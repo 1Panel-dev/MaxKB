@@ -1,0 +1,20 @@
+FROM python:3.11-slim-bullseye AS python-stage
+FROM postgres:17.4-bullseye
+
+ARG DEPENDENCIES="                    \
+        libexpat1-dev                 \
+        libffi-dev                    \
+        curl                          \
+        ca-certificates               \
+        vim                           \
+        gettext                       \
+        postgresql-17-pgvector        \
+        postgresql-17-age"
+
+RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
+    echo "Asia/Shanghai" > /etc/timezone && \
+    apt-get update && apt-get install -y --no-install-recommends $DEPENDENCIES && \
+    apt-get clean all  && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY --from=python-stage /usr/local /usr/local
