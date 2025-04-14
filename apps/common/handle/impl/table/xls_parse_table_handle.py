@@ -82,7 +82,10 @@ class XlsSplitHandle(BaseParseTableHandle):
                 for row in data:
                     # 将每个单元格中的内容替换换行符为 <br> 以保留原始格式
                     md_table += '| ' + ' | '.join(
-                        [str(cell).replace('\n', '<br>') if cell else '' for cell in row]) + ' |\n'
+                        [str(cell)
+                         .replace('\r\n', '<br>')
+                         .replace('\n', '<br>')
+                         if cell else '' for cell in row]) + ' |\n'
                 md_tables += md_table + '\n\n'
 
             return md_tables
