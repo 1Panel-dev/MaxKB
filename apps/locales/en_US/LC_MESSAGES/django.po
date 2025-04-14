@@ -1,0 +1,104 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-04-14 20:02+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: .\apps\common\auth\authenticate.py:63 .\apps\common\auth\authenticate.py:84
+msgid "Not logged in, please log in first"
+msgstr ""
+
+#: .\apps\common\auth\authenticate.py:69 .\apps\common\auth\authenticate.py:75
+#: .\apps\common\auth\authenticate.py:90 .\apps\common\auth\authenticate.py:96
+msgid "Authentication information is incorrect! illegal user"
+msgstr ""
+
+#: .\apps\common\auth\handle\impl\user_token.py:30
+msgid "Login expired"
+msgstr ""
+
+#: .\apps\common\constants\permission_constants.py:46
+msgid "ADMIN"
+msgstr ""
+
+#: .\apps\common\constants\permission_constants.py:46
+msgid "Super administrator"
+msgstr ""
+
+#: .\apps\common\exception\handle_exception.py:32
+msgid "Unknown exception"
+msgstr ""
+
+#: .\apps\common\result\api.py:17 .\apps\common\result\api.py:27
+msgid "response code"
+msgstr ""
+
+#: .\apps\common\result\api.py:18 .\apps\common\result\api.py:19
+#: .\apps\common\result\api.py:28 .\apps\common\result\api.py:29
+msgid "error prompt"
+msgstr ""
+
+#: .\apps\common\result\api.py:43
+msgid "total number of data"
+msgstr ""
+
+#: .\apps\common\result\api.py:44
+msgid "current page"
+msgstr ""
+
+#: .\apps\common\result\api.py:45
+msgid "page size"
+msgstr ""
+
+#: .\apps\common\result\result.py:31
+msgid "Success"
+msgstr ""
+
+#: .\apps\maxkb\settings\base.py:80
+msgid "Intelligent customer service platform"
+msgstr ""
+
+#: .\apps\users\serializers\login.py:23
+msgid "Username"
+msgstr ""
+
+#: .\apps\users\serializers\login.py:24
+msgid "Password"
+msgstr ""
+
+#: .\apps\users\serializers\login.py:31
+msgid "token"
+msgstr ""
+
+#: .\apps\users\serializers\login.py:43
+msgid "The username or password is incorrect"
+msgstr ""
+
+#: .\apps\users\serializers\login.py:45
+msgid "The user has been disabled, please contact the administrator!"
+msgstr ""
+
+#: .\apps\users\views\login.py:21 .\apps\users\views\login.py:22
+msgid "Log in"
+msgstr ""
+
+#: .\apps\users\views\login.py:23 .\apps\users\views\user.py:26
+msgid "User management"
+msgstr ""
+
+#: .\apps\users\views\user.py:24 .\apps\users\views\user.py:25
+msgid "Get current user information"
+msgstr ""

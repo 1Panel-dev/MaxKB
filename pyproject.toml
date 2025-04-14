@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "maxkb"
+version = "2.1.0"
+description = "智能知识库问答系统"
+authors = ["shaohuzhang1 <shaohu.zhang@fit2cloud.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+django = "^5.2"
+drf-spectacular = {extras = ["sidecar"], version = "^0.28.0"}
+django-redis = "^5.4.0"
+psycopg2-binary = "^2.9.10"
+django-db-connection-pool = "^1.2.5"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[[tool.poetry.source]]
+name = "pytorch"
+url = "https://download.pytorch.org/whl/cpu"
+priority = "explicit"

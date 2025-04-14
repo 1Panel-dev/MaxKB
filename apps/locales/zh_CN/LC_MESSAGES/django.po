@@ -1,0 +1,104 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-04-14 19:50+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: .\apps\common\auth\authenticate.py:63 .\apps\common\auth\authenticate.py:84
+msgid "Not logged in, please log in first"
+msgstr "未登录，请先登录"
+
+#: .\apps\common\auth\authenticate.py:69 .\apps\common\auth\authenticate.py:75
+#: .\apps\common\auth\authenticate.py:90 .\apps\common\auth\authenticate.py:96
+msgid "Authentication information is incorrect! illegal user"
+msgstr "身份验证信息不正确！非法用户"
+
+#: .\apps\common\auth\handle\impl\user_token.py:30
+msgid "Login expired"
+msgstr "登录已过期"
+
+#: .\apps\common\constants\permission_constants.py:46
+msgid "ADMIN"
+msgstr "管理员"
+
+#: .\apps\common\constants\permission_constants.py:46
+msgid "Super administrator"
+msgstr "超级管理员"
+
+#: .\apps\common\exception\handle_exception.py:32
+msgid "Unknown exception"
+msgstr "未知错误"
+
+#: .\apps\common\result\api.py:17 .\apps\common\result\api.py:27
+msgid "response code"
+msgstr "响应码"
+
+#: .\apps\common\result\api.py:18 .\apps\common\result\api.py:19
+#: .\apps\common\result\api.py:28 .\apps\common\result\api.py:29
+msgid "error prompt"
+msgstr "错误提示"
+
+#: .\apps\common\result\api.py:43
+msgid "total number of data"
+msgstr "总数据"
+
+#: .\apps\common\result\api.py:44
+msgid "current page"
+msgstr "当前页"
+
+#: .\apps\common\result\api.py:45
+msgid "page size"
+msgstr "每页大小"
+
+#: .\apps\common\result\result.py:31
+msgid "Success"
+msgstr "成功"
+
+#: .\apps\maxkb\settings\base.py:80
+msgid "Intelligent customer service platform"
+msgstr "智能客服平台"
+
+#: .\apps\users\serializers\login.py:23
+msgid "Username"
+msgstr "用户名"
+
+#: .\apps\users\serializers\login.py:24
+msgid "Password"
+msgstr "密码"
+
+#: .\apps\users\serializers\login.py:31
+msgid "token"
+msgstr "令牌"
+
+#: .\apps\users\serializers\login.py:43
+msgid "The username or password is incorrect"
+msgstr "用户名或密码不正确"
+
+#: .\apps\users\serializers\login.py:45
+msgid "The user has been disabled, please contact the administrator!"
+msgstr "用户已被禁用，请联系管理员！"
+
+#: .\apps\users\views\login.py:21 .\apps\users\views\login.py:22
+msgid "Log in"
+msgstr "登录"
+
+#: .\apps\users\views\login.py:23 .\apps\users\views\user.py:26
+msgid "User management"
+msgstr "用户管理"
+
+#: .\apps\users\views\user.py:24 .\apps\users\views\user.py:25
+msgid "Get current user information"
+msgstr "获取当前用户信息"
