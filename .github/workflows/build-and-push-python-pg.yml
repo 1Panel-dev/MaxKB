@@ -33,14 +33,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ${{ github.ref_name }}
       - name: Prepare
         id: prepare
         run: |
           DOCKER_IMAGE=ghcr.io/1panel-dev/maxkb-python-pg
           DOCKER_PLATFORMS=${{ github.event.inputs.architecture }}
           TAG_NAME=python3.11-pg17.4
-          DOCKER_IMAGE_TAGS="--tag ${DOCKER_IMAGE}:${TAG_NAME} --tag ${DOCKER_IMAGE}:latest"
+          DOCKER_IMAGE_TAGS="--tag ${DOCKER_IMAGE}:${TAG_NAME}"
           echo ::set-output name=docker_image::${DOCKER_IMAGE}
           echo ::set-output name=version::${TAG_NAME}
           echo ::set-output name=buildx_args::--platform ${DOCKER_PLATFORMS} --no-cache \
