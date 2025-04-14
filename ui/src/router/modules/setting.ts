@@ -59,7 +59,7 @@ const settingRouter = {
       meta: {
         icon: 'app-setting',
         iconActive: 'app-setting-active',
-        title: 'common.setting',
+        title: 'views.system.subTitle',
         activeMenu: '/setting',
         parentPath: '/setting',
         parentName: 'setting',

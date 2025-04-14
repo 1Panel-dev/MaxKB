@@ -1,5 +1,6 @@
 export default {
-  title: '系统设置',
+  title: '系统管理',
+  subTitle: '系统设置',
   test: '测试连接',
   testSuccess: '测试连接成功',
   testFailed: '测试连接失败',
