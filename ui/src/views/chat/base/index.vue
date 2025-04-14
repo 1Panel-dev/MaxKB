@@ -42,7 +42,6 @@
         </template>
       </AiChat>
     </div>
-    <div class="chat__footer"></div>
   </div>
 </template>
 <script setup lang="ts">
@@ -100,25 +99,6 @@ function refresh(id: string) {
     overflow: hidden;
   }
 
-  &__footer {
-    background: #f3f7f9;
-    height: 80px;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    box-sizing: border-box;
-    border-radius: 8px !important;
-    &:before {
-      background: linear-gradient(0deg, #f3f7f9 0%, rgba(243, 247, 249, 0) 100%);
-      content: '';
-      position: absolute;
-      width: 100%;
-      top: -16px;
-      left: 0;
-      height: 16px;
-    }
-  }
   .chat-width {
     // max-width: 80%;
     margin: 0 auto;
