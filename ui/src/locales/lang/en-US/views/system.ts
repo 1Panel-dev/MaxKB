@@ -123,7 +123,7 @@ export default {
     websiteSlogan: 'Welcome Slogan',
     websiteSloganPlaceholder: 'Please enter the welcome slogan',
     websiteSloganTip: 'The welcome slogan below the product logo',
-    defaultSlogan: 'Ready-to-use, flexible RAG Chatbot',
+    defaultSlogan: 'Ready-to-use open-source AI assistant',
     defaultTip: 'The default is the MaxKB platform interface, supports custom settings',
     logoDefaultTip: 'The default is the MaxKB login interface, supports custom settings',
     platformSetting: 'Platform Settings',
