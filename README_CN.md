@@ -1,5 +1,5 @@
 <p align="center"><img src= "https://github.com/1Panel-dev/maxkb/assets/52996290/c0694996-0eed-40d8-b369-322bf2a380bf" alt="MaxKB" width="300" /></p>
-<h3 align="center">基于大模型和 RAG 的知识库问答系统</h3>
+<h3 align="center">让 AI 助手更智能、更高效</h3>
 <p align="center">
     <a href="https://trendshift.io/repositories/9113" target="_blank"><img src="https://trendshift.io/api/badge/repositories/9113" alt="1Panel-dev%2FMaxKB | Trendshift" style="width: 250px; height: auto;" /></a>
     <a href="https://market.aliyun.com/products/53690006/cmjj00067609.html?userCode=kmemb8jp" target="_blank"><img src="https://img.alicdn.com/imgextra/i2/O1CN01H5JIwY1rZ0OobDjnJ_!!6000000005644-2-tps-1000-216.png" alt="1Panel-dev%2FMaxKB | Aliyun" style="width: 250px; height: auto;" /></a>
@@ -13,7 +13,7 @@
 </p>
 <hr/>
 
-MaxKB = Max Knowledge Brain，是一款开箱即用的 AI Chatbot，支持 RAG 检索增强、工作流编排、MCP 工具调用能力。MaxKB 支持对接各种主流大语言模型，广泛应用于智能客服、企业内部知识库问答、AI 助手搭建、学术研究与教育等场景。
+MaxKB = Max Knowledge Brain，是一款开箱即用的 AI 助手，支持 RAG 检索增强、工作流编排、MCP 工具调用能力。MaxKB 支持对接各种主流大语言模型，广泛应用于智能客服、企业内部知识库问答、员工助手、学术研究与教育等场景。
 
 - **RAG 检索增强**：支持直接上传文档 / 自动爬取在线文档，支持文本自动拆分、向量化和 RAG（检索增强生成），有效减少大模型幻觉，智能问答交互体验好；
 - **灵活编排**：内置强大的工作流引擎、函数库和 MCP 工具调用能力，支持编排 AI 工作过程，满足复杂业务场景下的需求；
