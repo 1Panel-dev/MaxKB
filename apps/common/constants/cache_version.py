@@ -10,5 +10,16 @@ from enum import Enum
 
 
 class Cache_Version(Enum):
-    # 系统用户
-    TOKEN = "TOKEN"
+    # 令牌
+    TOKEN = "TOKEN", lambda token: token
+    # 工作空间列表
+    WORKSPACE_LIST = "WORKSPACE::LIST", lambda user_id: user_id
+    # 用户数据
+    USER = "USER", lambda user_id: user_id
+    # 当前用户在当前工作空间的角色列表+本身的角色
+    ROLE_LIST = "ROLE::LIST", lambda user_id, workspace_id: f"{user_id}::{workspace_id}"
+    # 当前用户在当前工作空间的权限列表+本身的权限列表
+    PERMISSION_LIST = "PERMISSION::LIST", lambda user_id, workspace_id: f"{user_id}::{workspace_id}"
+
+
+version, get_key = Cache_Version.TOKEN.value

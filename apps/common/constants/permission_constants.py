@@ -8,8 +8,6 @@
 from enum import Enum
 from typing import List
 
-from django.utils.translation import gettext_lazy as _
-
 
 class Group(Enum):
     """
@@ -26,6 +24,10 @@ class Operate(Enum):
     EDIT = "EDIT"
     CREATE = "CREATE"
     DELETE = "DELETE"
+    """
+    使用权限
+    """
+    USE = "USE"
 
 
 class RoleGroup(Enum):
@@ -43,7 +45,9 @@ class Role:
 
 
 class RoleConstants(Enum):
-    ADMIN = Role(_("ADMIN"), _('Super administrator'), RoleGroup.SYSTEM_USER)
+    ADMIN = Role("ADMIN", '超级管理员', RoleGroup.SYSTEM_USER)
+    WORKSPACE_MANAGE = Role("WORKSPACE_MANAGE", '工作空间管理员', RoleGroup.SYSTEM_USER)
+    USER = Role("USER", '普通用户', RoleGroup.SYSTEM_USER)
 
 
 class Permission:
@@ -51,13 +55,24 @@ class Permission:
     权限信息
     """
 
-    def __init__(self, group: Group, operate: Operate, roles=None, dynamic_tag=None):
-        if roles is None:
-            roles = []
+    def __init__(self, group: Group, operate: Operate, dynamic_tag=None, role_list=None):
+        if role_list is None:
+            role_list = []
         self.group = group
         self.operate = operate
-        self.roleList = roles
         self.dynamic_tag = dynamic_tag
+        # 用于获取角色与权限的关系,只适用于没有权限管理的
+        self.role_list = role_list
+
+    @staticmethod
+    def new_instance(permission_str: str):
+        permission_split = permission_str.split(":")
+        group = Group[permission_split[0]]
+        operate = Operate[permission_split[2]]
+        if len(permission_split) > 2:
+            dynamic_tag = ":".join(permission_split[2:])
+            return Permission(group, operate, dynamic_tag)
+        return Permission(group, operate)
 
     def __str__(self):
         return self.group.value + ":" + self.operate.value + (
@@ -71,19 +86,20 @@ class PermissionConstants(Enum):
     """
      权限枚举
     """
-    USER_READ = Permission(group=Group.USER, operate=Operate.READ, roles=[RoleConstants.ADMIN])
-    USER_EDIT = Permission(group=Group.USER, operate=Operate.EDIT, roles=[RoleConstants.ADMIN])
-    USER_DELETE = Permission(group=Group.USER, operate=Operate.DELETE, roles=[RoleConstants.ADMIN])
+    USER_READ = Permission(group=Group.USER, operate=Operate.READ, role_list=[RoleConstants.ADMIN,
+                                                                              RoleConstants.USER])
+    USER_EDIT = Permission(group=Group.USER, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN])
+    USER_DELETE = Permission(group=Group.USER, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN])
 
 
-def get_permission_list_by_role(role: RoleConstants):
+def get_default_permission_list_by_role(role: RoleConstants):
     """
     根据角色 获取角色对应的权限
     :param role: 角色
     :return: 权限
     """
     return list(map(lambda k: PermissionConstants[k],
-                    list(filter(lambda k: PermissionConstants[k].value.roleList.__contains__(role),
+                    list(filter(lambda k: PermissionConstants[k].value.role_list.__contains__(role),
                                 PermissionConstants.__members__))))
 
 
@@ -92,14 +108,21 @@ class Auth:
      用于存储当前用户的角色和权限
     """
 
-    def __init__(self, role_list: List[RoleConstants], permission_list: List[PermissionConstants | Permission]
-                 , client_id, client_type, current_role: RoleConstants, **keywords):
-        self.role_list = role_list
+    def __init__(self,
+                 work_space_list: List,
+                 current_workspace,
+                 current_role_list: List[Role],
+                 permission_list: List[PermissionConstants | Permission],
+                 **keywords):
+        # 当前用户所有工作空间
+        self.work_space_list = work_space_list
+        # 当前工作空间
+        self.current_workspace = current_workspace
+        # 当前工作空间的所有权限+非工作空间权限
         self.permission_list = permission_list
-        self.client_id = client_id
-        self.client_type = client_type
+        # 当前工作空间角色列表
+        self.current_role_list = current_role_list
         self.keywords = keywords
-        self.current_role = current_role
 
 
 class CompareConstants(Enum):

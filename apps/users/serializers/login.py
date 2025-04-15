@@ -46,6 +46,8 @@ class LoginSerializer(serializers.Serializer):
         token = signing.dumps({'username': user.username,
                                'id': str(user.id),
                                'email': user.email,
-                               'type': AuthenticationType.SYSTEM_USER.value})
-        cache.set(token, user, version=Cache_Version.TOKEN)
+                               'type': AuthenticationType.SYSTEM_USER.value,
+                               'current_workspace': 'default'})
+        version, get_key = Cache_Version.TOKEN.value
+        cache.set(get_key(token), user, version=version)
         return {'token': token}

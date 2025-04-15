@@ -12,11 +12,11 @@ from importlib import import_module
 from django.conf import settings
 from django.core import cache
 from django.core import signing
+from django.utils.translation import gettext_lazy as _
 from rest_framework.authentication import TokenAuthentication
 
 from common.exception.app_exception import AppAuthenticationFailed, AppEmbedIdentityFailed, AppChatNumOutOfBoundsFailed, \
-    ChatException, AppApiException
-from django.utils.translation import gettext_lazy as _
+    AppApiException
 
 token_cache = cache.caches['default']
 
