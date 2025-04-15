@@ -8,10 +8,10 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.11"
 django = "^5.2"
-drf-spectacular = {extras = ["sidecar"], version = "^0.28.0"}
+drf-spectacular = { extras = ["sidecar"], version = "^0.28.0" }
 django-redis = "^5.4.0"
-psycopg2-binary = "^2.9.10"
 django-db-connection-pool = "^1.2.5"
+psycopg = {extras = ["binary"], version = "^3.2.6"}
 
 
 [build-system]
