@@ -1,6 +1,5 @@
 <p align="center"><img src= "https://github.com/1Panel-dev/maxkb/assets/52996290/c0694996-0eed-40d8-b369-322bf2a380bf" alt="MaxKB" width="300" /></p>
 <h3 align="center">基于大模型和 RAG 的知识库问答系统</h3>
-<h4 align="center">Ready-to-use, flexible RAG Chatbot</h4>
 <p align="center">
     <a href="https://trendshift.io/repositories/9113" target="_blank"><img src="https://trendshift.io/api/badge/repositories/9113" alt="1Panel-dev%2FMaxKB | Trendshift" style="width: 250px; height: auto;" /></a>
     <a href="https://market.aliyun.com/products/53690006/cmjj00067609.html?userCode=kmemb8jp" target="_blank"><img src="https://img.alicdn.com/imgextra/i2/O1CN01H5JIwY1rZ0OobDjnJ_!!6000000005644-2-tps-1000-216.png" alt="1Panel-dev%2FMaxKB | Aliyun" style="width: 250px; height: auto;" /></a>
@@ -14,12 +13,12 @@
 </p>
 <hr/>
 
-MaxKB = Max Knowledge Brain，是一款开箱即用的 RAG Chatbot，具备强大的工作流和 MCP 工具调用能力。它支持对接各种主流大语言模型（LLMs），广泛应用于智能客服、企业内部知识库、学术研究与教育等场景。
+MaxKB = Max Knowledge Brain，是一款开箱即用的 AI Chatbot，支持 RAG 检索增强、工作流编排、MCP 工具调用能力。MaxKB 能够无缝对接各种主流大语言模型，适用于智能客服、企业内部知识库管理、AI 助手搭建、学术研究与教育等多种场景。
 
-- **开箱即用**：支持直接上传文档 / 自动爬取在线文档，支持文本自动拆分、向量化和 RAG（检索增强生成），有效减少大模型幻觉，智能问答交互体验好；
-- **模型中立**：支持对接各种大模型，包括本地私有大模型（DeepSeek R1 / Llama 3 / Qwen 2 等）、国内公共大模型（通义千问 / 腾讯混元 / 字节豆包 / 百度千帆 / 智谱 AI / Kimi 等）和国外公共大模型（OpenAI / Claude / Gemini 等）；
+- **RAG 检索增强**：支持直接上传文档 / 自动爬取在线文档，支持文本自动拆分、向量化和 RAG（检索增强生成），有效减少大模型幻觉，智能问答交互体验好；
 - **灵活编排**：内置强大的工作流引擎、函数库和 MCP 工具调用能力，支持编排 AI 工作过程，满足复杂业务场景下的需求；
-- **无缝嵌入**：支持零编码快速嵌入到第三方业务系统，让已有系统快速拥有智能问答能力，提高用户满意度。
+- **无缝嵌入**：支持零编码快速嵌入到第三方业务系统，让已有系统快速拥有智能问答能力，提高用户满意度；
+- **模型中立**：支持对接各种大模型，包括本地私有大模型（DeepSeek R1 / Llama 3 / Qwen 2 等）、国内公共大模型（通义千问 / 腾讯混元 / 字节豆包 / 百度千帆 / 智谱 AI / Kimi 等）和国外公共大模型（OpenAI / Claude / Gemini 等）。
 
 MaxKB 三分钟视频介绍：https://www.bilibili.com/video/BV18JypYeEkj/
 
