@@ -7,12 +7,12 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-django = "^5.2"
-drf-spectacular = { extras = ["sidecar"], version = "^0.28.0" }
-django-redis = "^5.4.0"
-django-db-connection-pool = "^1.2.5"
-psycopg = {extras = ["binary"], version = "^3.2.6"}
-
+django = "5.2"
+drf-spectacular = { extras = ["sidecar"], version = "0.28.0" }
+django-redis = "5.4.0"
+django-db-connection-pool = "1.2.5"
+psycopg = {extras = ["binary"], version = "3.2.6"}
+python-dotenv = "1.1.0"
 
 [build-system]
 requires = ["poetry-core"]
