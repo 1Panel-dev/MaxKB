@@ -42,7 +42,7 @@ def get_workspace_resource_permission_list(permission_id, workspace_id, workspac
         return [
             get_workspace_permission(permission_id, workspace_id), get_permission(permission_id)]
     return [
-        f"{permission_id}:/WORKSPACE/{workspace_id}/{workspace_user_permission.auth_target_type}/{workspace_user_permission.taget}"
+        f"{permission_id}:/WORKSPACE/{workspace_id}/{workspace_user_permission.auth_target_type}/{workspace_user_permission.target}"
         for workspace_user_permission in
         workspace_user_permission_list if workspace_user_permission.is_auth] + [
         get_workspace_permission(permission_id, workspace_id), get_permission(permission_id)]
