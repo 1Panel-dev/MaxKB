@@ -109,6 +109,8 @@ class PermissionConstants(Enum):
                                                                               RoleConstants.USER])
     USER_EDIT = Permission(group=Group.USER, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN])
     USER_DELETE = Permission(group=Group.USER, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN])
+    TOOL_CREATE = Permission(group=Group.USER, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN,
+                                                                                  RoleConstants.USER])
 
     def get_workspace_application_permission(self):
         return lambda r, kwargs: Permission(group=self.value.group, operate=self.value.operate,

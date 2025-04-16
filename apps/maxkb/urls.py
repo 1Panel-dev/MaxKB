@@ -30,6 +30,7 @@ SpectacularRedocView.permission_classes = [permissions.AllowAny]
 SpectacularRedocView.authentication_classes = [AnonymousAuthentication]
 urlpatterns = [
     path("api/", include("users.urls")),
+    path("api/", include("tools.urls"))
 ]
 urlpatterns += [
     path('schema/', SpectacularAPIView.as_view(), name='schema'),  # schema的配置文件的路由，下面两个ui也是根据这个配置文件来生成的
