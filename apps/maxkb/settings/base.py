@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'drf_spectacular_sidecar',
     'users.apps.UsersConfig',
+    'tools.apps.ToolConfig',
     'common',
     'system_manage'
 ]
