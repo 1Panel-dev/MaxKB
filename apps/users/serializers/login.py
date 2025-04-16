@@ -6,6 +6,8 @@
     @date：2025/4/14 11:08
     @desc:
 """
+import datetime
+
 from django.core import signing
 from django.core.cache import cache
 from django.db.models import QuerySet
@@ -46,8 +48,7 @@ class LoginSerializer(serializers.Serializer):
         token = signing.dumps({'username': user.username,
                                'id': str(user.id),
                                'email': user.email,
-                               'type': AuthenticationType.SYSTEM_USER.value,
-                               'current_workspace': 'default'})
+                               'type': AuthenticationType.SYSTEM_USER.value})
         version, get_key = Cache_Version.TOKEN.value
-        cache.set(get_key(token), user, version=version)
+        cache.set(get_key(token), user, timeout=datetime.timedelta(seconds=60 * 60 * 2).seconds, version=version)
         return {'token': token}

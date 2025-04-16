@@ -15,6 +15,10 @@ class Group(Enum):
     """
     USER = "USER"
 
+    APPLICATION = "APPLICATION"
+
+    KNOWLEDGE = "KNOWLEDGE"
+
 
 class Operate(Enum):
     """
@@ -38,10 +42,18 @@ class RoleGroup(Enum):
 
 
 class Role:
-    def __init__(self, name: str, decs: str, group: RoleGroup):
+    def __init__(self, name: str, decs: str, group: RoleGroup, resource_path=None):
         self.name = name
         self.decs = decs
         self.group = group
+        self.resource_path = resource_path
+
+    def __str__(self):
+        return self.name + (
+            (":" + self.resource_path) if self.resource_path is not None else '')
+
+    def __eq__(self, other):
+        return str(self) == str(other)
 
 
 class RoleConstants(Enum):
@@ -49,18 +61,25 @@ class RoleConstants(Enum):
     WORKSPACE_MANAGE = Role("WORKSPACE_MANAGE", '工作空间管理员', RoleGroup.SYSTEM_USER)
     USER = Role("USER", '普通用户', RoleGroup.SYSTEM_USER)
 
+    def get_workspace_role(self):
+        return lambda r, kwargs: Role(name=self.value.name,
+                                      decs=self.value.decs,
+                                      group=self.value.group,
+                                      resource_path=
+                                      f"/WORKSPACE/{kwargs.get('workspace_id')}")
+
 
 class Permission:
     """
     权限信息
     """
 
-    def __init__(self, group: Group, operate: Operate, dynamic_tag=None, role_list=None):
+    def __init__(self, group: Group, operate: Operate, resource_path=None, role_list=None):
         if role_list is None:
             role_list = []
         self.group = group
         self.operate = operate
-        self.dynamic_tag = dynamic_tag
+        self.resource_path = resource_path
         # 用于获取角色与权限的关系,只适用于没有权限管理的
         self.role_list = role_list
 
@@ -76,7 +95,7 @@ class Permission:
 
     def __str__(self):
         return self.group.value + ":" + self.operate.value + (
-            (":" + self.dynamic_tag) if self.dynamic_tag is not None else '')
+            (":" + self.resource_path) if self.resource_path is not None else '')
 
     def __eq__(self, other):
         return str(self) == str(other)
@@ -90,6 +109,27 @@ class PermissionConstants(Enum):
                                                                               RoleConstants.USER])
     USER_EDIT = Permission(group=Group.USER, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN])
     USER_DELETE = Permission(group=Group.USER, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN])
+
+    def get_workspace_application_permission(self):
+        return lambda r, kwargs: Permission(group=self.value.group, operate=self.value.operate,
+                                            resource_path=
+                                            f"/WORKSPACE/{kwargs.get('workspace_id')}/APPLICATION/{kwargs.get('application_id')}")
+
+    def get_workspace_knowledge_permission(self):
+        return lambda r, kwargs: Permission(group=self.value.group, operate=self.value.operate,
+                                            resource_path=
+                                            f"/WORKSPACE/{kwargs.get('workspace_id')}/KNOWLEDGE/{kwargs.get('knowledge_id')}")
+
+    def get_workspace_permission(self):
+        return lambda r, kwargs: Permission(group=self.value.group, operate=self.value.operate,
+                                            resource_path=
+                                            f"/WORKSPACE/{kwargs.get('workspace_id')}")
+
+    def __eq__(self, other):
+        if isinstance(other, PermissionConstants):
+            return other == self
+        else:
+            return self.value == other
 
 
 def get_default_permission_list_by_role(role: RoleConstants):
@@ -109,15 +149,9 @@ class Auth:
     """
 
     def __init__(self,
-                 work_space_list: List,
-                 current_workspace,
                  current_role_list: List[Role],
                  permission_list: List[PermissionConstants | Permission],
                  **keywords):
-        # 当前用户所有工作空间
-        self.work_space_list = work_space_list
-        # 当前工作空间
-        self.current_workspace = current_workspace
         # 当前工作空间的所有权限+非工作空间权限
         self.permission_list = permission_list
         # 当前工作空间角色列表
