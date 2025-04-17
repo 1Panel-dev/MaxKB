@@ -6,12 +6,12 @@
     @date：2025/4/14 19:25
     @desc:
 """
-from drf_spectacular.utils import extend_schema
-from rest_framework.views import APIView
 from django.utils.translation import gettext_lazy as _
+from drf_spectacular.utils import extend_schema
 from rest_framework.request import Request
+from rest_framework.views import APIView
 
-from common.auth import TokenAuth
+from common.auth.authenticate import TokenAuth
 from common.auth.authentication import has_permissions
 from common.constants.permission_constants import PermissionConstants
 from common.result import result
@@ -36,7 +36,7 @@ class TestPermissionsUserView(APIView):
 
     @extend_schema(methods=['GET'],
                    description=_("Get current user information"),
-                   operation_id=_("Get current user information"),
+                   operation_id="测试",
                    tags=[_("User management")],
                    responses=UserProfileAPI.get_response())
     @has_permissions(PermissionConstants.USER_EDIT)
