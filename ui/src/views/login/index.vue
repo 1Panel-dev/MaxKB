@@ -34,6 +34,20 @@
               </el-input>
             </el-form-item>
           </div>
+          <div class="mb-24">
+            <el-form-item prop="code">
+              <div class="flex-between w-full">
+                <el-input
+                  size="large"
+                  class="input-item"
+                  v-model="loginForm.code"
+                  placeholder="请输入验证码"
+                >
+                </el-input>
+                <VerifyCode v-model:code="identifyCode" />
+              </div>
+            </el-form-item>
+          </div>
         </el-form>
 
         <el-button size="large" type="primary" class="w-full" @click="login"
@@ -63,6 +77,7 @@ import type { FormInstance, FormRules } from 'element-plus'
 import type { LoginRequest } from '@/api/type/login'
 import LoginContainer from '@/views/login/components/LoginContainer.vue'
 import LoginLayout from '@/views/login/components/LoginLayout.vue'
+import VerifyCode from './components/VerifyCode.vue'
 import { t, getBrowserLang } from '@/locales'
 import useStore from '@/stores'
 
@@ -70,11 +85,13 @@ const router = useRouter()
 const { user } = useStore()
 // const { locale } = useI18n({ useScope: 'global' })
 const loading = ref<boolean>(false)
+const identifyCode = ref<string>('1234')
 
 const loginFormRef = ref<FormInstance>()
 const loginForm = ref<LoginRequest>({
   username: '',
   password: '',
+  code: '',
 })
 
 const rules = ref<FormRules<LoginRequest>>({
