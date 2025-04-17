@@ -7,3 +7,4 @@
     @desc:
 """
 from .workspace_user_permission import *
+from .system_setting import *

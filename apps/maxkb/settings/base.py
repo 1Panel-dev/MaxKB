@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'tools.apps.ToolConfig',
     'common',
-    'system_manage'
+    'system_manage',
+    'models_provider',
 ]
 
 MIDDLEWARE = [
