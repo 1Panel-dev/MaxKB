@@ -15,7 +15,7 @@ from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
 from common.constants.permission_constants import PermissionConstants
 from common.result import result
-from users.api.user import UserProfileAPI
+from users.api.user import UserProfileAPI, TestWorkspacePermissionUserApi
 from users.serializers.user import UserProfileSerializer
 
 
@@ -41,4 +41,18 @@ class TestPermissionsUserView(APIView):
                    responses=UserProfileAPI.get_response())
     @has_permissions(PermissionConstants.USER_EDIT)
     def get(self, request: Request):
+        return result.success(UserProfileSerializer().profile(request.user))
+
+
+class TestWorkspacePermissionUserView(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(methods=['GET'],
+                   description="针对工作空间下权限校验",
+                   operation_id="针对工作空间下权限校验",
+                   tags=[_("User management")],
+                   responses=UserProfileAPI.get_response(),
+                   parameters=TestWorkspacePermissionUserApi.get_parameters())
+    @has_permissions(PermissionConstants.USER_EDIT.get_workspace_permission())
+    def get(self, request: Request, workspace_id):
         return result.success(UserProfileSerializer().profile(request.user))
