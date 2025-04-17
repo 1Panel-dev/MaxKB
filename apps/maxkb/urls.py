@@ -15,19 +15,11 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path, re_path, include
-from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
-from rest_framework import permissions
-from common.auth import AnonymousAuthentication
 from django.views import static
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 from maxkb import settings
 
-SpectacularSwaggerView.permission_classes = [permissions.AllowAny]
-SpectacularSwaggerView.authentication_classes = [AnonymousAuthentication]
-SpectacularAPIView.permission_classes = [permissions.AllowAny]
-SpectacularAPIView.authentication_classes = [AnonymousAuthentication]
-SpectacularRedocView.permission_classes = [permissions.AllowAny]
-SpectacularRedocView.authentication_classes = [AnonymousAuthentication]
 urlpatterns = [
     path("api/", include("users.urls")),
     path("api/", include("tools.urls"))
