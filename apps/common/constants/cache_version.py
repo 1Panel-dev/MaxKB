@@ -21,6 +21,8 @@ class Cache_Version(Enum):
     # 当前用户所有权限
     PERMISSION_LIST = "PERMISSION:LIST", lambda user_id: user_id
 
+    CAPTCHA = "CAPTCHA", lambda captcha: captcha
+
     def get_version(self):
         return self.value[0]
 

@@ -15,6 +15,7 @@ psycopg = { extras = ["binary"], version = "3.2.6" }
 python-dotenv = "1.1.0"
 uuid-utils = "0.10.0"
 diskcache2 = "0.1.2"
+captcha = "0.7.1"
 langchain-openai = "^0.3.0"
 langchain-anthropic = "^0.3.0"
 langchain-community = "^0.3.0"

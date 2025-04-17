@@ -7,6 +7,8 @@
     @desc:
 """
 import hashlib
+
+import random
 import io
 import mimetypes
 import re
@@ -47,6 +49,13 @@ def group_by(list_source: List, key):
         result[k] = array
     return result
 
+
+
+CHAR_SET = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+
+
+def get_random_chars(number=6):
+    return "".join([CHAR_SET[random.randint(0, len(CHAR_SET) - 1)] for index in range(number)])
 
 def encryption(message: str):
     """
