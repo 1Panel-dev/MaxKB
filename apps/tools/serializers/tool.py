@@ -13,7 +13,7 @@ class ToolModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tool
         fields = ['id', 'name', 'icon', 'desc', 'code', 'input_field_list', 'init_field_list', 'init_params',
-                  'scope', 'is_active', 'user_id', 'template_id',
+                  'scope', 'is_active', 'user_id', 'template_id', 'workspace_id', 'module_id',
                   'create_time', 'update_time']
 
 
@@ -38,11 +38,13 @@ class ToolCreateRequest(serializers.Serializer):
 
     code = serializers.CharField(required=True, label=_('tool content'))
 
-    input_field_list = serializers.ListField(child=ToolInputField(), required=True, label=_('input field list'))
+    input_field_list = serializers.ListField(child=ToolInputField(), required=False, label=_('input field list'))
 
     init_field_list = serializers.ListField(required=False, default=list, label=_('init field list'))
 
     is_active = serializers.BooleanField(required=False, label=_('Is active'))
+
+    module_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, default='root')
 
 
 class ToolSerializer(serializers.Serializer):
@@ -58,8 +60,8 @@ class ToolSerializer(serializers.Serializer):
                         desc=instance.get('desc'),
                         code=instance.get('code'),
                         user_id=self.data.get('user_id'),
-                        input_field_list=instance.get('input_field_list'),
-                        init_field_list=instance.get('init_field_list'),
+                        input_field_list=instance.get('input_field_list', []),
+                        init_field_list=instance.get('init_field_list', []),
                         scope=ToolScope.WORKSPACE,
                         is_active=False)
             tool.save()
