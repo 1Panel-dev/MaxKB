@@ -9,7 +9,7 @@
 
 from common.mixins.api_mixin import APIMixin
 from common.result import ResultSerializer
-from users.serializers.login import LoginResponse, LoginRequest
+from users.serializers.login import LoginResponse, LoginRequest, CaptchaResponse
 
 
 class ApiLoginResponse(ResultSerializer):
@@ -40,3 +40,14 @@ class LoginAPI(APIMixin):
     @staticmethod
     def get_response():
         return ApiLoginResponse
+
+
+class ApiCaptchaResponse(ResultSerializer):
+    def get_data(self):
+        return CaptchaResponse()
+
+
+class CaptchaAPI(APIMixin):
+    @staticmethod
+    def get_response():
+        return ApiCaptchaResponse

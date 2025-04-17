@@ -102,3 +102,12 @@ msgstr "用户管理"
 #: .\apps\users\views\user.py:24 .\apps\users\views\user.py:25
 msgid "Get current user information"
 msgstr "获取当前用户信息"
+
+msgid "Get captcha"
+msgstr "获取验证码"
+
+msgid "captcha"
+msgstr "验证码"
+
+msgid "Captcha code error or expiration"
+msgstr "验证码错误或过期"

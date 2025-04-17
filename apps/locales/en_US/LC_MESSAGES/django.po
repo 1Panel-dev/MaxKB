@@ -102,3 +102,12 @@ msgstr ""
 #: .\apps\users\views\user.py:24 .\apps\users\views\user.py:25
 msgid "Get current user information"
 msgstr ""
+
+msgid "Get captcha"
+msgstr ""
+
+msgid "captcha"
+msgstr ""
+
+msgid "Captcha code error or expiration"
+msgstr ""

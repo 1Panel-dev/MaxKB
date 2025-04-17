@@ -6,8 +6,10 @@
     @date：2025/4/14 11:08
     @desc:
 """
+import base64
 import datetime
 
+from captcha.image import ImageCaptcha
 from django.core import signing
 from django.core.cache import cache
 from django.db.models import QuerySet
@@ -17,13 +19,14 @@ from rest_framework import serializers
 from common.constants.authentication_type import AuthenticationType
 from common.constants.cache_version import Cache_Version
 from common.exception.app_exception import AppApiException
-from common.utils.common import password_encrypt
+from common.utils.common import password_encrypt, get_random_chars
 from users.models import User
 
 
 class LoginRequest(serializers.Serializer):
     username = serializers.CharField(required=True, max_length=64, help_text=_("Username"), label=_("Username"))
     password = serializers.CharField(required=True, max_length=128, label=_("Password"))
+    captcha = serializers.CharField(required=True, max_length=64, label=_('captcha'))
 
 
 class LoginResponse(serializers.Serializer):
@@ -40,6 +43,11 @@ class LoginSerializer(serializers.Serializer):
         LoginRequest(data=instance).is_valid(raise_exception=True)
         username = instance.get('username')
         password = instance.get('password')
+        captcha = instance.get('captcha')
+        captcha_cache = cache.get(Cache_Version.CAPTCHA.get_key(captcha=captcha),
+                                  version=Cache_Version.CAPTCHA.get_version())
+        if captcha_cache is None:
+            raise AppApiException(1005, _("Captcha code error or expiration"))
         user = QuerySet(User).filter(username=username, password=password_encrypt(password)).first()
         if user is None:
             raise AppApiException(500, _('The username or password is incorrect'))
@@ -52,3 +60,22 @@ class LoginSerializer(serializers.Serializer):
         version, get_key = Cache_Version.TOKEN.value
         cache.set(get_key(token), user, timeout=datetime.timedelta(seconds=60 * 60 * 2).seconds, version=version)
         return {'token': token}
+
+
+class CaptchaResponse(serializers.Serializer):
+    """
+       登录响应对象
+       """
+    captcha = serializers.CharField(required=True, label=_("captcha"))
+
+
+class CaptchaSerializer(serializers.Serializer):
+    @staticmethod
+    def generate():
+        chars = get_random_chars()
+        image = ImageCaptcha()
+        data = image.generate(chars)
+        captcha = base64.b64encode(data.getbuffer())
+        cache.set(Cache_Version.CAPTCHA.get_key(captcha=chars), chars,
+                  timeout=60, version=Cache_Version.CAPTCHA.get_version())
+        return {'captcha': 'data:image/png;base64,' + captcha.decode()}
