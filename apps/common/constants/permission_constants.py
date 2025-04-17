@@ -19,6 +19,8 @@ class Group(Enum):
 
     KNOWLEDGE = "KNOWLEDGE"
 
+    MODEL = "MODEL"
+
 
 class Operate(Enum):
     """
@@ -111,12 +113,13 @@ class PermissionConstants(Enum):
     USER_DELETE = Permission(group=Group.USER, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN])
     TOOL_CREATE = Permission(group=Group.USER, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN,
                                                                                   RoleConstants.USER])
-    MODEL_CREATE = Permission(group=Group.USER, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN,
-                                                                                   RoleConstants.USER])
-    MODEL_READ = Permission(group=Group.USER, operate=Operate.READ, role_list=[RoleConstants.ADMIN,
-                                                                               RoleConstants.USER])
-    MODEL_EDIT = Permission(group=Group.USER, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN, RoleConstants.USER])
-    MODEL_DELETE = Permission(group=Group.USER, operate=Operate.DELETE,
+    MODEL_CREATE = Permission(group=Group.MODEL, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN,
+                                                                                    RoleConstants.USER])
+    MODEL_READ = Permission(group=Group.MODEL, operate=Operate.READ, role_list=[RoleConstants.ADMIN,
+                                                                                RoleConstants.USER])
+    MODEL_EDIT = Permission(group=Group.MODEL, operate=Operate.EDIT,
+                            role_list=[RoleConstants.ADMIN, RoleConstants.USER])
+    MODEL_DELETE = Permission(group=Group.MODEL, operate=Operate.DELETE,
                               role_list=[RoleConstants.ADMIN, RoleConstants.USER])
 
     def get_workspace_application_permission(self):
