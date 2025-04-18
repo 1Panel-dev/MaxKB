@@ -88,4 +88,4 @@ class ModuleTreeView(APIView):
     def get(self, request: Request, workspace_id: str, source: str):
         return result.success(ModuleTreeSerializer(
             data={'workspace_id': workspace_id, 'source': source}
-        ).get_module_tree())
+        ).get_module_tree(request.query_params.get('name')))

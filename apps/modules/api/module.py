@@ -105,5 +105,12 @@ class ModuleTreeReadAPI(APIMixin):
                 enum=["APPLICATION", "KNOWLEDGE", "TOOL"],
                 location='path',
                 required=True,
-            )
+            ),
+            OpenApiParameter(
+                name="name",
+                description="名称",
+                type=OpenApiTypes.STR,
+                location='query',
+                required=False,
+            ),
         ]
