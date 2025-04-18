@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
 from common.constants.permission_constants import PermissionConstants
-from common.result import result, DefaultResultSerializer
+from common.result import result
 from tools.api.tool import ToolCreateAPI, ToolEditAPI, ToolReadAPI, ToolDeleteAPI, ToolTreeReadAPI
 from tools.serializers.tool import ToolSerializer, ToolTreeSerializer
 
@@ -60,7 +60,7 @@ class ToolView(APIView):
                        description=_('Delete tool'),
                        operation_id=_('Delete tool'),
                        parameters=ToolDeleteAPI.get_parameters(),
-                       responses=DefaultResultSerializer,
+                       responses=ToolDeleteAPI.get_response(),
                        tags=[_('Tool')])
         @has_permissions(PermissionConstants.TOOL_DELETE.get_workspace_permission())
         def delete(self, request: Request, workspace_id: str, tool_id: str):

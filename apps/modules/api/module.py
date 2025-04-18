@@ -3,7 +3,7 @@ from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter
 
 from common.mixins.api_mixin import APIMixin
-from common.result import ResultSerializer
+from common.result import ResultSerializer, DefaultResultSerializer
 from modules.models.module import ModuleCreateRequest, ModuleEditRequest
 from modules.serializers.module import ModuleSerializer
 
@@ -84,7 +84,9 @@ class ModuleEditAPI(ModuleReadAPI):
 
 
 class ModuleDeleteAPI(ModuleReadAPI):
-    pass
+    @staticmethod
+    def get_response():
+        return DefaultResultSerializer
 
 
 class ModuleTreeReadAPI(APIMixin):
