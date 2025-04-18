@@ -68,3 +68,24 @@ class ToolEditAPI(ToolReadAPI):
 
 class ToolDeleteAPI(ToolReadAPI):
     pass
+
+
+class ToolTreeReadAPI(APIMixin):
+    @staticmethod
+    def get_parameters():
+        return [
+            OpenApiParameter(
+                name="workspace_id",
+                description="工作空间id",
+                type=OpenApiTypes.STR,
+                location='path',
+                required=True,
+            ),
+            OpenApiParameter(
+                name="module_id",
+                description="模块id",
+                type=OpenApiTypes.STR,
+                location='query',
+                required=True,
+            )
+        ]

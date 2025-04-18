@@ -7,8 +7,8 @@ from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
 from common.constants.permission_constants import PermissionConstants
 from common.result import result
-from tools.api.tool import ToolCreateAPI, ToolEditAPI, ToolReadAPI, ToolDeleteAPI
-from tools.serializers.tool import ToolSerializer
+from tools.api.tool import ToolCreateAPI, ToolEditAPI, ToolReadAPI, ToolDeleteAPI, ToolTreeReadAPI
+from tools.serializers.tool import ToolSerializer, ToolTreeSerializer
 
 
 class ToolView(APIView):
@@ -45,8 +45,8 @@ class ToolView(APIView):
             ).edit(request.data))
 
         @extend_schema(methods=['GET'],
-                       description=_('Update tool'),
-                       operation_id=_('Update tool'),
+                       description=_('Get tool'),
+                       operation_id=_('Get tool'),
                        parameters=ToolReadAPI.get_parameters(),
                        responses=ToolReadAPI.get_response(),
                        tags=[_('Tool')])
@@ -66,3 +66,19 @@ class ToolView(APIView):
             return result.success(ToolSerializer.Operate(
                 data={'id': tool_id, 'workspace_id': workspace_id}
             ).delete())
+
+
+class ToolTreeView(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(methods=['GET'],
+                   description=_('Get tool'),
+                   operation_id=_('Get tool'),
+                   parameters=ToolTreeReadAPI.get_parameters(),
+                   responses=ToolTreeReadAPI.get_response(),
+                   tags=[_('Tool')])
+    @has_permissions(PermissionConstants.TOOL_READ.get_workspace_permission())
+    def get(self, request: Request, workspace_id: str):
+        return result.success(ToolTreeSerializer(
+            data={'workspace_id': workspace_id}
+        ).get_tools(request.query_params.get('module_id')))
