@@ -33,6 +33,7 @@ class ModuleView(APIView):
 
     class Operate(APIView):
         authentication_classes = [TokenAuth]
+        serializer_class = ModuleSerializer
 
         @extend_schema(methods=['PUT'],
                        description=_('Update module'),

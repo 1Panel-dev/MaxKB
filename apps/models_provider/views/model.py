@@ -64,6 +64,7 @@ class Model(APIView):
 
     class Operate(APIView):
         authentication_classes = [TokenAuth]
+        serializer_class = ModelSerializer
 
         @extend_schema(methods=['PUT'],
                        description=_('Update model'),
@@ -101,6 +102,7 @@ class Model(APIView):
 
     class ModelParamsForm(APIView):
         authentication_classes = [TokenAuth]
+        serializer_class = ModelSerializer
 
         @extend_schema(methods=['GET'],
                        description=_('Get model parameter form'),
@@ -142,6 +144,7 @@ class Model(APIView):
 
     class PauseDownload(APIView):
         authentication_classes = [TokenAuth]
+        serializer_class = ModelSerializer
 
         @extend_schema(methods=['PUT'],
                        description=_('Pause model download'),

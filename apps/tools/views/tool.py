@@ -30,6 +30,7 @@ class ToolView(APIView):
 
     class Operate(APIView):
         authentication_classes = [TokenAuth]
+        serializer_class = ToolSerializer
 
         @extend_schema(methods=['PUT'],
                        description=_('Update tool'),
