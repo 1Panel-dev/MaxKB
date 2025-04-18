@@ -73,8 +73,8 @@ class ToolTreeView(APIView):
     authentication_classes = [TokenAuth]
 
     @extend_schema(methods=['GET'],
-                   description=_('Get tool'),
-                   operation_id=_('Get tool'),
+                   description=_('Get tool by module'),
+                   operation_id=_('Get tool by module'),
                    parameters=ToolTreeReadAPI.get_parameters(),
                    responses=ToolTreeReadAPI.get_response(),
                    tags=[_('Tool')])
