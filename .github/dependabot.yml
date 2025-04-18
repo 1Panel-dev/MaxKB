@@ -6,3 +6,4 @@ updates:
       interval: "weekly"
       timezone: "Asia/Shanghai"
       day: "friday"
+    target-branch: v2
