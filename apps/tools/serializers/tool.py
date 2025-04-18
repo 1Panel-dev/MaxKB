@@ -7,7 +7,7 @@ from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from tools.models import Tool, ToolScope
+from tools.models import Tool, ToolScope, ToolModule
 
 
 class ToolModelSerializer(serializers.ModelSerializer):
@@ -63,7 +63,7 @@ class ToolCreateRequest(serializers.Serializer):
 class ToolSerializer(serializers.Serializer):
     class Create(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, label=_('user id'))
-        workspace_id = serializers.UUIDField(required=True, label=_('workspace id'))
+        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
 
         def insert(self, instance, with_valid=True):
             if with_valid:
@@ -77,6 +77,7 @@ class ToolSerializer(serializers.Serializer):
                         input_field_list=instance.get('input_field_list', []),
                         init_field_list=instance.get('init_field_list', []),
                         scope=ToolScope.WORKSPACE,
+                        module_id=instance.get('module_id', 'root'),
                         is_active=False)
             tool.save()
             return ToolModelSerializer(tool).data
@@ -109,3 +110,20 @@ class ToolSerializer(serializers.Serializer):
             self.is_valid(raise_exception=True)
             tool = QuerySet(Tool).filter(id=self.data.get('id')).first()
             return ToolModelSerializer(tool).data
+
+
+class ToolTreeSerializer(serializers.Serializer):
+    workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+
+    def get_tools(self, module_id):
+        self.is_valid(raise_exception=True)
+        if not module_id:
+            module_id = 'root'
+        root = ToolModule.objects.filter(id=module_id).first()
+        if not root:
+            raise serializers.ValidationError(_('Module not found'))
+        # 使用MPTT的get_family()方法获取所有相关节点
+        all_modules = root.get_descendants(include_self=True)
+
+        tools = QuerySet(Tool).filter(workspace_id=self.data.get('workspace_id'), module_id__in=all_modules)
+        return ToolModelSerializer(tools, many=True).data
