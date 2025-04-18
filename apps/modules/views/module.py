@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
 from common.constants.permission_constants import Permission, Group, Operate
-from common.result import result
+from common.result import result, DefaultResultSerializer
 from modules.api.module import ModuleCreateAPI, ModuleEditAPI, ModuleReadAPI, ModuleTreeReadAPI, ModuleDeleteAPI
 from modules.serializers.module import ModuleSerializer, ModuleTreeSerializer
 
@@ -65,6 +65,7 @@ class ModuleView(APIView):
                        description=_('Delete module'),
                        operation_id=_('Delete module'),
                        parameters=ModuleDeleteAPI.get_parameters(),
+                       responses=DefaultResultSerializer,
                        tags=[_('Module')])
         @has_permissions(lambda r, kwargs: Permission(group=Group(kwargs.get('source')), operate=Operate.DELETE,
                                                       resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}"))
