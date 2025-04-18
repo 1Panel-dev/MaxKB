@@ -95,9 +95,13 @@ class ModuleTreeSerializer(serializers.Serializer):
     workspace_id = serializers.CharField(required=True, allow_null=True, allow_blank=True, label=_('workspace id'))
     source = serializers.CharField(required=True, label=_('source'))
 
-    def get_module_tree(self):
+    def get_module_tree(self, name=None):
         self.is_valid(raise_exception=True)
         Module = get_module_type(self.data.get('source'))
-        nodes = Module.objects.filter(Q(workspace_id=self.data.get('workspace_id'))).get_cached_trees()
+        if name is not None:
+            nodes = Module.objects.filter(Q(workspace_id=self.data.get('workspace_id')) &
+                                          Q(name__contains=name)).get_cached_trees()
+        else:
+            nodes = Module.objects.filter(Q(workspace_id=self.data.get('workspace_id'))).get_cached_trees()
         serializer = ToolModuleTreeSerializer(nodes, many=True)
         return serializer.data  # 这是可序列化的字典
