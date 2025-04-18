@@ -30,8 +30,8 @@ class Tool(models.Model):
     tool_type = models.CharField(max_length=20, verbose_name='函数类型', choices=ToolType.choices,
                                  default=ToolType.PUBLIC)
     template_id = models.UUIDField(max_length=128, verbose_name="模版id", null=True, default=None)
-    module_id = models.ForeignKey(ToolModule, on_delete=models.CASCADE, verbose_name="模块id", default='root')
-    workspace_id = models.CharField(max_length=64, verbose_name="工作空间id", default="default")
+    module = models.ForeignKey(ToolModule, on_delete=models.CASCADE, verbose_name="模块id", default='root')
+    workspace_id = models.CharField(max_length=64, verbose_name="工作空间id", default="default", db_index=True)
     init_params = models.CharField(max_length=102400, verbose_name="初始化参数", null=True)
     create_time = models.DateTimeField(verbose_name="创建时间", auto_now_add=True, null=True)
     update_time = models.DateTimeField(verbose_name="修改时间", auto_now=True, null=True)
