@@ -109,8 +109,6 @@ def get_model_by_id(_id, user_id):
     connection.close()
     if model is None:
         raise Exception(_('Model does not exist'))
-    if model.permission_type == 'PRIVATE' and str(model.user_id) != str(user_id):
-        raise Exception(_('No permission to use this model') + f"{model.name}")
     return model
 
 

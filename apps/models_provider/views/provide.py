@@ -11,6 +11,7 @@ from common.auth.authentication import has_permissions
 from common.constants.permission_constants import PermissionConstants
 from models_provider.api.provide import ProvideApi
 from models_provider.constants.model_provider_constants import ModelProvideConstants
+from models_provider.serializers.model_serializer import get_default_model_params_setting
 
 
 class Provide(APIView):
@@ -66,3 +67,37 @@ class Provide(APIView):
             return result.success(
                 ModelProvideConstants[provider].value.get_model_list(
                     model_type))
+
+    class ModelParamsForm(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(methods=['GET'],
+                       description=_('Get model default parameters'),
+                       operation_id=_('Get the model creation form'),
+                       parameters=ProvideApi.ModelParamsForm.get_query_params_api(),
+                       responses=ProvideApi.ModelParamsForm.get_response(),
+                       tags=[_('Model')])
+        @has_permissions(PermissionConstants.MODEL_READ)
+        def get(self, request: Request):
+            provider = request.query_params.get('provider')
+            model_type = request.query_params.get('model_type')
+            model_name = request.query_params.get('model_name')
+
+            return result.success(get_default_model_params_setting(provider, model_type, model_name))
+
+    class ModelForm(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(methods=['GET'],
+                       description=_('Get the model creation form'),
+                       operation_id=_('Get the model creation form'),
+                       parameters=ProvideApi.ModelParamsForm.get_query_params_api(),
+                       responses=ProvideApi.ModelParamsForm.get_response(),
+                       tags=[_('Model')])
+        @has_permissions(PermissionConstants.MODEL_READ)
+        def get(self, request: Request):
+            provider = request.query_params.get('provider')
+            model_type = request.query_params.get('model_type')
+            model_name = request.query_params.get('model_name')
+            return result.success(
+                ModelProvideConstants[provider].value.get_model_credential(model_type, model_name).to_form_list())

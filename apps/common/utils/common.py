@@ -13,7 +13,8 @@ import io
 import mimetypes
 import re
 import shutil
-from typing import List
+from functools import reduce
+from typing import List, Dict
 
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.utils.translation import gettext as _
@@ -50,12 +51,12 @@ def group_by(list_source: List, key):
     return result
 
 
-
 CHAR_SET = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 
 
 def get_random_chars(number=6):
     return "".join([CHAR_SET[random.randint(0, len(CHAR_SET) - 1)] for index in range(number)])
+
 
 def encryption(message: str):
     """
@@ -120,7 +121,6 @@ def get_file_content(path):
     with open(path, "r", encoding='utf-8') as file:
         content = file.read()
     return content
-
 
 
 def bytes_to_uploaded_file(file_bytes, file_name="file.txt"):
@@ -205,3 +205,9 @@ def split_and_transcribe(file_path, model, max_segment_length_ms=59000, audio_fo
             full_text.append(text)
     return ' '.join(full_text)
 
+
+def query_params_to_single_dict(query_params: Dict):
+    return reduce(lambda x, y: {**x, **y}, list(
+        filter(lambda item: item is not None, [({key: value} if value is not None and len(value) > 0 else None) for
+                                               key, value in
+                                               query_params.items()])), {})

@@ -15,7 +15,7 @@ class BaiLianLLMModelParams(BaseForm):
     temperature = forms.SliderField(
         TooltipLabel(
             _('Temperature'),
-            _('Higher values make the output more random, while lower values make it more focused and deterministic.')
+            _('Higher values make the output more random, while lower values make it more focused and deterministic')
         ),
         required=True,
         default_value=0.7,

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-14 20:02+0800\n"
+"POT-Creation-Date: 2025-04-18 17:06+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,97 +17,2087 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: .\apps\common\auth\authenticate.py:63 .\apps\common\auth\authenticate.py:84
+#: common/auth/authenticate.py:80
 msgid "Not logged in, please log in first"
 msgstr ""
 
-#: .\apps\common\auth\authenticate.py:69 .\apps\common\auth\authenticate.py:75
-#: .\apps\common\auth\authenticate.py:90 .\apps\common\auth\authenticate.py:96
+#: common/auth/authenticate.py:82 common/auth/authenticate.py:89
+#: common/auth/authenticate.py:95
 msgid "Authentication information is incorrect! illegal user"
 msgstr ""
 
-#: .\apps\common\auth\handle\impl\user_token.py:30
+#: common/auth/authentication.py:96
+msgid "No permission to access"
+msgstr ""
+
+#: common/auth/handle/impl/user_token.py:157
 msgid "Login expired"
 msgstr ""
 
-#: .\apps\common\constants\permission_constants.py:46
-msgid "ADMIN"
-msgstr ""
-
-#: .\apps\common\constants\permission_constants.py:46
-msgid "Super administrator"
-msgstr ""
-
-#: .\apps\common\exception\handle_exception.py:32
+#: common/exception/handle_exception.py:32
 msgid "Unknown exception"
 msgstr ""
 
-#: .\apps\common\result\api.py:17 .\apps\common\result\api.py:27
+#: common/forms/base_field.py:64
+#, python-brace-format
+msgid "The field {field_label} is required"
+msgstr ""
+
+#: common/forms/slider_field.py:56
+#, python-brace-format
+msgid "The {field_label} cannot be less than {min}"
+msgstr ""
+
+#: common/forms/slider_field.py:62
+#, python-brace-format
+msgid "The {field_label} cannot be greater than {max}"
+msgstr ""
+
+#: common/result/api.py:17 common/result/api.py:27
 msgid "response code"
 msgstr ""
 
-#: .\apps\common\result\api.py:18 .\apps\common\result\api.py:19
-#: .\apps\common\result\api.py:28 .\apps\common\result\api.py:29
+#: common/result/api.py:18 common/result/api.py:19 common/result/api.py:28
+#: common/result/api.py:29
 msgid "error prompt"
 msgstr ""
 
-#: .\apps\common\result\api.py:43
+#: common/result/api.py:43
 msgid "total number of data"
 msgstr ""
 
-#: .\apps\common\result\api.py:44
+#: common/result/api.py:44
 msgid "current page"
 msgstr ""
 
-#: .\apps\common\result\api.py:45
+#: common/result/api.py:45
 msgid "page size"
 msgstr ""
 
-#: .\apps\common\result\result.py:31
+#: common/result/result.py:31
 msgid "Success"
 msgstr ""
 
-#: .\apps\maxkb\settings\base.py:80
+#: common/utils/common.py:83
+msgid "Text-to-speech node, the text content must be of string type"
+msgstr ""
+
+#: common/utils/common.py:85
+msgid "Text-to-speech node, the text content cannot be empty"
+msgstr ""
+
+#: maxkb/settings/base.py:83
 msgid "Intelligent customer service platform"
 msgstr ""
 
-#: .\apps\users\serializers\login.py:23
+#: models_provider/api/model.py:36 models_provider/api/model.py:49
+#: models_provider/serializers/model_serializer.py:262
+#: models_provider/serializers/model_serializer.py:326
+#: modules/serializers/module.py:31 modules/serializers/module.py:63
+#: modules/serializers/module.py:95 tools/serializers/tool.py:66
+#: tools/serializers/tool.py:86
+msgid "workspace id"
+msgstr ""
+
+#: models_provider/api/model.py:55
+#: models_provider/serializers/model_serializer.py:107
+#: models_provider/serializers/model_serializer.py:365
+msgid "model id"
+msgstr ""
+
+#: models_provider/api/provide.py:17 models_provider/api/provide.py:23
+#: models_provider/api/provide.py:28 models_provider/api/provide.py:30
+#: models_provider/api/provide.py:67
+#: models_provider/serializers/model_serializer.py:40
+#: models_provider/serializers/model_serializer.py:218
+#: models_provider/serializers/model_serializer.py:256
+#: models_provider/serializers/model_serializer.py:321
+msgid "model name"
+msgstr ""
+
+#: models_provider/api/provide.py:18 models_provider/api/provide.py:38
+#: models_provider/api/provide.py:61 models_provider/api/provide.py:89
+#: models_provider/api/provide.py:111
+#: models_provider/serializers/model_serializer.py:41
+#: models_provider/serializers/model_serializer.py:257
+#: models_provider/serializers/model_serializer.py:324
+msgid "provider"
+msgstr ""
+
+#: models_provider/api/provide.py:19
+msgid "icon"
+msgstr ""
+
+#: models_provider/api/provide.py:24
+msgid "value"
+msgstr ""
+
+#: models_provider/api/provide.py:29 models_provider/api/provide.py:55
+#: models_provider/api/provide.py:83
+#: models_provider/serializers/model_serializer.py:42
+#: models_provider/serializers/model_serializer.py:220
+#: models_provider/serializers/model_serializer.py:258
+#: models_provider/serializers/model_serializer.py:322
+msgid "model type"
+msgstr ""
+
+#: models_provider/api/provide.py:34 tools/serializers/tool.py:38
+msgid "input type"
+msgstr ""
+
+#: models_provider/api/provide.py:35
+msgid "label"
+msgstr ""
+
+#: models_provider/api/provide.py:36
+msgid "text field"
+msgstr ""
+
+#: models_provider/api/provide.py:37
+msgid "value field"
+msgstr ""
+
+#: models_provider/api/provide.py:39
+msgid "method"
+msgstr ""
+
+#: models_provider/api/provide.py:40 tools/serializers/tool.py:23
+#: tools/serializers/tool.py:37
+msgid "required"
+msgstr ""
+
+#: models_provider/api/provide.py:41
+msgid "default value"
+msgstr ""
+
+#: models_provider/api/provide.py:42
+msgid "relation show field dict"
+msgstr ""
+
+#: models_provider/api/provide.py:43
+msgid "relation trigger field dict"
+msgstr ""
+
+#: models_provider/api/provide.py:44
+msgid "trigger type"
+msgstr ""
+
+#: models_provider/api/provide.py:45
+msgid "attrs"
+msgstr ""
+
+#: models_provider/api/provide.py:46
+msgid "props info"
+msgstr ""
+
+#: models_provider/api/provide.py:82
+msgid "model_type"
+msgstr ""
+
+#: models_provider/base_model_provider.py:60
+msgid "Model type cannot be empty"
+msgstr ""
+
+#: models_provider/base_model_provider.py:85
+msgid "The current platform does not support downloading models"
+msgstr ""
+
+#: models_provider/base_model_provider.py:140
+msgid "LLM"
+msgstr ""
+
+#: models_provider/base_model_provider.py:141
+msgid "Embedding Model"
+msgstr ""
+
+#: models_provider/base_model_provider.py:142
+msgid "Speech2Text"
+msgstr ""
+
+#: models_provider/base_model_provider.py:143
+msgid "TTS"
+msgstr ""
+
+#: models_provider/base_model_provider.py:144
+msgid "Vision Model"
+msgstr ""
+
+#: models_provider/base_model_provider.py:145
+msgid "Image Generation"
+msgstr ""
+
+#: models_provider/base_model_provider.py:146
+msgid "Rerank"
+msgstr ""
+
+#: models_provider/base_model_provider.py:220
+msgid "The model does not support"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/aliyun_bai_lian_model_provider.py:42
+msgid ""
+"With the GTE-Rerank text sorting series model developed by Alibaba Tongyi "
+"Lab, developers can integrate high-quality text retrieval and sorting "
+"through the LlamaIndex framework."
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/aliyun_bai_lian_model_provider.py:45
+msgid ""
+"Chinese (including various dialects such as Cantonese), English, Japanese, "
+"and Korean support free switching between multiple languages."
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/aliyun_bai_lian_model_provider.py:48
+msgid ""
+"CosyVoice is based on a new generation of large generative speech models, "
+"which can predict emotions, intonation, rhythm, etc. based on context, and "
+"has better anthropomorphic effects."
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/aliyun_bai_lian_model_provider.py:51
+msgid ""
+"Universal text vector is Tongyi Lab's multi-language text unified vector "
+"model based on the LLM base. It provides high-level vector services for "
+"multiple mainstream languages around the world and helps developers quickly "
+"convert text data into high-quality vector data."
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/aliyun_bai_lian_model_provider.py:69
+#: models_provider/impl/qwen_model_provider/qwen_model_provider.py:40
+msgid ""
+"Tongyi Wanxiang - a large image model for text generation, supports "
+"bilingual input in Chinese and English, and supports the input of reference "
+"pictures for reference content or reference style migration. Key styles "
+"include but are not limited to watercolor, oil painting, Chinese painting, "
+"sketch, flat illustration, two-dimensional, and 3D. Cartoon."
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/aliyun_bai_lian_model_provider.py:95
+msgid "Alibaba Cloud Bailian"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/embedding.py:53
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/image.py:50
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/llm.py:74
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/reranker.py:61
+#: models_provider/impl/aliyun_bai_lian_model_provider/model/tti.py:43
+#: models_provider/impl/aliyun_bai_lian_model_provider/model/tts.py:37
+#: models_provider/impl/anthropic_model_provider/credential/image.py:33
+#: models_provider/impl/anthropic_model_provider/credential/llm.py:57
+#: models_provider/impl/aws_bedrock_model_provider/credential/embedding.py:34
+#: models_provider/impl/aws_bedrock_model_provider/credential/llm.py:53
+#: models_provider/impl/azure_model_provider/credential/embedding.py:37
+#: models_provider/impl/azure_model_provider/credential/image.py:55
+#: models_provider/impl/azure_model_provider/credential/llm.py:69
+#: models_provider/impl/deepseek_model_provider/credential/llm.py:57
+#: models_provider/impl/gemini_model_provider/credential/embedding.py:36
+#: models_provider/impl/gemini_model_provider/credential/image.py:51
+#: models_provider/impl/gemini_model_provider/credential/llm.py:57
+#: models_provider/impl/gemini_model_provider/model/stt.py:43
+#: models_provider/impl/kimi_model_provider/credential/llm.py:57
+#: models_provider/impl/local_model_provider/credential/embedding.py:36
+#: models_provider/impl/local_model_provider/credential/reranker.py:37
+#: models_provider/impl/ollama_model_provider/credential/embedding.py:37
+#: models_provider/impl/ollama_model_provider/credential/reranker.py:44
+#: models_provider/impl/openai_model_provider/credential/embedding.py:36
+#: models_provider/impl/openai_model_provider/credential/image.py:54
+#: models_provider/impl/openai_model_provider/credential/llm.py:59
+#: models_provider/impl/qwen_model_provider/credential/image.py:56
+#: models_provider/impl/qwen_model_provider/credential/llm.py:56
+#: models_provider/impl/qwen_model_provider/model/tti.py:43
+#: models_provider/impl/siliconCloud_model_provider/credential/embedding.py:36
+#: models_provider/impl/siliconCloud_model_provider/credential/image.py:54
+#: models_provider/impl/siliconCloud_model_provider/credential/llm.py:58
+#: models_provider/impl/siliconCloud_model_provider/credential/reranker.py:37
+#: models_provider/impl/tencent_cloud_model_provider/credential/llm.py:58
+#: models_provider/impl/tencent_model_provider/credential/embedding.py:23
+#: models_provider/impl/tencent_model_provider/credential/image.py:56
+#: models_provider/impl/tencent_model_provider/credential/llm.py:51
+#: models_provider/impl/tencent_model_provider/model/tti.py:54
+#: models_provider/impl/vllm_model_provider/credential/embedding.py:36
+#: models_provider/impl/vllm_model_provider/credential/llm.py:50
+#: models_provider/impl/volcanic_engine_model_provider/credential/embedding.py:36
+#: models_provider/impl/volcanic_engine_model_provider/credential/image.py:52
+#: models_provider/impl/volcanic_engine_model_provider/credential/llm.py:57
+#: models_provider/impl/volcanic_engine_model_provider/model/tts.py:77
+#: models_provider/impl/wenxin_model_provider/credential/embedding.py:31
+#: models_provider/impl/wenxin_model_provider/credential/llm.py:60
+#: models_provider/impl/xf_model_provider/credential/embedding.py:31
+#: models_provider/impl/xf_model_provider/credential/llm.py:76
+#: models_provider/impl/xf_model_provider/model/tts.py:101
+#: models_provider/impl/xinference_model_provider/credential/embedding.py:31
+#: models_provider/impl/xinference_model_provider/credential/image.py:51
+#: models_provider/impl/xinference_model_provider/credential/llm.py:50
+#: models_provider/impl/xinference_model_provider/credential/reranker.py:34
+#: models_provider/impl/xinference_model_provider/model/tts.py:44
+#: models_provider/impl/zhipu_model_provider/credential/image.py:51
+#: models_provider/impl/zhipu_model_provider/credential/llm.py:56
+#: models_provider/impl/zhipu_model_provider/model/tti.py:49
+msgid "Hello"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/image.py:36
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/llm.py:60
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/reranker.py:46
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/stt.py:44
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/tti.py:96
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/tts.py:89
+#: models_provider/impl/anthropic_model_provider/credential/image.py:23
+#: models_provider/impl/anthropic_model_provider/credential/llm.py:47
+#: models_provider/impl/aws_bedrock_model_provider/credential/embedding.py:21
+#: models_provider/impl/aws_bedrock_model_provider/credential/llm.py:40
+#: models_provider/impl/azure_model_provider/credential/embedding.py:27
+#: models_provider/impl/azure_model_provider/credential/image.py:45
+#: models_provider/impl/azure_model_provider/credential/llm.py:59
+#: models_provider/impl/azure_model_provider/credential/stt.py:23
+#: models_provider/impl/azure_model_provider/credential/tti.py:58
+#: models_provider/impl/azure_model_provider/credential/tts.py:41
+#: models_provider/impl/deepseek_model_provider/credential/llm.py:47
+#: models_provider/impl/gemini_model_provider/credential/embedding.py:26
+#: models_provider/impl/gemini_model_provider/credential/image.py:41
+#: models_provider/impl/gemini_model_provider/credential/llm.py:47
+#: models_provider/impl/gemini_model_provider/credential/stt.py:21
+#: models_provider/impl/kimi_model_provider/credential/llm.py:47
+#: models_provider/impl/local_model_provider/credential/embedding.py:27
+#: models_provider/impl/local_model_provider/credential/reranker.py:28
+#: models_provider/impl/ollama_model_provider/credential/embedding.py:26
+#: models_provider/impl/ollama_model_provider/credential/image.py:39
+#: models_provider/impl/ollama_model_provider/credential/llm.py:44
+#: models_provider/impl/ollama_model_provider/credential/reranker.py:27
+#: models_provider/impl/ollama_model_provider/credential/reranker.py:31
+#: models_provider/impl/openai_model_provider/credential/embedding.py:26
+#: models_provider/impl/openai_model_provider/credential/image.py:44
+#: models_provider/impl/openai_model_provider/credential/llm.py:48
+#: models_provider/impl/openai_model_provider/credential/stt.py:22
+#: models_provider/impl/openai_model_provider/credential/tti.py:61
+#: models_provider/impl/openai_model_provider/credential/tts.py:40
+#: models_provider/impl/qwen_model_provider/credential/image.py:47
+#: models_provider/impl/qwen_model_provider/credential/llm.py:47
+#: models_provider/impl/qwen_model_provider/credential/tti.py:68
+#: models_provider/impl/siliconCloud_model_provider/credential/embedding.py:26
+#: models_provider/impl/siliconCloud_model_provider/credential/image.py:44
+#: models_provider/impl/siliconCloud_model_provider/credential/llm.py:47
+#: models_provider/impl/siliconCloud_model_provider/credential/reranker.py:28
+#: models_provider/impl/siliconCloud_model_provider/credential/stt.py:22
+#: models_provider/impl/siliconCloud_model_provider/credential/tti.py:61
+#: models_provider/impl/siliconCloud_model_provider/credential/tts.py:22
+#: models_provider/impl/tencent_cloud_model_provider/credential/llm.py:47
+#: models_provider/impl/tencent_model_provider/credential/embedding.py:19
+#: models_provider/impl/tencent_model_provider/credential/image.py:47
+#: models_provider/impl/tencent_model_provider/credential/llm.py:31
+#: models_provider/impl/tencent_model_provider/credential/tti.py:78
+#: models_provider/impl/vllm_model_provider/credential/embedding.py:26
+#: models_provider/impl/vllm_model_provider/credential/image.py:42
+#: models_provider/impl/vllm_model_provider/credential/llm.py:39
+#: models_provider/impl/volcanic_engine_model_provider/credential/embedding.py:26
+#: models_provider/impl/volcanic_engine_model_provider/credential/image.py:42
+#: models_provider/impl/volcanic_engine_model_provider/credential/llm.py:47
+#: models_provider/impl/volcanic_engine_model_provider/credential/stt.py:25
+#: models_provider/impl/volcanic_engine_model_provider/credential/tti.py:41
+#: models_provider/impl/volcanic_engine_model_provider/credential/tts.py:51
+#: models_provider/impl/wenxin_model_provider/credential/embedding.py:27
+#: models_provider/impl/wenxin_model_provider/credential/llm.py:46
+#: models_provider/impl/xf_model_provider/credential/embedding.py:27
+#: models_provider/impl/xf_model_provider/credential/image.py:29
+#: models_provider/impl/xf_model_provider/credential/llm.py:66
+#: models_provider/impl/xf_model_provider/credential/stt.py:24
+#: models_provider/impl/xf_model_provider/credential/tts.py:47
+#: models_provider/impl/xinference_model_provider/credential/embedding.py:19
+#: models_provider/impl/xinference_model_provider/credential/image.py:41
+#: models_provider/impl/xinference_model_provider/credential/llm.py:39
+#: models_provider/impl/xinference_model_provider/credential/reranker.py:25
+#: models_provider/impl/xinference_model_provider/credential/stt.py:21
+#: models_provider/impl/xinference_model_provider/credential/tti.py:59
+#: models_provider/impl/xinference_model_provider/credential/tts.py:39
+#: models_provider/impl/zhipu_model_provider/credential/image.py:41
+#: models_provider/impl/zhipu_model_provider/credential/llm.py:47
+#: models_provider/impl/zhipu_model_provider/credential/tti.py:40
+#, python-brace-format
+msgid "{model_type} Model type is not supported"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/image.py:44
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/llm.py:68
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/reranker.py:55
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/stt.py:53
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/tti.py:105
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/tts.py:98
+#, python-brace-format
+msgid "{key} is required"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/image.py:60
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/llm.py:82
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/reranker.py:69
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/stt.py:67
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/tti.py:121
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/tts.py:113
+#: models_provider/impl/anthropic_model_provider/credential/image.py:43
+#: models_provider/impl/anthropic_model_provider/credential/llm.py:65
+#: models_provider/impl/aws_bedrock_model_provider/credential/embedding.py:42
+#: models_provider/impl/aws_bedrock_model_provider/credential/llm.py:61
+#: models_provider/impl/azure_model_provider/credential/image.py:65
+#: models_provider/impl/azure_model_provider/credential/stt.py:40
+#: models_provider/impl/azure_model_provider/credential/tti.py:77
+#: models_provider/impl/azure_model_provider/credential/tts.py:58
+#: models_provider/impl/deepseek_model_provider/credential/llm.py:65
+#: models_provider/impl/gemini_model_provider/credential/embedding.py:43
+#: models_provider/impl/gemini_model_provider/credential/image.py:61
+#: models_provider/impl/gemini_model_provider/credential/llm.py:66
+#: models_provider/impl/gemini_model_provider/credential/stt.py:38
+#: models_provider/impl/kimi_model_provider/credential/llm.py:64
+#: models_provider/impl/local_model_provider/credential/embedding.py:44
+#: models_provider/impl/local_model_provider/credential/reranker.py:45
+#: models_provider/impl/ollama_model_provider/credential/reranker.py:51
+#: models_provider/impl/openai_model_provider/credential/embedding.py:43
+#: models_provider/impl/openai_model_provider/credential/image.py:64
+#: models_provider/impl/openai_model_provider/credential/llm.py:67
+#: models_provider/impl/openai_model_provider/credential/stt.py:39
+#: models_provider/impl/openai_model_provider/credential/tti.py:80
+#: models_provider/impl/openai_model_provider/credential/tts.py:58
+#: models_provider/impl/qwen_model_provider/credential/image.py:66
+#: models_provider/impl/qwen_model_provider/credential/llm.py:64
+#: models_provider/impl/qwen_model_provider/credential/tti.py:86
+#: models_provider/impl/siliconCloud_model_provider/credential/embedding.py:43
+#: models_provider/impl/siliconCloud_model_provider/credential/image.py:64
+#: models_provider/impl/siliconCloud_model_provider/credential/llm.py:66
+#: models_provider/impl/siliconCloud_model_provider/credential/reranker.py:44
+#: models_provider/impl/siliconCloud_model_provider/credential/stt.py:39
+#: models_provider/impl/siliconCloud_model_provider/credential/tti.py:80
+#: models_provider/impl/siliconCloud_model_provider/credential/tts.py:40
+#: models_provider/impl/tencent_cloud_model_provider/credential/llm.py:66
+#: models_provider/impl/tencent_model_provider/credential/embedding.py:30
+#: models_provider/impl/tencent_model_provider/credential/image.py:66
+#: models_provider/impl/tencent_model_provider/credential/llm.py:57
+#: models_provider/impl/tencent_model_provider/credential/tti.py:104
+#: models_provider/impl/vllm_model_provider/credential/embedding.py:43
+#: models_provider/impl/vllm_model_provider/credential/image.py:62
+#: models_provider/impl/vllm_model_provider/credential/llm.py:55
+#: models_provider/impl/volcanic_engine_model_provider/credential/embedding.py:43
+#: models_provider/impl/volcanic_engine_model_provider/credential/image.py:62
+#: models_provider/impl/volcanic_engine_model_provider/credential/llm.py:66
+#: models_provider/impl/volcanic_engine_model_provider/credential/stt.py:42
+#: models_provider/impl/volcanic_engine_model_provider/credential/tti.py:58
+#: models_provider/impl/volcanic_engine_model_provider/credential/tts.py:68
+#: models_provider/impl/wenxin_model_provider/credential/embedding.py:38
+#: models_provider/impl/xf_model_provider/credential/embedding.py:38
+#: models_provider/impl/xf_model_provider/credential/image.py:50
+#: models_provider/impl/xf_model_provider/credential/llm.py:84
+#: models_provider/impl/xf_model_provider/credential/stt.py:41
+#: models_provider/impl/xf_model_provider/credential/tts.py:65
+#: models_provider/impl/xinference_model_provider/credential/image.py:60
+#: models_provider/impl/xinference_model_provider/credential/reranker.py:40
+#: models_provider/impl/xinference_model_provider/credential/stt.py:37
+#: models_provider/impl/xinference_model_provider/credential/tti.py:77
+#: models_provider/impl/xinference_model_provider/credential/tts.py:56
+#: models_provider/impl/zhipu_model_provider/credential/image.py:61
+#: models_provider/impl/zhipu_model_provider/credential/llm.py:64
+#: models_provider/impl/zhipu_model_provider/credential/tti.py:59
+#, python-brace-format
+msgid ""
+"Verification failed, please check whether the parameters are correct: {error}"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/llm.py:17
+#: models_provider/impl/anthropic_model_provider/credential/llm.py:22
+#: models_provider/impl/aws_bedrock_model_provider/credential/llm.py:14
+#: models_provider/impl/azure_model_provider/credential/image.py:17
+#: models_provider/impl/azure_model_provider/credential/llm.py:23
+#: models_provider/impl/deepseek_model_provider/credential/llm.py:22
+#: models_provider/impl/gemini_model_provider/credential/image.py:15
+#: models_provider/impl/gemini_model_provider/credential/llm.py:22
+#: models_provider/impl/kimi_model_provider/credential/llm.py:22
+#: models_provider/impl/ollama_model_provider/credential/image.py:12
+#: models_provider/impl/ollama_model_provider/credential/llm.py:20
+#: models_provider/impl/openai_model_provider/credential/image.py:17
+#: models_provider/impl/openai_model_provider/credential/llm.py:23
+#: models_provider/impl/qwen_model_provider/credential/image.py:22
+#: models_provider/impl/qwen_model_provider/credential/llm.py:22
+#: models_provider/impl/siliconCloud_model_provider/credential/image.py:17
+#: models_provider/impl/siliconCloud_model_provider/credential/llm.py:22
+#: models_provider/impl/tencent_cloud_model_provider/credential/llm.py:22
+#: models_provider/impl/tencent_model_provider/credential/image.py:22
+#: models_provider/impl/tencent_model_provider/credential/llm.py:14
+#: models_provider/impl/vllm_model_provider/credential/image.py:15
+#: models_provider/impl/vllm_model_provider/credential/llm.py:15
+#: models_provider/impl/volcanic_engine_model_provider/credential/image.py:15
+#: models_provider/impl/volcanic_engine_model_provider/credential/llm.py:22
+#: models_provider/impl/wenxin_model_provider/credential/llm.py:22
+#: models_provider/impl/xf_model_provider/credential/llm.py:22
+#: models_provider/impl/xf_model_provider/credential/llm.py:41
+#: models_provider/impl/xinference_model_provider/credential/image.py:14
+#: models_provider/impl/xinference_model_provider/credential/llm.py:15
+#: models_provider/impl/zhipu_model_provider/credential/image.py:15
+#: models_provider/impl/zhipu_model_provider/credential/llm.py:22
+msgid "Temperature"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/llm.py:18
+msgid ""
+"Higher values make the output more random, while lower values make it more "
+"focused and deterministic."
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/llm.py:30
+#: models_provider/impl/anthropic_model_provider/credential/llm.py:31
+#: models_provider/impl/aws_bedrock_model_provider/credential/llm.py:23
+#: models_provider/impl/azure_model_provider/credential/image.py:26
+#: models_provider/impl/azure_model_provider/credential/llm.py:32
+#: models_provider/impl/azure_model_provider/credential/llm.py:43
+#: models_provider/impl/deepseek_model_provider/credential/llm.py:31
+#: models_provider/impl/gemini_model_provider/credential/image.py:24
+#: models_provider/impl/gemini_model_provider/credential/llm.py:31
+#: models_provider/impl/kimi_model_provider/credential/llm.py:31
+#: models_provider/impl/ollama_model_provider/credential/image.py:21
+#: models_provider/impl/ollama_model_provider/credential/llm.py:29
+#: models_provider/impl/openai_model_provider/credential/image.py:26
+#: models_provider/impl/openai_model_provider/credential/llm.py:32
+#: models_provider/impl/qwen_model_provider/credential/image.py:31
+#: models_provider/impl/qwen_model_provider/credential/llm.py:31
+#: models_provider/impl/siliconCloud_model_provider/credential/image.py:26
+#: models_provider/impl/siliconCloud_model_provider/credential/llm.py:31
+#: models_provider/impl/tencent_cloud_model_provider/credential/llm.py:31
+#: models_provider/impl/tencent_model_provider/credential/image.py:31
+#: models_provider/impl/vllm_model_provider/credential/image.py:24
+#: models_provider/impl/vllm_model_provider/credential/llm.py:24
+#: models_provider/impl/volcanic_engine_model_provider/credential/image.py:24
+#: models_provider/impl/volcanic_engine_model_provider/credential/llm.py:31
+#: models_provider/impl/wenxin_model_provider/credential/llm.py:31
+#: models_provider/impl/xf_model_provider/credential/llm.py:31
+#: models_provider/impl/xf_model_provider/credential/llm.py:50
+#: models_provider/impl/xinference_model_provider/credential/image.py:23
+#: models_provider/impl/xinference_model_provider/credential/llm.py:24
+#: models_provider/impl/zhipu_model_provider/credential/image.py:24
+#: models_provider/impl/zhipu_model_provider/credential/llm.py:31
+msgid "Output the maximum Tokens"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/llm.py:31
+msgid "Specify the maximum number of tokens that the model can generate."
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/llm.py:44
+#: models_provider/impl/anthropic_model_provider/credential/image.py:15
+#: models_provider/impl/anthropic_model_provider/credential/llm.py:74
+msgid "API URL"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/llm.py:45
+#: models_provider/impl/anthropic_model_provider/credential/image.py:16
+#: models_provider/impl/anthropic_model_provider/credential/llm.py:75
+msgid "API Key"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/tti.py:20
+#: models_provider/impl/azure_model_provider/credential/tti.py:15
+#: models_provider/impl/openai_model_provider/credential/tti.py:15
+#: models_provider/impl/qwen_model_provider/credential/tti.py:22
+#: models_provider/impl/siliconCloud_model_provider/credential/tti.py:15
+#: models_provider/impl/volcanic_engine_model_provider/credential/tti.py:15
+#: models_provider/impl/xinference_model_provider/credential/tti.py:14
+#: models_provider/impl/zhipu_model_provider/credential/tti.py:15
+msgid "Image size"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/tti.py:20
+#: models_provider/impl/azure_model_provider/credential/tti.py:15
+#: models_provider/impl/qwen_model_provider/credential/tti.py:22
+msgid "Specify the size of the generated image, such as: 1024x1024"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/tti.py:34
+#: models_provider/impl/azure_model_provider/credential/tti.py:40
+#: models_provider/impl/openai_model_provider/credential/tti.py:43
+#: models_provider/impl/qwen_model_provider/credential/tti.py:34
+#: models_provider/impl/siliconCloud_model_provider/credential/tti.py:43
+#: models_provider/impl/xinference_model_provider/credential/tti.py:41
+msgid "Number of pictures"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/tti.py:34
+#: models_provider/impl/azure_model_provider/credential/tti.py:40
+#: models_provider/impl/qwen_model_provider/credential/tti.py:34
+msgid "Specify the number of generated images"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/tti.py:44
+#: models_provider/impl/qwen_model_provider/credential/tti.py:41
+msgid "Style"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/tti.py:44
+#: models_provider/impl/qwen_model_provider/credential/tti.py:41
+msgid "Specify the style of generated images"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/tti.py:48
+#: models_provider/impl/qwen_model_provider/credential/tti.py:45
+msgid "Default value, the image style is randomly output by the model"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/tti.py:49
+#: models_provider/impl/qwen_model_provider/credential/tti.py:46
+msgid "photography"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/tti.py:50
+#: models_provider/impl/qwen_model_provider/credential/tti.py:47
+msgid "Portraits"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/tti.py:51
+#: models_provider/impl/qwen_model_provider/credential/tti.py:48
+msgid "3D cartoon"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/tti.py:52
+#: models_provider/impl/qwen_model_provider/credential/tti.py:49
+msgid "animation"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/tti.py:53
+#: models_provider/impl/qwen_model_provider/credential/tti.py:50
+msgid "painting"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/tti.py:54
+#: models_provider/impl/qwen_model_provider/credential/tti.py:51
+msgid "watercolor"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/tti.py:55
+#: models_provider/impl/qwen_model_provider/credential/tti.py:52
+msgid "sketch"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/tti.py:56
+#: models_provider/impl/qwen_model_provider/credential/tti.py:53
+msgid "Chinese painting"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/tti.py:57
+#: models_provider/impl/qwen_model_provider/credential/tti.py:54
+msgid "flat illustration"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/tts.py:20
+msgid "Timbre"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/tts.py:20
+#: models_provider/impl/volcanic_engine_model_provider/credential/tts.py:15
+msgid "Chinese sounds can support mixed scenes of Chinese and English"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/tts.py:26
+msgid "Long Xiaochun"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/tts.py:27
+msgid "Long Xiaoxia"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/tts.py:28
+msgid "Long Xiaochen"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/tts.py:29
+msgid "Long Xiaobai"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/tts.py:30
+msgid "Long Laotie"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/tts.py:31
+msgid "Long Shu"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/tts.py:32
+msgid "Long Shuo"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/tts.py:33
+msgid "Long Jing"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/tts.py:34
+msgid "Long Miao"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/tts.py:35
+msgid "Long Yue"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/tts.py:36
+msgid "Long Yuan"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/tts.py:37
+msgid "Long Fei"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/tts.py:38
+msgid "Long Jielidou"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/tts.py:39
+msgid "Long Tong"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/tts.py:40
+msgid "Long Xiang"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/tts.py:47
+msgid "Speaking speed"
+msgstr ""
+
+#: models_provider/impl/aliyun_bai_lian_model_provider/credential/tts.py:47
+msgid "[0.5, 2], the default is 1, usually one decimal place is enough"
+msgstr ""
+
+#: models_provider/impl/anthropic_model_provider/credential/image.py:28
+#: models_provider/impl/anthropic_model_provider/credential/llm.py:52
+#: models_provider/impl/azure_model_provider/credential/embedding.py:32
+#: models_provider/impl/azure_model_provider/credential/image.py:50
+#: models_provider/impl/azure_model_provider/credential/llm.py:64
+#: models_provider/impl/azure_model_provider/credential/stt.py:28
+#: models_provider/impl/azure_model_provider/credential/tti.py:63
+#: models_provider/impl/azure_model_provider/credential/tts.py:46
+#: models_provider/impl/deepseek_model_provider/credential/llm.py:52
+#: models_provider/impl/gemini_model_provider/credential/embedding.py:31
+#: models_provider/impl/gemini_model_provider/credential/image.py:46
+#: models_provider/impl/gemini_model_provider/credential/llm.py:52
+#: models_provider/impl/gemini_model_provider/credential/stt.py:26
+#: models_provider/impl/kimi_model_provider/credential/llm.py:52
+#: models_provider/impl/local_model_provider/credential/embedding.py:31
+#: models_provider/impl/local_model_provider/credential/reranker.py:32
+#: models_provider/impl/ollama_model_provider/credential/embedding.py:46
+#: models_provider/impl/ollama_model_provider/credential/llm.py:62
+#: models_provider/impl/ollama_model_provider/credential/reranker.py:63
+#: models_provider/impl/openai_model_provider/credential/embedding.py:31
+#: models_provider/impl/openai_model_provider/credential/image.py:49
+#: models_provider/impl/openai_model_provider/credential/llm.py:53
+#: models_provider/impl/openai_model_provider/credential/stt.py:27
+#: models_provider/impl/openai_model_provider/credential/tti.py:66
+#: models_provider/impl/openai_model_provider/credential/tts.py:45
+#: models_provider/impl/qwen_model_provider/credential/image.py:51
+#: models_provider/impl/qwen_model_provider/credential/llm.py:51
+#: models_provider/impl/qwen_model_provider/credential/tti.py:72
+#: models_provider/impl/siliconCloud_model_provider/credential/embedding.py:31
+#: models_provider/impl/siliconCloud_model_provider/credential/image.py:49
+#: models_provider/impl/siliconCloud_model_provider/credential/llm.py:52
+#: models_provider/impl/siliconCloud_model_provider/credential/reranker.py:32
+#: models_provider/impl/siliconCloud_model_provider/credential/stt.py:27
+#: models_provider/impl/siliconCloud_model_provider/credential/tti.py:66
+#: models_provider/impl/siliconCloud_model_provider/credential/tts.py:27
+#: models_provider/impl/tencent_cloud_model_provider/credential/llm.py:52
+#: models_provider/impl/tencent_model_provider/credential/image.py:51
+#: models_provider/impl/vllm_model_provider/credential/embedding.py:31
+#: models_provider/impl/vllm_model_provider/credential/image.py:47
+#: models_provider/impl/vllm_model_provider/credential/llm.py:65
+#: models_provider/impl/volcanic_engine_model_provider/credential/embedding.py:31
+#: models_provider/impl/volcanic_engine_model_provider/credential/image.py:47
+#: models_provider/impl/volcanic_engine_model_provider/credential/llm.py:52
+#: models_provider/impl/volcanic_engine_model_provider/credential/stt.py:30
+#: models_provider/impl/volcanic_engine_model_provider/credential/tti.py:46
+#: models_provider/impl/volcanic_engine_model_provider/credential/tts.py:56
+#: models_provider/impl/wenxin_model_provider/credential/llm.py:55
+#: models_provider/impl/wenxin_model_provider/credential/llm.py:72
+#: models_provider/impl/xf_model_provider/credential/image.py:34
+#: models_provider/impl/xf_model_provider/credential/llm.py:71
+#: models_provider/impl/xf_model_provider/credential/stt.py:29
+#: models_provider/impl/xf_model_provider/credential/tts.py:52
+#: models_provider/impl/xinference_model_provider/credential/embedding.py:40
+#: models_provider/impl/xinference_model_provider/credential/image.py:46
+#: models_provider/impl/xinference_model_provider/credential/llm.py:59
+#: models_provider/impl/xinference_model_provider/credential/reranker.py:29
+#: models_provider/impl/xinference_model_provider/credential/stt.py:26
+#: models_provider/impl/xinference_model_provider/credential/tti.py:64
+#: models_provider/impl/xinference_model_provider/credential/tts.py:44
+#: models_provider/impl/zhipu_model_provider/credential/image.py:46
+#: models_provider/impl/zhipu_model_provider/credential/llm.py:51
+#: models_provider/impl/zhipu_model_provider/credential/tti.py:45
+#, python-brace-format
+msgid "{key}  is required"
+msgstr ""
+
+#: models_provider/impl/anthropic_model_provider/credential/llm.py:23
+#: models_provider/impl/aws_bedrock_model_provider/credential/llm.py:15
+#: models_provider/impl/azure_model_provider/credential/image.py:18
+#: models_provider/impl/azure_model_provider/credential/llm.py:24
+#: models_provider/impl/deepseek_model_provider/credential/llm.py:23
+#: models_provider/impl/gemini_model_provider/credential/image.py:16
+#: models_provider/impl/gemini_model_provider/credential/llm.py:23
+#: models_provider/impl/kimi_model_provider/credential/llm.py:23
+#: models_provider/impl/ollama_model_provider/credential/image.py:13
+#: models_provider/impl/ollama_model_provider/credential/llm.py:21
+#: models_provider/impl/openai_model_provider/credential/image.py:18
+#: models_provider/impl/openai_model_provider/credential/llm.py:24
+#: models_provider/impl/qwen_model_provider/credential/image.py:23
+#: models_provider/impl/qwen_model_provider/credential/llm.py:23
+#: models_provider/impl/siliconCloud_model_provider/credential/image.py:18
+#: models_provider/impl/siliconCloud_model_provider/credential/llm.py:23
+#: models_provider/impl/tencent_cloud_model_provider/credential/llm.py:23
+#: models_provider/impl/tencent_model_provider/credential/image.py:23
+#: models_provider/impl/tencent_model_provider/credential/llm.py:15
+#: models_provider/impl/vllm_model_provider/credential/image.py:16
+#: models_provider/impl/vllm_model_provider/credential/llm.py:16
+#: models_provider/impl/volcanic_engine_model_provider/credential/image.py:16
+#: models_provider/impl/volcanic_engine_model_provider/credential/llm.py:23
+#: models_provider/impl/wenxin_model_provider/credential/llm.py:23
+#: models_provider/impl/xf_model_provider/credential/llm.py:23
+#: models_provider/impl/xf_model_provider/credential/llm.py:42
+#: models_provider/impl/xinference_model_provider/credential/image.py:15
+#: models_provider/impl/xinference_model_provider/credential/llm.py:16
+#: models_provider/impl/zhipu_model_provider/credential/image.py:16
+#: models_provider/impl/zhipu_model_provider/credential/llm.py:23
+msgid ""
+"Higher values make the output more random, while lower values make it more "
+"focused and deterministic"
+msgstr ""
+
+#: models_provider/impl/anthropic_model_provider/credential/llm.py:32
+#: models_provider/impl/aws_bedrock_model_provider/credential/llm.py:24
+#: models_provider/impl/azure_model_provider/credential/image.py:27
+#: models_provider/impl/azure_model_provider/credential/llm.py:33
+#: models_provider/impl/azure_model_provider/credential/llm.py:44
+#: models_provider/impl/deepseek_model_provider/credential/llm.py:32
+#: models_provider/impl/gemini_model_provider/credential/image.py:25
+#: models_provider/impl/gemini_model_provider/credential/llm.py:32
+#: models_provider/impl/kimi_model_provider/credential/llm.py:32
+#: models_provider/impl/ollama_model_provider/credential/image.py:22
+#: models_provider/impl/ollama_model_provider/credential/llm.py:30
+#: models_provider/impl/openai_model_provider/credential/image.py:27
+#: models_provider/impl/openai_model_provider/credential/llm.py:33
+#: models_provider/impl/qwen_model_provider/credential/image.py:32
+#: models_provider/impl/qwen_model_provider/credential/llm.py:32
+#: models_provider/impl/siliconCloud_model_provider/credential/image.py:27
+#: models_provider/impl/siliconCloud_model_provider/credential/llm.py:32
+#: models_provider/impl/tencent_cloud_model_provider/credential/llm.py:32
+#: models_provider/impl/tencent_model_provider/credential/image.py:32
+#: models_provider/impl/vllm_model_provider/credential/image.py:25
+#: models_provider/impl/vllm_model_provider/credential/llm.py:25
+#: models_provider/impl/volcanic_engine_model_provider/credential/image.py:25
+#: models_provider/impl/volcanic_engine_model_provider/credential/llm.py:32
+#: models_provider/impl/wenxin_model_provider/credential/llm.py:32
+#: models_provider/impl/xf_model_provider/credential/llm.py:32
+#: models_provider/impl/xf_model_provider/credential/llm.py:51
+#: models_provider/impl/xinference_model_provider/credential/image.py:24
+#: models_provider/impl/xinference_model_provider/credential/llm.py:25
+#: models_provider/impl/zhipu_model_provider/credential/image.py:25
+#: models_provider/impl/zhipu_model_provider/credential/llm.py:32
+msgid "Specify the maximum number of tokens that the model can generate"
+msgstr ""
+
+#: models_provider/impl/aws_bedrock_model_provider/aws_bedrock_model_provider.py:36
+msgid ""
+"An update to Claude 2 that doubles the context window and improves "
+"reliability, hallucination rates, and evidence-based accuracy in long "
+"documents and RAG contexts."
+msgstr ""
+
+#: models_provider/impl/aws_bedrock_model_provider/aws_bedrock_model_provider.py:43
+msgid ""
+"Anthropic is a powerful model that can handle a variety of tasks, from "
+"complex dialogue and creative content generation to detailed command "
+"obedience."
+msgstr ""
+
+#: models_provider/impl/aws_bedrock_model_provider/aws_bedrock_model_provider.py:50
+msgid ""
+"The Claude 3 Haiku is Anthropic's fastest and most compact model, with near-"
+"instant responsiveness. The model can answer simple queries and requests "
+"quickly. Customers will be able to build seamless AI experiences that mimic "
+"human interactions. Claude 3 Haiku can process images and return text "
+"output, and provides 200K context windows."
+msgstr ""
+
+#: models_provider/impl/aws_bedrock_model_provider/aws_bedrock_model_provider.py:57
+msgid ""
+"The Claude 3 Sonnet model from Anthropic strikes the ideal balance between "
+"intelligence and speed, especially when it comes to handling enterprise "
+"workloads. This model offers maximum utility while being priced lower than "
+"competing products, and it's been engineered to be a solid choice for "
+"deploying AI at scale."
+msgstr ""
+
+#: models_provider/impl/aws_bedrock_model_provider/aws_bedrock_model_provider.py:64
+msgid ""
+"The Claude 3.5 Sonnet raises the industry standard for intelligence, "
+"outperforming competing models and the Claude 3 Opus in extensive "
+"evaluations, with the speed and cost-effectiveness of our mid-range models."
+msgstr ""
+
+#: models_provider/impl/aws_bedrock_model_provider/aws_bedrock_model_provider.py:71
+msgid ""
+"A faster, more affordable but still very powerful model that can handle a "
+"range of tasks including casual conversation, text analysis, summarization "
+"and document question answering."
+msgstr ""
+
+#: models_provider/impl/aws_bedrock_model_provider/aws_bedrock_model_provider.py:78
+msgid ""
+"Titan Text Premier is the most powerful and advanced model in the Titan Text "
+"series, designed to deliver exceptional performance for a variety of "
+"enterprise applications. With its cutting-edge features, it delivers greater "
+"accuracy and outstanding results, making it an excellent choice for "
+"organizations looking for a top-notch text processing solution."
+msgstr ""
+
+#: models_provider/impl/aws_bedrock_model_provider/aws_bedrock_model_provider.py:85
+msgid ""
+"Amazon Titan Text Lite is a lightweight, efficient model ideal for fine-"
+"tuning English-language tasks, including summarization and copywriting, "
+"where customers require smaller, more cost-effective, and highly "
+"customizable models."
+msgstr ""
+
+#: models_provider/impl/aws_bedrock_model_provider/aws_bedrock_model_provider.py:91
+msgid ""
+"Amazon Titan Text Express has context lengths of up to 8,000 tokens, making "
+"it ideal for a variety of high-level general language tasks, such as open-"
+"ended text generation and conversational chat, as well as support in "
+"retrieval-augmented generation (RAG). At launch, the model is optimized for "
+"English, but other languages are supported."
+msgstr ""
+
+#: models_provider/impl/aws_bedrock_model_provider/aws_bedrock_model_provider.py:97
+msgid ""
+"7B dense converter for rapid deployment and easy customization. Small in "
+"size yet powerful in a variety of use cases. Supports English and code, as "
+"well as 32k context windows."
+msgstr ""
+
+#: models_provider/impl/aws_bedrock_model_provider/aws_bedrock_model_provider.py:103
+msgid ""
+"Advanced Mistral AI large-scale language model capable of handling any "
+"language task, including complex multilingual reasoning, text understanding, "
+"transformation, and code generation."
+msgstr ""
+
+#: models_provider/impl/aws_bedrock_model_provider/aws_bedrock_model_provider.py:109
+msgid ""
+"Ideal for content creation, conversational AI, language understanding, R&D, "
+"and enterprise applications"
+msgstr ""
+
+#: models_provider/impl/aws_bedrock_model_provider/aws_bedrock_model_provider.py:115
+msgid ""
+"Ideal for limited computing power and resources, edge devices, and faster "
+"training times."
+msgstr ""
+
+#: models_provider/impl/aws_bedrock_model_provider/aws_bedrock_model_provider.py:123
+msgid ""
+"Titan Embed Text is the largest embedding model in the Amazon Titan Embed "
+"series and can handle various text embedding tasks, such as text "
+"classification, text similarity calculation, etc."
+msgstr ""
+
+#: models_provider/impl/aws_bedrock_model_provider/credential/embedding.py:28
+#: models_provider/impl/aws_bedrock_model_provider/credential/llm.py:47
+#, python-brace-format
+msgid "The following fields are required: {keys}"
+msgstr ""
+
+#: models_provider/impl/azure_model_provider/credential/embedding.py:44
+#: models_provider/impl/azure_model_provider/credential/llm.py:76
+msgid "Verification failed, please check whether the parameters are correct"
+msgstr ""
+
+#: models_provider/impl/azure_model_provider/credential/tti.py:28
+#: models_provider/impl/openai_model_provider/credential/tti.py:29
+#: models_provider/impl/siliconCloud_model_provider/credential/tti.py:29
+#: models_provider/impl/xinference_model_provider/credential/tti.py:28
+msgid "Picture quality"
+msgstr ""
+
+#: models_provider/impl/azure_model_provider/credential/tts.py:17
+#: models_provider/impl/openai_model_provider/credential/tts.py:17
+msgid ""
+"Try out the different sounds (Alloy, Echo, Fable, Onyx, Nova, and Sparkle) "
+"to find one that suits your desired tone and audience. The current voiceover "
+"is optimized for English."
+msgstr ""
+
+#: models_provider/impl/deepseek_model_provider/deepseek_model_provider.py:24
+msgid "Good at common conversational tasks, supports 32K contexts"
+msgstr ""
+
+#: models_provider/impl/deepseek_model_provider/deepseek_model_provider.py:29
+msgid "Good at handling programming tasks, supports 16K contexts"
+msgstr ""
+
+#: models_provider/impl/gemini_model_provider/gemini_model_provider.py:32
+msgid "Latest Gemini 1.0 Pro model, updated with Google update"
+msgstr ""
+
+#: models_provider/impl/gemini_model_provider/gemini_model_provider.py:36
+msgid "Latest Gemini 1.0 Pro Vision model, updated with Google update"
+msgstr ""
+
+#: models_provider/impl/gemini_model_provider/gemini_model_provider.py:43
+#: models_provider/impl/gemini_model_provider/gemini_model_provider.py:47
+#: models_provider/impl/gemini_model_provider/gemini_model_provider.py:54
+#: models_provider/impl/gemini_model_provider/gemini_model_provider.py:58
+msgid "Latest Gemini 1.5 Flash model, updated with Google updates"
+msgstr ""
+
+#: models_provider/impl/gemini_model_provider/model/stt.py:53
+msgid "convert audio to text"
+msgstr ""
+
+#: models_provider/impl/local_model_provider/credential/embedding.py:53
+#: models_provider/impl/local_model_provider/credential/reranker.py:54
+msgid "Model catalog"
+msgstr ""
+
+#: models_provider/impl/local_model_provider/local_model_provider.py:39
+msgid "local model"
+msgstr ""
+
+#: models_provider/impl/ollama_model_provider/credential/embedding.py:30
+#: models_provider/impl/ollama_model_provider/credential/image.py:43
+#: models_provider/impl/ollama_model_provider/credential/llm.py:48
+#: models_provider/impl/ollama_model_provider/credential/reranker.py:35
+#: models_provider/impl/vllm_model_provider/credential/llm.py:43
+#: models_provider/impl/xinference_model_provider/credential/embedding.py:24
+#: models_provider/impl/xinference_model_provider/credential/llm.py:44
+msgid "API domain name is invalid"
+msgstr ""
+
+#: models_provider/impl/ollama_model_provider/credential/embedding.py:35
+#: models_provider/impl/ollama_model_provider/credential/image.py:48
+#: models_provider/impl/ollama_model_provider/credential/llm.py:53
+#: models_provider/impl/ollama_model_provider/credential/reranker.py:40
+#: models_provider/impl/vllm_model_provider/credential/llm.py:47
+#: models_provider/impl/xinference_model_provider/credential/embedding.py:30
+#: models_provider/impl/xinference_model_provider/credential/llm.py:48
+msgid "The model does not exist, please download the model first"
+msgstr ""
+
+#: models_provider/impl/ollama_model_provider/ollama_model_provider.py:56
+msgid ""
+"Llama 2 is a set of pretrained and fine-tuned generative text models ranging "
+"in size from 7 billion to 70 billion. This is a repository of 7B pretrained "
+"models. Links to other models can be found in the index at the bottom."
+msgstr ""
+
+#: models_provider/impl/ollama_model_provider/ollama_model_provider.py:60
+msgid ""
+"Llama 2 is a set of pretrained and fine-tuned generative text models ranging "
+"in size from 7 billion to 70 billion. This is a repository of 13B pretrained "
+"models. Links to other models can be found in the index at the bottom."
+msgstr ""
+
+#: models_provider/impl/ollama_model_provider/ollama_model_provider.py:64
+msgid ""
+"Llama 2 is a set of pretrained and fine-tuned generative text models ranging "
+"in size from 7 billion to 70 billion. This is a repository of 70B pretrained "
+"models. Links to other models can be found in the index at the bottom."
+msgstr ""
+
+#: models_provider/impl/ollama_model_provider/ollama_model_provider.py:68
+msgid ""
+"Since the Chinese alignment of Llama2 itself is weak, we use the Chinese "
+"instruction set to fine-tune meta-llama/Llama-2-13b-chat-hf with LoRA so "
+"that it has strong Chinese conversation capabilities."
+msgstr ""
+
+#: models_provider/impl/ollama_model_provider/ollama_model_provider.py:72
+msgid ""
+"Meta Llama 3: The most capable public product LLM to date. 8 billion "
+"parameters."
+msgstr ""
+
+#: models_provider/impl/ollama_model_provider/ollama_model_provider.py:76
+msgid ""
+"Meta Llama 3: The most capable public product LLM to date. 70 billion "
+"parameters."
+msgstr ""
+
+#: models_provider/impl/ollama_model_provider/ollama_model_provider.py:80
+msgid ""
+"Compared with previous versions, qwen 1.5 0.5b has significantly enhanced "
+"the model's alignment with human preferences and its multi-language "
+"processing capabilities. Models of all sizes support a context length of "
+"32768 tokens. 500 million parameters."
+msgstr ""
+
+#: models_provider/impl/ollama_model_provider/ollama_model_provider.py:84
+msgid ""
+"Compared with previous versions, qwen 1.5 1.8b has significantly enhanced "
+"the model's alignment with human preferences and its multi-language "
+"processing capabilities. Models of all sizes support a context length of "
+"32768 tokens. 1.8 billion parameters."
+msgstr ""
+
+#: models_provider/impl/ollama_model_provider/ollama_model_provider.py:88
+msgid ""
+"Compared with previous versions, qwen 1.5 4b has significantly enhanced the "
+"model's alignment with human preferences and its multi-language processing "
+"capabilities. Models of all sizes support a context length of 32768 tokens. "
+"4 billion parameters."
+msgstr ""
+
+#: models_provider/impl/ollama_model_provider/ollama_model_provider.py:93
+msgid ""
+"Compared with previous versions, qwen 1.5 7b has significantly enhanced the "
+"model's alignment with human preferences and its multi-language processing "
+"capabilities. Models of all sizes support a context length of 32768 tokens. "
+"7 billion parameters."
+msgstr ""
+
+#: models_provider/impl/ollama_model_provider/ollama_model_provider.py:97
+msgid ""
+"Compared with previous versions, qwen 1.5 14b has significantly enhanced the "
+"model's alignment with human preferences and its multi-language processing "
+"capabilities. Models of all sizes support a context length of 32768 tokens. "
+"14 billion parameters."
+msgstr ""
+
+#: models_provider/impl/ollama_model_provider/ollama_model_provider.py:101
+msgid ""
+"Compared with previous versions, qwen 1.5 32b has significantly enhanced the "
+"model's alignment with human preferences and its multi-language processing "
+"capabilities. Models of all sizes support a context length of 32768 tokens. "
+"32 billion parameters."
+msgstr ""
+
+#: models_provider/impl/ollama_model_provider/ollama_model_provider.py:105
+msgid ""
+"Compared with previous versions, qwen 1.5 72b has significantly enhanced the "
+"model's alignment with human preferences and its multi-language processing "
+"capabilities. Models of all sizes support a context length of 32768 tokens. "
+"72 billion parameters."
+msgstr ""
+
+#: models_provider/impl/ollama_model_provider/ollama_model_provider.py:109
+msgid ""
+"Compared with previous versions, qwen 1.5 110b has significantly enhanced "
+"the model's alignment with human preferences and its multi-language "
+"processing capabilities. Models of all sizes support a context length of "
+"32768 tokens. 110 billion parameters."
+msgstr ""
+
+#: models_provider/impl/ollama_model_provider/ollama_model_provider.py:153
+#: models_provider/impl/ollama_model_provider/ollama_model_provider.py:193
+msgid ""
+"Phi-3 Mini is Microsoft's 3.8B parameter, lightweight, state-of-the-art open "
+"model."
+msgstr ""
+
+#: models_provider/impl/ollama_model_provider/ollama_model_provider.py:162
+#: models_provider/impl/ollama_model_provider/ollama_model_provider.py:197
+msgid ""
+"A high-performance open embedding model with a large token context window."
+msgstr ""
+
+#: models_provider/impl/openai_model_provider/credential/tti.py:16
+#: models_provider/impl/siliconCloud_model_provider/credential/tti.py:16
+msgid ""
+"The image generation endpoint allows you to create raw images based on text "
+"prompts. When using the DALL·E 3, the image size can be 1024x1024, 1024x1792 "
+"or 1792x1024 pixels."
+msgstr ""
+
+#: models_provider/impl/openai_model_provider/credential/tti.py:29
+#: models_provider/impl/siliconCloud_model_provider/credential/tti.py:29
+msgid ""
+"       \n"
+"By default, images are produced in standard quality, but with DALL·E 3 you "
+"can set quality: \"hd\" to enhance detail. Square, standard quality images "
+"are generated fastest.\n"
+"        "
+msgstr ""
+
+#: models_provider/impl/openai_model_provider/credential/tti.py:44
+#: models_provider/impl/siliconCloud_model_provider/credential/tti.py:44
+msgid ""
+"You can use DALL·E 3 to request 1 image at a time (requesting more images by "
+"issuing parallel requests), or use DALL·E 2 with the n parameter to request "
+"up to 10 images at a time."
+msgstr ""
+
+#: models_provider/impl/openai_model_provider/openai_model_provider.py:35
+#: models_provider/impl/openai_model_provider/openai_model_provider.py:119
+#: models_provider/impl/siliconCloud_model_provider/siliconCloud_model_provider.py:118
+msgid "The latest gpt-3.5-turbo, updated with OpenAI adjustments"
+msgstr ""
+
+#: models_provider/impl/openai_model_provider/openai_model_provider.py:38
+msgid "Latest gpt-4, updated with OpenAI adjustments"
+msgstr ""
+
+#: models_provider/impl/openai_model_provider/openai_model_provider.py:40
+#: models_provider/impl/openai_model_provider/openai_model_provider.py:99
+msgid ""
+"The latest GPT-4o, cheaper and faster than gpt-4-turbo, updated with OpenAI "
+"adjustments"
+msgstr ""
+
+#: models_provider/impl/openai_model_provider/openai_model_provider.py:43
+#: models_provider/impl/openai_model_provider/openai_model_provider.py:102
+msgid ""
+"The latest gpt-4o-mini, cheaper and faster than gpt-4o, updated with OpenAI "
+"adjustments"
+msgstr ""
+
+#: models_provider/impl/openai_model_provider/openai_model_provider.py:46
+msgid "The latest gpt-4-turbo, updated with OpenAI adjustments"
+msgstr ""
+
+#: models_provider/impl/openai_model_provider/openai_model_provider.py:49
+msgid "The latest gpt-4-turbo-preview, updated with OpenAI adjustments"
+msgstr ""
+
+#: models_provider/impl/openai_model_provider/openai_model_provider.py:53
+msgid ""
+"gpt-3.5-turbo snapshot on January 25, 2024, supporting context length 16,385 "
+"tokens"
+msgstr ""
+
+#: models_provider/impl/openai_model_provider/openai_model_provider.py:57
+msgid ""
+"gpt-3.5-turbo snapshot on November 6, 2023, supporting context length 16,385 "
+"tokens"
+msgstr ""
+
+#: models_provider/impl/openai_model_provider/openai_model_provider.py:61
+msgid ""
+"[Legacy] gpt-3.5-turbo snapshot on June 13, 2023, will be deprecated on June "
+"13, 2024"
+msgstr ""
+
+#: models_provider/impl/openai_model_provider/openai_model_provider.py:65
+msgid ""
+"gpt-4o snapshot on May 13, 2024, supporting context length 128,000 tokens"
+msgstr ""
+
+#: models_provider/impl/openai_model_provider/openai_model_provider.py:69
+msgid ""
+"gpt-4-turbo snapshot on April 9, 2024, supporting context length 128,000 "
+"tokens"
+msgstr ""
+
+#: models_provider/impl/openai_model_provider/openai_model_provider.py:72
+msgid ""
+"gpt-4-turbo snapshot on January 25, 2024, supporting context length 128,000 "
+"tokens"
+msgstr ""
+
+#: models_provider/impl/openai_model_provider/openai_model_provider.py:75
+msgid ""
+"gpt-4-turbo snapshot on November 6, 2023, supporting context length 128,000 "
+"tokens"
+msgstr ""
+
+#: models_provider/impl/qwen_model_provider/qwen_model_provider.py:63
+msgid "Tongyi Qianwen"
+msgstr ""
+
+#: models_provider/impl/tencent_cloud_model_provider/tencent_cloud_model_provider.py:58
+msgid "Tencent Cloud"
+msgstr ""
+
+#: models_provider/impl/tencent_model_provider/credential/llm.py:41
+#: models_provider/impl/tencent_model_provider/credential/tti.py:88
+#, python-brace-format
+msgid "{keys} is required"
+msgstr ""
+
+#: models_provider/impl/tencent_model_provider/credential/tti.py:14
+msgid "painting style"
+msgstr ""
+
+#: models_provider/impl/tencent_model_provider/credential/tti.py:14
+msgid "If not passed, the default value is 201 (Japanese anime style)"
+msgstr ""
+
+#: models_provider/impl/tencent_model_provider/credential/tti.py:18
+msgid "Not limited to style"
+msgstr ""
+
+#: models_provider/impl/tencent_model_provider/credential/tti.py:19
+msgid "ink painting"
+msgstr ""
+
+#: models_provider/impl/tencent_model_provider/credential/tti.py:20
+msgid "concept art"
+msgstr ""
+
+#: models_provider/impl/tencent_model_provider/credential/tti.py:21
+msgid "Oil painting 1"
+msgstr ""
+
+#: models_provider/impl/tencent_model_provider/credential/tti.py:22
+msgid "Oil Painting 2 (Van Gogh)"
+msgstr ""
+
+#: models_provider/impl/tencent_model_provider/credential/tti.py:23
+msgid "watercolor painting"
+msgstr ""
+
+#: models_provider/impl/tencent_model_provider/credential/tti.py:24
+msgid "pixel art"
+msgstr ""
+
+#: models_provider/impl/tencent_model_provider/credential/tti.py:25
+msgid "impasto style"
+msgstr ""
+
+#: models_provider/impl/tencent_model_provider/credential/tti.py:26
+msgid "illustration"
+msgstr ""
+
+#: models_provider/impl/tencent_model_provider/credential/tti.py:27
+msgid "paper cut style"
+msgstr ""
+
+#: models_provider/impl/tencent_model_provider/credential/tti.py:28
+msgid "Impressionism 1 (Monet)"
+msgstr ""
+
+#: models_provider/impl/tencent_model_provider/credential/tti.py:29
+msgid "Impressionism 2"
+msgstr ""
+
+#: models_provider/impl/tencent_model_provider/credential/tti.py:31
+msgid "classical portraiture"
+msgstr ""
+
+#: models_provider/impl/tencent_model_provider/credential/tti.py:32
+msgid "black and white sketch"
+msgstr ""
+
+#: models_provider/impl/tencent_model_provider/credential/tti.py:33
+msgid "cyberpunk"
+msgstr ""
+
+#: models_provider/impl/tencent_model_provider/credential/tti.py:34
+msgid "science fiction style"
+msgstr ""
+
+#: models_provider/impl/tencent_model_provider/credential/tti.py:35
+msgid "dark style"
+msgstr ""
+
+#: models_provider/impl/tencent_model_provider/credential/tti.py:37
+msgid "vaporwave"
+msgstr ""
+
+#: models_provider/impl/tencent_model_provider/credential/tti.py:38
+msgid "Japanese animation"
+msgstr ""
+
+#: models_provider/impl/tencent_model_provider/credential/tti.py:39
+msgid "monster style"
+msgstr ""
+
+#: models_provider/impl/tencent_model_provider/credential/tti.py:40
+msgid "Beautiful ancient style"
+msgstr ""
+
+#: models_provider/impl/tencent_model_provider/credential/tti.py:41
+msgid "retro anime"
+msgstr ""
+
+#: models_provider/impl/tencent_model_provider/credential/tti.py:42
+msgid "Game cartoon hand drawing"
+msgstr ""
+
+#: models_provider/impl/tencent_model_provider/credential/tti.py:43
+msgid "Universal realistic style"
+msgstr ""
+
+#: models_provider/impl/tencent_model_provider/credential/tti.py:50
+msgid "Generate image resolution"
+msgstr ""
+
+#: models_provider/impl/tencent_model_provider/credential/tti.py:50
+msgid "If not transmitted, the default value is 768:768."
+msgstr ""
+
+#: models_provider/impl/tencent_model_provider/tencent_model_provider.py:38
+msgid ""
+"The most effective version of the current hybrid model, the trillion-level "
+"parameter scale MOE-32K long article model. Reaching the absolute leading "
+"level on various benchmarks, with complex instructions and reasoning, "
+"complex mathematical capabilities, support for function call, and "
+"application focus optimization in fields such as multi-language translation, "
+"finance, law, and medical care"
+msgstr ""
+
+#: models_provider/impl/tencent_model_provider/tencent_model_provider.py:45
+msgid ""
+"A better routing strategy is adopted to simultaneously alleviate the "
+"problems of load balancing and expert convergence. For long articles, the "
+"needle-in-a-haystack index reaches 99.9%"
+msgstr ""
+
+#: models_provider/impl/tencent_model_provider/tencent_model_provider.py:51
+msgid ""
+"Upgraded to MOE structure, the context window is 256k, leading many open "
+"source models in multiple evaluation sets such as NLP, code, mathematics, "
+"industry, etc."
+msgstr ""
+
+#: models_provider/impl/tencent_model_provider/tencent_model_provider.py:57
+msgid ""
+"Hunyuan's latest version of the role-playing model, a role-playing model "
+"launched by Hunyuan's official fine-tuning training, is based on the Hunyuan "
+"model combined with the role-playing scene data set for additional training, "
+"and has better basic effects in role-playing scenes."
+msgstr ""
+
+#: models_provider/impl/tencent_model_provider/tencent_model_provider.py:63
+msgid ""
+"Hunyuan's latest MOE architecture FunctionCall model has been trained with "
+"high-quality FunctionCall data and has a context window of 32K, leading in "
+"multiple dimensions of evaluation indicators."
+msgstr ""
+
+#: models_provider/impl/tencent_model_provider/tencent_model_provider.py:69
+msgid ""
+"Hunyuan's latest code generation model, after training the base model with "
+"200B high-quality code data, and iterating on high-quality SFT data for half "
+"a year, the context long window length has been increased to 8K, and it "
+"ranks among the top in the automatic evaluation indicators of code "
+"generation in the five major languages; the five major languages In the "
+"manual high-quality evaluation of 10 comprehensive code tasks that consider "
+"all aspects, the performance is in the first echelon."
+msgstr ""
+
+#: models_provider/impl/tencent_model_provider/tencent_model_provider.py:77
+msgid ""
+"Tencent's Hunyuan Embedding interface can convert text into high-quality "
+"vector data. The vector dimension is 1024 dimensions."
+msgstr ""
+
+#: models_provider/impl/tencent_model_provider/tencent_model_provider.py:87
+msgid "Mixed element visual model"
+msgstr ""
+
+#: models_provider/impl/tencent_model_provider/tencent_model_provider.py:94
+msgid "Hunyuan graph model"
+msgstr ""
+
+#: models_provider/impl/tencent_model_provider/tencent_model_provider.py:125
+msgid "Tencent Hunyuan"
+msgstr ""
+
+#: models_provider/impl/vllm_model_provider/vllm_model_provider.py:24
+#: models_provider/impl/vllm_model_provider/vllm_model_provider.py:42
+msgid "Facebook’s 125M parameter model"
+msgstr ""
+
+#: models_provider/impl/vllm_model_provider/vllm_model_provider.py:25
+msgid "BAAI’s 7B parameter model"
+msgstr ""
+
+#: models_provider/impl/vllm_model_provider/vllm_model_provider.py:26
+msgid "BAAI’s 13B parameter mode"
+msgstr ""
+
+#: models_provider/impl/volcanic_engine_model_provider/credential/tti.py:16
+msgid ""
+"If the gap between width, height and 512 is too large, the picture rendering "
+"effect will be poor and the probability of excessive delay will increase "
+"significantly. Recommended ratio and corresponding width and height before "
+"super score: width*height"
+msgstr ""
+
+#: models_provider/impl/volcanic_engine_model_provider/credential/tts.py:15
+#: models_provider/impl/xinference_model_provider/credential/tts.py:15
+msgid "timbre"
+msgstr ""
+
+#: models_provider/impl/volcanic_engine_model_provider/credential/tts.py:31
+#: models_provider/impl/xf_model_provider/credential/tts.py:28
+msgid "speaking speed"
+msgstr ""
+
+#: models_provider/impl/volcanic_engine_model_provider/credential/tts.py:31
+msgid "[0.2,3], the default is 1, usually one decimal place is enough"
+msgstr ""
+
+#: models_provider/impl/volcanic_engine_model_provider/volcanic_engine_model_provider.py:39
+#: models_provider/impl/volcanic_engine_model_provider/volcanic_engine_model_provider.py:44
+#: models_provider/impl/volcanic_engine_model_provider/volcanic_engine_model_provider.py:88
+msgid ""
+"The user goes to the model inference page of Volcano Ark to create an "
+"inference access point. Here, you need to enter ep-xxxxxxxxxx-yyyy to call "
+"it."
+msgstr ""
+
+#: models_provider/impl/volcanic_engine_model_provider/volcanic_engine_model_provider.py:59
+msgid "Universal 2.0-Vincent Diagram"
+msgstr ""
+
+#: models_provider/impl/volcanic_engine_model_provider/volcanic_engine_model_provider.py:64
+msgid "Universal 2.0Pro-Vincent Chart"
+msgstr ""
+
+#: models_provider/impl/volcanic_engine_model_provider/volcanic_engine_model_provider.py:69
+msgid "Universal 1.4-Vincent Chart"
+msgstr ""
+
+#: models_provider/impl/volcanic_engine_model_provider/volcanic_engine_model_provider.py:74
+msgid "Animation 1.3.0-Vincent Picture"
+msgstr ""
+
+#: models_provider/impl/volcanic_engine_model_provider/volcanic_engine_model_provider.py:79
+msgid "Animation 1.3.1-Vincent Picture"
+msgstr ""
+
+#: models_provider/impl/volcanic_engine_model_provider/volcanic_engine_model_provider.py:113
+msgid "volcano engine"
+msgstr ""
+
+#: models_provider/impl/wenxin_model_provider/credential/llm.py:51
+#, python-brace-format
+msgid "{model_name} The model does not support"
+msgstr ""
+
+#: models_provider/impl/wenxin_model_provider/wenxin_model_provider.py:24
+#: models_provider/impl/wenxin_model_provider/wenxin_model_provider.py:53
+msgid ""
+"ERNIE-Bot-4 is a large language model independently developed by Baidu. It "
+"covers massive Chinese data and has stronger capabilities in dialogue Q&A, "
+"content creation and generation."
+msgstr ""
+
+#: models_provider/impl/wenxin_model_provider/wenxin_model_provider.py:27
+msgid ""
+"ERNIE-Bot is a large language model independently developed by Baidu. It "
+"covers massive Chinese data and has stronger capabilities in dialogue Q&A, "
+"content creation and generation."
+msgstr ""
+
+#: models_provider/impl/wenxin_model_provider/wenxin_model_provider.py:30
+msgid ""
+"ERNIE-Bot-turbo is a large language model independently developed by Baidu. "
+"It covers massive Chinese data, has stronger capabilities in dialogue Q&A, "
+"content creation and generation, and has a faster response speed."
+msgstr ""
+
+#: models_provider/impl/wenxin_model_provider/wenxin_model_provider.py:33
+msgid ""
+"BLOOMZ-7B is a well-known large language model in the industry. It was "
+"developed and open sourced by BigScience and can output text in 46 languages "
+"and 13 programming languages."
+msgstr ""
+
+#: models_provider/impl/wenxin_model_provider/wenxin_model_provider.py:39
+msgid ""
+"Llama-2-13b-chat was developed by Meta AI and is open source. It performs "
+"well in scenarios such as coding, reasoning and knowledge application. "
+"Llama-2-13b-chat is a native open source version with balanced performance "
+"and effect, suitable for conversation scenarios."
+msgstr ""
+
+#: models_provider/impl/wenxin_model_provider/wenxin_model_provider.py:42
+msgid ""
+"Llama-2-70b-chat was developed by Meta AI and is open source. It performs "
+"well in scenarios such as coding, reasoning, and knowledge application. "
+"Llama-2-70b-chat is a native open source version with high-precision effects."
+msgstr ""
+
+#: models_provider/impl/wenxin_model_provider/wenxin_model_provider.py:45
+msgid ""
+"The Chinese enhanced version developed by the Qianfan team based on "
+"Llama-2-7b has performed well on Chinese knowledge bases such as CMMLU and C-"
+"EVAL."
+msgstr ""
+
+#: models_provider/impl/wenxin_model_provider/wenxin_model_provider.py:49
+msgid ""
+"Embedding-V1 is a text representation model based on Baidu Wenxin large "
+"model technology. It can convert text into a vector form represented by "
+"numerical values and can be used in text retrieval, information "
+"recommendation, knowledge mining and other scenarios. Embedding-V1 provides "
+"the Embeddings interface, which can generate corresponding vector "
+"representations based on input content. You can call this interface to input "
+"text into the model and obtain the corresponding vector representation for "
+"subsequent text processing and analysis."
+msgstr ""
+
+#: models_provider/impl/wenxin_model_provider/wenxin_model_provider.py:66
+msgid "Thousand sails large model"
+msgstr ""
+
+#: models_provider/impl/xf_model_provider/credential/image.py:42
+msgid "Please outline this picture"
+msgstr ""
+
+#: models_provider/impl/xf_model_provider/credential/tts.py:15
+msgid "Speaker"
+msgstr ""
+
+#: models_provider/impl/xf_model_provider/credential/tts.py:16
+msgid ""
+"Speaker, optional value: Please go to the console to add a trial or purchase "
+"speaker. After adding, the speaker parameter value will be displayed."
+msgstr ""
+
+#: models_provider/impl/xf_model_provider/credential/tts.py:21
+msgid "iFlytek Xiaoyan"
+msgstr ""
+
+#: models_provider/impl/xf_model_provider/credential/tts.py:22
+msgid "iFlytek Xujiu"
+msgstr ""
+
+#: models_provider/impl/xf_model_provider/credential/tts.py:23
+msgid "iFlytek Xiaoping"
+msgstr ""
+
+#: models_provider/impl/xf_model_provider/credential/tts.py:24
+msgid "iFlytek Xiaojing"
+msgstr ""
+
+#: models_provider/impl/xf_model_provider/credential/tts.py:25
+msgid "iFlytek Xuxiaobao"
+msgstr ""
+
+#: models_provider/impl/xf_model_provider/credential/tts.py:28
+msgid "Speech speed, optional value: [0-100], default is 50"
+msgstr ""
+
+#: models_provider/impl/xf_model_provider/xf_model_provider.py:39
+#: models_provider/impl/xf_model_provider/xf_model_provider.py:50
+msgid "Chinese and English recognition"
+msgstr ""
+
+#: models_provider/impl/xf_model_provider/xf_model_provider.py:66
+msgid "iFlytek Spark"
+msgstr ""
+
+#: models_provider/impl/xinference_model_provider/credential/tti.py:15
+msgid ""
+"The image generation endpoint allows you to create raw images based on text "
+"prompts. The dimensions of the image can be 1024x1024, 1024x1792, or "
+"1792x1024 pixels."
+msgstr ""
+
+#: models_provider/impl/xinference_model_provider/credential/tti.py:29
+msgid ""
+"By default, images are generated in standard quality, you can set quality: "
+"\"hd\" to enhance detail. Square, standard quality images are generated "
+"fastest."
+msgstr ""
+
+#: models_provider/impl/xinference_model_provider/credential/tti.py:42
+msgid ""
+"You can request 1 image at a time (requesting more images by making parallel "
+"requests), or up to 10 images at a time using the n parameter."
+msgstr ""
+
+#: models_provider/impl/xinference_model_provider/credential/tts.py:20
+msgid "Chinese female"
+msgstr ""
+
+#: models_provider/impl/xinference_model_provider/credential/tts.py:21
+msgid "Chinese male"
+msgstr ""
+
+#: models_provider/impl/xinference_model_provider/credential/tts.py:22
+msgid "Japanese male"
+msgstr ""
+
+#: models_provider/impl/xinference_model_provider/credential/tts.py:23
+msgid "Cantonese female"
+msgstr ""
+
+#: models_provider/impl/xinference_model_provider/credential/tts.py:24
+msgid "English female"
+msgstr ""
+
+#: models_provider/impl/xinference_model_provider/credential/tts.py:25
+msgid "English male"
+msgstr ""
+
+#: models_provider/impl/xinference_model_provider/credential/tts.py:26
+msgid "Korean female"
+msgstr ""
+
+#: models_provider/impl/xinference_model_provider/xinference_model_provider.py:37
+msgid ""
+"Code Llama is a language model specifically designed for code generation."
+msgstr ""
+
+#: models_provider/impl/xinference_model_provider/xinference_model_provider.py:44
+msgid ""
+"       \n"
+"Code Llama Instruct is a fine-tuned version of Code Llama's instructions, "
+"designed to perform specific tasks.\n"
+"        "
+msgstr ""
+
+#: models_provider/impl/xinference_model_provider/xinference_model_provider.py:53
+msgid ""
+"Code Llama Python is a language model specifically designed for Python code "
+"generation."
+msgstr ""
+
+#: models_provider/impl/xinference_model_provider/xinference_model_provider.py:60
+msgid ""
+"CodeQwen 1.5 is a language model for code generation with high performance."
+msgstr ""
+
+#: models_provider/impl/xinference_model_provider/xinference_model_provider.py:67
+msgid "CodeQwen 1.5 Chat is a chat model version of CodeQwen 1.5."
+msgstr ""
+
+#: models_provider/impl/xinference_model_provider/xinference_model_provider.py:74
+msgid "Deepseek is a large-scale language model with 13 billion parameters."
+msgstr ""
+
+#: models_provider/impl/zhipu_model_provider/credential/tti.py:16
+msgid ""
+"Image size, only cogview-3-plus supports this parameter. Optional range: "
+"[1024x1024,768x1344,864x1152,1344x768,1152x864,1440x720,720x1440], the "
+"default is 1024x1024."
+msgstr ""
+
+#: models_provider/impl/zhipu_model_provider/zhipu_model_provider.py:34
+msgid ""
+"Have strong multi-modal understanding capabilities. Able to understand up to "
+"five images simultaneously and supports video content understanding"
+msgstr ""
+
+#: models_provider/impl/zhipu_model_provider/zhipu_model_provider.py:37
+msgid ""
+"Focus on single picture understanding. Suitable for scenarios requiring "
+"efficient image analysis"
+msgstr ""
+
+#: models_provider/impl/zhipu_model_provider/zhipu_model_provider.py:40
+msgid ""
+"Focus on single picture understanding. Suitable for scenarios requiring "
+"efficient image analysis (free)"
+msgstr ""
+
+#: models_provider/impl/zhipu_model_provider/zhipu_model_provider.py:46
+msgid ""
+"Quickly and accurately generate images based on user text descriptions. "
+"Resolution supports 1024x1024"
+msgstr ""
+
+#: models_provider/impl/zhipu_model_provider/zhipu_model_provider.py:49
+msgid ""
+"Generate high-quality images based on user text descriptions, supporting "
+"multiple image sizes"
+msgstr ""
+
+#: models_provider/impl/zhipu_model_provider/zhipu_model_provider.py:52
+msgid ""
+"Generate high-quality images based on user text descriptions, supporting "
+"multiple image sizes (free)"
+msgstr ""
+
+#: models_provider/impl/zhipu_model_provider/zhipu_model_provider.py:75
+msgid "zhipu AI"
+msgstr ""
+
+#: models_provider/serializers/model_serializer.py:43
+#: models_provider/serializers/model_serializer.py:222
+#: models_provider/serializers/model_serializer.py:259
+#: models_provider/serializers/model_serializer.py:323
+msgid "base model"
+msgstr ""
+
+#: models_provider/serializers/model_serializer.py:44
+#: models_provider/serializers/model_serializer.py:260
+msgid "parameter configuration"
+msgstr ""
+
+#: models_provider/serializers/model_serializer.py:45
+#: models_provider/serializers/model_serializer.py:225
+#: models_provider/serializers/model_serializer.py:261
+msgid "certification information"
+msgstr ""
+
+#: models_provider/serializers/model_serializer.py:108
+#: models_provider/serializers/model_serializer.py:215
+#: models_provider/serializers/model_serializer.py:255
+#: modules/serializers/module.py:35 tools/serializers/tool.py:65
+msgid "user id"
+msgstr ""
+
+#: models_provider/serializers/model_serializer.py:116
+#: models_provider/serializers/model_serializer.py:132
+#: models_provider/serializers/model_serializer.py:151
+#: models_provider/serializers/model_serializer.py:178
+#: models_provider/serializers/model_serializer.py:371
+#: models_provider/tools.py:111
+msgid "Model does not exist"
+msgstr ""
+
+#: models_provider/serializers/model_serializer.py:233
+#: models_provider/serializers/model_serializer.py:272
+#, python-brace-format
+msgid "base model【{model_name}】already exists"
+msgstr ""
+
+#: models_provider/serializers/model_serializer.py:312
+msgid "Model saving failed"
+msgstr ""
+
+#: models_provider/serializers/model_serializer.py:325
+msgid "create user"
+msgstr ""
+
+#: models_provider/tools.py:113
+msgid "No permission to use this model"
+msgstr ""
+
+#: models_provider/views/model.py:28 models_provider/views/model.py:29
+msgid "Create model"
+msgstr ""
+
+#: models_provider/views/model.py:30 models_provider/views/model.py:57
+#: models_provider/views/model.py:74 models_provider/views/model.py:85
+#: models_provider/views/model.py:96 models_provider/views/model.py:110
+#: models_provider/views/model.py:121 models_provider/views/model.py:137
+#: models_provider/views/model.py:150 models_provider/views/provide.py:24
+#: models_provider/views/provide.py:47 models_provider/views/provide.py:61
+#: models_provider/views/provide.py:79 models_provider/views/provide.py:96
+msgid "Model"
+msgstr ""
+
+#: models_provider/views/model.py:53 models_provider/views/model.py:54
+msgid "Query model list"
+msgstr ""
+
+#: models_provider/views/model.py:69 models_provider/views/model.py:70
+msgid "Update model"
+msgstr ""
+
+#: models_provider/views/model.py:82 models_provider/views/model.py:83
+msgid "Delete model"
+msgstr ""
+
+#: models_provider/views/model.py:92 models_provider/views/model.py:93
+msgid "Query model details"
+msgstr ""
+
+#: models_provider/views/model.py:106 models_provider/views/model.py:107
+msgid "Get model parameter form"
+msgstr ""
+
+#: models_provider/views/model.py:117 models_provider/views/model.py:118
+msgid "Save model parameter form"
+msgstr ""
+
+#: models_provider/views/model.py:132 models_provider/views/model.py:134
+msgid ""
+"Query model meta information, this interface does not carry authentication "
+"information"
+msgstr ""
+
+#: models_provider/views/model.py:147 models_provider/views/model.py:148
+msgid "Pause model download"
+msgstr ""
+
+#: models_provider/views/provide.py:21 models_provider/views/provide.py:22
+msgid "Get a list of model suppliers"
+msgstr ""
+
+#: models_provider/views/provide.py:43 models_provider/views/provide.py:44
+msgid "Get a list of model types"
+msgstr ""
+
+#: models_provider/views/provide.py:57 models_provider/views/provide.py:58
+msgid "Example of obtaining model list"
+msgstr ""
+
+#: models_provider/views/provide.py:75
+msgid "Get model default parameters"
+msgstr ""
+
+#: models_provider/views/provide.py:76 models_provider/views/provide.py:92
+#: models_provider/views/provide.py:93
+msgid "Get the model creation form"
+msgstr ""
+
+#: modules/models/module.py:6 modules/models/module.py:13
+#: modules/serializers/module.py:29
+msgid "module name"
+msgstr ""
+
+#: modules/models/module.py:9 modules/serializers/module.py:32
+msgid "parent id"
+msgstr ""
+
+#: modules/serializers/module.py:28 modules/serializers/module.py:62
+msgid "module id"
+msgstr ""
+
+#: modules/serializers/module.py:30
+msgid "module user id"
+msgstr ""
+
+#: modules/serializers/module.py:36 modules/serializers/module.py:64
+#: modules/serializers/module.py:96 tools/serializers/tool.py:28
+msgid "source"
+msgstr ""
+
+#: modules/serializers/module.py:49
+msgid "Module name already exists"
+msgstr ""
+
+#: modules/serializers/module.py:70
+msgid "Module does not exist"
+msgstr ""
+
+#: modules/serializers/module.py:89
+msgid "Cannot delete root module"
+msgstr ""
+
+#: modules/views/module.py:19 modules/views/module.py:20
+msgid "Create module"
+msgstr ""
+
+#: modules/views/module.py:24 modules/views/module.py:43
+#: modules/views/module.py:56 modules/views/module.py:68
+#: modules/views/module.py:85
+msgid "Module"
+msgstr ""
+
+#: modules/views/module.py:38 modules/views/module.py:39
+msgid "Update module"
+msgstr ""
+
+#: modules/views/module.py:52 modules/views/module.py:53
+msgid "Get module"
+msgstr ""
+
+#: modules/views/module.py:65 modules/views/module.py:66
+msgid "Delete module"
+msgstr ""
+
+#: modules/views/module.py:81 modules/views/module.py:82
+msgid "Get module tree"
+msgstr ""
+
+#: tools/serializers/tool.py:22
+msgid "variable name"
+msgstr ""
+
+#: tools/serializers/tool.py:24
+msgid "type"
+msgstr ""
+
+#: tools/serializers/tool.py:26
+msgid "fields only support string|int|dict|array|float"
+msgstr ""
+
+#: tools/serializers/tool.py:30
+msgid "The field only supports custom|reference"
+msgstr ""
+
+#: tools/serializers/tool.py:35
+msgid "field name"
+msgstr ""
+
+#: tools/serializers/tool.py:36
+msgid "field label"
+msgstr ""
+
+#: tools/serializers/tool.py:46
+msgid "tool name"
+msgstr ""
+
+#: tools/serializers/tool.py:49
+msgid "tool description"
+msgstr ""
+
+#: tools/serializers/tool.py:51
+msgid "tool content"
+msgstr ""
+
+#: tools/serializers/tool.py:54
+msgid "input field list"
+msgstr ""
+
+#: tools/serializers/tool.py:56
+msgid "init field list"
+msgstr ""
+
+#: tools/serializers/tool.py:58
+msgid "Is active"
+msgstr ""
+
+#: tools/serializers/tool.py:85
+msgid "tool id"
+msgstr ""
+
+#: tools/serializers/tool.py:93
+msgid "Tool not found"
+msgstr ""
+
+#: tools/views/tool.py:19 tools/views/tool.py:20
+msgid "Create tool"
+msgstr ""
+
+#: tools/views/tool.py:24 tools/views/tool.py:40 tools/views/tool.py:52
+#: tools/views/tool.py:63
+msgid "Tool"
+msgstr ""
+
+#: tools/views/tool.py:35 tools/views/tool.py:36 tools/views/tool.py:48
+#: tools/views/tool.py:49
+msgid "Update tool"
+msgstr ""
+
+#: tools/views/tool.py:60 tools/views/tool.py:61
+msgid "Delete tool"
+msgstr ""
+
+#: users/serializers/login.py:27
 msgid "Username"
 msgstr ""
 
-#: .\apps\users\serializers\login.py:24
+#: users/serializers/login.py:28
 msgid "Password"
 msgstr ""
 
-#: .\apps\users\serializers\login.py:31
-msgid "token"
-msgstr ""
-
-#: .\apps\users\serializers\login.py:43
-msgid "The username or password is incorrect"
-msgstr ""
-
-#: .\apps\users\serializers\login.py:45
-msgid "The user has been disabled, please contact the administrator!"
-msgstr ""
-
-#: .\apps\users\views\login.py:21 .\apps\users\views\login.py:22
-msgid "Log in"
-msgstr ""
-
-#: .\apps\users\views\login.py:23 .\apps\users\views\user.py:26
-msgid "User management"
-msgstr ""
-
-#: .\apps\users\views\user.py:24 .\apps\users\views\user.py:25
-msgid "Get current user information"
-msgstr ""
-
-msgid "Get captcha"
-msgstr ""
-
+#: users/serializers/login.py:29 users/serializers/login.py:69
 msgid "captcha"
 msgstr ""
 
+#: users/serializers/login.py:36
+msgid "token"
+msgstr ""
+
+#: users/serializers/login.py:50
 msgid "Captcha code error or expiration"
+msgstr ""
+
+#: users/serializers/login.py:53
+msgid "The username or password is incorrect"
+msgstr ""
+
+#: users/serializers/login.py:55
+msgid "The user has been disabled, please contact the administrator!"
+msgstr ""
+
+#: users/views/login.py:21 users/views/login.py:22
+msgid "Log in"
+msgstr ""
+
+#: users/views/login.py:23 users/views/login.py:34 users/views/user.py:28
+#: users/views/user.py:40 users/views/user.py:53
+msgid "User management"
+msgstr ""
+
+#: users/views/login.py:32 users/views/login.py:33
+msgid "Get captcha"
+msgstr ""
+
+#: users/views/user.py:26 users/views/user.py:27 users/views/user.py:38
+msgid "Get current user information"
 msgstr ""
