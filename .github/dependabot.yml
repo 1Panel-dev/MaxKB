@@ -3,7 +3,7 @@ updates:
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
       timezone: "Asia/Shanghai"
-      day: "friday"
+#      day: "friday"
     target-branch: v2
