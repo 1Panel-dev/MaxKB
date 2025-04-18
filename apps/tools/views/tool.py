@@ -7,22 +7,62 @@ from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
 from common.constants.permission_constants import PermissionConstants
 from common.result import result
-from tools.api.tool import ToolCreateAPI
+from tools.api.tool import ToolCreateAPI, ToolEditAPI, ToolReadAPI, ToolDeleteAPI
 from tools.serializers.tool import ToolSerializer
 
 
-class ToolCreateView(APIView):
-    authentication_classes = [TokenAuth]
+class ToolView(APIView):
+    class Create(APIView):
+        authentication_classes = [TokenAuth]
 
-    @extend_schema(methods=['POST'],
-                   description=_('Create tool'),
-                   operation_id=_('Create tool'),
-                   request=ToolCreateAPI.get_request(),
-                   responses=ToolCreateAPI.get_response(),
-                   tags=[_('Tool')])
-    @has_permissions(PermissionConstants.TOOL_CREATE)
-    # @log(menu='Tool', operate="Create tool",
-    #      get_operation_object=lambda r, k: r.data.get('name'))
-    def post(self, request: Request, workspace_id: str):
-        print(workspace_id)
-        return result.success(ToolSerializer.Create(data={'user_id': request.user.id}).insert(request.data))
+        @extend_schema(methods=['POST'],
+                       description=_('Create tool'),
+                       operation_id=_('Create tool'),
+                       parameters=ToolCreateAPI.get_parameters(),
+                       request=ToolCreateAPI.get_request(),
+                       responses=ToolCreateAPI.get_response(),
+                       tags=[_('Tool')])
+        @has_permissions(PermissionConstants.TOOL_CREATE.get_workspace_permission())
+        def post(self, request: Request, workspace_id: str):
+            return result.success(ToolSerializer.Create(
+                data={'user_id': request.user.id, 'workspace_id': workspace_id}
+            ).insert(request.data))
+
+    class Operate(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(methods=['PUT'],
+                       description=_('Update tool'),
+                       operation_id=_('Update tool'),
+                       parameters=ToolEditAPI.get_parameters(),
+                       request=ToolEditAPI.get_request(),
+                       responses=ToolEditAPI.get_response(),
+                       tags=[_('Tool')])
+        @has_permissions(PermissionConstants.TOOL_EDIT.get_workspace_permission())
+        def put(self, request: Request, workspace_id: str, tool_id: str):
+            return result.success(ToolSerializer.Operate(
+                data={'id': tool_id, 'workspace_id': workspace_id}
+            ).edit(request.data))
+
+        @extend_schema(methods=['GET'],
+                       description=_('Update tool'),
+                       operation_id=_('Update tool'),
+                       parameters=ToolReadAPI.get_parameters(),
+                       responses=ToolReadAPI.get_response(),
+                       tags=[_('Tool')])
+        @has_permissions(PermissionConstants.TOOL_READ.get_workspace_permission())
+        def get(self, request: Request, workspace_id: str, tool_id: str):
+            return result.success(ToolSerializer.Operate(
+                data={'id': tool_id, 'workspace_id': workspace_id}
+            ).one())
+
+        @extend_schema(methods=['DELETE'],
+                       description=_('Delete tool'),
+                       operation_id=_('Delete tool'),
+                       parameters=ToolDeleteAPI.get_parameters(),
+                       tags=[_('Tool')])
+        @has_permissions(PermissionConstants.TOOL_DELETE.get_workspace_permission())
+        def delete(self, request: Request, workspace_id: str, tool_id: str):
+            return result.success(ToolSerializer.Operate(
+                data={'id': tool_id, 'workspace_id': workspace_id}
+            ).delete())
