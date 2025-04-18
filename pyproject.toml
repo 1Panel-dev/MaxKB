@@ -38,7 +38,7 @@ pydub = "0.25.1"
 cffi = "1.17.1"
 pysilk = "0.0.1"
 sentence-transformers = "4.1.0"
-websockets = "13.1"
+websockets = "15.0.1"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
