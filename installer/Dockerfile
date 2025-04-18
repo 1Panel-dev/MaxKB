@@ -43,6 +43,8 @@ ENV MAXKB_VERSION="${DOCKER_IMAGE_TAG} (build at ${BUILD_AT}, commit: ${GITHUB_C
     MAXKB_DB_USER=${POSTGRES_USER} \
     MAXKB_DB_PASSWORD=${POSTGRES_PASSWORD} \
     MAXKB_DB_MAX_OVERFLOW=80 \
+    MAXKB_REDIS_HOST=127.0.0.1 \
+    MAXKB_REDIS_PASSWORD=${REDIS_PASSWORD} \
     MAXKB_EMBEDDING_MODEL_NAME=/opt/maxkb-app/model/embedding/shibing624_text2vec-base-chinese \
     MAXKB_EMBEDDING_MODEL_PATH=/opt/maxkb-app/model/embedding \
     MAXKB_SANDBOX=1 \
@@ -53,7 +55,7 @@ ENV MAXKB_VERSION="${DOCKER_IMAGE_TAG} (build at ${BUILD_AT}, commit: ${GITHUB_C
     PYTHONUNBUFFERED=1
 
 WORKDIR /opt/maxkb/app
-COPY --from=stage-build /opt/maxkb-app /opt/maxkb=app
+COPY --from=stage-build /opt/maxkb-app /opt/maxkb-app
 COPY --from=stage-build /opt/py3 /opt/py3
 COPY --from=vector-model /opt/maxkb/app/model /opt/maxkb-app/model
 
