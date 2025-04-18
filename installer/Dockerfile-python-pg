@@ -8,6 +8,7 @@ ARG DEPENDENCIES="                    \
         ca-certificates               \
         vim                           \
         gettext                       \
+        redis-server                  \
         postgresql-17-pgvector        \
         postgresql-17-age"
 
@@ -18,3 +19,10 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     rm -rf /var/lib/apt/lists/*
 
 COPY --from=python-stage /usr/local /usr/local
+
+ENV PGDATA=/opt/maxkb/data/postgresql/pgdata \
+    POSTGRES_USER=root \
+    POSTGRES_PASSWORD=Password123@postgres \
+    POSTGRES_MAX_CONNECTIONS=1000 \
+    REDIS_PASSWORD=Password123@redis \
+    LANG=en_US.UTF-8
