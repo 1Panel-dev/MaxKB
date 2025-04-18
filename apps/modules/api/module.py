@@ -83,6 +83,10 @@ class ModuleEditAPI(ModuleReadAPI):
         return ModuleEditRequest
 
 
+class ModuleDeleteAPI(ModuleReadAPI):
+    pass
+
+
 class ModuleTreeReadAPI(APIMixin):
     @staticmethod
     def get_parameters():

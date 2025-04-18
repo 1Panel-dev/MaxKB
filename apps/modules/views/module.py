@@ -7,7 +7,7 @@ from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
 from common.constants.permission_constants import Permission, Group, Operate
 from common.result import result
-from modules.api.module import ModuleCreateAPI, ModuleEditAPI, ModuleReadAPI, ModuleTreeReadAPI
+from modules.api.module import ModuleCreateAPI, ModuleEditAPI, ModuleReadAPI, ModuleTreeReadAPI, ModuleDeleteAPI
 from modules.serializers.module import ModuleSerializer, ModuleTreeSerializer
 
 
@@ -60,6 +60,18 @@ class ModuleView(APIView):
             return result.success(ModuleSerializer.Operate(
                 data={'id': module_id, 'workspace_id': workspace_id, 'source': source}
             ).one())
+
+        @extend_schema(methods=['DELETE'],
+                       description=_('Delete module'),
+                       operation_id=_('Delete module'),
+                       parameters=ModuleDeleteAPI.get_parameters(),
+                       tags=[_('Module')])
+        @has_permissions(lambda r, kwargs: Permission(group=Group(kwargs.get('source')), operate=Operate.DELETE,
+                                                      resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}"))
+        def delete(self, request: Request, workspace_id: str, source: str, module_id: str):
+            return result.success(ModuleSerializer.Operate(
+                data={'id': module_id, 'workspace_id': workspace_id, 'source': source}
+            ).delete())
 
 
 class ModuleTreeView(APIView):
