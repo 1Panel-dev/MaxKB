@@ -62,7 +62,7 @@ COPY --from=vector-model /opt/maxkb/app/model /opt/maxkb-app/model
 RUN chmod 755 /opt/maxkb-app/installer/*.sh && \
     cp -f /opt/maxkb-app/installer/*.sh /usr/bin/ && \
     cp -f /opt/maxkb-app/installer/init.sql /docker-entrypoint-initdb.d && \
-    rm -rf /opt/maxkb-app/installer
+    rm -rf /opt/maxkb-app/installer && \
     cp -r /opt/maxkb-app/model/base/hub /opt/maxkb-app/model/tokenizer && \
     curl -L --connect-timeout 120 -m 1800 https://resource.fit2cloud.com/maxkb/ffmpeg/get-ffmpeg-linux | sh && \
     mkdir -p /opt/maxkb-app/sandbox/ &&  \
