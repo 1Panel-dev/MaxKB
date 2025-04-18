@@ -128,6 +128,8 @@ class PermissionConstants(Enum):
                                                                                      RoleConstants.USER])
     TOOL_MODULE_EDIT = Permission(group=Group.TOOL, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN,
                                                                                      RoleConstants.USER])
+    TOOL_MODULE_DELETE = Permission(group=Group.TOOL, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN,
+                                                                                         RoleConstants.USER])
 
     TOOL_CREATE = Permission(group=Group.TOOL, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN,
                                                                                   RoleConstants.USER])

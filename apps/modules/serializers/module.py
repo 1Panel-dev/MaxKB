@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import uuid_utils.compat as uuid
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Q
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -83,6 +83,13 @@ class ModuleSerializer(serializers.Serializer):
             module = QuerySet(Module).filter(id=self.data.get('id')).first()
             return ModuleSerializer(module).data
 
+        def delete(self):
+            self.is_valid(raise_exception=True)
+            if self.data.get('id') == 'root':
+                raise serializers.ValidationError(_('Cannot delete root module'))
+            Module = get_module_type(self.data.get('source'))
+            QuerySet(Module).filter(id=self.data.get('id')).delete()
+
 
 class ModuleTreeSerializer(serializers.Serializer):
     workspace_id = serializers.CharField(required=True, allow_null=True, allow_blank=True, label=_('workspace id'))
@@ -91,6 +98,6 @@ class ModuleTreeSerializer(serializers.Serializer):
     def get_module_tree(self):
         self.is_valid(raise_exception=True)
         Module = get_module_type(self.data.get('source'))
-        nodes = Module.objects.filter(workspace_id=self.data.get('workspace_id')).get_cached_trees()
+        nodes = Module.objects.filter(Q(workspace_id=self.data.get('workspace_id'))).get_cached_trees()
         serializer = ToolModuleTreeSerializer(nodes, many=True)
         return serializer.data  # 这是可序列化的字典
