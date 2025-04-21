@@ -88,6 +88,6 @@ class ToolTreeReadAPI(APIMixin):
                 description="模块id",
                 type=OpenApiTypes.STR,
                 location='query',
-                required=True,
+                required=False,
             )
         ]
