@@ -238,6 +238,7 @@ class WorkflowManage:
                  base_to_response: BaseToResponse = SystemToResponse(), form_data=None, image_list=None,
                  document_list=None,
                  audio_list=None,
+                 other_list=None,
                  start_node_id=None,
                  start_node_data=None, chat_record=None, child_node=None):
         if form_data is None:
@@ -248,12 +249,15 @@ class WorkflowManage:
             document_list = []
         if audio_list is None:
             audio_list = []
+        if other_list is None:
+            other_list = []
         self.start_node_id = start_node_id
         self.start_node = None
         self.form_data = form_data
         self.image_list = image_list
         self.document_list = document_list
         self.audio_list = audio_list
+        self.other_list = other_list
         self.params = params
         self.flow = flow
         self.context = {}

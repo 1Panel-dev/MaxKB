@@ -40,6 +40,7 @@ class BaseStartStepNode(IStarNode):
         self.context['document'] = details.get('document_list')
         self.context['image'] = details.get('image_list')
         self.context['audio'] = details.get('audio_list')
+        self.context['other'] = details.get('other_list')
         self.status = details.get('status')
         self.err_message = details.get('err_message')
         for key, value in workflow_variable.items():
@@ -59,7 +60,8 @@ class BaseStartStepNode(IStarNode):
             'question': question,
             'image': self.workflow_manage.image_list,
             'document': self.workflow_manage.document_list,
-            'audio': self.workflow_manage.audio_list
+            'audio': self.workflow_manage.audio_list,
+            'other': self.workflow_manage.other_list,
         }
         return NodeResult(node_variable, workflow_variable)
 
@@ -83,5 +85,6 @@ class BaseStartStepNode(IStarNode):
             'image_list': self.context.get('image'),
             'document_list': self.context.get('document'),
             'audio_list': self.context.get('audio'),
+            'other_list': self.context.get('other'),
             'global_fields': global_fields
         }

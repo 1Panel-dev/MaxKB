@@ -78,7 +78,8 @@ const refreshFileUploadConfig = () => {
       item.value !== 'image' &&
       item.value !== 'document' &&
       item.value !== 'audio' &&
-      item.value !== 'video'
+      item.value !== 'video' &&
+      item.value !== 'other'
   )
 
   if (form_data.length === 0) {
@@ -97,6 +98,9 @@ const refreshFileUploadConfig = () => {
   }
   if (form_data[0].video) {
     fileUploadFields.push({ label: t('common.fileUpload.video'), value: 'video' })
+  }
+  if (form_data[0].other) {
+    fileUploadFields.push({ label: t('common.fileUpload.other'), value: 'other' })
   }
 
   set(props.nodeModel.properties.config, 'fields', [...fields, ...fileUploadFields])

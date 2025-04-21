@@ -10,12 +10,49 @@
             uploadDocumentList.length ||
             uploadImageList.length ||
             uploadAudioList.length ||
-            uploadVideoList.length
+            uploadVideoList.length ||
+            uploadOtherList.length
           "
         >
           <el-row :gutter="10">
             <el-col
               v-for="(item, index) in uploadDocumentList"
+              :key="index"
+              :xs="24"
+              :sm="props.type === 'debug-ai-chat' ? 24 : 12"
+              :md="props.type === 'debug-ai-chat' ? 24 : 12"
+              :lg="props.type === 'debug-ai-chat' ? 24 : 12"
+              :xl="props.type === 'debug-ai-chat' ? 24 : 12"
+              class="mb-8"
+            >
+              <el-card
+                shadow="never"
+                style="--el-card-padding: 8px; max-width: 100%"
+                class="file cursor"
+              >
+                <div
+                  class="flex align-center"
+                  @mouseenter.stop="mouseenter(item)"
+                  @mouseleave.stop="mouseleave()"
+                >
+                  <div
+                    @click="deleteFile(index, 'document')"
+                    class="delete-icon color-secondary"
+                    v-if="showDelete === item.url"
+                  >
+                    <el-icon>
+                      <CircleCloseFilled />
+                    </el-icon>
+                  </div>
+                  <img :src="getImgUrl(item && item?.name)" alt="" width="24" />
+                  <div class="ml-4 ellipsis-1" :title="item && item?.name">
+                    {{ item && item?.name }}
+                  </div>
+                </div>
+              </el-card>
+            </el-col>
+            <el-col
+              v-for="(item, index) in uploadOtherList"
               :key="index"
               :xs="24"
               :sm="props.type === 'debug-ai-chat' ? 24 : 12"
@@ -310,9 +347,10 @@ const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp']
 const documentExtensions = ['pdf', 'docx', 'txt', 'xls', 'xlsx', 'md', 'html', 'csv']
 const videoExtensions = ['mp4', 'avi', 'mov', 'mkv', 'flv']
 const audioExtensions = ['mp3', 'wav', 'ogg', 'aac', 'm4a']
+let otherExtensions = ['ppt', 'doc']
 
 const getAcceptList = () => {
-  const { image, document, audio, video } = props.applicationDetails.file_upload_setting
+  const { image, document, audio, video, other } = props.applicationDetails.file_upload_setting
   let accepts: any = []
   if (image) {
     accepts = [...imageExtensions]
@@ -325,6 +363,11 @@ const getAcceptList = () => {
   }
   if (video) {
     accepts = [...accepts, ...videoExtensions]
+  }
+  if (other) {
+    // 其他文件类型
+    otherExtensions = props.applicationDetails.file_upload_setting.otherExtensions
+    accepts = [...accepts, ...otherExtensions]
   }
 
   if (accepts.length === 0) {
@@ -339,7 +382,8 @@ const checkMaxFilesLimit = () => {
     uploadImageList.value.length +
       uploadDocumentList.value.length +
       uploadAudioList.value.length +
-      uploadVideoList.value.length
+      uploadVideoList.value.length +
+      uploadOtherList.value.length
   )
 }
 
@@ -350,7 +394,8 @@ const uploadFile = async (file: any, fileList: any) => {
     uploadImageList.value.length +
     uploadDocumentList.value.length +
     uploadAudioList.value.length +
-    uploadVideoList.value.length
+    uploadVideoList.value.length +
+    uploadOtherList.value.length
   if (file_limit_once >= maxFiles) {
     MsgWarning(t('chat.uploadFile.limitMessage1') + maxFiles + t('chat.uploadFile.limitMessage2'))
     fileList.splice(0, fileList.length)
@@ -376,6 +421,8 @@ const uploadFile = async (file: any, fileList: any) => {
     uploadVideoList.value.push(file)
   } else if (audioExtensions.includes(extension)) {
     uploadAudioList.value.push(file)
+  } else if (otherExtensions.includes(extension)) {
+    uploadOtherList.value.push(file)
   }
 
   if (!chatId_context.value) {
@@ -426,6 +473,15 @@ const uploadFile = async (file: any, fileList: any) => {
         }
       })
       uploadVideoList.value.forEach((file: any) => {
+        const f = response.data.filter(
+          (f: any) => f.name.replaceAll(' ', '') === file.name.replaceAll(' ', '')
+        )
+        if (f.length > 0) {
+          file.url = f[0].url
+          file.file_id = f[0].file_id
+        }
+      })
+      uploadOtherList.value.forEach((file: any) => {
         const f = response.data.filter(
           (f: any) => f.name.replaceAll(' ', '') === file.name.replaceAll(' ', '')
         )
@@ -499,6 +555,7 @@ const uploadImageList = ref<Array<any>>([])
 const uploadDocumentList = ref<Array<any>>([])
 const uploadVideoList = ref<Array<any>>([])
 const uploadAudioList = ref<Array<any>>([])
+const uploadOtherList = ref<Array<any>>([])
 
 const showDelete = ref('')
 
@@ -709,13 +766,15 @@ function autoSendMessage() {
         image_list: uploadImageList.value,
         document_list: uploadDocumentList.value,
         audio_list: uploadAudioList.value,
-        video_list: uploadVideoList.value
+        video_list: uploadVideoList.value,
+        other_list: uploadOtherList.value,
       })
       inputValue.value = ''
       uploadImageList.value = []
       uploadDocumentList.value = []
       uploadAudioList.value = []
       uploadVideoList.value = []
+      uploadOtherList.value = []
       if (quickInputRef.value) {
         quickInputRef.value.textareaStyle.height = '45px'
       }
@@ -771,6 +830,8 @@ function deleteFile(index: number, val: string) {
     uploadVideoList.value.splice(index, 1)
   } else if (val === 'audio') {
     uploadAudioList.value.splice(index, 1)
+  } else if (val === 'other') {
+    uploadOtherList.value.splice(index, 1)
   }
 }
 
