@@ -1,9 +1,10 @@
 # coding=utf-8
 
-from typing import Dict, List
+from typing import Dict, Optional, Sequence, Union, Any, Callable
 from urllib.parse import urlparse, ParseResult
 
 from langchain_core.messages import BaseMessage, get_buffer_string
+from langchain_core.tools import BaseTool
 
 from common.config.tokenizer_manage_config import TokenizerManage
 from setting.models_provider.base_model_provider import MaxKBBaseModel
@@ -31,13 +32,19 @@ class VllmChatModel(MaxKBBaseModel, BaseChatOpenAI):
             model=model_name,
             openai_api_base=model_credential.get('api_base'),
             openai_api_key=model_credential.get('api_key'),
-            **optional_params,
             streaming=True,
             stream_usage=True,
+            extra_body=optional_params
         )
         return vllm_chat_open_ai
 
-    def get_num_tokens_from_messages(self, messages: List[BaseMessage]) -> int:
+    def get_num_tokens_from_messages(
+            self,
+            messages: list[BaseMessage],
+            tools: Optional[
+                Sequence[Union[dict[str, Any], type, Callable, BaseTool]]
+            ] = None,
+    ) -> int:
         if self.usage_metadata is None or self.usage_metadata == {}:
             tokenizer = TokenizerManage.get_tokenizer()
             return sum([len(tokenizer.encode(get_buffer_string([m]))) for m in messages])

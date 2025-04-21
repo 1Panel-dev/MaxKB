@@ -21,11 +21,10 @@ class KimiChatModel(MaxKBBaseModel, BaseChatOpenAI):
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
-
         kimi_chat_open_ai = KimiChatModel(
             openai_api_base=model_credential['api_base'],
             openai_api_key=model_credential['api_key'],
             model_name=model_name,
-            **optional_params
+            extra_body=optional_params,
         )
         return kimi_chat_open_ai
