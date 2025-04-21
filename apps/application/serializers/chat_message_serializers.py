@@ -245,6 +245,7 @@ class OpenAIChatSerializer(serializers.Serializer):
                 'image_list': instance.get('image_list', []),
                 'document_list': instance.get('document_list', []),
                 'audio_list': instance.get('audio_list', []),
+                'other_list': instance.get('other_list', []),
             }
         ).chat(base_to_response=OpenaiToResponse())
 
@@ -274,6 +275,7 @@ class ChatMessageSerializer(serializers.Serializer):
     image_list = serializers.ListField(required=False, error_messages=ErrMessage.list(_("picture")))
     document_list = serializers.ListField(required=False, error_messages=ErrMessage.list(_("document")))
     audio_list = serializers.ListField(required=False, error_messages=ErrMessage.list(_("Audio")))
+    other_list = serializers.ListField(required=False, error_messages=ErrMessage.list(_("Other")))
     child_node = serializers.DictField(required=False, allow_null=True,
                                        error_messages=ErrMessage.dict(_("Child Nodes")))
 
@@ -372,6 +374,7 @@ class ChatMessageSerializer(serializers.Serializer):
         image_list = self.data.get('image_list')
         document_list = self.data.get('document_list')
         audio_list = self.data.get('audio_list')
+        other_list = self.data.get('other_list')
         user_id = chat_info.application.user_id
         chat_record_id = self.data.get('chat_record_id')
         chat_record = None
@@ -388,7 +391,7 @@ class ChatMessageSerializer(serializers.Serializer):
                                            'client_id': client_id,
                                            'client_type': client_type,
                                            'user_id': user_id}, WorkFlowPostHandler(chat_info, client_id, client_type),
-                                          base_to_response, form_data, image_list, document_list, audio_list,
+                                          base_to_response, form_data, image_list, document_list, audio_list, other_list,
                                           self.data.get('runtime_node_id'),
                                           self.data.get('node_data'), chat_record, self.data.get('child_node'))
         r = work_flow_manage.run()

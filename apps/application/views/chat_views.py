@@ -144,6 +144,8 @@ class ChatView(APIView):
                                                    'document_list') if 'document_list' in request.data else [],
                                                'audio_list': request.data.get(
                                                    'audio_list') if 'audio_list' in request.data else [],
+                                               'other_list': request.data.get(
+                                                   'other_list') if 'other_list' in request.data else [],
                                                'client_type': request.auth.client_type,
                                                'node_id': request.data.get('node_id', None),
                                                'runtime_node_id': request.data.get('runtime_node_id', None),

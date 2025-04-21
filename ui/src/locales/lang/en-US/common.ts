@@ -45,7 +45,9 @@ export default {
     document: 'Documents',
     image: 'Image',
     audio: 'Audio',
-    video: 'Video'
+    video: 'Video',
+    other: 'Other file',
+    addExtensions: 'Add file extensions',
   },
   status: {
     label: 'Status',
@@ -55,7 +57,7 @@ export default {
   param: {
     outputParam: 'Output Parameters',
     inputParam: 'Input Parameters',
-    initParam: 'Startup Parameters',
+    initParam: 'Startup Parameters'
   },
 
   inputPlaceholder: 'Please input',
