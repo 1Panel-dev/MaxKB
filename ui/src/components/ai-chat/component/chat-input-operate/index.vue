@@ -137,6 +137,8 @@
           type="textarea"
           :maxlength="100000"
           @keydown.enter="sendChatHandle($event)"
+          @paste="handlePaste"
+          @drop="handleDrop"
         />
 
         <div class="operate flex align-center">
@@ -188,6 +190,7 @@
                 :show-file-list="false"
                 :accept="getAcceptList()"
                 :on-change="(file: any, fileList: any) => uploadFile(file, fileList)"
+                ref="upload"
               >
                 <el-tooltip
                   :disabled="mode === 'mobile'"
@@ -300,6 +303,8 @@ const localLoading = computed({
     emit('update:loading', v)
   }
 })
+
+const upload = ref()
 
 const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp']
 const documentExtensions = ['pdf', 'docx', 'txt', 'xls', 'xlsx', 'md', 'html', 'csv']
@@ -433,6 +438,54 @@ const uploadFile = async (file: any, fileList: any) => {
         inputValue.value = t('chat.uploadFile.imageMessage')
       }
     })
+}
+// 粘贴处理
+const handlePaste = (event: ClipboardEvent) => {
+  if (!props.applicationDetails.file_upload_enable) return
+  const clipboardData = event.clipboardData
+  if (!clipboardData) return
+
+  // 获取剪贴板中的文件
+  const files = clipboardData.files
+  if (files.length === 0) return
+
+  // 转换 FileList 为数组并遍历处理
+  Array.from(files).forEach((rawFile: File) => {
+    // 创建符合 el-upload 要求的文件对象
+    const elFile = {
+      uid: Date.now(), // 生成唯一ID
+      name: rawFile.name,
+      size: rawFile.size,
+      raw: rawFile, // 原始文件对象
+      status: 'ready', // 文件状态
+      percentage: 0 // 上传进度
+    }
+
+    // 手动触发上传逻辑（模拟 on-change 事件）
+    uploadFile(elFile, [elFile])
+  })
+
+  // 阻止默认粘贴行为
+  event.preventDefault()
+}
+// 新增拖拽处理
+const handleDrop = (event: DragEvent) => {
+  if (!props.applicationDetails.file_upload_enable) return
+  event.preventDefault()
+  const files = event.dataTransfer?.files
+  if (!files) return
+
+  Array.from(files).forEach((rawFile) => {
+    const elFile = {
+      uid: Date.now(),
+      name: rawFile.name,
+      size: rawFile.size,
+      raw: rawFile,
+      status: 'ready',
+      percentage: 0
+    }
+    uploadFile(elFile, [elFile])
+  })
 }
 // 语音录制任务id
 const intervalId = ref<any | null>(null)
