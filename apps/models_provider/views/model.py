@@ -56,11 +56,11 @@ class Model(APIView):
                    responses=ModelListResponse.get_response(),
                    tags=[_('Model')])
     @has_permissions(PermissionConstants.MODEL_READ.get_workspace_permission())
-    def get(self, request: Request):
+    def get(self, request: Request, workspace_id: str):
         return result.success(
             ModelSerializer.Query(
-                data={**query_params_to_single_dict(request.query_params)}).list(
-                with_valid=True))
+                data={**query_params_to_single_dict(request.query_params)}).list(workspace_id=workspace_id,
+                                                                                 with_valid=True))
 
     class Operate(APIView):
         authentication_classes = [TokenAuth]

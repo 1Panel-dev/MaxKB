@@ -325,16 +325,18 @@ class ModelSerializer(serializers.Serializer):
         create_user = serializers.CharField(required=False, label=_('create user'))
         workspace_id = serializers.CharField(required=False, label=_('workspace id'))
 
-        def list(self, with_valid):
+        def list(self, workspace_id, with_valid):
             if with_valid:
                 self.is_valid(raise_exception=True)
 
-            query_params = self._build_query_params()
+            query_params = self._build_query_params(workspace_id)
             return self._fetch_models(query_params)
 
-        def _build_query_params(self):
+        def _build_query_params(self, workspace_id):
             query_params = {}
-            for field in ['name', 'model_type', 'model_name', 'provider', 'create_user', 'workspace_id']:
+            if workspace_id:
+                query_params['workspace_id'] = workspace_id
+            for field in ['name', 'model_type', 'model_name', 'provider', 'create_user']:
                 value = self.data.get(field)
                 if value is not None:
                     if field == 'name':
