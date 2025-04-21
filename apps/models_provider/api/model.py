@@ -4,7 +4,7 @@ from drf_spectacular.utils import OpenApiParameter
 from rest_framework import serializers
 
 from common.mixins.api_mixin import APIMixin
-from common.result import ResultSerializer
+from common.result import ResultSerializer, DefaultResultSerializer
 from models_provider.serializers.model_serializer import ModelModelSerializer, ModelCreateRequest
 from django.utils.translation import gettext_lazy as _
 
@@ -72,3 +72,9 @@ class ModelEditApi(APIMixin):
     @staticmethod
     def get_response():
         return ModelModelSerializer
+
+
+class DefaultModelResponse(APIMixin):
+    @staticmethod
+    def get_response():
+        return DefaultResultSerializer()

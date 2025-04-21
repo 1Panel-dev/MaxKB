@@ -14,9 +14,9 @@ from rest_framework.request import Request
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
 from common.constants.permission_constants import PermissionConstants
-from common.result import result
+from common.result import result, DefaultResultSerializer
 from common.utils.common import query_params_to_single_dict
-from models_provider.api.model import ModelCreateAPI, GetModelApi, ModelEditApi, ModelListResponse
+from models_provider.api.model import ModelCreateAPI, GetModelApi, ModelEditApi, ModelListResponse, DefaultModelResponse
 from models_provider.api.provide import ProvideApi
 from models_provider.serializers.model_serializer import ModelSerializer
 
@@ -82,6 +82,7 @@ class Model(APIView):
                        description=_('Delete model'),
                        operation_id=_('Delete model'),
                        parameters=GetModelApi.get_query_params_api(),
+                       responses=DefaultModelResponse.get_response(),
                        tags=[_('Model')])
         @has_permissions(PermissionConstants.MODEL_DELETE.get_workspace_permission())
         def delete(self, request: Request, workspace_id: str, model_id: str):
@@ -147,6 +148,7 @@ class Model(APIView):
                        description=_('Pause model download'),
                        operation_id=_('Pause model download'),
                        parameters=GetModelApi.get_query_params_api(),
+                       responses=DefaultModelResponse.get_response(),
                        tags=[_('Model')])
         @has_permissions(PermissionConstants.MODEL_CREATE.get_workspace_permission())
         def put(self, request: Request, workspace_id: str, model_id: str):
