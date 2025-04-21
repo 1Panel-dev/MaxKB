@@ -10,4 +10,4 @@ fi
 echo "Redis starting..."
 redis-server /opt/maxkb/conf/redis.conf &
 sleep 5
-/usr/bin/wait-for-it.sh 127.0.0.1:6379 --timeout=60 --strict -- echo "Redis started."
+wait-for-it 127.0.0.1:6379 --timeout=60 --strict -- echo "Redis started."

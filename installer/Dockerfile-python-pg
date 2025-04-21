@@ -8,6 +8,7 @@ ARG DEPENDENCIES="                    \
         ca-certificates               \
         vim                           \
         gettext                       \
+        wait-for-it                   \
         redis-server                  \
         postgresql-17-pgvector        \
         postgresql-17-age"
