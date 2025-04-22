@@ -213,12 +213,21 @@ class OpenAIChatSerializer(serializers.Serializer):
         return instance.get('messages')[-1].get('content')
 
     @staticmethod
-    def generate_chat(chat_id, application_id, message, client_id):
+    def generate_chat(chat_id, application_id, message, client_id, asker=None):
         if chat_id is None:
             chat_id = str(uuid.uuid1())
         chat = QuerySet(Chat).filter(id=chat_id).first()
         if chat is None:
-            Chat(id=chat_id, application_id=application_id, abstract=message[0:1024], client_id=client_id).save()
+            asker_dict = {'user_name': '游客'}
+            if asker is not None:
+                if isinstance(asker, str):
+                    asker_dict = {
+                        'user_name': asker
+                    }
+                elif isinstance(asker, dict):
+                    asker_dict = asker
+            Chat(id=chat_id, application_id=application_id, abstract=message[0:1024], client_id=client_id,
+                 asker=asker_dict).save()
         return chat_id
 
     def chat(self, instance: Dict, with_valid=True):
@@ -232,7 +241,8 @@ class OpenAIChatSerializer(serializers.Serializer):
         application_id = self.data.get('application_id')
         client_id = self.data.get('client_id')
         client_type = self.data.get('client_type')
-        chat_id = self.generate_chat(chat_id, application_id, message, client_id)
+        chat_id = self.generate_chat(chat_id, application_id, message, client_id,
+                                     asker=instance.get('form_data', {}).get("asker"))
         return ChatMessageSerializer(
             data={
                 'chat_id': chat_id, 'message': message,
