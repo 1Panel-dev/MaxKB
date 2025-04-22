@@ -46,8 +46,8 @@ export default {
     image: 'Image',
     audio: 'Audio',
     video: 'Video',
-    other: 'Other file',
-    addExtensions: 'Add file extensions',
+    other: 'Other',
+    addExtensions: 'Add suffix'
   },
   status: {
     label: 'Status',

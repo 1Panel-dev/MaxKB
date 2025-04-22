@@ -104,7 +104,8 @@ export default {
           label: 'File types allowed for upload',
           documentText: 'Requires "Document Content Extraction" node to parse document content',
           imageText: 'Requires "Image Understanding" node to parse image content',
-          audioText: 'Requires "Speech-to-Text" node to parse audio content'
+          audioText: 'Requires "Speech-to-Text" node to parse audio content',
+          otherText: 'Need to parse this type of file by yourself'
         }
       }
     },
