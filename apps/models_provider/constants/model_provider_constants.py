@@ -12,7 +12,6 @@ from models_provider.impl.kimi_model_provider.kimi_model_provider import KimiMod
 from models_provider.impl.local_model_provider.local_model_provider import LocalModelProvider
 from models_provider.impl.ollama_model_provider.ollama_model_provider import OllamaModelProvider
 from models_provider.impl.openai_model_provider.openai_model_provider import OpenAIModelProvider
-from models_provider.impl.qwen_model_provider.qwen_model_provider import QwenModelProvider
 from models_provider.impl.siliconCloud_model_provider.siliconCloud_model_provider import SiliconCloudModelProvider
 from models_provider.impl.tencent_cloud_model_provider.tencent_cloud_model_provider import TencentCloudModelProvider
 from models_provider.impl.tencent_model_provider.tencent_model_provider import TencentModelProvider
@@ -31,7 +30,6 @@ class ModelProvideConstants(Enum):
     model_ollama_provider = OllamaModelProvider()
     model_openai_provider = OpenAIModelProvider()
     model_kimi_provider = KimiModelProvider()
-    model_qwen_provider = QwenModelProvider()
     model_zhipu_provider = ZhiPuModelProvider()
     model_xf_provider = XunFeiModelProvider()
     model_deepseek_provider = DeepSeekModelProvider()
