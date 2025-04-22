@@ -688,7 +688,9 @@ const uploadRecording = async (audioBlob: Blob) => {
     recorderStatus.value = 'TRANSCRIBING'
     const formData = new FormData()
     formData.append('file', audioBlob, 'recording.mp3')
-    bus.emit('on:transcribing', true)
+    if (props.applicationDetails.stt_autosend) {
+      bus.emit('on:transcribing', true)
+    }
     applicationApi
       .postSpeechToText(props.applicationDetails.id as string, formData, localLoading)
       .then((response) => {
@@ -767,7 +769,7 @@ function autoSendMessage() {
         document_list: uploadDocumentList.value,
         audio_list: uploadAudioList.value,
         video_list: uploadVideoList.value,
-        other_list: uploadOtherList.value,
+        other_list: uploadOtherList.value
       })
       inputValue.value = ''
       uploadImageList.value = []
