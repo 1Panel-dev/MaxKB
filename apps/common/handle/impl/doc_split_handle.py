@@ -112,11 +112,7 @@ def get_image_id_func():
 
 title_font_list = [
     [36, 100],
-    [26, 36],
-    [24, 26],
-    [22, 24],
-    [18, 22],
-    [16, 18]
+    [30, 36]
 ]
 
 
@@ -130,7 +126,7 @@ def get_title_level(paragraph: Paragraph):
         if len(paragraph.runs) == 1:
             font_size = paragraph.runs[0].font.size
             pt = font_size.pt
-            if pt >= 16:
+            if pt >= 30:
                 for _value, index in zip(title_font_list, range(len(title_font_list))):
                     if pt >= _value[0] and pt < _value[1]:
                         return index + 1
