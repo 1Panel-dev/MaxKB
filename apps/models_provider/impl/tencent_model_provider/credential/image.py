@@ -18,25 +18,6 @@ from common.forms import BaseForm, TooltipLabel
 from models_provider.base_model_provider import BaseModelCredential, ValidCode
 
 
-class QwenModelParams(BaseForm):
-    temperature = forms.SliderField(TooltipLabel(_('Temperature'),
-                                                 _('Higher values make the output more random, while lower values make it more focused and deterministic')),
-                                    required=True, default_value=1.0,
-                                    _min=0.1,
-                                    _max=1.9,
-                                    _step=0.01,
-                                    precision=2)
-
-    max_tokens = forms.SliderField(
-        TooltipLabel(_('Output the maximum Tokens'),
-                     _('Specify the maximum number of tokens that the model can generate')),
-        required=True, default_value=800,
-        _min=1,
-        _max=100000,
-        _step=1,
-        precision=0)
-
-
 class TencentVisionModelCredential(BaseForm, BaseModelCredential):
 
     def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], model_params, provider,
@@ -75,4 +56,4 @@ class TencentVisionModelCredential(BaseForm, BaseModelCredential):
     api_key = forms.PasswordInputField('API Key', required=True)
 
     def get_model_params_setting_form(self, model_name):
-        return QwenModelParams()
+        pass

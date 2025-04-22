@@ -10,26 +10,6 @@ from common.exception.app_exception import AppApiException
 from common.forms import BaseForm, TooltipLabel
 from models_provider.base_model_provider import BaseModelCredential, ValidCode
 
-
-class VolcanicEngineImageModelParams(BaseForm):
-    temperature = forms.SliderField(TooltipLabel(_('Temperature'),
-                                                 _('Higher values make the output more random, while lower values make it more focused and deterministic')),
-                                    required=True, default_value=0.95,
-                                    _min=0.1,
-                                    _max=1.0,
-                                    _step=0.01,
-                                    precision=2)
-
-    max_tokens = forms.SliderField(
-        TooltipLabel(_('Output the maximum Tokens'),
-                     _('Specify the maximum number of tokens that the model can generate')),
-        required=True, default_value=1024,
-        _min=1,
-        _max=100000,
-        _step=1,
-        precision=0)
-
-
 class VolcanicEngineImageModelCredential(BaseForm, BaseModelCredential):
     api_key = forms.PasswordInputField('API Key', required=True)
     api_base = forms.TextInputField('API URL', required=True)
@@ -69,4 +49,4 @@ class VolcanicEngineImageModelCredential(BaseForm, BaseModelCredential):
         return {**model, 'api_key': super().encryption(model.get('api_key', ''))}
 
     def get_model_params_setting_form(self, model_name):
-        return VolcanicEngineImageModelParams()
+        pass

@@ -13,25 +13,6 @@ from models_provider.base_model_provider import BaseModelCredential, ValidCode
 from django.utils.translation import gettext_lazy as _, gettext
 
 
-class SiliconCloudImageModelParams(BaseForm):
-    temperature = forms.SliderField(TooltipLabel(_('Temperature'),
-                                                 _('Higher values make the output more random, while lower values make it more focused and deterministic')),
-                                    required=True, default_value=0.7,
-                                    _min=0.1,
-                                    _max=1.0,
-                                    _step=0.01,
-                                    precision=2)
-
-    max_tokens = forms.SliderField(
-        TooltipLabel(_('Output the maximum Tokens'),
-                     _('Specify the maximum number of tokens that the model can generate')),
-        required=True, default_value=800,
-        _min=1,
-        _max=100000,
-        _step=1,
-        precision=0)
-
-
 class SiliconCloudImageModelCredential(BaseForm, BaseModelCredential):
     api_base = forms.TextInputField('API URL', required=True)
     api_key = forms.PasswordInputField('API Key', required=True)
@@ -71,4 +52,4 @@ class SiliconCloudImageModelCredential(BaseForm, BaseModelCredential):
         return {**model, 'api_key': super().encryption(model.get('api_key', ''))}
 
     def get_model_params_setting_form(self, model_name):
-        return SiliconCloudImageModelParams()
+        pass
