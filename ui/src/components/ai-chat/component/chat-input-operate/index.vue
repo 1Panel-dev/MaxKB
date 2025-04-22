@@ -345,7 +345,7 @@ const upload = ref()
 
 const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp']
 const documentExtensions = ['pdf', 'docx', 'txt', 'xls', 'xlsx', 'md', 'html', 'csv']
-const videoExtensions = ['mp4', 'avi', 'mov', 'mkv', 'flv']
+const videoExtensions: any = []
 const audioExtensions = ['mp3', 'wav', 'ogg', 'aac', 'm4a']
 let otherExtensions = ['ppt', 'doc']
 
