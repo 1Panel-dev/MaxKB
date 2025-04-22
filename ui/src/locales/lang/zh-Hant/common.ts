@@ -47,7 +47,7 @@ export default {
     audio: '音頻',
     video: '視頻',
     other: '其他文件',
-    addExtensions: '添加文件擴展名'
+    addExtensions: '添加後綴名',
   },
   status: {
     label: '狀態',

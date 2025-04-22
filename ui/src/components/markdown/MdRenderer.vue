@@ -6,10 +6,10 @@
       <div
         v-if="item.type === 'question'"
         @click="sendMessage ? sendMessage(item.content, 'new') : (content: string) => {}"
-        class="problem-button ellipsis-2 mt-4 mb-4"
+        class="problem-button mt-4 mb-4 flex"
         :class="sendMessage ? 'cursor' : 'disabled'"
       >
-        <el-icon>
+        <el-icon class="mr-8" style="margin-top: 2px;">
           <EditPen />
         </el-icon>
         {{ item.content }}
@@ -234,12 +234,9 @@ const split_form_rander_ = (source: string, type: string) => {
   border: none;
   border-radius: 8px;
   background: var(--app-layout-bg-color);
-  height: 46px;
-  padding: 0 12px;
-  line-height: 46px;
+  padding: 12px;
   box-sizing: border-box;
   color: var(--el-text-color-regular);
-  -webkit-line-clamp: 1;
   word-break: break-all;
 
   &:hover {

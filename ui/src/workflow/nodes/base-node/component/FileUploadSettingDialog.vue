@@ -7,7 +7,7 @@
     :destroy-on-close="true"
     :before-close="close"
     append-to-body
-    width="600"
+    width="800"
   >
     <el-form
       label-position="top"
@@ -54,14 +54,16 @@
               <img class="mr-12" src="@/assets/icon_file-doc.svg" alt="" />
               <div>
                 <p class="line-height-22 mt-4">
-                  {{ $t('common.fileUpload.document') }}（TXT、MD、DOCX、HTML、CSV、XLSX、XLS、PDF）
+                  {{ $t('common.fileUpload.document') }}
+                  <el-text class="color-secondary"
+                    >{{
+                      $t(
+                        'views.applicationWorkflow.nodes.baseNode.FileUploadSetting.fileUploadType.documentText'
+                      )
+                    }}
+                  </el-text>
                 </p>
-                <el-text class="color-secondary">{{
-                    $t(
-                      'views.applicationWorkflow.nodes.baseNode.FileUploadSetting.fileUploadType.documentText'
-                    )
-                  }}
-                </el-text>
+                <p>TXT、MD、DOCX、HTML、CSV、XLSX、XLS、PDF</p>
               </div>
             </div>
             <el-checkbox
@@ -82,14 +84,16 @@
               <img class="mr-12" src="@/assets/icon_file-image.svg" alt="" />
               <div>
                 <p class="line-height-22 mt-4">
-                  {{ $t('common.fileUpload.image') }}（JPG、JPEG、PNG、GIF）
+                  {{ $t('common.fileUpload.image') }}
+                  <el-text class="color-secondary"
+                    >{{
+                      $t(
+                        'views.applicationWorkflow.nodes.baseNode.FileUploadSetting.fileUploadType.imageText'
+                      )
+                    }}
+                  </el-text>
                 </p>
-                <el-text class="color-secondary">{{
-                    $t(
-                      'views.applicationWorkflow.nodes.baseNode.FileUploadSetting.fileUploadType.imageText'
-                    )
-                  }}
-                </el-text>
+                <p>JPG、JPEG、PNG、GIF</p>
               </div>
             </div>
             <el-checkbox v-model="form_data.image" @change="form_data.image = !form_data.image" />
@@ -108,14 +112,16 @@
               <img class="mr-12" src="@/assets/icon_file-audio.svg" alt="" />
               <div>
                 <p class="line-height-22 mt-4">
-                  {{ $t('common.fileUpload.audio') }}（MP3、WAV、OGG、ACC、M4A）
+                  {{ $t('common.fileUpload.audio') }}
+                  <el-text class="color-secondary"
+                    >{{
+                      $t(
+                        'views.applicationWorkflow.nodes.baseNode.FileUploadSetting.fileUploadType.audioText'
+                      )
+                    }}
+                  </el-text>
                 </p>
-                <el-text class="color-secondary">{{
-                    $t(
-                      'views.applicationWorkflow.nodes.baseNode.FileUploadSetting.fileUploadType.audioText'
-                    )
-                  }}
-                </el-text>
+                <p>MP3、WAV、OGG、ACC、M4A</p>
               </div>
             </div>
             <el-checkbox v-model="form_data.audio" @change="form_data.audio = !form_data.audio" />
@@ -134,14 +140,28 @@
               <div>
                 <p class="line-height-22 mt-4">
                   {{ $t('common.fileUpload.other') }}
+                  <el-text class="color-secondary"
+                    >{{
+                      $t(
+                        'views.applicationWorkflow.nodes.baseNode.FileUploadSetting.fileUploadType.otherText'
+                      )
+                    }}
+                  </el-text>
                 </p>
-                <div class="flex">
+                <el-space wrap :size="2" class="mt-4">
                   <el-tag
                     v-for="tag in form_data.otherExtensions"
                     :key="tag"
                     closable
                     :disable-transitions="false"
                     @close="handleClose(tag)"
+                    type="info"
+                    class="mr-4"
+                    effect="plain"
+                    style="
+                      --el-tag-border-radius: 4px;
+                      --el-tag-border-color: var(--el-border-color);
+                    "
                   >
                     {{ tag }}
                   </el-tag>
@@ -149,7 +169,6 @@
                     v-if="inputVisible"
                     ref="InputRef"
                     v-model="inputValue"
-                    class="w-20"
                     size="small"
                     @keyup.enter="handleInputConfirm"
                     @blur="handleInputConfirm"
@@ -157,7 +176,7 @@
                   <el-button v-else class="button-new-tag" size="small" @click.stop="showInput">
                     + {{ $t('common.fileUpload.addExtensions') }}
                   </el-button>
-                </div>
+                </el-space>
               </div>
             </div>
             <el-checkbox v-model="form_data.other" @change="form_data.other = !form_data.other" />
@@ -214,7 +233,7 @@ function close() {
 }
 
 const handleClose = (tag: string) => {
-  form_data.value.otherExtensions = form_data.value.otherExtensions.filter(item => item !== tag)
+  form_data.value.otherExtensions = form_data.value.otherExtensions.filter((item) => item !== tag)
 }
 
 const showInput = () => {

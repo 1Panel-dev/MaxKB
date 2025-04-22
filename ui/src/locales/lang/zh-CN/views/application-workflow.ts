@@ -105,8 +105,10 @@ export default {
           label: '上传的文件类型',
           documentText: '需要使用“文档内容提取”节点解析文档内容',
           imageText: '需要使用“视觉模型”节点解析图片内容',
-          audioText: '需要使用“语音转文本”节点解析音频内容'
-        }
+          audioText: '需要使用“语音转文本”节点解析音频内容',
+          otherText: '需要自行解析该类型文件'
+        },
+        
       }
     },
     aiChatNode: {
