@@ -80,7 +80,7 @@ const props = defineProps<{
   chatRecord: chatType
   application: any
   loading: boolean
-  sendMessage: (question: string, other_params_data?: any, chat?: chatType) => void
+  sendMessage: (question: string, other_params_data?: any, chat?: chatType) => Promise<boolean>
   chatManagement: any
   type: 'log' | 'ai-chat' | 'debug-ai-chat'
 }>()
@@ -98,9 +98,10 @@ const showUserAvatar = computed(() => {
 const chatMessage = (question: string, type: 'old' | 'new', other_params_data?: any) => {
   if (type === 'old') {
     add_answer_text_list(props.chatRecord.answer_text_list)
-    props.sendMessage(question, other_params_data, props.chatRecord)
-    props.chatManagement.open(props.chatRecord.id)
-    props.chatManagement.write(props.chatRecord.id)
+    props.sendMessage(question, other_params_data, props.chatRecord).then(() => {
+      props.chatManagement.open(props.chatRecord.id)
+      props.chatManagement.write(props.chatRecord.id)
+    })
   } else {
     props.sendMessage(question, other_params_data)
   }

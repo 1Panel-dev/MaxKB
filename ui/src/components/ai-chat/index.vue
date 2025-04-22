@@ -224,33 +224,41 @@ const validate = () => {
   return userFormRef.value?.validate() || Promise.reject(false)
 }
 
-function sendMessage(val: string, other_params_data?: any, chat?: chatType) {
+function sendMessage(val: string, other_params_data?: any, chat?: chatType): Promise<boolean> {
   if (isUserInput.value) {
-    userFormRef.value
-      ?.validate()
-      .then((ok) => {
-        let userFormData = JSON.parse(localStorage.getItem(`${accessToken}userForm`) || '{}')
-        const newData = Object.keys(form_data.value).reduce((result: any, key: string) => {
-          result[key] = Object.prototype.hasOwnProperty.call(userFormData, key)
-            ? userFormData[key]
-            : form_data.value[key]
-          return result
-        }, {})
-        localStorage.setItem(`${accessToken}userForm`, JSON.stringify(newData))
-        showUserInput.value = false
-        if (!loading.value && props.applicationDetails?.name) {
-          handleDebounceClick(val, other_params_data, chat)
-        }
-      })
-      .catch((e) => {
-        showUserInput.value = true
-        return
-      })
+    if (userFormRef.value) {
+      return userFormRef.value
+        ?.validate()
+        .then((ok) => {
+          let userFormData = JSON.parse(localStorage.getItem(`${accessToken}userForm`) || '{}')
+          const newData = Object.keys(form_data.value).reduce((result: any, key: string) => {
+            result[key] = Object.prototype.hasOwnProperty.call(userFormData, key)
+              ? userFormData[key]
+              : form_data.value[key]
+            return result
+          }, {})
+          localStorage.setItem(`${accessToken}userForm`, JSON.stringify(newData))
+          showUserInput.value = false
+          if (!loading.value && props.applicationDetails?.name) {
+            handleDebounceClick(val, other_params_data, chat)
+            return true
+          }
+          throw 'err: no send'
+        })
+        .catch((e) => {
+          showUserInput.value = true
+          return false
+        })
+    } else {
+      return Promise.reject(false)
+    }
   } else {
     showUserInput.value = false
     if (!loading.value && props.applicationDetails?.name) {
       handleDebounceClick(val, other_params_data, chat)
+      return Promise.resolve(true)
     }
+    return Promise.reject(false)
   }
 }
 
