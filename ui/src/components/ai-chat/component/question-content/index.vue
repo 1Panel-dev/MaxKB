@@ -60,6 +60,26 @@
             </template>
           </el-space>
         </div>
+        <div class="mb-8" v-if="other_list.length">
+          <el-space wrap class="w-full media-file-width">
+            <template v-for="(item, index) in other_list" :key="index">
+              <el-card shadow="never" style="--el-card-padding: 8px" class="download-file cursor">
+                <div class="download-button flex align-center" @click="downloadFile(item)">
+                  <el-icon class="mr-4">
+                    <Download />
+                  </el-icon>
+                  {{ $t('chat.download') }}
+                </div>
+                <div class="show flex align-center">
+                  <img :src="getImgUrl(item && item?.name)" alt="" width="24" />
+                  <div class="ml-4 ellipsis-1" :title="item && item?.name">
+                    {{ item && item?.name }}
+                  </div>
+                </div>
+              </el-card>
+            </template>
+          </el-space>
+        </div>
         <span> {{ chatRecord.problem_text }}</span>
       </div>
     </div>
@@ -120,6 +140,15 @@ const audio_list = computed(() => {
     (detail) => detail.type === 'start-node'
   )
   return startNode?.audio_list || []
+})
+const other_list = computed(() => {
+  if (props.chatRecord?.upload_meta) {
+    return props.chatRecord.upload_meta?.other_list || []
+  }
+  const startNode = props.chatRecord.execution_details?.find(
+    (detail) => detail.type === 'start-node'
+  )
+  return startNode?.other_list || []
 })
 
 function downloadFile(item: any) {

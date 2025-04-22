@@ -424,7 +424,9 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean, other_para
             ? other_params_data.document_list
             : [],
         audio_list:
-          other_params_data && other_params_data.audio_list ? other_params_data.audio_list : []
+          other_params_data && other_params_data.audio_list ? other_params_data.audio_list : [],
+        other_list:
+          other_params_data && other_params_data.other_list ? other_params_data.other_list : []
       }
     })
     chatList.value.push(chat)

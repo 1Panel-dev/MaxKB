@@ -72,6 +72,7 @@ interface chatType {
     document_list: Array<any>
     image_list: Array<any>
     audio_list: Array<any>
+    other_list: Array<any>
   }
 }
 
