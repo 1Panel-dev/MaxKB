@@ -1,13 +1,56 @@
 # -*- coding: utf-8 -*-
+import json
+import pickle
 import re
 
 import uuid_utils.compat as uuid
 from django.core import validators
+from django.db import transaction
 from django.db.models import QuerySet
+from django.http import HttpResponse
 from django.utils.translation import gettext_lazy as _
-from rest_framework import serializers
+from rest_framework import serializers, status
 
+from common.exception.app_exception import AppApiException
+from common.result import result
+from common.utils.tool_code import ToolExecutor
+from maxkb.const import CONFIG
 from tools.models import Tool, ToolScope, ToolModule
+
+tool_executor = ToolExecutor(CONFIG.get('SANDBOX'))
+
+
+class ToolInstance:
+    def __init__(self, tool: dict, version: str):
+        self.tool = tool
+        self.version = version
+
+
+def encryption(message: str):
+    """
+        加密敏感字段数据  加密方式是 如果密码是 1234567890  那么给前端则是 123******890
+    :param message:
+    :return:
+    """
+    if type(message) != str:
+        return message
+    if message == "":
+        return ""
+    max_pre_len = 8
+    max_post_len = 4
+    message_len = len(message)
+    pre_len = int(message_len / 5 * 2)
+    post_len = int(message_len / 5 * 1)
+    pre_str = "".join([message[index] for index in
+                       range(0,
+                             max_pre_len if pre_len > max_pre_len else 1 if pre_len <= 0 else int(
+                                 pre_len))])
+    end_str = "".join(
+        [message[index] for index in
+         range(message_len - (int(post_len) if pre_len < max_post_len else max_post_len),
+               message_len)])
+    content = "***************"
+    return pre_str + content + end_str
 
 
 class ToolModelSerializer(serializers.ModelSerializer):
@@ -16,6 +59,14 @@ class ToolModelSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'icon', 'desc', 'code', 'input_field_list', 'init_field_list', 'init_params',
                   'scope', 'is_active', 'user_id', 'template_id', 'workspace_id', 'module_id',
                   'create_time', 'update_time']
+
+
+class UploadedFileField(serializers.FileField):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def to_representation(self, value):
+        return value
 
 
 class ToolInputField(serializers.Serializer):
@@ -60,6 +111,20 @@ class ToolCreateRequest(serializers.Serializer):
     module_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, default='root')
 
 
+class DebugField(serializers.Serializer):
+    name = serializers.CharField(required=True, label=_('variable name'))
+    value = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_('variable value'))
+
+
+class ToolDebugRequest(serializers.Serializer):
+    code = serializers.CharField(required=True, label=_('tool content'))
+    input_field_list = serializers.ListField(child=ToolInputField(), required=False, default=list,
+                                             label=_('input field list'))
+    init_field_list = serializers.ListField(child=InitField(), required=False, default=list, label=_('init field list'))
+    init_params = serializers.DictField(required=False, default=dict, label=_('init params'))
+    debug_field_list = DebugField(required=True, many=True)
+
+
 class ToolSerializer(serializers.Serializer):
     class Create(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, label=_('user id'))
@@ -81,6 +146,64 @@ class ToolSerializer(serializers.Serializer):
                         is_active=False)
             tool.save()
             return ToolModelSerializer(tool).data
+
+    class Debug(serializers.Serializer):
+        user_id = serializers.UUIDField(required=True, label=_('user id'))
+        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+
+        def debug(self, debug_instance):
+            self.is_valid(raise_exception=True)
+            ToolDebugRequest(data=debug_instance).is_valid(raise_exception=True)
+            input_field_list = debug_instance.get('input_field_list')
+            code = debug_instance.get('code')
+            debug_field_list = debug_instance.get('debug_field_list')
+            init_params = debug_instance.get('init_params')
+            params = {field.get('name'): self.convert_value(field.get('name'), field.get('value'), field.get('type'),
+                                                            field.get('is_required'))
+                      for field in
+                      [{'value': self.get_field_value(debug_field_list, field.get('name'), field.get('is_required')),
+                        **field} for field in
+                       input_field_list]}
+            # 合并初始化参数
+            if init_params is not None:
+                all_params = init_params | params
+            else:
+                all_params = params
+            return tool_executor.exec_code(code, all_params)
+
+        @staticmethod
+        def get_field_value(debug_field_list, name, is_required):
+            result = [field for field in debug_field_list if field.get('name') == name]
+            if len(result) > 0:
+                return result[-1].get('value')
+            if is_required:
+                raise AppApiException(500, f"{name}" + _('field has no value set'))
+            return None
+
+        @staticmethod
+        def convert_value(name: str, value: str, _type: str, is_required: bool):
+            if not is_required and value is None:
+                return None
+            try:
+                if _type == 'int':
+                    return int(value)
+                if _type == 'float':
+                    return float(value)
+                if _type == 'dict':
+                    v = json.loads(value)
+                    if isinstance(v, dict):
+                        return v
+                    raise Exception(_('type error'))
+                if _type == 'array':
+                    v = json.loads(value)
+                    if isinstance(v, list):
+                        return v
+                    raise Exception(_('type error'))
+                return value
+            except Exception as e:
+                raise AppApiException(500, _('Field: {name} Type: {_type} Value: {value} Type conversion error').format(
+                    name=name, type=_type, value=value
+                ))
 
     class Operate(serializers.Serializer):
         id = serializers.UUIDField(required=True, label=_('tool id'))
@@ -110,6 +233,52 @@ class ToolSerializer(serializers.Serializer):
             self.is_valid(raise_exception=True)
             tool = QuerySet(Tool).filter(id=self.data.get('id')).first()
             return ToolModelSerializer(tool).data
+
+        def export(self):
+            try:
+                self.is_valid()
+                id = self.data.get('id')
+                tool = QuerySet(Tool).filter(id=id).first()
+                tool_dict = ToolModelSerializer(tool).data
+                mk_instance = ToolInstance(tool_dict, 'v2')
+                tool_pickle = pickle.dumps(mk_instance)
+                response = HttpResponse(content_type='text/plain', content=tool_pickle)
+                response['Content-Disposition'] = f'attachment; filename="{tool.name}.fx"'
+                return response
+            except Exception as e:
+                return result.error(str(e), response_status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    class Import(serializers.Serializer):
+        file = UploadedFileField(required=True, label=_("file"))
+        user_id = serializers.UUIDField(required=True, label=_("User ID"))
+        workspace_id = serializers.CharField(required=True, label=_("workspace id"))
+
+        #
+        @transaction.atomic
+        def import_(self):
+            self.is_valid()
+
+            # user_id = self.data.get('user_id')
+            # flib_instance_bytes = self.data.get('file').read()
+            # try:
+            #     RestrictedUnpickler(io.BytesIO(s)).load()
+            #     flib_instance = restricted_loads(flib_instance_bytes)
+            # except Exception as e:
+            #     raise AppApiException(1001, _("Unsupported file format"))
+            # tool = flib_instance.tool
+            # tool_model = Tool(
+            #     id=uuid.uuid7(),
+            #     name=tool.get('name'),
+            #     desc=tool.get('desc'),
+            #     code=tool.get('code'),
+            #     user_id=user_id,
+            #     input_field_list=tool.get('input_field_list'),
+            #     init_field_list=tool.get('init_field_list', []),
+            #     scope=ToolScope.WORKSPACE,
+            #     is_active=False
+            # )
+            # tool_model.save()
+            return True
 
 
 class ToolTreeSerializer(serializers.Serializer):

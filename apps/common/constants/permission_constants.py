@@ -139,6 +139,12 @@ class PermissionConstants(Enum):
                                                                               RoleConstants.USER])
     TOOL_DELETE = Permission(group=Group.TOOL, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN,
                                                                                   RoleConstants.USER])
+    TOOL_DEBUG = Permission(group=Group.TOOL, operate=Operate.USE, role_list=[RoleConstants.ADMIN,
+                                                                                  RoleConstants.USER])
+    TOOL_IMPORT = Permission(group=Group.TOOL, operate=Operate.USE, role_list=[RoleConstants.ADMIN,
+                                                                                  RoleConstants.USER])
+    TOOL_EXPORT = Permission(group=Group.TOOL, operate=Operate.USE, role_list=[RoleConstants.ADMIN,
+                                                                                  RoleConstants.USER])
 
     def get_workspace_application_permission(self):
         return lambda r, kwargs: Permission(group=self.value.group, operate=self.value.operate,
