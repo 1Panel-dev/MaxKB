@@ -136,7 +136,7 @@
         >
           <div class="flex-between">
             <div class="flex align-center">
-              <img class="mr-12" src="@/assets/icon_file-doc.svg" alt="" />
+              <img class="mr-12" :width="32" src="@/assets/fileType/unknown-icon.svg" alt="" />
               <div>
                 <p class="line-height-22 mt-4">
                   {{ $t('common.fileUpload.other') }}
