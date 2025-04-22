@@ -31,22 +31,24 @@
                 class="file cursor"
               >
                 <div
-                  class="flex align-center"
+                  class="flex-between align-center"
                   @mouseenter.stop="mouseenter(item)"
                   @mouseleave.stop="mouseleave()"
                 >
+                  <div class="flex align-center">
+                    <img :src="getImgUrl(item && item?.name)" alt="" width="24" />
+                    <div class="ml-4 ellipsis-1" :title="item && item?.name">
+                      {{ item && item?.name }}
+                    </div>
+                  </div>
                   <div
                     @click="deleteFile(index, 'document')"
                     class="delete-icon color-secondary"
                     v-if="showDelete === item.url"
                   >
-                    <el-icon>
+                    <el-icon style="font-size: 16px; top: 2px">
                       <CircleCloseFilled />
                     </el-icon>
-                  </div>
-                  <img :src="getImgUrl(item && item?.name)" alt="" width="24" />
-                  <div class="ml-4 ellipsis-1" :title="item && item?.name">
-                    {{ item && item?.name }}
                   </div>
                 </div>
               </el-card>
@@ -67,22 +69,24 @@
                 class="file cursor"
               >
                 <div
-                  class="flex align-center"
+                  class="flex-between align-center"
                   @mouseenter.stop="mouseenter(item)"
                   @mouseleave.stop="mouseleave()"
                 >
+                  <div class="flex align-center">
+                    <img :src="getImgUrl(item && item?.name)" alt="" width="24" />
+                    <div class="ml-4 ellipsis-1" :title="item && item?.name">
+                      {{ item && item?.name }}
+                    </div>
+                  </div>
                   <div
                     @click="deleteFile(index, 'document')"
                     class="delete-icon color-secondary"
                     v-if="showDelete === item.url"
                   >
-                    <el-icon>
+                    <el-icon style="font-size: 16px; top: 2px">
                       <CircleCloseFilled />
                     </el-icon>
-                  </div>
-                  <img :src="getImgUrl(item && item?.name)" alt="" width="24" />
-                  <div class="ml-4 ellipsis-1" :title="item && item?.name">
-                    {{ item && item?.name }}
                   </div>
                 </div>
               </el-card>
@@ -100,22 +104,24 @@
             >
               <el-card shadow="never" style="--el-card-padding: 8px" class="file cursor">
                 <div
-                  class="flex align-center"
+                  class="flex-between align-center"
                   @mouseenter.stop="mouseenter(item)"
                   @mouseleave.stop="mouseleave()"
                 >
+                  <div class="flex align-center">
+                    <img :src="getImgUrl(item && item?.name)" alt="" width="24" />
+                    <div class="ml-4 ellipsis-1" :title="item && item?.name">
+                      {{ item && item?.name }}
+                    </div>
+                  </div>
                   <div
                     @click="deleteFile(index, 'audio')"
                     class="delete-icon color-secondary"
                     v-if="showDelete === item.url"
                   >
-                    <el-icon>
+                    <el-icon style="font-size: 16px; top: 2px">
                       <CircleCloseFilled />
                     </el-icon>
-                  </div>
-                  <img :src="getImgUrl(item && item?.name)" alt="" width="24" />
-                  <div class="ml-4 ellipsis-1" :title="item && item?.name">
-                    {{ item && item?.name }}
                   </div>
                 </div>
               </el-card>
@@ -124,7 +130,7 @@
           <el-space wrap>
             <template v-for="(item, index) in uploadImageList" :key="index">
               <div
-                class="file cursor border border-r-4"
+                class="file file-image cursor border border-r-4"
                 v-if="item.url"
                 @mouseenter.stop="mouseenter(item)"
                 @mouseleave.stop="mouseleave()"
@@ -134,7 +140,7 @@
                   class="delete-icon color-secondary"
                   v-if="showDelete === item.url"
                 >
-                  <el-icon>
+                  <el-icon style="font-size: 16px; top: 2px">
                     <CircleCloseFilled />
                   </el-icon>
                 </div>
@@ -939,7 +945,7 @@ onMounted(() => {
         }
       }
     }
-    .file {
+    .file-image {
       position: relative;
       overflow: inherit;
 
