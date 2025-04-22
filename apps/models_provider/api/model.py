@@ -17,7 +17,11 @@ class ModelCreateResponse(ResultSerializer):
 class ModelListResponse(APIMixin):
     @staticmethod
     def get_response():
-        return serializers.ListSerializer(child=ModelModelSerializer())
+        class ModelListResult(ResultSerializer):
+            def get_data(self):
+                return serializers.ListSerializer(child=ModelModelSerializer())
+
+        return ModelListResult
 
 
 class ModelCreateAPI(APIMixin):
@@ -61,7 +65,7 @@ class GetModelApi(APIMixin):
 
     @staticmethod
     def get_response():
-        return ModelModelSerializer
+        return ModelCreateResponse
 
 
 class ModelEditApi(APIMixin):
@@ -71,7 +75,7 @@ class ModelEditApi(APIMixin):
 
     @staticmethod
     def get_response():
-        return ModelModelSerializer
+        return ModelCreateResponse
 
 
 class DefaultModelResponse(APIMixin):

@@ -73,7 +73,11 @@ class ProvideApi(APIMixin):
 
         @staticmethod
         def get_response():
-            return serializers.ListSerializer(child=ModelParamsFormSerializer())
+            class ProvideListSerializer(ResultSerializer):
+                def get_data(self):
+                    return serializers.ListSerializer(child=ModelParamsFormSerializer())
+
+            return ProvideListSerializer
 
     class ModelList(APIMixin):
         @staticmethod
@@ -95,7 +99,11 @@ class ProvideApi(APIMixin):
 
         @staticmethod
         def get_response():
-            return serializers.ListSerializer(child=ModelListSerializer())
+            class ProvideListSerializer(ResultSerializer):
+                def get_data(self):
+                    return serializers.ListSerializer(child=ModelListSerializer())
+
+            return ProvideListSerializer
 
     @staticmethod
     def get_response():
@@ -118,4 +126,8 @@ class ProvideApi(APIMixin):
 
         @staticmethod
         def get_response():
-            return serializers.ListSerializer(child=ProvideListSerializer())
+            class ProvideListResponse(ResultSerializer):
+                def get_data(self):
+                    return serializers.ListSerializer(child=ProvideListSerializer())
+
+            return ProvideListResponse
