@@ -164,13 +164,6 @@ class ToolPageAPI(ToolReadAPI):
                 required=True,
             ),
             OpenApiParameter(
-                name="tool_id",
-                description="工具id",
-                type=OpenApiTypes.STR,
-                location='path',
-                required=True,
-            ),
-            OpenApiParameter(
                 name="current_page",
                 description="当前页码",
                 type=OpenApiTypes.INT,
@@ -182,6 +175,21 @@ class ToolPageAPI(ToolReadAPI):
                 description="每页大小",
                 type=OpenApiTypes.INT,
                 location='path',
+                required=True,
+            ),
+            OpenApiParameter(
+                name="module_id",
+                description="模块id",
+                type=OpenApiTypes.STR,
+                location='query',
+                required=True,
+            ),
+            OpenApiParameter(
+                name="tool_type",
+                description="工具类型",
+                type=OpenApiTypes.STR,
+                enum=["CUSTOM", "INTERNAL"],
+                location='query',
                 required=True,
             ),
             OpenApiParameter(

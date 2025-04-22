@@ -6,7 +6,7 @@ import re
 import uuid_utils.compat as uuid
 from django.core import validators
 from django.db import transaction
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Q
 from django.http import HttpResponse
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers, status
@@ -57,7 +57,7 @@ class ToolModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tool
         fields = ['id', 'name', 'icon', 'desc', 'code', 'input_field_list', 'init_field_list', 'init_params',
-                  'scope', 'is_active', 'user_id', 'template_id', 'workspace_id', 'module_id',
+                  'scope', 'is_active', 'user_id', 'template_id', 'workspace_id', 'module_id', 'tool_type',
                   'create_time', 'update_time']
 
 
@@ -291,8 +291,35 @@ class ToolTreeSerializer(serializers.Serializer):
         root = ToolModule.objects.filter(id=module_id).first()
         if not root:
             raise serializers.ValidationError(_('Module not found'))
-        # 使用MPTT的get_family()方法获取所有相关节点
+        # 使用MPTT的get_descendants()方法获取所有相关节点
         all_modules = root.get_descendants(include_self=True)
 
         tools = QuerySet(Tool).filter(workspace_id=self.data.get('workspace_id'), module_id__in=all_modules)
         return ToolModelSerializer(tools, many=True).data
+
+    class Query(serializers.Serializer):
+        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+        module_id = serializers.CharField(required=True, label=_('module id'))
+        name = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('tool name'))
+        tool_type = serializers.CharField(required=True, label=_('tool type'))
+
+        def page(self, current_page: int, page_size: int):
+            self.is_valid(raise_exception=True)
+
+            module_id = self.data.get('module_id', 'root')
+            root = ToolModule.objects.filter(id=module_id).first()
+            if not root:
+                raise serializers.ValidationError(_('Module not found'))
+            # 使用MPTT的get_descendants()方法获取所有相关节点
+            all_modules = root.get_descendants(include_self=True)
+
+            if self.data.get('name'):
+                tools = QuerySet(Tool).filter(Q(workspace_id=self.data.get('workspace_id')) &
+                                              Q(module_id__in=all_modules) &
+                                              Q(tool_type=self.data.get('tool_type')) &
+                                              Q(name__contains=self.data.get('name')))
+            else:
+                tools = QuerySet(Tool).filter(Q(workspace_id=self.data.get('workspace_id')) &
+                                              Q(module_id__in=all_modules) &
+                                              Q(tool_type=self.data.get('tool_type')))
+            return ToolModelSerializer(tools, many=True).data

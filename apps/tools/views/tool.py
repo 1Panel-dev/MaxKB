@@ -120,17 +120,15 @@ class ToolView(APIView):
             tags=[_('Tool')]
         )
         @has_permissions(PermissionConstants.TOOL_READ.get_workspace_permission())
-        def get(self, request: Request, current_page: int, page_size: int):
-            return result.success(
-                ToolSerializer.Query(
-                    data={
-                        'name': request.query_params.get('name'),
-                        'desc': request.query_params.get('desc'),
-                        'function_type': request.query_params.get('function_type'),
-                        'user_id': request.user.id,
-                        'select_user_id': request.query_params.get('select_user_id')
-                    }
-                ).page(current_page, page_size))
+        def get(self, request: Request, workspace_id: str, current_page: int, page_size: int):
+            return result.success(ToolTreeSerializer.Query(
+                data={
+                    'workspace_id': workspace_id,
+                    'module_id': request.query_params.get('module_id'),
+                    'name': request.query_params.get('name'),
+                    'tool_type': request.query_params.get('tool_type'),
+                }
+            ).page(current_page, page_size))
 
     class Import(APIView):
         authentication_classes = [TokenAuth]

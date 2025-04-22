@@ -10,6 +10,11 @@ class ToolScope(models.TextChoices):
     WORKSPACE = "WORKSPACE", "工作空间可用"
 
 
+class ToolType(models.TextChoices):
+    INTERNAL = "INTERNAL", '内置'
+    CUSTOM = "CUSTOM", "自定义"
+
+
 class Tool(models.Model):
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="用户id")
@@ -22,6 +27,8 @@ class Tool(models.Model):
     is_active = models.BooleanField(default=True)
     scope = models.CharField(max_length=20, verbose_name='可用范围', choices=ToolScope.choices,
                              default=ToolScope.WORKSPACE)
+    tool_type = models.CharField(max_length=20, verbose_name='函数类型', choices=ToolType.choices,
+                                     default=ToolType.CUSTOM, db_index=True)
     template_id = models.UUIDField(max_length=128, verbose_name="模版id", null=True, default=None)
     module = models.ForeignKey(ToolModule, on_delete=models.CASCADE, verbose_name="模块id", default='root')
     workspace_id = models.CharField(max_length=64, verbose_name="工作空间id", default="default", db_index=True)
