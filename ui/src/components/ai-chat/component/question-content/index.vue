@@ -3,7 +3,10 @@
   <div class="question-content item-content mb-16 lighter">
     <div
       class="content p-12-16 border-r-8"
-      :class="document_list.length >= 2 ? 'media_2' : `media_${document_list.length}`"
+      :class="
+        (document_list.length >= 2 ? 'media_2' : `media_${document_list.length}`) ||
+        (other_list.length >= 2 ? 'media_2' : `media_${other_list.length}`)
+      "
     >
       <div class="text break-all pre-wrap">
         <div class="mb-8" v-if="document_list.length">
