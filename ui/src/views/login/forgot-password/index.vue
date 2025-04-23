@@ -1,5 +1,5 @@
 <template>
-  <login-layout>
+  <login-layout v-if="!loading" v-loading="loading">
     <LoginContainer
       :subTitle="
         user.themeInfo?.slogan ? user.themeInfo?.slogan : $t('views.system.theme.defaultSlogan')
@@ -69,7 +69,7 @@
   </login-layout>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onBeforeMount, ref } from 'vue'
 import type { CheckCodeRequest } from '@/api/type/user'
 import { useRouter } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
@@ -80,6 +80,7 @@ import useStore from '@/stores'
 
 const router = useRouter()
 const { user } = useStore()
+
 const CheckEmailForm = ref<CheckCodeRequest>({
   email: '',
   code: '',
@@ -143,5 +144,11 @@ const handleTimeChange = () => {
     }, 1000)
   }
 }
+onBeforeMount(() => {
+  loading.value = true
+  user.asyncGetProfile().then(() => {
+    loading.value = false
+  })
+})
 </script>
 <style lang="scss" scoped></style>
