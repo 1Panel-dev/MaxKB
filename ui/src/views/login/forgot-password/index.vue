@@ -112,11 +112,11 @@ const rules = ref<FormRules<CheckCodeRequest>>({
 const loading = ref<boolean>(false)
 const isDisabled = ref<boolean>(false)
 const time = ref<number>(60)
-
+const sendLoading = ref<boolean>(false)
 const checkCode = () => {
   resetPasswordFormRef.value
     ?.validate()
-    .then(() => UserApi.checkCode(CheckEmailForm.value, loading))
+    .then(() => UserApi.checkCode(CheckEmailForm.value, sendLoading))
     .then(() => router.push({ name: 'reset_password', params: CheckEmailForm.value }))
 }
 /**
@@ -125,7 +125,7 @@ const checkCode = () => {
 const sendEmail = () => {
   resetPasswordFormRef.value?.validateField('email', (v: boolean) => {
     if (v) {
-      UserApi.sendEmit(CheckEmailForm.value.email, 'reset_password', loading).then(() => {
+      UserApi.sendEmit(CheckEmailForm.value.email, 'reset_password', sendLoading).then(() => {
         MsgSuccess(t('views.login.verificationCode.successMessage'))
         isDisabled.value = true
         handleTimeChange()

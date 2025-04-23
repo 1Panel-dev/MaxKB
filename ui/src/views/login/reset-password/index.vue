@@ -66,6 +66,7 @@ import type { FormInstance, FormRules } from 'element-plus'
 import UserApi from '@/api/user'
 import { t } from '@/locales'
 import useStore from '@/stores'
+
 const { user } = useStore()
 const router = useRouter()
 const route = useRoute()
@@ -133,10 +134,11 @@ const rules = ref<FormRules<ResetPasswordRequest>>({
 })
 const resetPasswordFormRef = ref<FormInstance>()
 const loading = ref<boolean>(false)
+const sendLoading = ref<boolean>(false)
 const resetPassword = () => {
   resetPasswordFormRef.value
     ?.validate()
-    .then(() => UserApi.resetPassword(resetPasswordForm.value, loading))
+    .then(() => UserApi.resetPassword(resetPasswordForm.value, sendLoading))
     .then(() => {
       MsgSuccess(t('common.modifySuccess'))
       router.push({ name: 'login' })
