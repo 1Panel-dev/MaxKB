@@ -4,7 +4,7 @@ from drf_spectacular.utils import OpenApiParameter
 
 from common.mixins.api_mixin import APIMixin
 from common.result import ResultSerializer, DefaultResultSerializer
-from tools.serializers.tool import ToolModelSerializer, ToolCreateRequest, ToolDebugRequest
+from tools.serializers.tool import ToolModelSerializer, ToolCreateRequest, ToolDebugRequest, ToolEditRequest
 
 
 class ToolCreateResponse(ResultSerializer):
@@ -63,7 +63,7 @@ class ToolEditAPI(ToolReadAPI):
 
     @staticmethod
     def get_request():
-        return ToolCreateRequest
+        return ToolEditRequest
 
 
 class ToolDeleteAPI(ToolReadAPI):
