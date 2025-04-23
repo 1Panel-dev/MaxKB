@@ -1,13 +1,7 @@
 <template>
   <!-- 问题内容 -->
   <div class="question-content item-content mb-16 lighter">
-    <div
-      class="content p-12-16 border-r-8"
-      :class="
-        (document_list.length >= 2 ? 'media_2' : `media_${document_list.length}`) ||
-        (other_list.length >= 2 ? 'media_2' : `media_${other_list.length}`)
-      "
-    >
+    <div class="content p-12-16 border-r-8" :class="getClassName">
       <div class="text break-all pre-wrap">
         <div class="mb-8" v-if="document_list.length">
           <el-space wrap class="w-full media-file-width">
@@ -153,7 +147,15 @@ const other_list = computed(() => {
   )
   return startNode?.other_list || []
 })
-
+const getClassName = computed(() => {
+  return document_list.value.length >= 2 || other_list.value.length >= 2
+    ? 'media_2'
+    : document_list.value.length
+      ? `media_${document_list.value.length}`
+      : other_list.value.length
+        ? `media_${other_list.value.length}`
+        : `media_0`
+})
 function downloadFile(item: any) {
   downloadByURL(item.url, item.name)
 }
