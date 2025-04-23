@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import io
 import json
 import pickle
 import re
@@ -24,6 +25,22 @@ class ToolInstance:
     def __init__(self, tool: dict, version: str):
         self.tool = tool
         self.version = version
+
+
+ALLOWED_CLASSES = {
+    ("builtins", "dict"),
+    ('uuid', 'UUID'),
+    ("tools.serializers.tool", "ToolInstance")
+}
+
+
+class RestrictedUnpickler(pickle.Unpickler):
+
+    def find_class(self, module, name):
+        if (module, name) in ALLOWED_CLASSES:
+            return super().find_class(module, name)
+        raise pickle.UnpicklingError("global '%s.%s' is forbidden" %
+                                     (module, name))
 
 
 def encryption(message: str):
@@ -258,26 +275,25 @@ class ToolSerializer(serializers.Serializer):
         def import_(self):
             self.is_valid()
 
-            # user_id = self.data.get('user_id')
-            # flib_instance_bytes = self.data.get('file').read()
-            # try:
-            #     RestrictedUnpickler(io.BytesIO(s)).load()
-            #     flib_instance = restricted_loads(flib_instance_bytes)
-            # except Exception as e:
-            #     raise AppApiException(1001, _("Unsupported file format"))
-            # tool = flib_instance.tool
-            # tool_model = Tool(
-            #     id=uuid.uuid7(),
-            #     name=tool.get('name'),
-            #     desc=tool.get('desc'),
-            #     code=tool.get('code'),
-            #     user_id=user_id,
-            #     input_field_list=tool.get('input_field_list'),
-            #     init_field_list=tool.get('init_field_list', []),
-            #     scope=ToolScope.WORKSPACE,
-            #     is_active=False
-            # )
-            # tool_model.save()
+            user_id = self.data.get('user_id')
+            tool_instance_bytes = self.data.get('file').read()
+            try:
+                tool_instance = RestrictedUnpickler(io.BytesIO(tool_instance_bytes)).load()
+            except Exception as e:
+                raise AppApiException(1001, _("Unsupported file format"))
+            tool = tool_instance.tool
+            tool_model = Tool(
+                id=uuid.uuid7(),
+                name=tool.get('name'),
+                desc=tool.get('desc'),
+                code=tool.get('code'),
+                user_id=user_id,
+                input_field_list=tool.get('input_field_list'),
+                init_field_list=tool.get('init_field_list', []),
+                scope=ToolScope.WORKSPACE,
+                is_active=False
+            )
+            tool_model.save()
             return True
 
 
