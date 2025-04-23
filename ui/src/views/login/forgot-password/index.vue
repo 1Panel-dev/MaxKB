@@ -1,5 +1,5 @@
 <template>
-  <login-layout v-if="!loading" v-loading="loading">
+  <login-layout v-if="!loading" v-loading="loading || sendLoading">
     <LoginContainer
       :subTitle="
         user.themeInfo?.slogan ? user.themeInfo?.slogan : $t('views.system.theme.defaultSlogan')
