@@ -349,11 +349,11 @@ const localLoading = computed({
 
 const upload = ref()
 
-const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp']
-const documentExtensions = ['pdf', 'docx', 'txt', 'xls', 'xlsx', 'md', 'html', 'csv']
+const imageExtensions = ['JPG', 'JPEG', 'PNG', 'GIF', 'BMP']
+const documentExtensions = ['PDF', 'DOCX', 'TXT', 'XLS', 'XLSX', 'MD', 'HTML', 'CSV']
 const videoExtensions: any = []
-const audioExtensions = ['mp3', 'wav', 'ogg', 'aac', 'm4a']
-let otherExtensions = ['ppt', 'doc']
+const audioExtensions = ['MP3', 'WAV', 'OGG', 'AAC', 'M4A']
+let otherExtensions = ['PPT', 'DOC']
 
 const getAcceptList = () => {
   const { image, document, audio, video, other } = props.applicationDetails.file_upload_setting
@@ -417,7 +417,7 @@ const uploadFile = async (file: any, fileList: any) => {
   const formData = new FormData()
   formData.append('file', file.raw, file.name)
   //
-  const extension = file.name.split('.').pop().toLowerCase() // 获取文件后缀名并转为小写
+  const extension = file.name.split('.').pop().toUpperCase() // 获取文件后缀名并转为小写
 
   if (imageExtensions.includes(extension)) {
     uploadImageList.value.push(file)

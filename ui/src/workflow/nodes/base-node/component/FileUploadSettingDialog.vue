@@ -63,7 +63,7 @@
                     }}
                   </el-text>
                 </p>
-                <p>{{ documentExtensions.map(s => s.toUpperCase()).join('、') }}</p>
+                <p>{{ documentExtensions.join('、') }}</p>
               </div>
             </div>
             <el-checkbox
@@ -93,7 +93,7 @@
                     }}
                   </el-text>
                 </p>
-                <p>{{ imageExtensions.map(s => s.toUpperCase()).join('、') }}</p>
+                <p>{{ imageExtensions.join('、') }}</p>
               </div>
             </div>
             <el-checkbox v-model="form_data.image" @change="form_data.image = !form_data.image" />
@@ -121,7 +121,7 @@
                     }}
                   </el-text>
                 </p>
-                <p>{{ audioExtensions.map(s => s.toUpperCase()).join('、') }}</p>
+                <p>{{ audioExtensions.join('、') }}</p>
               </div>
             </div>
             <el-checkbox v-model="form_data.audio" @change="form_data.audio = !form_data.audio" />
@@ -212,9 +212,9 @@ const loading = ref(false)
 const fieldFormRef = ref()
 const InputRef = ref<InputInstance>()
 
-const documentExtensions = ['txt', 'md', 'docx', 'html', 'csv', 'xlsx', 'xls', 'pdf']
-const imageExtensions = ['jpg', 'jpeg', 'png', 'gif']
-const audioExtensions = ['mp3', 'wav', 'ogg', 'acc', 'm4a']
+const documentExtensions = ['TXT', 'MD', 'DOCX', 'HTML', 'CSV', 'XLSX', 'XLS', 'PDF']
+const imageExtensions = ['JPG', 'JPEG', 'PNG', 'GIF']
+const audioExtensions = ['MP3', 'WAV', 'OGG', 'ACC', 'M4A']
 
 const form_data = ref({
   maxFiles: 3,
@@ -224,7 +224,7 @@ const form_data = ref({
   audio: false,
   video: false,
   other: false,
-  otherExtensions: ['ppt', 'doc']
+  otherExtensions: ['PPT', 'DOC']
 })
 
 function open(data: any) {
@@ -250,6 +250,7 @@ const showInput = () => {
 }
 const handleInputConfirm = () => {
   if (inputValue.value) {
+    inputValue.value = inputValue.value.toUpperCase()
     if (
       form_data.value.otherExtensions.includes(inputValue.value) ||
       documentExtensions.includes(inputValue.value) ||
