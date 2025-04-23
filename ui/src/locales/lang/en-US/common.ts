@@ -47,7 +47,8 @@ export default {
     audio: 'Audio',
     video: 'Video',
     other: 'Other',
-    addExtensions: 'Add suffix'
+    addExtensions: 'Add suffix',
+    existingExtensionsTip: 'File suffix already exists',
   },
   status: {
     label: 'Status',

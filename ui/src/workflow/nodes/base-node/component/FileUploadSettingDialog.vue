@@ -63,7 +63,7 @@
                     }}
                   </el-text>
                 </p>
-                <p>TXT、MD、DOCX、HTML、CSV、XLSX、XLS、PDF</p>
+                <p>{{ documentExtensions.map(s => s.toUpperCase()).join('、') }}</p>
               </div>
             </div>
             <el-checkbox
@@ -93,7 +93,7 @@
                     }}
                   </el-text>
                 </p>
-                <p>JPG、JPEG、PNG、GIF</p>
+                <p>{{ imageExtensions.map(s => s.toUpperCase()).join('、') }}</p>
               </div>
             </div>
             <el-checkbox v-model="form_data.image" @change="form_data.image = !form_data.image" />
@@ -121,7 +121,7 @@
                     }}
                   </el-text>
                 </p>
-                <p>MP3、WAV、OGG、ACC、M4A</p>
+                <p>{{ audioExtensions.map(s => s.toUpperCase()).join('、') }}</p>
               </div>
             </div>
             <el-checkbox v-model="form_data.audio" @change="form_data.audio = !form_data.audio" />
@@ -199,6 +199,8 @@
 import { nextTick, ref } from 'vue'
 import type { InputInstance } from 'element-plus'
 import { cloneDeep } from 'lodash'
+import { MsgWarning } from '@/utils/message'
+import { t } from '@/locales'
 
 const emit = defineEmits(['refresh'])
 const props = defineProps<{ nodeModel: any }>()
@@ -209,6 +211,10 @@ const inputValue = ref('')
 const loading = ref(false)
 const fieldFormRef = ref()
 const InputRef = ref<InputInstance>()
+
+const documentExtensions = ['txt', 'md', 'docx', 'html', 'csv', 'xlsx', 'xls', 'pdf']
+const imageExtensions = ['jpg', 'jpeg', 'png', 'gif']
+const audioExtensions = ['mp3', 'wav', 'ogg', 'acc', 'm4a']
 
 const form_data = ref({
   maxFiles: 3,
@@ -244,9 +250,15 @@ const showInput = () => {
 }
 const handleInputConfirm = () => {
   if (inputValue.value) {
-    if (form_data.value.otherExtensions.includes(inputValue.value)) {
+    if (
+      form_data.value.otherExtensions.includes(inputValue.value) ||
+      documentExtensions.includes(inputValue.value) ||
+      imageExtensions.includes(inputValue.value) ||
+      audioExtensions.includes(inputValue.value)
+    ) {
       inputVisible.value = false
       inputValue.value = ''
+      MsgWarning(t('common.fileUpload.existingExtensionsTip'))
       return
     }
     form_data.value.otherExtensions.push(inputValue.value)

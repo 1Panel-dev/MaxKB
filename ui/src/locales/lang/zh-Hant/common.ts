@@ -48,6 +48,7 @@ export default {
     video: '視頻',
     other: '其他文件',
     addExtensions: '添加後綴名',
+    existingExtensionsTip: '文件後綴已存在',
   },
   status: {
     label: '狀態',
