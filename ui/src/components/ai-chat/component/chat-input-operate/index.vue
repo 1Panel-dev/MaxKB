@@ -80,7 +80,7 @@
                     </div>
                   </div>
                   <div
-                    @click="deleteFile(index, 'document')"
+                    @click="deleteFile(index, 'other')"
                     class="delete-icon color-secondary"
                     v-if="showDelete === item.url"
                   >
