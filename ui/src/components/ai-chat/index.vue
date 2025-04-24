@@ -115,7 +115,6 @@ import UserForm from '@/components/ai-chat/component/user-form/index.vue'
 import Control from '@/components/ai-chat/component/control/index.vue'
 import { t } from '@/locales'
 import bus from '@/bus'
-import { fa } from 'element-plus/es/locale'
 const transcribing = ref<boolean>(false)
 defineOptions({ name: 'AiChat' })
 const route = useRoute()
