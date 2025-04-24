@@ -16,7 +16,7 @@ django-mptt = "0.17.0"
 psycopg = { extras = ["binary"], version = "3.2.6" }
 python-dotenv = "1.1.0"
 uuid-utils = "0.10.0"
-diskcache2 = "0.1.2"
+diskcache2 = "1.0.0"
 captcha = "0.7.1"
 langchain-openai = "0.3.14"
 langchain-anthropic = "0.3.12"
