@@ -172,7 +172,7 @@ const isAPIInput = computed(
 )
 const showUserInputContent = computed(() => {
   return (
-    (((isUserInput.value || isAPIInput) && firsUserInput.value) || showUserInput.value) &&
+    (((isUserInput.value || isAPIInput.value) && firsUserInput.value) || showUserInput.value) &&
     props.type !== 'log'
   )
 })
