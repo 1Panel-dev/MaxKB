@@ -93,7 +93,8 @@ class Config(dict):
         'SANDBOX': False,
         'LOCAL_MODEL_HOST': '127.0.0.1',
         'LOCAL_MODEL_PORT': '11636',
-        'LOCAL_MODEL_PROTOCOL': "http"
+        'LOCAL_MODEL_PROTOCOL': "http",
+        'LOCAL_MODEL_HOST_WORKER': 1
 
     }
 
