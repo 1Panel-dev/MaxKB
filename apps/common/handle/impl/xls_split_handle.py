@@ -14,7 +14,7 @@ from common.handle.base_split_handle import BaseSplitHandle
 
 
 def post_cell(cell_value):
-    return cell_value.replace('\n', '<br>').replace('|', '&#124;')
+    return cell_value.replace('\r\n', '<br>').replace('\n', '<br>').replace('|', '&#124;')
 
 
 def row_to_md(row):
