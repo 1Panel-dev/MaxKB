@@ -30,7 +30,7 @@ class GunicornLocalModelService(BaseService):
             '-b', bind,
             '-k', 'gthread',
             '--threads', '200',
-            '-w', worker,
+            '-w', str(worker),
             '--max-requests', '10240',
             '--max-requests-jitter', '2048',
             '--access-logformat', log_format,
