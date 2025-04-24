@@ -4545,7 +4545,7 @@ msgstr "修改知識庫信息"
 #: community/apps/dataset/views/document.py:463
 #: community/apps/dataset/views/document.py:464
 msgid "Get the knowledge base paginated list"
-msgstr "獲取知識庫分頁列表"
+msgstr "獲取知識庫文档分頁列表"
 
 #: community/apps/dataset/views/document.py:31
 #: community/apps/dataset/views/document.py:32

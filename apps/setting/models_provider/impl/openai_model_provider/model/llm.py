@@ -9,7 +9,6 @@
 from typing import List, Dict
 
 from langchain_core.messages import BaseMessage, get_buffer_string
-from langchain_openai.chat_models import ChatOpenAI
 
 from common.config.tokenizer_manage_config import TokenizerManage
 from setting.models_provider.base_model_provider import MaxKBBaseModel
@@ -35,9 +34,9 @@ class OpenAIChatModel(MaxKBBaseModel, BaseChatOpenAI):
             streaming = False
         azure_chat_open_ai = OpenAIChatModel(
             model=model_name,
-            openai_api_base=model_credential.get('api_base'),
-            openai_api_key=model_credential.get('api_key'),
-            **optional_params,
+            base_url=model_credential.get('api_base'),
+            api_key=model_credential.get('api_key'),
+            extra_body=optional_params,
             streaming=streaming,
             custom_get_token_ids=custom_get_token_ids
         )

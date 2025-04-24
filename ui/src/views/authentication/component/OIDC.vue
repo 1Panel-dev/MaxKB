@@ -62,6 +62,15 @@
             />
           </el-form-item>
           <el-form-item
+            :label="$t('views.system.authentication.oauth2.filedMapping')"
+            prop="config_data.fieldMapping"
+          >
+            <el-input
+              v-model="form.config_data.fieldMapping"
+              :placeholder="$t('views.system.authentication.oauth2.filedMappingPlaceholder')"
+            />
+          </el-form-item>
+          <el-form-item
             :label="$t('views.system.authentication.oidc.redirectUrl')"
             prop="config_data.redirectUrl"
           >
@@ -104,6 +113,7 @@ const form = ref<any>({
     state: '',
     clientId: '',
     clientSecret: '',
+    fieldMapping: '{"username": "preferred_username", "email": "email"}',
     redirectUrl: ''
   },
   is_active: true
@@ -156,6 +166,13 @@ const rules = reactive<FormRules<any>>({
       trigger: 'blur'
     }
   ],
+  'config_data.fieldMapping': [
+    {
+      required: true,
+      message: t('views.system.authentication.oauth2.filedMappingPlaceholder'),
+      trigger: 'blur'
+    }
+  ],
   'config_data.redirectUrl': [
     {
       required: true,
@@ -187,6 +204,12 @@ function getDetail() {
   authApi.getAuthSetting(form.value.auth_type, loading).then((res: any) => {
     if (res.data && JSON.stringify(res.data) !== '{}') {
       form.value = res.data
+      if (
+        form.value.config_data.fieldMapping === '' ||
+        form.value.config_data.fieldMapping === undefined
+      ) {
+        form.value.config_data.fieldMapping = '{"username": "preferred_username", "email": "email"}'
+      }
     }
   })
 }

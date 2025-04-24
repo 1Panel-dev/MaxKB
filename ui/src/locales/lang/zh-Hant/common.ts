@@ -45,7 +45,10 @@ export default {
     document: '文檔',
     image: '圖片',
     audio: '音頻',
-    video: '視頻'
+    video: '視頻',
+    other: '其他文件',
+    addExtensions: '添加後綴名',
+    existingExtensionsTip: '文件後綴已存在',
   },
   status: {
     label: '狀態',

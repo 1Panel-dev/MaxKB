@@ -65,7 +65,7 @@ const useUserStore = defineStore({
       if (token) {
         return token
       }
-      const local_token = localStorage.getItem(`${token}-accessToken`)
+      const local_token = localStorage.getItem(`${this.userAccessToken}-accessToken`)
       if (local_token) {
         return local_token
       }

@@ -1,10 +1,7 @@
 <template>
   <!-- 问题内容 -->
   <div class="question-content item-content mb-16 lighter">
-    <div
-      class="content p-12-16 border-r-8"
-      :class="document_list.length >= 2 ? 'media_2' : `media_${document_list.length}`"
-    >
+    <div class="content p-12-16 border-r-8" :class="getClassName">
       <div class="text break-all pre-wrap">
         <div class="mb-8" v-if="document_list.length">
           <el-space wrap class="w-full media-file-width">
@@ -57,6 +54,26 @@
                   class="border-r-4"
                 />
               </div>
+            </template>
+          </el-space>
+        </div>
+        <div class="mb-8" v-if="other_list.length">
+          <el-space wrap class="w-full media-file-width">
+            <template v-for="(item, index) in other_list" :key="index">
+              <el-card shadow="never" style="--el-card-padding: 8px" class="download-file cursor">
+                <div class="download-button flex align-center" @click="downloadFile(item)">
+                  <el-icon class="mr-4">
+                    <Download />
+                  </el-icon>
+                  {{ $t('chat.download') }}
+                </div>
+                <div class="show flex align-center">
+                  <img :src="getImgUrl(item && item?.name)" alt="" width="24" />
+                  <div class="ml-4 ellipsis-1" :title="item && item?.name">
+                    {{ item && item?.name }}
+                  </div>
+                </div>
+              </el-card>
             </template>
           </el-space>
         </div>
@@ -121,7 +138,24 @@ const audio_list = computed(() => {
   )
   return startNode?.audio_list || []
 })
-
+const other_list = computed(() => {
+  if (props.chatRecord?.upload_meta) {
+    return props.chatRecord.upload_meta?.other_list || []
+  }
+  const startNode = props.chatRecord.execution_details?.find(
+    (detail) => detail.type === 'start-node'
+  )
+  return startNode?.other_list || []
+})
+const getClassName = computed(() => {
+  return document_list.value.length >= 2 || other_list.value.length >= 2
+    ? 'media_2'
+    : document_list.value.length
+      ? `media_${document_list.value.length}`
+      : other_list.value.length
+        ? `media_${other_list.value.length}`
+        : `media_0`
+})
 function downloadFile(item: any) {
   downloadByURL(item.url, item.name)
 }

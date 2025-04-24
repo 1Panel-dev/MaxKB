@@ -213,12 +213,21 @@ class OpenAIChatSerializer(serializers.Serializer):
         return instance.get('messages')[-1].get('content')
 
     @staticmethod
-    def generate_chat(chat_id, application_id, message, client_id):
+    def generate_chat(chat_id, application_id, message, client_id, asker=None):
         if chat_id is None:
             chat_id = str(uuid.uuid1())
         chat = QuerySet(Chat).filter(id=chat_id).first()
         if chat is None:
-            Chat(id=chat_id, application_id=application_id, abstract=message[0:1024], client_id=client_id).save()
+            asker_dict = {'user_name': '游客'}
+            if asker is not None:
+                if isinstance(asker, str):
+                    asker_dict = {
+                        'user_name': asker
+                    }
+                elif isinstance(asker, dict):
+                    asker_dict = asker
+            Chat(id=chat_id, application_id=application_id, abstract=message[0:1024], client_id=client_id,
+                 asker=asker_dict).save()
         return chat_id
 
     def chat(self, instance: Dict, with_valid=True):
@@ -232,7 +241,8 @@ class OpenAIChatSerializer(serializers.Serializer):
         application_id = self.data.get('application_id')
         client_id = self.data.get('client_id')
         client_type = self.data.get('client_type')
-        chat_id = self.generate_chat(chat_id, application_id, message, client_id)
+        chat_id = self.generate_chat(chat_id, application_id, message, client_id,
+                                     asker=instance.get('form_data', {}).get("asker"))
         return ChatMessageSerializer(
             data={
                 'chat_id': chat_id, 'message': message,
@@ -245,6 +255,7 @@ class OpenAIChatSerializer(serializers.Serializer):
                 'image_list': instance.get('image_list', []),
                 'document_list': instance.get('document_list', []),
                 'audio_list': instance.get('audio_list', []),
+                'other_list': instance.get('other_list', []),
             }
         ).chat(base_to_response=OpenaiToResponse())
 
@@ -274,6 +285,7 @@ class ChatMessageSerializer(serializers.Serializer):
     image_list = serializers.ListField(required=False, error_messages=ErrMessage.list(_("picture")))
     document_list = serializers.ListField(required=False, error_messages=ErrMessage.list(_("document")))
     audio_list = serializers.ListField(required=False, error_messages=ErrMessage.list(_("Audio")))
+    other_list = serializers.ListField(required=False, error_messages=ErrMessage.list(_("Other")))
     child_node = serializers.DictField(required=False, allow_null=True,
                                        error_messages=ErrMessage.dict(_("Child Nodes")))
 
@@ -372,6 +384,7 @@ class ChatMessageSerializer(serializers.Serializer):
         image_list = self.data.get('image_list')
         document_list = self.data.get('document_list')
         audio_list = self.data.get('audio_list')
+        other_list = self.data.get('other_list')
         user_id = chat_info.application.user_id
         chat_record_id = self.data.get('chat_record_id')
         chat_record = None
@@ -388,7 +401,7 @@ class ChatMessageSerializer(serializers.Serializer):
                                            'client_id': client_id,
                                            'client_type': client_type,
                                            'user_id': user_id}, WorkFlowPostHandler(chat_info, client_id, client_type),
-                                          base_to_response, form_data, image_list, document_list, audio_list,
+                                          base_to_response, form_data, image_list, document_list, audio_list, other_list,
                                           self.data.get('runtime_node_id'),
                                           self.data.get('node_data'), chat_record, self.data.get('child_node'))
         r = work_flow_manage.run()

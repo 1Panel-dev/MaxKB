@@ -17,5 +17,5 @@ class VolcanicEngineChatModel(MaxKBBaseModel, BaseChatOpenAI):
             model=model_name,
             openai_api_base=model_credential.get('api_base'),
             openai_api_key=model_credential.get('api_key'),
-            **optional_params
+            extra_body=optional_params
         )

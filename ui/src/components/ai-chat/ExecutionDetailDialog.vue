@@ -125,6 +125,28 @@
                             </template>
                           </el-space>
                         </div>
+                        <div v-if="item.other_list?.length > 0">
+                          <p class="mb-8 color-secondary">
+                            {{ $t('common.fileUpload.document') }}:
+                          </p>
+
+                          <el-space wrap>
+                            <template v-for="(f, i) in item.other_list" :key="i">
+                              <el-card
+                                shadow="never"
+                                style="--el-card-padding: 8px"
+                                class="file cursor"
+                              >
+                                <div class="flex align-center">
+                                  <img :src="getImgUrl(f && f?.name)" alt="" width="24" />
+                                  <div class="ml-4 ellipsis" :title="f && f?.name">
+                                    {{ f && f?.name }}
+                                  </div>
+                                </div>
+                              </el-card>
+                            </template>
+                          </el-space>
+                        </div>
                       </div>
                     </div>
                   </template>

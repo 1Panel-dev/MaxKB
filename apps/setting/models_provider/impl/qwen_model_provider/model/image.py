@@ -18,9 +18,8 @@ class QwenVLChatModel(MaxKBBaseModel, BaseChatOpenAI):
             model_name=model_name,
             openai_api_key=model_credential.get('api_key'),
             openai_api_base='https://dashscope.aliyuncs.com/compatible-mode/v1',
-            # stream_options={"include_usage": True},
             streaming=True,
             stream_usage=True,
-            **optional_params,
+            extra_body=optional_params
         )
         return chat_tong_yi

@@ -1,10 +1,12 @@
 import os
 import re
-from typing import Dict
+from typing import Dict, List
 
 from botocore.config import Config
 from langchain_community.chat_models import BedrockChat
+from langchain_core.messages import BaseMessage, get_buffer_string
 
+from common.config.tokenizer_manage_config import TokenizerManage
 from setting.models_provider.base_model_provider import MaxKBBaseModel
 
 
@@ -71,6 +73,20 @@ class BedrockModel(MaxKBBaseModel, BedrockChat):
             model_kwargs=optional_params,
             config=config
         )
+
+    def get_num_tokens_from_messages(self, messages: List[BaseMessage]) -> int:
+        try:
+            return super().get_num_tokens_from_messages(messages)
+        except Exception as e:
+            tokenizer = TokenizerManage.get_tokenizer()
+            return sum([len(tokenizer.encode(get_buffer_string([m]))) for m in messages])
+
+    def get_num_tokens(self, text: str) -> int:
+        try:
+            return super().get_num_tokens(text)
+        except Exception as e:
+            tokenizer = TokenizerManage.get_tokenizer()
+            return len(tokenizer.encode(text))
 
 
 def _update_aws_credentials(profile_name, access_key_id, secret_access_key):

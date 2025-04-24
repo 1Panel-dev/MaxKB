@@ -1,6 +1,10 @@
 <template>
-  <login-layout>
-    <LoginContainer :subTitle="$t('views.system.theme.defaultSlogan')">
+  <login-layout v-if="!loading" v-loading="loading || sendLoading">
+    <LoginContainer
+      :subTitle="
+        user.themeInfo?.slogan ? user.themeInfo?.slogan : $t('views.system.theme.defaultSlogan')
+      "
+    >
       <h2 class="mb-24">{{ $t('views.login.forgotPassword') }}</h2>
       <el-form
         class="register-form"
@@ -41,15 +45,15 @@
                   isDisabled
                     ? `${$t('views.login.verificationCode.resend')}（${time}s）`
                     : $t('views.login.verificationCode.getVerificationCode')
-                }}</el-button
-              >
+                }}
+              </el-button>
             </div>
           </el-form-item>
         </div>
       </el-form>
-      <el-button size="large" type="primary" class="w-full" @click="checkCode">{{
-        $t('views.login.buttons.checkCode')
-      }}</el-button>
+      <el-button size="large" type="primary" class="w-full" @click="checkCode"
+        >{{ $t('views.login.buttons.checkCode') }}
+      </el-button>
       <div class="operate-container mt-12">
         <el-button
           class="register"
@@ -65,14 +69,18 @@
   </login-layout>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onBeforeMount, ref } from 'vue'
 import type { CheckCodeRequest } from '@/api/type/user'
 import { useRouter } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
 import UserApi from '@/api/user'
 import { MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
+import useStore from '@/stores'
+
 const router = useRouter()
+const { user } = useStore()
+
 const CheckEmailForm = ref<CheckCodeRequest>({
   email: '',
   code: '',
@@ -104,11 +112,11 @@ const rules = ref<FormRules<CheckCodeRequest>>({
 const loading = ref<boolean>(false)
 const isDisabled = ref<boolean>(false)
 const time = ref<number>(60)
-
+const sendLoading = ref<boolean>(false)
 const checkCode = () => {
   resetPasswordFormRef.value
     ?.validate()
-    .then(() => UserApi.checkCode(CheckEmailForm.value, loading))
+    .then(() => UserApi.checkCode(CheckEmailForm.value, sendLoading))
     .then(() => router.push({ name: 'reset_password', params: CheckEmailForm.value }))
 }
 /**
@@ -117,7 +125,7 @@ const checkCode = () => {
 const sendEmail = () => {
   resetPasswordFormRef.value?.validateField('email', (v: boolean) => {
     if (v) {
-      UserApi.sendEmit(CheckEmailForm.value.email, 'reset_password', loading).then(() => {
+      UserApi.sendEmit(CheckEmailForm.value.email, 'reset_password', sendLoading).then(() => {
         MsgSuccess(t('views.login.verificationCode.successMessage'))
         isDisabled.value = true
         handleTimeChange()
@@ -136,5 +144,11 @@ const handleTimeChange = () => {
     }, 1000)
   }
 }
+onBeforeMount(() => {
+  loading.value = true
+  user.asyncGetProfile().then(() => {
+    loading.value = false
+  })
+})
 </script>
 <style lang="scss" scoped></style>

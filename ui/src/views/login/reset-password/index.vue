@@ -1,6 +1,10 @@
 <template>
-  <login-layout>
-    <LoginContainer :subTitle="$t('views.system.theme.defaultSlogan')">
+  <login-layout v-if="!loading" v-loading="loading || sendLoading">
+    <LoginContainer
+      :subTitle="
+        user.themeInfo?.slogan ? user.themeInfo?.slogan : $t('views.system.theme.defaultSlogan')
+      "
+    >
       <h2 class="mb-24">{{ $t('views.login.resetPassword') }}</h2>
       <el-form
         class="reset-password-form"
@@ -35,9 +39,9 @@
           </el-form-item>
         </div>
       </el-form>
-      <el-button size="large" type="primary" class="w-full" @click="resetPassword">{{
-        $t('common.confirm')
-      }}</el-button>
+      <el-button size="large" type="primary" class="w-full" @click="resetPassword"
+        >{{ $t('common.confirm') }}
+      </el-button>
       <div class="operate-container mt-12">
         <el-button
           size="large"
@@ -54,13 +58,16 @@
   </login-layout>
 </template>
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onBeforeMount } from 'vue'
 import type { ResetPasswordRequest } from '@/api/type/user'
 import { useRouter, useRoute } from 'vue-router'
 import { MsgSuccess } from '@/utils/message'
 import type { FormInstance, FormRules } from 'element-plus'
 import UserApi from '@/api/user'
 import { t } from '@/locales'
+import useStore from '@/stores'
+
+const { user } = useStore()
 const router = useRouter()
 const route = useRoute()
 const {
@@ -81,7 +88,12 @@ onMounted(() => {
     router.push('forgot_password')
   }
 })
-
+onBeforeMount(() => {
+  loading.value = true
+  user.asyncGetProfile().then(() => {
+    loading.value = false
+  })
+})
 const rules = ref<FormRules<ResetPasswordRequest>>({
   password: [
     {
@@ -122,10 +134,11 @@ const rules = ref<FormRules<ResetPasswordRequest>>({
 })
 const resetPasswordFormRef = ref<FormInstance>()
 const loading = ref<boolean>(false)
+const sendLoading = ref<boolean>(false)
 const resetPassword = () => {
   resetPasswordFormRef.value
     ?.validate()
-    .then(() => UserApi.resetPassword(resetPasswordForm.value, loading))
+    .then(() => UserApi.resetPassword(resetPasswordForm.value, sendLoading))
     .then(() => {
       MsgSuccess(t('common.modifySuccess'))
       router.push({ name: 'login' })

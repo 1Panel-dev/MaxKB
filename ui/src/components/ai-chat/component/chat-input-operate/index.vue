@@ -10,7 +10,8 @@
             uploadDocumentList.length ||
             uploadImageList.length ||
             uploadAudioList.length ||
-            uploadVideoList.length
+            uploadVideoList.length ||
+            uploadOtherList.length
           "
         >
           <el-row :gutter="10">
@@ -30,22 +31,62 @@
                 class="file cursor"
               >
                 <div
-                  class="flex align-center"
+                  class="flex-between align-center"
                   @mouseenter.stop="mouseenter(item)"
                   @mouseleave.stop="mouseleave()"
                 >
+                  <div class="flex align-center">
+                    <img :src="getImgUrl(item && item?.name)" alt="" width="24" />
+                    <div class="ml-4 ellipsis-1" :title="item && item?.name">
+                      {{ item && item?.name }}
+                    </div>
+                  </div>
                   <div
                     @click="deleteFile(index, 'document')"
                     class="delete-icon color-secondary"
                     v-if="showDelete === item.url"
                   >
-                    <el-icon>
+                    <el-icon style="font-size: 16px; top: 2px">
                       <CircleCloseFilled />
                     </el-icon>
                   </div>
-                  <img :src="getImgUrl(item && item?.name)" alt="" width="24" />
-                  <div class="ml-4 ellipsis-1" :title="item && item?.name">
-                    {{ item && item?.name }}
+                </div>
+              </el-card>
+            </el-col>
+            <el-col
+              v-for="(item, index) in uploadOtherList"
+              :key="index"
+              :xs="24"
+              :sm="props.type === 'debug-ai-chat' ? 24 : 12"
+              :md="props.type === 'debug-ai-chat' ? 24 : 12"
+              :lg="props.type === 'debug-ai-chat' ? 24 : 12"
+              :xl="props.type === 'debug-ai-chat' ? 24 : 12"
+              class="mb-8"
+            >
+              <el-card
+                shadow="never"
+                style="--el-card-padding: 8px; max-width: 100%"
+                class="file cursor"
+              >
+                <div
+                  class="flex-between align-center"
+                  @mouseenter.stop="mouseenter(item)"
+                  @mouseleave.stop="mouseleave()"
+                >
+                  <div class="flex align-center">
+                    <img :src="getImgUrl(item && item?.name)" alt="" width="24" />
+                    <div class="ml-4 ellipsis-1" :title="item && item?.name">
+                      {{ item && item?.name }}
+                    </div>
+                  </div>
+                  <div
+                    @click="deleteFile(index, 'other')"
+                    class="delete-icon color-secondary"
+                    v-if="showDelete === item.url"
+                  >
+                    <el-icon style="font-size: 16px; top: 2px">
+                      <CircleCloseFilled />
+                    </el-icon>
                   </div>
                 </div>
               </el-card>
@@ -63,22 +104,24 @@
             >
               <el-card shadow="never" style="--el-card-padding: 8px" class="file cursor">
                 <div
-                  class="flex align-center"
+                  class="flex-between align-center"
                   @mouseenter.stop="mouseenter(item)"
                   @mouseleave.stop="mouseleave()"
                 >
+                  <div class="flex align-center">
+                    <img :src="getImgUrl(item && item?.name)" alt="" width="24" />
+                    <div class="ml-4 ellipsis-1" :title="item && item?.name">
+                      {{ item && item?.name }}
+                    </div>
+                  </div>
                   <div
                     @click="deleteFile(index, 'audio')"
                     class="delete-icon color-secondary"
                     v-if="showDelete === item.url"
                   >
-                    <el-icon>
+                    <el-icon style="font-size: 16px; top: 2px">
                       <CircleCloseFilled />
                     </el-icon>
-                  </div>
-                  <img :src="getImgUrl(item && item?.name)" alt="" width="24" />
-                  <div class="ml-4 ellipsis-1" :title="item && item?.name">
-                    {{ item && item?.name }}
                   </div>
                 </div>
               </el-card>
@@ -87,7 +130,7 @@
           <el-space wrap>
             <template v-for="(item, index) in uploadImageList" :key="index">
               <div
-                class="file cursor border border-r-4"
+                class="file file-image cursor border border-r-4"
                 v-if="item.url"
                 @mouseenter.stop="mouseenter(item)"
                 @mouseleave.stop="mouseleave()"
@@ -97,7 +140,7 @@
                   class="delete-icon color-secondary"
                   v-if="showDelete === item.url"
                 >
-                  <el-icon>
+                  <el-icon style="font-size: 16px; top: 2px">
                     <CircleCloseFilled />
                   </el-icon>
                 </div>
@@ -137,6 +180,8 @@
           type="textarea"
           :maxlength="100000"
           @keydown.enter="sendChatHandle($event)"
+          @paste="handlePaste"
+          @drop="handleDrop"
         />
 
         <div class="operate flex align-center">
@@ -188,6 +233,7 @@
                 :show-file-list="false"
                 :accept="getAcceptList()"
                 :on-change="(file: any, fileList: any) => uploadFile(file, fileList)"
+                ref="upload"
               >
                 <el-tooltip
                   :disabled="mode === 'mobile'"
@@ -301,13 +347,16 @@ const localLoading = computed({
   }
 })
 
-const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp']
-const documentExtensions = ['pdf', 'docx', 'txt', 'xls', 'xlsx', 'md', 'html', 'csv']
-const videoExtensions = ['mp4', 'avi', 'mov', 'mkv', 'flv']
-const audioExtensions = ['mp3', 'wav', 'ogg', 'aac', 'm4a']
+const upload = ref()
+
+const imageExtensions = ['JPG', 'JPEG', 'PNG', 'GIF', 'BMP']
+const documentExtensions = ['PDF', 'DOCX', 'TXT', 'XLS', 'XLSX', 'MD', 'HTML', 'CSV']
+const videoExtensions: any = []
+const audioExtensions = ['MP3', 'WAV', 'OGG', 'AAC', 'M4A']
+let otherExtensions = ['PPT', 'DOC']
 
 const getAcceptList = () => {
-  const { image, document, audio, video } = props.applicationDetails.file_upload_setting
+  const { image, document, audio, video, other } = props.applicationDetails.file_upload_setting
   let accepts: any = []
   if (image) {
     accepts = [...imageExtensions]
@@ -320,6 +369,11 @@ const getAcceptList = () => {
   }
   if (video) {
     accepts = [...accepts, ...videoExtensions]
+  }
+  if (other) {
+    // 其他文件类型
+    otherExtensions = props.applicationDetails.file_upload_setting.otherExtensions
+    accepts = [...accepts, ...otherExtensions]
   }
 
   if (accepts.length === 0) {
@@ -334,7 +388,8 @@ const checkMaxFilesLimit = () => {
     uploadImageList.value.length +
       uploadDocumentList.value.length +
       uploadAudioList.value.length +
-      uploadVideoList.value.length
+      uploadVideoList.value.length +
+      uploadOtherList.value.length
   )
 }
 
@@ -345,7 +400,8 @@ const uploadFile = async (file: any, fileList: any) => {
     uploadImageList.value.length +
     uploadDocumentList.value.length +
     uploadAudioList.value.length +
-    uploadVideoList.value.length
+    uploadVideoList.value.length +
+    uploadOtherList.value.length
   if (file_limit_once >= maxFiles) {
     MsgWarning(t('chat.uploadFile.limitMessage1') + maxFiles + t('chat.uploadFile.limitMessage2'))
     fileList.splice(0, fileList.length)
@@ -361,7 +417,7 @@ const uploadFile = async (file: any, fileList: any) => {
   const formData = new FormData()
   formData.append('file', file.raw, file.name)
   //
-  const extension = file.name.split('.').pop().toLowerCase() // 获取文件后缀名并转为小写
+  const extension = file.name.split('.').pop().toUpperCase() // 获取文件后缀名并转为小写
 
   if (imageExtensions.includes(extension)) {
     uploadImageList.value.push(file)
@@ -371,6 +427,8 @@ const uploadFile = async (file: any, fileList: any) => {
     uploadVideoList.value.push(file)
   } else if (audioExtensions.includes(extension)) {
     uploadAudioList.value.push(file)
+  } else if (otherExtensions.includes(extension)) {
+    uploadOtherList.value.push(file)
   }
 
   if (!chatId_context.value) {
@@ -429,10 +487,67 @@ const uploadFile = async (file: any, fileList: any) => {
           file.file_id = f[0].file_id
         }
       })
+      uploadOtherList.value.forEach((file: any) => {
+        const f = response.data.filter(
+          (f: any) => f.name.replaceAll(' ', '') === file.name.replaceAll(' ', '')
+        )
+        if (f.length > 0) {
+          file.url = f[0].url
+          file.file_id = f[0].file_id
+        }
+      })
       if (!inputValue.value && uploadImageList.value.length > 0) {
         inputValue.value = t('chat.uploadFile.imageMessage')
       }
     })
+}
+// 粘贴处理
+const handlePaste = (event: ClipboardEvent) => {
+  if (!props.applicationDetails.file_upload_enable) return
+  const clipboardData = event.clipboardData
+  if (!clipboardData) return
+
+  // 获取剪贴板中的文件
+  const files = clipboardData.files
+  if (files.length === 0) return
+
+  // 转换 FileList 为数组并遍历处理
+  Array.from(files).forEach((rawFile: File) => {
+    // 创建符合 el-upload 要求的文件对象
+    const elFile = {
+      uid: Date.now(), // 生成唯一ID
+      name: rawFile.name,
+      size: rawFile.size,
+      raw: rawFile, // 原始文件对象
+      status: 'ready', // 文件状态
+      percentage: 0 // 上传进度
+    }
+
+    // 手动触发上传逻辑（模拟 on-change 事件）
+    uploadFile(elFile, [elFile])
+  })
+
+  // 阻止默认粘贴行为
+  event.preventDefault()
+}
+// 新增拖拽处理
+const handleDrop = (event: DragEvent) => {
+  if (!props.applicationDetails.file_upload_enable) return
+  event.preventDefault()
+  const files = event.dataTransfer?.files
+  if (!files) return
+
+  Array.from(files).forEach((rawFile) => {
+    const elFile = {
+      uid: Date.now(),
+      name: rawFile.name,
+      size: rawFile.size,
+      raw: rawFile,
+      status: 'ready',
+      percentage: 0
+    }
+    uploadFile(elFile, [elFile])
+  })
 }
 // 语音录制任务id
 const intervalId = ref<any | null>(null)
@@ -446,6 +561,7 @@ const uploadImageList = ref<Array<any>>([])
 const uploadDocumentList = ref<Array<any>>([])
 const uploadVideoList = ref<Array<any>>([])
 const uploadAudioList = ref<Array<any>>([])
+const uploadOtherList = ref<Array<any>>([])
 
 const showDelete = ref('')
 
@@ -578,7 +694,9 @@ const uploadRecording = async (audioBlob: Blob) => {
     recorderStatus.value = 'TRANSCRIBING'
     const formData = new FormData()
     formData.append('file', audioBlob, 'recording.mp3')
-    bus.emit('on:transcribing', true)
+    if (props.applicationDetails.stt_autosend) {
+      bus.emit('on:transcribing', true)
+    }
     applicationApi
       .postSpeechToText(props.applicationDetails.id as string, formData, localLoading)
       .then((response) => {
@@ -656,13 +774,15 @@ function autoSendMessage() {
         image_list: uploadImageList.value,
         document_list: uploadDocumentList.value,
         audio_list: uploadAudioList.value,
-        video_list: uploadVideoList.value
+        video_list: uploadVideoList.value,
+        other_list: uploadOtherList.value
       })
       inputValue.value = ''
       uploadImageList.value = []
       uploadDocumentList.value = []
       uploadAudioList.value = []
       uploadVideoList.value = []
+      uploadOtherList.value = []
       if (quickInputRef.value) {
         quickInputRef.value.textareaStyle.height = '45px'
       }
@@ -718,6 +838,8 @@ function deleteFile(index: number, val: string) {
     uploadVideoList.value.splice(index, 1)
   } else if (val === 'audio') {
     uploadAudioList.value.splice(index, 1)
+  } else if (val === 'other') {
+    uploadOtherList.value.splice(index, 1)
   }
 }
 
@@ -823,7 +945,7 @@ onMounted(() => {
         }
       }
     }
-    .file {
+    .file-image {
       position: relative;
       overflow: inherit;
 

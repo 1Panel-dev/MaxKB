@@ -45,7 +45,10 @@ export default {
     document: '文档',
     image: '图片',
     audio: '音频',
-    video: '视频'
+    video: '视频',
+    other: '其他文件',
+    addExtensions: '添加后缀名',
+    existingExtensionsTip: '文件后缀已存在',
   },
   status: {
     label: '状态',

@@ -162,7 +162,10 @@ const initialApiFormData = ref({})
 const isUserInput = computed(
   () =>
     props.applicationDetails.work_flow?.nodes?.filter((v: any) => v.id === 'base-node')[0]
-      .properties.user_input_field_list.length > 0
+      .properties.user_input_field_list.length > 0 ||
+    (props.type === 'debug-ai-chat' &&
+      props.applicationDetails.work_flow?.nodes?.filter((v: any) => v.id === 'base-node')[0]
+        .properties.api_input_field_list.length > 0)
 )
 const showUserInputContent = computed(() => {
   return ((isUserInput.value && firsUserInput.value) || showUserInput.value) && props.type !== 'log'
@@ -224,33 +227,41 @@ const validate = () => {
   return userFormRef.value?.validate() || Promise.reject(false)
 }
 
-function sendMessage(val: string, other_params_data?: any, chat?: chatType) {
+function sendMessage(val: string, other_params_data?: any, chat?: chatType): Promise<boolean> {
   if (isUserInput.value) {
-    userFormRef.value
-      ?.validate()
-      .then((ok) => {
-        let userFormData = JSON.parse(localStorage.getItem(`${accessToken}userForm`) || '{}')
-        const newData = Object.keys(form_data.value).reduce((result: any, key: string) => {
-          result[key] = Object.prototype.hasOwnProperty.call(userFormData, key)
-            ? userFormData[key]
-            : form_data.value[key]
-          return result
-        }, {})
-        localStorage.setItem(`${accessToken}userForm`, JSON.stringify(newData))
-        showUserInput.value = false
-        if (!loading.value && props.applicationDetails?.name) {
-          handleDebounceClick(val, other_params_data, chat)
-        }
-      })
-      .catch((e) => {
-        showUserInput.value = true
-        return
-      })
+    if (userFormRef.value) {
+      return userFormRef.value
+        ?.validate()
+        .then((ok) => {
+          let userFormData = JSON.parse(localStorage.getItem(`${accessToken}userForm`) || '{}')
+          const newData = Object.keys(form_data.value).reduce((result: any, key: string) => {
+            result[key] = Object.prototype.hasOwnProperty.call(userFormData, key)
+              ? userFormData[key]
+              : form_data.value[key]
+            return result
+          }, {})
+          localStorage.setItem(`${accessToken}userForm`, JSON.stringify(newData))
+          showUserInput.value = false
+          if (!loading.value && props.applicationDetails?.name) {
+            handleDebounceClick(val, other_params_data, chat)
+            return true
+          }
+          throw 'err: no send'
+        })
+        .catch((e) => {
+          showUserInput.value = true
+          return false
+        })
+    } else {
+      return Promise.reject(false)
+    }
   } else {
     showUserInput.value = false
     if (!loading.value && props.applicationDetails?.name) {
       handleDebounceClick(val, other_params_data, chat)
+      return Promise.resolve(true)
     }
+    return Promise.reject(false)
   }
 }
 
@@ -416,7 +427,9 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean, other_para
             ? other_params_data.document_list
             : [],
         audio_list:
-          other_params_data && other_params_data.audio_list ? other_params_data.audio_list : []
+          other_params_data && other_params_data.audio_list ? other_params_data.audio_list : [],
+        other_list:
+          other_params_data && other_params_data.other_list ? other_params_data.other_list : []
       }
     })
     chatList.value.push(chat)

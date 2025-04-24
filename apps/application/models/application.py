@@ -11,7 +11,7 @@ import uuid
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from langchain.schema import HumanMessage, AIMessage
-
+from django.utils.translation import gettext as _
 from common.encoder.encoder import SystemEncoder
 from common.mixins.app_model_mixin import AppModelMixin
 from dataset.models.data_set import DataSet
@@ -167,7 +167,11 @@ class ChatRecord(AppModelMixin):
         return HumanMessage(content=self.problem_text)
 
     def get_ai_message(self):
-        return AIMessage(content=self.answer_text)
+        answer_text = self.answer_text
+        if answer_text is None or len(str(answer_text).strip()) == 0:
+            answer_text = _(
+                'Sorry, no relevant content was found. Please re-describe your problem or provide more information. ')
+        return AIMessage(content=answer_text)
 
     def get_node_details_runtime_node_id(self, runtime_node_id):
         return self.details.get(runtime_node_id, None)

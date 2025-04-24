@@ -45,7 +45,10 @@ export default {
     document: 'Documents',
     image: 'Image',
     audio: 'Audio',
-    video: 'Video'
+    video: 'Video',
+    other: 'Other',
+    addExtensions: 'Add suffix',
+    existingExtensionsTip: 'File suffix already exists',
   },
   status: {
     label: 'Status',
@@ -55,7 +58,7 @@ export default {
   param: {
     outputParam: 'Output Parameters',
     inputParam: 'Input Parameters',
-    initParam: 'Startup Parameters',
+    initParam: 'Startup Parameters'
   },
 
   inputPlaceholder: 'Please input',
