@@ -153,8 +153,9 @@ const form_data = ref<any>({})
 const api_form_data = ref<any>({})
 const userFormRef = ref<InstanceType<typeof UserForm>>()
 // 用户输入
-const firsUserInput = ref(true)
+const firsUserInput = ref(false)
 const showUserInput = ref(false)
+
 // 初始表单数据（用于恢复）
 const initialFormData = ref({})
 const initialApiFormData = ref({})
@@ -184,10 +185,14 @@ watch(
       firsUserInput.value = false
     } else {
       chartOpenId.value = ''
-      firsUserInput.value = true
+      if (isUserInput.value) {
+        firsUserInput.value = true
+      } else if (props.type == 'debug-ai-chat' && isAPIInput.value) {
+        firsUserInput.value = true
+      }
     }
   },
-  { deep: true }
+  { deep: true, immediate: true }
 )
 
 watch(
