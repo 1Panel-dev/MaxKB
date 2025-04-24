@@ -12,6 +12,7 @@ from django.http import HttpResponse
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers, status
 
+from common.db.search import page_search
 from common.exception.app_exception import AppApiException
 from common.result import result
 from common.utils.tool_code import ToolExecutor
@@ -126,6 +127,7 @@ class ToolCreateRequest(serializers.Serializer):
     is_active = serializers.BooleanField(required=False, label=_('Is active'))
 
     module_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, default='root')
+
 
 class ToolEditRequest(serializers.Serializer):
     name = serializers.CharField(required=False, label=_('tool name'))
@@ -357,4 +359,4 @@ class ToolTreeSerializer(serializers.Serializer):
                 tools = QuerySet(Tool).filter(Q(workspace_id=self.data.get('workspace_id')) &
                                               Q(module_id__in=all_modules) &
                                               Q(tool_type=self.data.get('tool_type')))
-            return ToolModelSerializer(tools, many=True).data
+            return page_search(current_page, page_size, tools, lambda record: ToolModelSerializer(record).data)
