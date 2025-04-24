@@ -24,6 +24,9 @@ def get_module_type(source):
         return None
 
 
+MODULE_DEPTH = 3  # Module 不能超过3层
+
+
 class ModuleSerializer(serializers.Serializer):
     id = serializers.CharField(required=True, label=_('module id'))
     name = serializers.CharField(required=True, label=_('module name'))
@@ -47,6 +50,8 @@ class ModuleSerializer(serializers.Serializer):
             Module = get_module_type(self.data.get('source'))
             if QuerySet(Module).filter(name=name, workspace_id=workspace_id, parent_id=parent_id).exists():
                 raise serializers.ValidationError(_('Module name already exists'))
+            # Module 不能超过3层
+            self.check_depth(parent_id)
 
             module = Module(
                 id=uuid.uuid7(),
@@ -57,6 +62,27 @@ class ModuleSerializer(serializers.Serializer):
             )
             module.save()
             return ModuleSerializer(module).data
+
+        def check_depth(self, parent_id):
+            # Module 不能超过3层
+            Module = get_module_type(self.data.get('source'))
+
+            if parent_id != 'root':
+                # 计算当前层级
+                depth = 1  # 当前要创建的节点算一层
+                current_parent_id = parent_id
+
+                # 向上追溯父节点
+                while current_parent_id != 'root':
+                    depth += 1
+                    parent_node = QuerySet(Module).filter(id=current_parent_id).first()
+                    if parent_node is None:
+                        break
+                    current_parent_id = parent_node.parent_id
+
+                # 验证层级深度
+                if depth > MODULE_DEPTH:
+                    raise serializers.ValidationError(_('Module depth cannot exceed 3 levels'))
 
     class Operate(serializers.Serializer):
         id = serializers.CharField(required=True, label=_('module id'))
