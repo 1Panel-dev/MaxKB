@@ -23,7 +23,7 @@
         ref="userFormRef"
       ></UserForm>
     </div>
-    <template v-if="!isUserInput || !firsUserInput || type === 'log'">
+    <template v-if="!(isUserInput || isAPIInput) || !firsUserInput || type === 'log'">
       <el-scrollbar ref="scrollDiv" @scroll="handleScrollTop">
         <div ref="dialogScrollbar" class="ai-chat__content p-16">
           <PrologueContent
@@ -80,7 +80,7 @@
             </slot>
 
             <el-button
-              v-if="isUserInput"
+              v-if="isUserInput || isAPIInput"
               class="user-input-button mb-8"
               type="primary"
               text
@@ -115,6 +115,7 @@ import UserForm from '@/components/ai-chat/component/user-form/index.vue'
 import Control from '@/components/ai-chat/component/control/index.vue'
 import { t } from '@/locales'
 import bus from '@/bus'
+import { fa } from 'element-plus/es/locale'
 const transcribing = ref<boolean>(false)
 defineOptions({ name: 'AiChat' })
 const route = useRoute()
@@ -162,13 +163,19 @@ const initialApiFormData = ref({})
 const isUserInput = computed(
   () =>
     props.applicationDetails.work_flow?.nodes?.filter((v: any) => v.id === 'base-node')[0]
-      .properties.user_input_field_list.length > 0 ||
-    (props.type === 'debug-ai-chat' &&
-      props.applicationDetails.work_flow?.nodes?.filter((v: any) => v.id === 'base-node')[0]
-        .properties.api_input_field_list.length > 0)
+      .properties.user_input_field_list.length > 0
+)
+const isAPIInput = computed(
+  () =>
+    props.type === 'debug-ai-chat' &&
+    props.applicationDetails.work_flow?.nodes?.filter((v: any) => v.id === 'base-node')[0]
+      .properties.api_input_field_list.length > 0
 )
 const showUserInputContent = computed(() => {
-  return ((isUserInput.value && firsUserInput.value) || showUserInput.value) && props.type !== 'log'
+  return (
+    (((isUserInput.value || isAPIInput) && firsUserInput.value) || showUserInput.value) &&
+    props.type !== 'log'
+  )
 })
 watch(
   () => props.chatId,
@@ -241,7 +248,9 @@ function sendMessage(val: string, other_params_data?: any, chat?: chatType): Pro
             return result
           }, {})
           localStorage.setItem(`${accessToken}userForm`, JSON.stringify(newData))
+
           showUserInput.value = false
+
           if (!loading.value && props.applicationDetails?.name) {
             handleDebounceClick(val, other_params_data, chat)
             return true
@@ -249,7 +258,12 @@ function sendMessage(val: string, other_params_data?: any, chat?: chatType): Pro
           throw 'err: no send'
         })
         .catch((e) => {
-          showUserInput.value = true
+          if (isAPIInput.value && props.type !== 'debug-ai-chat') {
+            showUserInput.value = false
+          } else {
+            showUserInput.value = true
+          }
+
           return false
         })
     } else {
