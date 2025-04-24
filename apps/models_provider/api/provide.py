@@ -46,6 +46,21 @@ class ModelParamsFormSerializer(serializers.Serializer):
     props_info = serializers.DictField(required=False, label=_("props info"))
 
 
+class ModelParamsFormResponse(ResultSerializer):
+    def get_data(self):
+        return serializers.ListSerializer(child=ModelParamsFormSerializer())
+
+
+class ModelListResponse(ResultSerializer):
+    def get_data(self):
+        return serializers.ListSerializer(child=ModelListSerializer())
+
+
+class ProvideListResponse(ResultSerializer):
+    def get_data(self):
+        return serializers.ListSerializer(child=ProvideListSerializer())
+
+
 class ProvideApi(APIMixin):
     class ModelParamsForm(APIMixin):
         @staticmethod
@@ -73,11 +88,7 @@ class ProvideApi(APIMixin):
 
         @staticmethod
         def get_response():
-            class ProvideListSerializer(ResultSerializer):
-                def get_data(self):
-                    return serializers.ListSerializer(child=ModelParamsFormSerializer())
-
-            return ProvideListSerializer
+            return ModelParamsFormResponse
 
     class ModelList(APIMixin):
         @staticmethod
@@ -99,11 +110,7 @@ class ProvideApi(APIMixin):
 
         @staticmethod
         def get_response():
-            class ProvideListSerializer(ResultSerializer):
-                def get_data(self):
-                    return serializers.ListSerializer(child=ModelListSerializer())
-
-            return ProvideListSerializer
+            return ModelListResponse
 
     @staticmethod
     def get_response():
@@ -126,8 +133,4 @@ class ProvideApi(APIMixin):
 
         @staticmethod
         def get_response():
-            class ProvideListResponse(ResultSerializer):
-                def get_data(self):
-                    return serializers.ListSerializer(child=ProvideListSerializer())
-
             return ProvideListResponse

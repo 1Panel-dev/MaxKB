@@ -118,6 +118,7 @@ class Model(APIView):
                        description=_('Save model parameter form'),
                        operation_id=_('Save model parameter form'),
                        parameters=GetModelApi.get_query_params_api(),
+                       request=GetModelApi.get_request(),
                        responses=ProvideApi.ModelParamsForm.get_response(),
                        tags=[_('Model')])
         @has_permissions(PermissionConstants.MODEL_READ.get_workspace_permission())
@@ -148,6 +149,7 @@ class Model(APIView):
                        description=_('Pause model download'),
                        operation_id=_('Pause model download'),
                        parameters=GetModelApi.get_query_params_api(),
+                       request=GetModelApi.get_request(),
                        responses=DefaultModelResponse.get_response(),
                        tags=[_('Model')])
         @has_permissions(PermissionConstants.MODEL_CREATE.get_workspace_permission())

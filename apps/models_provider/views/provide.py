@@ -73,7 +73,7 @@ class Provide(APIView):
 
         @extend_schema(methods=['GET'],
                        description=_('Get model default parameters'),
-                       operation_id=_('Get the model creation form'),
+                       operation_id=_('Get model default parameters'),
                        parameters=ProvideApi.ModelParamsForm.get_query_params_api(),
                        responses=ProvideApi.ModelParamsForm.get_response(),
                        tags=[_('Model')])
