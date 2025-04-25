@@ -1,3 +1,8 @@
-from django.shortcuts import render
+from django.urls import path
 
-# Create your views here.
+from . import views
+
+app_name = "knowledge"
+urlpatterns = [
+    path('workspace/<str:workspace_id>/knowledge', views.KnowledgeView.as_view()),
+]

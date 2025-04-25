@@ -38,7 +38,7 @@ class Migration(migrations.Migration):
                 ('parent',
                  mptt.fields.TreeForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE,
                                             related_name='children', to='tools.toolmodule')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='users.user',
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, to='users.user',
                                            verbose_name='用户id')),
             ],
             options={
@@ -70,7 +70,7 @@ class Migration(migrations.Migration):
                 ('template_id', models.UUIDField(default=None, null=True, verbose_name='模版id')),
                 ('workspace_id', models.CharField(default='default', max_length=64, verbose_name='工作空间id', db_index=True)),
                 ('init_params', models.CharField(max_length=102400, null=True, verbose_name='初始化参数')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='users.user',
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, to='users.user',
                                            verbose_name='用户id')),
                 ('module',
                  models.ForeignKey(default='root', on_delete=django.db.models.deletion.CASCADE, to='tools.toolmodule',

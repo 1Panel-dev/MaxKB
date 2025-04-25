@@ -153,8 +153,11 @@ class PermissionConstants(Enum):
     KNOWLEDGE_MODULE_EDIT = Permission(group=Group.KNOWLEDGE, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN,
                                                                                                RoleConstants.USER])
     KNOWLEDGE_MODULE_DELETE = Permission(group=Group.KNOWLEDGE, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN,
-                                                                                                   RoleConstants.USER])
-
+                                                                                         RoleConstants.USER])
+    KNOWLEDGE_READ = Permission(group=Group.KNOWLEDGE, operate=Operate.READ, role_list=[RoleConstants.ADMIN,
+                                                                                         RoleConstants.USER])
+    KNOWLEDGE_CREATE = Permission(group=Group.KNOWLEDGE, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN,
+                                                                                         RoleConstants.USER])
     def get_workspace_application_permission(self):
         return lambda r, kwargs: Permission(group=self.value.group, operate=self.value.operate,
                                             resource_path=

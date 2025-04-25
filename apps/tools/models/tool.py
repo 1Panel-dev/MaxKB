@@ -10,7 +10,7 @@ from users.models import User
 class ToolModule(MPTTModel, AppModelMixin):
     id = models.CharField(primary_key=True, max_length=64, editable=False, verbose_name="主键id")
     name = models.CharField(max_length=64, verbose_name="文件夹名称")
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="用户id")
+    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name="用户id")
     workspace_id = models.CharField(max_length=64, verbose_name="工作空间id", default="default", db_index=True)
     parent = TreeForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
 
@@ -33,7 +33,7 @@ class ToolType(models.TextChoices):
 
 class Tool(AppModelMixin):
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="用户id")
+    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name="用户id")
     name = models.CharField(max_length=64, verbose_name="工具名称")
     desc = models.CharField(max_length=128, verbose_name="描述")
     code = models.CharField(max_length=102400, verbose_name="python代码")

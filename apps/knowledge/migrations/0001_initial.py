@@ -14,9 +14,7 @@ def insert_default_data(apps, schema_editor):
     KnowledgeModule.objects.create(id='root', name='根目录', user_id='f0dd8f71-e4ee-11ee-8c84-a8a1595801ab')
 
 
-
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -30,8 +28,12 @@ class Migration(migrations.Migration):
             fields=[
                 ('create_time', models.DateTimeField(auto_now_add=True, verbose_name='创建时间')),
                 ('update_time', models.DateTimeField(auto_now=True, verbose_name='修改时间')),
-                ('id', models.UUIDField(default=uuid_utils.compat.uuid7, editable=False, primary_key=True, serialize=False, verbose_name='主键id')),
+                ('id',
+                 models.UUIDField(default=uuid_utils.compat.uuid7, editable=False, primary_key=True, serialize=False,
+                                  verbose_name='主键id')),
                 ('file_name', models.CharField(default='', max_length=256, verbose_name='文件名称')),
+                ('workspace_id',
+                 models.CharField(db_index=True, default='default', max_length=64, verbose_name='工作空间id')),
                 ('loid', models.IntegerField(verbose_name='loid')),
                 ('meta', models.JSONField(default=dict, verbose_name='文件关联数据')),
             ],
@@ -40,39 +42,60 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='Knowledge',
-            fields=[
-                ('create_time', models.DateTimeField(auto_now_add=True, verbose_name='创建时间')),
-                ('update_time', models.DateTimeField(auto_now=True, verbose_name='修改时间')),
-                ('id', models.UUIDField(default=uuid_utils.compat.uuid7, editable=False, primary_key=True, serialize=False, verbose_name='主键id')),
-                ('name', models.CharField(max_length=150, verbose_name='知识库名称')),
-                ('desc', models.CharField(max_length=256, verbose_name='描述')),
-                ('type', models.IntegerField(choices=[(0, '通用类型'), (1, 'web站点类型'), (2, '飞书类型'), (3, '语雀类型')], default=0, verbose_name='类型')),
-                ('meta', models.JSONField(default=dict, verbose_name='元数据')),
-                ('embedding_mode', models.ForeignKey(default=knowledge.models.knowledge.default_model, on_delete=django.db.models.deletion.DO_NOTHING, to='models_provider.model', verbose_name='向量模型')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, to='users.user', verbose_name='所属用户')),
-            ],
-            options={
-                'db_table': 'knowledge',
-            },
-        ),
-        migrations.CreateModel(
             name='KnowledgeModule',
             fields=[
                 ('create_time', models.DateTimeField(auto_now_add=True, verbose_name='创建时间')),
                 ('update_time', models.DateTimeField(auto_now=True, verbose_name='修改时间')),
-                ('id', models.CharField(editable=False, max_length=64, primary_key=True, serialize=False, verbose_name='主键id')),
+                ('id', models.CharField(editable=False, max_length=64, primary_key=True, serialize=False,
+                                        verbose_name='主键id')),
                 ('name', models.CharField(max_length=64, verbose_name='文件夹名称')),
-                ('workspace_id', models.CharField(db_index=True, default='default', max_length=64, verbose_name='工作空间id')),
+                ('workspace_id',
+                 models.CharField(db_index=True, default='default', max_length=64, verbose_name='工作空间id')),
                 ('lft', models.PositiveIntegerField(editable=False)),
                 ('rght', models.PositiveIntegerField(editable=False)),
                 ('tree_id', models.PositiveIntegerField(db_index=True, editable=False)),
                 ('level', models.PositiveIntegerField(editable=False)),
-                ('parent', mptt.fields.TreeForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='children', to='knowledge.knowledgemodule')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='users.user', verbose_name='用户id')),
+                ('parent',
+                 mptt.fields.TreeForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE,
+                                            related_name='children', to='knowledge.knowledgemodule')),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, to='users.user',
+                                           verbose_name='用户id')),
             ],
             options={
                 'db_table': 'knowledge_module',
+            },
+        ),
+        migrations.CreateModel(
+            name='Knowledge',
+            fields=[
+                ('create_time', models.DateTimeField(auto_now_add=True, verbose_name='创建时间')),
+                ('update_time', models.DateTimeField(auto_now=True, verbose_name='修改时间')),
+                ('id',
+                 models.UUIDField(default=uuid_utils.compat.uuid7, editable=False, primary_key=True, serialize=False,
+                                  verbose_name='主键id')),
+                ('name', models.CharField(max_length=150, verbose_name='知识库名称')),
+                ('workspace_id',
+                 models.CharField(db_index=True, default='default', max_length=64, verbose_name='工作空间id')),
+                ('desc', models.CharField(max_length=256, verbose_name='描述')),
+                ('type',
+                 models.IntegerField(choices=[(0, '通用类型'), (1, 'web站点类型'), (2, '飞书类型'), (3, '语雀类型')],
+                                     default=0, verbose_name='类型')),
+                ('meta', models.JSONField(default=dict, verbose_name='元数据')),
+                ('scope',
+                 models.CharField(choices=[('SHARED', '共享'), ('WORKSPACE', '工作空间可用')], default='WORKSPACE',
+                                  max_length=20, verbose_name='可用范围')),
+                ('module',
+                 models.ForeignKey(default='root', on_delete=django.db.models.deletion.CASCADE,
+                                   to='knowledge.knowledgemodule',
+                                   verbose_name='模块id')),
+                ('embedding_model', models.ForeignKey(default=knowledge.models.knowledge.default_model,
+                                                     on_delete=django.db.models.deletion.DO_NOTHING,
+                                                     to='models_provider.model', verbose_name='向量模型')),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, to='users.user',
+                                           verbose_name='所属用户')),
+            ],
+            options={
+                'db_table': 'knowledge',
             },
         ),
         migrations.RunPython(insert_default_data),
