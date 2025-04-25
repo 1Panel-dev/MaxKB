@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import uuid_utils.compat as uuid
+from django.db import transaction
 from django.db.models import QuerySet, Q
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
@@ -27,6 +28,28 @@ def get_module_type(source):
 MODULE_DEPTH = 3  # Module 不能超过3层
 
 
+def check_depth(source, parent_id):
+    # Module 不能超过3层
+    Module = get_module_type(source)
+
+    if parent_id != 'root':
+        # 计算当前层级
+        depth = 1  # 当前要创建的节点算一层
+        current_parent_id = parent_id
+
+        # 向上追溯父节点
+        while current_parent_id != 'root':
+            depth += 1
+            parent_node = QuerySet(Module).filter(id=current_parent_id).first()
+            if parent_node is None:
+                break
+            current_parent_id = parent_node.parent_id
+
+        # 验证层级深度
+        if depth > MODULE_DEPTH:
+            raise serializers.ValidationError(_('Module depth cannot exceed 3 levels'))
+
+
 class ModuleSerializer(serializers.Serializer):
     id = serializers.CharField(required=True, label=_('module id'))
     name = serializers.CharField(required=True, label=_('module name'))
@@ -51,7 +74,7 @@ class ModuleSerializer(serializers.Serializer):
             if QuerySet(Module).filter(name=name, workspace_id=workspace_id, parent_id=parent_id).exists():
                 raise serializers.ValidationError(_('Module name already exists'))
             # Module 不能超过3层
-            self.check_depth(parent_id)
+            check_depth(self.data.get('source'), parent_id)
 
             module = Module(
                 id=uuid.uuid7(),
@@ -63,43 +86,33 @@ class ModuleSerializer(serializers.Serializer):
             module.save()
             return ModuleSerializer(module).data
 
-        def check_depth(self, parent_id):
-            # Module 不能超过3层
-            Module = get_module_type(self.data.get('source'))
-
-            if parent_id != 'root':
-                # 计算当前层级
-                depth = 1  # 当前要创建的节点算一层
-                current_parent_id = parent_id
-
-                # 向上追溯父节点
-                while current_parent_id != 'root':
-                    depth += 1
-                    parent_node = QuerySet(Module).filter(id=current_parent_id).first()
-                    if parent_node is None:
-                        break
-                    current_parent_id = parent_node.parent_id
-
-                # 验证层级深度
-                if depth > MODULE_DEPTH:
-                    raise serializers.ValidationError(_('Module depth cannot exceed 3 levels'))
-
     class Operate(serializers.Serializer):
         id = serializers.CharField(required=True, label=_('module id'))
         workspace_id = serializers.CharField(required=True, allow_null=True, allow_blank=True, label=_('workspace id'))
         source = serializers.CharField(required=True, label=_('source'))
 
+        @transaction.atomic
         def edit(self, instance):
             self.is_valid(raise_exception=True)
             Module = get_module_type(self.data.get('source'))
-            if not QuerySet(Module).filter(id=self.data.get('id')).exists():
+            current_id = self.data.get('id')
+            current_node = Module.objects.get(id=current_id)
+            if current_node is None:
                 raise serializers.ValidationError(_('Module does not exist'))
 
             edit_field_list = ['name']
             edit_dict = {field: instance.get(field) for field in edit_field_list if (
                     field in instance and instance.get(field) is not None)}
 
-            QuerySet(Module).filter(id=self.data.get('id')).update(**edit_dict)
+            QuerySet(Module).filter(id=current_id).update(**edit_dict)
+
+            # 模块间的移动
+            parent_id = instance.get('parent_id')
+            if parent_id is not None and current_id != 'root':
+                # Module 不能超过3层
+                check_depth(self.data.get('source'), parent_id)
+                parent = Module.objects.get(id=parent_id)
+                current_node.move_to(parent)
 
             return self.one()
 
