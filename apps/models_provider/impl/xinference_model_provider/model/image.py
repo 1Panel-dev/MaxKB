@@ -19,7 +19,7 @@ class XinferenceImage(MaxKBBaseModel, BaseChatOpenAI):
             # stream_options={"include_usage": True},
             streaming=True,
             stream_usage=True,
-            **optional_params,
+            extra_body=optional_params
         )
 
     def get_num_tokens_from_messages(self, messages: List[BaseMessage]) -> int:

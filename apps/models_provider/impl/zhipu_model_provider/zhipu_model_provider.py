@@ -20,14 +20,14 @@ from models_provider.impl.zhipu_model_provider.model.tti import ZhiPuTextToImage
 from maxkb.conf import PROJECT_DIR
 from django.utils.translation import gettext as _
 
-qwen_model_credential = ZhiPuLLMModelCredential()
+zhipu_model_credential = ZhiPuLLMModelCredential()
 zhipu_image_model_credential = ZhiPuImageModelCredential()
 zhipu_tti_model_credential = ZhiPuTextToImageModelCredential()
 
 model_info_list = [
-    ModelInfo('glm-4', '', ModelTypeConst.LLM, qwen_model_credential, ZhipuChatModel),
-    ModelInfo('glm-4v', '', ModelTypeConst.LLM, qwen_model_credential, ZhipuChatModel),
-    ModelInfo('glm-3-turbo', '', ModelTypeConst.LLM, qwen_model_credential, ZhipuChatModel)
+    ModelInfo('glm-4', '', ModelTypeConst.LLM, zhipu_model_credential, ZhipuChatModel),
+    ModelInfo('glm-4v', '', ModelTypeConst.LLM, zhipu_model_credential, ZhipuChatModel),
+    ModelInfo('glm-3-turbo', '', ModelTypeConst.LLM, zhipu_model_credential, ZhipuChatModel)
 ]
 
 model_info_image_list = [
@@ -57,7 +57,7 @@ model_info_tti_list = [
 model_info_manage = (
     ModelInfoManage.builder()
     .append_model_info_list(model_info_list)
-    .append_default_model_info(ModelInfo('glm-4', '', ModelTypeConst.LLM, qwen_model_credential, ZhipuChatModel))
+    .append_default_model_info(ModelInfo('glm-4', '', ModelTypeConst.LLM, zhipu_model_credential, ZhipuChatModel))
     .append_model_info_list(model_info_image_list)
     .append_default_model_info(model_info_image_list[0])
     .append_model_info_list(model_info_tti_list)

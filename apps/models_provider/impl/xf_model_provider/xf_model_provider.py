@@ -27,15 +27,15 @@ from django.utils.translation import gettext as _
 
 ssl._create_default_https_context = ssl.create_default_context()
 
-qwen_model_credential = XunFeiLLMModelCredential()
+xunfei_model_credential = XunFeiLLMModelCredential()
 stt_model_credential = XunFeiSTTModelCredential()
 image_model_credential = XunFeiImageModelCredential()
 tts_model_credential = XunFeiTTSModelCredential()
 embedding_model_credential = XFEmbeddingCredential()
 model_info_list = [
-    ModelInfo('generalv3.5', '', ModelTypeConst.LLM, qwen_model_credential, XFChatSparkLLM),
-    ModelInfo('generalv3', '', ModelTypeConst.LLM, qwen_model_credential, XFChatSparkLLM),
-    ModelInfo('generalv2', '', ModelTypeConst.LLM, qwen_model_credential, XFChatSparkLLM),
+    ModelInfo('generalv3.5', '', ModelTypeConst.LLM, xunfei_model_credential, XFChatSparkLLM),
+    ModelInfo('generalv3', '', ModelTypeConst.LLM, xunfei_model_credential, XFChatSparkLLM),
+    ModelInfo('generalv2', '', ModelTypeConst.LLM, xunfei_model_credential, XFChatSparkLLM),
     ModelInfo('iat', _('Chinese and English recognition'), ModelTypeConst.STT, stt_model_credential, XFSparkSpeechToText),
     ModelInfo('tts', '', ModelTypeConst.TTS, tts_model_credential, XFSparkTextToSpeech),
     ModelInfo('embedding', '', ModelTypeConst.EMBEDDING, embedding_model_credential, XFEmbedding)
@@ -45,7 +45,7 @@ model_info_manage = (
     ModelInfoManage.builder()
     .append_model_info_list(model_info_list)
     .append_default_model_info(
-        ModelInfo('generalv3.5', '', ModelTypeConst.LLM, qwen_model_credential, XFChatSparkLLM))
+        ModelInfo('generalv3.5', '', ModelTypeConst.LLM, xunfei_model_credential, XFChatSparkLLM))
     .append_default_model_info(
         ModelInfo('iat', _('Chinese and English recognition'), ModelTypeConst.STT, stt_model_credential, XFSparkSpeechToText),
     )
