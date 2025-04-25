@@ -33,15 +33,15 @@ class OpenAIChatModel(MaxKBBaseModel, BaseChatOpenAI):
         streaming = model_kwargs.get('streaming', True)
         if 'o1' in model_name:
             streaming = False
-        azure_chat_open_ai = OpenAIChatModel(
+        chat_open_ai = OpenAIChatModel(
             model=model_name,
             openai_api_base=model_credential.get('api_base'),
             openai_api_key=model_credential.get('api_key'),
-            **optional_params,
+            extra_body=optional_params,
             streaming=streaming,
             custom_get_token_ids=custom_get_token_ids
         )
-        return azure_chat_open_ai
+        return chat_open_ai
 
     def get_num_tokens_from_messages(self, messages: List[BaseMessage]) -> int:
         try:

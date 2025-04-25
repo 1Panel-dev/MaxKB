@@ -34,7 +34,7 @@ class XinferenceChatModel(MaxKBBaseModel, BaseChatOpenAI):
             model=model_name,
             openai_api_base=base_url,
             openai_api_key=model_credential.get('api_key'),
-            **optional_params
+            extra_body=optional_params
         )
 
     def get_num_tokens_from_messages(self, messages: List[BaseMessage]) -> int:
