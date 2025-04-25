@@ -1,5 +1,25 @@
 export default {
   title: '普通登錄',
+  loginForm: {
+    username: {
+      label: '使用者名稱',
+      placeholder: '請輸入使用者名稱',
+      requiredMessage: '請輸入使用者名稱',
+      lengthMessage: '長度須介於 6 到 20 個字元之間'
+    },
+    password: {
+      label: '登入密碼',
+      placeholder: '請輸入密碼',
+      requiredMessage: '請輸入密碼',
+      lengthMessage: '長度須介於 6 到 20 個字元之間'
+    },
+    captcha: {
+      label: '驗證碼',
+      placeholder: '請輸入驗證碼',
+      requiredMessage: '請輸入驗證碼',
+      validatorMessage: '驗證碼不正確',
+    },
+  },
   jump_tip: '即將跳轉至認證源頁面進行認證',
   jump: '跳轉',
   resetPassword: '修改密碼',

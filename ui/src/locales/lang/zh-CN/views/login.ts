@@ -1,5 +1,25 @@
 export default {
   title: '普通登录',
+  loginForm: {
+    username: {
+      label: '用户名',
+      placeholder: '请输入用户名',
+      requiredMessage: '请输入用户名',
+      lengthMessage: '长度在 6 到 20 个字符',
+    },
+    password: {
+      label: '登录密码',
+      placeholder: '请输入密码',
+      requiredMessage: '请输入密码',
+      lengthMessage: '长度在 6 到 20 个字符',
+    },
+    captcha: {
+      label: '验证码',
+      placeholder: '请输入验证码',
+      requiredMessage: '请输入验证码',
+      validatorMessage: '验证码不正确',
+    },
+  },
   jump_tip: '即将跳转至认证源页面进行认证',
   jump: '跳转',
   resetPassword: '修改密码',
@@ -9,7 +29,7 @@ export default {
     login: '登录',
     register: '注册',
     backLogin: '返回登录',
-    checkCode: '立即验证'
+    checkCode: '立即验证',
   },
   newPassword: '新密码',
   enterPassword: '请输入修改密码',
@@ -19,6 +39,6 @@ export default {
     placeholder: '请输入验证码',
     getVerificationCode: '获取验证码',
     successMessage: '验证码发送成功',
-    resend: '重新发送'
-  }
+    resend: '重新发送',
+  },
 }

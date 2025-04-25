@@ -19,7 +19,7 @@ export default {
       ldap_filterPlaceholder: '請輸入使用者過濾器',
       ldap_mapping: 'LDAP 屬性對應',
       ldap_mappingPlaceholder: '請輸入 LDAP 屬性對應',
-      enableAuthentication: '啟用 LDAP 認證'
+      enableAuthentication: '啟用 LDAP 認證',
     },
     cas: {
       title: 'CAS',
@@ -29,7 +29,7 @@ export default {
       validateUrlPlaceholder: '請輸入驗證位址',
       redirectUrl: '回呼位址',
       redirectUrlPlaceholder: '請輸入回呼位址',
-      enableAuthentication: '啟用 CAS 認證'
+      enableAuthentication: '啟用 CAS 認證',
     },
     oidc: {
       title: 'OIDC',
@@ -48,7 +48,7 @@ export default {
       logoutEndpointPlaceholder: '請輸入登出端位址',
       redirectUrl: '回呼位址',
       redirectUrlPlaceholder: '請輸入回呼位址',
-      enableAuthentication: '啟用 OIDC 認證'
+      enableAuthentication: '啟用 OIDC 認證',
     },
 
     oauth2: {
@@ -69,7 +69,7 @@ export default {
       redirectUrlPlaceholder: '請輸入回呼位址',
       filedMapping: '欄位對應',
       filedMappingPlaceholder: '請輸入欄位對應',
-      enableAuthentication: '啟用 OAuth2 認證'
+      enableAuthentication: '啟用 OAuth2 認證',
     },
     scanTheQRCode: {
       title: '掃碼登入',
@@ -91,49 +91,10 @@ export default {
       larkQrCode: '飛書掃碼登錄',
       dingtalkQrCode: '釘釘掃碼登錄',
       setting: '設置',
-      access: '接入'
-    }
+      access: '接入',
+    },
   },
-  theme: {
-    title: '外觀設置',
-    platformDisplayTheme: '平台顯示主題',
-    customTheme: '自定義主題',
-    platformLoginSettings: '平台登錄設置',
-    custom: '自定義',
-    pagePreview: '頁面預覽',
-    default: '默認',
-    restoreDefaults: '恢復默認',
-    orange: '活力橙',
-    green: '松石綠',
-    purple: '神秘紫',
-    red: '胭脂紅',
-    loginBackground: '登錄背景圖',
-    loginLogo: '登錄 Logo',
-    websiteLogo: '網站 Logo',
-    replacePicture: '替換圖片',
-    websiteLogoTip: '頂部網站顯示的 Logo，建議尺寸 48*48，支持 JPG、PNG、GIF，大小不超過 10MB',
-    loginLogoTip: '登錄頁面右側 Logo，建議尺寸 204*52，支持 JPG、PNG、GIF，大小不超過 10 MB',
-    loginBackgroundTip:
-      '左側背景圖，矢量圖建議尺寸 576*900，位圖建議尺寸 1152*1800；支持 JPG、PNG、GIF，大小不超過 10 MB',
-    websiteName: '網站名稱',
-    websiteNamePlaceholder: '請輸入網站名稱',
-    websiteNameTip: '顯示在網頁 Tab 的平台名稱',
-    websiteSlogan: '歡迎語',
-    websiteSloganPlaceholder: '請輸入歡迎語',
-    websiteSloganTip: '產品 Logo 下的歡迎語',
-    logoDefaultTip: '默认为 MaxKB 登錄界面，支持自定义设置',
-    defaultSlogan: '歡迎使用 MaxKB 智能知識庫問答系統',
-    defaultTip: '默認為 MaxKB 平台界面，支持自定義設置',
-    platformSetting: '平台設置',
-    showUserManual: '顯示用戶手冊',
-    showForum: '顯示論壇求助',
-    showProject: '顯示項目地址',
-    urlPlaceholder: '請輸入 URL 地址',
-    abandonUpdate: '放棄更新',
-    saveAndApply: '保存並應用',
-    fileMessageError: '文件大小超過 10M',
-    saveSuccess: '外觀設置成功'
-  },
+
   email: {
     title: '郵箱設置',
     smtpHost: 'SMTP Host',
@@ -147,6 +108,6 @@ export default {
     smtpPassword: '發件人密碼',
     smtpPasswordPlaceholder: '請輸入發件人密碼',
     enableSSL: '啟用 SSL（如果 SMTP 端口是 465，通常需要啟用 SSL）',
-    enableTLS: '啟用 TLS（如果 SMTP 端口是 587，通常需要啟用 TLS）'
-  }
+    enableTLS: '啟用 TLS（如果 SMTP 端口是 587，通常需要啟用 TLS）',
+  },
 }
