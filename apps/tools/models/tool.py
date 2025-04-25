@@ -1,8 +1,24 @@
 import uuid_utils.compat as uuid
 from django.db import models
+from mptt.fields import TreeForeignKey
+from mptt.models import MPTTModel
 
+from common.mixins.app_model_mixin import AppModelMixin
 from users.models import User
-from .tool_module import ToolModule
+
+
+class ToolModule(MPTTModel, AppModelMixin):
+    id = models.CharField(primary_key=True, max_length=64, editable=False, verbose_name="主键id")
+    name = models.CharField(max_length=64, verbose_name="文件夹名称")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="用户id")
+    workspace_id = models.CharField(max_length=64, verbose_name="工作空间id", default="default", db_index=True)
+    parent = TreeForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
+
+    class Meta:
+        db_table = "tool_module"
+
+    class MPTTMeta:
+        order_insertion_by = ['name']
 
 
 class ToolScope(models.TextChoices):
@@ -15,7 +31,7 @@ class ToolType(models.TextChoices):
     CUSTOM = "CUSTOM", "自定义"
 
 
-class Tool(models.Model):
+class Tool(AppModelMixin):
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="用户id")
     name = models.CharField(max_length=64, verbose_name="工具名称")
@@ -33,8 +49,6 @@ class Tool(models.Model):
     module = models.ForeignKey(ToolModule, on_delete=models.CASCADE, verbose_name="模块id", default='root')
     workspace_id = models.CharField(max_length=64, verbose_name="工作空间id", default="default", db_index=True)
     init_params = models.CharField(max_length=102400, verbose_name="初始化参数", null=True)
-    create_time = models.DateTimeField(verbose_name="创建时间", auto_now_add=True, null=True)
-    update_time = models.DateTimeField(verbose_name="修改时间", auto_now=True, null=True)
 
     class Meta:
         db_table = "tool"

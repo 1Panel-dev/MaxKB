@@ -6,6 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from common.constants.permission_constants import Group
+from knowledge.models import KnowledgeModule
 from modules.api.module import ModuleCreateRequest
 from tools.models import ToolModule
 from tools.serializers.tool_module import ToolModuleTreeSerializer
@@ -18,8 +19,7 @@ def get_module_type(source):
         # todo app module
         return None
     elif source == Group.KNOWLEDGE.name:
-        # todo knowledge module
-        return None
+        return KnowledgeModule
     else:
         return None
 

@@ -2,6 +2,8 @@ import uuid_utils.compat as uuid
 from django.db import models
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
+from mptt.fields import TreeForeignKey
+from mptt.models import MPTTModel
 
 from common.db.sql_execute import select_one
 from common.mixins.app_model_mixin import AppModelMixin
@@ -9,7 +11,7 @@ from models_provider.models import Model
 from users.models import User
 
 
-class KnowledgeType(models.TextChoices):
+class KnowledgeType(models.IntegerChoices):
     base = 0, '通用类型'
     web = 1, 'web站点类型'
     lark = 2, '飞书类型'
@@ -21,7 +23,21 @@ def default_model():
     return uuid.UUID('42f63a3d-427e-11ef-b3ec-a8a1595801ab')
 
 
-class DataSet(AppModelMixin):
+class KnowledgeModule(MPTTModel, AppModelMixin):
+    id = models.CharField(primary_key=True, max_length=64, editable=False, verbose_name="主键id")
+    name = models.CharField(max_length=64, verbose_name="文件夹名称")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="用户id")
+    workspace_id = models.CharField(max_length=64, verbose_name="工作空间id", default="default", db_index=True)
+    parent = TreeForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
+
+    class Meta:
+        db_table = "knowledge_module"
+
+    class MPTTMeta:
+        order_insertion_by = ['name']
+
+
+class Knowledge(AppModelMixin):
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
     name = models.CharField(max_length=150, verbose_name="知识库名称")
     desc = models.CharField(max_length=256, verbose_name="描述")

@@ -24,13 +24,13 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ToolModule',
             fields=[
+                ('create_time', models.DateTimeField(auto_now_add=True, verbose_name='创建时间')),
+                ('update_time', models.DateTimeField(auto_now=True, verbose_name='修改时间')),
                 ('id', models.CharField(editable=False, max_length=64, primary_key=True, serialize=False,
                                         verbose_name='主键id')),
                 ('name', models.CharField(max_length=64, verbose_name='文件夹名称')),
                 ('workspace_id',
                  models.CharField(db_index=True, default='default', max_length=64, verbose_name='工作空间id')),
-                ('create_time', models.DateTimeField(auto_now_add=True, null=True, verbose_name='创建时间')),
-                ('update_time', models.DateTimeField(auto_now=True, null=True, verbose_name='修改时间')),
                 ('lft', models.PositiveIntegerField(editable=False)),
                 ('rght', models.PositiveIntegerField(editable=False)),
                 ('tree_id', models.PositiveIntegerField(db_index=True, editable=False)),
@@ -49,6 +49,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Tool',
             fields=[
+                ('create_time', models.DateTimeField(auto_now_add=True, verbose_name='创建时间')),
+                ('update_time', models.DateTimeField(auto_now=True, verbose_name='修改时间')),
                 ('id',
                  models.UUIDField(default=uuid_utils.compat.uuid7, editable=False, primary_key=True, serialize=False,
                                   verbose_name='主键id')),
@@ -68,8 +70,6 @@ class Migration(migrations.Migration):
                 ('template_id', models.UUIDField(default=None, null=True, verbose_name='模版id')),
                 ('workspace_id', models.CharField(default='default', max_length=64, verbose_name='工作空间id', db_index=True)),
                 ('init_params', models.CharField(max_length=102400, null=True, verbose_name='初始化参数')),
-                ('create_time', models.DateTimeField(auto_now_add=True, null=True, verbose_name='创建时间')),
-                ('update_time', models.DateTimeField(auto_now=True, null=True, verbose_name='修改时间')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='users.user',
                                            verbose_name='用户id')),
                 ('module',
