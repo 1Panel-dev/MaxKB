@@ -3,7 +3,7 @@
 import os
 import subprocess
 import sys
-import uuid
+import uuid_utils as uuid
 from textwrap import dedent
 
 from diskcache import Cache
@@ -18,7 +18,7 @@ class ToolExecutor:
     def __init__(self, sandbox=False):
         self.sandbox = sandbox
         if sandbox:
-            self.sandbox_path = '/opt/maxkb/app/sandbox'
+            self.sandbox_path = '/opt/maxkb-app/sandbox'
             self.user = 'sandbox'
         else:
             self.sandbox_path = os.path.join(PROJECT_DIR, 'data', 'sandbox')
@@ -35,7 +35,7 @@ class ToolExecutor:
             os.umask(old_mask)
 
     def exec_code(self, code_str, keywords):
-        _id = str(uuid.uuid1())
+        _id = str(uuid.uuid7())
         success = '{"code":200,"msg":"成功","data":exec_result}'
         err = '{"code":500,"msg":str(e),"data":None}'
         path = r'' + self.sandbox_path + ''

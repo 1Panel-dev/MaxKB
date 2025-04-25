@@ -293,7 +293,7 @@ class ModelSerializer(serializers.Serializer):
 
             credential = self.data.get('credential')
             model_data = {
-                'id': uuid.uuid1(),
+                'id': uuid.uuid7(),
                 'status': status,
                 'user_id': self.data.get('user_id'),
                 'name': self.data.get('name'),
