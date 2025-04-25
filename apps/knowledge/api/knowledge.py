@@ -11,7 +11,73 @@ class KnowledgeCreateResponse(ResultSerializer):
         return KnowledgeModelSerializer()
 
 
-class KnowledgeCreateAPI(APIMixin):
+class KnowledgeBaseCreateAPI(APIMixin):
+    @staticmethod
+    def get_parameters():
+        return [
+            OpenApiParameter(
+                name="workspace_id",
+                description="工作空间id",
+                type=OpenApiTypes.STR,
+                location='path',
+                required=True,
+            )
+        ]
+
+    @staticmethod
+    def get_request():
+        return KnowledgeBaseCreateRequest
+
+    @staticmethod
+    def get_response():
+        return KnowledgeCreateResponse
+
+
+class KnowledgeWebCreateAPI(APIMixin):
+    @staticmethod
+    def get_parameters():
+        return [
+            OpenApiParameter(
+                name="workspace_id",
+                description="工作空间id",
+                type=OpenApiTypes.STR,
+                location='path',
+                required=True,
+            )
+        ]
+
+    @staticmethod
+    def get_request():
+        return KnowledgeBaseCreateRequest
+
+    @staticmethod
+    def get_response():
+        return KnowledgeCreateResponse
+
+
+class KnowledgeLarkCreateAPI(APIMixin):
+    @staticmethod
+    def get_parameters():
+        return [
+            OpenApiParameter(
+                name="workspace_id",
+                description="工作空间id",
+                type=OpenApiTypes.STR,
+                location='path',
+                required=True,
+            )
+        ]
+
+    @staticmethod
+    def get_request():
+        return KnowledgeBaseCreateRequest
+
+    @staticmethod
+    def get_response():
+        return KnowledgeCreateResponse
+
+
+class KnowledgeYuqueCreateAPI(APIMixin):
     @staticmethod
     def get_parameters():
         return [
