@@ -29,7 +29,7 @@ class UserProfileResponse(serializers.ModelSerializer):
         fields = ['id', 'username', 'nick_name', 'email', 'role', 'permissions', 'language', 'is_edit_password']
 
 
-class CreateUserSerializer(serializers.ModelSerializer):
+class CreateUserSerializer(serializers.Serializer):
     username = serializers.CharField(required=True, label=_('Username'))
     password = serializers.CharField(required=True, label=_('Password'))
     email = serializers.EmailField(required=True, label=_('Email'))
