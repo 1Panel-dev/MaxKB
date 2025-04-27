@@ -7,9 +7,9 @@ interface LoginRequest {
    * 密码
    */
   password: string
-   /**
+  /**
    * 验证码
    */
-  code: string
+  captcha: string
 }
 export type { LoginRequest }

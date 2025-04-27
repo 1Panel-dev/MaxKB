@@ -1,6 +1,6 @@
 <template>
   <login-layout>
-    <LoginContainer :subTitle="$t('views.system.theme.defaultSlogan')">
+    <LoginContainer :subTitle="$t('theme.defaultSlogan')">
       <h2 class="mb-24">{{ $t('views.login.resetPassword') }}</h2>
       <el-form
         class="reset-password-form"

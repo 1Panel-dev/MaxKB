@@ -7,8 +7,7 @@ from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
 from common.constants.permission_constants import PermissionConstants
 from common.result import result
-from knowledge.api.knowledge import KnowledgeBaseCreateAPI, KnowledgeLarkCreateAPI, \
-    KnowledgeWebCreateAPI, KnowledgeYuqueCreateAPI, KnowledgeTreeReadAPI
+from knowledge.api.knowledge import KnowledgeBaseCreateAPI, KnowledgeWebCreateAPI, KnowledgeTreeReadAPI
 from knowledge.serializers.knowledge import KnowledgeSerializer, KnowledgeTreeSerializer
 
 
@@ -59,44 +58,6 @@ class KnowledgeWebView(APIView):
         parameters=KnowledgeWebCreateAPI.get_parameters(),
         request=KnowledgeWebCreateAPI.get_request(),
         responses=KnowledgeWebCreateAPI.get_response(),
-        tags=[_('Knowledge Base')]
-    )
-    @has_permissions(PermissionConstants.KNOWLEDGE_CREATE.get_workspace_permission())
-    def post(self, request: Request, workspace_id: str):
-        return result.success(KnowledgeSerializer.Create(
-            data={'user_id': request.user.id, 'workspace_id': workspace_id}
-        ).insert(request.data))
-
-
-class KnowledgeLarkView(APIView):
-    authentication_classes = [TokenAuth]
-
-    @extend_schema(
-        methods=['POST'],
-        description=_('Create lark knowledge'),
-        operation_id=_('Create lark knowledge'),
-        parameters=KnowledgeLarkCreateAPI.get_parameters(),
-        request=KnowledgeLarkCreateAPI.get_request(),
-        responses=KnowledgeLarkCreateAPI.get_response(),
-        tags=[_('Knowledge Base')]
-    )
-    @has_permissions(PermissionConstants.KNOWLEDGE_CREATE.get_workspace_permission())
-    def post(self, request: Request, workspace_id: str):
-        return result.success(KnowledgeSerializer.Create(
-            data={'user_id': request.user.id, 'workspace_id': workspace_id}
-        ).insert(request.data))
-
-
-class KnowledgeYuqueView(APIView):
-    authentication_classes = [TokenAuth]
-
-    @extend_schema(
-        methods=['POST'],
-        description=_('Create yuque knowledge'),
-        operation_id=_('Create yuque knowledge'),
-        parameters=KnowledgeYuqueCreateAPI.get_parameters(),
-        request=KnowledgeYuqueCreateAPI.get_request(),
-        responses=KnowledgeYuqueCreateAPI.get_response(),
         tags=[_('Knowledge Base')]
     )
     @has_permissions(PermissionConstants.KNOWLEDGE_CREATE.get_workspace_permission())

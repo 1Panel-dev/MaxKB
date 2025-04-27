@@ -153,6 +153,8 @@ class PermissionConstants(Enum):
     """
     USER_READ = Permission(group=Group.USER, operate=Operate.READ, role_list=[RoleConstants.ADMIN,
                                                                               RoleConstants.USER])
+    USER_CREATE = Permission(group=Group.USER, operate=Operate.CREATE,
+                             role_list=[RoleConstants.ADMIN, RoleConstants.USER])
     USER_EDIT = Permission(group=Group.USER, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN])
     USER_DELETE = Permission(group=Group.USER, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN])
 

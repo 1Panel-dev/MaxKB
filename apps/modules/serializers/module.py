@@ -25,10 +25,10 @@ def get_module_type(source):
         return None
 
 
-MODULE_DEPTH = 3  # Module 不能超过3层
+MODULE_DEPTH = 2  # Module 不能超过3层
 
 
-def check_depth(source, parent_id):
+def check_depth(source, parent_id, current_depth=0):
     # Module 不能超过3层
     Module = get_module_type(source)
 
@@ -46,8 +46,26 @@ def check_depth(source, parent_id):
             current_parent_id = parent_node.parent_id
 
         # 验证层级深度
-        if depth > MODULE_DEPTH:
+        if depth + current_depth > MODULE_DEPTH:
             raise serializers.ValidationError(_('Module depth cannot exceed 3 levels'))
+
+
+def get_max_depth(current_node):
+    if not current_node:
+        return 0
+
+    # 获取所有后代节点
+    descendants = current_node.get_descendants()
+
+    if not descendants.exists():
+        return 0
+
+    # 获取最大深度
+    max_level = descendants.order_by('-level').first().level
+    current_level = current_node.level
+    max_depth = max_level - current_level
+
+    return max_depth
 
 
 class ModuleSerializer(serializers.Serializer):
@@ -110,7 +128,8 @@ class ModuleSerializer(serializers.Serializer):
             parent_id = instance.get('parent_id')
             if parent_id is not None and current_id != 'root':
                 # Module 不能超过3层
-                check_depth(self.data.get('source'), parent_id)
+                current_depth = get_max_depth(current_node)
+                check_depth(self.data.get('source'), parent_id, current_depth)
                 parent = Module.objects.get(id=parent_id)
                 current_node.move_to(parent)
 

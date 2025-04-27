@@ -2,27 +2,27 @@ import { t } from '@/locales'
 
 export const themeList = [
   {
-    label: t('views.system.theme.default'),
+    label: t('theme.default'),
     value: '#3370FF',
     loginBackground: 'default',
   },
   {
-    label: t('views.system.theme.orange'),
+    label: t('theme.orange'),
     value: '#FF8800',
     loginBackground: 'orange',
   },
   {
-    label: t('views.system.theme.green'),
+    label: t('theme.green'),
     value: '#00B69D',
     loginBackground: 'green',
   },
   {
-    label: t('views.system.theme.purple'),
+    label: t('theme.purple'),
     value: '#7F3BF5',
     loginBackground: 'purple',
   },
   {
-    label: t('views.system.theme.red'),
+    label: t('theme.red'),
     value: '#F01D94',
     loginBackground: 'red',
   },
@@ -38,7 +38,7 @@ export const defaultSetting = {
   loginLogo: '',
   loginImage: '',
   title: 'MaxKB',
-  slogan: t('views.system.theme.defaultSlogan'),
+  slogan: t('theme.defaultSlogan'),
 }
 
 export const defaultPlatformSetting = {
