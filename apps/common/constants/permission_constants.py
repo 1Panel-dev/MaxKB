@@ -293,10 +293,10 @@ class Auth:
                  current_role_list: List[Role],
                  permission_list: List[PermissionConstants | Permission],
                  **keywords):
-        # 当前工作空间的所有权限+非工作空间权限
+        # 权限列表
         self.permission_list = permission_list
-        # 当前工作空间角色列表
-        self.current_role_list = current_role_list
+        # 角色列表
+        self.role_list = current_role_list
         self.keywords = keywords
 
 
