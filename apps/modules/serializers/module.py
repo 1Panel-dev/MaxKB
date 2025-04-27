@@ -25,7 +25,7 @@ def get_module_type(source):
         return None
 
 
-MODULE_DEPTH = 3  # Module 不能超过3层
+MODULE_DEPTH = 2  # Module 不能超过3层
 
 
 def check_depth(source, parent_id, current_depth=0):
