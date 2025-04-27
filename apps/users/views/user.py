@@ -28,7 +28,7 @@ class UserProfileView(APIView):
                    tags=[_("User management")],
                    responses=UserProfileAPI.get_response())
     def get(self, request: Request):
-        return result.success(UserProfileSerializer().profile(request.user))
+        return result.success(UserProfileSerializer().profile(request.user, request.auth))
 
 
 class TestPermissionsUserView(APIView):
@@ -41,7 +41,7 @@ class TestPermissionsUserView(APIView):
                    responses=UserProfileAPI.get_response())
     @has_permissions(PermissionConstants.USER_EDIT)
     def get(self, request: Request):
-        return result.success(UserProfileSerializer().profile(request.user))
+        return result.success(UserProfileSerializer().profile(request.user, request.auth))
 
 
 class TestWorkspacePermissionUserView(APIView):
@@ -55,7 +55,7 @@ class TestWorkspacePermissionUserView(APIView):
                    parameters=TestWorkspacePermissionUserApi.get_parameters())
     @has_permissions(PermissionConstants.USER_EDIT.get_workspace_permission())
     def get(self, request: Request, workspace_id):
-        return result.success(UserProfileSerializer().profile(request.user))
+        return result.success(UserProfileSerializer().profile(request.user, request.auth))
 
 
 class UserManage(APIView):

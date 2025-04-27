@@ -13,7 +13,7 @@ from django.db.models import QuerySet, Q
 from rest_framework import serializers
 import uuid_utils.compat as uuid
 from common.constants.exception_code_constants import ExceptionCodeConstants
-from common.constants.permission_constants import RoleConstants
+from common.constants.permission_constants import RoleConstants, Auth
 from common.utils.common import valid_license, password_encrypt
 from users.models import User
 from django.utils.translation import gettext_lazy as _
@@ -39,18 +39,20 @@ class CreateUserSerializer(serializers.Serializer):
 
 class UserProfileSerializer(serializers.Serializer):
     @staticmethod
-    def profile(user: User):
+    def profile(user: User, auth: Auth):
         """
-        获取用户详情
-        :param user: 用户对象
-        :return:
+          获取用户详情
+        @param user: 用户对象
+        @param auth: 认证对象
+        @return:
         """
+
         return {'id': user.id,
                 'username': user.username,
                 'nick_name': user.nick_name,
                 'email': user.email,
-                'role': user.role,
-                'permissions': [str(p) for p in []],
+                'role': auth.role_list,
+                'permissions': auth.permission_list,
                 'is_edit_password': user.password == 'd880e722c47a34d8e9fce789fc62389d' if user.role == 'ADMIN' else False,
                 'language': user.language}
 
