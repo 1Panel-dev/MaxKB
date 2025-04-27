@@ -88,7 +88,7 @@ class TokenAuth(TokenAuthentication):
                     return handle.handle(request, token, token_details.get_token_details)
             raise AppAuthenticationFailed(1002, _('Authentication information is incorrect! illegal user'))
         except Exception as e:
-            traceback.format_exc()
+            traceback.print_stack()
             if isinstance(e, AppEmbedIdentityFailed) or isinstance(e, AppChatNumOutOfBoundsFailed) or isinstance(e,
                                                                                                                  AppApiException):
                 raise e

@@ -8,9 +8,11 @@
 """
 
 import uuid_utils.compat as uuid
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
-from common.constants.permission_constants import Group
+from common.constants.permission_constants import Group, ResourcePermissionGroup, ResourceAuthType, \
+    ResourcePermissionRole
 from users.models import User
 
 
@@ -20,7 +22,7 @@ class AuthTargetType(models.TextChoices):
     APPLICATION = Group.APPLICATION.value, '应用'
 
 
-class WorkspaceUserPermission(models.Model):
+class WorkspaceUserResourcePermission(models.Model):
     """
     工作空间用户资源权限表
     用于管理当前工作空间是否有权限操作 某一个应用或者知识库
@@ -36,12 +38,20 @@ class WorkspaceUserPermission(models.Model):
     # 授权的知识库或者应用的id
     target = models.UUIDField(max_length=128, verbose_name="知识库/应用id")
 
-    # 是否授权
-    is_auth = models.BooleanField(default=False, verbose_name="是否授权")
+    # 授权类型 如果是Role那么就是角色的权限  如果是PERMISSION
+    auth_type = models.CharField(default=False, verbose_name="授权类型", choices=ResourceAuthType.choices,
+                                 db_default=ResourceAuthType.ROLE)
+    # 资源权限列表
+    permission_list = ArrayField(verbose_name="权限列表",
+                                 default=list,
+                                 base_field=models.CharField(max_length=256,
+                                                             blank=True,
+                                                             choices=ResourcePermissionGroup.choices + ResourcePermissionRole.choices,
+                                                             default=ResourcePermissionGroup.VIEW))
 
     create_time = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
 
     update_time = models.DateTimeField(verbose_name="修改时间", auto_now=True)
 
     class Meta:
-        db_table = "workspace_user_permission"
+        db_table = "workspace_user_resource_permission"

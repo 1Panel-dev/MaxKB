@@ -6,7 +6,10 @@
     @desc: 权限,角色 常量
 """
 from enum import Enum
+from functools import reduce
 from typing import List
+
+from django.db import models
 
 
 class Group(Enum):
@@ -45,6 +48,40 @@ class RoleGroup(Enum):
     CHAT_USER = "CHAT_USER"
 
 
+class ResourcePermissionRole(models.TextChoices):
+    """
+    资源权限根据角色
+    """
+    ROLE = "ROLE"
+
+    def __eq__(self, other):
+        return str(self) == str(other)
+
+
+class ResourcePermissionGroup(models.TextChoices):
+    """
+    资源权限组
+    """
+    # 查看
+    VIEW = "VIEW"
+    # 管理
+    MANAGE = "MANAGE"
+
+    def __eq__(self, other):
+        return str(self) == str(other)
+
+
+class ResourceAuthType(models.TextChoices):
+    """
+    资源授权类型
+    """
+    "当授权类型是Role时候"
+    ROLE = "ROLE"
+
+    """资源权限组"""
+    RESOURCE_PERMISSION_GROUP = "RESOURCE_PERMISSION_GROUP"
+
+
 class Role:
     def __init__(self, name: str, decs: str, group: RoleGroup, resource_path=None):
         self.name = name
@@ -78,14 +115,19 @@ class Permission:
     权限信息
     """
 
-    def __init__(self, group: Group, operate: Operate, resource_path=None, role_list=None):
+    def __init__(self, group: Group, operate: Operate, resource_path=None, role_list=None,
+                 resource_permission_group_list=None):
         if role_list is None:
             role_list = []
+        if resource_permission_group_list is None:
+            resource_permission_group_list = []
         self.group = group
         self.operate = operate
         self.resource_path = resource_path
         # 用于获取角色与权限的关系,只适用于没有权限管理的
         self.role_list = role_list
+        # 用于资源权限权限分组
+        self.resource_permission_group_list = resource_permission_group_list
 
     @staticmethod
     def new_instance(permission_str: str):
@@ -151,13 +193,28 @@ class PermissionConstants(Enum):
     KNOWLEDGE_MODULE_CREATE = Permission(group=Group.KNOWLEDGE, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN,
                                                                                                    RoleConstants.USER])
     KNOWLEDGE_MODULE_READ = Permission(group=Group.KNOWLEDGE, operate=Operate.READ, role_list=[RoleConstants.ADMIN,
-                                                                                               RoleConstants.USER])
+                                                                                               RoleConstants.USER],
+                                       resource_permission_group_list=[
+                                           ResourcePermissionGroup.VIEW
+                                       ])
     KNOWLEDGE_MODULE_EDIT = Permission(group=Group.KNOWLEDGE, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN,
-                                                                                               RoleConstants.USER])
+                                                                                               RoleConstants.USER],
+                                       resource_permission_group_list=[
+                                           ResourcePermissionGroup.MANAGE
+                                       ]
+                                       )
     KNOWLEDGE_MODULE_DELETE = Permission(group=Group.KNOWLEDGE, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN,
-                                                                                                   RoleConstants.USER])
+                                                                                                   RoleConstants.USER],
+                                         resource_permission_group_list=[
+                                             ResourcePermissionGroup.MANAGE
+                                         ]
+                                         )
     KNOWLEDGE_READ = Permission(group=Group.KNOWLEDGE, operate=Operate.READ, role_list=[RoleConstants.ADMIN,
-                                                                                        RoleConstants.USER])
+                                                                                        RoleConstants.USER],
+                                resource_permission_group_list=[
+                                    ResourcePermissionGroup.VIEW
+                                ]
+                                )
     KNOWLEDGE_CREATE = Permission(group=Group.KNOWLEDGE, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN,
                                                                                             RoleConstants.USER])
 
@@ -192,6 +249,39 @@ def get_default_permission_list_by_role(role: RoleConstants):
     return list(map(lambda k: PermissionConstants[k],
                     list(filter(lambda k: PermissionConstants[k].value.role_list.__contains__(role),
                                 PermissionConstants.__members__))))
+
+
+class RolePermissionMapping:
+    def __init__(self, role_id, permission_id):
+        self.role_id = role_id
+        self.permission_id = permission_id
+
+
+class WorkspaceUserRoleMapping:
+    def __init__(self, workspace_id, role_id, user_id):
+        self.workspace_id = workspace_id
+        self.role_id = role_id
+        self.user_id = user_id
+
+
+def get_default_role_permission_mapping_list():
+    role_permission_mapping_list = [
+        [RolePermissionMapping(role.value.name, PermissionConstants[k].value.__str__()) for role in
+         PermissionConstants[k].value.role_list] for k in PermissionConstants.__members__]
+    return reduce(lambda x, y: [*x, *y], role_permission_mapping_list, [])
+
+
+def get_default_workspace_user_role_mapping_list(user_role_list: list):
+    return [WorkspaceUserRoleMapping('default', role.value.name, 'default') for role in RoleConstants if
+            user_role_list.__contains__(role.value.name)]
+
+
+def get_permission_list_by_resource_group(resource_group: ResourcePermissionGroup):
+    """
+    根据资源组获取权限
+    """
+    return [PermissionConstants[k] for k in PermissionConstants.__members__ if
+            PermissionConstants[k].value.resource_permission_group_list.__contains__(resource_group)]
 
 
 class Auth:
