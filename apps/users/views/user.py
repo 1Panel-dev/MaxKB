@@ -16,7 +16,7 @@ from common.auth.authentication import has_permissions
 from common.constants.permission_constants import PermissionConstants, Permission, Group, Operate
 from common.result import result
 from users.api.user import UserProfileAPI, TestWorkspacePermissionUserApi
-from users.serializers.user import UserProfileSerializer
+from users.serializers.user import UserProfileSerializer, UserManageSerializer
 
 
 class UserProfileView(APIView):
@@ -56,3 +56,17 @@ class TestWorkspacePermissionUserView(APIView):
     @has_permissions(PermissionConstants.USER_EDIT.get_workspace_permission())
     def get(self, request: Request, workspace_id):
         return result.success(UserProfileSerializer().profile(request.user))
+
+
+class UserManage(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(methods=['POST'],
+                   description=_("Create user"),
+                   operation_id=_("Create user"),
+                   tags=[_("User management")],
+                   request=UserProfileAPI.get_request(),
+                   responses=UserProfileAPI.get_response())
+    @has_permissions(PermissionConstants.USER_CREATE)
+    def post(self, request: Request):
+        return result.success(UserManageSerializer().save(request.data))

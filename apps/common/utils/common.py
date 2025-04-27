@@ -17,10 +17,12 @@ from functools import reduce
 from typing import List, Dict
 
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.db.models import QuerySet
 from django.utils.translation import gettext as _
 from pydub import AudioSegment
 
 from ..exception.app_exception import AppApiException
+from ..models.db_model_manage import DBModelManage
 
 
 def password_encrypt(row_password):
@@ -211,3 +213,23 @@ def query_params_to_single_dict(query_params: Dict):
         filter(lambda item: item is not None, [({key: value} if value is not None and len(value) > 0 else None) for
                                                key, value in
                                                query_params.items()])), {})
+
+
+def valid_license(model=None, count=None, message=None):
+    def inner(func):
+        def run(*args, **kwargs):
+            xpack_cache = DBModelManage.get_model('xpack_cache')
+            is_license_valid = xpack_cache.get('XPACK_LICENSE_IS_VALID', False) if xpack_cache is not None else False
+            record_count = QuerySet(model).count()
+
+            if not is_license_valid and record_count >= count:
+                error_message = message or _(
+                    'Limit {count} exceeded, please contact us (https://fit2cloud.com/).').format(
+                    count=count)
+                raise AppApiException(400, error_message)
+
+            return func(*args, **kwargs)
+
+        return run
+
+    return inner
