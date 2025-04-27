@@ -7,8 +7,7 @@ from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
 from common.constants.permission_constants import PermissionConstants
 from common.result import result
-from knowledge.api.knowledge import KnowledgeBaseCreateAPI, KnowledgeLarkCreateAPI, \
-    KnowledgeWebCreateAPI, KnowledgeTreeReadAPI
+from knowledge.api.knowledge import KnowledgeBaseCreateAPI, KnowledgeWebCreateAPI, KnowledgeTreeReadAPI
 from knowledge.serializers.knowledge import KnowledgeSerializer, KnowledgeTreeSerializer
 
 
@@ -66,4 +65,3 @@ class KnowledgeWebView(APIView):
         return result.success(KnowledgeSerializer.Create(
             data={'user_id': request.user.id, 'workspace_id': workspace_id}
         ).insert(request.data))
-
