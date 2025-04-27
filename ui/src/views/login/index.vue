@@ -58,7 +58,7 @@
           @click="loginHandle"
           :loading="loading"
         >
-          >{{ $t('views.login.buttons.login') }}
+          {{ $t('views.login.buttons.login') }}
         </el-button>
         <div class="operate-container flex-between mt-12">
           <el-button
@@ -135,7 +135,7 @@ const loginHandle = () => {
 }
 function makeCode() {
   loginApi.getCaptcha().then((res: any) => {
-    identifyCode.value = res.data.captcha
+    identifyCode.value = res.captcha
   })
 }
 onBeforeMount(() => {

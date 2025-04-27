@@ -28,7 +28,7 @@ instance.interceptors.request.use(
     const language = user.getLanguage()
     config.headers['Accept-Language'] = `${language}`
     if (token) {
-      config.headers['AUTHORIZATION'] = `${token}`
+      config.headers['AUTHORIZATION'] = `Bearer ${token}`
     }
     return config
   },
@@ -43,14 +43,14 @@ instance.interceptors.response.use(
     if (response.data) {
       if (response.data.code !== 200 && !(response.data instanceof Blob)) {
         if (response.config.url.includes('/application/authentication')) {
-          return Promise.reject(response.data)
+          return Promise.reject(response.data.data)
         }
         if (
           !response.config.url.includes('/valid') &&
           !response.config.url.includes('/function_lib/debug')
         ) {
           MsgError(response.data.message)
-          return Promise.reject(response.data)
+          return Promise.reject(response.data.data)
         }
       }
     }
@@ -99,11 +99,12 @@ const promise: (
     }
     request
       .then((response) => {
+        console.log(response)
         // blob类型的返回状态是response.status
         if (response.status === 200) {
-          resolve(response?.data || response)
+          resolve(response?.data?.data || response)
         } else {
-          reject(response?.data || response)
+          reject(response?.data?.data || response)
         }
       })
       .catch((error) => {
