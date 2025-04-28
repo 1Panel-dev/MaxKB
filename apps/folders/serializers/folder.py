@@ -7,8 +7,9 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from common.constants.permission_constants import Group
-from knowledge.models import KnowledgeFolder
 from folders.api.folder import FolderCreateRequest
+from knowledge.models import KnowledgeFolder
+from knowledge.serializers.knowledge_folder import KnowledgeFolderTreeSerializer
 from tools.models import ToolFolder
 from tools.serializers.tool_folder import ToolFolderTreeSerializer
 
@@ -21,6 +22,18 @@ def get_folder_type(source):
         return None
     elif source == Group.KNOWLEDGE.name:
         return KnowledgeFolder
+    else:
+        return None
+
+
+def get_folder_tree_serializer(source):
+    if source == Group.TOOL.name:
+        return ToolFolderTreeSerializer
+    elif source == Group.APPLICATION.name:
+        # todo app folder
+        return None
+    elif source == Group.KNOWLEDGE.name:
+        return KnowledgeFolderTreeSerializer
     else:
         return None
 
@@ -161,5 +174,6 @@ class FolderTreeSerializer(serializers.Serializer):
                                           Q(name__contains=name)).get_cached_trees()
         else:
             nodes = Folder.objects.filter(Q(workspace_id=self.data.get('workspace_id'))).get_cached_trees()
-        serializer = ToolFolderTreeSerializer(nodes, many=True)
+        TreeSerializer = get_folder_tree_serializer(self.data.get('source'))
+        serializer = TreeSerializer(nodes, many=True)
         return serializer.data  # 这是可序列化的字典
