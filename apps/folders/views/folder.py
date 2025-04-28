@@ -7,26 +7,26 @@ from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
 from common.constants.permission_constants import Permission, Group, Operate
 from common.result import result
-from modules.api.module import ModuleCreateAPI, ModuleEditAPI, ModuleReadAPI, ModuleTreeReadAPI, ModuleDeleteAPI
-from modules.serializers.module import ModuleSerializer, ModuleTreeSerializer
+from folders.api.folder import FolderCreateAPI, FolderEditAPI, FolderReadAPI, FolderTreeReadAPI, FolderDeleteAPI
+from folders.serializers.folder import FolderSerializer, FolderTreeSerializer
 
 
-class ModuleView(APIView):
+class FolderView(APIView):
     authentication_classes = [TokenAuth]
 
     @extend_schema(
         methods=['POST'],
-        description=_('Create module'),
-        operation_id=_('Create module'),
-        parameters=ModuleCreateAPI.get_parameters(),
-        request=ModuleCreateAPI.get_request(),
-        responses=ModuleCreateAPI.get_response(),
-        tags=[_('Module')]
+        description=_('Create folder'),
+        operation_id=_('Create folder'),
+        parameters=FolderCreateAPI.get_parameters(),
+        request=FolderCreateAPI.get_request(),
+        responses=FolderCreateAPI.get_response(),
+        tags=[_('Folder')]
     )
     @has_permissions(lambda r, kwargs: Permission(group=Group(kwargs.get('source')), operate=Operate.CREATE,
                                                   resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}"))
     def post(self, request: Request, workspace_id: str, source: str):
-        return result.success(ModuleSerializer.Create(
+        return result.success(FolderSerializer.Create(
             data={'user_id': request.user.id,
                   'source': source,
                   'workspace_id': workspace_id}
@@ -34,64 +34,64 @@ class ModuleView(APIView):
 
     @extend_schema(
         methods=['GET'],
-        description=_('Get module tree'),
-        operation_id=_('Get module tree'),
-        parameters=ModuleTreeReadAPI.get_parameters(),
-        responses=ModuleTreeReadAPI.get_response(),
-        tags=[_('Module')]
+        description=_('Get folder tree'),
+        operation_id=_('Get folder tree'),
+        parameters=FolderTreeReadAPI.get_parameters(),
+        responses=FolderTreeReadAPI.get_response(),
+        tags=[_('Folder')]
     )
     @has_permissions(lambda r, kwargs: Permission(group=Group(kwargs.get('source')), operate=Operate.READ,
                                                   resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}"))
     def get(self, request: Request, workspace_id: str, source: str):
-        return result.success(ModuleTreeSerializer(
+        return result.success(FolderTreeSerializer(
             data={'workspace_id': workspace_id, 'source': source}
-        ).get_module_tree(request.query_params.get('name')))
+        ).get_folder_tree(request.query_params.get('name')))
 
     class Operate(APIView):
         authentication_classes = [TokenAuth]
 
         @extend_schema(
             methods=['PUT'],
-            description=_('Update module'),
-            operation_id=_('Update module'),
-            parameters=ModuleEditAPI.get_parameters(),
-            request=ModuleEditAPI.get_request(),
-            responses=ModuleEditAPI.get_response(),
-            tags=[_('Module')]
+            description=_('Update folder'),
+            operation_id=_('Update folder'),
+            parameters=FolderEditAPI.get_parameters(),
+            request=FolderEditAPI.get_request(),
+            responses=FolderEditAPI.get_response(),
+            tags=[_('Folder')]
         )
         @has_permissions(lambda r, kwargs: Permission(group=Group(kwargs.get('source')), operate=Operate.EDIT,
                                                       resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}"))
-        def put(self, request: Request, workspace_id: str, source: str, module_id: str):
-            return result.success(ModuleSerializer.Operate(
-                data={'id': module_id, 'workspace_id': workspace_id, 'source': source}
+        def put(self, request: Request, workspace_id: str, source: str, folder_id: str):
+            return result.success(FolderSerializer.Operate(
+                data={'id': folder_id, 'workspace_id': workspace_id, 'source': source}
             ).edit(request.data))
 
         @extend_schema(
             methods=['GET'],
-            description=_('Get module'),
-            operation_id=_('Get module'),
-            parameters=ModuleReadAPI.get_parameters(),
-            responses=ModuleReadAPI.get_response(),
-            tags=[_('Module')]
+            description=_('Get folder'),
+            operation_id=_('Get folder'),
+            parameters=FolderReadAPI.get_parameters(),
+            responses=FolderReadAPI.get_response(),
+            tags=[_('Folder')]
         )
         @has_permissions(lambda r, kwargs: Permission(group=Group(kwargs.get('source')), operate=Operate.READ,
                                                       resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}"))
-        def get(self, request: Request, workspace_id: str, source: str, module_id: str):
-            return result.success(ModuleSerializer.Operate(
-                data={'id': module_id, 'workspace_id': workspace_id, 'source': source}
+        def get(self, request: Request, workspace_id: str, source: str, folder_id: str):
+            return result.success(FolderSerializer.Operate(
+                data={'id': folder_id, 'workspace_id': workspace_id, 'source': source}
             ).one())
 
         @extend_schema(
             methods=['DELETE'],
-            description=_('Delete module'),
-            operation_id=_('Delete module'),
-            parameters=ModuleDeleteAPI.get_parameters(),
-            responses=ModuleDeleteAPI.get_response(),
-            tags=[_('Module')]
+            description=_('Delete folder'),
+            operation_id=_('Delete folder'),
+            parameters=FolderDeleteAPI.get_parameters(),
+            responses=FolderDeleteAPI.get_response(),
+            tags=[_('Folder')]
         )
         @has_permissions(lambda r, kwargs: Permission(group=Group(kwargs.get('source')), operate=Operate.DELETE,
                                                       resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}"))
-        def delete(self, request: Request, workspace_id: str, source: str, module_id: str):
-            return result.success(ModuleSerializer.Operate(
-                data={'id': module_id, 'workspace_id': workspace_id, 'source': source}
+        def delete(self, request: Request, workspace_id: str, source: str, folder_id: str):
+            return result.success(FolderSerializer.Operate(
+                data={'id': folder_id, 'workspace_id': workspace_id, 'source': source}
             ).delete())

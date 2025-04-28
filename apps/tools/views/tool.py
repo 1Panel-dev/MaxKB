@@ -33,8 +33,8 @@ class ToolView(APIView):
 
     @extend_schema(
         methods=['GET'],
-        description=_('Get tool by module'),
-        operation_id=_('Get tool by module'),
+        description=_('Get tool by folder'),
+        operation_id=_('Get tool by folder'),
         parameters=ToolTreeReadAPI.get_parameters(),
         responses=ToolTreeReadAPI.get_response(),
         tags=[_('Tool')]
@@ -43,7 +43,7 @@ class ToolView(APIView):
     def get(self, request: Request, workspace_id: str):
         return result.success(ToolTreeSerializer(
             data={'workspace_id': workspace_id}
-        ).get_tools(request.query_params.get('module_id')))
+        ).get_tools(request.query_params.get('folder_id')))
 
     class Debug(APIView):
         authentication_classes = [TokenAuth]
@@ -124,7 +124,7 @@ class ToolView(APIView):
             return result.success(ToolTreeSerializer.Query(
                 data={
                     'workspace_id': workspace_id,
-                    'module_id': request.query_params.get('module_id'),
+                    'folder_id': request.query_params.get('folder_id'),
                     'name': request.query_params.get('name'),
                     'tool_type': request.query_params.get('tool_type'),
                 }

@@ -7,30 +7,30 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from common.constants.permission_constants import Group
-from knowledge.models import KnowledgeModule
-from modules.api.module import ModuleCreateRequest
-from tools.models import ToolModule
-from tools.serializers.tool_module import ToolModuleTreeSerializer
+from knowledge.models import KnowledgeFolder
+from folders.api.folder import FolderCreateRequest
+from tools.models import ToolFolder
+from tools.serializers.tool_folder import ToolFolderTreeSerializer
 
 
-def get_module_type(source):
+def get_folder_type(source):
     if source == Group.TOOL.name:
-        return ToolModule
+        return ToolFolder
     elif source == Group.APPLICATION.name:
-        # todo app module
+        # todo app folder
         return None
     elif source == Group.KNOWLEDGE.name:
-        return KnowledgeModule
+        return KnowledgeFolder
     else:
         return None
 
 
-MODULE_DEPTH = 2  # Module 不能超过3层
+FOLDER_DEPTH = 2  # Folder 不能超过3层
 
 
 def check_depth(source, parent_id, current_depth=0):
-    # Module 不能超过3层
-    Module = get_module_type(source)
+    # Folder 不能超过3层
+    Folder = get_folder_type(source)
 
     if parent_id != 'root':
         # 计算当前层级
@@ -40,14 +40,14 @@ def check_depth(source, parent_id, current_depth=0):
         # 向上追溯父节点
         while current_parent_id != 'root':
             depth += 1
-            parent_node = QuerySet(Module).filter(id=current_parent_id).first()
+            parent_node = QuerySet(Folder).filter(id=current_parent_id).first()
             if parent_node is None:
                 break
             current_parent_id = parent_node.parent_id
 
         # 验证层级深度
-        if depth + current_depth > MODULE_DEPTH:
-            raise serializers.ValidationError(_('Module depth cannot exceed 3 levels'))
+        if depth + current_depth > FOLDER_DEPTH:
+            raise serializers.ValidationError(_('Folder depth cannot exceed 3 levels'))
 
 
 def get_max_depth(current_node):
@@ -68,10 +68,10 @@ def get_max_depth(current_node):
     return max_depth
 
 
-class ModuleSerializer(serializers.Serializer):
-    id = serializers.CharField(required=True, label=_('module id'))
-    name = serializers.CharField(required=True, label=_('module name'))
-    user_id = serializers.CharField(required=True, label=_('module user id'))
+class FolderSerializer(serializers.Serializer):
+    id = serializers.CharField(required=True, label=_('folder id'))
+    name = serializers.CharField(required=True, label=_('folder name'))
+    user_id = serializers.CharField(required=True, label=_('folder user id'))
     workspace_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('workspace id'))
     parent_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('parent id'))
 
@@ -82,84 +82,84 @@ class ModuleSerializer(serializers.Serializer):
         def insert(self, instance, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-                ModuleCreateRequest(data=instance).is_valid(raise_exception=True)
+                FolderCreateRequest(data=instance).is_valid(raise_exception=True)
 
             workspace_id = self.data.get('workspace_id', 'default')
             parent_id = instance.get('parent_id', 'root')
             name = instance.get('name')
 
-            Module = get_module_type(self.data.get('source'))
-            if QuerySet(Module).filter(name=name, workspace_id=workspace_id, parent_id=parent_id).exists():
-                raise serializers.ValidationError(_('Module name already exists'))
-            # Module 不能超过3层
+            Folder = get_folder_type(self.data.get('source'))
+            if QuerySet(Folder).filter(name=name, workspace_id=workspace_id, parent_id=parent_id).exists():
+                raise serializers.ValidationError(_('Folder name already exists'))
+            # Folder 不能超过3层
             check_depth(self.data.get('source'), parent_id)
 
-            module = Module(
+            folder = Folder(
                 id=uuid.uuid7(),
                 name=instance.get('name'),
                 user_id=self.data.get('user_id'),
                 workspace_id=workspace_id,
                 parent_id=parent_id
             )
-            module.save()
-            return ModuleSerializer(module).data
+            folder.save()
+            return FolderSerializer(folder).data
 
     class Operate(serializers.Serializer):
-        id = serializers.CharField(required=True, label=_('module id'))
+        id = serializers.CharField(required=True, label=_('folder id'))
         workspace_id = serializers.CharField(required=True, allow_null=True, allow_blank=True, label=_('workspace id'))
         source = serializers.CharField(required=True, label=_('source'))
 
         @transaction.atomic
         def edit(self, instance):
             self.is_valid(raise_exception=True)
-            Module = get_module_type(self.data.get('source'))
+            Folder = get_folder_type(self.data.get('source'))
             current_id = self.data.get('id')
-            current_node = Module.objects.get(id=current_id)
+            current_node = Folder.objects.get(id=current_id)
             if current_node is None:
-                raise serializers.ValidationError(_('Module does not exist'))
+                raise serializers.ValidationError(_('Folder does not exist'))
 
             edit_field_list = ['name']
             edit_dict = {field: instance.get(field) for field in edit_field_list if (
                     field in instance and instance.get(field) is not None)}
 
-            QuerySet(Module).filter(id=current_id).update(**edit_dict)
+            QuerySet(Folder).filter(id=current_id).update(**edit_dict)
 
             # 模块间的移动
             parent_id = instance.get('parent_id')
             if parent_id is not None and current_id != 'root':
-                # Module 不能超过3层
+                # Folder 不能超过3层
                 current_depth = get_max_depth(current_node)
                 check_depth(self.data.get('source'), parent_id, current_depth)
-                parent = Module.objects.get(id=parent_id)
+                parent = Folder.objects.get(id=parent_id)
                 current_node.move_to(parent)
 
             return self.one()
 
         def one(self):
             self.is_valid(raise_exception=True)
-            Module = get_module_type(self.data.get('source'))
-            module = QuerySet(Module).filter(id=self.data.get('id')).first()
-            return ModuleSerializer(module).data
+            Folder = get_folder_type(self.data.get('source'))
+            folder = QuerySet(Folder).filter(id=self.data.get('id')).first()
+            return FolderSerializer(folder).data
 
         def delete(self):
             self.is_valid(raise_exception=True)
             if self.data.get('id') == 'root':
-                raise serializers.ValidationError(_('Cannot delete root module'))
-            Module = get_module_type(self.data.get('source'))
-            QuerySet(Module).filter(id=self.data.get('id')).delete()
+                raise serializers.ValidationError(_('Cannot delete root folder'))
+            Folder = get_folder_type(self.data.get('source'))
+            QuerySet(Folder).filter(id=self.data.get('id')).delete()
 
 
-class ModuleTreeSerializer(serializers.Serializer):
+class FolderTreeSerializer(serializers.Serializer):
     workspace_id = serializers.CharField(required=True, allow_null=True, allow_blank=True, label=_('workspace id'))
     source = serializers.CharField(required=True, label=_('source'))
 
-    def get_module_tree(self, name=None):
+    def get_folder_tree(self, name=None):
         self.is_valid(raise_exception=True)
-        Module = get_module_type(self.data.get('source'))
+        Folder = get_folder_type(self.data.get('source'))
         if name is not None:
-            nodes = Module.objects.filter(Q(workspace_id=self.data.get('workspace_id')) &
+            nodes = Folder.objects.filter(Q(workspace_id=self.data.get('workspace_id')) &
                                           Q(name__contains=name)).get_cached_trees()
         else:
-            nodes = Module.objects.filter(Q(workspace_id=self.data.get('workspace_id'))).get_cached_trees()
-        serializer = ToolModuleTreeSerializer(nodes, many=True)
+            nodes = Folder.objects.filter(Q(workspace_id=self.data.get('workspace_id'))).get_cached_trees()
+        serializer = ToolFolderTreeSerializer(nodes, many=True)
         return serializer.data  # 这是可序列化的字典

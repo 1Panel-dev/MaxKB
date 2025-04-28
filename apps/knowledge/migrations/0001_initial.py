@@ -6,12 +6,12 @@ import mptt.fields
 import uuid_utils.compat
 from django.db import migrations, models
 
-from knowledge.models import KnowledgeModule
+from knowledge.models import KnowledgeFolder
 
 
 def insert_default_data(apps, schema_editor):
     # 创建一个根模块（没有父节点）
-    KnowledgeModule.objects.create(id='root', name='根目录', user_id='f0dd8f71-e4ee-11ee-8c84-a8a1595801ab')
+    KnowledgeFolder.objects.create(id='root', name='根目录', user_id='f0dd8f71-e4ee-11ee-8c84-a8a1595801ab')
 
 
 class Migration(migrations.Migration):
@@ -42,7 +42,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='KnowledgeModule',
+            name='KnowledgeFolder',
             fields=[
                 ('create_time', models.DateTimeField(auto_now_add=True, verbose_name='创建时间')),
                 ('update_time', models.DateTimeField(auto_now=True, verbose_name='修改时间')),
@@ -57,12 +57,12 @@ class Migration(migrations.Migration):
                 ('level', models.PositiveIntegerField(editable=False)),
                 ('parent',
                  mptt.fields.TreeForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE,
-                                            related_name='children', to='knowledge.knowledgemodule')),
+                                            related_name='children', to='knowledge.knowledgefolder')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, to='users.user',
                                            verbose_name='用户id')),
             ],
             options={
-                'db_table': 'knowledge_module',
+                'db_table': 'knowledge_folder',
             },
         ),
         migrations.CreateModel(
@@ -84,10 +84,10 @@ class Migration(migrations.Migration):
                 ('scope',
                  models.CharField(choices=[('SHARED', '共享'), ('WORKSPACE', '工作空间可用')], default='WORKSPACE',
                                   max_length=20, verbose_name='可用范围')),
-                ('module',
+                ('folder',
                  models.ForeignKey(default='root', on_delete=django.db.models.deletion.CASCADE,
-                                   to='knowledge.knowledgemodule',
-                                   verbose_name='模块id')),
+                                   to='knowledge.knowledgefolder',
+                                   verbose_name='文件夹id')),
                 ('embedding_model', models.ForeignKey(default=knowledge.models.knowledge.default_model,
                                                      on_delete=django.db.models.deletion.DO_NOTHING,
                                                      to='models_provider.model', verbose_name='向量模型')),

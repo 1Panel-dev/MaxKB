@@ -24,7 +24,7 @@ urlpatterns = [
     path("api/", include("users.urls")),
     path("api/", include("tools.urls")),
     path("api/", include("models_provider.urls")),
-    path("api/", include("modules.urls")),
+    path("api/", include("folders.urls")),
     path("api/", include("knowledge.urls")),
 ]
 urlpatterns += [

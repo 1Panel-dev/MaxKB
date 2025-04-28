@@ -40,6 +40,12 @@ cffi = "1.17.1"
 pysilk = "0.0.1"
 sentence-transformers = "4.1.0"
 websockets = "15.0.1"
+celery = { extras = ["sqlalchemy"], version = "5.5.2" }
+django-celery-beat = "2.8.0"
+celery-once = "3.0.1"
+beautifulsoup4 = "4.13.4"
+html2text = "2025.4.15"
+jieba = "0.42.1"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

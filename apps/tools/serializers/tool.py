@@ -17,7 +17,7 @@ from common.exception.app_exception import AppApiException
 from common.result import result
 from common.utils.tool_code import ToolExecutor
 from maxkb.const import CONFIG
-from tools.models import Tool, ToolScope, ToolModule
+from tools.models import Tool, ToolScope, ToolFolder
 
 tool_executor = ToolExecutor(CONFIG.get('SANDBOX'))
 
@@ -37,11 +37,11 @@ ALLOWED_CLASSES = {
 
 class RestrictedUnpickler(pickle.Unpickler):
 
-    def find_class(self, module, name):
-        if (module, name) in ALLOWED_CLASSES:
-            return super().find_class(module, name)
+    def find_class(self, folder, name):
+        if (folder, name) in ALLOWED_CLASSES:
+            return super().find_class(folder, name)
         raise pickle.UnpicklingError("global '%s.%s' is forbidden" %
-                                     (module, name))
+                                     (folder, name))
 
 
 def encryption(message: str):
@@ -75,7 +75,7 @@ class ToolModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tool
         fields = ['id', 'name', 'icon', 'desc', 'code', 'input_field_list', 'init_field_list', 'init_params',
-                  'scope', 'is_active', 'user_id', 'template_id', 'workspace_id', 'module_id', 'tool_type',
+                  'scope', 'is_active', 'user_id', 'template_id', 'workspace_id', 'folder_id', 'tool_type',
                   'create_time', 'update_time']
 
 
@@ -126,7 +126,7 @@ class ToolCreateRequest(serializers.Serializer):
 
     is_active = serializers.BooleanField(required=False, label=_('Is active'))
 
-    module_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, default='root')
+    folder_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, default='root')
 
 
 class ToolEditRequest(serializers.Serializer):
@@ -146,7 +146,7 @@ class ToolEditRequest(serializers.Serializer):
 
     is_active = serializers.BooleanField(required=False, label=_('Is active'))
 
-    module_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, default='root')
+    folder_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, default='root')
 
 
 class DebugField(serializers.Serializer):
@@ -180,7 +180,7 @@ class ToolSerializer(serializers.Serializer):
                         input_field_list=instance.get('input_field_list', []),
                         init_field_list=instance.get('init_field_list', []),
                         scope=ToolScope.WORKSPACE,
-                        module_id=instance.get('module_id', 'root'),
+                        folder_id=instance.get('folder_id', 'root'),
                         is_active=False)
             tool.save()
             return ToolModelSerializer(tool).data
@@ -321,42 +321,42 @@ class ToolSerializer(serializers.Serializer):
 class ToolTreeSerializer(serializers.Serializer):
     workspace_id = serializers.CharField(required=True, label=_('workspace id'))
 
-    def get_tools(self, module_id):
+    def get_tools(self, folder_id):
         self.is_valid(raise_exception=True)
-        if not module_id:
-            module_id = 'root'
-        root = ToolModule.objects.filter(id=module_id).first()
+        if not folder_id:
+            folder_id = 'root'
+        root = ToolFolder.objects.filter(id=folder_id).first()
         if not root:
-            raise serializers.ValidationError(_('Module not found'))
+            raise serializers.ValidationError(_('Folder not found'))
         # 使用MPTT的get_descendants()方法获取所有相关节点
-        all_modules = root.get_descendants(include_self=True)
+        all_folders = root.get_descendants(include_self=True)
 
-        tools = QuerySet(Tool).filter(workspace_id=self.data.get('workspace_id'), module_id__in=all_modules)
+        tools = QuerySet(Tool).filter(workspace_id=self.data.get('workspace_id'), folder_id__in=all_folders)
         return ToolModelSerializer(tools, many=True).data
 
     class Query(serializers.Serializer):
         workspace_id = serializers.CharField(required=True, label=_('workspace id'))
-        module_id = serializers.CharField(required=True, label=_('module id'))
+        folder_id = serializers.CharField(required=True, label=_('folder id'))
         name = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('tool name'))
         tool_type = serializers.CharField(required=True, label=_('tool type'))
 
         def page(self, current_page: int, page_size: int):
             self.is_valid(raise_exception=True)
 
-            module_id = self.data.get('module_id', 'root')
-            root = ToolModule.objects.filter(id=module_id).first()
+            folder_id = self.data.get('folder_id', 'root')
+            root = ToolFolder.objects.filter(id=folder_id).first()
             if not root:
-                raise serializers.ValidationError(_('Module not found'))
+                raise serializers.ValidationError(_('Folder not found'))
             # 使用MPTT的get_descendants()方法获取所有相关节点
-            all_modules = root.get_descendants(include_self=True)
+            all_folders = root.get_descendants(include_self=True)
 
             if self.data.get('name'):
                 tools = QuerySet(Tool).filter(Q(workspace_id=self.data.get('workspace_id')) &
-                                              Q(module_id__in=all_modules) &
+                                              Q(folder_id__in=all_folders) &
                                               Q(tool_type=self.data.get('tool_type')) &
                                               Q(name__contains=self.data.get('name')))
             else:
                 tools = QuerySet(Tool).filter(Q(workspace_id=self.data.get('workspace_id')) &
-                                              Q(module_id__in=all_modules) &
+                                              Q(folder_id__in=all_folders) &
                                               Q(tool_type=self.data.get('tool_type')))
             return page_search(current_page, page_size, tools, lambda record: ToolModelSerializer(record).data)

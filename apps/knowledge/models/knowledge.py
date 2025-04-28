@@ -28,7 +28,7 @@ def default_model():
     return uuid.UUID('42f63a3d-427e-11ef-b3ec-a8a1595801ab')
 
 
-class KnowledgeModule(MPTTModel, AppModelMixin):
+class KnowledgeFolder(MPTTModel, AppModelMixin):
     id = models.CharField(primary_key=True, max_length=64, editable=False, verbose_name="主键id")
     name = models.CharField(max_length=64, verbose_name="文件夹名称")
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name="用户id")
@@ -36,7 +36,7 @@ class KnowledgeModule(MPTTModel, AppModelMixin):
     parent = TreeForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
 
     class Meta:
-        db_table = "knowledge_module"
+        db_table = "knowledge_folder"
 
     class MPTTMeta:
         order_insertion_by = ['name']
@@ -51,7 +51,7 @@ class Knowledge(AppModelMixin):
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name="所属用户")
     type = models.IntegerField(verbose_name='类型', choices=KnowledgeType.choices, default=KnowledgeType.BASE)
     scope = models.CharField(max_length=20, verbose_name='可用范围', choices=KnowledgeScope.choices, default=KnowledgeScope.WORKSPACE)
-    module = models.ForeignKey(KnowledgeModule, on_delete=models.CASCADE, verbose_name="模块id", default='root')
+    folder = models.ForeignKey(KnowledgeFolder, on_delete=models.CASCADE, verbose_name="文件夹id", default='root')
     embedding_model = models.ForeignKey(Model, on_delete=models.DO_NOTHING, verbose_name="向量模型",
                                        default=default_model)
     meta = models.JSONField(verbose_name="元数据", default=dict)

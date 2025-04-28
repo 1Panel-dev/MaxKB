@@ -16,8 +16,8 @@ class KnowledgeView(APIView):
 
     @extend_schema(
         methods=['GET'],
-        description=_('Get knowledge by module'),
-        operation_id=_('Get knowledge by module'),
+        description=_('Get knowledge by folder'),
+        operation_id=_('Get knowledge by folder'),
         parameters=KnowledgeTreeReadAPI.get_parameters(),
         responses=KnowledgeTreeReadAPI.get_response(),
         tags=[_('Knowledge Base')]
@@ -26,7 +26,7 @@ class KnowledgeView(APIView):
     def get(self, request: Request, workspace_id: str):
         return result.success(KnowledgeTreeSerializer(
             data={'workspace_id': workspace_id}
-        ).get_knowledge_list(request.query_params.get('module_id')))
+        ).get_knowledge_list(request.query_params.get('folder_id')))
 
 
 class KnowledgeBaseView(APIView):
@@ -45,7 +45,7 @@ class KnowledgeBaseView(APIView):
     def post(self, request: Request, workspace_id: str):
         return result.success(KnowledgeSerializer.Create(
             data={'user_id': request.user.id, 'workspace_id': workspace_id}
-        ).insert(request.data))
+        ).save_base(request.data))
 
 
 class KnowledgeWebView(APIView):
@@ -64,4 +64,4 @@ class KnowledgeWebView(APIView):
     def post(self, request: Request, workspace_id: str):
         return result.success(KnowledgeSerializer.Create(
             data={'user_id': request.user.id, 'workspace_id': workspace_id}
-        ).insert(request.data))
+        ).save_web(request.data))

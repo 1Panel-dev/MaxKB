@@ -166,13 +166,13 @@ class PermissionConstants(Enum):
                             role_list=[RoleConstants.ADMIN, RoleConstants.USER])
     MODEL_DELETE = Permission(group=Group.MODEL, operate=Operate.DELETE,
                               role_list=[RoleConstants.ADMIN, RoleConstants.USER])
-    TOOL_MODULE_CREATE = Permission(group=Group.TOOL, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN,
+    TOOL_FOLDER_CREATE = Permission(group=Group.TOOL, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN,
                                                                                          RoleConstants.USER])
-    TOOL_MODULE_READ = Permission(group=Group.TOOL, operate=Operate.READ, role_list=[RoleConstants.ADMIN,
+    TOOL_FOLDER_READ = Permission(group=Group.TOOL, operate=Operate.READ, role_list=[RoleConstants.ADMIN,
                                                                                      RoleConstants.USER])
-    TOOL_MODULE_EDIT = Permission(group=Group.TOOL, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN,
+    TOOL_FOLDER_EDIT = Permission(group=Group.TOOL, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN,
                                                                                      RoleConstants.USER])
-    TOOL_MODULE_DELETE = Permission(group=Group.TOOL, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN,
+    TOOL_FOLDER_DELETE = Permission(group=Group.TOOL, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN,
                                                                                          RoleConstants.USER])
 
     TOOL_CREATE = Permission(group=Group.TOOL, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN,
@@ -190,20 +190,20 @@ class PermissionConstants(Enum):
     TOOL_EXPORT = Permission(group=Group.TOOL, operate=Operate.USE, role_list=[RoleConstants.ADMIN,
                                                                                RoleConstants.USER])
 
-    KNOWLEDGE_MODULE_CREATE = Permission(group=Group.KNOWLEDGE, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN,
+    KNOWLEDGE_FOLDER_CREATE = Permission(group=Group.KNOWLEDGE, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN,
                                                                                                    RoleConstants.USER])
-    KNOWLEDGE_MODULE_READ = Permission(group=Group.KNOWLEDGE, operate=Operate.READ, role_list=[RoleConstants.ADMIN,
+    KNOWLEDGE_FOLDER_READ = Permission(group=Group.KNOWLEDGE, operate=Operate.READ, role_list=[RoleConstants.ADMIN,
                                                                                                RoleConstants.USER],
                                        resource_permission_group_list=[
                                            ResourcePermissionGroup.VIEW
                                        ])
-    KNOWLEDGE_MODULE_EDIT = Permission(group=Group.KNOWLEDGE, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN,
+    KNOWLEDGE_FOLDER_EDIT = Permission(group=Group.KNOWLEDGE, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN,
                                                                                                RoleConstants.USER],
                                        resource_permission_group_list=[
                                            ResourcePermissionGroup.MANAGE
                                        ]
                                        )
-    KNOWLEDGE_MODULE_DELETE = Permission(group=Group.KNOWLEDGE, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN,
+    KNOWLEDGE_FOLDER_DELETE = Permission(group=Group.KNOWLEDGE, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN,
                                                                                                    RoleConstants.USER],
                                          resource_permission_group_list=[
                                              ResourcePermissionGroup.MANAGE

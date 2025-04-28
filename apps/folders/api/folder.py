@@ -4,16 +4,16 @@ from drf_spectacular.utils import OpenApiParameter
 
 from common.mixins.api_mixin import APIMixin
 from common.result import ResultSerializer, DefaultResultSerializer
-from modules.models.module import ModuleCreateRequest, ModuleEditRequest
-from modules.serializers.module import ModuleSerializer
+from folders.models.folder import FolderCreateRequest, FolderEditRequest
+from folders.serializers.folder import FolderSerializer
 
 
-class ModuleCreateResponse(ResultSerializer):
+class FolderCreateResponse(ResultSerializer):
     def get_data(self):
-        return ModuleSerializer()
+        return FolderSerializer()
 
 
-class ModuleCreateAPI(APIMixin):
+class FolderCreateAPI(APIMixin):
     @staticmethod
     def get_parameters():
         return [
@@ -36,14 +36,14 @@ class ModuleCreateAPI(APIMixin):
 
     @staticmethod
     def get_request():
-        return ModuleCreateRequest
+        return FolderCreateRequest
 
     @staticmethod
     def get_response():
-        return ModuleCreateResponse
+        return FolderCreateResponse
 
 
-class ModuleReadAPI(APIMixin):
+class FolderReadAPI(APIMixin):
     @staticmethod
     def get_parameters():
         return [
@@ -63,8 +63,8 @@ class ModuleReadAPI(APIMixin):
                 required=True,
             ),
             OpenApiParameter(
-                name="module_id",
-                description="模块id",
+                name="folder_id",
+                description="文件夹id",
                 type=OpenApiTypes.STR,
                 location='path',
                 required=True,
@@ -73,23 +73,23 @@ class ModuleReadAPI(APIMixin):
 
     @staticmethod
     def get_response():
-        return ModuleCreateResponse
+        return FolderCreateResponse
 
 
-class ModuleEditAPI(ModuleReadAPI):
+class FolderEditAPI(FolderReadAPI):
 
     @staticmethod
     def get_request():
-        return ModuleEditRequest
+        return FolderEditRequest
 
 
-class ModuleDeleteAPI(ModuleReadAPI):
+class FolderDeleteAPI(FolderReadAPI):
     @staticmethod
     def get_response():
         return DefaultResultSerializer
 
 
-class ModuleTreeReadAPI(APIMixin):
+class FolderTreeReadAPI(APIMixin):
     @staticmethod
     def get_parameters():
         return [

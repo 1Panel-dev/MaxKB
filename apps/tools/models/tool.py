@@ -7,7 +7,7 @@ from common.mixins.app_model_mixin import AppModelMixin
 from users.models import User
 
 
-class ToolModule(MPTTModel, AppModelMixin):
+class ToolFolder(MPTTModel, AppModelMixin):
     id = models.CharField(primary_key=True, max_length=64, editable=False, verbose_name="主键id")
     name = models.CharField(max_length=64, verbose_name="文件夹名称")
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name="用户id")
@@ -15,7 +15,7 @@ class ToolModule(MPTTModel, AppModelMixin):
     parent = TreeForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
 
     class Meta:
-        db_table = "tool_module"
+        db_table = "tool_folder"
 
     class MPTTMeta:
         order_insertion_by = ['name']
@@ -46,7 +46,7 @@ class Tool(AppModelMixin):
     tool_type = models.CharField(max_length=20, verbose_name='工具类型', choices=ToolType.choices,
                                      default=ToolType.CUSTOM, db_index=True)
     template_id = models.UUIDField(max_length=128, verbose_name="模版id", null=True, default=None)
-    module = models.ForeignKey(ToolModule, on_delete=models.CASCADE, verbose_name="模块id", default='root')
+    folder = models.ForeignKey(ToolFolder, on_delete=models.CASCADE, verbose_name="文件夹id", default='root')
     workspace_id = models.CharField(max_length=64, verbose_name="工作空间id", default="default", db_index=True)
     init_params = models.CharField(max_length=102400, verbose_name="初始化参数", null=True)
 

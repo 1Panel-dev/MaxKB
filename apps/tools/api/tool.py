@@ -84,8 +84,8 @@ class ToolTreeReadAPI(APIMixin):
                 required=True,
             ),
             OpenApiParameter(
-                name="module_id",
-                description="模块id",
+                name="folder_id",
+                description="文件夹id",
                 type=OpenApiTypes.STR,
                 location='query',
                 required=False,
@@ -178,8 +178,8 @@ class ToolPageAPI(ToolReadAPI):
                 required=True,
             ),
             OpenApiParameter(
-                name="module_id",
-                description="模块id",
+                name="folder_id",
+                description="文件夹id",
                 type=OpenApiTypes.STR,
                 location='query',
                 required=True,

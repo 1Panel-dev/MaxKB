@@ -67,8 +67,8 @@ class KnowledgeTreeReadAPI(APIMixin):
                 required=True,
             ),
             OpenApiParameter(
-                name="module_id",
-                description="模块id",
+                name="folder_id",
+                description="文件夹id",
                 type=OpenApiTypes.STR,
                 location='query',
                 required=False,

@@ -5,12 +5,12 @@ import mptt.fields
 import uuid_utils.compat
 from django.db import migrations, models
 
-from tools.models import ToolModule
+from tools.models import ToolFolder
 
 
 def insert_default_data(apps, schema_editor):
     # 创建一个根模块（没有父节点）
-    ToolModule.objects.create(id='root', name='根目录', user_id='f0dd8f71-e4ee-11ee-8c84-a8a1595801ab')
+    ToolFolder.objects.create(id='root', name='根目录', user_id='f0dd8f71-e4ee-11ee-8c84-a8a1595801ab')
 
 
 class Migration(migrations.Migration):
@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='ToolModule',
+            name='ToolFolder',
             fields=[
                 ('create_time', models.DateTimeField(auto_now_add=True, verbose_name='创建时间')),
                 ('update_time', models.DateTimeField(auto_now=True, verbose_name='修改时间')),
@@ -37,12 +37,12 @@ class Migration(migrations.Migration):
                 ('level', models.PositiveIntegerField(editable=False)),
                 ('parent',
                  mptt.fields.TreeForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE,
-                                            related_name='children', to='tools.toolmodule')),
+                                            related_name='children', to='tools.toolfolder')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, to='users.user',
                                            verbose_name='用户id')),
             ],
             options={
-                'db_table': 'tool_module',
+                'db_table': 'tool_folder',
             },
         ),
         migrations.RunPython(insert_default_data),
@@ -72,9 +72,9 @@ class Migration(migrations.Migration):
                 ('init_params', models.CharField(max_length=102400, null=True, verbose_name='初始化参数')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, to='users.user',
                                            verbose_name='用户id')),
-                ('module',
-                 models.ForeignKey(default='root', on_delete=django.db.models.deletion.CASCADE, to='tools.toolmodule',
-                                   verbose_name='模块id')),
+                ('folder',
+                 models.ForeignKey(default='root', on_delete=django.db.models.deletion.CASCADE, to='tools.toolfolder',
+                                   verbose_name='文件夹id')),
             ],
             options={
                 'db_table': 'tool',
