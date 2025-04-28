@@ -1,12 +1,13 @@
 import type { RouteRecordRaw } from 'vue-router'
-// const modules: any = import.meta.glob('./modules/*.ts', { eager: true })
-// const rolesRoutes: RouteRecordRaw[] = [...Object.keys(modules).map((key) => modules[key].default)]
+const modules: any = import.meta.glob('./modules/*.ts', { eager: true })
+const rolesRoutes: RouteRecordRaw[] = [...Object.keys(modules).map((key) => modules[key].default)]
 
 export const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'home',
-    component: () => import('@/views/HomeView.vue'),
+    redirect: '/model',
+    children: [...rolesRoutes],
   },
 
   {
@@ -17,12 +18,12 @@ export const routes: Array<RouteRecordRaw> = [
   {
     path: '/forget_password',
     name: 'ForgetPassword',
-    component: () => import('@/views/login/ForgetPassword.vue')
+    component: () => import('@/views/login/ForgetPassword.vue'),
   },
   {
     path: '/reset_password/:code/:email',
     name: 'ResetPassword',
-    component: () => import('@/views/login/ResetPassword.vue')
+    component: () => import('@/views/login/ResetPassword.vue'),
   },
   // {
   //   path: '/:pathMatch(.*)',

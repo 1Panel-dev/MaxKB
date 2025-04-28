@@ -35,9 +35,9 @@ const useLoginStore = defineStore('user', {
     isDefaultTheme() {
       return !this.themeInfo?.theme || this.themeInfo?.theme === '#3370FF'
     },
-    async profile() {
-      return UserApi.getUserProfile().then((ok) => {
-        this.userInfo = ok
+    async profile(loading?: Ref<boolean>) {
+      return UserApi.getUserProfile(loading).then((ok: { data: User }) => {
+        this.userInfo = ok.data
         useLocalStorage<string>(localeConfigKey, 'en-US').value =
           ok.data?.language || this.getLanguage()
         // return this.asyncGetProfile()

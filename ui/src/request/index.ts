@@ -99,7 +99,6 @@ const promise: (
     }
     request
       .then((response) => {
-        console.log(response)
         // blob类型的返回状态是response.status
         if (response.status === 200) {
           resolve(response?.data?.data || response)

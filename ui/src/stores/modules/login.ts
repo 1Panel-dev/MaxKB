@@ -34,7 +34,7 @@ const useLoginStore = defineStore('login', {
         this.token = ok.token
         localStorage.setItem('token', ok.token)
         const user = useUserStore()
-        return user.profile()
+        return user.profile(loading)
       })
     },
   },
