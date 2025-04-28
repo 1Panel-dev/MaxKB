@@ -179,7 +179,8 @@ def get_permission_list(user,
                                                                       workspace_user_role_mapping_list)
             # 系统权限
             system_permission_list = [role_permission_mapping.permission_id for role_permission_mapping in
-                                      role_permission_mapping_list]
+                                      role_permission_mapping_list if
+                                      [user.role].__contains__(role_permission_mapping.role_id)]
             # 合并权限
             permission_list = system_permission_list + workspace_permission_list + workspace_resource_permission_list
             cache.set(key, permission_list, version=version)
