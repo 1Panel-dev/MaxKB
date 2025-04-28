@@ -1,8 +1,8 @@
 <template>
   <div class="sidebar p-8">
-    <div v-if="showBreadcrumb">
+    <!-- <div v-if="showBreadcrumb">
       <AppBreadcrumb />
-    </div>
+    </div> -->
     <el-scrollbar wrap-class="scrollbar-wrapper">
       <el-menu :default-active="activeMenu" router>
         <sidebar-item
@@ -23,7 +23,7 @@ import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { getChildRouteListByPathAndName } from '@/router/index'
 import SidebarItem from './SidebarItem.vue'
-import AppBreadcrumb from './../breadcrumb/index.vue'
+// import AppBreadcrumb from './../breadcrumb/index.vue'
 
 const route = useRoute()
 

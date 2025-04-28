@@ -4,10 +4,10 @@
     <div class="logo">
       <LogoFull />
     </div>
-    <div class="flex-between">
+    <div class="flex-between w-full">
       <div></div>
       <TopMenu></TopMenu>
-      <TopUrlMenu></TopUrlMenu>
+      <TopAbout></TopAbout>
     </div>
     <Avatar></Avatar>
   </div>
@@ -15,9 +15,15 @@
 <script setup lang="ts">
 import TopMenu from './top-menu/index.vue'
 import Avatar from './avatar/index.vue'
-import TopUrlMenu from './top-url-menu/index.vue'
+import TopAbout from './top-about/index.vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 </script>
-<style lang="scss"></style>
+<style lang="scss" scoped>
+.app-top-bar-container {
+  height: var(--app-header-height);
+  box-sizing: border-box;
+  padding: var(--app-header-padding);
+}
+</style>

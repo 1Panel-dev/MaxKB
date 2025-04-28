@@ -129,15 +129,15 @@
       </template>
     </el-dropdown>
   </div>
-  <CreateApplicationDialog ref="CreateApplicationDialogRef" @refresh="refresh" />
-  <CreateDatasetDialog ref="CreateDatasetDialogRef" @refresh="refresh" />
+  <!-- <CreateApplicationDialog ref="CreateApplicationDialogRef" @refresh="refresh" />
+  <CreateDatasetDialog ref="CreateDatasetDialogRef" @refresh="refresh" /> -->
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { onBeforeRouteLeave, useRouter, useRoute } from 'vue-router'
-import CreateApplicationDialog from '@/views/application/component/CreateApplicationDialog.vue'
-import CreateDatasetDialog from '@/views/dataset/component/CreateDatasetDialog.vue'
+// import CreateApplicationDialog from '@/views/application/component/CreateApplicationDialog.vue'
+// import CreateDatasetDialog from '@/views/dataset/component/CreateDatasetDialog.vue'
 import { isAppIcon, isWorkFlow } from '@/utils/application'
 import useStore from '@/stores'
 const { common, dataset, application } = useStore()

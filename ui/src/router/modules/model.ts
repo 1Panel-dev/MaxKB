@@ -3,7 +3,7 @@ const ModelRouter = {
   name: 'model',
   meta: { title: 'views.model.title', permission: 'MODEL:READ' },
   redirect: '/model',
-  component: () => import('@/layout/layout-template/AppLayout.vue'),
+  component: () => import('@/layout/layout-template/MainLayout.vue'),
   children: [
     {
       path: '/model',

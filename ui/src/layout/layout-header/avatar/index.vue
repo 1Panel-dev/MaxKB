@@ -69,19 +69,19 @@
       </el-dropdown-menu>
     </template>
   </el-dropdown>
-  <ResetPassword ref="resetPasswordRef"></ResetPassword>
-  <AboutDialog ref="AboutDialogRef"></AboutDialog>
-  <APIKeyDialog :user-id="user.userInfo?.id" ref="APIKeyDialogRef" />
-  <UserPwdDialog ref="UserPwdDialogRef" />
+  <!-- <ResetPassword ref="resetPasswordRef"></ResetPassword> -->
+  <!-- <AboutDialog ref="AboutDialogRef"></AboutDialog>
+  <APIKeyDialog :user-id="user.userInfo?.id" ref="APIKeyDialogRef" /> -->
+  <!-- <UserPwdDialog ref="UserPwdDialogRef" /> -->
 </template>
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import useStore from '@/stores'
 import { useRouter } from 'vue-router'
-import ResetPassword from './ResetPassword.vue'
-import AboutDialog from './AboutDialog.vue'
-import UserPwdDialog from '@/views/user-manage/component/UserPwdDialog.vue'
-import APIKeyDialog from './APIKeyDialog.vue'
+// import ResetPassword from './ResetPassword.vue'
+// import AboutDialog from './AboutDialog.vue'
+// import UserPwdDialog from '@/views/user-manage/component/UserPwdDialog.vue'
+// import APIKeyDialog from './APIKeyDialog.vue'
 import { ComplexPermission } from '@/utils/permission/type'
 import { langList } from '@/locales/index'
 import { useLocale } from '@/locales/useLocale'
@@ -118,7 +118,7 @@ const logout = () => {
 
 onMounted(() => {
   if (user.userInfo?.is_edit_password) {
-    UserPwdDialogRef.value.open(user.userInfo)
+    // UserPwdDialogRef.value.open(user.userInfo)
   }
 })
 </script>

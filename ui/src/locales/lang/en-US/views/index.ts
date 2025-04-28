@@ -6,7 +6,7 @@ import system from './system'
 import functionLib from './function-lib'
 import user from './user'
 import team from './team'
-import template from './template'
+import model from './model'
 import document from './document'
 import paragraph from './paragraph'
 import problem from './problem'
@@ -22,7 +22,7 @@ export default {
   functionLib,
   user,
   team,
-  template,
+  model,
   dataset,
   applicationWorkflow,
   document,
