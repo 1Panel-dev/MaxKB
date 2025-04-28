@@ -14,7 +14,7 @@ from rest_framework.request import Request
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
 from common.constants.permission_constants import PermissionConstants
-from common.result import result, DefaultResultSerializer
+from common.result import result
 from common.utils.common import query_params_to_single_dict
 from models_provider.api.model import ModelCreateAPI, GetModelApi, ModelEditApi, ModelListResponse, DefaultModelResponse
 from models_provider.api.provide import ProvideApi
@@ -25,6 +25,7 @@ class Model(APIView):
     authentication_classes = [TokenAuth]
 
     @extend_schema(methods=['POST'],
+                   summary=_("Create model"),
                    description=_("Create model"),
                    operation_id=_("Create model"),
                    tags=[_("Model")],
@@ -38,7 +39,7 @@ class Model(APIView):
                                                                                              with_valid=True))
 
     # @extend_schema(methods=['PUT'],
-    #                description=_('Update model'),
+    #                summary=_('Update model'),
     #                operation_id=_('Update model'),
     #                request=ModelEditApi.get_request(),
     #                responses=ModelCreateApi.get_response(),
@@ -50,6 +51,7 @@ class Model(APIView):
     #                                                                                               with_valid=True))
 
     @extend_schema(methods=['GET'],
+                   summary=_('Query model list'),
                    description=_('Query model list'),
                    operation_id=_('Query model list'),
                    parameters=ModelCreateAPI.get_query_params_api(),
@@ -66,6 +68,7 @@ class Model(APIView):
         authentication_classes = [TokenAuth]
 
         @extend_schema(methods=['PUT'],
+                       summary=_('Update model'),
                        description=_('Update model'),
                        operation_id=_('Update model'),
                        request=ModelEditApi.get_request(),
@@ -79,6 +82,7 @@ class Model(APIView):
                                                                                                 str(request.user.id)))
 
         @extend_schema(methods=['DELETE'],
+                       summary=_('Delete model'),
                        description=_('Delete model'),
                        operation_id=_('Delete model'),
                        parameters=GetModelApi.get_query_params_api(),
@@ -90,6 +94,7 @@ class Model(APIView):
                 ModelSerializer.Operate(data={'id': model_id, 'user_id': request.user.id}).delete())
 
         @extend_schema(methods=['GET'],
+                       summary=_('Query model details'),
                        description=_('Query model details'),
                        operation_id=_('Query model details'),
                        parameters=GetModelApi.get_query_params_api(),
@@ -104,6 +109,7 @@ class Model(APIView):
         authentication_classes = [TokenAuth]
 
         @extend_schema(methods=['GET'],
+                       summary=_('Get model parameter form'),
                        description=_('Get model parameter form'),
                        operation_id=_('Get model parameter form'),
                        parameters=GetModelApi.get_query_params_api(),
@@ -115,6 +121,7 @@ class Model(APIView):
                 ModelSerializer.ModelParams(data={'id': model_id}).get_model_params())
 
         @extend_schema(methods=['PUT'],
+                       summary=_('Save model parameter form'),
                        description=_('Save model parameter form'),
                        operation_id=_('Save model parameter form'),
                        parameters=GetModelApi.get_query_params_api(),
@@ -130,6 +137,8 @@ class Model(APIView):
         authentication_classes = [TokenAuth]
 
         @extend_schema(methods=['GET'],
+                       summary=_(
+                           'Query model meta information, this interface does not carry authentication information'),
                        description=_(
                            'Query model meta information, this interface does not carry authentication information'),
                        operation_id=_(
@@ -146,6 +155,7 @@ class Model(APIView):
         authentication_classes = [TokenAuth]
 
         @extend_schema(methods=['PUT'],
+                       summary=_('Pause model download'),
                        description=_('Pause model download'),
                        operation_id=_('Pause model download'),
                        parameters=GetModelApi.get_query_params_api(),

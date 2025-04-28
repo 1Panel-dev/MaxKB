@@ -5,13 +5,15 @@ from django.db import migrations, models
 
 from common.constants.permission_constants import RoleConstants
 from common.utils.common import password_encrypt
+from maxkb.const import CONFIG
 
+default_password = CONFIG.get('default_password', 'MaxKB@123..')
 
 def insert_default_data(apps, schema_editor):
     UserModel = apps.get_model('users', 'User')
     UserModel.objects.create(id='f0dd8f71-e4ee-11ee-8c84-a8a1595801ab', email='', username='admin',
                              nick_name="系统管理员",
-                             password=password_encrypt('MaxKB@123..'),
+                             password=password_encrypt(default_password),
                              role=RoleConstants.ADMIN.name,
                              is_active=True)
 

@@ -19,6 +19,7 @@ from users.serializers.login import LoginSerializer, CaptchaSerializer
 class LoginView(APIView):
     @extend_schema(methods=['POST'],
                    description=_("Log in"),
+                   summary=_("Log in"),
                    operation_id=_("Log in"),
                    tags=[_("User management")],
                    request=LoginAPI.get_request(),
@@ -29,6 +30,7 @@ class LoginView(APIView):
 
 class CaptchaView(APIView):
     @extend_schema(methods=['GET'],
+                   summary=_("Get captcha"),
                    description=_("Get captcha"),
                    operation_id=_("Get captcha"),
                    tags=[_("User management")],

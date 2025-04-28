@@ -18,6 +18,7 @@ class Provide(APIView):
     authentication_classes = [TokenAuth]
 
     @extend_schema(methods=['GET'],
+                   summary=_('Get a list of model suppliers'),
                    description=_('Get a list of model suppliers'),
                    operation_id=_('Get a list of model suppliers'),
                    responses=ProvideApi.get_response(),
@@ -40,6 +41,7 @@ class Provide(APIView):
         authentication_classes = [TokenAuth]
 
         @extend_schema(methods=['GET'],
+                       summary=_('Get a list of model types'),
                        description=_('Get a list of model types'),
                        operation_id=_('Get a list of model types'),
                        parameters=ProvideApi.ModelTypeList.get_query_params_api(),
@@ -54,6 +56,7 @@ class Provide(APIView):
         authentication_classes = [TokenAuth]
 
         @extend_schema(methods=['GET'],
+                       summary=_('Example of obtaining model list'),
                        description=_('Example of obtaining model list'),
                        operation_id=_('Example of obtaining model list'),
                        parameters=ProvideApi.ModelList.get_query_params_api(),
@@ -72,6 +75,7 @@ class Provide(APIView):
         authentication_classes = [TokenAuth]
 
         @extend_schema(methods=['GET'],
+                       summary=_('Get model default parameters'),
                        description=_('Get model default parameters'),
                        operation_id=_('Get model default parameters'),
                        parameters=ProvideApi.ModelParamsForm.get_query_params_api(),
@@ -89,6 +93,7 @@ class Provide(APIView):
         authentication_classes = [TokenAuth]
 
         @extend_schema(methods=['GET'],
+                       summary=_('Get the model creation form'),
                        description=_('Get the model creation form'),
                        operation_id=_('Get the model creation form'),
                        parameters=ProvideApi.ModelParamsForm.get_query_params_api(),

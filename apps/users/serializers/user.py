@@ -9,15 +9,22 @@
 import re
 
 from django.db import transaction
-from django.db.models import QuerySet, Q
+from django.db.models import Q, QuerySet
 from rest_framework import serializers
 import uuid_utils.compat as uuid
 from common.constants.exception_code_constants import ExceptionCodeConstants
 from common.constants.permission_constants import RoleConstants, Auth
+from common.db.search import page_search
+from common.exception.app_exception import AppApiException
 from common.utils.common import valid_license, password_encrypt
 from users.models import User
 from django.utils.translation import gettext_lazy as _
 from django.core import validators
+
+PASSWORD_REGEX = re.compile(
+    r"^(?![a-zA-Z]+$)(?![A-Z0-9]+$)(?![A-Z_!@#$%^&*`~.()-+=]+$)(?![a-z0-9]+$)(?![a-z_!@#$%^&*`~()-+=]+$)"
+    r"(?![0-9_!@#$%^&*`~()-+=]+$)[a-zA-Z0-9_!@#$%^&*`~.()-+=]{6,20}$"
+)
 
 
 class UserProfileResponse(serializers.ModelSerializer):
@@ -46,15 +53,23 @@ class UserProfileSerializer(serializers.Serializer):
         @param auth: 认证对象
         @return:
         """
+        return {
+            'id': user.id,
+            'username': user.username,
+            'nick_name': user.nick_name,
+            'email': user.email,
+            'role': auth.role_list,
+            'permissions': auth.permission_list,
+            'is_edit_password': user.role == RoleConstants.ADMIN.name and user.password == 'd880e722c47a34d8e9fce789fc62389d',
+            'language': user.language,
+        }
 
-        return {'id': user.id,
-                'username': user.username,
-                'nick_name': user.nick_name,
-                'email': user.email,
-                'role': auth.role_list,
-                'permissions': auth.permission_list,
-                'is_edit_password': user.password == 'd880e722c47a34d8e9fce789fc62389d' if user.role == 'ADMIN' else False,
-                'language': user.language}
+
+class UserInstanceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'phone', 'is_active', 'role', 'nick_name', 'create_time', 'update_time',
+                  'source']
 
 
 class UserManageSerializer(serializers.Serializer):
@@ -62,40 +77,91 @@ class UserManageSerializer(serializers.Serializer):
         email = serializers.EmailField(
             required=True,
             label=_("Email"),
-            validators=[validators.EmailValidator(message=ExceptionCodeConstants.EMAIL_FORMAT_ERROR.value.message,
-                                                  code=ExceptionCodeConstants.EMAIL_FORMAT_ERROR.value.code)])
-
-        username = serializers.CharField(required=True,
-                                         label=_("Username"),
-                                         max_length=20,
-                                         min_length=6,
-                                         validators=[
-                                             validators.RegexValidator(regex=re.compile("^.{6,20}$"),
-                                                                       message=_(
-                                                                           'Username must be 6-20 characters long'))
-                                         ])
-        password = serializers.CharField(required=True, label=_("Password"), max_length=20, min_length=6,
-                                         validators=[validators.RegexValidator(regex=re.compile(
-                                             "^(?![a-zA-Z]+$)(?![A-Z0-9]+$)(?![A-Z_!@#$%^&*`~.()-+=]+$)(?![a-z0-9]+$)(?![a-z_!@#$%^&*`~()-+=]+$)"
-                                             "(?![0-9_!@#$%^&*`~()-+=]+$)[a-zA-Z0-9_!@#$%^&*`~.()-+=]{6,20}$")
-                                             , message=_(
-                                                 "The password must be 6-20 characters long and must be a combination of letters, numbers, and special characters."))])
-
-        nick_name = serializers.CharField(required=False, label=_("Nick name"), max_length=64,
-                                          allow_null=True, allow_blank=True)
-        phone = serializers.CharField(required=False, label=_("Phone"), max_length=20,
-                                      allow_null=True, allow_blank=True)
+            validators=[validators.EmailValidator(
+                message=ExceptionCodeConstants.EMAIL_FORMAT_ERROR.value.message,
+                code=ExceptionCodeConstants.EMAIL_FORMAT_ERROR.value.code
+            )]
+        )
+        username = serializers.CharField(
+            required=True,
+            label=_("Username"),
+            max_length=20,
+            min_length=6,
+            validators=[
+                validators.RegexValidator(
+                    regex=re.compile("^.{6,20}$"),
+                    message=_('Username must be 6-20 characters long')
+                )
+            ]
+        )
+        password = serializers.CharField(
+            required=True,
+            label=_("Password"),
+            max_length=20,
+            min_length=6,
+            validators=[
+                validators.RegexValidator(
+                    regex=PASSWORD_REGEX,
+                    message=_(
+                        "The password must be 6-20 characters long and must be a combination of letters, numbers, and special characters."
+                    )
+                )
+            ]
+        )
+        nick_name = serializers.CharField(
+            required=False,
+            label=_("Nick name"),
+            max_length=64,
+            allow_null=True,
+            allow_blank=True
+        )
+        phone = serializers.CharField(
+            required=False,
+            label=_("Phone"),
+            max_length=20,
+            allow_null=True,
+            allow_blank=True
+        )
 
         def is_valid(self, *, raise_exception=True):
             super().is_valid(raise_exception=True)
+            self._check_unique_username_and_email()
+
+        def _check_unique_username_and_email(self):
             username = self.data.get('username')
             email = self.data.get('email')
-            u = QuerySet(User).filter(Q(username=username) | Q(email=email)).first()
-            if u is not None:
-                if u.email == email:
+            user = User.objects.filter(Q(username=username) | Q(email=email)).first()
+            if user:
+                if user.email == email:
                     raise ExceptionCodeConstants.EMAIL_IS_EXIST.value.to_app_api_exception()
-                if u.username == username:
+                if user.username == username:
                     raise ExceptionCodeConstants.USERNAME_IS_EXIST.value.to_app_api_exception()
+
+    class Query(serializers.Serializer):
+        email_or_username = serializers.CharField(required=False, allow_null=True,
+                                                  label=_('Email or username'))
+
+        def get_query_set(self):
+            email_or_username = self.data.get('email_or_username')
+            query_set = QuerySet(User)
+            if email_or_username is not None:
+                query_set = query_set.filter(
+                    Q(username__contains=email_or_username) | Q(email__contains=email_or_username))
+            query_set = query_set.order_by("-create_time")
+            return query_set
+
+        def list(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            return [{'id': user_model.id, 'username': user_model.username, 'email': user_model.email} for user_model in
+                    self.get_query_set()]
+
+        def page(self, current_page: int, page_size: int, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            return page_search(current_page, page_size,
+                               self.get_query_set(),
+                               post_records_handler=lambda u: UserInstanceSerializer(u).data)
 
     @valid_license(model=User, count=2,
                    message=_(
@@ -103,13 +169,157 @@ class UserManageSerializer(serializers.Serializer):
     @transaction.atomic
     def save(self, instance, with_valid=True):
         if with_valid:
-            UserManageSerializer.UserInstance(data=instance).is_valid(raise_exception=True)
+            self.UserInstance(data=instance).is_valid(raise_exception=True)
 
-        user = User(id=uuid.uuid7(), email=instance.get('email'),
-                    phone="" if instance.get('phone') is None else instance.get('phone'),
-                    nick_name="" if instance.get('nick_name') is None else instance.get('nick_name')
-                    , username=instance.get('username'), password=password_encrypt(instance.get('password')),
-                    role=RoleConstants.USER.name, source="LOCAL",
-                    is_active=True)
+        user = User(
+            id=uuid.uuid7(),
+            email=instance.get('email'),
+            phone=instance.get('phone', ''),
+            nick_name=instance.get('nick_name', ''),
+            username=instance.get('username'),
+            password=password_encrypt(instance.get('password')),
+            role=RoleConstants.USER.name,
+            source="LOCAL",
+            is_active=True
+        )
         user.save()
-        return UserProfileSerializer(user).data
+        return UserInstanceSerializer(user).data
+
+    class UserEditInstance(serializers.Serializer):
+        email = serializers.EmailField(
+            required=False,
+            label=_("Email"),
+            validators=[validators.EmailValidator(
+                message=ExceptionCodeConstants.EMAIL_FORMAT_ERROR.value.message,
+                code=ExceptionCodeConstants.EMAIL_FORMAT_ERROR.value.code
+            )]
+        )
+        nick_name = serializers.CharField(
+            required=False,
+            label=_("Name"),
+            max_length=64,
+            allow_null=True,
+            allow_blank=True
+        )
+        phone = serializers.CharField(
+            required=False,
+            label=_("Phone"),
+            max_length=20,
+            allow_null=True,
+            allow_blank=True
+        )
+        is_active = serializers.BooleanField(
+            required=False,
+            label=_("Is Active")
+        )
+
+        def is_valid(self, *, user_id=None, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            self._check_unique_email(user_id)
+
+        def _check_unique_email(self, user_id):
+            email = self.data.get('email')
+            if email and User.objects.filter(email=email).exclude(id=user_id).exists():
+                raise AppApiException(1004, _('Email is already in use'))
+
+    class RePasswordInstance(serializers.Serializer):
+        password = serializers.CharField(
+            required=True,
+            label=_("Password"),
+            max_length=20,
+            min_length=6,
+            validators=[
+                validators.RegexValidator(
+                    regex=PASSWORD_REGEX,
+                    message=_(
+                        "The password must be 6-20 characters long and must be a combination of letters, numbers, and special characters."
+                    )
+                )
+            ]
+        )
+        re_password = serializers.CharField(
+            required=True,
+            label=_("Re Password"),
+            validators=[
+                validators.RegexValidator(
+                    regex=PASSWORD_REGEX,
+                    message=_(
+                        "The confirmation password must be 6-20 characters long and must be a combination of letters, numbers, and special characters."
+                    )
+                )
+            ]
+        )
+
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            self._check_passwords_match()
+
+        def _check_passwords_match(self):
+            if self.data.get('password') != self.data.get('re_password'):
+                raise ExceptionCodeConstants.PASSWORD_NOT_EQ_RE_PASSWORD.value.to_app_api_exception()
+
+    class Operate(serializers.Serializer):
+        id = serializers.UUIDField(required=True, label=_('User ID'))
+
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            self._check_user_exists()
+
+        def _check_user_exists(self):
+            if not User.objects.filter(id=self.data.get('id')).exists():
+                raise AppApiException(1004, _('User does not exist'))
+
+        @transaction.atomic
+        def delete(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+                self._check_not_admin()
+            user_id = self.data.get('id')
+            # TODO  需要删除授权关系
+            User.objects.filter(id=user_id).delete()
+            return True
+
+        def _check_not_admin(self):
+            user = User.objects.filter(id=self.data.get('id')).first()
+            if user.role == RoleConstants.ADMIN.name:
+                raise AppApiException(1004, _('Unable to delete administrator'))
+
+        def edit(self, instance, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+                UserManageSerializer.UserEditInstance(data=instance).is_valid(user_id=self.data.get('id'),
+                                                                              raise_exception=True)
+            user = User.objects.filter(id=self.data.get('id')).first()
+            self._check_admin_modification(user, instance)
+            self._update_user_fields(user, instance)
+            user.save()
+            return UserInstanceSerializer(user).data
+
+        @staticmethod
+        def _check_admin_modification(user, instance):
+            if user.role == RoleConstants.ADMIN.name and 'is_active' in instance and instance.get(
+                    'is_active') is not None:
+                raise AppApiException(1004, _('Cannot modify administrator status'))
+
+        @staticmethod
+        def _update_user_fields(user, instance):
+            update_keys = ['email', 'nick_name', 'phone', 'is_active']
+            for key in update_keys:
+                if key in instance and instance.get(key) is not None:
+                    setattr(user, key, instance.get(key))
+
+        def one(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            user = User.objects.filter(id=self.data.get('id')).first()
+            return UserInstanceSerializer(user).data
+
+        def re_password(self, instance, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+                UserManageSerializer.RePasswordInstance(data=instance).is_valid(raise_exception=True)
+            user = User.objects.filter(id=self.data.get('id')).first()
+            user.password = password_encrypt(instance.get('password'))
+            user.save()
+            return True
+
