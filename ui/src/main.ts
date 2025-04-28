@@ -10,6 +10,7 @@ import App from './App.vue'
 import router from '@/router'
 import i18n from '@/locales'
 import Components from '@/components'
+import directives from '@/directives'
 const app = createApp(App)
 app.use(createPinia())
 for (const [key, component] of Object.entries(ElementPlusIcons)) {
@@ -18,11 +19,12 @@ for (const [key, component] of Object.entries(ElementPlusIcons)) {
 const locale_map: any = {
   'zh-CN': zhCn,
   'zh-Hant': zhTW,
-  'en-US': enUs
+  'en-US': enUs,
 }
 app.use(ElementPlus, {
-  locale: locale_map[localStorage.getItem('MaxKB-locale') || navigator.language || 'en-US']
+  locale: locale_map[localStorage.getItem('MaxKB-locale') || navigator.language || 'en-US'],
 })
+app.use(directives)
 app.use(router)
 app.use(i18n)
 app.use(Components)

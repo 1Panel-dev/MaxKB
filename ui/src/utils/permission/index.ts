@@ -1,4 +1,4 @@
-import useStore from '@/stores';
+import useStore from '@/stores'
 import { Role, Permission, ComplexPermission } from '@/utils/permission/type'
 /**
  * 是否包含当前权限
@@ -6,7 +6,7 @@ import { Role, Permission, ComplexPermission } from '@/utils/permission/type'
  * @returns  True 包含 false 不包含
  */
 const hasPermissionChild = (permission: Role | string | Permission | ComplexPermission) => {
-  const { user } = useStore();
+  const { user } = useStore()
   const permissions = user.getPermissions()
   const role = user.getRole()
   if (!permission) {
@@ -43,7 +43,7 @@ export const hasPermission = (
     | string
     | Permission
     | ComplexPermission,
-  compare: 'OR' | 'AND'
+  compare: 'OR' | 'AND',
 ): boolean => {
   if (permission instanceof Array) {
     return compare === 'OR'
