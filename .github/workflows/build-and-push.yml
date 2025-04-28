@@ -7,7 +7,7 @@ on:
     inputs:
       dockerImageTag:
         description: 'Image Tag'
-        default: 'v1.10.6-dev'
+        default: 'v1.10.7-dev'
         required: true
       dockerImageTagWithLatest:
         description: '是否发布latest tag（正式发版时选择，测试版本切勿选择）'
@@ -36,7 +36,7 @@ on:
 jobs:
   build-and-push-to-fit2cloud-registry:
     if: ${{ contains(github.event.inputs.registry, 'fit2cloud') }}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - name: Check Disk Space
         run: df -h
@@ -52,10 +52,6 @@ jobs:
           swap-storage: true
       - name: Check Disk Space
         run: df -h
-      - name: Set Swap Space
-        uses: pierotofy/set-swap-space@master
-        with:
-          swap-size-gb: 8
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -73,13 +69,10 @@ jobs:
             DOCKER_IMAGE_TAGS="--tag ${DOCKER_IMAGE}:${TAG_NAME}"
           fi
           echo ::set-output name=buildx_args::--platform ${DOCKER_PLATFORMS} --memory-swap -1 \
-            --build-arg DOCKER_IMAGE_TAG=${{ github.event.inputs.dockerImageTag }} --build-arg BUILD_AT=$(TZ=Asia/Shanghai date +'%Y-%m-%dT%H:%M') --build-arg GITHUB_COMMIT=${GITHUB_SHA::8} --no-cache \
+            --build-arg DOCKER_IMAGE_TAG=${{ github.event.inputs.dockerImageTag }} --build-arg BUILD_AT=$(TZ=Asia/Shanghai date +'%Y-%m-%dT%H:%M') --build-arg GITHUB_COMMIT=`git rev-parse --short HEAD` --no-cache \
             ${DOCKER_IMAGE_TAGS} .
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
-        with:
-          # Until https://github.com/tonistiigi/binfmt/issues/215
-          image: tonistiigi/binfmt:qemu-v7.0.0-28
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Login to GitHub Container Registry
@@ -96,11 +89,12 @@ jobs:
           password: ${{ secrets.FIT2CLOUD_REGISTRY_PASSWORD }}
       - name: Docker Buildx (build-and-push)
         run: |
+          sudo sync && echo 3 | sudo tee /proc/sys/vm/drop_caches && free -m
           docker buildx build --output "type=image,push=true" ${{ steps.prepare.outputs.buildx_args }} -f installer/Dockerfile
 
   build-and-push-to-dockerhub:
     if: ${{ contains(github.event.inputs.registry, 'dockerhub') }}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - name: Check Disk Space
         run: df -h
@@ -116,10 +110,6 @@ jobs:
           swap-storage: true
       - name: Check Disk Space
         run: df -h
-      - name: Set Swap Space
-        uses: pierotofy/set-swap-space@master
-        with:
-          swap-size-gb: 8
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -137,13 +127,10 @@ jobs:
             DOCKER_IMAGE_TAGS="--tag ${DOCKER_IMAGE}:${TAG_NAME}"
           fi
           echo ::set-output name=buildx_args::--platform ${DOCKER_PLATFORMS} --memory-swap -1 \
-            --build-arg DOCKER_IMAGE_TAG=${{ github.event.inputs.dockerImageTag }} --build-arg BUILD_AT=$(TZ=Asia/Shanghai date +'%Y-%m-%dT%H:%M') --build-arg GITHUB_COMMIT=${GITHUB_SHA::8} --no-cache \
+            --build-arg DOCKER_IMAGE_TAG=${{ github.event.inputs.dockerImageTag }} --build-arg BUILD_AT=$(TZ=Asia/Shanghai date +'%Y-%m-%dT%H:%M') --build-arg GITHUB_COMMIT=`git rev-parse --short HEAD` --no-cache \
             ${DOCKER_IMAGE_TAGS} .
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
-        with:
-          # Until https://github.com/tonistiigi/binfmt/issues/215
-          image: tonistiigi/binfmt:qemu-v7.0.0-28
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Login to GitHub Container Registry
@@ -159,4 +146,5 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Docker Buildx (build-and-push)
         run: |
+          sudo sync && echo 3 | sudo tee /proc/sys/vm/drop_caches && free -m
           docker buildx build --output "type=image,push=true" ${{ steps.prepare.outputs.buildx_args }} -f installer/Dockerfile
