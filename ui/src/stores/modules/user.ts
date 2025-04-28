@@ -36,8 +36,8 @@ const useLoginStore = defineStore('user', {
       return !this.themeInfo?.theme || this.themeInfo?.theme === '#3370FF'
     },
     async profile() {
-      return UserApi.getUserProfile().then((ok: { data: User }) => {
-        this.userInfo = ok.data
+      return UserApi.getUserProfile().then((ok) => {
+        this.userInfo = ok
         useLocalStorage<string>(localeConfigKey, 'en-US').value =
           ok.data?.language || this.getLanguage()
         // return this.asyncGetProfile()
@@ -72,7 +72,7 @@ const useLoginStore = defineStore('user', {
           ? [...this.userInfo?.permissions, 'x-pack']
           : this.userInfo?.permissions
       } else {
-        return []
+        return this.userInfo?.permissions
       }
     },
     getRole() {

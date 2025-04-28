@@ -17,6 +17,24 @@ export class Permission {
   constructor(permission: string) {
     this.permission = permission
   }
+  /**
+   * 工作空间权限
+   * @param workspace_id 工作空间id
+   * @returns 工作空间权限
+   */
+  getWorkspacePermission(workspace_id: string) {
+    return `${this.permission}:/WORKSPACE/${workspace_id}`
+  }
+  /**
+   * 工作空间资源权限
+   * @param workspace_id 工作空间id
+   * @param resource     资源
+   * @param resource_id  资源id
+   * @returns  工作空间资源权限
+   */
+  getWorkspaceResourcePermission(workspace_id: string, resource: string, resource_id: string) {
+    return `${this.permission}:/WORKSPACE/${workspace_id}/${resource}/${resource_id}`
+  }
 }
 /**
  * 复杂权限对象
