@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-21 12:58+0800\n"
+"POT-Creation-Date: 2025-04-28 13:32+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,8 +30,50 @@ msgstr ""
 msgid "No permission to access"
 msgstr ""
 
-#: apps/common/auth/handle/impl/user_token.py:157
+#: apps/common/auth/handle/impl/user_token.py:241
 msgid "Login expired"
+msgstr ""
+
+#: apps/common/constants/exception_code_constants.py:31
+#: apps/users/serializers/login.py:53
+msgid "The username or password is incorrect"
+msgstr ""
+
+#: apps/common/constants/exception_code_constants.py:32
+msgid "Please log in first and bring the user Token"
+msgstr ""
+
+#: apps/common/constants/exception_code_constants.py:33
+msgid "Email sending failed"
+msgstr ""
+
+#: apps/common/constants/exception_code_constants.py:34
+msgid "Email format error"
+msgstr ""
+
+#: apps/common/constants/exception_code_constants.py:35
+msgid "The email has been registered, please log in directly"
+msgstr ""
+
+#: apps/common/constants/exception_code_constants.py:36
+msgid "The email is not registered, please register first"
+msgstr ""
+
+#: apps/common/constants/exception_code_constants.py:38
+msgid "The verification code is incorrect or the verification code has expired"
+msgstr ""
+
+#: apps/common/constants/exception_code_constants.py:39
+msgid "The username has been registered, please log in directly"
+msgstr ""
+
+#: apps/common/constants/exception_code_constants.py:41
+msgid ""
+"The username cannot be empty and must be between 6 and 20 characters long."
+msgstr ""
+
+#: apps/common/constants/exception_code_constants.py:43
+msgid "Password and confirmation password are inconsistent"
 msgstr ""
 
 #: apps/common/exception/handle_exception.py:32
@@ -78,28 +120,184 @@ msgstr ""
 msgid "Success"
 msgstr ""
 
-#: apps/common/utils/common.py:83
+#: apps/common/utils/common.py:85
 msgid "Text-to-speech node, the text content must be of string type"
 msgstr ""
 
-#: apps/common/utils/common.py:85
+#: apps/common/utils/common.py:87
 msgid "Text-to-speech node, the text content cannot be empty"
 msgstr ""
 
-#: apps/maxkb/settings/base.py:83
-msgid "Intelligent customer service platform"
+#: apps/common/utils/common.py:227
+#, python-brace-format
+msgid "Limit {count} exceeded, please contact us (https://fit2cloud.com/)."
 msgstr ""
 
-#: apps/models_provider/api/model.py:36 apps/models_provider/api/model.py:49
+#: apps/folders/models/folder.py:6 apps/folders/models/folder.py:13
+#: apps/folders/serializers/folder.py:86
+msgid "folder name"
+msgstr ""
+
+#: apps/folders/models/folder.py:9 apps/folders/models/folder.py:15
+#: apps/folders/serializers/folder.py:89
+msgid "parent id"
+msgstr ""
+
+#: apps/folders/serializers/folder.py:63
+msgid "Folder depth cannot exceed 3 levels"
+msgstr ""
+
+#: apps/folders/serializers/folder.py:85 apps/folders/serializers/folder.py:121
+#: apps/knowledge/serializers/knowledge.py:22
+#: apps/knowledge/serializers/knowledge.py:29
+#: apps/tools/serializers/tool.py:339
+msgid "folder id"
+msgstr ""
+
+#: apps/folders/serializers/folder.py:87
+msgid "folder user id"
+msgstr ""
+
+#: apps/folders/serializers/folder.py:88 apps/folders/serializers/folder.py:122
+#: apps/folders/serializers/folder.py:166
+#: apps/knowledge/serializers/knowledge.py:39
+#: apps/models_provider/api/model.py:40 apps/models_provider/api/model.py:53
 #: apps/models_provider/serializers/model_serializer.py:262
 #: apps/models_provider/serializers/model_serializer.py:326
-#: apps/modules/serializers/module.py:31 apps/modules/serializers/module.py:63
-#: apps/modules/serializers/module.py:95 apps/tools/serializers/tool.py:66
-#: apps/tools/serializers/tool.py:87 apps/tools/serializers/tool.py:116
+#: apps/tools/serializers/tool.py:169 apps/tools/serializers/tool.py:190
+#: apps/tools/serializers/tool.py:248 apps/tools/serializers/tool.py:292
+#: apps/tools/serializers/tool.py:322 apps/tools/serializers/tool.py:338
 msgid "workspace id"
 msgstr ""
 
-#: apps/models_provider/api/model.py:55
+#: apps/folders/serializers/folder.py:92
+#: apps/knowledge/serializers/knowledge.py:38
+#: apps/models_provider/serializers/model_serializer.py:108
+#: apps/models_provider/serializers/model_serializer.py:215
+#: apps/models_provider/serializers/model_serializer.py:255
+#: apps/tools/serializers/tool.py:168 apps/tools/serializers/tool.py:189
+msgid "user id"
+msgstr ""
+
+#: apps/folders/serializers/folder.py:93 apps/folders/serializers/folder.py:123
+#: apps/folders/serializers/folder.py:167 apps/tools/serializers/tool.py:97
+msgid "source"
+msgstr ""
+
+#: apps/folders/serializers/folder.py:106
+msgid "Folder name already exists"
+msgstr ""
+
+#: apps/folders/serializers/folder.py:132
+msgid "Folder does not exist"
+msgstr ""
+
+#: apps/folders/serializers/folder.py:160
+msgid "Cannot delete root folder"
+msgstr ""
+
+#: apps/folders/views/folder.py:19 apps/folders/views/folder.py:20
+msgid "Create folder"
+msgstr ""
+
+#: apps/folders/views/folder.py:24 apps/folders/views/folder.py:41
+#: apps/folders/views/folder.py:60 apps/folders/views/folder.py:75
+#: apps/folders/views/folder.py:90
+msgid "Folder"
+msgstr ""
+
+#: apps/folders/views/folder.py:37 apps/folders/views/folder.py:38
+msgid "Get folder tree"
+msgstr ""
+
+#: apps/folders/views/folder.py:55 apps/folders/views/folder.py:56
+msgid "Update folder"
+msgstr ""
+
+#: apps/folders/views/folder.py:71 apps/folders/views/folder.py:72
+msgid "Get folder"
+msgstr ""
+
+#: apps/folders/views/folder.py:86 apps/folders/views/folder.py:87
+msgid "Delete folder"
+msgstr ""
+
+#: apps/knowledge/serializers/knowledge.py:21
+#: apps/knowledge/serializers/knowledge.py:28
+msgid "knowledge name"
+msgstr ""
+
+#: apps/knowledge/serializers/knowledge.py:23
+#: apps/knowledge/serializers/knowledge.py:30
+msgid "knowledge description"
+msgstr ""
+
+#: apps/knowledge/serializers/knowledge.py:24
+#: apps/knowledge/serializers/knowledge.py:31
+msgid "knowledge embedding"
+msgstr ""
+
+#: apps/knowledge/serializers/knowledge.py:32
+msgid "source url"
+msgstr ""
+
+#: apps/knowledge/serializers/knowledge.py:33
+msgid "knowledge selector"
+msgstr ""
+
+#: apps/knowledge/serializers/knowledge.py:43
+msgid ""
+"The community version supports up to 50 knowledge bases. If you need more "
+"knowledge bases, please contact us (https://fit2cloud.com/)."
+msgstr ""
+
+#: apps/knowledge/serializers/knowledge.py:52
+#: apps/knowledge/serializers/knowledge.py:76
+msgid "Knowledge base name duplicate!"
+msgstr ""
+
+#: apps/knowledge/task/sync.py:30 apps/knowledge/task/sync.py:45
+#, python-brace-format
+msgid "Start--->Start synchronization web knowledge base:{knowledge_id}"
+msgstr ""
+
+#: apps/knowledge/task/sync.py:35 apps/knowledge/task/sync.py:49
+#, python-brace-format
+msgid "End--->End synchronization web knowledge base:{knowledge_id}"
+msgstr ""
+
+#: apps/knowledge/task/sync.py:37 apps/knowledge/task/sync.py:51
+#, python-brace-format
+msgid "Synchronize web knowledge base:{knowledge_id} error{error}{traceback}"
+msgstr ""
+
+#: apps/knowledge/task/tools.py:114
+#, python-brace-format
+msgid "Association problem failed {error}"
+msgstr ""
+
+#: apps/knowledge/views/knowledge.py:19 apps/knowledge/views/knowledge.py:20
+msgid "Get knowledge by folder"
+msgstr ""
+
+#: apps/knowledge/views/knowledge.py:23 apps/knowledge/views/knowledge.py:42
+#: apps/knowledge/views/knowledge.py:61
+msgid "Knowledge Base"
+msgstr ""
+
+#: apps/knowledge/views/knowledge.py:37 apps/knowledge/views/knowledge.py:38
+msgid "Create base knowledge"
+msgstr ""
+
+#: apps/knowledge/views/knowledge.py:56 apps/knowledge/views/knowledge.py:57
+msgid "Create web knowledge"
+msgstr ""
+
+#: apps/maxkb/settings/base.py:84
+msgid "Intelligent customer service platform"
+msgstr ""
+
+#: apps/models_provider/api/model.py:59
 #: apps/models_provider/serializers/model_serializer.py:107
 #: apps/models_provider/serializers/model_serializer.py:367
 msgid "model id"
@@ -109,7 +307,7 @@ msgstr ""
 #: apps/models_provider/api/provide.py:23
 #: apps/models_provider/api/provide.py:28
 #: apps/models_provider/api/provide.py:30
-#: apps/models_provider/api/provide.py:67
+#: apps/models_provider/api/provide.py:82
 #: apps/models_provider/serializers/model_serializer.py:40
 #: apps/models_provider/serializers/model_serializer.py:218
 #: apps/models_provider/serializers/model_serializer.py:256
@@ -119,9 +317,9 @@ msgstr ""
 
 #: apps/models_provider/api/provide.py:18
 #: apps/models_provider/api/provide.py:38
-#: apps/models_provider/api/provide.py:61
-#: apps/models_provider/api/provide.py:89
-#: apps/models_provider/api/provide.py:111
+#: apps/models_provider/api/provide.py:76
+#: apps/models_provider/api/provide.py:104
+#: apps/models_provider/api/provide.py:126
 #: apps/models_provider/serializers/model_serializer.py:41
 #: apps/models_provider/serializers/model_serializer.py:257
 #: apps/models_provider/serializers/model_serializer.py:324
@@ -137,8 +335,8 @@ msgid "value"
 msgstr ""
 
 #: apps/models_provider/api/provide.py:29
-#: apps/models_provider/api/provide.py:55
-#: apps/models_provider/api/provide.py:83
+#: apps/models_provider/api/provide.py:70
+#: apps/models_provider/api/provide.py:98
 #: apps/models_provider/serializers/model_serializer.py:42
 #: apps/models_provider/serializers/model_serializer.py:220
 #: apps/models_provider/serializers/model_serializer.py:258
@@ -146,7 +344,7 @@ msgstr ""
 msgid "model type"
 msgstr ""
 
-#: apps/models_provider/api/provide.py:34 apps/tools/serializers/tool.py:38
+#: apps/models_provider/api/provide.py:34 apps/tools/serializers/tool.py:107
 msgid "input type"
 msgstr ""
 
@@ -166,8 +364,8 @@ msgstr ""
 msgid "method"
 msgstr ""
 
-#: apps/models_provider/api/provide.py:40 apps/tools/serializers/tool.py:23
-#: apps/tools/serializers/tool.py:37
+#: apps/models_provider/api/provide.py:40 apps/tools/serializers/tool.py:92
+#: apps/tools/serializers/tool.py:106
 msgid "required"
 msgstr ""
 
@@ -203,35 +401,35 @@ msgstr ""
 msgid "The current platform does not support downloading models"
 msgstr ""
 
-#: apps/models_provider/base_model_provider.py:140
+#: apps/models_provider/base_model_provider.py:143
 msgid "LLM"
 msgstr ""
 
-#: apps/models_provider/base_model_provider.py:141
+#: apps/models_provider/base_model_provider.py:144
 msgid "Embedding Model"
 msgstr ""
 
-#: apps/models_provider/base_model_provider.py:142
+#: apps/models_provider/base_model_provider.py:145
 msgid "Speech2Text"
 msgstr ""
 
-#: apps/models_provider/base_model_provider.py:143
+#: apps/models_provider/base_model_provider.py:146
 msgid "TTS"
 msgstr ""
 
-#: apps/models_provider/base_model_provider.py:144
+#: apps/models_provider/base_model_provider.py:147
 msgid "Vision Model"
 msgstr ""
 
-#: apps/models_provider/base_model_provider.py:145
+#: apps/models_provider/base_model_provider.py:148
 msgid "Image Generation"
 msgstr ""
 
-#: apps/models_provider/base_model_provider.py:146
+#: apps/models_provider/base_model_provider.py:149
 msgid "Rerank"
 msgstr ""
 
-#: apps/models_provider/base_model_provider.py:220
+#: apps/models_provider/base_model_provider.py:223
 msgid "The model does not support"
 msgstr ""
 
@@ -264,7 +462,6 @@ msgid ""
 msgstr ""
 
 #: apps/models_provider/impl/aliyun_bai_lian_model_provider/aliyun_bai_lian_model_provider.py:69
-#: apps/models_provider/impl/qwen_model_provider/qwen_model_provider.py:40
 msgid ""
 "Tongyi Wanxiang - a large image model for text generation, supports "
 "bilingual input in Chinese and English, and supports the input of reference "
@@ -288,11 +485,11 @@ msgstr ""
 #: apps/models_provider/impl/aws_bedrock_model_provider/credential/embedding.py:34
 #: apps/models_provider/impl/aws_bedrock_model_provider/credential/llm.py:53
 #: apps/models_provider/impl/azure_model_provider/credential/embedding.py:37
-#: apps/models_provider/impl/azure_model_provider/credential/image.py:55
+#: apps/models_provider/impl/azure_model_provider/credential/image.py:40
 #: apps/models_provider/impl/azure_model_provider/credential/llm.py:69
 #: apps/models_provider/impl/deepseek_model_provider/credential/llm.py:57
 #: apps/models_provider/impl/gemini_model_provider/credential/embedding.py:36
-#: apps/models_provider/impl/gemini_model_provider/credential/image.py:51
+#: apps/models_provider/impl/gemini_model_provider/credential/image.py:32
 #: apps/models_provider/impl/gemini_model_provider/credential/llm.py:57
 #: apps/models_provider/impl/gemini_model_provider/model/stt.py:43
 #: apps/models_provider/impl/kimi_model_provider/credential/llm.py:57
@@ -301,24 +498,21 @@ msgstr ""
 #: apps/models_provider/impl/ollama_model_provider/credential/embedding.py:37
 #: apps/models_provider/impl/ollama_model_provider/credential/reranker.py:44
 #: apps/models_provider/impl/openai_model_provider/credential/embedding.py:36
-#: apps/models_provider/impl/openai_model_provider/credential/image.py:54
+#: apps/models_provider/impl/openai_model_provider/credential/image.py:35
 #: apps/models_provider/impl/openai_model_provider/credential/llm.py:59
-#: apps/models_provider/impl/qwen_model_provider/credential/image.py:56
-#: apps/models_provider/impl/qwen_model_provider/credential/llm.py:56
-#: apps/models_provider/impl/qwen_model_provider/model/tti.py:43
 #: apps/models_provider/impl/siliconCloud_model_provider/credential/embedding.py:36
-#: apps/models_provider/impl/siliconCloud_model_provider/credential/image.py:54
+#: apps/models_provider/impl/siliconCloud_model_provider/credential/image.py:35
 #: apps/models_provider/impl/siliconCloud_model_provider/credential/llm.py:58
 #: apps/models_provider/impl/siliconCloud_model_provider/credential/reranker.py:37
 #: apps/models_provider/impl/tencent_cloud_model_provider/credential/llm.py:58
 #: apps/models_provider/impl/tencent_model_provider/credential/embedding.py:23
-#: apps/models_provider/impl/tencent_model_provider/credential/image.py:56
+#: apps/models_provider/impl/tencent_model_provider/credential/image.py:37
 #: apps/models_provider/impl/tencent_model_provider/credential/llm.py:51
 #: apps/models_provider/impl/tencent_model_provider/model/tti.py:54
 #: apps/models_provider/impl/vllm_model_provider/credential/embedding.py:36
 #: apps/models_provider/impl/vllm_model_provider/credential/llm.py:50
 #: apps/models_provider/impl/volcanic_engine_model_provider/credential/embedding.py:36
-#: apps/models_provider/impl/volcanic_engine_model_provider/credential/image.py:52
+#: apps/models_provider/impl/volcanic_engine_model_provider/credential/image.py:32
 #: apps/models_provider/impl/volcanic_engine_model_provider/credential/llm.py:57
 #: apps/models_provider/impl/volcanic_engine_model_provider/model/tts.py:77
 #: apps/models_provider/impl/wenxin_model_provider/credential/embedding.py:31
@@ -327,11 +521,11 @@ msgstr ""
 #: apps/models_provider/impl/xf_model_provider/credential/llm.py:76
 #: apps/models_provider/impl/xf_model_provider/model/tts.py:101
 #: apps/models_provider/impl/xinference_model_provider/credential/embedding.py:31
-#: apps/models_provider/impl/xinference_model_provider/credential/image.py:51
+#: apps/models_provider/impl/xinference_model_provider/credential/image.py:32
 #: apps/models_provider/impl/xinference_model_provider/credential/llm.py:50
 #: apps/models_provider/impl/xinference_model_provider/credential/reranker.py:34
 #: apps/models_provider/impl/xinference_model_provider/model/tts.py:44
-#: apps/models_provider/impl/zhipu_model_provider/credential/image.py:51
+#: apps/models_provider/impl/zhipu_model_provider/credential/image.py:31
 #: apps/models_provider/impl/zhipu_model_provider/credential/llm.py:56
 #: apps/models_provider/impl/zhipu_model_provider/model/tti.py:49
 msgid "Hello"
@@ -348,35 +542,32 @@ msgstr ""
 #: apps/models_provider/impl/aws_bedrock_model_provider/credential/embedding.py:21
 #: apps/models_provider/impl/aws_bedrock_model_provider/credential/llm.py:40
 #: apps/models_provider/impl/azure_model_provider/credential/embedding.py:27
-#: apps/models_provider/impl/azure_model_provider/credential/image.py:45
+#: apps/models_provider/impl/azure_model_provider/credential/image.py:30
 #: apps/models_provider/impl/azure_model_provider/credential/llm.py:59
 #: apps/models_provider/impl/azure_model_provider/credential/stt.py:23
 #: apps/models_provider/impl/azure_model_provider/credential/tti.py:58
 #: apps/models_provider/impl/azure_model_provider/credential/tts.py:41
 #: apps/models_provider/impl/deepseek_model_provider/credential/llm.py:47
 #: apps/models_provider/impl/gemini_model_provider/credential/embedding.py:26
-#: apps/models_provider/impl/gemini_model_provider/credential/image.py:41
+#: apps/models_provider/impl/gemini_model_provider/credential/image.py:22
 #: apps/models_provider/impl/gemini_model_provider/credential/llm.py:47
 #: apps/models_provider/impl/gemini_model_provider/credential/stt.py:21
 #: apps/models_provider/impl/kimi_model_provider/credential/llm.py:47
 #: apps/models_provider/impl/local_model_provider/credential/embedding.py:27
 #: apps/models_provider/impl/local_model_provider/credential/reranker.py:28
 #: apps/models_provider/impl/ollama_model_provider/credential/embedding.py:26
-#: apps/models_provider/impl/ollama_model_provider/credential/image.py:39
+#: apps/models_provider/impl/ollama_model_provider/credential/image.py:19
 #: apps/models_provider/impl/ollama_model_provider/credential/llm.py:44
 #: apps/models_provider/impl/ollama_model_provider/credential/reranker.py:27
 #: apps/models_provider/impl/ollama_model_provider/credential/reranker.py:31
 #: apps/models_provider/impl/openai_model_provider/credential/embedding.py:26
-#: apps/models_provider/impl/openai_model_provider/credential/image.py:44
+#: apps/models_provider/impl/openai_model_provider/credential/image.py:25
 #: apps/models_provider/impl/openai_model_provider/credential/llm.py:48
 #: apps/models_provider/impl/openai_model_provider/credential/stt.py:22
 #: apps/models_provider/impl/openai_model_provider/credential/tti.py:61
 #: apps/models_provider/impl/openai_model_provider/credential/tts.py:40
-#: apps/models_provider/impl/qwen_model_provider/credential/image.py:47
-#: apps/models_provider/impl/qwen_model_provider/credential/llm.py:47
-#: apps/models_provider/impl/qwen_model_provider/credential/tti.py:68
 #: apps/models_provider/impl/siliconCloud_model_provider/credential/embedding.py:26
-#: apps/models_provider/impl/siliconCloud_model_provider/credential/image.py:44
+#: apps/models_provider/impl/siliconCloud_model_provider/credential/image.py:25
 #: apps/models_provider/impl/siliconCloud_model_provider/credential/llm.py:47
 #: apps/models_provider/impl/siliconCloud_model_provider/credential/reranker.py:28
 #: apps/models_provider/impl/siliconCloud_model_provider/credential/stt.py:22
@@ -384,14 +575,14 @@ msgstr ""
 #: apps/models_provider/impl/siliconCloud_model_provider/credential/tts.py:22
 #: apps/models_provider/impl/tencent_cloud_model_provider/credential/llm.py:47
 #: apps/models_provider/impl/tencent_model_provider/credential/embedding.py:19
-#: apps/models_provider/impl/tencent_model_provider/credential/image.py:47
+#: apps/models_provider/impl/tencent_model_provider/credential/image.py:28
 #: apps/models_provider/impl/tencent_model_provider/credential/llm.py:31
 #: apps/models_provider/impl/tencent_model_provider/credential/tti.py:78
 #: apps/models_provider/impl/vllm_model_provider/credential/embedding.py:26
-#: apps/models_provider/impl/vllm_model_provider/credential/image.py:42
+#: apps/models_provider/impl/vllm_model_provider/credential/image.py:22
 #: apps/models_provider/impl/vllm_model_provider/credential/llm.py:39
 #: apps/models_provider/impl/volcanic_engine_model_provider/credential/embedding.py:26
-#: apps/models_provider/impl/volcanic_engine_model_provider/credential/image.py:42
+#: apps/models_provider/impl/volcanic_engine_model_provider/credential/image.py:22
 #: apps/models_provider/impl/volcanic_engine_model_provider/credential/llm.py:47
 #: apps/models_provider/impl/volcanic_engine_model_provider/credential/stt.py:25
 #: apps/models_provider/impl/volcanic_engine_model_provider/credential/tti.py:41
@@ -404,13 +595,13 @@ msgstr ""
 #: apps/models_provider/impl/xf_model_provider/credential/stt.py:24
 #: apps/models_provider/impl/xf_model_provider/credential/tts.py:47
 #: apps/models_provider/impl/xinference_model_provider/credential/embedding.py:19
-#: apps/models_provider/impl/xinference_model_provider/credential/image.py:41
+#: apps/models_provider/impl/xinference_model_provider/credential/image.py:22
 #: apps/models_provider/impl/xinference_model_provider/credential/llm.py:39
 #: apps/models_provider/impl/xinference_model_provider/credential/reranker.py:25
 #: apps/models_provider/impl/xinference_model_provider/credential/stt.py:21
 #: apps/models_provider/impl/xinference_model_provider/credential/tti.py:59
 #: apps/models_provider/impl/xinference_model_provider/credential/tts.py:39
-#: apps/models_provider/impl/zhipu_model_provider/credential/image.py:41
+#: apps/models_provider/impl/zhipu_model_provider/credential/image.py:21
 #: apps/models_provider/impl/zhipu_model_provider/credential/llm.py:47
 #: apps/models_provider/impl/zhipu_model_provider/credential/tti.py:40
 #, python-brace-format
@@ -437,13 +628,13 @@ msgstr ""
 #: apps/models_provider/impl/anthropic_model_provider/credential/llm.py:65
 #: apps/models_provider/impl/aws_bedrock_model_provider/credential/embedding.py:42
 #: apps/models_provider/impl/aws_bedrock_model_provider/credential/llm.py:61
-#: apps/models_provider/impl/azure_model_provider/credential/image.py:65
+#: apps/models_provider/impl/azure_model_provider/credential/image.py:50
 #: apps/models_provider/impl/azure_model_provider/credential/stt.py:40
 #: apps/models_provider/impl/azure_model_provider/credential/tti.py:77
 #: apps/models_provider/impl/azure_model_provider/credential/tts.py:58
 #: apps/models_provider/impl/deepseek_model_provider/credential/llm.py:65
 #: apps/models_provider/impl/gemini_model_provider/credential/embedding.py:43
-#: apps/models_provider/impl/gemini_model_provider/credential/image.py:61
+#: apps/models_provider/impl/gemini_model_provider/credential/image.py:42
 #: apps/models_provider/impl/gemini_model_provider/credential/llm.py:66
 #: apps/models_provider/impl/gemini_model_provider/credential/stt.py:38
 #: apps/models_provider/impl/kimi_model_provider/credential/llm.py:64
@@ -451,16 +642,13 @@ msgstr ""
 #: apps/models_provider/impl/local_model_provider/credential/reranker.py:45
 #: apps/models_provider/impl/ollama_model_provider/credential/reranker.py:51
 #: apps/models_provider/impl/openai_model_provider/credential/embedding.py:43
-#: apps/models_provider/impl/openai_model_provider/credential/image.py:64
+#: apps/models_provider/impl/openai_model_provider/credential/image.py:45
 #: apps/models_provider/impl/openai_model_provider/credential/llm.py:67
 #: apps/models_provider/impl/openai_model_provider/credential/stt.py:39
 #: apps/models_provider/impl/openai_model_provider/credential/tti.py:80
 #: apps/models_provider/impl/openai_model_provider/credential/tts.py:58
-#: apps/models_provider/impl/qwen_model_provider/credential/image.py:66
-#: apps/models_provider/impl/qwen_model_provider/credential/llm.py:64
-#: apps/models_provider/impl/qwen_model_provider/credential/tti.py:86
 #: apps/models_provider/impl/siliconCloud_model_provider/credential/embedding.py:43
-#: apps/models_provider/impl/siliconCloud_model_provider/credential/image.py:64
+#: apps/models_provider/impl/siliconCloud_model_provider/credential/image.py:45
 #: apps/models_provider/impl/siliconCloud_model_provider/credential/llm.py:66
 #: apps/models_provider/impl/siliconCloud_model_provider/credential/reranker.py:44
 #: apps/models_provider/impl/siliconCloud_model_provider/credential/stt.py:39
@@ -468,14 +656,14 @@ msgstr ""
 #: apps/models_provider/impl/siliconCloud_model_provider/credential/tts.py:40
 #: apps/models_provider/impl/tencent_cloud_model_provider/credential/llm.py:66
 #: apps/models_provider/impl/tencent_model_provider/credential/embedding.py:30
-#: apps/models_provider/impl/tencent_model_provider/credential/image.py:66
+#: apps/models_provider/impl/tencent_model_provider/credential/image.py:47
 #: apps/models_provider/impl/tencent_model_provider/credential/llm.py:57
 #: apps/models_provider/impl/tencent_model_provider/credential/tti.py:104
 #: apps/models_provider/impl/vllm_model_provider/credential/embedding.py:43
-#: apps/models_provider/impl/vllm_model_provider/credential/image.py:62
+#: apps/models_provider/impl/vllm_model_provider/credential/image.py:42
 #: apps/models_provider/impl/vllm_model_provider/credential/llm.py:55
 #: apps/models_provider/impl/volcanic_engine_model_provider/credential/embedding.py:43
-#: apps/models_provider/impl/volcanic_engine_model_provider/credential/image.py:62
+#: apps/models_provider/impl/volcanic_engine_model_provider/credential/image.py:42
 #: apps/models_provider/impl/volcanic_engine_model_provider/credential/llm.py:66
 #: apps/models_provider/impl/volcanic_engine_model_provider/credential/stt.py:42
 #: apps/models_provider/impl/volcanic_engine_model_provider/credential/tti.py:58
@@ -486,12 +674,12 @@ msgstr ""
 #: apps/models_provider/impl/xf_model_provider/credential/llm.py:84
 #: apps/models_provider/impl/xf_model_provider/credential/stt.py:41
 #: apps/models_provider/impl/xf_model_provider/credential/tts.py:65
-#: apps/models_provider/impl/xinference_model_provider/credential/image.py:60
+#: apps/models_provider/impl/xinference_model_provider/credential/image.py:41
 #: apps/models_provider/impl/xinference_model_provider/credential/reranker.py:40
 #: apps/models_provider/impl/xinference_model_provider/credential/stt.py:37
 #: apps/models_provider/impl/xinference_model_provider/credential/tti.py:77
 #: apps/models_provider/impl/xinference_model_provider/credential/tts.py:56
-#: apps/models_provider/impl/zhipu_model_provider/credential/image.py:61
+#: apps/models_provider/impl/zhipu_model_provider/credential/image.py:41
 #: apps/models_provider/impl/zhipu_model_provider/credential/llm.py:64
 #: apps/models_provider/impl/zhipu_model_provider/credential/tti.py:59
 #, python-brace-format
@@ -502,33 +690,21 @@ msgstr ""
 #: apps/models_provider/impl/aliyun_bai_lian_model_provider/credential/llm.py:17
 #: apps/models_provider/impl/anthropic_model_provider/credential/llm.py:22
 #: apps/models_provider/impl/aws_bedrock_model_provider/credential/llm.py:14
-#: apps/models_provider/impl/azure_model_provider/credential/image.py:17
 #: apps/models_provider/impl/azure_model_provider/credential/llm.py:23
 #: apps/models_provider/impl/deepseek_model_provider/credential/llm.py:22
-#: apps/models_provider/impl/gemini_model_provider/credential/image.py:15
 #: apps/models_provider/impl/gemini_model_provider/credential/llm.py:22
 #: apps/models_provider/impl/kimi_model_provider/credential/llm.py:22
-#: apps/models_provider/impl/ollama_model_provider/credential/image.py:12
 #: apps/models_provider/impl/ollama_model_provider/credential/llm.py:20
-#: apps/models_provider/impl/openai_model_provider/credential/image.py:17
 #: apps/models_provider/impl/openai_model_provider/credential/llm.py:23
-#: apps/models_provider/impl/qwen_model_provider/credential/image.py:22
-#: apps/models_provider/impl/qwen_model_provider/credential/llm.py:22
-#: apps/models_provider/impl/siliconCloud_model_provider/credential/image.py:17
 #: apps/models_provider/impl/siliconCloud_model_provider/credential/llm.py:22
 #: apps/models_provider/impl/tencent_cloud_model_provider/credential/llm.py:22
-#: apps/models_provider/impl/tencent_model_provider/credential/image.py:22
 #: apps/models_provider/impl/tencent_model_provider/credential/llm.py:14
-#: apps/models_provider/impl/vllm_model_provider/credential/image.py:15
 #: apps/models_provider/impl/vllm_model_provider/credential/llm.py:15
-#: apps/models_provider/impl/volcanic_engine_model_provider/credential/image.py:15
 #: apps/models_provider/impl/volcanic_engine_model_provider/credential/llm.py:22
 #: apps/models_provider/impl/wenxin_model_provider/credential/llm.py:22
 #: apps/models_provider/impl/xf_model_provider/credential/llm.py:22
 #: apps/models_provider/impl/xf_model_provider/credential/llm.py:41
-#: apps/models_provider/impl/xinference_model_provider/credential/image.py:14
 #: apps/models_provider/impl/xinference_model_provider/credential/llm.py:15
-#: apps/models_provider/impl/zhipu_model_provider/credential/image.py:15
 #: apps/models_provider/impl/zhipu_model_provider/credential/llm.py:22
 msgid "Temperature"
 msgstr ""
@@ -536,33 +712,21 @@ msgstr ""
 #: apps/models_provider/impl/aliyun_bai_lian_model_provider/credential/llm.py:18
 #: apps/models_provider/impl/anthropic_model_provider/credential/llm.py:23
 #: apps/models_provider/impl/aws_bedrock_model_provider/credential/llm.py:15
-#: apps/models_provider/impl/azure_model_provider/credential/image.py:18
 #: apps/models_provider/impl/azure_model_provider/credential/llm.py:24
 #: apps/models_provider/impl/deepseek_model_provider/credential/llm.py:23
-#: apps/models_provider/impl/gemini_model_provider/credential/image.py:16
 #: apps/models_provider/impl/gemini_model_provider/credential/llm.py:23
 #: apps/models_provider/impl/kimi_model_provider/credential/llm.py:23
-#: apps/models_provider/impl/ollama_model_provider/credential/image.py:13
 #: apps/models_provider/impl/ollama_model_provider/credential/llm.py:21
-#: apps/models_provider/impl/openai_model_provider/credential/image.py:18
 #: apps/models_provider/impl/openai_model_provider/credential/llm.py:24
-#: apps/models_provider/impl/qwen_model_provider/credential/image.py:23
-#: apps/models_provider/impl/qwen_model_provider/credential/llm.py:23
-#: apps/models_provider/impl/siliconCloud_model_provider/credential/image.py:18
 #: apps/models_provider/impl/siliconCloud_model_provider/credential/llm.py:23
 #: apps/models_provider/impl/tencent_cloud_model_provider/credential/llm.py:23
-#: apps/models_provider/impl/tencent_model_provider/credential/image.py:23
 #: apps/models_provider/impl/tencent_model_provider/credential/llm.py:15
-#: apps/models_provider/impl/vllm_model_provider/credential/image.py:16
 #: apps/models_provider/impl/vllm_model_provider/credential/llm.py:16
-#: apps/models_provider/impl/volcanic_engine_model_provider/credential/image.py:16
 #: apps/models_provider/impl/volcanic_engine_model_provider/credential/llm.py:23
 #: apps/models_provider/impl/wenxin_model_provider/credential/llm.py:23
 #: apps/models_provider/impl/xf_model_provider/credential/llm.py:23
 #: apps/models_provider/impl/xf_model_provider/credential/llm.py:42
-#: apps/models_provider/impl/xinference_model_provider/credential/image.py:15
 #: apps/models_provider/impl/xinference_model_provider/credential/llm.py:16
-#: apps/models_provider/impl/zhipu_model_provider/credential/image.py:16
 #: apps/models_provider/impl/zhipu_model_provider/credential/llm.py:23
 msgid ""
 "Higher values make the output more random, while lower values make it more "
@@ -572,33 +736,21 @@ msgstr ""
 #: apps/models_provider/impl/aliyun_bai_lian_model_provider/credential/llm.py:30
 #: apps/models_provider/impl/anthropic_model_provider/credential/llm.py:31
 #: apps/models_provider/impl/aws_bedrock_model_provider/credential/llm.py:23
-#: apps/models_provider/impl/azure_model_provider/credential/image.py:26
 #: apps/models_provider/impl/azure_model_provider/credential/llm.py:32
 #: apps/models_provider/impl/azure_model_provider/credential/llm.py:43
 #: apps/models_provider/impl/deepseek_model_provider/credential/llm.py:31
-#: apps/models_provider/impl/gemini_model_provider/credential/image.py:24
 #: apps/models_provider/impl/gemini_model_provider/credential/llm.py:31
 #: apps/models_provider/impl/kimi_model_provider/credential/llm.py:31
-#: apps/models_provider/impl/ollama_model_provider/credential/image.py:21
 #: apps/models_provider/impl/ollama_model_provider/credential/llm.py:29
-#: apps/models_provider/impl/openai_model_provider/credential/image.py:26
 #: apps/models_provider/impl/openai_model_provider/credential/llm.py:32
-#: apps/models_provider/impl/qwen_model_provider/credential/image.py:31
-#: apps/models_provider/impl/qwen_model_provider/credential/llm.py:31
-#: apps/models_provider/impl/siliconCloud_model_provider/credential/image.py:26
 #: apps/models_provider/impl/siliconCloud_model_provider/credential/llm.py:31
 #: apps/models_provider/impl/tencent_cloud_model_provider/credential/llm.py:31
-#: apps/models_provider/impl/tencent_model_provider/credential/image.py:31
-#: apps/models_provider/impl/vllm_model_provider/credential/image.py:24
 #: apps/models_provider/impl/vllm_model_provider/credential/llm.py:24
-#: apps/models_provider/impl/volcanic_engine_model_provider/credential/image.py:24
 #: apps/models_provider/impl/volcanic_engine_model_provider/credential/llm.py:31
 #: apps/models_provider/impl/wenxin_model_provider/credential/llm.py:31
 #: apps/models_provider/impl/xf_model_provider/credential/llm.py:31
 #: apps/models_provider/impl/xf_model_provider/credential/llm.py:50
-#: apps/models_provider/impl/xinference_model_provider/credential/image.py:23
 #: apps/models_provider/impl/xinference_model_provider/credential/llm.py:24
-#: apps/models_provider/impl/zhipu_model_provider/credential/image.py:24
 #: apps/models_provider/impl/zhipu_model_provider/credential/llm.py:31
 msgid "Output the maximum Tokens"
 msgstr ""
@@ -622,7 +774,6 @@ msgstr ""
 #: apps/models_provider/impl/aliyun_bai_lian_model_provider/credential/tti.py:20
 #: apps/models_provider/impl/azure_model_provider/credential/tti.py:15
 #: apps/models_provider/impl/openai_model_provider/credential/tti.py:15
-#: apps/models_provider/impl/qwen_model_provider/credential/tti.py:22
 #: apps/models_provider/impl/siliconCloud_model_provider/credential/tti.py:15
 #: apps/models_provider/impl/volcanic_engine_model_provider/credential/tti.py:15
 #: apps/models_provider/impl/xinference_model_provider/credential/tti.py:14
@@ -632,14 +783,12 @@ msgstr ""
 
 #: apps/models_provider/impl/aliyun_bai_lian_model_provider/credential/tti.py:20
 #: apps/models_provider/impl/azure_model_provider/credential/tti.py:15
-#: apps/models_provider/impl/qwen_model_provider/credential/tti.py:22
 msgid "Specify the size of the generated image, such as: 1024x1024"
 msgstr ""
 
 #: apps/models_provider/impl/aliyun_bai_lian_model_provider/credential/tti.py:34
 #: apps/models_provider/impl/azure_model_provider/credential/tti.py:40
 #: apps/models_provider/impl/openai_model_provider/credential/tti.py:43
-#: apps/models_provider/impl/qwen_model_provider/credential/tti.py:34
 #: apps/models_provider/impl/siliconCloud_model_provider/credential/tti.py:43
 #: apps/models_provider/impl/xinference_model_provider/credential/tti.py:41
 msgid "Number of pictures"
@@ -647,67 +796,54 @@ msgstr ""
 
 #: apps/models_provider/impl/aliyun_bai_lian_model_provider/credential/tti.py:34
 #: apps/models_provider/impl/azure_model_provider/credential/tti.py:40
-#: apps/models_provider/impl/qwen_model_provider/credential/tti.py:34
 msgid "Specify the number of generated images"
 msgstr ""
 
 #: apps/models_provider/impl/aliyun_bai_lian_model_provider/credential/tti.py:44
-#: apps/models_provider/impl/qwen_model_provider/credential/tti.py:41
 msgid "Style"
 msgstr ""
 
 #: apps/models_provider/impl/aliyun_bai_lian_model_provider/credential/tti.py:44
-#: apps/models_provider/impl/qwen_model_provider/credential/tti.py:41
 msgid "Specify the style of generated images"
 msgstr ""
 
 #: apps/models_provider/impl/aliyun_bai_lian_model_provider/credential/tti.py:48
-#: apps/models_provider/impl/qwen_model_provider/credential/tti.py:45
 msgid "Default value, the image style is randomly output by the model"
 msgstr ""
 
 #: apps/models_provider/impl/aliyun_bai_lian_model_provider/credential/tti.py:49
-#: apps/models_provider/impl/qwen_model_provider/credential/tti.py:46
 msgid "photography"
 msgstr ""
 
 #: apps/models_provider/impl/aliyun_bai_lian_model_provider/credential/tti.py:50
-#: apps/models_provider/impl/qwen_model_provider/credential/tti.py:47
 msgid "Portraits"
 msgstr ""
 
 #: apps/models_provider/impl/aliyun_bai_lian_model_provider/credential/tti.py:51
-#: apps/models_provider/impl/qwen_model_provider/credential/tti.py:48
 msgid "3D cartoon"
 msgstr ""
 
 #: apps/models_provider/impl/aliyun_bai_lian_model_provider/credential/tti.py:52
-#: apps/models_provider/impl/qwen_model_provider/credential/tti.py:49
 msgid "animation"
 msgstr ""
 
 #: apps/models_provider/impl/aliyun_bai_lian_model_provider/credential/tti.py:53
-#: apps/models_provider/impl/qwen_model_provider/credential/tti.py:50
 msgid "painting"
 msgstr ""
 
 #: apps/models_provider/impl/aliyun_bai_lian_model_provider/credential/tti.py:54
-#: apps/models_provider/impl/qwen_model_provider/credential/tti.py:51
 msgid "watercolor"
 msgstr ""
 
 #: apps/models_provider/impl/aliyun_bai_lian_model_provider/credential/tti.py:55
-#: apps/models_provider/impl/qwen_model_provider/credential/tti.py:52
 msgid "sketch"
 msgstr ""
 
 #: apps/models_provider/impl/aliyun_bai_lian_model_provider/credential/tti.py:56
-#: apps/models_provider/impl/qwen_model_provider/credential/tti.py:53
 msgid "Chinese painting"
 msgstr ""
 
 #: apps/models_provider/impl/aliyun_bai_lian_model_provider/credential/tti.py:57
-#: apps/models_provider/impl/qwen_model_provider/credential/tti.py:54
 msgid "flat illustration"
 msgstr ""
 
@@ -791,14 +927,14 @@ msgstr ""
 #: apps/models_provider/impl/anthropic_model_provider/credential/image.py:28
 #: apps/models_provider/impl/anthropic_model_provider/credential/llm.py:52
 #: apps/models_provider/impl/azure_model_provider/credential/embedding.py:32
-#: apps/models_provider/impl/azure_model_provider/credential/image.py:50
+#: apps/models_provider/impl/azure_model_provider/credential/image.py:35
 #: apps/models_provider/impl/azure_model_provider/credential/llm.py:64
 #: apps/models_provider/impl/azure_model_provider/credential/stt.py:28
 #: apps/models_provider/impl/azure_model_provider/credential/tti.py:63
 #: apps/models_provider/impl/azure_model_provider/credential/tts.py:46
 #: apps/models_provider/impl/deepseek_model_provider/credential/llm.py:52
 #: apps/models_provider/impl/gemini_model_provider/credential/embedding.py:31
-#: apps/models_provider/impl/gemini_model_provider/credential/image.py:46
+#: apps/models_provider/impl/gemini_model_provider/credential/image.py:27
 #: apps/models_provider/impl/gemini_model_provider/credential/llm.py:52
 #: apps/models_provider/impl/gemini_model_provider/credential/stt.py:26
 #: apps/models_provider/impl/kimi_model_provider/credential/llm.py:52
@@ -808,28 +944,25 @@ msgstr ""
 #: apps/models_provider/impl/ollama_model_provider/credential/llm.py:62
 #: apps/models_provider/impl/ollama_model_provider/credential/reranker.py:63
 #: apps/models_provider/impl/openai_model_provider/credential/embedding.py:31
-#: apps/models_provider/impl/openai_model_provider/credential/image.py:49
+#: apps/models_provider/impl/openai_model_provider/credential/image.py:30
 #: apps/models_provider/impl/openai_model_provider/credential/llm.py:53
 #: apps/models_provider/impl/openai_model_provider/credential/stt.py:27
 #: apps/models_provider/impl/openai_model_provider/credential/tti.py:66
 #: apps/models_provider/impl/openai_model_provider/credential/tts.py:45
-#: apps/models_provider/impl/qwen_model_provider/credential/image.py:51
-#: apps/models_provider/impl/qwen_model_provider/credential/llm.py:51
-#: apps/models_provider/impl/qwen_model_provider/credential/tti.py:72
 #: apps/models_provider/impl/siliconCloud_model_provider/credential/embedding.py:31
-#: apps/models_provider/impl/siliconCloud_model_provider/credential/image.py:49
+#: apps/models_provider/impl/siliconCloud_model_provider/credential/image.py:30
 #: apps/models_provider/impl/siliconCloud_model_provider/credential/llm.py:52
 #: apps/models_provider/impl/siliconCloud_model_provider/credential/reranker.py:32
 #: apps/models_provider/impl/siliconCloud_model_provider/credential/stt.py:27
 #: apps/models_provider/impl/siliconCloud_model_provider/credential/tti.py:66
 #: apps/models_provider/impl/siliconCloud_model_provider/credential/tts.py:27
 #: apps/models_provider/impl/tencent_cloud_model_provider/credential/llm.py:52
-#: apps/models_provider/impl/tencent_model_provider/credential/image.py:51
+#: apps/models_provider/impl/tencent_model_provider/credential/image.py:32
 #: apps/models_provider/impl/vllm_model_provider/credential/embedding.py:31
-#: apps/models_provider/impl/vllm_model_provider/credential/image.py:47
+#: apps/models_provider/impl/vllm_model_provider/credential/image.py:27
 #: apps/models_provider/impl/vllm_model_provider/credential/llm.py:65
 #: apps/models_provider/impl/volcanic_engine_model_provider/credential/embedding.py:31
-#: apps/models_provider/impl/volcanic_engine_model_provider/credential/image.py:47
+#: apps/models_provider/impl/volcanic_engine_model_provider/credential/image.py:27
 #: apps/models_provider/impl/volcanic_engine_model_provider/credential/llm.py:52
 #: apps/models_provider/impl/volcanic_engine_model_provider/credential/stt.py:30
 #: apps/models_provider/impl/volcanic_engine_model_provider/credential/tti.py:46
@@ -841,13 +974,13 @@ msgstr ""
 #: apps/models_provider/impl/xf_model_provider/credential/stt.py:29
 #: apps/models_provider/impl/xf_model_provider/credential/tts.py:52
 #: apps/models_provider/impl/xinference_model_provider/credential/embedding.py:40
-#: apps/models_provider/impl/xinference_model_provider/credential/image.py:46
+#: apps/models_provider/impl/xinference_model_provider/credential/image.py:27
 #: apps/models_provider/impl/xinference_model_provider/credential/llm.py:59
 #: apps/models_provider/impl/xinference_model_provider/credential/reranker.py:29
 #: apps/models_provider/impl/xinference_model_provider/credential/stt.py:26
 #: apps/models_provider/impl/xinference_model_provider/credential/tti.py:64
 #: apps/models_provider/impl/xinference_model_provider/credential/tts.py:44
-#: apps/models_provider/impl/zhipu_model_provider/credential/image.py:46
+#: apps/models_provider/impl/zhipu_model_provider/credential/image.py:26
 #: apps/models_provider/impl/zhipu_model_provider/credential/llm.py:51
 #: apps/models_provider/impl/zhipu_model_provider/credential/tti.py:45
 #, python-brace-format
@@ -856,33 +989,21 @@ msgstr ""
 
 #: apps/models_provider/impl/anthropic_model_provider/credential/llm.py:32
 #: apps/models_provider/impl/aws_bedrock_model_provider/credential/llm.py:24
-#: apps/models_provider/impl/azure_model_provider/credential/image.py:27
 #: apps/models_provider/impl/azure_model_provider/credential/llm.py:33
 #: apps/models_provider/impl/azure_model_provider/credential/llm.py:44
 #: apps/models_provider/impl/deepseek_model_provider/credential/llm.py:32
-#: apps/models_provider/impl/gemini_model_provider/credential/image.py:25
 #: apps/models_provider/impl/gemini_model_provider/credential/llm.py:32
 #: apps/models_provider/impl/kimi_model_provider/credential/llm.py:32
-#: apps/models_provider/impl/ollama_model_provider/credential/image.py:22
 #: apps/models_provider/impl/ollama_model_provider/credential/llm.py:30
-#: apps/models_provider/impl/openai_model_provider/credential/image.py:27
 #: apps/models_provider/impl/openai_model_provider/credential/llm.py:33
-#: apps/models_provider/impl/qwen_model_provider/credential/image.py:32
-#: apps/models_provider/impl/qwen_model_provider/credential/llm.py:32
-#: apps/models_provider/impl/siliconCloud_model_provider/credential/image.py:27
 #: apps/models_provider/impl/siliconCloud_model_provider/credential/llm.py:32
 #: apps/models_provider/impl/tencent_cloud_model_provider/credential/llm.py:32
-#: apps/models_provider/impl/tencent_model_provider/credential/image.py:32
-#: apps/models_provider/impl/vllm_model_provider/credential/image.py:25
 #: apps/models_provider/impl/vllm_model_provider/credential/llm.py:25
-#: apps/models_provider/impl/volcanic_engine_model_provider/credential/image.py:25
 #: apps/models_provider/impl/volcanic_engine_model_provider/credential/llm.py:32
 #: apps/models_provider/impl/wenxin_model_provider/credential/llm.py:32
 #: apps/models_provider/impl/xf_model_provider/credential/llm.py:32
 #: apps/models_provider/impl/xf_model_provider/credential/llm.py:51
-#: apps/models_provider/impl/xinference_model_provider/credential/image.py:24
 #: apps/models_provider/impl/xinference_model_provider/credential/llm.py:25
-#: apps/models_provider/impl/zhipu_model_provider/credential/image.py:25
 #: apps/models_provider/impl/zhipu_model_provider/credential/llm.py:32
 msgid "Specify the maximum number of tokens that the model can generate"
 msgstr ""
@@ -1055,7 +1176,7 @@ msgid "local model"
 msgstr ""
 
 #: apps/models_provider/impl/ollama_model_provider/credential/embedding.py:30
-#: apps/models_provider/impl/ollama_model_provider/credential/image.py:43
+#: apps/models_provider/impl/ollama_model_provider/credential/image.py:23
 #: apps/models_provider/impl/ollama_model_provider/credential/llm.py:48
 #: apps/models_provider/impl/ollama_model_provider/credential/reranker.py:35
 #: apps/models_provider/impl/vllm_model_provider/credential/llm.py:43
@@ -1065,7 +1186,7 @@ msgid "API domain name is invalid"
 msgstr ""
 
 #: apps/models_provider/impl/ollama_model_provider/credential/embedding.py:35
-#: apps/models_provider/impl/ollama_model_provider/credential/image.py:48
+#: apps/models_provider/impl/ollama_model_provider/credential/image.py:28
 #: apps/models_provider/impl/ollama_model_provider/credential/llm.py:53
 #: apps/models_provider/impl/ollama_model_provider/credential/reranker.py:40
 #: apps/models_provider/impl/vllm_model_provider/credential/llm.py:47
@@ -1288,10 +1409,6 @@ msgstr ""
 msgid ""
 "gpt-4-turbo snapshot on November 6, 2023, supporting context length 128,000 "
 "tokens"
-msgstr ""
-
-#: apps/models_provider/impl/qwen_model_provider/qwen_model_provider.py:63
-msgid "Tongyi Qianwen"
 msgstr ""
 
 #: apps/models_provider/impl/tencent_cloud_model_provider/tencent_cloud_model_provider.py:58
@@ -1816,13 +1933,6 @@ msgstr ""
 msgid "certification information"
 msgstr ""
 
-#: apps/models_provider/serializers/model_serializer.py:108
-#: apps/models_provider/serializers/model_serializer.py:215
-#: apps/models_provider/serializers/model_serializer.py:255
-#: apps/modules/serializers/module.py:35 apps/tools/serializers/tool.py:65
-msgid "user id"
-msgstr ""
-
 #: apps/models_provider/serializers/model_serializer.py:116
 #: apps/models_provider/serializers/model_serializer.py:132
 #: apps/models_provider/serializers/model_serializer.py:151
@@ -1857,9 +1967,9 @@ msgstr ""
 #: apps/models_provider/views/model.py:86
 #: apps/models_provider/views/model.py:97
 #: apps/models_provider/views/model.py:111
-#: apps/models_provider/views/model.py:122
-#: apps/models_provider/views/model.py:138
-#: apps/models_provider/views/model.py:152
+#: apps/models_provider/views/model.py:123
+#: apps/models_provider/views/model.py:139
+#: apps/models_provider/views/model.py:154
 #: apps/models_provider/views/provide.py:24
 #: apps/models_provider/views/provide.py:47
 #: apps/models_provider/views/provide.py:61
@@ -1898,15 +2008,15 @@ msgstr ""
 msgid "Save model parameter form"
 msgstr ""
 
-#: apps/models_provider/views/model.py:133
-#: apps/models_provider/views/model.py:135
+#: apps/models_provider/views/model.py:134
+#: apps/models_provider/views/model.py:136
 msgid ""
 "Query model meta information, this interface does not carry authentication "
 "information"
 msgstr ""
 
-#: apps/models_provider/views/model.py:148
 #: apps/models_provider/views/model.py:149
+#: apps/models_provider/views/model.py:150
 msgid "Pause model download"
 msgstr ""
 
@@ -1926,166 +2036,167 @@ msgid "Example of obtaining model list"
 msgstr ""
 
 #: apps/models_provider/views/provide.py:75
+#: apps/models_provider/views/provide.py:76
 msgid "Get model default parameters"
 msgstr ""
 
-#: apps/models_provider/views/provide.py:76
 #: apps/models_provider/views/provide.py:92
 #: apps/models_provider/views/provide.py:93
 msgid "Get the model creation form"
 msgstr ""
 
-#: apps/modules/models/module.py:6 apps/modules/models/module.py:13
-#: apps/modules/serializers/module.py:29
-msgid "module name"
-msgstr ""
-
-#: apps/modules/models/module.py:9 apps/modules/serializers/module.py:32
-msgid "parent id"
-msgstr ""
-
-#: apps/modules/serializers/module.py:28 apps/modules/serializers/module.py:62
-msgid "module id"
-msgstr ""
-
-#: apps/modules/serializers/module.py:30
-msgid "module user id"
-msgstr ""
-
-#: apps/modules/serializers/module.py:36 apps/modules/serializers/module.py:64
-#: apps/modules/serializers/module.py:96 apps/tools/serializers/tool.py:28
-msgid "source"
-msgstr ""
-
-#: apps/modules/serializers/module.py:49
-msgid "Module name already exists"
-msgstr ""
-
-#: apps/modules/serializers/module.py:70
-msgid "Module does not exist"
-msgstr ""
-
-#: apps/modules/serializers/module.py:89
-msgid "Cannot delete root module"
-msgstr ""
-
-#: apps/modules/views/module.py:18 apps/modules/views/module.py:19
-msgid "Create module"
-msgstr ""
-
-#: apps/modules/views/module.py:23 apps/modules/views/module.py:38
-#: apps/modules/views/module.py:55 apps/modules/views/module.py:68
-#: apps/modules/views/module.py:81
-msgid "Module"
-msgstr ""
-
-#: apps/modules/views/module.py:34 apps/modules/views/module.py:35
-msgid "Get module tree"
-msgstr ""
-
-#: apps/modules/views/module.py:50 apps/modules/views/module.py:51
-msgid "Update module"
-msgstr ""
-
-#: apps/modules/views/module.py:64 apps/modules/views/module.py:65
-msgid "Get module"
-msgstr ""
-
-#: apps/modules/views/module.py:77 apps/modules/views/module.py:78
-msgid "Delete module"
-msgstr ""
-
-#: apps/tools/serializers/tool.py:22
+#: apps/tools/serializers/tool.py:91 apps/tools/serializers/tool.py:153
 msgid "variable name"
 msgstr ""
 
-#: apps/tools/serializers/tool.py:24
+#: apps/tools/serializers/tool.py:93
 msgid "type"
 msgstr ""
 
-#: apps/tools/serializers/tool.py:26
+#: apps/tools/serializers/tool.py:95
 msgid "fields only support string|int|dict|array|float"
 msgstr ""
 
-#: apps/tools/serializers/tool.py:30
+#: apps/tools/serializers/tool.py:99
 msgid "The field only supports custom|reference"
 msgstr ""
 
-#: apps/tools/serializers/tool.py:35
+#: apps/tools/serializers/tool.py:104
 msgid "field name"
 msgstr ""
 
-#: apps/tools/serializers/tool.py:36
+#: apps/tools/serializers/tool.py:105
 msgid "field label"
 msgstr ""
 
-#: apps/tools/serializers/tool.py:46
+#: apps/tools/serializers/tool.py:115 apps/tools/serializers/tool.py:133
+#: apps/tools/serializers/tool.py:340
 msgid "tool name"
 msgstr ""
 
-#: apps/tools/serializers/tool.py:49
+#: apps/tools/serializers/tool.py:118 apps/tools/serializers/tool.py:136
 msgid "tool description"
 msgstr ""
 
-#: apps/tools/serializers/tool.py:51
+#: apps/tools/serializers/tool.py:120 apps/tools/serializers/tool.py:138
+#: apps/tools/serializers/tool.py:158
 msgid "tool content"
 msgstr ""
 
-#: apps/tools/serializers/tool.py:54
+#: apps/tools/serializers/tool.py:123 apps/tools/serializers/tool.py:141
+#: apps/tools/serializers/tool.py:160
 msgid "input field list"
 msgstr ""
 
-#: apps/tools/serializers/tool.py:56
+#: apps/tools/serializers/tool.py:125 apps/tools/serializers/tool.py:143
+#: apps/tools/serializers/tool.py:161
 msgid "init field list"
 msgstr ""
 
-#: apps/tools/serializers/tool.py:58
+#: apps/tools/serializers/tool.py:127 apps/tools/serializers/tool.py:147
 msgid "Is active"
 msgstr ""
 
-#: apps/tools/serializers/tool.py:86
+#: apps/tools/serializers/tool.py:145 apps/tools/serializers/tool.py:162
+msgid "init params"
+msgstr ""
+
+#: apps/tools/serializers/tool.py:154
+msgid "variable value"
+msgstr ""
+
+#: apps/tools/serializers/tool.py:218
+msgid "field has no value set"
+msgstr ""
+
+#: apps/tools/serializers/tool.py:234 apps/tools/serializers/tool.py:239
+msgid "type error"
+msgstr ""
+
+#: apps/tools/serializers/tool.py:242
+#, python-brace-format
+msgid "Field: {name} Type: {_type} Value: {value} Type conversion error"
+msgstr ""
+
+#: apps/tools/serializers/tool.py:247
 msgid "tool id"
 msgstr ""
 
-#: apps/tools/serializers/tool.py:94
+#: apps/tools/serializers/tool.py:255
 msgid "Tool not found"
 msgstr ""
 
-#: apps/tools/serializers/tool.py:124
-msgid "Module not found"
+#: apps/tools/serializers/tool.py:290
+msgid "file"
 msgstr ""
 
-#: apps/tools/views/tool.py:18 apps/tools/views/tool.py:19
+#: apps/tools/serializers/tool.py:291
+msgid "User ID"
+msgstr ""
+
+#: apps/tools/serializers/tool.py:304
+msgid "Unsupported file format"
+msgstr ""
+
+#: apps/tools/serializers/tool.py:330 apps/tools/serializers/tool.py:349
+msgid "Folder not found"
+msgstr ""
+
+#: apps/tools/serializers/tool.py:341
+msgid "tool type"
+msgstr ""
+
+#: apps/tools/views/tool.py:21 apps/tools/views/tool.py:22
 msgid "Create tool"
 msgstr ""
 
-#: apps/tools/views/tool.py:23 apps/tools/views/tool.py:35
-#: apps/tools/views/tool.py:51 apps/tools/views/tool.py:63
-#: apps/tools/views/tool.py:75
+#: apps/tools/views/tool.py:26 apps/tools/views/tool.py:40
+#: apps/tools/views/tool.py:57 apps/tools/views/tool.py:75
+#: apps/tools/views/tool.py:89 apps/tools/views/tool.py:103
+#: apps/tools/views/tool.py:120 apps/tools/views/tool.py:144
+#: apps/tools/views/tool.py:161
 msgid "Tool"
 msgstr ""
 
-#: apps/tools/views/tool.py:31 apps/tools/views/tool.py:32
-msgid "Get tool by module"
+#: apps/tools/views/tool.py:36 apps/tools/views/tool.py:37
+msgid "Get tool by folder"
 msgstr ""
 
-#: apps/tools/views/tool.py:46 apps/tools/views/tool.py:47
+#: apps/tools/views/tool.py:53 apps/tools/views/tool.py:54
+msgid "Debug Tool"
+msgstr ""
+
+#: apps/tools/views/tool.py:70 apps/tools/views/tool.py:71
 msgid "Update tool"
 msgstr ""
 
-#: apps/tools/views/tool.py:59 apps/tools/views/tool.py:60
+#: apps/tools/views/tool.py:85 apps/tools/views/tool.py:86
 msgid "Get tool"
 msgstr ""
 
-#: apps/tools/views/tool.py:71 apps/tools/views/tool.py:72
+#: apps/tools/views/tool.py:99 apps/tools/views/tool.py:100
 msgid "Delete tool"
 msgstr ""
 
-#: apps/users/serializers/login.py:27
+#: apps/tools/views/tool.py:116 apps/tools/views/tool.py:117
+msgid "Get tool list by pagination"
+msgstr ""
+
+#: apps/tools/views/tool.py:139 apps/tools/views/tool.py:140
+msgid "Import tool"
+msgstr ""
+
+#: apps/tools/views/tool.py:157 apps/tools/views/tool.py:158
+msgid "Export tool"
+msgstr ""
+
+#: apps/users/serializers/login.py:27 apps/users/serializers/user.py:33
+#: apps/users/serializers/user.py:69
 msgid "Username"
 msgstr ""
 
-#: apps/users/serializers/login.py:28
+#: apps/users/serializers/login.py:28 apps/users/serializers/user.py:34
+#: apps/users/serializers/user.py:77
 msgid "Password"
 msgstr ""
 
@@ -2101,12 +2212,44 @@ msgstr ""
 msgid "Captcha code error or expiration"
 msgstr ""
 
-#: apps/users/serializers/login.py:53
-msgid "The username or password is incorrect"
-msgstr ""
-
 #: apps/users/serializers/login.py:55
 msgid "The user has been disabled, please contact the administrator!"
+msgstr ""
+
+#: apps/users/serializers/user.py:24
+msgid "Is Edit Password"
+msgstr ""
+
+#: apps/users/serializers/user.py:25
+msgid "permissions"
+msgstr ""
+
+#: apps/users/serializers/user.py:35 apps/users/serializers/user.py:64
+msgid "Email"
+msgstr ""
+
+#: apps/users/serializers/user.py:36 apps/users/serializers/user.py:84
+msgid "Nick name"
+msgstr ""
+
+#: apps/users/serializers/user.py:37 apps/users/serializers/user.py:86
+msgid "Phone"
+msgstr ""
+
+#: apps/users/serializers/user.py:75
+msgid "Username must be 6-20 characters long"
+msgstr ""
+
+#: apps/users/serializers/user.py:82
+msgid ""
+"The password must be 6-20 characters long and must be a combination of "
+"letters, numbers, and special characters."
+msgstr ""
+
+#: apps/users/serializers/user.py:102
+msgid ""
+"The community version supports up to 2 users. If you need more users, please "
+"contact us (https://fit2cloud.com/)."
 msgstr ""
 
 #: apps/users/views/login.py:21 apps/users/views/login.py:22
@@ -2115,7 +2258,7 @@ msgstr ""
 
 #: apps/users/views/login.py:23 apps/users/views/login.py:34
 #: apps/users/views/user.py:28 apps/users/views/user.py:40
-#: apps/users/views/user.py:53
+#: apps/users/views/user.py:53 apps/users/views/user.py:67
 msgid "User management"
 msgstr ""
 
@@ -2126,4 +2269,8 @@ msgstr ""
 #: apps/users/views/user.py:26 apps/users/views/user.py:27
 #: apps/users/views/user.py:38
 msgid "Get current user information"
+msgstr ""
+
+#: apps/users/views/user.py:65 apps/users/views/user.py:66
+msgid "Create user"
 msgstr ""
