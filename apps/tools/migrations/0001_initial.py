@@ -36,7 +36,7 @@ class Migration(migrations.Migration):
                 ('tree_id', models.PositiveIntegerField(db_index=True, editable=False)),
                 ('level', models.PositiveIntegerField(editable=False)),
                 ('parent',
-                 mptt.fields.TreeForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE,
+                 mptt.fields.TreeForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING,
                                             related_name='children', to='tools.toolfolder')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, to='users.user',
                                            verbose_name='用户id')),
@@ -73,7 +73,7 @@ class Migration(migrations.Migration):
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, to='users.user',
                                            verbose_name='用户id')),
                 ('folder',
-                 models.ForeignKey(default='root', on_delete=django.db.models.deletion.CASCADE, to='tools.toolfolder',
+                 models.ForeignKey(default='root', on_delete=django.db.models.deletion.DO_NOTHING, to='tools.toolfolder',
                                    verbose_name='文件夹id')),
             ],
             options={

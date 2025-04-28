@@ -3,7 +3,7 @@
 import os
 import subprocess
 import sys
-import uuid_utils as uuid
+import uuid_utils.compat as uuid
 from textwrap import dedent
 
 from diskcache import Cache

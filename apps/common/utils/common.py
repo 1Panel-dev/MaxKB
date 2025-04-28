@@ -124,6 +124,18 @@ def get_file_content(path):
         content = file.read()
     return content
 
+def sub_array(array: List, item_num=10):
+    result = []
+    temp = []
+    for item in array:
+        temp.append(item)
+        if len(temp) >= item_num:
+            result.append(temp)
+            temp = []
+    if len(temp) > 0:
+        result.append(temp)
+    return result
+
 
 def bytes_to_uploaded_file(file_bytes, file_name="file.txt"):
     content_type, _ = mimetypes.guess_type(file_name)
@@ -233,3 +245,15 @@ def valid_license(model=None, count=None, message=None):
         return run
 
     return inner
+
+
+def post(post_function):
+    def inner(func):
+        def run(*args, **kwargs):
+            result = func(*args, **kwargs)
+            return post_function(*result)
+
+        return run
+
+    return inner
+

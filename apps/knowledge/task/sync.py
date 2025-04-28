@@ -12,12 +12,11 @@ import traceback
 from typing import List
 
 from celery_once import QueueOnce
+from django.utils.translation import gettext_lazy as _
 
 from common.utils.fork import ForkManage, Fork
-from .tools import get_save_handler, get_sync_web_document_handler, get_sync_handler
-
 from ops import celery_app
-from django.utils.translation import gettext_lazy as _
+from .handler import get_save_handler, get_sync_web_document_handler, get_sync_handler
 
 max_kb_error = logging.getLogger("max_kb_error")
 max_kb = logging.getLogger("max_kb")
