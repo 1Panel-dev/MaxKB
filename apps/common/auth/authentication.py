@@ -88,7 +88,7 @@ def has_permissions(*permission, compare=CompareConstants.OR):
     def inner(func):
         def run(view, request, **kwargs):
             exit_list = list(
-                map(lambda p: exist(request.auth.current_role_list, request.auth.permission_list, p, request, **kwargs),
+                map(lambda p: exist(request.auth.role_list, request.auth.permission_list, p, request, **kwargs),
                     permission))
             # 判断是否有权限
             if any(exit_list) if compare == CompareConstants.OR else all(exit_list):
