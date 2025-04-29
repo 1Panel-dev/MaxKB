@@ -6,3 +6,4 @@
     @date：2025/4/16 19:07
     @desc:
 """
+from .user_resource_permission import *

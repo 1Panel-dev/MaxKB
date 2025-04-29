@@ -26,6 +26,8 @@ class Group(Enum):
 
     TOOL = "TOOL"
 
+    WORKSPACE_USER_RESOURCE_PERMISSION = "WORKSPACE_USER_RESOURCE_PERMISSION"
+
 
 class Operate(Enum):
     """
@@ -217,6 +219,11 @@ class PermissionConstants(Enum):
                                 )
     KNOWLEDGE_CREATE = Permission(group=Group.KNOWLEDGE, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN,
                                                                                             RoleConstants.USER])
+
+    WORKSPACE_USER_RESOURCE_PERMISSION_READ = Permission(group=Group.WORKSPACE_USER_RESOURCE_PERMISSION,
+                                                         operate=Operate.READ,
+                                                         role_list=[RoleConstants.ADMIN,
+                                                                    RoleConstants.WORKSPACE_MANAGE])
 
     def get_workspace_application_permission(self):
         return lambda r, kwargs: Permission(group=self.value.group, operate=self.value.operate,
