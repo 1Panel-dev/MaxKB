@@ -164,7 +164,7 @@ class ApplicationWorkflowSerializer(serializers.Serializer):
                                  max_length=256, min_length=1,
                                  error_messages=ErrMessage.char(_("Application Description")))
     work_flow = serializers.DictField(required=False, error_messages=ErrMessage.dict(_("Workflow Objects")))
-    prologue = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=4096,
+    prologue = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=102400,
                                      error_messages=ErrMessage.char(_("Opening remarks")))
 
     @staticmethod
@@ -227,7 +227,7 @@ class ApplicationSerializer(serializers.Serializer):
                                                min_value=0,
                                                max_value=1024,
                                                error_messages=ErrMessage.integer(_("Historical chat records")))
-    prologue = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=4096,
+    prologue = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=102400,
                                      error_messages=ErrMessage.char(_("Opening remarks")))
     dataset_id_list = serializers.ListSerializer(required=False, child=serializers.UUIDField(required=True),
                                                  allow_null=True,
@@ -495,7 +495,7 @@ class ApplicationSerializer(serializers.Serializer):
                                                    min_value=0,
                                                    max_value=1024,
                                                    error_messages=ErrMessage.integer(_("Historical chat records")))
-        prologue = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=4096,
+        prologue = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=102400,
                                          error_messages=ErrMessage.char(_("Opening remarks")))
         dataset_id_list = serializers.ListSerializer(required=False, child=serializers.UUIDField(required=True),
                                                      error_messages=ErrMessage.list(_("Related Knowledge Base"))
