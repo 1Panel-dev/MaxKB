@@ -174,7 +174,14 @@ class ChatSerializers(serializers.Serializer):
                 condition = base_condition & min_trample_query
             else:
                 condition = base_condition
-            return query_set.filter(condition).order_by("-application_chat.update_time")
+            inner_queryset = QuerySet(Chat).filter(application_id=self.data.get("application_id"))
+            if 'abstract' in self.data and self.data.get('abstract') is not None:
+                inner_queryset = inner_queryset.filter(abstract__icontains=self.data.get('abstract'))
+
+            return {
+                'inner_queryset': inner_queryset,
+                'default_queryset': query_set.filter(condition).order_by("-application_chat.update_time")
+            }
 
         def list(self, with_valid=True):
             if with_valid:
