@@ -160,18 +160,26 @@ class ProblemParagraphManage:
                                                            content__in=problem_list).all()
         problem_content_dict = {}
         problem_model_list = [
-            or_get(exists_problem_list, problemParagraphObject.problem_content, problemParagraphObject.knowledge_id,
-                   problemParagraphObject.document_id, problemParagraphObject.paragraph_id, problem_content_dict) for
-            problemParagraphObject in self.problem_paragraph_object_list]
+            or_get(
+                exists_problem_list,
+                problemParagraphObject.problem_content,
+                problemParagraphObject.knowledge_id,
+                problemParagraphObject.document_id,
+                problemParagraphObject.paragraph_id, problem_content_dict
+            ) for problemParagraphObject in self.problem_paragraph_object_list]
 
         problem_paragraph_mapping_list = [
-            ProblemParagraphMapping(id=uuid.uuid7(), document_id=document_id, problem_id=problem_model.id,
-                                    paragraph_id=paragraph_id,
-                                    knowledge_id=self.knowledge_id) for
-            problem_model, document_id, paragraph_id in problem_model_list]
+            ProblemParagraphMapping(
+                id=uuid.uuid7(),
+                document_id=document_id,
+                problem_id=problem_model.id,
+                paragraph_id=paragraph_id,
+                knowledge_id=self.knowledge_id
+            ) for problem_model, document_id, paragraph_id in problem_model_list]
 
-        result = [problem_model for problem_model, is_create in problem_content_dict.values() if
-                  is_create], problem_paragraph_mapping_list
+        result = [
+            problem_model for problem_model, is_create in problem_content_dict.values() if is_create
+        ], problem_paragraph_mapping_list
         return result
 
 
