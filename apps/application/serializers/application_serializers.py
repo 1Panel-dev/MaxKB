@@ -1012,7 +1012,8 @@ class ApplicationSerializer(serializers.Serializer):
                  'stt_autosend': application.stt_autosend,
                  'file_upload_enable': application.file_upload_enable,
                  'file_upload_setting': application.file_upload_setting,
-                 'work_flow': application.work_flow,
+                 'work_flow': {'nodes': [node for node in application.work_flow.get('nodes') if
+                                         node.get('id') == 'base-node']},
                  'show_source': application_access_token.show_source,
                  'language': application_access_token.language,
                  **application_setting_dict})
