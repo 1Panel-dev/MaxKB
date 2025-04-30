@@ -22,14 +22,3 @@
     padding-top: calc(var(--app-header-height) + 40px) !important;
   }
 }
-
-.sidebar-container {
-  box-sizing: border-box;
-  transition: width 0.28s;
-  width: var(--sidebar-width);
-  min-width: var(--sidebar-width);
-  background-color: var(--sidebar-bg-color);
-}
-.view-container {
-  width: calc(100% - var(--sidebar-width));
-}

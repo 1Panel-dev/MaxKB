@@ -275,7 +275,7 @@ import type { FormRules } from 'element-plus'
 import { MsgError, MsgSuccess, MsgWarning } from '@/utils/message'
 import { PermissionType, PermissionDesc } from '@/enums/model'
 import { input_type_list } from '@/components/dynamics-form/constructor/data'
-import AddParamDrawer from '@/views/template/component/AddParamDrawer.vue'
+import AddParamDrawer from '@/views/model/component/AddParamDrawer.vue'
 import { t } from '@/locales'
 
 const providerValue = ref<Provider>()

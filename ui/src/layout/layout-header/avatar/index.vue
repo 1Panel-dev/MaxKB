@@ -1,9 +1,9 @@
 <template>
   <el-dropdown trigger="click" type="primary">
     <div class="flex-center cursor">
-      <AppAvatar>
+      <el-avatar :size="30">
         <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
-      </AppAvatar>
+      </el-avatar>
       <span class="ml-8">{{ user.userInfo?.username }}</span>
       <el-icon class="el-icon--right">
         <CaretBottom />

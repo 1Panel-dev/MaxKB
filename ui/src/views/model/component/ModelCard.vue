@@ -61,7 +61,7 @@
     </div>
     <!-- progress -->
     <div class="progress-mask" v-if="currentModel.status === 'DOWNLOAD'">
-      <DownloadLoading class="percentage" />
+      <!-- <DownloadLoading class="percentage" /> -->
 
       <div class="percentage-label flex-center">
         {{ $t('views.model.download.downloading') }} <span class="dotting"></span>
@@ -125,8 +125,8 @@
 import type { Provider, Model } from '@/api/type/model'
 import ModelApi from '@/api/model/model'
 import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
-import EditModel from '@/views/template/component/EditModel.vue'
-import DownloadLoading from '@/components/loading/DownloadLoading.vue'
+import EditModel from '@/views/model/component/EditModel.vue'
+// import DownloadLoading from '@/components/loading/DownloadLoading.vue'
 import { MsgConfirm } from '@/utils/message'
 import { modelType } from '@/enums/model'
 import useStore from '@/stores'

@@ -9,3 +9,11 @@
   // --el-text-color-primary: #1f2329;
   // --el-font-line-height-primary: 22px;
 }
+
+.el-avatar {
+  --el-avatar-bg-color: var(--el-color-primary);
+  --el-avatar-size-small: 33px;
+  --el-avatar-border-radius: 6px;
+  cursor: pointer;
+  flex-shrink: 0;
+}

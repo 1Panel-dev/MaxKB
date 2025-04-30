@@ -3,20 +3,18 @@
     <div class="app-header">
       <UserHeader />
     </div>
-
     <div class="app-main">
-      <div class="main-layout h-full flex">
-        <div class="sidebar-container">
+      <layout-container>
+        <template #left>
           <Sidebar />
-        </div>
-        <div class="view-container">
+        </template>
+        <template #right>
           <AppMain />
-        </div>
-      </div>
+        </template>
+      </layout-container>
     </div>
   </div>
 </template>
-
 <script setup lang="ts">
 import UserHeader from '@/layout/layout-header/UserHeader.vue'
 import Sidebar from '@/layout/components/sidebar/index.vue'
@@ -25,5 +23,5 @@ import useStore from '@/stores'
 const { user } = useStore()
 </script>
 <style lang="scss" scoped>
-@import './index.scss';
+@use './index.scss';
 </style>
