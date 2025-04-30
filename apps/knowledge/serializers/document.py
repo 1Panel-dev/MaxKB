@@ -72,13 +72,17 @@ class DocumentSerializers(serializers.Serializer):
             if embedding_model.permission_type == 'PRIVATE' and knowledge_user_id != embedding_model.user_id:
                 raise AppApiException(500, _('No permission to use this model') + f"{embedding_model.name}")
             document_id = self.data.get("document_id")
-            ListenerManagement.update_status(QuerySet(Document).filter(id=document_id), TaskType.EMBEDDING,
-                                             State.PENDING)
-            ListenerManagement.update_status(QuerySet(Paragraph).annotate(
-                reversed_status=Reverse('status'),
-                task_type_status=Substr('reversed_status', TaskType.EMBEDDING.value, 1),
-            ).filter(task_type_status__in=state_list, document_id=document_id).values('id'),
-                                             TaskType.EMBEDDING, State.PENDING)
+            ListenerManagement.update_status(
+                QuerySet(Document).filter(id=document_id), TaskType.EMBEDDING, State.PENDING
+            )
+            ListenerManagement.update_status(
+                QuerySet(Paragraph).annotate(
+                    reversed_status=Reverse('status'),
+                    task_type_status=Substr('reversed_status', TaskType.EMBEDDING.value, 1),
+                ).filter(task_type_status__in=state_list, document_id=document_id).values('id'),
+                TaskType.EMBEDDING,
+                State.PENDING
+            )
             ListenerManagement.get_aggregation_document_status(document_id)()
 
             try:
@@ -122,8 +126,9 @@ class DocumentSerializers(serializers.Serializer):
             # 批量插入问题
             QuerySet(Problem).bulk_create(problem_model_list) if len(problem_model_list) > 0 else None
             # 批量插入关联问题
-            QuerySet(ProblemParagraphMapping).bulk_create(problem_paragraph_mapping_list) if len(
-                problem_paragraph_mapping_list) > 0 else None
+            QuerySet(ProblemParagraphMapping).bulk_create(
+                problem_paragraph_mapping_list
+            ) if len(problem_paragraph_mapping_list) > 0 else None
             document_id = str(document_model.id)
             return (DocumentSerializers.Operate(
                 data={'knowledge_id': knowledge_id, 'document_id': document_id}
@@ -160,13 +165,15 @@ class DocumentSerializers(serializers.Serializer):
                     'knowledge_id': knowledge_id,
                     'id': uuid.uuid7(),
                     'name': instance.get('name'),
-                    'char_length': reduce(lambda x, y: x + y,
-                                          [len(p.get('content')) for p in instance.get('paragraphs', [])],
-                                          0),
+                    'char_length': reduce(
+                        lambda x, y: x + y,
+                        [len(p.get('content')) for p in instance.get('paragraphs', [])],
+                        0),
                     'meta': instance.get('meta') if instance.get('meta') is not None else {},
                     'type': instance.get('type') if instance.get('type') is not None else KnowledgeType.BASE
                 })
 
-            return DocumentSerializers.Create.get_paragraph_model(document_model,
-                                                                  instance.get('paragraphs') if
-                                                                  'paragraphs' in instance else [])
+            return DocumentSerializers.Create.get_paragraph_model(
+                document_model,
+                instance.get('paragraphs') if 'paragraphs' in instance else []
+            )

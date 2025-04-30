@@ -13,7 +13,7 @@ from common.utils.common import post
 from knowledge.models import Paragraph, Problem, Document, ProblemParagraphMapping
 from knowledge.serializers.common import ProblemParagraphObject, ProblemParagraphManage, \
     get_embedding_model_id_by_knowledge_id, update_document_char_length
-from knowledge.serializers.problem import ProblemInstanceSerializer
+from knowledge.serializers.problem import ProblemInstanceSerializer, ProblemSerializer
 from knowledge.task import embedding_by_paragraph, enable_embedding_by_paragraph, disable_embedding_by_paragraph, \
     delete_embedding_by_paragraph
 
@@ -53,7 +53,7 @@ class ParagraphSerializers(serializers.Serializer):
         # 段落id
         paragraph_id = serializers.UUIDField(required=True, label=_('paragraph id'))
         # 知识库id
-        dataset_id = serializers.UUIDField(required=True, label=_('dataset id'))
+        knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
         # 文档id
         document_id = serializers.UUIDField(required=True, label=_('document id'))
 
@@ -105,20 +105,27 @@ class ParagraphSerializers(serializers.Serializer):
                 QuerySet(Problem).filter(id__in=[row.id for row in delete_problem_list]).delete() if len(
                     delete_problem_list) > 0 else None
                 # 插入新的问题
-                QuerySet(Problem).bulk_create(
-                    [Problem(id=uuid.uuid1(), content=p.get('content'), paragraph_id=self.data.get('paragraph_id'),
-                             dataset_id=self.data.get('dataset_id'), document_id=self.data.get('document_id')) for
-                     p in create_problem_list]) if len(create_problem_list) else None
+                QuerySet(Problem).bulk_create([
+                    Problem(
+                        id=uuid.uuid7(),
+                        content=p.get('content'),
+                        paragraph_id=self.data.get('paragraph_id'),
+                        knowledge_id=self.data.get('knowledge_id'),
+                        document_id=self.data.get('document_id')
+                    ) for p in create_problem_list
+                ]) if len(create_problem_list) else None
 
                 # 修改问题集合
-                QuerySet(Problem).bulk_update(
-                    [Problem(id=row.get('id'), content=row.get('content')) for row in update_problem_list],
-                    ['content']) if len(
-                    update_problem_list) > 0 else None
+                QuerySet(Problem).bulk_update([
+                    Problem(
+                        id=row.get('id'),
+                        content=row.get('content')
+                    ) for row in update_problem_list], ['content']
+                ) if len(update_problem_list) > 0 else None
 
             _paragraph.save()
             update_document_char_length(self.data.get('document_id'))
-            return self.one(), instance, self.data.get('dataset_id')
+            return self.one(), instance, self.data.get('knowledge_id')
 
         def get_problem_list(self):
             ProblemParagraphMapping(ProblemParagraphMapping)
@@ -172,8 +179,9 @@ class ParagraphSerializers(serializers.Serializer):
             # 插入問題
             QuerySet(Problem).bulk_create(problem_model_list) if len(problem_model_list) > 0 else None
             # 插入问题关联关系
-            QuerySet(ProblemParagraphMapping).bulk_create(problem_paragraph_mapping_list) if len(
-                problem_paragraph_mapping_list) > 0 else None
+            QuerySet(ProblemParagraphMapping).bulk_create(
+                problem_paragraph_mapping_list
+            ) if len(problem_paragraph_mapping_list) > 0 else None
             # 修改长度
             update_document_char_length(document_id)
             if with_embedding:
@@ -185,17 +193,21 @@ class ParagraphSerializers(serializers.Serializer):
 
         @staticmethod
         def get_paragraph_problem_model(knowledge_id: str, document_id: str, instance: Dict):
-            paragraph = Paragraph(id=uuid.uuid7(),
-                                  document_id=document_id,
-                                  content=instance.get("content"),
-                                  knowledge_id=knowledge_id,
-                                  title=instance.get("title") if 'title' in instance else '')
-            problem_paragraph_object_list = [
-                ProblemParagraphObject(knowledge_id, document_id, paragraph.id, problem.get('content')) for problem in
-                (instance.get('problem_list') if 'problem_list' in instance else [])]
+            paragraph = Paragraph(
+                id=uuid.uuid7(),
+                document_id=document_id,
+                content=instance.get("content"),
+                knowledge_id=knowledge_id,
+                title=instance.get("title") if 'title' in instance else ''
+            )
+            problem_paragraph_object_list = [ProblemParagraphObject(
+                knowledge_id, document_id, str(paragraph.id), problem.get('content')
+            ) for problem in (instance.get('problem_list') if 'problem_list' in instance else [])]
 
-            return {'paragraph': paragraph,
-                    'problem_paragraph_object_list': problem_paragraph_object_list}
+            return {
+                'paragraph': paragraph,
+                'problem_paragraph_object_list': problem_paragraph_object_list
+            }
 
         @staticmethod
         def or_get(exists_problem_list, content, knowledge_id):

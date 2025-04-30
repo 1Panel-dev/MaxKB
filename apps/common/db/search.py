@@ -24,7 +24,7 @@ def get_dynamics_model(attr: dict, table_name='dynamics'):
     :return: django 模型
     """
     attributes = {
-        "__module__": "dataset.models",
+        "__module__": "knowledge.models",
         "Meta": type("Meta", (), {'db_table': table_name}),
         **attr
     }
