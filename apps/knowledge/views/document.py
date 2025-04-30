@@ -8,7 +8,7 @@ from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
 from common.constants.permission_constants import PermissionConstants
 from common.result import result
-from knowledge.api.document import DocumentSplitAPI, DocumentBatchAPI
+from knowledge.api.document import DocumentSplitAPI, DocumentBatchAPI, DocumentBatchCreateAPI
 from knowledge.api.knowledge import KnowledgeTreeReadAPI
 from knowledge.serializers.document import DocumentSerializers
 from knowledge.serializers.knowledge import KnowledgeSerializer
@@ -76,9 +76,9 @@ class DocumentView(APIView):
             methods=['POST'],
             description=_('Create documents in batches'),
             operation_id=_('Create documents in batches'),
-            request=DocumentBatchAPI.get_request(),
-            parameters=DocumentBatchAPI.get_parameters(),
-            responses=DocumentBatchAPI.get_response(),
+            request=DocumentBatchCreateAPI.get_request(),
+            parameters=DocumentBatchCreateAPI.get_parameters(),
+            responses=DocumentBatchCreateAPI.get_response(),
             tags=[_('Knowledge Base/Documentation')]
         )
         @has_permissions([
