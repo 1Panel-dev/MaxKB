@@ -263,3 +263,10 @@ def parse_md_image(content: str):
     image_list = [match.group() for match in matches]
     return image_list
 
+def bulk_create_in_batches(model, data, batch_size=1000):
+    if len(data) == 0:
+        return
+    for i in range(0, len(data), batch_size):
+        batch = data[i:i + batch_size]
+        model.objects.bulk_create(batch)
+

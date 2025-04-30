@@ -6,9 +6,9 @@ from rest_framework.views import APIView
 
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
-from common.constants.permission_constants import PermissionConstants, CompareConstants
+from common.constants.permission_constants import PermissionConstants
 from common.result import result
-from knowledge.api.document import DocumentSplitAPI
+from knowledge.api.document import DocumentSplitAPI, DocumentBatchAPI
 from knowledge.api.knowledge import KnowledgeTreeReadAPI
 from knowledge.serializers.document import DocumentSerializers
 from knowledge.serializers.knowledge import KnowledgeSerializer
@@ -68,3 +68,60 @@ class DocumentView(APIView):
                 'workspace_id': workspace_id,
                 'knowledge_id': knowledge_id,
             }).parse(split_data))
+
+    class Batch(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['POST'],
+            description=_('Create documents in batches'),
+            operation_id=_('Create documents in batches'),
+            request=DocumentBatchAPI.get_request(),
+            parameters=DocumentBatchAPI.get_parameters(),
+            responses=DocumentBatchAPI.get_response(),
+            tags=[_('Knowledge Base/Documentation')]
+        )
+        @has_permissions([
+            PermissionConstants.DOCUMENT_CREATE.get_workspace_permission(),
+            PermissionConstants.DOCUMENT_EDIT.get_workspace_permission(),
+        ])
+        def post(self, request: Request, workspace_id: str, knowledge_id: str):
+            return result.success(DocumentSerializers.Batch(
+                data={'knowledge_id': knowledge_id, 'workspace_id': workspace_id}
+            ).batch_save(request.data))
+
+        @extend_schema(
+            methods=['PUT'],
+            description=_('Batch sync documents'),
+            operation_id=_('Batch sync documents'),
+            request=DocumentBatchAPI.get_request(),
+            parameters=DocumentBatchAPI.get_parameters(),
+            responses=DocumentBatchAPI.get_response(),
+            tags=[_('Knowledge Base/Documentation')]
+        )
+        @has_permissions([
+            PermissionConstants.DOCUMENT_CREATE.get_workspace_permission(),
+            PermissionConstants.DOCUMENT_EDIT.get_workspace_permission(),
+        ])
+        def put(self, request: Request, workspace_id: str, knowledge_id: str):
+            return result.success(DocumentSerializers.Batch(
+                data={'knowledge_id': knowledge_id, 'workspace_id': workspace_id}
+            ).batch_sync(request.data))
+
+        @extend_schema(
+            methods=['DELETE'],
+            description=_('Delete documents in batches'),
+            operation_id=_('Delete documents in batches'),
+            request=DocumentBatchAPI.get_request(),
+            parameters=DocumentBatchAPI.get_parameters(),
+            responses=DocumentBatchAPI.get_response(),
+            tags=[_('Knowledge Base/Documentation')]
+        )
+        @has_permissions([
+            PermissionConstants.DOCUMENT_CREATE.get_workspace_permission(),
+            PermissionConstants.DOCUMENT_EDIT.get_workspace_permission(),
+        ])
+        def delete(self, request: Request, workspace_id: str, knowledge_id: str):
+            return result.success(DocumentSerializers.Batch(
+                data={'workspace_id': workspace_id, 'knowledge_id': knowledge_id}
+            ).batch_delete(request.data))
