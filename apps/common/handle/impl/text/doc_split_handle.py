@@ -10,10 +10,10 @@ import io
 import os
 import re
 import traceback
-import uuid_utils.compat as uuid
 from functools import reduce
 from typing import List
 
+import uuid_utils.compat as uuid
 from docx import Document, ImagePart
 from docx.oxml import ns
 from docx.table import Table
@@ -22,7 +22,6 @@ from docx.text.paragraph import Paragraph
 from common.handle.base_split_handle import BaseSplitHandle
 from common.utils.split_model import SplitModel
 from knowledge.models import File
-from django.utils.translation import gettext_lazy as _
 
 default_pattern_list = [re.compile('(?<=^)# .*|(?<=\\n)# .*'),
                         re.compile('(?<=\\n)(?<!#)## (?!#).*|(?<=^)(?<!#)## (?!#).*'),

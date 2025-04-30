@@ -78,7 +78,6 @@ class XlsxSplitHandle(BaseParseTableHandle):
             return [{'name': file.name, 'paragraphs': []}]
         return result
 
-
     def get_content(self, file, save_image):
         try:
             # 加载 Excel 文件

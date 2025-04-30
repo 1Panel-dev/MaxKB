@@ -9,12 +9,12 @@
 import io
 import os
 import re
-import uuid_utils.compat as uuid
 import zipfile
 from typing import List
 from urllib.parse import urljoin
 
-from django.db.models import QuerySet
+import uuid_utils.compat as uuid
+from django.utils.translation import gettext_lazy as _
 
 from common.handle.base_parse_qa_handle import BaseParseQAHandle
 from common.handle.impl.qa.csv_parse_qa_handle import CsvParseQAHandle
@@ -22,7 +22,6 @@ from common.handle.impl.qa.xls_parse_qa_handle import XlsParseQAHandle
 from common.handle.impl.qa.xlsx_parse_qa_handle import XlsxParseQAHandle
 from common.utils.common import parse_md_image
 from knowledge.models import File
-from django.utils.translation import gettext_lazy as _
 
 
 class FileBufferHandle:

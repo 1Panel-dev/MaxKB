@@ -15,11 +15,11 @@ import traceback
 from typing import List
 
 import fitz
+from django.utils.translation import gettext_lazy as _
 from langchain_community.document_loaders import PyPDFLoader
 
 from common.handle.base_split_handle import BaseSplitHandle
 from common.utils.split_model import SplitModel
-from django.utils.translation import gettext_lazy as _
 
 default_pattern_list = [re.compile('(?<=^)# .*|(?<=\\n)# .*'),
                         re.compile('(?<=\\n)(?<!#)## (?!#).*|(?<=^)(?<!#)## (?!#).*'),
@@ -41,6 +41,7 @@ def check_links_in_pdf(doc):
                 if link['kind'] == 1:
                     return True
     return False
+
 
 class PdfSplitHandle(BaseSplitHandle):
     def handle(self, file, pattern_list: List, with_filter: bool, limit: int, get_buffer, save_image):
@@ -181,7 +182,8 @@ class PdfSplitHandle(BaseSplitHandle):
                 for text in split_text:
                     chapters.append({"title": real_chapter_title, "content": text})
             else:
-                chapters.append({"title": real_chapter_title, "content": chapter_text if chapter_text else real_chapter_title})
+                chapters.append(
+                    {"title": real_chapter_title, "content": chapter_text if chapter_text else real_chapter_title})
             # 保存章节内容和章节标题
         return chapters
 

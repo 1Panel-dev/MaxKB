@@ -13,14 +13,14 @@ from rest_framework import serializers
 from common.db.search import native_search
 from common.event import ListenerManagement
 from common.exception.app_exception import AppApiException
-from common.handle.impl.csv_split_handle import CsvSplitHandle
-from common.handle.impl.doc_split_handle import DocSplitHandle
-from common.handle.impl.html_split_handle import HTMLSplitHandle
-from common.handle.impl.pdf_split_handle import PdfSplitHandle
-from common.handle.impl.text_split_handle import TextSplitHandle
-from common.handle.impl.xls_split_handle import XlsSplitHandle
-from common.handle.impl.xlsx_split_handle import XlsxSplitHandle
-from common.handle.impl.zip_split_handle import ZipSplitHandle
+from common.handle.impl.text.csv_split_handle import CsvSplitHandle
+from common.handle.impl.text.doc_split_handle import DocSplitHandle
+from common.handle.impl.text.html_split_handle import HTMLSplitHandle
+from common.handle.impl.text.pdf_split_handle import PdfSplitHandle
+from common.handle.impl.text.text_split_handle import TextSplitHandle
+from common.handle.impl.text.xls_split_handle import XlsSplitHandle
+from common.handle.impl.text.xlsx_split_handle import XlsxSplitHandle
+from common.handle.impl.text.zip_split_handle import ZipSplitHandle
 from common.utils.common import post, get_file_content
 from knowledge.models import Knowledge, Paragraph, Problem, Document, KnowledgeType, ProblemParagraphMapping, State, \
     TaskType, File

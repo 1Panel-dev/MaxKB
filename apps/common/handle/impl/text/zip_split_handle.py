@@ -18,13 +18,13 @@ from charset_normalizer import detect
 from django.utils.translation import gettext_lazy as _
 
 from common.handle.base_split_handle import BaseSplitHandle
-from common.handle.impl.csv_split_handle import CsvSplitHandle
-from common.handle.impl.doc_split_handle import DocSplitHandle
-from common.handle.impl.html_split_handle import HTMLSplitHandle
-from common.handle.impl.pdf_split_handle import PdfSplitHandle
-from common.handle.impl.text_split_handle import TextSplitHandle
-from common.handle.impl.xls_split_handle import XlsSplitHandle
-from common.handle.impl.xlsx_split_handle import XlsxSplitHandle
+from common.handle.impl.text.csv_split_handle import CsvSplitHandle
+from common.handle.impl.text.doc_split_handle import DocSplitHandle
+from common.handle.impl.text.html_split_handle import HTMLSplitHandle
+from common.handle.impl.text.pdf_split_handle import PdfSplitHandle
+from common.handle.impl.text.text_split_handle import TextSplitHandle
+from common.handle.impl.text.xls_split_handle import XlsSplitHandle
+from common.handle.impl.text.xlsx_split_handle import XlsxSplitHandle
 from common.utils.common import parse_md_image
 from knowledge.models import File
 
