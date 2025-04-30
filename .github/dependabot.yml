@@ -11,14 +11,4 @@ updates:
       python-dependencies:
         patterns:
           - "*"
-  - package-ecosystem: "pip"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      timezone: "Asia/Shanghai"
-      day: "friday"
-    target-branch: "main"
-    groups:
-      python-dependencies:
-        patterns:
-          - "*"
+
