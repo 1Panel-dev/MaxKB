@@ -218,6 +218,14 @@ class PermissionConstants(Enum):
                                                                                             RoleConstants.USER])
     KNOWLEDGE_DELETE = Permission(group=Group.KNOWLEDGE, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN,
                                                                                             RoleConstants.USER])
+    DOCUMENT_READ = Permission(group=Group.KNOWLEDGE, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN,
+                                                                                            RoleConstants.USER])
+    DOCUMENT_CREATE = Permission(group=Group.KNOWLEDGE, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN,
+                                                                                            RoleConstants.USER])
+    DOCUMENT_EDIT = Permission(group=Group.KNOWLEDGE, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN,
+                                                                                            RoleConstants.USER])
+    DOCUMENT_DELETE = Permission(group=Group.KNOWLEDGE, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN,
+                                                                                            RoleConstants.USER])
 
     def get_workspace_application_permission(self):
         return lambda r, kwargs: Permission(group=self.value.group, operate=self.value.operate,

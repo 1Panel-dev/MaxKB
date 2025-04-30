@@ -257,3 +257,9 @@ def post(post_function):
 
     return inner
 
+
+def parse_md_image(content: str):
+    matches = re.finditer("!\[.*?\]\(.*?\)", content)
+    image_list = [match.group() for match in matches]
+    return image_list
+

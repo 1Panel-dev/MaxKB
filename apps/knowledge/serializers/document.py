@@ -13,13 +13,33 @@ from rest_framework import serializers
 from common.db.search import native_search
 from common.event import ListenerManagement
 from common.exception.app_exception import AppApiException
+from common.handle.impl.csv_split_handle import CsvSplitHandle
+from common.handle.impl.doc_split_handle import DocSplitHandle
+from common.handle.impl.html_split_handle import HTMLSplitHandle
+from common.handle.impl.pdf_split_handle import PdfSplitHandle
+from common.handle.impl.text_split_handle import TextSplitHandle
+from common.handle.impl.xls_split_handle import XlsSplitHandle
+from common.handle.impl.xlsx_split_handle import XlsxSplitHandle
+from common.handle.impl.zip_split_handle import ZipSplitHandle
 from common.utils.common import post, get_file_content
 from knowledge.models import Knowledge, Paragraph, Problem, Document, KnowledgeType, ProblemParagraphMapping, State, \
-    TaskType
+    TaskType, File
 from knowledge.serializers.common import ProblemParagraphManage
 from knowledge.serializers.paragraph import ParagraphSerializers, ParagraphInstanceSerializer
 from knowledge.task import embedding_by_document
 from maxkb.const import PROJECT_DIR
+
+default_split_handle = TextSplitHandle()
+split_handles = [
+    HTMLSplitHandle(),
+    DocSplitHandle(),
+    PdfSplitHandle(),
+    XlsxSplitHandle(),
+    XlsSplitHandle(),
+    CsvSplitHandle(),
+    ZipSplitHandle(),
+    default_split_handle
+]
 
 
 class DocumentInstanceSerializer(serializers.Serializer):
@@ -32,6 +52,17 @@ class DocumentCreateRequest(serializers.Serializer):
     desc = serializers.CharField(required=True, label=_('knowledge description'), max_length=256, min_length=1)
     embedding_model_id = serializers.UUIDField(required=True, label=_('embedding model'))
     documents = DocumentInstanceSerializer(required=False, many=True)
+
+
+class DocumentSplitRequest(serializers.Serializer):
+    file = serializers.ListField(required=True, label=_('file list'))
+    limit = serializers.IntegerField(required=False, label=_('limit'))
+    patterns = serializers.ListField(
+        required=False,
+        child=serializers.CharField(required=True, label=_('patterns')),
+        label=_('patterns')
+    )
+    with_filter = serializers.BooleanField(required=False, label=_('Auto Clean'))
 
 
 class DocumentSerializers(serializers.Serializer):
@@ -177,3 +208,67 @@ class DocumentSerializers(serializers.Serializer):
                 document_model,
                 instance.get('paragraphs') if 'paragraphs' in instance else []
             )
+
+    class Split(serializers.Serializer):
+        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+        knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
+
+        def is_valid(self, *, raise_exception=True):
+            super().is_valid(raise_exception=True)
+            files = self.data.get('file')
+            for f in files:
+                if f.size > 1024 * 1024 * 100:
+                    raise AppApiException(500, _(
+                        'The maximum size of the uploaded file cannot exceed {}MB'
+                    ).format(100))
+
+        def parse(self, instance):
+            self.is_valid(raise_exception=True)
+            DocumentSplitRequest(instance).is_valid(raise_exception=True)
+
+            file_list = instance.get("file")
+            return reduce(
+                lambda x, y: [*x, *y],
+                [self.file_to_paragraph(
+                    f,
+                    instance.get("patterns", None),
+                    instance.get("with_filter", None),
+                    instance.get("limit", 4096)
+                ) for f in file_list],
+                []
+            )
+
+        def save_image(self, image_list):
+            if image_list is not None and len(image_list) > 0:
+                exist_image_list = [str(i.get('id')) for i in
+                                    QuerySet(File).filter(id__in=[i.id for i in image_list]).values('id')]
+                save_image_list = [image for image in image_list if not exist_image_list.__contains__(str(image.id))]
+                save_image_list = list({img.id: img for img in save_image_list}.values())
+                # save image
+                for file in save_image_list:
+                    file_bytes = file.meta.pop('content')
+                    file.workspace_id = self.data.get('workspace_id')
+                    file.meta['knowledge_id'] = self.data.get('knowledge_id')
+                    file.save(file_bytes)
+
+        def file_to_paragraph(self, file, pattern_list: List, with_filter: bool, limit: int):
+            get_buffer = FileBufferHandle().get_buffer
+            for split_handle in split_handles:
+                if split_handle.support(file, get_buffer):
+                    result = split_handle.handle(file, pattern_list, with_filter, limit, get_buffer, self.save_image)
+                    if isinstance(result, list):
+                        return result
+                    return [result]
+            result = default_split_handle.handle(file, pattern_list, with_filter, limit, get_buffer, self.save_image)
+            if isinstance(result, list):
+                return result
+            return [result]
+
+
+class FileBufferHandle:
+    buffer = None
+
+    def get_buffer(self, file):
+        if self.buffer is None:
+            self.buffer = file.read()
+        return self.buffer
