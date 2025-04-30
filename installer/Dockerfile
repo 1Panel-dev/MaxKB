@@ -5,7 +5,7 @@ RUN cd ui && \
     npm install && \
     npm run build && \
     rm -rf ./node_modules
-FROM ghcr.io/1panel-dev/maxkb-python-pg:python3.11-pg17.4 AS stage-build
+FROM ghcr.io/1panel-dev/maxkb-base:python3.11-pg17.4 AS stage-build
 
 ARG DEPENDENCIES="                    \
         python3-pip"
@@ -29,7 +29,7 @@ RUN python3 -m venv /opt/py3 && \
     poetry install && \
     export MAXKB_CONFIG_TYPE=ENV && python3 /opt/maxkb-app/apps/manage.py compilemessages
 
-FROM ghcr.io/1panel-dev/maxkb-python-pg:python3.11-pg17.4
+FROM ghcr.io/1panel-dev/maxkb-base:python3.11-pg17.4
 ARG DOCKER_IMAGE_TAG=dev \
     BUILD_AT \
     GITHUB_COMMIT
