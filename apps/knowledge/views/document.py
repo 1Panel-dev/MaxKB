@@ -10,8 +10,8 @@ from common.constants.permission_constants import PermissionConstants
 from common.result import result
 from knowledge.api.document import DocumentSplitAPI, DocumentBatchAPI, DocumentBatchCreateAPI, DocumentCreateAPI, \
     DocumentReadAPI, DocumentEditAPI, DocumentDeleteAPI, TableDocumentCreateAPI, QaDocumentCreateAPI, \
-    WebDocumentCreateAPI, CancelTaskAPI, BatchCancelTaskAPI, SyncWebAPI, RefreshAPI, BatchEditHitHandlingAPI
-from knowledge.api.knowledge import KnowledgeTreeReadAPI
+    WebDocumentCreateAPI, CancelTaskAPI, BatchCancelTaskAPI, SyncWebAPI, RefreshAPI, BatchEditHitHandlingAPI, \
+    DocumentTreeReadAPI
 from knowledge.serializers.document import DocumentSerializers
 
 
@@ -40,8 +40,8 @@ class DocumentView(APIView):
         description=_('Get document'),
         summary=_('Get document'),
         operation_id=_('Get document'),
-        parameters=KnowledgeTreeReadAPI.get_parameters(),
-        responses=KnowledgeTreeReadAPI.get_response(),
+        parameters=DocumentTreeReadAPI.get_parameters(),
+        responses=DocumentTreeReadAPI.get_response(),
         tags=[_('Knowledge Base/Documentation')]
     )
     @has_permissions(PermissionConstants.DOCUMENT_READ.get_workspace_permission())
@@ -163,16 +163,17 @@ class DocumentView(APIView):
         authentication_classes = [TokenAuth]
 
         @extend_schema(
-            methods=['PUT'],
+            methods=['GET'],
             description=_('Synchronize web site types'),
             summary=_('Synchronize web site types'),
             operation_id=_('Synchronize web site types'),
             parameters=SyncWebAPI.get_parameters(),
+            request=SyncWebAPI.get_request(),
             responses=SyncWebAPI.get_response(),
             tags=[_('Knowledge Base/Documentation')]
         )
         @has_permissions(PermissionConstants.DOCUMENT_EDIT.get_workspace_permission())
-        def put(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
+        def get(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
             return result.success(DocumentSerializers.Sync(
                 data={'document_id': document_id, 'knowledge_id': knowledge_id, 'workspace_id': workspace_id}
             ).sync())
@@ -290,6 +291,31 @@ class DocumentView(APIView):
             return result.success(DocumentSerializers.Batch(
                 data={'workspace_id': workspace_id, 'knowledge_id': knowledge_id}
             ).batch_delete(request.data))
+
+    class Page(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['GET'],
+            description=_('Get document by pagination'),
+            summary=_('Get document by pagination'),
+            operation_id=_('Get document by pagination'),
+            parameters=DocumentTreeReadAPI.get_parameters(),
+            responses=DocumentTreeReadAPI.get_response(),
+            tags=[_('Knowledge Base/Documentation')]
+        )
+        @has_permissions(PermissionConstants.DOCUMENT_READ.get_workspace_permission())
+        def get(self, request: Request, workspace_id: str, knowledge_id: str, current_page: int, page_size: int):
+            return result.success(DocumentSerializers.Query(
+                data={
+                    'workspace_id': workspace_id,
+                    'knowledge_id': knowledge_id,
+                    'folder_id': request.query_params.get('folder_id'),
+                    'name': request.query_params.get('name'),
+                    'desc': request.query_params.get("desc"),
+                    'user_id': request.query_params.get('user_id')
+                }
+            ).page(current_page, page_size))
 
 
 class WebDocumentView(APIView):

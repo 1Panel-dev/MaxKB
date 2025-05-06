@@ -127,6 +127,7 @@ class Knowledge(AppModelMixin):
     folder = models.ForeignKey(KnowledgeFolder, on_delete=models.DO_NOTHING, verbose_name="文件夹id", default='root')
     embedding_model = models.ForeignKey(Model, on_delete=models.DO_NOTHING, verbose_name="向量模型",
                                         default=default_model)
+    file_size_limit = models.IntegerField(verbose_name="文件大小限制", default=100)
     meta = models.JSONField(verbose_name="元数据", default=dict)
 
     class Meta:
@@ -197,6 +198,7 @@ class ProblemParagraphMapping(AppModelMixin):
     class Meta:
         db_table = "problem_paragraph_mapping"
 
+
 class ApplicationKnowledgeMapping(AppModelMixin):
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
     # application = models.ForeignKey(Application, on_delete=models.CASCADE)
@@ -204,7 +206,6 @@ class ApplicationKnowledgeMapping(AppModelMixin):
 
     class Meta:
         db_table = "application_knowledge_mapping"
-
 
 
 class SourceType(models.IntegerChoices):

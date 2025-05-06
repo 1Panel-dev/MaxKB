@@ -20,5 +20,6 @@ urlpatterns = [
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/<str:document_id>/refresh', views.DocumentView.Refresh.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/<str:document_id>/cancel_task', views.DocumentView.CancelTask.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/<str:document_id>/cancel_task/batch', views.DocumentView.BatchCancelTask.as_view()),
+    path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/<int:current_page>/<int:page_sige>', views.DocumentView.Page.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<int:current_page>/<int:page_size>', views.KnowledgeView.Page.as_view()),
 ]

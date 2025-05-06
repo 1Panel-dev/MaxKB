@@ -266,3 +266,52 @@ class BatchEditHitHandlingAPI(APIMixin):
     @staticmethod
     def get_request():
         return BatchEditHitHandlingSerializer
+
+
+class DocumentTreeReadAPI(APIMixin):
+    @staticmethod
+    def get_parameters():
+        return [
+            OpenApiParameter(
+                name="workspace_id",
+                description="工作空间id",
+                type=OpenApiTypes.STR,
+                location='path',
+                required=True,
+            ),
+            OpenApiParameter(
+                name="knowledge_id",
+                description="知识库id",
+                type=OpenApiTypes.STR,
+                location='path',
+                required=True,
+            ),
+            OpenApiParameter(
+                name="folder_id",
+                description="文件夹id",
+                type=OpenApiTypes.STR,
+                location='query',
+                required=True,
+            ),
+            OpenApiParameter(
+                name="user_id",
+                description="用户id",
+                type=OpenApiTypes.STR,
+                location='query',
+                required=False,
+            ),
+            OpenApiParameter(
+                name="name",
+                description="名称",
+                type=OpenApiTypes.STR,
+                location='query',
+                required=False,
+            ),
+            OpenApiParameter(
+                name="desc",
+                description="描述",
+                type=OpenApiTypes.STR,
+                location='query',
+                required=False,
+            ),
+        ]
