@@ -11,7 +11,8 @@ from drf_spectacular.utils import OpenApiParameter
 
 from common.mixins.api_mixin import APIMixin
 from common.result import ResultSerializer
-from system_manage.serializers.user_resource_permission import UserResourcePermissionResponse
+from system_manage.serializers.user_resource_permission import UserResourcePermissionResponse, \
+    UpdateUserResourcePermissionRequest
 
 
 class APIUserResourcePermissionResponse(ResultSerializer):
@@ -35,3 +36,9 @@ class UserResourcePermissionAPI(APIMixin):
     @staticmethod
     def get_response():
         return APIUserResourcePermissionResponse
+
+
+class EditUserResourcePermissionAPI(APIMixin):
+    @staticmethod
+    def get_request():
+        return UpdateUserResourcePermissionRequest()
