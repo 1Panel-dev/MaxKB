@@ -17,6 +17,7 @@ class FolderView(APIView):
     @extend_schema(
         methods=['POST'],
         description=_('Create folder'),
+        summary=_('Create folder'),
         operation_id=_('Create folder'),
         parameters=FolderCreateAPI.get_parameters(),
         request=FolderCreateAPI.get_request(),
@@ -35,6 +36,7 @@ class FolderView(APIView):
     @extend_schema(
         methods=['GET'],
         description=_('Get folder tree'),
+        summary=_('Get folder tree'),
         operation_id=_('Get folder tree'),
         parameters=FolderTreeReadAPI.get_parameters(),
         responses=FolderTreeReadAPI.get_response(),
@@ -53,6 +55,7 @@ class FolderView(APIView):
         @extend_schema(
             methods=['PUT'],
             description=_('Update folder'),
+            summary=_('Update folder'),
             operation_id=_('Update folder'),
             parameters=FolderEditAPI.get_parameters(),
             request=FolderEditAPI.get_request(),
@@ -69,6 +72,7 @@ class FolderView(APIView):
         @extend_schema(
             methods=['GET'],
             description=_('Get folder'),
+            summary=_('Get folder'),
             operation_id=_('Get folder'),
             parameters=FolderReadAPI.get_parameters(),
             responses=FolderReadAPI.get_response(),
@@ -84,6 +88,7 @@ class FolderView(APIView):
         @extend_schema(
             methods=['DELETE'],
             description=_('Delete folder'),
+            summary=_('Delete folder'),
             operation_id=_('Delete folder'),
             parameters=FolderDeleteAPI.get_parameters(),
             responses=FolderDeleteAPI.get_response(),

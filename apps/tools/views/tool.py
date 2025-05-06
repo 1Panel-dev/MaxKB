@@ -19,6 +19,7 @@ class ToolView(APIView):
     @extend_schema(
         methods=['POST'],
         description=_('Create tool'),
+        summary=_('Create tool'),
         operation_id=_('Create tool'),
         parameters=ToolCreateAPI.get_parameters(),
         request=ToolCreateAPI.get_request(),
@@ -34,6 +35,7 @@ class ToolView(APIView):
     @extend_schema(
         methods=['GET'],
         description=_('Get tool by folder'),
+        summary=_('Get tool by folder'),
         operation_id=_('Get tool by folder'),
         parameters=ToolTreeReadAPI.get_parameters(),
         responses=ToolTreeReadAPI.get_response(),
@@ -51,6 +53,7 @@ class ToolView(APIView):
         @extend_schema(
             methods=['POST'],
             description=_('Debug Tool'),
+            summary=_('Debug Tool'),
             operation_id=_('Debug Tool'),
             request=ToolDebugApi.get_request(),
             responses=ToolDebugApi.get_response(),
@@ -68,6 +71,7 @@ class ToolView(APIView):
         @extend_schema(
             methods=['PUT'],
             description=_('Update tool'),
+            summary=_('Update tool'),
             operation_id=_('Update tool'),
             parameters=ToolEditAPI.get_parameters(),
             request=ToolEditAPI.get_request(),
@@ -83,6 +87,7 @@ class ToolView(APIView):
         @extend_schema(
             methods=['GET'],
             description=_('Get tool'),
+            summary=_('Get tool'),
             operation_id=_('Get tool'),
             parameters=ToolReadAPI.get_parameters(),
             responses=ToolReadAPI.get_response(),
@@ -97,6 +102,7 @@ class ToolView(APIView):
         @extend_schema(
             methods=['DELETE'],
             description=_('Delete tool'),
+            summary=_('Delete tool'),
             operation_id=_('Delete tool'),
             parameters=ToolDeleteAPI.get_parameters(),
             responses=ToolDeleteAPI.get_response(),
@@ -114,6 +120,7 @@ class ToolView(APIView):
         @extend_schema(
             methods=['GET'],
             description=_('Get tool list by pagination'),
+            summary=_('Get tool list by pagination'),
             operation_id=_('Get tool list by pagination'),
             parameters=ToolPageAPI.get_parameters(),
             responses=ToolPageAPI.get_response(),
@@ -137,6 +144,7 @@ class ToolView(APIView):
         @extend_schema(
             methods=['POST'],
             description=_("Import tool"),
+            summary=_("Import tool"),
             operation_id=_("Import tool"),
             parameters=ToolImportAPI.get_parameters(),
             request=ToolImportAPI.get_request(),
@@ -155,6 +163,7 @@ class ToolView(APIView):
         @extend_schema(
             methods=['GET'],
             description=_("Export tool"),
+            summary=_("Export tool"),
             operation_id=_("Export tool"),
             parameters=ToolExportAPI.get_parameters(),
             responses=ToolExportAPI.get_response(),

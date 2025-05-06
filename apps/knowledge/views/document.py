@@ -20,6 +20,7 @@ class DocumentView(APIView):
     @extend_schema(
         methods=['POST'],
         description=_('Create document'),
+        summary=_('Create document'),
         operation_id=_('Create document'),
         request=DocumentCreateAPI.get_request(),
         parameters=DocumentCreateAPI.get_parameters(),
@@ -36,6 +37,7 @@ class DocumentView(APIView):
     @extend_schema(
         methods=['GET'],
         description=_('Get document'),
+        summary=_('Get document'),
         operation_id=_('Get document'),
         parameters=KnowledgeTreeReadAPI.get_parameters(),
         responses=KnowledgeTreeReadAPI.get_response(),
@@ -59,6 +61,7 @@ class DocumentView(APIView):
 
         @extend_schema(
             description=_('Get document details'),
+            summary=_('Get document details'),
             operation_id=_('Get document details'),
             parameters=DocumentReadAPI.get_parameters(),
             responses=DocumentReadAPI.get_response(),
@@ -72,6 +75,7 @@ class DocumentView(APIView):
 
         @extend_schema(
             description=_('Modify document'),
+            summary=_('Modify document'),
             operation_id=_('Modify document'),
             parameters=DocumentEditAPI.get_parameters(),
             request=DocumentEditAPI.get_request(),
@@ -87,6 +91,7 @@ class DocumentView(APIView):
 
         @extend_schema(
             description=_('Delete document'),
+            summary=_('Delete document'),
             operation_id=_('Delete document'),
             parameters=DocumentDeleteAPI.get_parameters(),
             responses=DocumentDeleteAPI.get_response(),
@@ -105,6 +110,7 @@ class DocumentView(APIView):
         @extend_schema(
             methods=['POST'],
             description=_('Segmented document'),
+            summary=_('Segmented document'),
             operation_id=_('Segmented document'),
             parameters=DocumentSplitAPI.get_parameters(),
             request=DocumentSplitAPI.get_request(),
@@ -136,6 +142,7 @@ class DocumentView(APIView):
         @extend_schema(
             methods=['POST'],
             description=_('Create documents in batches'),
+            summary=_('Create documents in batches'),
             operation_id=_('Create documents in batches'),
             request=DocumentBatchCreateAPI.get_request(),
             parameters=DocumentBatchCreateAPI.get_parameters(),
@@ -154,6 +161,7 @@ class DocumentView(APIView):
         @extend_schema(
             methods=['PUT'],
             description=_('Batch sync documents'),
+            summary=_('Batch sync documents'),
             operation_id=_('Batch sync documents'),
             request=DocumentBatchAPI.get_request(),
             parameters=DocumentBatchAPI.get_parameters(),
@@ -172,6 +180,7 @@ class DocumentView(APIView):
         @extend_schema(
             methods=['DELETE'],
             description=_('Delete documents in batches'),
+            summary=_('Delete documents in batches'),
             operation_id=_('Delete documents in batches'),
             request=DocumentBatchAPI.get_request(),
             parameters=DocumentBatchAPI.get_parameters(),

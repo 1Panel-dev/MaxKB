@@ -18,6 +18,7 @@ class KnowledgeView(APIView):
     @extend_schema(
         methods=['GET'],
         description=_('Get knowledge by folder'),
+        summary=_('Get knowledge by folder'),
         operation_id=_('Get knowledge by folder'),
         parameters=KnowledgeTreeReadAPI.get_parameters(),
         responses=KnowledgeTreeReadAPI.get_response(),
@@ -41,6 +42,7 @@ class KnowledgeView(APIView):
         @extend_schema(
             methods=['PUT'],
             description=_('Edit knowledge'),
+            summary=_('Edit knowledge'),
             operation_id=_('Edit knowledge'),
             parameters=KnowledgeEditAPI.get_parameters(),
             request=KnowledgeEditAPI.get_request(),
@@ -56,6 +58,7 @@ class KnowledgeView(APIView):
         @extend_schema(
             methods=['DELETE'],
             description=_('Delete knowledge'),
+            summary=_('Delete knowledge'),
             operation_id=_('Delete knowledge'),
             parameters=KnowledgeBaseCreateAPI.get_parameters(),
             request=KnowledgeBaseCreateAPI.get_request(),
@@ -71,6 +74,7 @@ class KnowledgeView(APIView):
         @extend_schema(
             methods=['GET'],
             description=_('Get knowledge'),
+            summary=_('Get knowledge'),
             operation_id=_('Get knowledge'),
             parameters=KnowledgeReadAPI.get_parameters(),
             responses=KnowledgeReadAPI.get_response(),
@@ -88,6 +92,7 @@ class KnowledgeView(APIView):
         @extend_schema(
             methods=['GET'],
             description=_('Get the knowledge base paginated list'),
+            summary=_('Get the knowledge base paginated list'),
             operation_id=_('Get the knowledge base paginated list'),
             parameters=KnowledgePageAPI.get_parameters(),
             responses=KnowledgePageAPI.get_response(),
@@ -112,6 +117,7 @@ class KnowledgeBaseView(APIView):
     @extend_schema(
         methods=['POST'],
         description=_('Create base knowledge'),
+        summary=_('Create base knowledge'),
         operation_id=_('Create base knowledge'),
         parameters=KnowledgeBaseCreateAPI.get_parameters(),
         request=KnowledgeBaseCreateAPI.get_request(),
@@ -131,6 +137,7 @@ class KnowledgeWebView(APIView):
     @extend_schema(
         methods=['POST'],
         description=_('Create web knowledge'),
+        summary=_('Create web knowledge'),
         operation_id=_('Create web knowledge'),
         parameters=KnowledgeWebCreateAPI.get_parameters(),
         request=KnowledgeWebCreateAPI.get_request(),
