@@ -4,7 +4,7 @@ import views from './views'
 import theme from './theme'
 import layout from './layout'
 import dynamicsForm from './dynamics-form'
-// import common from './common'
+import common from './common'
 // import chat from './ai-chat'
 export default {
   lang: '简体中文',
@@ -13,4 +13,5 @@ export default {
   theme,
   layout,
   dynamicsForm,
+  common
 }

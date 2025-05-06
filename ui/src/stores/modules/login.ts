@@ -30,9 +30,9 @@ const useLoginStore = defineStore('login', {
     },
 
     async asyncLogin(data: LoginRequest, loading?: Ref<boolean>) {
-      return loginApi.login(data).then((ok: any) => {
-        this.token = ok.token
-        localStorage.setItem('token', ok.token)
+      return loginApi.login(data).then((ok) => {
+        this.token = ok?.data?.token
+        localStorage.setItem('token', ok?.data?.token)
         const user = useUserStore()
         return user.profile(loading)
       })

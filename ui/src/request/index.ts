@@ -43,14 +43,14 @@ instance.interceptors.response.use(
     if (response.data) {
       if (response.data.code !== 200 && !(response.data instanceof Blob)) {
         if (response.config.url.includes('/application/authentication')) {
-          return Promise.reject(response.data.data)
+          return Promise.reject(response.data)
         }
         if (
           !response.config.url.includes('/valid') &&
           !response.config.url.includes('/function_lib/debug')
         ) {
           MsgError(response.data.message)
-          return Promise.reject(response.data.data)
+          return Promise.reject(response.data)
         }
       }
     }
@@ -101,9 +101,9 @@ const promise: (
       .then((response) => {
         // blob类型的返回状态是response.status
         if (response.status === 200) {
-          resolve(response?.data?.data || response)
+          resolve(response?.data || response)
         } else {
-          reject(response?.data?.data || response)
+          reject(response?.data || response)
         }
       })
       .catch((error) => {

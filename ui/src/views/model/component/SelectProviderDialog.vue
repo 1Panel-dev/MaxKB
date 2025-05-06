@@ -73,7 +73,7 @@ const checkModelType = (model_type: string) => {
   selectModelType.value = model_type
   currentModelType.value = modelTypeOptions.filter((item) => item.value === model_type)[0].text
   ModelApi.getProviderByModelType(model_type, loading).then((ok) => {
-    list_provider.value = ok.data
+    list_provider.value = ok
     list_provider.value.sort((a, b) => a.provider.localeCompare(b.provider))
   })
 }

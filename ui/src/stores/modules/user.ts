@@ -37,8 +37,9 @@ const useLoginStore = defineStore('user', {
     },
     async profile(loading?: Ref<boolean>) {
       return UserApi.getUserProfile(loading).then((ok) => {
-        this.userInfo = ok
-        useLocalStorage<string>(localeConfigKey, 'en-US').value = ok?.language || this.getLanguage()
+        this.userInfo = ok.data
+        useLocalStorage<string>(localeConfigKey, 'en-US').value =
+          ok?.data?.language || this.getLanguage()
         // return this.asyncGetProfile()
       })
     },

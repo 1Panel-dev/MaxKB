@@ -1,15 +1,13 @@
-import { request } from '../../request/index'
+
 import { Result } from '@/request/Result'
 import { get, post, del, put } from '@/request/index'
 import { type Ref } from 'vue'
 import type {
-  modelRequest,
-  Provider,
   ListModelRequest,
   Model,
   BaseModel,
   CreateModelRequest,
-  EditModelRequest
+  EditModelRequest,
 } from '@/api/type/model'
 import type { FormField } from '@/components/dynamics-form/type'
 import type { KeyValue } from '../type/common'
@@ -22,40 +20,9 @@ const prefix_provider = '/provider'
  */
 const getModel: (
   request?: ListModelRequest,
-  loading?: Ref<boolean>
+  loading?: Ref<boolean>,
 ) => Promise<Result<Array<Model>>> = (data, loading) => {
   return get(`${prefix}`, data, loading)
-}
-
-/**
- * 获得供应商列表
- */
-const getProvider: (loading?: Ref<boolean>) => Promise<Result<Array<Provider>>> = (loading) => {
-  return get(`${prefix_provider}`, {}, loading)
-}
-
-/**
- * 获得供应商列表
- */
-const getProviderByModelType: (model_type: string, loading?: Ref<boolean>) => Promise<Result<Array<Provider>>> = (model_type, loading) => {
-  return get(`${prefix_provider}`, {model_type}, loading)
-}
-
-/**
- * 获取模型创建表单
- * @param provider
- * @param model_type
- * @param model_name
- * @param loading
- * @returns
- */
-const getModelCreateForm: (
-  provider: string,
-  model_type: string,
-  model_name: string,
-  loading?: Ref<boolean>
-) => Promise<Result<Array<FormField>>> = (provider, model_type, model_name, loading) => {
-  return get(`${prefix_provider}/model_form`, { provider, model_type, model_name }, loading)
 }
 
 /**
@@ -66,7 +33,7 @@ const getModelCreateForm: (
  */
 const getModelParamsForm: (
   model_id: string,
-  loading?: Ref<boolean>
+  loading?: Ref<boolean>,
 ) => Promise<Result<Array<FormField>>> = (model_id, loading) => {
   return get(`model/${model_id}/model_params_form`, {}, loading)
 }
@@ -78,7 +45,7 @@ const getModelParamsForm: (
  */
 const listModelType: (
   provider: string,
-  loading?: Ref<boolean>
+  loading?: Ref<boolean>,
 ) => Promise<Result<Array<KeyValue<string, string>>>> = (provider, loading?: Ref<boolean>) => {
   return get(`${prefix_provider}/model_type_list`, { provider }, loading)
 }
@@ -93,7 +60,7 @@ const listModelType: (
 const listBaseModel: (
   provider: string,
   model_type: string,
-  loading?: Ref<boolean>
+  loading?: Ref<boolean>,
 ) => Promise<Result<Array<BaseModel>>> = (provider, model_type, loading) => {
   return get(`${prefix_provider}/model_list`, { provider, model_type }, loading)
 }
@@ -102,9 +69,9 @@ const listBaseModelParamsForm: (
   provider: string,
   model_type: string,
   model_name: string,
-  loading?: Ref<boolean>
+  loading?: Ref<boolean>,
 ) => Promise<Result<Array<BaseModel>>> = (provider, model_type, model_name, loading) => {
-  return get(`${prefix_provider}/model_params_form`, { provider, model_type, model_name}, loading)
+  return get(`${prefix_provider}/model_params_form`, { provider, model_type, model_name }, loading)
 }
 
 /**
@@ -115,7 +82,7 @@ const listBaseModelParamsForm: (
  */
 const createModel: (
   request: CreateModelRequest,
-  loading?: Ref<boolean>
+  loading?: Ref<boolean>,
 ) => Promise<Result<Model>> = (request, loading) => {
   return post(`${prefix}`, request, {}, loading)
 }
@@ -129,7 +96,7 @@ const createModel: (
 const updateModel: (
   model_id: string,
   request: EditModelRequest,
-  loading?: Ref<boolean>
+  loading?: Ref<boolean>,
 ) => Promise<Result<Model>> = (model_id, request, loading) => {
   return put(`${prefix}/${model_id}`, request, {}, loading)
 }
@@ -143,7 +110,7 @@ const updateModel: (
 const updateModelParamsForm: (
   model_id: string,
   request: any[],
-  loading?: Ref<boolean>
+  loading?: Ref<boolean>,
 ) => Promise<Result<Model>> = (model_id, request, loading) => {
   return put(`${prefix}/${model_id}/model_params_form`, request, {}, loading)
 }
@@ -156,7 +123,7 @@ const updateModelParamsForm: (
  */
 const getModelById: (model_id: string, loading?: Ref<boolean>) => Promise<Result<Model>> = (
   model_id,
-  loading
+  loading,
 ) => {
   return get(`${prefix}/${model_id}`, {}, loading)
 }
@@ -168,7 +135,7 @@ const getModelById: (model_id: string, loading?: Ref<boolean>) => Promise<Result
  */
 const getModelMetaById: (model_id: string, loading?: Ref<boolean>) => Promise<Result<Model>> = (
   model_id,
-  loading
+  loading,
 ) => {
   return get(`${prefix}/${model_id}/meta`, {}, loading)
 }
@@ -180,20 +147,18 @@ const getModelMetaById: (model_id: string, loading?: Ref<boolean>) => Promise<Re
  */
 const pauseDownload: (model_id: string, loading?: Ref<boolean>) => Promise<Result<boolean>> = (
   model_id,
-  loading
+  loading,
 ) => {
   return put(`${prefix}/${model_id}/pause_download`, undefined, {}, loading)
 }
 const deleteModel: (model_id: string, loading?: Ref<boolean>) => Promise<Result<boolean>> = (
   model_id,
-  loading
+  loading,
 ) => {
   return del(`${prefix}/${model_id}`, undefined, {}, loading)
 }
 export default {
   getModel,
-  getProvider,
-  getModelCreateForm,
   listModelType,
   listBaseModel,
   listBaseModelParamsForm,
@@ -205,5 +170,4 @@ export default {
   pauseDownload,
   getModelParamsForm,
   updateModelParamsForm,
-  getProviderByModelType
 }
