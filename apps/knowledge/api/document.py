@@ -4,7 +4,7 @@ from drf_spectacular.utils import OpenApiParameter
 from common.mixins.api_mixin import APIMixin
 from common.result import DefaultResultSerializer
 from knowledge.serializers.common import BatchSerializer
-from knowledge.serializers.document import DocumentInstanceSerializer
+from knowledge.serializers.document import DocumentInstanceSerializer, DocumentWebInstanceSerializer
 
 
 class DocumentSplitAPI(APIMixin):
@@ -176,3 +176,45 @@ class DocumentEditAPI(DocumentReadAPI):
 
 class DocumentDeleteAPI(DocumentReadAPI):
     pass
+
+
+class TableDocumentCreateAPI(APIMixin):
+    @staticmethod
+    def get_parameters():
+        return [
+            OpenApiParameter(
+                name="workspace_id",
+                description="工作空间id",
+                type=OpenApiTypes.STR,
+                location='path',
+                required=True,
+            ),
+            OpenApiParameter(
+                name="knowledge_id",
+                description="知识库id",
+                type=OpenApiTypes.STR,
+                location='path',
+                required=True,
+            ),
+            OpenApiParameter(
+                name="file",
+                description="文件",
+                type=OpenApiTypes.BINARY,
+                location='query',
+                required=False,
+            ),
+        ]
+
+    @staticmethod
+    def get_response():
+        return DefaultResultSerializer
+
+
+class QaDocumentCreateAPI(TableDocumentCreateAPI):
+    pass
+
+
+class WebDocumentCreateAPI(APIMixin):
+    @staticmethod
+    def get_request():
+        return DocumentWebInstanceSerializer

@@ -9,7 +9,8 @@ from common.auth.authentication import has_permissions
 from common.constants.permission_constants import PermissionConstants
 from common.result import result
 from knowledge.api.document import DocumentSplitAPI, DocumentBatchAPI, DocumentBatchCreateAPI, DocumentCreateAPI, \
-    DocumentReadAPI, DocumentEditAPI, DocumentDeleteAPI
+    DocumentReadAPI, DocumentEditAPI, DocumentDeleteAPI, TableDocumentCreateAPI, QaDocumentCreateAPI, \
+    WebDocumentCreateAPI
 from knowledge.api.knowledge import KnowledgeTreeReadAPI
 from knowledge.serializers.document import DocumentSerializers
 
@@ -68,8 +69,10 @@ class DocumentView(APIView):
             tags=[_('Knowledge Base/Documentation')]
         )
         @has_permissions(PermissionConstants.DOCUMENT_READ.get_workspace_permission())
-        def get(self, request: Request, knowledge_id: str, document_id: str):
-            operate = DocumentSerializers.Operate(data={'document_id': document_id, 'knowledge_id': knowledge_id})
+        def get(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
+            operate = DocumentSerializers.Operate(data={
+                'document_id': document_id, 'knowledge_id': knowledge_id, 'workspace_id': workspace_id
+            })
             operate.is_valid(raise_exception=True)
             return result.success(operate.one())
 
@@ -83,11 +86,10 @@ class DocumentView(APIView):
             tags=[_('Knowledge Base/Documentation')]
         )
         @has_permissions(PermissionConstants.DOCUMENT_EDIT.get_workspace_permission())
-        def put(self, request: Request, knowledge_id: str, document_id: str):
-            return result.success(
-                DocumentSerializers.Operate(data={'document_id': document_id, 'knowledge_id': knowledge_id}).edit(
-                    request.data,
-                    with_valid=True))
+        def put(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
+            return result.success(DocumentSerializers.Operate(data={
+                'document_id': document_id, 'knowledge_id': knowledge_id, 'workspace_id': workspace_id
+            }).edit(request.data, with_valid=True))
 
         @extend_schema(
             description=_('Delete document'),
@@ -98,8 +100,10 @@ class DocumentView(APIView):
             tags=[_('Knowledge Base/Documentation')]
         )
         @has_permissions(PermissionConstants.DOCUMENT_DELETE.get_workspace_permission())
-        def delete(self, request: Request, knowledge_id: str, document_id: str):
-            operate = DocumentSerializers.Operate(data={'document_id': document_id, 'knowledge_id': knowledge_id})
+        def delete(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
+            operate = DocumentSerializers.Operate(data={
+                'document_id': document_id, 'knowledge_id': knowledge_id, 'workspace_id': workspace_id
+            })
             operate.is_valid(raise_exception=True)
             return result.success(operate.delete())
 
@@ -195,3 +199,63 @@ class DocumentView(APIView):
             return result.success(DocumentSerializers.Batch(
                 data={'workspace_id': workspace_id, 'knowledge_id': knowledge_id}
             ).batch_delete(request.data))
+
+
+class WebDocumentView(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(
+        methods=['POST'],
+        description=_('Create Web site documents'),
+        summary=_('Create Web site documents'),
+        operation_id=_('Create Web site documents'),
+        request=WebDocumentCreateAPI.get_request(),
+        parameters=WebDocumentCreateAPI.get_parameters(),
+        responses=WebDocumentCreateAPI.get_response(),
+        tags=[_('Knowledge Base/Documentation')]
+    )
+    @has_permissions(PermissionConstants.DOCUMENT_CREATE.get_workspace_permission())
+    def post(self, request: Request, workspace_id: str, knowledge_id: str):
+        return result.success(DocumentSerializers.Create(data={
+            'knowledge_id': knowledge_id, 'workspace_id': workspace_id
+        }).save_web(request.data, with_valid=True))
+
+
+class QaDocumentView(APIView):
+    authentication_classes = [TokenAuth]
+    parser_classes = [MultiPartParser]
+
+    @extend_schema(
+        summary=_('Import QA and create documentation'),
+        description=_('Import QA and create documentation'),
+        operation_id=_('Import QA and create documentation'),
+        request=QaDocumentCreateAPI.get_request(),
+        parameters=QaDocumentCreateAPI.get_parameters(),
+        responses=QaDocumentCreateAPI.get_response(),
+        tags=[_('Knowledge Base/Documentation')]
+    )
+    @has_permissions(PermissionConstants.DOCUMENT_CREATE.get_workspace_permission())
+    def post(self, request: Request, workspace_id: str, knowledge_id: str):
+        return result.success(DocumentSerializers.Create(data={
+            'knowledge_id': knowledge_id, 'workspace_id': workspace_id
+        }).save_qa({'file_list': request.FILES.getlist('file')}, with_valid=True))
+
+
+class TableDocumentView(APIView):
+    authentication_classes = [TokenAuth]
+    parser_classes = [MultiPartParser]
+
+    @extend_schema(
+        summary=_('Import tables and create documents'),
+        description=_('Import tables and create documents'),
+        operation_id=_('Import tables and create documents'),
+        request=TableDocumentCreateAPI.get_request(),
+        parameters=TableDocumentCreateAPI.get_parameters(),
+        responses=TableDocumentCreateAPI.get_response(),
+        tags=[_('Knowledge Base/Documentation')]
+    )
+    @has_permissions(PermissionConstants.DOCUMENT_CREATE.get_workspace_permission())
+    def post(self, request: Request, workspace_id: str, knowledge_id: str):
+        return result.success(DocumentSerializers.Create(
+            data={'knowledge_id': knowledge_id, 'workspace_id': workspace_id}
+        ).save_table({'file_list': request.FILES.getlist('file')}, with_valid=True))

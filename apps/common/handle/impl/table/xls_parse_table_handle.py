@@ -8,7 +8,7 @@ from common.handle.base_parse_table_handle import BaseParseTableHandle
 max_kb = logging.getLogger("max_kb")
 
 
-class XlsSplitHandle(BaseParseTableHandle):
+class XlsParseTableHandle(BaseParseTableHandle):
     def support(self, file, get_buffer):
         file_name: str = file.name.lower()
         buffer = get_buffer(file)

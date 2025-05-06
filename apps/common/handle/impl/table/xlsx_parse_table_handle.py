@@ -10,7 +10,7 @@ from common.handle.impl.common_handle import xlsx_embed_cells_images
 max_kb = logging.getLogger("max_kb")
 
 
-class XlsxSplitHandle(BaseParseTableHandle):
+class XlsxParseTableHandle(BaseParseTableHandle):
     def support(self, file, get_buffer):
         file_name: str = file.name.lower()
         if file_name.endswith('.xlsx'):

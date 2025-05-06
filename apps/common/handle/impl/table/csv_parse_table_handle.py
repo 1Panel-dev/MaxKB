@@ -8,7 +8,7 @@ from common.handle.base_parse_table_handle import BaseParseTableHandle
 max_kb = logging.getLogger("max_kb")
 
 
-class CsvSplitHandle(BaseParseTableHandle):
+class CsvParseTableHandle(BaseParseTableHandle):
     def support(self, file, get_buffer):
         file_name: str = file.name.lower()
         if file_name.endswith(".csv"):
