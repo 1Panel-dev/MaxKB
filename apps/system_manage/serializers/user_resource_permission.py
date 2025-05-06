@@ -9,10 +9,12 @@
 import json
 import os
 
+from django.core.cache import cache
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from common.constants.cache_version import Cache_Version
 from common.constants.permission_constants import get_default_workspace_user_role_mapping_list, RoleConstants, \
     ResourcePermissionGroup, ResourcePermissionRole, ResourceAuthType
 from common.database_model_manage.database_model_manage import DatabaseModelManage
@@ -147,4 +149,7 @@ class UserResourcePermissionSerializer(serializers.Serializer):
             update_list) > 0 else None
         # 批量插入
         QuerySet(WorkspaceUserResourcePermission).bulk_create(save_list) if len(save_list) > 0 else None
+        version = Cache_Version.PERMISSION_LIST.get_version()
+        key = Cache_Version.PERMISSION_LIST.get_key(user_id=str(user.id))
+        cache.delete(key, version=version)
         return True
