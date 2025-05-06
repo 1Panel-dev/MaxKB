@@ -101,14 +101,14 @@ def get_workspace_resource_permission_list_by_workspace_user_permission(
                                         workspace_user_resource_permission.workspace_id)]
     role_permission_mapping_list = reduce(lambda x, y: [*x, *y], role_permission_mapping_list, [])
     # 如果是根据角色
-    if (workspace_user_resource_permission.auth_target_type == ResourceAuthType.ROLE
+    if (workspace_user_resource_permission.auth_type == ResourceAuthType.ROLE
             and workspace_user_resource_permission.permission_list.__contains__(
                 ResourcePermissionRole.ROLE)):
         return [
             f"{role_permission_mapping.permission_id}:/WORKSPACE/{workspace_user_resource_permission.workspace_id}/{workspace_user_resource_permission.auth_target_type}/{workspace_user_resource_permission.target}"
             for role_permission_mapping in role_permission_mapping_list]
 
-    elif workspace_user_resource_permission.auth_target_type == ResourceAuthType.RESOURCE_PERMISSION_GROUP:
+    elif workspace_user_resource_permission.auth_type == ResourceAuthType.RESOURCE_PERMISSION_GROUP:
         resource_permission_list = [
             [
                 f"{permission}:/WORKSPACE/{workspace_user_resource_permission.workspace_id}/{workspace_user_resource_permission.auth_target_type}/{workspace_user_resource_permission.target}"
@@ -136,7 +136,7 @@ def get_permission_list(user,
             # 获取工作空间 用户 角色映射数据
             workspace_user_role_mapping_list = QuerySet(workspace_user_role_mapping_model).filter(user_id=user_id)
             workspace_user_role_mapping_dict = group_by(workspace_user_role_mapping_list,
-                                                        lambda item: item.role_id)
+                                                        lambda item: item.workspace_id)
             # 获取角色权限映射数据
             role_permission_mapping_list = QuerySet(role_permission_mapping_model).filter(
                 role_id__in=[workspace_user_role_mapping.role_id for workspace_user_role_mapping in
@@ -168,7 +168,7 @@ def get_permission_list(user,
             role_permission_mapping_dict = group_by(role_permission_mapping_list, lambda item: item.role_id)
             workspace_user_role_mapping_list = get_default_workspace_user_role_mapping_list([user.role])
             workspace_user_role_mapping_dict = group_by(workspace_user_role_mapping_list,
-                                                        lambda item: item.role_id)
+                                                        lambda item: item.workspace_id)
             # 资源权限
             workspace_resource_permission_list = get_workspace_resource_permission_list(
                 workspace_user_resource_permission_list,
