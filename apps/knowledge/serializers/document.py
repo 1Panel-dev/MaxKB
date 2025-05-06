@@ -624,6 +624,26 @@ class DocumentSerializers(serializers.Serializer):
                 return result
             return [result]
 
+    class SplitPattern(serializers.Serializer):
+        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+        knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
+
+        @staticmethod
+        def list():
+            return [
+                {'key': "#", 'value': '(?<=^)# .*|(?<=\\n)# .*'},
+                {'key': '##', 'value': '(?<=\\n)(?<!#)## (?!#).*|(?<=^)(?<!#)## (?!#).*'},
+                {'key': '###', 'value': "(?<=\\n)(?<!#)### (?!#).*|(?<=^)(?<!#)### (?!#).*"},
+                {'key': '####', 'value': "(?<=\\n)(?<!#)#### (?!#).*|(?<=^)(?<!#)#### (?!#).*"},
+                {'key': '#####', 'value': "(?<=\\n)(?<!#)##### (?!#).*|(?<=^)(?<!#)##### (?!#).*"},
+                {'key': '######', 'value': "(?<=\\n)(?<!#)###### (?!#).*|(?<=^)(?<!#)###### (?!#).*"},
+                {'key': '-', 'value': '(?<! )- .*'},
+                {'key': _('space'), 'value': '(?<! ) (?! )'},
+                {'key': _('semicolon'), 'value': '(?<!；)；(?!；)'}, {'key': _('comma'), 'value': '(?<!，)，(?!，)'},
+                {'key': _('period'), 'value': '(?<!。)。(?!。)'}, {'key': _('enter'), 'value': '(?<!\\n)\\n(?!\\n)'},
+                {'key': _('blank line'), 'value': '(?<!\\n)\\n\\n(?!\\n)'}
+            ]
+
     class Batch(serializers.Serializer):
         workspace_id = serializers.UUIDField(required=True, label=_('workspace id'))
         knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))

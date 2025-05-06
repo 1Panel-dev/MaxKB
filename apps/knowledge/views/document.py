@@ -11,7 +11,7 @@ from common.result import result
 from knowledge.api.document import DocumentSplitAPI, DocumentBatchAPI, DocumentBatchCreateAPI, DocumentCreateAPI, \
     DocumentReadAPI, DocumentEditAPI, DocumentDeleteAPI, TableDocumentCreateAPI, QaDocumentCreateAPI, \
     WebDocumentCreateAPI, CancelTaskAPI, BatchCancelTaskAPI, SyncWebAPI, RefreshAPI, BatchEditHitHandlingAPI, \
-    DocumentTreeReadAPI
+    DocumentTreeReadAPI, DocumentSplitPatternAPI
 from knowledge.serializers.document import DocumentSerializers
 
 
@@ -139,6 +139,22 @@ class DocumentView(APIView):
                 'workspace_id': workspace_id,
                 'knowledge_id': knowledge_id,
             }).parse(split_data))
+
+    class SplitPattern(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            summary=_('Get a list of segment IDs'),
+            description=_('Get a list of segment IDs'),
+            operation_id=_('Get a list of segment IDs'),
+            parameters=DocumentSplitPatternAPI.get_parameters(),
+            responses=DocumentSplitPatternAPI.get_response(),
+            tags=[_('Knowledge Base/Documentation')]
+        )
+        def get(self, request: Request, workspace_id: str, knowledge_id: str):
+            return result.success(DocumentSerializers.SplitPattern(
+                data={'knowledge_id': knowledge_id, 'workspace_id': workspace_id}
+            ).list())
 
     class BatchEditHitHandling(APIView):
         authentication_classes = [TokenAuth]
