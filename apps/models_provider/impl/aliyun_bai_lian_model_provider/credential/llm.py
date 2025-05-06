@@ -40,7 +40,6 @@ class BaiLianLLMModelParams(BaseForm):
 
 
 class BaiLianLLMModelCredential(BaseForm, BaseModelCredential):
-
     api_base = forms.TextInputField(_('API URL'), required=True)
     api_key = forms.PasswordInputField(_('API Key'), required=True)
 
@@ -71,7 +70,11 @@ class BaiLianLLMModelCredential(BaseForm, BaseModelCredential):
 
         try:
             model = provider.get_model(model_type, model_name, model_credential, **model_params)
-            model.invoke([HumanMessage(content=gettext('Hello'))])
+            if model_params.get('stream'):
+                for res in model.stream([HumanMessage(content=gettext('Hello'))]):
+                    pass
+            else:
+                model.invoke([HumanMessage(content=gettext('Hello'))])
         except Exception as e:
             traceback.print_exc()
             if isinstance(e, AppApiException):
