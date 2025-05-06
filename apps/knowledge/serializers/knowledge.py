@@ -16,7 +16,8 @@ from knowledge.models import Knowledge, KnowledgeScope, KnowledgeType, Document,
     ProblemParagraphMapping, ApplicationKnowledgeMapping
 from knowledge.serializers.common import ProblemParagraphManage, get_embedding_model_id_by_knowledge_id, MetaSerializer
 from knowledge.serializers.document import DocumentSerializers
-from knowledge.task import sync_web_knowledge, embedding_by_knowledge, delete_embedding_by_knowledge
+from knowledge.task.embedding import embedding_by_knowledge, delete_embedding_by_knowledge
+from knowledge.task.sync import sync_web_knowledge
 from maxkb.conf import PROJECT_DIR
 
 

@@ -11,24 +11,28 @@ from django.utils.translation import gettext_lazy as _
 from common.utils.fork import ChildLink, Fork
 from common.utils.split_model import get_split_model
 from knowledge.models.knowledge import KnowledgeType, Document, Knowledge, Status
+from knowledge.serializers.document import DocumentSerializers
+from knowledge.serializers.paragraph import ParagraphSerializers
 
 max_kb_error = logging.getLogger("max_kb_error")
 max_kb = logging.getLogger("max_kb")
 
 
 def get_save_handler(knowledge_id, selector):
-    from knowledge.serializers import DocumentSerializers
-
     def handler(child_link: ChildLink, response: Fork.Response):
         if response.status == 200:
             try:
                 document_name = child_link.tag.text if child_link.tag is not None and len(
                     child_link.tag.text.strip()) > 0 else child_link.url
                 paragraphs = get_split_model('web.md').parse(response.content)
-                DocumentSerializers.Create(data={'knowledge_id': knowledge_id}).save(
-                    {'name': document_name, 'paragraphs': paragraphs,
-                     'meta': {'source_url': child_link.url, 'selector': selector},
-                     'type': KnowledgeType.WEB}, with_valid=True)
+                DocumentSerializers.Create(
+                    data={'knowledge_id': knowledge_id}
+                ).save({
+                    'name': document_name,
+                    'paragraphs': paragraphs,
+                    'meta': {'source_url': child_link.url, 'selector': selector},
+                    'type': KnowledgeType.WEB
+                }, with_valid=True)
             except Exception as e:
                 logging.getLogger("max_kb_error").error(f'{str(e)}:{traceback.format_exc()}')
 
@@ -36,7 +40,6 @@ def get_save_handler(knowledge_id, selector):
 
 
 def get_sync_handler(knowledge_id):
-    from knowledge.serializers import DocumentSerializers
     knowledge = QuerySet(Knowledge).filter(id=knowledge_id).first()
 
     def handler(child_link: ChildLink, response: Fork.Response):
@@ -52,10 +55,14 @@ def get_sync_handler(knowledge_id):
                     DocumentSerializers.Sync(data={'document_id': first.id}).sync()
                 else:
                     # 插入
-                    DocumentSerializers.Create(data={'knowledge_id': knowledge.id}).save(
-                        {'name': document_name, 'paragraphs': paragraphs,
-                         'meta': {'source_url': child_link.url.strip(), 'selector': knowledge.meta.get('selector')},
-                         'type': KnowledgeType.WEB}, with_valid=True)
+                    DocumentSerializers.Create(
+                        data={'knowledge_id': knowledge.id}
+                    ).save({
+                        'name': document_name,
+                        'paragraphs': paragraphs,
+                        'meta': {'source_url': child_link.url.strip(), 'selector': knowledge.meta.get('selector')},
+                        'type': KnowledgeType.WEB
+                    }, with_valid=True)
             except Exception as e:
                 logging.getLogger("max_kb_error").error(f'{str(e)}:{traceback.format_exc()}')
 
@@ -63,8 +70,6 @@ def get_sync_handler(knowledge_id):
 
 
 def get_sync_web_document_handler(knowledge_id):
-    from knowledge.serializers import DocumentSerializers
-
     def handler(source_url: str, selector, response: Fork.Response):
         if response.status == 200:
             try:
@@ -88,7 +93,6 @@ def get_sync_web_document_handler(knowledge_id):
 
 
 def save_problem(knowledge_id, document_id, paragraph_id, problem):
-    from knowledge.serializers import ParagraphSerializers
     # print(f"knowledge_id: {knowledge_id}")
     # print(f"document_id: {document_id}")
     # print(f"paragraph_id: {paragraph_id}")
@@ -101,7 +105,11 @@ def save_problem(knowledge_id, document_id, paragraph_id, problem):
         return
     try:
         ParagraphSerializers.Problem(
-            data={"knowledge_id": knowledge_id, 'document_id': document_id,
-                  'paragraph_id': paragraph_id}).save(instance={"content": problem}, with_valid=True)
+            data={
+                "knowledge_id": knowledge_id,
+                'document_id': document_id,
+                'paragraph_id': paragraph_id
+            }
+        ).save(instance={"content": problem}, with_valid=True)
     except Exception as e:
         max_kb_error.error(_('Association problem failed {error}').format(error=str(e)))

@@ -1,16 +1,18 @@
+import logging
 import os
+import traceback
 from functools import reduce
 from typing import Dict, List
 
 import uuid_utils.compat as uuid
 from celery_once import AlreadyQueued
-from django.db import transaction
+from django.db import transaction, models
 from django.db.models import QuerySet, Model
 from django.db.models.functions import Substr, Reverse
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from common.db.search import native_search
+from common.db.search import native_search, get_dynamics_model, native_page_search
 from common.event import ListenerManagement
 from common.event.common import work_thread_pool
 from common.exception.app_exception import AppApiException
@@ -23,12 +25,15 @@ from common.handle.impl.text.xls_split_handle import XlsSplitHandle
 from common.handle.impl.text.xlsx_split_handle import XlsxSplitHandle
 from common.handle.impl.text.zip_split_handle import ZipSplitHandle
 from common.utils.common import post, get_file_content, bulk_create_in_batches
+from common.utils.fork import Fork
+from common.utils.split_model import get_split_model
 from knowledge.models import Knowledge, Paragraph, Problem, Document, KnowledgeType, ProblemParagraphMapping, State, \
     TaskType, File
-from knowledge.serializers.common import ProblemParagraphManage, BatchSerializer
+from knowledge.serializers.common import ProblemParagraphManage, BatchSerializer, get_embedding_model_id_by_knowledge_id
 from knowledge.serializers.paragraph import ParagraphSerializers, ParagraphInstanceSerializer, \
     delete_problems_and_mappings
-from knowledge.task import embedding_by_document, delete_embedding_by_document_list
+from knowledge.task.embedding import embedding_by_document, delete_embedding_by_document_list, \
+    delete_embedding_by_document
 from maxkb.const import PROJECT_DIR
 
 default_split_handle = TextSplitHandle()
@@ -62,13 +67,6 @@ class DocumentInstanceSerializer(serializers.Serializer):
     paragraphs = ParagraphInstanceSerializer(required=False, many=True, allow_null=True)
 
 
-class DocumentCreateRequest(serializers.Serializer):
-    name = serializers.CharField(required=True, label=_('knowledge name'), max_length=64, min_length=1)
-    desc = serializers.CharField(required=True, label=_('knowledge description'), max_length=256, min_length=1)
-    embedding_model_id = serializers.UUIDField(required=True, label=_('embedding model'))
-    documents = DocumentInstanceSerializer(required=False, many=True)
-
-
 class DocumentSplitRequest(serializers.Serializer):
     file = serializers.ListField(required=True, label=_('file list'))
     limit = serializers.IntegerField(required=False, label=_('limit'))
@@ -80,18 +78,153 @@ class DocumentSplitRequest(serializers.Serializer):
     with_filter = serializers.BooleanField(required=False, label=_('Auto Clean'))
 
 
-class DocumentBatchRequest(serializers.Serializer):
-    file = serializers.ListField(required=True, label=_('file list'))
-    limit = serializers.IntegerField(required=False, label=_('limit'))
-    patterns = serializers.ListField(
-        required=False,
-        child=serializers.CharField(required=True, label=_('patterns')),
-        label=_('patterns')
-    )
-    with_filter = serializers.BooleanField(required=False, label=_('Auto Clean'))
-
-
 class DocumentSerializers(serializers.Serializer):
+    class Query(serializers.Serializer):
+        # 知识库id
+        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+        knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
+        name = serializers.CharField(required=False, max_length=128, min_length=1, label=_('document name'))
+        hit_handling_method = serializers.CharField(required=False, label=_('hit handling method'))
+        is_active = serializers.BooleanField(required=False, label=_('document is active'))
+        task_type = serializers.IntegerField(required=False, label=_('task type'))
+        status = serializers.CharField(required=False, label=_('status'))
+        order_by = serializers.CharField(required=False, label=_('order by'))
+
+        def get_query_set(self):
+            query_set = QuerySet(model=Document)
+            query_set = query_set.filter(**{'knowledge_id': self.data.get("knowledge_id")})
+            if 'name' in self.data and self.data.get('name') is not None:
+                query_set = query_set.filter(**{'name__icontains': self.data.get('name')})
+            if 'hit_handling_method' in self.data and self.data.get('hit_handling_method') is not None:
+                query_set = query_set.filter(**{'hit_handling_method': self.data.get('hit_handling_method')})
+            if 'is_active' in self.data and self.data.get('is_active') is not None:
+                query_set = query_set.filter(**{'is_active': self.data.get('is_active')})
+            if 'status' in self.data and self.data.get(
+                    'status') is not None:
+                task_type = self.data.get('task_type')
+                status = self.data.get(
+                    'status')
+                if task_type is not None:
+                    query_set = query_set.annotate(
+                        reversed_status=Reverse('status'),
+                        task_type_status=Substr('reversed_status', TaskType(task_type).value,
+                                                1),
+                    ).filter(task_type_status=State(status).value).values('id')
+                else:
+                    if status != State.SUCCESS.value:
+                        query_set = query_set.filter(status__icontains=status)
+                    else:
+                        query_set = query_set.filter(status__iregex='^[2n]*$')
+            order_by = self.data.get('order_by', '')
+            order_by_query_set = QuerySet(model=get_dynamics_model(
+                {'char_length': models.CharField(), 'paragraph_count': models.IntegerField(),
+                 "update_time": models.IntegerField(), 'create_time': models.DateTimeField()}))
+            if order_by:
+                order_by_query_set = order_by_query_set.order_by(order_by)
+            else:
+                order_by_query_set = order_by_query_set.order_by('-create_time', 'id')
+            return {
+                'document_custom_sql': query_set,
+                'order_by_query': order_by_query_set
+            }
+
+        def list(self, with_valid=False):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            query_set = self.get_query_set()
+            return native_search(query_set, select_string=get_file_content(
+                os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'list_document.sql')))
+
+        def page(self, current_page, page_size):
+            query_set = self.get_query_set()
+            return native_page_search(current_page, page_size, query_set, select_string=get_file_content(
+                os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'list_document.sql')))
+
+    class Sync(serializers.Serializer):
+        document_id = serializers.UUIDField(required=True, label=_('document id'))
+
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            document_id = self.data.get('document_id')
+            first = QuerySet(Document).filter(id=document_id).first()
+            if first is None:
+                raise AppApiException(500, _('document id not exist'))
+            if first.type != KnowledgeType.WEB:
+                raise AppApiException(500, _('Synchronization is only supported for web site types'))
+
+        def sync(self, with_valid=True, with_embedding=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            document_id = self.data.get('document_id')
+            document = QuerySet(Document).filter(id=document_id).first()
+            state = State.SUCCESS
+            if document.type != KnowledgeType.WEB:
+                return True
+            try:
+                ListenerManagement.update_status(QuerySet(Document).filter(id=document_id),
+                                                 TaskType.SYNC,
+                                                 State.PENDING)
+                ListenerManagement.get_aggregation_document_status(document_id)()
+                source_url = document.meta.get('source_url')
+                selector_list = document.meta.get('selector').split(
+                    " ") if 'selector' in document.meta and document.meta.get('selector') is not None else []
+                result = Fork(source_url, selector_list).fork()
+                if result.status == 200:
+                    # 删除段落
+                    QuerySet(model=Paragraph).filter(document_id=document_id).delete()
+                    # 删除问题
+                    QuerySet(model=ProblemParagraphMapping).filter(document_id=document_id).delete()
+                    delete_problems_and_mappings([document_id])
+                    # 删除向量库
+                    delete_embedding_by_document(document_id)
+                    paragraphs = get_split_model('web.md').parse(result.content)
+                    char_length = reduce(lambda x, y: x + y,
+                                         [len(p.get('content')) for p in paragraphs],
+                                         0)
+                    QuerySet(Document).filter(id=document_id).update(char_length=char_length)
+                    document_paragraph_model = DocumentSerializers.Create.get_paragraph_model(document, paragraphs)
+
+                    paragraph_model_list = document_paragraph_model.get('paragraph_model_list')
+                    problem_paragraph_object_list = document_paragraph_model.get('problem_paragraph_object_list')
+                    problem_model_list, problem_paragraph_mapping_list = ProblemParagraphManage(
+                        problem_paragraph_object_list, document.knowledge_id).to_problem_model_list()
+                    # 批量插入段落
+                    QuerySet(Paragraph).bulk_create(paragraph_model_list) if len(paragraph_model_list) > 0 else None
+                    # 批量插入问题
+                    QuerySet(Problem).bulk_create(problem_model_list) if len(problem_model_list) > 0 else None
+                    # 插入关联问题
+                    QuerySet(ProblemParagraphMapping).bulk_create(problem_paragraph_mapping_list) if len(
+                        problem_paragraph_mapping_list) > 0 else None
+                    # 向量化
+                    if with_embedding:
+                        embedding_model_id = get_embedding_model_id_by_knowledge_id(document.knowledge_id)
+                        ListenerManagement.update_status(QuerySet(Document).filter(id=document_id),
+                                                         TaskType.EMBEDDING,
+                                                         State.PENDING)
+                        ListenerManagement.update_status(QuerySet(Paragraph).filter(document_id=document_id),
+                                                         TaskType.EMBEDDING,
+                                                         State.PENDING)
+                        ListenerManagement.get_aggregation_document_status(document_id)()
+                        embedding_by_document.delay(document_id, embedding_model_id)
+
+                else:
+                    state = State.FAILURE
+            except Exception as e:
+                logging.getLogger("max_kb_error").error(f'{str(e)}:{traceback.format_exc()}')
+                state = State.FAILURE
+            ListenerManagement.update_status(
+                QuerySet(Document).filter(id=document_id),
+                TaskType.SYNC,
+                state
+            )
+            ListenerManagement.update_status(
+                QuerySet(Paragraph).filter(document_id=document_id),
+                TaskType.SYNC,
+                state
+            )
+            ListenerManagement.get_aggregation_document_status(document_id)()
+            return True
+
     class Operate(serializers.Serializer):
         document_id = serializers.UUIDField(required=True, label=_('document id'))
         knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
@@ -148,6 +281,7 @@ class DocumentSerializers(serializers.Serializer):
                 raise AppApiException(500, _('The task is being executed, please do not send it repeatedly.'))
 
     class Create(serializers.Serializer):
+        workspace_id = serializers.UUIDField(required=True, label=_('workspace id'))
         knowledge_id = serializers.UUIDField(required=True, label=_('document id'))
 
         def is_valid(self, *, raise_exception=False):
@@ -166,7 +300,7 @@ class DocumentSerializers(serializers.Serializer):
         @transaction.atomic
         def save(self, instance: Dict, with_valid=False, **kwargs):
             if with_valid:
-                DocumentCreateRequest(data=instance).is_valid(raise_exception=True)
+                DocumentInstanceSerializer(data=instance).is_valid(raise_exception=True)
                 self.is_valid(raise_exception=True)
             knowledge_id = self.data.get('knowledge_id')
             document_paragraph_model = self.get_document_paragraph_model(knowledge_id, instance)

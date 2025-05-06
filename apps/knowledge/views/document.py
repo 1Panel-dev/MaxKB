@@ -8,14 +8,30 @@ from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
 from common.constants.permission_constants import PermissionConstants
 from common.result import result
-from knowledge.api.document import DocumentSplitAPI, DocumentBatchAPI, DocumentBatchCreateAPI
+from knowledge.api.document import DocumentSplitAPI, DocumentBatchAPI, DocumentBatchCreateAPI, DocumentCreateAPI, \
+    DocumentReadAPI, DocumentEditAPI, DocumentDeleteAPI
 from knowledge.api.knowledge import KnowledgeTreeReadAPI
 from knowledge.serializers.document import DocumentSerializers
-from knowledge.serializers.knowledge import KnowledgeSerializer
 
 
 class DocumentView(APIView):
     authentication_classes = [TokenAuth]
+
+    @extend_schema(
+        methods=['POST'],
+        description=_('Create document'),
+        operation_id=_('Create document'),
+        request=DocumentCreateAPI.get_request(),
+        parameters=DocumentCreateAPI.get_parameters(),
+        responses=DocumentCreateAPI.get_response(),
+        tags=[_('Knowledge Base/Documentation')]
+    )
+    @has_permissions(PermissionConstants.DOCUMENT_CREATE.get_workspace_permission())
+    def post(self, request: Request, workspace_id: str, knowledge_id: str):
+        return result.success(
+            DocumentSerializers.Create(
+                data={'workspace_id': workspace_id, 'knowledge_id': knowledge_id},
+            ).save(request.data))
 
     @extend_schema(
         methods=['GET'],
@@ -23,19 +39,64 @@ class DocumentView(APIView):
         operation_id=_('Get document'),
         parameters=KnowledgeTreeReadAPI.get_parameters(),
         responses=KnowledgeTreeReadAPI.get_response(),
-        tags=[_('Knowledge Base')]
+        tags=[_('Knowledge Base/Documentation')]
     )
     @has_permissions(PermissionConstants.DOCUMENT_READ.get_workspace_permission())
-    def get(self, request: Request, workspace_id: str):
-        return result.success(KnowledgeSerializer.Query(
+    def get(self, request: Request, workspace_id: str, knowledge_id: str):
+        return result.success(DocumentSerializers.Query(
             data={
                 'workspace_id': workspace_id,
+                'knowledge_id': knowledge_id,
                 'folder_id': request.query_params.get('folder_id'),
                 'name': request.query_params.get('name'),
                 'desc': request.query_params.get("desc"),
                 'user_id': request.query_params.get('user_id')
             }
         ).list())
+
+    class Operate(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            description=_('Get document details'),
+            operation_id=_('Get document details'),
+            parameters=DocumentReadAPI.get_parameters(),
+            responses=DocumentReadAPI.get_response(),
+            tags=[_('Knowledge Base/Documentation')]
+        )
+        @has_permissions(PermissionConstants.DOCUMENT_READ.get_workspace_permission())
+        def get(self, request: Request, knowledge_id: str, document_id: str):
+            operate = DocumentSerializers.Operate(data={'document_id': document_id, 'knowledge_id': knowledge_id})
+            operate.is_valid(raise_exception=True)
+            return result.success(operate.one())
+
+        @extend_schema(
+            description=_('Modify document'),
+            operation_id=_('Modify document'),
+            parameters=DocumentEditAPI.get_parameters(),
+            request=DocumentEditAPI.get_request(),
+            responses=DocumentEditAPI.get_response(),
+            tags=[_('Knowledge Base/Documentation')]
+        )
+        @has_permissions(PermissionConstants.DOCUMENT_EDIT.get_workspace_permission())
+        def put(self, request: Request, knowledge_id: str, document_id: str):
+            return result.success(
+                DocumentSerializers.Operate(data={'document_id': document_id, 'knowledge_id': knowledge_id}).edit(
+                    request.data,
+                    with_valid=True))
+
+        @extend_schema(
+            description=_('Delete document'),
+            operation_id=_('Delete document'),
+            parameters=DocumentDeleteAPI.get_parameters(),
+            responses=DocumentDeleteAPI.get_response(),
+            tags=[_('Knowledge Base/Documentation')]
+        )
+        @has_permissions(PermissionConstants.DOCUMENT_DELETE.get_workspace_permission())
+        def delete(self, request: Request, knowledge_id: str, document_id: str):
+            operate = DocumentSerializers.Operate(data={'document_id': document_id, 'knowledge_id': knowledge_id})
+            operate.is_valid(raise_exception=True)
+            return result.success(operate.delete())
 
     class Split(APIView):
         authentication_classes = [TokenAuth]
