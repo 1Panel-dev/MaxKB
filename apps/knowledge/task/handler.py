@@ -11,14 +11,14 @@ from django.utils.translation import gettext_lazy as _
 from common.utils.fork import ChildLink, Fork
 from common.utils.split_model import get_split_model
 from knowledge.models.knowledge import KnowledgeType, Document, Knowledge, Status
-from knowledge.serializers.document import DocumentSerializers
-from knowledge.serializers.paragraph import ParagraphSerializers
 
 max_kb_error = logging.getLogger("max_kb_error")
 max_kb = logging.getLogger("max_kb")
 
 
 def get_save_handler(knowledge_id, selector):
+    from knowledge.serializers.document import DocumentSerializers
+
     def handler(child_link: ChildLink, response: Fork.Response):
         if response.status == 200:
             try:
@@ -40,6 +40,8 @@ def get_save_handler(knowledge_id, selector):
 
 
 def get_sync_handler(knowledge_id):
+    from knowledge.serializers.document import DocumentSerializers
+
     knowledge = QuerySet(Knowledge).filter(id=knowledge_id).first()
 
     def handler(child_link: ChildLink, response: Fork.Response):
@@ -70,6 +72,8 @@ def get_sync_handler(knowledge_id):
 
 
 def get_sync_web_document_handler(knowledge_id):
+    from knowledge.serializers.document import DocumentSerializers
+
     def handler(source_url: str, selector, response: Fork.Response):
         if response.status == 200:
             try:
@@ -93,6 +97,8 @@ def get_sync_web_document_handler(knowledge_id):
 
 
 def save_problem(knowledge_id, document_id, paragraph_id, problem):
+    from knowledge.serializers.paragraph import ParagraphSerializers
+
     # print(f"knowledge_id: {knowledge_id}")
     # print(f"document_id: {document_id}")
     # print(f"paragraph_id: {paragraph_id}")

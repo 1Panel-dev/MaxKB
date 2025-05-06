@@ -10,7 +10,7 @@ from common.constants.permission_constants import PermissionConstants
 from common.result import result
 from knowledge.api.document import DocumentSplitAPI, DocumentBatchAPI, DocumentBatchCreateAPI, DocumentCreateAPI, \
     DocumentReadAPI, DocumentEditAPI, DocumentDeleteAPI, TableDocumentCreateAPI, QaDocumentCreateAPI, \
-    WebDocumentCreateAPI
+    WebDocumentCreateAPI, CancelTaskAPI, BatchCancelTaskAPI, SyncWebAPI, RefreshAPI, BatchEditHitHandlingAPI
 from knowledge.api.knowledge import KnowledgeTreeReadAPI
 from knowledge.serializers.document import DocumentSerializers
 
@@ -139,6 +139,97 @@ class DocumentView(APIView):
                 'workspace_id': workspace_id,
                 'knowledge_id': knowledge_id,
             }).parse(split_data))
+
+    class BatchEditHitHandling(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['PUT'],
+            summary=_('Modify document hit processing methods in batches'),
+            description=_('Modify document hit processing methods in batches'),
+            operation_id=_('Modify document hit processing methods in batches'),
+            request=BatchEditHitHandlingAPI.get_request(),
+            parameters=BatchEditHitHandlingAPI.get_parameters(),
+            responses=BatchEditHitHandlingAPI.get_response(),
+            tags=[_('Knowledge Base/Documentation')]
+        )
+        @has_permissions(PermissionConstants.DOCUMENT_EDIT.get_workspace_permission())
+        def put(self, request: Request, workspace_id: str, knowledge_id: str):
+            return result.success(DocumentSerializers.Batch(
+                data={'knowledge_id': knowledge_id, 'workspace_id': workspace_id}
+            ).batch_edit_hit_handling(request.data))
+
+    class SyncWeb(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['PUT'],
+            description=_('Synchronize web site types'),
+            summary=_('Synchronize web site types'),
+            operation_id=_('Synchronize web site types'),
+            parameters=SyncWebAPI.get_parameters(),
+            responses=SyncWebAPI.get_response(),
+            tags=[_('Knowledge Base/Documentation')]
+        )
+        @has_permissions(PermissionConstants.DOCUMENT_EDIT.get_workspace_permission())
+        def put(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
+            return result.success(DocumentSerializers.Sync(
+                data={'document_id': document_id, 'knowledge_id': knowledge_id, 'workspace_id': workspace_id}
+            ).sync())
+
+    class Refresh(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['PUT'],
+            summary=_('Refresh document vector library'),
+            description=_('Refresh document vector library'),
+            operation_id=_('Refresh document vector library'),
+            parameters=RefreshAPI.get_parameters(),
+            request=RefreshAPI.get_request(),
+            responses=RefreshAPI.get_response(),
+            tags=[_('Knowledge Base/Documentation')]
+        )
+        @has_permissions(PermissionConstants.DOCUMENT_EDIT.get_workspace_permission())
+        def put(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
+            return result.success(DocumentSerializers.Operate(
+                data={'document_id': document_id, 'knowledge_id': knowledge_id, 'workspace_id': workspace_id}
+            ).refresh(request.data.get('state_list')))
+
+    class CancelTask(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            summary=_('Cancel task'),
+            description=_('Cancel task'),
+            operation_id=_('Cancel task'),
+            parameters=CancelTaskAPI.get_parameters(),
+            request=CancelTaskAPI.get_request(),
+            responses=CancelTaskAPI.get_response(),
+            tags=[_('Knowledge Base/Documentation')]
+        )
+        @has_permissions(PermissionConstants.DOCUMENT_EDIT.get_workspace_permission())
+        def put(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
+            return result.success(DocumentSerializers.Operate(
+                data={'document_id': document_id, 'knowledge_id': knowledge_id, 'workspace_id': workspace_id}
+            ).cancel(request.data))
+
+    class BatchCancelTask(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            summary=_('Cancel tasks in batches'),
+            description=_('Cancel tasks in batches'),
+            operation_id=_('Cancel tasks in batches'),
+            parameters=BatchCancelTaskAPI.get_parameters(),
+            request=BatchCancelTaskAPI.get_request(),
+            responses=BatchCancelTaskAPI.get_response(),
+            tags=[_('Knowledge Base/Documentation')]
+        )
+        def put(self, request: Request, workspace_id: str, knowledge_id: str):
+            return result.success(DocumentSerializers.Batch(data={
+                'knowledge_id': knowledge_id, 'workspace_id': workspace_id}
+            ).batch_cancel(request.data))
 
     class Batch(APIView):
         authentication_classes = [TokenAuth]

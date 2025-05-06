@@ -64,7 +64,7 @@ parse_table_handle_list = [CsvParseTableHandle(), XlsParseTableHandle(), XlsxPar
 
 
 class BatchCancelInstanceSerializer(serializers.Serializer):
-    id_list = serializers.ListField(required=True, child=serializers.UUIDField(required=True), label=('id list'))
+    id_list = serializers.ListField(required=True, child=serializers.UUIDField(required=True), label=_('id list'))
     type = serializers.IntegerField(required=True, label=_('task type'))
 
     def is_valid(self, *, raise_exception=False):
@@ -79,6 +79,18 @@ class BatchCancelInstanceSerializer(serializers.Serializer):
 class DocumentInstanceSerializer(serializers.Serializer):
     name = serializers.CharField(required=True, label=_('document name'), max_length=128, min_length=1)
     paragraphs = ParagraphInstanceSerializer(required=False, many=True, allow_null=True)
+
+
+class CancelInstanceSerializer(serializers.Serializer):
+    type = serializers.IntegerField(required=True, label=_('task type'))
+
+    def is_valid(self, *, raise_exception=False):
+        super().is_valid(raise_exception=True)
+        _type = self.data.get('type')
+        try:
+            TaskType(_type)
+        except Exception as e:
+            raise AppApiException(500, _('task type not support'))
 
 
 class DocumentEditInstanceSerializer(serializers.Serializer):
@@ -136,6 +148,22 @@ class DocumentInstanceQASerializer(serializers.Serializer):
 class DocumentInstanceTableSerializer(serializers.Serializer):
     file_list = serializers.ListSerializer(required=True, label=_('file list'),
                                            child=serializers.FileField(required=True, label=_('file')))
+
+
+class DocumentRefreshSerializer(serializers.Serializer):
+    state_list = serializers.ListField(required=True, label=_('state list'))
+
+
+class BatchEditHitHandlingSerializer(serializers.Serializer):
+    id_list = serializers.ListField(required=True, child=serializers.UUIDField(required=True), label=_('id list'))
+    hit_handling_method = serializers.CharField(required=True, label=_('hit handling method'))
+    directly_return_similarity = serializers.FloatField(required=False, max_value=2, min_value=0,
+                                                        label=_('directly return similarity'))
+
+    def is_valid(self, *, raise_exception=False):
+        super().is_valid(raise_exception=True)
+        if self.data.get('hit_handling_method') not in ['optimization', 'directly_return']:
+            raise AppApiException(500, _('The type only supports optimization|directly_return'))
 
 
 class DocumentSerializers(serializers.Serializer):
@@ -201,6 +229,8 @@ class DocumentSerializers(serializers.Serializer):
                 os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'list_document.sql')))
 
     class Sync(serializers.Serializer):
+        workspace_id = serializers.CharField(required=False, label=_('workspace id'))
+        knowledge_id = serializers.UUIDField(required=False, label=_('knowledge id'))
         document_id = serializers.UUIDField(required=True, label=_('document id'))
 
         def is_valid(self, *, raise_exception=False):
@@ -319,6 +349,38 @@ class DocumentSerializers(serializers.Serializer):
                     _document.__setattr__(update_key, instance.get(update_key))
             _document.save()
             return self.one()
+
+        def cancel(self, instance, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+                CancelInstanceSerializer(data=instance).is_valid()
+            document_id = self.data.get("document_id")
+            ListenerManagement.update_status(
+                QuerySet(Paragraph).annotate(
+                    reversed_status=Reverse('status'),
+                    task_type_status=Substr('reversed_status', TaskType(instance.get('type')).value, 1),
+                ).filter(
+                    task_type_status__in=[State.PENDING.value, State.STARTED.value]
+                ).filter(
+                    document_id=document_id
+                ).values('id'),
+                TaskType(instance.get('type')),
+                State.REVOKE
+            )
+            ListenerManagement.update_status(
+                QuerySet(Document).annotate(
+                    reversed_status=Reverse('status'),
+                    task_type_status=Substr('reversed_status', TaskType(instance.get('type')).value,
+                                            1),
+                ).filter(
+                    task_type_status__in=[State.PENDING.value, State.STARTED.value]
+                ).filter(
+                    id=document_id
+                ).values('id'),
+                TaskType(instance.get('type')),
+                State.REVOKE
+            )
+            return True
 
         @transaction.atomic
         def delete(self):

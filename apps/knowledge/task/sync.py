@@ -16,7 +16,6 @@ from django.utils.translation import gettext_lazy as _
 
 from common.utils.fork import ForkManage, Fork
 from ops import celery_app
-from .handler import get_save_handler, get_sync_web_document_handler, get_sync_handler
 
 max_kb_error = logging.getLogger("max_kb_error")
 max_kb = logging.getLogger("max_kb")
@@ -24,6 +23,8 @@ max_kb = logging.getLogger("max_kb")
 
 @celery_app.task(base=QueueOnce, once={'keys': ['knowledge_id']}, name='celery:sync_web_knowledge')
 def sync_web_knowledge(knowledge_id: str, url: str, selector: str):
+    from knowledge.task.handler import get_save_handler
+
     try:
         max_kb.info(
             _('Start--->Start synchronization web knowledge base:{knowledge_id}').format(knowledge_id=knowledge_id))
@@ -39,6 +40,8 @@ def sync_web_knowledge(knowledge_id: str, url: str, selector: str):
 
 @celery_app.task(base=QueueOnce, once={'keys': ['knowledge_id']}, name='celery:sync_replace_web_knowledge')
 def sync_replace_web_knowledge(knowledge_id: str, url: str, selector: str):
+    from knowledge.task.handler import get_sync_handler
+
     try:
         max_kb.info(
             _('Start--->Start synchronization web knowledge base:{knowledge_id}').format(knowledge_id=knowledge_id))
@@ -53,6 +56,8 @@ def sync_replace_web_knowledge(knowledge_id: str, url: str, selector: str):
 
 @celery_app.task(name='celery:sync_web_document')
 def sync_web_document(knowledge_id, source_url_list: List[str], selector: str):
+    from knowledge.task.handler import get_sync_web_document_handler
+
     handler = get_sync_web_document_handler(knowledge_id)
     for source_url in source_url_list:
         try:

@@ -4,7 +4,8 @@ from drf_spectacular.utils import OpenApiParameter
 from common.mixins.api_mixin import APIMixin
 from common.result import DefaultResultSerializer
 from knowledge.serializers.common import BatchSerializer
-from knowledge.serializers.document import DocumentInstanceSerializer, DocumentWebInstanceSerializer
+from knowledge.serializers.document import DocumentInstanceSerializer, DocumentWebInstanceSerializer, \
+    CancelInstanceSerializer, BatchCancelInstanceSerializer, DocumentRefreshSerializer, BatchEditHitHandlingSerializer
 
 
 class DocumentSplitAPI(APIMixin):
@@ -218,3 +219,50 @@ class WebDocumentCreateAPI(APIMixin):
     @staticmethod
     def get_request():
         return DocumentWebInstanceSerializer
+
+
+class CancelTaskAPI(DocumentReadAPI):
+    @staticmethod
+    def get_request():
+        return CancelInstanceSerializer
+
+
+class BatchCancelTaskAPI(DocumentReadAPI):
+    @staticmethod
+    def get_request():
+        return BatchCancelInstanceSerializer
+
+
+class SyncWebAPI(DocumentReadAPI):
+    pass
+
+
+class RefreshAPI(DocumentReadAPI):
+    @staticmethod
+    def get_request():
+        return DocumentRefreshSerializer
+
+
+class BatchEditHitHandlingAPI(APIMixin):
+    @staticmethod
+    def get_parameters():
+        return [
+            OpenApiParameter(
+                name="workspace_id",
+                description="工作空间id",
+                type=OpenApiTypes.STR,
+                location='path',
+                required=True,
+            ),
+            OpenApiParameter(
+                name="knowledge_id",
+                description="知识库id",
+                type=OpenApiTypes.STR,
+                location='path',
+                required=True,
+            ),
+        ]
+
+    @staticmethod
+    def get_request():
+        return BatchEditHitHandlingSerializer
