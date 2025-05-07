@@ -43,7 +43,7 @@ FOLDER_DEPTH = 2  # Folder 不能超过3层
 
 def check_depth(source, parent_id, current_depth=0):
     # Folder 不能超过3层
-    Folder = get_folder_type(source)
+    Folder = get_folder_type(source)  # noqa
 
     if parent_id != 'root':
         # 计算当前层级
@@ -101,7 +101,7 @@ class FolderSerializer(serializers.Serializer):
             parent_id = instance.get('parent_id', 'root')
             name = instance.get('name')
 
-            Folder = get_folder_type(self.data.get('source'))
+            Folder = get_folder_type(self.data.get('source'))  # noqa
             if QuerySet(Folder).filter(name=name, workspace_id=workspace_id, parent_id=parent_id).exists():
                 raise serializers.ValidationError(_('Folder name already exists'))
             # Folder 不能超过3层
@@ -125,7 +125,7 @@ class FolderSerializer(serializers.Serializer):
         @transaction.atomic
         def edit(self, instance):
             self.is_valid(raise_exception=True)
-            Folder = get_folder_type(self.data.get('source'))
+            Folder = get_folder_type(self.data.get('source'))  # noqa
             current_id = self.data.get('id')
             current_node = Folder.objects.get(id=current_id)
             if current_node is None:
@@ -150,7 +150,7 @@ class FolderSerializer(serializers.Serializer):
 
         def one(self):
             self.is_valid(raise_exception=True)
-            Folder = get_folder_type(self.data.get('source'))
+            Folder = get_folder_type(self.data.get('source'))  # noqa
             folder = QuerySet(Folder).filter(id=self.data.get('id')).first()
             return FolderSerializer(folder).data
 
@@ -158,7 +158,7 @@ class FolderSerializer(serializers.Serializer):
             self.is_valid(raise_exception=True)
             if self.data.get('id') == 'root':
                 raise serializers.ValidationError(_('Cannot delete root folder'))
-            Folder = get_folder_type(self.data.get('source'))
+            Folder = get_folder_type(self.data.get('source'))  # noqa
             QuerySet(Folder).filter(id=self.data.get('id')).delete()
 
 
@@ -168,12 +168,12 @@ class FolderTreeSerializer(serializers.Serializer):
 
     def get_folder_tree(self, name=None):
         self.is_valid(raise_exception=True)
-        Folder = get_folder_type(self.data.get('source'))
+        Folder = get_folder_type(self.data.get('source'))  # noqa
         if name is not None:
             nodes = Folder.objects.filter(Q(workspace_id=self.data.get('workspace_id')) &
                                           Q(name__contains=name)).get_cached_trees()
         else:
             nodes = Folder.objects.filter(Q(workspace_id=self.data.get('workspace_id'))).get_cached_trees()
-        TreeSerializer = get_folder_tree_serializer(self.data.get('source'))
+        TreeSerializer = get_folder_tree_serializer(self.data.get('source'))  # noqa
         serializer = TreeSerializer(nodes, many=True)
         return serializer.data  # 这是可序列化的字典
