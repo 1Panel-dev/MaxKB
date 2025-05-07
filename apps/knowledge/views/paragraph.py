@@ -9,7 +9,7 @@ from common.constants.permission_constants import PermissionConstants
 from common.result import result
 from common.utils.common import query_params_to_single_dict
 from knowledge.api.paragraph import ParagraphReadAPI, ParagraphCreateAPI, ParagraphBatchDeleteAPI, ParagraphEditAPI, \
-    ParagraphGetAPI, ProblemCreateAPI, UnAssociationAPI, AssociationAPI
+    ParagraphGetAPI, ProblemCreateAPI, UnAssociationAPI, AssociationAPI, ParagraphPageAPI
 from knowledge.serializers.paragraph import ParagraphSerializers
 
 
@@ -232,3 +232,29 @@ class ParagraphView(APIView):
                     'problem_id': problem_id
                 }
             ).association())
+
+    class Page(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['GET'],
+            summary=_('Get paragraph list by pagination'),
+            description=_('Get paragraph list by pagination'),
+            operation_id=_('Get paragraph list by pagination'),
+            parameters=ParagraphPageAPI.get_parameters(),
+            responses=ParagraphPageAPI.get_response(),
+            tags=[_('Knowledge Base/Documentation/Paragraph')]
+        )
+        @has_permissions(PermissionConstants.DOCUMENT_EDIT.get_workspace_permission())
+        def get(self, request: Request,
+                workspace_id: str, knowledge_id: str, document_id: str, current_page: int, page_size: int):
+            d = ParagraphSerializers.Query(
+                data={
+                    **query_params_to_single_dict(request.query_params),
+                    'workspace_id': workspace_id,
+                    'knowledge_id': knowledge_id,
+                    'document_id': document_id
+                }
+            )
+            d.is_valid(raise_exception=True)
+            return result.success(d.page(current_page, page_size))

@@ -25,6 +25,7 @@ urlpatterns = [
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/<str:document_id>/paragraph/batch', views.ParagraphView.Batch.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/<str:document_id>/paragraph/<str:paragraph_id>', views.ParagraphView.Operate.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/<str:document_id>/paragraph/<str:paragraph_id>/problem', views.ParagraphView.Problem.as_view()),
+    path( 'workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/<str:document_id>/paragraph/<int:current_page>/<int:page_size>', views.ParagraphView.Page.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/<str:document_id>/paragraph/<str:paragraph_id>/problem/<str:problem_id>/association', views.ParagraphView.Association.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/<str:document_id>/paragraph/<str:paragraph_id>/problem/<str:problem_id>/unassociation', views.ParagraphView.UnAssociation.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/<int:current_page>/<int:page_sige>', views.DocumentView.Page.as_view()),
