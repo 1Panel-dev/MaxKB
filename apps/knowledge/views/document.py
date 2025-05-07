@@ -248,11 +248,11 @@ class DocumentView(APIView):
                 'knowledge_id': knowledge_id, 'workspace_id': workspace_id}
             ).batch_cancel(request.data))
 
-    class Batch(APIView):
+    class BatchCreate(APIView):
         authentication_classes = [TokenAuth]
 
         @extend_schema(
-            methods=['POST'],
+            methods=['PUT'],
             description=_('Create documents in batches'),
             summary=_('Create documents in batches'),
             operation_id=_('Create documents in batches'),
@@ -265,10 +265,13 @@ class DocumentView(APIView):
             PermissionConstants.DOCUMENT_CREATE.get_workspace_permission(),
             PermissionConstants.DOCUMENT_EDIT.get_workspace_permission(),
         ])
-        def post(self, request: Request, workspace_id: str, knowledge_id: str):
+        def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(DocumentSerializers.Batch(
                 data={'knowledge_id': knowledge_id, 'workspace_id': workspace_id}
             ).batch_save(request.data))
+
+    class BatchSync(APIView):
+        authentication_classes = [TokenAuth]
 
         @extend_schema(
             methods=['PUT'],
@@ -289,8 +292,11 @@ class DocumentView(APIView):
                 data={'knowledge_id': knowledge_id, 'workspace_id': workspace_id}
             ).batch_sync(request.data))
 
+    class BatchDelete(APIView):
+        authentication_classes = [TokenAuth]
+
         @extend_schema(
-            methods=['DELETE'],
+            methods=['PUT'],
             description=_('Delete documents in batches'),
             summary=_('Delete documents in batches'),
             operation_id=_('Delete documents in batches'),
@@ -303,7 +309,7 @@ class DocumentView(APIView):
             PermissionConstants.DOCUMENT_CREATE.get_workspace_permission(),
             PermissionConstants.DOCUMENT_EDIT.get_workspace_permission(),
         ])
-        def delete(self, request: Request, workspace_id: str, knowledge_id: str):
+        def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(DocumentSerializers.Batch(
                 data={'workspace_id': workspace_id, 'knowledge_id': knowledge_id}
             ).batch_delete(request.data))

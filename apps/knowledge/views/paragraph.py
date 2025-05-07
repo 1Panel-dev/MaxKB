@@ -51,11 +51,11 @@ class ParagraphView(APIView):
             data={'workspace_id': workspace_id, 'knowledge_id': knowledge_id, 'document_id': document_id}
         ).save(request.data))
 
-    class Batch(APIView):
+    class BatchDelete(APIView):
         authentication_classes = [TokenAuth]
 
         @extend_schema(
-            methods=['DELETE'],
+            methods=['PUT'],
             summary=_('Batch Paragraph'),
             description=_('Batch Paragraph'),
             operation_id=_('Batch Paragraph'),
@@ -65,7 +65,7 @@ class ParagraphView(APIView):
             tags=[_('Knowledge Base/Documentation/Paragraph')]
         )
         @has_permissions(PermissionConstants.DOCUMENT_EDIT.get_workspace_permission())
-        def delete(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
+        def put(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
             return result.success(ParagraphSerializers.Batch(
                 data={'workspace_id': workspace_id, 'knowledge_id': knowledge_id, 'document_id': document_id}
             ).batch_delete(request.data))
