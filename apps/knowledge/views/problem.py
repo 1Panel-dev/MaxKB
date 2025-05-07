@@ -50,8 +50,8 @@ class ProblemView(APIView):
     @has_permissions(PermissionConstants.DOCUMENT_EDIT.get_workspace_permission())
     def post(self, request: Request, workspace_id: str, knowledge_id: str):
         return result.success(ProblemSerializers.Create(
-            data={'workspace_id': workspace_id, 'knowledge_id': knowledge_id, 'problem_list': request.data}
-        ).batch())
+            data={'workspace_id': workspace_id, 'knowledge_id': knowledge_id}
+        ).batch(request.data))
 
     class Paragraph(APIView):
         authentication_classes = [TokenAuth]
