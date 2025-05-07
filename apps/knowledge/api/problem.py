@@ -121,7 +121,11 @@ class ProblemDeleteAPI(APIMixin):
         return DefaultResultSerializer
 
 
-class ProblemEditAPI(ProblemReadAPI):
+class ProblemEditAPI(ProblemDeleteAPI):
     @staticmethod
     def get_request():
         return ProblemEditSerializer
+
+
+class ProblemParagraphAPI(ProblemDeleteAPI):
+    pass

@@ -9,7 +9,7 @@ from common.constants.permission_constants import PermissionConstants
 from common.result import result
 from common.utils.common import query_params_to_single_dict
 from knowledge.api.problem import ProblemReadAPI, ProblemBatchCreateAPI, BatchAssociationAPI, BatchDeleteAPI, \
-    ProblemPageAPI, ProblemDeleteAPI, ProblemEditAPI
+    ProblemPageAPI, ProblemDeleteAPI, ProblemEditAPI, ProblemParagraphAPI
 from knowledge.serializers.problem import ProblemSerializers
 
 
@@ -52,6 +52,28 @@ class ProblemView(APIView):
         return result.success(ProblemSerializers.Create(
             data={'workspace_id': workspace_id, 'knowledge_id': knowledge_id, 'problem_list': request.data}
         ).batch())
+
+    class Paragraph(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            summary=_('Get a list of associated paragraphs'),
+            description=_('Get a list of associated paragraphs'),
+            operation_id=_('Get a list of associated paragraphs'),
+            parameters=ProblemParagraphAPI.get_parameters(),
+            responses=ProblemParagraphAPI.get_response(),
+            tags=[_('Knowledge Base/Documentation/Paragraph/Question')]
+        )
+        @has_permissions(PermissionConstants.DOCUMENT_EDIT.get_workspace_permission())
+        def get(self, request: Request, workspace_id: str, knowledge_id: str, problem_id: str):
+            return result.success(ProblemSerializers.Operate(
+                data={
+                    **query_params_to_single_dict(request.query_params),
+                    'workspace_id': workspace_id,
+                    'knowledge_id': knowledge_id,
+                    'problem_id': problem_id
+                }
+            ).list_paragraph())
 
     class BatchAssociation(APIView):
         authentication_classes = [TokenAuth]
