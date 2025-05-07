@@ -30,6 +30,9 @@ urlpatterns = [
     path( 'workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/<str:document_id>/paragraph/<int:current_page>/<int:page_size>', views.ParagraphView.Page.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/<str:document_id>/paragraph/<str:paragraph_id>/problem/<str:problem_id>/association', views.ParagraphView.Association.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/<str:document_id>/paragraph/<str:paragraph_id>/problem/<str:problem_id>/unassociation', views.ParagraphView.UnAssociation.as_view()),
+    path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/problem', views.ProblemView.as_view()),
+    path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/problem/batch_delete', views.ProblemView.BatchDelete.as_view()),
+    path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/problem/batch_association', views.ProblemView.BatchAssociation.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/<int:current_page>/<int:page_sige>', views.DocumentView.Page.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<int:current_page>/<int:page_size>', views.KnowledgeView.Page.as_view()),
 ]
