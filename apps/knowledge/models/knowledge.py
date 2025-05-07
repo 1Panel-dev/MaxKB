@@ -3,6 +3,7 @@ from enum import Enum
 import uuid_utils.compat as uuid
 from django.contrib.postgres.search import SearchVectorField
 from django.db import models
+from django.db.models import QuerySet
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 from mptt.fields import TreeForeignKey
@@ -10,6 +11,7 @@ from mptt.models import MPTTModel
 
 from common.db.sql_execute import select_one
 from common.mixins.app_model_mixin import AppModelMixin
+from common.utils.common import get_sha256_hash
 from models_provider.models import Model
 from users.models import User
 
@@ -221,6 +223,19 @@ class SearchMode(models.TextChoices):
     blend = 'blend'
 
 
+class FileSourceType(models.TextChoices):
+    # 知识库  跟随知识库被删除而被删除 source_id 为知识库id
+    KNOWLEDGE = "KNOWLEDGE"
+    # 应用  跟随应用被删除而被删除 source_id 为应用id
+    APPLICATION = "APPLICATION"
+    # 临时30分钟 数据30分钟后被清理 source_id 为TEMPORARY_30_MINUTE
+    TEMPORARY_30_MINUTE = "TEMPORARY_30_MINUTE"
+    # 临时120分钟 数据120分钟后被清理 source_id为TEMPORARY_100_MINUTE
+    TEMPORARY_120_MINUTE = "TEMPORARY_100_MINUTE"
+    # 临时1天 数据1天后被清理 source_id为TEMPORARY_1_DAY
+    TEMPORARY_1_DAY = "TEMPORARY_1_DAY"
+
+
 class VectorField(models.Field):
     def db_type(self, connection):
         return 'vector'
@@ -246,7 +261,11 @@ class Embedding(models.Model):
 class File(AppModelMixin):
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
     file_name = models.CharField(max_length=256, verbose_name="文件名称", default="")
-    workspace_id = models.CharField(max_length=64, verbose_name="工作空间id", default="default", db_index=True)
+    file_size = models.IntegerField(verbose_name="文件大小", default=0)
+    sha256_hash = models.CharField(verbose_name="文件sha256_hash标识", default="")
+    source_type = models.CharField(verbose_name="资源类型", choices=FileSourceType,
+                                   default=FileSourceType.TEMPORARY_120_MINUTE.value)
+    source_id = models.CharField(verbose_name="资源id", default=FileSourceType.TEMPORARY_120_MINUTE.value)
     loid = models.IntegerField(verbose_name="loid")
     meta = models.JSONField(verbose_name="文件关联数据", default=dict)
 
@@ -254,8 +273,13 @@ class File(AppModelMixin):
         db_table = "file"
 
     def save(self, bytea=None, force_insert=False, force_update=False, using=None, update_fields=None):
-        result = select_one("SELECT lo_from_bytea(%s, %s::bytea) as loid", [0, bytea])
-        self.loid = result['loid']
+        sha256_hash = get_sha256_hash(bytea)
+        f = QuerySet(File).filter(sha256_hash=sha256_hash).first()
+        if f is not None:
+            self.loid = f.loid
+        else:
+            result = select_one("SELECT lo_from_bytea(%s, %s::bytea) as loid", [0, bytea])
+            self.loid = result['loid']
         super().save()
 
     def get_bytes(self):
@@ -265,4 +289,6 @@ class File(AppModelMixin):
 
 @receiver(pre_delete, sender=File)
 def on_delete_file(sender, instance, **kwargs):
-    select_one(f'SELECT lo_unlink({instance.loid})', [])
+    exist = QuerySet(File).filter(loid=instance.loid).exclude(id=instance.id).exists()
+    if not exist:
+        select_one(f'SELECT lo_unlink({instance.loid})', [])
