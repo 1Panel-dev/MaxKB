@@ -143,7 +143,7 @@
 
       <div class="model-list-height">
         <el-scrollbar>
-          <div class="p-24 pt-0">
+          <div>
             <el-row v-if="model_split_list.length > 0" :gutter="15">
               <template v-for="(row, index) in model_split_list" :key="index">
                 <el-col
@@ -262,13 +262,15 @@ const openCreateModel = (provider?: Provider, model_type?: string) => {
 
 const list_model = () => {
   const params = active_provider.value?.provider ? { provider: active_provider.value.provider } : {}
-  ModelApi.getModel({ ...model_search_form.value, ...params }, list_model_loading).then((ok) => {
-    model_list.value = ok.data
-    const v = model_list.value.map((m) => ({ id: m.user_id, username: m.username }))
-    if (user_options.value.length === 0) {
-      user_options.value = Array.from(new Map(v.map((item) => [item.id, item])).values())
-    }
-  })
+  ModelApi.getModel('default', { ...model_search_form.value, ...params }, list_model_loading).then(
+    (ok) => {
+      model_list.value = ok.data
+      const v = model_list.value.map((m) => ({ id: m.user_id, username: m.username }))
+      if (user_options.value.length === 0) {
+        user_options.value = Array.from(new Map(v.map((item) => [item.id, item])).values())
+      }
+    },
+  )
 }
 
 const search_type_change = () => {
@@ -324,7 +326,7 @@ onMounted(() => {
     color: var(--el-color-primary);
     font-weight: 500;
   }
-  .template-collapse {
+  .model-collapse {
     border-top: none !important;
     border-bottom: none !important;
     :deep(.el-collapse-item__header) {
@@ -332,6 +334,7 @@ onMounted(() => {
       padding-left: 16px;
       font-size: 14px;
       height: 40px;
+      background: none;
       &:hover {
         background: var(--app-text-color-light-1);
         border-radius: 4px;

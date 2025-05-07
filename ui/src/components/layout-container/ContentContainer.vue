@@ -42,7 +42,7 @@ const showBack = computed(() => {
   .content-container__main {
     // background-color: var(--app-view-bg-color);
     box-sizing: border-box;
-    min-width: 847px;
+    min-width: 447px;
   }
 }
 </style>

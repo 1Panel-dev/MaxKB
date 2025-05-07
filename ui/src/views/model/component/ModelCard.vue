@@ -1,64 +1,50 @@
 <template>
   <card-box :title="model.name" shadow="hover" class="model-card">
-    <template #header>
-      <div class="flex">
-        <span style="height: 32px; width: 32px" :innerHTML="icon" class="mr-12"></span>
-        <div style="width: calc(100% - 32px - 4px - var(--app-base-px))">
-          <div class="flex" style="height: 22px">
-            <auto-tooltip :content="model.name" style="max-width: 40%">
-              {{ model.name }}
-            </auto-tooltip>
-            <span v-if="currentModel.status === 'ERROR'">
-              <el-tooltip effect="dark" :content="errMessage" placement="top">
-                <el-icon class="danger ml-4" size="18"><Warning /></el-icon>
-              </el-tooltip>
-            </span>
-            <span v-if="currentModel.status === 'PAUSE_DOWNLOAD'">
-              <el-tooltip
-                effect="dark"
-                :content="`${$t('views.model.modelForm.form.base_model.label')}: ${props.model.model_name} ${$t('views.model.tip.downloadError')}`"
-                placement="top"
-              >
-                <el-icon class="danger ml-4" size="18"><Warning /></el-icon>
-              </el-tooltip>
-            </span>
-          </div>
-          <div class="mt-4">
-            <el-tag v-if="model.permission_type === 'PRIVATE'" type="danger" class="danger-tag">{{
-              $t('common.private')
-            }}</el-tag>
-            <el-tag v-else type="info" class="info-tag"> {{ $t('common.public') }}</el-tag>
-          </div>
-        </div>
+    <template #icon>
+      <span style="height: 32px; width: 32px" :innerHTML="icon" class="mr-12"></span>
+    </template>
+    <template #title>
+      <div class="flex" style="height: 22px">
+        <auto-tooltip :content="model.name" style="max-width: 40%">
+          {{ model.name }}
+        </auto-tooltip>
+        <span v-if="currentModel.status === 'ERROR'">
+          <el-tooltip effect="dark" :content="errMessage" placement="top">
+            <el-icon class="danger ml-4" size="18"><Warning /></el-icon>
+          </el-tooltip>
+        </span>
+        <span v-if="currentModel.status === 'PAUSE_DOWNLOAD'">
+          <el-tooltip
+            effect="dark"
+            :content="`${$t('views.model.modelForm.form.base_model.label')}: ${props.model.model_name} ${$t('views.model.tip.downloadError')}`"
+            placement="top"
+          >
+            <el-icon class="danger ml-4" size="18"><Warning /></el-icon>
+          </el-tooltip>
+        </span>
       </div>
     </template>
-
-    <div class="mt-16">
-      <ul>
-        <li class="flex mt-16">
-          <el-text type="info">{{
-            $t('views.model.modelForm.form.model_type.label')
-          }}</el-text>
-          <span class="ellipsis ml-16">
-            {{ $t(modelType[model.model_type as keyof typeof modelType]) }}</span
-          >
-        </li>
-        <li class="flex mt-12">
-          <el-text type="info">{{
-            $t('views.model.modelForm.form.base_model.label')
-          }}</el-text>
-          <span class="ellipsis-1 ml-16" style="height: 20px; width: 70%">
-            {{ model.model_name }}</span
-          >
-        </li>
-        <li class="flex mt-12">
-          <el-text type="info">{{ $t('common.creator') }}</el-text>
-          <span class="ellipsis-1 ml-16" style="height: 20px; width: 70%">
-            {{ model.username }}</span
-          >
-        </li>
-      </ul>
-    </div>
+    <template #subTitle>
+      <el-text class="color-secondary" size="small">
+        <auto-tooltip :content="model.username">
+          {{ $t('common.creator') }}: {{ model.username }}
+        </auto-tooltip>
+      </el-text>
+    </template>
+    <ul>
+      <li class="flex">
+        <el-text type="info">{{ $t('views.model.modelForm.form.model_type.label') }}</el-text>
+        <span class="ellipsis ml-16">
+          {{ $t(modelType[model.model_type as keyof typeof modelType]) }}</span
+        >
+      </li>
+      <li class="flex">
+        <el-text type="info">{{ $t('views.model.modelForm.form.base_model.label') }}</el-text>
+        <span class="ellipsis-1 ml-16" style="height: 20px; width: 70%">
+          {{ model.model_name }}</span
+        >
+      </li>
+    </ul>
     <!-- progress -->
     <div class="progress-mask" v-if="currentModel.status === 'DOWNLOAD'">
       <!-- <DownloadLoading class="percentage" /> -->
@@ -170,8 +156,8 @@ const deleteModel = () => {
     `${t('views.model.delete.confirmMessage')}${props.model.name} ?`,
     {
       confirmButtonText: t('common.confirm'),
-      confirmButtonClass: 'danger'
-    }
+      confirmButtonClass: 'danger',
+    },
   )
     .then(() => {
       ModelApi.deleteModel(props.model.id).then(() => {

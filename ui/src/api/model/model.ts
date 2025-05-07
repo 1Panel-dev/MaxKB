@@ -1,28 +1,26 @@
-
 import { Result } from '@/request/Result'
 import { get, post, del, put } from '@/request/index'
 import { type Ref } from 'vue'
 import type {
   ListModelRequest,
   Model,
-  BaseModel,
   CreateModelRequest,
   EditModelRequest,
 } from '@/api/type/model'
 import type { FormField } from '@/components/dynamics-form/type'
-import type { KeyValue } from '../type/common'
-const prefix = '/model'
-const prefix_provider = '/provider'
+
+const prefix = '/workspace'
 
 /**
  * 获得模型列表
  * @params 参数 name, model_type, model_name
  */
 const getModel: (
+  wordspace_id: string,
   request?: ListModelRequest,
   loading?: Ref<boolean>,
-) => Promise<Result<Array<Model>>> = (data, loading) => {
-  return get(`${prefix}`, data, loading)
+) => Promise<Result<Array<Model>>> = (wordspace_id, data, loading) => {
+  return get(`${prefix}/${wordspace_id}/model`, data, loading)
 }
 
 /**
@@ -36,42 +34,6 @@ const getModelParamsForm: (
   loading?: Ref<boolean>,
 ) => Promise<Result<Array<FormField>>> = (model_id, loading) => {
   return get(`model/${model_id}/model_params_form`, {}, loading)
-}
-/**
- * 获取模型类型列表
- * @param provider 供应商
- * @param loading  加载器
- * @returns 模型类型列表
- */
-const listModelType: (
-  provider: string,
-  loading?: Ref<boolean>,
-) => Promise<Result<Array<KeyValue<string, string>>>> = (provider, loading?: Ref<boolean>) => {
-  return get(`${prefix_provider}/model_type_list`, { provider }, loading)
-}
-
-/**
- * 获取基础模型列表
- * @param provider
- * @param model_type
- * @param loading
- * @returns
- */
-const listBaseModel: (
-  provider: string,
-  model_type: string,
-  loading?: Ref<boolean>,
-) => Promise<Result<Array<BaseModel>>> = (provider, model_type, loading) => {
-  return get(`${prefix_provider}/model_list`, { provider, model_type }, loading)
-}
-
-const listBaseModelParamsForm: (
-  provider: string,
-  model_type: string,
-  model_name: string,
-  loading?: Ref<boolean>,
-) => Promise<Result<Array<BaseModel>>> = (provider, model_type, model_name, loading) => {
-  return get(`${prefix_provider}/model_params_form`, { provider, model_type, model_name }, loading)
 }
 
 /**
@@ -159,9 +121,6 @@ const deleteModel: (model_id: string, loading?: Ref<boolean>) => Promise<Result<
 }
 export default {
   getModel,
-  listModelType,
-  listBaseModel,
-  listBaseModelParamsForm,
   createModel,
   updateModel,
   deleteModel,

@@ -6,6 +6,7 @@ import dynamicsForm from './dynamics-form'
 import AppIcon from './app-icon/AppIcon.vue'
 import LayoutContainer from './layout-container/index.vue'
 import ContentContainer from './layout-container/ContentContainer.vue'
+import CardBox from './card-box/index.vue'
 export default {
   install(app: App) {
     app.component('LogoFull', LogoFull)
@@ -15,5 +16,6 @@ export default {
     app.component('AppIcon', AppIcon)
     app.component('LayoutContainer', LayoutContainer)
     app.component('ContentContainer', ContentContainer)
+    app.component('CardBox', CardBox)
   },
 }

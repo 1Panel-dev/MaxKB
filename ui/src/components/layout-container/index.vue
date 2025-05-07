@@ -1,6 +1,6 @@
 <template>
   <div class="layout-container flex h-full">
-    <div class="layout-container__left">
+    <div class="layout-container__left border-r">
       <slot name="left"></slot>
     </div>
     <div class="layout-container__right">
@@ -30,7 +30,6 @@ const showBack = computed(() => {
     transition: width 0.28s;
     width: var(--sidebar-width);
     min-width: var(--sidebar-width);
-    background-color: var(--sidebar-bg-color);
   }
   &__right {
     width: calc(100% - var(--sidebar-width));
