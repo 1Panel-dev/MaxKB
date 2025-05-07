@@ -8,15 +8,17 @@ from django.db.models import QuerySet, Count
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from common.db.search import page_search
 from common.exception.app_exception import AppApiException
 from common.utils.common import post
 from knowledge.models import Paragraph, Problem, Document, ProblemParagraphMapping, SourceType
 from knowledge.serializers.common import ProblemParagraphObject, ProblemParagraphManage, \
-    get_embedding_model_id_by_knowledge_id, update_document_char_length
+    get_embedding_model_id_by_knowledge_id, update_document_char_length, BatchSerializer
 from knowledge.serializers.problem import ProblemInstanceSerializer, ProblemSerializer, ProblemSerializers
 from knowledge.task.embedding import embedding_by_paragraph, enable_embedding_by_paragraph, \
     disable_embedding_by_paragraph, \
-    delete_embedding_by_paragraph, embedding_by_problem as embedding_by_problem_task
+    delete_embedding_by_paragraph, embedding_by_problem as embedding_by_problem_task, delete_embedding_by_paragraph_ids, \
+    embedding_by_problem, delete_embedding_by_source
 
 
 class ParagraphSerializer(serializers.ModelSerializer):
@@ -115,6 +117,7 @@ class ParagraphSerializers(serializers.Serializer):
             ).one(with_valid=True)
 
     class Operate(serializers.Serializer):
+        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
         # 段落id
         paragraph_id = serializers.UUIDField(required=True, label=_('paragraph id'))
         # 知识库id
@@ -281,6 +284,100 @@ class ParagraphSerializers(serializers.Serializer):
                 return exists[0]
             else:
                 return Problem(id=uuid.uuid7(), content=content, knowledge_id=knowledge_id)
+
+    class Query(serializers.Serializer):
+        knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
+        document_id = serializers.UUIDField(required=True, label=_('document id'))
+        title = serializers.CharField(required=False, label=_('section title'))
+        content = serializers.CharField(required=False)
+
+        def get_query_set(self):
+            query_set = QuerySet(model=Paragraph)
+            query_set = query_set.filter(
+                **{'knowledge_id': self.data.get('knowledge_id'), 'document_id': self.data.get("document_id")})
+            if 'title' in self.data:
+                query_set = query_set.filter(
+                    **{'title__icontains': self.data.get('title')})
+            if 'content' in self.data:
+                query_set = query_set.filter(**{'content__icontains': self.data.get('content')})
+            query_set.order_by('-create_time', 'id')
+            return query_set
+
+        def list(self):
+            return list(map(lambda row: ParagraphSerializer(row).data, self.get_query_set()))
+
+        def page(self, current_page, page_size):
+            query_set = self.get_query_set()
+            return page_search(current_page, page_size, query_set, lambda row: ParagraphSerializer(row).data)
+
+    class Association(serializers.Serializer):
+        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+        knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
+        problem_id = serializers.UUIDField(required=True, label=_('problem id'))
+        document_id = serializers.UUIDField(required=True, label=_('document id'))
+        paragraph_id = serializers.UUIDField(required=True, label=_('paragraph id'))
+
+        def is_valid(self, *, raise_exception=True):
+            super().is_valid(raise_exception=True)
+            knowledge_id = self.data.get('knowledge_id')
+            paragraph_id = self.data.get('paragraph_id')
+            problem_id = self.data.get("problem_id")
+            if not QuerySet(Paragraph).filter(knowledge_id=knowledge_id, id=paragraph_id).exists():
+                raise AppApiException(500, _('Paragraph does not exist'))
+            if not QuerySet(Problem).filter(knowledge_id=knowledge_id, id=problem_id).exists():
+                raise AppApiException(500, _('Problem does not exist'))
+
+        def association(self, with_valid=True, with_embedding=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            problem = QuerySet(Problem).filter(id=self.data.get("problem_id")).first()
+            problem_paragraph_mapping = ProblemParagraphMapping(id=uuid.uuid7(),
+                                                                document_id=self.data.get('document_id'),
+                                                                paragraph_id=self.data.get('paragraph_id'),
+                                                                knowledge_id=self.data.get('knowledge_id'),
+                                                                problem_id=problem.id)
+            problem_paragraph_mapping.save()
+            if with_embedding:
+                model_id = get_embedding_model_id_by_knowledge_id(self.data.get('knowledge_id'))
+                embedding_by_problem({
+                    'text': problem.content,
+                    'is_active': True,
+                    'source_type': SourceType.PROBLEM,
+                    'source_id': problem_paragraph_mapping.id,
+                    'document_id': self.data.get('document_id'),
+                    'paragraph_id': self.data.get('paragraph_id'),
+                    'knowledge_id': self.data.get('knowledge_id'),
+                }, model_id)
+
+        def un_association(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            problem_paragraph_mapping = QuerySet(ProblemParagraphMapping).filter(
+                paragraph_id=self.data.get('paragraph_id'),
+                knowledge_id=self.data.get('knowledge_id'),
+                problem_id=self.data.get(
+                    'problem_id')).first()
+            problem_paragraph_mapping_id = problem_paragraph_mapping.id
+            problem_paragraph_mapping.delete()
+            delete_embedding_by_source(problem_paragraph_mapping_id)
+            return True
+
+    class Batch(serializers.Serializer):
+        knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
+        document_id = serializers.UUIDField(required=True, label=_('document id'))
+
+        @transaction.atomic
+        def batch_delete(self, instance: Dict, with_valid=True):
+            if with_valid:
+                BatchSerializer(data=instance).is_valid(model=Paragraph, raise_exception=True)
+                self.is_valid(raise_exception=True)
+            paragraph_id_list = instance.get("id_list")
+            QuerySet(Paragraph).filter(id__in=paragraph_id_list).delete()
+            delete_problems_and_mappings(paragraph_id_list)
+            update_document_char_length(self.data.get('document_id'))
+            # 删除向量库
+            delete_embedding_by_paragraph_ids(paragraph_id_list)
+            return True
 
 
 def delete_problems_and_mappings(paragraph_ids):
