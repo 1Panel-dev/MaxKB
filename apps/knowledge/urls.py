@@ -33,6 +33,7 @@ urlpatterns = [
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/problem', views.ProblemView.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/problem/batch_delete', views.ProblemView.BatchDelete.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/problem/batch_association', views.ProblemView.BatchAssociation.as_view()),
+    path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/problem/<str:problem_id>', views.ProblemView.Operate.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/problem/<int:current_page>/<int:page_size>', views.ProblemView.Page.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/<int:current_page>/<int:page_size>', views.DocumentView.Page.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<int:current_page>/<int:page_size>', views.KnowledgeView.Page.as_view()),

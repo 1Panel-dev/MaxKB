@@ -9,7 +9,7 @@ from common.constants.permission_constants import PermissionConstants
 from common.result import result
 from common.utils.common import query_params_to_single_dict
 from knowledge.api.problem import ProblemReadAPI, ProblemBatchCreateAPI, BatchAssociationAPI, BatchDeleteAPI, \
-    ProblemPageAPI
+    ProblemPageAPI, ProblemDeleteAPI, ProblemEditAPI
 from knowledge.serializers.problem import ProblemSerializers
 
 
@@ -89,6 +89,48 @@ class ProblemView(APIView):
             return result.success(ProblemSerializers.BatchOperate(
                 data={'knowledge_id': knowledge_id, 'workspace_id': workspace_id}
             ).delete(request.data))
+
+    class Operate(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['DELETE'],
+            summary=_('Delete question'),
+            description=_('Delete question'),
+            operation_id=_('Delete question'),
+            parameters=ProblemDeleteAPI.get_parameters(),
+            responses=ProblemDeleteAPI.get_response(),
+            tags=[_('Knowledge Base/Documentation/Paragraph/Question')]
+        )
+        def delete(self, request: Request, workspace_id: str, knowledge_id: str, problem_id: str):
+            return result.success(ProblemSerializers.Operate(
+                data={
+                    **query_params_to_single_dict(request.query_params),
+                    'workspace_id': workspace_id,
+                    'knowledge_id': knowledge_id,
+                    'problem_id': problem_id
+                }
+            ).delete())
+
+        @extend_schema(
+            methods=['PUT'],
+            summary=_('Modify question'),
+            description=_('Modify question'),
+            operation_id=_('Modify question'),
+            parameters=ProblemEditAPI.get_parameters(),
+            request=ProblemEditAPI.get_request(),
+            responses=ProblemEditAPI.get_response(),
+            tags=[_('Knowledge Base/Documentation/Paragraph/Question')]
+        )
+        def put(self, request: Request, workspace_id: str, knowledge_id: str, problem_id: str):
+            return result.success(ProblemSerializers.Operate(
+                data={
+                    **query_params_to_single_dict(request.query_params),
+                    'workspace_id': workspace_id,
+                    'knowledge_id': knowledge_id,
+                    'problem_id': problem_id
+                }
+            ).edit(request.data))
 
     class Page(APIView):
         authentication_classes = [TokenAuth]

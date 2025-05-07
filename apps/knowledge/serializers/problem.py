@@ -26,6 +26,9 @@ class ProblemInstanceSerializer(serializers.Serializer):
     id = serializers.CharField(required=False, label=_('problem id'))
     content = serializers.CharField(required=True, max_length=256, label=_('content'))
 
+class ProblemEditSerializer(serializers.Serializer):
+    content = serializers.CharField(required=True, max_length=256, label=_('content'))
+
 
 class ProblemMappingSerializer(serializers.Serializer):
     paragraph_id = serializers.UUIDField(required=True, label=_('paragraph id'))
