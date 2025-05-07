@@ -135,7 +135,7 @@ const loginHandle = () => {
 }
 function makeCode() {
   loginApi.getCaptcha().then((res: any) => {
-    identifyCode.value = res.captcha
+    identifyCode.value = res.data.captcha
   })
 }
 onBeforeMount(() => {

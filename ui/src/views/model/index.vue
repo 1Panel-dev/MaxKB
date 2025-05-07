@@ -188,6 +188,7 @@
 <script lang="ts" setup>
 import { onMounted, ref, computed } from 'vue'
 import ModelApi from '@/api/model/model'
+import ProviderApi from '@/api/model/provider'
 import type { Provider, Model } from '@/api/type/model'
 import ModelCard from '@/views/model/component/ModelCard.vue'
 import { splitArray } from '@/utils/common'
@@ -275,7 +276,7 @@ const search_type_change = () => {
 }
 
 onMounted(() => {
-  ModelApi.getProvider(loading).then((ok) => {
+  ProviderApi.getProvider(loading).then((ok) => {
     active_provider.value = allObj
     provider_list.value = [allObj, ...ok.data]
 
