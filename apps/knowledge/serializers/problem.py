@@ -58,16 +58,18 @@ def is_exits(exits_problem_paragraph_mapping_list, new_paragraph_mapping):
                    exits_problem_paragraph_mapping_list if
                    str(exits_problem_paragraph_mapping.paragraph_id) == new_paragraph_mapping.paragraph_id
                    and str(exits_problem_paragraph_mapping.problem_id) == new_paragraph_mapping.problem_id
-                   and str(exits_problem_paragraph_mapping.dataset_id) == new_paragraph_mapping.dataset_id]
+                   and str(exits_problem_paragraph_mapping.knowledge_id) == new_paragraph_mapping.knowledge_id]
     return len(filter_list) > 0
 
 
-def to_problem_paragraph_mapping(problem, document_id: str, paragraph_id: str, dataset_id: str):
-    return ProblemParagraphMapping(id=uuid.uuid1(),
-                                   document_id=document_id,
-                                   paragraph_id=paragraph_id,
-                                   dataset_id=dataset_id,
-                                   problem_id=str(problem.id)), problem
+def to_problem_paragraph_mapping(problem, document_id: str, paragraph_id: str, knowledge_id: str):
+    return ProblemParagraphMapping(
+        id=uuid.uuid7(),
+        document_id=document_id,
+        paragraph_id=paragraph_id,
+        knowledge_id=knowledge_id,
+        problem_id=str(problem.id)
+    ), problem
 
 
 class ProblemSerializers(serializers.Serializer):
@@ -117,9 +119,9 @@ class ProblemSerializers(serializers.Serializer):
                 ) if not is_exits(exits_problem_paragraph_mapping, problem_paragraph_mapping)
             ]
 
-            QuerySet(ProblemParagraphMapping).bulk_create([
-                problem_paragraph_mapping for problem_paragraph_mapping, problem in problem_paragraph_mapping_list
-            ])
+            QuerySet(ProblemParagraphMapping).bulk_create(
+                [problem_paragraph_mapping for problem_paragraph_mapping, problem in problem_paragraph_mapping_list]
+            )
 
             data_list = [
                 {

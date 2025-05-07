@@ -8,7 +8,8 @@ from common.auth.authentication import has_permissions
 from common.constants.permission_constants import PermissionConstants
 from common.result import result
 from common.utils.common import query_params_to_single_dict
-from knowledge.api.problem import ProblemReadAPI, ProblemBatchCreateAPI, BatchAssociationAPI, BatchDeleteAPI
+from knowledge.api.problem import ProblemReadAPI, ProblemBatchCreateAPI, BatchAssociationAPI, BatchDeleteAPI, \
+    ProblemPageAPI
 from knowledge.serializers.problem import ProblemSerializers
 
 
@@ -88,3 +89,26 @@ class ProblemView(APIView):
             return result.success(ProblemSerializers.BatchOperate(
                 data={'knowledge_id': knowledge_id, 'workspace_id': workspace_id}
             ).delete(request.data))
+
+    class Page(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            summary=_('Get the list of questions by page'),
+            description=_('Get the list of questions by page'),
+            operation_id=_('Get the list of questions by page'),
+            parameters=ProblemPageAPI.get_parameters(),
+            responses=ProblemPageAPI.get_response(),
+            tags=[_('Knowledge Base/Documentation/Paragraph/Question')]
+        )
+        @has_permissions(PermissionConstants.DOCUMENT_EDIT.get_workspace_permission())
+        def get(self, request: Request, workspace_id: str, knowledge_id: str, current_page, page_size):
+            d = ProblemSerializers.Query(
+                data={
+                    **query_params_to_single_dict(request.query_params),
+                    'knowledge_id': knowledge_id,
+                    'workspace_id': workspace_id
+                }
+            )
+            d.is_valid(raise_exception=True)
+            return result.success(d.page(current_page, page_size))
