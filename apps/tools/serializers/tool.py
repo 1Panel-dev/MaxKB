@@ -18,6 +18,7 @@ from common.result import result
 from common.utils.tool_code import ToolExecutor
 from maxkb.const import CONFIG
 from tools.models import Tool, ToolScope, ToolFolder
+from tools.serializers.tool_folder import ToolFolderTreeSerializer
 
 tool_executor = ToolExecutor(CONFIG.get('SANDBOX'))
 
@@ -325,14 +326,25 @@ class ToolTreeSerializer(serializers.Serializer):
         self.is_valid(raise_exception=True)
         if not folder_id:
             folder_id = 'root'
-        root = ToolFolder.objects.filter(id=folder_id).first()
-        if not root:
+        # 获取当前文件夹
+        current_folder = ToolFolder.objects.filter(id=folder_id).first()
+        if not current_folder:
             raise serializers.ValidationError(_('Folder not found'))
-        # 使用MPTT的get_descendants()方法获取所有相关节点
-        all_folders = root.get_descendants(include_self=True)
 
-        tools = QuerySet(Tool).filter(workspace_id=self.data.get('workspace_id'), folder_id__in=all_folders)
-        return ToolModelSerializer(tools, many=True).data
+        # 获取当前文件夹下的直接子文件夹
+        child_folders = ToolFolder.objects.filter(parent=current_folder)
+        folders_data = ToolFolderTreeSerializer(child_folders, many=True).data
+
+        # 获取当前文件夹下的工具
+        tools = QuerySet(Tool).filter(Q(workspace_id=self.data.get('workspace_id')) &
+                                      Q(folder_id=folder_id))
+        tools_data = ToolModelSerializer(tools, many=True).data
+
+        # 返回包含文件夹和工具的结构
+        return {
+            'folders': folders_data,
+            'tools': tools_data,
+        }
 
     class Query(serializers.Serializer):
         workspace_id = serializers.CharField(required=True, label=_('workspace id'))
