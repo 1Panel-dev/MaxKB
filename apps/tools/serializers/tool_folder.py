@@ -14,3 +14,11 @@ class ToolFolderTreeSerializer(serializers.ModelSerializer):
 
     def get_children(self, obj):
         return ToolFolderTreeSerializer(obj.get_children(), many=True).data
+
+
+class ToolFolderFlatSerializer(serializers.ModelSerializer):
+    """只序列化当前层的文件夹，不包含子节点"""
+
+    class Meta:
+        model = ToolFolder
+        fields = ['id', 'name', 'user_id', 'workspace_id', 'parent_id']

@@ -18,7 +18,7 @@ from common.result import result
 from common.utils.tool_code import ToolExecutor
 from maxkb.const import CONFIG
 from tools.models import Tool, ToolScope, ToolFolder
-from tools.serializers.tool_folder import ToolFolderTreeSerializer
+from tools.serializers.tool_folder import ToolFolderFlatSerializer
 
 tool_executor = ToolExecutor(CONFIG.get('SANDBOX'))
 
@@ -333,7 +333,7 @@ class ToolTreeSerializer(serializers.Serializer):
 
         # 获取当前文件夹下的直接子文件夹
         child_folders = ToolFolder.objects.filter(parent=current_folder)
-        folders_data = ToolFolderTreeSerializer(child_folders, many=True).data
+        folders_data = ToolFolderFlatSerializer(child_folders, many=True).data
 
         # 获取当前文件夹下的工具
         tools = QuerySet(Tool).filter(Q(workspace_id=self.data.get('workspace_id')) &
