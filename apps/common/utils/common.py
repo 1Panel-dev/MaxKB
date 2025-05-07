@@ -23,6 +23,7 @@ from pydub import AudioSegment
 
 from ..exception.app_exception import AppApiException
 from ..models.db_model_manage import DBModelManage
+import hashlib
 
 
 def password_encrypt(row_password):
@@ -123,6 +124,7 @@ def get_file_content(path):
     with open(path, "r", encoding='utf-8') as file:
         content = file.read()
     return content
+
 
 def sub_array(array: List, item_num=10):
     result = []
@@ -270,3 +272,8 @@ def bulk_create_in_batches(model, data, batch_size=1000):
         batch = data[i:i + batch_size]
         model.objects.bulk_create(batch)
 
+
+def get_sha256_hash(_bytes):
+    sha256 = hashlib.sha256()
+    sha256.update(_bytes)
+    return sha256.hexdigest()
