@@ -7,3 +7,4 @@
     @desc:
 """
 from .user_resource_permission import *
+from .email_setting import *

@@ -217,22 +217,27 @@ class PermissionConstants(Enum):
     KNOWLEDGE_CREATE = Permission(group=Group.KNOWLEDGE, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN,
                                                                                             RoleConstants.USER])
     KNOWLEDGE_EDIT = Permission(group=Group.KNOWLEDGE, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN,
-                                                                                            RoleConstants.USER])
+                                                                                        RoleConstants.USER])
     KNOWLEDGE_DELETE = Permission(group=Group.KNOWLEDGE, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN,
                                                                                             RoleConstants.USER])
     DOCUMENT_READ = Permission(group=Group.KNOWLEDGE, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN,
-                                                                                            RoleConstants.USER])
+                                                                                         RoleConstants.USER])
     DOCUMENT_CREATE = Permission(group=Group.KNOWLEDGE, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN,
-                                                                                            RoleConstants.USER])
+                                                                                           RoleConstants.USER])
     DOCUMENT_EDIT = Permission(group=Group.KNOWLEDGE, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN,
-                                                                                            RoleConstants.USER])
+                                                                                         RoleConstants.USER])
     DOCUMENT_DELETE = Permission(group=Group.KNOWLEDGE, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN,
-                                                                                            RoleConstants.USER])
+                                                                                           RoleConstants.USER])
 
     WORKSPACE_USER_RESOURCE_PERMISSION_READ = Permission(group=Group.WORKSPACE_USER_RESOURCE_PERMISSION,
                                                          operate=Operate.READ,
                                                          role_list=[RoleConstants.ADMIN,
                                                                     RoleConstants.WORKSPACE_MANAGE])
+
+    EMAIL_SETTING_READ = Permission(group=Group.USER, operate=Operate.READ,
+                                    role_list=[RoleConstants.ADMIN])
+    EMAIL_SETTING_EDIT = Permission(group=Group.USER, operate=Operate.EDIT,
+                                    role_list=[RoleConstants.ADMIN])
 
     def get_workspace_application_permission(self):
         return lambda r, kwargs: Permission(group=self.value.group, operate=self.value.operate,
