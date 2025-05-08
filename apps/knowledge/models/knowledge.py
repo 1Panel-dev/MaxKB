@@ -281,6 +281,7 @@ class File(AppModelMixin):
             result = select_one("SELECT lo_from_bytea(%s, %s::bytea) as loid", [0, bytea])
             self.loid = result['loid']
         self.file_size = len(bytea)
+        self.sha256_hash = sha256_hash
         super().save()
 
     def get_bytes(self):
