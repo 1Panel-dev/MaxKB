@@ -26,6 +26,7 @@ class ProblemInstanceSerializer(serializers.Serializer):
     id = serializers.CharField(required=False, label=_('problem id'))
     content = serializers.CharField(required=True, max_length=256, label=_('content'))
 
+
 class ProblemEditSerializer(serializers.Serializer):
     content = serializers.CharField(required=True, max_length=256, label=_('content'))
 
@@ -54,25 +55,6 @@ class BatchAssociation(serializers.Serializer):
     problem_id_list = serializers.ListField(required=True, label=_('problem id list'),
                                             child=serializers.UUIDField(required=True, label=_('problem id')))
     paragraph_list = AssociationParagraph(many=True)
-
-
-def is_exits(exits_problem_paragraph_mapping_list, new_paragraph_mapping):
-    filter_list = [exits_problem_paragraph_mapping for exits_problem_paragraph_mapping in
-                   exits_problem_paragraph_mapping_list if
-                   str(exits_problem_paragraph_mapping.paragraph_id) == new_paragraph_mapping.paragraph_id
-                   and str(exits_problem_paragraph_mapping.problem_id) == new_paragraph_mapping.problem_id
-                   and str(exits_problem_paragraph_mapping.knowledge_id) == new_paragraph_mapping.knowledge_id]
-    return len(filter_list) > 0
-
-
-def to_problem_paragraph_mapping(problem, document_id: str, paragraph_id: str, knowledge_id: str):
-    return ProblemParagraphMapping(
-        id=uuid.uuid7(),
-        document_id=document_id,
-        paragraph_id=paragraph_id,
-        knowledge_id=knowledge_id,
-        problem_id=str(problem.id)
-    ), problem
 
 
 class ProblemSerializers(serializers.Serializer):
@@ -241,3 +223,22 @@ class ProblemSerializers(serializers.Serializer):
             query_set = self.get_query_set()
             return native_page_search(current_page, page_size, query_set, select_string=get_file_content(
                 os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'list_problem.sql')))
+
+
+def is_exits(exits_problem_paragraph_mapping_list, new_paragraph_mapping):
+    filter_list = [exits_problem_paragraph_mapping for exits_problem_paragraph_mapping in
+                   exits_problem_paragraph_mapping_list if
+                   str(exits_problem_paragraph_mapping.paragraph_id) == new_paragraph_mapping.paragraph_id
+                   and str(exits_problem_paragraph_mapping.problem_id) == new_paragraph_mapping.problem_id
+                   and str(exits_problem_paragraph_mapping.knowledge_id) == new_paragraph_mapping.knowledge_id]
+    return len(filter_list) > 0
+
+
+def to_problem_paragraph_mapping(problem, document_id: str, paragraph_id: str, knowledge_id: str):
+    return ProblemParagraphMapping(
+        id=uuid.uuid7(),
+        document_id=document_id,
+        paragraph_id=paragraph_id,
+        knowledge_id=knowledge_id,
+        problem_id=str(problem.id)
+    ), problem

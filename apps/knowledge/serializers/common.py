@@ -8,10 +8,10 @@
 """
 import os
 import re
-import uuid_utils.compat as uuid
 import zipfile
 from typing import List
 
+import uuid_utils.compat as uuid
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
@@ -25,72 +25,6 @@ from common.utils.fork import Fork
 from knowledge.models import Paragraph, Problem, ProblemParagraphMapping, Knowledge, File
 from maxkb.conf import PROJECT_DIR
 from models_provider.tools import get_model
-
-
-def zip_dir(zip_path, output=None):
-    output = output or os.path.basename(zip_path) + '.zip'
-    zip = zipfile.ZipFile(output, 'w', zipfile.ZIP_DEFLATED)
-    for root, dirs, files in os.walk(zip_path):
-        relative_root = '' if root == zip_path else root.replace(zip_path, '') + os.sep
-        for filename in files:
-            zip.write(os.path.join(root, filename), relative_root + filename)
-    zip.close()
-
-
-def is_valid_uuid(s):
-    try:
-        uuid.UUID(s)
-        return True
-    except ValueError:
-        return False
-
-
-def write_image(zip_path: str, image_list: List[str]):
-    for image in image_list:
-        search = re.search("\(.*\)", image)
-        if search:
-            text = search.group()
-            if text.startswith('(/api/file/'):
-                r = text.replace('(/api/file/', '').replace(')', '')
-                r = r.strip().split(" ")[0]
-                if not is_valid_uuid(r):
-                    break
-                file = QuerySet(File).filter(id=r).first()
-                if file is None:
-                    break
-                zip_inner_path = os.path.join('api', 'file', r)
-                file_path = os.path.join(zip_path, zip_inner_path)
-                if not os.path.exists(os.path.dirname(file_path)):
-                    os.makedirs(os.path.dirname(file_path))
-                with open(os.path.join(zip_path, file_path), 'wb') as f:
-                    f.write(file.get_bytes())
-            # else:
-            #     r = text.replace('(/api/image/', '').replace(')', '')
-            #     r = r.strip().split(" ")[0]
-            #     if not is_valid_uuid(r):
-            #         break
-            #     image_model = QuerySet(Image).filter(id=r).first()
-            #     if image_model is None:
-            #         break
-            #     zip_inner_path = os.path.join('api', 'image', r)
-            #     file_path = os.path.join(zip_path, zip_inner_path)
-            #     if not os.path.exists(os.path.dirname(file_path)):
-            #         os.makedirs(os.path.dirname(file_path))
-            #     with open(file_path, 'wb') as f:
-            #         f.write(image_model.image)
-
-
-def update_document_char_length(document_id: str):
-    update_execute(get_file_content(
-        os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'update_document_char_length.sql')),
-        (document_id, document_id))
-
-
-def list_paragraph(paragraph_list: List[str]):
-    if paragraph_list is None or len(paragraph_list) == 0:
-        return []
-    return native_search(QuerySet(Paragraph).filter(id__in=paragraph_list), get_file_content(
-        os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'list_paragraph.sql')))
 
 
 class MetaSerializer(serializers.Serializer):
@@ -133,17 +67,11 @@ class ProblemParagraphObject:
         self.problem_content = problem_content
 
 
-def or_get(exists_problem_list, content, knowledge_id, document_id, paragraph_id, problem_content_dict):
-    if content in problem_content_dict:
-        return problem_content_dict.get(content)[0], document_id, paragraph_id
-    exists = [row for row in exists_problem_list if row.content == content]
-    if len(exists) > 0:
-        problem_content_dict[content] = exists[0], False
-        return exists[0], document_id, paragraph_id
-    else:
-        problem = Problem(id=uuid.uuid7(), content=content, knowledge_id=knowledge_id)
-        problem_content_dict[content] = problem, True
-        return problem, document_id, paragraph_id
+class GenerateRelatedSerializer(serializers.Serializer):
+    model_id = serializers.UUIDField(required=True, label=_('Model id'))
+    prompt = serializers.CharField(required=True, label=_('Prompt word'))
+    state_list = serializers.ListField(required=False, child=serializers.CharField(required=True),
+                                       label=_("state list"))
 
 
 class ProblemParagraphManage:
@@ -216,8 +144,80 @@ def get_embedding_model_id_by_knowledge_id_list(knowledge_id_list: List):
     return str(knowledge_list[0].embedding_model_id)
 
 
-class GenerateRelatedSerializer(serializers.Serializer):
-    model_id = serializers.UUIDField(required=True, label=_('Model id'))
-    prompt = serializers.CharField(required=True, label=_('Prompt word'))
-    state_list = serializers.ListField(required=False, child=serializers.CharField(required=True),
-                                       label=_("state list"))
+def zip_dir(zip_path, output=None):
+    output = output or os.path.basename(zip_path) + '.zip'
+    zip = zipfile.ZipFile(output, 'w', zipfile.ZIP_DEFLATED)
+    for root, dirs, files in os.walk(zip_path):
+        relative_root = '' if root == zip_path else root.replace(zip_path, '') + os.sep
+        for filename in files:
+            zip.write(os.path.join(root, filename), relative_root + filename)
+    zip.close()
+
+
+def is_valid_uuid(s):
+    try:
+        uuid.UUID(s)
+        return True
+    except ValueError:
+        return False
+
+
+def write_image(zip_path: str, image_list: List[str]):
+    for image in image_list:
+        search = re.search("\(.*\)", image)
+        if search:
+            text = search.group()
+            if text.startswith('(/api/file/'):
+                r = text.replace('(/api/file/', '').replace(')', '')
+                r = r.strip().split(" ")[0]
+                if not is_valid_uuid(r):
+                    break
+                file = QuerySet(File).filter(id=r).first()
+                if file is None:
+                    break
+                zip_inner_path = os.path.join('api', 'file', r)
+                file_path = os.path.join(zip_path, zip_inner_path)
+                if not os.path.exists(os.path.dirname(file_path)):
+                    os.makedirs(os.path.dirname(file_path))
+                with open(os.path.join(zip_path, file_path), 'wb') as f:
+                    f.write(file.get_bytes())
+            # else:
+            #     r = text.replace('(/api/image/', '').replace(')', '')
+            #     r = r.strip().split(" ")[0]
+            #     if not is_valid_uuid(r):
+            #         break
+            #     image_model = QuerySet(Image).filter(id=r).first()
+            #     if image_model is None:
+            #         break
+            #     zip_inner_path = os.path.join('api', 'image', r)
+            #     file_path = os.path.join(zip_path, zip_inner_path)
+            #     if not os.path.exists(os.path.dirname(file_path)):
+            #         os.makedirs(os.path.dirname(file_path))
+            #     with open(file_path, 'wb') as f:
+            #         f.write(image_model.image)
+
+
+def update_document_char_length(document_id: str):
+    update_execute(get_file_content(
+        os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'update_document_char_length.sql')),
+        (document_id, document_id))
+
+
+def list_paragraph(paragraph_list: List[str]):
+    if paragraph_list is None or len(paragraph_list) == 0:
+        return []
+    return native_search(QuerySet(Paragraph).filter(id__in=paragraph_list), get_file_content(
+        os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'list_paragraph.sql')))
+
+
+def or_get(exists_problem_list, content, knowledge_id, document_id, paragraph_id, problem_content_dict):
+    if content in problem_content_dict:
+        return problem_content_dict.get(content)[0], document_id, paragraph_id
+    exists = [row for row in exists_problem_list if row.content == content]
+    if len(exists) > 0:
+        problem_content_dict[content] = exists[0], False
+        return exists[0], document_id, paragraph_id
+    else:
+        problem = Problem(id=uuid.uuid7(), content=content, knowledge_id=knowledge_id)
+        problem_content_dict[content] = problem, True
+        return problem, document_id, paragraph_id
