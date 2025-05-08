@@ -139,13 +139,22 @@ class ToolImportAPI(APIMixin):
                 location='path',
                 required=True,
             ),
-            OpenApiParameter(
-                name='file',
-                type=OpenApiTypes.BINARY,
-                description='工具文件',
-                required=True
-            ),
+
         ]
+
+    @staticmethod
+    def get_request():
+        return {
+            'multipart/form-data': {
+                'type': 'object',
+                'properties': {
+                    'file': {
+                        'type': 'string',
+                        'format': 'binary'  # Tells Swagger it's a file
+                    }
+                }
+            }
+        }
 
     @staticmethod
     def get_response():

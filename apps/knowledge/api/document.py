@@ -19,13 +19,7 @@ class DocumentSplitAPI(APIMixin):
                 location='path',
                 required=True,
             ),
-            OpenApiParameter(
-                name="file",
-                description="文件",
-                type=OpenApiTypes.BINARY,
-                location='query',
-                required=False,
-            ),
+
             OpenApiParameter(
                 name="limit",
                 description="分段长度",
@@ -48,6 +42,20 @@ class DocumentSplitAPI(APIMixin):
                 required=False,
             ),
         ]
+
+    @staticmethod
+    def get_request():
+        return {
+            'multipart/form-data': {
+                'type': 'object',
+                'properties': {
+                    'file': {
+                        'type': 'string',
+                        'format': 'binary'  # Tells Swagger it's a file
+                    }
+                }
+            }
+        }
 
 
 class DocumentBatchAPI(APIMixin):
@@ -197,14 +205,22 @@ class TableDocumentCreateAPI(APIMixin):
                 location='path',
                 required=True,
             ),
-            OpenApiParameter(
-                name="file",
-                description="文件",
-                type=OpenApiTypes.BINARY,
-                location='query',
-                required=False,
-            ),
+
         ]
+
+    @staticmethod
+    def get_request():
+        return {
+            'multipart/form-data': {
+                'type': 'object',
+                'properties': {
+                    'file': {
+                        'type': 'string',
+                        'format': 'binary'  # Tells Swagger it's a file
+                    }
+                }
+            }
+        }
 
     @staticmethod
     def get_response():
