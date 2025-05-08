@@ -8,7 +8,7 @@ from common.auth.authentication import has_permissions
 from common.constants.permission_constants import PermissionConstants
 from common.result import result
 from knowledge.api.knowledge import KnowledgeBaseCreateAPI, KnowledgeWebCreateAPI, KnowledgeTreeReadAPI, \
-    KnowledgeEditAPI, KnowledgeReadAPI, KnowledgePageAPI
+    KnowledgeEditAPI, KnowledgeReadAPI, KnowledgePageAPI, SyncWebAPI, GenerateRelatedAPI
 from knowledge.serializers.knowledge import KnowledgeSerializer
 
 
@@ -109,6 +109,46 @@ class KnowledgeView(APIView):
                     'user_id': request.query_params.get('user_id')
                 }
             ).page(current_page, page_size))
+
+    class SyncWeb(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['PUT'],
+            summary=_("Synchronize the knowledge base of the website"),
+            description=_("Synchronize the knowledge base of the website"),
+            operation_id=_("Synchronize the knowledge base of the website"),
+            parameters=SyncWebAPI.get_parameters(),
+            responses=SyncWebAPI.get_response(),
+            tags=[_('Knowledge Base')]
+        )
+        @has_permissions(PermissionConstants.KNOWLEDGE_EDIT.get_workspace_permission())
+        def put(self, request: Request, workspace_id: str, knowledge_id: str):
+            return result.success(KnowledgeSerializer.SyncWeb(
+                data={
+                    'workspace_id': workspace_id,
+                    'sync_type': request.query_params.get('sync_type'),
+                    'id': knowledge_id,
+                    'user_id': str(request.user.id)
+                }
+            ).sync())
+
+    class GenerateRelated(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['PUT'],
+            summary=_('Generate related'),
+            description=_('Generate related'),
+            operation_id=_('Generate related'),
+            parameters=GenerateRelatedAPI.get_parameters(),
+            request=GenerateRelatedAPI.get_request(),
+            tags=[_('Knowledge Base')]
+        )
+        def put(self, request: Request, workspace_id: str, knowledge_id: str):
+            return result.success(KnowledgeSerializer.Operate(
+                data={'knowledge_id': knowledge_id, 'workspace_id': workspace_id, 'user_id': request.user.id}
+            ).generate_related(request.data))
 
 
 class KnowledgeBaseView(APIView):

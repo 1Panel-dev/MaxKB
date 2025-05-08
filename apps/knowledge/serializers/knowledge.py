@@ -1,23 +1,34 @@
+import logging
 import os
+import re
+import traceback
 from functools import reduce
 from typing import Dict
 
 import uuid_utils.compat as uuid
+from celery_once import AlreadyQueued
+from django.core import validators
 from django.db import transaction, models
 from django.db.models import QuerySet
+from django.db.models.functions import Reverse, Substr
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from common.db.search import native_search, get_dynamics_model, native_page_search
 from common.db.sql_execute import select_list
+from common.event import ListenerManagement
 from common.exception.app_exception import AppApiException
 from common.utils.common import valid_license, post, get_file_content
+from common.utils.fork import Fork, ChildLink
+from common.utils.split_model import get_split_model
 from knowledge.models import Knowledge, KnowledgeScope, KnowledgeType, Document, Paragraph, Problem, \
-    ProblemParagraphMapping, ApplicationKnowledgeMapping
-from knowledge.serializers.common import ProblemParagraphManage, get_embedding_model_id_by_knowledge_id, MetaSerializer
+    ProblemParagraphMapping, ApplicationKnowledgeMapping, TaskType, State
+from knowledge.serializers.common import ProblemParagraphManage, get_embedding_model_id_by_knowledge_id, MetaSerializer, \
+    GenerateRelatedSerializer
 from knowledge.serializers.document import DocumentSerializers
 from knowledge.task.embedding import embedding_by_knowledge, delete_embedding_by_knowledge
-from knowledge.task.sync import sync_web_knowledge
+from knowledge.task.generate import generate_related_by_knowledge_id
+from knowledge.task.sync import sync_web_knowledge, sync_replace_web_knowledge
 from maxkb.conf import PROJECT_DIR
 
 
@@ -136,6 +147,35 @@ class KnowledgeSerializer(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, label=_('user id'))
         workspace_id = serializers.CharField(required=True, label=_('workspace id'))
         knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
+
+        def generate_related(self, instance: Dict, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+                GenerateRelatedSerializer(data=instance).is_valid(raise_exception=True)
+            knowledge_id = self.data.get('id')
+            model_id = instance.get("model_id")
+            prompt = instance.get("prompt")
+            state_list = instance.get('state_list')
+            ListenerManagement.update_status(
+                QuerySet(Document).filter(knowledge_id=knowledge_id),
+                TaskType.GENERATE_PROBLEM,
+                State.PENDING
+            )
+            ListenerManagement.update_status(
+                QuerySet(Paragraph).annotate(
+                    reversed_status=Reverse('status'),
+                    task_type_status=Substr('reversed_status', TaskType.GENERATE_PROBLEM.value, 1),
+                ).filter(
+                    task_type_status__in=state_list, knowledge_id=knowledge_id
+                ).values('id'),
+                TaskType.GENERATE_PROBLEM,
+                State.PENDING
+            )
+            ListenerManagement.get_aggregation_document_status_by_knowledge_id(knowledge_id)()
+            try:
+                generate_related_by_knowledge_id.delay(knowledge_id, model_id, prompt, state_list)
+            except AlreadyQueued as e:
+                raise AppApiException(500, _('Failed to send the vectorization task, please try again later!'))
 
         def list_application(self, with_valid=True):
             if with_valid:
@@ -340,3 +380,80 @@ class KnowledgeSerializer(serializers.Serializer):
             knowledge.save()
             sync_web_knowledge.delay(str(knowledge_id), instance.get('source_url'), instance.get('selector'))
             return {**KnowledgeModelSerializer(knowledge).data, 'document_list': []}
+
+    class SyncWeb(serializers.Serializer):
+        id = serializers.CharField(required=True, label=_('knowledge id'))
+        user_id = serializers.UUIDField(required=False, label=_('user id'))
+        sync_type = serializers.CharField(required=True, label=_('sync type'), validators=[
+            validators.RegexValidator(regex=re.compile("^replace|complete$"),
+                                      message=_('The synchronization type only supports:replace|complete'), code=500)])
+
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            first = QuerySet(Knowledge).filter(id=self.data.get("id")).first()
+            if first is None:
+                raise AppApiException(300, _('id does not exist'))
+            if first.type != KnowledgeType.WEB:
+                raise AppApiException(500, _('Synchronization is only supported for web site types'))
+
+        def sync(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            sync_type = self.data.get('sync_type')
+            knowledge_id = self.data.get('id')
+            knowledge = QuerySet(Knowledge).get(id=knowledge_id)
+            self.__getattribute__(sync_type + '_sync')(knowledge)
+            return True
+
+        @staticmethod
+        def get_sync_handler(knowledge):
+            def handler(child_link: ChildLink, response: Fork.Response):
+                if response.status == 200:
+                    try:
+                        document_name = child_link.tag.text if child_link.tag is not None and len(
+                            child_link.tag.text.strip()) > 0 else child_link.url
+                        paragraphs = get_split_model('web.md').parse(response.content)
+                        print(child_link.url.strip())
+                        first = QuerySet(Document).filter(
+                            meta__source_url=child_link.url.strip(),
+                            knowledge=knowledge
+                        ).first()
+                        if first is not None:
+                            # 如果存在,使用文档同步
+                            DocumentSerializers.Sync(data={'document_id': first.id}).sync()
+                        else:
+                            # 插入
+                            DocumentSerializers.Create(data={'knowledge_id': knowledge.id}).save(
+                                {'name': document_name, 'paragraphs': paragraphs,
+                                 'meta': {'source_url': child_link.url.strip(),
+                                          'selector': knowledge.meta.get('selector')},
+                                 'type': Knowledge.WEB}, with_valid=True)
+                    except Exception as e:
+                        logging.getLogger("max_kb_error").error(f'{str(e)}:{traceback.format_exc()}')
+
+            return handler
+
+        def replace_sync(self, knowledge):
+            """
+            替换同步
+            :return:
+            """
+            url = knowledge.meta.get('source_url')
+            selector = knowledge.meta.get('selector') if 'selector' in knowledge.meta else None
+            sync_replace_web_knowledge.delay(str(knowledge.id), url, selector)
+
+        def complete_sync(self, knowledge):
+            """
+            完整同步  删掉当前数据集下所有的文档,再进行同步
+            :return:
+            """
+            # 删除关联问题
+            QuerySet(ProblemParagraphMapping).filter(knowledge=knowledge).delete()
+            # 删除文档
+            QuerySet(Document).filter(knowledge=knowledge).delete()
+            # 删除段落
+            QuerySet(Paragraph).filter(knowledge=knowledge).delete()
+            # 删除向量
+            delete_embedding_by_knowledge(self.data.get('id'))
+            # 同步
+            self.replace_sync(knowledge)
