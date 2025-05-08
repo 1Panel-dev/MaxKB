@@ -5,7 +5,7 @@ from common.mixins.api_mixin import APIMixin
 from common.result import ResultSerializer, DefaultResultSerializer
 from knowledge.serializers.common import GenerateRelatedSerializer
 from knowledge.serializers.knowledge import KnowledgeBaseCreateRequest, KnowledgeModelSerializer, KnowledgeEditRequest, \
-    KnowledgeWebCreateRequest
+    KnowledgeWebCreateRequest, HitTestSerializer
 
 
 class KnowledgeCreateResponse(ResultSerializer):
@@ -238,3 +238,9 @@ class GenerateRelatedAPI(SyncWebAPI):
     @staticmethod
     def get_request():
         return GenerateRelatedSerializer
+
+
+class HitTestAPI(SyncWebAPI):
+    @staticmethod
+    def get_request():
+        return HitTestSerializer

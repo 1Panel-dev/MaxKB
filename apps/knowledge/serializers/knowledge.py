@@ -14,6 +14,7 @@ from django.db.models.functions import Reverse, Substr
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from common.config.embedding_config import VectorStore
 from common.db.search import native_search, get_dynamics_model, native_page_search
 from common.db.sql_execute import select_list
 from common.event import ListenerManagement
@@ -22,9 +23,9 @@ from common.utils.common import valid_license, post, get_file_content
 from common.utils.fork import Fork, ChildLink
 from common.utils.split_model import get_split_model
 from knowledge.models import Knowledge, KnowledgeScope, KnowledgeType, Document, Paragraph, Problem, \
-    ProblemParagraphMapping, ApplicationKnowledgeMapping, TaskType, State
+    ProblemParagraphMapping, ApplicationKnowledgeMapping, TaskType, State, SearchMode
 from knowledge.serializers.common import ProblemParagraphManage, get_embedding_model_id_by_knowledge_id, MetaSerializer, \
-    GenerateRelatedSerializer
+    GenerateRelatedSerializer, get_embedding_model_by_knowledge_id, list_paragraph
 from knowledge.serializers.document import DocumentSerializers
 from knowledge.task.embedding import embedding_by_knowledge, delete_embedding_by_knowledge
 from knowledge.task.generate import generate_related_by_knowledge_id
@@ -79,6 +80,14 @@ class KnowledgeEditRequest(serializers.Serializer):
             valid_class = knowledge_meta_valid_map.get(knowledge.type)
             valid_class(data=self.data.get('meta')).is_valid(raise_exception=True)
 
+class HitTestSerializer(serializers.Serializer):
+    query_text = serializers.CharField(required=True, label=_('query text'))
+    top_number = serializers.IntegerField(required=True, max_value=10000, min_value=1, label=_("top number"))
+    similarity = serializers.FloatField(required=True, max_value=2, min_value=0, label=_('similarity'))
+    search_mode = serializers.CharField(required=True, label=_('search mode'), validators=[
+        validators.RegexValidator(regex=re.compile("^embedding|keywords|blend$"),
+                                  message=_('The type only supports embedding|keywords|blend'), code=500)
+    ])
 
 class KnowledgeSerializer(serializers.Serializer):
     class Query(serializers.Serializer):
@@ -152,7 +161,7 @@ class KnowledgeSerializer(serializers.Serializer):
             if with_valid:
                 self.is_valid(raise_exception=True)
                 GenerateRelatedSerializer(data=instance).is_valid(raise_exception=True)
-            knowledge_id = self.data.get('id')
+            knowledge_id = self.data.get('knowledge_id')
             model_id = instance.get("model_id")
             prompt = instance.get("prompt")
             state_list = instance.get('state_list')
@@ -382,7 +391,8 @@ class KnowledgeSerializer(serializers.Serializer):
             return {**KnowledgeModelSerializer(knowledge).data, 'document_list': []}
 
     class SyncWeb(serializers.Serializer):
-        id = serializers.CharField(required=True, label=_('knowledge id'))
+        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+        knowledge_id = serializers.CharField(required=True, label=_('knowledge id'))
         user_id = serializers.UUIDField(required=False, label=_('user id'))
         sync_type = serializers.CharField(required=True, label=_('sync type'), validators=[
             validators.RegexValidator(regex=re.compile("^replace|complete$"),
@@ -390,7 +400,7 @@ class KnowledgeSerializer(serializers.Serializer):
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
-            first = QuerySet(Knowledge).filter(id=self.data.get("id")).first()
+            first = QuerySet(Knowledge).filter(id=self.data.get("knowledge_id")).first()
             if first is None:
                 raise AppApiException(300, _('id does not exist'))
             if first.type != KnowledgeType.WEB:
@@ -400,7 +410,7 @@ class KnowledgeSerializer(serializers.Serializer):
             if with_valid:
                 self.is_valid(raise_exception=True)
             sync_type = self.data.get('sync_type')
-            knowledge_id = self.data.get('id')
+            knowledge_id = self.data.get('knowledge_id')
             knowledge = QuerySet(Knowledge).get(id=knowledge_id)
             self.__getattribute__(sync_type + '_sync')(knowledge)
             return True
@@ -454,6 +464,52 @@ class KnowledgeSerializer(serializers.Serializer):
             # 删除段落
             QuerySet(Paragraph).filter(knowledge=knowledge).delete()
             # 删除向量
-            delete_embedding_by_knowledge(self.data.get('id'))
+            delete_embedding_by_knowledge(self.data.get('knowledge_id'))
             # 同步
             self.replace_sync(knowledge)
+
+    class HitTest(serializers.Serializer):
+        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+        knowledge_id = serializers.UUIDField(required=True, label=_("id"))
+        user_id = serializers.UUIDField(required=False, label=_('user id'))
+        query_text = serializers.CharField(required=True, label=_('query text'))
+        top_number = serializers.IntegerField(required=True, max_value=10000, min_value=1, label=_("top number"))
+        similarity = serializers.FloatField(required=True, max_value=2, min_value=0, label=_('similarity'))
+        search_mode = serializers.CharField(required=True, label=_('search mode'), validators=[
+            validators.RegexValidator(regex=re.compile("^embedding|keywords|blend$"),
+                                      message=_('The type only supports embedding|keywords|blend'), code=500)
+        ])
+
+        def is_valid(self, *, raise_exception=True):
+            super().is_valid(raise_exception=True)
+            if not QuerySet(Knowledge).filter(id=self.data.get("knowledge_id")).exists():
+                raise AppApiException(300, _('id does not exist'))
+
+        def hit_test(self):
+            self.is_valid()
+            vector = VectorStore.get_embedding_vector()
+            exclude_document_id_list = [
+                str(
+                    document.id
+                ) for document in QuerySet(Document).filter(knowledge_id=self.data.get('knowledge_id'), is_active=False)
+            ]
+            model = get_embedding_model_by_knowledge_id(self.data.get('knowledge_id'))
+            # 向量库检索
+            hit_list = vector.hit_test(
+                self.data.get('query_text'),
+                [self.data.get('knowledge_id')],
+                exclude_document_id_list,
+                self.data.get('top_number'),
+                self.data.get('similarity'),
+                SearchMode(self.data.get('search_mode')),
+                model
+            )
+            hit_dict = reduce(lambda x, y: {**x, **y}, [{hit.get('paragraph_id'): hit} for hit in hit_list], {})
+            p_list = list_paragraph([h.get('paragraph_id') for h in hit_list])
+            return [
+                {
+                    **p,
+                    'similarity': hit_dict.get(p.get('id')).get('similarity'),
+                    'comprehensive_score': hit_dict.get(p.get('id')).get('comprehensive_score')
+                } for p in p_list
+            ]
