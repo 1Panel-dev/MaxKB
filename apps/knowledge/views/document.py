@@ -11,7 +11,7 @@ from common.result import result
 from knowledge.api.document import DocumentSplitAPI, DocumentBatchAPI, DocumentBatchCreateAPI, DocumentCreateAPI, \
     DocumentReadAPI, DocumentEditAPI, DocumentDeleteAPI, TableDocumentCreateAPI, QaDocumentCreateAPI, \
     WebDocumentCreateAPI, CancelTaskAPI, BatchCancelTaskAPI, SyncWebAPI, RefreshAPI, BatchEditHitHandlingAPI, \
-    DocumentTreeReadAPI, DocumentSplitPatternAPI
+    DocumentTreeReadAPI, DocumentSplitPatternAPI, BatchRefreshAPI, BatchGenerateRelatedAPI
 from knowledge.serializers.document import DocumentSerializers
 
 
@@ -313,6 +313,49 @@ class DocumentView(APIView):
             return result.success(DocumentSerializers.Batch(
                 data={'workspace_id': workspace_id, 'knowledge_id': knowledge_id}
             ).batch_delete(request.data))
+
+    class BatchRefresh(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['PUT'],
+            summary=_('Batch refresh document vector library'),
+            operation_id=_('Batch refresh document vector library'),
+            request=BatchRefreshAPI.get_request(),
+            parameters=BatchRefreshAPI.get_parameters(),
+            responses=BatchRefreshAPI.get_response(),
+            tags=[_('Knowledge Base/Documentation')]
+        )
+        @has_permissions([
+            PermissionConstants.DOCUMENT_CREATE.get_workspace_permission(),
+            PermissionConstants.DOCUMENT_EDIT.get_workspace_permission(),
+        ])
+        def put(self, request: Request, workspace_id: str, knowledge_id: str):
+            return result.success(
+                DocumentSerializers.Batch(
+                    data={'workspace_id': workspace_id, 'knowledge_id': knowledge_id}
+                ).batch_refresh(request.data))
+
+    class BatchGenerateRelated(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['PUT'],
+            summary=_('Batch refresh document vector library'),
+            operation_id=_('Batch refresh document vector library'),
+            request=BatchGenerateRelatedAPI.get_request(),
+            parameters=BatchGenerateRelatedAPI.get_parameters(),
+            responses=BatchGenerateRelatedAPI.get_response(),
+            tags=[_('Knowledge Base/Documentation')]
+        )
+        @has_permissions([
+            PermissionConstants.DOCUMENT_CREATE.get_workspace_permission(),
+            PermissionConstants.DOCUMENT_EDIT.get_workspace_permission(),
+        ])
+        def put(self, request: Request, workspace_id: str, knowledge_id: str):
+            return result.success(DocumentSerializers.BatchGenerateRelated(
+                data={'workspace_id': workspace_id, 'knowledge_id': knowledge_id}
+            ).batch_generate_related(request.data))
 
     class Page(APIView):
         authentication_classes = [TokenAuth]

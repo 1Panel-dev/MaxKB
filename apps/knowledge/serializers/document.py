@@ -44,6 +44,7 @@ from knowledge.serializers.paragraph import ParagraphSerializers, ParagraphInsta
     delete_problems_and_mappings
 from knowledge.task.embedding import embedding_by_document, delete_embedding_by_document_list, \
     delete_embedding_by_document
+from knowledge.task.generate import generate_related_by_document_id
 from knowledge.task.sync import sync_web_document
 from maxkb.const import PROJECT_DIR
 
@@ -109,17 +110,17 @@ class DocumentEditInstanceSerializer(serializers.Serializer):
 
     @staticmethod
     def get_meta_valid_map():
-        dataset_meta_valid_map = {
+        knowledge_meta_valid_map = {
             KnowledgeType.BASE: MetaSerializer.BaseMeta,
             KnowledgeType.WEB: MetaSerializer.WebMeta
         }
-        return dataset_meta_valid_map
+        return knowledge_meta_valid_map
 
     def is_valid(self, *, document: Document = None):
         super().is_valid(raise_exception=True)
         if 'meta' in self.data and self.data.get('meta') is not None:
-            dataset_meta_valid_map = self.get_meta_valid_map()
-            valid_class = dataset_meta_valid_map.get(document.type)
+            knowledge_meta_valid_map = self.get_meta_valid_map()
+            valid_class = knowledge_meta_valid_map.get(document.type)
             valid_class(data=self.data.get('meta')).is_valid(raise_exception=True)
 
 
@@ -151,6 +152,18 @@ class DocumentInstanceTableSerializer(serializers.Serializer):
 
 
 class DocumentRefreshSerializer(serializers.Serializer):
+    state_list = serializers.ListField(required=True, label=_('state list'))
+
+
+class DocumentBatchRefreshSerializer(serializers.Serializer):
+    id_list = serializers.ListField(required=True, label=_('id list'))
+    state_list = serializers.ListField(required=True, label=_('state list'))
+
+
+class DocumentBatchGenerateRelatedSerializer(serializers.Serializer):
+    document_id_list = serializers.ListField(required=True, label=_('document id list'))
+    model_id = serializers.UUIDField(required=True, label=_('model id'))
+    prompt = serializers.CharField(required=True, label=_('prompt'))
     state_list = serializers.ListField(required=True, label=_('state list'))
 
 
@@ -521,10 +534,10 @@ class DocumentSerializers(serializers.Serializer):
             if with_valid:
                 DocumentWebInstanceSerializer(data=instance).is_valid(raise_exception=True)
                 self.is_valid(raise_exception=True)
-            dataset_id = self.data.get('dataset_id')
+            knowledge_id = self.data.get('knowledge_id')
             source_url_list = instance.get('source_url_list')
             selector = instance.get('selector')
-            sync_web_document.delay(dataset_id, source_url_list, selector)
+            sync_web_document.delay(knowledge_id, source_url_list, selector)
 
         def save_qa(self, instance: Dict, with_valid=True):
             if with_valid:
@@ -532,7 +545,8 @@ class DocumentSerializers(serializers.Serializer):
                 self.is_valid(raise_exception=True)
             file_list = instance.get('file_list')
             document_list = flat_map([self.parse_qa_file(file) for file in file_list])
-            return DocumentSerializers.Batch(data={'dataset_id': self.data.get('dataset_id')}).batch_save(document_list)
+            return DocumentSerializers.Batch(data={'knowledge_id': self.data.get('knowledge_id')}).batch_save(
+                document_list)
 
         def save_table(self, instance: Dict, with_valid=True):
             if with_valid:
@@ -540,7 +554,8 @@ class DocumentSerializers(serializers.Serializer):
                 self.is_valid(raise_exception=True)
             file_list = instance.get('file_list')
             document_list = flat_map([self.parse_table_file(file) for file in file_list])
-            return DocumentSerializers.Batch(data={'dataset_id': self.data.get('dataset_id')}).batch_save(document_list)
+            return DocumentSerializers.Batch(data={'knowledge_id': self.data.get('knowledge_id')}).batch_save(
+                document_list)
 
         def parse_qa_file(self, file):
             get_buffer = FileBufferHandle().get_buffer
@@ -787,6 +802,42 @@ class DocumentSerializers(serializers.Serializer):
                         data={'knowledge_id': knowledge_id, 'document_id': document_id}).refresh(state_list)
                 except AlreadyQueued as e:
                     pass
+
+    class BatchGenerateRelated(serializers.Serializer):
+        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+        knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
+
+        def batch_generate_related(self, instance: Dict, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            document_id_list = instance.get("document_id_list")
+            model_id = instance.get("model_id")
+            prompt = instance.get("prompt")
+            state_list = instance.get('state_list')
+            ListenerManagement.update_status(
+                QuerySet(Document).filter(id__in=document_id_list),
+                TaskType.GENERATE_PROBLEM,
+                State.PENDING
+            )
+            ListenerManagement.update_status(
+                QuerySet(Paragraph).annotate(
+                    reversed_status=Reverse('status'),
+                    task_type_status=Substr('reversed_status', TaskType.GENERATE_PROBLEM.value,
+                                            1),
+                ).filter(
+                    task_type_status__in=state_list, document_id__in=document_id_list
+                )
+                .values('id'),
+                TaskType.GENERATE_PROBLEM,
+                State.PENDING
+            )
+            ListenerManagement.get_aggregation_document_status_by_query_set(
+                QuerySet(Document).filter(id__in=document_id_list))()
+            try:
+                for document_id in document_id_list:
+                    generate_related_by_document_id.delay(document_id, model_id, prompt, state_list)
+            except AlreadyQueued as e:
+                pass
 
 
 class FileBufferHandle:
