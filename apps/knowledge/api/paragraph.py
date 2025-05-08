@@ -4,7 +4,7 @@ from drf_spectacular.utils import OpenApiParameter
 from common.mixins.api_mixin import APIMixin
 from common.result import DefaultResultSerializer, ResultSerializer
 from knowledge.serializers.common import BatchSerializer
-from knowledge.serializers.paragraph import ParagraphSerializer
+from knowledge.serializers.paragraph import ParagraphSerializer, ParagraphBatchGenerateRelatedSerializer
 from knowledge.serializers.problem import ProblemSerializer
 
 
@@ -100,6 +100,16 @@ class ParagraphBatchDeleteAPI(ParagraphCreateAPI):
     @staticmethod
     def get_request():
         return BatchSerializer
+
+    @staticmethod
+    def get_response():
+        return DefaultResultSerializer
+
+
+class ParagraphBatchGenerateRelatedAPI(ParagraphCreateAPI):
+    @staticmethod
+    def get_request():
+        return ParagraphBatchGenerateRelatedSerializer
 
     @staticmethod
     def get_response():

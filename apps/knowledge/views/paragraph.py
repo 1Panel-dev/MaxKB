@@ -9,7 +9,8 @@ from common.constants.permission_constants import PermissionConstants
 from common.result import result
 from common.utils.common import query_params_to_single_dict
 from knowledge.api.paragraph import ParagraphReadAPI, ParagraphCreateAPI, ParagraphBatchDeleteAPI, ParagraphEditAPI, \
-    ParagraphGetAPI, ProblemCreateAPI, UnAssociationAPI, AssociationAPI, ParagraphPageAPI
+    ParagraphGetAPI, ProblemCreateAPI, UnAssociationAPI, AssociationAPI, ParagraphPageAPI, \
+    ParagraphBatchGenerateRelatedAPI
 from knowledge.serializers.paragraph import ParagraphSerializers
 
 
@@ -69,6 +70,25 @@ class ParagraphView(APIView):
             return result.success(ParagraphSerializers.Batch(
                 data={'workspace_id': workspace_id, 'knowledge_id': knowledge_id, 'document_id': document_id}
             ).batch_delete(request.data))
+
+    class BatchGenerateRelated(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['PUT'],
+            summary=_('Batch Generate Related'),
+            description=_('Batch Generate Related'),
+            operation_id=_('Batch Generate Related'),
+            parameters=ParagraphBatchGenerateRelatedAPI.get_parameters(),
+            request=ParagraphBatchGenerateRelatedAPI.get_request(),
+            responses=ParagraphBatchGenerateRelatedAPI.get_response(),
+            tags=[_('Knowledge Base/Documentation/Paragraph')]
+        )
+        @has_permissions(PermissionConstants.DOCUMENT_EDIT.get_workspace_permission())
+        def put(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
+            return result.success(ParagraphSerializers.Batch(
+                data={'workspace_id': workspace_id, 'knowledge_id': knowledge_id, 'document_id': document_id}
+            ).batch_generate_related(request.data))
 
     class Operate(APIView):
         authentication_classes = [TokenAuth]

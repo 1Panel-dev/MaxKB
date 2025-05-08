@@ -3,15 +3,17 @@
 from typing import Dict
 
 import uuid_utils.compat as uuid
+from celery_once import AlreadyQueued
 from django.db import transaction
 from django.db.models import QuerySet, Count
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from common.db.search import page_search
+from common.event import ListenerManagement
 from common.exception.app_exception import AppApiException
 from common.utils.common import post
-from knowledge.models import Paragraph, Problem, Document, ProblemParagraphMapping, SourceType
+from knowledge.models import Paragraph, Problem, Document, ProblemParagraphMapping, SourceType, TaskType, State
 from knowledge.serializers.common import ProblemParagraphObject, ProblemParagraphManage, \
     get_embedding_model_id_by_knowledge_id, update_document_char_length, BatchSerializer
 from knowledge.serializers.problem import ProblemInstanceSerializer, ProblemSerializer, ProblemSerializers
@@ -19,6 +21,7 @@ from knowledge.task.embedding import embedding_by_paragraph, enable_embedding_by
     disable_embedding_by_paragraph, \
     delete_embedding_by_paragraph, embedding_by_problem as embedding_by_problem_task, delete_embedding_by_paragraph_ids, \
     embedding_by_problem, delete_embedding_by_source
+from knowledge.task.generate import generate_related_by_paragraph_id_list
 
 
 class ParagraphSerializer(serializers.ModelSerializer):
@@ -45,6 +48,15 @@ class EditParagraphSerializers(serializers.Serializer):
     content = serializers.CharField(required=False, max_length=102400, allow_null=True, allow_blank=True,
                                     label=_('section title'))
     problem_list = ProblemInstanceSerializer(required=False, many=True)
+
+
+class ParagraphBatchGenerateRelatedSerializer(serializers.Serializer):
+    paragraph_id_list = serializers.ListField(required=True, label=_('paragraph id list'),
+                                              child=serializers.UUIDField(required=True, label=_('paragraph id')))
+    model_id = serializers.UUIDField(required=True, label=_('model id'))
+    prompt = serializers.CharField(required=True, label=_('prompt'), max_length=102400, allow_null=True,
+                                   allow_blank=True)
+    document_id = serializers.UUIDField(required=True, label=_('document id'))
 
 
 class ParagraphSerializers(serializers.Serializer):
@@ -378,6 +390,29 @@ class ParagraphSerializers(serializers.Serializer):
             # 删除向量库
             delete_embedding_by_paragraph_ids(paragraph_id_list)
             return True
+
+        def batch_generate_related(self, instance: Dict, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            paragraph_id_list = instance.get("paragraph_id_list")
+            model_id = instance.get("model_id")
+            prompt = instance.get("prompt")
+            document_id = self.data.get('document_id')
+            ListenerManagement.update_status(
+                QuerySet(Document).filter(id=document_id),
+                TaskType.GENERATE_PROBLEM,
+                State.PENDING
+            )
+            ListenerManagement.update_status(
+                QuerySet(Paragraph).filter(id__in=paragraph_id_list),
+                TaskType.GENERATE_PROBLEM,
+                State.PENDING
+            )
+            ListenerManagement.get_aggregation_document_status(document_id)()
+            try:
+                generate_related_by_paragraph_id_list.delay(document_id, paragraph_id_list, model_id, prompt)
+            except AlreadyQueued as e:
+                raise AppApiException(500, _('The task is being executed, please do not send it again.'))
 
 
 def delete_problems_and_mappings(paragraph_ids):
