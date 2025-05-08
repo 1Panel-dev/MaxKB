@@ -14,6 +14,7 @@ from rest_framework import serializers
 import uuid_utils.compat as uuid
 from common.constants.exception_code_constants import ExceptionCodeConstants
 from common.constants.permission_constants import RoleConstants, Auth
+from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import page_search
 from common.exception.app_exception import AppApiException
 from common.utils.common import valid_license, password_encrypt
@@ -182,6 +183,21 @@ class UserManageSerializer(serializers.Serializer):
             source="LOCAL",
             is_active=True
         )
+        # 企业版本 增加用户的角色设置 参数是  role_id  [workspace_id]
+        workspace_user_role_mapping_model = DatabaseModelManage.get_model("workspace_user_role_mapping")
+        if workspace_user_role_mapping_model:
+            # 获取当前用户的角色设置
+            role_setting = instance.get('role_setting')
+            # role_setting 的数据类型是{"role_id": [workspace_id1, workspace_id2]}
+            # 如果是系统层级的 workspace_id 是 SYSTEM 或者是NONE
+            for role_id, workspace_ids in role_setting.items():
+                for workspace_id in workspace_ids:
+                    # 创建用户角色映射关系
+                    workspace_user_role_mapping_model.objects.create(
+                        user_id=user.id,
+                        role_id=role_id,
+                        workspace_id=workspace_id
+                    )
         user.save()
         return UserInstanceSerializer(user).data
 
@@ -292,6 +308,20 @@ class UserManageSerializer(serializers.Serializer):
             user = User.objects.filter(id=self.data.get('id')).first()
             self._check_admin_modification(user, instance)
             self._update_user_fields(user, instance)
+            workspace_user_role_mapping_model = DatabaseModelManage.get_model("workspace_user_role_mapping")
+            if workspace_user_role_mapping_model:
+                # 获取当前用户的角色设置
+                role_setting = instance.get('role_setting')
+                # 全部删除重新添加
+                workspace_user_role_mapping_model.objects.filter(user_id=user.id).delete()
+                for role_id, workspace_ids in role_setting.items():
+                    for workspace_id in workspace_ids:
+                        # 创建用户角色映射关系
+                        workspace_user_role_mapping_model.objects.create(
+                            user_id=user.id,
+                            role_id=role_id,
+                            workspace_id=workspace_id
+                        )
             user.save()
             return UserInstanceSerializer(user).data
 
@@ -312,6 +342,26 @@ class UserManageSerializer(serializers.Serializer):
             if with_valid:
                 self.is_valid(raise_exception=True)
             user = User.objects.filter(id=self.data.get('id')).first()
+            workspace_user_role_mapping_model = DatabaseModelManage.get_model("workspace_user_role_mapping")
+            if workspace_user_role_mapping_model:
+                role_setting = {}
+                workspace_user_role_mapping_list = QuerySet(workspace_user_role_mapping_model).filter(
+                    user_id=user.id)
+                for workspace_user_role_mapping in workspace_user_role_mapping_list:
+                    role_id = workspace_user_role_mapping.role_id
+                    workspace_id = workspace_user_role_mapping.workspace_id
+                    if role_id not in role_setting:
+                        role_setting[role_id] = []
+                    role_setting[role_id].append(workspace_id)
+                return {
+                    'id': user.id,
+                    'username': user.username,
+                    'email': user.email,
+                    'phone': user.phone,
+                    'nick_name': user.nick_name,
+                    'is_active': user.is_active,
+                    'role_setting': role_setting
+                }
             return UserInstanceSerializer(user).data
 
         def re_password(self, instance, with_valid=True):
@@ -322,4 +372,3 @@ class UserManageSerializer(serializers.Serializer):
             user.password = password_encrypt(instance.get('password'))
             user.save()
             return True
-
