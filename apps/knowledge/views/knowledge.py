@@ -8,7 +8,7 @@ from common.auth.authentication import has_permissions
 from common.constants.permission_constants import PermissionConstants
 from common.result import result
 from knowledge.api.knowledge import KnowledgeBaseCreateAPI, KnowledgeWebCreateAPI, KnowledgeTreeReadAPI, \
-    KnowledgeEditAPI, KnowledgeReadAPI, KnowledgePageAPI, SyncWebAPI, GenerateRelatedAPI, HitTestAPI
+    KnowledgeEditAPI, KnowledgeReadAPI, KnowledgePageAPI, SyncWebAPI, GenerateRelatedAPI, HitTestAPI, EmbeddingAPI
 from knowledge.serializers.knowledge import KnowledgeSerializer
 
 
@@ -159,6 +159,24 @@ class KnowledgeView(APIView):
                     'search_mode': request.query_params.get('search_mode')
                 }
             ).hit_test())
+
+    class Embedding(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['PUT'],
+            summary=_('Re-vectorize'),
+            description=_('Re-vectorize'),
+            operation_id=_('Re-vectorize'),
+            parameters=EmbeddingAPI.get_parameters(),
+            responses=EmbeddingAPI.get_response(),
+            tags=[_('Knowledge Base')]
+        )
+        @has_permissions(PermissionConstants.KNOWLEDGE_EDIT.get_workspace_permission())
+        def put(self, request: Request, workspace_id: str, knowledge_id: str):
+            return result.success(KnowledgeSerializer.Operate(
+                data={'knowledge_id': knowledge_id, 'workspace_id': workspace_id, 'user_id': request.user.id}
+            ).embedding())
 
     class GenerateRelated(APIView):
         authentication_classes = [TokenAuth]

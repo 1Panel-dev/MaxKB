@@ -31,6 +31,7 @@ from knowledge.task.embedding import embedding_by_knowledge, delete_embedding_by
 from knowledge.task.generate import generate_related_by_knowledge_id
 from knowledge.task.sync import sync_web_knowledge, sync_replace_web_knowledge
 from maxkb.conf import PROJECT_DIR
+from models_provider.models import Model
 
 
 class KnowledgeModelSerializer(serializers.ModelSerializer):
@@ -80,6 +81,7 @@ class KnowledgeEditRequest(serializers.Serializer):
             valid_class = knowledge_meta_valid_map.get(knowledge.type)
             valid_class(data=self.data.get('meta')).is_valid(raise_exception=True)
 
+
 class HitTestSerializer(serializers.Serializer):
     query_text = serializers.CharField(required=True, label=_('query text'))
     top_number = serializers.IntegerField(required=True, max_value=10000, min_value=1, label=_("top number"))
@@ -88,6 +90,7 @@ class HitTestSerializer(serializers.Serializer):
         validators.RegexValidator(regex=re.compile("^embedding|keywords|blend$"),
                                   message=_('The type only supports embedding|keywords|blend'), code=500)
     ])
+
 
 class KnowledgeSerializer(serializers.Serializer):
     class Query(serializers.Serializer):
@@ -156,6 +159,36 @@ class KnowledgeSerializer(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, label=_('user id'))
         workspace_id = serializers.CharField(required=True, label=_('workspace id'))
         knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
+
+        @transaction.atomic
+        def embedding(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            knowledge_id = self.data.get('knowledge_id')
+            knowledge = QuerySet(Knowledge).filter(id=knowledge_id).first()
+            embedding_model_id = knowledge.embedding_mode_id
+            knowledge_user_id = knowledge.user_id
+            embedding_model = QuerySet(Model).filter(id=embedding_model_id).first()
+            if embedding_model is None:
+                raise AppApiException(500, _('Model does not exist'))
+            if embedding_model.permission_type == 'PRIVATE' and knowledge_user_id != embedding_model.user_id:
+                raise AppApiException(500, _('No permission to use this model') + f"{embedding_model.name}")
+            ListenerManagement.update_status(
+                QuerySet(Document).filter(knowledge_id=self.data.get('knowledge_id')),
+                TaskType.EMBEDDING,
+                State.PENDING
+            )
+            ListenerManagement.update_status(
+                QuerySet(Paragraph).filter(knowledge_id=self.data.get('knowledge_id')),
+                TaskType.EMBEDDING,
+                State.PENDING
+            )
+            ListenerManagement.get_aggregation_document_status_by_knowledge_id(self.data.get('knowledge_id'))()
+            embedding_model_id = get_embedding_model_id_by_knowledge_id(self.data.get('knowledge_id'))
+            try:
+                embedding_by_knowledge.delay(knowledge_id, embedding_model_id)
+            except AlreadyQueued as e:
+                raise AppApiException(500, _('Failed to send the vectorization task, please try again later!'))
 
         def generate_related(self, instance: Dict, with_valid=True):
             if with_valid:

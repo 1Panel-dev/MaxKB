@@ -244,3 +244,7 @@ class HitTestAPI(SyncWebAPI):
     @staticmethod
     def get_request():
         return HitTestSerializer
+
+
+class EmbeddingAPI(SyncWebAPI):
+    pass
