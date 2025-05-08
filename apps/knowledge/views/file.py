@@ -23,7 +23,7 @@ class FileView(APIView):
         parameters=FileUploadAPI.get_parameters(),
         request=FileUploadAPI.get_request(),
         responses=FileUploadAPI.get_response(),
-        tags=[_('file')]
+        tags=[_('File')]
     )
     def post(self, request: Request):
         return result.success(FileSerializer(data={'file': request.FILES.get('file')}).upload())
@@ -36,7 +36,7 @@ class FileView(APIView):
             operation_id=_('Get file'),
             parameters=FileGetAPI.get_parameters(),
             responses=FileGetAPI.get_response(),
-            tags=[_('file')]
+            tags=[_('File')]
         )
         def get(self, request: Request, file_id: str):
             return FileSerializer.Operate(data={'id': file_id}).get()
