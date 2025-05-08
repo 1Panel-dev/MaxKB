@@ -93,3 +93,11 @@ class FileSerializer(serializers.Serializer):
                 status=200,
                 headers={'Content-Type': mime_types.get(file_type, 'text/plain')}
             )
+
+        def delete(self):
+            self.is_valid(raise_exception=True)
+            file_id = self.data.get('id')
+            file = QuerySet(File).filter(id=file_id).first()
+            if file is not None:
+                file.delete()
+            return True

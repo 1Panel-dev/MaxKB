@@ -40,3 +40,15 @@ class FileView(APIView):
         )
         def get(self, request: Request, file_id: str):
             return FileSerializer.Operate(data={'id': file_id}).get()
+
+        @extend_schema(
+            methods=['DELETE'],
+            summary=_('Get file'),
+            description=_('Get file'),
+            operation_id=_('Get file'),
+            parameters=FileGetAPI.get_parameters(),
+            responses=FileGetAPI.get_response(),
+            tags=[_('File')]
+        )
+        def delete(self, request: Request, file_id: str):
+            return result.success(FileSerializer.Operate(data={'id': file_id}).delete())
