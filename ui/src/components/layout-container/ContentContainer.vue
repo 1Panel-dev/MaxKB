@@ -1,5 +1,5 @@
 <template>
-  <div class="content-container border-r-4">
+  <div class="content-container border-r-4 p-16-24">
     <div class="content-container__header flex align-center w-full" v-if="slots.header || header">
       <slot name="backButton">
         <back-button :to="backTo" v-if="showBack"></back-button>
@@ -8,11 +8,10 @@
         <h4>{{ header }}</h4>
       </slot>
     </div>
-    <el-scrollbar>
-      <div class="content-container__main">
-        <slot></slot>
-      </div>
-    </el-scrollbar>
+
+    <div class="content-container__main">
+      <slot></slot>
+    </div>
   </div>
 </template>
 
@@ -22,7 +21,7 @@ defineOptions({ name: 'ContentContainer' })
 const slots = useSlots()
 const props = defineProps({
   header: String || null,
-  backTo: String
+  backTo: String,
 })
 const showBack = computed(() => {
   const { backTo } = props
@@ -33,10 +32,9 @@ const showBack = computed(() => {
 <style lang="scss" scoped>
 .content-container {
   transition: 0.3s;
-  padding: 0 var(--app-view-padding) var(--app-view-padding);
   .content-container__header {
     box-sizing: border-box;
-    padding: 16px 0;
+    padding: calc(var(--app-base-px) * 2) 0;
     flex-wrap: wrap;
   }
   .content-container__main {

@@ -1,9 +1,11 @@
 import login from './login'
 import model from './model'
+import knowledge from './knowledge'
+import tool from './tool'
 // import notFound from './404'
 // import application from './application'
 // import applicationOverview from './application-overview'
-// import dataset from './dataset'
+
 // import system from './system'
 // import functionLib from './function-lib'
 // import user from './user'
@@ -19,10 +21,11 @@ import model from './model'
 export default {
   login,
   model,
+  knowledge,
+  tool,
   // notFound,
   // application,
   // applicationOverview,
-  // dataset,
   // system,
   // functionLib,
   // user,

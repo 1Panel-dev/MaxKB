@@ -17,3 +17,6 @@
   cursor: pointer;
   flex-shrink: 0;
 }
+.el-card {
+  --el-card-padding: calc(var(--app-base-px) * 2);
+}

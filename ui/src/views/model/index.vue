@@ -148,10 +148,10 @@
               <template v-for="(row, index) in model_split_list" :key="index">
                 <el-col
                   :xs="24"
-                  :sm="24"
-                  :md="24"
-                  :lg="12"
-                  :xl="12"
+                  :sm="12"
+                  :md="12"
+                  :lg="8"
+                  :xl="6"
                   class="mb-16"
                   v-for="(model, i) in row"
                   :key="i"

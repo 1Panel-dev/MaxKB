@@ -8,7 +8,7 @@ const ModelRouter = {
     {
       path: '/model',
       name: 'model-index',
-      meta: { title: '模型主页', activeMenu: '/function-lib' },
+      meta: { title: '模型主页', activeMenu: '/model' },
       component: () => import('@/views/model/index.vue')
     }
   ]

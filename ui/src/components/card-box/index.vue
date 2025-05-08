@@ -5,14 +5,14 @@
         <div class="title flex align-center" :class="$slots.subTitle ? 'mt-4' : ''">
           <slot name="icon">
             <el-avatar v-if="showIcon" class="mr-12 avatar-blue" shape="square" :size="32">
-              <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
+              <img src="@/assets/knowledge/icon_document.svg" style="width: 58%" alt="" />
             </el-avatar>
           </slot>
           <div style="width: 90%">
             <slot name="title">
-              <auto-tooltip :content="title" style="width: 65%; height: 22px">
+              <div>
                 {{ title }}
-              </auto-tooltip>
+              </div>
             </slot>
             <slot name="subTitle"> </slot>
           </div>
@@ -83,7 +83,6 @@ function subHoveredEnter() {
     margin-top: -10px;
   }
   .description {
-    color: var(--app-text-color-secondary);
     line-height: 22px;
     font-weight: 400;
     .content {
@@ -97,10 +96,9 @@ function subHoveredEnter() {
 
   .card-footer {
     position: absolute;
-    bottom: 8px;
+    bottom: 4px;
     left: 0;
     min-height: 30px;
-    color: var(--app-text-color-secondary);
     font-weight: 400;
     padding: 0 16px;
     width: 100%;

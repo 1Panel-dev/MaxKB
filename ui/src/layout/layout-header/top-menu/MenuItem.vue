@@ -1,6 +1,6 @@
 <template>
   <div
-    class="menu-item-container flex-center h-full"
+    class="menu-item-container h-full"
     :class="isActive ? 'active' : ''"
     @click="router.push({ name: menu.name })"
   >

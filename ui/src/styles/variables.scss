@@ -17,11 +17,7 @@
   --app-logo-color: linear-gradient(180deg, #3370FF 0%, #7f3bf5 100%);
   --app-avatar-gradient-color: linear-gradient(270deg, #9258f7 0%, #3370FF 100%);
 
-  /* 计算高度 */
-  --app-main-height: calc(100vh - var(--app-header-height) - var(--app-view-padding) * 2 - 40px);
-
   /** sidebar 组件 */
-  --sidebar-bg-color: #ffffff;
   --sidebar-width: 240px;
   /** tag */
   --tag-default-bg: rgba(51, 112, 255, 0.2);

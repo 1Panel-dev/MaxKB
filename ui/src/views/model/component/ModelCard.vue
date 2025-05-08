@@ -5,9 +5,7 @@
     </template>
     <template #title>
       <div class="flex" style="height: 22px">
-        <auto-tooltip :content="model.name" style="max-width: 40%">
-          {{ model.name }}
-        </auto-tooltip>
+        {{ model.name }}
         <span v-if="currentModel.status === 'ERROR'">
           <el-tooltip effect="dark" :content="errMessage" placement="top">
             <el-icon class="danger ml-4" size="18"><Warning /></el-icon>
@@ -26,20 +24,22 @@
     </template>
     <template #subTitle>
       <el-text class="color-secondary" size="small">
-        <auto-tooltip :content="model.username">
-          {{ $t('common.creator') }}: {{ model.username }}
-        </auto-tooltip>
+        {{ $t('common.creator') }}: {{ model.username }}
       </el-text>
     </template>
     <ul>
       <li class="flex">
-        <el-text type="info">{{ $t('views.model.modelForm.form.model_type.label') }}</el-text>
+        <el-text type="info" class="color-secondary">{{
+          $t('views.model.modelForm.form.model_type.label')
+        }}</el-text>
         <span class="ellipsis ml-16">
           {{ $t(modelType[model.model_type as keyof typeof modelType]) }}</span
         >
       </li>
       <li class="flex">
-        <el-text type="info">{{ $t('views.model.modelForm.form.base_model.label') }}</el-text>
+        <el-text type="info" class="color-secondary">{{
+          $t('views.model.modelForm.form.base_model.label')
+        }}</el-text>
         <span class="ellipsis-1 ml-16" style="height: 20px; width: 70%">
           {{ model.model_name }}</span
         >

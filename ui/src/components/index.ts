@@ -7,6 +7,7 @@ import AppIcon from './app-icon/AppIcon.vue'
 import LayoutContainer from './layout-container/index.vue'
 import ContentContainer from './layout-container/ContentContainer.vue'
 import CardBox from './card-box/index.vue'
+import FolderTree from './folder-tree/index.vue'
 export default {
   install(app: App) {
     app.component('LogoFull', LogoFull)
@@ -17,5 +18,6 @@ export default {
     app.component('LayoutContainer', LayoutContainer)
     app.component('ContentContainer', ContentContainer)
     app.component('CardBox', CardBox)
+    app.component('FolderTree', FolderTree)
   },
 }

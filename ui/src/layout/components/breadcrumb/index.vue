@@ -43,10 +43,10 @@
             :size="24"
             style="background: none"
           >
-            <img src="@/assets/logo_lark.svg" style="width: 100%" alt="" />
+            <img src="@/assets/knowledge/logo_lark.svg" style="width: 100%" alt="" />
           </AppAvatar>
           <AppAvatar v-else class="mr-8 avatar-blue" shape="square" :size="24">
-            <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
+            <img src="@/assets/knowledge/icon_document.svg" style="width: 58%" alt="" />
           </AppAvatar>
           <div class="ellipsis" :title="current?.name">{{ current?.name }}</div>
         </div>
