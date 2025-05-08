@@ -430,14 +430,8 @@ async function changeState(bool: Boolean, row: any) {
       row.is_active = false
       return
     }
-    const init_params = res.data.init_field_list.reduce((acc: any, item: any) => {
-      acc[item.field] = item.default_value
-      return acc
-    }, {})
     const obj = {
       is_active: bool,
-      init_params: init_params,
-      init_field_list: res.data.init_field_list
     }
     functionLibApi.putFunctionLib(row.id, obj, changeStateloading).then((res) => {})
   }
