@@ -1132,7 +1132,7 @@ msgstr "取消关联问题"
 #: apps/knowledge/views/paragraph.py:236 apps/knowledge/views/paragraph.py:237
 #: apps/knowledge/views/paragraph.py:238
 msgid "Related questions"
-msgstr "管理问题"
+msgstr "关联问题"
 
 #: apps/knowledge/views/paragraph.py:261 apps/knowledge/views/paragraph.py:262
 #: apps/knowledge/views/paragraph.py:263
