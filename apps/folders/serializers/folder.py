@@ -8,10 +8,22 @@ from rest_framework import serializers
 
 from common.constants.permission_constants import Group
 from folders.api.folder import FolderCreateRequest
-from knowledge.models import KnowledgeFolder
+from knowledge.models import KnowledgeFolder, Knowledge
 from knowledge.serializers.knowledge_folder import KnowledgeFolderTreeSerializer
-from tools.models import ToolFolder
+from tools.models import ToolFolder, Tool
 from tools.serializers.tool_folder import ToolFolderTreeSerializer
+
+
+def get_source_type(source):
+    if source == Group.TOOL.name:
+        return Tool
+    elif source == Group.APPLICATION.name:
+        # todo app folder
+        return None
+    elif source == Group.KNOWLEDGE.name:
+        return Knowledge
+    else:
+        return None
 
 
 def get_folder_type(source):
@@ -154,12 +166,20 @@ class FolderSerializer(serializers.Serializer):
             folder = QuerySet(Folder).filter(id=self.data.get('id')).first()
             return FolderSerializer(folder).data
 
+        @transaction.atomic
         def delete(self):
             self.is_valid(raise_exception=True)
             if self.data.get('id') == 'root':
                 raise serializers.ValidationError(_('Cannot delete root folder'))
             Folder = get_folder_type(self.data.get('source'))  # noqa
-            QuerySet(Folder).filter(id=self.data.get('id')).delete()
+            Source = get_source_type(self.data.get('source'))  # noqa
+            nodes = Folder.objects.filter(id=self.data.get('id')).get_descendants(include_self=True)
+            for node in nodes:
+                # print(node)
+                # 删除相关的资源
+                Source.objects.filter(folder_id=node.id).delete()
+                # 删除节点
+                node.delete()
 
 
 class FolderTreeSerializer(serializers.Serializer):
