@@ -8,8 +8,7 @@ const prefix = '/workspace'
  * 获得知识库文件夹列表
  * @params 参数
  *  source : APPLICATION, KNOWLEDGE, TOOL
- * {
- * name: string}
+ * {name: string}
  */
 const getFolder: (
   wordspace_id: string,

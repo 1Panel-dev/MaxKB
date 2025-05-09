@@ -2,7 +2,7 @@
   <LayoutContainer class="tool-manage">
     <template #left>
       <h4>{{ $t('views.tool.title') }}</h4>
-      <folder-tree />
+      <folder-tree :data="folderList" />
     </template>
     <ContentContainer>
       <div class="flex-between mb-16">
@@ -68,6 +68,7 @@ const paginationConfig = reactive({
   total: 0,
 })
 
+const folderList = ref<any[]>([])
 const toolList = ref<any[]>([])
 const folderId = ref<string>('root')
 
@@ -84,9 +85,8 @@ function getList() {
 
 function getFolder() {
   const params = {}
-  folder.asynGetFolder('default', 'TOOL', params, loading).then((res) => {
-    // paginationConfig.total = res.data.total
-    // datasetList.value = [...datasetList.value, ...res.data.records]
+  folder.asynGetFolder('default', 'TOOL', params, loading).then((res: any) => {
+    folderList.value = res.data
   })
 }
 
