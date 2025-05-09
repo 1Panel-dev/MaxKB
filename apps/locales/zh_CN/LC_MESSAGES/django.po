@@ -181,7 +181,7 @@ msgstr "不支持的文件格式"
 #: apps/common/handle/impl/text/pdf_split_handle.py:281
 #, python-brace-format
 msgid "This document has no preface and is treated as ordinary text: {e}"
-msgstr ""
+msgstr "该文档没有前言，视为普通文本: {e}"
 
 #: apps/common/result/api.py:17 apps/common/result/api.py:27
 msgid "response code"
@@ -390,15 +390,14 @@ msgstr "知识库设置错误，请重置知识库"
 #: apps/knowledge/serializers/document.py:69
 #: apps/knowledge/serializers/document.py:86
 #: apps/knowledge/serializers/document.py:190
-#, fuzzy
 #| msgid "tool type"
 msgid "task type"
-msgstr "工具类型"
+msgstr "任务类型"
 
 #: apps/knowledge/serializers/document.py:77
 #: apps/knowledge/serializers/document.py:94
 msgid "task type not support"
-msgstr ""
+msgstr "任务类型不支持"
 
 #: apps/knowledge/serializers/document.py:81
 #: apps/knowledge/serializers/document.py:99
@@ -408,56 +407,52 @@ msgstr "文档名称"
 
 #: apps/knowledge/serializers/document.py:102
 #: apps/knowledge/serializers/document.py:179
-#, fuzzy
 #| msgid "The field only supports custom|reference"
 msgid "The type only supports optimization|directly_return"
-msgstr "字段仅支持自定义|引用"
+msgstr "该类型仅支持优化|直接返回"
 
 #: apps/knowledge/serializers/document.py:104
 #: apps/knowledge/serializers/document.py:172
 #: apps/knowledge/serializers/document.py:188
 msgid "hit handling method"
-msgstr ""
+msgstr "命中处理方法"
 
 #: apps/knowledge/serializers/document.py:107
 #: apps/knowledge/serializers/document.py:174
 msgid "directly return similarity"
-msgstr ""
+msgstr "直接返回相似度"
 
 #: apps/knowledge/serializers/document.py:109
 #: apps/knowledge/serializers/document.py:189
-#, fuzzy
 #| msgid "document name"
 msgid "document is active"
-msgstr "文档名称"
+msgstr "文档已激活"
 
 #: apps/knowledge/serializers/document.py:128
 #: apps/knowledge/serializers/document.py:145
 #: apps/knowledge/serializers/document.py:150
-#, fuzzy
 #| msgid "id list"
 msgid "file list"
-msgstr "ID 列表"
+msgstr "文件 列表"
 
 #: apps/knowledge/serializers/document.py:129
 msgid "limit"
-msgstr ""
+msgstr "限制"
 
 #: apps/knowledge/serializers/document.py:132
 #: apps/knowledge/serializers/document.py:133
 msgid "patterns"
-msgstr ""
+msgstr "分割符"
 
 #: apps/knowledge/serializers/document.py:135
 msgid "Auto Clean"
-msgstr ""
+msgstr "自动清理"
 
 #: apps/knowledge/serializers/document.py:139
 #: apps/knowledge/serializers/document.py:140
-#, fuzzy
 #| msgid "document id"
 msgid "document url list"
-msgstr "文档 ID"
+msgstr "文档 URL 列表"
 
 #: apps/knowledge/serializers/document.py:146
 #: apps/knowledge/serializers/document.py:151
@@ -466,10 +461,9 @@ msgid "file"
 msgstr "文件"
 
 #: apps/knowledge/serializers/document.py:164
-#, fuzzy
 #| msgid "document id"
 msgid "document id list"
-msgstr "文档 ID"
+msgstr "文档 ID 列表"
 
 #: apps/knowledge/serializers/document.py:165
 #: apps/knowledge/serializers/paragraph.py:56
@@ -482,10 +476,9 @@ msgstr "模型ID"
 
 #: apps/knowledge/serializers/document.py:166
 #: apps/knowledge/serializers/paragraph.py:57
-#, fuzzy
 #| msgid "error prompt"
 msgid "prompt"
-msgstr "错误提示"
+msgstr "提示词"
 
 #: apps/knowledge/serializers/document.py:186
 #: apps/knowledge/serializers/document.py:246
@@ -510,14 +503,13 @@ msgid "knowledge id"
 msgstr "知识库 ID"
 
 #: apps/knowledge/serializers/document.py:191
-#, fuzzy
 #| msgid "state list"
 msgid "status"
-msgstr "状态列表"
+msgstr "状态"
 
 #: apps/knowledge/serializers/document.py:192
 msgid "order by"
-msgstr ""
+msgstr "排序"
 
 #: apps/knowledge/serializers/document.py:247
 #: apps/knowledge/serializers/document.py:333
@@ -542,7 +534,7 @@ msgstr "文档 ID 不存在"
 #: apps/knowledge/serializers/document.py:256
 #: apps/knowledge/serializers/knowledge.py:440
 msgid "Synchronization is only supported for web site types"
-msgstr ""
+msgstr "仅支持网站类型的同步"
 
 #: apps/knowledge/serializers/document.py:422
 #: apps/knowledge/serializers/knowledge.py:173
@@ -570,45 +562,44 @@ msgstr "知识库 ID 不存在"
 
 #: apps/knowledge/serializers/document.py:597
 msgid "The maximum size of the uploaded file cannot exceed {}MB"
-msgstr ""
+msgstr "上传文件的最大大小不能超过 {}MB"
 
 #: apps/knowledge/serializers/document.py:656
 msgid "space"
-msgstr ""
+msgstr "空格"
 
 #: apps/knowledge/serializers/document.py:657
 msgid "semicolon"
-msgstr ""
+msgstr "分号"
 
 #: apps/knowledge/serializers/document.py:657
 msgid "comma"
-msgstr ""
+msgstr "逗号"
 
 #: apps/knowledge/serializers/document.py:658
 msgid "period"
-msgstr ""
+msgstr "句号"
 
 #: apps/knowledge/serializers/document.py:658
 msgid "enter"
-msgstr ""
+msgstr "回车"
 
 #: apps/knowledge/serializers/document.py:659
 msgid "blank line"
-msgstr ""
+msgstr "空行"
 
 #: apps/knowledge/serializers/document.py:781
 msgid "Hit handling method is required"
-msgstr ""
+msgstr "命中处理方法是必需的"
 
 #: apps/knowledge/serializers/document.py:783
 msgid "The hit processing method must be directly_return|optimization"
-msgstr ""
+msgstr "命中处理方法必须是直接返回|优化"
 
 #: apps/knowledge/serializers/file.py:79
-#, fuzzy
 #| msgid "Folder not found"
 msgid "File not found"
-msgstr "文件夹不存在"
+msgstr "文件未找到"
 
 #: apps/knowledge/serializers/knowledge.py:44
 #: apps/knowledge/serializers/knowledge.py:51
@@ -634,48 +625,45 @@ msgid "knowledge selector"
 msgstr "知识库选择器"
 
 #: apps/knowledge/serializers/knowledge.py:65
-#, fuzzy
 #| msgid "animation"
 msgid "application id"
-msgstr "动画"
+msgstr "应用 ID"
 
 #: apps/knowledge/serializers/knowledge.py:66
 msgid "application id list"
-msgstr ""
+msgstr "应用 ID 列表"
 
 #: apps/knowledge/serializers/knowledge.py:86
 #: apps/knowledge/serializers/knowledge.py:508
 msgid "query text"
-msgstr ""
+msgstr "查询文本"
 
 #: apps/knowledge/serializers/knowledge.py:87
 #: apps/knowledge/serializers/knowledge.py:509
-#, fuzzy
 #| msgid "total number of data"
 msgid "top number"
-msgstr "总数据"
+msgstr "Top 数量"
 
 #: apps/knowledge/serializers/knowledge.py:88
 #: apps/knowledge/serializers/knowledge.py:510
 msgid "similarity"
-msgstr ""
+msgstr "相似度"
 
 #: apps/knowledge/serializers/knowledge.py:89
 #: apps/knowledge/serializers/knowledge.py:511
-#, fuzzy
 #| msgid "base model"
 msgid "search mode"
-msgstr "基础模型"
+msgstr "搜索模式"
 
 #: apps/knowledge/serializers/knowledge.py:91
 #: apps/knowledge/serializers/knowledge.py:513
 msgid "The type only supports embedding|keywords|blend"
-msgstr ""
+msgstr "类型仅支持嵌入|关键字|混合"
 
 #: apps/knowledge/serializers/knowledge.py:191
 #: apps/knowledge/serializers/knowledge.py:220
 msgid "Failed to send the vectorization task, please try again later!"
-msgstr ""
+msgstr "发送向量化任务失败，请稍后再试！"
 
 #: apps/knowledge/serializers/knowledge.py:271
 #: apps/knowledge/serializers/knowledge.py:344
@@ -686,7 +674,7 @@ msgstr "知识库名称重复！"
 #: apps/knowledge/serializers/knowledge.py:293
 #, python-brace-format
 msgid "Unknown application id {knowledge_id}, cannot be associated"
-msgstr ""
+msgstr "未知应用 ID {knowledge_id}，无法关联"
 
 #: apps/knowledge/serializers/knowledge.py:335
 msgid ""
@@ -697,25 +685,23 @@ msgstr ""
 "fit2cloud.com/)."
 
 #: apps/knowledge/serializers/knowledge.py:430
-#, fuzzy
 #| msgid "input type"
 msgid "sync type"
-msgstr "输入类型"
+msgstr "同步类型"
 
 #: apps/knowledge/serializers/knowledge.py:432
 msgid "The synchronization type only supports:replace|complete"
-msgstr ""
+msgstr "同步类型仅支持:replace|complete"
 
 #: apps/knowledge/serializers/knowledge.py:438
 #: apps/knowledge/serializers/knowledge.py:519
-#, fuzzy
 #| msgid "Model does not exist"
 msgid "id does not exist"
-msgstr "模型不存在"
+msgstr "知识库 ID 不存在"
 
 #: apps/knowledge/serializers/knowledge.py:506
 msgid "id"
-msgstr ""
+msgstr "ID"
 
 #: apps/knowledge/serializers/paragraph.py:37
 #: apps/knowledge/serializers/problem.py:27
@@ -739,10 +725,9 @@ msgid "Is active"
 msgstr "是否启用"
 
 #: apps/knowledge/serializers/paragraph.py:54
-#, fuzzy
 #| msgid "paragraph id"
 msgid "paragraph id list"
-msgstr "段落 ID"
+msgstr "段落 ID 列表"
 
 #: apps/knowledge/serializers/paragraph.py:55
 #: apps/knowledge/serializers/paragraph.py:70
@@ -760,7 +745,7 @@ msgstr "段落 ID 不存在"
 
 #: apps/knowledge/serializers/paragraph.py:106
 msgid "Already associated, please do not associate again"
-msgstr ""
+msgstr "已关联，请勿再次关联"
 
 #: apps/knowledge/serializers/paragraph.py:179
 msgid "Problem id does not exist"
@@ -779,41 +764,35 @@ msgid "problem id"
 msgstr "问题 ID"
 
 #: apps/knowledge/serializers/paragraph.py:338
-#, fuzzy
 #| msgid "Paragraph id does not exist"
 msgid "Paragraph does not exist"
-msgstr "段落 ID 不存在"
+msgstr "段落不存在"
 
 #: apps/knowledge/serializers/paragraph.py:340
-#, fuzzy
 #| msgid "Problem id does not exist"
 msgid "Problem does not exist"
-msgstr "问题 ID 不存在"
+msgstr "问题不存在"
 
 #: apps/knowledge/serializers/paragraph.py:415
-#, fuzzy
 #| msgid "The task is being executed, please do not send it repeatedly."
 msgid "The task is being executed, please do not send it again."
 msgstr "任务正在执行，请勿重复发送。"
 
 #: apps/knowledge/serializers/problem.py:40
-#, fuzzy
 #| msgid "problem id"
 msgid "problem list"
-msgstr "问题 ID"
+msgstr "问题列表"
 
 #: apps/knowledge/serializers/problem.py:41
-#, fuzzy
 #| msgid "problem id"
 msgid "problem"
 msgstr "问题 ID"
 
 #: apps/knowledge/serializers/problem.py:45
 #: apps/knowledge/serializers/problem.py:55
-#, fuzzy
 #| msgid "problem id"
 msgid "problem id list"
-msgstr "问题 ID"
+msgstr "问题 ID 列表"
 
 #: apps/knowledge/task/embedding.py:24 apps/knowledge/task/embedding.py:74
 #, python-brace-format
@@ -836,17 +815,15 @@ msgid "End--->Vectorized knowledge: {knowledge_id}"
 msgstr "结束--->向量知识库: {knowledge_id}"
 
 #: apps/knowledge/task/generate.py:106
-#, fuzzy, python-brace-format
 #| msgid "Vectorized document: {document_id} error {error} {traceback}"
 msgid ""
 "Generate issue based on document: {document_id} error {error}{traceback}"
-msgstr "向量文档: {document_id} 错误：{error} {traceback}"
+msgstr "生成问题基于文档: {document_id} 错误 {error}{traceback}"
 
 #: apps/knowledge/task/generate.py:110
-#, fuzzy, python-brace-format
 #| msgid "End--->Embedding document: {document_id}"
 msgid "End--->Generate problem: {document_id}"
-msgstr "结束--->向量文档: {document_id}"
+msgstr "结束--->生成问题: {document_id}"
 
 #: apps/knowledge/task/handler.py:121
 #, python-brace-format
@@ -870,10 +847,9 @@ msgstr "同步 web 知识库:{knowledge_id} 错误{error}{traceback}"
 
 #: apps/knowledge/views/document.py:23 apps/knowledge/views/document.py:24
 #: apps/knowledge/views/document.py:25
-#, fuzzy
 #| msgid "Create user"
 msgid "Create document"
-msgstr "创建者"
+msgstr "创建文档"
 
 #: apps/knowledge/views/document.py:29 apps/knowledge/views/document.py:45
 #: apps/knowledge/views/document.py:69 apps/knowledge/views/document.py:86
@@ -886,149 +862,138 @@ msgstr "创建者"
 #: apps/knowledge/views/document.py:350 apps/knowledge/views/document.py:371
 #: apps/knowledge/views/document.py:398 apps/knowledge/views/document.py:418
 #: apps/knowledge/views/document.py:438
-#, fuzzy
 #| msgid "Knowledge Base"
 msgid "Knowledge Base/Documentation"
-msgstr "知识库"
+msgstr "知识库/文档"
 
 #: apps/knowledge/views/document.py:40 apps/knowledge/views/document.py:41
 #: apps/knowledge/views/document.py:42
-#, fuzzy
 #| msgid "document id"
 msgid "Get document"
-msgstr "文档 ID"
+msgstr "获取文档"
 
 #: apps/knowledge/views/document.py:64 apps/knowledge/views/document.py:65
 #: apps/knowledge/views/document.py:66
-#, fuzzy
 #| msgid "document id"
 msgid "Get document details"
-msgstr "文档 ID"
+msgstr "文档文档详情"
 
 #: apps/knowledge/views/document.py:80 apps/knowledge/views/document.py:81
 #: apps/knowledge/views/document.py:82
-#, fuzzy
 #| msgid "document id"
 msgid "Modify document"
-msgstr "文档 ID"
+msgstr "修改文档"
 
 #: apps/knowledge/views/document.py:95 apps/knowledge/views/document.py:96
 #: apps/knowledge/views/document.py:97
-#, fuzzy
 #| msgid "Delete user"
 msgid "Delete document"
-msgstr "删除用户"
+msgstr "删除文档"
 
 #: apps/knowledge/views/document.py:116 apps/knowledge/views/document.py:117
 #: apps/knowledge/views/document.py:118
 msgid "Segmented document"
-msgstr ""
+msgstr "分段文档"
 
 #: apps/knowledge/views/document.py:147 apps/knowledge/views/document.py:148
 #: apps/knowledge/views/document.py:149
-#, fuzzy
 #| msgid "Get a list of model types"
 msgid "Get a list of segment IDs"
-msgstr "获取模型类型列表"
+msgstr "获取分段列表"
 
 #: apps/knowledge/views/document.py:164 apps/knowledge/views/document.py:165
 #: apps/knowledge/views/document.py:166
 msgid "Modify document hit processing methods in batches"
-msgstr ""
+msgstr "批量修改文档命中处理方法"
 
 #: apps/knowledge/views/document.py:183 apps/knowledge/views/document.py:184
 #: apps/knowledge/views/document.py:185
 msgid "Synchronize web site types"
-msgstr ""
+msgstr "同步网站类型"
 
 #: apps/knowledge/views/document.py:202 apps/knowledge/views/document.py:203
 #: apps/knowledge/views/document.py:204
 msgid "Refresh document vector library"
-msgstr ""
+msgstr "刷新文档向量库"
 
 #: apps/knowledge/views/document.py:220 apps/knowledge/views/document.py:221
 #: apps/knowledge/views/document.py:222
 msgid "Cancel task"
-msgstr ""
+msgstr "取消任务"
 
 #: apps/knowledge/views/document.py:238 apps/knowledge/views/document.py:239
 #: apps/knowledge/views/document.py:240
 msgid "Cancel tasks in batches"
-msgstr ""
+msgstr "批量取消任务"
 
 #: apps/knowledge/views/document.py:256 apps/knowledge/views/document.py:257
 #: apps/knowledge/views/document.py:258
-#, fuzzy
 #| msgid "document name"
 msgid "Create documents in batches"
-msgstr "文档名称"
+msgstr "批量创建文档"
 
 #: apps/knowledge/views/document.py:278 apps/knowledge/views/document.py:279
 #: apps/knowledge/views/document.py:280
 msgid "Batch sync documents"
-msgstr ""
+msgstr "批量同步文档"
 
 #: apps/knowledge/views/document.py:300 apps/knowledge/views/document.py:301
 #: apps/knowledge/views/document.py:302
-#, fuzzy
 #| msgid "document name"
 msgid "Delete documents in batches"
-msgstr "文档名称"
+msgstr "批量删除文档"
 
 #: apps/knowledge/views/document.py:322 apps/knowledge/views/document.py:323
 msgid "Batch refresh document vector library"
-msgstr ""
+msgstr "批量刷新文档向量库"
 
 #: apps/knowledge/views/document.py:344 apps/knowledge/views/document.py:345
 #: apps/knowledge/views/document.py:346
 msgid "Batch generate related documents"
-msgstr ""
+msgstr "批量生成相关文档"
 
 #: apps/knowledge/views/document.py:366 apps/knowledge/views/document.py:367
 #: apps/knowledge/views/document.py:368
-#, fuzzy
 #| msgid "Get tool list by pagination"
 msgid "Get document by pagination"
-msgstr "获取工具列表"
+msgstr "分页获取文档"
 
 #: apps/knowledge/views/document.py:392 apps/knowledge/views/document.py:393
 #: apps/knowledge/views/document.py:394
 msgid "Create Web site documents"
-msgstr ""
+msgstr "创建网站文档"
 
 #: apps/knowledge/views/document.py:412 apps/knowledge/views/document.py:413
 #: apps/knowledge/views/document.py:414
 msgid "Import QA and create documentation"
-msgstr ""
+msgstr "导入问答并创建文档"
 
 #: apps/knowledge/views/document.py:432 apps/knowledge/views/document.py:433
 #: apps/knowledge/views/document.py:434
 msgid "Import tables and create documents"
-msgstr ""
+msgstr "导入表格并创建文档"
 
 #: apps/knowledge/views/file.py:20 apps/knowledge/views/file.py:21
 #: apps/knowledge/views/file.py:22
 msgid "Upload file"
-msgstr ""
+msgstr "上传文件"
 
 #: apps/knowledge/views/file.py:26 apps/knowledge/views/file.py:39
 #: apps/knowledge/views/file.py:51
 msgid "File"
-msgstr ""
+msgstr "文件"
 
 #: apps/knowledge/views/file.py:34 apps/knowledge/views/file.py:35
 #: apps/knowledge/views/file.py:36
-#, fuzzy
 #| msgid "Get folder"
 msgid "Get file"
-msgstr "获取文件夹"
+msgstr "获取文件"
 
 #: apps/knowledge/views/file.py:46 apps/knowledge/views/file.py:47
 #: apps/knowledge/views/file.py:48
-#, fuzzy
 #| msgid "Delete folder"
 msgid "Delete file"
-msgstr "删除文件夹"
+msgstr "删除文件"
 
 #: apps/knowledge/views/knowledge.py:20 apps/knowledge/views/knowledge.py:21
 #: apps/knowledge/views/knowledge.py:22
@@ -1046,57 +1011,50 @@ msgstr "知识库"
 
 #: apps/knowledge/views/knowledge.py:44 apps/knowledge/views/knowledge.py:45
 #: apps/knowledge/views/knowledge.py:46
-#, fuzzy
 #| msgid "knowledge id"
 msgid "Edit knowledge"
-msgstr "知识库 ID"
+msgstr "修改知识库"
 
 #: apps/knowledge/views/knowledge.py:60 apps/knowledge/views/knowledge.py:61
 #: apps/knowledge/views/knowledge.py:62
-#, fuzzy
 #| msgid "Delete folder"
 msgid "Delete knowledge"
-msgstr "删除文件夹"
+msgstr "删除知识库"
 
 #: apps/knowledge/views/knowledge.py:76 apps/knowledge/views/knowledge.py:77
 #: apps/knowledge/views/knowledge.py:78
-#, fuzzy
 #| msgid "Create web knowledge"
 msgid "Get knowledge"
-msgstr "创建 web 知识库"
+msgstr "获取知识库"
 
 #: apps/knowledge/views/knowledge.py:94 apps/knowledge/views/knowledge.py:95
 #: apps/knowledge/views/knowledge.py:96
-#, fuzzy
 #| msgid "Get user paginated list"
 msgid "Get the knowledge base paginated list"
-msgstr "获取用户分页列表"
+msgstr "获取知识库分页列表"
 
 #: apps/knowledge/views/knowledge.py:118 apps/knowledge/views/knowledge.py:119
 #: apps/knowledge/views/knowledge.py:120
 msgid "Synchronize the knowledge base of the website"
-msgstr ""
+msgstr "同步网站知识库"
 
 #: apps/knowledge/views/knowledge.py:142 apps/knowledge/views/knowledge.py:143
 #: apps/knowledge/views/knowledge.py:144
-#, fuzzy
 #| msgid "state list"
 msgid "Hit test list"
-msgstr "状态列表"
+msgstr "命中测试列表"
 
 #: apps/knowledge/views/knowledge.py:169 apps/knowledge/views/knowledge.py:170
 #: apps/knowledge/views/knowledge.py:171
-#, fuzzy
 #| msgid "selector"
 msgid "Re-vectorize"
-msgstr "选择器"
+msgstr "重新向量化"
 
 #: apps/knowledge/views/knowledge.py:188 apps/knowledge/views/knowledge.py:189
 #: apps/knowledge/views/knowledge.py:190
-#, fuzzy
 #| msgid "Generate image resolution"
 msgid "Generate related"
-msgstr "生成图像分辨率"
+msgstr "生成相关"
 
 #: apps/knowledge/views/knowledge.py:207 apps/knowledge/views/knowledge.py:208
 #: apps/knowledge/views/knowledge.py:209
@@ -1110,10 +1068,9 @@ msgstr "创建 web 知识库"
 
 #: apps/knowledge/views/paragraph.py:21 apps/knowledge/views/paragraph.py:22
 #: apps/knowledge/views/paragraph.py:23
-#, fuzzy
 #| msgid "paragraph id"
 msgid "Paragraph list"
-msgstr "段落 ID"
+msgstr "段落列表"
 
 #: apps/knowledge/views/paragraph.py:26 apps/knowledge/views/paragraph.py:47
 #: apps/knowledge/views/paragraph.py:66 apps/knowledge/views/paragraph.py:85
@@ -1122,128 +1079,118 @@ msgstr "段落 ID"
 #: apps/knowledge/views/paragraph.py:193 apps/knowledge/views/paragraph.py:216
 #: apps/knowledge/views/paragraph.py:241 apps/knowledge/views/paragraph.py:266
 msgid "Knowledge Base/Documentation/Paragraph"
-msgstr ""
+msgstr "知识库/文档/段落"
 
 #: apps/knowledge/views/paragraph.py:42 apps/knowledge/views/paragraph.py:43
 msgid "Create Paragraph"
-msgstr ""
+msgstr "创建段落"
 
 #: apps/knowledge/views/paragraph.py:60 apps/knowledge/views/paragraph.py:61
 #: apps/knowledge/views/paragraph.py:62
 msgid "Batch Paragraph"
-msgstr ""
+msgstr "批量段落"
 
 #: apps/knowledge/views/paragraph.py:79 apps/knowledge/views/paragraph.py:80
 #: apps/knowledge/views/paragraph.py:81
 msgid "Batch Generate Related"
-msgstr ""
+msgstr "批量生成相关"
 
 #: apps/knowledge/views/paragraph.py:98 apps/knowledge/views/paragraph.py:99
 #: apps/knowledge/views/paragraph.py:100
-#, fuzzy
 #| msgid "paragraph id"
 msgid "Modify paragraph data"
-msgstr "段落 ID"
+msgstr "修改段落数据"
 
 #: apps/knowledge/views/paragraph.py:121 apps/knowledge/views/paragraph.py:122
 #: apps/knowledge/views/paragraph.py:123
-#, fuzzy
 #| msgid "paragraph id"
 msgid "Get paragraph details"
-msgstr "段落 ID"
+msgstr "获取段落详情"
 
 #: apps/knowledge/views/paragraph.py:143 apps/knowledge/views/paragraph.py:144
 #: apps/knowledge/views/paragraph.py:145
-#, fuzzy
 #| msgid "paragraph id"
 msgid "Delete paragraph"
-msgstr "段落 ID"
+msgstr "删除段落"
 
 #: apps/knowledge/views/paragraph.py:167 apps/knowledge/views/paragraph.py:168
 #: apps/knowledge/views/paragraph.py:169
 msgid "Add associated questions"
-msgstr ""
+msgstr "添加关联问题"
 
 #: apps/knowledge/views/paragraph.py:188 apps/knowledge/views/paragraph.py:189
 #: apps/knowledge/views/paragraph.py:190
-#, fuzzy
 #| msgid "Get tool list by pagination"
 msgid "Get a list of paragraph questions"
-msgstr "获取工具列表"
+msgstr "获取段落问题列表"
 
 #: apps/knowledge/views/paragraph.py:211 apps/knowledge/views/paragraph.py:212
 #: apps/knowledge/views/paragraph.py:213
 msgid "Disassociation issue"
-msgstr ""
+msgstr "取消关联问题"
 
 #: apps/knowledge/views/paragraph.py:236 apps/knowledge/views/paragraph.py:237
 #: apps/knowledge/views/paragraph.py:238
 msgid "Related questions"
-msgstr ""
+msgstr "管理问题"
 
 #: apps/knowledge/views/paragraph.py:261 apps/knowledge/views/paragraph.py:262
 #: apps/knowledge/views/paragraph.py:263
-#, fuzzy
 #| msgid "Get tool list by pagination"
 msgid "Get paragraph list by pagination"
-msgstr "获取工具列表"
+msgstr "获取段落列表"
 
 #: apps/knowledge/views/problem.py:21 apps/knowledge/views/problem.py:22
 #: apps/knowledge/views/problem.py:23
-#, fuzzy
 #| msgid "Query model list"
 msgid "Question list"
-msgstr "查询模型列表"
+msgstr "问题列表"
 
 #: apps/knowledge/views/problem.py:26 apps/knowledge/views/problem.py:48
 #: apps/knowledge/views/problem.py:65 apps/knowledge/views/problem.py:88
 #: apps/knowledge/views/problem.py:107 apps/knowledge/views/problem.py:125
 #: apps/knowledge/views/problem.py:145 apps/knowledge/views/problem.py:166
 msgid "Knowledge Base/Documentation/Paragraph/Question"
-msgstr ""
+msgstr "知识库/文档/段落/问题"
 
 #: apps/knowledge/views/problem.py:42 apps/knowledge/views/problem.py:43
 #: apps/knowledge/views/problem.py:44
-#, fuzzy
 #| msgid "Create tool"
 msgid "Create question"
-msgstr "创建工具"
+msgstr "创建问题"
 
 #: apps/knowledge/views/problem.py:60 apps/knowledge/views/problem.py:61
 #: apps/knowledge/views/problem.py:62
-#, fuzzy
 #| msgid "Get a list of model types"
 msgid "Get a list of associated paragraphs"
-msgstr "获取模型类型列表"
+msgstr "获取关联段落列表"
 
 #: apps/knowledge/views/problem.py:82 apps/knowledge/views/problem.py:83
 #: apps/knowledge/views/problem.py:84
 msgid "Batch associated paragraphs"
-msgstr ""
+msgstr "批量关联段落"
 
 #: apps/knowledge/views/problem.py:101 apps/knowledge/views/problem.py:102
 #: apps/knowledge/views/problem.py:103
 msgid "Batch deletion issues"
-msgstr ""
+msgstr "批量删除问题"
 
 #: apps/knowledge/views/problem.py:120 apps/knowledge/views/problem.py:121
 #: apps/knowledge/views/problem.py:122
-#, fuzzy
 #| msgid "Delete tool"
 msgid "Delete question"
-msgstr "删除工具"
+msgstr "删除问题"
 
 #: apps/knowledge/views/problem.py:139 apps/knowledge/views/problem.py:140
 #: apps/knowledge/views/problem.py:141
 msgid "Modify question"
-msgstr ""
+msgstr "修改问题"
 
 #: apps/knowledge/views/problem.py:161 apps/knowledge/views/problem.py:162
 #: apps/knowledge/views/problem.py:163
-#, fuzzy
 #| msgid "Get a list of model types"
 msgid "Get the list of questions by page"
-msgstr "获取模型类型列表"
+msgstr "分页获取问题列表"
 
 #: apps/maxkb/settings/base.py:85
 msgid "Intelligent customer service platform"
@@ -2983,25 +2930,24 @@ msgstr "智谱 AI"
 #: apps/models_provider/serializers/model_apply_serializers.py:32
 #: apps/models_provider/serializers/model_apply_serializers.py:37
 msgid "vector text"
-msgstr ""
+msgstr "向量文本"
 
 #: apps/models_provider/serializers/model_apply_serializers.py:33
-#, fuzzy
 #| msgid "state list"
 msgid "vector text list"
-msgstr "状态列表"
+msgstr "向量文本列表"
 
 #: apps/models_provider/serializers/model_apply_serializers.py:41
 msgid "text"
-msgstr ""
+msgstr "文本"
 
 #: apps/models_provider/serializers/model_apply_serializers.py:42
 msgid "metadata"
-msgstr ""
+msgstr "元数据"
 
 #: apps/models_provider/serializers/model_apply_serializers.py:47
 msgid "query"
-msgstr ""
+msgstr "查询"
 
 #: apps/models_provider/serializers/model_serializer.py:43
 #: apps/models_provider/serializers/model_serializer.py:222
@@ -3033,7 +2979,7 @@ msgstr "模型保存失败"
 
 #: apps/models_provider/serializers/model_serializer.py:325
 msgid "create user"
-msgstr "创建者"
+msgstr "创建用户"
 
 #: apps/models_provider/views/model.py:28
 #: apps/models_provider/views/model.py:29
@@ -3117,16 +3063,15 @@ msgstr "下载模型暂停"
 #: apps/models_provider/views/model_apply.py:38
 #: apps/models_provider/views/model_apply.py:39
 #: apps/models_provider/views/model_apply.py:40
-#, fuzzy
 #| msgid "certification information"
 msgid "Vectorization documentation"
-msgstr "认证信息"
+msgstr "向量化文档"
 
 #: apps/models_provider/views/model_apply.py:51
 #: apps/models_provider/views/model_apply.py:52
 #: apps/models_provider/views/model_apply.py:53
 msgid "Reorder documents"
-msgstr ""
+msgstr "重新排序文档"
 
 #: apps/models_provider/views/provide.py:21
 #: apps/models_provider/views/provide.py:22
@@ -3169,7 +3114,7 @@ msgstr ""
 #: apps/system_manage/serializers/email_setting.py:30
 #: apps/system_manage/serializers/email_setting.py:34
 msgid "Sender's email"
-msgstr ""
+msgstr "发送者邮箱"
 
 #: apps/system_manage/serializers/email_setting.py:31
 #: apps/users/serializers/login.py:28 apps/users/serializers/user.py:42
@@ -3179,67 +3124,64 @@ msgstr "密码"
 
 #: apps/system_manage/serializers/email_setting.py:32
 msgid "Whether to enable TLS"
-msgstr ""
+msgstr "是否启用 TLS"
 
 #: apps/system_manage/serializers/email_setting.py:33
 msgid "Whether to enable SSL"
-msgstr ""
+msgstr "是否启用 SSL"
 
 #: apps/system_manage/serializers/email_setting.py:49
-#, fuzzy
 #| msgid "Email sending failed"
 msgid "Email verification failed"
-msgstr "邮件发送失败"
+msgstr "邮件认证失败"
 
 #: apps/system_manage/serializers/user_resource_permission.py:52
-#, fuzzy
 #| msgid "parent id"
 msgid "target id"
-msgstr "父级 ID"
+msgstr "当前 ID"
 
 #: apps/system_manage/serializers/user_resource_permission.py:69
 msgid "Non-existent application|knowledge base id["
-msgstr ""
+msgstr "不存在的应用|知识库 ID["
 
 #: apps/system_manage/views/email_setting.py:30
 #: apps/system_manage/views/email_setting.py:31
 #: apps/system_manage/views/email_setting.py:32
 msgid "Create or update email settings"
-msgstr ""
+msgstr "创建或更新邮件设置"
 
 #: apps/system_manage/views/email_setting.py:35
 #: apps/system_manage/views/email_setting.py:48
 #: apps/system_manage/views/email_setting.py:61
-#, fuzzy
 #| msgid "Email sending failed"
 msgid "Email settings"
-msgstr "邮件发送失败"
+msgstr "邮箱设置"
 
 #: apps/system_manage/views/email_setting.py:44
 #: apps/system_manage/views/email_setting.py:45
 msgid "Test email settings"
-msgstr ""
+msgstr "测试邮箱设置"
 
 #: apps/system_manage/views/email_setting.py:57
 #: apps/system_manage/views/email_setting.py:58
 #: apps/system_manage/views/email_setting.py:59
 msgid "Get email settings"
-msgstr ""
+msgstr "获取邮箱设置"
 
 #: apps/system_manage/views/user_resource_permission.py:29
 #: apps/system_manage/views/user_resource_permission.py:30
 msgid "Obtain resource authorization list"
-msgstr ""
+msgstr "获取资源授权列表"
 
 #: apps/system_manage/views/user_resource_permission.py:33
 #: apps/system_manage/views/user_resource_permission.py:48
 msgid "Resources authorization"
-msgstr ""
+msgstr "资源授权"
 
 #: apps/system_manage/views/user_resource_permission.py:43
 #: apps/system_manage/views/user_resource_permission.py:44
 msgid "Modify the resource authorization list"
-msgstr ""
+msgstr "修改资源授权列表"
 
 #: apps/tools/serializers/tool.py:92 apps/tools/serializers/tool.py:154
 msgid "variable name"
@@ -3462,7 +3404,6 @@ msgid "Name"
 msgstr "用户名"
 
 #: apps/users/serializers/user.py:229
-#, fuzzy
 #| msgid "Is active"
 msgid "Is Active"
 msgstr "是否启用"
