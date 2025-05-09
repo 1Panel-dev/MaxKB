@@ -248,3 +248,21 @@ class HitTestAPI(SyncWebAPI):
 
 class EmbeddingAPI(SyncWebAPI):
     pass
+
+
+class GetModelAPI(SyncWebAPI):
+    @staticmethod
+    def get_parameters():
+        return [
+            OpenApiParameter(
+                name="workspace_id",
+                description="工作空间id",
+                type=OpenApiTypes.STR,
+                location='path',
+                required=True,
+            ),
+        ]
+
+    @staticmethod
+    def get_response():
+        return DefaultResultSerializer

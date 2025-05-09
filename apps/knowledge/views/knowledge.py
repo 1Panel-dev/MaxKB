@@ -8,8 +8,10 @@ from common.auth.authentication import has_permissions
 from common.constants.permission_constants import PermissionConstants
 from common.result import result
 from knowledge.api.knowledge import KnowledgeBaseCreateAPI, KnowledgeWebCreateAPI, KnowledgeTreeReadAPI, \
-    KnowledgeEditAPI, KnowledgeReadAPI, KnowledgePageAPI, SyncWebAPI, GenerateRelatedAPI, HitTestAPI, EmbeddingAPI
+    KnowledgeEditAPI, KnowledgeReadAPI, KnowledgePageAPI, SyncWebAPI, GenerateRelatedAPI, HitTestAPI, EmbeddingAPI, \
+    GetModelAPI
 from knowledge.serializers.knowledge import KnowledgeSerializer
+from models_provider.serializers.model_serializer import ModelSerializer
 
 
 class KnowledgeView(APIView):
@@ -193,10 +195,32 @@ class KnowledgeView(APIView):
             responses=GenerateRelatedAPI.get_response(),
             tags=[_('Knowledge Base')]  # type: ignore
         )
+        @has_permissions(PermissionConstants.KNOWLEDGE_EDIT.get_workspace_permission())
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(KnowledgeSerializer.Operate(
                 data={'knowledge_id': knowledge_id, 'workspace_id': workspace_id, 'user_id': request.user.id}
             ).generate_related(request.data))
+
+    class Model(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['GET'],
+            summary=_('Get model for knowledge base'),
+            description=_('Get model for knowledge base'),
+            operation_id=_('Get model for knowledge base'),  # type: ignore
+            parameters=GetModelAPI.get_parameters(),
+            responses=GetModelAPI.get_response(),
+            tags=[_('Knowledge Base')]  # type: ignore
+        )
+        @has_permissions(PermissionConstants.KNOWLEDGE_EDIT.get_workspace_permission())
+        def get(self, request: Request, workspace_id: str):
+            return result.success(ModelSerializer.Query(
+                data={
+                    'workspace_id': workspace_id,
+                    'model_type': 'LLM'
+                }
+            ).list(workspace_id, True))
 
 
 class KnowledgeBaseView(APIView):
