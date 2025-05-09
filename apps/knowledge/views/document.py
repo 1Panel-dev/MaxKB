@@ -341,8 +341,9 @@ class DocumentView(APIView):
 
         @extend_schema(
             methods=['PUT'],
-            summary=_('Batch refresh document vector library'),
-            operation_id=_('Batch refresh document vector library'),
+            summary=_('Batch generate related documents'),
+            description=_('Batch generate related documents'),
+            operation_id=_('Batch generate related documents'),
             request=BatchGenerateRelatedAPI.get_request(),
             parameters=BatchGenerateRelatedAPI.get_parameters(),
             responses=BatchGenerateRelatedAPI.get_response(),

@@ -43,9 +43,9 @@ class FileView(APIView):
 
         @extend_schema(
             methods=['DELETE'],
-            summary=_('Get file'),
-            description=_('Get file'),
-            operation_id=_('Get file'),
+            summary=_('Delete file'),
+            description=_('Delete file'),
+            operation_id=_('Delete file'),
             parameters=FileGetAPI.get_parameters(),
             responses=FileGetAPI.get_response(),
             tags=[_('File')]

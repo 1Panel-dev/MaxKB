@@ -119,6 +119,7 @@ class KnowledgeView(APIView):
             description=_("Synchronize the knowledge base of the website"),
             operation_id=_("Synchronize the knowledge base of the website"),
             parameters=SyncWebAPI.get_parameters(),
+            request=SyncWebAPI.get_request(),
             responses=SyncWebAPI.get_response(),
             tags=[_('Knowledge Base')]
         )
@@ -169,6 +170,7 @@ class KnowledgeView(APIView):
             description=_('Re-vectorize'),
             operation_id=_('Re-vectorize'),
             parameters=EmbeddingAPI.get_parameters(),
+            request=EmbeddingAPI.get_request(),
             responses=EmbeddingAPI.get_response(),
             tags=[_('Knowledge Base')]
         )
@@ -188,6 +190,7 @@ class KnowledgeView(APIView):
             operation_id=_('Generate related'),
             parameters=GenerateRelatedAPI.get_parameters(),
             request=GenerateRelatedAPI.get_request(),
+            responses=GenerateRelatedAPI.get_response(),
             tags=[_('Knowledge Base')]
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
