@@ -24,9 +24,9 @@ class ModelApply(APIView):
         @extend_schema(methods=['POST'],
                        summary=_('Vectorization documentation'),
                        description=_('Vectorization documentation'),
-                       operation_id=_('Vectorization documentation'),
+                       operation_id=_('Vectorization documentation'),  # type: ignore
                        responses=DefaultModelResponse.get_response(),
-                       tags=[_('Model')]
+                       tags=[_('Model')]  # type: ignore
                        )
         @has_permissions(PermissionConstants.MODEL_READ.get_workspace_permission())
         def post(self, request: Request, workspace_id, model_id):
@@ -37,9 +37,9 @@ class ModelApply(APIView):
         @extend_schema(methods=['POST'],
                        summary=_('Vectorization documentation'),
                        description=_('Vectorization documentation'),
-                       operation_id=_('Vectorization documentation'),
+                       operation_id=_('Vectorization documentation'),  # type: ignore
                        responses=DefaultModelResponse.get_response(),
-                       tags=[_('Model')]
+                       tags=[_('Model')]  # type: ignore
                        )
         @has_permissions(PermissionConstants.MODEL_READ.get_workspace_permission())
         def post(self, request: Request, workspace_id, model_id):
@@ -50,9 +50,9 @@ class ModelApply(APIView):
         @extend_schema(methods=['POST'],
                        summary=_('Reorder documents'),
                        description=_('Reorder documents'),
-                       operation_id=_('Reorder documents'),
+                       operation_id=_('Reorder documents'),  # type: ignore
                        responses=DefaultModelResponse.get_response(),
-                       tags=[_('Model')]
+                       tags=[_('Model')]  # type: ignore
                        )
         @has_permissions(PermissionConstants.MODEL_READ.get_workspace_permission())
         def post(self, request: Request, workspace_id, model_id):

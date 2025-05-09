@@ -29,10 +29,10 @@ class SystemSetting(APIView):
         @extend_schema(methods=['PUT'],
                        summary=_('Create or update email settings'),
                        description=_('Create or update email settings'),
-                       operation_id=_('Create or update email settings'),
+                       operation_id=_('Create or update email settings'),  # type: ignore
                        request=EmailSettingAPI.get_request(),
                        responses=EmailSettingAPI.get_response(),
-                       tags=[_('Email settings')])
+                       tags=[_('Email settings')])  # type: ignore
         @has_permissions(PermissionConstants.EMAIL_SETTING_EDIT)
         def put(self, request: Request):
             return result.success(
@@ -42,10 +42,10 @@ class SystemSetting(APIView):
         @extend_schema(
             methods=['POST'],
             summary=_('Test email settings'),
-            operation_id=_('Test email settings'),
+            operation_id=_('Test email settings'),  # type: ignore
             request=EmailSettingAPI.get_request(),
             responses=DefaultModelResponse.get_response(),
-            tags=[_('Email settings')]
+            tags=[_('Email settings')]  # type: ignore
         )
         @has_permissions(PermissionConstants.EMAIL_SETTING_EDIT)
         def post(self, request: Request):
@@ -56,9 +56,9 @@ class SystemSetting(APIView):
         @extend_schema(methods=['GET'],
                        summary=_('Get email settings'),
                        description=_('Get email settings'),
-                       operation_id=_('Get email settings'),
+                       operation_id=_('Get email settings'),  # type: ignore
                        responses=DefaultModelResponse.get_response(),
-                       tags=[_('Email settings')])
+                       tags=[_('Email settings')])  # type: ignore
         @has_permissions(PermissionConstants.EMAIL_SETTING_READ)
         def get(self, request: Request):
             return result.success(

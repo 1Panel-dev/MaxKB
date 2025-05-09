@@ -20,9 +20,9 @@ class Provide(APIView):
     @extend_schema(methods=['GET'],
                    summary=_('Get a list of model suppliers'),
                    description=_('Get a list of model suppliers'),
-                   operation_id=_('Get a list of model suppliers'),
+                   operation_id=_('Get a list of model suppliers'),  # type: ignore
                    responses=ProvideApi.get_response(),
-                   tags=[_('Model')])
+                   tags=[_('Model')])  # type: ignore
     @has_permissions(PermissionConstants.MODEL_READ)
     def get(self, request: Request):
         model_type = request.query_params.get('model_type')
@@ -43,10 +43,10 @@ class Provide(APIView):
         @extend_schema(methods=['GET'],
                        summary=_('Get a list of model types'),
                        description=_('Get a list of model types'),
-                       operation_id=_('Get a list of model types'),
+                       operation_id=_('Get a list of model types'),  # type: ignore
                        parameters=ProvideApi.ModelTypeList.get_query_params_api(),
                        responses=ProvideApi.ModelTypeList.get_response(),
-                       tags=[_('Model')])
+                       tags=[_('Model')])  # type: ignore
         @has_permissions(PermissionConstants.MODEL_READ)
         def get(self, request: Request):
             provider = request.query_params.get('provider')
@@ -58,10 +58,10 @@ class Provide(APIView):
         @extend_schema(methods=['GET'],
                        summary=_('Example of obtaining model list'),
                        description=_('Example of obtaining model list'),
-                       operation_id=_('Example of obtaining model list'),
+                       operation_id=_('Example of obtaining model list'),  # type: ignore
                        parameters=ProvideApi.ModelList.get_query_params_api(),
                        responses=ProvideApi.ModelList.get_response(),
-                       tags=[_('Model')])
+                       tags=[_('Model')])  # type: ignore
         @has_permissions(PermissionConstants.MODEL_READ)
         def get(self, request: Request):
             provider = request.query_params.get('provider')
@@ -77,10 +77,10 @@ class Provide(APIView):
         @extend_schema(methods=['GET'],
                        summary=_('Get model default parameters'),
                        description=_('Get model default parameters'),
-                       operation_id=_('Get model default parameters'),
+                       operation_id=_('Get model default parameters'),  # type: ignore
                        parameters=ProvideApi.ModelParamsForm.get_query_params_api(),
                        responses=ProvideApi.ModelParamsForm.get_response(),
-                       tags=[_('Model')])
+                       tags=[_('Model')])  # type: ignore
         @has_permissions(PermissionConstants.MODEL_READ)
         def get(self, request: Request):
             provider = request.query_params.get('provider')
@@ -95,10 +95,10 @@ class Provide(APIView):
         @extend_schema(methods=['GET'],
                        summary=_('Get the model creation form'),
                        description=_('Get the model creation form'),
-                       operation_id=_('Get the model creation form'),
+                       operation_id=_('Get the model creation form'),  # type: ignore
                        parameters=ProvideApi.ModelParamsForm.get_query_params_api(),
                        responses=ProvideApi.ModelParamsForm.get_response(),
-                       tags=[_('Model')])
+                       tags=[_('Model')])  # type: ignore
         @has_permissions(PermissionConstants.MODEL_READ)
         def get(self, request: Request):
             provider = request.query_params.get('provider')

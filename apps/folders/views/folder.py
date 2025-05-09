@@ -18,11 +18,11 @@ class FolderView(APIView):
         methods=['POST'],
         description=_('Create folder'),
         summary=_('Create folder'),
-        operation_id=_('Create folder'),
+        operation_id=_('Create folder'),  # type: ignore
         parameters=FolderCreateAPI.get_parameters(),
         request=FolderCreateAPI.get_request(),
         responses=FolderCreateAPI.get_response(),
-        tags=[_('Folder')]
+        tags=[_('Folder')]  # type: ignore
     )
     @has_permissions(lambda r, kwargs: Permission(group=Group(kwargs.get('source')), operate=Operate.CREATE,
                                                   resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}"))
@@ -37,10 +37,10 @@ class FolderView(APIView):
         methods=['GET'],
         description=_('Get folder tree'),
         summary=_('Get folder tree'),
-        operation_id=_('Get folder tree'),
+        operation_id=_('Get folder tree'),  # type: ignore
         parameters=FolderTreeReadAPI.get_parameters(),
         responses=FolderTreeReadAPI.get_response(),
-        tags=[_('Folder')]
+        tags=[_('Folder')]  # type: ignore
     )
     @has_permissions(lambda r, kwargs: Permission(group=Group(kwargs.get('source')), operate=Operate.READ,
                                                   resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}"))
@@ -56,11 +56,11 @@ class FolderView(APIView):
             methods=['PUT'],
             description=_('Update folder'),
             summary=_('Update folder'),
-            operation_id=_('Update folder'),
+            operation_id=_('Update folder'),  # type: ignore
             parameters=FolderEditAPI.get_parameters(),
             request=FolderEditAPI.get_request(),
             responses=FolderEditAPI.get_response(),
-            tags=[_('Folder')]
+            tags=[_('Folder')]  # type: ignore
         )
         @has_permissions(lambda r, kwargs: Permission(group=Group(kwargs.get('source')), operate=Operate.EDIT,
                                                       resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}"))
@@ -73,10 +73,10 @@ class FolderView(APIView):
             methods=['GET'],
             description=_('Get folder'),
             summary=_('Get folder'),
-            operation_id=_('Get folder'),
+            operation_id=_('Get folder'),  # type: ignore
             parameters=FolderReadAPI.get_parameters(),
             responses=FolderReadAPI.get_response(),
-            tags=[_('Folder')]
+            tags=[_('Folder')]  # type: ignore
         )
         @has_permissions(lambda r, kwargs: Permission(group=Group(kwargs.get('source')), operate=Operate.READ,
                                                       resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}"))
@@ -89,10 +89,10 @@ class FolderView(APIView):
             methods=['DELETE'],
             description=_('Delete folder'),
             summary=_('Delete folder'),
-            operation_id=_('Delete folder'),
+            operation_id=_('Delete folder'),  # type: ignore
             parameters=FolderDeleteAPI.get_parameters(),
             responses=FolderDeleteAPI.get_response(),
-            tags=[_('Folder')]
+            tags=[_('Folder')]  # type: ignore
         )
         @has_permissions(lambda r, kwargs: Permission(group=Group(kwargs.get('source')), operate=Operate.DELETE,
                                                       resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}"))

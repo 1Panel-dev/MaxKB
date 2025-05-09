@@ -27,8 +27,8 @@ class UserProfileView(APIView):
     @extend_schema(methods=['GET'],
                    summary=_("Get current user information"),
                    description=_("Get current user information"),
-                   operation_id=_("Get current user information"),
-                   tags=[_("User management")],
+                   operation_id=_("Get current user information"),  # type: ignore
+                   tags=[_("User management")],  # type: ignore
                    responses=UserProfileAPI.get_response())
     def get(self, request: Request):
         return result.success(UserProfileSerializer().profile(request.user, request.auth))
@@ -41,7 +41,7 @@ class TestPermissionsUserView(APIView):
                    summary=_("Get current user information"),
                    description=_("Get current user information"),
                    operation_id="测试",
-                   tags=[_("User management")],
+                   tags=[_("User management")],  # type: ignore
                    responses=UserProfileAPI.get_response())
     @has_permissions(PermissionConstants.USER_EDIT)
     def get(self, request: Request):
@@ -55,7 +55,7 @@ class TestWorkspacePermissionUserView(APIView):
                    summary="针对工作空间下权限校验",
                    description="针对工作空间下权限校验",
                    operation_id="针对工作空间下权限校验",
-                   tags=[_("User management")],
+                   tags=[_("User management")],  # type: ignore
                    responses=UserProfileAPI.get_response(),
                    parameters=TestWorkspacePermissionUserApi.get_parameters())
     @has_permissions(PermissionConstants.USER_EDIT.get_workspace_permission())
@@ -69,8 +69,8 @@ class UserManage(APIView):
     @extend_schema(methods=['POST'],
                    summary=_("Create user"),
                    description=_("Create user"),
-                   operation_id=_("Create user"),
-                   tags=[_("User management")],
+                   operation_id=_("Create user"),  # type: ignore
+                   tags=[_("User management")],  # type: ignore
                    request=UserProfileAPI.get_request(),
                    responses=UserProfileAPI.get_response())
     @has_permissions(PermissionConstants.USER_CREATE)
@@ -83,8 +83,8 @@ class UserManage(APIView):
         @extend_schema(methods=['DELETE'],
                        description=_("Delete user"),
                        summary=_("Delete user"),
-                       operation_id=_("Delete user"),
-                       tags=[_("User management")],
+                       operation_id=_("Delete user"),  # type: ignore
+                       tags=[_("User management")],  # type: ignore
                        parameters=DeleteUserApi.get_parameters(),
                        responses=DefaultModelResponse.get_response())
         @has_permissions(PermissionConstants.USER_DELETE)
@@ -94,8 +94,8 @@ class UserManage(APIView):
         @extend_schema(methods=['GET'],
                        summary=_("Get user information"),
                        description=_("Get user information"),
-                       operation_id=_("Get user information"),
-                       tags=[_("User management")],
+                       operation_id=_("Get user information"),  # type: ignore
+                       tags=[_("User management")],  # type: ignore
                        request=DeleteUserApi.get_parameters(),
                        responses=UserProfileAPI.get_response())
         @has_permissions(PermissionConstants.USER_READ)
@@ -105,8 +105,8 @@ class UserManage(APIView):
         @extend_schema(methods=['PUT'],
                        summary=_("Update user information"),
                        description=_("Update user information"),
-                       operation_id=_("Update user information"),
-                       tags=[_("User management")],
+                       operation_id=_("Update user information"),  # type: ignore
+                       tags=[_("User management")],  # type: ignore
                        parameters=DeleteUserApi.get_parameters(),
                        request=EditUserApi.get_request(),
                        responses=UserProfileAPI.get_response())
@@ -121,8 +121,8 @@ class UserManage(APIView):
         @extend_schema(methods=['PUT'],
                        summary=_("Change password"),
                        description=_("Change password"),
-                       operation_id=_("Change password"),
-                       tags=[_("User management")],
+                       operation_id=_("Change password"),  # type: ignore
+                       tags=[_("User management")],  # type: ignore
                        parameters=DeleteUserApi.get_parameters(),
                        request=ChangeUserPasswordApi.get_request(),
                        responses=DefaultModelResponse.get_response())
@@ -136,8 +136,8 @@ class UserManage(APIView):
         @extend_schema(methods=['GET'],
                        summary=_("Get user paginated list"),
                        description=_("Get user paginated list"),
-                       operation_id=_("Get user paginated list"),
-                       tags=[_("User management")],
+                       operation_id=_("Get user paginated list"),  # type: ignore
+                       tags=[_("User management")],  # type: ignore
                        parameters=UserPageApi.get_parameters(),
                        responses=UserPageApi.get_response())
         @has_permissions(PermissionConstants.USER_READ)

@@ -27,8 +27,8 @@ class Model(APIView):
     @extend_schema(methods=['POST'],
                    summary=_("Create model"),
                    description=_("Create model"),
-                   operation_id=_("Create model"),
-                   tags=[_("Model")],
+                   operation_id=_("Create model"),  # type: ignore
+                   tags=[_("Model")],  # type: ignore
                    parameters=ModelCreateAPI.get_query_params_api(),
                    request=ModelCreateAPI.get_request(),
                    responses=ModelCreateAPI.get_response())
@@ -40,10 +40,10 @@ class Model(APIView):
 
     # @extend_schema(methods=['PUT'],
     #                summary=_('Update model'),
-    #                operation_id=_('Update model'),
+    #                operation_id=_('Update model'),  # type: ignore
     #                request=ModelEditApi.get_request(),
     #                responses=ModelCreateApi.get_response(),
-    #                tags=[_('Model')])
+    #                tags=[_('Model')])  # type: ignore
     # @has_permissions(PermissionConstants.MODEL_CREATE)
     # def put(self, request: Request):
     #     return result.success(
@@ -53,10 +53,10 @@ class Model(APIView):
     @extend_schema(methods=['GET'],
                    summary=_('Query model list'),
                    description=_('Query model list'),
-                   operation_id=_('Query model list'),
+                   operation_id=_('Query model list'),  # type: ignore
                    parameters=ModelCreateAPI.get_query_params_api(),
                    responses=ModelListResponse.get_response(),
-                   tags=[_('Model')])
+                   tags=[_('Model')])  # type: ignore
     @has_permissions(PermissionConstants.MODEL_READ.get_workspace_permission())
     def get(self, request: Request, workspace_id: str):
         return result.success(
@@ -70,11 +70,11 @@ class Model(APIView):
         @extend_schema(methods=['PUT'],
                        summary=_('Update model'),
                        description=_('Update model'),
-                       operation_id=_('Update model'),
+                       operation_id=_('Update model'),  # type: ignore
                        request=ModelEditApi.get_request(),
                        parameters=GetModelApi.get_query_params_api(),
                        responses=ModelEditApi.get_response(),
-                       tags=[_('Model')])
+                       tags=[_('Model')])  # type: ignore
         @has_permissions(PermissionConstants.MODEL_EDIT.get_workspace_permission())
         def put(self, request: Request, workspace_id, model_id: str):
             return result.success(
@@ -84,10 +84,10 @@ class Model(APIView):
         @extend_schema(methods=['DELETE'],
                        summary=_('Delete model'),
                        description=_('Delete model'),
-                       operation_id=_('Delete model'),
+                       operation_id=_('Delete model'),  # type: ignore
                        parameters=GetModelApi.get_query_params_api(),
                        responses=DefaultModelResponse.get_response(),
-                       tags=[_('Model')])
+                       tags=[_('Model')])  # type: ignore
         @has_permissions(PermissionConstants.MODEL_DELETE.get_workspace_permission())
         def delete(self, request: Request, workspace_id: str, model_id: str):
             return result.success(
@@ -96,10 +96,10 @@ class Model(APIView):
         @extend_schema(methods=['GET'],
                        summary=_('Query model details'),
                        description=_('Query model details'),
-                       operation_id=_('Query model details'),
+                       operation_id=_('Query model details'),  # type: ignore
                        parameters=GetModelApi.get_query_params_api(),
                        responses=GetModelApi.get_response(),
-                       tags=[_('Model')])
+                       tags=[_('Model')])  # type: ignore
         @has_permissions(PermissionConstants.MODEL_READ.get_workspace_permission())
         def get(self, request: Request, workspace_id: str, model_id: str):
             return result.success(
@@ -111,10 +111,10 @@ class Model(APIView):
         @extend_schema(methods=['GET'],
                        summary=_('Get model parameter form'),
                        description=_('Get model parameter form'),
-                       operation_id=_('Get model parameter form'),
+                       operation_id=_('Get model parameter form'),  # type: ignore
                        parameters=GetModelApi.get_query_params_api(),
                        responses=ProvideApi.ModelParamsForm.get_response(),
-                       tags=[_('Model')])
+                       tags=[_('Model')])  # type: ignore
         @has_permissions(PermissionConstants.MODEL_READ.get_workspace_permission())
         def get(self, request: Request, workspace_id: str, model_id: str):
             return result.success(
@@ -123,11 +123,11 @@ class Model(APIView):
         @extend_schema(methods=['PUT'],
                        summary=_('Save model parameter form'),
                        description=_('Save model parameter form'),
-                       operation_id=_('Save model parameter form'),
+                       operation_id=_('Save model parameter form'),  # type: ignore
                        parameters=GetModelApi.get_query_params_api(),
                        request=GetModelApi.get_request(),
                        responses=ProvideApi.ModelParamsForm.get_response(),
-                       tags=[_('Model')])
+                       tags=[_('Model')])  # type: ignore
         @has_permissions(PermissionConstants.MODEL_READ.get_workspace_permission())
         def put(self, request: Request, workspace_id: str, model_id: str):
             return result.success(
@@ -145,7 +145,7 @@ class Model(APIView):
                            'Query model meta information, this interface does not carry authentication information'),
                        parameters=GetModelApi.get_query_params_api(),
                        responses=GetModelApi.get_response(),
-                       tags=[_('Model')])
+                       tags=[_('Model')])  # type: ignore
         @has_permissions(PermissionConstants.MODEL_READ.get_workspace_permission())
         def get(self, request: Request, workspace_id: str, model_id: str):
             return result.success(
@@ -157,11 +157,11 @@ class Model(APIView):
         @extend_schema(methods=['PUT'],
                        summary=_('Pause model download'),
                        description=_('Pause model download'),
-                       operation_id=_('Pause model download'),
+                       operation_id=_('Pause model download'),  # type: ignore
                        parameters=GetModelApi.get_query_params_api(),
                        request=GetModelApi.get_request(),
                        responses=DefaultModelResponse.get_response(),
-                       tags=[_('Model')])
+                       tags=[_('Model')])  # type: ignore
         @has_permissions(PermissionConstants.MODEL_CREATE.get_workspace_permission())
         def put(self, request: Request, workspace_id: str, model_id: str):
             return result.success(

@@ -27,10 +27,10 @@ class WorkSpaceUserResourcePermissionView(APIView):
     @extend_schema(
         methods=['GET'],
         description=_('Obtain resource authorization list'),
-        operation_id=_('Obtain resource authorization list'),
+        operation_id=_('Obtain resource authorization list'),  # type: ignore
         parameters=UserResourcePermissionAPI.get_parameters(),
         responses=UserResourcePermissionAPI.get_response(),
-        tags=[_('Resources authorization')]
+        tags=[_('Resources authorization')]  # type: ignore
     )
     @has_permissions(PermissionConstants.WORKSPACE_USER_RESOURCE_PERMISSION_READ.get_workspace_permission())
     def get(self, request: Request, workspace_id: str):
@@ -41,11 +41,11 @@ class WorkSpaceUserResourcePermissionView(APIView):
     @extend_schema(
         methods=['PUT'],
         description=_('Modify the resource authorization list'),
-        operation_id=_('Modify the resource authorization list'),
+        operation_id=_('Modify the resource authorization list'),  # type: ignore
         parameters=UserResourcePermissionAPI.get_parameters(),
         request=EditUserResourcePermissionAPI.get_request(),
         responses=DefaultResultSerializer(),
-        tags=[_('Resources authorization')]
+        tags=[_('Resources authorization')]  # type: ignore
     )
     def put(self, request: Request, workspace_id: str):
         return result.success(UserResourcePermissionSerializer(

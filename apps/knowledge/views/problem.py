@@ -20,10 +20,10 @@ class ProblemView(APIView):
         methods=['GET'],
         summary=_('Question list'),
         description=_('Question list'),
-        operation_id=_('Question list'),
+        operation_id=_('Question list'),  # type: ignore
         parameters=ProblemReadAPI.get_parameters(),
         responses=ProblemReadAPI.get_response(),
-        tags=[_('Knowledge Base/Documentation/Paragraph/Question')]
+        tags=[_('Knowledge Base/Documentation/Paragraph/Question')]  # type: ignore
     )
     @has_permissions(PermissionConstants.DOCUMENT_EDIT.get_workspace_permission())
     def get(self, request: Request, workspace_id: str, knowledge_id: str):
@@ -41,11 +41,11 @@ class ProblemView(APIView):
         methods=['POST'],
         summary=_('Create question'),
         description=_('Create question'),
-        operation_id=_('Create question'),
+        operation_id=_('Create question'),  # type: ignore
         parameters=ProblemBatchCreateAPI.get_parameters(),
         responses=ProblemBatchCreateAPI.get_response(),
         request=ProblemBatchCreateAPI.get_request(),
-        tags=[_('Knowledge Base/Documentation/Paragraph/Question')]
+        tags=[_('Knowledge Base/Documentation/Paragraph/Question')]  # type: ignore
     )
     @has_permissions(PermissionConstants.DOCUMENT_EDIT.get_workspace_permission())
     def post(self, request: Request, workspace_id: str, knowledge_id: str):
@@ -59,10 +59,10 @@ class ProblemView(APIView):
         @extend_schema(
             summary=_('Get a list of associated paragraphs'),
             description=_('Get a list of associated paragraphs'),
-            operation_id=_('Get a list of associated paragraphs'),
+            operation_id=_('Get a list of associated paragraphs'),  # type: ignore
             parameters=ProblemParagraphAPI.get_parameters(),
             responses=ProblemParagraphAPI.get_response(),
-            tags=[_('Knowledge Base/Documentation/Paragraph/Question')]
+            tags=[_('Knowledge Base/Documentation/Paragraph/Question')]  # type: ignore
         )
         @has_permissions(PermissionConstants.DOCUMENT_EDIT.get_workspace_permission())
         def get(self, request: Request, workspace_id: str, knowledge_id: str, problem_id: str):
@@ -81,11 +81,11 @@ class ProblemView(APIView):
         @extend_schema(
             summary=_('Batch associated paragraphs'),
             description=_('Batch associated paragraphs'),
-            operation_id=_('Batch associated paragraphs'),
+            operation_id=_('Batch associated paragraphs'),  # type: ignore
             request=BatchAssociationAPI.get_request(),
             parameters=BatchAssociationAPI.get_parameters(),
             responses=BatchAssociationAPI.get_response(),
-            tags=[_('Knowledge Base/Documentation/Paragraph/Question')]
+            tags=[_('Knowledge Base/Documentation/Paragraph/Question')]  # type: ignore
         )
         @has_permissions(PermissionConstants.DOCUMENT_EDIT.get_workspace_permission())
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
@@ -100,11 +100,11 @@ class ProblemView(APIView):
             methods=['PUT'],
             summary=_('Batch deletion issues'),
             description=_('Batch deletion issues'),
-            operation_id=_('Batch deletion issues'),
+            operation_id=_('Batch deletion issues'),  # type: ignore
             request=BatchDeleteAPI.get_request(),
             parameters=BatchDeleteAPI.get_parameters(),
             responses=BatchDeleteAPI.get_response(),
-            tags=[_('Knowledge Base/Documentation/Paragraph/Question')]
+            tags=[_('Knowledge Base/Documentation/Paragraph/Question')]  # type: ignore
         )
         @has_permissions(PermissionConstants.DOCUMENT_EDIT.get_workspace_permission())
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
@@ -119,10 +119,10 @@ class ProblemView(APIView):
             methods=['DELETE'],
             summary=_('Delete question'),
             description=_('Delete question'),
-            operation_id=_('Delete question'),
+            operation_id=_('Delete question'),  # type: ignore
             parameters=ProblemDeleteAPI.get_parameters(),
             responses=ProblemDeleteAPI.get_response(),
-            tags=[_('Knowledge Base/Documentation/Paragraph/Question')]
+            tags=[_('Knowledge Base/Documentation/Paragraph/Question')]  # type: ignore
         )
         def delete(self, request: Request, workspace_id: str, knowledge_id: str, problem_id: str):
             return result.success(ProblemSerializers.Operate(
@@ -138,11 +138,11 @@ class ProblemView(APIView):
             methods=['PUT'],
             summary=_('Modify question'),
             description=_('Modify question'),
-            operation_id=_('Modify question'),
+            operation_id=_('Modify question'),  # type: ignore
             parameters=ProblemEditAPI.get_parameters(),
             request=ProblemEditAPI.get_request(),
             responses=ProblemEditAPI.get_response(),
-            tags=[_('Knowledge Base/Documentation/Paragraph/Question')]
+            tags=[_('Knowledge Base/Documentation/Paragraph/Question')]  # type: ignore
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str, problem_id: str):
             return result.success(ProblemSerializers.Operate(
@@ -160,10 +160,10 @@ class ProblemView(APIView):
         @extend_schema(
             summary=_('Get the list of questions by page'),
             description=_('Get the list of questions by page'),
-            operation_id=_('Get the list of questions by page'),
+            operation_id=_('Get the list of questions by page'),  # type: ignore
             parameters=ProblemPageAPI.get_parameters(),
             responses=ProblemPageAPI.get_response(),
-            tags=[_('Knowledge Base/Documentation/Paragraph/Question')]
+            tags=[_('Knowledge Base/Documentation/Paragraph/Question')]  # type: ignore
         )
         @has_permissions(PermissionConstants.DOCUMENT_EDIT.get_workspace_permission())
         def get(self, request: Request, workspace_id: str, knowledge_id: str, current_page, page_size):

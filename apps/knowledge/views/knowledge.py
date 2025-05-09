@@ -19,10 +19,10 @@ class KnowledgeView(APIView):
         methods=['GET'],
         description=_('Get knowledge by folder'),
         summary=_('Get knowledge by folder'),
-        operation_id=_('Get knowledge by folder'),
+        operation_id=_('Get knowledge by folder'),  # type: ignore
         parameters=KnowledgeTreeReadAPI.get_parameters(),
         responses=KnowledgeTreeReadAPI.get_response(),
-        tags=[_('Knowledge Base')]
+        tags=[_('Knowledge Base')]  # type: ignore
     )
     @has_permissions(PermissionConstants.KNOWLEDGE_READ.get_workspace_permission())
     def get(self, request: Request, workspace_id: str):
@@ -43,11 +43,11 @@ class KnowledgeView(APIView):
             methods=['PUT'],
             description=_('Edit knowledge'),
             summary=_('Edit knowledge'),
-            operation_id=_('Edit knowledge'),
+            operation_id=_('Edit knowledge'),  # type: ignore
             parameters=KnowledgeEditAPI.get_parameters(),
             request=KnowledgeEditAPI.get_request(),
             responses=KnowledgeEditAPI.get_response(),
-            tags=[_('Knowledge Base')]
+            tags=[_('Knowledge Base')]  # type: ignore
         )
         @has_permissions(PermissionConstants.KNOWLEDGE_EDIT.get_workspace_permission())
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
@@ -59,11 +59,11 @@ class KnowledgeView(APIView):
             methods=['DELETE'],
             description=_('Delete knowledge'),
             summary=_('Delete knowledge'),
-            operation_id=_('Delete knowledge'),
+            operation_id=_('Delete knowledge'),  # type: ignore
             parameters=KnowledgeBaseCreateAPI.get_parameters(),
             request=KnowledgeBaseCreateAPI.get_request(),
             responses=KnowledgeBaseCreateAPI.get_response(),
-            tags=[_('Knowledge Base')]
+            tags=[_('Knowledge Base')]  # type: ignore
         )
         @has_permissions(PermissionConstants.KNOWLEDGE_DELETE.get_workspace_permission())
         def delete(self, request: Request, workspace_id: str, knowledge_id: str):
@@ -75,10 +75,10 @@ class KnowledgeView(APIView):
             methods=['GET'],
             description=_('Get knowledge'),
             summary=_('Get knowledge'),
-            operation_id=_('Get knowledge'),
+            operation_id=_('Get knowledge'),  # type: ignore
             parameters=KnowledgeReadAPI.get_parameters(),
             responses=KnowledgeReadAPI.get_response(),
-            tags=[_('Knowledge Base')]
+            tags=[_('Knowledge Base')]  # type: ignore
         )
         @has_permissions(PermissionConstants.KNOWLEDGE_DELETE.get_workspace_permission())
         def get(self, request: Request, workspace_id: str, knowledge_id: str):
@@ -93,10 +93,10 @@ class KnowledgeView(APIView):
             methods=['GET'],
             description=_('Get the knowledge base paginated list'),
             summary=_('Get the knowledge base paginated list'),
-            operation_id=_('Get the knowledge base paginated list'),
+            operation_id=_('Get the knowledge base paginated list'),  # type: ignore
             parameters=KnowledgePageAPI.get_parameters(),
             responses=KnowledgePageAPI.get_response(),
-            tags=[_('Knowledge Base')]
+            tags=[_('Knowledge Base')]  # type: ignore
         )
         @has_permissions(PermissionConstants.KNOWLEDGE_READ.get_workspace_permission())
         def get(self, request: Request, workspace_id: str, current_page: int, page_size: int):
@@ -117,11 +117,11 @@ class KnowledgeView(APIView):
             methods=['PUT'],
             summary=_("Synchronize the knowledge base of the website"),
             description=_("Synchronize the knowledge base of the website"),
-            operation_id=_("Synchronize the knowledge base of the website"),
+            operation_id=_("Synchronize the knowledge base of the website"),  # type: ignore
             parameters=SyncWebAPI.get_parameters(),
             request=SyncWebAPI.get_request(),
             responses=SyncWebAPI.get_response(),
-            tags=[_('Knowledge Base')]
+            tags=[_('Knowledge Base')]  # type: ignore
         )
         @has_permissions(PermissionConstants.KNOWLEDGE_EDIT.get_workspace_permission())
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
@@ -141,11 +141,11 @@ class KnowledgeView(APIView):
             methods=['PUT'],
             summary=_('Hit test list'),
             description=_('Hit test list'),
-            operation_id=_('Hit test list'),
+            operation_id=_('Hit test list'),  # type: ignore
             parameters=HitTestAPI.get_parameters(),
             request=HitTestAPI.get_request(),
             responses=HitTestAPI.get_response(),
-            tags=[_('Knowledge Base')]
+            tags=[_('Knowledge Base')]  # type: ignore
         )
         @has_permissions(PermissionConstants.KNOWLEDGE_EDIT.get_workspace_permission())
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
@@ -168,11 +168,11 @@ class KnowledgeView(APIView):
             methods=['PUT'],
             summary=_('Re-vectorize'),
             description=_('Re-vectorize'),
-            operation_id=_('Re-vectorize'),
+            operation_id=_('Re-vectorize'),  # type: ignore
             parameters=EmbeddingAPI.get_parameters(),
             request=EmbeddingAPI.get_request(),
             responses=EmbeddingAPI.get_response(),
-            tags=[_('Knowledge Base')]
+            tags=[_('Knowledge Base')]  # type: ignore
         )
         @has_permissions(PermissionConstants.KNOWLEDGE_EDIT.get_workspace_permission())
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
@@ -187,11 +187,11 @@ class KnowledgeView(APIView):
             methods=['PUT'],
             summary=_('Generate related'),
             description=_('Generate related'),
-            operation_id=_('Generate related'),
+            operation_id=_('Generate related'),  # type: ignore
             parameters=GenerateRelatedAPI.get_parameters(),
             request=GenerateRelatedAPI.get_request(),
             responses=GenerateRelatedAPI.get_response(),
-            tags=[_('Knowledge Base')]
+            tags=[_('Knowledge Base')]  # type: ignore
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(KnowledgeSerializer.Operate(
@@ -206,11 +206,11 @@ class KnowledgeBaseView(APIView):
         methods=['POST'],
         description=_('Create base knowledge'),
         summary=_('Create base knowledge'),
-        operation_id=_('Create base knowledge'),
+        operation_id=_('Create base knowledge'),  # type: ignore
         parameters=KnowledgeBaseCreateAPI.get_parameters(),
         request=KnowledgeBaseCreateAPI.get_request(),
         responses=KnowledgeBaseCreateAPI.get_response(),
-        tags=[_('Knowledge Base')]
+        tags=[_('Knowledge Base')]  # type: ignore
     )
     @has_permissions(PermissionConstants.KNOWLEDGE_CREATE.get_workspace_permission())
     def post(self, request: Request, workspace_id: str):
@@ -226,11 +226,11 @@ class KnowledgeWebView(APIView):
         methods=['POST'],
         description=_('Create web knowledge'),
         summary=_('Create web knowledge'),
-        operation_id=_('Create web knowledge'),
+        operation_id=_('Create web knowledge'),  # type: ignore
         parameters=KnowledgeWebCreateAPI.get_parameters(),
         request=KnowledgeWebCreateAPI.get_request(),
         responses=KnowledgeWebCreateAPI.get_response(),
-        tags=[_('Knowledge Base')]
+        tags=[_('Knowledge Base')]  # type: ignore
     )
     @has_permissions(PermissionConstants.KNOWLEDGE_CREATE.get_workspace_permission())
     def post(self, request: Request, workspace_id: str):

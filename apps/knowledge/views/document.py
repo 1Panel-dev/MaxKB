@@ -22,11 +22,11 @@ class DocumentView(APIView):
         methods=['POST'],
         description=_('Create document'),
         summary=_('Create document'),
-        operation_id=_('Create document'),
+        operation_id=_('Create document'),  # type: ignore
         request=DocumentCreateAPI.get_request(),
         parameters=DocumentCreateAPI.get_parameters(),
         responses=DocumentCreateAPI.get_response(),
-        tags=[_('Knowledge Base/Documentation')]
+        tags=[_('Knowledge Base/Documentation')]  # type: ignore
     )
     @has_permissions(PermissionConstants.DOCUMENT_CREATE.get_workspace_permission())
     def post(self, request: Request, workspace_id: str, knowledge_id: str):
@@ -39,10 +39,10 @@ class DocumentView(APIView):
         methods=['GET'],
         description=_('Get document'),
         summary=_('Get document'),
-        operation_id=_('Get document'),
+        operation_id=_('Get document'),  # type: ignore
         parameters=DocumentTreeReadAPI.get_parameters(),
         responses=DocumentTreeReadAPI.get_response(),
-        tags=[_('Knowledge Base/Documentation')]
+        tags=[_('Knowledge Base/Documentation')]  # type: ignore
     )
     @has_permissions(PermissionConstants.DOCUMENT_READ.get_workspace_permission())
     def get(self, request: Request, workspace_id: str, knowledge_id: str):
@@ -63,10 +63,10 @@ class DocumentView(APIView):
         @extend_schema(
             description=_('Get document details'),
             summary=_('Get document details'),
-            operation_id=_('Get document details'),
+            operation_id=_('Get document details'),  # type: ignore
             parameters=DocumentReadAPI.get_parameters(),
             responses=DocumentReadAPI.get_response(),
-            tags=[_('Knowledge Base/Documentation')]
+            tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
         @has_permissions(PermissionConstants.DOCUMENT_READ.get_workspace_permission())
         def get(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
@@ -79,11 +79,11 @@ class DocumentView(APIView):
         @extend_schema(
             description=_('Modify document'),
             summary=_('Modify document'),
-            operation_id=_('Modify document'),
+            operation_id=_('Modify document'),  # type: ignore
             parameters=DocumentEditAPI.get_parameters(),
             request=DocumentEditAPI.get_request(),
             responses=DocumentEditAPI.get_response(),
-            tags=[_('Knowledge Base/Documentation')]
+            tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
         @has_permissions(PermissionConstants.DOCUMENT_EDIT.get_workspace_permission())
         def put(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
@@ -94,10 +94,10 @@ class DocumentView(APIView):
         @extend_schema(
             description=_('Delete document'),
             summary=_('Delete document'),
-            operation_id=_('Delete document'),
+            operation_id=_('Delete document'),  # type: ignore
             parameters=DocumentDeleteAPI.get_parameters(),
             responses=DocumentDeleteAPI.get_response(),
-            tags=[_('Knowledge Base/Documentation')]
+            tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
         @has_permissions(PermissionConstants.DOCUMENT_DELETE.get_workspace_permission())
         def delete(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
@@ -115,11 +115,11 @@ class DocumentView(APIView):
             methods=['POST'],
             description=_('Segmented document'),
             summary=_('Segmented document'),
-            operation_id=_('Segmented document'),
+            operation_id=_('Segmented document'),  # type: ignore
             parameters=DocumentSplitAPI.get_parameters(),
             request=DocumentSplitAPI.get_request(),
             responses=DocumentSplitAPI.get_response(),
-            tags=[_('Knowledge Base/Documentation')]
+            tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
         @has_permissions([
             PermissionConstants.DOCUMENT_CREATE.get_workspace_permission(),
@@ -146,10 +146,10 @@ class DocumentView(APIView):
         @extend_schema(
             summary=_('Get a list of segment IDs'),
             description=_('Get a list of segment IDs'),
-            operation_id=_('Get a list of segment IDs'),
+            operation_id=_('Get a list of segment IDs'),  # type: ignore
             parameters=DocumentSplitPatternAPI.get_parameters(),
             responses=DocumentSplitPatternAPI.get_response(),
-            tags=[_('Knowledge Base/Documentation')]
+            tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
         def get(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(DocumentSerializers.SplitPattern(
@@ -163,11 +163,11 @@ class DocumentView(APIView):
             methods=['PUT'],
             summary=_('Modify document hit processing methods in batches'),
             description=_('Modify document hit processing methods in batches'),
-            operation_id=_('Modify document hit processing methods in batches'),
+            operation_id=_('Modify document hit processing methods in batches'),  # type: ignore
             request=BatchEditHitHandlingAPI.get_request(),
             parameters=BatchEditHitHandlingAPI.get_parameters(),
             responses=BatchEditHitHandlingAPI.get_response(),
-            tags=[_('Knowledge Base/Documentation')]
+            tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
         @has_permissions(PermissionConstants.DOCUMENT_EDIT.get_workspace_permission())
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
@@ -182,11 +182,11 @@ class DocumentView(APIView):
             methods=['GET'],
             description=_('Synchronize web site types'),
             summary=_('Synchronize web site types'),
-            operation_id=_('Synchronize web site types'),
+            operation_id=_('Synchronize web site types'),  # type: ignore
             parameters=SyncWebAPI.get_parameters(),
             request=SyncWebAPI.get_request(),
             responses=SyncWebAPI.get_response(),
-            tags=[_('Knowledge Base/Documentation')]
+            tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
         @has_permissions(PermissionConstants.DOCUMENT_EDIT.get_workspace_permission())
         def get(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
@@ -201,11 +201,11 @@ class DocumentView(APIView):
             methods=['PUT'],
             summary=_('Refresh document vector library'),
             description=_('Refresh document vector library'),
-            operation_id=_('Refresh document vector library'),
+            operation_id=_('Refresh document vector library'),  # type: ignore
             parameters=RefreshAPI.get_parameters(),
             request=RefreshAPI.get_request(),
             responses=RefreshAPI.get_response(),
-            tags=[_('Knowledge Base/Documentation')]
+            tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
         @has_permissions(PermissionConstants.DOCUMENT_EDIT.get_workspace_permission())
         def put(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
@@ -219,11 +219,11 @@ class DocumentView(APIView):
         @extend_schema(
             summary=_('Cancel task'),
             description=_('Cancel task'),
-            operation_id=_('Cancel task'),
+            operation_id=_('Cancel task'),  # type: ignore
             parameters=CancelTaskAPI.get_parameters(),
             request=CancelTaskAPI.get_request(),
             responses=CancelTaskAPI.get_response(),
-            tags=[_('Knowledge Base/Documentation')]
+            tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
         @has_permissions(PermissionConstants.DOCUMENT_EDIT.get_workspace_permission())
         def put(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
@@ -237,11 +237,11 @@ class DocumentView(APIView):
         @extend_schema(
             summary=_('Cancel tasks in batches'),
             description=_('Cancel tasks in batches'),
-            operation_id=_('Cancel tasks in batches'),
+            operation_id=_('Cancel tasks in batches'),  # type: ignore
             parameters=BatchCancelTaskAPI.get_parameters(),
             request=BatchCancelTaskAPI.get_request(),
             responses=BatchCancelTaskAPI.get_response(),
-            tags=[_('Knowledge Base/Documentation')]
+            tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(DocumentSerializers.Batch(data={
@@ -255,11 +255,11 @@ class DocumentView(APIView):
             methods=['PUT'],
             description=_('Create documents in batches'),
             summary=_('Create documents in batches'),
-            operation_id=_('Create documents in batches'),
+            operation_id=_('Create documents in batches'),  # type: ignore
             request=DocumentBatchCreateAPI.get_request(),
             parameters=DocumentBatchCreateAPI.get_parameters(),
             responses=DocumentBatchCreateAPI.get_response(),
-            tags=[_('Knowledge Base/Documentation')]
+            tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
         @has_permissions([
             PermissionConstants.DOCUMENT_CREATE.get_workspace_permission(),
@@ -277,11 +277,11 @@ class DocumentView(APIView):
             methods=['PUT'],
             description=_('Batch sync documents'),
             summary=_('Batch sync documents'),
-            operation_id=_('Batch sync documents'),
+            operation_id=_('Batch sync documents'),  # type: ignore
             request=DocumentBatchAPI.get_request(),
             parameters=DocumentBatchAPI.get_parameters(),
             responses=DocumentBatchAPI.get_response(),
-            tags=[_('Knowledge Base/Documentation')]
+            tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
         @has_permissions([
             PermissionConstants.DOCUMENT_CREATE.get_workspace_permission(),
@@ -299,11 +299,11 @@ class DocumentView(APIView):
             methods=['PUT'],
             description=_('Delete documents in batches'),
             summary=_('Delete documents in batches'),
-            operation_id=_('Delete documents in batches'),
+            operation_id=_('Delete documents in batches'),  # type: ignore
             request=DocumentBatchAPI.get_request(),
             parameters=DocumentBatchAPI.get_parameters(),
             responses=DocumentBatchAPI.get_response(),
-            tags=[_('Knowledge Base/Documentation')]
+            tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
         @has_permissions([
             PermissionConstants.DOCUMENT_CREATE.get_workspace_permission(),
@@ -320,11 +320,11 @@ class DocumentView(APIView):
         @extend_schema(
             methods=['PUT'],
             summary=_('Batch refresh document vector library'),
-            operation_id=_('Batch refresh document vector library'),
+            operation_id=_('Batch refresh document vector library'),  # type: ignore
             request=BatchRefreshAPI.get_request(),
             parameters=BatchRefreshAPI.get_parameters(),
             responses=BatchRefreshAPI.get_response(),
-            tags=[_('Knowledge Base/Documentation')]
+            tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
         @has_permissions([
             PermissionConstants.DOCUMENT_CREATE.get_workspace_permission(),
@@ -343,11 +343,11 @@ class DocumentView(APIView):
             methods=['PUT'],
             summary=_('Batch generate related documents'),
             description=_('Batch generate related documents'),
-            operation_id=_('Batch generate related documents'),
+            operation_id=_('Batch generate related documents'),  # type: ignore
             request=BatchGenerateRelatedAPI.get_request(),
             parameters=BatchGenerateRelatedAPI.get_parameters(),
             responses=BatchGenerateRelatedAPI.get_response(),
-            tags=[_('Knowledge Base/Documentation')]
+            tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
         @has_permissions([
             PermissionConstants.DOCUMENT_CREATE.get_workspace_permission(),
@@ -365,10 +365,10 @@ class DocumentView(APIView):
             methods=['GET'],
             description=_('Get document by pagination'),
             summary=_('Get document by pagination'),
-            operation_id=_('Get document by pagination'),
+            operation_id=_('Get document by pagination'),  # type: ignore
             parameters=DocumentTreeReadAPI.get_parameters(),
             responses=DocumentTreeReadAPI.get_response(),
-            tags=[_('Knowledge Base/Documentation')]
+            tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
         @has_permissions(PermissionConstants.DOCUMENT_READ.get_workspace_permission())
         def get(self, request: Request, workspace_id: str, knowledge_id: str, current_page: int, page_size: int):
@@ -391,11 +391,11 @@ class WebDocumentView(APIView):
         methods=['POST'],
         description=_('Create Web site documents'),
         summary=_('Create Web site documents'),
-        operation_id=_('Create Web site documents'),
+        operation_id=_('Create Web site documents'),  # type: ignore
         request=WebDocumentCreateAPI.get_request(),
         parameters=WebDocumentCreateAPI.get_parameters(),
         responses=WebDocumentCreateAPI.get_response(),
-        tags=[_('Knowledge Base/Documentation')]
+        tags=[_('Knowledge Base/Documentation')]  # type: ignore
     )
     @has_permissions(PermissionConstants.DOCUMENT_CREATE.get_workspace_permission())
     def post(self, request: Request, workspace_id: str, knowledge_id: str):
@@ -411,11 +411,11 @@ class QaDocumentView(APIView):
     @extend_schema(
         summary=_('Import QA and create documentation'),
         description=_('Import QA and create documentation'),
-        operation_id=_('Import QA and create documentation'),
+        operation_id=_('Import QA and create documentation'),  # type: ignore
         request=QaDocumentCreateAPI.get_request(),
         parameters=QaDocumentCreateAPI.get_parameters(),
         responses=QaDocumentCreateAPI.get_response(),
-        tags=[_('Knowledge Base/Documentation')]
+        tags=[_('Knowledge Base/Documentation')]  # type: ignore
     )
     @has_permissions(PermissionConstants.DOCUMENT_CREATE.get_workspace_permission())
     def post(self, request: Request, workspace_id: str, knowledge_id: str):
@@ -431,11 +431,11 @@ class TableDocumentView(APIView):
     @extend_schema(
         summary=_('Import tables and create documents'),
         description=_('Import tables and create documents'),
-        operation_id=_('Import tables and create documents'),
+        operation_id=_('Import tables and create documents'),  # type: ignore
         request=TableDocumentCreateAPI.get_request(),
         parameters=TableDocumentCreateAPI.get_parameters(),
         responses=TableDocumentCreateAPI.get_response(),
-        tags=[_('Knowledge Base/Documentation')]
+        tags=[_('Knowledge Base/Documentation')]  # type: ignore
     )
     @has_permissions(PermissionConstants.DOCUMENT_CREATE.get_workspace_permission())
     def post(self, request: Request, workspace_id: str, knowledge_id: str):

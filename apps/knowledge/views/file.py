@@ -19,11 +19,11 @@ class FileView(APIView):
         methods=['POST'],
         summary=_('Upload file'),
         description=_('Upload file'),
-        operation_id=_('Upload file'),
+        operation_id=_('Upload file'),  # type: ignore
         parameters=FileUploadAPI.get_parameters(),
         request=FileUploadAPI.get_request(),
         responses=FileUploadAPI.get_response(),
-        tags=[_('File')]
+        tags=[_('File')]  # type: ignore
     )
     def post(self, request: Request):
         return result.success(FileSerializer(data={'file': request.FILES.get('file')}).upload())
@@ -33,10 +33,10 @@ class FileView(APIView):
             methods=['GET'],
             summary=_('Get file'),
             description=_('Get file'),
-            operation_id=_('Get file'),
+            operation_id=_('Get file'),  # type: ignore
             parameters=FileGetAPI.get_parameters(),
             responses=FileGetAPI.get_response(),
-            tags=[_('File')]
+            tags=[_('File')]  # type: ignore
         )
         def get(self, request: Request, file_id: str):
             return FileSerializer.Operate(data={'id': file_id}).get()
@@ -45,10 +45,10 @@ class FileView(APIView):
             methods=['DELETE'],
             summary=_('Delete file'),
             description=_('Delete file'),
-            operation_id=_('Delete file'),
+            operation_id=_('Delete file'),  # type: ignore
             parameters=FileGetAPI.get_parameters(),
             responses=FileGetAPI.get_response(),
-            tags=[_('File')]
+            tags=[_('File')]  # type: ignore
         )
         def delete(self, request: Request, file_id: str):
             return result.success(FileSerializer.Operate(data={'id': file_id}).delete())

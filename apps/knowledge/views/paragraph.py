@@ -20,10 +20,10 @@ class ParagraphView(APIView):
     @extend_schema(
         summary=_('Paragraph list'),
         description=_('Paragraph list'),
-        operation_id=_('Paragraph list'),
+        operation_id=_('Paragraph list'),  # type: ignore
         parameters=ParagraphReadAPI.get_parameters(),
         responses=ParagraphReadAPI.get_response(),
-        tags=[_('Knowledge Base/Documentation/Paragraph')]
+        tags=[_('Knowledge Base/Documentation/Paragraph')]  # type: ignore
     )
     @has_permissions(PermissionConstants.DOCUMENT_READ.get_workspace_permission())
     def get(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
@@ -40,11 +40,11 @@ class ParagraphView(APIView):
 
     @extend_schema(
         summary=_('Create Paragraph'),
-        operation_id=_('Create Paragraph'),
+        operation_id=_('Create Paragraph'),  # type: ignore
         parameters=ParagraphCreateAPI.get_parameters(),
         request=ParagraphCreateAPI.get_request(),
         responses=ParagraphCreateAPI.get_response(),
-        tags=[_('Knowledge Base/Documentation/Paragraph')]
+        tags=[_('Knowledge Base/Documentation/Paragraph')]  # type: ignore
     )
     @has_permissions(PermissionConstants.DOCUMENT_CREATE.get_workspace_permission())
     def post(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
@@ -59,11 +59,11 @@ class ParagraphView(APIView):
             methods=['PUT'],
             summary=_('Batch Paragraph'),
             description=_('Batch Paragraph'),
-            operation_id=_('Batch Paragraph'),
+            operation_id=_('Batch Paragraph'),  # type: ignore
             parameters=ParagraphBatchDeleteAPI.get_parameters(),
             request=ParagraphBatchDeleteAPI.get_request(),
             responses=ParagraphBatchDeleteAPI.get_response(),
-            tags=[_('Knowledge Base/Documentation/Paragraph')]
+            tags=[_('Knowledge Base/Documentation/Paragraph')]  # type: ignore
         )
         @has_permissions(PermissionConstants.DOCUMENT_EDIT.get_workspace_permission())
         def put(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
@@ -78,11 +78,11 @@ class ParagraphView(APIView):
             methods=['PUT'],
             summary=_('Batch Generate Related'),
             description=_('Batch Generate Related'),
-            operation_id=_('Batch Generate Related'),
+            operation_id=_('Batch Generate Related'),  # type: ignore
             parameters=ParagraphBatchGenerateRelatedAPI.get_parameters(),
             request=ParagraphBatchGenerateRelatedAPI.get_request(),
             responses=ParagraphBatchGenerateRelatedAPI.get_response(),
-            tags=[_('Knowledge Base/Documentation/Paragraph')]
+            tags=[_('Knowledge Base/Documentation/Paragraph')]  # type: ignore
         )
         @has_permissions(PermissionConstants.DOCUMENT_EDIT.get_workspace_permission())
         def put(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
@@ -97,11 +97,11 @@ class ParagraphView(APIView):
             methods=['PUT'],
             summary=_('Modify paragraph data'),
             description=_('Modify paragraph data'),
-            operation_id=_('Modify paragraph data'),
+            operation_id=_('Modify paragraph data'),  # type: ignore
             parameters=ParagraphEditAPI.get_parameters(),
             request=ParagraphEditAPI.get_request(),
             responses=ParagraphEditAPI.get_response(),
-            tags=[_('Knowledge Base/Documentation/Paragraph')]
+            tags=[_('Knowledge Base/Documentation/Paragraph')]  # type: ignore
         )
         @has_permissions(PermissionConstants.DOCUMENT_EDIT.get_workspace_permission())
         def put(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str, paragraph_id: str):
@@ -120,10 +120,10 @@ class ParagraphView(APIView):
             methods=['GET'],
             summary=_('Get paragraph details'),
             description=_('Get paragraph details'),
-            operation_id=_('Get paragraph details'),
+            operation_id=_('Get paragraph details'),  # type: ignore
             parameters=ParagraphGetAPI.get_parameters(),
             responses=ParagraphGetAPI.get_response(),
-            tags=[_('Knowledge Base/Documentation/Paragraph')]
+            tags=[_('Knowledge Base/Documentation/Paragraph')]  # type: ignore
         )
         @has_permissions(PermissionConstants.DOCUMENT_EDIT.get_workspace_permission())
         def get(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str, paragraph_id: str):
@@ -142,10 +142,10 @@ class ParagraphView(APIView):
             methods=['DELETE'],
             summary=_('Delete paragraph'),
             description=_('Delete paragraph'),
-            operation_id=_('Delete paragraph'),
+            operation_id=_('Delete paragraph'),  # type: ignore
             parameters=ParagraphGetAPI.get_parameters(),
             responses=ParagraphGetAPI.get_response(),
-            tags=[_('Knowledge Base/Documentation/Paragraph')])
+            tags=[_('Knowledge Base/Documentation/Paragraph')])  # type: ignore
         @has_permissions(PermissionConstants.DOCUMENT_EDIT.get_workspace_permission())
         def delete(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str, paragraph_id: str):
             o = ParagraphSerializers.Operate(
@@ -166,11 +166,11 @@ class ParagraphView(APIView):
             methods=['POST'],
             summary=_('Add associated questions'),
             description=_('Add associated questions'),
-            operation_id=_('Add associated questions'),
+            operation_id=_('Add associated questions'),  # type: ignore
             parameters=ProblemCreateAPI.get_parameters(),
             request=ProblemCreateAPI.get_request(),
             responses=ProblemCreateAPI.get_response(),
-            tags=[_('Knowledge Base/Documentation/Paragraph')]
+            tags=[_('Knowledge Base/Documentation/Paragraph')]  # type: ignore
         )
         @has_permissions(PermissionConstants.DOCUMENT_EDIT.get_workspace_permission())
         def post(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str, paragraph_id: str):
@@ -187,10 +187,10 @@ class ParagraphView(APIView):
             methods=['GET'],
             summary=_('Get a list of paragraph questions'),
             description=_('Get a list of paragraph questions'),
-            operation_id=_('Get a list of paragraph questions'),
+            operation_id=_('Get a list of paragraph questions'),  # type: ignore
             parameters=ParagraphGetAPI.get_parameters(),
             responses=ParagraphGetAPI.get_response(),
-            tags=[_('Knowledge Base/Documentation/Paragraph')]
+            tags=[_('Knowledge Base/Documentation/Paragraph')]  # type: ignore
         )
         @has_permissions(PermissionConstants.DOCUMENT_EDIT.get_workspace_permission())
         def get(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str, paragraph_id: str):
@@ -210,10 +210,10 @@ class ParagraphView(APIView):
             methods=['GET'],
             summary=_('Disassociation issue'),
             description=_('Disassociation issue'),
-            operation_id=_('Disassociation issue'),
+            operation_id=_('Disassociation issue'),  # type: ignore
             parameters=UnAssociationAPI.get_parameters(),
             responses=UnAssociationAPI.get_response(),
-            tags=[_('Knowledge Base/Documentation/Paragraph')]
+            tags=[_('Knowledge Base/Documentation/Paragraph')]  # type: ignore
         )
         @has_permissions(PermissionConstants.DOCUMENT_EDIT.get_workspace_permission())
         def get(self, request: Request,
@@ -235,10 +235,10 @@ class ParagraphView(APIView):
             methods=['GET'],
             summary=_('Related questions'),
             description=_('Related questions'),
-            operation_id=_('Related questions'),
+            operation_id=_('Related questions'),  # type: ignore
             parameters=AssociationAPI.get_parameters(),
             responses=AssociationAPI.get_response(),
-            tags=[_('Knowledge Base/Documentation/Paragraph')]
+            tags=[_('Knowledge Base/Documentation/Paragraph')]  # type: ignore
         )
         @has_permissions(PermissionConstants.DOCUMENT_EDIT.get_workspace_permission())
         def get(self, request: Request,
@@ -260,10 +260,10 @@ class ParagraphView(APIView):
             methods=['GET'],
             summary=_('Get paragraph list by pagination'),
             description=_('Get paragraph list by pagination'),
-            operation_id=_('Get paragraph list by pagination'),
+            operation_id=_('Get paragraph list by pagination'),  # type: ignore
             parameters=ParagraphPageAPI.get_parameters(),
             responses=ParagraphPageAPI.get_response(),
-            tags=[_('Knowledge Base/Documentation/Paragraph')]
+            tags=[_('Knowledge Base/Documentation/Paragraph')]  # type: ignore
         )
         @has_permissions(PermissionConstants.DOCUMENT_EDIT.get_workspace_permission())
         def get(self, request: Request,

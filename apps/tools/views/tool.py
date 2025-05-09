@@ -20,11 +20,11 @@ class ToolView(APIView):
         methods=['POST'],
         description=_('Create tool'),
         summary=_('Create tool'),
-        operation_id=_('Create tool'),
+        operation_id=_('Create tool'),  # type: ignore
         parameters=ToolCreateAPI.get_parameters(),
         request=ToolCreateAPI.get_request(),
         responses=ToolCreateAPI.get_response(),
-        tags=[_('Tool')]
+        tags=[_('Tool')]  # type: ignore
     )
     @has_permissions(PermissionConstants.TOOL_CREATE.get_workspace_permission())
     def post(self, request: Request, workspace_id: str):
@@ -36,10 +36,10 @@ class ToolView(APIView):
         methods=['GET'],
         description=_('Get tool by folder'),
         summary=_('Get tool by folder'),
-        operation_id=_('Get tool by folder'),
+        operation_id=_('Get tool by folder'),  # type: ignore
         parameters=ToolTreeReadAPI.get_parameters(),
         responses=ToolTreeReadAPI.get_response(),
-        tags=[_('Tool')]
+        tags=[_('Tool')]  # type: ignore
     )
     @has_permissions(PermissionConstants.TOOL_READ.get_workspace_permission())
     def get(self, request: Request, workspace_id: str):
@@ -54,10 +54,10 @@ class ToolView(APIView):
             methods=['POST'],
             description=_('Debug Tool'),
             summary=_('Debug Tool'),
-            operation_id=_('Debug Tool'),
+            operation_id=_('Debug Tool'),  # type: ignore
             request=ToolDebugApi.get_request(),
             responses=ToolDebugApi.get_response(),
-            tags=[_('Tool')]
+            tags=[_('Tool')]  # type: ignore
         )
         @has_permissions(PermissionConstants.TOOL_DEBUG.get_workspace_permission())
         def post(self, request: Request, workspace_id: str, tool_id: str):
@@ -72,11 +72,11 @@ class ToolView(APIView):
             methods=['PUT'],
             description=_('Update tool'),
             summary=_('Update tool'),
-            operation_id=_('Update tool'),
+            operation_id=_('Update tool'),  # type: ignore
             parameters=ToolEditAPI.get_parameters(),
             request=ToolEditAPI.get_request(),
             responses=ToolEditAPI.get_response(),
-            tags=[_('Tool')]
+            tags=[_('Tool')]  # type: ignore
         )
         @has_permissions(PermissionConstants.TOOL_EDIT.get_workspace_permission())
         def put(self, request: Request, workspace_id: str, tool_id: str):
@@ -88,10 +88,10 @@ class ToolView(APIView):
             methods=['GET'],
             description=_('Get tool'),
             summary=_('Get tool'),
-            operation_id=_('Get tool'),
+            operation_id=_('Get tool'),  # type: ignore
             parameters=ToolReadAPI.get_parameters(),
             responses=ToolReadAPI.get_response(),
-            tags=[_('Tool')]
+            tags=[_('Tool')]  # type: ignore
         )
         @has_permissions(PermissionConstants.TOOL_READ.get_workspace_permission())
         def get(self, request: Request, workspace_id: str, tool_id: str):
@@ -103,10 +103,10 @@ class ToolView(APIView):
             methods=['DELETE'],
             description=_('Delete tool'),
             summary=_('Delete tool'),
-            operation_id=_('Delete tool'),
+            operation_id=_('Delete tool'),  # type: ignore
             parameters=ToolDeleteAPI.get_parameters(),
             responses=ToolDeleteAPI.get_response(),
-            tags=[_('Tool')]
+            tags=[_('Tool')]  # type: ignore
         )
         @has_permissions(PermissionConstants.TOOL_DELETE.get_workspace_permission())
         def delete(self, request: Request, workspace_id: str, tool_id: str):
@@ -121,10 +121,10 @@ class ToolView(APIView):
             methods=['GET'],
             description=_('Get tool list by pagination'),
             summary=_('Get tool list by pagination'),
-            operation_id=_('Get tool list by pagination'),
+            operation_id=_('Get tool list by pagination'),  # type: ignore
             parameters=ToolPageAPI.get_parameters(),
             responses=ToolPageAPI.get_response(),
-            tags=[_('Tool')]
+            tags=[_('Tool')]  # type: ignore
         )
         @has_permissions(PermissionConstants.TOOL_READ.get_workspace_permission())
         def get(self, request: Request, workspace_id: str, current_page: int, page_size: int):
@@ -145,11 +145,11 @@ class ToolView(APIView):
             methods=['POST'],
             description=_("Import tool"),
             summary=_("Import tool"),
-            operation_id=_("Import tool"),
+            operation_id=_("Import tool"),  # type: ignore
             parameters=ToolImportAPI.get_parameters(),
             request=ToolImportAPI.get_request(),
             responses=ToolImportAPI.get_response(),
-            tags=[_("Tool")]
+            tags=[_("Tool")]  # type: ignore
         )
         @has_permissions(PermissionConstants.TOOL_IMPORT.get_workspace_permission())
         def post(self, request: Request, workspace_id: str):
@@ -164,10 +164,10 @@ class ToolView(APIView):
             methods=['GET'],
             description=_("Export tool"),
             summary=_("Export tool"),
-            operation_id=_("Export tool"),
+            operation_id=_("Export tool"),  # type: ignore
             parameters=ToolExportAPI.get_parameters(),
             responses=ToolExportAPI.get_response(),
-            tags=[_("Tool")]
+            tags=[_("Tool")]  # type: ignore
         )
         @has_permissions(PermissionConstants.TOOL_EXPORT.get_workspace_permission())
         def get(self, request: Request, tool_id: str, workspace_id: str):
