@@ -184,7 +184,7 @@ class DocumentSerializers(serializers.Serializer):
         # 知识库id
         workspace_id = serializers.CharField(required=True, label=_('workspace id'))
         knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
-        name = serializers.CharField(required=False, max_length=128, min_length=1, label=_('document name'))
+        name = serializers.CharField(required=False, max_length=128, min_length=1, allow_null=True, allow_blank=True, label=_('document name'))
         hit_handling_method = serializers.CharField(required=False, label=_('hit handling method'))
         is_active = serializers.BooleanField(required=False, label=_('document is active'))
         task_type = serializers.IntegerField(required=False, label=_('task type'))
@@ -229,9 +229,8 @@ class DocumentSerializers(serializers.Serializer):
                 'order_by_query': order_by_query_set
             }
 
-        def list(self, with_valid=False):
-            if with_valid:
-                self.is_valid(raise_exception=True)
+        def list(self):
+            self.is_valid(raise_exception=True)
             query_set = self.get_query_set()
             return native_search(query_set, select_string=get_file_content(
                 os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'list_document.sql')))
