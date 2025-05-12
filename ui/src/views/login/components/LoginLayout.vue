@@ -51,7 +51,7 @@ defineProps({
     default: true,
   },
 })
-const { user } = useStore()
+const { user, theme } = useStore()
 
 const changeLang = (lang: string) => {
   useLocalStorage(localeConfigKey, getBrowserLang()).value = lang
@@ -63,11 +63,11 @@ const currentLanguage = computed(() => {
 })
 
 const fileURL = computed(() => {
-  if (user.themeInfo?.loginImage) {
-    if (typeof user.themeInfo?.loginImage === 'string') {
-      return user.themeInfo?.loginImage
+  if (theme.themeInfo?.loginImage) {
+    if (typeof theme.themeInfo?.loginImage === 'string') {
+      return theme.themeInfo?.loginImage
     } else {
-      return URL.createObjectURL(user.themeInfo?.loginImage)
+      return URL.createObjectURL(theme.themeInfo?.loginImage)
     }
   } else {
     return ''
@@ -75,10 +75,10 @@ const fileURL = computed(() => {
 })
 
 const loginImage = computed(() => {
-  if (user.themeInfo?.loginImage) {
+  if (theme.themeInfo?.loginImage) {
     return `${fileURL.value}`
   } else {
-    const imgName = getThemeImg(user.themeInfo?.theme)
+    const imgName = getThemeImg(theme.themeInfo?.theme)
     const imgPath = `../../../assets/theme/${imgName}.jpg`
     const imageUrl = new URL(imgPath, import.meta.url).href
     return imageUrl

@@ -1,12 +1,15 @@
+$primary-color: #3370ff;
 :root {
   --el-color-primary: #3370ff;
+  --el-color-success: #34c724;
+  --el-text-color-primary: #1f2329;
   // --el-menu-item-height: 45px;
   // --el-box-shadow-light: 0px 2px 4px 0px rgba(31, 35, 41, 0.12);
   // --el-border-color: #dee0e3;
   // --el-text-color-regular: #1f2329;
   // --el-color-info: #8f959e !important;
   // --el-disabled-bg-color: #eff0f1 !important;
-  // --el-text-color-primary: #1f2329;
+
   // --el-font-line-height-primary: 22px;
 }
 
@@ -21,6 +24,22 @@
   --el-card-padding: calc(var(--app-base-px) * 2);
 }
 
+// tree
 .el-tree {
   background: none;
+}
+.el-tree-node__content {
+  border-radius: 4px;
+  padding: 7px 0;
+  &:hover {
+    background: var(--app-text-color-light-1);
+  }
+}
+.el-tree--highlight-current .el-tree-node.is-current > .el-tree-node__content {
+  background: rgba($primary-color, 0.1);
+  color: var(--el-color-primary);
+}
+.el-tree-node__expand-icon {
+  color: var(--app-text-color-secondary);
+  font-size: 16px;
 }

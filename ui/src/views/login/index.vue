@@ -1,6 +1,6 @@
 <template>
   <login-layout v-if="!loading" v-loading="loading">
-    <LoginContainer :subTitle="user.themeInfo?.slogan || $t('theme.defaultSlogan')">
+    <LoginContainer :subTitle="theme.themeInfo?.slogan || $t('theme.defaultSlogan')">
       <h2 class="mb-24">{{ $t('views.login.title') }}</h2>
       <div>
         <el-form
@@ -88,7 +88,7 @@ import useStore from '@/stores'
 import { useI18n } from 'vue-i18n'
 
 const router = useRouter()
-const { login, user } = useStore()
+const { login, user, theme } = useStore()
 const { locale } = useI18n({ useScope: 'global' })
 const loading = ref<boolean>(false)
 

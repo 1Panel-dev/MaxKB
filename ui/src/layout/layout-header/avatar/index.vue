@@ -4,7 +4,7 @@
       <el-avatar :size="30">
         <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
       </el-avatar>
-      <span class="ml-8">{{ user.userInfo?.username }}</span>
+      <span class="ml-8 color-text-primary">{{ user.userInfo?.username }}</span>
       <el-icon class="el-icon--right">
         <CaretBottom />
       </el-icon>

@@ -8,13 +8,13 @@ import UserApi from '@/api/user/user'
 // import { defaultPlatformSetting } from '@/utils/theme'
 import { useLocalStorage } from '@vueuse/core'
 import { localeConfigKey, getBrowserLang } from '@/locales/index'
+import useThemeStore from './theme'
 export interface userStateTypes {
   userType: number // 1 系统操作者 2 对话用户
   userInfo: User | null
   version?: string
   XPACK_LICENSE_IS_VALID: false
   isXPack: false
-  themeInfo: any
 }
 
 const useLoginStore = defineStore('user', {
@@ -24,7 +24,6 @@ const useLoginStore = defineStore('user', {
     version: '',
     XPACK_LICENSE_IS_VALID: false,
     isXPack: false,
-    themeInfo: null,
   }),
   actions: {
     getLanguage() {
@@ -32,14 +31,13 @@ const useLoginStore = defineStore('user', {
         ? localStorage.getItem('MaxKB-locale') || getBrowserLang()
         : sessionStorage.getItem('language') || getBrowserLang()
     },
-    isDefaultTheme() {
-      return !this.themeInfo?.theme || this.themeInfo?.theme === '#3370FF'
-    },
     async profile(loading?: Ref<boolean>) {
       return UserApi.getUserProfile(loading).then((ok) => {
         this.userInfo = ok.data
         useLocalStorage<string>(localeConfigKey, 'en-US').value =
           ok?.data?.language || this.getLanguage()
+        const theme = useThemeStore()
+        theme.setTheme()
         // return this.asyncGetProfile()
       })
     },
@@ -86,11 +84,6 @@ const useLoginStore = defineStore('user', {
     //   return this.isXPack
     // },
 
-    // setTheme(data: any) {
-    //   const { changeTheme } = useElementPlusTheme(this.themeInfo?.theme)
-    //   changeTheme(data?.['theme'])
-    //   this.themeInfo = cloneDeep(data)
-    // },
     // isExpire() {
     //   return this.isXPack && !this.XPACK_LICENSE_IS_VALID
     // },
@@ -103,16 +96,7 @@ const useLoginStore = defineStore('user', {
     //   this.userAccessToken = token
     // },
 
-    // async theme(loading?: Ref<boolean>) {
-    //   return await ThemeApi.getThemeInfo(loading).then((ok) => {
-    //     this.setTheme(ok.data)
-    //     // window.document.title = this.themeInfo['title'] || 'MaxKB'
-    //     // const link = document.querySelector('link[rel="icon"]') as any
-    //     // if (link) {
-    //     //   link['href'] = this.themeInfo['icon'] || '/favicon.ico'
-    //     // }
-    //   })
-    // },
+
 
     // async dingCallback(code: string) {
     //   return UserApi.getDingCallback(code).then((ok) => {

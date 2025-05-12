@@ -1,12 +1,17 @@
 <template>
   <LayoutContainer class="tool-manage">
     <template #left>
-      <h4>{{ $t('views.tool.title') }}</h4>
-      <folder-tree :data="folderList" />
+      <h4 class="p-8">{{ $t('views.tool.title') }}</h4>
+
+      <folder-tree
+        :data="folderList"
+        :currentNodeKey="currentFolder?.id"
+        @handleNodeClick="folderClickHandel"
+      />
     </template>
     <ContentContainer>
       <div class="flex-between mb-16">
-        <h4>{{ $t('views.tool.title') }}</h4>
+        <h4>{{ currentFolder?.name }}</h4>
         <div class="flex-between"></div>
       </div>
       <div>
@@ -15,25 +20,8 @@
             <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" class="mb-16">
               <CardBox :title="item.name" :description="item.desc" class="cursor">
                 <template #icon>
-                  <el-avatar
-                    v-if="item.type === '1'"
-                    class="mr-8 avatar-purple"
-                    shape="square"
-                    :size="32"
-                  >
-                    <img src="@/assets/knowledge/icon_web.svg" style="width: 58%" alt="" />
-                  </el-avatar>
-                  <el-avatar
-                    v-else-if="item.type === '2'"
-                    class="mr-8 avatar-purple"
-                    shape="square"
-                    :size="32"
-                    style="background: none"
-                  >
-                    <img src="@/assets/knowledge/logo_lark.svg" style="width: 100%" alt="" />
-                  </el-avatar>
-                  <el-avatar v-else class="mr-8 avatar-blue" shape="square" :size="32">
-                    <img src="@/assets/knowledge/icon_document.svg" style="width: 58%" alt="" />
+                  <el-avatar class="mr-8 avatar-green" shape="square" :size="32">
+                    <img src="@/assets/node/icon_tool.svg" style="width: 58%" alt="" />
                   </el-avatar>
                 </template>
                 <template #subTitle>
@@ -67,14 +55,14 @@ const paginationConfig = reactive({
   page_size: 30,
   total: 0,
 })
-
+const searchValue = ref('')
 const folderList = ref<any[]>([])
 const toolList = ref<any[]>([])
-const folderId = ref<string>('root')
+const currentFolder = ref<any>({})
 
 function getList() {
   const params = {
-    folder_id: folderId.value,
+    folder_id: currentFolder.value?.id || 'root',
     tool_type: 'CUSTOM',
   }
   ToolApi.getToolList('default', paginationConfig, params, loading).then((res) => {
@@ -87,12 +75,13 @@ function getFolder() {
   const params = {}
   folder.asynGetFolder('default', 'TOOL', params, loading).then((res: any) => {
     folderList.value = res.data
+    currentFolder.value = res.data?.[0] || {}
+    getList()
   })
 }
 
 onMounted(() => {
   getFolder()
-  getList()
 })
 </script>
 

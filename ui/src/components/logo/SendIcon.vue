@@ -30,9 +30,9 @@ defineProps({
     default: '36px'
   }
 })
-const { user } = useStore()
+const { theme } = useStore()
 const isDefaultTheme = computed(() => {
-  return user.isDefaultTheme()
+  return theme.isDefaultTheme()
 })
 </script>
 <style lang="scss" scoped>

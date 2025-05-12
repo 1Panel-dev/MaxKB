@@ -28,7 +28,7 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
-  color: var(--app-text-color);
+  color: var(--el-text-color-primary);
 }
 
 #app {
@@ -373,6 +373,15 @@ h5 {
 }
 
 // 颜色
+.color-text-primary {
+  color: var(--el-text-color-primary);
+}
 .color-secondary {
   color: var(--app-text-color-secondary);
+}
+.avatar-purple {
+  background: #7f3bf5;
+}
+.avatar-green {
+  background: var(--el-color-success);
 }

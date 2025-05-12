@@ -11,7 +11,8 @@
     </template>
     <div class="about-ui" v-loading="loading">
       <div class="flex">
-        <span class="label">{{ $t('layout.about.authorize') }}</span><span>{{ licenseInfo?.corporation || '-' }}</span>
+        <span class="label">{{ $t('layout.about.authorize') }}</span
+        ><span>{{ licenseInfo?.corporation || '-' }}</span>
       </div>
       <div class="flex">
         <span class="label">{{ $t('layout.about.expiredTime') }}</span>
@@ -24,16 +25,23 @@
       </div>
       <div class="flex">
         <span class="label">{{ $t('layout.about.edition.label') }}</span>
-        <span>{{ user.showXpack() ? $t('layout.about.edition.professional') : $t('layout.about.edition.community') }}</span>
+        <span>{{
+          user.showXpack()
+            ? $t('layout.about.edition.professional')
+            : $t('layout.about.edition.community')
+        }}</span>
       </div>
       <div class="flex">
-        <span class="label">{{ $t('layout.about.version') }}</span><span>{{ user.version }}</span>
+        <span class="label">{{ $t('layout.about.version') }}</span
+        ><span>{{ user.version }}</span>
       </div>
       <div class="flex">
-        <span class="label">{{ $t('layout.about.serialNo') }}</span><span>{{ licenseInfo?.serialNo || '-' }}</span>
+        <span class="label">{{ $t('layout.about.serialNo') }}</span
+        ><span>{{ licenseInfo?.serialNo || '-' }}</span>
       </div>
       <div class="flex">
-        <span class="label">{{ $t('layout.about.remark') }}</span><span>{{ licenseInfo?.remark || '-' }}</span>
+        <span class="label">{{ $t('layout.about.remark') }}</span
+        ><span>{{ licenseInfo?.remark || '-' }}</span>
       </div>
       <div class="mt-16 flex align-center" v-if="user.showXpack()">
         <el-upload
@@ -44,7 +52,9 @@
           :on-change="onChange"
           v-hasPermission="new Role('ADMIN')"
         >
-          <el-button class="border-primary mr-16">{{ $t('layout.about.update') }} License</el-button>
+          <el-button class="border-primary mr-16"
+            >{{ $t('layout.about.update') }} License</el-button
+          >
         </el-upload>
       </div>
     </div>
@@ -59,9 +69,9 @@ import licenseApi from '@/api/license'
 import { fromNowDate } from '@/utils/time'
 import { Role } from '@/utils/permission/type'
 import useStore from '@/stores'
-const { user } = useStore()
+const { user, theme } = useStore()
 const isDefaultTheme = computed(() => {
-  return user.isDefaultTheme()
+  return theme.isDefaultTheme()
 })
 
 const aboutDialogVisible = ref(false)

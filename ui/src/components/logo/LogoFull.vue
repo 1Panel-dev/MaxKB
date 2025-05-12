@@ -1,5 +1,5 @@
 <template>
-  <img v-if="user.themeInfo?.loginLogo" :src="fileURL" alt="" height="45px" class="mr-8" />
+  <img v-if="theme.themeInfo?.loginLogo" :src="fileURL" alt="" height="45px" class="mr-8" />
   <template v-else>
     <svg
       v-if="!isDefaultTheme"
@@ -66,20 +66,20 @@ defineOptions({ name: 'LogoFull' })
 defineProps({
   height: {
     type: String,
-    default: '36px'
-  }
+    default: '36px',
+  },
 })
-const { user } = useStore()
+const { theme } = useStore()
 const isDefaultTheme = computed(() => {
-  return user.isDefaultTheme()
+  return theme.isDefaultTheme()
 })
 
 const fileURL = computed(() => {
-  if (user.themeInfo) {
-    if (typeof user.themeInfo?.loginLogo === 'string') {
-      return user.themeInfo?.loginLogo
+  if (theme.themeInfo) {
+    if (typeof theme.themeInfo?.loginLogo === 'string') {
+      return theme.themeInfo?.loginLogo
     } else {
-      return URL.createObjectURL(user.themeInfo?.loginLogo)
+      return URL.createObjectURL(theme.themeInfo?.loginLogo)
     }
   } else {
     return ''
