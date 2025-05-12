@@ -2,7 +2,6 @@
   <LayoutContainer class="tool-manage">
     <template #left>
       <h4 class="p-8">{{ $t('views.tool.title') }}</h4>
-
       <folder-tree
         :data="folderList"
         :currentNodeKey="currentFolder?.id"
@@ -55,7 +54,7 @@ const paginationConfig = reactive({
   page_size: 30,
   total: 0,
 })
-const searchValue = ref('')
+
 const folderList = ref<any[]>([])
 const toolList = ref<any[]>([])
 const currentFolder = ref<any>({})

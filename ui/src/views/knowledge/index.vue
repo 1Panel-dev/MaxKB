@@ -1,11 +1,16 @@
 <template>
   <LayoutContainer class="knowledge-manage">
     <template #left>
-      <div class="p-8"></div>
+      <h4 class="p-8">{{ $t('views.knowledge.title') }}</h4>
+      <folder-tree
+        :data="folderList"
+        :currentNodeKey="currentFolder?.id"
+        @handleNodeClick="folderClickHandel"
+      />
     </template>
     <ContentContainer>
       <div class="flex-between mb-16">
-        <h4>{{ $t('views.knowledge.title') }}</h4>
+        <h4>{{ currentFolder?.name }}</h4>
         <div class="flex-between"></div>
       </div>
       <div>
@@ -86,12 +91,13 @@ const paginationConfig = reactive({
   total: 0,
 })
 
+const folderList = ref<any[]>([])
 const datasetList = ref<any[]>([])
-const folderId = ref<string>('root')
+const currentFolder = ref<any>({})
 
 function getList() {
   const params = {
-    folder_id: folderId.value,
+    folder_id: currentFolder.value?.id || 'root',
   }
   KnowledgeApi.getKnowledgeList('default', paginationConfig, params, loading).then((res) => {
     paginationConfig.total = res.data.total
@@ -102,14 +108,14 @@ function getList() {
 function getFolder() {
   const params = {}
   folder.asynGetFolder('default', 'KNOWLEDGE', params, loading).then((res) => {
-    // paginationConfig.total = res.data.total
-    // datasetList.value = [...datasetList.value, ...res.data.records]
+    folderList.value = res.data
+    currentFolder.value = res.data?.[0] || {}
+    getList()
   })
 }
 
 onMounted(() => {
   getFolder()
-  getList()
 })
 </script>
 
