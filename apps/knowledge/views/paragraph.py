@@ -207,7 +207,7 @@ class ParagraphView(APIView):
         authentication_classes = [TokenAuth]
 
         @extend_schema(
-            methods=['PUT'],
+            methods=['GET'],
             summary=_('Disassociation issue'),
             description=_('Disassociation issue'),
             operation_id=_('Disassociation issue'),  # type: ignore
@@ -216,15 +216,14 @@ class ParagraphView(APIView):
             tags=[_('Knowledge Base/Documentation/Paragraph')]  # type: ignore
         )
         @has_permissions(PermissionConstants.DOCUMENT_EDIT.get_workspace_permission())
-        def put(self, request: Request,
-                workspace_id: str, knowledge_id: str, document_id: str, paragraph_id: str, problem_id: str):
+        def get(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
             return result.success(ParagraphSerializers.Association(
                 data={
                     'workspace_id': workspace_id,
                     'knowledge_id': knowledge_id,
                     'document_id': document_id,
-                    'paragraph_id': paragraph_id,
-                    'problem_id': problem_id
+                    'paragraph_id': request.query_params.get('paragraph_id'),
+                    'problem_id': request.query_params.get('problem_id')
                 }
             ).un_association())
 
@@ -232,7 +231,7 @@ class ParagraphView(APIView):
         authentication_classes = [TokenAuth]
 
         @extend_schema(
-            methods=['PUT'],
+            methods=['GET'],
             summary=_('Related questions'),
             description=_('Related questions'),
             operation_id=_('Related questions'),  # type: ignore
@@ -241,15 +240,14 @@ class ParagraphView(APIView):
             tags=[_('Knowledge Base/Documentation/Paragraph')]  # type: ignore
         )
         @has_permissions(PermissionConstants.DOCUMENT_EDIT.get_workspace_permission())
-        def put(self, request: Request,
-                workspace_id: str, knowledge_id: str, document_id: str, paragraph_id: str, problem_id: str):
+        def get(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
             return result.success(ParagraphSerializers.Association(
                 data={
                     'workspace_id': workspace_id,
                     'knowledge_id': knowledge_id,
                     'document_id': document_id,
-                    'paragraph_id': paragraph_id,
-                    'problem_id': problem_id
+                    'paragraph_id': request.query_params.get('paragraph_id'),
+                    'problem_id': request.query_params.get('problem_id')
                 }
             ).association())
 

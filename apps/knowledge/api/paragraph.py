@@ -201,14 +201,14 @@ class UnAssociationAPI(APIMixin):
                 name="paragraph_id",
                 description="段落id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location='query',
                 required=True,
             ),
             OpenApiParameter(
                 name="problem_id",
                 description="问题id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location='query',
                 required=True,
             )
         ]
