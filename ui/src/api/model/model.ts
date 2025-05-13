@@ -30,10 +30,11 @@ const getModel: (
  * @returns
  */
 const getModelParamsForm: (
+  wordspace_id: string,
   model_id: string,
   loading?: Ref<boolean>,
-) => Promise<Result<Array<FormField>>> = (model_id, loading) => {
-  return get(`model/${model_id}/model_params_form`, {}, loading)
+) => Promise<Result<Array<FormField>>> = (wordspace_id, model_id, loading) => {
+  return get(`${prefix}/${wordspace_id}/model/${model_id}/model_params_form`, {}, loading)
 }
 
 /**
@@ -43,10 +44,11 @@ const getModelParamsForm: (
  * @returns
  */
 const createModel: (
+  wordspace_id: string,
   request: CreateModelRequest,
   loading?: Ref<boolean>,
-) => Promise<Result<Model>> = (request, loading) => {
-  return post(`${prefix}`, request, {}, loading)
+) => Promise<Result<Model>> = (wordspace_id, request, loading) => {
+  return post(`${prefix}/${wordspace_id}/model`, request, {}, loading)
 }
 
 /**
@@ -56,11 +58,12 @@ const createModel: (
  * @returns
  */
 const updateModel: (
+  wordspace_id: string,
   model_id: string,
   request: EditModelRequest,
   loading?: Ref<boolean>,
-) => Promise<Result<Model>> = (model_id, request, loading) => {
-  return put(`${prefix}/${model_id}`, request, {}, loading)
+) => Promise<Result<Model>> = (wordspace_id, model_id, request, loading) => {
+  return put(`${prefix}/${wordspace_id}/model/${model_id}`, request, {}, loading)
 }
 
 /**
@@ -70,11 +73,12 @@ const updateModel: (
  * @returns
  */
 const updateModelParamsForm: (
+  wordspace_id: string,
   model_id: string,
   request: any[],
   loading?: Ref<boolean>,
-) => Promise<Result<Model>> = (model_id, request, loading) => {
-  return put(`${prefix}/${model_id}/model_params_form`, request, {}, loading)
+) => Promise<Result<Model>> = (wordspace_id, model_id, request, loading) => {
+  return put(`${prefix}/${wordspace_id}/model/${model_id}/model_params_form`, request, {}, loading)
 }
 
 /**
@@ -83,11 +87,12 @@ const updateModelParamsForm: (
  * @param loading  加载器
  * @returns
  */
-const getModelById: (model_id: string, loading?: Ref<boolean>) => Promise<Result<Model>> = (
-  model_id,
-  loading,
-) => {
-  return get(`${prefix}/${model_id}`, {}, loading)
+const getModelById: (
+  wordspace_id: string,
+  model_id: string,
+  loading?: Ref<boolean>,
+) => Promise<Result<Model>> = (wordspace_id, model_id, loading) => {
+  return get(`${prefix}/${wordspace_id}/model/${model_id}`, {}, loading)
 }
 /**
  * 获取模型信息不包括认证信息根据模型id
@@ -95,11 +100,12 @@ const getModelById: (model_id: string, loading?: Ref<boolean>) => Promise<Result
  * @param loading  加载器
  * @returns
  */
-const getModelMetaById: (model_id: string, loading?: Ref<boolean>) => Promise<Result<Model>> = (
-  model_id,
-  loading,
-) => {
-  return get(`${prefix}/${model_id}/meta`, {}, loading)
+const getModelMetaById: (
+  wordspace_id: string,
+  model_id: string,
+  loading?: Ref<boolean>,
+) => Promise<Result<Model>> = (wordspace_id, model_id, loading) => {
+  return get(`${prefix}/${wordspace_id}/model/${model_id}/meta`, {}, loading)
 }
 /**
  * 暂停下载
@@ -107,17 +113,19 @@ const getModelMetaById: (model_id: string, loading?: Ref<boolean>) => Promise<Re
  * @param loading 加载器
  * @returns
  */
-const pauseDownload: (model_id: string, loading?: Ref<boolean>) => Promise<Result<boolean>> = (
-  model_id,
-  loading,
-) => {
-  return put(`${prefix}/${model_id}/pause_download`, undefined, {}, loading)
+const pauseDownload: (
+  wordspace_id: string,
+  model_id: string,
+  loading?: Ref<boolean>,
+) => Promise<Result<boolean>> = (wordspace_id, model_id, loading) => {
+  return put(`${prefix}/${wordspace_id}/model/${model_id}/pause_download`, undefined, {}, loading)
 }
-const deleteModel: (model_id: string, loading?: Ref<boolean>) => Promise<Result<boolean>> = (
-  model_id,
-  loading,
-) => {
-  return del(`${prefix}/${model_id}`, undefined, {}, loading)
+const deleteModel: (
+  wordspace_id: string,
+  model_id: string,
+  loading?: Ref<boolean>,
+) => Promise<Result<boolean>> = (wordspace_id, model_id, loading) => {
+  return del(`${prefix}/${wordspace_id}/model/${model_id}`, undefined, {}, loading)
 }
 export default {
   getModel,

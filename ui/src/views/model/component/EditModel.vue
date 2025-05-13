@@ -31,11 +31,11 @@
           <template #label>
             <div class="flex align-center" style="display: inline-flex">
               <div class="mr-4">
-                <span>{{ $t('views.model.modelForm.form.templateName.label') }} </span>
+                <span>{{ $t('views.model.modelForm.modeName.label') }} </span>
               </div>
               <el-tooltip effect="dark" placement="right">
                 <template #content>
-                  <p>{{ $t('views.model.modelForm.form.templateName.tooltip') }}</p>
+                  <p>{{ $t('views.model.modelForm.modeName.tooltip') }}</p>
                 </template>
                 <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
               </el-tooltip>
@@ -45,12 +45,12 @@
             v-model="base_form_data.name"
             maxlength="64"
             show-word-limit
-            :placeholder="$t('views.model.modelForm.form.templateName.placeholder')"
+            :placeholder="$t('views.model.modelForm.modeName.placeholder')"
           />
         </el-form-item>
         <el-form-item prop="permission_type" :rules="base_form_data_rule.permission_type">
           <template #label>
-            <span>{{ $t('views.model.modelForm.form.permissionType.label') }}</span>
+            <span>{{ $t('views.model.modelForm.permissionType.label') }}</span>
           </template>
 
           <el-radio-group v-model="base_form_data.permission_type" class="card__radio">
@@ -76,7 +76,7 @@
         </el-form-item>
         <el-form-item prop="model_type" :rules="base_form_data_rule.model_type">
           <template #label>
-            <span>{{ $t('views.model.modelForm.form.model_type.label') }}</span>
+            <span>{{ $t('views.model.modelForm.model_type.label') }}</span>
           </template>
           <el-select
             disabled
@@ -84,7 +84,7 @@
             @change="list_base_model($event, true)"
             v-model="base_form_data.model_type"
             class="w-full m-2"
-            :placeholder="$t('views.model.modelForm.form.model_type.placeholder')"
+            :placeholder="$t('views.model.modelForm.model_type.placeholder')"
           >
             <el-option
               v-for="item in model_type_list"
@@ -98,9 +98,9 @@
           <template #label>
             <div class="flex align-center" style="display: inline-flex">
               <div class="mr-4">
-                <span>{{ $t('views.model.modelForm.form.base_model.label') }} </span>
+                <span>{{ $t('views.model.modelForm.base_model.label') }} </span>
                 <span class="danger ml-4">{{
-                  $t('views.model.modelForm.form.base_model.tooltip')
+                  $t('views.model.modelForm.base_model.tooltip')
                 }}</span>
               </div>
             </div>
@@ -110,7 +110,7 @@
             v-loading="base_model_loading"
             v-model="base_form_data.model_name"
             class="w-full m-2"
-            :placeholder="$t('views.model.modelForm.form.base_model.requiredMessage')"
+            :placeholder="$t('views.model.modelForm.base_model.requiredMessage')"
             filterable
             allow-create
             default-first-option
@@ -149,6 +149,7 @@ import { ref, computed } from 'vue'
 import type { Provider, BaseModel, Model } from '@/api/type/model'
 import type { Dict, KeyValue } from '@/api/type/common'
 import ModelApi from '@/api/model/model'
+import ProviderApi from '@/api/model/provider'
 import type { FormField } from '@/components/dynamics-form/type'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
 import type { FormRules } from 'element-plus'
@@ -173,18 +174,18 @@ const base_form_data_rule = ref<FormRules>({
   name: {
     required: true,
     trigger: 'blur',
-    message: t('views.model.modelForm.form.templateName.requiredMessage')
+    message: t('views.model.modelForm.modeName.requiredMessage'),
   },
   model_type: {
     required: true,
     trigger: 'change',
-    message: t('views.model.modelForm.form.model_type.requiredMessage')
+    message: t('views.model.modelForm.model_type.requiredMessage'),
   },
   model_name: {
     required: true,
     trigger: 'change',
-    message: t('views.model.modelForm.form.base_model.requiredMessage')
-  }
+    message: t('views.model.modelForm.base_model.requiredMessage'),
+  },
 })
 
 const base_form_data = ref<{
@@ -203,15 +204,15 @@ const form_data = computed({
   },
   set: (event: any) => {
     credential_form_data.value = event
-  }
+  },
 })
 
 const getModelForm = (model_name: string) => {
   if (providerValue.value) {
-    ModelApi.getModelCreateForm(
+    ProviderApi.getModelCreateForm(
       providerValue.value.provider,
       form_data.value.model_type,
-      model_name
+      model_name,
     ).then((ok) => {
       model_form_field.value = ok.data
       if (modelValue.value) {
@@ -226,18 +227,18 @@ const list_base_model = (model_type: any, change?: boolean) => {
     base_form_data.value.model_name = ''
   }
   if (providerValue.value) {
-    ModelApi.listBaseModel(providerValue.value.provider, model_type, base_model_loading).then(
+    ProviderApi.listBaseModel(providerValue.value.provider, model_type, base_model_loading).then(
       (ok) => {
         base_model_list.value = ok.data
-      }
+      },
     )
   }
 }
 const open = (provider: Provider, model: Model) => {
   modelValue.value = model
-  ModelApi.getModelById(model.id, formLoading).then((ok) => {
+  ModelApi.getModelById('default', model.id, formLoading).then((ok) => {
     modelValue.value = ok.data
-    ModelApi.listModelType(model.provider, model_type_loading).then((ok) => {
+    ProviderApi.listModelType(model.provider, model_type_loading).then((ok) => {
       model_type_list.value = ok.data
       list_base_model(model.model_type)
     })
@@ -247,7 +248,7 @@ const open = (provider: Provider, model: Model) => {
       name: model.name,
       permission_type: model.permission_type,
       model_type: model.model_type,
-      model_name: model.model_name
+      model_name: model.model_name,
     }
     form_data.value = model.credential
     getModelForm(model.model_name)
@@ -268,12 +269,13 @@ const submit = () => {
   dynamicsFormRef.value?.validate().then(() => {
     if (modelValue.value) {
       ModelApi.updateModel(
+        'default',
         modelValue.value.id,
         {
           ...base_form_data.value,
-          credential: credential_form_data.value
+          credential: credential_form_data.value,
         },
-        loading
+        loading,
       ).then((ok) => {
         MsgSuccess(t('views.model.tip.updateSuccessMessage'))
         close()

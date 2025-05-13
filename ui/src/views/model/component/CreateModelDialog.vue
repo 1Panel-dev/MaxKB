@@ -39,11 +39,11 @@
               <template #label>
                 <div class="flex align-center" style="display: inline-flex">
                   <div class="mr-4">
-                    <span> {{ $t('views.model.modelForm.form.templateName.label') }} </span>
+                    <span> {{ $t('views.model.modelForm.modeName.label') }} </span>
                   </div>
                   <el-tooltip effect="dark" placement="right">
                     <template #content>
-                      <p>{{ $t('views.model.modelForm.form.templateName.tooltip') }}</p>
+                      <p>{{ $t('views.model.modelForm.modeName.tooltip') }}</p>
                     </template>
                     <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
                   </el-tooltip>
@@ -53,12 +53,12 @@
                 v-model="base_form_data.name"
                 maxlength="64"
                 show-word-limit
-                :placeholder="$t('views.model.modelForm.form.templateName.placeholder')"
+                :placeholder="$t('views.model.modelForm.modeName.placeholder')"
               />
             </el-form-item>
             <el-form-item prop="permission_type" :rules="base_form_data_rule.permission_type">
               <template #label>
-                <span>{{ $t('views.model.modelForm.form.permissionType.label') }}</span>
+                <span>{{ $t('views.model.modelForm.permissionType.label') }}</span>
               </template>
               <el-radio-group v-model="base_form_data.permission_type" class="card__radio">
                 <el-row :gutter="16">
@@ -84,18 +84,16 @@
             <el-form-item prop="model_type" :rules="base_form_data_rule.model_type">
               <template #label>
                 <div class="flex align-center" style="display: inline-flex">
-                  <span class="mr-4"
-                    >{{ $t('views.model.modelForm.form.model_type.label') }}
-                  </span>
+                  <span class="mr-4">{{ $t('views.model.modelForm.model_type.label') }} </span>
                   <el-tooltip effect="dark" placement="right">
                     <template #content>
-                      <p>{{ $t('views.model.modelForm.form.model_type.tooltip1') }}</p>
-                      <p>{{ $t('views.model.modelForm.form.model_type.tooltip2') }}</p>
-                      <p>{{ $t('views.model.modelForm.form.model_type.tooltip3') }}</p>
-                      <p>{{ $t('views.model.modelForm.form.model_type.tooltip4') }}</p>
-                      <p>{{ $t('views.model.modelForm.form.model_type.tooltip5') }}</p>
-                      <p>{{ $t('views.model.modelForm.form.model_type.tooltip6') }}</p>
-                      <p>{{ $t('views.model.modelForm.form.model_type.tooltip7') }}</p>
+                      <p>{{ $t('views.model.modelForm.model_type.tooltip1') }}</p>
+                      <p>{{ $t('views.model.modelForm.model_type.tooltip2') }}</p>
+                      <p>{{ $t('views.model.modelForm.model_type.tooltip3') }}</p>
+                      <p>{{ $t('views.model.modelForm.model_type.tooltip4') }}</p>
+                      <p>{{ $t('views.model.modelForm.model_type.tooltip5') }}</p>
+                      <p>{{ $t('views.model.modelForm.model_type.tooltip6') }}</p>
+                      <p>{{ $t('views.model.modelForm.model_type.tooltip7') }}</p>
                     </template>
                     <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
                   </el-tooltip>
@@ -106,7 +104,7 @@
                 @change="list_base_model($event, true)"
                 v-model="base_form_data.model_type"
                 class="w-full m-2"
-                :placeholder="$t('views.model.modelForm.form.model_type.placeholder')"
+                :placeholder="$t('views.model.modelForm.model_type.placeholder')"
               >
                 <el-option
                   v-for="item in model_type_list"
@@ -121,9 +119,9 @@
               <template #label>
                 <div class="flex align-center" style="display: inline-flex">
                   <div class="mr-4">
-                    <span>{{ $t('views.model.modelForm.form.base_model.label') }} </span>
+                    <span>{{ $t('views.model.modelForm.base_model.label') }} </span>
                     <span class="danger ml-4">{{
-                      $t('views.model.modelForm.form.base_model.tooltip')
+                      $t('views.model.modelForm.base_model.tooltip')
                     }}</span>
                   </div>
                 </div>
@@ -133,7 +131,7 @@
                 v-loading="base_model_loading"
                 v-model="base_form_data.model_name"
                 class="w-full m-2"
-                :placeholder="$t('views.model.modelForm.form.base_model.placeholder')"
+                :placeholder="$t('views.model.modelForm.base_model.placeholder')"
                 filterable
                 allow-create
                 default-first-option
@@ -158,10 +156,7 @@
           </template>
         </DynamicsForm>
       </el-tab-pane>
-      <el-tab-pane
-        :label="$t('views.model.modelForm.title.advancedInfo')"
-        name="advanced-info"
-      >
+      <el-tab-pane :label="$t('views.model.modelForm.title.advancedInfo')" name="advanced-info">
         <el-empty
           v-if="!base_form_data.model_type || !base_form_data.model_name"
           :description="$t('views.model.tip.emptyMessage1')"
@@ -269,6 +264,7 @@ import { ref, computed } from 'vue'
 import type { Provider, BaseModel } from '@/api/type/model'
 import type { Dict, KeyValue } from '@/api/type/common'
 import ModelApi from '@/api/model/model'
+import ProviderApi from '@/api/model/provider'
 import type { FormField } from '@/components/dynamics-form/type'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
 import type { FormRules } from 'element-plus'
@@ -296,23 +292,23 @@ const base_form_data_rule = ref<FormRules>({
   name: {
     required: true,
     trigger: 'blur',
-    message: t('views.model.modelForm.form.templateName.requiredMessage')
+    message: t('views.model.modelForm.modeName.requiredMessage'),
   },
   permission_type: {
     required: true,
     trigger: 'change',
-    message: t('views.model.modelForm.form.permissionType.requiredMessage')
+    message: t('views.model.modelForm.permissionType.requiredMessage'),
   },
   model_type: {
     required: true,
     trigger: 'change',
-    message: t('views.model.modelForm.form.model_type.requiredMessage')
+    message: t('views.model.modelForm.model_type.requiredMessage'),
   },
   model_name: {
     required: true,
     trigger: 'change',
-    message: t('views.model.modelForm.form.base_model.requiredMessage')
-  }
+    message: t('views.model.modelForm.base_model.requiredMessage'),
+  },
 })
 
 const base_form_data = ref<{
@@ -333,36 +329,36 @@ const form_data = computed({
       model_type: base_form_data.value.model_type,
       model_name: base_form_data.value.model_name,
       permission_type: base_form_data.value.permission_type,
-      model_params_form: base_form_data.value.model_params_form
+      model_params_form: base_form_data.value.model_params_form,
     }
   },
   set: (event: any) => {
     credential_form_data.value = event
-  }
+  },
 })
 
 const getModelForm = (model_name: string) => {
   if (!form_data.value.model_type) {
-    MsgWarning(t('views.model.modelForm.form.model_type.requiredMessage'))
+    MsgWarning(t('views.model.modelForm.model_type.requiredMessage'))
     base_form_data.value.model_name = ''
     return
   }
   if (providerValue.value) {
-    ModelApi.getModelCreateForm(
+    ProviderApi.getModelCreateForm(
       providerValue.value.provider,
       form_data.value.model_type,
-      model_name
+      model_name,
     ).then((ok) => {
       model_form_field.value = ok.data
       // 渲染动态表单
       dynamicsFormRef.value?.render(model_form_field.value, undefined)
     })
 
-    ModelApi.listBaseModelParamsForm(
+    ProviderApi.listBaseModelParamsForm(
       providerValue.value.provider,
       form_data.value.model_type,
       model_name,
-      base_model_loading
+      base_model_loading,
     ).then((ok) => {
       base_form_data.value.model_params_form = ok.data
     })
@@ -370,7 +366,7 @@ const getModelForm = (model_name: string) => {
 }
 
 const open = (provider: Provider, model_type?: string) => {
-  ModelApi.listModelType(provider.provider, model_type_loading).then((ok) => {
+  ProviderApi.listModelType(provider.provider, model_type_loading).then((ok) => {
     model_type_list.value = ok.data
   })
   providerValue.value = provider
@@ -388,10 +384,10 @@ const list_base_model = (model_type: any, change?: boolean) => {
     base_form_data.value.model_params_form = []
   }
   if (providerValue.value) {
-    ModelApi.listBaseModel(providerValue.value.provider, model_type, base_model_loading).then(
+    ProviderApi.listBaseModel(providerValue.value.provider, model_type, base_model_loading).then(
       (ok) => {
         base_model_list.value = ok.data
-      }
+      },
     )
   }
 }
@@ -402,7 +398,7 @@ const close = () => {
     model_type: '',
     model_name: '',
     permission_type: 'PRIVATE',
-    model_params_form: []
+    model_params_form: [],
   }
   credential_form_data.value = {}
   model_form_field.value = []
@@ -416,12 +412,13 @@ const submit = () => {
     .then(() => {
       if (providerValue.value) {
         ModelApi.createModel(
+          'default',
           {
             ...base_form_data.value,
             credential: credential_form_data.value,
-            provider: providerValue.value.provider
+            provider: providerValue.value.provider,
           },
-          loading
+          loading,
         ).then((ok) => {
           close()
           MsgSuccess(t('views.model.tip.createSuccessMessage'))

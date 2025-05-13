@@ -14,7 +14,7 @@
         <span v-if="currentModel.status === 'PAUSE_DOWNLOAD'">
           <el-tooltip
             effect="dark"
-            :content="`${$t('views.model.modelForm.form.base_model.label')}: ${props.model.model_name} ${$t('views.model.tip.downloadError')}`"
+            :content="`${$t('views.model.modelForm.base_model.label')}: ${props.model.model_name} ${$t('views.model.tip.downloadError')}`"
             placement="top"
           >
             <el-icon class="danger ml-4" size="18"><Warning /></el-icon>
@@ -30,7 +30,7 @@
     <ul>
       <li class="flex">
         <el-text type="info" class="color-secondary">{{
-          $t('views.model.modelForm.form.model_type.label')
+          $t('views.model.modelForm.model_type.label')
         }}</el-text>
         <span class="ellipsis ml-16">
           {{ $t(modelType[model.model_type as keyof typeof modelType]) }}</span
@@ -38,7 +38,7 @@
       </li>
       <li class="flex">
         <el-text type="info" class="color-secondary">{{
-          $t('views.model.modelForm.form.base_model.label')
+          $t('views.model.modelForm.base_model.label')
         }}</el-text>
         <span class="ellipsis-1 ml-16" style="height: 20px; width: 70%">
           {{ model.model_name }}</span
@@ -163,7 +163,7 @@ const deleteModel = () => {
     },
   )
     .then(() => {
-      ModelApi.deleteModel(props.model.id).then(() => {
+      ModelApi.deleteModel('default', props.model.id).then(() => {
         emit('change')
       })
     })
@@ -171,7 +171,7 @@ const deleteModel = () => {
 }
 
 const cancelDownload = () => {
-  ModelApi.pauseDownload(props.model.id).then(() => {
+  ModelApi.pauseDownload('default', props.model.id).then(() => {
     downModel.value = undefined
     emit('change')
   })
@@ -192,7 +192,7 @@ const icon = computed(() => {
 const initInterval = () => {
   interval = setInterval(() => {
     if (currentModel.value.status === 'DOWNLOAD') {
-      ModelApi.getModelMetaById(props.model.id).then((ok) => {
+      ModelApi.getModelMetaById('default', props.model.id).then((ok) => {
         downModel.value = ok.data
       })
     } else {

@@ -47,7 +47,7 @@
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
-import ModelApi from '@/api/model/model'
+import ProviderApi from '@/api/model/provider'
 import type { Provider } from '@/api/type/model'
 import { modelTypeList } from './data'
 import { t } from '@/locales'
@@ -72,8 +72,8 @@ const close = () => {
 const checkModelType = (model_type: string) => {
   selectModelType.value = model_type
   currentModelType.value = modelTypeOptions.filter((item) => item.value === model_type)[0].text
-  ModelApi.getProviderByModelType(model_type, loading).then((ok) => {
-    list_provider.value = ok
+  ProviderApi.getProviderByModelType(model_type, loading).then((ok) => {
+    list_provider.value = ok.data
     list_provider.value.sort((a, b) => a.provider.localeCompare(b.provider))
   })
 }

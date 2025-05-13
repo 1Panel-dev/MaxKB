@@ -9,3 +9,10 @@ export const modelTypeList = [
   { text: t(modelType['IMAGE']), value: 'IMAGE' },
   { text: t(modelType['TTI']), value: 'TTI' }
 ]
+
+
+export const allObj = {
+  icon: '',
+  provider: '',
+  name: t('views.model.modelType.allModel'),
+}

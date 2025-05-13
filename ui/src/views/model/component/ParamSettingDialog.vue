@@ -12,7 +12,11 @@
       {{ $t('views.model.modelForm.title.addParam') }}
     </el-button>
     <el-table :data="modelParamsForm" class="mb-16">
-      <el-table-column prop="label" :label="$t('dynamicsForm.paramForm.name.label')" show-overflow-tooltip>
+      <el-table-column
+        prop="label"
+        :label="$t('dynamicsForm.paramForm.name.label')"
+        show-overflow-tooltip
+      >
         <template #default="{ row }">
           <span v-if="row.label && row.label.input_type === 'TooltipLabel'">{{
             row.label.label
@@ -20,7 +24,11 @@
           <span v-else>{{ row.label }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="field" :label="$t('dynamicsForm.paramForm.field.label')" show-overflow-tooltip />
+      <el-table-column
+        prop="field"
+        :label="$t('dynamicsForm.paramForm.field.label')"
+        show-overflow-tooltip
+      />
       <el-table-column :label="$t('dynamicsForm.paramForm.input_type.label')" width="110px">
         <template #default="{ row }">
           <el-tag type="info" class="info-tag">{{
@@ -92,7 +100,7 @@ const AddParamRef = ref()
 const open = () => {
   dialogVisible.value = true
   loading.value = true
-  ModelApi.getModelParamsForm(props.model.id, loading)
+  ModelApi.getModelParamsForm('default', props.model.id, loading)
     .then((ok) => {
       loading.value = false
       modelParamsForm.value = ok.data
@@ -143,11 +151,13 @@ function refresh(data: any, index: any) {
 }
 
 function submit() {
-  ModelApi.updateModelParamsForm(props.model.id, modelParamsForm.value, loading).then((ok) => {
-    MsgSuccess(t('views.model.tip.saveSuccessMessage'))
-    close()
-    // emit('submit')
-  })
+  ModelApi.updateModelParamsForm('default', props.model.id, modelParamsForm.value, loading).then(
+    (ok) => {
+      MsgSuccess(t('views.model.tip.saveSuccessMessage'))
+      close()
+      // emit('submit')
+    },
+  )
 }
 
 defineExpose({ open, close })
