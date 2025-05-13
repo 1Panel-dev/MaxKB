@@ -579,7 +579,6 @@ class DocumentSerializers(serializers.Serializer):
                 # save image
                 for file in save_image_list:
                     file_bytes = file.meta.pop('content')
-                    file.workspace_id = self.data.get('workspace_id')
                     file.meta['knowledge_id'] = self.data.get('knowledge_id')
                     file.save(file_bytes)
 
@@ -622,7 +621,6 @@ class DocumentSerializers(serializers.Serializer):
                 # save image
                 for file in save_image_list:
                     file_bytes = file.meta.pop('content')
-                    file.workspace_id = self.data.get('workspace_id')
                     file.meta['knowledge_id'] = self.data.get('knowledge_id')
                     file.save(file_bytes)
 

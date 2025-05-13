@@ -147,7 +147,7 @@ class ZipSplitHandle(BaseSplitHandle):
                 with zip_ref.open(image.get('source_file')) as f:
                     i = File(
                         id=image.get('image_id'),
-                        image_name=os.path.basename(image.get('source_file')),
+                        file_name=os.path.basename(image.get('source_file')),
                         meta={'debug': False, 'content': f.read()}  # 这里的content是二进制数据
                     )
                     image_mode_list.append(i)
