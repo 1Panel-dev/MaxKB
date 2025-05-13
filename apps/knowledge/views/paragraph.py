@@ -207,7 +207,7 @@ class ParagraphView(APIView):
         authentication_classes = [TokenAuth]
 
         @extend_schema(
-            methods=['GET'],
+            methods=['PUT'],
             summary=_('Disassociation issue'),
             description=_('Disassociation issue'),
             operation_id=_('Disassociation issue'),  # type: ignore
@@ -216,7 +216,7 @@ class ParagraphView(APIView):
             tags=[_('Knowledge Base/Documentation/Paragraph')]  # type: ignore
         )
         @has_permissions(PermissionConstants.KNOWLEDGE_PARAGRAPH_EDIT.get_workspace_permission())
-        def get(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
+        def put(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
             return result.success(ParagraphSerializers.Association(
                 data={
                     'workspace_id': workspace_id,
@@ -231,7 +231,7 @@ class ParagraphView(APIView):
         authentication_classes = [TokenAuth]
 
         @extend_schema(
-            methods=['GET'],
+            methods=['PUT'],
             summary=_('Related questions'),
             description=_('Related questions'),
             operation_id=_('Related questions'),  # type: ignore
@@ -240,7 +240,7 @@ class ParagraphView(APIView):
             tags=[_('Knowledge Base/Documentation/Paragraph')]  # type: ignore
         )
         @has_permissions(PermissionConstants.KNOWLEDGE_PARAGRAPH_EDIT.get_workspace_permission())
-        def get(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
+        def put(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
             return result.success(ParagraphSerializers.Association(
                 data={
                     'workspace_id': workspace_id,
