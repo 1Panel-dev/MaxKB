@@ -22,6 +22,12 @@ class Group(Enum):
 
     KNOWLEDGE = "KNOWLEDGE"
 
+    KNOWLEDGE_DOCUMENT = "KNOWLEDGE_DOCUMENT"
+
+    KNOWLEDGE_PARAGRAPH = "KNOWLEDGE_PARAGRAPH"
+
+    KNOWLEDGE_PROBLEM = "KNOWLEDGE_PROBLEM"
+
     MODEL = "MODEL"
 
     TOOL = "TOOL"
@@ -153,91 +159,143 @@ class PermissionConstants(Enum):
     """
      权限枚举
     """
-    USER_READ = Permission(group=Group.USER, operate=Operate.READ, role_list=[RoleConstants.ADMIN,
-                                                                              RoleConstants.USER])
-    USER_CREATE = Permission(group=Group.USER, operate=Operate.CREATE,
-                             role_list=[RoleConstants.ADMIN])
-    USER_EDIT = Permission(group=Group.USER, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN])
-    USER_DELETE = Permission(group=Group.USER, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN])
-
-    MODEL_CREATE = Permission(group=Group.MODEL, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN,
-                                                                                    RoleConstants.USER])
-    MODEL_READ = Permission(group=Group.MODEL, operate=Operate.READ, role_list=[RoleConstants.ADMIN,
-                                                                                RoleConstants.USER])
-    MODEL_EDIT = Permission(group=Group.MODEL, operate=Operate.EDIT,
-                            role_list=[RoleConstants.ADMIN, RoleConstants.USER])
-    MODEL_DELETE = Permission(group=Group.MODEL, operate=Operate.DELETE,
-                              role_list=[RoleConstants.ADMIN, RoleConstants.USER])
-    TOOL_FOLDER_CREATE = Permission(group=Group.TOOL, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN,
-                                                                                         RoleConstants.USER])
-    TOOL_FOLDER_READ = Permission(group=Group.TOOL, operate=Operate.READ, role_list=[RoleConstants.ADMIN,
-                                                                                     RoleConstants.USER])
-    TOOL_FOLDER_EDIT = Permission(group=Group.TOOL, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN,
-                                                                                     RoleConstants.USER])
-    TOOL_FOLDER_DELETE = Permission(group=Group.TOOL, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN,
-                                                                                         RoleConstants.USER])
-
-    TOOL_CREATE = Permission(group=Group.TOOL, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN,
-                                                                                  RoleConstants.USER])
-    TOOL_EDIT = Permission(group=Group.TOOL, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN,
-                                                                              RoleConstants.USER])
-    TOOL_READ = Permission(group=Group.TOOL, operate=Operate.READ, role_list=[RoleConstants.ADMIN,
-                                                                              RoleConstants.USER])
-    TOOL_DELETE = Permission(group=Group.TOOL, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN,
-                                                                                  RoleConstants.USER])
-    TOOL_DEBUG = Permission(group=Group.TOOL, operate=Operate.USE, role_list=[RoleConstants.ADMIN,
-                                                                              RoleConstants.USER])
-    TOOL_IMPORT = Permission(group=Group.TOOL, operate=Operate.USE, role_list=[RoleConstants.ADMIN,
-                                                                               RoleConstants.USER])
-    TOOL_EXPORT = Permission(group=Group.TOOL, operate=Operate.USE, role_list=[RoleConstants.ADMIN,
-                                                                               RoleConstants.USER])
-
-    KNOWLEDGE_FOLDER_CREATE = Permission(group=Group.KNOWLEDGE, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN,
-                                                                                                   RoleConstants.USER])
-    KNOWLEDGE_FOLDER_READ = Permission(group=Group.KNOWLEDGE, operate=Operate.READ, role_list=[RoleConstants.ADMIN,
-                                                                                               RoleConstants.USER],
-                                       resource_permission_group_list=[
-                                           ResourcePermissionGroup.VIEW
-                                       ])
-    KNOWLEDGE_FOLDER_EDIT = Permission(group=Group.KNOWLEDGE, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN,
-                                                                                               RoleConstants.USER],
-                                       resource_permission_group_list=[
-                                           ResourcePermissionGroup.MANAGE
-                                       ]
-                                       )
-    KNOWLEDGE_FOLDER_DELETE = Permission(group=Group.KNOWLEDGE, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN,
-                                                                                                   RoleConstants.USER],
-                                         resource_permission_group_list=[
-                                             ResourcePermissionGroup.MANAGE
-                                         ]
-                                         )
-    KNOWLEDGE_READ = Permission(group=Group.KNOWLEDGE, operate=Operate.READ, role_list=[RoleConstants.ADMIN,
-                                                                                        RoleConstants.USER],
-                                resource_permission_group_list=[ResourcePermissionGroup.VIEW])
-    KNOWLEDGE_CREATE = Permission(group=Group.KNOWLEDGE, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN,
-                                                                                            RoleConstants.USER])
-    KNOWLEDGE_EDIT = Permission(group=Group.KNOWLEDGE, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN,
-                                                                                        RoleConstants.USER])
-    KNOWLEDGE_DELETE = Permission(group=Group.KNOWLEDGE, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN,
-                                                                                            RoleConstants.USER])
-    DOCUMENT_READ = Permission(group=Group.KNOWLEDGE, operate=Operate.READ, role_list=[RoleConstants.ADMIN,
-                                                                                         RoleConstants.USER])
-    DOCUMENT_CREATE = Permission(group=Group.KNOWLEDGE, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN,
-                                                                                           RoleConstants.USER])
-    DOCUMENT_EDIT = Permission(group=Group.KNOWLEDGE, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN,
-                                                                                         RoleConstants.USER])
-    DOCUMENT_DELETE = Permission(group=Group.KNOWLEDGE, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN,
-                                                                                           RoleConstants.USER])
-
-    WORKSPACE_USER_RESOURCE_PERMISSION_READ = Permission(group=Group.WORKSPACE_USER_RESOURCE_PERMISSION,
-                                                         operate=Operate.READ,
-                                                         role_list=[RoleConstants.ADMIN,
-                                                                    RoleConstants.WORKSPACE_MANAGE])
-
-    EMAIL_SETTING_READ = Permission(group=Group.USER, operate=Operate.READ,
-                                    role_list=[RoleConstants.ADMIN])
-    EMAIL_SETTING_EDIT = Permission(group=Group.USER, operate=Operate.EDIT,
-                                    role_list=[RoleConstants.ADMIN])
+    USER_READ = Permission(
+        group=Group.USER, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+    )
+    USER_CREATE = Permission(
+        group=Group.USER, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN]
+    )
+    USER_EDIT = Permission(
+        group=Group.USER, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN]
+    )
+    USER_DELETE = Permission(
+        group=Group.USER, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN]
+    )
+    MODEL_CREATE = Permission(
+        group=Group.MODEL, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+    )
+    MODEL_READ = Permission(
+        group=Group.MODEL, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+    )
+    MODEL_EDIT = Permission(
+        group=Group.MODEL, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+    )
+    MODEL_DELETE = Permission(
+        group=Group.MODEL, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+    )
+    TOOL_FOLDER_CREATE = Permission(
+        group=Group.TOOL, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+    )
+    TOOL_FOLDER_READ = Permission(
+        group=Group.TOOL, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+    )
+    TOOL_FOLDER_EDIT = Permission(
+        group=Group.TOOL, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+    )
+    TOOL_FOLDER_DELETE = Permission(
+        group=Group.TOOL, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+    )
+    TOOL_CREATE = Permission(
+        group=Group.TOOL, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+    )
+    TOOL_EDIT = Permission(
+        group=Group.TOOL, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+    )
+    TOOL_READ = Permission(
+        group=Group.TOOL, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+    )
+    TOOL_DELETE = Permission(
+        group=Group.TOOL, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+    )
+    TOOL_DEBUG = Permission(
+        group=Group.TOOL, operate=Operate.USE, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+    )
+    TOOL_IMPORT = Permission(
+        group=Group.TOOL, operate=Operate.USE, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+    )
+    TOOL_EXPORT = Permission(
+        group=Group.TOOL, operate=Operate.USE, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+    )
+    KNOWLEDGE_FOLDER_CREATE = Permission(
+        group=Group.KNOWLEDGE, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+    )
+    KNOWLEDGE_FOLDER_READ = Permission(
+        group=Group.KNOWLEDGE, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        resource_permission_group_list=[ResourcePermissionGroup.VIEW]
+    )
+    KNOWLEDGE_FOLDER_EDIT = Permission(
+        group=Group.KNOWLEDGE, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        resource_permission_group_list=[ResourcePermissionGroup.MANAGE]
+    )
+    KNOWLEDGE_FOLDER_DELETE = Permission(
+        group=Group.KNOWLEDGE, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        resource_permission_group_list=[ResourcePermissionGroup.MANAGE]
+    )
+    KNOWLEDGE_READ = Permission(
+        group=Group.KNOWLEDGE, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        resource_permission_group_list=[ResourcePermissionGroup.VIEW]
+    )
+    KNOWLEDGE_CREATE = Permission(
+        group=Group.KNOWLEDGE, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+    )
+    KNOWLEDGE_EDIT = Permission(
+        group=Group.KNOWLEDGE, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+    )
+    KNOWLEDGE_DELETE = Permission(
+        group=Group.KNOWLEDGE, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+    )
+    KNOWLEDGE_DOCUMENT_READ = Permission(
+        group=Group.KNOWLEDGE_DOCUMENT, operate=Operate.READ,
+        role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+    )
+    KNOWLEDGE_DOCUMENT_CREATE = Permission(
+        group=Group.KNOWLEDGE_DOCUMENT, operate=Operate.CREATE,
+        role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+    )
+    KNOWLEDGE_DOCUMENT_EDIT = Permission(
+        group=Group.KNOWLEDGE_DOCUMENT, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+    )
+    KNOWLEDGE_DOCUMENT_DELETE = Permission(
+        group=Group.KNOWLEDGE_DOCUMENT, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+    )
+    KNOWLEDGE_PARAGRAPH_READ = Permission(
+        group=Group.KNOWLEDGE_PARAGRAPH, operate=Operate.READ,
+        role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+    )
+    KNOWLEDGE_PARAGRAPH_CREATE = Permission(
+        group=Group.KNOWLEDGE_PARAGRAPH, operate=Operate.CREATE,
+        role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+    )
+    KNOWLEDGE_PARAGRAPH_EDIT = Permission(
+        group=Group.KNOWLEDGE_PARAGRAPH, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+    )
+    KNOWLEDGE_PARAGRAPH_DELETE = Permission(
+        group=Group.KNOWLEDGE_PARAGRAPH, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+    )
+    KNOWLEDGE_PROBLEM_READ = Permission(
+        group=Group.KNOWLEDGE_PROBLEM, operate=Operate.READ,
+        role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+    )
+    KNOWLEDGE_PROBLEM_CREATE = Permission(
+        group=Group.KNOWLEDGE_PROBLEM, operate=Operate.CREATE,
+        role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+    )
+    KNOWLEDGE_PROBLEM_EDIT = Permission(
+        group=Group.KNOWLEDGE_PROBLEM, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+    )
+    KNOWLEDGE_PROBLEM_DELETE = Permission(
+        group=Group.KNOWLEDGE_PROBLEM, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+    )
+    WORKSPACE_USER_RESOURCE_PERMISSION_READ = Permission(
+        group=Group.WORKSPACE_USER_RESOURCE_PERMISSION, operate=Operate.READ,
+        role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE]
+    )
+    EMAIL_SETTING_READ = Permission(
+        group=Group.USER, operate=Operate.READ, role_list=[RoleConstants.ADMIN]
+    )
+    EMAIL_SETTING_EDIT = Permission(
+        group=Group.USER, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN]
+    )
 
     def get_workspace_application_permission(self):
         return lambda r, kwargs: Permission(group=self.value.group, operate=self.value.operate,
