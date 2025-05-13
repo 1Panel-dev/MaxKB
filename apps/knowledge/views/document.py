@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
-from common.constants.permission_constants import PermissionConstants
+from common.constants.permission_constants import PermissionConstants, CompareConstants
 from common.result import result
 from knowledge.api.document import DocumentSplitAPI, DocumentBatchAPI, DocumentBatchCreateAPI, DocumentCreateAPI, \
     DocumentReadAPI, DocumentEditAPI, DocumentDeleteAPI, TableDocumentCreateAPI, QaDocumentCreateAPI, \
@@ -121,10 +121,10 @@ class DocumentView(APIView):
             responses=DocumentSplitAPI.get_response(),
             tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
-        @has_permissions([
+        @has_permissions(
             PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_permission(),
             PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_permission(),
-        ])
+        )
         def post(self, request: Request, workspace_id: str, knowledge_id: str):
             split_data = {'file': request.FILES.getlist('file')}
             request_data = request.data
@@ -262,10 +262,10 @@ class DocumentView(APIView):
             responses=DocumentBatchCreateAPI.get_response(),
             tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
-        @has_permissions([
+        @has_permissions(
             PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_permission(),
             PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_permission(),
-        ])
+        )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(DocumentSerializers.Batch(
                 data={'knowledge_id': knowledge_id, 'workspace_id': workspace_id}
@@ -284,10 +284,10 @@ class DocumentView(APIView):
             responses=DocumentBatchAPI.get_response(),
             tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
-        @has_permissions([
+        @has_permissions(
             PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_permission(),
             PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_permission(),
-        ])
+        )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(DocumentSerializers.Batch(
                 data={'knowledge_id': knowledge_id, 'workspace_id': workspace_id}
@@ -306,10 +306,10 @@ class DocumentView(APIView):
             responses=DocumentBatchAPI.get_response(),
             tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
-        @has_permissions([
+        @has_permissions(
             PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_permission(),
             PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_permission(),
-        ])
+        )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(DocumentSerializers.Batch(
                 data={'workspace_id': workspace_id, 'knowledge_id': knowledge_id}
@@ -327,10 +327,10 @@ class DocumentView(APIView):
             responses=BatchRefreshAPI.get_response(),
             tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
-        @has_permissions([
+        @has_permissions(
             PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_permission(),
             PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_permission(),
-        ])
+        )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(
                 DocumentSerializers.Batch(
@@ -350,10 +350,10 @@ class DocumentView(APIView):
             responses=BatchGenerateRelatedAPI.get_response(),
             tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
-        @has_permissions([
+        @has_permissions(
             PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_permission(),
             PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_permission(),
-        ])
+        )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(DocumentSerializers.BatchGenerateRelated(
                 data={'workspace_id': workspace_id, 'knowledge_id': knowledge_id}
