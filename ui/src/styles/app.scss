@@ -1,3 +1,4 @@
+$primary-color: #3370ff;
 @font-face {
   font-family: AlibabaPuHuiTi;
   src:
@@ -373,6 +374,12 @@ h5 {
 }
 
 // 颜色
+.color-primary-1 {
+  background: rgba($primary-color, 0.1);
+}
+.color-primary {
+  color: var(--el-color-primary);
+}
 .color-text-primary {
   color: var(--el-text-color-primary);
 }

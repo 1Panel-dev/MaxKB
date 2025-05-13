@@ -1,15 +1,20 @@
 <template>
-  <div class="content-container border-r-4 p-16-24">
+  <div class="content-container">
     <div class="content-container__header flex align-center w-full" v-if="slots.header || header">
       <slot name="backButton">
         <back-button :to="backTo" v-if="showBack"></back-button>
       </slot>
-      <slot name="header">
-        <h4>{{ header }}</h4>
-      </slot>
+      <div class="flex-between w-full">
+        <slot name="header">
+          <h4>{{ header }}</h4>
+        </slot>
+        <slot name="search">
+          <h4>{{ header }}</h4>
+        </slot>
+      </div>
     </div>
 
-    <div class="content-container__main">
+    <div class="content-container__main p-16">
       <slot></slot>
     </div>
   </div>
@@ -34,11 +39,10 @@ const showBack = computed(() => {
   transition: 0.3s;
   .content-container__header {
     box-sizing: border-box;
-    padding: calc(var(--app-base-px) * 2) 0;
+    padding: calc(var(--app-base-px) * 2) calc(var(--app-base-px) * 2) 0;
     flex-wrap: wrap;
   }
   .content-container__main {
-    // background-color: var(--app-view-bg-color);
     box-sizing: border-box;
     min-width: 447px;
   }

@@ -43,3 +43,59 @@ $primary-color: #3370ff;
   color: var(--app-text-color-secondary);
   font-size: 16px;
 }
+
+// button
+.el-button {
+  --el-button-font-weight: 400;
+  padding: 5px 12px;
+  &.is-text {
+    padding: 4px !important;
+    font-size: 16px;
+    max-height: 24px;
+    &:not(.is-disabled):hover {
+      background: var(--app-text-color-light-1);
+    }
+  }
+  &:focus {
+    color: var(--el-button-text-color);
+    background-color: var(--el-button-bg-color);
+    border-color: var(--el-button-border-color);
+  }
+  &.is-link:focus {
+    background: none;
+    border: none;
+  }
+}
+.el-button--text {
+  border: none !important;
+  &:focus {
+    border: none !important;
+  }
+}
+.el-button--large {
+  font-size: 16px;
+}
+
+
+// dropdown
+.el-dropdown {
+  color: var(--app-text-color);
+}
+.el-dropdown-menu__item {
+  color: var(--app-text-color);
+  font-weight: 400;
+  padding: 5px 11px;
+  i {
+    margin-right: 8px;
+  }
+  &:not(.is-disabled):focus,
+  &:not(.is-active):focus {
+    background-color: var(--app-text-color-light-1);
+    color: var(--app-text-color);
+  }
+  &.is-active,
+  &.is-active:hover {
+    color: var(--el-menu-active-color);
+    background: var(--el-color-primary-light-9);
+  }
+}

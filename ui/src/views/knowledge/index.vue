@@ -1,7 +1,7 @@
 <template>
   <LayoutContainer class="knowledge-manage">
     <template #left>
-      <h4 class="p-8">{{ $t('views.knowledge.title') }}</h4>
+      <h4 class="p-16 pb-0">{{ $t('views.knowledge.title') }}</h4>
       <folder-tree
         :data="folderList"
         :currentNodeKey="currentFolder?.id"
@@ -107,11 +107,17 @@ function getList() {
 
 function getFolder() {
   const params = {}
-  folder.asynGetFolder('default', 'KNOWLEDGE', params, loading).then((res) => {
+  folder.asynGetFolder('default', 'KNOWLEDGE', params, loading).then((res: any) => {
     folderList.value = res.data
     currentFolder.value = res.data?.[0] || {}
     getList()
   })
+}
+
+function folderClickHandel(row: any) {
+  // currentFolder.value = row
+  // toolList.value = []
+  // getList()
 }
 
 onMounted(() => {

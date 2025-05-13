@@ -64,19 +64,21 @@
 
     <template #mouseEnter>
       <div class="operation-button">
-        <el-tooltip effect="dark" :content="$t('common.modify')" placement="top">
-          <el-button text :disabled="!is_permisstion" @click.stop="openEditModel">
-            <el-icon>
-              <el-icon><EditPen /></el-icon>
-            </el-icon>
-          </el-button>
-        </el-tooltip>
         <el-dropdown trigger="click">
           <el-button text @click.stop>
             <el-icon><MoreFilled /></el-icon>
           </el-button>
           <template #dropdown>
             <el-dropdown-menu>
+              <el-dropdown-item
+                icon="EditPen"
+                :disabled="!is_permisstion"
+                text
+                @click.stop="openEditModel"
+              >
+                {{ $t('common.modify') }}
+              </el-dropdown-item>
+
               <el-dropdown-item
                 v-if="
                   currentModel.model_type === 'TTS' ||
@@ -91,6 +93,7 @@
                 {{ $t('views.model.modelForm.title.paramSetting') }}
               </el-dropdown-item>
               <el-dropdown-item
+                divided
                 icon="Delete"
                 :disabled="!is_permisstion"
                 text
@@ -230,11 +233,8 @@ onBeforeUnmount(() => {
   .operation-button {
     position: absolute;
     right: 12px;
-    top: 18px;
+    bottom: 12px;
     height: auto;
-    .el-button + .el-button {
-      margin-left: 4px;
-    }
   }
   .progress-mask {
     position: absolute;

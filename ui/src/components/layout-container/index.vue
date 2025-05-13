@@ -1,6 +1,6 @@
 <template>
   <div class="layout-container flex h-full">
-    <div class="layout-container__left border-r p-8">
+    <div class="layout-container__left border-r">
       <slot name="left"></slot>
     </div>
     <div class="layout-container__right">

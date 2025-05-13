@@ -8,6 +8,7 @@ import LayoutContainer from './layout-container/index.vue'
 import ContentContainer from './layout-container/ContentContainer.vue'
 import CardBox from './card-box/index.vue'
 import FolderTree from './folder-tree/index.vue'
+import CommonList from './common-list/index.vue'
 export default {
   install(app: App) {
     app.component('LogoFull', LogoFull)
@@ -19,5 +20,6 @@ export default {
     app.component('ContentContainer', ContentContainer)
     app.component('CardBox', CardBox)
     app.component('FolderTree', FolderTree)
+    app.component('CommonList', CommonList)
   },
 }

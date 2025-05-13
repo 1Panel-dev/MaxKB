@@ -1,0 +1,14 @@
+// 复合搜索框
+.complex-search {
+  border: 1px solid var(--el-border-color);
+  border-radius: var(--el-border-radius-base);
+  .el-select__wrapper {
+    box-shadow: none !important;
+  }
+  .el-input__wrapper {
+    box-shadow: none !important;
+  }
+  &__left {
+    border-right: 1px solid var(--el-border-color);
+  }
+}

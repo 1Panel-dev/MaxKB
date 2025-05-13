@@ -1,30 +1,38 @@
 <template>
   <LayoutContainer class="model-manage">
     <template #left>
-      <div class="p-8">
-        <h4 class="p-16">{{ $t('views.model.provider') }}</h4>
-        <div class="model-list-height-left">
-          <div
-            class="all-mode flex cursor"
-            @click="clickListHandle(allObj as Provider)"
-            :class="!active_provider?.provider ? 'all-mode-active' : ''"
-          >
-            <!-- <AppIcon
-              class="mr-8"
-              style="height: 20px; width: 20px"
-              :iconName="'app-all-menu-active'"
-            ></AppIcon> -->
-            <span>{{ $t('views.model.modelType.allModel') }}</span>
-          </div>
+      <h4 class="p-16 mb-8 pb-0">{{ $t('views.model.provider') }}</h4>
+      <div class="model-manage-height-left">
+        <el-scrollbar>
+          <div class="p-8">
+            <div
+              class="all-mode flex cursor"
+              @click="clickListHandle(allObj as Provider)"
+              :class="!active_provider?.provider ? 'all-mode-active color-primary-1' : ''"
+            >
+              <AppIcon
+                class="mr-8 color-primary"
+                style="height: 20px; width: 20px"
+                :iconName="'app-all-menu-active'"
+              ></AppIcon>
+              <span>{{ $t('views.model.modelType.allModel') }}</span>
+            </div>
 
-          <el-scrollbar>
-            <el-collapse class="model-collapse">
-              <el-collapse-item :title="$t('views.model.modelType.publicModel')" name="1">
+            <el-collapse class="model-collapse" expand-icon-position="left">
+              <el-collapse-item
+                :title="$t('views.model.modelType.publicModel')"
+                name="1"
+                icon="CaretRight"
+              >
                 <template #title>
-                  <!-- <img src="@/assets/icon_file-folder_colorful.svg" class="mr-8" /> -->
-                  {{ $t('views.model.modelType.publicModel') }}
+                  <div class="flex align-center">
+                    <AppIcon iconName="app-folder" style="font-size: 20px"></AppIcon>
+                    <span class="ml-8">
+                      {{ $t('views.model.modelType.publicModel') }}
+                    </span>
+                  </div>
                 </template>
-                <!-- <common-list
+                <common-list
                   :data="online_provider_list"
                   v-loading="loading"
                   @click="clickListHandle"
@@ -40,17 +48,25 @@
                         style="height: 20px; width: 20px"
                         class="mr-8"
                       />
-                      <span>{{ row.name }}</span>
+                      <span class="ellipsis-1" :title="row.name">{{ row.name }}</span>
                     </div>
                   </template>
-                </common-list> -->
+                </common-list>
               </el-collapse-item>
-              <el-collapse-item :title="$t('views.model.modelType.privateModel')" name="2">
+              <el-collapse-item
+                :title="$t('views.model.modelType.privateModel')"
+                name="2"
+                icon="CaretRight"
+              >
                 <template #title>
-                  <!-- <img src="@/assets/icon_file-folder_colorful.svg" class="mr-8" /> -->
-                  {{ $t('views.model.modelType.privateModel') }}
+                  <div class="flex align-center">
+                    <AppIcon iconName="app-folder" style="font-size: 20px"></AppIcon>
+                    <span class="ml-8">
+                      {{ $t('views.model.modelType.privateModel') }}
+                    </span>
+                  </div>
                 </template>
-                <!-- <common-list
+                <common-list
                   :data="local_provider_list"
                   v-loading="loading"
                   @click="clickListHandle"
@@ -66,108 +82,111 @@
                         style="height: 20px; width: 20px"
                         class="mr-8"
                       />
-                      <span>{{ row.name }}</span>
+                      <span class="ellipsis-1" :title="row.name">{{ row.name }}</span>
                     </div>
                   </template>
-                </common-list> -->
+                </common-list>
               </el-collapse-item>
             </el-collapse>
-          </el-scrollbar>
-        </div>
+          </div>
+        </el-scrollbar>
       </div>
     </template>
     <ContentContainer :header="active_provider?.name" v-loading="list_model_loading">
-      <div class="flex-between mt-16 mb-16">
-        <el-button type="primary" @click="openCreateModel(active_provider)">
-          {{ $t('views.model.addModel') }}</el-button
-        >
-        <div class="flex-between complex-search">
-          <el-select
-            class="complex-search__left"
-            v-model="search_type"
-            style="width: 120px"
-            @change="search_type_change"
-          >
-            <el-option :label="$t('common.creator')" value="create_user" />
-            <el-option
-              :label="$t('views.model.modelForm.form.permissionType.label')"
-              value="permission_type"
+      <template #search>
+        <div class="flex">
+          <div class="flex-between complex-search">
+            <el-select
+              class="complex-search__left"
+              v-model="search_type"
+              style="width: 120px"
+              @change="search_type_change"
+            >
+              <el-option :label="$t('common.creator')" value="create_user" />
+              <el-option
+                :label="$t('views.model.modelForm.form.permissionType.label')"
+                value="permission_type"
+              />
+              <el-option
+                :label="$t('views.model.modelForm.form.model_type.label')"
+                value="model_type"
+              />
+              <el-option
+                :label="$t('views.model.modelForm.form.templateName.label')"
+                value="name"
+              />
+            </el-select>
+            <el-input
+              v-if="search_type === 'name'"
+              v-model="model_search_form.name"
+              @change="list_model"
+              :placeholder="$t('views.model.searchBar.placeholder')"
+              prefix-icon="Search"
+              style="width: 220px"
+              clearable
             />
-            <el-option
-              :label="$t('views.model.modelForm.form.model_type.label')"
-              value="model_type"
-            />
-            <el-option :label="$t('views.model.modelForm.form.templateName.label')" value="name" />
-          </el-select>
-          <el-input
-            v-if="search_type === 'name'"
-            v-model="model_search_form.name"
-            @change="list_model"
-            :placeholder="$t('views.model.searchBar.placeholder')"
-            prefix-icon="Search"
-            style="width: 220px"
-            clearable
-          />
-          <el-select
-            v-else-if="search_type === 'create_user'"
-            v-model="model_search_form.create_user"
-            @change="list_model"
-            clearable
-            style="width: 220px"
+            <el-select
+              v-else-if="search_type === 'create_user'"
+              v-model="model_search_form.create_user"
+              @change="list_model"
+              clearable
+              style="width: 220px"
+            >
+              <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.username" />
+            </el-select>
+            <el-select
+              v-else-if="search_type === 'permission_type'"
+              v-model="model_search_form.permission_type"
+              clearable
+              @change="list_model"
+              style="width: 220px"
+            >
+              <el-option :label="$t('common.public')" value="PUBLIC" />
+              <el-option :label="$t('common.private')" value="PRIVATE" />
+            </el-select>
+            <el-select
+              v-else-if="search_type === 'model_type'"
+              v-model="model_search_form.model_type"
+              clearable
+              @change="list_model"
+              style="width: 220px"
+            >
+              <template v-for="item in modelTypeList" :key="item.value">
+                <el-option :label="item.text" :value="item.value" />
+              </template>
+            </el-select>
+          </div>
+          <el-button class="ml-16" type="primary" @click="openCreateModel(active_provider)">
+            {{ $t('views.model.addModel') }}</el-button
           >
-            <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.username" />
-          </el-select>
-          <el-select
-            v-else-if="search_type === 'permission_type'"
-            v-model="model_search_form.permission_type"
-            clearable
-            @change="list_model"
-            style="width: 220px"
-          >
-            <el-option :label="$t('common.public')" value="PUBLIC" />
-            <el-option :label="$t('common.private')" value="PRIVATE" />
-          </el-select>
-          <el-select
-            v-else-if="search_type === 'model_type'"
-            v-model="model_search_form.model_type"
-            clearable
-            @change="list_model"
-            style="width: 220px"
-          >
-            <template v-for="item in modelTypeList" :key="item.value">
-              <el-option :label="item.text" :value="item.value" />
-            </template>
-          </el-select>
         </div>
-      </div>
+      </template>
 
       <div class="model-list-height">
         <el-scrollbar>
-          <div>
-            <el-row v-if="model_split_list.length > 0" :gutter="15">
-              <template v-for="(row, index) in model_split_list" :key="index">
-                <el-col
-                  :xs="24"
-                  :sm="12"
-                  :md="12"
-                  :lg="8"
-                  :xl="6"
-                  class="mb-16"
-                  v-for="(model, i) in row"
-                  :key="i"
+          <el-row v-if="model_split_list.length > 0" :gutter="15" class="w-full">
+            <template v-for="(row, index) in model_split_list" :key="index">
+              <el-col
+                :xs="24"
+                :sm="12"
+                :md="12"
+                :lg="8"
+                :xl="6"
+                class="mb-16"
+                v-for="(model, i) in row"
+                :key="i"
+              >
+                <ModelCard
+                  @change="list_model"
+                  :updateModelById="updateModelById"
+                  :model="model"
+                  :provider_list="provider_list"
                 >
-                  <ModelCard
-                    @change="list_model"
-                    :updateModelById="updateModelById"
-                    :model="model"
-                    :provider_list="provider_list"
-                  >
-                  </ModelCard>
-                </el-col>
-              </template>
-            </el-row>
-            <el-empty :description="$t('common.noData')" v-else />
-          </div>
+                </ModelCard>
+              </el-col>
+            </template>
+          </el-row>
+          <el-empty :description="$t('common.noData')" v-else />
         </el-scrollbar>
       </div>
     </ContentContainer>
@@ -304,35 +323,30 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .model-manage {
-  &__left {
-    box-sizing: border-box;
-    width: var(--setting-left-width);
-    min-width: var(--setting-left-width);
-  }
-
   .model-list-height {
-    height: calc(var(--create-dataset-height) - 80px);
+    height: calc(var(--app-main-height));
   }
 
-  .model-list-height-left {
-    height: calc(var(--create-dataset-height) - 40px);
+  .model-manage-height-left {
+    height: calc(var(--app-main-height));
   }
   .all-mode {
-    padding: 10px 16px;
+    padding: 10px 8px;
+    font-weight: 400;
   }
   .all-mode-active {
-    background: var(--el-color-primary-light-9);
     border-radius: 4px;
     color: var(--el-color-primary);
-    font-weight: 500;
+    font-weight: 500 !important;
   }
   .model-collapse {
     border-top: none !important;
     border-bottom: none !important;
     :deep(.el-collapse-item__header) {
       border-bottom: none !important;
-      padding-left: 16px;
+      padding-left: 8px;
       font-size: 14px;
+      font-weight: 400;
       height: 40px;
       background: none;
       &:hover {
@@ -345,11 +359,12 @@ onMounted(() => {
     }
     :deep(.common-list) {
       li {
-        padding-left: 30px !important;
+        padding-left: 50px !important;
       }
     }
     :deep(.el-collapse-item__wrap) {
       border-bottom: none !important;
+      background: none !important;
     }
     :deep(.el-collapse-item__content) {
       padding-bottom: 0 !important;
