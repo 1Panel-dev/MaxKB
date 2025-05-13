@@ -587,9 +587,9 @@ class DocumentSerializers(serializers.Serializer):
         workspace_id = serializers.CharField(required=True, label=_('workspace id'))
         knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
 
-        def is_valid(self, *, raise_exception=True):
+        def is_valid(self, *, instance=None, raise_exception=True):
             super().is_valid(raise_exception=True)
-            files = self.data.get('file')
+            files = instance.get('file')
             for f in files:
                 if f.size > 1024 * 1024 * 100:
                     raise AppApiException(500, _(
@@ -597,8 +597,8 @@ class DocumentSerializers(serializers.Serializer):
                     ).format(100))
 
         def parse(self, instance):
-            self.is_valid(raise_exception=True)
-            DocumentSplitRequest(instance).is_valid(raise_exception=True)
+            self.is_valid(instance=instance, raise_exception=True)
+            DocumentSplitRequest(data=instance).is_valid(raise_exception=True)
 
             file_list = instance.get("file")
             return reduce(
