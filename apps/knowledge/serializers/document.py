@@ -590,11 +590,12 @@ class DocumentSerializers(serializers.Serializer):
         def is_valid(self, *, instance=None, raise_exception=True):
             super().is_valid(raise_exception=True)
             files = instance.get('file')
+            knowledge = Knowledge.objects.filter(id=self.data.get('knowledge_id')).first()
             for f in files:
-                if f.size > 1024 * 1024 * 100:
+                if f.size > 1024 * 1024 * knowledge.file_size_limit:
                     raise AppApiException(500, _(
                         'The maximum size of the uploaded file cannot exceed {}MB'
-                    ).format(100))
+                    ).format(knowledge.file_size_limit))
 
         def parse(self, instance):
             self.is_valid(instance=instance, raise_exception=True)
