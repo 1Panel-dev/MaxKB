@@ -3489,3 +3489,6 @@ msgstr "修改密碼"
 msgid "Get user paginated list"
 msgstr "獲取用戶分頁列表"
 
+msgid "Get default password"
+msgstr "獲取默認密碼"
+

@@ -3311,3 +3311,6 @@ msgstr ""
 #: apps/users/views/user.py:139
 msgid "Get user paginated list"
 msgstr ""
+
+msgid "Get default password"
+msgstr ""

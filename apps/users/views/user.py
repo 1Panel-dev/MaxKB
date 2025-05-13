@@ -15,10 +15,13 @@ from common.auth.authenticate import TokenAuth
 from common.auth.authentication import has_permissions
 from common.constants.permission_constants import PermissionConstants, Permission, Group, Operate
 from common.result import result
+from maxkb.const import CONFIG
 from models_provider.api.model import DefaultModelResponse
 from users.api.user import UserProfileAPI, TestWorkspacePermissionUserApi, DeleteUserApi, EditUserApi, \
-    ChangeUserPasswordApi, UserPageApi, UserListApi
+    ChangeUserPasswordApi, UserPageApi, UserListApi, UserPasswordResponse
 from users.serializers.user import UserProfileSerializer, UserManageSerializer
+
+default_password = CONFIG.get('default_password', 'MaxKB@123..')
 
 
 class UserProfileView(APIView):
@@ -76,6 +79,19 @@ class UserManage(APIView):
     @has_permissions(PermissionConstants.USER_CREATE)
     def post(self, request: Request):
         return result.success(UserManageSerializer().save(request.data))
+
+    class Password(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(methods=['Get'],
+                       summary=_("Get default password"),
+                       description=_("Get default password"),
+                       operation_id=_("Get default password"),  # type: ignore
+                       tags=[_("User management")],  # type: ignore
+                       responses=UserPasswordResponse.get_response())
+        @has_permissions(PermissionConstants.USER_CREATE)
+        def get(self, request: Request):
+            return result.success(data={'password': default_password})
 
     class Operate(APIView):
         authentication_classes = [TokenAuth]

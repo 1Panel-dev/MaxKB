@@ -43,6 +43,22 @@ class UserProfileAPI(APIMixin):
         )]
 
 
+class UserPasswordResponse(APIMixin):
+
+    @staticmethod
+    def get_response():
+        return PasswordResponse
+
+
+class Password(serializers.Serializer):
+    password = serializers.CharField(required=True, label=_('Password'))
+
+
+class PasswordResponse(ResultSerializer):
+    def get_data(self):
+        return Password()
+
+
 class EditUserApi(APIMixin):
     @staticmethod
     def get_parameters():

@@ -3489,3 +3489,5 @@ msgstr "修改密码"
 msgid "Get user paginated list"
 msgstr "获取用户分页列表"
 
+msgid "Get default password"
+msgstr "获取默认密码"
