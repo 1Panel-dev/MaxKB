@@ -80,7 +80,8 @@ class BaseQuestionNode(IQuestionNode):
         self.context['answer'] = details.get('answer')
         self.context['message_tokens'] = details.get('message_tokens')
         self.context['answer_tokens'] = details.get('answer_tokens')
-        self.answer_text = details.get('answer')
+        if self.node_params.get('is_result', False):
+            self.answer_text = details.get('answer')
 
     def execute(self, model_id, system, prompt, dialogue_number, history_chat_record, stream, chat_id, chat_record_id,
                 model_params_setting=None,

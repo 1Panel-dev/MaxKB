@@ -18,7 +18,8 @@ class BaseSpeechToTextNode(ISpeechToTextNode):
 
     def save_context(self, details, workflow_manage):
         self.context['answer'] = details.get('answer')
-        self.answer_text = details.get('answer')
+        if self.node_params.get('is_result', False):
+            self.answer_text = details.get('answer')
 
     def execute(self, stt_model_id, chat_id, audio, **kwargs) -> NodeResult:
         stt_model = get_model_instance_by_model_user_id(stt_model_id, self.flow_params_serializer.data.get('user_id'))
