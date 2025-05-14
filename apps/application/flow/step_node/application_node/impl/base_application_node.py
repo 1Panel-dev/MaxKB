@@ -168,7 +168,8 @@ class BaseApplicationNode(IApplicationNode):
         self.context['question'] = details.get('question')
         self.context['type'] = details.get('type')
         self.context['reasoning_content'] = details.get('reasoning_content')
-        self.answer_text = details.get('answer')
+        if self.node_params.get('is_result', False):
+            self.answer_text = details.get('answer')
 
     def execute(self, application_id, message, chat_id, chat_record_id, stream, re_chat, client_id, client_type,
                 app_document_list=None, app_image_list=None, app_audio_list=None, child_node=None, node_data=None,
