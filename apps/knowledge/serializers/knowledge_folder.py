@@ -8,7 +8,7 @@ class KnowledgeFolderTreeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = KnowledgeFolder
-        fields = ['id', 'name', 'user_id', 'workspace_id', 'parent_id', 'children']
+        fields = ['id', 'name', 'desc', 'user_id', 'workspace_id', 'parent_id', 'children']
 
     def get_children(self, obj):
         return KnowledgeFolderTreeSerializer(obj.get_children(), many=True).data
@@ -19,4 +19,4 @@ class KnowledgeFolderFlatSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = KnowledgeFolder
-        fields = ['id', 'name', 'user_id', 'workspace_id', 'parent_id']
+        fields = ['id', 'name', 'desc', 'user_id', 'workspace_id', 'parent_id']

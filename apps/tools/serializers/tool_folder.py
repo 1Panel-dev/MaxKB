@@ -10,7 +10,7 @@ class ToolFolderTreeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ToolFolder
-        fields = ['id', 'name', 'user_id', 'workspace_id', 'parent_id', 'children']
+        fields = ['id', 'name', 'desc', 'user_id', 'workspace_id', 'parent_id', 'children']
 
     def get_children(self, obj):
         return ToolFolderTreeSerializer(obj.get_children(), many=True).data
@@ -21,4 +21,4 @@ class ToolFolderFlatSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ToolFolder
-        fields = ['id', 'name', 'user_id', 'workspace_id', 'parent_id']
+        fields = ['id', 'name', 'desc', 'user_id', 'workspace_id', 'parent_id']

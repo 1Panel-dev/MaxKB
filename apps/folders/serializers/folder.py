@@ -32,6 +32,7 @@ def get_folder_type(source):
     elif source == Group.APPLICATION.name:
         # todo app folder
         return None
+        # return ApplicationFolder
     elif source == Group.KNOWLEDGE.name:
         return KnowledgeFolder
     else:
@@ -44,6 +45,7 @@ def get_folder_tree_serializer(source):
     elif source == Group.APPLICATION.name:
         # todo app folder
         return None
+        # return ApplicationFolderTreeSerializer
     elif source == Group.KNOWLEDGE.name:
         return KnowledgeFolderTreeSerializer
     else:
