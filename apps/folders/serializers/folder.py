@@ -98,6 +98,7 @@ def get_max_depth(current_node):
 class FolderSerializer(serializers.Serializer):
     id = serializers.CharField(required=True, label=_('folder id'))
     name = serializers.CharField(required=True, label=_('folder name'))
+    desc = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('folder description'))
     user_id = serializers.CharField(required=True, label=_('folder user id'))
     workspace_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('workspace id'))
     parent_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('parent id'))
@@ -124,6 +125,7 @@ class FolderSerializer(serializers.Serializer):
             folder = Folder(
                 id=uuid.uuid7(),
                 name=instance.get('name'),
+                desc=instance.get('desc'),
                 user_id=self.data.get('user_id'),
                 workspace_id=workspace_id,
                 parent_id=parent_id
@@ -145,7 +147,7 @@ class FolderSerializer(serializers.Serializer):
             if current_node is None:
                 raise serializers.ValidationError(_('Folder does not exist'))
 
-            edit_field_list = ['name']
+            edit_field_list = ['name', 'desc']
             edit_dict = {field: instance.get(field) for field in edit_field_list if (
                     field in instance and instance.get(field) is not None)}
 
