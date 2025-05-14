@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import io
 import json
+import os
 import pickle
 import re
 
@@ -10,13 +11,15 @@ from django.db import transaction
 from django.db.models import QuerySet, Q
 from django.http import HttpResponse
 from django.utils.translation import gettext_lazy as _
+from pylint.lint import Run
+from pylint.reporters import JSON2Reporter
 from rest_framework import serializers, status
 
 from common.db.search import page_search
 from common.exception.app_exception import AppApiException
 from common.result import result
 from common.utils.tool_code import ToolExecutor
-from maxkb.const import CONFIG
+from maxkb.const import CONFIG, PROJECT_DIR
 from tools.models import Tool, ToolScope, ToolFolder
 from tools.serializers.tool_folder import ToolFolderFlatSerializer
 
@@ -34,6 +37,25 @@ ALLOWED_CLASSES = {
     ('uuid', 'UUID'),
     ("tools.serializers.tool", "ToolInstance")
 }
+
+
+def to_dict(message, file_name):
+    return {
+        'line': message.line,
+        'column': message.column,
+        'endLine': message.end_line,
+        'endColumn': message.end_column,
+        'message': (message.msg or "").replace(file_name, 'code'),
+        'type': message.category
+    }
+
+
+def get_file_name():
+    file_name = f"{uuid.uuid7()}"
+    pylint_dir = os.path.join(PROJECT_DIR, 'data', 'pylint')
+    if not os.path.exists(pylint_dir):
+        os.makedirs(pylint_dir)
+    return os.path.join(pylint_dir, file_name)
 
 
 class RestrictedUnpickler(pickle.Unpickler):
@@ -164,6 +186,10 @@ class ToolDebugRequest(serializers.Serializer):
     debug_field_list = DebugField(required=True, many=True)
 
 
+class PylintInstance(serializers.Serializer):
+    code = serializers.CharField(required=True, allow_null=True, allow_blank=True, label=_('function content'))
+
+
 class ToolSerializer(serializers.Serializer):
     class Create(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, label=_('user id'))
@@ -286,6 +312,22 @@ class ToolSerializer(serializers.Serializer):
                 return response
             except Exception as e:
                 return result.error(str(e), response_status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        def pylint(self, instance, is_valid=True):
+            if is_valid:
+                self.is_valid(raise_exception=True)
+                PylintInstance(data=instance).is_valid(raise_exception=True)
+            code = instance.get('code')
+            file_name = get_file_name()
+            with open(file_name, 'w') as file:
+                file.write(code)
+            reporter = JSON2Reporter()
+            Run([file_name,
+                 "--disable=line-too-long",
+                 '--module-rgx=[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'],
+                reporter=reporter, exit=False)
+            os.remove(file_name)
+            return [to_dict(m, os.path.basename(file_name)) for m in reporter.messages]
 
     class Import(serializers.Serializer):
         file = UploadedFileField(required=True, label=_("file"))

@@ -4,7 +4,8 @@ from drf_spectacular.utils import OpenApiParameter
 
 from common.mixins.api_mixin import APIMixin
 from common.result import ResultSerializer, DefaultResultSerializer
-from tools.serializers.tool import ToolModelSerializer, ToolCreateRequest, ToolDebugRequest, ToolEditRequest
+from tools.serializers.tool import ToolModelSerializer, ToolCreateRequest, ToolDebugRequest, ToolEditRequest, \
+    PylintInstance
 
 
 class ToolCreateResponse(ResultSerializer):
@@ -209,3 +210,28 @@ class ToolPageAPI(ToolReadAPI):
                 required=False,
             ),
         ]
+
+
+class PylintAPI(APIMixin):
+    @staticmethod
+    def get_parameters():
+        return [
+            OpenApiParameter(
+                name="workspace_id",
+                description="工作空间id",
+                type=OpenApiTypes.STR,
+                location='path',
+                required=True,
+            ),
+            OpenApiParameter(
+                name="tool_id",
+                description="工具id",
+                type=OpenApiTypes.STR,
+                location='path',
+                required=True,
+            )
+        ]
+
+    @staticmethod
+    def get_request():
+        return PylintInstance

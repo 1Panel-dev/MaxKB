@@ -9,7 +9,7 @@ from common.auth.authentication import has_permissions
 from common.constants.permission_constants import PermissionConstants
 from common.result import result
 from tools.api.tool import ToolCreateAPI, ToolEditAPI, ToolReadAPI, ToolDeleteAPI, ToolTreeReadAPI, ToolDebugApi, \
-    ToolExportAPI, ToolImportAPI, ToolPageAPI
+    ToolExportAPI, ToolImportAPI, ToolPageAPI, PylintAPI
 from tools.serializers.tool import ToolSerializer, ToolTreeSerializer
 
 
@@ -174,3 +174,22 @@ class ToolView(APIView):
             return ToolSerializer.Operate(
                 data={'id': tool_id, 'workspace_id': workspace_id}
             ).export()
+
+    class Pylint(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['POST'],
+            summary=_('Check code'),
+            operation_id=_('Check code'),
+            description=_('Check code'),
+            request=PylintAPI.get_request(),
+            responses=PylintAPI.get_response(),
+            parameters=PylintAPI.get_parameters(),
+            tags=[_('Tool')]
+        )
+        @has_permissions(PermissionConstants.TOOL_EXPORT.get_workspace_permission())
+        def post(self, request: Request, workspace_id: str, tool_id: str):
+            return result.success(ToolSerializer.Operate(
+                data={'id': tool_id, 'workspace_id': workspace_id}
+            ).pylint(request.data))
