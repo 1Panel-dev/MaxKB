@@ -135,7 +135,7 @@ class ToolView(APIView):
                     'name': request.query_params.get('name'),
                     'tool_type': request.query_params.get('tool_type'),
                 }
-            ).page(current_page, page_size))
+            ).page_tool_with_folders(current_page, page_size))
 
     class Import(APIView):
         authentication_classes = [TokenAuth]
