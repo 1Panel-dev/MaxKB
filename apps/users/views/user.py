@@ -18,7 +18,7 @@ from common.result import result
 from maxkb.const import CONFIG
 from models_provider.api.model import DefaultModelResponse
 from users.api.user import UserProfileAPI, TestWorkspacePermissionUserApi, DeleteUserApi, EditUserApi, \
-    ChangeUserPasswordApi, UserPageApi, UserListApi, UserPasswordResponse
+    ChangeUserPasswordApi, UserPageApi, UserListApi, UserPasswordResponse, WorkspaceUserAPI
 from users.serializers.user import UserProfileSerializer, UserManageSerializer
 
 default_password = CONFIG.get('default_password', 'MaxKB@123..')
@@ -31,7 +31,7 @@ class UserProfileView(APIView):
                    summary=_("Get current user information"),
                    description=_("Get current user information"),
                    operation_id=_("Get current user information"),  # type: ignore
-                   tags=[_("User management")],  # type: ignore
+                   tags=[_("User Management")],  # type: ignore
                    responses=UserProfileAPI.get_response())
     def get(self, request: Request):
         return result.success(UserProfileSerializer().profile(request.user, request.auth))
@@ -44,7 +44,7 @@ class TestPermissionsUserView(APIView):
                    summary=_("Get current user information"),
                    description=_("Get current user information"),
                    operation_id="测试",
-                   tags=[_("User management")],  # type: ignore
+                   tags=[_("User Management")],  # type: ignore
                    responses=UserProfileAPI.get_response())
     @has_permissions(PermissionConstants.USER_EDIT)
     def get(self, request: Request):
@@ -58,12 +58,26 @@ class TestWorkspacePermissionUserView(APIView):
                    summary="针对工作空间下权限校验",
                    description="针对工作空间下权限校验",
                    operation_id="针对工作空间下权限校验",
-                   tags=[_("User management")],  # type: ignore
+                   tags=[_("User Management")],  # type: ignore
                    responses=UserProfileAPI.get_response(),
                    parameters=TestWorkspacePermissionUserApi.get_parameters())
     @has_permissions(PermissionConstants.USER_EDIT.get_workspace_permission())
     def get(self, request: Request, workspace_id):
         return result.success(UserProfileSerializer().profile(request.user, request.auth))
+
+
+class WorkspaceUserListView(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(methods=['GET'],
+                   summary=_("Get user list under workspace"),
+                   description=_("Get user list under workspace"),
+                   operation_id=_("Get user list under workspace"),  # type: ignore
+                   tags=[_("User Management")],  # type: ignore
+                   parameters=WorkspaceUserAPI.get_parameters(),
+                   responses=WorkspaceUserAPI.get_response())
+    def get(self, request: Request, workspace_id):
+        return result.success(UserManageSerializer().get_user_list(workspace_id))
 
 
 class UserManage(APIView):
@@ -73,7 +87,7 @@ class UserManage(APIView):
                    summary=_("Create user"),
                    description=_("Create user"),
                    operation_id=_("Create user"),  # type: ignore
-                   tags=[_("User management")],  # type: ignore
+                   tags=[_("User Management")],  # type: ignore
                    request=UserProfileAPI.get_request(),
                    responses=UserProfileAPI.get_response())
     @has_permissions(PermissionConstants.USER_CREATE)
@@ -87,7 +101,7 @@ class UserManage(APIView):
                        summary=_("Get default password"),
                        description=_("Get default password"),
                        operation_id=_("Get default password"),  # type: ignore
-                       tags=[_("User management")],  # type: ignore
+                       tags=[_("User Management")],  # type: ignore
                        responses=UserPasswordResponse.get_response())
         @has_permissions(PermissionConstants.USER_CREATE)
         def get(self, request: Request):
@@ -100,7 +114,7 @@ class UserManage(APIView):
                        description=_("Delete user"),
                        summary=_("Delete user"),
                        operation_id=_("Delete user"),  # type: ignore
-                       tags=[_("User management")],  # type: ignore
+                       tags=[_("User Management")],  # type: ignore
                        parameters=DeleteUserApi.get_parameters(),
                        responses=DefaultModelResponse.get_response())
         @has_permissions(PermissionConstants.USER_DELETE)
@@ -111,7 +125,7 @@ class UserManage(APIView):
                        summary=_("Get user information"),
                        description=_("Get user information"),
                        operation_id=_("Get user information"),  # type: ignore
-                       tags=[_("User management")],  # type: ignore
+                       tags=[_("User Management")],  # type: ignore
                        request=DeleteUserApi.get_parameters(),
                        responses=UserProfileAPI.get_response())
         @has_permissions(PermissionConstants.USER_READ)
@@ -122,7 +136,7 @@ class UserManage(APIView):
                        summary=_("Update user information"),
                        description=_("Update user information"),
                        operation_id=_("Update user information"),  # type: ignore
-                       tags=[_("User management")],  # type: ignore
+                       tags=[_("User Management")],  # type: ignore
                        parameters=DeleteUserApi.get_parameters(),
                        request=EditUserApi.get_request(),
                        responses=UserProfileAPI.get_response())
@@ -138,7 +152,7 @@ class UserManage(APIView):
                        summary=_("Change password"),
                        description=_("Change password"),
                        operation_id=_("Change password"),  # type: ignore
-                       tags=[_("User management")],  # type: ignore
+                       tags=[_("User Management")],  # type: ignore
                        parameters=DeleteUserApi.get_parameters(),
                        request=ChangeUserPasswordApi.get_request(),
                        responses=DefaultModelResponse.get_response())
@@ -153,7 +167,7 @@ class UserManage(APIView):
                        summary=_("Get user paginated list"),
                        description=_("Get user paginated list"),
                        operation_id=_("Get user paginated list"),  # type: ignore
-                       tags=[_("User management")],  # type: ignore
+                       tags=[_("User Management")],  # type: ignore
                        parameters=UserPageApi.get_parameters(),
                        responses=UserPageApi.get_response())
         @has_permissions(PermissionConstants.USER_READ)

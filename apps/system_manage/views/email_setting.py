@@ -32,7 +32,7 @@ class SystemSetting(APIView):
                        operation_id=_('Create or update email settings'),  # type: ignore
                        request=EmailSettingAPI.get_request(),
                        responses=EmailSettingAPI.get_response(),
-                       tags=[_('Email settings')])  # type: ignore
+                       tags=[_('Email Settings')])  # type: ignore
         @has_permissions(PermissionConstants.EMAIL_SETTING_EDIT)
         def put(self, request: Request):
             return result.success(
@@ -45,7 +45,7 @@ class SystemSetting(APIView):
             operation_id=_('Test email settings'),  # type: ignore
             request=EmailSettingAPI.get_request(),
             responses=DefaultModelResponse.get_response(),
-            tags=[_('Email settings')]  # type: ignore
+            tags=[_('Email Settings')]  # type: ignore
         )
         @has_permissions(PermissionConstants.EMAIL_SETTING_EDIT)
         def post(self, request: Request):
@@ -58,7 +58,7 @@ class SystemSetting(APIView):
                        description=_('Get email settings'),
                        operation_id=_('Get email settings'),  # type: ignore
                        responses=DefaultModelResponse.get_response(),
-                       tags=[_('Email settings')])  # type: ignore
+                       tags=[_('Email Settings')])  # type: ignore
         @has_permissions(PermissionConstants.EMAIL_SETTING_READ)
         def get(self, request: Request):
             return result.success(

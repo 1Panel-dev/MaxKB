@@ -43,6 +43,32 @@ class UserProfileAPI(APIMixin):
         )]
 
 
+class WorkspaceUserAPI(APIMixin):
+    @staticmethod
+    def get_parameters():
+        return [OpenApiParameter(
+            name="workspace_id",
+            description=_('Workspace ID'),
+            type=OpenApiTypes.STR,
+            location=OpenApiParameter.PATH,
+            required=True,
+        )]
+
+    @staticmethod
+    def get_response():
+        return WorkspaceUserListResponse
+
+
+class WorkspaceUser(serializers.Serializer):
+    id = serializers.CharField(required=True, label=_('id'))
+    username = serializers.CharField(required=True, label=_('Username'))
+
+
+class WorkspaceUserListResponse(ResultSerializer):
+    def get_data(self):
+        return serializers.ListSerializer(child=WorkspaceUser())
+
+
 class UserPasswordResponse(APIMixin):
 
     @staticmethod

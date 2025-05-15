@@ -21,7 +21,7 @@ class LoginView(APIView):
                    description=_("Log in"),
                    summary=_("Log in"),
                    operation_id=_("Log in"),  # type: ignore
-                   tags=[_("User management")],  # type: ignore
+                   tags=[_("User Management")],  # type: ignore
                    request=LoginAPI.get_request(),
                    responses=LoginAPI.get_response())
     def post(self, request: Request):
@@ -33,7 +33,7 @@ class CaptchaView(APIView):
                    summary=_("Get captcha"),
                    description=_("Get captcha"),
                    operation_id=_("Get captcha"),  # type: ignore
-                   tags=[_("User management")],  # type: ignore
+                   tags=[_("User Management")],  # type: ignore
                    responses=CaptchaAPI.get_response())
     def get(self, request: Request):
         return result.success(CaptchaSerializer().generate())

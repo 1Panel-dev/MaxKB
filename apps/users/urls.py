@@ -8,6 +8,8 @@ urlpatterns = [
     path('user/profile', views.UserProfileView.as_view(), name="user_profile"),
     path('user/captcha', views.CaptchaView.as_view(), name='captcha'),
     path('user/test', views.TestPermissionsUserView.as_view(), name="test"),
+    path('workspace/<str:workspace_id>/user_list', views.WorkspaceUserListView.as_view(),
+         name="test_workspace_id_permission"),
     path('workspace/<str:workspace_id>/user/profile', views.TestWorkspacePermissionUserView.as_view(),
          name="test_workspace_id_permission"),
     path("user_manage", views.UserManage.as_view(), name="user_manage"),

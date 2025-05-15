@@ -372,3 +372,23 @@ class UserManageSerializer(serializers.Serializer):
             user.password = password_encrypt(instance.get('password'))
             user.save()
             return True
+
+    def get_user_list(self, workspace_id):
+        """
+        获取用户列表
+        :param workspace_id: 工作空间ID
+        :return: 用户列表
+        """
+        workspace_user_role_mapping_model = DatabaseModelManage.get_model("workspace_user_role_mapping")
+        if workspace_user_role_mapping_model:
+            user_ids = (
+                workspace_user_role_mapping_model.objects
+                .filter(workspace_id=workspace_id)
+                .values_list('user_id', flat=True)
+                .distinct()
+            )
+        else:
+            user_ids = User.objects.values_list('id', flat=True)
+
+        users = User.objects.filter(id__in=user_ids).values('id', 'username')
+        return list(users)
