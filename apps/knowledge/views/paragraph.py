@@ -212,6 +212,7 @@ class ParagraphView(APIView):
             description=_('Disassociation issue'),
             operation_id=_('Disassociation issue'),  # type: ignore
             parameters=UnAssociationAPI.get_parameters(),
+            request=UnAssociationAPI.get_request(),
             responses=UnAssociationAPI.get_response(),
             tags=[_('Knowledge Base/Documentation/Paragraph')]  # type: ignore
         )
@@ -236,6 +237,7 @@ class ParagraphView(APIView):
             description=_('Related questions'),
             operation_id=_('Related questions'),  # type: ignore
             parameters=AssociationAPI.get_parameters(),
+            request=AssociationAPI.get_request(),
             responses=AssociationAPI.get_response(),
             tags=[_('Knowledge Base/Documentation/Paragraph')]  # type: ignore
         )
