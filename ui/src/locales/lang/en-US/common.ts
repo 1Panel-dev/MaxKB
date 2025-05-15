@@ -44,12 +44,14 @@ export default {
     document: 'Documents',
     image: 'Image',
     audio: 'Audio',
-    video: 'Video'
+    video: 'Video',
   },
   status: {
     label: 'Status',
+    enabled: 'Enabled',
+    disabled: 'Disabled',
     enableSuccess: 'Successful',
-    disableSuccess: 'Successful'
+    disableSuccess: 'Successful',
   },
   param: {
     outputParam: 'Output Parameters',
@@ -60,5 +62,5 @@ export default {
   inputPlaceholder: 'Please input',
   title: 'Title',
   content: 'Content',
-  rename: 'Rename'
+  rename: 'Rename',
 }

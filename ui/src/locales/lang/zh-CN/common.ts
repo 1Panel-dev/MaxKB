@@ -52,8 +52,10 @@ export default {
   },
   status: {
     label: '状态',
+    enabled: '已启用',
+    disabled: '已禁用',
     enableSuccess: '启用成功',
-    disableSuccess: '禁用成功'
+    disableSuccess: '禁用成功',
   },
   inputPlaceholder: '请输入',
   title: '标题',
@@ -61,7 +63,7 @@ export default {
   param: {
     outputParam: '输出参数',
     inputParam: '输入参数',
-    initParam: '启动参数'
+    initParam: '启动参数',
   },
-  rename: '重命名'
+  rename: '重命名',
 }

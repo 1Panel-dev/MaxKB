@@ -55,7 +55,7 @@ const option_list = computed(() => {
   border-radius: 4px;
   font-weight: 400;
   font-size: 14px;
-  color: #1f2329;
+  color: var(--el-text-color-primary);
   padding: 3px 4px;
   box-sizing: border-box;
   white-space: nowrap;

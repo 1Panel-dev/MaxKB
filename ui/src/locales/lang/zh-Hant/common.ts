@@ -44,12 +44,14 @@ export default {
     document: '文檔',
     image: '圖片',
     audio: '音頻',
-    video: '視頻'
+    video: '視頻',
   },
   status: {
     label: '狀態',
+    enabled: '已啟用',
+    disabled: '已停用',
     enableSuccess: '啟用成功',
-    disableSuccess: '停用成功'
+    disableSuccess: '停用成功',
   },
   inputPlaceholder: '請輸入',
   title: '標題',
@@ -59,5 +61,5 @@ export default {
     inputParam: '輸入參數',
     initParam: '啟動參數',
   },
-  rename: '重命名'
+  rename: '重命名',
 }

@@ -6,7 +6,6 @@ $primary-color: #3370ff;
   // --el-menu-item-height: 45px;
   // --el-box-shadow-light: 0px 2px 4px 0px rgba(31, 35, 41, 0.12);
   // --el-border-color: #dee0e3;
-  // --el-text-color-regular: #1f2329;
   // --el-color-info: #8f959e !important;
   // --el-disabled-bg-color: #eff0f1 !important;
 
@@ -79,19 +78,20 @@ $primary-color: #3370ff;
 
 // dropdown
 .el-dropdown {
-  color: var(--app-text-color);
+  color: var(--el-text-color-primary);
 }
 .el-dropdown-menu__item {
-  color: var(--app-text-color);
+  color: var(--el-text-color-primary);
   font-weight: 400;
   padding: 5px 11px;
+  min-width: 80px;
   i {
     margin-right: 8px;
   }
   &:not(.is-disabled):focus,
   &:not(.is-active):focus {
     background-color: var(--app-text-color-light-1);
-    color: var(--app-text-color);
+    color: var(--el-text-color-primary);
   }
   &.is-active,
   &.is-active:hover {

@@ -48,21 +48,110 @@
       </template>
 
       <div>
-        <el-row v-if="toolList.length > 0" :gutter="15">
+        <el-row v-if="toolFolderList.length > 0 || toolList.length > 0" :gutter="15">
+          <template v-for="(item, index) in toolFolderList" :key="index">
+            <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" class="mb-16">
+              <CardBox
+                :title="item.name"
+                :description="item.desc || $t('common.noData')"
+                class="cursor"
+              >
+                <template #icon>
+                  <el-avatar shape="square" :size="32" style="background: none">
+                    <AppIcon iconName="app-folder" style="font-size: 32px"></AppIcon>
+                  </el-avatar>
+                </template>
+                <template #subTitle>
+                  <el-text class="color-secondary lighter" size="small">
+                    {{ $t('common.creator') }}: {{ item.username }}
+                  </el-text>
+                </template>
+              </CardBox>
+            </el-col>
+          </template>
+
           <template v-for="(item, index) in toolList" :key="index">
             <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" class="mb-16">
               <CardBox :title="item.name" :description="item.desc" class="cursor">
                 <template #icon>
-                  <el-avatar class="mr-8 avatar-green" shape="square" :size="32">
+                  <el-avatar class="avatar-green" shape="square" :size="32">
                     <img src="@/assets/node/icon_tool.svg" style="width: 58%" alt="" />
                   </el-avatar>
                 </template>
                 <template #subTitle>
-                  <el-text class="color-secondary" size="small">
-                    <auto-tooltip :content="item.username">
-                      {{ $t('common.creator') }}: {{ item.username }}
-                    </auto-tooltip>
+                  <el-text class="color-secondary lighter" size="small">
+                    {{ $t('common.creator') }}: {{ item.username }}
                   </el-text>
+                </template>
+
+                <template #footer>
+                  <div v-if="item.is_active" class="flex align-center">
+                    <el-icon class="color-success mr-8" style="font-size: 16px"
+                      ><SuccessFilled
+                    /></el-icon>
+                    <span class="color-secondary">
+                      {{ $t('common.status.enabled') }}
+                    </span>
+                  </div>
+                  <div v-else class="flex align-center">
+                    <AppIcon iconName="app-disabled" class="color-secondary mr-8"></AppIcon>
+                    <span class="color-secondary">
+                      {{ $t('common.status.disabled') }}
+                    </span>
+                  </div>
+                </template>
+                <template #mouseEnter>
+                  <div @click.stop>
+                    <el-switch
+                      v-model="item.is_active"
+                      :before-change="() => changeState(item)"
+                      size="small"
+                      class="mr-4"
+                    />
+                    <el-divider direction="vertical" />
+                    <el-dropdown trigger="click">
+                      <el-button text @click.stop>
+                        <el-icon><MoreFilled /></el-icon>
+                      </el-button>
+                      <!-- <template #dropdown>
+                        <el-dropdown-menu>
+                          <el-dropdown-item
+                            v-if="!item.template_id"
+                            @click.stop="openCreateDialog(item)"
+                          >
+                            <el-icon><EditPen /></el-icon>
+                            {{ $t('common.edit') }}
+                          </el-dropdown-item>
+                          <el-dropdown-item
+                            :disabled="item.permission_type === 'PUBLIC' && !canEdit(item)"
+                            v-if="!item.template_id"
+                            @click.stop="copyFunctionLib(item)"
+                          >
+                            <AppIcon iconName="app-copy"></AppIcon>
+                            {{ $t('common.copy') }}
+                          </el-dropdown-item>
+                          <el-dropdown-item
+                            v-if="item.init_field_list?.length > 0"
+                            @click.stop="configInitParams(item)"
+                          >
+                            <AppIcon iconName="app-operation" class="mr-4"></AppIcon>
+                            {{ $t('common.param.initParam') }}
+                          </el-dropdown-item>
+                          <el-dropdown-item
+                            v-if="!item.template_id"
+                            @click.stop="exportFunctionLib(item)"
+                          >
+                            <AppIcon iconName="app-export"></AppIcon>
+                            {{ $t('common.export') }}
+                          </el-dropdown-item>
+                          <el-dropdown-item divided @click.stop="deleteFunctionLib(item)">
+                            <el-icon><Delete /></el-icon>
+                            {{ $t('common.delete') }}
+                          </el-dropdown-item>
+                        </el-dropdown-menu>
+                      </template> -->
+                    </el-dropdown>
+                  </div>
                 </template>
               </CardBox>
             </el-col>
@@ -71,6 +160,7 @@
         <el-empty :description="$t('common.noData')" v-else />
       </div>
     </ContentContainer>
+    <InitParamDrawer ref="InitParamDrawerRef" @refresh="refresh" />
   </LayoutContainer>
 </template>
 
@@ -78,10 +168,13 @@
 import { onMounted, ref, reactive, computed } from 'vue'
 import ToolApi from '@/api/tool/tool'
 import useStore from '@/stores'
-import { numberFormat } from '@/utils/common'
+import { MsgConfirm } from '@/utils/message'
+import InitParamDrawer from '@/views/tool/component/InitParamDrawer.vue'
 import { t } from '@/locales'
 
 const { folder } = useStore()
+
+const InitParamDrawerRef = ref()
 
 const search_type = ref('name')
 const search_form = ref<{
@@ -94,6 +187,7 @@ const search_form = ref<{
 const user_options = ref<any[]>([])
 
 const loading = ref(false)
+const changeStateloading = ref(false)
 const paginationConfig = reactive({
   current_page: 1,
   page_size: 30,
@@ -102,6 +196,7 @@ const paginationConfig = reactive({
 
 const folderList = ref<any[]>([])
 const toolList = ref<any[]>([])
+const toolFolderList = ref<any[]>([])
 const currentFolder = ref<any>({})
 
 const search_type_change = () => {
@@ -114,8 +209,9 @@ function getList() {
     tool_type: 'CUSTOM',
   }
   ToolApi.getToolList('default', paginationConfig, params, loading).then((res) => {
-    paginationConfig.total = res.data.total
-    toolList.value = [...toolList.value, ...res.data.records]
+    toolFolderList.value = res.data?.folders
+    paginationConfig.total = res.data?.tools.total
+    toolList.value = [...toolList.value, ...res.data?.tools.records]
   })
 }
 
@@ -126,6 +222,61 @@ function getFolder() {
     currentFolder.value = res.data?.[0] || {}
     getList()
   })
+}
+
+async function changeState(row: any) {
+  // if (!bool) {
+  //   MsgConfirm(
+  //     `${t('views.functionLib.disabled.confirmTitle')}${row.name} ?`,
+  //     t('views.functionLib.disabled.confirmMessage'),
+  //     {
+  //       confirmButtonText: t('views.functionLib.setting.disabled'),
+  //       confirmButtonClass: 'danger',
+  //     },
+  //   )
+  //     .then(() => {
+  //       const obj = {
+  //         is_active: bool,
+  //       }
+  //       ToolApi.putToolLib('default', row.id, obj, changeStateloading).then((res) => {})
+  //     })
+  //     .catch(() => {
+  //       row.is_active = true
+  //     })
+  // } else {
+  //   const res = await ToolApi.getToolById('default', row.id, changeStateloading)
+  //   if (
+  //     !res.data.init_params &&
+  //     res.data.init_field_list &&
+  //     res.data.init_field_list.length > 0 &&
+  //     res.data.init_field_list.filter((item: any) => item.default_value && item.show_default_value)
+  //       .length !== res.data.init_field_list.length
+  //   ) {
+  //     row.is_active = false
+  //     InitParamDrawerRef.value.open(res.data, bool)
+  //     return
+  //   }
+  //   const obj = {
+  //     is_active: bool,
+  //   }
+  //   ToolApi.putToolLib('default', row.id, obj, changeStateloading).then((res) => {})
+  // }
+}
+
+function refresh(data: any) {
+  if (data) {
+    const index = toolList.value.findIndex((v) => v.id === data.id)
+    // if (user.userInfo && data.user_id === user.userInfo.id) {
+    //   data.username = user.userInfo.username
+    // } else {
+    //   data.username = userOptions.value.find((v) => v.value === data.user_id)?.label
+    // }
+    toolList.value.splice(index, 1, data)
+  }
+  paginationConfig.total = 0
+  paginationConfig.current_page = 1
+  toolList.value = []
+  getList()
 }
 
 function folderClickHandel(row: any) {

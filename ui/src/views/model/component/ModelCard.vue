@@ -1,7 +1,7 @@
 <template>
   <card-box :title="model.name" shadow="hover" class="model-card">
     <template #icon>
-      <span style="height: 32px; width: 32px" :innerHTML="icon" class="mr-12"></span>
+      <span style="height: 32px; width: 32px" :innerHTML="icon"></span>
     </template>
     <template #title>
       <div class="flex" style="height: 22px">
@@ -23,12 +23,12 @@
       </div>
     </template>
     <template #subTitle>
-      <el-text class="color-secondary" size="small">
+      <el-text class="color-secondary lighter" size="small">
         {{ $t('common.creator') }}: {{ model.username }}
       </el-text>
     </template>
     <ul>
-      <li class="flex">
+      <li class="flex mb-4">
         <el-text type="info" class="color-secondary">{{
           $t('views.model.modelForm.model_type.label')
         }}</el-text>
@@ -63,48 +63,46 @@
     </div>
 
     <template #mouseEnter>
-      <div class="operation-button">
-        <el-dropdown trigger="click">
-          <el-button text @click.stop>
-            <el-icon><MoreFilled /></el-icon>
-          </el-button>
-          <template #dropdown>
-            <el-dropdown-menu>
-              <el-dropdown-item
-                icon="EditPen"
-                :disabled="!is_permisstion"
-                text
-                @click.stop="openEditModel"
-              >
-                {{ $t('common.modify') }}
-              </el-dropdown-item>
+      <el-dropdown trigger="click">
+        <el-button text @click.stop>
+          <el-icon><MoreFilled /></el-icon>
+        </el-button>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item
+              icon="EditPen"
+              :disabled="!is_permisstion"
+              text
+              @click.stop="openEditModel"
+            >
+              {{ $t('common.modify') }}
+            </el-dropdown-item>
 
-              <el-dropdown-item
-                v-if="
-                  currentModel.model_type === 'TTS' ||
-                  currentModel.model_type === 'LLM' ||
-                  currentModel.model_type === 'IMAGE' ||
-                  currentModel.model_type === 'TTI'
-                "
-                :disabled="!is_permisstion"
-                icon="Setting"
-                @click.stop="openParamSetting"
-              >
-                {{ $t('views.model.modelForm.title.paramSetting') }}
-              </el-dropdown-item>
-              <el-dropdown-item
-                divided
-                icon="Delete"
-                :disabled="!is_permisstion"
-                text
-                @click.stop="deleteModel"
-              >
-                {{ $t('common.delete') }}
-              </el-dropdown-item>
-            </el-dropdown-menu>
-          </template>
-        </el-dropdown>
-      </div>
+            <el-dropdown-item
+              v-if="
+                currentModel.model_type === 'TTS' ||
+                currentModel.model_type === 'LLM' ||
+                currentModel.model_type === 'IMAGE' ||
+                currentModel.model_type === 'TTI'
+              "
+              :disabled="!is_permisstion"
+              icon="Setting"
+              @click.stop="openParamSetting"
+            >
+              {{ $t('views.model.modelForm.title.paramSetting') }}
+            </el-dropdown-item>
+            <el-dropdown-item
+              divided
+              icon="Delete"
+              :disabled="!is_permisstion"
+              text
+              @click.stop="deleteModel"
+            >
+              {{ $t('common.delete') }}
+            </el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
     </template>
     <EditModel ref="editModelRef" @submit="emit('change')"></EditModel>
     <ParamSettingDialog ref="paramSettingRef" :model="model" />

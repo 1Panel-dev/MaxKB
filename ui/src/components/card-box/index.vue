@@ -2,12 +2,14 @@
   <el-card shadow="hover" class="card-box" @mouseenter="cardEnter()" @mouseleave="cardLeave()">
     <div class="card-header">
       <slot name="header">
-        <div class="title flex align-center" :class="$slots.subTitle ? 'mt-4' : ''">
-          <slot name="icon">
-            <el-avatar v-if="showIcon" class="mr-12 avatar-blue" shape="square" :size="32">
-              <img src="@/assets/knowledge/icon_document.svg" style="width: 58%" alt="" />
-            </el-avatar>
-          </slot>
+        <div class="title flex align-center">
+          <div class="mr-12 flex align-center" v-if="showIcon">
+            <slot name="icon">
+              <el-avatar shape="square" :size="32" class="avatar-blue">
+                <img src="@/assets/knowledge/icon_document.svg" style="width: 58%" alt="" />
+              </el-avatar>
+            </slot>
+          </div>
           <div style="width: 90%">
             <slot name="title">
               <div>
@@ -21,16 +23,19 @@
     </div>
     <div class="description break-all mt-12">
       <slot>
-        <div class="content">
+        <div class="content color-secondary">
           {{ description }}
         </div>
       </slot>
     </div>
-    <div @mouseenter="subHoveredEnter">
-      <slot name="mouseEnter" v-if="$slots.mouseEnter && show" />
-    </div>
-    <div class="card-footer" v-if="$slots.footer">
-      <slot name="footer" />
+
+    <div class="card-footer flex-between" v-if="$slots.footer || $slots.mouseEnter">
+      <div>
+        <slot name="footer"></slot>
+      </div>
+      <div @mouseenter="subHoveredEnter">
+        <slot name="mouseEnter" v-if="$slots.mouseEnter && show" />
+      </div>
     </div>
   </el-card>
 </template>
@@ -80,11 +85,12 @@ function subHoveredEnter() {
   min-width: var(--card-min-width);
   border-radius: 8px;
   .card-header {
-    margin-top: -10px;
+    margin-top: -5px;
   }
   .description {
     line-height: 22px;
     font-weight: 400;
+    min-height: 70px;
     .content {
       display: -webkit-box;
       height: var(--app-card-box-description-height, 40px);
@@ -96,7 +102,7 @@ function subHoveredEnter() {
 
   .card-footer {
     position: absolute;
-    bottom: 4px;
+    bottom: 8px;
     left: 0;
     min-height: 30px;
     font-weight: 400;

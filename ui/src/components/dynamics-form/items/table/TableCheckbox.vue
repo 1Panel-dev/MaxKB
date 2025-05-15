@@ -193,7 +193,7 @@ const activeText = computed(() => {
     justify-content: space-between;
     margin-bottom: 16px;
     .title {
-      color: #1f2329;
+      color: var(--el-text-color-primary);
       font-weight: 400;
       font-size: 14px;
       line-height: 22px;

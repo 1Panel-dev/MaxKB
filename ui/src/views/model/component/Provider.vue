@@ -96,7 +96,7 @@ import { modelTypeList, allObj } from '@/views/model/component/data'
 const props = defineProps<{
   data: Array<Provider>
   loading: boolean
-  active: Provider
+  active?: Provider
 }>()
 const emit = defineEmits(['click'])
 

@@ -2,6 +2,7 @@ import { Result } from '@/request/Result'
 import { get, post, del, put } from '@/request/index'
 import { type Ref } from 'vue'
 import type { pageRequest } from '@/api/type/common'
+import type { toolData } from '@/api/type/tool'
 const prefix = '/workspace'
 
 /**
@@ -38,7 +39,37 @@ const getToolList: (
   )
 }
 
+/**
+ * 修改工具
+ * @param 参数
+
+ */
+const putToolLib: (
+  wordspace_id: string,
+  tool_id: string,
+  data: toolData,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (wordspace_id, tool_id, data, loading) => {
+  return put(`${prefix}/${wordspace_id}/tool/${tool_id}`, data, undefined, loading)
+}
+
+/**
+ * 获取工具详情
+ * @param tool_id 工具id
+ * @param loading 加载器
+ * @returns 函数详情
+ */
+const getToolById: (
+  wordspace_id: string,
+  tool_id: String,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (wordspace_id, function_lib_id, loading) => {
+  return get(`${prefix}/${wordspace_id}/tool/${function_lib_id}`, undefined, loading)
+}
+
 export default {
   getToolByFolder,
   getToolList,
+  putToolLib,
+  getToolById
 }
