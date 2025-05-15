@@ -23,8 +23,10 @@ class ModelManage:
         model_instance = ModelManage.cache.get(_id)
         if model_instance is None:
             with _lock:
-                model_instance = get_model(_id)
-                ModelManage.cache.set(_id, model_instance, timeout=60 * 60 * 8)
+                model_instance = ModelManage.cache.get(_id)
+                if model_instance is None:
+                    model_instance = get_model(_id)
+                    ModelManage.cache.set(_id, model_instance, timeout=60 * 60 * 8)
         else:
             if model_instance.is_cache_model():
                 ModelManage.cache.touch(_id, timeout=60 * 60 * 8)
