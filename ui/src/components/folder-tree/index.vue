@@ -5,7 +5,7 @@
       :placeholder="$t('common.search')"
       prefix-icon="Search"
       clearable
-      class="p-16"
+      class="p-8"
     />
     <el-tree
       ref="treeRef"

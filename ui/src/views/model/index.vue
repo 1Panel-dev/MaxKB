@@ -32,7 +32,6 @@
               v-model="model_search_form.name"
               @change="list_model"
               :placeholder="$t('views.model.searchBar.placeholder')"
-              prefix-icon="Search"
               style="width: 220px"
               clearable
             />

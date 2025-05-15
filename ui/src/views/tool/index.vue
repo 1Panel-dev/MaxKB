@@ -6,13 +6,47 @@
         :data="folderList"
         :currentNodeKey="currentFolder?.id"
         @handleNodeClick="folderClickHandel"
+        class="p-8"
       />
     </template>
-    <ContentContainer>
-      <div class="flex-between mb-16">
-        <h4>{{ currentFolder?.name }}</h4>
-        <div class="flex-between"></div>
-      </div>
+    <ContentContainer :header="currentFolder?.name">
+      <template #search>
+        <div class="flex">
+          <div class="flex-between complex-search">
+            <el-select
+              class="complex-search__left"
+              v-model="search_type"
+              style="width: 120px"
+              @change="search_type_change"
+            >
+              <el-option :label="$t('common.creator')" value="create_user" />
+
+              <el-option :label="$t('views.model.modelForm.modeName.label')" value="name" />
+            </el-select>
+            <el-input
+              v-if="search_type === 'name'"
+              v-model="search_form.name"
+              @change="getList"
+              :placeholder="$t('views.model.searchBar.placeholder')"
+              style="width: 220px"
+              clearable
+            />
+            <el-select
+              v-else-if="search_type === 'create_user'"
+              v-model="search_form.create_user"
+              @change="getList"
+              clearable
+              style="width: 220px"
+            >
+              <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.username" />
+            </el-select>
+          </div>
+          <!-- <el-button class="ml-16" type="primary" @click="openCreateModel(active_provider)">
+            {{ $t('views.model.addModel') }}</el-button
+          > -->
+        </div>
+      </template>
+
       <div>
         <el-row v-if="toolList.length > 0" :gutter="15">
           <template v-for="(item, index) in toolList" :key="index">
@@ -48,6 +82,17 @@ import { numberFormat } from '@/utils/common'
 import { t } from '@/locales'
 
 const { folder } = useStore()
+
+const search_type = ref('name')
+const search_form = ref<{
+  name: string
+  create_user: string
+}>({
+  name: '',
+  create_user: '',
+})
+const user_options = ref<any[]>([])
+
 const loading = ref(false)
 const paginationConfig = reactive({
   current_page: 1,
@@ -58,6 +103,10 @@ const paginationConfig = reactive({
 const folderList = ref<any[]>([])
 const toolList = ref<any[]>([])
 const currentFolder = ref<any>({})
+
+const search_type_change = () => {
+  search_form.value = { name: '', create_user: '' }
+}
 
 function getList() {
   const params = {
