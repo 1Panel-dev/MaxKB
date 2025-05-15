@@ -25,16 +25,14 @@ class ModelManage:
             with _lock:
                 model_instance = get_model(_id)
                 ModelManage.cache.set(_id, model_instance, timeout=60 * 60 * 8)
-                ModelManage.clear_timeout_cache()
-                return model_instance
         else:
             if model_instance.is_cache_model():
                 ModelManage.cache.touch(_id, timeout=60 * 60 * 8)
-                return model_instance
             else:
                 model_instance = get_model(_id)
                 ModelManage.cache.set(_id, model_instance, timeout=60 * 60 * 8)
-                return model_instance
+        ModelManage.clear_timeout_cache()
+        return model_instance
 
     @staticmethod
     def clear_timeout_cache():
