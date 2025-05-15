@@ -392,6 +392,7 @@ class ToolTreeSerializer(serializers.Serializer):
         workspace_id = serializers.CharField(required=True, label=_('workspace id'))
         folder_id = serializers.CharField(required=True, label=_('folder id'))
         name = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('tool name'))
+        user_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('user id'))
         tool_type = serializers.CharField(required=True, label=_('tool type'))
 
         def page_tool(self, current_page: int, page_size: int):
@@ -408,10 +409,12 @@ class ToolTreeSerializer(serializers.Serializer):
                 tools = QuerySet(Tool).filter(Q(workspace_id=self.data.get('workspace_id')) &
                                               Q(folder_id__in=all_folders) &
                                               Q(tool_type=self.data.get('tool_type')) &
+                                              Q(user_id=self.data.get('user_id')) &
                                               Q(name__contains=self.data.get('name')))
             else:
                 tools = QuerySet(Tool).filter(Q(workspace_id=self.data.get('workspace_id')) &
                                               Q(folder_id__in=all_folders) &
+                                              Q(user_id=self.data.get('user_id')) &
                                               Q(tool_type=self.data.get('tool_type')))
             return page_search(current_page, page_size, tools, lambda record: ToolModelSerializer(record).data)
 

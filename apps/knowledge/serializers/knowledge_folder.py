@@ -15,8 +15,6 @@ class KnowledgeFolderTreeSerializer(serializers.ModelSerializer):
 
 
 class KnowledgeFolderFlatSerializer(serializers.ModelSerializer):
-    children = serializers.SerializerMethodField()
-
     class Meta:
         model = KnowledgeFolder
         fields = ['id', 'name', 'desc', 'user_id', 'workspace_id', 'parent_id']

@@ -195,6 +195,13 @@ class ToolPageAPI(ToolReadAPI):
                 required=True,
             ),
             OpenApiParameter(
+                name="user_id",
+                description="创建者id",
+                type=OpenApiTypes.STR,
+                location='query',
+                required=False,
+            ),
+            OpenApiParameter(
                 name="tool_type",
                 description="工具类型",
                 type=OpenApiTypes.STR,
