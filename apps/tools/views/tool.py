@@ -181,12 +181,12 @@ class ToolView(APIView):
         @extend_schema(
             methods=['POST'],
             summary=_('Check code'),
-            operation_id=_('Check code'),
+            operation_id=_('Check code'), # type: ignore
             description=_('Check code'),
             request=PylintAPI.get_request(),
             responses=PylintAPI.get_response(),
             parameters=PylintAPI.get_parameters(),
-            tags=[_('Tool')]
+            tags=[_('Tool')] # type: ignore
         )
         @has_permissions(PermissionConstants.TOOL_EXPORT.get_workspace_permission())
         def post(self, request: Request, workspace_id: str, tool_id: str):

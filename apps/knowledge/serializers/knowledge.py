@@ -23,10 +23,11 @@ from common.utils.common import valid_license, post, get_file_content
 from common.utils.fork import Fork, ChildLink
 from common.utils.split_model import get_split_model
 from knowledge.models import Knowledge, KnowledgeScope, KnowledgeType, Document, Paragraph, Problem, \
-    ProblemParagraphMapping, ApplicationKnowledgeMapping, TaskType, State, SearchMode
+    ProblemParagraphMapping, ApplicationKnowledgeMapping, TaskType, State, SearchMode, KnowledgeFolder
 from knowledge.serializers.common import ProblemParagraphManage, get_embedding_model_id_by_knowledge_id, MetaSerializer, \
     GenerateRelatedSerializer, get_embedding_model_by_knowledge_id, list_paragraph
 from knowledge.serializers.document import DocumentSerializers
+from knowledge.serializers.knowledge_folder import KnowledgeFolderFlatSerializer
 from knowledge.task.embedding import embedding_by_knowledge, delete_embedding_by_knowledge
 from knowledge.task.generate import generate_related_by_knowledge_id
 from knowledge.task.sync import sync_web_knowledge, sync_replace_web_knowledge
@@ -136,15 +137,27 @@ class KnowledgeSerializer(serializers.Serializer):
 
         def page(self, current_page: int, page_size: int):
             self.is_valid(raise_exception=True)
-            return native_page_search(
-                current_page,
-                page_size,
-                self.get_query_set(),
-                select_string=get_file_content(
-                    os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'list_knowledge.sql')
+
+            folder_id = self.data.get('folder_id', 'root')
+            root = KnowledgeFolder.objects.filter(id=folder_id).first()
+            if not root:
+                raise serializers.ValidationError(_('Folder not found'))
+                # 获取当前文件夹下的直接子文件夹
+            child_folders = KnowledgeFolder.objects.filter(parent=root)
+            folders_data = KnowledgeFolderFlatSerializer(child_folders, many=True).data
+
+            return {
+                'knowledge': native_page_search(
+                    current_page,
+                    page_size,
+                    self.get_query_set(),
+                    select_string=get_file_content(
+                        os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'list_knowledge.sql')
+                    ),
+                    post_records_handler=lambda r: r
                 ),
-                post_records_handler=lambda r: r
-            )
+                'folders': folders_data
+            }
 
         def list(self):
             self.is_valid(raise_exception=True)
