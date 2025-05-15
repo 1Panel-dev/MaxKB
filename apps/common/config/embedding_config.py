@@ -12,6 +12,7 @@ import time
 from common.cache.mem_cache import MemCache
 
 _lock = threading.Lock()
+locks = {}
 
 
 class ModelManage:
@@ -19,10 +20,23 @@ class ModelManage:
     up_clear_time = time.time()
 
     @staticmethod
+    def _get_lock(_id):
+        lock = locks.get(_id)
+        if lock is None:
+            with _lock:
+                lock = locks.get(_id)
+                if lock is None:
+                    lock = threading.Lock()
+                    locks[_id] = lock
+
+        return lock
+
+    @staticmethod
     def get_model(_id, get_model):
         model_instance = ModelManage.cache.get(_id)
         if model_instance is None:
-            with _lock:
+            lock = ModelManage._get_lock(_id)
+            with lock:
                 model_instance = ModelManage.cache.get(_id)
                 if model_instance is None:
                     model_instance = get_model(_id)
