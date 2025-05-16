@@ -41,3 +41,4 @@ class ExceptionCodeConstants(Enum):
                                                  _('The username cannot be empty and must be between 6 and 20 characters long.'))
     PASSWORD_NOT_EQ_RE_PASSWORD = ExceptionCodeConstantsValue(1007,
                                                               _('Password and confirmation password are inconsistent'))
+    NICKNAME_IS_EXIST = ExceptionCodeConstantsValue(1008, _('The nickname is already registered'))

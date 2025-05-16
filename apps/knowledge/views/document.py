@@ -188,7 +188,7 @@ class DocumentView(APIView):
             responses=SyncWebAPI.get_response(),
             tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_permission())
+        @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_SYNC.get_workspace_permission())
         def get(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
             return result.success(DocumentSerializers.Sync(
                 data={'document_id': document_id, 'knowledge_id': knowledge_id, 'workspace_id': workspace_id}
@@ -207,7 +207,7 @@ class DocumentView(APIView):
             responses=RefreshAPI.get_response(),
             tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_permission())
+        @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_VECTOR.get_workspace_permission())
         def put(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
             return result.success(DocumentSerializers.Operate(
                 data={'document_id': document_id, 'knowledge_id': knowledge_id, 'workspace_id': workspace_id}
@@ -285,7 +285,7 @@ class DocumentView(APIView):
             tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_permission(),
+            PermissionConstants.KNOWLEDGE_DOCUMENT_SYNC.get_workspace_permission(),
             PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_permission(),
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
@@ -307,7 +307,7 @@ class DocumentView(APIView):
             tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_permission(),
+            PermissionConstants.KNOWLEDGE_DOCUMENT_DELETE.get_workspace_permission(),
             PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_permission(),
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
@@ -328,7 +328,7 @@ class DocumentView(APIView):
             tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_permission(),
+            PermissionConstants.KNOWLEDGE_DOCUMENT_VECTOR.get_workspace_permission(),
             PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_permission(),
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
@@ -351,7 +351,7 @@ class DocumentView(APIView):
             tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_permission(),
+            PermissionConstants.KNOWLEDGE_DOCUMENT_GENERATE.get_workspace_permission(),
             PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_permission(),
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):

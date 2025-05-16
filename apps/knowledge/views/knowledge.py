@@ -125,7 +125,7 @@ class KnowledgeView(APIView):
             responses=SyncWebAPI.get_response(),
             tags=[_('Knowledge Base')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_EDIT.get_workspace_permission())
+        @has_permissions(PermissionConstants.KNOWLEDGE_SYNC.get_workspace_permission())
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(KnowledgeSerializer.SyncWeb(
                 data={
@@ -176,7 +176,7 @@ class KnowledgeView(APIView):
             responses=EmbeddingAPI.get_response(),
             tags=[_('Knowledge Base')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_EDIT.get_workspace_permission())
+        @has_permissions(PermissionConstants.KNOWLEDGE_VECTOR.get_workspace_permission())
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(KnowledgeSerializer.Operate(
                 data={'knowledge_id': knowledge_id, 'workspace_id': workspace_id, 'user_id': request.user.id}
@@ -195,7 +195,7 @@ class KnowledgeView(APIView):
             responses=GenerateRelatedAPI.get_response(),
             tags=[_('Knowledge Base')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_EDIT.get_workspace_permission())
+        @has_permissions(PermissionConstants.KNOWLEDGE_GENERATE.get_workspace_permission())
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(KnowledgeSerializer.Operate(
                 data={'knowledge_id': knowledge_id, 'workspace_id': workspace_id, 'user_id': request.user.id}

@@ -10,21 +10,20 @@ from functools import reduce
 from typing import List
 
 from django.db import models
+from django.utils.translation import gettext as _
 
 
 class Group(Enum):
     """
     权限组 一个组一般对应前端一个菜单
     """
-    USER = "USER"
+    USER = "USER_MANAGEMENT"
 
     APPLICATION = "APPLICATION"
 
     KNOWLEDGE = "KNOWLEDGE"
 
     KNOWLEDGE_DOCUMENT = "KNOWLEDGE_DOCUMENT"
-
-    KNOWLEDGE_PARAGRAPH = "KNOWLEDGE_PARAGRAPH"
 
     KNOWLEDGE_PROBLEM = "KNOWLEDGE_PROBLEM"
 
@@ -34,19 +33,69 @@ class Group(Enum):
 
     WORKSPACE_USER_RESOURCE_PERMISSION = "WORKSPACE_USER_RESOURCE_PERMISSION"
 
+    EMAIL_SETTING = "EMAIL_SETTING"
+    ROLE = "ROLE"
+
+
+class SystemGroup(Enum):
+    """
+    一级菜单
+    """
+    USER_MANAGEMENT = "USER_MANAGEMENT"
+    ROLE = "ROLE"
+    WORKSPACE = "WORKSPACE"
+    RESOURCE_APPLICATION = "RESOURCE_APPLICATION"
+    RESOURCE_KNOWLEDGE = "RESOURCE_KNOWLEDGE"
+    RESOURCE_TOOL = "RESOURCE_TOOL"
+    RESOURCE_MODEL = "RESOURCE_MODEL"
+    RESOURCE_PERMISSION = "RESOURCE_PERMISSION"
+    SHARED_KNOWLEDGE = "SHARED_KNOWLEDGE"
+    SHARED_MODEL = "SHARED_MODEL"
+    SHARED_TOOL = "SHARED_TOOL"
+    SYSTEM_SETTING = "SYSTEM_SETTING"
+    OPERATION_LOG = "OPERATION_LOG"
+    OTHER = "OTHER"
+
+
+class WorkspaceGroup(Enum):
+    SYSTEM_MANAGEMENT = "SYSTEM_MANAGEMENT"
+    APPLICATION = "APPLICATION"
+    KNOWLEDGE = "KNOWLEDGE"
+    MODEL = "MODEL"
+    TOOL = "TOOL"
+    OTHER = "OTHER"
+
+
+class UserGroup(Enum):
+    APPLICATION = "APPLICATION"
+    KNOWLEDGE = "KNOWLEDGE"
+    MODEL = "MODEL"
+    TOOL = "TOOL"
+    OTHER = "OTHER"
+
 
 class Operate(Enum):
     """
      一个权限组的操作权限
     """
     READ = 'READ'
-    EDIT = "EDIT"
-    CREATE = "CREATE"
-    DELETE = "DELETE"
+    EDIT = "READ+EDIT"
+    CREATE = "READ+CREATE"
+    DELETE = "READ+DELETE"
     """
     使用权限
     """
     USE = "USE"
+    IMPORT = "READ+IMPORT"
+    EXPORT = "READ+EXPORT"  # 导入导出
+    DEBUG = "READ+DEBUG"  # 调试
+    SYNC = "READ+SYNC"  # 同步
+    GENERATE = "READ+GENERATE"  # 生成
+    ADD_MEMBER = "READ+ADD_MEMBER"  # 添加成员
+    REMOVE_MEMBER = "READ+REMOVE_MEMBER"  # 添加成员
+    VECTOR = "READ+VECTOR"  # 向量化
+    MIGRATE = "READ+MIGRATE"  # 迁移
+    RELATE = "READ+RELATE"  # 关联
 
 
 class RoleGroup(Enum):
@@ -118,13 +167,57 @@ class RoleConstants(Enum):
                                       f"/WORKSPACE/{kwargs.get('workspace_id')}")
 
 
+Permission_Label = {
+    SystemGroup.SYSTEM_SETTING.value: _("System Setting"),
+    SystemGroup.USER_MANAGEMENT.value: _("User Management"),
+    SystemGroup.ROLE.value: _("Role"),
+    SystemGroup.WORKSPACE.value: _("Workspace"),
+    SystemGroup.RESOURCE_APPLICATION.value: _("Resource Application"),
+    SystemGroup.RESOURCE_KNOWLEDGE.value: _("Resource Knowledge"),
+    SystemGroup.RESOURCE_TOOL.value: _("Resource Tool"),
+    SystemGroup.RESOURCE_MODEL.value: _("Resource Model"),
+    SystemGroup.RESOURCE_PERMISSION.value: _("Resource Permission"),
+    SystemGroup.SHARED_KNOWLEDGE.value: _("Shared Knowledge"),
+    SystemGroup.SHARED_MODEL.value: _("Shared Model"),
+    SystemGroup.SHARED_TOOL.value: _("Shared Tool"),
+    SystemGroup.OPERATION_LOG.value: _("Operation Log"),
+    SystemGroup.OTHER.value: _("Other"),
+    WorkspaceGroup.SYSTEM_MANAGEMENT.value: _("System Management"),
+    WorkspaceGroup.APPLICATION.value: _("Application"),
+    WorkspaceGroup.KNOWLEDGE.value: _("Knowledge"),
+    WorkspaceGroup.MODEL.value: _("Model"),
+    WorkspaceGroup.TOOL.value: _("Tool"),
+    WorkspaceGroup.OTHER.value: _("Other"),
+    Operate.READ.value: _("Read"),
+    Operate.EDIT.value: _("Edit"),
+    Operate.CREATE.value: _("Create"),
+    Operate.DELETE.value: _("Delete"),
+    Group.EMAIL_SETTING.value: _("Email Setting"),
+    Group.APPLICATION.value: _("Application"),
+    Group.KNOWLEDGE.value: _("Knowledge"),
+    Group.KNOWLEDGE_DOCUMENT.value: _("Document"),
+    Group.KNOWLEDGE_PROBLEM.value: _("Problem"),
+    Operate.IMPORT.value: _("Import"),
+    Operate.EXPORT.value: _("Export"),
+    Operate.DEBUG.value: _("Debug"),
+    Operate.SYNC.value: _("Sync"),
+    Operate.GENERATE.value: _("Generate"),
+    Operate.ADD_MEMBER.value: _("Add Member"),
+    Operate.REMOVE_MEMBER.value: _("Remove Member"),
+    Operate.VECTOR.value: _("Vector"),
+    Operate.MIGRATE.value: _("Migrate"),
+    Operate.RELATE.value: _("Relate"),
+
+}
+
+
 class Permission:
     """
     权限信息
     """
 
     def __init__(self, group: Group, operate: Operate, resource_path=None, role_list=None,
-                 resource_permission_group_list=None):
+                 resource_permission_group_list=None, parent_group=None, label=None):
         if role_list is None:
             role_list = []
         if resource_permission_group_list is None:
@@ -136,6 +229,8 @@ class Permission:
         self.role_list = role_list
         # 用于资源权限权限分组
         self.resource_permission_group_list = resource_permission_group_list
+        self.parent_group = parent_group  # 新增字段：父级组
+        self.label = label
 
     @staticmethod
     def new_instance(permission_str: str):
@@ -160,141 +255,191 @@ class PermissionConstants(Enum):
      权限枚举
     """
     USER_READ = Permission(
-        group=Group.USER, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+        group=Group.USER, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[SystemGroup.USER_MANAGEMENT]
     )
     USER_CREATE = Permission(
-        group=Group.USER, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN]
+        group=Group.USER, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.USER_MANAGEMENT]
     )
     USER_EDIT = Permission(
-        group=Group.USER, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN]
+        group=Group.USER, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.USER_MANAGEMENT]
     )
     USER_DELETE = Permission(
-        group=Group.USER, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN]
+        group=Group.USER, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.USER_MANAGEMENT]
+    )
+    ROLE_READ = Permission(
+        group=Group.ROLE, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[SystemGroup.ROLE, WorkspaceGroup.SYSTEM_MANAGEMENT]
+    )
+    ROLE_CREATE = Permission(
+        group=Group.ROLE, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.ROLE]
+    )
+    ROLE_EDIT = Permission(
+        group=Group.ROLE, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.ROLE]
+    )
+    ROLE_DELETE = Permission(
+        group=Group.ROLE, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.ROLE]
     )
     MODEL_CREATE = Permission(
-        group=Group.MODEL, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+        group=Group.MODEL, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.MODEL, UserGroup.MODEL]
     )
     MODEL_READ = Permission(
-        group=Group.MODEL, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+        group=Group.MODEL, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.MODEL, UserGroup.MODEL]
     )
     MODEL_EDIT = Permission(
-        group=Group.MODEL, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+        group=Group.MODEL, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.MODEL, UserGroup.MODEL]
     )
     MODEL_DELETE = Permission(
-        group=Group.MODEL, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
-    )
-    TOOL_FOLDER_CREATE = Permission(
-        group=Group.TOOL, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
-    )
-    TOOL_FOLDER_READ = Permission(
-        group=Group.TOOL, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
-    )
-    TOOL_FOLDER_EDIT = Permission(
-        group=Group.TOOL, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
-    )
-    TOOL_FOLDER_DELETE = Permission(
-        group=Group.TOOL, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+        group=Group.MODEL, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.MODEL, UserGroup.MODEL]
     )
     TOOL_CREATE = Permission(
-        group=Group.TOOL, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+        group=Group.TOOL, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL]
     )
     TOOL_EDIT = Permission(
-        group=Group.TOOL, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+        group=Group.TOOL, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL]
     )
     TOOL_READ = Permission(
-        group=Group.TOOL, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+        group=Group.TOOL, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL]
     )
     TOOL_DELETE = Permission(
-        group=Group.TOOL, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+        group=Group.TOOL, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL]
     )
     TOOL_DEBUG = Permission(
-        group=Group.TOOL, operate=Operate.USE, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+        group=Group.TOOL, operate=Operate.DEBUG, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL]
     )
     TOOL_IMPORT = Permission(
-        group=Group.TOOL, operate=Operate.USE, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+        group=Group.TOOL, operate=Operate.IMPORT, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL]
     )
     TOOL_EXPORT = Permission(
-        group=Group.TOOL, operate=Operate.USE, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
-    )
-    KNOWLEDGE_FOLDER_CREATE = Permission(
-        group=Group.KNOWLEDGE, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
-    )
-    KNOWLEDGE_FOLDER_READ = Permission(
-        group=Group.KNOWLEDGE, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        resource_permission_group_list=[ResourcePermissionGroup.VIEW]
-    )
-    KNOWLEDGE_FOLDER_EDIT = Permission(
-        group=Group.KNOWLEDGE, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        resource_permission_group_list=[ResourcePermissionGroup.MANAGE]
-    )
-    KNOWLEDGE_FOLDER_DELETE = Permission(
-        group=Group.KNOWLEDGE, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        resource_permission_group_list=[ResourcePermissionGroup.MANAGE]
+        group=Group.TOOL, operate=Operate.EXPORT, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL]
     )
     KNOWLEDGE_READ = Permission(
         group=Group.KNOWLEDGE, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        resource_permission_group_list=[ResourcePermissionGroup.VIEW]
+        resource_permission_group_list=[ResourcePermissionGroup.VIEW],
+        parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
     KNOWLEDGE_CREATE = Permission(
-        group=Group.KNOWLEDGE, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+        group=Group.KNOWLEDGE, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
     KNOWLEDGE_EDIT = Permission(
-        group=Group.KNOWLEDGE, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+        group=Group.KNOWLEDGE, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
     KNOWLEDGE_DELETE = Permission(
-        group=Group.KNOWLEDGE, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+        group=Group.KNOWLEDGE, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
+    )
+    KNOWLEDGE_SYNC = Permission(
+        group=Group.KNOWLEDGE, operate=Operate.SYNC, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
+    )
+    KNOWLEDGE_EXPORT = Permission(
+        group=Group.KNOWLEDGE, operate=Operate.EXPORT, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
+    )
+    KNOWLEDGE_VECTOR = Permission(
+        group=Group.KNOWLEDGE, operate=Operate.VECTOR, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
+    )
+    KNOWLEDGE_GENERATE = Permission(
+        group=Group.KNOWLEDGE, operate=Operate.GENERATE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
     KNOWLEDGE_DOCUMENT_READ = Permission(
         group=Group.KNOWLEDGE_DOCUMENT, operate=Operate.READ,
-        role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+        role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
     KNOWLEDGE_DOCUMENT_CREATE = Permission(
         group=Group.KNOWLEDGE_DOCUMENT, operate=Operate.CREATE,
-        role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+        role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
     KNOWLEDGE_DOCUMENT_EDIT = Permission(
-        group=Group.KNOWLEDGE_DOCUMENT, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+        group=Group.KNOWLEDGE_DOCUMENT, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
     KNOWLEDGE_DOCUMENT_DELETE = Permission(
-        group=Group.KNOWLEDGE_DOCUMENT, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+        group=Group.KNOWLEDGE_DOCUMENT, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
-    KNOWLEDGE_PARAGRAPH_READ = Permission(
-        group=Group.KNOWLEDGE_PARAGRAPH, operate=Operate.READ,
-        role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+    KNOWLEDGE_DOCUMENT_SYNC = Permission(
+        group=Group.KNOWLEDGE_DOCUMENT, operate=Operate.SYNC, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
-    KNOWLEDGE_PARAGRAPH_CREATE = Permission(
-        group=Group.KNOWLEDGE_PARAGRAPH, operate=Operate.CREATE,
-        role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+    KNOWLEDGE_DOCUMENT_EXPORT = Permission(
+        group=Group.KNOWLEDGE_DOCUMENT, operate=Operate.EXPORT,
+        role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
-    KNOWLEDGE_PARAGRAPH_EDIT = Permission(
-        group=Group.KNOWLEDGE_PARAGRAPH, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+    KNOWLEDGE_DOCUMENT_GENERATE = Permission(
+        group=Group.KNOWLEDGE_DOCUMENT, operate=Operate.GENERATE,
+        role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
-    KNOWLEDGE_PARAGRAPH_DELETE = Permission(
-        group=Group.KNOWLEDGE_PARAGRAPH, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+    KNOWLEDGE_DOCUMENT_VECTOR = Permission(
+        group=Group.KNOWLEDGE_DOCUMENT, operate=Operate.VECTOR,
+        role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
+    KNOWLEDGE_DOCUMENT_MIGRATE = Permission(
+        group=Group.KNOWLEDGE_DOCUMENT, operate=Operate.MIGRATE,
+        role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
+    )
+
     KNOWLEDGE_PROBLEM_READ = Permission(
         group=Group.KNOWLEDGE_PROBLEM, operate=Operate.READ,
-        role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+        role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
     KNOWLEDGE_PROBLEM_CREATE = Permission(
         group=Group.KNOWLEDGE_PROBLEM, operate=Operate.CREATE,
-        role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+        role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
     KNOWLEDGE_PROBLEM_EDIT = Permission(
-        group=Group.KNOWLEDGE_PROBLEM, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+        group=Group.KNOWLEDGE_PROBLEM, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
     KNOWLEDGE_PROBLEM_DELETE = Permission(
-        group=Group.KNOWLEDGE_PROBLEM, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+        group=Group.KNOWLEDGE_PROBLEM, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
+    )
+    KNOWLEDGE_PROBLEM_RELATE = Permission(
+        group=Group.KNOWLEDGE_PROBLEM, operate=Operate.RELATE,
+        role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
     WORKSPACE_USER_RESOURCE_PERMISSION_READ = Permission(
         group=Group.WORKSPACE_USER_RESOURCE_PERMISSION, operate=Operate.READ,
         role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE]
     )
     EMAIL_SETTING_READ = Permission(
-        group=Group.USER, operate=Operate.READ, role_list=[RoleConstants.ADMIN]
+        group=Group.EMAIL_SETTING, operate=Operate.READ, role_list=[RoleConstants.ADMIN],
+        parent_group=SystemGroup.SYSTEM_SETTING
     )
     EMAIL_SETTING_EDIT = Permission(
-        group=Group.USER, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN]
+        group=Group.EMAIL_SETTING, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN],
+        parent_group=SystemGroup.SYSTEM_SETTING
     )
 
     def get_workspace_application_permission(self):

@@ -110,11 +110,9 @@ class UserManageSerializer(serializers.Serializer):
             ]
         )
         nick_name = serializers.CharField(
-            required=False,
+            required=True,
             label=_("Nick name"),
             max_length=64,
-            allow_null=True,
-            allow_blank=True
         )
         phone = serializers.CharField(
             required=False,
@@ -131,12 +129,15 @@ class UserManageSerializer(serializers.Serializer):
         def _check_unique_username_and_email(self):
             username = self.data.get('username')
             email = self.data.get('email')
-            user = User.objects.filter(Q(username=username) | Q(email=email)).first()
+            nick_name = self.data.get('nick_name')
+            user = User.objects.filter(Q(username=username) | Q(email=email) | Q(nick_name=nick_name)).first()
             if user:
                 if user.email == email:
                     raise ExceptionCodeConstants.EMAIL_IS_EXIST.value.to_app_api_exception()
                 if user.username == username:
                     raise ExceptionCodeConstants.USERNAME_IS_EXIST.value.to_app_api_exception()
+                if user.nick_name == nick_name:
+                    raise ExceptionCodeConstants.NICKNAME_IS_EXIST.value.to_app_api_exception()
 
     class Query(serializers.Serializer):
         email_or_username = serializers.CharField(required=False, allow_null=True,
@@ -147,7 +148,8 @@ class UserManageSerializer(serializers.Serializer):
             query_set = QuerySet(User)
             if email_or_username is not None:
                 query_set = query_set.filter(
-                    Q(username__contains=email_or_username) | Q(email__contains=email_or_username))
+                    Q(username__contains=email_or_username) | Q(email__contains=email_or_username) | Q(
+                        nick_name__contains=email_or_username))
             query_set = query_set.order_by("-create_time")
             return query_set
 
@@ -211,11 +213,9 @@ class UserManageSerializer(serializers.Serializer):
             )]
         )
         nick_name = serializers.CharField(
-            required=False,
+            required=True,
             label=_("Name"),
             max_length=64,
-            allow_null=True,
-            allow_blank=True
         )
         phone = serializers.CharField(
             required=False,
@@ -232,6 +232,12 @@ class UserManageSerializer(serializers.Serializer):
         def is_valid(self, *, user_id=None, raise_exception=False):
             super().is_valid(raise_exception=True)
             self._check_unique_email(user_id)
+            self._check_unique_nick_name(user_id)
+
+        def _check_unique_nick_name(self, user_id):
+            nick_name = self.data.get('nick_name')
+            if nick_name and User.objects.filter(nick_name=nick_name).exclude(id=user_id).exists():
+                raise AppApiException(1008, _('Nickname is already in use'))
 
         def _check_unique_email(self, user_id):
             email = self.data.get('email')
@@ -390,5 +396,5 @@ class UserManageSerializer(serializers.Serializer):
         else:
             user_ids = User.objects.values_list('id', flat=True)
 
-        users = User.objects.filter(id__in=user_ids).values('id', 'username')
+        users = User.objects.filter(id__in=user_ids).values('id', 'nick_name')
         return list(users)
