@@ -23,6 +23,8 @@ FROM
 		chat_id
 	FROM
 		application_chat_record
+	WHERE chat_id IN (
+	  SELECT id FROM application_chat ${inner_queryset})
 	GROUP BY
 		application_chat_record.chat_id
 	) chat_record_temp ON application_chat."id" = chat_record_temp.chat_id
@@ -36,3 +38,4 @@ FROM
 		FROM
 		application_chat_record application_chat_record
 	) application_chat_record_temp ON application_chat_record_temp.chat_id = application_chat."id"
+	${default_queryset}
