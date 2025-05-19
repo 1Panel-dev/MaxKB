@@ -65,7 +65,7 @@ def valid_reference_value(_type, value, name):
 
 
 def convert_value(name: str, value, _type, is_required, source, node):
-    if not is_required and value is None:
+    if not is_required and (value is None or (isinstance(value, str) and len(value) == 0)):
         return None
     if not is_required and source == 'reference' and (value is None or len(value) == 0):
         return None
