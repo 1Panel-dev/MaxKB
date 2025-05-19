@@ -446,7 +446,7 @@ class PermissionConstants(Enum):
     ROLE_ADD_MEMBER = Permission(
         group=Group.ROLE, operate=Operate.ADD_MEMBER, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.ROLE]
-    ),
+    )
     ROLE_REMOVE_MEMBER = Permission(
         group=Group.ROLE, operate=Operate.REMOVE_MEMBER, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.ROLE]
