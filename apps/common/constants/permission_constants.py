@@ -270,22 +270,7 @@ class PermissionConstants(Enum):
         group=Group.USER, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.USER_MANAGEMENT]
     )
-    ROLE_READ = Permission(
-        group=Group.ROLE, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        parent_group=[SystemGroup.ROLE, WorkspaceGroup.SYSTEM_MANAGEMENT]
-    )
-    ROLE_CREATE = Permission(
-        group=Group.ROLE, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN],
-        parent_group=[SystemGroup.ROLE]
-    )
-    ROLE_EDIT = Permission(
-        group=Group.ROLE, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN],
-        parent_group=[SystemGroup.ROLE]
-    )
-    ROLE_DELETE = Permission(
-        group=Group.ROLE, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN],
-        parent_group=[SystemGroup.ROLE]
-    )
+
     MODEL_CREATE = Permission(
         group=Group.MODEL, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
         parent_group=[WorkspaceGroup.MODEL, UserGroup.MODEL]
@@ -440,6 +425,31 @@ class PermissionConstants(Enum):
     EMAIL_SETTING_EDIT = Permission(
         group=Group.EMAIL_SETTING, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN],
         parent_group=SystemGroup.SYSTEM_SETTING
+    )
+
+    ROLE_READ = Permission(
+        group=Group.ROLE, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[SystemGroup.ROLE, WorkspaceGroup.SYSTEM_MANAGEMENT]
+    )
+    ROLE_CREATE = Permission(
+        group=Group.ROLE, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.ROLE]
+    )
+    ROLE_EDIT = Permission(
+        group=Group.ROLE, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.ROLE]
+    )
+    ROLE_DELETE = Permission(
+        group=Group.ROLE, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.ROLE]
+    )
+    ROLE_ADD_MEMBER = Permission(
+        group=Group.ROLE, operate=Operate.ADD_MEMBER, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.ROLE]
+    ),
+    ROLE_REMOVE_MEMBER = Permission(
+        group=Group.ROLE, operate=Operate.REMOVE_MEMBER, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.ROLE]
     )
 
     def get_workspace_application_permission(self):
