@@ -418,7 +418,7 @@ const uploadFile = async (file: any, fileList: any) => {
   formData.append('file', file.raw, file.name)
   //
   const extension = file.name.split('.').pop().toUpperCase() // 获取文件后缀名并转为小写
-
+console.log(documentExtensions)
   if (imageExtensions.includes(extension)) {
     uploadImageList.value.push(file)
   } else if (documentExtensions.includes(extension)) {
