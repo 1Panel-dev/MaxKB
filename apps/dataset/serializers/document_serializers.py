@@ -661,10 +661,9 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                         cell = worksheet.cell(row=row_idx + 1, column=col_idx + 1)
                         if isinstance(col, str):
                             col = re.sub(ILLEGAL_CHARACTERS_RE, '', col)
-                        if col.startswith(('=', '+', '-', '@')):
-                            cell.value = '\ufeff' + col
-                        else:
-                            cell.value = col
+                            if col.startswith(('=', '+', '-', '@')):
+                                col = '\ufeff' + col
+                        cell.value = col
                     # 创建HttpResponse对象返回Excel文件
             return workbook
 
