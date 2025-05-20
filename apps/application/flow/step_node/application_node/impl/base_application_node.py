@@ -179,7 +179,8 @@ class BaseApplicationNode(IApplicationNode):
         current_chat_id = string_to_uuid(chat_id + application_id)
         Chat.objects.get_or_create(id=current_chat_id, defaults={
             'application_id': application_id,
-            'abstract': message[0:1024]
+            'abstract': message[0:1024],
+            'client_id': client_id,
         })
         if app_document_list is None:
             app_document_list = []
