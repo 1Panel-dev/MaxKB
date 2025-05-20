@@ -68,6 +68,7 @@ django-db-connection-pool = "1.2.5"
 opencv-python-headless = "4.11.0.86"
 pymysql = "1.1.1"
 accelerate = "1.6.0"
+captcha = "0.7.1"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

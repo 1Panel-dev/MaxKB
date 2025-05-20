@@ -11,6 +11,7 @@ import importlib
 import io
 import mimetypes
 import pickle
+import random
 import re
 import shutil
 from functools import reduce
@@ -297,3 +298,10 @@ def markdown_to_plain_text(md: str) -> str:
     # 去除首尾空格
     text = text.strip()
     return text
+
+
+CHAR_SET = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+
+
+def get_random_chars(number=6):
+    return "".join([CHAR_SET[random.randint(0, len(CHAR_SET) - 1)] for index in range(number)])
