@@ -19,7 +19,7 @@ class ModelListResponse(APIMixin):
     def get_response():
         class ModelListResult(ResultSerializer):
             def get_data(self):
-                return serializers.ListSerializer(child=ModelModelSerializer())
+                return ModelModelSerializer(many=True)
 
         return ModelListResult
 

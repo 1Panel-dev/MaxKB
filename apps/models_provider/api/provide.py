@@ -48,17 +48,17 @@ class ModelParamsFormSerializer(serializers.Serializer):
 
 class ModelParamsFormResponse(ResultSerializer):
     def get_data(self):
-        return serializers.ListSerializer(child=ModelParamsFormSerializer())
+        return ModelParamsFormSerializer(many=True)
 
 
 class ModelListResponse(ResultSerializer):
     def get_data(self):
-        return serializers.ListSerializer(child=ModelListSerializer())
+        return ModelListSerializer(many=True)
 
 
 class ProvideListResponse(ResultSerializer):
     def get_data(self):
-        return serializers.ListSerializer(child=ProvideListSerializer())
+        return ProvideListSerializer(many=True)
 
 
 class ProvideApi(APIMixin):

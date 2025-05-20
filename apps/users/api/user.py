@@ -66,7 +66,7 @@ class WorkspaceUser(serializers.Serializer):
 
 class WorkspaceUserListResponse(ResultSerializer):
     def get_data(self):
-        return serializers.ListSerializer(child=WorkspaceUser())
+        return WorkspaceUser(many=True)
 
 
 class UserPasswordResponse(APIMixin):
@@ -121,7 +121,7 @@ class ChangeUserPasswordApi(APIMixin):
 
 class UserListResponse(ResultSerializer):
     def get_data(self):
-        return serializers.ListSerializer(child=UserInstanceSerializer())
+        return UserInstanceSerializer(many=True)
 
 
 class UserPageApi(APIMixin):
