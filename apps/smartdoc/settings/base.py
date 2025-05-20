@@ -126,6 +126,10 @@ CACHES = {
     "token_cache": {
         'BACKEND': 'common.cache.file_cache.FileCache',
         'LOCATION': os.path.join(PROJECT_DIR, 'data', 'cache', "token_cache")  # 文件夹路径
+    },
+    'captcha_cache': {
+        'BACKEND': 'common.cache.file_cache.FileCache',
+        'LOCATION': os.path.join(PROJECT_DIR, 'data', 'cache', "captcha_cache")  # 文件夹路径
     }
 }
 

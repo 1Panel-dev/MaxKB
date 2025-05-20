@@ -7664,3 +7664,12 @@ msgstr "欄位: {name} 未設定值"
 
 msgid "Generate related"
 msgstr "生成問題"
+
+msgid "Obtain graphical captcha"
+msgstr "獲取圖形驗證碼"
+
+msgid "Captcha code error or expiration"
+msgstr "驗證碼錯誤或過期"
+
+msgid "captcha"
+msgstr "驗證碼"
