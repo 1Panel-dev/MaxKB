@@ -19,36 +19,24 @@ class XlsxSplitHandle(BaseParseTableHandle):
 
     def fill_merged_cells(self, sheet, image_dict):
         data = []
-
-        # 获取第一行作为标题行
-        headers = []
-        for idx, cell in enumerate(sheet[1]):
-            if cell.value is None:
-                headers.append(' ' * (idx + 1))
-            else:
-                headers.append(cell.value)
-
         # 从第二行开始遍历每一行
-        for row in sheet.iter_rows(min_row=2, values_only=False):
-            row_data = {}
+        for row in sheet.iter_rows(values_only=False):
+            row_data = []
             for col_idx, cell in enumerate(row):
                 cell_value = cell.value
-
-                # 如果单元格为空，并且该单元格在合并单元格内，获取合并单元格的值
-                if cell_value is None:
-                    for merged_range in sheet.merged_cells.ranges:
-                        if cell.coordinate in merged_range:
-                            cell_value = sheet[merged_range.min_row][merged_range.min_col - 1].value
-                            break
-
                 image = image_dict.get(cell_value, None)
                 if image is not None:
                     cell_value = f'![](/api/image/{image.id})'
 
                 # 使用标题作为键，单元格的值作为值存入字典
-                row_data[headers[col_idx]] = cell_value
+                row_data.insert(col_idx, cell_value)
             data.append(row_data)
 
+        for merged_range in sheet.merged_cells.ranges:
+            cell_value = data[merged_range.min_row - 1][merged_range.min_col - 1]
+            for row_index in range(merged_range.min_row, merged_range.max_row + 1):
+                for col_index in range(merged_range.min_col, merged_range.max_col + 1):
+                    data[row_index - 1][col_index - 1] = cell_value
         return data
 
     def handle(self, file, get_buffer, save_image):
@@ -65,11 +53,13 @@ class XlsxSplitHandle(BaseParseTableHandle):
                 paragraphs = []
                 ws = wb[sheetname]
                 data = self.fill_merged_cells(ws, image_dict)
-
-                for row in data:
-                    row_output = "; ".join([f"{key}: {value}" for key, value in row.items()])
-                    # print(row_output)
-                    paragraphs.append({'title': '', 'content': row_output})
+                if len(data) >= 2:
+                    head_list = data[0]
+                    for row_index in range(1, len(data)):
+                        row_output = "; ".join(
+                            [f"{head_list[col_index]}: {data[row_index][col_index]}" for col_index in
+                             range(0, len(data[row_index]))])
+                        paragraphs.append({'title': '', 'content': row_output})
 
                 result.append({'name': sheetname, 'paragraphs': paragraphs})
 
@@ -77,7 +67,6 @@ class XlsxSplitHandle(BaseParseTableHandle):
             max_kb.error(f'excel split handle error: {e}')
             return [{'name': file.name, 'paragraphs': []}]
         return result
-
 
     def get_content(self, file, save_image):
         try:
@@ -94,18 +83,18 @@ class XlsxSplitHandle(BaseParseTableHandle):
             # 如果未指定 sheet_name，则使用第一个工作表
             for sheetname in workbook.sheetnames:
                 sheet = workbook[sheetname] if sheetname else workbook.active
-                rows = self.fill_merged_cells(sheet, image_dict)
-                if len(rows) == 0:
+                data = self.fill_merged_cells(sheet, image_dict)
+                if len(data) == 0:
                     continue
                 # 提取表头和内容
 
-                headers = [f"{key}" for key, value in rows[0].items()]
+                headers = [f"{value}" for value in data[0]]
 
                 # 构建 Markdown 表格
                 md_table = '| ' + ' | '.join(headers) + ' |\n'
                 md_table += '| ' + ' | '.join(['---'] * len(headers)) + ' |\n'
-                for row in rows:
-                    r = [f'{value}' for key, value in row.items()]
+                for row_index in range(1, len(data)):
+                    r = [f'{value}' for value in data[row_index]]
                     md_table += '| ' + ' | '.join(
                         [str(cell).replace('\n', '<br>') if cell is not None else '' for cell in r]) + ' |\n'
 
