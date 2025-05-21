@@ -529,14 +529,16 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean, other_para
  * @param row
  */
 function getSourceDetail(row: any) {
-  logApi.getRecordDetail(id || props.appId, row.chat_id, row.record_id, loading).then((res) => {
-    const exclude_keys = ['answer_text', 'id', 'answer_text_list']
-    Object.keys(res.data).forEach((key) => {
-      if (!exclude_keys.includes(key)) {
-        row[key] = res.data[key]
-      }
+  if (row.record_id) {
+    logApi.getRecordDetail(id || props.appId, row.chat_id, row.record_id, loading).then((res) => {
+      const exclude_keys = ['answer_text', 'id', 'answer_text_list']
+      Object.keys(res.data).forEach((key) => {
+        if (!exclude_keys.includes(key)) {
+          row[key] = res.data[key]
+        }
+      })
     })
-  })
+  }
   return true
 }
 
