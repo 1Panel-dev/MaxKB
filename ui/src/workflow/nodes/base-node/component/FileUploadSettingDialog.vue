@@ -56,7 +56,7 @@
                 <p class="line-height-22 mt-4">
                   {{ $t('common.fileUpload.document') }}
                   <el-text class="color-secondary"
-                  >{{
+                    >{{
                       $t(
                         'views.applicationWorkflow.nodes.baseNode.FileUploadSetting.fileUploadType.documentText'
                       )
@@ -86,7 +86,7 @@
                 <p class="line-height-22 mt-4">
                   {{ $t('common.fileUpload.image') }}
                   <el-text class="color-secondary"
-                  >{{
+                    >{{
                       $t(
                         'views.applicationWorkflow.nodes.baseNode.FileUploadSetting.fileUploadType.imageText'
                       )
@@ -114,7 +114,7 @@
                 <p class="line-height-22 mt-4">
                   {{ $t('common.fileUpload.audio') }}
                   <el-text class="color-secondary"
-                  >{{
+                    >{{
                       $t(
                         'views.applicationWorkflow.nodes.baseNode.FileUploadSetting.fileUploadType.audioText'
                       )
@@ -141,7 +141,7 @@
                 <p class="line-height-22 mt-4">
                   {{ $t('common.fileUpload.other') }}
                   <el-text class="color-secondary"
-                  >{{
+                    >{{
                       $t(
                         'views.applicationWorkflow.nodes.baseNode.FileUploadSetting.fileUploadType.otherText'
                       )
