@@ -64,7 +64,7 @@ class CaptchaSerializer(ApiMixin, serializers.Serializer):
         image = ImageCaptcha()
         data = image.generate(chars)
         captcha = base64.b64encode(data.getbuffer())
-        captcha_cache.set(f"LOGIN:{chars}", chars, timeout=5 * 60)
+        captcha_cache.set(f"LOGIN:{chars.lower()}", chars, timeout=5 * 60)
         return 'data:image/png;base64,' + captcha.decode()
 
 
@@ -105,7 +105,7 @@ class LoginSerializer(ApiMixin, serializers.Serializer):
         """
         super().is_valid(raise_exception=True)
         captcha = self.data.get('captcha')
-        captcha_value = captcha_cache.get(f"LOGIN:{captcha}")
+        captcha_value = captcha_cache.get(f"LOGIN:{captcha.lower()}")
         if captcha_value is None:
             raise AppApiException(1005, _("Captcha code error or expiration"))
         username = self.data.get("username")
