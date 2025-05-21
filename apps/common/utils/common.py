@@ -54,11 +54,17 @@ def group_by(list_source: List, key):
     return result
 
 
-CHAR_SET = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+SAFE_CHAR_SET = (
+        [chr(i) for i in range(65, 91) if chr(i) not in {'I', 'O'}] +  # 大写字母 A-H, J-N, P-Z
+        [chr(i) for i in range(97, 123) if chr(i) not in {'i', 'l', 'o'}] +  # 小写字母 a-h, j-n, p-z
+        [str(i) for i in range(10) if str(i) not in {'0', '1', '7'}]  # 数字 2-6, 8-9
+)
 
 
-def get_random_chars(number=6):
-    return "".join([CHAR_SET[random.randint(0, len(CHAR_SET) - 1)] for index in range(number)])
+def get_random_chars(number=4):
+    if number <= 0:
+        return ""
+    return ''.join(random.choices(SAFE_CHAR_SET, k=number))
 
 
 def encryption(message: str):
