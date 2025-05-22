@@ -71,7 +71,7 @@ RUN chmod 755 /opt/maxkb/app/installer/run-maxkb.sh && \
     chown -R sandbox:root /opt/maxkb/app/sandbox && \
     chmod g-x /usr/local/bin/* /usr/bin/* /bin/* /usr/sbin/* /sbin/* /usr/lib/postgresql/15/bin/* && \
     chmod g+x /usr/local/bin/python* && \
-    chmod g-rx /etc
+    find /etc/ -type f ! -path '/etc/resolv.conf' ! -path '/etc/hosts' | xargs chmod g-rx
 
 EXPOSE 8080
 
