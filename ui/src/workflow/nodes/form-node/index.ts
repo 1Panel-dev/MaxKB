@@ -7,18 +7,22 @@ class FormNode extends AppNode {
   get_node_field_list() {
     const result = []
     const fields = this.props.model.properties?.config?.fields || []
-    let otherFields = []
+
     try {
-      otherFields = this.props.model.properties.node_data.form_field_list.map((item: any) => ({
-        label: typeof item.label == 'string' ? item.label : item.label.label,
-        value: item.field
-      }))
+      this.props.model.properties.node_data.form_field_list.forEach((item: any) => {
+        if (!fields.some((f: any) => f.value === item.field)) {
+          fields.push({
+            value: item.field,
+            label: typeof item.label == 'string' ? item.label : item.label.label
+          })
+        }
+      })
     } catch (e) {}
     result.push({
       value: this.props.model.id,
       label: this.props.model.properties.stepName,
       type: this.props.model.type,
-      children: [...fields, ...otherFields]
+      children: fields
     })
     return result
   }
