@@ -44,7 +44,7 @@ class LoginSerializer(serializers.Serializer):
         username = instance.get('username')
         password = instance.get('password')
         captcha = instance.get('captcha')
-        captcha_cache = cache.get(Cache_Version.CAPTCHA.get_key(captcha=captcha),
+        captcha_cache = cache.get(Cache_Version.CAPTCHA.get_key(captcha=captcha.lower()),
                                   version=Cache_Version.CAPTCHA.get_version())
         if captcha_cache is None:
             raise AppApiException(1005, _("Captcha code error or expiration"))
@@ -76,6 +76,6 @@ class CaptchaSerializer(serializers.Serializer):
         image = ImageCaptcha()
         data = image.generate(chars)
         captcha = base64.b64encode(data.getbuffer())
-        cache.set(Cache_Version.CAPTCHA.get_key(captcha=chars), chars,
+        cache.set(Cache_Version.CAPTCHA.get_key(captcha=chars.lower()), chars,
                   timeout=60, version=Cache_Version.CAPTCHA.get_version())
         return {'captcha': 'data:image/png;base64,' + captcha.decode()}
