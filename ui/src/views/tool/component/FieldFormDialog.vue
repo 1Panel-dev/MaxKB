@@ -18,34 +18,34 @@
       :model="form"
       require-asterisk-position="right"
     >
-      <el-form-item :label="$t('views.functionLib.functionForm.form.paramName.label')" prop="name">
+      <el-form-item :label="$t('views.tool.form.paramName.label')" prop="name">
         <el-input
           v-model="form.name"
-          :placeholder="$t('views.functionLib.functionForm.form.paramName.placeholder')"
+          :placeholder="$t('views.tool.form.paramName.placeholder')"
           maxlength="64"
           show-word-limit
           @blur="form.name = form.name.trim()"
         />
       </el-form-item>
-      <el-form-item :label="$t('views.functionLib.functionForm.form.dataType.label')">
+      <el-form-item :label="$t('views.tool.form.dataType.label')">
         <el-select v-model="form.type">
           <el-option v-for="item in typeOptions" :key="item" :label="item" :value="item" />
         </el-select>
       </el-form-item>
-      <el-form-item :label="$t('views.functionLib.functionForm.form.source.label')">
+      <el-form-item :label="$t('views.tool.form.source.label')">
         <el-select v-model="form.source">
           <el-option
-            :label="$t('views.functionLib.functionForm.form.source.reference')"
+            :label="$t('views.tool.form.source.reference')"
             value="reference"
           />
           <el-option
-            :label="$t('views.functionLib.functionForm.form.source.custom')"
+            :label="$t('views.tool.form.source.custom')"
             value="custom"
           />
         </el-select>
       </el-form-item>
       <el-form-item
-        :label="$t('views.functionLib.functionForm.form.required.label')"
+        :label="$t('views.tool.form.required.label')"
         @click.prevent
       >
         <el-switch size="small" v-model="form.is_required"></el-switch>
@@ -85,7 +85,7 @@ const rules = reactive({
   name: [
     {
       required: true,
-      message: t('views.functionLib.functionForm.form.paramName.placeholder'),
+      message: t('views.tool.form.paramName.placeholder'),
       trigger: 'blur'
     }
   ]

@@ -7,7 +7,6 @@ import tool from './tool'
 // import applicationOverview from './application-overview'
 
 // import system from './system'
-// import functionLib from './function-lib'
 // import user from './user'
 // import team from './team'
 
@@ -27,7 +26,6 @@ export default {
   // application,
   // applicationOverview,
   // system,
-  // functionLib,
   // user,
   // team,
   // document,

@@ -47,7 +47,7 @@
                 :prop="'debug_field_list.' + index + '.value'"
                 :rules="{
                   required: item.is_required,
-                  message: $t('views.functionLib.functionForm.form.param.inputPlaceholder'),
+                  message: $t('views.tool.form.param.inputPlaceholder'),
                   trigger: 'blur'
                 }"
               >
@@ -61,7 +61,7 @@
                 </template>
                 <el-input
                   v-model="item.value"
-                  :placeholder="$t('views.functionLib.functionForm.form.param.inputPlaceholder')"
+                  :placeholder="$t('views.tool.form.param.inputPlaceholder')"
                 />
               </el-form-item>
             </template>
@@ -70,30 +70,30 @@
       </div>
 
       <el-button type="primary" @click="submit(FormRef)" :loading="loading">
-        {{ $t('views.functionLib.functionForm.form.debug.run') }}
+        {{ $t('views.tool.form.debug.run') }}
       </el-button>
       <div v-if="showResult" class="mt-8">
         <h4 class="title-decoration-1 mb-16 mt-16">
-          {{ $t('views.functionLib.functionForm.form.debug.runResult') }}
+          {{ $t('views.tool.form.debug.runResult') }}
         </h4>
         <div class="mb-16">
           <el-alert
             v-if="isSuccess"
-            :title="$t('views.functionLib.functionForm.form.debug.runSuccess')"
+            :title="$t('views.tool.form.debug.runSuccess')"
             type="success"
             show-icon
             :closable="false"
           />
           <el-alert
             v-else
-            :title="$t('views.functionLib.functionForm.form.debug.runFailed')"
+            :title="$t('views.tool.form.debug.runFailed')"
             type="error"
             show-icon
             :closable="false"
           />
         </div>
 
-        <p class="lighter mb-8">{{ $t('views.functionLib.functionForm.form.debug.output') }}</p>
+        <p class="lighter mb-8">{{ $t('views.tool.form.debug.output') }}</p>
 
         <el-card
           :class="isSuccess ? '' : 'danger'"
@@ -110,7 +110,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, watch } from 'vue'
-import functionLibApi from '@/api/function-lib'
+import ToolApi from '@/api/tool/tool'
 import type { FormInstance } from 'element-plus'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
 
@@ -148,7 +148,7 @@ watch(debugVisible, (bool) => {
 const submit = async (formEl: FormInstance | undefined) => {
   const validate = formEl ? formEl.validate() : Promise.resolve()
   Promise.all([dynamicsFormRef.value?.validate(), validate]).then(() => {
-    functionLibApi.postFunctionLibDebug(form.value, loading).then((res) => {
+    toolApi.posttoolDebug(form.value, loading).then((res) => {
       if (res.code === 500) {
         showResult.value = true
         isSuccess.value = false

@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="$t('views.functionLib.functionForm.form.functionName.name')"
+    :title="$t('views.tool.form.toolName.name')"
     v-model="dialogVisible"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
@@ -49,7 +49,7 @@ const rules = reactive({
   name: [
     {
       required: true,
-      message: t('views.functionLib.functionForm.form.functionName.placeholder'),
+      message: t('views.tool.form.toolName.placeholder'),
       trigger: 'blur'
     }
   ]

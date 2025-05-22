@@ -48,6 +48,7 @@ export default {
   },
   status: {
     label: 'Status',
+    disable: 'Disable',
     enabled: 'Enabled',
     disabled: 'Disabled',
     enableSuccess: 'Successful',

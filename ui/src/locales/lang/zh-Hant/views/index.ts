@@ -3,7 +3,7 @@ import application from './application'
 import applicationOverview from './application-overview'
 import dataset from './dataset'
 import system from './system'
-import functionLib from './function-lib'
+import tool from './tool'
 import user from './user'
 import team from './team'
 import model from './model'
@@ -19,7 +19,7 @@ export default {
   application,
   applicationOverview,
   system,
-  functionLib,
+  tool,
   user,
   team,
   model,

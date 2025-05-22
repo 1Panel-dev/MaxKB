@@ -61,7 +61,7 @@
 </template>
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import functionLibApi from '@/api/function-lib'
+import ToolApi from '@/api/tool/tool'
 import { cloneDeep } from 'lodash'
 import { MsgError, MsgSuccess } from '@/utils/message'
 import { defaultIcon, isAppIcon } from '@/utils/application'
@@ -111,7 +111,7 @@ function submit() {
   } else if (radioType.value === 'custom' && iconFile.value) {
     let fd = new FormData()
     fd.append('file', iconFile.value.raw)
-    functionLibApi.putFunctionLibIcon(detail.value.id, fd, loading).then((res: any) => {
+    toolApi.puttoolIcon(detail.value.id, fd, loading).then((res: any) => {
       emit('refresh', res.data)
       dialogVisible.value = false
     })

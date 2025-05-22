@@ -113,25 +113,27 @@
                       <el-button text @click.stop>
                         <el-icon><MoreFilled /></el-icon>
                       </el-button>
-                      <!-- <template #dropdown>
+                      <template #dropdown>
                         <el-dropdown-menu>
                           <el-dropdown-item
                             v-if="!item.template_id"
+                            :disabled="!canEdit(item)"
                             @click.stop="openCreateDialog(item)"
                           >
                             <el-icon><EditPen /></el-icon>
                             {{ $t('common.edit') }}
                           </el-dropdown-item>
-                          <el-dropdown-item
-                            :disabled="item.permission_type === 'PUBLIC' && !canEdit(item)"
+                          <!-- <el-dropdown-item
+                            :disabled="!canEdit(item)"
                             v-if="!item.template_id"
-                            @click.stop="copyFunctionLib(item)"
+                            @click.stop="copytool(item)"
                           >
                             <AppIcon iconName="app-copy"></AppIcon>
                             {{ $t('common.copy') }}
                           </el-dropdown-item>
                           <el-dropdown-item
                             v-if="item.init_field_list?.length > 0"
+                            :disabled="!canEdit(item)"
                             @click.stop="configInitParams(item)"
                           >
                             <AppIcon iconName="app-operation" class="mr-4"></AppIcon>
@@ -139,17 +141,22 @@
                           </el-dropdown-item>
                           <el-dropdown-item
                             v-if="!item.template_id"
-                            @click.stop="exportFunctionLib(item)"
+                            :disabled="!canEdit(item)"
+                            @click.stop="exporttool(item)"
                           >
                             <AppIcon iconName="app-export"></AppIcon>
                             {{ $t('common.export') }}
                           </el-dropdown-item>
-                          <el-dropdown-item divided @click.stop="deleteFunctionLib(item)">
+                          <el-dropdown-item
+                            :disabled="!canEdit(item)"
+                            divided
+                            @click.stop="deletetool(item)"
+                          >
                             <el-icon><Delete /></el-icon>
                             {{ $t('common.delete') }}
-                          </el-dropdown-item>
+                          </el-dropdown-item> -->
                         </el-dropdown-menu>
-                      </template> -->
+                      </template>
                     </el-dropdown>
                   </div>
                 </template>
@@ -161,6 +168,7 @@
       </div>
     </ContentContainer>
     <InitParamDrawer ref="InitParamDrawerRef" @refresh="refresh" />
+    <ToolFormDrawer ref="ToolFormDrawerRef" @refresh="refresh" :title="ToolDrawertitle" />
   </LayoutContainer>
 </template>
 
@@ -170,12 +178,12 @@ import ToolApi from '@/api/tool/tool'
 import useStore from '@/stores'
 import { MsgConfirm } from '@/utils/message'
 import InitParamDrawer from '@/views/tool/component/InitParamDrawer.vue'
+import ToolFormDrawer from './component/ToolFormDrawer.vue'
 import { t } from '@/locales'
 
-const { folder } = useStore()
+const { folder, user } = useStore()
 
 const InitParamDrawerRef = ref()
-
 const search_type = ref('name')
 const search_form = ref<{
   name: string
@@ -202,6 +210,28 @@ const currentFolder = ref<any>({})
 const search_type_change = () => {
   search_form.value = { name: '', create_user: '' }
 }
+const canEdit = (row: any) => {
+  return user.userInfo?.id === row?.user_id
+}
+
+const ToolFormDrawerRef = ref()
+const ToolDrawertitle = ref('')
+function openCreateDialog(data?: any) {
+  // 有template_id的不允许编辑，是模板转换来的
+  if (data?.template_id) {
+    return
+  }
+  ToolDrawertitle.value = data ? t('views.tool.editTool') : t('views.tool.createTool')
+  if (data) {
+    if (data?.permission_type !== 'PUBLIC' || canEdit(data)) {
+      ToolApi.getToolById('default', data?.id, changeStateloading).then((res) => {
+        ToolFormDrawerRef.value.open(res.data)
+      })
+    }
+  } else {
+    ToolFormDrawerRef.value.open(data)
+  }
+}
 
 function getList() {
   const params = {
@@ -225,42 +255,49 @@ function getFolder() {
 }
 
 async function changeState(row: any) {
-  // if (!bool) {
-  //   MsgConfirm(
-  //     `${t('views.functionLib.disabled.confirmTitle')}${row.name} ?`,
-  //     t('views.functionLib.disabled.confirmMessage'),
-  //     {
-  //       confirmButtonText: t('views.functionLib.setting.disabled'),
-  //       confirmButtonClass: 'danger',
-  //     },
-  //   )
-  //     .then(() => {
-  //       const obj = {
-  //         is_active: bool,
-  //       }
-  //       ToolApi.putToolLib('default', row.id, obj, changeStateloading).then((res) => {})
-  //     })
-  //     .catch(() => {
-  //       row.is_active = true
-  //     })
-  // } else {
-  //   const res = await ToolApi.getToolById('default', row.id, changeStateloading)
-  //   if (
-  //     !res.data.init_params &&
-  //     res.data.init_field_list &&
-  //     res.data.init_field_list.length > 0 &&
-  //     res.data.init_field_list.filter((item: any) => item.default_value && item.show_default_value)
-  //       .length !== res.data.init_field_list.length
-  //   ) {
-  //     row.is_active = false
-  //     InitParamDrawerRef.value.open(res.data, bool)
-  //     return
-  //   }
-  //   const obj = {
-  //     is_active: bool,
-  //   }
-  //   ToolApi.putToolLib('default', row.id, obj, changeStateloading).then((res) => {})
-  // }
+  if (row.is_active) {
+    MsgConfirm(
+      `${t('views.tool.disabled.confirmTitle')}${row.name} ?`,
+      t('views.tool.disabled.confirmMessage'),
+      {
+        confirmButtonText: t('common.status.disable'),
+        confirmButtonClass: 'danger',
+      },
+    ).then(() => {
+      const obj = {
+        is_active: !row.is_active,
+      }
+      ToolApi.putToolLib('default', row.id, obj, changeStateloading)
+        .then(() => {
+          return true
+        })
+        .catch(() => {
+          return false
+        })
+    })
+  } else {
+    const res = await ToolApi.getToolById('default', row.id, changeStateloading)
+    if (
+      !res.data.init_params &&
+      res.data.init_field_list &&
+      res.data.init_field_list.length > 0 &&
+      res.data.init_field_list.filter((item: any) => item.default_value && item.show_default_value)
+        .length !== res.data.init_field_list.length
+    ) {
+      InitParamDrawerRef.value.open(res.data, !row.is_active)
+      return false
+    }
+    const obj = {
+      is_active: !row.is_active,
+    }
+    ToolApi.putToolLib('default', row.id, obj, changeStateloading)
+      .then(() => {
+        return true
+      })
+      .catch(() => {
+        return false
+      })
+  }
 }
 
 function refresh(data: any) {

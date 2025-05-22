@@ -3,6 +3,7 @@ $primary-color: #3370ff;
   --el-color-primary: #3370ff;
   --el-color-success: #34c724;
   --el-text-color-primary: #1f2329;
+  --el-border-radius-base: 6px;
   // --el-menu-item-height: 45px;
   // --el-box-shadow-light: 0px 2px 4px 0px rgba(31, 35, 41, 0.12);
   // --el-border-color: #dee0e3;
@@ -28,7 +29,7 @@ $primary-color: #3370ff;
   background: none;
 }
 .el-tree-node__content {
-  border-radius: 4px;
+  border-radius: var(--el-border-radius-base);
   padding: 7px 0;
   &:hover {
     background: var(--app-text-color-light-1);
@@ -75,7 +76,6 @@ $primary-color: #3370ff;
   font-size: 16px;
 }
 
-
 // dropdown
 .el-dropdown {
   color: var(--el-text-color-primary);
@@ -98,4 +98,70 @@ $primary-color: #3370ff;
     color: var(--el-menu-active-color);
     background: var(--el-color-primary-light-9);
   }
+}
+
+// message
+.el-message {
+  --el-message-close-icon-color: var(--app-text-color-secondary);
+}
+.el-message-box {
+  --el-messagebox-font-size: 16px;
+  --el-messagebox-width: 475px;
+  padding: 24px;
+  .el-message-box__header {
+    padding: 0;
+  }
+  .el-message-box__title {
+    word-break: break-all;
+    width: 95%;
+  }
+}
+
+.el-message-box__content {
+  padding: 24px 0;
+  color: var(--app-text-color);
+  font-weight: 400;
+}
+.el-message-box__btns {
+  padding: 0;
+  button {
+    min-width: 80px;
+    &:nth-child(2) {
+      margin-left: 12px;
+    }
+  }
+  button.danger {
+    background: var(--el-color-danger);
+    border: var(--el-color-danger);
+    color: #ffffff;
+  }
+}
+.el-message-box__headerbtn {
+  right: 10px;
+  top: 16px;
+  .el-message-box__close {
+    font-size: 20px;
+  }
+}
+
+// drawer
+.el-drawer {
+  .el-drawer__header {
+    padding: 16px 24px;
+    margin: 0;
+    border-bottom: 1px solid var(--el-border-color);
+    color: var(--app-text-color);
+  }
+  .el-drawer__body {
+    padding: 16px 24px;
+  }
+  .el-drawer__footer {
+    border-top: 1px solid var(--el-border-color);
+    padding: 16px 24px;
+  }
+}
+
+// popper
+.el-popper {
+  --el-popper-border-radius: 6px;
 }

@@ -48,6 +48,7 @@ export default {
   },
   status: {
     label: '狀態',
+    disable: '停用',
     enabled: '已啟用',
     disabled: '已停用',
     enableSuccess: '啟用成功',

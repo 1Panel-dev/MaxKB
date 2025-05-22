@@ -1,14 +1,7 @@
 <template>
   <el-drawer v-model="debugVisible" size="60%" :append-to-body="true">
     <template #header>
-      <div class="flex align-center" style="margin-left: -8px">
-        <el-button class="cursor mr-4" link @click.prevent="debugVisible = false">
-          <el-icon :size="20">
-            <Back />
-          </el-icon>
-        </el-button>
-        <h4>{{ $t('common.param.initParam') }}</h4>
-      </div>
+      <h4>{{ $t('common.param.initParam') }}</h4>
     </template>
     <div>
       <div v-if="form.init_field_list?.length > 0">

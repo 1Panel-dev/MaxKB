@@ -5,7 +5,7 @@
     </template>
     <div>
       <h4 class="title-decoration-1 mb-16">
-        {{ $t('views.functionLib.functionForm.title.baseInfo') }}
+        {{ $t('views.tool.functionForm.title.baseInfo') }}
       </h4>
       <el-form
         ref="FormRef"
@@ -17,7 +17,7 @@
         @submit.prevent
       >
         <el-form-item
-          :label="$t('views.functionLib.functionForm.form.functionName.label')"
+          :label="$t('views.tool.form.toolName.label')"
           prop="name"
         >
           <div class="flex w-full">
@@ -55,12 +55,12 @@
                 <el-icon><EditPen /></el-icon>
               </AppAvatar>
             </div>
-            <AppAvatar shape="square" style="background: #34c724" class="mr-12" v-else>
-              <img src="@/assets/icon_function_outlined.svg" style="width: 75%" alt="" />
+            <AppAvatar shape="square" class="avatar-green" v-else>
+              <img src="@/assets/node/icon_tool.svg" style="width: 75%" alt="" />
             </AppAvatar>
             <el-input
               v-model="form.name"
-              :placeholder="$t('views.functionLib.functionForm.form.functionName.placeholder')"
+              :placeholder="$t('views.tool.form.toolName.placeholder')"
               maxlength="64"
               show-word-limit
               @blur="form.name = form.name?.trim()"
@@ -68,45 +68,17 @@
           </div>
         </el-form-item>
 
-        <el-form-item :label="$t('views.functionLib.functionForm.form.functionDescription.label')">
+        <el-form-item :label="$t('views.tool.form.toolDescription.label')">
           <el-input
             v-model="form.desc"
             type="textarea"
-            :placeholder="$t('views.functionLib.functionForm.form.functionDescription.placeholder')"
+            :placeholder="$t('views.tool.form.toolDescription.placeholder')"
             maxlength="128"
             show-word-limit
             :autosize="{ minRows: 3 }"
             @blur="form.desc = form.desc?.trim()"
           />
         </el-form-item>
-        <!--
-        <el-form-item prop="permission_type">
-          <template #label>
-            <span>{{ $t('views.functionLib.functionForm.form.permission_type.label') }}</span>
-          </template>
-
-          <el-radio-group v-model="form.permission_type" class="card__radio">
-            <el-row :gutter="16">
-              <template v-for="(value, key) of PermissionType" :key="key">
-                <el-col :span="12">
-                  <el-card
-                    shadow="never"
-                    class="mb-16"
-                    :class="form.permission_type === key ? 'active' : ''"
-                  >
-                    <el-radio :value="key" size="large">
-                      <p class="mb-4">{{ $t(value) }}</p>
-                      <el-text type="info">
-                        {{ $t(PermissionDesc[key]) }}
-                      </el-text>
-                    </el-radio>
-                  </el-card>
-                </el-col>
-              </template>
-            </el-row>
-          </el-radio-group>
-        </el-form-item>
-        -->
       </el-form>
       <div class="flex-between">
         <h4 class="title-decoration-1 mb-16">
@@ -180,7 +152,7 @@
         <h4 class="title-decoration-1 mb-16">
           {{ $t('common.param.inputParam') }}
           <el-text type="info" class="color-secondary">
-            {{ $t('views.functionLib.functionForm.form.param.paramInfo1') }}
+            {{ $t('views.tool.form.param.paramInfo1') }}
           </el-text>
         </h4>
         <el-button link type="primary" @click="openAddDialog()">
@@ -191,9 +163,9 @@
       <el-table ref="inputFieldTableRef" :data="form.input_field_list" class="mb-16">
         <el-table-column
           prop="name"
-          :label="$t('views.functionLib.functionForm.form.paramName.label')"
+          :label="$t('views.tool.form.paramName.label')"
         />
-        <el-table-column :label="$t('views.functionLib.functionForm.form.dataType.label')">
+        <el-table-column :label="$t('views.tool.form.dataType.label')">
           <template #default="{ row }">
             <el-tag type="info" class="info-tag">{{ row.type }}</el-tag>
           </template>
@@ -207,13 +179,13 @@
         </el-table-column>
         <el-table-column
           prop="source"
-          :label="$t('views.functionLib.functionForm.form.source.label')"
+          :label="$t('views.tool.form.source.label')"
         >
           <template #default="{ row }">
             {{
               row.source === 'custom'
-                ? $t('views.functionLib.functionForm.form.source.custom')
-                : $t('views.functionLib.functionForm.form.source.reference')
+                ? $t('views.tool.form.source.custom')
+                : $t('views.tool.form.source.reference')
             }}
           </template>
         </el-table-column>
@@ -237,16 +209,16 @@
         </el-table-column>
       </el-table>
       <h4 class="title-decoration-1 mb-16">
-        {{ $t('views.functionLib.functionForm.form.param.code') }}
+        {{ $t('views.tool.form.param.code') }}
         <span style="color: red; margin-left: -10px">*</span>
         <el-text type="info" class="color-secondary">
-          {{ $t('views.functionLib.functionForm.form.param.paramInfo2') }}
+          {{ $t('views.tool.form.param.paramInfo2') }}
         </el-text>
       </h4>
 
       <div class="mb-8" v-if="showEditor">
         <CodemirrorEditor
-          :title="$t('views.functionLib.functionForm.form.param.code')"
+          :title="$t('views.tool.form.param.code')"
           v-model="form.code"
           @submitDialog="submitCodemirrorEditor"
         />
@@ -254,7 +226,7 @@
       <h4 class="title-decoration-1 mb-16 mt-16">
         {{ $t('common.param.outputParam') }}
         <el-text type="info" class="color-secondary">
-          {{ $t('views.functionLib.functionForm.form.param.paramInfo1') }}
+          {{ $t('views.tool.form.param.paramInfo1') }}
         </el-text>
       </h4>
       <div class="flex-between border-r-4 p-8-12 mb-8 layout-bg lighter">
@@ -274,8 +246,8 @@
 
     <FunctionDebugDrawer ref="FunctionDebugDrawerRef" />
     <FieldFormDialog ref="FieldFormDialogRef" @refresh="refreshFieldList" />
-    <UserFieldFormDialog ref="UserFieldFormDialogRef" @refresh="refreshInitFieldList" />
-    <EditAvatarDialog ref="EditAvatarDialogRef" @refresh="refreshFunctionLib" />
+    <!-- <UserFieldFormDialog ref="UserFieldFormDialogRef" @refresh="refreshInitFieldList" /> -->
+    <EditAvatarDialog ref="EditAvatarDialogRef" @refresh="refreshtool" />
   </el-drawer>
 </template>
 
@@ -283,20 +255,19 @@
 import { ref, reactive, watch, nextTick } from 'vue'
 import FieldFormDialog from './FieldFormDialog.vue'
 import FunctionDebugDrawer from './FunctionDebugDrawer.vue'
-import type { functionLibData } from '@/api/type/function-lib'
-import functionLibApi from '@/api/function-lib'
+import type { toolData } from '@/api/type/tool'
+import ToolApi from '@/api/tool/tool'
 import type { FormInstance } from 'element-plus'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { cloneDeep } from 'lodash'
 import { PermissionType, PermissionDesc } from '@/enums/model'
 import { t } from '@/locales'
-import UserFieldFormDialog from '@/workflow/nodes/base-node/component/UserFieldFormDialog.vue'
+// import UserFieldFormDialog from '@/workflow/nodes/base-node/component/UserFieldFormDialog.vue'
 import { isAppIcon } from '@/utils/application'
 import EditAvatarDialog from './EditAvatarDialog.vue'
-import Sortable from 'sortablejs'
 
 const props = defineProps({
-  title: String
+  title: String,
 })
 
 const emit = defineEmits(['refresh'])
@@ -316,14 +287,13 @@ const showEditor = ref(false)
 const currentIndex = ref<any>(null)
 const showEditIcon = ref(false)
 
-const form = ref<functionLibData>({
+const form = ref<toolData>({
   name: '',
   desc: '',
   code: '',
   icon: '',
   input_field_list: [],
   init_field_list: [],
-  permission_type: 'PRIVATE'
 })
 
 watch(visible, (bool) => {
@@ -338,7 +308,6 @@ watch(visible, (bool) => {
       icon: '',
       input_field_list: [],
       init_field_list: [],
-      permission_type: 'PRIVATE'
     }
     FormRef.value?.clearValidate()
   }
@@ -348,52 +317,11 @@ const rules = reactive({
   name: [
     {
       required: true,
-      message: t('views.functionLib.functionForm.form.functionName.requiredMessage'),
-      trigger: 'blur'
-    }
+      message: t('views.tool.form.toolName.requiredMessage'),
+      trigger: 'blur',
+    },
   ],
-  permission_type: [
-    {
-      required: true,
-      message: t('views.functionLib.functionForm.form.permission_type.requiredMessage'),
-      trigger: 'change'
-    }
-  ]
 })
-
-function onDragHandle() {
-  // For init_field_list table
-  if (initFieldTableRef.value) {
-    const el = initFieldTableRef.value.$el.querySelector('.el-table__body-wrapper tbody')
-    Sortable.create(el, {
-      animation: 150,
-      ghostClass: 'sortable-ghost',
-      onEnd: ({ newIndex, oldIndex }) => {
-        if (newIndex === undefined || oldIndex === undefined) return
-        if (newIndex !== oldIndex) {
-          const item = form.value.init_field_list?.splice(oldIndex, 1)[0]
-          form.value.init_field_list?.splice(newIndex, 0, item)
-        }
-      }
-    })
-  }
-
-  // For input_field_list table
-  if (inputFieldTableRef.value) {
-    const el = inputFieldTableRef.value.$el.querySelector('.el-table__body-wrapper tbody')
-    Sortable.create(el, {
-      animation: 150,
-      ghostClass: 'sortable-ghost',
-      onEnd: ({ newIndex, oldIndex }) => {
-        if (newIndex === undefined || oldIndex === undefined) return
-        if (newIndex !== oldIndex) {
-          const item = form.value.input_field_list?.splice(oldIndex, 1)[0]
-          form.value.input_field_list?.splice(newIndex, 0, item)
-        }
-      }
-    })
-  }
-}
 
 function submitCodemirrorEditor(val: string) {
   form.value.code = val
@@ -403,9 +331,9 @@ function close() {
   if (isEdit.value || !areAllValuesNonEmpty(form.value)) {
     visible.value = false
   } else {
-    MsgConfirm(t('common.tip'), t('views.functionLib.tip.saveMessage'), {
+    MsgConfirm(t('common.tip'), t('views.tool.tip.saveMessage'), {
       confirmButtonText: t('common.confirm'),
-      type: 'warning'
+      type: 'warning',
     })
       .then(() => {
         visible.value = false
@@ -465,7 +393,7 @@ function refreshInitFieldList(data: any) {
   UserFieldFormDialogRef.value.close()
 }
 
-function refreshFunctionLib(data: any) {
+function refreshtool(data: any) {
   form.value.icon = data
   // console.log(data)
 }
@@ -484,13 +412,13 @@ const submit = async (formEl: FormInstance | undefined) => {
     if (valid) {
       // console.log(form.value)
       if (isEdit.value) {
-        functionLibApi.putFunctionLib(form.value?.id as string, form.value, loading).then((res) => {
+        toolApi.puttool(form.value?.id as string, form.value, loading).then((res) => {
           MsgSuccess(t('common.editSuccess'))
           emit('refresh', res.data)
           visible.value = false
         })
       } else {
-        functionLibApi.postFunctionLib(form.value, loading).then((res) => {
+        toolApi.posttool(form.value, loading).then((res) => {
           MsgSuccess(t('common.createSuccess'))
           emit('refresh')
           visible.value = false
@@ -512,7 +440,7 @@ const open = (data: any) => {
 }
 
 defineExpose({
-  open
+  open,
 })
 </script>
 <style lang="scss" scoped></style>
