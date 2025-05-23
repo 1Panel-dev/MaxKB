@@ -87,10 +87,10 @@ class UserManageSerializer(serializers.Serializer):
             required=True,
             label=_("Username"),
             max_length=20,
-            min_length=6,
+            min_length=4,
             validators=[
                 validators.RegexValidator(
-                    regex=re.compile("^.{6,20}$"),
+                    regex=re.compile("^.{4,20}$"),
                     message=_('Username must be 6-20 characters long')
                 )
             ]
