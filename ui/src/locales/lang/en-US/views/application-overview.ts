@@ -27,17 +27,6 @@ export default {
       enabledSuccess: 'Enabled',
       disabledSuccess: 'Disabled'
     },
-    EditAvatarDialog: {
-      title: 'App Logo',
-      customizeUpload: 'Custom Upload',
-      upload: 'Upload',
-      default: 'Default Logo',
-      custom: 'Custom',
-      sizeTip:
-        'Recommended size: 32×32 pixels. Supports JPG, PNG, and GIF formats. Max size: 10 MB',
-      fileSizeExceeded: 'File size exceeds 10 MB',
-      uploadImagePrompt: 'Please upload an image'
-    },
     EmbedDialog: {
       fullscreenModeTitle: 'Fullscreen Mode',
       copyInstructions: 'Copy the code below to embed',

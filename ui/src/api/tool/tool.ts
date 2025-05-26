@@ -40,11 +40,23 @@ const getToolList: (
 }
 
 /**
+ * 创建工具
+ * @param 参数
+ */
+const postTool: (
+  wordspace_id: string,
+  data: toolData,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (wordspace_id, data, loading) => {
+  return post(`${prefix}/${wordspace_id}/tool`, data, undefined, loading)
+}
+
+/**
  * 修改工具
  * @param 参数
 
  */
-const putToolLib: (
+const putTool: (
   wordspace_id: string,
   tool_id: string,
   data: toolData,
@@ -67,9 +79,22 @@ const getToolById: (
   return get(`${prefix}/${wordspace_id}/tool/${function_lib_id}`, undefined, loading)
 }
 
+/**
+ * 调试工具
+ * @param 参数
+
+ */
+// const postToolDebug: (data: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
+//   data: any,
+//   loading
+// ) => {
+//   return post(`${prefix}/debug`, data, undefined, loading)
+// }
+
 export default {
   getToolByFolder,
   getToolList,
-  putToolLib,
-  getToolById
+  putTool,
+  getToolById,
+  postTool
 }

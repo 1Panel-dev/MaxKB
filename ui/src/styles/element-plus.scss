@@ -165,3 +165,29 @@ $primary-color: #3370ff;
 .el-popper {
   --el-popper-border-radius: 6px;
 }
+
+// table
+.el-table {
+  --el-table-header-bg-color: var(--app-layout-bg-color);
+  --el-table-text-color: var(--app-text-color);
+  font-weight: 400;
+  thead {
+    color: var(--app-text-color-secondary);
+    th {
+      font-weight: 500;
+    }
+  }
+
+  th.el-table__cell {
+    border-top: var(--el-table-border);
+  }
+  .el-table__cell {
+    padding: 12px 0;
+  }
+  .el-checkbox {
+    height: 23px;
+  }
+  tr.highlight {
+    background: var(--el-table-current-row-bg-color);
+  }
+}

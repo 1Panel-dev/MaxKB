@@ -7,6 +7,10 @@ export default {
     confirmMessage: '禁用后，引用了该工具的应用提问时会报错 ，请谨慎操作。',
   },
   form: {
+    title: {
+      copy: '副本',
+      baseInfo: '基础信息'
+    },
     toolName: {
       label: '名称',
       name: '工具名称',

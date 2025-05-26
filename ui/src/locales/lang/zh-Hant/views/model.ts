@@ -38,8 +38,6 @@ export default {
       baseInfo: '基礎資訊',
       advancedInfo: '進階設定',
       modelParams: '模型參數',
-      editParam: '編輯參數',
-      addParam: '新增參數',
       paramSetting: '模型參數設定',
       apiParamPassing: '接口傳參',
     },

@@ -12,3 +12,46 @@
     border-right: 1px solid var(--el-border-color);
   }
 }
+
+// 编辑头像
+.edit-avatar {
+  position: relative;
+  line-height: 0;
+  .edit-mask {
+    position: absolute;
+    left: 0;
+    background: rgba(0, 0, 0, 0.4);
+  }
+}
+
+// radio 一行一个样式
+.radio-block {
+  width: 100%;
+  display: inline-flex;
+  .el-radio {
+    align-items: flex-start;
+    height: 100%;
+    width: 100%;
+    margin-top: 8px;
+  }
+  .el-radio__label {
+    width: 100%;
+    margin-top: -8px;
+    line-height: 30px;
+  }
+}
+// radio 一行一个样式 有输入框 上传头像的内容
+.radio-block-avatar {
+  width: 100%;
+  display: block;
+  .el-radio {
+    align-items: flex-start;
+    height: 100%;
+    width: 100%;
+  }
+  .el-radio__label {
+    width: 100%;
+    margin-top: -8px;
+    line-height: 30px;
+  }
+}

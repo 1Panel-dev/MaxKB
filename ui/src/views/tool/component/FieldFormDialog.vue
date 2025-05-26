@@ -1,10 +1,6 @@
 <template>
   <el-dialog
-    :title="
-      isEdit
-        ? $t('views.template.templateForm.title.editParam')
-        : $t('views.template.templateForm.title.addParam')
-    "
+    :title="isEdit ? $t('common.param.editParam') : $t('common.param.addParam')"
     v-model="dialogVisible"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
@@ -34,20 +30,11 @@
       </el-form-item>
       <el-form-item :label="$t('views.tool.form.source.label')">
         <el-select v-model="form.source">
-          <el-option
-            :label="$t('views.tool.form.source.reference')"
-            value="reference"
-          />
-          <el-option
-            :label="$t('views.tool.form.source.custom')"
-            value="custom"
-          />
+          <el-option :label="$t('views.tool.form.source.reference')" value="reference" />
+          <el-option :label="$t('views.tool.form.source.custom')" value="custom" />
         </el-select>
       </el-form-item>
-      <el-form-item
-        :label="$t('views.tool.form.required.label')"
-        @click.prevent
-      >
+      <el-form-item :label="$t('views.tool.form.required.label')" @click.prevent>
         <el-switch size="small" v-model="form.is_required"></el-switch>
       </el-form-item>
     </el-form>
@@ -78,7 +65,7 @@ const form = ref<any>({
   name: '',
   type: typeOptions[0],
   source: 'reference',
-  is_required: true
+  is_required: true,
 })
 
 const rules = reactive({
@@ -86,9 +73,9 @@ const rules = reactive({
     {
       required: true,
       message: t('views.tool.form.paramName.placeholder'),
-      trigger: 'blur'
-    }
-  ]
+      trigger: 'blur',
+    },
+  ],
 })
 
 const dialogVisible = ref<boolean>(false)
@@ -99,7 +86,7 @@ watch(dialogVisible, (bool) => {
       name: '',
       type: typeOptions[0],
       source: 'reference',
-      is_required: true
+      is_required: true,
     }
     isEdit.value = false
   }

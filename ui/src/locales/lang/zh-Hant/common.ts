@@ -54,13 +54,25 @@ export default {
     enableSuccess: '啟用成功',
     disableSuccess: '停用成功',
   },
-  inputPlaceholder: '請輸入',
-  title: '標題',
-  content: '内容',
   param: {
     outputParam: '輸出參數',
     inputParam: '輸入參數',
     initParam: '啟動參數',
+    editParam: '編輯參數',
+    addParam: '新增參數',
   },
+  inputPlaceholder: '請輸入',
+  title: '標題',
+  content: '内容',
   rename: '重命名',
+  EditAvatarDialog: {
+    title: '應用頭像',
+    customizeUpload: '自訂上傳',
+    upload: '上傳',
+    default: '預設logo',
+    custom: '自訂',
+    sizeTip: '建議尺寸 32*32，支援 JPG、PNG、GIF，大小不超過 10 MB',
+    fileSizeExceeded: '檔案大小超過 10 MB',
+    uploadImagePrompt: '請上傳一張圖片'
+  },
 }

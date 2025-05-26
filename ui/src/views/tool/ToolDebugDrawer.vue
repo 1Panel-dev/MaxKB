@@ -11,7 +11,7 @@
       </div>
     </template>
     <div>
-      <div v-if="form.init_field_list.length > 0">
+      <div v-if="form.init_field_list.length > 0" class="mb-16">
         <h4 class="title-decoration-1 mb-16">
           {{ $t('common.param.initParam') }}
         </h4>
@@ -48,13 +48,13 @@
                 :rules="{
                   required: item.is_required,
                   message: $t('views.tool.form.param.inputPlaceholder'),
-                  trigger: 'blur'
+                  trigger: 'blur',
                 }"
               >
                 <template #label>
                   <div class="flex">
                     <span
-                    >{{ item.name }} <span class="danger" v-if="item.is_required">*</span></span
+                      >{{ item.name }} <span class="danger" v-if="item.is_required">*</span></span
                     >
                     <el-tag type="info" class="info-tag ml-4">{{ item.type }}</el-tag>
                   </div>
@@ -127,7 +127,7 @@ const form = ref<any>({
   code: '',
   input_field_list: [],
   init_field_list: [],
-  init_params: {}
+  init_params: {},
 })
 
 watch(debugVisible, (bool) => {
@@ -140,7 +140,7 @@ watch(debugVisible, (bool) => {
       code: '',
       input_field_list: [],
       init_field_list: [],
-      init_params: {}
+      init_params: {},
     }
   }
 })
@@ -148,7 +148,7 @@ watch(debugVisible, (bool) => {
 const submit = async (formEl: FormInstance | undefined) => {
   const validate = formEl ? formEl.validate() : Promise.resolve()
   Promise.all([dynamicsFormRef.value?.validate(), validate]).then(() => {
-    toolApi.posttoolDebug(form.value, loading).then((res) => {
+    toolApi.postToolDebug(form.value, loading).then((res) => {
       if (res.code === 500) {
         showResult.value = true
         isSuccess.value = false
@@ -167,7 +167,7 @@ const open = (data: any) => {
     data.input_field_list.forEach((item: any) => {
       form.value.debug_field_list.push({
         value: '',
-        ...item
+        ...item,
       })
     })
   }
@@ -178,7 +178,7 @@ const open = (data: any) => {
 }
 
 defineExpose({
-  open
+  open,
 })
 </script>
 <style lang="scss"></style>

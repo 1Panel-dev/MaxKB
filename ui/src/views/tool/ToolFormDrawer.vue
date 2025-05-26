@@ -5,7 +5,7 @@
     </template>
     <div>
       <h4 class="title-decoration-1 mb-16">
-        {{ $t('views.tool.functionForm.title.baseInfo') }}
+        {{ $t('views.tool.form.title.baseInfo') }}
       </h4>
       <el-form
         ref="FormRef"
@@ -16,10 +16,7 @@
         v-loading="loading"
         @submit.prevent
       >
-        <el-form-item
-          :label="$t('views.tool.form.toolName.label')"
-          prop="name"
-        >
+        <el-form-item :label="$t('views.tool.form.toolName.label')" prop="name">
           <div class="flex w-full">
             <div
               v-if="form.id"
@@ -27,7 +24,8 @@
               @mouseenter="showEditIcon = true"
               @mouseleave="showEditIcon = false"
             >
-              <AppAvatar
+
+              <el-Avatar
                 v-if="isAppIcon(form.icon)"
                 :id="form.id"
                 shape="square"
@@ -35,16 +33,11 @@
                 style="background: none"
               >
                 <img :src="String(form.icon)" alt="" />
-              </AppAvatar>
-              <AppAvatar
-                v-else-if="form.name"
-                :id="form.id"
-                :name="form.name"
-                pinyinColor
-                shape="square"
-                :size="32"
-              />
-              <AppAvatar
+              </el-Avatar>
+              <el-avatar v-else class="avatar-green" shape="square" :size="32">
+                <img src="@/assets/node/icon_tool.svg" style="width: 58%" alt="" />
+              </el-avatar>
+              <el-Avatar
                 v-if="showEditIcon"
                 :id="form.id"
                 shape="square"
@@ -53,11 +46,11 @@
                 @click="openEditAvatar"
               >
                 <el-icon><EditPen /></el-icon>
-              </AppAvatar>
+              </el-Avatar>
             </div>
-            <AppAvatar shape="square" class="avatar-green" v-else>
-              <img src="@/assets/node/icon_tool.svg" style="width: 75%" alt="" />
-            </AppAvatar>
+            <el-avatar v-else class="avatar-green" shape="square" :size="32">
+              <img src="@/assets/node/icon_tool.svg" style="width: 58%" alt="" />
+            </el-avatar>
             <el-input
               v-model="form.name"
               :placeholder="$t('views.tool.form.toolName.placeholder')"
@@ -161,10 +154,7 @@
       </div>
 
       <el-table ref="inputFieldTableRef" :data="form.input_field_list" class="mb-16">
-        <el-table-column
-          prop="name"
-          :label="$t('views.tool.form.paramName.label')"
-        />
+        <el-table-column prop="name" :label="$t('views.tool.form.paramName.label')" />
         <el-table-column :label="$t('views.tool.form.dataType.label')">
           <template #default="{ row }">
             <el-tag type="info" class="info-tag">{{ row.type }}</el-tag>
@@ -177,10 +167,7 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column
-          prop="source"
-          :label="$t('views.tool.form.source.label')"
-        >
+        <el-table-column prop="source" :label="$t('views.tool.form.source.label')">
           <template #default="{ row }">
             {{
               row.source === 'custom'
@@ -244,17 +231,19 @@
       </div>
     </template>
 
-    <FunctionDebugDrawer ref="FunctionDebugDrawerRef" />
+    <ToolDebugDrawer ref="ToolDebugDrawerRef" />
     <FieldFormDialog ref="FieldFormDialogRef" @refresh="refreshFieldList" />
-    <!-- <UserFieldFormDialog ref="UserFieldFormDialogRef" @refresh="refreshInitFieldList" /> -->
-    <EditAvatarDialog ref="EditAvatarDialogRef" @refresh="refreshtool" />
+    <UserFieldFormDialog ref="UserFieldFormDialogRef" @refresh="refreshInitFieldList" />
+    <EditAvatarDialog ref="EditAvatarDialogRef" @refresh="refreshTool" />
   </el-drawer>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, watch, nextTick } from 'vue'
-import FieldFormDialog from './FieldFormDialog.vue'
-import FunctionDebugDrawer from './FunctionDebugDrawer.vue'
+import FieldFormDialog from '@/views/tool/component/FieldFormDialog.vue'
+import ToolDebugDrawer from './ToolDebugDrawer.vue'
+import UserFieldFormDialog from '@/views/tool/component/UserFieldFormDialog.vue'
+import EditAvatarDialog from '@/views/tool/component/EditAvatarDialog.vue'
 import type { toolData } from '@/api/type/tool'
 import ToolApi from '@/api/tool/tool'
 import type { FormInstance } from 'element-plus'
@@ -262,9 +251,7 @@ import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { cloneDeep } from 'lodash'
 import { PermissionType, PermissionDesc } from '@/enums/model'
 import { t } from '@/locales'
-// import UserFieldFormDialog from '@/workflow/nodes/base-node/component/UserFieldFormDialog.vue'
-import { isAppIcon } from '@/utils/application'
-import EditAvatarDialog from './EditAvatarDialog.vue'
+import { isAppIcon } from '@/utils/common'
 
 const props = defineProps({
   title: String,
@@ -272,7 +259,7 @@ const props = defineProps({
 
 const emit = defineEmits(['refresh'])
 const FieldFormDialogRef = ref()
-const FunctionDebugDrawerRef = ref()
+const ToolDebugDrawerRef = ref()
 const UserFieldFormDialogRef = ref()
 const EditAvatarDialogRef = ref()
 const initFieldTableRef = ref()
@@ -351,7 +338,7 @@ function areAllValuesNonEmpty(obj: any) {
 }
 
 function openDebug() {
-  FunctionDebugDrawerRef.value.open(form.value)
+  ToolDebugDrawerRef.value.open(form.value)
 }
 
 function deleteField(index: any) {
@@ -395,7 +382,6 @@ function refreshInitFieldList(data: any) {
 
 function refreshtool(data: any) {
   form.value.icon = data
-  // console.log(data)
 }
 
 function deleteInitField(index: any) {
@@ -410,15 +396,14 @@ const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid: any) => {
     if (valid) {
-      // console.log(form.value)
       if (isEdit.value) {
-        toolApi.puttool(form.value?.id as string, form.value, loading).then((res) => {
+        ToolApi.putTool('default', form.value?.id as string, form.value, loading).then((res) => {
           MsgSuccess(t('common.editSuccess'))
           emit('refresh', res.data)
           visible.value = false
         })
       } else {
-        toolApi.posttool(form.value, loading).then((res) => {
+        ToolApi.postTool('default', form.value, loading).then((res) => {
           MsgSuccess(t('common.createSuccess'))
           emit('refresh')
           visible.value = false

@@ -8,7 +8,7 @@
   >
     <el-radio-group v-model="radioType" class="radio-block mb-16">
       <el-radio value="default">
-        <p>{{ $t('views.applicationOverview.appInfo.EditAvatarDialog.default') }}</p>
+        <p>{{ $t('common.EditAvatarDialog.default') }}</p>
         <AppAvatar
           v-if="detail?.name"
           :name="detail?.name"
@@ -20,7 +20,7 @@
       </el-radio>
 
       <el-radio value="custom">
-        <p>{{ $t('views.applicationOverview.appInfo.EditAvatarDialog.customizeUpload') }}</p>
+        <p>{{ $t('common.EditAvatarDialog.customizeUpload') }}</p>
         <div class="flex mt-8">
           <AppAvatar
             v-if="fileURL"
@@ -40,12 +40,12 @@
             :on-change="onChange"
           >
             <el-button icon="Upload" :disabled="radioType !== 'custom'"
-              >{{ $t('views.applicationOverview.appInfo.EditAvatarDialog.upload') }}
+              >{{ $t('common.EditAvatarDialog.upload') }}
             </el-button>
           </el-upload>
         </div>
         <div class="el-upload__tip info mt-8">
-          {{ $t('views.applicationOverview.appInfo.EditAvatarDialog.sizeTip') }}
+          {{ $t('common.EditAvatarDialog.sizeTip') }}
         </div>
       </el-radio>
     </el-radio-group>
@@ -64,7 +64,7 @@ import { ref, watch } from 'vue'
 import ToolApi from '@/api/tool/tool'
 import { cloneDeep } from 'lodash'
 import { MsgError, MsgSuccess } from '@/utils/message'
-import { defaultIcon, isAppIcon } from '@/utils/application'
+import { defaultIcon, isAppIcon } from '@/utils/common'
 import { t } from '@/locales'
 
 const emit = defineEmits(['refresh'])
@@ -96,7 +96,7 @@ const onChange = (file: any) => {
   const isLimit = file?.size / 1024 / 1024 < 10
   if (!isLimit) {
     // @ts-ignore
-    MsgError(t('views.applicationOverview.appInfo.EditAvatarDialog.fileSizeExceeded'))
+    MsgError(t('common.EditAvatarDialog.fileSizeExceeded'))
     return false
   } else {
     iconFile.value = file
@@ -111,12 +111,12 @@ function submit() {
   } else if (radioType.value === 'custom' && iconFile.value) {
     let fd = new FormData()
     fd.append('file', iconFile.value.raw)
-    toolApi.puttoolIcon(detail.value.id, fd, loading).then((res: any) => {
+    toolApi.putToolIcon(detail.value.id, fd, loading).then((res: any) => {
       emit('refresh', res.data)
       dialogVisible.value = false
     })
   } else {
-    MsgError(t('views.applicationOverview.appInfo.EditAvatarDialog.uploadImagePrompt'))
+    MsgError(t('common.EditAvatarDialog.uploadImagePrompt'))
   }
 }
 

@@ -138,14 +138,16 @@ import { ref, onMounted, computed } from 'vue'
 import { onBeforeRouteLeave, useRouter, useRoute } from 'vue-router'
 // import CreateApplicationDialog from '@/views/application/component/CreateApplicationDialog.vue'
 // import CreateDatasetDialog from '@/views/dataset/component/CreateDatasetDialog.vue'
-import { isAppIcon, isWorkFlow } from '@/utils/application'
+import { isWorkFlow } from '@/utils/application'
+import { isAppIcon } from '@/utils/common'
+
 import useStore from '@/stores'
 const { common, dataset, application } = useStore()
 const route = useRoute()
 const router = useRouter()
 const {
   meta: { activeMenu },
-  params: { id }
+  params: { id },
 } = route as any
 
 onBeforeRouteLeave((to, from) => {
@@ -193,7 +195,7 @@ function changeMenu(id: string) {
       } else {
         router.push({
           name: lastMatched.name,
-          params: { id: id, type: type }
+          params: { id: id, type: type },
         })
       }
     }

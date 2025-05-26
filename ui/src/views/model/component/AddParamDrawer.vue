@@ -10,8 +10,8 @@
       <h4>
         {{
           isEdit
-            ? $t('views.model.modelForm.title.editParam')
-            : $t('views.model.modelForm.title.addParam')
+            ? $t('common.param.editParam')
+            : $t('common.param.addParam')
         }}
       </h4>
     </template>

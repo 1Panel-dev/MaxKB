@@ -46,3 +46,9 @@ export function filesize(size: number) {
   if (size < Math.pow(num, 4)) return (size / Math.pow(num, 3)).toFixed(2) + 'G' //G
   return (size / Math.pow(num, 4)).toFixed(2) + 'T' //T
 }
+
+// 头像
+export const defaultIcon = '/ui/favicon.ico'
+export function isAppIcon(url: String | undefined) {
+  return url === defaultIcon ? '' : url
+}

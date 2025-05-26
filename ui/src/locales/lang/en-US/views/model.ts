@@ -38,8 +38,6 @@ export default {
       baseInfo: 'Basic Information',
       advancedInfo: 'Advanced Settings',
       modelParams: 'Model Parameters',
-      editParam: 'Edit Parameter',
-      addParam: 'Add Parameter',
       paramSetting: 'Model Parameter Settings',
       apiParamPassing: 'Interface Parameters',
     },

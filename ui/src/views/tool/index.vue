@@ -74,7 +74,16 @@
             <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" class="mb-16">
               <CardBox :title="item.name" :description="item.desc" class="cursor">
                 <template #icon>
-                  <el-avatar class="avatar-green" shape="square" :size="32">
+                  <el-avatar
+                    v-if="isAppIcon(item?.icon)"
+                    shape="square"
+                    :size="32"
+                    style="background: none"
+                    class="mr-8"
+                  >
+                    <img :src="item?.icon" alt="" />
+                  </el-avatar>
+                  <el-avatar v-else class="avatar-green" shape="square" :size="32">
                     <img src="@/assets/node/icon_tool.svg" style="width: 58%" alt="" />
                   </el-avatar>
                 </template>
@@ -178,8 +187,9 @@ import ToolApi from '@/api/tool/tool'
 import useStore from '@/stores'
 import { MsgConfirm } from '@/utils/message'
 import InitParamDrawer from '@/views/tool/component/InitParamDrawer.vue'
-import ToolFormDrawer from './component/ToolFormDrawer.vue'
+import ToolFormDrawer from './ToolFormDrawer.vue'
 import { t } from '@/locales'
+import { isAppIcon } from '@/utils/common'
 
 const { folder, user } = useStore()
 
@@ -267,7 +277,7 @@ async function changeState(row: any) {
       const obj = {
         is_active: !row.is_active,
       }
-      ToolApi.putToolLib('default', row.id, obj, changeStateloading)
+      ToolApi.putTool('default', row.id, obj, changeStateloading)
         .then(() => {
           return true
         })
@@ -290,7 +300,7 @@ async function changeState(row: any) {
     const obj = {
       is_active: !row.is_active,
     }
-    ToolApi.putToolLib('default', row.id, obj, changeStateloading)
+    ToolApi.putTool('default', row.id, obj, changeStateloading)
       .then(() => {
         return true
       })

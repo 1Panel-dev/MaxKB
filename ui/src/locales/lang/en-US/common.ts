@@ -58,10 +58,21 @@ export default {
     outputParam: 'Output Parameters',
     inputParam: 'Input Parameters',
     initParam: 'Startup Parameters',
+    editParam: 'Edit Parameter',
+    addParam: 'Add Parameter',
   },
-
   inputPlaceholder: 'Please input',
   title: 'Title',
   content: 'Content',
   rename: 'Rename',
+  EditAvatarDialog: {
+    title: 'App Logo',
+    customizeUpload: 'Custom Upload',
+    upload: 'Upload',
+    default: 'Default Logo',
+    custom: 'Custom',
+    sizeTip: 'Recommended size: 32×32 pixels. Supports JPG, PNG, and GIF formats. Max size: 10 MB',
+    fileSizeExceeded: 'File size exceeds 10 MB',
+    uploadImagePrompt: 'Please upload an image',
+  },
 }

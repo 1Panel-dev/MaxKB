@@ -65,9 +65,8 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-
 import { cloneDeep } from 'lodash'
-import { isAppIcon } from '@/utils/application'
+import { isAppIcon } from '@/utils/common'
 const emit = defineEmits(['refresh', 'addFunction'])
 
 const visibleInternalDesc = ref(false)
