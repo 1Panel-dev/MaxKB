@@ -6,6 +6,7 @@ from django.db.models import QuerySet, Q
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from application.models.application import Application, ApplicationFolder
 from common.constants.permission_constants import Group
 from folders.api.folder import FolderCreateRequest
 from knowledge.models import KnowledgeFolder, Knowledge
@@ -18,8 +19,7 @@ def get_source_type(source):
     if source == Group.TOOL.name:
         return Tool
     elif source == Group.APPLICATION.name:
-        # todo app folder
-        return None
+        return Application
     elif source == Group.KNOWLEDGE.name:
         return Knowledge
     else:
@@ -30,8 +30,7 @@ def get_folder_type(source):
     if source == Group.TOOL.name:
         return ToolFolder
     elif source == Group.APPLICATION.name:
-        # todo app folder
-        return None
+        return ApplicationFolder
         # return ApplicationFolder
     elif source == Group.KNOWLEDGE.name:
         return KnowledgeFolder
