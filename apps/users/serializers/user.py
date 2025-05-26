@@ -7,6 +7,7 @@
     @desc:
 """
 import re
+from itertools import product
 
 from django.db import transaction
 from django.db.models import Q, QuerySet
@@ -185,21 +186,7 @@ class UserManageSerializer(serializers.Serializer):
             source="LOCAL",
             is_active=True
         )
-        # 企业版本 增加用户的角色设置 参数是  role_id  [workspace_id]
-        workspace_user_role_mapping_model = DatabaseModelManage.get_model("workspace_user_role_mapping")
-        if workspace_user_role_mapping_model:
-            # 获取当前用户的角色设置
-            role_setting = instance.get('role_setting')
-            # role_setting 的数据类型是{"role_id": [workspace_id1, workspace_id2]}
-            # 如果是系统层级的 workspace_id 是 SYSTEM 或者是NONE
-            for role_id, workspace_ids in role_setting.items():
-                for workspace_id in workspace_ids:
-                    # 创建用户角色映射关系
-                    workspace_user_role_mapping_model.objects.create(
-                        user_id=user.id,
-                        role_id=role_id,
-                        workspace_id=workspace_id
-                    )
+        update_user_role(instance, user)
         user.save()
         return UserInstanceSerializer(user).data
 
@@ -314,20 +301,7 @@ class UserManageSerializer(serializers.Serializer):
             user = User.objects.filter(id=self.data.get('id')).first()
             self._check_admin_modification(user, instance)
             self._update_user_fields(user, instance)
-            workspace_user_role_mapping_model = DatabaseModelManage.get_model("workspace_user_role_mapping")
-            if workspace_user_role_mapping_model:
-                # 获取当前用户的角色设置
-                role_setting = instance.get('role_setting')
-                # 全部删除重新添加
-                workspace_user_role_mapping_model.objects.filter(user_id=user.id).delete()
-                for role_id, workspace_ids in role_setting.items():
-                    for workspace_id in workspace_ids:
-                        # 创建用户角色映射关系
-                        workspace_user_role_mapping_model.objects.create(
-                            user_id=user.id,
-                            role_id=role_id,
-                            workspace_id=workspace_id
-                        )
+            update_user_role(instance, user)
             user.save()
             return UserInstanceSerializer(user).data
 
@@ -398,3 +372,30 @@ class UserManageSerializer(serializers.Serializer):
 
         users = User.objects.filter(id__in=user_ids).values('id', 'nick_name')
         return list(users)
+
+def update_user_role(instance, user):
+    workspace_user_role_mapping_model = DatabaseModelManage.get_model("workspace_user_role_mapping")
+    role_setting_model = DatabaseModelManage.get_model("role_model")
+    if workspace_user_role_mapping_model:
+        role_setting = instance.get('role_setting')
+        workspace_user_role_mapping_model.objects.filter(user_id=user.id).delete()
+        relations = set()
+        for item in role_setting:
+            for role_id, workspace_ids in item.items():
+                relations.update(set(product([role_id], workspace_ids)))
+
+        role_ids = {role_id for item in role_setting for role_id in item}
+        role_ids_is_system = role_setting_model.objects.filter(id__in=role_ids,
+                                                               type='SYSTEM_ADMIN').values_list(
+            'id', flat=True)
+        if role_ids_is_system:
+            relations = {(role_id, 'SYSTEM') if role_id in role_ids_is_system else (role_id, workspace_id)
+                         for role_id, workspace_id in relations}
+        for role_id, workspace_id in relations:
+            workspace_user_role_mapping_model.objects.create(
+                id=uuid.uuid7(),
+                role_id=role_id,
+                workspace_id=workspace_id,
+                user_id=user.id
+            )
+
