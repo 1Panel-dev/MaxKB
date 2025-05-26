@@ -14,14 +14,34 @@
         <div class="flex-between"></div>
       </div>
       <div>
-        <el-row v-if="datasetList.length > 0" :gutter="15">
+        <el-row v-if="datasetList.length > 0 || datasetFolderList.length > 0" :gutter="15">
+          <template v-for="(item, index) in datasetFolderList" :key="index">
+            <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" class="mb-16">
+              <CardBox
+                :title="item.name"
+                :description="item.desc || $t('common.noData')"
+                class="cursor"
+              >
+                <template #icon>
+                  <el-avatar shape="square" :size="32" style="background: none">
+                    <AppIcon iconName="app-folder" style="font-size: 32px"></AppIcon>
+                  </el-avatar>
+                </template>
+                <template #subTitle>
+                  <el-text class="color-secondary lighter" size="small">
+                    {{ $t('common.creator') }}: {{ item.username }}
+                  </el-text>
+                </template>
+              </CardBox>
+            </el-col>
+          </template>
           <template v-for="(item, index) in datasetList" :key="index">
             <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" class="mb-16">
               <CardBox :title="item.name" :description="item.desc" class="cursor">
                 <template #icon>
                   <el-avatar
                     v-if="item.type === '1'"
-                    class="mr-8 avatar-purple"
+                    class="avatar-purple"
                     shape="square"
                     :size="32"
                   >
@@ -29,14 +49,14 @@
                   </el-avatar>
                   <el-avatar
                     v-else-if="item.type === '2'"
-                    class="mr-8 avatar-purple"
+                    class="avatar-purple"
                     shape="square"
                     :size="32"
                     style="background: none"
                   >
                     <img src="@/assets/knowledge/logo_lark.svg" style="width: 100%" alt="" />
                   </el-avatar>
-                  <el-avatar v-else class="mr-8 avatar-blue" shape="square" :size="32">
+                  <el-avatar v-else class="avatar-blue" shape="square" :size="32">
                     <img src="@/assets/knowledge/icon_document.svg" style="width: 58%" alt="" />
                   </el-avatar>
                 </template>
@@ -93,6 +113,7 @@ const paginationConfig = reactive({
 
 const folderList = ref<any[]>([])
 const datasetList = ref<any[]>([])
+const datasetFolderList = ref<any[]>([])
 const currentFolder = ref<any>({})
 
 function getList() {
@@ -100,8 +121,9 @@ function getList() {
     folder_id: currentFolder.value?.id || 'root',
   }
   KnowledgeApi.getKnowledgeList('default', paginationConfig, params, loading).then((res) => {
+    datasetFolderList.value = res.data?.folders
     paginationConfig.total = res.data.total
-    datasetList.value = [...datasetList.value, ...res.data.records]
+    datasetList.value = [...datasetList.value, ...res.data.knowledge.records]
   })
 }
 
