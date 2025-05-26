@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-16 17:54+0800\n"
+"POT-Creation-Date: 2025-05-26 16:31+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -79,11 +79,11 @@ msgstr "密碼和確認密碼不一致"
 msgid "The nickname is already registered"
 msgstr "暱稱已註冊"
 
-#: common/constants/permission_constants.py:171
+#: common/constants/permission_constants.py:172
 msgid "System Setting"
 msgstr "系統設置"
 
-#: common/constants/permission_constants.py:172 users/views/login.py:24
+#: common/constants/permission_constants.py:173 users/views/login.py:24
 #: users/views/login.py:36 users/views/user.py:34 users/views/user.py:47
 #: users/views/user.py:61 users/views/user.py:76 users/views/user.py:90
 #: users/views/user.py:104 users/views/user.py:117 users/views/user.py:128
@@ -91,70 +91,82 @@ msgstr "系統設置"
 msgid "User Management"
 msgstr "用戶管理"
 
-#: common/constants/permission_constants.py:173
+#: common/constants/permission_constants.py:174
+#: role_setting/views/role_setting.py:29 role_setting/views/role_setting.py:51
+#: role_setting/views/role_setting.py:66 role_setting/views/role_setting.py:85
+#: role_setting/views/role_setting.py:105
+#: role_setting/views/role_setting.py:123
+#: role_setting/views/role_setting.py:145
+#: role_setting/views/role_setting.py:167
+#: role_setting/views/role_setting.py:183
 msgid "Role"
 msgstr "角色"
 
-#: common/constants/permission_constants.py:174
+#: common/constants/permission_constants.py:175 workspace/views/workspace.py:28
+#: workspace/views/workspace.py:38 workspace/views/workspace.py:52
+#: workspace/views/workspace.py:68 workspace/views/workspace.py:84
+#: workspace/views/workspace.py:101 workspace/views/workspace.py:118
+#: workspace/views/workspace.py:133 workspace/views/workspace.py:149
+#: workspace/views/workspace.py:166 workspace/views/workspace.py:182
 msgid "Workspace"
 msgstr "工作空間"
 
-#: common/constants/permission_constants.py:175
+#: common/constants/permission_constants.py:176
 msgid "Resource Application"
 msgstr "資源管理-應用"
 
-#: common/constants/permission_constants.py:176
+#: common/constants/permission_constants.py:177
 msgid "Resource Knowledge"
 msgstr "資源管理-知識庫"
 
-#: common/constants/permission_constants.py:177
+#: common/constants/permission_constants.py:178
 msgid "Resource Tool"
 msgstr "資源管理-工具"
 
-#: common/constants/permission_constants.py:178
+#: common/constants/permission_constants.py:179
 msgid "Resource Model"
 msgstr "資源管理-模型"
 
-#: common/constants/permission_constants.py:179
+#: common/constants/permission_constants.py:180
 msgid "Resource Permission"
 msgstr "資源授權"
 
-#: common/constants/permission_constants.py:180
+#: common/constants/permission_constants.py:181
 msgid "Shared Knowledge"
 msgstr "共享資源-知識庫"
 
-#: common/constants/permission_constants.py:181
+#: common/constants/permission_constants.py:182
 msgid "Shared Model"
 msgstr "共享資源-模型"
 
-#: common/constants/permission_constants.py:182
+#: common/constants/permission_constants.py:183
 msgid "Shared Tool"
 msgstr "共享資源-工具"
 
-#: common/constants/permission_constants.py:183
+#: common/constants/permission_constants.py:184
 msgid "Operation Log"
 msgstr "操作日誌"
 
-#: common/constants/permission_constants.py:184
-#: common/constants/permission_constants.py:190
+#: common/constants/permission_constants.py:185
+#: common/constants/permission_constants.py:191
 msgid "Other"
 msgstr "其他"
 
-#: common/constants/permission_constants.py:185
+#: common/constants/permission_constants.py:186
 msgid "System Management"
 msgstr "系統管理"
 
-#: common/constants/permission_constants.py:186
-#: common/constants/permission_constants.py:196
+#: common/constants/permission_constants.py:187
+#: common/constants/permission_constants.py:197
 msgid "Application"
 msgstr "應用"
 
-#: common/constants/permission_constants.py:187
-#: common/constants/permission_constants.py:197
+#: common/constants/permission_constants.py:188
+#: common/constants/permission_constants.py:198
 msgid "Knowledge"
 msgstr "知識庫"
 
-#: common/constants/permission_constants.py:188
+#: common/constants/permission_constants.py:189
 #: models_provider/views/model.py:31 models_provider/views/model.py:59
 #: models_provider/views/model.py:77 models_provider/views/model.py:90
 #: models_provider/views/model.py:102 models_provider/views/model.py:117
@@ -167,78 +179,78 @@ msgstr "知識庫"
 msgid "Model"
 msgstr "模型"
 
-#: common/constants/permission_constants.py:189 tools/views/tool.py:27
+#: common/constants/permission_constants.py:190 tools/views/tool.py:27
 #: tools/views/tool.py:42 tools/views/tool.py:60 tools/views/tool.py:79
 #: tools/views/tool.py:94 tools/views/tool.py:109 tools/views/tool.py:127
 #: tools/views/tool.py:152 tools/views/tool.py:170 tools/views/tool.py:189
 msgid "Tool"
 msgstr "工具"
 
-#: common/constants/permission_constants.py:191
+#: common/constants/permission_constants.py:192
 msgid "Read"
 msgstr "查看"
 
-#: common/constants/permission_constants.py:192
+#: common/constants/permission_constants.py:193
 msgid "Edit"
 msgstr "編輯"
 
-#: common/constants/permission_constants.py:193
+#: common/constants/permission_constants.py:194
 msgid "Create"
 msgstr "創建"
 
-#: common/constants/permission_constants.py:194
+#: common/constants/permission_constants.py:195
 msgid "Delete"
 msgstr "刪除"
 
-#: common/constants/permission_constants.py:195
+#: common/constants/permission_constants.py:196
 msgid "Email Setting"
 msgstr "郵箱設置"
 
-#: common/constants/permission_constants.py:198
+#: common/constants/permission_constants.py:199
 msgid "Document"
 msgstr "文檔"
 
-#: common/constants/permission_constants.py:199
+#: common/constants/permission_constants.py:200
 msgid "Problem"
 msgstr "問題"
 
-#: common/constants/permission_constants.py:200
+#: common/constants/permission_constants.py:201
 msgid "Import"
 msgstr "導入"
 
-#: common/constants/permission_constants.py:201
+#: common/constants/permission_constants.py:202
 msgid "Export"
 msgstr "導出"
 
-#: common/constants/permission_constants.py:202
+#: common/constants/permission_constants.py:203
 msgid "Debug"
 msgstr "調試"
 
-#: common/constants/permission_constants.py:203
+#: common/constants/permission_constants.py:204
 msgid "Sync"
 msgstr "同步"
 
-#: common/constants/permission_constants.py:204
+#: common/constants/permission_constants.py:205
 msgid "Generate"
 msgstr "生成問題"
 
-#: common/constants/permission_constants.py:205
+#: common/constants/permission_constants.py:206
 msgid "Add Member"
 msgstr "添加成員"
 
-#: common/constants/permission_constants.py:206
+#: common/constants/permission_constants.py:207
 msgid "Remove Member"
 msgstr "移除成員"
 
-#: common/constants/permission_constants.py:207
+#: common/constants/permission_constants.py:208
 msgid "Vector"
 msgstr "向量化"
 
-#: common/constants/permission_constants.py:208
+#: common/constants/permission_constants.py:209
 msgid "Migrate"
 msgstr "遷移"
 
-#: common/constants/permission_constants.py:209
+#: common/constants/permission_constants.py:210
 msgid "Relate"
 msgstr "關聯分段"
 
@@ -372,15 +384,15 @@ msgstr "每頁大小"
 msgid "Success"
 msgstr "成功"
 
-#: common/utils/common.py:86
+#: common/utils/common.py:92
 msgid "Text-to-speech node, the text content must be of string type"
 msgstr "文本轉語音節點，文本內容必須是字符串類型"
 
-#: common/utils/common.py:88
+#: common/utils/common.py:94
 msgid "Text-to-speech node, the text content cannot be empty"
 msgstr "文本轉語音節點，文本內容不能為空"
 
-#: common/utils/common.py:241
+#: common/utils/common.py:247
 #, python-brace-format
 msgid "Limit {count} exceeded, please contact us (https://fit2cloud.com/)."
 msgstr "超過限制 {count}，請聯繫我們 (https://fit2cloud.com/)."
@@ -3126,6 +3138,241 @@ msgstr "獲取模型默認參數"
 msgid "Get the model creation form"
 msgstr "獲取模型創建表單"
 
+#: role_setting/api/role_setting.py:15 role_setting/api/role_setting.py:21
+#: role_setting/api/role_setting.py:32 role_setting/api/role_setting.py:142
+#: role_setting/serializers/role_setting_serializers.py:170
+#: workspace/api/workspace.py:81
+msgid "ID"
+msgstr ""
+
+#: role_setting/api/role_setting.py:16 role_setting/api/role_setting.py:22
+#: role_setting/api/role_setting.py:33 users/serializers/user.py:204
+msgid "Name"
+msgstr "用戶名"
+
+#: role_setting/api/role_setting.py:17 role_setting/api/role_setting.py:28
+#: role_setting/serializers/role_setting_serializers.py:171
+msgid "Enable"
+msgstr "啟用"
+
+#: role_setting/api/role_setting.py:25
+#| msgid "permissions"
+msgid "Permission"
+msgstr "權限"
+
+#: role_setting/api/role_setting.py:36
+msgid "Children"
+msgstr "子級"
+
+#: role_setting/api/role_setting.py:54
+#: role_setting/serializers/role_setting_serializers.py:105
+#| msgid "tool type"
+msgid "Role type"
+msgstr "角色類型"
+
+#: role_setting/api/role_setting.py:75
+msgid "Internal role"
+msgstr "內置角色"
+
+#: role_setting/api/role_setting.py:79
+msgid "Custom role"
+msgstr "自定義角色"
+
+#: role_setting/api/role_setting.py:107 role_setting/api/role_setting.py:127
+#: role_setting/api/role_setting.py:163
+#: role_setting/serializers/role_setting_serializers.py:108
+#: role_setting/serializers/role_setting_serializers.py:286
+#: workspace/api/workspace.py:86
+#| msgid "Role"
+msgid "Role ID"
+msgstr "角色 ID"
+
+#: role_setting/api/role_setting.py:134
+#| msgid "User ID"
+msgid "User relation ID"
+msgstr "用戶關係 ID"
+
+#: role_setting/api/role_setting.py:143 tools/serializers/tool.py:334
+#: users/api/user.py:39 users/api/user.py:93 users/api/user.py:109
+#: users/serializers/user.py:271 workspace/api/workspace.py:82
+#: workspace/serializers/workspace_serializers.py:189
+msgid "User ID"
+msgstr "用戶 ID"
+
+#: role_setting/api/role_setting.py:144 role_setting/api/role_setting.py:184
+#: role_setting/serializers/role_setting_serializers.py:287
+#: users/api/user.py:64 users/serializers/login.py:27
+#: users/serializers/user.py:42 users/serializers/user.py:89
+#: workspace/api/workspace.py:83 workspace/api/workspace.py:124
+#: workspace/serializers/workspace_serializers.py:159
+msgid "Username"
+msgstr "用戶名"
+
+#: role_setting/api/role_setting.py:145 workspace/api/workspace.py:84
+#| msgid "Nick name"
+msgid "Nickname"
+msgstr "暱稱"
+
+#: role_setting/api/role_setting.py:146 users/api/user.py:51
+#: users/api/user.py:148 workspace/api/workspace.py:46
+#: workspace/api/workspace.py:66 workspace/api/workspace.py:85
+#: workspace/api/workspace.py:103
+#: workspace/serializers/workspace_serializers.py:158
+msgid "Workspace ID"
+msgstr "工作空間 ID"
+
+#: role_setting/api/role_setting.py:147
+#| msgid "Workspace"
+msgid "Workspace Name"
+msgstr "工作空間"
+
+#: role_setting/api/role_setting.py:170 workspace/api/workspace.py:110
+#| msgid "current page"
+msgid "Current page"
+msgstr "當前頁"
+
+#: role_setting/api/role_setting.py:177 workspace/api/workspace.py:117
+#| msgid "page size"
+msgid "Page size"
+msgstr "每頁大小"
+
+#: role_setting/serializers/role_setting_serializers.py:102
+msgid "Role name"
+msgstr "角色名稱"
+
+#: role_setting/serializers/role_setting_serializers.py:120
+#: role_setting/serializers/role_setting_serializers.py:177
+#: role_setting/serializers/role_setting_serializers.py:282
+#: role_setting/serializers/role_setting_serializers.py:294
+msgid "Role does not exist"
+msgstr "角色不存在"
+
+#: role_setting/serializers/role_setting_serializers.py:122
+#: role_setting/serializers/role_setting_serializers.py:179
+msgid "Cannot modify built-in role"
+msgstr "不能修改內置角色"
+
+#: role_setting/serializers/role_setting_serializers.py:130
+msgid "Role name already exists"
+msgstr "角色名稱已存在"
+
+#: role_setting/serializers/role_setting_serializers.py:150
+msgid "Invalid role type"
+msgstr "無效的角色類型"
+
+#: role_setting/serializers/role_setting_serializers.py:181
+msgid "Cannot delete built-in role"
+msgstr "無法刪除內置角色"
+
+#: role_setting/serializers/role_setting_serializers.py:233
+#: workspace/serializers/workspace_serializers.py:90
+msgid "User IDs"
+msgstr "用戶 ID"
+
+#: role_setting/serializers/role_setting_serializers.py:238
+msgid "Workspace IDs"
+msgstr "工作空間 ID"
+
+#: role_setting/serializers/role_setting_serializers.py:243
+#: workspace/serializers/workspace_serializers.py:101
+msgid "Members"
+msgstr "成員集合"
+
+#: role_setting/serializers/role_setting_serializers.py:270
+#: workspace/serializers/workspace_serializers.py:144
+msgid "User relation does not exist"
+msgstr "用戶關係不存在"
+
+#: role_setting/serializers/role_setting_serializers.py:274
+#: workspace/serializers/workspace_serializers.py:147
+msgid "Cannot remove member from built-in role"
+msgstr "不能從內置角色中移除成員"
+
+#: role_setting/serializers/role_setting_serializers.py:327
+msgid "Only update members to normal users"
+msgstr "只能為普通用戶更新成員"
+
+#: role_setting/views/role_setting.py:24 role_setting/views/role_setting.py:25
+#: role_setting/views/role_setting.py:26
+msgid "Get role permission template"
+msgstr "獲取角色權限模板"
+
+#: role_setting/views/role_setting.py:46 role_setting/views/role_setting.py:47
+#: role_setting/views/role_setting.py:48
+msgid "Create or update role"
+msgstr "創建或更新角色"
+
+#: role_setting/views/role_setting.py:62 role_setting/views/role_setting.py:63
+#: role_setting/views/role_setting.py:64
+msgid "Get role list"
+msgstr "獲取角色列表"
+
+#: role_setting/views/role_setting.py:80 role_setting/views/role_setting.py:81
+#: role_setting/views/role_setting.py:82
+msgid "Delete role"
+msgstr "刪除角色"
+
+#: role_setting/views/role_setting.py:100
+#: role_setting/views/role_setting.py:101
+#: role_setting/views/role_setting.py:102
+msgid "Create or update role permission"
+msgstr "創建或更新角色權限"
+
+#: role_setting/views/role_setting.py:118
+#: role_setting/views/role_setting.py:119
+#: role_setting/views/role_setting.py:120
+msgid "Get role permission"
+msgstr "獲取角色權限"
+
+#: role_setting/views/role_setting.py:139
+#: role_setting/views/role_setting.py:140
+#: role_setting/views/role_setting.py:141
+msgid "Add member to system role"
+msgstr "系統角色添加成員"
+
+#: role_setting/views/role_setting.py:162
+#: role_setting/views/role_setting.py:163
+#: role_setting/views/role_setting.py:164
+msgid "Remove member from system role"
+msgstr "系統角色移除成員"
+
+#: role_setting/views/role_setting.py:178
+#: role_setting/views/role_setting.py:179
+#: role_setting/views/role_setting.py:180
+msgid "Get system role member list"
+msgstr "獲取系統角色成員列表"
+
+#: role_setting/views/role_setting.py:196
+#: role_setting/views/role_setting.py:197
+#: role_setting/views/role_setting.py:198
+msgid "Get Workspace role list"
+msgstr "獲取工作空間角色列表"
+
+#: role_setting/views/role_setting.py:200
+#: role_setting/views/role_setting.py:221
+#: role_setting/views/role_setting.py:243
+#: role_setting/views/role_setting.py:259
+msgid "Workspace Role"
+msgstr "工作空間角色"
+
+#: role_setting/views/role_setting.py:215
+#: role_setting/views/role_setting.py:216
+#: role_setting/views/role_setting.py:217
+msgid "Add member to workspace role"
+msgstr "工作空間角色添加成員"
+
+#: role_setting/views/role_setting.py:238
+#: role_setting/views/role_setting.py:239
+#: role_setting/views/role_setting.py:240
+msgid "Remove member from workspace role"
+msgstr "工作空間角色移除成員"
+
+#: role_setting/views/role_setting.py:254
+#: role_setting/views/role_setting.py:255
+#: role_setting/views/role_setting.py:256
+msgid "Get workspace role member list"
+msgstr "獲取工作空間角色成員列表"
+
 #: system_manage/serializers/email_setting.py:28
 msgid "SMTP host"
 msgstr ""
@@ -3140,8 +3387,8 @@ msgid "Sender's email"
 msgstr "發送者郵箱"
 
 #: system_manage/serializers/email_setting.py:31 users/api/user.py:80
-#: users/serializers/login.py:28 users/serializers/user.py:42
-#: users/serializers/user.py:100 users/serializers/user.py:250
+#: users/serializers/login.py:28 users/serializers/user.py:43
+#: users/serializers/user.py:101 users/serializers/user.py:237
 msgid "Password"
 msgstr "密碼"
 
@@ -3284,11 +3531,6 @@ msgstr "工具 ID"
 msgid "Tool not found"
 msgstr "工具不存在"
 
-#: tools/serializers/tool.py:334 users/api/user.py:39 users/api/user.py:93
-#: users/api/user.py:109 users/serializers/user.py:284
-msgid "User ID"
-msgstr "用戶 ID"
-
 #: tools/serializers/tool.py:396
 msgid "tool type"
 msgstr "工具類型"
@@ -3333,15 +3575,6 @@ msgstr "導出工具"
 msgid "Check code"
 msgstr "檢查代碼"
 
-#: users/api/user.py:51 users/api/user.py:148
-msgid "Workspace ID"
-msgstr "工作空間 ID"
-
-#: users/api/user.py:64 users/serializers/login.py:27
-#: users/serializers/user.py:41 users/serializers/user.py:88
-msgid "Username"
-msgstr "用戶名"
-
 #: users/api/user.py:132
 msgid "Email or Username"
 msgstr "郵箱或用戶名"
@@ -3362,84 +3595,80 @@ msgstr "驗證碼錯誤或過期"
 msgid "The user has been disabled, please contact the administrator!"
 msgstr "用戶已被禁用，請聯繫管理員！"
 
-#: users/serializers/user.py:32
+#: users/serializers/user.py:33
 msgid "Is Edit Password"
 msgstr "是否編輯密碼"
 
-#: users/serializers/user.py:33
+#: users/serializers/user.py:34
 msgid "permissions"
 msgstr "無權限訪問"
 
-#: users/serializers/user.py:43 users/serializers/user.py:80
-#: users/serializers/user.py:209
+#: users/serializers/user.py:44 users/serializers/user.py:81
+#: users/serializers/user.py:196
 msgid "Email"
 msgstr "郵箱"
 
-#: users/serializers/user.py:44 users/serializers/user.py:114
+#: users/serializers/user.py:45 users/serializers/user.py:115
 msgid "Nick name"
 msgstr "暱稱"
 
-#: users/serializers/user.py:45 users/serializers/user.py:119
-#: users/serializers/user.py:222
+#: users/serializers/user.py:46 users/serializers/user.py:120
+#: users/serializers/user.py:209
 msgid "Phone"
 msgstr "手機"
 
-#: users/serializers/user.py:94
+#: users/serializers/user.py:95
 msgid "Username must be 6-20 characters long"
 msgstr "用戶名必須為6-20個字符"
 
-#: users/serializers/user.py:107 users/serializers/user.py:257
+#: users/serializers/user.py:108 users/serializers/user.py:244
 msgid ""
 "The password must be 6-20 characters long and must be a combination of "
 "letters, numbers, and special characters."
 msgstr "密碼必須為6-20個字符，且必須包含字母、數字和特殊字符。"
 
-#: users/serializers/user.py:144
+#: users/serializers/user.py:145
 msgid "Email or username"
 msgstr "郵箱或用戶名"
 
-#: users/serializers/user.py:171
+#: users/serializers/user.py:172
 msgid ""
 "The community version supports up to 2 users. If you need more users, please "
 "contact us (https://fit2cloud.com/)."
 msgstr ""
 "社區版支持最多2個用戶，如需更多用戶，請聯繫我們（https://fit2cloud.com/）。"
 
-#: users/serializers/user.py:217
-msgid "Name"
-msgstr "用戶名"
-
-#: users/serializers/user.py:229
+#: users/serializers/user.py:216
 msgid "Is Active"
 msgstr "是否啟用"
 
-#: users/serializers/user.py:240
+#: users/serializers/user.py:227
 msgid "Nickname is already in use"
 msgstr "Nickname已被使用"
 
-#: users/serializers/user.py:245
+#: users/serializers/user.py:232
 msgid "Email is already in use"
 msgstr "郵箱已被使用"
 
-#: users/serializers/user.py:264
+#: users/serializers/user.py:251
 msgid "Re Password"
 msgstr "確認密碼"
 
-#: users/serializers/user.py:269
+#: users/serializers/user.py:256
 msgid ""
 "The confirmation password must be 6-20 characters long and must be a "
 "combination of letters, numbers, and special characters."
 msgstr "確認密碼必須為6-20個字符，且必須包含字母、數字和特殊字符。"
 
-#: users/serializers/user.py:292
+#: users/serializers/user.py:279
 msgid "User does not exist"
 msgstr "用戶不存在"
 
-#: users/serializers/user.py:307
+#: users/serializers/user.py:294
 msgid "Unable to delete administrator"
 msgstr "無法刪除管理員"
 
-#: users/serializers/user.py:338
+#: users/serializers/user.py:312
 msgid "Cannot modify administrator status"
 msgstr "不能修改管理員狀態"
 
@@ -3488,3 +3717,86 @@ msgstr "修改密碼"
 msgid "Get user paginated list"
 msgstr "獲取用戶分頁列表"
 
+#: workspace/api/workspace.py:73
+#: workspace/serializers/workspace_serializers.py:134
+msgid "User Relation ID"
+msgstr "用戶關係 ID"
+
+#: workspace/api/workspace.py:87
+msgid "Role Name"
+msgstr "角色名稱"
+
+#: workspace/serializers/workspace_serializers.py:37
+#: workspace/serializers/workspace_serializers.py:72
+#: workspace/serializers/workspace_serializers.py:106
+#: workspace/serializers/workspace_serializers.py:140
+#: workspace/serializers/workspace_serializers.py:165
+msgid "Workspace does not exist"
+msgstr "工作空間不存在"
+
+#: workspace/serializers/workspace_serializers.py:44
+msgid "Workspace name already exists"
+msgstr "工作空間名稱已存在"
+
+#: workspace/serializers/workspace_serializers.py:74
+msgid "Default workspace cannot be deleted"
+msgstr "默認工作空間不能被刪除"
+
+#: workspace/serializers/workspace_serializers.py:95
+msgid "Role IDs"
+msgstr "角色 IDs"
+
+#: workspace/views/workspace.py:23 workspace/views/workspace.py:24
+#: workspace/views/workspace.py:25
+msgid "Create or update workspace"
+msgstr "創建或更新工作空間"
+
+#: workspace/views/workspace.py:34 workspace/views/workspace.py:35
+#: workspace/views/workspace.py:36
+msgid "Get system workspace list"
+msgstr "獲取系統工作空間列表"
+
+#: workspace/views/workspace.py:47 workspace/views/workspace.py:48
+#: workspace/views/workspace.py:49
+msgid "Delete workspace"
+msgstr "刪除工作空間"
+
+#: workspace/views/workspace.py:62 workspace/views/workspace.py:63
+#: workspace/views/workspace.py:64
+msgid "Add member to system workspace"
+msgstr "系統工作空間添加成員"
+
+#: workspace/views/workspace.py:79 workspace/views/workspace.py:80
+#: workspace/views/workspace.py:81
+msgid "Remove member from system workspace"
+msgstr "系統工作空間移除成員"
+
+#: workspace/views/workspace.py:96 workspace/views/workspace.py:97
+#: workspace/views/workspace.py:98
+msgid "Get system workspace member list"
+msgstr "獲取系統工作空間成員列表"
+
+#: workspace/views/workspace.py:114 workspace/views/workspace.py:115
+#: workspace/views/workspace.py:116
+msgid "Get workspace list"
+msgstr "獲取工作空間列表"
+
+#: workspace/views/workspace.py:127 workspace/views/workspace.py:128
+#: workspace/views/workspace.py:129
+msgid "Add member to workspace"
+msgstr "工作空間添加成員"
+
+#: workspace/views/workspace.py:144 workspace/views/workspace.py:145
+#: workspace/views/workspace.py:146
+msgid "Remove member from workspace"
+msgstr "工作空間移除成員"
+
+#: workspace/views/workspace.py:161 workspace/views/workspace.py:162
+#: workspace/views/workspace.py:163
+msgid "Get workspace member list"
+msgstr "獲取工作空間成員列表"
+
+#: workspace/views/workspace.py:178 workspace/views/workspace.py:179
+#: workspace/views/workspace.py:180
+msgid "Get workspace list by user"
+msgstr "根據用戶獲取工作空間列表"
