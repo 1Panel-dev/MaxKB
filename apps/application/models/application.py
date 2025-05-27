@@ -67,7 +67,7 @@ class Application(AppModelMixin):
     dialogue_number = models.IntegerField(default=0, verbose_name="会话数量")
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
     model = models.ForeignKey(Model, on_delete=models.SET_NULL, db_constraint=False, blank=True, null=True)
-    dataset_setting = models.JSONField(verbose_name="数据集参数设置", default=get_dataset_setting_dict)
+    knowledge_setting = models.JSONField(verbose_name="数据集参数设置", default=get_dataset_setting_dict)
     model_setting = models.JSONField(verbose_name="模型参数相关设置", default=get_model_setting_dict)
     model_params_setting = models.JSONField(verbose_name="模型参数相关设置", default=dict)
     tts_model_params_setting = models.JSONField(verbose_name="模型参数相关设置", default=dict)
