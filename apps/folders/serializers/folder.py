@@ -7,6 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from application.models.application import Application, ApplicationFolder
+from application.serializers.application_folder import ApplicationFolderTreeSerializer
 from common.constants.permission_constants import Group
 from folders.api.folder import FolderCreateRequest
 from knowledge.models import KnowledgeFolder, Knowledge
@@ -42,9 +43,7 @@ def get_folder_tree_serializer(source):
     if source == Group.TOOL.name:
         return ToolFolderTreeSerializer
     elif source == Group.APPLICATION.name:
-        # todo app folder
-        return None
-        # return ApplicationFolderTreeSerializer
+        return ApplicationFolderTreeSerializer
     elif source == Group.KNOWLEDGE.name:
         return KnowledgeFolderTreeSerializer
     else:

@@ -56,7 +56,7 @@ class ModelKnowledgeAssociation(serializers.Serializer):
     user_id = serializers.UUIDField(required=True, label=_("User ID"))
     model_id = serializers.CharField(required=False, allow_null=True, allow_blank=True,
                                      label=_("Model id"))
-    Knowledge_id_list = serializers.ListSerializer(required=False, child=serializers.UUIDField(required=True,
+    knowledge_id_list = serializers.ListSerializer(required=False, child=serializers.UUIDField(required=True,
                                                                                                label=_(
                                                                                                    "Knowledge base id")),
                                                    label=_("Knowledge Base List"))
@@ -68,7 +68,7 @@ class ModelKnowledgeAssociation(serializers.Serializer):
         if model_id is not None and len(model_id) > 0:
             if not QuerySet(Model).filter(id=model_id).exists():
                 raise AppApiException(500, f'{_("Model does not exist")}【{model_id}】')
-        knowledge_id_list = list(set(self.data.get('knowledge_id_list')))
+        knowledge_id_list = list(set(self.data.get('knowledge_id_list', [])))
         exist_knowledge_id_list = [str(knowledge.id) for knowledge in
                                    QuerySet(Knowledge).filter(id__in=knowledge_id_list, user_id=user_id)]
         for knowledge_id in knowledge_id_list:
@@ -110,6 +110,7 @@ class ApplicationCreateSerializer(serializers.Serializer):
         work_flow = serializers.DictField(required=True, label=_("Workflow Objects"))
         prologue = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=102400,
                                          label=_("Opening remarks"))
+        folder_id = serializers.CharField(required=True, label=_('folder id'))
 
         @staticmethod
         def to_application_model(user_id: str, workspace_id: str, application: Dict):
@@ -123,6 +124,7 @@ class ApplicationCreateSerializer(serializers.Serializer):
                                name=application.get('name'),
                                desc=application.get('desc'),
                                workspace_id=workspace_id,
+                               folder_id=application.get('folder_id', 'root'),
                                prologue="",
                                dialogue_number=0,
                                user_id=user_id, model_id=None,
@@ -135,7 +137,7 @@ class ApplicationCreateSerializer(serializers.Serializer):
                                tts_model_id=application.get('tts_model', None),
                                tts_model_enable=application.get('tts_model_enable', False),
                                tts_model_params_setting=application.get('tts_model_params_setting', {}),
-                               tts_type=application.get('tts_type', None),
+                               tts_type=application.get('tts_type', 'BROWSER'),
                                file_upload_enable=application.get('file_upload_enable', False),
                                file_upload_setting=application.get('file_upload_setting', {}),
                                work_flow=default_workflow
@@ -147,6 +149,7 @@ class ApplicationCreateSerializer(serializers.Serializer):
         desc = serializers.CharField(required=False, allow_null=True, allow_blank=True,
                                      max_length=256, min_length=1,
                                      label=_("application describe"))
+        folder_id = serializers.CharField(required=True, label=_('folder id'))
         model_id = serializers.CharField(required=False, allow_null=True, allow_blank=True,
                                          label=_("Model"))
         dialogue_number = serializers.IntegerField(required=True,
@@ -179,6 +182,20 @@ class ApplicationCreateSerializer(serializers.Serializer):
         model_params_setting = serializers.DictField(required=False,
                                                      label=_('Model parameters'))
 
+        tts_model_enable = serializers.BooleanField(required=False, label=_('Voice playback enabled'))
+
+        tts_model_id = serializers.UUIDField(required=False, allow_null=True, label=_("Voice playback model ID"))
+
+        tts_type = serializers.CharField(required=False, label=_('Voice playback type'))
+
+        tts_autoplay = serializers.BooleanField(required=False, label=_('Voice playback autoplay'))
+
+        stt_model_enable = serializers.BooleanField(required=False, label=_('Voice recognition enabled'))
+
+        stt_model_id = serializers.UUIDField(required=False, allow_null=True, label=_('Speech recognition model ID'))
+
+        stt_autosend = serializers.BooleanField(required=False, label=_('Voice recognition automatic transmission'))
+
         def is_valid(self, *, user_id=None, raise_exception=False):
             super().is_valid(raise_exception=True)
             ModelKnowledgeAssociation(data={'user_id': user_id, 'model_id': self.data.get('model_id'),
@@ -190,7 +207,8 @@ class ApplicationCreateSerializer(serializers.Serializer):
                                prologue=application.get('prologue'),
                                dialogue_number=application.get('dialogue_number', 0),
                                user_id=user_id, model_id=application.get('model_id'),
-                               dataset_setting=application.get('dataset_setting'),
+                               folder_id=application.get('folder_id', 'root'),
+                               knowledge_setting=application.get('knowledge_setting'),
                                model_setting=application.get('model_setting'),
                                problem_optimization=application.get('problem_optimization'),
                                type=ApplicationTypeChoices.SIMPLE,
@@ -198,10 +216,11 @@ class ApplicationCreateSerializer(serializers.Serializer):
                                problem_optimization_prompt=application.get('problem_optimization_prompt', None),
                                stt_model_enable=application.get('stt_model_enable', False),
                                stt_model_id=application.get('stt_model', None),
+                               stt_autosend=application.get('stt_autosend', False),
                                tts_model_id=application.get('tts_model', None),
                                tts_model_enable=application.get('tts_model_enable', False),
                                tts_model_params_setting=application.get('tts_model_params_setting', {}),
-                               tts_type=application.get('tts_type', None),
+                               tts_type=application.get('tts_type', 'BROWSER'),
                                file_upload_enable=application.get('file_upload_enable', False),
                                file_upload_setting=application.get('file_upload_setting', {}),
                                work_flow={}
@@ -222,8 +241,10 @@ class ApplicationSerializer(serializers.Serializer):
     def insert_workflow(self, instance: Dict):
         self.is_valid(raise_exception=True)
         user_id = self.data.get('user_id')
-        ApplicationCreateSerializer.WorkflowRequest(data=instance).is_valid(raise_exception=True)
-        application_model = ApplicationCreateSerializer.WorkflowRequest.to_application_model(user_id, instance)
+        workspace_id = self.data.get('workspace_id')
+        wq = ApplicationCreateSerializer.WorkflowRequest(data=instance)
+        wq.is_valid(raise_exception=True)
+        application_model = wq.to_application_model(user_id, workspace_id, instance)
         application_model.save()
         # 插入认证信息
         ApplicationAccessToken(application_id=application_model.id,
