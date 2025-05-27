@@ -36,6 +36,8 @@ class Group(Enum):
     EMAIL_SETTING = "EMAIL_SETTING"
     ROLE = "ROLE"
     WORKSPACE = "WORKSPACE"
+    DISPLAY_SETTINGS = "DISPLAY_SETTINGS"
+    LOGIN_AUTH = "LOGIN_AUTH"
 
 
 class SystemGroup(Enum):
@@ -208,6 +210,8 @@ Permission_Label = {
     Operate.VECTOR.value: _("Vector"),
     Operate.MIGRATE.value: _("Migrate"),
     Operate.RELATE.value: _("Relate"),
+    Group.LOGIN_AUTH.value: _("Login Auth"),
+    Group.DISPLAY_SETTINGS.value: _("Display Settings"),
 
 }
 
@@ -502,6 +506,16 @@ class PermissionConstants(Enum):
         group=Group.WORKSPACE, operate=Operate.REMOVE_MEMBER, role_list=[RoleConstants.ADMIN],
         parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT]
     )
+    LOGIN_AUTH_READ = Permission(
+        group=Group.LOGIN_AUTH, operate=Operate.READ, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.SYSTEM_SETTING]
+    )
+    LOGIN_AUTH_EDIT = Permission(
+        group=Group.LOGIN_AUTH, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.SYSTEM_SETTING]
+    )
+
+
 
     def get_workspace_application_permission(self):
         return lambda r, kwargs: Permission(group=self.value.group, operate=self.value.operate,
