@@ -22,6 +22,19 @@ class ApiUserProfileResponse(ResultSerializer):
         return UserProfileResponse()
 
 
+class RoleSettingRequestSerializer(serializers.Serializer):
+    role_id = serializers.CharField(required=True, label=_('Role ID'))
+    workspace_ids = serializers.ListField(
+        child=serializers.CharField(required=True),
+        required=True,
+        label=_('Workspace IDs')
+    )
+
+
+class CreateUserRequestSerializer(CreateUserSerializer):
+    role_setting = RoleSettingRequestSerializer(required=False, label=_('Role Setting'), allow_null=True, many=True)
+
+
 class UserProfileAPI(APIMixin):
 
     @staticmethod
@@ -30,7 +43,7 @@ class UserProfileAPI(APIMixin):
 
     @staticmethod
     def get_request():
-        return CreateUserSerializer
+        return CreateUserRequestSerializer
 
     @staticmethod
     def get_parameters():
@@ -85,6 +98,10 @@ class PasswordResponse(ResultSerializer):
         return Password()
 
 
+class EditUserRequestSerializer(UserManageSerializer.UserEditInstance):
+    role_setting = RoleSettingRequestSerializer(required=False, label=_('Role Setting'), allow_null=True, many=True)
+
+
 class EditUserApi(APIMixin):
     @staticmethod
     def get_parameters():
@@ -98,7 +115,7 @@ class EditUserApi(APIMixin):
 
     @staticmethod
     def get_request():
-        return UserManageSerializer.UserEditInstance
+        return EditUserRequestSerializer
 
 
 class DeleteUserApi(APIMixin):

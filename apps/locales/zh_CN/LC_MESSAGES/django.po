@@ -3691,7 +3691,7 @@ msgstr "获取工作空间下用户列表"
 
 #: users/views/user.py:87 users/views/user.py:88 users/views/user.py:89
 msgid "Create user"
-msgstr "创建者"
+msgstr "创建用户"
 
 #: users/views/user.py:101 users/views/user.py:102 users/views/user.py:103
 msgid "Get default password"
