@@ -200,8 +200,7 @@ onMounted(() => {})
   }
   .media-file-width {
     :deep(.el-space__item) {
-      min-width: 40% !important;
-      flex-grow: 1;
+      width: 49% !important;
     }
   }
   .media_2 {

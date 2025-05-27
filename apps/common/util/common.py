@@ -11,6 +11,7 @@ import importlib
 import io
 import mimetypes
 import pickle
+import random
 import re
 import shutil
 from functools import reduce
@@ -297,3 +298,14 @@ def markdown_to_plain_text(md: str) -> str:
     # 去除首尾空格
     text = text.strip()
     return text
+
+
+SAFE_CHAR_SET = (
+        [chr(i) for i in range(65, 91) if chr(i) not in {'I', 'O'}] +  # 大写字母 A-H, J-N, P-Z
+        [chr(i) for i in range(97, 123) if chr(i) not in {'i', 'l', 'o'}] +  # 小写字母 a-h, j-n, p-z
+        [str(i) for i in range(10) if str(i) not in {'0', '1', '7'}]  # 数字 2-6, 8-9
+)
+
+
+def get_random_chars(number=4):
+    return ''.join(random.choices(SAFE_CHAR_SET, k=number))

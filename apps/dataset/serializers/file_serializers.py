@@ -28,6 +28,9 @@ mime_types = {"html": "text/html", "htm": "text/html", "shtml": "text/html", "cs
               "woff2": "font/woff2", "jar": "application/java-archive", "war": "application/java-archive",
               "ear": "application/java-archive", "json": "application/json", "hqx": "application/mac-binhex40",
               "doc": "application/msword", "pdf": "application/pdf", "ps": "application/postscript",
+              "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+              "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+              "pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
               "eps": "application/postscript", "ai": "application/postscript", "rtf": "application/rtf",
               "m3u8": "application/vnd.apple.mpegurl", "kml": "application/vnd.google-earth.kml+xml",
               "kmz": "application/vnd.google-earth.kmz", "xls": "application/vnd.ms-excel",
@@ -87,4 +90,4 @@ class FileSerializer(serializers.Serializer):
                                                                           'Content-Disposition': 'attachment; filename="{}"'.format(
                                                                               file.file_name)})
             return HttpResponse(file.get_byte(), status=200,
-                                headers={'Content-Type': mime_types.get(file.file_name.split(".")[-1], 'text/plain')})
+                                headers={'Content-Type': mime_types.get(file_type, 'text/plain')})

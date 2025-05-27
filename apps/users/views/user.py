@@ -26,7 +26,7 @@ from smartdoc.settings import JWT_AUTH
 from users.serializers.user_serializers import RegisterSerializer, LoginSerializer, CheckCodeSerializer, \
     RePasswordSerializer, \
     SendEmailSerializer, UserProfile, UserSerializer, UserManageSerializer, UserInstanceSerializer, SystemSerializer, \
-    SwitchLanguageSerializer
+    SwitchLanguageSerializer, CaptchaSerializer
 from users.views.common import get_user_operation_object, get_re_password_details
 
 user_cache = cache.caches['user_cache']
@@ -168,6 +168,18 @@ def _get_details(request):
         'body': {**body, 'password': encryption(body.get('password', ''))},
         'query': query
     }
+
+
+class CaptchaView(APIView):
+
+    @action(methods=['GET'], detail=False)
+    @swagger_auto_schema(operation_summary=_("Obtain graphical captcha"),
+                         operation_id=_("Obtain graphical captcha"),
+                         responses=CaptchaSerializer().get_response_body_api(),
+                         security=[],
+                         tags=[_("User management")])
+    def get(self, request: Request):
+        return result.success(CaptchaSerializer().generate())
 
 
 class Login(APIView):

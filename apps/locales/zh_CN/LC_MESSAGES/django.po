@@ -7654,3 +7654,12 @@ msgstr "字段: {name} 未设置值"
 
 msgid "Generate related"
 msgstr "生成问题"
+
+msgid "Obtain graphical captcha"
+msgstr "获取图形验证码"
+
+msgid "Captcha code error or expiration"
+msgstr "验证码错误或过期"
+
+msgid "captcha"
+msgstr "验证码"

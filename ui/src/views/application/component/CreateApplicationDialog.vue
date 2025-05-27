@@ -242,6 +242,7 @@ const submitHandle = async (formEl: FormInstance | undefined) => {
       }
       applicationApi.postApplication(applicationForm.value, loading).then((res) => {
         MsgSuccess(t('common.createSuccess'))
+        emit('refresh')
         if (isWorkFlow(applicationForm.value.type)) {
           router.push({ path: `/application/${res.data.id}/workflow` })
         } else {

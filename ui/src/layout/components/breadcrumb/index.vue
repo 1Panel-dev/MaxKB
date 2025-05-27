@@ -228,6 +228,11 @@ function getApplication() {
 }
 function refresh() {
   common.saveBreadcrumb(null)
+  if (isDataset.value) {
+    getDataset()
+  } else if (isApplication.value) {
+    getApplication()
+  }
 }
 onMounted(() => {
   if (!breadcrumbData.value) {

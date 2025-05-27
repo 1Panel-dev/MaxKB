@@ -28,6 +28,10 @@ export default {
         requiredMessage: 'Please enter username',
         lengthMessage: 'Length must be between 6 and 20 words'
       },
+      captcha: {
+        label: 'captcha',
+        placeholder: 'Please enter the captcha'
+      },
       nick_name: {
         label: 'Name',
         placeholder: 'Please enter name'

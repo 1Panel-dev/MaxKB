@@ -392,7 +392,17 @@ const checkMaxFilesLimit = () => {
       uploadOtherList.value.length
   )
 }
-
+const file_name_eq = (str: string, str1: string) => {
+  return (
+    str.replaceAll(' ', '') === str1.replaceAll(' ', '') ||
+    decodeHtmlEntities(str) === decodeHtmlEntities(str1)
+  )
+}
+function decodeHtmlEntities(str: string) {
+  const tempDiv = document.createElement('div')
+  tempDiv.innerHTML = str
+  return tempDiv.textContent || tempDiv.innerText || ''
+}
 const uploadFile = async (file: any, fileList: any) => {
   const { maxFiles, fileLimit } = props.applicationDetails.file_upload_setting
   // 单次上传文件数量限制
@@ -418,7 +428,6 @@ const uploadFile = async (file: any, fileList: any) => {
   formData.append('file', file.raw, file.name)
   //
   const extension = file.name.split('.').pop().toUpperCase() // 获取文件后缀名并转为小写
-
   if (imageExtensions.includes(extension)) {
     uploadImageList.value.push(file)
   } else if (documentExtensions.includes(extension)) {
@@ -452,45 +461,35 @@ const uploadFile = async (file: any, fileList: any) => {
     .then((response) => {
       fileList.splice(0, fileList.length)
       uploadImageList.value.forEach((file: any) => {
-        const f = response.data.filter(
-          (f: any) => f.name.replaceAll(' ', '') === file.name.replaceAll(' ', '')
-        )
+        const f = response.data.filter((f: any) => file_name_eq(f.name, file.name))
         if (f.length > 0) {
           file.url = f[0].url
           file.file_id = f[0].file_id
         }
       })
       uploadDocumentList.value.forEach((file: any) => {
-        const f = response.data.filter(
-          (f: any) => f.name.replaceAll(' ', '') == file.name.replaceAll(' ', '')
-        )
+        const f = response.data.filter((f: any) => file_name_eq(f.name, file.name))
         if (f.length > 0) {
           file.url = f[0].url
           file.file_id = f[0].file_id
         }
       })
       uploadAudioList.value.forEach((file: any) => {
-        const f = response.data.filter(
-          (f: any) => f.name.replaceAll(' ', '') === file.name.replaceAll(' ', '')
-        )
+        const f = response.data.filter((f: any) => file_name_eq(f.name, file.name))
         if (f.length > 0) {
           file.url = f[0].url
           file.file_id = f[0].file_id
         }
       })
       uploadVideoList.value.forEach((file: any) => {
-        const f = response.data.filter(
-          (f: any) => f.name.replaceAll(' ', '') === file.name.replaceAll(' ', '')
-        )
+        const f = response.data.filter((f: any) => file_name_eq(f.name, file.name))
         if (f.length > 0) {
           file.url = f[0].url
           file.file_id = f[0].file_id
         }
       })
       uploadOtherList.value.forEach((file: any) => {
-        const f = response.data.filter(
-          (f: any) => f.name.replaceAll(' ', '') === file.name.replaceAll(' ', '')
-        )
+        const f = response.data.filter((f: any) => file_name_eq(f.name, file.name))
         if (f.length > 0) {
           file.url = f[0].url
           file.file_id = f[0].file_id

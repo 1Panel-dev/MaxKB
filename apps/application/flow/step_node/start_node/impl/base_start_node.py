@@ -45,6 +45,8 @@ class BaseStartStepNode(IStarNode):
         self.err_message = details.get('err_message')
         for key, value in workflow_variable.items():
             workflow_manage.context[key] = value
+        for item in details.get('global_fields', []):
+            workflow_manage.context[item.get('key')] = item.get('value')
 
     def get_node_params_serializer_class(self) -> Type[serializers.Serializer]:
         pass

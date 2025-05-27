@@ -37,6 +37,10 @@ interface LoginRequest {
    * 密码
    */
   password: string
+  /**
+   * 验证码
+   */
+  captcha: string
 }
 
 interface RegisterRequest {

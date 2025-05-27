@@ -223,14 +223,14 @@ export default {
     },
     mcpNode: {
       label: 'MCP 調用',
-      text: '透過SSE方式執行MCP服務中的工具',
+      text: '透過SSE/Streamable HTTP方式執行MCP服務中的工具',
       getToolsSuccess: '獲取工具成功',
       getTool: '獲取工具',
       tool: '工具',
       toolParam: '工具變數',
       mcpServerTip: '請輸入JSON格式的MCP服務器配置',
       mcpToolTip: '請選擇工具',
-      configLabel: 'MCP Server Config (僅支持SSE調用方式)'
+      configLabel: 'MCP Server Config (僅支持SSE/Streamable HTTP調用方式)'
     },
     imageGenerateNode: {
       label: '圖片生成',

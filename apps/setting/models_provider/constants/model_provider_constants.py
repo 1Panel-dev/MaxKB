@@ -19,6 +19,8 @@ from setting.models_provider.impl.kimi_model_provider.kimi_model_provider import
 from setting.models_provider.impl.ollama_model_provider.ollama_model_provider import OllamaModelProvider
 from setting.models_provider.impl.openai_model_provider.openai_model_provider import OpenAIModelProvider
 from setting.models_provider.impl.qwen_model_provider.qwen_model_provider import QwenModelProvider
+from setting.models_provider.impl.regolo_model_provider.regolo_model_provider import \
+    RegoloModelProvider
 from setting.models_provider.impl.siliconCloud_model_provider.siliconCloud_model_provider import \
     SiliconCloudModelProvider
 from setting.models_provider.impl.tencent_cloud_model_provider.tencent_cloud_model_provider import \
@@ -55,3 +57,4 @@ class ModelProvideConstants(Enum):
     aliyun_bai_lian_model_provider = AliyunBaiLianModelProvider()
     model_anthropic_provider = AnthropicModelProvider()
     model_siliconCloud_provider = SiliconCloudModelProvider()
+    model_regolo_provider = RegoloModelProvider()

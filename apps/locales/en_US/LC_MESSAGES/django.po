@@ -7491,3 +7491,12 @@ msgstr ""
 
 msgid "Generate related"
 msgstr ""
+
+msgid "Obtain graphical captcha"
+msgstr ""
+
+msgid "Captcha code error or expiration"
+msgstr ""
+
+msgid "captcha"
+msgstr ""

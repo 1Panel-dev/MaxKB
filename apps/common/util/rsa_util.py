@@ -40,15 +40,12 @@ def generate():
 def get_key_pair():
     rsa_value = rsa_cache.get(cache_key)
     if rsa_value is None:
-        lock.acquire()
-        rsa_value = rsa_cache.get(cache_key)
-        if rsa_value is not None:
-            return rsa_value
-        try:
+        with lock:
+            rsa_value = rsa_cache.get(cache_key)
+            if rsa_value is not None:
+                return rsa_value
             rsa_value = get_key_pair_by_sql()
             rsa_cache.set(cache_key, rsa_value)
-        finally:
-            lock.release()
     return rsa_value
 
 

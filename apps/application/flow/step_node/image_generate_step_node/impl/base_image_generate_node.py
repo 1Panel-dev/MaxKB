@@ -16,7 +16,8 @@ class BaseImageGenerateNode(IImageGenerateNode):
     def save_context(self, details, workflow_manage):
         self.context['answer'] = details.get('answer')
         self.context['question'] = details.get('question')
-        self.answer_text = details.get('answer')
+        if self.node_params.get('is_result', False):
+            self.answer_text = details.get('answer')
 
     def execute(self, model_id, prompt, negative_prompt, dialogue_number, dialogue_type, history_chat_record, chat_id,
                 model_params_setting,
@@ -24,7 +25,8 @@ class BaseImageGenerateNode(IImageGenerateNode):
                 **kwargs) -> NodeResult:
         print(model_params_setting)
         application = self.workflow_manage.work_flow_post_handler.chat_info.application
-        tti_model = get_model_instance_by_model_user_id(model_id, self.flow_params_serializer.data.get('user_id'), **model_params_setting)
+        tti_model = get_model_instance_by_model_user_id(model_id, self.flow_params_serializer.data.get('user_id'),
+                                                        **model_params_setting)
         history_message = self.get_history_message(history_chat_record, dialogue_number)
         self.context['history_message'] = history_message
         question = self.generate_prompt_question(prompt)

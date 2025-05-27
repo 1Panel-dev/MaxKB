@@ -40,6 +40,7 @@ tool_message_template = """
 
 """
 
+
 def _write_context(node_variable: Dict, workflow_variable: Dict, node: INode, workflow, answer: str,
                    reasoning_content: str):
     chat_model = node_variable.get('chat_model')
@@ -102,7 +103,6 @@ def write_context_stream(node_variable: Dict, workflow_variable: Dict, node: INo
     _write_context(node_variable, workflow_variable, node, workflow, answer, reasoning_content)
 
 
-
 async def _yield_mcp_response(chat_model, message_list, mcp_servers):
     async with MultiServerMCPClient(json.loads(mcp_servers)) as client:
         agent = create_react_agent(chat_model, client.get_tools())
@@ -114,6 +114,7 @@ async def _yield_mcp_response(chat_model, message_list, mcp_servers):
                 yield chunk[0]
             if isinstance(chunk[0], AIMessageChunk):
                 yield chunk[0]
+
 
 def mcp_response_generator(chat_model, message_list, mcp_servers):
     loop = asyncio.new_event_loop()
@@ -129,6 +130,7 @@ def mcp_response_generator(chat_model, message_list, mcp_servers):
         print(f'exception: {e}')
     finally:
         loop.close()
+
 
 async def anext_async(agen):
     return await agen.__anext__()
@@ -186,7 +188,8 @@ class BaseChatNode(IChatNode):
         self.context['answer'] = details.get('answer')
         self.context['question'] = details.get('question')
         self.context['reasoning_content'] = details.get('reasoning_content')
-        self.answer_text = details.get('answer')
+        if self.node_params.get('is_result', False):
+            self.answer_text = details.get('answer')
 
     def execute(self, model_id, system, prompt, dialogue_number, history_chat_record, stream, chat_id, chat_record_id,
                 model_params_setting=None,

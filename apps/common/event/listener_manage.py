@@ -238,11 +238,8 @@ class ListenerManagement:
         for key in params_dict:
             _value_ = params_dict[key]
             exec_sql = exec_sql.replace(key, str(_value_))
-        lock.acquire()
-        try:
+        with lock:
             native_update(query_set, exec_sql)
-        finally:
-            lock.release()
 
     @staticmethod
     def embedding_by_document(document_id, embedding_model: Embeddings, state_list=None):
@@ -271,7 +268,6 @@ class ListenerManagement:
             # 批量修改状态为PADDING
             ListenerManagement.update_status(QuerySet(Document).filter(id=document_id), TaskType.EMBEDDING,
                                              State.STARTED)
-
 
             # 根据段落进行向量化处理
             page_desc(QuerySet(Paragraph)

@@ -38,7 +38,8 @@ class BaseFormNode(IFormNode):
         self.context['start_time'] = details.get('start_time')
         self.context['form_data'] = form_data
         self.context['is_submit'] = details.get('is_submit')
-        self.answer_text = details.get('result')
+        if self.node_params.get('is_result', False):
+            self.answer_text = details.get('result')
         if form_data is not None:
             for key in form_data:
                 self.context[key] = form_data[key]
@@ -70,7 +71,7 @@ class BaseFormNode(IFormNode):
                         "chat_record_id": self.flow_params_serializer.data.get("chat_record_id"),
                         'form_data': self.context.get('form_data', {}),
                         "is_submit": self.context.get("is_submit", False)}
-        form = f'<form_rander>{json.dumps(form_setting,ensure_ascii=False)}</form_rander>'
+        form = f'<form_rander>{json.dumps(form_setting, ensure_ascii=False)}</form_rander>'
         context = self.workflow_manage.get_workflow_content()
         form_content_format = self.workflow_manage.reset_prompt(form_content_format)
         prompt_template = PromptTemplate.from_template(form_content_format, template_format='jinja2')
@@ -85,7 +86,7 @@ class BaseFormNode(IFormNode):
                         "chat_record_id": self.flow_params_serializer.data.get("chat_record_id"),
                         'form_data': self.context.get('form_data', {}),
                         "is_submit": self.context.get("is_submit", False)}
-        form = f'<form_rander>{json.dumps(form_setting,ensure_ascii=False)}</form_rander>'
+        form = f'<form_rander>{json.dumps(form_setting, ensure_ascii=False)}</form_rander>'
         context = self.workflow_manage.get_workflow_content()
         form_content_format = self.workflow_manage.reset_prompt(form_content_format)
         prompt_template = PromptTemplate.from_template(form_content_format, template_format='jinja2')

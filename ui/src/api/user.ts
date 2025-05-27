@@ -28,6 +28,13 @@ const login: (
   return post('/user/login', request, undefined, loading)
 }
 /**
+ * 获取图形验证码
+ * @returns
+ */
+const getCaptcha: () => Promise<Result<string>> = () => {
+  return get('user/captcha')
+}
+/**
  * 登出
  * @param loading 接口加载器
  * @returns
@@ -226,5 +233,6 @@ export default {
   postLanguage,
   getDingOauth2Callback,
   getlarkCallback,
-  getQrSource
+  getQrSource,
+  getCaptcha
 }

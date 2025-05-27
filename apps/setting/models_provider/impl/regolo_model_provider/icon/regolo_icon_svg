@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   id="Livello_2"
+   data-name="Livello 2"
+   viewBox="0 0 104.4 104.38"
+   version="1.1"
+   sodipodi:docname="Regolo_logo_positive.svg"
+   width="100%" height="100%"
+   inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview13"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="2.1335227"
+     inkscape:cx="119.05193"
+     inkscape:cy="48.511318"
+     inkscape:window-width="1920"
+     inkscape:window-height="1025"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g13" />
+  <defs
+     id="defs1">
+    <style
+       id="style1">
+      .cls-1 {
+        fill: #303030;
+      }
+
+      .cls-2 {
+        fill: #59e389;
+      }
+    </style>
+  </defs>
+  <g
+     id="Grafica"
+     transform="translate(0,-40.87)">
+    <g
+       id="g13">
+      <path
+         class="cls-1"
+         d="m 104.39,105.96 v 36.18 c 0,0.32 -0.05,0.62 -0.14,0.91 -0.39,1.27 -1.58,2.2 -2.99,2.2 H 65.08 c -1.73,0 -3.13,-1.41 -3.13,-3.13 V 113.4 c 0,-0.15 0,-0.29 0,-0.44 v -7 c 0,-1.73 1.4,-3.13 3.13,-3.13 h 36.19 c 1.5,0 2.77,1.07 3.06,2.5 0.05,0.21 0.07,0.41 0.07,0.63 z"
+         id="path1" />
+      <path
+         class="cls-1"
+         d="m 104.39,105.96 v 36.18 c 0,0.32 -0.05,0.62 -0.14,0.91 -0.39,1.27 -1.58,2.2 -2.99,2.2 H 65.08 c -1.73,0 -3.13,-1.41 -3.13,-3.13 V 113.4 c 0,-0.15 0,-0.29 0,-0.44 v -7 c 0,-1.73 1.4,-3.13 3.13,-3.13 h 36.19 c 1.5,0 2.77,1.07 3.06,2.5 0.05,0.21 0.07,0.41 0.07,0.63 z"
+         id="path2" />
+      <path
+         class="cls-2"
+         d="M 101.27,40.88 H 65.09 c -1.73,0 -3.13,1.4 -3.13,3.13 v 28.71 c 0,4.71 -1.88,9.23 -5.2,12.56 L 44.42,97.61 c -3.32,3.33 -7.85,5.2 -12.55,5.2 H 18.98 c -2.21,0 -3.99,-1.79 -3.99,-3.99 V 87.29 c 0,-2.21 1.79,-3.99 3.99,-3.99 h 20.34 c 1.41,0 2.59,-0.93 2.99,-2.2 0.09,-0.29 0.14,-0.59 0.14,-0.91 V 44 c 0,-0.22 -0.02,-0.42 -0.07,-0.63 -0.29,-1.43 -1.56,-2.5 -3.06,-2.5 H 3.13 C 1.4,40.87 0,42.27 0,44 v 7 c 0,0.15 0,0.29 0,0.44 v 28.72 c 0,1.72 1.41,3.13 3.13,3.13 h 3.16 c 2.21,0 3.99,1.79 3.99,3.99 v 11.53 c 0,2.21 -1.79,3.99 -3.99,3.99 H 3.15 c -1.73,0 -3.13,1.4 -3.13,3.13 v 36.19 c 0,1.72 1.41,3.13 3.13,3.13 h 36.19 c 1.73,0 3.13,-1.41 3.13,-3.13 V 113.4 c 0,-4.7 1.87,-9.23 5.2,-12.55 L 60,88.51 c 3.33,-3.32 7.85,-5.2 12.56,-5.2 h 28.71 c 1.73,0 3.13,-1.4 3.13,-3.13 V 44 c 0,-1.73 -1.4,-3.13 -3.13,-3.13 z"
+         id="path3" />
+    </g>
+  </g>
+</svg>

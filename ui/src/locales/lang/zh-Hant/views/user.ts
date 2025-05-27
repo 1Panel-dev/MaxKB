@@ -26,6 +26,10 @@ export default {
         requiredMessage: '請輸入使用者名稱',
         lengthMessage: '長度須介於 6 到 20 個字元之間'
       },
+      captcha: {
+        label: '驗證碼',
+        placeholder: '請輸入驗證碼'
+      },
       nick_name: {
         label: '姓名',
         placeholder: '請輸入姓名'

@@ -25,6 +25,10 @@ export default {
         requiredMessage: '请输入用户名',
         lengthMessage: '长度在 6 到 20 个字符'
       },
+      captcha: {
+        label: '验证码',
+        placeholder: '请输入验证码'
+      },
       nick_name: {
         label: '姓名',
         placeholder: '请输入姓名'
@@ -33,7 +37,7 @@ export default {
         label: '邮箱',
         placeholder: '请输入邮箱',
         requiredMessage: '请输入邮箱',
-        validatorEmail: '请输入有效邮箱格式！',
+        validatorEmail: '请输入有效邮箱格式！'
       },
       phone: {
         label: '手机号',
@@ -48,13 +52,13 @@ export default {
       new_password: {
         label: '新密码',
         placeholder: '请输入新密码',
-        requiredMessage: '请输入新密码',
+        requiredMessage: '请输入新密码'
       },
       re_password: {
         label: '确认密码',
         placeholder: '请输入确认密码',
         requiredMessage: '请输入确认密码',
-        validatorMessage: '密码不一致',
+        validatorMessage: '密码不一致'
       }
     }
   },

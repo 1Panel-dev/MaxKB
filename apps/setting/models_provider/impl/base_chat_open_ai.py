@@ -133,7 +133,7 @@ class BaseChatOpenAI(ChatOpenAI):
         )
 
         usage_metadata: Optional[UsageMetadata] = (
-            _create_usage_metadata(token_usage) if token_usage else None
+            _create_usage_metadata(token_usage) if token_usage and token_usage.get("prompt_tokens") else None
         )
         if len(choices) == 0:
             # logprobs is implicitly None
