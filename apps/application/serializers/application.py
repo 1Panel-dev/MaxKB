@@ -6,6 +6,7 @@
     @date：2025/5/26 17:03
     @desc:
 """
+import hashlib
 import re
 from typing import Dict
 
@@ -16,7 +17,8 @@ from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from application.models.application import Application, ApplicationTypeChoices
+from application.models.application import Application, ApplicationTypeChoices, ApplicationKnowledgeMapping
+from application.models.application_access_token import ApplicationAccessToken
 from common.exception.app_exception import AppApiException
 from knowledge.models import Knowledge
 from models_provider.models import Model
@@ -94,6 +96,11 @@ class ModelSettingSerializer(serializers.Serializer):
 
 
 class ApplicationCreateSerializer(serializers.Serializer):
+    class ApplicationResponse(serializers.ModelSerializer):
+        class Meta:
+            model = Application
+            fields = "__all__"
+
     class WorkflowRequest(serializers.Serializer):
         name = serializers.CharField(required=True, max_length=64, min_length=1,
                                      label=_("Application Name"))
@@ -105,7 +112,7 @@ class ApplicationCreateSerializer(serializers.Serializer):
                                          label=_("Opening remarks"))
 
         @staticmethod
-        def to_application_model(user_id: str, application: Dict):
+        def to_application_model(user_id: str, workspace_id: str, application: Dict):
             default_workflow = application.get('work_flow')
             for node in default_workflow.get('nodes'):
                 if node.get('id') == 'base-node':
@@ -115,6 +122,7 @@ class ApplicationCreateSerializer(serializers.Serializer):
             return Application(id=uuid.uuid7(),
                                name=application.get('name'),
                                desc=application.get('desc'),
+                               workspace_id=workspace_id,
                                prologue="",
                                dialogue_number=0,
                                user_id=user_id, model_id=None,
@@ -176,7 +184,70 @@ class ApplicationCreateSerializer(serializers.Serializer):
             ModelKnowledgeAssociation(data={'user_id': user_id, 'model_id': self.data.get('model_id'),
                                             'knowledge_id_list': self.data.get('knowledge_id_list')}).is_valid()
 
+        @staticmethod
+        def to_application_model(user_id: str, application: Dict):
+            return Application(id=uuid.uuid1(), name=application.get('name'), desc=application.get('desc'),
+                               prologue=application.get('prologue'),
+                               dialogue_number=application.get('dialogue_number', 0),
+                               user_id=user_id, model_id=application.get('model_id'),
+                               dataset_setting=application.get('dataset_setting'),
+                               model_setting=application.get('model_setting'),
+                               problem_optimization=application.get('problem_optimization'),
+                               type=ApplicationTypeChoices.SIMPLE,
+                               model_params_setting=application.get('model_params_setting', {}),
+                               problem_optimization_prompt=application.get('problem_optimization_prompt', None),
+                               stt_model_enable=application.get('stt_model_enable', False),
+                               stt_model_id=application.get('stt_model', None),
+                               tts_model_id=application.get('tts_model', None),
+                               tts_model_enable=application.get('tts_model_enable', False),
+                               tts_model_params_setting=application.get('tts_model_params_setting', {}),
+                               tts_type=application.get('tts_type', None),
+                               file_upload_enable=application.get('file_upload_enable', False),
+                               file_upload_setting=application.get('file_upload_setting', {}),
+                               work_flow={}
+                               )
+
 
 class ApplicationSerializer(serializers.Serializer):
-    def insert(self):
-        pass
+    workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+    user_id = serializers.UUIDField(required=True, label=_("User ID"))
+
+    def insert(self, instance: Dict, with_valid=True):
+        application_type = instance.get('type')
+        if 'WORK_FLOW' == application_type:
+            return self.insert_workflow(instance)
+        else:
+            return self.insert_simple(instance)
+
+    def insert_workflow(self, instance: Dict):
+        self.is_valid(raise_exception=True)
+        user_id = self.data.get('user_id')
+        ApplicationCreateSerializer.WorkflowRequest(data=instance).is_valid(raise_exception=True)
+        application_model = ApplicationCreateSerializer.WorkflowRequest.to_application_model(user_id, instance)
+        application_model.save()
+        # 插入认证信息
+        ApplicationAccessToken(application_id=application_model.id,
+                               access_token=hashlib.md5(str(uuid.uuid1()).encode()).hexdigest()[8:24]).save()
+        return ApplicationCreateSerializer.ApplicationResponse(application_model).data
+
+    @staticmethod
+    def to_application_knowledge_mapping(application_id: str, dataset_id: str):
+        return ApplicationKnowledgeMapping(id=uuid.uuid1(), application_id=application_id, dataset_id=dataset_id)
+
+    def insert_simple(self, instance: Dict):
+        self.is_valid(raise_exception=True)
+        user_id = self.data.get('user_id')
+        ApplicationCreateSerializer.SimplateRequest(data=instance).is_valid(user_id=user_id, raise_exception=True)
+        application_model = ApplicationCreateSerializer.SimplateRequest.to_application_model(user_id, instance)
+        dataset_id_list = instance.get('knowledge_id_list', [])
+        application_knowledge_mapping_model_list = [
+            self.to_application_knowledge_mapping(application_model.id, dataset_id) for
+            dataset_id in dataset_id_list]
+        # 插入应用
+        application_model.save()
+        # 插入认证信息
+        ApplicationAccessToken(application_id=application_model.id,
+                               access_token=hashlib.md5(str(uuid.uuid1()).encode()).hexdigest()[8:24]).save()
+        # 插入关联数据
+        QuerySet(ApplicationKnowledgeMapping).bulk_create(application_knowledge_mapping_model_list)
+        return ApplicationCreateSerializer.ApplicationResponse(application_model).data

@@ -13,10 +13,16 @@ from rest_framework import serializers
 
 from application.serializers.application import ApplicationCreateSerializer
 from common.mixins.api_mixin import APIMixin
+from common.result import ResultSerializer
 
 
 class ApplicationCreateRequest(ApplicationCreateSerializer.SimplateRequest):
     work_flow = serializers.DictField(required=True, label=_("Workflow Objects"))
+
+
+class ApplicationCreateResponse(ResultSerializer):
+    def get_data(self):
+        return ApplicationCreateSerializer.ApplicationResponse()
 
 
 class ApplicationCreateAPI(APIMixin):
@@ -38,4 +44,4 @@ class ApplicationCreateAPI(APIMixin):
 
     @staticmethod
     def get_response():
-        return FolderCreateResponse
+        return ApplicationCreateResponse

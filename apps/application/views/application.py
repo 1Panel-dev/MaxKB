@@ -14,9 +14,11 @@ from rest_framework.views import APIView
 from application.api.application_api import ApplicationCreateAPI
 from application.serializers.application import ApplicationSerializer
 from common import result
+from common.auth import TokenAuth
 
 
 class Application(APIView):
+    authentication_classes = [TokenAuth]
 
     @extend_schema(
         methods=['POST'],
@@ -28,5 +30,6 @@ class Application(APIView):
         responses=ApplicationCreateAPI.get_response(),
         tags=[_('Application')]  # type: ignore
     )
-    def post(self, request: Request):
-        return result.success(ApplicationSerializer.insert(request.data))
+    def post(self, request: Request, workspace_id: str):
+        return result.success(
+            ApplicationSerializer(data={'workspace_id': workspace_id, 'user_id': request.user.id}).insert(request.data))
