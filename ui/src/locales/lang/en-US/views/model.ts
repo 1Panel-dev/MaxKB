@@ -3,9 +3,7 @@ export default {
   provider: 'Provider',
   providerPlaceholder: 'Select Provider',
   addModel: 'Add Model',
-  searchBar: {
-    placeholder: 'Search by name',
-  },
+
   delete: {
     confirmTitle: 'Delete Model',
     confirmMessage: 'Are you sure you want to delete the model:',

@@ -6,13 +6,44 @@
         :data="folderList"
         :currentNodeKey="currentFolder?.id"
         @handleNodeClick="folderClickHandel"
+        class="p-8"
       />
     </template>
-    <ContentContainer>
-      <div class="flex-between mb-16">
-        <h4>{{ currentFolder?.name }}</h4>
-        <div class="flex-between"></div>
-      </div>
+    <ContentContainer :header="currentFolder?.name">
+      <template #search>
+        <div class="flex">
+          <div class="flex-between complex-search">
+            <el-select
+              class="complex-search__left"
+              v-model="search_type"
+              style="width: 120px"
+              @change="search_type_change"
+            >
+              <el-option :label="$t('common.creator')" value="create_user" />
+
+              <el-option :label="$t('common.name')" value="name" />
+            </el-select>
+            <el-input
+              v-if="search_type === 'name'"
+              v-model="search_form.name"
+              @change="getList"
+              :placeholder="$t('common.searchBar.placeholder')"
+              style="width: 220px"
+              clearable
+            />
+            <el-select
+              v-else-if="search_type === 'create_user'"
+              v-model="search_form.create_user"
+              @change="getList"
+              clearable
+              style="width: 220px"
+            >
+              <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.username" />
+            </el-select>
+          </div>
+          <el-button class="ml-16" type="primary"> {{ $t('common.create') }}</el-button>
+        </div>
+      </template>
       <div>
         <el-row v-if="datasetList.length > 0 || datasetFolderList.length > 0" :gutter="15">
           <template v-for="(item, index) in datasetFolderList" :key="index">
@@ -37,7 +68,12 @@
           </template>
           <template v-for="(item, index) in datasetList" :key="index">
             <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" class="mb-16">
-              <CardBox :title="item.name" :description="item.desc" class="cursor">
+              <CardBox
+                :title="item.name"
+                :description="item.desc"
+                class="cursor"
+                @click="router.push({ path: `/knowledge/${item.id}/document` })"
+              >
                 <template #icon>
                   <el-avatar
                     v-if="item.type === '1'"
@@ -86,6 +122,53 @@
                     </div>
                   </div>
                 </template>
+                <template #mouseEnter>
+                  <div @click.stop>
+                    <el-dropdown trigger="click">
+                      <el-button text @click.stop>
+                        <el-icon><MoreFilled /></el-icon>
+                      </el-button>
+                      <template #dropdown>
+                        <el-dropdown-menu>
+                          <el-dropdown-item
+                            icon="Refresh"
+                            @click.stop="syncDataset(item)"
+                            v-if="item.type === 1"
+                            >{{ $t('views.knowledge.setting.sync') }}</el-dropdown-item
+                          >
+                          <el-dropdown-item @click.stop="reEmbeddingDataset(item)">
+                            <AppIcon iconName="app-vectorization"></AppIcon>
+                            {{ $t('views.knowledge.setting.vectorization') }}
+                          </el-dropdown-item>
+                          <!--
+
+                          <el-dropdown-item
+                            icon="Connection"
+                            @click.stop="openGenerateDialog(item)"
+                            >{{ $t('views.document.generateQuestion.title') }}</el-dropdown-item
+                          >
+                          <el-dropdown-item
+                            icon="Setting"
+                            @click.stop="router.push({ path: `/dataset/${item.id}/setting` })"
+                          >
+                            {{ $t('common.setting') }}</el-dropdown-item
+                          >
+                          <el-dropdown-item @click.stop="export_dataset(item)">
+                            <AppIcon iconName="app-export"></AppIcon
+                            >{{ $t('views.document.setting.export') }} Excel</el-dropdown-item
+                          >
+                          <el-dropdown-item @click.stop="export_zip_dataset(item)">
+                            <AppIcon iconName="app-export"></AppIcon
+                            >{{ $t('views.document.setting.export') }} ZIP</el-dropdown-item
+                          >
+                          <el-dropdown-item icon="Delete" @click.stop="deleteDataset(item)">{{
+                            $t('common.delete')
+                          }}</el-dropdown-item> -->
+                        </el-dropdown-menu>
+                      </template>
+                    </el-dropdown>
+                  </div>
+                </template>
               </CardBox>
             </el-col>
           </template>
@@ -99,12 +182,28 @@
 <script lang="ts" setup>
 import { onMounted, ref, reactive, computed } from 'vue'
 import KnowledgeApi from '@/api/knowledge/knowledge'
+import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import useStore from '@/stores'
 import { numberFormat } from '@/utils/common'
 import { t } from '@/locales'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const { folder } = useStore()
+
 const loading = ref(false)
+
+const search_type = ref('name')
+const search_form = ref<{
+  name: string
+  create_user: string
+}>({
+  name: '',
+  create_user: '',
+})
+
+const user_options = ref<any[]>([])
+
 const paginationConfig = reactive({
   current_page: 1,
   page_size: 30,
@@ -115,6 +214,21 @@ const folderList = ref<any[]>([])
 const datasetList = ref<any[]>([])
 const datasetFolderList = ref<any[]>([])
 const currentFolder = ref<any>({})
+
+function reEmbeddingDataset(row: any) {
+  KnowledgeApi.putReEmbeddingDataset('default', row.id).then(() => {
+    MsgSuccess(t('common.submitSuccess'))
+  })
+}
+
+const SyncWebDialogRef = ref()
+function syncDataset(row: any) {
+  SyncWebDialogRef.value.open(row.id)
+}
+
+const search_type_change = () => {
+  search_form.value = { name: '', create_user: '' }
+}
 
 function getList() {
   const params = {
@@ -137,9 +251,9 @@ function getFolder() {
 }
 
 function folderClickHandel(row: any) {
-  // currentFolder.value = row
-  // toolList.value = []
-  // getList()
+  currentFolder.value = row
+  datasetFolderList.value = []
+  getList()
 }
 
 onMounted(() => {

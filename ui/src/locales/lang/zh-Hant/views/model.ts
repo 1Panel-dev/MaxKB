@@ -3,9 +3,6 @@ export default {
   provider: '供應商',
   providerPlaceholder: '選擇供應商',
   addModel: '新增模型',
-  searchBar: {
-    placeholder: '按名稱搜尋',
-  },
   delete: {
     confirmTitle: '刪除模型',
     confirmMessage: '是否刪除模型：',

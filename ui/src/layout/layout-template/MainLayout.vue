@@ -8,9 +8,7 @@
         <template #left>
           <Sidebar />
         </template>
-        <template #right>
-          <AppMain />
-        </template>
+        <AppMain />
       </layout-container>
     </div>
   </div>

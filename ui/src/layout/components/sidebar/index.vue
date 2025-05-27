@@ -23,16 +23,13 @@ import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { getChildRouteListByPathAndName } from '@/router/index'
 import SidebarItem from './SidebarItem.vue'
-// import AppBreadcrumb from './../breadcrumb/index.vue'
+import AppBreadcrumb from './../breadcrumb/index.vue'
 
 const route = useRoute()
 
 const showBreadcrumb = computed(() => {
   const { meta } = route as any
-  return (
-    meta?.activeMenu &&
-    (meta?.activeMenu.includes('dataset') || meta?.activeMenu.includes('application'))
-  )
+  return meta?.breadcrumb
 })
 
 const subMenuList = computed(() => {

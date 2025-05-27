@@ -55,3 +55,32 @@
     line-height: 30px;
   }
 }
+
+
+/*
+  表格第一行插入自定义行
+*/
+.table-quick-append {
+  background: #ffffff;
+  .el-table__append-wrapper {
+    position: absolute;
+    top: 0;
+    border-bottom: var(--el-table-border);
+    width: 100%;
+    height: 49px;
+    box-sizing: border-box;
+    align-items: center;
+    display: flex;
+    padding: 0 12px;
+    background: #ffffff;
+    cursor: pointer;
+    z-index: 2;
+    &:hover {
+      background: var(--el-color-primary-light-9);
+      z-index: 1;
+    }
+  }
+  .el-table__body {
+    margin-top: 49px;
+  }
+}

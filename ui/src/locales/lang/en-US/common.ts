@@ -34,12 +34,16 @@ export default {
   public: 'Public',
   private: 'Private',
   paramSetting: 'Parameter Settings',
+  name: 'Name',
   creator: 'Creator',
   author: 'Author',
   debug: 'Debug',
   required: 'Required',
   noData: 'No data',
   result: 'Result',
+  searchBar: {
+    placeholder: 'Search by name',
+  },
   fileUpload: {
     document: 'Documents',
     image: 'Image',

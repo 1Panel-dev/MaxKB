@@ -2,6 +2,7 @@ import login from './login'
 import model from './model'
 import knowledge from './knowledge'
 import tool from './tool'
+import document from './document'
 // import notFound from './404'
 // import application from './application'
 // import applicationOverview from './application-overview'
@@ -10,7 +11,6 @@ import tool from './tool'
 // import user from './user'
 // import team from './team'
 
-// import document from './document'
 // import paragraph from './paragraph'
 // import problem from './problem'
 // import log from './log'
@@ -22,13 +22,13 @@ export default {
   model,
   knowledge,
   tool,
+  document,
   // notFound,
   // application,
   // applicationOverview,
   // system,
   // user,
   // team,
-  // document,
   // paragraph,
   // problem,
   // log,

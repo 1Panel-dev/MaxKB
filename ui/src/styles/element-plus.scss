@@ -1,10 +1,9 @@
-$primary-color: #3370ff;
 :root {
   --el-color-primary: #3370ff;
   --el-color-success: #34c724;
   --el-text-color-primary: #1f2329;
   --el-border-radius-base: 6px;
-  // --el-menu-item-height: 45px;
+  --el-menu-item-height: 45px;
   // --el-box-shadow-light: 0px 2px 4px 0px rgba(31, 35, 41, 0.12);
   // --el-border-color: #dee0e3;
   // --el-color-info: #8f959e !important;
@@ -36,7 +35,7 @@ $primary-color: #3370ff;
   }
 }
 .el-tree--highlight-current .el-tree-node.is-current > .el-tree-node__content {
-  background: rgba($primary-color, 0.1);
+  background: var(--el-color-primary-light-9);
   color: var(--el-color-primary);
 }
 .el-tree-node__expand-icon {

@@ -47,7 +47,7 @@ const props = defineProps<{
 const router = useRouter()
 const route = useRoute()
 const {
-  params: { id, type }
+  params: { id, type },
 } = route as any
 
 function showMenu() {
@@ -79,7 +79,7 @@ const menuIcon = computed(() => {
     margin-top: -2px;
   }
   .el-menu-item {
-    padding: 13px 12px 13px 16px !important;
+    padding: 13px 12px 13px 8px !important;
     font-weight: 500;
     border-radius: 4px;
     &:hover {

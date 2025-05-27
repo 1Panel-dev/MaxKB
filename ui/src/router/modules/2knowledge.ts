@@ -9,9 +9,9 @@ const ModelRouter = {
       path: '/knowledge',
       name: 'knowledge-index',
       meta: { title: '知识库主页', activeMenu: '/knowledge' },
-      component: () => import('@/views/knowledge/index.vue')
-    }
-  ]
+      component: () => import('@/views/knowledge/index.vue'),
+    },
+  ],
 }
 
 export default ModelRouter

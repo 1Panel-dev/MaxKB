@@ -10,7 +10,7 @@
     >
       <div class="breadcrumb-hover flex-between cursor">
         <div class="flex align-center">
-          <AppAvatar
+          <el-avatar
             v-if="isApplication && isAppIcon(current?.icon)"
             shape="square"
             :size="24"
@@ -18,8 +18,8 @@
             class="mr-8"
           >
             <img :src="current?.icon" alt="" />
-          </AppAvatar>
-          <AppAvatar
+          </el-avatar>
+          <el-avatar
             v-else-if="isApplication"
             :name="current?.name"
             pinyinColor
@@ -28,15 +28,15 @@
             :size="24"
           />
 
-          <AppAvatar
+          <el-avatar
             v-else-if="isDataset && current?.type === '1'"
             class="mr-8 avatar-purple"
             shape="square"
             :size="24"
           >
-            <img src="@/assets/icon_web.svg" style="width: 58%" alt="" />
-          </AppAvatar>
-          <AppAvatar
+            <img src="@/assets/knowledge/icon_web.svg" style="width: 58%" alt="" />
+          </el-avatar>
+          <el-avatar
             v-else-if="isDataset && current?.type === '2'"
             class="mr-8 avatar-purple"
             shape="square"
@@ -44,10 +44,10 @@
             style="background: none"
           >
             <img src="@/assets/knowledge/logo_lark.svg" style="width: 100%" alt="" />
-          </AppAvatar>
-          <AppAvatar v-else class="mr-8 avatar-blue" shape="square" :size="24">
+          </el-avatar>
+          <el-avatar v-else class="mr-8 avatar-blue" shape="square" :size="24">
             <img src="@/assets/knowledge/icon_document.svg" style="width: 58%" alt="" />
-          </AppAvatar>
+          </el-avatar>
           <div class="ellipsis" :title="current?.name">{{ current?.name }}</div>
         </div>
 
@@ -63,7 +63,7 @@
                 <div :class="item.id === id ? 'dropdown-active' : ''">
                   <el-dropdown-item :command="item.id">
                     <div class="flex align-center">
-                      <AppAvatar
+                      <el-avatar
                         v-if="isApplication && isAppIcon(item?.icon)"
                         shape="square"
                         :size="24"
@@ -71,9 +71,9 @@
                         class="mr-8"
                       >
                         <img :src="item?.icon" alt="" />
-                      </AppAvatar>
+                      </el-avatar>
 
-                      <AppAvatar
+                      <el-avatar
                         v-else-if="isApplication"
                         :name="item.name"
                         pinyinColor
@@ -87,7 +87,7 @@
                         shape="square"
                         :size="24"
                       >
-                        <img src="@/assets/icon_web.svg" style="width: 58%" alt="" />
+                        <img src="@/assets/knowledge/icon_web.svg" style="width: 58%" alt="" />
                       </AppAvatar>
                       <AppAvatar
                         v-else-if="isDataset && item.type === '2'"
@@ -96,10 +96,10 @@
                         :size="24"
                         style="background: none"
                       >
-                        <img src="@/assets/logo_lark.svg" style="width: 100%" alt="" />
+                        <img src="@/assets/knowledge/logo_lark.svg" style="width: 100%" alt="" />
                       </AppAvatar>
                       <AppAvatar v-else class="mr-12 avatar-blue" shape="square" :size="24">
-                        <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
+                        <img src="@/assets/knowledge/icon_document.svg" style="width: 58%" alt="" />
                       </AppAvatar>
                       <span class="ellipsis" :title="item?.name"> {{ item?.name }}</span>
                     </div>

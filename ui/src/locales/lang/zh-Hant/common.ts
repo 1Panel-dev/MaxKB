@@ -34,12 +34,16 @@ export default {
   public: '公有',
   private: '私有',
   paramSetting: '參數設定',
+  name: '名稱',
   creator: '建立者',
   author: '作者',
   debug: '調試',
   required: '必填',
   noData: '暂无数据',
   result: '結果',
+  searchBar: {
+    placeholder: '按名稱搜尋',
+  },
   fileUpload: {
     document: '文檔',
     image: '圖片',
@@ -73,6 +77,6 @@ export default {
     custom: '自訂',
     sizeTip: '建議尺寸 32*32，支援 JPG、PNG、GIF，大小不超過 10 MB',
     fileSizeExceeded: '檔案大小超過 10 MB',
-    uploadImagePrompt: '請上傳一張圖片'
+    uploadImagePrompt: '請上傳一張圖片',
   },
 }

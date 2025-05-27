@@ -31,7 +31,7 @@
               v-if="search_type === 'name'"
               v-model="model_search_form.name"
               @change="list_model"
-              :placeholder="$t('views.model.searchBar.placeholder')"
+              :placeholder="$t('common.searchBar.placeholder')"
               style="width: 220px"
               clearable
             />

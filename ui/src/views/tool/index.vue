@@ -27,7 +27,7 @@
               v-if="search_type === 'name'"
               v-model="search_form.name"
               @change="getList"
-              :placeholder="$t('views.model.searchBar.placeholder')"
+              :placeholder="$t('common.searchBar.placeholder')"
               style="width: 220px"
               clearable
             />
@@ -41,9 +41,7 @@
               <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.username" />
             </el-select>
           </div>
-          <!-- <el-button class="ml-16" type="primary" @click="openCreateModel(active_provider)">
-            {{ $t('views.model.addModel') }}</el-button
-          > -->
+          <el-button class="ml-16" type="primary"> {{ $t('common.create') }}</el-button>
         </div>
       </template>
 
@@ -327,9 +325,9 @@ function refresh(data: any) {
 }
 
 function folderClickHandel(row: any) {
-  // currentFolder.value = row
-  // toolList.value = []
-  // getList()
+  currentFolder.value = row
+  toolList.value = []
+  getList()
 }
 
 onMounted(() => {

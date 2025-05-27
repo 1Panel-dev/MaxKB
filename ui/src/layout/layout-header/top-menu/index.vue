@@ -5,6 +5,7 @@
       v-hasPermission="menu.meta?.permission"
       v-for="(menu, index) in topMenuList"
       :key="index"
+      v-show="!menu.hidden"
     >
     </MenuItem>
   </div>
@@ -22,5 +23,4 @@ const topMenuList = computed(() => {
 .top-menu-container {
   line-height: var(--app-header-height);
 }
-
 </style>

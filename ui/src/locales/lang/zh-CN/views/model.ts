@@ -3,9 +3,6 @@ export default {
   provider: '供应商',
   providerPlaceholder: '选择供应商',
   addModel: '添加模型',
-  searchBar: {
-    placeholder: '按名称搜索',
-  },
   delete: {
     confirmTitle: '删除模型',
     confirmMessage: '是否删除模型：',

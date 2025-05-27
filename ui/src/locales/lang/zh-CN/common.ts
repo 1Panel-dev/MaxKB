@@ -35,12 +35,16 @@ export default {
   public: '公有',
   private: '私有',
   paramSetting: '参数设置',
+  name: '名称',
   creator: '创建者',
   author: '作者',
   debug: '调试',
   required: '必填',
   noData: '暂无数据',
   result: '结果',
+  searchBar: {
+    placeholder: '按名称搜索',
+  },
   fileUpload: {
     document: '文档',
     image: '图片',
