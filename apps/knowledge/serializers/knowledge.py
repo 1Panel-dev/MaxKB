@@ -14,6 +14,7 @@ from django.db.models.functions import Reverse, Substr
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from application.models import ApplicationKnowledgeMapping
 from common.config.embedding_config import VectorStore
 from common.db.search import native_search, get_dynamics_model, native_page_search
 from common.db.sql_execute import select_list
@@ -23,7 +24,7 @@ from common.utils.common import valid_license, post, get_file_content
 from common.utils.fork import Fork, ChildLink
 from common.utils.split_model import get_split_model
 from knowledge.models import Knowledge, KnowledgeScope, KnowledgeType, Document, Paragraph, Problem, \
-    ProblemParagraphMapping, ApplicationKnowledgeMapping, TaskType, State, SearchMode, KnowledgeFolder
+    ProblemParagraphMapping, TaskType, State, SearchMode, KnowledgeFolder
 from knowledge.serializers.common import ProblemParagraphManage, get_embedding_model_id_by_knowledge_id, MetaSerializer, \
     GenerateRelatedSerializer, get_embedding_model_by_knowledge_id, list_paragraph
 from knowledge.serializers.document import DocumentSerializers

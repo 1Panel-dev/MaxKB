@@ -12,6 +12,7 @@ from mptt.fields import TreeForeignKey
 from mptt.models import MPTTModel
 
 from common.mixins.app_model_mixin import AppModelMixin
+from knowledge.models import Knowledge
 from models_provider.models import Model
 from users.models import User
 
@@ -59,6 +60,7 @@ class Application(AppModelMixin):
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
     workspace_id = models.CharField(max_length=64, verbose_name="工作空间id", default="default", db_index=True)
     folder = models.ForeignKey(ApplicationFolder, on_delete=models.DO_NOTHING, verbose_name="文件夹id", default='root')
+    is_publish = models.BooleanField(verbose_name="是否发布", default=False)
     name = models.CharField(max_length=128, verbose_name="应用名称")
     desc = models.CharField(max_length=512, verbose_name="引用描述", default="")
     prologue = models.CharField(max_length=40960, verbose_name="开场白", default="")
@@ -106,3 +108,12 @@ class Application(AppModelMixin):
 
     class Meta:
         db_table = "application"
+
+
+class ApplicationKnowledgeMapping(AppModelMixin):
+    id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
+    application = models.ForeignKey(Application, on_delete=models.DO_NOTHING)
+    knowledge = models.ForeignKey(Knowledge, on_delete=models.DO_NOTHING)
+
+    class Meta:
+        db_table = "application_knowledge_mapping"

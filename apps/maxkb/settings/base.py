@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'drf_spectacular_sidecar',
     'users.apps.UsersConfig',
     'tools.apps.ToolConfig',
-    'knowledge.apps.KnowledgeConfig',
+    'knowledge',
     'common',
     'system_manage',
     'models_provider',
