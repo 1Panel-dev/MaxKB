@@ -58,6 +58,7 @@ class SystemGroup(Enum):
     SYSTEM_SETTING = "SYSTEM_SETTING"
     OPERATION_LOG = "OPERATION_LOG"
     OTHER = "OTHER"
+    APPLICATION = "APPLICATION"
 
 
 class WorkspaceGroup(Enum):
@@ -514,8 +515,11 @@ class PermissionConstants(Enum):
         group=Group.LOGIN_AUTH, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.SYSTEM_SETTING]
     )
-
-
+    APPLICATION_READ = Permission(group=Group.APPLICATION, operate=Operate.READ,
+                                  role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                  parent_group=[SystemGroup.APPLICATION],
+                                  resource_permission_group_list=[ResourcePermissionGroup.VIEW],
+                                  )
 
     def get_workspace_application_permission(self):
         return lambda r, kwargs: Permission(group=self.value.group, operate=self.value.operate,

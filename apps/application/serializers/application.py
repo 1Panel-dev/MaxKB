@@ -7,6 +7,7 @@
     @desc:
 """
 import hashlib
+import os
 import re
 from typing import Dict
 
@@ -17,10 +18,15 @@ from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from application.models.application import Application, ApplicationTypeChoices, ApplicationKnowledgeMapping
+from application.models.application import Application, ApplicationTypeChoices, ApplicationKnowledgeMapping, \
+    ApplicationFolder
 from application.models.application_access_token import ApplicationAccessToken
+from common.database_model_manage.database_model_manage import DatabaseModelManage
+from common.db.search import native_search, native_page_search
 from common.exception.app_exception import AppApiException
+from common.utils.common import get_file_content
 from knowledge.models import Knowledge
+from maxkb.conf import PROJECT_DIR
 from models_provider.models import Model
 
 
@@ -227,11 +233,85 @@ class ApplicationCreateSerializer(serializers.Serializer):
                                )
 
 
+class ApplicationQueryRequest(serializers.Serializer):
+    folder_id = serializers.CharField(required=False, label=_("folder id"))
+    name = serializers.CharField(required=False, label=_('Application Name'))
+    desc = serializers.CharField(required=False, label=_("Application Description"))
+    user_id = serializers.UUIDField(required=False, label=_("User ID"))
+
+
+class ApplicationListResponse(serializers.Serializer):
+    id = serializers.CharField(required=True, label=_("Primary key id"), help_text=_("Primary key id"))
+    name = serializers.CharField(required=True, label=_("Application Name"), help_text=_("Application Name"))
+    desc = serializers.CharField(required=True, label=_("Application Description"),
+                                 help_text=_("Application Description"))
+    is_publish = serializers.BooleanField(required=True, label=_("Model id"), help_text=_("Model id"))
+    type = serializers.CharField(required=True, label=_("Application type"), help_text=_("Application type"))
+    resource_type = serializers.CharField(required=True, label=_("Resource type"), help_text=_("Resource type"))
+    user_id = serializers.CharField(required=True, label=_('Affiliation user'), help_text=_("Affiliation user"))
+    create_time = serializers.CharField(required=True, label=_('Creation time'), help_text=_("Creation time"))
+    update_time = serializers.CharField(required=True, label=_('Modification time'), help_text=_("Modification time"))
+
+
+class Query(serializers.Serializer):
+    workspace_id = serializers.CharField(required=False, label=_('workspace id'))
+
+    def get_query_set(self, instance: Dict):
+        folder_query_set = QuerySet(ApplicationFolder)
+        application_query_set = QuerySet(Application)
+        workspace_id = self.data.get('workspace_id')
+        user_id = instance.get('user_id')
+        desc = instance.get('desc')
+        name = instance.get('name')
+        if workspace_id is not None:
+            folder_query_set = folder_query_set.filter(workspace_id=workspace_id)
+            application_query_set = application_query_set.filter(workspace_id=workspace_id)
+        if user_id is not None:
+            folder_query_set = folder_query_set.filter(user_id=user_id)
+            application_query_set = application_query_set.filter(user_id=user_id)
+        folder_id = instance.get('folder_id')
+        if folder_id is not None:
+            folder_query_set = folder_query_set.filter(parent=folder_id)
+            application_query_set = application_query_set.filter(folder_id=folder_id)
+        if name is not None:
+            folder_query_set = folder_query_set.filter(name__contains=name)
+            application_query_set = application_query_set.filter(name__contains=name)
+        if desc is not None:
+            folder_query_set = folder_query_set.filter(desc__contains=desc)
+            application_query_set = application_query_set.filter(desc__contains=desc)
+        application_query_set = application_query_set.order_by("-update_time")
+        return {
+            'folder_query_set': folder_query_set,
+            'application_query_set': application_query_set
+        }
+
+    @staticmethod
+    def is_x_pack_ee():
+        workspace_user_role_mapping_model = DatabaseModelManage.get_model("workspace_user_role_mapping")
+        role_permission_mapping_model = DatabaseModelManage.get_model("role_permission_mapping_model")
+        return workspace_user_role_mapping_model is not None and role_permission_mapping_model is not None
+
+    def list(self, instance: Dict):
+        self.is_valid(raise_exception=True)
+        ApplicationQueryRequest(data=instance).is_valid(raise_exception=True)
+        return native_search(self.get_query_set(instance), select_string=get_file_content(
+            os.path.join(PROJECT_DIR, "apps", "application", 'sql',
+                         'list_application_ee.sql' if self.is_x_pack_ee() else 'list_application.sql')))
+
+    def page(self, current_page: int, page_size: int, instance: Dict):
+        self.is_valid(raise_exception=True)
+        ApplicationQueryRequest(data=instance).is_valid(raise_exception=True)
+        return native_page_search(current_page, page_size, self.get_query_set(instance), get_file_content(
+            os.path.join(PROJECT_DIR, "apps", "application", 'sql',
+                         'list_application_ee.sql' if self.is_x_pack_ee() else 'list_application.sql')),
+                                  )
+
+
 class ApplicationSerializer(serializers.Serializer):
     workspace_id = serializers.CharField(required=True, label=_('workspace id'))
     user_id = serializers.UUIDField(required=True, label=_("User ID"))
 
-    def insert(self, instance: Dict, with_valid=True):
+    def insert(self, instance: Dict):
         application_type = instance.get('type')
         if 'WORK_FLOW' == application_type:
             return self.insert_workflow(instance)
