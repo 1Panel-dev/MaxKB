@@ -373,6 +373,7 @@ class UserManageSerializer(serializers.Serializer):
         users = User.objects.filter(id__in=user_ids).values('id', 'nick_name')
         return list(users)
 
+
 def update_user_role(instance, user):
     workspace_user_role_mapping_model = DatabaseModelManage.get_model("workspace_user_role_mapping")
     role_setting_model = DatabaseModelManage.get_model("role_model")
@@ -386,7 +387,7 @@ def update_user_role(instance, user):
 
         role_ids = {role_id for item in role_setting for role_id in item}
         role_ids_is_system = role_setting_model.objects.filter(id__in=role_ids,
-                                                               type='SYSTEM_ADMIN').values_list(
+                                                               type=RoleConstants.ADMIN.name).values_list(
             'id', flat=True)
         if role_ids_is_system:
             relations = {(role_id, 'SYSTEM') if role_id in role_ids_is_system else (role_id, workspace_id)
@@ -398,4 +399,3 @@ def update_user_role(instance, user):
                 workspace_id=workspace_id,
                 user_id=user.id
             )
-
