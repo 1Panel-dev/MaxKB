@@ -3,11 +3,12 @@ import model from './model'
 import knowledge from './knowledge'
 import tool from './tool'
 import document from './document'
+import system from './system'
+import userManage from './user-manage'
 // import notFound from './404'
 // import application from './application'
 // import applicationOverview from './application-overview'
 
-// import system from './system'
 // import user from './user'
 // import team from './team'
 
@@ -23,10 +24,12 @@ export default {
   knowledge,
   tool,
   document,
+  system,
+  userManage,
   // notFound,
   // application,
   // applicationOverview,
-  // system,
+
   // user,
   // team,
   // paragraph,

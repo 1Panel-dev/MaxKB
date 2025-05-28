@@ -1,0 +1,28 @@
+·
+<template>
+  <div class="app-top-bar-container border-b flex-center">
+    <div class="logo">
+      <LogoFull />
+    </div>
+    <div class="flex-between w-full">
+      <div><el-divider direction="vertical" />{{ $t('views.system.title') }}</div>
+      <TopAbout></TopAbout>
+    </div>
+    <Avatar></Avatar>
+  </div>
+</template>
+<script setup lang="ts">
+import TopMenu from './top-menu/index.vue'
+import Avatar from './avatar/index.vue'
+import TopAbout from './top-about/index.vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+</script>
+<style lang="scss" scoped>
+.app-top-bar-container {
+  height: var(--app-header-height);
+  box-sizing: border-box;
+  padding: var(--app-header-padding);
+}
+</style>
