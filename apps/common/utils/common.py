@@ -280,7 +280,10 @@ def bulk_create_in_batches(model, data, batch_size=1000):
         model.objects.bulk_create(batch)
 
 
-def get_sha256_hash(_v: str):
+def get_sha256_hash(_v: str | bytes):
     sha256 = hashlib.sha256()
-    sha256.update(_v.encode())
+    if isinstance(_v, str):
+        sha256.update(_v.encode())
+    else:
+        sha256.update(_v)
     return sha256.hexdigest()
