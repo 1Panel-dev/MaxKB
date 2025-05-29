@@ -5,6 +5,7 @@ import dataset from './dataset'
 import system from './system'
 import tool from './tool'
 import userManage from './user-manage'
+import resourceAuthorization from './resource-authorization'
 import team from './team'
 import model from './model'
 import document from './document'
@@ -21,6 +22,7 @@ export default {
   system,
   tool,
   userManage,
+  resourceAuthorization,
   team,
   model,
   dataset,
