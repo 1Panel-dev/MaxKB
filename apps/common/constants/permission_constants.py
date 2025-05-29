@@ -38,6 +38,8 @@ class Group(Enum):
     WORKSPACE = "WORKSPACE"
     DISPLAY_SETTINGS = "DISPLAY_SETTINGS"
     LOGIN_AUTH = "LOGIN_AUTH"
+    SYSTEM_API_KEY = "SYSTEM_API_KEY"
+    APPEARANCE_SETTINGS = "APPEARANCE_SETTINGS"
 
 
 class SystemGroup(Enum):
@@ -213,6 +215,8 @@ Permission_Label = {
     Operate.RELATE.value: _("Relate"),
     Group.LOGIN_AUTH.value: _("Login Auth"),
     Group.DISPLAY_SETTINGS.value: _("Display Settings"),
+    Group.SYSTEM_API_KEY.value: _("System API Key"),
+    Group.APPEARANCE_SETTINGS.value:_("Appearance Settings")
 
 }
 
@@ -520,6 +524,36 @@ class PermissionConstants(Enum):
                                   parent_group=[SystemGroup.APPLICATION],
                                   resource_permission_group_list=[ResourcePermissionGroup.VIEW],
                                   )
+    SYSTEM_API_KEY_READ = Permission(group=Group.SYSTEM_API_KEY, operate=Operate.READ,
+                                     role_list=[RoleConstants.ADMIN],
+                                     parent_group=[SystemGroup.SYSTEM_SETTING]
+                                     )
+    SYSTEM_API_KEY_EDIT = Permission(group=Group.SYSTEM_API_KEY, operate=Operate.EDIT,
+                                     role_list=[RoleConstants.ADMIN],
+                                     parent_group=[SystemGroup.SYSTEM_SETTING]
+                                     )
+    SYSTEM_API_KEY_DELETE = Permission(group=Group.SYSTEM_API_KEY, operate=Operate.DELETE,
+                                       role_list=[RoleConstants.ADMIN],
+                                       parent_group=[SystemGroup.SYSTEM_SETTING]
+                                       )
+    SYSTEM_API_KEY_CREATE = Permission(group=Group.SYSTEM_API_KEY, operate=Operate.CREATE,
+                                       role_list=[RoleConstants.ADMIN],
+                                       parent_group=[SystemGroup.SYSTEM_SETTING]
+                                       )
+    APPEARANCE_SETTINGS_READ = Permission(group=Group.APPEARANCE_SETTINGS, operate=Operate.READ,
+                                    role_list=[RoleConstants.ADMIN],
+                                    parent_group=[SystemGroup.SYSTEM_SETTING]
+                                    )
+    APPEARANCE_SETTINGS_EDIT = Permission(group=Group.APPEARANCE_SETTINGS, operate=Operate.EDIT,
+                                    role_list=[RoleConstants.ADMIN],
+                                    parent_group=[SystemGroup.SYSTEM_SETTING]
+                                    )
+
+
+
+
+
+
 
     def get_workspace_application_permission(self):
         return lambda r, kwargs: Permission(group=self.value.group, operate=self.value.operate,
