@@ -1,7 +1,7 @@
 ·
 <template>
   <div class="app-top-bar-container border-b flex-center">
-    <div class="logo">
+    <div class="logo mt-4">
       <LogoFull />
     </div>
     <div class="flex-between w-full">

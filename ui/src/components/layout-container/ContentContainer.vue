@@ -8,9 +8,7 @@
         <slot name="header">
           <h4>{{ header }}</h4>
         </slot>
-        <slot name="search">
-          <h4>{{ header }}</h4>
-        </slot>
+        <slot name="search"> </slot>
       </div>
     </div>
 

@@ -2,6 +2,8 @@ export default {
   title: 'User',
   createUser: 'Create User',
   editUser: 'Edit User',
+  info: 'Base Information',
+  roleSetting: 'Role Setting',
   setting: {
     updatePwd: 'Change Password',
   },
@@ -50,7 +52,7 @@ export default {
     },
   },
   source: {
-    label: 'User Type',
+    label: 'User Source',
     local: 'System User',
     wecom: 'WeCom',
     lark: 'Lark',

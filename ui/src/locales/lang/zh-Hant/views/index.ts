@@ -4,7 +4,7 @@ import applicationOverview from './application-overview'
 import dataset from './dataset'
 import system from './system'
 import tool from './tool'
-import user from './user'
+import userManage from './user-manage'
 import team from './team'
 import model from './model'
 import document from './document'
@@ -20,7 +20,7 @@ export default {
   applicationOverview,
   system,
   tool,
-  user,
+  userManage,
   team,
   model,
   dataset,

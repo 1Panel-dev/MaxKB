@@ -13,5 +13,5 @@ export default {
   theme,
   layout,
   dynamicsForm,
-  common
+  common,
 }
