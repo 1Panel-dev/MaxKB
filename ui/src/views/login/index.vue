@@ -34,6 +34,21 @@
               </el-input>
             </el-form-item>
           </div>
+          <div class="mb-24">
+            <el-form-item prop="captcha">
+              <div class="flex-between w-full">
+                <el-input
+                  size="large"
+                  class="input-item"
+                  v-model="loginForm.captcha"
+                  :placeholder="$t('views.user.userForm.form.captcha.placeholder')"
+                >
+                </el-input>
+
+                <img :src="identifyCode" alt="" height="38" class="ml-8 cursor border border-r-4" @click="makeCode" />
+              </div>
+            </el-form-item>
+          </div>
         </el-form>
 
         <el-button size="large" type="primary" class="w-full" @click="login"
@@ -107,6 +122,7 @@ import { useRoute, useRouter } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
 import useStore from '@/stores'
 import authApi from '@/api/auth-setting'
+import useApi from '@/api/user'
 import { MsgConfirm, MsgError, MsgSuccess } from '@/utils/message'
 
 import { t, getBrowserLang } from '@/locales'
@@ -120,9 +136,15 @@ const { user } = useStore()
 const router = useRouter()
 const loginForm = ref<LoginRequest>({
   username: '',
-  password: ''
+  password: '',
+  captcha: ''
 })
-
+const identifyCode = ref<string>('')
+function makeCode() {
+  useApi.getCaptcha().then((res: any) => {
+    identifyCode.value = res.data
+  })
+}
 const rules = ref<FormRules<LoginRequest>>({
   username: [
     {
@@ -135,6 +157,13 @@ const rules = ref<FormRules<LoginRequest>>({
     {
       required: true,
       message: t('views.user.userForm.form.password.requiredMessage'),
+      trigger: 'blur'
+    }
+  ],
+  captcha: [
+    {
+      required: true,
+      message: t('views.user.userForm.form.captcha.placeholder'),
       trigger: 'blur'
     }
   ]
@@ -222,7 +251,8 @@ function changeMode(val: string) {
   showQrCodeTab.value = false
   loginForm.value = {
     username: '',
-    password: ''
+    password: '',
+    captcha: ''
   }
   redirectAuth(val)
   loginFormRef.value?.clearValidate()
@@ -232,7 +262,12 @@ const login = () => {
   loginFormRef.value?.validate().then(() => {
     loading.value = true
     user
-      .login(loginMode.value, loginForm.value.username, loginForm.value.password)
+      .login(
+        loginMode.value,
+        loginForm.value.username,
+        loginForm.value.password,
+        loginForm.value.captcha
+      )
       .then(() => {
         locale.value = localStorage.getItem('MaxKB-locale') || getBrowserLang() || 'en-US'
         router.push({ name: 'home' })
@@ -285,6 +320,7 @@ onBeforeMount(() => {
 declare const window: any
 
 onMounted(() => {
+  makeCode()
   const route = useRoute()
   const currentUrl = ref(route.fullPath)
   const params = new URLSearchParams(currentUrl.value.split('?')[1])

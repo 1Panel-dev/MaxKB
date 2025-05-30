@@ -6,18 +6,22 @@
     @date：2023/9/5 16:32
     @desc:
 """
+import base64
 import datetime
 import os
 import random
 import re
 import uuid
 
+from captcha.image import ImageCaptcha
 from django.conf import settings
 from django.core import validators, signing, cache
 from django.core.mail import send_mail
 from django.core.mail.backends.smtp import EmailBackend
 from django.db import transaction
 from django.db.models import Q, QuerySet, Prefetch
+from django.utils.translation import get_language
+from django.utils.translation import gettext_lazy as _, to_locale
 from drf_yasg import openapi
 from rest_framework import serializers
 
@@ -30,7 +34,7 @@ from common.exception.app_exception import AppApiException
 from common.mixins.api_mixin import ApiMixin
 from common.models.db_model_manage import DBModelManage
 from common.response.result import get_api_response
-from common.util.common import valid_license
+from common.util.common import valid_license, get_random_chars
 from common.util.field_message import ErrMessage
 from common.util.lock import lock
 from dataset.models import DataSet, Document, Paragraph, Problem, ProblemParagraphMapping
@@ -39,9 +43,29 @@ from function_lib.models.function import FunctionLib
 from setting.models import Team, SystemSetting, SettingType, Model, TeamMember, TeamMemberPermission
 from smartdoc.conf import PROJECT_DIR
 from users.models.user import User, password_encrypt, get_user_dynamics_permission
-from django.utils.translation import gettext_lazy as _, gettext, to_locale
-from django.utils.translation import get_language
+
 user_cache = cache.caches['user_cache']
+captcha_cache = cache.caches['captcha_cache']
+
+
+class CaptchaSerializer(ApiMixin, serializers.Serializer):
+    @staticmethod
+    def get_response_body_api():
+        return get_api_response(openapi.Schema(
+            type=openapi.TYPE_STRING,
+            title="captcha",
+            default="xxxx",
+            description="captcha"
+        ))
+
+    @staticmethod
+    def generate():
+        chars = get_random_chars()
+        image = ImageCaptcha()
+        data = image.generate(chars)
+        captcha = base64.b64encode(data.getbuffer())
+        captcha_cache.set(f"LOGIN:{chars.lower()}", chars, timeout=5 * 60)
+        return 'data:image/png;base64,' + captcha.decode()
 
 
 class SystemSerializer(ApiMixin, serializers.Serializer):
@@ -71,6 +95,8 @@ class LoginSerializer(ApiMixin, serializers.Serializer):
 
     password = serializers.CharField(required=True, error_messages=ErrMessage.char(_("Password")))
 
+    captcha = serializers.CharField(required=True, error_messages=ErrMessage.char(_("captcha")))
+
     def is_valid(self, *, raise_exception=False):
         """
         校验参数
@@ -78,6 +104,10 @@ class LoginSerializer(ApiMixin, serializers.Serializer):
         :return: User information
         """
         super().is_valid(raise_exception=True)
+        captcha = self.data.get('captcha')
+        captcha_value = captcha_cache.get(f"LOGIN:{captcha.lower()}")
+        if captcha_value is None:
+            raise AppApiException(1005, _("Captcha code error or expiration"))
         username = self.data.get("username")
         password = password_encrypt(self.data.get("password"))
         user = QuerySet(User).filter(Q(username=username,
@@ -109,7 +139,8 @@ class LoginSerializer(ApiMixin, serializers.Serializer):
             required=['username', 'password'],
             properties={
                 'username': openapi.Schema(type=openapi.TYPE_STRING, title=_("Username"), description=_("Username")),
-                'password': openapi.Schema(type=openapi.TYPE_STRING, title=_("Password"), description=_("Password"))
+                'password': openapi.Schema(type=openapi.TYPE_STRING, title=_("Password"), description=_("Password")),
+                'captcha': openapi.Schema(type=openapi.TYPE_STRING, title=_("captcha"), description=_("captcha"))
             }
         )
 

@@ -28,6 +28,6 @@ class SwitchField(BaseField):
         @param props_info:
         """
 
-        super().__init__('Switch', label, required, default_value, relation_show_field_dict,
+        super().__init__('SwitchInput', label, required, default_value, relation_show_field_dict,
                          {},
                          TriggerType.OPTION_LIST, attrs, props_info)

@@ -11,7 +11,7 @@
   >
     <el-scrollbar max-height="550">
       <div class="p-16">
-        <el-form label-position="top" ref="paramFormRef" :model="form">
+        <el-form label-position="top" ref="paramFormRef" :model="form" v-loading="loading">
           <el-form-item :label="$t('views.application.applicationForm.dialog.selectSearchMode')">
             <el-radio-group
               v-model="form.dataset_setting.search_mode"
@@ -81,7 +81,7 @@
                 <el-input-number
                   v-model="form.dataset_setting.similarity"
                   :min="0"
-                  :max="form.search_mode === 'blend' ? 2 : 1"
+                  :max="form.dataset_setting.search_mode === 'blend' ? 2 : 1"
                   :precision="3"
                   :step="0.1"
                   :value-on-clear="0"
@@ -259,20 +259,20 @@ const isWorkflowType = ref(false)
 
 watch(dialogVisible, (bool) => {
   if (!bool) {
-    form.value = {
-      dataset_setting: {
-        search_mode: 'embedding',
-        top_n: 3,
-        similarity: 0.6,
-        max_paragraph_char_number: 5000,
-        no_references_setting: {
-          status: 'ai_questioning',
-          value: '{question}'
-        }
-      },
-      problem_optimization: false,
-      problem_optimization_prompt: ''
-    }
+    // form.value = {
+    //   dataset_setting: {
+    //     search_mode: 'embedding',
+    //     top_n: 3,
+    //     similarity: 0.6,
+    //     max_paragraph_char_number: 5000,
+    //     no_references_setting: {
+    //       status: 'ai_questioning',
+    //       value: '{question}'
+    //     }
+    //   },
+    //   problem_optimization: false,
+    //   problem_optimization_prompt: ''
+    // }
     noReferencesform.value = {
       ai_questioning: defaultValue['ai_questioning'],
       designated_answer: defaultValue['designated_answer']

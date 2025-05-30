@@ -65,7 +65,7 @@ def valid_reference_value(_type, value, name):
 
 
 def convert_value(name: str, value, _type, is_required, source, node):
-    if not is_required and value is None:
+    if not is_required and (value is None or (isinstance(value, str) and len(value) == 0)):
         return None
     if not is_required and source == 'reference' and (value is None or len(value) == 0):
         return None
@@ -113,7 +113,8 @@ def valid_function(function_lib, user_id):
 class BaseFunctionLibNodeNode(IFunctionLibNode):
     def save_context(self, details, workflow_manage):
         self.context['result'] = details.get('result')
-        self.answer_text = str(details.get('result'))
+        if self.node_params.get('is_result'):
+            self.answer_text = str(details.get('result'))
 
     def execute(self, function_lib_id, input_field_list, **kwargs) -> NodeResult:
         function_lib = QuerySet(FunctionLib).filter(id=function_lib_id).first()

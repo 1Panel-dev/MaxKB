@@ -168,7 +168,8 @@ class BaseApplicationNode(IApplicationNode):
         self.context['question'] = details.get('question')
         self.context['type'] = details.get('type')
         self.context['reasoning_content'] = details.get('reasoning_content')
-        self.answer_text = details.get('answer')
+        if self.node_params.get('is_result', False):
+            self.answer_text = details.get('answer')
 
     def execute(self, application_id, message, chat_id, chat_record_id, stream, re_chat, client_id, client_type,
                 app_document_list=None, app_image_list=None, app_audio_list=None, child_node=None, node_data=None,
@@ -178,7 +179,8 @@ class BaseApplicationNode(IApplicationNode):
         current_chat_id = string_to_uuid(chat_id + application_id)
         Chat.objects.get_or_create(id=current_chat_id, defaults={
             'application_id': application_id,
-            'abstract': message[0:1024]
+            'abstract': message[0:1024],
+            'client_id': client_id,
         })
         if app_document_list is None:
             app_document_list = []

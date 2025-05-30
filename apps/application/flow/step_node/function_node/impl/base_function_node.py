@@ -49,7 +49,7 @@ def valid_reference_value(_type, value, name):
 
 
 def convert_value(name: str, value, _type, is_required, source, node):
-    if not is_required and value is None:
+    if not is_required and (value is None or (isinstance(value, str) and len(value) == 0)):
         return None
     if source == 'reference':
         value = node.workflow_manage.get_reference_field(
@@ -84,7 +84,8 @@ def convert_value(name: str, value, _type, is_required, source, node):
 class BaseFunctionNodeNode(IFunctionNode):
     def save_context(self, details, workflow_manage):
         self.context['result'] = details.get('result')
-        self.answer_text = str(details.get('result'))
+        if self.node_params.get('is_result', False):
+            self.answer_text = str(details.get('result'))
 
     def execute(self, input_field_list, code, **kwargs) -> NodeResult:
         params = {field.get('name'): convert_value(field.get('name'), field.get('value'), field.get('type'),

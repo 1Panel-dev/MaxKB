@@ -23,6 +23,8 @@ from django.db import transaction, models
 from django.db.models import QuerySet, Count
 from django.db.models.functions import Substr, Reverse
 from django.http import HttpResponse
+from django.utils.translation import get_language
+from django.utils.translation import gettext_lazy as _, gettext, to_locale
 from drf_yasg import openapi
 from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
 from rest_framework import serializers
@@ -64,8 +66,6 @@ from embedding.task.embedding import embedding_by_document, delete_embedding_by_
     embedding_by_document_list
 from setting.models import Model
 from smartdoc.conf import PROJECT_DIR
-from django.utils.translation import gettext_lazy as _, gettext, to_locale
-from django.utils.translation import get_language
 
 parse_qa_handle_list = [XlsParseQAHandle(), CsvParseQAHandle(), XlsxParseQAHandle(), ZipParseQAHandle()]
 parse_table_handle_list = [CsvSplitTableHandle(), XlsSplitTableHandle(), XlsxSplitTableHandle()]
@@ -661,6 +661,8 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                         cell = worksheet.cell(row=row_idx + 1, column=col_idx + 1)
                         if isinstance(col, str):
                             col = re.sub(ILLEGAL_CHARACTERS_RE, '', col)
+                            if col.startswith(('=', '+', '-', '@')):
+                                col = '\ufeff' + col
                         cell.value = col
                     # 创建HttpResponse对象返回Excel文件
             return workbook

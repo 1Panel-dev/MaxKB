@@ -7,10 +7,8 @@ updates:
       timezone: "Asia/Shanghai"
       day: "friday"
     target-branch: "v2"
-  - package-ecosystem: "pip"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      timezone: "Asia/Shanghai"
-      day: "friday"
-    target-branch: "main"
+    groups:
+      python-dependencies:
+        patterns:
+          - "*"
+

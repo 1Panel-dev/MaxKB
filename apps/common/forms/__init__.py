@@ -22,3 +22,4 @@ from .table_checkbox import *
 from .radio_card_field import *
 from .label import *
 from .slider_field import *
+from .switch_field import *
