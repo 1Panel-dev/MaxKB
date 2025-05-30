@@ -28,7 +28,7 @@
               <template #default="{ row }">
                 <div class="flex-between">
                   <div>
-                    <span class="mr-8">{{ row.username }}</span>
+                    <span class="mr-8" :title="row.email">{{ row.username }}</span>
                     <el-tag v-if="isManage(row.type)" class="default-tag">{{
                       $t('views.team.manage')
                     }}</el-tag>
