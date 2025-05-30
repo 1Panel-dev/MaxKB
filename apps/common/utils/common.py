@@ -7,10 +7,10 @@
     @desc:
 """
 import hashlib
-
-import random
 import io
 import mimetypes
+import pickle
+import random
 import re
 import shutil
 from functools import reduce
@@ -23,7 +23,6 @@ from pydub import AudioSegment
 
 from ..exception.app_exception import AppApiException
 from ..models.db_model_manage import DBModelManage
-import hashlib
 
 
 def password_encrypt(row_password):
@@ -287,3 +286,36 @@ def get_sha256_hash(_v: str | bytes):
     else:
         sha256.update(_v)
     return sha256.hexdigest()
+
+
+ALLOWED_CLASSES = {
+    ("builtins", "dict"),
+    ('uuid', 'UUID'),
+    ("application.serializers.application_serializers", "MKInstance"),
+    ("function_lib.serializers.function_lib_serializer", "FlibInstance")
+}
+
+
+class RestrictedUnpickler(pickle.Unpickler):
+
+    def find_class(self, module, name):
+        if (module, name) in ALLOWED_CLASSES:
+            return super().find_class(module, name)
+        raise pickle.UnpicklingError("global '%s.%s' is forbidden" %
+                                     (module, name))
+
+
+def restricted_loads(s):
+    """Helper function analogous to pickle.loads()."""
+    return RestrictedUnpickler(io.BytesIO(s)).load()
+
+def flat_map(array: List[List]):
+    """
+    将二位数组转为一维数组
+    :param array: 二维数组
+    :return: 一维数组
+    """
+    result = []
+    for e in array:
+        result += e
+    return result
