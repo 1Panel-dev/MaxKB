@@ -7,6 +7,7 @@
     @desc:
 """
 import re
+from collections import defaultdict
 from itertools import product
 
 from django.db import transaction
@@ -163,9 +164,38 @@ class UserManageSerializer(serializers.Serializer):
         def page(self, current_page: int, page_size: int, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            return page_search(current_page, page_size,
-                               self.get_query_set(),
-                               post_records_handler=lambda u: UserInstanceSerializer(u).data)
+            result = page_search(current_page, page_size,
+                                 self.get_query_set(),
+                                 post_records_handler=lambda u: UserInstanceSerializer(u).data)
+            role_model = DatabaseModelManage.get_model("role_model")
+            user_role_relation_model = DatabaseModelManage.get_model("workspace_user_role_mapping")
+
+            def _get_user_roles(user_ids):
+                if not (role_model and user_role_relation_model):
+                    return {}
+
+                # 获取所有相关角色关系，并预加载角色信息
+                user_role_relations = (
+                    user_role_relation_model.objects
+                    .filter(user_id__in=user_ids)
+                    .select_related('role_id')  # 预加载外键数据
+                )
+
+                # 构建用户ID到角色名称列表的映射
+                user_role_mapping = defaultdict(list)
+                for relation in user_role_relations:
+                    user_role_mapping[relation.user_id].append(relation.role_id.name)
+
+                return user_role_mapping
+
+            if role_model and user_role_relation_model:
+                user_ids = [user['id'] for user in result['records']]
+                user_role_mapping = _get_user_roles(user_ids)
+
+                # 将角色信息添加回用户数据中
+                for user in result['records']:
+                    user['role'] = user_role_mapping.get(user['id'], [])
+            return result
 
     @valid_license(model=User, count=2,
                    message=_(
