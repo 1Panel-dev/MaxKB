@@ -15,7 +15,7 @@
               size="large"
               class="input-item"
               v-model="resetPasswordForm.password"
-              :placeholder="$t('views.user.userForm.form.password.placeholder')"
+              :placeholder="$t('views.login.loginForm.password.placeholder')"
               show-password
             >
             </el-input>
@@ -28,7 +28,7 @@
               size="large"
               class="input-item"
               v-model="resetPasswordForm.re_password"
-              :placeholder="$t('views.user.userForm.form.re_password.placeholder')"
+              :placeholder="$t('views.login.loginForm.re_password.placeholder')"
               show-password
             >
             </el-input>
@@ -86,32 +86,32 @@ const rules = ref<FormRules<ResetPasswordRequest>>({
   password: [
     {
       required: true,
-      message: t('views.user.userForm.form.re_password.requiredMessage'),
+      message: t('views.login.loginForm.re_password.requiredMessage'),
       trigger: 'blur'
     },
     {
       min: 6,
       max: 20,
-      message: t('views.user.userForm.form.password.lengthMessage'),
+      message: t('views.login.loginForm.password.lengthMessage'),
       trigger: 'blur'
     }
   ],
   re_password: [
     {
       required: true,
-      message: t('views.user.userForm.form.re_password.requiredMessage'),
+      message: t('views.login.loginForm.re_password.requiredMessage'),
       trigger: 'blur'
     },
     {
       min: 6,
       max: 20,
-      message: t('views.user.userForm.form.password.lengthMessage'),
+      message: t('views.login.loginForm.password.lengthMessage'),
       trigger: 'blur'
     },
     {
       validator: (rule, value, callback) => {
         if (resetPasswordForm.value.password != resetPasswordForm.value.re_password) {
-          callback(new Error(t('views.user.userForm.form.re_password.validatorMessage')))
+          callback(new Error(t('views.login.loginForm.re_password.validatorMessage')))
         } else {
           callback()
         }

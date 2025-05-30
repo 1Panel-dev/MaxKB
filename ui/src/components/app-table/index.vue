@@ -135,6 +135,7 @@ defineExpose({
 })
 
 onMounted(() => {
+
   tableHeight.value = window.innerHeight - 300
   window.onresize = () => {
     return (() => {

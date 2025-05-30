@@ -19,6 +19,19 @@ const systemRouter = {
       },
       component: () => import('@/views/user-manage/index.vue'),
     },
+    {
+      path: '/system/authorization',
+      name: 'authorization',
+      meta: {
+        icon: 'app-resource-authorization',
+        iconActive: 'app-resource-authorization-active',
+        title: 'views.resourceAuthorization.title',
+        activeMenu: '/system',
+        parentPath: '/system',
+        parentName: 'system',
+      },
+      component: () => import('@/views/resource-authorization/index.vue'),
+    },
   ],
 }
 

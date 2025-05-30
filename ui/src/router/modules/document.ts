@@ -1,6 +1,6 @@
 const ModelRouter = {
   path: '/knowledge/:id',
-  name: 'DatasetDetail',
+  name: 'KnowledgeDetail',
   meta: { title: 'common.fileUpload.document', activeMenu: '/knowledge', breadcrumb: true },
   component: () => import('@/layout/layout-template/MainLayout.vue'),
   hidden: true,
@@ -14,35 +14,35 @@ const ModelRouter = {
         title: 'common.fileUpload.document',
         active: 'document',
         parentPath: '/knowledge/:id',
-        parentName: 'DatasetDetail',
+        parentName: 'KnowledgeDetail',
       },
       component: () => import('@/views/document/index.vue'),
     },
-    // {
-    //   path: 'problem',
-    //   name: 'Problem',
-    //   meta: {
-    //     icon: 'app-problems',
-    //     iconActive: 'QuestionFilled',
-    //     title: 'views.problem.title',
-    //     active: 'problem',
-    //     parentPath: '/dataset/:id',
-    //     parentName: 'DatasetDetail'
-    //   },
-    //   component: () => import('@/views/problem/index.vue')
-    // },
-    // {
-    //   path: 'hit-test',
-    //   name: 'DatasetHitTest',
-    //   meta: {
-    //     icon: 'app-hit-test',
-    //     title: 'views.application.hitTest.title',
-    //     active: 'hit-test',
-    //     parentPath: '/dataset/:id',
-    //     parentName: 'DatasetDetail'
-    //   },
-    //   component: () => import('@/views/hit-test/index.vue')
-    // },
+    {
+      path: 'problem',
+      name: 'Problem',
+      meta: {
+        icon: 'app-problems',
+        iconActive: 'QuestionFilled',
+        title: 'views.problem.title',
+        active: 'problem',
+        parentPath: '/knowledge/:id',
+        parentName: 'KnowledgeDetail'
+      },
+      component: () => import('@/views/problem/index.vue')
+    },
+    {
+      path: 'hit-test',
+      name: 'DatasetHitTest',
+      meta: {
+        icon: 'app-hit-test',
+        title: 'views.application.hitTest.title',
+        active: 'hit-test',
+        parentPath: '/knowledge/:id',
+        parentName: 'KnowledgeDetail'
+      },
+      component: () => import('@/views/hit-test/index.vue')
+    },
     // {
     //   path: 'setting',
     //   name: 'DatasetSetting',

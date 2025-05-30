@@ -2,6 +2,8 @@ export default {
   title: '使用者管理',
   createUser: '建立使用者',
   editUser: '編輯使用者',
+  info: '使用者資訊',
+  roleSetting: '角色設定',
   setting: {
     updatePwd: '修改使用者密碼'
   },
@@ -59,7 +61,7 @@ export default {
     }
   },
   source: {
-    label: '使用者類型',
+    label: '使用者來源',
     local: '系統使用者',
     wecom: '企業微信',
     lark: '飛書',

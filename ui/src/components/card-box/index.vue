@@ -83,7 +83,6 @@ function subHoveredEnter() {
   position: relative;
   min-height: var(--card-min-height);
   min-width: var(--card-min-width);
-  border-radius: 8px;
   .card-header {
     margin-top: -5px;
   }

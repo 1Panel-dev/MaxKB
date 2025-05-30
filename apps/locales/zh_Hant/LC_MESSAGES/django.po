@@ -3800,3 +3800,69 @@ msgstr "獲取工作空間成員列表"
 #: workspace/views/workspace.py:180
 msgid "Get workspace list by user"
 msgstr "根據用戶獲取工作空間列表"
+
+msgid "System API Key"
+msgstr "系統 API Key"
+
+msgid "Create SystemAPIKey"
+msgstr "創建系統 API 密鑰"
+
+msgid "Get SystemAPIKey List"
+msgstr "獲取系統 API 密鑰清單"
+
+msgid "Update SystemAPIKey"
+msgstr "更新系統 API 密鑰"
+
+msgid "Delete SystemAPIKey"
+msgstr "刪除系統 API 密鑰"
+
+msgid "Allow cross domain"
+msgstr "允許跨域"
+
+msgid "Cross domain list"
+msgstr "跨域清單"
+
+msgid "system API key id"
+msgstr "系統 API 密鑰 ID"
+
+msgid "View appearance settings"
+msgstr "查看外觀設置"
+
+msgid "SystemParams"
+msgstr "系統參數"
+
+msgid "Update appearance settings"
+msgstr "更新外觀設置"
+
+msgid "theme"
+msgstr "主題"
+
+msgid "login logo"
+msgstr "登錄 logo"
+
+msgid "login image"
+msgstr "登錄圖片"
+
+msgid "title"
+msgstr "標題"
+
+msgid "slogan"
+msgstr "標語"
+
+msgid "show user manual"
+msgstr "顯示用戶手冊"
+
+msgid "user manual url"
+msgstr "用戶手冊網址"
+
+msgid "show forum"
+msgstr "顯示論壇"
+
+msgid "forum url"
+msgstr "論壇網址"
+
+msgid "show project"
+msgstr "顯示項目"
+
+msgid "project url"
+msgstr "項目網址"

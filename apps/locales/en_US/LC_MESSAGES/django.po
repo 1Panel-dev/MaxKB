@@ -3672,3 +3672,69 @@ msgstr ""
 #: workspace/views/workspace.py:180
 msgid "Get workspace list by user"
 msgstr ""
+
+msgid "System API Key"
+msgstr ""
+
+msgid "msgid "Create SystemAPIKey"
+msgstr ""
+
+msgid "Get SystemAPIKey List"
+msgstr ""
+
+msgid "Update SystemAPIKey"
+msgstr ""
+
+msgid "Delete SystemAPIKey"
+msgstr ""
+
+msgid "Allow cross domain"
+msgstr ""
+
+msgid "Cross domain list"
+msgstr ""
+
+msgid "system API key id"
+msgstr ""
+
+msgid "View appearance settings"
+msgstr ""
+
+msgid "SystemParams"
+msgstr ""
+
+msgid "Update appearance settings"
+msgstr ""
+
+msgid "theme"
+msgstr ""
+
+msgid "login logo"
+msgstr ""
+
+msgid "login image"
+msgstr ""
+
+msgid "title"
+msgstr ""
+
+msgid "slogan"
+msgstr ""
+
+msgid "show user manual"
+msgstr ""
+
+msgid "user manual url"
+msgstr ""
+
+msgid "show forum"
+msgstr ""
+
+msgid "forum url"
+msgstr ""
+
+msgid "show project"
+msgstr ""
+
+msgid "project url"
+msgstr ""
