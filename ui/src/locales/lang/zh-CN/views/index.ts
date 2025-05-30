@@ -6,8 +6,9 @@ import document from './document'
 import system from './system'
 import userManage from './user-manage'
 import resourceAuthorization from './resource-authorization'
+import application from './application'
 // import notFound from './404'
-// import application from './application'
+
 // import applicationOverview from './application-overview'
 
 // import user from './user'
@@ -27,9 +28,10 @@ export default {
   document,
   system,
   userManage,
-  resourceAuthorization
+  resourceAuthorization,
+  application,
   // notFound,
-  // application,
+
   // applicationOverview,
 
   // user,
