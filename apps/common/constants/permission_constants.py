@@ -520,6 +520,20 @@ class PermissionConstants(Enum):
                                   parent_group=[SystemGroup.APPLICATION],
                                   resource_permission_group_list=[ResourcePermissionGroup.VIEW],
                                   )
+    APPLICATION_EXPORT = Permission(group=Group.APPLICATION, operate=Operate.EXPORT,
+                                    role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                    parent_group=[SystemGroup.APPLICATION]
+                                    )
+    APPLICATION_DELETE = Permission(group=Group.APPLICATION, operate=Operate.DELETE,
+                                    role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                    parent_group=[SystemGroup.APPLICATION],
+                                    resource_permission_group_list=[ResourcePermissionGroup.VIEW],
+                                    )
+    APPLICATION_EDIT = Permission(group=Group.APPLICATION, operate=Operate.EDIT,
+                                  role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                  parent_group=[SystemGroup.APPLICATION],
+                                  resource_permission_group_list=[ResourcePermissionGroup.VIEW],
+                                  )
 
     def get_workspace_application_permission(self):
         return lambda r, kwargs: Permission(group=self.value.group, operate=self.value.operate,

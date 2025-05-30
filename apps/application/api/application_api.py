@@ -12,9 +12,9 @@ from drf_spectacular.utils import OpenApiParameter
 from rest_framework import serializers
 
 from application.serializers.application import ApplicationCreateSerializer, ApplicationListResponse, \
-    ApplicationQueryRequest
+    ApplicationImportRequest, ApplicationEditSerializer
 from common.mixins.api_mixin import APIMixin
-from common.result import ResultSerializer, ResultPageSerializer
+from common.result import ResultSerializer, ResultPageSerializer, DefaultResultSerializer
 
 
 class ApplicationCreateRequest(ApplicationCreateSerializer.SimplateRequest):
@@ -120,3 +120,50 @@ class ApplicationCreateAPI(APIMixin):
     @staticmethod
     def get_response():
         return ApplicationCreateResponse
+
+
+class ApplicationImportAPI(APIMixin):
+    @staticmethod
+    def get_parameters():
+        ApplicationCreateAPI.get_parameters()
+
+    @staticmethod
+    def get_request():
+        return ApplicationImportRequest
+
+
+class ApplicationOperateAPI(APIMixin):
+    @staticmethod
+    def get_parameters():
+        return [
+            OpenApiParameter(
+                name="workspace_id",
+                description="工作空间id",
+                type=OpenApiTypes.STR,
+                location='path',
+                required=True,
+            ),
+            OpenApiParameter(
+                name="application_id",
+                description="应用id",
+                type=OpenApiTypes.STR,
+                location='path',
+                required=True,
+            )
+        ]
+
+
+class ApplicationExportAPI(APIMixin):
+    @staticmethod
+    def get_parameters():
+        return ApplicationOperateAPI.get_parameters()
+
+    @staticmethod
+    def get_response():
+        return DefaultResultSerializer
+
+
+class ApplicationEditAPI(APIMixin):
+    @staticmethod
+    def get_request():
+        return ApplicationEditSerializer

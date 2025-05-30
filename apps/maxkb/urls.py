@@ -27,7 +27,8 @@ urlpatterns = [
     path("api/", include("folders.urls")),
     path("api/", include("knowledge.urls")),
     path("api/", include("system_manage.urls")),
-    path("api/", include("application.urls"))
+    path("api/", include("application.urls")),
+    path("chat/", include("chat.urls"))
 ]
 urlpatterns += [
     path('schema/', SpectacularAPIView.as_view(), name='schema'),  # schema的配置文件的路由，下面两个ui也是根据这个配置文件来生成的

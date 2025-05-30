@@ -1,10 +1,9 @@
 import hashlib
-import uuid_utils.compat as uuid
-from baidubce.services.bmr.bmr_client import application
 
+import uuid_utils.compat as uuid
 from django.db.models import QuerySet
-from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
+from rest_framework import serializers
 
 from application.models import Application
 from application.models.application_api_key import ApplicationApiKey
@@ -16,6 +15,7 @@ class ApplicationKeySerializerModel(serializers.ModelSerializer):
         model = ApplicationApiKey
         fields = "__all__"
 
+
 class Edit(serializers.Serializer):
     pass
 
@@ -24,10 +24,6 @@ class ApplicationKeySerializer(serializers.Serializer):
     user_id = serializers.UUIDField(required=True, label=_('user id'))
     workspace_id = serializers.CharField(required=True, label=_('workspace id'))
     application_id = serializers.UUIDField(required=True, label=_('application id'))
-
-
-
-
 
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)
@@ -49,21 +45,18 @@ class ApplicationKeySerializer(serializers.Serializer):
         application_api_key.save()
         return ApplicationKeySerializerModel(application_api_key).data
 
-    def list(self,with_valid=True):
+    def list(self, with_valid=True):
         if with_valid:
             self.is_valid(raise_exception=True)
         application_id = self.data.get("application_id")
         return [ApplicationKeySerializerModel(application_api_key).data for application_api_key in
-                QuerySet(ApplicationApiKey).filter(application_id = application_id)]
+                QuerySet(ApplicationApiKey).filter(application_id=application_id)]
 
     class Operate(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, label=_('user id'))
         workspace_id = serializers.CharField(required=True, label=_('workspace id'))
         application_id = serializers.UUIDField(required=True, label=_('application id'))
 
-
-
         def edit(self, instance, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-

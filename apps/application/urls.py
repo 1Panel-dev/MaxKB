@@ -5,8 +5,12 @@ from . import views
 app_name = 'application'
 
 urlpatterns = [
+
     path('workspace/<str:workspace_id>/application', views.Application.as_view(), name='application'),
+    path('workspace/<str:workspace_id>/application/import', views.Application.Import.as_view()),
     path('workspace/<str:workspace_id>/application/<int:current_page>/<int:page_size>',
          views.Application.Page.as_view(), name='application_page'),
     path('workspace/<str:workspace_id>/application/<str:application_id>/application_key',
-         views.ApplicationKey.as_view())]
+         views.ApplicationKey.as_view()),
+    path('workspace/<str:workspace_id>/application/<str:application_id>/export', views.Application.Export.as_view()),
+]
