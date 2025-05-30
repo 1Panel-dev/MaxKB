@@ -1,3 +1,9 @@
+// 排序
+export function arraySort(list: Array<any>, property: any, desc?: boolean) {
+  return list.sort((a: any, b: any) => {
+    return desc ? b[property] - a[property] : a[property] - b[property]
+  })
+}
 /**
  * 拆分数组 每n个拆分为一个数组
  * @param sourceDataList 资源数据
