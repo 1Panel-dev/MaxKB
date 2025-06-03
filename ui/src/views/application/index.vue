@@ -41,7 +41,49 @@
               <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.username" />
             </el-select>
           </div>
-          <el-button class="ml-16" type="primary"> {{ $t('common.create') }}</el-button>
+          <el-dropdown trigger="click">
+            <el-button type="primary" class="ml-8">
+              {{ $t('common.create') }}<el-icon class="el-icon--right"><arrow-down /></el-icon>
+            </el-button>
+            <template #dropdown>
+              <el-dropdown-menu class="create-dropdown">
+                <el-dropdown-item>
+                  <div class="flex">
+                    <el-avatar shape="square" class="avatar-blue mt-4" :size="36">
+                      <img
+                        src="@/assets/application/icon_simple_application.svg"
+                        style="width: 65%"
+                        alt=""
+                      />
+                    </el-avatar>
+                    <div class="pre-wrap ml-8">
+                      <div class="lighter">{{ $t('views.application.simple') }}</div>
+                      <el-text type="info" size="small">{{
+                        $t('views.application.simplePlaceholder')
+                      }}</el-text>
+                    </div>
+                  </div>
+                </el-dropdown-item>
+                <el-dropdown-item>
+                  <div class="flex">
+                    <el-avatar shape="square" class="avatar-purple mt-4" :size="36">
+                      <img
+                        src="@/assets/application/icon_workflow_application.svg"
+                        style="width: 65%"
+                        alt=""
+                      />
+                    </el-avatar>
+                    <div class="pre-wrap ml-8">
+                      <div class="lighter">{{ $t('views.application.workflow') }}</div>
+                      <el-text type="info" size="small">{{
+                        $t('views.application.workflowPlaceholder')
+                      }}</el-text>
+                    </div>
+                  </div>
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
         </div>
       </template>
       <div>

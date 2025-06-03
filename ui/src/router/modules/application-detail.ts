@@ -1,7 +1,7 @@
 const ApplicationDetailRouter = {
   path: '/application/:id/:type',
   name: 'ApplicationDetail',
-  meta: { title: '应用详情', activeMenu: '/application', breadcrumb: true },
+  meta: { title: 'views.applicationOverview.title', activeMenu: '/application', breadcrumb: true },
   component: () => import('@/layout/layout-template/MainLayout.vue'),
   hidden: true,
   children: [

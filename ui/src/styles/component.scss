@@ -56,7 +56,6 @@
   }
 }
 
-
 /*
   表格第一行插入自定义行
 */
@@ -82,5 +81,15 @@
   }
   .el-table__body {
     margin-top: 49px;
+  }
+}
+
+.create-dropdown {
+  width: 280px;
+  .el-dropdown-menu__item {
+    padding: 8px 12px;
+    &:hover {
+      background: var(--app-text-color-light-1);
+    }
   }
 }
