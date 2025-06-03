@@ -40,6 +40,10 @@ class Group(Enum):
     LOGIN_AUTH = "LOGIN_AUTH"
     SYSTEM_API_KEY = "SYSTEM_API_KEY"
     APPEARANCE_SETTINGS = "APPEARANCE_SETTINGS"
+    CHAT_USER = "CHAT_USER"
+    USER_GROUP = "USER_GROUP"
+    CHAT_USER_AUTH = "CHAT_USER_AUTH"
+    OTHER = "OTHER"
 
 
 class SystemGroup(Enum):
@@ -54,13 +58,13 @@ class SystemGroup(Enum):
     RESOURCE_TOOL = "RESOURCE_TOOL"
     RESOURCE_MODEL = "RESOURCE_MODEL"
     RESOURCE_PERMISSION = "RESOURCE_PERMISSION"
-    SHARED_KNOWLEDGE = "SHARED_KNOWLEDGE"
-    SHARED_MODEL = "SHARED_MODEL"
-    SHARED_TOOL = "SHARED_TOOL"
+    CHAT_USER = "CHAT_USER"
+    # SHARED_KNOWLEDGE = "SHARED_KNOWLEDGE"
+    # SHARED_MODEL = "SHARED_MODEL"
+    # SHARED_TOOL = "SHARED_TOOL"
     SYSTEM_SETTING = "SYSTEM_SETTING"
     OPERATION_LOG = "OPERATION_LOG"
     OTHER = "OTHER"
-    APPLICATION = "APPLICATION"
 
 
 class WorkspaceGroup(Enum):
@@ -102,6 +106,7 @@ class Operate(Enum):
     VECTOR = "READ+VECTOR"  # 向量化
     MIGRATE = "READ+MIGRATE"  # 迁移
     RELATE = "READ+RELATE"  # 关联
+    USER_GROUP = "READ+USER_GROUP"  # 用户组
 
 
 class RoleGroup(Enum):
@@ -183,9 +188,9 @@ Permission_Label = {
     SystemGroup.RESOURCE_TOOL.value: _("Resource Tool"),
     SystemGroup.RESOURCE_MODEL.value: _("Resource Model"),
     SystemGroup.RESOURCE_PERMISSION.value: _("Resource Permission"),
-    SystemGroup.SHARED_KNOWLEDGE.value: _("Shared Knowledge"),
-    SystemGroup.SHARED_MODEL.value: _("Shared Model"),
-    SystemGroup.SHARED_TOOL.value: _("Shared Tool"),
+    # SystemGroup.SHARED_KNOWLEDGE.value: _("Shared Knowledge"),
+    # SystemGroup.SHARED_MODEL.value: _("Shared Model"),
+    # SystemGroup.SHARED_TOOL.value: _("Shared Tool"),
     SystemGroup.OPERATION_LOG.value: _("Operation Log"),
     SystemGroup.OTHER.value: _("Other"),
     WorkspaceGroup.SYSTEM_MANAGEMENT.value: _("System Management"),
@@ -216,7 +221,10 @@ Permission_Label = {
     Group.LOGIN_AUTH.value: _("Login Auth"),
     Group.DISPLAY_SETTINGS.value: _("Display Settings"),
     Group.SYSTEM_API_KEY.value: _("System API Key"),
-    Group.APPEARANCE_SETTINGS.value:_("Appearance Settings")
+    Group.APPEARANCE_SETTINGS.value: _("Appearance Settings"),
+    Group.CHAT_USER.value: _("Chat User"),
+    Group.USER_GROUP.value: _("User Group"),
+    Group.CHAT_USER_AUTH.value: _("Chat User Auth"),
 
 }
 
@@ -521,51 +529,143 @@ class PermissionConstants(Enum):
     )
     APPLICATION_READ = Permission(group=Group.APPLICATION, operate=Operate.READ,
                                   role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-                                  parent_group=[SystemGroup.APPLICATION],
+                                  parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
                                   resource_permission_group_list=[ResourcePermissionGroup.VIEW],
                                   )
     APPLICATION_EXPORT = Permission(group=Group.APPLICATION, operate=Operate.EXPORT,
                                     role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-                                    parent_group=[SystemGroup.APPLICATION]
+                                    parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
                                     )
     APPLICATION_DELETE = Permission(group=Group.APPLICATION, operate=Operate.DELETE,
                                     role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-                                    parent_group=[SystemGroup.APPLICATION],
+                                    parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
                                     resource_permission_group_list=[ResourcePermissionGroup.VIEW],
                                     )
     APPLICATION_EDIT = Permission(group=Group.APPLICATION, operate=Operate.EDIT,
                                   role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-                                  parent_group=[SystemGroup.APPLICATION],
+                                  parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
                                   resource_permission_group_list=[ResourcePermissionGroup.VIEW],
                                   )
-    SYSTEM_API_KEY_READ = Permission(group=Group.SYSTEM_API_KEY, operate=Operate.READ,
+    SYSTEM_API_KEY_EDIT = Permission(group=Group.OTHER, operate=Operate.EDIT,
                                      role_list=[RoleConstants.ADMIN],
-                                     parent_group=[SystemGroup.SYSTEM_SETTING]
+                                     parent_group=[SystemGroup.OTHER],
+                                     label=_('System API Key')
                                      )
-    SYSTEM_API_KEY_EDIT = Permission(group=Group.SYSTEM_API_KEY, operate=Operate.EDIT,
-                                     role_list=[RoleConstants.ADMIN],
-                                     parent_group=[SystemGroup.SYSTEM_SETTING]
-                                     )
-    SYSTEM_API_KEY_DELETE = Permission(group=Group.SYSTEM_API_KEY, operate=Operate.DELETE,
-                                       role_list=[RoleConstants.ADMIN],
-                                       parent_group=[SystemGroup.SYSTEM_SETTING]
-                                       )
-    SYSTEM_API_KEY_CREATE = Permission(group=Group.SYSTEM_API_KEY, operate=Operate.CREATE,
-                                       role_list=[RoleConstants.ADMIN],
-                                       parent_group=[SystemGroup.SYSTEM_SETTING]
-                                       )
     APPEARANCE_SETTINGS_READ = Permission(group=Group.APPEARANCE_SETTINGS, operate=Operate.READ,
-                                    role_list=[RoleConstants.ADMIN],
-                                    parent_group=[SystemGroup.SYSTEM_SETTING]
-                                    )
+                                          role_list=[RoleConstants.ADMIN],
+                                          parent_group=[SystemGroup.SYSTEM_SETTING]
+                                          )
     APPEARANCE_SETTINGS_EDIT = Permission(group=Group.APPEARANCE_SETTINGS, operate=Operate.EDIT,
-                                    role_list=[RoleConstants.ADMIN],
-                                    parent_group=[SystemGroup.SYSTEM_SETTING]
-                                    )
-
-
-
-
+                                          role_list=[RoleConstants.ADMIN],
+                                          parent_group=[SystemGroup.SYSTEM_SETTING]
+                                          )
+    CHAT_USER_READ = Permission(group=Group.CHAT_USER, operate=Operate.READ,
+                                role_list=[RoleConstants.ADMIN],
+                                parent_group=[SystemGroup.CHAT_USER],
+                                label=_('Sync users')
+                                )
+    CHAT_USER_CREATE = Permission(group=Group.CHAT_USER, operate=Operate.CREATE,
+                                  role_list=[RoleConstants.ADMIN],
+                                  parent_group=[SystemGroup.CHAT_USER]
+                                  )
+    CHAT_USER_SYNC = Permission(group=Group.CHAT_USER, operate=Operate.SYNC,
+                                role_list=[RoleConstants.ADMIN],
+                                parent_group=[SystemGroup.CHAT_USER]
+                                )
+    CHAT_USER_EDIT = Permission(group=Group.CHAT_USER, operate=Operate.EDIT,
+                                role_list=[RoleConstants.ADMIN],
+                                parent_group=[SystemGroup.CHAT_USER]
+                                )
+    CHAT_USER_DELETE = Permission(group=Group.CHAT_USER, operate=Operate.DELETE,
+                                  role_list=[RoleConstants.ADMIN],
+                                  parent_group=[SystemGroup.CHAT_USER]
+                                  )
+    CHAT_USER_GROUP = Permission(group=Group.CHAT_USER, operate=Operate.USER_GROUP,
+                                 role_list=[RoleConstants.ADMIN],
+                                 parent_group=[SystemGroup.CHAT_USER],
+                                 label=_('Set up user groups')
+                                 )
+    USER_GROUP_READ = Permission(group=Group.USER_GROUP, operate=Operate.READ,
+                                 role_list=[RoleConstants.ADMIN],
+                                 parent_group=[SystemGroup.CHAT_USER]
+                                 )
+    USER_GROUP_CREATE = Permission(group=Group.USER_GROUP, operate=Operate.CREATE,
+                                   role_list=[RoleConstants.ADMIN],
+                                   parent_group=[SystemGroup.CHAT_USER]
+                                   )
+    USER_GROUP_EDIT = Permission(group=Group.USER_GROUP, operate=Operate.EDIT,
+                                 role_list=[RoleConstants.ADMIN],
+                                 parent_group=[SystemGroup.CHAT_USER]
+                                 )
+    USER_GROUP_DELETE = Permission(group=Group.USER_GROUP, operate=Operate.DELETE,
+                                   role_list=[RoleConstants.ADMIN],
+                                   parent_group=[SystemGroup.CHAT_USER]
+                                   )
+    USER_GROUP_ADD_MEMBER = Permission(group=Group.USER_GROUP, operate=Operate.ADD_MEMBER,
+                                       role_list=[RoleConstants.ADMIN],
+                                       parent_group=[SystemGroup.CHAT_USER]
+                                       )
+    USER_GROUP_REMOVE_MEMBER = Permission(group=Group.USER_GROUP, operate=Operate.REMOVE_MEMBER,
+                                          role_list=[RoleConstants.ADMIN],
+                                          parent_group=[SystemGroup.CHAT_USER]
+                                          )
+    CHAT_USER_AUTH_READ = Permission(group=Group.CHAT_USER_AUTH, operate=Operate.READ,
+                                     role_list=[RoleConstants.ADMIN],
+                                     parent_group=[SystemGroup.CHAT_USER]
+                                     )
+    CHAT_USER_AUTH_EDIT = Permission(group=Group.CHAT_USER_AUTH, operate=Operate.EDIT,
+                                     role_list=[RoleConstants.ADMIN],
+                                     parent_group=[SystemGroup.CHAT_USER]
+                                     )
+    WORKSPACE_CHAT_USER_READ = Permission(group=Group.CHAT_USER, operate=Operate.READ,
+                                          role_list=[RoleConstants.ADMIN],
+                                          parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT],
+                                          )
+    WORKSPACE_CHAT_USER_CREATE = Permission(group=Group.CHAT_USER, operate=Operate.CREATE,
+                                            role_list=[RoleConstants.ADMIN],
+                                            parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT],
+                                            )
+    WORKSPACE_CHAT_USER_EDIT = Permission(group=Group.CHAT_USER, operate=Operate.EDIT,
+                                          role_list=[RoleConstants.ADMIN],
+                                          parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT],
+                                          )
+    WORKSPACE_CHAT_USER_DELETE = Permission(group=Group.CHAT_USER, operate=Operate.DELETE,
+                                            role_list=[RoleConstants.ADMIN],
+                                            parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT],
+                                            )
+    WORKSPACE_CHAT_USER_SYNC = Permission(group=Group.CHAT_USER, operate=Operate.SYNC,
+                                          role_list=[RoleConstants.ADMIN],
+                                          parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT],
+                                          )
+    WORKSPACE_CHAT_USER_GROUP = Permission(group=Group.CHAT_USER, operate=Operate.USER_GROUP,
+                                           role_list=[RoleConstants.ADMIN],
+                                           parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT],
+                                           label=_('Set up user groups')
+                                           )
+    WORKSPACE_USER_GROUP_READ = Permission(group=Group.USER_GROUP, operate=Operate.READ,
+                                           role_list=[RoleConstants.ADMIN],
+                                           parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT]
+                                           )
+    WORKSPACE_USER_GROUP_CREATE = Permission(group=Group.USER_GROUP, operate=Operate.CREATE,
+                                             role_list=[RoleConstants.ADMIN],
+                                             parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT]
+                                             )
+    WORKSPACE_USER_GROUP_EDIT = Permission(group=Group.USER_GROUP, operate=Operate.EDIT,
+                                           role_list=[RoleConstants.ADMIN],
+                                           parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT]
+                                           )
+    WORKSPACE_USER_GROUP_DELETE = Permission(group=Group.USER_GROUP, operate=Operate.DELETE,
+                                             role_list=[RoleConstants.ADMIN],
+                                             parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT]
+                                             )
+    WORKSPACE_USER_GROUP_ADD_MEMBER = Permission(group=Group.USER_GROUP, operate=Operate.ADD_MEMBER,
+                                                 role_list=[RoleConstants.ADMIN],
+                                                 parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT]
+                                                 )
+    WORKSPACE_USER_GROUP_REMOVE_MEMBER = Permission(group=Group.USER_GROUP, operate=Operate.REMOVE_MEMBER,
+                                                    role_list=[RoleConstants.ADMIN],
+                                                    parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT]
+                                                    )
 
     def get_workspace_application_permission(self):
         return lambda r, kwargs: Permission(group=self.value.group, operate=self.value.operate,
