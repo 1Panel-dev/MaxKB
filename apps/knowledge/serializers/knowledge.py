@@ -181,12 +181,9 @@ class KnowledgeSerializer(serializers.Serializer):
             knowledge_id = self.data.get('knowledge_id')
             knowledge = QuerySet(Knowledge).filter(id=knowledge_id).first()
             embedding_model_id = knowledge.embedding_model_id
-            knowledge_user_id = knowledge.user_id
             embedding_model = QuerySet(Model).filter(id=embedding_model_id).first()
             if embedding_model is None:
                 raise AppApiException(500, _('Model does not exist'))
-            if embedding_model.permission_type == 'PRIVATE' and knowledge_user_id != embedding_model.user_id:
-                raise AppApiException(500, _('No permission to use this model') + f"{embedding_model.name}")
             ListenerManagement.update_status(
                 QuerySet(Document).filter(knowledge_id=self.data.get('knowledge_id')),
                 TaskType.EMBEDDING,
