@@ -13,14 +13,15 @@ from common.db.search import page_search
 from common.event import ListenerManagement
 from common.exception.app_exception import AppApiException
 from common.utils.common import post
-from knowledge.models import Paragraph, Problem, Document, ProblemParagraphMapping, SourceType, TaskType, State
+from knowledge.models import Paragraph, Problem, Document, ProblemParagraphMapping, SourceType, TaskType, State, \
+    Knowledge
 from knowledge.serializers.common import ProblemParagraphObject, ProblemParagraphManage, \
     get_embedding_model_id_by_knowledge_id, update_document_char_length, BatchSerializer
 from knowledge.serializers.problem import ProblemInstanceSerializer, ProblemSerializer, ProblemSerializers
 from knowledge.task.embedding import embedding_by_paragraph, enable_embedding_by_paragraph, \
     disable_embedding_by_paragraph, \
     delete_embedding_by_paragraph, embedding_by_problem as embedding_by_problem_task, delete_embedding_by_paragraph_ids, \
-    embedding_by_problem, delete_embedding_by_source
+    embedding_by_problem, delete_embedding_by_source, update_embedding_document_id
 from knowledge.task.generate import generate_related_by_paragraph_id_list
 
 
@@ -413,6 +414,126 @@ class ParagraphSerializers(serializers.Serializer):
                 generate_related_by_paragraph_id_list.delay(document_id, paragraph_id_list, model_id, prompt)
             except AlreadyQueued as e:
                 raise AppApiException(500, _('The task is being executed, please do not send it again.'))
+
+    class Migrate(serializers.Serializer):
+        workspace_id = serializers.UUIDField(required=True, label=_('workspace id'))
+        knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
+        document_id = serializers.UUIDField(required=True, label=_('document id'))
+        target_knowledge_id = serializers.UUIDField(required=True, label=_('target knowledge id'))
+        target_document_id = serializers.UUIDField(required=True, label=_('target document id'))
+        paragraph_id_list = serializers.ListField(required=True, label=_('paragraph id list'),
+                                                  child=serializers.UUIDField(required=True, label=_('paragraph id')))
+
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            document_list = QuerySet(Document).filter(
+                id__in=[self.data.get('document_id'), self.data.get('target_document_id')])
+            document_id = self.data.get('document_id')
+            target_document_id = self.data.get('target_document_id')
+            if document_id == target_document_id:
+                raise AppApiException(5000, _('The document to be migrated is consistent with the target document'))
+            if len([document for document in document_list if str(document.id) == self.data.get('document_id')]) < 1:
+                raise AppApiException(5000, _('The document id does not exist [{document_id}]').format(
+                    document_id=self.data.get('document_id')))
+            if len([document for document in document_list if
+                    str(document.id) == self.data.get('target_document_id')]) < 1:
+                raise AppApiException(5000, _('The target document id does not exist [{document_id}]').format(
+                    document_id=self.data.get('target_document_id')))
+
+        @transaction.atomic
+        def migrate(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            knowledge_id = self.data.get('knowledge_id')
+            target_knowledge_id = self.data.get('target_knowledge_id')
+            document_id = self.data.get('document_id')
+            target_document_id = self.data.get('target_document_id')
+            paragraph_id_list = self.data.get('paragraph_id_list')
+            paragraph_list = QuerySet(Paragraph).filter(knowledge_id=knowledge_id, document_id=document_id,
+                                                        id__in=paragraph_id_list)
+            problem_paragraph_mapping_list = QuerySet(ProblemParagraphMapping).filter(paragraph__in=paragraph_list)
+            # 同数据集迁移
+            if target_knowledge_id == knowledge_id:
+                if len(problem_paragraph_mapping_list):
+                    problem_paragraph_mapping_list = [
+                        self.update_problem_paragraph_mapping(target_document_id,
+                                                              problem_paragraph_mapping) for problem_paragraph_mapping
+                        in
+                        problem_paragraph_mapping_list]
+                    # 修改mapping
+                    QuerySet(ProblemParagraphMapping).bulk_update(problem_paragraph_mapping_list,
+                                                                  ['document_id'])
+                update_embedding_document_id([paragraph.id for paragraph in paragraph_list],
+                                             target_document_id, target_knowledge_id, None)
+                # 修改段落信息
+                paragraph_list.update(document_id=target_document_id)
+            # 不同数据集迁移
+            else:
+                problem_list = QuerySet(Problem).filter(
+                    id__in=[problem_paragraph_mapping.problem_id for problem_paragraph_mapping in
+                            problem_paragraph_mapping_list])
+                # 目标数据集问题
+                target_problem_list = list(
+                    QuerySet(Problem).filter(content__in=[problem.content for problem in problem_list],
+                                             knowledge_id=target_knowledge_id))
+
+                target_handle_problem_list = [
+                    self.get_target_knowledge_problem(target_knowledge_id, target_document_id,
+                                                      problem_paragraph_mapping,
+                                                      problem_list, target_problem_list) for
+                    problem_paragraph_mapping
+                    in
+                    problem_paragraph_mapping_list]
+
+                create_problem_list = [problem for problem, is_create in target_handle_problem_list if
+                                       is_create is not None and is_create]
+                # 插入问题
+                QuerySet(Problem).bulk_create(create_problem_list)
+                # 修改mapping
+                QuerySet(ProblemParagraphMapping).bulk_update(problem_paragraph_mapping_list,
+                                                              ['problem_id', 'knowledge_id', 'document_id'])
+                target_knowledge = QuerySet(Knowledge).filter(id=target_knowledge_id).first()
+                knowledge = QuerySet(Knowledge).filter(id=knowledge_id).first()
+                embedding_model_id = None
+                if target_knowledge.embedding_mode_id != knowledge.embedding_mode_id:
+                    embedding_model_id = str(target_knowledge.embedding_mode_id)
+                pid_list = [paragraph.id for paragraph in paragraph_list]
+                # 修改段落信息
+                paragraph_list.update(knowledge_id=target_knowledge_id, document_id=target_document_id)
+                # 修改向量段落信息
+                update_embedding_document_id(pid_list, target_document_id, target_knowledge_id, embedding_model_id)
+
+            update_document_char_length(document_id)
+            update_document_char_length(target_document_id)
+
+        @staticmethod
+        def update_problem_paragraph_mapping(target_document_id: str, problem_paragraph_mapping):
+            problem_paragraph_mapping.document_id = target_document_id
+            return problem_paragraph_mapping
+
+        @staticmethod
+        def get_target_knowledge_problem(target_knowledge_id: str,
+                                         target_document_id: str,
+                                         problem_paragraph_mapping,
+                                         source_problem_list,
+                                         target_problem_list):
+            source_problem_list = [source_problem for source_problem in source_problem_list if
+                                   source_problem.id == problem_paragraph_mapping.problem_id]
+            problem_paragraph_mapping.knowledge_id = target_knowledge_id
+            problem_paragraph_mapping.document_id = target_document_id
+            if len(source_problem_list) > 0:
+                problem_content = source_problem_list[-1].content
+                problem_list = [problem for problem in target_problem_list if problem.content == problem_content]
+                if len(problem_list) > 0:
+                    problem = problem_list[-1]
+                    problem_paragraph_mapping.problem_id = problem.id
+                    return problem, False
+                else:
+                    problem = Problem(id=uuid.uuid1(), knowledge_id=target_knowledge_id, content=problem_content)
+                    target_problem_list.append(problem)
+                    problem_paragraph_mapping.problem_id = problem.id
+                    return problem, True
+            return None
 
 
 def delete_problems_and_mappings(paragraph_ids):

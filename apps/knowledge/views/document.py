@@ -12,7 +12,7 @@ from knowledge.api.document import DocumentSplitAPI, DocumentBatchAPI, DocumentB
     DocumentReadAPI, DocumentEditAPI, DocumentDeleteAPI, TableDocumentCreateAPI, QaDocumentCreateAPI, \
     WebDocumentCreateAPI, CancelTaskAPI, BatchCancelTaskAPI, SyncWebAPI, RefreshAPI, BatchEditHitHandlingAPI, \
     DocumentTreeReadAPI, DocumentSplitPatternAPI, BatchRefreshAPI, BatchGenerateRelatedAPI, TemplateExportAPI, \
-    DocumentExportAPI
+    DocumentExportAPI, DocumentMigrateAPI
 from knowledge.serializers.document import DocumentSerializers
 
 
@@ -396,8 +396,10 @@ class DocumentView(APIView):
             tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
         @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_EXPORT.get_workspace_permission())
-        def get(self, request: Request, dataset_id: str, document_id: str):
-            return DocumentSerializers.Operate(data={'document_id': document_id, 'dataset_id': dataset_id}).export()
+        def get(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
+            return DocumentSerializers.Operate(data={
+                'workspace_id': workspace_id, 'document_id': document_id, 'knowledge_id': knowledge_id
+            }).export()
 
     class ExportZip(APIView):
         authentication_classes = [TokenAuth]
@@ -410,8 +412,31 @@ class DocumentView(APIView):
             tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
         @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_EXPORT.get_workspace_permission())
-        def get(self, request: Request, dataset_id: str, document_id: str):
-            return DocumentSerializers.Operate(data={'document_id': document_id, 'dataset_id': dataset_id}).export_zip()
+        def get(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
+            return DocumentSerializers.Operate(data={
+                'workspace_id': workspace_id, 'document_id': document_id, 'knowledge_id': knowledge_id
+            }).export_zip()
+
+    class Migrate(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            summary=_('Migrate documents in batches'),
+            operation_id=_('Migrate documents in batches'),  # type: ignore
+            parameters=DocumentMigrateAPI.get_parameters(),
+            request=DocumentMigrateAPI.get_request(),
+            responses=DocumentMigrateAPI.get_response(),
+            tags=[_('Knowledge Base/Documentation')]  # type: ignore
+        )
+        @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_MIGRATE.get_workspace_permission())
+        def put(self, request: Request, workspace_id, knowledge_id: str, target_knowledge_id: str):
+            return result.success(DocumentSerializers.Migrate(
+                data={
+                    'workspace_id': workspace_id,
+                    'knowledge_id': knowledge_id,
+                    'target_knowledge_id': target_knowledge_id,
+                    'document_id_list': request.data}
+            ).migrate())
 
 
 class WebDocumentView(APIView):

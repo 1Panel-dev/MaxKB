@@ -49,7 +49,8 @@ from knowledge.serializers.common import ProblemParagraphManage, BatchSerializer
 from knowledge.serializers.paragraph import ParagraphSerializers, ParagraphInstanceSerializer, \
     delete_problems_and_mappings
 from knowledge.task.embedding import embedding_by_document, delete_embedding_by_document_list, \
-    delete_embedding_by_document
+    delete_embedding_by_document, delete_embedding_by_paragraph_ids, embedding_by_document_list, \
+    update_embedding_knowledge_id
 from knowledge.task.generate import generate_related_by_document_id
 from knowledge.task.sync import sync_web_document
 from maxkb.const import PROJECT_DIR
@@ -173,6 +174,10 @@ class DocumentBatchGenerateRelatedSerializer(serializers.Serializer):
     state_list = serializers.ListField(required=True, label=_('state list'))
 
 
+class DocumentMigrateSerializer(serializers.Serializer):
+    document_id_list = serializers.ListField(required=True, label=_('document id list'))
+
+
 class BatchEditHitHandlingSerializer(serializers.Serializer):
     id_list = serializers.ListField(required=True, child=serializers.UUIDField(required=True), label=_('id list'))
     hit_handling_method = serializers.CharField(required=True, label=_('hit handling method'))
@@ -199,7 +204,8 @@ class DocumentSerializers(serializers.Serializer):
             language = get_language()
             if self.data.get('type') == 'csv':
                 file = open(
-                    os.path.join(PROJECT_DIR, "apps", "knowledge", 'template', f'csv_template_{to_locale(language)}.csv'),
+                    os.path.join(PROJECT_DIR, "apps", "knowledge", 'template',
+                                 f'csv_template_{to_locale(language)}.csv'),
                     "rb")
                 content = file.read()
                 file.close()
@@ -239,6 +245,98 @@ class DocumentSerializers(serializers.Serializer):
             else:
                 return None
 
+    class Migrate(serializers.Serializer):
+        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+        knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
+        target_knowledge_id = serializers.UUIDField(required=True, label=_('target knowledge id'))
+        document_id_list = serializers.ListField(required=True, label=_('document list'),
+                                                 child=serializers.UUIDField(required=True, label=_('document id')))
+
+        @transaction.atomic
+        def migrate(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            knowledge_id = self.data.get('knowledge_id')
+            target_knowledge_id = self.data.get('target_knowledge_id')
+            knowledge = QuerySet(Knowledge).filter(id=knowledge_id).first()
+            target_knowledge = QuerySet(Knowledge).filter(id=target_knowledge_id).first()
+            document_id_list = self.data.get('document_id_list')
+            document_list = QuerySet(Document).filter(knowledge_id=knowledge_id, id__in=document_id_list)
+            paragraph_list = QuerySet(Paragraph).filter(knowledge_id=knowledge_id, document_id__in=document_id_list)
+
+            problem_paragraph_mapping_list = QuerySet(ProblemParagraphMapping).filter(paragraph__in=paragraph_list)
+            problem_list = QuerySet(Problem).filter(
+                id__in=[problem_paragraph_mapping.problem_id for problem_paragraph_mapping in
+                        problem_paragraph_mapping_list])
+            target_problem_list = list(
+                QuerySet(Problem).filter(content__in=[problem.content for problem in problem_list],
+                                         knowledge_id=target_knowledge_id))
+            target_handle_problem_list = [
+                self.get_target_knowledge_problem(target_knowledge_id, problem_paragraph_mapping,
+                                                  problem_list, target_problem_list) for
+                problem_paragraph_mapping
+                in
+                problem_paragraph_mapping_list]
+
+            create_problem_list = [problem for problem, is_create in target_handle_problem_list if
+                                   is_create is not None and is_create]
+            # 插入问题
+            QuerySet(Problem).bulk_create(create_problem_list)
+            # 修改mapping
+            QuerySet(ProblemParagraphMapping).bulk_update(problem_paragraph_mapping_list,
+                                                          ['problem_id', 'knowledge_id'])
+            # 修改文档
+            if knowledge.type == KnowledgeType.BASE.value and target_knowledge.type == KnowledgeType.WEB.value:
+                document_list.update(knowledge_id=target_knowledge_id, type=KnowledgeType.WEB,
+                                     meta={'source_url': '', 'selector': ''})
+            elif target_knowledge.type == KnowledgeType.BASE.value and knowledge.type == KnowledgeType.WEB.value:
+                document_list.update(knowledge_id=target_knowledge_id, type=KnowledgeType.BASE,
+                                     meta={})
+            else:
+                document_list.update(knowledge_id=target_knowledge_id)
+            model_id = None
+            if knowledge.embedding_mode_id != target_knowledge.embedding_mode_id:
+                model_id = get_embedding_model_id_by_knowledge_id(target_knowledge_id)
+
+            pid_list = [paragraph.id for paragraph in paragraph_list]
+            # 修改段落信息
+            paragraph_list.update(knowledge_id=target_knowledge_id)
+            # 修改向量信息
+            if model_id:
+                delete_embedding_by_paragraph_ids(pid_list)
+                ListenerManagement.update_status(QuerySet(Document).filter(id__in=document_id_list),
+                                                 TaskType.EMBEDDING,
+                                                 State.PENDING)
+                ListenerManagement.update_status(QuerySet(Paragraph).filter(document_id__in=document_id_list),
+                                                 TaskType.EMBEDDING,
+                                                 State.PENDING)
+                ListenerManagement.get_aggregation_document_status_by_query_set(
+                    QuerySet(Document).filter(id__in=document_id_list))()
+                embedding_by_document_list.delay(document_id_list, model_id)
+            else:
+                update_embedding_knowledge_id(pid_list, target_knowledge_id)
+
+        @staticmethod
+        def get_target_knowledge_problem(target_knowledge_id: str,
+                                         problem_paragraph_mapping,
+                                         source_problem_list,
+                                         target_problem_list):
+            source_problem_list = [source_problem for source_problem in source_problem_list if
+                                   source_problem.id == problem_paragraph_mapping.problem_id]
+            problem_paragraph_mapping.knowledge_id = target_knowledge_id
+            if len(source_problem_list) > 0:
+                problem_content = source_problem_list[-1].content
+                problem_list = [problem for problem in target_problem_list if problem.content == problem_content]
+                if len(problem_list) > 0:
+                    problem = problem_list[-1]
+                    problem_paragraph_mapping.problem_id = problem.id
+                    return problem, False
+                else:
+                    problem = Problem(id=uuid.uuid1(), knowledge_id=target_knowledge_id, content=problem_content)
+                    target_problem_list.append(problem)
+                    problem_paragraph_mapping.problem_id = problem.id
+                    return problem, True
+            return None
 
     class Query(serializers.Serializer):
         # 知识库id

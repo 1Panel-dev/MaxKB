@@ -193,8 +193,10 @@ class KnowledgeView(APIView):
             tags=[_('Knowledge Base')]  # type: ignore
         )
         @has_permissions(PermissionConstants.KNOWLEDGE_EXPORT.get_workspace_permission())
-        def get(self, request: Request, knowledge_id: str):
-            return KnowledgeSerializer.Operate(data={'id': knowledge_id, 'user_id': request.user.id}).export_excel()
+        def get(self, request: Request, workspace_id: str, knowledge_id: str):
+            return KnowledgeSerializer.Operate(data={
+                'workspace_id': workspace_id, 'knowledge_id': knowledge_id, 'user_id': request.user.id
+            }).export_excel()
 
     class ExportZip(APIView):
         authentication_classes = [TokenAuth]
@@ -207,8 +209,10 @@ class KnowledgeView(APIView):
             tags=[_('Knowledge Base')]  # type: ignore
         )
         @has_permissions(PermissionConstants.KNOWLEDGE_EXPORT.get_workspace_permission())
-        def get(self, request: Request, knowledge_id: str):
-            return KnowledgeSerializer.Operate(data={'id': knowledge_id, 'user_id': request.user.id}).export_zip()
+        def get(self, request: Request, workspace_id: str, knowledge_id: str):
+            return KnowledgeSerializer.Operate(data={
+                'workspace_id': workspace_id, 'knowledge_id': knowledge_id, 'user_id': request.user.id
+            }).export_zip()
 
     class GenerateRelated(APIView):
         authentication_classes = [TokenAuth]

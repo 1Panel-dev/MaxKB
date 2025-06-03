@@ -10,7 +10,7 @@ from common.result import result
 from common.utils.common import query_params_to_single_dict
 from knowledge.api.paragraph import ParagraphReadAPI, ParagraphCreateAPI, ParagraphBatchDeleteAPI, ParagraphEditAPI, \
     ParagraphGetAPI, ProblemCreateAPI, UnAssociationAPI, AssociationAPI, ParagraphPageAPI, \
-    ParagraphBatchGenerateRelatedAPI
+    ParagraphBatchGenerateRelatedAPI, ParagraphMigrateAPI
 from knowledge.serializers.paragraph import ParagraphSerializers
 
 
@@ -70,6 +70,30 @@ class ParagraphView(APIView):
             return result.success(ParagraphSerializers.Batch(
                 data={'workspace_id': workspace_id, 'knowledge_id': knowledge_id, 'document_id': document_id}
             ).batch_delete(request.data))
+
+    class BatchMigrate(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            summary=_('Migrate paragraphs in batches'),
+            operation_id=_('Migrate paragraphs in batches'),  # type: ignore
+            parameters=ParagraphMigrateAPI.get_parameters(),
+            request=ParagraphMigrateAPI.get_request(),
+            responses=ParagraphMigrateAPI.get_response(),
+            tags=[_('Knowledge Base/Documentation/Paragraph')]  # type: ignore
+        )
+        @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_MIGRATE.get_workspace_permission())
+        def put(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str,
+                target_knowledge_id: str, target_document_id):
+            return result.success(
+                ParagraphSerializers.Migrate(data={
+                    'workspace_id': workspace_id,
+                    'knowledge_id': knowledge_id,
+                    'target_knowledge_id': target_knowledge_id,
+                    'document_id': document_id,
+                    'target_document_id': target_document_id,
+                    'paragraph_id_list': request.data.get('id_list')
+                }).migrate())
 
     class BatchGenerateRelated(APIView):
         authentication_classes = [TokenAuth]
