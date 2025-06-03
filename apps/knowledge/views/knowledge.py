@@ -222,6 +222,27 @@ class KnowledgeView(APIView):
                 }
             ).list(workspace_id, True))
 
+    class EmbeddingModel(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['GET'],
+            summary=_('Get embedding model for knowledge base'),
+            description=_('Get embedding model for knowledge base'),
+            operation_id=_('Get embedding model for knowledge base'),  # type: ignore
+            parameters=GetModelAPI.get_parameters(),
+            responses=GetModelAPI.get_response(),
+            tags=[_('Knowledge Base')]  # type: ignore
+        )
+        @has_permissions(PermissionConstants.KNOWLEDGE_EDIT.get_workspace_permission())
+        def get(self, request: Request, workspace_id: str):
+            return result.success(ModelSerializer.Query(
+                data={
+                    'workspace_id': workspace_id,
+                    'model_type': 'EMBEDDING'
+                }
+            ).list(workspace_id, True))
+
 
 class KnowledgeBaseView(APIView):
     authentication_classes = [TokenAuth]
