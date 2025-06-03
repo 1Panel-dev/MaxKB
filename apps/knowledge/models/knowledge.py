@@ -220,6 +220,10 @@ class FileSourceType(models.TextChoices):
     KNOWLEDGE = "KNOWLEDGE"
     # 应用  跟随应用被删除而被删除 source_id 为应用id
     APPLICATION = "APPLICATION"
+    # 工具  跟随工具被删除而被删除 source_id 为应用id
+    TOOL = "TOOL"
+    # 文档
+    DOCUMENT = "DOCUMENT"
     # 临时30分钟 数据30分钟后被清理 source_id 为TEMPORARY_30_MINUTE
     TEMPORARY_30_MINUTE = "TEMPORARY_30_MINUTE"
     # 临时120分钟 数据120分钟后被清理 source_id为TEMPORARY_100_MINUTE

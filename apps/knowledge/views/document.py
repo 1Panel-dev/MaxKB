@@ -12,7 +12,7 @@ from knowledge.api.document import DocumentSplitAPI, DocumentBatchAPI, DocumentB
     DocumentReadAPI, DocumentEditAPI, DocumentDeleteAPI, TableDocumentCreateAPI, QaDocumentCreateAPI, \
     WebDocumentCreateAPI, CancelTaskAPI, BatchCancelTaskAPI, SyncWebAPI, RefreshAPI, BatchEditHitHandlingAPI, \
     DocumentTreeReadAPI, DocumentSplitPatternAPI, BatchRefreshAPI, BatchGenerateRelatedAPI, TemplateExportAPI, \
-    DocumentExportAPI, DocumentMigrateAPI
+    DocumentExportAPI, DocumentMigrateAPI, DocumentDownloadSourceAPI
 from knowledge.serializers.document import DocumentSerializers
 
 
@@ -416,6 +416,22 @@ class DocumentView(APIView):
             return DocumentSerializers.Operate(data={
                 'workspace_id': workspace_id, 'document_id': document_id, 'knowledge_id': knowledge_id
             }).export_zip()
+
+    class DownloadSourceFile(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            summary=_('Download source file'),
+            operation_id=_('Download source file'),  # type: ignore
+            parameters=DocumentDownloadSourceAPI.get_parameters(),
+            responses=DocumentDownloadSourceAPI.get_response(),
+            tags=[_('Knowledge Base/Documentation')]  # type: ignore
+        )
+        @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_DOWNLOAD_RAW.get_workspace_permission())
+        def get(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
+            return DocumentSerializers.Operate(data={
+                'workspace_id': workspace_id, 'document_id': document_id, 'knowledge_id': knowledge_id
+            }).download_source_file()
 
     class Migrate(APIView):
         authentication_classes = [TokenAuth]

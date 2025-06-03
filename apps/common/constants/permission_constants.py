@@ -393,6 +393,11 @@ class PermissionConstants(Enum):
         role_list=[RoleConstants.ADMIN, RoleConstants.USER],
         parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
+    KNOWLEDGE_DOCUMENT_DOWNLOAD_RAW = Permission(
+        group=Group.KNOWLEDGE_DOCUMENT, operate=Operate.EXPORT,
+        role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
+    )
     KNOWLEDGE_DOCUMENT_GENERATE = Permission(
         group=Group.KNOWLEDGE_DOCUMENT, operate=Operate.GENERATE,
         role_list=[RoleConstants.ADMIN, RoleConstants.USER],
