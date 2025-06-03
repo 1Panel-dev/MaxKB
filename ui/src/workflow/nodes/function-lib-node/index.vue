@@ -89,7 +89,7 @@ import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'
 import { isLastNode } from '@/workflow/common/data'
-import applicationApi from '@/api/application'
+import applicationApi from '@/api/application/application'
 import { app } from '@/main'
 const props = defineProps<{ nodeModel: any }>()
 

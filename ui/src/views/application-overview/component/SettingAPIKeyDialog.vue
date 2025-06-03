@@ -37,7 +37,7 @@
 import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
-import overviewApi from '@/api/application-overview'
+import overviewApi from '@/api/application/application-overview'
 import overviewSystemApi from '@/api/system-api-key'
 import { MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'

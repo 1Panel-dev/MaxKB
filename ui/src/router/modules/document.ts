@@ -1,4 +1,4 @@
-const ModelRouter = {
+const DocumentRouter = {
   path: '/knowledge/:id',
   name: 'KnowledgeDetail',
   meta: { title: 'common.fileUpload.document', activeMenu: '/knowledge', breadcrumb: true },
@@ -59,4 +59,4 @@ const ModelRouter = {
   ],
 }
 
-export default ModelRouter
+export default DocumentRouter

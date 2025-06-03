@@ -47,7 +47,7 @@
 import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import type { FormInstance, FormRules, UploadFiles } from 'element-plus'
-import applicationApi from '@/api/application'
+import applicationApi from '@/api/application/application'
 import { isWorkFlow } from '@/utils/application'
 import { MsgSuccess, MsgError } from '@/utils/message'
 import { getBrowserLang, langList, t } from '@/locales'

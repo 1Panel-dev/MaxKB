@@ -61,7 +61,7 @@
 import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { copyClick } from '@/utils/clipboard'
-import overviewApi from '@/api/application-overview'
+import overviewApi from '@/api/application/application-overview'
 import SettingAPIKeyDialog from './SettingAPIKeyDialog.vue'
 import { datetimeFormat } from '@/utils/time'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'

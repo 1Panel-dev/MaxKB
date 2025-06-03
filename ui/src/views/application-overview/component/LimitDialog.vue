@@ -103,7 +103,7 @@
 import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
-import applicationApi from '@/api/application'
+import applicationApi from '@/api/application/application'
 import { MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
 import { copyClick } from '@/utils/clipboard'

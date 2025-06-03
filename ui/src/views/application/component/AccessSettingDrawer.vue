@@ -101,7 +101,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed } from 'vue'
 import type { FormInstance } from 'element-plus'
-import applicationApi from '@/api/application'
+import applicationApi from '@/api/application/application'
 import { useRoute } from 'vue-router'
 import { MsgError, MsgSuccess } from '@/utils/message'
 import { copyClick } from '@/utils/clipboard'

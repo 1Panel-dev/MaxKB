@@ -132,7 +132,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { menuNodes, functionLibNode, functionNode, applicationNode } from '@/workflow/common/data'
 import { iconComponent } from '@/workflow/icons/utils'
-import applicationApi from '@/api/application'
+import applicationApi from '@/api/application/application'
 import { isWorkFlow } from '@/utils/application'
 import { isAppIcon } from '@/utils/common'
 const search_text = ref<string>('')

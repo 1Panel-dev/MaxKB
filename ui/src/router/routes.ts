@@ -6,7 +6,7 @@ export const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'home',
-    redirect: '/knowledge',
+    redirect: '/application',
     children: [...rolesRoutes],
   },
 

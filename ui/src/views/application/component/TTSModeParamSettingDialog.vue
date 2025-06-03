@@ -44,7 +44,7 @@
 import { ref } from 'vue'
 import type { FormField } from '@/components/dynamics-form/type'
 import modelAPi from '@/api/model'
-import applicationApi from '@/api/application'
+import applicationApi from '@/api/application/application'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
 import { keys } from 'lodash'
 import { app } from '@/main'

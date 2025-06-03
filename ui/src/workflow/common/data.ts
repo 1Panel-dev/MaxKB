@@ -1,4 +1,4 @@
-import { WorkflowType } from '@/enums/workflow'
+import { WorkflowType } from '@/enums/application'
 import { t } from '@/locales'
 
 export const startNode = {

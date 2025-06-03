@@ -45,7 +45,7 @@
 <script setup lang="ts">
 import { reactive, ref, onMounted } from 'vue'
 import AccessSettingDrawer from './component/AccessSettingDrawer.vue'
-import applicationApi from '@/api/application'
+import applicationApi from '@/api/application/application'
 import { MsgSuccess } from '@/utils/message'
 import { useRoute } from 'vue-router'
 import { t } from '@/locales'

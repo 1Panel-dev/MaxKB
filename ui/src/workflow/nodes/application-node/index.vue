@@ -172,7 +172,7 @@ import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import { ref, computed, onMounted, onActivated } from 'vue'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import type { FormInstance } from 'element-plus'
-import applicationApi from '@/api/application'
+import applicationApi from '@/api/application/application'
 import { isWorkFlow } from '@/utils/application'
 
 const form = {

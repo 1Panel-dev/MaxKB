@@ -174,7 +174,7 @@
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import { computed, onMounted, ref } from 'vue'
 import { groupBy, set } from 'lodash'
-import applicationApi from '@/api/application'
+import applicationApi from '@/api/application/application'
 import { app } from '@/main'
 import useStore from '@/stores'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'

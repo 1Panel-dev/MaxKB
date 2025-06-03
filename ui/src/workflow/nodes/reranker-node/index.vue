@@ -173,7 +173,7 @@ import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import ParamSettingDialog from './ParamSettingDialog.vue'
 import { ref, computed, onMounted } from 'vue'
 
-import applicationApi from '@/api/application'
+import applicationApi from '@/api/application/application'
 import useStore from '@/stores'
 import { app } from '@/main'
 
