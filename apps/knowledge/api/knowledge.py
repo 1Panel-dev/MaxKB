@@ -186,13 +186,6 @@ class KnowledgePageAPI(KnowledgeReadAPI):
                 required=True,
             ),
             OpenApiParameter(
-                name="user_id",
-                description="用户id",
-                type=OpenApiTypes.STR,
-                location='query',
-                required=False,
-            ),
-            OpenApiParameter(
                 name="name",
                 description="名称",
                 type=OpenApiTypes.STR,

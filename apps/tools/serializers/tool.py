@@ -15,9 +15,10 @@ from pylint.lint import Run
 from pylint.reporters import JSON2Reporter
 from rest_framework import serializers, status
 
-from common.db.search import page_search
+from common.db.search import page_search, native_page_search
 from common.exception.app_exception import AppApiException
 from common.result import result
+from common.utils.common import get_file_content
 from common.utils.tool_code import ToolExecutor
 from maxkb.const import CONFIG, PROJECT_DIR
 from tools.models import Tool, ToolScope, ToolFolder
@@ -418,27 +419,47 @@ class ToolTreeSerializer(serializers.Serializer):
                                               Q(tool_type=self.data.get('tool_type')))
             return page_search(current_page, page_size, tools, lambda record: ToolModelSerializer(record).data)
 
+        def get_query_set(self):
+            tool_query_set = QuerySet(Tool)
+            tool_type_query_set = QuerySet(Tool)
+            folder_query_set = QuerySet(ToolFolder)
+            workspace_id = self.data.get('workspace_id')
+            user_id = self.data.get('user_id')
+            tool_type = self.data.get('tool_type')
+            desc = self.data.get('desc')
+            name = self.data.get('name')
+            folder_id = self.data.get('folder_id')
+
+            if workspace_id is not None:
+                folder_query_set = folder_query_set.filter(workspace_id=workspace_id)
+                tool_query_set = tool_query_set.filter(workspace_id=workspace_id)
+            if user_id is not None:
+                folder_query_set = folder_query_set.filter(user_id=user_id)
+                tool_query_set = tool_query_set.filter(user_id=user_id)
+            if folder_id is not None:
+                folder_query_set = folder_query_set.filter(parent=folder_id)
+                tool_query_set = tool_query_set.filter(folder_id=folder_id)
+            if name is not None:
+                folder_query_set = folder_query_set.filter(name__contains=name)
+                tool_query_set = tool_query_set.filter(name__contains=name)
+            if desc is not None:
+                folder_query_set = folder_query_set.filter(desc__contains=desc)
+                tool_query_set = tool_query_set.filter(desc__contains=desc)
+            tool_query_set = tool_query_set.order_by("-update_time")
+
+            if tool_type is not None:
+                tool_type_query_set = tool_type_query_set.filter(tool_type=tool_type)
+
+            return {
+                'folder_query_set': folder_query_set,
+                'tool_query_set': tool_query_set,
+                'tool_type_query_set': tool_type_query_set
+            }
+
         def page_tool_with_folders(self, current_page: int, page_size: int):
             self.is_valid(raise_exception=True)
 
-            folder_id = self.data.get('folder_id', 'root')
-            root = ToolFolder.objects.filter(id=folder_id).first()
-            if not root:
-                raise serializers.ValidationError(_('Folder not found'))
-                # 获取当前文件夹下的直接子文件夹
-            child_folders = ToolFolder.objects.filter(parent=root)
-            folders_data = ToolFolderFlatSerializer(child_folders, many=True).data
-
-            if self.data.get('name'):
-                tools = QuerySet(Tool).filter(Q(workspace_id=self.data.get('workspace_id')) &
-                                              Q(folder_id=root) &
-                                              Q(tool_type=self.data.get('tool_type')) &
-                                              Q(name__contains=self.data.get('name')))
-            else:
-                tools = QuerySet(Tool).filter(Q(workspace_id=self.data.get('workspace_id')) &
-                                              Q(folder_id=root) &
-                                              Q(tool_type=self.data.get('tool_type')))
-            return {
-                'tools': page_search(current_page, page_size, tools, lambda record: ToolModelSerializer(record).data),
-                'folders': folders_data
-            }
+            return native_page_search(
+                current_page, page_size, self.get_query_set(),
+                get_file_content(os.path.join(PROJECT_DIR, "apps", "tools", 'sql', 'list_tool.sql'))
+            )

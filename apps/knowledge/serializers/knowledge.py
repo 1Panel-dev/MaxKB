@@ -28,7 +28,6 @@ from knowledge.models import Knowledge, KnowledgeScope, KnowledgeType, Document,
 from knowledge.serializers.common import ProblemParagraphManage, get_embedding_model_id_by_knowledge_id, MetaSerializer, \
     GenerateRelatedSerializer, get_embedding_model_by_knowledge_id, list_paragraph
 from knowledge.serializers.document import DocumentSerializers
-from knowledge.serializers.knowledge_folder import KnowledgeFolderFlatSerializer
 from knowledge.task.embedding import embedding_by_knowledge, delete_embedding_by_knowledge
 from knowledge.task.generate import generate_related_by_knowledge_id
 from knowledge.task.sync import sync_web_knowledge, sync_replace_web_knowledge
@@ -117,23 +116,30 @@ class KnowledgeSerializer(serializers.Serializer):
                 'temp.folder_id': models.CharField(),
                 'temp.id': models.CharField()
             }))
+            folder_query_set = QuerySet(KnowledgeFolder)
+
             if "desc" in self.data and self.data.get('desc') is not None:
                 query_set = query_set.filter(**{'temp.desc__icontains': self.data.get("desc")})
+                folder_query_set = folder_query_set.filter(**{'desc__icontains': self.data.get("desc")})
             if "name" in self.data and self.data.get('name') is not None:
                 query_set = query_set.filter(**{'temp.name__icontains': self.data.get("name")})
+                folder_query_set = folder_query_set.filter(**{'name__icontains': self.data.get("name")})
             if "user_id" in self.data and self.data.get('user_id') is not None:
                 query_set = query_set.filter(**{'temp.user_id': self.data.get("user_id")})
+                folder_query_set = folder_query_set.filter(**{'user_id': self.data.get("user_id")})
             if "workspace_id" in self.data and self.data.get('workspace_id') is not None:
                 query_set = query_set.filter(**{'temp.workspace_id': self.data.get("workspace_id")})
+                folder_query_set = folder_query_set.filter(**{'workspace_id': self.data.get("workspace_id")})
             if "folder_id" in self.data and self.data.get('folder_id') is not None:
                 query_set = query_set.filter(**{'temp.folder_id': self.data.get("folder_id")})
+                folder_query_set = folder_query_set.filter(**{'parent_id': self.data.get("folder_id")})
             query_set = query_set.order_by("-temp.create_time", "temp.id")
             query_set_dict['default_sql'] = query_set
 
             query_set_dict['knowledge_custom_sql'] = QuerySet(model=get_dynamics_model({
                 'knowledge.workspace_id': models.CharField(),
             })).filter(**{'knowledge.workspace_id': workspace_id})
-
+            query_set_dict['folder_query_set'] = folder_query_set
             return query_set_dict
 
         def page(self, current_page: int, page_size: int):
@@ -143,22 +149,16 @@ class KnowledgeSerializer(serializers.Serializer):
             root = KnowledgeFolder.objects.filter(id=folder_id).first()
             if not root:
                 raise serializers.ValidationError(_('Folder not found'))
-                # 获取当前文件夹下的直接子文件夹
-            child_folders = KnowledgeFolder.objects.filter(parent=root)
-            folders_data = KnowledgeFolderFlatSerializer(child_folders, many=True).data
 
-            return {
-                'knowledge': native_page_search(
-                    current_page,
-                    page_size,
-                    self.get_query_set(),
-                    select_string=get_file_content(
-                        os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'list_knowledge.sql')
-                    ),
-                    post_records_handler=lambda r: r
+            return native_page_search(
+                current_page,
+                page_size,
+                self.get_query_set(),
+                select_string=get_file_content(
+                    os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'list_knowledge.sql')
                 ),
-                'folders': folders_data
-            }
+                post_records_handler=lambda r: r
+            )
 
         def list(self):
             self.is_valid(raise_exception=True)

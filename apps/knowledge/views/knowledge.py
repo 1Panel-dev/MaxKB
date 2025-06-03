@@ -108,7 +108,7 @@ class KnowledgeView(APIView):
                     'folder_id': request.query_params.get('folder_id'),
                     'name': request.query_params.get('name'),
                     'desc': request.query_params.get("desc"),
-                    'user_id': request.query_params.get('user_id')
+                    'user_id': request.user.id
                 }
             ).page(current_page, page_size))
 
