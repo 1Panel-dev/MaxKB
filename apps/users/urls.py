@@ -13,6 +13,7 @@ urlpatterns = [
     path('workspace/<str:workspace_id>/user/profile', views.TestWorkspacePermissionUserView.as_view(),
          name="test_workspace_id_permission"),
     path("user_manage", views.UserManage.as_view(), name="user_manage"),
+    path("user_manage/batch_delete", views.UserManage.BatchDelete.as_view()),
     path("user_manage/password", views.UserManage.Password.as_view()),
     path("user_manage/<str:user_id>", views.UserManage.Operate.as_view(), name="user_manage_operate"),
     path("user_manage/<str:user_id>/re_password", views.UserManage.RePassword.as_view(),

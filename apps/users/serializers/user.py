@@ -403,6 +403,18 @@ class UserManageSerializer(serializers.Serializer):
         users = User.objects.filter(id__in=user_ids).values('id', 'nick_name')
         return list(users)
 
+    class BatchDelete(serializers.Serializer):
+        ids = serializers.ListField(required=True, label=_('User IDs'))
+
+        def batch_delete(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            ids = self.data.get('ids')
+            if not ids:
+                raise AppApiException(1004, _('User IDs cannot be empty'))
+            User.objects.filter(id__in=ids).delete()
+            return True
+
 
 def update_user_role(instance, user):
     workspace_user_role_mapping_model = DatabaseModelManage.get_model("workspace_user_role_mapping")

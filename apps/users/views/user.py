@@ -145,6 +145,20 @@ class UserManage(APIView):
             return result.success(
                 UserManageSerializer.Operate(data={'id': user_id}).edit(request.data, with_valid=True))
 
+    class BatchDelete(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(methods=['POST'],
+                       description=_("Batch delete user"),
+                       summary=_("Batch delete user"),
+                       operation_id=_("Batch delete user"),  # type: ignore
+                       tags=[_("User Management")],  # type: ignore
+                       request=DeleteUserApi.get_request(),
+                       responses=DefaultModelResponse.get_response())
+        @has_permissions(PermissionConstants.USER_DELETE)
+        def post(self, request: Request):
+            return result.success(UserManageSerializer.BatchDelete(data=request.data).batch_delete(with_valid=True))
+
     class RePassword(APIView):
         authentication_classes = [TokenAuth]
 

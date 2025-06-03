@@ -129,6 +129,11 @@ class DeleteUserApi(APIMixin):
             required=True,
         )]
 
+    @staticmethod
+    def get_request():
+        return serializers.ListSerializer(child=serializers.CharField(required=True), required=True,
+                                          label=_('User IDs'))
+
 
 class ChangeUserPasswordApi(APIMixin):
     @staticmethod
