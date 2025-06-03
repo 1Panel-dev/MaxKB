@@ -155,7 +155,7 @@ class ModelSerializer(serializers.Serializer):
             #     if application_count > 0:
             #         raise AppApiException(500, f"该模型关联了{application_count} 个应用，无法删除该模型。")
             # elif model.model_type == 'EMBEDDING':
-            #     dataset_count = DataSet.objects.filter(embedding_mode_id=model_id).count()
+            #     dataset_count = DataSet.objects.filter(embedding_model_id=model_id).count()
             #     if dataset_count > 0:
             #         raise AppApiException(500, f"该模型关联了{dataset_count} 个知识库，无法删除该模型。")
             # elif model.model_type == 'TTS':

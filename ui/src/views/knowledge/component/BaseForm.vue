@@ -32,10 +32,10 @@
     </el-form-item>
     <el-form-item
       :label="$t('views.dataset.datasetForm.form.EmbeddingModel.label')"
-      prop="embedding_mode_id"
+      prop="embedding_model_id"
     >
       <ModelSelect
-        v-model="form.embedding_mode_id"
+        v-model="form.embedding_model_id"
         :placeholder="$t('views.dataset.datasetForm.form.EmbeddingModel.placeholder')"
         :options="modelOptions"
         :model-type="'EMBEDDING'"
@@ -60,7 +60,7 @@ const { model } = useStore()
 const form = ref<datasetData>({
   name: '',
   desc: '',
-  embedding_mode_id: ''
+  embedding_model_id: ''
 })
 
 const rules = reactive({
@@ -78,7 +78,7 @@ const rules = reactive({
       trigger: 'blur'
     }
   ],
-  embedding_mode_id: [
+  embedding_model_id: [
     {
       required: true,
       message: t('views.dataset.datasetForm.form.EmbeddingModel.requiredMessage'),
@@ -97,7 +97,7 @@ watch(
     if (value && JSON.stringify(value) !== '{}') {
       form.value.name = value.name
       form.value.desc = value.desc
-      form.value.embedding_mode_id = value.embedding_mode_id
+      form.value.embedding_model_id = value.embedding_model_id
     }
   },
   {
@@ -134,7 +134,7 @@ onUnmounted(() => {
   form.value = {
     name: '',
     desc: '',
-    embedding_mode_id: ''
+    embedding_model_id: ''
   }
   FormRef.value?.clearValidate()
 })

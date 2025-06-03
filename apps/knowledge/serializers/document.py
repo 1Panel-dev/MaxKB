@@ -236,6 +236,7 @@ class DocumentSerializers(serializers.Serializer):
                 os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'list_document.sql')))
 
         def page(self, current_page, page_size):
+            self.is_valid(raise_exception=True)
             query_set = self.get_query_set()
             return native_page_search(current_page, page_size, query_set, select_string=get_file_content(
                 os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'list_document.sql')))

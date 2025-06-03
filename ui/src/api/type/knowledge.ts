@@ -3,7 +3,7 @@ interface knowledgeData {
   desc: String
   documents?: Array<any>
   type?: String
-  embedding_mode_id?: String
+  embedding_model_id?: String
 }
 
 export type { knowledgeData }

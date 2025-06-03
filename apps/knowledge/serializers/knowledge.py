@@ -180,7 +180,7 @@ class KnowledgeSerializer(serializers.Serializer):
                 self.is_valid(raise_exception=True)
             knowledge_id = self.data.get('knowledge_id')
             knowledge = QuerySet(Knowledge).filter(id=knowledge_id).first()
-            embedding_model_id = knowledge.embedding_mode_id
+            embedding_model_id = knowledge.embedding_model_id
             knowledge_user_id = knowledge.user_id
             embedding_model = QuerySet(Model).filter(id=embedding_model_id).first()
             if embedding_model is None:
