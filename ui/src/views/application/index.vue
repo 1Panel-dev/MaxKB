@@ -47,7 +47,7 @@
             </el-button>
             <template #dropdown>
               <el-dropdown-menu class="create-dropdown">
-                <el-dropdown-item>
+                <el-dropdown-item @click="openCreateDialog">
                   <div class="flex">
                     <el-avatar shape="square" class="avatar-blue mt-4" :size="36">
                       <img
@@ -64,7 +64,7 @@
                     </div>
                   </div>
                 </el-dropdown-item>
-                <el-dropdown-item>
+                <el-dropdown-item @click="openCreateDialog('WORK_FLOW')">
                   <div class="flex">
                     <el-avatar shape="square" class="avatar-purple mt-4" :size="36">
                       <img
@@ -235,11 +235,13 @@
         <el-empty :description="$t('common.noData')" v-else />
       </div>
     </ContentContainer>
+    <CreateApplicationDialog ref="CreateApplicationDialogRef" />
   </LayoutContainer>
 </template>
 
 <script lang="ts" setup>
 import { onMounted, ref, reactive, computed } from 'vue'
+import CreateApplicationDialog from '@/views/application/component/CreateApplicationDialog.vue'
 import ApplicaitonApi from '@/api/application/application'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import useStore from '@/stores'
@@ -271,18 +273,26 @@ const paginationConfig = reactive({
 
 const folderList = ref<any[]>([])
 const applicationList = ref<any[]>([])
-const datasetFolderList = ref<any[]>([])
 const currentFolder = ref<any>({})
 
-function reEmbeddingDataset(row: any) {
-  KnowledgeApi.putReEmbeddingDataset('default', row.id).then(() => {
-    MsgSuccess(t('common.submitSuccess'))
-  })
-}
+const CreateApplicationDialogRef = ref()
 
-const SyncWebDialogRef = ref()
-function syncDataset(row: any) {
-  SyncWebDialogRef.value.open(row.id)
+function openCreateDialog(type?: string) {
+  CreateApplicationDialogRef.value.open(currentFolder.value?.id || 'root', type)
+  // common
+  //   .asyncGetValid(ValidType.Application, ValidCount.Application, loading)
+  //   .then(async (res: any) => {
+  //     if (res?.data) {
+  //       CreateApplicationDialogRef.value.open()
+  //     } else if (res?.code === 400) {
+  //       MsgConfirm(t('common.tip'), t('views.application.tip.professionalMessage'), {
+  //         cancelButtonText: t('common.confirm'),
+  //         confirmButtonText: t('common.professional'),
+  //       }).then(() => {
+  //         window.open('https://maxkb.cn/pricing.html', '_blank')
+  //       })
+  //     }
+  //   })
 }
 
 const search_type_change = () => {
@@ -310,7 +320,7 @@ function getFolder() {
 
 function folderClickHandel(row: any) {
   currentFolder.value = row
-  datasetFolderList.value = []
+  applicationList.value = []
   getList()
 }
 

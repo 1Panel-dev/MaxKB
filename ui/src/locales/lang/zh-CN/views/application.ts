@@ -1,6 +1,7 @@
 export default {
   title: '应用',
-  createApplication: '创建应用',
+  createApplication: '创建简易应用',
+  createWorkFlowApplication: '创建高级编排应用',
   importApplication: '导入应用',
   copyApplication: '复制应用',
   workflow: '高级编排',

@@ -39,10 +39,11 @@ const getApplication: (
  * @param 参数
  */
 const postApplication: (
+  wordspace_id: string,
   data: ApplicationFormType,
   loading?: Ref<boolean>,
-) => Promise<Result<any>> = (data, loading) => {
-  return post(`${prefix}`, data, undefined, loading)
+) => Promise<Result<any>> = (wordspace_id, data, loading) => {
+  return post(`${prefix}/${wordspace_id}/application`, data, undefined, loading)
 }
 
 /**

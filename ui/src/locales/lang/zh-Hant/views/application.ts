@@ -1,6 +1,7 @@
 export default {
   title: '應用',
-  createApplication: '建立應用',
+  createApplication: '建立簡易應用',
+  createWorkFlowApplication: '建立進階編排應用',
   importApplication: '匯入應用',
   copyApplication: '複製應用',
   workflow: '進階編排',

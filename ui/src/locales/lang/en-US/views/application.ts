@@ -1,6 +1,7 @@
 export default {
   title: 'APP',
-  createApplication: 'Create APP',
+  createApplication: 'Create Simple APP',
+  createWorkFlowApplication: 'Create Workflow APP',
   importApplication: 'Import APP',
   copyApplication: 'Copy APP',
   workflow: 'WORKFLOW',

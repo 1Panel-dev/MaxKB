@@ -1,6 +1,10 @@
 <template>
   <el-dialog
-    :title="$t('views.application.createApplication')"
+    :title="
+      isWorkFlow(applicationForm.type)
+        ? $t('views.application.createWorkFlowApplication')
+        : $t('views.application.createApplication')
+    "
     v-model="dialogVisible"
     width="650"
     append-to-body
@@ -15,51 +19,26 @@
       require-asterisk-position="right"
       @submit.prevent
     >
-      <el-form-item :label="$t('views.application.applicationForm.form.appName.label')" prop="name">
+      <el-form-item :label="$t('views.application.form.appName.label')" prop="name">
         <el-input
           v-model="applicationForm.name"
           maxlength="64"
-          :placeholder="$t('views.application.applicationForm.form.appName.placeholder')"
+          :placeholder="$t('views.application.form.appName.placeholder')"
           show-word-limit
           @blur="applicationForm.name = applicationForm.name?.trim()"
         />
       </el-form-item>
-      <el-form-item :label="$t('views.application.applicationForm.form.appDescription.label')">
+      <el-form-item :label="$t('views.application.form.appDescription.label')">
         <el-input
           v-model="applicationForm.desc"
           type="textarea"
-          :placeholder="$t('views.application.applicationForm.form.appDescription.placeholder')"
+          :placeholder="$t('views.application.form.appDescription.placeholder')"
           :rows="3"
           maxlength="256"
           show-word-limit
         />
       </el-form-item>
-      <el-form-item :label="$t('views.application.applicationForm.form.appType.label')">
-        <el-radio-group v-model="applicationForm.type" class="card__radio">
-          <el-row :gutter="16">
-            <el-col :span="12">
-              <el-card shadow="never" :class="applicationForm.type === 'SIMPLE' ? 'active' : ''">
-                <el-radio value="SIMPLE" size="large">
-                  <p class="mb-4">{{ $t('views.application.simple') }}</p>
-                  <el-text type="info">{{
-                    $t('views.application.applicationForm.form.appType.simplePlaceholder')
-                  }}</el-text>
-                </el-radio>
-              </el-card>
-            </el-col>
-            <el-col :span="12">
-              <el-card shadow="never" :class="isWorkFlow(applicationForm.type) ? 'active' : ''">
-                <el-radio value="WORK_FLOW" size="large">
-                  <p class="mb-4">{{ $t('views.application.workflow') }}</p>
-                  <el-text type="info">{{
-                    $t('views.application.applicationForm.form.appType.workflowPlaceholder')
-                  }}</el-text>
-                </el-radio>
-              </el-card>
-            </el-col>
-          </el-row>
-        </el-radio-group>
-      </el-form-item>
+
       <el-form-item
         :label="$t('views.document.upload.template')"
         v-if="applicationForm.type === 'WORK_FLOW'"
@@ -73,7 +52,7 @@
                 @click="selectedType('blank')"
                 :class="appTemplate === 'blank' ? 'active' : ''"
               >
-                {{ $t('views.application.applicationForm.form.appTemplate.blankApp') }}
+                {{ $t('views.application.form.appTemplate.blankApp') }}
               </el-card>
             </el-col>
             <el-col :span="12">
@@ -83,7 +62,7 @@
                 :class="appTemplate === 'assistant' ? 'active' : ''"
                 @click="selectedType('assistant')"
               >
-                {{ $t('views.application.applicationForm.form.appTemplate.assistantApp') }}
+                {{ $t('views.application.form.appTemplate.assistantApp') }}
               </el-card>
             </el-col>
           </el-row>
@@ -116,21 +95,21 @@ const router = useRouter()
 const emit = defineEmits(['refresh'])
 
 // @ts-ignore
-const defaultPrompt = t('views.application.applicationForm.form.prompt.defaultPrompt', {
+const defaultPrompt = t('views.application.form.prompt.defaultPrompt', {
   data: '{data}',
-  question: '{question}'
+  question: '{question}',
 })
 
 const optimizationPrompt =
-  t('views.application.applicationForm.dialog.defaultPrompt1', {
-    question: '{question}'
+  t('views.application.dialog.defaultPrompt1', {
+    question: '{question}',
   }) +
   '<data></data>' +
-  t('views.application.applicationForm.dialog.defaultPrompt2')
+  t('views.application.dialog.defaultPrompt2')
 
 const workflowDefault = ref<any>({
   edges: [],
-  nodes: baseNodes
+  nodes: baseNodes,
 })
 const appTemplate = ref('blank')
 
@@ -144,7 +123,7 @@ const applicationForm = ref<ApplicationFormType>({
   desc: '',
   model_id: '',
   dialogue_number: 1,
-  prologue: t('views.application.applicationForm.form.defaultPrologue'),
+  prologue: t('views.application.form.defaultPrologue'),
   dataset_id_list: [],
   dataset_setting: {
     top_n: 3,
@@ -153,13 +132,13 @@ const applicationForm = ref<ApplicationFormType>({
     search_mode: 'embedding',
     no_references_setting: {
       status: 'ai_questioning',
-      value: '{question}'
-    }
+      value: '{question}',
+    },
   },
   model_setting: {
     prompt: defaultPrompt,
-    system: t('views.application.applicationForm.form.roleSettings.placeholder'),
-    no_references_prompt: '{question}'
+    system: t('views.application.form.roleSettings.placeholder'),
+    no_references_prompt: '{question}',
   },
   model_params_setting: {},
   problem_optimization: false,
@@ -169,25 +148,27 @@ const applicationForm = ref<ApplicationFormType>({
   stt_model_enable: false,
   tts_model_enable: false,
   tts_type: 'BROWSER',
-  type: 'SIMPLE'
+  type: 'SIMPLE',
 })
 
 const rules = reactive<FormRules<ApplicationFormType>>({
   name: [
     {
       required: true,
-      message: t('views.application.applicationForm.form.appName.placeholder'),
-      trigger: 'blur'
-    }
+      message: t('views.application.form.appName.placeholder'),
+      trigger: 'blur',
+    },
   ],
   model_id: [
     {
       required: false,
-      message: t('views.application.applicationForm.form.aiModel.placeholder'),
-      trigger: 'change'
-    }
-  ]
+      message: t('views.application.form.aiModel.placeholder'),
+      trigger: 'change',
+    },
+  ],
 })
+
+const currentFolder = ref('')
 
 watch(dialogVisible, (bool) => {
   if (!bool) {
@@ -196,7 +177,7 @@ watch(dialogVisible, (bool) => {
       desc: '',
       model_id: '',
       dialogue_number: 1,
-      prologue: t('views.application.applicationForm.form.defaultPrologue'),
+      prologue: t('views.application.form.defaultPrologue'),
       dataset_id_list: [],
       dataset_setting: {
         top_n: 3,
@@ -205,13 +186,13 @@ watch(dialogVisible, (bool) => {
         search_mode: 'embedding',
         no_references_setting: {
           status: 'ai_questioning',
-          value: '{question}'
-        }
+          value: '{question}',
+        },
       },
       model_setting: {
         prompt: defaultPrompt,
-        system: t('views.application.applicationForm.form.roleSettings.placeholder'),
-        no_references_prompt: '{question}'
+        system: t('views.application.form.roleSettings.placeholder'),
+        no_references_prompt: '{question}',
       },
       model_params_setting: {},
       problem_optimization: false,
@@ -221,13 +202,15 @@ watch(dialogVisible, (bool) => {
       stt_model_enable: false,
       tts_model_enable: false,
       tts_type: 'BROWSER',
-      type: 'SIMPLE'
+      type: 'SIMPLE',
     }
     applicationFormRef.value?.clearValidate()
   }
 })
 
-const open = () => {
+const open = (folder: string, type?: sting) => {
+  currentFolder.value = folder
+  applicationForm.value.type = type || 'SIMPLE'
   dialogVisible.value = true
 }
 
@@ -235,12 +218,13 @@ const submitHandle = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid) => {
     if (valid) {
+      applicationForm.value['folder_id'] = currentFolder.value
       if (isWorkFlow(applicationForm.value.type) && appTemplate.value === 'blank') {
         workflowDefault.value.nodes[0].properties.node_data.desc = applicationForm.value.desc
         workflowDefault.value.nodes[0].properties.node_data.name = applicationForm.value.name
         applicationForm.value['work_flow'] = workflowDefault.value
       }
-      applicationApi.postApplication(applicationForm.value, loading).then((res) => {
+      applicationApi.postApplication('default', applicationForm.value, loading).then((res) => {
         MsgSuccess(t('common.createSuccess'))
         emit('refresh')
         if (isWorkFlow(applicationForm.value.type)) {
