@@ -3491,7 +3491,7 @@ msgid "Phone"
 msgstr ""
 
 #: users/serializers/user.py:95
-msgid "Username must be 6-20 characters long"
+msgid "Username must be 4-20 characters long"
 msgstr ""
 
 #: users/serializers/user.py:108 users/serializers/user.py:244
@@ -3676,7 +3676,7 @@ msgstr ""
 msgid "System API Key"
 msgstr ""
 
-msgid "msgid "Create SystemAPIKey"
+msgid "Create SystemAPIKey"
 msgstr ""
 
 msgid "Get SystemAPIKey List"

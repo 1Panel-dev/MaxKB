@@ -3618,8 +3618,8 @@ msgid "Phone"
 msgstr "手机"
 
 #: users/serializers/user.py:95
-msgid "Username must be 6-20 characters long"
-msgstr "用户名必须为6-20个字符"
+msgid "Username must be 4-20 characters long"
+msgstr "用户名必须为4-20个字符"
 
 #: users/serializers/user.py:108 users/serializers/user.py:244
 msgid ""
