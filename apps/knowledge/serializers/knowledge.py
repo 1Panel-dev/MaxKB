@@ -1,9 +1,11 @@
+import io
 import logging
 import os
 import re
 import traceback
 from functools import reduce
-from typing import Dict
+from tempfile import TemporaryDirectory
+from typing import Dict, List
 
 import uuid_utils.compat as uuid
 from celery_once import AlreadyQueued
@@ -11,6 +13,7 @@ from django.core import validators
 from django.db import transaction, models
 from django.db.models import QuerySet
 from django.db.models.functions import Reverse, Substr
+from django.http import HttpResponse
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -20,13 +23,13 @@ from common.db.search import native_search, get_dynamics_model, native_page_sear
 from common.db.sql_execute import select_list
 from common.event import ListenerManagement
 from common.exception.app_exception import AppApiException
-from common.utils.common import valid_license, post, get_file_content
+from common.utils.common import valid_license, post, get_file_content, parse_image
 from common.utils.fork import Fork, ChildLink
 from common.utils.split_model import get_split_model
 from knowledge.models import Knowledge, KnowledgeScope, KnowledgeType, Document, Paragraph, Problem, \
     ProblemParagraphMapping, TaskType, State, SearchMode, KnowledgeFolder
 from knowledge.serializers.common import ProblemParagraphManage, get_embedding_model_id_by_knowledge_id, MetaSerializer, \
-    GenerateRelatedSerializer, get_embedding_model_by_knowledge_id, list_paragraph
+    GenerateRelatedSerializer, get_embedding_model_by_knowledge_id, list_paragraph, write_image, zip_dir
 from knowledge.serializers.document import DocumentSerializers
 from knowledge.task.embedding import embedding_by_knowledge, delete_embedding_by_knowledge
 from knowledge.task.generate import generate_related_by_knowledge_id
@@ -330,6 +333,77 @@ class KnowledgeSerializer(serializers.Serializer):
             knowledge.delete()
             delete_embedding_by_knowledge(self.data.get('knowledge_id'))
             return True
+        
+        def export_excel(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            document_list = QuerySet(Document).filter(knowledge_id=self.data.get('id'))
+            paragraph_list = native_search(QuerySet(Paragraph).filter(knowledge_id=self.data.get("id")), get_file_content(
+                os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'list_paragraph_document_name.sql')))
+            problem_mapping_list = native_search(
+                QuerySet(ProblemParagraphMapping).filter(knowledge_id=self.data.get("id")), get_file_content(
+                    os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'list_problem_mapping.sql')),
+                with_table_name=True)
+            data_dict, document_dict = DocumentSerializers.Operate.merge_problem(paragraph_list, problem_mapping_list,
+                                                                                 document_list)
+            workbook = DocumentSerializers.Operate.get_workbook(data_dict, document_dict)
+            response = HttpResponse(content_type='application/vnd.ms-excel')
+            response['Content-Disposition'] = 'attachment; filename="knowledge.xlsx"'
+            workbook.save(response)
+            return response
+
+        def export_zip(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            document_list = QuerySet(Document).filter(knowledge_id=self.data.get('id'))
+            paragraph_list = native_search(QuerySet(Paragraph).filter(knowledge_id=self.data.get("id")), get_file_content(
+                os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'list_paragraph_document_name.sql')))
+            problem_mapping_list = native_search(
+                QuerySet(ProblemParagraphMapping).filter(knowledge_id=self.data.get("id")), get_file_content(
+                    os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'list_problem_mapping.sql')),
+                with_table_name=True)
+            data_dict, document_dict = DocumentSerializers.Operate.merge_problem(paragraph_list, problem_mapping_list,
+                                                                                 document_list)
+            res = [parse_image(paragraph.get('content')) for paragraph in paragraph_list]
+
+            workbook = DocumentSerializers.Operate.get_workbook(data_dict, document_dict)
+            response = HttpResponse(content_type='application/zip')
+            response['Content-Disposition'] = 'attachment; filename="archive.zip"'
+            zip_buffer = io.BytesIO()
+            with TemporaryDirectory() as tempdir:
+                knowledge_file = os.path.join(tempdir, 'knowledge.xlsx')
+                workbook.save(knowledge_file)
+                for r in res:
+                    write_image(tempdir, r)
+                zip_dir(tempdir, zip_buffer)
+            response.write(zip_buffer.getvalue())
+            return response
+
+        @staticmethod
+        def merge_problem(paragraph_list: List[Dict], problem_mapping_list: List[Dict]):
+            result = {}
+            document_dict = {}
+
+            for paragraph in paragraph_list:
+                problem_list = [problem_mapping.get('content') for problem_mapping in problem_mapping_list if
+                                problem_mapping.get('paragraph_id') == paragraph.get('id')]
+                document_sheet = result.get(paragraph.get('document_id'))
+                d = document_dict.get(paragraph.get('document_name'))
+                if d is None:
+                    document_dict[paragraph.get('document_name')] = {paragraph.get('document_id')}
+                else:
+                    d.add(paragraph.get('document_id'))
+
+                if document_sheet is None:
+                    result[paragraph.get('document_id')] = [[paragraph.get('title'), paragraph.get('content'),
+                                                             '\n'.join(problem_list)]]
+                else:
+                    document_sheet.append([paragraph.get('title'), paragraph.get('content'), '\n'.join(problem_list)])
+            result_document_dict = {}
+            for d_name in document_dict:
+                for index, d_id in enumerate(document_dict.get(d_name)):
+                    result_document_dict[d_id] = d_name if index == 0 else d_name + str(index)
+            return result, result_document_dict
 
     class Create(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, label=_('user id'))

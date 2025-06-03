@@ -383,6 +383,7 @@ class BatchRefreshAPI(APIMixin):
     def get_request():
         return DocumentBatchRefreshSerializer
 
+
 class BatchGenerateRelatedAPI(APIMixin):
     @staticmethod
     def get_parameters():
@@ -406,3 +407,67 @@ class BatchGenerateRelatedAPI(APIMixin):
     @staticmethod
     def get_request():
         return DocumentBatchGenerateRelatedSerializer
+
+
+class TemplateExportAPI(APIMixin):
+    @staticmethod
+    def get_parameters():
+        return [
+            OpenApiParameter(
+                name="workspace_id",
+                description="工作空间id",
+                type=OpenApiTypes.STR,
+                location='path',
+                required=True,
+            ),
+            OpenApiParameter(
+                name="knowledge_id",
+                description="知识库id",
+                type=OpenApiTypes.STR,
+                location='path',
+                required=True,
+            ),
+            OpenApiParameter(
+                name="type",
+                description="Export template type csv|excel",
+                type=OpenApiTypes.STR,
+                location='query',
+                required=True,
+            ),
+        ]
+
+    @staticmethod
+    def get_response():
+        return DefaultResultSerializer
+
+
+class DocumentExportAPI(APIMixin):
+    @staticmethod
+    def get_parameters():
+        return [
+            OpenApiParameter(
+                name="workspace_id",
+                description="工作空间id",
+                type=OpenApiTypes.STR,
+                location='path',
+                required=True,
+            ),
+            OpenApiParameter(
+                name="knowledge_id",
+                description="知识库id",
+                type=OpenApiTypes.STR,
+                location='path',
+                required=True,
+            ),
+            OpenApiParameter(
+                name="document_id",
+                description="文档id",
+                type=OpenApiTypes.STR,
+                location='path',
+                required=True,
+            ),
+        ]
+
+    @staticmethod
+    def get_response():
+        return DefaultResultSerializer

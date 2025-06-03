@@ -9,7 +9,7 @@ from common.constants.permission_constants import PermissionConstants
 from common.result import result
 from knowledge.api.knowledge import KnowledgeBaseCreateAPI, KnowledgeWebCreateAPI, KnowledgeTreeReadAPI, \
     KnowledgeEditAPI, KnowledgeReadAPI, KnowledgePageAPI, SyncWebAPI, GenerateRelatedAPI, HitTestAPI, EmbeddingAPI, \
-    GetModelAPI
+    GetModelAPI, KnowledgeExportAPI
 from knowledge.serializers.knowledge import KnowledgeSerializer
 from models_provider.serializers.model_serializer import ModelSerializer
 
@@ -181,6 +181,34 @@ class KnowledgeView(APIView):
             return result.success(KnowledgeSerializer.Operate(
                 data={'knowledge_id': knowledge_id, 'workspace_id': workspace_id, 'user_id': request.user.id}
             ).embedding())
+
+    class Export(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            summary=_('Export knowledge base'),
+            operation_id=_('Export knowledge base'),  # type: ignore
+            parameters=KnowledgeExportAPI.get_parameters(),
+            responses=KnowledgeExportAPI.get_response(),
+            tags=[_('Knowledge Base')]  # type: ignore
+        )
+        @has_permissions(PermissionConstants.KNOWLEDGE_EXPORT.get_workspace_permission())
+        def get(self, request: Request, knowledge_id: str):
+            return KnowledgeSerializer.Operate(data={'id': knowledge_id, 'user_id': request.user.id}).export_excel()
+
+    class ExportZip(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            summary=_('Export knowledge base containing images'),
+            operation_id=_('Export knowledge base containing images'),  # type: ignore
+            parameters=KnowledgeExportAPI.get_parameters(),
+            responses=KnowledgeExportAPI.get_response(),
+            tags=[_('Knowledge Base')]  # type: ignore
+        )
+        @has_permissions(PermissionConstants.KNOWLEDGE_EXPORT.get_workspace_permission())
+        def get(self, request: Request, knowledge_id: str):
+            return KnowledgeSerializer.Operate(data={'id': knowledge_id, 'user_id': request.user.id}).export_zip()
 
     class GenerateRelated(APIView):
         authentication_classes = [TokenAuth]

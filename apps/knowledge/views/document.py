@@ -11,7 +11,8 @@ from common.result import result
 from knowledge.api.document import DocumentSplitAPI, DocumentBatchAPI, DocumentBatchCreateAPI, DocumentCreateAPI, \
     DocumentReadAPI, DocumentEditAPI, DocumentDeleteAPI, TableDocumentCreateAPI, QaDocumentCreateAPI, \
     WebDocumentCreateAPI, CancelTaskAPI, BatchCancelTaskAPI, SyncWebAPI, RefreshAPI, BatchEditHitHandlingAPI, \
-    DocumentTreeReadAPI, DocumentSplitPatternAPI, BatchRefreshAPI, BatchGenerateRelatedAPI
+    DocumentTreeReadAPI, DocumentSplitPatternAPI, BatchRefreshAPI, BatchGenerateRelatedAPI, TemplateExportAPI, \
+    DocumentExportAPI
 from knowledge.serializers.document import DocumentSerializers
 
 
@@ -384,6 +385,34 @@ class DocumentView(APIView):
                 }
             ).page(current_page, page_size))
 
+    class Export(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            summary=_('Export document'),
+            operation_id=_('Export document'),  # type: ignore
+            parameters=DocumentExportAPI.get_parameters(),
+            responses=DocumentExportAPI.get_response(),
+            tags=[_('Knowledge Base/Documentation')]  # type: ignore
+        )
+        @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_EXPORT.get_workspace_permission())
+        def get(self, request: Request, dataset_id: str, document_id: str):
+            return DocumentSerializers.Operate(data={'document_id': document_id, 'dataset_id': dataset_id}).export()
+
+    class ExportZip(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            summary=_('Export Zip document'),
+            operation_id=_('Export Zip document'),  # type: ignore
+            parameters=DocumentExportAPI.get_parameters(),
+            responses=DocumentExportAPI.get_response(),
+            tags=[_('Knowledge Base/Documentation')]  # type: ignore
+        )
+        @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_EXPORT.get_workspace_permission())
+        def get(self, request: Request, dataset_id: str, document_id: str):
+            return DocumentSerializers.Operate(data={'document_id': document_id, 'dataset_id': dataset_id}).export_zip()
+
 
 class WebDocumentView(APIView):
     authentication_classes = [TokenAuth]
@@ -443,3 +472,30 @@ class TableDocumentView(APIView):
         return result.success(DocumentSerializers.Create(
             data={'knowledge_id': knowledge_id, 'workspace_id': workspace_id}
         ).save_table({'file_list': request.FILES.getlist('file')}, with_valid=True))
+
+
+class Template(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(
+        summary=_('Get QA template'),
+        operation_id=_('Get QA template'),  # type: ignore
+        parameters=TemplateExportAPI.get_parameters(),
+        responses=TemplateExportAPI.get_response(),
+        tags=[_('Knowledge Base/Documentation')]  # type: ignore
+    )
+    def get(self, request: Request):
+        return DocumentSerializers.Export(data={'type': request.query_params.get('type')}).export(with_valid=True)
+
+
+class TableTemplate(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(
+        summary=_('Get form template'),
+        operation_id=_('Get form template'),  # type: ignore
+        parameters=TemplateExportAPI.get_parameters(),
+        responses=TemplateExportAPI.get_response(),
+        tags=[_('Knowledge Base/Documentation')])  # type: ignore
+    def get(self, request: Request):
+        return DocumentSerializers.Export(data={'type': request.query_params.get('type')}).table_export(with_valid=True)

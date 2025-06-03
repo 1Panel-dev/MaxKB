@@ -1,18 +1,24 @@
+import io
 import logging
 import os
 import re
 import traceback
 from functools import reduce
+from tempfile import TemporaryDirectory
 from typing import Dict, List
 
+import openpyxl
 import uuid_utils.compat as uuid
 from celery_once import AlreadyQueued
 from django.core import validators
 from django.db import transaction, models
 from django.db.models import QuerySet, Model
 from django.db.models.functions import Substr, Reverse
-from django.utils.translation import gettext_lazy as _
+from django.http import HttpResponse
+from django.utils.translation import gettext_lazy as _, gettext, get_language, to_locale
+from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
 from rest_framework import serializers
+from xlwt import Utils
 
 from common.db.search import native_search, get_dynamics_model, native_page_search
 from common.event import ListenerManagement
@@ -33,13 +39,13 @@ from common.handle.impl.text.text_split_handle import TextSplitHandle
 from common.handle.impl.text.xls_split_handle import XlsSplitHandle
 from common.handle.impl.text.xlsx_split_handle import XlsxSplitHandle
 from common.handle.impl.text.zip_split_handle import ZipSplitHandle
-from common.utils.common import post, get_file_content, bulk_create_in_batches
+from common.utils.common import post, get_file_content, bulk_create_in_batches, parse_image
 from common.utils.fork import Fork
 from common.utils.split_model import get_split_model, flat_map
 from knowledge.models import Knowledge, Paragraph, Problem, Document, KnowledgeType, ProblemParagraphMapping, State, \
     TaskType, File
 from knowledge.serializers.common import ProblemParagraphManage, BatchSerializer, \
-    get_embedding_model_id_by_knowledge_id, MetaSerializer
+    get_embedding_model_id_by_knowledge_id, MetaSerializer, write_image, zip_dir
 from knowledge.serializers.paragraph import ParagraphSerializers, ParagraphInstanceSerializer, \
     delete_problems_and_mappings
 from knowledge.task.embedding import embedding_by_document, delete_embedding_by_document_list, \
@@ -180,11 +186,66 @@ class BatchEditHitHandlingSerializer(serializers.Serializer):
 
 
 class DocumentSerializers(serializers.Serializer):
+    class Export(serializers.Serializer):
+        type = serializers.CharField(required=True, validators=[
+            validators.RegexValidator(regex=re.compile("^csv|excel$"),
+                                      message=_('The template type only supports excel|csv'),
+                                      code=500)
+        ], label=_('type'))
+
+        def export(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            language = get_language()
+            if self.data.get('type') == 'csv':
+                file = open(
+                    os.path.join(PROJECT_DIR, "apps", "knowledge", 'template', f'csv_template_{to_locale(language)}.csv'),
+                    "rb")
+                content = file.read()
+                file.close()
+                return HttpResponse(content, status=200, headers={'Content-Type': 'text/csv',
+                                                                  'Content-Disposition': 'attachment; filename="csv_template.csv"'})
+            elif self.data.get('type') == 'excel':
+                file = open(os.path.join(PROJECT_DIR, "apps", "knowledge", 'template',
+                                         f'excel_template_{to_locale(language)}.xlsx'), "rb")
+                content = file.read()
+                file.close()
+                return HttpResponse(content, status=200, headers={'Content-Type': 'application/vnd.ms-excel',
+                                                                  'Content-Disposition': 'attachment; filename="excel_template.xlsx"'})
+            else:
+                return None
+
+        def table_export(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            language = get_language()
+            if self.data.get('type') == 'csv':
+                file = open(
+                    os.path.join(PROJECT_DIR, "apps", "knowledge", 'template',
+                                 f'table_template_{to_locale(language)}.csv'),
+                    "rb")
+                content = file.read()
+                file.close()
+                return HttpResponse(content, status=200, headers={'Content-Type': 'text/cxv',
+                                                                  'Content-Disposition': 'attachment; filename="csv_template.csv"'})
+            elif self.data.get('type') == 'excel':
+                file = open(os.path.join(PROJECT_DIR, "apps", "knowledge", 'template',
+                                         f'table_template_{to_locale(language)}.xlsx'),
+                            "rb")
+                content = file.read()
+                file.close()
+                return HttpResponse(content, status=200, headers={'Content-Type': 'application/vnd.ms-excel',
+                                                                  'Content-Disposition': 'attachment; filename="excel_template.xlsx"'})
+            else:
+                return None
+
+
     class Query(serializers.Serializer):
         # 知识库id
         workspace_id = serializers.CharField(required=True, label=_('workspace id'))
         knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
-        name = serializers.CharField(required=False, max_length=128, min_length=1, allow_null=True, allow_blank=True, label=_('document name'))
+        name = serializers.CharField(required=False, max_length=128, min_length=1, allow_null=True, allow_blank=True,
+                                     label=_('document name'))
         hit_handling_method = serializers.CharField(required=False, label=_('hit handling method'))
         is_active = serializers.BooleanField(required=False, label=_('document is active'))
         task_type = serializers.IntegerField(required=False, label=_('task type'))
@@ -339,6 +400,53 @@ class DocumentSerializers(serializers.Serializer):
             if not QuerySet(Document).filter(id=document_id).exists():
                 raise AppApiException(500, _('document id not exist'))
 
+        def export(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            document = QuerySet(Document).filter(id=self.data.get("document_id")).first()
+            paragraph_list = native_search(QuerySet(Paragraph).filter(document_id=self.data.get("document_id")),
+                                           get_file_content(
+                                               os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql',
+                                                            'list_paragraph_document_name.sql')))
+            problem_mapping_list = native_search(
+                QuerySet(ProblemParagraphMapping).filter(document_id=self.data.get("document_id")), get_file_content(
+                    os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'list_problem_mapping.sql')),
+                with_table_name=True)
+            data_dict, document_dict = self.merge_problem(paragraph_list, problem_mapping_list, [document])
+            workbook = self.get_workbook(data_dict, document_dict)
+            response = HttpResponse(content_type='application/vnd.ms-excel')
+            response['Content-Disposition'] = f'attachment; filename="data.xlsx"'
+            workbook.save(response)
+            return response
+
+        def export_zip(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            document = QuerySet(Document).filter(id=self.data.get("document_id")).first()
+            paragraph_list = native_search(QuerySet(Paragraph).filter(document_id=self.data.get("document_id")),
+                                           get_file_content(
+                                               os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql',
+                                                            'list_paragraph_document_name.sql')))
+            problem_mapping_list = native_search(
+                QuerySet(ProblemParagraphMapping).filter(document_id=self.data.get("document_id")), get_file_content(
+                    os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'list_problem_mapping.sql')),
+                with_table_name=True)
+            data_dict, document_dict = self.merge_problem(paragraph_list, problem_mapping_list, [document])
+            res = [parse_image(paragraph.get('content')) for paragraph in paragraph_list]
+
+            workbook = DocumentSerializers.Operate.get_workbook(data_dict, document_dict)
+            response = HttpResponse(content_type='application/zip')
+            response['Content-Disposition'] = 'attachment; filename="archive.zip"'
+            zip_buffer = io.BytesIO()
+            with TemporaryDirectory() as tempdir:
+                knowledge_file = os.path.join(tempdir, 'knowledge.xlsx')
+                workbook.save(knowledge_file)
+                for r in res:
+                    write_image(tempdir, r)
+                zip_dir(tempdir, zip_buffer)
+            response.write(zip_buffer.getvalue())
+            return response
+
         def one(self, with_valid=False):
             if with_valid:
                 self.is_valid(raise_exception=True)
@@ -440,6 +548,78 @@ class DocumentSerializers(serializers.Serializer):
                 embedding_by_document.delay(document_id, embedding_model_id, state_list)
             except AlreadyQueued as e:
                 raise AppApiException(500, _('The task is being executed, please do not send it repeatedly.'))
+
+        @staticmethod
+        def get_workbook(data_dict, document_dict):
+            # 创建工作簿对象
+            workbook = openpyxl.Workbook()
+            workbook.remove(workbook.active)
+            if len(data_dict.keys()) == 0:
+                data_dict['sheet'] = []
+            for sheet_id in data_dict:
+                # 添加工作表
+                worksheet = workbook.create_sheet(document_dict.get(sheet_id))
+                data = [
+                    [gettext('Section title (optional)'),
+                     gettext('Section content (required, question answer, no more than 4096 characters)'),
+                     gettext('Question (optional, one per line in the cell)')],
+                    *data_dict.get(sheet_id, [])
+                ]
+                # 写入数据到工作表
+                for row_idx, row in enumerate(data):
+                    for col_idx, col in enumerate(row):
+                        cell = worksheet.cell(row=row_idx + 1, column=col_idx + 1)
+                        if isinstance(col, str):
+                            col = re.sub(ILLEGAL_CHARACTERS_RE, '', col)
+                            if col.startswith(('=', '+', '-', '@')):
+                                col = '\ufeff' + col
+                        cell.value = col
+                    # 创建HttpResponse对象返回Excel文件
+            return workbook
+
+        @staticmethod
+        def merge_problem(paragraph_list: List[Dict], problem_mapping_list: List[Dict], document_list):
+            result = {}
+            document_dict = {}
+
+            for paragraph in paragraph_list:
+                problem_list = [problem_mapping.get('content') for problem_mapping in problem_mapping_list if
+                                problem_mapping.get('paragraph_id') == paragraph.get('id')]
+                document_sheet = result.get(paragraph.get('document_id'))
+                document_name = DocumentSerializers.Operate.reset_document_name(paragraph.get('document_name'))
+                d = document_dict.get(document_name)
+                if d is None:
+                    document_dict[document_name] = {paragraph.get('document_id')}
+                else:
+                    d.add(paragraph.get('document_id'))
+
+                if document_sheet is None:
+                    result[paragraph.get('document_id')] = [[paragraph.get('title'), paragraph.get('content'),
+                                                             '\n'.join(problem_list)]]
+                else:
+                    document_sheet.append([paragraph.get('title'), paragraph.get('content'), '\n'.join(problem_list)])
+            for document in document_list:
+                if document.id not in result:
+                    document_name = DocumentSerializers.Operate.reset_document_name(document.name)
+                    result[document.id] = [[]]
+                    d = document_dict.get(document_name)
+                    if d is None:
+                        document_dict[document_name] = {document.id}
+                    else:
+                        d.add(document.id)
+            result_document_dict = {}
+            for d_name in document_dict:
+                for index, d_id in enumerate(document_dict.get(d_name)):
+                    result_document_dict[d_id] = d_name if index == 0 else d_name + str(index)
+            return result, result_document_dict
+
+        @staticmethod
+        def reset_document_name(document_name):
+            if document_name is not None:
+                document_name = document_name.strip()[0:29]
+            if document_name is None or not Utils.valid_sheet_name(document_name):
+                return "Sheet"
+            return document_name.strip()
 
     class Create(serializers.Serializer):
         workspace_id = serializers.UUIDField(required=True, label=_('workspace id'))
