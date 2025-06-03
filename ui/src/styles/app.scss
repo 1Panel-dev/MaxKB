@@ -409,3 +409,11 @@ h5 {
     background: var(--el-color-primary);
   }
 }
+
+/*
+  内容部分 自适应高度
+*/
+.main-calc-height {
+  height: var(--app-main-height);
+  box-sizing: border-box;
+}

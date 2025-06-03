@@ -4,6 +4,15 @@ import type { pageRequest } from '@/api/type/common'
 import type { Ref } from 'vue'
 
 const prefix = '/workspace'
+
+/**
+ * 获取成员列表
+ * @query 参数
+ */
+const getUserList: (workspace_id: String) => Promise<Result<any>> = (workspace_id) => {
+  return get(`${prefix}/${workspace_id}/user_list`)
+}
+
 /**
  * 获取资源权限
  * @query 参数
@@ -40,4 +49,5 @@ const putResourceAuthorization: (workspace_id: String, body: any) => Promise<Res
 export default {
   getResourceAuthorization,
   putResourceAuthorization,
+  getUserList
 }

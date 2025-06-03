@@ -30,7 +30,7 @@
                 shape="square"
                 :size="24"
               >
-                <img src="@/assets/icon_web.svg" style="width: 58%" alt="" />
+                <img src="@/assets/knowledge/icon_web.svg" style="width: 58%" alt="" />
               </AppAvatar>
               <AppAvatar
                 v-else-if="!item.dataset_id && item.type === '2'"
@@ -39,7 +39,7 @@
                 :size="24"
                 style="background: none"
               >
-                <img src="@/assets/logo_lark.svg" style="width: 100%" alt="" />
+                <img src="@/assets/knowledge/logo_lark.svg" style="width: 100%" alt="" />
               </AppAvatar>
               <AppAvatar
                 v-else-if="!item.dataset_id && item.type === '0'"
@@ -47,7 +47,7 @@
                 shape="square"
                 :size="24"
               >
-                <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
+                <img src="@/assets/knowledge/icon_document.svg" style="width: 58%" alt="" />
               </AppAvatar>
               {{ item.name }}
             </span>

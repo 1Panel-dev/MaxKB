@@ -1,6 +1,6 @@
 export enum AuthorizationEnum {
   MANAGE = 'MANAGE',
   USE = 'USE',
-  DATASET = 'DATASET',
+  KNOWLEDGE = 'KNOWLEDGE',
   APPLICATION = 'APPLICATION'
 }

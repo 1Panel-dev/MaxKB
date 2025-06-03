@@ -54,7 +54,7 @@
                 <div class="flex-between">
                   <div class="flex align-center">
                     <AppAvatar class="mr-8 avatar-purple" shape="square" :size="32">
-                      <img src="@/assets/icon_web.svg" style="width: 58%" alt="" />
+                      <img src="@/assets/knowledge/icon_web.svg" style="width: 58%" alt="" />
                     </AppAvatar>
                     <div>
                       <p>
@@ -106,7 +106,7 @@
               <!--                <div class="flex-between">-->
               <!--                  <div class="flex align-center">-->
               <!--                    <AppAvatar class="mr-8" :size="32">-->
-              <!--                      <img src="@/assets/icon_web.svg" style="width: 100%" alt="" />-->
+              <!--                      <img src="@/assets/knowledge/icon_web.svg" style="width: 100%" alt="" />-->
               <!--                    </AppAvatar>-->
               <!--                    <div>-->
               <!--                      <p>-->

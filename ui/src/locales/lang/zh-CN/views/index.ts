@@ -8,17 +8,13 @@ import userManage from './user-manage'
 import resourceAuthorization from './resource-authorization'
 import application from './application'
 import problem from './problem'
+import applicationOverview from './application-overview'
+import applicationWorkflow from './application-workflow'
 // import notFound from './404'
-
-// import applicationOverview from './application-overview'
-
-// import user from './user'
-// import team from './team'
 
 // import paragraph from './paragraph'
 
 // import log from './log'
-// import applicationWorkflow from './application-workflow'
 
 // import operateLog from './operate-log'
 export default {
@@ -32,16 +28,12 @@ export default {
   resourceAuthorization,
   application,
   problem,
+  applicationOverview,
+  applicationWorkflow,
   // notFound,
-
-  // applicationOverview,
-
-  // user,
-  // team,
   // paragraph,
 
   // log,
-  // applicationWorkflow,
 
   // operateLog
 }

@@ -1,13 +1,11 @@
 <template>
-  <div class="p-16-24">
+  <div class="resource-authorization p-16-24">
     <h4 class="mb-16">{{ $t('views.userManage.title') }}</h4>
-    <el-card>
-      <div class="resource-authorization flex main-calc-height">
-        <div class="team-member p-8 border-r">
-          <div class="flex-between p-16">
-            <h4>{{ $t('views.resourceAuthorization.member') }}</h4>
-          </div>
-          <div class="team-member-input">
+    <el-card style="--el-card-padding: 0">
+      <div class="flex main-calc-height">
+        <div class="resource-authorization__left border-r p-8">
+          <div class="p-8">
+            <h4 class="mb-12">{{ $t('views.resourceAuthorization.member') }}</h4>
             <el-input
               v-model="filterText"
               :placeholder="$t('common.search')"
@@ -27,24 +25,10 @@
                 <template #default="{ row }">
                   <div class="flex-between">
                     <div>
-                      <span class="mr-8">{{ row.username }}</span>
+                      <span class="mr-8">{{ row.nick_name }}</span>
                       <el-tag v-if="isManage(row.type)" class="default-tag">{{
                         $t('views.resourceAuthorization.manage')
                       }}</el-tag>
-                    </div>
-                    <div @click.stop style="margin-top: 5px">
-                      <el-dropdown trigger="click" v-if="!isManage(row.type)">
-                        <span class="cursor">
-                          <el-icon class="rotate-90"><MoreFilled /></el-icon>
-                        </span>
-                        <template #dropdown>
-                          <el-dropdown-menu>
-                            <el-dropdown-item @click.prevent="deleteMember(row)">{{
-                              $t('views.resourceAuthorization.delete.button')
-                            }}</el-dropdown-item>
-                          </el-dropdown-menu>
-                        </template>
-                      </el-dropdown>
                     </div>
                   </div>
                 </template>
@@ -52,23 +36,23 @@
             </el-scrollbar>
           </div>
         </div>
-        <div class="permission-setting flex" v-loading="rLoading">
-          <div class="team-manage__table">
-            <h4 class="p-24 pb-0 mb-4">{{ $t('views.resourceAuthorization.permissionSetting') }}</h4>
-            <el-tabs v-model="activeName" class="team-manage__tabs">
+        <div class="permission-setting p-16 flex" v-loading="rLoading">
+          <div class="resource-authorization__table">
+            <h4 class="mb-4">{{ $t('views.resourceAuthorization.permissionSetting') }}</h4>
+            <el-tabs v-model="activeName" class="resource-authorization__tabs">
               <el-tab-pane
                 v-for="(item, index) in settingTags"
                 :key="item.value"
                 :label="item.label"
                 :name="item.value"
               >
-                <!-- <PermissionSetting
+                <PermissionSetting
                   :key="index"
                   :data="item.data"
                   :type="item.value"
                   :tableHeight="tableHeight"
                   :manage="isManage(currentType)"
-                ></PermissionSetting> -->
+                ></PermissionSetting>
               </el-tab-pane>
             </el-tabs>
           </div>
@@ -79,36 +63,33 @@
         </div>
       </div>
     </el-card>
-    <!-- <CreateMemberDialog ref="CreateMemberRef" @refresh="refresh" /> -->
   </div>
 </template>
 
 <script lang="ts" setup>
 import { onMounted, ref, reactive, watch } from 'vue'
 import AuthorizationApi from '@/api/user/resource-authorization'
-import type { TeamMember } from '@/api/type/team'
-// import CreateMemberDialog from './component/CreateMemberDialog.vue'
-// import PermissionSetting from './component/PermissionSetting.vue'
+import PermissionSetting from './component/PermissionSetting.vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { AuthorizationEnum } from '@/enums/system'
 import { t } from '@/locales'
-// const CreateMemberRef = ref<InstanceType<typeof CreateMemberDialog>>()
+
 const loading = ref(false)
 const rLoading = ref(false)
-const memberList = ref<TeamMember[]>([]) // 全部成员
-const filterMember = ref<TeamMember[]>([]) // 搜索过滤后列表
+const memberList = ref<any[]>([]) // 全部成员
+const filterMember = ref<any[]>([]) // 搜索过滤后列表
 const currentUser = ref<String>('')
 const currentType = ref<String>('')
 
 const filterText = ref('')
 
-const activeName = ref(AuthorizationEnum.DATASET)
+const activeName = ref(AuthorizationEnum.KNOWLEDGE)
 const tableHeight = ref(0)
 
 const settingTags = reactive([
   {
     label: t('views.knowledge.title'),
-    value: AuthorizationEnum.DATASET,
+    value: AuthorizationEnum.KNOWLEDGE,
     data: [] as any,
   },
   {
@@ -156,10 +137,40 @@ function submitPermissions() {
     })
 }
 
+function clickMemberHandle(item: any) {
+  currentUser.value = item.id
+  currentType.value = item.type
+  ResourcePermissions(item.id)
+}
+
+function getMember(id?: string) {
+  loading.value = true
+  AuthorizationApi.getUserList()
+    .then((res) => {
+      memberList.value = res.data
+      filterMember.value = res.data
+
+      const user = (id && memberList.value.find((p) => p.user_id === id)) || null
+      currentUser.value = user ? user.id : memberList.value[0].id
+      currentType.value = user ? user.type : memberList.value[0].type
+      ResourcePermissions(currentUser.value)
+      loading.value = false
+    })
+    .catch(() => {
+      loading.value = false
+    })
+}
 function ResourcePermissions() {
   rLoading.value = true
   AuthorizationApi.getResourceAuthorization('default')
     .then((res) => {
+      if (!res.data || Object.keys(res.data).length > 0) {
+        settingTags.map((item) => {
+          if (Object.keys(res.data).indexOf(item.value) !== -1) {
+            item.data = res.data[item.value]
+          }
+        })
+      }
       rLoading.value = false
     })
     .catch(() => {
@@ -176,19 +187,13 @@ onMounted(() => {
       tableHeight.value = window.innerHeight - 330
     })()
   }
-  ResourcePermissions()
+  getMember()
 })
 </script>
 
 <style lang="scss" scoped>
 .resource-authorization {
-  .add-user-icon {
-    font-size: 17px;
-  }
-  .team-member-input {
-    padding: 0 calc(var(--app-base-px) * 2);
-  }
-  .team-member {
+  .resource-authorization__left {
     box-sizing: border-box;
     width: var(--setting-left-width);
     min-width: var(--setting-left-width);
@@ -196,28 +201,17 @@ onMounted(() => {
 
   .permission-setting {
     box-sizing: border-box;
-    width: calc(100% - var(--setting-left-width));
+    width: 100%;
     flex-direction: column;
     position: relative;
     .submit-button {
       position: absolute;
-      top: 54px;
+      top: 16px;
       right: 24px;
     }
   }
   .list-height-left {
-    height: calc(var(--create-dataset-height) - 60px);
-  }
-
-  &__tabs {
-    margin-top: 10px;
-
-    :deep(.el-tabs__nav-scroll) {
-      padding: 0 24px;
-    }
-  }
-  &__table {
-    flex: 1;
+    height: calc(100vh - 240px);
   }
 }
 </style>
