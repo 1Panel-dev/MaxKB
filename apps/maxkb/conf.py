@@ -29,6 +29,16 @@ class Config(dict):
         # 语言
         'LANGUAGE_CODE': 'zh-CN',
         "DEBUG": False,
+        # redis 目前先支持单机 哨兵的配置后期加上
+        'REDIS_HOST': '127.0.0.1',
+        # 端口
+        'REDIS_PORT': 6379,
+        # 密码
+        'REDIS_PASSWORD': 'Password123@redis',
+        # 库
+        'REDIS_DB': 0,
+        # 最大连接数
+        'REDIS_MAX_CONNECTIONS': 100
     }
 
     def get_debug(self) -> bool:
@@ -52,11 +62,17 @@ class Config(dict):
         }
 
     @staticmethod
-    def get_cache_setting():
+    def get_cache_setting(self):
         return {
             'default': {
-                'BACKEND': 'diskcache.DjangoCache',
-                'LOCATION': f'{PROJECT_DIR}/data/cache'
+                'BACKEND': 'django_redis.cache.RedisCache',
+                'LOCATION': f'redis://{self.get("REDIS_HOST")}:{self.get("REDIS_PORT")}',
+                'OPTIONS': {
+                    'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+                    "DB": self.get("REDIS_DB"),
+                    "PASSWORD": self.get("REDIS_PASSWORD"),
+                    "CONNECTION_POOL_KWARGS": {"max_connections": int(self.get("REDIS_MAX_CONNECTIONS"))}
+                },
             },
         }
 
