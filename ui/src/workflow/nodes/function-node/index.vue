@@ -118,7 +118,7 @@ import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'
-import FieldFormDialog from '@/views/function-lib/component/FieldFormDialog.vue'
+import FieldFormDialog from '@/views/tool/component/FieldFormDialog.vue'
 import { isLastNode } from '@/workflow/common/data'
 
 const props = defineProps<{ nodeModel: any }>()
