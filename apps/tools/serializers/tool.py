@@ -314,7 +314,10 @@ class ToolSerializer(serializers.Serializer):
             except Exception as e:
                 return result.error(str(e), response_status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        def pylint(self, instance, is_valid=True):
+    class Pylint(serializers.Serializer):
+        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+
+        def run(self, instance, is_valid=True):
             if is_valid:
                 self.is_valid(raise_exception=True)
                 PylintInstance(data=instance).is_valid(raise_exception=True)
