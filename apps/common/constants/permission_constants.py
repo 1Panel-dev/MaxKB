@@ -638,10 +638,11 @@ class PermissionConstants(Enum):
                                             role_list=[RoleConstants.ADMIN],
                                             parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT],
                                             )
-    WORKSPACE_CHAT_USER_SYNC = Permission(group=Group.CHAT_USER, operate=Operate.SYNC,
-                                          role_list=[RoleConstants.ADMIN],
-                                          parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT],
-                                          )
+    WORKSPACE_CHAT_USER_GROUP = Permission(group=Group.CHAT_USER, operate=Operate.USER_GROUP,
+                                           role_list=[RoleConstants.ADMIN],
+                                           parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT],
+                                           label=_('Set up user groups')
+                                           )
     WORKSPACE_USER_GROUP_READ = Permission(group=Group.USER_GROUP, operate=Operate.READ,
                                            role_list=[RoleConstants.ADMIN],
                                            parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT]
