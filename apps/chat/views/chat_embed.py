@@ -19,12 +19,12 @@ class ChatEmbedView(APIView):
 
     @extend_schema(
         methods=['GET'],
-        description=_('Import Application'),
-        summary=_('Import Application'),
-        operation_id=_('Import Application'),  # type: ignore
+        description=_('Get embedded js'),
+        summary=_('Get embedded js'),
+        operation_id=_('Get embedded js'),  # type: ignore
         parameters=ChatEmbedAPI.get_parameters(),
         responses=ChatEmbedAPI.get_response(),
-        tags=[_('Application')]  # type: ignore
+        tags=[_('Chat')]  # type: ignore
     )
     def get(self, request: Request):
         return ChatEmbedSerializer(

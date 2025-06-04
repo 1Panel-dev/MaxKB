@@ -78,9 +78,9 @@ const loading = ref(false)
 const rLoading = ref(false)
 const memberList = ref<any[]>([]) // 全部成员
 const filterMember = ref<any[]>([]) // 搜索过滤后列表
-const currentUser = ref<String>('')
-const currentType = ref<String>('')
-
+const currentUser = ref<string>('')
+const currentType = ref<string>('')
+const workspace_id = ref<string>('default')
 const filterText = ref('')
 
 const activeName = ref(AuthorizationEnum.KNOWLEDGE)
@@ -99,9 +99,9 @@ const settingTags = reactive([
   },
 ])
 
-watch(filterText, (val) => {
+watch(filterText, (val: any) => {
   if (val) {
-    filterMember.value = memberList.value.filter((v) =>
+    filterMember.value = memberList.value.filter((v: any) =>
       v.username.toLowerCase().includes(val.toLowerCase()),
     )
   } else {
@@ -116,21 +116,22 @@ function isManage(type: String) {
 function submitPermissions() {
   rLoading.value = true
   const obj: any = {
-    team_member_permission_list: [],
+    user_resource_permission_list: [],
   }
-  settingTags.map((item) => {
+  settingTags.map((item: any) => {
     item.data.map((v: any) => {
-      obj['team_member_permission_list'].push({
+      obj['user_resource_permission_list'].push({
         target_id: v.id,
-        type: v.type,
-        operate: v.operate,
+        auth_target_type: v.auth_target_type,
+        permission: v.permission,
+        auth_type: 'RESOURCE_PERMISSION_GROUP',
       })
     })
   })
-  AuthorizationApi.putResourceAuthorization(currentUser.value, obj)
+  AuthorizationApi.putResourceAuthorization(workspace_id.value, currentUser.value, obj)
     .then(() => {
       MsgSuccess(t('common.submitSuccess'))
-      ResourcePermissions(currentUser.value)
+      ResourcePermissions(workspace_id.value, currentUser.value)
     })
     .catch(() => {
       rLoading.value = false
@@ -140,32 +141,32 @@ function submitPermissions() {
 function clickMemberHandle(item: any) {
   currentUser.value = item.id
   currentType.value = item.type
-  ResourcePermissions(item.id)
+  ResourcePermissions(workspace_id.value, item.id)
 }
 
 function getMember(id?: string) {
   loading.value = true
-  AuthorizationApi.getUserList()
+  AuthorizationApi.getUserList(workspace_id.value)
     .then((res) => {
       memberList.value = res.data
       filterMember.value = res.data
 
-      const user = (id && memberList.value.find((p) => p.user_id === id)) || null
+      const user = (id && memberList.value.find((p: any) => p.user_id === id)) || null
       currentUser.value = user ? user.id : memberList.value[0].id
       currentType.value = user ? user.type : memberList.value[0].type
-      ResourcePermissions(currentUser.value)
+      ResourcePermissions(workspace_id.value, currentUser.value)
       loading.value = false
     })
     .catch(() => {
       loading.value = false
     })
 }
-function ResourcePermissions() {
+function ResourcePermissions(workspace_id: string, user_id: string) {
   rLoading.value = true
-  AuthorizationApi.getResourceAuthorization('default')
+  AuthorizationApi.getResourceAuthorization(workspace_id, user_id)
     .then((res) => {
       if (!res.data || Object.keys(res.data).length > 0) {
-        settingTags.map((item) => {
+        settingTags.map((item: any) => {
           if (Object.keys(res.data).indexOf(item.value) !== -1) {
             item.data = res.data[item.value]
           }

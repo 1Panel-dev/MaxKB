@@ -6,9 +6,18 @@ FROM (SELECT "id",
              'KNOWLEDGE' AS "auth_target_type",
              user_id,
              workspace_id,
-             "type"    AS "icon"
+             "type"::varchar    AS "icon"
       FROM knowledge
       ${knowledge_query_set}
+     UNION
+     SELECT "id",
+             "name",
+             'APPLICATION' AS "auth_target_type",
+             user_id,
+             workspace_id,
+             icon
+      FROM application
+      ${application_query_set}
    ) app_or_knowledge
          LEFT JOIN (SELECT *
                     FROM workspace_user_resource_permission

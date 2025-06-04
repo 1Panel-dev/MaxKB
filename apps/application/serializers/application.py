@@ -25,7 +25,7 @@ from rest_framework.utils.formatting import lazy_format
 from application.models.application import Application, ApplicationTypeChoices, ApplicationKnowledgeMapping, \
     ApplicationFolder, WorkFlowVersion
 from application.models.application_access_token import ApplicationAccessToken
-from chat.flow.workflow_manage import Flow
+from application.flow.workflow_manage import Flow
 from common import result
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import native_search, native_page_search

@@ -17,8 +17,11 @@ const getUserList: (workspace_id: String) => Promise<Result<any>> = (workspace_i
  * 获取资源权限
  * @query 参数
  */
-const getResourceAuthorization: (workspace_id: String) => Promise<Result<any>> = (workspace_id) => {
-  return get(`${prefix}/${workspace_id}/user_resource_permission`)
+const getResourceAuthorization: (workspace_id: String, user_id: string) => Promise<Result<any>> = (
+  workspace_id,
+  user_id,
+) => {
+  return get(`${prefix}/${workspace_id}/user_resource_permission/user/${user_id}`)
 }
 
 /**
@@ -39,15 +42,16 @@ const getResourceAuthorization: (workspace_id: String) => Promise<Result<any>> =
           ]
         }
  */
-const putResourceAuthorization: (workspace_id: String, body: any) => Promise<Result<any>> = (
-  workspace_id,
-  body,
-) => {
-  return put(`${prefix}/${workspace_id}/user_resource_permission`, body)
+const putResourceAuthorization: (
+  workspace_id: String,
+  user_id: string,
+  body: any,
+) => Promise<Result<any>> = (workspace_id, user_id, body) => {
+  return put(`${prefix}/${workspace_id}/user_resource_permission/user/${user_id}`, body)
 }
 
 export default {
   getResourceAuthorization,
   putResourceAuthorization,
-  getUserList
+  getUserList,
 }
