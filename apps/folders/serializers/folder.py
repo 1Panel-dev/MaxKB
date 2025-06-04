@@ -98,8 +98,8 @@ class FolderSerializer(serializers.Serializer):
     name = serializers.CharField(required=True, label=_('folder name'))
     desc = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('folder description'))
     user_id = serializers.CharField(required=True, label=_('folder user id'))
-    workspace_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('workspace id'))
-    parent_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('parent id'))
+    workspace_id = serializers.CharField(required=False, label=_('workspace id'))
+    parent_id = serializers.CharField(required=False, label=_('parent id'))
 
     class Create(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, label=_('user id'))
@@ -110,8 +110,12 @@ class FolderSerializer(serializers.Serializer):
                 self.is_valid(raise_exception=True)
                 FolderCreateRequest(data=instance).is_valid(raise_exception=True)
 
-            workspace_id = self.data.get('workspace_id', 'default')
-            parent_id = instance.get('parent_id', 'root')
+            workspace_id = self.data.get('workspace_id')
+            if not workspace_id:
+                workspace_id = 'default'
+            parent_id = instance.get('parent_id')
+            if not parent_id:
+                parent_id = 'root'
             name = instance.get('name')
 
             Folder = get_folder_type(self.data.get('source'))  # noqa
