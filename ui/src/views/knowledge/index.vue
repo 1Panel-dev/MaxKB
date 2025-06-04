@@ -117,7 +117,7 @@
                     </div>
                   </div>
                 </el-dropdown-item>
-                <el-dropdown-item @click="openCreateDialog" divided>
+                <el-dropdown-item @click="openCreateFolder" divided>
                   <div class="flex align-center">
                     <AppIcon iconName="app-folder" style="font-size: 32px"></AppIcon>
                     <div class="pre-wrap ml-4">
@@ -174,7 +174,9 @@
                   :title="item.name"
                   :description="item.desc"
                   class="cursor"
-                  @click="router.push({ path: `/knowledge/${item.id}/document` })"
+                  @click="
+                    router.push({ path: `/knowledge/${item.id}/${currentFolder.id}/document` })
+                  "
                 >
                   <template #icon>
                     <KnowledgeIcon :type="item.type" />
@@ -260,6 +262,7 @@
     </ContentContainer>
 
     <component :is="currentCreateDialog" ref="CreateKnowledgeDialogRef" />
+    <CreateFolderDialog ref="CreateFolderDialogRef" @refresh="refreshFolder" />
   </LayoutContainer>
 </template>
 
@@ -268,6 +271,7 @@ import { onMounted, ref, reactive, shallowRef, nextTick } from 'vue'
 import KnowledgeIcon from '@/views/knowledge/component/KnowledgeIcon.vue'
 import CreateKnowledgeDialog from './create-component/CreateKnowledgeDialog.vue'
 import CreateWebKnowledgeDialog from './create-component/CreateWebKnowledgeDialog.vue'
+import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
 import KnowledgeApi from '@/api/knowledge/knowledge'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import useStore from '@/stores'
@@ -363,6 +367,16 @@ function getFolder() {
 function folderClickHandel(row: any) {
   currentFolder.value = row
   knowledgeList.value = []
+  getList()
+}
+const CreateFolderDialogRef = ref()
+
+function openCreateFolder() {
+  CreateFolderDialogRef.value.open('KNOWLEDGE', currentFolder.value.parent_id)
+}
+
+function refreshFolder() {
+  getFolder()
   getList()
 }
 

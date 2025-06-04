@@ -5,10 +5,10 @@ import type { pageRequest } from '@/api/type/common'
 const prefix = '/workspace'
 
 /**
- * 获得知识库文件夹列表
+ * 获得文件夹列表
  * @params 参数
  *  source : APPLICATION, KNOWLEDGE, TOOL
- * {name: string}
+ *  data : {name: string}
  */
 const getFolder: (
   wordspace_id: string,
@@ -19,6 +19,26 @@ const getFolder: (
   return get(`${prefix}/${wordspace_id}/${source}/folder`, data, loading)
 }
 
+/**
+ * 添加文件夹
+ * @params 参数
+ *  source : APPLICATION, KNOWLEDGE, TOOL
+{
+  "name": "string",
+  "desc": "string",
+  "parent_id": "root"
+}
+ */
+const postFolder: (
+  wordspace_id: string,
+  source: string,
+  data?: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<Array<any>>> = (wordspace_id, source, data, loading) => {
+  return post(`${prefix}/${wordspace_id}/${source}/folder`, data, loading)
+}
+
 export default {
   getFolder,
+  postFolder,
 }
