@@ -230,13 +230,7 @@ class PylintAPI(APIMixin):
                 location='path',
                 required=True,
             ),
-            OpenApiParameter(
-                name="tool_id",
-                description="工具id",
-                type=OpenApiTypes.STR,
-                location='path',
-                required=True,
-            )
+
         ]
 
     @staticmethod
