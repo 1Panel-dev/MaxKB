@@ -17,9 +17,11 @@ from rest_framework import serializers, status
 
 from common.db.search import page_search, native_page_search
 from common.exception.app_exception import AppApiException
+from common.field.common import UploadedImageField
 from common.result import result
 from common.utils.common import get_file_content
 from common.utils.tool_code import ToolExecutor
+from knowledge.models import File, FileSourceType
 from maxkb.const import CONFIG, PROJECT_DIR
 from tools.models import Tool, ToolScope, ToolFolder
 from tools.serializers.tool_folder import ToolFolderFlatSerializer
@@ -363,6 +365,42 @@ class ToolSerializer(serializers.Serializer):
             )
             tool_model.save()
             return True
+
+    class IconOperate(serializers.Serializer):
+        id = serializers.UUIDField(required=True, label=_("function ID"))
+        workspace_id = serializers.CharField(required=True, label=_("workspace id"))
+        user_id = serializers.UUIDField(required=True, label=_("User ID"))
+        image = UploadedImageField(required=True, label=_("picture"))
+
+        def edit(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            tool = QuerySet(Tool).filter(id=self.data.get('id')).first()
+            if tool is None:
+                raise AppApiException(500, _('Function does not exist'))
+            # 删除旧的图片
+            if tool.icon != '/ui/favicon.ico':
+                QuerySet(File).filter(id=tool.icon.split('/')[-1]).delete()
+            if self.data.get('image') is None:
+                tool.icon = '/ui/favicon.ico'
+            else:
+                meta = {
+                    'debug': False
+                }
+                file_id = uuid.uuid7()
+                file = File(
+                    id=file_id,
+                    file_name=self.data.get('image').name,
+                    source_type=FileSourceType.TOOL,
+                    source_id=tool.id,
+                    meta=meta
+                )
+                file.save(self.data.get('image').read())
+
+                tool.icon = f'/api/file/{file_id}'
+            tool.save()
+
+            return tool.icon
 
 
 class ToolTreeSerializer(serializers.Serializer):

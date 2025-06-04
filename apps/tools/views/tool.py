@@ -193,3 +193,16 @@ class ToolView(APIView):
             return result.success(ToolSerializer.Pylint(
                 data={'workspace_id': workspace_id}
             ).run(request.data))
+
+    class EditIcon(APIView):
+        authentication_classes = [TokenAuth]
+        parser_classes = [MultiPartParser]
+
+        @has_permissions(PermissionConstants.TOOL_EDIT.get_workspace_permission())
+        def put(self, request: Request, id: str, workspace_id: str):
+            return result.success(ToolSerializer.IconOperate(data={
+                'id': id,
+                'workspace_id': workspace_id,
+                'user_id': request.user.id,
+                'image': request.FILES.get('file')
+            }).edit(request.data))

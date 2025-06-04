@@ -9,6 +9,7 @@ urlpatterns = [
     path('workspace/<str:workspace_id>/tool/pylint', views.ToolView.Pylint.as_view()),
     path('workspace/<str:workspace_id>/tool/<str:tool_id>', views.ToolView.Operate.as_view()),
     path('workspace/<str:workspace_id>/tool/<str:tool_id>/debug', views.ToolView.Debug.as_view()),
+    path('workspace/<str:workspace_id>/tool/<str:tool_id>/edit_icon', views.ToolView.Debug.as_view()),
     path('workspace/<str:workspace_id>/tool/<str:tool_id>/export', views.ToolView.Export.as_view()),
     path('workspace/<str:workspace_id>/tool/<int:current_page>/<int:page_size>', views.ToolView.Page.as_view()),
 ]
