@@ -684,6 +684,18 @@ class PermissionConstants(Enum):
         group=Group.TOOL, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.SHARED_TOOL]
     )
+    SHARED_TOOL_IMPORT = Permission(
+        group=Group.TOOL, operate=Operate.IMPORT, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.SHARED_TOOL]
+    )
+    SHARED_TOOL_EXPORT = Permission(
+        group=Group.TOOL, operate=Operate.EXPORT, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.SHARED_TOOL]
+    )
+    SHARED_TOOL_DEBUG = Permission(
+        group=Group.TOOL, operate=Operate.DEBUG, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.SHARED_TOOL]
+    )
 
     def get_workspace_application_permission(self):
         return lambda r, kwargs: Permission(group=self.value.group, operate=self.value.operate,
