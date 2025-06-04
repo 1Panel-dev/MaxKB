@@ -33,9 +33,9 @@ class WorkSpaceUserResourcePermissionView(APIView):
         tags=[_('Resources authorization')]  # type: ignore
     )
     @has_permissions(PermissionConstants.WORKSPACE_USER_RESOURCE_PERMISSION_READ.get_workspace_permission())
-    def get(self, request: Request, workspace_id: str):
+    def get(self, request: Request, workspace_id: str, user_id: str):
         return result.success(UserResourcePermissionSerializer(
-            data={'workspace_id': workspace_id}
+            data={'workspace_id': workspace_id, 'user_id': user_id}
         ).list(request.user))
 
     @extend_schema(
@@ -47,7 +47,7 @@ class WorkSpaceUserResourcePermissionView(APIView):
         responses=DefaultResultSerializer(),
         tags=[_('Resources authorization')]  # type: ignore
     )
-    def put(self, request: Request, workspace_id: str):
+    def put(self, request: Request, workspace_id: str, user_id: str):
         return result.success(UserResourcePermissionSerializer(
-            data={'workspace_id': workspace_id}
+            data={'workspace_id': workspace_id, 'user_id': user_id}
         ).edit(request.data, request.user))

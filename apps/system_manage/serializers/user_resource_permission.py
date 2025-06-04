@@ -14,6 +14,7 @@ from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from application.models import Application
 from common.constants.cache_version import Cache_Version
 from common.constants.permission_constants import get_default_workspace_user_role_mapping_list, RoleConstants, \
     ResourcePermissionGroup, ResourcePermissionRole, ResourceAuthType
@@ -63,7 +64,7 @@ class UpdateUserResourcePermissionRequest(serializers.Serializer):
         illegal_target_id_list = select_list(
             get_file_content(
                 os.path.join(PROJECT_DIR, "apps", "system_manage", 'sql', 'check_member_permission_target_exists.sql')),
-            [json.dumps(user_resource_permission_list), workspace_id])
+            [json.dumps(user_resource_permission_list), workspace_id, workspace_id])
         if illegal_target_id_list is not None and len(illegal_target_id_list) > 0:
             raise AppApiException(500,
                                   _('Non-existent application|knowledge base id[') + str(illegal_target_id_list) + ']')
@@ -71,10 +72,13 @@ class UpdateUserResourcePermissionRequest(serializers.Serializer):
 
 class UserResourcePermissionSerializer(serializers.Serializer):
     workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+    user_id = serializers.CharField(required=True, label=_('user id'))
 
     def get_queryset(self):
         return {
             "knowledge_query_set": QuerySet(Knowledge)
+            .filter(workspace_id=self.data.get('workspace_id')),
+            'application_query_set': QuerySet(Application)
             .filter(workspace_id=self.data.get('workspace_id')),
             'workspace_user_resource_permission_query_set': QuerySet(WorkspaceUserResourcePermission).filter(
                 workspace_id=self.data.get('workspace_id'))
@@ -84,13 +88,14 @@ class UserResourcePermissionSerializer(serializers.Serializer):
         if with_valid:
             self.is_valid(raise_exception=True)
         workspace_id = self.data.get("workspace_id")
+        user_id = self.data.get("user_id")
         # 用户权限列表
         user_resource_permission_list = native_search(self.get_queryset(), get_file_content(
             os.path.join(PROJECT_DIR, "apps", "system_manage", 'sql', 'get_user_resource_permission.sql')))
         workspace_user_role_mapping_model = DatabaseModelManage.get_model("workspace_user_role_mapping")
         workspace_model = DatabaseModelManage.get_model("workspace_model")
         if workspace_user_role_mapping_model and workspace_model:
-            workspace_user_role_mapping_list = QuerySet(workspace_user_role_mapping_model).filter(user_id=user.id,
+            workspace_user_role_mapping_list = QuerySet(workspace_user_role_mapping_model).filter(user_id=user_id,
                                                                                                   workspace_id=workspace_id)
         else:
             workspace_user_role_mapping_list = get_default_workspace_user_role_mapping_list([user.role])
@@ -119,6 +124,7 @@ class UserResourcePermissionSerializer(serializers.Serializer):
             UpdateUserResourcePermissionRequest(data=instance).is_valid(raise_exception=True,
                                                                         workspace_id=self.data.get('workspace_id'))
         workspace_id = self.data.get("workspace_id")
+        user_id = self.data.get("user_id")
         update_list = []
         save_list = []
         user_resource_permission_list = instance.get('user_resource_permission_list')
@@ -142,7 +148,7 @@ class UserResourcePermissionSerializer(serializers.Serializer):
                                                                                   user_resource_permission.get(
                                                                                       'permission').get(key)],
                                                                  workspace_id=workspace_id,
-                                                                 user_id=user.id,
+                                                                 user_id=user_id,
                                                                  auth_type=user_resource_permission.get('auth_type')))
         # 批量更新
         QuerySet(WorkspaceUserResourcePermission).bulk_update(update_list, ['permission_list']) if len(
@@ -150,6 +156,6 @@ class UserResourcePermissionSerializer(serializers.Serializer):
         # 批量插入
         QuerySet(WorkspaceUserResourcePermission).bulk_create(save_list) if len(save_list) > 0 else None
         version = Cache_Version.PERMISSION_LIST.get_version()
-        key = Cache_Version.PERMISSION_LIST.get_key(user_id=str(user.id))
+        key = Cache_Version.PERMISSION_LIST.get_key(user_id=user_id)
         cache.delete(key, version=version)
         return True

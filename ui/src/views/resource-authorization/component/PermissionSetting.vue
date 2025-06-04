@@ -30,7 +30,7 @@
               class="mr-12"
             />
             <el-avatar
-              v-if="row.icon === '1' && isDataset"
+              v-if="row.icon === '1' && isKnowledge"
               class="mr-8 avatar-purple"
               shape="square"
               :size="24"
@@ -38,7 +38,7 @@
               <img src="@/assets/knowledge/icon_web.svg" style="width: 58%" alt="" />
             </el-avatar>
             <el-avatar
-              v-else-if="row.icon === '2' && isDataset"
+              v-else-if="row.icon === '2' && isKnowledge"
               class="mr-8 avatar-purple"
               shape="square"
               :size="24"
@@ -46,7 +46,7 @@
             >
               <img src="@/assets/knowledge/logo_lark.svg" style="width: 100%" alt="" />
             </el-avatar>
-            <el-avatar v-else-if="isDataset" class="mr-8 avatar-blue" shape="square" :size="24">
+            <el-avatar v-else-if="isKnowledge" class="mr-8 avatar-blue" shape="square" :size="24">
               <img src="@/assets/knowledge/icon_document.svg" style="width: 58%" alt="" />
             </el-avatar>
             <auto-tooltip :content="row?.name">
@@ -72,7 +72,7 @@
         <template #default="{ row }">
           <el-checkbox
             :disabled="props.manage"
-            v-model="row.operate[AuthorizationEnum.MANAGE]"
+            v-model="row.permission[AuthorizationEnum.MANAGE]"
             @change="(e: boolean) => checkedOperateChange(AuthorizationEnum.MANAGE, row, e)"
           />
         </template>
@@ -86,16 +86,16 @@
         <template #header>
           <el-checkbox
             :disabled="props.manage"
-            v-model="allChecked[AuthorizationEnum.USE]"
-            :indeterminate="allIndeterminate[AuthorizationEnum.USE]"
+            v-model="allChecked[AuthorizationEnum.VIEW]"
+            :indeterminate="allIndeterminate[AuthorizationEnum.VIEW]"
             :label="$t('views.resourceAuthorization.setting.check')"
           />
         </template>
         <template #default="{ row }">
           <el-checkbox
             :disabled="props.manage"
-            v-model="row.operate[AuthorizationEnum.USE]"
-            @change="(e: boolean) => checkedOperateChange(AuthorizationEnum.USE, row, e)"
+            v-model="row.permission[AuthorizationEnum.VIEW]"
+            @change="(e: boolean) => checkedOperateChange(AuthorizationEnum.VIEW, row, e)"
           />
         </template>
       </el-table-column>
@@ -118,41 +118,41 @@ const props = defineProps({
   manage: Boolean,
 })
 
-const isDataset = computed(() => props.type === AuthorizationEnum.DATASET)
+const isKnowledge = computed(() => props.type === AuthorizationEnum.KNOWLEDGE)
 const isApplication = computed(() => props.type === AuthorizationEnum.APPLICATION)
 
 const emit = defineEmits(['update:data'])
 const allChecked: any = ref({
   [AuthorizationEnum.MANAGE]: computed({
     get: () => {
-      return filterData.value.some((item: any) => item.operate[AuthorizationEnum.MANAGE])
+      return filterData.value.some((item: any) => item.permission[AuthorizationEnum.MANAGE])
     },
     set: (val: boolean) => {
       if (val) {
         filterData.value.map((item: any) => {
-          item.operate[AuthorizationEnum.MANAGE] = true
-          item.operate[AuthorizationEnum.USE] = true
+          item.permission[AuthorizationEnum.MANAGE] = true
+          item.permission[AuthorizationEnum.VIEW] = true
         })
       } else {
         filterData.value.map((item: any) => {
-          item.operate[AuthorizationEnum.MANAGE] = false
+          item.permission[AuthorizationEnum.MANAGE] = false
         })
       }
     },
   }),
-  [AuthorizationEnum.USE]: computed({
+  [AuthorizationEnum.VIEW]: computed({
     get: () => {
-      return filterData.value.some((item: any) => item.operate[AuthorizationEnum.USE])
+      return filterData.value.some((item: any) => item.permission[AuthorizationEnum.VIEW])
     },
     set: (val: boolean) => {
       if (val) {
         filterData.value.map((item: any) => {
-          item.operate[AuthorizationEnum.USE] = true
+          item.permission[AuthorizationEnum.VIEW] = true
         })
       } else {
         filterData.value.map((item: any) => {
-          item.operate[AuthorizationEnum.USE] = false
-          item.operate[AuthorizationEnum.MANAGE] = false
+          item.permission[AuthorizationEnum.VIEW] = false
+          item.permission[AuthorizationEnum.MANAGE] = false
         })
       }
     },
@@ -168,32 +168,32 @@ const filterData = computed(() =>
 const allIndeterminate: any = ref({
   [AuthorizationEnum.MANAGE]: computed(() => {
     const all_not_checked = filterData.value.every(
-      (item: any) => !item.operate[AuthorizationEnum.MANAGE],
+      (item: any) => !item.permission[AuthorizationEnum.MANAGE],
     )
     if (all_not_checked) {
       return false
     }
-    return !filterData.value.every((item: any) => item.operate[AuthorizationEnum.MANAGE])
+    return !filterData.value.every((item: any) => item.permission[AuthorizationEnum.MANAGE])
   }),
-  [AuthorizationEnum.USE]: computed(() => {
+  [AuthorizationEnum.VIEW]: computed(() => {
     const all_not_checked = filterData.value.every(
-      (item: any) => !item.operate[AuthorizationEnum.USE],
+      (item: any) => !item.permission[AuthorizationEnum.VIEW],
     )
     if (all_not_checked) {
       return false
     }
-    return !filterData.value.every((item: any) => item.operate[AuthorizationEnum.USE])
+    return !filterData.value.every((item: any) => item.permission[AuthorizationEnum.VIEW])
   }),
 })
 
 function checkedOperateChange(Name: string | number, row: any, e: boolean) {
   props.data.map((item: any) => {
     if (item.id === row.id) {
-      item.operate[Name] = e
+      item.permission[Name] = e
       if (Name === AuthorizationEnum.MANAGE && e) {
-        item.operate[AuthorizationEnum.USE] = true
-      } else if (Name === AuthorizationEnum.USE && !e) {
-        item.operate[AuthorizationEnum.MANAGE] = false
+        item.permission[AuthorizationEnum.VIEW] = true
+      } else if (Name === AuthorizationEnum.VIEW && !e) {
+        item.permission[AuthorizationEnum.MANAGE] = false
       }
     }
   })

@@ -8,7 +8,6 @@
 """
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
-from rest_framework.decorators import action
 from rest_framework.parsers import MultiPartParser
 from rest_framework.request import Request
 from rest_framework.views import APIView
@@ -94,12 +93,11 @@ class Application(APIView):
     class Export(APIView):
         authentication_classes = [TokenAuth]
 
-        @action(methods=['POST'], detail=False)
         @extend_schema(
             methods=['POST'],
-            description=_('Export conversation'),
-            summary=_('Export conversation'),
-            operation_id=_('Export conversation'),  # type: ignore
+            description=_('Export application'),
+            summary=_('Export application'),
+            operation_id=_('Export application'),  # type: ignore
             parameters=ApplicationExportAPI.get_parameters(),
             responses=ApplicationExportAPI.get_response(),
             tags=[_('Application')]  # type: ignore
@@ -123,7 +121,7 @@ class Application(APIView):
             tags=[_('Application')]  # type: ignore
         )
         @has_permissions(PermissionConstants.APPLICATION_DELETE.get_workspace_application_permission())
-        def delete(self, request: Request, application_id: str):
+        def delete(self, request: Request, workspace_id: str, application_id: str):
             return result.success(ApplicationOperateSerializer(
                 data={'application_id': application_id, 'user_id': request.user.id}).delete(
                 with_valid=True))
@@ -139,14 +137,14 @@ class Application(APIView):
             tags=[_('Application')]  # type: ignore
         )
         @has_permissions(PermissionConstants.APPLICATION_EDIT.get_workspace_application_permission())
-        def put(self, request: Request, application_id: str):
+        def put(self, request: Request, workspace_id: str, application_id: str):
             return result.success(
                 ApplicationOperateSerializer(
                     data={'application_id': application_id, 'user_id': request.user.id}).edit(
                     request.data))
 
         @extend_schema(
-            methods=['PUT'],
+            methods=['GET'],
             description=_('Get application details'),
             summary=_('Get application details'),
             operation_id=_('Get application details'),  # type: ignore
@@ -156,6 +154,24 @@ class Application(APIView):
             tags=[_('Application')]  # type: ignore
         )
         @has_permissions(PermissionConstants.WORKSPACE_READ.get_workspace_application_permission())
-        def get(self, request: Request, application_id: str):
+        def get(self, request: Request, workspace_id: str, application_id: str):
             return result.success(ApplicationOperateSerializer(
                 data={'application_id': application_id, 'user_id': request.user.id}).one())
+
+    class Publish(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['PUT'],
+            description=_("Publishing an application"),
+            summary=_("Publishing an application"),
+            operation_id=_("Publishing an application"),  # type: ignore
+            parameters=ApplicationOperateAPI.get_parameters(),
+            request=ApplicationEditAPI.get_request(),
+            responses=result.DefaultResultSerializer,
+            tags=[_('Application')]  # type: ignore
+        )
+        def put(self, request: Request, application_id: str):
+            return result.success(
+                ApplicationOperateSerializer(
+                    data={'application_id': application_id, 'user_id': request.user.id}).publish(request.data))

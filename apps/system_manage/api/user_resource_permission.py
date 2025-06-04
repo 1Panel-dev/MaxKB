@@ -30,7 +30,14 @@ class UserResourcePermissionAPI(APIMixin):
                 type=OpenApiTypes.STR,
                 location='path',
                 required=True,
-            )
+            ),
+            OpenApiParameter(
+                name="user_id",
+                description="用户id",
+                type=OpenApiTypes.STR,
+                location='path',
+                required=True,
+            ),
         ]
 
     @staticmethod
