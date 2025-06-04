@@ -11,6 +11,7 @@ import FolderTree from './folder-tree/index.vue'
 import CommonList from './common-list/index.vue'
 import BackButton from './back-button/index.vue'
 import AppTable from './app-table/index.vue'
+import CodemirrorEditor from './codemirror-editor/index.vue'
 export default {
   install(app: App) {
     app.component('LogoFull', LogoFull)
@@ -25,5 +26,6 @@ export default {
     app.component('CommonList', CommonList)
     app.component('BackButton', BackButton)
     app.component('AppTable', AppTable)
+    app.component('CodemirrorEditor', CodemirrorEditor)
   },
 }

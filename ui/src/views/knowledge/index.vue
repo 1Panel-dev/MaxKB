@@ -45,9 +45,17 @@
         </div>
       </template>
       <div>
-        <el-row v-if="datasetList.length > 0 || datasetFolderList.length > 0" :gutter="15">
-          <template v-for="(item, index) in datasetFolderList" :key="index">
-            <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" class="mb-16">
+        <el-row v-if="datasetList.length > 0" :gutter="15">
+          <template v-for="(item, index) in datasetList" :key="index">
+            <el-col
+              v-if="item.resource_type === 'folder'"
+              :xs="24"
+              :sm="12"
+              :md="12"
+              :lg="8"
+              :xl="6"
+              class="mb-16"
+            >
               <CardBox
                 :title="item.name"
                 :description="item.desc || $t('common.noData')"
@@ -65,9 +73,7 @@
                 </template>
               </CardBox>
             </el-col>
-          </template>
-          <template v-for="(item, index) in datasetList" :key="index">
-            <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" class="mb-16">
+            <el-col v-else :xs="24" :sm="12" :md="12" :lg="8" :xl="6" class="mb-16">
               <CardBox
                 :title="item.name"
                 :description="item.desc"
@@ -235,9 +241,8 @@ function getList() {
     folder_id: currentFolder.value?.id || 'root',
   }
   KnowledgeApi.getKnowledgeList('default', paginationConfig, params, loading).then((res) => {
-    datasetFolderList.value = res.data?.folders
     paginationConfig.total = res.data.total
-    datasetList.value = [...datasetList.value, ...res.data.knowledge.records]
+    datasetList.value = [...datasetList.value, ...res.data.records]
   })
 }
 
@@ -252,7 +257,7 @@ function getFolder() {
 
 function folderClickHandel(row: any) {
   currentFolder.value = row
-  datasetFolderList.value = []
+  datasetList.value = []
   getList()
 }
 

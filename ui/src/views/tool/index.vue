@@ -46,9 +46,17 @@
       </template>
 
       <div>
-        <el-row v-if="toolFolderList.length > 0 || toolList.length > 0" :gutter="15">
-          <template v-for="(item, index) in toolFolderList" :key="index">
-            <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" class="mb-16">
+        <el-row v-if="toolList.length > 0" :gutter="15">
+          <template v-for="(item, index) in toolList" :key="index">
+            <el-col
+              v-if="item.resource_type === 'folder'"
+              :xs="24"
+              :sm="12"
+              :md="12"
+              :lg="8"
+              :xl="6"
+              class="mb-16"
+            >
               <CardBox
                 :title="item.name"
                 :description="item.desc || $t('common.noData')"
@@ -66,10 +74,7 @@
                 </template>
               </CardBox>
             </el-col>
-          </template>
-
-          <template v-for="(item, index) in toolList" :key="index">
-            <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" class="mb-16">
+            <el-col v-else :xs="24" :sm="12" :md="12" :lg="8" :xl="6" class="mb-16">
               <CardBox :title="item.name" :description="item.desc" class="cursor">
                 <template #icon>
                   <el-avatar
@@ -212,7 +217,6 @@ const paginationConfig = reactive({
 
 const folderList = ref<any[]>([])
 const toolList = ref<any[]>([])
-const toolFolderList = ref<any[]>([])
 const currentFolder = ref<any>({})
 
 const search_type_change = () => {
@@ -247,9 +251,8 @@ function getList() {
     tool_type: 'CUSTOM',
   }
   ToolApi.getToolList('default', paginationConfig, params, loading).then((res) => {
-    toolFolderList.value = res.data?.folders
-    paginationConfig.total = res.data?.tools.total
-    toolList.value = [...toolList.value, ...res.data?.tools.records]
+    paginationConfig.total = res.data?.total
+    toolList.value = [...toolList.value, ...res.data?.records]
   })
 }
 

@@ -75,8 +75,16 @@ const getToolById: (
   wordspace_id: string,
   tool_id: String,
   loading?: Ref<boolean>,
-) => Promise<Result<any>> = (wordspace_id, function_lib_id, loading) => {
-  return get(`${prefix}/${wordspace_id}/tool/${function_lib_id}`, undefined, loading)
+) => Promise<Result<any>> = (wordspace_id, tool_id, loading) => {
+  return get(`${prefix}/${wordspace_id}/tool/${tool_id}`, undefined, loading)
+}
+
+const postPylint: (
+  wordspace_id: string,
+  code: string,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (wordspace_id, code, loading) => {
+  return post(`${prefix}/${wordspace_id}/tool/pylint`, { code }, {}, loading)
 }
 
 /**
@@ -96,5 +104,6 @@ export default {
   getToolList,
   putTool,
   getToolById,
-  postTool
+  postTool,
+  postPylint
 }
