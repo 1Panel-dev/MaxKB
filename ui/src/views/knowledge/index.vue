@@ -62,7 +62,7 @@
                     </div>
                   </div>
                 </el-dropdown-item>
-                <el-dropdown-item @click="openCreateDialog">
+                <el-dropdown-item @click="openCreateDialog(CreateWebKnowledgeDialog)">
                   <div class="flex">
                     <el-avatar class="avatar-purple mt-4" shape="square" :size="32">
                       <img src="@/assets/knowledge/icon_web.svg" style="width: 58%" alt="" />
@@ -77,7 +77,7 @@
                     </div>
                   </div>
                 </el-dropdown-item>
-                <el-dropdown-item @click="openCreateDialog">
+                <el-dropdown-item>
                   <div class="flex">
                     <el-avatar
                       class="avatar-purple mt-4"
@@ -97,7 +97,7 @@
                     </div>
                   </div>
                 </el-dropdown-item>
-                <el-dropdown-item @click="openCreateDialog">
+                <el-dropdown-item>
                   <div class="flex">
                     <el-avatar
                       class="avatar-purple mt-4"
@@ -267,6 +267,7 @@
 import { onMounted, ref, reactive, shallowRef, nextTick } from 'vue'
 import KnowledgeIcon from '@/views/knowledge/component/KnowledgeIcon.vue'
 import CreateKnowledgeDialog from './create-component/CreateKnowledgeDialog.vue'
+import CreateWebKnowledgeDialog from './create-component/CreateWebKnowledgeDialog.vue'
 import KnowledgeApi from '@/api/knowledge/knowledge'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import useStore from '@/stores'

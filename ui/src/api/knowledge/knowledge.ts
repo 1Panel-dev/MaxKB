@@ -123,16 +123,19 @@ const postDataset: (
  * @param 参数
  * {
  "name": "string",
- "desc": "string",
- "source_url": "string",
- "selector": "string",
+  "folder_id": "string",
+  "desc": "string",
+  "embedding": "string",
+  "source_url": "string",
+  "selector": "string"
  }
  */
-const postWebDataset: (data: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
-  data,
-  loading,
-) => {
-  return post(`${prefix}/web`, data, undefined, loading)
+const postWebDataset: (
+  wordspace_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (wordspace_id, data, loading) => {
+  return post(`${prefix}/${wordspace_id}/knowledge/web`, data, undefined, loading)
 }
 /**
  * 创建Lark知识库
@@ -159,4 +162,5 @@ export default {
   putSyncWebKnowledge,
   getKnowledgeDetail,
   postDataset,
+  postWebDataset
 }

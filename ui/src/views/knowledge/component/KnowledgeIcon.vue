@@ -18,7 +18,7 @@
 <script setup lang="ts">
 const props = defineProps({
   type: {
-    type: String,
+    type: [String, Number],
     default: '',
   },
 })

@@ -36,10 +36,11 @@ const BaseFormRef = ref()
 
 const loading = ref(false)
 const dialogVisible = ref<boolean>(false)
-const currentFolder = ref<string>('')
+const currentFolder = ref<any>(null)
 
 watch(dialogVisible, (bool) => {
   if (!bool) {
+    currentFolder.value = null
   }
 })
 
@@ -51,7 +52,7 @@ const open = (folder: string) => {
 const submitHandle = async () => {
   if (await BaseFormRef.value?.validate()) {
     const obj = {
-      folder_id: currentFolder.value.id,
+      folder_id: currentFolder.value?.id,
       ...BaseFormRef.value.form,
     }
     KnowledgeApi.postDataset('default', obj, loading).then((res) => {
