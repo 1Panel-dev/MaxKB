@@ -60,9 +60,9 @@ class ToolView(APIView):
             tags=[_('Tool')]  # type: ignore
         )
         @has_permissions(PermissionConstants.TOOL_DEBUG.get_workspace_permission())
-        def post(self, request: Request, workspace_id: str, tool_id: str):
+        def post(self, request: Request, workspace_id: str):
             return result.success(ToolSerializer.Debug(
-                data={'tool_id': tool_id, 'workspace_id': workspace_id}
+                data={'workspace_id': workspace_id, 'user_id': request.user.id}
             ).debug(request.data))
 
     class Operate(APIView):
