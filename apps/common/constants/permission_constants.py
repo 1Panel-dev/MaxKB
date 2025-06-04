@@ -59,9 +59,9 @@ class SystemGroup(Enum):
     RESOURCE_MODEL = "RESOURCE_MODEL"
     RESOURCE_PERMISSION = "RESOURCE_PERMISSION"
     CHAT_USER = "CHAT_USER"
-    # SHARED_KNOWLEDGE = "SHARED_KNOWLEDGE"
-    # SHARED_MODEL = "SHARED_MODEL"
-    # SHARED_TOOL = "SHARED_TOOL"
+    SHARED_KNOWLEDGE = "SHARED_KNOWLEDGE"
+    SHARED_MODEL = "SHARED_MODEL"
+    SHARED_TOOL = "SHARED_TOOL"
     SYSTEM_SETTING = "SYSTEM_SETTING"
     OPERATION_LOG = "OPERATION_LOG"
     OTHER = "OTHER"
@@ -188,9 +188,9 @@ Permission_Label = {
     SystemGroup.RESOURCE_TOOL.value: _("Resource Tool"),
     SystemGroup.RESOURCE_MODEL.value: _("Resource Model"),
     SystemGroup.RESOURCE_PERMISSION.value: _("Resource Permission"),
-    # SystemGroup.SHARED_KNOWLEDGE.value: _("Shared Knowledge"),
-    # SystemGroup.SHARED_MODEL.value: _("Shared Model"),
-    # SystemGroup.SHARED_TOOL.value: _("Shared Tool"),
+    SystemGroup.SHARED_KNOWLEDGE.value: _("Shared Knowledge"),
+    SystemGroup.SHARED_MODEL.value: _("Shared Model"),
+    SystemGroup.SHARED_TOOL.value: _("Shared Tool"),
     SystemGroup.OPERATION_LOG.value: _("Operation Log"),
     SystemGroup.OTHER.value: _("Other"),
     WorkspaceGroup.SYSTEM_MANAGEMENT.value: _("System Management"),
@@ -667,6 +667,23 @@ class PermissionConstants(Enum):
                                                     role_list=[RoleConstants.ADMIN],
                                                     parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT]
                                                     )
+
+    SHARED_TOOL_READ = Permission(
+        group=Group.TOOL, operate=Operate.READ, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.SHARED_TOOL]
+    )
+    SHARED_TOOL_CREATE = Permission(
+        group=Group.TOOL, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.SHARED_TOOL]
+    )
+    SHARED_TOOL_EDIT = Permission(
+        group=Group.TOOL, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.SHARED_TOOL]
+    )
+    SHARED_TOOL_DELETE = Permission(
+        group=Group.TOOL, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.SHARED_TOOL]
+    )
 
     def get_workspace_application_permission(self):
         return lambda r, kwargs: Permission(group=self.value.group, operate=self.value.operate,
