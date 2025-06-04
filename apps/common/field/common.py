@@ -6,6 +6,8 @@
     @date：2024/1/11 18:44
     @desc:
 """
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
 
@@ -49,14 +51,13 @@ class FunctionField(serializers.Field):
     def to_representation(self, value):
         return value
 
-
+@extend_schema_field(OpenApiTypes.BINARY)
 class UploadedImageField(serializers.ImageField):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
     def to_representation(self, value):
         return value
-
 
 class UploadedFileField(serializers.FileField):
     def __init__(self, **kwargs):
