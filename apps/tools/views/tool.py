@@ -9,7 +9,7 @@ from common.auth.authentication import has_permissions
 from common.constants.permission_constants import PermissionConstants
 from common.result import result
 from tools.api.tool import ToolCreateAPI, ToolEditAPI, ToolReadAPI, ToolDeleteAPI, ToolTreeReadAPI, ToolDebugApi, \
-    ToolExportAPI, ToolImportAPI, ToolPageAPI, PylintAPI
+    ToolExportAPI, ToolImportAPI, ToolPageAPI, PylintAPI, EditIconAPI
 from tools.serializers.tool import ToolSerializer, ToolTreeSerializer
 
 
@@ -198,6 +198,16 @@ class ToolView(APIView):
         authentication_classes = [TokenAuth]
         parser_classes = [MultiPartParser]
 
+        @extend_schema(
+            methods=['PUT'],
+            summary=_('Edit tool icon'),
+            operation_id=_('Edit tool icon'),  # type: ignore
+            description=_('Edit tool icon'),
+            request=EditIconAPI.get_request(),
+            responses=EditIconAPI.get_response(),
+            parameters=EditIconAPI.get_parameters(),
+            tags=[_('Tool')]  # type: ignore
+        )
         @has_permissions(PermissionConstants.TOOL_EDIT.get_workspace_permission())
         def put(self, request: Request, id: str, workspace_id: str):
             return result.success(ToolSerializer.IconOperate(data={

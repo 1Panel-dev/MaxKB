@@ -236,3 +236,42 @@ class PylintAPI(APIMixin):
     @staticmethod
     def get_request():
         return PylintInstance
+
+
+class EditIconAPI(APIMixin):
+    @staticmethod
+    def get_parameters():
+        return [
+            OpenApiParameter(
+                name="workspace_id",
+                description="工作空间id",
+                type=OpenApiTypes.STR,
+                location='path',
+                required=True,
+            ),
+            OpenApiParameter(
+                name="tool_id",
+                description="工具id",
+                type=OpenApiTypes.STR,
+                location='path',
+                required=True,
+            ),
+        ]
+
+    @staticmethod
+    def get_request():
+        return {
+            'multipart/form-data': {
+                'type': 'object',
+                'properties': {
+                    'icon': {
+                        'type': 'string',
+                        'format': 'binary'  # Tells Swagger it's a file
+                    }
+                }
+            }
+        }
+
+    @staticmethod
+    def get_response():
+        return DefaultResultSerializer
