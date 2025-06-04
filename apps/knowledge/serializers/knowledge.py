@@ -236,15 +236,13 @@ class KnowledgeSerializer(serializers.Serializer):
         def list_application(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            knowledge = QuerySet(Knowledge).get(id=self.data.get("knowledge_id"))
+            # knowledge = QuerySet(Knowledge).get(id=self.data.get("knowledge_id"))
             return select_list(
                 get_file_content(
                     os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'list_knowledge_application.sql')
                 ),
                 [
-                    self.data.get('user_id') if self.data.get('user_id') == str(knowledge.user_id) else None,
-                    knowledge.user_id,
-                    self.data.get('user_id')
+                    self.data.get('user_id'),
                 ]
             )
 
@@ -252,15 +250,14 @@ class KnowledgeSerializer(serializers.Serializer):
             self.is_valid()
             query_set_dict = {
                 'default_sql': QuerySet(
-                    model=get_dynamics_model({'temp.id': models.UUIDField()})
+                    model=get_dynamics_model({'temp.id': models.CharField()})
                 ).filter(**{'temp.id': self.data.get("knowledge_id")}),
                 'knowledge_custom_sql': QuerySet(
                     model=get_dynamics_model({'knowledge.user_id': models.CharField()})
                 ).filter(**{'knowledge.user_id': self.data.get("user_id")}),
+                'folder_query_set': QuerySet(KnowledgeFolder)
             }
-            # todo 这里需要优化
-            # all_application_list = [str(adm.get('id')) for adm in self.list_application(with_valid=False)]
-            all_application_list = []
+            all_application_list = [str(adm.get('id')) for adm in self.list_application(with_valid=False)]
             return {
                 **native_search(query_set_dict, select_string=get_file_content(
                     os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'list_knowledge.sql')), with_search_one=True),
@@ -555,7 +552,7 @@ class KnowledgeSerializer(serializers.Serializer):
                                 {'name': document_name, 'paragraphs': paragraphs,
                                  'meta': {'source_url': child_link.url.strip(),
                                           'selector': knowledge.meta.get('selector')},
-                                 'type': Knowledge.WEB}, with_valid=True)
+                                 'type': KnowledgeType.WEB}, with_valid=True)
                     except Exception as e:
                         logging.getLogger("max_kb_error").error(f'{str(e)}:{traceback.format_exc()}')
 
