@@ -1,0 +1,41 @@
+# coding=utf-8
+"""
+    @project: MaxKB
+    @Author：虎虎
+    @file： system.py
+    @date：2025/6/4 16:01
+    @desc:
+"""
+import os
+
+from django.db import models
+from rest_framework import serializers
+from django.core.cache import cache
+
+from common.constants.cache_version import Cache_Version
+from maxkb import settings
+
+
+class SettingType(models.CharField):
+    # Community Edition
+    CE = "CE", "社区"
+    # Enterprise Edition
+    PE = "PE", "专业版"
+    # Professional Edition
+    EE = "EE", '企业版'
+
+
+class SystemProfileResponseSerializer(serializers.Serializer):
+    version = serializers.CharField(required=True, label="version")
+    edition = serializers.CharField(required=True, label="edition")
+    license_is_valid = serializers.BooleanField(required=True, label="License is valid")
+
+
+class SystemProfileSerializer(serializers.Serializer):
+    @staticmethod
+    def profile():
+        version = os.environ.get('MAXKB_VERSION')
+        license_is_valid = cache.get(Cache_Version.SYSTEM.get_key(key='license_is_valid'),
+                                     version=Cache_Version.SYSTEM.get_version())
+        return {'version': version, 'edition': settings.edition,
+                'license_is_valid': license_is_valid if license_is_valid is not None else False}

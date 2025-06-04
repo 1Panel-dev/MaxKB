@@ -20,8 +20,10 @@ class Cache_Version(Enum):
     ROLE_LIST = "ROLE:LIST", lambda user_id: user_id
     # 当前用户所有权限
     PERMISSION_LIST = "PERMISSION:LIST", lambda user_id: user_id
-
+    # 验证码
     CAPTCHA = "CAPTCHA", lambda captcha: captcha
+    # 系统
+    SYSTEM = "SYSTEM", lambda key: key
 
     def get_version(self):
         return self.value[0]
