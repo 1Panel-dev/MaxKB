@@ -47,7 +47,7 @@
             </el-button>
             <template #dropdown>
               <el-dropdown-menu class="create-dropdown">
-                <el-dropdown-item @click="openCreateDialog">
+                <el-dropdown-item @click="openCreateDialog('SIMPLE')">
                   <div class="flex">
                     <el-avatar shape="square" class="avatar-blue mt-4" :size="36">
                       <img
@@ -248,7 +248,7 @@ import useStore from '@/stores'
 import { numberFormat } from '@/utils/common'
 import { t } from '@/locales'
 import { useRouter } from 'vue-router'
-
+import { isWorkFlow } from '@/utils/application'
 const router = useRouter()
 const { folder } = useStore()
 
