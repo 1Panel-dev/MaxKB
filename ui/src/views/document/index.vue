@@ -481,7 +481,7 @@ import documentApi from '@/api/knowledge/document'
 import ImportDocumentDialog from './component/ImportDocumentDialog.vue'
 import SyncWebDialog from '@/views/knowledge/component/SyncWebDialog.vue'
 import SelectDatasetDialog from './component/SelectDatasetDialog.vue'
-// import { numberFormat } from '@/utils/utils'
+import { numberFormat } from '@/utils/common'
 // import { datetimeFormat } from '@/utils/time'
 // import { hitHandlingMethod } from '@/enums/document'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
@@ -489,13 +489,13 @@ import useStore from '@/stores'
 import StatusVlue from '@/views/document/component/Status.vue'
 // import GenerateRelatedDialog from '@/components/generate-related-dialog/index.vue'
 import EmbeddingContentDialog from '@/views/document/component/EmbeddingContentDialog.vue'
-// import { TaskType, State } from '@/utils/status'
+import { TaskType, State } from '@/utils/status'
 import { t } from '@/locales'
 
 const router = useRouter()
 const route = useRoute()
 const {
-  params: { id }, // id为datasetID
+  params: { id, folderId }, // id为datasetID
 } = route as any
 
 const { common, knowledge, document } = useStore()
@@ -872,6 +872,7 @@ function getList(bool?: boolean) {
     ...(filterText.value && { name: filterText.value }),
     ...filterMethod.value,
     order_by: orderBy.value,
+    folder_id: folderId,
   }
   documentApi
     .getDocument('default', id as string, paginationConfig.value, param, bool ? undefined : loading)
