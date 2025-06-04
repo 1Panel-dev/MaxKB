@@ -2,6 +2,7 @@ import { Result } from '@/request/Result'
 import { get, post, del, put } from '@/request/index'
 import { type Ref } from 'vue'
 import type { pageRequest } from '@/api/type/common'
+import type { knowledgeData } from '@/api/type/knowledge'
 const prefix = '/workspace'
 
 /**
@@ -99,10 +100,63 @@ const getKnowledgeDetail: (
   return get(`${prefix}/${wordspace_id}/knowledge/${knowledge_id}`, undefined, loading)
 }
 
+/**
+ * 创建知识库
+ * @param 参数
+ * {
+  "name": "string",
+  "folder_id": "string",
+  "desc": "string",
+  "embedding": "string"
+ }
+ */
+const postDataset: (
+  wordspace_id: string,
+  data: knowledgeData,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (wordspace_id, data, loading) => {
+  return post(`${prefix}/${wordspace_id}/knowledge/base`, data, undefined, loading, 1000 * 60 * 5)
+}
+
+/**
+ * 创建Web知识库
+ * @param 参数
+ * {
+ "name": "string",
+ "desc": "string",
+ "source_url": "string",
+ "selector": "string",
+ }
+ */
+const postWebDataset: (data: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  data,
+  loading,
+) => {
+  return post(`${prefix}/web`, data, undefined, loading)
+}
+/**
+ * 创建Lark知识库
+ * @param 参数
+ * {
+ "name": "string",
+ "desc": "string",
+ "app_id": "string",
+ "app_secret": "string",
+ "folder_token": "string",
+ }
+ */
+const postLarkDataset: (data: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  data,
+  loading,
+) => {
+  return post(`${prefix}/lark/save`, data, undefined, loading)
+}
+
 export default {
   getKnowledgeByFolder,
   getKnowledgeList,
   putReEmbeddingDataset,
   putSyncWebKnowledge,
   getKnowledgeDetail,
+  postDataset,
 }

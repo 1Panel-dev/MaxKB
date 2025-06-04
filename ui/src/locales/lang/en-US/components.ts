@@ -8,5 +8,8 @@ export default {
     title: 'Select Segments',
     error: 'Process only the failed segments',
     all: 'All Segments'
+  },
+  folder: {
+    addFolder:'Add Folder'
   }
 }

@@ -195,3 +195,16 @@
     background: var(--el-table-current-row-bg-color);
   }
 }
+
+// dialog
+.el-dialog {
+  --el-dialog-padding-primary: 24px;
+  --el-dialog-border-radius: 8px;
+}
+.el-dialog__headerbtn {
+  top: 8px;
+  right: 8px;
+  .el-dialog__close {
+    font-size: 20px;
+  }
+}

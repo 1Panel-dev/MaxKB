@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="$t('views.dataset.createDataset')"
+    :title="$t('views.knowledge.knowledgeType.createGeneralKnowledge')"
     v-model="dialogVisible"
     width="720"
     append-to-body
@@ -16,114 +16,7 @@
       label-position="top"
       require-asterisk-position="right"
     >
-      <el-form-item :label="$t('views.dataset.datasetForm.form.datasetType.label')" required>
-        <el-radio-group v-model="datasetForm.type" class="card__radio" @change="radioChange">
-          <el-row :gutter="20">
-            <el-col :span="12">
-              <el-card
-                shadow="never"
-                class="mb-16"
-                :class="datasetForm.type === '0' ? 'active' : ''"
-                @click="datasetForm.type = '0'"
-              >
-                <div class="flex-between">
-                  <div class="flex align-center">
-                    <AppAvatar class="mr-8 avatar-blue" shape="square" :size="32">
-                      <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
-                    </AppAvatar>
-                    <div>
-                      <p>
-                        <el-text>{{ $t('views.dataset.general') }}</el-text>
-                      </p>
-                      <el-text type="info">{{
-                        $t('views.dataset.datasetForm.form.datasetType.generalInfo')
-                      }}</el-text>
-                    </div>
-                  </div>
-                  <el-radio value="0" size="large" style="width: 16px"></el-radio>
-                </div>
-              </el-card>
-            </el-col>
-            <el-col :span="12">
-              <el-card
-                shadow="never"
-                class="mb-16"
-                :class="datasetForm.type === '1' ? 'active' : ''"
-                @click="datasetForm.type = '1'"
-              >
-                <div class="flex-between">
-                  <div class="flex align-center">
-                    <AppAvatar class="mr-8 avatar-purple" shape="square" :size="32">
-                      <img src="@/assets/knowledge/icon_web.svg" style="width: 58%" alt="" />
-                    </AppAvatar>
-                    <div>
-                      <p>
-                        <el-text>{{ $t('views.dataset.web') }}</el-text>
-                      </p>
-                      <el-text type="info">{{
-                        $t('views.dataset.datasetForm.form.datasetType.webInfo')
-                      }}</el-text>
-                    </div>
-                  </div>
-                  <el-radio value="1" size="large" style="width: 16px"></el-radio>
-                </div>
-              </el-card>
-            </el-col>
-          </el-row>
-          <el-row :gutter="20" v-hasPermission="new ComplexPermission([], ['x-pack'], 'OR')">
-            <el-col :span="12">
-              <el-card
-                shadow="never"
-                class="mb-16"
-                :class="datasetForm.type === '2' ? 'active' : ''"
-                @click="datasetForm.type = '2'"
-              >
-                <div class="flex-between">
-                  <div class="flex align-center">
-                    <AppAvatar shape="square" :size="32" style="background: none">
-                      <img src="@/assets/logo_lark.svg" style="width: 100%" alt="" />
-                    </AppAvatar>
-                    <div>
-                      <p>
-                        <el-text>{{ $t('views.dataset.lark') }}</el-text>
-                      </p>
-                      <el-text type="info">{{
-                        $t('views.dataset.datasetForm.form.datasetType.larkInfo')
-                      }}</el-text>
-                    </div>
-                  </div>
-                  <el-radio value="2" size="large" style="width: 16px"></el-radio>
-                </div>
-              </el-card>
-            </el-col>
-            <el-col :span="12">
-              <!--              <el-card-->
-              <!--                shadow="never"-->
-              <!--                class="mb-16"-->
-              <!--                :class="datasetForm.type === '3' ? 'active' : ''"-->
-              <!--                @click="datasetForm.type = '3'"-->
-              <!--              >-->
-              <!--                <div class="flex-between">-->
-              <!--                  <div class="flex align-center">-->
-              <!--                    <AppAvatar class="mr-8" :size="32">-->
-              <!--                      <img src="@/assets/knowledge/icon_web.svg" style="width: 100%" alt="" />-->
-              <!--                    </AppAvatar>-->
-              <!--                    <div>-->
-              <!--                      <p>-->
-              <!--                        <el-text>{{ $t('views.dataset.yuque') }}</el-text>-->
-              <!--                      </p>-->
-              <!--                      <el-text type="info">{{-->
-              <!--                        $t('views.dataset.datasetForm.form.datasetType.yuqueInfo')-->
-              <!--                      }}</el-text>-->
-              <!--                    </div>-->
-              <!--                  </div>-->
-              <!--                  <el-radio value="3" size="large" style="width: 16px"></el-radio>-->
-              <!--                </div>-->
-              <!--              </el-card>-->
-            </el-col>
-          </el-row>
-        </el-radio-group>
-      </el-form-item>
+
       <el-form-item
         :label="$t('views.dataset.datasetForm.form.source_url.label')"
         prop="source_url"
@@ -199,8 +92,8 @@
 <script setup lang="ts">
 import { ref, watch, reactive } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import BaseForm from './BaseForm.vue'
-import datasetApi from '@/api/dataset'
+import BaseForm from '@/views/knowledge/component/BaseForm.vue'
+import KnowledgeApi from '@/api/knowledge/knowledge'
 import { MsgSuccess, MsgAlert } from '@/utils/message'
 import { t } from '@/locales'
 import { ComplexPermission } from '@/utils/permission/type'

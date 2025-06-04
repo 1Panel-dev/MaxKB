@@ -1,9 +1,9 @@
 interface knowledgeData {
   name: String
+  folder_id?: String
   desc: String
+  embedding?: String
   documents?: Array<any>
-  type?: String
-  embedding_model_id?: String
 }
 
 export type { knowledgeData }

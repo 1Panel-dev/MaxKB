@@ -12,6 +12,8 @@ import CommonList from './common-list/index.vue'
 import BackButton from './back-button/index.vue'
 import AppTable from './app-table/index.vue'
 import CodemirrorEditor from './codemirror-editor/index.vue'
+import InfiniteScroll from './infinite-scroll/index.vue'
+import ModelSelect from './model-select/index.vue'
 export default {
   install(app: App) {
     app.component('LogoFull', LogoFull)
@@ -27,5 +29,7 @@ export default {
     app.component('BackButton', BackButton)
     app.component('AppTable', AppTable)
     app.component('CodemirrorEditor', CodemirrorEditor)
+    app.component('InfiniteScroll', InfiniteScroll)
+    app.component('ModelSelect', ModelSelect)
   },
 }

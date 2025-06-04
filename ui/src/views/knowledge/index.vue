@@ -41,112 +41,187 @@
               <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.username" />
             </el-select>
           </div>
-          <el-button class="ml-16" type="primary"> {{ $t('common.create') }}</el-button>
-        </div>
-      </template>
-      <div>
-        <el-row v-if="datasetList.length > 0" :gutter="15">
-          <template v-for="(item, index) in datasetList" :key="index">
-            <el-col
-              v-if="item.resource_type === 'folder'"
-              :xs="24"
-              :sm="12"
-              :md="12"
-              :lg="8"
-              :xl="6"
-              class="mb-16"
-            >
-              <CardBox
-                :title="item.name"
-                :description="item.desc || $t('common.noData')"
-                class="cursor"
-              >
-                <template #icon>
-                  <el-avatar shape="square" :size="32" style="background: none">
-                    <AppIcon iconName="app-folder" style="font-size: 32px"></AppIcon>
-                  </el-avatar>
-                </template>
-                <template #subTitle>
-                  <el-text class="color-secondary lighter" size="small">
-                    {{ $t('common.creator') }}: {{ item.username }}
-                  </el-text>
-                </template>
-              </CardBox>
-            </el-col>
-            <el-col v-else :xs="24" :sm="12" :md="12" :lg="8" :xl="6" class="mb-16">
-              <CardBox
-                :title="item.name"
-                :description="item.desc"
-                class="cursor"
-                @click="router.push({ path: `/knowledge/${item.id}/document` })"
-              >
-                <template #icon>
-                  <el-avatar
-                    v-if="item.type === '1'"
-                    class="avatar-purple"
-                    shape="square"
-                    :size="32"
-                  >
-                    <img src="@/assets/knowledge/icon_web.svg" style="width: 58%" alt="" />
-                  </el-avatar>
-                  <el-avatar
-                    v-else-if="item.type === '2'"
-                    class="avatar-purple"
-                    shape="square"
-                    :size="32"
-                    style="background: none"
-                  >
-                    <img src="@/assets/knowledge/logo_lark.svg" style="width: 100%" alt="" />
-                  </el-avatar>
-                  <el-avatar v-else class="avatar-blue" shape="square" :size="32">
-                    <img src="@/assets/knowledge/icon_document.svg" style="width: 58%" alt="" />
-                  </el-avatar>
-                </template>
-                <template #subTitle>
-                  <el-text class="color-secondary" size="small">
-                    <auto-tooltip :content="item.username">
-                      {{ $t('common.creator') }}: {{ item.username }}
-                    </auto-tooltip>
-                  </el-text>
-                </template>
-
-                <template #footer>
-                  <div class="footer-content flex-between">
-                    <div>
-                      <span class="bold mr-4">{{ item?.document_count || 0 }}</span>
-                      <span class="color-secondary">{{
-                        $t('views.knowledge.document_count')
-                      }}</span>
-                      <el-divider direction="vertical" />
-                      <span class="bold mr-4">{{ numberFormat(item?.char_length) || 0 }}</span>
-                      <span class="color-secondary">{{ $t('common.character') }}</span
-                      ><el-divider direction="vertical" />
-                      <span class="bold mr-4">{{ item?.application_mapping_count || 0 }}</span>
-                      <span class="color-secondary">{{
-                        $t('views.knowledge.relatedApp_count')
-                      }}</span>
+          <el-dropdown trigger="click">
+            <el-button type="primary" class="ml-8">
+              {{ $t('common.create') }}<el-icon class="el-icon--right"><arrow-down /></el-icon>
+            </el-button>
+            <template #dropdown>
+              <el-dropdown-menu class="create-dropdown">
+                <el-dropdown-item @click="openCreateDialog(CreateKnowledgeDialog)">
+                  <div class="flex">
+                    <el-avatar class="avatar-blue mt-4" shape="square" :size="32">
+                      <img src="@/assets/knowledge/icon_document.svg" style="width: 58%" alt="" />
+                    </el-avatar>
+                    <div class="pre-wrap ml-8">
+                      <div class="lighter">
+                        {{ $t('views.knowledge.knowledgeType.generalKnowledge') }}
+                      </div>
+                      <el-text type="info" size="small">{{
+                        $t('views.knowledge.knowledgeType.generalInfo')
+                      }}</el-text>
                     </div>
                   </div>
-                </template>
-                <template #mouseEnter>
-                  <div @click.stop>
-                    <el-dropdown trigger="click">
-                      <el-button text @click.stop>
-                        <el-icon><MoreFilled /></el-icon>
-                      </el-button>
-                      <template #dropdown>
-                        <el-dropdown-menu>
-                          <el-dropdown-item
-                            icon="Refresh"
-                            @click.stop="syncDataset(item)"
-                            v-if="item.type === 1"
-                            >{{ $t('views.knowledge.setting.sync') }}</el-dropdown-item
-                          >
-                          <el-dropdown-item @click.stop="reEmbeddingDataset(item)">
-                            <AppIcon iconName="app-vectorization"></AppIcon>
-                            {{ $t('views.knowledge.setting.vectorization') }}
-                          </el-dropdown-item>
-                          <!--
+                </el-dropdown-item>
+                <el-dropdown-item @click="openCreateDialog">
+                  <div class="flex">
+                    <el-avatar class="avatar-purple mt-4" shape="square" :size="32">
+                      <img src="@/assets/knowledge/icon_web.svg" style="width: 58%" alt="" />
+                    </el-avatar>
+                    <div class="pre-wrap ml-8">
+                      <div class="lighter">
+                        {{ $t('views.knowledge.knowledgeType.webKnowledge') }}
+                      </div>
+                      <el-text type="info" size="small">{{
+                        $t('views.knowledge.knowledgeType.webInfo')
+                      }}</el-text>
+                    </div>
+                  </div>
+                </el-dropdown-item>
+                <el-dropdown-item @click="openCreateDialog">
+                  <div class="flex">
+                    <el-avatar
+                      class="avatar-purple mt-4"
+                      shape="square"
+                      :size="32"
+                      style="background: none"
+                    >
+                      <img src="@/assets/knowledge/logo_lark.svg" alt="" />
+                    </el-avatar>
+                    <div class="pre-wrap ml-8">
+                      <div class="lighter">
+                        {{ $t('views.knowledge.knowledgeType.larkKnowledge') }}
+                      </div>
+                      <el-text type="info" size="small">{{
+                        $t('views.knowledge.knowledgeType.larkInfo')
+                      }}</el-text>
+                    </div>
+                  </div>
+                </el-dropdown-item>
+                <el-dropdown-item @click="openCreateDialog">
+                  <div class="flex">
+                    <el-avatar
+                      class="avatar-purple mt-4"
+                      shape="square"
+                      :size="32"
+                      style="background: none"
+                    >
+                      <img src="@/assets/knowledge/logo_yuque.svg" alt="" />
+                    </el-avatar>
+                    <div class="pre-wrap ml-8">
+                      <div class="lighter">
+                        {{ $t('views.knowledge.knowledgeType.yuqueKnowledge') }}
+                      </div>
+                      <el-text type="info" size="small">{{
+                        $t('views.knowledge.knowledgeType.yuqueInfo')
+                      }}</el-text>
+                    </div>
+                  </div>
+                </el-dropdown-item>
+                <el-dropdown-item @click="openCreateDialog" divided>
+                  <div class="flex align-center">
+                    <AppIcon iconName="app-folder" style="font-size: 32px"></AppIcon>
+                    <div class="pre-wrap ml-4">
+                      <div class="lighter">
+                        {{ $t('components.folder.addFolder') }}
+                      </div>
+                    </div>
+                  </div>
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+        </div>
+      </template>
+      <div v-loading.fullscreen.lock="paginationConfig.current_page === 1 && loading">
+        <InfiniteScroll
+          :size="knowledgeList.length"
+          :total="paginationConfig.total"
+          :page_size="paginationConfig.page_size"
+          v-model:current_page="paginationConfig.current_page"
+          @load="getList"
+          :loading="loading"
+        >
+          <el-row v-if="knowledgeList.length > 0" :gutter="15">
+            <template v-for="(item, index) in knowledgeList" :key="index">
+              <el-col
+                v-if="item.resource_type === 'folder'"
+                :xs="24"
+                :sm="12"
+                :md="12"
+                :lg="8"
+                :xl="6"
+                class="mb-16"
+              >
+                <CardBox
+                  :title="item.name"
+                  :description="item.desc || $t('common.noData')"
+                  class="cursor"
+                >
+                  <template #icon>
+                    <el-avatar shape="square" :size="32" style="background: none">
+                      <AppIcon iconName="app-folder" style="font-size: 32px"></AppIcon>
+                    </el-avatar>
+                  </template>
+                  <template #subTitle>
+                    <el-text class="color-secondary lighter" size="small">
+                      {{ $t('common.creator') }}: {{ item.username }}
+                    </el-text>
+                  </template>
+                </CardBox>
+              </el-col>
+              <el-col v-else :xs="24" :sm="12" :md="12" :lg="8" :xl="6" class="mb-16">
+                <CardBox
+                  :title="item.name"
+                  :description="item.desc"
+                  class="cursor"
+                  @click="router.push({ path: `/knowledge/${item.id}/document` })"
+                >
+                  <template #icon>
+                    <KnowledgeIcon :type="item.type" />
+                  </template>
+                  <template #subTitle>
+                    <el-text class="color-secondary" size="small">
+                      {{ $t('common.creator') }}: {{ item.username }}
+                    </el-text>
+                  </template>
+
+                  <template #footer>
+                    <div class="footer-content flex-between">
+                      <div>
+                        <span class="bold mr-4">{{ item?.document_count || 0 }}</span>
+                        <span class="color-secondary">{{
+                          $t('views.knowledge.document_count')
+                        }}</span>
+                        <el-divider direction="vertical" />
+                        <span class="bold mr-4">{{ numberFormat(item?.char_length) || 0 }}</span>
+                        <span class="color-secondary">{{ $t('common.character') }}</span
+                        ><el-divider direction="vertical" />
+                        <span class="bold mr-4">{{ item?.application_mapping_count || 0 }}</span>
+                        <span class="color-secondary">{{
+                          $t('views.knowledge.relatedApp_count')
+                        }}</span>
+                      </div>
+                    </div>
+                  </template>
+                  <template #mouseEnter>
+                    <div @click.stop>
+                      <el-dropdown trigger="click">
+                        <el-button text @click.stop>
+                          <el-icon><MoreFilled /></el-icon>
+                        </el-button>
+                        <template #dropdown>
+                          <el-dropdown-menu>
+                            <el-dropdown-item
+                              icon="Refresh"
+                              @click.stop="syncDataset(item)"
+                              v-if="item.type === 1"
+                              >{{ $t('views.knowledge.setting.sync') }}</el-dropdown-item
+                            >
+                            <el-dropdown-item @click.stop="reEmbeddingDataset(item)">
+                              <AppIcon iconName="app-vectorization"></AppIcon>
+                              {{ $t('views.knowledge.setting.vectorization') }}
+                            </el-dropdown-item>
+                            <!--
 
                           <el-dropdown-item
                             icon="Connection"
@@ -170,23 +245,28 @@
                           <el-dropdown-item icon="Delete" @click.stop="deleteDataset(item)">{{
                             $t('common.delete')
                           }}</el-dropdown-item> -->
-                        </el-dropdown-menu>
-                      </template>
-                    </el-dropdown>
-                  </div>
-                </template>
-              </CardBox>
-            </el-col>
-          </template>
-        </el-row>
-        <el-empty :description="$t('common.noData')" v-else />
+                          </el-dropdown-menu>
+                        </template>
+                      </el-dropdown>
+                    </div>
+                  </template>
+                </CardBox>
+              </el-col>
+            </template>
+          </el-row>
+          <el-empty :description="$t('common.noData')" v-else />
+        </InfiniteScroll>
       </div>
     </ContentContainer>
+
+    <component :is="currentCreateDialog" ref="CreateKnowledgeDialogRef" />
   </LayoutContainer>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, reactive, computed } from 'vue'
+import { onMounted, ref, reactive, shallowRef, nextTick } from 'vue'
+import KnowledgeIcon from '@/views/knowledge/component/KnowledgeIcon.vue'
+import CreateKnowledgeDialog from './create-component/CreateKnowledgeDialog.vue'
 import KnowledgeApi from '@/api/knowledge/knowledge'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import useStore from '@/stores'
@@ -217,9 +297,33 @@ const paginationConfig = reactive({
 })
 
 const folderList = ref<any[]>([])
-const datasetList = ref<any[]>([])
-const datasetFolderList = ref<any[]>([])
+const knowledgeList = ref<any[]>([])
 const currentFolder = ref<any>({})
+
+const CreateKnowledgeDialogRef = ref()
+const currentCreateDialog = shallowRef<any>(null)
+
+function openCreateDialog(data: any) {
+  currentCreateDialog.value = data
+  nextTick(() => {
+    CreateKnowledgeDialogRef.value.open(currentFolder.value)
+  })
+
+  // common.asyncGetValid(ValidType.Dataset, ValidCount.Dataset, loading).then(async (res: any) => {
+  //   if (res?.data) {
+  //     CreateDatasetDialogRef.value.open()
+  //   } else if (res?.code === 400) {
+  //     MsgConfirm(t('common.tip'), t('views.dataset.tip.professionalMessage'), {
+  //       cancelButtonText: t('common.confirm'),
+  //       confirmButtonText: t('common.professional'),
+  //     })
+  //       .then(() => {
+  //         window.open('https://maxkb.cn/pricing.html', '_blank')
+  //       })
+  //       .catch(() => {})
+  //   }
+  // })
+}
 
 function reEmbeddingDataset(row: any) {
   KnowledgeApi.putReEmbeddingDataset('default', row.id).then(() => {
@@ -242,7 +346,7 @@ function getList() {
   }
   KnowledgeApi.getKnowledgeList('default', paginationConfig, params, loading).then((res) => {
     paginationConfig.total = res.data.total
-    datasetList.value = [...datasetList.value, ...res.data.records]
+    knowledgeList.value = [...knowledgeList.value, ...res.data.records]
   })
 }
 
@@ -257,7 +361,7 @@ function getFolder() {
 
 function folderClickHandel(row: any) {
   currentFolder.value = row
-  datasetList.value = []
+  knowledgeList.value = []
   getList()
 }
 

@@ -7,23 +7,20 @@
     require-asterisk-position="right"
     v-loading="loading"
   >
-    <el-form-item :label="$t('views.dataset.datasetForm.form.datasetName.label')" prop="name">
+    <el-form-item :label="$t('views.knowledge.form.knowledgeName.label')" prop="name">
       <el-input
         v-model="form.name"
-        :placeholder="$t('views.dataset.datasetForm.form.datasetName.placeholder')"
+        :placeholder="$t('views.knowledge.form.knowledgeName.placeholder')"
         maxlength="64"
         show-word-limit
         @blur="form.name = form.name.trim()"
       />
     </el-form-item>
-    <el-form-item
-      :label="$t('views.dataset.datasetForm.form.datasetDescription.label')"
-      prop="desc"
-    >
+    <el-form-item :label="$t('views.knowledge.form.knowledgeDescription.label')" prop="desc">
       <el-input
         v-model="form.desc"
         type="textarea"
-        :placeholder="$t('views.dataset.datasetForm.form.datasetDescription.placeholder')"
+        :placeholder="$t('views.knowledge.form.knowledgeDescription.placeholder')"
         maxlength="256"
         show-word-limit
         :autosize="{ minRows: 3 }"
@@ -31,12 +28,12 @@
       />
     </el-form-item>
     <el-form-item
-      :label="$t('views.dataset.datasetForm.form.EmbeddingModel.label')"
+      :label="$t('views.knowledge.form.EmbeddingModel.label')"
       prop="embedding_model_id"
     >
       <ModelSelect
-        v-model="form.embedding_model_id"
-        :placeholder="$t('views.dataset.datasetForm.form.EmbeddingModel.placeholder')"
+        v-model="form.embedding"
+        :placeholder="$t('views.knowledge.form.EmbeddingModel.placeholder')"
         :options="modelOptions"
         :model-type="'EMBEDDING'"
         showFooter
@@ -48,43 +45,43 @@
 import { ref, reactive, onMounted, onUnmounted, computed, watch } from 'vue'
 import { groupBy } from 'lodash'
 import useStore from '@/stores'
-import type { datasetData } from '@/api/type/knowledge'
+import type { knowledgeData } from '@/api/type/knowledge'
 import { t } from '@/locales'
 const props = defineProps({
   data: {
     type: Object,
-    default: () => {}
-  }
+    default: () => {},
+  },
 })
 const { model } = useStore()
-const form = ref<datasetData>({
+const form = ref<knowledgeData>({
   name: '',
   desc: '',
-  embedding_model_id: ''
+  embedding: '',
 })
 
 const rules = reactive({
   name: [
     {
       required: true,
-      message: t('views.dataset.datasetForm.form.datasetName.requiredMessage'),
-      trigger: 'blur'
-    }
+      message: t('views.knowledge.form.knowledgeName.requiredMessage'),
+      trigger: 'blur',
+    },
   ],
   desc: [
     {
       required: true,
-      message: t('views.dataset.datasetForm.form.datasetDescription.requiredMessage'),
-      trigger: 'blur'
-    }
+      message: t('views.knowledge.form.knowledgeDescription.requiredMessage'),
+      trigger: 'blur',
+    },
   ],
-  embedding_model_id: [
+  embedding: [
     {
       required: true,
-      message: t('views.dataset.datasetForm.form.EmbeddingModel.requiredMessage'),
-      trigger: 'change'
-    }
-  ]
+      message: t('views.knowledge.form.EmbeddingModel.requiredMessage'),
+      trigger: 'change',
+    },
+  ],
 })
 
 const FormRef = ref()
@@ -97,12 +94,12 @@ watch(
     if (value && JSON.stringify(value) !== '{}') {
       form.value.name = value.name
       form.value.desc = value.desc
-      form.value.embedding_model_id = value.embedding_model_id
+      form.value.embedding = value.embedding
     }
   },
   {
-    immediate: true
-  }
+    immediate: true,
+  },
 )
 /*
   表单校验
@@ -117,7 +114,7 @@ function validate() {
 function getModel() {
   loading.value = true
   model
-    .asyncGetModel({ model_type: 'EMBEDDING' })
+    .asyncGetModel('default', { model_type: 'EMBEDDING' })
     .then((res: any) => {
       modelOptions.value = groupBy(res?.data, 'provider')
       loading.value = false
@@ -134,14 +131,14 @@ onUnmounted(() => {
   form.value = {
     name: '',
     desc: '',
-    embedding_model_id: ''
+    embedding: '',
   }
   FormRef.value?.clearValidate()
 })
 
 defineExpose({
   validate,
-  form
+  form,
 })
 </script>
 <style scoped lang="scss"></style>

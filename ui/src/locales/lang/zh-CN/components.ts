@@ -8,5 +8,8 @@ export default {
     title: '选择分段',
     error: '仅执行未成功分段',
     all: '全部分段'
+  },
+  folder: {
+    addFolder:'添加文件夹'
   }
 }

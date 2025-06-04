@@ -1,3 +1,11 @@
+/*
+  从指定数组中过滤出对应的对象
+*/
+export function relatedObject(list: any, val: any, attr: string) {
+  const filterData: any = list.filter((item: any) => item[attr] === val)?.[0]
+  return filterData || null
+}
+
 // 排序
 export function arraySort(list: Array<any>, property: any, desc?: boolean) {
   return list.sort((a: any, b: any) => {

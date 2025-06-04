@@ -1,7 +1,7 @@
 import notFound from './404'
 import application from './application'
 import applicationOverview from './application-overview'
-import dataset from './dataset'
+import knowledge from './knowledge'
 import system from './system'
 import tool from './tool'
 import userManage from './user-manage'
@@ -25,7 +25,7 @@ export default {
   resourceAuthorization,
   team,
   model,
-  dataset,
+  knowledge,
   applicationWorkflow,
   document,
   paragraph,

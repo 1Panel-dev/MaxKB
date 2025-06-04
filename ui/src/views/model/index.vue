@@ -116,7 +116,6 @@
 
 <script lang="ts" setup>
 import { onMounted, ref, computed } from 'vue'
-import ModelApi from '@/api/model/model'
 import ProviderApi from '@/api/model/provider'
 import type { Provider, Model } from '@/api/type/model'
 import ModelCard from '@/views/model/component/ModelCard.vue'
@@ -125,7 +124,10 @@ import { splitArray } from '@/utils/common'
 import { modelTypeList, allObj } from '@/views/model/component/data'
 import CreateModelDialog from '@/views/model/component/CreateModelDialog.vue'
 import SelectProviderDialog from '@/views/model/component/SelectProviderDialog.vue'
+import useStore from '@/stores'
 import { t } from '@/locales'
+
+const { model } = useStore()
 
 const commonList1 = ref()
 const commonList2 = ref()
@@ -182,15 +184,15 @@ const openCreateModel = (provider?: Provider, model_type?: string) => {
 
 const list_model = () => {
   const params = active_provider.value?.provider ? { provider: active_provider.value.provider } : {}
-  ModelApi.getModel('default', { ...model_search_form.value, ...params }, list_model_loading).then(
-    (ok) => {
+  model
+    .asyncGetModel('default', { ...model_search_form.value, ...params }, list_model_loading)
+    .then((ok: any) => {
       model_list.value = ok.data
       const v = model_list.value.map((m) => ({ id: m.user_id, username: m.username }))
       if (user_options.value.length === 0) {
         user_options.value = Array.from(new Map(v.map((item) => [item.id, item])).values())
       }
-    },
-  )
+    })
 }
 
 const search_type_change = () => {
