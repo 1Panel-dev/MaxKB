@@ -61,7 +61,6 @@ class Config(dict):
             }
         }
 
-    @staticmethod
     def get_cache_setting(self):
         return {
             'default': {
