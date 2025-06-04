@@ -40,7 +40,6 @@ class VoteChoices(models.TextChoices):
     TRAMPLE = "1", '反对'
 
 
-
 class ChatRecord(AppModelMixin):
     """
     对话日志 详情

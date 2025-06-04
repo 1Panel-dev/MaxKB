@@ -99,6 +99,7 @@ class Application(APIView):
             summary=_('Export application'),
             operation_id=_('Export application'),  # type: ignore
             parameters=ApplicationExportAPI.get_parameters(),
+            request=None,
             responses=ApplicationExportAPI.get_response(),
             tags=[_('Application')]  # type: ignore
         )
