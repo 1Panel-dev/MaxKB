@@ -759,7 +759,7 @@ def get_permission_list_by_resource_group(resource_group: ResourcePermissionGrou
     """
     根据资源组获取权限
     """
-    return [PermissionConstants[k] for k in PermissionConstants.__members__ if
+    return [PermissionConstants[k].value for k in PermissionConstants.__members__ if
             PermissionConstants[k].value.resource_permission_group_list.__contains__(resource_group)]
 
 

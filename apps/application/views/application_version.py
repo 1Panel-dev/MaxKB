@@ -11,6 +11,8 @@ from drf_spectacular.utils import extend_schema
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
+from application.api.application_version import ApplicationVersionListAPI, ApplicationVersionPageAPI, \
+    ApplicationVersionAPI, ApplicationVersionOperateAPI
 from application.serializers.application_version import ApplicationVersionSerializer
 from common import result
 from common.auth import TokenAuth
@@ -22,42 +24,39 @@ class ApplicationVersionView(APIView):
     authentication_classes = [TokenAuth]
 
     @extend_schema(
-        methods=['POST'],
-        description=_("Get the application list"),
-        summary=_("Get the application list"),
-        operation_id=_("Get the application list"),  # type: ignore
-        # parameters=ApplicationCreateAPI.get_parameters(),
-        # request=ApplicationCreateAPI.get_request(),
-        # responses=ApplicationCreateAPI.get_response(),
+        methods=['GET'],
+        description=_("Get the application version list"),
+        summary=_("Get the application version list"),
+        operation_id=_("Get the application version list"),  # type: ignore
+        parameters=ApplicationVersionListAPI.get_parameters(),
+        responses=ApplicationVersionListAPI.get_response(),
         tags=[_('Application/Version')]  # type: ignore
     )
-    @has_permissions(PermissionConstants.APPLICATION_READ)
+    @has_permissions(PermissionConstants.APPLICATION_READ.get_workspace_application_permission())
     def get(self, request: Request, workspace_id, application_id: str):
         return result.success(
             ApplicationVersionSerializer.Query(
-                data={'name': request.query_params.get('name'), 'user_id': request.user.id,
-                      'application_id': application_id}).list(request.data))
+                data={'workspace_id': workspace_id}).list(
+                {'name': request.query_params.get("name"), 'application_id': application_id}))
 
     class Page(APIView):
         authentication_classes = [TokenAuth]
 
         @extend_schema(
-            methods=['GET'
-                     ''],
+            methods=['GET'],
             description=_("Get the list of application versions by page"),
             summary=_("Get the list of application versions by page"),
             operation_id=_("Get the list of application versions by page"),  # type: ignore
-            # parameters=ApplicationCreateAPI.get_parameters(),
-            # request=ApplicationCreateAPI.get_request(),
-            # responses=ApplicationCreateAPI.get_response(),
+            parameters=ApplicationVersionPageAPI.get_parameters(),
+            responses=ApplicationVersionPageAPI.get_response(),
             tags=[_('Application/Version')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.APPLICATION_READ)
-        def get(self, request: Request, application_id: str, current_page: int, page_size: int):
+        @has_permissions(PermissionConstants.APPLICATION_READ.get_workspace_application_permission())
+        def get(self, request: Request, workspace_id: str, application_id: str, current_page: int, page_size: int):
             return result.success(
                 ApplicationVersionSerializer.Query(
-                    data={'name': request.query_params.get('name'), 'user_id': request.user,
-                          'application_id': application_id}).page(
+                    data={'workspace_id': workspace_id}).page(
+                    {'name': request.query_params.get("name"), 'application_id': application_id},
                     current_page, page_size))
 
     class Operate(APIView):
@@ -68,13 +67,12 @@ class ApplicationVersionView(APIView):
             description=_("Get application version details"),
             summary=_("Get application version details"),
             operation_id=_("Get application version details"),  # type: ignore
-            # parameters=ApplicationCreateAPI.get_parameters(),
-            # request=ApplicationCreateAPI.get_request(),
-            # responses=ApplicationCreateAPI.get_response(),
+            parameters=ApplicationVersionOperateAPI.get_parameters(),
+            responses=ApplicationVersionOperateAPI.get_response(),
             tags=[_('Application/Version')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.APPLICATION_READ)
-        def get(self, request: Request, application_id: str, work_flow_version_id: str):
+        @has_permissions(PermissionConstants.APPLICATION_EDIT.get_workspace_application_permission())
+        def get(self, request: Request, workspace_id: str, application_id: str, work_flow_version_id: str):
             return result.success(
                 ApplicationVersionSerializer.Operate(
                     data={'user_id': request.user,
@@ -85,12 +83,12 @@ class ApplicationVersionView(APIView):
             description=_("Modify application version information"),
             summary=_("Modify application version information"),
             operation_id=_("Modify application version information"),  # type: ignore
-            # parameters=ApplicationCreateAPI.get_parameters(),
-            # request=ApplicationCreateAPI.get_request(),
-            # responses=ApplicationCreateAPI.get_response(),
+            parameters=ApplicationVersionOperateAPI.get_parameters(),
+            request=None,
+            responses=ApplicationVersionOperateAPI.get_response(),
             tags=[_('Application/Version')]  # type: ignore
         )
-        def put(self, request: Request, application_id: str, work_flow_version_id: str):
+        def put(self, request: Request, workspace_id: str, application_id: str, work_flow_version_id: str):
             return result.success(
                 ApplicationVersionSerializer.Operate(
                     data={'application_id': application_id, 'work_flow_version_id': work_flow_version_id,
