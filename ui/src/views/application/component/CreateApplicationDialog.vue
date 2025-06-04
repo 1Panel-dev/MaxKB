@@ -121,11 +121,11 @@ const dialogVisible = ref<boolean>(false)
 const applicationForm = ref<ApplicationFormType>({
   name: '',
   desc: '',
-  model_id: '',
+  model_id: undefined,
   dialogue_number: 1,
   prologue: t('views.application.form.defaultPrologue'),
-  dataset_id_list: [],
-  dataset_setting: {
+  knowledge_id_list: [],
+  knowledge_setting: {
     top_n: 3,
     similarity: 0.6,
     max_paragraph_char_number: 5000,
@@ -143,8 +143,8 @@ const applicationForm = ref<ApplicationFormType>({
   model_params_setting: {},
   problem_optimization: false,
   problem_optimization_prompt: optimizationPrompt,
-  stt_model_id: '',
-  tts_model_id: '',
+  stt_model_id: undefined,
+  tts_model_id: undefined,
   stt_model_enable: false,
   tts_model_enable: false,
   tts_type: 'BROWSER',
@@ -175,11 +175,11 @@ watch(dialogVisible, (bool) => {
     applicationForm.value = {
       name: '',
       desc: '',
-      model_id: '',
+      model_id: undefined,
       dialogue_number: 1,
       prologue: t('views.application.form.defaultPrologue'),
-      dataset_id_list: [],
-      dataset_setting: {
+      knowledge_id_list: [],
+      knowledge_setting: {
         top_n: 3,
         similarity: 0.6,
         max_paragraph_char_number: 5000,
@@ -197,8 +197,8 @@ watch(dialogVisible, (bool) => {
       model_params_setting: {},
       problem_optimization: false,
       problem_optimization_prompt: optimizationPrompt,
-      stt_model_id: '',
-      tts_model_id: '',
+      stt_model_id: undefined,
+      tts_model_id: undefined,
       stt_model_enable: false,
       tts_model_enable: false,
       tts_type: 'BROWSER',
@@ -208,7 +208,7 @@ watch(dialogVisible, (bool) => {
   }
 })
 
-const open = (folder: string, type?: sting) => {
+const open = (folder: string, type?: string) => {
   currentFolder.value = folder
   applicationForm.value.type = type || 'SIMPLE'
   dialogVisible.value = true
@@ -216,24 +216,31 @@ const open = (folder: string, type?: sting) => {
 
 const submitHandle = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
+  console.log(applicationForm.value.type)
   await formEl.validate((valid) => {
     if (valid) {
-      applicationForm.value['folder_id'] = currentFolder.value
       if (isWorkFlow(applicationForm.value.type) && appTemplate.value === 'blank') {
         workflowDefault.value.nodes[0].properties.node_data.desc = applicationForm.value.desc
         workflowDefault.value.nodes[0].properties.node_data.name = applicationForm.value.name
         applicationForm.value['work_flow'] = workflowDefault.value
       }
-      applicationApi.postApplication('default', applicationForm.value, loading).then((res) => {
-        MsgSuccess(t('common.createSuccess'))
-        emit('refresh')
-        if (isWorkFlow(applicationForm.value.type)) {
-          router.push({ path: `/application/${res.data.id}/workflow` })
-        } else {
-          router.push({ path: `/application/${res.data.id}/${res.data.type}/setting` })
-        }
-        dialogVisible.value = false
-      })
+      console.log(applicationForm.value.type)
+      applicationApi
+        .postApplication(
+          'default',
+          { ...applicationForm.value, folder_id: currentFolder.value },
+          loading,
+        )
+        .then((res) => {
+          MsgSuccess(t('common.createSuccess'))
+          emit('refresh')
+          if (isWorkFlow(applicationForm.value.type)) {
+            router.push({ path: `/application/${res.data.id}/workflow` })
+          } else {
+            router.push({ path: `/application/${res.data.id}/${res.data.type}/setting` })
+          }
+          dialogVisible.value = false
+        })
     }
   })
 }

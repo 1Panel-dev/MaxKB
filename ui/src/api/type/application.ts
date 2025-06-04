@@ -7,8 +7,8 @@ interface ApplicationFormType {
   model_id?: string
   dialogue_number?: number
   prologue?: string
-  dataset_id_list?: string[]
-  dataset_setting?: any
+  knowledge_id_list?: string[]
+  knowledge_setting?: any
   model_setting?: any
   problem_optimization?: boolean
   problem_optimization_prompt?: string
@@ -24,6 +24,7 @@ interface ApplicationFormType {
   tts_type?: string
   tts_autoplay?: boolean
   stt_autosend?: boolean
+  folder_id?: string
 }
 interface Chunk {
   real_node_id: string
@@ -118,7 +119,7 @@ export class ChatRecordManage {
     chat_record_id?: string,
     runtime_node_id?: string,
     child_node?: any,
-    real_node_id?: string
+    real_node_id?: string,
   ) {
     if (chunk_answer || reasoning_content) {
       const set_index = index != undefined ? index : this.chat.answer_text_list.length - 1
@@ -142,7 +143,7 @@ export class ChatRecordManage {
           chat_record_id,
           runtime_node_id,
           child_node,
-          real_node_id
+          real_node_id,
         })
       }
     }
@@ -167,7 +168,7 @@ export class ChatRecordManage {
       return this.write_node_info
     }
     const run_node = this.node_list.filter(
-      (item) => item.reasoning_content_buffer.length > 0 || item.buffer.length > 0 || !item.is_end
+      (item) => item.reasoning_content_buffer.length > 0 || item.buffer.length > 0 || !item.is_end,
     )[0]
 
     if (run_node) {
@@ -185,7 +186,7 @@ export class ChatRecordManage {
         const none_index = this.findIndex(
           this.chat.answer_text_list,
           (item) => (item.length == 1 && item[0].content == '') || item.length == 0,
-          'index'
+          'index',
         )
         if (none_index > -1) {
           answer_text_list_index = none_index
@@ -196,7 +197,7 @@ export class ChatRecordManage {
         const none_index = this.findIndex(
           this.chat.answer_text_list,
           (item) => (item.length == 1 && item[0].content == '') || item.length == 0,
-          'index'
+          'index',
         )
         if (none_index > -1) {
           answer_text_list_index = none_index
@@ -208,7 +209,7 @@ export class ChatRecordManage {
       this.write_node_info = {
         current_node: run_node,
         current_up_node: current_up_node,
-        answer_text_list_index: answer_text_list_index
+        answer_text_list_index: answer_text_list_index,
       }
 
       return this.write_node_info
@@ -241,7 +242,7 @@ export class ChatRecordManage {
     const last_index = this.findIndex(
       this.chat.answer_text_list,
       (item) => (item.length == 1 && item[0].content == '') || item.length == 0,
-      'last'
+      'last',
     )
     if (last_index > 0) {
       this.chat.answer_text_list.splice(last_index, 1)
@@ -274,13 +275,13 @@ export class ChatRecordManage {
           ? current_node.buffer.splice(0)
           : current_node.buffer.splice(
               0,
-              current_node.is_end ? undefined : current_node.buffer.length - 20
+              current_node.is_end ? undefined : current_node.buffer.length - 20,
             )
         const reasoning_content = current_node.is_end
           ? current_node.reasoning_content_buffer.splice(0)
           : current_node.reasoning_content_buffer.splice(
               0,
-              current_node.is_end ? undefined : current_node.reasoning_content_buffer.length - 20
+              current_node.is_end ? undefined : current_node.reasoning_content_buffer.length - 20,
             )
         this.append_answer(
           context.join(''),
@@ -289,7 +290,7 @@ export class ChatRecordManage {
           current_node.chat_record_id,
           current_node.runtime_node_id,
           current_node.child_node,
-          current_node.real_node_id
+          current_node.real_node_id,
         )
       } else if (this.is_close) {
         while (true) {
@@ -305,7 +306,7 @@ export class ChatRecordManage {
             node_info.current_node.chat_record_id,
             node_info.current_node.runtime_node_id,
             node_info.current_node.child_node,
-            node_info.current_node.real_node_id
+            node_info.current_node.real_node_id,
           )
 
           if (
@@ -327,7 +328,7 @@ export class ChatRecordManage {
             current_node.chat_record_id,
             current_node.runtime_node_id,
             current_node.child_node,
-            current_node.real_node_id
+            current_node.real_node_id,
           )
         }
         if (reasoning_content !== undefined) {
@@ -338,7 +339,7 @@ export class ChatRecordManage {
             current_node.chat_record_id,
             current_node.runtime_node_id,
             current_node.child_node,
-            current_node.real_node_id
+            current_node.real_node_id,
           )
         }
       }
@@ -383,7 +384,7 @@ export class ChatRecordManage {
         node_type: chunk.node_type,
         index: this.node_list.length,
         view_type: chunk.view_type,
-        is_end: false
+        is_end: false,
       }
       this.node_list.push(n)
     }
@@ -395,7 +396,7 @@ export class ChatRecordManage {
     let set_index = this.findIndex(
       this.chat.answer_text_list,
       (item) => item.length == 1 && item[0].content == '',
-      'index'
+      'index',
     )
     if (set_index <= -1) {
       set_index = 0
@@ -403,8 +404,8 @@ export class ChatRecordManage {
     this.chat.answer_text_list[set_index] = [
       {
         content: answer_text_block,
-        reasoning_content: reasoning_content ? reasoning_content : ''
-      }
+        reasoning_content: reasoning_content ? reasoning_content : '',
+      },
     ]
   }
 }
