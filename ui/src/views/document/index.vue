@@ -1,477 +1,503 @@
 <template>
-  <div class="main-calc-height">
-    <div class="p-24">
-      <div class="flex-between">
-        <div>
-          <el-button
-            v-if="datasetDetail.type === '0'"
-            type="primary"
-            @click="router.push({ path: '/dataset/upload', query: { id: id } })"
-            >{{ $t('views.document.uploadDocument') }}
-          </el-button>
-          <el-button v-if="datasetDetail.type === '1'" type="primary" @click="importDoc"
-            >{{ $t('views.document.importDocument') }}
-          </el-button>
-          <el-button
-            @click="syncMulDocument"
-            :disabled="multipleSelection.length === 0"
-            v-if="datasetDetail.type === '1'"
-            >{{ $t('views.document.syncDocument') }}
-          </el-button>
-          <el-button
-            v-if="datasetDetail.type === '2'"
-            type="primary"
-            @click="
-              router.push({
-                path: '/dataset/import',
-                query: { id: id, folder_token: datasetDetail.meta.folder_token },
-              })
-            "
-            >{{ $t('views.document.importDocument') }}
-          </el-button>
-          <el-button
-            @click="syncLarkMulDocument"
-            :disabled="multipleSelection.length === 0"
-            v-if="datasetDetail.type === '2'"
-            >{{ $t('views.document.syncDocument') }}
-          </el-button>
-          <el-button @click="openDatasetDialog()" :disabled="multipleSelection.length === 0">
-            {{ $t('views.document.setting.migration') }}
-          </el-button>
-          <el-button @click="batchRefresh" :disabled="multipleSelection.length === 0">
-            {{ $t('views.knowledge.setting.vectorization') }}
-          </el-button>
-          <el-button @click="openGenerateDialog()" :disabled="multipleSelection.length === 0">
-            {{ $t('views.document.generateQuestion.title') }}
-          </el-button>
-          <el-button @click="openBatchEditDocument" :disabled="multipleSelection.length === 0">
-            {{ $t('common.setting') }}
-          </el-button>
-          <el-button @click="deleteMulDocument" :disabled="multipleSelection.length === 0">
-            {{ $t('common.delete') }}
-          </el-button>
+  <div class="document p-16-24">
+    <h2 class="mb-16">{{ $t('common.fileUpload.document') }}</h2>
+    <el-card style="--el-card-padding: 0">
+      <div class="main-calc-height">
+        <div class="p-24">
+          <div class="flex-between">
+            <div>
+              <el-button
+                v-if="datasetDetail.type === 0"
+                type="primary"
+                @click="router.push({ path: '/dataset/upload', query: { id: id } })"
+                >{{ $t('views.document.uploadDocument') }}
+              </el-button>
+              <el-button v-if="datasetDetail.type === 1" type="primary" @click="importDoc"
+                >{{ $t('views.document.importDocument') }}
+              </el-button>
+              <el-button
+                @click="syncMulDocument"
+                :disabled="multipleSelection.length === 0"
+                v-if="datasetDetail.type === 1"
+                >{{ $t('views.document.syncDocument') }}
+              </el-button>
+              <el-button
+                v-if="datasetDetail.type === 2"
+                type="primary"
+                @click="
+                  router.push({
+                    path: '/dataset/import',
+                    query: { id: id, folder_token: datasetDetail.meta.folder_token },
+                  })
+                "
+                >{{ $t('views.document.importDocument') }}
+              </el-button>
+              <el-button
+                @click="syncLarkMulDocument"
+                :disabled="multipleSelection.length === 0"
+                v-if="datasetDetail.type === 2"
+                >{{ $t('views.document.syncDocument') }}
+              </el-button>
+              <el-button @click="openDatasetDialog()" :disabled="multipleSelection.length === 0">
+                {{ $t('views.document.setting.migration') }}
+              </el-button>
+              <el-button @click="batchRefresh" :disabled="multipleSelection.length === 0">
+                {{ $t('views.knowledge.setting.vectorization') }}
+              </el-button>
+              <el-button @click="openGenerateDialog()" :disabled="multipleSelection.length === 0">
+                {{ $t('views.document.generateQuestion.title') }}
+              </el-button>
+              <el-button @click="openBatchEditDocument" :disabled="multipleSelection.length === 0">
+                {{ $t('common.setting') }}
+              </el-button>
+              <el-button @click="deleteMulDocument" :disabled="multipleSelection.length === 0">
+                {{ $t('common.delete') }}
+              </el-button>
+            </div>
+
+            <el-input
+              v-model="filterText"
+              :placeholder="$t('common.searchBar.placeholder')"
+              prefix-icon="Search"
+              class="w-240"
+              @change="getList"
+              clearable
+            />
+          </div>
+          <app-table
+            ref="multipleTableRef"
+            class="mt-16"
+            :data="documentData"
+            :pagination-config="paginationConfig"
+            :quick-create="datasetDetail.type === 0"
+            @sizeChange="handleSizeChange"
+            @changePage="getList"
+            @cell-mouse-enter="cellMouseEnter"
+            @cell-mouse-leave="cellMouseLeave"
+            @creatQuick="creatQuickHandle"
+            @row-click="rowClickHandle"
+            @selection-change="handleSelectionChange"
+            @sort-change="handleSortChange"
+            v-loading="loading"
+            :row-key="(row: any) => row.id"
+            :storeKey="storeKey"
+          >
+            <el-table-column type="selection" width="55" :reserve-selection="true" />
+            <el-table-column prop="name" :label="$t('views.document.table.name')" min-width="280">
+              <template #default="{ row }">
+                <ReadWrite
+                  @change="editName($event, row.id)"
+                  :data="row.name"
+                  :showEditIcon="row.id === currentMouseId"
+                />
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="char_length"
+              :label="$t('views.document.table.char_length')"
+              align="right"
+              min-width="90"
+              sortable
+            >
+              <template #default="{ row }">
+                {{ numberFormat(row.char_length) }}
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="paragraph_count"
+              :label="$t('views.document.table.paragraph')"
+              align="right"
+              min-width="90"
+              sortable
+            />
+            <el-table-column
+              prop="status"
+              :label="$t('views.document.fileStatus.label')"
+              width="130"
+            >
+              <template #header>
+                <div>
+                  <span>{{ $t('views.document.fileStatus.label') }}</span>
+                  <el-dropdown trigger="click" @command="dropdownHandle">
+                    <el-button
+                      style="margin-top: 1px"
+                      link
+                      :type="filterMethod['status'] ? 'primary' : ''"
+                    >
+                      <el-icon>
+                        <Filter />
+                      </el-icon>
+                    </el-button>
+                    <template #dropdown>
+                      <el-dropdown-menu style="width: 100px">
+                        <el-dropdown-item
+                          :class="filterMethod['status'] ? '' : 'is-active'"
+                          :command="beforeCommand('status', '')"
+                          class="justify-center"
+                          >{{ $t('views.document.table.all') }}
+                        </el-dropdown-item>
+                        <el-dropdown-item
+                          :class="filterMethod['status'] === State.SUCCESS ? 'is-active' : ''"
+                          class="justify-center"
+                          :command="beforeCommand('status', State.SUCCESS)"
+                          >{{ $t('views.document.fileStatus.SUCCESS') }}
+                        </el-dropdown-item>
+                        <el-dropdown-item
+                          :class="filterMethod['status'] === State.FAILURE ? 'is-active' : ''"
+                          class="justify-center"
+                          :command="beforeCommand('status', State.FAILURE)"
+                          >{{ $t('views.document.fileStatus.FAILURE') }}
+                        </el-dropdown-item>
+                        <el-dropdown-item
+                          :class="
+                            filterMethod['status'] === State.STARTED &&
+                            filterMethod['task_type'] == TaskType.EMBEDDING
+                              ? 'is-active'
+                              : ''
+                          "
+                          class="justify-center"
+                          :command="beforeCommand('status', State.STARTED, TaskType.EMBEDDING)"
+                          >{{ $t('views.document.fileStatus.EMBEDDING') }}
+                        </el-dropdown-item>
+                        <el-dropdown-item
+                          :class="filterMethod['status'] === State.PENDING ? 'is-active' : ''"
+                          class="justify-center"
+                          :command="beforeCommand('status', State.PENDING)"
+                          >{{ $t('views.document.fileStatus.PENDING') }}
+                        </el-dropdown-item>
+                        <el-dropdown-item
+                          :class="
+                            filterMethod['status'] === State.STARTED &&
+                            filterMethod['task_type'] === TaskType.GENERATE_PROBLEM
+                              ? 'is-active'
+                              : ''
+                          "
+                          class="justify-center"
+                          :command="
+                            beforeCommand('status', State.STARTED, TaskType.GENERATE_PROBLEM)
+                          "
+                          >{{ $t('views.document.fileStatus.GENERATE') }}
+                        </el-dropdown-item>
+                      </el-dropdown-menu>
+                    </template>
+                  </el-dropdown>
+                </div>
+              </template>
+              <template #default="{ row }">
+                <StatusValue :status="row.status" :status-meta="row.status_meta"></StatusValue>
+              </template>
+            </el-table-column>
+            <el-table-column width="130">
+              <template #header>
+                <div>
+                  <span>{{ $t('views.document.enableStatus.label') }}</span>
+                  <el-dropdown trigger="click" @command="dropdownHandle">
+                    <el-button
+                      style="margin-top: 1px"
+                      link
+                      :type="filterMethod['is_active'] ? 'primary' : ''"
+                    >
+                      <el-icon>
+                        <Filter />
+                      </el-icon>
+                    </el-button>
+                    <template #dropdown>
+                      <el-dropdown-menu style="width: 100px">
+                        <el-dropdown-item
+                          :class="filterMethod['is_active'] === '' ? 'is-active' : ''"
+                          :command="beforeCommand('is_active', '')"
+                          class="justify-center"
+                          >{{ $t('views.document.table.all') }}
+                        </el-dropdown-item>
+                        <el-dropdown-item
+                          :class="filterMethod['is_active'] === true ? 'is-active' : ''"
+                          class="justify-center"
+                          :command="beforeCommand('is_active', true)"
+                          >{{ $t('views.document.enableStatus.enable') }}
+                        </el-dropdown-item>
+                        <el-dropdown-item
+                          :class="filterMethod['is_active'] === false ? 'is-active' : ''"
+                          class="justify-center"
+                          :command="beforeCommand('is_active', false)"
+                          >{{ $t('views.document.enableStatus.close') }}
+                        </el-dropdown-item>
+                      </el-dropdown-menu>
+                    </template>
+                  </el-dropdown>
+                </div>
+              </template>
+              <template #default="{ row }">
+                <div @click.stop>
+                  <el-switch
+                    :loading="loading"
+                    size="small"
+                    v-model="row.is_active"
+                    :before-change="() => changeState(row)"
+                  />
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column width="170">
+              <template #header>
+                <div>
+                  <span>{{ $t('views.document.form.hit_handling_method.label') }}</span>
+                  <el-dropdown trigger="click" @command="dropdownHandle">
+                    <el-button
+                      style="margin-top: 1px"
+                      link
+                      :type="filterMethod['hit_handling_method'] ? 'primary' : ''"
+                    >
+                      <el-icon>
+                        <Filter />
+                      </el-icon>
+                    </el-button>
+                    <template #dropdown>
+                      <el-dropdown-menu style="width: 150px">
+                        <el-dropdown-item
+                          :class="filterMethod['hit_handling_method'] ? '' : 'is-active'"
+                          :command="beforeCommand('hit_handling_method', '')"
+                          class="justify-center"
+                          >{{ $t('views.document.table.all') }}
+                        </el-dropdown-item>
+                        <template v-for="(value, key) of hitHandlingMethod" :key="key">
+                          <el-dropdown-item
+                            :class="filterMethod['hit_handling_method'] === key ? 'is-active' : ''"
+                            class="justify-center"
+                            :command="beforeCommand('hit_handling_method', key)"
+                            >{{ $t(value) }}
+                          </el-dropdown-item>
+                        </template>
+                      </el-dropdown-menu>
+                    </template>
+                  </el-dropdown>
+                </div>
+              </template>
+              <template #default="{ row }">
+                {{
+                  $t(hitHandlingMethod[row.hit_handling_method as keyof typeof hitHandlingMethod])
+                }}
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="create_time"
+              :label="$t('common.createTime')"
+              width="175"
+              sortable
+            >
+              <template #default="{ row }">
+                {{ datetimeFormat(row.create_time) }}
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="update_time"
+              :label="$t('views.document.table.updateTime')"
+              width="175"
+              sortable
+            >
+              <template #default="{ row }">
+                {{ datetimeFormat(row.update_time) }}
+              </template>
+            </el-table-column>
+            <el-table-column :label="$t('common.operation')" align="left" width="110" fixed="right">
+              <template #default="{ row }">
+                <div v-if="datasetDetail.type === 0">
+                  <span class="mr-4">
+                    <el-tooltip
+                      effect="dark"
+                      v-if="
+                        ([State.STARTED, State.PENDING] as Array<string>).includes(
+                          getTaskState(row.status, TaskType.EMBEDDING),
+                        )
+                      "
+                      :content="$t('views.document.setting.cancelVectorization')"
+                      placement="top"
+                    >
+                      <el-button
+                        type="primary"
+                        text
+                        @click.stop="cancelTask(row, TaskType.EMBEDDING)"
+                      >
+                        <AppIcon iconName="app-close" style="font-size: 16px"></AppIcon>
+                      </el-button>
+                    </el-tooltip>
+                    <el-tooltip
+                      v-else
+                      effect="dark"
+                      :content="$t('views.dataset.setting.vectorization')"
+                      placement="top"
+                    >
+                      <el-button type="primary" text @click.stop="refreshDocument(row)">
+                        <AppIcon iconName="app-document-refresh" style="font-size: 16px"></AppIcon>
+                      </el-button>
+                    </el-tooltip>
+                  </span>
+                  <span class="mr-4">
+                    <el-tooltip effect="dark" :content="$t('common.setting')" placement="top">
+                      <el-button type="primary" text @click.stop="settingDoc(row)">
+                        <el-icon><Setting /></el-icon>
+                      </el-button>
+                    </el-tooltip>
+                  </span>
+                  <span @click.stop>
+                    <el-dropdown trigger="click">
+                      <el-button text type="primary">
+                        <el-icon><MoreFilled /></el-icon>
+                      </el-button>
+                      <template #dropdown>
+                        <el-dropdown-menu>
+                          <el-dropdown-item
+                            v-if="
+                              ([State.STARTED, State.PENDING] as Array<string>).includes(
+                                getTaskState(row.status, TaskType.GENERATE_PROBLEM),
+                              )
+                            "
+                            @click="cancelTask(row, TaskType.GENERATE_PROBLEM)"
+                          >
+                            <el-icon><Connection /></el-icon>
+                            {{ $t('views.document.setting.cancelGenerateQuestion') }}
+                          </el-dropdown-item>
+                          <el-dropdown-item v-else @click="openGenerateDialog(row)">
+                            <el-icon><Connection /></el-icon>
+                            {{ $t('views.document.generateQuestion.title') }}
+                          </el-dropdown-item>
+                          <el-dropdown-item @click="openDatasetDialog(row)">
+                            <AppIcon iconName="app-migrate"></AppIcon>
+                            {{ $t('views.document.setting.migration') }}
+                          </el-dropdown-item>
+                          <el-dropdown-item @click="exportDocument(row)">
+                            <AppIcon iconName="app-export"></AppIcon>
+                            {{ $t('views.document.setting.export') }} Excel
+                          </el-dropdown-item>
+                          <el-dropdown-item @click="exportDocumentZip(row)">
+                            <AppIcon iconName="app-export"></AppIcon>
+                            {{ $t('views.document.setting.export') }} Zip
+                          </el-dropdown-item>
+                          <el-dropdown-item icon="Delete" @click.stop="deleteDocument(row)">{{
+                            $t('common.delete')
+                          }}</el-dropdown-item>
+                        </el-dropdown-menu>
+                      </template>
+                    </el-dropdown>
+                  </span>
+                </div>
+                <div v-if="datasetDetail.type === 1 || datasetDetail.type === 2">
+                  <span class="mr-4">
+                    <el-tooltip
+                      effect="dark"
+                      :content="$t('views.dataset.setting.sync')"
+                      placement="top"
+                    >
+                      <el-button type="primary" text @click.stop="syncDocument(row)">
+                        <el-icon><Refresh /></el-icon>
+                      </el-button>
+                    </el-tooltip>
+                  </span>
+                  <span class="mr-4">
+                    <el-tooltip
+                      effect="dark"
+                      v-if="
+                        ([State.STARTED, State.PENDING] as Array<string>).includes(
+                          getTaskState(row.status, TaskType.EMBEDDING),
+                        )
+                      "
+                      :content="$t('views.document.setting.cancelVectorization')"
+                      placement="top"
+                    >
+                      <el-button
+                        type="primary"
+                        text
+                        @click.stop="cancelTask(row, TaskType.EMBEDDING)"
+                      >
+                        <AppIcon iconName="app-close" style="font-size: 16px"></AppIcon>
+                      </el-button>
+                    </el-tooltip>
+
+                    <el-tooltip
+                      effect="dark"
+                      v-else
+                      :content="$t('views.dataset.setting.vectorization')"
+                      placement="top"
+                    >
+                      <el-button type="primary" text @click.stop="refreshDocument(row)">
+                        <AppIcon iconName="app-document-refresh" style="font-size: 16px"></AppIcon>
+                      </el-button>
+                    </el-tooltip>
+                  </span>
+
+                  <span @click.stop>
+                    <el-dropdown trigger="click">
+                      <el-button text type="primary">
+                        <el-icon><MoreFilled /></el-icon>
+                      </el-button>
+                      <template #dropdown>
+                        <el-dropdown-menu>
+                          <el-dropdown-item icon="Setting" @click="settingDoc(row)">{{
+                            $t('common.setting')
+                          }}</el-dropdown-item>
+                          <el-dropdown-item
+                            v-if="
+                              ([State.STARTED, State.PENDING] as Array<string>).includes(
+                                getTaskState(row.status, TaskType.GENERATE_PROBLEM),
+                              )
+                            "
+                            @click="cancelTask(row, TaskType.GENERATE_PROBLEM)"
+                          >
+                            <el-icon><Connection /></el-icon>
+                            {{ $t('views.document.setting.cancelGenerateQuestion') }}
+                          </el-dropdown-item>
+                          <el-dropdown-item v-else @click="openGenerateDialog(row)">
+                            <el-icon><Connection /></el-icon>
+                            {{ $t('views.document.generateQuestion.title') }}
+                          </el-dropdown-item>
+                          <el-dropdown-item @click="openDatasetDialog(row)">
+                            <AppIcon iconName="app-migrate"></AppIcon>
+                            {{ $t('views.document.setting.migration') }}</el-dropdown-item
+                          >
+                          <el-dropdown-item @click="exportDocument(row)">
+                            <AppIcon iconName="app-export"></AppIcon>
+                            {{ $t('views.document.setting.export') }} Excel
+                          </el-dropdown-item>
+                          <el-dropdown-item @click="exportDocumentZip(row)">
+                            <AppIcon iconName="app-export"></AppIcon>
+                            {{ $t('views.document.setting.export') }} Zip
+                          </el-dropdown-item>
+                          <el-dropdown-item icon="Delete" @click.stop="deleteDocument(row)">{{
+                            $t('common.delete')
+                          }}</el-dropdown-item>
+                        </el-dropdown-menu>
+                      </template>
+                    </el-dropdown>
+                  </span>
+                </div>
+              </template>
+            </el-table-column>
+          </app-table>
         </div>
 
-        <el-input
-          v-model="filterText"
-          :placeholder="$t('common.searchBar.placeholder')"
-          prefix-icon="Search"
-          class="w-240"
-          @change="getList"
-          clearable
-        />
+        <ImportDocumentDialog ref="ImportDocumentDialogRef" :title="title" @refresh="refresh" />
+        <SyncWebDialog ref="SyncWebDialogRef" @refresh="refresh" />
+        <!-- 选择知识库 -->
+        <SelectDatasetDialog ref="SelectDatasetDialogRef" @refresh="refreshMigrate" />
+        <GenerateRelatedDialog ref="GenerateRelatedDialogRef" @refresh="getList" />
       </div>
-      <app-table
-        ref="multipleTableRef"
-        class="mt-16"
-        :data="documentData"
-        :pagination-config="paginationConfig"
-        :quick-create="datasetDetail.type === '0'"
-        @sizeChange="handleSizeChange"
-        @changePage="getList"
-        @cell-mouse-enter="cellMouseEnter"
-        @cell-mouse-leave="cellMouseLeave"
-        @creatQuick="creatQuickHandle"
-        @row-click="rowClickHandle"
-        @selection-change="handleSelectionChange"
-        @sort-change="handleSortChange"
-        v-loading="loading"
-        :row-key="(row: any) => row.id"
-        :storeKey="storeKey"
-      >
-        <el-table-column type="selection" width="55" :reserve-selection="true" />
-        <el-table-column prop="name" :label="$t('views.document.table.name')" min-width="280">
-          <template #default="{ row }">
-            <ReadWrite
-              @change="editName($event, row.id)"
-              :data="row.name"
-              :showEditIcon="row.id === currentMouseId"
-            />
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="char_length"
-          :label="$t('views.document.table.char_length')"
-          align="right"
-          min-width="90"
-          sortable
-        >
-          <template #default="{ row }">
-            {{ numberFormat(row.char_length) }}
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="paragraph_count"
-          :label="$t('views.document.table.paragraph')"
-          align="right"
-          min-width="90"
-          sortable
-        />
-        <el-table-column prop="status" :label="$t('views.document.fileStatus.label')" width="130">
-          <template #header>
-            <div>
-              <span>{{ $t('views.document.fileStatus.label') }}</span>
-              <el-dropdown trigger="click" @command="dropdownHandle">
-                <el-button
-                  style="margin-top: 1px"
-                  link
-                  :type="filterMethod['status'] ? 'primary' : ''"
-                >
-                  <el-icon>
-                    <Filter />
-                  </el-icon>
-                </el-button>
-                <template #dropdown>
-                  <el-dropdown-menu style="width: 100px">
-                    <el-dropdown-item
-                      :class="filterMethod['status'] ? '' : 'is-active'"
-                      :command="beforeCommand('status', '')"
-                      class="justify-center"
-                      >{{ $t('views.document.table.all') }}
-                    </el-dropdown-item>
-                    <el-dropdown-item
-                      :class="filterMethod['status'] === State.SUCCESS ? 'is-active' : ''"
-                      class="justify-center"
-                      :command="beforeCommand('status', State.SUCCESS)"
-                      >{{ $t('views.document.fileStatus.SUCCESS') }}
-                    </el-dropdown-item>
-                    <el-dropdown-item
-                      :class="filterMethod['status'] === State.FAILURE ? 'is-active' : ''"
-                      class="justify-center"
-                      :command="beforeCommand('status', State.FAILURE)"
-                      >{{ $t('views.document.fileStatus.FAILURE') }}
-                    </el-dropdown-item>
-                    <el-dropdown-item
-                      :class="
-                        filterMethod['status'] === State.STARTED &&
-                        filterMethod['task_type'] == TaskType.EMBEDDING
-                          ? 'is-active'
-                          : ''
-                      "
-                      class="justify-center"
-                      :command="beforeCommand('status', State.STARTED, TaskType.EMBEDDING)"
-                      >{{ $t('views.document.fileStatus.EMBEDDING') }}
-                    </el-dropdown-item>
-                    <el-dropdown-item
-                      :class="filterMethod['status'] === State.PENDING ? 'is-active' : ''"
-                      class="justify-center"
-                      :command="beforeCommand('status', State.PENDING)"
-                      >{{ $t('views.document.fileStatus.PENDING') }}
-                    </el-dropdown-item>
-                    <el-dropdown-item
-                      :class="
-                        filterMethod['status'] === State.STARTED &&
-                        filterMethod['task_type'] === TaskType.GENERATE_PROBLEM
-                          ? 'is-active'
-                          : ''
-                      "
-                      class="justify-center"
-                      :command="beforeCommand('status', State.STARTED, TaskType.GENERATE_PROBLEM)"
-                      >{{ $t('views.document.fileStatus.GENERATE') }}
-                    </el-dropdown-item>
-                  </el-dropdown-menu>
-                </template>
-              </el-dropdown>
-            </div>
-          </template>
-          <template #default="{ row }">
-            <StatusValue :status="row.status" :status-meta="row.status_meta"></StatusValue>
-          </template>
-        </el-table-column>
-        <el-table-column width="130">
-          <template #header>
-            <div>
-              <span>{{ $t('views.document.enableStatus.label') }}</span>
-              <el-dropdown trigger="click" @command="dropdownHandle">
-                <el-button
-                  style="margin-top: 1px"
-                  link
-                  :type="filterMethod['is_active'] ? 'primary' : ''"
-                >
-                  <el-icon>
-                    <Filter />
-                  </el-icon>
-                </el-button>
-                <template #dropdown>
-                  <el-dropdown-menu style="width: 100px">
-                    <el-dropdown-item
-                      :class="filterMethod['is_active'] === '' ? 'is-active' : ''"
-                      :command="beforeCommand('is_active', '')"
-                      class="justify-center"
-                      >{{ $t('views.document.table.all') }}
-                    </el-dropdown-item>
-                    <el-dropdown-item
-                      :class="filterMethod['is_active'] === true ? 'is-active' : ''"
-                      class="justify-center"
-                      :command="beforeCommand('is_active', true)"
-                      >{{ $t('views.document.enableStatus.enable') }}
-                    </el-dropdown-item>
-                    <el-dropdown-item
-                      :class="filterMethod['is_active'] === false ? 'is-active' : ''"
-                      class="justify-center"
-                      :command="beforeCommand('is_active', false)"
-                      >{{ $t('views.document.enableStatus.close') }}
-                    </el-dropdown-item>
-                  </el-dropdown-menu>
-                </template>
-              </el-dropdown>
-            </div>
-          </template>
-          <template #default="{ row }">
-            <div @click.stop>
-              <el-switch
-                :loading="loading"
-                size="small"
-                v-model="row.is_active"
-                :before-change="() => changeState(row)"
-              />
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column width="170">
-          <template #header>
-            <div>
-              <span>{{ $t('views.document.form.hit_handling_method.label') }}</span>
-              <el-dropdown trigger="click" @command="dropdownHandle">
-                <el-button
-                  style="margin-top: 1px"
-                  link
-                  :type="filterMethod['hit_handling_method'] ? 'primary' : ''"
-                >
-                  <el-icon>
-                    <Filter />
-                  </el-icon>
-                </el-button>
-                <template #dropdown>
-                  <el-dropdown-menu style="width: 150px">
-                    <el-dropdown-item
-                      :class="filterMethod['hit_handling_method'] ? '' : 'is-active'"
-                      :command="beforeCommand('hit_handling_method', '')"
-                      class="justify-center"
-                      >{{ $t('views.document.table.all') }}
-                    </el-dropdown-item>
-                    <template v-for="(value, key) of hitHandlingMethod" :key="key">
-                      <el-dropdown-item
-                        :class="filterMethod['hit_handling_method'] === key ? 'is-active' : ''"
-                        class="justify-center"
-                        :command="beforeCommand('hit_handling_method', key)"
-                        >{{ $t(value) }}
-                      </el-dropdown-item>
-                    </template>
-                  </el-dropdown-menu>
-                </template>
-              </el-dropdown>
-            </div>
-          </template>
-          <template #default="{ row }">
-            {{ $t(hitHandlingMethod[row.hit_handling_method as keyof typeof hitHandlingMethod]) }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="create_time" :label="$t('common.createTime')" width="175" sortable>
-          <template #default="{ row }">
-            {{ datetimeFormat(row.create_time) }}
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="update_time"
-          :label="$t('views.document.table.updateTime')"
-          width="175"
-          sortable
-        >
-          <template #default="{ row }">
-            {{ datetimeFormat(row.update_time) }}
-          </template>
-        </el-table-column>
-        <el-table-column :label="$t('common.operation')" align="left" width="110" fixed="right">
-          <template #default="{ row }">
-            <div v-if="datasetDetail.type === '0'">
-              <span class="mr-4">
-                <el-tooltip
-                  effect="dark"
-                  v-if="
-                    ([State.STARTED, State.PENDING] as Array<string>).includes(
-                      getTaskState(row.status, TaskType.EMBEDDING),
-                    )
-                  "
-                  :content="$t('views.document.setting.cancelVectorization')"
-                  placement="top"
-                >
-                  <el-button type="primary" text @click.stop="cancelTask(row, TaskType.EMBEDDING)">
-                    <AppIcon iconName="app-close" style="font-size: 16px"></AppIcon>
-                  </el-button>
-                </el-tooltip>
-                <el-tooltip
-                  v-else
-                  effect="dark"
-                  :content="$t('views.dataset.setting.vectorization')"
-                  placement="top"
-                >
-                  <el-button type="primary" text @click.stop="refreshDocument(row)">
-                    <AppIcon iconName="app-document-refresh" style="font-size: 16px"></AppIcon>
-                  </el-button>
-                </el-tooltip>
-              </span>
-              <span class="mr-4">
-                <el-tooltip effect="dark" :content="$t('common.setting')" placement="top">
-                  <el-button type="primary" text @click.stop="settingDoc(row)">
-                    <el-icon><Setting /></el-icon>
-                  </el-button>
-                </el-tooltip>
-              </span>
-              <span @click.stop>
-                <el-dropdown trigger="click">
-                  <el-button text type="primary">
-                    <el-icon><MoreFilled /></el-icon>
-                  </el-button>
-                  <template #dropdown>
-                    <el-dropdown-menu>
-                      <el-dropdown-item
-                        v-if="
-                          ([State.STARTED, State.PENDING] as Array<string>).includes(
-                            getTaskState(row.status, TaskType.GENERATE_PROBLEM),
-                          )
-                        "
-                        @click="cancelTask(row, TaskType.GENERATE_PROBLEM)"
-                      >
-                        <el-icon><Connection /></el-icon>
-                        {{ $t('views.document.setting.cancelGenerateQuestion') }}
-                      </el-dropdown-item>
-                      <el-dropdown-item v-else @click="openGenerateDialog(row)">
-                        <el-icon><Connection /></el-icon>
-                        {{ $t('views.document.generateQuestion.title') }}
-                      </el-dropdown-item>
-                      <el-dropdown-item @click="openDatasetDialog(row)">
-                        <AppIcon iconName="app-migrate"></AppIcon>
-                        {{ $t('views.document.setting.migration') }}
-                      </el-dropdown-item>
-                      <el-dropdown-item @click="exportDocument(row)">
-                        <AppIcon iconName="app-export"></AppIcon>
-                        {{ $t('views.document.setting.export') }} Excel
-                      </el-dropdown-item>
-                      <el-dropdown-item @click="exportDocumentZip(row)">
-                        <AppIcon iconName="app-export"></AppIcon>
-                        {{ $t('views.document.setting.export') }} Zip
-                      </el-dropdown-item>
-                      <el-dropdown-item icon="Delete" @click.stop="deleteDocument(row)">{{
-                        $t('common.delete')
-                      }}</el-dropdown-item>
-                    </el-dropdown-menu>
-                  </template>
-                </el-dropdown>
-              </span>
-            </div>
-            <div v-if="datasetDetail.type === '1' || datasetDetail.type === '2'">
-              <span class="mr-4">
-                <el-tooltip
-                  effect="dark"
-                  :content="$t('views.dataset.setting.sync')"
-                  placement="top"
-                >
-                  <el-button type="primary" text @click.stop="syncDocument(row)">
-                    <el-icon><Refresh /></el-icon>
-                  </el-button>
-                </el-tooltip>
-              </span>
-              <span class="mr-4">
-                <el-tooltip
-                  effect="dark"
-                  v-if="
-                    ([State.STARTED, State.PENDING] as Array<string>).includes(
-                      getTaskState(row.status, TaskType.EMBEDDING),
-                    )
-                  "
-                  :content="$t('views.document.setting.cancelVectorization')"
-                  placement="top"
-                >
-                  <el-button type="primary" text @click.stop="cancelTask(row, TaskType.EMBEDDING)">
-                    <AppIcon iconName="app-close" style="font-size: 16px"></AppIcon>
-                  </el-button>
-                </el-tooltip>
-
-                <el-tooltip
-                  effect="dark"
-                  v-else
-                  :content="$t('views.dataset.setting.vectorization')"
-                  placement="top"
-                >
-                  <el-button type="primary" text @click.stop="refreshDocument(row)">
-                    <AppIcon iconName="app-document-refresh" style="font-size: 16px"></AppIcon>
-                  </el-button>
-                </el-tooltip>
-              </span>
-
-              <span @click.stop>
-                <el-dropdown trigger="click">
-                  <el-button text type="primary">
-                    <el-icon><MoreFilled /></el-icon>
-                  </el-button>
-                  <template #dropdown>
-                    <el-dropdown-menu>
-                      <el-dropdown-item icon="Setting" @click="settingDoc(row)">{{
-                        $t('common.setting')
-                      }}</el-dropdown-item>
-                      <el-dropdown-item
-                        v-if="
-                          ([State.STARTED, State.PENDING] as Array<string>).includes(
-                            getTaskState(row.status, TaskType.GENERATE_PROBLEM),
-                          )
-                        "
-                        @click="cancelTask(row, TaskType.GENERATE_PROBLEM)"
-                      >
-                        <el-icon><Connection /></el-icon>
-                        {{ $t('views.document.setting.cancelGenerateQuestion') }}
-                      </el-dropdown-item>
-                      <el-dropdown-item v-else @click="openGenerateDialog(row)">
-                        <el-icon><Connection /></el-icon>
-                        {{ $t('views.document.generateQuestion.title') }}
-                      </el-dropdown-item>
-                      <el-dropdown-item @click="openDatasetDialog(row)">
-                        <AppIcon iconName="app-migrate"></AppIcon>
-                        {{ $t('views.document.setting.migration') }}</el-dropdown-item
-                      >
-                      <el-dropdown-item @click="exportDocument(row)">
-                        <AppIcon iconName="app-export"></AppIcon>
-                        {{ $t('views.document.setting.export') }} Excel
-                      </el-dropdown-item>
-                      <el-dropdown-item @click="exportDocumentZip(row)">
-                        <AppIcon iconName="app-export"></AppIcon>
-                        {{ $t('views.document.setting.export') }} Zip
-                      </el-dropdown-item>
-                      <el-dropdown-item icon="Delete" @click.stop="deleteDocument(row)">{{
-                        $t('common.delete')
-                      }}</el-dropdown-item>
-                    </el-dropdown-menu>
-                  </template>
-                </el-dropdown>
-              </span>
-            </div>
-          </template>
-        </el-table-column>
-      </app-table>
-    </div>
-
-    <ImportDocumentDialog ref="ImportDocumentDialogRef" :title="title" @refresh="refresh" />
-    <SyncWebDialog ref="SyncWebDialogRef" @refresh="refresh" />
-    <!-- 选择知识库 -->
-    <SelectDatasetDialog ref="SelectDatasetDialogRef" @refresh="refreshMigrate" />
-    <GenerateRelatedDialog ref="GenerateRelatedDialogRef" @refresh="getList" />
+      <div class="mul-operation w-full flex" v-if="multipleSelection.length !== 0">
+        <el-button :disabled="multipleSelection.length === 0" @click="cancelTaskHandle(1)">
+          {{ $t('views.document.setting.cancelVectorization') }}
+        </el-button>
+        <el-button :disabled="multipleSelection.length === 0" @click="cancelTaskHandle(2)">
+          {{ $t('views.document.setting.cancelGenerate') }}
+        </el-button>
+        <el-text type="info" class="secondary ml-24">
+          {{ $t('views.document.selected') }} {{ multipleSelection.length }}
+          {{ $t('views.document.items') }}
+        </el-text>
+        <el-button class="ml-16" type="primary" link @click="clearSelection">
+          {{ $t('common.clear') }}
+        </el-button>
+      </div>
+      <EmbeddingContentDialog ref="embeddingContentDialogRef"></EmbeddingContentDialog>
+    </el-card>
   </div>
-  <div class="mul-operation w-full flex" v-if="multipleSelection.length !== 0">
-    <el-button :disabled="multipleSelection.length === 0" @click="cancelTaskHandle(1)">
-      {{ $t('views.document.setting.cancelVectorization') }}
-    </el-button>
-    <el-button :disabled="multipleSelection.length === 0" @click="cancelTaskHandle(2)">
-      {{ $t('views.document.setting.cancelGenerate') }}
-    </el-button>
-    <el-text type="info" class="secondary ml-24">
-      {{ $t('views.document.selected') }} {{ multipleSelection.length }}
-      {{ $t('views.document.items') }}
-    </el-text>
-    <el-button class="ml-16" type="primary" link @click="clearSelection">
-      {{ $t('common.clear') }}
-    </el-button>
-  </div>
-  <EmbeddingContentDialog ref="embeddingContentDialogRef"></EmbeddingContentDialog>
 </template>
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue'

@@ -1,6 +1,6 @@
 <template>
   <div class="resource-authorization p-16-24">
-    <h4 class="mb-16">{{ $t('views.userManage.title') }}</h4>
+    <h2 class="mb-16">{{ $t('views.userManage.title') }}</h2>
     <el-card style="--el-card-padding: 0">
       <div class="flex main-calc-height">
         <div class="resource-authorization__left border-r p-8">

@@ -1,6 +1,6 @@
 <template>
   <div class="p-16-24">
-    <h4 class="mb-16">{{ $t('views.userManage.title') }}</h4>
+    <h2 class="mb-16">{{ $t('views.userManage.title') }}</h2>
     <el-card>
       <div class="flex-between mb-16">
         <el-button type="primary" @click="createUser">{{
