@@ -6,7 +6,7 @@
     @date：2025/4/28 16:38
     @desc:
 """
-
+from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
 from rest_framework.request import Request
@@ -16,10 +16,20 @@ from common import result
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
 from common.constants.permission_constants import PermissionConstants
+from common.log.log import log
 from common.result import DefaultResultSerializer
 from system_manage.api.user_resource_permission import UserResourcePermissionAPI, EditUserResourcePermissionAPI
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
+from users.models import User
 
+
+def get_user_operation_object(user_id):
+    user_model = QuerySet(model=User).filter(id=user_id).first()
+    if user_model is not None:
+        return {
+            "name": user_model.username
+        }
+    return {}
 
 class WorkSpaceUserResourcePermissionView(APIView):
     authentication_classes = [TokenAuth]
@@ -47,6 +57,9 @@ class WorkSpaceUserResourcePermissionView(APIView):
         responses=DefaultResultSerializer(),
         tags=[_('Resources authorization')]  # type: ignore
     )
+    @log(menu='System', operate='Modify the resource authorization list',
+         get_operation_object=lambda r, k: get_user_operation_object(k.get('user_id'))
+         )
     def put(self, request: Request, workspace_id: str, user_id: str):
         return result.success(UserResourcePermissionSerializer(
             data={'workspace_id': workspace_id, 'user_id': user_id}

@@ -6,6 +6,7 @@
     @date：2025/5/26 16:51
     @desc:
 """
+from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
 from rest_framework.parsers import MultiPartParser
@@ -14,11 +15,22 @@ from rest_framework.views import APIView
 
 from application.api.application_api import ApplicationCreateAPI, ApplicationQueryAPI, ApplicationImportAPI, \
     ApplicationExportAPI, ApplicationOperateAPI, ApplicationEditAPI
+from application.models import Application
 from application.serializers.application import ApplicationSerializer, Query, ApplicationOperateSerializer
 from common import result
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
 from common.constants.permission_constants import PermissionConstants
+from common.log.log import log
+
+
+def get_application_operation_object(application_id):
+    application_model = QuerySet(model=Application).filter(id=application_id).first()
+    if application_model is not None:
+        return{
+            'name': application_model.name
+        }
+    return {}
 
 
 class Application(APIView):
@@ -35,6 +47,8 @@ class Application(APIView):
         tags=[_('Application')]  # type: ignore
     )
     @has_permissions(PermissionConstants.APPLICATION_READ.get_workspace_permission())
+    @log(menu='Application', operate='Create an application',
+         get_operation_object=lambda r,k: {'name': r.data.get('name')})
     def post(self, request: Request, workspace_id: str):
         return result.success(
             ApplicationSerializer(data={'workspace_id': workspace_id, 'user_id': request.user.id}).insert(request.data))
@@ -85,10 +99,13 @@ class Application(APIView):
             tags=[_('Application')]  # type: ignore
         )
         @has_permissions(PermissionConstants.APPLICATION_READ)
+        @log(menu='Application', operate="Import Application")
         def post(self, request: Request, workspace_id: str):
             return result.success(ApplicationSerializer(
                 data={'user_id': request.user.id, 'workspace_id': workspace_id,
                       }).import_({'file': request.FILES.get('file')}))
+
+
 
     class Export(APIView):
         authentication_classes = [TokenAuth]
@@ -104,6 +121,8 @@ class Application(APIView):
             tags=[_('Application')]  # type: ignore
         )
         @has_permissions(PermissionConstants.APPLICATION_EXPORT.get_workspace_application_permission())
+        @log(menu='Application', operate="Export Application",
+             get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')))
         def post(self, request: Request, workspace_id: str, application_id: str):
             return ApplicationOperateSerializer(
                 data={'application_id': application_id,
@@ -122,6 +141,9 @@ class Application(APIView):
             tags=[_('Application')]  # type: ignore
         )
         @has_permissions(PermissionConstants.APPLICATION_DELETE.get_workspace_application_permission())
+        @log(menu='Application', operate='Deleting application',
+             get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id'))
+             )
         def delete(self, request: Request, workspace_id: str, application_id: str):
             return result.success(ApplicationOperateSerializer(
                 data={'application_id': application_id, 'user_id': request.user.id}).delete(
@@ -138,6 +160,8 @@ class Application(APIView):
             tags=[_('Application')]  # type: ignore
         )
         @has_permissions(PermissionConstants.APPLICATION_EDIT.get_workspace_application_permission())
+        @log(menu='Application', operate="Modify the application",
+             get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')))
         def put(self, request: Request, workspace_id: str, application_id: str):
             return result.success(
                 ApplicationOperateSerializer(
@@ -172,6 +196,9 @@ class Application(APIView):
             responses=result.DefaultResultSerializer,
             tags=[_('Application')]  # type: ignore
         )
+        @log(menu='Application', operate='Publishing an application',
+             get_operation_object=lambda r,k: get_application_operation_object(k.get('application_id'))
+             )
         def put(self, request: Request, application_id: str):
             return result.success(
                 ApplicationOperateSerializer(
