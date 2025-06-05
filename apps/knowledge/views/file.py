@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.views import Request
 
 from common.auth import TokenAuth
+from common.log.log import log
 from common.result import result
 from knowledge.api.file import FileUploadAPI, FileGetAPI
 from knowledge.serializers.file import FileSerializer
@@ -25,6 +26,7 @@ class FileView(APIView):
         responses=FileUploadAPI.get_response(),
         tags=[_('File')]  # type: ignore
     )
+    @log(menu='file', operate='Upload file')
     def post(self, request: Request):
         return result.success(FileSerializer(data={'file': request.FILES.get('file')}).upload())
 
@@ -50,5 +52,6 @@ class FileView(APIView):
             responses=FileGetAPI.get_response(),
             tags=[_('File')]  # type: ignore
         )
+        @log(menu='file', operate='Delete file')
         def delete(self, request: Request, file_id: str):
             return result.success(FileSerializer.Operate(data={'id': file_id}).delete())

@@ -1,3 +1,4 @@
+from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
 from rest_framework.parsers import MultiPartParser
@@ -7,11 +8,21 @@ from rest_framework.views import APIView
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
 from common.constants.permission_constants import PermissionConstants
+from common.log.log import log
 from common.result import result
 from tools.api.tool import ToolCreateAPI, ToolEditAPI, ToolReadAPI, ToolDeleteAPI, ToolTreeReadAPI, ToolDebugApi, \
     ToolExportAPI, ToolImportAPI, ToolPageAPI, PylintAPI
+from tools.models import Tool
 from tools.serializers.tool import ToolSerializer, ToolTreeSerializer
 
+
+def get_tool_operation_object(tool_id):
+    tool_model = QuerySet(model=Tool).filter(id=tool_id).first()
+    if tool_model is not None:
+        return {
+            "name": tool_model.name
+        }
+    return {}
 
 class ToolView(APIView):
     authentication_classes = [TokenAuth]
@@ -27,6 +38,8 @@ class ToolView(APIView):
         tags=[_('Tool')]  # type: ignore
     )
     @has_permissions(PermissionConstants.TOOL_CREATE.get_workspace_permission())
+    @log(menu="Tool", operate="Create tool",
+         get_operation_object=lambda r,k: r.data.get('name'))
     def post(self, request: Request, workspace_id: str):
         return result.success(ToolSerializer.Create(
             data={'user_id': request.user.id, 'workspace_id': workspace_id}
@@ -79,6 +92,8 @@ class ToolView(APIView):
             tags=[_('Tool')]  # type: ignore
         )
         @has_permissions(PermissionConstants.TOOL_EDIT.get_workspace_permission())
+        @log(menu='Tool', operate='Update tool',
+             get_operation_object=lambda r, k: get_tool_operation_object(k.get('tool_id')))
         def put(self, request: Request, workspace_id: str, tool_id: str):
             return result.success(ToolSerializer.Operate(
                 data={'id': tool_id, 'workspace_id': workspace_id}
@@ -94,6 +109,7 @@ class ToolView(APIView):
             tags=[_('Tool')]  # type: ignore
         )
         @has_permissions(PermissionConstants.TOOL_READ.get_workspace_permission())
+        @log(menu='Tool', operate='Get tool')
         def get(self, request: Request, workspace_id: str, tool_id: str):
             return result.success(ToolSerializer.Operate(
                 data={'id': tool_id, 'workspace_id': workspace_id}
@@ -109,6 +125,8 @@ class ToolView(APIView):
             tags=[_('Tool')]  # type: ignore
         )
         @has_permissions(PermissionConstants.TOOL_DELETE.get_workspace_permission())
+        @log(menu='Tool', operate="Delete tool",
+             get_operation_object=lambda r,k: get_tool_operation_object(k.get('tool_id')))
         def delete(self, request: Request, workspace_id: str, tool_id: str):
             return result.success(ToolSerializer.Operate(
                 data={'id': tool_id, 'workspace_id': workspace_id}
@@ -127,6 +145,7 @@ class ToolView(APIView):
             tags=[_('Tool')]  # type: ignore
         )
         @has_permissions(PermissionConstants.TOOL_READ.get_workspace_permission())
+        @log(menu='Tool', operate='Get tool list')
         def get(self, request: Request, workspace_id: str, current_page: int, page_size: int):
             return result.success(ToolTreeSerializer.Query(
                 data={
@@ -152,6 +171,7 @@ class ToolView(APIView):
             tags=[_("Tool")]  # type: ignore
         )
         @has_permissions(PermissionConstants.TOOL_IMPORT.get_workspace_permission())
+        @log(menu='Tool', operate='Import tool')
         def post(self, request: Request, workspace_id: str):
             return result.success(ToolSerializer.Import(
                 data={'workspace_id': workspace_id, 'file': request.FILES.get('file'), 'user_id': request.user.id}
@@ -170,6 +190,8 @@ class ToolView(APIView):
             tags=[_("Tool")]  # type: ignore
         )
         @has_permissions(PermissionConstants.TOOL_EXPORT.get_workspace_permission())
+        @log(menu='Tool', operate="Export function",
+             get_operation_object=lambda r,k: get_tool_operation_object(k.get('id')))
         def get(self, request: Request, tool_id: str, workspace_id: str):
             return ToolSerializer.Operate(
                 data={'id': tool_id, 'workspace_id': workspace_id}
