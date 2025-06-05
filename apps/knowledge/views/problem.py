@@ -25,7 +25,7 @@ class ProblemView(APIView):
         responses=ProblemReadAPI.get_response(),
         tags=[_('Knowledge Base/Documentation/Paragraph/Question')]  # type: ignore
     )
-    @has_permissions(PermissionConstants.KNOWLEDGE_PROBLEM_READ.get_workspace_permission())
+    @has_permissions(PermissionConstants.KNOWLEDGE_PROBLEM_READ.get_workspace_knowledge_permission())
     def get(self, request: Request, workspace_id: str, knowledge_id: str):
         q = ProblemSerializers.Query(
             data={
@@ -47,7 +47,7 @@ class ProblemView(APIView):
         request=ProblemBatchCreateAPI.get_request(),
         tags=[_('Knowledge Base/Documentation/Paragraph/Question')]  # type: ignore
     )
-    @has_permissions(PermissionConstants.KNOWLEDGE_PROBLEM_EDIT.get_workspace_permission())
+    @has_permissions(PermissionConstants.KNOWLEDGE_PROBLEM_EDIT.get_workspace_knowledge_permission())
     def post(self, request: Request, workspace_id: str, knowledge_id: str):
         return result.success(ProblemSerializers.Create(
             data={'workspace_id': workspace_id, 'knowledge_id': knowledge_id}
@@ -64,7 +64,7 @@ class ProblemView(APIView):
             responses=ProblemParagraphAPI.get_response(),
             tags=[_('Knowledge Base/Documentation/Paragraph/Question')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_PROBLEM_EDIT.get_workspace_permission())
+        @has_permissions(PermissionConstants.KNOWLEDGE_PROBLEM_EDIT.get_workspace_knowledge_permission())
         def get(self, request: Request, workspace_id: str, knowledge_id: str, problem_id: str):
             return result.success(ProblemSerializers.Operate(
                 data={
@@ -87,7 +87,7 @@ class ProblemView(APIView):
             responses=BatchAssociationAPI.get_response(),
             tags=[_('Knowledge Base/Documentation/Paragraph/Question')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_PROBLEM_EDIT.get_workspace_permission())
+        @has_permissions(PermissionConstants.KNOWLEDGE_PROBLEM_EDIT.get_workspace_knowledge_permission())
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(ProblemSerializers.BatchOperate(
                 data={'knowledge_id': knowledge_id, 'workspace_id': workspace_id}
@@ -106,7 +106,7 @@ class ProblemView(APIView):
             responses=BatchDeleteAPI.get_response(),
             tags=[_('Knowledge Base/Documentation/Paragraph/Question')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_PROBLEM_EDIT.get_workspace_permission())
+        @has_permissions(PermissionConstants.KNOWLEDGE_PROBLEM_EDIT.get_workspace_knowledge_permission())
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(ProblemSerializers.BatchOperate(
                 data={'knowledge_id': knowledge_id, 'workspace_id': workspace_id}
@@ -124,7 +124,7 @@ class ProblemView(APIView):
             responses=ProblemDeleteAPI.get_response(),
             tags=[_('Knowledge Base/Documentation/Paragraph/Question')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_PROBLEM_DELETE.get_workspace_permission())
+        @has_permissions(PermissionConstants.KNOWLEDGE_PROBLEM_DELETE.get_workspace_knowledge_permission())
         def delete(self, request: Request, workspace_id: str, knowledge_id: str, problem_id: str):
             return result.success(ProblemSerializers.Operate(
                 data={
@@ -145,7 +145,7 @@ class ProblemView(APIView):
             responses=ProblemEditAPI.get_response(),
             tags=[_('Knowledge Base/Documentation/Paragraph/Question')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_PROBLEM_EDIT.get_workspace_permission())
+        @has_permissions(PermissionConstants.KNOWLEDGE_PROBLEM_EDIT.get_workspace_knowledge_permission())
         def put(self, request: Request, workspace_id: str, knowledge_id: str, problem_id: str):
             return result.success(ProblemSerializers.Operate(
                 data={
@@ -167,7 +167,7 @@ class ProblemView(APIView):
             responses=ProblemPageAPI.get_response(),
             tags=[_('Knowledge Base/Documentation/Paragraph/Question')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_PROBLEM_READ.get_workspace_permission())
+        @has_permissions(PermissionConstants.KNOWLEDGE_PROBLEM_READ.get_workspace_knowledge_permission())
         def get(self, request: Request, workspace_id: str, knowledge_id: str, current_page, page_size):
             d = ProblemSerializers.Query(
                 data={

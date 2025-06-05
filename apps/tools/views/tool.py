@@ -188,7 +188,10 @@ class ToolView(APIView):
             parameters=PylintAPI.get_parameters(),
             tags=[_('Tool')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.TOOL_EXPORT.get_workspace_permission())
+        @has_permissions(
+            PermissionConstants.TOOL_CREATE.get_workspace_permission(),
+            PermissionConstants.TOOL_EDIT.get_workspace_permission(),
+        )
         def post(self, request: Request, workspace_id: str):
             return result.success(ToolSerializer.Pylint(
                 data={'workspace_id': workspace_id}

@@ -51,7 +51,7 @@ class KnowledgeView(APIView):
             responses=KnowledgeEditAPI.get_response(),
             tags=[_('Knowledge Base')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_EDIT.get_workspace_permission())
+        @has_permissions(PermissionConstants.KNOWLEDGE_EDIT.get_workspace_knowledge_permission())
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(KnowledgeSerializer.Operate(
                 data={'user_id': request.user.id, 'workspace_id': workspace_id, 'knowledge_id': knowledge_id}
@@ -67,7 +67,7 @@ class KnowledgeView(APIView):
             responses=KnowledgeBaseCreateAPI.get_response(),
             tags=[_('Knowledge Base')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_DELETE.get_workspace_permission())
+        @has_permissions(PermissionConstants.KNOWLEDGE_DELETE.get_workspace_knowledge_permission())
         def delete(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(KnowledgeSerializer.Operate(
                 data={'user_id': request.user.id, 'workspace_id': workspace_id, 'knowledge_id': knowledge_id}
@@ -82,7 +82,7 @@ class KnowledgeView(APIView):
             responses=KnowledgeReadAPI.get_response(),
             tags=[_('Knowledge Base')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_DELETE.get_workspace_permission())
+        @has_permissions(PermissionConstants.KNOWLEDGE_READ.get_workspace_knowledge_permission())
         def get(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(KnowledgeSerializer.Operate(
                 data={'user_id': request.user.id, 'workspace_id': workspace_id, 'knowledge_id': knowledge_id}
@@ -100,7 +100,7 @@ class KnowledgeView(APIView):
             responses=KnowledgePageAPI.get_response(),
             tags=[_('Knowledge Base')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_READ.get_workspace_permission())
+        @has_permissions(PermissionConstants.KNOWLEDGE_READ.get_workspace_knowledge_permission())
         def get(self, request: Request, workspace_id: str, current_page: int, page_size: int):
             return result.success(KnowledgeSerializer.Query(
                 data={
@@ -125,7 +125,7 @@ class KnowledgeView(APIView):
             responses=SyncWebAPI.get_response(),
             tags=[_('Knowledge Base')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_SYNC.get_workspace_permission())
+        @has_permissions(PermissionConstants.KNOWLEDGE_SYNC.get_workspace_knowledge_permission())
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(KnowledgeSerializer.SyncWeb(
                 data={
@@ -149,7 +149,7 @@ class KnowledgeView(APIView):
             responses=HitTestAPI.get_response(),
             tags=[_('Knowledge Base')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_EDIT.get_workspace_permission())
+        @has_permissions(PermissionConstants.KNOWLEDGE_EDIT.get_workspace_knowledge_permission())
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(KnowledgeSerializer.HitTest(
                 data={
@@ -176,7 +176,7 @@ class KnowledgeView(APIView):
             responses=EmbeddingAPI.get_response(),
             tags=[_('Knowledge Base')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_VECTOR.get_workspace_permission())
+        @has_permissions(PermissionConstants.KNOWLEDGE_VECTOR.get_workspace_knowledge_permission())
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(KnowledgeSerializer.Operate(
                 data={'knowledge_id': knowledge_id, 'workspace_id': workspace_id, 'user_id': request.user.id}
@@ -192,7 +192,7 @@ class KnowledgeView(APIView):
             responses=KnowledgeExportAPI.get_response(),
             tags=[_('Knowledge Base')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_EXPORT.get_workspace_permission())
+        @has_permissions(PermissionConstants.KNOWLEDGE_EXPORT.get_workspace_knowledge_permission())
         def get(self, request: Request, workspace_id: str, knowledge_id: str):
             return KnowledgeSerializer.Operate(data={
                 'workspace_id': workspace_id, 'knowledge_id': knowledge_id, 'user_id': request.user.id
@@ -208,7 +208,7 @@ class KnowledgeView(APIView):
             responses=KnowledgeExportAPI.get_response(),
             tags=[_('Knowledge Base')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_EXPORT.get_workspace_permission())
+        @has_permissions(PermissionConstants.KNOWLEDGE_EXPORT.get_workspace_knowledge_permission())
         def get(self, request: Request, workspace_id: str, knowledge_id: str):
             return KnowledgeSerializer.Operate(data={
                 'workspace_id': workspace_id, 'knowledge_id': knowledge_id, 'user_id': request.user.id
@@ -227,7 +227,7 @@ class KnowledgeView(APIView):
             responses=GenerateRelatedAPI.get_response(),
             tags=[_('Knowledge Base')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_GENERATE.get_workspace_permission())
+        @has_permissions(PermissionConstants.KNOWLEDGE_GENERATE.get_workspace_knowledge_permission())
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(KnowledgeSerializer.Operate(
                 data={'knowledge_id': knowledge_id, 'workspace_id': workspace_id, 'user_id': request.user.id}
