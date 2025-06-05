@@ -427,7 +427,7 @@ class DocumentView(APIView):
             responses=DocumentDownloadSourceAPI.get_response(),
             tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_DOWNLOAD_RAW.get_workspace_knowledge_permission())
+        @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_DOWNLOAD_SOURCE_FILE.get_workspace_knowledge_permission())
         def get(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
             return DocumentSerializers.Operate(data={
                 'workspace_id': workspace_id, 'document_id': document_id, 'knowledge_id': knowledge_id
