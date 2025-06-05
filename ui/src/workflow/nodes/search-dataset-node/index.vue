@@ -21,20 +21,20 @@
           </template>
           <div class="w-full">
             <el-text type="info" v-if="form_data.dataset_id_list?.length === 0">
-              {{ $t('views.application.applicationForm.form.relatedKnowledge.placeholder') }}
+              {{ $t('views.application.form.relatedKnowledge.placeholder') }}
             </el-text>
             <template v-for="(item, index) in form_data.dataset_id_list" :key="index" v-else>
               <div class="flex-between border border-r-4 white-bg mb-4" style="padding: 5px 8px">
                 <div class="flex align-center" style="line-height: 20px">
-                  <AppAvatar
+                  <el-avatar
                     v-if="relatedObject(datasetList, item, 'id')?.type === '1'"
                     class="mr-8 avatar-purple"
                     shape="square"
                     :size="20"
                   >
                     <img src="@/assets/knowledge/icon_web.svg" style="width: 58%" alt="" />
-                  </AppAvatar>
-                  <AppAvatar
+                  </el-avatar>
+                  <el-avatar
                     v-else-if="relatedObject(datasetList, item, 'id')?.type === '2'"
                     class="mr-8 avatar-purple"
                     shape="square"
@@ -42,10 +42,10 @@
                     style="background: none"
                   >
                     <img src="@/assets/knowledge/logo_lark.svg" style="width: 100%" alt="" />
-                  </AppAvatar>
-                  <AppAvatar v-else class="mr-8 avatar-blue" shape="square" :size="20">
+                  </el-avatar>
+                  <el-avatar v-else class="mr-8 avatar-blue" shape="square" :size="20">
                     <img src="@/assets/knowledge/icon_document.svg" style="width: 58%" alt="" />
-                  </AppAvatar>
+                  </el-avatar>
 
                   <div class="ellipsis" :title="relatedObject(datasetList, item, 'id')?.name">
                     {{ relatedObject(datasetList, item, 'id')?.name }}

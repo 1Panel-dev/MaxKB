@@ -12,22 +12,22 @@
               @mouseenter="showEditIcon = true"
               @mouseleave="showEditIcon = false"
             >
-              <AppAvatar
+              <el-avatar
                 v-if="isAppIcon(detail?.icon)"
                 shape="square"
                 :size="32"
                 style="background: none"
               >
                 <img :src="detail?.icon" alt="" />
-              </AppAvatar>
-              <AppAvatar
+              </el-avatar>
+              <el-avatar
                 v-else-if="detail?.name"
                 :name="detail?.name"
                 pinyinColor
                 shape="square"
                 :size="32"
               />
-              <AppAvatar
+              <el-avatar
                 v-if="showEditIcon"
                 shape="square"
                 class="edit-mask"
@@ -35,7 +35,7 @@
                 @click="openEditAvatar"
               >
                 <el-icon><EditPen /></el-icon>
-              </AppAvatar>
+              </el-avatar>
             </div>
 
             <h4>{{ detail?.name }}</h4>

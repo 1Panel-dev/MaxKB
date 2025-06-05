@@ -5,6 +5,7 @@ import useFolderStore from './modules/folder'
 import useThemeStore from './modules/theme'
 import useKnowledgeStore from './modules/knowledge'
 import useModelStore from './modules/model'
+import usePromptStore from './modules/prompt'
 
 const useStore = () => ({
   common: useCommonStore(),
@@ -14,6 +15,7 @@ const useStore = () => ({
   theme: useThemeStore(),
   knowledge: useKnowledgeStore(),
   model: useModelStore(),
+  prompt: usePromptStore(),
 })
 
 export default useStore

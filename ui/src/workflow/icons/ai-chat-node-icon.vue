@@ -1,6 +1,6 @@
 <template>
-  <AppAvatar class="avatar-gradient" shape="square">
+  <el-avatar class="avatar-gradient" shape="square">
     <img src="@/assets/icon_robot.svg" style="width: 75%" alt="" />
-  </AppAvatar>
+  </el-avatar>
 </template>
 <script setup lang="ts"></script>

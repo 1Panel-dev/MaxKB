@@ -13,7 +13,7 @@
         :label="$t('views.applicationWorkflow.nodes.baseNode.appName.label')"
         prop="name"
         :rules="{
-          message: t('views.application.applicationForm.form.appName.requiredMessage'),
+          message: t('views.application.form.appName.requiredMessage'),
           trigger: 'blur',
           required: true
         }"
@@ -21,7 +21,7 @@
         <el-input
           v-model="form_data.name"
           maxlength="64"
-          :placeholder="t('views.application.applicationForm.form.appName.placeholder')"
+          :placeholder="t('views.application.form.appName.placeholder')"
           show-word-limit
           @blur="form_data.name = form_data.name?.trim()"
         />
@@ -29,17 +29,17 @@
       <el-form-item :label="$t('views.applicationWorkflow.nodes.baseNode.appDescription.label')">
         <el-input
           v-model="form_data.desc"
-          :placeholder="$t('views.application.applicationForm.form.appDescription.placeholder')"
+          :placeholder="$t('views.application.form.appDescription.placeholder')"
           :rows="3"
           type="textarea"
           maxlength="256"
           show-word-limit
         />
       </el-form-item>
-      <el-form-item :label="$t('views.application.applicationForm.form.prologue')">
+      <el-form-item :label="$t('views.application.form.prologue')">
         <MdEditorMagnify
           @wheel="wheel"
-          :title="$t('views.application.applicationForm.form.prologue')"
+          :title="$t('views.application.form.prologue')"
           v-model="form_data.prologue"
           style="height: 150px"
           @submitDialog="submitDialog"
@@ -87,11 +87,11 @@
         <template #label>
           <div class="flex-between">
             <span class="mr-4">{{
-              $t('views.application.applicationForm.form.voiceInput.label')
+              $t('views.application.form.voiceInput.label')
             }}</span>
             <div class="flex">
               <el-checkbox v-if="form_data.stt_model_enable" v-model="form_data.stt_autosend">{{
-                $t('views.application.applicationForm.form.voiceInput.autoSend')
+                $t('views.application.form.voiceInput.autoSend')
               }}</el-checkbox>
               <el-switch
                 class="ml-8"
@@ -106,7 +106,7 @@
           @wheel="wheel"
           v-show="form_data.stt_model_enable"
           v-model="form_data.stt_model_id"
-          :placeholder="$t('views.application.applicationForm.form.voiceInput.placeholder')"
+          :placeholder="$t('views.application.form.voiceInput.placeholder')"
           :options="sttModelOptions"
           showFooter
           :model-type="'STT'"
@@ -116,11 +116,11 @@
         <template #label>
           <div class="flex-between">
             <span class="mr-4">{{
-              $t('views.application.applicationForm.form.voicePlay.label')
+              $t('views.application.form.voicePlay.label')
             }}</span>
             <div class="flex">
               <el-checkbox v-if="form_data.tts_model_enable" v-model="form_data.tts_autoplay">{{
-                $t('views.application.applicationForm.form.voicePlay.autoPlay')
+                $t('views.application.form.voicePlay.autoPlay')
               }}</el-checkbox>
               <el-switch
                 class="ml-8"
@@ -134,11 +134,11 @@
         <div class="w-full">
           <el-radio-group v-model="form_data.tts_type" v-show="form_data.tts_model_enable">
             <el-radio
-              :label="$t('views.application.applicationForm.form.voicePlay.browser')"
+              :label="$t('views.application.form.voicePlay.browser')"
               value="BROWSER"
             />
             <el-radio
-              :label="$t('views.application.applicationForm.form.voicePlay.tts')"
+              :label="$t('views.application.form.voicePlay.tts')"
               value="TTS"
             />
           </el-radio-group>
@@ -148,7 +148,7 @@
             @wheel="wheel"
             v-if="form_data.tts_type === 'TTS' && form_data.tts_model_enable"
             v-model="form_data.tts_model_id"
-            :placeholder="$t('views.application.applicationForm.form.voicePlay.placeholder')"
+            :placeholder="$t('views.application.form.voicePlay.placeholder')"
             :options="ttsModelOptions"
             @change="ttsModelChange()"
             showFooter
@@ -206,7 +206,7 @@ const FileUploadSettingDialogRef = ref<InstanceType<typeof FileUploadSettingDial
 const form = {
   name: '',
   desc: '',
-  prologue: t('views.application.applicationForm.form.defaultPrologue')
+  prologue: t('views.application.form.defaultPrologue')
 }
 
 const wheel = (e: any) => {
@@ -247,13 +247,13 @@ const validate = () => {
   ) {
     return Promise.reject({
       node: props.nodeModel,
-      errMessage: t('views.application.applicationForm.form.voicePlay.requiredMessage')
+      errMessage: t('views.application.form.voicePlay.requiredMessage')
     })
   }
   if (form_data.value.stt_model_enable && !form_data.value.stt_model_id) {
     return Promise.reject({
       node: props.nodeModel,
-      errMessage: t('views.application.applicationForm.form.voiceInput.requiredMessage')
+      errMessage: t('views.application.form.voiceInput.requiredMessage')
     })
   }
   return baseNodeFormRef.value?.validate().catch((err) => {
@@ -297,7 +297,7 @@ function sttModelEnableChange() {
 const openTTSParamSettingDialog = () => {
   const model_id = form_data.value.tts_model_id
   if (!model_id) {
-    MsgSuccess(t('views.application.applicationForm.form.voicePlay.requiredMessage'))
+    MsgSuccess(t('views.application.form.voicePlay.requiredMessage'))
     return
   }
   TTSModeParamSettingDialogRef.value?.open(model_id, id, form_data.value.tts_model_params_setting)

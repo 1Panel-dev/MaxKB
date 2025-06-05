@@ -15,6 +15,7 @@ import CodemirrorEditor from './codemirror-editor/index.vue'
 import InfiniteScroll from './infinite-scroll/index.vue'
 import ModelSelect from './model-select/index.vue'
 import ReadWrite from './read-write/index.vue'
+import AutoTooltip from './auto-tooltip/index.vue'
 export default {
   install(app: App) {
     app.component('LogoFull', LogoFull)
@@ -33,5 +34,6 @@ export default {
     app.component('InfiniteScroll', InfiniteScroll)
     app.component('ModelSelect', ModelSelect)
     app.component('ReadWrite', ReadWrite)
+    app.component('AutoTooltip', AutoTooltip)
   },
 }

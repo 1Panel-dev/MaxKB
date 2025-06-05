@@ -22,7 +22,7 @@
       <div class="flex-between">
         <el-button @click="testPlay" :loading="playLoading">
           <AppIcon iconName="app-video-play" class="mr-4"></AppIcon>
-          {{ $t('views.application.applicationForm.form.voicePlay.listeningTest') }}
+          {{ $t('views.application.form.voicePlay.listeningTest') }}
         </el-button>
 
         <span class="dialog-footer">

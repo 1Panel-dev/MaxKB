@@ -15,7 +15,7 @@
       <div class="card-header">
         <div class="flex-between">
           <div class="title flex align-center">
-            <AppAvatar
+            <el-avatar
               v-if="isAppIcon(functionDetail?.icon)"
               shape="square"
               :size="64"
@@ -23,8 +23,8 @@
               class="mr-8"
             >
               <img :src="functionDetail?.icon" alt="" />
-            </AppAvatar>
-            <AppAvatar
+            </el-avatar>
+            <el-avatar
               v-else-if="functionDetail?.name"
               :name="functionDetail?.name"
               pinyinColor

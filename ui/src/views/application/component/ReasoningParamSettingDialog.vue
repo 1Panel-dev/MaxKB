@@ -11,12 +11,12 @@
   >
     <el-form label-position="top" ref="paramFormRef" :model="form" class="p-12-16">
       <el-text type="info" class="color-secondary">{{
-        $t('views.application.applicationForm.form.reasoningContent.tooltip')
+        $t('views.application.form.reasoningContent.tooltip')
       }}</el-text>
       <el-row class="mt-16" :gutter="20">
         <el-col :span="12">
           <el-form-item
-            :label="$t('views.application.applicationForm.form.reasoningContent.start')"
+            :label="$t('views.application.form.reasoningContent.start')"
           >
             <el-input
               type="textarea"
@@ -28,7 +28,7 @@
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item :label="$t('views.application.applicationForm.form.reasoningContent.end')">
+          <el-form-item :label="$t('views.application.form.reasoningContent.end')">
             <el-input
               type="textarea"
               v-model="form.reasoning_content_end"

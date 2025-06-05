@@ -16,7 +16,7 @@
           prop="tts_model_id"
           :rules="{
             required: true,
-            message: $t('views.application.applicationForm.form.voicePlay.placeholder'),
+            message: $t('views.application.form.voicePlay.placeholder'),
             trigger: 'change'
           }"
         >
@@ -43,7 +43,7 @@
             @wheel="wheel"
             :teleported="false"
             v-model="form_data.tts_model_id"
-            :placeholder="$t('views.application.applicationForm.form.voicePlay.placeholder')"
+            :placeholder="$t('views.application.form.voicePlay.placeholder')"
             :options="modelOptions"
             showFooter
             :model-type="'TTS'"
@@ -184,7 +184,7 @@ function getModel() {
 const openTTSParamSettingDialog = () => {
   const model_id = form_data.value.tts_model_id
   if (!model_id) {
-    MsgSuccess(t('views.application.applicationForm.form.voicePlay.requiredMessage'))
+    MsgSuccess(t('views.application.form.voicePlay.requiredMessage'))
     return
   }
   TTSModeParamSettingDialogRef.value?.open(model_id, id, form_data.value.model_params_setting)

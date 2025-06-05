@@ -1,5 +1,5 @@
 <template>
-  <AppAvatar
+  <el-avatar
     v-if="isAppIcon(item?.icon)"
     shape="square"
     :size="32"
@@ -7,10 +7,10 @@
     class="mr-8"
   >
     <img :src="item?.icon" alt="" />
-  </AppAvatar>
-  <AppAvatar v-else shape="square" style="background: #34c724">
+  </el-avatar>
+  <el-avatar v-else shape="square" style="background: #34c724">
     <img src="@/assets/icon_function_outlined.svg" style="width: 75%" alt="" />
-  </AppAvatar>
+  </el-avatar>
 </template>
 <script setup lang="ts">
 import { isAppIcon } from '@/utils/common'

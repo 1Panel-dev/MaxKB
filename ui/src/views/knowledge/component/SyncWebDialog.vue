@@ -1,29 +1,29 @@
 <template>
   <el-dialog
-    :title="$t('views.dataset.syncWeb.title')"
+    :title="$t('views.knowledge.syncWeb.title')"
     v-model="dialogVisible"
     width="600px"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
     :destroy-on-close="true"
   >
-    <p class="mb-8">{{ $t('views.dataset.syncWeb.syncMethod') }}</p>
+    <p class="mb-8">{{ $t('views.knowledge.syncWeb.syncMethod') }}</p>
     <el-radio-group v-model="method" class="card__radio">
       <el-card shadow="never" class="mb-16" :class="method === 'replace' ? 'active' : ''">
         <el-radio value="replace" size="large">
-          <p class="mb-4">{{ $t('views.dataset.syncWeb.replace') }}</p>
-          <el-text type="info">{{ $t('views.dataset.syncWeb.replaceText') }}</el-text>
+          <p class="mb-4">{{ $t('views.knowledge.syncWeb.replace') }}</p>
+          <el-text type="info">{{ $t('views.knowledge.syncWeb.replaceText') }}</el-text>
         </el-radio>
       </el-card>
 
       <el-card shadow="never" class="mb-16" :class="method === 'complete' ? 'active' : ''">
         <el-radio value="complete" size="large">
-          <p class="mb-4">{{ $t('views.dataset.syncWeb.complete') }}</p>
-          <el-text type="info">{{ $t('views.dataset.syncWeb.completeText') }}</el-text>
+          <p class="mb-4">{{ $t('views.knowledge.syncWeb.complete') }}</p>
+          <el-text type="info">{{ $t('views.knowledge.syncWeb.completeText') }}</el-text>
         </el-radio>
       </el-card>
     </el-radio-group>
-    <p class="danger">{{ $t('views.dataset.syncWeb.tip') }}</p>
+    <p class="danger">{{ $t('views.knowledge.syncWeb.tip') }}</p>
     <template #footer>
       <span class="dialog-footer">
         <el-button @click.prevent="dialogVisible = false"> {{ $t('common.cancel') }} </el-button>

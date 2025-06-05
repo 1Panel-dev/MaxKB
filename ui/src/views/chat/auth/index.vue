@@ -2,15 +2,15 @@
   <div class="chat-pc__header" :style="customStyle">
     <div class="flex align-center">
       <div class="mr-12 ml-24 flex">
-        <AppAvatar
+        <el-avatar
           v-if="isAppIcon(application_profile?.icon)"
           shape="square"
           :size="32"
           style="background: none"
         >
           <img :src="application_profile?.icon" alt="" />
-        </AppAvatar>
-        <AppAvatar
+        </el-avatar>
+        <el-avatar
           v-else-if="application_profile?.name"
           :name="application_profile?.name"
           pinyinColor

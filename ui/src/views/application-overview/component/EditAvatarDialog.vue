@@ -9,7 +9,7 @@
     <el-radio-group v-model="radioType" class="radio-block mb-16">
       <el-radio value="default">
         <p>{{ $t('views.applicationOverview.appInfo.EditAvatarDialog.default') }}</p>
-        <AppAvatar
+        <el-avatar
           v-if="detail?.name"
           :name="detail?.name"
           pinyinColor
@@ -21,7 +21,7 @@
       <el-radio value="custom">
         <p>{{ $t('views.applicationOverview.appInfo.EditAvatarDialog.customizeUpload') }}</p>
         <div class="flex mt-8">
-          <AppAvatar
+          <el-avatar
             v-if="fileURL"
             shape="square"
             :size="32"
@@ -29,7 +29,7 @@
             class="mr-16"
           >
             <img :src="fileURL" alt="" />
-          </AppAvatar>
+          </el-avatar>
           <el-upload
             ref="uploadRef"
             action="#"

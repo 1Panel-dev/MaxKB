@@ -10,9 +10,9 @@
       <div class="hit-test__main p-16" v-loading="loading">
         <div class="question-title" :style="{ visibility: questionTitle ? 'visible' : 'hidden' }">
           <div class="avatar">
-            <AppAvatar>
+            <el-avatar>
               <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
-            </AppAvatar>
+            </el-avatar>
           </div>
           <div class="content">
             <h4 class="text break-all">{{ questionTitle }}</h4>
@@ -54,8 +54,8 @@
                   @click="editParagraph(item)"
                 >
                   <template #icon>
-                    <AppAvatar class="mr-12 avatar-light" :size="22">
-                      {{ index + 1 + '' }}</AppAvatar
+                    <el-avatar class="mr-12 avatar-light" :size="22">
+                      {{ index + 1 + '' }}</el-avatar
                     >
                   </template>
                   <div class="active-button primary">{{ item.similarity?.toFixed(3) }}</div>

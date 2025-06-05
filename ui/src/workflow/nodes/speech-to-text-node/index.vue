@@ -16,7 +16,7 @@
           prop="stt_model_id"
           :rules="{
             required: true,
-            message: $t('views.application.applicationForm.form.voiceInput.placeholder'),
+            message: $t('views.application.form.voiceInput.placeholder'),
             trigger: 'change'
           }"
         >
@@ -34,7 +34,7 @@
             @wheel="wheel"
             :teleported="false"
             v-model="form_data.stt_model_id"
-            :placeholder="$t('views.application.applicationForm.form.voiceInput.placeholder')"
+            :placeholder="$t('views.application.form.voiceInput.placeholder')"
             :options="modelOptions"
             showFooter
             :model-type="'STT'"

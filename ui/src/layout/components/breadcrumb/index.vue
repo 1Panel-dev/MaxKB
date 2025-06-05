@@ -81,15 +81,15 @@
                         shape="square"
                         :size="24"
                       />
-                      <AppAvatar
+                      <el-avatar
                         v-else-if="isDataset && item.type === '1'"
                         class="mr-12 avatar-purple"
                         shape="square"
                         :size="24"
                       >
                         <img src="@/assets/knowledge/icon_web.svg" style="width: 58%" alt="" />
-                      </AppAvatar>
-                      <AppAvatar
+                      </el-avatar>
+                      <el-avatar
                         v-else-if="isDataset && item.type === '2'"
                         class="mr-8 avatar-purple"
                         shape="square"
@@ -97,10 +97,10 @@
                         style="background: none"
                       >
                         <img src="@/assets/knowledge/logo_lark.svg" style="width: 100%" alt="" />
-                      </AppAvatar>
-                      <AppAvatar v-else class="mr-12 avatar-blue" shape="square" :size="24">
+                      </el-avatar>
+                      <el-avatar v-else class="mr-12 avatar-blue" shape="square" :size="24">
                         <img src="@/assets/knowledge/icon_document.svg" style="width: 58%" alt="" />
-                      </AppAvatar>
+                      </el-avatar>
                       <span class="ellipsis" :title="item?.name"> {{ item?.name }}</span>
                     </div>
                   </el-dropdown-item>

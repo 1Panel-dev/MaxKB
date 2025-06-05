@@ -19,7 +19,7 @@ export const startNode = {
       globalFields: [
         { label: t('views.applicationWorkflow.nodes.startNode.currentTime'), value: 'time' },
         {
-          label: t('views.application.applicationForm.form.historyRecord.label'),
+          label: t('views.application.form.historyRecord.label'),
           value: 'history_context'
         },
         {
@@ -49,7 +49,7 @@ export const baseNode = {
       name: '',
       desc: '',
       // @ts-ignore
-      prologue: t('views.application.applicationForm.form.defaultPrologue'),
+      prologue: t('views.application.form.defaultPrologue'),
       tts_type: 'BROWSER'
     },
     config: {},

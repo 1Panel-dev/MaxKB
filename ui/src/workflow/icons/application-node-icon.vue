@@ -1,5 +1,5 @@
 <template>
-  <AppAvatar
+  <el-avatar
     v-if="isAppIcon(item?.icon)"
     shape="square"
     :size="32"
@@ -7,8 +7,8 @@
     class="mr-8"
   >
     <img :src="item?.icon" alt="" />
-  </AppAvatar>
-  <AppAvatar
+  </el-avatar>
+  <el-avatar
     v-else-if="item?.name"
     :name="item?.name"
     pinyinColor

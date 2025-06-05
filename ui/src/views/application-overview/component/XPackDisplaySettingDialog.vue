@@ -33,15 +33,15 @@
             <div class="flex-between">
               <div class="flex align-center">
                 <div class="mr-12 ml-24 flex">
-                  <AppAvatar
+                  <el-avatar
                     v-if="isAppIcon(detail?.icon)"
                     shape="square"
                     :size="32"
                     style="background: none"
                   >
                     <img :src="detail?.icon" alt="" />
-                  </AppAvatar>
-                  <AppAvatar
+                  </el-avatar>
+                  <el-avatar
                     v-else-if="detail?.name"
                     :name="detail?.name"
                     pinyinColor
@@ -51,7 +51,7 @@
                 </div>
 
                 <h4 class="ellipsis">
-                  {{ detail?.name || $t('views.application.applicationForm.form.appName.label') }}
+                  {{ detail?.name || $t('views.application.form.appName.label') }}
                 </h4>
               </div>
               <div class="mr-16">
@@ -133,9 +133,9 @@
                     fit="cover"
                     style="width: 28px; height: 28px; display: block"
                   />
-                  <AppAvatar v-else>
+                  <el-avatar v-else>
                     <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
-                  </AppAvatar>
+                  </el-avatar>
                 </div>
               </div>
             </div>
