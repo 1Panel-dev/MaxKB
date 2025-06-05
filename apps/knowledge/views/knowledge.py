@@ -100,7 +100,7 @@ class KnowledgeView(APIView):
             responses=KnowledgePageAPI.get_response(),
             tags=[_('Knowledge Base')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_READ.get_workspace_knowledge_permission())
+        @has_permissions(PermissionConstants.KNOWLEDGE_READ.get_workspace_permission())
         def get(self, request: Request, workspace_id: str, current_page: int, page_size: int):
             return result.success(KnowledgeSerializer.Query(
                 data={
