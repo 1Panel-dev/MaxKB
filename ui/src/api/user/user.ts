@@ -13,6 +13,13 @@ const getUserProfile: (loading?: Ref<boolean>) => Promise<Result<User>> = (loadi
 }
 
 /**
+ * 获取profile
+ */
+const getProfile: (loading?: Ref<boolean>) => Promise<Result<any>> = (loading) => {
+  return get('/profile', undefined, loading)
+}
+
+/**
  * 获取版本profile
  */
 // const getProfile: (loading?: Ref<boolean>) => Promise<Result<any>> = (loading) => {
@@ -21,4 +28,5 @@ const getUserProfile: (loading?: Ref<boolean>) => Promise<Result<User>> = (loadi
 
 export default {
   getUserProfile,
+  getProfile
 }

@@ -37,6 +37,14 @@ const useLoginStore = defineStore('login', {
         return user.profile(loading)
       })
     },
+    async asyncLdapLogin(data: LoginRequest, loading?: Ref<boolean>) {
+      return loginApi.ldapLogin(data).then((ok) => {
+        this.token = ok?.data?.token
+        localStorage.setItem('token', ok?.data?.token)
+        const user = useUserStore()
+        return user.profile(loading)
+      })
+    },
   },
 })
 

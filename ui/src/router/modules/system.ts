@@ -32,6 +32,56 @@ const systemRouter = {
       },
       component: () => import('@/views/resource-authorization/index.vue'),
     },
+    {
+      path:'/system/setting',
+      name: 'setting',
+      meta: {
+        icon: 'app-setting',
+        iconActive: 'app-setting-active',
+        title: 'views.system.subTitle',
+        activeMenu: '/system',
+        parentPath: '/system',
+        parentName: 'system',
+      },
+      children: [
+        {
+          path: '/system/theme',
+          name: 'theme',
+          meta: {
+            title: 'views.system.theme.title',
+            activeMenu: '/setting',
+            parentPath: '/setting',
+            parentName: 'setting',
+            //permission: new ComplexPermission(['ADMIN'], ['x-pack'], 'AND')
+          },
+          component: () => import('@/views/theme/index.vue'),
+        },
+        {
+          path: '/system/authentication',
+          name: 'authentication',
+          meta: {
+            title: 'views.system.authentication.title',
+            activeMenu: '/setting',
+            parentPath: '/setting',
+            parentName: 'setting',
+            //permission: new ComplexPermission(['ADMIN'], ['x-pack'], 'AND')
+          },
+          component: () => import('@/views/authentication/index.vue')
+        },
+        {
+          path: '/system/email',
+          name: 'email',
+          meta: {
+            title: 'views.system.email.title',
+            activeMenu: '/setting',
+            parentPath: '/setting',
+            parentName: 'setting',
+            //permission: new Role('ADMIN')
+          },
+          component: () => import('@/views/email/index.vue')
+        }
+      ]
+    }
   ],
 }
 

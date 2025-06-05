@@ -32,9 +32,10 @@ def get_user_operation_object(user_id):
     user_model = QuerySet(model=User).filter(id=user_id).first()
     if user_model is not None:
         return {
-            "name":user_model.name
+            "name": user_model.name
         }
     return {}
+
 
 def get_re_password_details(request):
     path = request.path
@@ -43,10 +44,9 @@ def get_re_password_details(request):
     return {
         "path": path,
         "body": {**body, 'password': encryption(body.get('password', '')),
-                 're_password': encryption(body.get('re_password',''))},
+                 're_password': encryption(body.get('re_password', ''))},
         "query": query
     }
-
 
 
 class UserProfileView(APIView):
@@ -145,7 +145,7 @@ class UserManage(APIView):
                        responses=DefaultModelResponse.get_response())
         @has_permissions(PermissionConstants.USER_DELETE)
         @log(menu='User management', operate='Delete user',
-             get_operation_object= lambda r,k: get_user_operation_object(k.get('user_id')))
+             get_operation_object=lambda r, k: get_user_operation_object(k.get('user_id')))
         def delete(self, request: Request, user_id):
             return result.success(UserManageSerializer.Operate(data={'id': user_id}).delete(with_valid=True))
 
@@ -185,7 +185,7 @@ class UserManage(APIView):
                        responses=DefaultModelResponse.get_response())
         @has_permissions(PermissionConstants.USER_DELETE)
         @log(menu='User management', operate='Batch delete user',
-             get_operation_object= lambda r,k: get_user_operation_object(k.get('user_id')))
+             get_operation_object=lambda r, k: get_user_operation_object(k.get('user_id')))
         def post(self, request: Request):
             return result.success(UserManageSerializer.BatchDelete(data=request.data).batch_delete(with_valid=True))
 
@@ -201,7 +201,7 @@ class UserManage(APIView):
                        request=ChangeUserPasswordApi.get_request(),
                        responses=DefaultModelResponse.get_response())
         @log(menu='User management', operate='Change password',
-             get_operation_object= lambda r,k: get_user_operation_object(k.get('user_id')),
+             get_operation_object=lambda r, k: get_user_operation_object(k.get('user_id')),
              get_details=get_re_password_details)
         def put(self, request: Request, user_id):
             return result.success(

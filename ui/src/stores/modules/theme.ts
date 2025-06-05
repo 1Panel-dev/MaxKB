@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia'
 import { cloneDeep } from 'lodash'
 import { useElementPlusTheme } from 'use-element-plus-theme'
+import ThemeApi from '@/api/systemSettings/theme'
+import type {Ref} from "vue";
 export interface themeStateTypes {
   themeInfo: any
 }
@@ -18,8 +20,8 @@ const useThemeStore = defineStore('theme', {
     setTheme(data?: any) {
       const { changeTheme } = useElementPlusTheme(this.themeInfo?.theme || defalueColor)
       changeTheme(defalueColor)
-      // changeTheme(data?.['theme'])
-      // this.themeInfo = cloneDeep(data)
+      changeTheme(data?.['theme'])
+      this.themeInfo = cloneDeep(data)
     },
 
     // async theme(loading?: Ref<boolean>) {
