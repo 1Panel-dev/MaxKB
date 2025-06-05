@@ -152,7 +152,7 @@ class ToolView(APIView):
                     'workspace_id': workspace_id,
                     'folder_id': request.query_params.get('folder_id'),
                     'name': request.query_params.get('name'),
-                    'tool_type': request.query_params.get('tool_type'),
+                    'scope': request.query_params.get('scope'),
                 }
             ).page_tool_with_folders(current_page, page_size))
 

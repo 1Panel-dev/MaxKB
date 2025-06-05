@@ -9,7 +9,7 @@ from (select "id"::text,
              "user_id",
              "create_time",
              "update_time"
-      from tool ${tool_type_query_set}
+      from tool ${tool_scope_query_set}
       UNION
       select "id",
              "name",

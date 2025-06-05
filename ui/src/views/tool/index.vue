@@ -248,7 +248,7 @@ function openCreateDialog(data?: any) {
 function getList() {
   const params = {
     folder_id: currentFolder.value?.id || 'root',
-    tool_type: 'CUSTOM',
+    scope: 'WORKSPACE',
   }
   ToolApi.getToolList('default', paginationConfig, params, loading).then((res) => {
     paginationConfig.total = res.data?.total
