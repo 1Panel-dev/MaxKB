@@ -9,50 +9,70 @@
               <el-button
                 v-if="datasetDetail.type === 0"
                 type="primary"
-                @click="router.push({ path: '/dataset/upload', query: { id: id } })"
+                @click="router.push({ path: '/knowledge/upload', query: { id: id } })"
                 >{{ $t('views.document.uploadDocument') }}
               </el-button>
               <el-button v-if="datasetDetail.type === 1" type="primary" @click="importDoc"
                 >{{ $t('views.document.importDocument') }}
               </el-button>
-              <el-button
-                @click="syncMulDocument"
-                :disabled="multipleSelection.length === 0"
-                v-if="datasetDetail.type === 1"
-                >{{ $t('views.document.syncDocument') }}
-              </el-button>
-              <el-button
-                v-if="datasetDetail.type === 2"
-                type="primary"
-                @click="
-                  router.push({
-                    path: '/dataset/import',
-                    query: { id: id, folder_token: datasetDetail.meta.folder_token },
-                  })
-                "
-                >{{ $t('views.document.importDocument') }}
-              </el-button>
-              <el-button
-                @click="syncLarkMulDocument"
-                :disabled="multipleSelection.length === 0"
-                v-if="datasetDetail.type === 2"
-                >{{ $t('views.document.syncDocument') }}
-              </el-button>
-              <el-button @click="openDatasetDialog()" :disabled="multipleSelection.length === 0">
-                {{ $t('views.document.setting.migration') }}
-              </el-button>
+
               <el-button @click="batchRefresh" :disabled="multipleSelection.length === 0">
                 {{ $t('views.knowledge.setting.vectorization') }}
               </el-button>
               <el-button @click="openGenerateDialog()" :disabled="multipleSelection.length === 0">
                 {{ $t('views.document.generateQuestion.title') }}
               </el-button>
-              <el-button @click="openBatchEditDocument" :disabled="multipleSelection.length === 0">
-                {{ $t('common.setting') }}
+              <el-button @click="openDatasetDialog()" :disabled="multipleSelection.length === 0">
+                {{ $t('views.document.setting.migration') }}
               </el-button>
-              <el-button @click="deleteMulDocument" :disabled="multipleSelection.length === 0">
-                {{ $t('common.delete') }}
-              </el-button>
+              <el-dropdown>
+                <el-button class="ml-12 mr-12">
+                  <el-icon><MoreFilled /></el-icon>
+                </el-button>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item
+                      @click="openBatchEditDocument"
+                      :disabled="multipleSelection.length === 0"
+                    >
+                      {{ $t('common.setting') }}</el-dropdown-item
+                    >
+                    <el-dropdown-item
+                      divided
+                      @click="syncMulDocument"
+                      :disabled="multipleSelection.length === 0"
+                      v-if="datasetDetail.type === 1"
+                      >{{ $t('views.document.syncDocument') }}</el-dropdown-item
+                    >
+                    <el-dropdown-item
+                      divided
+                      v-if="datasetDetail.type === 2"
+                      type="primary"
+                      @click="
+                        router.push({
+                          path: '/knowledge/import',
+                          query: { id: id, folder_token: datasetDetail.meta.folder_token },
+                        })
+                      "
+                      >{{ $t('views.document.importDocument') }}</el-dropdown-item
+                    >
+                    <el-dropdown-item
+                      divided
+                      @click="syncLarkMulDocument"
+                      :disabled="multipleSelection.length === 0"
+                      v-if="datasetDetail.type === 2"
+                      >{{ $t('views.document.syncDocument') }}</el-dropdown-item
+                    >
+
+                    <el-dropdown-item
+                      divided
+                      @click="deleteMulDocument"
+                      :disabled="multipleSelection.length === 0"
+                      >{{ $t('common.delete') }}</el-dropdown-item
+                    >
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
             </div>
 
             <el-input
@@ -92,24 +112,6 @@
                 />
               </template>
             </el-table-column>
-            <el-table-column
-              prop="char_length"
-              :label="$t('views.document.table.char_length')"
-              align="right"
-              min-width="90"
-              sortable
-            >
-              <template #default="{ row }">
-                {{ numberFormat(row.char_length) }}
-              </template>
-            </el-table-column>
-            <el-table-column
-              prop="paragraph_count"
-              :label="$t('views.document.table.paragraph')"
-              align="right"
-              min-width="90"
-              sortable
-            />
             <el-table-column
               prop="status"
               :label="$t('views.document.fileStatus.label')"
@@ -187,6 +189,25 @@
                 <StatusValue :status="row.status" :status-meta="row.status_meta"></StatusValue>
               </template>
             </el-table-column>
+            <el-table-column
+              prop="char_length"
+              :label="$t('views.document.table.char_length')"
+              align="right"
+              min-width="90"
+              sortable
+            >
+              <template #default="{ row }">
+                {{ numberFormat(row.char_length) }}
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="paragraph_count"
+              :label="$t('views.document.table.paragraph')"
+              align="right"
+              min-width="90"
+              sortable
+            />
+
             <el-table-column width="130">
               <template #header>
                 <div>
@@ -227,13 +248,19 @@
                 </div>
               </template>
               <template #default="{ row }">
-                <div @click.stop>
-                  <el-switch
-                    :loading="loading"
-                    size="small"
-                    v-model="row.is_active"
-                    :before-change="() => changeState(row)"
-                  />
+                <div v-if="row.is_active" class="flex align-center">
+                  <el-icon class="color-success mr-8" style="font-size: 16px"
+                    ><SuccessFilled
+                  /></el-icon>
+                  <span class="color-secondary">
+                    {{ $t('common.status.enabled') }}
+                  </span>
+                </div>
+                <div v-else class="flex align-center">
+                  <AppIcon iconName="app-disabled" class="color-secondary mr-8"></AppIcon>
+                  <span class="color-secondary">
+                    {{ $t('common.status.disabled') }}
+                  </span>
                 </div>
               </template>
             </el-table-column>
@@ -300,43 +327,50 @@
             </el-table-column>
             <el-table-column :label="$t('common.operation')" align="left" width="110" fixed="right">
               <template #default="{ row }">
+                <span @click.stop>
+                  <el-switch
+                    :loading="loading"
+                    size="small"
+                    v-model="row.is_active"
+                    :before-change="() => changeState(row)"
+                  />
+                </span>
+                <el-divider direction="vertical" />
                 <div v-if="datasetDetail.type === 0">
                   <span class="mr-4">
-                    <el-tooltip
-                      effect="dark"
+                    <el-button
                       v-if="
                         ([State.STARTED, State.PENDING] as Array<string>).includes(
                           getTaskState(row.status, TaskType.EMBEDDING),
                         )
                       "
-                      :content="$t('views.document.setting.cancelVectorization')"
-                      placement="top"
+                      type="primary"
+                      text
+                      @click.stop="cancelTask(row, TaskType.EMBEDDING)"
+                      :title="$t('views.document.setting.cancelVectorization')"
                     >
-                      <el-button
-                        type="primary"
-                        text
-                        @click.stop="cancelTask(row, TaskType.EMBEDDING)"
-                      >
-                        <AppIcon iconName="app-close" style="font-size: 16px"></AppIcon>
-                      </el-button>
-                    </el-tooltip>
-                    <el-tooltip
-                      v-else
-                      effect="dark"
-                      :content="$t('views.dataset.setting.vectorization')"
-                      placement="top"
-                    >
-                      <el-button type="primary" text @click.stop="refreshDocument(row)">
-                        <AppIcon iconName="app-document-refresh" style="font-size: 16px"></AppIcon>
-                      </el-button>
-                    </el-tooltip>
+                      <AppIcon iconName="app-close" style="font-size: 16px"></AppIcon>
+                    </el-button>
                   </span>
                   <span class="mr-4">
-                    <el-tooltip effect="dark" :content="$t('common.setting')" placement="top">
-                      <el-button type="primary" text @click.stop="settingDoc(row)">
-                        <el-icon><Setting /></el-icon>
-                      </el-button>
-                    </el-tooltip>
+                    <el-button
+                      type="primary"
+                      text
+                      @click.stop="refreshDocument(row)"
+                      :title="$t('views.knowledge.setting.vectorization')"
+                    >
+                      <AppIcon iconName="app-document-refresh" style="font-size: 16px"></AppIcon>
+                    </el-button>
+                  </span>
+                  <span class="mr-4">
+                    <el-button
+                      type="primary"
+                      text
+                      @click.stop="settingDoc(row)"
+                      :title="$t('common.setting')"
+                    >
+                      <el-icon><Setting /></el-icon>
+                    </el-button>
                   </span>
                   <span @click.stop>
                     <el-dropdown trigger="click">
@@ -382,46 +416,39 @@
                 </div>
                 <div v-if="datasetDetail.type === 1 || datasetDetail.type === 2">
                   <span class="mr-4">
-                    <el-tooltip
-                      effect="dark"
-                      :content="$t('views.dataset.setting.sync')"
-                      placement="top"
+                    <el-button
+                      type="primary"
+                      text
+                      @click.stop="syncDocument(row)"
+                      :title="$t('views.knowledge.setting.sync')"
                     >
-                      <el-button type="primary" text @click.stop="syncDocument(row)">
-                        <el-icon><Refresh /></el-icon>
-                      </el-button>
-                    </el-tooltip>
+                      <el-icon><Refresh /></el-icon>
+                    </el-button>
                   </span>
                   <span class="mr-4">
-                    <el-tooltip
-                      effect="dark"
+                    <el-button
                       v-if="
                         ([State.STARTED, State.PENDING] as Array<string>).includes(
                           getTaskState(row.status, TaskType.EMBEDDING),
                         )
                       "
-                      :content="$t('views.document.setting.cancelVectorization')"
-                      placement="top"
+                      type="primary"
+                      text
+                      @click.stop="cancelTask(row, TaskType.EMBEDDING)"
+                      :title="$t('views.document.setting.cancelVectorization')"
                     >
-                      <el-button
-                        type="primary"
-                        text
-                        @click.stop="cancelTask(row, TaskType.EMBEDDING)"
-                      >
-                        <AppIcon iconName="app-close" style="font-size: 16px"></AppIcon>
-                      </el-button>
-                    </el-tooltip>
+                      <AppIcon iconName="app-close" style="font-size: 16px"></AppIcon>
+                    </el-button>
 
-                    <el-tooltip
-                      effect="dark"
+                    <el-button
                       v-else
-                      :content="$t('views.dataset.setting.vectorization')"
-                      placement="top"
+                      type="primary"
+                      text
+                      @click.stop="refreshDocument(row)"
+                      :title="$t('views.knowledge.setting.vectorization')"
                     >
-                      <el-button type="primary" text @click.stop="refreshDocument(row)">
-                        <AppIcon iconName="app-document-refresh" style="font-size: 16px"></AppIcon>
-                      </el-button>
-                    </el-tooltip>
+                      <AppIcon iconName="app-document-refresh" style="font-size: 16px"></AppIcon>
+                    </el-button>
                   </span>
 
                   <span @click.stop>
@@ -480,23 +507,23 @@
         <SelectDatasetDialog ref="SelectDatasetDialogRef" @refresh="refreshMigrate" />
         <GenerateRelatedDialog ref="GenerateRelatedDialogRef" @refresh="getList" />
       </div>
-      <div class="mul-operation w-full flex" v-if="multipleSelection.length !== 0">
-        <el-button :disabled="multipleSelection.length === 0" @click="cancelTaskHandle(1)">
-          {{ $t('views.document.setting.cancelVectorization') }}
-        </el-button>
-        <el-button :disabled="multipleSelection.length === 0" @click="cancelTaskHandle(2)">
-          {{ $t('views.document.setting.cancelGenerate') }}
-        </el-button>
-        <el-text type="info" class="secondary ml-24">
-          {{ $t('views.document.selected') }} {{ multipleSelection.length }}
-          {{ $t('views.document.items') }}
-        </el-text>
-        <el-button class="ml-16" type="primary" link @click="clearSelection">
-          {{ $t('common.clear') }}
-        </el-button>
-      </div>
-      <EmbeddingContentDialog ref="embeddingContentDialogRef"></EmbeddingContentDialog>
     </el-card>
+    <div class="mul-operation w-full flex" v-if="multipleSelection.length !== 0">
+      <el-button :disabled="multipleSelection.length === 0" @click="cancelTaskHandle(1)">
+        {{ $t('views.document.setting.cancelVectorization') }}
+      </el-button>
+      <el-button :disabled="multipleSelection.length === 0" @click="cancelTaskHandle(2)">
+        {{ $t('views.document.setting.cancelGenerate') }}
+      </el-button>
+      <el-text type="info" class="secondary ml-24">
+        {{ $t('views.document.selected') }} {{ multipleSelection.length }}
+        {{ $t('views.document.items') }}
+      </el-text>
+      <el-button class="ml-16" type="primary" link @click="clearSelection">
+        {{ $t('common.clear') }}
+      </el-button>
+    </div>
+    <EmbeddingContentDialog ref="embeddingContentDialogRef"></EmbeddingContentDialog>
   </div>
 </template>
 <script setup lang="ts">
@@ -508,8 +535,8 @@ import ImportDocumentDialog from './component/ImportDocumentDialog.vue'
 import SyncWebDialog from '@/views/knowledge/component/SyncWebDialog.vue'
 import SelectDatasetDialog from './component/SelectDatasetDialog.vue'
 import { numberFormat } from '@/utils/common'
-// import { datetimeFormat } from '@/utils/time'
-// import { hitHandlingMethod } from '@/enums/document'
+import { datetimeFormat } from '@/utils/time'
+import { hitHandlingMethod } from '@/enums/document'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import useStore from '@/stores'
 import StatusValue from '@/views/document/component/Status.vue'
