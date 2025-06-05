@@ -175,7 +175,7 @@
             </div>
           </template>
           <template #default="{ row }">
-            <StatusVlue :status="row.status" :status-meta="row.status_meta"></StatusVlue>
+            <StatusValue :status="row.status" :status-meta="row.status_meta"></StatusValue>
           </template>
         </el-table-column>
         <el-table-column width="130">
@@ -486,7 +486,7 @@ import { numberFormat } from '@/utils/common'
 // import { hitHandlingMethod } from '@/enums/document'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import useStore from '@/stores'
-import StatusVlue from '@/views/document/component/Status.vue'
+import StatusValue from '@/views/document/component/Status.vue'
 // import GenerateRelatedDialog from '@/components/generate-related-dialog/index.vue'
 import EmbeddingContentDialog from '@/views/document/component/EmbeddingContentDialog.vue'
 import { TaskType, State } from '@/utils/status'
