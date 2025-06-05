@@ -3,11 +3,11 @@ import { get, post, del, put } from '@/request/index'
 import type { Ref } from 'vue'
 import type { KeyValue } from '@/api/type/common'
 import type { pageRequest } from '@/api/type/common'
-const prefix = '/dataset'
+const prefix = '/workspace'
 
 /**
- * 文档分页列表
- * @param 参数  dataset_id,   
+ * 问题分页列表
+ * @param 参数  dataset_id,
  * page {
               "current_page": "string",
               "page_size": "string",
@@ -18,15 +18,16 @@ const prefix = '/dataset'
  */
 
 const getProblems: (
+  workspace_id: string,
   dataset_id: string,
   page: pageRequest,
   param: any,
-  loading?: Ref<boolean>
-) => Promise<Result<any>> = (dataset_id, page, param, loading) => {
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (wordspace_id, dataset_id, page, param, loading) => {
   return get(
-    `${prefix}/${dataset_id}/problem/${page.current_page}/${page.page_size}`,
+    `${prefix}/${wordspace_id}/knowledge/${dataset_id}/problem/${page.current_page}/${page.page_size}`,
     param,
-    loading
+    loading,
   )
 }
 
@@ -38,7 +39,7 @@ const getProblems: (
 const postProblems: (
   dataset_id: string,
   data: any,
-  loading?: Ref<boolean>
+  loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (dataset_id, data, loading) => {
   return post(`${prefix}/${dataset_id}/problem`, data, undefined, loading)
 }
@@ -50,7 +51,7 @@ const postProblems: (
 const delProblems: (
   dataset_id: string,
   problem_id: string,
-  loading?: Ref<boolean>
+  loading?: Ref<boolean>,
 ) => Promise<Result<boolean>> = (dataset_id, problem_id, loading) => {
   return del(`${prefix}/${dataset_id}/problem/${problem_id}`, loading)
 }
@@ -62,15 +63,15 @@ const delProblems: (
 const delMulProblem: (
   dataset_id: string,
   data: any,
-  loading?: Ref<boolean>
+  loading?: Ref<boolean>,
 ) => Promise<Result<boolean>> = (dataset_id, data, loading) => {
   return del(`${prefix}/${dataset_id}/problem/_batch`, undefined, data, loading)
 }
 
 /**
  * 修改问题
- * @param 参数 
- * dataset_id, problem_id, 
+ * @param 参数
+ * dataset_id, problem_id,
  * {
       "content": "string",
     }
@@ -79,7 +80,7 @@ const putProblems: (
   dataset_id: string,
   problem_id: string,
   data: any,
-  loading?: Ref<boolean>
+  loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (dataset_id, problem_id, data: any, loading) => {
   return put(`${prefix}/${dataset_id}/problem/${problem_id}`, data, undefined, loading)
 }
@@ -92,7 +93,7 @@ const putProblems: (
 const getDetailProblems: (
   dataset_id: string,
   problem_id: string,
-  loading?: Ref<boolean>
+  loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (dataset_id, problem_id, loading) => {
   return get(`${prefix}/${dataset_id}/problem/${problem_id}/paragraph`, undefined, loading)
 }
@@ -108,7 +109,7 @@ const getDetailProblems: (
 const postMulAssociationProblem: (
   dataset_id: string,
   data: any,
-  loading?: Ref<boolean>
+  loading?: Ref<boolean>,
 ) => Promise<Result<boolean>> = (dataset_id, data, loading) => {
   return post(`${prefix}/${dataset_id}/problem/_batch`, data, undefined, loading)
 }
@@ -120,5 +121,5 @@ export default {
   putProblems,
   getDetailProblems,
   delMulProblem,
-  postMulAssociationProblem
+  postMulAssociationProblem,
 }

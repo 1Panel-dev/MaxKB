@@ -6,6 +6,7 @@ import useThemeStore from './modules/theme'
 import useKnowledgeStore from './modules/knowledge'
 import useModelStore from './modules/model'
 import usePromptStore from './modules/prompt'
+import useProblemStore from './modules/problem'
 
 const useStore = () => ({
   common: useCommonStore(),
@@ -16,6 +17,7 @@ const useStore = () => ({
   knowledge: useKnowledgeStore(),
   model: useModelStore(),
   prompt: usePromptStore(),
+  problem: useProblemStore(),
 })
 
 export default useStore

@@ -3,7 +3,7 @@
     <template #header>
       <h4>{{ title }}</h4>
     </template>
-    <h4 class="title-decoration-1 mb-16 mt-8">{{ $t('views.userManage.info') }}</h4>
+    <h4 class="title-decoration-1 mb-16 mt-8">{{ $t('common.info') }}</h4>
     <el-form
       ref="userFormRef"
       :model="userForm"

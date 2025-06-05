@@ -79,4 +79,5 @@ export default {
     fileSizeExceeded: 'File size exceeds 10 MB',
     uploadImagePrompt: 'Please upload an image',
   },
+  info: 'Base Information',
 }

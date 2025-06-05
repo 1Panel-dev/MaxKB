@@ -75,7 +75,7 @@ const putSyncWebKnowledge: (
  * 向量化知识库
  * @param 参数 knowledge_id
  */
-const putReEmbeddingDataset: (
+const putReEmbeddingKnowledge: (
   wordspace_id: string,
   knowledge_id: string,
   loading?: Ref<boolean>,
@@ -110,7 +110,7 @@ const getKnowledgeDetail: (
   "embedding": "string"
  }
  */
-const postDataset: (
+const postKnowledge: (
   wordspace_id: string,
   data: knowledgeData,
   loading?: Ref<boolean>,
@@ -130,7 +130,7 @@ const postDataset: (
   "selector": "string"
  }
  */
-const postWebDataset: (
+const postWebKnowledge: (
   wordspace_id: string,
   data: any,
   loading?: Ref<boolean>,
@@ -138,29 +138,30 @@ const postWebDataset: (
   return post(`${prefix}/${wordspace_id}/knowledge/web`, data, undefined, loading)
 }
 /**
- * 创建Lark知识库
+ * 修改知识库信息
  * @param 参数
+ * knowledge_id
  * {
  "name": "string",
- "desc": "string",
- "app_id": "string",
- "app_secret": "string",
- "folder_token": "string",
+ "desc": true
  }
  */
-const postLarkDataset: (data: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
-  data,
-  loading,
-) => {
-  return post(`${prefix}/lark/save`, data, undefined, loading)
+const putKnowledge: (
+  wordspace_id: string,
+  knowledge_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (wordspace_id, knowledge_id, data, loading) => {
+  return put(`${prefix}/${wordspace_id}/knowledge/${knowledge_id}`, data, undefined, loading)
 }
 
 export default {
   getKnowledgeByFolder,
   getKnowledgeList,
-  putReEmbeddingDataset,
+  putReEmbeddingKnowledge,
   putSyncWebKnowledge,
   getKnowledgeDetail,
-  postDataset,
-  postWebDataset
+  postKnowledge,
+  postWebKnowledge,
+  putKnowledge,
 }

@@ -83,4 +83,5 @@ export default {
     fileSizeExceeded: '文件大小超过 10 MB',
     uploadImagePrompt: '请上传一张图片',
   },
+  info: '基本信息',
 }

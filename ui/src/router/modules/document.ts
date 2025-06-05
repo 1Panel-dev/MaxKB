@@ -43,19 +43,19 @@ const DocumentRouter = {
       },
       component: () => import('@/views/hit-test/index.vue')
     },
-    // {
-    //   path: 'setting',
-    //   name: 'DatasetSetting',
-    //   meta: {
-    //     icon: 'app-setting',
-    //     iconActive: 'app-setting-active',
-    //     title: 'common.setting',
-    //     active: 'setting',
-    //     parentPath: '/knowledge/:id/:folderId',
-    //     parentName: 'KnowledgeDetail'
-    //   },
-    //   component: () => import('@/views/dataset/DatasetSetting.vue')
-    // }
+    {
+      path: 'setting',
+      name: 'KnowledgeSetting',
+      meta: {
+        icon: 'app-setting',
+        iconActive: 'app-setting-active',
+        title: 'common.setting',
+        active: 'setting',
+        parentPath: '/knowledge/:id/:folderId',
+        parentName: 'KnowledgeDetail'
+      },
+      component: () => import('@/views/knowledge/KnowledgeSetting.vue')
+    }
   ],
 }
 

@@ -59,10 +59,15 @@ const useKnowledgeStore = defineStore('knowledge', {
           })
       })
     },
-    async asyncSyncDataset(id: string, sync_type: string, loading?: Ref<boolean>) {
+    async asyncSyncDataset(
+      workspace_id: string,
+      id: string,
+      sync_type: string,
+      loading?: Ref<boolean>,
+    ) {
       return new Promise((resolve, reject) => {
         knowledgeApi
-          .putSyncWebKnowledge(id, sync_type, loading)
+          .putSyncWebKnowledge(workspace_id, id, sync_type, loading)
           .then((data) => {
             resolve(data)
           })

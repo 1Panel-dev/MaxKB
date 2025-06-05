@@ -79,4 +79,5 @@ export default {
     fileSizeExceeded: '檔案大小超過 10 MB',
     uploadImagePrompt: '請上傳一張圖片',
   },
+  info: '使用者資訊',
 }
