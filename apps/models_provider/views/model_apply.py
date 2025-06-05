@@ -28,7 +28,7 @@ class ModelApply(APIView):
                        responses=DefaultModelResponse.get_response(),
                        tags=[_('Model')]  # type: ignore
                        )
-        def post(self, request: Request, workspace_id, model_id):
+        def post(self, request: Request, model_id):
             return result.success(
                 ModelApplySerializers(data={'model_id': model_id}).embed_documents(request.data))
 
@@ -40,7 +40,7 @@ class ModelApply(APIView):
                        responses=DefaultModelResponse.get_response(),
                        tags=[_('Model')]  # type: ignore
                        )
-        def post(self, request: Request, workspace_id, model_id):
+        def post(self, request: Request, model_id):
             return result.success(
                 ModelApplySerializers(data={'model_id': model_id}).embed_query(request.data))
 
@@ -52,6 +52,6 @@ class ModelApply(APIView):
                        responses=DefaultModelResponse.get_response(),
                        tags=[_('Model')]  # type: ignore
                        )
-        def post(self, request: Request, workspace_id, model_id):
+        def post(self, request: Request, model_id):
             return result.success(
                 ModelApplySerializers(data={'model_id': model_id}).compress_documents(request.data))
