@@ -410,6 +410,46 @@ h5 {
   }
 }
 
+/* tag */
+.default-tag {
+  background: var(--el-color-primary-light-8);
+  color: var(--el-color-primary);
+  border: none;
+}
+.danger-tag {
+  background: var(--tag-danger-bg);
+  color: #d03f3b;
+  border: none;
+}
+.success-tag {
+  background: var(--tag-success-bg);
+  color: var(--el-color-success);
+  border: none;
+}
+.warning-tag {
+  background: var(--tag-warning-bg);
+  color: var(--el-color-warning);
+  border: none;
+}
+
+.info-tag {
+  background: var(--app-text-color-light-1);
+  color: var(--app-text-color-secondary);
+  border: none;
+}
+
+.purple-tag {
+  background: #f2ebfe;
+  color: #7f3bf5;
+  border-color: #e0d7f0;
+}
+
+.blue-tag {
+  background: #ebf1ff;
+  color: #3370ff;
+  border-color: #d6e2ff;
+}
+
 /*
   内容部分 自适应高度
 */

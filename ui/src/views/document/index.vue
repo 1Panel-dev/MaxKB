@@ -325,7 +325,7 @@
                 {{ datetimeFormat(row.update_time) }}
               </template>
             </el-table-column>
-            <el-table-column :label="$t('common.operation')" align="left" width="110" fixed="right">
+            <el-table-column :label="$t('common.operation')" align="left" width="160" fixed="right">
               <template #default="{ row }">
                 <span @click.stop>
                   <el-switch
@@ -336,14 +336,16 @@
                   />
                 </span>
                 <el-divider direction="vertical" />
-                <div v-if="datasetDetail.type === 0">
-                  <span class="mr-4">
+                <template v-if="datasetDetail.type === 0">
+                  <span
+                    class="mr-4"
+                    v-if="
+                      ([State.STARTED, State.PENDING] as Array<string>).includes(
+                        getTaskState(row.status, TaskType.EMBEDDING),
+                      )
+                    "
+                  >
                     <el-button
-                      v-if="
-                        ([State.STARTED, State.PENDING] as Array<string>).includes(
-                          getTaskState(row.status, TaskType.EMBEDDING),
-                        )
-                      "
                       type="primary"
                       text
                       @click.stop="cancelTask(row, TaskType.EMBEDDING)"
@@ -352,7 +354,7 @@
                       <AppIcon iconName="app-close" style="font-size: 16px"></AppIcon>
                     </el-button>
                   </span>
-                  <span class="mr-4">
+                  <span class="mr-4" v-else>
                     <el-button
                       type="primary"
                       text
@@ -413,8 +415,8 @@
                       </template>
                     </el-dropdown>
                   </span>
-                </div>
-                <div v-if="datasetDetail.type === 1 || datasetDetail.type === 2">
+                </template>
+                <template v-if="datasetDetail.type === 1 || datasetDetail.type === 2">
                   <span class="mr-4">
                     <el-button
                       type="primary"
@@ -495,7 +497,7 @@
                       </template>
                     </el-dropdown>
                   </span>
-                </div>
+                </template>
               </template>
             </el-table-column>
           </app-table>

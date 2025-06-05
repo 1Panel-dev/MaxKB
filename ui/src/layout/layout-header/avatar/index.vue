@@ -12,23 +12,34 @@
 
     <template #dropdown>
       <el-dropdown-menu class="avatar-dropdown">
-        <div class="userInfo">
-          <p class="bold mb-4" style="font-size: 14px">{{ user.userInfo?.username }}</p>
-          <p>
-            <el-text type="info">
-              {{ user.userInfo?.email }}
-            </el-text>
-          </p>
+        <div class="userInfo flex align-center">
+          <div class="mr-12 flex align-center">
+            <el-avatar :size="30">
+              <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
+            </el-avatar>
+          </div>
+          <div style="width: 90%">
+            <p class="bold mb-4" style="font-size: 14px">{{ user.userInfo?.username }}</p>
+            <template
+              v-for="item in user.userInfo?.role"
+              v-if="user.userInfo?.role && user.userInfo.role.length > 0"
+            >
+              <el-tag size="small" class="default-tag">{{ user.userInfo?.role[0] }}</el-tag>
+              <el-tag size="small" class="default-tag ml-4" v-if="user.userInfo?.role?.length > 1"
+                >+{{ user.userInfo?.role?.length - 1 }}</el-tag
+              >
+            </template>
+          </div>
         </div>
         <el-dropdown-item class="border-t p-8" @click="openResetPassword">
           {{ $t('views.login.resetPassword') }}
         </el-dropdown-item>
         <div v-hasPermission="new ComplexPermission([], ['x-pack'], 'OR')">
-          <el-dropdown-item class="border-t p-8" @click="openAPIKeyDialog">
+          <el-dropdown-item class="p-8" @click="openAPIKeyDialog">
             {{ $t('layout.apiKey') }}
           </el-dropdown-item>
         </div>
-        <el-dropdown-item class="border-t" style="padding: 0" @click.stop>
+        <el-dropdown-item style="padding: 0" @click.stop>
           <el-dropdown class="w-full" trigger="hover" placement="left-start">
             <div class="flex-between w-full" style="line-height: 22px; padding: 12px 11px">
               <span> {{ $t('layout.language') }}</span>
@@ -59,8 +70,15 @@
             </template>
           </el-dropdown>
         </el-dropdown-item>
-        <el-dropdown-item class="border-t" @click="openAbout">
+        <el-dropdown-item @click="openAbout">
           {{ $t('layout.about.title') }}
+        </el-dropdown-item>
+
+        <el-dropdown-item @click="router.push({ path: `/system/user` })">
+          <div class="flex-between w-full">
+            {{ $t('views.system.title') }}
+            <AppIcon iconName="app-go"></AppIcon>
+          </div>
         </el-dropdown-item>
 
         <el-dropdown-item class="border-t" @click="logout">
