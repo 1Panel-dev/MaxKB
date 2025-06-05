@@ -768,7 +768,7 @@ function rowClickHandle(row: any, column: any) {
     return
   }
 
-  router.push({ path: `/dataset/${id}/${row.id}` })
+  router.push({ path: `/knowledge/${id}/${row.id}` })
 }
 
 /*

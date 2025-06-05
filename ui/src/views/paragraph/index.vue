@@ -182,7 +182,7 @@
 <script setup lang="ts">
 import { reactive, ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import documentApi from '@/api/document'
+import documentApi from '@/api/knowledge/document'
 import paragraphApi from '@/api/knowledge/paragraph'
 import ParagraphDialog from './component/ParagraphDialog.vue'
 import SelectDocumentDialog from './component/SelectDocumentDialog.vue'

@@ -65,7 +65,7 @@ const useLoginStore = defineStore('user', {
             this.XPACK_LICENSE_IS_VALID = true
 
             if (this.isEnterprise()) {
-              await this.theme()
+              // await this.theme()
             } else {
               this.themeInfo = {
                 ...defaultPlatformSetting
