@@ -10,6 +10,7 @@ from common.constants.permission_constants import PermissionConstants
 from common.result import result
 from tools.api.tool import ToolCreateAPI, ToolEditAPI, ToolReadAPI, ToolDeleteAPI, ToolTreeReadAPI, ToolDebugApi, \
     ToolExportAPI, ToolImportAPI, ToolPageAPI, PylintAPI, EditIconAPI
+from tools.models import ToolScope
 from tools.serializers.tool import ToolSerializer, ToolTreeSerializer
 
 
@@ -30,7 +31,7 @@ class ToolView(APIView):
     def post(self, request: Request, workspace_id: str):
         return result.success(ToolSerializer.Create(
             data={'user_id': request.user.id, 'workspace_id': workspace_id}
-        ).insert(request.data))
+        ).insert({**request.data, 'scope': ToolScope.WORKSPACE}))
 
     @extend_schema(
         methods=['GET'],
@@ -155,7 +156,7 @@ class ToolView(APIView):
         def post(self, request: Request, workspace_id: str):
             return result.success(ToolSerializer.Import(
                 data={'workspace_id': workspace_id, 'file': request.FILES.get('file'), 'user_id': request.user.id}
-            ).import_())
+            ).import_(ToolScope.WORKSPACE))
 
     class Export(APIView):
         authentication_classes = [TokenAuth]

@@ -210,7 +210,7 @@ class ToolSerializer(serializers.Serializer):
                         user_id=self.data.get('user_id'),
                         input_field_list=instance.get('input_field_list', []),
                         init_field_list=instance.get('init_field_list', []),
-                        scope=ToolScope.WORKSPACE,
+                        scope=instance.get('scope', ToolScope.WORKSPACE),
                         folder_id=instance.get('folder_id', 'root'),
                         is_active=False)
             tool.save()
@@ -371,7 +371,7 @@ class ToolSerializer(serializers.Serializer):
 
         #
         @transaction.atomic
-        def import_(self):
+        def import_(self, scope=ToolScope.WORKSPACE):
             self.is_valid()
 
             user_id = self.data.get('user_id')
@@ -389,7 +389,7 @@ class ToolSerializer(serializers.Serializer):
                 user_id=user_id,
                 input_field_list=tool.get('input_field_list'),
                 init_field_list=tool.get('init_field_list', []),
-                scope=ToolScope.WORKSPACE,
+                scope=scope,
                 is_active=False
             )
             tool_model.save()
