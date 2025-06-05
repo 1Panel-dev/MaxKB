@@ -25,6 +25,7 @@ class ToolFolder(MPTTModel, AppModelMixin):
 class ToolScope(models.TextChoices):
     SHARED = "SHARED", '共享'
     WORKSPACE = "WORKSPACE", "工作空间可用"
+    INTERNAL = "INTERNAL", '内置'
 
 
 class ToolType(models.TextChoices):

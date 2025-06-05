@@ -48,7 +48,7 @@ class Migration(migrations.Migration):
                 ('init_field_list', models.JSONField(default=list, verbose_name='启动字段列表')),
                 ('icon', models.CharField(default='/ui/favicon.ico', max_length=256, verbose_name='工具库icon')),
                 ('is_active', models.BooleanField(default=True)),
-                ('scope', models.CharField(choices=[('SHARED', '共享'), ('WORKSPACE', '工作空间可用')], default='WORKSPACE', max_length=20, verbose_name='可用范围')),
+                ('scope', models.CharField(choices=[('SHARED', '共享'), ('WORKSPACE', '工作空间可用'), ('INTERNAL', '内置')], default='WORKSPACE', max_length=20, verbose_name='可用范围')),
                 ('tool_type', models.CharField(choices=[('INTERNAL', '内置'), ('CUSTOM', '自定义')], db_index=True, default='CUSTOM', max_length=20, verbose_name='工具类型')),
                 ('template_id', models.UUIDField(default=None, null=True, verbose_name='模版id')),
                 ('workspace_id', models.CharField(db_index=True, default='default', max_length=64, verbose_name='工作空间id')),
