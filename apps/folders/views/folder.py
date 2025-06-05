@@ -1,3 +1,4 @@
+from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
 from rest_framework.request import Request
@@ -6,10 +7,28 @@ from rest_framework.views import APIView
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
 from common.constants.permission_constants import Permission, Group, Operate
+from common.log.log import log
 from common.result import result
 from folders.api.folder import FolderCreateAPI, FolderEditAPI, FolderReadAPI, FolderTreeReadAPI, FolderDeleteAPI
+from folders.models.folder import FolderCreateRequest, FolderEditRequest
 from folders.serializers.folder import FolderSerializer, FolderTreeSerializer
 
+
+def get_folder_create_operation_object(folder_name):
+    folder_model = QuerySet(model=FolderCreateRequest).filter(name=folder_name).first()
+    if folder_model is not None:
+        return {
+            'name': folder_model.name
+        }
+    return {}
+
+def get_folder_edit_operation_object(folder_name):
+    folder_model = QuerySet(model=FolderEditRequest).filter(name=folder_name).first()
+    if folder_model is not None:
+        return {
+            'name': folder_model.name
+        }
+    return {}
 
 class FolderView(APIView):
     authentication_classes = [TokenAuth]
@@ -26,6 +45,9 @@ class FolderView(APIView):
     )
     @has_permissions(lambda r, kwargs: Permission(group=Group(kwargs.get('source')), operate=Operate.CREATE,
                                                   resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}"))
+    @log(menu='folder', operate='Create folder',
+         get_operation_object=lambda r,k: get_folder_create_operation_object(k.get('folder_name'))
+         )
     def post(self, request: Request, workspace_id: str, source: str):
         return result.success(FolderSerializer.Create(
             data={'user_id': request.user.id,
@@ -64,6 +86,9 @@ class FolderView(APIView):
         )
         @has_permissions(lambda r, kwargs: Permission(group=Group(kwargs.get('source')), operate=Operate.EDIT,
                                                       resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}"))
+        @log(menu='folder', operate='Edit folder',
+             get_operation_object=lambda r, k: get_folder_edit_operation_object(k.get('folder_name'))
+             )
         def put(self, request: Request, workspace_id: str, source: str, folder_id: str):
             return result.success(FolderSerializer.Operate(
                 data={'id': folder_id, 'workspace_id': workspace_id, 'source': source}
@@ -96,6 +121,7 @@ class FolderView(APIView):
         )
         @has_permissions(lambda r, kwargs: Permission(group=Group(kwargs.get('source')), operate=Operate.DELETE,
                                                       resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}"))
+        @log(menu='folder', operate='Delete folder')
         def delete(self, request: Request, workspace_id: str, source: str, folder_id: str):
             return result.success(FolderSerializer.Operate(
                 data={'id': folder_id, 'workspace_id': workspace_id, 'source': source}

@@ -14,10 +14,12 @@ from rest_framework.views import APIView
 from application.api.application_version import ApplicationVersionListAPI, ApplicationVersionPageAPI, \
     ApplicationVersionAPI, ApplicationVersionOperateAPI
 from application.serializers.application_version import ApplicationVersionSerializer
+from application.views import get_application_operation_object
 from common import result
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
 from common.constants.permission_constants import PermissionConstants
+from common.log.log import log
 
 
 class ApplicationVersionView(APIView):
@@ -88,6 +90,8 @@ class ApplicationVersionView(APIView):
             responses=ApplicationVersionOperateAPI.get_response(),
             tags=[_('Application/Version')]  # type: ignore
         )
+        @log(menu='Application', operate="Modify application version information",
+             get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')))
         def put(self, request: Request, workspace_id: str, application_id: str, work_flow_version_id: str):
             return result.success(
                 ApplicationVersionSerializer.Operate(
