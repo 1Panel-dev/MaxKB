@@ -21,7 +21,10 @@
       @submit.prevent
     >
       <el-form-item :label="$t('views.team.teamForm.form.userName.label')" prop="users">
-        <tags-input v-model:tags="memberForm.users" :placeholder="$t('views.team.teamForm.form.userName.placeholder')" />
+        <tags-input
+          v-model:tags="memberForm.users"
+          :placeholder="$t('views.team.teamForm.form.userName.placeholder')"
+        />
       </el-form-item>
     </el-form>
     <template #footer>
@@ -45,7 +48,7 @@ const emit = defineEmits(['refresh'])
 const dialogVisible = ref<boolean>(false)
 
 const memberForm = ref({
-  users: []
+  users: [],
 })
 
 const addMemberFormRef = ref<FormInstance>()
@@ -58,15 +61,15 @@ const rules = ref<FormRules>({
       type: 'array',
       required: true,
       message: t('views.team.teamForm.form.userName.requiredMessage'),
-      trigger: 'change'
-    }
-  ]
+      trigger: 'change',
+    },
+  ],
 })
 
 watch(dialogVisible, (bool) => {
   if (!bool) {
     memberForm.value = {
-      users: []
+      users: [],
     }
     loading.value = false
   }
@@ -79,18 +82,12 @@ const submitMember = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid, fields) => {
     if (valid) {
-      loading.value = true
-      let idsArray = memberForm.value.users.map((obj: any) => obj.id)
-      AuthorizationApi.postCreatTeamMember(idsArray)
-        .then((res) => {
-          MsgSuccess(t('common.submitSuccess'))
-          emit('refresh', idsArray)
-          dialogVisible.value = false
-          loading.value = false
-        })
-        .catch(() => {
-          loading.value = false
-        })
+      const idsArray = memberForm.value.users.map((obj: any) => obj.id)
+      AuthorizationApi.postCreatTeamMember(idsArray, loading).then((res) => {
+        MsgSuccess(t('common.submitSuccess'))
+        emit('refresh', idsArray)
+        dialogVisible.value = false
+      })
     }
   })
 }

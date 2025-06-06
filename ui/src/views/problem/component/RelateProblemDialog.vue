@@ -131,13 +131,13 @@ const loading = ref(false)
 const documentList = ref<any[]>([])
 const cloneDocumentList = ref<any[]>([])
 const paragraphList = ref<any[]>([])
-const currentProblemId = ref<String>('')
+const currentProblemId = ref<string>('')
 const currentMulProblemId = ref<string[]>([])
 
 // 回显
 const associationParagraph = ref<any[]>([])
 
-const currentDocument = ref<String>('')
+const currentDocument = ref<string>('')
 const search = ref('')
 const searchType = ref('title')
 const filterDoc = ref('')
@@ -222,7 +222,7 @@ function getDocument() {
   })
 }
 
-function getParagraphList(documentId: String) {
+function getParagraphList(documentId: string) {
   paragraphApi
     .getParagraph(
       id,
@@ -238,16 +238,16 @@ function getParagraphList(documentId: String) {
 }
 
 // 已关联分段
-function getRecord(problemId: String) {
+function getRecord(problemId: string) {
   problemApi.getDetailProblems(id as string, problemId as string, loading).then((res) => {
     associationParagraph.value = res.data
   })
 }
 
-function associationCount(documentId: String) {
+function associationCount(documentId: string) {
   return associationParagraph.value.filter((item) => item.document_id === documentId).length
 }
-function isAssociation(paragraphId: String) {
+function isAssociation(paragraphId: string) {
   return associationParagraph.value.some((option) => option.id === paragraphId)
 }
 

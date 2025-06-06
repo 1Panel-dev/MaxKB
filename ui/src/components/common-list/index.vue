@@ -32,18 +32,18 @@ const props = withDefaults(
   {
     data: () => [],
     defaultActive: '',
-    valueKey: 'id'
-  }
+    valueKey: 'id',
+  },
 )
 
-const current = ref<Number | String>(0)
+const current = ref<number | string>(0)
 
 watch(
   () => props.defaultActive,
   (val) => {
     current.value = val
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 const emit = defineEmits(['click', 'mouseenter', 'mouseleave'])
@@ -64,7 +64,7 @@ function clearCurrent() {
   current.value = 0
 }
 defineExpose({
-  clearCurrent
+  clearCurrent,
 })
 </script>
 <style lang="scss" scoped>
@@ -87,6 +87,12 @@ defineExpose({
     &:hover {
       border-radius: 4px;
       background: var(--app-text-color-light-1);
+    }
+    &.is-active {
+      &:hover {
+        color: var(--el-color-primary);
+        background: var(--el-color-primary-light-9);
+      }
     }
   }
 }

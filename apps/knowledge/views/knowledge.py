@@ -6,10 +6,12 @@ from rest_framework.views import APIView
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
 from common.constants.permission_constants import PermissionConstants
+from common.log.log import log
 from common.result import result
 from knowledge.api.knowledge import KnowledgeBaseCreateAPI, KnowledgeWebCreateAPI, KnowledgeTreeReadAPI, \
     KnowledgeEditAPI, KnowledgeReadAPI, KnowledgePageAPI, SyncWebAPI, GenerateRelatedAPI, HitTestAPI, EmbeddingAPI, \
     GetModelAPI, KnowledgeExportAPI
+from knowledge.serializers.common import get_knowledge_operation_object
 from knowledge.serializers.knowledge import KnowledgeSerializer
 from models_provider.serializers.model_serializer import ModelSerializer
 
@@ -51,7 +53,9 @@ class KnowledgeView(APIView):
             responses=KnowledgeEditAPI.get_response(),
             tags=[_('Knowledge Base')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_EDIT.get_workspace_permission())
+        @has_permissions(PermissionConstants.KNOWLEDGE_EDIT.get_workspace_knowledge_permission())
+        @log(menu='Knowledge Base', operate="Modify knowledge base information",
+             get_operation_object=lambda r, keywords: get_knowledge_operation_object(keywords.get('knowledge_id')))
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(KnowledgeSerializer.Operate(
                 data={'user_id': request.user.id, 'workspace_id': workspace_id, 'knowledge_id': knowledge_id}
@@ -67,7 +71,9 @@ class KnowledgeView(APIView):
             responses=KnowledgeBaseCreateAPI.get_response(),
             tags=[_('Knowledge Base')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_DELETE.get_workspace_permission())
+        @has_permissions(PermissionConstants.KNOWLEDGE_DELETE.get_workspace_knowledge_permission())
+        @log(menu='Knowledge Base', operate="Delete knowledge base",
+             get_operation_object=lambda r, keywords: get_knowledge_operation_object(keywords.get('knowledge_id')))
         def delete(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(KnowledgeSerializer.Operate(
                 data={'user_id': request.user.id, 'workspace_id': workspace_id, 'knowledge_id': knowledge_id}
@@ -82,7 +88,7 @@ class KnowledgeView(APIView):
             responses=KnowledgeReadAPI.get_response(),
             tags=[_('Knowledge Base')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_DELETE.get_workspace_permission())
+        @has_permissions(PermissionConstants.KNOWLEDGE_READ.get_workspace_knowledge_permission())
         def get(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(KnowledgeSerializer.Operate(
                 data={'user_id': request.user.id, 'workspace_id': workspace_id, 'knowledge_id': knowledge_id}
@@ -125,7 +131,9 @@ class KnowledgeView(APIView):
             responses=SyncWebAPI.get_response(),
             tags=[_('Knowledge Base')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_SYNC.get_workspace_permission())
+        @has_permissions(PermissionConstants.KNOWLEDGE_SYNC.get_workspace_knowledge_permission())
+        @log(menu='Knowledge Base', operate="Synchronize the knowledge base of the website",
+             get_operation_object=lambda r, keywords: get_knowledge_operation_object(keywords.get('knowledge_id')))
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(KnowledgeSerializer.SyncWeb(
                 data={
@@ -149,7 +157,7 @@ class KnowledgeView(APIView):
             responses=HitTestAPI.get_response(),
             tags=[_('Knowledge Base')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_EDIT.get_workspace_permission())
+        @has_permissions(PermissionConstants.KNOWLEDGE_EDIT.get_workspace_knowledge_permission())
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(KnowledgeSerializer.HitTest(
                 data={
@@ -176,7 +184,9 @@ class KnowledgeView(APIView):
             responses=EmbeddingAPI.get_response(),
             tags=[_('Knowledge Base')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_VECTOR.get_workspace_permission())
+        @has_permissions(PermissionConstants.KNOWLEDGE_VECTOR.get_workspace_knowledge_permission())
+        @log(menu='Knowledge Base', operate='Re-vectorize',
+             get_operation_object=lambda r,k: get_knowledge_operation_object(k.get('knowledge_id')))
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(KnowledgeSerializer.Operate(
                 data={'knowledge_id': knowledge_id, 'workspace_id': workspace_id, 'user_id': request.user.id}
@@ -192,7 +202,9 @@ class KnowledgeView(APIView):
             responses=KnowledgeExportAPI.get_response(),
             tags=[_('Knowledge Base')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_EXPORT.get_workspace_permission())
+        @has_permissions(PermissionConstants.KNOWLEDGE_EXPORT.get_workspace_knowledge_permission())
+        @log(menu='Knowledge Base', operate="Export knowledge base",
+             get_operation_object=lambda r, keywords: get_knowledge_operation_object(keywords.get('knowledge_id')))
         def get(self, request: Request, workspace_id: str, knowledge_id: str):
             return KnowledgeSerializer.Operate(data={
                 'workspace_id': workspace_id, 'knowledge_id': knowledge_id, 'user_id': request.user.id
@@ -208,7 +220,9 @@ class KnowledgeView(APIView):
             responses=KnowledgeExportAPI.get_response(),
             tags=[_('Knowledge Base')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_EXPORT.get_workspace_permission())
+        @has_permissions(PermissionConstants.KNOWLEDGE_EXPORT.get_workspace_knowledge_permission())
+        @log(menu='Knowledge Base', operate="Export knowledge base containing images",
+             get_operation_object=lambda r, keywords: get_knowledge_operation_object(keywords.get('knowledge_id')))
         def get(self, request: Request, workspace_id: str, knowledge_id: str):
             return KnowledgeSerializer.Operate(data={
                 'workspace_id': workspace_id, 'knowledge_id': knowledge_id, 'user_id': request.user.id
@@ -227,7 +241,10 @@ class KnowledgeView(APIView):
             responses=GenerateRelatedAPI.get_response(),
             tags=[_('Knowledge Base')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_GENERATE.get_workspace_permission())
+        @has_permissions(PermissionConstants.KNOWLEDGE_GENERATE.get_workspace_knowledge_permission())
+        @log(menu='document', operate='Generate related documents',
+             get_operation_object=lambda r,k: get_knowledge_operation_object(k.get('knowledge_id'))
+             )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(KnowledgeSerializer.Operate(
                 data={'knowledge_id': knowledge_id, 'workspace_id': workspace_id, 'user_id': request.user.id}
@@ -290,6 +307,8 @@ class KnowledgeBaseView(APIView):
         tags=[_('Knowledge Base')]  # type: ignore
     )
     @has_permissions(PermissionConstants.KNOWLEDGE_CREATE.get_workspace_permission())
+    @log(menu='knowledge Base', operate='Create base knowledge',
+         get_operation_object=lambda r,k: {'name': r.data.get('name'), 'desc': r.data.get('desc')})
     def post(self, request: Request, workspace_id: str):
         return result.success(KnowledgeSerializer.Create(
             data={'user_id': request.user.id, 'workspace_id': workspace_id}
@@ -310,6 +329,13 @@ class KnowledgeWebView(APIView):
         tags=[_('Knowledge Base')]  # type: ignore
     )
     @has_permissions(PermissionConstants.KNOWLEDGE_CREATE.get_workspace_permission())
+    @log(menu='Knowledge Base', operate="Create a web site knowledge base",
+         get_operation_object=lambda r,k: {'name': r.data.get('name'),'desc': r.data.get('desc'),
+                                           'first_list': r.FILES.getlist('file'),
+                                           'meta': {'source_url': r.data.get('source_url'),
+                                                    'selector': r.data.get('selector'),
+                                                    'embedding_model_id': r.data.get('embedding_model_id')}}
+         )
     def post(self, request: Request, workspace_id: str):
         return result.success(KnowledgeSerializer.Create(
             data={'user_id': request.user.id, 'workspace_id': workspace_id}

@@ -96,7 +96,7 @@ const open = () => {
 }
 
 const onChange = (file: any) => {
-  let fd = new FormData()
+  const fd = new FormData()
   fd.append('license_file', file.raw)
   licenseApi.putLicense(fd, loading).then((res: any) => {
     getLicenseInfo()

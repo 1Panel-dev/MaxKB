@@ -1,13 +1,13 @@
 interface toolData {
-  id?: String
-  name?: String
-  icon?: String
-  desc?: String
-  code?: String
+  id?: string
+  name?: string
+  icon?: string
+  desc?: string
+  code?: string
   input_field_list?: Array<any>
   init_field_list?: Array<any>
-  is_active?: Boolean
-  folder_id?: String
+  is_active?: boolean
+  folder_id?: string
 }
 
 export type { toolData }

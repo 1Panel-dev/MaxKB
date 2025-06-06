@@ -2,7 +2,7 @@ export default {
   github: '項目地址',
   wiki: '使用者手冊',
   forum: '論壇求助',
-  logout: '退出',
+  logout: '登出',
 
   apiKey: 'API Key 管理',
   apiServiceAddress: 'API 服務地址',

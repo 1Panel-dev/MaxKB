@@ -19,7 +19,7 @@
         <el-button @click="router.push({ path: `/dataset` })">{{
           $t('views.dataset.ResultSuccess.buttons.toDataset')
         }}</el-button>
-        <el-button type="primary" @click="router.push({ path: `/dataset/${data?.id}/document` })">{{
+        <el-button type="primary" @click="router.push({ path: `/dataset/${data?.id}/${currentFolder.id}/document` })">{{
           $t('views.dataset.ResultSuccess.buttons.toDocument')
         }}</el-button>
       </template>

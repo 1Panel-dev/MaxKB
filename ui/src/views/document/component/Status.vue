@@ -71,9 +71,9 @@ const startedMap = {
   [TaskType.SYNC]: t('views.document.fileStatus.SYNC')
 }
 const taskTypeMap = {
-  [TaskType.EMBEDDING]: t('views.dataset.setting.vectorization'),
+  [TaskType.EMBEDDING]: t('views.knowledge.setting.vectorization'),
   [TaskType.GENERATE_PROBLEM]: t('views.document.generateQuestion.title'),
-  [TaskType.SYNC]: t('views.dataset.setting.sync')
+  [TaskType.SYNC]: t('views.knowledge.setting.sync')
 }
 const stateMap: any = {
   [State.PENDING]: (type: number) => t('views.document.fileStatus.PENDING'),

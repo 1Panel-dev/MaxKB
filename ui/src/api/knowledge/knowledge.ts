@@ -1,9 +1,10 @@
-import { Result } from '@/request/Result'
-import { get, post, del, put } from '@/request/index'
-import { type Ref } from 'vue'
-import type { pageRequest } from '@/api/type/common'
-import type { knowledgeData } from '@/api/type/knowledge'
-const prefix = '/workspace'
+import {Result} from '@/request/Result'
+import {get, post, del, put} from '@/request/index'
+import {type Ref} from 'vue'
+import type {pageRequest} from '@/api/type/common'
+import type {knowledgeData} from '@/api/type/knowledge'
+
+const prefix = '/workspace/' + localStorage.getItem('workspace_id')
 
 /**
  * 获得知识库文件夹列表
@@ -14,31 +15,29 @@ const prefix = '/workspace'
  * desc: string,}
  */
 const getKnowledgeByFolder: (
-  wordspace_id: string,
   data?: any,
   loading?: Ref<boolean>,
-) => Promise<Result<Array<any>>> = (wordspace_id, data, loading) => {
-  return get(`${prefix}/${wordspace_id}/knowledge`, data, loading)
+) => Promise<Result<Array<any>>> = (data, loading) => {
+  return get(`${prefix}/knowledge`, data, loading)
 }
 
 /**
  * 知识库分页列表
  * @param 参数
-* param  {
-            "folder_id": "string",
-            "name": "string",
-            "tool_type": "string",
-            desc: string,
-          }
+ * param  {
+ "folder_id": "string",
+ "name": "string",
+ "tool_type": "string",
+ desc: string,
+ }
  */
 const getKnowledgeList: (
-  wordspace_id: string,
   page: pageRequest,
   param?: any,
   loading?: Ref<boolean>,
-) => Promise<Result<any>> = (wordspace_id, page, param, loading) => {
+) => Promise<Result<any>> = (page, param, loading) => {
   return get(
-    `${prefix}/${wordspace_id}/knowledge/${page.current_page}/${page.page_size}`,
+    `${prefix}/knowledge/${page.current_page}/${page.page_size}`,
     param,
     loading,
   )
@@ -58,15 +57,14 @@ const getKnowledgeList: (
  * @query 参数 sync_type // 同步类型->replace:替换同步,complete:完整同步
  */
 const putSyncWebKnowledge: (
-  wordspace_id: string,
   knowledge_id: string,
   sync_type: string,
   loading?: Ref<boolean>,
-) => Promise<Result<any>> = (wordspace_id, knowledge_id, sync_type, loading) => {
+) => Promise<Result<any>> = (knowledge_id, sync_type, loading) => {
   return put(
-    `${prefix}/${wordspace_id}/knowledge/${knowledge_id}/sync`,
+    `${prefix}/knowledge/${knowledge_id}/sync`,
     undefined,
-    { sync_type },
+    {sync_type},
     loading,
   )
 }
@@ -75,13 +73,12 @@ const putSyncWebKnowledge: (
  * 向量化知识库
  * @param 参数 knowledge_id
  */
-const putReEmbeddingDataset: (
-  wordspace_id: string,
+const putReEmbeddingKnowledge: (
   knowledge_id: string,
   loading?: Ref<boolean>,
-) => Promise<Result<any>> = (wordspace_id, knowledge_id, loading) => {
+) => Promise<Result<any>> = (knowledge_id, loading) => {
   return put(
-    `${prefix}/${wordspace_id}/knowledge/${knowledge_id}/embedding`,
+    `${prefix}/knowledge/${knowledge_id}/embedding`,
     undefined,
     undefined,
     loading,
@@ -93,29 +90,27 @@ const putReEmbeddingDataset: (
  * @param 参数 knowledge_id
  */
 const getKnowledgeDetail: (
-  wordspace_id: string,
   knowledge_id: string,
   loading?: Ref<boolean>,
-) => Promise<Result<any>> = (wordspace_id, knowledge_id, loading) => {
-  return get(`${prefix}/${wordspace_id}/knowledge/${knowledge_id}`, undefined, loading)
+) => Promise<Result<any>> = (knowledge_id, loading) => {
+  return get(`${prefix}/knowledge/${knowledge_id}`, undefined, loading)
 }
 
 /**
  * 创建知识库
  * @param 参数
  * {
-  "name": "string",
-  "folder_id": "string",
-  "desc": "string",
-  "embedding": "string"
+ "name": "string",
+ "folder_id": "string",
+ "desc": "string",
+ "embedding": "string"
  }
  */
-const postDataset: (
-  wordspace_id: string,
+const postKnowledge: (
   data: knowledgeData,
   loading?: Ref<boolean>,
-) => Promise<Result<any>> = (wordspace_id, data, loading) => {
-  return post(`${prefix}/${wordspace_id}/knowledge/base`, data, undefined, loading, 1000 * 60 * 5)
+) => Promise<Result<any>> = (data, loading) => {
+  return post(`${prefix}/knowledge/base`, data, undefined, loading, 1000 * 60 * 5)
 }
 
 /**
@@ -123,44 +118,43 @@ const postDataset: (
  * @param 参数
  * {
  "name": "string",
-  "folder_id": "string",
-  "desc": "string",
-  "embedding": "string",
-  "source_url": "string",
-  "selector": "string"
+ "folder_id": "string",
+ "desc": "string",
+ "embedding": "string",
+ "source_url": "string",
+ "selector": "string"
  }
  */
-const postWebDataset: (
-  wordspace_id: string,
+const postWebKnowledge: (
   data: any,
   loading?: Ref<boolean>,
-) => Promise<Result<any>> = (wordspace_id, data, loading) => {
-  return post(`${prefix}/${wordspace_id}/knowledge/web`, data, undefined, loading)
+) => Promise<Result<any>> = (data, loading) => {
+  return post(`${prefix}/knowledge/web`, data, undefined, loading)
 }
 /**
- * 创建Lark知识库
+ * 修改知识库信息
  * @param 参数
+ * knowledge_id
  * {
  "name": "string",
- "desc": "string",
- "app_id": "string",
- "app_secret": "string",
- "folder_token": "string",
+ "desc": true
  }
  */
-const postLarkDataset: (data: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
-  data,
-  loading,
-) => {
-  return post(`${prefix}/lark/save`, data, undefined, loading)
+const putKnowledge: (
+  knowledge_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (knowledge_id, data, loading) => {
+  return put(`${prefix}/knowledge/${knowledge_id}`, data, undefined, loading)
 }
 
 export default {
   getKnowledgeByFolder,
   getKnowledgeList,
-  putReEmbeddingDataset,
+  putReEmbeddingKnowledge,
   putSyncWebKnowledge,
   getKnowledgeDetail,
-  postDataset,
-  postWebDataset
+  postKnowledge,
+  postWebKnowledge,
+  putKnowledge,
 }

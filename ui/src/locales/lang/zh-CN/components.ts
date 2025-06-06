@@ -7,9 +7,12 @@ export default {
   selectParagraph: {
     title: '选择分段',
     error: '仅执行未成功分段',
-    all: '全部分段'
+    all: '全部分段',
   },
   folder: {
-    addFolder:'添加文件夹'
-  }
+    addFolder: '添加文件夹',
+    folderNamePlaceholder: '请输入名称',
+    description: '描述',
+    descriptionPlaceholder: '请输入描述',
+  },
 }

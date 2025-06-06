@@ -33,7 +33,7 @@ CELERY_WORKER_REDIRECT_STDOUTS = True
 CELERY_WORKER_REDIRECT_STDOUTS_LEVEL = "INFO"
 CELERY_TASK_SOFT_TIME_LIMIT = 3600
 CELERY_WORKER_CANCEL_LONG_RUNNING_TASKS_ON_CONNECTION_LOSS = True
-CELERY_ACKS_LATE = True
+CELERY_TASK_ACKS_LATE = True
 celery_once_path = os.path.join(celery_data_dir, "celery_once")
 try:
     if os.path.exists(celery_once_path) and os.path.isdir(celery_once_path):

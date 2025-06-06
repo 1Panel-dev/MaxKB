@@ -1,17 +1,17 @@
-import { Result } from '@/request/Result'
-import { get, post, postStream, del, put, request, download, exportFile } from '@/request/index'
-import type { pageRequest } from '@/api/type/common'
-import type { ApplicationFormType } from '@/api/type/application'
-import { type Ref } from 'vue'
-import type { FormField } from '@/components/dynamics-form/type'
+import {Result} from '@/request/Result'
+import {get, post, postStream, del, put, request, download, exportFile} from '@/request/index'
+import type {pageRequest} from '@/api/type/common'
+import type {ApplicationFormType} from '@/api/type/application'
+import {type Ref} from 'vue'
+import type {FormField} from '@/components/dynamics-form/type'
 
-const prefix = '/workspace'
+const prefix = '/workspace/' + localStorage.getItem('workspace_id') + '/application'
 
 /**
  * 获取全部应用
  * @param 参数
  */
-const getAllAppilcation: () => Promise<Result<any[]>> = () => {
+const getAllApplication: () => Promise<Result<any[]>> = () => {
   return get(`${prefix}`)
 }
 
@@ -22,13 +22,12 @@ const getAllAppilcation: () => Promise<Result<any[]>> = () => {
  }
  */
 const getApplication: (
-  wordspace_id: string,
   page: pageRequest,
   param: any,
   loading?: Ref<boolean>,
-) => Promise<Result<any>> = (wordspace_id, page, param, loading) => {
+) => Promise<Result<any>> = (page, param, loading) => {
   return get(
-    `${prefix}/${wordspace_id}/application/${page.current_page}/${page.page_size}`,
+    `${prefix}/${page.current_page}/${page.page_size}`,
     param,
     loading,
   )
@@ -39,11 +38,10 @@ const getApplication: (
  * @param 参数
  */
 const postApplication: (
-  wordspace_id: string,
   data: ApplicationFormType,
   loading?: Ref<boolean>,
-) => Promise<Result<any>> = (wordspace_id, data, loading) => {
-  return post(`${prefix}/${wordspace_id}/application`, data, undefined, loading)
+) => Promise<Result<any>> = (data, loading) => {
+  return post(`${prefix}`, data, undefined, loading)
 }
 
 /**
@@ -51,7 +49,7 @@ const postApplication: (
  * @param 参数
  */
 const putApplication: (
-  application_id: String,
+  application_id: string,
   data: ApplicationFormType,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (application_id, data, loading) => {
@@ -63,7 +61,7 @@ const putApplication: (
  * @param 参数 application_id
  */
 const delApplication: (
-  application_id: String,
+  application_id: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<boolean>> = (application_id, loading) => {
   return del(`${prefix}/${application_id}`, undefined, {}, loading)
@@ -131,7 +129,7 @@ const postAppAuthentication: (
 ) => Promise<any> = (access_token, loading, authentication_value) => {
   return post(
     `${prefix}/authentication`,
-    { access_token: access_token, authentication_value },
+    {access_token: access_token, authentication_value},
     undefined,
     loading,
   )
@@ -179,7 +177,7 @@ const postWorkflowChatOpen: (data: ApplicationFormType) => Promise<Result<any>> 
  ]
  }
  */
-const getChatOpen: (application_id: String) => Promise<Result<any>> = (application_id) => {
+const getChatOpen: (application_id: string) => Promise<Result<any>> = (application_id) => {
   return get(`${prefix}/${application_id}/chat/open`)
 }
 /**
@@ -257,7 +255,7 @@ const getApplicationRerankerModel: (
   application_id: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<Array<any>>> = (application_id, loading) => {
-  return get(`${prefix}/${application_id}/model`, { model_type: 'RERANKER' }, loading)
+  return get(`${prefix}/${application_id}/model`, {model_type: 'RERANKER'}, loading)
 }
 
 /**
@@ -271,7 +269,7 @@ const getApplicationSTTModel: (
   application_id: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<Array<any>>> = (application_id, loading) => {
-  return get(`${prefix}/${application_id}/model`, { model_type: 'STT' }, loading)
+  return get(`${prefix}/${application_id}/model`, {model_type: 'STT'}, loading)
 }
 
 /**
@@ -285,21 +283,21 @@ const getApplicationTTSModel: (
   application_id: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<Array<any>>> = (application_id, loading) => {
-  return get(`${prefix}/${application_id}/model`, { model_type: 'TTS' }, loading)
+  return get(`${prefix}/${application_id}/model`, {model_type: 'TTS'}, loading)
 }
 
 const getApplicationImageModel: (
   application_id: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<Array<any>>> = (application_id, loading) => {
-  return get(`${prefix}/${application_id}/model`, { model_type: 'IMAGE' }, loading)
+  return get(`${prefix}/${application_id}/model`, {model_type: 'IMAGE'}, loading)
 }
 
 const getApplicationTTIModel: (
   application_id: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<Array<any>>> = (application_id, loading) => {
-  return get(`${prefix}/${application_id}/model`, { model_type: 'TTI' }, loading)
+  return get(`${prefix}/${application_id}/model`, {model_type: 'TTI'}, loading)
 }
 
 /**
@@ -307,7 +305,7 @@ const getApplicationTTIModel: (
  * @param 参数
  */
 const putPublishApplication: (
-  application_id: String,
+  application_id: string,
   data: ApplicationFormType,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (application_id, data, loading) => {
@@ -319,7 +317,7 @@ const putPublishApplication: (
  * @param loading
  * @returns
  */
-const listFunctionLib: (application_id: String, loading?: Ref<boolean>) => Promise<Result<any>> = (
+const listFunctionLib: (application_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
   application_id,
   loading,
 ) => {
@@ -345,8 +343,8 @@ export const getApplicationList: (
  * @returns
  */
 const getFunctionLib: (
-  application_id: String,
-  function_lib_id: String,
+  application_id: string,
+  function_lib_id: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (application_id, function_lib_id, loading) => {
   return get(`${prefix}/${application_id}/function_lib/${function_lib_id}`, undefined, loading)
@@ -360,8 +358,8 @@ const getMcpTools: (data: any, loading?: Ref<boolean>) => Promise<Result<any>> =
 }
 
 const getApplicationById: (
-  application_id: String,
-  app_id: String,
+  application_id: string,
+  app_id: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (application_id, app_id, loading) => {
   return get(`${prefix}/${application_id}/application/${app_id}`, undefined, loading)
@@ -374,8 +372,8 @@ const getApplicationById: (
  * @returns
  */
 const getModelParamsForm: (
-  application_id: String,
-  model_id: String,
+  application_id: string,
+  model_id: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<Array<FormField>>> = (application_id, model_id, loading) => {
   return get(`${prefix}/${application_id}/model_params_form/${model_id}`, undefined, loading)
@@ -385,8 +383,8 @@ const getModelParamsForm: (
  * 上传文档图片附件
  */
 const uploadFile: (
-  application_id: String,
-  chat_id: String,
+  application_id: string,
+  chat_id: string,
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (application_id, chat_id, data, loading) => {
@@ -397,7 +395,7 @@ const uploadFile: (
  * 语音转文本
  */
 const postSpeechToText: (
-  application_id: String,
+  application_id: string,
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (application_id, data, loading) => {
@@ -408,7 +406,7 @@ const postSpeechToText: (
  * 文本转语音
  */
 const postTextToSpeech: (
-  application_id: String,
+  application_id: string,
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (application_id, data, loading) => {
@@ -419,7 +417,7 @@ const postTextToSpeech: (
  * 播放测试文本
  */
 const playDemoText: (
-  application_id: String,
+  application_id: string,
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (application_id, data, loading) => {
@@ -542,7 +540,7 @@ const importApplication: (data: any, loading?: Ref<boolean>) => Promise<Result<a
   return post(`${prefix}/import`, data, undefined, loading)
 }
 export default {
-  getAllAppilcation,
+  getAllAppilcation: getAllApplication,
   getApplication,
   postApplication,
   putApplication,

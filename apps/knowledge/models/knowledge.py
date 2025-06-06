@@ -131,6 +131,7 @@ class Knowledge(AppModelMixin):
     embedding_model = models.ForeignKey(Model, on_delete=models.DO_NOTHING, verbose_name="向量模型",
                                         default=default_model)
     file_size_limit = models.IntegerField(verbose_name="文件大小限制", default=100)
+    file_count_limit = models.IntegerField(verbose_name="文件数量限制", default=50)
     meta = models.JSONField(verbose_name="元数据", default=dict)
 
     class Meta:

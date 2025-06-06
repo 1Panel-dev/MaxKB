@@ -1,6 +1,6 @@
 <template>
   <div class="resource-authorization p-16-24">
-    <h4 class="mb-16">{{ $t('views.userManage.title') }}</h4>
+    <h2 class="mb-16">{{ $t('views.userManage.title') }}</h2>
     <el-card style="--el-card-padding: 0">
       <div class="flex main-calc-height">
         <div class="resource-authorization__left border-r p-8">
@@ -80,7 +80,6 @@ const memberList = ref<any[]>([]) // 全部成员
 const filterMember = ref<any[]>([]) // 搜索过滤后列表
 const currentUser = ref<string>('')
 const currentType = ref<string>('')
-const workspace_id = ref<string>('default')
 const filterText = ref('')
 
 const activeName = ref(AuthorizationEnum.KNOWLEDGE)
@@ -109,12 +108,11 @@ watch(filterText, (val: any) => {
   }
 })
 
-function isManage(type: String) {
+function isManage(type: string) {
   return type === 'manage'
 }
 
 function submitPermissions() {
-  rLoading.value = true
   const obj: any = {
     user_resource_permission_list: [],
   }
@@ -128,55 +126,39 @@ function submitPermissions() {
       })
     })
   })
-  AuthorizationApi.putResourceAuthorization(workspace_id.value, currentUser.value, obj)
-    .then(() => {
-      MsgSuccess(t('common.submitSuccess'))
-      ResourcePermissions(workspace_id.value, currentUser.value)
-    })
-    .catch(() => {
-      rLoading.value = false
-    })
+  AuthorizationApi.putResourceAuthorization(currentUser.value, obj, rLoading).then(() => {
+    MsgSuccess(t('common.submitSuccess'))
+    ResourcePermissions(currentUser.value)
+  })
 }
 
 function clickMemberHandle(item: any) {
   currentUser.value = item.id
   currentType.value = item.type
-  ResourcePermissions(workspace_id.value, item.id)
+  ResourcePermissions(item.id)
 }
 
 function getMember(id?: string) {
-  loading.value = true
-  AuthorizationApi.getUserList(workspace_id.value)
-    .then((res) => {
-      memberList.value = res.data
-      filterMember.value = res.data
+  AuthorizationApi.getUserList(loading).then((res) => {
+    memberList.value = res.data
+    filterMember.value = res.data
 
-      const user = (id && memberList.value.find((p: any) => p.user_id === id)) || null
-      currentUser.value = user ? user.id : memberList.value[0].id
-      currentType.value = user ? user.type : memberList.value[0].type
-      ResourcePermissions(workspace_id.value, currentUser.value)
-      loading.value = false
-    })
-    .catch(() => {
-      loading.value = false
-    })
+    const user = (id && memberList.value.find((p: any) => p.user_id === id)) || null
+    currentUser.value = user ? user.id : memberList.value[0].id
+    currentType.value = user ? user.type : memberList.value[0].type
+    ResourcePermissions(currentUser.value)
+  })
 }
-function ResourcePermissions(workspace_id: string, user_id: string) {
-  rLoading.value = true
-  AuthorizationApi.getResourceAuthorization(workspace_id, user_id)
-    .then((res) => {
-      if (!res.data || Object.keys(res.data).length > 0) {
-        settingTags.map((item: any) => {
-          if (Object.keys(res.data).indexOf(item.value) !== -1) {
-            item.data = res.data[item.value]
-          }
-        })
-      }
-      rLoading.value = false
-    })
-    .catch(() => {
-      rLoading.value = false
-    })
+function ResourcePermissions(user_id: string) {
+  AuthorizationApi.getResourceAuthorization(user_id, rLoading).then((res) => {
+    if (!res.data || Object.keys(res.data).length > 0) {
+      settingTags.map((item: any) => {
+        if (Object.keys(res.data).indexOf(item.value) !== -1) {
+          item.data = res.data[item.value]
+        }
+      })
+    }
+  })
 }
 
 function refresh(data?: string[]) {}

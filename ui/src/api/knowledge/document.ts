@@ -1,10 +1,10 @@
-import { Result } from '@/request/Result'
-import { get, post, del, put, exportExcel, exportFile } from '@/request/index'
-import type { Ref } from 'vue'
-import type { KeyValue } from '@/api/type/common'
-import type { pageRequest } from '@/api/type/common'
+import {Result} from '@/request/Result'
+import {get, post, del, put, exportExcel, exportFile} from '@/request/index'
+import type {Ref} from 'vue'
+import type {KeyValue} from '@/api/type/common'
+import type {pageRequest} from '@/api/type/common'
 
-const prefix = '/workspace'
+const prefix = '/workspace/' + localStorage.getItem('workspace_id') + '/knowledge'
 
 /**
  * 文档分页列表
@@ -19,14 +19,13 @@ const prefix = '/workspace'
  */
 
 const getDocument: (
-  wordspace_id: string,
   knowledge_id: string,
   page: pageRequest,
   param: any,
   loading?: Ref<boolean>,
-) => Promise<Result<any>> = (wordspace_id, knowledge_id, page, param, loading) => {
+) => Promise<Result<any>> = (knowledge_id, page, param, loading) => {
   return get(
-    `${prefix}/${wordspace_id}/knowledge/${knowledge_id}/document/${page.current_page}/${page.page_size}`,
+    `${prefix}/${knowledge_id}/document/${page.current_page}/${page.page_size}`,
     param,
     loading,
   )
@@ -124,7 +123,7 @@ const delMulDocument: (
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<boolean>> = (dataset_id, data, loading) => {
-  return del(`${prefix}/${dataset_id}/document/_bach`, undefined, { id_list: data }, loading)
+  return del(`${prefix}/${dataset_id}/document/_bach`, undefined, {id_list: data}, loading)
 }
 
 const batchRefresh: (
@@ -135,7 +134,7 @@ const batchRefresh: (
 ) => Promise<Result<boolean>> = (dataset_id, data, stateList, loading) => {
   return put(
     `${prefix}/${dataset_id}/document/batch_refresh`,
-    { id_list: data, state_list: stateList },
+    {id_list: data, state_list: stateList},
     undefined,
     loading,
   )
@@ -164,7 +163,7 @@ const putDocumentRefresh: (
 ) => Promise<Result<any>> = (dataset_id, document_id, state_list, loading) => {
   return put(
     `${prefix}/${dataset_id}/document/${document_id}/refresh`,
-    { state_list },
+    {state_list},
     undefined,
     loading,
   )
@@ -204,14 +203,14 @@ const delMulSyncDocument: (
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<boolean>> = (dataset_id, data, loading) => {
-  return put(`${prefix}/${dataset_id}/document/_bach`, { id_list: data }, undefined, loading)
+  return put(`${prefix}/${dataset_id}/document/_bach`, {id_list: data}, undefined, loading)
 }
 const delMulLarkSyncDocument: (
   dataset_id: string,
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<boolean>> = (dataset_id, data, loading) => {
-  return put(`${prefix}/lark/${dataset_id}/_batch`, { id_list: data }, undefined, loading)
+  return put(`${prefix}/lark/${dataset_id}/_batch`, {id_list: data}, undefined, loading)
 }
 
 /**
@@ -302,7 +301,7 @@ const exportQATemplate: (fileName: string, type: string, loading?: Ref<boolean>)
   type,
   loading,
 ) => {
-  return exportExcel(fileName, `${prefix}/document/template/export`, { type }, loading)
+  return exportExcel(fileName, `${prefix}/document/template/export`, {type}, loading)
 }
 
 /**
@@ -314,7 +313,7 @@ const exportTableTemplate: (fileName: string, type: string, loading?: Ref<boolea
   type,
   loading,
 ) => {
-  return exportExcel(fileName, `${prefix}/document/table_template/export`, { type }, loading)
+  return exportExcel(fileName, `${prefix}/document/table_template/export`, {type}, loading)
 }
 
 /**

@@ -1,94 +1,88 @@
 <template>
-  <div class="hit-test">
-    <LayoutContainer>
-      <template #header>
-        <h4>
-          {{ $t('views.application.hitTest.title') }}
-          <el-text type="info" class="ml-4"> {{ $t('views.application.hitTest.text') }}</el-text>
-        </h4>
-      </template>
-      <div class="hit-test__main p-16" v-loading="loading">
-        <div class="question-title" :style="{ visibility: questionTitle ? 'visible' : 'hidden' }">
-          <div class="avatar">
-            <AppAvatar>
-              <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
-            </AppAvatar>
-          </div>
-          <div class="content">
-            <h4 class="text break-all">{{ questionTitle }}</h4>
-          </div>
+  <div class="hit-test p-16-24">
+    <h4>
+      {{ $t('views.application.hitTest.title') }}
+      <el-text type="info" class="ml-4"> {{ $t('views.application.hitTest.text') }}</el-text>
+    </h4>
+    <el-card style="--el-card-padding: 0" class="hit-test__main p-16 mt-16 mb-16" v-loading="loading">
+      <div class="question-title" :style="{ visibility: questionTitle ? 'visible' : 'hidden' }">
+        <div class="avatar">
+          <el-avatar>
+            <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
+          </el-avatar>
         </div>
-        <el-scrollbar>
-          <div class="hit-test-height">
-            <el-empty
-              v-if="first"
-              :image="emptyImg"
-              :description="$t('views.application.hitTest.emptyMessage1')"
-              style="padding-top: 160px"
-              :image-size="125"
-            />
-            <el-empty
-              v-else-if="paragraphDetail.length == 0"
-              :description="$t('views.application.hitTest.emptyMessage2')"
-              style="padding-top: 160px"
-              :image-size="125"
-            />
-            <el-row v-else>
-              <el-col
-                :xs="24"
-                :sm="12"
-                :md="12"
-                :lg="8"
-                :xl="6"
-                v-for="(item, index) in paragraphDetail"
-                :key="index"
-                class="p-8"
-              >
-                <CardBox
-                  shadow="hover"
-                  :title="item.title || '-'"
-                  :description="item.content"
-                  class="document-card layout-bg layout-bg cursor"
-                  :class="item.is_active ? '' : 'disabled'"
-                  :showIcon="false"
-                  @click="editParagraph(item)"
-                >
-                  <template #icon>
-                    <AppAvatar class="mr-12 avatar-light" :size="22">
-                      {{ index + 1 + '' }}</AppAvatar
-                    >
-                  </template>
-                  <div class="active-button primary">{{ item.similarity?.toFixed(3) }}</div>
-                  <template #footer>
-                    <div class="footer-content flex-between">
-                      <el-text>
-                        <el-icon>
-                          <Document />
-                        </el-icon>
-                        {{ item?.document_name }}
-                      </el-text>
-                      <div v-if="item.trample_num || item.star_num">
-                        <span v-if="item.star_num">
-                          <AppIcon iconName="app-like-color"></AppIcon>
-                          {{ item.star_num }}
-                        </span>
-                        <span v-if="item.trample_num" class="ml-4">
-                          <AppIcon iconName="app-oppose-color"></AppIcon>
-                          {{ item.trample_num }}
-                        </span>
-                      </div>
-                    </div>
-                  </template>
-                </CardBox>
-              </el-col>
-            </el-row>
-          </div>
-        </el-scrollbar>
+        <div class="content">
+          <h4 class="text break-all">{{ questionTitle }}</h4>
+        </div>
       </div>
+      <el-scrollbar>
+        <div class="hit-test-height">
+          <el-empty
+            v-if="first"
+            :image="emptyImg"
+            :description="$t('views.application.hitTest.emptyMessage1')"
+            style="padding-top: 160px"
+            :image-size="125"
+          />
+          <el-empty
+            v-else-if="paragraphDetail.length == 0"
+            :description="$t('views.application.hitTest.emptyMessage2')"
+            style="padding-top: 160px"
+            :image-size="125"
+          />
+          <el-row v-else>
+            <el-col
+              :xs="24"
+              :sm="12"
+              :md="12"
+              :lg="8"
+              :xl="6"
+              v-for="(item, index) in paragraphDetail"
+              :key="index"
+              class="p-8"
+            >
+              <CardBox
+                shadow="hover"
+                :title="item.title || '-'"
+                :description="item.content"
+                class="document-card layout-bg layout-bg cursor"
+                :class="item.is_active ? '' : 'disabled'"
+                :showIcon="false"
+                @click="editParagraph(item)"
+              >
+                <template #icon>
+                  <el-avatar class="mr-12 avatar-light" :size="22"> {{ index + 1 + '' }}</el-avatar>
+                </template>
+                <div class="active-button primary">{{ item.similarity?.toFixed(3) }}</div>
+                <template #footer>
+                  <div class="footer-content flex-between">
+                    <el-text>
+                      <el-icon>
+                        <Document />
+                      </el-icon>
+                      {{ item?.document_name }}
+                    </el-text>
+                    <div v-if="item.trample_num || item.star_num">
+                      <span v-if="item.star_num">
+                        <AppIcon iconName="app-like-color"></AppIcon>
+                        {{ item.star_num }}
+                      </span>
+                      <span v-if="item.trample_num" class="ml-4">
+                        <AppIcon iconName="app-oppose-color"></AppIcon>
+                        {{ item.trample_num }}
+                      </span>
+                    </div>
+                  </div>
+                </template>
+              </CardBox>
+            </el-col>
+          </el-row>
+        </div>
+      </el-scrollbar>
+    </el-card>
+    <ParagraphDialog ref="ParagraphDialogRef" :title="title" @refresh="refresh" />
 
-      <ParagraphDialog ref="ParagraphDialogRef" :title="title" @refresh="refresh" />
-    </LayoutContainer>
-    <div class="hit-test__operate p-24 pt-0">
+    <div class="hit-test__operate">
       <el-popover :visible="popoverVisible" placement="right-end" :width="500" trigger="click">
         <template #reference>
           <el-button icon="Setting" class="mb-8" @click="settingChange('open')">{{
@@ -230,7 +224,7 @@ import { t } from '@/locales'
 const route = useRoute()
 const {
   meta: { activeMenu },
-  params: { id }
+  params: { id },
 } = route as any
 
 const quickInputRef = ref()
@@ -242,7 +236,7 @@ const inputValue = ref('')
 const formInline = ref({
   similarity: 0.6,
   top_number: 5,
-  search_mode: 'embedding'
+  search_mode: 'embedding',
 })
 
 // 第一次加载
@@ -299,7 +293,7 @@ function sendChatHandle(event: any) {
 }
 const insertNewlineAtCursor = (event?: any) => {
   const textarea = quickInputRef.value.$el.querySelector(
-    '.el-textarea__inner'
+    '.el-textarea__inner',
   ) as HTMLTextAreaElement
   const startPos = textarea.selectionStart
   const endPos = textarea.selectionEnd
@@ -315,7 +309,7 @@ const insertNewlineAtCursor = (event?: any) => {
 function getHitTestList() {
   const obj = {
     query_text: inputValue.value,
-    ...formInline.value
+    ...formInline.value,
   }
   if (isDataset.value) {
     datasetApi.getDatasetHitTest(id, obj, loading).then((res) => {
@@ -407,7 +401,7 @@ onMounted(() => {})
   }
 
   .hit-test-height {
-    height: calc(var(--app-main-height) - 170px);
+    height: calc(100vh - 300px);
   }
   .document-card {
     height: 210px;

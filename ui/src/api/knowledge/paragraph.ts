@@ -2,7 +2,7 @@ import { Result } from '@/request/Result'
 import { get, post, del, put } from '@/request/index'
 import type { pageRequest } from '@/api/type/common'
 import type { Ref } from 'vue'
-const prefix = '/dataset'
+const prefix = '/workspace/' + localStorage.getItem('workspace_id') + '/knowledge'
 
 /**
  * 段落列表
@@ -68,7 +68,7 @@ const delMulParagraph: (
 
 /**
  * 创建段落
- * @param 参数 
+ * @param 参数
  * dataset_id, document_id
  * {
   "content": "string",
@@ -93,7 +93,7 @@ const postParagraph: (
 
 /**
  * 修改段落
- * @param 参数 
+ * @param 参数
  * dataset_id, document_id, paragraph_id
  * {
   "content": "string",
@@ -163,7 +163,7 @@ const getProblem: (
 
 /**
  * 创建问题
- * @param 参数 
+ * @param 参数
  * dataset_id, document_id, paragraph_id
  * {
       "id": "string",

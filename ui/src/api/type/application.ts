@@ -45,7 +45,7 @@ interface chatType {
   id: string
   problem_text: string
   answer_text: string
-  buffer: Array<String>
+  buffer: Array<string>
   answer_text_list: Array<
     Array<{
       content: string

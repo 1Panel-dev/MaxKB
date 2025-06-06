@@ -84,15 +84,15 @@
           <div class="flex-between">
             <div class="flex align-center">
               <div class="mr-12 ml-24 flex">
-                <AppAvatar
+                <el-avatar
                   v-if="isAppIcon(detail?.icon)"
                   shape="square"
                   :size="32"
                   style="background: none"
                 >
                   <img :src="detail?.icon" alt="" />
-                </AppAvatar>
-                <AppAvatar
+                </el-avatar>
+                <el-avatar
                   v-else-if="detail?.name"
                   :name="detail?.name"
                   pinyinColor
@@ -102,7 +102,7 @@
               </div>
 
               <h4>
-                {{ detail?.name || $t('views.application.applicationForm.form.appName.label') }}
+                {{ detail?.name || $t('views.application.form.appName.label') }}
               </h4>
             </div>
             <div class="mr-16">
@@ -278,7 +278,7 @@ async function publicHandle() {
         MsgError(e.toString())
         return
       }
-      applicationApi.putPublishApplication(id as String, obj, loading).then(() => {
+      applicationApi.putPublishApplication(id as string, obj, loading).then(() => {
 
         application.asyncGetApplicationDetail(id, loading).then((res: any) => {
           detail.value.name = res.data.name

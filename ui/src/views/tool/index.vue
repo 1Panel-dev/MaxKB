@@ -19,9 +19,9 @@
               style="width: 120px"
               @change="search_type_change"
             >
-              <el-option :label="$t('common.creator')" value="create_user" />
+              <el-option :label="$t('common.creator')" value="create_user"/>
 
-              <el-option :label="$t('views.model.modelForm.modeName.label')" value="name" />
+              <el-option :label="$t('views.model.modelForm.modeName.label')" value="name"/>
             </el-select>
             <el-input
               v-if="search_type === 'name'"
@@ -38,7 +38,7 @@
               clearable
               style="width: 220px"
             >
-              <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.username" />
+              <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.username"/>
             </el-select>
           </div>
           <el-button class="ml-16" type="primary"> {{ $t('common.create') }}</el-button>
@@ -84,10 +84,10 @@
                     style="background: none"
                     class="mr-8"
                   >
-                    <img :src="item?.icon" alt="" />
+                    <img :src="item?.icon" alt=""/>
                   </el-avatar>
                   <el-avatar v-else class="avatar-green" shape="square" :size="32">
-                    <img src="@/assets/node/icon_tool.svg" style="width: 58%" alt="" />
+                    <img src="@/assets/node/icon_tool.svg" style="width: 58%" alt=""/>
                   </el-avatar>
                 </template>
                 <template #subTitle>
@@ -99,8 +99,10 @@
                 <template #footer>
                   <div v-if="item.is_active" class="flex align-center">
                     <el-icon class="color-success mr-8" style="font-size: 16px"
-                      ><SuccessFilled
-                    /></el-icon>
+                    >
+                      <SuccessFilled
+                      />
+                    </el-icon>
                     <span class="color-secondary">
                       {{ $t('common.status.enabled') }}
                     </span>
@@ -120,10 +122,12 @@
                       size="small"
                       class="mr-4"
                     />
-                    <el-divider direction="vertical" />
+                    <el-divider direction="vertical"/>
                     <el-dropdown trigger="click">
                       <el-button text @click.stop>
-                        <el-icon><MoreFilled /></el-icon>
+                        <el-icon>
+                          <MoreFilled/>
+                        </el-icon>
                       </el-button>
                       <template #dropdown>
                         <el-dropdown-menu>
@@ -132,7 +136,9 @@
                             :disabled="!canEdit(item)"
                             @click.stop="openCreateDialog(item)"
                           >
-                            <el-icon><EditPen /></el-icon>
+                            <el-icon>
+                              <EditPen/>
+                            </el-icon>
                             {{ $t('common.edit') }}
                           </el-dropdown-item>
                           <!-- <el-dropdown-item
@@ -176,25 +182,25 @@
             </el-col>
           </template>
         </el-row>
-        <el-empty :description="$t('common.noData')" v-else />
+        <el-empty :description="$t('common.noData')" v-else/>
       </div>
     </ContentContainer>
-    <InitParamDrawer ref="InitParamDrawerRef" @refresh="refresh" />
-    <ToolFormDrawer ref="ToolFormDrawerRef" @refresh="refresh" :title="ToolDrawertitle" />
+    <InitParamDrawer ref="InitParamDrawerRef" @refresh="refresh"/>
+    <ToolFormDrawer ref="ToolFormDrawerRef" @refresh="refresh" :title="ToolDrawertitle"/>
   </LayoutContainer>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, reactive, computed } from 'vue'
+import {onMounted, ref, reactive, computed} from 'vue'
 import ToolApi from '@/api/tool/tool'
 import useStore from '@/stores'
-import { MsgConfirm } from '@/utils/message'
+import {MsgConfirm} from '@/utils/message'
 import InitParamDrawer from '@/views/tool/component/InitParamDrawer.vue'
 import ToolFormDrawer from './ToolFormDrawer.vue'
-import { t } from '@/locales'
-import { isAppIcon } from '@/utils/common'
+import {t} from '@/locales'
+import {isAppIcon} from '@/utils/common'
 
-const { folder, user } = useStore()
+const {folder, user} = useStore()
 
 const InitParamDrawerRef = ref()
 const search_type = ref('name')
@@ -220,7 +226,7 @@ const toolList = ref<any[]>([])
 const currentFolder = ref<any>({})
 
 const search_type_change = () => {
-  search_form.value = { name: '', create_user: '' }
+  search_form.value = {name: '', create_user: ''}
 }
 const canEdit = (row: any) => {
   return user.userInfo?.id === row?.user_id
@@ -228,6 +234,7 @@ const canEdit = (row: any) => {
 
 const ToolFormDrawerRef = ref()
 const ToolDrawertitle = ref('')
+
 function openCreateDialog(data?: any) {
   // 有template_id的不允许编辑，是模板转换来的
   if (data?.template_id) {
@@ -236,7 +243,7 @@ function openCreateDialog(data?: any) {
   ToolDrawertitle.value = data ? t('views.tool.editTool') : t('views.tool.createTool')
   if (data) {
     if (data?.permission_type !== 'PUBLIC' || canEdit(data)) {
-      ToolApi.getToolById('default', data?.id, changeStateloading).then((res) => {
+      ToolApi.getToolById(data?.id, changeStateloading).then((res) => {
         ToolFormDrawerRef.value.open(res.data)
       })
     }
@@ -248,9 +255,9 @@ function openCreateDialog(data?: any) {
 function getList() {
   const params = {
     folder_id: currentFolder.value?.id || 'root',
-    tool_type: 'CUSTOM',
+    scope: 'WORKSPACE',
   }
-  ToolApi.getToolList('default', paginationConfig, params, loading).then((res) => {
+  ToolApi.getToolList(paginationConfig, params, loading).then((res) => {
     paginationConfig.total = res.data?.total
     toolList.value = [...toolList.value, ...res.data?.records]
   })
@@ -258,7 +265,7 @@ function getList() {
 
 function getFolder() {
   const params = {}
-  folder.asynGetFolder('default', 'TOOL', params, loading).then((res: any) => {
+  folder.asyncGetFolder('TOOL', params, loading).then((res: any) => {
     folderList.value = res.data
     currentFolder.value = res.data?.[0] || {}
     getList()
@@ -278,7 +285,7 @@ async function changeState(row: any) {
       const obj = {
         is_active: !row.is_active,
       }
-      ToolApi.putTool('default', row.id, obj, changeStateloading)
+      ToolApi.putTool(row.id, obj, changeStateloading)
         .then(() => {
           return true
         })
@@ -287,7 +294,7 @@ async function changeState(row: any) {
         })
     })
   } else {
-    const res = await ToolApi.getToolById('default', row.id, changeStateloading)
+    const res = await ToolApi.getToolById(row.id, changeStateloading)
     if (
       !res.data.init_params &&
       res.data.init_field_list &&
@@ -301,7 +308,7 @@ async function changeState(row: any) {
     const obj = {
       is_active: !row.is_active,
     }
-    ToolApi.putTool('default', row.id, obj, changeStateloading)
+    ToolApi.putTool(row.id, obj, changeStateloading)
       .then(() => {
         return true
       })

@@ -9,8 +9,8 @@
     <el-form label-position="top" ref="displayFormRef" :model="form">
       <el-form-item>
         <span>{{
-          $t('views.applicationOverview.appInfo.SettingDisplayDialog.languageLabel')
-        }}</span>
+            $t('views.applicationOverview.appInfo.SettingDisplayDialog.languageLabel')
+          }}</span>
         <el-select v-model="form.language" clearable>
           <el-option
             v-for="item in langList"
@@ -24,11 +24,15 @@
         <el-space direction="vertical" alignment="start">
           <el-checkbox
             v-model="form.show_source"
-            :label="
-              isWorkFlow(detail.type)
-                ? $t('views.applicationOverview.appInfo.SettingDisplayDialog.showExecutionDetail')
-                : $t('views.applicationOverview.appInfo.SettingDisplayDialog.showSourceLabel')
-            "
+            :label="$t('views.applicationOverview.appInfo.SettingDisplayDialog.showSourceLabel')"
+          />
+        </el-space>
+      </el-form-item>
+      <el-form-item>
+        <el-space direction="vertical" alignment="start">
+          <el-checkbox
+            v-model="form.show_exec"
+            :label="$t('views.applicationOverview.appInfo.SettingDisplayDialog.showExecutionDetail')"
           />
         </el-space>
       </el-form-item>
@@ -44,16 +48,16 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
-import type { FormInstance, FormRules, UploadFiles } from 'element-plus'
+import {ref, watch} from 'vue'
+import {useRoute} from 'vue-router'
+import type {FormInstance, FormRules, UploadFiles} from 'element-plus'
 import applicationApi from '@/api/application/application'
-import { isWorkFlow } from '@/utils/application'
-import { MsgSuccess, MsgError } from '@/utils/message'
-import { getBrowserLang, langList, t } from '@/locales'
+import {MsgSuccess, MsgError} from '@/utils/message'
+import {getBrowserLang, langList, t} from '@/locales'
+
 const route = useRoute()
 const {
-  params: { id }
+  params: {id}
 } = route
 
 const emit = defineEmits(['refresh'])
@@ -61,6 +65,7 @@ const emit = defineEmits(['refresh'])
 const displayFormRef = ref()
 const form = ref<any>({
   show_source: false,
+  show_exec: false,
   language: ''
 })
 
@@ -73,6 +78,7 @@ watch(dialogVisible, (bool) => {
   if (!bool) {
     form.value = {
       show_source: false,
+      show_exec: false,
       language: ''
     }
   }
@@ -80,6 +86,7 @@ watch(dialogVisible, (bool) => {
 const open = (data: any, content: any) => {
   detail.value = content
   form.value.show_source = data.show_source
+  form.value.show_exec = data.show_exec
   form.value.language = data.language
   dialogVisible.value = true
 }
@@ -98,6 +105,6 @@ const submit = async (formEl: FormInstance | undefined) => {
   })
 }
 
-defineExpose({ open })
+defineExpose({open})
 </script>
 <style lang="scss" scoped></style>

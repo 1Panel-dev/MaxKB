@@ -12,11 +12,11 @@
         hide-required-asterisk
       >
         <el-form-item
-          :label="$t('views.application.applicationForm.form.aiModel.label')"
+          :label="$t('views.application.form.aiModel.label')"
           prop="model_id"
           :rules="{
             required: true,
-            message: $t('views.application.applicationForm.form.aiModel.placeholder'),
+            message: $t('views.application.form.aiModel.placeholder'),
             trigger: 'change'
           }"
         >
@@ -24,7 +24,7 @@
             <div class="flex-between w-full">
               <div>
                 <span
-                  >{{ $t('views.application.applicationForm.form.aiModel.label')
+                  >{{ $t('views.application.form.aiModel.label')
                   }}<span class="danger">*</span></span
                 >
               </div>
@@ -45,7 +45,7 @@
             @wheel="wheel"
             :teleported="false"
             v-model="chat_data.model_id"
-            :placeholder="$t('views.application.applicationForm.form.aiModel.placeholder')"
+            :placeholder="$t('views.application.form.aiModel.placeholder')"
             :options="modelOptions"
             @submitModel="getModel"
             showFooter
@@ -53,21 +53,21 @@
           ></ModelSelect>
         </el-form-item>
 
-        <el-form-item :label="$t('views.application.applicationForm.form.roleSettings.label')">
+        <el-form-item :label="$t('views.application.form.roleSettings.label')">
           <MdEditorMagnify
-            :title="$t('views.application.applicationForm.form.roleSettings.label')"
+            :title="$t('views.application.form.roleSettings.label')"
             v-model="chat_data.system"
             style="height: 100px"
             @submitDialog="submitSystemDialog"
-            :placeholder="$t('views.application.applicationForm.form.roleSettings.label')"
+            :placeholder="$t('views.application.form.roleSettings.label')"
           />
         </el-form-item>
         <el-form-item
-          :label="$t('views.application.applicationForm.form.prompt.label')"
+          :label="$t('views.application.form.prompt.label')"
           prop="prompt"
           :rules="{
             required: true,
-            message: $t('views.application.applicationForm.form.prompt.requiredMessage'),
+            message: $t('views.application.form.prompt.requiredMessage'),
             trigger: 'blur'
           }"
         >
@@ -75,13 +75,13 @@
             <div class="flex align-center">
               <div class="mr-4">
                 <span
-                  >{{ $t('views.application.applicationForm.form.prompt.label')
+                  >{{ $t('views.application.form.prompt.label')
                   }}<span class="danger">*</span></span
                 >
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content
-                  >{{ $t('views.application.applicationForm.form.prompt.tooltip') }}
+                  >{{ $t('views.application.form.prompt.tooltip') }}
                 </template>
                 <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
               </el-tooltip>
@@ -89,16 +89,16 @@
           </template>
           <MdEditorMagnify
             @wheel="wheel"
-            :title="$t('views.application.applicationForm.form.prompt.label')"
+            :title="$t('views.application.form.prompt.label')"
             v-model="chat_data.prompt"
             style="height: 150px"
             @submitDialog="submitDialog"
           />
         </el-form-item>
-        <el-form-item :label="$t('views.application.applicationForm.form.historyRecord.label')">
+        <el-form-item :label="$t('views.application.form.historyRecord.label')">
           <template #label>
             <div class="flex-between">
-              <div>{{ $t('views.application.applicationForm.form.historyRecord.label') }}</div>
+              <div>{{ $t('views.application.form.historyRecord.label') }}</div>
               <el-select v-model="chat_data.dialogue_type" type="small" style="width: 100px">
                 <el-option :label="$t('views.applicationWorkflow.node')" value="NODE" />
                 <el-option :label="$t('views.applicationWorkflow.workflow')" value="WORKFLOW" />
@@ -128,7 +128,7 @@
             <div class="flex-between w-full">
               <div>
                 <span>{{
-                  $t('views.application.applicationForm.form.reasoningContent.label')
+                  $t('views.application.form.reasoningContent.label')
                 }}</span>
               </div>
               <el-button

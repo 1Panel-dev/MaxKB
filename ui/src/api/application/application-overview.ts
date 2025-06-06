@@ -32,8 +32,8 @@ const postAPIKey: (application_id: string, loading?: Ref<boolean>) => Promise<Re
  * @param 参数 application_id api_key_id
  */
 const delAPIKey: (
-  application_id: String,
-  api_key_id: String,
+  application_id: string,
+  api_key_id: string,
   loading?: Ref<boolean>
 ) => Promise<Result<boolean>> = (application_id, api_key_id, loading) => {
   return del(`${prefix}/${application_id}/api_key/${api_key_id}`, undefined, undefined, loading)
@@ -48,7 +48,7 @@ const delAPIKey: (
  */
 const putAPIKey: (
   application_id: string,
-  api_key_id: String,
+  api_key_id: string,
   data: any,
   loading?: Ref<boolean>
 ) => Promise<Result<any>> = (application_id, api_key_id, data, loading) => {

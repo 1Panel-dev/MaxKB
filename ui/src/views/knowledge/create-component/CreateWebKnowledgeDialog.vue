@@ -101,9 +101,9 @@ const submitHandle = async () => {
           ...BaseFormRef.value.form,
           ...knowledgeForm.value,
         }
-        KnowledgeApi.postWebDataset('default', obj, loading).then((res) => {
+        KnowledgeApi.postWebKnowledge(obj, loading).then((res) => {
           MsgSuccess(t('common.createSuccess'))
-          router.push({ path: `/knowledge/${res.data.id}/document` })
+          router.push({ path: `/knowledge/${res.data.id}/${currentFolder.value.id}/document` })
           emit('refresh')
         })
       } else {

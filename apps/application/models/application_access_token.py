@@ -26,6 +26,7 @@ class ApplicationAccessToken(AppModelMixin):
                             base_field=models.CharField(max_length=128, blank=True)
                             , default=list)
     show_source = models.BooleanField(default=False, verbose_name="是否显示知识来源")
+    show_exec = models.BooleanField(default=False, verbose_name="是否显示执行详情")
 
     language = models.CharField(max_length=10, verbose_name="语言", default=None, null=True)
 

@@ -24,23 +24,23 @@
                 <el-card shadow="never" :class="item.id === selectDataset ? 'active' : ''">
                   <el-radio :value="item.id" size="large">
                     <div class="flex align-center">
-                      <AppAvatar
+                      <el-avatar
                         v-if="item?.type === '0'"
                         class="mr-8 avatar-blue"
                         shape="square"
                         :size="32"
                       >
                         <img src="@/assets/knowledge/icon_document.svg" style="width: 58%" alt="" />
-                      </AppAvatar>
-                      <AppAvatar
+                      </el-avatar>
+                      <el-avatar
                         v-if="item?.type === '1'"
                         class="mr-8 avatar-purple"
                         shape="square"
                         :size="32"
                       >
                         <img src="@/assets/knowledge/icon_web.svg" style="width: 58%" alt="" />
-                      </AppAvatar>
-                      <AppAvatar
+                      </el-avatar>
+                      <el-avatar
                         v-if="item?.type === '2'"
                         class="mr-8 avatar-purple"
                         shape="square"
@@ -48,7 +48,7 @@
                         style="background: none"
                       >
                         <img src="@/assets/knowledge/logo_lark.svg" style="width: 100%" alt="" />
-                      </AppAvatar>
+                      </el-avatar>
                       <span class="ellipsis" :title="item.name">
                         {{ item.name }}
                       </span>

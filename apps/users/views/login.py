@@ -12,8 +12,21 @@ from rest_framework.request import Request
 from rest_framework.views import APIView
 
 from common import result
+from common.log.log import log
+from common.utils.common import encryption
 from users.api.login import LoginAPI, CaptchaAPI
 from users.serializers.login import LoginSerializer, CaptchaSerializer
+
+
+def _get_details(request):
+    path = request.path
+    body = request.data
+    query = request.query_params
+    return {
+        'path': path,
+        'body': {**body, 'password': encryption(body.get('password', ''))},
+        'query': query
+    }
 
 
 class LoginView(APIView):
@@ -24,6 +37,9 @@ class LoginView(APIView):
                    tags=[_("User Management")],  # type: ignore
                    request=LoginAPI.get_request(),
                    responses=LoginAPI.get_response())
+    @log(menu='User management', operate='Log in', get_user=lambda r: {'username': r.data.get('username', None)},
+         get_details=_get_details,
+         get_operation_object=lambda r, k: {'name': r.data.get('username')})
     def post(self, request: Request):
         return result.success(LoginSerializer().login(request.data))
 

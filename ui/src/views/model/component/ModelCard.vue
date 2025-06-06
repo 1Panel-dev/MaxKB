@@ -8,7 +8,7 @@
         {{ model.name }}
         <span v-if="currentModel.status === 'ERROR'">
           <el-tooltip effect="dark" :content="errMessage" placement="top">
-            <el-icon class="danger ml-4" size="18"><Warning /></el-icon>
+            <el-icon class="danger ml-4" size="18"><Warning/></el-icon>
           </el-tooltip>
         </span>
         <span v-if="currentModel.status === 'PAUSE_DOWNLOAD'">
@@ -17,7 +17,7 @@
             :content="`${$t('views.model.modelForm.base_model.label')}: ${props.model.model_name} ${$t('views.model.tip.downloadError')}`"
             placement="top"
           >
-            <el-icon class="danger ml-4" size="18"><Warning /></el-icon>
+            <el-icon class="danger ml-4" size="18"><Warning/></el-icon>
           </el-tooltip>
         </span>
       </div>
@@ -30,16 +30,18 @@
     <ul>
       <li class="flex mb-4">
         <el-text type="info" class="color-secondary">{{
-          $t('views.model.modelForm.model_type.label')
-        }}</el-text>
+            $t('views.model.modelForm.model_type.label')
+          }}
+        </el-text>
         <span class="ellipsis ml-16">
           {{ $t(modelType[model.model_type as keyof typeof modelType]) }}</span
         >
       </li>
       <li class="flex">
         <el-text type="info" class="color-secondary">{{
-          $t('views.model.modelForm.base_model.label')
-        }}</el-text>
+            $t('views.model.modelForm.base_model.label')
+          }}
+        </el-text>
         <span class="ellipsis-1 ml-16" style="height: 20px; width: 70%">
           {{ model.model_name }}</span
         >
@@ -57,7 +59,8 @@
           class="ml-16"
           :disabled="!is_permisstion"
           @click.stop="cancelDownload"
-          >{{ $t('views.model.download.cancelDownload') }}</el-button
+        >{{ $t('views.model.download.cancelDownload') }}
+        </el-button
         >
       </div>
     </div>
@@ -65,7 +68,9 @@
     <template #mouseEnter>
       <el-dropdown trigger="click">
         <el-button text @click.stop>
-          <el-icon><MoreFilled /></el-icon>
+          <el-icon>
+            <MoreFilled/>
+          </el-icon>
         </el-button>
         <template #dropdown>
           <el-dropdown-menu>
@@ -105,27 +110,28 @@
       </el-dropdown>
     </template>
     <EditModel ref="editModelRef" @submit="emit('change')"></EditModel>
-    <ParamSettingDialog ref="paramSettingRef" :model="model" />
+    <ParamSettingDialog ref="paramSettingRef" :model="model"/>
   </card-box>
 </template>
 <script setup lang="ts">
-import type { Provider, Model } from '@/api/type/model'
+import type {Provider, Model} from '@/api/type/model'
 import ModelApi from '@/api/model/model'
-import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
+import {computed, ref, onMounted, onBeforeUnmount} from 'vue'
 import EditModel from '@/views/model/component/EditModel.vue'
 // import DownloadLoading from '@/components/loading/DownloadLoading.vue'
-import { MsgConfirm } from '@/utils/message'
-import { modelType } from '@/enums/model'
+import {MsgConfirm} from '@/utils/message'
+import {modelType} from '@/enums/model'
 import useStore from '@/stores'
 import ParamSettingDialog from './ParamSettingDialog.vue'
-import { t } from '@/locales'
+import {t} from '@/locales'
+
 const props = defineProps<{
   model: Model
   provider_list: Array<Provider>
   updateModelById: (model_id: string, model: Model) => void
 }>()
 
-const { user } = useStore()
+const {user} = useStore()
 const downModel = ref<Model>()
 
 const is_permisstion = computed(() => {
@@ -161,15 +167,16 @@ const deleteModel = () => {
     },
   )
     .then(() => {
-      ModelApi.deleteModel('default', props.model.id).then(() => {
+      ModelApi.deleteModel(props.model.id).then(() => {
         emit('change')
       })
     })
-    .catch(() => {})
+    .catch(() => {
+    })
 }
 
 const cancelDownload = () => {
-  ModelApi.pauseDownload('default', props.model.id).then(() => {
+  ModelApi.pauseDownload(props.model.id).then(() => {
     downModel.value = undefined
     emit('change')
   })
@@ -190,7 +197,7 @@ const icon = computed(() => {
 const initInterval = () => {
   interval = setInterval(() => {
     if (currentModel.value.status === 'DOWNLOAD') {
-      ModelApi.getModelMetaById('default', props.model.id).then((ok) => {
+      ModelApi.getModelMetaById(props.model.id).then((ok) => {
         downModel.value = ok.data
       })
     } else {
@@ -228,12 +235,14 @@ onBeforeUnmount(() => {
 .model-card {
   min-height: 135px;
   min-width: auto;
+
   .operation-button {
     position: absolute;
     right: 12px;
     bottom: 12px;
     height: auto;
   }
+
   .progress-mask {
     position: absolute;
     top: 0;
@@ -243,6 +252,7 @@ onBeforeUnmount(() => {
     height: 100%;
     z-index: 99;
     text-align: center;
+
     .percentage {
       margin-top: 55px;
       margin-bottom: 16px;

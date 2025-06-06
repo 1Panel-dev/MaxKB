@@ -24,15 +24,15 @@
         >
           <el-option v-for="item in datasetList" :key="item.id" :label="item.name" :value="item.id">
             <span class="flex align-center">
-              <AppAvatar
+              <el-avatar
                 v-if="!item.dataset_id && item.type === '1'"
                 class="mr-12 avatar-purple"
                 shape="square"
                 :size="24"
               >
                 <img src="@/assets/knowledge/icon_web.svg" style="width: 58%" alt="" />
-              </AppAvatar>
-              <AppAvatar
+              </el-avatar>
+              <el-avatar
                 v-else-if="!item.dataset_id && item.type === '2'"
                 class="mr-12 avatar-purple"
                 shape="square"
@@ -40,15 +40,15 @@
                 style="background: none"
               >
                 <img src="@/assets/knowledge/logo_lark.svg" style="width: 100%" alt="" />
-              </AppAvatar>
-              <AppAvatar
+              </el-avatar>
+              <el-avatar
                 v-else-if="!item.dataset_id && item.type === '0'"
                 class="mr-12 avatar-blue"
                 shape="square"
                 :size="24"
               >
                 <img src="@/assets/knowledge/icon_document.svg" style="width: 58%" alt="" />
-              </AppAvatar>
+              </el-avatar>
               {{ item.name }}
             </span>
           </el-option>

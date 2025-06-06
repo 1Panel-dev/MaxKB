@@ -10,7 +10,7 @@ const useLoginStore = defineStore('login', {
     userAccessToken: '',
   }),
   actions: {
-    getToken(): String | null {
+    getToken(): string | null {
       if (this.token) {
         return this.token
       }
@@ -31,6 +31,14 @@ const useLoginStore = defineStore('login', {
 
     async asyncLogin(data: LoginRequest, loading?: Ref<boolean>) {
       return loginApi.login(data).then((ok) => {
+        this.token = ok?.data?.token
+        localStorage.setItem('token', ok?.data?.token)
+        const user = useUserStore()
+        return user.profile(loading)
+      })
+    },
+    async asyncLdapLogin(data: LoginRequest, loading?: Ref<boolean>) {
+      return loginApi.ldapLogin(data).then((ok) => {
         this.token = ok?.data?.token
         localStorage.setItem('token', ok?.data?.token)
         const user = useUserStore()

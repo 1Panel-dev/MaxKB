@@ -34,7 +34,7 @@ const showicon = ref(false)
 const globalFields = [
   { label: t('views.applicationWorkflow.nodes.startNode.currentTime'), value: 'time' },
   {
-    label: t('views.application.applicationForm.form.historyRecord.label'),
+    label: t('views.application.form.historyRecord.label'),
     value: 'history_context'
   },
   { label: t('chat.chatId'), value: 'chat_id' }
@@ -86,7 +86,7 @@ const refreshFileUploadConfig = () => {
     set(props.nodeModel.properties.config, 'fields', fields)
     return
   }
-  let fileUploadFields = []
+  const fileUploadFields = []
   if (form_data[0].document) {
     fileUploadFields.push({ label: t('common.fileUpload.document'), value: 'document' })
   }

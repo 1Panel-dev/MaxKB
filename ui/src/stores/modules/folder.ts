@@ -1,14 +1,14 @@
-import { defineStore } from 'pinia'
-import { type Ref } from 'vue'
+import {defineStore} from 'pinia'
+import {type Ref} from 'vue'
 import folderApi from '@/api/folder'
 
 const useFolderStore = defineStore('folder', {
   state: () => ({}),
   actions: {
-    async asynGetFolder(workspace_id: string, source: string, data: any, loading?: Ref<boolean>) {
+    async asyncGetFolder(source: string, data: any, loading?: Ref<boolean>) {
       return new Promise((resolve, reject) => {
         folderApi
-          .getFolder(workspace_id, source, data, loading)
+          .getFolder(source, data, loading)
           .then((res) => {
             resolve(res)
           })

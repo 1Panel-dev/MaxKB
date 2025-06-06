@@ -202,10 +202,10 @@ class ToolPageAPI(ToolReadAPI):
                 required=False,
             ),
             OpenApiParameter(
-                name="tool_type",
+                name="scope",
                 description="工具类型",
                 type=OpenApiTypes.STR,
-                enum=["CUSTOM", "INTERNAL"],
+                enum=["SHARED", "WORKSPACE"],
                 location='query',
                 required=True,
             ),

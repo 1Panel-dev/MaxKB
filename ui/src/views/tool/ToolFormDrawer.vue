@@ -32,10 +32,10 @@
                 :size="32"
                 style="background: none"
               >
-                <img :src="String(form.icon)" alt="" />
+                <img :src="String(form.icon)" alt=""/>
               </el-Avatar>
               <el-avatar v-else class="avatar-green" shape="square" :size="32">
-                <img src="@/assets/node/icon_tool.svg" style="width: 58%" alt="" />
+                <img src="@/assets/node/icon_tool.svg" style="width: 58%" alt=""/>
               </el-avatar>
               <el-Avatar
                 v-if="showEditIcon"
@@ -45,11 +45,13 @@
                 :size="32"
                 @click="openEditAvatar"
               >
-                <el-icon><EditPen /></el-icon>
+                <el-icon>
+                  <EditPen/>
+                </el-icon>
               </el-Avatar>
             </div>
             <el-avatar v-else class="avatar-green" shape="square" :size="32">
-              <img src="@/assets/node/icon_tool.svg" style="width: 58%" alt="" />
+              <img src="@/assets/node/icon_tool.svg" style="width: 58%" alt=""/>
             </el-avatar>
             <el-input
               v-model="form.name"
@@ -78,7 +80,10 @@
           {{ $t('common.param.initParam') }}
         </h4>
         <el-button link type="primary" @click="openAddInitDialog()">
-          <el-icon class="mr-4"><Plus /></el-icon> {{ $t('common.add') }}
+          <el-icon class="mr-4">
+            <Plus/>
+          </el-icon>
+          {{ $t('common.add') }}
         </el-button>
       </div>
       <el-table ref="initFieldTableRef" :data="form.init_field_list" class="mb-16">
@@ -90,35 +95,43 @@
         <el-table-column :label="$t('dynamicsForm.paramForm.input_type.label')">
           <template #default="{ row }">
             <el-tag type="info" class="info-tag" v-if="row.input_type === 'TextInput'">{{
-              $t('dynamicsForm.input_type_list.TextInput')
-            }}</el-tag>
+                $t('dynamicsForm.input_type_list.TextInput')
+              }}
+            </el-tag>
             <el-tag type="info" class="info-tag" v-if="row.input_type === 'PasswordInput'">{{
-              $t('dynamicsForm.input_type_list.PasswordInput')
-            }}</el-tag>
+                $t('dynamicsForm.input_type_list.PasswordInput')
+              }}
+            </el-tag>
             <el-tag type="info" class="info-tag" v-if="row.input_type === 'Slider'">{{
-              $t('dynamicsForm.input_type_list.Slider')
-            }}</el-tag>
+                $t('dynamicsForm.input_type_list.Slider')
+              }}
+            </el-tag>
             <el-tag type="info" class="info-tag" v-if="row.input_type === 'SwitchInput'">{{
-              $t('dynamicsForm.input_type_list.SwitchInput')
-            }}</el-tag>
+                $t('dynamicsForm.input_type_list.SwitchInput')
+              }}
+            </el-tag>
             <el-tag type="info" class="info-tag" v-if="row.input_type === 'SingleSelect'">{{
-              $t('dynamicsForm.input_type_list.SingleSelect')
-            }}</el-tag>
+                $t('dynamicsForm.input_type_list.SingleSelect')
+              }}
+            </el-tag>
             <el-tag type="info" class="info-tag" v-if="row.input_type === 'MultiSelect'">{{
-              $t('dynamicsForm.input_type_list.MultiSelect')
-            }}</el-tag>
+                $t('dynamicsForm.input_type_list.MultiSelect')
+              }}
+            </el-tag>
             <el-tag type="info" class="info-tag" v-if="row.input_type === 'RadioCard'">{{
-              $t('dynamicsForm.input_type_list.RadioCard')
-            }}</el-tag>
+                $t('dynamicsForm.input_type_list.RadioCard')
+              }}
+            </el-tag>
             <el-tag type="info" class="info-tag" v-if="row.input_type === 'DatePicker'">{{
-              $t('dynamicsForm.input_type_list.DatePicker')
-            }}</el-tag>
+                $t('dynamicsForm.input_type_list.DatePicker')
+              }}
+            </el-tag>
           </template>
         </el-table-column>
         <el-table-column :label="$t('common.required')">
           <template #default="{ row }">
             <div @click.stop>
-              <el-switch disabled size="small" v-model="row.required" />
+              <el-switch disabled size="small" v-model="row.required"/>
             </div>
           </template>
         </el-table-column>
@@ -127,14 +140,14 @@
             <span class="mr-4">
               <el-tooltip effect="dark" :content="$t('common.modify')" placement="top">
                 <el-button type="primary" text @click.stop="openAddInitDialog(row, $index)">
-                  <el-icon><EditPen /></el-icon>
+                  <el-icon><EditPen/></el-icon>
                 </el-button>
               </el-tooltip>
             </span>
             <el-tooltip effect="dark" :content="$t('common.delete')" placement="top">
               <el-button type="primary" text @click="deleteInitField($index)">
                 <el-icon>
-                  <Delete />
+                  <Delete/>
                 </el-icon>
               </el-button>
             </el-tooltip>
@@ -149,12 +162,15 @@
           </el-text>
         </h4>
         <el-button link type="primary" @click="openAddDialog()">
-          <el-icon class="mr-4"><Plus /></el-icon> {{ $t('common.add') }}
+          <el-icon class="mr-4">
+            <Plus/>
+          </el-icon>
+          {{ $t('common.add') }}
         </el-button>
       </div>
 
       <el-table ref="inputFieldTableRef" :data="form.input_field_list" class="mb-16">
-        <el-table-column prop="name" :label="$t('views.tool.form.paramName.label')" />
+        <el-table-column prop="name" :label="$t('views.tool.form.paramName.label')"/>
         <el-table-column :label="$t('views.tool.form.dataType.label')">
           <template #default="{ row }">
             <el-tag type="info" class="info-tag">{{ row.type }}</el-tag>
@@ -163,7 +179,7 @@
         <el-table-column :label="$t('common.required')">
           <template #default="{ row }">
             <div @click.stop>
-              <el-switch size="small" v-model="row.is_required" />
+              <el-switch size="small" v-model="row.is_required"/>
             </div>
           </template>
         </el-table-column>
@@ -181,14 +197,14 @@
             <span class="mr-4">
               <el-tooltip effect="dark" :content="$t('common.modify')" placement="top">
                 <el-button type="primary" text @click.stop="openAddDialog(row, $index)">
-                  <el-icon><EditPen /></el-icon>
+                  <el-icon><EditPen/></el-icon>
                 </el-button>
               </el-tooltip>
             </span>
             <el-tooltip effect="dark" :content="$t('common.delete')" placement="top">
               <el-button type="primary" text @click="deleteField($index)">
                 <el-icon>
-                  <Delete />
+                  <Delete/>
                 </el-icon>
               </el-button>
             </el-tooltip>
@@ -226,32 +242,33 @@
         <el-button :loading="loading" @click="visible = false">{{ $t('common.cancel') }}</el-button>
         <el-button :loading="loading" @click="openDebug">{{ $t('common.debug') }}</el-button>
         <el-button type="primary" @click="submit(FormRef)" :loading="loading">
-          {{ isEdit ? $t('common.save') : $t('common.create') }}</el-button
+          {{ isEdit ? $t('common.save') : $t('common.create') }}
+        </el-button
         >
       </div>
     </template>
 
-    <ToolDebugDrawer ref="ToolDebugDrawerRef" />
-    <FieldFormDialog ref="FieldFormDialogRef" @refresh="refreshFieldList" />
-    <UserFieldFormDialog ref="UserFieldFormDialogRef" @refresh="refreshInitFieldList" />
-    <EditAvatarDialog ref="EditAvatarDialogRef" @refresh="refreshTool" />
+    <ToolDebugDrawer ref="ToolDebugDrawerRef"/>
+    <FieldFormDialog ref="FieldFormDialogRef" @refresh="refreshFieldList"/>
+    <UserFieldFormDialog ref="UserFieldFormDialogRef" @refresh="refreshInitFieldList"/>
+    <EditAvatarDialog ref="EditAvatarDialogRef" @refresh="refreshTool"/>
   </el-drawer>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch, nextTick } from 'vue'
+import {ref, reactive, watch, nextTick} from 'vue'
 import FieldFormDialog from '@/views/tool/component/FieldFormDialog.vue'
 import ToolDebugDrawer from './ToolDebugDrawer.vue'
 import UserFieldFormDialog from '@/views/tool/component/UserFieldFormDialog.vue'
 import EditAvatarDialog from '@/views/tool/component/EditAvatarDialog.vue'
-import type { toolData } from '@/api/type/tool'
+import type {toolData} from '@/api/type/tool'
 import ToolApi from '@/api/tool/tool'
-import type { FormInstance } from 'element-plus'
-import { MsgSuccess, MsgConfirm } from '@/utils/message'
-import { cloneDeep } from 'lodash'
-import { PermissionType, PermissionDesc } from '@/enums/model'
-import { t } from '@/locales'
-import { isAppIcon } from '@/utils/common'
+import type {FormInstance} from 'element-plus'
+import {MsgSuccess, MsgConfirm} from '@/utils/message'
+import {cloneDeep} from 'lodash'
+import {PermissionType, PermissionDesc} from '@/enums/model'
+import {t} from '@/locales'
+import {isAppIcon} from '@/utils/common'
 
 const props = defineProps({
   title: String,
@@ -325,7 +342,8 @@ function close() {
       .then(() => {
         visible.value = false
       })
-      .catch(() => {})
+      .catch(() => {
+      })
   }
 }
 
@@ -397,13 +415,13 @@ const submit = async (formEl: FormInstance | undefined) => {
   await formEl.validate((valid: any) => {
     if (valid) {
       if (isEdit.value) {
-        ToolApi.putTool('default', form.value?.id as string, form.value, loading).then((res) => {
+        ToolApi.putTool(form.value?.id as string, form.value, loading).then((res) => {
           MsgSuccess(t('common.editSuccess'))
           emit('refresh', res.data)
           visible.value = false
         })
       } else {
-        ToolApi.postTool('default', form.value, loading).then((res) => {
+        ToolApi.postTool(form.value, loading).then((res) => {
           MsgSuccess(t('common.createSuccess'))
           emit('refresh')
           visible.value = false

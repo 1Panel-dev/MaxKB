@@ -102,7 +102,7 @@ class ToolModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tool
         fields = ['id', 'name', 'icon', 'desc', 'code', 'input_field_list', 'init_field_list', 'init_params',
-                  'scope', 'is_active', 'user_id', 'template_id', 'workspace_id', 'folder_id', 'tool_type',
+                  'scope', 'is_active', 'user_id', 'template_id', 'workspace_id', 'folder_id',
                   'create_time', 'update_time']
 
 
@@ -210,7 +210,7 @@ class ToolSerializer(serializers.Serializer):
                         user_id=self.data.get('user_id'),
                         input_field_list=instance.get('input_field_list', []),
                         init_field_list=instance.get('init_field_list', []),
-                        scope=ToolScope.WORKSPACE,
+                        scope=instance.get('scope', ToolScope.WORKSPACE),
                         folder_id=instance.get('folder_id', 'root'),
                         is_active=False)
             tool.save()
@@ -371,7 +371,7 @@ class ToolSerializer(serializers.Serializer):
 
         #
         @transaction.atomic
-        def import_(self):
+        def import_(self, scope=ToolScope.WORKSPACE):
             self.is_valid()
 
             user_id = self.data.get('user_id')
@@ -389,7 +389,7 @@ class ToolSerializer(serializers.Serializer):
                 user_id=user_id,
                 input_field_list=tool.get('input_field_list'),
                 init_field_list=tool.get('init_field_list', []),
-                scope=ToolScope.WORKSPACE,
+                scope=scope,
                 is_active=False
             )
             tool_model.save()
@@ -426,7 +426,7 @@ class ToolSerializer(serializers.Serializer):
                 )
                 file.save(self.data.get('image').read())
 
-                tool.icon = f'/api/file/{file_id}'
+                tool.icon = f'/oss/file/{file_id}'
             tool.save()
 
             return tool.icon
@@ -464,7 +464,7 @@ class ToolTreeSerializer(serializers.Serializer):
         folder_id = serializers.CharField(required=True, label=_('folder id'))
         name = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('tool name'))
         user_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('user id'))
-        tool_type = serializers.CharField(required=True, label=_('tool type'))
+        scope = serializers.CharField(required=True, label=_('scope'))
 
         def page_tool(self, current_page: int, page_size: int):
             self.is_valid(raise_exception=True)
@@ -477,25 +477,27 @@ class ToolTreeSerializer(serializers.Serializer):
             all_folders = root.get_descendants(include_self=True)
 
             if self.data.get('name'):
-                tools = QuerySet(Tool).filter(Q(workspace_id=self.data.get('workspace_id')) &
-                                              Q(folder_id__in=all_folders) &
-                                              Q(tool_type=self.data.get('tool_type')) &
-                                              Q(user_id=self.data.get('user_id')) &
-                                              Q(name__contains=self.data.get('name')))
+                tools = QuerySet(Tool).filter(
+                    Q(workspace_id=self.data.get('workspace_id')) &
+                    Q(folder_id__in=all_folders) &
+                    Q(user_id=self.data.get('user_id')) &
+                    Q(name__contains=self.data.get('name'))
+                )
             else:
-                tools = QuerySet(Tool).filter(Q(workspace_id=self.data.get('workspace_id')) &
-                                              Q(folder_id__in=all_folders) &
-                                              Q(user_id=self.data.get('user_id')) &
-                                              Q(tool_type=self.data.get('tool_type')))
+                tools = QuerySet(Tool).filter(
+                    Q(workspace_id=self.data.get('workspace_id')) &
+                    Q(folder_id__in=all_folders) &
+                    Q(user_id=self.data.get('user_id'))
+                )
             return page_search(current_page, page_size, tools, lambda record: ToolModelSerializer(record).data)
 
         def get_query_set(self):
             tool_query_set = QuerySet(Tool)
-            tool_type_query_set = QuerySet(Tool)
+            tool_scope_query_set = QuerySet(Tool)
             folder_query_set = QuerySet(ToolFolder)
             workspace_id = self.data.get('workspace_id')
             user_id = self.data.get('user_id')
-            tool_type = self.data.get('tool_type')
+            scope = self.data.get('scope')
             desc = self.data.get('desc')
             name = self.data.get('name')
             folder_id = self.data.get('folder_id')
@@ -517,13 +519,13 @@ class ToolTreeSerializer(serializers.Serializer):
                 tool_query_set = tool_query_set.filter(desc__contains=desc)
             tool_query_set = tool_query_set.order_by("-update_time")
 
-            if tool_type is not None:
-                tool_type_query_set = tool_type_query_set.filter(tool_type=tool_type)
+            if scope is not None:
+                tool_scope_query_set = tool_scope_query_set.filter(scope=scope)
 
             return {
                 'folder_query_set': folder_query_set,
                 'tool_query_set': tool_query_set,
-                'tool_type_query_set': tool_type_query_set
+                'tool_scope_query_set': tool_scope_query_set
             }
 
         def page_tool_with_folders(self, current_page: int, page_size: int):

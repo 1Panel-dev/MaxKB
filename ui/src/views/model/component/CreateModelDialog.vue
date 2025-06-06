@@ -412,7 +412,6 @@ const submit = () => {
     .then(() => {
       if (providerValue.value) {
         ModelApi.createModel(
-          'default',
           {
             ...base_form_data.value,
             credential: credential_form_data.value,
@@ -441,7 +440,7 @@ function deleteParam(index: any) {
 
 function refresh(data: any, index: any) {
   for (let i = 0; i < base_form_data.value.model_params_form.length; i++) {
-    let field = base_form_data.value.model_params_form[i].field
+    const field = base_form_data.value.model_params_form[i].field
     let label = base_form_data.value.model_params_form[i].label
     if (label && label.input_type === 'TooltipLabel') {
       label = label.label

@@ -10,6 +10,9 @@ export default {
     all: 'All Segments'
   },
   folder: {
-    addFolder:'Add Folder'
+    addFolder: 'Add Folder',
+    folderNamePlaceholder: 'Please enter a name',
+    description: 'Description',
+    descriptionPlaceholder: 'Please enter a description',
   }
 }

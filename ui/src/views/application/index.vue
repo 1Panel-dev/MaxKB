@@ -19,9 +19,9 @@
               style="width: 120px"
               @change="search_type_change"
             >
-              <el-option :label="$t('common.creator')" value="create_user" />
+              <el-option :label="$t('common.creator')" value="create_user"/>
 
-              <el-option :label="$t('common.name')" value="name" />
+              <el-option :label="$t('common.name')" value="name"/>
             </el-select>
             <el-input
               v-if="search_type === 'name'"
@@ -38,12 +38,15 @@
               clearable
               style="width: 220px"
             >
-              <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.username" />
+              <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.username"/>
             </el-select>
           </div>
           <el-dropdown trigger="click">
             <el-button type="primary" class="ml-8">
-              {{ $t('common.create') }}<el-icon class="el-icon--right"><arrow-down /></el-icon>
+              {{ $t('common.create') }}
+              <el-icon class="el-icon--right">
+                <arrow-down/>
+              </el-icon>
             </el-button>
             <template #dropdown>
               <el-dropdown-menu class="create-dropdown">
@@ -59,8 +62,9 @@
                     <div class="pre-wrap ml-8">
                       <div class="lighter">{{ $t('views.application.simple') }}</div>
                       <el-text type="info" size="small">{{
-                        $t('views.application.simplePlaceholder')
-                      }}</el-text>
+                          $t('views.application.simplePlaceholder')
+                        }}
+                      </el-text>
                     </div>
                   </div>
                 </el-dropdown-item>
@@ -76,8 +80,9 @@
                     <div class="pre-wrap ml-8">
                       <div class="lighter">{{ $t('views.application.workflow') }}</div>
                       <el-text type="info" size="small">{{
-                        $t('views.application.workflowPlaceholder')
-                      }}</el-text>
+                          $t('views.application.workflowPlaceholder')
+                        }}
+                      </el-text>
                     </div>
                   </div>
                 </el-dropdown-item>
@@ -117,7 +122,7 @@
                 @click="router.push({ path: `/application/${item.id}/${item.type}/overview` })"
               >
                 <template #icon>
-                  <LogoIcon height="28px" style="width: 28px; height: 28px; display: block" />
+                  <LogoIcon height="28px" style="width: 28px; height: 28px; display: block"/>
                 </template>
                 <template #subTitle>
                   <el-text class="color-secondary" size="small">
@@ -146,17 +151,17 @@
                         <AppIcon iconName="app-view"></AppIcon>
                       </el-button>
                     </el-tooltip>
-                    <el-divider direction="vertical" />
+                    <el-divider direction="vertical"/>
                     <el-tooltip effect="dark" :content="$t('common.setting')" placement="top">
                       <el-button text @click.stop="settingApplication(item)">
                         <AppIcon iconName="Setting"></AppIcon>
                       </el-button>
                     </el-tooltip>
-                    <el-divider direction="vertical" />
+                    <el-divider direction="vertical"/>
                     <span @click.stop>
                       <el-dropdown trigger="click">
                         <el-button text @click.stop>
-                          <el-icon><MoreFilled /></el-icon>
+                          <el-icon><MoreFilled/></el-icon>
                         </el-button>
                         <template #dropdown>
                           <el-dropdown-menu>
@@ -173,8 +178,8 @@
                               {{ $t('common.export') }}
                             </el-dropdown-item>
                             <el-dropdown-item icon="Delete" @click.stop="deleteApplication(item)">{{
-                              $t('common.delete')
-                            }}</el-dropdown-item>
+                                $t('common.delete')
+                              }}</el-dropdown-item>
                           </el-dropdown-menu>
                         </template>
                       </el-dropdown>
@@ -185,7 +190,9 @@
                   <div @click.stop>
                     <el-dropdown trigger="click">
                       <el-button text @click.stop>
-                        <el-icon><MoreFilled /></el-icon>
+                        <el-icon>
+                          <MoreFilled/>
+                        </el-icon>
                       </el-button>
                       <template #dropdown>
                         <el-dropdown-menu>
@@ -193,7 +200,8 @@
                             icon="Refresh"
                             @click.stop="syncDataset(item)"
                             v-if="item.type === 1"
-                            >{{ $t('views.knowledge.setting.sync') }}</el-dropdown-item
+                          >{{ $t('views.knowledge.setting.sync') }}
+                          </el-dropdown-item
                           >
                           <el-dropdown-item @click.stop="reEmbeddingDataset(item)">
                             <AppIcon iconName="app-vectorization"></AppIcon>
@@ -232,25 +240,26 @@
             </el-col>
           </template>
         </el-row>
-        <el-empty :description="$t('common.noData')" v-else />
+        <el-empty :description="$t('common.noData')" v-else/>
       </div>
     </ContentContainer>
-    <CreateApplicationDialog ref="CreateApplicationDialogRef" />
+    <CreateApplicationDialog ref="CreateApplicationDialogRef"/>
   </LayoutContainer>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, reactive, computed } from 'vue'
+import {onMounted, ref, reactive, computed} from 'vue'
 import CreateApplicationDialog from '@/views/application/component/CreateApplicationDialog.vue'
 import ApplicaitonApi from '@/api/application/application'
-import { MsgSuccess, MsgConfirm } from '@/utils/message'
+import {MsgSuccess, MsgConfirm} from '@/utils/message'
 import useStore from '@/stores'
-import { numberFormat } from '@/utils/common'
-import { t } from '@/locales'
-import { useRouter } from 'vue-router'
-import { isWorkFlow } from '@/utils/application'
+import {numberFormat} from '@/utils/common'
+import {t} from '@/locales'
+import {useRouter} from 'vue-router'
+import {isWorkFlow} from '@/utils/application'
+
 const router = useRouter()
-const { folder } = useStore()
+const {folder} = useStore()
 
 const loading = ref(false)
 
@@ -296,14 +305,14 @@ function openCreateDialog(type?: string) {
 }
 
 const search_type_change = () => {
-  search_form.value = { name: '', create_user: '' }
+  search_form.value = {name: '', create_user: ''}
 }
 
 function getList() {
   const params = {
     folder_id: currentFolder.value?.id || 'root',
   }
-  ApplicaitonApi.getApplication('default', paginationConfig, params, loading).then((res) => {
+  ApplicaitonApi.getApplication(paginationConfig, params, loading).then((res) => {
     paginationConfig.total = res.data.total
     applicationList.value = [...applicationList.value, ...res.data.records]
   })
@@ -311,7 +320,7 @@ function getList() {
 
 function getFolder() {
   const params = {}
-  folder.asynGetFolder('default', 'APPLICATION', params, loading).then((res: any) => {
+  folder.asyncGetFolder('APPLICATION', params, loading).then((res: any) => {
     folderList.value = res.data
     currentFolder.value = res.data?.[0] || {}
     getList()

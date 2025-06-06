@@ -6,6 +6,7 @@
     @date：2025/4/14 19:25
     @desc:
 """
+from django.db.models import QuerySet
 from drf_spectacular.utils import extend_schema
 from rest_framework.views import APIView
 from django.utils.translation import gettext_lazy as _
@@ -14,14 +15,45 @@ from rest_framework.request import Request
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
 from common.constants.permission_constants import PermissionConstants
+from common.log.log import log
 from common.result import result
 from common.utils.common import query_params_to_single_dict
 from models_provider.api.model import ModelCreateAPI, GetModelApi, ModelEditApi, ModelListResponse, DefaultModelResponse
 from models_provider.api.provide import ProvideApi
+from models_provider.models import Model
 from models_provider.serializers.model_serializer import ModelSerializer
+from system_manage.views import encryption_str
 
 
-class Model(APIView):
+def encryption_credential(credential):
+    if isinstance(credential, dict):
+        return {key: encryption_str(credential.get(key)) for key in credential}
+    return credential
+
+
+def get_edit_model_details(request):
+    path = request.path
+    body = request.data
+    query = request.query_params
+    credential = body.get('credential', {})
+    credential_encryption_ed = encryption_credential(credential)
+    return {
+        'path': path,
+        'body': {**body, 'credential': credential_encryption_ed},
+        'query': query
+    }
+
+
+def get_model_operation_object(model_id):
+    model_model = QuerySet(model=Model).filter(id=model_id).first()
+    if model_model is not None:
+        return {
+            "name": model_model.name
+        }
+    return {}
+
+
+class ModelSetting(APIView):
     authentication_classes = [TokenAuth]
 
     @extend_schema(methods=['POST'],
@@ -33,6 +65,10 @@ class Model(APIView):
                    request=ModelCreateAPI.get_request(),
                    responses=ModelCreateAPI.get_response())
     @has_permissions(PermissionConstants.MODEL_CREATE.get_workspace_permission())
+    @log(menu='model', operate='Create model',
+         get_operation_object=lambda r, k: {'name': r.date.get('name')},
+         get_details=get_edit_model_details
+         )
     def post(self, request: Request, workspace_id: str):
         return result.success(
             ModelSerializer.Create(data={**request.data, 'user_id': request.user.id}).insert(workspace_id,
@@ -76,6 +112,10 @@ class Model(APIView):
                        responses=ModelEditApi.get_response(),
                        tags=[_('Model')])  # type: ignore
         @has_permissions(PermissionConstants.MODEL_EDIT.get_workspace_permission())
+        @log(menu='model', operate='Update model',
+             get_operation_object=lambda r, k: get_model_operation_object(k.get('model_id')),
+             get_details=get_edit_model_details
+             )
         def put(self, request: Request, workspace_id, model_id: str):
             return result.success(
                 ModelSerializer.Operate(data={'id': model_id, 'user_id': request.user.id}).edit(request.data,
@@ -89,6 +129,8 @@ class Model(APIView):
                        responses=DefaultModelResponse.get_response(),
                        tags=[_('Model')])  # type: ignore
         @has_permissions(PermissionConstants.MODEL_DELETE.get_workspace_permission())
+        @log(menu='model', operate='Delete model',
+             get_operation_object=lambda r, k: get_model_operation_object(k.get('model_id')))
         def delete(self, request: Request, workspace_id: str, model_id: str):
             return result.success(
                 ModelSerializer.Operate(data={'id': model_id, 'user_id': request.user.id}).delete())
@@ -129,6 +171,8 @@ class Model(APIView):
                        responses=ProvideApi.ModelParamsForm.get_response(),
                        tags=[_('Model')])  # type: ignore
         @has_permissions(PermissionConstants.MODEL_READ.get_workspace_permission())
+        @log(menu='model', operate='Save model parameter form',
+             get_operation_object=lambda r, k: get_model_operation_object(k.get('model_id')))
         def put(self, request: Request, workspace_id: str, model_id: str):
             return result.success(
                 ModelSerializer.ModelParams(data={'id': model_id}).save_model_params_form(request.data))

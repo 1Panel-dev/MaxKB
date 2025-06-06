@@ -9,7 +9,7 @@
     <el-radio-group v-model="radioType" class="radio-block mb-16">
       <el-radio value="default">
         <p>{{ $t('common.EditAvatarDialog.default') }}</p>
-        <AppAvatar
+        <el-avatar
           v-if="detail?.name"
           :name="detail?.name"
           pinyinColor
@@ -22,7 +22,7 @@
       <el-radio value="custom">
         <p>{{ $t('common.EditAvatarDialog.customizeUpload') }}</p>
         <div class="flex mt-8">
-          <AppAvatar
+          <el-avatar
             v-if="fileURL"
             shape="square"
             :size="32"
@@ -30,7 +30,7 @@
             class="mr-16"
           >
             <img :src="fileURL" alt="" />
-          </AppAvatar>
+          </el-avatar>
           <el-upload
             ref="uploadRef"
             action="#"
@@ -109,7 +109,7 @@ function submit() {
     emit('refresh', '/ui/favicon.ico')
     dialogVisible.value = false
   } else if (radioType.value === 'custom' && iconFile.value) {
-    let fd = new FormData()
+    const fd = new FormData()
     fd.append('file', iconFile.value.raw)
     toolApi.putToolIcon(detail.value.id, fd, loading).then((res: any) => {
       emit('refresh', res.data)

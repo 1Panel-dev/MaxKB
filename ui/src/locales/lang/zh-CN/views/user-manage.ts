@@ -2,7 +2,6 @@ export default {
   title: '用户管理',
   createUser: '创建用户',
   editUser: '编辑用户',
-  info: '基本信息',
   roleSetting: '角色设置',
   setting: {
     updatePwd: '修改用户密码',

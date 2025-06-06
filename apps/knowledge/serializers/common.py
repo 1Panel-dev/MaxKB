@@ -167,8 +167,8 @@ def write_image(zip_path: str, image_list: List[str]):
         search = re.search("\(.*\)", image)
         if search:
             text = search.group()
-            if text.startswith('(/api/file/'):
-                r = text.replace('(/api/file/', '').replace(')', '')
+            if text.startswith('(/oss/file/'):
+                r = text.replace('(/oss/file/', '').replace(')', '')
                 r = r.strip().split(" ")[0]
                 if not is_valid_uuid(r):
                     break
@@ -221,3 +221,17 @@ def or_get(exists_problem_list, content, knowledge_id, document_id, paragraph_id
         problem = Problem(id=uuid.uuid7(), content=content, knowledge_id=knowledge_id)
         problem_content_dict[content] = problem, True
         return problem, document_id, paragraph_id
+
+
+
+def get_knowledge_operation_object(knowledge_id: str):
+    knowledge_model = QuerySet(model=Knowledge).filter(id=knowledge_id).first()
+    if knowledge_model is not None:
+        return {
+            "name": knowledge_model.name,
+            "desc": knowledge_model.desc,
+            "type": knowledge_model.type,
+            "create_time": knowledge_model.create_time,
+            "update_time": knowledge_model.update_time
+        }
+    return {}

@@ -21,9 +21,8 @@ from django.db.models import QuerySet
 from django.utils.translation import gettext as _
 from pydub import AudioSegment
 
+from ..database_model_manage.database_model_manage import DatabaseModelManage
 from ..exception.app_exception import AppApiException
-from ..models.db_model_manage import DBModelManage
-
 
 def password_encrypt(row_password):
     """
@@ -237,7 +236,7 @@ def query_params_to_single_dict(query_params: Dict):
 def valid_license(model=None, count=None, message=None):
     def inner(func):
         def run(*args, **kwargs):
-            xpack_cache = DBModelManage.get_model('xpack_cache')
+            xpack_cache = DatabaseModelManage.get_model('xpack_cache')
             is_license_valid = xpack_cache.get('XPACK_LICENSE_IS_VALID', False) if xpack_cache is not None else False
             record_count = QuerySet(model).count()
 

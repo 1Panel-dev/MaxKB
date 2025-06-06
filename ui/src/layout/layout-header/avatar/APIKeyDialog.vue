@@ -125,7 +125,7 @@ function deleteApiKey(row: any) {
     .catch(() => {})
 }
 
-function changeState(bool: Boolean, row: any) {
+function changeState(bool: boolean, row: any) {
   const obj = {
     is_active: bool
   }

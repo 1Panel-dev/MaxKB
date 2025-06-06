@@ -50,7 +50,7 @@ class Status {
     }
     status = status.split('').reverse().join('')
     this.task_status = {}
-    for (let key in TaskType) {
+    for (const key in TaskType) {
       const value = TaskType[key as keyof TaskTypeInterface]
       const index = value - 1
       this.task_status[value] = status[index] ? status[index] : 'n'
@@ -58,7 +58,7 @@ class Status {
   }
   toString() {
     const r = []
-    for (let key in TaskType) {
+    for (const key in TaskType) {
       const value = TaskType[key as keyof TaskTypeInterface]
       r.push(this.task_status[value])
     }

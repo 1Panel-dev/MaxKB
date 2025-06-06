@@ -14,19 +14,19 @@
       label-position="top"
       require-asterisk-position="right"
     >
-      <el-form-item :label="$t('views.application.applicationForm.form.appName.label')" prop="name">
+      <el-form-item :label="$t('views.application.form.appName.label')" prop="name">
         <el-input
           v-model="applicationForm.name"
           maxlength="64"
-          :placeholder="$t('views.application.applicationForm.form.appName.placeholder')"
+          :placeholder="$t('views.application.form.appName.placeholder')"
           show-word-limit
         />
       </el-form-item>
-      <el-form-item :label="$t('views.application.applicationForm.form.appDescription.label')">
+      <el-form-item :label="$t('views.application.form.appDescription.label')">
         <el-input
           v-model="applicationForm.desc"
           type="textarea"
-          :placeholder="$t('views.application.applicationForm.form.appDescription.placeholder')"
+          :placeholder="$t('views.application.form.appDescription.placeholder')"
           :rows="3"
           maxlength="256"
           show-word-limit
@@ -61,7 +61,7 @@ const router = useRouter()
 const { common, user } = useStore()
 
 // @ts-ignore
-const defaultPrompt = t('views.application.applicationForm.form.prompt.defaultPrompt', {
+const defaultPrompt = t('views.application.form.prompt.defaultPrompt', {
   data: '{data}',
   question: '{question}'
 })
@@ -75,7 +75,7 @@ const applicationForm = ref<ApplicationFormType>({
   desc: '',
   model_id: '',
   dialogue_number: 0,
-  prologue: t('views.application.applicationForm.form.defaultPrologue'),
+  prologue: t('views.application.form.defaultPrologue'),
   dataset_id_list: [],
   dataset_setting: {
     top_n: 3,
@@ -98,7 +98,7 @@ const rules = reactive<FormRules<ApplicationFormType>>({
   name: [
     {
       required: true,
-      message: t('views.application.applicationForm.form.appName.placeholder'),
+      message: t('views.application.form.appName.placeholder'),
       trigger: 'blur'
     }
   ]
@@ -111,7 +111,7 @@ watch(dialogVisible, (bool) => {
       desc: '',
       model_id: '',
       dialogue_number: 0,
-      prologue: t('views.application.applicationForm.form.defaultPrologue'),
+      prologue: t('views.application.form.defaultPrologue'),
       dataset_id_list: [],
       dataset_setting: {
         top_n: 3,

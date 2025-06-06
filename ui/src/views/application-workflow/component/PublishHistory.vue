@@ -28,9 +28,9 @@
                     }}</el-tag>
                   </h5>
                   <el-text type="info" class="color-secondary flex mt-8">
-                    <AppAvatar :size="20" class="avatar-grey mr-4">
+                    <el-avatar :size="20" class="avatar-grey mr-4">
                       <el-icon><UserFilled /></el-icon>
-                    </AppAvatar>
+                    </el-avatar>
                     {{ row.publish_user_name }}
                   </el-text>
                 </div>

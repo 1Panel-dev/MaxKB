@@ -33,7 +33,7 @@
                 <template #label>
                   <div class="flex-between">
                     <span
-                      >{{ $t('views.application.applicationForm.form.appName.label') }}
+                      >{{ $t('views.application.form.appName.label') }}
                       <span class="danger">*</span></span
                     >
                   </div>
@@ -41,19 +41,19 @@
                 <el-input
                   v-model="applicationForm.name"
                   maxlength="64"
-                  :placeholder="$t('views.application.applicationForm.form.appName.placeholder')"
+                  :placeholder="$t('views.application.form.appName.placeholder')"
                   show-word-limit
                   @blur="applicationForm.name = applicationForm.name?.trim()"
                 />
               </el-form-item>
               <el-form-item
-                :label="$t('views.application.applicationForm.form.appDescription.label')"
+                :label="$t('views.application.form.appDescription.label')"
               >
                 <el-input
                   v-model="applicationForm.desc"
                   type="textarea"
                   :placeholder="
-                    $t('views.application.applicationForm.form.appDescription.placeholder')
+                    $t('views.application.form.appDescription.placeholder')
                   "
                   :rows="3"
                   maxlength="256"
@@ -61,10 +61,10 @@
                 />
               </el-form-item>
 
-              <el-form-item :label="$t('views.application.applicationForm.form.aiModel.label')">
+              <el-form-item :label="$t('views.application.form.aiModel.label')">
                 <template #label>
                   <div class="flex-between">
-                    <span>{{ $t('views.application.applicationForm.form.aiModel.label') }}</span>
+                    <span>{{ $t('views.application.form.aiModel.label') }}</span>
 
                     <el-button
                       type="primary"
@@ -78,7 +78,7 @@
                 </template>
                 <ModelSelect
                   v-model="applicationForm.model_id"
-                  :placeholder="$t('views.application.applicationForm.form.aiModel.placeholder')"
+                  :placeholder="$t('views.application.form.aiModel.placeholder')"
                   :options="modelOptions"
                   @change="model_change"
                   @submitModel="getModel"
@@ -87,15 +87,15 @@
                 ></ModelSelect>
               </el-form-item>
               <el-form-item
-                :label="$t('views.application.applicationForm.form.roleSettings.label')"
+                :label="$t('views.application.form.roleSettings.label')"
               >
                 <MdEditorMagnify
-                  :title="$t('views.application.applicationForm.form.roleSettings.label')"
+                  :title="$t('views.application.form.roleSettings.label')"
                   v-model="applicationForm.model_setting.system"
                   style="height: 120px"
                   @submitDialog="submitSystemDialog"
                   :placeholder="
-                    $t('views.application.applicationForm.form.roleSettings.placeholder')
+                    $t('views.application.form.roleSettings.placeholder')
                   "
                 />
               </el-form-item>
@@ -103,7 +103,7 @@
                 prop="model_setting.no_references_prompt"
                 :rules="{
                   required: applicationForm.model_id,
-                  message: $t('views.application.applicationForm.form.prompt.requiredMessage'),
+                  message: $t('views.application.form.prompt.requiredMessage'),
                   trigger: 'blur'
                 }"
               >
@@ -111,14 +111,14 @@
                   <div class="flex align-center">
                     <span class="mr-4"
                       >{{
-                        $t('views.application.applicationForm.form.prompt.label') +
-                        $t('views.application.applicationForm.form.prompt.noReferences')
+                        $t('views.application.form.prompt.label') +
+                        $t('views.application.form.prompt.noReferences')
                       }}
                     </span>
                     <el-tooltip
                       effect="dark"
                       :content="
-                        $t('views.application.applicationForm.form.prompt.noReferencesTooltip', {
+                        $t('views.application.form.prompt.noReferencesTooltip', {
                           question: '{question}'
                         })
                       "
@@ -133,8 +133,8 @@
 
                 <MdEditorMagnify
                   :title="
-                    $t('views.application.applicationForm.form.prompt.label') +
-                    $t('views.application.applicationForm.form.prompt.noReferences')
+                    $t('views.application.form.prompt.label') +
+                    $t('views.application.form.prompt.noReferences')
                   "
                   v-model="applicationForm.model_setting.no_references_prompt"
                   style="height: 120px"
@@ -143,7 +143,7 @@
                 />
               </el-form-item>
               <el-form-item
-                :label="$t('views.application.applicationForm.form.historyRecord.label')"
+                :label="$t('views.application.form.historyRecord.label')"
                 @click.prevent
               >
                 <el-input-number
@@ -157,12 +157,12 @@
                 />
               </el-form-item>
               <el-form-item
-                label="$t('views.application.applicationForm.form.relatedKnowledgeBase')"
+                label="$t('views.application.form.relatedKnowledgeBase')"
               >
                 <template #label>
                   <div class="flex-between">
                     <span>{{
-                      $t('views.application.applicationForm.form.relatedKnowledge.label')
+                      $t('views.application.form.relatedKnowledge.label')
                     }}</span>
                     <div>
                       <el-button type="primary" link @click="openParamSettingDialog">
@@ -180,7 +180,7 @@
                 </template>
                 <div class="w-full">
                   <el-text type="info" v-if="applicationForm.dataset_id_list?.length === 0"
-                    >{{ $t('views.application.applicationForm.form.relatedKnowledge.placeholder') }}
+                    >{{ $t('views.application.form.relatedKnowledge.placeholder') }}
                   </el-text>
                   <el-row :gutter="12" v-else>
                     <el-col
@@ -196,15 +196,15 @@
                       <el-card class="relate-dataset-card border-r-4" shadow="never">
                         <div class="flex-between">
                           <div class="flex align-center" style="width: 80%">
-                            <AppAvatar
+                            <el-avatar
                               v-if="relatedObject(datasetList, item, 'id')?.type === '1'"
                               class="mr-8 avatar-purple"
                               shape="square"
                               :size="32"
                             >
                               <img src="@/assets/knowledge/icon_web.svg" style="width: 58%" alt="" />
-                            </AppAvatar>
-                            <AppAvatar
+                            </el-avatar>
+                            <el-avatar
                               v-else-if="relatedObject(datasetList, item, 'id')?.type === '2'"
                               class="mr-8 avatar-purple"
                               shape="square"
@@ -212,10 +212,10 @@
                               style="background: none"
                             >
                               <img src="@/assets/knowledge/logo_lark.svg" style="width: 100%" alt="" />
-                            </AppAvatar>
-                            <AppAvatar v-else class="mr-8 avatar-blue" shape="square" :size="32">
+                            </el-avatar>
+                            <el-avatar v-else class="mr-8 avatar-blue" shape="square" :size="32">
                               <img src="@/assets/knowledge/icon_document.svg" style="width: 58%" alt="" />
-                            </AppAvatar>
+                            </el-avatar>
 
                             <span
                               class="ellipsis cursor"
@@ -236,24 +236,24 @@
                 </div>
               </el-form-item>
               <el-form-item
-                :label="$t('views.application.applicationForm.form.prompt.label')"
+                :label="$t('views.application.form.prompt.label')"
                 prop="model_setting.prompt"
                 :rules="{
                   required: applicationForm.model_id,
-                  message: $t('views.application.applicationForm.form.prompt.requiredMessage'),
+                  message: $t('views.application.form.prompt.requiredMessage'),
                   trigger: 'blur'
                 }"
               >
                 <template #label>
                   <div class="flex align-center">
                     <span class="mr-4">
-                      {{ $t('views.application.applicationForm.form.prompt.label') }}
-                      {{ $t('views.application.applicationForm.form.prompt.references') }}
+                      {{ $t('views.application.form.prompt.label') }}
+                      {{ $t('views.application.form.prompt.references') }}
                     </span>
                     <el-tooltip
                       effect="dark"
                       :content="
-                        $t('views.application.applicationForm.form.prompt.referencesTooltip', {
+                        $t('views.application.form.prompt.referencesTooltip', {
                           data: '{data}',
                           question: '{question}'
                         })
@@ -269,8 +269,8 @@
 
                 <MdEditorMagnify
                   :title="
-                    $t('views.application.applicationForm.form.prompt.label') +
-                    $t('views.application.applicationForm.form.prompt.references')
+                    $t('views.application.form.prompt.label') +
+                    $t('views.application.form.prompt.references')
                   "
                   v-model="applicationForm.model_setting.prompt"
                   style="height: 150px"
@@ -278,9 +278,9 @@
                   :placeholder="defaultPrompt"
                 />
               </el-form-item>
-              <el-form-item :label="$t('views.application.applicationForm.form.prologue')">
+              <el-form-item :label="$t('views.application.form.prologue')">
                 <MdEditorMagnify
-                  :title="$t('views.application.applicationForm.form.prologue')"
+                  :title="$t('views.application.form.prologue')"
                   v-model="applicationForm.prologue"
                   style="height: 150px"
                   @submitDialog="submitPrologueDialog"
@@ -290,7 +290,7 @@
                 <template #label>
                   <div class="flex-between">
                     <span class="mr-4">
-                      {{ $t('views.application.applicationForm.form.reasoningContent.label') }}
+                      {{ $t('views.application.form.reasoningContent.label') }}
                     </span>
 
                     <div class="flex">
@@ -312,14 +312,14 @@
                 prop="stt_model_id"
                 :rules="{
                   required: applicationForm.stt_model_enable,
-                  message: $t('views.application.applicationForm.form.voiceInput.requiredMessage'),
+                  message: $t('views.application.form.voiceInput.requiredMessage'),
                   trigger: 'change'
                 }"
               >
                 <template #label>
                   <div class="flex-between">
                     <span class="mr-4">
-                      {{ $t('views.application.applicationForm.form.voiceInput.label') }}
+                      {{ $t('views.application.form.voiceInput.label') }}
                       <span class="danger" v-if="applicationForm.stt_model_enable">*</span>
                     </span>
 
@@ -328,7 +328,7 @@
                         v-if="applicationForm.stt_model_enable"
                         v-model="applicationForm.stt_autosend"
                         >{{
-                          $t('views.application.applicationForm.form.voiceInput.autoSend')
+                          $t('views.application.form.voiceInput.autoSend')
                         }}</el-checkbox
                       >
                       <el-switch
@@ -343,7 +343,7 @@
                 <ModelSelect
                   v-show="applicationForm.stt_model_enable"
                   v-model="applicationForm.stt_model_id"
-                  :placeholder="$t('views.application.applicationForm.form.voiceInput.placeholder')"
+                  :placeholder="$t('views.application.form.voiceInput.placeholder')"
                   :options="sttModelOptions"
                   :model-type="'STT'"
                 ></ModelSelect>
@@ -352,14 +352,14 @@
                 prop="tts_model_id"
                 :rules="{
                   required: applicationForm.tts_type === 'TTS' && applicationForm.tts_model_enable,
-                  message: $t('views.application.applicationForm.form.voicePlay.requiredMessage'),
+                  message: $t('views.application.form.voicePlay.requiredMessage'),
                   trigger: 'change'
                 }"
               >
                 <template #label>
                   <div class="flex-between">
                     <span class="mr-4"
-                      >{{ $t('views.application.applicationForm.form.voicePlay.label') }}
+                      >{{ $t('views.application.form.voicePlay.label') }}
                       <span
                         class="danger"
                         v-if="
@@ -373,7 +373,7 @@
                         v-if="applicationForm.tts_model_enable"
                         v-model="applicationForm.tts_autoplay"
                         >{{
-                          $t('views.application.applicationForm.form.voicePlay.autoPlay')
+                          $t('views.application.form.voicePlay.autoPlay')
                         }}</el-checkbox
                       >
                       <el-switch
@@ -392,10 +392,10 @@
                     class="mb-8"
                   >
                     <el-radio value="BROWSER">{{
-                      $t('views.application.applicationForm.form.voicePlay.browser')
+                      $t('views.application.form.voicePlay.browser')
                     }}</el-radio>
                     <el-radio value="TTS">{{
-                      $t('views.application.applicationForm.form.voicePlay.tts')
+                      $t('views.application.form.voicePlay.tts')
                     }}</el-radio>
                   </el-radio-group>
                 </div>
@@ -404,7 +404,7 @@
                     v-if="applicationForm.tts_type === 'TTS' && applicationForm.tts_model_enable"
                     v-model="applicationForm.tts_model_id"
                     :placeholder="
-                      $t('views.application.applicationForm.form.voicePlay.placeholder')
+                      $t('views.application.form.voicePlay.placeholder')
                     "
                     :options="ttsModelOptions"
                     @change="ttsModelChange()"
@@ -436,22 +436,22 @@
               @mouseenter="showEditIcon = true"
               @mouseleave="showEditIcon = false"
             >
-              <AppAvatar
+              <el-avatar
                 v-if="isAppIcon(applicationForm?.icon)"
                 shape="square"
                 :size="32"
                 style="background: none"
               >
                 <img :src="applicationForm?.icon" alt="" />
-              </AppAvatar>
-              <AppAvatar
+              </el-avatar>
+              <el-avatar
                 v-else-if="applicationForm?.name"
                 :name="applicationForm?.name"
                 pinyinColor
                 shape="square"
                 :size="32"
               />
-              <AppAvatar
+              <el-avatar
                 v-if="showEditIcon"
                 shape="square"
                 class="edit-mask"
@@ -459,11 +459,11 @@
                 @click="openEditAvatar"
               >
                 <el-icon><EditPen /></el-icon>
-              </AppAvatar>
+              </el-avatar>
             </div>
             <h4>
               {{
-                applicationForm?.name || $t('views.application.applicationForm.form.appName.label')
+                applicationForm?.name || $t('views.application.form.appName.label')
               }}
             </h4>
           </div>
@@ -518,7 +518,7 @@ const {
   params: { id }
 } = route as any
 // @ts-ignore
-const defaultPrompt = t('views.application.applicationForm.form.prompt.defaultPrompt', {
+const defaultPrompt = t('views.application.form.prompt.defaultPrompt', {
   data: '{data}',
   question: '{question}'
 })
@@ -546,7 +546,7 @@ const applicationForm = ref<ApplicationFormType>({
   desc: '',
   model_id: '',
   dialogue_number: 1,
-  prologue: t('views.application.applicationForm.form.defaultPrologue'),
+  prologue: t('views.application.form.defaultPrologue'),
   dataset_id_list: [],
   dataset_setting: {
     top_n: 3,
@@ -560,7 +560,7 @@ const applicationForm = ref<ApplicationFormType>({
   },
   model_setting: {
     prompt: defaultPrompt,
-    system: t('views.application.applicationForm.form.roleSettings.placeholder'),
+    system: t('views.application.form.roleSettings.placeholder'),
     no_references_prompt: '{question}',
     reasoning_content_enable: false
   },
@@ -579,7 +579,7 @@ const rules = reactive<FormRules<ApplicationFormType>>({
   name: [
     {
       required: true,
-      message: t('views.application.applicationForm.form.appName.placeholder'),
+      message: t('views.application.form.appName.placeholder'),
       trigger: 'blur'
     }
   ]

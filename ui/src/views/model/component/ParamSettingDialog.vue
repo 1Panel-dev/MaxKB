@@ -100,7 +100,7 @@ const AddParamRef = ref()
 const open = () => {
   dialogVisible.value = true
   loading.value = true
-  ModelApi.getModelParamsForm('default', props.model.id, loading)
+  ModelApi.getModelParamsForm(props.model.id, loading)
     .then((ok) => {
       loading.value = false
       modelParamsForm.value = ok.data
@@ -124,7 +124,7 @@ function deleteParam(index: any) {
 
 function refresh(data: any, index: any) {
   for (let i = 0; i < modelParamsForm.value.length; i++) {
-    let field = modelParamsForm.value[i].field
+    const field = modelParamsForm.value[i].field
     let label = modelParamsForm.value[i].label
     if (label && label.input_type === 'TooltipLabel') {
       label = label.label
@@ -151,7 +151,7 @@ function refresh(data: any, index: any) {
 }
 
 function submit() {
-  ModelApi.updateModelParamsForm('default', props.model.id, modelParamsForm.value, loading).then(
+  ModelApi.updateModelParamsForm(props.model.id, modelParamsForm.value, loading).then(
     (ok) => {
       MsgSuccess(t('views.model.tip.saveSuccessMessage'))
       close()
