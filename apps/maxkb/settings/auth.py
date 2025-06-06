@@ -7,7 +7,9 @@
     @desc:
 """
 USER_TOKEN_AUTH = 'common.auth.handle.impl.user_token.UserToken'
+CHAT_ANONYMOUS_USER_AURH = 'common.auth.handle.impl.chat_anonymous_user_token.ChatAnonymousUserToken'
 
 AUTH_HANDLES = [
     USER_TOKEN_AUTH,
+    CHAT_ANONYMOUS_USER_AURH
 ]

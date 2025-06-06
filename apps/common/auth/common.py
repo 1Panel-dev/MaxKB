@@ -1,0 +1,64 @@
+# coding=utf-8
+"""
+    @project: MaxKB
+    @Author：虎虎
+    @file： common.py
+    @date：2025/6/6 19:55
+    @desc:
+"""
+import json
+
+from django.core import signing
+
+from common.utils.rsa_util import encrypt, decrypt
+
+
+class ChatAuthentication:
+    def __init__(self, auth_type: str | None, is_auth: bool, auth_passed: bool):
+        self.is_auth = is_auth
+        self.auth_passed = auth_passed
+        self.auth_type = auth_type
+
+    def to_dict(self):
+        return {'is_auth': self.is_auth, 'auth_passed': self.auth_passed, 'auth_type': self.auth_type}
+
+    def to_string(self):
+        return encrypt(json.dumps(self.to_dict()))
+
+    @staticmethod
+    def new_instance(authentication: str):
+        auth = json.loads(decrypt(authentication))
+        return ChatAuthentication(auth.get('auth_type'), auth.get('is_auth'), auth.get('auth_passed'))
+
+
+class ChatUserToken:
+    def __init__(self, application_id, user_id, access_token, _type, client_type, client_id,
+                 authentication: ChatAuthentication):
+        self.application_id = application_id
+        self.user_id = user_id,
+        self.access_token = access_token
+        self.type = _type
+        self.client_type = client_type
+        self.client_id = client_id
+        self.authentication = authentication
+
+    def to_dict(self):
+        return {
+            'application_id': str(self.application_id),
+            'user_id': str(self.user_id),
+            'access_token': self.access_token,
+            'type': str(self.type.value),
+            'client_type': str(self.client_type),
+            'client_id': str(self.client_id),
+            'authentication': self.authentication.to_string()
+        }
+
+    def to_token(self):
+        return signing.dumps(self.to_dict())
+
+    @staticmethod
+    def new_instance(token_dict):
+        return ChatUserToken(token_dict.get('application_id'), token_dict.get('user_id'),
+                             token_dict.get('access_token'), token_dict.get('type'), token_dict.get('client_type'),
+                             token_dict.get('client_id'),
+                             ChatAuthentication.new_instance(token_dict.get('authentication')))

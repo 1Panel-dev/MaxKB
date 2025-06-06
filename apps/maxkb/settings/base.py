@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'system_manage',
     'models_provider',
     'django_celery_beat',
-    'application'
+    'application',
+    'chat'
 ]
 
 MIDDLEWARE = [

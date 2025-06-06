@@ -15,6 +15,7 @@ from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 
 from common.auth.handle.auth_base_handle import AuthBaseHandle
+from common.constants.authentication_type import AuthenticationType
 from common.constants.cache_version import Cache_Version
 from common.constants.permission_constants import Auth, PermissionConstants, ResourcePermissionGroup, \
     get_permission_list_by_resource_group, ResourceAuthType, \
@@ -233,7 +234,7 @@ class UserToken(AuthBaseHandle):
         auth_details = get_token_details()
         if auth_details is None:
             return False
-        return True
+        return 'id' in auth_details and auth_details.get('type') == AuthenticationType.SYSTEM_USER.value
 
     def handle(self, request, token: str, get_token_details):
         version, get_key = Cache_Version.TOKEN.value

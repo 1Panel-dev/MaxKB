@@ -169,6 +169,8 @@ class RoleConstants(Enum):
     ADMIN = Role("ADMIN", '超级管理员', RoleGroup.SYSTEM_USER)
     WORKSPACE_MANAGE = Role("WORKSPACE_MANAGE", '工作空间管理员', RoleGroup.SYSTEM_USER)
     USER = Role("USER", '普通用户', RoleGroup.SYSTEM_USER)
+    CHAT_ANONYMOUS_USER = Role("CHAT_ANONYMOUS_USER", "对话匿名用户", RoleGroup.CHAT_USER)
+    CHAT_USER = Role("CHAT_USER", "对话用户", RoleGroup.CHAT_USER)
 
     def get_workspace_role(self):
         return lambda r, kwargs: Role(name=self.value.name,
@@ -769,7 +771,7 @@ class Auth:
     """
 
     def __init__(self,
-                 current_role_list: List[Role],
+                 current_role_list: List[RoleConstants | Role],
                  permission_list: List[PermissionConstants | Permission],
                  **keywords):
         # 权限列表

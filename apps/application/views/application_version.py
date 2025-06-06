@@ -12,7 +12,7 @@ from rest_framework.request import Request
 from rest_framework.views import APIView
 
 from application.api.application_version import ApplicationVersionListAPI, ApplicationVersionPageAPI, \
-    ApplicationVersionAPI, ApplicationVersionOperateAPI
+    ApplicationVersionOperateAPI
 from application.serializers.application_version import ApplicationVersionSerializer
 from common import result
 from common.auth import TokenAuth
@@ -88,6 +88,7 @@ class ApplicationVersionView(APIView):
             responses=ApplicationVersionOperateAPI.get_response(),
             tags=[_('Application/Version')]  # type: ignore
         )
+        @has_permissions(PermissionConstants.APPLICATION_EDIT.get_workspace_application_permission())
         def put(self, request: Request, workspace_id: str, application_id: str, work_flow_version_id: str):
             return result.success(
                 ApplicationVersionSerializer.Operate(

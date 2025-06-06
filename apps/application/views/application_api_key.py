@@ -20,10 +20,10 @@ class ApplicationKey(APIView):
         parameters=ApplicationKeyCreateAPI.get_parameters(),
         tags=[_('Application Api Key')]  # type: ignore
     )
-    def post(self,request: Request, application_id: str, workspace_id: str):
+    def post(self, request: Request, workspace_id: str, application_id: str):
         return result.success(ApplicationKeySerializer(
-                data={'application_id': application_id, 'user_id': request.user.id,
-                      'workspace_id':workspace_id}).generate())
+            data={'application_id': application_id, 'user_id': request.user.id,
+                  'workspace_id': workspace_id}).generate())
 
     @extend_schema(
         methods=['GET'],
@@ -33,11 +33,10 @@ class ApplicationKey(APIView):
         parameters=ApplicationKeyCreateAPI.get_parameters(),
         tags=[_('Application Api Key')]  # type: ignore
     )
-    def get(self,request: Request, application_id: str, workspace_id: str):
-        return result,success(ApplicationKeySerializer(
-            data={'application_id':application_id, 'user_id':request.user.id,
-                  'workspace_id':workspace_id}).list())
-
+    def get(self, request: Request, workspace_id: str, application_id: str, ):
+        return result, success(ApplicationKeySerializer(
+            data={'application_id': application_id, 'user_id': request.user.id,
+                  'workspace_id': workspace_id}).list())
 
     class Operate(APIView):
         authentication_classes = [TokenAuth]
@@ -50,9 +49,8 @@ class ApplicationKey(APIView):
             parameters=ApplicationKeyCreateAPI.get_parameters(),
             tags=[_('Application Api Key')]  # type: ignore
         )
-        def put(self, request: Request, application_id: str, workspace_id: str):
+        def put(self, request: Request, workspace_id: str, application_id: str):
             return result.success(ApplicationKeySerializer.Operate(
 
             )
-                                  )
-
+            )
