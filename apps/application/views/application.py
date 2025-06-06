@@ -27,7 +27,7 @@ from common.log.log import log
 def get_application_operation_object(application_id):
     application_model = QuerySet(model=Application).filter(id=application_id).first()
     if application_model is not None:
-        return{
+        return {
             'name': application_model.name
         }
     return {}
@@ -48,7 +48,7 @@ class Application(APIView):
     )
     @has_permissions(PermissionConstants.APPLICATION_READ.get_workspace_permission())
     @log(menu='Application', operate='Create an application',
-         get_operation_object=lambda r,k: {'name': r.data.get('name')})
+         get_operation_object=lambda r, k: {'name': r.data.get('name')})
     def post(self, request: Request, workspace_id: str):
         return result.success(
             ApplicationSerializer(data={'workspace_id': workspace_id, 'user_id': request.user.id}).insert(request.data))
@@ -104,8 +104,6 @@ class Application(APIView):
             return result.success(ApplicationSerializer(
                 data={'user_id': request.user.id, 'workspace_id': workspace_id,
                       }).import_({'file': request.FILES.get('file')}))
-
-
 
     class Export(APIView):
         authentication_classes = [TokenAuth]
@@ -197,7 +195,7 @@ class Application(APIView):
             tags=[_('Application')]  # type: ignore
         )
         @log(menu='Application', operate='Publishing an application',
-             get_operation_object=lambda r,k: get_application_operation_object(k.get('application_id'))
+             get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id'))
              )
         def put(self, request: Request, application_id: str):
             return result.success(

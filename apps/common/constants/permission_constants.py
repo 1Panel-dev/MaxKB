@@ -44,6 +44,7 @@ class Group(Enum):
     USER_GROUP = "USER_GROUP"
     CHAT_USER_AUTH = "CHAT_USER_AUTH"
     OTHER = "OTHER"
+    OVERVIEW = "OVERVIEW"
 
 
 class SystemGroup(Enum):
@@ -225,6 +226,7 @@ Permission_Label = {
     Group.CHAT_USER.value: _("Chat User"),
     Group.USER_GROUP.value: _("User Group"),
     Group.CHAT_USER_AUTH.value: _("Chat User Auth"),
+    Group.OVERVIEW.value: _("Overview"),
 
 }
 
@@ -573,6 +575,42 @@ class PermissionConstants(Enum):
                                   parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
                                   resource_permission_group_list=[ResourcePermissionGroup.VIEW],
                                   )
+    APPLICATION_OVERVIEW_READ = Permission(group=Group.OVERVIEW, operate=Operate.READ,
+                                           role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                           parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
+                                           resource_permission_group_list=[ResourcePermissionGroup.VIEW],
+                                           )
+    APPLICATION_OVERVIEW_EMBEDDED = Permission(group=Group.OVERVIEW, operate=Operate.READ,
+                                               role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                               parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
+                                               resource_permission_group_list=[ResourcePermissionGroup.VIEW],
+                                               label=_('Embed third party')
+                                               )
+    APPLICATION_OVERVIEW_ACCESS = Permission(group=Group.OVERVIEW, operate=Operate.READ,
+                                             role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                             parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
+                                             resource_permission_group_list=[ResourcePermissionGroup.VIEW],
+                                             label=_('Access restrictions')
+                                             )
+    APPLICATION_OVERVIEW_DISPLAY = Permission(group=Group.OVERVIEW, operate=Operate.READ,
+                                              role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                              parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
+                                              resource_permission_group_list=[ResourcePermissionGroup.VIEW],
+                                              label=_('Display settings')
+                                              )
+    APPLICATION_OVERVIEW_API_KEY = Permission(group=Group.OVERVIEW, operate=Operate.READ,
+                                              role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                              parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
+                                              resource_permission_group_list=[ResourcePermissionGroup.VIEW],
+                                              label=_('API Key')
+                                              )
+    APPLICATION_OVERVIEW_PUBLIC = Permission(group=Group.OVERVIEW, operate=Operate.READ,
+                                             role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                             parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
+                                             resource_permission_group_list=[ResourcePermissionGroup.VIEW],
+                                             label=_('Public settings')
+                                             )
+
     SYSTEM_API_KEY_EDIT = Permission(group=Group.OTHER, operate=Operate.EDIT,
                                      role_list=[RoleConstants.ADMIN],
                                      parent_group=[SystemGroup.OTHER],
