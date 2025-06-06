@@ -290,6 +290,10 @@ class KnowledgeSerializer(serializers.Serializer):
                 knowledge.desc = instance.get("desc")
             if 'meta' in instance:
                 knowledge.meta = instance.get('meta')
+            if 'file_size_limit' in instance:
+                knowledge.file_size_limit = instance.get('file_size_limit')
+            if 'file_count_limit' in instance:
+                knowledge.file_count_limit = instance.get('file_count_limit')
             if 'application_id_list' in instance and instance.get('application_id_list') is not None:
                 application_id_list = instance.get('application_id_list')
                 # 当前用户可修改关联的知识库列表
