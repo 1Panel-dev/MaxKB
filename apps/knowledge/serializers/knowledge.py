@@ -69,6 +69,8 @@ class KnowledgeEditRequest(serializers.Serializer):
         child=serializers.UUIDField(required=True, label=_('application id')),
         label=_('application id list')
     )
+    file_size_limit = serializers.IntegerField(required=False, label=_('file size limit'))
+    file_count_limit = serializers.IntegerField(required=False, label=_('file count limit'))
 
     @staticmethod
     def get_knowledge_meta_valid_map():
