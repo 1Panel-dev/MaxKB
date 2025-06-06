@@ -426,7 +426,7 @@ class ToolSerializer(serializers.Serializer):
                 )
                 file.save(self.data.get('image').read())
 
-                tool.icon = f'/api/file/{file_id}'
+                tool.icon = f'/oss/file/{file_id}'
             tool.save()
 
             return tool.icon

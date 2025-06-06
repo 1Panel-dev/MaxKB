@@ -65,7 +65,7 @@ class FileSerializer(serializers.Serializer):
         file_id = meta.get('file_id', uuid.uuid7())
         file = File(id=file_id, file_name=self.data.get('file').name, meta=meta)
         file.save(self.data.get('file').read())
-        return f'/api/file/{file_id}'
+        return f'/oss/file/{file_id}'
 
     class Operate(serializers.Serializer):
         id = serializers.UUIDField(required=True)

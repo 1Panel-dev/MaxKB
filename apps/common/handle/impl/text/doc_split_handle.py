@@ -226,7 +226,7 @@ class DocSplitHandle(BaseSplitHandle):
             doc = Document(io.BytesIO(buffer))
             content = self.to_md(doc, image_list, get_image_id_func())
             if len(image_list) > 0:
-                content = content.replace('/api/image/', '/api/file/')
+                content = content.replace('/api/image/', '/oss/file/')
                 save_image(image_list)
             return content
         except BaseException as e:

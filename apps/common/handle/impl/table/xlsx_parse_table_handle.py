@@ -110,7 +110,7 @@ class XlsxParseTableHandle(BaseParseTableHandle):
 
                 md_tables += md_table + '\n\n'
 
-                md_tables = md_tables.replace('/api/image/', '/api/file/')
+                md_tables = md_tables.replace('/api/image/', '/oss/file/')
             return md_tables
         except Exception as e:
             max_kb.error(f'excel split handle error: {e}')

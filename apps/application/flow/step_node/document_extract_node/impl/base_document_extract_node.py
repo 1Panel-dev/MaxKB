@@ -9,7 +9,7 @@ from application.flow.i_step_node import NodeResult
 from application.flow.step_node.document_extract_node.i_document_extract_node import IDocumentExtractNode
 from knowledge.models import File
 from knowledge.serializers.document import split_handles, parse_table_handle_list, FileBufferHandle
-from knowledge.serializers.file import FileSerializer
+from oss.serializers.file import FileSerializer
 
 
 def bytes_to_uploaded_file(file_bytes, file_name="file.txt"):

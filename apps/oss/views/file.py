@@ -9,7 +9,7 @@ from common.auth import TokenAuth
 from common.log.log import log
 from common.result import result
 from knowledge.api.file import FileUploadAPI, FileGetAPI
-from knowledge.serializers.file import FileSerializer
+from oss.serializers.file import FileSerializer
 
 
 class FileView(APIView):

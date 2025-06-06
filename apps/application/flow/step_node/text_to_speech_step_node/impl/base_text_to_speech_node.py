@@ -6,7 +6,7 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.text_to_speech_step_node.i_text_to_speech_node import ITextToSpeechNode
-from knowledge.serializers.file import FileSerializer
+from oss.serializers.file import FileSerializer
 from models_provider.tools import get_model_instance_by_model_user_id
 
 

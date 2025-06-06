@@ -8,7 +8,7 @@ from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.image_generate_step_node.i_image_generate_node import IImageGenerateNode
 from common.utils.common import bytes_to_uploaded_file
-from knowledge.serializers.file import FileSerializer
+from oss.serializers.file import FileSerializer
 from models_provider.tools import get_model_instance_by_model_user_id
 
 

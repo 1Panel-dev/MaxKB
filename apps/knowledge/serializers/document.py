@@ -46,7 +46,6 @@ from knowledge.models import Knowledge, Paragraph, Problem, Document, KnowledgeT
     TaskType, File, FileSourceType
 from knowledge.serializers.common import ProblemParagraphManage, BatchSerializer, \
     get_embedding_model_id_by_knowledge_id, MetaSerializer, write_image, zip_dir
-from knowledge.serializers.file import FileSerializer
 from knowledge.serializers.paragraph import ParagraphSerializers, ParagraphInstanceSerializer, \
     delete_problems_and_mappings
 from knowledge.task.embedding import embedding_by_document, delete_embedding_by_document_list, \
@@ -56,6 +55,7 @@ from knowledge.task.generate import generate_related_by_document_id
 from knowledge.task.sync import sync_web_document
 from maxkb.const import PROJECT_DIR
 from models_provider.models import Model
+from oss.serializers.file import FileSerializer
 
 default_split_handle = TextSplitHandle()
 split_handles = [

@@ -130,7 +130,7 @@ class BaseImageUnderstandNode(IImageUnderstandNode):
                 file_id_list = [image.get('file_id') for image in image_list]
                 return HumanMessage(content=[
                     {'type': 'text', 'text': data['question']},
-                    *[{'type': 'image_url', 'image_url': {'url': f'/api/file/{file_id}'}} for file_id in file_id_list]
+                    *[{'type': 'image_url', 'image_url': {'url': f'/oss/file/{file_id}'}} for file_id in file_id_list]
 
                 ])
         return HumanMessage(content=chat_record.problem_text)
