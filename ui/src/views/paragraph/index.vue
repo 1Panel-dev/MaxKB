@@ -224,22 +224,6 @@ function searchHandle() {
   getParagraphList()
 }
 
-function changeState(row: any) {
-  const obj = {
-    is_active: !row.is_active,
-  }
-  paragraph
-    .asyncPutParagraph(id, documentId, row.id, obj, changeStateloading)
-    .then((res) => {
-      const index = paragraphDetail.value.findIndex((v) => v.id === row.id)
-      paragraphDetail.value[index].is_active = !paragraphDetail.value[index].is_active
-      return true
-    })
-    .catch(() => {
-      return false
-    })
-}
-
 function deleteParagraph(row: any) {
   MsgConfirm(
     `${t('views.paragraph.delete.confirmTitle')} ${row.title || '-'} ?`,

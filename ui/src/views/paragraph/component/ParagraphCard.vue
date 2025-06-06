@@ -12,15 +12,62 @@
       :modelValue="data.content"
       class="maxkb-md"
     />
+    <el-card shadow="always" style="--el-card-padding: 8px 12px; --el-card-border-radius: 8px">
+      <el-switch
+        :loading="changeStateloading"
+        v-model="data.is_active"
+        :before-change="() => changeState(data)"
+        size="small"
+      />
+
+      <el-divider direction="vertical" />
+      <el-button link>
+        <el-icon :size="16" :title="$t('views.applicationWorkflow.control.zoomOut')"
+          ><ZoomOut
+        /></el-icon>
+      </el-button>
+      <el-dropdown trigger="click">
+        <el-button text>
+          <el-icon><MoreFilled /></el-icon>
+        </el-button>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item @click="openGenerateDialog(data)">
+              <el-icon><Connection /></el-icon>
+              {{ $t('views.document.generateQuestion.title') }}</el-dropdown-item
+            >
+            <el-dropdown-item @click="openSelectDocumentDialog(data)">
+              <AppIcon iconName="app-migrate"></AppIcon>
+              {{ $t('views.document.setting.migration') }}</el-dropdown-item
+            >
+            <el-dropdown-item icon="Delete" @click.stop="deleteParagraph(data)">{{
+              $t('common.delete')
+            }}</el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
+    </el-card>
   </el-card>
 </template>
 <script setup lang="ts">
 import { ref, useSlots } from 'vue'
+import { useRoute } from 'vue-router'
 import { t } from '@/locales'
+import useStore from '@/stores'
+import GenerateRelatedDialog from '@/components/generate-related-dialog/index.vue'
+import { MsgSuccess, MsgConfirm } from '@/utils/message'
+const { paragraph } = useStore()
+
+const route = useRoute()
+const {
+  params: { id, documentId },
+} = route as any
 const props = defineProps<{
   data: any
 }>()
 
+const SelectDocumentDialogRef = ref()
+const changeStateloading = ref(false)
 const show = ref(false)
 // card上面存在dropdown菜单
 const subHovered = ref(false)
@@ -33,8 +80,52 @@ function cardLeave() {
   show.value = subHovered.value
 }
 
-function subHoveredEnter() {
-  subHovered.value = true
+function changeState(row: any) {
+  const obj = {
+    is_active: !row.is_active,
+  }
+  paragraph
+    .asyncPutParagraph(id, documentId, row.id, obj, changeStateloading)
+    .then((res) => {
+      // const index = paragraphDetail.value.findIndex((v) => v.id === row.id)
+      // paragraphDetail.value[index].is_active = !paragraphDetail.value[index].is_active
+      return true
+    })
+    .catch(() => {
+      return false
+    })
+}
+
+const GenerateRelatedDialogRef = ref<InstanceType<typeof GenerateRelatedDialog>>()
+function openGenerateDialog(row: any) {
+  if (GenerateRelatedDialogRef.value) {
+    GenerateRelatedDialogRef.value.open([], 'dataset', row.id)
+  }
+}
+function openSelectDocumentDialog(row?: any) {
+//   if (row) {
+//     multipleSelection.value = [row.id]
+//   }
+//   SelectDocumentDialogRef.value.open(multipleSelection.value)
+}
+
+function deleteParagraph(row: any) {
+  MsgConfirm(
+    `${t('views.paragraph.delete.confirmTitle')} ${row.title || '-'} ?`,
+    t('views.paragraph.delete.confirmMessage'),
+    {
+      confirmButtonText: t('common.confirm'),
+      confirmButtonClass: 'danger',
+    },
+  )
+    .then(() => {
+      paragraph.asyncDelParagraph(id, documentId, row.id, loading).then(() => {
+        // const index = paragraphDetail.value.findIndex((v) => v.id === row.id)
+        // paragraphDetail.value.splice(index, 1)
+        MsgSuccess(t('common.deleteSuccess'))
+      })
+    })
+    .catch(() => {})
 }
 </script>
 <style lang="scss" scoped>
