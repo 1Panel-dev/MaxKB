@@ -80,4 +80,5 @@ export default {
     uploadImagePrompt: '請上傳一張圖片',
   },
   info: '使用者資訊',
+  otherSetting: '其他設定',
 }

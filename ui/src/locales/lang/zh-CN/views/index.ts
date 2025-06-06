@@ -10,9 +10,8 @@ import application from './application'
 import problem from './problem'
 import applicationOverview from './application-overview'
 import applicationWorkflow from './application-workflow'
+import paragraph from './paragraph'
 // import notFound from './404'
-
-// import paragraph from './paragraph'
 
 // import log from './log'
 
@@ -30,8 +29,8 @@ export default {
   problem,
   applicationOverview,
   applicationWorkflow,
+  paragraph,
   // notFound,
-  // paragraph,
 
   // log,
 

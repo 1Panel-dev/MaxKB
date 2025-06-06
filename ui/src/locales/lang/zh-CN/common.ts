@@ -84,4 +84,5 @@ export default {
     uploadImagePrompt: '请上传一张图片',
   },
   info: '基本信息',
+  otherSetting: '其他设置',
 }

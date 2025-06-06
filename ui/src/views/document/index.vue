@@ -502,12 +502,6 @@
             </el-table-column>
           </app-table>
         </div>
-
-        <ImportDocumentDialog ref="ImportDocumentDialogRef" :title="title" @refresh="refresh" />
-        <SyncWebDialog ref="SyncWebDialogRef" @refresh="refresh" />
-        <!-- 选择知识库 -->
-        <SelectDatasetDialog ref="SelectDatasetDialogRef" @refresh="refreshMigrate" />
-        <GenerateRelatedDialog ref="GenerateRelatedDialogRef" @refresh="getList" />
       </div>
     </el-card>
     <div class="mul-operation w-full flex" v-if="multipleSelection.length !== 0">
@@ -525,7 +519,14 @@
         {{ $t('common.clear') }}
       </el-button>
     </div>
+
     <EmbeddingContentDialog ref="embeddingContentDialogRef"></EmbeddingContentDialog>
+
+    <ImportDocumentDialog ref="ImportDocumentDialogRef" :title="title" @refresh="refresh" />
+    <SyncWebDialog ref="SyncWebDialogRef" @refresh="refresh" />
+    <!-- 选择知识库 -->
+    <SelectDatasetDialog ref="SelectDatasetDialogRef" @refresh="refreshMigrate" />
+    <GenerateRelatedDialog ref="GenerateRelatedDialogRef" @refresh="getList" />
   </div>
 </template>
 <script setup lang="ts">
@@ -768,7 +769,7 @@ function rowClickHandle(row: any, column: any) {
     return
   }
 
-  router.push({ path: `/knowledge/${id}/${row.id}` })
+  router.push({ path: `/paragraph/${id}/${row.id}` })
 }
 
 /*
@@ -930,7 +931,7 @@ function getList(bool?: boolean) {
     folder_id: folderId,
   }
   documentApi
-    .getDocument( id as string, paginationConfig.value, param, bool ? undefined : loading)
+    .getDocument(id as string, paginationConfig.value, param, bool ? undefined : loading)
     .then((res) => {
       documentData.value = res.data.records
       paginationConfig.value.total = res.data.total
@@ -938,7 +939,7 @@ function getList(bool?: boolean) {
 }
 
 function getDetail() {
-  knowledge.asyncGetDatasetDetail( id, loading).then((res: any) => {
+  knowledge.asyncGetDatasetDetail(id, loading).then((res: any) => {
     datasetDetail.value = res.data
   })
 }

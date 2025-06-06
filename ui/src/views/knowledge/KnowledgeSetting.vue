@@ -8,7 +8,7 @@
             <h4 class="title-decoration-1 mb-16">
               {{ $t('common.info') }}
             </h4>
-            <BaseForm ref="BaseFormRef" :data="detail"/>
+            <BaseForm ref="BaseFormRef" :data="detail" />
 
             <el-form
               ref="webFormRef"
@@ -18,23 +18,33 @@
               require-asterisk-position="right"
             >
               <el-form-item :label="$t('views.knowledge.knowledgeType.label')" required>
-                <el-card shadow="never" class="mb-8" style="width: 50%" v-if="detail.type === 0">
+                <el-card
+                  shadow="never"
+                  class="mb-8 w-full"
+                  style="line-height: 22px"
+                  v-if="detail.type === 0"
+                >
                   <div class="flex align-center">
                     <el-avatar class="mr-8 avatar-blue" shape="square" :size="32">
-                      <img src="@/assets/knowledge/icon_document.svg" style="width: 58%" alt=""/>
+                      <img src="@/assets/knowledge/icon_document.svg" style="width: 58%" alt="" />
                     </el-avatar>
                     <div>
                       <div>{{ $t('views.knowledge.knowledgeType.generalKnowledge') }}</div>
                       <el-text type="info"
-                      >{{ $t('views.knowledge.knowledgeType.generalInfo') }}
+                        >{{ $t('views.knowledge.knowledgeType.generalInfo') }}
                       </el-text>
                     </div>
                   </div>
                 </el-card>
-                <el-card shadow="never" class="mb-8" style="width: 50%" v-if="detail?.type === 1">
+                <el-card
+                  shadow="never"
+                  class="mb-8 w-full"
+                  style="line-height: 22px"
+                  v-if="detail?.type === 1"
+                >
                   <div class="flex align-center">
                     <el-avatar class="mr-8 avatar-purple" shape="square" :size="32">
-                      <img src="@/assets/knowledge/icon_web.svg" style="width: 58%" alt=""/>
+                      <img src="@/assets/knowledge/icon_web.svg" style="width: 58%" alt="" />
                     </el-avatar>
                     <div>
                       <div>{{ $t('views.knowledge.knowledgeType.webKnowledge') }}</div>
@@ -44,17 +54,22 @@
                     </div>
                   </div>
                 </el-card>
-                <el-card shadow="never" class="mb-8" style="width: 50%" v-if="detail?.type === 2">
+                <el-card
+                  shadow="never"
+                  class="mb-8 w-full"
+                  style="line-height: 22px"
+                  v-if="detail?.type === 2"
+                >
                   <div class="flex align-center">
                     <el-avatar shape="square" :size="32" style="background: none">
-                      <img src="@/assets/knowledge/logo_lark.svg" style="width: 100%" alt=""/>
+                      <img src="@/assets/knowledge/logo_lark.svg" style="width: 100%" alt="" />
                     </el-avatar>
                     <div>
                       <p>
                         <el-text>{{ $t('views.knowledge.knowledgeType.larkKnowledge') }}</el-text>
                       </p>
                       <el-text type="info"
-                      >{{ $t('views.knowledge.knowledgeType.larkInfo') }}
+                        >{{ $t('views.knowledge.knowledgeType.larkInfo') }}
                       </el-text>
                     </div>
                   </div>
@@ -107,48 +122,23 @@
                   "
                 />
               </el-form-item>
-            </el-form>
-            <div v-if="application_id_list.length > 0">
-              <h4 class="title-decoration-1 mb-16">
-                {{ $t('views.dataset.relatedApplications') }}
-              </h4>
-              <el-row :gutter="12">
-                <el-col
-                  :span="12"
-                  v-for="(item, index) in application_list.filter((obj: any) =>
-                    application_id_list.some((v: any) => v === obj?.id),
-                  )"
-                  :key="index"
-                  class="mb-16"
-                >
-                  <el-card shadow="never">
-                    <div class="flex-between">
-                      <div class="flex align-center">
-                        <el-avatar
-                          v-if="isAppIcon(item?.icon)"
-                          shape="square"
-                          :size="32"
-                          style="background: none"
-                          class="mr-12"
-                        >
-                          <img :src="item?.icon" alt=""/>
-                        </el-avatar>
-                        <el-avatar
-                          v-else-if="item?.name"
-                          :name="item?.name"
-                          pinyinColor
-                          shape="square"
-                          :size="32"
-                          class="mr-12"
-                        />
-                        {{ item.name }}
-                      </div>
-                    </div>
-                  </el-card>
-                </el-col>
-              </el-row>
-            </div>
 
+              <div v-if="detail.type === 0">
+                <h4 class="title-decoration-1 mb-16">
+                  {{ $t('common.otherSetting') }}
+                </h4>
+              </div>
+              <el-form-item :label="$t('上传的每个文档最大限制')">
+                <el-slider
+                  v-model="form.max_paragraph_char_number"
+                  show-input
+                  :show-input-controls="false"
+                  :min="500"
+                  :max="100000"
+                  class="custom-slider"
+                />
+              </el-form-item>
+            </el-form>
             <div class="text-right">
               <el-button @click="submit" type="primary"> {{ $t('common.save') }}</el-button>
             </div>
@@ -159,22 +149,22 @@
   </div>
 </template>
 <script setup lang="ts">
-import {ref, onMounted, reactive} from 'vue'
-import {useRoute} from 'vue-router'
+import { ref, onMounted, reactive } from 'vue'
+import { useRoute } from 'vue-router'
 import BaseForm from '@/views/knowledge/component/BaseForm.vue'
 import KnowledgeApi from '@/api/knowledge/knowledge'
-import type {ApplicationFormType} from '@/api/type/application'
-import {MsgSuccess, MsgConfirm} from '@/utils/message'
-import {isAppIcon} from '@/utils/common'
+import type { ApplicationFormType } from '@/api/type/application'
+import { MsgSuccess, MsgConfirm } from '@/utils/message'
+import { isAppIcon } from '@/utils/common'
 import useStore from '@/stores'
-import {t} from '@/locales'
+import { t } from '@/locales'
 
 const route = useRoute()
 const {
-  params: {id},
+  params: { id },
 } = route as any
 
-const {knowledge} = useStore()
+const { knowledge } = useStore()
 const webFormRef = ref()
 const BaseFormRef = ref()
 const loading = ref(false)
@@ -229,14 +219,14 @@ async function submit() {
         const obj =
           detail.value.type === '1' || detail.value.type === '2'
             ? {
-              application_id_list: application_id_list.value,
-              meta: form.value,
-              ...BaseFormRef.value.form,
-            }
+                application_id_list: application_id_list.value,
+                meta: form.value,
+                ...BaseFormRef.value.form,
+              }
             : {
-              application_id_list: application_id_list.value,
-              ...BaseFormRef.value.form,
-            }
+                application_id_list: application_id_list.value,
+                ...BaseFormRef.value.form,
+              }
 
         if (cloneModelId.value !== BaseFormRef.value.form.embedding_mode_id) {
           MsgConfirm(t('common.tip'), t('views.knowledge.tip.updateModeMessage'), {
@@ -257,8 +247,7 @@ async function submit() {
                 })
               }
             })
-            .catch(() => {
-            })
+            .catch(() => {})
         } else {
           if (detail.value.type === 2) {
             KnowledgeApi.putLarkDataset(id, obj, loading).then((res) => {

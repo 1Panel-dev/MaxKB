@@ -1,39 +1,34 @@
 <template>
-  <LayoutContainer back-to="-1" class="document-detail">
-    <template #header>
-      <div style="width: 78%">
-        <h3 style="display: inline-block">{{ documentDetail?.name }}</h3>
-        <el-text type="info" v-if="documentDetail?.type === '1'"
-          >（{{ $t('views.document.form.source_url.label') }}：<el-link
-            :href="documentDetail?.meta?.source_url"
-            target="_blank"
-          >
-            <span class="break-all">{{ documentDetail?.meta?.source_url }} </span></el-link
-          >）
-        </el-text>
-      </div>
-      <div class="header-button">
-        <el-button @click="batchSelectedHandle(true)" v-if="isBatch === false">
-          {{ $t('views.paragraph.setting.batchSelected') }}
-        </el-button>
-        <el-button @click="batchSelectedHandle(false)" v-if="isBatch === true">
-          {{ $t('views.paragraph.setting.cancelSelected') }}
-        </el-button>
-        <el-button
-          @click="addParagraph"
-          type="primary"
-          :disabled="loading"
-          v-if="isBatch === false"
+  <div class="paragraph p-12-24">
+    <div class="flex align-center" style="width: 78%">
+      <back-button to="-1" style="margin-left: -4px"></back-button>
+      <h3 style="display: inline-block">{{ documentDetail?.name }}</h3>
+      <el-text type="info" v-if="documentDetail?.type === '1'"
+        >（{{ $t('views.document.form.source_url.label') }}：<el-link
+          :href="documentDetail?.meta?.source_url"
+          target="_blank"
         >
-          {{ $t('views.paragraph.addParagraph') }}
-        </el-button>
-      </div>
-    </template>
-    <div
-      class="document-detail__main p-16"
+          <span class="break-all">{{ documentDetail?.meta?.source_url }} </span></el-link
+        >）
+      </el-text>
+    </div>
+    <div class="header-button">
+      <el-button @click="batchSelectedHandle(true)" v-if="isBatch === false">
+        {{ $t('views.paragraph.setting.batchSelected') }}
+      </el-button>
+      <el-button @click="batchSelectedHandle(false)" v-if="isBatch === true">
+        {{ $t('views.paragraph.setting.cancelSelected') }}
+      </el-button>
+      <el-button @click="addParagraph" type="primary" :disabled="loading" v-if="isBatch === false">
+        {{ $t('views.paragraph.addParagraph') }}
+      </el-button>
+    </div>
+    <el-card
+      style="--el-card-padding: 0"
+      class="paragraph-detail__main mt-16"
       v-loading="(paginationConfig.current_page === 1 && loading) || changeStateloading"
     >
-      <div class="flex-between p-8">
+      <div class="flex-between p-12-16 border-b">
         <span>{{ paginationConfig.total }} {{ $t('views.paragraph.paragraph_count') }}</span>
         <el-input
           v-model="search"
@@ -51,111 +46,23 @@
           </template>
         </el-input>
       </div>
-      <el-scrollbar>
-        <div class="document-detail-height">
-          <el-empty v-if="paragraphDetail.length == 0" :description="$t('common.noData')" />
+      <el-empty v-if="paragraphDetail.length == 0" :description="$t('common.noData')" />
+      <div v-else>
+        <el-scrollbar>
+          <div class="paragraph-detail-height">
+            <InfiniteScroll
+              :size="paragraphDetail.length"
+              :total="paginationConfig.total"
+              :page_size="paginationConfig.page_size"
+              v-model:current_page="paginationConfig.current_page"
+              @load="getParagraphList"
+              :loading="loading"
+            >
 
-          <InfiniteScroll
-            v-else
-            :size="paragraphDetail.length"
-            :total="paginationConfig.total"
-            :page_size="paginationConfig.page_size"
-            v-model:current_page="paginationConfig.current_page"
-            @load="getParagraphList"
-            :loading="loading"
-          >
-            <el-row>
-              <el-col
-                :xs="24"
-                :sm="12"
-                :md="8"
-                :lg="6"
-                :xl="6"
-                v-for="(item, index) in paragraphDetail"
-                :key="index"
-                class="p-8"
-              >
-                <!-- 批量操作card -->
-                <CardBox
-                  v-if="isBatch === true"
-                  shadow="hover"
-                  :title="item.title || '-'"
-                  :description="item.content"
-                  class="document-card cursor"
-                  :class="multipleSelection.includes(item.id) ? 'selected' : ''"
-                  :showIcon="false"
-                  @click="selectHandle(item.id)"
-                >
-                  <div class="active-button" @click.stop></div>
-
-                  <template #footer>
-                    <div class="footer-content flex-between">
-                      <span>
-                        {{ numberFormat(item?.content.length) || 0 }}
-                        {{ $t('views.paragraph.character_count') }}
-                      </span>
-                    </div>
-                  </template>
-                </CardBox>
-                <!-- 非批量操作card -->
-                <CardBox
-                  v-else
-                  shadow="hover"
-                  :title="item.title || '-'"
-                  :description="item.content"
-                  class="document-card cursor"
-                  :class="item.is_active ? '' : 'disabled'"
-                  :showIcon="false"
-                  @click="editParagraph(item)"
-                >
-                  <div class="active-button" @click.stop>
-                    <el-switch
-                      :loading="loading"
-                      v-model="item.is_active"
-                      :before-change="() => changeState(item)"
-                      size="small"
-                    />
-                  </div>
-
-                  <template #footer>
-                    <div class="footer-content flex-between">
-                      <span>
-                        {{ numberFormat(item?.content.length) || 0 }}
-                        {{ $t('views.paragraph.character_count') }}
-                      </span>
-
-                      <span @click.stop>
-                        <el-dropdown trigger="click">
-                          <el-button text>
-                            <el-icon><MoreFilled /></el-icon>
-                          </el-button>
-                          <template #dropdown>
-                            <el-dropdown-menu>
-                              <el-dropdown-item @click="openGenerateDialog(item)">
-                                <el-icon><Connection /></el-icon>
-                                {{
-                                  $t('views.document.generateQuestion.title')
-                                }}</el-dropdown-item
-                              >
-                              <el-dropdown-item @click="openSelectDocumentDialog(item)">
-                                <AppIcon iconName="app-migrate"></AppIcon>
-                                {{ $t('views.document.setting.migration') }}</el-dropdown-item
-                              >
-                              <el-dropdown-item icon="Delete" @click.stop="deleteParagraph(item)">{{
-                                $t('common.delete')
-                              }}</el-dropdown-item>
-                            </el-dropdown-menu>
-                          </template>
-                        </el-dropdown>
-                      </span>
-                    </div>
-                  </template>
-                </CardBox>
-              </el-col>
-            </el-row>
-          </InfiniteScroll>
-        </div>
-      </el-scrollbar>
+            </InfiniteScroll>
+          </div>
+        </el-scrollbar>
+      </div>
 
       <div class="mul-operation border-t w-full" v-if="isBatch === true">
         <el-button :disabled="multipleSelection.length === 0" @click="openGenerateDialog()">
@@ -173,11 +80,11 @@
           {{ $t('views.document.items') }}
         </span>
       </div>
-    </div>
+    </el-card>
     <ParagraphDialog ref="ParagraphDialogRef" :title="title" @refresh="refresh" />
     <SelectDocumentDialog ref="SelectDocumentDialogRef" @refresh="refreshMigrateParagraph" />
     <GenerateRelatedDialog ref="GenerateRelatedDialogRef" @refresh="refresh" />
-  </LayoutContainer>
+  </div>
 </template>
 <script setup lang="ts">
 import { reactive, ref, onMounted, computed } from 'vue'
@@ -194,7 +101,7 @@ import { t } from '@/locales'
 const { paragraph } = useStore()
 const route = useRoute()
 const {
-  params: { id, documentId }
+  params: { id, documentId },
 } = route as any
 
 const SelectDocumentDialogRef = ref()
@@ -214,12 +121,12 @@ const multipleSelection = ref<any[]>([])
 const paginationConfig = reactive({
   current_page: 1,
   page_size: 30,
-  total: 0
+  total: 0,
 })
 
 function refreshMigrateParagraph() {
   paragraphDetail.value = paragraphDetail.value.filter(
-    (v) => !multipleSelection.value.includes(v.id)
+    (v) => !multipleSelection.value.includes(v.id),
   )
   multipleSelection.value = []
   MsgSuccess(t('views.document.tip.migrationSuccess'))
@@ -237,15 +144,15 @@ function deleteMulParagraph() {
     t('views.paragraph.delete.confirmMessage'),
     {
       confirmButtonText: t('common.confirm'),
-      confirmButtonClass: 'danger'
-    }
+      confirmButtonClass: 'danger',
+    },
   )
     .then(() => {
       paragraphApi
         .delMulParagraph(id, documentId, multipleSelection.value, changeStateloading)
         .then(() => {
           paragraphDetail.value = paragraphDetail.value.filter(
-            (v) => !multipleSelection.value.includes(v.id)
+            (v) => !multipleSelection.value.includes(v.id),
           )
           multipleSelection.value = []
           MsgSuccess(t('views.document.delete.successMessage'))
@@ -275,7 +182,7 @@ function searchHandle() {
 
 function changeState(row: any) {
   const obj = {
-    is_active: !row.is_active
+    is_active: !row.is_active,
   }
   paragraph
     .asyncPutParagraph(id, documentId, row.id, obj, changeStateloading)
@@ -295,8 +202,8 @@ function deleteParagraph(row: any) {
     t('views.paragraph.delete.confirmMessage'),
     {
       confirmButtonText: t('common.confirm'),
-      confirmButtonClass: 'danger'
-    }
+      confirmButtonClass: 'danger',
+    },
   )
     .then(() => {
       paragraph.asyncDelParagraph(id, documentId, row.id, loading).then(() => {
@@ -337,7 +244,7 @@ function getParagraphList() {
       documentId,
       paginationConfig,
       search.value && { [searchType.value]: search.value },
-      loading
+      loading,
     )
     .then((res) => {
       paragraphDetail.value = [...paragraphDetail.value, ...res.data.records]
@@ -378,16 +285,18 @@ onMounted(() => {
 })
 </script>
 <style lang="scss" scoped>
-.document-detail {
+.paragraph {
+  position: relative;
   .header-button {
     position: absolute;
     right: calc(var(--app-base-px) * 3);
+    top: calc(var(--app-base-px) + 4px);
   }
 
-  .document-detail-height {
+  .paragraph-detail-height {
     height: calc(var(--app-main-height) - 75px);
   }
-  .document-card {
+  .paragraph-card {
     height: 210px;
     background: var(--app-layout-bg-color);
     border: 1px solid var(--app-layout-bg-color);

@@ -141,7 +141,7 @@
                             </el-icon>
                             {{ $t('common.edit') }}
                           </el-dropdown-item>
-                          <!-- <el-dropdown-item
+                          <el-dropdown-item
                             :disabled="!canEdit(item)"
                             v-if="!item.template_id"
                             @click.stop="copytool(item)"
@@ -172,7 +172,7 @@
                           >
                             <el-icon><Delete /></el-icon>
                             {{ $t('common.delete') }}
-                          </el-dropdown-item> -->
+                          </el-dropdown-item>
                         </el-dropdown-menu>
                       </template>
                     </el-dropdown>

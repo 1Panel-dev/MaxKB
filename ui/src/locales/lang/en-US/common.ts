@@ -80,4 +80,5 @@ export default {
     uploadImagePrompt: 'Please upload an image',
   },
   info: 'Base Information',
+  otherSetting: 'Other Settings',
 }

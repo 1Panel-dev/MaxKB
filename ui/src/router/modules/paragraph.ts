@@ -7,7 +7,7 @@ const ParagraphRouter = {
   children: [
     {
       path: '/paragraph/:id/:documentId',
-      name: 'Paragraph1',
+      name: 'ParagraphIndex',
       meta: { activeMenu: '/knowledge' },
       component: () => import('@/views/paragraph/index.vue'),
     },

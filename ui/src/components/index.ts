@@ -16,6 +16,9 @@ import InfiniteScroll from './infinite-scroll/index.vue'
 import ModelSelect from './model-select/index.vue'
 import ReadWrite from './read-write/index.vue'
 import AutoTooltip from './auto-tooltip/index.vue'
+import MdEditor from './markdown/MdEditor.vue'
+import MdPreview from './markdown/MdPreview.vue'
+import MdEditorMagnify from './markdown/MdEditorMagnify.vue'
 export default {
   install(app: App) {
     app.component('LogoFull', LogoFull)
@@ -35,5 +38,8 @@ export default {
     app.component('ModelSelect', ModelSelect)
     app.component('ReadWrite', ReadWrite)
     app.component('AutoTooltip', AutoTooltip)
+    app.component('MdPreview', MdPreview)
+    app.component('MdEditor', MdEditor)
+    app.component('MdEditorMagnify', MdEditorMagnify)
   },
 }
