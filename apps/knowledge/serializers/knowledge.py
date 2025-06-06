@@ -336,13 +336,15 @@ class KnowledgeSerializer(serializers.Serializer):
             knowledge.delete()
             delete_embedding_by_knowledge(self.data.get('knowledge_id'))
             return True
-        
+
         def export_excel(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
             document_list = QuerySet(Document).filter(knowledge_id=self.data.get('id'))
-            paragraph_list = native_search(QuerySet(Paragraph).filter(knowledge_id=self.data.get("id")), get_file_content(
-                os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'list_paragraph_document_name.sql')))
+            paragraph_list = native_search(QuerySet(Paragraph).filter(knowledge_id=self.data.get("id")),
+                                           get_file_content(
+                                               os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql',
+                                                            'list_paragraph_document_name.sql')))
             problem_mapping_list = native_search(
                 QuerySet(ProblemParagraphMapping).filter(knowledge_id=self.data.get("id")), get_file_content(
                     os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'list_problem_mapping.sql')),
@@ -359,8 +361,10 @@ class KnowledgeSerializer(serializers.Serializer):
             if with_valid:
                 self.is_valid(raise_exception=True)
             document_list = QuerySet(Document).filter(knowledge_id=self.data.get('id'))
-            paragraph_list = native_search(QuerySet(Paragraph).filter(knowledge_id=self.data.get("id")), get_file_content(
-                os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'list_paragraph_document_name.sql')))
+            paragraph_list = native_search(QuerySet(Paragraph).filter(knowledge_id=self.data.get("id")),
+                                           get_file_content(
+                                               os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql',
+                                                            'list_paragraph_document_name.sql')))
             problem_mapping_list = native_search(
                 QuerySet(ProblemParagraphMapping).filter(knowledge_id=self.data.get("id")), get_file_content(
                     os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'list_problem_mapping.sql')),
@@ -411,7 +415,8 @@ class KnowledgeSerializer(serializers.Serializer):
     class Create(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, label=_('user id'))
         workspace_id = serializers.CharField(required=True, label=_('workspace id'))
-        scope = serializers.ChoiceField(required=False, label=_('scope'), default=KnowledgeScope.WORKSPACE, choices=KnowledgeScope.choices)
+        scope = serializers.ChoiceField(required=False, label=_('scope'), default=KnowledgeScope.WORKSPACE,
+                                        choices=KnowledgeScope.choices)
 
         @staticmethod
         def post_embedding_knowledge(document_list, knowledge_id):
@@ -428,7 +433,9 @@ class KnowledgeSerializer(serializers.Serializer):
             if with_valid:
                 self.is_valid(raise_exception=True)
                 KnowledgeBaseCreateRequest(data=instance).is_valid(raise_exception=True)
+            folder_id = instance.get('folder_id', 'root')
             if QuerySet(Knowledge).filter(workspace_id=self.data.get('workspace_id'),
+                                          folder_id=folder_id,
                                           name=instance.get('name')).exists():
                 raise AppApiException(500, _('Knowledge base name duplicate!'))
 
@@ -441,7 +448,7 @@ class KnowledgeSerializer(serializers.Serializer):
                 type=instance.get('type', KnowledgeType.BASE),
                 user_id=self.data.get('user_id'),
                 scope=self.data.get('scope', KnowledgeScope.WORKSPACE),
-                folder_id=instance.get('folder_id', 'root'),
+                folder_id=folder_id,
                 embedding_model_id=instance.get('embedding'),
                 meta=instance.get('meta', {}),
             )
@@ -488,7 +495,9 @@ class KnowledgeSerializer(serializers.Serializer):
                 self.is_valid(raise_exception=True)
                 KnowledgeWebCreateRequest(data=instance).is_valid(raise_exception=True)
 
+            folder_id = instance.get('folder_id', 'root')
             if QuerySet(Knowledge).filter(workspace_id=self.data.get('workspace_id'),
+                                          folder_id=folder_id,
                                           name=instance.get('name')).exists():
                 raise AppApiException(500, _('Knowledge base name duplicate!'))
 
@@ -500,7 +509,7 @@ class KnowledgeSerializer(serializers.Serializer):
                 user_id=self.data.get('user_id'),
                 type=instance.get('type', KnowledgeType.WEB),
                 scope=self.data.get('scope', KnowledgeScope.WORKSPACE),
-                folder_id=instance.get('folder_id', 'root'),
+                folder_id=folder_id,
                 embedding_model_id=instance.get('embedding'),
                 meta={
                     'source_url': instance.get('source_url'),
