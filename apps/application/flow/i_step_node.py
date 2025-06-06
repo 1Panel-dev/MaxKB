@@ -19,7 +19,7 @@ from rest_framework.exceptions import ValidationError, ErrorDetail
 
 from application.flow.common import Answer, NodeChunk
 from application.models import ChatRecord
-from application.models import ApplicationPublicAccessClient
+from application.models import ApplicationChatClientStats
 from common.constants.authentication_type import AuthenticationType
 from common.field.common import InstanceField
 
@@ -89,7 +89,7 @@ class WorkFlowPostHandler:
         chat_cache.set(chat_id,
                        self.chat_info, timeout=60 * 30)
         if self.client_type == AuthenticationType.APPLICATION_ACCESS_TOKEN.value:
-            application_public_access_client = (QuerySet(ApplicationPublicAccessClient)
+            application_public_access_client = (QuerySet(ApplicationChatClientStats)
                                                 .filter(client_id=self.client_id,
                                                         application_id=self.chat_info.application.id).first())
             if application_public_access_client is not None:

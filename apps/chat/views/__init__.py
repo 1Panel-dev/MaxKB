@@ -7,3 +7,4 @@
     @desc:
 """
 from .chat_embed import *
+from .chat import *

@@ -9,19 +9,17 @@
 import os
 from typing import List, Dict
 
-from django.db.models import QuerySet
 from django.db import connection
+from django.db.models import QuerySet
+
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.search_dataset_node.i_search_dataset_node import ISearchDatasetStepNode
 from common.config.embedding_config import VectorStore
 from common.db.search import native_search
 from common.utils.common import get_file_content
-from knowledge.models import Document, Paragraph, Knowledge
-
-from models_provider.tools import get_model_instance_by_model_user_id
+from knowledge.models import Document, Paragraph, Knowledge, SearchMode
 from maxkb.conf import PROJECT_DIR
-
-SearchMode = None
+from models_provider.tools import get_model_instance_by_model_user_id
 
 
 def get_embedding_id(dataset_id_list):
