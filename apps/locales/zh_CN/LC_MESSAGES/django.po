@@ -3866,3 +3866,81 @@ msgstr "显示项目"
 
 msgid "project url"
 msgstr "项目网址"
+
+msgid "Create an application"
+msgstr "創建一個應用程式"
+
+msgid "Import Application"
+msgstr "导入应用程序"
+
+msgid "Export Application"
+msgstr "导出应用程序"
+
+msgid "Deleting application"
+msgstr "删除应用程序"
+
+msgid "Modify the application"
+msgstr "修改应用程序"
+
+msgid "Get application details"
+msgstr "获取应用程序详情"
+
+msgid "Get the application list by page"
+msgstr "分页获取应用程序列表"
+
+msgid "Get the application list"
+msgstr "获取应用程序列表"
+
+msgid "Publishing an application"
+msgstr "发布应用程序"
+
+msgid "Create application ApiKey"
+msgstr "创建应用程序 API 密钥"
+
+msgid "Add ApiKey"
+msgstr "添加 API 密钥"
+
+msgid "GET application ApiKey List"
+msgstr "获取应用程序的 API 密钥列表"
+
+msgid "Create application ApiKey List"
+msgstr "创建应用程序 API 密钥列表"
+
+msgid "Application Api Key"
+msgstr "应用程序 API 密钥"
+
+msgid "Get the application version list"
+msgstr "获取应用程序版本列表"
+
+msgid "Application/Version"
+msgstr "应用程序 / 版本"
+
+msgid "Get the list of application versions by page"
+msgstr "分页获取应用程序版本列表"
+
+msgid "Get application version details"
+msgstr "获取应用程序版本详情"
+
+msgid "Modify application version information"
+msgstr "修改应用程序版本信息"
+
+msgid "Get embedded js"
+msgstr "获取嵌入式 JavaScript"
+
+msgid "Chat"
+msgstr "聊天"
+
+msgid "Get MaxKB related information"
+msgstr "获取 MaxKB 相关信息"
+
+msgid "Get menu operate log"
+msgstr "获取菜单操作日志"
+
+msgid "System operate log"
+msgstr "系统操作日志"
+
+msgid "Get paginated operate log"
+msgstr "获取分页操作日志"
+
+msgid "Export operate log"
+msgstr "导出操作日志"

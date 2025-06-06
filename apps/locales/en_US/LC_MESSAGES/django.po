@@ -3738,3 +3738,82 @@ msgstr ""
 
 msgid "project url"
 msgstr ""
+
+msgid "Create an application"
+msgstr ""
+
+msgid "Import Application"
+msgstr ""
+
+msgid "Export Application"
+msgstr ""
+
+msgid "Deleting application"
+msgstr ""
+
+msgid "Modify the application"
+msgstr ""
+
+msgid "Get application details"
+msgstr ""
+
+msgid "Get the application list by page"
+msgstr ""
+
+msgid "Get the application list"
+msgstr ""
+
+msgid "Publishing an application"
+msgstr ""
+
+msgid "Create application ApiKey"
+msgstr ""
+
+msgid "Add ApiKey"
+msgstr ""
+
+msgid "GET application ApiKey List"
+msgstr ""
+
+msgid "Create application ApiKey List"
+msgstr ""
+
+msgid "Application Api Key"
+msgstr ""
+
+msgid "Get the application version list"
+msgstr ""
+
+msgid "Application/Version"
+msgstr ""
+
+msgid "Get the list of application versions by page"
+msgstr ""
+
+msgid "Get application version details"
+msgstr ""
+
+msgid "Modify application version information"
+msgstr ""
+
+msgid "Get embedded js"
+msgstr ""
+
+msgid "Chat"
+msgstr ""
+
+msgid "Get MaxKB related information"
+msgstr ""
+
+msgid "Get menu operate log"
+msgstr ""
+
+msgid "System operate log"
+msgstr ""
+
+msgid "Get paginated operate log"
+msgstr ""
+
+msgid "Export operate log"
+msgstr ""
+

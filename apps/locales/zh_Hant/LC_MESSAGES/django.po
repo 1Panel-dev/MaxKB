@@ -3866,3 +3866,81 @@ msgstr "顯示項目"
 
 msgid "project url"
 msgstr "項目網址"
+
+msgid "Create an application"
+msgstr "創建一個應用程式"
+
+msgid "Import Application"
+msgstr "導入應用程式"
+
+msgid "Export Application"
+msgstr "導出應用程式"
+
+msgid "Deleting application"
+msgstr "刪除應用程式"
+
+msgid "Modify the application"
+msgstr "修改應用程式"
+
+msgid "Get application details"
+msgstr "獲取應用程式詳情"
+
+msgid "Get the application list by page"
+msgstr "獲取應用程式清單"
+
+msgid "Get the application list"
+msgstr "分頁獲取應用程式清單"
+
+msgid "Publishing an application"
+msgstr "發佈應用程式"
+
+msgid "Create application ApiKey"
+msgstr "創建應用程式 API 密鑰"
+
+msgid "Add ApiKey"
+msgstr "新增 API 密鑰"
+
+msgid "GET application ApiKey List"
+msgstr "獲取應用程式的 API 密鑰清單"
+
+msgid "Create application ApiKey List"
+msgstr "建立應用程式 API 密鑰清單"
+
+msgid "Application Api Key"
+msgstr "應用程式 API 密鑰"
+
+msgid "Get the application version list"
+msgstr "獲取應用程式版本列表"
+
+msgid "Application/Version"
+msgstr "應用程式 / 版本"
+
+msgid "Get the list of application versions by page"
+msgstr "分頁獲取應用程式版本列表"
+
+msgid "Get application version details"
+msgstr "獲取應用程式版本詳情"
+
+msgid "Modify application version information"
+msgstr "修改應用程式版本資訊"
+
+msgid "Get embedded js"
+msgstr "獲取嵌入式 JavaScript"
+
+msgid "Chat"
+msgstr "聊天"
+
+msgid "Get MaxKB related information"
+msgstr "獲取 MaxKB 相關資訊"
+
+msgid "Get menu operate log"
+msgstr "獲取菜單操作日誌"
+
+msgid "System operate log"
+msgstr "系統操作日誌"
+
+msgid "Get paginated operate log"
+msgstr "獲取分頁操作日誌"
+
+msgid "Export operate log"
+msgstr "導出操作日誌
