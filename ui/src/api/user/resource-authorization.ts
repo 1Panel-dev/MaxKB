@@ -3,25 +3,25 @@ import { get, put, post, del } from '@/request/index'
 import type { pageRequest } from '@/api/type/common'
 import type { Ref } from 'vue'
 
-const prefix = '/workspace'
+const prefix = '/workspace/' + localStorage.getItem('workspace_id')
 
 /**
  * 获取成员列表
  * @query 参数
  */
-const getUserList: (workspace_id: String) => Promise<Result<any>> = (workspace_id) => {
-  return get(`${prefix}/${workspace_id}/user_list`)
+const getUserList: (loading?: Ref<boolean>) => Promise<Result<any>> = (loading) => {
+  return get(`${prefix}/user_list`, undefined, loading)
 }
 
 /**
  * 获取资源权限
  * @query 参数
  */
-const getResourceAuthorization: (workspace_id: String, user_id: string) => Promise<Result<any>> = (
-  workspace_id,
-  user_id,
-) => {
-  return get(`${prefix}/${workspace_id}/user_resource_permission/user/${user_id}`)
+const getResourceAuthorization: (
+  user_id: string,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (user_id, loading) => {
+  return get(`${prefix}/user_resource_permission/user/${user_id}`, undefined, loading)
 }
 
 /**
@@ -43,11 +43,11 @@ const getResourceAuthorization: (workspace_id: String, user_id: string) => Promi
         }
  */
 const putResourceAuthorization: (
-  workspace_id: String,
   user_id: string,
   body: any,
-) => Promise<Result<any>> = (workspace_id, user_id, body) => {
-  return put(`${prefix}/${workspace_id}/user_resource_permission/user/${user_id}`, body)
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (user_id, body, loading) => {
+  return put(`${prefix}/user_resource_permission/user/${user_id}`, body, loading)
 }
 
 export default {
