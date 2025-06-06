@@ -772,6 +772,62 @@ class PermissionConstants(Enum):
         group=Group.KNOWLEDGE, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.SHARED_KNOWLEDGE]
     )
+    SHARED_KNOWLEDGE_DOCUMENT_READ = Permission(
+        group=Group.KNOWLEDGE_DOCUMENT, operate=Operate.READ, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.SHARED_KNOWLEDGE]
+    )
+    SHARED_KNOWLEDGE_DOCUMENT_CREATE = Permission(
+        group=Group.KNOWLEDGE_DOCUMENT, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.SHARED_KNOWLEDGE]
+    )
+    SHARED_KNOWLEDGE_DOCUMENT_EDIT = Permission(
+        group=Group.KNOWLEDGE_DOCUMENT, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.SHARED_KNOWLEDGE]
+    )
+    SHARED_KNOWLEDGE_DOCUMENT_DELETE = Permission(
+        group=Group.KNOWLEDGE_DOCUMENT, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.SHARED_KNOWLEDGE]
+    )
+    SHARED_KNOWLEDGE_DOCUMENT_SYNC = Permission(
+        group=Group.KNOWLEDGE_DOCUMENT, operate=Operate.SYNC, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.SHARED_KNOWLEDGE]
+    )
+    SHARED_KNOWLEDGE_DOCUMENT_VECTOR = Permission(
+        group=Group.KNOWLEDGE_DOCUMENT, operate=Operate.VECTOR, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.SHARED_KNOWLEDGE]
+    )
+    SHARED_KNOWLEDGE_DOCUMENT_GENERATE = Permission(
+        group=Group.KNOWLEDGE_DOCUMENT, operate=Operate.GENERATE, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.SHARED_KNOWLEDGE]
+    )
+    SHARED_KNOWLEDGE_DOCUMENT_MIGRATE = Permission(
+        group=Group.KNOWLEDGE_DOCUMENT, operate=Operate.MIGRATE, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.SHARED_KNOWLEDGE]
+    )
+    SHARED_KNOWLEDGE_DOCUMENT_EXPORT = Permission(
+        group=Group.KNOWLEDGE_DOCUMENT, operate=Operate.EXPORT, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.SHARED_KNOWLEDGE]
+    )
+    SHARED_KNOWLEDGE_DOCUMENT_DOWNLOAD_SOURCE_FILE = Permission(
+        group=Group.KNOWLEDGE_DOCUMENT, operate=Operate.READ, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.SHARED_KNOWLEDGE]
+    )
+    SHARED_KNOWLEDGE_PROBLEM_READ = Permission(
+        group=Group.KNOWLEDGE_PROBLEM, operate=Operate.READ, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.SHARED_KNOWLEDGE]
+    )
+    SHARED_KNOWLEDGE_PROBLEM_CREATE = Permission(
+        group=Group.KNOWLEDGE_PROBLEM, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.SHARED_KNOWLEDGE]
+    )
+    SHARED_KNOWLEDGE_PROBLEM_EDIT = Permission(
+        group=Group.KNOWLEDGE_PROBLEM, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.SHARED_KNOWLEDGE]
+    )
+    SHARED_KNOWLEDGE_PROBLEM_DELETE = Permission(
+        group=Group.KNOWLEDGE_PROBLEM, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.SHARED_KNOWLEDGE]
+    )
 
     def get_workspace_application_permission(self):
         return lambda r, kwargs: Permission(group=self.value.group, operate=self.value.operate,

@@ -30,7 +30,7 @@ urlpatterns = [
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/batch_hit_handling', views.DocumentView.BatchEditHitHandling.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/template/export', views.Template.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/table_template/export', views.TableTemplate.as_view()),
-    path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/migrate/target_knowledge_id', views.DocumentView.Migrate.as_view()),
+    path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/migrate/<str:target_knowledge_id>', views.DocumentView.Migrate.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/<str:document_id>', views.DocumentView.Operate.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/<str:document_id>/sync', views.DocumentView.SyncWeb.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/<str:document_id>/refresh', views.DocumentView.Refresh.as_view()),
