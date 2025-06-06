@@ -7,6 +7,7 @@ import useKnowledgeStore from './modules/knowledge'
 import useModelStore from './modules/model'
 import usePromptStore from './modules/prompt'
 import useProblemStore from './modules/problem'
+import useParagraphStore from './modules/paragraph'
 
 const useStore = () => ({
   common: useCommonStore(),
@@ -18,6 +19,7 @@ const useStore = () => ({
   model: useModelStore(),
   prompt: usePromptStore(),
   problem: useProblemStore(),
+  paragraph: useParagraphStore(),
 })
 
 export default useStore

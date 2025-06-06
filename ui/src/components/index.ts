@@ -19,6 +19,7 @@ import AutoTooltip from './auto-tooltip/index.vue'
 import MdEditor from './markdown/MdEditor.vue'
 import MdPreview from './markdown/MdPreview.vue'
 import MdEditorMagnify from './markdown/MdEditorMagnify.vue'
+import TagEllipsis from './tag-ellipsis/index.vue'
 export default {
   install(app: App) {
     app.component('LogoFull', LogoFull)
@@ -41,5 +42,6 @@ export default {
     app.component('MdPreview', MdPreview)
     app.component('MdEditor', MdEditor)
     app.component('MdEditorMagnify', MdEditorMagnify)
+    app.component('TagEllipsis', TagEllipsis)
   },
 }

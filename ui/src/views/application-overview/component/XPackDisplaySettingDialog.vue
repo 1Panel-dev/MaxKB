@@ -59,7 +59,7 @@
                   <AppIcon
                     :iconName="'app-magnify'"
                     :style="{
-                      color: xpackForm.custom_theme?.header_font_color
+                      color: xpackForm.custom_theme?.header_font_color,
                     }"
                     style="font-size: 20px"
                   ></AppIcon>
@@ -69,7 +69,7 @@
                     :size="20"
                     class="color-secondary"
                     :style="{
-                      color: xpackForm.custom_theme?.header_font_color
+                      color: xpackForm.custom_theme?.header_font_color,
                     }"
                   >
                     <Close/>
@@ -305,7 +305,7 @@
                     <el-option
                       :label="
                         $t(
-                          'views.applicationOverview.appInfo.SettingDisplayDialog.iconPosition.left'
+                          'views.applicationOverview.appInfo.SettingDisplayDialog.iconPosition.left',
                         )
                       "
                       value="left"
@@ -313,7 +313,7 @@
                     <el-option
                       :label="
                         $t(
-                          'views.applicationOverview.appInfo.SettingDisplayDialog.iconPosition.right'
+                          'views.applicationOverview.appInfo.SettingDisplayDialog.iconPosition.right',
                         )
                       "
                       value="right"
@@ -337,7 +337,7 @@
                     <el-option
                       :label="
                         $t(
-                          'views.applicationOverview.appInfo.SettingDisplayDialog.iconPosition.top'
+                          'views.applicationOverview.appInfo.SettingDisplayDialog.iconPosition.top',
                         )
                       "
                       value="top"
@@ -345,7 +345,7 @@
                     <el-option
                       :label="
                         $t(
-                          'views.applicationOverview.appInfo.SettingDisplayDialog.iconPosition.bottom'
+                          'views.applicationOverview.appInfo.SettingDisplayDialog.iconPosition.bottom',
                         )
                       "
                       value="bottom"
@@ -453,14 +453,14 @@ const defaultSetting = {
   disclaimer_value: t('views.applicationOverview.appInfo.SettingDisplayDialog.disclaimerValue'),
   custom_theme: {
     theme_color: '',
-    header_font_color: '#1f2329'
+    header_font_color: '#1f2329',
   },
   float_location: {
     y: {type: 'bottom', value: 30},
     x: {type: 'right', value: 0}
   },
   show_avatar: true,
-  show_user_avatar: false
+  show_user_avatar: false,
 }
 
 const displayFormRef = ref()
@@ -486,14 +486,14 @@ const xpackForm = ref<any>({
   disclaimer_value: t('views.applicationOverview.appInfo.SettingDisplayDialog.disclaimerValue'),
   custom_theme: {
     theme_color: '',
-    header_font_color: '#1f2329'
+    header_font_color: '#1f2329',
   },
   float_location: {
     y: {type: 'bottom', value: 30},
     x: {type: 'right', value: 0}
   },
   show_avatar: true,
-  show_user_avatar: false
+  show_user_avatar: false,
 })
 
 const imgUrl = ref<any>({
@@ -512,7 +512,7 @@ const detail = ref<any>(null)
 const customStyle = computed(() => {
   return {
     background: xpackForm.value.custom_theme?.theme_color,
-    color: xpackForm.value.custom_theme?.header_font_color
+    color: xpackForm.value.custom_theme?.header_font_color,
   }
 })
 
@@ -561,7 +561,7 @@ const open = (data: any, content: any) => {
     t('views.applicationOverview.appInfo.SettingDisplayDialog.disclaimerValue')
   ) {
     xpackForm.value.disclaimer_value = t(
-      'views.applicationOverview.appInfo.SettingDisplayDialog.disclaimerValue'
+      'views.applicationOverview.appInfo.SettingDisplayDialog.disclaimerValue',
     )
   }
   xpackForm.value.avatar_url = data.avatar
@@ -573,7 +573,7 @@ const open = (data: any, content: any) => {
   xpackForm.value.show_user_avatar = data.show_user_avatar
   xpackForm.value.custom_theme = {
     theme_color: data.custom_theme?.theme_color || '',
-    header_font_color: data.custom_theme?.header_font_color || '#1f2329'
+    header_font_color: data.custom_theme?.header_font_color || '#1f2329',
   }
   xpackForm.value.float_location = data.float_location
   dialogVisible.value = true
@@ -613,7 +613,7 @@ defineExpose({open})
 </script>
 <style lang="scss">
 .setting-preview {
-  background: #f5f6f7;
+  background: var(--app-layout-bg-color);
   height: 570px;
   position: relative;
 

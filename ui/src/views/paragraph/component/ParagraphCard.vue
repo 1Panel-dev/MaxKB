@@ -1,12 +1,15 @@
 <template>
-  <el-card shadow="hover" class="paragraph-box" @mouseenter="cardEnter()" @mouseleave="cardLeave()">
-    <div class="card-header">
-      <h2>{{ 1111 }}</h2>
-    </div>
+  <el-card
+    shadow="hover"
+    class="paragraph-box cursor"
+    @mouseenter="cardEnter()"
+    @mouseleave="cardLeave()"
+  >
+    <h2 class="mb-16">{{ data.title || '-' }}</h2>
     <MdPreview
       ref="editorRef"
       editorId="preview-only"
-      :modelValue="form.content"
+      :modelValue="data.content"
       class="maxkb-md"
     />
   </el-card>
@@ -14,24 +17,9 @@
 <script setup lang="ts">
 import { ref, useSlots } from 'vue'
 import { t } from '@/locales'
-defineOptions({ name: 'CardBox' })
-const props = withDefaults(
-  defineProps<{
-    /**
-     * 标题
-     */
-    title?: string
-    /**
-     * 描述
-     */
-    description?: string
-    /**
-     * 是否展示icon
-     */
-    showIcon?: boolean
-  }>(),
-  { title: t('common.title'), description: '', showIcon: true, border: true },
-)
+const props = defineProps<{
+  data: any
+}>()
 
 const show = ref(false)
 // card上面存在dropdown菜单
@@ -50,36 +38,13 @@ function subHoveredEnter() {
 }
 </script>
 <style lang="scss" scoped>
-.card-box {
-  font-size: 14px;
-  position: relative;
-  min-height: var(--card-min-height);
-  min-width: var(--card-min-width);
-  .card-header {
-    margin-top: -5px;
-  }
-  .description {
-    line-height: 22px;
-    font-weight: 400;
-    min-height: 70px;
-    .content {
-      display: -webkit-box;
-      height: var(--app-card-box-description-height, 40px);
-      -webkit-box-orient: vertical;
-      -webkit-line-clamp: 2;
-      overflow: hidden;
-    }
-  }
-
-  .card-footer {
-    position: absolute;
-    bottom: 8px;
-    left: 0;
-    min-height: 30px;
-    font-weight: 400;
-    padding: 0 16px;
-    width: 100%;
-    box-sizing: border-box;
+.paragraph-box {
+  background: var(--app-layout-bg-color);
+  border: 1px solid #ffffff;
+  box-shadow: none !important;
+  &:hover {
+    background: rgba(31, 35, 41, 0.1);
+    border: 1px solid #dee0e3;
   }
 }
 </style>
