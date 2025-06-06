@@ -29,7 +29,8 @@ class Chat(AppModelMixin):
     application = models.ForeignKey(Application, on_delete=models.CASCADE)
     abstract = models.CharField(max_length=1024, verbose_name="摘要")
     client_id = models.UUIDField(verbose_name="客户端id", default=None, null=True)
-    client_type = models.CharField(max_length=64, verbose_name="客户端类型", choices=ClientType.choices)
+    client_type = models.CharField(max_length=64, verbose_name="客户端类型", choices=ClientType.choices,
+                                   default=ClientType.ANONYMOUS_USER)
     is_deleted = models.BooleanField(verbose_name="逻辑删除", default=False)
 
     class Meta:
@@ -88,7 +89,8 @@ class ChatRecord(AppModelMixin):
 class ApplicationChatClientStats(AppModelMixin):
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
     client_id = models.UUIDField(max_length=128, default=uuid.uuid7, verbose_name="公共访问链接客户端id")
-    client_type = models.CharField(max_length=64, verbose_name="客户端类型", choices=ClientType.choices)
+    client_type = models.CharField(max_length=64, verbose_name="客户端类型", choices=ClientType.choices,
+                                   default=ClientType.ANONYMOUS_USER)
     application = models.ForeignKey(Application, on_delete=models.CASCADE, verbose_name="应用id")
     access_num = models.IntegerField(default=0, verbose_name="访问总次数次数")
     intraday_access_num = models.IntegerField(default=0, verbose_name="当日访问次数")
