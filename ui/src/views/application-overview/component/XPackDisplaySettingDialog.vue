@@ -439,6 +439,10 @@ const defaultSetting = {
   show_history: true,
   draggable: true,
   show_guide: true,
+  icon: '',
+  icon_url: '',
+  chat_background: '',
+  chat_background_url: '',
   avatar: '',
   avatar_url: '',
   float_icon: '',
@@ -465,9 +469,13 @@ const xpackForm = ref<any>({
   show_source: false,
   show_exec: false,
   language: '',
+  icon: '',
+  icon_url: '',
   show_history: false,
   draggable: false,
   show_guide: false,
+  chat_background: '',
+  chat_background_url: '',
   avatar: '',
   avatar_url: '',
   float_icon: '',
@@ -491,7 +499,9 @@ const xpackForm = ref<any>({
 const imgUrl = ref<any>({
   avatar: '',
   float_icon: '',
-  user_avatar: ''
+  user_avatar: '',
+  icon: '',
+  chat_background: ''
 })
 
 const dialogVisible = ref<boolean>(false)
@@ -511,7 +521,9 @@ function resetForm() {
   imgUrl.value = {
     avatar: '',
     float_icon: '',
-    user_avatar: ''
+    user_avatar: '',
+    icon: '',
+    chat_background: ''
   }
 }
 
@@ -538,6 +550,8 @@ const open = (data: any, content: any) => {
   xpackForm.value.draggable = data.draggable
   xpackForm.value.show_guide = data.show_guide
   imgUrl.value.avatar = data.avatar
+  imgUrl.value.icon = data.icon
+  imgUrl.value.chat_background = data.chat_background
   imgUrl.value.float_icon = data.float_icon
   imgUrl.value.user_avatar = data.user_avatar
   xpackForm.value.disclaimer = data.disclaimer
@@ -551,6 +565,8 @@ const open = (data: any, content: any) => {
     )
   }
   xpackForm.value.avatar_url = data.avatar
+  xpackForm.value.chat_background_url = data.chat_background
+  xpackForm.value.icon_url = data.icon
   xpackForm.value.user_avatar_url = data.user_avatar
   xpackForm.value.float_icon_url = data.float_icon
   xpackForm.value.show_avatar = data.show_avatar

@@ -8,6 +8,8 @@ from application.api.application_api_key import ApplicationKeyCreateAPI
 from application.models import ApplicationApiKey
 from application.serializers.application_api_key import ApplicationKeySerializer
 from common.auth import TokenAuth
+from common.auth.authentication import has_permissions
+from common.constants.permission_constants import PermissionConstants
 from common.log.log import log
 from common.result import result, success
 
@@ -34,10 +36,11 @@ class ApplicationKey(APIView):
     )
     @log(menu='Application', operate="Add ApiKey",
          get_operation_object=lambda r, k: get_application_operation_object(k.get('application_api_key_id')))
-    def post(self,request: Request, application_id: str, workspace_id: str):
+    @has_permissions(PermissionConstants.APPLICATION_OVERVIEW_API_KEY.get_workspace_application_permission())
+    def post(self, request: Request, application_id: str, workspace_id: str):
         return result.success(ApplicationKeySerializer(
-                data={'application_id': application_id, 'user_id': request.user.id,
-                      'workspace_id':workspace_id}).generate())
+            data={'application_id': application_id, 'user_id': request.user.id,
+                  'workspace_id': workspace_id}).generate())
 
     @extend_schema(
         methods=['GET'],
@@ -47,11 +50,11 @@ class ApplicationKey(APIView):
         parameters=ApplicationKeyCreateAPI.get_parameters(),
         tags=[_('Application Api Key')]  # type: ignore
     )
-    def get(self,request: Request, application_id: str, workspace_id: str):
-        return result,success(ApplicationKeySerializer(
-            data={'application_id':application_id, 'user_id':request.user.id,
-                  'workspace_id':workspace_id}).list())
-
+    @has_permissions(PermissionConstants.APPLICATION_OVERVIEW_API_KEY.get_workspace_application_permission())
+    def get(self, request: Request, application_id: str, workspace_id: str):
+        return result, success(ApplicationKeySerializer(
+            data={'application_id': application_id, 'user_id': request.user.id,
+                  'workspace_id': workspace_id}).list())
 
     class Operate(APIView):
         authentication_classes = [TokenAuth]
@@ -64,9 +67,6 @@ class ApplicationKey(APIView):
             parameters=ApplicationKeyCreateAPI.get_parameters(),
             tags=[_('Application Api Key')]  # type: ignore
         )
+        @has_permissions(PermissionConstants.APPLICATION_OVERVIEW_API_KEY.get_workspace_application_permission())
         def put(self, request: Request, application_id: str, workspace_id: str):
-            return result.success(ApplicationKeySerializer.Operate(
-
-            )
-                                  )
-
+            return result.success(ApplicationKeySerializer.Operate())
