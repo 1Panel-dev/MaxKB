@@ -334,7 +334,7 @@ class KnowledgeWebView(APIView):
                                            'first_list': r.FILES.getlist('file'),
                                            'meta': {'source_url': r.data.get('source_url'),
                                                     'selector': r.data.get('selector'),
-                                                    'embedding_mode_id': r.data.get('embedding_mode_id')}}
+                                                    'embedding_model_id': r.data.get('embedding_model_id')}}
          )
     def post(self, request: Request, workspace_id: str):
         return result.success(KnowledgeSerializer.Create(

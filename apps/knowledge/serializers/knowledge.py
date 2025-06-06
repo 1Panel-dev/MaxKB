@@ -405,6 +405,7 @@ class KnowledgeSerializer(serializers.Serializer):
     class Create(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, label=_('user id'))
         workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+        scope = serializers.ChoiceField(required=False, label=_('scope'), default=KnowledgeScope.WORKSPACE, choices=KnowledgeScope.choices)
 
         @staticmethod
         def post_embedding_knowledge(document_list, knowledge_id):
@@ -433,7 +434,7 @@ class KnowledgeSerializer(serializers.Serializer):
                 desc=instance.get('desc'),
                 type=instance.get('type', KnowledgeType.BASE),
                 user_id=self.data.get('user_id'),
-                scope=KnowledgeScope.WORKSPACE,
+                scope=self.data.get('scope', KnowledgeScope.WORKSPACE),
                 folder_id=instance.get('folder_id', 'root'),
                 embedding_model_id=instance.get('embedding'),
                 meta=instance.get('meta', {}),
@@ -492,7 +493,7 @@ class KnowledgeSerializer(serializers.Serializer):
                 desc=instance.get('desc'),
                 user_id=self.data.get('user_id'),
                 type=instance.get('type', KnowledgeType.WEB),
-                scope=KnowledgeScope.WORKSPACE,
+                scope=self.data.get('scope', KnowledgeScope.WORKSPACE),
                 folder_id=instance.get('folder_id', 'root'),
                 embedding_model_id=instance.get('embedding'),
                 meta={
