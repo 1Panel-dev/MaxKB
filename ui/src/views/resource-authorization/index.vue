@@ -108,7 +108,7 @@ watch(filterText, (val: any) => {
   }
 })
 
-function isManage(type: String) {
+function isManage(type: string) {
   return type === 'manage'
 }
 

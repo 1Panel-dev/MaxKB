@@ -86,7 +86,7 @@ const refreshFileUploadConfig = () => {
     set(props.nodeModel.properties.config, 'fields', fields)
     return
   }
-  let fileUploadFields = []
+  const fileUploadFields = []
   if (form_data[0].document) {
     fileUploadFields.push({ label: t('common.fileUpload.document'), value: 'document' })
   }

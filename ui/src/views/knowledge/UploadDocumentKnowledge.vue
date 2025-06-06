@@ -82,7 +82,7 @@ async function next() {
   disabled.value = true
   if (await UploadComponentRef.value.validate()) {
     if (documentsType.value === 'QA') {
-      let fd = new FormData()
+      const fd = new FormData()
       documentsFiles.value.forEach((item: any) => {
         if (item?.raw) {
           fd.append('file', item?.raw)
@@ -97,7 +97,7 @@ async function next() {
         })
       }
     } else if (documentsType.value === 'table') {
-      let fd = new FormData()
+      const fd = new FormData()
       documentsFiles.value.forEach((item: any) => {
         if (item?.raw) {
           fd.append('file', item?.raw)

@@ -25,7 +25,7 @@ import { t } from '@/locales'
 const props = defineProps<{
   nodeModel: any
   modelValue: Array<any>
-  global?: Boolean
+  global?: boolean
 }>()
 const emit = defineEmits(['update:modelValue'])
 const data = computed({

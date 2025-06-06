@@ -284,7 +284,7 @@ function changeTool() {
   )[0].args_schema
   form_data.value.tool_form_field = []
   for (const item in args_schema.properties) {
-    let params = args_schema.properties[item].properties
+    const params = args_schema.properties[item].properties
     if (params) {
       form_data.value.params_nested = item
       for (const item2 in params) {

@@ -120,7 +120,7 @@ function submit() {
       dialogVisible.value = false
     })
   } else if (radioType.value === 'custom' && iconFile.value) {
-    let fd = new FormData()
+    const fd = new FormData()
     fd.append('file', iconFile.value.raw)
     overviewApi.putAppIcon(id as string, fd, loading).then((res: any) => {
       emit('refresh')

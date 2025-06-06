@@ -36,7 +36,7 @@ const props = withDefaults(
   },
 )
 
-const current = ref<Number | String>(0)
+const current = ref<number | string>(0)
 
 watch(
   () => props.defaultActive,

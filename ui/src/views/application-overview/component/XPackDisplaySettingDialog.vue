@@ -573,7 +573,7 @@ const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid, fields) => {
     if (valid) {
-      let fd = new FormData()
+      const fd = new FormData()
       Object.keys(xpackForm.value).map((item) => {
         if (['custom_theme', 'float_location'].includes(item)) {
           fd.append(item, JSON.stringify(xpackForm.value[item]))

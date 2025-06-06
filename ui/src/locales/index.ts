@@ -5,13 +5,13 @@ import {createI18n} from 'vue-i18n'
 // 导入语言文件
 const langModules = import.meta.glob('./lang/*/index.ts', {eager: true}) as Record<
   string,
-  () => Promise<{ default: Object }>
+  () => Promise<{ default: object }>
 >
 
 // 定义 Recordable 类型
 type Recordable<T = any> = Record<string, T>
 
-const langModuleMap = new Map<string, Object>()
+const langModuleMap = new Map<string, object>()
 
 export const langCode: Array<string> = []
 

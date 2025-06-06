@@ -1,8 +1,8 @@
 interface knowledgeData {
-  name: String
-  folder_id?: String
-  desc: String
-  embedding?: String
+  name: string
+  folder_id?: string
+  desc: string
+  embedding?: string
   documents?: Array<any>
 }
 

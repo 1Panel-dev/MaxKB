@@ -10,7 +10,7 @@ const useLoginStore = defineStore('login', {
     userAccessToken: '',
   }),
   actions: {
-    getToken(): String | null {
+    getToken(): string | null {
       if (this.token) {
         return this.token
       }

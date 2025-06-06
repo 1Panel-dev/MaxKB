@@ -149,7 +149,7 @@ function refreshFieldList(data: any, index: any) {
     }
   }
   // 查看另一个list又没有重复的
-  let arr = props.nodeModel.properties.api_input_field_list
+  const arr = props.nodeModel.properties.api_input_field_list
   for (let i = 0; i < arr.length; i++) {
     if (arr[i].variable === data.field) {
       MsgError(t('views.applicationWorkflow.tip.paramErrorMessage') + data.field)

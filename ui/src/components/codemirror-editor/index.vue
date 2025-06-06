@@ -49,7 +49,7 @@ import ToolApi from '@/api/tool/tool'
 defineOptions({name: 'CodemirrorEditor'})
 
 const props = defineProps<{
-  title: String
+  title: string
   modelValue: any
 }>()
 const emit = defineEmits(['update:modelValue', 'submitDialog'])
@@ -73,7 +73,7 @@ function getRangeFromLineAndColumn(state: any, line: number, column: number, end
 }
 
 const regexpLinter = linter(async (view) => {
-  let diagnostics: Diagnostic[] = []
+  const diagnostics: Diagnostic[] = []
   await ToolApi.postPylint(view.state.doc.toString()).then((ok) => {
     ok.data.forEach((element: any) => {
       const range = getRangeFromLineAndColumn(

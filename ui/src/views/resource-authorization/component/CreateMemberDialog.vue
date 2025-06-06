@@ -82,7 +82,7 @@ const submitMember = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid, fields) => {
     if (valid) {
-      let idsArray = memberForm.value.users.map((obj: any) => obj.id)
+      const idsArray = memberForm.value.users.map((obj: any) => obj.id)
       AuthorizationApi.postCreatTeamMember(idsArray, loading).then((res) => {
         MsgSuccess(t('common.submitSuccess'))
         emit('refresh', idsArray)

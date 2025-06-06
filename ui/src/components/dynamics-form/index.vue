@@ -74,12 +74,12 @@ const formFieldRef = ref<Array<InstanceType<typeof FormItem>>>([])
  */
 const show = (field: FormField) => {
   if (field.relation_show_field_dict) {
-    let keys = Object.keys(field.relation_show_field_dict)
+    const keys = Object.keys(field.relation_show_field_dict)
     for (const index in keys) {
       const key = keys[index]
-      let v = _.get(formValue.value, key)
+      const v = _.get(formValue.value, key)
       if (v && v !== undefined && v !== null) {
-        let values = field.relation_show_field_dict[key]
+        const values = field.relation_show_field_dict[key]
         if (values && values.length > 0) {
           return values.includes(v)
         } else {

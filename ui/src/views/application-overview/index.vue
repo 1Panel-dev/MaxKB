@@ -334,7 +334,7 @@ function refreshAccessToken() {
     })
     .catch(() => {})
 }
-function changeState(bool: Boolean) {
+function changeState(bool: boolean) {
   const obj = {
     is_active: !bool
   }

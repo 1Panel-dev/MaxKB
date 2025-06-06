@@ -44,11 +44,12 @@ mime_types = {
     "dll": "application/octet-stream", "deb": "application/octet-stream", "dmg": "application/octet-stream",
     "iso": "application/octet-stream", "img": "application/octet-stream", "msi": "application/octet-stream",
     "msp": "application/octet-stream", "msm": "application/octet-stream", "mid": "audio/midi",
-    "midi": "audio/midi", "kar": "audio/midi", "mp3": "audio/mpeg", "ogg": "audio/ogg", "m4a": "audio/x-m4a",
+    "midi": "audio/midi", "kar": "audio/midi", "mp3": "audio/mp3", "ogg": "audio/ogg", "m4a": "audio/x-m4a",
     "ra": "audio/x-realaudio", "3gpp": "video/3gpp", "3gp": "video/3gpp", "ts": "video/mp2t",
     "mp4": "video/mp4", "mpeg": "video/mpeg", "mpg": "video/mpeg", "mov": "video/quicktime",
     "webm": "video/webm", "flv": "video/x-flv", "m4v": "video/x-m4v", "mng": "video/x-mng",
-    "asx": "video/x-ms-asf", "asf": "video/x-ms-asf", "wmv": "video/x-ms-wmv", "avi": "video/x-msvideo"
+    "asx": "video/x-ms-asf", "asf": "video/x-ms-asf", "wmv": "video/x-ms-wmv", "avi": "video/x-msvideo",
+    "wav": "audio/wav", "flac": "audio/flac", "aac": "audio/aac", "opus": "audio/opus",
 }
 
 
@@ -77,21 +78,16 @@ class FileSerializer(serializers.Serializer):
             file = QuerySet(File).filter(id=file_id).first()
             if file is None:
                 raise NotFound404(404, _('File not found'))
-            # 如果是音频文件，直接返回文件流
-            file_type = file.file_name.split(".")[-1]
-            if file_type in ['mp3', 'wav', 'ogg', 'aac']:
-                return HttpResponse(
-                    file.get_bytes(),
-                    status=200,
-                    headers={
-                        'Content-Type': f'audio/{file_type}',
-                        'Content-Disposition': 'attachment; filename="{}"'.format(file.file_name)
-                    }
-                )
+            file_type = file.file_name.split(".")[-1].lower()
+            content_type = mime_types.get(file_type, 'application/octet-stream')
+            headers = {
+                'Content-Type': content_type,
+                'Content-Disposition': f'attachment; filename="{file.file_name}"'
+            }
             return HttpResponse(
                 file.get_bytes(),
                 status=200,
-                headers={'Content-Type': mime_types.get(file_type, 'text/plain')}
+                headers=headers
             )
 
         def delete(self):

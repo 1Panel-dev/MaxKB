@@ -109,7 +109,7 @@ function submit() {
     emit('refresh', '/ui/favicon.ico')
     dialogVisible.value = false
   } else if (radioType.value === 'custom' && iconFile.value) {
-    let fd = new FormData()
+    const fd = new FormData()
     fd.append('file', iconFile.value.raw)
     toolApi.putToolIcon(detail.value.id, fd, loading).then((res: any) => {
       emit('refresh', res.data)

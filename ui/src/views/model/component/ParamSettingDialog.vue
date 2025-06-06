@@ -124,7 +124,7 @@ function deleteParam(index: any) {
 
 function refresh(data: any, index: any) {
   for (let i = 0; i < modelParamsForm.value.length; i++) {
-    let field = modelParamsForm.value[i].field
+    const field = modelParamsForm.value[i].field
     let label = modelParamsForm.value[i].label
     if (label && label.input_type === 'TooltipLabel') {
       label = label.label

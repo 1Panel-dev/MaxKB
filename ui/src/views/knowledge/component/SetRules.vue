@@ -168,7 +168,7 @@ function changeHandle(val: boolean) {
 }
 function splitDocument() {
   loading.value = true
-  let fd = new FormData()
+  const fd = new FormData()
   documentsFiles.value.forEach((item) => {
     if (item?.raw) {
       fd.append('file', item?.raw)

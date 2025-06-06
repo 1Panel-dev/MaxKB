@@ -70,7 +70,7 @@ const putTool: (
  * @returns 函数详情
  */
 const getToolById: (
-  tool_id: String,
+  tool_id: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (tool_id, loading) => {
   return get(`${prefix}/tool/${tool_id}`, undefined, loading)

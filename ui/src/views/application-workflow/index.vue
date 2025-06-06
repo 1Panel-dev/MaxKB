@@ -278,7 +278,7 @@ async function publicHandle() {
         MsgError(e.toString())
         return
       }
-      applicationApi.putPublishApplication(id as String, obj, loading).then(() => {
+      applicationApi.putPublishApplication(id as string, obj, loading).then(() => {
 
         application.asyncGetApplicationDetail(id, loading).then((res: any) => {
           detail.value.name = res.data.name
