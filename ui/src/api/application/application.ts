@@ -1,17 +1,17 @@
-import { Result } from '@/request/Result'
-import { get, post, postStream, del, put, request, download, exportFile } from '@/request/index'
-import type { pageRequest } from '@/api/type/common'
-import type { ApplicationFormType } from '@/api/type/application'
-import { type Ref } from 'vue'
-import type { FormField } from '@/components/dynamics-form/type'
+import {Result} from '@/request/Result'
+import {get, post, postStream, del, put, request, download, exportFile} from '@/request/index'
+import type {pageRequest} from '@/api/type/common'
+import type {ApplicationFormType} from '@/api/type/application'
+import {type Ref} from 'vue'
+import type {FormField} from '@/components/dynamics-form/type'
 
-const prefix = '/workspace'
+const prefix = '/workspace/' + localStorage.getItem('workspace_id') + '/application'
 
 /**
  * 获取全部应用
  * @param 参数
  */
-const getAllAppilcation: () => Promise<Result<any[]>> = () => {
+const getAllApplication: () => Promise<Result<any[]>> = () => {
   return get(`${prefix}`)
 }
 
@@ -22,13 +22,12 @@ const getAllAppilcation: () => Promise<Result<any[]>> = () => {
  }
  */
 const getApplication: (
-  wordspace_id: string,
   page: pageRequest,
   param: any,
   loading?: Ref<boolean>,
-) => Promise<Result<any>> = (wordspace_id, page, param, loading) => {
+) => Promise<Result<any>> = (page, param, loading) => {
   return get(
-    `${prefix}/${wordspace_id}/application/${page.current_page}/${page.page_size}`,
+    `${prefix}/${page.current_page}/${page.page_size}`,
     param,
     loading,
   )
@@ -39,11 +38,10 @@ const getApplication: (
  * @param 参数
  */
 const postApplication: (
-  wordspace_id: string,
   data: ApplicationFormType,
   loading?: Ref<boolean>,
-) => Promise<Result<any>> = (wordspace_id, data, loading) => {
-  return post(`${prefix}/${wordspace_id}/application`, data, undefined, loading)
+) => Promise<Result<any>> = (data, loading) => {
+  return post(`${prefix}`, data, undefined, loading)
 }
 
 /**
@@ -131,7 +129,7 @@ const postAppAuthentication: (
 ) => Promise<any> = (access_token, loading, authentication_value) => {
   return post(
     `${prefix}/authentication`,
-    { access_token: access_token, authentication_value },
+    {access_token: access_token, authentication_value},
     undefined,
     loading,
   )
@@ -257,7 +255,7 @@ const getApplicationRerankerModel: (
   application_id: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<Array<any>>> = (application_id, loading) => {
-  return get(`${prefix}/${application_id}/model`, { model_type: 'RERANKER' }, loading)
+  return get(`${prefix}/${application_id}/model`, {model_type: 'RERANKER'}, loading)
 }
 
 /**
@@ -271,7 +269,7 @@ const getApplicationSTTModel: (
   application_id: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<Array<any>>> = (application_id, loading) => {
-  return get(`${prefix}/${application_id}/model`, { model_type: 'STT' }, loading)
+  return get(`${prefix}/${application_id}/model`, {model_type: 'STT'}, loading)
 }
 
 /**
@@ -285,21 +283,21 @@ const getApplicationTTSModel: (
   application_id: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<Array<any>>> = (application_id, loading) => {
-  return get(`${prefix}/${application_id}/model`, { model_type: 'TTS' }, loading)
+  return get(`${prefix}/${application_id}/model`, {model_type: 'TTS'}, loading)
 }
 
 const getApplicationImageModel: (
   application_id: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<Array<any>>> = (application_id, loading) => {
-  return get(`${prefix}/${application_id}/model`, { model_type: 'IMAGE' }, loading)
+  return get(`${prefix}/${application_id}/model`, {model_type: 'IMAGE'}, loading)
 }
 
 const getApplicationTTIModel: (
   application_id: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<Array<any>>> = (application_id, loading) => {
-  return get(`${prefix}/${application_id}/model`, { model_type: 'TTI' }, loading)
+  return get(`${prefix}/${application_id}/model`, {model_type: 'TTI'}, loading)
 }
 
 /**
@@ -542,7 +540,7 @@ const importApplication: (data: any, loading?: Ref<boolean>) => Promise<Result<a
   return post(`${prefix}/import`, data, undefined, loading)
 }
 export default {
-  getAllAppilcation,
+  getAllAppilcation: getAllApplication,
   getApplication,
   postApplication,
   putApplication,

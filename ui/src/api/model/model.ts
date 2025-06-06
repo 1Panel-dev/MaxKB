@@ -1,26 +1,25 @@
-import { Result } from '@/request/Result'
-import { get, post, del, put } from '@/request/index'
-import { type Ref } from 'vue'
+import {Result} from '@/request/Result'
+import {get, post, del, put} from '@/request/index'
+import {type Ref} from 'vue'
 import type {
   ListModelRequest,
   Model,
   CreateModelRequest,
   EditModelRequest,
 } from '@/api/type/model'
-import type { FormField } from '@/components/dynamics-form/type'
+import type {FormField} from '@/components/dynamics-form/type'
 
-const prefix = '/workspace'
+const prefix = '/workspace/' + localStorage.getItem('workspace_id')
 
 /**
  * 获得模型列表
  * @params 参数 name, model_type, model_name
  */
 const getModel: (
-  wordspace_id: string,
   request?: ListModelRequest,
   loading?: Ref<boolean>,
-) => Promise<Result<Array<Model>>> = (wordspace_id, data, loading) => {
-  return get(`${prefix}/${wordspace_id}/model`, data, loading)
+) => Promise<Result<Array<Model>>> = (data, loading) => {
+  return get(`${prefix}/model`, data, loading)
 }
 
 /**
@@ -30,11 +29,10 @@ const getModel: (
  * @returns
  */
 const getModelParamsForm: (
-  wordspace_id: string,
   model_id: string,
   loading?: Ref<boolean>,
-) => Promise<Result<Array<FormField>>> = (wordspace_id, model_id, loading) => {
-  return get(`${prefix}/${wordspace_id}/model/${model_id}/model_params_form`, {}, loading)
+) => Promise<Result<Array<FormField>>> = (model_id, loading) => {
+  return get(`${prefix}/model/${model_id}/model_params_form`, {}, loading)
 }
 
 /**
@@ -44,11 +42,10 @@ const getModelParamsForm: (
  * @returns
  */
 const createModel: (
-  wordspace_id: string,
   request: CreateModelRequest,
   loading?: Ref<boolean>,
-) => Promise<Result<Model>> = (wordspace_id, request, loading) => {
-  return post(`${prefix}/${wordspace_id}/model`, request, {}, loading)
+) => Promise<Result<Model>> = (request, loading) => {
+  return post(`${prefix}/model`, request, {}, loading)
 }
 
 /**
@@ -58,12 +55,11 @@ const createModel: (
  * @returns
  */
 const updateModel: (
-  wordspace_id: string,
   model_id: string,
   request: EditModelRequest,
   loading?: Ref<boolean>,
-) => Promise<Result<Model>> = (wordspace_id, model_id, request, loading) => {
-  return put(`${prefix}/${wordspace_id}/model/${model_id}`, request, {}, loading)
+) => Promise<Result<Model>> = (model_id, request, loading) => {
+  return put(`${prefix}/model/${model_id}`, request, {}, loading)
 }
 
 /**
@@ -73,12 +69,11 @@ const updateModel: (
  * @returns
  */
 const updateModelParamsForm: (
-  wordspace_id: string,
   model_id: string,
   request: any[],
   loading?: Ref<boolean>,
-) => Promise<Result<Model>> = (wordspace_id, model_id, request, loading) => {
-  return put(`${prefix}/${wordspace_id}/model/${model_id}/model_params_form`, request, {}, loading)
+) => Promise<Result<Model>> = (model_id, request, loading) => {
+  return put(`${prefix}/model/${model_id}/model_params_form`, request, {}, loading)
 }
 
 /**
@@ -88,11 +83,10 @@ const updateModelParamsForm: (
  * @returns
  */
 const getModelById: (
-  wordspace_id: string,
   model_id: string,
   loading?: Ref<boolean>,
-) => Promise<Result<Model>> = (wordspace_id, model_id, loading) => {
-  return get(`${prefix}/${wordspace_id}/model/${model_id}`, {}, loading)
+) => Promise<Result<Model>> = (model_id, loading) => {
+  return get(`${prefix}/model/${model_id}`, {}, loading)
 }
 /**
  * 获取模型信息不包括认证信息根据模型id
@@ -101,11 +95,10 @@ const getModelById: (
  * @returns
  */
 const getModelMetaById: (
-  wordspace_id: string,
   model_id: string,
   loading?: Ref<boolean>,
-) => Promise<Result<Model>> = (wordspace_id, model_id, loading) => {
-  return get(`${prefix}/${wordspace_id}/model/${model_id}/meta`, {}, loading)
+) => Promise<Result<Model>> = (model_id, loading) => {
+  return get(`${prefix}/model/${model_id}/meta`, {}, loading)
 }
 /**
  * 暂停下载
@@ -114,18 +107,16 @@ const getModelMetaById: (
  * @returns
  */
 const pauseDownload: (
-  wordspace_id: string,
   model_id: string,
   loading?: Ref<boolean>,
-) => Promise<Result<boolean>> = (wordspace_id, model_id, loading) => {
-  return put(`${prefix}/${wordspace_id}/model/${model_id}/pause_download`, undefined, {}, loading)
+) => Promise<Result<boolean>> = (model_id, loading) => {
+  return put(`${prefix}/model/${model_id}/pause_download`, undefined, {}, loading)
 }
 const deleteModel: (
-  wordspace_id: string,
   model_id: string,
   loading?: Ref<boolean>,
-) => Promise<Result<boolean>> = (wordspace_id, model_id, loading) => {
-  return del(`${prefix}/${wordspace_id}/model/${model_id}`, undefined, {}, loading)
+) => Promise<Result<boolean>> = (model_id, loading) => {
+  return del(`${prefix}/model/${model_id}`, undefined, {}, loading)
 }
 export default {
   getModel,

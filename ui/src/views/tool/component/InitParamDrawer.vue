@@ -27,12 +27,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import {ref, watch} from 'vue'
 import ToolApi from '@/api/tool/tool'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
-import { MsgSuccess } from '@/utils/message'
-import { t } from '@/locales'
-import { cloneDeep } from 'lodash'
+import {MsgSuccess} from '@/utils/message'
+import {t} from '@/locales'
+import {cloneDeep} from 'lodash'
 
 const emit = defineEmits(['refresh'])
 
@@ -55,7 +55,7 @@ watch(debugVisible, (bool) => {
 
 const submit = async () => {
   dynamicsFormRef.value.validate().then(() => {
-    ToolApi.putToolLib('default', form.value?.id as string, form.value, loading).then((res) => {
+    ToolApi.putTool(form.value?.id as string, form.value, loading).then((res) => {
       MsgSuccess(t('common.editSuccess'))
       emit('refresh')
       debugVisible.value = false
@@ -71,12 +71,12 @@ const open = (data: any, is_active: boolean) => {
   const init_params = form.value.init_field_list
     .map((item: any) => {
       if (item.show_default_value === false) {
-        return { [item.field]: undefined }
+        return {[item.field]: undefined}
       }
-      return { [item.field]: item.default_value }
+      return {[item.field]: item.default_value}
     })
-    .reduce((x: any, y: any) => ({ ...x, ...y }), {})
-  form.value.init_params = { ...init_params, ...form.value.init_params }
+    .reduce((x: any, y: any) => ({...x, ...y}), {})
+  form.value.init_params = {...init_params, ...form.value.init_params}
   debugVisible.value = true
 }
 

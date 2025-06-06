@@ -1,31 +1,31 @@
-import { Result } from '@/request/Result'
-import { get, post, del, put } from '@/request/index'
-import type { Ref } from 'vue'
-import type { KeyValue } from '@/api/type/common'
-import type { pageRequest } from '@/api/type/common'
-const prefix = '/workspace'
+import {Result} from '@/request/Result'
+import {get, post, del, put} from '@/request/index'
+import type {Ref} from 'vue'
+import type {KeyValue} from '@/api/type/common'
+import type {pageRequest} from '@/api/type/common'
+
+const prefix = '/workspace/' + localStorage.getItem('workspace_id') + '/knowledge'
 
 /**
  * 问题分页列表
  * @param 参数  dataset_id,
  * page {
-              "current_page": "string",
-              "page_size": "string",
-            }
-* query {
-          "content": "string",
-        }
+ "current_page": "string",
+ "page_size": "string",
+ }
+ * query {
+ "content": "string",
+ }
  */
 
 const getProblems: (
-  workspace_id: string,
   dataset_id: string,
   page: pageRequest,
   param: any,
   loading?: Ref<boolean>,
-) => Promise<Result<any>> = (wordspace_id, dataset_id, page, param, loading) => {
+) => Promise<Result<any>> = (dataset_id, page, param, loading) => {
   return get(
-    `${prefix}/${wordspace_id}/knowledge/${dataset_id}/problem/${page.current_page}/${page.page_size}`,
+    `${prefix}/${dataset_id}/problem/${page.current_page}/${page.page_size}`,
     param,
     loading,
   )
@@ -73,8 +73,8 @@ const delMulProblem: (
  * @param 参数
  * dataset_id, problem_id,
  * {
-      "content": "string",
-    }
+ "content": "string",
+ }
  */
 const putProblems: (
   dataset_id: string,
@@ -102,9 +102,9 @@ const getDetailProblems: (
  * 批量关联段落
  * @param 参数 dataset_id,
  * {
-      "problem_id_list": "Array",
-      "paragraph_list": "Array",
-    }
+ "problem_id_list": "Array",
+ "paragraph_list": "Array",
+ }
  */
 const postMulAssociationProblem: (
   dataset_id: string,

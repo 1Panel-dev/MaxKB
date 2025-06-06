@@ -42,18 +42,20 @@
   </el-form>
 </template>
 <script setup lang="ts">
-import { ref, reactive, onMounted, onUnmounted, computed, watch } from 'vue'
-import { groupBy } from 'lodash'
+import {ref, reactive, onMounted, onUnmounted, computed, watch} from 'vue'
+import {groupBy} from 'lodash'
 import useStore from '@/stores'
-import type { knowledgeData } from '@/api/type/knowledge'
-import { t } from '@/locales'
+import type {knowledgeData} from '@/api/type/knowledge'
+import {t} from '@/locales'
+
 const props = defineProps({
   data: {
     type: Object,
-    default: () => {},
+    default: () => {
+    },
   },
 })
-const { model } = useStore()
+const {model} = useStore()
 const form = ref<knowledgeData>({
   name: '',
   desc: '',
@@ -101,6 +103,7 @@ watch(
     immediate: true,
   },
 )
+
 /*
   表单校验
 */
@@ -114,7 +117,7 @@ function validate() {
 function getModel() {
   loading.value = true
   model
-    .asyncGetModel('default', { model_type: 'EMBEDDING' })
+    .asyncGetModel({model_type: 'EMBEDDING'})
     .then((res: any) => {
       modelOptions.value = groupBy(res?.data, 'provider')
       loading.value = false

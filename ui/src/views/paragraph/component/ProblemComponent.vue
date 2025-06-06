@@ -174,7 +174,6 @@ const remoteMethod = (query: string) => {
 function getProblemOption(filterText?: string) {
   return problem
     .asyncGetProblem(
-      'default',
       props.datasetId || (id as string),
       { current_page: 1, page_size: 100 },
       filterText && { content: filterText },

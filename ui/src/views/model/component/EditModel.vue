@@ -10,7 +10,7 @@
     <template #header="{ close, titleId, titleClass }">
       <el-breadcrumb separator=">">
         <el-breadcrumb-item
-          ><span class="active-breadcrumb">{{
+        ><span class="active-breadcrumb">{{
             `${$t('common.edit')} ${providerValue?.name}`
           }}</span></el-breadcrumb-item
         >
@@ -100,8 +100,8 @@
               <div class="mr-4">
                 <span>{{ $t('views.model.modelForm.base_model.label') }} </span>
                 <span class="danger ml-4">{{
-                  $t('views.model.modelForm.base_model.tooltip')
-                }}</span>
+                    $t('views.model.modelForm.base_model.tooltip')
+                  }}</span>
               </div>
             </div>
           </template>
@@ -145,17 +145,17 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import type { Provider, BaseModel, Model } from '@/api/type/model'
-import type { Dict, KeyValue } from '@/api/type/common'
+import {ref, computed} from 'vue'
+import type {Provider, BaseModel, Model} from '@/api/type/model'
+import type {Dict, KeyValue} from '@/api/type/common'
 import ModelApi from '@/api/model/model'
 import ProviderApi from '@/api/model/provider'
-import type { FormField } from '@/components/dynamics-form/type'
+import type {FormField} from '@/components/dynamics-form/type'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
-import type { FormRules } from 'element-plus'
-import { MsgSuccess } from '@/utils/message'
-import { PermissionType, PermissionDesc } from '@/enums/model'
-import { t } from '@/locales'
+import type {FormRules} from 'element-plus'
+import {MsgSuccess} from '@/utils/message'
+import {PermissionType, PermissionDesc} from '@/enums/model'
+import {t} from '@/locales'
 
 const providerValue = ref<Provider>()
 const dynamicsFormRef = ref<InstanceType<typeof DynamicsForm>>()
@@ -194,13 +194,13 @@ const base_form_data = ref<{
   model_type: string
 
   model_name: string
-}>({ name: '', model_type: '', model_name: '', permission_type: 'PRIVATE' })
+}>({name: '', model_type: '', model_name: '', permission_type: 'PRIVATE'})
 
 const credential_form_data = ref<Dict<any>>({})
 
 const form_data = computed({
   get: () => {
-    return { ...credential_form_data.value, ...base_form_data.value }
+    return {...credential_form_data.value, ...base_form_data.value}
   },
   set: (event: any) => {
     credential_form_data.value = event
@@ -236,7 +236,7 @@ const list_base_model = (model_type: any, change?: boolean) => {
 }
 const open = (provider: Provider, model: Model) => {
   modelValue.value = model
-  ModelApi.getModelById('default', model.id, formLoading).then((ok) => {
+  ModelApi.getModelById(model.id, formLoading).then((ok) => {
     modelValue.value = ok.data
     ProviderApi.listModelType(model.provider, model_type_loading).then((ok) => {
       model_type_list.value = ok.data
@@ -257,7 +257,7 @@ const open = (provider: Provider, model: Model) => {
 }
 
 const close = () => {
-  base_form_data.value = { name: '', model_type: '', model_name: '', permission_type: '' }
+  base_form_data.value = {name: '', model_type: '', model_name: '', permission_type: ''}
   dynamicsFormRef.value?.ruleFormRef?.resetFields()
   credential_form_data.value = {}
   model_form_field.value = []
@@ -269,7 +269,6 @@ const submit = () => {
   dynamicsFormRef.value?.validate().then(() => {
     if (modelValue.value) {
       ModelApi.updateModel(
-        'default',
         modelValue.value.id,
         {
           ...base_form_data.value,
@@ -285,7 +284,7 @@ const submit = () => {
   })
 }
 
-defineExpose({ open, close })
+defineExpose({open, close})
 </script>
 <style lang="scss" scoped>
 .select-provider {

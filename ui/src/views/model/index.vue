@@ -185,7 +185,7 @@ const openCreateModel = (provider?: Provider, model_type?: string) => {
 const list_model = () => {
   const params = active_provider.value?.provider ? { provider: active_provider.value.provider } : {}
   model
-    .asyncGetModel('default', { ...model_search_form.value, ...params }, list_model_loading)
+    .asyncGetModel( { ...model_search_form.value, ...params }, list_model_loading)
     .then((ok: any) => {
       model_list.value = ok.data
       const v = model_list.value.map((m) => ({ id: m.user_id, username: m.username }))

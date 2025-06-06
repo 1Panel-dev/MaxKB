@@ -1,14 +1,15 @@
-import { defineStore } from 'pinia'
-import { type Ref } from 'vue'
+import {defineStore} from 'pinia'
+import {type Ref} from 'vue'
 import ModelApi from '@/api/model/model'
 import ProviderApi from '@/api/model/provider'
-import type { ListModelRequest } from '@/api/type/model'
+import type {ListModelRequest} from '@/api/type/model'
+
 const useModelStore = defineStore('model', {
   state: () => ({}),
   actions: {
-    async asyncGetModel(wordspace_id: string, data?: ListModelRequest, loading?: Ref<boolean>) {
+    async asyncGetModel(data?: ListModelRequest, loading?: Ref<boolean>) {
       return new Promise((resolve, reject) => {
-        ModelApi.getModel(wordspace_id, data, loading)
+        ModelApi.getModel(data, loading)
           .then((res) => {
             resolve(res)
           })

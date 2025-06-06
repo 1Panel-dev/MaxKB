@@ -930,7 +930,7 @@ function getList(bool?: boolean) {
     folder_id: folderId,
   }
   documentApi
-    .getDocument('default', id as string, paginationConfig.value, param, bool ? undefined : loading)
+    .getDocument( id as string, paginationConfig.value, param, bool ? undefined : loading)
     .then((res) => {
       documentData.value = res.data.records
       paginationConfig.value.total = res.data.total
@@ -938,7 +938,7 @@ function getList(bool?: boolean) {
 }
 
 function getDetail() {
-  knowledge.asyncGetDatasetDetail('default', id, loading).then((res: any) => {
+  knowledge.asyncGetDatasetDetail( id, loading).then((res: any) => {
     datasetDetail.value = res.data
   })
 }

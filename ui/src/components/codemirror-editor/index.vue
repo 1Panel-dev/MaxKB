@@ -39,14 +39,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { Codemirror } from 'vue-codemirror'
-import { python } from '@codemirror/lang-python'
-import { oneDark } from '@codemirror/theme-one-dark'
-import { linter, type Diagnostic } from '@codemirror/lint'
+import {ref, computed, watch} from 'vue'
+import {Codemirror} from 'vue-codemirror'
+import {python} from '@codemirror/lang-python'
+import {oneDark} from '@codemirror/theme-one-dark'
+import {linter, type Diagnostic} from '@codemirror/lint'
 import ToolApi from '@/api/tool/tool'
 
-defineOptions({ name: 'CodemirrorEditor' })
+defineOptions({name: 'CodemirrorEditor'})
 
 const props = defineProps<{
   title: String
@@ -74,7 +74,7 @@ function getRangeFromLineAndColumn(state: any, line: number, column: number, end
 
 const regexpLinter = linter(async (view) => {
   let diagnostics: Diagnostic[] = []
-  await ToolApi.postPylint('default', view.state.doc.toString()).then((ok) => {
+  await ToolApi.postPylint(view.state.doc.toString()).then((ok) => {
     ok.data.forEach((element: any) => {
       const range = getRangeFromLineAndColumn(
         view.state,
@@ -124,6 +124,7 @@ function submitDialog() {
 <style lang="scss" scoped>
 .codemirror-editor {
   position: relative;
+
   &__footer {
     position: absolute;
     bottom: 10px;

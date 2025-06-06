@@ -412,7 +412,6 @@ const submit = () => {
     .then(() => {
       if (providerValue.value) {
         ModelApi.createModel(
-          'default',
           {
             ...base_form_data.value,
             credential: credential_form_data.value,

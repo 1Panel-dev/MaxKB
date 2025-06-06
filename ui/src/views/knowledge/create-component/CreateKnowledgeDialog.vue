@@ -55,7 +55,7 @@ const submitHandle = async () => {
       folder_id: currentFolder.value?.id,
       ...BaseFormRef.value.form,
     }
-    KnowledgeApi.postDataset('default', obj, loading).then((res) => {
+    KnowledgeApi.postKnowledge(obj, loading).then((res) => {
       MsgSuccess(t('common.createSuccess'))
       // router.push({ path: `/knowledge/${res.data.id}/${currentFolder.value.id}/document` })
       emit('refresh')

@@ -20,7 +20,6 @@ const useProblemStore = defineStore('problem', {
       })
     },
     async asyncGetProblem(
-      workspace_id: string,
       datasetId: string,
       page: pageRequest,
       param: any,
@@ -28,7 +27,7 @@ const useProblemStore = defineStore('problem', {
     ) {
       return new Promise((resolve, reject) => {
         problemApi
-          .getProblems(workspace_id, datasetId, page, param, loading)
+          .getProblems(datasetId, page, param, loading)
           .then((data) => {
             resolve(data)
           })

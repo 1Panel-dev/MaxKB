@@ -1,9 +1,10 @@
-import { Result } from '@/request/Result'
-import { get, post } from '@/request/index'
-import type { Ref } from 'vue'
-import type { Provider, BaseModel } from '@/api/type/model'
-import type { FormField } from '@/components/dynamics-form/type'
-import type { KeyValue } from '../type/common'
+import {Result} from '@/request/Result'
+import {get, post} from '@/request/index'
+import type {Ref} from 'vue'
+import type {Provider, BaseModel} from '@/api/type/model'
+import type {FormField} from '@/components/dynamics-form/type'
+import type {KeyValue} from '../type/common'
+
 const prefix_provider = '/provider'
 /**
  * 获得供应商列表
@@ -19,7 +20,7 @@ const getProviderByModelType: (
   model_type: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<Array<Provider>>> = (model_type, loading) => {
-  return get(`${prefix_provider}`, { model_type }, loading)
+  return get(`${prefix_provider}`, {model_type}, loading)
 }
 
 /**
@@ -36,7 +37,7 @@ const getModelCreateForm: (
   model_name: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<Array<FormField>>> = (provider, model_type, model_name, loading) => {
-  return get(`${prefix_provider}/model_form`, { provider, model_type, model_name }, loading)
+  return get(`${prefix_provider}/model_form`, {provider, model_type, model_name}, loading)
 }
 
 /**
@@ -49,7 +50,7 @@ const listModelType: (
   provider: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<Array<KeyValue<string, string>>>> = (provider, loading?: Ref<boolean>) => {
-  return get(`${prefix_provider}/model_type_list`, { provider }, loading)
+  return get(`${prefix_provider}/model_type_list`, {provider}, loading)
 }
 
 /**
@@ -64,7 +65,7 @@ const listBaseModel: (
   model_type: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<Array<BaseModel>>> = (provider, model_type, loading) => {
-  return get(`${prefix_provider}/model_list`, { provider, model_type }, loading)
+  return get(`${prefix_provider}/model_list`, {provider, model_type}, loading)
 }
 
 const listBaseModelParamsForm: (
@@ -73,7 +74,7 @@ const listBaseModelParamsForm: (
   model_name: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<Array<BaseModel>>> = (provider, model_type, model_name, loading) => {
-  return get(`${prefix_provider}/model_params_form`, { provider, model_type, model_name }, loading)
+  return get(`${prefix_provider}/model_params_form`, {provider, model_type, model_name}, loading)
 }
 export default {
   getProvider,

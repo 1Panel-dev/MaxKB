@@ -1,39 +1,39 @@
-import { Result } from '@/request/Result'
-import { get, post, del, put } from '@/request/index'
-import { type Ref } from 'vue'
-import type { pageRequest } from '@/api/type/common'
-import type { toolData } from '@/api/type/tool'
-const prefix = '/workspace'
+import {Result} from '@/request/Result'
+import {get, post, del, put} from '@/request/index'
+import {type Ref} from 'vue'
+import type {pageRequest} from '@/api/type/common'
+import type {toolData} from '@/api/type/tool'
+
+const prefix = '/workspace/' + localStorage.getItem('workspace_id')
+
 
 /**
  * 获得工具文件夹列表
  * @params 参数 {folder_id: string}
  */
 const getToolByFolder: (
-  wordspace_id: string,
   data?: any,
   loading?: Ref<boolean>,
-) => Promise<Result<Array<any>>> = (wordspace_id, data, loading) => {
-  return get(`${prefix}/${wordspace_id}/tool`, data, loading)
+) => Promise<Result<Array<any>>> = (data, loading) => {
+  return get(`${prefix}/tool`, data, loading)
 }
 
 /**
  * 工具列表
  * @param 参数
-* param  {
-              "folder_id": "string",
-              "name": "string",
-              "tool_type": "string",
-            }
+ * param  {
+ "folder_id": "string",
+ "name": "string",
+ "tool_type": "string",
+ }
  */
 const getToolList: (
-  wordspace_id: string,
   page: pageRequest,
   param?: any,
   loading?: Ref<boolean>,
-) => Promise<Result<any>> = (wordspace_id, page, param, loading) => {
+) => Promise<Result<any>> = (page, param, loading) => {
   return get(
-    `${prefix}/${wordspace_id}/tool/${page.current_page}/${page.page_size}`,
+    `${prefix}/tool/${page.current_page}/${page.page_size}`,
     param,
     loading,
   )
@@ -44,11 +44,10 @@ const getToolList: (
  * @param 参数
  */
 const postTool: (
-  wordspace_id: string,
   data: toolData,
   loading?: Ref<boolean>,
-) => Promise<Result<any>> = (wordspace_id, data, loading) => {
-  return post(`${prefix}/${wordspace_id}/tool`, data, undefined, loading)
+) => Promise<Result<any>> = (data, loading) => {
+  return post(`${prefix}/tool`, data, undefined, loading)
 }
 
 /**
@@ -57,12 +56,11 @@ const postTool: (
 
  */
 const putTool: (
-  wordspace_id: string,
   tool_id: string,
   data: toolData,
   loading?: Ref<boolean>,
-) => Promise<Result<any>> = (wordspace_id, tool_id, data, loading) => {
-  return put(`${prefix}/${wordspace_id}/tool/${tool_id}`, data, undefined, loading)
+) => Promise<Result<any>> = (tool_id, data, loading) => {
+  return put(`${prefix}/tool/${tool_id}`, data, undefined, loading)
 }
 
 /**
@@ -72,19 +70,17 @@ const putTool: (
  * @returns 函数详情
  */
 const getToolById: (
-  wordspace_id: string,
   tool_id: String,
   loading?: Ref<boolean>,
-) => Promise<Result<any>> = (wordspace_id, tool_id, loading) => {
-  return get(`${prefix}/${wordspace_id}/tool/${tool_id}`, undefined, loading)
+) => Promise<Result<any>> = (tool_id, loading) => {
+  return get(`${prefix}/tool/${tool_id}`, undefined, loading)
 }
 
 const postPylint: (
-  wordspace_id: string,
   code: string,
   loading?: Ref<boolean>,
-) => Promise<Result<any>> = (wordspace_id, code, loading) => {
-  return post(`${prefix}/${wordspace_id}/tool/pylint`, { code }, {}, loading)
+) => Promise<Result<any>> = (code, loading) => {
+  return post(`${prefix}/tool/pylint`, {code}, {}, loading)
 }
 
 /**

@@ -96,7 +96,7 @@ const open = (source: string, id: string) => {
 const submitHandle = async () => {
   await FolderFormRef.value.validate((valid: any) => {
     if (valid) {
-      folderApi.postFolder('default', sourceType.value, folderForm.value, loading).then((res) => {
+      folderApi.postFolder( sourceType.value, folderForm.value, loading).then((res) => {
         MsgSuccess(t('common.createSuccess'))
         emit('refresh')
         dialogVisible.value = false
