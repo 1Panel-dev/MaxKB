@@ -59,7 +59,7 @@ import type { ResetPasswordRequest } from '@/api/type/user'
 import { useRouter, useRoute } from 'vue-router'
 import { MsgSuccess } from '@/utils/message'
 import type { FormInstance, FormRules } from 'element-plus'
-import UserApi from '@/api/user'
+import UserApi from '@/api/user/user-manage'
 import { t } from '@/locales'
 const router = useRouter()
 const route = useRoute()

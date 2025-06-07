@@ -6,10 +6,13 @@
     @date：2025/4/14 19:18
     @desc:
 """
+import datetime
+import os
+import random
 import re
 from collections import defaultdict
 from itertools import product
-
+from django.core.mail.backends.smtp import EmailBackend
 from django.db import transaction
 from django.db.models import Q, QuerySet
 from rest_framework import serializers
@@ -20,9 +23,13 @@ from common.database_model_manage.database_model_manage import DatabaseModelMana
 from common.db.search import page_search
 from common.exception.app_exception import AppApiException
 from common.utils.common import valid_license, password_encrypt
+from maxkb.conf import PROJECT_DIR
+from system_manage.models import SystemSetting, SettingType
 from users.models import User
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, to_locale
 from django.core import validators
+from django.core.mail import send_mail
+from django.utils.translation import get_language
 
 PASSWORD_REGEX = re.compile(
     r"^(?![a-zA-Z]+$)(?![A-Z0-9]+$)(?![A-Z_!@#$%^&*`~.()-+=]+$)(?![a-z0-9]+$)(?![a-z_!@#$%^&*`~()-+=]+$)"
@@ -441,3 +448,169 @@ def update_user_role(instance, user):
                 workspace_id=workspace_id,
                 user_id=user.id
             )
+
+
+class RePasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField(
+        required=True,
+        label=_("Email"),
+        validators=[validators.EmailValidator(message=ExceptionCodeConstants.EMAIL_FORMAT_ERROR.value.message,
+                                              code=ExceptionCodeConstants.EMAIL_FORMAT_ERROR.value.code)])
+
+    code = serializers.CharField(required=True, label=_("Verification code"))
+
+    password = serializers.CharField(required=True, label=_("Password"),
+                                     validators=[validators.RegexValidator(regex=re.compile(
+                                         "^(?![a-zA-Z]+$)(?![A-Z0-9]+$)(?![A-Z_!@#$%^&*`~.()-+=]+$)(?![a-z0-9]+$)(?![a-z_!@#$%^&*`~()-+=]+$)"
+                                         "(?![0-9_!@#$%^&*`~()-+=]+$)[a-zA-Z0-9_!@#$%^&*`~.()-+=]{6,20}$")
+                                         , message=_(
+                                             "The confirmation password must be 6-20 characters long and must be a combination of letters, numbers, and special characters."))])
+
+    re_password = serializers.CharField(required=True, label=_("Confirm Password"),
+                                        validators=[validators.RegexValidator(regex=re.compile(
+                                            "^(?![a-zA-Z]+$)(?![A-Z0-9]+$)(?![A-Z_!@#$%^&*`~.()-+=]+$)(?![a-z0-9]+$)(?![a-z_!@#$%^&*`~()-+=]+$)"
+                                            "(?![0-9_!@#$%^&*`~()-+=]+$)[a-zA-Z0-9_!@#$%^&*`~.()-+=]{6,20}$")
+                                            , message=_(
+                                                "The confirmation password must be 6-20 characters long and must be a combination of letters, numbers, and special characters."))]
+                                        )
+
+    class Meta:
+        model = User
+        fields = '__all__'
+
+    def is_valid(self, *, raise_exception=False):
+        super().is_valid(raise_exception=True)
+        email = self.data.get("email")
+        # TODO  删除缓存
+        # cache_code = user_cache.get(email + ':reset_password')
+        if self.data.get('password') != self.data.get('re_password'):
+            raise AppApiException(ExceptionCodeConstants.PASSWORD_NOT_EQ_RE_PASSWORD.value.code,
+                                  ExceptionCodeConstants.PASSWORD_NOT_EQ_RE_PASSWORD.value.message)
+        # if cache_code != self.data.get('code'):
+        #     raise AppApiException(ExceptionCodeConstants.CODE_ERROR.value.code,
+        #                           ExceptionCodeConstants.CODE_ERROR.value.message)
+        return True
+
+    def reset_password(self):
+        """
+        修改密码
+        :return: 是否成功
+        """
+        if self.is_valid():
+            email = self.data.get("email")
+            QuerySet(User).filter(email=email).update(
+                password=password_encrypt(self.data.get('password')))
+            code_cache_key = email + ":reset_password"
+            # 删除验证码缓存
+            # user_cache.delete(code_cache_key)
+            return True
+
+
+class SendEmailSerializer(serializers.Serializer):
+    email = serializers.EmailField(
+        required=True
+        , label=_("Email"),
+        validators=[validators.EmailValidator(message=ExceptionCodeConstants.EMAIL_FORMAT_ERROR.value.message,
+                                              code=ExceptionCodeConstants.EMAIL_FORMAT_ERROR.value.code)])
+
+    type = serializers.CharField(required=True, label=_("Type"), validators=[
+        validators.RegexValidator(regex=re.compile("^register|reset_password$"),
+                                  message=_("The type only supports register|reset_password"), code=500)
+    ])
+
+    class Meta:
+        model = User
+        fields = '__all__'
+
+    def is_valid(self, *, raise_exception=False):
+        super().is_valid(raise_exception=raise_exception)
+        user_exists = QuerySet(User).filter(email=self.data.get('email')).exists()
+        if not user_exists and self.data.get('type') == 'reset_password':
+            raise ExceptionCodeConstants.EMAIL_IS_NOT_EXIST.value.to_app_api_exception()
+        elif user_exists and self.data.get('type') == 'register':
+            raise ExceptionCodeConstants.EMAIL_IS_EXIST.value.to_app_api_exception()
+        code_cache_key = self.data.get('email') + ":" + self.data.get("type")
+        code_cache_key_lock = code_cache_key + "_lock"
+        ttl = None  # user_cache.ttl(code_cache_key_lock)
+        if ttl is not None:
+            raise AppApiException(500, _("Do not send emails again within {seconds} seconds").format(
+                seconds=int(ttl.total_seconds())))
+        return True
+
+    def send(self):
+        """
+        发送邮件
+        :return:   是否发送成功
+        :exception 发送失败异常
+        """
+        email = self.data.get("email")
+        state = self.data.get("type")
+        # 生成随机验证码
+        code = "".join(list(map(lambda i: random.choice(['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'
+                                                         ]), range(6))))
+        # 获取邮件模板
+        language = get_language()
+        file = open(
+            os.path.join(PROJECT_DIR, "apps", "common", 'template', f'email_template_{to_locale(language)}.html'), "r",
+            encoding='utf-8')
+        content = file.read()
+        file.close()
+        code_cache_key = email + ":" + state
+        code_cache_key_lock = code_cache_key + "_lock"
+        # 设置缓存
+        # user_cache.set(code_cache_key_lock, code, timeout=datetime.timedelta(minutes=1))
+        system_setting = QuerySet(SystemSetting).filter(type=SettingType.EMAIL.value).first()
+        if system_setting is None:
+            # user_cache.delete(code_cache_key_lock)
+            raise AppApiException(1004,
+                                  _("The email service has not been set up. Please contact the administrator to set up the email service in [Email Settings]."))
+        try:
+            connection = EmailBackend(system_setting.meta.get("email_host"),
+                                      system_setting.meta.get('email_port'),
+                                      system_setting.meta.get('email_host_user'),
+                                      system_setting.meta.get('email_host_password'),
+                                      system_setting.meta.get('email_use_tls'),
+                                      False,
+                                      system_setting.meta.get('email_use_ssl')
+                                      )
+            # 发送邮件
+            send_mail(_('【Intelligent knowledge base question and answer system-{action}】').format(
+                action=_('User registration') if state == 'register' else _('Change password')),
+                '',
+                html_message=f'{content.replace("${code}", code)}',
+                from_email=system_setting.meta.get('from_email'),
+                recipient_list=[email], fail_silently=False, connection=connection)
+        except Exception as e:
+            # user_cache.delete(code_cache_key_lock)
+            raise AppApiException(500, f"{str(e)}" + _("Email sending failed"))
+        # user_cache.set(code_cache_key, code, timeout=datetime.timedelta(minutes=30))
+        return True
+
+
+class CheckCodeSerializer(serializers.Serializer):
+    """
+     校验验证码
+    """
+    email = serializers.EmailField(
+        required=True,
+        label=_("Email"),
+        validators=[validators.EmailValidator(message=ExceptionCodeConstants.EMAIL_FORMAT_ERROR.value.message,
+                                              code=ExceptionCodeConstants.EMAIL_FORMAT_ERROR.value.code)])
+    code = serializers.CharField(required=True, label=_("Verification code"))
+
+    type = serializers.CharField(required=True,
+                                 label=_("Type"),
+                                 validators=[
+                                     validators.RegexValidator(regex=re.compile("^register|reset_password$"),
+                                                               message=_(
+                                                                   "The type only supports register|reset_password"),
+                                                               code=500)
+                                 ])
+
+    def is_valid(self, *, raise_exception=False):
+        super().is_valid()
+        #TODO 这里的缓存 需要重新设计
+        value = None#user_cache.get(self.data.get("email") + ":" + self.data.get("type"))
+        if value is None or value != self.data.get("code"):
+            raise ExceptionCodeConstants.CODE_ERROR.value.to_app_api_exception()
+        return True

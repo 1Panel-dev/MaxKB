@@ -87,9 +87,10 @@
       </el-dropdown-menu>
     </template>
   </el-dropdown>
+  <APIKeyDialog :user-id="user.userInfo?.id" ref="APIKeyDialogRef" />
   <!-- <ResetPassword ref="resetPasswordRef"></ResetPassword> -->
   <!-- <AboutDialog ref="AboutDialogRef"></AboutDialog>
-  <APIKeyDialog :user-id="user.userInfo?.id" ref="APIKeyDialogRef" /> -->
+  -->
   <!-- <UserPwdDialog ref="UserPwdDialogRef" /> -->
 </template>
 <script setup lang="ts">
@@ -99,14 +100,14 @@ import { useRouter } from 'vue-router'
 // import ResetPassword from './ResetPassword.vue'
 // import AboutDialog from './AboutDialog.vue'
 // import UserPwdDialog from '@/views/user-manage/component/UserPwdDialog.vue'
-// import APIKeyDialog from './APIKeyDialog.vue'
+import APIKeyDialog from './APIKeyDialog.vue'
 import { ComplexPermission } from '@/utils/permission/type'
 import { langList } from '@/locales/index'
 import { useLocale } from '@/locales/useLocale'
+import type ResetPassword from "@/layout/layout-header/avatar/ResetPassword.vue";
 const { user } = useStore()
 const router = useRouter()
 
-const UserPwdDialogRef = ref()
 const AboutDialogRef = ref()
 const APIKeyDialogRef = ref()
 const resetPasswordRef = ref<InstanceType<typeof ResetPassword>>()

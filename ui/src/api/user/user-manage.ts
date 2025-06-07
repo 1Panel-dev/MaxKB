@@ -2,6 +2,7 @@ import { Result } from '@/request/Result'
 import { get, put, post, del } from '@/request/index'
 import type { pageRequest } from '@/api/type/common'
 import type { Ref } from 'vue'
+import type {ResetPasswordRequest} from "@/api/type/user.ts";
 
 const prefix = '/user_manage'
 /**
@@ -64,11 +65,24 @@ const putUserManagePassword: (
   return put(`${prefix}/${user_id}/re_password`, data, undefined, loading)
 }
 
+/**
+ * 重置密码
+ * @param request 重置密码请求参数
+ * @param loading 接口加载器
+ * @returns
+ */
+const resetPassword: (
+  request: ResetPasswordRequest,
+  loading?: Ref<boolean>
+) => Promise<Result<boolean>> = (request, loading) => {
+  return post('/user/re_password', request, undefined, loading)
+}
 
 export default {
   getUserManage,
   putUserManage,
   delUserManage,
   postUserManage,
-  putUserManagePassword
+  putUserManagePassword,
+  resetPassword
 }

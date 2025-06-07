@@ -10,9 +10,9 @@ from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter
 
 from common.mixins.api_mixin import APIMixin
-from common.result import ResultSerializer
+from common.result import ResultSerializer, DefaultResultSerializer
 from users.serializers.user import UserProfileResponse, CreateUserSerializer, UserManageSerializer, \
-    UserInstanceSerializer
+    UserInstanceSerializer, RePasswordSerializer, CheckCodeSerializer, SendEmailSerializer
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -192,3 +192,29 @@ class TestWorkspacePermissionUserApi(APIMixin):
             # 指定必须给
             required=True,
         )]
+
+
+class ResetPasswordAPI(APIMixin):
+    @staticmethod
+    def get_request():
+        return RePasswordSerializer
+
+
+class CheckCodeAPI(APIMixin):
+    @staticmethod
+    def get_request():
+        return CheckCodeSerializer
+
+    @staticmethod
+    def get_response():
+        return DefaultResultSerializer
+
+
+class SendEmailAPI(APIMixin):
+    @staticmethod
+    def get_request():
+        return SendEmailSerializer
+
+    @staticmethod
+    def get_response():
+        return DefaultResultSerializer

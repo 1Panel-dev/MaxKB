@@ -20,10 +20,12 @@ from common.result import result
 from maxkb.const import CONFIG
 from models_provider.api.model import DefaultModelResponse
 from tools.serializers.tool import encryption
+from users.api import SendEmailAPI, CheckCodeAPI, ResetPasswordAPI
 from users.api.user import UserProfileAPI, TestWorkspacePermissionUserApi, DeleteUserApi, EditUserApi, \
     ChangeUserPasswordApi, UserPageApi, UserListApi, UserPasswordResponse, WorkspaceUserAPI
 from users.models import User
-from users.serializers.user import UserProfileSerializer, UserManageSerializer
+from users.serializers.user import UserProfileSerializer, UserManageSerializer, CheckCodeSerializer, \
+    SendEmailSerializer, RePasswordSerializer
 
 default_password = CONFIG.get('default_password', 'MaxKB@123..')
 
@@ -223,3 +225,73 @@ class UserManage(APIView):
                 data={'email_or_username': request.query_params.get('email_or_username', None),
                       'user_id': str(request.user.id)})
             return result.success(d.page(current_page, page_size))
+
+
+class RePasswordView(APIView):
+
+    @extend_schema(methods=['POST'],
+                   summary=_("Change password"),
+                   description=_("Change password"),
+                   operation_id=_("Change password"),  # type: ignore
+                   tags=[_("User Management")],  # type: ignore
+                   request=ResetPasswordAPI.get_request(),
+                   responses=DefaultModelResponse.get_response())
+    @log(menu='User management', operate='Change password',
+         get_operation_object=lambda r, k: {'name': r.data.get('email', None)},
+         get_user=lambda r: {'user_name': None, 'email': r.data.get('email', None)},
+         get_details=get_re_password_details)
+    def post(self, request: Request):
+        serializer_obj = RePasswordSerializer(data=request.data)
+        return result.success(serializer_obj.reset_password())
+
+
+class SendEmail(APIView):
+
+    @extend_schema(methods=['POST'],
+                   summary=_("Send email"),
+                   description=_("Send email"),
+                   operation_id=_("Send email"),  # type: ignore
+                   tags=[_("User Management")],  # type: ignore
+                   request=SendEmailAPI().get_request(),
+                   responses=SendEmailAPI().get_response())
+    @log(menu='User management', operate='Send email',
+         get_operation_object=lambda r, k: {'name': r.data.get('email', None)},
+         get_user=lambda r: {'user_name': None, 'email': r.data.get('email', None)})
+    def post(self, request: Request):
+        serializer_obj = SendEmailSerializer(data=request.data)
+        if serializer_obj.is_valid(raise_exception=True):
+            return result.success(serializer_obj.send())
+
+
+class CheckCode(APIView):
+
+    @extend_schema(methods=['POST'],
+                   summary=_("Check whether the verification code is correct"),
+                   description=_("Check whether the verification code is correct"),
+                   operation_id=_("Check whether the verification code is correct"),  # type: ignore
+                   tags=[_("User Management")],  # type: ignore
+                   request=CheckCodeAPI().get_request(),
+                   responses=CheckCodeAPI().get_response())
+    @log(menu='User management', operate='Check whether the verification code is correct',
+         get_operation_object=lambda r, k: {'name': r.data.get('email', None)},
+         get_user=lambda r: {'user_name': None, 'email': r.data.get('email', None)})
+    def post(self, request: Request):
+        return result.success(CheckCodeSerializer(data=request.data).is_valid(raise_exception=True))
+
+
+class SendEmailToCurrentUserView(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(methods=['POST'],
+                   summary=_("Send email to current user"),
+                   description=_("Send email to current user"),
+                   operation_id=_("Send email to current user"),  # type: ignore
+                   tags=[_("User Management")],  # type: ignore
+                   request=SendEmailAPI().get_request(),
+                   responses=SendEmailAPI().get_response())
+    @log(menu='User management', operate='Send email to current user',
+         get_operation_object=lambda r, k: {'name': r.user.username})
+    def post(self, request: Request):
+        serializer_obj = SendEmailSerializer(data={'email': request.user.email, 'type': "reset_password"})
+        if serializer_obj.is_valid(raise_exception=True):
+            return result.success(serializer_obj.send())
