@@ -24,6 +24,7 @@ from pydub import AudioSegment
 from ..database_model_manage.database_model_manage import DatabaseModelManage
 from ..exception.app_exception import AppApiException
 
+
 def password_encrypt(row_password):
     """
     密码 md5加密
@@ -308,6 +309,7 @@ def restricted_loads(s):
     """Helper function analogous to pickle.loads()."""
     return RestrictedUnpickler(io.BytesIO(s)).load()
 
+
 def flat_map(array: List[List]):
     """
     将二位数组转为一维数组
@@ -319,8 +321,8 @@ def flat_map(array: List[List]):
         result += e
     return result
 
+
 def parse_image(content: str):
-    matches = re.finditer("!\[.*?\]\(\/api\/(image|file)\/.*?\)", content)
+    matches = re.finditer("!\[.*?\]\(\/oss\/(image|file)\/.*?\)", content)
     image_list = [match.group() for match in matches]
     return image_list
-

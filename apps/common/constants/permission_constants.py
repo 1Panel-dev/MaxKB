@@ -45,6 +45,7 @@ class Group(Enum):
     CHAT_USER_AUTH = "CHAT_USER_AUTH"
     OTHER = "OTHER"
     OVERVIEW = "OVERVIEW"
+    APPLICATION_ACCESS = "APPLICATION_ACCESS"
 
 
 class SystemGroup(Enum):
@@ -612,6 +613,16 @@ class PermissionConstants(Enum):
                                              resource_permission_group_list=[ResourcePermissionGroup.VIEW],
                                              label=_('Public settings')
                                              )
+    APPLICATION_ACCESS_READ = Permission(group=Group.APPLICATION_ACCESS, operate=Operate.READ,
+                                         role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                         parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
+                                         resource_permission_group_list=[ResourcePermissionGroup.VIEW],
+                                         )
+    APPLICATION_ACCESS_EDIT = Permission(group=Group.APPLICATION_ACCESS, operate=Operate.EDIT,
+                                         role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                         parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
+                                         resource_permission_group_list=[ResourcePermissionGroup.VIEW],
+                                         )
 
     SYSTEM_API_KEY_EDIT = Permission(group=Group.OTHER, operate=Operate.EDIT,
                                      role_list=[RoleConstants.ADMIN],

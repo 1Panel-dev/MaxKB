@@ -15,6 +15,7 @@ from urllib.parse import urljoin
 
 import uuid_utils.compat as uuid
 from charset_normalizer import detect
+from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 
 from common.handle.base_split_handle import BaseSplitHandle
@@ -36,6 +37,16 @@ class FileBufferHandle:
         if self.buffer is None:
             self.buffer = file.read()
         return self.buffer
+
+
+def save_image(image_list):
+    if image_list is not None and len(image_list) > 0:
+        exist_image_list = [str(i.get('id')) for i in
+                            QuerySet(File).filter(id__in=[i.id for i in image_list]).values('id')]
+        save_image_list = [image for image in image_list if not exist_image_list.__contains__(str(image.id))]
+        save_image_list = list({img.id: img for img in save_image_list}.values())
+        if len(save_image_list) > 0:
+            QuerySet(File).bulk_create(save_image_list)
 
 
 default_split_handle = TextSplitHandle()
@@ -82,20 +93,20 @@ def get_image_list(result_list: list, zip_files: List[str]):
                         '/') else source_image_path)
                     if not zip_files.__contains__(image_path):
                         continue
-                    if image_path.startswith('api/file/') or image_path.startswith('api/image/'):
-                        image_id = image_path.replace('api/file/', '').replace('api/image/', '')
+                    if image_path.startswith('oss/file/') or image_path.startswith('oss/image/'):
+                        image_id = image_path.replace('oss/file/', '').replace('oss/image/', '')
                         if is_valid_uuid(image_id):
                             image_file_list.append({'source_file': image_path,
                                                     'image_id': image_id})
                         else:
                             image_file_list.append({'source_file': image_path,
                                                     'image_id': new_image_id})
-                            content = content.replace(source_image_path, f'/api/image/{new_image_id}')
+                            content = content.replace(source_image_path, f'/oss/image/{new_image_id}')
                             p['content'] = content
                     else:
                         image_file_list.append({'source_file': image_path,
                                                 'image_id': new_image_id})
-                        content = content.replace(source_image_path, f'/api/image/{new_image_id}')
+                        content = content.replace(source_image_path, f'/oss/image/{new_image_id}')
                         p['content'] = content
 
     return image_file_list
