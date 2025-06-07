@@ -20,9 +20,9 @@ from common.result import result
 from maxkb.const import CONFIG
 from models_provider.api.model import DefaultModelResponse
 from tools.serializers.tool import encryption
-from users.api import SendEmailAPI, CheckCodeAPI, ResetPasswordAPI
 from users.api.user import UserProfileAPI, TestWorkspacePermissionUserApi, DeleteUserApi, EditUserApi, \
-    ChangeUserPasswordApi, UserPageApi, UserListApi, UserPasswordResponse, WorkspaceUserAPI
+    ChangeUserPasswordApi, UserPageApi, UserListApi, UserPasswordResponse, WorkspaceUserAPI, ResetPasswordAPI, \
+    SendEmailAPI, CheckCodeAPI
 from users.models import User
 from users.serializers.user import UserProfileSerializer, UserManageSerializer, CheckCodeSerializer, \
     SendEmailSerializer, RePasswordSerializer
@@ -252,8 +252,8 @@ class SendEmail(APIView):
                    description=_("Send email"),
                    operation_id=_("Send email"),  # type: ignore
                    tags=[_("User Management")],  # type: ignore
-                   request=SendEmailAPI().get_request(),
-                   responses=SendEmailAPI().get_response())
+                   request=SendEmailAPI.get_request(),
+                   responses=SendEmailAPI.get_response())
     @log(menu='User management', operate='Send email',
          get_operation_object=lambda r, k: {'name': r.data.get('email', None)},
          get_user=lambda r: {'user_name': None, 'email': r.data.get('email', None)})
@@ -270,8 +270,8 @@ class CheckCode(APIView):
                    description=_("Check whether the verification code is correct"),
                    operation_id=_("Check whether the verification code is correct"),  # type: ignore
                    tags=[_("User Management")],  # type: ignore
-                   request=CheckCodeAPI().get_request(),
-                   responses=CheckCodeAPI().get_response())
+                   request=CheckCodeAPI.get_request(),
+                   responses=CheckCodeAPI.get_response())
     @log(menu='User management', operate='Check whether the verification code is correct',
          get_operation_object=lambda r, k: {'name': r.data.get('email', None)},
          get_user=lambda r: {'user_name': None, 'email': r.data.get('email', None)})
@@ -287,8 +287,8 @@ class SendEmailToCurrentUserView(APIView):
                    description=_("Send email to current user"),
                    operation_id=_("Send email to current user"),  # type: ignore
                    tags=[_("User Management")],  # type: ignore
-                   request=SendEmailAPI().get_request(),
-                   responses=SendEmailAPI().get_response())
+                   request=SendEmailAPI.get_request(),
+                   responses=SendEmailAPI.get_response())
     @log(menu='User management', operate='Send email to current user',
          get_operation_object=lambda r, k: {'name': r.user.username})
     def post(self, request: Request):
