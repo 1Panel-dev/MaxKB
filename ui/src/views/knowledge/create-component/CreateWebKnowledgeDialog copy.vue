@@ -184,21 +184,21 @@ const submitHandle = async () => {
             ...BaseFormRef.value.form,
             type: datasetForm.value.type
           }
-          datasetApi.postDataset(obj, loading).then((res) => {
+          knowledgeApi.postDataset(obj, loading).then((res) => {
             MsgSuccess(t('common.createSuccess'))
             router.push({ path: `/dataset/${res.data.id}/document` })
             emit('refresh')
           })
         } else if (datasetForm.value.type === '1') {
           const obj = { ...BaseFormRef.value.form, ...datasetForm.value }
-          datasetApi.postWebDataset(obj, loading).then((res) => {
+          knowledgeApi.postWebDataset(obj, loading).then((res) => {
             MsgSuccess(t('common.createSuccess'))
             router.push({ path: `/dataset/${res.data.id}/document` })
             emit('refresh')
           })
         } else if (datasetForm.value.type === '2') {
           const obj = { ...BaseFormRef.value.form, ...datasetForm.value }
-          datasetApi.postLarkDataset(obj, loading).then((res) => {
+          knowledgeApi.postLarkDataset(obj, loading).then((res) => {
             MsgSuccess(t('common.createSuccess'))
             router.push({ path: `/dataset/${res.data.id}/document` })
             emit('refresh')

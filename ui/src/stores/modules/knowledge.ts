@@ -58,7 +58,7 @@ const useKnowledgeStore = defineStore('knowledge', {
           })
       })
     },
-    async asyncSyncDataset(
+    async asyncSyncKnowledge(
       id: string,
       sync_type: string,
       loading?: Ref<boolean>,

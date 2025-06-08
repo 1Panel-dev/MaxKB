@@ -89,7 +89,12 @@
                           height="15"
                           class="handle-img mr-8 mt-24 cursor"
                         />
-                        <ParagraphCard :data="item" class="mb-8 w-full" />
+                        <ParagraphCard
+                          :data="item"
+                          class="mb-8 w-full"
+                          @changeState="changeState"
+                          @deleteParagraph="deleteParagraph"
+                        />
                       </div>
                     </template>
                   </VueDraggable>
@@ -132,7 +137,6 @@ import ParagraphDialog from './component/ParagraphDialog.vue'
 import ParagraphCard from './component/ParagraphCard.vue'
 import SelectDocumentDialog from './component/SelectDocumentDialog.vue'
 import GenerateRelatedDialog from '@/components/generate-related-dialog/index.vue'
-import { numberFormat } from '@/utils/common'
 import { VueDraggable } from 'vue-draggable-plus'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import useStore from '@/stores'
@@ -143,7 +147,6 @@ const {
   params: { id, documentId },
 } = route as any
 
-const containerRef = ref<HTMLElement | null>(null)
 const SelectDocumentDialogRef = ref()
 const ParagraphDialogRef = ref()
 const loading = ref(false)
@@ -167,6 +170,16 @@ const paginationConfig = reactive({
   page_size: 30,
   total: 0,
 })
+
+function deleteParagraph(id: string) {
+  const index = paragraphDetail.value.findIndex((v) => v.id === id)
+  paragraphDetail.value.splice(index, 1)
+}
+
+function changeState(id: string) {
+  const index = paragraphDetail.value.findIndex((v) => v.id === id)
+  paragraphDetail.value[index].is_active = !paragraphDetail.value[index].is_active
+}
 
 function refreshMigrateParagraph() {
   paragraphDetail.value = paragraphDetail.value.filter(
@@ -224,32 +237,9 @@ function searchHandle() {
   getParagraphList()
 }
 
-function deleteParagraph(row: any) {
-  MsgConfirm(
-    `${t('views.paragraph.delete.confirmTitle')} ${row.title || '-'} ?`,
-    t('views.paragraph.delete.confirmMessage'),
-    {
-      confirmButtonText: t('common.confirm'),
-      confirmButtonClass: 'danger',
-    },
-  )
-    .then(() => {
-      paragraph.asyncDelParagraph(id, documentId, row.id, loading).then(() => {
-        const index = paragraphDetail.value.findIndex((v) => v.id === row.id)
-        paragraphDetail.value.splice(index, 1)
-        MsgSuccess(t('common.deleteSuccess'))
-      })
-    })
-    .catch(() => {})
-}
-
 function addParagraph() {
   title.value = t('views.paragraph.addParagraph')
   ParagraphDialogRef.value.open()
-}
-function editParagraph(row: any) {
-  title.value = t('views.paragraph.paragraphDetail')
-  ParagraphDialogRef.value.open(row)
 }
 
 function getDetail() {

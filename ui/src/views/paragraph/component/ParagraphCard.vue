@@ -6,7 +6,8 @@
     @mouseleave="cardLeave()"
   >
     <h2 class="mb-16">{{ data.title || '-' }}</h2>
-      <el-card
+    <el-card
+      v-show="show"
       class="paragraph-box-operation mt-8 mr-8"
       shadow="always"
       style="--el-card-padding: 8px 12px; --el-card-border-radius: 8px"
@@ -75,6 +76,7 @@ import GenerateRelatedDialog from '@/components/generate-related-dialog/index.vu
 import ParagraphDialog from '@/views/paragraph/component/ParagraphDialog.vue'
 import SelectDocumentDialog from '@/views/paragraph/component/SelectDocumentDialog.vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
+
 const { paragraph } = useStore()
 
 const route = useRoute()
@@ -85,6 +87,8 @@ const props = defineProps<{
   data: any
 }>()
 
+const emit = defineEmits(['changeState', 'deleteParagraph'])
+const loading = ref(false)
 const changeStateloading = ref(false)
 const show = ref(false)
 // card上面存在dropdown菜单
@@ -105,8 +109,7 @@ function changeState(row: any) {
   paragraph
     .asyncPutParagraph(id, documentId, row.id, obj, changeStateloading)
     .then((res) => {
-      // const index = paragraphDetail.value.findIndex((v) => v.id === row.id)
-      // paragraphDetail.value[index].is_active = !paragraphDetail.value[index].is_active
+      emit('changeState', row.id)
       return true
     })
     .catch(() => {
@@ -138,8 +141,7 @@ function deleteParagraph(row: any) {
   )
     .then(() => {
       paragraph.asyncDelParagraph(id, documentId, row.id, loading).then(() => {
-        // const index = paragraphDetail.value.findIndex((v) => v.id === row.id)
-        // paragraphDetail.value.splice(index, 1)
+        emit('deleteParagraph', row.id)
         MsgSuccess(t('common.deleteSuccess'))
       })
     })
@@ -163,7 +165,6 @@ function refreshMigrateParagraph() {}
   border: 1px solid #ffffff;
   box-shadow: none !important;
   position: relative;
-  z-index: 9999;
   &:hover {
     background: rgba(31, 35, 41, 0.1);
     border: 1px solid #dee0e3;

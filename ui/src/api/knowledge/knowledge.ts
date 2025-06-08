@@ -1,8 +1,8 @@
-import {Result} from '@/request/Result'
-import {get, post, del, put} from '@/request/index'
-import {type Ref} from 'vue'
-import type {pageRequest} from '@/api/type/common'
-import type {knowledgeData} from '@/api/type/knowledge'
+import { Result } from '@/request/Result'
+import { get, post, del, put, exportFile, exportExcel } from '@/request/index'
+import { type Ref } from 'vue'
+import type { pageRequest } from '@/api/type/common'
+import type { knowledgeData } from '@/api/type/knowledge'
 
 const prefix = '/workspace/' + localStorage.getItem('workspace_id')
 
@@ -14,10 +14,10 @@ const prefix = '/workspace/' + localStorage.getItem('workspace_id')
  * user_id: string，
  * desc: string,}
  */
-const getKnowledgeByFolder: (
-  data?: any,
-  loading?: Ref<boolean>,
-) => Promise<Result<Array<any>>> = (data, loading) => {
+const getKnowledgeByFolder: (data?: any, loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (
+  data,
+  loading,
+) => {
   return get(`${prefix}/knowledge`, data, loading)
 }
 
@@ -36,11 +36,7 @@ const getKnowledgeList: (
   param?: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (page, param, loading) => {
-  return get(
-    `${prefix}/knowledge/${page.current_page}/${page.page_size}`,
-    param,
-    loading,
-  )
+  return get(`${prefix}/knowledge/${page.current_page}/${page.page_size}`, param, loading)
 }
 
 /**
@@ -61,12 +57,7 @@ const putSyncWebKnowledge: (
   sync_type: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (knowledge_id, sync_type, loading) => {
-  return put(
-    `${prefix}/knowledge/${knowledge_id}/sync`,
-    undefined,
-    {sync_type},
-    loading,
-  )
+  return put(`${prefix}/knowledge/${knowledge_id}/sync`, undefined, { sync_type }, loading)
 }
 
 /**
@@ -77,22 +68,17 @@ const putReEmbeddingKnowledge: (
   knowledge_id: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (knowledge_id, loading) => {
-  return put(
-    `${prefix}/knowledge/${knowledge_id}/embedding`,
-    undefined,
-    undefined,
-    loading,
-  )
+  return put(`${prefix}/knowledge/${knowledge_id}/embedding`, undefined, undefined, loading)
 }
 
 /**
  * 知识库详情
  * @param 参数 knowledge_id
  */
-const getKnowledgeDetail: (
-  knowledge_id: string,
-  loading?: Ref<boolean>,
-) => Promise<Result<any>> = (knowledge_id, loading) => {
+const getKnowledgeDetail: (knowledge_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  knowledge_id,
+  loading,
+) => {
   return get(`${prefix}/knowledge/${knowledge_id}`, undefined, loading)
 }
 
@@ -106,10 +92,10 @@ const getKnowledgeDetail: (
  "embedding": "string"
  }
  */
-const postKnowledge: (
-  data: knowledgeData,
-  loading?: Ref<boolean>,
-) => Promise<Result<any>> = (data, loading) => {
+const postKnowledge: (data: knowledgeData, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  data,
+  loading,
+) => {
   return post(`${prefix}/knowledge/base`, data, undefined, loading, 1000 * 60 * 5)
 }
 
@@ -125,10 +111,10 @@ const postKnowledge: (
  "selector": "string"
  }
  */
-const postWebKnowledge: (
-  data: any,
-  loading?: Ref<boolean>,
-) => Promise<Result<any>> = (data, loading) => {
+const postWebKnowledge: (data: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  data,
+  loading,
+) => {
   return post(`${prefix}/knowledge/web`, data, undefined, loading)
 }
 /**
@@ -148,6 +134,105 @@ const putKnowledge: (
   return put(`${prefix}/knowledge/${knowledge_id}`, data, undefined, loading)
 }
 
+/**
+ * 命中测试列表
+ * @param knowledge_id
+ * @param loading
+ * @query  { query_text: string, top_number: number, similarity: number }
+ * @returns
+ */
+const getKnowledgeHitTest: (
+  knowledge_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<Array<any>>> = (knowledge_id, data, loading) => {
+  return get(`${prefix}/${knowledge_id}/hit_test`, data, loading)
+}
+
+/**
+ * 导出知识库
+ * @param knowledge_name 知识库名称
+ * @param knowledge_id   知识库id
+ * @returns
+ */
+const exportKnowledge: (
+  knowledge_name: string,
+  knowledge_id: string,
+  loading?: Ref<boolean>,
+) => Promise<any> = (knowledge_name, knowledge_id, loading) => {
+  return exportExcel(knowledge_name + '.xlsx', `dataset/${knowledge_id}/export`, undefined, loading)
+}
+/**
+ *导出Zip知识库
+ * @param knowledge_name 知识库名称
+ * @param knowledge_id   知识库id
+ * @param loading      加载器
+ * @returns
+ */
+const exportZipKnowledge: (
+  knowledge_name: string,
+  knowledge_id: string,
+  loading?: Ref<boolean>,
+) => Promise<any> = (knowledge_name, knowledge_id, loading) => {
+  return exportFile(
+    knowledge_name + '.zip',
+    `dataset/${knowledge_id}/export_zip`,
+    undefined,
+    loading,
+  )
+}
+
+/**
+ * 获取当前用户可使用的模型列表
+ * @param application_id
+ * @param loading
+ * @query  { query_text: string, top_number: number, similarity: number }
+ * @returns
+ */
+const getKnowledgeModel: (
+  knowledge_id: string,
+  loading?: Ref<boolean>,
+) => Promise<Result<Array<any>>> = (knowledge_id, loading) => {
+  return get(`${prefix}/${knowledge_id}/model`, loading)
+}
+/**
+ * 获取飞书文档列表
+ * @param knowledge_id
+ * @param folder_token
+ * @param loading
+ * @returns
+ */
+const getLarkDocumentList: (
+  knowledge_id: string,
+  folder_token: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<Array<any>>> = (knowledge_id, folder_token, data, loading) => {
+  return post(`${prefix}/lark/${knowledge_id}/${folder_token}/doc_list`, data, null, loading)
+}
+
+const importLarkDocument: (
+  knowledge_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<Array<any>>> = (knowledge_id, data, loading) => {
+  return post(`${prefix}/lark/${knowledge_id}/import`, data, null, loading)
+}
+/**
+ * 生成关联问题
+ * @param knowledge_id 知识库id
+ * @param data
+ * @param loading
+ * @returns
+ */
+const generateRelated: (
+  knowledge_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<Array<any>>> = (knowledge_id, data, loading) => {
+  return put(`${prefix}/${knowledge_id}/generate_related`, data, null, loading)
+}
+
 export default {
   getKnowledgeByFolder,
   getKnowledgeList,
@@ -157,4 +242,11 @@ export default {
   postKnowledge,
   postWebKnowledge,
   putKnowledge,
+  getKnowledgeHitTest,
+  exportKnowledge,
+  exportZipKnowledge,
+  getKnowledgeModel,
+  getLarkDocumentList,
+  importLarkDocument,
+  generateRelated,
 }

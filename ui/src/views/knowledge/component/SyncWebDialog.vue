@@ -38,12 +38,12 @@
 import { ref, watch } from 'vue'
 
 import useStore from '@/stores'
-const { dataset } = useStore()
+const { knowledge } = useStore()
 
 const emit = defineEmits(['refresh'])
 const loading = ref<boolean>(false)
 const method = ref('replace')
-const datasetId = ref('')
+const knowledgeId = ref('')
 
 const dialogVisible = ref<boolean>(false)
 
@@ -54,12 +54,12 @@ watch(dialogVisible, (bool) => {
 })
 
 const open = (id: string) => {
-  datasetId.value = id
+  knowledgeId.value = id
   dialogVisible.value = true
 }
 
 const submit = () => {
-  dataset.asyncSyncDataset(datasetId.value, method.value, loading).then((res: any) => {
+  knowledge.asyncSyncKnowledge(knowledgeId.value, method.value, loading).then((res: any) => {
     emit('refresh', res.data)
     dialogVisible.value = false
   })

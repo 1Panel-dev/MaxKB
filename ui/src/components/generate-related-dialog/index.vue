@@ -176,7 +176,7 @@ const submitHandle = async (formEl: FormInstance) => {
           ...form.value,
           state_list: stateMap[state.value]
         }
-        datasetApi.generateRelated(id ? id : datasetId.value, data, loading).then(() => {
+        knowledgeApi.generateRelated(id ? id : datasetId.value, data, loading).then(() => {
           MsgSuccess(t('views.document.generateQuestion.successMessage'))
           dialogVisible.value = false
         })
@@ -187,8 +187,8 @@ const submitHandle = async (formEl: FormInstance) => {
 
 function getModel() {
   loading.value = true
-  datasetApi
-    .getDatasetModel(id ? id : datasetId.value)
+  knowledgeApi
+    .getKnowledgeModel(id ? id : datasetId.value)
     .then((res: any) => {
       modelOptions.value = groupBy(res?.data, 'provider')
       loading.value = false
