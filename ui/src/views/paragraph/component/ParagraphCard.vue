@@ -6,13 +6,7 @@
     @mouseleave="cardLeave()"
   >
     <h2 class="mb-16">{{ data.title || '-' }}</h2>
-    <MdPreview
-      ref="editorRef"
-      editorId="preview-only"
-      :modelValue="data.content"
-      class="maxkb-md"
-    />
-    <el-card
+      <el-card
       class="paragraph-box-operation mt-8 mr-8"
       shadow="always"
       style="--el-card-padding: 8px 12px; --el-card-border-radius: 8px"
@@ -39,7 +33,7 @@
           </el-icon>
         </el-button>
       </span>
-      <el-dropdown trigger="click">
+      <el-dropdown trigger="click" :teleported="false">
         <el-button text>
           <el-icon><MoreFilled /></el-icon>
         </el-button>
@@ -60,6 +54,13 @@
         </template>
       </el-dropdown>
     </el-card>
+    <MdPreview
+      ref="editorRef"
+      editorId="preview-only"
+      :modelValue="data.content"
+      class="maxkb-md"
+    />
+
     <ParagraphDialog ref="ParagraphDialogRef" :title="title" @refresh="refresh" />
     <SelectDocumentDialog ref="SelectDocumentDialogRef" @refresh="refreshMigrateParagraph" />
     <GenerateRelatedDialog ref="GenerateRelatedDialogRef" @refresh="refresh" />
@@ -162,6 +163,7 @@ function refreshMigrateParagraph() {}
   border: 1px solid #ffffff;
   box-shadow: none !important;
   position: relative;
+  z-index: 9999;
   &:hover {
     background: rgba(31, 35, 41, 0.1);
     border: 1px solid #dee0e3;
