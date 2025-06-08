@@ -12,7 +12,11 @@
       :modelValue="data.content"
       class="maxkb-md"
     />
-    <el-card shadow="always" style="--el-card-padding: 8px 12px; --el-card-border-radius: 8px">
+    <el-card
+      class="paragraph-box-operation mt-8 mr-8"
+      shadow="always"
+      style="--el-card-padding: 8px 12px; --el-card-border-radius: 8px"
+    >
       <el-switch
         :loading="changeStateloading"
         v-model="data.is_active"
@@ -21,11 +25,20 @@
       />
 
       <el-divider direction="vertical" />
-      <el-button link>
-        <el-icon :size="16" :title="$t('views.applicationWorkflow.control.zoomOut')"
-          ><ZoomOut
-        /></el-icon>
-      </el-button>
+      <span class="mr-8">
+        <el-button link @click="editParagraph(data)">
+          <el-icon :size="16" :title="$t('views.applicationWorkflow.control.zoomOut')">
+            <EditPen />
+          </el-icon>
+        </el-button>
+      </span>
+      <span class="mr-8">
+        <el-button link>
+          <el-icon :size="16" :title="$t('views.applicationWorkflow.control.zoomOut')">
+            <el-icon><CirclePlus /></el-icon>
+          </el-icon>
+        </el-button>
+      </span>
       <el-dropdown trigger="click">
         <el-button text>
           <el-icon><MoreFilled /></el-icon>
@@ -47,6 +60,9 @@
         </template>
       </el-dropdown>
     </el-card>
+    <ParagraphDialog ref="ParagraphDialogRef" :title="title" @refresh="refresh" />
+    <SelectDocumentDialog ref="SelectDocumentDialogRef" @refresh="refreshMigrateParagraph" />
+    <GenerateRelatedDialog ref="GenerateRelatedDialogRef" @refresh="refresh" />
   </el-card>
 </template>
 <script setup lang="ts">
@@ -55,6 +71,8 @@ import { useRoute } from 'vue-router'
 import { t } from '@/locales'
 import useStore from '@/stores'
 import GenerateRelatedDialog from '@/components/generate-related-dialog/index.vue'
+import ParagraphDialog from '@/views/paragraph/component/ParagraphDialog.vue'
+import SelectDocumentDialog from '@/views/paragraph/component/SelectDocumentDialog.vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 const { paragraph } = useStore()
 
@@ -66,7 +84,6 @@ const props = defineProps<{
   data: any
 }>()
 
-const SelectDocumentDialogRef = ref()
 const changeStateloading = ref(false)
 const show = ref(false)
 // card上面存在dropdown菜单
@@ -103,10 +120,10 @@ function openGenerateDialog(row: any) {
   }
 }
 function openSelectDocumentDialog(row?: any) {
-//   if (row) {
-//     multipleSelection.value = [row.id]
-//   }
-//   SelectDocumentDialogRef.value.open(multipleSelection.value)
+  //   if (row) {
+  //     multipleSelection.value = [row.id]
+  //   }
+  //   SelectDocumentDialogRef.value.open(multipleSelection.value)
 }
 
 function deleteParagraph(row: any) {
@@ -127,14 +144,32 @@ function deleteParagraph(row: any) {
     })
     .catch(() => {})
 }
+const SelectDocumentDialogRef = ref()
+const ParagraphDialogRef = ref()
+const title = ref('')
+function editParagraph(row: any) {
+  title.value = t('views.paragraph.paragraphDetail')
+  ParagraphDialogRef.value.open(row)
+}
+
+function refresh() {}
+
+function refreshMigrateParagraph() {}
 </script>
 <style lang="scss" scoped>
 .paragraph-box {
   background: var(--app-layout-bg-color);
   border: 1px solid #ffffff;
   box-shadow: none !important;
+  position: relative;
   &:hover {
     background: rgba(31, 35, 41, 0.1);
+    border: 1px solid #dee0e3;
+  }
+  .paragraph-box-operation {
+    position: absolute;
+    right: 0;
+    top: 0;
     border: 1px solid #dee0e3;
   }
 }
