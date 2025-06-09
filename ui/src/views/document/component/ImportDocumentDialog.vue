@@ -217,7 +217,7 @@ const submit = async (formEl: FormInstance | undefined) => {
             directly_return_similarity: form.value.directly_return_similarity,
             id_list: documentList.value
           }
-          documentApi.batchEditHitHandling(id, obj, loading).then(() => {
+          documentApi.putBatchEditHitHandling(id, obj, loading).then(() => {
             MsgSuccess(t('common.settingSuccess'))
             emit('refresh')
             dialogVisible.value = false

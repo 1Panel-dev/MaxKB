@@ -1,27 +1,30 @@
 <template>
-  <LayoutContainer :header="$t('views.document.uploadDocument')" class="create-dataset">
-    <template #backButton>
-      <back-button @click="back"></back-button>
-    </template>
-    <div class="create-dataset__main flex" v-loading="loading">
-      <div class="create-dataset__component main-calc-height">
-        <el-scrollbar>
-          <template v-if="active === 0">
-            <div class="upload-document p-24">
-              <!-- 上传文档 -->
-              <UploadComponent ref="UploadComponentRef" />
-            </div>
-          </template>
-          <template v-else-if="active === 1">
-            <SetRules ref="SetRulesRef" />
-          </template>
-          <template v-else-if="active === 2">
-            <ResultSuccess :data="successInfo" />
-          </template>
-        </el-scrollbar>
-      </div>
+  <div class="upload-document p-12-24">
+    <div class="flex align-center mb-16">
+      <back-button to="-1" style="margin-left: -4px"></back-button>
+      <h3 style="display: inline-block">{{ $t('views.document.uploadDocument') }}</h3>
     </div>
-    <div class="create-dataset__footer text-right border-t" v-if="active !== 2">
+    <el-card style="--el-card-padding: 0">
+      <div class="upload-document__main flex" v-loading="loading">
+        <div class="upload-document__component main-calc-height">
+          <el-scrollbar>
+            <template v-if="active === 0">
+              <div class="upload-component p-24">
+                <!-- 上传文档 -->
+                <UploadComponent ref="UploadComponentRef" />
+              </div>
+            </template>
+            <template v-else-if="active === 1">
+              <SetRules ref="SetRulesRef" />
+            </template>
+            <template v-else-if="active === 2">
+              <ResultSuccess :data="successInfo" />
+            </template>
+          </el-scrollbar>
+        </div>
+      </div>
+    </el-card>
+    <div class="upload-document__footer text-right border-t" v-if="active !== 2">
       <el-button @click="router.go(-1)" :disabled="SetRulesRef?.loading || loading">{{
         $t('common.cancel')
       }}</el-button>
@@ -49,15 +52,15 @@
         {{ $t('views.document.buttons.import') }}
       </el-button>
     </div>
-  </LayoutContainer>
+  </div>
 </template>
 <script setup lang="ts">
 import { ref, computed, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import SetRules from './component/SetRules.vue'
-import ResultSuccess from './component/ResultSuccess.vue'
-import UploadComponent from './component/UploadComponent.vue'
-import documentApi from '@/api/document'
+import SetRules from './upload/SetRules.vue'
+import ResultSuccess from './upload/ResultSuccess.vue'
+import UploadComponent from './upload/UploadComponent.vue'
+import documentApi from '@/api/knowledge/document'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
 import useStore from '@/stores'
@@ -68,7 +71,7 @@ const documentsType = computed(() => knowledge.documentsType)
 const router = useRouter()
 const route = useRoute()
 const {
-  query: { id } // id为knowledgeID，有id的是上传文档
+  query: { id }, // id为knowledgeID，有id的是上传文档
 } = route
 
 const SetRulesRef = ref()
@@ -137,7 +140,7 @@ function submit() {
     }
     documents.push({
       name: item.name,
-      paragraphs: item.content
+      paragraphs: item.content,
     })
   })
 
@@ -159,7 +162,7 @@ function back() {
   if (documentsFiles.value?.length > 0) {
     MsgConfirm(t('common.tip'), t('views.document.tip.saveMessage'), {
       confirmButtonText: t('common.confirm'),
-      type: 'warning'
+      type: 'warning',
     })
       .then(() => {
         router.go(-1)
@@ -175,7 +178,7 @@ onUnmounted(() => {
 })
 </script>
 <style lang="scss" scoped>
-.create-dataset {
+.upload-document {
   &__steps {
     min-width: 450px;
     max-width: 800px;
@@ -203,7 +206,7 @@ onUnmounted(() => {
     width: 100%;
     box-sizing: border-box;
   }
-  .upload-document {
+  .upload-component {
     width: 70%;
     margin: 0 auto;
     margin-bottom: 20px;

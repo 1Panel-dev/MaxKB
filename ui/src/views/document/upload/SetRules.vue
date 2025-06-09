@@ -122,7 +122,7 @@
 import { ref, computed, onMounted, reactive, watch } from 'vue'
 import ParagraphPreview from '@/views/knowledge/component/ParagraphPreview.vue'
 import { cutFilename } from '@/utils/utils'
-import documentApi from '@/api/document'
+import documentApi from '@/api/knowledge/document'
 import useStore from '@/stores'
 import type { KeyValue } from '@/api/type/common'
 const { knowledge } = useStore()

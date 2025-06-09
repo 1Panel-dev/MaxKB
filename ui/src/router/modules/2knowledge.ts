@@ -11,6 +11,15 @@ const ModelRouter = {
       meta: { title: '知识库主页', activeMenu: '/knowledge' },
       component: () => import('@/views/knowledge/index.vue'),
     },
+
+    // 上传文档
+    {
+      path: '/knowledge/document/upload',
+      name: 'UploadDocument',
+      meta: { activeMenu: '/knowledge' },
+      component: () => import('@/views/document/UploadDocument.vue'),
+      hidden: true,
+    },
   ],
 }
 

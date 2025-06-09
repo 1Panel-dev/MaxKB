@@ -9,7 +9,7 @@
               <el-button
                 v-if="datasetDetail.type === 0"
                 type="primary"
-                @click="router.push({ path: '/knowledge/upload', query: { id: id } })"
+                @click="router.push({ path: '/knowledge/document/upload', query: { id: id } })"
                 >{{ $t('views.document.uploadDocument') }}
               </el-button>
               <el-button v-if="datasetDetail.type === 1" type="primary" @click="importDoc"
@@ -625,7 +625,7 @@ function cancelTaskHandle(val: any) {
     id_list: arr,
     type: val,
   }
-  documentApi.batchCancelTask(id, obj, loading).then(() => {
+  documentApi.putBatchCancelTask(id, obj, loading).then(() => {
     MsgSuccess(t('views.document.tip.cancelSuccess'))
     multipleTableRef.value?.clearSelection()
   })
@@ -668,7 +668,7 @@ function beforeCommand(attr: string, val: any, task_type?: number) {
 }
 
 const cancelTask = (row: any, task_type: number) => {
-  documentApi.cancelTask(row.dataset_id, row.id, { type: task_type }).then(() => {
+  documentApi.putCancelTask(row.dataset_id, row.id, { type: task_type }).then(() => {
     MsgSuccess(t('views.document.tip.sendMessage'))
   })
 }
@@ -796,7 +796,7 @@ function syncMulDocument() {
       arr.push(v.id)
     }
   })
-  documentApi.delMulSyncDocument(id, arr, loading).then(() => {
+  documentApi.putMulSyncDocument(id, arr, loading).then(() => {
     MsgSuccess(t('views.document.sync.successMessage'))
     getList()
   })

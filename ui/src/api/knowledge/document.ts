@@ -1,21 +1,17 @@
-import {Result} from '@/request/Result'
-import {get, post, del, put, exportExcel, exportFile} from '@/request/index'
-import type {Ref} from 'vue'
-import type {KeyValue} from '@/api/type/common'
-import type {pageRequest} from '@/api/type/common'
+import { Result } from '@/request/Result'
+import { get, post, del, put, exportExcel, exportFile } from '@/request/index'
+import type { Ref } from 'vue'
+import type { KeyValue } from '@/api/type/common'
+import type { pageRequest } from '@/api/type/common'
 
 const prefix = '/workspace/' + localStorage.getItem('workspace_id') + '/knowledge'
 
 /**
  * 文档分页列表
  * @param 参数  knowledge_id,
- * page {
- "current_page": "string",
- "page_size": "string",
- }
  * param {
- "name": "string",
- }
+ "   name": "string",
+  }
  */
 
 const getDocument: (
@@ -29,6 +25,342 @@ const getDocument: (
     param,
     loading,
   )
+}
+
+/**
+ * 文档详情
+ * @param 参数 knowledge_id
+ */
+const getDocumentDetail: (knowledge_id: string, document_id: string) => Promise<Result<any>> = (
+  knowledge_id,
+  document_id,
+) => {
+  return get(`${prefix}/${knowledge_id}/document/${document_id}`)
+}
+
+/**
+ * 修改文档
+ * @param 参数
+ * knowledge_id, document_id,
+ * {
+    "name": "string",
+    "is_active": true,
+    "meta": {}
+ }
+ */
+const putDocument: (
+  knowledge_id: string,
+  document_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (knowledge_id, document_id, data: any, loading) => {
+  return put(`${prefix}/${knowledge_id}/document/${document_id}`, data, undefined, loading)
+}
+
+/**
+ * 删除文档
+ * @param 参数 knowledge_id, document_id,
+ */
+const delDocument: (
+  knowledge_id: string,
+  document_id: string,
+  loading?: Ref<boolean>,
+) => Promise<Result<boolean>> = (knowledge_id, document_id, loading) => {
+  return del(`${prefix}/${knowledge_id}/document/${document_id}`, loading)
+}
+
+/**
+ * 批量取消文档任务
+ * @param 参数 knowledge_id, document_id,
+ *{
+  "id_list": [
+    "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+  ],
+  "type": 0
+}
+ */
+
+const putBatchCancelTask: (
+  knowledge_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<boolean>> = (knowledge_id, data, loading) => {
+  return put(`${prefix}/${knowledge_id}/document/cancel_task/_batch`, data, undefined, loading)
+}
+
+/**
+ * 取消文档任务
+ * @param 参数 knowledge_id, document_id,
+ */
+const putCancelTask: (
+  knowledge_id: string,
+  document_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<boolean>> = (knowledge_id, document_id, data, loading) => {
+  return put(
+    `${prefix}/${knowledge_id}/document/${document_id}/cancel_task`,
+    data,
+    undefined,
+    loading,
+  )
+}
+
+/**
+ * 下载原文档
+ * @param 参数 knowledge_id
+ */
+const getDownloadSourceFile: (knowledge_id: string, document_id: string) => Promise<Result<any>> = (
+  knowledge_id,
+  document_id,
+) => {
+  return get(`${prefix}/${knowledge_id}/document/${document_id}/download_source_file`)
+}
+
+/**
+ * 导出文档
+ * @param document_name 文档名称
+ * @param knowledge_id    数据集id
+ * @param document_id   文档id
+ * @param loading       加载器
+ * @returns
+ */
+const exportDocument: (
+  document_name: string,
+  knowledge_id: string,
+  document_id: string,
+  loading?: Ref<boolean>,
+) => Promise<any> = (document_name, knowledge_id, document_id, loading) => {
+  return exportExcel(
+    document_name + '.xlsx',
+    `${prefix}/${knowledge_id}/document/${document_id}/export`,
+    {},
+    loading,
+  )
+}
+/**
+ * 导出文档
+ * @param document_name 文档名称
+ * @param knowledge_id    数据集id
+ * @param document_id   文档id
+ * @param loading       加载器
+ * @returns
+ */
+const exportDocumentZip: (
+  document_name: string,
+  knowledge_id: string,
+  document_id: string,
+  loading?: Ref<boolean>,
+) => Promise<any> = (document_name, knowledge_id, document_id, loading) => {
+  return exportFile(
+    document_name + '.zip',
+    `${prefix}/${knowledge_id}/document/${document_id}/export_zip`,
+    {},
+    loading,
+  )
+}
+
+/**
+ * 刷新文档向量库
+ * @param 参数
+ * knowledge_id, document_id,
+ * {
+  "state_list": [
+    "string"
+  ]
+}
+ */
+const putDocumentRefresh: (
+  knowledge_id: string,
+  document_id: string,
+  state_list: Array<string>,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (knowledge_id, document_id, state_list, loading) => {
+  return put(
+    `${prefix}/${knowledge_id}/document/${document_id}/refresh`,
+    { state_list },
+    undefined,
+    loading,
+  )
+}
+
+/**
+ * 同步web站点类型
+ * @param 参数
+ * knowledge_id, document_id,
+ */
+const putDocumentSync: (
+  knowledge_id: string,
+  document_id: string,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (knowledge_id, document_id, loading) => {
+  return put(
+    `${prefix}/${knowledge_id}/document/${document_id}/sync`,
+    undefined,
+    undefined,
+    loading,
+  )
+}
+
+/**
+ * 创建批量文档
+ * @param 参数
+{
+  "name": "string",
+  "paragraphs": [
+    {
+      "content": "string",
+      "title": "string",
+      "problem_list": [
+        {
+          "id": "string",
+          "content": "string"
+        }
+      ],
+      "is_active": true
+    }
+  ],
+  "source_file_id": string
+}
+ */
+const postMulDocument: (
+  knowledge_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (knowledge_id, data, loading) => {
+  return post(`${prefix}/${knowledge_id}/document/bach_create`, data, {}, loading, 1000 * 60 * 5)
+}
+
+/**
+ * 批量删除文档
+ * @param 参数 knowledge_id,
+ * {
+  "id_list": [String]
+}
+ */
+const delMulDocument: (
+  knowledge_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<boolean>> = (knowledge_id, data, loading) => {
+  return del(
+    `${prefix}/${knowledge_id}/document/bach_delete`,
+    undefined,
+    { id_list: data },
+    loading,
+  )
+}
+
+/**
+ * 批量关联
+ * @param 参数 knowledge_id,
+{
+  "document_id_list": [
+    "string"
+  ],
+  "model_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "prompt": "string",
+  "state_list": [
+    "string"
+  ]
+}
+ */
+const putBatchGenerateRelated: (
+  knowledge_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<boolean>> = (knowledge_id, data, loading) => {
+  return put(`${prefix}/${knowledge_id}/document/batch_generate_related`, data, undefined, loading)
+}
+
+/**
+ * 批量修改命中方式
+ * @param knowledge_id 知识库id
+ * @param data
+ * {id_list:[],hit_handling_method:'directly_return|optimization',directly_return_similarity}
+ * @param loading
+ * @returns
+ */
+const putBatchEditHitHandling: (
+  knowledge_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<boolean>> = (knowledge_id, data, loading) => {
+  return put(`${prefix}/${knowledge_id}/document/batch_hit_handling`, data, undefined, loading)
+}
+
+/**
+ * 批量刷新文档向量库
+ * @param knowledge_id 知识库id
+ * @param data
+{
+  "id_list": [
+    "string"
+  ],
+  "state_list": [
+    "string"
+  ]
+}
+ * @param loading
+ * @returns
+ */
+const putBatchRefresh: (
+  knowledge_id: string,
+  data: any,
+  stateList: Array<string>,
+  loading?: Ref<boolean>,
+) => Promise<Result<boolean>> = (knowledge_id, data, stateList, loading) => {
+  return put(
+    `${prefix}/${knowledge_id}/document/batch_refresh`,
+    { id_list: data, state_list: stateList },
+    undefined,
+    loading,
+  )
+}
+
+/**
+ * 批量同步文档
+ * @param 参数 knowledge_id,
+ */
+const putMulSyncDocument: (
+  knowledge_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<boolean>> = (knowledge_id, data, loading) => {
+  return put(`${prefix}/${knowledge_id}/document/batch_sync`, { id_list: data }, undefined, loading)
+}
+
+/**
+ * 批量迁移文档
+ * @param 参数 knowledge_id,target_knowledge_id,
+
+ */
+const putMigrateMulDocument: (
+  knowledge_id: string,
+  target_knowledge_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<boolean>> = (knowledge_id, target_knowledge_id, data, loading) => {
+  return put(
+    `${prefix}/${knowledge_id}/document/migrate/${target_knowledge_id}`,
+    data,
+    undefined,
+    loading,
+  )
+}
+
+/**
+ * 导入QA文档
+ * @param 参数
+ * file
+ }
+ */
+const postQADocument: (
+  knowledge_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (knowledge_id, data, loading) => {
+  return post(`${prefix}/${knowledge_id}/document/qa`, data, undefined, loading)
 }
 
 /**
@@ -50,167 +382,41 @@ const listSplitPattern: (
   return get(`${prefix}/document/split_pattern`, {}, loading)
 }
 
-const getAllDocument: (dataset_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
-  dataset_id,
+/**
+ * 导入表格
+ * @param 参数
+ * file
+ */
+const postTableDocument: (
+  knowledge_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (knowledge_id, data, loading) => {
+  return post(`${prefix}/${knowledge_id}/document/table`, data, undefined, loading)
+}
+
+/**
+ * 获得QA模版
+ * @param 参数 fileName,type,
+ */
+const exportQATemplate: (fileName: string, type: string, loading?: Ref<boolean>) => void = (
+  fileName,
+  type,
   loading,
 ) => {
-  return get(`${prefix}/${dataset_id}/document`, undefined, loading)
+  return exportExcel(fileName, `${prefix}/document/template/export`, { type }, loading)
 }
 
 /**
- * 创建批量文档
- * @param 参数
- * {
- "name": "string",
- "paragraphs": [
- {
- "content": "string",
- "title": "string",
- "problem_list": [
- {
- "id": "string",
- "content": "string"
- }
- ]
- }
- ]
- }
+ * 获得table模版
+ * @param 参数 fileName,type,
  */
-const postDocument: (
-  dataset_id: string,
-  data: any,
-  loading?: Ref<boolean>,
-) => Promise<Result<any>> = (dataset_id, data, loading) => {
-  return post(`${prefix}/${dataset_id}/document/_bach`, data, {}, loading, 1000 * 60 * 5)
-}
-
-/**
- * 修改文档
- * @param 参数
- * dataset_id, document_id,
- * {
- "name": "string",
- "is_active": true,
- "meta": {}
- }
- */
-const putDocument: (
-  dataset_id: string,
-  document_id: string,
-  data: any,
-  loading?: Ref<boolean>,
-) => Promise<Result<any>> = (dataset_id, document_id, data: any, loading) => {
-  return put(`${prefix}/${dataset_id}/document/${document_id}`, data, undefined, loading)
-}
-
-/**
- * 删除文档
- * @param 参数 dataset_id, document_id,
- */
-const delDocument: (
-  dataset_id: string,
-  document_id: string,
-  loading?: Ref<boolean>,
-) => Promise<Result<boolean>> = (dataset_id, document_id, loading) => {
-  return del(`${prefix}/${dataset_id}/document/${document_id}`, loading)
-}
-/**
- * 批量删除文档
- * @param 参数 dataset_id,
- */
-const delMulDocument: (
-  dataset_id: string,
-  data: any,
-  loading?: Ref<boolean>,
-) => Promise<Result<boolean>> = (dataset_id, data, loading) => {
-  return del(`${prefix}/${dataset_id}/document/_bach`, undefined, {id_list: data}, loading)
-}
-
-const batchRefresh: (
-  dataset_id: string,
-  data: any,
-  stateList: Array<string>,
-  loading?: Ref<boolean>,
-) => Promise<Result<boolean>> = (dataset_id, data, stateList, loading) => {
-  return put(
-    `${prefix}/${dataset_id}/document/batch_refresh`,
-    {id_list: data, state_list: stateList},
-    undefined,
-    loading,
-  )
-}
-/**
- * 文档详情
- * @param 参数 dataset_id
- */
-const getDocumentDetail: (dataset_id: string, document_id: string) => Promise<Result<any>> = (
-  dataset_id,
-  document_id,
+const exportTableTemplate: (fileName: string, type: string, loading?: Ref<boolean>) => void = (
+  fileName,
+  type,
+  loading,
 ) => {
-  return get(`${prefix}/${dataset_id}/document/${document_id}`)
-}
-
-/**
- * 刷新文档向量库
- * @param 参数
- * dataset_id, document_id,
- */
-const putDocumentRefresh: (
-  dataset_id: string,
-  document_id: string,
-  state_list: Array<string>,
-  loading?: Ref<boolean>,
-) => Promise<Result<any>> = (dataset_id, document_id, state_list, loading) => {
-  return put(
-    `${prefix}/${dataset_id}/document/${document_id}/refresh`,
-    {state_list},
-    undefined,
-    loading,
-  )
-}
-
-/**
- * 同步web站点类型
- * @param 参数
- * dataset_id, document_id,
- */
-const putDocumentSync: (
-  dataset_id: string,
-  document_id: string,
-  loading?: Ref<boolean>,
-) => Promise<Result<any>> = (dataset_id, document_id, loading) => {
-  return put(`${prefix}/${dataset_id}/document/${document_id}/sync`, undefined, undefined, loading)
-}
-const putLarkDocumentSync: (
-  dataset_id: string,
-  document_id: string,
-  loading?: Ref<boolean>,
-) => Promise<Result<any>> = (dataset_id, document_id, loading) => {
-  return put(
-    `${prefix}/lark/${dataset_id}/document/${document_id}/sync`,
-    undefined,
-    undefined,
-    loading,
-  )
-}
-
-/**
- * 批量同步文档
- * @param 参数 dataset_id,
- */
-const delMulSyncDocument: (
-  dataset_id: string,
-  data: any,
-  loading?: Ref<boolean>,
-) => Promise<Result<boolean>> = (dataset_id, data, loading) => {
-  return put(`${prefix}/${dataset_id}/document/_bach`, {id_list: data}, undefined, loading)
-}
-const delMulLarkSyncDocument: (
-  dataset_id: string,
-  data: any,
-  loading?: Ref<boolean>,
-) => Promise<Result<boolean>> = (dataset_id, data, loading) => {
-  return put(`${prefix}/lark/${dataset_id}/_batch`, {id_list: data}, undefined, loading)
+  return exportExcel(fileName, `${prefix}/document/table_template/export`, { type }, loading)
 }
 
 /**
@@ -225,195 +431,69 @@ const delMulLarkSyncDocument: (
  }
  */
 const postWebDocument: (
-  dataset_id: string,
+  knowledge_id: string,
   data: any,
   loading?: Ref<boolean>,
-) => Promise<Result<any>> = (dataset_id, data, loading) => {
-  return post(`${prefix}/${dataset_id}/document/web`, data, undefined, loading)
+) => Promise<Result<any>> = (knowledge_id, data, loading) => {
+  return post(`${prefix}/${knowledge_id}/document/web`, data, undefined, loading)
 }
 
-/**
- * 导入QA文档
- * @param 参数
- * file
- }
- */
-const postQADocument: (
-  dataset_id: string,
-  data: any,
-  loading?: Ref<boolean>,
-) => Promise<Result<any>> = (dataset_id, data, loading) => {
-  return post(`${prefix}/${dataset_id}/document/qa`, data, undefined, loading)
+const getAllDocument: (knowledge_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  knowledge_id,
+  loading,
+) => {
+  return get(`${prefix}/${knowledge_id}/document`, undefined, loading)
 }
 
-/**
- * 导入表格
- * @param 参数
- * file
- */
-const postTableDocument: (
-  dataset_id: string,
-  data: any,
+const putLarkDocumentSync: (
+  knowledge_id: string,
+  document_id: string,
   loading?: Ref<boolean>,
-) => Promise<Result<any>> = (dataset_id, data, loading) => {
-  return post(`${prefix}/${dataset_id}/document/table`, data, undefined, loading)
-}
-
-/**
- * 批量迁移文档
- * @param 参数 dataset_id,target_dataset_id,
- */
-const putMigrateMulDocument: (
-  dataset_id: string,
-  target_dataset_id: string,
-  data: any,
-  loading?: Ref<boolean>,
-) => Promise<Result<boolean>> = (dataset_id, target_dataset_id, data, loading) => {
+) => Promise<Result<any>> = (knowledge_id, document_id, loading) => {
   return put(
-    `${prefix}/${dataset_id}/document/migrate/${target_dataset_id}`,
-    data,
+    `${prefix}/lark/${knowledge_id}/document/${document_id}/sync`,
+    undefined,
     undefined,
     loading,
   )
 }
 
-/**
- * 批量修改命中方式
- * @param dataset_id 知识库id
- * @param data       {id_list:[],hit_handling_method:'directly_return|optimization'}
- * @param loading
- * @returns
- */
-const batchEditHitHandling: (
-  dataset_id: string,
+const delMulLarkSyncDocument: (
+  knowledge_id: string,
   data: any,
   loading?: Ref<boolean>,
-) => Promise<Result<boolean>> = (dataset_id, data, loading) => {
-  return put(`${prefix}/${dataset_id}/document/batch_hit_handling`, data, undefined, loading)
-}
-
-/**
- * 获得QA模版
- * @param 参数 fileName,type,
- */
-const exportQATemplate: (fileName: string, type: string, loading?: Ref<boolean>) => void = (
-  fileName,
-  type,
-  loading,
-) => {
-  return exportExcel(fileName, `${prefix}/document/template/export`, {type}, loading)
-}
-
-/**
- * 获得table模版
- * @param 参数 fileName,type,
- */
-const exportTableTemplate: (fileName: string, type: string, loading?: Ref<boolean>) => void = (
-  fileName,
-  type,
-  loading,
-) => {
-  return exportExcel(fileName, `${prefix}/document/table_template/export`, {type}, loading)
-}
-
-/**
- * 导出文档
- * @param document_name 文档名称
- * @param dataset_id    数据集id
- * @param document_id   文档id
- * @param loading       加载器
- * @returns
- */
-const exportDocument: (
-  document_name: string,
-  dataset_id: string,
-  document_id: string,
-  loading?: Ref<boolean>,
-) => Promise<any> = (document_name, dataset_id, document_id, loading) => {
-  return exportExcel(
-    document_name + '.xlsx',
-    `${prefix}/${dataset_id}/document/${document_id}/export`,
-    {},
-    loading,
-  )
-}
-/**
- * 导出文档
- * @param document_name 文档名称
- * @param dataset_id    数据集id
- * @param document_id   文档id
- * @param loading       加载器
- * @returns
- */
-const exportDocumentZip: (
-  document_name: string,
-  dataset_id: string,
-  document_id: string,
-  loading?: Ref<boolean>,
-) => Promise<any> = (document_name, dataset_id, document_id, loading) => {
-  return exportFile(
-    document_name + '.zip',
-    `${prefix}/${dataset_id}/document/${document_id}/export_zip`,
-    {},
-    loading,
-  )
-}
-const batchGenerateRelated: (
-  dataset_id: string,
-  data: any,
-  loading?: Ref<boolean>,
-) => Promise<Result<boolean>> = (dataset_id, data, loading) => {
-  return put(`${prefix}/${dataset_id}/document/batch_generate_related`, data, undefined, loading)
-}
-
-const cancelTask: (
-  dataset_id: string,
-  document_id: string,
-  data: any,
-  loading?: Ref<boolean>,
-) => Promise<Result<boolean>> = (dataset_id, document_id, data, loading) => {
-  return put(
-    `${prefix}/${dataset_id}/document/${document_id}/cancel_task`,
-    data,
-    undefined,
-    loading,
-  )
-}
-
-const batchCancelTask: (
-  dataset_id: string,
-  data: any,
-  loading?: Ref<boolean>,
-) => Promise<Result<boolean>> = (dataset_id, data, loading) => {
-  return put(`${prefix}/${dataset_id}/document/cancel_task/_batch`, data, undefined, loading)
+) => Promise<Result<boolean>> = (knowledge_id, data, loading) => {
+  return put(`${prefix}/lark/${knowledge_id}/_batch`, { id_list: data }, undefined, loading)
 }
 
 export default {
-  postSplitDocument,
   getDocument,
-  getAllDocument,
-  postDocument,
+  getDocumentDetail,
   putDocument,
   delDocument,
-  delMulDocument,
-  getDocumentDetail,
-  listSplitPattern,
+  putBatchCancelTask,
+  putCancelTask,
+  getDownloadSourceFile,
+  exportDocument,
+  exportDocumentZip,
   putDocumentRefresh,
   putDocumentSync,
-  delMulSyncDocument,
-  postWebDocument,
+  postMulDocument,
+  delMulDocument,
+  putBatchGenerateRelated,
+  putBatchEditHitHandling,
+  putBatchRefresh,
+  putMulSyncDocument,
   putMigrateMulDocument,
-  batchEditHitHandling,
+  postQADocument,
+  postSplitDocument,
+  listSplitPattern,
+  postTableDocument,
   exportQATemplate,
   exportTableTemplate,
-  postQADocument,
-  postTableDocument,
-  exportDocument,
-  batchRefresh,
-  batchGenerateRelated,
-  cancelTask,
-  exportDocumentZip,
-  batchCancelTask,
+  postWebDocument,
+
+  getAllDocument,
   putLarkDocumentSync,
   delMulLarkSyncDocument,
 }
