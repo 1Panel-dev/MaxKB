@@ -1,10 +1,11 @@
+from django.utils.translation import gettext_lazy as _
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter
+from rest_framework import serializers
 
 from common.mixins.api_mixin import APIMixin
 from common.result import DefaultResultSerializer
-from knowledge.serializers.problem import ProblemBatchSerializer, \
-    ProblemBatchDeleteSerializer, BatchAssociation, ProblemEditSerializer
+from knowledge.serializers.problem import BatchAssociation, ProblemEditSerializer
 
 
 class ProblemReadAPI(APIMixin):
@@ -35,7 +36,8 @@ class ProblemReadAPI(APIMixin):
 class ProblemBatchCreateAPI(ProblemReadAPI):
     @staticmethod
     def get_request():
-        return ProblemBatchSerializer
+        return serializers.ListField(required=True, label=_('problem list'),
+                                     child=serializers.UUIDField(required=True, label=_('problem')))
 
 
 class BatchAssociationAPI(ProblemReadAPI):
@@ -47,7 +49,8 @@ class BatchAssociationAPI(ProblemReadAPI):
 class BatchDeleteAPI(ProblemReadAPI):
     @staticmethod
     def get_request():
-        return ProblemBatchDeleteSerializer
+        return serializers.ListField(required=True, label=_('problem list'),
+                                     child=serializers.UUIDField(required=True, label=_('problem')))
 
 
 class ProblemPageAPI(APIMixin):
