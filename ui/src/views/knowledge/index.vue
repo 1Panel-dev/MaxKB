@@ -19,9 +19,9 @@
               style="width: 120px"
               @change="search_type_change"
             >
-              <el-option :label="$t('common.creator')" value="create_user"/>
+              <el-option :label="$t('common.creator')" value="create_user" />
 
-              <el-option :label="$t('common.name')" value="name"/>
+              <el-option :label="$t('common.name')" value="name" />
             </el-select>
             <el-input
               v-if="search_type === 'name'"
@@ -38,14 +38,14 @@
               clearable
               style="width: 220px"
             >
-              <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.username"/>
+              <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.username" />
             </el-select>
           </div>
           <el-dropdown trigger="click">
             <el-button type="primary" class="ml-8">
               {{ $t('common.create') }}
               <el-icon class="el-icon--right">
-                <arrow-down/>
+                <arrow-down />
               </el-icon>
             </el-button>
             <template #dropdown>
@@ -53,15 +53,14 @@
                 <el-dropdown-item @click="openCreateDialog(CreateKnowledgeDialog)">
                   <div class="flex">
                     <el-avatar class="avatar-blue mt-4" shape="square" :size="32">
-                      <img src="@/assets/knowledge/icon_document.svg" style="width: 58%" alt=""/>
+                      <img src="@/assets/knowledge/icon_document.svg" style="width: 58%" alt="" />
                     </el-avatar>
                     <div class="pre-wrap ml-8">
                       <div class="lighter">
                         {{ $t('views.knowledge.knowledgeType.generalKnowledge') }}
                       </div>
-                      <el-text type="info" size="small">{{
-                          $t('views.knowledge.knowledgeType.generalInfo')
-                        }}
+                      <el-text type="info" size="small"
+                        >{{ $t('views.knowledge.knowledgeType.generalInfo') }}
                       </el-text>
                     </div>
                   </div>
@@ -69,15 +68,14 @@
                 <el-dropdown-item @click="openCreateDialog(CreateWebKnowledgeDialog)">
                   <div class="flex">
                     <el-avatar class="avatar-purple mt-4" shape="square" :size="32">
-                      <img src="@/assets/knowledge/icon_web.svg" style="width: 58%" alt=""/>
+                      <img src="@/assets/knowledge/icon_web.svg" style="width: 58%" alt="" />
                     </el-avatar>
                     <div class="pre-wrap ml-8">
                       <div class="lighter">
                         {{ $t('views.knowledge.knowledgeType.webKnowledge') }}
                       </div>
-                      <el-text type="info" size="small">{{
-                          $t('views.knowledge.knowledgeType.webInfo')
-                        }}
+                      <el-text type="info" size="small"
+                        >{{ $t('views.knowledge.knowledgeType.webInfo') }}
                       </el-text>
                     </div>
                   </div>
@@ -90,15 +88,14 @@
                       :size="32"
                       style="background: none"
                     >
-                      <img src="@/assets/knowledge/logo_lark.svg" alt=""/>
+                      <img src="@/assets/knowledge/logo_lark.svg" alt="" />
                     </el-avatar>
                     <div class="pre-wrap ml-8">
                       <div class="lighter">
                         {{ $t('views.knowledge.knowledgeType.larkKnowledge') }}
                       </div>
-                      <el-text type="info" size="small">{{
-                          $t('views.knowledge.knowledgeType.larkInfo')
-                        }}
+                      <el-text type="info" size="small"
+                        >{{ $t('views.knowledge.knowledgeType.larkInfo') }}
                       </el-text>
                     </div>
                   </div>
@@ -111,15 +108,14 @@
                       :size="32"
                       style="background: none"
                     >
-                      <img src="@/assets/knowledge/logo_yuque.svg" alt=""/>
+                      <img src="@/assets/knowledge/logo_yuque.svg" alt="" />
                     </el-avatar>
                     <div class="pre-wrap ml-8">
                       <div class="lighter">
                         {{ $t('views.knowledge.knowledgeType.yuqueKnowledge') }}
                       </div>
-                      <el-text type="info" size="small">{{
-                          $t('views.knowledge.knowledgeType.yuqueInfo')
-                        }}
+                      <el-text type="info" size="small"
+                        >{{ $t('views.knowledge.knowledgeType.yuqueInfo') }}
                       </el-text>
                     </div>
                   </div>
@@ -186,7 +182,7 @@
                   "
                 >
                   <template #icon>
-                    <KnowledgeIcon :type="item.type"/>
+                    <KnowledgeIcon :type="item.type" />
                   </template>
                   <template #subTitle>
                     <el-text class="color-secondary" size="small">
@@ -199,17 +195,16 @@
                       <div>
                         <span class="bold mr-4">{{ item?.document_count || 0 }}</span>
                         <span class="color-secondary">{{
-                            $t('views.knowledge.document_count')
-                          }}</span>
-                        <el-divider direction="vertical"/>
+                          $t('views.knowledge.document_count')
+                        }}</span>
+                        <el-divider direction="vertical" />
                         <span class="bold mr-4">{{ numberFormat(item?.char_length) || 0 }}</span>
-                        <span class="color-secondary">{{ $t('common.character') }}</span
-                        >
-                        <el-divider direction="vertical"/>
+                        <span class="color-secondary">{{ $t('common.character') }}</span>
+                        <el-divider direction="vertical" />
                         <span class="bold mr-4">{{ item?.application_mapping_count || 0 }}</span>
                         <span class="color-secondary">{{
-                            $t('views.knowledge.relatedApp_count')
-                          }}</span>
+                          $t('views.knowledge.relatedApp_count')
+                        }}</span>
                       </div>
                     </div>
                   </template>
@@ -218,7 +213,7 @@
                       <el-dropdown trigger="click">
                         <el-button text @click.stop>
                           <el-icon>
-                            <MoreFilled/>
+                            <MoreFilled />
                           </el-icon>
                         </el-button>
                         <template #dropdown>
@@ -227,9 +222,8 @@
                               icon="Refresh"
                               @click.stop="syncDataset(item)"
                               v-if="item.type === 1"
-                            >{{ $t('views.knowledge.setting.sync') }}
-                            </el-dropdown-item
-                            >
+                              >{{ $t('views.knowledge.setting.sync') }}
+                            </el-dropdown-item>
                             <el-dropdown-item @click.stop="reEmbeddingDataset(item)">
                               <AppIcon iconName="app-vectorization"></AppIcon>
                               {{ $t('views.knowledge.setting.vectorization') }}
@@ -267,39 +261,36 @@
               </el-col>
             </template>
           </el-row>
-          <el-empty :description="$t('common.noData')" v-else/>
+          <el-empty :description="$t('common.noData')" v-else />
         </InfiniteScroll>
       </div>
     </ContentContainer>
 
-    <component :is="currentCreateDialog" ref="CreateKnowledgeDialogRef"/>
-    <CreateFolderDialog ref="CreateFolderDialogRef" @refresh="refreshFolder"/>
+    <component :is="currentCreateDialog" ref="CreateKnowledgeDialogRef" />
+    <CreateFolderDialog ref="CreateFolderDialogRef" @refresh="refreshFolder" />
   </LayoutContainer>
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref, reactive, shallowRef, nextTick} from 'vue'
+import { onMounted, ref, reactive, shallowRef, nextTick } from 'vue'
 import KnowledgeIcon from '@/views/knowledge/component/KnowledgeIcon.vue'
 import CreateKnowledgeDialog from './create-component/CreateKnowledgeDialog.vue'
 import CreateWebKnowledgeDialog from './create-component/CreateWebKnowledgeDialog.vue'
 import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
 import KnowledgeApi from '@/api/knowledge/knowledge'
-import {MsgSuccess, MsgConfirm} from '@/utils/message'
+import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import useStore from '@/stores'
-import {numberFormat} from '@/utils/common'
-import {t} from '@/locales'
-import {useRouter} from 'vue-router'
+import { numberFormat } from '@/utils/common'
+import { t } from '@/locales'
+import { useRouter } from 'vue-router'
 
 const router = useRouter()
-const {folder} = useStore()
+const { folder } = useStore()
 
 const loading = ref(false)
 
 const search_type = ref('name')
-const search_form = ref<{
-  name: string
-  create_user: string
-}>({
+const search_form = ref<any>({
   name: '',
   create_user: '',
 })
@@ -354,12 +345,13 @@ function syncDataset(row: any) {
 }
 
 const search_type_change = () => {
-  search_form.value = {name: '', create_user: ''}
+  search_form.value = { name: '', create_user: '' }
 }
 
 function getList() {
   const params = {
     folder_id: currentFolder.value?.id || 'root',
+    [search_type.value]: search_form.value[search_type.value],
   }
   KnowledgeApi.getKnowledgeList(paginationConfig, params, loading).then((res) => {
     paginationConfig.total = res.data.total
