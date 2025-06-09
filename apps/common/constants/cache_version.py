@@ -27,6 +27,9 @@ class Cache_Version(Enum):
     # 应用对接三方应用的缓存
     APPLICATION_THIRD_PARTY = "APPLICATION:THIRD_PARTY", lambda key: key
 
+    # 对话
+    CHAT = "CHAT", lambda key: key
+
     def get_version(self):
         return self.value[0]
 

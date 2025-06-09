@@ -12,17 +12,17 @@ from typing import Type
 
 from rest_framework import serializers
 
-from dataset.models import Paragraph
+from knowledge.models import Paragraph
 
 
 class ParagraphPipelineModel:
 
-    def __init__(self, _id: str, document_id: str, dataset_id: str, content: str, title: str, status: str,
+    def __init__(self, _id: str, document_id: str, knowledge_id: str, content: str, title: str, status: str,
                  is_active: bool, comprehensive_score: float, similarity: float, dataset_name: str, document_name: str,
                  hit_handling_method: str, directly_return_similarity: float, meta: dict = None):
         self.id = _id
         self.document_id = document_id
-        self.dataset_id = dataset_id
+        self.knowledge_id = knowledge_id
         self.content = content
         self.title = title
         self.status = status,
@@ -39,7 +39,7 @@ class ParagraphPipelineModel:
         return {
             'id': self.id,
             'document_id': self.document_id,
-            'dataset_id': self.dataset_id,
+            'knowledge_id': self.knowledge_id,
             'content': self.content,
             'title': self.title,
             'status': self.status,
@@ -66,7 +66,7 @@ class ParagraphPipelineModel:
             if isinstance(paragraph, Paragraph):
                 self.paragraph = {'id': paragraph.id,
                                   'document_id': paragraph.document_id,
-                                  'dataset_id': paragraph.dataset_id,
+                                  'knowledge_id': paragraph.knowledge_id,
                                   'content': paragraph.content,
                                   'title': paragraph.title,
                                   'status': paragraph.status,
@@ -106,7 +106,7 @@ class ParagraphPipelineModel:
 
         def build(self):
             return ParagraphPipelineModel(str(self.paragraph.get('id')), str(self.paragraph.get('document_id')),
-                                          str(self.paragraph.get('dataset_id')),
+                                          str(self.paragraph.get('knowledge_id')),
                                           self.paragraph.get('content'), self.paragraph.get('title'),
                                           self.paragraph.get('status'),
                                           self.paragraph.get('is_active'),

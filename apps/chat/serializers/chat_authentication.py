@@ -14,43 +14,18 @@ from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from application.models import ApplicationAccessToken, ClientType, Application, ApplicationTypeChoices, WorkFlowVersion
+from application.models import ApplicationAccessToken, ChatUserType, Application, ApplicationTypeChoices, \
+    WorkFlowVersion
 from application.serializers.application import ApplicationSerializerModel
 from common.auth.common import ChatUserToken, ChatAuthentication
-
 from common.constants.authentication_type import AuthenticationType
 from common.constants.cache_version import Cache_Version
 from common.database_model_manage.database_model_manage import DatabaseModelManage
-from common.exception.app_exception import NotFound404, AppApiException, AppUnauthorizedFailed
+from common.exception.app_exception import NotFound404, AppUnauthorizedFailed
 
 
-def auth(application_id, access_token, authentication_value, token_details):
-    client_id = token_details.get('client_id')
-    if client_id is None:
-        client_id = str(uuid.uuid1())
-    _type = AuthenticationType.CHAT_ANONYMOUS_USER
-    if authentication_value is not None:
-        application_setting_model = DatabaseModelManage.get_model('application_setting')
-        if application_setting_model is not None:
-            application_setting = QuerySet(application_setting_model).filter(application_id=application_id).first()
-            if application_setting.authentication:
-                auth_type = application_setting.authentication_value.get('type')
-                auth_value = authentication_value.get(auth_type + '_value')
-                if auth_type == 'password':
-                    if authentication_value.get('type') == 'password':
-                        if auth_value == authentication_value.get(auth_type + '_value'):
-                            return ChatUserToken(application_id, None, access_token, _type, ClientType.ANONYMOUS_USER,
-                                                 client_id, ChatAuthentication(auth_type, True, True))
-                    else:
-                        raise AppApiException(500, '认证方式不匹配')
-    return ChatUserToken(application_id, None, access_token, _type, ClientType.ANONYMOUS_USER,
-                         client_id, ChatAuthentication(None, False, False))
-
-
-class AuthenticationSerializer(serializers.Serializer):
+class AnonymousAuthenticationSerializer(serializers.Serializer):
     access_token = serializers.CharField(required=True, label=_("access_token"))
-    authentication_value = serializers.JSONField(required=False, allow_null=True,
-                                                 label=_("Certification Information"))
 
     def auth(self, request, with_valid=True):
         token = request.META.get('HTTP_AUTHORIZATION')
@@ -65,14 +40,40 @@ class AuthenticationSerializer(serializers.Serializer):
             self.is_valid(raise_exception=True)
         access_token = self.data.get("access_token")
         application_access_token = QuerySet(ApplicationAccessToken).filter(access_token=access_token).first()
-        authentication_value = self.data.get('authentication_value', None)
         if application_access_token is not None and application_access_token.is_active:
-            chat_user_token = auth(application_access_token.application_id, access_token, authentication_value,
-                                   token_details)
-
-            return chat_user_token.to_token()
+            chat_user_id = token_details.get('chat_user_id') or str(uuid.uuid1())
+            _type = AuthenticationType.CHAT_ANONYMOUS_USER
+            return ChatUserToken(application_access_token.application_id, None, access_token, _type,
+                                 ChatUserType.ANONYMOUS_USER,
+                                 chat_user_id, ChatAuthentication(None, False, False)).to_token()
         else:
             raise NotFound404(404, _("Invalid access_token"))
+
+
+class AuthProfileSerializer(serializers.Serializer):
+    access_token = serializers.CharField(required=True, label=_("access_token"))
+
+    def profile(self):
+        self.is_valid(raise_exception=True)
+        access_token = self.data.get("access_token")
+        application_access_token = QuerySet(ApplicationAccessToken).filter(access_token=access_token).first()
+        application_id = application_access_token.application_id
+        profile = {
+            'authentication': False
+        }
+        application_setting_model = DatabaseModelManage.get_model('application_setting')
+        if application_setting_model:
+            application_setting = QuerySet(application_setting_model).filter(application_id=application_id).first()
+            profile = {
+                'icon': application_setting.application.icon,
+                'application_name': application_setting.application.name,
+                'bg_icon': application_setting.chat_background,
+                'authentication': application_setting.authentication,
+                'authentication_type': application_setting.authentication_value.get(
+                    'type', 'password'),
+                'login_value': application_setting.authentication_value.get('login_value', [])
+            }
+        return profile
 
 
 class ApplicationProfileSerializer(serializers.Serializer):
@@ -119,11 +120,6 @@ class ApplicationProfileSerializer(serializers.Serializer):
                                             'avatar': application_setting.avatar,
                                             'show_avatar': application_setting.show_avatar,
                                             'float_icon': application_setting.float_icon,
-                                            'authentication': application_setting.authentication,
-                                            'authentication_type': application_setting.authentication_value.get(
-                                                'type', 'password'),
-                                            'login_value': application_setting.authentication_value.get(
-                                                'login_value', []),
                                             'disclaimer': application_setting.disclaimer,
                                             'disclaimer_value': application_setting.disclaimer_value,
                                             'custom_theme': application_setting.custom_theme,

@@ -17,7 +17,7 @@ from common.encoder.encoder import SystemEncoder
 from common.mixins.app_model_mixin import AppModelMixin
 
 
-class ClientType(models.TextChoices):
+class ChatUserType(models.TextChoices):
     ANONYMOUS_USER = "ANONYMOUS_USER", '匿名用户'
     CHAT_USER = "CHAT_USER", "对话用户"
     SYSTEM_API_KEY = "SYSTEM_API_KEY", "系统API_KEY"
@@ -28,9 +28,9 @@ class Chat(AppModelMixin):
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7(), editable=False, verbose_name="主键id")
     application = models.ForeignKey(Application, on_delete=models.CASCADE)
     abstract = models.CharField(max_length=1024, verbose_name="摘要")
-    client_id = models.UUIDField(verbose_name="客户端id", default=None, null=True)
-    client_type = models.CharField(max_length=64, verbose_name="客户端类型", choices=ClientType.choices,
-                                   default=ClientType.ANONYMOUS_USER)
+    chat_user_id = models.UUIDField(verbose_name="客户端id", default=None, null=True)
+    chat_user_type = models.CharField(max_length=64, verbose_name="客户端类型", choices=ChatUserType.choices,
+                                      default=ChatUserType.ANONYMOUS_USER)
     is_deleted = models.BooleanField(verbose_name="逻辑删除", default=False)
 
     class Meta:
@@ -86,17 +86,17 @@ class ChatRecord(AppModelMixin):
         db_table = "application_chat_record"
 
 
-class ApplicationChatClientStats(AppModelMixin):
+class ApplicationChatUserStats(AppModelMixin):
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
-    client_id = models.UUIDField(max_length=128, default=uuid.uuid7, verbose_name="公共访问链接客户端id")
-    client_type = models.CharField(max_length=64, verbose_name="客户端类型", choices=ClientType.choices,
-                                   default=ClientType.ANONYMOUS_USER)
+    chat_user_id = models.UUIDField(max_length=128, default=uuid.uuid7, verbose_name="对话用户id")
+    chat_user_type = models.CharField(max_length=64, verbose_name="对话用户类型", choices=ChatUserType.choices,
+                                      default=ChatUserType.ANONYMOUS_USER)
     application = models.ForeignKey(Application, on_delete=models.CASCADE, verbose_name="应用id")
     access_num = models.IntegerField(default=0, verbose_name="访问总次数次数")
     intraday_access_num = models.IntegerField(default=0, verbose_name="当日访问次数")
 
     class Meta:
-        db_table = "application_chat_client_stats"
+        db_table = "application_chat_user_stats"
         indexes = [
-            models.Index(fields=['application_id', 'client_id']),
+            models.Index(fields=['application_id', 'chat_user_id']),
         ]

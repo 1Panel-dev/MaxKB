@@ -35,42 +35,33 @@ def get_model_by_id(_id, user_id):
     return model
 
 
-def get_embedding_id(dataset_id_list):
-<<<<<<< Updated upstream:apps/chat/chat_pipeline/step/search_dataset_step/impl/base_search_dataset_step.py
-    dataset_list = QuerySet(DataSet).filter(id__in=dataset_id_list)
-    if len(set([dataset.embedding_model_id for dataset in dataset_list])) > 1:
-        raise Exception(_("The vector model of the associated knowledge base is inconsistent and the segmentation cannot be recalled."))
-    if len(dataset_list) == 0:
-        raise Exception(_("The knowledge base setting is wrong, please reset the knowledge base"))
-    return dataset_list[0].embedding_model_id
-=======
-    knowledge_list = QuerySet(Knowledge).filter(id__in=dataset_id_list)
+def get_embedding_id(knowledge_id_list):
+    knowledge_list = QuerySet(Knowledge).filter(id__in=knowledge_id_list)
     if len(set([knowledge.embedding_mode_id for knowledge in knowledge_list])) > 1:
         raise Exception(
             _("The vector model of the associated knowledge base is inconsistent and the segmentation cannot be recalled."))
     if len(knowledge_list) == 0:
         raise Exception(_("The knowledge base setting is wrong, please reset the knowledge base"))
     return knowledge_list[0].embedding_mode_id
->>>>>>> Stashed changes:apps/application/chat_pipeline/step/search_dataset_step/impl/base_search_dataset_step.py
 
 
 class BaseSearchDatasetStep(ISearchDatasetStep):
 
-    def execute(self, problem_text: str, dataset_id_list: list[str], exclude_document_id_list: list[str],
+    def execute(self, problem_text: str, knowledge_id_list: list[str], exclude_document_id_list: list[str],
                 exclude_paragraph_id_list: list[str], top_n: int, similarity: float, padding_problem_text: str = None,
                 search_mode: str = None,
                 user_id=None,
                 **kwargs) -> List[ParagraphPipelineModel]:
-        if len(dataset_id_list) == 0:
+        if len(knowledge_id_list) == 0:
             return []
         exec_problem_text = padding_problem_text if padding_problem_text is not None else problem_text
-        model_id = get_embedding_id(dataset_id_list)
+        model_id = get_embedding_id(knowledge_id_list)
         model = get_model_by_id(model_id, user_id)
         self.context['model_name'] = model.name
         embedding_model = ModelManage.get_model(model_id, lambda _id: get_model(model))
         embedding_value = embedding_model.embed_query(exec_problem_text)
         vector = VectorStore.get_embedding_vector()
-        embedding_list = vector.query(exec_problem_text, embedding_value, dataset_id_list, exclude_document_id_list,
+        embedding_list = vector.query(exec_problem_text, embedding_value, knowledge_id_list, exclude_document_id_list,
                                       exclude_paragraph_id_list, True, top_n, similarity, SearchMode(search_mode))
         if embedding_list is None:
             return []

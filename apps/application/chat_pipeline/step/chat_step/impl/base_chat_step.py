@@ -25,15 +25,16 @@ from application.chat_pipeline.I_base_chat_pipeline import ParagraphPipelineMode
 from application.chat_pipeline.pipeline_manage import PipelineManage
 from application.chat_pipeline.step.chat_step.i_chat_step import IChatStep, PostResponseHandler
 from application.flow.tools import Reasoning
-from application.models.application_api_key import ApplicationPublicAccessClient
-from common.constants.authentication_type import AuthenticationType
+from application.models import ApplicationChatUserStats, ChatUserType
 from models_provider.tools import get_model_instance_by_model_user_id
 
 
-def add_access_num(client_id=None, client_type=None, application_id=None):
-    if client_type == AuthenticationType.APPLICATION_ACCESS_TOKEN.value and application_id is not None:
-        application_public_access_client = (QuerySet(ApplicationPublicAccessClient).filter(client_id=client_id,
-                                                                                           application_id=application_id)
+def add_access_num(chat_user_id=None, chat_user_type=None, application_id=None):
+    if [ChatUserType.ANONYMOUS_USER.value, ChatUserType.CHAT_USER.value].__contains__(
+            chat_user_type) and application_id is not None:
+        application_public_access_client = (QuerySet(ApplicationChatUserStats).filter(chat_user_id=chat_user_id,
+                                                                                      chat_user_type=chat_user_type,
+                                                                                      application_id=application_id)
                                             .first())
         if application_public_access_client is not None:
             application_public_access_client.access_num = application_public_access_client.access_num + 1
@@ -124,11 +125,9 @@ def event_content(response,
             request_token = 0
             response_token = 0
         write_context(step, manage, request_token, response_token, all_text)
-        asker = manage.context.get('form_data', {}).get('asker', None)
         post_response_handler.handler(chat_id, chat_record_id, paragraph_list, problem_text,
-                                      all_text, manage, step, padding_problem_text, client_id,
-                                      reasoning_content=reasoning_content if reasoning_content_enable else ''
-                                      , asker=asker)
+                                      all_text, manage, step, padding_problem_text,
+                                      reasoning_content=reasoning_content if reasoning_content_enable else '')
         yield manage.get_base_to_response().to_stream_chunk_response(chat_id, str(chat_record_id), 'ai-chat-node',
                                                                      [], '', True,
                                                                      request_token, response_token,
@@ -139,10 +138,8 @@ def event_content(response,
         logging.getLogger("max_kb_error").error(f'{str(e)}:{traceback.format_exc()}')
         all_text = 'Exception:' + str(e)
         write_context(step, manage, 0, 0, all_text)
-        asker = manage.context.get('form_data', {}).get('asker', None)
         post_response_handler.handler(chat_id, chat_record_id, paragraph_list, problem_text,
-                                      all_text, manage, step, padding_problem_text, client_id, reasoning_content='',
-                                      asker=asker)
+                                      all_text, manage, step, padding_problem_text, reasoning_content='')
         add_access_num(client_id, client_type, manage.context.get('application_id'))
         yield manage.get_base_to_response().to_stream_chunk_response(chat_id, str(chat_record_id), 'ai-chat-node',
                                                                      [], all_text,
@@ -165,7 +162,7 @@ class BaseChatStep(IChatStep):
                 manage: PipelineManage = None,
                 padding_problem_text: str = None,
                 stream: bool = True,
-                client_id=None, client_type=None,
+                chat_user_id=None, chat_user_type=None,
                 no_references_setting=None,
                 model_params_setting=None,
                 model_setting=None,
@@ -175,12 +172,13 @@ class BaseChatStep(IChatStep):
         if stream:
             return self.execute_stream(message_list, chat_id, problem_text, post_response_handler, chat_model,
                                        paragraph_list,
-                                       manage, padding_problem_text, client_id, client_type, no_references_setting,
+                                       manage, padding_problem_text, chat_user_id, chat_user_type,
+                                       no_references_setting,
                                        model_setting)
         else:
             return self.execute_block(message_list, chat_id, problem_text, post_response_handler, chat_model,
                                       paragraph_list,
-                                      manage, padding_problem_text, client_id, client_type, no_references_setting,
+                                      manage, padding_problem_text, chat_user_id, chat_user_type, no_references_setting,
                                       model_setting)
 
     def get_details(self, manage, **kwargs):
@@ -235,7 +233,7 @@ class BaseChatStep(IChatStep):
                        paragraph_list=None,
                        manage: PipelineManage = None,
                        padding_problem_text: str = None,
-                       client_id=None, client_type=None,
+                       chat_user_id=None, chat_user_type=None,
                        no_references_setting=None,
                        model_setting=None):
         chat_result, is_ai_chat = self.get_stream_result(message_list, chat_model, paragraph_list,
@@ -244,7 +242,8 @@ class BaseChatStep(IChatStep):
         r = StreamingHttpResponse(
             streaming_content=event_content(chat_result, chat_id, chat_record_id, paragraph_list,
                                             post_response_handler, manage, self, chat_model, message_list, problem_text,
-                                            padding_problem_text, client_id, client_type, is_ai_chat, model_setting),
+                                            padding_problem_text, chat_user_id, chat_user_type, is_ai_chat,
+                                            model_setting),
             content_type='text/event-stream;charset=utf-8')
 
         r['Cache-Control'] = 'no-cache'

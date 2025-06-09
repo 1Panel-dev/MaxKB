@@ -32,14 +32,14 @@ class ChatAuthentication:
 
 
 class ChatUserToken:
-    def __init__(self, application_id, user_id, access_token, _type, client_type, client_id,
+    def __init__(self, application_id, user_id, access_token, _type, chat_user_type, chat_user_id,
                  authentication: ChatAuthentication):
         self.application_id = application_id
         self.user_id = user_id,
         self.access_token = access_token
         self.type = _type
-        self.client_type = client_type
-        self.client_id = client_id
+        self.chat_user_type = chat_user_type
+        self.chat_user_id = chat_user_id
         self.authentication = authentication
 
     def to_dict(self):
@@ -48,8 +48,8 @@ class ChatUserToken:
             'user_id': str(self.user_id),
             'access_token': self.access_token,
             'type': str(self.type.value),
-            'client_type': str(self.client_type),
-            'client_id': str(self.client_id),
+            'chat_user_type': str(self.chat_user_type),
+            'chat_user_id': str(self.chat_user_id),
             'authentication': self.authentication.to_string()
         }
 
@@ -59,6 +59,6 @@ class ChatUserToken:
     @staticmethod
     def new_instance(token_dict):
         return ChatUserToken(token_dict.get('application_id'), token_dict.get('user_id'),
-                             token_dict.get('access_token'), token_dict.get('type'), token_dict.get('client_type'),
-                             token_dict.get('client_id'),
+                             token_dict.get('access_token'), token_dict.get('type'), token_dict.get('chat_user_type'),
+                             token_dict.get('chat_user_id'),
                              ChatAuthentication.new_instance(token_dict.get('authentication')))
