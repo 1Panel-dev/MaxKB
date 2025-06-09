@@ -34,7 +34,6 @@ class ApplicationKey(APIView):
         parameters=ApplicationKeyCreateAPI.get_parameters(),
         tags=[_('Application Api Key')]  # type: ignore
     )
-
     @log(menu='Application', operate="Add ApiKey",
          get_operation_object=lambda r, k: get_application_operation_object(k.get('application_api_key_id')))
     @has_permissions(PermissionConstants.APPLICATION_OVERVIEW_API_KEY.get_workspace_application_permission())
@@ -52,7 +51,7 @@ class ApplicationKey(APIView):
         tags=[_('Application Api Key')]  # type: ignore
     )
     @has_permissions(PermissionConstants.APPLICATION_OVERVIEW_API_KEY.get_workspace_application_permission())
-    def get(self, request: Request, workspace_id: str, application_id: str ):
+    def get(self, request: Request, workspace_id: str, application_id: str):
         return result, success(ApplicationKeySerializer(
             data={'application_id': application_id, 'user_id': request.user.id,
                   'workspace_id': workspace_id}).list())
