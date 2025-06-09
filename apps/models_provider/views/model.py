@@ -210,20 +210,3 @@ class ModelSetting(APIView):
         def put(self, request: Request, workspace_id: str, model_id: str):
             return result.success(
                 ModelSerializer.Operate(data={'id': model_id}).pause_download())
-
-    class Share(APIView):
-        authentication_classes = [TokenAuth]
-
-        @extend_schema(methods=['Get'],
-                       summary=_('Get Share model'),
-                       description=_('Get Share model'),
-                       operation_id=_('Get Share model'),  # type: ignore
-                       parameters=ModelListResponse.get_parameters(),
-                       responses=ModelListResponse.get_response(),
-                       tags=[_('Model')])  # type: ignore
-        @has_permissions(PermissionConstants.MODEL_READ.get_workspace_permission())
-        def get(self, request: Request, workspace_id: str):
-            return result.success(
-                ModelSerializer.Query(
-                    data={**query_params_to_single_dict(request.query_params)}).list(workspace_id='None',
-                                                                                     with_valid=True))

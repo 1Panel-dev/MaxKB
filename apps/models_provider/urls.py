@@ -12,7 +12,6 @@ urlpatterns = [
     path('provider/model_params_form', views.Provide.ModelParamsForm.as_view()),
     path('provider/model_form', views.Provide.ModelForm.as_view()),
     path('workspace/<str:workspace_id>/model', views.ModelSetting.as_view()),
-    path('workspace/<str:workspace_id>/share_model', views.ModelSetting.Share.as_view()),
     path('workspace/<str:workspace_id>/model/<str:model_id>/model_params_form',
          views.ModelSetting.ModelParamsForm.as_view()),
     path('workspace/<str:workspace_id>/model/<str:model_id>', views.ModelSetting.Operate.as_view()),
