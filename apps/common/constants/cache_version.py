@@ -24,6 +24,8 @@ class Cache_Version(Enum):
     CAPTCHA = "CAPTCHA", lambda captcha: captcha
     # 系统
     SYSTEM = "SYSTEM", lambda key: key
+    # 应用对接三方应用的缓存
+    APPLICATION_THIRD_PARTY = "APPLICATION:THIRD_PARTY", lambda key: key
 
     def get_version(self):
         return self.value[0]
