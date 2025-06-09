@@ -14,13 +14,11 @@ from common.utils.rsa_util import encrypt, decrypt
 
 
 class ChatAuthentication:
-    def __init__(self, auth_type: str | None, is_auth: bool, auth_passed: bool):
-        self.is_auth = is_auth
-        self.auth_passed = auth_passed
+    def __init__(self, auth_type: str | None):
         self.auth_type = auth_type
 
     def to_dict(self):
-        return {'is_auth': self.is_auth, 'auth_passed': self.auth_passed, 'auth_type': self.auth_type}
+        return {'auth_type': self.auth_type}
 
     def to_string(self):
         return encrypt(json.dumps(self.to_dict()))
@@ -28,7 +26,7 @@ class ChatAuthentication:
     @staticmethod
     def new_instance(authentication: str):
         auth = json.loads(decrypt(authentication))
-        return ChatAuthentication(auth.get('auth_type'), auth.get('is_auth'), auth.get('auth_passed'))
+        return ChatAuthentication(auth.get('auth_type'))
 
 
 class ChatUserToken:
