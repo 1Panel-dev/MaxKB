@@ -216,7 +216,7 @@
                           >
                           <el-dropdown-item
                             icon="Setting"
-                            @click.stop="router.push({ path: `/dataset/${item.id}/setting` })"
+                            @click.stop="router.push({ path: `/knowledge/${item.id}/setting` })"
                           >
                             {{ $t('common.setting') }}</el-dropdown-item
                           >

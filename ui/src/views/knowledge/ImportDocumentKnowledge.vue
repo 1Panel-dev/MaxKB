@@ -140,14 +140,14 @@ import { MsgConfirm, MsgSuccess, MsgWarning } from '@/utils/message'
 import { getImgUrl } from '@/utils/utils'
 import { t } from '@/locales'
 import type Node from 'element-plus/es/components/tree/src/model/node'
-import dataset from '@/api/dataset'
+import knowledgeApi from '@/api/knowledge/knowledge'
 
 const router = useRouter()
 const route = useRoute()
 const {
-  query: { id, folder_token } // id为datasetID，有id的是上传文档 folder_token为飞书文件夹token
+  query: { id, folder_token } // id为knowledgeID，有id的是上传文档 folder_token为飞书文件夹token
 } = route
-const datasetId = id as string
+const knowledgeId = id as string
 const folderToken = folder_token as string
 
 const loading = ref(false)
@@ -183,8 +183,8 @@ const props = {
 
 const loadNode = (node: Node, resolve: (nodeData: Tree[]) => void) => {
   const token = node.level === 0 ? folderToken : node.data.token // 根节点使用 folder_token，其他节点使用 node.data.token
-  dataset
-    .getLarkDocumentList(datasetId, token, {}, loading)
+  knowledgeApi
+    .getLarkDocumentList(knowledgeId, token, {}, loading)
     .then((res: any) => {
       const nodes = res.data.files as Tree[]
       resolve(nodes)
@@ -234,8 +234,8 @@ function submit() {
     loading.value = false
     return
   }
-  dataset
-    .importLarkDocument(datasetId, newList, loading)
+  knowledge
+    .importLarkDocument(knowledgeId, newList, loading)
     .then((res) => {
       MsgSuccess(t('views.document.tip.importMessage'))
       disabled.value = false

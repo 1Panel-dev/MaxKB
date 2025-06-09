@@ -141,7 +141,7 @@ import { ref, computed, onMounted } from 'vue'
 import { relatedObject } from '@/utils/utils'
 import { SearchMode } from '@/enums/application'
 import useStore from '@/stores'
-const { dataset, application, user } = useStore()
+const { knowledge, application, user } = useStore()
 const {
   params: { id }
 } = app.config.globalProperties.$route as any
@@ -208,7 +208,7 @@ function getDataset() {
       datasetList.value = res.data
     })
   } else {
-    dataset.asyncGetAllDataset(datasetLoading).then((res: any) => {
+    knowledge.asyncGetAllKnowledge(datasetLoading).then((res: any) => {
       datasetList.value = res.data?.filter((v: any) => v.user_id === user.userInfo?.id)
     })
   }

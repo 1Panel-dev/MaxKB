@@ -43,9 +43,9 @@ const getKnowledgeList: (
  * 获取全部知识库
  * @param 参数
  */
-// const getAllDataset: (loading?: Ref<boolean>) => Promise<Result<any[]>> = (loading) => {
-//   return get(`${prefix}`, undefined, loading)
-// }
+const getAllKnowledge: (loading?: Ref<boolean>) => Promise<Result<any[]>> = (loading) => {
+  return get(`${prefix}`, undefined, loading)
+}
 
 /**
  * 同步知识库
@@ -260,5 +260,6 @@ export default {
   getLarkDocumentList,
   importLarkDocument,
   generateRelated,
-  delKnowledge
+  delKnowledge,
+  getAllKnowledge
 }

@@ -76,27 +76,36 @@
                   <VueDraggable
                     ref="el"
                     v-bind:modelValue="paragraphDetail"
+                    :disabled="isBatch === true"
                     handle=".handle"
                     :animation="150"
                     ghostClass="ghost"
                     @end="onEnd"
                   >
-                    <template v-for="(item, index) in paragraphDetail" :key="item.id">
-                      <div class="handle paragraph-card flex" :id="item.id">
-                        <img
-                          src="@/assets/sort.svg"
-                          alt=""
-                          height="15"
-                          class="handle-img mr-8 mt-24 cursor"
-                        />
-                        <ParagraphCard
-                          :data="item"
-                          class="mb-8 w-full"
-                          @changeState="changeState"
-                          @deleteParagraph="deleteParagraph"
-                        />
-                      </div>
-                    </template>
+                    <el-checkbox-group v-model="multipleSelection">
+                      <template v-for="(item, index) in paragraphDetail" :key="item.id">
+                        <!-- 批量操作 -->
+                        <div class="paragraph-card flex" :id="item.id" v-if="isBatch === true">
+                          <el-checkbox :value="item.id" />
+                          <ParagraphCard :data="item" class="mb-8 w-full" />
+                        </div>
+                        <!-- 非批量操作 -->
+                        <div class="handle paragraph-card flex" :id="item.id" v-else>
+                          <img
+                            src="@/assets/sort.svg"
+                            alt=""
+                            height="15"
+                            class="handle-img mr-8 mt-24 cursor"
+                          />
+                          <ParagraphCard
+                            :data="item"
+                            class="mb-8 w-full"
+                            @changeState="changeState"
+                            @deleteParagraph="deleteParagraph"
+                          />
+                        </div>
+                      </template>
+                    </el-checkbox-group>
                   </VueDraggable>
                 </InfiniteScroll>
               </div>
@@ -206,7 +215,7 @@ function deleteMulParagraph() {
   )
     .then(() => {
       paragraphApi
-        .delMulParagraph(id, documentId, multipleSelection.value, changeStateloading)
+        .putMulParagraph(id, documentId, multipleSelection.value, changeStateloading)
         .then(() => {
           paragraphDetail.value = paragraphDetail.value.filter(
             (v) => !multipleSelection.value.includes(v.id),

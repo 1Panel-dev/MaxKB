@@ -31,18 +31,18 @@ const useKnowledgeStore = defineStore('knowledge', {
     saveDocumentsFile(file: UploadUserFile[]) {
       this.documentsFiles = file
     },
-    // async asyncGetAllDataset(loading?: Ref<boolean>) {
-    //   return new Promise((resolve, reject) => {
-    //     knowledgeApi
-    //       .getAllDataset(loading)
-    //       .then((data) => {
-    //         resolve(data)
-    //       })
-    //       .catch((error) => {
-    //         reject(error)
-    //       })
-    //   })
-    // },
+    async asyncGetAllKnowledge(loading?: Ref<boolean>) {
+      return new Promise((resolve, reject) => {
+        knowledgeApi
+          .getAllKnowledge(loading)
+          .then((data) => {
+            resolve(data)
+          })
+          .catch((error) => {
+            reject(error)
+          })
+      })
+    },
     async asyncGetKnowledgeDetail(
       knowledge_id: string,
       loading?: Ref<boolean>,

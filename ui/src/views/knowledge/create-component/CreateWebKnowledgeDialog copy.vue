@@ -18,23 +18,23 @@
     >
 
       <el-form-item
-        :label="$t('views.dataset.datasetForm.form.source_url.label')"
+        :label="$t('views.knowledge.form.source_url.label')"
         prop="source_url"
         v-if="datasetForm.type === '1'"
       >
         <el-input
           v-model="datasetForm.source_url"
-          :placeholder="$t('views.dataset.datasetForm.form.source_url.placeholder')"
+          :placeholder="$t('views.knowledge.form.source_url.placeholder')"
           @blur="datasetForm.source_url = datasetForm.source_url.trim()"
         />
       </el-form-item>
       <el-form-item
-        :label="$t('views.dataset.datasetForm.form.selector.label')"
+        :label="$t('views.knowledge.form.selector.label')"
         v-if="datasetForm.type === '1'"
       >
         <el-input
           v-model="datasetForm.selector"
-          :placeholder="$t('views.dataset.datasetForm.form.selector.placeholder')"
+          :placeholder="$t('views.knowledge.form.selector.placeholder')"
           @blur="datasetForm.selector = datasetForm.selector.trim()"
         />
       </el-form-item>
@@ -119,7 +119,7 @@ const rules = reactive({
   source_url: [
     {
       required: true,
-      message: t('views.dataset.datasetForm.form.source_url.requiredMessage'),
+      message: t('views.knowledge.form.source_url.requiredMessage'),
       trigger: 'blur'
     }
   ],
@@ -147,14 +147,14 @@ const rules = reactive({
   user_id: [
     {
       required: true,
-      message: t('views.dataset.datasetForm.form.user_id.requiredMessage'),
+      message: t('views.knowledge.form.user_id.requiredMessage'),
       trigger: 'blur'
     }
   ],
   token: [
     {
       required: true,
-      message: t('views.dataset.datasetForm.form.token.requiredMessage'),
+      message: t('views.knowledge.form.token.requiredMessage'),
       trigger: 'blur'
     }
   ]
@@ -186,21 +186,21 @@ const submitHandle = async () => {
           }
           knowledgeApi.postDataset(obj, loading).then((res) => {
             MsgSuccess(t('common.createSuccess'))
-            router.push({ path: `/dataset/${res.data.id}/document` })
+            router.push({ path: `/knowledge/${res.data.id}/document` })
             emit('refresh')
           })
         } else if (datasetForm.value.type === '1') {
           const obj = { ...BaseFormRef.value.form, ...datasetForm.value }
           knowledgeApi.postWebDataset(obj, loading).then((res) => {
             MsgSuccess(t('common.createSuccess'))
-            router.push({ path: `/dataset/${res.data.id}/document` })
+            router.push({ path: `/knowledge/${res.data.id}/document` })
             emit('refresh')
           })
         } else if (datasetForm.value.type === '2') {
           const obj = { ...BaseFormRef.value.form, ...datasetForm.value }
           knowledgeApi.postLarkDataset(obj, loading).then((res) => {
             MsgSuccess(t('common.createSuccess'))
-            router.push({ path: `/dataset/${res.data.id}/document` })
+            router.push({ path: `/knowledge/${res.data.id}/document` })
             emit('refresh')
           })
         }

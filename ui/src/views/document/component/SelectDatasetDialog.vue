@@ -77,7 +77,7 @@ import { useRoute } from 'vue-router'
 import documentApi from '@/api/knowledge/document'
 
 import useStore from '@/stores'
-const { dataset } = useStore()
+const { knowledge } = useStore()
 const route = useRoute()
 const {
   params: { id } // id为datasetID
@@ -115,7 +115,7 @@ const submitHandle = () => {
 }
 
 function getDataset() {
-  dataset.asyncGetAllDataset(loading).then((res: any) => {
+  knowledge.asyncGetAllKnowledge(loading).then((res: any) => {
     datasetList.value = res.data?.filter((v: any) => v.id !== id)
   })
 }

@@ -325,7 +325,7 @@ function openCreateDialog(data: any) {
   //   if (res?.data) {
   //     CreateDatasetDialogRef.value.open()
   //   } else if (res?.code === 400) {
-  //     MsgConfirm(t('common.tip'), t('views.dataset.tip.professionalMessage'), {
+  //     MsgConfirm(t('common.tip'), t('views.knowledge.tip.professionalMessage'), {
   //       cancelButtonText: t('common.confirm'),
   //       confirmButtonText: t('common.professional'),
   //     })
@@ -388,7 +388,7 @@ function openCreateFolder() {
 const GenerateRelatedDialogRef = ref<InstanceType<typeof GenerateRelatedDialog>>()
 function openGenerateDialog(row: any) {
   if (GenerateRelatedDialogRef.value) {
-    GenerateRelatedDialogRef.value.open([], 'dataset', row.id)
+    GenerateRelatedDialogRef.value.open([], 'knowledge', row.id)
   }
 }
 

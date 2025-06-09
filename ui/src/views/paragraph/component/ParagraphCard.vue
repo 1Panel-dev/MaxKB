@@ -120,7 +120,7 @@ function changeState(row: any) {
 const GenerateRelatedDialogRef = ref<InstanceType<typeof GenerateRelatedDialog>>()
 function openGenerateDialog(row: any) {
   if (GenerateRelatedDialogRef.value) {
-    GenerateRelatedDialogRef.value.open([], 'dataset', row.id)
+    GenerateRelatedDialogRef.value.open([], 'knowledge', row.id)
   }
 }
 function openSelectDocumentDialog(row?: any) {

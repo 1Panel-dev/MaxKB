@@ -253,7 +253,7 @@ const isApplication = computed(() => {
   return activeMenu.includes('application')
 })
 const isDataset = computed(() => {
-  return activeMenu.includes('dataset')
+  return activeMenu.includes('knowledge')
 })
 
 function changeHandle(val: string) {

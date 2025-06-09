@@ -142,7 +142,7 @@ import { isWorkFlow } from '@/utils/application'
 import { isAppIcon } from '@/utils/common'
 
 import useStore from '@/stores'
-const { common, dataset, application } = useStore()
+const { common, knowledge, application } = useStore()
 const route = useRoute()
 const router = useRouter()
 const {
@@ -169,7 +169,7 @@ const isApplication = computed(() => {
   return activeMenu.includes('application')
 })
 const isDataset = computed(() => {
-  return activeMenu.includes('dataset')
+  return activeMenu.includes('knowledge')
 })
 
 function openCreateDialog() {
@@ -204,8 +204,8 @@ function changeMenu(id: string) {
 
 function getDataset() {
   loading.value = true
-  dataset
-    .asyncGetAllDataset()
+  knowledge
+    .asyncGetAllKnowledge()
     .then((res: any) => {
       list.value = res.data
       common.saveBreadcrumb(list.value)

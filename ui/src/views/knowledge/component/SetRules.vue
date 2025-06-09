@@ -120,13 +120,13 @@
 </template>
 <script setup lang="ts">
 import { ref, computed, onMounted, reactive, watch } from 'vue'
-import ParagraphPreview from '@/views/dataset/component/ParagraphPreview.vue'
+import ParagraphPreview from '@/views/knowledge/component/ParagraphPreview.vue'
 import { cutFilename } from '@/utils/utils'
 import documentApi from '@/api/document'
 import useStore from '@/stores'
 import type { KeyValue } from '@/api/type/common'
-const { dataset } = useStore()
-const documentsFiles = computed(() => dataset.documentsFiles)
+const { knowledge } = useStore()
+const documentsFiles = computed(() => knowledge.documentsFiles)
 const splitPatternList = ref<Array<KeyValue<string, string>>>([])
 
 const radio = ref('1')

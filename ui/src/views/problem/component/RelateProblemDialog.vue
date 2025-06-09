@@ -120,7 +120,7 @@ const { problem, document } = useStore()
 
 const route = useRoute()
 const {
-  params: { id }, // datasetId
+  params: { id }, // knowledgeId
 } = route as any
 
 const emit = defineEmits(['refresh'])

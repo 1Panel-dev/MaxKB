@@ -33,7 +33,7 @@
         <ProblemComponent
           :problemId="problemId"
           :docId="document_id"
-          :datasetId="dataset_id"
+          :knowledgeId="dataset_id"
           ref="ProblemRef"
         />
       </el-col>

@@ -63,12 +63,12 @@ import useStore from '@/stores'
 const props = defineProps({
   problemId: String,
   docId: String,
-  datasetId: String
+  knowledgeId: String,
 })
 
 const route = useRoute()
 const {
-  params: { id, documentId } // id为datasetId
+  params: { id, documentId }, // id为knowledgeId
 } = route as any
 
 const { problem } = useStore()
@@ -90,19 +90,19 @@ watch(
     }
   },
   {
-    immediate: true
-  }
+    immediate: true,
+  },
 )
 
 function delProblemHandle(item: any, index: number) {
   if (item.id) {
     problem
       .asyncDisassociationProblem(
-        props.datasetId || id,
+        props.knowledgeId || id,
         documentId || props.docId,
         props.problemId || '',
         item.id,
-        loading
+        loading,
       )
       .then((res: any) => {
         getProblemList()
@@ -115,7 +115,7 @@ function delProblemHandle(item: any, index: number) {
 function getProblemList() {
   loading.value = true
   paragraphApi
-    .getProblem(props.datasetId || id, documentId || props.docId, props.problemId || '')
+    .getParagraphProblem(props.knowledgeId || id, documentId || props.docId, props.problemId || '')
     .then((res) => {
       problemList.value = res.data
       loading.value = false
@@ -135,20 +135,20 @@ function addProblemHandle(val: string) {
   if (props.problemId) {
     const api = problemOptions.value.some((option) => option.id === val)
       ? problem.asyncAssociationProblem(
-          props.datasetId || id,
+          props.knowledgeId || id,
           documentId || props.docId,
           props.problemId,
           val,
-          loading
+          loading,
         )
-      : paragraphApi.postProblem(
-          props.datasetId || id,
+      : paragraphApi.postParagraphProblem(
+          props.knowledgeId || id,
           documentId || props.docId,
           props.problemId,
           {
-            content: val
+            content: val,
           },
-          loading
+          loading,
         )
     api.then(() => {
       getProblemList()
@@ -174,10 +174,10 @@ const remoteMethod = (query: string) => {
 function getProblemOption(filterText?: string) {
   return problem
     .asyncGetProblem(
-      props.datasetId || (id as string),
+      props.knowledgeId || (id as string),
       { current_page: 1, page_size: 100 },
       filterText && { content: filterText },
-      optionLoading
+      optionLoading,
     )
     .then((res: any) => {
       problemOptions.value = res.data.records
@@ -194,11 +194,7 @@ onUnmounted(() => {
 })
 
 defineExpose({
-  problemList
+  problemList,
 })
 </script>
-<style scoped lang="scss">
-.question-tag {
-  // width: 217px;
-}
-</style>
+<style scoped lang="scss"></style>

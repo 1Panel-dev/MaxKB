@@ -61,14 +61,14 @@ import documentApi from '@/api/document'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
 import useStore from '@/stores'
-const { dataset, document } = useStore()
-const documentsFiles = computed(() => dataset.documentsFiles)
-const documentsType = computed(() => dataset.documentsType)
+const { knowledge, document } = useStore()
+const documentsFiles = computed(() => knowledge.documentsFiles)
+const documentsType = computed(() => knowledge.documentsType)
 
 const router = useRouter()
 const route = useRoute()
 const {
-  query: { id } // id为datasetID，有id的是上传文档
+  query: { id } // id为knowledgeID，有id的是上传文档
 } = route
 
 const SetRulesRef = ref()
@@ -93,7 +93,7 @@ async function next() {
         documentApi.postQADocument(id as string, fd, loading).then((res) => {
           MsgSuccess(t('common.submitSuccess'))
           clearStore()
-          router.push({ path: `/dataset/${id}/document` })
+          router.push({ path: `/knowledge/${id}/document` })
         })
       }
     } else if (documentsType.value === 'table') {
@@ -108,7 +108,7 @@ async function next() {
         documentApi.postTableDocument(id as string, fd, loading).then((res) => {
           MsgSuccess(t('common.submitSuccess'))
           clearStore()
-          router.push({ path: `/dataset/${id}/document` })
+          router.push({ path: `/knowledge/${id}/document` })
         })
       }
     } else {
@@ -123,8 +123,8 @@ const prev = () => {
 }
 
 function clearStore() {
-  dataset.saveDocumentsFile([])
-  dataset.saveDocumentsType('')
+  knowledge.saveDocumentsFile([])
+  knowledge.saveDocumentsType('')
 }
 function submit() {
   loading.value = true
@@ -148,7 +148,7 @@ function submit() {
       .then(() => {
         MsgSuccess(t('common.submitSuccess'))
         clearStore()
-        router.push({ path: `/dataset/${id}/document` })
+        router.push({ path: `/knowledge/${id}/document` })
       })
       .catch(() => {
         loading.value = false

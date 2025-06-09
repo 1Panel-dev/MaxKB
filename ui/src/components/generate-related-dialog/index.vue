@@ -51,7 +51,7 @@
           />
         </el-form-item>
         <el-form-item
-          v-if="['document', 'dataset'].includes(apiType)"
+          v-if="['document', 'knowledge'].includes(apiType)"
           :label="$t('components.selectParagraph.title')"
           prop="state"
         >
@@ -107,7 +107,7 @@ const stateMap = {
   error: ['0', '1', '3', '4', '5', 'n']
 }
 const FormRef = ref()
-const datasetId = ref<string>()
+const knowledgeId = ref<string>()
 const userId = user.userInfo?.id as string
 const form = ref(prompt.get(userId))
 const rules = reactive({
@@ -135,7 +135,7 @@ watch(dialogVisible, (bool) => {
 })
 
 const open = (ids: string[], type: string, _datasetId?: string) => {
-  datasetId.value = _datasetId
+  knowledgeId.value = _datasetId
   getModel()
   idList.value = ids
   apiType.value = type
@@ -155,7 +155,7 @@ const submitHandle = async (formEl: FormInstance) => {
           ...form.value,
           paragraph_id_list: idList.value
         }
-        paragraphApi.batchGenerateRelated(id, documentId, data, loading).then(() => {
+        paragraphApi.putBatchGenerateRelated(id, documentId, data, loading).then(() => {
           MsgSuccess(t('views.document.generateQuestion.successMessage'))
           emit('refresh')
           dialogVisible.value = false
@@ -171,12 +171,12 @@ const submitHandle = async (formEl: FormInstance) => {
           emit('refresh')
           dialogVisible.value = false
         })
-      } else if (apiType.value === 'dataset') {
+      } else if (apiType.value === 'knowledge') {
         const data = {
           ...form.value,
           state_list: stateMap[state.value]
         }
-        knowledgeApi.generateRelated(id ? id : datasetId.value, data, loading).then(() => {
+        knowledgeApi.generateRelated(id ? id : knowledgeId.value, data, loading).then(() => {
           MsgSuccess(t('views.document.generateQuestion.successMessage'))
           dialogVisible.value = false
         })
@@ -188,7 +188,7 @@ const submitHandle = async (formEl: FormInstance) => {
 function getModel() {
   loading.value = true
   knowledgeApi
-    .getKnowledgeModel(id ? id : datasetId.value)
+    .getKnowledgeModel(id ? id : knowledgeId.value)
     .then((res: any) => {
       modelOptions.value = groupBy(res?.data, 'provider')
       loading.value = false

@@ -1,7 +1,6 @@
 import { Result } from '@/request/Result'
 import { get, post, del, put } from '@/request/index'
 import type { Ref } from 'vue'
-import type { KeyValue } from '@/api/type/common'
 import type { pageRequest } from '@/api/type/common'
 
 const prefix = '/workspace/' + localStorage.getItem('workspace_id') + '/knowledge'
@@ -22,13 +21,9 @@ const postProblems: (
 /**
  * 问题分页列表
  * @param 参数  knowledge_id,
- * page {
- "current_page": "string",
- "page_size": "string",
- }
  * query {
- "content": "string",
- }
+     "content": "string",
+   }
  */
 
 const getProblems: (
@@ -106,7 +101,7 @@ const putMulAssociationProblem: (
  * 批量删除问题
  * @param 参数 knowledge_id,
  * data: array[string]
-*/
+ */
 const putMulProblem: (
   knowledge_id: string,
   data: any,
@@ -116,11 +111,11 @@ const putMulProblem: (
 }
 
 export default {
-  getProblems,
   postProblems,
-  delProblems,
+  getProblems,
   putProblems,
+  delProblems,
   getDetailProblems,
-  putMulProblem,
   putMulAssociationProblem,
+  putMulProblem,
 }

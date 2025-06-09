@@ -6,7 +6,7 @@ const useParagraphStore = defineStore('paragraph', {
   state: () => ({}),
   actions: {
     async asyncPutParagraph(
-      datasetId: string,
+      knowledgeId: string,
       documentId: string,
       paragraphId: string,
       data: any,
@@ -14,7 +14,7 @@ const useParagraphStore = defineStore('paragraph', {
     ) {
       return new Promise((resolve, reject) => {
         paragraphApi
-          .putParagraph(datasetId, documentId, paragraphId, data, loading)
+          .putParagraph(knowledgeId, documentId, paragraphId, data, loading)
           .then((data) => {
             resolve(data)
           })
@@ -25,14 +25,58 @@ const useParagraphStore = defineStore('paragraph', {
     },
 
     async asyncDelParagraph(
-      datasetId: string,
+      knowledgeId: string,
       documentId: string,
       paragraphId: string,
       loading?: Ref<boolean>,
     ) {
       return new Promise((resolve, reject) => {
         paragraphApi
-          .delParagraph(datasetId, documentId, paragraphId, loading)
+          .delParagraph(knowledgeId, documentId, paragraphId, loading)
+          .then((data) => {
+            resolve(data)
+          })
+          .catch((error) => {
+            reject(error)
+          })
+      })
+    },
+    async asyncDisassociationProblem(
+      knowledgeId: string,
+      documentId: string,
+      paragraphId: string,
+      problemId: string,
+      loading?: Ref<boolean>,
+    ) {
+      return new Promise((resolve, reject) => {
+        const obj = {
+          paragraphId,
+          problemId,
+        }
+        paragraphApi
+          .putDisassociationProblem(knowledgeId, documentId, obj, loading)
+          .then((data) => {
+            resolve(data)
+          })
+          .catch((error) => {
+            reject(error)
+          })
+      })
+    },
+    async asyncAssociationProblem(
+      knowledgeId: string,
+      documentId: string,
+      paragraphId: string,
+      problemId: string,
+      loading?: Ref<boolean>,
+    ) {
+      return new Promise((resolve, reject) => {
+        const obj = {
+          paragraphId,
+          problemId,
+        }
+        paragraphApi
+          .putAssociationProblem(knowledgeId, documentId, obj, loading)
           .then((data) => {
             resolve(data)
           })

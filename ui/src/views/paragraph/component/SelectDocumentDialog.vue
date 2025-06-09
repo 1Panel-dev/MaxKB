@@ -89,7 +89,7 @@ import type { FormInstance, FormRules } from 'element-plus'
 import paragraphApi from '@/api/knowledge/paragraph'
 import useStore from '@/stores'
 import { t } from '@/locales'
-const { dataset, document } = useStore()
+const { knowledge, document } = useStore()
 
 const route = useRoute()
 const {
@@ -144,7 +144,7 @@ function getDocument(id: string) {
 }
 
 function getDataset() {
-  dataset.asyncGetAllDataset(loading).then((res: any) => {
+  knowledge.asyncGetAllKnowledge(loading).then((res: any) => {
     datasetList.value = res.data
   })
 }

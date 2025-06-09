@@ -202,9 +202,9 @@ import { MsgError } from '@/utils/message'
 import documentApi from '@/api/document'
 import useStore from '@/stores'
 import { t } from '@/locales'
-const { dataset } = useStore()
-const documentsFiles = computed(() => dataset.documentsFiles)
-const documentsType = computed(() => dataset.documentsType)
+const { knowledge } = useStore()
+const documentsFiles = computed(() => knowledge.documentsFiles)
+const documentsType = computed(() => knowledge.documentsType)
 const form = ref({
   fileType: 'txt',
   fileList: [] as any
@@ -218,8 +218,8 @@ const rules = reactive({
 const FormRef = ref()
 
 watch(form.value, (value) => {
-  dataset.saveDocumentsType(value.fileType)
-  dataset.saveDocumentsFile(value.fileList)
+  knowledge.saveDocumentsType(value.fileType)
+  knowledge.saveDocumentsFile(value.fileList)
 })
 
 function downloadTemplate(type: string) {
