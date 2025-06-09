@@ -148,7 +148,7 @@ watch(debugVisible, (bool) => {
 const submit = async (formEl: FormInstance | undefined) => {
   const validate = formEl ? formEl.validate() : Promise.resolve()
   Promise.all([dynamicsFormRef.value?.validate(), validate]).then(() => {
-    toolApi.postToolDebug(form.value, loading).then((res) => {
+    ToolApi.postToolDebug(form.value, loading).then((res) => {
       if (res.code === 500) {
         showResult.value = true
         isSuccess.value = false

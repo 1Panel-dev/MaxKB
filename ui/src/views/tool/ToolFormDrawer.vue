@@ -398,7 +398,7 @@ function refreshInitFieldList(data: any) {
   UserFieldFormDialogRef.value.close()
 }
 
-function refreshtool(data: any) {
+function refreshTool(data: any) {
   form.value.icon = data
 }
 

@@ -19,9 +19,9 @@
               style="width: 120px"
               @change="search_type_change"
             >
-              <el-option :label="$t('common.creator')" value="create_user"/>
+              <el-option :label="$t('common.creator')" value="create_user" />
 
-              <el-option :label="$t('views.model.modelForm.modeName.label')" value="name"/>
+              <el-option :label="$t('views.model.modelForm.modeName.label')" value="name" />
             </el-select>
             <el-input
               v-if="search_type === 'name'"
@@ -38,7 +38,7 @@
               clearable
               style="width: 220px"
             >
-              <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.username"/>
+              <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.username" />
             </el-select>
           </div>
           <el-button class="ml-16" type="primary"> {{ $t('common.create') }}</el-button>
@@ -84,10 +84,10 @@
                     style="background: none"
                     class="mr-8"
                   >
-                    <img :src="item?.icon" alt=""/>
+                    <img :src="item?.icon" alt="" />
                   </el-avatar>
                   <el-avatar v-else class="avatar-green" shape="square" :size="32">
-                    <img src="@/assets/node/icon_tool.svg" style="width: 58%" alt=""/>
+                    <img src="@/assets/node/icon_tool.svg" style="width: 58%" alt="" />
                   </el-avatar>
                 </template>
                 <template #subTitle>
@@ -98,10 +98,8 @@
 
                 <template #footer>
                   <div v-if="item.is_active" class="flex align-center">
-                    <el-icon class="color-success mr-8" style="font-size: 16px"
-                    >
-                      <SuccessFilled
-                      />
+                    <el-icon class="color-success mr-8" style="font-size: 16px">
+                      <SuccessFilled />
                     </el-icon>
                     <span class="color-secondary">
                       {{ $t('common.status.enabled') }}
@@ -122,11 +120,11 @@
                       size="small"
                       class="mr-4"
                     />
-                    <el-divider direction="vertical"/>
+                    <el-divider direction="vertical" />
                     <el-dropdown trigger="click">
                       <el-button text @click.stop>
                         <el-icon>
-                          <MoreFilled/>
+                          <MoreFilled />
                         </el-icon>
                       </el-button>
                       <template #dropdown>
@@ -137,14 +135,14 @@
                             @click.stop="openCreateDialog(item)"
                           >
                             <el-icon>
-                              <EditPen/>
+                              <EditPen />
                             </el-icon>
                             {{ $t('common.edit') }}
                           </el-dropdown-item>
                           <el-dropdown-item
                             :disabled="!canEdit(item)"
                             v-if="!item.template_id"
-                            @click.stop="copytool(item)"
+                            @click.stop="copyTool(item)"
                           >
                             <AppIcon iconName="app-copy"></AppIcon>
                             {{ $t('common.copy') }}
@@ -160,7 +158,7 @@
                           <el-dropdown-item
                             v-if="!item.template_id"
                             :disabled="!canEdit(item)"
-                            @click.stop="exporttool(item)"
+                            @click.stop="exportTool(item)"
                           >
                             <AppIcon iconName="app-export"></AppIcon>
                             {{ $t('common.export') }}
@@ -168,7 +166,7 @@
                           <el-dropdown-item
                             :disabled="!canEdit(item)"
                             divided
-                            @click.stop="deletetool(item)"
+                            @click.stop="deleteTool(item)"
                           >
                             <el-icon><Delete /></el-icon>
                             {{ $t('common.delete') }}
@@ -182,25 +180,26 @@
             </el-col>
           </template>
         </el-row>
-        <el-empty :description="$t('common.noData')" v-else/>
+        <el-empty :description="$t('common.noData')" v-else />
       </div>
     </ContentContainer>
-    <InitParamDrawer ref="InitParamDrawerRef" @refresh="refresh"/>
-    <ToolFormDrawer ref="ToolFormDrawerRef" @refresh="refresh" :title="ToolDrawertitle"/>
+    <InitParamDrawer ref="InitParamDrawerRef" @refresh="refresh" />
+    <ToolFormDrawer ref="ToolFormDrawerRef" @refresh="refresh" :title="ToolDrawertitle" />
   </LayoutContainer>
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref, reactive, computed} from 'vue'
+import { onMounted, ref, reactive, computed } from 'vue'
+import { cloneDeep, get } from 'lodash'
 import ToolApi from '@/api/tool/tool'
 import useStore from '@/stores'
-import {MsgConfirm} from '@/utils/message'
 import InitParamDrawer from '@/views/tool/component/InitParamDrawer.vue'
 import ToolFormDrawer from './ToolFormDrawer.vue'
-import {t} from '@/locales'
-import {isAppIcon} from '@/utils/common'
+import { t } from '@/locales'
+import { isAppIcon } from '@/utils/common'
+import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 
-const {folder, user} = useStore()
+const { folder, user } = useStore()
 
 const InitParamDrawerRef = ref()
 const search_type = ref('name')
@@ -226,7 +225,7 @@ const toolList = ref<any[]>([])
 const currentFolder = ref<any>({})
 
 const search_type_change = () => {
-  search_form.value = {name: '', create_user: ''}
+  search_form.value = { name: '', create_user: '' }
 }
 const canEdit = (row: any) => {
   return user.userInfo?.id === row?.user_id
@@ -339,6 +338,74 @@ function folderClickHandel(row: any) {
   toolList.value = []
   getList()
 }
+
+function copyTool(row: any) {
+  ToolDrawertitle.value = t('views.tool.copyTool')
+  const obj = cloneDeep(row)
+  delete obj['id']
+  obj['name'] = obj['name'] + `  ${t('views.tool.form.title.copy')}`
+  ToolFormDrawerRef.value.open(obj)
+}
+
+function exportTool(row: any) {
+  ToolApi.exportTool(row.id, row.name, loading).catch((e: any) => {
+    if (e.response.status !== 403) {
+      e.response.data.text().then((res: string) => {
+        MsgError(`${t('views.application.tip.ExportError')}:${JSON.parse(res).message}`)
+      })
+    }
+  })
+}
+
+function deleteTool(row: any) {
+  MsgConfirm(
+    `${t('views.tool.delete.confirmTitle')}${row.name} ?`,
+    t('views.tool.delete.confirmMessage'),
+    {
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
+      confirmButtonClass: 'danger'
+    }
+  )
+    .then(() => {
+      ToolApi.delTool(row.id, loading).then(() => {
+        const index = toolList.value.findIndex((v) => v.id === row.id)
+        toolList.value.splice(index, 1)
+        MsgSuccess(t('common.deleteSuccess'))
+      })
+    })
+    .catch(() => {})
+}
+
+function configInitParams(item: any) {
+  ToolApi.getToolById(item?.id, changeStateloading).then((res) => {
+    InitParamDrawerRef.value.open(res.data)
+  })
+}
+
+
+// function importTool(file: any) {
+//   const formData = new FormData()
+//   formData.append('file', file.raw, file.name)
+//   elUploadRef.value.clearFiles()
+//   ToolApi
+//     .postImportTool(formData, loading)
+//     .then(async (res: any) => {
+//       if (res?.data) {
+//         searchHandle()
+//       }
+//     })
+//     .catch((e: any) => {
+//       if (e.code === 400) {
+//         MsgConfirm(t('common.tip'), t('views.application.tip.professionalMessage'), {
+//           cancelButtonText: t('common.confirm'),
+//           confirmButtonText: t('common.professional')
+//         }).then(() => {
+//           window.open('https://maxkb.cn/pricing.html', '_blank')
+//         })
+//       }
+//     })
+// }
 
 onMounted(() => {
   getFolder()

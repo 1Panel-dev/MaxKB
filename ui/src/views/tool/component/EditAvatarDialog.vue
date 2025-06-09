@@ -9,14 +9,9 @@
     <el-radio-group v-model="radioType" class="radio-block mb-16">
       <el-radio value="default">
         <p>{{ $t('common.EditAvatarDialog.default') }}</p>
-        <el-avatar
-          v-if="detail?.name"
-          :name="detail?.name"
-          pinyinColor
-          class="mt-8 mb-8"
-          shape="square"
-          :size="32"
-        />
+        <el-avatar class="avatar-green" shape="square" :size="32">
+          <img src="@/assets/node/icon_tool.svg" style="width: 58%" alt="" />
+        </el-avatar>
       </el-radio>
 
       <el-radio value="custom">
@@ -122,6 +117,4 @@ function submit() {
 
 defineExpose({ open })
 </script>
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>

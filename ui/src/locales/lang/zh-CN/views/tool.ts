@@ -2,14 +2,19 @@ export default {
   title: '工具',
   createTool: '创建工具',
   editTool: '编辑工具',
+  copyTool: '复制函数',
+  importTool: '导入函数',
   disabled: {
     confirmTitle: '是否禁用工具：',
     confirmMessage: '禁用后，引用了该工具的应用提问时会报错 ，请谨慎操作。',
   },
+  tip: {
+    saveMessage: '当前的更改尚未保存，确认退出吗?',
+  },
   form: {
     title: {
       copy: '副本',
-      baseInfo: '基础信息'
+      baseInfo: '基础信息',
     },
     toolName: {
       label: '名称',
