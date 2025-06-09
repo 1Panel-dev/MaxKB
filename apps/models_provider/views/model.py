@@ -61,7 +61,7 @@ class ModelSetting(APIView):
                    description=_("Create model"),
                    operation_id=_("Create model"),  # type: ignore
                    tags=[_("Model")],  # type: ignore
-                   parameters=ModelCreateAPI.get_query_params_api(),
+                   parameters=ModelCreateAPI.get_parameters(),
                    request=ModelCreateAPI.get_request(),
                    responses=ModelCreateAPI.get_response())
     @has_permissions(PermissionConstants.MODEL_CREATE.get_workspace_permission())
@@ -90,7 +90,7 @@ class ModelSetting(APIView):
                    summary=_('Query model list'),
                    description=_('Query model list'),
                    operation_id=_('Query model list'),  # type: ignore
-                   parameters=ModelCreateAPI.get_query_params_api(),
+                   parameters=ModelListResponse.get_parameters(),
                    responses=ModelListResponse.get_response(),
                    tags=[_('Model')])  # type: ignore
     @has_permissions(PermissionConstants.MODEL_READ.get_workspace_permission())
@@ -108,7 +108,7 @@ class ModelSetting(APIView):
                        description=_('Update model'),
                        operation_id=_('Update model'),  # type: ignore
                        request=ModelEditApi.get_request(),
-                       parameters=GetModelApi.get_query_params_api(),
+                       parameters=GetModelApi.get_parameters(),
                        responses=ModelEditApi.get_response(),
                        tags=[_('Model')])  # type: ignore
         @has_permissions(PermissionConstants.MODEL_EDIT.get_workspace_permission())
@@ -125,7 +125,7 @@ class ModelSetting(APIView):
                        summary=_('Delete model'),
                        description=_('Delete model'),
                        operation_id=_('Delete model'),  # type: ignore
-                       parameters=GetModelApi.get_query_params_api(),
+                       parameters=GetModelApi.get_parameters(),
                        responses=DefaultModelResponse.get_response(),
                        tags=[_('Model')])  # type: ignore
         @has_permissions(PermissionConstants.MODEL_DELETE.get_workspace_permission())
@@ -139,7 +139,7 @@ class ModelSetting(APIView):
                        summary=_('Query model details'),
                        description=_('Query model details'),
                        operation_id=_('Query model details'),  # type: ignore
-                       parameters=GetModelApi.get_query_params_api(),
+                       parameters=GetModelApi.get_parameters(),
                        responses=GetModelApi.get_response(),
                        tags=[_('Model')])  # type: ignore
         @has_permissions(PermissionConstants.MODEL_READ.get_workspace_permission())
@@ -154,7 +154,7 @@ class ModelSetting(APIView):
                        summary=_('Get model parameter form'),
                        description=_('Get model parameter form'),
                        operation_id=_('Get model parameter form'),  # type: ignore
-                       parameters=GetModelApi.get_query_params_api(),
+                       parameters=GetModelApi.get_parameters(),
                        responses=ProvideApi.ModelParamsForm.get_response(),
                        tags=[_('Model')])  # type: ignore
         @has_permissions(PermissionConstants.MODEL_READ.get_workspace_permission())
@@ -166,7 +166,7 @@ class ModelSetting(APIView):
                        summary=_('Save model parameter form'),
                        description=_('Save model parameter form'),
                        operation_id=_('Save model parameter form'),  # type: ignore
-                       parameters=GetModelApi.get_query_params_api(),
+                       parameters=GetModelApi.get_parameters(),
                        request=GetModelApi.get_request(),
                        responses=ProvideApi.ModelParamsForm.get_response(),
                        tags=[_('Model')])  # type: ignore
@@ -187,7 +187,7 @@ class ModelSetting(APIView):
                            'Query model meta information, this interface does not carry authentication information'),
                        operation_id=_(
                            'Query model meta information, this interface does not carry authentication information'),
-                       parameters=GetModelApi.get_query_params_api(),
+                       parameters=GetModelApi.get_parameters(),
                        responses=GetModelApi.get_response(),
                        tags=[_('Model')])  # type: ignore
         @has_permissions(PermissionConstants.MODEL_READ.get_workspace_permission())
@@ -202,7 +202,7 @@ class ModelSetting(APIView):
                        summary=_('Pause model download'),
                        description=_('Pause model download'),
                        operation_id=_('Pause model download'),  # type: ignore
-                       parameters=GetModelApi.get_query_params_api(),
+                       parameters=GetModelApi.get_parameters(),
                        request=GetModelApi.get_request(),
                        responses=DefaultModelResponse.get_response(),
                        tags=[_('Model')])  # type: ignore
@@ -218,9 +218,8 @@ class ModelSetting(APIView):
                        summary=_('Get Share model'),
                        description=_('Get Share model'),
                        operation_id=_('Get Share model'),  # type: ignore
-                       parameters=GetModelApi.get_query_params_api(),
-                       request=GetModelApi.get_request(),
-                       responses=DefaultModelResponse.get_response(),
+                       parameters=ModelListResponse.get_parameters(),
+                       responses=ModelListResponse.get_response(),
                        tags=[_('Model')])  # type: ignore
         @has_permissions(PermissionConstants.MODEL_READ.get_workspace_permission())
         def get(self, request: Request, workspace_id: str):

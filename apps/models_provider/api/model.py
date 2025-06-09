@@ -23,6 +23,52 @@ class ModelListResponse(APIMixin):
 
         return ModelListResult
 
+    @staticmethod
+    def get_parameters():
+        return [OpenApiParameter(
+            name="workspace_id",
+            description=_("workspace id"),
+            type=OpenApiTypes.STR,
+            location=OpenApiParameter.PATH,
+            required=True,
+        ),
+            OpenApiParameter(
+                name="name",
+                description=_("model name"),
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+                required=False,
+            ),
+            OpenApiParameter(
+                name="model_type",
+                description=_("model type"),
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+                required=False,
+            ),
+            OpenApiParameter(
+                name="model_name",
+                description=_("base model"),
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+                required=False,
+            ),
+            OpenApiParameter(
+                name="provider",
+                description=_("provider"),
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+                required=False,
+            ),
+            OpenApiParameter(
+                name="create_user",
+                description=_("create user"),
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+                required=False,
+            )
+        ]
+
 
 class ModelCreateAPI(APIMixin):
     @staticmethod
@@ -34,7 +80,7 @@ class ModelCreateAPI(APIMixin):
         return ModelCreateResponse
 
     @classmethod
-    def get_query_params_api(cls):
+    def get_parameters(cls):
         return [OpenApiParameter(
             name="workspace_id",
             description=_("workspace id"),

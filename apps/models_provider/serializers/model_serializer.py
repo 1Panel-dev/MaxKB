@@ -105,7 +105,7 @@ class ModelSerializer(serializers.Serializer):
 
     class Operate(serializers.Serializer):
         id = serializers.UUIDField(required=True, label=_("model id"))
-        user_id = serializers.UUIDField(required=True, label=_("user id"))
+        user_id = serializers.UUIDField(required=False, label=_("user id"))
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
@@ -114,6 +114,8 @@ class ModelSerializer(serializers.Serializer):
             ).first()
             if model is None:
                 raise AppApiException(500, _('Model does not exist'))
+            if model.workspace_id == 'None':
+                raise AppApiException(500, _('Shared models cannot be deleted or modified'))
 
         def one(self, with_valid=False):
             if with_valid:
@@ -147,8 +149,6 @@ class ModelSerializer(serializers.Serializer):
                 self.is_valid(raise_exception=True)
             model_id = self.data.get('id')
             model = Model.objects.filter(id=model_id).first()
-            if not model:
-                raise AppApiException(500, _("Model does not exist"))
             # TODO : 这里可以添加模型删除的逻辑,需要注意删除模型时的权限和关联关系
             # if model.model_type == 'LLM':
             #     application_count = Application.objects.filter(model_id=model_id).count()
@@ -174,35 +174,32 @@ class ModelSerializer(serializers.Serializer):
                 self.is_valid(raise_exception=True)
             model = QuerySet(Model).filter(id=self.data.get('id')).first()
 
-            if model is None:
-                raise AppApiException(500, _('Model does not exist'))
-            else:
-                credential, model_credential, provider_handler = ModelSerializer.Edit(
-                    data={**instance}).is_valid(
-                    model=model)
-                try:
-                    model.status = Status.SUCCESS
-                    default_params = {item['field']: item['default_value'] for item in model.model_params_form}
-                    # 校验模型认证数据
-                    provider_handler.is_valid_credential(model.model_type,
-                                                         instance.get("model_name"),
-                                                         credential,
-                                                         default_params,
-                                                         raise_exception=True)
+            credential, model_credential, provider_handler = ModelSerializer.Edit(
+                data={**instance}).is_valid(
+                model=model)
+            try:
+                model.status = Status.SUCCESS
+                default_params = {item['field']: item['default_value'] for item in model.model_params_form}
+                # 校验模型认证数据
+                provider_handler.is_valid_credential(model.model_type,
+                                                     instance.get("model_name"),
+                                                     credential,
+                                                     default_params,
+                                                     raise_exception=True)
 
-                except AppApiException as e:
-                    if e.code == ValidCode.model_not_fount:
-                        model.status = Status.DOWNLOAD
+            except AppApiException as e:
+                if e.code == ValidCode.model_not_fount:
+                    model.status = Status.DOWNLOAD
+                else:
+                    raise e
+            update_keys = ['credential', 'name', 'model_type', 'model_name']
+            for update_key in update_keys:
+                if update_key in instance and instance.get(update_key) is not None:
+                    if update_key == 'credential':
+                        model_credential_str = json.dumps(credential)
+                        model.__setattr__(update_key, rsa_long_encrypt(model_credential_str))
                     else:
-                        raise e
-                update_keys = ['credential', 'name', 'model_type', 'model_name']
-                for update_key in update_keys:
-                    if update_key in instance and instance.get(update_key) is not None:
-                        if update_key == 'credential':
-                            model_credential_str = json.dumps(credential)
-                            model.__setattr__(update_key, rsa_long_encrypt(model_credential_str))
-                        else:
-                            model.__setattr__(update_key, instance.get(update_key))
+                        model.__setattr__(update_key, instance.get(update_key))
 
             ModelManage.delete_key(str(model.id))
             model.save()
