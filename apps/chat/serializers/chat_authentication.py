@@ -45,7 +45,7 @@ class AnonymousAuthenticationSerializer(serializers.Serializer):
             _type = AuthenticationType.CHAT_ANONYMOUS_USER
             return ChatUserToken(application_access_token.application_id, None, access_token, _type,
                                  ChatUserType.ANONYMOUS_USER,
-                                 chat_user_id, ChatAuthentication(None, False, False)).to_token()
+                                 chat_user_id, ChatAuthentication(None)).to_token()
         else:
             raise NotFound404(404, _("Invalid access_token"))
 
