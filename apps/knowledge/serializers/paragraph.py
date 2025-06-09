@@ -234,6 +234,7 @@ class ParagraphSerializers(serializers.Serializer):
             delete_embedding_by_paragraph(paragraph_id)
 
     class Create(serializers.Serializer):
+        workspace_id = serializers.CharField(required=True, label='Workspace ID')
         knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
         document_id = serializers.UUIDField(required=True, label=_('document id'))
 
@@ -269,7 +270,12 @@ class ParagraphSerializers(serializers.Serializer):
                 model_id = get_embedding_model_id_by_knowledge_id(knowledge_id)
                 embedding_by_paragraph(str(paragraph.id), model_id)
             return ParagraphSerializers.Operate(
-                data={'paragraph_id': str(paragraph.id), 'knowledge_id': knowledge_id, 'document_id': document_id}
+                data={
+                    'paragraph_id': str(paragraph.id),
+                    'knowledge_id': knowledge_id,
+                    'document_id': document_id,
+                    'workspace_id': self.data.get('workspace_id')
+                }
             ).one(with_valid=True)
 
         @staticmethod
