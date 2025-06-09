@@ -939,7 +939,7 @@ function getList(bool?: boolean) {
 }
 
 function getDetail() {
-  knowledge.asyncGetDatasetDetail(id, loading).then((res: any) => {
+  knowledge.asyncGetKnowledgeDetail(id, loading).then((res: any) => {
     datasetDetail.value = res.data
   })
 }

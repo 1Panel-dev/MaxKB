@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="$t('views.application.applicationForm.dialog.addDataset')"
+    :title="$t('views.application.form.dialog.addDataset')"
     v-model="dialogVisible"
     width="600"
     append-to-body
@@ -12,7 +12,7 @@
     <template #header="{ titleId, titleClass }">
       <div class="flex-between mb-8">
         <h4 :id="titleId" :class="titleClass">
-          {{ $t('views.application.applicationForm.dialog.addDataset') }}
+          {{ $t('views.application.form.dialog.addDataset') }}
         </h4>
         <div class="flex align-center mr-8">
           <el-button link class="ml-16" @click="refresh">
@@ -23,7 +23,7 @@
       </div>
       <div class="flex-between">
         <el-text type="info" class="color-secondary">
-          {{ $t('views.application.applicationForm.dialog.addDatasetPlaceholder') }}
+          {{ $t('views.application.form.dialog.addDatasetPlaceholder') }}
         </el-text>
         <el-input
           v-model="searchValue"
@@ -49,8 +49,8 @@
       <div class="flex-between">
         <div class="flex">
           <el-text type="info" class="color-secondary mr-8" v-if="checkList.length > 0">
-            {{ $t('views.application.applicationForm.dialog.selected') }} {{ checkList.length }}
-            {{ $t('views.application.applicationForm.dialog.countDataset') }}
+            {{ $t('views.application.form.dialog.selected') }} {{ checkList.length }}
+            {{ $t('views.application.form.dialog.countDataset') }}
           </el-text>
           <el-button link type="primary" v-if="checkList.length > 0" @click="clearCheck">
             {{ $t('common.clear') }}

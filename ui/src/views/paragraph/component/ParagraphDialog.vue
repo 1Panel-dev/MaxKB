@@ -52,7 +52,6 @@
 import { ref, watch, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import { cloneDeep, debounce } from 'lodash'
-
 import ParagraphForm from '@/views/paragraph/component/ParagraphForm.vue'
 import ProblemComponent from '@/views/paragraph/component/ProblemComponent.vue'
 import paragraphApi from '@/api/knowledge/paragraph'

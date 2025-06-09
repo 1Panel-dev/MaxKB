@@ -250,6 +250,7 @@
 <script lang="ts" setup>
 import {onMounted, ref, reactive, computed} from 'vue'
 import CreateApplicationDialog from '@/views/application/component/CreateApplicationDialog.vue'
+import GenerateRelatedDialog from '@/components/generate-related-dialog/index.vue'
 import ApplicaitonApi from '@/api/application/application'
 import {MsgSuccess, MsgConfirm} from '@/utils/message'
 import useStore from '@/stores'

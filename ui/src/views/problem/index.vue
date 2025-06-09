@@ -6,17 +6,14 @@
         <div class="p-24">
           <div class="flex-between">
             <div>
-              <el-button type="primary" @click="createProblem">{{
-                  $t('views.problem.createProblem')
-                }}
+              <el-button type="primary" @click="createProblem"
+                >{{ $t('views.problem.createProblem') }}
               </el-button>
-              <el-button @click="relateProblem()" :disabled="multipleSelection.length === 0">{{
-                  $t('views.problem.relateParagraph.title')
-                }}
+              <el-button @click="relateProblem()" :disabled="multipleSelection.length === 0"
+                >{{ $t('views.problem.relateParagraph.title') }}
               </el-button>
-              <el-button @click="deleteMulDocument" :disabled="multipleSelection.length === 0">{{
-                  $t('views.problem.setting.batchDelete')
-                }}
+              <el-button @click="deleteMulDocument" :disabled="multipleSelection.length === 0"
+                >{{ $t('views.problem.setting.batchDelete') }}
               </el-button>
             </div>
 
@@ -49,7 +46,7 @@
             v-loading="loading"
             :row-key="(row: any) => row.id"
           >
-            <el-table-column type="selection" width="55" :reserve-selection="true"/>
+            <el-table-column type="selection" width="55" :reserve-selection="true" />
             <el-table-column prop="content" :label="$t('views.problem.title')" min-width="280">
               <template #default="{ row }">
                 <ReadWrite
@@ -103,14 +100,14 @@
                       placement="top"
                     >
                       <el-button type="primary" text @click.stop="relateProblem(row)">
-                        <el-icon><Connection/></el-icon>
+                        <el-icon><Connection /></el-icon>
                       </el-button>
                     </el-tooltip>
                   </span>
                   <span>
                     <el-tooltip effect="dark" :content="$t('common.delete')" placement="top">
                       <el-button type="primary" text @click.stop="deleteProblem(row)">
-                        <el-icon><Delete/></el-icon>
+                        <el-icon><Delete /></el-icon>
                       </el-button>
                     </el-tooltip>
                   </span>
@@ -121,7 +118,7 @@
         </div>
       </div>
     </el-card>
-    <CreateProblemDialog ref="CreateProblemDialogRef" @refresh="refresh"/>
+    <CreateProblemDialog ref="CreateProblemDialogRef" @refresh="refresh" />
     <DetailProblemDrawer
       :next="nextChatRecord"
       :pre="preChatRecord"
@@ -132,29 +129,29 @@
       :next_disable="next_disable"
       @refresh="refreshRelate"
     />
-    <RelateProblemDialog ref="RelateProblemDialogRef" @refresh="refreshRelate"/>
+    <RelateProblemDialog ref="RelateProblemDialogRef" @refresh="refreshRelate" />
   </div>
 </template>
 <script setup lang="ts">
-import {ref, onMounted, reactive, onBeforeUnmount, computed} from 'vue'
-import {useRouter, useRoute} from 'vue-router'
-import {ElTable} from 'element-plus'
+import { ref, onMounted, reactive, onBeforeUnmount, computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { ElTable } from 'element-plus'
 import problemApi from '@/api/knowledge/problem'
 import CreateProblemDialog from './component/CreateProblemDialog.vue'
 import DetailProblemDrawer from './component/DetailProblemDrawer.vue'
 import RelateProblemDialog from './component/RelateProblemDialog.vue'
-import {datetimeFormat} from '@/utils/time'
-import {MsgSuccess, MsgConfirm, MsgError} from '@/utils/message'
-import type {Dict} from '@/api/type/common'
+import { datetimeFormat } from '@/utils/time'
+import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
+import type { Dict } from '@/api/type/common'
 import useStore from '@/stores'
-import {t} from '@/locales'
+import { t } from '@/locales'
 
 const route = useRoute()
 const {
-  params: {id}, // 知识库id
+  params: { id }, // 知识库id
 } = route as any
 
-const {problem} = useStore()
+const { problem } = useStore()
 
 const RelateProblemDialogRef = ref()
 const DetailProblemRef = ref()
@@ -180,7 +177,7 @@ const problemIndexMap = computed<Dict<number>>(() => {
     .map((row, index) => ({
       [row.id]: index,
     }))
-    .reduce((pre, next) => ({...pre, ...next}), {})
+    .reduce((pre, next) => ({ ...pre, ...next }), {})
 })
 
 const multipleTableRef = ref<InstanceType<typeof ElTable>>()
@@ -233,7 +230,7 @@ function deleteMulDocument() {
       arr.push(v.id)
     }
   })
-  problemApi.delMulProblem(id, arr, loading).then(() => {
+  problemApi.putMulProblem(id, arr, loading).then(() => {
     MsgSuccess(t('views.document.delete.successMessage'))
     multipleTableRef.value?.clearSelection()
     getList()
@@ -255,8 +252,7 @@ function deleteProblem(row: any) {
         getList()
       })
     })
-    .catch(() => {
-    })
+    .catch(() => {})
 }
 
 function editName(val: string, problemId: string) {
@@ -314,7 +310,7 @@ const next_disable = computed(() => {
   return (
     index >= problemData.value.length &&
     index + (paginationConfig.current_page - 1) * paginationConfig.page_size >=
-    paginationConfig.total - 1
+      paginationConfig.total - 1
   )
 })
 /**
@@ -350,7 +346,7 @@ function rowClickHandle(row: any, column?: any) {
   }
 }
 
-const setRowClass = ({row}: any) => {
+const setRowClass = ({ row }: any) => {
   return currentClickId.value === row?.id ? 'highlight' : ''
 }
 
@@ -364,7 +360,7 @@ function getList() {
     .asyncGetProblem(
       id as string,
       paginationConfig,
-      filterText.value && {content: filterText.value},
+      filterText.value && { content: filterText.value },
       loading,
     )
     .then((res: any) => {
@@ -387,7 +383,6 @@ onMounted(() => {
   getList()
 })
 
-onBeforeUnmount(() => {
-})
+onBeforeUnmount(() => {})
 </script>
 <style lang="scss" scoped></style>

@@ -8,6 +8,7 @@ import useModelStore from './modules/model'
 import usePromptStore from './modules/prompt'
 import useProblemStore from './modules/problem'
 import useParagraphStore from './modules/paragraph'
+import useDocumentStore from './modules/document'
 
 const useStore = () => ({
   common: useCommonStore(),
@@ -20,6 +21,7 @@ const useStore = () => ({
   prompt: usePromptStore(),
   problem: useProblemStore(),
   paragraph: useParagraphStore(),
+  document: useDocumentStore(),
 })
 
 export default useStore

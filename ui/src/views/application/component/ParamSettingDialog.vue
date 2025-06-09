@@ -12,7 +12,7 @@
     <el-scrollbar max-height="550">
       <div class="p-16">
         <el-form label-position="top" ref="paramFormRef" :model="form" v-loading="loading">
-          <el-form-item :label="$t('views.application.applicationForm.dialog.selectSearchMode')">
+          <el-form-item :label="$t('views.application.dialog.selectSearchMode')">
             <el-radio-group
               v-model="form.dataset_setting.search_mode"
               class="card__radio"
@@ -25,10 +25,10 @@
               >
                 <el-radio value="embedding" size="large">
                   <p class="mb-4">
-                    {{ $t('views.application.applicationForm.dialog.vectorSearch') }}
+                    {{ $t('views.application.dialog.vectorSearch') }}
                   </p>
                   <el-text type="info">{{
-                    $t('views.application.applicationForm.dialog.vectorSearchTooltip')
+                    $t('views.application.dialog.vectorSearchTooltip')
                   }}</el-text>
                 </el-radio>
               </el-card>
@@ -39,10 +39,10 @@
               >
                 <el-radio value="keywords" size="large">
                   <p class="mb-4">
-                    {{ $t('views.application.applicationForm.dialog.fullTextSearch') }}
+                    {{ $t('views.application.dialog.fullTextSearch') }}
                   </p>
                   <el-text type="info">{{
-                    $t('views.application.applicationForm.dialog.fullTextSearchTooltip')
+                    $t('views.application.dialog.fullTextSearchTooltip')
                   }}</el-text>
                 </el-radio>
               </el-card>
@@ -52,10 +52,10 @@
               >
                 <el-radio value="blend" size="large">
                   <p class="mb-4">
-                    {{ $t('views.application.applicationForm.dialog.hybridSearch') }}
+                    {{ $t('views.application.dialog.hybridSearch') }}
                   </p>
                   <el-text type="info">{{
-                    $t('views.application.applicationForm.dialog.hybridSearchTooltip')
+                    $t('views.application.dialog.hybridSearchTooltip')
                   }}</el-text>
                 </el-radio>
               </el-card>
@@ -67,11 +67,11 @@
                 <template #label>
                   <div class="flex align-center">
                     <span class="mr-4">{{
-                      $t('views.application.applicationForm.dialog.similarityThreshold')
+                      $t('views.application.dialog.similarityThreshold')
                     }}</span>
                     <el-tooltip
                       effect="dark"
-                      :content="$t('views.application.applicationForm.dialog.similarityTooltip')"
+                      :content="$t('views.application.dialog.similarityTooltip')"
                       placement="right"
                     >
                       <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
@@ -91,7 +91,7 @@
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item :label="$t('views.application.applicationForm.dialog.topReferences')">
+              <el-form-item :label="$t('views.application.dialog.topReferences')">
                 <el-input-number
                   v-model="form.dataset_setting.top_n"
                   :min="1"
@@ -104,7 +104,7 @@
             </el-col>
           </el-row>
 
-          <el-form-item :label="$t('views.application.applicationForm.dialog.maxCharacters')">
+          <el-form-item :label="$t('views.application.dialog.maxCharacters')">
             <el-slider
               v-model="form.dataset_setting.max_paragraph_char_number"
               show-input
@@ -117,7 +117,7 @@
 
           <el-form-item
             v-if="!isWorkflowType"
-            :label="$t('views.application.applicationForm.dialog.noReferencesAction')"
+            :label="$t('views.application.dialog.noReferencesAction')"
           >
             <el-form
               label-position="top"
@@ -133,12 +133,12 @@
               >
                 <el-radio value="ai_questioning">
                   <p>
-                    {{ $t('views.application.applicationForm.dialog.continueQuestioning') }}
+                    {{ $t('views.application.dialog.continueQuestioning') }}
                   </p>
                 </el-radio>
 
                 <el-radio value="designated_answer">
-                  <p>{{ $t('views.application.applicationForm.dialog.provideAnswer') }}</p>
+                  <p>{{ $t('views.application.dialog.provideAnswer') }}</p>
                   <el-form-item
                     v-if="form.dataset_setting.no_references_setting.status === 'designated_answer'"
                     prop="designated_answer"
@@ -205,15 +205,15 @@ const noReferencesformRef = ref()
 const defaultValue = {
   ai_questioning: '{question}',
   // @ts-ignore
-  designated_answer: t('views.application.applicationForm.dialog.designated_answer')
+  designated_answer: t('views.application.dialog.designated_answer')
 }
 
 const defaultPrompt =
-  t('views.application.applicationForm.dialog.defaultPrompt1', {
+  t('views.application.dialog.defaultPrompt1', {
     question: '{question}'
   }) +
   '<data></data>' +
-  t('views.application.applicationForm.dialog.defaultPrompt2')
+  t('views.application.dialog.defaultPrompt2')
 
 const form = ref<any>({
   dataset_setting: {

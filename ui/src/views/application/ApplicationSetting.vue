@@ -6,7 +6,7 @@
           {{ $t('common.setting') }}
         </h3>
         <el-button type="primary" @click="submit(applicationFormRef)" :disabled="loading">
-          {{ $t('views.application.applicationForm.buttons.publish') }}
+          {{ $t('views.application.form.buttons.publish') }}
         </el-button>
       </div>
     </template>
@@ -427,7 +427,7 @@
       </el-col>
       <el-col :span="14" class="p-24 border-l">
         <h4 class="title-decoration-1 mb-16">
-          {{ $t('views.application.applicationForm.title.appTest') }}
+          {{ $t('views.application.form.title.appTest') }}
         </h4>
         <div class="dialog-bg">
           <div class="flex align-center p-16 mb-8">
@@ -524,11 +524,11 @@ const defaultPrompt = t('views.application.form.prompt.defaultPrompt', {
 })
 
 const optimizationPrompt =
-  t('views.application.applicationForm.dialog.defaultPrompt1', {
+  t('views.application.form.dialog.defaultPrompt1', {
     question: '{question}'
   }) +
   '<data></data>' +
-  t('views.application.applicationForm.dialog.defaultPrompt2')
+  t('views.application.form.dialog.defaultPrompt2')
 
 const AIModeParamSettingDialogRef = ref<InstanceType<typeof AIModeParamSettingDialog>>()
 const ReasoningParamSettingDialogRef = ref<InstanceType<typeof ReasoningParamSettingDialog>>()

@@ -169,8 +169,6 @@ const webFormRef = ref()
 const BaseFormRef = ref()
 const loading = ref(false)
 const detail = ref<any>({})
-const application_list = ref<Array<ApplicationFormType>>([])
-const application_id_list = ref([])
 const cloneModelId = ref('')
 
 const form = ref<any>({
@@ -217,14 +215,12 @@ async function submit() {
     await webFormRef.value.validate((valid: any) => {
       if (valid) {
         const obj =
-          detail.value.type === '1' || detail.value.type === '2'
+          detail.value.type === 1 || detail.value.type === 2
             ? {
-                application_id_list: application_id_list.value,
                 meta: form.value,
                 ...BaseFormRef.value.form,
               }
             : {
-                application_id_list: application_id_list.value,
                 ...BaseFormRef.value.form,
               }
 
@@ -234,14 +230,14 @@ async function submit() {
           })
             .then(() => {
               if (detail.value.type === 2) {
-                KnowledgeApi.putLarkDataset(id, obj, loading).then((res) => {
-                  KnowledgeApi.putReEmbeddingDataset(id).then(() => {
+                KnowledgeApi.putLarkKnowledge(id, obj, loading).then((res) => {
+                  KnowledgeApi.putReEmbeddingKnowledge(id).then(() => {
                     MsgSuccess(t('common.saveSuccess'))
                   })
                 })
               } else {
                 KnowledgeApi.putKnowledge(id, obj, loading).then((res) => {
-                  KnowledgeApi.putReEmbeddingDataset(id).then(() => {
+                  KnowledgeApi.putReEmbeddingKnowledge(id).then(() => {
                     MsgSuccess(t('common.saveSuccess'))
                   })
                 })
@@ -250,8 +246,8 @@ async function submit() {
             .catch(() => {})
         } else {
           if (detail.value.type === 2) {
-            KnowledgeApi.putLarkDataset(id, obj, loading).then((res) => {
-              KnowledgeApi.putReEmbeddingDataset(id).then(() => {
+            KnowledgeApi.putLarkKnowledge(id, obj, loading).then((res) => {
+              KnowledgeApi.putReEmbeddingKnowledge(id).then(() => {
                 MsgSuccess(t('common.saveSuccess'))
               })
             })
@@ -267,16 +263,12 @@ async function submit() {
 }
 
 function getDetail() {
-  knowledge.asyncGetDatasetDetail(id, loading).then((res: any) => {
+  knowledge.asyncGetKnowledgeDetail(id, loading).then((res: any) => {
     detail.value = res.data
     cloneModelId.value = res.data?.embedding_mode_id
     if (detail.value.type === '1' || detail.value.type === '2') {
       form.value = res.data.meta
     }
-    application_id_list.value = res.data?.application_id_list
-    KnowledgeApi.listUsableApplication(id, loading).then((ok) => {
-      application_list.value = ok.data
-    })
   })
 }
 

@@ -91,7 +91,7 @@
         </template>
         <div class="mb-16">
           <div class="title mb-8">
-            {{ $t('views.application.applicationForm.dialog.selectSearchMode') }}
+            {{ $t('views.application.dialog.selectSearchMode') }}
           </div>
           <el-radio-group
             v-model="cloneForm.search_mode"
@@ -105,10 +105,10 @@
             >
               <el-radio value="embedding" size="large">
                 <p class="mb-4">
-                  {{ $t('views.application.applicationForm.dialog.vectorSearch') }}
+                  {{ $t('views.application.dialog.vectorSearch') }}
                 </p>
                 <el-text type="info">{{
-                  $t('views.application.applicationForm.dialog.vectorSearchTooltip')
+                  $t('views.application.dialog.vectorSearchTooltip')
                 }}</el-text>
               </el-radio>
             </el-card>
@@ -119,10 +119,10 @@
             >
               <el-radio value="keywords" size="large">
                 <p class="mb-4">
-                  {{ $t('views.application.applicationForm.dialog.fullTextSearch') }}
+                  {{ $t('views.application.dialog.fullTextSearch') }}
                 </p>
                 <el-text type="info">{{
-                  $t('views.application.applicationForm.dialog.fullTextSearchTooltip')
+                  $t('views.application.dialog.fullTextSearchTooltip')
                 }}</el-text>
               </el-radio>
             </el-card>
@@ -133,10 +133,10 @@
             >
               <el-radio value="blend" size="large">
                 <p class="mb-4">
-                  {{ $t('views.application.applicationForm.dialog.hybridSearch') }}
+                  {{ $t('views.application.dialog.hybridSearch') }}
                 </p>
                 <el-text type="info">{{
-                  $t('views.application.applicationForm.dialog.hybridSearchTooltip')
+                  $t('views.application.dialog.hybridSearchTooltip')
                 }}</el-text>
               </el-radio>
             </el-card>
@@ -146,7 +146,7 @@
           <el-col :span="12">
             <div class="mb-16">
               <div class="title mb-8">
-                {{ $t('views.application.applicationForm.dialog.similarityThreshold') }}
+                {{ $t('views.application.dialog.similarityThreshold') }}
               </div>
               <el-input-number
                 v-model="cloneForm.similarity"
@@ -163,7 +163,7 @@
           <el-col :span="12">
             <div class="mb-16">
               <div class="title mb-8">
-                {{ $t('views.application.applicationForm.dialog.topReferences') }}
+                {{ $t('views.application.dialog.topReferences') }}
               </div>
               <el-input-number
                 v-model="cloneForm.top_number"

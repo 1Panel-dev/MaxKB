@@ -49,13 +49,6 @@ const activeMenu = computed(() => {
     height: 100%;
     border: none;
     background: none;
-    .el-menu-item {
-      &:hover {
-        background: var(--app-text-color-light-1);
-        color: var(--el-menu-text-color);
-        cursor: pointer;
-      }
-    }
   }
 }
 </style>

@@ -120,7 +120,7 @@ const { problem, document } = useStore()
 
 const route = useRoute()
 const {
-  params: { id } // datasetId
+  params: { id }, // datasetId
 } = route as any
 
 const emit = defineEmits(['refresh'])
@@ -147,7 +147,7 @@ const isMul = ref(false)
 const paginationConfig = reactive({
   current_page: 1,
   page_size: 50,
-  total: 0
+  total: 0,
 })
 
 function mulAssociation() {
@@ -155,10 +155,10 @@ function mulAssociation() {
     problem_id_list: currentMulProblemId.value,
     paragraph_list: associationParagraph.value.map((item) => ({
       paragraph_id: item.id,
-      document_id: item.document_id
-    }))
+      document_id: item.document_id,
+    })),
   }
-  problemApi.postMulAssociationProblem(id, data, loading).then(() => {
+  problemApi.putMulAssociationProblem(id, data, loading).then(() => {
     MsgSuccess(t('views.problem.tip.relatedSuccess'))
     dialogVisible.value = false
   })
@@ -179,7 +179,7 @@ function associationClick(item: any) {
           item.document_id,
           item.id,
           currentProblemId.value as string,
-          loading
+          loading,
         )
         .then(() => {
           getRecord(currentProblemId.value)
@@ -191,7 +191,7 @@ function associationClick(item: any) {
           item.document_id,
           item.id,
           currentProblemId.value as string,
-          loading
+          loading,
         )
         .then(() => {
           getRecord(currentProblemId.value)
@@ -229,7 +229,7 @@ function getParagraphList(documentId: string) {
       (documentId || currentDocument.value) as string,
       paginationConfig,
       search.value && { [searchType.value]: search.value },
-      loading
+      loading,
     )
     .then((res) => {
       paragraphList.value = [...paragraphList.value, ...res.data.records]
@@ -291,6 +291,35 @@ defineExpose({ open })
 <style lang="scss" scoped>
 .paragraph-card {
   position: relative;
+  // card 选中样式
+  &.selected {
+    border: 1px solid var(--el-color-primary) !important;
+    &:before {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 0;
+      border: 14px solid var(--el-color-primary);
+      border-bottom-color: transparent;
+      border-left-color: transparent;
+    }
+
+    &:after {
+      content: '';
+      width: 3px;
+      height: 6px;
+      position: absolute;
+      right: 5px;
+      top: 2px;
+      border: 2px solid #fff;
+      border-top-color: transparent;
+      border-left-color: transparent;
+      transform: rotate(35deg);
+    }
+    &:hover {
+      border: 1px solid var(--el-color-primary);
+    }
+  }
 }
 .paragraph-badge {
   .el-badge__content {

@@ -70,7 +70,7 @@
           <div class="w-full">
             <el-row>
               <el-col :span="12" class="color-secondary lighter">{{
-                $t('views.application.applicationForm.dialog.selectSearchMode')
+                $t('views.application.form.dialog.selectSearchMode')
               }}</el-col>
               <el-col :span="12" class="lighter">
                 {{
@@ -78,17 +78,17 @@
                 }}</el-col
               >
               <el-col :span="12" class="color-secondary lighter">
-                {{ $t('views.application.applicationForm.dialog.similarityThreshold') }}</el-col
+                {{ $t('views.application.form.dialog.similarityThreshold') }}</el-col
               >
               <el-col :span="12" class="lighter">
                 {{ form_data.dataset_setting.similarity?.toFixed(3) }}</el-col
               >
               <el-col :span="12" class="color-secondary lighter">{{
-                $t('views.application.applicationForm.dialog.topReferences')
+                $t('views.application.form.dialog.topReferences')
               }}</el-col>
               <el-col :span="12" class="lighter"> {{ form_data.dataset_setting.top_n }}</el-col>
               <el-col :span="12" class="color-secondary lighter">
-                {{ $t('views.application.applicationForm.dialog.maxCharacters') }}</el-col
+                {{ $t('views.application.form.dialog.maxCharacters') }}</el-col
               >
               <el-col :span="12" class="lighter">
                 {{ form_data.dataset_setting.max_paragraph_char_number }}</el-col

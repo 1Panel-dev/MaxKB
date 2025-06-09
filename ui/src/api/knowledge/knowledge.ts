@@ -160,7 +160,7 @@ const exportKnowledge: (
   knowledge_id: string,
   loading?: Ref<boolean>,
 ) => Promise<any> = (knowledge_name, knowledge_id, loading) => {
-  return exportExcel(knowledge_name + '.xlsx', `dataset/${knowledge_id}/export`, undefined, loading)
+  return exportExcel(knowledge_name + '.xlsx', `${prefix}/${knowledge_id}/knowledge/${knowledge_id}/export`, undefined, loading)
 }
 /**
  *导出Zip知识库
@@ -176,7 +176,7 @@ const exportZipKnowledge: (
 ) => Promise<any> = (knowledge_name, knowledge_id, loading) => {
   return exportFile(
     knowledge_name + '.zip',
-    `dataset/${knowledge_id}/export_zip`,
+    `${prefix}/${knowledge_id}/knowledge/${knowledge_id}/export_zip`,
     undefined,
     loading,
   )
@@ -233,6 +233,17 @@ const generateRelated: (
   return put(`${prefix}/${knowledge_id}/generate_related`, data, null, loading)
 }
 
+/**
+ * 删除知识库
+ * @param 参数 knowledge_id
+ */
+const delKnowledge: (knowledge_id: String, loading?: Ref<boolean>) => Promise<Result<boolean>> = (
+  knowledge_id,
+  loading
+) => {
+  return del(`${prefix}/${knowledge_id}`, undefined, {}, loading)
+}
+
 export default {
   getKnowledgeByFolder,
   getKnowledgeList,
@@ -249,4 +260,5 @@ export default {
   getLarkDocumentList,
   importLarkDocument,
   generateRelated,
+  delKnowledge
 }

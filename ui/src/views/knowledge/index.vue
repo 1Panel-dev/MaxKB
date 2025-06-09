@@ -220,38 +220,41 @@
                           <el-dropdown-menu>
                             <el-dropdown-item
                               icon="Refresh"
-                              @click.stop="syncDataset(item)"
+                              @click.stop="syncKnowledge(item)"
                               v-if="item.type === 1"
                               >{{ $t('views.knowledge.setting.sync') }}
                             </el-dropdown-item>
-                            <el-dropdown-item @click.stop="reEmbeddingDataset(item)">
+                            <el-dropdown-item @click.stop="reEmbeddingKnowledge(item)">
                               <AppIcon iconName="app-vectorization"></AppIcon>
                               {{ $t('views.knowledge.setting.vectorization') }}
                             </el-dropdown-item>
-                            <!--
 
-                          <el-dropdown-item
-                            icon="Connection"
-                            @click.stop="openGenerateDialog(item)"
-                            >{{ $t('views.document.generateQuestion.title') }}</el-dropdown-item
-                          >
-                          <el-dropdown-item
-                            icon="Setting"
-                            @click.stop="router.push({ path: `/dataset/${item.id}/setting` })"
-                          >
-                            {{ $t('common.setting') }}</el-dropdown-item
-                          >
-                          <el-dropdown-item @click.stop="export_dataset(item)">
-                            <AppIcon iconName="app-export"></AppIcon
-                            >{{ $t('views.document.setting.export') }} Excel</el-dropdown-item
-                          >
-                          <el-dropdown-item @click.stop="export_zip_dataset(item)">
-                            <AppIcon iconName="app-export"></AppIcon
-                            >{{ $t('views.document.setting.export') }} ZIP</el-dropdown-item
-                          >
-                          <el-dropdown-item icon="Delete" @click.stop="deleteDataset(item)">{{
-                            $t('common.delete')
-                          }}</el-dropdown-item> -->
+                            <el-dropdown-item
+                              icon="Connection"
+                              @click.stop="openGenerateDialog(item)"
+                              >{{ $t('views.document.generateQuestion.title') }}</el-dropdown-item
+                            >
+                            <el-dropdown-item
+                              icon="Setting"
+                              @click.stop="
+                                router.push({
+                                  path: `/knowledge/${item.id}/${currentFolder.value}/setting`,
+                                })
+                              "
+                            >
+                              {{ $t('common.setting') }}</el-dropdown-item
+                            >
+                            <el-dropdown-item @click.stop="exportKnowledge(item)">
+                              <AppIcon iconName="app-export"></AppIcon
+                              >{{ $t('views.document.setting.export') }} Excel</el-dropdown-item
+                            >
+                            <el-dropdown-item @click.stop="exportZipKnowledge(item)">
+                              <AppIcon iconName="app-export"></AppIcon
+                              >{{ $t('views.document.setting.export') }} ZIP</el-dropdown-item
+                            >
+                            <el-dropdown-item icon="Delete" @click.stop="deleteKnowledge(item)">{{
+                              $t('common.delete')
+                            }}</el-dropdown-item>
                           </el-dropdown-menu>
                         </template>
                       </el-dropdown>
@@ -268,6 +271,7 @@
 
     <component :is="currentCreateDialog" ref="CreateKnowledgeDialogRef" />
     <CreateFolderDialog ref="CreateFolderDialogRef" @refresh="refreshFolder" />
+    <GenerateRelatedDialog ref="GenerateRelatedDialogRef" />
   </LayoutContainer>
 </template>
 
@@ -277,6 +281,7 @@ import KnowledgeIcon from '@/views/knowledge/component/KnowledgeIcon.vue'
 import CreateKnowledgeDialog from './create-component/CreateKnowledgeDialog.vue'
 import CreateWebKnowledgeDialog from './create-component/CreateWebKnowledgeDialog.vue'
 import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
+import GenerateRelatedDialog from '@/components/generate-related-dialog/index.vue'
 import KnowledgeApi from '@/api/knowledge/knowledge'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import useStore from '@/stores'
@@ -332,7 +337,7 @@ function openCreateDialog(data: any) {
   // })
 }
 
-function reEmbeddingDataset(row: any) {
+function reEmbeddingKnowledge(row: any) {
   KnowledgeApi.putReEmbeddingKnowledge(row.id).then(() => {
     MsgSuccess(t('common.submitSuccess'))
   })
@@ -340,7 +345,7 @@ function reEmbeddingDataset(row: any) {
 
 const SyncWebDialogRef = ref()
 
-function syncDataset(row: any) {
+function syncKnowledge(row: any) {
   SyncWebDialogRef.value.open(row.id)
 }
 
@@ -379,6 +384,44 @@ const CreateFolderDialogRef = ref()
 function openCreateFolder() {
   CreateFolderDialogRef.value.open('KNOWLEDGE', currentFolder.value.parent_id)
 }
+
+const GenerateRelatedDialogRef = ref<InstanceType<typeof GenerateRelatedDialog>>()
+function openGenerateDialog(row: any) {
+  if (GenerateRelatedDialogRef.value) {
+    GenerateRelatedDialogRef.value.open([], 'dataset', row.id)
+  }
+}
+
+const exportKnowledge = (item: any) => {
+  KnowledgeApi.exportKnowledge(item.name, item.id, loading).then((ok) => {
+    MsgSuccess(t('common.exportSuccess'))
+  })
+}
+const exportZipKnowledge = (item: any) => {
+  KnowledgeApi.exportZipKnowledge(item.name, item.id, loading).then((ok) => {
+    MsgSuccess(t('common.exportSuccess'))
+  })
+}
+
+function deleteKnowledge(row: any) {
+  MsgConfirm(
+    `${t('views.knowledge.delete.confirmTitle')}${row.name} ?`,
+    `${t('views.knowledge.delete.confirmMessage1')} ${row.application_mapping_count} ${t('views.knowledge.delete.confirmMessage2')}`,
+    {
+      confirmButtonText: t('common.confirm'),
+      confirmButtonClass: 'danger'
+    }
+  )
+    .then(() => {
+      KnowledgeApi.delKnowledge(row.id, loading).then(() => {
+        const index = knowledgeList.value.findIndex((v) => v.id === row.id)
+        knowledgeList.value.splice(index, 1)
+        MsgSuccess(t('common.deleteSuccess'))
+      })
+    })
+    .catch(() => {})
+}
+
 
 function refreshFolder() {
   getFolder()

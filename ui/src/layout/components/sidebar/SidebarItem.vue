@@ -83,8 +83,8 @@ const menuIcon = computed(() => {
     font-weight: 500;
     border-radius: 4px;
     &:hover {
-      background: none;
-      color: var(--el-color-primary);
+      background: var(--app-text-color-light-1);
+      color: var(--el-menu-text-color);
     }
   }
   :deep(.el-sub-menu__title) {

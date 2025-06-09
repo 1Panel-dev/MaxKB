@@ -25,7 +25,6 @@
   --el-card-padding: calc(var(--app-base-px) * 2);
   --el-card-border-radius: 6px;
   box-shadow: 0px 2px 4px 0px rgba(31, 35, 41, 0.12) !important;
-  border: none;
   &.is-never-shadow {
     border: 1px solid var(--el-card-border-color);
     box-shadow: none !important;

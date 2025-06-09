@@ -1,14 +1,27 @@
-import {Result} from '@/request/Result'
-import {get, post, del, put} from '@/request/index'
-import type {Ref} from 'vue'
-import type {KeyValue} from '@/api/type/common'
-import type {pageRequest} from '@/api/type/common'
+import { Result } from '@/request/Result'
+import { get, post, del, put } from '@/request/index'
+import type { Ref } from 'vue'
+import type { KeyValue } from '@/api/type/common'
+import type { pageRequest } from '@/api/type/common'
 
 const prefix = '/workspace/' + localStorage.getItem('workspace_id') + '/knowledge'
 
 /**
+ * 创建问题
+ * @param 参数 knowledge_id
+ * data: array[string]
+ */
+const postProblems: (
+  knowledge_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (knowledge_id, data, loading) => {
+  return post(`${prefix}/${knowledge_id}/problem`, data, undefined, loading)
+}
+
+/**
  * 问题分页列表
- * @param 参数  dataset_id,
+ * @param 参数  knowledge_id,
  * page {
  "current_page": "string",
  "page_size": "string",
@@ -19,99 +32,87 @@ const prefix = '/workspace/' + localStorage.getItem('workspace_id') + '/knowledg
  */
 
 const getProblems: (
-  dataset_id: string,
+  knowledge_id: string,
   page: pageRequest,
   param: any,
   loading?: Ref<boolean>,
-) => Promise<Result<any>> = (dataset_id, page, param, loading) => {
+) => Promise<Result<any>> = (knowledge_id, page, param, loading) => {
   return get(
-    `${prefix}/${dataset_id}/problem/${page.current_page}/${page.page_size}`,
+    `${prefix}/${knowledge_id}/problem/${page.current_page}/${page.page_size}`,
     param,
     loading,
   )
 }
 
 /**
- * 创建问题
- * @param 参数 dataset_id
- * data: array[string]
- */
-const postProblems: (
-  dataset_id: string,
-  data: any,
-  loading?: Ref<boolean>,
-) => Promise<Result<any>> = (dataset_id, data, loading) => {
-  return post(`${prefix}/${dataset_id}/problem`, data, undefined, loading)
-}
-
-/**
- * 删除问题
- * @param 参数 dataset_id, problem_id,
- */
-const delProblems: (
-  dataset_id: string,
-  problem_id: string,
-  loading?: Ref<boolean>,
-) => Promise<Result<boolean>> = (dataset_id, problem_id, loading) => {
-  return del(`${prefix}/${dataset_id}/problem/${problem_id}`, loading)
-}
-
-/**
- * 批量删除问题
- * @param 参数 dataset_id,
- */
-const delMulProblem: (
-  dataset_id: string,
-  data: any,
-  loading?: Ref<boolean>,
-) => Promise<Result<boolean>> = (dataset_id, data, loading) => {
-  return del(`${prefix}/${dataset_id}/problem/_batch`, undefined, data, loading)
-}
-
-/**
  * 修改问题
  * @param 参数
- * dataset_id, problem_id,
+ * knowledge_id, problem_id,
  * {
  "content": "string",
  }
  */
 const putProblems: (
-  dataset_id: string,
+  knowledge_id: string,
   problem_id: string,
   data: any,
   loading?: Ref<boolean>,
-) => Promise<Result<any>> = (dataset_id, problem_id, data: any, loading) => {
-  return put(`${prefix}/${dataset_id}/problem/${problem_id}`, data, undefined, loading)
+) => Promise<Result<any>> = (knowledge_id, problem_id, data: any, loading) => {
+  return put(`${prefix}/${knowledge_id}/problem/${problem_id}`, data, undefined, loading)
+}
+
+/**
+ * 删除问题
+ * @param 参数 knowledge_id, problem_id,
+ */
+const delProblems: (
+  knowledge_id: string,
+  problem_id: string,
+  loading?: Ref<boolean>,
+) => Promise<Result<boolean>> = (knowledge_id, problem_id, loading) => {
+  return del(`${prefix}/${knowledge_id}/problem/${problem_id}`, loading)
 }
 
 /**
  * 问题详情
  * @param 参数
- * dataset_id, problem_id,
+ * knowledge_id, problem_id,
  */
 const getDetailProblems: (
-  dataset_id: string,
+  knowledge_id: string,
   problem_id: string,
   loading?: Ref<boolean>,
-) => Promise<Result<any>> = (dataset_id, problem_id, loading) => {
-  return get(`${prefix}/${dataset_id}/problem/${problem_id}/paragraph`, undefined, loading)
+) => Promise<Result<any>> = (knowledge_id, problem_id, loading) => {
+  return get(`${prefix}/${knowledge_id}/problem/${problem_id}/paragraph`, undefined, loading)
 }
 
 /**
  * 批量关联段落
- * @param 参数 dataset_id,
+ * @param 参数 knowledge_id,
  * {
- "problem_id_list": "Array",
- "paragraph_list": "Array",
- }
+      "problem_id_list": "Array",
+      "paragraph_list": "Array",
+    }
  */
-const postMulAssociationProblem: (
-  dataset_id: string,
+const putMulAssociationProblem: (
+  knowledge_id: string,
   data: any,
   loading?: Ref<boolean>,
-) => Promise<Result<boolean>> = (dataset_id, data, loading) => {
-  return post(`${prefix}/${dataset_id}/problem/_batch`, data, undefined, loading)
+) => Promise<Result<boolean>> = (knowledge_id, data, loading) => {
+  return put(`${prefix}/${knowledge_id}/problem/batch_association`, data, undefined, loading)
+}
+
+/**
+ * 批量删除问题
+ * @param 参数 knowledge_id,
+ * data: array[string]
+*/
+const putMulProblem: (
+  knowledge_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<boolean>> = (knowledge_id, data, loading) => {
+  return put(`${prefix}/${knowledge_id}/problem/batch_delete`, data, undefined, loading)
 }
 
 export default {
@@ -120,6 +121,6 @@ export default {
   delProblems,
   putProblems,
   getDetailProblems,
-  delMulProblem,
-  postMulAssociationProblem,
+  putMulProblem,
+  putMulAssociationProblem,
 }
