@@ -10,3 +10,4 @@ from .application_api_key import *
 from .application import *
 from .application_version import *
 from .application_access_token import *
+from .application_stats import *
