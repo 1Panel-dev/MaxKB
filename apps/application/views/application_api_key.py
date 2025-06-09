@@ -1,17 +1,17 @@
 from django.db.models import QuerySet
+from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
 from rest_framework.request import Request
 from rest_framework.views import APIView
-from django.utils.translation import gettext_lazy as _
 
-from application.api.application_api_key import ApplicationKeyCreateAPI
+from application.api.application_api_key import ApplicationKeyAPI
 from application.models import ApplicationApiKey
 from application.serializers.application_api_key import ApplicationKeySerializer
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
 from common.constants.permission_constants import PermissionConstants
 from common.log.log import log
-from common.result import result, success
+from common.result import result, success, DefaultResultSerializer
 
 
 def get_application_operation_object(application_api_key_id):
@@ -31,7 +31,9 @@ class ApplicationKey(APIView):
         description=_('Create application ApiKey'),
         summary=_('Create application ApiKey'),
         operation_id=_('Create application ApiKey'),  # type: ignore
-        parameters=ApplicationKeyCreateAPI.get_parameters(),
+        parameters=ApplicationKeyAPI.get_parameters(),
+        request=None,
+        responses=ApplicationKeyAPI.get_response(),
         tags=[_('Application Api Key')]  # type: ignore
     )
     @log(menu='Application', operate="Add ApiKey",
@@ -47,26 +49,50 @@ class ApplicationKey(APIView):
         description=_('GET application ApiKey List'),
         summary=_('Create application ApiKey List'),
         operation_id=_('Create application ApiKey List'),  # type: ignore
-        parameters=ApplicationKeyCreateAPI.get_parameters(),
+        parameters=ApplicationKeyAPI.get_parameters(),
+        responses=ApplicationKeyAPI.List.get_response(),
         tags=[_('Application Api Key')]  # type: ignore
     )
     @has_permissions(PermissionConstants.APPLICATION_OVERVIEW_API_KEY.get_workspace_application_permission())
     def get(self, request: Request, workspace_id: str, application_id: str):
-        return result, success(ApplicationKeySerializer(
-            data={'application_id': application_id, 'user_id': request.user.id,
+        return result.success(ApplicationKeySerializer(
+            data={'application_id': application_id,
                   'workspace_id': workspace_id}).list())
 
     class Operate(APIView):
         authentication_classes = [TokenAuth]
 
         @extend_schema(
-            methods=['GET'],
-            description=_('GET application ApiKey List'),
-            summary=_('Create application ApiKey List'),
-            operation_id=_('Create application ApiKey List'),  # type: ignore
-            parameters=ApplicationKeyCreateAPI.get_parameters(),
+            methods=['PUT'],
+            description=_('Modify application API_KEY'),
+            summary=_('Modify application API_KEY'),
+            operation_id=_('Modify application API_KEY'),  # type: ignore
+            parameters=ApplicationKeyAPI.Operate.get_parameters(),
+            request=ApplicationKeyAPI.Operate.get_request(),
+            responses=DefaultResultSerializer,
             tags=[_('Application Api Key')]  # type: ignore
         )
         @has_permissions(PermissionConstants.APPLICATION_OVERVIEW_API_KEY.get_workspace_application_permission())
-        def put(self, request: Request, application_id: str, workspace_id: str):
-            return result.success(ApplicationKeySerializer.Operate())
+        def put(self, request: Request, workspace_id: str, application_id: str, api_key_id: str):
+            return result.success(
+                ApplicationKeySerializer.Operate(
+                    data={'workspace_id': workspace_id, 'application_id': application_id,
+                          'api_key_id': api_key_id}).edit(
+                    request.data))
+
+        @extend_schema(
+            methods=['DELETE'],
+            description=_('Delete Application API_KEY'),
+            summary=_('Delete Application API_KEY'),
+            operation_id=_('Delete Application API_KEY'),  # type: ignore
+            parameters=ApplicationKeyAPI.Operate.get_parameters(),
+            request=ApplicationKeyAPI.Operate.get_request(),
+            responses=DefaultResultSerializer,
+            tags=[_('Application Api Key')]  # type: ignore
+        )
+        @has_permissions(PermissionConstants.APPLICATION_OVERVIEW_API_KEY.get_workspace_application_permission())
+        def delete(self, request: Request, workspace_id: str, application_id: str, api_key_id: str):
+            return result.success(
+                ApplicationKeySerializer.Operate(
+                    data={'workspace_id': workspace_id, 'application_id': application_id,
+                          'api_key_id': api_key_id}).delete())
