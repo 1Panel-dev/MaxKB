@@ -176,7 +176,7 @@ const submitHandle = async (formEl: FormInstance) => {
           ...form.value,
           state_list: stateMap[state.value]
         }
-        knowledgeApi.generateRelated(id ? id : knowledgeId.value, data, loading).then(() => {
+        knowledgeApi.putGenerateRelated(id ? id : knowledgeId.value, data, loading).then(() => {
           MsgSuccess(t('views.document.generateQuestion.successMessage'))
           dialogVisible.value = false
         })

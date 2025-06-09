@@ -40,38 +40,6 @@ const getKnowledgeList: (
 }
 
 /**
- * 获取全部知识库
- * @param 参数
- */
-const getAllKnowledge: (loading?: Ref<boolean>) => Promise<Result<any[]>> = (loading) => {
-  return get(`${prefix}`, undefined, loading)
-}
-
-/**
- * 同步知识库
- * @param 参数 knowledge_id
- * @query 参数 sync_type // 同步类型->replace:替换同步,complete:完整同步
- */
-const putSyncWebKnowledge: (
-  knowledge_id: string,
-  sync_type: string,
-  loading?: Ref<boolean>,
-) => Promise<Result<any>> = (knowledge_id, sync_type, loading) => {
-  return put(`${prefix}/knowledge/${knowledge_id}/sync`, undefined, { sync_type }, loading)
-}
-
-/**
- * 向量化知识库
- * @param 参数 knowledge_id
- */
-const putReEmbeddingKnowledge: (
-  knowledge_id: string,
-  loading?: Ref<boolean>,
-) => Promise<Result<any>> = (knowledge_id, loading) => {
-  return put(`${prefix}/knowledge/${knowledge_id}/embedding`, undefined, undefined, loading)
-}
-
-/**
  * 知识库详情
  * @param 参数 knowledge_id
  */
@@ -82,41 +50,6 @@ const getKnowledgeDetail: (knowledge_id: string, loading?: Ref<boolean>) => Prom
   return get(`${prefix}/knowledge/${knowledge_id}`, undefined, loading)
 }
 
-/**
- * 创建知识库
- * @param 参数
- * {
- "name": "string",
- "folder_id": "string",
- "desc": "string",
- "embedding": "string"
- }
- */
-const postKnowledge: (data: knowledgeData, loading?: Ref<boolean>) => Promise<Result<any>> = (
-  data,
-  loading,
-) => {
-  return post(`${prefix}/knowledge/base`, data, undefined, loading, 1000 * 60 * 5)
-}
-
-/**
- * 创建Web知识库
- * @param 参数
- * {
- "name": "string",
- "folder_id": "string",
- "desc": "string",
- "embedding": "string",
- "source_url": "string",
- "selector": "string"
- }
- */
-const postWebKnowledge: (data: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
-  data,
-  loading,
-) => {
-  return post(`${prefix}/knowledge/web`, data, undefined, loading)
-}
 /**
  * 修改知识库信息
  * @param 参数
@@ -135,18 +68,25 @@ const putKnowledge: (
 }
 
 /**
- * 命中测试列表
- * @param knowledge_id
- * @param loading
- * @query  { query_text: string, top_number: number, similarity: number }
- * @returns
+ * 删除知识库
+ * @param 参数 knowledge_id
  */
-const getKnowledgeHitTest: (
+const delKnowledge: (knowledge_id: String, loading?: Ref<boolean>) => Promise<Result<boolean>> = (
+  knowledge_id,
+  loading,
+) => {
+  return del(`${prefix}/${knowledge_id}`, undefined, {}, loading)
+}
+
+/**
+ * 向量化知识库
+ * @param 参数 knowledge_id
+ */
+const putReEmbeddingKnowledge: (
   knowledge_id: string,
-  data: any,
   loading?: Ref<boolean>,
-) => Promise<Result<Array<any>>> = (knowledge_id, data, loading) => {
-  return get(`${prefix}/${knowledge_id}/hit_test`, data, loading)
+) => Promise<Result<any>> = (knowledge_id, loading) => {
+  return put(`${prefix}/knowledge/${knowledge_id}/embedding`, undefined, undefined, loading)
 }
 
 /**
@@ -160,7 +100,12 @@ const exportKnowledge: (
   knowledge_id: string,
   loading?: Ref<boolean>,
 ) => Promise<any> = (knowledge_name, knowledge_id, loading) => {
-  return exportExcel(knowledge_name + '.xlsx', `${prefix}/${knowledge_id}/knowledge/${knowledge_id}/export`, undefined, loading)
+  return exportExcel(
+    knowledge_name + '.xlsx',
+    `${prefix}/${knowledge_id}/knowledge/${knowledge_id}/export`,
+    undefined,
+    loading,
+  )
 }
 /**
  *导出Zip知识库
@@ -183,6 +128,80 @@ const exportZipKnowledge: (
 }
 
 /**
+ * 生成关联问题
+ * @param knowledge_id 知识库id
+ * @param data
+ * @param loading
+ * @returns
+ */
+const putGenerateRelated: (
+  knowledge_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<Array<any>>> = (knowledge_id, data, loading) => {
+  return put(`${prefix}/${knowledge_id}/generate_related`, data, null, loading)
+}
+
+/**
+ * 命中测试列表
+ * @param knowledge_id
+ * @param loading
+ * @query  { query_text: string, top_number: number, similarity: number }
+ * @returns
+ */
+const getKnowledgeHitTest: (
+  knowledge_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<Array<any>>> = (knowledge_id, data, loading) => {
+  return get(`${prefix}/${knowledge_id}/hit_test`, data, loading)
+}
+
+/**
+ * 同步知识库
+ * @param 参数 knowledge_id
+ * @query 参数 sync_type // 同步类型->replace:替换同步,complete:完整同步
+ */
+const putSyncWebKnowledge: (
+  knowledge_id: string,
+  sync_type: string,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (knowledge_id, sync_type, loading) => {
+  return put(`${prefix}/knowledge/${knowledge_id}/sync`, undefined, { sync_type }, loading)
+}
+
+/**
+ * 创建知识库
+ * @param 参数
+ * {
+ "name": "string",
+ "folder_id": "string",
+ "desc": "string",
+ "embedding": "string"
+ }
+ */
+const postKnowledge: (data: knowledgeData, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  data,
+  loading,
+) => {
+  return post(`${prefix}/knowledge/base`, data, undefined, loading, 1000 * 60 * 5)
+}
+
+/**
+ * 获取当前用户可使用的向量化模型列表
+ * @param application_id
+ * @param loading
+ * @query  { query_text: string, top_number: number, similarity: number }
+ * @returns
+ */
+const getKnowledgeEmdeddingModel: (
+  knowledge_id: string,
+  loading?: Ref<boolean>,
+) => Promise<Result<Array<any>>> = (knowledge_id, loading) => {
+  return get(`${prefix}/${knowledge_id}/emdedding_model`, loading)
+}
+
+/**
  * 获取当前用户可使用的模型列表
  * @param application_id
  * @param loading
@@ -195,6 +214,34 @@ const getKnowledgeModel: (
 ) => Promise<Result<Array<any>>> = (knowledge_id, loading) => {
   return get(`${prefix}/${knowledge_id}/model`, loading)
 }
+
+/**
+ * 创建Web知识库
+ * @param 参数
+ * {
+ "name": "string",
+ "folder_id": "string",
+ "desc": "string",
+ "embedding": "string",
+ "source_url": "string",
+ "selector": "string"
+ }
+ */
+const postWebKnowledge: (data: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  data,
+  loading,
+) => {
+  return post(`${prefix}/knowledge/web`, data, undefined, loading)
+}
+
+/**
+ * 获取全部知识库
+ * @param 参数
+ */
+const getAllKnowledge: (loading?: Ref<boolean>) => Promise<Result<any[]>> = (loading) => {
+  return get(`${prefix}`, undefined, loading)
+}
+
 /**
  * 获取飞书文档列表
  * @param knowledge_id
@@ -218,48 +265,24 @@ const importLarkDocument: (
 ) => Promise<Result<Array<any>>> = (knowledge_id, data, loading) => {
   return post(`${prefix}/lark/${knowledge_id}/import`, data, null, loading)
 }
-/**
- * 生成关联问题
- * @param knowledge_id 知识库id
- * @param data
- * @param loading
- * @returns
- */
-const generateRelated: (
-  knowledge_id: string,
-  data: any,
-  loading?: Ref<boolean>,
-) => Promise<Result<Array<any>>> = (knowledge_id, data, loading) => {
-  return put(`${prefix}/${knowledge_id}/generate_related`, data, null, loading)
-}
-
-/**
- * 删除知识库
- * @param 参数 knowledge_id
- */
-const delKnowledge: (knowledge_id: String, loading?: Ref<boolean>) => Promise<Result<boolean>> = (
-  knowledge_id,
-  loading
-) => {
-  return del(`${prefix}/${knowledge_id}`, undefined, {}, loading)
-}
 
 export default {
   getKnowledgeByFolder,
   getKnowledgeList,
-  putReEmbeddingKnowledge,
-  putSyncWebKnowledge,
   getKnowledgeDetail,
-  postKnowledge,
-  postWebKnowledge,
   putKnowledge,
-  getKnowledgeHitTest,
+  delKnowledge,
+  putReEmbeddingKnowledge,
   exportKnowledge,
   exportZipKnowledge,
+  putGenerateRelated,
+  getKnowledgeHitTest,
+  putSyncWebKnowledge,
+  postKnowledge,
   getKnowledgeModel,
+  postWebKnowledge,
+
   getLarkDocumentList,
   importLarkDocument,
-  generateRelated,
-  delKnowledge,
-  getAllKnowledge
+  getAllKnowledge,
 }
