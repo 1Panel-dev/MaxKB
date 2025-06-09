@@ -14,7 +14,8 @@ from common.auth.common import ChatUserToken
 from common.auth.handle.auth_base_handle import AuthBaseHandle
 from common.constants.authentication_type import AuthenticationType
 from common.constants.permission_constants import RoleConstants, Permission, Group, Operate, ChatAuth
-from common.exception.app_exception import AppAuthenticationFailed, ChatException
+from common.database_model_manage.database_model_manage import DatabaseModelManage
+from common.exception.app_exception import AppAuthenticationFailed
 
 
 class ChatAnonymousUserToken(AuthBaseHandle):
@@ -40,10 +41,11 @@ class ChatAnonymousUserToken(AuthBaseHandle):
             raise AppAuthenticationFailed(1002, _('Authentication information is incorrect'))
         if not application_access_token.access_token == access_token:
             raise AppAuthenticationFailed(1002, _('Authentication information is incorrect'))
-        # 匿名用户 除了/api/application/profile 都需要校验是否开启了密码认证
-        if request.path != '/api/application/profile':
-            if chat_user_token.authentication.is_auth and not chat_user_token.authentication.auth_passed:
-                raise ChatException(1002, _('Authentication information is incorrect'))
+        application_setting_model = DatabaseModelManage.get_model("application_setting")
+        if application_setting_model is not None:
+            application_setting = QuerySet(application_setting_model).filter(application_id=application_id).first()
+            if application_setting.authentication:
+                raise AppAuthenticationFailed(1002, _('Authentication information is incorrect'))
         return None, ChatAuth(
             current_role_list=[RoleConstants.CHAT_ANONYMOUS_USER],
             permission_list=[
