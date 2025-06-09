@@ -842,6 +842,23 @@ class PermissionConstants(Enum):
         parent_group=[SystemGroup.SHARED_KNOWLEDGE]
     )
 
+    SHARED_MODEL_CREATE = Permission(
+        group=Group.MODEL, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[SystemGroup.SHARED_MODEL]
+    )
+    SHARED_MODEL_READ = Permission(
+        group=Group.MODEL, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[SystemGroup.SHARED_MODEL]
+    )
+    SHARED_MODEL_EDIT = Permission(
+        group=Group.MODEL, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[SystemGroup.SHARED_MODEL]
+    )
+    SHARED_MODEL_DELETE = Permission(
+        group=Group.MODEL, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[SystemGroup.SHARED_MODEL]
+    )
+
     def get_workspace_application_permission(self):
         return lambda r, kwargs: Permission(group=self.value.group, operate=self.value.operate,
                                             resource_path=
