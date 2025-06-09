@@ -31,7 +31,7 @@ class AccessToken(APIView):
         request=ApplicationAccessTokenAPI.get_request(),
         tags=[_('Application')]  # type: ignore
     )
-    @has_permissions(PermissionConstants.APPLICATION_OVERVIEW_ACCESS.get_workspace_permission())
+    @has_permissions(PermissionConstants.APPLICATION_OVERVIEW_ACCESS.get_workspace_application_permission())
     def put(self, request: Request, workspace_id: str, application_id: str):
         return result.success(
             AccessTokenSerializer(data={'application_id': application_id}).edit(
@@ -45,6 +45,6 @@ class AccessToken(APIView):
         parameters=ApplicationAccessTokenAPI.get_parameters(),
         tags=[_('Application')]  # type: ignore
     )
-    @has_permissions(PermissionConstants.APPLICATION_READ.get_workspace_permission())
+    @has_permissions(PermissionConstants.APPLICATION_READ.get_workspace_application_permission())
     def get(self, request: Request, workspace_id: str, application_id: str):
         return result.success(AccessTokenSerializer(data={'application_id': application_id}).one())
