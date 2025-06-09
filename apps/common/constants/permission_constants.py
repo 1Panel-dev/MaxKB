@@ -64,6 +64,9 @@ class SystemGroup(Enum):
     SHARED_KNOWLEDGE = "SHARED_KNOWLEDGE"
     SHARED_MODEL = "SHARED_MODEL"
     SHARED_TOOL = "SHARED_TOOL"
+    SYSTEM_KNOWLEDGE = "SYSTEM_KNOWLEDGE"
+    SYSTEM_MODEL = "SYSTEM_MODEL"
+    SYSTEM_TOOL = "SYSTEM_TOOL"
     SYSTEM_SETTING = "SYSTEM_SETTING"
     OPERATION_LOG = "OPERATION_LOG"
     OTHER = "OTHER"
@@ -857,6 +860,34 @@ class PermissionConstants(Enum):
     SHARED_MODEL_DELETE = Permission(
         group=Group.MODEL, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
         parent_group=[SystemGroup.SHARED_MODEL]
+    )
+    SYSTEM_TOOL_READ = Permission(
+        group=Group.TOOL, operate=Operate.READ, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.SYSTEM_TOOL]
+    )
+    SYSTEM_TOOL_CREATE = Permission(
+        group=Group.TOOL, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.SYSTEM_TOOL]
+    )
+    SYSTEM_TOOL_EDIT = Permission(
+        group=Group.TOOL, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.SYSTEM_TOOL]
+    )
+    SYSTEM_TOOL_DELETE = Permission(
+        group=Group.TOOL, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.SYSTEM_TOOL]
+    )
+    SYSTEM_TOOL_IMPORT = Permission(
+        group=Group.TOOL, operate=Operate.IMPORT, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.SYSTEM_TOOL]
+    )
+    SYSTEM_TOOL_EXPORT = Permission(
+        group=Group.TOOL, operate=Operate.EXPORT, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.SYSTEM_TOOL]
+    )
+    SYSTEM_TOOL_DEBUG = Permission(
+        group=Group.TOOL, operate=Operate.DEBUG, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.SYSTEM_TOOL]
     )
 
     def get_workspace_application_permission(self):
