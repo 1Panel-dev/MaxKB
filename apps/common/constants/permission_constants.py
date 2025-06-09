@@ -925,6 +925,22 @@ def get_permission_list_by_resource_group(resource_group: ResourcePermissionGrou
             PermissionConstants[k].value.resource_permission_group_list.__contains__(resource_group)]
 
 
+class ChatAuth:
+    def __init__(self,
+                 current_role_list: List[RoleConstants | Role],
+                 permission_list: List[PermissionConstants | Permission],
+                 chat_user_id,
+                 chat_user_type,
+                 application_id):
+        # 权限列表
+        self.permission_list = permission_list
+        # 角色列表
+        self.role_list = current_role_list
+        self.chat_user_id = chat_user_id
+        self.chat_user_type = chat_user_type
+        self.application_id = application_id
+
+
 class Auth:
     """
      用于存储当前用户的角色和权限

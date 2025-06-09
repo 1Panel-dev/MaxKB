@@ -44,7 +44,7 @@ class PostResponseHandler:
     @abstractmethod
     def handler(self, chat_id, chat_record_id, paragraph_list: List[ParagraphPipelineModel], problem_text: str,
                 answer_text,
-                manage, step, padding_problem_text: str = None, client_id=None, **kwargs):
+                manage, step, padding_problem_text: str = None, **kwargs):
         pass
 
 
@@ -68,8 +68,9 @@ class IChatStep(IBaseChatPipelineStep):
                                                      label=_("Completion Question"))
         # 是否使用流的形式输出
         stream = serializers.BooleanField(required=False, label=_("Streaming Output"))
-        client_id = serializers.CharField(required=True, label=_("Client id"))
-        client_type = serializers.CharField(required=True, label=_("Client Type"))
+        chat_user_id = serializers.CharField(required=True, label=_("Chat user id"))
+
+        chat_user_type = serializers.CharField(required=True, label=_("Chat user Type"))
         # 未查询到引用分段
         no_references_setting = NoReferencesSetting(required=True,
                                                     label=_("No reference segment settings"))
@@ -104,6 +105,6 @@ class IChatStep(IBaseChatPipelineStep):
                 user_id: str = None,
                 paragraph_list=None,
                 manage: PipelineManage = None,
-                padding_problem_text: str = None, stream: bool = True, client_id=None, client_type=None,
+                padding_problem_text: str = None, stream: bool = True, chat_user_id=None, chat_user_type=None,
                 no_references_setting=None, model_params_setting=None, model_setting=None, **kwargs):
         pass

@@ -9,12 +9,11 @@
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 
-from application.models import ApplicationAccessToken, ClientType
+from application.models import ApplicationAccessToken
 from common.auth.common import ChatUserToken
-
 from common.auth.handle.auth_base_handle import AuthBaseHandle
 from common.constants.authentication_type import AuthenticationType
-from common.constants.permission_constants import RoleConstants, Permission, Group, Operate, Auth
+from common.constants.permission_constants import RoleConstants, Permission, Group, Operate, ChatAuth
 from common.exception.app_exception import AppAuthenticationFailed, ChatException
 
 
@@ -45,11 +44,11 @@ class ChatAnonymousUserToken(AuthBaseHandle):
         if request.path != '/api/application/profile':
             if chat_user_token.authentication.is_auth and not chat_user_token.authentication.auth_passed:
                 raise ChatException(1002, _('Authentication information is incorrect'))
-        return None, Auth(
+        return None, ChatAuth(
             current_role_list=[RoleConstants.CHAT_ANONYMOUS_USER],
             permission_list=[
                 Permission(group=Group.APPLICATION,
                            operate=Operate.USE)],
             application_id=application_access_token.application_id,
-            client_id=auth_details.get('client_id'),
-            client_type=ClientType.ANONYMOUS_USER)
+            chat_user_id=chat_user_token.chat_user_id,
+            chat_user_type=chat_user_token.chat_user_type)
