@@ -13,6 +13,8 @@ urlpatterns = [
     path('workspace/<str:workspace_id>/application/<str:application_id>', views.Application.Operate.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/application_key',
          views.ApplicationKey.as_view()),
+    path('workspace/<str:workspace_id>/application/<str:application_id>/application_stats',
+         views.ApplicationStats.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/application_key/<str:api_key_id>',
          views.ApplicationKey.Operate.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/export', views.Application.Export.as_view()),
