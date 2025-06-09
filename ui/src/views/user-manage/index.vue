@@ -214,8 +214,4 @@ onMounted(() => {
   getList()
 })
 </script>
-<style lang="scss" scoped>
-.log-table tr {
-  cursor: pointer;
-}
-</style>
+<style lang="scss" scoped></style>

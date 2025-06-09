@@ -36,7 +36,7 @@ const getMemberPermissions: (member_id: String) => Promise<Result<any>> = (membe
 }
 
 /**
- * 获取成员权限
+ * 修改成员权限
  * @param 参数 member_id
  * @param 参数 {
           "team_member_permission_list": [
