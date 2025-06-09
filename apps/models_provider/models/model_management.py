@@ -42,8 +42,7 @@ class Model(AppModelMixin):
     meta = models.JSONField(verbose_name="模型元数据,用于存储下载,或者错误信息", default=dict)
 
     model_params_form = models.JSONField(verbose_name="模型参数配置", default=list)
-
-    workspace_id = models.CharField(max_length=128, verbose_name="工作空间id", null=True, blank=True)
+    workspace_id = models.CharField(max_length=64, verbose_name="工作空间id", default="default", db_index=True)
 
     class Meta:
         db_table = "model"
