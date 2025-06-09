@@ -195,7 +195,7 @@ class Problem(AppModelMixin):
 class ProblemParagraphMapping(AppModelMixin):
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
     knowledge = models.ForeignKey(Knowledge, on_delete=models.DO_NOTHING, db_constraint=False)
-    document = models.ForeignKey(Document, on_delete=models.DO_NOTHING)
+    document = models.ForeignKey(Document, on_delete=models.DO_NOTHING, db_constraint=False)
     problem = models.ForeignKey(Problem, on_delete=models.DO_NOTHING, db_constraint=False)
     paragraph = models.ForeignKey(Paragraph, on_delete=models.DO_NOTHING, db_constraint=False)
 
