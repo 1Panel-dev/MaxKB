@@ -30,9 +30,9 @@ export const routes: Array<RouteRecordRaw> = [
     component: () => import('@/views/login/index.vue'),
   },
   {
-    path: '/forget_password',
-    name: 'ForgetPassword',
-    component: () => import('@/views/login/ForgetPassword.vue'),
+    path: '/forgot_password',
+    name: 'ForgotPassword',
+    component: () => import('@/views/login/ForgotPassword.vue'),
   },
   {
     path: '/reset_password/:code/:email',

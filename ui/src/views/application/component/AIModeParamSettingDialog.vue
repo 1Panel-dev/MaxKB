@@ -35,7 +35,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import type { FormField } from '@/components/dynamics-form/type'
-import modelAPi from '@/api/model'
+import modelAPi from '@/api/model/model'
 import applicationApi from '@/api/application/application'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
 const model_form_field = ref<Array<FormField>>([])

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { DeviceType, ValidType } from '@/enums/common'
 // import type { Ref } from 'vue'
-// import userApi from '@/api/user'
+// import userApi from '@/api/user/user'
 
 export interface commonTypes {
   breadcrumb: any
