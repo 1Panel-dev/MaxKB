@@ -26,8 +26,8 @@ class ISearchDatasetStep(IBaseChatPipelineStep):
         padding_problem_text = serializers.CharField(required=False,
                                                      label=_("System completes question text"))
         # 需要查询的数据集id列表
-        dataset_id_list = serializers.ListField(required=True, child=serializers.UUIDField(required=True),
-                                                label=_("Dataset id list"))
+        knowledge_id_list = serializers.ListField(required=True, child=serializers.UUIDField(required=True),
+                                                  label=_("Dataset id list"))
         # 需要排除的文档id
         exclude_document_id_list = serializers.ListField(required=True, child=serializers.UUIDField(required=True),
                                                          label=_("List of document ids to exclude"))
@@ -55,7 +55,7 @@ class ISearchDatasetStep(IBaseChatPipelineStep):
         self.context['paragraph_list'] = paragraph_list
 
     @abstractmethod
-    def execute(self, problem_text: str, dataset_id_list: list[str], exclude_document_id_list: list[str],
+    def execute(self, problem_text: str, knowledge_id_list: list[str], exclude_document_id_list: list[str],
                 exclude_paragraph_id_list: list[str], top_n: int, similarity: float, padding_problem_text: str = None,
                 search_mode: str = None,
                 user_id=None,
@@ -65,7 +65,7 @@ class ISearchDatasetStep(IBaseChatPipelineStep):
         :param similarity:                         相关性
         :param top_n:                              查询多少条
         :param problem_text:                       用户问题
-        :param dataset_id_list:                    需要查询的数据集id列表
+        :param knowledge_id_list:                    需要查询的数据集id列表
         :param exclude_document_id_list:           需要排除的文档id
         :param exclude_paragraph_id_list:          需要排除段落id
         :param padding_problem_text                补全问题

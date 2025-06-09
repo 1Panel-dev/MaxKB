@@ -15,7 +15,7 @@ from application.chat_pipeline.I_base_chat_pipeline import ParagraphPipelineMode
 from application.chat_pipeline.step.generate_human_message_step.i_generate_human_message_step import \
     IGenerateHumanMessageStep
 from application.models import ChatRecord
-from common.util.split_model import flat_map
+from common.utils.common import flat_map
 
 
 class BaseGenerateHumanMessageStep(IGenerateHumanMessageStep):

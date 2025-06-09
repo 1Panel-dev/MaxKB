@@ -18,8 +18,8 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError, ErrorDetail
 
 from application.flow.common import Answer, NodeChunk
-from application.models import ChatRecord
-from application.models import ApplicationChatClientStats
+from application.models import ChatRecord, ChatUserType
+from application.models import ApplicationChatUserStats
 from common.constants.authentication_type import AuthenticationType
 from common.field.common import InstanceField
 
@@ -45,10 +45,10 @@ def is_interrupt(node, step_variable: Dict, global_variable: Dict):
 
 
 class WorkFlowPostHandler:
-    def __init__(self, chat_info, client_id, client_type):
+    def __init__(self, chat_info, chat_user_id, chat_user_type):
         self.chat_info = chat_info
-        self.client_id = client_id
-        self.client_type = client_type
+        self.chat_user_id = chat_user_id
+        self.chat_user_type = chat_user_type
 
     def handler(self, chat_id,
                 chat_record_id,
@@ -84,13 +84,13 @@ class WorkFlowPostHandler:
                                      run_time=time.time() - workflow.context['start_time'],
                                      index=0)
         asker = workflow.context.get('asker', None)
-        self.chat_info.append_chat_record(chat_record, self.client_id, asker)
-        # 重新设置缓存
-        chat_cache.set(chat_id,
-                       self.chat_info, timeout=60 * 30)
-        if self.client_type == AuthenticationType.APPLICATION_ACCESS_TOKEN.value:
-            application_public_access_client = (QuerySet(ApplicationChatClientStats)
-                                                .filter(client_id=self.client_id,
+        self.chat_info.append_chat_record(chat_record)
+        self.chat_info.set_cahce()
+        if [ChatUserType.ANONYMOUS_USER.value, ChatUserType.CHAT_USER.value].__contains__(
+                self.chat_user_type):
+            application_public_access_client = (QuerySet(ApplicationChatUserStats)
+                                                .filter(chat_user_id=self.chat_user_id,
+                                                        chat_user_type=self.chat_user_type,
                                                         application_id=self.chat_info.application.id).first())
             if application_public_access_client is not None:
                 application_public_access_client.access_num = application_public_access_client.access_num + 1

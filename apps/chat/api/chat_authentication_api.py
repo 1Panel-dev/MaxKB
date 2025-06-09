@@ -6,14 +6,19 @@
     @date：2025/6/6 19:59
     @desc:
 """
-from chat.serializers.chat_authentication import AuthenticationSerializer
+
+from django.utils.translation import gettext_lazy as _
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiParameter
+
+from chat.serializers.chat_authentication import AnonymousAuthenticationSerializer
 from common.mixins.api_mixin import APIMixin
 
 
 class ChatAuthenticationAPI(APIMixin):
     @staticmethod
     def get_request():
-        return AuthenticationSerializer()
+        return AnonymousAuthenticationSerializer
 
     @staticmethod
     def get_parameters():
@@ -22,3 +27,35 @@ class ChatAuthenticationAPI(APIMixin):
     @staticmethod
     def get_response():
         pass
+
+
+class ChatAuthenticationProfileAPI(APIMixin):
+
+    @staticmethod
+    def get_parameters():
+        return [OpenApiParameter(
+            name="access_token",
+            description=_("access_token"),
+            type=OpenApiTypes.STR,
+            location='query',
+            required=True,
+        )]
+
+
+class ChatOpenAPI(APIMixin):
+    @staticmethod
+    def get_parameters():
+        return [OpenApiParameter(
+            name="workspace_id",
+            description="工作空间id",
+            type=OpenApiTypes.STR,
+            location='path',
+            required=True,
+        ),
+            OpenApiParameter(
+                name="application_id",
+                description="应用id",
+                type=OpenApiTypes.STR,
+                location='path',
+                required=True,
+            )]

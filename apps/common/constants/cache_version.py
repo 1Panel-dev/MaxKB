@@ -24,6 +24,8 @@ class Cache_Version(Enum):
     CAPTCHA = "CAPTCHA", lambda captcha: captcha
     # 系统
     SYSTEM = "SYSTEM", lambda key: key
+    # 对话
+    CHAT = "CHAT", lambda key: key
 
     def get_version(self):
         return self.value[0]
