@@ -70,9 +70,11 @@ export default {
     addParam: '添加参数',
   },
   inputPlaceholder: '请输入',
+  selectPlaceholder: '请选择',
   title: '标题',
   content: '内容',
   rename: '重命名',
+  renameSuccess: '重命名成功',
   EditAvatarDialog: {
     title: '应用头像',
     customizeUpload: '自定义上传',

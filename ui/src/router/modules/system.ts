@@ -33,6 +33,19 @@ const systemRouter = {
       component: () => import('@/views/resource-authorization/index.vue'),
     },
     {
+      path: '/system/role',
+      name: 'role',
+      meta: {
+        icon: 'app-resource-authorization', // TODO
+        iconActive: 'app-resource-authorization-active', // TODO
+        title: 'views.role.title',
+        activeMenu: '/system',
+        parentPath: '/system',
+        parentName: 'system',
+      },
+      component: () => import('@/views/role/index.vue'),
+    },
+    {
       path:'/system/setting',
       name: 'setting',
       meta: {

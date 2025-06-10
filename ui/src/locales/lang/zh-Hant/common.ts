@@ -66,9 +66,11 @@ export default {
     addParam: '新增參數',
   },
   inputPlaceholder: '請輸入',
+  selectPlaceholder: '請選擇',
   title: '標題',
   content: '内容',
   rename: '重命名',
+  renameSuccess: '重命名成功',
   EditAvatarDialog: {
     title: '應用頭像',
     customizeUpload: '自訂上傳',
