@@ -5,7 +5,7 @@ from rest_framework.request import Request
 from rest_framework.views import APIView
 
 from application.api.application_api_key import ApplicationKeyAPI
-from application.models import ApplicationApiKey
+from application.models import ApplicationApiKey, Application
 from application.serializers.application_api_key import ApplicationKeySerializer
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
@@ -14,11 +14,11 @@ from common.log.log import log
 from common.result import result, success, DefaultResultSerializer
 
 
-def get_application_operation_object(application_api_key_id):
-    application_api_key_model = QuerySet(model=ApplicationApiKey).filter(id=application_api_key_id).first()
-    if application_api_key_model is not None:
+def get_application_operation_object(application_id):
+    application_model = QuerySet(model=Application).filter(id=application_id).first()
+    if application_model is not None:
         return {
-            "name": application_api_key_model.name
+            "name": application_model.name
         }
     return {}
 
@@ -37,7 +37,8 @@ class ApplicationKey(APIView):
         tags=[_('Application Api Key')]  # type: ignore
     )
     @log(menu='Application', operate="Add ApiKey",
-         get_operation_object=lambda r, k: get_application_operation_object(k.get('application_api_key_id')))
+         get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')),
+         workspace_id=lambda r, k: k.get('workspace_id'))
     @has_permissions(PermissionConstants.APPLICATION_OVERVIEW_API_KEY.get_workspace_application_permission())
     def post(self, request: Request, workspace_id: str, application_id: str):
         return result.success(ApplicationKeySerializer(
@@ -73,6 +74,9 @@ class ApplicationKey(APIView):
             tags=[_('Application Api Key')]  # type: ignore
         )
         @has_permissions(PermissionConstants.APPLICATION_OVERVIEW_API_KEY.get_workspace_application_permission())
+        @log(menu='Application', operate="Modify application API_KEY",
+             get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')),
+             workspace_id=lambda r, k: k.get('workspace_id'))
         def put(self, request: Request, workspace_id: str, application_id: str, api_key_id: str):
             return result.success(
                 ApplicationKeySerializer.Operate(
@@ -91,6 +95,9 @@ class ApplicationKey(APIView):
             tags=[_('Application Api Key')]  # type: ignore
         )
         @has_permissions(PermissionConstants.APPLICATION_OVERVIEW_API_KEY.get_workspace_application_permission())
+        @log(menu='Application', operate="Delete application API_KEY",
+             get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')),
+             workspace_id=lambda r, k: k.get('workspace_id'))
         def delete(self, request: Request, workspace_id: str, application_id: str, api_key_id: str):
             return result.success(
                 ApplicationKeySerializer.Operate(

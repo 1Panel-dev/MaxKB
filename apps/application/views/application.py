@@ -48,7 +48,8 @@ class Application(APIView):
     )
     @has_permissions(PermissionConstants.APPLICATION_READ.get_workspace_permission())
     @log(menu='Application', operate='Create an application',
-         get_operation_object=lambda r, k: {'name': r.data.get('name')})
+         get_operation_object=lambda r, k: {'name': r.data.get('name')},
+         workspace_id=lambda r, k: k.get('workspace_id'))
     def post(self, request: Request, workspace_id: str):
         return result.success(
             ApplicationSerializer(data={'workspace_id': workspace_id, 'user_id': request.user.id}).insert(request.data))
@@ -99,7 +100,7 @@ class Application(APIView):
             tags=[_('Application')]  # type: ignore
         )
         @has_permissions(PermissionConstants.APPLICATION_READ)
-        @log(menu='Application', operate="Import Application")
+        @log(menu='Application', operate="Import Application", workspace_id=lambda r, k: k.get('workspace_id'))
         def post(self, request: Request, workspace_id: str):
             return result.success(ApplicationSerializer(
                 data={'user_id': request.user.id, 'workspace_id': workspace_id,
@@ -120,7 +121,8 @@ class Application(APIView):
         )
         @has_permissions(PermissionConstants.APPLICATION_EXPORT.get_workspace_application_permission())
         @log(menu='Application', operate="Export Application",
-             get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')))
+             get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')),
+             workspace_id=lambda r, k: k.get('workspace_id'))
         def post(self, request: Request, workspace_id: str, application_id: str):
             return ApplicationOperateSerializer(
                 data={'application_id': application_id,
@@ -140,7 +142,8 @@ class Application(APIView):
         )
         @has_permissions(PermissionConstants.APPLICATION_DELETE.get_workspace_application_permission())
         @log(menu='Application', operate='Deleting application',
-             get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id'))
+             get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')),
+             workspace_id=lambda r, k: k.get('workspace_id')
              )
         def delete(self, request: Request, workspace_id: str, application_id: str):
             return result.success(ApplicationOperateSerializer(
@@ -159,7 +162,8 @@ class Application(APIView):
         )
         @has_permissions(PermissionConstants.APPLICATION_EDIT.get_workspace_application_permission())
         @log(menu='Application', operate="Modify the application",
-             get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')))
+             get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')),
+             workspace_id=lambda r, k: k.get('workspace_id'))
         def put(self, request: Request, workspace_id: str, application_id: str):
             return result.success(
                 ApplicationOperateSerializer(
@@ -195,7 +199,8 @@ class Application(APIView):
             tags=[_('Application')]  # type: ignore
         )
         @log(menu='Application', operate='Publishing an application',
-             get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id'))
+             get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')),
+             workspace_id=lambda r, k: k.get('workspace_id')
              )
         def put(self, request: Request, application_id: str):
             return result.success(

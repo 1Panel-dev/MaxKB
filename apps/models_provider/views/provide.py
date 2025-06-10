@@ -9,7 +9,6 @@ from common import result
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
 from common.constants.permission_constants import PermissionConstants
-from common.log.log import log
 from models_provider.api.provide import ProvideApi
 from models_provider.constants.model_provider_constants import ModelProvideConstants
 from models_provider.serializers.model_serializer import get_default_model_params_setting
@@ -25,7 +24,6 @@ class Provide(APIView):
                    responses=ProvideApi.get_response(),
                    tags=[_('Model')])  # type: ignore
     @has_permissions(PermissionConstants.MODEL_READ)
-    @log(menu='model',operate='Get a list of model suppliers')
     def get(self, request: Request):
         model_type = request.query_params.get('model_type')
         if model_type:

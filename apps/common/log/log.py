@@ -57,7 +57,7 @@ def _get_details(request):
 
 
 def log(menu: str, operate, get_user=_get_user, get_ip_address=_get_ip_address, get_details=_get_details,
-        get_operation_object=None):
+        get_operation_object=None, workspace_id="None"):
     """
     记录审计日志
     @param menu: 操作菜单 str
@@ -92,7 +92,7 @@ def log(menu: str, operate, get_user=_get_user, get_ip_address=_get_ip_address, 
                     _operate = operate(request)
                 # 插入审计日志
                 Log(menu=menu, operate=_operate, user=user, status=status, ip_address=ip, details=details,
-                    operation_object=operation_object).save()
+                    operation_object=operation_object, workspace_id=workspace_id).save()
 
         return run
 

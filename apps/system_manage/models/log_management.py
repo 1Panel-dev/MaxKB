@@ -33,6 +33,7 @@ class Log(AppModelMixin):
     ip_address = models.CharField(max_length=128, verbose_name="ip地址")
 
     details = models.JSONField(verbose_name="详情", default=dict, encoder=SystemEncoder)
+    workspace_id = models.CharField(max_length=64, verbose_name="工作空间id", default="default", db_index=True)
 
     class Meta:
         db_table = "log"

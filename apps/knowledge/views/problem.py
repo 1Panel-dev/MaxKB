@@ -52,6 +52,7 @@ class ProblemView(APIView):
     @has_permissions(PermissionConstants.KNOWLEDGE_PROBLEM_EDIT.get_workspace_knowledge_permission())
     @log(menu='problem', operate='Create question',
          get_operation_object=lambda r, keywords: get_knowledge_operation_object(keywords.get('knowledge_id'))
+        , workspace_id=lambda r, k: k.get('workspace_id')
          )
     def post(self, request: Request, workspace_id: str, knowledge_id: str):
         return result.success(ProblemSerializers.Create(
@@ -94,7 +95,8 @@ class ProblemView(APIView):
         )
         @has_permissions(PermissionConstants.KNOWLEDGE_PROBLEM_EDIT.get_workspace_knowledge_permission())
         @log(menu='problem', operate='Batch associated paragraphs',
-             get_operation_object=lambda r, keywords: get_knowledge_operation_object(keywords.get('knowledge_id')))
+             get_operation_object=lambda r, keywords: get_knowledge_operation_object(keywords.get('knowledge_id')),
+             workspace_id=lambda r, k: k.get('workspace_id'))
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(ProblemSerializers.BatchOperate(
                 data={'knowledge_id': knowledge_id, 'workspace_id': workspace_id}
@@ -115,7 +117,8 @@ class ProblemView(APIView):
         )
         @has_permissions(PermissionConstants.KNOWLEDGE_PROBLEM_EDIT.get_workspace_knowledge_permission())
         @log(menu='problem', operate='Batch deletion issues',
-             get_operation_object=lambda r, keywords: get_knowledge_operation_object(keywords.get('knowledge_id')))
+             get_operation_object=lambda r, keywords: get_knowledge_operation_object(keywords.get('knowledge_id')),
+             workspace_id=lambda r, k: k.get('workspace_id'))
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(ProblemSerializers.BatchOperate(
                 data={'knowledge_id': knowledge_id, 'workspace_id': workspace_id}
@@ -135,7 +138,8 @@ class ProblemView(APIView):
         )
         @has_permissions(PermissionConstants.KNOWLEDGE_PROBLEM_DELETE.get_workspace_knowledge_permission())
         @log(menu='problem', operate='Delete question',
-             get_operation_object=lambda r, keywords: get_knowledge_operation_object(keywords.get('knowledge_id')))
+             get_operation_object=lambda r, keywords: get_knowledge_operation_object(keywords.get('knowledge_id')),
+             workspace_id=lambda r, k: k.get('workspace_id'))
         def delete(self, request: Request, workspace_id: str, knowledge_id: str, problem_id: str):
             return result.success(ProblemSerializers.Operate(
                 data={
@@ -158,7 +162,8 @@ class ProblemView(APIView):
         )
         @has_permissions(PermissionConstants.KNOWLEDGE_PROBLEM_EDIT.get_workspace_knowledge_permission())
         @log(menu='problem', operate='Modify question',
-             get_operation_object=lambda r, keywords: get_knowledge_operation_object(keywords.get('knowledge_id')))
+             get_operation_object=lambda r, keywords: get_knowledge_operation_object(keywords.get('knowledge_id')),
+             workspace_id=lambda r, k: k.get('workspace_id'))
         def put(self, request: Request, workspace_id: str, knowledge_id: str, problem_id: str):
             return result.success(ProblemSerializers.Operate(
                 data={

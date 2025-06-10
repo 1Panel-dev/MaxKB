@@ -24,11 +24,11 @@ from models_provider.api.model import DefaultModelResponse
 from system_manage.api.email_setting import EmailSettingAPI
 from system_manage.serializers.email_setting import EmailSettingSerializer
 
+
 def encryption_str(_value):
     if isinstance(_value, str):
         return encryption(_value)
     return _value
-
 
 
 def get_email_details(request):
@@ -55,7 +55,7 @@ class SystemSetting(APIView):
                        responses=EmailSettingAPI.get_response(),
                        tags=[_('Email Settings')])  # type: ignore
         @log(menu='Email settings', operate='Create or update email settings',
-             get_details=get_email_details)
+             get_details=get_email_details, workspace_id='None')
         @has_permissions(PermissionConstants.EMAIL_SETTING_EDIT)
         def put(self, request: Request):
             return result.success(
@@ -71,8 +71,8 @@ class SystemSetting(APIView):
             tags=[_('Email Settings')]  # type: ignore
         )
         @has_permissions(PermissionConstants.EMAIL_SETTING_EDIT)
-        @log(menu='Email settings',operate='Test email settings',
-             get_details=get_email_details
+        @log(menu='Email settings', operate='Test email settings',
+             get_details=get_email_details, workspace_id='None'
              )
         def post(self, request: Request):
             return result.success(

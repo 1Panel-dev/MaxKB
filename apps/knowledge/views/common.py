@@ -3,7 +3,6 @@ from django.db.models import QuerySet
 from knowledge.models import Document
 
 
-
 def get_document_operation_object(document_id: str):
     document_model = QuerySet(model=Document).filter(id=document_id).first()
     if document_model is not None:
@@ -12,6 +11,7 @@ def get_document_operation_object(document_id: str):
             "type": document_model.type,
         }
     return {}
+
 
 def get_document_operation_object_batch(document_id_list: str):
     document_model_list = QuerySet(model=Document).filter(id__in=document_id_list)
