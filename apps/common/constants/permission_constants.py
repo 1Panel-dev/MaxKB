@@ -61,6 +61,7 @@ class Group(Enum):
     OTHER = "OTHER"
     OVERVIEW = "OVERVIEW"
     APPLICATION_ACCESS = "APPLICATION_ACCESS"
+    APPLICATION_CHAT_LOG = "APPLICATION_CHAT_LOG"
 
 
 class SystemGroup(Enum):
@@ -124,6 +125,8 @@ class Operate(Enum):
     MIGRATE = "READ+MIGRATE"  # 迁移
     RELATE = "READ+RELATE"  # 关联
     USER_GROUP = "READ+USER_GROUP"  # 用户组
+    ANNOTATION = "READ+ANNOTATION"  # 标注
+    CLEAR_POLICY = "READ+CLEAR_POLICY"
 
 
 class RoleGroup(Enum):
@@ -237,6 +240,8 @@ Permission_Label = {
     Operate.VECTOR.value: _("Vector"),
     Operate.MIGRATE.value: _("Migrate"),
     Operate.RELATE.value: _("Relate"),
+    Operate.ANNOTATION.value: _("Annotation"),
+    Operate.CLEAR_POLICY.value: _("Clear Policy"),
     Group.LOGIN_AUTH.value: _("Login Auth"),
     Group.DISPLAY_SETTINGS.value: _("Display Settings"),
     Group.SYSTEM_API_KEY.value: _("System API Key"),
@@ -257,7 +262,8 @@ Permission_Label = {
     Group.SYSTEM_RES_KNOWLEDGE_PROBLEM.value: _("Problem"),
     Group.WORKSPACE_USER_GROUP.value: _("User Group"),
     Group.WORKSPACE_CHAT_USER.value: _("Chat User"),
-    Group.WORKSPACE_WORKSPACE: _("Workspace"),
+    Group.WORKSPACE_WORKSPACE.value: _("Workspace"),
+    Group.APPLICATION_CHAT_LOG.value: _("Dialogue log")
 
 }
 
@@ -649,6 +655,30 @@ class PermissionConstants(Enum):
                                              resource_permission_group_list=[ResourcePermissionGroup.VIEW],
                                              label=_('Public settings')
                                              )
+    APPLICATION_CHAT_LOG = Permission(group=Group.APPLICATION_CHAT_LOG, operate=Operate.READ,
+                                      role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                      parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
+                                      resource_permission_group_list=[ResourcePermissionGroup.VIEW],
+                                      label=_('Dialogue log'))
+
+    APPLICATION_CHAT_LOG_ANNOTATION = Permission(group=Group.APPLICATION_CHAT_LOG, operate=Operate.ANNOTATION,
+                                                 role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                                 parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
+                                                 resource_permission_group_list=[ResourcePermissionGroup.VIEW],
+                                                 label=_('Dialogue log'))
+
+    APPLICATION_CHAT_LOG_EXPORT = Permission(group=Group.APPLICATION_CHAT_LOG, operate=Operate.EXPORT,
+                                             role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                             parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
+                                             resource_permission_group_list=[ResourcePermissionGroup.VIEW],
+                                             label=_('Dialogue log'))
+
+    APPLICATION_CHAT_LOG_CLEAR_POLICY = Permission(group=Group.APPLICATION_CHAT_LOG, operate=Operate.CLEAR_POLICY,
+                                                   role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                                   parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
+                                                   resource_permission_group_list=[ResourcePermissionGroup.VIEW],
+                                                   label=_('Dialogue log'))
+
     APPLICATION_ACCESS_READ = Permission(group=Group.APPLICATION_ACCESS, operate=Operate.READ,
                                          role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                          parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],

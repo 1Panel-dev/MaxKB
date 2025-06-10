@@ -23,6 +23,29 @@ urlpatterns = [
          views.ApplicationVersionView.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/access_token',
          views.AccessToken.as_view()),
+    path('workspace/<str:workspace_id>/application/<str:application_id>/add_knowledge',
+         views.ApplicationChatRecordAddKnowledge.as_view()),
+    path('workspace/<str:workspace_id>/application/<str:application_id>/chat',
+         views.ApplicationChat.as_view()),
+    path('workspace/<str:workspace_id>/application/<str:application_id>/chat/export',
+         views.ApplicationChat.Export.as_view()),
+    path('workspace/<str:workspace_id>/application/<str:application_id>/chat/<int:current_page>/<int:page_size>',
+         views.ApplicationChat.Page.as_view()),
+    path(
+        'workspace/<str:workspace_id>/application/<str:application_id>/chat/<str:chat_id>/chat_record',
+        views.ApplicationChatRecord.as_view()),
+    path(
+        'workspace/<str:workspace_id>/application/<str:application_id>/chat/<str:chat_id>/chat_record/<int:current_page>/<int:page_size>',
+        views.ApplicationChatRecord.Page.as_view()),
+    path(
+        'workspace/<str:workspace_id>/application/<str:application_id>/chat/<str:chat_id>/chat_record/<str:chat_record_id>/improve',
+        views.ApplicationChatRecordImprove.as_view()),
+    path(
+        'workspace/<str:workspace_id>/application/<str:application_id>/chat/<str:chat_id>/chat_record/<str:chat_record_id>/knowledge/<str:knowledge_id>/document/<str:document_id>/improve',
+        views.ApplicationChatRecordImproveParagraph.as_view()),
+    path(
+        'workspace/<str:workspace_id>/application/<str:application_id>/chat/<str:chat_id>/chat_record/<str:chat_record_id>/knowledge/<str:knowledge_id>/document/<str:document_id>/paragraph/<str:paragraph_id>/improve',
+        views.ApplicationChatRecordImproveParagraph.Operate.as_view()),
     path(
         'workspace/<str:workspace_id>/application/<str:application_id>/work_flow_version/<int:current_page>/<int:page_size>',
         views.ApplicationVersionView.Page.as_view()),
