@@ -166,7 +166,7 @@
                     </div>
                   </template>
                   <div class="w-full">
-                    <el-text type="info" v-if="applicationForm.dataset_id_list?.length === 0"
+                    <el-text type="info" v-if="applicationForm.knowledge_id_list?.length === 0"
                       >{{ $t('views.application.form.relatedKnowledge.placeholder') }}
                     </el-text>
                     <el-row :gutter="12" v-else>
@@ -177,7 +177,7 @@
                         :lg="12"
                         :xl="12"
                         class="mb-8"
-                        v-for="(item, index) in applicationForm.dataset_id_list"
+                        v-for="(item, index) in applicationForm.knowledge_id_list"
                         :key="index"
                       >
                         <el-card class="relate-dataset-card border-r-4" shadow="never">
@@ -540,8 +540,8 @@ const applicationForm = ref<ApplicationFormType>({
   model_id: '',
   dialogue_number: 1,
   prologue: t('views.application.form.defaultPrologue'),
-  dataset_id_list: [],
-  dataset_setting: {
+  knowledge_id_list: [],
+  knowledge_setting: {
     top_n: 3,
     similarity: 0.6,
     max_paragraph_char_number: 5000,
@@ -661,20 +661,20 @@ function refreshTTSForm(data: any) {
 }
 
 function removeDataset(id: any) {
-  if (applicationForm.value.dataset_id_list) {
-    applicationForm.value.dataset_id_list.splice(
-      applicationForm.value.dataset_id_list.indexOf(id),
+  if (applicationForm.value.knowledge_id_list) {
+    applicationForm.value.knowledge_id_list.splice(
+      applicationForm.value.knowledge_id_list.indexOf(id),
       1,
     )
   }
 }
 
 function addDataset(val: Array<string>) {
-  applicationForm.value.dataset_id_list = val
+  applicationForm.value.knowledge_id_list = val
 }
 
 function openDatasetDialog() {
-  AddDatasetDialogRef.value.open(applicationForm.value.dataset_id_list)
+  AddDatasetDialogRef.value.open(applicationForm.value.knowledge_id_list)
 }
 
 function getDetail() {

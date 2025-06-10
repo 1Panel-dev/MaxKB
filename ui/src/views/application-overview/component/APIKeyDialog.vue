@@ -61,7 +61,7 @@
 import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { copyClick } from '@/utils/clipboard'
-import overviewApi from '@/api/application/application-overview'
+import applicationKeyApi from '@/api/application/application-key'
 import SettingAPIKeyDialog from './SettingAPIKeyDialog.vue'
 import { datetimeFormat } from '@/utils/time'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
@@ -100,7 +100,7 @@ function deleteApiKey(row: any) {
     }
   )
     .then(() => {
-      overviewApi.delAPIKey(id as string, row.id, loading).then(() => {
+      applicationKeyApi.delAPIKey(id as string, row.id, loading).then(() => {
         MsgSuccess(t('common.deleteSuccess'))
         getApiKeyList()
       })
@@ -115,7 +115,7 @@ function changeState(row: any) {
   const str = obj.is_active
     ? t('views.applicationOverview.appInfo.APIKeyDialog.enabledSuccess')
     : t('views.applicationOverview.appInfo.APIKeyDialog.disabledSuccess')
-  overviewApi
+  applicationKeyApi
     .putAPIKey(id as string, row.id, obj, loading)
     .then((res) => {
       MsgSuccess(str)
@@ -128,7 +128,7 @@ function changeState(row: any) {
 }
 
 function createApiKey() {
-  overviewApi.postAPIKey(id as string, loading).then((res) => {
+  applicationKeyApi.postAPIKey(id as string, loading).then((res) => {
     getApiKeyList()
   })
 }
@@ -139,7 +139,7 @@ const open = () => {
 }
 
 function getApiKeyList() {
-  overviewApi.getAPIKey(id as string, loading).then((res) => {
+  applicationKeyApi.getAPIKey(id as string, loading).then((res) => {
     apiKey.value = res.data
   })
 }

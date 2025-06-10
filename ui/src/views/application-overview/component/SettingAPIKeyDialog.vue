@@ -37,7 +37,7 @@
 import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
-import overviewApi from '@/api/application/application-overview'
+import applicationKeyApi from '@/api/application/application-key'
 import overviewSystemApi from '@/api/system-api-key'
 import { MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
@@ -95,7 +95,7 @@ const submit = async (formEl: FormInstance | undefined) => {
 
       const apiCall =
         APIType.value === 'APPLICATION'
-          ? overviewApi.putAPIKey(id as string, APIKeyId.value, obj, loading)
+          ? applicationKeyApi.putAPIKey(id as string, APIKeyId.value, obj, loading)
           : overviewSystemApi.putAPIKey(APIKeyId.value, obj, loading)
 
       apiCall.then((res) => {

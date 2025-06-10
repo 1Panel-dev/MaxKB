@@ -61,7 +61,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import overviewApi from '@/api/application/application-overview'
+import overviewApi from '@/api/application/application-key'
 import { cloneDeep } from 'lodash'
 import { MsgSuccess, MsgError } from '@/utils/message'
 import { defaultIcon, isAppIcon } from '@/utils/common'

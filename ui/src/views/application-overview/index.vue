@@ -211,7 +211,7 @@ import XPackDisplaySettingDialog from './component/XPackDisplaySettingDialog.vue
 import EditAvatarDialog from './component/EditAvatarDialog.vue'
 import StatisticsCharts from './component/StatisticsCharts.vue'
 import applicationApi from '@/api/application/application'
-import overviewApi from '@/api/application/application-overview'
+import overviewApi from '@/api/application/application-key'
 import { nowDate, beforeDay } from '@/utils/time'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { copyClick } from '@/utils/clipboard'
@@ -317,7 +317,7 @@ function changeDayRangeHandle(val: string) {
 }
 
 function getAppStatistics() {
-  overviewApi.getStatistics(id, daterange.value, statisticsLoading).then((res: any) => {
+  applicationApi.getStatistics(id, daterange.value, statisticsLoading).then((res: any) => {
     statisticsData.value = res.data
   })
 }
@@ -424,8 +424,8 @@ function mapToUrlParams(map: any[]) {
 }
 
 onMounted(() => {
-  // getDetail()
-  // getAccessToken()
+  getDetail()
+  getAccessToken()
   // changeDayHandle(history_day.value)
 })
 </script>
