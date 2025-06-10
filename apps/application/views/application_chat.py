@@ -1,0 +1,80 @@
+# coding=utf-8
+"""
+    @project: MaxKB
+    @Author：虎虎
+    @file： application_chat.py
+    @date：2025/6/10 11:00
+    @desc:
+"""
+from django.utils.translation import gettext_lazy as _
+from drf_spectacular.utils import extend_schema
+from rest_framework.request import Request
+from rest_framework.views import APIView
+
+from application.api.application_chat import ApplicationChatQueryAPI, ApplicationChatQueryPageAPI, \
+    ApplicationChatExportAPI
+from application.serializers.application_chat import ApplicationChatQuerySerializers
+from common.auth import TokenAuth
+from common.auth.authentication import has_permissions
+from common.constants.permission_constants import PermissionConstants
+from common.result import result
+from common.utils.common import query_params_to_single_dict
+
+
+class ApplicationChat(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(
+        methods=['GET'],
+        description=_("Get the conversation list"),
+        summary=_("Get the conversation list"),
+        operation_id=_("Get the conversation list"),  # type: ignore
+        request=ApplicationChatQueryAPI.get_request(),
+        parameters=ApplicationChatQueryAPI.get_parameters(),
+        responses=ApplicationChatQueryAPI.get_response(),
+        tags=[_("Application/Conversation Log")]  # type: ignore
+    )
+    @has_permissions(PermissionConstants.APPLICATION_CHAT_LOG.get_workspace_application_permission())
+    def get(self, request: Request, workspace_id: str, application_id: str):
+        return result.success(ApplicationChatQuerySerializers(
+            data={**query_params_to_single_dict(request.query_params), 'application_id': application_id,
+                  }).list())
+
+    class Page(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['GET'],
+            description=_("Get the conversation list by page"),
+            summary=_("Get the conversation list by page"),
+            operation_id=_("Get the conversation list by page"),  # type: ignore
+            request=ApplicationChatQueryPageAPI.get_request(),
+            parameters=ApplicationChatQueryPageAPI.get_parameters(),
+            responses=ApplicationChatQueryPageAPI.get_response(),
+            tags=[_("Application/Conversation Log")]  # type: ignore
+        )
+        @has_permissions(PermissionConstants.APPLICATION_CHAT_LOG.get_workspace_application_permission())
+        def get(self, request: Request, workspace_id: str, application_id: str, current_page: int, page_size: int):
+            return result.success(ApplicationChatQuerySerializers(
+                data={**query_params_to_single_dict(request.query_params), 'application_id': application_id,
+                      }).page(current_page=current_page,
+                              page_size=page_size))
+
+    class Export(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['POST'],
+            description=_("Export conversation"),
+            summary=_("Export conversation"),
+            operation_id=_("Export conversation"),  # type: ignore
+            request=ApplicationChatExportAPI.get_request(),
+            parameters=ApplicationChatExportAPI.get_parameters(),
+            responses=ApplicationChatExportAPI.get_response(),
+            tags=[_("Application/Conversation Log")]  # type: ignore
+        )
+        @has_permissions(PermissionConstants.APPLICATION_CHAT_LOG_EXPORT.get_workspace_application_permission())
+        def post(self, request: Request, workspace_id: str, application_id: str):
+            return ApplicationChatQuerySerializers(
+                data={**query_params_to_single_dict(request.query_params), 'application_id': application_id,
+                      }).export(request.data)
