@@ -5,3 +5,9 @@ export enum AuthorizationEnum {
   KNOWLEDGE = 'KNOWLEDGE',
   APPLICATION = 'APPLICATION',
 }
+
+export enum RoleTypeEnum {
+  ADMIN = 'ADMIN',
+  USER = 'USER',
+  WORKSPACE_MANAGE = 'WORKSPACE_MANAGE',
+}

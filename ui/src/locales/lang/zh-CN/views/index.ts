@@ -6,6 +6,7 @@ import document from './document'
 import system from './system'
 import userManage from './user-manage'
 import resourceAuthorization from './resource-authorization'
+import role from './role'
 import application from './application'
 import problem from './problem'
 import applicationOverview from './application-overview'
@@ -24,6 +25,7 @@ export default {
   system,
   userManage,
   resourceAuthorization,
+  role,
   application,
   problem,
   applicationOverview,

@@ -1,5 +1,6 @@
 import notFound from './404'
 import application from './application'
+import role from './role'
 import applicationOverview from './application-overview'
 import knowledge from './knowledge'
 import system from './system'
@@ -32,5 +33,6 @@ export default {
   problem,
   log,
   login,
-  operateLog
+  operateLog,
+  role
 }

@@ -66,9 +66,11 @@ export default {
     addParam: 'Add Parameter',
   },
   inputPlaceholder: 'Please input',
+  selectPlaceholder: 'Please select',
   title: 'Title',
   content: 'Content',
   rename: 'Rename',
+  renameSuccess: 'Successful',
   EditAvatarDialog: {
     title: 'App Logo',
     customizeUpload: 'Custom Upload',
