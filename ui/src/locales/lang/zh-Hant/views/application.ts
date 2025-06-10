@@ -13,12 +13,12 @@ export default {
   searchBar: {
     placeholder: '按名稱搜尋',
   },
-   status: {
+  status: {
     published: '已发布',
     unpublished: '未发布',
   },
-  setting: {
-    demo: '示範',
+  operation: {
+    toChat: '去對話',
   },
   delete: {
     confirmTitle: '是否刪除應用：',

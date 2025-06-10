@@ -17,8 +17,8 @@ export default {
     published: '已发布',
     unpublished: '未发布',
   },
-  setting: {
-    demo: '演示',
+  operation: {
+    toChat: '去对话',
   },
   delete: {
     confirmTitle: '是否删除应用：',

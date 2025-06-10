@@ -173,17 +173,24 @@
                       </el-button>
                       <template #dropdown>
                         <el-dropdown-menu>
-                          <!-- <el-dropdown-item
-                            icon="Refresh"
-                            @click.stop="syncDataset(item)"
-                            v-if="item.type === 1"
-                            >{{ $t('views.knowledge.setting.sync') }}
+                          <el-dropdown-item @click.stop="getAccessToken(item.id)">
+                            <AppIcon iconName="app-create-chat"></AppIcon>
+                            {{ $t('views.application.operation.toChat') }}
                           </el-dropdown-item>
-                          <el-dropdown-item @click.stop="reEmbeddingDataset(item)">
-                            <AppIcon iconName="app-vectorization"></AppIcon>
-                            {{ $t('views.knowledge.setting.vectorization') }}
+                          <el-dropdown-item @click.stop="settingApplication(item)">
+                            <el-icon><Setting /></el-icon>
+                            {{ $t('common.setting') }}
                           </el-dropdown-item>
-                        -->
+                          <el-dropdown-item divided @click.stop="exportApplication(item)">
+                            <AppIcon iconName="app-export"></AppIcon>
+                            {{ $t('common.export') }}
+                          </el-dropdown-item>
+                          <el-dropdown-item
+                            divided
+                            icon="Delete"
+                            @click.stop="deleteApplication(item)"
+                            >{{ $t('common.delete') }}</el-dropdown-item
+                          >
                         </el-dropdown-menu>
                       </template>
                     </el-dropdown>

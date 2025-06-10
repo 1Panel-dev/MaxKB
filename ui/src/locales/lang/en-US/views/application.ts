@@ -18,8 +18,8 @@ export default {
     published: 'Published',
     unpublished: 'Unpublished',
   },
-  setting: {
-    demo: 'Demo',
+  operation: {
+    toChat: 'Chat',
   },
   delete: {
     confirmTitle: 'Are you sure you want to delete this APP: ',
