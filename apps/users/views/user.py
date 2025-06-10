@@ -6,6 +6,7 @@
     @date：2025/4/14 19:25
     @desc:
 """
+from django.core.cache import cache
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
@@ -14,6 +15,7 @@ from rest_framework.views import APIView
 
 from common.auth.authenticate import TokenAuth
 from common.auth.authentication import has_permissions
+from common.constants.cache_version import Cache_Version
 from common.constants.permission_constants import PermissionConstants, Permission, Group, Operate
 from common.log.log import log
 from common.result import result
@@ -295,3 +297,27 @@ class SendEmailToCurrentUserView(APIView):
         serializer_obj = SendEmailSerializer(data={'email': request.user.email, 'type': "reset_password"})
         if serializer_obj.is_valid(raise_exception=True):
             return result.success(serializer_obj.send())
+
+
+class ResetCurrentUserPasswordView(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(methods=['POST'],
+                   summary=_("Modify current user password"),
+                   description=_("Modify current user password"),
+                   operation_id=_("Modify current user password"),  # type: ignore
+                   tags=[_("User Management")],  # type: ignore
+                   request=ResetPasswordAPI.get_request(),
+                   responses=DefaultModelResponse.get_response())
+    @log(menu='User management', operate='Modify current user password',
+         get_operation_object=lambda r, k: {'name': r.user.username},
+         get_details=get_re_password_details)
+    def post(self, request: Request):
+        data = {'email': request.user.email}
+        data.update(request.data)
+        serializer_obj = RePasswordSerializer(data=data)
+        if serializer_obj.reset_password():
+            version, get_key = Cache_Version.TOKEN.value
+            cache.delete(get_key(token=request.auth), version=version)
+            return result.success(True)
+        return result.error(_("Failed to change password"))

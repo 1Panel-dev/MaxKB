@@ -12,11 +12,15 @@ import random
 import re
 from collections import defaultdict
 from itertools import product
+
+from django.core.cache import cache
 from django.core.mail.backends.smtp import EmailBackend
 from django.db import transaction
 from django.db.models import Q, QuerySet
 from rest_framework import serializers
 import uuid_utils.compat as uuid
+
+from common.constants.cache_version import Cache_Version
 from common.constants.exception_code_constants import ExceptionCodeConstants
 from common.constants.permission_constants import RoleConstants, Auth
 from common.database_model_manage.database_model_manage import DatabaseModelManage
@@ -35,6 +39,8 @@ PASSWORD_REGEX = re.compile(
     r"^(?![a-zA-Z]+$)(?![A-Z0-9]+$)(?![A-Z_!@#$%^&*`~.()-+=]+$)(?![a-z0-9]+$)(?![a-z_!@#$%^&*`~()-+=]+$)"
     r"(?![0-9_!@#$%^&*`~()-+=]+$)[a-zA-Z0-9_!@#$%^&*`~.()-+=]{6,20}$"
 )
+
+version, get_key = Cache_Version.SYSTEM.value
 
 
 class UserProfileResponse(serializers.ModelSerializer):
@@ -481,14 +487,13 @@ class RePasswordSerializer(serializers.Serializer):
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)
         email = self.data.get("email")
-        # TODO  删除缓存
-        # cache_code = user_cache.get(email + ':reset_password')
+        cache_code = cache.get(get_key(email + ':reset_password'), version=version)
         if self.data.get('password') != self.data.get('re_password'):
             raise AppApiException(ExceptionCodeConstants.PASSWORD_NOT_EQ_RE_PASSWORD.value.code,
                                   ExceptionCodeConstants.PASSWORD_NOT_EQ_RE_PASSWORD.value.message)
-        # if cache_code != self.data.get('code'):
-        #     raise AppApiException(ExceptionCodeConstants.CODE_ERROR.value.code,
-        #                           ExceptionCodeConstants.CODE_ERROR.value.message)
+        if cache_code != self.data.get('code'):
+            raise AppApiException(ExceptionCodeConstants.CODE_ERROR.value.code,
+                                  ExceptionCodeConstants.CODE_ERROR.value.message)
         return True
 
     def reset_password(self):
@@ -502,7 +507,7 @@ class RePasswordSerializer(serializers.Serializer):
                 password=password_encrypt(self.data.get('password')))
             code_cache_key = email + ":reset_password"
             # 删除验证码缓存
-            # user_cache.delete(code_cache_key)
+            cache.delete(code_cache_key, version=version)
             return True
 
 
@@ -531,7 +536,7 @@ class SendEmailSerializer(serializers.Serializer):
             raise ExceptionCodeConstants.EMAIL_IS_EXIST.value.to_app_api_exception()
         code_cache_key = self.data.get('email') + ":" + self.data.get("type")
         code_cache_key_lock = code_cache_key + "_lock"
-        ttl = None  # user_cache.ttl(code_cache_key_lock)
+        ttl = cache.ttl(code_cache_key_lock)
         if ttl is not None:
             raise AppApiException(500, _("Do not send emails again within {seconds} seconds").format(
                 seconds=int(ttl.total_seconds())))
@@ -558,10 +563,10 @@ class SendEmailSerializer(serializers.Serializer):
         code_cache_key = email + ":" + state
         code_cache_key_lock = code_cache_key + "_lock"
         # 设置缓存
-        # user_cache.set(code_cache_key_lock, code, timeout=datetime.timedelta(minutes=1))
+        cache.set(get_key(code_cache_key_lock), code, timeout=datetime.timedelta(minutes=1), version=version)
         system_setting = QuerySet(SystemSetting).filter(type=SettingType.EMAIL.value).first()
         if system_setting is None:
-            # user_cache.delete(code_cache_key_lock)
+            cache.delete(get_key(code_cache_key_lock), version=version)
             raise AppApiException(1004,
                                   _("The email service has not been set up. Please contact the administrator to set up the email service in [Email Settings]."))
         try:
@@ -581,9 +586,9 @@ class SendEmailSerializer(serializers.Serializer):
                 from_email=system_setting.meta.get('from_email'),
                 recipient_list=[email], fail_silently=False, connection=connection)
         except Exception as e:
-            # user_cache.delete(code_cache_key_lock)
+            cache.delete(get_key(code_cache_key_lock))
             raise AppApiException(500, f"{str(e)}" + _("Email sending failed"))
-        # user_cache.set(code_cache_key, code, timeout=datetime.timedelta(minutes=30))
+        cache.set(get_key(code_cache_key), code, timeout=datetime.timedelta(minutes=30), version=version)
         return True
 
 
@@ -609,8 +614,7 @@ class CheckCodeSerializer(serializers.Serializer):
 
     def is_valid(self, *, raise_exception=False):
         super().is_valid()
-        #TODO 这里的缓存 需要重新设计
-        value = None#user_cache.get(self.data.get("email") + ":" + self.data.get("type"))
+        value = cache.get(get_key(self.data.get("email") + ":" + self.data.get("type")), version=version)
         if value is None or value != self.data.get("code"):
             raise ExceptionCodeConstants.CODE_ERROR.value.to_app_api_exception()
         return True

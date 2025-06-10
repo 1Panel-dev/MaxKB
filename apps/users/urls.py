@@ -13,6 +13,7 @@ urlpatterns = [
     path("user/check_code", views.CheckCode.as_view(), name='check_code'),
     path("user/re_password", views.RePasswordView.as_view(), name='re_password'),
     path("user/current/send_email", views.SendEmailToCurrentUserView.as_view(), name="send_email_current"),
+    path("user/current/reset_password", views.ResetCurrentUserPasswordView.as_view(), name="reset_password_current"),
     path('workspace/<str:workspace_id>/user_list', views.WorkspaceUserListView.as_view(),
          name="test_workspace_id_permission"),
     path('workspace/<str:workspace_id>/user/profile', views.TestWorkspacePermissionUserView.as_view(),
