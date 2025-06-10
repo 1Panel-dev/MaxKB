@@ -106,7 +106,7 @@ function submit() {
   } else if (radioType.value === 'custom' && iconFile.value) {
     const fd = new FormData()
     fd.append('file', iconFile.value.raw)
-    toolApi.putToolIcon(detail.value.id, fd, loading).then((res: any) => {
+    ToolApi.putToolIcon(detail.value.id, fd, loading).then((res: any) => {
       emit('refresh', res.data)
       dialogVisible.value = false
     })

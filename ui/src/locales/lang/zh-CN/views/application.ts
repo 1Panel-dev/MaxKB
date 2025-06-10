@@ -13,6 +13,10 @@ export default {
   searchBar: {
     placeholder: '按名称搜索',
   },
+  status: {
+    published: '已发布',
+    unpublished: '未发布',
+  },
   setting: {
     demo: '演示',
   },

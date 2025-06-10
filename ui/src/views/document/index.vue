@@ -35,15 +35,15 @@
                       @click="openBatchEditDocument"
                       :disabled="multipleSelection.length === 0"
                     >
-                      {{ $t('common.setting') }}</el-dropdown-item
-                    >
+                      {{ $t('common.setting') }}
+                    </el-dropdown-item>
                     <el-dropdown-item
                       divided
                       @click="syncMulDocument"
                       :disabled="multipleSelection.length === 0"
                       v-if="datasetDetail.type === 1"
-                      >{{ $t('views.document.syncDocument') }}</el-dropdown-item
-                    >
+                      >{{ $t('views.document.syncDocument') }}
+                    </el-dropdown-item>
                     <el-dropdown-item
                       divided
                       v-if="datasetDetail.type === 2"
@@ -54,22 +54,22 @@
                           query: { id: id, folder_token: datasetDetail.meta.folder_token },
                         })
                       "
-                      >{{ $t('views.document.importDocument') }}</el-dropdown-item
-                    >
+                      >{{ $t('views.document.importDocument') }}
+                    </el-dropdown-item>
                     <el-dropdown-item
                       divided
                       @click="syncLarkMulDocument"
                       :disabled="multipleSelection.length === 0"
                       v-if="datasetDetail.type === 2"
-                      >{{ $t('views.document.syncDocument') }}</el-dropdown-item
-                    >
+                      >{{ $t('views.document.syncDocument') }}
+                    </el-dropdown-item>
 
                     <el-dropdown-item
                       divided
                       @click="deleteMulDocument"
                       :disabled="multipleSelection.length === 0"
-                      >{{ $t('common.delete') }}</el-dropdown-item
-                    >
+                      >{{ $t('common.delete') }}
+                    </el-dropdown-item>
                   </el-dropdown-menu>
                 </template>
               </el-dropdown>
@@ -249,9 +249,9 @@
               </template>
               <template #default="{ row }">
                 <div v-if="row.is_active" class="flex align-center">
-                  <el-icon class="color-success mr-8" style="font-size: 16px"
-                    ><SuccessFilled
-                  /></el-icon>
+                  <el-icon class="color-success mr-8" style="font-size: 16px">
+                    <SuccessFilled />
+                  </el-icon>
                   <span class="color-secondary">
                     {{ $t('common.status.enabled') }}
                   </span>

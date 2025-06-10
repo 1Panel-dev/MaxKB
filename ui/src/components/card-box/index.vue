@@ -18,6 +18,9 @@
             </slot>
             <slot name="subTitle"> </slot>
           </div>
+          <div class="status-tag">
+            <slot name="tag"> </slot>
+          </div>
         </div>
       </slot>
     </div>
@@ -108,6 +111,11 @@ function subHoveredEnter() {
     padding: 0 16px;
     width: 100%;
     box-sizing: border-box;
+  }
+  .status-tag {
+    position: absolute;
+    right: 16px;
+    top: 15px;
   }
 }
 </style>

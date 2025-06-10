@@ -14,7 +14,10 @@ export default {
   searchBar: {
     placeholder: 'Search by name',
   },
-
+  status: {
+    published: 'Published',
+    unpublished: 'Unpublished',
+  },
   setting: {
     demo: 'Demo',
   },

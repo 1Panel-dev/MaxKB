@@ -19,9 +19,9 @@
               style="width: 120px"
               @change="search_type_change"
             >
-              <el-option :label="$t('common.creator')" value="create_user"/>
+              <el-option :label="$t('common.creator')" value="create_user" />
 
-              <el-option :label="$t('common.name')" value="name"/>
+              <el-option :label="$t('common.name')" value="name" />
             </el-select>
             <el-input
               v-if="search_type === 'name'"
@@ -38,14 +38,14 @@
               clearable
               style="width: 220px"
             >
-              <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.username"/>
+              <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.username" />
             </el-select>
           </div>
           <el-dropdown trigger="click">
             <el-button type="primary" class="ml-8">
               {{ $t('common.create') }}
               <el-icon class="el-icon--right">
-                <arrow-down/>
+                <arrow-down />
               </el-icon>
             </el-button>
             <template #dropdown>
@@ -61,9 +61,8 @@
                     </el-avatar>
                     <div class="pre-wrap ml-8">
                       <div class="lighter">{{ $t('views.application.simple') }}</div>
-                      <el-text type="info" size="small">{{
-                          $t('views.application.simplePlaceholder')
-                        }}
+                      <el-text type="info" size="small"
+                        >{{ $t('views.application.simplePlaceholder') }}
                       </el-text>
                     </div>
                   </div>
@@ -79,9 +78,8 @@
                     </el-avatar>
                     <div class="pre-wrap ml-8">
                       <div class="lighter">{{ $t('views.application.workflow') }}</div>
-                      <el-text type="info" size="small">{{
-                          $t('views.application.workflowPlaceholder')
-                        }}
+                      <el-text type="info" size="small"
+                        >{{ $t('views.application.workflowPlaceholder') }}
                       </el-text>
                     </div>
                   </div>
@@ -93,8 +91,16 @@
       </template>
       <div>
         <el-row v-if="applicationList.length > 0" :gutter="15">
-          <!-- <template v-for="(item, index) in datasetFolderList" :key="index">
-            <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" class="mb-16">
+          <template v-for="(item, index) in applicationList" :key="index">
+            <el-col
+              v-if="item.resource_type === 'folder'"
+              :xs="24"
+              :sm="12"
+              :md="12"
+              :lg="8"
+              :xl="6"
+              class="mb-16"
+            >
               <CardBox
                 :title="item.name"
                 :description="item.desc || $t('common.noData')"
@@ -112,9 +118,7 @@
                 </template>
               </CardBox>
             </el-col>
-          </template> -->
-          <template v-for="(item, index) in applicationList" :key="index">
-            <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" class="mb-16">
+            <el-col v-else :xs="24" :sm="12" :md="12" :lg="8" :xl="6" class="mb-16">
               <CardBox
                 :title="item.name"
                 :description="item.desc"
@@ -122,7 +126,7 @@
                 @click="router.push({ path: `/application/${item.id}/${item.type}/overview` })"
               >
                 <template #icon>
-                  <LogoIcon height="28px" style="width: 28px; height: 28px; display: block"/>
+                  <LogoIcon height="28px" style="width: 28px; height: 28px; display: block" />
                 </template>
                 <template #subTitle>
                   <el-text class="color-secondary" size="small">
@@ -131,58 +135,31 @@
                     </auto-tooltip>
                   </el-text>
                 </template>
-                <div class="status-tag">
+                <template #tag>
                   <el-tag type="warning" v-if="isWorkFlow(item.type)" style="height: 22px">
                     {{ $t('views.application.workflow') }}
                   </el-tag>
                   <el-tag class="blue-tag" v-else style="height: 22px">
                     {{ $t('views.application.simple') }}
                   </el-tag>
-                </div>
+                </template>
 
                 <template #footer>
-                  <div class="footer-content">
-                    <el-tooltip
-                      effect="dark"
-                      :content="$t('views.application.setting.demo')"
-                      placement="top"
-                    >
-                      <el-button text @click.stop @click="getAccessToken(item.id)">
-                        <AppIcon iconName="app-view"></AppIcon>
-                      </el-button>
-                    </el-tooltip>
-                    <el-divider direction="vertical"/>
-                    <el-tooltip effect="dark" :content="$t('common.setting')" placement="top">
-                      <el-button text @click.stop="settingApplication(item)">
-                        <AppIcon iconName="Setting"></AppIcon>
-                      </el-button>
-                    </el-tooltip>
-                    <el-divider direction="vertical"/>
-                    <span @click.stop>
-                      <el-dropdown trigger="click">
-                        <el-button text @click.stop>
-                          <el-icon><MoreFilled/></el-icon>
-                        </el-button>
-                        <template #dropdown>
-                          <el-dropdown-menu>
-                            <el-dropdown-item
-                              v-if="is_show_copy_button(item)"
-                              @click="copyApplication(item)"
-                            >
-                              <AppIcon iconName="app-copy"></AppIcon>
-                              {{ $t('common.copy') }}
-                            </el-dropdown-item>
-                            <el-dropdown-item @click.stop="exportApplication(item)">
-                              <AppIcon iconName="app-export"></AppIcon>
-
-                              {{ $t('common.export') }}
-                            </el-dropdown-item>
-                            <el-dropdown-item icon="Delete" @click.stop="deleteApplication(item)">{{
-                                $t('common.delete')
-                              }}</el-dropdown-item>
-                          </el-dropdown-menu>
-                        </template>
-                      </el-dropdown>
+                  <div v-if="item.is_publish" class="flex align-center">
+                    <el-icon class="color-success mr-8" style="font-size: 16px">
+                      <SuccessFilled />
+                    </el-icon>
+                    <span class="color-secondary">
+                      {{ $t('views.application.status.published') }}
+                    </span>
+                    <el-divider direction="vertical" />
+                    <el-icon class="mr-8"><Clock /></el-icon>
+                    <span class="color-secondary">{{ dateFormat(item.update_time) }}</span>
+                  </div>
+                  <div v-else class="flex align-center">
+                    <AppIcon iconName="app-disabled" class="color-secondary mr-8"></AppIcon>
+                    <span class="color-secondary">
+                      {{ $t('views.application.status.unpublished') }}
                     </span>
                   </div>
                 </template>
@@ -191,46 +168,22 @@
                     <el-dropdown trigger="click">
                       <el-button text @click.stop>
                         <el-icon>
-                          <MoreFilled/>
+                          <MoreFilled />
                         </el-icon>
                       </el-button>
                       <template #dropdown>
                         <el-dropdown-menu>
-                          <el-dropdown-item
+                          <!-- <el-dropdown-item
                             icon="Refresh"
                             @click.stop="syncDataset(item)"
                             v-if="item.type === 1"
-                          >{{ $t('views.knowledge.setting.sync') }}
-                          </el-dropdown-item
-                          >
+                            >{{ $t('views.knowledge.setting.sync') }}
+                          </el-dropdown-item>
                           <el-dropdown-item @click.stop="reEmbeddingDataset(item)">
                             <AppIcon iconName="app-vectorization"></AppIcon>
                             {{ $t('views.knowledge.setting.vectorization') }}
                           </el-dropdown-item>
-                          <!--
-
-                          <el-dropdown-item
-                            icon="Connection"
-                            @click.stop="openGenerateDialog(item)"
-                            >{{ $t('views.document.generateQuestion.title') }}</el-dropdown-item
-                          >
-                          <el-dropdown-item
-                            icon="Setting"
-                            @click.stop="router.push({ path: `/knowledge/${item.id}/setting` })"
-                          >
-                            {{ $t('common.setting') }}</el-dropdown-item
-                          >
-                          <el-dropdown-item @click.stop="export_dataset(item)">
-                            <AppIcon iconName="app-export"></AppIcon
-                            >{{ $t('views.document.setting.export') }} Excel</el-dropdown-item
-                          >
-                          <el-dropdown-item @click.stop="export_zip_dataset(item)">
-                            <AppIcon iconName="app-export"></AppIcon
-                            >{{ $t('views.document.setting.export') }} ZIP</el-dropdown-item
-                          >
-                          <el-dropdown-item icon="Delete" @click.stop="deleteDataset(item)">{{
-                            $t('common.delete')
-                          }}</el-dropdown-item> -->
+                        -->
                         </el-dropdown-menu>
                       </template>
                     </el-dropdown>
@@ -240,27 +193,28 @@
             </el-col>
           </template>
         </el-row>
-        <el-empty :description="$t('common.noData')" v-else/>
+        <el-empty :description="$t('common.noData')" v-else />
       </div>
     </ContentContainer>
-    <CreateApplicationDialog ref="CreateApplicationDialogRef"/>
+    <CreateApplicationDialog ref="CreateApplicationDialogRef" />
+    <CopyApplicationDialog ref="CopyApplicationDialogRef" />
   </LayoutContainer>
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref, reactive, computed} from 'vue'
+import { onMounted, ref, reactive, computed } from 'vue'
 import CreateApplicationDialog from '@/views/application/component/CreateApplicationDialog.vue'
-import GenerateRelatedDialog from '@/components/generate-related-dialog/index.vue'
+import CopyApplicationDialog from '@/views/application/component/CopyApplicationDialog.vue'
 import ApplicaitonApi from '@/api/application/application'
-import {MsgSuccess, MsgConfirm} from '@/utils/message'
+import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import useStore from '@/stores'
-import {numberFormat} from '@/utils/common'
-import {t} from '@/locales'
-import {useRouter} from 'vue-router'
-import {isWorkFlow} from '@/utils/application'
+import { t } from '@/locales'
+import { useRouter } from 'vue-router'
+import { isWorkFlow } from '@/utils/application'
+import { dateFormat } from '@/utils/time'
 
 const router = useRouter()
-const {folder} = useStore()
+const { folder, application, user } = useStore()
 
 const loading = ref(false)
 
@@ -284,7 +238,7 @@ const paginationConfig = reactive({
 const folderList = ref<any[]>([])
 const applicationList = ref<any[]>([])
 const currentFolder = ref<any>({})
-
+const CopyApplicationDialogRef = ref()
 const CreateApplicationDialogRef = ref()
 
 function openCreateDialog(type?: string) {
@@ -306,7 +260,7 @@ function openCreateDialog(type?: string) {
 }
 
 const search_type_change = () => {
-  search_form.value = {name: '', create_user: ''}
+  search_form.value = { name: '', create_user: '' }
 }
 
 function getList() {
@@ -332,6 +286,100 @@ function folderClickHandel(row: any) {
   currentFolder.value = row
   applicationList.value = []
   getList()
+}
+
+function getAccessToken(id: string) {
+  applicationList.value
+    .filter((app) => app.id === id)[0]
+    ?.work_flow?.nodes?.filter((v: any) => v.id === 'base-node')
+    .map((v: any) => {
+      apiInputParams.value = v.properties.api_input_field_list
+        ? v.properties.api_input_field_list.map((v: any) => {
+            return {
+              name: v.variable,
+              value: v.default_value,
+            }
+          })
+        : v.properties.input_field_list
+          ? v.properties.input_field_list
+              .filter((v: any) => v.assignment_method === 'api_input')
+              .map((v: any) => {
+                return {
+                  name: v.variable,
+                  value: v.default_value,
+                }
+              })
+          : []
+    })
+  const apiParams = mapToUrlParams(apiInputParams.value)
+    ? '?' + mapToUrlParams(apiInputParams.value)
+    : ''
+  application.asyncGetAccessToken(id, loading).then((res: any) => {
+    window.open(application.location + res?.data?.access_token + apiParams)
+  })
+}
+
+const apiInputParams = ref([])
+
+function copyApplication(row: any) {
+  application.asyncGetApplicationDetail(row.id, loading).then((res: any) => {
+    if (res?.data) {
+      CopyApplicationDialogRef.value.open({ ...res.data, model_id: res.data.model })
+    }
+  })
+}
+
+const is_show_copy_button = (row: any) => {
+  return user.userInfo ? user.userInfo.id == row.user_id : false
+}
+
+function settingApplication(row: any) {
+  if (isWorkFlow(row.type)) {
+    router.push({ path: `/application/${row.id}/workflow` })
+  } else {
+    router.push({ path: `/application/${row.id}/${row.type}/setting` })
+  }
+}
+
+function mapToUrlParams(map: any[]) {
+  const params = new URLSearchParams()
+
+  map.forEach((item: any) => {
+    params.append(encodeURIComponent(item.name), encodeURIComponent(item.value))
+  })
+
+  return params.toString() // 返回 URL 查询字符串
+}
+
+function deleteApplication(row: any) {
+  MsgConfirm(
+    // @ts-ignore
+    `${t('views.application.delete.confirmTitle')}${row.name} ?`,
+    t('views.application.delete.confirmMessage'),
+    {
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
+      confirmButtonClass: 'danger',
+    },
+  )
+    .then(() => {
+      ApplicaitonApi.delApplication(row.id, loading).then(() => {
+        const index = applicationList.value.findIndex((v) => v.id === row.id)
+        applicationList.value.splice(index, 1)
+        MsgSuccess(t('common.deleteSuccess'))
+      })
+    })
+    .catch(() => {})
+}
+
+const exportApplication = (application: any) => {
+  ApplicaitonApi.exportApplication(application.id, application.name, loading).catch((e) => {
+    if (e.response.status !== 403) {
+      e.response.data.text().then((res: string) => {
+        MsgError(`${t('views.application.tip.ExportError')}:${JSON.parse(res).message}`)
+      })
+    }
+  })
 }
 
 onMounted(() => {
