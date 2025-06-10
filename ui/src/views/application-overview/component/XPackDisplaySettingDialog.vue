@@ -17,11 +17,11 @@
         <div class="flex align-center">
           <el-button type="primary" @click.prevent="resetForm" link>
             <el-icon class="mr-4">
-              <Refresh/>
+              <Refresh />
             </el-icon>
             {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.restoreDefault') }}
           </el-button>
-          <el-divider direction="vertical"/>
+          <el-divider direction="vertical" />
         </div>
       </div>
     </template>
@@ -39,7 +39,7 @@
                     :size="32"
                     style="background: none"
                   >
-                    <img :src="detail?.icon" alt=""/>
+                    <img :src="detail?.icon" alt="" />
                   </el-avatar>
                   <el-avatar
                     v-else-if="detail?.name"
@@ -72,7 +72,7 @@
                       color: xpackForm.custom_theme?.header_font_color,
                     }"
                   >
-                    <Close/>
+                    <Close />
                   </el-icon>
                 </el-button>
               </div>
@@ -97,7 +97,7 @@
                 </div>
 
                 <img
-                  src="@/assets/display-bg2.png"
+                  src="@/assets/application/display-bg2.png"
                   alt=""
                   :width="
                     xpackForm.show_avatar
@@ -112,7 +112,7 @@
               </div>
               <div class="flex mt-4" style="justify-content: flex-end">
                 <img
-                  src="@/assets/display-bg3.png"
+                  src="@/assets/application/display-bg3.png"
                   alt=""
                   :width="
                     xpackForm.show_user_avatar
@@ -134,7 +134,7 @@
                     style="width: 28px; height: 28px; display: block"
                   />
                   <el-avatar v-else>
-                    <img src="@/assets/user-icon.svg" style="width: 54%" alt=""/>
+                    <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
                   </el-avatar>
                 </div>
               </div>
@@ -143,7 +143,7 @@
               style="position: absolute; bottom: 0; padding-bottom: 8px; box-sizing: border-box"
               class="p-16 text-center w-full"
             >
-              <img src="@/assets/display-bg1.png" alt="" class="w-full"/>
+              <img src="@/assets/application/display-bg1.png" alt="" class="w-full" />
               <el-text type="info" v-if="xpackForm.disclaimer" class="mt-8" style="font-size: 12px">
                 <auto-tooltip :content="xpackForm.disclaimer_value">
                   {{ xpackForm.disclaimer_value }}
@@ -177,7 +177,7 @@
               {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.customThemeColor') }}
             </h5>
             <div>
-              <el-color-picker v-model="xpackForm.custom_theme.theme_color"/>
+              <el-color-picker v-model="xpackForm.custom_theme.theme_color" />
               {{
                 !xpackForm.custom_theme.theme_color
                   ? $t('views.applicationOverview.appInfo.SettingDisplayDialog.default')
@@ -191,7 +191,7 @@
                 $t('views.applicationOverview.appInfo.SettingDisplayDialog.headerTitleFontColor')
               }}
             </h5>
-            <el-color-picker v-model="xpackForm.custom_theme.header_font_color"/>
+            <el-color-picker v-model="xpackForm.custom_theme.header_font_color" />
           </el-col>
         </el-row>
         <el-row class="w-full mb-8">
@@ -210,12 +210,12 @@
         <el-card shadow="never" class="mb-8">
           <div class="flex-between mb-8">
             <span class="lighter">{{
-                $t('views.applicationOverview.appInfo.SettingDisplayDialog.AIAvatar')
-              }}</span>
+              $t('views.applicationOverview.appInfo.SettingDisplayDialog.AIAvatar')
+            }}</span>
             <span class="flex align-center">
               <el-checkbox v-model="xpackForm.show_avatar">{{
-                  $t('views.applicationOverview.appInfo.SettingDisplayDialog.display')
-                }}</el-checkbox>
+                $t('views.applicationOverview.appInfo.SettingDisplayDialog.display')
+              }}</el-checkbox>
               <el-upload
                 class="ml-8"
                 ref="uploadRef"
@@ -238,8 +238,8 @@
         <el-card shadow="never" class="mb-8">
           <div class="flex-between mb-8">
             <span class="lighter">{{
-                $t('views.applicationOverview.appInfo.SettingDisplayDialog.askUserAvatar')
-              }}</span>
+              $t('views.applicationOverview.appInfo.SettingDisplayDialog.askUserAvatar')
+            }}</span>
             <span class="flex align-center">
               <el-checkbox v-model="xpackForm.show_user_avatar">
                 {{
@@ -262,14 +262,14 @@
             </span>
           </div>
           <el-text type="info" size="small"
-          >{{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.imageMessage') }}
+            >{{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.imageMessage') }}
           </el-text>
         </el-card>
         <el-card shadow="never" class="mb-8">
           <div class="flex-between mb-8">
             <span class="lighter">{{
-                $t('views.applicationOverview.appInfo.SettingDisplayDialog.floatIcon')
-              }}</span>
+              $t('views.applicationOverview.appInfo.SettingDisplayDialog.floatIcon')
+            }}</span>
             <el-upload
               ref="uploadRef"
               action="#"
@@ -289,8 +289,8 @@
           <div class="border-t mt-8">
             <div class="flex-between mb-8">
               <span class="lighter">{{
-                  $t('views.applicationOverview.appInfo.SettingDisplayDialog.iconDefaultPosition')
-                }}</span>
+                $t('views.applicationOverview.appInfo.SettingDisplayDialog.iconDefaultPosition')
+              }}</span>
               <el-checkbox
                 v-model="xpackForm.draggable"
                 :label="
@@ -374,7 +374,9 @@
           />
           <el-checkbox
             v-model="xpackForm.show_exec"
-            :label="$t('views.applicationOverview.appInfo.SettingDisplayDialog.showExecutionDetail')"
+            :label="
+              $t('views.applicationOverview.appInfo.SettingDisplayDialog.showExecutionDetail')
+            "
           />
           <el-checkbox
             v-model="xpackForm.show_history"
@@ -390,7 +392,7 @@
             @change="changeDisclaimer"
           />
           <span v-if="xpackForm.disclaimer"
-          ><el-tooltip :content="xpackForm.disclaimer_value" placement="top">
+            ><el-tooltip :content="xpackForm.disclaimer_value" placement="top">
               <el-input
                 v-model="xpackForm.disclaimer_value"
                 style="width: 422px; margin-bottom: 10px"
@@ -413,21 +415,21 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import {computed, ref, watch} from 'vue'
-import {useRoute} from 'vue-router'
-import type {FormInstance, FormRules, UploadFiles} from 'element-plus'
-import {isAppIcon} from '@/utils/common'
+import { computed, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import type { FormInstance, FormRules, UploadFiles } from 'element-plus'
+import { isAppIcon } from '@/utils/common'
 import applicationXpackApi from '@/api/application/application-xpack'
-import {MsgSuccess, MsgError} from '@/utils/message'
-import {langList, t} from '@/locales'
+import { MsgSuccess, MsgError } from '@/utils/message'
+import { langList, t } from '@/locales'
 import useStore from '@/stores'
-import {cloneDeep} from 'lodash'
+import { cloneDeep } from 'lodash'
 
-const {user} = useStore()
+const { user } = useStore()
 
 const route = useRoute()
 const {
-  params: {id}
+  params: { id },
 } = route
 
 const emit = defineEmits(['refresh'])
@@ -456,8 +458,8 @@ const defaultSetting = {
     header_font_color: '#1f2329',
   },
   float_location: {
-    y: {type: 'bottom', value: 30},
-    x: {type: 'right', value: 0}
+    y: { type: 'bottom', value: 30 },
+    x: { type: 'right', value: 0 },
   },
   show_avatar: true,
   show_user_avatar: false,
@@ -489,8 +491,8 @@ const xpackForm = ref<any>({
     header_font_color: '#1f2329',
   },
   float_location: {
-    y: {type: 'bottom', value: 30},
-    x: {type: 'right', value: 0}
+    y: { type: 'bottom', value: 30 },
+    x: { type: 'right', value: 0 },
   },
   show_avatar: true,
   show_user_avatar: false,
@@ -501,7 +503,7 @@ const imgUrl = ref<any>({
   float_icon: '',
   user_avatar: '',
   icon: '',
-  chat_background: ''
+  chat_background: '',
 })
 
 const dialogVisible = ref<boolean>(false)
@@ -523,7 +525,7 @@ function resetForm() {
     float_icon: '',
     user_avatar: '',
     icon: '',
-    chat_background: ''
+    chat_background: '',
   }
 }
 
@@ -609,7 +611,7 @@ const submit = async (formEl: FormInstance | undefined) => {
   })
 }
 
-defineExpose({open})
+defineExpose({ open })
 </script>
 <style lang="scss">
 .setting-preview {

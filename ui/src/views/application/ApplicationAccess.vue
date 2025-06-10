@@ -58,7 +58,7 @@ const platforms = reactive([
     name: t('views.application.applicationAccess.wecom'),
     description: t('views.application.applicationAccess.wecomTip'),
     isActive: false,
-    exists: false
+    exists: false,
   },
   {
     key: 'dingtalk',
@@ -66,7 +66,7 @@ const platforms = reactive([
     name: t('views.application.applicationAccess.dingtalk'),
     description: t('views.application.applicationAccess.dingtalkTip'),
     isActive: false,
-    exists: false
+    exists: false,
   },
   {
     key: 'wechat',
@@ -74,7 +74,7 @@ const platforms = reactive([
     name: t('views.application.applicationAccess.wechat'),
     description: t('views.application.applicationAccess.wechatTip'),
     isActive: false,
-    exists: false
+    exists: false,
   },
   {
     key: 'feishu',
@@ -82,7 +82,7 @@ const platforms = reactive([
     name: t('views.application.applicationAccess.lark'),
     description: t('views.application.applicationAccess.larkTip'),
     isActive: false,
-    exists: false
+    exists: false,
   },
   {
     key: 'slack',
@@ -90,15 +90,15 @@ const platforms = reactive([
     name: t('views.application.applicationAccess.slack'),
     description: t('views.application.applicationAccess.slackTip'),
     isActive: false,
-    exists: false
-  }
+    exists: false,
+  },
 ])
 
 const AccessSettingDrawerRef = ref()
 const loading = ref(false)
 const route = useRoute()
 const {
-  params: { id }
+  params: { id },
 } = route as any
 
 function openDrawer(key: string) {
@@ -123,7 +123,7 @@ function getPlatformStatus() {
 function changeStatus(type: string, value: boolean) {
   const data = {
     type: type,
-    status: value
+    status: value,
   }
   applicationApi.updatePlatformStatus(id, data).then(() => {
     MsgSuccess(t('common.saveSuccess'))
@@ -131,55 +131,8 @@ function changeStatus(type: string, value: boolean) {
 }
 
 onMounted(() => {
-  getPlatformStatus()
+  // getPlatformStatus()
 })
 </script>
 
-<style lang="scss" scoped>
-.p-16-24 {
-  padding: 16px 24px;
-}
-
-.mb-16 {
-  margin-bottom: 16px;
-}
-
-.flex-between {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.flex {
-  display: flex;
-}
-
-.align-center {
-  align-items: center;
-}
-
-.ml-8 {
-  margin-left: 8px;
-}
-
-.mr-8 {
-  margin-right: 8px;
-}
-
-.ml-12 {
-  margin-left: 12px;
-}
-
-.mr-4 {
-  margin-right: 4px;
-}
-
-.cursor {
-  cursor: pointer;
-}
-
-.icon {
-  width: 32px; // 设置图标宽度
-  height: 32px; // 设置图标高度
-}
-</style>
+<style lang="scss" scoped></style>

@@ -1,3 +1,16 @@
+import moment from 'moment'
+import 'moment/dist/locale/zh-cn'
+moment.locale('zh-cn')
+import { t } from '@/locales'
+
+// 当天日期 YYYY-MM-DD
+export const nowDate = moment().format('YYYY-MM-DD')
+
+// 当前时间的前n天
+export function beforeDay(n: number | string) {
+  return moment().subtract(n, 'days').format('YYYY-MM-DD')
+}
+
 const getCheckDate = (timestamp: any) => {
   if (!timestamp) return false
   const dt = new Date(timestamp)

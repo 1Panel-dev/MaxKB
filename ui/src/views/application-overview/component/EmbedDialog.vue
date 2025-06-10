@@ -13,7 +13,7 @@
           <p class="title p-16 bold">
             {{ $t('views.applicationOverview.appInfo.EmbedDialog.fullscreenModeTitle') }}
           </p>
-          <img src="@/assets/window1.png" alt="" class="ml-8" height="150" />
+          <img src="@/assets/application/window1.png" alt="" class="ml-8" height="150" />
           <div class="code layout-bg border-t p-8">
             <div class="flex-between p-8">
               <span class="bold">{{
@@ -36,7 +36,7 @@
           <p class="title p-16 bold">
             {{ $t('views.applicationOverview.appInfo.EmbedDialog.mobileModeTitle') }}
           </p>
-          <img src="@/assets/window3.png" alt="" class="ml-8" height="150" />
+          <img src="@/assets/application/window3.png" alt="" class="ml-8" height="150" />
           <div class="code layout-bg border-t p-8">
             <div class="flex-between p-8">
               <span class="bold">{{
@@ -59,7 +59,7 @@
           <p class="title p-16 bold">
             {{ $t('views.applicationOverview.appInfo.EmbedDialog.floatingModeTitle') }}
           </p>
-          <img src="@/assets/window2.png" alt="" class="ml-8" height="150" />
+          <img src="@/assets/application/window2.png" alt="" class="ml-8" height="150" />
           <div class="code layout-bg border-t p-8">
             <div class="flex-between p-8">
               <span class="bold">{{
