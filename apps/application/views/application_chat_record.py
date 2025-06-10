@@ -27,9 +27,9 @@ class ApplicationChatRecord(APIView):
 
     @extend_schema(
         methods=['GET'],
-        description=_("Get the conversation list"),
-        summary=_("Get the conversation list"),
-        operation_id=_("Get the conversation list"),  # type: ignore
+        description=_("Get the conversation record list"),
+        summary=_("Get the conversation record list"),
+        operation_id=_("Get the conversation record list"),  # type: ignore
         request=ApplicationChatRecordQueryAPI.get_request(),
         parameters=ApplicationChatRecordQueryAPI.get_parameters(),
         responses=ApplicationChatRecordQueryAPI.get_response(),
