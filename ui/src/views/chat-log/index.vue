@@ -1,6 +1,8 @@
 <template>
-  <LayoutContainer :header="$t('views.chatLog.title')">
-    <div class="p-24">
+  <div class="p-16-24">
+    <h2 class="mb-16">{{ $t('views.chatLog.title') }}</h2>
+
+    <el-card style="--el-card-padding: 24px">
       <div class="mb-16">
         <el-select
           v-model="history_day"
@@ -24,6 +26,8 @@
           format="YYYY-MM-DD"
           value-format="YYYY-MM-DD"
           @change="changeDayRangeHandle"
+          style="width: 240px;"
+          class="mr-12"
         />
         <el-input
           v-model="search"
@@ -153,7 +157,7 @@
           </template>
         </el-table-column>
       </app-table>
-    </div>
+    </el-card>
     <ChatRecordDrawer
       :next="nextChatRecord"
       :pre="preChatRecord"
@@ -223,31 +227,7 @@
               :value="item.id"
             >
               <span class="flex align-center">
-                <AppAvatar
-                  v-if="!item.knowledge_id && item.type === '1'"
-                  class="mr-12 avatar-purple"
-                  shape="square"
-                  :size="24"
-                >
-                  <img src="@/assets/icon_web.svg" style="width: 58%" alt="" />
-                </AppAvatar>
-                <AppAvatar
-                  v-else-if="!item.knowledge_id && item.type === '2'"
-                  class="mr-12 avatar-purple"
-                  shape="square"
-                  :size="24"
-                  style="background: none"
-                >
-                  <img src="@/assets/logo_lark.svg" style="width: 100%" alt="" />
-                </AppAvatar>
-                <AppAvatar
-                  v-else-if="!item.knowledge_id && item.type === '0'"
-                  class="mr-12 avatar-blue"
-                  shape="square"
-                  :size="24"
-                >
-                  <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
-                </AppAvatar>
+                <KnowledgeIcon :type="item.type" v-if="!item.knowledge_id" />
                 {{ item.name }}
               </span>
             </el-option>
@@ -283,12 +263,13 @@
         </span>
       </template>
     </el-dialog>
-  </LayoutContainer>
+  </div>
 </template>
 <script setup lang="ts">
 import { ref, type Ref, onMounted, reactive, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { cloneDeep } from 'lodash'
+import KnowledgeIcon from '@/views/knowledge/component/KnowledgeIcon.vue'
 import ChatRecordDrawer from './component/ChatRecordDrawer.vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import chatLogApi from '@/api/application/chat-log'
@@ -542,7 +523,13 @@ const exportLog = () => {
       obj = { ...obj, abstract: search.value }
     }
 
-    chatLogApi.postExportChatLog(detail.value.id, detail.value.name, obj, { select_ids: arr }, loading)
+    chatLogApi.postExportChatLog(
+      detail.value.id,
+      detail.value.name,
+      obj,
+      { select_ids: arr },
+      loading,
+    )
   }
 }
 

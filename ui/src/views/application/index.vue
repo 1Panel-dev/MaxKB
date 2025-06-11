@@ -89,118 +89,127 @@
           </el-dropdown>
         </div>
       </template>
-      <div>
-        <el-row v-if="applicationList.length > 0" :gutter="15">
-          <template v-for="(item, index) in applicationList" :key="index">
-            <el-col
-              v-if="item.resource_type === 'folder'"
-              :xs="24"
-              :sm="12"
-              :md="12"
-              :lg="8"
-              :xl="6"
-              class="mb-16"
-            >
-              <CardBox
-                :title="item.name"
-                :description="item.desc || $t('common.noData')"
-                class="cursor"
+      <div v-loading.fullscreen.lock="paginationConfig.current_page === 1 && loading">
+        <InfiniteScroll
+          :size="applicationList.length"
+          :total="paginationConfig.total"
+          :page_size="paginationConfig.page_size"
+          v-model:current_page="paginationConfig.current_page"
+          @load="getList"
+          :loading="loading"
+        >
+          <el-row v-if="applicationList.length > 0" :gutter="15">
+            <template v-for="(item, index) in applicationList" :key="index">
+              <el-col
+                v-if="item.resource_type === 'folder'"
+                :xs="24"
+                :sm="12"
+                :md="12"
+                :lg="8"
+                :xl="6"
+                class="mb-16"
               >
-                <template #icon>
-                  <el-avatar shape="square" :size="32" style="background: none">
-                    <AppIcon iconName="app-folder" style="font-size: 32px"></AppIcon>
-                  </el-avatar>
-                </template>
-                <template #subTitle>
-                  <el-text class="color-secondary lighter" size="small">
-                    {{ $t('common.creator') }}: {{ item.username }}
-                  </el-text>
-                </template>
-              </CardBox>
-            </el-col>
-            <el-col v-else :xs="24" :sm="12" :md="12" :lg="8" :xl="6" class="mb-16">
-              <CardBox
-                :title="item.name"
-                :description="item.desc"
-                class="cursor"
-                @click="router.push({ path: `/application/${item.id}/${item.type}/overview` })"
-              >
-                <template #icon>
-                  <LogoIcon height="28px" style="width: 28px; height: 28px; display: block" />
-                </template>
-                <template #subTitle>
-                  <el-text class="color-secondary" size="small">
-                    <auto-tooltip :content="item.username">
+                <CardBox
+                  :title="item.name"
+                  :description="item.desc || $t('common.noData')"
+                  class="cursor"
+                >
+                  <template #icon>
+                    <el-avatar shape="square" :size="32" style="background: none">
+                      <AppIcon iconName="app-folder" style="font-size: 32px"></AppIcon>
+                    </el-avatar>
+                  </template>
+                  <template #subTitle>
+                    <el-text class="color-secondary lighter" size="small">
                       {{ $t('common.creator') }}: {{ item.username }}
-                    </auto-tooltip>
-                  </el-text>
-                </template>
-                <template #tag>
-                  <el-tag type="warning" v-if="isWorkFlow(item.type)" style="height: 22px">
-                    {{ $t('views.application.workflow') }}
-                  </el-tag>
-                  <el-tag class="blue-tag" v-else style="height: 22px">
-                    {{ $t('views.application.simple') }}
-                  </el-tag>
-                </template>
+                    </el-text>
+                  </template>
+                </CardBox>
+              </el-col>
+              <el-col v-else :xs="24" :sm="12" :md="12" :lg="8" :xl="6" class="mb-16">
+                <CardBox
+                  :title="item.name"
+                  :description="item.desc"
+                  class="cursor"
+                  @click="router.push({ path: `/application/${item.id}/${item.type}/overview` })"
+                >
+                  <template #icon>
+                    <LogoIcon height="28px" style="width: 28px; height: 28px; display: block" />
+                  </template>
+                  <template #subTitle>
+                    <el-text class="color-secondary" size="small">
+                      <auto-tooltip :content="item.username">
+                        {{ $t('common.creator') }}: {{ item.username }}
+                      </auto-tooltip>
+                    </el-text>
+                  </template>
+                  <template #tag>
+                    <el-tag type="warning" v-if="isWorkFlow(item.type)" style="height: 22px">
+                      {{ $t('views.application.workflow') }}
+                    </el-tag>
+                    <el-tag class="blue-tag" v-else style="height: 22px">
+                      {{ $t('views.application.simple') }}
+                    </el-tag>
+                  </template>
 
-                <template #footer>
-                  <div v-if="item.is_publish" class="flex align-center">
-                    <el-icon class="color-success mr-8" style="font-size: 16px">
-                      <SuccessFilled />
-                    </el-icon>
-                    <span class="color-secondary">
-                      {{ $t('views.application.status.published') }}
-                    </span>
-                    <el-divider direction="vertical" />
-                    <el-icon class="mr-8"><Clock /></el-icon>
-                    <span class="color-secondary">{{ dateFormat(item.update_time) }}</span>
-                  </div>
-                  <div v-else class="flex align-center">
-                    <AppIcon iconName="app-disabled" class="color-secondary mr-8"></AppIcon>
-                    <span class="color-secondary">
-                      {{ $t('views.application.status.unpublished') }}
-                    </span>
-                  </div>
-                </template>
-                <template #mouseEnter>
-                  <div @click.stop>
-                    <el-dropdown trigger="click">
-                      <el-button text @click.stop>
-                        <el-icon>
-                          <MoreFilled />
-                        </el-icon>
-                      </el-button>
-                      <template #dropdown>
-                        <el-dropdown-menu>
-                          <el-dropdown-item @click.stop="getAccessToken(item.id)">
-                            <AppIcon iconName="app-create-chat"></AppIcon>
-                            {{ $t('views.application.operation.toChat') }}
-                          </el-dropdown-item>
-                          <el-dropdown-item @click.stop="settingApplication(item)">
-                            <el-icon><Setting /></el-icon>
-                            {{ $t('common.setting') }}
-                          </el-dropdown-item>
-                          <el-dropdown-item divided @click.stop="exportApplication(item)">
-                            <AppIcon iconName="app-export"></AppIcon>
-                            {{ $t('common.export') }}
-                          </el-dropdown-item>
-                          <el-dropdown-item
-                            divided
-                            icon="Delete"
-                            @click.stop="deleteApplication(item)"
-                            >{{ $t('common.delete') }}</el-dropdown-item
-                          >
-                        </el-dropdown-menu>
-                      </template>
-                    </el-dropdown>
-                  </div>
-                </template>
-              </CardBox>
-            </el-col>
-          </template>
-        </el-row>
-        <el-empty :description="$t('common.noData')" v-else />
+                  <template #footer>
+                    <div v-if="item.is_publish" class="flex align-center">
+                      <el-icon class="color-success mr-8" style="font-size: 16px">
+                        <SuccessFilled />
+                      </el-icon>
+                      <span class="color-secondary">
+                        {{ $t('views.application.status.published') }}
+                      </span>
+                      <el-divider direction="vertical" />
+                      <el-icon class="mr-8"><Clock /></el-icon>
+                      <span class="color-secondary">{{ dateFormat(item.update_time) }}</span>
+                    </div>
+                    <div v-else class="flex align-center">
+                      <AppIcon iconName="app-disabled" class="color-secondary mr-8"></AppIcon>
+                      <span class="color-secondary">
+                        {{ $t('views.application.status.unpublished') }}
+                      </span>
+                    </div>
+                  </template>
+                  <template #mouseEnter>
+                    <div @click.stop>
+                      <el-dropdown trigger="click">
+                        <el-button text @click.stop>
+                          <el-icon>
+                            <MoreFilled />
+                          </el-icon>
+                        </el-button>
+                        <template #dropdown>
+                          <el-dropdown-menu>
+                            <el-dropdown-item @click.stop="getAccessToken(item.id)">
+                              <AppIcon iconName="app-create-chat"></AppIcon>
+                              {{ $t('views.application.operation.toChat') }}
+                            </el-dropdown-item>
+                            <el-dropdown-item @click.stop="settingApplication(item)">
+                              <el-icon><Setting /></el-icon>
+                              {{ $t('common.setting') }}
+                            </el-dropdown-item>
+                            <el-dropdown-item divided @click.stop="exportApplication(item)">
+                              <AppIcon iconName="app-export"></AppIcon>
+                              {{ $t('common.export') }}
+                            </el-dropdown-item>
+                            <el-dropdown-item
+                              divided
+                              icon="Delete"
+                              @click.stop="deleteApplication(item)"
+                              >{{ $t('common.delete') }}</el-dropdown-item
+                            >
+                          </el-dropdown-menu>
+                        </template>
+                      </el-dropdown>
+                    </div>
+                  </template>
+                </CardBox>
+              </el-col>
+            </template>
+          </el-row>
+          <el-empty :description="$t('common.noData')" v-else />
+        </InfiniteScroll>
       </div>
     </ContentContainer>
     <CreateApplicationDialog ref="CreateApplicationDialogRef" />

@@ -35,7 +35,7 @@ const useApplicationStore = defineStore('application', {
       })
     },
 
-    async asyncGetApplicationDataset(id: string, loading?: Ref<boolean>) {
+    async asyncGetApplicationKnowledge(id: string, loading?: Ref<boolean>) {
       return new Promise((resolve, reject) => {
         applicationApi
           .getApplicationDataset(id, loading)

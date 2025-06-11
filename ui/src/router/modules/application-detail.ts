@@ -64,7 +64,7 @@ const ApplicationDetailRouter = {
         icon: 'app-document',
         iconActive: 'app-document-active',
         title: 'views.chatLog.title',
-        active: 'log',
+        active: 'chat-log',
         parentPath: '/application/:id/:type',
         parentName: 'ApplicationDetail'
       },

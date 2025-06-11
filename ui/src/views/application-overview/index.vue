@@ -424,8 +424,8 @@ function mapToUrlParams(map: any[]) {
 }
 
 onMounted(() => {
-  getDetail()
-  getAccessToken()
+  // getDetail()
+  // getAccessToken()
   // changeDayHandle(history_day.value)
 })
 </script>
