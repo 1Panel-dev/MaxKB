@@ -36,7 +36,7 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
 import type { RoleItem, RolePermissionItem, RoleTableDataItem, ChildrenPermissionItem } from '@/api/type/role'
-import RoleApi from '@/api/user/role'
+import RoleApi from '@/api/system/role'
 import { MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
 

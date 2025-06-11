@@ -44,9 +44,12 @@
               </div>
               <div class="role-left_title">
                 <span class="color-secondary lighter">{{ $t('views.role.customRole') }}</span>
-                <AppIcon iconName="app-wordspace" style="font-size: 16px" class="cursor color-primary"
-                  @click="createOrUpdateRole()">
-                </AppIcon>
+                <el-tooltip effect="dark" :content="`${$t('common.create')}${$t('views.role.customRole')}`"
+                  placement="top">
+                  <el-button type="primary" text @click="createOrUpdateRole()">
+                    <AppIcon iconName="app-copy"></AppIcon>
+                  </el-button>
+                </el-tooltip>
               </div>
               <common-list :data="filterCustomRole" @click="clickRole" :default-active="currentRole?.id">
                 <template #default="{ row }">
@@ -113,7 +116,7 @@
 
 <script lang="ts" setup>
 import { onMounted, ref, watch } from 'vue'
-import RoleApi from '@/api/user/role'
+import RoleApi from '@/api/system/role'
 import { t } from '@/locales'
 import PermissionConfiguration from './component/PermissionConfiguration.vue'
 import Member from './component/Member.vue'

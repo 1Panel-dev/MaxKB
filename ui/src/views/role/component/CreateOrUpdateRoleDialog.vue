@@ -30,7 +30,7 @@ import type { FormInstance } from 'element-plus'
 import { MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
 import type { RoleItem, CreateOrUpdateParams } from '@/api/type/role'
-import RoleApi from '@/api/user/role'
+import RoleApi from '@/api/system/role'
 import { roleTypeMap } from '../index'
 
 const emit = defineEmits<{
