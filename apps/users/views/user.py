@@ -135,6 +135,8 @@ class UserManage(APIView):
                    request=UserProfileAPI.get_request(),
                    responses=UserProfileAPI.get_response())
     @has_permissions(PermissionConstants.USER_CREATE)
+    @log(menu='User management', operate='Add user',
+         get_operation_object=lambda r, k: {'name': r.data.get('username', None)})
     def post(self, request: Request):
         return result.success(UserManageSerializer().save(request.data))
 
@@ -187,6 +189,8 @@ class UserManage(APIView):
                        request=EditUserApi.get_request(),
                        responses=UserProfileAPI.get_response())
         @has_permissions(PermissionConstants.USER_EDIT)
+        @log(menu='User management', operate='Update user information',
+             get_operation_object=lambda r, k: get_user_operation_object(k.get('user_id')))
         def put(self, request: Request, user_id):
             return result.success(
                 UserManageSerializer.Operate(data={'id': user_id}).edit(request.data, with_valid=True))
