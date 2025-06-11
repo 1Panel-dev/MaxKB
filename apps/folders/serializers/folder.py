@@ -53,17 +53,17 @@ def get_folder_tree_serializer(source):
 FOLDER_DEPTH = 2  # Folder 不能超过3层
 
 
-def check_depth(source, parent_id, current_depth=0):
+def check_depth(source, parent_id, workspace_id, current_depth=0):
     # Folder 不能超过3层
     Folder = get_folder_type(source)  # noqa
 
-    if parent_id != 'root':
+    if parent_id != workspace_id:
         # 计算当前层级
         depth = 1  # 当前要创建的节点算一层
         current_parent_id = parent_id
 
         # 向上追溯父节点
-        while current_parent_id != 'root':
+        while current_parent_id != workspace_id:
             depth += 1
             parent_node = QuerySet(Folder).filter(id=current_parent_id).first()
             if parent_node is None:
@@ -115,14 +115,14 @@ class FolderSerializer(serializers.Serializer):
                 workspace_id = 'default'
             parent_id = instance.get('parent_id')
             if not parent_id:
-                parent_id = 'root'
+                parent_id = workspace_id
             name = instance.get('name')
 
             Folder = get_folder_type(self.data.get('source'))  # noqa
             if QuerySet(Folder).filter(name=name, workspace_id=workspace_id, parent_id=parent_id).exists():
                 raise serializers.ValidationError(_('Folder name already exists'))
             # Folder 不能超过3层
-            check_depth(self.data.get('source'), parent_id)
+            check_depth(self.data.get('source'), parent_id, workspace_id)
 
             folder = Folder(
                 id=uuid.uuid7(),
@@ -157,10 +157,10 @@ class FolderSerializer(serializers.Serializer):
 
             # 模块间的移动
             parent_id = instance.get('parent_id')
-            if parent_id is not None and current_id != 'root':
+            if parent_id is not None and current_id != current_node.workspace_id:
                 # Folder 不能超过3层
                 current_depth = get_max_depth(current_node)
-                check_depth(self.data.get('source'), parent_id, current_depth)
+                check_depth(self.data.get('source'), parent_id, current_node.workspace_id, current_depth)
                 parent = Folder.objects.get(id=parent_id)
                 current_node.move_to(parent)
 
@@ -175,10 +175,13 @@ class FolderSerializer(serializers.Serializer):
         @transaction.atomic
         def delete(self):
             self.is_valid(raise_exception=True)
-            if self.data.get('id') == 'root':
-                raise serializers.ValidationError(_('Cannot delete root folder'))
             Folder = get_folder_type(self.data.get('source'))  # noqa
             Source = get_source_type(self.data.get('source'))  # noqa
+            folder = Folder.objects.filter(id=self.data.get('id')).first()
+            if not folder:
+                raise serializers.ValidationError(_('Folder does not exist'))
+            if folder.id != folder.workspace_id:
+                raise serializers.ValidationError(_('Cannot delete root folder'))
             nodes = Folder.objects.filter(id=self.data.get('id')).get_descendants(include_self=True)
             for node in nodes:
                 # print(node)
