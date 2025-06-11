@@ -7,6 +7,13 @@ import mptt.fields
 import uuid_utils.compat
 from django.db import migrations, models
 
+from knowledge.models import KnowledgeFolder
+
+
+def insert_default_data(apps, schema_editor):
+    # 创建一个根模块（没有父节点）
+    KnowledgeFolder.objects.create(id='default', name='根目录', user_id='f0dd8f71-e4ee-11ee-8c84-a8a1595801ab', workspace_id='default')
+
 
 class Migration(migrations.Migration):
 
@@ -168,4 +175,5 @@ class Migration(migrations.Migration):
                 'db_table': 'problem_paragraph_mapping',
             },
         ),
+        migrations.RunPython(insert_default_data),
     ]

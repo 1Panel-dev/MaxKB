@@ -12,8 +12,8 @@ from django.db import migrations, models
 
 def insert_default_data(apps, schema_editor):
     # 创建一个根模块（没有父节点）
-    QuerySet(application.models.application.ApplicationFolder).create(id='root', name='根目录',
-                                                                      user_id='f0dd8f71-e4ee-11ee-8c84-a8a1595801ab')
+    QuerySet(application.models.application.ApplicationFolder).create(id='default', name='根目录',
+                                                                      user_id='f0dd8f71-e4ee-11ee-8c84-a8a1595801ab', workspace_id='default')
 
 
 class Migration(migrations.Migration):
