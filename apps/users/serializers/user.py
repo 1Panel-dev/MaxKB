@@ -431,18 +431,31 @@ class UserManageSerializer(serializers.Serializer):
                 .filter(workspace_id=workspace_id)
                 .exclude(role__id='workspace_admin')
                 .select_related('role', 'user')  # 预加载外键数据
-                .distinct('user_id')
             )
-            return [
-                {
-                    'id': relation.user.id,
-                    'nick_name': relation.user.nick_name,
-                    'email': relation.user.email,
-                    'role': relation.role.name
-                }
-                for relation in user_role_relations
-            ]
-        return []
+            user_dict = {}
+            for relation in user_role_relations:
+                user_id = relation.user.id
+                if user_id not in user_dict:
+                    user_dict[user_id] = {
+                        'id': user_id,
+                        'nick_name': relation.user.nick_name,
+                        'email': relation.user.email,
+                        'roles': [relation.role.name]
+                    }
+                else:
+                    user_dict[user_id]['roles'].append(relation.role.name)
+
+            # 将字典值转换为列表形式
+            return list(user_dict.values())
+        user_list = User.objects.exclude(role=RoleConstants.ADMIN.name)
+        return [
+            {
+                'id': user.id,
+                'nick_name': user.nick_name,
+                'email': user.email,
+                'roles': [RoleConstants.USER.name]
+            } for user in user_list
+        ]
 
     class BatchDelete(serializers.Serializer):
         ids = serializers.ListField(required=True, label=_('User IDs'))
