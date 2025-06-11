@@ -11,7 +11,10 @@ from (select "id"::text,
              "create_time",
              "update_time"
       from application
-    ${application_custom_sql}
+      where id in (select target
+                   from workspace_user_resource_permission
+                   where auth_target_type = 'APPLICATION'
+                     and 'VIEW' = any (permission_list))
       UNION
       select "id",
              "name",

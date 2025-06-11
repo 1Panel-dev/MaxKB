@@ -18,7 +18,7 @@ from application.serializers.application_chat_record import ApplicationChatRecor
 from common import result
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
-from common.constants.permission_constants import PermissionConstants
+from common.constants.permission_constants import PermissionConstants, RoleConstants
 from common.utils.common import query_params_to_single_dict
 
 
@@ -35,7 +35,8 @@ class ApplicationChatRecord(APIView):
         responses=ApplicationChatRecordQueryAPI.get_response(),
         tags=[_("Application/Conversation Log")]  # type: ignore
     )
-    @has_permissions(PermissionConstants.APPLICATION_CHAT_LOG.get_workspace_application_permission())
+    @has_permissions(PermissionConstants.APPLICATION_CHAT_LOG.get_workspace_application_permission(),
+                     RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def get(self, request: Request, workspace_id: str, application_id: str, chat_id: str):
         return result.success(ApplicationChatRecordQuerySerializers(
             data={**query_params_to_single_dict(request.query_params), 'application_id': application_id,
