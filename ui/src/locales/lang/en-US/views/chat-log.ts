@@ -22,10 +22,10 @@ export default {
     mark: 'Marks',
     recenTimes: 'Last Chat Time'
   },
-  addToDataset: 'Add to Knowledge',
+  addToKnowledge: 'Add to Knowledge',
   daysText: 'Days ago',
-  selectDataset: 'Select Knowledge',
-  selectDatasetPlaceholder: 'Please select a knowledge',
+  selectKnowledge: 'Select Knowledge',
+  selectKnowledgePlaceholder: 'Please select a knowledge',
   saveToDocument: 'Save to Document',
   documentPlaceholder: 'Please select a document',
   editContent: 'Edit Content',

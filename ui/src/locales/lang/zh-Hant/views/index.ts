@@ -12,7 +12,7 @@ import model from './model'
 import document from './document'
 import paragraph from './paragraph'
 import problem from './problem'
-import log from './log'
+import chatLog from './chat-log'
 import applicationWorkflow from './application-workflow'
 import login from './login'
 import operateLog from './operate-log'
@@ -31,7 +31,7 @@ export default {
   document,
   paragraph,
   problem,
-  log,
+  chatLog,
   login,
   operateLog,
   role

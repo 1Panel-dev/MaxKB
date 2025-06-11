@@ -10,10 +10,10 @@
         label-width="auto"
         ref="DatasetNodeFormRef"
       >
-        <el-form-item :label="$t('views.log.selectDataset')">
+        <el-form-item :label="$t('views.chatLog.selectDataset')">
           <template #label>
             <div class="flex-between">
-              <span>{{ $t('views.log.selectDataset') }}</span>
+              <span>{{ $t('views.chatLog.selectDataset') }}</span>
               <el-button type="primary" link @click="openDatasetDialog">
                 <el-icon><Plus /></el-icon>
               </el-button>

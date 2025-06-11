@@ -10,7 +10,7 @@ import useProblemStore from './modules/problem'
 import useParagraphStore from './modules/paragraph'
 import useDocumentStore from './modules/document'
 import useApplicationStore from './modules/application'
-
+import useChatLogStore from './modules/chat-log'
 const useStore = () => ({
   common: useCommonStore(),
   login: useLoginStore(),
@@ -24,6 +24,7 @@ const useStore = () => ({
   paragraph: useParagraphStore(),
   document: useDocumentStore(),
   application: useApplicationStore(),
+  chatLog: useChatLogStore(),
 })
 
 export default useStore

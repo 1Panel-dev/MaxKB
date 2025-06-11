@@ -22,10 +22,10 @@ export default {
     mark: '改進標註',
     recenTimes: '最近對話時間'
   },
-  addToDataset: '添加至知識庫',
+  addToKnowledge: '添加至知識庫',
   daysText: '天之前的對話記錄',
-  selectDataset: '選擇知識庫',
-  selectDatasetPlaceholder: '請選擇知識庫',
+  selectKnowledge: '選擇知識庫',
+  selectKnowledgePlaceholder: '請選擇知識庫',
   saveToDocument: '保存至文件',
   documentPlaceholder: '請選擇文件',
   editContent: '修改內容',

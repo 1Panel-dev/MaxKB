@@ -12,7 +12,7 @@ import problem from './problem'
 import applicationOverview from './application-overview'
 import applicationWorkflow from './application-workflow'
 import paragraph from './paragraph'
-import log from './log'
+import chatLog from './chat-log'
 // import notFound from './404'
 
 // import operateLog from './operate-log'
@@ -31,7 +31,7 @@ export default {
   applicationOverview,
   applicationWorkflow,
   paragraph,
-  log,
+  chatLog,
   // notFound,
 
   // operateLog

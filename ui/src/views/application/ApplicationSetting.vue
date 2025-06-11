@@ -156,7 +156,7 @@
                           <AppIcon iconName="app-operation" class="mr-4"></AppIcon>
                           {{ $t('common.paramSetting') }}
                         </el-button>
-                        <el-button type="primary" link @click="openDatasetDialog">
+                        <el-button type="primary" link @click="openKnowledgeDialog">
                           <el-icon class="mr-4">
                             <Plus />
                           </el-icon>
@@ -180,11 +180,11 @@
                         v-for="(item, index) in applicationForm.knowledge_id_list"
                         :key="index"
                       >
-                        <el-card class="relate-dataset-card border-r-4" shadow="never">
+                        <el-card class="relate-knowledge-card border-r-4" shadow="never">
                           <div class="flex-between">
                             <div class="flex align-center" style="width: 80%">
                               <el-avatar
-                                v-if="relatedObject(datasetList, item, 'id')?.type === '1'"
+                                v-if="relatedObject(knowledgeList, item, 'id')?.type === '1'"
                                 class="mr-8 avatar-purple"
                                 shape="square"
                                 :size="32"
@@ -196,7 +196,7 @@
                                 />
                               </el-avatar>
                               <el-avatar
-                                v-else-if="relatedObject(datasetList, item, 'id')?.type === '2'"
+                                v-else-if="relatedObject(knowledgeList, item, 'id')?.type === '2'"
                                 class="mr-8 avatar-purple"
                                 shape="square"
                                 :size="32"
@@ -218,12 +218,12 @@
 
                               <span
                                 class="ellipsis cursor"
-                                :title="relatedObject(datasetList, item, 'id')?.name"
+                                :title="relatedObject(knowledgeList, item, 'id')?.name"
                               >
-                                {{ relatedObject(datasetList, item, 'id')?.name }}</span
+                                {{ relatedObject(knowledgeList, item, 'id')?.name }}</span
                               >
                             </div>
-                            <el-button text @click="removeDataset(item)">
+                            <el-button text @click="removeKnowledge(item)">
                               <el-icon>
                                 <Close />
                               </el-icon>
@@ -470,12 +470,12 @@
     <AIModeParamSettingDialog ref="AIModeParamSettingDialogRef" @refresh="refreshForm" />
     <TTSModeParamSettingDialog ref="TTSModeParamSettingDialogRef" @refresh="refreshTTSForm" />
     <ParamSettingDialog ref="ParamSettingDialogRef" @refresh="refreshParam" />
-    <AddDatasetDialog
-      ref="AddDatasetDialogRef"
-      @addData="addDataset"
-      :data="datasetList"
+    <AddKnowledgeDialog
+      ref="AddKnowledgeDialogRef"
+      @addData="addKnowledge"
+      :data="knowledgeList"
       @refresh="refresh"
-      :loading="datasetLoading"
+      :loading="knowledgeLoading"
     />
 
     <EditAvatarDialog ref="EditAvatarDialogRef" @refresh="refreshIcon" />
@@ -491,7 +491,7 @@ import { useRoute } from 'vue-router'
 import { groupBy } from 'lodash'
 import AIModeParamSettingDialog from './component/AIModeParamSettingDialog.vue'
 import ParamSettingDialog from './component/ParamSettingDialog.vue'
-import AddDatasetDialog from './component/AddDatasetDialog.vue'
+import AddKnowledgeDialog from './component/AddKnowledgeDialog.vue'
 import EditAvatarDialog from '@/views/application-overview/component/EditAvatarDialog.vue'
 import applicationApi from '@/api/application/application'
 import { isAppIcon } from '@/utils/common'
@@ -529,11 +529,11 @@ const TTSModeParamSettingDialogRef = ref<InstanceType<typeof TTSModeParamSetting
 const ParamSettingDialogRef = ref<InstanceType<typeof ParamSettingDialog>>()
 
 const applicationFormRef = ref<FormInstance>()
-const AddDatasetDialogRef = ref()
+const AddKnowledgeDialogRef = ref()
 const EditAvatarDialogRef = ref()
 
 const loading = ref(false)
-const datasetLoading = ref(false)
+const knowledgeLoading = ref(false)
 const applicationForm = ref<ApplicationFormType>({
   name: '',
   desc: '',
@@ -578,7 +578,7 @@ const rules = reactive<FormRules<ApplicationFormType>>({
   ],
 })
 const modelOptions = ref<any>(null)
-const datasetList = ref([])
+const knowledgeList = ref([])
 const sttModelOptions = ref<any>(null)
 const ttsModelOptions = ref<any>(null)
 const showEditIcon = ref(false)
@@ -660,7 +660,7 @@ function refreshTTSForm(data: any) {
   applicationForm.value.tts_model_params_setting = data
 }
 
-function removeDataset(id: any) {
+function removeKnowledge(id: any) {
   if (applicationForm.value.knowledge_id_list) {
     applicationForm.value.knowledge_id_list.splice(
       applicationForm.value.knowledge_id_list.indexOf(id),
@@ -669,12 +669,12 @@ function removeDataset(id: any) {
   }
 }
 
-function addDataset(val: Array<string>) {
+function addKnowledge(val: Array<string>) {
   applicationForm.value.knowledge_id_list = val
 }
 
-function openDatasetDialog() {
-  AddDatasetDialogRef.value.open(applicationForm.value.knowledge_id_list)
+function openKnowledgeDialog() {
+  AddKnowledgeDialogRef.value.open(applicationForm.value.knowledge_id_list)
 }
 
 function getDetail() {
@@ -692,9 +692,9 @@ function getDetail() {
   })
 }
 
-function getDataset() {
-  application.asyncGetApplicationDataset(id, datasetLoading).then((res: any) => {
-    datasetList.value = res.data
+function getKnowledge() {
+  application.asyncGetApplicationKnowledge(id, knowledgeLoading).then((res: any) => {
+    knowledgeList.value = res.data
   })
 }
 
@@ -766,12 +766,12 @@ function refreshIcon() {
 }
 
 function refresh() {
-  getDataset()
+  getKnowledge()
 }
 
 onMounted(() => {
   // getModel()
-  // getDataset()
+  // getKnowledge()
   // getDetail()
   // getSTTModel()
   // getTTSModel()
@@ -779,7 +779,7 @@ onMounted(() => {
 </script>
 <style lang="scss" scoped>
 .application-setting {
-  .relate-dataset-card {
+  .relate-knowledge-card {
     color: var(--app-text-color);
   }
 

@@ -57,19 +57,19 @@ const ApplicationDetailRouter = {
       },
       component: () => import('@/views/hit-test/index.vue'),
     },
-    // {
-    //   path: 'log',
-    //   name: 'Log',
-    //   meta: {
-    //     icon: 'app-document',
-    //     iconActive: 'app-document-active',
-    //     title: 'views.log.title',
-    //     active: 'log',
-    //     parentPath: '/application/:id/:type',
-    //     parentName: 'ApplicationDetail'
-    //   },
-    //   component: () => import('@/views/log/index.vue')
-    // }
+    {
+      path: 'chat-log',
+      name: 'ChatLog',
+      meta: {
+        icon: 'app-document',
+        iconActive: 'app-document-active',
+        title: 'views.chatLog.title',
+        active: 'log',
+        parentPath: '/application/:id/:type',
+        parentName: 'ApplicationDetail'
+      },
+      component: () => import('@/views/chat-log/index.vue')
+    }
   ],
 }
 
