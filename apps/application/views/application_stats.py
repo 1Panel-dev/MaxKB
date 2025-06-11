@@ -16,6 +16,9 @@ from common import result
 from common.auth import TokenAuth
 from django.utils.translation import gettext_lazy as _
 
+from common.auth.authentication import has_permissions
+from common.constants.permission_constants import PermissionConstants, RoleConstants
+
 
 class ApplicationStats(APIView):
     authentication_classes = [TokenAuth]
@@ -29,6 +32,8 @@ class ApplicationStats(APIView):
         responses=ApplicationStatsAPI.get_response(),
         tags=[_('Application')]  # type: ignore
     )
+    @has_permissions(PermissionConstants.APPLICATION_READ.get_workspace_application_permission(),
+                     RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def get(self, request: Request, workspace_id: str, application_id: str):
         return result.success(
             ApplicationStatisticsSerializer(data={'application_id': application_id,

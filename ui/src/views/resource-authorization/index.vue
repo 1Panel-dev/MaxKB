@@ -139,7 +139,7 @@ function clickMemberHandle(item: any) {
 }
 
 function getMember(id?: string) {
-  AuthorizationApi.getUserList(loading).then((res) => {
+  AuthorizationApi.getUserMember(loading).then((res) => {
     memberList.value = res.data
     filterMember.value = res.data
 

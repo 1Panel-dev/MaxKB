@@ -16,7 +16,7 @@ from application.serializers.application_access_token import AccessTokenSerializ
 from common import result
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
-from common.constants.permission_constants import PermissionConstants
+from common.constants.permission_constants import PermissionConstants, RoleConstants
 
 
 class AccessToken(APIView):
@@ -31,7 +31,8 @@ class AccessToken(APIView):
         request=ApplicationAccessTokenAPI.get_request(),
         tags=[_('Application')]  # type: ignore
     )
-    @has_permissions(PermissionConstants.APPLICATION_OVERVIEW_ACCESS.get_workspace_application_permission())
+    @has_permissions(PermissionConstants.APPLICATION_OVERVIEW_ACCESS.get_workspace_application_permission(),
+                     RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def put(self, request: Request, workspace_id: str, application_id: str):
         return result.success(
             AccessTokenSerializer(data={'application_id': application_id}).edit(
@@ -45,6 +46,8 @@ class AccessToken(APIView):
         parameters=ApplicationAccessTokenAPI.get_parameters(),
         tags=[_('Application')]  # type: ignore
     )
-    @has_permissions(PermissionConstants.APPLICATION_READ.get_workspace_application_permission())
+    @has_permissions(PermissionConstants.APPLICATION_READ.get_workspace_application_permission(),
+                     RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+                     )
     def get(self, request: Request, workspace_id: str, application_id: str):
         return result.success(AccessTokenSerializer(data={'application_id': application_id}).one())

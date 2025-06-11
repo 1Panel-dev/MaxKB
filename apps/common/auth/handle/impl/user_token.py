@@ -224,8 +224,9 @@ def get_role_list(user,
                        workspace_user_role_mapping in
                        workspace_user_role_mapping_list] + [user.role], version=version)
         else:
-            cache.set(key, [user.role], version=version)
-            return [user.role, get_role_permission(RoleConstants.WORKSPACE_MANAGE, 'default')]
+            role_list = [user.role, get_role_permission(RoleConstants.WORKSPACE_MANAGE, 'default')]
+            cache.set(key, role_list, version=version)
+            return role_list
     return workspace_list
 
 

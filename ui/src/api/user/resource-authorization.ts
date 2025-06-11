@@ -49,9 +49,12 @@ const putResourceAuthorization: (
 ) => Promise<Result<any>> = (user_id, body, loading) => {
   return put(`${prefix}/user_resource_permission/user/${user_id}`, body, loading)
 }
-
+const getUserMember: (loading?: Ref<boolean>) => Promise<Result<any>> = (loading) => {
+  return get(`${prefix}/user_member`, undefined, loading)
+}
 export default {
   getResourceAuthorization,
   putResourceAuthorization,
   getUserList,
+  getUserMember,
 }
