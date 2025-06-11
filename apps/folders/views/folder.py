@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
-from common.constants.permission_constants import Permission, Group, Operate
+from common.constants.permission_constants import Permission, Group, Operate, RoleConstants
 from common.log.log import log
 from common.result import result
 from folders.api.folder import FolderCreateAPI, FolderEditAPI, FolderReadAPI, FolderTreeReadAPI, FolderDeleteAPI
@@ -36,12 +36,16 @@ class FolderView(APIView):
         responses=FolderCreateAPI.get_response(),
         tags=[_('Folder')]  # type: ignore
     )
-    @has_permissions(lambda r, kwargs: Permission(group=Group(kwargs.get('source')), operate=Operate.CREATE,
-                                                  resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}"))
-    @log(menu='folder', operate='Create folder',
-         get_operation_object=lambda r, k: {'name': r.data.get('name')},
-         workspace_id=lambda r, k: k.get('workspace_id')
-         )
+    @has_permissions(
+        lambda r, kwargs: Permission(group=Group(kwargs.get('source')), operate=Operate.CREATE,
+                                     resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}"),
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+    )
+    @log(
+        menu='folder', operate='Create folder',
+        get_operation_object=lambda r, k: {'name': r.data.get('name')},
+        workspace_id=lambda r, k: k.get('workspace_id')
+    )
     def post(self, request: Request, workspace_id: str, source: str):
         return result.success(FolderSerializer.Create(
             data={'user_id': request.user.id,
@@ -58,8 +62,11 @@ class FolderView(APIView):
         responses=FolderTreeReadAPI.get_response(),
         tags=[_('Folder')]  # type: ignore
     )
-    @has_permissions(lambda r, kwargs: Permission(group=Group(kwargs.get('source')), operate=Operate.READ,
-                                                  resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}"))
+    @has_permissions(
+        lambda r, kwargs: Permission(group=Group(kwargs.get('source')), operate=Operate.READ,
+                                     resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}"),
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+    )
     def get(self, request: Request, workspace_id: str, source: str):
         return result.success(FolderTreeSerializer(
             data={'workspace_id': workspace_id, 'source': source}
@@ -78,12 +85,16 @@ class FolderView(APIView):
             responses=FolderEditAPI.get_response(),
             tags=[_('Folder')]  # type: ignore
         )
-        @has_permissions(lambda r, kwargs: Permission(group=Group(kwargs.get('source')), operate=Operate.EDIT,
-                                                      resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}"))
-        @log(menu='folder', operate='Edit folder',
-             get_operation_object=lambda r, k: get_folder_operation_object(k.get('folder_id'), k.get('source')),
-             workspace_id=lambda r, k: k.get('workspace_id')
-             )
+        @has_permissions(
+            lambda r, kwargs: Permission(group=Group(kwargs.get('source')), operate=Operate.EDIT,
+                                         resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}"),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+        )
+        @log(
+            menu='folder', operate='Edit folder',
+            get_operation_object=lambda r, k: get_folder_operation_object(k.get('folder_id'), k.get('source')),
+            workspace_id=lambda r, k: k.get('workspace_id')
+        )
         def put(self, request: Request, workspace_id: str, source: str, folder_id: str):
             return result.success(FolderSerializer.Operate(
                 data={'id': folder_id, 'workspace_id': workspace_id, 'source': source}
@@ -98,8 +109,11 @@ class FolderView(APIView):
             responses=FolderReadAPI.get_response(),
             tags=[_('Folder')]  # type: ignore
         )
-        @has_permissions(lambda r, kwargs: Permission(group=Group(kwargs.get('source')), operate=Operate.READ,
-                                                      resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}"))
+        @has_permissions(
+            lambda r, kwargs: Permission(group=Group(kwargs.get('source')), operate=Operate.READ,
+                                         resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}"),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+        )
         def get(self, request: Request, workspace_id: str, source: str, folder_id: str):
             return result.success(FolderSerializer.Operate(
                 data={'id': folder_id, 'workspace_id': workspace_id, 'source': source}
@@ -114,12 +128,16 @@ class FolderView(APIView):
             responses=FolderDeleteAPI.get_response(),
             tags=[_('Folder')]  # type: ignore
         )
-        @has_permissions(lambda r, kwargs: Permission(group=Group(kwargs.get('source')), operate=Operate.DELETE,
-                                                      resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}"))
-        @log(menu='folder', operate='Delete folder',
-             get_operation_object=lambda r, k: get_folder_operation_object(k.get('folder_id'), k.get('source')),
-             workspace_id=lambda r, k: k.get('workspace_id')
-             )
+        @has_permissions(
+            lambda r, kwargs: Permission(group=Group(kwargs.get('source')), operate=Operate.DELETE,
+                                         resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}"),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+        )
+        @log(
+            menu='folder', operate='Delete folder',
+            get_operation_object=lambda r, k: get_folder_operation_object(k.get('folder_id'), k.get('source')),
+            workspace_id=lambda r, k: k.get('workspace_id')
+        )
         def delete(self, request: Request, workspace_id: str, source: str, folder_id: str):
             return result.success(FolderSerializer.Operate(
                 data={'id': folder_id, 'workspace_id': workspace_id, 'source': source}

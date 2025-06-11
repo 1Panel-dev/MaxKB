@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
-from common.constants.permission_constants import PermissionConstants
+from common.constants.permission_constants import PermissionConstants, RoleConstants
 from common.log.log import log
 from common.result import result
 from knowledge.api.document import DocumentSplitAPI, DocumentBatchAPI, DocumentBatchCreateAPI, DocumentCreateAPI, \
@@ -33,7 +33,10 @@ class DocumentView(APIView):
         responses=DocumentCreateAPI.get_response(),
         tags=[_('Knowledge Base/Documentation')]  # type: ignore
     )
-    @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_knowledge_permission())
+    @has_permissions(
+        PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_knowledge_permission(),
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+    )
     @log(menu='document', operate="Create document",
          get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
              get_knowledge_operation_object(keywords.get('knowledge_id')),
@@ -53,7 +56,10 @@ class DocumentView(APIView):
         responses=DocumentTreeReadAPI.get_response(),
         tags=[_('Knowledge Base/Documentation')]  # type: ignore
     )
-    @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_READ.get_workspace_knowledge_permission())
+    @has_permissions(
+        PermissionConstants.KNOWLEDGE_DOCUMENT_READ.get_workspace_knowledge_permission(),
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+    )
     def get(self, request: Request, workspace_id: str, knowledge_id: str):
         return result.success(DocumentSerializers.Query(
             data={
@@ -77,7 +83,10 @@ class DocumentView(APIView):
             responses=DocumentReadAPI.get_response(),
             tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_READ.get_workspace_knowledge_permission())
+        @has_permissions(
+            PermissionConstants.KNOWLEDGE_DOCUMENT_READ.get_workspace_knowledge_permission(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+        )
         def get(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
             operate = DocumentSerializers.Operate(data={
                 'document_id': document_id, 'knowledge_id': knowledge_id, 'workspace_id': workspace_id
@@ -94,13 +103,17 @@ class DocumentView(APIView):
             responses=DocumentEditAPI.get_response(),
             tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission())
-        @log(menu='document', operate="Modify document",
-             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
-                 get_knowledge_operation_object(keywords.get('knowledge_id')),
-                 get_document_operation_object(keywords.get('document_id'))
-             ), workspace_id=lambda r, keywords: keywords.get('workspace_id')
-             )
+        @has_permissions(
+            PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+        )
+        @log(
+            menu='document', operate="Modify document",
+            get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
+                get_knowledge_operation_object(keywords.get('knowledge_id')),
+                get_document_operation_object(keywords.get('document_id'))
+            ), workspace_id=lambda r, keywords: keywords.get('workspace_id')
+        )
         def put(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
             return result.success(DocumentSerializers.Operate(data={
                 'document_id': document_id, 'knowledge_id': knowledge_id, 'workspace_id': workspace_id
@@ -114,13 +127,17 @@ class DocumentView(APIView):
             responses=DocumentDeleteAPI.get_response(),
             tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_DELETE.get_workspace_knowledge_permission())
-        @log(menu='document', operate="Delete document",
-             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
-                 get_knowledge_operation_object(keywords.get('knowledge_id')),
-                 get_document_operation_object(keywords.get('document_id'))
-             ), workspace_id=lambda r, keywords: keywords.get('workspace_id')
-             )
+        @has_permissions(
+            PermissionConstants.KNOWLEDGE_DOCUMENT_DELETE.get_workspace_knowledge_permission(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+        )
+        @log(
+            menu='document', operate="Delete document",
+            get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
+                get_knowledge_operation_object(keywords.get('knowledge_id')),
+                get_document_operation_object(keywords.get('document_id'))
+            ), workspace_id=lambda r, keywords: keywords.get('workspace_id')
+        )
         def delete(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
             operate = DocumentSerializers.Operate(data={
                 'document_id': document_id, 'knowledge_id': knowledge_id, 'workspace_id': workspace_id
@@ -145,6 +162,7 @@ class DocumentView(APIView):
         @has_permissions(
             PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_knowledge_permission(),
             PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
         )
         def post(self, request: Request, workspace_id: str, knowledge_id: str):
             split_data = {'file': request.FILES.getlist('file')}
@@ -190,12 +208,17 @@ class DocumentView(APIView):
             responses=BatchEditHitHandlingAPI.get_response(),
             tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission())
-        @log(menu='document', operate="Modify document hit processing methods in batches",
-             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
-                 get_knowledge_operation_object(keywords.get('knowledge_id')),
-                 get_document_operation_object_batch(r.data.get('id_list'))),
-             workspace_id=lambda r, keywords: keywords.get('workspace_id'))
+        @has_permissions(
+            PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+        )
+        @log(
+            menu='document', operate="Modify document hit processing methods in batches",
+            get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
+                get_knowledge_operation_object(keywords.get('knowledge_id')),
+                get_document_operation_object_batch(r.data.get('id_list'))),
+            workspace_id=lambda r, keywords: keywords.get('workspace_id')
+        )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(DocumentSerializers.Batch(
                 data={'knowledge_id': knowledge_id, 'workspace_id': workspace_id}
@@ -214,12 +237,17 @@ class DocumentView(APIView):
             responses=SyncWebAPI.get_response(),
             tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_SYNC.get_workspace_knowledge_permission())
-        @log(menu='document', operate="Synchronize web site types",
-             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
-                 get_knowledge_operation_object(keywords.get('knowledge_id')),
-                 get_document_operation_object(keywords.get('document_id'))
-             ), workspace_id=lambda r, keywords: keywords.get('workspace_id'))
+        @has_permissions(
+            PermissionConstants.KNOWLEDGE_DOCUMENT_SYNC.get_workspace_knowledge_permission(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+        )
+        @log(
+            menu='document', operate="Synchronize web site types",
+            get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
+                get_knowledge_operation_object(keywords.get('knowledge_id')),
+                get_document_operation_object(keywords.get('document_id'))
+            ), workspace_id=lambda r, keywords: keywords.get('workspace_id')
+        )
         def get(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
             return result.success(DocumentSerializers.Sync(
                 data={'document_id': document_id, 'knowledge_id': knowledge_id, 'workspace_id': workspace_id}
@@ -238,13 +266,17 @@ class DocumentView(APIView):
             responses=RefreshAPI.get_response(),
             tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_VECTOR.get_workspace_knowledge_permission())
-        @log(menu='document', operate="Refresh document vector library",
-             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
-                 get_knowledge_operation_object(keywords.get('knowledge_id')),
-                 get_document_operation_object(keywords.get('document_id'))
-             ), workspace_id=lambda r, keywords: keywords.get('workspace_id')
-             )
+        @has_permissions(
+            PermissionConstants.KNOWLEDGE_DOCUMENT_VECTOR.get_workspace_knowledge_permission(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+        )
+        @log(
+            menu='document', operate="Refresh document vector library",
+            get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
+                get_knowledge_operation_object(keywords.get('knowledge_id')),
+                get_document_operation_object(keywords.get('document_id'))
+            ), workspace_id=lambda r, keywords: keywords.get('workspace_id')
+        )
         def put(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
             return result.success(DocumentSerializers.Operate(
                 data={'document_id': document_id, 'knowledge_id': knowledge_id, 'workspace_id': workspace_id}
@@ -262,12 +294,17 @@ class DocumentView(APIView):
             responses=CancelTaskAPI.get_response(),
             tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission())
-        @log(menu='document', operate="Cancel task",
-             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
-                 get_knowledge_operation_object(keywords.get('knowledge_id')),
-                 get_document_operation_object(keywords.get('document_id'))
-             ), workspace_id=lambda r, keywords: keywords.get('workspace_id'))
+        @has_permissions(
+            PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+        )
+        @log(
+            menu='document', operate="Cancel task",
+            get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
+                get_knowledge_operation_object(keywords.get('knowledge_id')),
+                get_document_operation_object(keywords.get('document_id'))
+            ), workspace_id=lambda r, keywords: keywords.get('workspace_id')
+        )
         def put(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
             return result.success(DocumentSerializers.Operate(
                 data={'document_id': document_id, 'knowledge_id': knowledge_id, 'workspace_id': workspace_id}
@@ -285,13 +322,17 @@ class DocumentView(APIView):
             responses=BatchCancelTaskAPI.get_response(),
             tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission())
-        @log(menu='document', operate="Cancel tasks in batches",
-             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
-                 get_knowledge_operation_object(keywords.get('knowledge_id')),
-                 get_document_operation_object_batch(r.data.get('id_list'))
-             ), workspace_id=lambda r, keywords: keywords.get('workspace_id')
-             )
+        @has_permissions(
+            PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+        )
+        @log(
+            menu='document', operate="Cancel tasks in batches",
+            get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
+                get_knowledge_operation_object(keywords.get('knowledge_id')),
+                get_document_operation_object_batch(r.data.get('id_list'))
+            ), workspace_id=lambda r, keywords: keywords.get('workspace_id')
+        )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(DocumentSerializers.Batch(data={
                 'knowledge_id': knowledge_id, 'workspace_id': workspace_id}
@@ -313,13 +354,15 @@ class DocumentView(APIView):
         @has_permissions(
             PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_knowledge_permission(),
             PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
         )
-        @log(menu='document', operate="Create documents in batches",
-             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
-                 get_knowledge_operation_object(keywords.get('knowledge_id')),
-                 {'name': f'[{",".join([document.get("name") for document in r.data])}]',
-                  'document_list': r.data}), workspace_id=lambda r, keywords: keywords.get('workspace_id')
-             )
+        @log(
+            menu='document', operate="Create documents in batches",
+            get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
+                get_knowledge_operation_object(keywords.get('knowledge_id')),
+                {'name': f'[{",".join([document.get("name") for document in r.data])}]',
+                 'document_list': r.data}), workspace_id=lambda r, keywords: keywords.get('workspace_id')
+        )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(DocumentSerializers.Batch(
                 data={'knowledge_id': knowledge_id, 'workspace_id': workspace_id}
@@ -341,13 +384,15 @@ class DocumentView(APIView):
         @has_permissions(
             PermissionConstants.KNOWLEDGE_DOCUMENT_SYNC.get_workspace_knowledge_permission(),
             PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
         )
-        @log(menu='document', operate="Batch sync documents",
-             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
-                 get_knowledge_operation_object(keywords.get('knowledge_id')),
-                 get_document_operation_object_batch(r.data.get('id_list'))),
-             workspace_id=lambda r, keywords: keywords.get('workspace_id')
-             )
+        @log(
+            menu='document', operate="Batch sync documents",
+            get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
+                get_knowledge_operation_object(keywords.get('knowledge_id')),
+                get_document_operation_object_batch(r.data.get('id_list'))),
+            workspace_id=lambda r, keywords: keywords.get('workspace_id')
+        )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(DocumentSerializers.Batch(
                 data={'knowledge_id': knowledge_id, 'workspace_id': workspace_id}
@@ -369,12 +414,15 @@ class DocumentView(APIView):
         @has_permissions(
             PermissionConstants.KNOWLEDGE_DOCUMENT_DELETE.get_workspace_knowledge_permission(),
             PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
         )
-        @log(menu='document', operate="Delete documents in batches",
-             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
-                 get_knowledge_operation_object(keywords.get('knowledge_id')),
-                 get_document_operation_object_batch(r.data.get('id_list'))),
-             workspace_id=lambda r, keywords: keywords.get('workspace_id'))
+        @log(
+            menu='document', operate="Delete documents in batches",
+            get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
+                get_knowledge_operation_object(keywords.get('knowledge_id')),
+                get_document_operation_object_batch(r.data.get('id_list'))),
+            workspace_id=lambda r, keywords: keywords.get('workspace_id')
+        )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(DocumentSerializers.Batch(
                 data={'workspace_id': workspace_id, 'knowledge_id': knowledge_id}
@@ -395,13 +443,15 @@ class DocumentView(APIView):
         @has_permissions(
             PermissionConstants.KNOWLEDGE_DOCUMENT_VECTOR.get_workspace_knowledge_permission(),
             PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
         )
-        @log(menu='document', operate="Batch refresh document vector library",
-             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
-                 get_knowledge_operation_object(keywords.get('knowledge_id')),
-                 get_document_operation_object_batch(r.data.get('id_list'))
-             ), workspace_id=lambda r, keywords: keywords.get('workspace_id')
-             )
+        @log(
+            menu='document', operate="Batch refresh document vector library",
+            get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
+                get_knowledge_operation_object(keywords.get('knowledge_id')),
+                get_document_operation_object_batch(r.data.get('id_list'))
+            ), workspace_id=lambda r, keywords: keywords.get('workspace_id')
+        )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(
                 DocumentSerializers.Batch(
@@ -424,13 +474,15 @@ class DocumentView(APIView):
         @has_permissions(
             PermissionConstants.KNOWLEDGE_DOCUMENT_GENERATE.get_workspace_knowledge_permission(),
             PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
         )
-        @log(menu='document', operate="Batch generate related documents",
-             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
-                 get_knowledge_operation_object(keywords.get('knowledge_id')),
-                 get_document_operation_object_batch(r.data.get('document_id_list'))
-             ), workspace_id=lambda r, keywords: keywords.get('workspace_id')
-             )
+        @log(
+            menu='document', operate="Batch generate related documents",
+            get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
+                get_knowledge_operation_object(keywords.get('knowledge_id')),
+                get_document_operation_object_batch(r.data.get('document_id_list'))
+            ), workspace_id=lambda r, keywords: keywords.get('workspace_id')
+        )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(DocumentSerializers.BatchGenerateRelated(
                 data={'workspace_id': workspace_id, 'knowledge_id': knowledge_id}
@@ -448,7 +500,10 @@ class DocumentView(APIView):
             responses=DocumentTreeReadAPI.get_response(),
             tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_READ.get_workspace_knowledge_permission())
+        @has_permissions(
+            PermissionConstants.KNOWLEDGE_DOCUMENT_READ.get_workspace_knowledge_permission(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+        )
         def get(self, request: Request, workspace_id: str, knowledge_id: str, current_page: int, page_size: int):
             return result.success(DocumentSerializers.Query(
                 data={
@@ -471,13 +526,17 @@ class DocumentView(APIView):
             responses=DocumentExportAPI.get_response(),
             tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_EXPORT.get_workspace_knowledge_permission())
-        @log(menu='document', operate="Export document",
-             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
-                 get_knowledge_operation_object(keywords.get('knowledge_id')),
-                 get_document_operation_object(keywords.get('document_id'))
-             ), workspace_id=lambda r, keywords: keywords.get('workspace_id')
-             )
+        @has_permissions(
+            PermissionConstants.KNOWLEDGE_DOCUMENT_EXPORT.get_workspace_knowledge_permission(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+        )
+        @log(
+            menu='document', operate="Export document",
+            get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
+                get_knowledge_operation_object(keywords.get('knowledge_id')),
+                get_document_operation_object(keywords.get('document_id'))
+            ), workspace_id=lambda r, keywords: keywords.get('workspace_id')
+        )
         def get(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
             return DocumentSerializers.Operate(data={
                 'workspace_id': workspace_id, 'document_id': document_id, 'knowledge_id': knowledge_id
@@ -493,13 +552,17 @@ class DocumentView(APIView):
             responses=DocumentExportAPI.get_response(),
             tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_EXPORT.get_workspace_knowledge_permission())
-        @log(menu='document', operate="Export Zip document",
-             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
-                 get_knowledge_operation_object(keywords.get('knowledge_id')),
-                 get_document_operation_object(keywords.get('document_id'))
-             ), workspace_id=lambda r, keywords: keywords.get('workspace_id')
-             )
+        @has_permissions(
+            PermissionConstants.KNOWLEDGE_DOCUMENT_EXPORT.get_workspace_knowledge_permission(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+        )
+        @log(
+            menu='document', operate="Export Zip document",
+            get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
+                get_knowledge_operation_object(keywords.get('knowledge_id')),
+                get_document_operation_object(keywords.get('document_id'))
+            ), workspace_id=lambda r, keywords: keywords.get('workspace_id')
+        )
         def get(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
             return DocumentSerializers.Operate(data={
                 'workspace_id': workspace_id, 'document_id': document_id, 'knowledge_id': knowledge_id
@@ -516,7 +579,9 @@ class DocumentView(APIView):
             tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.KNOWLEDGE_DOCUMENT_DOWNLOAD_SOURCE_FILE.get_workspace_knowledge_permission())
+            PermissionConstants.KNOWLEDGE_DOCUMENT_DOWNLOAD_SOURCE_FILE.get_workspace_knowledge_permission(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+        )
         def get(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
             return DocumentSerializers.Operate(data={
                 'workspace_id': workspace_id, 'document_id': document_id, 'knowledge_id': knowledge_id
@@ -533,13 +598,17 @@ class DocumentView(APIView):
             responses=DocumentMigrateAPI.get_response(),
             tags=[_('Knowledge Base/Documentation')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_MIGRATE.get_workspace_knowledge_permission())
-        @log(menu='document', operate="Migrate documents in batches",
-             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
-                 get_knowledge_operation_object(keywords.get('knowledge_id')),
-                 get_document_operation_object_batch(r.data)
-             ), workspace_id=lambda r, keywords: keywords.get('workspace_id')
-             )
+        @has_permissions(
+            PermissionConstants.KNOWLEDGE_DOCUMENT_MIGRATE.get_workspace_knowledge_permission(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+        )
+        @log(
+            menu='document', operate="Migrate documents in batches",
+            get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
+                get_knowledge_operation_object(keywords.get('knowledge_id')),
+                get_document_operation_object_batch(r.data)
+            ), workspace_id=lambda r, keywords: keywords.get('workspace_id')
+        )
         def put(self, request: Request, workspace_id, knowledge_id: str, target_knowledge_id: str):
             return result.success(DocumentSerializers.Migrate(
                 data={
@@ -563,13 +632,18 @@ class WebDocumentView(APIView):
         responses=WebDocumentCreateAPI.get_response(),
         tags=[_('Knowledge Base/Documentation')]  # type: ignore
     )
-    @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_knowledge_permission())
-    @log(menu='document', operate="Create Web site documents",
-         get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
-             get_knowledge_operation_object(keywords.get('knowledge_id')),
-             {'name': f'[{",".join([url for url in r.data.get("source_url_list", [])])}]',
-              'document_list': [{'name': url} for url in r.data.get("source_url_list", [])]}),
-         workspace_id=lambda r, keywords: keywords.get('workspace_id'))
+    @has_permissions(
+        PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_knowledge_permission(),
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+    )
+    @log(
+        menu='document', operate="Create Web site documents",
+        get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
+            get_knowledge_operation_object(keywords.get('knowledge_id')),
+            {'name': f'[{",".join([url for url in r.data.get("source_url_list", [])])}]',
+             'document_list': [{'name': url} for url in r.data.get("source_url_list", [])]}),
+        workspace_id=lambda r, keywords: keywords.get('workspace_id')
+    )
     def post(self, request: Request, workspace_id: str, knowledge_id: str):
         return result.success(DocumentSerializers.Create(data={
             'knowledge_id': knowledge_id, 'workspace_id': workspace_id
@@ -589,13 +663,18 @@ class QaDocumentView(APIView):
         responses=QaDocumentCreateAPI.get_response(),
         tags=[_('Knowledge Base/Documentation')]  # type: ignore
     )
-    @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_knowledge_permission())
-    @log(menu='document', operate="Import QA and create documentation",
-         get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
-             get_knowledge_operation_object(keywords.get('knowledge_id')),
-             {'name': f'[{",".join([file.name for file in r.FILES.getlist("file")])}]',
-              'document_list': [{'name': file.name} for file in r.FILES.getlist("file")]}),
-         workspace_id=lambda r, keywords: keywords.get('workspace_id'))
+    @has_permissions(
+        PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_knowledge_permission(),
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+    )
+    @log(
+        menu='document', operate="Import QA and create documentation",
+        get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
+            get_knowledge_operation_object(keywords.get('knowledge_id')),
+            {'name': f'[{",".join([file.name for file in r.FILES.getlist("file")])}]',
+             'document_list': [{'name': file.name} for file in r.FILES.getlist("file")]}),
+        workspace_id=lambda r, keywords: keywords.get('workspace_id')
+    )
     def post(self, request: Request, workspace_id: str, knowledge_id: str):
         return result.success(DocumentSerializers.Create(data={
             'knowledge_id': knowledge_id, 'workspace_id': workspace_id
@@ -615,13 +694,18 @@ class TableDocumentView(APIView):
         responses=TableDocumentCreateAPI.get_response(),
         tags=[_('Knowledge Base/Documentation')]  # type: ignore
     )
-    @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_knowledge_permission())
-    @log(menu='document', operate="Import tables and create documents",
-         get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
-             get_knowledge_operation_object(keywords.get('knowledge_id')),
-             {'name': f'[{",".join([file.name for file in r.FILES.getlist("file")])}]',
-              'document_list': [{'name': file.name} for file in r.FILES.getlist("file")]}),
-         workspace_id=lambda r, keywords: keywords.get('workspace_id'))
+    @has_permissions(
+        PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_knowledge_permission(),
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+    )
+    @log(
+        menu='document', operate="Import tables and create documents",
+        get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
+            get_knowledge_operation_object(keywords.get('knowledge_id')),
+            {'name': f'[{",".join([file.name for file in r.FILES.getlist("file")])}]',
+             'document_list': [{'name': file.name} for file in r.FILES.getlist("file")]}),
+        workspace_id=lambda r, keywords: keywords.get('workspace_id')
+    )
     def post(self, request: Request, workspace_id: str, knowledge_id: str):
         return result.success(DocumentSerializers.Create(
             data={'knowledge_id': knowledge_id, 'workspace_id': workspace_id}

@@ -5,7 +5,7 @@ from rest_framework.views import Request
 
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
-from common.constants.permission_constants import PermissionConstants
+from common.constants.permission_constants import PermissionConstants, RoleConstants
 from common.log.log import log
 from common.result import result
 from common.utils.common import query_params_to_single_dict
@@ -28,7 +28,10 @@ class ParagraphView(APIView):
         responses=ParagraphReadAPI.get_response(),
         tags=[_('Knowledge Base/Documentation/Paragraph')]  # type: ignore
     )
-    @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_READ.get_workspace_knowledge_permission())
+    @has_permissions(
+        PermissionConstants.KNOWLEDGE_DOCUMENT_READ.get_workspace_knowledge_permission(),
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+    )
     def get(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
         q = ParagraphSerializers.Query(
             data={
@@ -49,13 +52,17 @@ class ParagraphView(APIView):
         responses=ParagraphCreateAPI.get_response(),
         tags=[_('Knowledge Base/Documentation/Paragraph')]  # type: ignore
     )
-    @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_knowledge_permission())
-    @log(menu='Paragraph', operate='Create Paragraph',
-         get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
-             get_knowledge_operation_object(keywords.get('knowledge_id')),
-             get_document_operation_object(keywords.get('document_id'))
-         ), workspace_id=lambda r, k: k.get('workspace_id')
-         )
+    @has_permissions(
+        PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_knowledge_permission(),
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+    )
+    @log(
+        menu='Paragraph', operate='Create Paragraph',
+        get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
+            get_knowledge_operation_object(keywords.get('knowledge_id')),
+            get_document_operation_object(keywords.get('document_id'))
+        ), workspace_id=lambda r, k: k.get('workspace_id')
+    )
     def post(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
         return result.success(ParagraphSerializers.Create(
             data={'workspace_id': workspace_id, 'knowledge_id': knowledge_id, 'document_id': document_id}
@@ -74,7 +81,10 @@ class ParagraphView(APIView):
             responses=ParagraphBatchDeleteAPI.get_response(),
             tags=[_('Knowledge Base/Documentation/Paragraph')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission())
+        @has_permissions(
+            PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+        )
         def put(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
             return result.success(ParagraphSerializers.Batch(
                 data={'workspace_id': workspace_id, 'knowledge_id': knowledge_id, 'document_id': document_id}
@@ -91,13 +101,17 @@ class ParagraphView(APIView):
             responses=ParagraphMigrateAPI.get_response(),
             tags=[_('Knowledge Base/Documentation/Paragraph')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_MIGRATE.get_workspace_knowledge_permission())
-        @log(menu='Paragraph', operate='Migrate paragraphs in batches',
-             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
-                 get_knowledge_operation_object(keywords.get('knowledge_id')),
-                 get_document_operation_object(keywords.get('document_id'))
-             ), workspace_id=lambda r, k: k.get('workspace_id')
-             )
+        @has_permissions(
+            PermissionConstants.KNOWLEDGE_DOCUMENT_MIGRATE.get_workspace_knowledge_permission(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+        )
+        @log(
+            menu='Paragraph', operate='Migrate paragraphs in batches',
+            get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
+                get_knowledge_operation_object(keywords.get('knowledge_id')),
+                get_document_operation_object(keywords.get('document_id'))
+            ), workspace_id=lambda r, k: k.get('workspace_id')
+        )
         def put(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str,
                 target_knowledge_id: str, target_document_id):
             return result.success(
@@ -123,13 +137,17 @@ class ParagraphView(APIView):
             responses=ParagraphBatchGenerateRelatedAPI.get_response(),
             tags=[_('Knowledge Base/Documentation/Paragraph')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_GENERATE.get_workspace_knowledge_permission())
-        @log(menu='Paragraph', operate='Batch generate related',
-             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
-                 get_knowledge_operation_object(keywords.get('knowledge_id')),
-                 get_document_operation_object(keywords.get('document_id'))
-             ), workspace_id=lambda r, k: k.get('workspace_id')
-             )
+        @has_permissions(
+            PermissionConstants.KNOWLEDGE_DOCUMENT_GENERATE.get_workspace_knowledge_permission(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+        )
+        @log(
+            menu='Paragraph', operate='Batch generate related',
+            get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
+                get_knowledge_operation_object(keywords.get('knowledge_id')),
+                get_document_operation_object(keywords.get('document_id'))
+            ), workspace_id=lambda r, k: k.get('workspace_id')
+        )
         def put(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
             return result.success(ParagraphSerializers.Batch(
                 data={'workspace_id': workspace_id, 'knowledge_id': knowledge_id, 'document_id': document_id}
@@ -148,13 +166,17 @@ class ParagraphView(APIView):
             responses=ParagraphEditAPI.get_response(),
             tags=[_('Knowledge Base/Documentation/Paragraph')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission())
-        @log(menu='Paragraph', operate='Modify paragraph data',
-             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
-                 get_knowledge_operation_object(keywords.get('knowledge_id')),
-                 get_document_operation_object(keywords.get('document_id'))
-             ), workspace_id=lambda r, k: k.get('workspace_id')
-             )
+        @has_permissions(
+            PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+        )
+        @log(
+            menu='Paragraph', operate='Modify paragraph data',
+            get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
+                get_knowledge_operation_object(keywords.get('knowledge_id')),
+                get_document_operation_object(keywords.get('document_id'))
+            ), workspace_id=lambda r, k: k.get('workspace_id')
+        )
         def put(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str, paragraph_id: str):
             o = ParagraphSerializers.Operate(
                 data={
@@ -176,7 +198,10 @@ class ParagraphView(APIView):
             responses=ParagraphGetAPI.get_response(),
             tags=[_('Knowledge Base/Documentation/Paragraph')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission())
+        @has_permissions(
+            PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+        )
         def get(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str, paragraph_id: str):
             o = ParagraphSerializers.Operate(
                 data={
@@ -197,13 +222,17 @@ class ParagraphView(APIView):
             parameters=ParagraphGetAPI.get_parameters(),
             responses=ParagraphGetAPI.get_response(),
             tags=[_('Knowledge Base/Documentation/Paragraph')])  # type: ignore
-        @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission())
-        @log(menu='Paragraph', operate='Delete paragraph',
-             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
-                 get_knowledge_operation_object(keywords.get('knowledge_id')),
-                 get_document_operation_object(keywords.get('document_id'))
-             ), workspace_id=lambda r, k: k.get('workspace_id')
-             )
+        @has_permissions(
+            PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+        )
+        @log(
+            menu='Paragraph', operate='Delete paragraph',
+            get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
+                get_knowledge_operation_object(keywords.get('knowledge_id')),
+                get_document_operation_object(keywords.get('document_id'))
+            ), workspace_id=lambda r, k: k.get('workspace_id')
+        )
         def delete(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str, paragraph_id: str):
             o = ParagraphSerializers.Operate(
                 data={
@@ -229,13 +258,17 @@ class ParagraphView(APIView):
             responses=ProblemCreateAPI.get_response(),
             tags=[_('Knowledge Base/Documentation/Paragraph')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission())
-        @log(menu='Paragraph', operate='Add associated questions',
-             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
-                 get_knowledge_operation_object(keywords.get('knowledge_id')),
-                 get_document_operation_object(keywords.get('document_id'))
-             ), workspace_id=lambda r, k: k.get('workspace_id')
-             )
+        @has_permissions(
+            PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+        )
+        @log(
+            menu='Paragraph', operate='Add associated questions',
+            get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
+                get_knowledge_operation_object(keywords.get('knowledge_id')),
+                get_document_operation_object(keywords.get('document_id'))
+            ), workspace_id=lambda r, k: k.get('workspace_id')
+        )
         def post(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str, paragraph_id: str):
             return result.success(ParagraphSerializers.Problem(
                 data={
@@ -255,7 +288,10 @@ class ParagraphView(APIView):
             responses=ParagraphGetAPI.get_response(),
             tags=[_('Knowledge Base/Documentation/Paragraph')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission())
+        @has_permissions(
+            PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+        )
         def get(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str, paragraph_id: str):
             return result.success(ParagraphSerializers.Problem(
                 data={
@@ -279,13 +315,17 @@ class ParagraphView(APIView):
             responses=UnAssociationAPI.get_response(),
             tags=[_('Knowledge Base/Documentation/Paragraph')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission())
-        @log(menu='Paragraph', operate='Disassociation issue',
-             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
-                 get_knowledge_operation_object(keywords.get('knowledge_id')),
-                 get_document_operation_object(keywords.get('document_id'))
-             )
-             )
+        @has_permissions(
+            PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+        )
+        @log(
+            menu='Paragraph', operate='Disassociation issue',
+            get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
+                get_knowledge_operation_object(keywords.get('knowledge_id')),
+                get_document_operation_object(keywords.get('document_id'))
+            )
+        )
         def put(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
             return result.success(ParagraphSerializers.Association(
                 data={
@@ -310,13 +350,17 @@ class ParagraphView(APIView):
             responses=AssociationAPI.get_response(),
             tags=[_('Knowledge Base/Documentation/Paragraph')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission())
-        @log(menu='Paragraph', operate='Related questions',
-             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
-                 get_knowledge_operation_object(keywords.get('knowledge_id')),
-                 get_document_operation_object(keywords.get('document_id'))
-             ), workspace_id=lambda r, k: k.get('workspace_id')
-             )
+        @has_permissions(
+            PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+        )
+        @log(
+            menu='Paragraph', operate='Related questions',
+            get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
+                get_knowledge_operation_object(keywords.get('knowledge_id')),
+                get_document_operation_object(keywords.get('document_id'))
+            ), workspace_id=lambda r, k: k.get('workspace_id')
+        )
         def put(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
             return result.success(ParagraphSerializers.Association(
                 data={
@@ -340,7 +384,10 @@ class ParagraphView(APIView):
             responses=ParagraphPageAPI.get_response(),
             tags=[_('Knowledge Base/Documentation/Paragraph')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission())
+        @has_permissions(
+            PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+        )
         def get(self, request: Request,
                 workspace_id: str, knowledge_id: str, document_id: str, current_page: int, page_size: int):
             d = ParagraphSerializers.Query(
