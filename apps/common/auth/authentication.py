@@ -11,7 +11,7 @@ from typing import List
 from django.utils.translation import gettext_lazy as _
 
 from common.constants.permission_constants import PermissionConstants, RoleConstants, ViewPermission, CompareConstants, \
-    Permission
+    Permission, Role
 from common.exception.app_exception import AppUnauthorizedFailed
 
 
@@ -67,6 +67,8 @@ def exist_permissions(user_role: List[RoleConstants], user_permission: List[Perm
         return exist_permissions_by_permission_constants(user_permission, [permission])
     if isinstance(permission, Permission):
         return user_permission.__contains__(permission)
+    if isinstance(permission, Role):
+        return user_role.__contains__(permission.__str__())
     return False
 
 
