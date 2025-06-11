@@ -138,7 +138,7 @@ const getStatistics: (
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (application_id, data, loading) => {
-  return get(`${prefix}/${application_id}/application-stats`, data, loading)
+  return get(`${prefix}/${application_id}/application_stats`, data, loading)
 }
 
 export default {

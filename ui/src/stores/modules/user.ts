@@ -1,23 +1,23 @@
-import {defineStore} from 'pinia'
-import {type Ref} from 'vue'
-import type {User} from '@/api/type/user'
+import { defineStore } from 'pinia'
+import { type Ref } from 'vue'
+import type { User } from '@/api/type/user'
 import UserApi from '@/api/user/user'
 import LoginApi from '@/api/user/login'
-import {cloneDeep} from 'lodash'
+import { cloneDeep } from 'lodash'
 import ThemeApi from '@/api/systemSettings/theme'
 // import { defaultPlatformSetting } from '@/utils/theme'
-import {useLocalStorage} from '@vueuse/core'
-import {localeConfigKey, getBrowserLang} from '@/locales/index'
+import { useLocalStorage } from '@vueuse/core'
+import { localeConfigKey, getBrowserLang } from '@/locales/index'
 import useThemeStore from './theme'
-import {useElementPlusTheme} from "use-element-plus-theme";
-import {defaultPlatformSetting} from "@/utils/theme.ts";
+import { useElementPlusTheme } from 'use-element-plus-theme'
+import { defaultPlatformSetting } from '@/utils/theme.ts'
 
 export interface userStateTypes {
   userType: number // 1 系统操作者 2 对话用户
   userInfo: User | null
   version?: string
-  XPACK_LICENSE_IS_VALID: true
-  isXPack: true
+  license_is_valid: boolean
+  edition: 'CE' | 'PE' | 'EE'
   themeInfo: any
   token: any
 }
@@ -27,10 +27,10 @@ const useLoginStore = defineStore('user', {
     userType: 1, // 1 系统操作者 2 对话用户
     userInfo: null,
     version: '',
-    XPACK_LICENSE_IS_VALID: false,
-    isXPack: false,
+    license_is_valid: false,
+    edition: 'CE',
     themeInfo: null,
-    token: ''
+    token: '',
   }),
   actions: {
     getLanguage() {
@@ -42,7 +42,7 @@ const useLoginStore = defineStore('user', {
       return !this.themeInfo?.theme || this.themeInfo?.theme === '#3370FF'
     },
     setTheme(data: any) {
-      const {changeTheme} = useElementPlusTheme(this.themeInfo?.theme)
+      const { changeTheme } = useElementPlusTheme(this.themeInfo?.theme)
       changeTheme(data?.['theme'])
       this.themeInfo = cloneDeep(data)
     },
@@ -61,14 +61,15 @@ const useLoginStore = defineStore('user', {
         UserApi.getProfile()
           .then(async (ok) => {
             // this.version = ok.data?.version || '-'
-            this.isXPack = true
-            this.XPACK_LICENSE_IS_VALID = true
+            console.log(ok)
+            this.license_is_valid = ok.data.license_is_valid
+            this.edition = ok.data.edition
 
-            if (this.isEnterprise()) {
-             // await this.theme()
+            if (this.isEE() || this.isPE()) {
+              // await this.theme()
             } else {
               this.themeInfo = {
-                ...defaultPlatformSetting
+                ...defaultPlatformSetting,
               }
             }
             resolve(ok)
@@ -106,21 +107,27 @@ const useLoginStore = defineStore('user', {
       })
     },
     showXpack() {
-      return this.isXPack
-    },
-
-    isExpire() {
-      return this.isXPack && !this.XPACK_LICENSE_IS_VALID
+      return this.edition != 'CE'
     },
     isEnterprise() {
-      return this.isXPack && this.XPACK_LICENSE_IS_VALID
+      return this.edition != 'CE' && !this.license_is_valid
     },
-
+    isExpire() {
+      return this.edition != 'CE' && !this.license_is_valid
+    },
+    isCE() {
+      return this.edition == 'CE' && this.license_is_valid
+    },
+    isPE() {
+      return this.edition == 'PE' && this.license_is_valid
+    },
+    isEE() {
+      return this.edition == 'EE' && this.license_is_valid
+    },
     // changeUserType(num: number, token?: string) {
     //   this.userType = num
     //   this.userAccessToken = token
     // },
-
 
     async dingCallback(code: string) {
       return LoginApi.getDingCallback(code).then((ok) => {
@@ -184,7 +191,7 @@ const useLoginStore = defineStore('user', {
             reject(error)
           })
       })
-    }
+    },
   },
 })
 
