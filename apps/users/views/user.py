@@ -96,6 +96,19 @@ class TestWorkspacePermissionUserView(APIView):
         return result.success(UserProfileSerializer().profile(request.user, request.auth))
 
 
+class UserList(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(methods=['GET'],
+                   summary=_("Get all user"),
+                   description=_("Get all user"),
+                   operation_id=_("Get all user"),  # type: ignore
+                   tags=[_("User Management")],  # type: ignore
+                   responses=UserListApi.get_response())
+    def get(self, request: Request):
+        return result.success(UserManageSerializer().get_all_user_list())
+
+
 class WorkspaceUserListView(APIView):
     authentication_classes = [TokenAuth]
 

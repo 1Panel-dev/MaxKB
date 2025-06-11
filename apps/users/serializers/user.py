@@ -479,6 +479,10 @@ class UserManageSerializer(serializers.Serializer):
             User.objects.filter(id__in=ids).delete()
             return True
 
+    def get_all_user_list(self):
+        users = User.objects.all().values('id', 'nick_name', 'username')
+        return list(users)
+
 
 def update_user_role(instance, user):
     workspace_user_role_mapping_model = DatabaseModelManage.get_model("workspace_user_role_mapping")
