@@ -180,7 +180,7 @@ class FolderSerializer(serializers.Serializer):
             folder = Folder.objects.filter(id=self.data.get('id')).first()
             if not folder:
                 raise serializers.ValidationError(_('Folder does not exist'))
-            if folder.id != folder.workspace_id:
+            if folder.id == folder.workspace_id:
                 raise serializers.ValidationError(_('Cannot delete root folder'))
             nodes = Folder.objects.filter(id=self.data.get('id')).get_descendants(include_self=True)
             for node in nodes:
