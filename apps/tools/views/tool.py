@@ -238,9 +238,9 @@ class ToolView(APIView):
             tags=[_('Tool')]  # type: ignore
         )
         @has_permissions(PermissionConstants.TOOL_EDIT.get_workspace_permission())
-        def put(self, request: Request, id: str, workspace_id: str):
+        def put(self, request: Request, tool_id: str, workspace_id: str):
             return result.success(ToolSerializer.IconOperate(data={
-                'id': id,
+                'id': tool_id,
                 'workspace_id': workspace_id,
                 'user_id': request.user.id,
                 'image': request.FILES.get('file')
