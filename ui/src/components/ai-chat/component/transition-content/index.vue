@@ -13,9 +13,9 @@
         fit="cover"
         style="width: 28px; height: 28px; display: block"
       />
-      <AppAvatar v-else>
+      <el-avatar v-else>
         <img src="@/assets/user-icon.svg" style="width: 50%" alt="" />
-      </AppAvatar>
+      </el-avatar>
     </div>
   </div>
 </template>

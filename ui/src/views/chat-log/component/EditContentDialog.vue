@@ -48,11 +48,11 @@
         >
         </el-input>
       </el-form-item>
-      <el-form-item :label="$t('views.chatLog.selectDataset')" prop="dataset_id">
+      <el-form-item :label="$t('views.chatLog.selectKnowledge')" prop="dataset_id">
         <el-select
           v-model="form.dataset_id"
           filterable
-          :placeholder="$t('views.chatLog.selectDatasetPlaceholder')"
+          :placeholder="$t('views.chatLog.selectKnowledgePlaceholder')"
           :loading="optionLoading"
           @change="changeDataset"
         >
@@ -160,7 +160,7 @@ const form = ref<any>({
 const rules = reactive<FormRules>({
   content: [{ required: true, message: t('views.chatLog.form.content.placeholder'), trigger: 'blur' }],
   dataset_id: [
-    { required: true, message: t('views.chatLog.selectDatasetPlaceholder'), trigger: 'change' },
+    { required: true, message: t('views.chatLog.selectKnowledgePlaceholder'), trigger: 'change' },
   ],
   document_id: [{ required: true, message: t('views.chatLog.documentPlaceholder'), trigger: 'change' }],
 })
@@ -229,7 +229,7 @@ function getDocument(dataset_id: string) {
 }
 
 function getDataset() {
-  application.asyncGetApplicationDataset(id, loading).then((res: any) => {
+  application.asyncGetApplicationKnowledge(id, loading).then((res: any) => {
     datasetList.value = res.data
     if (localStorage.getItem(id + 'chat_dataset_id')) {
       form.value.dataset_id = localStorage.getItem(id + 'chat_dataset_id') as string

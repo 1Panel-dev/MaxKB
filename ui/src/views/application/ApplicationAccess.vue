@@ -54,7 +54,7 @@ import { t } from '@/locales'
 const platforms = reactive([
   {
     key: 'wecom',
-    logoSrc: new URL(`../../assets/logo_wechat-work.svg`, import.meta.url).href,
+    logoSrc: new URL(`../../assets/logo/logo_wechat-work.svg`, import.meta.url).href,
     name: t('views.application.applicationAccess.wecom'),
     description: t('views.application.applicationAccess.wecomTip'),
     isActive: false,
@@ -62,7 +62,7 @@ const platforms = reactive([
   },
   {
     key: 'dingtalk',
-    logoSrc: new URL(`../../assets/logo_dingtalk.svg`, import.meta.url).href,
+    logoSrc: new URL(`../../assets/logo/logo_dingtalk.svg`, import.meta.url).href,
     name: t('views.application.applicationAccess.dingtalk'),
     description: t('views.application.applicationAccess.dingtalkTip'),
     isActive: false,
@@ -70,7 +70,7 @@ const platforms = reactive([
   },
   {
     key: 'wechat',
-    logoSrc: new URL(`../../assets/logo_wechat.svg`, import.meta.url).href,
+    logoSrc: new URL(`../../assets/logo/logo_wechat.svg`, import.meta.url).href,
     name: t('views.application.applicationAccess.wechat'),
     description: t('views.application.applicationAccess.wechatTip'),
     isActive: false,
@@ -78,7 +78,7 @@ const platforms = reactive([
   },
   {
     key: 'feishu',
-    logoSrc: new URL(`../../assets/logo_lark.svg`, import.meta.url).href,
+    logoSrc: new URL(`../../assets/logo/logo_lark.svg`, import.meta.url).href,
     name: t('views.application.applicationAccess.lark'),
     description: t('views.application.applicationAccess.larkTip'),
     isActive: false,
@@ -86,7 +86,7 @@ const platforms = reactive([
   },
   {
     key: 'slack',
-    logoSrc: new URL(`../../assets/logo_slack.svg`, import.meta.url).href,
+    logoSrc: new URL(`../../assets/logo/logo_slack.svg`, import.meta.url).href,
     name: t('views.application.applicationAccess.slack'),
     description: t('views.application.applicationAccess.slackTip'),
     isActive: false,

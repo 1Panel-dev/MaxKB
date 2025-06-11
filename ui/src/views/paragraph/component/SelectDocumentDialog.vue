@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="`${$t('views.chatLog.selectDataset')}/${$t('common.fileUpload.document')}`"
+    :title="`${$t('views.chatLog.selectKnowledge')}/${$t('common.fileUpload.document')}`"
     v-model="dialogVisible"
     width="500"
     :close-on-click-modal="false"
@@ -14,11 +14,11 @@
       :rules="rules"
       @submit.prevent
     >
-      <el-form-item :label="$t('views.chatLog.selectDataset')" prop="dataset_id">
+      <el-form-item :label="$t('views.chatLog.selectKnowledge')" prop="dataset_id">
         <el-select
           v-model="form.dataset_id"
           filterable
-          :placeholder="$t('views.chatLog.selectDatasetPlaceholder')"
+          :placeholder="$t('views.chatLog.selectKnowledgePlaceholder')"
           :loading="optionLoading"
           @change="changeDataset"
         >
@@ -86,7 +86,7 @@ const form = ref<any>({
 
 const rules = reactive<FormRules>({
   dataset_id: [
-    { required: true, message: t('views.chatLog.selectDatasetPlaceholder'), trigger: 'change' },
+    { required: true, message: t('views.chatLog.selectKnowledgePlaceholder'), trigger: 'change' },
   ],
   document_id: [{ required: true, message: t('views.chatLog.documentPlaceholder'), trigger: 'change' }],
 })

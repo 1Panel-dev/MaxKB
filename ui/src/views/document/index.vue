@@ -525,7 +525,7 @@
     <ImportDocumentDialog ref="ImportDocumentDialogRef" :title="title" @refresh="refresh" />
     <SyncWebDialog ref="SyncWebDialogRef" @refresh="refresh" />
     <!-- 选择知识库 -->
-    <SelectDatasetDialog ref="SelectDatasetDialogRef" @refresh="refreshMigrate" />
+    <selectKnowledgeDialog ref="selectKnowledgeDialogRef" @refresh="refreshMigrate" />
     <GenerateRelatedDialog ref="GenerateRelatedDialogRef" @refresh="getList" />
   </div>
 </template>
@@ -536,7 +536,7 @@ import { ElTable } from 'element-plus'
 import documentApi from '@/api/knowledge/document'
 import ImportDocumentDialog from './component/ImportDocumentDialog.vue'
 import SyncWebDialog from '@/views/knowledge/component/SyncWebDialog.vue'
-import SelectDatasetDialog from './component/SelectDatasetDialog.vue'
+import selectKnowledgeDialog from './component/selectKnowledgeDialog.vue'
 import { numberFormat } from '@/utils/common'
 import { datetimeFormat } from '@/utils/time'
 import { hitHandlingMethod } from '@/enums/document'
@@ -599,7 +599,7 @@ const multipleTableRef = ref<InstanceType<typeof ElTable>>()
 const multipleSelection = ref<any[]>([])
 const title = ref('')
 
-const SelectDatasetDialogRef = ref()
+const selectKnowledgeDialogRef = ref()
 
 const exportDocument = (document: any) => {
   documentApi.exportDocument(document.name, document.dataset_id, document.id, loading).then(() => {
@@ -647,7 +647,7 @@ function openDatasetDialog(row?: any) {
     })
   }
 
-  SelectDatasetDialogRef.value.open(arr)
+  selectKnowledgeDialogRef.value.open(arr)
 }
 
 function dropdownHandle(obj: any) {

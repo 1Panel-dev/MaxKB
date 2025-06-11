@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="$t('views.chatLog.selectDataset')"
+    :title="$t('views.chatLog.selectKnowledge')"
     v-model="dialogVisible"
     width="600"
     class="select-dataset-dialog"
@@ -9,19 +9,19 @@
   >
     <template #header="{ titleId, titleClass }">
       <div class="my-header flex">
-        <h4 :id="titleId" :class="titleClass">{{ $t('views.chatLog.selectDataset') }}</h4>
+        <h4 :id="titleId" :class="titleClass">{{ $t('views.chatLog.selectKnowledge') }}</h4>
         <el-button link class="ml-16" @click="refresh">
           <el-icon class="mr-4"><Refresh /></el-icon>{{ $t('common.refresh') }}
         </el-button>
       </div>
     </template>
     <div class="content-height">
-      <el-radio-group v-model="selectDataset" class="card__radio">
+      <el-radio-group v-model="selectKnowledge" class="card__radio">
         <el-scrollbar height="500">
           <div class="p-16">
             <el-row :gutter="12" v-loading="loading">
               <el-col :span="12" v-for="(item, index) in datasetList" :key="index" class="mb-16">
-                <el-card shadow="never" :class="item.id === selectDataset ? 'active' : ''">
+                <el-card shadow="never" :class="item.id === selectKnowledge ? 'active' : ''">
                   <el-radio :value="item.id" size="large">
                     <div class="flex align-center">
                       <KnowledgeIcon :type="item.type" />
@@ -41,7 +41,7 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click.prevent="dialogVisible = false"> {{ $t('common.cancel') }} </el-button>
-        <el-button type="primary" @click="submitHandle" :disabled="!selectDataset || loading">
+        <el-button type="primary" @click="submitHandle" :disabled="!selectKnowledge || loading">
           {{ $t('common.confirm') }}
         </el-button>
       </span>
@@ -65,13 +65,13 @@ const emit = defineEmits(['refresh'])
 const loading = ref<boolean>(false)
 
 const dialogVisible = ref<boolean>(false)
-const selectDataset = ref('')
+const selectKnowledge = ref('')
 const datasetList = ref<any>([])
 const documentList = ref<any>([])
 
 watch(dialogVisible, (bool) => {
   if (!bool) {
-    selectDataset.value = ''
+    selectKnowledge.value = ''
     datasetList.value = []
     documentList.value = []
   }
@@ -84,7 +84,7 @@ const open = (list: any) => {
 }
 const submitHandle = () => {
   documentApi
-    .putMigrateMulDocument(id, selectDataset.value, documentList.value, loading)
+    .putMigrateMulDocument(id, selectKnowledge.value, documentList.value, loading)
     .then((res) => {
       emit('refresh')
       dialogVisible.value = false

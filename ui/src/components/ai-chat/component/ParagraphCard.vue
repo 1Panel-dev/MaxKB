@@ -7,7 +7,7 @@
     :showIcon="false"
   >
     <template #icon>
-      <AppAvatar class="mr-12 avatar-light" :size="22"> {{ index + 1 + '' }}</AppAvatar>
+      <el-avatar class="mr-12 avatar-light" :size="22"> {{ index + 1 + '' }}</el-avatar>
     </template>
     <div class="active-button primary">{{ score?.toFixed(3) || data.similarity?.toFixed(3) }}</div>
     <template #description>
@@ -37,9 +37,9 @@
           </template>
         </el-text>
         <div class="flex align-center item" style="line-height: 32px">
-          <AppAvatar class="mr-8 avatar-blue" shape="square" :size="18">
+          <el-avatar class="mr-8 avatar-blue" shape="square" :size="18">
             <img src="@/assets/knowledge/icon_document.svg" style="width: 58%" alt="" />
-          </AppAvatar>
+          </el-avatar>
 
           <span class="ellipsis-1 break-all" :title="data?.dataset_name">
             {{ data?.dataset_name }}</span

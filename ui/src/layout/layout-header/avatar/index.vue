@@ -21,7 +21,6 @@
           <div style="width: 90%">
             <p class="bold mb-4" style="font-size: 14px">{{ user.userInfo?.username }}</p>
             <template
-              v-for="item in user.userInfo?.role"
               v-if="user.userInfo?.role && user.userInfo.role.length > 0"
             >
               <el-tag size="small" class="default-tag">{{ user.userInfo?.role[0] }}</el-tag>

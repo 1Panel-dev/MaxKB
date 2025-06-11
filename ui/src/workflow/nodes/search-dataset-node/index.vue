@@ -10,10 +10,10 @@
         label-width="auto"
         ref="DatasetNodeFormRef"
       >
-        <el-form-item :label="$t('views.chatLog.selectDataset')">
+        <el-form-item :label="$t('views.chatLog.selectKnowledge')">
           <template #label>
             <div class="flex-between">
-              <span>{{ $t('views.chatLog.selectDataset') }}</span>
+              <span>{{ $t('views.chatLog.selectKnowledge') }}</span>
               <el-button type="primary" link @click="openDatasetDialog">
                 <el-icon><Plus /></el-icon>
               </el-button>
@@ -185,7 +185,7 @@ function openDatasetDialog() {
 
 function getDataset() {
   if (id) {
-    application.asyncGetApplicationDataset(id, datasetLoading).then((res: any) => {
+    application.asyncGetApplicationKnowledge(id, datasetLoading).then((res: any) => {
       datasetList.value = res.data
     })
   } else {
