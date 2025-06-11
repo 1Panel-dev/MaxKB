@@ -1,0 +1,49 @@
+.ai-chat {
+  --padding-left: 36px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  position: relative;
+  color: var(--app-text-color);
+  box-sizing: border-box;
+  &__content {
+    padding-top: 0;
+    box-sizing: border-box;
+
+    .avatar {
+      float: left;
+    }
+
+    .content {
+      // padding-left: var(--padding-left);
+      // padding-right: var(--padding-left);
+
+      :deep(ol) {
+        margin-left: 16px !important;
+      }
+    }
+  }
+}
+
+.chat-width {
+  max-width: 80%;
+  margin: 0 auto;
+}
+@media only screen and (max-width: 1000px) {
+  .chat-width {
+    max-width: 100% !important;
+    margin: 0 auto;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  .ai-chat {
+    height: calc(100% - 106px) !important;
+  }
+}
+.chat-mobile {
+  .el-button.is-text:not(.is-disabled):hover {
+    background: none;
+  }
+}

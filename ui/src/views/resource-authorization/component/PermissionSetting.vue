@@ -29,26 +29,8 @@
               :size="24"
               class="mr-12"
             />
-            <el-avatar
-              v-if="row.icon === '1' && isKnowledge"
-              class="mr-8 avatar-purple"
-              shape="square"
-              :size="24"
-            >
-              <img src="@/assets/knowledge/icon_web.svg" style="width: 58%" alt="" />
-            </el-avatar>
-            <el-avatar
-              v-else-if="row.icon === '2' && isKnowledge"
-              class="mr-8 avatar-purple"
-              shape="square"
-              :size="24"
-              style="background: none"
-            >
-              <img src="@/assets/knowledge/logo_lark.svg" style="width: 100%" alt="" />
-            </el-avatar>
-            <el-avatar v-else-if="isKnowledge" class="mr-8 avatar-blue" shape="square" :size="24">
-              <img src="@/assets/knowledge/icon_document.svg" style="width: 58%" alt="" />
-            </el-avatar>
+            <KnowledgeIcon v-if="isKnowledge" :type="row.icon" />
+
             <auto-tooltip :content="row?.name">
               {{ row?.name }}
             </auto-tooltip>

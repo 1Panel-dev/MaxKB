@@ -37,7 +37,7 @@
           :label="$t('views.problem.relateParagraph.selectDocument')"
           prop="document_list"
           :rules="{
-            message: $t('views.log.documentPlaceholder'),
+            message: $t('views.chatLog.documentPlaceholder'),
             trigger: 'blur',
             required: false
           }"
@@ -46,7 +46,7 @@
             ref="nodeCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
-            :placeholder="$t('views.log.documentPlaceholder')"
+            :placeholder="$t('views.chatLog.documentPlaceholder')"
             v-model="form_data.document_list"
           />
         </el-form-item>

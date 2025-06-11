@@ -183,38 +183,9 @@
                         <el-card class="relate-knowledge-card border-r-4" shadow="never">
                           <div class="flex-between">
                             <div class="flex align-center" style="width: 80%">
-                              <el-avatar
-                                v-if="relatedObject(knowledgeList, item, 'id')?.type === '1'"
-                                class="mr-8 avatar-purple"
-                                shape="square"
-                                :size="32"
-                              >
-                                <img
-                                  src="@/assets/knowledge/icon_web.svg"
-                                  style="width: 58%"
-                                  alt=""
-                                />
-                              </el-avatar>
-                              <el-avatar
-                                v-else-if="relatedObject(knowledgeList, item, 'id')?.type === '2'"
-                                class="mr-8 avatar-purple"
-                                shape="square"
-                                :size="32"
-                                style="background: none"
-                              >
-                                <img
-                                  src="@/assets/knowledge/logo_lark.svg"
-                                  style="width: 100%"
-                                  alt=""
-                                />
-                              </el-avatar>
-                              <el-avatar v-else class="mr-8 avatar-blue" shape="square" :size="32">
-                                <img
-                                  src="@/assets/knowledge/icon_document.svg"
-                                  style="width: 58%"
-                                  alt=""
-                                />
-                              </el-avatar>
+                              <KnowledgeIcon
+                                :type="relatedObject(knowledgeList, item, 'id')?.type"
+                              />
 
                               <span
                                 class="ellipsis cursor"

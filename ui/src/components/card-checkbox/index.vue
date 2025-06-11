@@ -18,7 +18,6 @@
   </el-card>
 </template>
 <script setup lang="ts">
-import KnowledgeIcon from '@/views/knowledge/component/KnowledgeIcon.vue'
 import { computed } from 'vue'
 defineOptions({ name: 'CardCheckbox' })
 const props = defineProps<{

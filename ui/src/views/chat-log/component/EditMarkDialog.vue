@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="$t('views.log.editMark')"
+    :title="$t('views.chatLog.editMark')"
     v-model="dialogVisible"
     width="600"
     class="edit-mark-dialog"

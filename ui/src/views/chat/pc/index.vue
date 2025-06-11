@@ -172,7 +172,7 @@ import EditTitleDialog from './EditTitleDialog.vue'
 import { t } from '@/locales'
 useResize()
 
-const { user, log, common } = useStore()
+const { user, chatLog, common } = useStore()
 
 const EditTitleDialogRef = ref()
 
@@ -239,7 +239,7 @@ function refreshFieldTitle(chatId: string, abstract: string) {
   }
 }
 function deleteLog(row: any) {
-  log.asyncDelChatClientLog(applicationDetail.value.id, row.id, left_loading).then(() => {
+  chatLog.asyncDelChatClientLog(applicationDetail.value.id, row.id, left_loading).then(() => {
     if (currentChatId.value === row.id) {
       currentChatId.value = 'new'
       currentChatName.value = t('chat.createChat')
@@ -289,7 +289,7 @@ function getChatLog(id: string, refresh?: boolean) {
     page_size: 20
   }
 
-  log.asyncGetChatLogClient(id, page, left_loading).then((res: any) => {
+  chatLog.asyncGetChatLogClient(id, page, left_loading).then((res: any) => {
     chatLogData.value = res.data.records
     if (refresh) {
       currentChatName.value = chatLogData.value?.[0]?.abstract
@@ -307,7 +307,7 @@ function getChatLog(id: string, refresh?: boolean) {
 }
 
 function getChatRecord() {
-  return log
+  return chatLog
     .asyncChatRecordLog(
       applicationDetail.value.id,
       currentChatId.value,

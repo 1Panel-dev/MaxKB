@@ -277,7 +277,6 @@
 
 <script lang="ts" setup>
 import { onMounted, ref, reactive, shallowRef, nextTick } from 'vue'
-import KnowledgeIcon from '@/views/knowledge/component/KnowledgeIcon.vue'
 import CreateKnowledgeDialog from './create-component/CreateKnowledgeDialog.vue'
 import CreateWebKnowledgeDialog from './create-component/CreateWebKnowledgeDialog.vue'
 import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'

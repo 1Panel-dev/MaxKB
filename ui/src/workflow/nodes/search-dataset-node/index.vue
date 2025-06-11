@@ -26,26 +26,7 @@
             <template v-for="(item, index) in form_data.dataset_id_list" :key="index" v-else>
               <div class="flex-between border border-r-4 white-bg mb-4" style="padding: 5px 8px">
                 <div class="flex align-center" style="line-height: 20px">
-                  <el-avatar
-                    v-if="relatedObject(datasetList, item, 'id')?.type === '1'"
-                    class="mr-8 avatar-purple"
-                    shape="square"
-                    :size="20"
-                  >
-                    <img src="@/assets/knowledge/icon_web.svg" style="width: 58%" alt="" />
-                  </el-avatar>
-                  <el-avatar
-                    v-else-if="relatedObject(datasetList, item, 'id')?.type === '2'"
-                    class="mr-8 avatar-purple"
-                    shape="square"
-                    :size="20"
-                    style="background: none"
-                  >
-                    <img src="@/assets/knowledge/logo_lark.svg" style="width: 100%" alt="" />
-                  </el-avatar>
-                  <el-avatar v-else class="mr-8 avatar-blue" shape="square" :size="20">
-                    <img src="@/assets/knowledge/icon_document.svg" style="width: 58%" alt="" />
-                  </el-avatar>
+                  <KnowledgeIcon :type="relatedObject(datasetList, item, 'id')?.type" />
 
                   <div class="ellipsis" :title="relatedObject(datasetList, item, 'id')?.name">
                     {{ relatedObject(datasetList, item, 'id')?.name }}
@@ -101,10 +82,10 @@
           prop="question_reference_address"
           :rules="{
             message: $t(
-              'views.applicationWorkflow.nodes.searchDatasetNode.searchQuestion.requiredMessage'
+              'views.applicationWorkflow.nodes.searchDatasetNode.searchQuestion.requiredMessage',
             ),
             trigger: 'blur',
-            required: true
+            required: true,
           }"
         >
           <NodeCascader
@@ -143,7 +124,7 @@ import { SearchMode } from '@/enums/application'
 import useStore from '@/stores'
 const { knowledge, application, user } = useStore()
 const {
-  params: { id }
+  params: { id },
 } = app.config.globalProperties.$route as any
 
 const props = defineProps<{ nodeModel: any }>()
@@ -154,9 +135,9 @@ const form = {
     top_n: 3,
     similarity: 0.6,
     max_paragraph_char_number: 5000,
-    search_mode: 'embedding'
+    search_mode: 'embedding',
   },
-  question_reference_address: []
+  question_reference_address: [],
 }
 
 const form_data = computed({
@@ -170,7 +151,7 @@ const form_data = computed({
   },
   set: (value) => {
     set(props.nodeModel.properties, 'node_data', value)
-  }
+  },
 })
 
 const DatasetNodeFormRef = ref<FormInstance>()
@@ -220,7 +201,7 @@ function refresh() {
 const validate = () => {
   return Promise.all([
     nodeCascaderRef.value.validate(),
-    DatasetNodeFormRef.value?.validate()
+    DatasetNodeFormRef.value?.validate(),
   ]).catch((err) => {
     return Promise.reject({ node: props.nodeModel, errMessage: err })
   })

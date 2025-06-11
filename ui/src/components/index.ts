@@ -21,6 +21,8 @@ import MdPreview from './markdown/MdPreview.vue'
 import MdEditorMagnify from './markdown/MdEditorMagnify.vue'
 import TagEllipsis from './tag-ellipsis/index.vue'
 import CardCheckbox from './card-checkbox/index.vue'
+import AiChat from './ai-chat/index.vue'
+import KnowledgeIcon from './app-icon/KnowledgeIcon.vue'
 export default {
   install(app: App) {
     app.component('LogoFull', LogoFull)
@@ -45,5 +47,7 @@ export default {
     app.component('MdEditorMagnify', MdEditorMagnify)
     app.component('TagEllipsis', TagEllipsis)
     app.component('CardCheckbox', CardCheckbox)
+    app.component('AiChat', AiChat)
+    app.component('KnowledgeIcon', KnowledgeIcon)
   },
 }

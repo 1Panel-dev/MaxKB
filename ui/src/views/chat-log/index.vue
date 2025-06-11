@@ -269,7 +269,6 @@
 import { ref, type Ref, onMounted, reactive, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { cloneDeep } from 'lodash'
-import KnowledgeIcon from '@/views/knowledge/component/KnowledgeIcon.vue'
 import ChatRecordDrawer from './component/ChatRecordDrawer.vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import chatLogApi from '@/api/application/chat-log'

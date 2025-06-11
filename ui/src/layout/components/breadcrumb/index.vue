@@ -27,27 +27,8 @@
             class="mr-8"
             :size="24"
           />
+          <KnowledgeIcon v-else-if="isDataset" :type="current?.type" />
 
-          <el-avatar
-            v-else-if="isDataset && current?.type === '1'"
-            class="mr-8 avatar-purple"
-            shape="square"
-            :size="24"
-          >
-            <img src="@/assets/knowledge/icon_web.svg" style="width: 58%" alt="" />
-          </el-avatar>
-          <el-avatar
-            v-else-if="isDataset && current?.type === '2'"
-            class="mr-8 avatar-purple"
-            shape="square"
-            :size="24"
-            style="background: none"
-          >
-            <img src="@/assets/knowledge/logo_lark.svg" style="width: 100%" alt="" />
-          </el-avatar>
-          <el-avatar v-else class="mr-8 avatar-blue" shape="square" :size="24">
-            <img src="@/assets/knowledge/icon_document.svg" style="width: 58%" alt="" />
-          </el-avatar>
           <div class="ellipsis" :title="current?.name">{{ current?.name }}</div>
         </div>
 
@@ -81,26 +62,9 @@
                         shape="square"
                         :size="24"
                       />
-                      <el-avatar
-                        v-else-if="isDataset && item.type === '1'"
-                        class="mr-12 avatar-purple"
-                        shape="square"
-                        :size="24"
-                      >
-                        <img src="@/assets/knowledge/icon_web.svg" style="width: 58%" alt="" />
-                      </el-avatar>
-                      <el-avatar
-                        v-else-if="isDataset && item.type === '2'"
-                        class="mr-8 avatar-purple"
-                        shape="square"
-                        :size="24"
-                        style="background: none"
-                      >
-                        <img src="@/assets/knowledge/logo_lark.svg" style="width: 100%" alt="" />
-                      </el-avatar>
-                      <el-avatar v-else class="mr-12 avatar-blue" shape="square" :size="24">
-                        <img src="@/assets/knowledge/icon_document.svg" style="width: 58%" alt="" />
-                      </el-avatar>
+
+                      <KnowledgeIcon v-if="isDataset" :type="item.type" />
+
                       <span class="ellipsis" :title="item?.name"> {{ item?.name }}</span>
                     </div>
                   </el-dropdown-item>

@@ -135,7 +135,7 @@ import { hexToRgba } from '@/utils/theme'
 import { MsgError } from '@/utils/message'
 import useStore from '@/stores'
 import { t } from '@/locales'
-const { user, log } = useStore()
+const { user, chatLog } = useStore()
 const route = useRoute()
 
 const isPopup = computed(() => {
@@ -179,7 +179,7 @@ function editName(val: string, item: any) {
     const obj = {
       abstract: val
     }
-    log.asyncPutChatClientLog(applicationDetail.value.id, item.id, obj, loading).then(() => {
+    chatLog.asyncPutChatClientLog(applicationDetail.value.id, item.id, obj, loading).then(() => {
       const find = chatLogData.value.find((row: any) => row.id === item.id)
       if (find) {
         find.abstract = val
@@ -203,7 +203,7 @@ function mouseenter(row: any) {
   mouseId.value = row.id
 }
 function deleteLog(row: any) {
-  log.asyncDelChatClientLog(applicationDetail.value.id, row.id, left_loading).then(() => {
+  chatLog.asyncDelChatClientLog(applicationDetail.value.id, row.id, left_loading).then(() => {
     if (currentChatId.value === row.id) {
       currentChatId.value = 'new'
       paginationConfig.current_page = 1
@@ -244,7 +244,7 @@ function getChatLog(id: string) {
     page_size: 20
   }
 
-  log.asyncGetChatLogClient(id, page, left_loading).then((res: any) => {
+  chatLog.asyncGetChatLogClient(id, page, left_loading).then((res: any) => {
     chatLogData.value = res.data.records
     paginationConfig.current_page = 1
     paginationConfig.total = 0
@@ -257,7 +257,7 @@ function getChatLog(id: string) {
 }
 
 function getChatRecord() {
-  return log
+  return chatLog
     .asyncChatRecordLog(
       applicationDetail.value.id,
       currentChatId.value,

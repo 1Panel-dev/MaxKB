@@ -16,6 +16,7 @@
   </el-avatar>
 </template>
 <script setup lang="ts">
+defineOptions({ name: 'KnowledgeIcon' })
 const props = defineProps({
   type: {
     type: [String, Number],

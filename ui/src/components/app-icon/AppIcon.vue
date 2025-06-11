@@ -14,16 +14,16 @@
   </el-icon>
 </template>
 <script setup lang="ts">
+import { iconMap } from './index'
 import { computed } from 'vue'
-import { iconMap } from '@/components/app-icon/index'
 defineOptions({ name: 'AppIcon' })
 const props = withDefaults(
   defineProps<{
     iconName?: string
   }>(),
   {
-    iconName: '404'
-  }
+    iconName: '404',
+  },
 )
 
 const isIconfont = computed(() => props.iconName?.includes('app-'))

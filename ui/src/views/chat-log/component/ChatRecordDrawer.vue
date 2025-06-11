@@ -20,10 +20,10 @@
     <template #footer>
       <div>
         <el-button @click="pre" :disabled="pre_disable || loading">{{
-          $t('views.log.buttons.prev')
+          $t('views.chatLog.buttons.prev')
         }}</el-button>
         <el-button @click="next" :disabled="next_disable || loading">{{
-          $t('views.log.buttons.next')
+          $t('views.chatLog.buttons.next')
         }}</el-button>
       </div>
     </template>
@@ -36,7 +36,7 @@ import { useRoute } from 'vue-router'
 import { type ApplicationFormType, type chatType } from '@/api/type/application'
 import useStore from '@/stores'
 const AiChatRef = ref()
-const { log } = useStore()
+const { chatLog } = useStore()
 const props = withDefaults(
   defineProps<{
     /**
@@ -87,7 +87,7 @@ function closeHandle() {
 }
 
 function getChatRecord() {
-  return log
+  return chatLog
     .asyncChatRecordLog(id as string, props.chatId, paginationConfig, loading)
     .then((res: any) => {
       paginationConfig.total = res.data.total

@@ -1,0 +1,32 @@
+{
+  "name": "recorder-core",
+  "version": "1.3.25011100",
+  "description": "Recorder库: html5 js 录音 mp3 wav ogg webm amr g711a g711u 格式，支持pc和Android、iOS部分浏览器、Hybrid App（提供Android iOS App源码）、微信，提供ASR语音识别转文字 H5版语音通话聊天示例 DTMF编码解码",
+  "homepage": "https://github.com/xiangyuecn/Recorder",
+  "main": "src/recorder-core.js",
+  "keywords": [
+    "recorder",
+    "recordapp",
+    "record",
+    "html录音",
+    "h5录音",
+    "html5",
+    "mp3",
+    "wav",
+    "ASR",
+    "语音识别",
+    "语音转文字",
+    "DTMF",
+    "recording",
+    "webrtc"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xiangyuecn/Recorder.git"
+  },
+  "bugs": {
+    "url": "https://github.com/xiangyuecn/Recorder/issues"
+  },
+  "author": "xiangyuecn",
+  "license": "MIT"
+}

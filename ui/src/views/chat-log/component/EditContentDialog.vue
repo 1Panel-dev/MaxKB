@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="$t('views.log.editContent')"
+    :title="$t('views.chatLog.editContent')"
     v-model="dialogVisible"
     width="600"
     :close-on-click-modal="false"
@@ -26,7 +26,7 @@
       <el-form-item :label="$t('common.content')" prop="content">
         <MdEditor
           v-model="form.content"
-          :placeholder="$t('views.log.form.content.placeholder')"
+          :placeholder="$t('views.chatLog.form.content.placeholder')"
           :maxLength="100000"
           :preview="false"
           :toolbars="toolbars"
@@ -43,56 +43,33 @@
         <el-input
           show-word-limit
           v-model="form.title"
-          :placeholder="$t('views.log.form.title.placeholder')"
+          :placeholder="$t('views.chatLog.form.title.placeholder')"
           maxlength="256"
         >
         </el-input>
       </el-form-item>
-      <el-form-item :label="$t('views.log.selectDataset')" prop="dataset_id">
+      <el-form-item :label="$t('views.chatLog.selectDataset')" prop="dataset_id">
         <el-select
           v-model="form.dataset_id"
           filterable
-          :placeholder="$t('views.log.selectDatasetPlaceholder')"
+          :placeholder="$t('views.chatLog.selectDatasetPlaceholder')"
           :loading="optionLoading"
           @change="changeDataset"
         >
           <el-option v-for="item in datasetList" :key="item.id" :label="item.name" :value="item.id">
             <span class="flex align-center">
-              <AppAvatar
-                v-if="!item.dataset_id && item.type === '1'"
-                class="mr-12 avatar-purple"
-                shape="square"
-                :size="24"
-              >
-                <img src="@/assets/icon_web.svg" style="width: 58%" alt="" />
-              </AppAvatar>
-              <AppAvatar
-                v-else-if="!item.dataset_id && item.type === '2'"
-                class="mr-8 avatar-purple"
-                shape="square"
-                :size="24"
-                style="background: none"
-              >
-                <img src="@/assets/logo_lark.svg" style="width: 100%" alt="" />
-              </AppAvatar>
-              <AppAvatar
-                v-else-if="!item.dataset_id && item.type === '0'"
-                class="mr-12 avatar-blue"
-                shape="square"
-                :size="24"
-              >
-                <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
-              </AppAvatar>
+              <KnowledgeIcon v-if="item.dataset_id" :type="item.type" />
+
               {{ item.name }}
             </span>
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item :label="$t('views.log.saveToDocument')" prop="document_id">
+      <el-form-item :label="$t('views.chatLog.saveToDocument')" prop="document_id">
         <el-select
           v-model="form.document_id"
           filterable
-          :placeholder="$t('views.log.documentPlaceholder')"
+          :placeholder="$t('views.chatLog.documentPlaceholder')"
           :loading="optionLoading"
           @change="changeDocument"
         >
@@ -121,7 +98,7 @@
 import { ref, watch, reactive } from 'vue'
 import { useRoute } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
-import logApi from '@/api/log'
+import chatLogApi from '@/api/application/chat-log'
 import imageApi from '@/api/image'
 import useStore from '@/stores'
 import { t } from '@/locales'
@@ -129,7 +106,7 @@ const { application, document, user } = useStore()
 
 const route = useRoute()
 const {
-  params: { id }
+  params: { id },
 } = route as any
 
 const emit = defineEmits(['refresh'])
@@ -162,7 +139,7 @@ const toolbars = [
   '=',
   'pageFullscreen',
   'preview',
-  'htmlPreview'
+  'htmlPreview',
 ] as any[]
 
 const footers = ['markdownTotal', 0, '=', 1, 'scrollSwitch']
@@ -177,15 +154,15 @@ const form = ref<any>({
   title: '',
   content: '',
   dataset_id: '',
-  document_id: ''
+  document_id: '',
 })
 
 const rules = reactive<FormRules>({
-  content: [{ required: true, message: t('views.log.form.content.placeholder'), trigger: 'blur' }],
+  content: [{ required: true, message: t('views.chatLog.form.content.placeholder'), trigger: 'blur' }],
   dataset_id: [
-    { required: true, message: t('views.log.selectDatasetPlaceholder'), trigger: 'change' }
+    { required: true, message: t('views.chatLog.selectDatasetPlaceholder'), trigger: 'change' },
   ],
-  document_id: [{ required: true, message: t('views.log.documentPlaceholder'), trigger: 'change' }]
+  document_id: [{ required: true, message: t('views.chatLog.documentPlaceholder'), trigger: 'change' }],
 })
 
 const datasetList = ref<any[]>([])
@@ -201,7 +178,7 @@ watch(dialogVisible, (bool) => {
       title: '',
       content: '',
       dataset_id: '',
-      document_id: ''
+      document_id: '',
     }
     datasetList.value = []
     documentList.value = []
@@ -223,7 +200,7 @@ const onUploadImg = async (files: any, callback: any) => {
           })
           .catch((error) => rej(error))
       })
-    })
+    }),
   )
 
   callback(res.map((item) => item.data))
@@ -282,9 +259,9 @@ const submitForm = async (formEl: FormInstance | undefined) => {
       const obj = {
         title: form.value.title,
         content: form.value.content,
-        problem_text: form.value.problem_text
+        problem_text: form.value.problem_text,
       }
-      logApi
+      chatLogApi
         .putChatRecordLog(
           id,
           form.value.chat_id,
@@ -292,7 +269,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
           form.value.dataset_id,
           form.value.document_id,
           obj,
-          loading
+          loading,
         )
         .then((res: any) => {
           emit('refresh', res.data)

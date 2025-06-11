@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="`${$t('views.log.selectDataset')}/${$t('common.fileUpload.document')}`"
+    :title="`${$t('views.chatLog.selectDataset')}/${$t('common.fileUpload.document')}`"
     v-model="dialogVisible"
     width="500"
     :close-on-click-modal="false"
@@ -14,51 +14,28 @@
       :rules="rules"
       @submit.prevent
     >
-      <el-form-item :label="$t('views.log.selectDataset')" prop="dataset_id">
+      <el-form-item :label="$t('views.chatLog.selectDataset')" prop="dataset_id">
         <el-select
           v-model="form.dataset_id"
           filterable
-          :placeholder="$t('views.log.selectDatasetPlaceholder')"
+          :placeholder="$t('views.chatLog.selectDatasetPlaceholder')"
           :loading="optionLoading"
           @change="changeDataset"
         >
           <el-option v-for="item in datasetList" :key="item.id" :label="item.name" :value="item.id">
             <span class="flex align-center">
-              <el-avatar
-                v-if="!item.dataset_id && item.type === '1'"
-                class="mr-12 avatar-purple"
-                shape="square"
-                :size="24"
-              >
-                <img src="@/assets/knowledge/icon_web.svg" style="width: 58%" alt="" />
-              </el-avatar>
-              <el-avatar
-                v-else-if="!item.dataset_id && item.type === '2'"
-                class="mr-12 avatar-purple"
-                shape="square"
-                :size="24"
-                style="background: none"
-              >
-                <img src="@/assets/knowledge/logo_lark.svg" style="width: 100%" alt="" />
-              </el-avatar>
-              <el-avatar
-                v-else-if="!item.dataset_id && item.type === '0'"
-                class="mr-12 avatar-blue"
-                shape="square"
-                :size="24"
-              >
-                <img src="@/assets/knowledge/icon_document.svg" style="width: 58%" alt="" />
-              </el-avatar>
+              <KnowledgeIcon v-if="!item.dataset_id" :type="item.type" />
+
               {{ item.name }}
             </span>
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item :label="$t('views.log.saveToDocument')" prop="document_id">
+      <el-form-item :label="$t('views.chatLog.saveToDocument')" prop="document_id">
         <el-select
           v-model="form.document_id"
           filterable
-          :placeholder="$t('views.log.documentPlaceholder')"
+          :placeholder="$t('views.chatLog.documentPlaceholder')"
           :loading="optionLoading"
         >
           <el-option
@@ -93,7 +70,7 @@ const { knowledge, document } = useStore()
 
 const route = useRoute()
 const {
-  params: { id, documentId }
+  params: { id, documentId },
 } = route as any
 
 const emit = defineEmits(['refresh'])
@@ -104,14 +81,14 @@ const loading = ref(false)
 
 const form = ref<any>({
   dataset_id: '',
-  document_id: ''
+  document_id: '',
 })
 
 const rules = reactive<FormRules>({
   dataset_id: [
-    { required: true, message: t('views.log.selectDatasetPlaceholder'), trigger: 'change' }
+    { required: true, message: t('views.chatLog.selectDatasetPlaceholder'), trigger: 'change' },
   ],
-  document_id: [{ required: true, message: t('views.log.documentPlaceholder'), trigger: 'change' }]
+  document_id: [{ required: true, message: t('views.chatLog.documentPlaceholder'), trigger: 'change' }],
 })
 
 const datasetList = ref<any[]>([])
@@ -123,7 +100,7 @@ watch(dialogVisible, (bool) => {
   if (!bool) {
     form.value = {
       dataset_id: '',
-      document_id: ''
+      document_id: '',
     }
     datasetList.value = []
     documentList.value = []
@@ -166,7 +143,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
           form.value.dataset_id,
           form.value.document_id,
           paragraphList.value,
-          loading
+          loading,
         )
         .then(() => {
           emit('refresh')

@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="$t('views.log.selectDataset')"
+    :title="$t('views.chatLog.selectDataset')"
     v-model="dialogVisible"
     width="600"
     class="select-dataset-dialog"
@@ -9,7 +9,7 @@
   >
     <template #header="{ titleId, titleClass }">
       <div class="my-header flex">
-        <h4 :id="titleId" :class="titleClass">{{ $t('views.log.selectDataset') }}</h4>
+        <h4 :id="titleId" :class="titleClass">{{ $t('views.chatLog.selectDataset') }}</h4>
         <el-button link class="ml-16" @click="refresh">
           <el-icon class="mr-4"><Refresh /></el-icon>{{ $t('common.refresh') }}
         </el-button>
@@ -24,31 +24,8 @@
                 <el-card shadow="never" :class="item.id === selectDataset ? 'active' : ''">
                   <el-radio :value="item.id" size="large">
                     <div class="flex align-center">
-                      <el-avatar
-                        v-if="item?.type === '0'"
-                        class="mr-8 avatar-blue"
-                        shape="square"
-                        :size="32"
-                      >
-                        <img src="@/assets/knowledge/icon_document.svg" style="width: 58%" alt="" />
-                      </el-avatar>
-                      <el-avatar
-                        v-if="item?.type === '1'"
-                        class="mr-8 avatar-purple"
-                        shape="square"
-                        :size="32"
-                      >
-                        <img src="@/assets/knowledge/icon_web.svg" style="width: 58%" alt="" />
-                      </el-avatar>
-                      <el-avatar
-                        v-if="item?.type === '2'"
-                        class="mr-8 avatar-purple"
-                        shape="square"
-                        :size="32"
-                        style="background: none"
-                      >
-                        <img src="@/assets/knowledge/logo_lark.svg" style="width: 100%" alt="" />
-                      </el-avatar>
+                      <KnowledgeIcon :type="item.type" />
+
                       <span class="ellipsis" :title="item.name">
                         {{ item.name }}
                       </span>
@@ -80,7 +57,7 @@ import useStore from '@/stores'
 const { knowledge } = useStore()
 const route = useRoute()
 const {
-  params: { id } // id为datasetID
+  params: { id }, // id为datasetID
 } = route as any
 
 const emit = defineEmits(['refresh'])
