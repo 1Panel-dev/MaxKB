@@ -10,6 +10,7 @@ FROM (SELECT "temp_knowledge".id::text, "temp_knowledge".name,
              "temp_knowledge".update_time,
              "temp_knowledge".file_size_limit,
              "temp_knowledge".file_count_limit,
+             "temp_knowledge"."scope",
              "document_temp"."char_length",
              CASE
                  WHEN
@@ -38,6 +39,7 @@ FROM (SELECT "temp_knowledge".id::text, "temp_knowledge".name,
              "update_time",
              0           as file_size_limit,
              0           as file_count_limit,
+             'WORKSPACE' as "scope",
              0 as char_length,
                 0 as application_mapping_count,
                 0 as document_count

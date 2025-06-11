@@ -109,6 +109,7 @@ class KnowledgeSerializer(serializers.Serializer):
         desc = serializers.CharField(required=False, label=_('knowledge description'), allow_null=True,
                                      allow_blank=True, max_length=256, min_length=1)
         user_id = serializers.UUIDField(required=False, label=_('user id'), allow_null=True)
+        scope = serializers.CharField(required=False, label=_('knowledge scope'), allow_null=True)
 
         @staticmethod
         def is_x_pack_ee():
@@ -127,7 +128,8 @@ class KnowledgeSerializer(serializers.Serializer):
                 'temp.user_id': models.CharField(),
                 'temp.workspace_id': models.CharField(),
                 'temp.folder_id': models.CharField(),
-                'temp.id': models.CharField()
+                'temp.id': models.CharField(),
+                'temp.scope': models.CharField(),
             }))
             folder_query_set = QuerySet(KnowledgeFolder)
 
@@ -146,6 +148,8 @@ class KnowledgeSerializer(serializers.Serializer):
             if "folder_id" in self.data and self.data.get('folder_id') is not None:
                 query_set = query_set.filter(**{'temp.folder_id': self.data.get("folder_id")})
                 folder_query_set = folder_query_set.filter(**{'parent_id': self.data.get("folder_id")})
+            if "scope" in self.data and self.data.get('scope') is not None:
+                query_set = query_set.filter(**{'temp.scope': self.data.get("scope")})
             query_set = query_set.order_by("-temp.create_time", "temp.id")
             query_set_dict['default_sql'] = query_set
 

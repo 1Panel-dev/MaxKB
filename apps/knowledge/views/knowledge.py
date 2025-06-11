@@ -11,6 +11,7 @@ from common.result import result
 from knowledge.api.knowledge import KnowledgeBaseCreateAPI, KnowledgeWebCreateAPI, KnowledgeTreeReadAPI, \
     KnowledgeEditAPI, KnowledgeReadAPI, KnowledgePageAPI, SyncWebAPI, GenerateRelatedAPI, HitTestAPI, EmbeddingAPI, \
     GetModelAPI, KnowledgeExportAPI
+from knowledge.models import KnowledgeScope
 from knowledge.serializers.common import get_knowledge_operation_object
 from knowledge.serializers.knowledge import KnowledgeSerializer
 from models_provider.serializers.model_serializer import ModelSerializer
@@ -39,6 +40,7 @@ class KnowledgeView(APIView):
                 'folder_id': request.query_params.get('folder_id'),
                 'name': request.query_params.get('name'),
                 'desc': request.query_params.get("desc"),
+                'scope': KnowledgeScope.WORKSPACE,
                 'user_id': request.query_params.get('user_id')
             }
         ).list())
@@ -135,6 +137,7 @@ class KnowledgeView(APIView):
                     'folder_id': request.query_params.get('folder_id'),
                     'name': request.query_params.get('name'),
                     'desc': request.query_params.get("desc"),
+                    'scope': KnowledgeScope.WORKSPACE,
                     'user_id': request.user.id
                 }
             ).page(current_page, page_size))
