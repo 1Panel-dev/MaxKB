@@ -32,6 +32,8 @@ class Cache_Version(Enum):
     # 应用API KEY
     APPLICATION_API_KEY = "APPLICATION_API_KEY", lambda secret_key, use_get_data: secret_key
 
+    CHAT_USER_TOKEN = "CHAT_USER_TOKEN", lambda token: token
+
     def get_version(self):
         return self.value[0]
 
