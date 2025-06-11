@@ -440,7 +440,7 @@ class UserManageSerializer(serializers.Serializer):
             user_role_relations = (
                 user_role_relation_model.objects
                 .filter(workspace_id=workspace_id)
-                .exclude(role__id='workspace_admin')
+                .exclude(role__id='workspace_admin', role__type='USER')
                 .select_related('role', 'user')  # 预加载外键数据
             )
             user_dict = {}
