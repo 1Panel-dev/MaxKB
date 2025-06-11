@@ -17,11 +17,7 @@ FROM (SELECT "temp_knowledge".id::text, "temp_knowledge".name,
                  ELSE "app_knowledge_temp"."count" END AS application_mapping_count,
              "document_temp".document_count
       FROM (SELECT knowledge.*
-            FROM knowledge knowledge ${knowledge_custom_sql}
-            AND id in (SELECT target
-                   FROM workspace_user_resource_permission
-                   WHERE auth_target_type = 'KNOWLEDGE'
-                     AND 'VIEW' = any (permission_list))) temp_knowledge
+            FROM knowledge knowledge ${knowledge_custom_sql}) temp_knowledge
                LEFT JOIN (SELECT "count"("id") AS document_count, "sum"("char_length") "char_length", knowledge_id
                           FROM "document"
                           GROUP BY knowledge_id) "document_temp" ON temp_knowledge."id" = "document_temp".knowledge_id

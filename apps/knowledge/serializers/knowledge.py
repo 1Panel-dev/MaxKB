@@ -19,6 +19,7 @@ from rest_framework import serializers
 
 from application.models import ApplicationKnowledgeMapping
 from common.config.embedding_config import VectorStore
+from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import native_search, get_dynamics_model, native_page_search
 from common.db.sql_execute import select_list
 from common.event import ListenerManagement
@@ -36,6 +37,7 @@ from knowledge.task.generate import generate_related_by_knowledge_id
 from knowledge.task.sync import sync_web_knowledge, sync_replace_web_knowledge
 from maxkb.conf import PROJECT_DIR
 from models_provider.models import Model
+from users.serializers.user import is_workspace_manage
 
 
 class KnowledgeModelSerializer(serializers.ModelSerializer):
@@ -108,6 +110,12 @@ class KnowledgeSerializer(serializers.Serializer):
                                      allow_blank=True, max_length=256, min_length=1)
         user_id = serializers.UUIDField(required=False, label=_('user id'), allow_null=True)
 
+        @staticmethod
+        def is_x_pack_ee():
+            workspace_user_role_mapping_model = DatabaseModelManage.get_model("workspace_user_role_mapping")
+            role_permission_mapping_model = DatabaseModelManage.get_model("role_permission_mapping_model")
+            return workspace_user_role_mapping_model is not None and role_permission_mapping_model is not None
+
         def get_query_set(self):
             workspace_id = self.data.get("workspace_id")
             query_set_dict = {}
@@ -150,28 +158,44 @@ class KnowledgeSerializer(serializers.Serializer):
         def page(self, current_page: int, page_size: int):
             self.is_valid(raise_exception=True)
 
-            folder_id = self.data.get('folder_id', 'root')
+            folder_id = self.data.get('folder_id', self.data.get("workspace_id"))
             root = KnowledgeFolder.objects.filter(id=folder_id).first()
             if not root:
                 raise serializers.ValidationError(_('Folder not found'))
+            workspace_manage = is_workspace_manage(self.data.get('user_id'), self.data.get('workspace_id'))
 
             return native_page_search(
                 current_page,
                 page_size,
                 self.get_query_set(),
                 select_string=get_file_content(
-                    os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'list_knowledge.sql')
+                    os.path.join(
+                        PROJECT_DIR,
+                        "apps",
+                        "knowledge", 'sql',
+                        'list_knowledge.sql' if workspace_manage else (
+                            'list_knowledge_user_ee.sql' if self.is_x_pack_ee() else 'list_knowledge_user.sql'
+                        )
+                    )
                 ),
                 post_records_handler=lambda r: r
             )
 
         def list(self):
             self.is_valid(raise_exception=True)
+            workspace_manage = is_workspace_manage(self.data.get('user_id'), self.data.get('workspace_id'))
+
             return native_search(
                 self.get_query_set(),
                 select_string=get_file_content(
-                    os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'list_knowledge.sql')
-                )
+                    os.path.join(
+                        PROJECT_DIR,
+                        "apps",
+                        "knowledge", 'sql',
+                        'list_knowledge.sql' if workspace_manage else (
+                            'list_knowledge_user_ee.sql' if self.is_x_pack_ee() else 'list_knowledge_user.sql'
+                        )
+                    ))
             )
 
     class Operate(serializers.Serializer):
@@ -433,7 +457,7 @@ class KnowledgeSerializer(serializers.Serializer):
             if with_valid:
                 self.is_valid(raise_exception=True)
                 KnowledgeBaseCreateRequest(data=instance).is_valid(raise_exception=True)
-            folder_id = instance.get('folder_id', 'root')
+            folder_id = instance.get('folder_id', self.data.get('workspace_id'))
             if QuerySet(Knowledge).filter(workspace_id=self.data.get('workspace_id'),
                                           folder_id=folder_id,
                                           name=instance.get('name')).exists():
@@ -495,7 +519,7 @@ class KnowledgeSerializer(serializers.Serializer):
                 self.is_valid(raise_exception=True)
                 KnowledgeWebCreateRequest(data=instance).is_valid(raise_exception=True)
 
-            folder_id = instance.get('folder_id', 'root')
+            folder_id = instance.get('folder_id', self.data.get('workspace_id'))
             if QuerySet(Knowledge).filter(workspace_id=self.data.get('workspace_id'),
                                           folder_id=folder_id,
                                           name=instance.get('name')).exists():
