@@ -40,4 +40,17 @@ interface CreateOrUpdateParams {
   role_type?: RoleTypeEnum,
 }
 
-export type { RoleItem, RolePermissionItem, RoleTableDataItem, CreateOrUpdateParams, ChildrenPermissionItem }
+interface RoleMemberItem {
+  user_relation_id: string,
+  user_id: string,
+  username: string,
+  nick_name: string,
+  workspace_id: string,
+  workspace_name: string,
+}
+
+interface CreateMemberParams {
+  members: { user_ids: string[], workspace_ids: string[] }[]
+}
+
+export type { RoleItem, RolePermissionItem, RoleTableDataItem, CreateOrUpdateParams, ChildrenPermissionItem, RoleMemberItem, CreateMemberParams }

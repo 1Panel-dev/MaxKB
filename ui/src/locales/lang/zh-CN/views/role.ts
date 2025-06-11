@@ -17,6 +17,13 @@ export default {
     moduleName: '模块名称'
   },
   member: {
-    title: '成员'
+    title: '成员',
+    add: '添加成员',
+    workspace: '工作空间',
+    role: '角色',
+    delete: {
+      button: '移除',
+      confirmTitle: '是否删除成员：',
+    }
   }
 }
