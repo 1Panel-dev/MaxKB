@@ -52,7 +52,7 @@ template
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import { ElForm } from 'element-plus'
-import platformApi from '@/api/systemSettings/platform-source'
+import platformApi from '@/api/system-settings/platform-source'
 import { MsgError, MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
 

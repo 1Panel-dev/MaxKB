@@ -1,77 +1,76 @@
 <template>
-  <div class="email-setting">
-    <h4 class="p-16-24">{{ $t('views.system.email.title') }}</h4>
-    <el-scrollbar>
-      <div class="p-24" v-loading="loading">
-        <el-form
-          ref="emailFormRef"
-          :rules="rules"
-          :model="form"
-          label-position="top"
-          require-asterisk-position="right"
-        >
-          <el-form-item :label="$t('views.system.email.smtpHost')" prop="email_host">
-            <el-input
-              v-model="form.email_host"
-              :placeholder="$t('views.system.email.smtpHostPlaceholder')"
-            />
-          </el-form-item>
-          <el-form-item :label="$t('views.system.email.smtpPort')" prop="email_port">
-            <el-input
-              v-model="form.email_port"
-              :placeholder="$t('views.system.email.smtpPortPlaceholder')"
-            />
-          </el-form-item>
-          <el-form-item :label="$t('views.system.email.smtpUser')" prop="email_host_user">
-            <el-input
-              v-model="form.email_host_user"
-              :placeholder="$t('views.system.email.smtpUserPlaceholder')"
-            />
-          </el-form-item>
-          <el-form-item :label="$t('views.system.email.sendEmail')" prop="from_email">
-            <el-input
-              v-model="form.from_email"
-              :placeholder="$t('views.system.email.sendEmailPlaceholder')"
-            />
-          </el-form-item>
-          <el-form-item :label="$t('views.system.password')" prop="email_host_password">
-            <el-input
-              v-model="form.email_host_password"
-              :placeholder="$t('views.system.email.smtpPasswordPlaceholder')"
-              show-password
-            />
-          </el-form-item>
-          <el-form-item>
-            <el-checkbox v-model="form.email_use_ssl"
-            >{{ $t('views.system.email.enableSSL') }}
-            </el-checkbox>
-          </el-form-item>
-          <el-form-item>
-            <el-checkbox v-model="form.email_use_tls"
-            >{{ $t('views.system.email.enableTLS') }}
-            </el-checkbox>
-          </el-form-item>
-          <el-button @click="submit(emailFormRef, 'test')" :disabled="loading">
-            {{ $t('views.system.test') }}
-          </el-button>
-        </el-form>
-
-        <div class="text-right">
-          <el-button @click="submit(emailFormRef)" type="primary" :disabled="loading">
-            {{ $t('common.save') }}
-          </el-button>
+  <div class="email-setting p-16-24">
+    <h4 class="mb-16">{{ $t('views.system.email.title') }}</h4>
+    <el-card style="--el-card-padding: 16px" v-loading="loading">
+      <el-scrollbar>
+        <div class="email-setting__main p-16">
+          <el-form
+            ref="emailFormRef"
+            :rules="rules"
+            :model="form"
+            label-position="top"
+            require-asterisk-position="right"
+          >
+            <el-form-item :label="$t('views.system.email.smtpHost')" prop="email_host">
+              <el-input
+                v-model="form.email_host"
+                :placeholder="$t('views.system.email.smtpHostPlaceholder')"
+              />
+            </el-form-item>
+            <el-form-item :label="$t('views.system.email.smtpPort')" prop="email_port">
+              <el-input
+                v-model="form.email_port"
+                :placeholder="$t('views.system.email.smtpPortPlaceholder')"
+              />
+            </el-form-item>
+            <el-form-item :label="$t('views.system.email.smtpUser')" prop="email_host_user">
+              <el-input
+                v-model="form.email_host_user"
+                :placeholder="$t('views.system.email.smtpUserPlaceholder')"
+              />
+            </el-form-item>
+            <el-form-item :label="$t('views.system.email.sendEmail')" prop="from_email">
+              <el-input
+                v-model="form.from_email"
+                :placeholder="$t('views.system.email.sendEmailPlaceholder')"
+              />
+            </el-form-item>
+            <el-form-item :label="$t('views.system.password')" prop="email_host_password">
+              <el-input
+                v-model="form.email_host_password"
+                :placeholder="$t('views.system.email.smtpPasswordPlaceholder')"
+                show-password
+              />
+            </el-form-item>
+            <el-form-item>
+              <el-checkbox v-model="form.email_use_ssl"
+                >{{ $t('views.system.email.enableSSL') }}
+              </el-checkbox>
+            </el-form-item>
+            <el-form-item>
+              <el-checkbox v-model="form.email_use_tls"
+                >{{ $t('views.system.email.enableTLS') }}
+              </el-checkbox>
+            </el-form-item>
+            <el-button @click="submit(emailFormRef)" type="primary" :disabled="loading">
+              {{ $t('common.save') }}
+            </el-button>
+            <el-button @click="submit(emailFormRef, 'test')" :disabled="loading">
+              {{ $t('views.system.test') }}
+            </el-button>
+          </el-form>
         </div>
-      </div>
-    </el-scrollbar>
+      </el-scrollbar>
+    </el-card>
   </div>
 </template>
 <script setup lang="ts">
-import {reactive, ref, watch, onMounted} from 'vue'
-import emailApi from '@/api/systemSettings/email-setting'
-import type {FormInstance, FormRules} from 'element-plus'
+import { reactive, ref, watch, onMounted } from 'vue'
+import emailApi from '@/api/system-settings/email-setting'
+import type { FormInstance, FormRules } from 'element-plus'
 
-import {MsgSuccess} from '@/utils/message'
-import {t} from '@/locales'
+import { MsgSuccess } from '@/utils/message'
+import { t } from '@/locales'
 
 const form = ref<any>({
   email_host: '',
@@ -80,7 +79,7 @@ const form = ref<any>({
   email_host_password: '',
   email_use_tls: false,
   email_use_ssl: false,
-  from_email: ''
+  from_email: '',
 })
 
 const emailFormRef = ref()
@@ -89,20 +88,20 @@ const loading = ref(false)
 
 const rules = reactive<FormRules<any>>({
   email_host: [
-    {required: true, message: t('views.system.email.smtpHostPlaceholder'), trigger: 'blur'}
+    { required: true, message: t('views.system.email.smtpHostPlaceholder'), trigger: 'blur' },
   ],
   email_port: [
-    {required: true, message: t('views.system.email.smtpPortPlaceholder'), trigger: 'blur'}
+    { required: true, message: t('views.system.email.smtpPortPlaceholder'), trigger: 'blur' },
   ],
   email_host_user: [
-    {required: true, message: t('views.system.email.smtpUserPlaceholder'), trigger: 'blur'}
+    { required: true, message: t('views.system.email.smtpUserPlaceholder'), trigger: 'blur' },
   ],
   email_host_password: [
-    {required: true, message: t('views.system.email.smtpPasswordPlaceholder'), trigger: 'blur'}
+    { required: true, message: t('views.system.email.smtpPasswordPlaceholder'), trigger: 'blur' },
   ],
   from_email: [
-    {required: true, message: t('views.system.email.sendEmailPlaceholder'), trigger: 'blur'}
-  ]
+    { required: true, message: t('views.system.email.sendEmailPlaceholder'), trigger: 'blur' },
+  ],
 })
 
 const submit = async (formEl: FormInstance | undefined, test?: string) => {
@@ -136,8 +135,10 @@ onMounted(() => {
 </script>
 <style lang="scss" scoped>
 .email-setting {
-  width: 70%;
-  margin: 0 auto;
+  &__main {
+    width: 70%;
+    margin: 0 auto;
+  }
 
   :deep(.el-checkbox__label) {
     font-weight: 400;

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { cloneDeep } from 'lodash'
 import { useElementPlusTheme } from 'use-element-plus-theme'
-import ThemeApi from '@/api/systemSettings/theme'
+import ThemeApi from '@/api/system-settings/theme'
 import type {Ref} from "vue";
 export interface themeStateTypes {
   themeInfo: any

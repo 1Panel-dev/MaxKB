@@ -46,7 +46,7 @@ const systemRouter = {
       component: () => import('@/views/role/index.vue'),
     },
     {
-      path:'/system/setting',
+      path: '/system/setting',
       name: 'setting',
       meta: {
         icon: 'app-setting',
@@ -58,13 +58,13 @@ const systemRouter = {
       },
       children: [
         {
-          path: '/system/theme',
+          path: '/system/setting/theme',
           name: 'theme',
           meta: {
             title: 'views.system.theme.title',
-            activeMenu: '/setting',
-            parentPath: '/setting',
-            parentName: 'setting',
+            activeMenu: '/system',
+            parentPath: '/system',
+            parentName: 'system',
             //permission: new ComplexPermission(['ADMIN'], ['x-pack'], 'AND')
           },
           component: () => import('@/views/theme/index.vue'),
@@ -74,27 +74,27 @@ const systemRouter = {
           name: 'authentication',
           meta: {
             title: 'views.system.authentication.title',
-            activeMenu: '/setting',
-            parentPath: '/setting',
-            parentName: 'setting',
+            activeMenu: '/system',
+            parentPath: '/system',
+            parentName: 'system',
             //permission: new ComplexPermission(['ADMIN'], ['x-pack'], 'AND')
           },
-          component: () => import('@/views/authentication/index.vue')
+          component: () => import('@/views/authentication/index.vue'),
         },
         {
           path: '/system/email',
           name: 'email',
           meta: {
             title: 'views.system.email.title',
-            activeMenu: '/setting',
-            parentPath: '/setting',
-            parentName: 'setting',
+            activeMenu: '/system',
+            parentPath: '/system',
+            parentName: 'system',
             //permission: new Role('ADMIN')
           },
-          component: () => import('@/views/email/index.vue')
-        }
-      ]
-    }
+          component: () => import('@/views/email/index.vue'),
+        },
+      ],
+    },
   ],
 }
 

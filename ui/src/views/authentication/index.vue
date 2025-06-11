@@ -1,6 +1,7 @@
 <template>
   <div class="authentication-setting p-16-24">
-    <h4>{{ $t('views.system.authentication.title') }}</h4>
+    <h4 class="mb-16">{{ $t('views.system.authentication.title') }}</h4>
+
     <el-tabs v-model="activeName" class="mt-4" @tab-click="handleClick">
       <template v-for="(item, index) in tabList" :key="index">
         <el-tab-pane :label="item.label" :name="item.name">
@@ -29,28 +30,28 @@ const tabList = [
   {
     label: t('views.system.authentication.ldap.title'),
     name: 'LDAP',
-    component: LDAP
+    component: LDAP,
   },
   {
     label: t('views.system.authentication.cas.title'),
     name: 'CAS',
-    component: CAS
+    component: CAS,
   },
   {
     label: t('views.system.authentication.oidc.title'),
     name: 'OIDC',
-    component: OIDC
+    component: OIDC,
   },
   {
     label: t('views.system.authentication.oauth2.title'),
     name: 'OAuth2',
-    component: OAuth2
+    component: OAuth2,
   },
   {
     label: t('views.system.authentication.scanTheQRCode.title'),
     name: 'SCAN',
-    component: SCAN
-  }
+    component: SCAN,
+  },
 ]
 
 function handleClick() {}

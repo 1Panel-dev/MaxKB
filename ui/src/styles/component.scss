@@ -150,3 +150,26 @@
     padding: calc(var(--app-base-px) + 4px) calc(var(--app-base-px) * 2);
   }
 }
+
+// radio-button-group
+.app-radio-button-group {
+  border: 1px solid var(--app-border-color-dark);
+  border-radius: var(--el-border-radius-base);
+  .el-radio-button {
+    padding: 3px;
+  }
+  .el-radio-button__inner {
+    border: none !important;
+    border-radius: var(--el-border-radius-base) !important;
+    padding: 5px 8px;
+    font-weight: 400;
+  }
+  .el-radio-button__original-radio:checked + .el-radio-button__inner {
+    color: var(--el-color-primary) !important;
+    background: var(--el-color-primary-light-9) !important;
+    border: none !important;
+    box-shadow: none !important;
+    font-weight: 500;
+  }
+}
+

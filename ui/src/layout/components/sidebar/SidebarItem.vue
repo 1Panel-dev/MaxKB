@@ -88,7 +88,7 @@ const menuIcon = computed(() => {
     }
   }
   :deep(.el-sub-menu__title) {
-    padding: 13px 12px 13px 16px !important;
+    padding: 13px 12px 13px 10px !important;
     &:hover {
       background: none;
       color: var(--el-color-primary);

@@ -95,7 +95,7 @@ const fileURL = computed(() => {
   }
 
   .header {
-    background: var(--el-disabled-bg-color);
+    background: #eceeef;
     height: 38px;
     border-radius: 4px 4px 0 0;
     position: relative;

@@ -89,7 +89,7 @@
 import { reactive, ref, onMounted } from 'vue'
 import { copyClick } from '@/utils/clipboard'
 import EditModel from './EditModal.vue'
-import platformApi from '@/api/systemSettings/platform-source'
+import platformApi from '@/api/system-settings/platform-source'
 import { MsgError, MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
 
