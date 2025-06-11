@@ -184,6 +184,10 @@ class Role:
     def __eq__(self, other):
         return str(self) == str(other)
 
+    def get_workspace_role(self):
+        return lambda r, kwargs: Role(self.name, self.decs, self.group,
+                                      resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}")
+
 
 class RoleConstants(Enum):
     ADMIN = Role("ADMIN", '超级管理员', RoleGroup.SYSTEM_USER)

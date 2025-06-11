@@ -19,7 +19,8 @@ from common.constants.authentication_type import AuthenticationType
 from common.constants.cache_version import Cache_Version
 from common.constants.permission_constants import Auth, PermissionConstants, ResourcePermissionGroup, \
     get_permission_list_by_resource_group, ResourceAuthType, \
-    ResourcePermissionRole, get_default_role_permission_mapping_list, get_default_workspace_user_role_mapping_list
+    ResourcePermissionRole, get_default_role_permission_mapping_list, get_default_workspace_user_role_mapping_list, \
+    RoleConstants
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.exception.app_exception import AppAuthenticationFailed
 from common.utils.common import group_by
@@ -48,6 +49,18 @@ def get_workspace_permission(permission_id, workspace_id):
     if isinstance(permission_id, PermissionConstants):
         permission_id = permission_id.value
     return f"{permission_id}:/WORKSPACE/{workspace_id}"
+
+
+def get_role_permission(role, workspace_id):
+    """
+    获取工作空间角色
+    @param role:  角色
+    @param workspace_id: 工作空间id
+    @return:
+    """
+    if isinstance(role, RoleConstants):
+        role = role.value
+    return f"{role}:/WORKSPACE/{workspace_id}"
 
 
 def get_workspace_permission_list(role_permission_mapping_dict, workspace_user_role_mapping_list):
@@ -212,7 +225,7 @@ def get_role_list(user,
                        workspace_user_role_mapping_list] + [user.role], version=version)
         else:
             cache.set(key, [user.role], version=version)
-            return [user.role]
+            return [user.role, get_role_permission(RoleConstants.WORKSPACE_MANAGE, 'default')]
     return workspace_list
 
 
