@@ -1,7 +1,7 @@
 import { get, post, del } from '@/request/index'
 import type { Ref } from 'vue'
 import { Result } from '@/request/Result'
-import type { RoleItem, RolePermissionItem, CreateOrUpdateParams, RoleMemberItem, CreateMemberParams } from '@/api/type/role'
+import type { RoleItem, RolePermissionItem, CreateOrUpdateParams, PageList, RoleMemberItem, CreateMemberParamsItem } from '@/api/type/role'
 import { RoleTypeEnum } from '@/enums/system'
 import type { pageRequest } from '@/api/type/common'
 
@@ -66,7 +66,7 @@ const getRoleMemberList: (
   page: pageRequest,
   param: any,
   loading?: Ref<boolean>,
-) => Promise<Result<RoleMemberItem>> = (role_id, page, param, loading) => {
+) => Promise<Result<PageList<RoleMemberItem[]>>> = (role_id, page, param, loading) => {
   return get(
     `${prefix}/${role_id}/user_list/${page.current_page}/${page.page_size}`,
     param,
@@ -79,7 +79,7 @@ const getRoleMemberList: (
  */
 const CreateMember: (
   role_id: string,
-  data: CreateMemberParams,
+  data: { members: CreateMemberParamsItem[] },
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (role_id, data, loading) => {
   return post(`${prefix}/${role_id}/add_member`, data, undefined, loading)

@@ -1,5 +1,5 @@
 import { RoleTypeEnum } from '@/enums/system'
-
+import type { FormItemRule } from 'element-plus'
 interface RoleItem {
   id: string,
   role_name: string,
@@ -49,8 +49,27 @@ interface RoleMemberItem {
   workspace_name: string,
 }
 
-interface CreateMemberParams {
-  members: { user_ids: string[], workspace_ids: string[] }[]
+interface CreateMemberParamsItem {
+  user_ids: string[],
+  workspace_ids: string[]
 }
 
-export type { RoleItem, RolePermissionItem, RoleTableDataItem, CreateOrUpdateParams, ChildrenPermissionItem, RoleMemberItem, CreateMemberParams }
+interface PageList<T> {
+  current: number,
+  size: number,
+  total: number,
+  records: T
+}
+
+type Arrayable<T> = T | T[]
+interface FormItemModel {
+  path: string
+  label?: string
+  rules?: Arrayable<FormItemRule>,
+  selectProps: {
+    options?: { label: string, value: string }[]
+    placeholder?: string
+  }
+}
+
+export type { RoleItem, FormItemModel, RolePermissionItem, RoleTableDataItem, CreateOrUpdateParams, PageList, ChildrenPermissionItem, RoleMemberItem, CreateMemberParamsItem }

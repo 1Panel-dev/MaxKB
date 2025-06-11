@@ -17,12 +17,10 @@
       <el-table-column prop="nick_name" :label="$t('views.userManage.form.nick_name.label')" />
       <el-table-column prop="username" :label="$t('views.userManage.form.username.label')" />
       <el-table-column prop="workspace_name" :label="$t('views.role.member.workspace')" />
-      <!-- TODO -->
-      <el-table-column prop="nick_name" :label="$t('views.role.member.role')" />
       <el-table-column :label="$t('common.operation')" width="100" fixed="right">
         <template #default="{ row }">
-          <el-tooltip effect="dark" :content="`${$t('common.create')}${$t('views.role.customRole')}`" placement="top">
-            <el-button type="primary" text @click.stop="handleDelete(row)" :title="$t('common.edit')">
+          <el-tooltip effect="dark" :content="`${$t('views.role.member.delete.button')}`" placement="top">
+            <el-button type="primary" text @click.stop="handleDelete(row)">
               <el-icon>
                 <EditPen />
               </el-icon>
@@ -32,7 +30,7 @@
       </el-table-column>
     </app-table>
   </div>
-  <!-- <AddMemberDrawer ref="addMemberDrawerRef" /> -->
+  <AddMemberDrawer ref="addMemberDrawerRef" :role-id="props.currentRole?.id as string" @refresh="getList" />
 </template>
 
 <script setup lang="ts">
@@ -41,6 +39,7 @@ import RoleApi from '@/api/system/role'
 import type { RoleItem, RoleMemberItem } from '@/api/type/role'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { t } from '@/locales'
+import AddMemberDrawer from './AddMemberDrawer.vue'
 
 const props = defineProps<{
   currentRole?: RoleItem
@@ -66,7 +65,8 @@ async function getList() {
       [searchType.value]: searchForm.value[searchType.value],
     }
     const res = await RoleApi.getRoleMemberList(props.currentRole?.id as string, paginationConfig, params, loading)
-    console.log('🤔️ =>', res);
+    tableData.value = res.data.records
+    paginationConfig.total = res.data.total
   } catch (error) {
     console.error(error)
   }
@@ -85,8 +85,9 @@ watch(() => props.currentRole?.id, () => {
   getList()
 })
 
-// TODO
+const addMemberDrawerRef = ref<InstanceType<typeof AddMemberDrawer>>()
 function handleAdd() {
+  addMemberDrawerRef.value?.open();
 }
 
 function handleDelete(row: RoleMemberItem) {

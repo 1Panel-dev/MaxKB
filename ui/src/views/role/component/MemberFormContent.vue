@@ -1,0 +1,72 @@
+<template>
+  <el-form :model="form" ref="formRef" label-position="top" require-asterisk-position="right">
+    <el-scrollbar>
+      <div v-for="(element, index) in form" :key="index" class="flex w-full">
+        <el-form-item v-for="model of props.models" :key="model.path" :prop="`[${index}].${model.path}`"
+          :rules="model.rules" :label="index === 0 && model.label ? model.label : ''" class="mr-8" style="flex: 1">
+          <el-select v-model="element[model.path]"
+            :placeholder="model.selectProps.placeholder ?? $t('common.selectPlaceholder')" clearable filterable multiple
+            style="width: 100%">
+            <el-option v-for="opt in model.selectProps.options" :key="opt.value" :label="opt.label"
+              :value="opt.value" />
+          </el-select>
+        </el-form-item>
+        <!-- 删除按钮 -->
+        <el-button @click="handleDelete(index)"
+          :style="{ 'margin-top': index === 0 && props.models.some((item) => item.label) ? '30px' : '' }">
+          <el-icon>
+            <Delete />
+          </el-icon>
+        </el-button>
+      </div>
+    </el-scrollbar>
+
+    <!-- 添加按钮 -->
+    <el-button type="primary" text class="mt-2" @click="handleAdd">
+      <el-icon class="mr-4">
+        <Plus />
+      </el-icon>
+      {{ $t('views.role.member.add') }}
+    </el-button>
+  </el-form>
+</template>
+
+<script setup lang="ts">
+import { ref, watch } from 'vue'
+import type { FormItemModel } from '@/api/type/role'
+
+const props = defineProps<{
+  models: FormItemModel[];
+}>()
+
+const formRef = ref()
+const formItem: Record<string, any> = {};
+const form = defineModel<Record<string, any>[]>('form', {
+  default: [],
+});
+
+function handleAdd() {
+  form.value.push({ ...formItem });
+}
+
+watch(() => props.models, () => {
+  props.models.forEach((e) => {
+    formItem[e.path] = [];
+  });
+  handleAdd();
+}, { immediate: true })
+
+function handleDelete(index: number) {
+  form.value.splice(index, 1);
+}
+
+const validate = () => {
+  if (formRef.value) {
+    return formRef.value?.validate()
+  }
+  return Promise.resolve()
+}
+
+defineExpose({ validate })
+
+</script>

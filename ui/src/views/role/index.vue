@@ -69,7 +69,7 @@
                           <el-dropdown-item @click.stop="createOrUpdateRole(row)" class="p-8"> {{ $t('common.rename') }}
                           </el-dropdown-item>
                           <el-dropdown-item @click.stop="deleteRole(row)" class="border-t p-8"> {{ $t('common.delete')
-                            }}
+                          }}
                           </el-dropdown-item>
                         </el-dropdown-menu>
                       </template>
@@ -85,12 +85,13 @@
         </div>
 
         <!-- 右边 -->
-        <div class="role-right">
+        <div class="role-right" v-loading="loading">
           <div class="flex-between mb-16 p-24 pb-0">
             <div class="flex align-center">
               <span>
                 {{ currentRole?.role_name }}
-                <span v-if="currentRole?.type" class="color-input-placeholder ml-4">({{ roleTypeMap[currentRole?.type as
+                <span v-if="currentRole?.type && !currentRole.internal" class="color-input-placeholder ml-4">({{
+                  roleTypeMap[currentRole?.type as
                   RoleTypeEnum] }})
                 </span>
               </span>

@@ -26,7 +26,15 @@ const getProfile: (loading?: Ref<boolean>) => Promise<Result<any>> = (loading) =
 //   return get('/profile', undefined, loading)
 // }
 
+/**
+ * 获取全部用户
+ */
+const getUserList: (loading?: Ref<boolean>) => Promise<Result<Record<string, any>[]>> = (loading) => {
+  return get('/user/list', undefined, loading)
+}
+
 export default {
   getUserProfile,
-  getProfile
+  getProfile,
+  getUserList
 }
