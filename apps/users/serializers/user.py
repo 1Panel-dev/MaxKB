@@ -416,6 +416,34 @@ class UserManageSerializer(serializers.Serializer):
         users = User.objects.filter(id__in=user_ids).values('id', 'nick_name')
         return list(users)
 
+    def get_user_members(self, workspace_id):
+        """
+        获取工作空间成员列表
+        :param workspace_id: 工作空间ID
+        :return: 成员列表
+        """
+        role_model = DatabaseModelManage.get_model("role_model")
+        user_role_relation_model = DatabaseModelManage.get_model("workspace_user_role_mapping")
+
+        if user_role_relation_model and role_model:
+            user_role_relations = (
+                user_role_relation_model.objects
+                .filter(workspace_id=workspace_id)
+                .exclude(role__id='workspace_admin')
+                .select_related('role', 'user')  # 预加载外键数据
+                .distinct('user_id')
+            )
+            return [
+                {
+                    'id': relation.user.id,
+                    'nick_name': relation.user.nick_name,
+                    'email': relation.user.email,
+                    'role': relation.role.name
+                }
+                for relation in user_role_relations
+            ]
+        return []
+
     class BatchDelete(serializers.Serializer):
         ids = serializers.ListField(required=True, label=_('User IDs'))
 

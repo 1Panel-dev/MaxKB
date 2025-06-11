@@ -110,6 +110,20 @@ class WorkspaceUserListView(APIView):
         return result.success(UserManageSerializer().get_user_list(workspace_id))
 
 
+class WorkspaceUserMemberView(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(methods=['GET'],
+                   summary=_("Get user member under workspace"),
+                   description=_("Get user member under workspace"),
+                   operation_id=_("Get user member under workspace"),  # type: ignore
+                   tags=[_("User Management")],  # type: ignore
+                   parameters=WorkspaceUserAPI.get_parameters(),
+                   responses=WorkspaceUserAPI.get_response())
+    def get(self, request: Request, workspace_id):
+        return result.success(UserManageSerializer().get_user_members(workspace_id))
+
+
 class UserManage(APIView):
     authentication_classes = [TokenAuth]
 

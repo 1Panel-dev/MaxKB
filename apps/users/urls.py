@@ -16,6 +16,8 @@ urlpatterns = [
     path("user/current/reset_password", views.ResetCurrentUserPasswordView.as_view(), name="reset_password_current"),
     path('workspace/<str:workspace_id>/user_list', views.WorkspaceUserListView.as_view(),
          name="test_workspace_id_permission"),
+    path('workspace/<str:workspace_id>/user_member',views.WorkspaceUserMemberView.as_view(),
+         name="test_workspace_id_permission"),
     path('workspace/<str:workspace_id>/user/profile', views.TestWorkspacePermissionUserView.as_view(),
          name="test_workspace_id_permission"),
     path("user_manage", views.UserManage.as_view(), name="user_manage"),
