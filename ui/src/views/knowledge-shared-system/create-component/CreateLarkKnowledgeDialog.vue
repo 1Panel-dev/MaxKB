@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="$t('views.knowledge.knowledgeType.createGeneralKnowledge')"
+    :title="$t('views.knowledge.knowledgeType.createLarkKnowledge')"
     v-model="dialogVisible"
     width="720"
     append-to-body
@@ -16,34 +16,13 @@
       label-position="top"
       require-asterisk-position="right"
     >
-      <el-form-item
-        :label="$t('views.knowledge.form.source_url.label')"
-        prop="source_url"
-        v-if="datasetForm.type === '1'"
-      >
-        <el-input
-          v-model="datasetForm.source_url"
-          :placeholder="$t('views.knowledge.form.source_url.placeholder')"
-          @blur="datasetForm.source_url = datasetForm.source_url.trim()"
-        />
-      </el-form-item>
-      <el-form-item
-        :label="$t('views.knowledge.form.selector.label')"
-        v-if="datasetForm.type === '1'"
-      >
-        <el-input
-          v-model="datasetForm.selector"
-          :placeholder="$t('views.knowledge.form.selector.placeholder')"
-          @blur="datasetForm.selector = datasetForm.selector.trim()"
-        />
-      </el-form-item>
-      <el-form-item label="App ID" prop="app_id" v-if="datasetForm.type === '2'">
+      <el-form-item label="App ID" prop="app_id">
         <el-input
           v-model="datasetForm.app_id"
           :placeholder="$t('views.application.applicationAccess.larkSetting.appIdPlaceholder')"
         />
       </el-form-item>
-      <el-form-item label="App Secret" prop="app_secret" v-if="datasetForm.type === '2'">
+      <el-form-item label="App Secret" prop="app_secret">
         <el-input
           v-model="datasetForm.app_secret"
           type="password"
@@ -51,25 +30,9 @@
           :placeholder="$t('views.application.applicationAccess.larkSetting.appSecretPlaceholder')"
         />
       </el-form-item>
-      <el-form-item label="Folder Token" prop="folder_token" v-if="datasetForm.type === '2'">
+      <el-form-item label="Folder Token" prop="folder_token">
         <el-input
           v-model="datasetForm.folder_token"
-          :placeholder="
-            $t('views.application.applicationAccess.larkSetting.folderTokenPlaceholder')
-          "
-        />
-      </el-form-item>
-      <el-form-item label="User ID" prop="user_id" v-if="datasetForm.type === '3'">
-        <el-input
-          v-model="datasetForm.user_id"
-          :placeholder="
-            $t('views.application.applicationAccess.larkSetting.folderTokenPlaceholder')
-          "
-        />
-      </el-form-item>
-      <el-form-item label="Token" prop="token" v-if="datasetForm.type === '3'">
-        <el-input
-          v-model="datasetForm.token"
           :placeholder="
             $t('views.application.applicationAccess.larkSetting.folderTokenPlaceholder')
           "
