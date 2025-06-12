@@ -55,6 +55,8 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import LoginContainer from '@/layout/login-layout/LoginContainer.vue'
+import LoginLayout from '@/layout/login-layout/LoginLayout.vue'
 import type { ResetPasswordRequest } from '@/api/type/user'
 import { useRouter, useRoute } from 'vue-router'
 import { MsgSuccess } from '@/utils/message'

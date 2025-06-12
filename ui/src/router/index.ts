@@ -25,8 +25,8 @@ router.beforeEach(
       return
     }
     const { user, login } = useStore()
-    const notAuthRouteNameList = ['register', 'login', 'forgot_password', 'reset_password', 'Chat']
 
+    const notAuthRouteNameList = ['login', 'ForgotPassword', 'ResetPassword', 'Chat', 'UserLogin']
     if (!notAuthRouteNameList.includes(to.name ? to.name.toString() : '')) {
       if (to.query && to.query.token) {
         localStorage.setItem('token', to.query.token.toString())

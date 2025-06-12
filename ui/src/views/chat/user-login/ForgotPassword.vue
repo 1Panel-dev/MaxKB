@@ -1,5 +1,5 @@
 <template>
-  <login-layout>
+  <UserLoginLayout>
     <LoginContainer :subTitle="$t('theme.defaultSlogan')">
       <h2 class="mb-24">{{ $t('views.login.resetPassword') }}</h2>
       <el-form
@@ -15,7 +15,7 @@
               size="large"
               class="input-item"
               v-model="resetPasswordForm.password"
-                :placeholder="$t('views.login.loginForm.password.placeholder')"
+              :placeholder="$t('views.login.loginForm.password.placeholder')"
               show-password
             >
             </el-input>
@@ -51,13 +51,13 @@
         </el-button>
       </div>
     </LoginContainer>
-  </login-layout>
+  </UserLoginLayout>
 </template>
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import LoginContainer from '@/layout/login-layout/LoginContainer.vue'
-import LoginLayout from '@/layout/login-layout/LoginLayout.vue'
 import type { ResetPasswordRequest } from '@/api/type/user'
+import LoginContainer from '@/layout/login-layout/LoginContainer.vue'
+import UserLoginLayout from '@/layout/login-layout/UserLoginLayout.vue'
 import { useRouter, useRoute } from 'vue-router'
 import { MsgSuccess } from '@/utils/message'
 import type { FormInstance, FormRules } from 'element-plus'
@@ -66,13 +66,13 @@ import { t } from '@/locales'
 const router = useRouter()
 const route = useRoute()
 const {
-  params: { code, email }
+  params: { code, email },
 } = route
 const resetPasswordForm = ref<ResetPasswordRequest>({
   password: '',
   re_password: '',
   email: '',
-  code: ''
+  code: '',
 })
 
 onMounted(() => {
@@ -89,26 +89,26 @@ const rules = ref<FormRules<ResetPasswordRequest>>({
     {
       required: true,
       message: t('views.login.loginForm.re_password.requiredMessage'),
-      trigger: 'blur'
+      trigger: 'blur',
     },
     {
       min: 6,
       max: 20,
       message: t('views.login.loginForm.password.lengthMessage'),
-      trigger: 'blur'
-    }
+      trigger: 'blur',
+    },
   ],
   re_password: [
     {
       required: true,
       message: t('views.login.loginForm.re_password.requiredMessage'),
-      trigger: 'blur'
+      trigger: 'blur',
     },
     {
       min: 6,
       max: 20,
       message: t('views.login.loginForm.password.lengthMessage'),
-      trigger: 'blur'
+      trigger: 'blur',
     },
     {
       validator: (rule, value, callback) => {
@@ -118,9 +118,9 @@ const rules = ref<FormRules<ResetPasswordRequest>>({
           callback()
         }
       },
-      trigger: 'blur'
-    }
-  ]
+      trigger: 'blur',
+    },
+  ],
 })
 const resetPasswordFormRef = ref<FormInstance>()
 const loading = ref<boolean>(false)

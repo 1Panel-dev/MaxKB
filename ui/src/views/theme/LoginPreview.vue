@@ -53,8 +53,8 @@
 
 <script lang="ts" setup>
 import { computed } from 'vue'
-import LoginLayout from "@/views/login/components/LoginLayout.vue";
-import LoginContainer from "@/views/login/components/LoginContainer.vue";
+import LoginLayout from "@/layout/login-layout/LoginLayout.vue";
+import LoginContainer from "@/layout/login-layout/LoginContainer.vue";
 
 const props = defineProps({
   data: {

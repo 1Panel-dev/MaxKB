@@ -1,5 +1,5 @@
 <template>
-  <login-layout v-if="!loading" v-loading="loading">
+  <UserLoginLayout v-if="!loading" v-loading="loading">
     <LoginContainer :subTitle="theme.themeInfo?.slogan || $t('theme.defaultSlogan')">
       <h2 class="mb-24" v-if="!showQrCodeTab">{{ loginMode || $t('views.login.title') }}</h2>
       <div v-if="!showQrCodeTab">
@@ -45,8 +45,13 @@
                 >
                 </el-input>
 
-                <img :src="identifyCode" alt="" height="38" class="ml-8 cursor border border-r-4"
-                     @click="makeCode"/>
+                <img
+                  :src="identifyCode"
+                  alt=""
+                  height="38"
+                  class="ml-8 cursor border border-r-4"
+                  @click="makeCode"
+                />
               </div>
             </el-form-item>
           </div>
@@ -74,7 +79,7 @@
         </div>
       </div>
       <div v-if="showQrCodeTab">
-        <QrCodeTab :tabs="orgOptions"/>
+        <QrCodeTab :tabs="orgOptions" />
       </div>
       <div class="login-gradient-divider lighter mt-24" v-if="modeList.length > 1">
         <span>{{ $t('views.login.moreMethod') }}</span>
@@ -91,7 +96,7 @@
             <span
               :style="{
                 'font-size': item === 'OAUTH2' ? '8px' : '10px',
-                color: user.themeInfo?.theme
+                color: user.themeInfo?.theme,
               }"
               >{{ item }}</span
             >
@@ -117,27 +122,27 @@
         </template>
       </div>
     </LoginContainer>
-  </login-layout>
+  </UserLoginLayout>
 </template>
 <script setup lang="ts">
-import {onMounted, ref, onBeforeMount} from 'vue'
-import {useRoute, useRouter} from 'vue-router'
-import type {FormInstance, FormRules} from 'element-plus'
-import type {LoginRequest} from '@/api/type/login'
+import { onMounted, ref, onBeforeMount } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import type { FormInstance, FormRules } from 'element-plus'
+import type { LoginRequest } from '@/api/type/login'
 import LoginContainer from '@/layout/login-layout/LoginContainer.vue'
-import LoginLayout from '@/layout/login-layout/LoginLayout.vue'
+import UserLoginLayout from '@/layout/login-layout/UserLoginLayout.vue'
 import loginApi from '@/api/user/login'
 import authApi from '@/api/system-settings/auth-setting'
-import {t, getBrowserLang} from '@/locales'
+import { t, getBrowserLang } from '@/locales'
 import useStore from '@/stores'
-import {useI18n} from 'vue-i18n'
-import QrCodeTab from "@/views/login/scanCompinents/QrCodeTab.vue";
-import {MsgConfirm, MsgError} from "@/utils/message.ts";
+import { useI18n } from 'vue-i18n'
+import QrCodeTab from '@/views/login/scanCompinents/QrCodeTab.vue'
+import { MsgConfirm, MsgError } from '@/utils/message.ts'
 import * as dd from 'dingtalk-jsapi'
 import { loadScript } from '@/utils/utils'
 const router = useRouter()
-const {login, user, theme} = useStore()
-const {locale} = useI18n({useScope: 'global'})
+const { login, user, theme } = useStore()
+const { locale } = useI18n({ useScope: 'global' })
 const loading = ref<boolean>(false)
 
 const identifyCode = ref<string>('')
@@ -178,13 +183,13 @@ const loginHandle = () => {
     if (loginMode.value === 'LDAP') {
       login.asyncLdapLogin(loginForm.value, loading).then(() => {
         locale.value = localStorage.getItem('MaxKB-locale') || getBrowserLang() || 'en-US'
-        router.push({name: 'home'})
+        router.push({ name: 'home' })
       })
     } else {
       login.asyncLogin(loginForm.value, loading).then(() => {
         locale.value = localStorage.getItem('MaxKB-locale') || getBrowserLang() || 'en-US'
         localStorage.setItem('workspace_id', 'default')
-        router.push({name: 'home'})
+        router.push({ name: 'home' })
       })
     }
   })
@@ -231,7 +236,7 @@ function redirectAuth(authType: string) {
     MsgConfirm(t('views.login.jump_tip'), '', {
       confirmButtonText: t('views.login.jump'),
       cancelButtonText: t('common.cancel'),
-      confirmButtonClass: ''
+      confirmButtonClass: '',
     })
       .then(() => {
         if (!res.data.config_data) {
@@ -267,8 +272,7 @@ function redirectAuth(authType: string) {
           window.location.href = url
         }
       })
-      .catch(() => {
-      })
+      .catch(() => {})
   })
 }
 
@@ -283,7 +287,7 @@ function changeMode(val: string) {
   loginForm.value = {
     username: '',
     password: '',
-    captcha: ''
+    captcha: '',
   }
   redirectAuth(val)
   loginFormRef.value?.clearValidate()
@@ -319,7 +323,7 @@ onBeforeMount(() => {
                     ? t('views.system.authentication.scanTheQRCode.wecom')
                     : item === 'dingtalk'
                       ? t('views.system.authentication.scanTheQRCode.dingtalk')
-                      : t('views.system.authentication.scanTheQRCode.lark')
+                      : t('views.system.authentication.scanTheQRCode.lark'),
               })
             })
           }
@@ -363,13 +367,13 @@ onMounted(() => {
         },
         fail: (error: any) => {
           MsgError(error)
-        }
+        },
       })
     }
 
     loadScript('https://lf-scm-cn.feishucdn.com/lark/op/h5-js-sdk-1.5.35.js', {
       jsId: 'lark-sdk',
-      forceReload: true
+      forceReload: true,
     })
       .then(() => {
         if (window.tt) {
@@ -386,7 +390,7 @@ onMounted(() => {
               if (errno === 103) {
                 callRequestAuthCode()
               }
-            }
+            },
           })
         } else {
           callRequestAuthCode()

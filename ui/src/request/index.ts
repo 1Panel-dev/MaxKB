@@ -47,7 +47,7 @@ instance.interceptors.response.use(
         }
         if (
           !response.config.url.includes('/valid') &&
-          !response.config.url.includes('/function_lib/debug')
+          !response.config.url.includes('/tool/debug')
         ) {
           MsgError(response.data.message)
           return Promise.reject(response.data)
