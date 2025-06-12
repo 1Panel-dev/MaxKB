@@ -512,14 +512,6 @@ def update_user_role(instance, user):
 
 
 class RePasswordSerializer(serializers.Serializer):
-    email = serializers.EmailField(
-        required=True,
-        label=_("Email"),
-        validators=[validators.EmailValidator(message=ExceptionCodeConstants.EMAIL_FORMAT_ERROR.value.message,
-                                              code=ExceptionCodeConstants.EMAIL_FORMAT_ERROR.value.code)])
-
-    code = serializers.CharField(required=True, label=_("Verification code"))
-
     password = serializers.CharField(required=True, label=_("Password"),
                                      validators=[validators.RegexValidator(regex=re.compile(
                                          "^(?![a-zA-Z]+$)(?![A-Z0-9]+$)(?![A-Z_!@#$%^&*`~.()-+=]+$)(?![a-z0-9]+$)(?![a-z_!@#$%^&*`~()-+=]+$)"
@@ -541,28 +533,19 @@ class RePasswordSerializer(serializers.Serializer):
 
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)
-        email = self.data.get("email")
-        cache_code = cache.get(get_key(email + ':reset_password'), version=version)
         if self.data.get('password') != self.data.get('re_password'):
             raise AppApiException(ExceptionCodeConstants.PASSWORD_NOT_EQ_RE_PASSWORD.value.code,
                                   ExceptionCodeConstants.PASSWORD_NOT_EQ_RE_PASSWORD.value.message)
-        if cache_code != self.data.get('code'):
-            raise AppApiException(ExceptionCodeConstants.CODE_ERROR.value.code,
-                                  ExceptionCodeConstants.CODE_ERROR.value.message)
         return True
 
-    def reset_password(self):
+    def reset_password(self, user_id: str):
         """
         修改密码
         :return: 是否成功
         """
         if self.is_valid():
-            email = self.data.get("email")
-            QuerySet(User).filter(email=email).update(
+            QuerySet(User).filter(id=user_id).update(
                 password=password_encrypt(self.data.get('password')))
-            code_cache_key = email + ":reset_password"
-            # 删除验证码缓存
-            cache.delete(code_cache_key, version=version)
             return True
 
 

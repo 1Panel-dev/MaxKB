@@ -287,12 +287,11 @@ class RePasswordView(APIView):
                    request=ResetPasswordAPI.get_request(),
                    responses=DefaultModelResponse.get_response())
     @log(menu='User management', operate='Change password',
-         get_operation_object=lambda r, k: {'name': r.data.get('email', None)},
-         get_user=lambda r: {'user_name': None, 'email': r.data.get('email', None)},
+         get_operation_object=lambda r, k: {'name': r.user.username},
          get_details=get_re_password_details)
     def post(self, request: Request):
         serializer_obj = RePasswordSerializer(data=request.data)
-        return result.success(serializer_obj.reset_password())
+        return result.success(serializer_obj.reset_password(request.user.id))
 
 
 class SendEmail(APIView):
@@ -361,10 +360,8 @@ class ResetCurrentUserPasswordView(APIView):
          get_operation_object=lambda r, k: {'name': r.user.username},
          get_details=get_re_password_details)
     def post(self, request: Request):
-        data = {'email': request.user.email}
-        data.update(request.data)
-        serializer_obj = RePasswordSerializer(data=data)
-        if serializer_obj.reset_password():
+        serializer_obj = RePasswordSerializer(data=request.data)
+        if serializer_obj.reset_password(request.user.id):
             version, get_key = Cache_Version.TOKEN.value
             cache.delete(get_key(token=request.auth), version=version)
             return result.success(True)
