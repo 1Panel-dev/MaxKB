@@ -422,7 +422,7 @@ class ParagraphSerializers(serializers.Serializer):
                 raise AppApiException(500, _('The task is being executed, please do not send it again.'))
 
     class Migrate(serializers.Serializer):
-        workspace_id = serializers.UUIDField(required=True, label=_('workspace id'))
+        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
         knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
         document_id = serializers.UUIDField(required=True, label=_('document id'))
         target_knowledge_id = serializers.UUIDField(required=True, label=_('target knowledge id'))

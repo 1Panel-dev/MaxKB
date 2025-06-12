@@ -37,7 +37,7 @@ class ApplicationVersionEditSerializer(serializers.Serializer):
 
 
 class ApplicationVersionSerializer(serializers.Serializer):
-    workspace_id = serializers.UUIDField(required=False, label=_("Workspace ID"))
+    workspace_id = serializers.CharField(required=False, label=_("Workspace ID"))
 
     class Query(serializers.Serializer):
 
