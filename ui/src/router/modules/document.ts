@@ -27,9 +27,9 @@ const DocumentRouter = {
         title: 'views.problem.title',
         active: 'problem',
         parentPath: '/knowledge/:id/:folderId',
-        parentName: 'KnowledgeDetail'
+        parentName: 'KnowledgeDetail',
       },
-      component: () => import('@/views/problem/index.vue')
+      component: () => import('@/views/problem/index.vue'),
     },
     {
       path: 'hit-test',
@@ -39,9 +39,9 @@ const DocumentRouter = {
         title: 'views.application.hitTest.title',
         active: 'hit-test',
         parentPath: '/knowledge/:id/:folderId',
-        parentName: 'KnowledgeDetail'
+        parentName: 'KnowledgeDetail',
       },
-      component: () => import('@/views/hit-test/index.vue')
+      component: () => import('@/views/hit-test/index.vue'),
     },
     {
       path: 'setting',
@@ -52,10 +52,10 @@ const DocumentRouter = {
         title: 'common.setting',
         active: 'setting',
         parentPath: '/knowledge/:id/:folderId',
-        parentName: 'KnowledgeDetail'
+        parentName: 'KnowledgeDetail',
       },
-      component: () => import('@/views/knowledge/KnowledgeSetting.vue')
-    }
+      component: () => import('@/views/knowledge/KnowledgeSetting.vue'),
+    },
   ],
 }
 

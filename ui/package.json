@@ -20,6 +20,7 @@
     "@logicflow/core": "^2.0.15",
     "@logicflow/extension": "^2.0.20",
     "@vavt/cm-extension": "^1.9.1",
+    "@vueuse/core": "^13.3.0",
     "@wecom/jssdk": "^2.3.1",
     "axios": "^1.8.4",
     "cropperjs": "^2.0.0-rc.2",

@@ -7,9 +7,11 @@
         :currentNodeKey="currentFolder?.id"
         @handleNodeClick="folderClickHandel"
         class="p-8"
+        isShared
       />
     </template>
-    <ContentContainer :header="currentFolder?.name">
+    <SharedWorkspace v-if="currentFolder.id === 'share'"></SharedWorkspace>
+    <ContentContainer v-else :header="currentFolder?.name">
       <template #search>
         <div class="flex">
           <div class="flex-between complex-search">
@@ -176,6 +178,7 @@
                 <CardBox
                   :title="item.name"
                   :description="item.desc"
+                  :isShared="currentFolder.id === 'share'"
                   class="cursor"
                   @click="
                     router.push({ path: `/knowledge/${item.id}/${currentFolder.id}/document` })
@@ -282,6 +285,7 @@ import CreateWebKnowledgeDialog from './create-component/CreateWebKnowledgeDialo
 import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
 import GenerateRelatedDialog from '@/components/generate-related-dialog/index.vue'
 import KnowledgeApi from '@/api/knowledge/knowledge'
+import SharedWorkspace from '@/views/knowledge-shared-system/SharedWorkspace.vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import useStore from '@/stores'
 import { numberFormat } from '@/utils/common'
@@ -357,6 +361,7 @@ function getList() {
     folder_id: currentFolder.value?.id || localStorage.getItem('workspace_id'),
     [search_type.value]: search_form.value[search_type.value],
   }
+
   KnowledgeApi.getKnowledgeList(paginationConfig, params, loading).then((res) => {
     paginationConfig.total = res.data.total
     knowledgeList.value = [...knowledgeList.value, ...res.data.records]
@@ -375,6 +380,7 @@ function getFolder() {
 function folderClickHandel(row: any) {
   currentFolder.value = row
   knowledgeList.value = []
+  if (currentFolder.value.id === 'share') return
   getList()
 }
 
@@ -408,8 +414,8 @@ function deleteKnowledge(row: any) {
     `${t('views.knowledge.delete.confirmMessage1')} ${row.application_mapping_count} ${t('views.knowledge.delete.confirmMessage2')}`,
     {
       confirmButtonText: t('common.confirm'),
-      confirmButtonClass: 'danger'
-    }
+      confirmButtonClass: 'danger',
+    },
   )
     .then(() => {
       KnowledgeApi.delKnowledge(row.id, loading).then(() => {
@@ -420,7 +426,6 @@ function deleteKnowledge(row: any) {
     })
     .catch(() => {})
 }
-
 
 function refreshFolder() {
   getFolder()

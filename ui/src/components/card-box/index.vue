@@ -17,6 +17,7 @@
               </div>
             </slot>
             <slot name="subTitle"> </slot>
+            <div class="shared" v-if="isShared">{{t('views.system.shared')}}</div>
           </div>
           <div class="status-tag">
             <slot name="tag"> </slot>
@@ -60,8 +61,9 @@ const props = withDefaults(
      * 是否展示icon
      */
     showIcon?: boolean
+    isShared?: boolean
   }>(),
-  { title: t('common.title'), description: '', showIcon: true, border: true },
+  { title: t('common.title'), description: '', showIcon: true, border: true, isShared: false },
 )
 
 const show = ref(false)
@@ -100,6 +102,28 @@ function subHoveredEnter() {
       -webkit-line-clamp: 2;
       overflow: hidden;
     }
+  }
+
+  .shared {
+    position: absolute;
+    right: 20px;
+    top: 17px;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 20px;
+    color: #646a73;
+
+    &::after {
+        content: '';
+        background-color: #1f23291a;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 32px;
+        height: 20px;
+        border-radius: 4px;
+      }
   }
 
   .card-footer {

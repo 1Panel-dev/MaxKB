@@ -7,6 +7,18 @@
       clearable
       class="p-8"
     />
+    <div
+      @click="handleSharedNodeClick"
+      v-if="isShared"
+      class="shared-knowledge"
+      :class="currentNodeKey === 'share' && 'active'"
+    >
+      <AppIcon
+        :iconName="currentNodeKey === 'share' ? 'app-folder-share-active' : 'app-folder-share'"
+        style="font-size: 20px"
+      ></AppIcon>
+      <span class="name">{{ $t('views.system.share_knowledge') }}</span>
+    </div>
     <el-tree
       ref="treeRef"
       :data="data"
@@ -21,7 +33,7 @@
       <template #default="{ node, data }">
         <div class="custom-tree-node flex align-center">
           <AppIcon iconName="app-folder" style="font-size: 16px"></AppIcon>
-          <span class="ml-8" >{{ node.label }}</span>
+          <span class="ml-8">{{ node.label }}</span>
         </div>
       </template>
     </el-tree>
@@ -31,6 +43,7 @@
 <script lang="ts" setup>
 import { ref, watch } from 'vue'
 import type { TreeInstance } from 'element-plus'
+import { t } from '@/locales'
 defineOptions({ name: 'FolderTree' })
 const props = defineProps({
   data: {
@@ -41,10 +54,15 @@ const props = defineProps({
     type: String,
     default: 'root',
   },
+  isShared: {
+    type: Boolean,
+    default: false,
+  },
 })
 interface Tree {
   name: string
   children?: Tree[]
+  id?: string
 }
 
 const defaultProps = {
@@ -69,4 +87,48 @@ const filterNode = (value: string, data: Tree) => {
 const handleNodeClick = (data: Tree) => {
   emit('handleNodeClick', data)
 }
+
+const handleSharedNodeClick = () => {
+  treeRef.value?.setCurrentKey(null)
+  emit('handleNodeClick', { id: 'share', name: t('views.system.share_knowledge') })
+}
 </script>
+<style lang="scss" scoped>
+.shared-knowledge {
+  padding-left: 8px;
+  display: flex;
+  align-items: center;
+  height: 40px;
+  position: relative;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--app-text-color-light-1);
+    color: var(--el-menu-text-color);
+  }
+
+  &.active {
+    color: var(--el-color-primary);
+    background: var(--el-color-primary-light-9);
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    background-color: #1f232926;
+    left: 0;
+    width: 100%;
+    height: 1px;
+  }
+
+  .name {
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 22px;
+    margin-left: 8px;
+  }
+}
+</style>

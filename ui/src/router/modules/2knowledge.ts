@@ -19,7 +19,7 @@ const ModelRouter = {
       meta: { activeMenu: '/knowledge' },
       component: () => import('@/views/document/UploadDocument.vue'),
       hidden: true,
-    },
+    }
   ],
 }
 
