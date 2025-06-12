@@ -15,7 +15,7 @@
         :rules="{
           message: t('views.application.form.appName.requiredMessage'),
           trigger: 'blur',
-          required: true
+          required: true,
         }"
       >
         <el-input
@@ -86,9 +86,7 @@
       <el-form-item>
         <template #label>
           <div class="flex-between">
-            <span class="mr-4">{{
-              $t('views.application.form.voiceInput.label')
-            }}</span>
+            <span class="mr-4">{{ $t('views.application.form.voiceInput.label') }}</span>
             <div class="flex">
               <el-checkbox v-if="form_data.stt_model_enable" v-model="form_data.stt_autosend">{{
                 $t('views.application.form.voiceInput.autoSend')
@@ -115,9 +113,7 @@
       <el-form-item>
         <template #label>
           <div class="flex-between">
-            <span class="mr-4">{{
-              $t('views.application.form.voicePlay.label')
-            }}</span>
+            <span class="mr-4">{{ $t('views.application.form.voicePlay.label') }}</span>
             <div class="flex">
               <el-checkbox v-if="form_data.tts_model_enable" v-model="form_data.tts_autoplay">{{
                 $t('views.application.form.voicePlay.autoPlay')
@@ -133,14 +129,8 @@
         </template>
         <div class="w-full">
           <el-radio-group v-model="form_data.tts_type" v-show="form_data.tts_model_enable">
-            <el-radio
-              :label="$t('views.application.form.voicePlay.browser')"
-              value="BROWSER"
-            />
-            <el-radio
-              :label="$t('views.application.form.voicePlay.tts')"
-              value="TTS"
-            />
+            <el-radio :label="$t('views.application.form.voicePlay.browser')" value="BROWSER" />
+            <el-radio :label="$t('views.application.form.voicePlay.tts')" value="TTS" />
           </el-radio-group>
         </div>
         <div class="flex-between w-full">
@@ -183,6 +173,7 @@ import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'
 import applicationApi from '@/api/application/application'
+import modelAPI from '@/api/model/model.ts'
 import { MsgError, MsgSuccess, MsgWarning } from '@/utils/message'
 import { t } from '@/locales'
 import TTSModeParamSettingDialog from '@/views/application/component/TTSModeParamSettingDialog.vue'
@@ -191,7 +182,7 @@ import UserInputFieldTable from './component/UserInputFieldTable.vue'
 import FileUploadSettingDialog from '@/workflow/nodes/base-node/component/FileUploadSettingDialog.vue'
 
 const {
-  params: { id }
+  params: { id },
 } = app.config.globalProperties.$route as any
 
 const props = defineProps<{ nodeModel: any }>()
@@ -206,7 +197,7 @@ const FileUploadSettingDialogRef = ref<InstanceType<typeof FileUploadSettingDial
 const form = {
   name: '',
   desc: '',
-  prologue: t('views.application.form.defaultPrologue')
+  prologue: t('views.application.form.defaultPrologue'),
 }
 
 const wheel = (e: any) => {
@@ -234,7 +225,7 @@ const form_data = computed({
   },
   set: (value) => {
     set(props.nodeModel.properties, 'node_data', value)
-  }
+  },
 })
 
 const baseNodeFormRef = ref<FormInstance>()
@@ -247,13 +238,13 @@ const validate = () => {
   ) {
     return Promise.reject({
       node: props.nodeModel,
-      errMessage: t('views.application.form.voicePlay.requiredMessage')
+      errMessage: t('views.application.form.voicePlay.requiredMessage'),
     })
   }
   if (form_data.value.stt_model_enable && !form_data.value.stt_model_id) {
     return Promise.reject({
       node: props.nodeModel,
-      errMessage: t('views.application.form.voiceInput.requiredMessage')
+      errMessage: t('views.application.form.voiceInput.requiredMessage'),
     })
   }
   return baseNodeFormRef.value?.validate().catch((err) => {
@@ -262,13 +253,13 @@ const validate = () => {
 }
 
 function getSTTModel() {
-  applicationApi.getApplicationSTTModel(id).then((res: any) => {
+  modelAPI.getSTTModel().then((res: any) => {
     sttModelOptions.value = groupBy(res?.data, 'provider')
   })
 }
 
 function getTTSModel() {
-  applicationApi.getApplicationTTSModel(id).then((res: any) => {
+  modelAPI.getTTSModel().then((res: any) => {
     ttsModelOptions.value = groupBy(res?.data, 'provider')
   })
 }
@@ -316,7 +307,7 @@ const switchFileUpload = () => {
     audio: false,
     video: false,
     other: false,
-    otherExtensions: ['ppt', 'doc']
+    otherExtensions: ['ppt', 'doc'],
   }
 
   if (form_data.value.file_upload_enable) {

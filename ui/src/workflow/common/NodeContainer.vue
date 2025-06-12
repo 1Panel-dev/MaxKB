@@ -144,8 +144,8 @@
             {
               required: true,
               message: $t('common.inputPlaceholder'),
-              trigger: 'blur'
-            }
+              trigger: 'blur',
+            },
           ]"
         >
           <el-input v-model="form.title" @blur="form.title = form.title.trim()" />
@@ -176,7 +176,7 @@ import { MsgError, MsgConfirm } from '@/utils/message'
 import type { FormInstance } from 'element-plus'
 import { t } from '@/locales'
 const {
-  params: { id }
+  params: { id },
 } = app.config.globalProperties.$route as any
 
 const height = ref<{
@@ -186,14 +186,14 @@ const height = ref<{
 }>({
   stepContainerHeight: 0,
   inputContainerHeight: 0,
-  outputContainerHeight: 0
+  outputContainerHeight: 0,
 })
 const showAnchor = ref<boolean>(false)
 const anchorData = ref<any>()
 const titleFormRef = ref()
 const nodeNameDialogVisible = ref<boolean>(false)
 const form = ref<any>({
-  title: ''
+  title: '',
 })
 
 const condition = computed({
@@ -206,7 +206,7 @@ const condition = computed({
     }
     set(props.nodeModel.properties, 'condition', 'AND')
     return true
-  }
+  },
 })
 const showNode = computed({
   set: (v) => {
@@ -218,7 +218,7 @@ const showNode = computed({
     }
     set(props.nodeModel.properties, 'showNode', true)
     return true
-  }
+  },
 })
 
 const handleWheel = (event: any) => {
@@ -244,7 +244,7 @@ const editName = async (formEl: FormInstance | undefined) => {
     if (valid) {
       if (
         !props.nodeModel.graphModel.nodes?.some(
-          (node: any) => node.properties.stepName === form.value.title
+          (node: any) => node.properties.stepName === form.value.title,
         )
       ) {
         set(props.nodeModel.properties, 'stepName', form.value.title)
@@ -274,7 +274,7 @@ const copyNode = () => {
 const deleteNode = () => {
   MsgConfirm(t('common.tip'), t('views.applicationWorkflow.delete.confirmTitle'), {
     confirmButtonText: t('common.confirm'),
-    confirmButtonClass: 'danger'
+    confirmButtonClass: 'danger',
   }).then(() => {
     props.nodeModel.graphModel.deleteNode(props.nodeModel.id)
   })
@@ -295,13 +295,13 @@ function clickNodes(item: any) {
     type: item.type,
     properties: item.properties,
     x: anchorData.value?.x + width / 2 + 200,
-    y: anchorData.value?.y - item.height
+    y: anchorData.value?.y - item.height,
   })
   props.nodeModel.graphModel.addEdge({
     type: 'app-edge',
     sourceNodeId: props.nodeModel.id,
     sourceAnchorId: anchorData.value?.id,
-    targetNodeId: nodeModel.id
+    targetNodeId: nodeModel.id,
   })
 
   closeNodeMenu()
@@ -317,7 +317,7 @@ const nodeFields = computed(() => {
         label: field.label,
         value: field.value,
         globeLabel: `{{${props.nodeModel.properties.stepName}.${field.value}}}`,
-        globeValue: `{{context['${props.nodeModel.id}'].${field.value}}}`
+        globeValue: `{{context['${props.nodeModel.id}'].${field.value}}}`,
       }
     })
     return fields
@@ -363,5 +363,10 @@ onMounted(() => {
 }
 :deep(.el-card) {
   overflow: visible;
+}
+.app-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0px 2px 4px 0px rgba(31, 35, 41, 0.12);
 }
 </style>
