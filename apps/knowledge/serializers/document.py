@@ -89,7 +89,7 @@ class BatchCancelInstanceSerializer(serializers.Serializer):
 class DocumentInstanceSerializer(serializers.Serializer):
     name = serializers.CharField(required=True, label=_('document name'), max_length=128, min_length=1)
     paragraphs = ParagraphInstanceSerializer(required=False, many=True, allow_null=True)
-    source_file_id = serializers.UUIDField(required=True, label=_('source file id'))
+    source_file_id = serializers.UUIDField(required=False, allow_null=True, label=_('source file id'))
 
 
 class CancelInstanceSerializer(serializers.Serializer):
