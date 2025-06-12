@@ -723,7 +723,7 @@ function syncDocument(row: any) {
 function syncLarkDocument(row: any) {
   MsgConfirm(t('views.document.sync.confirmTitle'), t('views.document.sync.confirmMessage1'), {
     confirmButtonText: t('views.document.sync.label'),
-    confirmButtonClass: 'danger',
+    confirmButtonClass: 'color-danger',
   })
     .then(() => {
       documentApi.putLarkDocumentSync(id, row.id).then(() => {
@@ -737,7 +737,7 @@ function syncWebDocument(row: any) {
   if (row.meta?.source_url) {
     MsgConfirm(t('views.document.sync.confirmTitle'), t('views.document.sync.confirmMessage1'), {
       confirmButtonText: t('views.document.sync.label'),
-      confirmButtonClass: 'danger',
+      confirmButtonClass: 'color-danger',
     })
       .then(() => {
         documentApi.putDocumentSync(row.dataset_id, row.id).then(() => {
@@ -821,7 +821,7 @@ function deleteMulDocument() {
     t('views.document.delete.confirmMessage'),
     {
       confirmButtonText: t('common.confirm'),
-      confirmButtonClass: 'danger',
+      confirmButtonClass: 'color-danger',
     },
   )
     .then(() => {
@@ -857,7 +857,7 @@ function deleteDocument(row: any) {
     `${t('views.document.delete.confirmMessage1')} ${row.paragraph_count} ${t('views.document.delete.confirmMessage2')}`,
     {
       confirmButtonText: t('common.confirm'),
-      confirmButtonClass: 'danger',
+      confirmButtonClass: 'color-danger',
     },
   )
     .then(() => {

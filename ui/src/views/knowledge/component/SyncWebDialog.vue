@@ -23,7 +23,7 @@
         </el-radio>
       </el-card>
     </el-radio-group>
-    <p class="danger">{{ $t('views.knowledge.syncWeb.tip') }}</p>
+    <p class="color-danger">{{ $t('views.knowledge.syncWeb.tip') }}</p>
     <template #footer>
       <span class="dialog-footer">
         <el-button @click.prevent="dialogVisible = false"> {{ $t('common.cancel') }} </el-button>

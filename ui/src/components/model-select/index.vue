@@ -42,7 +42,7 @@
               class="model-icon mr-8"
             ></span>
             <span>{{ item.name }}</span>
-            <span class="danger">{{ $t('common.unavailable') }}</span>
+            <span class="color-danger">{{ $t('common.unavailable') }}</span>
           </div>
           <el-icon class="check-icon" v-if="item.id === modelValue">
             <Check />

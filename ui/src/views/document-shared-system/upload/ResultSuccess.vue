@@ -41,15 +41,15 @@
             </div>
           </div>
           <div>
-            <el-text type="info" class="mr-16"
+            <el-text type="color-info" class="mr-16"
               >{{ item && item?.paragraph_count }}
               {{ $t('views.knowledge.ResultSuccess.paragraph_count') }}</el-text
             >
             <el-text v-if="item.status === '1'">
-              <el-icon class="success"><SuccessFilled /></el-icon>
+              <el-icon class="color-success"><SuccessFilled /></el-icon>
             </el-text>
             <el-text v-else-if="item.status === '2'">
-              <el-icon class="danger"><CircleCloseFilled /></el-icon>
+              <el-icon class="color-danger"><CircleCloseFilled /></el-icon>
             </el-text>
             <el-text v-else-if="item.status === '0'">
               <el-icon class="is-loading primary"><Loading /></el-icon> {{ $t('views.knowledge.ResultSuccess.loading') }}...

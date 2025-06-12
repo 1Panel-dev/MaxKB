@@ -3,23 +3,23 @@
     <span> {{ taskTypeMap[status.type] }}：</span>
     <span>
       <el-text v-if="status.state === State.SUCCESS || status.state === State.REVOKED">
-        <el-icon class="success"><SuccessFilled /></el-icon>
+        <el-icon class="color-success"><SuccessFilled /></el-icon>
         {{ stateMap[status.state](status.type) }}
       </el-text>
       <el-text v-else-if="status.state === State.FAILURE">
-        <el-icon class="danger"><CircleCloseFilled /></el-icon>
+        <el-icon class="color-danger"><CircleCloseFilled /></el-icon>
         {{ stateMap[status.state](status.type) }}
       </el-text>
       <el-text v-else-if="status.state === State.STARTED">
-        <el-icon class="is-loading primary"><Loading /></el-icon>
+        <el-icon class="is-loading color-primary"><Loading /></el-icon>
         {{ stateMap[status.state](status.type) }}
       </el-text>
       <el-text v-else-if="status.state === State.PENDING">
-        <el-icon class="is-loading primary"><Loading /></el-icon>
+        <el-icon class="is-loading color-primary"><Loading /></el-icon>
         {{ stateMap[status.state](status.type) }}
       </el-text>
       <el-text v-else-if="status.state === State.REVOKE">
-        <el-icon class="is-loading primary"><Loading /></el-icon>
+        <el-icon class="is-loading color-primary"><Loading /></el-icon>
         {{ stateMap[status.state](status.type) }}
       </el-text>
     </span>

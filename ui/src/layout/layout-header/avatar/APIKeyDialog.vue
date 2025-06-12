@@ -113,7 +113,7 @@ function deleteApiKey(row: any) {
     {
       confirmButtonText: t('common.confirm'),
       cancelButtonText: t('common.cancel'),
-      confirmButtonClass: 'danger'
+      confirmButtonClass: 'color-danger'
     }
   )
     .then(() => {

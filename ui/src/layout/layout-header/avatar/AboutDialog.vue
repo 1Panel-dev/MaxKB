@@ -18,7 +18,7 @@
         <span class="label">{{ $t('layout.about.expiredTime') }}</span>
         <span
           >{{ licenseInfo?.expired || '-' }}
-          <span class="danger" v-if="licenseInfo?.expired && fromNowDate(licenseInfo?.expired)"
+          <span class="color-danger" v-if="licenseInfo?.expired && fromNowDate(licenseInfo?.expired)"
             >（{{ fromNowDate(licenseInfo?.expired) }}）</span
           ></span
         >

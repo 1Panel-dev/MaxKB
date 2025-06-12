@@ -373,8 +373,22 @@ h5 {
 }
 
 // 颜色
+
 .color-primary {
   color: var(--el-color-primary);
+}
+
+.color-danger {
+  color: var(--el-color-danger);
+}
+.color-warning {
+  color: var(--el-color-warning);
+}
+.color-success {
+  color: var(--el-color-success);
+}
+.color-info {
+  color: var(--el-color-info);
 }
 .color-text-primary {
   color: var(--el-text-color-primary);
@@ -382,9 +396,7 @@ h5 {
 .color-secondary {
   color: var(--app-text-color-secondary);
 }
-.color-success {
-  color: var(--el-color-success);
-}
+
 .color-input-placeholder {
   color: var(--app-input-color-placeholder);
 }

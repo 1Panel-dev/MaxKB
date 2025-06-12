@@ -33,7 +33,7 @@
                     <div class="flex-between">
                       <span
                         >{{ $t('views.application.form.appName.label') }}
-                        <span class="danger">*</span></span
+                        <span class="color-danger">*</span></span
                       >
                     </div>
                   </template>
@@ -118,7 +118,7 @@
                       >
                         <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
                       </el-tooltip>
-                      <span class="danger ml-4" v-if="applicationForm.model_id">*</span>
+                      <span class="color-danger ml-4" v-if="applicationForm.model_id">*</span>
                     </div>
                   </template>
 
@@ -233,7 +233,7 @@
                       >
                         <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
                       </el-tooltip>
-                      <span class="danger ml-4" v-if="applicationForm.model_id">*</span>
+                      <span class="color-danger ml-4" v-if="applicationForm.model_id">*</span>
                     </div>
                   </template>
 
@@ -290,7 +290,7 @@
                     <div class="flex-between">
                       <span class="mr-4">
                         {{ $t('views.application.form.voiceInput.label') }}
-                        <span class="danger" v-if="applicationForm.stt_model_enable">*</span>
+                        <span class="color-danger" v-if="applicationForm.stt_model_enable">*</span>
                       </span>
 
                       <div class="flex">
@@ -330,7 +330,7 @@
                       <span class="mr-4"
                         >{{ $t('views.application.form.voicePlay.label') }}
                         <span
-                          class="danger"
+                          class="color-danger"
                           v-if="
                             applicationForm.tts_type === 'TTS' && applicationForm.tts_model_enable
                           "
@@ -395,41 +395,6 @@
             {{ $t('views.application.appTest') }}
           </h4>
           <div class="dialog-bg">
-            <div class="flex align-center p-16 mb-8">
-              <div
-                class="edit-avatar mr-12"
-                @mouseenter="showEditIcon = true"
-                @mouseleave="showEditIcon = false"
-              >
-                <el-avatar
-                  v-if="isAppIcon(applicationForm?.icon)"
-                  shape="square"
-                  :size="32"
-                  style="background: none"
-                >
-                  <img :src="applicationForm?.icon" alt="" />
-                </el-avatar>
-                <el-avatar
-                  v-else-if="applicationForm?.name"
-                  :name="applicationForm?.name"
-                  pinyinColor
-                  shape="square"
-                  :size="32"
-                />
-                <el-avatar
-                  v-if="showEditIcon"
-                  shape="square"
-                  class="edit-mask"
-                  :size="32"
-                  @click="openEditAvatar"
-                >
-                  <el-icon><EditPen /></el-icon>
-                </el-avatar>
-              </div>
-              <h4>
-                {{ applicationForm?.name || $t('views.application.form.appName.label') }}
-              </h4>
-            </div>
             <div class="scrollbar-height">
               <AiChat :applicationDetails="applicationForm" :type="'debug-ai-chat'"></AiChat>
             </div>
@@ -768,7 +733,8 @@ onMounted(() => {
   }
 
   .scrollbar-height {
-    height: calc(var(--app-main-height) - 166px);
+    padding-top: 16px;
+    height: calc(var(--app-main-height) - 96px);
   }
 }
 

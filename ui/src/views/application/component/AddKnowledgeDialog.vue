@@ -1,37 +1,38 @@
 <template>
   <el-dialog
-    :title="$t('views.application.form.dialog.addDataset')"
+    :title="$t('views.application.dialog.addKnowledge')"
     v-model="dialogVisible"
-    width="600"
+    width="1000"
     append-to-body
-    class="addDataset-dialog"
+    class="addKnowledge-dialog"
     align-center
     :close-on-click-modal="false"
     :close-on-press-escape="false"
   >
     <template #header="{ titleId, titleClass }">
       <div class="flex-between mb-8">
-        <h4 :id="titleId" :class="titleClass">
-          {{ $t('views.application.form.dialog.addDataset') }}
-        </h4>
-        <div class="flex align-center mr-8">
-          <el-button link class="ml-16" @click="refresh">
-            <el-icon class="mr-4"><Refresh /></el-icon>{{ $t('common.refresh') }}
-          </el-button>
-          <el-divider direction="vertical" />
+        <div class="flex">
+          <h4 :id="titleId" :class="titleClass" class="mr-8">
+            {{ $t('views.application.dialog.addKnowledge') }}
+          </h4>
+          <el-text type="info">
+            {{ $t('views.application.dialog.addKnowledgePlaceholder') }}
+          </el-text>
         </div>
-      </div>
-      <div class="flex-between">
-        <el-text type="info" class="color-secondary">
-          {{ $t('views.application.form.dialog.addDatasetPlaceholder') }}
-        </el-text>
-        <el-input
-          v-model="searchValue"
-          :placeholder="$t('common.search')"
-          prefix-icon="Search"
-          class="w-240"
-          clearable
-        />
+
+        <div class="flex align-center mr-8">
+          <el-input
+            v-model="searchValue"
+            :placeholder="$t('common.search')"
+            prefix-icon="Search"
+            class="w-240 mr-8"
+            clearable
+          />
+          <el-divider direction="vertical" />
+          <el-button link class="mr-16" @click="refresh">
+            <el-icon class="mr-4" :size="18"><Refresh /></el-icon>
+          </el-button>
+        </div>
       </div>
     </template>
     <el-scrollbar>
@@ -49,8 +50,8 @@
       <div class="flex-between">
         <div class="flex">
           <el-text type="info" class="color-secondary mr-8" v-if="checkList.length > 0">
-            {{ $t('views.application.form.dialog.selected') }} {{ checkList.length }}
-            {{ $t('views.application.form.dialog.countDataset') }}
+            {{ $t('views.application.dialog.selected') }} {{ checkList.length }}
+            {{ $t('views.application.dialog.countDataset') }}
           </el-text>
           <el-button link type="primary" v-if="checkList.length > 0" @click="clearCheck">
             {{ $t('common.clear') }}
@@ -73,9 +74,9 @@ import { computed, ref, watch } from 'vue'
 const props = defineProps({
   data: {
     type: Array<any>,
-    default: () => []
+    default: () => [],
   },
-  loading: Boolean
+  loading: Boolean,
 })
 
 const emit = defineEmits(['addData', 'refresh'])
@@ -111,7 +112,7 @@ watch(searchValue, (val) => {
 function changeHandle() {
   if (checkList.value.length > 0) {
     currentEmbedding.value = props.data.filter(
-      (v) => v.id === checkList.value[0]
+      (v) => v.id === checkList.value[0],
     )[0].embedding_mode_id
   } else if (checkList.value.length === 0) {
     currentEmbedding.value = ''
@@ -127,7 +128,7 @@ const open = (checked: any) => {
   checkList.value = checked
   if (checkList.value.length > 0) {
     currentEmbedding.value = props.data.filter(
-      (v) => v.id === checkList.value[0]
+      (v) => v.id === checkList.value[0],
     )[0].embedding_mode_id
   }
 
@@ -145,20 +146,22 @@ const refresh = () => {
 defineExpose({ open })
 </script>
 <style lang="scss">
-.addDataset-dialog {
+.addKnowledge-dialog {
   padding: 0;
   .el-dialog__header {
-    padding: 24px 24px 8px 24px;
+    padding: 12px 20px 4px 24px;
+    border-bottom: 1px solid var(--el-border-color-light);
   }
   .el-dialog__body {
     padding: 8px !important;
   }
   .el-dialog__footer {
-    padding: 8px 24px 24px 24px;
+    padding: 0 24px 16px 24px;
   }
 
   .el-dialog__headerbtn {
-    top: 9px;
+    top: 6px;
+    right: 6px;
   }
   .max-height {
     max-height: calc(100vh - 260px);

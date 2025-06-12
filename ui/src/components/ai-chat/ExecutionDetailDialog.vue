@@ -38,10 +38,10 @@
                   >{{ item?.message_tokens + item?.answer_tokens }} tokens</span
                 >
                 <span class="mr-16 color-secondary">{{ item?.run_time?.toFixed(2) || 0.0 }} s</span>
-                <el-icon class="success" :size="16" v-if="item.status === 200">
+                <el-icon class="color-success" :size="16" v-if="item.status === 200">
                   <CircleCheck />
                 </el-icon>
-                <el-icon class="danger" :size="16" v-else>
+                <el-icon class="color-danger" :size="16" v-else>
                   <CircleClose />
                 </el-icon>
               </div>

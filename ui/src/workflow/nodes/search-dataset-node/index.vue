@@ -103,7 +103,7 @@
     <ParamSettingDialog ref="ParamSettingDialogRef" @refresh="refreshParam" />
     <AddDatasetDialog
       ref="AddDatasetDialogRef"
-      @addData="addDataset"
+      @addData="addKnowledge"
       :data="datasetList"
       @refresh="refresh"
       :loading="datasetLoading"
@@ -173,7 +173,7 @@ function removeDataset(id: any) {
   set(props.nodeModel.properties.node_data, 'dataset_id_list', list)
 }
 
-function addDataset(val: Array<string>) {
+function addKnowledge(val: Array<string>) {
   set(props.nodeModel.properties.node_data, 'dataset_id_list', val)
 }
 

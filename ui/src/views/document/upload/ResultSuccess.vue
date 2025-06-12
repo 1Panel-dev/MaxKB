@@ -1,6 +1,6 @@
 <template>
   <el-scrollbar>
-    <el-result icon="success" :title="`🎉 ${$t('views.knowledge.ResultSuccess.title')} 🎉`">
+    <el-result icon="color-success" :title="`🎉 ${$t('views.knowledge.ResultSuccess.title')} 🎉`">
       <template #sub-title>
         <div class="mt-8">
           <span class="bold">{{ data?.document_list.length || 0 }}</span>
@@ -46,10 +46,10 @@
               {{ $t('views.knowledge.ResultSuccess.paragraph_count') }}</el-text
             >
             <el-text v-if="item.status === '1'">
-              <el-icon class="success"><SuccessFilled /></el-icon>
+              <el-icon class="color-success"><SuccessFilled /></el-icon>
             </el-text>
             <el-text v-else-if="item.status === '2'">
-              <el-icon class="danger"><CircleCloseFilled /></el-icon>
+              <el-icon class="color-danger"><CircleCloseFilled /></el-icon>
             </el-text>
             <el-text v-else-if="item.status === '0'">
               <el-icon class="is-loading primary"><Loading /></el-icon> {{ $t('views.knowledge.ResultSuccess.loading') }}...

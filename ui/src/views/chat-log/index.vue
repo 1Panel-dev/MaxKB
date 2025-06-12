@@ -463,21 +463,6 @@ const handleSelectionChange = (val: any[]) => {
   multipleSelection.value = val
 }
 
-// function deleteLog(row: any) {
-//   MsgConfirm(`是否删除对话：${row.abstract} ?`, `删除后无法恢复，请谨慎操作。`, {
-//     confirmButtonText: t('common.delete'),
-//     confirmButtonClass: 'danger'
-//   })
-//     .then(() => {
-//       loading.value = true
-//       logApi.delChatLog(id as string, row.id, loading).then(() => {
-//         MsgSuccess(t('common.deleteSuccess'))
-//         getList()
-//       })
-//     })
-//     .catch(() => {})
-// }
-
 function getList() {
   let obj: any = {
     start_time: daterange.value.start_time,

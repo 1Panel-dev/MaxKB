@@ -211,3 +211,32 @@
     font-size: 20px;
   }
 }
+
+// el-form
+
+.el-form {
+  --el-form-inline-content-width: 100%;
+}
+
+.el-form-item {
+  margin-bottom: 16px;
+  .el-form-item {
+    margin-bottom: 16px;
+    &:last-child {
+      margin-bottom: 0px;
+    }
+  }
+}
+.el-form-item__label {
+  font-weight: 400;
+  width: 100%;
+}
+
+.el-form-item__error {
+  position: unset;
+  font-size: 14px;
+}
+
+.el-form--label-top .el-form-item .el-form-item__label {
+  padding-right: 0;
+}

@@ -16,23 +16,23 @@
     </template>
     <template #reference>
       <el-text v-if="aggStatus?.value === State.SUCCESS || aggStatus?.value === State.REVOKED">
-        <el-icon class="success"><SuccessFilled /></el-icon>
+        <el-icon class="color-success"><SuccessFilled /></el-icon>
         {{ stateMap[aggStatus.value](aggStatus.key) }}
       </el-text>
       <el-text v-else-if="aggStatus?.value === State.FAILURE">
-        <el-icon class="danger"><CircleCloseFilled /></el-icon>
+        <el-icon class="color-danger"><CircleCloseFilled /></el-icon>
         {{ stateMap[aggStatus.value](aggStatus.key) }}
       </el-text>
       <el-text v-else-if="aggStatus?.value === State.STARTED">
-        <el-icon class="is-loading primary"><Loading /></el-icon>
+        <el-icon class="is-loading color-primary"><Loading /></el-icon>
         {{ stateMap[aggStatus.value](aggStatus.key) }}
       </el-text>
       <el-text v-else-if="aggStatus?.value === State.PENDING">
-        <el-icon class="is-loading primary"><Loading /></el-icon>
+        <el-icon class="is-loading color-primary"><Loading /></el-icon>
         {{ stateMap[aggStatus.value](aggStatus.key) }}
       </el-text>
       <el-text v-else-if="aggStatus?.value === State.REVOKE">
-        <el-icon class="is-loading primary"><Loading /></el-icon>
+        <el-icon class="is-loading color-primary"><Loading /></el-icon>
         {{ stateMap[aggStatus.value](aggStatus.key) }}
       </el-text>
     </template>

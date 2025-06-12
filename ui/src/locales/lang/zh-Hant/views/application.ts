@@ -119,8 +119,8 @@ export default {
   },
 
   dialog: {
-    addDataset: '新增關聯知識庫',
-    addDatasetPlaceholder: '所選知識庫必須使用相同的 Embedding 模型',
+    addKnowledge: '新增關聯知識庫',
+    addKnowledgePlaceholder: '所選知識庫必須使用相同的 Embedding 模型',
     selected: '已選',
     countDataset: '個知識庫',
 

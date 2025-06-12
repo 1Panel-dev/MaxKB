@@ -128,8 +128,8 @@ export default {
     addModel: 'Add Model',
   },
   dialog: {
-    addDataset: 'Add Related Knowledge',
-    addDatasetPlaceholder: 'The selected knowledge must use the same embedding model',
+    addKnowledge: 'Add Related Knowledge',
+    addKnowledgePlaceholder: 'The selected knowledge must use the same embedding model',
     selected: 'Selected',
     countDataset: 'Knowledge',
 
