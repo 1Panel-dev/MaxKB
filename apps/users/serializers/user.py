@@ -677,7 +677,7 @@ class CheckCodeSerializer(serializers.Serializer):
 
 class SwitchLanguageSerializer(serializers.Serializer):
     user_id = serializers.UUIDField(required=True, label=_('user id'))
-    language = serializers.CharField(required=True, label=('language'))
+    language = serializers.CharField(required=True, label=_('language'))
 
     def switch(self):
         self.is_valid(raise_exception=True)
