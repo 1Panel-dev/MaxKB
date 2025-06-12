@@ -1,7 +1,8 @@
 <template>
   <UserLoginLayout v-if="!loading" v-loading="loading">
     <LoginContainer :subTitle="theme.themeInfo?.slogan || $t('theme.defaultSlogan')">
-      <h2 class="mb-24" v-if="!showQrCodeTab">{{ loginMode || $t('views.login.title') }}</h2>
+      <h2 class="mb-24" v-if="!showQrCodeTab">
+        {{ loginMode == 'LOCAL' ? $t('views.login.title') : loginMode }}</h2>
       <div v-if="!showQrCodeTab">
         <el-form
           class="login-form"
@@ -87,7 +88,7 @@
       <div class="text-center mt-16">
         <template v-for="item in modeList">
           <el-button
-            v-if="item !== '' && loginMode !== item && item !== 'QR_CODE'"
+            v-if="item !== 'LOCAL' && loginMode !== item && item !== 'QR_CODE'"
             circle
             :key="item"
             class="login-button-circle color-secondary"
@@ -111,13 +112,13 @@
             <img src="@/assets/scan/icon_qr_outlined.svg" width="25px"/>
           </el-button>
           <el-button
-            v-if="item === '' && loginMode !== ''"
+            v-if="item === 'LOCAL' && loginMode != 'LOCAL'"
             circle
             :key="item"
             class="login-button-circle color-secondary"
             style="font-size: 24px"
             icon="UserFilled"
-            @click="changeMode('')"
+            @click="changeMode('LOCAL')"
           />
         </template>
       </div>
@@ -208,7 +209,7 @@ onBeforeMount(() => {
   makeCode()
 })
 
-const modeList = ref<string[]>([''])
+const modeList = ref<string[]>([])
 //const QrList = ref<any[]>([''])
 const loginMode = ref('')
 const showQrCodeTab = ref(false)
@@ -279,7 +280,7 @@ function redirectAuth(authType: string, needMessage: boolean = false) {
 }
 
 function changeMode(val: string) {
-  loginMode.value = val === 'LDAP' ? val : ''
+  loginMode.value = val === 'LDAP' ? val : 'LOCAL'
   if (val === 'QR_CODE') {
     loginMode.value = val
     showQrCodeTab.value = true
@@ -315,7 +316,8 @@ onBeforeMount(() => {
               const [ldap] = res.splice(ldapIndex, 1)
               res.unshift(ldap)
             }
-            modeList.value = [...modeList.value, ...res]
+            modeList.value = [...modeList.value, ...res].filter((item => item !== ''))
+            loginMode.value = modeList.value[0] || 'LOCAL'
             console.log(modeList.value)
           }
         })
