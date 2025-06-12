@@ -43,7 +43,7 @@ class XlsxParseTableHandle(BaseParseTableHandle):
 
                 image = image_dict.get(cell_value, None)
                 if image is not None:
-                    cell_value = f'![](/api/image/{image.id})'
+                    cell_value = f'![](/oss/file/{image.id})'
 
                 # 使用标题作为键，单元格的值作为值存入字典
                 row_data[headers[col_idx]] = cell_value
@@ -110,7 +110,6 @@ class XlsxParseTableHandle(BaseParseTableHandle):
 
                 md_tables += md_table + '\n\n'
 
-                md_tables = md_tables.replace('/api/image/', '/oss/file/')
             return md_tables
         except Exception as e:
             max_kb.error(f'excel split handle error: {e}')

@@ -181,20 +181,6 @@ def write_image(zip_path: str, image_list: List[str]):
                     os.makedirs(os.path.dirname(file_path))
                 with open(os.path.join(zip_path, file_path), 'wb') as f:
                     f.write(file.get_bytes())
-            # else:
-            #     r = text.replace('(/api/image/', '').replace(')', '')
-            #     r = r.strip().split(" ")[0]
-            #     if not is_valid_uuid(r):
-            #         break
-            #     image_model = QuerySet(Image).filter(id=r).first()
-            #     if image_model is None:
-            #         break
-            #     zip_inner_path = os.path.join('api', 'image', r)
-            #     file_path = os.path.join(zip_path, zip_inner_path)
-            #     if not os.path.exists(os.path.dirname(file_path)):
-            #         os.makedirs(os.path.dirname(file_path))
-            #     with open(file_path, 'wb') as f:
-            #         f.write(image_model.image)
 
 
 def update_document_char_length(document_id: str):
@@ -221,7 +207,6 @@ def or_get(exists_problem_list, content, knowledge_id, document_id, paragraph_id
         problem = Problem(id=uuid.uuid7(), content=content, knowledge_id=knowledge_id)
         problem_content_dict[content] = problem, True
         return problem, document_id, paragraph_id
-
 
 
 def get_knowledge_operation_object(knowledge_id: str):

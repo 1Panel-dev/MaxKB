@@ -90,20 +90,20 @@ def get_image_list(result_list: list, zip_files: List[str]):
                         '/') else source_image_path)
                     if not zip_files.__contains__(image_path):
                         continue
-                    if image_path.startswith('api/file/') or image_path.startswith('api/image/'):
-                        image_id = image_path.replace('api/file/', '').replace('api/image/', '')
+                    if image_path.startswith('oss/file/') or image_path.startswith('oss/image/'):
+                        image_id = image_path.replace('oss/file/', '')
                         if is_valid_uuid(image_id):
                             image_file_list.append({'source_file': image_path,
                                                     'image_id': image_id})
                         else:
                             image_file_list.append({'source_file': image_path,
                                                     'image_id': new_image_id})
-                            content = content.replace(source_image_path, f'/api/image/{new_image_id}')
+                            content = content.replace(source_image_path, f'/oss/file/{new_image_id}')
                             p['content'] = content
                     else:
                         image_file_list.append({'source_file': image_path,
                                                 'image_id': new_image_id})
-                        content = content.replace(source_image_path, f'/api/image/{new_image_id}')
+                        content = content.replace(source_image_path, f'/oss/file/{new_image_id}')
                         p['content'] = content
 
     return image_file_list

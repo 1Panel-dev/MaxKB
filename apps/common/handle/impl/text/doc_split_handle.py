@@ -43,7 +43,7 @@ def image_to_mode(image, doc: Document, images_list, get_image_id):
             if len([i for i in images_list if i.id == image_uuid]) == 0:
                 image = File(id=image_uuid, file_name=part.filename, meta={'debug': False, 'content': part.blob})
                 images_list.append(image)
-            return f'![](/api/image/{image_uuid})'
+            return f'![](/oss/file/{image_uuid})'
         return None
     return None
 
@@ -226,7 +226,6 @@ class DocSplitHandle(BaseSplitHandle):
             doc = Document(io.BytesIO(buffer))
             content = self.to_md(doc, image_list, get_image_id_func())
             if len(image_list) > 0:
-                content = content.replace('/api/image/', '/oss/file/')
                 save_image(image_list)
             return content
         except BaseException as e:

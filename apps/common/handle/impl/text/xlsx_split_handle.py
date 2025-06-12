@@ -18,7 +18,7 @@ from common.handle.impl.common_handle import xlsx_embed_cells_images
 def post_cell(image_dict, cell_value):
     image = image_dict.get(cell_value, None)
     if image is not None:
-        return f'![](/api/image/{image.id})'
+        return f'![](/oss/file/{image.id})'
     return cell_value.replace('\n', '<br>').replace('|', '&#124;')
 
 
