@@ -38,7 +38,7 @@
 import { ref, watch, onMounted } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { MsgSuccess } from '@/utils/message'
-import TeamApi from '@/api/team'
+import GroupApi from '@/api/system/user-group'
 import { t } from '@/locales'
 const emit = defineEmits(['refresh'])
 

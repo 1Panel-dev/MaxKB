@@ -93,6 +93,53 @@ const systemRouter = {
       ],
     },
     {
+      path: '/system/chat',
+      name: 'SystemChat',
+      meta: {
+        icon: 'app-folder-share',
+        iconActive: 'app-folder-share-active',
+        title: '对话用户',
+        activeMenu: '/system',
+        parentPath: '/system',
+        parentName: 'system',
+      },
+      children: [
+        {
+          path: '/system/chat/chat-user',
+          name: 'ChatUser',
+          meta: {
+            title: '对话用户',
+            activeMenu: '/system',
+            parentPath: '/system',
+            parentName: 'system',
+          },
+          component: () => import('@/views/system-chat-user/user-manage/index.vue'),
+        },
+        {
+          path: '/system/chat/group',
+          name: 'Group',
+          meta: {
+            title: '用户组',
+            activeMenu: '/system',
+            parentPath: '/system',
+            parentName: 'system',
+          },
+          component: () => import('@/views/system-chat-user/group/index.vue'),
+        },
+        {
+          path: '/system/chat/authentication',
+          name: 'Authentication',
+          meta: {
+            title: '登录认证',
+            activeMenu: '/system',
+            parentPath: '/system',
+            parentName: 'system',
+          },
+          component: () => import('@/views/system-chat-user/authentication/index.vue'),
+        },
+      ],
+    },
+    {
       path: '/system/setting',
       name: 'setting',
       meta: {

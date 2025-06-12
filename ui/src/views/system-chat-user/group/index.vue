@@ -1,6 +1,8 @@
 <template>
-  <LayoutContainer :header="$t('views.group.title')">
-    <div class="group-manage flex main-calc-height">
+  <div class="group-manage p-16-24">
+    <h4 class="mb-16">{{ $t('views.group.title') }}</h4>
+
+    <div class="flex main-calc-height">
       <div class="group-member p-8 border-r">
         <div class="flex-between p-16">
           <h4>{{ $t('views.group.member') }}</h4>
@@ -57,7 +59,7 @@
       </div>
     </div>
     <CreateGroupDialog ref="CreateGroupRef" @refresh="refresh" />
-  </LayoutContainer>
+  </div>
 </template>
 
 <script lang="ts" setup>

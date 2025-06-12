@@ -16,7 +16,6 @@
       label-position="top"
       require-asterisk-position="right"
     >
-
       <el-form-item
         :label="$t('views.knowledge.form.source_url.label')"
         prop="source_url"
@@ -92,8 +91,8 @@
 <script setup lang="ts">
 import { ref, watch, reactive } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import BaseForm from '@/views/knowledge-shared-system/component/BaseForm.vue'
-import KnowledgeApi from '@/api/shared/knowledge'
+import BaseForm from '@/views/knowledge/component/BaseForm.vue'
+import KnowledgeApi from '@/api/knowledge/knowledge'
 import { MsgSuccess, MsgAlert } from '@/utils/message'
 import { t } from '@/locales'
 import { ComplexPermission } from '@/utils/permission/type'
@@ -112,7 +111,7 @@ const datasetForm = ref<any>({
   selector: '',
   app_id: '',
   app_secret: '',
-  folder_token: ''
+  folder_token: '',
 })
 
 const rules = reactive({
@@ -120,44 +119,44 @@ const rules = reactive({
     {
       required: true,
       message: t('views.knowledge.form.source_url.requiredMessage'),
-      trigger: 'blur'
-    }
+      trigger: 'blur',
+    },
   ],
   app_id: [
     {
       required: true,
       message: t('views.application.applicationAccess.larkSetting.appIdPlaceholder'),
-      trigger: 'blur'
-    }
+      trigger: 'blur',
+    },
   ],
   app_secret: [
     {
       required: true,
       message: t('views.application.applicationAccess.larkSetting.appSecretPlaceholder'),
-      trigger: 'blur'
-    }
+      trigger: 'blur',
+    },
   ],
   folder_token: [
     {
       required: true,
       message: t('views.application.applicationAccess.larkSetting.folderTokenPlaceholder'),
-      trigger: 'blur'
-    }
+      trigger: 'blur',
+    },
   ],
   user_id: [
     {
       required: true,
       message: t('views.knowledge.form.user_id.requiredMessage'),
-      trigger: 'blur'
-    }
+      trigger: 'blur',
+    },
   ],
   token: [
     {
       required: true,
       message: t('views.knowledge.form.token.requiredMessage'),
-      trigger: 'blur'
-    }
-  ]
+      trigger: 'blur',
+    },
+  ],
 })
 
 watch(dialogVisible, (bool) => {
@@ -165,7 +164,7 @@ watch(dialogVisible, (bool) => {
     datasetForm.value = {
       type: '0',
       source_url: '',
-      selector: ''
+      selector: '',
     }
     DatasetFormRef.value?.clearValidate()
   }
@@ -179,31 +178,12 @@ const submitHandle = async () => {
   if (await BaseFormRef.value?.validate()) {
     await DatasetFormRef.value.validate((valid: any) => {
       if (valid) {
-        if (datasetForm.value.type === '0') {
-          const obj = {
-            ...BaseFormRef.value.form,
-            type: datasetForm.value.type
-          }
-          knowledgeApi.postDataset(obj, loading).then((res) => {
-            MsgSuccess(t('common.createSuccess'))
-            router.push({ path: `/knowledge/system/${res.data.id}/documentShared` })
-            emit('refresh')
-          })
-        } else if (datasetForm.value.type === '1') {
-          const obj = { ...BaseFormRef.value.form, ...datasetForm.value }
-          knowledgeApi.postWebDataset(obj, loading).then((res) => {
-            MsgSuccess(t('common.createSuccess'))
-            router.push({ path: `/knowledge/system/${res.data.id}/documentShared` })
-            emit('refresh')
-          })
-        } else if (datasetForm.value.type === '2') {
-          const obj = { ...BaseFormRef.value.form, ...datasetForm.value }
-          knowledgeApi.postLarkDataset(obj, loading).then((res) => {
-            MsgSuccess(t('common.createSuccess'))
-            router.push({ path: `/knowledge/system/${res.data.id}/documentShared` })
-            emit('refresh')
-          })
-        }
+        const obj = { ...BaseFormRef.value.form, ...datasetForm.value }
+        KnowledgeApi.postLarkKnowledge(obj, loading).then((res) => {
+          MsgSuccess(t('common.createSuccess'))
+          router.push({ path: `/knowledge/${res.data.id}/document` })
+          emit('refresh')
+        })
       } else {
         return false
       }
@@ -211,10 +191,6 @@ const submitHandle = async () => {
   } else {
     return false
   }
-}
-function radioChange() {
-  datasetForm.value.source_url = ''
-  datasetForm.value.selector = ''
 }
 
 defineExpose({ open })

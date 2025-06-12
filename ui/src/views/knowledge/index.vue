@@ -82,7 +82,7 @@
                     </div>
                   </div>
                 </el-dropdown-item>
-                <el-dropdown-item>
+                <el-dropdown-item @click="openCreateDialog(CreateLarkKnowledgeDialog)">
                   <div class="flex">
                     <el-avatar
                       class="avatar-purple mt-4"
@@ -282,6 +282,7 @@
 import { onMounted, ref, reactive, shallowRef, nextTick } from 'vue'
 import CreateKnowledgeDialog from './create-component/CreateKnowledgeDialog.vue'
 import CreateWebKnowledgeDialog from './create-component/CreateWebKnowledgeDialog.vue'
+import CreateLarkKnowledgeDialog from './create-component/CreateLarkKnowledgeDialog.vue'
 import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
 import GenerateRelatedDialog from '@/components/generate-related-dialog/index.vue'
 import KnowledgeApi from '@/api/knowledge/knowledge'

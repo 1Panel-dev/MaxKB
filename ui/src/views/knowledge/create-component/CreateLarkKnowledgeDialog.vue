@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="$t('views.knowledge.knowledgeType.createGeneralKnowledge')"
+    :title="$t('views.knowledge.knowledgeType.createLarkKnowledge')"
     v-model="dialogVisible"
     width="720"
     append-to-body
@@ -16,35 +16,13 @@
       label-position="top"
       require-asterisk-position="right"
     >
-
-      <el-form-item
-        :label="$t('views.knowledge.form.source_url.label')"
-        prop="source_url"
-        v-if="datasetForm.type === '1'"
-      >
-        <el-input
-          v-model="datasetForm.source_url"
-          :placeholder="$t('views.knowledge.form.source_url.placeholder')"
-          @blur="datasetForm.source_url = datasetForm.source_url.trim()"
-        />
-      </el-form-item>
-      <el-form-item
-        :label="$t('views.knowledge.form.selector.label')"
-        v-if="datasetForm.type === '1'"
-      >
-        <el-input
-          v-model="datasetForm.selector"
-          :placeholder="$t('views.knowledge.form.selector.placeholder')"
-          @blur="datasetForm.selector = datasetForm.selector.trim()"
-        />
-      </el-form-item>
-      <el-form-item label="App ID" prop="app_id" v-if="datasetForm.type === '2'">
+      <el-form-item label="App ID" prop="app_id">
         <el-input
           v-model="datasetForm.app_id"
           :placeholder="$t('views.application.applicationAccess.larkSetting.appIdPlaceholder')"
         />
       </el-form-item>
-      <el-form-item label="App Secret" prop="app_secret" v-if="datasetForm.type === '2'">
+      <el-form-item label="App Secret" prop="app_secret">
         <el-input
           v-model="datasetForm.app_secret"
           type="password"
@@ -52,25 +30,9 @@
           :placeholder="$t('views.application.applicationAccess.larkSetting.appSecretPlaceholder')"
         />
       </el-form-item>
-      <el-form-item label="Folder Token" prop="folder_token" v-if="datasetForm.type === '2'">
+      <el-form-item label="Folder Token" prop="folder_token">
         <el-input
           v-model="datasetForm.folder_token"
-          :placeholder="
-            $t('views.application.applicationAccess.larkSetting.folderTokenPlaceholder')
-          "
-        />
-      </el-form-item>
-      <el-form-item label="User ID" prop="user_id" v-if="datasetForm.type === '3'">
-        <el-input
-          v-model="datasetForm.user_id"
-          :placeholder="
-            $t('views.application.applicationAccess.larkSetting.folderTokenPlaceholder')
-          "
-        />
-      </el-form-item>
-      <el-form-item label="Token" prop="token" v-if="datasetForm.type === '3'">
-        <el-input
-          v-model="datasetForm.token"
           :placeholder="
             $t('views.application.applicationAccess.larkSetting.folderTokenPlaceholder')
           "
@@ -112,7 +74,7 @@ const datasetForm = ref<any>({
   selector: '',
   app_id: '',
   app_secret: '',
-  folder_token: ''
+  folder_token: '',
 })
 
 const rules = reactive({
@@ -120,44 +82,44 @@ const rules = reactive({
     {
       required: true,
       message: t('views.knowledge.form.source_url.requiredMessage'),
-      trigger: 'blur'
-    }
+      trigger: 'blur',
+    },
   ],
   app_id: [
     {
       required: true,
       message: t('views.application.applicationAccess.larkSetting.appIdPlaceholder'),
-      trigger: 'blur'
-    }
+      trigger: 'blur',
+    },
   ],
   app_secret: [
     {
       required: true,
       message: t('views.application.applicationAccess.larkSetting.appSecretPlaceholder'),
-      trigger: 'blur'
-    }
+      trigger: 'blur',
+    },
   ],
   folder_token: [
     {
       required: true,
       message: t('views.application.applicationAccess.larkSetting.folderTokenPlaceholder'),
-      trigger: 'blur'
-    }
+      trigger: 'blur',
+    },
   ],
   user_id: [
     {
       required: true,
       message: t('views.knowledge.form.user_id.requiredMessage'),
-      trigger: 'blur'
-    }
+      trigger: 'blur',
+    },
   ],
   token: [
     {
       required: true,
       message: t('views.knowledge.form.token.requiredMessage'),
-      trigger: 'blur'
-    }
-  ]
+      trigger: 'blur',
+    },
+  ],
 })
 
 watch(dialogVisible, (bool) => {
@@ -165,7 +127,7 @@ watch(dialogVisible, (bool) => {
     datasetForm.value = {
       type: '0',
       source_url: '',
-      selector: ''
+      selector: '',
     }
     DatasetFormRef.value?.clearValidate()
   }
@@ -179,31 +141,12 @@ const submitHandle = async () => {
   if (await BaseFormRef.value?.validate()) {
     await DatasetFormRef.value.validate((valid: any) => {
       if (valid) {
-        if (datasetForm.value.type === '0') {
-          const obj = {
-            ...BaseFormRef.value.form,
-            type: datasetForm.value.type
-          }
-          knowledgeApi.postDataset(obj, loading).then((res) => {
-            MsgSuccess(t('common.createSuccess'))
-            router.push({ path: `/knowledge/${res.data.id}/document` })
-            emit('refresh')
-          })
-        } else if (datasetForm.value.type === '1') {
-          const obj = { ...BaseFormRef.value.form, ...datasetForm.value }
-          knowledgeApi.postWebDataset(obj, loading).then((res) => {
-            MsgSuccess(t('common.createSuccess'))
-            router.push({ path: `/knowledge/${res.data.id}/document` })
-            emit('refresh')
-          })
-        } else if (datasetForm.value.type === '2') {
-          const obj = { ...BaseFormRef.value.form, ...datasetForm.value }
-          knowledgeApi.postLarkDataset(obj, loading).then((res) => {
-            MsgSuccess(t('common.createSuccess'))
-            router.push({ path: `/knowledge/${res.data.id}/document` })
-            emit('refresh')
-          })
-        }
+        const obj = { ...BaseFormRef.value.form, ...datasetForm.value }
+        KnowledgeApi.postLarkKnowledge(obj, loading).then((res) => {
+          MsgSuccess(t('common.createSuccess'))
+          router.push({ path: `/knowledge/${res.data.id}/document` })
+          emit('refresh')
+        })
       } else {
         return false
       }
@@ -211,10 +154,6 @@ const submitHandle = async () => {
   } else {
     return false
   }
-}
-function radioChange() {
-  datasetForm.value.source_url = ''
-  datasetForm.value.selector = ''
 }
 
 defineExpose({ open })
