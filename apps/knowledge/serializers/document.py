@@ -725,7 +725,7 @@ class DocumentSerializers(serializers.Serializer):
             return document_name.strip()
 
     class Create(serializers.Serializer):
-        workspace_id = serializers.UUIDField(required=True, label=_('workspace id'))
+        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
         knowledge_id = serializers.UUIDField(required=True, label=_('document id'))
 
         def is_valid(self, *, raise_exception=False):
