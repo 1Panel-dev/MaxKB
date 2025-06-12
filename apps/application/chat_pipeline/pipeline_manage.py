@@ -17,12 +17,14 @@ from common.handle.impl.response.system_to_response import SystemToResponse
 
 class PipelineManage:
     def __init__(self, step_list: List[Type[IBaseChatPipelineStep]],
-                 base_to_response: BaseToResponse = SystemToResponse()):
+                 base_to_response: BaseToResponse = SystemToResponse(),
+                 debug=False):
         # 步骤执行器
         self.step_list = [step() for step in step_list]
         # 上下文
         self.context = {'message_tokens': 0, 'answer_tokens': 0}
         self.base_to_response = base_to_response
+        self.debug = debug
 
     def run(self, context: Dict = None):
         self.context['start_time'] = time.time()
@@ -44,6 +46,7 @@ class PipelineManage:
         def __init__(self):
             self.step_list: List[Type[IBaseChatPipelineStep]] = []
             self.base_to_response = SystemToResponse()
+            self.debug = False
 
         def append_step(self, step: Type[IBaseChatPipelineStep]):
             self.step_list.append(step)
@@ -53,5 +56,9 @@ class PipelineManage:
             self.base_to_response = base_to_response
             return self
 
+        def add_debug(self, debug):
+            self.debug = debug
+            return self
+
         def build(self):
-            return PipelineManage(step_list=self.step_list, base_to_response=self.base_to_response)
+            return PipelineManage(step_list=self.step_list, base_to_response=self.base_to_response, debug=self.debug)
