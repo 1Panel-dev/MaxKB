@@ -17,7 +17,7 @@
           :rules="{
             required: true,
             message: $t('views.application.form.aiModel.placeholder'),
-            trigger: 'change'
+            trigger: 'change',
           }"
         >
           <template #label>
@@ -68,7 +68,7 @@
           :rules="{
             required: true,
             message: $t('views.application.form.prompt.requiredMessage'),
-            trigger: 'blur'
+            trigger: 'blur',
           }"
         >
           <template #label>
@@ -80,9 +80,7 @@
                 >
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
-                <template #content
-                  >{{ $t('views.application.form.prompt.tooltip') }}
-                </template>
+                <template #content>{{ $t('views.application.form.prompt.tooltip') }} </template>
                 <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
               </el-tooltip>
             </div>
@@ -127,9 +125,7 @@
           <template #label>
             <div class="flex-between w-full">
               <div>
-                <span>{{
-                  $t('views.application.form.reasoningContent.label')
-                }}</span>
+                <span>{{ $t('views.application.form.reasoningContent.label') }}</span>
               </div>
               <el-button
                 type="primary"
@@ -179,6 +175,7 @@ import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'
 import applicationApi from '@/api/application/application'
+import modelAPI from '@/api/model/model.ts'
 import useStore from '@/stores'
 import { isLastNode } from '@/workflow/common/data'
 import AIModeParamSettingDialog from '@/views/application/component/AIModeParamSettingDialog.vue'
@@ -213,7 +210,7 @@ const model_change = (model_id?: string) => {
   }
 }
 const {
-  params: { id }
+  params: { id },
 } = app.config.globalProperties.$route as any
 
 // @ts-ignore
@@ -234,8 +231,8 @@ const form = {
   model_setting: {
     reasoning_content_start: '<think>',
     reasoning_content_end: '</think>',
-    reasoning_content_enable: false
-  }
+    reasoning_content_enable: false,
+  },
 }
 
 const chat_data = computed({
@@ -245,7 +242,7 @@ const chat_data = computed({
         set(props.nodeModel.properties.node_data, 'model_setting', {
           reasoning_content_start: '<think>',
           reasoning_content_end: '</think>',
-          reasoning_content_enable: false
+          reasoning_content_enable: false,
         })
       }
       return props.nodeModel.properties.node_data
@@ -257,7 +254,7 @@ const chat_data = computed({
   },
   set: (value) => {
     set(props.nodeModel.properties, 'node_data', value)
-  }
+  },
 })
 const props = defineProps<{ nodeModel: any }>()
 
@@ -274,7 +271,7 @@ const validate = () => {
 
 function getModel() {
   if (id) {
-    applicationApi.getApplicationModel(id).then((res: any) => {
+    modelAPI.getLLMModel().then((res: any) => {
       modelOptions.value = groupBy(res?.data, 'provider')
     })
   } else {
@@ -302,7 +299,7 @@ function submitReasoningDialog(val: any) {
   let model_setting = cloneDeep(props.nodeModel.properties.node_data.model_setting)
   model_setting = {
     ...model_setting,
-    ...val
+    ...val,
   }
 
   set(props.nodeModel.properties.node_data, 'model_setting', model_setting)
@@ -312,7 +309,7 @@ const mcpServersDialogRef = ref()
 function openMcpServersDialog() {
   const config = {
     mcp_servers: chat_data.value.mcp_servers,
-    mcp_enable: chat_data.value.mcp_enable
+    mcp_enable: chat_data.value.mcp_enable,
   }
   mcpServersDialogRef.value.open(config)
 }

@@ -11,7 +11,7 @@ import AppEdge from './common/edge'
 import Control from './common/NodeControl.vue'
 import { baseNodes } from '@/workflow/common/data'
 import '@logicflow/extension/lib/style/index.css'
-import '@logicflow/core/dist/index.css'
+import '@logicflow/core/dist/style/index.css'
 import { initDefaultShortcut } from '@/workflow/common/shortcut'
 import Dagre from '@/workflow/plugins/dagre'
 import { getTeleport } from '@/workflow/common/teleport'
@@ -32,11 +32,11 @@ type ShapeItem = {
 }
 
 const props = defineProps({
-  data: Object || null
+  data: Object || null,
 })
 
 const defaultData = {
-  nodes: [...baseNodes]
+  nodes: [...baseNodes],
 }
 const graphData = computed({
   get: () => {
@@ -48,7 +48,7 @@ const graphData = computed({
   },
   set: (value) => {
     return value
-  }
+  },
 })
 
 const lf = ref()
@@ -67,27 +67,27 @@ const renderGraphData = (data?: any) => {
       adjustEdge: false,
       adjustEdgeStartAndEnd: false,
       background: {
-        backgroundColor: '#f5f6f7'
+        backgroundColor: '#f5f6f7',
       },
       grid: {
         size: 10,
         type: 'dot',
         config: {
           color: '#DEE0E3',
-          thickness: 1
-        }
+          thickness: 1,
+        },
       },
       keyboard: {
-        enabled: true
+        enabled: true,
       },
       isSilentMode: false,
-      container: container
+      container: container,
     })
     lf.value.setTheme({
       bezier: {
         stroke: '#afafaf',
-        strokeWidth: 1
-      }
+        strokeWidth: 1,
+      },
     })
     lf.value.on('graph:rendered', () => {
       flowId.value = lf.value.graphModel.flowId
@@ -124,7 +124,7 @@ const onmousedown = (shapeItem: ShapeItem) => {
   if (shapeItem.type) {
     lf.value.dnd.startDrag({
       type: shapeItem.type,
-      properties: { ...shapeItem.properties }
+      properties: { ...shapeItem.properties },
     })
   }
   if (shapeItem.callback) {
@@ -139,7 +139,7 @@ const addNode = (shapeItem: ShapeItem) => {
     type: shapeItem.type,
     properties: shapeItem.properties,
     x: virtualRectCenterPositionX,
-    y: virtualRectCenterPositionY - lf.value.graphModel.height / 2
+    y: virtualRectCenterPositionY - lf.value.graphModel.height / 2,
   })
   newNode.isSelected = true
   newNode.isHovered = true
@@ -157,7 +157,7 @@ defineExpose({
   addNode,
   clearGraphData,
   renderGraphData,
-  render
+  render,
 })
 </script>
 <style lang="scss">

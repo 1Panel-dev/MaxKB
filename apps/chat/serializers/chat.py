@@ -219,12 +219,17 @@ class ChatSerializers(serializers.Serializer):
         other_list = instance.get('other_list')
         workspace_id = chat_info.application.workspace_id
         chat_record_id = instance.get('chat_record_id')
+        debug = self.data.get('debug', False)
         chat_record = None
         history_chat_record = chat_info.chat_record_list
         if chat_record_id is not None:
             chat_record = self.get_chat_record(chat_info, chat_record_id)
             history_chat_record = [r for r in chat_info.chat_record_list if str(r.id) != chat_record_id]
-        work_flow_manage = WorkflowManage(Flow.new_instance(chat_info.work_flow_version.work_flow),
+        if not debug:
+            work_flow = chat_info.work_flow_version.work_flow
+        else:
+            work_flow = chat_info.application.work_flow
+        work_flow_manage = WorkflowManage(Flow.new_instance(work_flow),
                                           {'history_chat_record': history_chat_record, 'question': message,
                                            'chat_id': chat_info.chat_id, 'chat_record_id': str(
                                               uuid.uuid1()) if chat_record is None else chat_record.id,
@@ -233,7 +238,7 @@ class ChatSerializers(serializers.Serializer):
                                            'chat_user_id': chat_user_id,
                                            'chat_user_type': chat_user_type,
                                            'workspace_id': workspace_id,
-                                           'debug': self.data.get('debug', False)},
+                                           'debug': debug},
                                           WorkFlowPostHandler(chat_info),
                                           base_to_response, form_data, image_list, document_list, audio_list,
                                           other_list,
@@ -339,12 +344,14 @@ class OpenChatSerializers(serializers.Serializer):
         chat_user_type = self.data.get("chat_user_type")
         debug = self.data.get("debug")
         chat_id = str(uuid.uuid7())
-        work_flow_version = QuerySet(WorkFlowVersion).filter(application_id=application_id).order_by(
-            '-create_time')[0:1].first()
-        if work_flow_version is None:
-            raise AppApiException(500,
-                                  gettext(
-                                      "The application has not been published. Please use it after publishing."))
+        work_flow_version = None
+        if not debug:
+            work_flow_version = QuerySet(WorkFlowVersion).filter(application_id=application_id).order_by(
+                '-create_time')[0:1].first()
+            if work_flow_version is None:
+                raise AppApiException(500,
+                                      gettext(
+                                          "The application has not been published. Please use it after publishing."))
         ChatInfo(chat_id, chat_user_id, chat_user_type, [],
                  [],
                  application_id,

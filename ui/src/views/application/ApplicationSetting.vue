@@ -673,7 +673,7 @@ function getKnowledge() {
 function getModel() {
   loading.value = true
   modelAPI
-    .getModel({})
+    .getLLMModel()
     .then((res: any) => {
       modelOptions.value = groupBy(res?.data, 'provider')
       loading.value = false
@@ -686,7 +686,7 @@ function getModel() {
 function getSTTModel() {
   loading.value = true
   modelAPI
-    .getApplicationSTTModel(id)
+    .getSTTModel()
     .then((res: any) => {
       sttModelOptions.value = groupBy(res?.data, 'provider')
       loading.value = false
@@ -699,7 +699,7 @@ function getSTTModel() {
 function getTTSModel() {
   loading.value = true
   modelAPI
-    .getApplicationTTSModel(id)
+    .getTTSModel()
     .then((res: any) => {
       ttsModelOptions.value = groupBy(res?.data, 'provider')
       loading.value = false

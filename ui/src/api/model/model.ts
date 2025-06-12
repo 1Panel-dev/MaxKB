@@ -22,59 +22,54 @@ const getModel: (
   return get(`${prefix}/model`, data, loading)
 }
 /**
- * 获取当前用户可使用的模型列表
- * @param application_id
- * @param loading
- * @query  { query_text: string, top_number: number, similarity: number }
- * @returns
+ * 获取工作空间下重排模型列表
+ * @param loading 加载器
+ * @returns 重排模型列表
  */
-const getApplicationRerankerModel: (
-  application_id: string,
-  loading?: Ref<boolean>,
-) => Promise<Result<Array<any>>> = (application_id, loading) => {
+const getRerankerModel: (loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (loading) => {
   return get(`${prefix}/model`, { model_type: 'RERANKER' }, loading)
 }
 
 /**
- * 获取当前用户可使用的模型列表
- * @param application_id
+ * 获取语音转文本模型列表
  * @param loading
- * @query  { query_text: string, top_number: number, similarity: number }
- * @returns
+ * @returns 语音转文本模型列表
  */
-const getApplicationSTTModel: (
-  application_id: string,
-  loading?: Ref<boolean>,
-) => Promise<Result<Array<any>>> = (application_id, loading) => {
+const getSTTModel: (loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (loading) => {
   return get(`${prefix}/model`, { model_type: 'STT' }, loading)
 }
 
 /**
- * 获取当前用户可使用的模型列表
- * @param application_id
+ * 获取文本转语音模型列表
  * @param loading
- * @query  { query_text: string, top_number: number, similarity: number }
  * @returns
  */
-const getApplicationTTSModel: (
-  application_id: string,
-  loading?: Ref<boolean>,
-) => Promise<Result<Array<any>>> = (application_id, loading) => {
+const getTTSModel: (loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (loading) => {
   return get(`${prefix}/model`, { model_type: 'TTS' }, loading)
 }
-
-const getApplicationImageModel: (
-  application_id: string,
-  loading?: Ref<boolean>,
-) => Promise<Result<Array<any>>> = (application_id, loading) => {
+/**
+ * 获取图片理解模型列表
+ * @param loading
+ * @returns 图片理解模型列表
+ */
+const getImageModel: (loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (loading) => {
   return get(`${prefix}/model`, { model_type: 'IMAGE' }, loading)
 }
-
-const getApplicationTTIModel: (
-  application_id: string,
-  loading?: Ref<boolean>,
-) => Promise<Result<Array<any>>> = (application_id, loading) => {
+/**
+ * 获取图片生成模型列表
+ * @param loading
+ * @returns  图片生成模型列表
+ */
+const getTTIModel: (loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (loading) => {
   return get(`${prefix}/model`, { model_type: 'TTI' }, loading)
+}
+/**
+ * 获取大语言模型列表
+ * @param loading
+ * @returns 大语言模型列表
+ */
+const getLLMModel: (loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (loading) => {
+  return get(`${prefix}/model`, { model_type: 'LLM' }, loading)
 }
 /**
  * 获取模型参数表单
@@ -182,9 +177,10 @@ export default {
   pauseDownload,
   getModelParamsForm,
   updateModelParamsForm,
-  getApplicationRerankerModel,
-  getApplicationSTTModel,
-  getApplicationTTSModel,
-  getApplicationImageModel,
-  getApplicationTTIModel,
+  getRerankerModel,
+  getSTTModel,
+  getTTSModel,
+  getImageModel,
+  getTTIModel,
+  getLLMModel,
 }
