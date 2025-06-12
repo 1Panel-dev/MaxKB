@@ -234,10 +234,10 @@ function redirectAuth(authType: string) {
       confirmButtonClass: ''
     })
       .then(() => {
-        if (!res.data.config_data) {
+        if (!res.data.config) {
           return
         }
-        const config = res.data.config_data
+        const config = res.data.config
         const redirectUrl = eval(`\`${config.redirectUrl}\``)
         let url
         if (authType === 'CAS') {
