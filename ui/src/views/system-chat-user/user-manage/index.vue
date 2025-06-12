@@ -3,7 +3,7 @@
     <h2 class="mb-16">{{ $t('views.userManage.title') }}</h2>
     <el-card>
       <div class="flex-between mb-16">
-        <el-button type="primary" @click="createUser">{{
+        <el-button type="primary" @click="createUser()">{{
           $t('views.userManage.createUser')
         }}</el-button>
         <div class="flex-between complex-search">
@@ -208,7 +208,7 @@ function editUser(row: any) {
 
 function createUser() {
   title.value = t('views.userManage.createUser')
-  UserDrawerRef.value.open()
+  UserDrawerRef.value.open(1)
   // common.asyncGetValid(ValidType.User, ValidCount.User, loading).then(async (res: any) => {
   //   if (res?.data) {
   //     title.value = t('views.userManage.createUser')

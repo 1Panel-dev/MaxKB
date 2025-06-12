@@ -51,8 +51,31 @@
         >
         </el-input>
       </el-form-item>
-      <el-form-item label="默认密码" v-if="!isEdit">
-        <span>MaxKB@123</span>
+      <el-form-item
+        :label="$t('views.userManage.form.password.label')"
+        prop="password"
+        v-if="!isEdit"
+      >
+        <el-input
+          type="password"
+          v-model="userForm.password"
+          :placeholder="$t('views.userManage.form.password.placeholder')"
+          show-password
+        >
+        </el-input>
+      </el-form-item>
+      <el-form-item
+        :label="$t('views.userManage.form.password.label')"
+        prop="password"
+        v-if="!isEdit"
+      >
+        <el-input
+          type="password"
+          v-model="userForm.password"
+          :placeholder="$t('views.userManage.form.password.placeholder')"
+          show-password
+        >
+        </el-input>
       </el-form-item>
     </el-form>
     <template #footer>
