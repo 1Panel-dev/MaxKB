@@ -9,6 +9,7 @@ urlpatterns = [
     path('user/captcha', views.CaptchaView.as_view(), name='captcha'),
     path('user/test', views.TestPermissionsUserView.as_view(), name="test"),
     path('user/logout', views.Logout.as_view(), name='logout'),
+    path('user/language', views.SwitchUserLanguageView.as_view(), name='language'),
     path("user/send_email", views.SendEmail.as_view(), name='send_email'),
     path("user/check_code", views.CheckCode.as_view(), name='check_code'),
     path("user/re_password", views.RePasswordView.as_view(), name='re_password'),

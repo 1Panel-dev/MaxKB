@@ -218,3 +218,13 @@ class SendEmailAPI(APIMixin):
     @staticmethod
     def get_response():
         return DefaultResultSerializer
+
+
+class LanguageSerializer(serializers.Serializer):
+    language = serializers.CharField(required=True, label=_('Language'))
+
+
+class SwitchUserLanguageAPI(APIMixin):
+    @staticmethod
+    def get_request():
+        return LanguageSerializer

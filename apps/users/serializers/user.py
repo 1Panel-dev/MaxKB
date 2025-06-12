@@ -673,3 +673,16 @@ class CheckCodeSerializer(serializers.Serializer):
         if value is None or value != self.data.get("code"):
             raise ExceptionCodeConstants.CODE_ERROR.value.to_app_api_exception()
         return True
+
+
+class SwitchLanguageSerializer(serializers.Serializer):
+    user_id = serializers.UUIDField(required=True, label=_('user id'))
+    language = serializers.CharField(required=True, label=('language'))
+
+    def switch(self):
+        self.is_valid(raise_exception=True)
+        language = self.data.get('language')
+        support_language_list = ['zh-CN', 'zh-Hant', 'en-US']
+        if not support_language_list.__contains__(language):
+            raise AppApiException(500, _('language only support:') + ','.join(support_language_list))
+        QuerySet(User).filter(id=self.data.get('user_id')).update(language=language)

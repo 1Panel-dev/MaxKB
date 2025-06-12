@@ -24,10 +24,10 @@ from models_provider.api.model import DefaultModelResponse
 from tools.serializers.tool import encryption
 from users.api.user import UserProfileAPI, TestWorkspacePermissionUserApi, DeleteUserApi, EditUserApi, \
     ChangeUserPasswordApi, UserPageApi, UserListApi, UserPasswordResponse, WorkspaceUserAPI, ResetPasswordAPI, \
-    SendEmailAPI, CheckCodeAPI
+    SendEmailAPI, CheckCodeAPI, SwitchUserLanguageAPI
 from users.models import User
 from users.serializers.user import UserProfileSerializer, UserManageSerializer, CheckCodeSerializer, \
-    SendEmailSerializer, RePasswordSerializer
+    SendEmailSerializer, RePasswordSerializer, SwitchLanguageSerializer
 
 default_password = CONFIG.get('default_password', 'MaxKB@123..')
 
@@ -79,6 +79,23 @@ class TestPermissionsUserView(APIView):
     @has_permissions(PermissionConstants.USER_EDIT)
     def get(self, request: Request):
         return result.success(UserProfileSerializer().profile(request.user, request.auth))
+
+
+class SwitchUserLanguageView(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(methods=['POST'],
+                   summary=_("Switch Language"),
+                   description=_("Switch Language"),
+                   operation_id=_("Switch Language"),  # type: ignore
+                   tags=[_("User Management")],  # type: ignore
+                   request=SwitchUserLanguageAPI.get_request(),
+                   )
+    @log(menu='User management', operate='Switch Language',
+         get_operation_object=lambda r, k: {'name': r.user.username})
+    def post(self, request: Request):
+        data = {**request.data, 'user_id': request.user.id}
+        return result.success(SwitchLanguageSerializer(data=data).switch())
 
 
 class TestWorkspacePermissionUserView(APIView):
