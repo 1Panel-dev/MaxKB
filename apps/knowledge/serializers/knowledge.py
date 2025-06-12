@@ -538,6 +538,7 @@ class KnowledgeSerializer(serializers.Serializer):
                 type=instance.get('type', KnowledgeType.WEB),
                 scope=self.data.get('scope', KnowledgeScope.WORKSPACE),
                 folder_id=folder_id,
+                workspace_id=self.data.get('workspace_id'),
                 embedding_model_id=instance.get('embedding'),
                 meta={
                     'source_url': instance.get('source_url'),
