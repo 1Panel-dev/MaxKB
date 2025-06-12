@@ -1,11 +1,11 @@
 <template>
   <div class="group-manage p-16-24">
-    <h4 class="mb-16">{{ $t('views.group.title') }}</h4>
+    <h4 class="mb-16">{{ $t('views.system.group.title') }}</h4>
 
     <div class="flex main-calc-height">
       <div class="group-member p-8 border-r">
         <div class="flex-between p-16">
-          <h4>{{ $t('views.group.member') }}</h4>
+          <h4>{{ $t('views.system.group.member') }}</h4>
           <el-button type="primary" link @click="addMember">
             <AppIcon iconName="app-add-users" class="add-user-icon" />
           </el-button>
@@ -13,7 +13,7 @@
         <div class="group-member-input">
           <el-input
             v-model="filterText"
-            :placeholder="$t('views.group.searchBar.placeholder')"
+            :placeholder="$t('views.system.group.searchBar.placeholder')"
             prefix-icon="Search"
             clearable
           />
@@ -40,7 +40,7 @@
                       <template #dropdown>
                         <el-dropdown-menu>
                           <el-dropdown-item @click.prevent="deleteMember(row)">{{
-                            $t('views.group.delete.button')
+                            $t('views.system.group.delete.button')
                           }}</el-dropdown-item>
                         </el-dropdown-menu>
                       </template>
@@ -54,7 +54,7 @@
       </div>
       <div class="permission-setting flex" v-loading="rLoading">
         <div class="group-manage__table">
-          <h4 class="p-24 pb-0 mb-4">{{ $t('views.group.permissionSetting') }}</h4>
+          <h4 class="p-24 pb-0 mb-4">{{ $t('views.system.group.permissionSetting') }}</h4>
         </div>
       </div>
     </div>

@@ -4,7 +4,7 @@ export default {
   shared: '共享',
   shared_resources: '共享资源',
   share_knowledge: '共享知识库',
-  authorized_workspace:'授权工作空间',
+  authorized_workspace: '授权工作空间',
   test: '测试连接',
   testSuccess: '测试连接成功',
   testFailed: '测试连接失败',
@@ -23,7 +23,7 @@ export default {
       ldap_filterPlaceholder: '请输入用户过滤器',
       ldap_mapping: 'LDAP 属性映射',
       ldap_mappingPlaceholder: '请输入 LDAP 属性映射',
-      enableAuthentication: '启用 LDAP 认证'
+      enableAuthentication: '启用 LDAP 认证',
     },
     cas: {
       title: 'CAS',
@@ -33,7 +33,7 @@ export default {
       validateUrlPlaceholder: '请输入验证地址',
       redirectUrl: '回调地址',
       redirectUrlPlaceholder: '请输入回调地址',
-      enableAuthentication: '启用 CAS 认证'
+      enableAuthentication: '启用 CAS 认证',
     },
     oidc: {
       title: 'OIDC',
@@ -52,7 +52,7 @@ export default {
       logoutEndpointPlaceholder: '请输入注销端地址',
       redirectUrl: '回调地址',
       redirectUrlPlaceholder: '请输入回调地址',
-      enableAuthentication: '启用 OIDC 认证'
+      enableAuthentication: '启用 OIDC 认证',
     },
 
     oauth2: {
@@ -73,7 +73,7 @@ export default {
       redirectUrlPlaceholder: '请输入回调地址',
       filedMapping: '字段映射',
       filedMappingPlaceholder: '请输入字段映射',
-      enableAuthentication: '启用 OAuth2 认证'
+      enableAuthentication: '启用 OAuth2 认证',
     },
     scanTheQRCode: {
       title: '扫码登录',
@@ -95,8 +95,8 @@ export default {
       larkQrCode: '飞书扫码登录',
       dingtalkQrCode: '钉钉扫码登录',
       setting: '设置',
-      access: '接入'
-    }
+      access: '接入',
+    },
   },
   theme: {
     title: '外观设置',
@@ -136,7 +136,7 @@ export default {
     abandonUpdate: '放弃更新',
     saveAndApply: '保存并应用',
     fileMessageError: '文件大小超过 10M',
-    saveSuccess: '外观设置成功'
+    saveSuccess: '外观设置成功',
   },
   email: {
     title: '邮箱设置',
@@ -151,6 +151,34 @@ export default {
     smtpPassword: '发件人密码',
     smtpPasswordPlaceholder: '请输入发件人密码',
     enableSSL: '启用 SSL（如果 SMTP 端口是 465，通常需要启用 SSL）',
-    enableTLS: '启用 TLS（如果 SMTP 端口是 587，通常需要启用 TLS）'
-  }
+    enableTLS: '启用 TLS（如果 SMTP 端口是 587，通常需要启用 TLS）',
+  },
+  group: {
+    title: '团队成员',
+    member: '成员',
+    manage: '所有者',
+    permissionSetting: '权限设置',
+    addMember: '添加成员',
+    addSubTitle: '成员登录后可以访问到您授权的数据。',
+    searchBar: {
+      placeholder: '请输入用户名搜索',
+    },
+    delete: {
+      button: '移除',
+      confirmTitle: '是否移除成员：',
+      confirmMessage: '移除后将会取消成员拥有的知识库和应用权限。',
+    },
+    setting: {
+      management: '管理',
+      check: '查看',
+    },
+
+    form: {
+      userName: {
+        label: '用户名/邮箱',
+        placeholder: '请输入成员的用户名或邮箱',
+        requiredMessage: '请输入用户名/邮箱',
+      },
+    },
+  },
 }
