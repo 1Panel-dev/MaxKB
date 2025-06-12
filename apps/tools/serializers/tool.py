@@ -153,7 +153,7 @@ class ToolCreateRequest(serializers.Serializer):
 
     is_active = serializers.BooleanField(required=False, label=_('Is active'))
 
-    folder_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, default='root')
+    folder_id = serializers.CharField(required=False, allow_null=True)
 
 
 class ToolEditRequest(serializers.Serializer):
@@ -173,7 +173,7 @@ class ToolEditRequest(serializers.Serializer):
 
     is_active = serializers.BooleanField(required=False, label=_('Is active'))
 
-    folder_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, default='root')
+    folder_id = serializers.CharField(required=False, allow_null=True)
 
 
 class DebugField(serializers.Serializer):
@@ -212,7 +212,7 @@ class ToolSerializer(serializers.Serializer):
                         input_field_list=instance.get('input_field_list', []),
                         init_field_list=instance.get('init_field_list', []),
                         scope=instance.get('scope', ToolScope.WORKSPACE),
-                        folder_id=instance.get('folder_id', 'root'),
+                        folder_id=instance.get('folder_id', self.data.get('workspace_id')),
                         is_active=False)
             tool.save()
             return ToolModelSerializer(tool).data
@@ -440,7 +440,7 @@ class ToolTreeSerializer(serializers.Serializer):
     def get_tools(self, folder_id):
         self.is_valid(raise_exception=True)
         if not folder_id:
-            folder_id = 'root'
+            folder_id = self.data.get('workspace_id')
         # 获取当前文件夹
         current_folder = ToolFolder.objects.filter(id=folder_id).first()
         if not current_folder:
@@ -471,7 +471,7 @@ class ToolTreeSerializer(serializers.Serializer):
         def page_tool(self, current_page: int, page_size: int):
             self.is_valid(raise_exception=True)
 
-            folder_id = self.data.get('folder_id', 'root')
+            folder_id = self.data.get('folder_id', self.data.get('workspace_id'))
             root = ToolFolder.objects.filter(id=folder_id).first()
             if not root:
                 raise serializers.ValidationError(_('Folder not found'))
