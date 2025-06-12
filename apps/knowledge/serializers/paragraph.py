@@ -501,8 +501,8 @@ class ParagraphSerializers(serializers.Serializer):
                 target_knowledge = QuerySet(Knowledge).filter(id=target_knowledge_id).first()
                 knowledge = QuerySet(Knowledge).filter(id=knowledge_id).first()
                 embedding_model_id = None
-                if target_knowledge.embedding_mode_id != knowledge.embedding_mode_id:
-                    embedding_model_id = str(target_knowledge.embedding_mode_id)
+                if target_knowledge.embedding_model_id != knowledge.embedding_model_id:
+                    embedding_model_id = str(target_knowledge.embedding_model_id)
                 pid_list = [paragraph.id for paragraph in paragraph_list]
                 # 修改段落信息
                 paragraph_list.update(knowledge_id=target_knowledge_id, document_id=target_document_id)

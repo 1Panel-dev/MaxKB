@@ -298,7 +298,7 @@ class DocumentSerializers(serializers.Serializer):
             else:
                 document_list.update(knowledge_id=target_knowledge_id)
             model_id = None
-            if knowledge.embedding_mode_id != target_knowledge.embedding_mode_id:
+            if knowledge.embedding_model_id != target_knowledge.embedding_model_id:
                 model_id = get_embedding_model_id_by_knowledge_id(target_knowledge_id)
 
             pid_list = [paragraph.id for paragraph in paragraph_list]

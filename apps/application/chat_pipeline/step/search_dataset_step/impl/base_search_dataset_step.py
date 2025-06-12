@@ -37,12 +37,12 @@ def get_model_by_id(_id, user_id):
 
 def get_embedding_id(knowledge_id_list):
     knowledge_list = QuerySet(Knowledge).filter(id__in=knowledge_id_list)
-    if len(set([knowledge.embedding_mode_id for knowledge in knowledge_list])) > 1:
+    if len(set([knowledge.embedding_model_id for knowledge in knowledge_list])) > 1:
         raise Exception(
             _("The vector model of the associated knowledge base is inconsistent and the segmentation cannot be recalled."))
     if len(knowledge_list) == 0:
         raise Exception(_("The knowledge base setting is wrong, please reset the knowledge base"))
-    return knowledge_list[0].embedding_mode_id
+    return knowledge_list[0].embedding_model_id
 
 
 class BaseSearchDatasetStep(ISearchDatasetStep):
