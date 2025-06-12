@@ -87,7 +87,7 @@ const putToolIcon: (
     data: any,
     loading?: Ref<boolean>
 ) => Promise<Result<any>> = (id, data, loading) => {
-  return put(`${prefix}/${id}/edit_icon`, data, undefined, loading)
+  return put(`${prefix}/tool/${id}/edit_icon`, data, undefined, loading)
 }
 
 const exportTool = (id: string, name: string, loading?: Ref<boolean>) => {
@@ -103,14 +103,14 @@ const postToolDebug: (data: any, loading?: Ref<boolean>) => Promise<Result<any>>
   data: any,
   loading,
 ) => {
-  return post(`${prefix}/debug`, data, undefined, loading)
+  return post(`${prefix}/tool/debug`, data, undefined, loading)
 }
 
 const postImportTool: (data: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
   data,
   loading,
 ) => {
-  return post(`${prefix}/import`, data, undefined, loading)
+  return post(`${prefix}/tool/import`, data, undefined, loading)
 }
 
 const postPylint: (code: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
