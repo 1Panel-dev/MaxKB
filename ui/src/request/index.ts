@@ -208,7 +208,7 @@ export const postStream: (url: string, data?: unknown) => Promise<Result<any> | 
   const language = user.getLanguage()
   const headers: HeadersInit = { 'Content-Type': 'application/json' }
   if (token) {
-    headers['AUTHORIZATION'] = `${token}`
+    headers['AUTHORIZATION'] = `Bearer ${token}`
   }
   headers['Accept-Language'] = `${language}`
   return fetch(url, {

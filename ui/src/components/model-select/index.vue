@@ -102,7 +102,7 @@ const modelValue = computed({
   },
   get: () => {
     return props.modelValue
-  }
+  },
 })
 const { model } = useStore()
 

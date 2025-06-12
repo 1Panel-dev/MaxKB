@@ -1,13 +1,13 @@
-import {Result} from '@/request/Result'
-import {get, post, del, put} from '@/request/index'
-import {type Ref} from 'vue'
+import { Result } from '@/request/Result'
+import { get, post, del, put } from '@/request/index'
+import { type Ref } from 'vue'
 import type {
   ListModelRequest,
   Model,
   CreateModelRequest,
   EditModelRequest,
 } from '@/api/type/model'
-import type {FormField} from '@/components/dynamics-form/type'
+import type { FormField } from '@/components/dynamics-form/type'
 
 const prefix = '/workspace/' + localStorage.getItem('workspace_id')
 
@@ -21,7 +21,61 @@ const getModel: (
 ) => Promise<Result<Array<Model>>> = (data, loading) => {
   return get(`${prefix}/model`, data, loading)
 }
+/**
+ * 获取当前用户可使用的模型列表
+ * @param application_id
+ * @param loading
+ * @query  { query_text: string, top_number: number, similarity: number }
+ * @returns
+ */
+const getApplicationRerankerModel: (
+  application_id: string,
+  loading?: Ref<boolean>,
+) => Promise<Result<Array<any>>> = (application_id, loading) => {
+  return get(`${prefix}/model`, { model_type: 'RERANKER' }, loading)
+}
 
+/**
+ * 获取当前用户可使用的模型列表
+ * @param application_id
+ * @param loading
+ * @query  { query_text: string, top_number: number, similarity: number }
+ * @returns
+ */
+const getApplicationSTTModel: (
+  application_id: string,
+  loading?: Ref<boolean>,
+) => Promise<Result<Array<any>>> = (application_id, loading) => {
+  return get(`${prefix}/model`, { model_type: 'STT' }, loading)
+}
+
+/**
+ * 获取当前用户可使用的模型列表
+ * @param application_id
+ * @param loading
+ * @query  { query_text: string, top_number: number, similarity: number }
+ * @returns
+ */
+const getApplicationTTSModel: (
+  application_id: string,
+  loading?: Ref<boolean>,
+) => Promise<Result<Array<any>>> = (application_id, loading) => {
+  return get(`${prefix}/model`, { model_type: 'TTS' }, loading)
+}
+
+const getApplicationImageModel: (
+  application_id: string,
+  loading?: Ref<boolean>,
+) => Promise<Result<Array<any>>> = (application_id, loading) => {
+  return get(`${prefix}/model`, { model_type: 'IMAGE' }, loading)
+}
+
+const getApplicationTTIModel: (
+  application_id: string,
+  loading?: Ref<boolean>,
+) => Promise<Result<Array<any>>> = (application_id, loading) => {
+  return get(`${prefix}/model`, { model_type: 'TTI' }, loading)
+}
 /**
  * 获取模型参数表单
  * @param model_id 模型id
@@ -82,10 +136,10 @@ const updateModelParamsForm: (
  * @param loading  加载器
  * @returns
  */
-const getModelById: (
-  model_id: string,
-  loading?: Ref<boolean>,
-) => Promise<Result<Model>> = (model_id, loading) => {
+const getModelById: (model_id: string, loading?: Ref<boolean>) => Promise<Result<Model>> = (
+  model_id,
+  loading,
+) => {
   return get(`${prefix}/model/${model_id}`, {}, loading)
 }
 /**
@@ -94,10 +148,10 @@ const getModelById: (
  * @param loading  加载器
  * @returns
  */
-const getModelMetaById: (
-  model_id: string,
-  loading?: Ref<boolean>,
-) => Promise<Result<Model>> = (model_id, loading) => {
+const getModelMetaById: (model_id: string, loading?: Ref<boolean>) => Promise<Result<Model>> = (
+  model_id,
+  loading,
+) => {
   return get(`${prefix}/model/${model_id}/meta`, {}, loading)
 }
 /**
@@ -106,16 +160,16 @@ const getModelMetaById: (
  * @param loading 加载器
  * @returns
  */
-const pauseDownload: (
-  model_id: string,
-  loading?: Ref<boolean>,
-) => Promise<Result<boolean>> = (model_id, loading) => {
+const pauseDownload: (model_id: string, loading?: Ref<boolean>) => Promise<Result<boolean>> = (
+  model_id,
+  loading,
+) => {
   return put(`${prefix}/model/${model_id}/pause_download`, undefined, {}, loading)
 }
-const deleteModel: (
-  model_id: string,
-  loading?: Ref<boolean>,
-) => Promise<Result<boolean>> = (model_id, loading) => {
+const deleteModel: (model_id: string, loading?: Ref<boolean>) => Promise<Result<boolean>> = (
+  model_id,
+  loading,
+) => {
   return del(`${prefix}/model/${model_id}`, undefined, {}, loading)
 }
 export default {
@@ -128,4 +182,9 @@ export default {
   pauseDownload,
   getModelParamsForm,
   updateModelParamsForm,
+  getApplicationRerankerModel,
+  getApplicationSTTModel,
+  getApplicationTTSModel,
+  getApplicationImageModel,
+  getApplicationTTIModel,
 }

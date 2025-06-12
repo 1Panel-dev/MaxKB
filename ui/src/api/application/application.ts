@@ -140,6 +140,27 @@ const getStatistics: (
 ) => Promise<Result<any>> = (application_id, data, loading) => {
   return get(`${prefix}/${application_id}/application_stats`, data, loading)
 }
+/**
+ * 打开调试对话id
+ * @param application_id 应用id
+ * @param loading 加载器
+ * @returns
+ */
+const open: (application_id: string, loading?: Ref<boolean>) => Promise<Result<string>> = (
+  application_id,
+  loading,
+) => {
+  return get(`${prefix}/${application_id}/open`, {}, loading)
+}
+/**
+ * 对话
+ * @param 参数
+ * chat_id: string
+ * data
+ */
+const chat: (chat_id: string, data: any) => Promise<any> = (chat_id, data) => {
+  return postStream(`/api/chat_message/${chat_id}`, data)
+}
 
 export default {
   getAllApplication,
@@ -153,4 +174,6 @@ export default {
   exportApplication,
   importApplication,
   getStatistics,
+  open,
+  chat,
 }

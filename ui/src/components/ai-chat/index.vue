@@ -5,7 +5,7 @@
     :class="type"
     :style="{
       height: firsUserInput ? '100%' : undefined,
-      paddingBottom: applicationDetails.disclaimer ? '20px' : 0
+      paddingBottom: applicationDetails.disclaimer ? '20px' : 0,
     }"
   >
     <div
@@ -120,7 +120,7 @@ defineOptions({ name: 'AiChat' })
 const route = useRoute()
 const {
   params: { accessToken, id },
-  query: { mode }
+  query: { mode },
 } = route as any
 const props = withDefaults(
   defineProps<{
@@ -134,8 +134,8 @@ const props = withDefaults(
   {
     applicationDetails: () => ({}),
     available: true,
-    type: 'ai-chat'
-  }
+    type: 'ai-chat',
+  },
 )
 const emit = defineEmits(['refresh', 'scroll'])
 const { application, common } = useStore()
@@ -163,13 +163,13 @@ const initialApiFormData = ref({})
 const isUserInput = computed(
   () =>
     props.applicationDetails.work_flow?.nodes?.filter((v: any) => v.id === 'base-node')[0]
-      .properties.user_input_field_list.length > 0
+      .properties.user_input_field_list.length > 0,
 )
 const isAPIInput = computed(
   () =>
     props.type === 'debug-ai-chat' &&
     props.applicationDetails.work_flow?.nodes?.filter((v: any) => v.id === 'base-node')[0]
-      .properties.api_input_field_list.length > 0
+      .properties.api_input_field_list.length > 0,
 )
 const showUserInputContent = computed(() => {
   return (
@@ -192,7 +192,7 @@ watch(
       }
     }
   },
-  { deep: true, immediate: true }
+  { deep: true, immediate: true },
 )
 
 watch(
@@ -200,7 +200,7 @@ watch(
   () => {
     chartOpenId.value = ''
   },
-  { deep: true }
+  { deep: true },
 )
 
 watch(
@@ -209,8 +209,8 @@ watch(
     chatList.value = value ? value : []
   },
   {
-    immediate: true
-  }
+    immediate: true,
+  },
 )
 
 const toggleUserInput = () => {
@@ -292,9 +292,9 @@ const handleDebounceClick = debounce((val, other_params_data?: any, chat?: chatT
  */
 const openChatId: () => Promise<string> = () => {
   const obj = props.applicationDetails
-  if (props.appId) {
+  if (props.type === 'debug-ai-chat') {
     return applicationApi
-      .getChatOpen(props.appId)
+      .open(obj.id)
       .then((res) => {
         chartOpenId.value = res.data
         return res.data
@@ -308,21 +308,7 @@ const openChatId: () => Promise<string> = () => {
         return Promise.reject(res)
       })
   } else {
-    if (isWorkFlow(obj.type)) {
-      const submitObj = {
-        work_flow: obj.work_flow,
-        user_id: obj.user
-      }
-      return applicationApi.postWorkflowChatOpen(submitObj).then((res) => {
-        chartOpenId.value = res.data
-        return res.data
-      })
-    } else {
-      return applicationApi.postChatOpen(obj).then((res) => {
-        chartOpenId.value = res.data
-        return res.data
-      })
-    }
+    return Promise.reject('暂不支持')
   }
 }
 /**
@@ -447,8 +433,8 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean, other_para
         audio_list:
           other_params_data && other_params_data.audio_list ? other_params_data.audio_list : [],
         other_list:
-          other_params_data && other_params_data.other_list ? other_params_data.other_list : []
-      }
+          other_params_data && other_params_data.other_list ? other_params_data.other_list : [],
+      },
     })
     chatList.value.push(chat)
     ChatManagement.addChatRecord(chat, 50, loading)
@@ -470,16 +456,17 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean, other_para
   } else {
     const obj = {
       message: chat.problem_text,
+      stream: true,
       re_chat: re_chat || false,
       ...other_params_data,
       form_data: {
         ...form_data.value,
-        ...api_form_data.value
-      }
+        ...api_form_data.value,
+      },
     }
     // 对话
     applicationApi
-      .postChatMessage(chartOpenId.value, obj)
+      .chat(chartOpenId.value, obj)
       .then((response) => {
         if (response.status === 401) {
           application
@@ -504,7 +491,7 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean, other_para
           const write = getWrite(
             chat,
             reader,
-            response.headers.get('Content-Type') !== 'application/json'
+            response.headers.get('Content-Type') !== 'application/json',
           )
           return reader.read().then(write)
         }
@@ -530,14 +517,16 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean, other_para
  */
 function getSourceDetail(row: any) {
   if (row.record_id) {
-    chatLogApi.getRecordDetail(id || props.appId, row.chat_id, row.record_id, loading).then((res) => {
-      const exclude_keys = ['answer_text', 'id', 'answer_text_list']
-      Object.keys(res.data).forEach((key) => {
-        if (!exclude_keys.includes(key)) {
-          row[key] = res.data[key]
-        }
+    chatLogApi
+      .getChatRecordDetails(id || props.appId, row.chat_id, row.record_id, loading)
+      .then((res) => {
+        const exclude_keys = ['answer_text', 'id', 'answer_text_list']
+        Object.keys(res.data).forEach((key) => {
+          if (!exclude_keys.includes(key)) {
+            row[key] = res.data[key]
+          }
+        })
       })
-    })
   }
   return true
 }
@@ -617,11 +606,11 @@ watch(
   () => {
     handleScroll()
   },
-  { deep: true, immediate: true }
+  { deep: true, immediate: true },
 )
 
 defineExpose({
-  setScrollBottom
+  setScrollBottom,
 })
 </script>
 <style lang="scss">
