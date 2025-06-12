@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import applicationApi from '@/api/application/application'
+import knowledgeAPI from '@/api/knowledge/knowledge.ts'
 import applicationXpackApi from '@/api/application/application-xpack'
 import { type Ref } from 'vue'
 import { getBrowserLang } from '@/locales/index'
@@ -37,8 +38,8 @@ const useApplicationStore = defineStore('application', {
 
     async asyncGetApplicationKnowledge(id: string, loading?: Ref<boolean>) {
       return new Promise((resolve, reject) => {
-        applicationApi
-          .getApplicationDataset(id, loading)
+        knowledgeAPI
+          .getAllKnowledge(loading)
           .then((data) => {
             resolve(data)
           })

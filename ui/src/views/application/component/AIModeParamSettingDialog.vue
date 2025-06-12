@@ -45,9 +45,7 @@ const form_data = ref<any>({})
 const dialogVisible = ref(false)
 const loading = ref(false)
 const getApi = (model_id: string, application_id?: string) => {
-  return application_id
-    ? applicationApi.getModelParamsForm(application_id, model_id, loading)
-    : modelAPi.getModelParamsForm(model_id, loading)
+  return modelAPi.getModelParamsForm(model_id, loading)
 }
 const open = (model_id: string, application_id?: string, model_setting_data?: any) => {
   form_data.value = {}

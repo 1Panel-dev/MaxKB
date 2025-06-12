@@ -15,7 +15,8 @@ from django.db.models import QuerySet
 from rest_framework import serializers
 from rest_framework.utils.formatting import lazy_format
 
-from application.models import ChatRecord
+from application.models import ChatRecord, ApplicationAccessToken
+from application.serializers.common import ChatInfo
 from common.db.search import page_search
 from common.exception.app_exception import AppApiException
 from common.utils.common import post
@@ -35,6 +36,40 @@ class ChatRecordSerializerModel(serializers.ModelSerializer):
                   'message_tokens', 'answer_tokens', 'const', 'improve_paragraph_id_list', 'run_time', 'index',
                   'answer_text_list',
                   'create_time', 'update_time']
+
+
+class ChatRecordOperateSerializer(serializers.Serializer):
+    chat_id = serializers.UUIDField(required=True, label=_("Conversation ID"))
+    workspace_id = serializers.CharField(required=False, label=_("Workspace ID"))
+    application_id = serializers.UUIDField(required=True, label=_("Application ID"))
+    chat_record_id = serializers.UUIDField(required=True, label=_("Conversation record id"))
+
+    def is_valid(self, *, debug=False, raise_exception=False):
+        super().is_valid(raise_exception=True)
+        application_access_token = QuerySet(ApplicationAccessToken).filter(
+            application_id=self.data.get('application_id')).first()
+        if application_access_token is None:
+            raise AppApiException(500, gettext('Application authentication information does not exist'))
+        if not application_access_token.show_source and not debug:
+            raise AppApiException(500, gettext('Displaying knowledge sources is not enabled'))
+
+    def get_chat_record(self):
+        chat_record_id = self.data.get('chat_record_id')
+        chat_id = self.data.get('chat_id')
+        chat_info: ChatInfo = ChatInfo.get_cache(chat_id)
+        if chat_info is not None:
+            chat_record_list = [chat_record for chat_record in chat_info.chat_record_list if
+                                str(chat_record.id) == str(chat_record_id)]
+            if chat_record_list is not None and len(chat_record_list):
+                return chat_record_list[-1]
+        return QuerySet(ChatRecord).filter(id=chat_record_id, chat_id=chat_id).first()
+
+    def one(self, debug):
+        self.is_valid(debug=debug, raise_exception=True)
+        chat_record = self.get_chat_record()
+        if chat_record is None:
+            raise AppApiException(500, gettext("Conversation does not exist"))
+        return ApplicationChatRecordQuerySerializers.reset_chat_record(chat_record)
 
 
 class ApplicationChatRecordQuerySerializers(serializers.Serializer):

@@ -704,14 +704,14 @@ class ApplicationOperateSerializer(serializers.Serializer):
             self.is_valid()
         application_id = self.data.get("application_id")
         application = QuerySet(Application).get(id=application_id)
-        dataset_list = self.list_knowledge(with_valid=False)
+        knowledge_list = self.list_knowledge(with_valid=False)
         mapping_knowledge_id_list = [akm.knowledge_id for akm in
                                      QuerySet(ApplicationKnowledgeMapping).filter(application_id=application_id)]
         knowledge_id_list = [d.get('id') for d in
                              list(filter(lambda row: mapping_knowledge_id_list.__contains__(row.get('id')),
-                                         dataset_list))]
+                                         knowledge_list))]
         return {**ApplicationSerializerModel(application).data,
-                'dataset_id_list': knowledge_id_list}
+                'knowledge_id_list': knowledge_id_list}
 
     def list_knowledge(self, with_valid=True):
         if with_valid:

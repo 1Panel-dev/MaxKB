@@ -465,6 +465,7 @@ import ParamSettingDialog from './component/ParamSettingDialog.vue'
 import AddKnowledgeDialog from './component/AddKnowledgeDialog.vue'
 import EditAvatarDialog from '@/views/application-overview/component/EditAvatarDialog.vue'
 import applicationApi from '@/api/application/application'
+import modelAPI from '@/api/model/model.ts'
 import { isAppIcon } from '@/utils/common'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { ApplicationFormType } from '@/api/type/application'
@@ -671,8 +672,8 @@ function getKnowledge() {
 
 function getModel() {
   loading.value = true
-  applicationApi
-    .getApplicationModel(id)
+  modelAPI
+    .getModel({})
     .then((res: any) => {
       modelOptions.value = groupBy(res?.data, 'provider')
       loading.value = false
@@ -684,7 +685,7 @@ function getModel() {
 
 function getSTTModel() {
   loading.value = true
-  applicationApi
+  modelAPI
     .getApplicationSTTModel(id)
     .then((res: any) => {
       sttModelOptions.value = groupBy(res?.data, 'provider')
@@ -697,7 +698,7 @@ function getSTTModel() {
 
 function getTTSModel() {
   loading.value = true
-  applicationApi
+  modelAPI
     .getApplicationTTSModel(id)
     .then((res: any) => {
       ttsModelOptions.value = groupBy(res?.data, 'provider')
@@ -718,14 +719,14 @@ function ttsModelChange() {
 
 function ttsModelEnableChange() {
   if (!applicationForm.value.tts_model_enable) {
-    applicationForm.value.tts_model_id = ''
+    applicationForm.value.tts_model_id = undefined
     applicationForm.value.tts_type = 'BROWSER'
   }
 }
 
 function sttModelEnableChange() {
   if (!applicationForm.value.stt_model_enable) {
-    applicationForm.value.stt_model_id = ''
+    applicationForm.value.stt_model_id = undefined
   }
 }
 
@@ -741,11 +742,12 @@ function refresh() {
 }
 
 onMounted(() => {
-  // getModel()
+  getModel()
+  // todo
   // getKnowledge()
-  // getDetail()
-  // getSTTModel()
-  // getTTSModel()
+  getDetail()
+  getSTTModel()
+  getTTSModel()
 })
 </script>
 <style lang="scss" scoped>

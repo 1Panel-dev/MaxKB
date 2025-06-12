@@ -101,6 +101,8 @@ class DebugChatSerializers(serializers.Serializer):
         self.is_valid(raise_exception=True)
         chat_id = self.data.get('chat_id')
         chat_info: ChatInfo = ChatInfo.get_cache(chat_id)
+        application = QuerySet(Application).filter(id=chat_info.application_id).first()
+        chat_info.application = application
         return ChatSerializers(data={
             'chat_id': chat_id, "chat_user_id": chat_info.chat_user_id,
             "chat_user_type": chat_info.chat_user_type,

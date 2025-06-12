@@ -188,7 +188,18 @@ const postExportChatLog: (
     loading,
   )
 }
-
+const getChatRecordDetails: (
+  application_id: string,
+  chat_id: string,
+  chat_record_id: string,
+  loading?: Ref<boolean>,
+) => Promise<any> = (application_id, chat_id, chat_record_id, loading) => {
+  return get(
+    `${prefix}/${application_id}/chat/${chat_id}/chat_record/${chat_record_id}`,
+    {},
+    loading,
+  )
+}
 export default {
   postChatLogAddKnowledge,
   getChatLog,
@@ -197,4 +208,5 @@ export default {
   putChatRecordLog,
   delMarkChatRecord,
   postExportChatLog,
+  getChatRecordDetails,
 }

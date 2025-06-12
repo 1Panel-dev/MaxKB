@@ -14,7 +14,8 @@ from rest_framework.views import APIView
 from application.api.application_chat_record import ApplicationChatRecordQueryAPI, \
     ApplicationChatRecordImproveParagraphAPI, ApplicationChatRecordAddKnowledgeAPI
 from application.serializers.application_chat_record import ApplicationChatRecordQuerySerializers, \
-    ApplicationChatRecordImproveSerializer, ChatRecordImproveSerializer, ApplicationChatRecordAddKnowledgeSerializer
+    ApplicationChatRecordImproveSerializer, ChatRecordImproveSerializer, ApplicationChatRecordAddKnowledgeSerializer, \
+    ChatRecordOperateSerializer
 from common import result
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
@@ -65,6 +66,30 @@ class ApplicationChatRecord(APIView):
                       'chat_id': chat_id}).page(
                 current_page=current_page,
                 page_size=page_size))
+
+
+class ApplicationChatRecordOperateAPI(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(
+        methods=['GET'],
+        description=_("Get conversation record details"),
+        summary=_("Get conversation record details"),
+        operation_id=_("Get conversation record details"),  # type: ignore
+        request=ApplicationChatRecordQueryAPI.get_request(),
+        parameters=ApplicationChatRecordQueryAPI.get_parameters(),
+        responses=ApplicationChatRecordQueryAPI.get_response(),
+        tags=[_("Application/Conversation Log")]  # type: ignore
+    )
+    @has_permissions(PermissionConstants.APPLICATION_CHAT_LOG.get_workspace_application_permission(),
+                     RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
+    def get(self, request: Request, workspace_id: str, application_id: str, chat_id: str, chat_record_id: str):
+        return result.success(ChatRecordOperateSerializer(
+            data={
+                'workspace_id': workspace_id,
+                'application_id': application_id,
+                'chat_id': chat_id,
+                'chat_record_id': chat_record_id}).one(True))
 
 
 class ApplicationChatRecordAddKnowledge(APIView):
