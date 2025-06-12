@@ -46,6 +46,53 @@ const systemRouter = {
       component: () => import('@/views/role/index.vue'),
     },
     {
+      path: '/system/shared',
+      name: 'shared',
+      meta: {
+        icon: 'app-folder-share',
+        iconActive: 'app-folder-share-active',
+        title: 'views.system.shared_resources',
+        activeMenu: '/system',
+        parentPath: '/system',
+        parentName: 'system',
+      },
+      children: [
+        {
+          path: '/system/shared/knowledge',
+          name: 'knowledgeBase',
+          meta: {
+            title: 'views.knowledge.title',
+            activeMenu: '/system',
+            parentPath: '/system',
+            parentName: 'system',
+          },
+          component: () => import('@/views/knowledge-shared-system/index.vue'),
+        },
+        {
+          path: '/system/shared/tool',
+          name: 'tools',
+          meta: {
+            title: 'views.tool.title',
+            activeMenu: '/system',
+            parentPath: '/system',
+            parentName: 'system',
+          },
+          component: () => import('@/views/tool-shared-system/index.vue'),
+        },
+        {
+          path: '/system/shared/model',
+          name: 'models',
+          meta: {
+            title: 'views.model.title',
+            activeMenu: '/system',
+            parentPath: '/system',
+            parentName: 'system',
+          },
+          component: () => import('@/views/model-shared-system/index.vue'),
+        },
+      ],
+    },
+    {
       path: '/system/setting',
       name: 'setting',
       meta: {

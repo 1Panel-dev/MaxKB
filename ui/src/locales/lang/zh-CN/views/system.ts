@@ -1,6 +1,10 @@
 export default {
   title: '系统管理',
   subTitle: '系统设置',
+  shared: '共享',
+  shared_resources: '共享资源',
+  share_knowledge: '共享知识库',
+  authorized_workspace:'授权工作空间',
   test: '测试连接',
   testSuccess: '测试连接成功',
   testFailed: '测试连接失败',

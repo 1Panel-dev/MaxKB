@@ -191,7 +191,7 @@
 <script lang="ts" setup>
 import { onMounted, ref, reactive, computed } from 'vue'
 import { cloneDeep, get } from 'lodash'
-import ToolApi from '@/api/tool/tool'
+import ToolApi from '@/api/shared/tool'
 import useStore from '@/stores'
 import InitParamDrawer from '@/views/tool/component/InitParamDrawer.vue'
 import ToolFormDrawer from './ToolFormDrawer.vue'
