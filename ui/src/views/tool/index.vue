@@ -253,7 +253,7 @@ function openCreateDialog(data?: any) {
 
 function getList() {
   const params = {
-    folder_id: currentFolder.value?.id || 'root',
+    folder_id: currentFolder.value?.id || localStorage.getItem('workspace_id'),
     scope: 'WORKSPACE',
   }
   ToolApi.getToolList(paginationConfig, params, loading).then((res) => {

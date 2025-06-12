@@ -354,7 +354,7 @@ const search_type_change = () => {
 
 function getList() {
   const params = {
-    folder_id: currentFolder.value?.id || 'root',
+    folder_id: currentFolder.value?.id || localStorage.getItem('workspace_id'),
     [search_type.value]: search_form.value[search_type.value],
   }
   KnowledgeApi.getKnowledgeList(paginationConfig, params, loading).then((res) => {
