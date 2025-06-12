@@ -82,7 +82,7 @@ interface ResetCurrentUserPasswordRequest {
   /**
    * 验证码
    */
-  code: string
+  code?: string
   /**
    *密码
    */

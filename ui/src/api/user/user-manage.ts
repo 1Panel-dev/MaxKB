@@ -78,11 +78,25 @@ const resetPassword: (
   return post('/user/re_password', request, undefined, loading)
 }
 
+/**
+ * 重置密码
+ * @param request 重置密码请求参数
+ * @param loading 接口加载器
+ * @returns
+ */
+const resetCurrentPassword: (
+  request: ResetPasswordRequest,
+  loading?: Ref<boolean>
+) => Promise<Result<boolean>> = (request, loading) => {
+  return post('/user/current/reset_password', request, undefined, loading)
+}
+
 export default {
   getUserManage,
   putUserManage,
   delUserManage,
   postUserManage,
   putUserManagePassword,
-  resetPassword
+  resetPassword,
+  resetCurrentPassword
 }

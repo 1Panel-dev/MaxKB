@@ -2,11 +2,11 @@
   <el-dropdown trigger="click" type="primary">
     <div class="flex-center cursor">
       <el-avatar :size="30">
-        <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
+        <img src="@/assets/user-icon.svg" style="width: 54%" alt=""/>
       </el-avatar>
       <span class="ml-8 color-text-primary">{{ user.userInfo?.username }}</span>
       <el-icon class="el-icon--right">
-        <CaretBottom />
+        <CaretBottom/>
       </el-icon>
     </div>
 
@@ -15,7 +15,7 @@
         <div class="userInfo flex align-center">
           <div class="mr-12 flex align-center">
             <el-avatar :size="30">
-              <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
+              <img src="@/assets/user-icon.svg" style="width: 54%" alt=""/>
             </el-avatar>
           </div>
           <div style="width: 90%">
@@ -25,7 +25,8 @@
             >
               <el-tag size="small" class="default-tag">{{ user.userInfo?.role[0] }}</el-tag>
               <el-tag size="small" class="default-tag ml-4" v-if="user.userInfo?.role?.length > 1"
-                >+{{ user.userInfo?.role?.length - 1 }}</el-tag
+              >+{{ user.userInfo?.role?.length - 1 }}
+              </el-tag
               >
             </template>
           </div>
@@ -42,7 +43,9 @@
           <el-dropdown class="w-full" trigger="hover" placement="left-start">
             <div class="flex-between w-full" style="line-height: 22px; padding: 12px 11px">
               <span> {{ $t('layout.language') }}</span>
-              <el-icon><ArrowRight /></el-icon>
+              <el-icon>
+                <ArrowRight/>
+              </el-icon>
             </div>
 
             <template #dropdown>
@@ -55,14 +58,14 @@
                   class="flex-between"
                 >
                   <span :class="lang.value === user.userInfo?.language ? 'primary' : ''">{{
-                    lang.label
-                  }}</span>
+                      lang.label
+                    }}</span>
 
                   <el-icon
                     :class="lang.value === user.userInfo?.language ? 'primary' : ''"
                     v-if="lang.value === user.userInfo?.language"
                   >
-                    <Check />
+                    <Check/>
                   </el-icon>
                 </el-dropdown-item>
               </el-dropdown-menu>
@@ -86,25 +89,24 @@
       </el-dropdown-menu>
     </template>
   </el-dropdown>
-  <APIKeyDialog :user-id="user.userInfo?.id" ref="APIKeyDialogRef" />
-  <!-- <ResetPassword ref="resetPasswordRef"></ResetPassword> -->
+  <APIKeyDialog :user-id="user.userInfo?.id" ref="APIKeyDialogRef"/>
+  <ResetPassword ref="resetPasswordRef"></ResetPassword>
   <!-- <AboutDialog ref="AboutDialogRef"></AboutDialog>
   -->
   <!-- <UserPwdDialog ref="UserPwdDialogRef" /> -->
 </template>
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import {ref, onMounted} from 'vue'
 import useStore from '@/stores'
-import { useRouter } from 'vue-router'
-// import ResetPassword from './ResetPassword.vue'
+import {useRouter} from 'vue-router'
+import ResetPassword from './ResetPassword.vue'
 // import AboutDialog from './AboutDialog.vue'
 // import UserPwdDialog from '@/views/user-manage/component/UserPwdDialog.vue'
 import APIKeyDialog from './APIKeyDialog.vue'
-import { ComplexPermission } from '@/utils/permission/type'
-import { langList } from '@/locales/index'
-import { useLocale } from '@/locales/useLocale'
-import type ResetPassword from "@/layout/layout-header/avatar/ResetPassword.vue";
-const { user } = useStore()
+import {ComplexPermission} from '@/utils/permission/type'
+import {langList} from '@/locales/index'
+
+const {user} = useStore()
 const router = useRouter()
 
 const AboutDialogRef = ref()
@@ -130,7 +132,7 @@ const openResetPassword = () => {
 
 const logout = () => {
   user.logout().then(() => {
-    router.push({ name: 'login' })
+    router.push({name: 'login'})
   })
 }
 
@@ -150,6 +152,7 @@ onMounted(() => {
 
   :deep(.el-dropdown-menu__item) {
     padding: 12px 11px;
+
     &:hover {
       background: var(--app-text-color-light-1);
     }
