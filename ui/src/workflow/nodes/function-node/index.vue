@@ -25,8 +25,8 @@
                 required: item.is_required,
                 message:
                   item.source === 'reference'
-                    ? $t('views.functionLib.functionForm.form.param.selectPlaceholder')
-                    : $t('views.functionLib.functionForm.form.param.inputPlaceholder'),
+                    ? $t('views.tool.functionForm.form.param.selectPlaceholder')
+                    : $t('views.tool.functionForm.form.param.inputPlaceholder'),
                 trigger: 'blur'
               }"
             >
@@ -58,14 +58,14 @@
                 ref="nodeCascaderRef"
                 :nodeModel="nodeModel"
                 class="w-full"
-                :placeholder="$t('views.functionLib.functionForm.form.param.selectPlaceholder')"
+                :placeholder="$t('views.tool.functionForm.form.param.selectPlaceholder')"
                 v-model="item.value"
                 :width="100"
               />
               <el-input
                 v-else
                 v-model="item.value"
-                :placeholder="$t('views.functionLib.functionForm.form.param.inputPlaceholder')"
+                :placeholder="$t('views.tool.functionForm.form.param.inputPlaceholder')"
               />
             </el-form-item>
           </template>
@@ -75,11 +75,11 @@
       </el-card>
 
       <h5 class="lighter mb-8">
-        {{ $t('views.functionLib.functionForm.form.param.code') }}
+        {{ $t('views.tool.functionForm.form.param.code') }}
       </h5>
       <div class="mb-8" v-if="showEditor">
         <CodemirrorEditor
-          :title="$t('views.functionLib.functionForm.form.param.code')"
+          :title="$t('views.tool.functionForm.form.param.code')"
           v-model="chat_data.code"
           @wheel="wheel"
           style="height: 130px !important"

@@ -51,7 +51,7 @@
         >
           <div class="flex-between">
             <div class="flex align-center">
-              <img class="mr-12" src="@/assets/icon_file-doc.svg" alt="" />
+              <img class="mr-12" src="@/assets/workflow/icon_file-doc.svg" alt="" />
               <div>
                 <p class="line-height-22 mt-4">
                   {{ $t('common.fileUpload.document') }}
@@ -81,7 +81,7 @@
         >
           <div class="flex-between">
             <div class="flex align-center">
-              <img class="mr-12" src="@/assets/icon_file-image.svg" alt="" />
+              <img class="mr-12" src="@/assets/workflow/icon_file-image.svg" alt="" />
               <div>
                 <p class="line-height-22 mt-4">
                   {{ $t('common.fileUpload.image') }}
@@ -109,7 +109,7 @@
         >
           <div class="flex-between">
             <div class="flex align-center">
-              <img class="mr-12" src="@/assets/icon_file-audio.svg" alt="" />
+              <img class="mr-12" src="@/assets/workflow/icon_file-audio.svg" alt="" />
               <div>
                 <p class="line-height-22 mt-4">
                   {{ $t('common.fileUpload.audio') }}

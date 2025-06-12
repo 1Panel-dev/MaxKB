@@ -205,9 +205,9 @@ function refreshVersion(item?: any) {
   if (item) {
     renderGraphData(item)
   }
-  if (hasPermission(`APPLICATION:MANAGE:${id}`, 'AND') && isSave.value) {
-    initInterval()
-  }
+  // if (hasPermission(`APPLICATION:MANAGE:${id}`, 'AND') && isSave.value) {
+  //   initInterval()
+  // }
   showHistory.value = false
   disablePublic.value = false
 }
@@ -233,9 +233,9 @@ function renderGraphData(item: any) {
 
 function closeHistory() {
   getDetail()
-  if (hasPermission(`APPLICATION:MANAGE:${id}`, 'AND') && isSave.value) {
-    initInterval()
-  }
+  // if (hasPermission(`APPLICATION:MANAGE:${id}`, 'AND') && isSave.value) {
+  //   initInterval()
+  // }
   showHistory.value = false
   disablePublic.value = false
 }
@@ -419,9 +419,9 @@ onMounted(() => {
   const workflowAutoSave = localStorage.getItem('workflowAutoSave')
   isSave.value = workflowAutoSave === 'true' ? true : false
   // 初始化定时任务
-  if (hasPermission(`APPLICATION:MANAGE:${id}`, 'AND') && isSave.value) {
-    initInterval()
-  }
+  // if (hasPermission(`APPLICATION:MANAGE:${id}`, 'AND') && isSave.value) {
+  //   initInterval()
+  // }
 })
 
 onBeforeUnmount(() => {

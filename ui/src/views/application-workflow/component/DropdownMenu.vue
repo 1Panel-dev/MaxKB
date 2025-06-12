@@ -35,7 +35,7 @@
           </div>
         </el-scrollbar>
       </el-tab-pane>
-      <el-tab-pane :label="$t('views.functionLib.title')" name="function">
+      <el-tab-pane :label="$t('views.tool.title')" name="function">
         <el-scrollbar height="400">
           <div
             class="workflow-dropdown-item cursor flex p-8-12"
@@ -52,8 +52,8 @@
           <template v-for="(item, index) in filter_function_lib_list" :key="index">
             <div
               class="workflow-dropdown-item cursor flex p-8-12 align-center"
-              @click.stop="clickNodes(functionLibNode, item, 'function')"
-              @mousedown.stop="onmousedown(functionLibNode, item, 'function')"
+              @click.stop="clickNodes(toolNode, item, 'function')"
+              @mousedown.stop="onmousedown(toolNode, item, 'function')"
             >
               <component
                 :is="iconComponent(`function-lib-node-icon`)"
@@ -130,7 +130,7 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
-import { menuNodes, functionLibNode, functionNode, applicationNode } from '@/workflow/common/data'
+import { menuNodes, toolNode, functionNode, applicationNode } from '@/workflow/common/data'
 import { iconComponent } from '@/workflow/icons/utils'
 import applicationApi from '@/api/application/application'
 import { isWorkFlow } from '@/utils/application'
@@ -153,9 +153,9 @@ const emit = defineEmits(['clickNodes', 'onmousedown'])
 const loading = ref(false)
 const activeName = ref('base')
 
-const functionLibList = ref<any[]>([])
+const toolList = ref<any[]>([])
 const filter_function_lib_list = computed(() => {
-  return functionLibList.value.filter((item: any) =>
+  return toolList.value.filter((item: any) =>
     item.name.toLocaleLowerCase().includes(search_text.value.toLocaleLowerCase())
   )
 })
@@ -261,8 +261,8 @@ function onmousedown(item: any, data?: any, type?: string) {
 }
 
 function getList() {
-  applicationApi.listFunctionLib(props.id, loading).then((res: any) => {
-    functionLibList.value = res.data
+  applicationApi.listTool(props.id, loading).then((res: any) => {
+    toolList.value = res.data
   })
   applicationApi.getApplicationList(props.id, loading).then((res: any) => {
     applicationList.value = res.data
@@ -270,7 +270,7 @@ function getList() {
 }
 
 onMounted(() => {
-  getList()
+  // getList()
 })
 </script>
 <style lang="scss" scoped>

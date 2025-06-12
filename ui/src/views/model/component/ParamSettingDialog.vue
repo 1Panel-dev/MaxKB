@@ -9,7 +9,7 @@
     :before-close="close"
   >
     <el-button type="primary" @click="openAddDrawer()" class="mb-12">
-      {{ $t('views.model.modelForm.title.addParam') }}
+      {{ $t('common.param.addParam') }}
     </el-button>
     <el-table :data="modelParamsForm" class="mb-16">
       <el-table-column

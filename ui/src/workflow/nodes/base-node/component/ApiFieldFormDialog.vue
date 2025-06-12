@@ -2,8 +2,8 @@
   <el-dialog
     :title="
       isEdit
-        ? $t('views.template.templateForm.title.editParam')
-        : $t('views.template.templateForm.title.addParam')
+        ? $t('common.param.editParam')
+        : $t('common.param.addParam')
     "
     v-model="dialogVisible"
     :close-on-click-modal="false"

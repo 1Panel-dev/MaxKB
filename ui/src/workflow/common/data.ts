@@ -374,7 +374,7 @@ export const functionNode = {
     }
   }
 }
-export const functionLibNode = {
+export const toolNode = {
   type: WorkflowType.FunctionLib,
   text: t('views.applicationWorkflow.nodes.functionNode.text'),
   label: t('views.applicationWorkflow.nodes.functionNode.label'),
@@ -437,7 +437,7 @@ export const nodeDict: any = {
   [WorkflowType.Base]: baseNode,
   [WorkflowType.Start]: startNode,
   [WorkflowType.Reply]: replyNode,
-  [WorkflowType.FunctionLib]: functionLibNode,
+  [WorkflowType.FunctionLib]: toolNode,
   [WorkflowType.FunctionLibCustom]: functionNode,
   [WorkflowType.RrerankerNode]: rerankerNode,
   [WorkflowType.FormNode]: formNode,

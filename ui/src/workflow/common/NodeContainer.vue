@@ -30,8 +30,8 @@
               placement="bottom-start"
             >
               <el-button text>
-                <img src="@/assets/icon_or.svg" alt="" v-if="condition === 'OR'" />
-                <img src="@/assets/icon_and.svg" alt="" v-if="condition === 'AND'" />
+                <img src="@/assets/workflow/icon_or.svg" alt="" v-if="condition === 'OR'" />
+                <img src="@/assets/workflow/icon_and.svg" alt="" v-if="condition === 'AND'" />
               </el-button>
               <template #dropdown>
                 <div style="width: 280px" class="p-12-16">
