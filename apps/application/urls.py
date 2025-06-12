@@ -52,4 +52,7 @@ urlpatterns = [
     path(
         'workspace/<str:workspace_id>/application/<str:application_id>/work_flow_version/<str:work_flow_version_id>',
         views.ApplicationVersionView.Operate.as_view()),
+    path('workspace/<str:workspace_id>/application/<str:application_id>/open', views.OpenView.as_view()),
+    path('chat_message/<str:chat_id>', views.ChatView.as_view()),
+
 ]

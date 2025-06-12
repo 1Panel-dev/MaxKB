@@ -367,9 +367,7 @@ class WorkflowManage:
             '\n\n'.join([a.get('content') for a in answer]) for answer in
             answer_text_list)
         answer_list = reduce(lambda pre, _n: [*pre, *_n], answer_text_list, [])
-        self.work_flow_post_handler.handler(self.params['chat_id'], self.params['chat_record_id'],
-                                            answer_text,
-                                            self)
+        self.work_flow_post_handler.handler(self)
         return self.base_to_response.to_block_response(self.params['chat_id'],
                                                        self.params['chat_record_id'], answer_text, True
                                                        , message_tokens, answer_tokens,
@@ -383,6 +381,9 @@ class WorkflowManage:
         """
         self.run_chain_async(current_node, node_result_future, language)
         return tools.to_stream_response_simple(self.await_result())
+
+    def get_body(self):
+        return self.params
 
     def is_run(self, timeout=0.5):
         future_list_len = len(self.future_list)
@@ -420,9 +421,7 @@ class WorkflowManage:
                                   'message_tokens' in row and row.get('message_tokens') is not None])
             answer_tokens = sum([row.get('answer_tokens') for row in details.values() if
                                  'answer_tokens' in row and row.get('answer_tokens') is not None])
-            self.work_flow_post_handler.handler(self.params['chat_id'], self.params['chat_record_id'],
-                                                self.answer,
-                                                self)
+            self.work_flow_post_handler.handler(self)
             yield self.base_to_response.to_stream_chunk_response(self.params['chat_id'],
                                                                  self.params['chat_record_id'],
                                                                  '',

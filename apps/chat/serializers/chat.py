@@ -94,12 +94,27 @@ def get_post_handler(chat_info: ChatInfo):
     return PostHandler()
 
 
+class DebugChatSerializers(serializers.Serializer):
+    chat_id = serializers.UUIDField(required=True, label=_("Conversation ID"))
+
+    def chat(self, instance: dict, base_to_response: BaseToResponse = SystemToResponse()):
+        self.is_valid(raise_exception=True)
+        chat_id = self.data.get('chat_id')
+        chat_info: ChatInfo = ChatInfo.get_cache(chat_id)
+        return ChatSerializers(data={
+            'chat_id': chat_id, "chat_user_id": chat_info.chat_user_id,
+            "chat_user_type": chat_info.chat_user_type,
+            "application_id": chat_info.application.id, "debug": True
+        }).chat(instance, base_to_response)
+
+
 class ChatSerializers(serializers.Serializer):
     chat_id = serializers.UUIDField(required=True, label=_("Conversation ID"))
     chat_user_id = serializers.CharField(required=True, label=_("Client id"))
     chat_user_type = serializers.CharField(required=True, label=_("Client Type"))
     application_id = serializers.UUIDField(required=True, allow_null=True,
                                            label=_("Application ID"))
+    debug = serializers.BooleanField(required=False, label=_("Debug"))
 
     def is_valid_application_workflow(self, *, raise_exception=False):
         self.is_valid_intraday_access_num()
@@ -158,6 +173,7 @@ class ChatSerializers(serializers.Serializer):
                             .append_step(BaseGenerateHumanMessageStep)
                             .append_step(BaseChatStep)
                             .add_base_to_response(base_to_response)
+                            .add_debug(self.data.get('debug', False))
                             .build())
         exclude_paragraph_id_list = []
         # 相同问题是否需要排除已经查询到的段落
@@ -189,18 +205,18 @@ class ChatSerializers(serializers.Serializer):
         return chat_record
 
     def chat_work_flow(self, chat_info: ChatInfo, instance: dict, base_to_response):
-        message = self.data.get('message')
-        re_chat = self.data.get('re_chat')
-        stream = self.data.get('stream')
-        chat_user_id = instance.get('chat_user_id')
-        chat_user_type = instance.get('chat_user_type')
-        form_data = self.data.get('form_data')
-        image_list = self.data.get('image_list')
-        document_list = self.data.get('document_list')
-        audio_list = self.data.get('audio_list')
-        other_list = self.data.get('other_list')
-        user_id = chat_info.application.user_id
-        chat_record_id = self.data.get('chat_record_id')
+        message = instance.get('message')
+        re_chat = instance.get('re_chat')
+        stream = instance.get('stream')
+        chat_user_id = self.data.get("chat_user_id")
+        chat_user_type = self.data.get('chat_user_type')
+        form_data = instance.get('form_data')
+        image_list = instance.get('image_list')
+        document_list = instance.get('document_list')
+        audio_list = instance.get('audio_list')
+        other_list = instance.get('other_list')
+        workspace_id = chat_info.application.workspace_id
+        chat_record_id = instance.get('chat_record_id')
         chat_record = None
         history_chat_record = chat_info.chat_record_list
         if chat_record_id is not None:
@@ -214,8 +230,9 @@ class ChatSerializers(serializers.Serializer):
                                            're_chat': re_chat,
                                            'chat_user_id': chat_user_id,
                                            'chat_user_type': chat_user_type,
-                                           'user_id': user_id},
-                                          WorkFlowPostHandler(chat_info, chat_user_id, chat_user_type),
+                                           'workspace_id': workspace_id,
+                                           'debug': self.data.get('debug', False)},
+                                          WorkFlowPostHandler(chat_info),
                                           base_to_response, form_data, image_list, document_list, audio_list,
                                           other_list,
                                           self.data.get('runtime_node_id'),
@@ -229,7 +246,7 @@ class ChatSerializers(serializers.Serializer):
         chat_info = self.get_chat_info()
         self.is_valid_chat_id(chat_info)
         if chat_info.application.type == ApplicationTypeChoices.SIMPLE:
-            self.is_valid_application_simple(raise_exception=True, chat_info=chat_info),
+            self.is_valid_application_simple(raise_exception=True, chat_info=chat_info)
             return self.chat_simple(chat_info, instance, base_to_response)
         else:
             self.is_valid_application_workflow(raise_exception=True)
@@ -295,6 +312,7 @@ class OpenChatSerializers(serializers.Serializer):
     application_id = serializers.UUIDField(required=True)
     chat_user_id = serializers.CharField(required=True, label=_("Client id"))
     chat_user_type = serializers.CharField(required=True, label=_("Client Type"))
+    debug = serializers.BooleanField(required=True, label=_("Debug"))
 
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)
@@ -317,6 +335,7 @@ class OpenChatSerializers(serializers.Serializer):
         application_id = self.data.get('application_id')
         chat_user_id = self.data.get("chat_user_id")
         chat_user_type = self.data.get("chat_user_type")
+        debug = self.data.get("debug")
         chat_id = str(uuid.uuid7())
         work_flow_version = QuerySet(WorkFlowVersion).filter(application_id=application_id).order_by(
             '-create_time')[0:1].first()
@@ -326,13 +345,15 @@ class OpenChatSerializers(serializers.Serializer):
                                       "The application has not been published. Please use it after publishing."))
         ChatInfo(chat_id, chat_user_id, chat_user_type, [],
                  [],
-                 application, work_flow_version).set_cache()
+                 application_id,
+                 application, work_flow_version, debug).set_cache()
         return chat_id
 
     def open_simple(self, application):
         application_id = self.data.get('application_id')
         chat_user_id = self.data.get("chat_user_id")
         chat_user_type = self.data.get("chat_user_type")
+        debug = self.data.get("debug")
         knowledge_id_list = [str(row.dataset_id) for row in
                              QuerySet(ApplicationKnowledgeMapping).filter(
                                  application_id=application_id)]
@@ -342,5 +363,6 @@ class OpenChatSerializers(serializers.Serializer):
                   QuerySet(Document).filter(
                       knowledge_id__in=knowledge_id_list,
                       is_active=False)],
-                 application).set_cache()
+                 application_id,
+                 application, debug=debug).set_cache()
         return chat_id

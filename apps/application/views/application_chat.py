@@ -6,6 +6,8 @@
     @date：2025/6/10 11:00
     @desc:
 """
+import uuid
+
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
 from rest_framework.request import Request
@@ -13,7 +15,11 @@ from rest_framework.views import APIView
 
 from application.api.application_chat import ApplicationChatQueryAPI, ApplicationChatQueryPageAPI, \
     ApplicationChatExportAPI
+from application.models import ChatUserType
 from application.serializers.application_chat import ApplicationChatQuerySerializers
+from chat.api.chat_api import ChatAPI
+from chat.api.chat_authentication_api import ChatOpenAPI
+from chat.serializers.chat import OpenChatSerializers, ChatSerializers, DebugChatSerializers
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
 from common.constants.permission_constants import PermissionConstants, RoleConstants
@@ -81,3 +87,39 @@ class ApplicationChat(APIView):
             return ApplicationChatQuerySerializers(
                 data={**query_params_to_single_dict(request.query_params), 'application_id': application_id,
                       }).export(request.data)
+
+
+class OpenView(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(
+        methods=['GET'],
+        description=_("Get a temporary session id based on the application id"),
+        summary=_("Get a temporary session id based on the application id"),
+        operation_id=_("Get a temporary session id based on the application id"),  # type: ignore
+        parameters=ChatOpenAPI.get_parameters(),
+        responses=None,
+        tags=[_('Application')]  # type: ignore
+    )
+    def get(self, request: Request, workspace_id: str, application_id: str):
+        return result.success(OpenChatSerializers(
+            data={'workspace_id': workspace_id, 'application_id': application_id,
+                  'chat_user_id': str(uuid.uuid1()), 'chat_user_type': ChatUserType.ANONYMOUS_USER,
+                  'debug': True}).open())
+
+
+class ChatView(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(
+        methods=['POST'],
+        description=_("dialogue"),
+        summary=_("dialogue"),
+        operation_id=_("dialogue"),  # type: ignore
+        request=ChatAPI.get_request(),
+        parameters=ChatAPI.get_parameters(),
+        responses=None,
+        tags=[_('Application')]  # type: ignore
+    )
+    def post(self, request: Request, chat_id: str):
+        return DebugChatSerializers(data={'chat_id': chat_id}).chat(request.data)

@@ -27,15 +27,19 @@ class ChatInfo:
                  chat_user_type: str,
                  knowledge_id_list: List[str],
                  exclude_document_id_list: list[str],
+                 application_id: str,
                  application: Application,
-                 work_flow_version: WorkFlowVersion = None):
+                 work_flow_version: WorkFlowVersion = None,
+                 debug=False):
         """
-        :param chat_id:                    对话id
+        :param chat_id:                     对话id
         :param chat_user_id                 对话用户id
         :param chat_user_type               对话用户类型
         :param knowledge_id_list:           知识库列表
         :param exclude_document_id_list:    排除的文档
+        :param application_id               应用id
         :param application:                 应用信息
+        :param debug                        是否是调试
         """
         self.chat_id = chat_id
         self.chat_user_id = chat_user_id
@@ -43,8 +47,10 @@ class ChatInfo:
         self.application = application
         self.knowledge_id_list = knowledge_id_list
         self.exclude_document_id_list = exclude_document_id_list
+        self.application_id = application_id
         self.chat_record_list: List[ChatRecord] = []
         self.work_flow_version = work_flow_version
+        self.debug = debug
 
     @staticmethod
     def get_no_references_setting(knowledge_setting, model_setting):
@@ -116,17 +122,17 @@ class ChatInfo:
             if record.id == chat_record.id:
                 self.chat_record_list[index] = chat_record
                 is_save = False
+                break
         if is_save:
             self.chat_record_list.append(chat_record)
-        cache.set(Cache_Version.CHAT.get_key(key=self.chat_id), self, version=Cache_Version.CHAT.get_version(),
-                  timeout=60 * 30)
-        if self.application.id is not None:
-            Chat(id=self.chat_id, application_id=self.application.id, abstract=chat_record.problem_text[0:1024],
-                 chat_user_id=self.chat_user_id, chat_user_type=self.chat_user_type).save()
-        else:
-            QuerySet(Chat).filter(id=self.chat_id).update(update_time=datetime.now())
+        if not self.debug:
+            if not QuerySet(Chat).filter(id=self.chat_id).exists():
+                Chat(id=self.chat_id, application_id=self.application.id, abstract=chat_record.problem_text[0:1024],
+                     chat_user_id=self.chat_user_id, chat_user_type=self.chat_user_type).save()
+            else:
+                QuerySet(Chat).filter(id=self.chat_id).update(update_time=datetime.now())
             # 插入会话记录
-        chat_record.save()
+            chat_record.save()
 
     def set_cache(self):
         cache.set(Cache_Version.CHAT.get_key(key=self.chat_id), self, version=Cache_Version.CHAT.get_version(),
