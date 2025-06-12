@@ -6,7 +6,8 @@ FROM (SELECT "id",
              'KNOWLEDGE' AS "auth_target_type",
              user_id,
              workspace_id,
-             "type"::varchar    AS "icon"
+             "type"::varchar    AS "icon",
+             folder_id
       FROM knowledge
       ${knowledge_query_set}
      UNION
@@ -15,7 +16,8 @@ FROM (SELECT "id",
              'APPLICATION' AS "auth_target_type",
              user_id,
              workspace_id,
-             icon
+             icon,
+             folder_id
       FROM application
       ${application_query_set}
    ) app_or_knowledge
