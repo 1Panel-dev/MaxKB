@@ -491,7 +491,7 @@ class DocumentSerializers(serializers.Serializer):
             return True
 
     class Operate(serializers.Serializer):
-        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+        workspace_id = serializers.CharField(required=False, label=_('workspace id'), allow_blank=True)
         document_id = serializers.UUIDField(required=True, label=_('document id'))
         knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
 
@@ -725,7 +725,7 @@ class DocumentSerializers(serializers.Serializer):
             return document_name.strip()
 
     class Create(serializers.Serializer):
-        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+        workspace_id = serializers.CharField(required=False, label=_('workspace id'), allow_null=True)
         knowledge_id = serializers.UUIDField(required=True, label=_('document id'))
 
         def is_valid(self, *, raise_exception=False):
@@ -869,7 +869,7 @@ class DocumentSerializers(serializers.Serializer):
                     file.save(file_bytes)
 
     class Split(serializers.Serializer):
-        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+        workspace_id = serializers.CharField(required=False, label=_('workspace id'), allow_null=True)
         knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
 
         def is_valid(self, *, instance=None, raise_exception=True):
@@ -944,7 +944,7 @@ class DocumentSerializers(serializers.Serializer):
             return [result]
 
     class SplitPattern(serializers.Serializer):
-        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+        workspace_id = serializers.CharField(required=False, label=_('workspace id'), allow_null=True)
         knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
 
         @staticmethod
