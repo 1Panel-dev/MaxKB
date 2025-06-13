@@ -84,6 +84,27 @@
                     </div>
                   </div>
                 </el-dropdown-item>
+                <el-dropdown-item>
+                  <el-upload
+                    ref="elUploadRef"
+                    :file-list="[]"
+                    action="#"
+                    multiple
+                    :auto-upload="false"
+                    :show-file-list="false"
+                    :limit="1"
+                    :on-change="(file: any, fileList: any) => importApplication(file)"
+                  >
+                    <div class="flex align-center">
+                      <el-avatar shape="square" class="mt-4" :size="36" style="background: none">
+                        <img src="@/assets/application/icon_import_app.svg" alt="" />
+                      </el-avatar>
+                      <div class="pre-wrap ml-8">
+                        <div class="lighter">{{ $t('views.application.importApplication') }}</div>
+                      </div>
+                    </div>
+                  </el-upload>
+                </el-dropdown-item>
                 <el-dropdown-item @click="openCreateFolder" divided>
                   <div class="flex align-center">
                     <AppIcon iconName="app-folder" style="font-size: 32px"></AppIcon>
@@ -417,6 +438,28 @@ function openCreateFolder() {
 function refreshFolder() {
   getFolder()
   getList()
+}
+const elUploadRef = ref()
+const importApplication = (file: any) => {
+  const formData = new FormData()
+  formData.append('file', file.raw, file.name)
+  elUploadRef.value.clearFiles()
+  ApplicaitonApi.importApplication(formData, loading)
+    .then(async (res: any) => {
+      if (res?.data) {
+        getList()
+      }
+    })
+    .catch((e) => {
+      if (e.code === 400) {
+        MsgConfirm(t('common.tip'), t('views.application.tip.professionalMessage'), {
+          cancelButtonText: t('common.confirm'),
+          confirmButtonText: t('common.professional'),
+        }).then(() => {
+          window.open('https://maxkb.cn/pricing.html', '_blank')
+        })
+      }
+    })
 }
 
 onMounted(() => {
