@@ -63,8 +63,7 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_AUTHENTICATION_CLASSES': ['common.auth.authenticate.AnonymousAuthentication']
 }
-STATICFILES_DIRS = [(os.path.join(PROJECT_DIR, 'ui', 'dist'))]
-
+STATICFILES_DIRS = [(os.path.join(PROJECT_DIR, 'ui', 'dist')), (os.path.join(PROJECT_DIR, 'chat', 'dist'))]
 STATIC_ROOT = os.path.join(BASE_DIR.parent, 'static')
 ROOT_URLCONF = 'maxkb.urls'
 
@@ -82,6 +81,19 @@ TEMPLATES = [
             ],
         },
     },
+    {"NAME": "CHAT",
+     'BACKEND': 'django.template.backends.django.DjangoTemplates',
+     'DIRS': ["apps/static/chat"],
+     'APP_DIRS': True,
+     'OPTIONS': {
+         'context_processors': [
+             'django.template.context_processors.debug',
+             'django.template.context_processors.request',
+             'django.contrib.auth.context_processors.auth',
+             'django.contrib.messages.context_processors.messages',
+         ],
+     },
+     },
 ]
 SPECTACULAR_SETTINGS = {
     'TITLE': 'MaxKB API',
