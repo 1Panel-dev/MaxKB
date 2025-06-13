@@ -4,40 +4,44 @@ import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import DefineOptions from 'unplugin-vue-define-options/vite'
+import path from 'path'
+import { createHtmlPlugin } from 'vite-plugin-html'
+
 // import vueDevTools from 'vite-plugin-vue-devtools'
 const envDir = './env'
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
+  console.log('ssss')
   const ENV = loadEnv(mode, envDir)
   const prefix = process.env.VITE_DYNAMIC_PREFIX || ENV.VITE_BASE_PATH
   const proxyConf: Record<string, string | ProxyOptions> = {}
   proxyConf['/api'] = {
     target: 'http://127.0.0.1:8080',
     changeOrigin: true,
-    rewrite: (path) => path.replace(ENV.VITE_BASE_PATH, '/'),
+    rewrite: (path: string) => path.replace(ENV.VITE_BASE_PATH, '/'),
   }
-    proxyConf['/oss'] = {
+  proxyConf['/oss'] = {
     target: 'http://127.0.0.1:8080',
     changeOrigin: true,
-    rewrite: (path) => path.replace(ENV.VITE_BASE_PATH, '/'),
+    rewrite: (path: string) => path.replace(ENV.VITE_BASE_PATH, '/'),
   }
   proxyConf['/doc'] = {
     target: 'http://127.0.0.1:8080',
     changeOrigin: true,
-    rewrite: (path) => path.replace(ENV.VITE_BASE_PATH, '/'),
+    rewrite: (path: string) => path.replace(ENV.VITE_BASE_PATH, '/'),
   }
   proxyConf['/static'] = {
     target: 'http://127.0.0.1:8080',
     changeOrigin: true,
-    rewrite: (path) => path.replace(ENV.VITE_BASE_PATH, '/'),
+    rewrite: (path: string) => path.replace(ENV.VITE_BASE_PATH, '/'),
   }
   return {
     preflight: false,
     lintOnSave: false,
     base: prefix,
     envDir: envDir,
-    plugins: [vue(), vueJsx(), DefineOptions()],
+    plugins: [vue(), vueJsx(), DefineOptions(), createHtmlPlugin({ template: ENV.VITE_INPUT })],
     server: {
       cors: true,
       host: '0.0.0.0',
@@ -46,7 +50,10 @@ export default defineConfig(({ mode }) => {
       proxy: proxyConf,
     },
     build: {
-      outDir: 'dist/ui',
+      outDir: `dist${ENV.VITE_BASE_PATH}`,
+      rollupOptions: {
+        input: path.resolve(__dirname, ENV.VITE_INPUT),
+      },
     },
     resolve: {
       alias: {

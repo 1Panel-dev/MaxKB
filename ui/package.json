@@ -5,9 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "chat": "vite --mode chat",
     "build": "run-p type-check \"build-only {@}\" --",
+    "build-chat": "run-p type-check \"build-only-chat {@}\" --",
     "preview": "vite preview",
     "build-only": "vite build",
+    "build-only-chat": "vite build --mode chat",
     "type-check": "vue-tsc --build",
     "lint": "eslint . --fix",
     "format": "prettier --write src/"
@@ -39,6 +42,7 @@
     "screenfull": "^6.0.2",
     "sortablejs": "^1.15.6",
     "use-element-plus-theme": "^0.0.5",
+    "vite-plugin-html": "^3.2.2",
     "vue": "^3.5.13",
     "vue-clipboard3": "^2.0.0",
     "vue-codemirror": "^6.1.1",
