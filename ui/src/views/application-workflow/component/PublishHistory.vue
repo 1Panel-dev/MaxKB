@@ -71,7 +71,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import applicationApi from '@/api/application/application'
+import workFlowVersionApi from '@/api/application/work-flow-version'
 import { datetimeFormat } from '@/utils/time'
 import { MsgSuccess, MsgError } from '@/utils/message'
 import { t } from '@/locales'
@@ -111,20 +111,20 @@ function editName(val: string, item: any) {
     const obj = {
       name: val
     }
-    // applicationApi.putWorkFlowVersion(id as string, item.id, obj, loading).then(() => {
-    //   MsgSuccess(t('common.modifySuccess'))
-    //   item['writeStatus'] = false
-    //   getList()
-    // })
+    workFlowVersionApi.putWorkFlowVersion(id as string, item.id, obj, loading).then(() => {
+      MsgSuccess(t('common.modifySuccess'))
+      item['writeStatus'] = false
+      getList()
+    })
   } else {
     MsgError(t('views.applicationWorkflow.tip.nameMessage'))
   }
 }
 
 function getList() {
-  // applicationApi.getWorkFlowVersion(id, loading).then((res: any) => {
-  //   LogData.value = res.data
-  // })
+  workFlowVersionApi.getWorkFlowVersion(id, loading).then((res: any) => {
+    LogData.value = res.data
+  })
 }
 
 onMounted(() => {
