@@ -39,9 +39,9 @@
                       </span>
                       <template #dropdown>
                         <el-dropdown-menu>
-                          <el-dropdown-item @click.prevent="deleteMember(row)">{{
+                          <!-- <el-dropdown-item @click.prevent="deleteMember(row)">{{
                             $t('views.system.group.delete.button')
-                          }}</el-dropdown-item>
+                          }}</el-dropdown-item> -->
                         </el-dropdown-menu>
                       </template>
                     </el-dropdown>
@@ -82,9 +82,9 @@ const tableHeight = ref(0)
 
 watch(filterText, (val) => {
   if (val) {
-    filterGroup.value = groupList.value.filter((v) =>
-      v.name.toLowerCase().includes(val.toLowerCase()),
-    )
+    // filterGroup.value = groupList.value.filter((v) =>
+    //   v.name.toLowerCase().includes(val.toLowerCase()),
+    // )
   } else {
     filterGroup.value = groupList.value
   }

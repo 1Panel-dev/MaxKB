@@ -564,18 +564,18 @@ function changeDocument(document_id: string) {
 const knowledgeList = ref<any[]>([])
 
 function getKnowledge() {
-  application.asyncGetApplicationKnowledge(id, documentLoading).then((res: any) => {
-    knowledgeList.value = res.data
-    if (localStorage.getItem(id + 'chat_knowledge_id')) {
-      form.value.knowledge_id = localStorage.getItem(id + 'chat_knowledge_id') as string
-      if (!knowledgeList.value.find((v) => v.id === form.value.knowledge_id)) {
-        form.value.knowledge_id = ''
-        form.value.document_id = ''
-      } else {
-        getDocument(form.value.knowledge_id)
-      }
-    }
-  })
+  // application.asyncGetApplicationKnowledge(id, documentLoading).then((res: any) => {
+  //   knowledgeList.value = res.data
+  //   if (localStorage.getItem(id + 'chat_knowledge_id')) {
+  //     form.value.knowledge_id = localStorage.getItem(id + 'chat_knowledge_id') as string
+  //     if (!knowledgeList.value.find((v) => v.id === form.value.knowledge_id)) {
+  //       form.value.knowledge_id = ''
+  //       form.value.document_id = ''
+  //     } else {
+  //       getDocument(form.value.knowledge_id)
+  //     }
+  //   }
+  // })
 }
 
 const submitForm = async (formEl: FormInstance | undefined) => {

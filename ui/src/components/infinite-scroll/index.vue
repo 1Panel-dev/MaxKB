@@ -1,5 +1,5 @@
 <template>
-  <div v-infinite-scroll="loadDataset" :infinite-scroll-disabled="disabledScroll">
+  <div v-infinite-scroll="loadData" :infinite-scroll-disabled="disabledScroll">
     <slot />
   </div>
   <div style="padding: 16px 10px">
@@ -62,7 +62,7 @@ const noMore = computed(
 )
 const disabledScroll = computed(() => props.size > 0 && (props.loading || noMore.value))
 
-function loadDataset() {
+function loadData() {
   if (props.total > props.page_size) {
     current.value += 1
     emit('update:current_page', current.value)

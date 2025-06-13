@@ -63,7 +63,7 @@ const { common, user } = useStore()
 // @ts-ignore
 const defaultPrompt = t('views.application.form.prompt.defaultPrompt', {
   data: '{data}',
-  question: '{question}'
+  question: '{question}',
 })
 const applicationFormRef = ref()
 
@@ -76,22 +76,22 @@ const applicationForm = ref<ApplicationFormType>({
   model_id: '',
   dialogue_number: 0,
   prologue: t('views.application.form.defaultPrologue'),
-  dataset_id_list: [],
-  dataset_setting: {
+  knowledge_id_list: [],
+  knowledge_setting: {
     top_n: 3,
     similarity: 0.6,
     max_paragraph_char_number: 5000,
     search_mode: 'embedding',
     no_references_setting: {
       status: 'ai_questioning',
-      value: '{question}'
-    }
+      value: '{question}',
+    },
   },
   model_setting: {
-    prompt: defaultPrompt
+    prompt: defaultPrompt,
   },
   problem_optimization: false,
-  type: 'SIMPLE'
+  type: 'SIMPLE',
 })
 
 const rules = reactive<FormRules<ApplicationFormType>>({
@@ -99,9 +99,9 @@ const rules = reactive<FormRules<ApplicationFormType>>({
     {
       required: true,
       message: t('views.application.form.appName.placeholder'),
-      trigger: 'blur'
-    }
-  ]
+      trigger: 'blur',
+    },
+  ],
 })
 
 watch(dialogVisible, (bool) => {
@@ -112,22 +112,22 @@ watch(dialogVisible, (bool) => {
       model_id: '',
       dialogue_number: 0,
       prologue: t('views.application.form.defaultPrologue'),
-      dataset_id_list: [],
-      dataset_setting: {
+      knowledge_id_list: [],
+      knowledge_setting: {
         top_n: 3,
         similarity: 0.6,
         max_paragraph_char_number: 5000,
         search_mode: 'embedding',
         no_references_setting: {
           status: 'ai_questioning',
-          value: '{question}'
-        }
+          value: '{question}',
+        },
       },
       model_setting: {
-        prompt: defaultPrompt
+        prompt: defaultPrompt,
       },
       problem_optimization: false,
-      type: 'SIMPLE'
+      type: 'SIMPLE',
     }
     applicationFormRef.value?.clearValidate()
   }
@@ -145,15 +145,15 @@ const submitValid = (formEl: FormInstance | undefined) => {
   if (user.isEnterprise()) {
     submitHandle(formEl)
   } else {
-    common
-      .asyncGetValid(ValidType.Application, ValidCount.Application, loading)
-      .then(async (res: any) => {
-        if (res?.data) {
-          submitHandle(formEl)
-        } else {
-          MsgAlert(t('common.tip'), t('views.application.tip.professionalMessage'))
-        }
-      })
+    // common
+    //   .asyncGetValid(ValidType.Application, ValidCount.Application, loading)
+    //   .then(async (res: any) => {
+    //     if (res?.data) {
+    //       submitHandle(formEl)
+    //     } else {
+    //       MsgAlert(t('common.tip'), t('views.application.tip.professionalMessage'))
+    //     }
+    //   })
   }
 }
 const submitHandle = async (formEl: FormInstance | undefined) => {

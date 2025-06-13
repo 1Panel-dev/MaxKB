@@ -169,17 +169,18 @@ const form_data = computed({
   }
 })
 
-function getModel() {
-  if (id) {
-    applicationApi.getApplicationTTSModel(id).then((res: any) => {
-      modelOptions.value = groupBy(res?.data, 'provider')
-    })
-  } else {
-    model.asyncGetModel().then((res: any) => {
-      modelOptions.value = groupBy(res?.data, 'provider')
-    })
-  }
-}
+// todo
+// function getModel() {
+//   if (id) {
+//     applicationApi.getApplicationTTSModel(id).then((res: any) => {
+//       modelOptions.value = groupBy(res?.data, 'provider')
+//     })
+//   } else {
+//     model.asyncGetModel().then((res: any) => {
+//       modelOptions.value = groupBy(res?.data, 'provider')
+//     })
+//   }
+// }
 
 const openTTSParamSettingDialog = () => {
   const model_id = form_data.value.tts_model_id
@@ -194,7 +195,7 @@ const refreshTTSForm = (data: any) => {
 }
 
 onMounted(() => {
-  getModel()
+  // getModel()
 
   set(props.nodeModel, 'validate', validate)
 })

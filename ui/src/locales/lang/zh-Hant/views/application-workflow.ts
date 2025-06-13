@@ -121,7 +121,7 @@ export default {
       defaultPrompt: '已知信息',
       think: '思考過程'
     },
-    searchDatasetNode: {
+    searchKnowledgeNode: {
       label: '知識庫檢索',
       text: '關聯知識庫，查找與問題相關的分段',
       paragraph_list: '檢索結果的分段列表',

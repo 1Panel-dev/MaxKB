@@ -261,12 +261,12 @@ function onmousedown(item: any, data?: any, type?: string) {
 }
 
 function getList() {
-  applicationApi.listTool(props.id, loading).then((res: any) => {
-    toolList.value = res.data
-  })
-  applicationApi.getApplicationList(props.id, loading).then((res: any) => {
-    applicationList.value = res.data
-  })
+  // applicationApi.listTool(props.id, loading).then((res: any) => {
+  //   toolList.value = res.data
+  // })
+  // applicationApi.getApplicationList(props.id, loading).then((res: any) => {
+  //   applicationList.value = res.data
+  // })
 }
 
 onMounted(() => {

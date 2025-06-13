@@ -11,14 +11,14 @@ const useApplicationStore = defineStore('application', {
   actions: {
     async asyncGetAllApplication() {
       return new Promise((resolve, reject) => {
-        applicationApi
-          .getAllAppilcation()
-          .then((data) => {
-            resolve(data)
-          })
-          .catch((error) => {
-            reject(error)
-          })
+        // applicationApi
+        //   .getAllAppilcation()
+        //   .then((data) => {
+        //     resolve(data)
+        //   })
+        //   .catch((error) => {
+        //     reject(error)
+        //   })
       })
     },
 
@@ -62,15 +62,15 @@ const useApplicationStore = defineStore('application', {
 
     async asyncGetAppProfile(loading?: Ref<boolean>) {
       return new Promise((resolve, reject) => {
-        applicationApi
-          .getAppProfile(loading)
-          .then((res) => {
-            sessionStorage.setItem('language', res.data?.language || getBrowserLang())
-            resolve(res)
-          })
-          .catch((error) => {
-            reject(error)
-          })
+        // applicationApi
+        //   .getAppProfile(loading)
+        //   .then((res) => {
+        //     sessionStorage.setItem('language', res.data?.language || getBrowserLang())
+        //     resolve(res)
+        //   })
+        //   .catch((error) => {
+        //     reject(error)
+        //   })
       })
     },
 
@@ -110,14 +110,14 @@ const useApplicationStore = defineStore('application', {
     },
     async validatePassword(id: string, password: string, loading?: Ref<boolean>) {
       return new Promise((resolve, reject) => {
-        applicationApi
-          .validatePassword(id, password, loading)
-          .then((data) => {
-            resolve(data)
-          })
-          .catch((error) => {
-            reject(error)
-          })
+        // applicationApi
+        //   .validatePassword(id, password, loading)
+        //   .then((data) => {
+        //     resolve(data)
+        //   })
+        //   .catch((error) => {
+        //     reject(error)
+        //   })
       })
     },
   },

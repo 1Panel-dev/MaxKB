@@ -52,7 +52,7 @@ watch(dialogVisible, (bool) => {
 const open = (data: any, id?: string) => {
   detail.value = cloneDeep(data)
   detail.value.paragraph_list = id
-    ? detail.value.paragraph_list.filter((v: any) => v.dataset_id === id)
+    ? detail.value.paragraph_list.filter((v: any) => v.knowledge_id === id)
     : detail.value.paragraph_list
   detail.value.paragraph_list = arraySort(detail.value.paragraph_list, 'similarity', true)
   dialogVisible.value = true

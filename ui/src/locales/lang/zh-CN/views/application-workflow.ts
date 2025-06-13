@@ -108,7 +108,7 @@ export default {
           audioText: '需要使用“语音转文本”节点解析音频内容',
           otherText: '需要自行解析该类型文件'
         },
-        
+
       }
     },
     aiChatNode: {
@@ -123,7 +123,7 @@ export default {
       defaultPrompt: '已知信息',
       think: '思考过程'
     },
-    searchDatasetNode: {
+    searchKnowledgeNode: {
       label: '知识库检索',
       text: '关联知识库，查找与问题相关的分段',
       paragraph_list: '检索结果的分段列表',

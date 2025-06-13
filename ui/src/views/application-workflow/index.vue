@@ -278,13 +278,13 @@ async function publicHandle() {
         MsgError(e.toString())
         return
       }
-      applicationApi.putPublishApplication(id as string, obj, loading).then(() => {
+      // applicationApi.putPublishApplication(id as string, obj, loading).then(() => {
 
-        application.asyncGetApplicationDetail(id, loading).then((res: any) => {
-          detail.value.name = res.data.name
-          MsgSuccess(t('views.applicationWorkflow.tip.publicSuccess'))
-        })
-      })
+      //   application.asyncGetApplicationDetail(id, loading).then((res: any) => {
+      //     detail.value.name = res.data.name
+      //     MsgSuccess(t('views.applicationWorkflow.tip.publicSuccess'))
+      //   })
+      // })
     })
     .catch((res: any) => {
       const node = res.node

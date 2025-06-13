@@ -7,7 +7,7 @@
           <div class="flex-between">
             <div>
               <el-button
-                v-if="datasetDetail.type === 0"
+                v-if="knowledgeDetail.type === 0"
                 type="primary"
                 @click="
                   router.push({
@@ -17,7 +17,7 @@
                 "
                 >{{ $t('views.document.uploadDocument') }}
               </el-button>
-              <el-button v-if="datasetDetail.type === 1" type="primary" @click="importDoc"
+              <el-button v-if="knowledgeDetail.type === 1" type="primary" @click="importDoc"
                 >{{ $t('views.document.importDocument') }}
               </el-button>
 
@@ -27,7 +27,7 @@
               <el-button @click="openGenerateDialog()" :disabled="multipleSelection.length === 0">
                 {{ $t('views.document.generateQuestion.title') }}
               </el-button>
-              <el-button @click="openDatasetDialog()" :disabled="multipleSelection.length === 0">
+              <el-button @click="openknowledgeDialog()" :disabled="multipleSelection.length === 0">
                 {{ $t('views.document.setting.migration') }}
               </el-button>
               <el-dropdown>
@@ -46,17 +46,17 @@
                       divided
                       @click="syncMulDocument"
                       :disabled="multipleSelection.length === 0"
-                      v-if="datasetDetail.type === 1"
+                      v-if="knowledgeDetail.type === 1"
                       >{{ $t('views.document.syncDocument') }}</el-dropdown-item
                     >
                     <el-dropdown-item
                       divided
-                      v-if="datasetDetail.type === 2"
+                      v-if="knowledgeDetail.type === 2"
                       type="primary"
                       @click="
                         router.push({
                           path: '/knowledge/import',
-                          query: { id: id, folder_token: datasetDetail.meta.folder_token },
+                          query: { id: id, folder_token: knowledgeDetail.meta.folder_token },
                         })
                       "
                       >{{ $t('views.document.importDocument') }}</el-dropdown-item
@@ -65,7 +65,7 @@
                       divided
                       @click="syncLarkMulDocument"
                       :disabled="multipleSelection.length === 0"
-                      v-if="datasetDetail.type === 2"
+                      v-if="knowledgeDetail.type === 2"
                       >{{ $t('views.document.syncDocument') }}</el-dropdown-item
                     >
 
@@ -94,7 +94,7 @@
             class="mt-16"
             :data="documentData"
             :pagination-config="paginationConfig"
-            :quick-create="datasetDetail.type === 0"
+            :quick-create="knowledgeDetail.type === 0"
             @sizeChange="handleSizeChange"
             @changePage="getList"
             @cell-mouse-enter="cellMouseEnter"
@@ -341,7 +341,7 @@
                   />
                 </span>
                 <el-divider direction="vertical" />
-                <template v-if="datasetDetail.type === 0">
+                <template v-if="knowledgeDetail.type === 0">
                   <span
                     class="mr-4"
                     v-if="
@@ -401,7 +401,7 @@
                             <el-icon><Connection /></el-icon>
                             {{ $t('views.document.generateQuestion.title') }}
                           </el-dropdown-item>
-                          <el-dropdown-item @click="openDatasetDialog(row)">
+                          <el-dropdown-item @click="openknowledgeDialog(row)">
                             <AppIcon iconName="app-migrate"></AppIcon>
                             {{ $t('views.document.setting.migration') }}
                           </el-dropdown-item>
@@ -421,7 +421,7 @@
                     </el-dropdown>
                   </span>
                 </template>
-                <template v-if="datasetDetail.type === 1 || datasetDetail.type === 2">
+                <template v-if="knowledgeDetail.type === 1 || knowledgeDetail.type === 2">
                   <span class="mr-4">
                     <el-button
                       type="primary"
@@ -483,7 +483,7 @@
                             <el-icon><Connection /></el-icon>
                             {{ $t('views.document.generateQuestion.title') }}
                           </el-dropdown-item>
-                          <el-dropdown-item @click="openDatasetDialog(row)">
+                          <el-dropdown-item @click="openknowledgeDialog(row)">
                             <AppIcon iconName="app-migrate"></AppIcon>
                             {{ $t('views.document.setting.migration') }}</el-dropdown-item
                           >
@@ -530,7 +530,7 @@
     <ImportDocumentDialog ref="ImportDocumentDialogRef" :title="title" @refresh="refresh" />
     <SyncWebDialog ref="SyncWebDialogRef" @refresh="refresh" />
     <!-- 选择知识库 -->
-    <SelectDatasetDialog ref="SelectDatasetDialogRef" @refresh="refreshMigrate" />
+    <SelectKnowledgeDialog ref="SelectKnowledgeDialogRef" @refresh="refreshMigrate" />
     <GenerateRelatedDialog ref="GenerateRelatedDialogRef" @refresh="getList" />
   </div>
 </template>
@@ -541,7 +541,7 @@ import { ElTable } from 'element-plus'
 import documentApi from '@/api/shared/document'
 import ImportDocumentDialog from './component/ImportDocumentDialog.vue'
 import SyncWebDialog from '@/views/knowledge/component/SyncWebDialog.vue'
-import SelectDatasetDialog from './component/SelectDatasetDialog.vue'
+import SelectKnowledgeDialog from './component/SelectKnowledgeDialog.vue'
 import { numberFormat } from '@/utils/common'
 import { datetimeFormat } from '@/utils/time'
 import { hitHandlingMethod } from '@/enums/document'
@@ -556,7 +556,7 @@ import { t } from '@/locales'
 const router = useRouter()
 const route = useRoute()
 const {
-  params: { id, folderId }, // id为datasetID
+  params: { id, folderId }, // id为knowledgeID
 } = route as any
 
 const { common, knowledge, document } = useStore()
@@ -591,7 +591,7 @@ const filterMethod = ref<any>({})
 const orderBy = ref<string>('')
 const documentData = ref<any[]>([])
 const currentMouseId = ref(null)
-const datasetDetail = ref<any>({})
+const knowledgeDetail = ref<any>({})
 
 const paginationConfig = ref({
   current_page: 1,
@@ -604,16 +604,16 @@ const multipleTableRef = ref<InstanceType<typeof ElTable>>()
 const multipleSelection = ref<any[]>([])
 const title = ref('')
 
-const SelectDatasetDialogRef = ref()
+const SelectknowledgeDialogRef = ref()
 
 const exportDocument = (document: any) => {
-  documentApi.exportDocument(document.name, document.dataset_id, document.id, loading).then(() => {
+  documentApi.exportDocument(document.name, document.knowledge_id, document.id, loading).then(() => {
     MsgSuccess(t('common.exportSuccess'))
   })
 }
 const exportDocumentZip = (document: any) => {
   documentApi
-    .exportDocumentZip(document.name, document.dataset_id, document.id, loading)
+    .exportDocumentZip(document.name, document.knowledge_id, document.id, loading)
     .then(() => {
       MsgSuccess(t('common.exportSuccess'))
     })
@@ -640,7 +640,7 @@ function clearSelection() {
   multipleTableRef.value?.clearSelection()
 }
 
-function openDatasetDialog(row?: any) {
+function openknowledgeDialog(row?: any) {
   const arr: string[] = []
   if (row) {
     arr.push(row.id)
@@ -652,7 +652,7 @@ function openDatasetDialog(row?: any) {
     })
   }
 
-  SelectDatasetDialogRef.value.open(arr)
+  SelectknowledgeDialogRef.value.open(arr)
 }
 
 function dropdownHandle(obj: any) {
@@ -673,7 +673,7 @@ function beforeCommand(attr: string, val: any, task_type?: number) {
 }
 
 const cancelTask = (row: any, task_type: number) => {
-  documentApi.putCancelTask(row.dataset_id, row.id, { type: task_type }).then(() => {
+  documentApi.putCancelTask(row.knowledge_id, row.id, { type: task_type }).then(() => {
     MsgSuccess(t('views.document.tip.sendMessage'))
   })
 }
@@ -745,7 +745,7 @@ function syncWebDocument(row: any) {
       confirmButtonClass: 'danger',
     })
       .then(() => {
-        documentApi.putDocumentSync(row.dataset_id, row.id).then(() => {
+        documentApi.putDocumentSync(row.knowledge_id, row.id).then(() => {
           getList()
         })
       })
@@ -762,7 +762,7 @@ function syncWebDocument(row: any) {
 
 function refreshDocument(row: any) {
   const embeddingDocument = (stateList: Array<string>) => {
-    return documentApi.putDocumentRefresh(row.dataset_id, row.id, stateList).then(() => {
+    return documentApi.putDocumentRefresh(row.knowledge_id, row.id, stateList).then(() => {
       getList()
     })
   }
@@ -782,7 +782,7 @@ function rowClickHandle(row: any, column: any) {
 */
 function creatQuickHandle(val: string) {
   loading.value = true
-  const obj = [{ name: val }]  
+  const obj = [{ name: val }]
   document
     .asyncPostDocument(id, obj)
     .then(() => {
@@ -848,7 +848,7 @@ function deleteMulDocument() {
 function batchRefresh() {
   const arr: string[] = multipleSelection.value.map((v) => v.id)
   const embeddingBatchDocument = (stateList: Array<string>) => {
-    documentApi.batchRefresh(id, arr, stateList, loading).then(() => {
+    documentApi.putBatchRefresh(id, arr, stateList, loading).then(() => {
       MsgSuccess(t('views.document.tip.vectorizationSuccess'))
       multipleTableRef.value?.clearSelection()
     })
@@ -945,7 +945,7 @@ function getList(bool?: boolean) {
 
 function getDetail() {
   knowledge.asyncGetKnowledgeDetail(id, loading).then((res: any) => {
-    datasetDetail.value = res.data
+    knowledgeDetail.value = res.data
   })
 }
 

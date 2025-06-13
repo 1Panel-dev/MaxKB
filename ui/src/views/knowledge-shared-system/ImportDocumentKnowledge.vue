@@ -145,7 +145,7 @@ import knowledgeApi from '@/api/shared/knowledge'
 const router = useRouter()
 const route = useRoute()
 const {
-  query: { id, folder_token } // id为knowledgeID，有id的是上传文档 folder_token为飞书文件夹token
+  query: { id, folder_token }, // id为knowledgeID，有id的是上传文档 folder_token为飞书文件夹token
 } = route
 const knowledgeId = id as string
 const folderToken = folder_token as string
@@ -165,20 +165,20 @@ interface Tree {
 
 const form = ref({
   fileType: 'txt',
-  fileList: [] as any
+  fileList: [] as any,
 })
 
 const rules = reactive({
   fileList: [
-    { required: true, message: t('views.document.upload.requiredMessage'), trigger: 'change' }
-  ]
+    { required: true, message: t('views.document.upload.requiredMessage'), trigger: 'change' },
+  ],
 })
 
 const props = {
   label: 'name',
   children: 'zones',
   isLeaf: (data: any) => data.type !== 'folder',
-  disabled: (data: any) => data.is_exist
+  disabled: (data: any) => data.is_exist,
 }
 
 const loadNode = (node: Node, resolve: (nodeData: Tree[]) => void) => {
@@ -225,7 +225,7 @@ function submit() {
     return {
       name: node.name,
       token: node.token,
-      type: node.type
+      type: node.type,
     }
   })
   if (newList.length === 0) {
@@ -234,7 +234,7 @@ function submit() {
     loading.value = false
     return
   }
-  knowledge
+  knowledgeApi
     .importLarkDocument(knowledgeId, newList, loading)
     .then((res) => {
       MsgSuccess(t('views.document.tip.importMessage'))

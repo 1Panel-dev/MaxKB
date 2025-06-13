@@ -90,29 +90,29 @@ export const aiChatNode = {
 /**
  * 知识库检索配置数据
  */
-export const searchDatasetNode = {
-  type: WorkflowType.SearchDataset,
-  text: t('views.applicationWorkflow.nodes.searchDatasetNode.text'),
-  label: t('views.applicationWorkflow.nodes.searchDatasetNode.label'),
+export const searchKnowledgeNode = {
+  type: WorkflowType.SearchKnowledge,
+  text: t('views.applicationWorkflow.nodes.searchKnowledgeNode.text'),
+  label: t('views.applicationWorkflow.nodes.searchKnowledgeNode.label'),
   height: 355,
   properties: {
-    stepName: t('views.applicationWorkflow.nodes.searchDatasetNode.label'),
+    stepName: t('views.applicationWorkflow.nodes.searchKnowledgeNode.label'),
     config: {
       fields: [
         {
-          label: t('views.applicationWorkflow.nodes.searchDatasetNode.paragraph_list'),
+          label: t('views.applicationWorkflow.nodes.searchKnowledgeNode.paragraph_list'),
           value: 'paragraph_list'
         },
         {
-          label: t('views.applicationWorkflow.nodes.searchDatasetNode.is_hit_handling_method_list'),
+          label: t('views.applicationWorkflow.nodes.searchKnowledgeNode.is_hit_handling_method_list'),
           value: 'is_hit_handling_method_list'
         },
         {
-          label: t('views.applicationWorkflow.nodes.searchDatasetNode.result'),
+          label: t('views.applicationWorkflow.nodes.searchKnowledgeNode.result'),
           value: 'data'
         },
         {
-          label: t('views.applicationWorkflow.nodes.searchDatasetNode.directly_return'),
+          label: t('views.applicationWorkflow.nodes.searchKnowledgeNode.directly_return'),
           value: 'directly_return'
         }
       ]
@@ -341,7 +341,7 @@ export const menuNodes = [
   aiChatNode,
   imageUnderstandNode,
   imageGenerateNode,
-  searchDatasetNode,
+  searchKnowledgeNode,
   rerankerNode,
   conditionNode,
   replyNode,
@@ -431,7 +431,7 @@ export const compareList = [
 
 export const nodeDict: any = {
   [WorkflowType.AiChat]: aiChatNode,
-  [WorkflowType.SearchDataset]: searchDatasetNode,
+  [WorkflowType.SearchKnowledge]: searchKnowledgeNode,
   [WorkflowType.Question]: questionNode,
   [WorkflowType.Condition]: conditionNode,
   [WorkflowType.Base]: baseNode,

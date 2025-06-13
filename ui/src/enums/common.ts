@@ -5,12 +5,12 @@ export enum DeviceType {
 
 export enum ValidType {
   Application = 'application',
-  Dataset = 'dataset',
+  Knowledge = 'knowledge',
   User = 'user'
 }
 
 export enum ValidCount {
   Application = 5,
-  Dataset = 50,
+  Knowledge = 50,
   User = 2
 }

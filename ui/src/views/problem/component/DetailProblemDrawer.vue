@@ -109,17 +109,17 @@ const props = withDefaults(
 
     next_disable: boolean
   }>(),
-  {}
+  {},
 )
 
 const emit = defineEmits(['update:currentId', 'update:currentContent', 'refresh'])
 
 const route = useRoute()
 const {
-  params: { id }
+  params: { id },
 } = route
 
-const { problem } = useStore()
+const { paragraph } = useStore()
 const RelateProblemDialogRef = ref()
 const ParagraphDialogRef = ref()
 const loading = ref(false)
@@ -127,13 +127,13 @@ const visible = ref(false)
 const paragraphList = ref<any[]>([])
 
 function disassociation(item: any) {
-  problem
+  paragraph
     .asyncDisassociationProblem(
-      item.dataset_id,
+      item.knowledge_id,
       item.document_id,
       item.id,
       props.currentId,
-      loading
+      loading,
     )
     .then(() => {
       getRecord()
@@ -151,7 +151,7 @@ function editParagraph(row: any) {
 function editName(val: string) {
   if (val) {
     const obj = {
-      content: val
+      content: val,
     }
     problemApi.putProblems(id as string, props.currentId, obj, loading).then(() => {
       emit('update:currentContent', val)
@@ -183,7 +183,7 @@ watch(
   () => {
     paragraphList.value = []
     getRecord()
-  }
+  },
 )
 
 watch(visible, (bool) => {
@@ -200,7 +200,7 @@ const open = () => {
 }
 
 defineExpose({
-  open
+  open,
 })
 </script>
 <style lang="scss"></style>

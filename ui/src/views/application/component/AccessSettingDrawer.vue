@@ -383,11 +383,11 @@ const open = async (id: string, type: PlatformType) => {
   dataLoaded.value = false
   formRef.value?.resetFields()
   try {
-    const res = await applicationApi.getPlatformConfig(id, type)
-    if (res.data) {
-      form[configType.value] = res.data
-    }
-    dataLoaded.value = true
+    // const res = await applicationApi.getPlatformConfig(id, type)
+    // if (res.data) {
+    //   form[configType.value] = res.data
+    // }
+    // dataLoaded.value = true
   } catch {
     MsgError(t('views.application.tip.loadingErrorMessage'))
   } finally {

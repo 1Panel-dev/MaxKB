@@ -41,8 +41,8 @@
             <img src="@/assets/knowledge/icon_document.svg" style="width: 58%" alt="" />
           </el-avatar>
 
-          <span class="ellipsis-1 break-all" :title="data?.dataset_name">
-            {{ data?.dataset_name }}</span
+          <span class="ellipsis-1 break-all" :title="data?.knowledge_name">
+            {{ data?.knowledge_name }}</span
           >
         </div>
       </div>

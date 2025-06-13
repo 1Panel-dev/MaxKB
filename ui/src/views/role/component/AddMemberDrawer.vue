@@ -4,8 +4,12 @@
       <h4>{{ $t('views.role.member.add') }}</h4>
     </template>
     <template #default>
-      <MemberFormContent ref="memberFormContentRef" :models="formItemModel" v-model:form="list"
-        v-loading="memberFormContentLoading" />
+      <MemberFormContent
+        ref="memberFormContentRef"
+        :models="formItemModel"
+        v-model:form="list"
+        v-loading="memberFormContentLoading"
+      />
     </template>
     <template #footer>
       <div style="flex: auto">
@@ -35,65 +39,71 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'refresh'): void;
-}>();
+  (e: 'refresh'): void
+}>()
 
 const loading = ref(false)
 const visible = ref(false)
-const list = ref<CreateMemberParamsItem[]>([]);
+const list = ref<CreateMemberParamsItem[]>([])
 
-const memberFormContentLoading = ref(false);
-const formItemModel = ref<FormItemModel[]>([]);
-const userFormItem = ref<FormItemModel[]>([]);
-const workspaceFormItem = ref<FormItemModel[]>([]);
+const memberFormContentLoading = ref(false)
+const formItemModel = ref<FormItemModel[]>([])
+const userFormItem = ref<FormItemModel[]>([])
+const workspaceFormItem = ref<FormItemModel[]>([])
 
 async function getUserFormItem() {
   try {
-    const res = await UserApi.getUserList(memberFormContentLoading);
-    userFormItem.value = [{
-      path: 'user_ids',
-      label: t('views.role.member.title'),
-      rules: [
-        {
-          required: true,
-          message: `${t('common.selectPlaceholder')}${t('views.role.member.title')}`,
+    const res = await UserApi.getUserList(memberFormContentLoading)
+    userFormItem.value = [
+      {
+        path: 'user_ids',
+        label: t('views.role.member.title'),
+        rules: [
+          {
+            required: true,
+            message: `${t('common.selectPlaceholder')}${t('views.role.member.title')}`,
+          },
+        ],
+        selectProps: {
+          options:
+            res.data?.map((item) => ({
+              label: item.nick_name,
+              value: item.id,
+            })) || [],
+          placeholder: `${t('common.selectPlaceholder')}${t('views.role.member.title')}`,
         },
-      ],
-      selectProps: {
-        options: res.data?.map(item => ({
-          label: item.nick_name,
-          value: item.id
-        })) || [],
-        placeholder: `${t('common.selectPlaceholder')}${t('views.role.member.title')}`
-      }
-    }];
+      },
+    ]
   } catch (e) {
-    console.error(e);
+    console.error(e)
   }
 }
 
 async function getWorkspaceFormItem() {
   try {
-    const res = await WorkspaceApi.getWorkspaceList(memberFormContentLoading);
-    workspaceFormItem.value = [{
-      path: 'workspace_ids',
-      label: t('views.role.member.workspace'),
-      rules: [
-        {
-          required: true,
-          message: `${t('common.selectPlaceholder')}${t('views.role.member.workspace')}`,
+    const res = await WorkspaceApi.getWorkspaceList(memberFormContentLoading)
+    workspaceFormItem.value = [
+      {
+        path: 'workspace_ids',
+        label: t('views.role.member.workspace'),
+        rules: [
+          {
+            required: true,
+            message: `${t('common.selectPlaceholder')}${t('views.role.member.workspace')}`,
+          },
+        ],
+        selectProps: {
+          options:
+            res.data?.map((item) => ({
+              label: item.name,
+              value: item.id,
+            })) || [],
+          placeholder: `${t('common.selectPlaceholder')}${t('views.role.member.workspace')}`,
         },
-      ],
-      selectProps: {
-        options: res.data?.map(item => ({
-          label: item.name,
-          value: item.id
-        })) || [],
-        placeholder: `${t('common.selectPlaceholder')}${t('views.role.member.workspace')}`
-      }
-    }]
+      },
+    ]
   } catch (e) {
-    console.error(e);
+    console.error(e)
   }
 }
 
@@ -108,13 +118,13 @@ function init() {
 }
 
 onBeforeMount(async () => {
-  await getUserFormItem();
-  await getWorkspaceFormItem();
+  await getUserFormItem()
+  await getWorkspaceFormItem()
   init()
 })
 
 function open() {
-  init();
+  init()
   visible.value = true
 }
 
@@ -124,15 +134,19 @@ function handleCancel() {
 
 const memberFormContentRef = ref<InstanceType<typeof MemberFormContent>>()
 function handleAdd() {
-  memberFormContentRef.value?.validate().then(async (valid) => {
+  memberFormContentRef.value?.validate().then(async (valid: any) => {
     if (valid) {
-      let params;
+      let params
       if (props.currentRole?.type === RoleTypeEnum.ADMIN) {
-        params = list.value.map(item => ({ user_ids: item.user_ids, workspace_ids: ['None'] }))
+        params = list.value.map((item) => ({ user_ids: item.user_ids, workspace_ids: ['None'] }))
       }
-      await RoleApi.CreateMember(props.currentRole?.id as string, { members: params ?? list.value }, loading)
+      await RoleApi.CreateMember(
+        props.currentRole?.id as string,
+        { members: params ?? list.value },
+        loading,
+      )
       MsgSuccess(t('common.addSuccess'))
-      handleCancel();
+      handleCancel()
       emit('refresh')
     }
   })

@@ -18,7 +18,7 @@
           :rules="{
             required: true,
             message: $t('views.application.form.aiModel.placeholder'),
-            trigger: 'change'
+            trigger: 'change',
           }"
         >
           <template #label>
@@ -67,7 +67,7 @@
           :rules="{
             required: true,
             message: $t('views.application.form.prompt.tooltip'),
-            trigger: 'blur'
+            trigger: 'blur',
           }"
         >
           <template #label>
@@ -79,9 +79,7 @@
                 >
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
-                <template #content>{{
-                  $t('views.application.form.prompt.tooltip')
-                }}</template>
+                <template #content>{{ $t('views.application.form.prompt.tooltip') }}</template>
                 <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
                 <el-icon><EditPen /></el-icon>
               </el-tooltip>
@@ -113,10 +111,9 @@
           <template #label>
             <div class="flex align-center">
               <div class="mr-4">
-                <span
-                  >{{ $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')
-                  }}</span
-                >
+                <span>{{
+                  $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')
+                }}</span>
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content>
@@ -173,7 +170,7 @@ function submitSystemDialog(val: string) {
   set(props.nodeModel.properties.node_data, 'system', val)
 }
 const {
-  params: { id }
+  params: { id },
 } = app.config.globalProperties.$route as any
 
 // @ts-ignore
@@ -185,7 +182,7 @@ const form = {
   system: t('views.applicationWorkflow.nodes.questionNode.systemDefault'),
   prompt: defaultPrompt,
   dialogue_number: 1,
-  is_result: false
+  is_result: false,
 }
 function refreshParam(data: any) {
   set(props.nodeModel.properties.node_data, 'model_params_setting', data)
@@ -207,7 +204,7 @@ const form_data = computed({
   },
   set: (value) => {
     set(props.nodeModel.properties, 'node_data', value)
-  }
+  },
 })
 const props = defineProps<{ nodeModel: any }>()
 
@@ -223,9 +220,10 @@ const validate = () => {
 
 function getModel() {
   if (id) {
-    applicationApi.getApplicationModel(id).then((res: any) => {
-      modelOptions.value = groupBy(res?.data, 'provider')
-    })
+    //todo
+    // applicationApi.getApplicationModel(id).then((res: any) => {
+    //   modelOptions.value = groupBy(res?.data, 'provider')
+    // })
   } else {
     model.asyncGetModel().then((res: any) => {
       modelOptions.value = groupBy(res?.data, 'provider')

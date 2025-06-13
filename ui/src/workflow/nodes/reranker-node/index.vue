@@ -16,10 +16,10 @@
           :rules="{
             type: 'array',
             message: $t(
-              'views.applicationWorkflow.nodes.rerankerNode.rerankerContent.requiredMessage'
+              'views.applicationWorkflow.nodes.rerankerNode.rerankerContent.requiredMessage',
             ),
             trigger: 'change',
-            required: true
+            required: true,
           }"
         >
           <template #label>
@@ -46,7 +46,7 @@
                   type: 'array',
                   required: true,
                   message: $t('views.applicationWorkflow.variable.placeholder'),
-                  trigger: 'change'
+                  trigger: 'change',
                 }"
               >
                 <NodeCascader
@@ -55,7 +55,7 @@
                   class="w-full"
                   :placeholder="
                     $t(
-                      'views.applicationWorkflow.nodes.rerankerNode.rerankerContent.requiredMessage'
+                      'views.applicationWorkflow.nodes.rerankerNode.rerankerContent.requiredMessage',
                     )
                   "
                   v-model="form_data.reranker_reference_list[index]"
@@ -69,10 +69,10 @@
             </el-col>
           </el-row>
         </el-form-item>
-        <el-form-item :label="$t('views.applicationWorkflow.nodes.searchDatasetNode.searchParam')">
+        <el-form-item :label="$t('views.applicationWorkflow.nodes.searchKnowledgeNode.searchParam')">
           <template #label>
             <div class="flex-between">
-              <span>{{ $t('views.applicationWorkflow.nodes.searchDatasetNode.searchParam') }}</span>
+              <span>{{ $t('views.applicationWorkflow.nodes.searchKnowledgeNode.searchParam') }}</span>
               <el-button type="primary" link @click="openParamSettingDialog">
                 <el-icon><Setting /></el-icon>
               </el-button>
@@ -103,20 +103,20 @@
           </div>
         </el-form-item>
         <el-form-item
-          :label="$t('views.applicationWorkflow.nodes.searchDatasetNode.searchQuestion.label')"
+          :label="$t('views.applicationWorkflow.nodes.searchKnowledgeNode.searchQuestion.label')"
           prop="question_reference_address"
           :rules="{
             message: $t(
-              'views.applicationWorkflow.nodes.searchDatasetNode.searchQuestion.requiredMessage'
+              'views.applicationWorkflow.nodes.searchKnowledgeNode.searchQuestion.requiredMessage',
             ),
             trigger: 'blur',
-            required: true
+            required: true,
           }"
         >
           <template #label>
             <div class="flex-between">
               <span
-                >{{ $t('views.applicationWorkflow.nodes.searchDatasetNode.searchQuestion.label')
+                >{{ $t('views.applicationWorkflow.nodes.searchKnowledgeNode.searchQuestion.label')
                 }}<span class="danger">*</span></span
               >
             </div>
@@ -126,7 +126,7 @@
             :nodeModel="nodeModel"
             class="w-full"
             :placeholder="
-              $t('views.applicationWorkflow.nodes.searchDatasetNode.searchQuestion.label')
+              $t('views.applicationWorkflow.nodes.searchKnowledgeNode.searchQuestion.label')
             "
             v-model="form_data.question_reference_address"
           />
@@ -137,7 +137,7 @@
           :rules="{
             required: true,
             message: $t('views.applicationWorkflow.nodes.rerankerNode.reranker_model.placeholder'),
-            trigger: 'change'
+            trigger: 'change',
           }"
         >
           <template #label>
@@ -182,7 +182,7 @@ const props = defineProps<{ nodeModel: any }>()
 
 const ParamSettingDialogRef = ref<InstanceType<typeof ParamSettingDialog>>()
 const {
-  params: { id }
+  params: { id },
 } = app.config.globalProperties.$route as any
 const form = {
   reranker_reference_list: [[]],
@@ -191,8 +191,8 @@ const form = {
   reranker_setting: {
     top_n: 3,
     similarity: 0,
-    max_paragraph_char_number: 5000
-  }
+    max_paragraph_char_number: 5000,
+  },
 }
 
 const modelOptions = ref<any>(null)
@@ -224,16 +224,17 @@ const form_data = computed({
   },
   set: (value) => {
     set(props.nodeModel.properties, 'node_data', value)
-  }
+  },
 })
 function refreshParam(data: any) {
   set(props.nodeModel.properties.node_data, 'reranker_setting', data)
 }
 function getModel() {
   if (id) {
-    applicationApi.getApplicationRerankerModel(id).then((res: any) => {
-      modelOptions.value = groupBy(res?.data, 'provider')
-    })
+    //todo
+    // applicationApi.getApplicationRerankerModel(id).then((res: any) => {
+    //   modelOptions.value = groupBy(res?.data, 'provider')
+    // })
   } else {
     model.asyncGetModel({ model_type: 'RERANKER' }).then((res: any) => {
       modelOptions.value = groupBy(res?.data, 'provider')
@@ -251,7 +252,7 @@ const nodeCascaderRef = ref()
 const validate = () => {
   return Promise.all([
     nodeCascaderRef.value ? nodeCascaderRef.value.validate() : Promise.resolve(''),
-    rerankerNodeFormRef.value?.validate()
+    rerankerNodeFormRef.value?.validate(),
   ]).catch((err: any) => {
     return Promise.reject({ node: props.nodeModel, errMessage: err })
   })

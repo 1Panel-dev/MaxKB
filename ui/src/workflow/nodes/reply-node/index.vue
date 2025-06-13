@@ -45,7 +45,7 @@
             :nodeModel="nodeModel"
             class="w-full"
             :placeholder="
-              $t('views.applicationWorkflow.nodes.searchDatasetNode.searchQuestion.placeholder')
+              $t('views.applicationWorkflow.nodes.searchKnowledgeNode.searchQuestion.placeholder')
             "
             v-model="form_data.fields"
           />

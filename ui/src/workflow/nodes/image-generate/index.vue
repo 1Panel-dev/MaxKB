@@ -17,7 +17,7 @@
           :rules="{
             required: true,
             message: $t('views.applicationWorkflow.nodes.imageGenerateNode.model.requiredMessage'),
-            trigger: 'change'
+            trigger: 'change',
           }"
         >
           <template #label>
@@ -60,7 +60,7 @@
           :rules="{
             required: true,
             message: $t('views.application.form.prompt.requiredMessage'),
-            trigger: 'blur'
+            trigger: 'blur',
           }"
         >
           <template #label>
@@ -93,7 +93,7 @@
           :rules="{
             required: false,
             message: $t('views.application.form.prompt.requiredMessage'),
-            trigger: 'blur'
+            trigger: 'blur',
           }"
         >
           <template #label>
@@ -131,10 +131,9 @@
           <template #label>
             <div class="flex align-center">
               <div class="mr-4">
-                <span
-                  >{{ $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')
-                  }}</span
-                >
+                <span>{{
+                  $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')
+                }}</span>
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content>
@@ -165,7 +164,7 @@ import { t } from '@/locales'
 const { model } = useStore()
 
 const {
-  params: { id }
+  params: { id },
 } = app.config.globalProperties.$route as any
 
 const props = defineProps<{ nodeModel: any }>()
@@ -201,7 +200,7 @@ const form = {
   is_result: true,
   temperature: null,
   max_tokens: null,
-  image_list: ['start-node', 'image']
+  image_list: ['start-node', 'image'],
 }
 
 const form_data = computed({
@@ -215,14 +214,15 @@ const form_data = computed({
   },
   set: (value) => {
     set(props.nodeModel.properties, 'node_data', value)
-  }
+  },
 })
 
 function getModel() {
   if (id) {
-    applicationApi.getApplicationTTIModel(id).then((res: any) => {
-      modelOptions.value = groupBy(res?.data, 'provider')
-    })
+    // todo
+    // applicationApi.getApplicationTTIModel(id).then((res: any) => {
+    //   modelOptions.value = groupBy(res?.data, 'provider')
+    // })
   } else {
     model.asyncGetModel().then((res: any) => {
       modelOptions.value = groupBy(res?.data, 'provider')

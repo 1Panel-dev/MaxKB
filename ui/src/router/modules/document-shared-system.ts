@@ -33,7 +33,7 @@ const DocumentRouter = {
     },
     {
       path: 'hit-test-shared',
-      name: 'DatasetHitTestSharedSystem',
+      name: 'KnowledgeHitTestSharedSystem',
       meta: {
         icon: 'app-hit-test',
         title: 'views.application.hitTest.title',

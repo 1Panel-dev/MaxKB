@@ -127,7 +127,7 @@ const putChatRecordLog: (
   loading,
 ) => {
   return put(
-    `${prefix}/${application_id}/chat/${chart_id}/chat_record/${chart_record_id}/dataset/${knowledge_id}/document/${document_id}/improve`,
+    `${prefix}/${application_id}/chat/${chart_id}/chat_record/${chart_record_id}/knowledge/${knowledge_id}/document/${document_id}/improve`,
     data,
     undefined,
     loading,
@@ -137,7 +137,7 @@ const putChatRecordLog: (
 /**
  * 删除标注
  * @param 参数
- * application_id, chart_id,  chart_record_id, dataset_id, document_id,paragraph_id
+ * application_id, chart_id,  chart_record_id, knowledge_id, document_id,paragraph_id
  */
 const delMarkChatRecord: (
   application_id: String,

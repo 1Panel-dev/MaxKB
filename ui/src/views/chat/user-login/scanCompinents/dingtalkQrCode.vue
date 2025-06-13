@@ -70,7 +70,7 @@ const props = defineProps<{
 }>()
 
 const router = useRouter()
-const { user } = useStore()
+const { login } = useStore()
 const { load } = useScriptTag('https://g.alicdn.com/dingding/h5-dingtalk-login/0.21.0/ddlogin.js')
 const isConfigReady = ref(false)
 
@@ -105,7 +105,7 @@ const initActive = async () => {
       },
       (loginResult) => {
         const authCode = loginResult.authCode
-        user.dingCallback(authCode).then(() => {
+        login.dingCallback(authCode).then(() => {
           router.push({ name: 'home' })
         })
       },

@@ -151,7 +151,7 @@
                     </div>
                   </template>
                   <!-- 知识库检索 -->
-                  <template v-if="item.type == WorkflowType.SearchDataset">
+                  <template v-if="item.type == WorkflowType.SearchKnowledge">
                     <div class="card-never border-r-4">
                       <h5 class="p-8-12">
                         {{ $t('chat.executionDetails.searchContent') }}

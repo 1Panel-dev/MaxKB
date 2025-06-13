@@ -3,7 +3,7 @@
     :title="$t('views.chatLog.selectKnowledge')"
     v-model="dialogVisible"
     width="600"
-    class="select-dataset-dialog"
+    class="select-knowledge-dialog"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
   >
@@ -20,7 +20,7 @@
         <el-scrollbar height="500">
           <div class="p-16">
             <el-row :gutter="12" v-loading="loading">
-              <el-col :span="12" v-for="(item, index) in datasetList" :key="index" class="mb-16">
+              <el-col :span="12" v-for="(item, index) in knowledgeList" :key="index" class="mb-16">
                 <el-card shadow="never" :class="item.id === selectKnowledge ? 'active' : ''">
                   <el-radio :value="item.id" size="large">
                     <div class="flex align-center">
@@ -57,7 +57,7 @@ import useStore from '@/stores'
 const { knowledge } = useStore()
 const route = useRoute()
 const {
-  params: { id }, // id为datasetID
+  params: { id }, // id为knowledgeID
 } = route as any
 
 const emit = defineEmits(['refresh'])
@@ -66,20 +66,20 @@ const loading = ref<boolean>(false)
 
 const dialogVisible = ref<boolean>(false)
 const selectKnowledge = ref('')
-const datasetList = ref<any>([])
+const knowledgeList = ref<any>([])
 const documentList = ref<any>([])
 
 watch(dialogVisible, (bool) => {
   if (!bool) {
     selectKnowledge.value = ''
-    datasetList.value = []
+    knowledgeList.value = []
     documentList.value = []
   }
 })
 
 const open = (list: any) => {
   documentList.value = list
-  getDataset()
+  getKnowledge()
   dialogVisible.value = true
 }
 const submitHandle = () => {
@@ -91,20 +91,20 @@ const submitHandle = () => {
     })
 }
 
-function getDataset() {
+function getKnowledge() {
   knowledge.asyncGetRootKnowledge(loading).then((res: any) => {
-    datasetList.value = res.data?.filter((v: any) => v.id !== id)
+    knowledgeList.value = res.data?.filter((v: any) => v.id !== id)
   })
 }
 
 const refresh = () => {
-  getDataset()
+  getKnowledge()
 }
 
 defineExpose({ open })
 </script>
 <style lang="scss">
-.select-dataset-dialog {
+.select-knowledge-dialog {
   padding: 0;
   .el-dialog__header {
     padding: 24px 24px 0 24px;

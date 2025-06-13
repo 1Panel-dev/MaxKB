@@ -17,11 +17,13 @@
       </template>
       <template #extra>
         <el-button @click="router.push({ path: `/knowledge` })">{{
-          $t('views.knowledge.ResultSuccess.buttons.toDataset')
+          $t('views.knowledge.ResultSuccess.buttons.toknowledge')
         }}</el-button>
-        <el-button type="primary" @click="router.push({ path: `/knowledge/${data?.id}/${currentFolder.id}/document` })">{{
-          $t('views.knowledge.ResultSuccess.buttons.toDocument')
-        }}</el-button>
+        <el-button
+          type="primary"
+          @click="router.push({ path: `/knowledge/${data?.id}/${folderId}/document` })"
+          >{{ $t('views.knowledge.ResultSuccess.buttons.toDocument') }}</el-button
+        >
       </template>
     </el-result>
     <div class="result-success">
@@ -52,7 +54,8 @@
               <el-icon class="color-danger"><CircleCloseFilled /></el-icon>
             </el-text>
             <el-text v-else-if="item.status === '0'">
-              <el-icon class="is-loading primary"><Loading /></el-icon> {{ $t('views.knowledge.ResultSuccess.loading') }}...
+              <el-icon class="is-loading primary"><Loading /></el-icon>
+              {{ $t('views.knowledge.ResultSuccess.loading') }}...
             </el-text>
           </div>
         </div>
@@ -62,23 +65,28 @@
 </template>
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { numberFormat } from '@/utils/utils'
 import { filesize, getImgUrl } from '@/utils/utils'
+const route = useRoute()
 const props = defineProps({
   data: {
     type: Object,
-    default: () => {}
-  }
+    default: () => {},
+  },
 })
+
+const {
+  params: { id, folderId }, // id为knowledgeID
+} = route as any
 const router = useRouter()
 const paragraph_count = computed(() =>
-  props.data?.document_list.reduce((sum: number, obj: any) => (sum += obj.paragraph_count), 0)
+  props.data?.document_list.reduce((sum: number, obj: any) => (sum += obj.paragraph_count), 0),
 )
 
 const char_length = computed(
   () =>
-    props.data?.document_list.reduce((sum: number, obj: any) => (sum += obj.char_length), 0) || 0
+    props.data?.document_list.reduce((sum: number, obj: any) => (sum += obj.char_length), 0) || 0,
 )
 </script>
 <style scoped lang="scss">

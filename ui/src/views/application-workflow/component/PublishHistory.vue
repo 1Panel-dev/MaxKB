@@ -111,20 +111,20 @@ function editName(val: string, item: any) {
     const obj = {
       name: val
     }
-    applicationApi.putWorkFlowVersion(id as string, item.id, obj, loading).then(() => {
-      MsgSuccess(t('common.modifySuccess'))
-      item['writeStatus'] = false
-      getList()
-    })
+    // applicationApi.putWorkFlowVersion(id as string, item.id, obj, loading).then(() => {
+    //   MsgSuccess(t('common.modifySuccess'))
+    //   item['writeStatus'] = false
+    //   getList()
+    // })
   } else {
     MsgError(t('views.applicationWorkflow.tip.nameMessage'))
   }
 }
 
 function getList() {
-  applicationApi.getWorkFlowVersion(id, loading).then((res: any) => {
-    LogData.value = res.data
-  })
+  // applicationApi.getWorkFlowVersion(id, loading).then((res: any) => {
+  //   LogData.value = res.data
+  // })
 }
 
 onMounted(() => {

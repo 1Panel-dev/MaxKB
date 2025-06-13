@@ -105,7 +105,7 @@ function deleteMark() {
       id as string,
       detail.value.chat_id,
       detail.value.id,
-      form.value.dataset,
+      form.value.knowledge,
       form.value.document,
       form.value.id,
       loading,
@@ -123,7 +123,7 @@ function getMark(data: any) {
       id as string,
       data.chat_id,
       data.id,
-      data.dataset,
+      data.knowledge,
       data.document,
       loading,
     )
@@ -145,7 +145,7 @@ const submit = async (formEl: FormInstance) => {
     if (valid) {
       paragraph
         .asyncPutParagraph(
-          form.value.dataset,
+          form.value.knowledge,
           form.value.document,
           form.value.id,
           {

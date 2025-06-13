@@ -16,12 +16,12 @@
       </div>
       <div class="flex">
         <span class="label">{{ $t('layout.about.expiredTime') }}</span>
-        <span
+        <!-- <span
           >{{ licenseInfo?.expired || '-' }}
           <span class="color-danger" v-if="licenseInfo?.expired && fromNowDate(licenseInfo?.expired)"
             >（{{ fromNowDate(licenseInfo?.expired) }}）</span
           ></span
-        >
+        > -->
       </div>
       <div class="flex">
         <span class="label">{{ $t('layout.about.edition.label') }}</span>
@@ -65,8 +65,8 @@
 </template>
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import licenseApi from '@/api/license'
-import { fromNowDate } from '@/utils/time'
+// import licenseApi from '@/api/license'
+// import { fromNowDate } from '@/utils/time'
 import { Role } from '@/utils/permission/type'
 import useStore from '@/stores'
 const { user, theme } = useStore()
@@ -98,15 +98,15 @@ const open = () => {
 const onChange = (file: any) => {
   const fd = new FormData()
   fd.append('license_file', file.raw)
-  licenseApi.putLicense(fd, loading).then((res: any) => {
-    getLicenseInfo()
-    isUpdate.value = true
-  })
+  // licenseApi.putLicense(fd, loading).then((res: any) => {
+  //   getLicenseInfo()
+  //   isUpdate.value = true
+  // })
 }
 function getLicenseInfo() {
-  licenseApi.getLicense(loading).then((res: any) => {
-    licenseInfo.value = res.data?.license
-  })
+  // licenseApi.getLicense(loading).then((res: any) => {
+  //   licenseInfo.value = res.data?.license
+  // })
 }
 
 defineExpose({ open })

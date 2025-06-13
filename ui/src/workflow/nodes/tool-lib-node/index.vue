@@ -129,23 +129,24 @@ const update_field = () => {
     set(props.nodeModel.properties, 'status', 500)
     return
   }
-  applicationApi
-    .getFunctionLib(id, props.nodeModel.properties.node_data.function_lib_id)
-    .then((ok) => {
-      const old_input_field_list = props.nodeModel.properties.node_data.input_field_list
-      const merge_input_field_list = ok.data.input_field_list.map((item: any) => {
-        const find_field = old_input_field_list.find((old_item: any) => old_item.name == item.name)
-        if (find_field && find_field.source == item.source) {
-          return { ...item, value: JSON.parse(JSON.stringify(find_field.value)) }
-        }
-        return { ...item, value: item.source == 'reference' ? [] : '' }
-      })
-      set(props.nodeModel.properties.node_data, 'input_field_list', merge_input_field_list)
-      set(props.nodeModel.properties, 'status', ok.data.is_active ? 200 : 500)
-    })
-    .catch((err) => {
-      set(props.nodeModel.properties, 'status', 500)
-    })
+  //todo
+  // applicationApi
+  //   .getFunctionLib(id, props.nodeModel.properties.node_data.function_lib_id)
+  //   .then((ok) => {
+  //     const old_input_field_list = props.nodeModel.properties.node_data.input_field_list
+  //     const merge_input_field_list = ok.data.input_field_list.map((item: any) => {
+  //       const find_field = old_input_field_list.find((old_item: any) => old_item.name == item.name)
+  //       if (find_field && find_field.source == item.source) {
+  //         return { ...item, value: JSON.parse(JSON.stringify(find_field.value)) }
+  //       }
+  //       return { ...item, value: item.source == 'reference' ? [] : '' }
+  //     })
+  //     set(props.nodeModel.properties.node_data, 'input_field_list', merge_input_field_list)
+  //     set(props.nodeModel.properties, 'status', ok.data.is_active ? 200 : 500)
+  //   })
+  //   .catch((err) => {
+  //     set(props.nodeModel.properties, 'status', 500)
+  //   })
 }
 
 onMounted(() => {

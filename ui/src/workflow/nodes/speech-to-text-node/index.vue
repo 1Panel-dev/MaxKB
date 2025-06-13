@@ -157,9 +157,10 @@ const form_data = computed({
 
 function getModel() {
   if (id) {
-    applicationApi.getApplicationSTTModel(id).then((res: any) => {
-      modelOptions.value = groupBy(res?.data, 'provider')
-    })
+    //todo
+    // applicationApi.getApplicationSTTModel(id).then((res: any) => {
+    //   modelOptions.value = groupBy(res?.data, 'provider')
+    // })
   } else {
     model.asyncGetModel().then((res: any) => {
       modelOptions.value = groupBy(res?.data, 'provider')

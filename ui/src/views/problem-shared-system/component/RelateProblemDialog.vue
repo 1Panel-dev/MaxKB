@@ -116,7 +116,7 @@ import paragraphApi from '@/api/shared/paragraph'
 import useStore from '@/stores/modules-shared-system'
 import { MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
-const { problem, document } = useStore()
+const { problem, document, paragraph } = useStore()
 
 const route = useRoute()
 const {
@@ -173,7 +173,7 @@ function associationClick(item: any) {
     }
   } else {
     if (isAssociation(item.id)) {
-      problem
+      paragraph
         .asyncDisassociationProblem(
           id,
           item.document_id,
@@ -185,7 +185,7 @@ function associationClick(item: any) {
           getRecord(currentProblemId.value)
         })
     } else {
-      problem
+      paragraph
         .asyncAssociationProblem(
           id,
           item.document_id,

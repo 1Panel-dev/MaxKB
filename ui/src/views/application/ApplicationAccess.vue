@@ -111,13 +111,13 @@ function refresh() {
 
 function getPlatformStatus() {
   loading.value = true
-  applicationApi.getPlatformStatus(id).then((res: any) => {
-    platforms.forEach((platform) => {
-      platform.isActive = res.data[platform.key][1]
-      platform.exists = res.data[platform.key][0]
-    })
-    loading.value = false
-  })
+  // applicationApi.getPlatformStatus(id).then((res: any) => {
+  //   platforms.forEach((platform) => {
+  //     platform.isActive = res.data[platform.key][1]
+  //     platform.exists = res.data[platform.key][0]
+  //   })
+  //   loading.value = false
+  // })
 }
 
 function changeStatus(type: string, value: boolean) {

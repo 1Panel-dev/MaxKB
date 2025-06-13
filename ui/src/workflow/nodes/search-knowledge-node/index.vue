@@ -8,41 +8,41 @@
         label-position="top"
         require-asterisk-position="right"
         label-width="auto"
-        ref="DatasetNodeFormRef"
+        ref="knowledgeNodeFormRef"
       >
         <el-form-item :label="$t('views.chatLog.selectKnowledge')">
           <template #label>
             <div class="flex-between">
               <span>{{ $t('views.chatLog.selectKnowledge') }}</span>
-              <el-button type="primary" link @click="openDatasetDialog">
+              <el-button type="primary" link @click="openknowledgeDialog">
                 <el-icon><Plus /></el-icon>
               </el-button>
             </div>
           </template>
           <div class="w-full">
-            <el-text type="info" v-if="form_data.dataset_id_list?.length === 0">
+            <el-text type="info" v-if="form_data.knowledge_id_list?.length === 0">
               {{ $t('views.application.form.relatedKnowledge.placeholder') }}
             </el-text>
-            <template v-for="(item, index) in form_data.dataset_id_list" :key="index" v-else>
+            <template v-for="(item, index) in form_data.knowledge_id_list" :key="index" v-else>
               <div class="flex-between border border-r-4 white-bg mb-4" style="padding: 5px 8px">
                 <div class="flex align-center" style="line-height: 20px">
-                  <KnowledgeIcon :type="relatedObject(datasetList, item, 'id')?.type" />
+                  <KnowledgeIcon :type="relatedObject(knowledgeList, item, 'id')?.type" />
 
-                  <div class="ellipsis" :title="relatedObject(datasetList, item, 'id')?.name">
-                    {{ relatedObject(datasetList, item, 'id')?.name }}
+                  <div class="ellipsis" :title="relatedObject(knowledgeList, item, 'id')?.name">
+                    {{ relatedObject(knowledgeList, item, 'id')?.name }}
                   </div>
                 </div>
-                <el-button text @click="removeDataset(item)">
+                <el-button text @click="removeknowledge(item)">
                   <el-icon><Close /></el-icon>
                 </el-button>
               </div>
             </template>
           </div>
         </el-form-item>
-        <el-form-item :label="$t('views.applicationWorkflow.nodes.searchDatasetNode.searchParam')">
+        <el-form-item :label="$t('views.applicationWorkflow.nodes.searchknowledgeNode.searchParam')">
           <template #label>
             <div class="flex-between">
-              <span>{{ $t('views.applicationWorkflow.nodes.searchDatasetNode.searchParam') }}</span>
+              <span>{{ $t('views.applicationWorkflow.nodes.searchknowledgeNode.searchParam') }}</span>
               <el-button type="primary" link @click="openParamSettingDialog">
                 <el-icon><Setting /></el-icon>
               </el-button>
@@ -55,34 +55,34 @@
               }}</el-col>
               <el-col :span="12" class="lighter">
                 {{
-                  $t(SearchMode[form_data.dataset_setting.search_mode as keyof typeof SearchMode])
+                  $t(SearchMode[form_data.knowledge_setting.search_mode as keyof typeof SearchMode])
                 }}</el-col
               >
               <el-col :span="12" class="color-secondary lighter">
                 {{ $t('views.application.dialog.similarityThreshold') }}</el-col
               >
               <el-col :span="12" class="lighter">
-                {{ form_data.dataset_setting.similarity?.toFixed(3) }}</el-col
+                {{ form_data.knowledge_setting.similarity?.toFixed(3) }}</el-col
               >
               <el-col :span="12" class="color-secondary lighter">{{
                 $t('views.application.dialog.topReferences')
               }}</el-col>
-              <el-col :span="12" class="lighter"> {{ form_data.dataset_setting.top_n }}</el-col>
+              <el-col :span="12" class="lighter"> {{ form_data.knowledge_setting.top_n }}</el-col>
               <el-col :span="12" class="color-secondary lighter">
                 {{ $t('views.application.dialog.maxCharacters') }}</el-col
               >
               <el-col :span="12" class="lighter">
-                {{ form_data.dataset_setting.max_paragraph_char_number }}</el-col
+                {{ form_data.knowledge_setting.max_paragraph_char_number }}</el-col
               >
             </el-row>
           </div>
         </el-form-item>
         <el-form-item
-          :label="$t('views.applicationWorkflow.nodes.searchDatasetNode.searchQuestion.label')"
+          :label="$t('views.applicationWorkflow.nodes.searchknowledgeNode.searchQuestion.label')"
           prop="question_reference_address"
           :rules="{
             message: $t(
-              'views.applicationWorkflow.nodes.searchDatasetNode.searchQuestion.requiredMessage',
+              'views.applicationWorkflow.nodes.searchknowledgeNode.searchQuestion.requiredMessage',
             ),
             trigger: 'blur',
             required: true,
@@ -93,7 +93,7 @@
             :nodeModel="nodeModel"
             class="w-full"
             :placeholder="
-              $t('views.applicationWorkflow.nodes.searchDatasetNode.searchQuestion.placeholder')
+              $t('views.applicationWorkflow.nodes.searchknowledgeNode.searchQuestion.placeholder')
             "
             v-model="form_data.question_reference_address"
           />
@@ -101,12 +101,12 @@
       </el-form>
     </el-card>
     <ParamSettingDialog ref="ParamSettingDialogRef" @refresh="refreshParam" />
-    <AddDatasetDialog
-      ref="AddDatasetDialogRef"
+    <AddknowledgeDialog
+      ref="AddknowledgeDialogRef"
       @addData="addKnowledge"
-      :data="datasetList"
+      :data="knowledgeList"
       @refresh="refresh"
-      :loading="datasetLoading"
+      :loading="knowledgeLoading"
     />
   </NodeContainer>
 </template>
@@ -115,7 +115,7 @@ import { set } from 'lodash'
 import { app } from '@/main'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
-import AddDatasetDialog from '@/views/application/component/AddKnowledgeDialog.vue'
+import AddknowledgeDialog from '@/views/application/component/AddKnowledgeDialog.vue'
 import ParamSettingDialog from '@/views/application/component/ParamSettingDialog.vue'
 import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'
@@ -130,8 +130,8 @@ const {
 const props = defineProps<{ nodeModel: any }>()
 const nodeCascaderRef = ref()
 const form = {
-  dataset_id_list: [],
-  dataset_setting: {
+  knowledge_id_list: [],
+  knowledge_setting: {
     top_n: 3,
     similarity: 0.6,
     max_paragraph_char_number: 5000,
@@ -154,61 +154,61 @@ const form_data = computed({
   },
 })
 
-const DatasetNodeFormRef = ref<FormInstance>()
+const knowledgeNodeFormRef = ref<FormInstance>()
 const ParamSettingDialogRef = ref<InstanceType<typeof ParamSettingDialog>>()
-const AddDatasetDialogRef = ref<InstanceType<typeof AddDatasetDialog>>()
-const datasetList = ref<any>([])
-const datasetLoading = ref(false)
+const AddknowledgeDialogRef = ref<InstanceType<typeof AddknowledgeDialog>>()
+const knowledgeList = ref<any>([])
+const knowledgeLoading = ref(false)
 
 function refreshParam(data: any) {
-  set(props.nodeModel.properties.node_data, 'dataset_setting', data.dataset_setting)
+  set(props.nodeModel.properties.node_data, 'knowledge_setting', data.knowledge_setting)
 }
 
 const openParamSettingDialog = () => {
   ParamSettingDialogRef.value?.open(form_data.value, 'WORK_FLOW')
 }
 
-function removeDataset(id: any) {
-  const list = props.nodeModel.properties.node_data.dataset_id_list.filter((v: any) => v !== id)
-  set(props.nodeModel.properties.node_data, 'dataset_id_list', list)
+function removeknowledge(id: any) {
+  const list = props.nodeModel.properties.node_data.knowledge_id_list.filter((v: any) => v !== id)
+  set(props.nodeModel.properties.node_data, 'knowledge_id_list', list)
 }
 
 function addKnowledge(val: Array<string>) {
-  set(props.nodeModel.properties.node_data, 'dataset_id_list', val)
+  set(props.nodeModel.properties.node_data, 'knowledge_id_list', val)
 }
 
-function openDatasetDialog() {
-  if (AddDatasetDialogRef.value) {
-    AddDatasetDialogRef.value.open(form_data.value.dataset_id_list)
+function openknowledgeDialog() {
+  if (AddknowledgeDialogRef.value) {
+    AddknowledgeDialogRef.value.open(form_data.value.knowledge_id_list)
   }
 }
 
-function getDataset() {
+function getknowledge() {
   // if (id) {
-  //   application.asyncGetApplicationKnowledge(id, datasetLoading).then((res: any) => {
-  //     datasetList.value = res.data
+  //   application.asyncGetApplicationKnowledge(id, knowledgeLoading).then((res: any) => {
+  //     knowledgeList.value = res.data
   //   })
   // } else {
-  knowledge.asyncGetRootKnowledge(datasetLoading).then((res: any) => {
-    datasetList.value = res.data?.filter((v: any) => v.user_id === user.userInfo?.id)
+  knowledge.asyncGetRootKnowledge(knowledgeLoading).then((res: any) => {
+    knowledgeList.value = res.data?.filter((v: any) => v.user_id === user.userInfo?.id)
   })
   // }
 }
 function refresh() {
-  getDataset()
+  getknowledge()
 }
 
 const validate = () => {
   return Promise.all([
     nodeCascaderRef.value.validate(),
-    DatasetNodeFormRef.value?.validate(),
+    knowledgeNodeFormRef.value?.validate(),
   ]).catch((err) => {
     return Promise.reject({ node: props.nodeModel, errMessage: err })
   })
 }
 
 onMounted(() => {
-  getDataset()
+  getknowledge()
   set(props.nodeModel, 'validate', validate)
 })
 </script>

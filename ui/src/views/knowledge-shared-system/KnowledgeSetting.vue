@@ -230,11 +230,11 @@ async function submit() {
           })
             .then(() => {
               if (detail.value.type === 2) {
-                KnowledgeApi.putLarkKnowledge(id, obj, loading).then((res) => {
-                  KnowledgeApi.putReEmbeddingKnowledge(id).then(() => {
-                    MsgSuccess(t('common.saveSuccess'))
-                  })
-                })
+                // KnowledgeApi.putLarkKnowledge(id, obj, loading).then((res) => {
+                //   KnowledgeApi.putReEmbeddingKnowledge(id).then(() => {
+                //     MsgSuccess(t('common.saveSuccess'))
+                //   })
+                // })
               } else {
                 KnowledgeApi.putKnowledge(id, obj, loading).then((res) => {
                   KnowledgeApi.putReEmbeddingKnowledge(id).then(() => {
@@ -246,11 +246,11 @@ async function submit() {
             .catch(() => {})
         } else {
           if (detail.value.type === 2) {
-            KnowledgeApi.putLarkKnowledge(id, obj, loading).then((res) => {
-              KnowledgeApi.putReEmbeddingKnowledge(id).then(() => {
-                MsgSuccess(t('common.saveSuccess'))
-              })
-            })
+            // KnowledgeApi.putLarkKnowledge(id, obj, loading).then((res) => {
+            //   KnowledgeApi.putReEmbeddingKnowledge(id).then(() => {
+            //     MsgSuccess(t('common.saveSuccess'))
+            //   })
+            // })
           } else {
             KnowledgeApi.putKnowledge(id, obj, loading).then((res) => {
               MsgSuccess(t('common.saveSuccess'))

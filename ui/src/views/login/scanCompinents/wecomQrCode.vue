@@ -19,7 +19,7 @@ const router = useRouter()
 
 const wwLogin = ref({})
 const obj = ref<any>({ isWeComLogin: false })
-const { user } = useStore()
+const { login } = useStore()
 
 const props = defineProps<{
   config: {
@@ -53,7 +53,7 @@ const init = async () => {
       },
       onCheckWeComLogin: obj.value,
       async onLoginSuccess({ code }: any) {
-        user.wecomCallback(code).then(() => {
+        login.wecomCallback(code).then(() => {
           setTimeout(() => {
             router.push({ name: 'home' })
           })

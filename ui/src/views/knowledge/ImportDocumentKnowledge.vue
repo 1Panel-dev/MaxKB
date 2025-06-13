@@ -1,10 +1,10 @@
 <template>
-  <LayoutContainer :header="$t('views.document.importDocument')" class="create-dataset">
+  <LayoutContainer :header="$t('views.document.importDocument')" class="create-knowledge">
     <template #backButton>
       <back-button @click="back"></back-button>
     </template>
-    <div class="create-dataset__main flex" v-loading="loading">
-      <div class="create-dataset__component main-calc-height">
+    <div class="create-knowledge__main flex" v-loading="loading">
+      <div class="create-knowledge__component main-calc-height">
         <div class="upload-document p-24" style="min-width: 850px">
           <h4 class="title-decoration-1 mb-8">
             {{ $t('views.document.feishu.selectDocument') }}
@@ -124,7 +124,7 @@
         </div>
       </div>
     </div>
-    <div class="create-dataset__footer text-right border-t">
+    <div class="create-knowledge__footer text-right border-t">
       <el-button @click="router.go(-1)">{{ $t('common.cancel') }}</el-button>
 
       <el-button @click="submit" type="primary" :disabled="disabled">
@@ -145,7 +145,7 @@ import knowledgeApi from '@/api/knowledge/knowledge'
 const router = useRouter()
 const route = useRoute()
 const {
-  query: { id, folder_token } // id为knowledgeID，有id的是上传文档 folder_token为飞书文件夹token
+  query: { id, folder_token }, // id为knowledgeID，有id的是上传文档 folder_token为飞书文件夹token
 } = route
 const knowledgeId = id as string
 const folderToken = folder_token as string
@@ -165,20 +165,20 @@ interface Tree {
 
 const form = ref({
   fileType: 'txt',
-  fileList: [] as any
+  fileList: [] as any,
 })
 
 const rules = reactive({
   fileList: [
-    { required: true, message: t('views.document.upload.requiredMessage'), trigger: 'change' }
-  ]
+    { required: true, message: t('views.document.upload.requiredMessage'), trigger: 'change' },
+  ],
 })
 
 const props = {
   label: 'name',
   children: 'zones',
   isLeaf: (data: any) => data.type !== 'folder',
-  disabled: (data: any) => data.is_exist
+  disabled: (data: any) => data.is_exist,
 }
 
 const loadNode = (node: Node, resolve: (nodeData: Tree[]) => void) => {
@@ -225,7 +225,7 @@ function submit() {
     return {
       name: node.name,
       token: node.token,
-      type: node.type
+      type: node.type,
     }
   })
   if (newList.length === 0) {
@@ -234,7 +234,7 @@ function submit() {
     loading.value = false
     return
   }
-  knowledge
+  knowledgeApi
     .importLarkDocument(knowledgeId, newList, loading)
     .then((res) => {
       MsgSuccess(t('views.document.tip.importMessage'))
@@ -255,7 +255,7 @@ function back() {
 }
 </script>
 <style lang="scss" scoped>
-.create-dataset {
+.create-knowledge {
   &__component {
     width: 100%;
     margin: 0 auto;

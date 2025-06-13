@@ -225,7 +225,7 @@ const putMigrateMulParagraph: (
   loading,
 ) => {
   return put(
-    `${prefix}/${knowledge_id}/document/${document_id}/paragraph/migrate/dataset/${target_knowledge_id}/document/${target_document_id}`,
+    `${prefix}/${knowledge_id}/document/${document_id}/paragraph/migrate/knowledge/${target_knowledge_id}/document/${target_document_id}`,
     data,
     undefined,
     loading,
@@ -234,19 +234,19 @@ const putMigrateMulParagraph: (
 
 /**
  * 解除某段落关联问题
- * @param 参数 dataset_id, document_id,
+ * @param 参数 knowledge_id, document_id,
  * @query data {
  *            paragraph_id 段落id  problem_id 问题id
  *         }
  */
 const putDisassociationProblem: (
-  dataset_id: string,
+  knowledge_id: string,
   document_id: string,
   data: any,
   loading?: Ref<boolean>,
-) => Promise<Result<boolean>> = (dataset_id, document_id, data, loading) => {
+) => Promise<Result<boolean>> = (knowledge_id, document_id, data, loading) => {
   return put(
-    `${prefix}/${dataset_id}/document/${document_id}/paragraph/unassociation`,
+    `${prefix}/${knowledge_id}/document/${document_id}/paragraph/unassociation`,
     {},
     data,
     loading,

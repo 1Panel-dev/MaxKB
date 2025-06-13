@@ -71,7 +71,7 @@ const {
   params: { id, documentId }, // id为knowledgeId
 } = route as any
 
-const { problem } = useStore()
+const { problem, paragraph } = useStore()
 const inputRef = ref()
 const loading = ref(false)
 const isAddProblem = ref(false)
@@ -96,7 +96,7 @@ watch(
 
 function delProblemHandle(item: any, index: number) {
   if (item.id) {
-    problem
+    paragraph
       .asyncDisassociationProblem(
         props.knowledgeId || id,
         documentId || props.docId,
@@ -134,7 +134,7 @@ function addProblem() {
 function addProblemHandle(val: string) {
   if (props.problemId) {
     const api = problemOptions.value.some((option) => option.id === val)
-      ? problem.asyncAssociationProblem(
+      ? paragraph.asyncAssociationProblem(
           props.knowledgeId || id,
           documentId || props.docId,
           props.problemId,

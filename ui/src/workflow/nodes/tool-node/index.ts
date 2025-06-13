@@ -1,12 +1,12 @@
-import FunctionNodeVue from './index.vue'
+import ToolNodeVue from './index.vue'
 import { AppNode, AppNodeModel } from '@/workflow/common/app-node'
-class FunctionLibCustomNode extends AppNode {
+class ToolLibCustomNode extends AppNode {
   constructor(props: any) {
-    super(props, FunctionNodeVue)
+    super(props, ToolNodeVue)
   }
 }
 export default {
   type: 'function-node',
   model: AppNodeModel,
-  view: FunctionLibCustomNode
+  view: ToolLibCustomNode,
 }

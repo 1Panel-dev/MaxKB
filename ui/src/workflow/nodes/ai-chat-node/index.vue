@@ -215,7 +215,7 @@ const {
 
 // @ts-ignore
 const defaultPrompt = `${t('views.applicationWorkflow.nodes.aiChatNode.defaultPrompt')}：
-{{${t('views.applicationWorkflow.nodes.searchDatasetNode.label')}.data}}
+{{${t('views.applicationWorkflow.nodes.searchKnowledgeNode.label')}.data}}
 ${t('views.problem.title')}：
 {{${t('views.applicationWorkflow.nodes.startNode.label')}.question}}`
 

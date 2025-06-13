@@ -119,7 +119,7 @@ const {
   params: { id }
 } = route
 
-const { problem } = useStore()
+const { paragraph } = useStore()
 const RelateProblemDialogRef = ref()
 const ParagraphDialogRef = ref()
 const loading = ref(false)
@@ -127,9 +127,9 @@ const visible = ref(false)
 const paragraphList = ref<any[]>([])
 
 function disassociation(item: any) {
-  problem
+  paragraph
     .asyncDisassociationProblem(
-      item.dataset_id,
+      item.knowledge_id,
       item.document_id,
       item.id,
       props.currentId,

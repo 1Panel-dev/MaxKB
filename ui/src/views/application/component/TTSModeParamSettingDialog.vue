@@ -120,31 +120,31 @@ const testPlay = () => {
     ...form_data.value,
     tts_model_id: tts_model_id.value
   }
-  applicationApi
-    .playDemoText(id as string, data, playLoading)
-    .then(async (res: any) => {
-      if (res.type === 'application/json') {
-        const text = await res.text()
-        MsgError(text)
-        return
-      }
-      // 创建 Blob 对象
-      const blob = new Blob([res], { type: 'audio/mp3' })
+  // applicationApi
+  //   .playDemoText(id as string, data, playLoading)
+  //   .then(async (res: any) => {
+  //     if (res.type === 'application/json') {
+  //       const text = await res.text()
+  //       MsgError(text)
+  //       return
+  //     }
+  //     // 创建 Blob 对象
+  //     const blob = new Blob([res], { type: 'audio/mp3' })
 
-      // 创建对象 URL
-      const url = URL.createObjectURL(blob)
+  //     // 创建对象 URL
+  //     const url = URL.createObjectURL(blob)
 
-      // 检查 audioPlayer 是否已经引用了 DOM 元素
-      if (audioPlayer.value instanceof HTMLAudioElement) {
-        audioPlayer.value.src = url
-        audioPlayer.value.play() // 自动播放音频
-      } else {
-        console.error('audioPlayer.value is not an instance of HTMLAudioElement')
-      }
-    })
-    .catch((err) => {
-      console.log('err: ', err)
-    })
+  //     // 检查 audioPlayer 是否已经引用了 DOM 元素
+  //     if (audioPlayer.value instanceof HTMLAudioElement) {
+  //       audioPlayer.value.src = url
+  //       audioPlayer.value.play() // 自动播放音频
+  //     } else {
+  //       console.error('audioPlayer.value is not an instance of HTMLAudioElement')
+  //     }
+  //   })
+  //   .catch((err) => {
+  //     console.log('err: ', err)
+  //   })
 }
 
 defineExpose({ open, reset_default })

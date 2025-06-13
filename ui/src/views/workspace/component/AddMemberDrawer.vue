@@ -117,14 +117,14 @@ function handleCancel() {
 
 const memberFormContentRef = ref<InstanceType<typeof MemberFormContent>>()
 function handleAdd() {
-  memberFormContentRef.value?.validate().then(async (valid) => {
-    if (valid) {
-      await WorkspaceApi.CreateWorkspaceMember(props.currentWorkspace?.id as string, list.value, loading)
-      MsgSuccess(t('common.addSuccess'))
-      handleCancel();
-      emit('refresh')
-    }
-  })
+  // memberFormContentRef.value?.validate().then(async (valid) => {
+  //   if (valid) {
+  //     await WorkspaceApi.CreateWorkspaceMember(props.currentWorkspace?.id as string, list.value, loading)
+  //     MsgSuccess(t('common.addSuccess'))
+  //     handleCancel();
+  //     emit('refresh')
+  //   }
+  // })
 }
 
 defineExpose({ open })

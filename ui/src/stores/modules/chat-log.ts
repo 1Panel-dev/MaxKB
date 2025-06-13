@@ -38,38 +38,38 @@ const useChatLogStore = defineStore('chatLog',{
     },
     async asyncGetChatLogClient(id: string, page: pageRequest, loading?: Ref<boolean>) {
       return new Promise((resolve, reject) => {
-        chatLogApi
-          .getChatLogClient(id, page, loading)
-          .then((data) => {
-            resolve(data)
-          })
-          .catch((error) => {
-            reject(error)
-          })
+        // chatLogApi
+        //   .getChatLogClient(id, page, loading)
+        //   .then((data) => {
+        //     resolve(data)
+        //   })
+        //   .catch((error) => {
+        //     reject(error)
+        //   })
       })
     },
     async asyncDelChatClientLog(id: string, chatId: string, loading?: Ref<boolean>) {
       return new Promise((resolve, reject) => {
-        chatLogApi
-          .delChatClientLog(id, chatId, loading)
-          .then((data) => {
-            resolve(data)
-          })
-          .catch((error) => {
-            reject(error)
-          })
+        // chatLogApi
+        //   .delChatClientLog(id, chatId, loading)
+        //   .then((data) => {
+        //     resolve(data)
+        //   })
+        //   .catch((error) => {
+        //     reject(error)
+        //   })
       })
     },
     async asyncPutChatClientLog(id: string, chatId: string, data: any, loading?: Ref<boolean>) {
       return new Promise((resolve, reject) => {
-        chatLogApi
-          .putChatClientLog(id, chatId, data, loading)
-          .then((data) => {
-            resolve(data)
-          })
-          .catch((error) => {
-            reject(error)
-          })
+        // chatLogApi
+        //   .putChatClientLog(id, chatId, data, loading)
+        //   .then((data) => {
+        //     resolve(data)
+        //   })
+        //   .catch((error) => {
+        //     reject(error)
+        //   })
       })
     }
   }

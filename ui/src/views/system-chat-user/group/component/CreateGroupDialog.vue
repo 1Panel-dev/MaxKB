@@ -81,16 +81,16 @@ const submitMember = async (formEl: FormInstance | undefined) => {
     if (valid) {
       loading.value = true
       let idsArray = memberForm.value.users.map((obj: any) => obj.id)
-      TeamApi.postCreatTeamMember(idsArray)
-        .then((res) => {
-          MsgSuccess(t('common.submitSuccess'))
-          emit('refresh', idsArray)
-          dialogVisible.value = false
-          loading.value = false
-        })
-        .catch(() => {
-          loading.value = false
-        })
+      // GroupApi.postCreatTeamMember(idsArray)
+      //   .then((res) => {
+      //     MsgSuccess(t('common.submitSuccess'))
+      //     emit('refresh', idsArray)
+      //     dialogVisible.value = false
+      //     loading.value = false
+      //   })
+      //   .catch(() => {
+      //     loading.value = false
+      //   })
     }
   })
 }

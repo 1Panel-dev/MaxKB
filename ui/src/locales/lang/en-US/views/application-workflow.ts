@@ -120,7 +120,7 @@ export default {
       defaultPrompt: 'Known Information',
       think: 'Thinking Process'
     },
-    searchDatasetNode: {
+    searchKnowledgeNode: {
       label: 'Knowledge Retrieval',
       text: 'Allows you to query text content related to user questions from the Knowledge',
       paragraph_list: 'List of retrieved segments',

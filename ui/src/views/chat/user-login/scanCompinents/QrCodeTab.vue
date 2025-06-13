@@ -41,10 +41,10 @@ const activeKey = ref('')
 const allConfigs = ref<PlatformConfig[]>([])
 const config = ref<Config>({ app_key: '', app_secret: '' })
 // const logoUrl = ref('')
-const { user } = useStore()
+const { login } = useStore()
 async function getPlatformInfo() {
   try {
-    return await user.getQrSource()
+    return await login.getQrSource()
   } catch (error) {
     return []
   }

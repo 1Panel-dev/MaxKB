@@ -27,7 +27,7 @@
             class="mr-8"
             :size="24"
           />
-          <KnowledgeIcon v-else-if="isDataset" :type="current?.type" />
+          <KnowledgeIcon v-else-if="isKnowledge" :type="current?.type" />
 
           <div class="ellipsis" :title="current?.name">{{ current?.name }}</div>
         </div>
@@ -63,7 +63,7 @@
                         :size="24"
                       />
 
-                      <KnowledgeIcon v-if="isDataset" :type="item.type" />
+                      <KnowledgeIcon v-if="isKnowledge" :type="item.type" />
 
                       <span class="ellipsis" :title="item?.name"> {{ item?.name }}</span>
                     </div>
@@ -82,10 +82,10 @@
               </el-button>
             </div>
           </template>
-          <template v-else-if="isDataset">
+          <template v-else-if="isKnowledge">
             <div class="w-full text-left cursor" @click="openCreateDialog">
               <el-button link>
-                <el-icon class="mr-4"><Plus /></el-icon> {{ $t('views.dataset.createDataset') }}
+                <el-icon class="mr-4"><Plus /></el-icon> {{ $t('views.knowledge.createKnowledge') }}
               </el-button>
             </div>
           </template>
@@ -93,15 +93,11 @@
       </template>
     </el-dropdown>
   </div>
-  <!-- <CreateApplicationDialog ref="CreateApplicationDialogRef" @refresh="refresh" />
-  <CreateDatasetDialog ref="CreateDatasetDialogRef" @refresh="refresh" /> -->
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { onBeforeRouteLeave, useRouter, useRoute } from 'vue-router'
-// import CreateApplicationDialog from '@/views/application/component/CreateApplicationDialog.vue'
-// import CreateDatasetDialog from '@/views/dataset/component/CreateDatasetDialog.vue'
 import { isWorkFlow } from '@/utils/application'
 import { isAppIcon } from '@/utils/common'
 
@@ -118,7 +114,7 @@ onBeforeRouteLeave((to, from) => {
   common.saveBreadcrumb(null)
 })
 
-const CreateDatasetDialogRef = ref()
+const CreateKnowledgeDialogRef = ref()
 const CreateApplicationDialogRef = ref()
 const list = ref<any[]>([])
 const loading = ref(false)
@@ -132,13 +128,13 @@ const current = computed(() => {
 const isApplication = computed(() => {
   return activeMenu.includes('application')
 })
-const isDataset = computed(() => {
+const isKnowledge = computed(() => {
   return activeMenu.includes('knowledge')
 })
 
 function openCreateDialog() {
-  if (isDataset.value) {
-    CreateDatasetDialogRef.value.open()
+  if (isKnowledge.value) {
+    CreateKnowledgeDialogRef.value.open()
   } else if (isApplication.value) {
     CreateApplicationDialogRef.value.open()
   }
@@ -147,7 +143,7 @@ function openCreateDialog() {
 function changeMenu(id: string) {
   const lastMatched = route.matched[route.matched.length - 1]
   if (lastMatched) {
-    if (isDataset.value) {
+    if (isKnowledge.value) {
       router.push({ name: lastMatched.name, params: { id: id } })
     } else if (isApplication.value) {
       const type = list.value?.filter((v) => v.id === id)?.[0]?.type
@@ -166,7 +162,7 @@ function changeMenu(id: string) {
   }
 }
 
-function getDataset() {
+function getKnowledge() {
   loading.value = true
   knowledge
     .asyncGetRootKnowledge()
@@ -197,8 +193,8 @@ function refresh() {
 }
 onMounted(() => {
   if (!breadcrumbData.value) {
-    if (isDataset.value) {
-      getDataset()
+    if (isKnowledge.value) {
+      getKnowledge()
     } else if (isApplication.value) {
       getApplication()
     }

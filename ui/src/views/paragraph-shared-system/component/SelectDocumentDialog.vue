@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="`${$t('views.log.selectDataset')}/${$t('common.fileUpload.document')}`"
+    :title="`${$t('views.chatLog.selectKnowledge')}/${$t('common.fileUpload.document')}`"
     v-model="dialogVisible"
     width="500"
     :close-on-click-modal="false"
@@ -14,18 +14,18 @@
       :rules="rules"
       @submit.prevent
     >
-      <el-form-item :label="$t('views.log.selectDataset')" prop="dataset_id">
+      <el-form-item :label="$t('views.chatLog.selectKnowledge')" prop="knowledge_id">
         <el-select
-          v-model="form.dataset_id"
+          v-model="form.knowledge_id"
           filterable
-          :placeholder="$t('views.log.selectDatasetPlaceholder')"
+          :placeholder="$t('views.chatLog.selectKnowledgePlaceholder')"
           :loading="optionLoading"
-          @change="changeDataset"
+          @change="changeknowledge"
         >
-          <el-option v-for="item in datasetList" :key="item.id" :label="item.name" :value="item.id">
+          <el-option v-for="item in knowledgeList" :key="item.id" :label="item.name" :value="item.id">
             <span class="flex align-center">
               <el-avatar
-                v-if="!item.dataset_id && item.type === '1'"
+                v-if="!item.knowledge_id && item.type === '1'"
                 class="mr-12 avatar-purple"
                 shape="square"
                 :size="24"
@@ -33,7 +33,7 @@
                 <img src="@/assets/knowledge/icon_web.svg" style="width: 58%" alt="" />
               </el-avatar>
               <el-avatar
-                v-else-if="!item.dataset_id && item.type === '2'"
+                v-else-if="!item.knowledge_id && item.type === '2'"
                 class="mr-12 avatar-purple"
                 shape="square"
                 :size="24"
@@ -42,7 +42,7 @@
                 <img src="@/assets/knowledge/logo_lark.svg" style="width: 100%" alt="" />
               </el-avatar>
               <el-avatar
-                v-else-if="!item.dataset_id && item.type === '0'"
+                v-else-if="!item.knowledge_id && item.type === '0'"
                 class="mr-12 avatar-blue"
                 shape="square"
                 :size="24"
@@ -54,11 +54,11 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item :label="$t('views.log.saveToDocument')" prop="document_id">
+      <el-form-item :label="$t('views.chatLog.saveToDocument')" prop="document_id">
         <el-select
           v-model="form.document_id"
           filterable
-          :placeholder="$t('views.log.documentPlaceholder')"
+          :placeholder="$t('views.chatLog.documentPlaceholder')"
           :loading="optionLoading"
         >
           <el-option
@@ -103,18 +103,18 @@ const dialogVisible = ref<boolean>(false)
 const loading = ref(false)
 
 const form = ref<any>({
-  dataset_id: '',
+  knowledge_id: '',
   document_id: ''
 })
 
 const rules = reactive<FormRules>({
-  dataset_id: [
-    { required: true, message: t('views.log.selectDatasetPlaceholder'), trigger: 'change' }
+  knowledge_id: [
+    { required: true, message: t('views.chatLog.selectknowledgePlaceholder'), trigger: 'change' }
   ],
-  document_id: [{ required: true, message: t('views.log.documentPlaceholder'), trigger: 'change' }]
+  document_id: [{ required: true, message: t('views.chatLog.documentPlaceholder'), trigger: 'change' }]
 })
 
-const datasetList = ref<any[]>([])
+const knowledgeList = ref<any[]>([])
 const documentList = ref<any[]>([])
 const optionLoading = ref(false)
 const paragraphList = ref<string[]>([])
@@ -122,17 +122,17 @@ const paragraphList = ref<string[]>([])
 watch(dialogVisible, (bool) => {
   if (!bool) {
     form.value = {
-      dataset_id: '',
+      knowledge_id: '',
       document_id: ''
     }
-    datasetList.value = []
+    knowledgeList.value = []
     documentList.value = []
     paragraphList.value = []
     formRef.value?.clearValidate()
   }
 })
 
-function changeDataset(id: string) {
+function changeknowledge(id: string) {
   form.value.document_id = ''
   getDocument(id)
 }
@@ -143,15 +143,15 @@ function getDocument(id: string) {
   })
 }
 
-function getDataset() {
+function getknowledge() {
   knowledge.asyncGetRootKnowledge(loading).then((res: any) => {
-    datasetList.value = res.data
+    knowledgeList.value = res.data
   })
 }
 
 const open = (list: any) => {
   paragraphList.value = list
-  getDataset()
+  getknowledge()
   formRef.value?.clearValidate()
   dialogVisible.value = true
 }
@@ -163,7 +163,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
         .putMigrateMulParagraph(
           id,
           documentId,
-          form.value.dataset_id,
+          form.value.knowledge_id,
           form.value.document_id,
           paragraphList.value,
           loading

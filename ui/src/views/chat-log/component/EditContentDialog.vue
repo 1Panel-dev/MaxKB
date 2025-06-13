@@ -48,17 +48,17 @@
         >
         </el-input>
       </el-form-item>
-      <el-form-item :label="$t('views.chatLog.selectKnowledge')" prop="dataset_id">
+      <el-form-item :label="$t('views.chatLog.selectKnowledge')" prop="knowledge_id">
         <el-select
-          v-model="form.dataset_id"
+          v-model="form.knowledge_id"
           filterable
           :placeholder="$t('views.chatLog.selectKnowledgePlaceholder')"
           :loading="optionLoading"
-          @change="changeDataset"
+          @change="changeKnowledge"
         >
-          <el-option v-for="item in datasetList" :key="item.id" :label="item.name" :value="item.id">
+          <el-option v-for="item in knowledgeList" :key="item.id" :label="item.name" :value="item.id">
             <span class="flex align-center">
-              <KnowledgeIcon v-if="item.dataset_id" :type="item.type" />
+              <KnowledgeIcon v-if="item.knowledge_id" :type="item.type" />
 
               {{ item.name }}
             </span>
@@ -153,19 +153,19 @@ const form = ref<any>({
   problem_text: '',
   title: '',
   content: '',
-  dataset_id: '',
+  knowledge_id: '',
   document_id: '',
 })
 
 const rules = reactive<FormRules>({
   content: [{ required: true, message: t('views.chatLog.form.content.placeholder'), trigger: 'blur' }],
-  dataset_id: [
+  knowledge_id: [
     { required: true, message: t('views.chatLog.selectKnowledgePlaceholder'), trigger: 'change' },
   ],
   document_id: [{ required: true, message: t('views.chatLog.documentPlaceholder'), trigger: 'change' }],
 })
 
-const datasetList = ref<any[]>([])
+const knowledgeList = ref<any[]>([])
 const documentList = ref<any[]>([])
 const optionLoading = ref(false)
 
@@ -177,10 +177,10 @@ watch(dialogVisible, (bool) => {
       problem_text: '',
       title: '',
       content: '',
-      dataset_id: '',
+      knowledge_id: '',
       document_id: '',
     }
-    datasetList.value = []
+    knowledgeList.value = []
     documentList.value = []
     formRef.value?.clearValidate()
   }
@@ -206,18 +206,18 @@ const onUploadImg = async (files: any, callback: any) => {
   callback(res.map((item) => item.data))
 }
 
-function changeDataset(dataset_id: string) {
-  localStorage.setItem(id + 'chat_dataset_id', dataset_id)
+function changeKnowledge(knowledge_id: string) {
+  localStorage.setItem(id + 'chat_knowledge_id', knowledge_id)
   form.value.document_id = ''
-  getDocument(dataset_id)
+  getDocument(knowledge_id)
 }
 
 function changeDocument(document_id: string) {
   localStorage.setItem(id + 'chat_document_id', document_id)
 }
 
-function getDocument(dataset_id: string) {
-  document.asyncGetAllDocument(dataset_id, loading).then((res: any) => {
+function getDocument(knowledge_id: string) {
+  document.asyncGetAllDocument(knowledge_id, loading).then((res: any) => {
     documentList.value = res.data
     if (localStorage.getItem(id + 'chat_document_id')) {
       form.value.document_id = localStorage.getItem(id + 'chat_document_id') as string
@@ -228,23 +228,23 @@ function getDocument(dataset_id: string) {
   })
 }
 
-function getDataset() {
-  application.asyncGetApplicationKnowledge(id, loading).then((res: any) => {
-    datasetList.value = res.data
-    if (localStorage.getItem(id + 'chat_dataset_id')) {
-      form.value.dataset_id = localStorage.getItem(id + 'chat_dataset_id') as string
-      if (!datasetList.value.find((v) => v.id === form.value.dataset_id)) {
-        form.value.dataset_id = ''
-        form.value.document_id = ''
-      } else {
-        getDocument(form.value.dataset_id)
-      }
-    }
-  })
+function getKnowledge_id() {
+  // application.asyncGetApplicationKnowledge(id, loading).then((res: any) => {
+  //   knowledgeList.value = res.data
+  //   if (localStorage.getItem(id + 'chat_knowledge_id')) {
+  //     form.value.knowledge_id = localStorage.getItem(id + 'chat_knowledge_id') as string
+  //     if (!knowledgeList.value.find((v) => v.id === form.value.knowledge_id)) {
+  //       form.value.knowledge_id = ''
+  //       form.value.document_id = ''
+  //     } else {
+  //       getDocument(form.value.knowledge_id)
+  //     }
+  //   }
+  // })
 }
 
 const open = (data: any) => {
-  getDataset()
+  getKnowledge_id()
   form.value.chat_id = data.chat_id
   form.value.record_id = data.id
   form.value.problem_text = data.problem_text ? data.problem_text.substring(0, 256) : ''
@@ -266,7 +266,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
           id,
           form.value.chat_id,
           form.value.record_id,
-          form.value.dataset_id,
+          form.value.knowledge_id,
           form.value.document_id,
           obj,
           loading,

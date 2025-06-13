@@ -33,7 +33,7 @@ const DocumentRouter = {
     },
     {
       path: 'hit-test',
-      name: 'DatasetHitTest',
+      name: 'KnowledgeHitTest',
       meta: {
         icon: 'app-hit-test',
         title: 'views.application.hitTest.title',

@@ -10,7 +10,7 @@
     <!-- 基本信息 -->
     <BaseForm ref="BaseFormRef" v-if="dialogVisible" />
     <el-form
-      ref="DatasetFormRef"
+      ref="KnowledgeFormRef"
       :rules="rules"
       :model="datasetForm"
       label-position="top"
@@ -63,7 +63,7 @@ const emit = defineEmits(['refresh'])
 
 const router = useRouter()
 const BaseFormRef = ref()
-const DatasetFormRef = ref()
+const KnowledgeFormRef = ref()
 
 const loading = ref(false)
 const dialogVisible = ref<boolean>(false)
@@ -129,7 +129,7 @@ watch(dialogVisible, (bool) => {
       source_url: '',
       selector: '',
     }
-    DatasetFormRef.value?.clearValidate()
+    KnowledgeFormRef.value?.clearValidate()
   }
 })
 
@@ -139,14 +139,16 @@ const open = () => {
 
 const submitHandle = async () => {
   if (await BaseFormRef.value?.validate()) {
-    await DatasetFormRef.value.validate((valid: any) => {
+    await KnowledgeFormRef.value.validate((valid: any) => {
       if (valid) {
         const obj = { ...BaseFormRef.value.form, ...datasetForm.value }
-        KnowledgeApi.postLarkKnowledge({...obj, embedding_model_id: obj.embedding }, loading).then((res) => {
-          MsgSuccess(t('common.createSuccess'))
-          router.push({ path: `/knowledge/${res.data.id}/document` })
-          emit('refresh')
-        })
+        KnowledgeApi.postLarkKnowledge({ ...obj, embedding_model_id: obj.embedding }, loading).then(
+          (res: any) => {
+            MsgSuccess(t('common.createSuccess'))
+            router.push({ path: `/knowledge/${res.data.id}/document` })
+            emit('refresh')
+          },
+        )
       } else {
         return false
       }

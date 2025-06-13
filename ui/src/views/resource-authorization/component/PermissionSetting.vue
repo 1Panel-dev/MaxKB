@@ -21,12 +21,10 @@
               <img :src="row?.icon" alt="" />
             </el-avatar>
 
-            <el-avatar
-              v-else-if="row?.name && isApplication"
-              :name="row?.name"
-              pinyinColor
-              shape="square"
-              :size="20"
+            <LogoIcon
+              v-else-if="isApplication"
+              height="28px"
+              style="width: 28px; height: 28px; display: block"
               class="mr-12"
             />
             <el-avatar

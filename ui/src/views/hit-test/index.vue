@@ -312,19 +312,19 @@ function getHitTestList() {
     ...formInline.value,
   }
   if (isDataset.value) {
-    knowledgeApi.getDatasetHitTest(id, obj, loading).then((res) => {
+    KnowledgeApi.getKnowledgeHitTest(id, obj, loading).then((res) => {
       paragraphDetail.value = res.data && arraySort(res.data, 'comprehensive_score', true)
       questionTitle.value = inputValue.value
       inputValue.value = ''
       first.value = false
     })
   } else if (isApplication.value) {
-    applicationApi.getApplicationHitTest(id, obj, loading).then((res) => {
-      paragraphDetail.value = res.data && arraySort(res.data, 'comprehensive_score', true)
-      questionTitle.value = inputValue.value
-      inputValue.value = ''
-      first.value = false
-    })
+    // applicationApi.getApplicationHitTest(id, obj, loading).then((res) => {
+    //   paragraphDetail.value = res.data && arraySort(res.data, 'comprehensive_score', true)
+    //   questionTitle.value = inputValue.value
+    //   inputValue.value = ''
+    //   first.value = false
+    // })
   }
 }
 

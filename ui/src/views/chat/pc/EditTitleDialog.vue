@@ -49,7 +49,7 @@ import type { FormInstance } from 'element-plus'
 import useStore from '@/stores'
 import { t } from '@/locales'
 
-const { log } = useStore()
+const { chatLog } = useStore()
 const emit = defineEmits(['refresh'])
 
 const fieldFormRef = ref()
@@ -74,7 +74,7 @@ const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid) => {
     if (valid) {
-      log.asyncPutChatClientLog(applicationId.value, chatId.value, form.value, loading).then(() => {
+      chatLog.asyncPutChatClientLog(applicationId.value, chatId.value, form.value, loading).then(() => {
         emit('refresh', chatId.value, form.value.abstract)
         dialogVisible.value = false
       })

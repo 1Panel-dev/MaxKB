@@ -8,7 +8,6 @@
         label-position="top"
         require-asterisk-position="right"
         label-width="auto"
-        ref="DatasetNodeFormRef"
       >
         <el-form-item :label="$t('views.problem.relateParagraph.selectDocument')" :rules="{
             type: 'array',

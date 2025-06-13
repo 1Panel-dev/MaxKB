@@ -261,16 +261,17 @@ function getTools() {
     MsgError(t('views.applicationWorkflow.nodes.mcpNode.mcpServerTip'))
     return
   }
-  applicationApi
-    .getMcpTools({ mcp_servers: form_data.value.mcp_servers }, loading)
-    .then((res: any) => {
-      form_data.value.mcp_tools = res.data
-      MsgSuccess(t('views.applicationWorkflow.nodes.mcpNode.getToolsSuccess'))
-      // 修改了json，刷新mcp_server
-      form_data.value.mcp_server = form_data.value.mcp_tools.filter(
-        (item: any) => item.name === form_data.value.mcp_tool
-      )[0].server
-    })
+  // todo
+  // applicationApi
+  //   .getMcpTools({ mcp_servers: form_data.value.mcp_servers }, loading)
+  //   .then((res: any) => {
+  //     form_data.value.mcp_tools = res.data
+  //     MsgSuccess(t('views.applicationWorkflow.nodes.mcpNode.getToolsSuccess'))
+  //     // 修改了json，刷新mcp_server
+  //     form_data.value.mcp_server = form_data.value.mcp_tools.filter(
+  //       (item: any) => item.name === form_data.value.mcp_tool
+  //     )[0].server
+  //   })
 }
 
 function changeTool() {

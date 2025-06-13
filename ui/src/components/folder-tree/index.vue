@@ -89,7 +89,7 @@ const handleNodeClick = (data: Tree) => {
 }
 
 const handleSharedNodeClick = () => {
-  treeRef.value?.setCurrentKey(null)
+  treeRef.value?.setCurrentKey(undefined)
   emit('handleNodeClick', { id: 'share', name: t('views.system.share_knowledge') })
 }
 </script>

@@ -88,7 +88,7 @@ import type { FormInstance } from 'element-plus'
 
 const route = useRoute()
 const {
-  params: { id, documentId } // id为datasetID
+  params: { id, documentId } // id为knowledgeID
 } = route as any
 
 const { model, prompt, user } = useStore()
@@ -134,8 +134,8 @@ watch(dialogVisible, (bool) => {
   }
 })
 
-const open = (ids: string[], type: string, _datasetId?: string) => {
-  knowledgeId.value = _datasetId
+const open = (ids: string[], type: string, _knowledgeId?: string) => {
+  knowledgeId.value = _knowledgeId
   getModel()
   idList.value = ids
   apiType.value = type
