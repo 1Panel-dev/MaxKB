@@ -26,7 +26,7 @@ class ServicesUtil(object):
 
     def start_and_watch(self):
         logging.info(time.ctime())
-        logging.info(f'MaxKB version {__version__}, more see https://www.jumpserver.org')
+        logging.info(f'MaxKB version {__version__}, more see https://www.maxkb.cn')
         self.start()
         if self.run_daemon:
             self.show_status()
