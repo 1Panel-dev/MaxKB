@@ -65,38 +65,39 @@
           <div v-else>
             <el-scrollbar class="paragraph-scollbar">
               <div class="paragraph-detail">
-                <InfiniteScroll
-                  :size="paragraphDetail.length"
-                  :total="paginationConfig.total"
-                  :page_size="paginationConfig.page_size"
-                  v-model:current_page="paginationConfig.current_page"
-                  @load="getParagraphList"
-                  :loading="loading"
-                >
-                  <VueDraggable
-                    ref="el"
-                    v-bind:modelValue="paragraphDetail"
-                    :disabled="isBatch === true"
-                    handle=".handle"
-                    :animation="150"
-                    ghostClass="ghost"
-                    @end="onEnd"
+                <el-checkbox-group v-model="multipleSelection">
+                  <InfiniteScroll
+                    :size="paragraphDetail.length"
+                    :total="paginationConfig.total"
+                    :page_size="paginationConfig.page_size"
+                    v-model:current_page="paginationConfig.current_page"
+                    @load="getParagraphList"
+                    :loading="loading"
                   >
-                    <el-checkbox-group v-model="multipleSelection">
+                    <VueDraggable
+                      ref="el"
+                      v-model="paragraphDetail"
+                      :disabled="isBatch === true"
+                      handle=".handle"
+                      :animation="150"
+                      ghostClass="ghost"
+                    >
                       <template v-for="(item, index) in paragraphDetail" :key="item.id">
-                        <!-- 批量操作 -->
-                        <div class="paragraph-card flex" :id="item.id" v-if="isBatch === true">
-                          <el-checkbox :value="item.id" />
-                          <ParagraphCard :data="item" class="mb-8 w-full" />
-                        </div>
-                        <!-- 非批量操作 -->
-                        <div class="handle paragraph-card flex" :id="item.id" v-else>
-                          <img
-                            src="@/assets/sort.svg"
-                            alt=""
-                            height="15"
-                            class="handle-img mr-8 mt-24 cursor"
-                          />
+                        <div style="display: flex; margin-bottom: 16px">
+                          <!-- 批量操作 -->
+                          <div class="paragraph-card flex" :id="item.id" v-if="isBatch === true">
+                            <el-checkbox :value="item.id" />
+                            <ParagraphCard :data="item" class="mb-8 w-full" />
+                          </div>
+                          <!-- 非批量操作 -->
+                          <div class="handle paragraph-card flex" :id="item.id" v-else>
+                            <img
+                              src="@/assets/sort.svg"
+                              alt=""
+                              height="15"
+                              class="handle-img mr-8 mt-24 cursor"
+                            />
+                          </div>
                           <ParagraphCard
                             :data="item"
                             class="mb-8 w-full"
@@ -105,9 +106,9 @@
                           />
                         </div>
                       </template>
-                    </el-checkbox-group>
-                  </VueDraggable>
-                </InfiniteScroll>
+                    </VueDraggable>
+                  </InfiniteScroll>
+                </el-checkbox-group>
               </div>
             </el-scrollbar>
           </div>
@@ -341,6 +342,10 @@ onMounted(() => {
     height: calc(100vh - 215px);
     max-width: 1000px;
     margin: 16px auto;
+
+    // .el-checkbox-group {
+    //   display: flex;
+    // }
   }
 
   &__main {

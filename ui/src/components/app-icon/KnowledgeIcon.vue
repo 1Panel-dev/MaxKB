@@ -1,17 +1,17 @@
 <template>
-  <el-avatar v-if="type === 1" class="avatar-purple" shape="square" :size="32">
+  <el-avatar v-if="type === 1" class="avatar-purple" shape="square" :size="size">
     <img src="@/assets/knowledge/icon_web.svg" style="width: 58%" alt="" />
   </el-avatar>
   <el-avatar
     v-else-if="type === 2"
     class="avatar-purple"
     shape="square"
-    :size="32"
+    :size="size"
     style="background: none"
   >
     <img src="@/assets/knowledge/logo_lark.svg" style="width: 100%" alt="" />
   </el-avatar>
-  <el-avatar v-else class="avatar-blue" shape="square" :size="32">
+  <el-avatar v-else class="avatar-blue" shape="square" :size="size">
     <img src="@/assets/knowledge/icon_document.svg" style="width: 58%" alt="" />
   </el-avatar>
 </template>
@@ -21,6 +21,10 @@ const props = defineProps({
   type: {
     type: [String, Number],
     default: '',
+  },
+  size: {
+    type: [String, Number],
+    default: 32,
   },
 })
 </script>

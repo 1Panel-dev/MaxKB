@@ -54,8 +54,8 @@
 <script setup lang="ts">
 import { ref, watch, reactive } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import BaseForm from '@/views/knowledge/component/BaseForm.vue'
-import KnowledgeApi from '@/api/knowledge/knowledge'
+import BaseForm from '@/views/knowledge-shared-system/component/BaseForm.vue'
+import KnowledgeApi from '@/api/shared/knowledge'
 import { MsgSuccess, MsgAlert } from '@/utils/message'
 import { t } from '@/locales'
 import { ComplexPermission } from '@/utils/permission/type'
@@ -142,7 +142,7 @@ const submitHandle = async () => {
     await DatasetFormRef.value.validate((valid: any) => {
       if (valid) {
         const obj = { ...BaseFormRef.value.form, ...datasetForm.value }
-        KnowledgeApi.postLarkKnowledge(obj, loading).then((res) => {
+        KnowledgeApi.postLarkKnowledge({...obj, embedding_model_id: obj.embedding }, loading).then((res) => {
           MsgSuccess(t('common.createSuccess'))
           router.push({ path: `/knowledge/${res.data.id}/document` })
           emit('refresh')

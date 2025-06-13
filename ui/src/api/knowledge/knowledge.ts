@@ -275,6 +275,13 @@ const importLarkDocument: (
   return post(`${prefix}/lark/${knowledge_id}/import`, data, null, loading)
 }
 
+const postLarkKnowledge: (data: any, loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (
+  data,
+  loading,
+) => {
+  return post(`${prefix}/knowledge/lark/save`, data, null, loading)
+}
+
 export default {
   getKnowledgeByFolder,
   getKnowledgeList,
@@ -294,4 +301,5 @@ export default {
 
   getLarkDocumentList,
   importLarkDocument,
+  postLarkKnowledge,
 }

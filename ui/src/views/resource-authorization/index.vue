@@ -52,6 +52,7 @@
                   :type="item.value"
                   :tableHeight="tableHeight"
                   :manage="isManage(currentType)"
+                  @refreshData="refreshData"
                 ></PermissionSetting>
               </el-tab-pane>
             </el-tabs>
@@ -73,6 +74,8 @@ import PermissionSetting from './component/PermissionSetting.vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { AuthorizationEnum } from '@/enums/system'
 import { t } from '@/locales'
+import useStore from '@/stores'
+import { cloneDeep } from 'lodash'
 
 const loading = ref(false)
 const rLoading = ref(false)
@@ -84,6 +87,7 @@ const filterText = ref('')
 
 const activeName = ref(AuthorizationEnum.KNOWLEDGE)
 const tableHeight = ref(0)
+const { folder } = useStore()
 
 const settingTags = reactive([
   {
@@ -146,8 +150,141 @@ function getMember(id?: string) {
     const user = (id && memberList.value.find((p: any) => p.user_id === id)) || null
     currentUser.value = user ? user.id : memberList.value[0].id
     currentType.value = user ? user.type : memberList.value[0].type
-    ResourcePermissions(currentUser.value)
+    getWholeTree(currentUser.value)
   })
+}
+
+const dfsPermissionIndeterminateTrue = (arr: any = [], type: string) => {
+  return arr.every((item: any) => {
+    if (item.children?.length) {
+      item.permission[type] = dfsPermissionIndeterminateTrue(item.children, type)
+    }
+    return item.permission[type]
+  })
+}
+
+const dfsPermissionIndeterminate = (
+  arr: any = [],
+  type: string,
+  permissionHalf: any,
+  permissionHalfMap: any,
+  id: string,
+) => {
+  arr.forEach((item: any) => {
+    if (item.isFolder) {
+      if (!permissionHalfMap[item.id]) {
+        permissionHalfMap[item.id] = cloneDeep(permissionHalf)
+      }
+    }
+
+    if (item.children?.length) {
+      dfsPermissionIndeterminate(item.children, type, permissionHalf, permissionHalfMap, item.id)
+    }
+
+    if (!item.isFolder) {
+      permissionHalfMap[id][type] = [...permissionHalfMap[id][type], item.permission[type]]
+    }
+
+    if (item.isFolder) {
+      item.permissionHalf[type] = permissionHalfMap[item.id][type].length
+        ? new Set(permissionHalfMap[item.id][type]).size > 1
+        : false
+      if (item.children.some((ele: any) => ele.isFolder && ele.permissionHalf[type])) {
+        item.permissionHalf[type] = true
+      }
+
+      if (
+        item.children.some((ele: any) => ele.permission[type]) &&
+        item.children.some((ele: any) => !ele.permission[type])
+      ) {
+        item.permissionHalf[type] = true
+      }
+    }
+  })
+}
+
+const dfsFolder = (arr: any[] = [], folderIdMap: any) => {
+  arr.forEach((ele) => {
+    if (ele.permission) return
+    if (ele.children?.length) {
+      if (folderIdMap[ele.id]) {
+        ele.children = [...ele.children, ...folderIdMap[ele.id]]
+      }
+      dfsFolder(ele.children, folderIdMap)
+    } else {
+      ele.children = folderIdMap[ele.id] || []
+    }
+    ele.isFolder = true
+    ele.permission = {
+      VIEW: false,
+      MANAGE: false,
+      ROLE: false,
+    }
+
+    ele.permissionHalf = {
+      VIEW: false,
+      MANAGE: false,
+      ROLE: false,
+    }
+  })
+}
+
+function getFolder() {
+  return folder.asyncGetFolder('KNOWLEDGE', {}, loading)
+}
+
+function getResourcePermissions(user_id: string) {
+  return AuthorizationApi.getResourceAuthorization(user_id, rLoading)
+}
+
+const getWholeTree = async (user_id: string) => {
+  const [parentRes, childrenRes] = await Promise.all([getFolder(), getResourcePermissions(user_id)])
+  if (!childrenRes.data || Object.keys(childrenRes.data).length > 0) {
+    settingTags.map((item: any) => {
+      let folderIdMap = []
+      const folderTree = cloneDeep((parentRes as unknown as any).data)
+      if (Object.keys(childrenRes.data).indexOf(item.value) !== -1) {
+        folderIdMap = getFolderIdMap(childrenRes.data[item.value])
+        dfsFolder(folderTree, folderIdMap)
+        const permissionHalf = {
+          VIEW: [],
+          MANAGE: [],
+          ROLE: [],
+        }
+        Object.keys(permissionHalf).forEach((ele) => {
+          dfsPermissionIndeterminateTrue(folderTree, ele)
+          dfsPermissionIndeterminate(folderTree, ele, cloneDeep(permissionHalf), {}, 'default')
+        })
+        item.data = folderTree
+      }
+    })
+  }
+}
+
+const refreshData = () => {
+  settingTags.map((item: any) => {
+    if (activeName.value === item.value) {
+      const permissionHalf = {
+        VIEW: [],
+        MANAGE: [],
+        ROLE: [],
+      }
+      Object.keys(permissionHalf).forEach((ele) => {
+        dfsPermissionIndeterminateTrue(item.data, ele)
+        dfsPermissionIndeterminate(item.data, ele, cloneDeep(permissionHalf), {}, 'default')
+      })
+    }
+  })
+}
+const getFolderIdMap = (arr: any = []) => {
+  return arr.reduce((pre: any, next: any) => {
+    if (pre[next.folder_id]) {
+      pre[next.folder_id].push(next)
+    } else {
+      pre[next.folder_id] = [next]
+    }
+    return pre
+  }, {})
 }
 function ResourcePermissions(user_id: string) {
   AuthorizationApi.getResourceAuthorization(user_id, rLoading).then((res) => {
@@ -155,6 +292,7 @@ function ResourcePermissions(user_id: string) {
       settingTags.map((item: any) => {
         if (Object.keys(res.data).indexOf(item.value) !== -1) {
           item.data = res.data[item.value]
+          getFolderIdMap(item.data)
         }
       })
     }
