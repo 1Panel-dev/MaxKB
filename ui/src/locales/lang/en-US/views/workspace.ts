@@ -1,11 +1,15 @@
 export default {
-  // TODO
-  title: '工作空间',
-  list: '工作空间列表',
-  name: '工作空间名称',
+  title: 'Workspace',
+  list: 'Workspace list',
+  name: 'Workspace name',
+  delete: {
+    confirmTitle: 'Confirm to delete workspace:',
+    confirmContent: 'After deletion, all members in this space will be removed. Please proceed with caution.',
+    confirmContentNotDelete: 'This workspace contains knowledge base resources and application resources, and cannot be deleted.',
+  },
   member: {
     delete: {
-      confirmTitle: '是否移除成员：',
+      confirmTitle: 'Confirm to remove member:',
     }
   }
-}
+};

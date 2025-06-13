@@ -18,6 +18,7 @@ export default {
   modifySuccess: '修改成功',
   cancel: '取消',
   confirm: '確認',
+  close: '關閉',
   tip: '提示',
   add: '新增',
   refresh: '重新整理',

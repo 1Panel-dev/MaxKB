@@ -7,6 +7,13 @@ import type { pageRequest, PageList } from '@/api/type/common'
 const prefix = '/system/workspace'
 
 /**
+ * 获取首页的工作空间下拉列表
+ */
+const getWorkspaceListByUser: (loading?: Ref<boolean>) => Promise<Result<WorkspaceItem[]>> = (loading) => {
+  return get('/workspace/by_user', undefined, loading)
+}
+
+/**
  * 获取添加成员时的工作空间下拉列表
  */
 const getWorkspaceList: (loading?: Ref<boolean>) => Promise<Result<Record<string, any>[]>> = (loading) => {
@@ -28,6 +35,16 @@ const CreateOrUpdateWorkspace: (
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (data, loading) => {
   return post(`${prefix}`, data, undefined, loading)
+}
+
+/**
+ * 删除工作空间前的校验
+ */
+const deleteWorkspaceCheck: (workspace_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  workspace_id,
+  loading,
+) => {
+  return get(`${prefix}/${workspace_id}/check`, undefined, loading)
 }
 
 /**
@@ -94,4 +111,6 @@ export default {
   CreateWorkspaceMember,
   deleteWorkspaceMember,
   getWorkspaceRoleList,
+  getWorkspaceListByUser,
+  deleteWorkspaceCheck
 }

@@ -13,8 +13,8 @@
   </div>
   <app-table :data="tableData" :pagination-config="paginationConfig" @sizeChange="handleSizeChange"
     @changePage="getList" v-loading="loading">
-    <el-table-column prop="nick_name" :label="$t('views.userManage.form.nick_name.label')" />
-    <el-table-column prop="username" :label="$t('views.userManage.form.username.label')" />
+    <el-table-column prop="nick_name" :label="$t('views.userManage.userForm.nick_name.label')" />
+    <el-table-column prop="username" :label="$t('views.login.loginForm.username.label')" />
     <el-table-column prop="role_name" :label="$t('views.role.member.role')" />
     <el-table-column :label="$t('common.operation')" width="100" fixed="right">
       <template #default="{ row }">
