@@ -19,6 +19,17 @@ export default {
       requiredMessage: '请输入验证码',
       validatorMessage: '验证码不正确',
     },
+    new_password: {
+      label: '新密码',
+      placeholder: '请输入新密码',
+      requiredMessage: '请输入新密码',
+    },
+    re_password: {
+      label: '确认密码',
+      placeholder: '请输入确认密码',
+      requiredMessage: '请输入确认密码',
+      validatorMessage: '密码不一致',
+    },
   },
   jump_tip: '即将跳转至认证源页面进行认证',
   jump: '跳转',

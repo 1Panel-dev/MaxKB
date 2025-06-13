@@ -5,19 +5,30 @@ export default {
       label: '使用者名稱',
       placeholder: '請輸入使用者名稱',
       requiredMessage: '請輸入使用者名稱',
-      lengthMessage: '長度須介於 6 到 20 個字元之間'
+      lengthMessage: '長度須介於 6 到 20 個字元之間',
     },
     password: {
       label: '登入密碼',
       placeholder: '請輸入密碼',
       requiredMessage: '請輸入密碼',
-      lengthMessage: '長度須介於 6 到 20 個字元之間'
+      lengthMessage: '長度須介於 6 到 20 個字元之間',
     },
     captcha: {
       label: '驗證碼',
       placeholder: '請輸入驗證碼',
       requiredMessage: '請輸入驗證碼',
       validatorMessage: '驗證碼不正確',
+    },
+    new_password: {
+      label: '新密碼',
+      placeholder: '請輸入新密碼',
+      requiredMessage: '請輸入新密碼',
+    },
+    re_password: {
+      label: '確認密碼',
+      placeholder: '請輸入確認密碼',
+      requiredMessage: '請輸入確認密碼',
+      validatorMessage: '密碼不一致',
     },
   },
   jump_tip: '即將跳轉至認證源頁面進行認證',
@@ -29,7 +40,7 @@ export default {
     login: '登錄',
     register: '註冊',
     backLogin: '返回登錄',
-    checkCode: '立即驗證'
+    checkCode: '立即驗證',
   },
   newPassword: '新密碼',
   enterPassword: '請輸入新密碼',
@@ -39,6 +50,6 @@ export default {
     placeholder: '請輸入驗證碼',
     getVerificationCode: '獲取驗證碼',
     successMessage: '驗證碼發送成功',
-    resend: '重新發送'
-  }
+    resend: '重新發送',
+  },
 }

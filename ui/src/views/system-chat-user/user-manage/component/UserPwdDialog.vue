@@ -10,20 +10,20 @@
       :close-on-click-modal="false"
       :close-on-press-escape="false"
     >
-      <el-form-item :label="$t('views.userManage.form.new_password.label')" prop="password">
+      <el-form-item :label="$t('views.login.loginForm.new_password.label')" prop="password">
         <el-input
           type="password"
           v-model="userForm.password"
-          :placeholder="$t('views.userManage.form.new_password.placeholder')"
+          :placeholder="$t('views.login.loginForm.new_password.placeholder')"
           show-password
         >
         </el-input>
       </el-form-item>
-      <el-form-item :label="$t('views.userManage.form.re_password.label')" prop="re_password">
+      <el-form-item :label="$t('views.login.loginForm.re_password.label')" prop="re_password">
         <el-input
           type="password"
           v-model="userForm.re_password"
-          :placeholder="$t('views.userManage.form.re_password.placeholder')"
+          :placeholder="$t('views.login.loginForm.re_password.placeholder')"
           show-password
         >
         </el-input>
@@ -61,32 +61,32 @@ const rules = reactive<FormRules<ResetPasswordRequest>>({
   password: [
     {
       required: true,
-      message: t('views.userManage.form.new_password.requiredMessage'),
+      message: t('views.login.loginForm.new_password.requiredMessage'),
       trigger: 'blur'
     },
     {
       min: 6,
       max: 20,
-      message: t('views.userManage.form.password.lengthMessage'),
+      message: t('views.login.loginForm.password.lengthMessage'),
       trigger: 'blur'
     }
   ],
   re_password: [
     {
       required: true,
-      message: t('views.userManage.form.re_password.requiredMessage'),
+      message: t('views.login.loginForm.re_password.requiredMessage'),
       trigger: 'blur'
     },
     {
       min: 6,
       max: 20,
-      message: t('views.userManage.form.password.lengthMessage'),
+      message: t('views.login.loginForm.password.lengthMessage'),
       trigger: 'blur'
     },
     {
       validator: (rule, value, callback) => {
         if (userFormRef.value.password != userFormRef.value.re_password) {
-          callback(new Error(t('views.userManage.form.re_password.validatorMessage')))
+          callback(new Error(t('views.login.loginForm.re_password.validatorMessage')))
         } else {
           callback()
         }

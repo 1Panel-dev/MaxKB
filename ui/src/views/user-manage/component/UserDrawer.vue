@@ -16,38 +16,38 @@
     >
       <el-form-item
         :prop="isEdit ? '' : 'username'"
-        :label="$t('views.userManage.form.username.label')"
+        :label="$t('views.login.loginForm.username.label')"
       >
         <el-input
           v-model="userForm.username"
-          :placeholder="$t('views.userManage.form.username.placeholder')"
+          :placeholder="$t('views.login.loginForm.username.placeholder')"
           maxlength="20"
           show-word-limit
           :disabled="isEdit"
         >
         </el-input>
       </el-form-item>
-      <el-form-item :label="$t('views.userManage.form.nick_name.label')">
+      <el-form-item :label="$t('views.userManage.userForm.nick_name.label')">
         <el-input
           v-model="userForm.nick_name"
-          :placeholder="$t('views.userManage.form.nick_name.placeholder')"
+          :placeholder="$t('views.userManage.userForm.nick_name.placeholder')"
           maxlength="64"
           show-word-limit
         >
         </el-input>
       </el-form-item>
-      <el-form-item :label="$t('views.userManage.form.email.label')" prop="email">
+      <el-form-item :label="$t('views.userManage.userForm.email.label')" prop="email">
         <el-input
           type="email"
           v-model="userForm.email"
-          :placeholder="$t('views.userManage.form.email.placeholder')"
+          :placeholder="$t('views.userManage.userForm.email.placeholder')"
         >
         </el-input>
       </el-form-item>
-      <el-form-item :label="$t('views.userManage.form.phone.label')">
+      <el-form-item :label="$t('views.userManage.userForm.phone.label')">
         <el-input
           v-model="userForm.phone"
-          :placeholder="$t('views.userManage.form.phone.placeholder')"
+          :placeholder="$t('views.userManage.userForm.phone.placeholder')"
         >
         </el-input>
       </el-form-item>
@@ -88,13 +88,13 @@ const rules = reactive({
   username: [
     {
       required: true,
-      message: t('views.userManage.form.username.requiredMessage'),
+      message: t('views.login.loginForm.username.requiredMessage'),
       trigger: 'blur',
     },
     {
       min: 6,
       max: 20,
-      message: t('views.userManage.form.username.lengthMessage'),
+      message: t('views.login.loginForm.username.lengthMessage'),
       trigger: 'blur',
     },
   ],
@@ -108,13 +108,13 @@ const rules = reactive({
   password: [
     {
       required: true,
-      message: t('views.userManage.form.password.requiredMessage'),
+      message: t('views.login.loginForm.password.requiredMessage'),
       trigger: 'blur',
     },
     {
       min: 6,
       max: 20,
-      message: t('views.userManage.form.password.lengthMessage'),
+      message: t('views.login.loginForm.password.lengthMessage'),
       trigger: 'blur',
     },
   ],

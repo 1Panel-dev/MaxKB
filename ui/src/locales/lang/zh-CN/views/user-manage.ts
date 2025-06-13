@@ -15,21 +15,10 @@ export default {
     confirmMessage: '删除用户，该用户创建的资源（应用、知识库、模型）都会删除，请谨慎操作。',
   },
   disabled: {
-    confirmTitle: '是否禁用函数：',
-    confirmMessage: '禁用后，引用了该函数的应用提问时会报错 ，请谨慎操作。',
+    confirmTitle: '是否禁用工具：',
+    confirmMessage: '禁用后，引用了该工具的应用提问时会报错 ，请谨慎操作。',
   },
-
-  form: {
-    username: {
-      label: '用户名',
-      placeholder: '请输入用户名',
-      requiredMessage: '请输入用户名',
-      lengthMessage: '长度在 6 到 20 个字符',
-    },
-    captcha: {
-      label: '验证码',
-      placeholder: '请输入验证码',
-    },
+  userForm: {
     nick_name: {
       label: '姓名',
       placeholder: '请输入姓名',
@@ -44,25 +33,7 @@ export default {
       label: '手机号',
       placeholder: '请输入手机号',
     },
-    password: {
-      label: '登录密码',
-      placeholder: '请输入密码',
-      requiredMessage: '请输入密码',
-      lengthMessage: '长度在 6 到 20 个字符',
-    },
-    new_password: {
-      label: '新密码',
-      placeholder: '请输入新密码',
-      requiredMessage: '请输入新密码',
-    },
-    re_password: {
-      label: '确认密码',
-      placeholder: '请输入确认密码',
-      requiredMessage: '请输入确认密码',
-      validatorMessage: '密码不一致',
-    },
   },
-
   source: {
     label: '用户来源',
     local: '系统用户',

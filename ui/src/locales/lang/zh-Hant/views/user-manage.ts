@@ -16,47 +16,22 @@ export default {
       '刪除該使用者後，該使用者建立的所有資源（應用、知識庫、模型）都會被刪除，請謹慎操作。',
   },
   disabled: {
-    confirmTitle: '是否停用函數？',
-    confirmMessage: '停用後，引用該函數的應用在查詢時會報錯，請謹慎操作。',
+    confirmTitle: '是否停用工具？',
+    confirmMessage: '停用後，引用該工具的應用在查詢時會報錯，請謹慎操作。',
   },
   userForm: {
-    form: {
-      username: {
-        label: '使用者名稱',
-        placeholder: '請輸入使用者名稱',
-        requiredMessage: '請輸入使用者名稱',
-        lengthMessage: '長度須介於 6 到 20 個字元之間',
-      },
-      nick_name: {
-        label: '姓名',
-        placeholder: '請輸入姓名',
-      },
-      email: {
-        label: '電子信箱',
-        placeholder: '請輸入電子信箱',
-        requiredMessage: '請輸入電子信箱',
-      },
-      phone: {
-        label: '手機號碼',
-        placeholder: '請輸入手機號碼',
-      },
-      password: {
-        label: '登入密碼',
-        placeholder: '請輸入密碼',
-        requiredMessage: '請輸入密碼',
-        lengthMessage: '長度須介於 6 到 20 個字元之間',
-      },
-      new_password: {
-        label: '新密碼',
-        placeholder: '請輸入新密碼',
-        requiredMessage: '請輸入新密碼',
-      },
-      re_password: {
-        label: '確認密碼',
-        placeholder: '請輸入確認密碼',
-        requiredMessage: '請輸入確認密碼',
-        validatorMessage: '密碼不一致',
-      },
+    nick_name: {
+      label: '姓名',
+      placeholder: '請輸入姓名',
+    },
+    email: {
+      label: '電子信箱',
+      placeholder: '請輸入電子信箱',
+      requiredMessage: '請輸入電子信箱',
+    },
+    phone: {
+      label: '手機號碼',
+      placeholder: '請輸入手機號碼',
     },
   },
   source: {

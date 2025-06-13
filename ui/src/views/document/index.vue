@@ -525,7 +525,7 @@
     <ImportDocumentDialog ref="ImportDocumentDialogRef" :title="title" @refresh="refresh" />
     <SyncWebDialog ref="SyncWebDialogRef" @refresh="refresh" />
     <!-- 选择知识库 -->
-    <selectKnowledgeDialog ref="selectKnowledgeDialogRef" @refresh="refreshMigrate" />
+    <SelectKnowledgeDialog ref="selectKnowledgeDialogRef" @refresh="refreshMigrate" />
     <GenerateRelatedDialog ref="GenerateRelatedDialogRef" @refresh="getList" />
   </div>
 </template>
@@ -536,7 +536,7 @@ import { ElTable } from 'element-plus'
 import documentApi from '@/api/knowledge/document'
 import ImportDocumentDialog from './component/ImportDocumentDialog.vue'
 import SyncWebDialog from '@/views/knowledge/component/SyncWebDialog.vue'
-import selectKnowledgeDialog from './component/selectKnowledgeDialog.vue'
+import SelectKnowledgeDialog from './component/SelectKnowledgeDialog.vue'
 import { numberFormat } from '@/utils/common'
 import { datetimeFormat } from '@/utils/time'
 import { hitHandlingMethod } from '@/enums/document'

@@ -33,8 +33,8 @@
         @changePage="getList"
         v-loading="loading"
       >
-        <el-table-column prop="nick_name" :label="$t('views.userManage.form.nick_name.label')" />
-        <el-table-column prop="username" :label="$t('views.userManage.form.username.label')" />
+        <el-table-column prop="nick_name" :label="$t('views.userManage.userForm.nick_name.label')" />
+        <el-table-column prop="username" :label="$t('views.userManage.userForm.username.label')" />
         <el-table-column prop="is_active" :label="$t('common.status.label')">
           <template #default="{ row }">
             <div v-if="row.is_active" class="flex align-center">
@@ -56,14 +56,14 @@
 
         <el-table-column
           prop="email"
-          :label="$t('views.userManage.form.email.label')"
+          :label="$t('views.userManage.userForm.email.label')"
           show-overflow-tooltip
         >
           <template #default="{ row }">
             {{ row.email || '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="phone" :label="$t('views.userManage.form.phone.label')">
+        <el-table-column prop="phone" :label="$t('views.userManage.userForm.phone.label')">
           <template #default="{ row }">
             {{ row.phone || '-' }}
           </template>

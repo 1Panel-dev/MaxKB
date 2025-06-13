@@ -19,6 +19,17 @@ export default {
       requiredMessage: 'Please enter verification code',
       validatorMessage: 'Verification code is incorrect',
     },
+    new_password: {
+      label: 'New Password',
+      placeholder: 'Please enter new password',
+      requiredMessage: 'Please enter new password',
+    },
+    re_password: {
+      label: 'Confirm Password',
+      placeholder: 'Please enter confirm password',
+      requiredMessage: 'Please enter confirm password',
+      validatorMessage: 'Password does not match',
+    },
   },
   jump_tip: 'You will be redirected to the authentication source page for authentication',
   jump: 'Redirect',

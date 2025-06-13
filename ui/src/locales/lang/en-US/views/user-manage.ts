@@ -17,37 +17,23 @@ export default {
       'Deleting this user will also delete all resources (APP, knowledge, models) created by this user. Please proceed with caution.',
   },
   disabled: {
-    confirmTitle: 'Confirm disable function:',
+    confirmTitle: 'Confirm disable tool:',
     confirmMessage:
-      'Disabling this function will cause errors when APP that reference it are queried. Please proceed with caution.',
+      'Disabling this tool will cause errors when APP that reference it are queried. Please proceed with caution.',
   },
   userForm: {
-    form: {
-      nick_name: {
-        label: 'Name',
-        placeholder: 'Please enter name',
-      },
-      email: {
-        label: 'Email',
-        placeholder: 'Please enter email',
-        requiredMessage: 'Please enter email',
-      },
-      phone: {
-        label: 'Phone',
-        placeholder: 'Please enter phone',
-      },
-
-      new_password: {
-        label: 'New Password',
-        placeholder: 'Please enter new password',
-        requiredMessage: 'Please enter new password',
-      },
-      re_password: {
-        label: 'Confirm Password',
-        placeholder: 'Please enter confirm password',
-        requiredMessage: 'Please enter confirm password',
-        validatorMessage: 'Passwords do not match',
-      },
+    nick_name: {
+      label: 'Name',
+      placeholder: 'Please enter name',
+    },
+    email: {
+      label: 'Email',
+      placeholder: 'Please enter email',
+      requiredMessage: 'Please enter email',
+    },
+    phone: {
+      label: 'Phone',
+      placeholder: 'Please enter phone',
     },
   },
   source: {

@@ -20,7 +20,7 @@
               <el-input
                 size="large"
                 class="input-item"
-                :placeholder="$t('views.userManage.form.username.placeholder')"
+                :placeholder="$t('views.login.loginForm.username.placeholder')"
               >
               </el-input>
             </el-form-item>
@@ -31,7 +31,7 @@
                 type="password"
                 size="large"
                 class="input-item"
-                :placeholder="$t('views.userManage.form.password.placeholder')"
+                :placeholder="$t('views.login.loginForm.password.placeholder')"
                 show-password
               >
               </el-input>
