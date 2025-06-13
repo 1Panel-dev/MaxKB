@@ -7,6 +7,7 @@ import system from './system'
 import userManage from './user-manage'
 import resourceAuthorization from './resource-authorization'
 import role from './role'
+import workspace from './workspace'
 import application from './application'
 import problem from './problem'
 import applicationOverview from './application-overview'
@@ -26,6 +27,7 @@ export default {
   userManage,
   resourceAuthorization,
   role,
+  workspace,
   application,
   problem,
   applicationOverview,

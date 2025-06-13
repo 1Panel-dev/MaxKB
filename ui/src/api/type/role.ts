@@ -51,14 +51,7 @@ interface RoleMemberItem {
 
 interface CreateMemberParamsItem {
   user_ids: string[],
-  workspace_ids: string[]
-}
-
-interface PageList<T> {
-  current: number,
-  size: number,
-  total: number,
-  records: T
+  workspace_ids?: string[]
 }
 
 type Arrayable<T> = T | T[]
@@ -72,4 +65,4 @@ interface FormItemModel {
   }
 }
 
-export type { RoleItem, FormItemModel, RolePermissionItem, RoleTableDataItem, CreateOrUpdateParams, PageList, ChildrenPermissionItem, RoleMemberItem, CreateMemberParamsItem }
+export type { RoleItem, FormItemModel, RolePermissionItem, RoleTableDataItem, CreateOrUpdateParams, ChildrenPermissionItem, RoleMemberItem, CreateMemberParamsItem }

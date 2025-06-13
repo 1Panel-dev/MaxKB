@@ -1,9 +1,9 @@
 import { get, post, del } from '@/request/index'
 import type { Ref } from 'vue'
 import { Result } from '@/request/Result'
-import type { RoleItem, RolePermissionItem, CreateOrUpdateParams, PageList, RoleMemberItem, CreateMemberParamsItem } from '@/api/type/role'
+import type { RoleItem, RolePermissionItem, CreateOrUpdateParams, RoleMemberItem, CreateMemberParamsItem } from '@/api/type/role'
 import { RoleTypeEnum } from '@/enums/system'
-import type { pageRequest } from '@/api/type/common'
+import type { pageRequest, PageList } from '@/api/type/common'
 
 const prefix = '/system/role'
 /**

@@ -30,7 +30,7 @@
       </el-table-column>
     </app-table>
   </div>
-  <AddMemberDrawer ref="addMemberDrawerRef" :role-id="props.currentRole?.id as string" @refresh="getList" />
+  <AddMemberDrawer ref="addMemberDrawerRef" :currentRole="props.currentRole" @refresh="getList" />
 </template>
 
 <script setup lang="ts">

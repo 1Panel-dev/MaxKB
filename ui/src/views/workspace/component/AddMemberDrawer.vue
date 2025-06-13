@@ -20,18 +20,16 @@
 
 <script setup lang="ts">
 import { onBeforeMount, ref } from 'vue'
-import type { CreateMemberParamsItem, FormItemModel } from '@/api/type/role'
-import RoleApi from '@/api/system/role'
 import UserApi from '@/api/user/user'
 import WorkspaceApi from '@/api/workspace'
-import MemberFormContent from './MemberFormContent.vue'
+import MemberFormContent from '@/views/role/component/MemberFormContent.vue'
 import { t } from '@/locales'
-import type { RoleItem } from '@/api/type/role'
 import { MsgSuccess } from '@/utils/message'
-import { RoleTypeEnum } from '@/enums/system'
+import type { CreateWorkspaceMemberParamsItem, WorkspaceItem } from '@/api/type/workspace'
+import type {  FormItemModel } from '@/api/type/role'
 
 const props = defineProps<{
-  currentRole?: RoleItem
+  currentWorkspace?: WorkspaceItem
 }>()
 
 const emit = defineEmits<{
@@ -40,12 +38,12 @@ const emit = defineEmits<{
 
 const loading = ref(false)
 const visible = ref(false)
-const list = ref<CreateMemberParamsItem[]>([]);
+const list = ref<CreateWorkspaceMemberParamsItem[]>([]);
 
 const memberFormContentLoading = ref(false);
 const formItemModel = ref<FormItemModel[]>([]);
 const userFormItem = ref<FormItemModel[]>([]);
-const workspaceFormItem = ref<FormItemModel[]>([]);
+const roleFormItem = ref<FormItemModel[]>([]);
 
 async function getUserFormItem() {
   try {
@@ -72,16 +70,16 @@ async function getUserFormItem() {
   }
 }
 
-async function getWorkspaceFormItem() {
+async function getRoleFormItem() {
   try {
-    const res = await WorkspaceApi.getWorkspaceList(memberFormContentLoading);
-    workspaceFormItem.value = [{
-      path: 'workspace_ids',
-      label: t('views.role.member.workspace'),
+    const res = await WorkspaceApi.getWorkspaceRoleList(memberFormContentLoading);
+    roleFormItem.value = [{
+      path: 'role_ids',
+      label: t('views.role.member.role'),
       rules: [
         {
           required: true,
-          message: `${t('common.selectPlaceholder')}${t('views.role.member.workspace')}`,
+          message: `${t('common.selectPlaceholder')}${t('views.role.member.role')}`,
         },
       ],
       selectProps: {
@@ -89,7 +87,7 @@ async function getWorkspaceFormItem() {
           label: item.name,
           value: item.id
         })) || [],
-        placeholder: `${t('common.selectPlaceholder')}${t('views.role.member.workspace')}`
+        placeholder: `${t('common.selectPlaceholder')}${t('views.role.member.role')}`
       }
     }]
   } catch (e) {
@@ -98,18 +96,13 @@ async function getWorkspaceFormItem() {
 }
 
 function init() {
-  if (props.currentRole?.type !== RoleTypeEnum.ADMIN) {
-    formItemModel.value = [...userFormItem.value, ...workspaceFormItem.value]
-    list.value = [{ user_ids: [], workspace_ids: [] }]
-  } else {
-    formItemModel.value = [...userFormItem.value]
-    list.value = [{ user_ids: [] }]
-  }
+  formItemModel.value = [...userFormItem.value, ...roleFormItem.value]
+  list.value = [{ user_ids: [], role_ids: [] }]
 }
 
 onBeforeMount(async () => {
   await getUserFormItem();
-  await getWorkspaceFormItem();
+  await getRoleFormItem();
   init()
 })
 
@@ -126,11 +119,7 @@ const memberFormContentRef = ref<InstanceType<typeof MemberFormContent>>()
 function handleAdd() {
   memberFormContentRef.value?.validate().then(async (valid) => {
     if (valid) {
-      let params;
-      if (props.currentRole?.type === RoleTypeEnum.ADMIN) {
-        params = list.value.map(item => ({ user_ids: item.user_ids, workspace_ids: ['None'] }))
-      }
-      await RoleApi.CreateMember(props.currentRole?.id as string, { members: params ?? list.value }, loading)
+      await WorkspaceApi.CreateWorkspaceMember(props.currentWorkspace?.id as string, list.value, loading)
       MsgSuccess(t('common.addSuccess'))
       handleCancel();
       emit('refresh')

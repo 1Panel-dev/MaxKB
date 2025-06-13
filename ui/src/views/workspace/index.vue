@@ -1,0 +1,205 @@
+<template>
+  <div class="workspace">
+    <h2 class="mb-16">{{ $t('views.workspace.title') }}</h2>
+    <el-card style="--el-card-padding: 0" body-class="workspace-card">
+      <div class="flex h-full">
+        <div class="workspace-left border-r p-16">
+          <div class="workspace-left_title">
+            <h4 class="medium">{{ $t('views.workspace.list') }}</h4>
+            <el-tooltip effect="dark" :content="`${$t('common.create')}${$t('views.workspace.title')}`" placement="top">
+              <el-button type="primary" text @click="createOrUpdateWorkspace()">
+                <AppIcon iconName="app-copy"></AppIcon>
+              </el-button>
+            </el-tooltip>
+          </div>
+          <div class="p-8">
+            <el-input v-model="filterText" :placeholder="$t('common.search')" prefix-icon="Search" clearable />
+          </div>
+          <div class="list-height-left">
+            <el-scrollbar v-loading="loading">
+              <common-list :data="filterList" @click="clickWorkspace" :default-active="currentWorkspace?.id">
+                <template #default="{ row }">
+                  <div class="flex-between">
+                    <span>{{ row.name }}</span>
+                    <el-dropdown :teleported="false">
+                      <el-button text>
+                        <el-icon class="color-secondary">
+                          <MoreFilled />
+                        </el-icon>
+                      </el-button>
+                      <template #dropdown>
+                        <el-dropdown-menu style="min-width: 80px">
+                          <el-dropdown-item @click.stop="createOrUpdateWorkspace(row)" class="p-8">
+                            <AppIcon iconName="app-copy"></AppIcon>
+                            {{
+                              $t('common.rename') }}
+                          </el-dropdown-item>
+                          <el-dropdown-item @click.stop="deleteWorkspace(row)" class="border-t p-8">
+                            <AppIcon iconName="app-copy"></AppIcon>
+                            {{
+                              $t('common.delete')
+                            }}
+                          </el-dropdown-item>
+                        </el-dropdown-menu>
+                      </template>
+                    </el-dropdown>
+                  </div>
+                </template>
+                <template #empty>
+                  <span></span>
+                </template>
+              </common-list>
+            </el-scrollbar>
+          </div>
+        </div>
+
+        <!-- 右边 -->
+        <div class="workspace-right" v-loading="loading">
+          <div class="flex align-center" style="margin-bottom: 20px;">
+            <h4 class="medium">{{ currentWorkspace?.name }}</h4>
+            <el-divider direction="vertical" class="mr-8 ml-8" />
+            <AppIcon iconName="app-wordspace" style="font-size: 16px" class="color-input-placeholder"></AppIcon>
+            <span class="color-input-placeholder ml-4">
+              数字
+            </span>
+          </div>
+          <Member :currentWorkspace="currentWorkspace" />
+        </div>
+      </div>
+    </el-card>
+
+    <CreateOrUpdateWorkspaceDialog ref="createOrUpdateWorkspaceDialogRef" @refresh="refresh" />
+  </div>
+</template>
+
+<script lang="ts" setup>
+import { onMounted, ref, watch } from 'vue'
+import WorkspaceApi from '@/api/workspace'
+import { t } from '@/locales'
+import Member from './component/Member.vue'
+import CreateOrUpdateWorkspaceDialog from './component/CreateOrUpdateWorkspaceDialog.vue'
+import type { WorkspaceItem } from '@/api/type/workspace'
+import { MsgSuccess, MsgConfirm } from '@/utils/message'
+
+const filterText = ref('')
+const loading = ref(false)
+const list = ref<WorkspaceItem[]>([])
+const filterList = ref<WorkspaceItem[]>([]) // 搜索过滤后列表
+const currentWorkspace = ref<WorkspaceItem>()
+
+async function getWorkspace() {
+  try {
+    const res = await WorkspaceApi.getSystemWorkspaceList(loading)
+    list.value = res.data
+    filterList.value = filter(list.value, filterText.value)
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+onMounted(async () => {
+  await getWorkspace()
+  currentWorkspace.value = list.value[0]
+})
+
+async function refresh(workspace?: WorkspaceItem) {
+  await getWorkspace();
+  // 创建角色后选中新建的角色
+  currentWorkspace.value = workspace ? workspace : currentWorkspace.value
+}
+
+function filter(list: WorkspaceItem[], filterText: string) {
+  if (!filterText.length) {
+    return list
+  }
+  return list.filter((v: WorkspaceItem) =>
+    v.name.toLowerCase().includes(filterText.toLowerCase()),
+  )
+}
+
+watch(filterText, (val: string) => {
+  filterList.value = filter(list.value, val)
+})
+
+function clickWorkspace(item: WorkspaceItem) {
+  currentWorkspace.value = item
+}
+
+const createOrUpdateWorkspaceDialogRef = ref<InstanceType<typeof CreateOrUpdateWorkspaceDialog>>()
+function createOrUpdateWorkspace(item?: WorkspaceItem) {
+  createOrUpdateWorkspaceDialogRef.value?.open(item);
+}
+
+// TODO 该工作空间下存在 知识库资源、应用资源，无法删除
+function deleteWorkspace(item: WorkspaceItem) {
+  MsgConfirm(
+    `${t('views.workspace.delete.confirmTitle')}${item.name} ?`,
+    t('views.workspace.delete.confirmMessage'),
+    {
+      confirmButtonText: t('common.confirm'),
+      confirmButtonClass: 'danger',
+    },
+  )
+    .then(() => {
+      WorkspaceApi.deleteWorkspace(item.id as string, loading).then(async () => {
+        MsgSuccess(t('common.deleteSuccess'))
+        await getWorkspace()
+        currentWorkspace.value = item.id === currentWorkspace.value?.id ? list.value[0] : currentWorkspace.value
+      })
+    })
+    .catch(() => { })
+}
+</script>
+
+<style lang="scss" scoped>
+.workspace {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+  padding: 16px 24px;
+
+  :deep(.workspace-card) {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .workspace-left {
+    box-sizing: border-box;
+    width: var(--setting-left-width);
+    min-width: var(--setting-left-width);
+
+    .workspace-left_title {
+      padding: 8px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .list-height-left {
+      height: calc(100vh - 255px);
+
+      :deep(.common-list li) {
+        padding-right: 4px;
+        padding-left: 8px;
+      }
+    }
+
+    .workspace-left_divider {
+      padding: 0 8px;
+
+      :deep(.el-divider) {
+        margin: 4px 0;
+      }
+    }
+  }
+
+  .workspace-right {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+  }
+}
+</style>

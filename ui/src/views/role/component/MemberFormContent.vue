@@ -6,7 +6,7 @@
           :rules="model.rules" :label="index === 0 && model.label ? model.label : ''" class="mr-8" style="flex: 1">
           <el-select v-model="element[model.path]"
             :placeholder="model.selectProps.placeholder ?? $t('common.selectPlaceholder')" clearable filterable multiple
-            style="width: 100%">
+            style="width: 100%" collapse-tags collapse-tags-tooltip>
             <el-option v-for="opt in model.selectProps.options" :key="opt.value" :label="opt.label"
               :value="opt.value" />
           </el-select>
@@ -53,7 +53,6 @@ watch(() => props.models, () => {
   props.models.forEach((e) => {
     formItem[e.path] = [];
   });
-  handleAdd();
 }, { immediate: true })
 
 function handleDelete(index: number) {
@@ -68,5 +67,4 @@ const validate = () => {
 }
 
 defineExpose({ validate })
-
 </script>

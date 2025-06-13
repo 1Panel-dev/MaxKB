@@ -11,4 +11,11 @@ interface pageRequest {
   page_size: number
 }
 
-export type { KeyValue, Dict, pageRequest }
+interface PageList<T> {
+  current: number,
+  size: number,
+  total: number,
+  records: T
+}
+
+export type { KeyValue, Dict, pageRequest, PageList }

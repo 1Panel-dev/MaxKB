@@ -25,9 +25,11 @@
                       <template #dropdown>
                         <el-dropdown-menu style="min-width: 80px">
                           <el-dropdown-item @click.stop="createOrUpdateRole(row)" class="p-8">
+                            <AppIcon iconName="app-copy"></AppIcon>
                             {{ $t('common.rename') }}
                           </el-dropdown-item>
                           <el-dropdown-item @click.stop="deleteRole(row)" class="border-t p-8">
+                            <AppIcon iconName="app-copy"></AppIcon>
                             {{ $t('common.delete') }}
                           </el-dropdown-item>
                         </el-dropdown-menu>
@@ -66,10 +68,13 @@
                       </el-button>
                       <template #dropdown>
                         <el-dropdown-menu style="min-width: 80px">
-                          <el-dropdown-item @click.stop="createOrUpdateRole(row)" class="p-8"> {{ $t('common.rename') }}
+                          <el-dropdown-item @click.stop="createOrUpdateRole(row)" class="p-8">
+                            <AppIcon iconName="app-copy"></AppIcon>
+                            {{ $t('common.rename') }}
                           </el-dropdown-item>
-                          <el-dropdown-item @click.stop="deleteRole(row)" class="border-t p-8"> {{ $t('common.delete')
-                          }}
+                          <el-dropdown-item @click.stop="deleteRole(row)" class="border-t p-8">
+                            <AppIcon iconName="app-copy"></AppIcon>
+                            {{ $t('common.delete') }}
                           </el-dropdown-item>
                         </el-dropdown-menu>
                       </template>

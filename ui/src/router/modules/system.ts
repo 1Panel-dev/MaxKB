@@ -46,6 +46,19 @@ const systemRouter = {
       component: () => import('@/views/role/index.vue'),
     },
     {
+      path: '/system/workspace',
+      name: 'workspace',
+      meta: {
+        icon: 'app-resource-authorization', // TODO
+        iconActive: 'app-resource-authorization-active', // TODO
+        title: 'views.workspace.title',
+        activeMenu: '/system',
+        parentPath: '/system',
+        parentName: 'system',
+      },
+      component: () => import('@/views/workspace/index.vue'),
+    },
+    {
       path: '/system/shared',
       name: 'shared',
       meta: {
