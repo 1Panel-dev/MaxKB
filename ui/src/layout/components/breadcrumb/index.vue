@@ -169,7 +169,7 @@ function changeMenu(id: string) {
 function getDataset() {
   loading.value = true
   knowledge
-    .asyncGetAllKnowledge()
+    .asyncGetRootKnowledge()
     .then((res: any) => {
       list.value = res.data
       common.saveBreadcrumb(list.value)

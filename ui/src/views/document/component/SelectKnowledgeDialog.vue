@@ -92,7 +92,7 @@ const submitHandle = () => {
 }
 
 function getDataset() {
-  knowledge.asyncGetAllKnowledge(loading).then((res: any) => {
+  knowledge.asyncGetRootKnowledge(loading).then((res: any) => {
     datasetList.value = res.data?.filter((v: any) => v.id !== id)
   })
 }

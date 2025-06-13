@@ -368,7 +368,7 @@ function getList() {
     [search_type.value]: search_form.value[search_type.value],
   }
 
-  KnowledgeApi.getKnowledgeList(paginationConfig, params, loading).then((res) => {
+  KnowledgeApi.getKnowledgeListPage(paginationConfig, params, loading).then((res) => {
     paginationConfig.total = res.data.total
     knowledgeList.value = [...knowledgeList.value, ...res.data.records]
   })

@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia'
 import applicationApi from '@/api/application/application'
-import knowledgeAPI from '@/api/knowledge/knowledge.ts'
 import applicationXpackApi from '@/api/application/application-xpack'
 import { type Ref } from 'vue'
 import { getBrowserLang } from '@/locales/index'
@@ -27,19 +26,6 @@ const useApplicationStore = defineStore('application', {
       return new Promise((resolve, reject) => {
         applicationApi
           .getApplicationDetail(id, loading)
-          .then((data) => {
-            resolve(data)
-          })
-          .catch((error) => {
-            reject(error)
-          })
-      })
-    },
-
-    async asyncGetApplicationKnowledge(id: string, loading?: Ref<boolean>) {
-      return new Promise((resolve, reject) => {
-        knowledgeAPI
-          .getAllKnowledge(loading)
           .then((data) => {
             resolve(data)
           })

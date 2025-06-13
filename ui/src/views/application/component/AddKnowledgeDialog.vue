@@ -35,23 +35,39 @@
         </div>
       </div>
     </template>
-    <el-scrollbar>
-      <div class="max-height">
-        <el-row :gutter="12" v-loading="loading">
-          <el-col :span="12" v-for="(item, index) in filterData" :key="index" class="mb-16">
-            <CardCheckbox value-field="id" :data="item" v-model="checkList" @change="changeHandle">
-              <span class="ellipsis cursor" :title="item.name"> {{ item.name }}</span>
-            </CardCheckbox>
-          </el-col>
-        </el-row>
-      </div>
-    </el-scrollbar>
+    <LayoutContainer class="application-manage">
+      <template #left>
+        <folder-tree
+          :data="folderList"
+          :currentNodeKey="currentFolder?.id"
+          @handleNodeClick="folderClickHandel"
+          class="p-8"
+          v-loading="folderLoading"
+        />
+      </template>
+      <el-scrollbar>
+        <div class="max-height layout-bg p-16-24">
+          <el-row :gutter="12" v-loading="loading">
+            <el-col :span="12" v-for="(item, index) in filterData" :key="index" class="mb-16">
+              <CardCheckbox
+                value-field="id"
+                :data="item"
+                v-model="checkList"
+                @change="changeHandle"
+              >
+                <span class="ellipsis cursor ml-12" :title="item.name"> {{ item.name }}</span>
+              </CardCheckbox>
+            </el-col>
+          </el-row>
+        </div>
+      </el-scrollbar>
+    </LayoutContainer>
+
     <template #footer>
       <div class="flex-between">
         <div class="flex">
           <el-text type="info" class="color-secondary mr-8" v-if="checkList.length > 0">
             {{ $t('views.application.dialog.selected') }} {{ checkList.length }}
-            {{ $t('views.application.dialog.countDataset') }}
           </el-text>
           <el-button link type="primary" v-if="checkList.length > 0" @click="clearCheck">
             {{ $t('common.clear') }}
@@ -62,7 +78,7 @@
             {{ $t('common.cancel') }}
           </el-button>
           <el-button type="primary" @click="submitHandle">
-            {{ $t('common.confirm') }}
+            {{ $t('common.add') }}
           </el-button>
         </span>
       </div>
@@ -71,6 +87,8 @@
 </template>
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import KnowledgeApi from '@/api/knowledge/knowledge'
+import useStore from '@/stores'
 const props = defineProps({
   data: {
     type: Array<any>,
@@ -80,12 +98,14 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['addData', 'refresh'])
+const { folder } = useStore()
 
 const dialogVisible = ref<boolean>(false)
 const checkList = ref([])
 const currentEmbedding = ref('')
 const searchValue = ref('')
 const searchDate = ref<any[]>([])
+const loading = ref(false)
 
 const filterData = computed(() => {
   return currentEmbedding.value
@@ -124,8 +144,8 @@ function clearCheck() {
 }
 
 const open = (checked: any) => {
-  searchDate.value = props.data
   checkList.value = checked
+  getFolder()
   if (checkList.value.length > 0) {
     currentEmbedding.value = props.data.filter(
       (v) => v.id === checkList.value[0],
@@ -134,6 +154,7 @@ const open = (checked: any) => {
 
   dialogVisible.value = true
 }
+
 const submitHandle = () => {
   emit('addData', checkList.value)
   dialogVisible.value = false
@@ -141,6 +162,36 @@ const submitHandle = () => {
 
 const refresh = () => {
   emit('refresh')
+}
+
+const folderList = ref<any[]>([])
+const knowledgeList = ref<any[]>([])
+const currentFolder = ref<any>({})
+const folderLoading = ref(false)
+// 文件
+function folderClickHandel(row: any) {
+  currentFolder.value = row
+  knowledgeList.value = []
+  if (currentFolder.value.id === 'share') return
+  getList()
+}
+
+function getFolder() {
+  const params = {}
+  folder.asyncGetFolder('KNOWLEDGE', params, folderLoading).then((res: any) => {
+    folderList.value = res.data
+    currentFolder.value = res.data?.[0] || {}
+    getList()
+  })
+}
+
+function getList() {
+  const params = {
+    folder_id: currentFolder.value?.id || localStorage.getItem('workspace_id'),
+  }
+  KnowledgeApi.getKnowledgeList(params, loading).then((res) => {
+    searchDate.value = res.data
+  })
 }
 
 defineExpose({ open })
@@ -152,11 +203,9 @@ defineExpose({ open })
     padding: 12px 20px 4px 24px;
     border-bottom: 1px solid var(--el-border-color-light);
   }
-  .el-dialog__body {
-    padding: 8px !important;
-  }
   .el-dialog__footer {
-    padding: 0 24px 16px 24px;
+    padding: 12px 24px 12px 24px;
+    border-top: 1px solid var(--el-border-color-light);
   }
 
   .el-dialog__headerbtn {
@@ -165,7 +214,7 @@ defineExpose({ open })
   }
   .max-height {
     max-height: calc(100vh - 260px);
-    padding: 0 16px;
+    min-height: 300px;
   }
 }
 </style>

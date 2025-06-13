@@ -184,15 +184,15 @@ function openDatasetDialog() {
 }
 
 function getDataset() {
-  if (id) {
-    application.asyncGetApplicationKnowledge(id, datasetLoading).then((res: any) => {
-      datasetList.value = res.data
-    })
-  } else {
-    knowledge.asyncGetAllKnowledge(datasetLoading).then((res: any) => {
-      datasetList.value = res.data?.filter((v: any) => v.user_id === user.userInfo?.id)
-    })
-  }
+  // if (id) {
+  //   application.asyncGetApplicationKnowledge(id, datasetLoading).then((res: any) => {
+  //     datasetList.value = res.data
+  //   })
+  // } else {
+  knowledge.asyncGetRootKnowledge(datasetLoading).then((res: any) => {
+    datasetList.value = res.data?.filter((v: any) => v.user_id === user.userInfo?.id)
+  })
+  // }
 }
 function refresh() {
   getDataset()

@@ -131,7 +131,6 @@ export default {
     addKnowledge: 'Add Related Knowledge',
     addKnowledgePlaceholder: 'The selected knowledge must use the same embedding model',
     selected: 'Selected',
-    countDataset: 'Knowledge',
 
     selectSearchMode: 'Retrieval Mode',
     vectorSearch: 'Vector Search',

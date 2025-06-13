@@ -185,6 +185,7 @@
                             <div class="flex align-center" style="width: 80%">
                               <KnowledgeIcon
                                 :type="relatedObject(knowledgeList, item, 'id')?.type"
+                                class="mr-12"
                               />
 
                               <span
@@ -439,7 +440,7 @@ import { t } from '@/locales'
 import TTSModeParamSettingDialog from './component/TTSModeParamSettingDialog.vue'
 import ReasoningParamSettingDialog from './component/ReasoningParamSettingDialog.vue'
 
-const { model, application } = useStore()
+const { knowledge, model, application } = useStore()
 
 const route = useRoute()
 const {
@@ -628,7 +629,7 @@ function getDetail() {
 }
 
 function getKnowledge() {
-  application.asyncGetApplicationKnowledge(id, knowledgeLoading).then((res: any) => {
+  knowledge.asyncGetRootKnowledge(knowledgeLoading).then((res: any) => {
     knowledgeList.value = res.data
   })
 }
@@ -706,8 +707,7 @@ function refresh() {
 
 onMounted(() => {
   getModel()
-  // todo
-  // getKnowledge()
+  getKnowledge()
   getDetail()
   getSTTModel()
   getTTSModel()

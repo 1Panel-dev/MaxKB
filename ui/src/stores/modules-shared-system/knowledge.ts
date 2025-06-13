@@ -1,8 +1,8 @@
-import {defineStore} from 'pinia'
-import type {knowledgeData} from '@/api/type/knowledge'
-import type {UploadUserFile} from 'element-plus'
+import { defineStore } from 'pinia'
+import type { knowledgeData } from '@/api/type/knowledge'
+import type { UploadUserFile } from 'element-plus'
 import knowledgeApi from '@/api/shared/knowledge'
-import {type Ref} from 'vue'
+import { type Ref } from 'vue'
 
 export interface knowledgeStateTypes {
   baseInfo: knowledgeData | null
@@ -31,10 +31,13 @@ const useKnowledgeStore = defineStore('knowledg', {
     saveDocumentsFile(file: UploadUserFile[]) {
       this.documentsFiles = file
     },
-    async asyncGetAllKnowledge(loading?: Ref<boolean>) {
+    async asyncGetRootKnowledge(loading?: Ref<boolean>) {
       return new Promise((resolve, reject) => {
+        const params = {
+          folder_id: localStorage.getItem('workspace_id'),
+        }
         knowledgeApi
-          .getAllKnowledge(loading)
+          .getKnowledgeList(params, loading)
           .then((data) => {
             resolve(data)
           })
@@ -43,10 +46,7 @@ const useKnowledgeStore = defineStore('knowledg', {
           })
       })
     },
-    async asyncGetKnowledgeDetail(
-      knowledge_id: string,
-      loading?: Ref<boolean>,
-    ) {
+    async asyncGetKnowledgeDetail(knowledge_id: string, loading?: Ref<boolean>) {
       return new Promise((resolve, reject) => {
         knowledgeApi
           .getKnowledgeDetail(knowledge_id, loading)
@@ -58,11 +58,7 @@ const useKnowledgeStore = defineStore('knowledg', {
           })
       })
     },
-    async asyncSyncKnowledge(
-      id: string,
-      sync_type: string,
-      loading?: Ref<boolean>,
-    ) {
+    async asyncSyncKnowledge(id: string, sync_type: string, loading?: Ref<boolean>) {
       return new Promise((resolve, reject) => {
         knowledgeApi
           .putSyncWebKnowledge(id, sync_type, loading)

@@ -121,7 +121,7 @@ function getDocument(id: string) {
 }
 
 function getDataset() {
-  knowledge.asyncGetAllKnowledge(loading).then((res: any) => {
+  knowledge.asyncGetRootKnowledge(loading).then((res: any) => {
     datasetList.value = res.data
   })
 }

@@ -22,6 +22,23 @@ const getKnowledgeByFolder: (data?: any, loading?: Ref<boolean>) => Promise<Resu
 }
 
 /**
+ * 知识库列表（无分页）
+ * @param 参数
+ * param  {
+    folder_id: "string",
+    name: "string",
+    tool_type: "string",
+    desc: string,
+  }
+ */
+const getKnowledgeList: (param?: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  param,
+  loading,
+) => {
+  return get(`${prefix}/knowledge`, param, loading)
+}
+
+/**
  * 知识库分页列表
  * @param 参数
  * param  {
@@ -31,7 +48,7 @@ const getKnowledgeByFolder: (data?: any, loading?: Ref<boolean>) => Promise<Resu
  desc: string,
  }
  */
-const getKnowledgeList: (
+const getKnowledgeListPage: (
   page: pageRequest,
   param?: any,
   loading?: Ref<boolean>,
@@ -235,14 +252,6 @@ const postWebKnowledge: (data: any, loading?: Ref<boolean>) => Promise<Result<an
 }
 
 /**
- * 获取全部知识库
- * @param 参数
- */
-const getAllKnowledge: (loading?: Ref<boolean>) => Promise<Result<any[]>> = (loading) => {
-  return get(`${prefix}`, undefined, loading)
-}
-
-/**
  * 获取飞书文档列表
  * @param knowledge_id
  * @param folder_token
@@ -269,6 +278,7 @@ const importLarkDocument: (
 export default {
   getKnowledgeByFolder,
   getKnowledgeList,
+  getKnowledgeListPage,
   getKnowledgeDetail,
   putKnowledge,
   delKnowledge,
@@ -284,5 +294,4 @@ export default {
 
   getLarkDocumentList,
   importLarkDocument,
-  getAllKnowledge,
 }
