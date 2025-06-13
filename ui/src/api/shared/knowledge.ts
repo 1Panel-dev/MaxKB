@@ -366,7 +366,8 @@ export default {
   getSharedAuthorizationModelPost,
 
   getLarkDocumentList,
-  importLarkDocument
+  importLarkDocument,
+  postLarkKnowledge
 } as {
   [key: string]: any
 }
