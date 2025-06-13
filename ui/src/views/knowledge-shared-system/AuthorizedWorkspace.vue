@@ -92,13 +92,13 @@ let knowledge_id = ''
 let currentType = 'Knowledge'
 const loading = ref(false)
 const centerDialogVisible = ref(false)
-let auth_list = []
+let auth_list: any[] = []
 let un_auth_list = []
 const closeIcon = iconMap['close-outlined'].iconReader()
 const momentsCategories = iconMap['moments-categories'].iconReader()
 
 const workspaceWithKeywords = computed(() => {
-  return workspace.value.filter((ele) => ele.includes(search.value))
+  return workspace.value.filter((ele) => (ele as string).includes(search.value))
 })
 const handleCheckAllChange = (val: CheckboxValueType) => {
   checkedWorkspace.value = val ? workspace.value : []
@@ -122,7 +122,7 @@ const handleCheckedWorkspaceChange = (value: CheckboxValueType[]) => {
   ]
 }
 
-const open = ({ id }, type = 'Knowledge') => {
+const open = ({ id }: any, type = 'Knowledge') => {
   knowledge_id = id
   auth_list = []
   un_auth_list = []
@@ -130,10 +130,10 @@ const open = ({ id }, type = 'Knowledge') => {
   loading.value = true
   currentType = type
   KnowledgeApi[`getSharedAuthorization${type}Get`](id)
-    .then((res) => {
+    .then((res: any) => {
       auth_list = (res.data || {}).auth_list || []
       un_auth_list = (res.data || {}).un_auth_list || []
-      workspace.value = [...un_auth_list, ...auth_list.map((ele) => ele.workspace_id)]
+      workspace.value = [...un_auth_list, ...auth_list.map((ele) => ele.workspace_id)] as any
       handleListTypeChange(listType.value)
     })
     .finally(() => {
@@ -151,7 +151,7 @@ const handleConfirm = () => {
   })
 }
 
-const clearWorkspace = (val) => {
+const clearWorkspace = (val: any) => {
   checkedWorkspace.value = checkedWorkspace.value.filter((ele) => ele !== val)
   auth_list = auth_list.filter((ele) => ele.workspace_id !== val)
 }
@@ -162,10 +162,10 @@ const clearWorkspaceAll = () => {
   handleCheckedWorkspaceChange([])
 }
 
-const handleListTypeChange = (val) => {
+const handleListTypeChange = (val: any) => {
   checkedWorkspace.value = auth_list
     .filter((ele) => ele.authentication_type === val)
-    .map((ele) => ele.workspace_id)
+    .map((ele) => ele.workspace_id) as any
   handleCheckedWorkspaceChange(checkedWorkspace.value)
 }
 defineExpose({
