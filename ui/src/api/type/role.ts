@@ -6,6 +6,7 @@ interface RoleItem {
   type: RoleTypeEnum,
   create_user: string,
   internal: boolean,
+  user_count?: number,
 }
 
 interface ChildrenPermissionItem {

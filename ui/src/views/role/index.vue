@@ -5,21 +5,23 @@
       <div class="flex h-full">
         <div class="role-left border-r p-16">
           <div class="p-8 pb-0">
-            <el-input v-model="filterText" :placeholder="$t('common.search')" prefix-icon="Search" clearable />
+            <el-input v-model="filterText" :placeholder="$t('common.search')" prefix-icon="Search"
+                      clearable/>
           </div>
           <div class="list-height-left mt-8">
             <el-scrollbar v-loading="loading">
               <div class="role-left_title color-secondary lighter">
                 <span>{{ $t('views.role.internalRole') }}</span>
               </div>
-              <common-list :data="filterInternalRole" @click="clickRole" :default-active="currentRole?.id">
+              <common-list :data="filterInternalRole" @click="clickRole"
+                           :default-active="currentRole?.id">
                 <template #default="{ row }">
                   <div class="flex-between">
                     <span class="mr-8">{{ row.role_name }}</span>
                     <el-dropdown :teleported="false">
                       <el-button text>
                         <el-icon class="color-secondary">
-                          <MoreFilled />
+                          <MoreFilled/>
                         </el-icon>
                       </el-button>
                       <template #dropdown>
@@ -42,28 +44,32 @@
                 </template>
               </common-list>
               <div class="role-left_divider">
-                <el-divider />
+                <el-divider/>
               </div>
               <div class="role-left_title">
                 <span class="color-secondary lighter">{{ $t('views.role.customRole') }}</span>
-                <el-tooltip effect="dark" :content="`${$t('common.create')}${$t('views.role.customRole')}`"
-                  placement="top">
+                <el-tooltip effect="dark"
+                            :content="`${$t('common.create')}${$t('views.role.customRole')}`"
+                            placement="top">
                   <el-button type="primary" text @click="createOrUpdateRole()">
                     <AppIcon iconName="app-copy"></AppIcon>
                   </el-button>
                 </el-tooltip>
               </div>
-              <common-list :data="filterCustomRole" @click="clickRole" :default-active="currentRole?.id">
+              <common-list :data="filterCustomRole" @click="clickRole"
+                           :default-active="currentRole?.id">
                 <template #default="{ row }">
                   <div class="flex-between">
                     <span>
                       {{ row.role_name }}
-                      <span class="color-input-placeholder ml-4">({{ roleTypeMap[row.type as RoleTypeEnum] }})</span>
+                      <span class="color-input-placeholder ml-4">({{
+                          roleTypeMap[row.type as RoleTypeEnum]
+                        }})</span>
                     </span>
                     <el-dropdown :teleported="false">
                       <el-button text>
                         <el-icon class="color-secondary">
-                          <MoreFilled />
+                          <MoreFilled/>
                         </el-icon>
                       </el-button>
                       <template #dropdown>
@@ -95,42 +101,46 @@
             <div class="flex align-center">
               <span>
                 {{ currentRole?.role_name }}
-                <span v-if="currentRole?.type && !currentRole.internal" class="color-input-placeholder ml-4">({{
-                  roleTypeMap[currentRole?.type as
-                  RoleTypeEnum] }})
+                <span v-if="currentRole?.type && !currentRole.internal"
+                      class="color-input-placeholder ml-4">({{
+                    roleTypeMap[currentRole?.type as
+                      RoleTypeEnum]
+                  }})
                 </span>
               </span>
-              <el-divider direction="vertical" class="mr-8 ml-8" />
-              <AppIcon iconName="app-wordspace" style="font-size: 16px" class="color-input-placeholder"></AppIcon>
+              <el-divider direction="vertical" class="mr-8 ml-8"/>
+              <AppIcon iconName="app-wordspace" style="font-size: 16px"
+                       class="color-input-placeholder"></AppIcon>
               <span class="color-input-placeholder ml-4">
-                数字
+                {{ currentRole?.user_count }}
               </span>
             </div>
             <el-radio-group v-model="currentTab">
-              <el-radio-button v-for="item in tabList" :key="item.value" :label="item.label" :value="item.value" />
+              <el-radio-button v-for="item in tabList" :key="item.value" :label="item.label"
+                               :value="item.value"/>
             </el-radio-group>
           </div>
-          <PermissionConfiguration v-if="currentTab === 'permission'" :currentRole="currentRole" />
-          <Member v-else :currentRole="currentRole" />
+          <PermissionConfiguration v-if="currentTab === 'permission'" :currentRole="currentRole"/>
+          <Member v-else :currentRole="currentRole"/>
         </div>
       </div>
     </el-card>
 
-    <CreateOrUpdateRoleDialog ref="createOrUpdateRoleDialogRef" @refresh="refresh" />
+    <CreateOrUpdateRoleDialog ref="createOrUpdateRoleDialogRef" @refresh="refresh"/>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, watch } from 'vue'
+import {onMounted, ref, watch} from 'vue'
 import RoleApi from '@/api/system/role'
-import { t } from '@/locales'
+import {t} from '@/locales'
 import PermissionConfiguration from './component/PermissionConfiguration.vue'
 import Member from './component/Member.vue'
 import CreateOrUpdateRoleDialog from './component/CreateOrUpdateRoleDialog.vue'
-import type { RoleItem } from '@/api/type/role'
-import { RoleTypeEnum } from '@/enums/system'
-import { roleTypeMap } from './index'
-import { MsgSuccess, MsgConfirm } from '@/utils/message'
+import type {RoleItem} from '@/api/type/role'
+import {RoleTypeEnum} from '@/enums/system'
+import {roleTypeMap} from './index'
+import {MsgSuccess, MsgConfirm} from '@/utils/message'
 
 const filterText = ref('')
 const loading = ref(false)
@@ -182,6 +192,7 @@ function clickRole(item: RoleItem) {
 }
 
 const createOrUpdateRoleDialogRef = ref<InstanceType<typeof CreateOrUpdateRoleDialog>>()
+
 function createOrUpdateRole(item?: RoleItem) {
   createOrUpdateRoleDialogRef.value?.open(item);
 }
@@ -202,7 +213,8 @@ function deleteRole(item: RoleItem) {
         currentRole.value = item.id === currentRole.value?.id ? internalRoleList.value[0] : currentRole.value
       })
     })
-    .catch(() => { })
+    .catch(() => {
+    })
 }
 
 

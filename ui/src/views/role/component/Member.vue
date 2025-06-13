@@ -6,23 +6,26 @@
       </el-button>
       <div class="flex complex-search">
         <el-select class="complex-search__left" v-model="searchType" style="width: 120px">
-          <el-option :label="$t('views.login.loginForm.username.label')" value="username" />
+          <el-option :label="$t('views.login.loginForm.username.label')" value="username"/>
         </el-select>
         <el-input v-if="searchType === 'username'" v-model="searchForm.username" @change="getList"
-          :placeholder="$t('common.inputPlaceholder')" style="width: 220px" clearable />
+                  :placeholder="$t('common.inputPlaceholder')" style="width: 220px" clearable/>
       </div>
     </div>
-    <app-table class="mt-16" :data="tableData" :pagination-config="paginationConfig" @sizeChange="handleSizeChange"
-      @changePage="getList" v-loading="loading">
-      <el-table-column prop="nick_name" :label="$t('views.userManage.form.nick_name.label')" />
-      <el-table-column prop="username" :label="$t('views.userManage.form.username.label')" />
-      <el-table-column prop="workspace_name" :label="$t('views.role.member.workspace')" />
+    <app-table class="mt-16" :data="tableData" :pagination-config="paginationConfig"
+               @sizeChange="handleSizeChange"
+               @changePage="getList" v-loading="loading">
+      <el-table-column prop="nick_name" :label="$t('views.userManage.form.nick_name.label')"/>
+      <el-table-column prop="username" :label="$t('views.userManage.form.username.label')"/>
+      <el-table-column prop="workspace_name" :label="$t('views.role.member.workspace')"
+                       v-if="currentRole?.type !==RoleTypeEnum.ADMIN"/>
       <el-table-column :label="$t('common.operation')" width="100" fixed="right">
         <template #default="{ row }">
-          <el-tooltip effect="dark" :content="`${$t('views.role.member.delete.button')}`" placement="top">
+          <el-tooltip effect="dark" :content="`${$t('views.role.member.delete.button')}`"
+                      placement="top">
             <el-button type="primary" text @click.stop="handleDelete(row)">
               <el-icon>
-                <EditPen />
+                <Delete/>
               </el-icon>
             </el-button>
           </el-tooltip>
@@ -30,16 +33,17 @@
       </el-table-column>
     </app-table>
   </div>
-  <AddMemberDrawer ref="addMemberDrawerRef" :currentRole="props.currentRole" @refresh="getList" />
+  <AddMemberDrawer ref="addMemberDrawerRef" :currentRole="props.currentRole" @refresh="getList"/>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, reactive, watch } from 'vue'
+import {onMounted, ref, reactive, watch} from 'vue'
 import RoleApi from '@/api/system/role'
-import type { RoleItem, RoleMemberItem } from '@/api/type/role'
-import { MsgSuccess, MsgConfirm } from '@/utils/message'
-import { t } from '@/locales'
+import type {RoleItem, RoleMemberItem} from '@/api/type/role'
+import {MsgSuccess, MsgConfirm} from '@/utils/message'
+import {t} from '@/locales'
 import AddMemberDrawer from './AddMemberDrawer.vue'
+import {RoleTypeEnum} from "@/enums/system.ts";
 
 const props = defineProps<{
   currentRole?: RoleItem
@@ -86,6 +90,7 @@ watch(() => props.currentRole?.id, () => {
 })
 
 const addMemberDrawerRef = ref<InstanceType<typeof AddMemberDrawer>>()
+
 function handleAdd() {
   addMemberDrawerRef.value?.open();
 }
@@ -105,6 +110,7 @@ function handleDelete(row: RoleMemberItem) {
         getList()
       })
     })
-    .catch(() => { })
+    .catch(() => {
+    })
 }
 </script>

@@ -1,6 +1,7 @@
 interface WorkspaceItem {
   name: string,
-  id?: string
+  id?: string,
+  user_count?: number,
 }
 
 interface CreateWorkspaceMemberParamsItem {
