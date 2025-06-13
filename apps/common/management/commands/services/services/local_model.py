@@ -27,7 +27,7 @@ class GunicornLocalModelService(BaseService):
         bind = f'{CONFIG.get("LOCAL_MODEL_HOST")}:{CONFIG.get("LOCAL_MODEL_PORT")}'
         worker = CONFIG.get("LOCAL_MODEL_HOST_WORKER", 1)
         cmd = [
-            'gunicorn', 'smartdoc.wsgi:application',
+            'gunicorn', 'maxkb.wsgi:application',
             '-b', bind,
             '-k', 'gthread',
             '--threads', '200',

@@ -5,7 +5,7 @@ import sys
 from maxkb.const import CONFIG, PROJECT_DIR
 
 try:
-    from apps.smartdoc import const
+    from apps.maxkb import const
 
     __version__ = const.VERSION
 except ImportError as e:

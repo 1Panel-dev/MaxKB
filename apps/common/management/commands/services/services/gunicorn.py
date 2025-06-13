@@ -17,7 +17,7 @@ class GunicornService(BaseService):
         log_format = '%(h)s %(t)s %(L)ss "%(r)s" %(s)s %(b)s '
         bind = f'{HTTP_HOST}:{HTTP_PORT}'
         cmd = [
-            'gunicorn', 'smartdoc.wsgi:application',
+            'gunicorn', 'maxkb.wsgi:application',
             '-b', bind,
             '-k', 'gthread',
             '--threads', '200',
