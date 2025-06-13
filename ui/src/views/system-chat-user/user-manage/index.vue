@@ -4,8 +4,9 @@
     <el-card>
       <div class="flex-between mb-16">
         <el-button type="primary" @click="createUser()">{{
-          $t('views.userManage.createUser')
-        }}</el-button>
+            $t('views.userManage.createUser')
+          }}
+        </el-button>
         <div class="flex-between complex-search">
           <el-select
             class="complex-search__left"
@@ -13,7 +14,7 @@
             style="width: 120px"
             @change="search_type_change"
           >
-            <el-option :label="$t('views.login.loginForm.username.label')" value="name" />
+            <el-option :label="$t('views.login.loginForm.username.label')" value="name"/>
           </el-select>
           <el-input
             v-if="search_type === 'name'"
@@ -33,14 +34,16 @@
         @changePage="getList"
         v-loading="loading"
       >
-        <el-table-column prop="nick_name" :label="$t('views.userManage.userForm.nick_name.label')" />
-        <el-table-column prop="username" :label="$t('views.userManage.userForm.username.label')" />
+        <el-table-column prop="nick_name" :label="$t('views.userManage.userForm.nick_name.label')"/>
+        <el-table-column prop="username" :label="$t('views.userManage.userForm.username.label')"/>
         <el-table-column prop="is_active" :label="$t('common.status.label')">
           <template #default="{ row }">
             <div v-if="row.is_active" class="flex align-center">
               <el-icon class="color-success mr-8" style="font-size: 16px"
-                ><SuccessFilled
-              /></el-icon>
+              >
+                <SuccessFilled
+                />
+              </el-icon>
               <span class="color-secondary">
                 {{ $t('common.status.enabled') }}
               </span>
@@ -96,16 +99,15 @@
           <template #default="{ row }">
             <span @click.stop>
               <el-switch
-                :disabled="row.role === 'ADMIN'"
                 size="small"
                 v-model="row.is_active"
                 :before-change="() => changeState(row)"
               />
             </span>
-            <el-divider direction="vertical" />
+            <el-divider direction="vertical"/>
             <span class="mr-8">
               <el-button type="primary" text @click.stop="editUser(row)" :title="$t('common.edit')">
-                <el-icon><EditPen /></el-icon>
+                <el-icon><EditPen/></el-icon>
               </el-button>
             </span>
 
@@ -116,7 +118,7 @@
                 @click.stop="editPwdUser(row)"
                 :title="$t('views.userManage.setting.updatePwd')"
               >
-                <el-icon><Lock /></el-icon>
+                <el-icon><Lock/></el-icon>
               </el-button>
             </span>
             <span>
@@ -127,26 +129,27 @@
                 @click.stop="deleteUserManage(row)"
                 :title="$t('common.delete')"
               >
-                <el-icon><Delete /></el-icon>
+                <el-icon><Delete/></el-icon>
               </el-button>
             </span>
           </template>
         </el-table-column>
       </app-table>
     </el-card>
-    <UserDrawer :title="title" ref="UserDrawerRef" @refresh="refresh" />
-    <UserPwdDialog ref="UserPwdDialogRef" @refresh="refresh" />
+    <UserDrawer :title="title" ref="UserDrawerRef" @refresh="refresh"/>
+    <UserPwdDialog ref="UserPwdDialogRef" @refresh="refresh"/>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, reactive, watch } from 'vue'
+import {onMounted, ref, reactive, watch} from 'vue'
 import UserDrawer from './component/UserDrawer.vue'
 import UserPwdDialog from './component/UserPwdDialog.vue'
-import userManageApi from '@/api/user/user-manage'
-import { datetimeFormat } from '@/utils/time'
-import { MsgSuccess, MsgConfirm } from '@/utils/message'
-import { t } from '@/locales'
+import userManageApi from '@/api/system/chat-user'
+import {datetimeFormat} from '@/utils/time'
+import {MsgSuccess, MsgConfirm} from '@/utils/message'
+import {t} from '@/locales'
+
 const search_type = ref('name')
 const search_form = ref<{
   name: string
@@ -167,8 +170,9 @@ const paginationConfig = reactive({
 const userTableData = ref<any[]>([])
 
 const search_type_change = () => {
-  search_form.value = { name: '' }
+  search_form.value = {name: ''}
 }
+
 function handleSizeChange() {
   paginationConfig.current_page = 1
   getList()
@@ -201,6 +205,7 @@ function changeState(row: any) {
 }
 
 const title = ref('')
+
 function editUser(row: any) {
   title.value = t('views.userManage.editUser')
   UserDrawerRef.value.open(row)
@@ -208,22 +213,7 @@ function editUser(row: any) {
 
 function createUser() {
   title.value = t('views.userManage.createUser')
-  UserDrawerRef.value.open(1)
-  // common.asyncGetValid(ValidType.User, ValidCount.User, loading).then(async (res: any) => {
-  //   if (res?.data) {
-  //     title.value = t('views.userManage.createUser')
-  //     UserDrawerRef.value.open()
-  //   } else if (res?.code === 400) {
-  //     MsgConfirm(t('common.tip'), t('views.userManage.tip.professionalMessage'), {
-  //       cancelButtonText: t('common.confirm'),
-  //       confirmButtonText: t('common.professional'),
-  //     })
-  //       .then(() => {
-  //         window.open('https://maxkb.cn/pricing.html', '_blank')
-  //       })
-  //       .catch(() => {})
-  //   }
-  // })
+  UserDrawerRef.value.open()
 }
 
 function deleteUserManage(row: any) {
@@ -242,7 +232,8 @@ function deleteUserManage(row: any) {
         getList()
       })
     })
-    .catch(() => {})
+    .catch(() => {
+    })
 }
 
 function editPwdUser(row: any) {

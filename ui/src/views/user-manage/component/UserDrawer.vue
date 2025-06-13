@@ -52,11 +52,11 @@
         </el-input>
       </el-form-item>
       <el-form-item label="默认密码" v-if="!isEdit">
-        <span>MaxKB@123</span>
+        <span>{{userForm.password}}</span>
       </el-form-item>
     </el-form>
     <template #footer>
-      <el-button @click.prevent="visible = false"> {{ $t('common.cancel') }} </el-button>
+      <el-button @click.prevent="visible = false"> {{ $t('common.cancel') }}</el-button>
       <el-button type="primary" @click="submit(userFormRef)" :loading="loading">
         {{ $t('common.save') }}
       </el-button>
@@ -64,11 +64,12 @@
   </el-drawer>
 </template>
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue'
-import type { FormInstance } from 'element-plus'
+import {ref, reactive, watch} from 'vue'
+import type {FormInstance} from 'element-plus'
 import userManageApi from '@/api/user/user-manage'
-import { MsgSuccess } from '@/utils/message'
-import { t } from '@/locales'
+import {MsgSuccess} from '@/utils/message'
+import {t} from '@/locales'
+
 const props = defineProps({
   title: String,
 })
@@ -146,7 +147,13 @@ const open = (data: any) => {
     userForm.value.phone = data.phone
     userForm.value.nick_name = data.nick_name
     isEdit.value = true
+  } else {
+    //需要查询默认密码是啥zxl
+    userManageApi.getSystemDefaultPassword().then((res: any) => {
+      userForm.value.password = res.data.password
+    })
   }
+
   visible.value = true
 }
 
@@ -171,6 +178,6 @@ const submit = async (formEl: FormInstance | undefined) => {
   })
 }
 
-defineExpose({ open })
+defineExpose({open})
 </script>
 <style lang="scss" scoped></style>

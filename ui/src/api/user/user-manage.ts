@@ -1,14 +1,14 @@
-import { Result } from '@/request/Result'
-import { get, put, post, del } from '@/request/index'
-import type { pageRequest } from '@/api/type/common'
-import type { Ref } from 'vue'
+import {Result} from '@/request/Result'
+import {get, put, post, del} from '@/request/index'
+import type {pageRequest} from '@/api/type/common'
+import type {Ref} from 'vue'
 import type {ResetPasswordRequest} from "@/api/type/user.ts";
 
 const prefix = '/user_manage'
 /**
  * 用户分页列表
  * @query 参数
-   email_or_username: string
+ email_or_username: string
  */
 const getUserManage: (
   page: pageRequest,
@@ -17,7 +17,7 @@ const getUserManage: (
 ) => Promise<Result<any>> = (page, email_or_username, loading) => {
   return get(
     `${prefix}/${page.current_page}/${page.page_size}`,
-    email_or_username ? { email_or_username } : undefined,
+    email_or_username ? {email_or_username} : undefined,
     loading,
   )
 }
@@ -91,6 +91,16 @@ const resetCurrentPassword: (
   return post('/user/current/reset_password', request, undefined, loading)
 }
 
+/**
+ * 获取系统默认密码
+ */
+const getSystemDefaultPassword: (
+  loading?: Ref<boolean>
+) => Promise<Result<string>> = (loading) => {
+  return get('/user_manage/password', undefined, loading)
+}
+
+
 export default {
   getUserManage,
   putUserManage,
@@ -98,5 +108,6 @@ export default {
   postUserManage,
   putUserManagePassword,
   resetPassword,
-  resetCurrentPassword
+  resetCurrentPassword,
+  getSystemDefaultPassword
 }

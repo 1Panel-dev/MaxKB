@@ -64,22 +64,9 @@
         >
         </el-input>
       </el-form-item>
-      <el-form-item
-        :label="$t('views.userManage.form.password.label')"
-        prop="password"
-        v-if="!isEdit"
-      >
-        <el-input
-          type="password"
-          v-model="userForm.password"
-          :placeholder="$t('views.userManage.form.password.placeholder')"
-          show-password
-        >
-        </el-input>
-      </el-form-item>
     </el-form>
     <template #footer>
-      <el-button @click.prevent="visible = false"> {{ $t('common.cancel') }} </el-button>
+      <el-button @click.prevent="visible = false"> {{ $t('common.cancel') }}</el-button>
       <el-button type="primary" @click="submit(userFormRef)" :loading="loading">
         {{ $t('common.save') }}
       </el-button>
@@ -87,11 +74,12 @@
   </el-drawer>
 </template>
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue'
-import type { FormInstance } from 'element-plus'
-import userManageApi from '@/api/user/user-manage'
-import { MsgSuccess } from '@/utils/message'
-import { t } from '@/locales'
+import {ref, reactive, watch} from 'vue'
+import type {FormInstance} from 'element-plus'
+import userManageApi from '@/api/system/chat-user'
+import {MsgSuccess} from '@/utils/message'
+import {t} from '@/locales'
+
 const props = defineProps({
   title: String,
 })
@@ -194,6 +182,6 @@ const submit = async (formEl: FormInstance | undefined) => {
   })
 }
 
-defineExpose({ open })
+defineExpose({open})
 </script>
 <style lang="scss" scoped></style>
