@@ -13,11 +13,8 @@
       class="shared-knowledge"
       :class="currentNodeKey === 'share' && 'active'"
     >
-      <AppIcon
-        :iconName="currentNodeKey === 'share' ? 'app-folder-share-active' : 'app-folder-share'"
-        style="font-size: 20px"
-      ></AppIcon>
-      <span class="name">{{ $t('views.system.share_knowledge') }}</span>
+      <AppIcon iconName="app-folder-share-active" style="font-size: 18px"></AppIcon>
+      <span class="ml-8 lighter">{{ $t('views.system.share_knowledge') }}</span>
     </div>
     <el-tree
       ref="treeRef"
@@ -122,13 +119,6 @@ const handleSharedNodeClick = () => {
     left: 0;
     width: 100%;
     height: 1px;
-  }
-
-  .name {
-    font-weight: 500;
-    font-size: 14px;
-    line-height: 22px;
-    margin-left: 8px;
   }
 }
 </style>

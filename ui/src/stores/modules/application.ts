@@ -80,16 +80,16 @@ const useApplicationStore = defineStore('application', {
       authentication_value?: any,
     ) {
       return new Promise((resolve, reject) => {
-        applicationApi
-          .postAppAuthentication(token, loading, authentication_value)
-          .then((res) => {
-            localStorage.setItem(`${token}-accessToken`, res.data)
-            sessionStorage.setItem(`${token}-accessToken`, res.data)
-            resolve(res)
-          })
-          .catch((error) => {
-            reject(error)
-          })
+        // applicationApi
+        //   .postAppAuthentication(token, loading, authentication_value)
+        //   .then((res) => {
+        //     localStorage.setItem(`${token}-accessToken`, res.data)
+        //     sessionStorage.setItem(`${token}-accessToken`, res.data)
+        //     resolve(res)
+        //   })
+        //   .catch((error) => {
+        //     reject(error)
+        //   })
       })
     },
     async refreshAccessToken(token: string) {

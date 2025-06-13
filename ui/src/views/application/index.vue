@@ -84,6 +84,16 @@
                     </div>
                   </div>
                 </el-dropdown-item>
+                <el-dropdown-item @click="openCreateFolder" divided>
+                  <div class="flex align-center">
+                    <AppIcon iconName="app-folder" style="font-size: 32px"></AppIcon>
+                    <div class="pre-wrap ml-4">
+                      <div class="lighter">
+                        {{ $t('components.folder.addFolder') }}
+                      </div>
+                    </div>
+                  </div>
+                </el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -214,12 +224,14 @@
     </ContentContainer>
     <CreateApplicationDialog ref="CreateApplicationDialogRef" />
     <CopyApplicationDialog ref="CopyApplicationDialogRef" />
+    <CreateFolderDialog ref="CreateFolderDialogRef" @refresh="refreshFolder" />
   </LayoutContainer>
 </template>
 
 <script lang="ts" setup>
 import { onMounted, ref, reactive, computed } from 'vue'
 import CreateApplicationDialog from '@/views/application/component/CreateApplicationDialog.vue'
+import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
 import CopyApplicationDialog from '@/views/application/component/CopyApplicationDialog.vue'
 import ApplicaitonApi from '@/api/application/application'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
@@ -396,6 +408,15 @@ const exportApplication = (application: any) => {
       })
     }
   })
+}
+
+const CreateFolderDialogRef = ref()
+function openCreateFolder() {
+  CreateFolderDialogRef.value.open('APPLICATION', currentFolder.value.parent_id)
+}
+function refreshFolder() {
+  getFolder()
+  getList()
 }
 
 onMounted(() => {
