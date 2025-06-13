@@ -13,7 +13,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
-    "@antv/layout": "^1.2.14-beta.8",
+    "@antv/layout": "^0.3.1",
     "@codemirror/lang-json": "^6.0.1",
     "@codemirror/lang-python": "^6.2.1",
     "@codemirror/theme-one-dark": "^6.1.2",

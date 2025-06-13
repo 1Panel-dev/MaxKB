@@ -22,10 +22,10 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers, status
 from rest_framework.utils.formatting import lazy_format
 
+from application.flow.common import Workflow
 from application.models.application import Application, ApplicationTypeChoices, ApplicationKnowledgeMapping, \
     ApplicationFolder, WorkFlowVersion
 from application.models.application_access_token import ApplicationAccessToken
-from application.flow.workflow_manage import Flow
 from common import result
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import native_search, native_page_search
@@ -589,7 +589,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
         work_flow = instance.get('work_flow')
         if work_flow is None:
             raise AppApiException(500, _("work_flow is a required field"))
-        Flow.new_instance(work_flow).is_valid()
+        Workflow.new_instance(work_flow).is_valid()
         base_node = get_base_node_work_flow(work_flow)
         if base_node is not None:
             node_data = base_node.get('properties').get('node_data')
