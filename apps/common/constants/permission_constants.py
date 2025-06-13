@@ -267,8 +267,8 @@ Permission_Label = {
     Group.WORKSPACE_USER_GROUP.value: _("User Group"),
     Group.WORKSPACE_CHAT_USER.value: _("Chat User"),
     Group.WORKSPACE_WORKSPACE.value: _("Workspace"),
-    Group.APPLICATION_CHAT_LOG.value: _("Dialogue log")
-
+    Group.APPLICATION_CHAT_LOG.value: _("Dialogue log"),
+    Group.WORKSPACE_ROLE.value: _("Role"),
 }
 
 
