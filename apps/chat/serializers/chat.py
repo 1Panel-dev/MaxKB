@@ -22,9 +22,9 @@ from application.chat_pipeline.step.generate_human_message_step.impl.base_genera
     BaseGenerateHumanMessageStep
 from application.chat_pipeline.step.reset_problem_step.impl.base_reset_problem_step import BaseResetProblemStep
 from application.chat_pipeline.step.search_dataset_step.impl.base_search_dataset_step import BaseSearchDatasetStep
-from application.flow.common import Answer
+from application.flow.common import Answer, Workflow
 from application.flow.i_step_node import WorkFlowPostHandler
-from application.flow.workflow_manage import WorkflowManage, Flow
+from application.flow.workflow_manage import WorkflowManage
 from application.models import Application, ApplicationTypeChoices, WorkFlowVersion, ApplicationKnowledgeMapping, \
     ChatUserType, ApplicationChatUserStats, ApplicationAccessToken, ChatRecord, Chat
 from application.serializers.common import ChatInfo
@@ -229,7 +229,7 @@ class ChatSerializers(serializers.Serializer):
             work_flow = chat_info.work_flow_version.work_flow
         else:
             work_flow = chat_info.application.work_flow
-        work_flow_manage = WorkflowManage(Flow.new_instance(work_flow),
+        work_flow_manage = WorkflowManage(Workflow.new_instance(work_flow),
                                           {'history_chat_record': history_chat_record, 'question': message,
                                            'chat_id': chat_info.chat_id, 'chat_record_id': str(
                                               uuid.uuid1()) if chat_record is None else chat_record.id,

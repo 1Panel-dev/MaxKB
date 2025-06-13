@@ -40,7 +40,7 @@ export default class Dagre {
       nodesep,
       ranksep,
       begin: [120, 120],
-      ...option
+      ...option,
     }
     const layoutInstance = new DagreLayout(this.option)
     const layoutData = layoutInstance.layout({
@@ -48,15 +48,15 @@ export default class Dagre {
         id: node.id,
         size: {
           width: node.width,
-          height: node.height
+          height: node.height,
         },
-        model: node
+        model: node,
       })),
       edges: edges.map((edge: any) => ({
         source: edge.sourceNodeId,
         target: edge.targetNodeId,
-        model: edge
-      }))
+        model: edge,
+      })),
     })
 
     layoutData.nodes?.forEach((node: any) => {
