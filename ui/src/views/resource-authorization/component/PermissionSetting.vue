@@ -3,12 +3,12 @@
     v-model="filterText"
     :placeholder="$t('common.search')"
     prefix-icon="Search"
-    class="mb-16 mt-4"
+    class="mb-16 mt-4 1"
     clearable
   />
   <div class="pt-0">
-    <el-table :data="filterData" :max-height="tableHeight">
-      <el-table-column prop="name" :label="$t('common.name')">
+    <el-table row-key="id" :data="filterData" :max-height="tableHeight">
+      <el-table-column class-name="folder-flex" prop="name" :label="$t('common.name')">
         <template #default="{ row }">
           <div class="flex align-center">
             <el-avatar
@@ -16,7 +16,7 @@
               style="background: none"
               class="mr-12"
               shape="square"
-              :size="24"
+              :size="20"
             >
               <img :src="row?.icon" alt="" />
             </el-avatar>
@@ -26,10 +26,23 @@
               :name="row?.name"
               pinyinColor
               shape="square"
-              :size="24"
+              :size="20"
               class="mr-12"
             />
-            <KnowledgeIcon v-if="isKnowledge" :type="row.icon" />
+            <el-avatar
+              v-if="row.isFolder"
+              class="mr-12"
+              shape="square"
+              :size="20"
+              style="background: none"
+            >
+              <img
+                src="@/assets/knowledge/icon_file-folder_colorful.svg"
+                style="width: 100%"
+                alt=""
+              />
+            </el-avatar>
+            <KnowledgeIcon class="mr-12" :size="20" v-else-if="isKnowledge" :type="row.icon" />
 
             <auto-tooltip :content="row?.name">
               {{ row?.name }}
@@ -43,16 +56,24 @@
         width="100"
         fixed="right"
       >
-        <template #header>
+        <!-- <template #header>
           <el-checkbox
             :disabled="props.manage"
             v-model="allChecked[AuthorizationEnum.MANAGE]"
             :indeterminate="allIndeterminate[AuthorizationEnum.MANAGE]"
             :label="$t('views.resourceAuthorization.setting.management')"
           />
-        </template>
+        </template> -->
         <template #default="{ row }">
           <el-checkbox
+            v-if="row.isFolder"
+            :disabled="props.manage"
+            v-model="row.permission[AuthorizationEnum.MANAGE]"
+            :indeterminate="row.permissionHalf[AuthorizationEnum.MANAGE]"
+            @change="(e: boolean) => checkedOperateChange(AuthorizationEnum.MANAGE, row, e)"
+          />
+          <el-checkbox
+            v-else
             :disabled="props.manage"
             v-model="row.permission[AuthorizationEnum.MANAGE]"
             @change="(e: boolean) => checkedOperateChange(AuthorizationEnum.MANAGE, row, e)"
@@ -65,16 +86,24 @@
         width="100"
         fixed="right"
       >
-        <template #header>
+        <!-- <template #header>
           <el-checkbox
             :disabled="props.manage"
             v-model="allChecked[AuthorizationEnum.VIEW]"
             :indeterminate="allIndeterminate[AuthorizationEnum.VIEW]"
             :label="$t('views.resourceAuthorization.setting.check')"
           />
-        </template>
+        </template> -->
         <template #default="{ row }">
           <el-checkbox
+            v-if="row.isFolder"
+            :disabled="props.manage"
+            v-model="row.permission[AuthorizationEnum.VIEW]"
+            :indeterminate="row.permissionHalf[AuthorizationEnum.VIEW]"
+            @change="(e: boolean) => checkedOperateChange(AuthorizationEnum.VIEW, row, e)"
+          />
+          <el-checkbox
+            v-else
             :disabled="props.manage"
             v-model="row.permission[AuthorizationEnum.VIEW]"
             @change="(e: boolean) => checkedOperateChange(AuthorizationEnum.VIEW, row, e)"
@@ -103,74 +132,9 @@ const props = defineProps({
 const isKnowledge = computed(() => props.type === AuthorizationEnum.KNOWLEDGE)
 const isApplication = computed(() => props.type === AuthorizationEnum.APPLICATION)
 
-const emit = defineEmits(['update:data'])
-const allChecked: any = ref({
-  [AuthorizationEnum.MANAGE]: computed({
-    get: () => {
-      return filterData.value.some((item: any) => item.permission[AuthorizationEnum.MANAGE])
-    },
-    set: (val: boolean) => {
-      if (val) {
-        filterData.value.map((item: any) => {
-          item.permission[AuthorizationEnum.MANAGE] = true
-          item.permission[AuthorizationEnum.VIEW] = true
-        })
-      } else {
-        filterData.value.map((item: any) => {
-          item.permission[AuthorizationEnum.MANAGE] = false
-        })
-      }
-    },
-  }),
-  [AuthorizationEnum.VIEW]: computed({
-    get: () => {
-      return filterData.value.some((item: any) => item.permission[AuthorizationEnum.VIEW])
-    },
-    set: (val: boolean) => {
-      if (val) {
-        filterData.value.map((item: any) => {
-          item.permission[AuthorizationEnum.VIEW] = true
-        })
-      } else {
-        filterData.value.map((item: any) => {
-          item.permission[AuthorizationEnum.VIEW] = false
-          item.permission[AuthorizationEnum.MANAGE] = false
-        })
-      }
-    },
-  }),
-})
-
-const filterText = ref('')
-
-const filterData = computed(() =>
-  props.data.filter((v: any) => v.name.toLowerCase().includes(filterText.value.toLowerCase())),
-)
-
-const allIndeterminate: any = ref({
-  [AuthorizationEnum.MANAGE]: computed(() => {
-    const all_not_checked = filterData.value.every(
-      (item: any) => !item.permission[AuthorizationEnum.MANAGE],
-    )
-    if (all_not_checked) {
-      return false
-    }
-    return !filterData.value.every((item: any) => item.permission[AuthorizationEnum.MANAGE])
-  }),
-  [AuthorizationEnum.VIEW]: computed(() => {
-    const all_not_checked = filterData.value.every(
-      (item: any) => !item.permission[AuthorizationEnum.VIEW],
-    )
-    if (all_not_checked) {
-      return false
-    }
-    return !filterData.value.every((item: any) => item.permission[AuthorizationEnum.VIEW])
-  }),
-})
-
-function checkedOperateChange(Name: string | number, row: any, e: boolean) {
-  props.data.map((item: any) => {
-    if (item.id === row.id) {
+const dfsPermission = (arr: any = [], Name: string | number, e: boolean, idArr: any[]) => {
+  arr.map((item: any) => {
+    if (idArr.includes(item.id)) {
       item.permission[Name] = e
       if (Name === AuthorizationEnum.MANAGE && e) {
         item.permission[AuthorizationEnum.VIEW] = true
@@ -178,7 +142,36 @@ function checkedOperateChange(Name: string | number, row: any, e: boolean) {
         item.permission[AuthorizationEnum.MANAGE] = false
       }
     }
+
+    if (item.children?.length) {
+      dfsPermission(
+        item.children,
+        Name,
+        e,
+        idArr.includes(item.id) ? item.children.map((ele: any) => ele.id) : idArr,
+      )
+    }
   })
 }
+
+const emit = defineEmits(['update:data', 'refreshData'])
+
+const filterText = ref('')
+
+const filterData = computed(() =>
+  props.data.filter((v: any) => v.name.toLowerCase().includes(filterText.value.toLowerCase())),
+)
+
+function checkedOperateChange(Name: string | number, row: any, e: boolean) {
+  dfsPermission(props.data, Name, e, [row.id])
+  emit('refreshData')
+}
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+:deep(.folder-flex) {
+  .cell {
+    display: flex;
+    align-items: center;
+  }
+}
+</style>
