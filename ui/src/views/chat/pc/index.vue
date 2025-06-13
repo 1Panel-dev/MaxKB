@@ -5,157 +5,149 @@
     v-loading="loading"
     :style="{
       '--el-color-primary': applicationDetail?.custom_theme?.theme_color,
-      '--el-color-primary-light-9': hexToRgba(applicationDetail?.custom_theme?.theme_color, 0.1)
+      '--el-color-primary-light-9': hexToRgba(applicationDetail?.custom_theme?.theme_color, 0.1),
     }"
   >
-    <div class="chat-pc__header" :style="customStyle">
-      <div class="flex align-center">
-        <div class="mr-12 ml-24 flex">
-          <el-avatar
-            v-if="isAppIcon(applicationDetail?.icon)"
-            shape="square"
-            :size="32"
-            style="background: none"
-          >
-            <img :src="applicationDetail?.icon" alt="" />
-          </el-avatar>
-          <el-avatar
-            v-else-if="applicationDetail?.name"
-            :name="applicationDetail?.name"
-            pinyinColor
-            shape="square"
-            :size="32"
-          />
-        </div>
-        <h4>{{ applicationDetail?.name }}</h4>
-      </div>
-    </div>
-    <div>
-      <div class="flex">
-        <div class="chat-pc__left border-r">
-          <div class="p-24 pb-0">
-            <el-button class="add-button w-full primary" @click="newChat">
-              <el-icon>
-                <Plus />
-              </el-icon>
-              <span class="ml-4">{{ $t('chat.createChat') }}</span>
-            </el-button>
-            <p class="mt-20 mb-8">{{ $t('chat.history') }}</p>
+    11111111111
+    <div class="flex">
+      <div class="chat-pc__left border-r">
+        <div class="p-24 pb-0">
+          <div class="flex align-center">
+            <div class="mr-12 ml-24 flex">
+              <el-avatar
+                v-if="isAppIcon(applicationDetail?.icon)"
+                shape="square"
+                :size="32"
+                style="background: none"
+              >
+                <img :src="applicationDetail?.icon" alt="" />
+              </el-avatar>
+              <LogoIcon v-else height="28px" style="width: 28px; height: 28px; display: block" />
+            </div>
+            <h4>{{ applicationDetail?.name }}</h4>
           </div>
-          <div class="left-height pt-0">
-            <el-scrollbar>
-              <div class="p-8 pt-0">
-                <common-list
-                  :style="{
-                    '--el-color-primary': applicationDetail?.custom_theme?.theme_color,
-                    '--el-color-primary-light-9': hexToRgba(
-                      applicationDetail?.custom_theme?.theme_color,
-                      0.1
-                    )
-                  }"
-                  :data="chatLogData"
-                  class="mt-8"
-                  v-loading="left_loading"
-                  :defaultActive="currentChatId"
-                  @click="clickListHandle"
-                  @mouseenter="mouseenter"
-                  @mouseleave="mouseId = ''"
-                >
-                  <template #default="{ row }">
-                    <div class="flex-between">
-                      <auto-tooltip :content="row.abstract">
-                        {{ row.abstract }}
-                      </auto-tooltip>
-                      <div @click.stop v-show="mouseId === row.id && row.id !== 'new'">
-                        <el-dropdown trigger="click" :teleported="false">
-                          <el-icon class="rotate-90 mt-4"><MoreFilled /></el-icon>
-                          <template #dropdown>
-                            <el-dropdown-menu>
-                              <el-dropdown-item @click.stop="editLogTitle(row)">
-                                <el-icon><EditPen /></el-icon>
-                                {{ $t('common.edit') }}
-                              </el-dropdown-item>
-                              <el-dropdown-item @click.stop="deleteLog(row)">
-                                <el-icon><Delete /></el-icon>
-                                {{ $t('common.delete') }}
-                              </el-dropdown-item>
-                            </el-dropdown-menu>
-                          </template>
-                        </el-dropdown>
-                      </div>
-                    </div>
-                  </template>
-
-                  <template #empty>
-                    <div class="text-center">
-                      <el-text type="info">{{ $t('chat.noHistory') }}</el-text>
-                    </div>
-                  </template>
-                </common-list>
-              </div>
-              <div v-if="chatLogData?.length" class="gradient-divider lighter mt-8">
-                <span>{{ $t('chat.only20history') }}</span>
-              </div>
-            </el-scrollbar>
-          </div>
+          <el-button class="add-button w-full primary" @click="newChat">
+            <el-icon>
+              <Plus />
+            </el-icon>
+            <span class="ml-4">{{ $t('chat.createChat') }}</span>
+          </el-button>
+          <p class="mt-20 mb-8">{{ $t('chat.history') }}</p>
         </div>
-        <div class="chat-pc__right">
-          <div class="right-header border-b mb-24 p-16-24 flex-between">
-            <h4 class="ellipsis-1" style="width: 66%">
-              {{ currentChatName }}
-            </h4>
-
-            <span class="flex align-center" v-if="currentRecordList.length">
-              <AppIcon
-                v-if="paginationConfig.total"
-                iconName="app-chat-record"
-                class="info mr-8"
-                style="font-size: 16px"
-              ></AppIcon>
-              <span v-if="paginationConfig.total" class="lighter">
-                {{ paginationConfig.total }} {{ $t('chat.question_count') }}
-              </span>
-              <el-dropdown class="ml-8">
-                <AppIcon
-                  iconName="app-export"
-                  class="cursor"
-                  :title="$t('chat.exportRecords')"
-                ></AppIcon>
-                <template #dropdown>
-                  <el-dropdown-menu>
-                    <el-dropdown-item @click="exportMarkdown"
-                      >{{ $t('common.export') }} Markdown</el-dropdown-item
-                    >
-                    <el-dropdown-item @click="exportHTML"
-                      >{{ $t('common.export') }} HTML</el-dropdown-item
-                    >
-                  </el-dropdown-menu>
+        <div class="left-height pt-0">
+          <el-scrollbar>
+            <div class="p-8 pt-0">
+              <common-list
+                :style="{
+                  '--el-color-primary': applicationDetail?.custom_theme?.theme_color,
+                  '--el-color-primary-light-9': hexToRgba(
+                    applicationDetail?.custom_theme?.theme_color,
+                    0.1,
+                  ),
+                }"
+                :data="chatLogData"
+                class="mt-8"
+                v-loading="left_loading"
+                :defaultActive="currentChatId"
+                @click="clickListHandle"
+                @mouseenter="mouseenter"
+                @mouseleave="mouseId = ''"
+              >
+                <template #default="{ row }">
+                  <div class="flex-between">
+                    <auto-tooltip :content="row.abstract">
+                      {{ row.abstract }}
+                    </auto-tooltip>
+                    <div @click.stop v-show="mouseId === row.id && row.id !== 'new'">
+                      <el-dropdown trigger="click" :teleported="false">
+                        <el-icon class="rotate-90 mt-4"><MoreFilled /></el-icon>
+                        <template #dropdown>
+                          <el-dropdown-menu>
+                            <el-dropdown-item @click.stop="editLogTitle(row)">
+                              <el-icon><EditPen /></el-icon>
+                              {{ $t('common.edit') }}
+                            </el-dropdown-item>
+                            <el-dropdown-item @click.stop="deleteLog(row)">
+                              <el-icon><Delete /></el-icon>
+                              {{ $t('common.delete') }}
+                            </el-dropdown-item>
+                          </el-dropdown-menu>
+                        </template>
+                      </el-dropdown>
+                    </div>
+                  </div>
                 </template>
-              </el-dropdown>
-            </span>
-          </div>
-          <div class="right-height chat-width">
-            <AiChat
-              ref="AiChatRef"
-              v-model:applicationDetails="applicationDetail"
-              :available="applicationAvailable"
-              type="ai-chat"
-              :appId="applicationDetail?.id"
-              :record="currentRecordList"
-              :chatId="currentChatId"
-              @refresh="refresh"
-              @scroll="handleScroll"
-            >
-            </AiChat>
-          </div>
+
+                <template #empty>
+                  <div class="text-center">
+                    <el-text type="info">{{ $t('chat.noHistory') }}</el-text>
+                  </div>
+                </template>
+              </common-list>
+            </div>
+            <div v-if="chatLogData?.length" class="gradient-divider lighter mt-8">
+              <span>{{ $t('chat.only20history') }}</span>
+            </div>
+          </el-scrollbar>
         </div>
       </div>
-      <div class="collapse">
-        <el-button @click="isCollapse = !isCollapse">
-          <el-icon> <component :is="isCollapse ? 'Fold' : 'Expand'" /></el-icon>
-        </el-button>
+      <div class="chat-pc__right">
+        <div class="right-header border-b mb-24 p-16-24 flex-between">
+          <h4 class="ellipsis-1" style="width: 66%">
+            {{ currentChatName }}
+          </h4>
+
+          <span class="flex align-center" v-if="currentRecordList.length">
+            <AppIcon
+              v-if="paginationConfig.total"
+              iconName="app-chat-record"
+              class="info mr-8"
+              style="font-size: 16px"
+            ></AppIcon>
+            <span v-if="paginationConfig.total" class="lighter">
+              {{ paginationConfig.total }} {{ $t('chat.question_count') }}
+            </span>
+            <el-dropdown class="ml-8">
+              <AppIcon
+                iconName="app-export"
+                class="cursor"
+                :title="$t('chat.exportRecords')"
+              ></AppIcon>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item @click="exportMarkdown"
+                    >{{ $t('common.export') }} Markdown</el-dropdown-item
+                  >
+                  <el-dropdown-item @click="exportHTML"
+                    >{{ $t('common.export') }} HTML</el-dropdown-item
+                  >
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </span>
+        </div>
+        <div class="right-height chat-width">
+          <AiChat
+            ref="AiChatRef"
+            v-model:applicationDetails="applicationDetail"
+            :available="applicationAvailable"
+            type="ai-chat"
+            :appId="applicationDetail?.id"
+            :record="currentRecordList"
+            :chatId="currentChatId"
+            @refresh="refresh"
+            @scroll="handleScroll"
+          >
+          </AiChat>
+        </div>
       </div>
     </div>
+    <div class="collapse">
+      <el-button @click="isCollapse = !isCollapse">
+        <el-icon> <component :is="isCollapse ? 'Fold' : 'Expand'" /></el-icon>
+      </el-button>
+    </div>
+
     <EditTitleDialog ref="EditTitleDialogRef" @refresh="refreshFieldTitle" />
   </div>
 </template>
@@ -181,7 +173,7 @@ const isCollapse = ref(false)
 const customStyle = computed(() => {
   return {
     background: applicationDetail.value?.custom_theme?.theme_color,
-    color: applicationDetail.value?.custom_theme?.header_font_color
+    color: applicationDetail.value?.custom_theme?.header_font_color,
   }
 })
 
@@ -189,13 +181,13 @@ const classObj = computed(() => {
   return {
     mobile: common.isMobile(),
     hideLeft: !isCollapse.value,
-    openLeft: isCollapse.value
+    openLeft: isCollapse.value,
   }
 })
 
 const newObj = {
   id: 'new',
-  abstract: t('chat.createChat')
+  abstract: t('chat.createChat'),
 }
 const props = defineProps<{
   application_profile: any
@@ -209,7 +201,7 @@ const applicationDetail = computed({
   get: () => {
     return props.application_profile
   },
-  set: (v) => {}
+  set: (v) => {},
 })
 
 const chatLogData = ref<any[]>([])
@@ -217,7 +209,7 @@ const chatLogData = ref<any[]>([])
 const paginationConfig = ref({
   current_page: 1,
   page_size: 20,
-  total: 0
+  total: 0,
 })
 
 const currentRecordList = ref<any>([])
@@ -286,7 +278,7 @@ function newChat() {
 function getChatLog(id: string, refresh?: boolean) {
   const page = {
     current_page: 1,
-    page_size: 20
+    page_size: 20,
   }
 
   chatLog.asyncGetChatLogClient(id, page, left_loading).then((res: any) => {
@@ -313,7 +305,7 @@ function getChatRecord() {
       currentChatId.value,
       paginationConfig.value,
       loading,
-      false
+      false,
     )
     .then((res: any) => {
       paginationConfig.value.total = res.data.total
@@ -323,7 +315,7 @@ function getChatRecord() {
         v['record_id'] = v.id
       })
       currentRecordList.value = [...list, ...currentRecordList.value].sort((a, b) =>
-        a.create_time.localeCompare(b.create_time)
+        a.create_time.localeCompare(b.create_time),
       )
       if (paginationConfig.value.current_page === 1) {
         nextTick(() => {

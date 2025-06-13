@@ -62,15 +62,16 @@ const useApplicationStore = defineStore('application', {
 
     async asyncGetAppProfile(loading?: Ref<boolean>) {
       return new Promise((resolve, reject) => {
-        // applicationApi
-        //   .getAppProfile(loading)
-        //   .then((res) => {
-        //     sessionStorage.setItem('language', res.data?.language || getBrowserLang())
-        //     resolve(res)
-        //   })
-        //   .catch((error) => {
-        //     reject(error)
-        //   })
+        console.log('xxxx')
+        applicationApi
+          .getAppProfile(loading)
+          .then((res) => {
+            sessionStorage.setItem('language', res.data?.language || getBrowserLang())
+            resolve(res)
+          })
+          .catch((error) => {
+            reject(error)
+          })
       })
     },
 
@@ -80,16 +81,16 @@ const useApplicationStore = defineStore('application', {
       authentication_value?: any,
     ) {
       return new Promise((resolve, reject) => {
-        // applicationApi
-        //   .postAppAuthentication(token, loading, authentication_value)
-        //   .then((res) => {
-        //     localStorage.setItem(`${token}-accessToken`, res.data)
-        //     sessionStorage.setItem(`${token}-accessToken`, res.data)
-        //     resolve(res)
-        //   })
-        //   .catch((error) => {
-        //     reject(error)
-        //   })
+        applicationApi
+          .postAppAuthentication(token, loading, authentication_value)
+          .then((res) => {
+            localStorage.setItem(`${token}-accessToken`, res.data)
+            sessionStorage.setItem(`${token}-accessToken`, res.data)
+            resolve(res)
+          })
+          .catch((error) => {
+            reject(error)
+          })
       })
     },
     async refreshAccessToken(token: string) {

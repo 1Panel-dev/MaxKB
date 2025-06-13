@@ -24,7 +24,7 @@ export const routes: Array<RouteRecordRaw> = [
     component: () => import('@/views/chat/index.vue'),
   },
 
-   // 对话用户登录
+  // 对话用户登录
   {
     path: '/user-login/:accessToken',
     name: 'UserLogin',

@@ -41,12 +41,10 @@
                   >
                     <img :src="detail?.icon" alt="" />
                   </el-avatar>
-                  <el-avatar
-                    v-else-if="detail?.name"
-                    :name="detail?.name"
-                    pinyinColor
-                    shape="square"
-                    :size="32"
+                  <LogoIcon
+                    v-else
+                    height="28px"
+                    style="width: 28px; height: 28px; display: block"
                   />
                 </div>
 

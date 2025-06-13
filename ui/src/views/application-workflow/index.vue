@@ -92,13 +92,7 @@
                 >
                   <img :src="detail?.icon" alt="" />
                 </el-avatar>
-                <el-avatar
-                  v-else-if="detail?.name"
-                  :name="detail?.name"
-                  pinyinColor
-                  shape="square"
-                  :size="32"
-                />
+                <LogoIcon v-else height="28px" style="width: 28px; height: 28px; display: block" />
               </div>
 
               <h4>
@@ -157,7 +151,7 @@ const isDefaultTheme = computed(() => {
   return user.isDefaultTheme()
 })
 const {
-  params: { id }
+  params: { id },
 } = route as any
 
 let interval: any
@@ -182,7 +176,7 @@ function back() {
       confirmButtonText: t('views.applicationWorkflow.setting.exitSave'),
       cancelButtonText: t('views.applicationWorkflow.setting.exit'),
       type: 'warning',
-      distinguishCancelAndClose: true
+      distinguishCancelAndClose: true,
     })
       .then(() => {
         saveApplication(true, true)
@@ -268,7 +262,7 @@ async function publicHandle() {
     ?.validate()
     .then(async () => {
       const obj = {
-        work_flow: getGraphData()
+        work_flow: getGraphData(),
       }
       await application.asyncPutApplication(id, obj, loading)
       const workflow = new WorkFlowInstance(obj.work_flow)
@@ -293,14 +287,14 @@ async function publicHandle() {
         MsgError(
           res.node.properties?.stepName +
             ` ${t('views.applicationWorkflow.node').toLowerCase()} ` +
-            err_message.toLowerCase()
+            err_message.toLowerCase(),
         )
       } else {
         const keys = Object.keys(err_message)
         MsgError(
           node.properties?.stepName +
             ` ${t('views.applicationWorkflow.node').toLowerCase()} ` +
-            err_message[keys[0]]?.[0]?.message.toLowerCase()
+            err_message[keys[0]]?.[0]?.message.toLowerCase(),
         )
       }
     })
@@ -318,7 +312,7 @@ const clickShowDebug = () => {
           ...detail.value,
           type: 'WORK_FLOW',
           ...workflow.get_base_node()?.properties.node_data,
-          work_flow: getGraphData()
+          work_flow: getGraphData(),
         }
 
         showDebug.value = true
@@ -331,14 +325,14 @@ const clickShowDebug = () => {
       const err_message = res.errMessage
       if (typeof err_message == 'string') {
         MsgError(
-          res.node.properties?.stepName + ` ${t('views.applicationWorkflow.node')}，` + err_message
+          res.node.properties?.stepName + ` ${t('views.applicationWorkflow.node')}，` + err_message,
         )
       } else {
         const keys = Object.keys(err_message)
         MsgError(
           node.properties?.stepName +
             ` ${t('views.applicationWorkflow.node')}，` +
-            err_message[keys[0]]?.[0]?.message
+            err_message[keys[0]]?.[0]?.message,
         )
       }
     })
@@ -376,7 +370,7 @@ function getDetail() {
 
 function saveApplication(bool?: boolean, back?: boolean) {
   const obj = {
-    work_flow: getGraphData()
+    work_flow: getGraphData(),
   }
   loading.value = back || false
   application
