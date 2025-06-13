@@ -3943,4 +3943,4 @@ msgid "Get paginated operate log"
 msgstr "獲取分頁操作日誌"
 
 msgid "Export operate log"
-msgstr "導出操作日誌
+msgstr "導出操作日誌"
