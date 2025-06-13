@@ -97,7 +97,7 @@
 </template>
 <script setup lang="ts">
 import { reactive, ref, watch, onMounted } from 'vue'
-import authApi from '@/api/system/auth'
+import authApi from '@/api/chat-user/auth-setting'
 import type { FormInstance, FormRules } from 'element-plus'
 import { t } from '@/locales'
 import { MsgSuccess } from '@/utils/message'

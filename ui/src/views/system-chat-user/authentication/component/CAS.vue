@@ -38,7 +38,7 @@
           </el-form-item>
           <el-form-item>
             <el-checkbox v-model="form.is_active"
-              >{{ $t('views.system.authentication.cas.enableAuthentication') }}
+            >{{ $t('views.system.authentication.cas.enableAuthentication') }}
             </el-checkbox>
           </el-form-item>
         </el-form>
@@ -53,11 +53,11 @@
   </div>
 </template>
 <script setup lang="ts">
-import { reactive, ref, watch, onMounted } from 'vue'
-import authApi from '@/api/system/auth'
-import type { FormInstance, FormRules } from 'element-plus'
-import { t } from '@/locales'
-import { MsgSuccess } from '@/utils/message'
+import {reactive, ref, watch, onMounted} from 'vue'
+import authApi from '@/api/chat-user/auth-setting'
+import type {FormInstance, FormRules} from 'element-plus'
+import {t} from '@/locales'
+import {MsgSuccess} from '@/utils/message'
 
 const form = ref<any>({
   id: '',

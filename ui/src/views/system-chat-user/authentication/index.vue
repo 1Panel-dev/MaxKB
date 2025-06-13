@@ -17,7 +17,7 @@ import { useRouter } from 'vue-router'
 import LDAP from './component/LDAP.vue'
 import CAS from './component/CAS.vue'
 import OIDC from './component/OIDC.vue'
-import SCAN from './component/SCAN.vue'
+//import SCAN from './component/SCAN.vue'
 import OAuth2 from './component/OAuth2.vue'
 import { t } from '@/locales'
 import useStore from '@/stores'
@@ -47,19 +47,19 @@ const tabList = [
     name: 'OAuth2',
     component: OAuth2,
   },
-  {
-    label: t('views.system.authentication.scanTheQRCode.title'),
-    name: 'SCAN',
-    component: SCAN,
-  },
+  // {
+  //   label: t('views.system.authentication.scanTheQRCode.title'),
+  //   name: 'SCAN',
+  //   component: SCAN,
+  // },
 ]
 
 function handleClick() {}
 
 onMounted(() => {
-  if (user.isExpire()) {
-    router.push({ path: `/application` })
-  }
+  // if (user.isExpire()) {
+  //   router.push({ path: `/application` })
+  // }
 })
 </script>
 <style lang="scss" scoped>
