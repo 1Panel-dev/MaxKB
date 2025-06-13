@@ -12,7 +12,6 @@ const envDir = './env'
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
-  console.log('ssss')
   const ENV = loadEnv(mode, envDir)
   const prefix = process.env.VITE_DYNAMIC_PREFIX || ENV.VITE_BASE_PATH
   const proxyConf: Record<string, string | ProxyOptions> = {}
@@ -41,7 +40,7 @@ export default defineConfig(({ mode }) => {
     lintOnSave: false,
     base: prefix,
     envDir: envDir,
-    plugins: [vue(), vueJsx(), DefineOptions(), createHtmlPlugin({ template: ENV.VITE_INPUT })],
+    plugins: [vue(), vueJsx(), DefineOptions(), createHtmlPlugin({ template: ENV.VITE_ENTRY })],
     server: {
       cors: true,
       host: '0.0.0.0',
@@ -52,7 +51,7 @@ export default defineConfig(({ mode }) => {
     build: {
       outDir: `dist${ENV.VITE_BASE_PATH}`,
       rollupOptions: {
-        input: path.resolve(__dirname, ENV.VITE_INPUT),
+        input: path.resolve(__dirname, ENV.VITE_ENTRY),
       },
     },
     resolve: {
