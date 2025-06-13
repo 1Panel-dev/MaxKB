@@ -13,7 +13,7 @@
         v-for="(item, index) in platforms"
         :key="index"
       >
-        <el-card shadow="hover" class="border-none cursor" style="--el-card-padding: 24px">
+        <el-card shadow="hover" class="border-none cursor">
           <div class="flex-between">
             <div class="flex align-center ml-8 mr-8">
               <img :src="item.logoSrc" alt="" class="icon" />

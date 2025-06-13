@@ -33,45 +33,6 @@
         </el-input>
       </el-form-item>
     </el-form>
-    <!--    <el-form-->
-    <!--      class="reset-password-form mb-24"-->
-    <!--      ref="resetPasswordFormRef2"-->
-    <!--      :model="resetPasswordForm"-->
-    <!--      :rules="rules2"-->
-    <!--    >-->
-    <!--      <p class="mb-8 lighter">{{ $t('views.login.useEmail') }}</p>-->
-    <!--      <el-form-item style="margin-bottom: 8px">-->
-    <!--        <el-input-->
-    <!--          class="input-item"-->
-    <!--          :disabled="true"-->
-    <!--          v-bind:modelValue="user.userInfo?.email"-->
-    <!--          :placeholder="t('views.user.userForm.form.email.placeholder')"-->
-    <!--        >-->
-    <!--        </el-input>-->
-    <!--      </el-form-item>-->
-    <!--      <el-form-item prop="code">-->
-    <!--        <div class="flex-between w-full">-->
-    <!--          <el-input-->
-    <!--            class="code-input"-->
-    <!--            v-model="resetPasswordForm.code"-->
-    <!--            :placeholder="$t('views.login.verificationCode.placeholder')"-->
-    <!--          >-->
-    <!--          </el-input>-->
-    <!--          <el-button-->
-    <!--            :disabled="isDisabled"-->
-    <!--            class="send-email-button ml-8"-->
-    <!--            @click="sendEmail"-->
-    <!--            :loading="loading"-->
-    <!--          >-->
-    <!--            {{-->
-    <!--              isDisabled-->
-    <!--                ? `${$t('views.login.verificationCode.resend')}（${time}s）`-->
-    <!--                : $t('views.login.verificationCode.getVerificationCode')-->
-    <!--            }}-->
-    <!--          </el-button>-->
-    <!--        </div>-->
-    <!--      </el-form-item>-->
-    <!--    </el-form>-->
     <template #footer>
       <div class="dialog-footer">
         <el-button @click="resetPasswordDialog = false">{{ $t('common.cancel') }}</el-button>
@@ -119,26 +80,26 @@ const rules1 = ref<FormRules<ResetCurrentUserPasswordRequest>>({
     {
       min: 6,
       max: 20,
-      message: t('views.user.userForm.form.password.lengthMessage'),
+      message: t('views.login.loginForm.password.lengthMessage'),
       trigger: 'blur',
     },
   ],
   re_password: [
     {
       required: true,
-      message: t('views.user.userForm.form.re_password.requiredMessage'),
+      message: t('views.login.loginForm.re_password.requiredMessage'),
       trigger: 'blur',
     },
     {
       min: 6,
       max: 20,
-      message: t('views.user.userForm.form.password.lengthMessage'),
+      message: t('views.login.loginForm.password.lengthMessage'),
       trigger: 'blur',
     },
     {
       validator: (rule, value, callback) => {
         if (resetPasswordForm.value.password != resetPasswordForm.value.re_password) {
-          callback(new Error(t('views.user.userForm.form.re_password.validatorMessage')))
+          callback(new Error(t('views.login.loginForm.re_password.validatorMessage')))
         } else {
           callback()
         }
@@ -147,28 +108,6 @@ const rules1 = ref<FormRules<ResetCurrentUserPasswordRequest>>({
     },
   ],
 })
-// const rules2 = ref<FormRules<ResetCurrentUserPasswordRequest>>({
-//   // @ts-ignore
-//   code: [
-//     {
-//       required: true,
-//       message: t('views.login.verificationCode.placeholder'),
-//       trigger: 'blur'
-//     }
-//   ]
-// })
-// /**
-//  * 发送验证码
-//  */
-// const sendEmail = () => {
-//   resetPasswordFormRef1.value?.validate().then(() => {
-//     UserApi.sendEmailToCurrent(loading).then(() => {
-//       MsgSuccess(t('views.login.verificationCode.successMessage'))
-//       isDisabled.value = true
-//       handleTimeChange()
-//     })
-//   })
-// }
 
 const handleTimeChange = () => {
   if (time.value <= 0) {

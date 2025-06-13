@@ -1,7 +1,7 @@
 export enum SearchMode {
-  embedding = 'views.application.form.dialog.vectorSearch',
-  keywords = 'views.application.form.dialog.fullTextSearch',
-  blend = 'views.application.form.dialog.hybridSearch'
+  embedding = 'views.application.dialog.vectorSearch',
+  keywords = 'views.application.dialog.fullTextSearch',
+  blend = 'views.application.dialog.hybridSearch'
 }
 
 export enum WorkflowType {

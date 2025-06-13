@@ -429,9 +429,7 @@ import AIModeParamSettingDialog from './component/AIModeParamSettingDialog.vue'
 import ParamSettingDialog from './component/ParamSettingDialog.vue'
 import AddKnowledgeDialog from './component/AddKnowledgeDialog.vue'
 import EditAvatarDialog from '@/views/application-overview/component/EditAvatarDialog.vue'
-import applicationApi from '@/api/application/application'
 import modelAPI from '@/api/model/model.ts'
-import { isAppIcon } from '@/utils/common'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { ApplicationFormType } from '@/api/type/application'
 import { relatedObject } from '@/utils/utils'
@@ -454,11 +452,11 @@ const defaultPrompt = t('views.application.form.prompt.defaultPrompt', {
 })
 
 const optimizationPrompt =
-  t('views.application.form.dialog.defaultPrompt1', {
+  t('views.application.dialog.defaultPrompt1', {
     question: '{question}',
   }) +
   '<data></data>' +
-  t('views.application.form.dialog.defaultPrompt2')
+  t('views.application.dialog.defaultPrompt2')
 
 const AIModeParamSettingDialogRef = ref<InstanceType<typeof AIModeParamSettingDialog>>()
 const ReasoningParamSettingDialogRef = ref<InstanceType<typeof ReasoningParamSettingDialog>>()
