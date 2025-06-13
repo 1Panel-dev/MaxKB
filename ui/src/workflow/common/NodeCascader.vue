@@ -34,7 +34,7 @@ const data = computed({
   },
   get: () => {
     return props.modelValue
-  }
+  },
 })
 const options = ref<Array<any>>([])
 
