@@ -83,23 +83,23 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import {ref} from 'vue'
-import type {ResetCurrentUserPasswordRequest} from '@/api/type/user'
-import type {FormInstance, FormRules} from 'element-plus'
+import { ref } from 'vue'
+import type { ResetCurrentUserPasswordRequest } from '@/api/type/user'
+import type { FormInstance, FormRules } from 'element-plus'
 import UserApi from '@/api/user/user-manage'
 import useStore from '@/stores'
-import {useRouter} from 'vue-router'
-import {t} from '@/locales'
+import { useRouter } from 'vue-router'
+import { t } from '@/locales'
 
 const router = useRouter()
-const {user} = useStore()
+const { login } = useStore()
 
 const resetPasswordDialog = ref<boolean>(false)
 
 const resetPasswordForm = ref<ResetCurrentUserPasswordRequest>({
   code: '',
   password: '',
-  re_password: ''
+  re_password: '',
 })
 
 const resetPasswordFormRef1 = ref<FormInstance>()
@@ -114,26 +114,26 @@ const rules1 = ref<FormRules<ResetCurrentUserPasswordRequest>>({
     {
       required: true,
       message: t('views.login.enterPassword'),
-      trigger: 'blur'
+      trigger: 'blur',
     },
     {
       min: 6,
       max: 20,
       message: t('views.user.userForm.form.password.lengthMessage'),
-      trigger: 'blur'
-    }
+      trigger: 'blur',
+    },
   ],
   re_password: [
     {
       required: true,
       message: t('views.user.userForm.form.re_password.requiredMessage'),
-      trigger: 'blur'
+      trigger: 'blur',
     },
     {
       min: 6,
       max: 20,
       message: t('views.user.userForm.form.password.lengthMessage'),
-      trigger: 'blur'
+      trigger: 'blur',
     },
     {
       validator: (rule, value, callback) => {
@@ -143,9 +143,9 @@ const rules1 = ref<FormRules<ResetCurrentUserPasswordRequest>>({
           callback()
         }
       },
-      trigger: 'blur'
-    }
-  ]
+      trigger: 'blur',
+    },
+  ],
 })
 // const rules2 = ref<FormRules<ResetCurrentUserPasswordRequest>>({
 //   // @ts-ignore
@@ -186,7 +186,7 @@ const open = () => {
   resetPasswordForm.value = {
     //code: '',
     password: '',
-    re_password: ''
+    re_password: '',
   }
   resetPasswordDialog.value = true
   resetPasswordFormRef1.value?.resetFields()
@@ -194,17 +194,16 @@ const open = () => {
 }
 const resetPassword = () => {
   resetPasswordFormRef1.value?.validate().then(() => {
-    return UserApi.resetCurrentPassword(resetPasswordForm.value)
-      .then(() => {
-        user.logout()
-        router.push({name: 'login'})
-      })
+    return UserApi.resetCurrentPassword(resetPasswordForm.value).then(() => {
+      login.logout()
+      router.push({ name: 'login' })
+    })
   })
 }
 const close = () => {
   resetPasswordDialog.value = false
 }
 
-defineExpose({open, close})
+defineExpose({ open, close })
 </script>
 <style lang="scss" scope></style>

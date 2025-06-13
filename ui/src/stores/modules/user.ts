@@ -3,14 +3,16 @@ import { type Ref } from 'vue'
 import type { User } from '@/api/type/user'
 import UserApi from '@/api/user/user'
 import LoginApi from '@/api/user/login'
-import {cloneDeep} from 'lodash'
+import { cloneDeep } from 'lodash'
 import ThemeApi from '@/api/system-settings/theme'
-// import { defaultPlatformSetting } from '@/utils/theme'
 import { useLocalStorage } from '@vueuse/core'
+// import { defaultPlatformSetting } from '@/utils/theme'
+
 import { localeConfigKey, getBrowserLang } from '@/locales/index'
 import useThemeStore from './theme'
 import { useElementPlusTheme } from 'use-element-plus-theme'
 import { defaultPlatformSetting } from '@/utils/theme.ts'
+import useLoginStore from './login'
 
 export interface userStateTypes {
   userType: number // 1 系统操作者 2 对话用户
@@ -19,10 +21,9 @@ export interface userStateTypes {
   license_is_valid: boolean
   edition: 'CE' | 'PE' | 'EE'
   themeInfo: any
-  token: any
 }
 
-const useLoginStore = defineStore('user', {
+const useUserStore = defineStore('user', {
   state: (): userStateTypes => ({
     userType: 1, // 1 系统操作者 2 对话用户
     userInfo: null,
@@ -30,7 +31,6 @@ const useLoginStore = defineStore('user', {
     license_is_valid: false,
     edition: 'CE',
     themeInfo: null,
-    token: '',
   }),
   actions: {
     getLanguage() {
@@ -124,61 +124,12 @@ const useLoginStore = defineStore('user', {
     isEE() {
       return this.edition == 'EE' && this.license_is_valid
     },
-    // changeUserType(num: number, token?: string) {
-    //   this.userType = num
-    //   this.userAccessToken = token
-    // },
-
-    async dingCallback(code: string) {
-      return LoginApi.getDingCallback(code).then((ok) => {
-        this.token = ok.data
-        localStorage.setItem('token', ok.data)
-        return this.profile()
-      })
-    },
-    async dingOauth2Callback(code: string) {
-      return LoginApi.getDingOauth2Callback(code).then((ok) => {
-        this.token = ok.data
-        localStorage.setItem('token', ok.data)
-        return this.profile()
-      })
-    },
-    async wecomCallback(code: string) {
-      return LoginApi.getWecomCallback(code).then((ok) => {
-        this.token = ok.data
-        localStorage.setItem('token', ok.data)
-        return this.profile()
-      })
-    },
-    async larkCallback(code: string) {
-      return LoginApi.getLarkCallback(code).then((ok) => {
-        this.token = ok.data
-        localStorage.setItem('token', ok.data)
-        return this.profile()
-      })
+    changeUserType(num: number, token?: string) {
+      this.userType = num
+      const login = useLoginStore()
+      login.userAccessToken = token || ''
     },
 
-    async logout() {
-      return LoginApi.logout().then(() => {
-        localStorage.removeItem('token')
-        return true
-      })
-    },
-    async getAuthType() {
-      return LoginApi.getAuthType().then((ok) => {
-        return ok.data
-      })
-    },
-    async getQrType() {
-      return LoginApi.getQrType().then((ok) => {
-        return ok.data
-      })
-    },
-    async getQrSource() {
-      return LoginApi.getQrSource().then((ok) => {
-        return ok.data
-      })
-    },
     async postUserLanguage(lang: string, loading?: Ref<boolean>) {
       return new Promise((resolve, reject) => {
         LoginApi.postLanguage({ language: lang }, loading)
@@ -195,4 +146,4 @@ const useLoginStore = defineStore('user', {
   },
 })
 
-export default useLoginStore
+export default useUserStore

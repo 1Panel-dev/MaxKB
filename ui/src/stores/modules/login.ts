@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { type Ref } from 'vue'
-import loginApi from '@/api/user/login'
+import LoginApi from '@/api/user/login'
 import type { LoginRequest } from '@/api/type/login'
 import useUserStore from './user'
 
@@ -30,7 +30,7 @@ const useLoginStore = defineStore('login', {
     },
 
     async asyncLogin(data: LoginRequest, loading?: Ref<boolean>) {
-      return loginApi.login(data).then((ok) => {
+      return LoginApi.login(data).then((ok) => {
         this.token = ok?.data?.token
         localStorage.setItem('token', ok?.data?.token)
         const user = useUserStore()
@@ -38,13 +38,68 @@ const useLoginStore = defineStore('login', {
       })
     },
     async asyncLdapLogin(data: LoginRequest, loading?: Ref<boolean>) {
-      return loginApi.ldapLogin(data).then((ok) => {
+      return LoginApi.ldapLogin(data).then((ok) => {
         this.token = ok?.data?.token
         localStorage.setItem('token', ok?.data?.token)
         const user = useUserStore()
         return user.profile(loading)
       })
     },
+    async dingCallback(code: string) {
+      return LoginApi.getDingCallback(code).then((ok) => {
+        this.token = ok.data
+        localStorage.setItem('token', ok.data)
+        const user = useUserStore()
+        return user.profile()
+      })
+    },
+    async dingOauth2Callback(code: string) {
+      return LoginApi.getDingOauth2Callback(code).then((ok) => {
+        this.token = ok.data
+        localStorage.setItem('token', ok.data)
+        const user = useUserStore()
+        return user.profile()
+      })
+    },
+    async wecomCallback(code: string) {
+      return LoginApi.getWecomCallback(code).then((ok) => {
+        this.token = ok.data
+        localStorage.setItem('token', ok.data)
+        const user = useUserStore()
+        return user.profile()
+      })
+    },
+    async larkCallback(code: string) {
+      return LoginApi.getLarkCallback(code).then((ok) => {
+        this.token = ok.data
+        localStorage.setItem('token', ok.data)
+        const user = useUserStore()
+        return user.profile()
+      })
+    },
+
+    async logout() {
+      return LoginApi.logout().then(() => {
+        localStorage.removeItem('token')
+        return true
+      })
+    },
+    async getAuthType() {
+      return LoginApi.getAuthType().then((ok) => {
+        return ok.data
+      })
+    },
+    async getQrType() {
+      return LoginApi.getQrType().then((ok) => {
+        return ok.data
+      })
+    },
+    async getQrSource() {
+      return LoginApi.getQrSource().then((ok) => {
+        return ok.data
+      })
+    },
+
   },
 })
 
