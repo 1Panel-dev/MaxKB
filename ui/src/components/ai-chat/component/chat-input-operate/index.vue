@@ -156,35 +156,48 @@
           </el-space>
         </div>
       </el-scrollbar>
-      <div class="flex" :style="{ alignItems: isMicrophone ? 'center' : 'end' }">
-        <TouchChat
-          v-if="isMicrophone"
-          @TouchStart="startRecording"
-          @TouchEnd="TouchEnd"
-          :time="recorderTime"
-          :start="recorderStatus === 'START'"
-          :disabled="loading"
-        />
-        <el-input
-          v-else
-          ref="quickInputRef"
-          v-model="inputValue"
-          :placeholder="
-            recorderStatus === 'START'
-              ? `${$t('chat.inputPlaceholder.speaking')}...`
-              : recorderStatus === 'TRANSCRIBING'
-                ? `${$t('chat.inputPlaceholder.recorderLoading')}...`
-                : $t('chat.inputPlaceholder.default')
-          "
-          :autosize="{ minRows: 1, maxRows: isMobile ? 4 : 10 }"
-          type="textarea"
-          :maxlength="100000"
-          @keydown.enter="sendChatHandle($event)"
-          @paste="handlePaste"
-          @drop="handleDrop"
-        />
 
-        <div class="operate flex align-center">
+      <TouchChat
+        v-if="isMicrophone"
+        @TouchStart="startRecording"
+        @TouchEnd="TouchEnd"
+        :time="recorderTime"
+        :start="recorderStatus === 'START'"
+        :disabled="loading"
+      />
+      <el-input
+        v-else
+        ref="quickInputRef"
+        v-model="inputValue"
+        :placeholder="
+          recorderStatus === 'START'
+            ? `${$t('chat.inputPlaceholder.speaking')}...`
+            : recorderStatus === 'TRANSCRIBING'
+              ? `${$t('chat.inputPlaceholder.recorderLoading')}...`
+              : $t('chat.inputPlaceholder.default')
+        "
+        :autosize="{ minRows: 1, maxRows: isMobile ? 4 : 10 }"
+        type="textarea"
+        :maxlength="100000"
+        @keydown.enter="sendChatHandle($event)"
+        @paste="handlePaste"
+        @drop="handleDrop"
+      />
+
+      <div class="operate flex-between">
+        <div>
+          <!-- <el-button
+          v-if="isUserInput || isAPIInput"
+          class="user-input-button mb-8"
+          type="primary"
+          text
+          @click="toggleUserInput"
+        >
+          <AppIcon iconName="app-user-input"></AppIcon>
+        </el-button> -->
+        </div>
+
+        <div>
           <template v-if="props.applicationDetails.stt_model_enable">
             <span v-if="mode === 'mobile'">
               <el-button text @click="switchMicrophone(!isMicrophone)">
@@ -277,6 +290,7 @@
         </div>
       </div>
     </div>
+
     <div class="text-center" v-if="applicationDetails.disclaimer" style="margin-top: 8px">
       <el-text type="info" v-if="applicationDetails.disclaimer" style="font-size: 12px">
         <auto-tooltip :content="applicationDetails.disclaimer_value">

@@ -26,9 +26,7 @@
             <h4>{{ applicationDetail?.name }}</h4>
           </div>
           <el-button class="add-button w-full primary" @click="newChat">
-            <el-icon>
-              <Plus />
-            </el-icon>
+            <AppIcon iconName="app-create-chat"></AppIcon>
             <span class="ml-4">{{ $t('chat.createChat') }}</span>
           </el-button>
           <p class="mt-20 mb-8">{{ $t('chat.history') }}</p>
@@ -420,7 +418,7 @@ onMounted(() => {
     }
 
     .left-height {
-      height: calc(100vh - var(--app-header-height) - 85px);
+      height: calc(100vh - 140px);
     }
   }
 
@@ -431,7 +429,7 @@ onMounted(() => {
     box-sizing: border-box;
 
     .right-height {
-      height: calc(100vh - var(--app-header-height) * 2 - 24px);
+      height: calc(100vh - 85px);
     }
   }
 
@@ -489,7 +487,7 @@ onMounted(() => {
         position: fixed;
         width: 100%;
         z-index: 99;
-        height: calc(100vh - var(--app-header-height) + 6px);
+        height: calc(100vh);
       }
     }
     .collapse {

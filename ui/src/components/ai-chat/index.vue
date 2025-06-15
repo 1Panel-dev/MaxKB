@@ -74,21 +74,9 @@
         v-if="type !== 'log'"
       >
         <template #operateBefore>
-          <div class="flex-between">
-            <slot name="operateBefore">
-              <span></span>
-            </slot>
-
-            <el-button
-              v-if="isUserInput || isAPIInput"
-              class="user-input-button mb-8"
-              type="primary"
-              text
-              @click="toggleUserInput"
-            >
-              <AppIcon iconName="app-user-input"></AppIcon>
-            </el-button>
-          </div>
+          <slot name="operateBefore">
+            <span></span>
+          </slot>
         </template>
       </ChatInputOperate>
 
