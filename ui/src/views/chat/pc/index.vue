@@ -1,6 +1,6 @@
 <template>
   <div
-    class="chat-pc layout-bg"
+    class="chat-pc"
     :class="classObj"
     v-loading="loading"
     :style="{
@@ -8,12 +8,11 @@
       '--el-color-primary-light-9': hexToRgba(applicationDetail?.custom_theme?.theme_color, 0.1),
     }"
   >
-    11111111111
     <div class="flex">
       <div class="chat-pc__left border-r">
-        <div class="p-24 pb-0">
-          <div class="flex align-center">
-            <div class="mr-12 ml-24 flex">
+        <div class="p-16-24 pb-0">
+          <div class="flex align-center mb-16">
+            <div class="flex">
               <el-avatar
                 v-if="isAppIcon(applicationDetail?.icon)"
                 shape="square"
@@ -92,7 +91,7 @@
         </div>
       </div>
       <div class="chat-pc__right">
-        <div class="right-header border-b mb-24 p-16-24 flex-between">
+        <div class="mb-24 p-16-24 flex-between">
           <h4 class="ellipsis-1" style="width: 66%">
             {{ currentChatName }}
           </h4>
@@ -394,6 +393,7 @@ onMounted(() => {
 <style lang="scss">
 .chat-pc {
   overflow: hidden;
+  background: #eef1f4;
 
   &__header {
     background: var(--app-header-bg-color);
@@ -409,8 +409,10 @@ onMounted(() => {
   }
 
   &__left {
-    padding-top: calc(var(--app-header-height) - 8px);
-    background: #ffffff;
+    background:
+      linear-gradient(187.61deg, rgba(235, 241, 255, 0.5) 39.6%, rgba(231, 249, 255, 0.5) 94.3%),
+      #eef1f4;
+
     width: 280px;
 
     .add-button {
@@ -418,21 +420,15 @@ onMounted(() => {
     }
 
     .left-height {
-      height: calc(100vh - var(--app-header-height) - 135px);
+      height: calc(100vh - var(--app-header-height) - 85px);
     }
   }
 
   &__right {
     width: calc(100% - 280px);
-    padding-top: calc(var(--app-header-height));
     overflow: hidden;
     position: relative;
     box-sizing: border-box;
-
-    .right-header {
-      background: #ffffff;
-      box-sizing: border-box;
-    }
 
     .right-height {
       height: calc(100vh - var(--app-header-height) * 2 - 24px);

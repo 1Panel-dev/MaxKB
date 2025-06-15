@@ -303,7 +303,7 @@ import { t } from '@/locales'
 const router = useRouter()
 const route = useRoute()
 const {
-  query: { mode, question }
+  query: { mode, question },
 } = route as any
 const quickInputRef = ref()
 const props = withDefaults(
@@ -321,8 +321,8 @@ const props = withDefaults(
   }>(),
   {
     applicationDetails: () => ({}),
-    available: true
-  }
+    available: true,
+  },
 )
 const emit = defineEmits(['update:chatId', 'update:loading', 'update:showUserInput'])
 const chartOpenId = ref<string>()
@@ -336,7 +336,7 @@ const chatId_context = computed({
   set: (v) => {
     chartOpenId.value = v
     emit('update:chatId', v)
-  }
+  },
 })
 const localLoading = computed({
   get: () => {
@@ -344,7 +344,7 @@ const localLoading = computed({
   },
   set: (v) => {
     emit('update:loading', v)
-  }
+  },
 })
 
 const upload = ref()
@@ -418,7 +418,7 @@ const uploadFile = async (file: any, fileList: any) => {
   formData.append('file', file.raw, file.name)
   //
   const extension = file.name.split('.').pop().toUpperCase() // 获取文件后缀名并转为小写
-console.log(documentExtensions)
+  console.log(documentExtensions)
   if (imageExtensions.includes(extension)) {
     uploadImageList.value.push(file)
   } else if (documentExtensions.includes(extension)) {
@@ -447,13 +447,13 @@ console.log(documentExtensions)
       props.applicationDetails.id as string,
       chatId_context.value as string,
       formData,
-      localLoading
+      localLoading,
     )
     .then((response) => {
       fileList.splice(0, fileList.length)
       uploadImageList.value.forEach((file: any) => {
         const f = response.data.filter(
-          (f: any) => f.name.replaceAll(' ', '') === file.name.replaceAll(' ', '')
+          (f: any) => f.name.replaceAll(' ', '') === file.name.replaceAll(' ', ''),
         )
         if (f.length > 0) {
           file.url = f[0].url
@@ -462,7 +462,7 @@ console.log(documentExtensions)
       })
       uploadDocumentList.value.forEach((file: any) => {
         const f = response.data.filter(
-          (f: any) => f.name.replaceAll(' ', '') == file.name.replaceAll(' ', '')
+          (f: any) => f.name.replaceAll(' ', '') == file.name.replaceAll(' ', ''),
         )
         if (f.length > 0) {
           file.url = f[0].url
@@ -471,7 +471,7 @@ console.log(documentExtensions)
       })
       uploadAudioList.value.forEach((file: any) => {
         const f = response.data.filter(
-          (f: any) => f.name.replaceAll(' ', '') === file.name.replaceAll(' ', '')
+          (f: any) => f.name.replaceAll(' ', '') === file.name.replaceAll(' ', ''),
         )
         if (f.length > 0) {
           file.url = f[0].url
@@ -480,7 +480,7 @@ console.log(documentExtensions)
       })
       uploadVideoList.value.forEach((file: any) => {
         const f = response.data.filter(
-          (f: any) => f.name.replaceAll(' ', '') === file.name.replaceAll(' ', '')
+          (f: any) => f.name.replaceAll(' ', '') === file.name.replaceAll(' ', ''),
         )
         if (f.length > 0) {
           file.url = f[0].url
@@ -489,7 +489,7 @@ console.log(documentExtensions)
       })
       uploadOtherList.value.forEach((file: any) => {
         const f = response.data.filter(
-          (f: any) => f.name.replaceAll(' ', '') === file.name.replaceAll(' ', '')
+          (f: any) => f.name.replaceAll(' ', '') === file.name.replaceAll(' ', ''),
         )
         if (f.length > 0) {
           file.url = f[0].url
@@ -520,7 +520,7 @@ const handlePaste = (event: ClipboardEvent) => {
       size: rawFile.size,
       raw: rawFile, // 原始文件对象
       status: 'ready', // 文件状态
-      percentage: 0 // 上传进度
+      percentage: 0, // 上传进度
     }
 
     // 手动触发上传逻辑（模拟 on-change 事件）
@@ -544,7 +544,7 @@ const handleDrop = (event: DragEvent) => {
       size: rawFile.size,
       raw: rawFile,
       status: 'ready',
-      percentage: 0
+      percentage: 0,
     }
     uploadFile(elFile, [elFile])
   })
@@ -566,7 +566,7 @@ const uploadOtherList = ref<Array<any>>([])
 const showDelete = ref('')
 
 const isDisabledChat = computed(
-  () => !(inputValue.value.trim() && (props.appId || props.applicationDetails?.name))
+  () => !(inputValue.value.trim() && (props.appId || props.applicationDetails?.name)),
 )
 // 是否显示移动端语音按钮
 const isMicrophone = ref(false)
@@ -605,7 +605,7 @@ class RecorderManage {
     const recorder = new Recorder({
       type: 'mp3',
       bitRate: 128,
-      sampleRate: 16000
+      sampleRate: 16000,
     })
     if (!this.recorder) {
       recorder.open(() => {
@@ -625,7 +625,7 @@ class RecorderManage {
       const recorder = new Recorder({
         type: 'mp3',
         bitRate: 128,
-        sampleRate: 16000
+        sampleRate: 16000,
       })
       recorder.open(() => {
         this.recorder = recorder
@@ -648,9 +648,9 @@ class RecorderManage {
           MsgAlert(t('common.tip'), err, {
             confirmButtonText: t('chat.tip.confirm'),
             dangerouslyUseHTMLString: true,
-            customClass: 'record-tip-confirm'
+            customClass: 'record-tip-confirm',
           })
-        }
+        },
       )
     }
   }
@@ -666,7 +666,7 @@ class RecorderManage {
       MsgAlert(t('common.tip'), err, {
         confirmButtonText: t('chat.tip.confirm'),
         dangerouslyUseHTMLString: true,
-        customClass: 'record-tip-confirm'
+        customClass: 'record-tip-confirm',
       })
     } else {
       MsgAlert(
@@ -678,8 +678,8 @@ class RecorderManage {
         {
           confirmButtonText: t('chat.tip.confirm'),
           dangerouslyUseHTMLString: true,
-          customClass: 'record-tip-confirm'
-        }
+          customClass: 'record-tip-confirm',
+        },
       )
     }
   }
@@ -775,7 +775,7 @@ function autoSendMessage() {
         document_list: uploadDocumentList.value,
         audio_list: uploadAudioList.value,
         video_list: uploadVideoList.value,
-        other_list: uploadOtherList.value
+        other_list: uploadOtherList.value,
       })
       inputValue.value = ''
       uploadImageList.value = []
@@ -794,7 +794,7 @@ function autoSendMessage() {
 
 function sendChatHandle(event?: any) {
   const isMobile = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-    navigator.userAgent
+    navigator.userAgent,
   )
   // 如果是移动端，且按下回车键，不直接发送
   if ((isMobile || mode === 'mobile') && event?.key === 'Enter') {
@@ -816,7 +816,7 @@ function sendChatHandle(event?: any) {
 }
 const insertNewlineAtCursor = (event?: any) => {
   const textarea = quickInputRef.value.$el.querySelector(
-    '.el-textarea__inner'
+    '.el-textarea__inner',
   ) as HTMLTextAreaElement
   const startPos = textarea.selectionStart
   const endPos = textarea.selectionEnd
@@ -887,22 +887,10 @@ onMounted(() => {
 <style lang="scss" scoped>
 .ai-chat {
   &__operate {
-    background: #f3f7f9;
     position: relative;
     width: 100%;
     box-sizing: border-box;
     z-index: 10;
-
-    &:before {
-      background: linear-gradient(0deg, #f3f7f9 0%, rgba(243, 247, 249, 0) 100%);
-      content: '';
-      position: absolute;
-      width: 100%;
-      top: -16px;
-      left: 0;
-      height: 16px;
-    }
-
     :deep(.operate-textarea) {
       box-shadow: 0px 6px 24px 0px rgba(31, 35, 41, 0.08);
       background-color: #ffffff;
