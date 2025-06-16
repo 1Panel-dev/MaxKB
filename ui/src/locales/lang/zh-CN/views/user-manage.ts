@@ -23,12 +23,7 @@ export default {
       label: '姓名',
       placeholder: '请输入姓名',
     },
-    email: {
-      label: '邮箱',
-      placeholder: '请输入邮箱',
-      requiredMessage: '请输入邮箱',
-      validatorEmail: '请输入有效邮箱格式！',
-    },
+
     phone: {
       label: '手机号',
       placeholder: '请输入手机号',

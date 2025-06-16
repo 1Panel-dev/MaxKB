@@ -30,6 +30,12 @@ export default {
       requiredMessage: 'Please enter confirm password',
       validatorMessage: 'Password does not match',
     },
+    email: {
+      label: 'Email',
+      placeholder: 'Please enter email',
+      requiredMessage: 'Please enter email',
+      validatorEmail: 'Please enter a valid email format!',
+    },
   },
   jump_tip: 'You will be redirected to the authentication source page for authentication',
   jump: 'Redirect',

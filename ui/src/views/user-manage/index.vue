@@ -56,7 +56,7 @@
 
         <el-table-column
           prop="email"
-          :label="$t('views.userManage.userForm.email.label')"
+          :label="$t('views.login.loginForm.email.label')"
           show-overflow-tooltip
         >
           <template #default="{ row }">
