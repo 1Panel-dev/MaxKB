@@ -66,6 +66,7 @@ REST_FRAMEWORK = {
 STATICFILES_DIRS = [(os.path.join(PROJECT_DIR, 'ui', 'dist')), (os.path.join(PROJECT_DIR, 'chat', 'dist'))]
 STATIC_ROOT = os.path.join(BASE_DIR.parent, 'static')
 ROOT_URLCONF = 'maxkb.urls'
+APPS_DIR = os.path.join(PROJECT_DIR, 'apps')
 
 TEMPLATES = [
     {
