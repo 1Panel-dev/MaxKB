@@ -7,7 +7,7 @@ import type { knowledgeData } from '@/api/type/knowledge'
 import useStore from '@/stores'
 const prefix = '/system/shared'
 const prefix_workspace: any = { _value: '/workspace/' }
-Object.defineProperty(prefix, 'value', {
+Object.defineProperty(prefix_workspace, 'value', {
   get: function () {
     const { user } = useStore()
     return this._value + user.getWorkspaceId()
