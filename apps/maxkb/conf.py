@@ -40,7 +40,7 @@ class Config(dict):
         # 密码
         'REDIS_PASSWORD': 'Password123@redis',
         # 库
-        'REDIS_DB': 0,
+        'REDIS_DATABASE': 0,
         # 最大连接数
         'REDIS_MAX_CONNECTIONS': 100
     }
@@ -66,18 +66,42 @@ class Config(dict):
         }
 
     def get_cache_setting(self):
-        return {
-            'default': {
-                'BACKEND': 'django_redis.cache.RedisCache',
-                'LOCATION': f'redis://{self.get("REDIS_HOST")}:{self.get("REDIS_PORT")}',
-                'OPTIONS': {
-                    'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-                    "DB": self.get("REDIS_DB"),
-                    "PASSWORD": self.get("REDIS_PASSWORD"),
-                    "CONNECTION_POOL_KWARGS": {"max_connections": int(self.get("REDIS_MAX_CONNECTIONS"))}
+        if self.get("REDIS_SENTINEL_MASTER"):
+            # sentinel_nodes is set by env MAXKB_REDIS_SENTINEL_NODES=192.168.1.1:26379,192.168.1.2:26379,192.168.1.3:26379
+            sentinel_nodes = self.get("REDIS_SENTINEL_NODES");
+            # TODO parse sentinel_nodes to LOCATION below
+            return {
+                "default": {
+                    "BACKEND": "django_redis.cache.RedisCache",
+                    "LOCATION": [
+                        "sentinel://192.168.1.1:26379",
+                        "sentinel://192.168.1.2:26379",
+                        "sentinel://192.168.1.3:26379",
+                    ],
+                    "OPTIONS": {
+                        "CLIENT_CLASS": "django_redis.client.SentinelClient",
+                        "PASSWORD": self.get("REDIS_SENTINEL_PASSWORD"),
+                        "DB": self.get("REDIS_SENTINEL_DATABASE") or 0,
+                        "SENTINEL_MASTER_NAME": self.get("REDIS_SENTINEL_MASTER"),
+                        "SOCKET_TIMEOUT": float(self.get("REDIS_SENTINEL_SOCKET_TIMEOUT") or 10),
+                        "CONNECTION_POOL_KWARGS": {"max_connections": int(self.get("REDIS_SENTINEL_MAX_CONNECTIONS") or 100)}
+                    }
+                }
+            }
+        else:
+            return {
+                'default': {
+                    'BACKEND': 'django_redis.cache.RedisCache',
+                    'LOCATION': f'redis://{self.get("REDIS_HOST")}:{self.get("REDIS_PORT")}',
+                    'OPTIONS': {
+                        'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+                        "DB": self.get("REDIS_DATABASE"),
+                        "PASSWORD": self.get("REDIS_PASSWORD"),
+                        "CONNECTION_POOL_KWARGS": {"max_connections": int(self.get("REDIS_MAX_CONNECTIONS") or 100)}
+                    },
                 },
-            },
-        }
+            }
+
 
     def get_language_code(self):
         return self.get('LANGUAGE_CODE', 'zh-CN')
