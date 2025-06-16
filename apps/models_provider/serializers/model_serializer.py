@@ -386,3 +386,30 @@ class ModelSerializer(serializers.Serializer):
             model.model_params_form = model_params_form
             model.save()
             return True
+
+
+class SharedModelSerializer(serializers.Serializer):
+    workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+    name = serializers.CharField(required=False, max_length=64, label=_('model name'))
+    model_type = serializers.CharField(required=False, label=_('model type'))
+    model_name = serializers.CharField(required=False, label=_('base model'))
+    provider = serializers.CharField(required=False, label=_('provider'))
+    create_user = serializers.CharField(required=False, label=_('create user'))
+
+    def get_share_model_list(self):
+        self.is_valid(raise_exception=True)
+        queryset = QuerySet(Model).filter(workspace_id='None')
+        return [
+            {
+                'id': str(model.id),
+                'provider': model.provider,
+                'name': model.name,
+                'model_type': model.model_type,
+                'model_name': model.model_name,
+                'status': model.status,
+                'meta': model.meta,
+                'user_id': model.user_id,
+                'username': model.user.username
+            }
+            for model in queryset.order_by("-create_time")
+        ]

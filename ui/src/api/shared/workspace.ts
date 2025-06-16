@@ -1,15 +1,16 @@
-import { Result } from '@/request/Result'
-import { get, post, del, put, exportFile, exportExcel } from '@/request/index'
-import { type Ref } from 'vue'
-import type { pageRequest } from '@/api/type/common'
-import type { knowledgeData } from '@/api/type/knowledge'
+import {Result} from '@/request/Result'
+import {get, post, del, put, exportFile, exportExcel} from '@/request/index'
+import {type Ref} from 'vue'
+import type {pageRequest} from '@/api/type/common'
+import type {knowledgeData} from '@/api/type/knowledge'
 
 import useStore from '@/stores'
+
 const prefix = '/system/shared'
-const prefix_workspace: any = { _value: '/workspace/' }
+const prefix_workspace: any = {_value: 'workspace/'}
 Object.defineProperty(prefix_workspace, 'value', {
   get: function () {
-    const { user } = useStore()
+    const {user} = useStore()
     return this._value + user.getWorkspaceId()
   },
 })
@@ -38,10 +39,18 @@ const getSharedWorkspaceModel: (loading?: Ref<boolean>) => Promise<Result<Array<
   return get(`${prefix}/${prefix_workspace.value}/model`, {}, loading)
 }
 
+const getCESharedWorkspaceModel: (loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (
+  loading,
+) => {
+  return get(`/${prefix_workspace.value}/model`, {}, loading)
+
+}
+
 const getSharedWorkspaceModelPage: (
   param: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<Array<any>>> = (param: any, loading) => {
+  console.log(`${prefix}/${prefix_workspace.value}/model`)
   return get(`${prefix}/${prefix_workspace.value}/model`, param, loading)
 }
 
@@ -65,4 +74,5 @@ export default {
   getSharedWorkspaceModelPage,
   getSharedWorkspaceTool,
   getSharedWorkspaceToolPage,
+  getCESharedWorkspaceModel
 }
