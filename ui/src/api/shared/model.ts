@@ -10,6 +10,7 @@ import type {
 import type { FormField } from '@/components/dynamics-form/type'
 
 const prefix = '/system/shared'
+const workspace_id = localStorage.getItem('workspace_id') || 'default'
 
 /**
  * 获得模型列表
@@ -118,6 +119,21 @@ const deleteModel: (model_id: string, loading?: Ref<boolean>) => Promise<Result<
 ) => {
   return del(`${prefix}/model/${model_id}`, undefined, {}, loading)
 }
+
+
+
+const getSharedWorkspaceModel: (loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (
+  loading,
+) => {
+  return get(`${prefix}/workspace/${workspace_id}/model`, {}, loading)
+}
+
+const getSharedWorkspaceModelPage: (
+  param: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<Array<any>>> = (param: any, loading) => {
+  return get(`${prefix}/workspace/${workspace_id}/model`, param, loading)
+}
 export default {
   getModel,
   createModel,
@@ -128,4 +144,6 @@ export default {
   pauseDownload,
   getModelParamsForm,
   updateModelParamsForm,
+  getSharedWorkspaceModel,
+  getSharedWorkspaceModelPage
 }

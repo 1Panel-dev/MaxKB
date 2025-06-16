@@ -7,7 +7,7 @@
     clearable
   />
   <div class="pt-0">
-    <el-table row-key="id" :data="filterData" :max-height="tableHeight">
+    <el-table default-expand-all row-key="id" :data="filterData" :max-height="tableHeight">
       <el-table-column class-name="folder-flex" prop="name" :label="$t('common.name')">
         <template #default="{ row }">
           <div class="flex align-center">

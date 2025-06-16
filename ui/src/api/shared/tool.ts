@@ -5,6 +5,7 @@ import type { pageRequest } from '@/api/type/common'
 import type { toolData } from '@/api/type/tool'
 
 const prefix = '/system/shared'
+const workspace_id = localStorage.getItem('workspace_id') || 'default'
 
 /**
  * 获得工具文件夹列表
@@ -120,6 +121,19 @@ const postPylint: (code: string, loading?: Ref<boolean>) => Promise<Result<any>>
   return post(`${prefix}/tool/pylint`, { code }, {}, loading)
 }
 
+const getSharedWorkspaceTool: (loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (
+  loading,
+) => {
+  return get(`${prefix}/workspace/${workspace_id}/tool`, {}, loading)
+}
+
+const getSharedWorkspaceToolPage: (
+  param: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<Array<any>>> = (param: any, loading) => {
+  return get(`${prefix}/workspace/${workspace_id}/tool`, param, loading)
+}
+
 export default {
   getToolByFolder,
   getToolList,
@@ -132,4 +146,6 @@ export default {
   exportTool,
   putToolIcon,
   delTool,
+  getSharedWorkspaceTool,
+  getSharedWorkspaceToolPage
 }

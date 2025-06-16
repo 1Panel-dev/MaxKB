@@ -3,6 +3,8 @@ export default {
   subTitle: '系统设置',
   shared: '共享',
   shared_resources: '共享资源',
+  share_tool: '共享工具',
+  share_model: '共享模型',
   share_knowledge: '共享知识库',
   authorized_workspace: '授权工作空间',
   test: '测试连接',
