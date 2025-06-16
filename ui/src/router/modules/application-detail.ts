@@ -1,3 +1,6 @@
+import { ComplexPermission } from '@/utils/permission/type'
+import { PermissionConst, RoleConst } from '@/utils/permission/data'
+
 const ApplicationDetailRouter = {
   path: '/application/:id/:type',
   name: 'ApplicationDetail',
@@ -15,6 +18,10 @@ const ApplicationDetailRouter = {
         active: 'overview',
         parentPath: '/application/:id/:type',
         parentName: 'ApplicationDetail',
+        permission: [
+          PermissionConst.APPLICATION_OVERVIEW_READ.getWorkspacePermission,
+          RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        ],
       },
       component: () => import('@/views/application-overview/index.vue'),
     },
@@ -66,10 +73,10 @@ const ApplicationDetailRouter = {
         title: 'views.chatLog.title',
         active: 'chat-log',
         parentPath: '/application/:id/:type',
-        parentName: 'ApplicationDetail'
+        parentName: 'ApplicationDetail',
       },
-      component: () => import('@/views/chat-log/index.vue')
-    }
+      component: () => import('@/views/chat-log/index.vue'),
+    },
   ],
 }
 

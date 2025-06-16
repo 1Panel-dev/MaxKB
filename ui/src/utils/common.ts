@@ -66,3 +66,7 @@ export const defaultIcon = '/ui/favicon.ico'
 export function isAppIcon(url: string | undefined) {
   return url === defaultIcon ? '' : url
 }
+
+export function isFunction(fn: any) {
+  return typeof fn === 'function'
+}
