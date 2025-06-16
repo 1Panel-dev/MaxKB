@@ -4,8 +4,12 @@
     <div class="logo mt-4">
       <LogoFull />
     </div>
-    <el-divider direction="vertical" class="ml-24 mr-24" />
-    <Workspace />
+    <el-divider
+      direction="vertical"
+      class="ml-24 mr-24"
+      v-if="hasPermission(EditionConst.IS_EE, 'OR')"
+    />
+    <WorkspaceDropdown v-if="hasPermission(EditionConst.IS_EE, 'OR')" />
     <div class="flex-between w-full">
       <div></div>
       <TopMenu></TopMenu>
@@ -18,10 +22,14 @@
 import TopMenu from './top-menu/index.vue'
 import Avatar from './avatar/index.vue'
 import TopAbout from './top-about/index.vue'
-import Workspace from './workspace/index.vue'
-import { useRouter } from 'vue-router'
+import { EditionConst } from '@/utils/permission/data'
+import { hasPermission } from '@/utils/permission/index'
+import WorkspaceDropdown from './workspace-dropdown/index.vue'
 
+import { useRouter } from 'vue-router'
+import useStore from '@/stores'
 const router = useRouter()
+const { user } = useStore()
 </script>
 <style lang="scss" scoped>
 .app-top-bar-container {
