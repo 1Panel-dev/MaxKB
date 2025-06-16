@@ -38,7 +38,7 @@ class ApplicationKey(APIView):
     )
     @log(menu='Application', operate="Add ApiKey",
          get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')),
-         workspace_id=lambda r, k: k.get('workspace_id'))
+         )
     @has_permissions(PermissionConstants.APPLICATION_OVERVIEW_API_KEY.get_workspace_application_permission(),
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
                      )
@@ -80,7 +80,7 @@ class ApplicationKey(APIView):
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         @log(menu='Application', operate="Modify application API_KEY",
              get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')),
-             workspace_id=lambda r, k: k.get('workspace_id'))
+             )
         def put(self, request: Request, workspace_id: str, application_id: str, api_key_id: str):
             return result.success(
                 ApplicationKeySerializer.Operate(
@@ -102,7 +102,7 @@ class ApplicationKey(APIView):
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         @log(menu='Application', operate="Delete application API_KEY",
              get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')),
-             workspace_id=lambda r, k: k.get('workspace_id'))
+             )
         def delete(self, request: Request, workspace_id: str, application_id: str, api_key_id: str):
             return result.success(
                 ApplicationKeySerializer.Operate(

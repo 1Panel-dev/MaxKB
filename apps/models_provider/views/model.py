@@ -67,7 +67,7 @@ class ModelSetting(APIView):
     @has_permissions(PermissionConstants.MODEL_CREATE.get_workspace_permission())
     @log(menu='model', operate='Create model',
          get_operation_object=lambda r, k: {'name': r.date.get('name')},
-         get_details=get_edit_model_details, workspace_id=lambda r, k: k.get('workspace_id')
+         get_details=get_edit_model_details, 
          )
     def post(self, request: Request, workspace_id: str):
         return result.success(
@@ -114,7 +114,7 @@ class ModelSetting(APIView):
         @has_permissions(PermissionConstants.MODEL_EDIT.get_workspace_permission())
         @log(menu='model', operate='Update model',
              get_operation_object=lambda r, k: get_model_operation_object(k.get('model_id')),
-             get_details=get_edit_model_details, workspace_id=lambda r, k: k.get('workspace_id')
+             get_details=get_edit_model_details, 
              )
         def put(self, request: Request, workspace_id, model_id: str):
             return result.success(
@@ -131,7 +131,7 @@ class ModelSetting(APIView):
         @has_permissions(PermissionConstants.MODEL_DELETE.get_workspace_permission())
         @log(menu='model', operate='Delete model',
              get_operation_object=lambda r, k: get_model_operation_object(k.get('model_id')),
-             workspace_id=lambda r, k: k.get('workspace_id'))
+             )
         def delete(self, request: Request, workspace_id: str, model_id: str):
             return result.success(
                 ModelSerializer.Operate(data={'id': model_id, 'user_id': request.user.id}).delete())
@@ -174,7 +174,7 @@ class ModelSetting(APIView):
         @has_permissions(PermissionConstants.MODEL_READ.get_workspace_permission())
         @log(menu='model', operate='Save model parameter form',
              get_operation_object=lambda r, k: get_model_operation_object(k.get('model_id')),
-             workspace_id=lambda r, k: k.get('workspace_id'))
+             )
         def put(self, request: Request, workspace_id: str, model_id: str):
             return result.success(
                 ModelSerializer.ModelParams(data={'id': model_id}).save_model_params_form(request.data))

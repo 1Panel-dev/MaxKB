@@ -65,7 +65,7 @@ class KnowledgeView(APIView):
         @log(
             menu='Knowledge Base', operate="Modify knowledge base information",
             get_operation_object=lambda r, keywords: get_knowledge_operation_object(keywords.get('knowledge_id')),
-            workspace_id=lambda r, keywords: keywords.get('workspace_id')
+            
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(KnowledgeSerializer.Operate(
@@ -89,7 +89,7 @@ class KnowledgeView(APIView):
         @log(
             menu='Knowledge Base', operate="Delete knowledge base",
             get_operation_object=lambda r, keywords: get_knowledge_operation_object(keywords.get('knowledge_id')),
-            workspace_id=lambda r, keywords: keywords.get('workspace_id')
+            
         )
         def delete(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(KnowledgeSerializer.Operate(
@@ -162,7 +162,7 @@ class KnowledgeView(APIView):
         @log(
             menu='Knowledge Base', operate="Synchronize the knowledge base of the website",
             get_operation_object=lambda r, keywords: get_knowledge_operation_object(keywords.get('knowledge_id')),
-            workspace_id=lambda r, keywords: keywords.get('workspace_id')
+            
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(KnowledgeSerializer.SyncWeb(
@@ -224,7 +224,7 @@ class KnowledgeView(APIView):
         @log(
             menu='Knowledge Base', operate='Re-vectorize',
             get_operation_object=lambda r, k: get_knowledge_operation_object(k.get('knowledge_id')),
-            workspace_id=lambda r, keywords: keywords.get('workspace_id')
+            
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(KnowledgeSerializer.Operate(
@@ -248,7 +248,7 @@ class KnowledgeView(APIView):
         @log(
             menu='Knowledge Base', operate="Export knowledge base",
             get_operation_object=lambda r, keywords: get_knowledge_operation_object(keywords.get('knowledge_id')),
-            workspace_id=lambda r, keywords: keywords.get('workspace_id')
+            
         )
         def get(self, request: Request, workspace_id: str, knowledge_id: str):
             return KnowledgeSerializer.Operate(data={
@@ -272,7 +272,7 @@ class KnowledgeView(APIView):
         @log(
             menu='Knowledge Base', operate="Export knowledge base containing images",
             get_operation_object=lambda r, keywords: get_knowledge_operation_object(keywords.get('knowledge_id')),
-            workspace_id=lambda r, keywords: keywords.get('workspace_id')
+            
         )
         def get(self, request: Request, workspace_id: str, knowledge_id: str):
             return KnowledgeSerializer.Operate(data={
@@ -299,7 +299,7 @@ class KnowledgeView(APIView):
         @log(
             menu='document', operate='Generate related documents',
             get_operation_object=lambda r, k: get_knowledge_operation_object(k.get('knowledge_id')),
-            workspace_id=lambda r, keywords: keywords.get('workspace_id')
+            
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(KnowledgeSerializer.Operate(
@@ -375,7 +375,7 @@ class KnowledgeBaseView(APIView):
     @log(
         menu='knowledge Base', operate='Create base knowledge',
         get_operation_object=lambda r, k: {'name': r.data.get('name'), 'desc': r.data.get('desc')},
-        workspace_id=lambda r, keywords: keywords.get('workspace_id')
+        
     )
     def post(self, request: Request, workspace_id: str):
         return result.success(KnowledgeSerializer.Create(
@@ -407,7 +407,7 @@ class KnowledgeWebView(APIView):
                                            'meta': {'source_url': r.data.get('source_url'),
                                                     'selector': r.data.get('selector'),
                                                     'embedding_model_id': r.data.get('embedding_model_id')}}
-        , workspace_id=lambda r, keywords: keywords.get('workspace_id')
+        , 
     )
     def post(self, request: Request, workspace_id: str):
         return result.success(KnowledgeSerializer.Create(

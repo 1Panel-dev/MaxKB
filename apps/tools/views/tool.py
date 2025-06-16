@@ -44,7 +44,7 @@ class ToolView(APIView):
     )
     @log(
         menu="Tool", operate="Create tool",
-        get_operation_object=lambda r, k: r.data.get('name'), workspace_id=lambda r, k: k.get('workspace_id')
+        get_operation_object=lambda r, k: r.data.get('name'), 
     )
     def post(self, request: Request, workspace_id: str):
         return result.success(ToolSerializer.Create(
@@ -110,7 +110,7 @@ class ToolView(APIView):
         @log(
             menu='Tool', operate='Update tool',
             get_operation_object=lambda r, k: get_tool_operation_object(k.get('tool_id')),
-            workspace_id=lambda r, k: k.get('workspace_id')
+            
         )
         def put(self, request: Request, workspace_id: str, tool_id: str):
             return result.success(ToolSerializer.Operate(
@@ -152,7 +152,7 @@ class ToolView(APIView):
         @log(
             menu='Tool', operate="Delete tool",
             get_operation_object=lambda r, k: get_tool_operation_object(k.get('tool_id')),
-            workspace_id=lambda r, k: k.get('workspace_id')
+            
         )
         def delete(self, request: Request, workspace_id: str, tool_id: str):
             return result.success(ToolSerializer.Operate(
@@ -204,7 +204,7 @@ class ToolView(APIView):
             PermissionConstants.TOOL_IMPORT.get_workspace_permission(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
         )
-        @log(menu='Tool', operate='Import tool', workspace_id=lambda r, k: k.get('workspace_id'))
+        @log(menu='Tool', operate='Import tool', )
         def post(self, request: Request, workspace_id: str):
             return result.success(ToolSerializer.Import(
                 data={'workspace_id': workspace_id, 'file': request.FILES.get('file'), 'user_id': request.user.id}
@@ -229,7 +229,7 @@ class ToolView(APIView):
         @log(
             menu='Tool', operate="Export function",
             get_operation_object=lambda r, k: get_tool_operation_object(k.get('id')),
-            workspace_id=lambda r, k: k.get('workspace_id')
+            
         )
         def get(self, request: Request, tool_id: str, workspace_id: str):
             return ToolSerializer.Operate(

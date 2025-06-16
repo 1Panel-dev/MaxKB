@@ -97,7 +97,7 @@ class ApplicationVersionView(APIView):
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         @log(menu='Application', operate="Modify application version information",
              get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')),
-             workspace_id=lambda r, k: k.get('workspace_id'))
+             )
         def put(self, request: Request, workspace_id: str, application_id: str, work_flow_version_id: str):
             return result.success(
                 ApplicationVersionSerializer.Operate(

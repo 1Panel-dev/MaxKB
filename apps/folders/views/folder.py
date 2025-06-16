@@ -44,7 +44,7 @@ class FolderView(APIView):
     @log(
         menu='folder', operate='Create folder',
         get_operation_object=lambda r, k: {'name': r.data.get('name')},
-        workspace_id=lambda r, k: k.get('workspace_id')
+        
     )
     def post(self, request: Request, workspace_id: str, source: str):
         return result.success(FolderSerializer.Create(
@@ -93,7 +93,7 @@ class FolderView(APIView):
         @log(
             menu='folder', operate='Edit folder',
             get_operation_object=lambda r, k: get_folder_operation_object(k.get('folder_id'), k.get('source')),
-            workspace_id=lambda r, k: k.get('workspace_id')
+            
         )
         def put(self, request: Request, workspace_id: str, source: str, folder_id: str):
             return result.success(FolderSerializer.Operate(
@@ -136,7 +136,7 @@ class FolderView(APIView):
         @log(
             menu='folder', operate='Delete folder',
             get_operation_object=lambda r, k: get_folder_operation_object(k.get('folder_id'), k.get('source')),
-            workspace_id=lambda r, k: k.get('workspace_id')
+            
         )
         def delete(self, request: Request, workspace_id: str, source: str, folder_id: str):
             return result.success(FolderSerializer.Operate(

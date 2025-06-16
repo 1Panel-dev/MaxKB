@@ -40,7 +40,7 @@ class DocumentView(APIView):
     @log(menu='document', operate="Create document",
          get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
              get_knowledge_operation_object(keywords.get('knowledge_id')),
-             {'name': r.data.get('name')}), workspace_id=lambda r, keywords: keywords.get('workspace_id'))
+             {'name': r.data.get('name')}), )
     def post(self, request: Request, workspace_id: str, knowledge_id: str):
         return result.success(
             DocumentSerializers.Create(
@@ -112,7 +112,7 @@ class DocumentView(APIView):
             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
                 get_knowledge_operation_object(keywords.get('knowledge_id')),
                 get_document_operation_object(keywords.get('document_id'))
-            ), workspace_id=lambda r, keywords: keywords.get('workspace_id')
+            ), 
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
             return result.success(DocumentSerializers.Operate(data={
@@ -136,7 +136,7 @@ class DocumentView(APIView):
             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
                 get_knowledge_operation_object(keywords.get('knowledge_id')),
                 get_document_operation_object(keywords.get('document_id'))
-            ), workspace_id=lambda r, keywords: keywords.get('workspace_id')
+            ), 
         )
         def delete(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
             operate = DocumentSerializers.Operate(data={
@@ -217,7 +217,7 @@ class DocumentView(APIView):
             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
                 get_knowledge_operation_object(keywords.get('knowledge_id')),
                 get_document_operation_object_batch(r.data.get('id_list'))),
-            workspace_id=lambda r, keywords: keywords.get('workspace_id')
+            
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(DocumentSerializers.Batch(
@@ -246,7 +246,7 @@ class DocumentView(APIView):
             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
                 get_knowledge_operation_object(keywords.get('knowledge_id')),
                 get_document_operation_object(keywords.get('document_id'))
-            ), workspace_id=lambda r, keywords: keywords.get('workspace_id')
+            ), 
         )
         def get(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
             return result.success(DocumentSerializers.Sync(
@@ -275,7 +275,7 @@ class DocumentView(APIView):
             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
                 get_knowledge_operation_object(keywords.get('knowledge_id')),
                 get_document_operation_object(keywords.get('document_id'))
-            ), workspace_id=lambda r, keywords: keywords.get('workspace_id')
+            ), 
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
             return result.success(DocumentSerializers.Operate(
@@ -303,7 +303,7 @@ class DocumentView(APIView):
             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
                 get_knowledge_operation_object(keywords.get('knowledge_id')),
                 get_document_operation_object(keywords.get('document_id'))
-            ), workspace_id=lambda r, keywords: keywords.get('workspace_id')
+            ), 
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
             return result.success(DocumentSerializers.Operate(
@@ -331,7 +331,7 @@ class DocumentView(APIView):
             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
                 get_knowledge_operation_object(keywords.get('knowledge_id')),
                 get_document_operation_object_batch(r.data.get('id_list'))
-            ), workspace_id=lambda r, keywords: keywords.get('workspace_id')
+            ), 
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(DocumentSerializers.Batch(data={
@@ -361,7 +361,7 @@ class DocumentView(APIView):
             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
                 get_knowledge_operation_object(keywords.get('knowledge_id')),
                 {'name': f'[{",".join([document.get("name") for document in r.data])}]',
-                 'document_list': r.data}), workspace_id=lambda r, keywords: keywords.get('workspace_id')
+                 'document_list': r.data}), 
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(DocumentSerializers.Batch(
@@ -391,7 +391,7 @@ class DocumentView(APIView):
             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
                 get_knowledge_operation_object(keywords.get('knowledge_id')),
                 get_document_operation_object_batch(r.data.get('id_list'))),
-            workspace_id=lambda r, keywords: keywords.get('workspace_id')
+            
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(DocumentSerializers.Batch(
@@ -421,7 +421,7 @@ class DocumentView(APIView):
             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
                 get_knowledge_operation_object(keywords.get('knowledge_id')),
                 get_document_operation_object_batch(r.data.get('id_list'))),
-            workspace_id=lambda r, keywords: keywords.get('workspace_id')
+            
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(DocumentSerializers.Batch(
@@ -450,7 +450,7 @@ class DocumentView(APIView):
             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
                 get_knowledge_operation_object(keywords.get('knowledge_id')),
                 get_document_operation_object_batch(r.data.get('id_list'))
-            ), workspace_id=lambda r, keywords: keywords.get('workspace_id')
+            ), 
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(
@@ -481,7 +481,7 @@ class DocumentView(APIView):
             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
                 get_knowledge_operation_object(keywords.get('knowledge_id')),
                 get_document_operation_object_batch(r.data.get('document_id_list'))
-            ), workspace_id=lambda r, keywords: keywords.get('workspace_id')
+            ), 
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(DocumentSerializers.BatchGenerateRelated(
@@ -535,7 +535,7 @@ class DocumentView(APIView):
             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
                 get_knowledge_operation_object(keywords.get('knowledge_id')),
                 get_document_operation_object(keywords.get('document_id'))
-            ), workspace_id=lambda r, keywords: keywords.get('workspace_id')
+            ), 
         )
         def get(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
             return DocumentSerializers.Operate(data={
@@ -561,7 +561,7 @@ class DocumentView(APIView):
             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
                 get_knowledge_operation_object(keywords.get('knowledge_id')),
                 get_document_operation_object(keywords.get('document_id'))
-            ), workspace_id=lambda r, keywords: keywords.get('workspace_id')
+            ), 
         )
         def get(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
             return DocumentSerializers.Operate(data={
@@ -607,7 +607,7 @@ class DocumentView(APIView):
             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
                 get_knowledge_operation_object(keywords.get('knowledge_id')),
                 get_document_operation_object_batch(r.data)
-            ), workspace_id=lambda r, keywords: keywords.get('workspace_id')
+            ), 
         )
         def put(self, request: Request, workspace_id, knowledge_id: str, target_knowledge_id: str):
             return result.success(DocumentSerializers.Migrate(
@@ -642,7 +642,7 @@ class WebDocumentView(APIView):
             get_knowledge_operation_object(keywords.get('knowledge_id')),
             {'name': f'[{",".join([url for url in r.data.get("source_url_list", [])])}]',
              'document_list': [{'name': url} for url in r.data.get("source_url_list", [])]}),
-        workspace_id=lambda r, keywords: keywords.get('workspace_id')
+        
     )
     def post(self, request: Request, workspace_id: str, knowledge_id: str):
         return result.success(DocumentSerializers.Create(data={
@@ -673,7 +673,7 @@ class QaDocumentView(APIView):
             get_knowledge_operation_object(keywords.get('knowledge_id')),
             {'name': f'[{",".join([file.name for file in r.FILES.getlist("file")])}]',
              'document_list': [{'name': file.name} for file in r.FILES.getlist("file")]}),
-        workspace_id=lambda r, keywords: keywords.get('workspace_id')
+        
     )
     def post(self, request: Request, workspace_id: str, knowledge_id: str):
         return result.success(DocumentSerializers.Create(data={
@@ -704,7 +704,7 @@ class TableDocumentView(APIView):
             get_knowledge_operation_object(keywords.get('knowledge_id')),
             {'name': f'[{",".join([file.name for file in r.FILES.getlist("file")])}]',
              'document_list': [{'name': file.name} for file in r.FILES.getlist("file")]}),
-        workspace_id=lambda r, keywords: keywords.get('workspace_id')
+        
     )
     def post(self, request: Request, workspace_id: str, knowledge_id: str):
         return result.success(DocumentSerializers.Create(

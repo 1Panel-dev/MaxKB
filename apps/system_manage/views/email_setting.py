@@ -55,7 +55,7 @@ class SystemSetting(APIView):
                        responses=EmailSettingAPI.get_response(),
                        tags=[_('Email Settings')])  # type: ignore
         @log(menu='Email settings', operate='Create or update email settings',
-             get_details=get_email_details, workspace_id='None')
+             get_details=get_email_details)
         @has_permissions(PermissionConstants.EMAIL_SETTING_EDIT)
         def put(self, request: Request):
             return result.success(
@@ -72,7 +72,7 @@ class SystemSetting(APIView):
         )
         @has_permissions(PermissionConstants.EMAIL_SETTING_EDIT)
         @log(menu='Email settings', operate='Test email settings',
-             get_details=get_email_details, workspace_id='None'
+             get_details=get_email_details
              )
         def post(self, request: Request):
             return result.success(

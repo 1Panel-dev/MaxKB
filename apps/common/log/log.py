@@ -57,7 +57,7 @@ def _get_details(request):
 
 
 def _get_workspace_id(request, kwargs):
-    return kwargs.get('workspace_id', None)
+    return kwargs.get('workspace_id', 'None')
 
 
 def log(menu: str, operate, get_user=_get_user, get_ip_address=_get_ip_address, get_details=_get_details,
