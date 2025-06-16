@@ -969,6 +969,8 @@ class DocumentSerializers(serializers.Serializer):
 
         @staticmethod
         def link_file(source_file_id, document_id):
+            if source_file_id is None:
+                return
             source_file = QuerySet(File).filter(id=source_file_id).first()
             if source_file:
                 # 获取原始文件内容
@@ -1016,7 +1018,7 @@ class DocumentSerializers(serializers.Serializer):
                 )
                 # 保存文档和文件的关系
                 document_instance = document_paragraph_dict_model.get('document')
-                self.link_file(document['source_file_id'], document_instance.id)
+                self.link_file(document.get('source_file_id'), document_instance.id)
                 document_model_list.append(document_instance)
                 for paragraph in document_paragraph_dict_model.get('paragraph_model_list'):
                     paragraph_model_list.append(paragraph)
