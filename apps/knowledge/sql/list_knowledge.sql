@@ -11,6 +11,7 @@ FROM (SELECT "temp_knowledge".id::text, "temp_knowledge".name,
              "temp_knowledge".file_size_limit,
              "temp_knowledge".file_count_limit,
              "temp_knowledge"."scope",
+             "temp_knowledge"."embedding_model_id"::text,
              "document_temp"."char_length",
              CASE
                  WHEN
@@ -40,6 +41,7 @@ FROM (SELECT "temp_knowledge".id::text, "temp_knowledge".name,
              0           as file_size_limit,
              0           as file_count_limit,
              'WORKSPACE' as "scope",
+             ''          as "embedding_model_id",
              0 as char_length,
                 0 as application_mapping_count,
                 0 as document_count
