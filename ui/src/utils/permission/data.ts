@@ -1,4 +1,4 @@
-import { Permission, Role } from '@/utils/permission/type'
+import { Permission, Role, Edition } from '@/utils/permission/type'
 const PermissionConst = {
   USER_READ: new Permission('USER:READ'),
   USER_CREATE: new Permission('USER:CREATE'),
@@ -10,4 +10,9 @@ const RoleConst = {
   WORKSPACE_MANAGE: new Role('WORKSPACE_MANAGE'),
   USER: new Role('USER'),
 }
-export { PermissionConst, RoleConst }
+const EditionConst = {
+  IS_PE: new Edition('X-PACK-PE'),
+  IS_EE: new Edition('X-PACK-EE'),
+  IS_CE: new Edition('X-PACK-CE'),
+}
+export { PermissionConst, RoleConst, EditionConst }

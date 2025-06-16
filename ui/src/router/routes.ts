@@ -46,6 +46,11 @@ export const routes: Array<RouteRecordRaw> = [
     name: 'ResetPassword',
     component: () => import('@/views/login/ResetPassword.vue'),
   },
+  {
+    path: '/permission',
+    name: 'permission',
+    component: () => import('@/views/Permission.vue'),
+  },
   // {
   //   path: '/:pathMatch(.*)',
   //   name: '404',

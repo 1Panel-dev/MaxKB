@@ -93,14 +93,26 @@ const useUserStore = defineStore('user', {
     getPermissions() {
       if (this.userInfo) {
         if (this.isEE()) {
-          return [...this.userInfo?.permissions, 'x-pack-ee']
+          return [...this.userInfo?.permissions, 'X-PACK-EE']
         } else if (this.isPE()) {
-          return [...this.userInfo?.permissions, 'x-pack-pe']
+          return [...this.userInfo?.permissions, 'X-PACK-PE']
         }
         return this.userInfo?.permissions
       } else {
         return []
       }
+    },
+    getEdition() {
+      if (this.userInfo) {
+        if (this.isEE()) {
+          return 'X-PACK-EE'
+        } else if (this.isPE()) {
+          return 'X-PACK-PE'
+        } else {
+          return 'X-PACK-CE'
+        }
+      }
+      return 'X-PACK-CE'
     },
     getRole() {
       if (this.userInfo) {

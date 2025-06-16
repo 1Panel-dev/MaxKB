@@ -1,21 +1,30 @@
 import useStore from '@/stores'
-import { Role, Permission, ComplexPermission } from '@/utils/permission/type'
+import {
+  Role,
+  Permission,
+  ComplexPermission,
+  Edition,
+  type PF,
+  type CPF,
+  type CRF,
+} from '@/utils/permission/type'
 import { isFunction } from '@/utils/common'
 
-type PF = () => Role | string | Permission | ComplexPermission
 /**
  * 是否包含当前权限
  * @param permission 当前权限
  * @returns  True 包含 false 不包含
  */
-const hasPermissionChild = (permission: Role | string | Permission | ComplexPermission | PF) => {
+const hasPermissionChild = (
+  permission: Role | string | Permission | ComplexPermission | Edition | PF,
+) => {
   const { user } = useStore()
   const permissions = user.getPermissions()
   const role: Array<string> = user.getRole()
+  const edition = user.getEdition()
   if (!permission) {
     return true
   }
-
   if (isFunction(permission)) {
     permission = (permission as PF)()
   }
@@ -25,10 +34,22 @@ const hasPermissionChild = (permission: Role | string | Permission | ComplexPerm
   if (permission instanceof Permission) {
     return permissions.includes(permission.permission)
   }
+  if (permission instanceof Edition) {
+    return permission.edition === edition
+  }
   if (permission instanceof ComplexPermission) {
-    const permissionOk = permission.permissionList.some((p) => permissions.includes(p))
-    const roleOk = role.some((r) => permission.roleList.includes(r))
-    return permission.compare === 'AND' ? permissionOk && roleOk : permissionOk || roleOk
+    const permissionOk = permission.permissionList.some((p) =>
+      permissions.includes(isFunction(p) ? (p as CPF)().toString() : p.toString()),
+    )
+    const roleList = permission.roleList
+    const roleOk = roleList.some((r) =>
+      role.includes(isFunction(r) ? (r as CRF)().toString() : r.toString()),
+    )
+    const editionOK = permission.editionList.includes(edition.toString())
+
+    return permission.compare === 'AND'
+      ? permissionOk && roleOk && editionOK
+      : (permissionOk || roleOk) && editionOK
   }
   if (typeof permission === 'string') {
     return permissions.includes(permission)
@@ -45,10 +66,11 @@ const hasPermissionChild = (permission: Role | string | Permission | ComplexPerm
  */
 export const hasPermission = (
   permission:
-    | Array<Role | string | Permission | ComplexPermission | PF>
+    | Array<Role | string | Permission | ComplexPermission | Edition | PF>
     | Role
     | string
     | Permission
+    | Edition
     | ComplexPermission
     | PF,
   compare: 'OR' | 'AND',
