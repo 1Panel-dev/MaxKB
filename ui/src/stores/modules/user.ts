@@ -73,7 +73,6 @@ const useUserStore = defineStore('user', {
         UserApi.getProfile()
           .then(async (ok) => {
             // this.version = ok.data?.version || '-'
-            console.log(ok)
             this.license_is_valid = ok.data.license_is_valid
             this.edition = ok.data.edition
 
@@ -91,21 +90,23 @@ const useUserStore = defineStore('user', {
           })
       })
     },
-
     getPermissions() {
       if (this.userInfo) {
-        return this.isXPack && this.XPACK_LICENSE_IS_VALID
-          ? [...this.userInfo?.permissions, 'x-pack']
-          : this.userInfo?.permissions
-      } else {
+        if (this.isEE()) {
+          return [...this.userInfo?.permissions, 'x-pack-ee']
+        } else if (this.isPE()) {
+          return [...this.userInfo?.permissions, 'x-pack-pe']
+        }
         return this.userInfo?.permissions
+      } else {
+        return []
       }
     },
     getRole() {
       if (this.userInfo) {
         return this.userInfo?.role
       } else {
-        return ''
+        return []
       }
     },
     async theme(loading?: Ref<boolean>) {

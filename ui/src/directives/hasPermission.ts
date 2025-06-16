@@ -1,6 +1,5 @@
 import type { App } from 'vue'
 import { hasPermission } from '@/utils/permission'
-
 const display = async (el: any, binding: any) => {
   const has = hasPermission(
     binding.value?.permission || binding.value,

@@ -1,3 +1,4 @@
+import useStore from '@/stores'
 /**
  * 角色对象
  */
@@ -6,6 +7,11 @@ export class Role {
 
   constructor(role: string) {
     this.role = role
+  }
+
+  getWorkspaceRole = () => {
+    const { user } = useStore()
+    return new Role(`${this.role}:/WORKSPACE/${user.getWorkspaceId()}`)
   }
 }
 /**
@@ -22,8 +28,9 @@ export class Permission {
    * @param workspace_id 工作空间id
    * @returns 工作空间权限
    */
-  getWorkspacePermission(workspace_id: string) {
-    return `${this.permission}:/WORKSPACE/${workspace_id}`
+  getWorkspacePermission = () => {
+    const { user } = useStore()
+    return `${this.permission}:/WORKSPACE/${user.getWorkspaceId()}`
   }
   /**
    * 工作空间资源权限
@@ -32,8 +39,9 @@ export class Permission {
    * @param resource_id  资源id
    * @returns  工作空间资源权限
    */
-  getWorkspaceResourcePermission(workspace_id: string, resource: string, resource_id: string) {
-    return `${this.permission}:/WORKSPACE/${workspace_id}/${resource}/${resource_id}`
+  getWorkspaceResourcePermission = (resource: string, resource_id: string) => {
+    const { user } = useStore()
+    return `${this.permission}:/WORKSPACE/${user.getWorkspaceId()}/${resource}/${resource_id}`
   }
 }
 /**
