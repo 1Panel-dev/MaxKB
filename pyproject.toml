@@ -41,6 +41,7 @@ cffi = "1.17.1"
 pysilk = "0.0.1"
 sentence-transformers = "4.1.0"
 websockets = "15.0.1"
+psutil = "7.0.0"
 celery = { extras = ["sqlalchemy"], version = "5.5.3" }
 django-celery-beat = "2.8.1"
 celery-once = "3.0.1"
