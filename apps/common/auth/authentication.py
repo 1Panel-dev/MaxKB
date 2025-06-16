@@ -34,7 +34,7 @@ def exist_role_by_role_constants(user_role: List[RoleConstants],
     :param role_list: 需要拥有的角色
     :return:  是否拥有
     """
-    return any(list(map(lambda up: role_list.__contains__(up), user_role)))
+    return any([True for role in role_list if user_role.__contains__(role.value.__str__())])
 
 
 def exist_permissions_by_view_permission(user_role: List[RoleConstants],
