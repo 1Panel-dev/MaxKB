@@ -17,6 +17,13 @@ export default {
     moduleName: 'Module name'
   },
   member: {
-    title: 'Members'
+    title: 'Members',
+    add: 'Add Member',
+    workspace: 'worksapce',
+    role: 'role',
+    delete: {
+      button: 'remove',
+      confirmTitle: 'Whether to remove the member:',    
   }
-};
+}
+}
