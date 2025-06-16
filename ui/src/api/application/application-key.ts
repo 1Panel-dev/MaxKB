@@ -1,10 +1,15 @@
 import { Result } from '@/request/Result'
 import { get, post, del, put } from '@/request/index'
-
+import useStore from '@/stores'
 import { type Ref } from 'vue'
 
-const prefix = '/workspace/' + localStorage.getItem('workspace_id') + '/application'
-
+const prefix: any = { _value: '/workspace/' }
+Object.defineProperty(prefix, 'value', {
+  get: function () {
+    const { user } = useStore()
+    return this._value + user.getWorkspaceId() + '/application'
+  },
+})
 /**
  * API_KEY列表
  * @param 参数 application_id
@@ -13,7 +18,7 @@ const getAPIKey: (application_id: string, loading?: Ref<boolean>) => Promise<Res
   application_id,
   loading,
 ) => {
-  return get(`${prefix}/${application_id}/application`, undefined, loading)
+  return get(`${prefix.value}/${application_id}/application`, undefined, loading)
 }
 
 /**
@@ -24,7 +29,7 @@ const postAPIKey: (application_id: string, loading?: Ref<boolean>) => Promise<Re
   application_id,
   loading,
 ) => {
-  return post(`${prefix}/${application_id}/application`, {}, undefined, loading)
+  return post(`${prefix.value}/${application_id}/application`, {}, undefined, loading)
 }
 
 /**
@@ -36,7 +41,12 @@ const delAPIKey: (
   api_key_id: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<boolean>> = (application_id, api_key_id, loading) => {
-  return del(`${prefix}/${application_id}/application/${api_key_id}`, undefined, undefined, loading)
+  return del(
+    `${prefix.value}/${application_id}/application/${api_key_id}`,
+    undefined,
+    undefined,
+    loading,
+  )
 }
 
 /**
@@ -52,7 +62,12 @@ const putAPIKey: (
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (application_id, api_key_id, data, loading) => {
-  return put(`${prefix}/${application_id}/application/${api_key_id}`, data, undefined, loading)
+  return put(
+    `${prefix.value}/${application_id}/application/${api_key_id}`,
+    data,
+    undefined,
+    loading,
+  )
 }
 
 export default {

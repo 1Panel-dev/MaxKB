@@ -25,6 +25,11 @@ export default defineConfig(({ mode }) => {
     changeOrigin: true,
     rewrite: (path: string) => path.replace(ENV.VITE_BASE_PATH, '/'),
   }
+  proxyConf['/chat'] = {
+    target: 'http://127.0.0.1:8080',
+    changeOrigin: true,
+    rewrite: (path: string) => path.replace(ENV.VITE_BASE_PATH, '/'),
+  }
   proxyConf['/doc'] = {
     target: 'http://127.0.0.1:8080',
     changeOrigin: true,

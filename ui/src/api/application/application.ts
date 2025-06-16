@@ -3,9 +3,15 @@ import { get, post, postStream, del, put, request, download, exportFile } from '
 import type { pageRequest } from '@/api/type/common'
 import type { ApplicationFormType } from '@/api/type/application'
 import { type Ref } from 'vue'
+import useStore from '@/stores'
 
-const prefix = '/workspace/' + localStorage.getItem('workspace_id') + '/application'
-
+const prefix: any = { _value: '/workspace/' }
+Object.defineProperty(prefix, 'value', {
+  get: function () {
+    const { user } = useStore()
+    return this._value + user.getWorkspaceId() + '/application'
+  },
+})
 /**
  * 获取全部应用
  * @param 参数
@@ -14,7 +20,7 @@ const getAllApplication: (param?: any, loading?: Ref<boolean>) => Promise<Result
   param,
   loading,
 ) => {
-  return get(`${prefix}`, param, loading)
+  return get(`${prefix.value}`, param, loading)
 }
 
 /**
@@ -28,7 +34,7 @@ const getApplication: (
   param: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (page, param, loading) => {
-  return get(`${prefix}/${page.current_page}/${page.page_size}`, param, loading)
+  return get(`${prefix.value}/${page.current_page}/${page.page_size}`, param, loading)
 }
 
 /**
@@ -39,7 +45,7 @@ const postApplication: (
   data: ApplicationFormType,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (data, loading) => {
-  return post(`${prefix}`, data, undefined, loading)
+  return post(`${prefix.value}`, data, undefined, loading)
 }
 
 /**
@@ -51,7 +57,7 @@ const putApplication: (
   data: ApplicationFormType,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (application_id, data, loading) => {
-  return put(`${prefix}/${application_id}`, data, undefined, loading)
+  return put(`${prefix.value}/${application_id}`, data, undefined, loading)
 }
 
 /**
@@ -62,7 +68,7 @@ const delApplication: (
   application_id: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<boolean>> = (application_id, loading) => {
-  return del(`${prefix}/${application_id}`, undefined, {}, loading)
+  return del(`${prefix.value}/${application_id}`, undefined, {}, loading)
 }
 
 /**
@@ -73,7 +79,7 @@ const getApplicationDetail: (
   application_id: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (application_id, loading) => {
-  return get(`${prefix}/${application_id}`, undefined, loading)
+  return get(`${prefix.value}/${application_id}`, undefined, loading)
 }
 
 /**
@@ -84,7 +90,7 @@ const getAccessToken: (application_id: string, loading?: Ref<boolean>) => Promis
   application_id,
   loading,
 ) => {
-  return get(`${prefix}/${application_id}/access_token`, undefined, loading)
+  return get(`${prefix.value}/${application_id}/access_token`, undefined, loading)
 }
 
 /**
@@ -99,7 +105,7 @@ const putAccessToken: (
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (application_id, data, loading) => {
-  return put(`${prefix}/${application_id}/access_token`, data, undefined, loading)
+  return put(`${prefix.value}/${application_id}/access_token`, data, undefined, loading)
 }
 
 /**
@@ -113,7 +119,7 @@ const exportApplication = (
 ) => {
   return exportFile(
     application_name + '.mk',
-    `${prefix}/${application_id}/export`,
+    `${prefix.value}/${application_id}/export`,
     undefined,
     loading,
   )
@@ -126,7 +132,7 @@ const importApplication: (data: any, loading?: Ref<boolean>) => Promise<Result<a
   data,
   loading,
 ) => {
-  return post(`${prefix}/import`, data, undefined, loading)
+  return post(`${prefix.value}/import`, data, undefined, loading)
 }
 
 /**
@@ -138,7 +144,7 @@ const getStatistics: (
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (application_id, data, loading) => {
-  return get(`${prefix}/${application_id}/application_stats`, data, loading)
+  return get(`${prefix.value}/${application_id}/application_stats`, data, loading)
 }
 /**
  * 打开调试对话id
@@ -150,7 +156,7 @@ const open: (application_id: string, loading?: Ref<boolean>) => Promise<Result<s
   application_id,
   loading,
 ) => {
-  return get(`${prefix}/${application_id}/open`, {}, loading)
+  return get(`${prefix.value}/${application_id}/open`, {}, loading)
 }
 /**
  * 对话
