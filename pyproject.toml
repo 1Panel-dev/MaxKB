@@ -57,6 +57,7 @@ pypdf = "5.6.0"
 gunicorn = "23.0.0"
 python-daemon = "3.1.2"
 pytz = "2025.2"
+django-apscheduler = "0.6.2"
 
 [build-system]
 requires = ["poetry-core"]

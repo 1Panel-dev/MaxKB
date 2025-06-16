@@ -237,8 +237,8 @@ def query_params_to_single_dict(query_params: Dict):
 def valid_license(model=None, count=None, message=None):
     def inner(func):
         def run(*args, **kwargs):
-            xpack_cache = DatabaseModelManage.get_model('xpack_cache')
-            is_license_valid = xpack_cache.get('XPACK_LICENSE_IS_VALID', False) if xpack_cache is not None else False
+            is_license_valid = DatabaseModelManage.get_model('license_is_valid')
+            is_license_valid = is_license_valid if is_license_valid is not None else False
             record_count = QuerySet(model).count()
 
             if not is_license_valid and record_count >= count:
