@@ -245,7 +245,7 @@ function openCreateDialog(data?: any) {
   }
   ToolDrawertitle.value = data ? t('views.tool.editTool') : t('views.tool.createTool')
   if (data) {
-    if (data?.permission_type !== 'PUBLIC' || canEdit(data)) {
+    if (canEdit(data)) {
       ToolApi.getToolById(data?.id, changeStateloading).then((res) => {
         ToolFormDrawerRef.value.open(res.data)
       })

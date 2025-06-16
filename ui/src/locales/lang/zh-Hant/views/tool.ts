@@ -30,10 +30,6 @@ export default {
       label: '描述',
       placeholder: '請輸入工具的描述',
     },
-    permission_type: {
-      label: '權限',
-      requiredMessage: '請選擇',
-    },
     paramName: {
       label: '參數名',
       placeholder: '請輸入參數名',

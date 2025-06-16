@@ -56,31 +56,7 @@
                 :placeholder="$t('views.model.modelForm.modeName.placeholder')"
               />
             </el-form-item>
-            <el-form-item prop="permission_type" :rules="base_form_data_rule.permission_type">
-              <template #label>
-                <span>{{ $t('views.model.modelForm.permissionType.label') }}</span>
-              </template>
-              <el-radio-group v-model="base_form_data.permission_type" class="card__radio">
-                <el-row :gutter="16">
-                  <template v-for="(value, key) of PermissionType" :key="key">
-                    <el-col :span="12">
-                      <el-card
-                        shadow="never"
-                        class="mb-16"
-                        :class="base_form_data.permission_type === key ? 'active' : ''"
-                      >
-                        <el-radio :value="key" size="large">
-                          <p class="mb-4">{{ $t(value) }}</p>
-                          <el-text type="info">
-                            {{ $t(PermissionDesc[key]) }}
-                          </el-text>
-                        </el-radio>
-                      </el-card>
-                    </el-col>
-                  </template>
-                </el-row>
-              </el-radio-group>
-            </el-form-item>
+
             <el-form-item prop="model_type" :rules="base_form_data_rule.model_type">
               <template #label>
                 <div class="flex align-center" style="display: inline-flex">
@@ -294,11 +270,6 @@ const base_form_data_rule = ref<FormRules>({
     trigger: 'blur',
     message: t('views.model.modelForm.modeName.requiredMessage'),
   },
-  permission_type: {
-    required: true,
-    trigger: 'change',
-    message: t('views.model.modelForm.permissionType.requiredMessage'),
-  },
   model_type: {
     required: true,
     trigger: 'change',
@@ -313,11 +284,10 @@ const base_form_data_rule = ref<FormRules>({
 
 const base_form_data = ref<{
   name: string
-  permission_type: string
   model_type: string
   model_name: string
   model_params_form: any
-}>({ name: '', model_type: '', model_name: '', permission_type: 'PRIVATE', model_params_form: [] })
+}>({ name: '', model_type: '', model_name: '', model_params_form: [] })
 
 const credential_form_data = ref<Dict<any>>({})
 
@@ -328,7 +298,6 @@ const form_data = computed({
       name: base_form_data.value.name,
       model_type: base_form_data.value.model_type,
       model_name: base_form_data.value.model_name,
-      permission_type: base_form_data.value.permission_type,
       model_params_form: base_form_data.value.model_params_form,
     }
   },
@@ -397,7 +366,6 @@ const close = () => {
     name: '',
     model_type: '',
     model_name: '',
-    permission_type: 'PRIVATE',
     model_params_form: [],
   }
   credential_form_data.value = {}

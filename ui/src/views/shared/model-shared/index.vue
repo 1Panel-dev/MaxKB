@@ -31,10 +31,7 @@
                 @change="search_type_change"
               >
                 <el-option :label="$t('common.creator')" value="create_user" />
-                <el-option
-                  :label="$t('views.model.modelForm.permissionType.label')"
-                  value="permission_type"
-                />
+
                 <el-option
                   :label="$t('views.model.modelForm.model_type.label')"
                   value="model_type"
@@ -63,16 +60,7 @@
                   :label="u.username"
                 />
               </el-select>
-              <el-select
-                v-else-if="search_type === 'permission_type'"
-                v-model="model_search_form.permission_type"
-                clearable
-                @change="list_model"
-                style="width: 220px"
-              >
-                <el-option :label="$t('common.public')" value="PUBLIC" />
-                <el-option :label="$t('common.private')" value="PRIVATE" />
-              </el-select>
+
               <el-select
                 v-else-if="search_type === 'model_type'"
                 v-model="model_search_form.model_type"
@@ -160,12 +148,10 @@ const search_type = ref('name')
 const model_search_form = ref<{
   name: string
   create_user: string
-  permission_type: string
   model_type: string
 }>({
   name: '',
   create_user: '',
-  permission_type: '',
   model_type: '',
 })
 const user_options = ref<any[]>([])
@@ -218,7 +204,7 @@ const list_model = () => {
 }
 
 const search_type_change = () => {
-  model_search_form.value = { name: '', create_user: '', permission_type: '', model_type: '' }
+  model_search_form.value = { name: '', create_user: '',  model_type: '' }
 }
 
 onMounted(() => {
