@@ -3,7 +3,7 @@ FROM node:18-alpine3.18 AS web-build
 COPY ui ui
 RUN cd ui && \
     npm install && \
-    npm run build && \
+    npm run build-only && \
     rm -rf ./node_modules
 FROM ghcr.io/1panel-dev/maxkb-base:python3.11-pg17.4 AS stage-build
 
