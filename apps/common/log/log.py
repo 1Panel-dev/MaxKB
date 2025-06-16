@@ -56,8 +56,12 @@ def _get_details(request):
     }
 
 
+def _get_workspace_id(request, kwargs):
+    return kwargs.get('workspace_id', None)
+
+
 def log(menu: str, operate, get_user=_get_user, get_ip_address=_get_ip_address, get_details=_get_details,
-        get_operation_object=None, workspace_id="None"):
+        get_operation_object=None, get_workspace_id=_get_workspace_id):
     """
     记录审计日志
     @param menu: 操作菜单 str
@@ -66,6 +70,7 @@ def log(menu: str, operate, get_user=_get_user, get_ip_address=_get_ip_address, 
     @param get_ip_address:获取IP地址
     @param get_details: 获取执行详情
     @param get_operation_object: 获取操作对象
+    @param get_workspace_id: 获取工作空间id
     @return:
     """
 
@@ -87,6 +92,7 @@ def log(menu: str, operate, get_user=_get_user, get_ip_address=_get_ip_address, 
                 ip = get_ip_address(request)
                 user = get_user(request)
                 details = get_details(request)
+                workspace_id = get_workspace_id(request, kwargs)
                 _operate = operate
                 if callable(operate):
                     _operate = operate(request)
