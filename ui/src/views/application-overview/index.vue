@@ -192,12 +192,9 @@
     <APIKeyDialog ref="APIKeyDialogRef" />
     <LimitDialog ref="LimitDialogRef" @refresh="refresh" />
     <EditAvatarDialog ref="EditAvatarDialogRef" @refresh="refreshIcon" />
-    <XPackDisplaySettingDialog
-      ref="XPackDisplaySettingDialogRef"
-      @refresh="refresh"
-      v-if="user.isEnterprise()"
-    />
-    <DisplaySettingDialog ref="DisplaySettingDialogRef" @refresh="refresh" v-else />
+    <XPackDisplaySettingDialog ref="XPackDisplaySettingDialogRef" @refresh="refresh" />
+    <!-- v-if="user.isEnterprise()" -->
+    <DisplaySettingDialog ref="DisplaySettingDialogRef" @refresh="refresh" />
   </div>
 </template>
 <script setup lang="ts">
@@ -292,11 +289,11 @@ function toUrl(url: string) {
   window.open(url, '_blank')
 }
 function openDisplaySettingDialog() {
-  if (user.isEnterprise()) {
-    XPackDisplaySettingDialogRef.value?.open(accessToken.value, detail.value)
-  } else {
-    DisplaySettingDialogRef.value?.open(accessToken.value, detail.value)
-  }
+  // if (user.isEnterprise()) {
+  XPackDisplaySettingDialogRef.value?.open(accessToken.value, detail.value)
+  // } else {
+  //   DisplaySettingDialogRef.value?.open(accessToken.value, detail.value)
+  // }
 }
 function openEditAvatar() {
   EditAvatarDialogRef.value.open(detail.value)

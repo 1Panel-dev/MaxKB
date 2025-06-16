@@ -1,8 +1,15 @@
 import { Result } from '@/request/Result'
 import { get, put } from '@/request/index'
+import useStore from '@/stores'
 import { type Ref } from 'vue'
 
-const prefix = '/application'
+const prefix: any = { _value: '/workspace/' }
+Object.defineProperty(prefix, 'value', {
+  get: function () {
+    const { user } = useStore()
+    return this._value + user.getWorkspaceId() + '/application'
+  },
+})
 
 /**
  * 替换社区版-获取AccessToken
@@ -10,9 +17,9 @@ const prefix = '/application'
  */
 const getAccessToken: (application_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
   application_id,
-  loading
+  loading,
 ) => {
-  return get(`${prefix}/${application_id}/setting`, undefined, loading)
+  return get(`${prefix.value}/${application_id}/setting`, undefined, loading)
 }
 
 /**
@@ -30,12 +37,12 @@ const getAccessToken: (application_id: string, loading?: Ref<boolean>) => Promis
 const putAccessToken: (
   application_id: string,
   data: any,
-  loading?: Ref<boolean>
+  loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (application_id, data, loading) => {
-  return put(`${prefix}/${application_id}/setting`, data, undefined, loading)
+  return put(`${prefix.value}/${application_id}/setting`, data, undefined, loading)
 }
 
 export default {
   getAccessToken,
-  putAccessToken
+  putAccessToken,
 }
