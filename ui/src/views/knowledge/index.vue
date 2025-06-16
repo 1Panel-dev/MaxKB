@@ -437,6 +437,7 @@ function deleteKnowledge(row: any) {
 }
 
 function refreshFolder() {
+  knowledgeList.value = []
   getFolder()
   getList()
 }

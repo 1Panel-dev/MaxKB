@@ -144,6 +144,7 @@
                   :title="item.name"
                   :description="item.desc || $t('common.noData')"
                   class="cursor"
+                  @click="clickFolder(item)"
                 >
                   <template #icon>
                     <el-avatar shape="square" :size="32" style="background: none">
@@ -337,6 +338,13 @@ function folderClickHandel(row: any) {
   getList()
 }
 
+function clickFolder(item: any) {
+  currentFolder.value.id = item.id
+  applicationList.value = []
+  getList()
+}
+
+
 function getAccessToken(id: string) {
   applicationList.value
     .filter((app) => app.id === id)[0]
@@ -436,6 +444,7 @@ function openCreateFolder() {
   CreateFolderDialogRef.value.open('APPLICATION', currentFolder.value.parent_id)
 }
 function refreshFolder() {
+  applicationList.value = []
   getFolder()
   getList()
 }
