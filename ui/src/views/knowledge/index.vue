@@ -161,6 +161,7 @@
                   :title="item.name"
                   :description="item.desc || $t('common.noData')"
                   class="cursor"
+                  @click="clickFolder(item)"
                 >
                   <template #icon>
                     <el-avatar shape="square" :size="32" style="background: none">
@@ -358,6 +359,7 @@ const search_type_change = () => {
 }
 
 function getList() {
+  console.log(currentFolder.value?.id)
   const params = {
     folder_id: currentFolder.value?.id || localStorage.getItem('workspace_id'),
     [search_type.value]: search_form.value[search_type.value],
@@ -382,6 +384,12 @@ function folderClickHandel(row: any) {
   currentFolder.value = row
   knowledgeList.value = []
   if (currentFolder.value.id === 'share') return
+  getList()
+}
+
+function clickFolder(item: any) {
+  currentFolder.value.id = item.id
+  knowledgeList.value = []
   getList()
 }
 
