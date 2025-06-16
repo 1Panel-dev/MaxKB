@@ -1,4 +1,3 @@
-import { ComplexPermission } from '@/utils/permission/type'
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
 
 const ApplicationDetailRouter = {
