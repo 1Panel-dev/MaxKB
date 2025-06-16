@@ -48,7 +48,7 @@ class Tool(AppModelMixin):
     tool_type = models.CharField(max_length=20, verbose_name='工具类型', choices=ToolType.choices,
                                      default=ToolType.CUSTOM, db_index=True)
     template_id = models.UUIDField(max_length=128, verbose_name="模版id", null=True, default=None)
-    folder = models.ForeignKey(ToolFolder, on_delete=models.DO_NOTHING, verbose_name="文件夹id", default='root')
+    folder = models.ForeignKey(ToolFolder, on_delete=models.DO_NOTHING, verbose_name="文件夹id", default='default')
     workspace_id = models.CharField(max_length=64, verbose_name="工作空间id", default="default", db_index=True)
     init_params = models.CharField(max_length=102400, verbose_name="初始化参数", null=True)
 

@@ -107,7 +107,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='knowledge',
             name='folder',
-            field=models.ForeignKey(default='root', on_delete=django.db.models.deletion.DO_NOTHING, to='knowledge.knowledgefolder', verbose_name='文件夹id'),
+            field=models.ForeignKey(default='default', on_delete=django.db.models.deletion.DO_NOTHING, to='knowledge.knowledgefolder', verbose_name='文件夹id'),
         ),
         migrations.CreateModel(
             name='Paragraph',

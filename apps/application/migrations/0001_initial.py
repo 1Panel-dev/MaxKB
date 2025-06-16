@@ -153,7 +153,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='application',
             name='folder',
-            field=models.ForeignKey(default='root', on_delete=django.db.models.deletion.DO_NOTHING,
+            field=models.ForeignKey(default='default', on_delete=django.db.models.deletion.DO_NOTHING,
                                     to='application.applicationfolder', verbose_name='文件夹id'),
         ),
         migrations.CreateModel(
