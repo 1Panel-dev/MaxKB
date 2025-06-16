@@ -12,7 +12,14 @@ import {
 
 import { type Ref } from 'vue'
 
-const prefix = '/workspace/' + localStorage.getItem('workspace_id') + '/application'
+import useStore from '@/stores'
+const prefix: any = { _value: '/workspace/' }
+Object.defineProperty(prefix, 'value', {
+  get: function () {
+    const { user } = useStore()
+    return this._value + user.getWorkspaceId() + '/application'
+  },
+})
 
 /**
  * 打开调试对话id
@@ -24,7 +31,7 @@ const open: (application_id: string, loading?: Ref<boolean>) => Promise<Result<s
   application_id,
   loading,
 ) => {
-  return get(`${prefix}/${application_id}/open`, {}, loading)
+  return get(`${prefix.value}/${application_id}/open`, {}, loading)
 }
 /**
  * 对话

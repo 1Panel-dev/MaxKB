@@ -117,14 +117,15 @@
 import { onMounted, ref, computed } from 'vue'
 import ProviderApi from '@/api/shared/provider'
 import ModelApi from '@/api/shared/model'
+import ModelWorkspaceApi from '@/api/shared/workspace'
 import type { Provider, Model } from '@/api/type/model'
-import ModelCard from '@/views/model-shared-system/component/ModelCard.vue'
-import ProviderComponent from '@/views/model-shared-system/component/Provider.vue'
+import ModelCard from '@/views/shared/model-shared/component/ModelCard.vue'
+import ProviderComponent from '@/views/shared/model-shared/component/Provider.vue'
 import { splitArray } from '@/utils/common'
-import { modelTypeList, allObj } from '@/views/model-shared-system/component/data'
-import CreateModelDialog from '@/views/model-shared-system/component/CreateModelDialog.vue'
+import { modelTypeList, allObj } from '@/views/shared/model-shared/component/data'
+import CreateModelDialog from '@/views/shared/model-shared/component/CreateModelDialog.vue'
 import iconMap from '@/components/app-icon/icons/common'
-import SelectProviderDialog from '@/views/model-shared-system/component/SelectProviderDialog.vue'
+import SelectProviderDialog from '@/views/shared/model-shared/component/SelectProviderDialog.vue'
 import useStore from '@/stores/modules-shared-system'
 import { t } from '@/locales'
 
@@ -186,7 +187,7 @@ const openCreateModel = (provider?: Provider, model_type?: string) => {
 
 const list_model = () => {
   const params = active_provider.value?.provider ? { provider: active_provider.value.provider } : {}
-  ModelApi
+  ModelWorkspaceApi
     .getSharedWorkspaceModelPage({ ...model_search_form.value, ...params }, list_model_loading)
     .then((ok: any) => {
       model_list.value = ok.data

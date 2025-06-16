@@ -282,7 +282,7 @@
 
 <script lang="ts" setup>
 import { onMounted, ref, reactive, shallowRef, nextTick } from 'vue'
-import KnowledgeIcon from '@/views/knowledge-shared-system/component/KnowledgeIcon.vue'
+import KnowledgeIcon from '@/views/shared/knowledge-shared/component/KnowledgeIcon.vue'
 import CreateKnowledgeDialog from './create-component/CreateKnowledgeDialog.vue'
 import CreateWebKnowledgeDialog from './create-component/CreateWebKnowledgeDialog.vue'
 import CreateLarkKnowledgeDialog from './create-component/CreateLarkKnowledgeDialog.vue'
@@ -295,7 +295,7 @@ import { numberFormat } from '@/utils/common'
 import iconMap from '@/components/app-icon/icons/common'
 import { t } from '@/locales'
 import { useRouter } from 'vue-router'
-import AuthorizedWorkspace from '@/views/knowledge-shared-system/AuthorizedWorkspace.vue'
+import AuthorizedWorkspace from '@/views/shared/AuthorizedWorkspaceDialog.vue'
 
 const router = useRouter()
 const { folder } = useStore()
@@ -368,7 +368,7 @@ function getList() {
     [search_type.value]: search_form.value[search_type.value],
   }
 
-  KnowledgeApi.getKnowledgeListPage(paginationConfig, params, loading).then((res) => {
+  KnowledgeApi.getKnowledgeListPage(paginationConfig, params, loading).then((res: any) => {
     paginationConfig.total = res.data.total
     knowledgeList.value = [...knowledgeList.value, ...res.data.records]
   })
@@ -409,12 +409,12 @@ function openAuthorizedWorkspaceDialog(row: any) {
 }
 
 const exportKnowledge = (item: any) => {
-  KnowledgeApi.exportKnowledge(item.name, item.id, loading).then((ok) => {
+  KnowledgeApi.exportKnowledge(item.name, item.id, loading).then(() => {
     MsgSuccess(t('common.exportSuccess'))
   })
 }
 const exportZipKnowledge = (item: any) => {
-  KnowledgeApi.exportZipKnowledge(item.name, item.id, loading).then((ok) => {
+  KnowledgeApi.exportZipKnowledge(item.name, item.id, loading).then(() => {
     MsgSuccess(t('common.exportSuccess'))
   })
 }

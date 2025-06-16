@@ -13,8 +13,14 @@ import {
 import type { pageRequest } from '@/api/type/common'
 import type { ApplicationFormType } from '@/api/type/application'
 import { type Ref } from 'vue'
-
-const prefix = '/workspace/' + localStorage.getItem('workspace_id') + '/application'
+import useStore from '@/stores'
+const prefix: any = { _value: '/workspace/' }
+Object.defineProperty(prefix, 'value', {
+  get: function () {
+    const { user } = useStore()
+    return this._value + user.getWorkspaceId() + '/application'
+  },
+})
 /**
  * 对话记录提交至知识库
  * @param data
@@ -28,7 +34,7 @@ const postChatLogAddKnowledge: (
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (application_id, data, loading) => {
-  return post(`${prefix}/${application_id}/add_knowledge`, data, undefined, loading)
+  return post(`${prefix.value}/${application_id}/add_knowledge`, data, undefined, loading)
 }
 
 /**
@@ -47,7 +53,7 @@ const getChatLog: (
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (application_id, page, param, loading) => {
   return get(
-    `${prefix}/${application_id}/chat/${page.current_page}/${page.page_size}`,
+    `${prefix.value}/${application_id}/chat/${page.current_page}/${page.page_size}`,
     param,
     loading,
   )
@@ -66,7 +72,7 @@ const getChatRecordLog: (
   order_asc?: boolean,
 ) => Promise<Result<any>> = (application_id, chart_id, page, loading, order_asc) => {
   return get(
-    `${prefix}/${application_id}/chat/${chart_id}/chat_record/${page.current_page}/${page.page_size}`,
+    `${prefix.value}/${application_id}/chat/${chart_id}/chat_record/${page.current_page}/${page.page_size}`,
     { order_asc: order_asc !== undefined ? order_asc : true },
     loading,
   )
@@ -93,7 +99,7 @@ const getMarkChatRecord: (
   loading,
 ) => {
   return get(
-    `${prefix}/${application_id}/chat/${chart_id}/chat_record/${chart_record_id}/knowledge/${knowledge_id}/document/${document_id}/improve`,
+    `${prefix.value}/${application_id}/chat/${chart_id}/chat_record/${chart_record_id}/knowledge/${knowledge_id}/document/${document_id}/improve`,
     undefined,
     loading,
   )
@@ -127,7 +133,7 @@ const putChatRecordLog: (
   loading,
 ) => {
   return put(
-    `${prefix}/${application_id}/chat/${chart_id}/chat_record/${chart_record_id}/knowledge/${knowledge_id}/document/${document_id}/improve`,
+    `${prefix.value}/${application_id}/chat/${chart_id}/chat_record/${chart_record_id}/knowledge/${knowledge_id}/document/${document_id}/improve`,
     data,
     undefined,
     loading,
@@ -157,7 +163,7 @@ const delMarkChatRecord: (
   loading,
 ) => {
   return del(
-    `${prefix}/${application_id}/chat/${chart_id}/chat_record/${chart_record_id}/knowledge/${knowledge_id}/document/${document_id}/paragraph/${paragraph_id}/improve`,
+    `${prefix.value}/${application_id}/chat/${chart_id}/chat_record/${chart_record_id}/knowledge/${knowledge_id}/document/${document_id}/paragraph/${paragraph_id}/improve`,
     undefined,
     {},
     loading,
@@ -182,7 +188,7 @@ const postExportChatLog: (
 ) => void = (application_id, application_name, param, data, loading) => {
   exportExcelPost(
     application_name + '.xlsx',
-    `${prefix}/${application_id}/chat/export`,
+    `${prefix.value}/${application_id}/chat/export`,
     param,
     data,
     loading,
@@ -195,7 +201,7 @@ const getChatRecordDetails: (
   loading?: Ref<boolean>,
 ) => Promise<any> = (application_id, chat_id, chat_record_id, loading) => {
   return get(
-    `${prefix}/${application_id}/chat/${chat_id}/chat_record/${chat_record_id}`,
+    `${prefix.value}/${application_id}/chat/${chat_id}/chat_record/${chat_record_id}`,
     {},
     loading,
   )

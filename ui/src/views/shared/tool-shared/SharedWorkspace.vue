@@ -119,13 +119,14 @@
 import { onMounted, ref, reactive, computed } from 'vue'
 import { cloneDeep, get } from 'lodash'
 import ToolApi from '@/api/shared/tool'
+import ToolWorkspaceApi from '@/api/shared/workspace'
 import useStore from '@/stores/modules-shared-system'
-import InitParamDrawer from '@/views/tool-shared-system/component/InitParamDrawer.vue'
+import InitParamDrawer from '@/views/shared/tool-shared/component/InitParamDrawer.vue'
 import ToolFormDrawer from './ToolFormDrawer.vue'
 import { t } from '@/locales'
 import { isAppIcon } from '@/utils/common'
 import iconMap from '@/components/app-icon/icons/common'
-import AuthorizedWorkspace from '@/views/knowledge-shared-system/AuthorizedWorkspace.vue'
+import AuthorizedWorkspace from '@/views/shared/AuthorizedWorkspaceDialog.vue'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 
 const { folder, user } = useStore()
@@ -191,7 +192,7 @@ function getList() {
     folder_id: currentFolder.value?.id || 'root',
     scope: 'WORKSPACE',
   }
-  ToolApi.getSharedWorkspaceToolPage(params, loading).then((res) => {
+  ToolWorkspaceApi.getSharedWorkspaceToolPage(params, loading).then((res) => {
     toolList.value = [...res.data]
   })
 }

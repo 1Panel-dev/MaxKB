@@ -131,19 +131,20 @@
 
 <script lang="ts" setup>
 import { onMounted, ref, reactive, shallowRef, nextTick } from 'vue'
-import KnowledgeIcon from '@/views/knowledge-shared-system/component/KnowledgeIcon.vue'
+import KnowledgeIcon from '@/views/shared/knowledge-shared/component/KnowledgeIcon.vue'
 import CreateKnowledgeDialog from './create-component/CreateKnowledgeDialog.vue'
 import CreateWebKnowledgeDialog from './create-component/CreateWebKnowledgeDialog.vue'
 import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
 import GenerateRelatedDialog from '@/components/generate-related-dialog/index.vue'
 import KnowledgeApi from '@/api/shared/knowledge'
+import KnowledgeWorkspaceApi from '@/api/shared/workspace'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import useStore from '@/stores/modules-shared-system'
 import { numberFormat } from '@/utils/common'
 import iconMap from '@/components/app-icon/icons/common'
 import { t } from '@/locales'
 import { useRouter } from 'vue-router'
-import AuthorizedWorkspace from '@/views/knowledge-shared-system/AuthorizedWorkspace.vue'
+import AuthorizedWorkspace from '@/views/shared/AuthorizedWorkspaceDialog.vue'
 
 const router = useRouter()
 const { folder } = useStore()
@@ -218,9 +219,12 @@ function getList() {
   if (!search_form.value[search_type.value]) {
     delete params[search_type.value]
   }
-  KnowledgeApi.getSharedWorkspaceKnowledgePage(params, loading).then((res) => {
-    knowledgeList.value = [...res.data]
-  })
+  KnowledgeWorkspaceApi.getSharedWorkspaceKnowledgePage(paginationConfig, params, loading).then(
+    (res: any) => {
+      paginationConfig.total = res.data.total
+      knowledgeList.value = [...knowledgeList.value, ...res.data.records]
+    },
+  )
 }
 
 function getFolder() {

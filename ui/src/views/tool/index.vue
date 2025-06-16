@@ -201,7 +201,7 @@ import ToolFormDrawer from './ToolFormDrawer.vue'
 import { t } from '@/locales'
 import { isAppIcon } from '@/utils/common'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
-import SharedWorkspace from '@/views/tool-shared-system/SharedWorkspace.vue'
+import SharedWorkspace from '@/views/shared/tool-shared/SharedWorkspace.vue'
 
 const { folder, user } = useStore()
 

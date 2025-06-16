@@ -9,7 +9,7 @@ const ParagraphRouter = {
       path: '/paragraph/system/:id/:documentId/shared',
       name: 'ParagraphIndexSharedSystem',
       meta: { activeMenu: '/knowledge' },
-      component: () => import('@/views/paragraph-shared-system/index.vue'),
+      component: () => import('@/views/shared/paragraph-shared/index.vue'),
     },
   ],
 }

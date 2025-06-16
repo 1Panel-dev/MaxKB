@@ -4,7 +4,15 @@ import { type Ref } from 'vue'
 import type { pageRequest } from '@/api/type/common'
 import type { toolData } from '@/api/type/tool'
 
-const prefix = '/workspace/' + localStorage.getItem('workspace_id')
+
+import useStore from '@/stores'
+const prefix: any = { _value: '/workspace/' }
+Object.defineProperty(prefix, 'value', {
+  get: function () {
+    const { user } = useStore()
+    return this._value + user.getWorkspaceId() + '/tool'
+  },
+})
 
 /**
  * 获得工具文件夹列表
@@ -14,7 +22,7 @@ const getToolByFolder: (data?: any, loading?: Ref<boolean>) => Promise<Result<Ar
   data,
   loading,
 ) => {
-  return get(`${prefix}/tool`, data, loading)
+  return get(`${prefix.value}`, data, loading)
 }
 
 /**
@@ -31,7 +39,7 @@ const getToolList: (
   param?: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (page, param, loading) => {
-  return get(`${prefix}/tool/${page.current_page}/${page.page_size}`, param, loading)
+  return get(`${prefix.value}/${page.current_page}/${page.page_size}`, param, loading)
 }
 
 /**
@@ -42,7 +50,7 @@ const postTool: (data: toolData, loading?: Ref<boolean>) => Promise<Result<any>>
   data,
   loading,
 ) => {
-  return post(`${prefix}/tool`, data, undefined, loading)
+  return post(`${prefix.value}`, data, undefined, loading)
 }
 
 /**
@@ -55,7 +63,7 @@ const putTool: (tool_id: string, data: toolData, loading?: Ref<boolean>) => Prom
   data,
   loading,
 ) => {
-  return put(`${prefix}/tool/${tool_id}`, data, undefined, loading)
+  return put(`${prefix.value}/${tool_id}`, data, undefined, loading)
 }
 
 /**
@@ -68,7 +76,7 @@ const getToolById: (tool_id: string, loading?: Ref<boolean>) => Promise<Result<a
   tool_id,
   loading,
 ) => {
-  return get(`${prefix}/tool/${tool_id}`, undefined, loading)
+  return get(`${prefix.value}/${tool_id}`, undefined, loading)
 }
 
 /**
@@ -79,7 +87,7 @@ const delTool: (
   tool_id: String,
   loading?: Ref<boolean>
 ) => Promise<Result<boolean>> = (tool_id, loading) => {
-  return del(`${prefix}/${tool_id}`, undefined, {}, loading)
+  return del(`${prefix.value}/${tool_id}`, undefined, {}, loading)
 }
 
 const putToolIcon: (
@@ -87,11 +95,11 @@ const putToolIcon: (
     data: any,
     loading?: Ref<boolean>
 ) => Promise<Result<any>> = (id, data, loading) => {
-  return put(`${prefix}/tool/${id}/edit_icon`, data, undefined, loading)
+  return put(`${prefix.value}/${id}/edit_icon`, data, undefined, loading)
 }
 
 const exportTool = (id: string, name: string, loading?: Ref<boolean>) => {
-  return exportFile(name + '.fx', `${prefix}/${id}/export`, undefined, loading)
+  return exportFile(name + '.fx', `${prefix.value}/${id}/export`, undefined, loading)
 }
 
 /**
@@ -103,21 +111,21 @@ const postToolDebug: (data: any, loading?: Ref<boolean>) => Promise<Result<any>>
   data: any,
   loading,
 ) => {
-  return post(`${prefix}/tool/debug`, data, undefined, loading)
+  return post(`${prefix.value}/debug`, data, undefined, loading)
 }
 
 const postImportTool: (data: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
   data,
   loading,
 ) => {
-  return post(`${prefix}/tool/import`, data, undefined, loading)
+  return post(`${prefix.value}/import`, data, undefined, loading)
 }
 
 const postPylint: (code: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
   code,
   loading,
 ) => {
-  return post(`${prefix}/tool/pylint`, { code }, {}, loading)
+  return post(`${prefix.value}/pylint`, { code }, {}, loading)
 }
 
 export default {

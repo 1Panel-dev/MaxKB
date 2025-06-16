@@ -151,7 +151,7 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive } from 'vue'
 import { useRoute } from 'vue-router'
-import BaseForm from '@/views/knowledge-shared-system/component/BaseForm.vue'
+import BaseForm from '@/views/shared/knowledge-shared/component/BaseForm.vue'
 import KnowledgeApi from '@/api/shared/knowledge'
 import type { ApplicationFormType } from '@/api/type/application'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'

@@ -46,7 +46,7 @@
 <script setup lang="ts">
 import { ref, watch, reactive } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import BaseForm from '@/views/knowledge-shared-system/component/BaseForm.vue'
+import BaseForm from '@/views/shared/knowledge-shared/component/BaseForm.vue'
 import KnowledgeApi from '@/api/shared/knowledge'
 import { MsgSuccess, MsgAlert } from '@/utils/message'
 import { t } from '@/locales'

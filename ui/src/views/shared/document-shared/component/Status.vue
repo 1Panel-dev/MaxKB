@@ -41,7 +41,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { TaskType, State } from '@/utils/status'
-import StatusTable from '@/views/document-shared-system/component/StatusTable.vue'
+import StatusTable from '@/views/shared/document-shared/component/StatusTable.vue'
 import { t } from '@/locales'
 const props = defineProps<{ status: string; statusMeta: any }>()
 const visible = ref<boolean>(false)

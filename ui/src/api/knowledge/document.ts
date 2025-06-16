@@ -4,7 +4,14 @@ import type { Ref } from 'vue'
 import type { KeyValue } from '@/api/type/common'
 import type { pageRequest } from '@/api/type/common'
 
-const prefix = '/workspace/' + localStorage.getItem('workspace_id') + '/knowledge'
+import useStore from '@/stores'
+const prefix: any = { _value: '/workspace/' }
+Object.defineProperty(prefix, 'value', {
+  get: function () {
+    const { user } = useStore()
+    return this._value + user.getWorkspaceId() + '/knowledge'
+  },
+})
 
 /**
  * 文档分页列表
@@ -21,7 +28,7 @@ const getDocument: (
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (knowledge_id, page, param, loading) => {
   return get(
-    `${prefix}/${knowledge_id}/document/${page.current_page}/${page.page_size}`,
+    `${prefix.value}/${knowledge_id}/document/${page.current_page}/${page.page_size}`,
     param,
     loading,
   )
@@ -35,7 +42,7 @@ const getDocumentDetail: (knowledge_id: string, document_id: string) => Promise<
   knowledge_id,
   document_id,
 ) => {
-  return get(`${prefix}/${knowledge_id}/document/${document_id}`)
+  return get(`${prefix.value}/${knowledge_id}/document/${document_id}`)
 }
 
 /**
@@ -54,7 +61,7 @@ const putDocument: (
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (knowledge_id, document_id, data: any, loading) => {
-  return put(`${prefix}/${knowledge_id}/document/${document_id}`, data, undefined, loading)
+  return put(`${prefix.value}/${knowledge_id}/document/${document_id}`, data, undefined, loading)
 }
 
 /**
@@ -66,7 +73,7 @@ const delDocument: (
   document_id: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<boolean>> = (knowledge_id, document_id, loading) => {
-  return del(`${prefix}/${knowledge_id}/document/${document_id}`, loading)
+  return del(`${prefix.value}/${knowledge_id}/document/${document_id}`, loading)
 }
 
 /**
@@ -85,7 +92,7 @@ const putBatchCancelTask: (
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<boolean>> = (knowledge_id, data, loading) => {
-  return put(`${prefix}/${knowledge_id}/document/cancel_task/_batch`, data, undefined, loading)
+  return put(`${prefix.value}/${knowledge_id}/document/cancel_task/_batch`, data, undefined, loading)
 }
 
 /**
@@ -99,7 +106,7 @@ const putCancelTask: (
   loading?: Ref<boolean>,
 ) => Promise<Result<boolean>> = (knowledge_id, document_id, data, loading) => {
   return put(
-    `${prefix}/${knowledge_id}/document/${document_id}/cancel_task`,
+    `${prefix.value}/${knowledge_id}/document/${document_id}/cancel_task`,
     data,
     undefined,
     loading,
@@ -114,7 +121,7 @@ const getDownloadSourceFile: (knowledge_id: string, document_id: string) => Prom
   knowledge_id,
   document_id,
 ) => {
-  return get(`${prefix}/${knowledge_id}/document/${document_id}/download_source_file`)
+  return get(`${prefix.value}/${knowledge_id}/document/${document_id}/download_source_file`)
 }
 
 /**
@@ -133,7 +140,7 @@ const exportDocument: (
 ) => Promise<any> = (document_name, knowledge_id, document_id, loading) => {
   return exportExcel(
     document_name + '.xlsx',
-    `${prefix}/${knowledge_id}/document/${document_id}/export`,
+    `${prefix.value}/${knowledge_id}/document/${document_id}/export`,
     {},
     loading,
   )
@@ -154,7 +161,7 @@ const exportDocumentZip: (
 ) => Promise<any> = (document_name, knowledge_id, document_id, loading) => {
   return exportFile(
     document_name + '.zip',
-    `${prefix}/${knowledge_id}/document/${document_id}/export_zip`,
+    `${prefix.value}/${knowledge_id}/document/${document_id}/export_zip`,
     {},
     loading,
   )
@@ -177,7 +184,7 @@ const putDocumentRefresh: (
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (knowledge_id, document_id, state_list, loading) => {
   return put(
-    `${prefix}/${knowledge_id}/document/${document_id}/refresh`,
+    `${prefix.value}/${knowledge_id}/document/${document_id}/refresh`,
     { state_list },
     undefined,
     loading,
@@ -195,7 +202,7 @@ const putDocumentSync: (
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (knowledge_id, document_id, loading) => {
   return put(
-    `${prefix}/${knowledge_id}/document/${document_id}/sync`,
+    `${prefix.value}/${knowledge_id}/document/${document_id}/sync`,
     undefined,
     undefined,
     loading,
@@ -228,7 +235,7 @@ const postMulDocument: (
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (knowledge_id, data, loading) => {
-  return put(`${prefix}/${knowledge_id}/document/batch_create`, data, {}, loading, 1000 * 60 * 5)
+  return put(`${prefix.value}/${knowledge_id}/document/batch_create`, data, {}, loading, 1000 * 60 * 5)
 }
 
 /**
@@ -244,7 +251,7 @@ const delMulDocument: (
   loading?: Ref<boolean>,
 ) => Promise<Result<boolean>> = (knowledge_id, data, loading) => {
   return del(
-    `${prefix}/${knowledge_id}/document/bach_delete`,
+    `${prefix.value}/${knowledge_id}/document/bach_delete`,
     undefined,
     { id_list: data },
     loading,
@@ -270,7 +277,7 @@ const putBatchGenerateRelated: (
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<boolean>> = (knowledge_id, data, loading) => {
-  return put(`${prefix}/${knowledge_id}/document/batch_generate_related`, data, undefined, loading)
+  return put(`${prefix.value}/${knowledge_id}/document/batch_generate_related`, data, undefined, loading)
 }
 
 /**
@@ -286,7 +293,7 @@ const putBatchEditHitHandling: (
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<boolean>> = (knowledge_id, data, loading) => {
-  return put(`${prefix}/${knowledge_id}/document/batch_hit_handling`, data, undefined, loading)
+  return put(`${prefix.value}/${knowledge_id}/document/batch_hit_handling`, data, undefined, loading)
 }
 
 /**
@@ -311,7 +318,7 @@ const putBatchRefresh: (
   loading?: Ref<boolean>,
 ) => Promise<Result<boolean>> = (knowledge_id, data, stateList, loading) => {
   return put(
-    `${prefix}/${knowledge_id}/document/batch_refresh`,
+    `${prefix.value}/${knowledge_id}/document/batch_refresh`,
     { id_list: data, state_list: stateList },
     undefined,
     loading,
@@ -327,7 +334,7 @@ const putMulSyncDocument: (
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<boolean>> = (knowledge_id, data, loading) => {
-  return put(`${prefix}/${knowledge_id}/document/batch_sync`, { id_list: data }, undefined, loading)
+  return put(`${prefix.value}/${knowledge_id}/document/batch_sync`, { id_list: data }, undefined, loading)
 }
 
 /**
@@ -342,7 +349,7 @@ const putMigrateMulDocument: (
   loading?: Ref<boolean>,
 ) => Promise<Result<boolean>> = (knowledge_id, target_knowledge_id, data, loading) => {
   return put(
-    `${prefix}/${knowledge_id}/document/migrate/${target_knowledge_id}`,
+    `${prefix.value}/${knowledge_id}/document/migrate/${target_knowledge_id}`,
     data,
     undefined,
     loading,
@@ -360,7 +367,7 @@ const postQADocument: (
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (knowledge_id, data, loading) => {
-  return post(`${prefix}/${knowledge_id}/document/qa`, data, undefined, loading)
+  return post(`${prefix.value}/${knowledge_id}/document/qa`, data, undefined, loading)
 }
 
 /**
@@ -368,7 +375,7 @@ const postQADocument: (
  * @param 参数  file:file,limit:number,patterns:array,with_filter:boolean
  */
 const postSplitDocument: (data: any) => Promise<Result<any>> = (data) => {
-  return post(`${prefix}/document/split`, data, undefined, undefined, 1000 * 60 * 60)
+  return post(`${prefix.value}/document/split`, data, undefined, undefined, 1000 * 60 * 60)
 }
 
 /**
@@ -379,7 +386,7 @@ const postSplitDocument: (data: any) => Promise<Result<any>> = (data) => {
 const listSplitPattern: (
   loading?: Ref<boolean>,
 ) => Promise<Result<Array<KeyValue<string, string>>>> = (loading) => {
-  return get(`${prefix}/document/split_pattern`, {}, loading)
+  return get(`${prefix.value}/document/split_pattern`, {}, loading)
 }
 
 /**
@@ -392,7 +399,7 @@ const postTableDocument: (
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (knowledge_id, data, loading) => {
-  return post(`${prefix}/${knowledge_id}/document/table`, data, undefined, loading)
+  return post(`${prefix.value}/${knowledge_id}/document/table`, data, undefined, loading)
 }
 
 /**
@@ -404,7 +411,7 @@ const exportQATemplate: (fileName: string, type: string, loading?: Ref<boolean>)
   type,
   loading,
 ) => {
-  return exportExcel(fileName, `${prefix}/document/template/export`, { type }, loading)
+  return exportExcel(fileName, `${prefix.value}/document/template/export`, { type }, loading)
 }
 
 /**
@@ -416,7 +423,7 @@ const exportTableTemplate: (fileName: string, type: string, loading?: Ref<boolea
   type,
   loading,
 ) => {
-  return exportExcel(fileName, `${prefix}/document/table_template/export`, { type }, loading)
+  return exportExcel(fileName, `${prefix.value}/document/table_template/export`, { type }, loading)
 }
 
 /**
@@ -435,14 +442,14 @@ const postWebDocument: (
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (knowledge_id, data, loading) => {
-  return post(`${prefix}/${knowledge_id}/document/web`, data, undefined, loading)
+  return post(`${prefix.value}/${knowledge_id}/document/web`, data, undefined, loading)
 }
 
 const getAllDocument: (knowledge_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
   knowledge_id,
   loading,
 ) => {
-  return get(`${prefix}/${knowledge_id}/document`, undefined, loading)
+  return get(`${prefix.value}/${knowledge_id}/document`, undefined, loading)
 }
 
 const putLarkDocumentSync: (
@@ -451,7 +458,7 @@ const putLarkDocumentSync: (
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (knowledge_id, document_id, loading) => {
   return put(
-    `${prefix}/lark/${knowledge_id}/document/${document_id}/sync`,
+    `${prefix.value}/lark/${knowledge_id}/document/${document_id}/sync`,
     undefined,
     undefined,
     loading,
@@ -463,7 +470,7 @@ const delMulLarkSyncDocument: (
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<boolean>> = (knowledge_id, data, loading) => {
-  return put(`${prefix}/lark/${knowledge_id}/_batch`, { id_list: data }, undefined, loading)
+  return put(`${prefix.value}/lark/${knowledge_id}/_batch`, { id_list: data }, undefined, loading)
 }
 
 export default {

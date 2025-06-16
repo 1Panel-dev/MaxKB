@@ -257,10 +257,10 @@
 
 <script setup lang="ts">
 import {ref, reactive, watch, nextTick} from 'vue'
-import FieldFormDialog from '@/views/tool-shared-system/component/FieldFormDialog.vue'
+import FieldFormDialog from '@/views/shared/tool-shared/component/FieldFormDialog.vue'
 import ToolDebugDrawer from './ToolDebugDrawer.vue'
-import UserFieldFormDialog from '@/views/tool-shared-system/component/UserFieldFormDialog.vue'
-import EditAvatarDialog from '@/views/tool-shared-system/component/EditAvatarDialog.vue'
+import UserFieldFormDialog from '@/views/shared/tool-shared/component/UserFieldFormDialog.vue'
+import EditAvatarDialog from '@/views/shared/tool-shared/component/EditAvatarDialog.vue'
 import type {toolData} from '@/api/type/tool'
 import ToolApi from '@/api/shared/tool'
 import type {FormInstance} from 'element-plus'

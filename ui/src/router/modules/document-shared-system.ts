@@ -16,7 +16,7 @@ const DocumentRouter = {
         parentPath: '/knowledge/system/:id/',
         parentName: 'KnowledgeDetailSharedSystem',
       },
-      component: () => import('@/views/document-shared-system/index.vue'),
+      component: () => import('@/views/shared/document-shared/index.vue'),
     },
     {
       path: 'problemShared',
@@ -29,7 +29,7 @@ const DocumentRouter = {
         parentPath: '/knowledge/system/:id/',
         parentName: 'KnowledgeDetailSharedSystem',
       },
-      component: () => import('@/views/problem-shared-system/index.vue'),
+      component: () => import('@/views/shared/problem-shared/index.vue'),
     },
     {
       path: 'hit-test-shared',
@@ -41,7 +41,7 @@ const DocumentRouter = {
         parentPath: '/knowledge/system/:id/',
         parentName: 'KnowledgeDetailSharedSystem',
       },
-      component: () => import('@/views/hit-test-shared-system/index.vue'),
+      component: () => import('@/views/shared/hit-test-shared/index.vue'),
     },
     {
       path: 'settingShared',
@@ -54,7 +54,7 @@ const DocumentRouter = {
         parentPath: '/knowledge/system/:id/',
         parentName: 'KnowledgeDetailSharedSystem',
       },
-      component: () => import('@/views/knowledge-shared-system/KnowledgeSetting.vue'),
+      component: () => import('@/views/shared/knowledge-shared/KnowledgeSetting.vue'),
     }
   ],
 }

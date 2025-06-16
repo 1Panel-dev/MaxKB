@@ -2,7 +2,14 @@ import { Result } from '@/request/Result'
 import { get, put } from '@/request/index'
 import { type Ref } from 'vue'
 
-const prefix = '/workspace/' + localStorage.getItem('workspace_id') + '/application'
+import useStore from '@/stores'
+const prefix: any = { _value: '/workspace/' }
+Object.defineProperty(prefix, 'value', {
+  get: function () {
+    const { user } = useStore()
+    return this._value + user.getWorkspaceId() + '/application'
+  },
+})
 
 /**
  * workflow历史版本
@@ -11,7 +18,7 @@ const getWorkFlowVersion: (
   application_id: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (application_id, loading) => {
-  return get(`${prefix}/${application_id}/work_flow_version`, undefined, loading)
+  return get(`${prefix.value}/${application_id}/work_flow_version`, undefined, loading)
 }
 
 /**
@@ -23,7 +30,7 @@ const getWorkFlowVersionDetail: (
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (application_id, application_version_id, loading) => {
   return get(
-    `${prefix}/${application_id}/work_flow_version/${application_version_id}`,
+    `${prefix.value}/${application_id}/work_flow_version/${application_version_id}`,
     undefined,
     loading,
   )
@@ -38,7 +45,7 @@ const putWorkFlowVersion: (
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (application_id, application_version_id, data, loading) => {
   return put(
-    `${prefix}/${application_id}/work_flow_version/${application_version_id}`,
+    `${prefix.value}/${application_id}/work_flow_version/${application_version_id}`,
     data,
     undefined,
     loading,

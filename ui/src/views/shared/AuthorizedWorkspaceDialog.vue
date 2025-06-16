@@ -80,7 +80,7 @@ import { ref, computed } from 'vue'
 import type { CheckboxValueType } from 'element-plus'
 import iconMap from '@/components/app-icon/icons/common'
 import { Search } from '@element-plus/icons-vue'
-import KnowledgeApi from '@/api/shared/knowledge'
+import authorizationApi from '@/api/shared/authorization'
 
 const checkAll = ref(false)
 const isIndeterminate = ref(true)
@@ -129,7 +129,7 @@ const open = ({ id }: any, type = 'Knowledge') => {
   listType.value = 'WHITE_LIST'
   loading.value = true
   currentType = type
-  KnowledgeApi[`getSharedAuthorization${type}Get`](id)
+  authorizationApi[`getSharedAuthorization${type}`](id)
     .then((res: any) => {
       auth_list = (res.data || {}).auth_list || []
       un_auth_list = (res.data || {}).un_auth_list || []
@@ -143,7 +143,7 @@ const open = ({ id }: any, type = 'Knowledge') => {
 }
 
 const handleConfirm = () => {
-  KnowledgeApi[`getSharedAuthorization${currentType}Post`](knowledge_id, {
+  authorizationApi[`postSharedAuthorization${currentType}`](knowledge_id, {
     workspace_id_list: checkedWorkspace.value,
     authentication_type: listType.value,
   }).then(() => {

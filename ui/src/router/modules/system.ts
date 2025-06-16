@@ -79,7 +79,7 @@ const systemRouter = {
             parentPath: '/system',
             parentName: 'system',
           },
-          component: () => import('@/views/knowledge-shared-system/index.vue'),
+          component: () => import('@/views/shared/knowledge-shared/index.vue'),
         },
         {
           path: '/system/shared/tool',
@@ -90,7 +90,7 @@ const systemRouter = {
             parentPath: '/system',
             parentName: 'system',
           },
-          component: () => import('@/views/tool-shared-system/index.vue'),
+          component: () => import('@/views/shared/tool-shared/index.vue'),
         },
         {
           path: '/system/shared/model',
@@ -101,7 +101,7 @@ const systemRouter = {
             parentPath: '/system',
             parentName: 'system',
           },
-          component: () => import('@/views/model-shared-system/index.vue'),
+          component: () => import('@/views/shared/model-shared/index.vue'),
         },
       ],
     },

@@ -92,7 +92,7 @@
 <script lang="ts" setup>
 import { watch, ref } from 'vue'
 import type { Provider, Model } from '@/api/type/model'
-import { modelTypeList, allObj } from '@/views/model-shared-system/component/data'
+import { modelTypeList, allObj } from '@/views/shared/model-shared/component/data'
 const props = defineProps<{
   data: Array<Provider>
   loading: boolean
