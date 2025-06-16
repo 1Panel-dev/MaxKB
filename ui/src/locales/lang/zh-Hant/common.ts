@@ -84,4 +84,5 @@ export default {
   },
   info: '使用者資訊',
   otherSetting: '其他設定',
+  username: '用户名'
 }

@@ -1,3 +1,5 @@
+import { ChatUserResourceEnum } from '@/enums/workspaceChatUser'
+
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
 
 const ApplicationDetailRouter = {
@@ -62,6 +64,20 @@ const ApplicationDetailRouter = {
         parentName: 'ApplicationDetail',
       },
       component: () => import('@/views/hit-test/index.vue'),
+    },
+    {
+      path: 'chat-user',
+      name: 'applicationChatUser',
+      meta: {
+        icon: 'app-document',
+        iconActive: 'app-document-active',
+        title: 'views.chatUser.title',
+        active: 'chat-log',
+        parentPath: '/application/:id/:type',
+        parentName: 'ApplicationDetail',
+        resourceType: ChatUserResourceEnum.APPLICATION
+      },
+      component: () => import('@/views/chat-user/index.vue')
     },
     {
       path: 'chat-log',

@@ -14,6 +14,7 @@ import applicationOverview from './application-overview'
 import applicationWorkflow from './application-workflow'
 import paragraph from './paragraph'
 import chatLog from './chat-log'
+import chatUser from './chat-user'
 // import notFound from './404'
 
 // import operateLog from './operate-log'
@@ -34,6 +35,7 @@ export default {
   applicationWorkflow,
   paragraph,
   chatLog,
+  chatUser,
   // notFound,
 
   // operateLog
