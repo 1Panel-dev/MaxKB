@@ -21,6 +21,7 @@ export interface userStateTypes {
   license_is_valid: boolean
   edition: 'CE' | 'PE' | 'EE'
   themeInfo: any
+  workspace_id: string
 }
 
 const useUserStore = defineStore('user', {
@@ -31,6 +32,7 @@ const useUserStore = defineStore('user', {
     license_is_valid: false,
     edition: 'CE',
     themeInfo: null,
+    workspace_id: 'default',
   }),
   actions: {
     getLanguage() {
@@ -55,6 +57,16 @@ const useUserStore = defineStore('user', {
         theme.setTheme()
         return this.asyncGetProfile()
       })
+    },
+    getWorkspaceId(): string | null {
+      if (this.workspace_id) {
+        return this.workspace_id
+      }
+      const workspace_id = localStorage.getItem('workspace_id')
+      if (workspace_id) {
+        this.workspace_id = workspace_id
+      }
+      return workspace_id
     },
     async asyncGetProfile() {
       return new Promise((resolve, reject) => {

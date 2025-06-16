@@ -14,7 +14,7 @@
     v-model="is_auth"
     :style="{
       '--el-color-primary': application_profile?.custom_theme?.theme_color,
-      '--el-color-primary-light-9': hexToRgba(application_profile?.custom_theme?.theme_color, 0.1)
+      '--el-color-primary-light-9': hexToRgba(application_profile?.custom_theme?.theme_color, 0.1),
     }"
   ></Auth>
 </template>
@@ -26,17 +26,18 @@ import Auth from '@/views/chat/auth/index.vue'
 import { hexToRgba } from '@/utils/theme'
 import { useI18n } from 'vue-i18n'
 import { getBrowserLang } from '@/locales/index'
+import ChatAPI from '@/api/chat/chat.ts'
 const { locale } = useI18n({ useScope: 'global' })
 const route = useRoute()
 const { application, user } = useStore()
 
 const components: any = import.meta.glob('@/views/chat/**/index.vue', {
-  eager: true
+  eager: true,
 })
 
 const {
   query: { mode },
-  params: { accessToken }
+  params: { accessToken },
 } = route as any
 const is_auth = ref<boolean>(false)
 const currentTemplate = computed(() => {
@@ -91,9 +92,14 @@ function getAccessToken(token: string) {
     return getAppProfile()
   })
 }
+const getChatProfile = () => {
+  return ChatAPI.chatProfile(accessToken).then((ok: any) => {
+    console.log(ok)
+  })
+}
 onBeforeMount(() => {
   user.changeUserType(2, accessToken)
-  Promise.all([user.asyncGetProfile(), getAccessToken(accessToken)])
+  Promise.all([user.asyncGetProfile(), getChatProfile()])
     .catch(() => {
       applicationAvailable.value = false
     })
