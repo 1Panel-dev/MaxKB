@@ -228,7 +228,7 @@ const postMulDocument: (
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (knowledge_id, data, loading) => {
-  return post(`${prefix}/${knowledge_id}/document/bach_create`, data, {}, loading, 1000 * 60 * 5)
+  return put(`${prefix}/${knowledge_id}/document/batch_create`, data, {}, loading, 1000 * 60 * 5)
 }
 
 /**

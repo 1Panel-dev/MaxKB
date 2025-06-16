@@ -1,18 +1,6 @@
 <template>
-  <LayoutContainer class="tool-manage">
-    <template #left>
-      <h4 class="p-16 pb-0">{{ $t('views.tool.title') }}</h4>
-      <folder-tree
-        :data="folderList"
-        :currentNodeKey="currentFolder?.id"
-        @handleNodeClick="folderClickHandel"
-        shareTitle="views.system.share_tool"
-        isShared
-        class="p-8"
-      />
-    </template>
-    <SharedWorkspace v-if="currentFolder.id === 'share'"></SharedWorkspace>
-    <ContentContainer v-else :header="currentFolder?.name">
+  <div class="tool-shared">
+    <ContentContainer :header="$t('views.system.share_tool')">
       <template #search>
         <div class="flex">
           <div class="flex-between complex-search">
@@ -44,7 +32,6 @@
               <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.username" />
             </el-select>
           </div>
-          <el-button class="ml-16" type="primary"> {{ $t('common.create') }}</el-button>
         </div>
       </template>
 
@@ -78,7 +65,7 @@
               </CardBox>
             </el-col>
             <el-col v-else :xs="24" :sm="12" :md="12" :lg="8" :xl="6" class="mb-16">
-              <CardBox :title="item.name" :description="item.desc" class="cursor">
+              <CardBox isShared :title="item.name" :description="item.desc" class="cursor">
                 <template #icon>
                   <el-avatar
                     v-if="isAppIcon(item?.icon)"
@@ -115,70 +102,6 @@
                     </span>
                   </div>
                 </template>
-                <template #mouseEnter>
-                  <div @click.stop>
-                    <el-switch
-                      v-model="item.is_active"
-                      :before-change="() => changeState(item)"
-                      size="small"
-                      class="mr-4"
-                    />
-                    <el-divider direction="vertical" />
-                    <el-dropdown trigger="click">
-                      <el-button text @click.stop>
-                        <el-icon>
-                          <MoreFilled />
-                        </el-icon>
-                      </el-button>
-                      <template #dropdown>
-                        <el-dropdown-menu>
-                          <el-dropdown-item
-                            v-if="!item.template_id"
-                            :disabled="!canEdit(item)"
-                            @click.stop="openCreateDialog(item)"
-                          >
-                            <el-icon>
-                              <EditPen />
-                            </el-icon>
-                            {{ $t('common.edit') }}
-                          </el-dropdown-item>
-                          <el-dropdown-item
-                            :disabled="!canEdit(item)"
-                            v-if="!item.template_id"
-                            @click.stop="copyTool(item)"
-                          >
-                            <AppIcon iconName="app-copy"></AppIcon>
-                            {{ $t('common.copy') }}
-                          </el-dropdown-item>
-                          <el-dropdown-item
-                            v-if="item.init_field_list?.length > 0"
-                            :disabled="!canEdit(item)"
-                            @click.stop="configInitParams(item)"
-                          >
-                            <AppIcon iconName="app-operation" class="mr-4"></AppIcon>
-                            {{ $t('common.param.initParam') }}
-                          </el-dropdown-item>
-                          <el-dropdown-item
-                            v-if="!item.template_id"
-                            :disabled="!canEdit(item)"
-                            @click.stop="exportTool(item)"
-                          >
-                            <AppIcon iconName="app-export"></AppIcon>
-                            {{ $t('common.export') }}
-                          </el-dropdown-item>
-                          <el-dropdown-item
-                            :disabled="!canEdit(item)"
-                            divided
-                            @click.stop="deleteTool(item)"
-                          >
-                            <el-icon><Delete /></el-icon>
-                            {{ $t('common.delete') }}
-                          </el-dropdown-item>
-                        </el-dropdown-menu>
-                      </template>
-                    </el-dropdown>
-                  </div>
-                </template>
               </CardBox>
             </el-col>
           </template>
@@ -188,23 +111,25 @@
     </ContentContainer>
     <InitParamDrawer ref="InitParamDrawerRef" @refresh="refresh" />
     <ToolFormDrawer ref="ToolFormDrawerRef" @refresh="refresh" :title="ToolDrawertitle" />
-  </LayoutContainer>
+    <AuthorizedWorkspace ref="AuthorizedWorkspaceDialogRef"></AuthorizedWorkspace>
+  </div>
 </template>
 
 <script lang="ts" setup>
 import { onMounted, ref, reactive, computed } from 'vue'
 import { cloneDeep, get } from 'lodash'
 import ToolApi from '@/api/shared/tool'
-import useStore from '@/stores'
-import InitParamDrawer from '@/views/tool/component/InitParamDrawer.vue'
+import useStore from '@/stores/modules-shared-system'
+import InitParamDrawer from '@/views/tool-shared-system/component/InitParamDrawer.vue'
 import ToolFormDrawer from './ToolFormDrawer.vue'
 import { t } from '@/locales'
 import { isAppIcon } from '@/utils/common'
+import iconMap from '@/components/app-icon/icons/common'
+import AuthorizedWorkspace from '@/views/knowledge-shared-system/AuthorizedWorkspace.vue'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
-import SharedWorkspace from '@/views/tool-shared-system/SharedWorkspace.vue'
 
 const { folder, user } = useStore()
-
+const rightOutlined = iconMap['right-outlined'].iconReader()
 const InitParamDrawerRef = ref()
 const search_type = ref('name')
 const search_form = ref<{
@@ -216,6 +141,12 @@ const search_form = ref<{
 })
 const user_options = ref<any[]>([])
 
+const AuthorizedWorkspaceDialogRef = ref()
+function openAuthorizedWorkspaceDialog(row: any) {
+  if (AuthorizedWorkspaceDialogRef.value) {
+    AuthorizedWorkspaceDialogRef.value.open(row, 'Tool')
+  }
+}
 const loading = ref(false)
 const changeStateloading = ref(false)
 const paginationConfig = reactive({
@@ -257,12 +188,11 @@ function openCreateDialog(data?: any) {
 
 function getList() {
   const params = {
-    folder_id: currentFolder.value?.id || localStorage.getItem('workspace_id'),
+    folder_id: currentFolder.value?.id || 'root',
     scope: 'WORKSPACE',
   }
-  ToolApi.getToolList(paginationConfig, params, loading).then((res) => {
-    paginationConfig.total = res.data?.total
-    toolList.value = [...toolList.value, ...res.data?.records]
+  ToolApi.getSharedWorkspaceToolPage(params, loading).then((res) => {
+    toolList.value = [...res.data]
   })
 }
 
@@ -368,8 +298,8 @@ function deleteTool(row: any) {
     {
       confirmButtonText: t('common.confirm'),
       cancelButtonText: t('common.cancel'),
-      confirmButtonClass: 'danger'
-    }
+      confirmButtonClass: 'danger',
+    },
   )
     .then(() => {
       ToolApi.delTool(row.id, loading).then(() => {
@@ -386,7 +316,6 @@ function configInitParams(item: any) {
     InitParamDrawerRef.value.open(res.data)
   })
 }
-
 
 // function importTool(file: any) {
 //   const formData = new FormData()
@@ -416,4 +345,24 @@ onMounted(() => {
 })
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.tool-shared {
+  padding-left: 8px;
+  .shared-header {
+    color: #646a73;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 22px;
+    display: flex;
+    align-items: center;
+
+    :deep(.el-icon i) {
+      height: 12px;
+    }
+
+    .sub-title {
+      color: #1f2329;
+    }
+  }
+}
+</style>

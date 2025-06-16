@@ -61,54 +61,6 @@
         </el-button>
       </div>
     </div>
-
-    <template #mouseEnter>
-      <el-dropdown trigger="click">
-        <el-button text @click.stop>
-          <el-icon>
-            <MoreFilled />
-          </el-icon>
-        </el-button>
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item icon="Lock" @click.stop="openAuthorizedWorkspaceDialog(model)">{{
-              $t('views.system.authorized_workspace')
-            }}</el-dropdown-item>
-            <el-dropdown-item
-              icon="EditPen"
-              :disabled="!is_permisstion"
-              text
-              @click.stop="openEditModel"
-            >
-              {{ $t('common.modify') }}
-            </el-dropdown-item>
-
-            <el-dropdown-item
-              v-if="
-                currentModel.model_type === 'TTS' ||
-                currentModel.model_type === 'LLM' ||
-                currentModel.model_type === 'IMAGE' ||
-                currentModel.model_type === 'TTI'
-              "
-              :disabled="!is_permisstion"
-              icon="Setting"
-              @click.stop="openParamSetting"
-            >
-              {{ $t('views.model.modelForm.title.paramSetting') }}
-            </el-dropdown-item>
-            <el-dropdown-item
-              divided
-              icon="Delete"
-              :disabled="!is_permisstion"
-              text
-              @click.stop="deleteModel"
-            >
-              {{ $t('common.delete') }}
-            </el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
-    </template>
     <EditModel ref="editModelRef" @submit="emit('change')"></EditModel>
     <ParamSettingDialog ref="paramSettingRef" :model="model" />
     <AuthorizedWorkspace ref="AuthorizedWorkspaceDialogRef"></AuthorizedWorkspace>

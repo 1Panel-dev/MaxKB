@@ -165,15 +165,18 @@ function refreshMigrateParagraph() {}
   border: 1px solid #ffffff;
   box-shadow: none !important;
   position: relative;
+  overflow: inherit;
   &:hover {
     background: rgba(31, 35, 41, 0.1);
     border: 1px solid #dee0e3;
   }
   .paragraph-box-operation {
     position: absolute;
+    overflow: inherit;
     right: 0;
     top: 0;
     border: 1px solid #dee0e3;
+    z-index: 10;
   }
 }
 </style>

@@ -139,7 +139,7 @@ function submitPermissions() {
 function clickMemberHandle(item: any) {
   currentUser.value = item.id
   currentType.value = item.type
-  ResourcePermissions(item.id)
+  getWholeTree(item.id)
 }
 
 function getMember(id?: string) {

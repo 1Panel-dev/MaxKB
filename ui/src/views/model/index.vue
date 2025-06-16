@@ -6,10 +6,13 @@
         :data="provider_list"
         @click="clickListHandle"
         :loading="loading"
+        shareTitle="views.system.share_tool"
+        isShared
         :active="active_provider"
       />
     </template>
-    <ContentContainer :header="active_provider?.name" v-loading="list_model_loading">
+    <SharedWorkspace v-if="active_provider && active_provider.id === 'share'"></SharedWorkspace>
+    <ContentContainer v-else :header="active_provider?.name" v-loading="list_model_loading">
       <template #search>
         <div class="flex">
           <div class="flex-between complex-search">
@@ -123,6 +126,7 @@ import ProviderComponent from '@/views/model/component/Provider.vue'
 import { splitArray } from '@/utils/common'
 import { modelTypeList, allObj } from '@/views/model/component/data'
 import CreateModelDialog from '@/views/model/component/CreateModelDialog.vue'
+import SharedWorkspace from '@/views/model-shared-system/SharedWorkspace.vue'
 import SelectProviderDialog from '@/views/model/component/SelectProviderDialog.vue'
 import useStore from '@/stores'
 import { t } from '@/locales'

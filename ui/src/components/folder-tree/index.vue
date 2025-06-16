@@ -9,12 +9,12 @@
     />
     <div
       @click="handleSharedNodeClick"
-      v-if="isShared"
+      v-if="!!shareTitle"
       class="shared-knowledge"
       :class="currentNodeKey === 'share' && 'active'"
     >
-      <AppIcon iconName="app-folder-share-active" style="font-size: 18px"></AppIcon>
-      <span class="ml-8 lighter">{{ $t('views.system.share_knowledge') }}</span>
+      <AppIcon :iconName="iconName" style="font-size: 18px"></AppIcon>
+      <span class="ml-8 lighter">{{ $t(shareTitle) }}</span>
     </div>
     <el-tree
       ref="treeRef"
@@ -55,6 +55,14 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  iconName: {
+    type: String,
+    default: 'app-folder-share-active',
+  },
+  shareTitle: {
+    type: String,
+    default: 'views.system.share_knowledge',
+  },
 })
 interface Tree {
   name: string
@@ -87,7 +95,7 @@ const handleNodeClick = (data: Tree) => {
 
 const handleSharedNodeClick = () => {
   treeRef.value?.setCurrentKey(undefined)
-  emit('handleNodeClick', { id: 'share', name: t('views.system.share_knowledge') })
+  emit('handleNodeClick', { id: 'share', name: t(props.shareTitle) })
 }
 </script>
 <style lang="scss" scoped>

@@ -3,6 +3,15 @@
     <el-scrollbar>
       <div class="p-8">
         <div
+          @click="handleSharedNodeClick"
+          class="shared-knowledge"
+          v-if="isShared"
+          :class="currentNodeKey === 'share' && 'active'"
+        >
+          <AppIcon iconName="app-folder-share-active" style="font-size: 18px"></AppIcon>
+          <span class="ml-8 lighter">{{ $t('views.system.share_model') }}</span>
+        </div>
+        <div
           class="all-mode flex cursor"
           @click="clickListHandle(allObj as Provider)"
           :class="!active?.provider ? 'all-mode-active color-primary-1' : ''"
@@ -96,6 +105,7 @@ import { modelTypeList, allObj } from '@/views/model/component/data'
 const props = defineProps<{
   data: Array<Provider>
   loading: boolean
+  isShared?: boolean
   active?: Provider
 }>()
 const emit = defineEmits(['click'])
@@ -129,6 +139,10 @@ watch(
 
 const clickListHandle = (item: Provider) => {
   emit('click', item)
+}
+
+const handleSharedNodeClick = () => {
+  emit('click', { id: 'share' })
 }
 </script>
 <style lang="scss" scoped>
@@ -172,6 +186,36 @@ const clickListHandle = (item: Provider) => {
     }
     :deep(.el-collapse-item__content) {
       padding-bottom: 0 !important;
+    }
+  }
+  .shared-knowledge {
+    padding-left: 8px;
+    display: flex;
+    align-items: center;
+    height: 40px;
+    position: relative;
+    margin-bottom: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+
+    &:hover {
+      background: var(--app-text-color-light-1);
+      color: var(--el-menu-text-color);
+    }
+
+    &.active {
+      color: var(--el-color-primary);
+      background: var(--el-color-primary-light-9);
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      background-color: #1f232926;
+      left: 0;
+      width: 100%;
+      height: 1px;
     }
   }
 }
