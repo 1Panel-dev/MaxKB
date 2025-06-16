@@ -784,7 +784,7 @@ function creatQuickHandle(val: string) {
   loading.value = true
   const obj = [{ name: val }]
   document
-    .asyncPostDocument(id, obj)
+    .asyncPutDocument(id, obj)
     .then(() => {
       getList()
       MsgSuccess(t('common.createSuccess'))

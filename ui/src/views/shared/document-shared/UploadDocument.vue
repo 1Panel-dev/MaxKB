@@ -148,7 +148,7 @@ function submit() {
   if (id) {
     // 上传文档
     document
-      .asyncPostDocument(id as string, documents)
+      .asyncPutDocument(id as string, documents)
       .then(() => {
         MsgSuccess(t('common.submitSuccess'))
         clearStore()

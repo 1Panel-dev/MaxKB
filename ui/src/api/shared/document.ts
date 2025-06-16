@@ -223,7 +223,7 @@ const putDocumentSync: (
   "source_file_id": string
 }
  */
-const postMulDocument: (
+const putMulDocument: (
   knowledge_id: string,
   data: any,
   loading?: Ref<boolean>,
@@ -478,7 +478,7 @@ export default {
   exportDocumentZip,
   putDocumentRefresh,
   putDocumentSync,
-  postMulDocument,
+  putMulDocument,
   delMulDocument,
   putBatchGenerateRelated,
   putBatchEditHitHandling,

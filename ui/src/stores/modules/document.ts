@@ -17,10 +17,10 @@ const useDocumentStore = defineStore('document', {
           })
       })
     },
-    async asyncPostDocument(knowledgeId: string, data: any, loading?: Ref<boolean>) {
+    async asyncPutDocument(knowledgeId: string, data: any, loading?: Ref<boolean>) {
       return new Promise((resolve, reject) => {
         documentApi
-          .postMulDocument(knowledgeId, data, loading)
+          .putMulDocument(knowledgeId, data, loading)
           .then((data) => {
             resolve(data)
           })

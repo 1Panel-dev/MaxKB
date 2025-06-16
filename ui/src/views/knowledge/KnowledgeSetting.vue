@@ -130,11 +130,11 @@
               </div>
               <el-form-item :label="$t('上传的每个文档最大限制')">
                 <el-slider
-                  v-model="form.max_paragraph_char_number"
+                  v-model="form.file_count_limit"
                   show-input
                   :show-input-controls="false"
-                  :min="500"
-                  :max="100000"
+                  :min="1"
+                  :max="1000"
                   class="custom-slider"
                 />
               </el-form-item>
@@ -177,6 +177,7 @@ const form = ref<any>({
   app_id: '',
   app_secret: '',
   folder_token: '',
+  file_count_limit: 100,
 })
 
 const rules = reactive({
