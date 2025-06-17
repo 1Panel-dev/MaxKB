@@ -25,5 +25,6 @@ interface ChatUserGroupUserItem {
   is_active: boolean,
   create_time: string,
   update_time: string,
+  user_group_relation_id: string,
 }
 export type { ChatUserGroupUserItem, ChatUserItem }
