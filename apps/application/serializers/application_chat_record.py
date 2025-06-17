@@ -12,6 +12,8 @@ from typing import Dict
 
 from django.db import transaction
 from django.db.models import QuerySet
+from django.db.models.aggregates import Max
+from django.utils.translation import gettext_lazy as _, gettext
 from rest_framework import serializers
 from rest_framework.utils.formatting import lazy_format
 
@@ -21,9 +23,6 @@ from common.db.search import page_search
 from common.exception.app_exception import AppApiException
 from common.utils.common import post
 from knowledge.models import Paragraph, Document, Problem, ProblemParagraphMapping
-
-from django.utils.translation import gettext_lazy as _, gettext
-
 from knowledge.serializers.common import get_embedding_model_id_by_knowledge_id, update_document_char_length
 from knowledge.serializers.paragraph import ParagraphSerializers
 from knowledge.task.embedding import embedding_by_paragraph, embedding_by_paragraph_list
@@ -229,6 +228,11 @@ class ApplicationChatRecordAddKnowledgeSerializer(serializers.Serializer):
             chat_record.improve_paragraph_id_list.append(paragraph.id)
 
         # 批量保存段落和问题映射
+        max_position = Paragraph.objects.filter(document_id=document_id).aggregate(
+            max_position=Max('position')
+        )['max_position']
+        for i, paragraph in enumerate(paragraphs):
+            paragraph.position = max_position + i + 1
         Paragraph.objects.bulk_create(paragraphs)
         ProblemParagraphMapping.objects.bulk_create(problem_paragraph_mappings)
 
@@ -276,11 +280,17 @@ class ApplicationChatRecordImproveSerializer(serializers.Serializer):
 
         document_id = self.data.get("document_id")
         knowledge_id = self.data.get("knowledge_id")
-        paragraph = Paragraph(id=uuid.uuid1(),
-                              document_id=document_id,
-                              content=instance.get("content"),
-                              knowledge_id=knowledge_id,
-                              title=instance.get("title") if 'title' in instance else '')
+        max_position = Paragraph.objects.filter(document_id=document_id).aggregate(
+            max_position=Max('position')
+        )['max_position'] or 0
+        paragraph = Paragraph(
+            id=uuid.uuid1(),
+            document_id=document_id,
+            content=instance.get("content"),
+            knowledge_id=knowledge_id,
+            title=instance.get("title") if 'title' in instance else '',
+            position=max_position + 1
+        )
         problem_text = instance.get('problem_text') if instance.get(
             'problem_text') is not None else chat_record.problem_text
         problem, _ = QuerySet(Problem).get_or_create(content=problem_text, knowledge_id=knowledge_id)

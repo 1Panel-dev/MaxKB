@@ -131,7 +131,7 @@ const documentsFiles = computed(() => knowledge.documentsFiles)
 const splitPatternList = ref<Array<KeyValue<string, string>>>([])
 const route = useRoute()
 const {
-  query: { id }, // id为datasetID
+  query: { id }, // id为knowledgeID
 } = route as any
 const radio = ref('1')
 const loading = ref(false)
@@ -188,7 +188,7 @@ function splitDocument() {
     })
   }
   documentApi
-    .postSplitDocument(fd, id)
+    .postSplitDocument(id, fd)
     .then((res: any) => {
       const list = res.data
 
@@ -218,7 +218,7 @@ function splitDocument() {
 }
 
 const initSplitPatternList = () => {
-  documentApi.listSplitPattern(patternLoading).then((ok) => {
+  documentApi.listSplitPattern(id,patternLoading).then((ok) => {
     splitPatternList.value = ok.data
   })
 }

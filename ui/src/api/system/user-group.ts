@@ -1,13 +1,15 @@
-import {Result} from '@/request/Result'
-import {get, post, del, put} from '@/request/index'
-import type {Ref} from 'vue'
+import { Result } from '@/request/Result'
+import { get, post, del } from '@/request/index'
+import type { Ref } from 'vue'
+import type { ChatUserGroupUserItem, } from '@/api/type/systemChatUser'
+import type { pageRequest, PageList, ListItem } from '@/api/type/common'
 
 const prefix = '/system/group'
 
 /**
  * 获取用户组列表
  */
-const getUserGroup: (loading?: Ref<boolean>) => Promise<Result<any[]>> = () => {
+const getUserGroup: (loading?: Ref<boolean>) => Promise<Result<ListItem[]>> = () => {
   return get(`${prefix}`)
 }
 
@@ -19,7 +21,7 @@ const getUserGroup: (loading?: Ref<boolean>) => Promise<Result<any[]>> = () => {
  "name": "string"
  }
  */
-const postUserGroup: (data: any, loading?: Ref<boolean>) => Promise<Result<boolean>> = (
+const postUserGroup: (data: ListItem, loading?: Ref<boolean>) => Promise<Result<boolean>> = (
   data,
   loading,
 ) => {
@@ -30,7 +32,7 @@ const postUserGroup: (data: any, loading?: Ref<boolean>) => Promise<Result<boole
  * 删除用户组
  * @param 参数 user_group_id
  */
-const delUserGroup: (user_group_id: String, loading?: Ref<boolean>) => Promise<Result<boolean>> = (
+const delUserGroup: (user_group_id: string, loading?: Ref<boolean>) => Promise<Result<boolean>> = (
   user_group_id,
   loading,
 ) => {
@@ -39,16 +41,10 @@ const delUserGroup: (user_group_id: String, loading?: Ref<boolean>) => Promise<R
 
 /**
  * 给用户组添加用户
- * @param 参数
- * {
- "additionalProp1": "string",
- "additionalProp2": "string",
- "additionalProp3": "string"
- }
  */
 const postAddMember: (
   user_group_id: string,
-  body: any,
+  body: string[],
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (user_group_id, body, loading) => {
   return post(`${prefix}/${user_group_id}/add_member`, body, {}, loading)
@@ -56,24 +52,35 @@ const postAddMember: (
 
 /**
  * 从用户组删除用户
- * @param 参数 {
- "additionalProp1": "string",
- "additionalProp2": "string",
- "additionalProp3": "string"
- }
  */
 const postRemoveMember: (
   user_group_id: string,
-  body: any,
+  body: string[],
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (user_group_id, body, loading) => {
-  return post(`${prefix}/${user_group_id}`, body, {}, loading)
+  return post(`${prefix}/${user_group_id}/remove_member`, body, {}, loading)
 }
 
+/**
+ * 获取用户组的成员列表
+ */
+const getUserListByGroup: (
+  user_group_id: string,
+  page: pageRequest,
+  username: string,
+  loading?: Ref<boolean>,
+) => Promise<Result<PageList<ChatUserGroupUserItem[]>>> = (user_group_id, page, username, loading) => {
+  return get(
+    `${prefix}/${user_group_id}/user_list/${page.current_page}/${page.page_size}`,
+    username ? { username } : undefined,
+    loading,
+  )
+}
 export default {
   getUserGroup,
   postUserGroup,
   delUserGroup,
   postAddMember,
   postRemoveMember,
+  getUserListByGroup
 }

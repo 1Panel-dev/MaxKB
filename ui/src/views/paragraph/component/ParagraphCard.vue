@@ -6,55 +6,56 @@
     @mouseleave="cardLeave()"
   >
     <h2 class="mb-16">{{ data.title || '-' }}</h2>
-    <el-card
-      v-show="show"
-      class="paragraph-box-operation mt-8 mr-8"
-      shadow="always"
-      style="--el-card-padding: 8px 12px; --el-card-border-radius: 8px"
-    >
-      <el-switch
-        :loading="changeStateloading"
-        v-model="data.is_active"
-        :before-change="() => changeState(data)"
-        size="small"
-      />
+    <div v-show="show" class="mk-sticky">
+      <el-card
+        class="paragraph-box-operation mt-8 mr-8"
+        shadow="always"
+        style="--el-card-padding: 8px 12px; --el-card-border-radius: 8px"
+      >
+        <el-switch
+          :loading="changeStateloading"
+          v-model="data.is_active"
+          :before-change="() => changeState(data)"
+          size="small"
+        />
 
-      <el-divider direction="vertical" />
-      <span class="mr-8">
-        <el-button link @click="editParagraph(data)">
-          <el-icon :size="16" :title="$t('views.applicationWorkflow.control.zoomOut')">
-            <EditPen />
-          </el-icon>
-        </el-button>
-      </span>
-      <span class="mr-8">
-        <el-button link>
-          <el-icon :size="16" :title="$t('views.applicationWorkflow.control.zoomOut')">
-            <el-icon><CirclePlus /></el-icon>
-          </el-icon>
-        </el-button>
-      </span>
-      <el-dropdown trigger="click" :teleported="false">
-        <el-button text>
-          <el-icon><MoreFilled /></el-icon>
-        </el-button>
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item @click="openGenerateDialog(data)">
-              <el-icon><Connection /></el-icon>
-              {{ $t('views.document.generateQuestion.title') }}</el-dropdown-item
-            >
-            <el-dropdown-item @click="openSelectDocumentDialog(data)">
-              <AppIcon iconName="app-migrate"></AppIcon>
-              {{ $t('views.document.setting.migration') }}</el-dropdown-item
-            >
-            <el-dropdown-item icon="Delete" @click.stop="deleteParagraph(data)">{{
-              $t('common.delete')
-            }}</el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
-    </el-card>
+        <el-divider direction="vertical" />
+        <span class="mr-8">
+          <el-button link @click="editParagraph(data)">
+            <el-icon :size="16" :title="$t('views.applicationWorkflow.control.zoomOut')">
+              <EditPen />
+            </el-icon>
+          </el-button>
+        </span>
+        <span class="mr-8">
+          <el-button link>
+            <el-icon :size="16" :title="$t('views.applicationWorkflow.control.zoomOut')">
+              <el-icon><CirclePlus /></el-icon>
+            </el-icon>
+          </el-button>
+        </span>
+        <el-dropdown trigger="click" :teleported="false">
+          <el-button text>
+            <el-icon><MoreFilled /></el-icon>
+          </el-button>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item @click="openGenerateDialog(data)">
+                <el-icon><Connection /></el-icon>
+                {{ $t('views.document.generateQuestion.title') }}</el-dropdown-item
+              >
+              <el-dropdown-item @click="openSelectDocumentDialog(data)">
+                <AppIcon iconName="app-migrate"></AppIcon>
+                {{ $t('views.document.setting.migration') }}</el-dropdown-item
+              >
+              <el-dropdown-item icon="Delete" @click.stop="deleteParagraph(data)">{{
+                $t('common.delete')
+              }}</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+      </el-card>
+    </div>
     <MdPreview
       ref="editorRef"
       editorId="preview-only"
@@ -176,6 +177,16 @@ function refreshMigrateParagraph() {}
     top: 0;
     overflow: inherit;
     border: 1px solid #dee0e3;
+    z-index: 10;
+    float: right;
+  }
+
+  .mk-sticky {
+    height: 0;
+    position: sticky;
+    right: 0;
+    top: 0;
+    overflow: inherit;
     z-index: 10;
   }
 }

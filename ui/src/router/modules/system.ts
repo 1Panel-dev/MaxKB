@@ -1,4 +1,4 @@
-import { Role, ComplexPermission } from '@/utils/permission/type'
+import { PermissionConst, EditionConst, RoleConst } from '@/utils/permission/data'
 const systemRouter = {
   path: '/system',
   name: 'system',
@@ -42,6 +42,7 @@ const systemRouter = {
         activeMenu: '/system',
         parentPath: '/system',
         parentName: 'system',
+        permission: [EditionConst.IS_EE],
       },
       component: () => import('@/views/role/index.vue'),
     },
@@ -55,6 +56,7 @@ const systemRouter = {
         activeMenu: '/system',
         parentPath: '/system',
         parentName: 'system',
+        permission: [EditionConst.IS_EE],
       },
       component: () => import('@/views/workspace/index.vue'),
     },
@@ -68,6 +70,7 @@ const systemRouter = {
         activeMenu: '/system',
         parentPath: '/system',
         parentName: 'system',
+        permission: [EditionConst.IS_EE],
       },
       children: [
         {
@@ -115,6 +118,7 @@ const systemRouter = {
         activeMenu: '/system',
         parentPath: '/system',
         parentName: 'system',
+        permission: [EditionConst.IS_PE, EditionConst.IS_EE],
       },
       children: [
         {
@@ -172,7 +176,7 @@ const systemRouter = {
             activeMenu: '/system',
             parentPath: '/system',
             parentName: 'system',
-            //permission: new ComplexPermission(['ADMIN'], ['x-pack'], 'AND')
+            permission: [EditionConst.IS_PE, EditionConst.IS_EE],
           },
           component: () => import('@/views/theme/index.vue'),
         },
@@ -184,7 +188,7 @@ const systemRouter = {
             activeMenu: '/system',
             parentPath: '/system',
             parentName: 'system',
-            //permission: new ComplexPermission(['ADMIN'], ['x-pack'], 'AND')
+            permission: [EditionConst.IS_PE, EditionConst.IS_EE],
           },
           component: () => import('@/views/authentication/index.vue'),
         },

@@ -56,7 +56,7 @@
             @click="handleClick"
           >
             <template v-for="(item, index) in paragraphDetail" :key="item.id">
-              <el-anchor-link :href="`#${item.id}`" :title="item.title" v-if="item.title" />
+              <el-anchor-link :href="`#m${item.id}`" :title="item.title" v-if="item.title" />
             </template>
           </el-anchor>
         </div>
@@ -83,9 +83,9 @@
                       ghostClass="ghost"
                     >
                       <template v-for="(item, index) in paragraphDetail" :key="item.id">
-                        <div style="display: flex; margin-bottom: 16px">
+                        <div :id="`m${item.id}`" style="display: flex; margin-bottom: 16px">
                           <!-- 批量操作 -->
-                          <div class="paragraph-card flex" :id="item.id" v-if="isBatch === true">
+                          <div class="paragraph-card flex" v-if="isBatch === true">
                             <el-checkbox :value="item.id" />
                             <ParagraphCard :data="item" class="mb-8 w-full" />
                           </div>
@@ -167,8 +167,9 @@ const title = ref('')
 const search = ref('')
 const searchType = ref('title')
 
-const handleClick = (e: MouseEvent) => {
+const handleClick = (e: MouseEvent, ele: any) => {
   e.preventDefault()
+  document.querySelector(`${ele}`).scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 
 // 批量操作
@@ -267,7 +268,7 @@ function getDetail() {
 
 function getParagraphList() {
   paragraphApi
-    .getParagraph(
+    .getParagraphPage(
       id,
       documentId,
       paginationConfig,

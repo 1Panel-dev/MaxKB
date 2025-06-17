@@ -4,7 +4,6 @@ import { type Ref } from 'vue'
 import type { pageRequest } from '@/api/type/common'
 import type { knowledgeData } from '@/api/type/knowledge'
 
-import useStore from '@/stores'
 const prefix = '/system/shared'
 
 /**
@@ -248,31 +247,6 @@ const postWebKnowledge: (data: any, loading?: Ref<boolean>) => Promise<Result<an
 ) => {
   return post(`${prefix}/knowledge/web`, data, undefined, loading)
 }
-
-/**
- * 获取飞书文档列表
- * @param knowledge_id
- * @param folder_token
- * @param loading
- * @returns
- */
-const getLarkDocumentList: (
-  knowledge_id: string,
-  folder_token: string,
-  data: any,
-  loading?: Ref<boolean>,
-) => Promise<Result<Array<any>>> = (knowledge_id, folder_token, data, loading) => {
-  return post(`${prefix}/lark/${knowledge_id}/${folder_token}/doc_list`, data, null, loading)
-}
-
-const importLarkDocument: (
-  knowledge_id: string,
-  data: any,
-  loading?: Ref<boolean>,
-) => Promise<Result<Array<any>>> = (knowledge_id, data, loading) => {
-  return post(`${prefix}/lark/${knowledge_id}/import`, data, null, loading)
-}
-
 const postLarkKnowledge: (data: any, loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (
   data,
   loading,
@@ -297,8 +271,6 @@ export default {
   getKnowledgeModel,
   postWebKnowledge,
 
-  getLarkDocumentList,
-  importLarkDocument,
   postLarkKnowledge,
 } as {
   [key: string]: any

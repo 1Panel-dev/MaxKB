@@ -11,16 +11,6 @@ Object.defineProperty(prefix, 'value', {
     return this._value + user.getWorkspaceId()
   },
 })
-
-
-/**
- * 获取成员列表
- * @query 参数
- */
-const getUserList: (loading?: Ref<boolean>) => Promise<Result<any>> = (loading) => {
-  return get(`${prefix}/user_list`, undefined, loading)
-}
-
 /**
  * 获取资源权限
  * @query 参数
@@ -29,7 +19,7 @@ const getResourceAuthorization: (
   user_id: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (user_id, loading) => {
-  return get(`${prefix}/user_resource_permission/user/${user_id}`, undefined, loading)
+  return get(`${prefix.value}/user_resource_permission/user/${user_id}`, undefined, loading)
 }
 
 /**
@@ -55,11 +45,22 @@ const putResourceAuthorization: (
   body: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (user_id, body, loading) => {
-  return put(`${prefix}/user_resource_permission/user/${user_id}`, body, loading)
+  return put(`${prefix.value}/user_resource_permission/user/${user_id}`, body, loading)
 }
+
+
+/**
+ * 获取成员列表
+ * @query 参数
+ */
+const getUserList: (loading?: Ref<boolean>) => Promise<Result<any>> = (loading) => {
+  return get(`${prefix.value}/user_list`, undefined, loading)
+}
+
 const getUserMember: (loading?: Ref<boolean>) => Promise<Result<any>> = (loading) => {
-  return get(`${prefix}/user_member`, undefined, loading)
+  return get(`${prefix.value}/user_member`, undefined, loading)
 }
+
 export default {
   getResourceAuthorization,
   putResourceAuthorization,

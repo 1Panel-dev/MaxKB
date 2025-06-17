@@ -229,18 +229,18 @@ function getDocument(knowledge_id: string) {
 }
 
 function getKnowledge_id() {
-  // application.asyncGetApplicationKnowledge(id, loading).then((res: any) => {
-  //   knowledgeList.value = res.data
-  //   if (localStorage.getItem(id + 'chat_knowledge_id')) {
-  //     form.value.knowledge_id = localStorage.getItem(id + 'chat_knowledge_id') as string
-  //     if (!knowledgeList.value.find((v) => v.id === form.value.knowledge_id)) {
-  //       form.value.knowledge_id = ''
-  //       form.value.document_id = ''
-  //     } else {
-  //       getDocument(form.value.knowledge_id)
-  //     }
-  //   }
-  // })
+  application.asyncGetApplicationKnowledge(id, loading).then((res: any) => {
+    knowledgeList.value = res.data
+    if (localStorage.getItem(id + 'chat_knowledge_id')) {
+      form.value.knowledge_id = localStorage.getItem(id + 'chat_knowledge_id') as string
+      if (!knowledgeList.value.find((v) => v.id === form.value.knowledge_id)) {
+        form.value.knowledge_id = ''
+        form.value.document_id = ''
+      } else {
+        getDocument(form.value.knowledge_id)
+      }
+    }
+  })
 }
 
 const open = (data: any) => {

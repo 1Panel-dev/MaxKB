@@ -132,7 +132,7 @@ const splitPatternList = ref<Array<KeyValue<string, string>>>([])
 
 const route = useRoute()
 const {
-  query: { id }, // id为datasetID
+  query: { id }, // id为knowledgeID
 } = route as any
 const radio = ref('1')
 const loading = ref(false)
@@ -150,7 +150,7 @@ const form = reactive<{
 }>({
   patterns: [],
   limit: 500,
-  with_filter: true
+  with_filter: true,
 })
 
 function changeHandle(val: boolean) {
@@ -162,11 +162,11 @@ function changeHandle(val: boolean) {
         problem_list: v.title.trim()
           ? [
               {
-                content: v.title.trim()
-              }
+                content: v.title.trim(),
+              },
             ]
-          : []
-      }))
+          : [],
+      })),
     }))
     firstChecked.value = false
   }
@@ -189,7 +189,7 @@ function splitDocument() {
     })
   }
   documentApi
-    .postSplitDocument(fd, id)
+    .postSplitDocument(id, fd)
     .then((res: any) => {
       const list = res.data
 
@@ -202,8 +202,8 @@ function splitDocument() {
             v['problem_list'] = v.title.trim()
               ? [
                   {
-                    content: v.title.trim()
-                  }
+                    content: v.title.trim(),
+                  },
                 ]
               : []
           })
@@ -219,7 +219,7 @@ function splitDocument() {
 }
 
 const initSplitPatternList = () => {
-  documentApi.listSplitPattern(patternLoading).then((ok) => {
+  documentApi.listSplitPattern(id, patternLoading).then((ok) => {
     splitPatternList.value = ok.data
   })
 }
@@ -237,7 +237,7 @@ onMounted(() => {
 defineExpose({
   paragraphList,
   checkedConnect,
-  loading
+  loading,
 })
 </script>
 <style scoped lang="scss">

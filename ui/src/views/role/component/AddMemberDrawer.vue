@@ -33,6 +33,7 @@ import { t } from '@/locales'
 import type { RoleItem } from '@/api/type/role'
 import { MsgSuccess } from '@/utils/message'
 import { RoleTypeEnum } from '@/enums/system'
+import { loadPermissionApi } from '@/utils/permission-api'
 
 const props = defineProps<{
   currentRole?: RoleItem
@@ -140,7 +141,7 @@ function handleAdd() {
       if (props.currentRole?.type === RoleTypeEnum.ADMIN) {
         params = list.value.map((item) => ({ user_ids: item.user_ids, workspace_ids: ['None'] }))
       }
-      await RoleApi.CreateMember(
+      await loadPermissionApi('role').CreateMember(
         props.currentRole?.id as string,
         { members: params ?? list.value },
         loading,

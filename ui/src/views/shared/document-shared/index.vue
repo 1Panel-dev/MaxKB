@@ -510,10 +510,10 @@
       </div>
     </el-card>
     <div class="mul-operation w-full flex" v-if="multipleSelection.length !== 0">
-      <el-button :disabled="multipleSelection.length === 0" @click="cancelTaskHandle(1)">
+      <el-button :disabled="multipleSelection.length === 0" @click="cancelTaskHandle(1, row)">
         {{ $t('views.document.setting.cancelVectorization') }}
       </el-button>
-      <el-button :disabled="multipleSelection.length === 0" @click="cancelTaskHandle(2)">
+      <el-button :disabled="multipleSelection.length === 0" @click="cancelTaskHandle(2, row)">
         {{ $t('views.document.setting.cancelGenerate') }}
       </el-button>
       <el-text type="info" class="secondary ml-24">
@@ -607,9 +607,11 @@ const title = ref('')
 const SelectknowledgeDialogRef = ref()
 
 const exportDocument = (document: any) => {
-  documentApi.exportDocument(document.name, document.knowledge_id, document.id, loading).then(() => {
-    MsgSuccess(t('common.exportSuccess'))
-  })
+  documentApi
+    .exportDocument(document.name, document.knowledge_id, document.id, loading)
+    .then(() => {
+      MsgSuccess(t('common.exportSuccess'))
+    })
 }
 const exportDocumentZip = (document: any) => {
   documentApi
@@ -619,7 +621,7 @@ const exportDocumentZip = (document: any) => {
     })
 }
 
-function cancelTaskHandle(val: any) {
+function cancelTaskHandle(val: any, row: any) {
   const arr: string[] = []
   multipleSelection.value.map((v) => {
     if (v) {
@@ -630,7 +632,7 @@ function cancelTaskHandle(val: any) {
     id_list: arr,
     type: val,
   }
-  documentApi.putBatchCancelTask(id, obj, loading).then(() => {
+  documentApi.putBatchCancelTask(id, row.id, obj, loading).then(() => {
     MsgSuccess(t('views.document.tip.cancelSuccess'))
     multipleTableRef.value?.clearSelection()
   })
@@ -717,8 +719,7 @@ const closeInterval = () => {
 }
 
 function syncDocument(row: any) {
-  console.log('row', row)
-  if (row.type === '1') {
+  if (+row.type === 1) {
     syncWebDocument(row)
   } else {
     syncLarkDocument(row)
@@ -936,7 +937,7 @@ function getList(bool?: boolean) {
     folder_id: folderId,
   }
   documentApi
-    .getDocument(id as string, paginationConfig.value, param, bool ? undefined : loading)
+    .getDocumentPage(id as string, paginationConfig.value, param, bool ? undefined : loading)
     .then((res) => {
       documentData.value = res.data.records
       paginationConfig.value.total = res.data.total

@@ -1,0 +1,5 @@
+Section title (optional), Section content (required，question answer), Question (optional，one per line in the cell)
+MaxKB product introduction,"MaxKB is a knowledge base question-answering system based on the LLM large language model. MaxKB = Max Knowledge Base，aims to become the most powerful brain of the enterprise。Out-of-the-box: supports direct document upload、automatic crawling of online documents、automatic text splitting and vectorization、and good intelligent question-answering interactive experience；Seamless embedding: supports zero-coding and rapid embedding into third-party business systems；Multi-model support: supports docking with mainstream large models，including Ollama local private large models (such as Llama 2、Llama 3、qwen)、Tongyi Qianwen、OpenAI、Azure OpenAI、Kimi、Zhipu AI、iFlytek Spark and Baidu Qianfan large models、etc.","What is MaxKB?
+MaxKB product introduction
+Large language model supported by MaxKB
+MaxKB advantages"

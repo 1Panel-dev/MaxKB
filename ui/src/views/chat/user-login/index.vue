@@ -132,18 +132,18 @@ import type {FormInstance, FormRules} from 'element-plus'
 import type {LoginRequest} from '@/api/type/login'
 import LoginContainer from '@/layout/login-layout/LoginContainer.vue'
 import UserLoginLayout from '@/layout/login-layout/UserLoginLayout.vue'
-import loginApi from '@/api/chat-user/user-login.ts'
-import authApi from '@/api/chat-user/auth-setting'
+import loginApi from '@/api/chat/chat.ts'
 import {t, getBrowserLang} from '@/locales'
 import useStore from '@/stores'
 import {useI18n} from 'vue-i18n'
 import QrCodeTab from '@/views/login/scanCompinents/QrCodeTab.vue'
 import {MsgConfirm, MsgError} from '@/utils/message.ts'
+import useUserStore from "@/stores/modules/user.ts";
 // import * as dd from 'dingtalk-jsapi'
 // import {loadScript} from '@/utils/utils'
 
 const router = useRouter()
-const {login, user, theme} = useStore()
+const {login, user, theme, chatUser} = useStore()
 const {locale} = useI18n({useScope: 'global'})
 const loading = ref<boolean>(false)
 const route = useRoute()
@@ -185,15 +185,16 @@ const rules = ref<FormRules<LoginRequest>>({
 const loginHandle = () => {
   loginFormRef.value?.validate().then(() => {
     if (loginMode.value === 'LDAP') {
-      login.asyncLdapLogin(loginForm.value, loading).then(() => {
-        locale.value = localStorage.getItem('MaxKB-locale') || getBrowserLang() || 'en-US'
-        router.push({name: 'home'})
+      loginApi.ldapLogin(accessToken, loginForm.value,).then((ok) => {
+        localStorage.setItem('token', ok?.data?.token)
+        const user = useUserStore()
+        return user.profile(loading)
       })
     } else {
-      login.asyncLogin(loginForm.value, loading).then(() => {
-        locale.value = localStorage.getItem('MaxKB-locale') || getBrowserLang() || 'en-US'
-        localStorage.setItem('workspace_id', 'default')
-        router.push({name: 'home'})
+      loginApi.login(accessToken, loginForm.value,).then((ok) => {
+        localStorage.setItem('token', ok?.data?.token)
+        const user = useUserStore()
+        return user.profile(loading)
       })
     }
   })
@@ -233,7 +234,7 @@ function redirectAuth(authType: string, needMessage: boolean = false) {
   if (authType === 'LDAP' || authType === '') {
     return
   }
-  authApi.getAuthSetting(authType, loading).then((res: any) => {
+  loginApi.getAuthSetting(authType, loading).then((res: any) => {
     if (!res.data || !res.data.config) {
       return;
     }
@@ -297,55 +298,33 @@ function changeMode(val: string) {
 }
 
 onBeforeMount(() => {
-  loading.value = true
-  user.asyncGetProfile().then((res) => {
-    if (user.isEnterprise()) {
-      loginApi
-        .getAuthType(accessToken)
-        .then((res: any) => {
-          res = res.data || {}
-          const direct = res.needDirect
-          res = res.authType || []
-          if (direct) {
-            redirectAuth(res[0], false)
-          } else {
-
-            //如果结果包含LDAP，把LDAP放在第一个
-            const ldapIndex = res.indexOf('LDAP')
-            if (ldapIndex !== -1) {
-              const [ldap] = res.splice(ldapIndex, 1)
-              res.unshift(ldap)
-            }
-            modeList.value = [...modeList.value, ...res].filter((item => item !== ''))
-            loginMode.value = modeList.value[0] || 'LOCAL'
-            console.log(modeList.value)
-          }
-        })
-        .finally(() => (loading.value = false))
-      // user
-      //   .getQrType()
-      //   .then((res) => {
-      //     if (res.length > 0) {
-      //       modeList.value = ['QR_CODE', ...modeList.value]
-      //       QrList.value = res
-      //       QrList.value.forEach((item) => {
-      //         orgOptions.value.push({
-      //           key: item,
-      //           value:
-      //             item === 'wecom'
-      //               ? t('views.system.authentication.scanTheQRCode.wecom')
-      //               : item === 'dingtalk'
-      //                 ? t('views.system.authentication.scanTheQRCode.dingtalk')
-      //                 : t('views.system.authentication.scanTheQRCode.lark'),
-      //         })
-      //       })
-      //     }
-      //   })
-      //   .finally(() => (loading.value = false))
-    } else {
-      loading.value = false
+  if (chatUser.chat_profile?.login_value) {
+    modeList.value = chatUser.chat_profile.login_value
+    loginMode.value = modeList.value[0] || 'LOCAL'
+    if (modeList.value.length == 1 && ['CAS', 'OIDC', 'OAuth2'].includes(modeList.value[0])) {
+      redirectAuth(modeList.value[0])
     }
-  })
+  }
+  // user
+  //   .getQrType()
+  //   .then((res) => {
+  //     if (res.length > 0) {
+  //       modeList.value = ['QR_CODE', ...modeList.value]
+  //       QrList.value = res
+  //       QrList.value.forEach((item) => {
+  //         orgOptions.value.push({
+  //           key: item,
+  //           value:
+  //             item === 'wecom'
+  //               ? t('views.system.authentication.scanTheQRCode.wecom')
+  //               : item === 'dingtalk'
+  //                 ? t('views.system.authentication.scanTheQRCode.dingtalk')
+  //                 : t('views.system.authentication.scanTheQRCode.lark'),
+  //         })
+  //       })
+  //     }
+  //   })
+  //   .finally(() => (loading.value = false))
 })
 //declare const window: any
 

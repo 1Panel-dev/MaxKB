@@ -25,35 +25,34 @@ router.beforeEach(
       return
     }
     const { chatUser } = useStore()
-    const notAuthRouteNameList = ['user_login']
-    if (!notAuthRouteNameList.includes(to.name ? to.name.toString() : '')) {
-      if (to.params && to.params.accessToken) {
-        chatUser.setAccessToken(to.params.accessToken.toString())
-      } else {
+    if (['login', 'chat'].includes(to.name ? to.name.toString() : '')) {
+      chatUser.setAccessToken(to.params.accessToken.toString())
+    } else {
+      next({
+        path: '/404',
+      })
+      return
+    }
+    const authentication = await chatUser.isAuthentication()
+    const token = chatUser.getToken()
+    if (authentication) {
+      if (!token && to.name != 'login') {
         next({
-          path: '/404',
+          name: 'login',
+          params: {
+            accessToken: to.params.accessToken,
+          },
         })
         return
-      }
-      const token = chatUser.getToken()
-      const authentication = await chatUser.isAuthentication()
-      if (authentication) {
-        if (!token) {
-          next({
-            name: 'user_login',
-            params: {
-              accessToken: to.params.accessToken,
-            },
-          })
-          return
-        }
       } else {
-        await chatUser.anonymousAuthentication()
+        next()
+        return
       }
-
-      if (!chatUser.application) {
-        await chatUser.applicationProfile()
-      }
+    } else {
+      await chatUser.anonymousAuthentication()
+    }
+    if (!chatUser.application) {
+      await chatUser.applicationProfile()
     }
     // 判断是否有菜单权限
     if (to.meta.permission ? hasPermission(to.meta.permission as any, 'OR') : true) {

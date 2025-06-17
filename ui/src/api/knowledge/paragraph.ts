@@ -41,14 +41,14 @@ const postParagraph: (
 }
 
 /**
- * 段落列表
+ * 段落分页列表
  * @param 参数 knowledge_id document_id
  * param {
           "title": "string",
           "content": "string",
         }
  */
-const getParagraph: (
+const getParagraphPage: (
   knowledge_id: string,
   document_id: string,
   page: pageRequest,
@@ -141,6 +141,30 @@ const postParagraphProblem: (
     `${prefix.value}/${knowledge_id}/document/${document_id}/paragraph/${paragraph_id}/problem`,
     data,
     {},
+    loading,
+  )
+}
+
+
+/**
+ * 段落调整顺序
+ * @param knowledge_id 数据集id
+ * @param document_id 文档id
+ * @param loading 加载器
+ * @query data {
+ *              paragraph_id 段落id  new_position 新顺序
+ *             }
+ */
+const putAdjustPosition: (
+  knowledge_id: string,
+  document_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (knowledge_id, document_id, data, loading) => {
+  return put(
+    `${prefix.value}/${knowledge_id}/document/${document_id}/paragraph/adjust_position`,
+    {},
+    data,
     loading,
   )
 }
@@ -262,7 +286,7 @@ const putDisassociationProblem: (
 
 export default {
   postParagraph,
-  getParagraph,
+  getParagraphPage,
   putParagraph,
   delParagraph,
   getParagraphProblem,

@@ -140,7 +140,7 @@ import { MsgConfirm, MsgSuccess, MsgWarning } from '@/utils/message'
 import { getImgUrl } from '@/utils/utils'
 import { t } from '@/locales'
 import type Node from 'element-plus/es/components/tree/src/model/node'
-import knowledgeApi from '@/api/shared/knowledge'
+import documentApi from '@/api/shared/document'
 
 const router = useRouter()
 const route = useRoute()
@@ -183,7 +183,7 @@ const props = {
 
 const loadNode = (node: Node, resolve: (nodeData: Tree[]) => void) => {
   const token = node.level === 0 ? folderToken : node.data.token // 根节点使用 folder_token，其他节点使用 node.data.token
-  knowledgeApi
+  documentApi
     .getLarkDocumentList(knowledgeId, token, {}, loading)
     .then((res: any) => {
       const nodes = res.data.files as Tree[]
@@ -234,7 +234,7 @@ function submit() {
     loading.value = false
     return
   }
-  knowledgeApi
+  documentApi
     .importLarkDocument(knowledgeId, newList, loading)
     .then((res) => {
       MsgSuccess(t('views.document.tip.importMessage'))

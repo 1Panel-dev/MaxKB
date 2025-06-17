@@ -4,6 +4,8 @@ from . import views
 
 app_name = "knowledge"
 urlpatterns = [
+    path('workspace/knowledge/document/template/export', views.Template.as_view()),
+    path('workspace/knowledge/document/table_template/export', views.TableTemplate.as_view()),
     path('workspace/<str:workspace_id>/knowledge', views.KnowledgeView.as_view()),
     path('workspace/<str:workspace_id>/knowledge/base', views.KnowledgeBaseView.as_view()),
     path('workspace/<str:workspace_id>/knowledge/web', views.KnowledgeWebView.as_view()),
@@ -39,10 +41,6 @@ urlpatterns = [
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/table', views.TableDocumentView.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/batch_hit_handling',
          views.DocumentView.BatchEditHitHandling.as_view()),
-    path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/template/export',
-         views.Template.as_view()),
-    path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/table_template/export',
-         views.TableTemplate.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/migrate/<str:target_knowledge_id>',
          views.DocumentView.Migrate.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/<str:document_id>',

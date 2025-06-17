@@ -7,10 +7,10 @@ import type { toolData } from '@/api/type/tool'
 const prefix = '/system/shared'
 
 /**
- * 获得工具文件夹列表
+ * 工具列表带分页（无分页）
  * @params 参数 {folder_id: string}
  */
-const getToolByFolder: (data?: any, loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (
+const getToolList: (data?: any, loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (
   data,
   loading,
 ) => {
@@ -18,7 +18,7 @@ const getToolByFolder: (data?: any, loading?: Ref<boolean>) => Promise<Result<Ar
 }
 
 /**
- * 工具列表
+ * 工具列表带分页
  * @param 参数
  * param  {
  "folder_id": "string",
@@ -26,7 +26,7 @@ const getToolByFolder: (data?: any, loading?: Ref<boolean>) => Promise<Result<Ar
  "tool_type": "string",
  }
  */
-const getToolList: (
+const getToolListPage: (
   page: pageRequest,
   param?: any,
   loading?: Ref<boolean>,
@@ -123,8 +123,8 @@ const postPylint: (code: string, loading?: Ref<boolean>) => Promise<Result<any>>
 
 
 export default {
-  getToolByFolder,
   getToolList,
+  getToolListPage,
   putTool,
   getToolById,
   postTool,
