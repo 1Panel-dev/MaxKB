@@ -14,7 +14,7 @@ const prefix = '/system/shared/knowledge'
   }
  */
 
-const getDocument: (
+const getDocumentPage: (
   knowledge_id: string,
   page: pageRequest,
   param: any,
@@ -82,10 +82,16 @@ const delDocument: (
 
 const putBatchCancelTask: (
   knowledge_id: string,
+  document_id: string,
   data: any,
   loading?: Ref<boolean>,
-) => Promise<Result<boolean>> = (knowledge_id, data, loading) => {
-  return put(`${prefix}/${knowledge_id}/document/cancel_task/_batch`, data, undefined, loading)
+) => Promise<Result<boolean>> = (knowledge_id, document_id, data, loading) => {
+  return put(
+    `${prefix}/${knowledge_id}/document/${document_id}/batch_cancel_task`,
+    data,
+    undefined,
+    loading,
+  )
 }
 
 /**
@@ -367,8 +373,17 @@ const postQADocument: (
  * 分段预览（上传文档）
  * @param 参数  file:file,limit:number,patterns:array,with_filter:boolean
  */
-const postSplitDocument: (data: any, id:string) => Promise<Result<any>> = (data, id) => {
-  return post(`${prefix}/${id}/document/split`, data, undefined, undefined, 1000 * 60 * 60)
+const postSplitDocument: (knowledge_id: string, data: any) => Promise<Result<any>> = (
+  knowledge_id,
+  data,
+) => {
+  return post(
+    `${prefix}/${knowledge_id}/document/split`,
+    data,
+    undefined,
+    undefined,
+    1000 * 60 * 60,
+  )
 }
 
 /**
@@ -377,9 +392,10 @@ const postSplitDocument: (data: any, id:string) => Promise<Result<any>> = (data,
  * @returns 分段标识列表
  */
 const listSplitPattern: (
+  knowledge_id: string,
   loading?: Ref<boolean>,
-) => Promise<Result<Array<KeyValue<string, string>>>> = (loading) => {
-  return get(`${prefix}/document/split_pattern`, {}, loading)
+) => Promise<Result<Array<KeyValue<string, string>>>> = (knowledge_id, loading) => {
+  return get(`${prefix}/${knowledge_id}/document/split_pattern`, {}, loading)
 }
 
 /**
@@ -438,13 +454,34 @@ const postWebDocument: (
   return post(`${prefix}/${knowledge_id}/document/web`, data, undefined, loading)
 }
 
-const getAllDocument: (knowledge_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
-  knowledge_id,
-  loading,
-) => {
-  return get(`${prefix}/${knowledge_id}/document`, undefined, loading)
+/**
+ * 飞书导入获得相关文档
+ * @param 参数
+ * {
+ "source_url_list": [
+ "string"
+ ],
+ "selector": "string"
+ }
+ }
+ */
+const getLarkDocumentList: (
+  knowledge_id: string,
+  folder_token: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (knowledge_id, folder_token, data, loading) => {
+  return post(
+    `${prefix}/lark/${knowledge_id}/${folder_token}/doc_list`,
+    data,
+    undefined,
+    loading,
+  )
 }
 
+/**
+ * 同步飞书文档
+ */
 const putLarkDocumentSync: (
   knowledge_id: string,
   document_id: string,
@@ -458,7 +495,10 @@ const putLarkDocumentSync: (
   )
 }
 
-const delMulLarkSyncDocument: (
+/**
+ * 批量同步飞书文档
+ */
+const putMulLarkSyncDocument: (
   knowledge_id: string,
   data: any,
   loading?: Ref<boolean>,
@@ -466,8 +506,26 @@ const delMulLarkSyncDocument: (
   return put(`${prefix}/lark/${knowledge_id}/_batch`, { id_list: data }, undefined, loading)
 }
 
+/**
+ * 导入飞书文档
+ */
+const importLarkDocument: (
+  knowledge_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<Array<any>>> = (knowledge_id, data, loading) => {
+  return post(`${prefix}/lark/${knowledge_id}/import`, data, null, loading)
+}
+
+const getAllDocument: (knowledge_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  knowledge_id,
+  loading,
+) => {
+  return get(`${prefix}/${knowledge_id}/document`, undefined, loading)
+}
+
 export default {
-  getDocument,
+  getDocumentPage,
   getDocumentDetail,
   putDocument,
   delDocument,
@@ -489,11 +547,11 @@ export default {
   postSplitDocument,
   listSplitPattern,
   postTableDocument,
+  postWebDocument,
   exportQATemplate,
   exportTableTemplate,
-  postWebDocument,
-
-  getAllDocument,
+  getLarkDocumentList,
   putLarkDocumentSync,
-  delMulLarkSyncDocument,
+  putMulLarkSyncDocument,
+  importLarkDocument,
 }

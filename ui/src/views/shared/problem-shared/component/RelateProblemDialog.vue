@@ -224,7 +224,7 @@ function getDocument() {
 
 function getParagraphList(documentId: string) {
   paragraphApi
-    .getParagraph(
+    .getParagraphPage(
       id,
       (documentId || currentDocument.value) as string,
       paginationConfig,

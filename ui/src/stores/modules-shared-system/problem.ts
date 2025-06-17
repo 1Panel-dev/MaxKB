@@ -26,7 +26,7 @@ const useProblemStore = defineStore('proble', {
     ) {
       return new Promise((resolve, reject) => {
         problemApi
-          .getProblems(knowledgeId, page, param, loading)
+          .getProblemsPage(knowledgeId, page, param, loading)
           .then((data) => {
             resolve(data)
           })

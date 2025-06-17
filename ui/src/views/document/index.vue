@@ -505,10 +505,10 @@
       </div>
     </el-card>
     <div class="mul-operation w-full flex" v-if="multipleSelection.length !== 0">
-      <el-button :disabled="multipleSelection.length === 0" @click="cancelTaskHandle(1)">
+      <el-button :disabled="multipleSelection.length === 0" @click="cancelTaskHandle(1, row)">
         {{ $t('views.document.setting.cancelVectorization') }}
       </el-button>
-      <el-button :disabled="multipleSelection.length === 0" @click="cancelTaskHandle(2)">
+      <el-button :disabled="multipleSelection.length === 0" @click="cancelTaskHandle(2, row)">
         {{ $t('views.document.setting.cancelGenerate') }}
       </el-button>
       <el-text type="info" class="secondary ml-24">
@@ -616,7 +616,7 @@ const exportDocumentZip = (document: any) => {
     })
 }
 
-function cancelTaskHandle(val: any) {
+function cancelTaskHandle(val: any, row: any) {
   const arr: string[] = []
   multipleSelection.value.map((v) => {
     if (v) {
@@ -627,7 +627,7 @@ function cancelTaskHandle(val: any) {
     id_list: arr,
     type: val,
   }
-  documentApi.putBatchCancelTask(id, obj, loading).then(() => {
+  documentApi.putBatchCancelTask(id, row.id, obj, loading).then(() => {
     MsgSuccess(t('views.document.tip.cancelSuccess'))
     multipleTableRef.value?.clearSelection()
   })
@@ -670,7 +670,7 @@ function beforeCommand(attr: string, val: any, task_type?: number) {
 }
 
 const cancelTask = (row: any, task_type: number) => {
-  documentApi.putCancelTask(row.knowledge_id, row.id, { type: task_type }).then(() => {
+  documentApi.putCancelTask(id, row.id, { type: task_type }).then(() => {
     MsgSuccess(t('views.document.tip.sendMessage'))
   })
 }
@@ -932,7 +932,7 @@ function getList(bool?: boolean) {
     folder_id: folderId,
   }
   documentApi
-    .getDocument(id as string, paginationConfig.value, param, bool ? undefined : loading)
+    .getDocumentPage(id as string, paginationConfig.value, param, bool ? undefined : loading)
     .then((res) => {
       documentData.value = res.data.records
       paginationConfig.value.total = res.data.total

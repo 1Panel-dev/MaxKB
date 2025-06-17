@@ -315,7 +315,7 @@ function getList() {
     folder_id: currentFolder.value?.id || localStorage.getItem('workspace_id'),
     scope: 'WORKSPACE',
   }
-  ToolApi.getToolList(paginationConfig, params, loading).then((res) => {
+  ToolApi.getToolListPage(paginationConfig, params, loading).then((res) => {
     paginationConfig.total = res.data?.total
     toolList.value = [...toolList.value, ...res.data?.records]
   })

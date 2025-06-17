@@ -41,7 +41,7 @@ const postParagraph: (
           "content": "string",
         }
  */
-const getParagraph: (
+const getParagraphPage: (
   knowledge_id: string,
   document_id: string,
   page: pageRequest,
@@ -255,7 +255,7 @@ const putDisassociationProblem: (
 
 export default {
   postParagraph,
-  getParagraph,
+  getParagraphPage,
   putParagraph,
   delParagraph,
   getParagraphProblem,

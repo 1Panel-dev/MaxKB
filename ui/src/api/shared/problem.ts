@@ -26,7 +26,7 @@ const postProblems: (
    }
  */
 
-const getProblems: (
+const getProblemsPage: (
   knowledge_id: string,
   page: pageRequest,
   param: any,
@@ -112,7 +112,7 @@ const putMulProblem: (
 
 export default {
   postProblems,
-  getProblems,
+  getProblemsPage,
   putProblems,
   delProblems,
   getDetailProblems,

@@ -268,7 +268,7 @@ function getDetail() {
 
 function getParagraphList() {
   paragraphApi
-    .getParagraph(
+    .getParagraphPage(
       id,
       documentId,
       paginationConfig,
