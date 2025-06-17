@@ -44,7 +44,59 @@
               <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.username" />
             </el-select>
           </div>
-          <el-button class="ml-16" type="primary"> {{ $t('common.create') }}</el-button>
+          <el-dropdown trigger="click">
+            <el-button type="primary" class="ml-8">
+              {{ $t('common.create') }}
+              <el-icon class="el-icon--right">
+                <arrow-down />
+              </el-icon>
+            </el-button>
+            <template #dropdown>
+              <el-dropdown-menu class="create-dropdown">
+                <el-dropdown-item @click="openCreateDialog()">
+                  <div class="flex align-center">
+                    <el-avatar class="avatar-green" shape="square" :size="32">
+                      <img src="@/assets/node/icon_tool.svg" style="width: 58%" alt="" />
+                    </el-avatar>
+                    <div class="pre-wrap ml-8">
+                      <div class="lighter">空白创建</div>
+                    </div>
+                  </div>
+                </el-dropdown-item>
+                <el-dropdown-item>
+                  <el-upload
+                    ref="elUploadRef"
+                    :file-list="[]"
+                    action="#"
+                    multiple
+                    :auto-upload="false"
+                    :show-file-list="false"
+                    :limit="1"
+                    :on-change="(file: any, fileList: any) => importTool(file)"
+                  >
+                    <div class="flex align-center">
+                      <el-avatar shape="square" class="mt-4" :size="36" style="background: none">
+                        <img src="@/assets/icon_import.svg" alt="" />
+                      </el-avatar>
+                      <div class="pre-wrap ml-8">
+                        <div class="lighter">{{ $t('common.importCreate') }}</div>
+                      </div>
+                    </div>
+                  </el-upload>
+                </el-dropdown-item>
+                <el-dropdown-item @click="openCreateFolder" divided>
+                  <div class="flex align-center">
+                    <AppIcon iconName="app-folder" style="font-size: 32px"></AppIcon>
+                    <div class="pre-wrap ml-4">
+                      <div class="lighter">
+                        {{ $t('components.folder.addFolder') }}
+                      </div>
+                    </div>
+                  </div>
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
         </div>
       </template>
 
@@ -64,6 +116,7 @@
                 :title="item.name"
                 :description="item.desc || $t('common.noData')"
                 class="cursor"
+                @click="clickFolder(item)"
               >
                 <template #icon>
                   <el-avatar shape="square" :size="32" style="background: none">
@@ -188,16 +241,18 @@
     </ContentContainer>
     <InitParamDrawer ref="InitParamDrawerRef" @refresh="refresh" />
     <ToolFormDrawer ref="ToolFormDrawerRef" @refresh="refresh" :title="ToolDrawertitle" />
+    <CreateFolderDialog ref="CreateFolderDialogRef" @refresh="refreshFolder" />
   </LayoutContainer>
 </template>
 
 <script lang="ts" setup>
 import { onMounted, ref, reactive, computed } from 'vue'
 import { cloneDeep, get } from 'lodash'
-import ToolApi from '@/api/shared/tool'
+import ToolApi from '@/api/tool/tool'
 import useStore from '@/stores'
 import InitParamDrawer from '@/views/tool/component/InitParamDrawer.vue'
 import ToolFormDrawer from './ToolFormDrawer.vue'
+import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
 import { t } from '@/locales'
 import { isAppIcon } from '@/utils/common'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
@@ -337,8 +392,20 @@ function refresh(data: any) {
   getList()
 }
 
+function refreshFolder() {
+  toolList.value = []
+  getFolder()
+  getList()
+}
+
 function folderClickHandel(row: any) {
   currentFolder.value = row
+  toolList.value = []
+  getList()
+}
+
+function clickFolder(item: any) {
+  currentFolder.value.id = item.id
   toolList.value = []
   getList()
 }
@@ -368,8 +435,8 @@ function deleteTool(row: any) {
     {
       confirmButtonText: t('common.confirm'),
       cancelButtonText: t('common.cancel'),
-      confirmButtonClass: 'danger'
-    }
+      confirmButtonClass: 'danger',
+    },
   )
     .then(() => {
       ToolApi.delTool(row.id, loading).then(() => {
@@ -387,29 +454,34 @@ function configInitParams(item: any) {
   })
 }
 
+const CreateFolderDialogRef = ref()
+function openCreateFolder() {
+  CreateFolderDialogRef.value.open('TOOL', currentFolder.value.parent_id)
+}
 
-// function importTool(file: any) {
-//   const formData = new FormData()
-//   formData.append('file', file.raw, file.name)
-//   elUploadRef.value.clearFiles()
-//   ToolApi
-//     .postImportTool(formData, loading)
-//     .then(async (res: any) => {
-//       if (res?.data) {
-//         searchHandle()
-//       }
-//     })
-//     .catch((e: any) => {
-//       if (e.code === 400) {
-//         MsgConfirm(t('common.tip'), t('views.application.tip.professionalMessage'), {
-//           cancelButtonText: t('common.confirm'),
-//           confirmButtonText: t('common.professional')
-//         }).then(() => {
-//           window.open('https://maxkb.cn/pricing.html', '_blank')
-//         })
-//       }
-//     })
-// }
+const elUploadRef = ref()
+function importTool(file: any) {
+  const formData = new FormData()
+  formData.append('file', file.raw, file.name)
+  elUploadRef.value.clearFiles()
+  ToolApi.postImportTool(formData, loading)
+    .then(async (res: any) => {
+      if (res?.data) {
+        toolList.value = []
+        getList()
+      }
+    })
+    .catch((e: any) => {
+      if (e.code === 400) {
+        MsgConfirm(t('common.tip'), t('views.application.tip.professionalMessage'), {
+          cancelButtonText: t('common.confirm'),
+          confirmButtonText: t('common.professional'),
+        }).then(() => {
+          window.open('https://maxkb.cn/pricing.html', '_blank')
+        })
+      }
+    })
+}
 
 onMounted(() => {
   getFolder()

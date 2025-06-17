@@ -84,5 +84,6 @@ export default {
   },
   info: '使用者資訊',
   otherSetting: '其他設定',
-  username: '用户名'
+  username: '用戶名',
+  importCreate: '導入創建',
 }
