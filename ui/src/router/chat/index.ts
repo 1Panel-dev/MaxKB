@@ -51,7 +51,6 @@ router.beforeEach(
     } else {
       await chatUser.anonymousAuthentication()
     }
-
     if (!chatUser.application) {
       await chatUser.applicationProfile()
     }
