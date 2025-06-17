@@ -842,8 +842,9 @@ class DocumentSerializers(serializers.Serializer):
                 self.is_valid(raise_exception=True)
             file_list = instance.get('file_list')
             document_list = flat_map([self.parse_qa_file(file) for file in file_list])
-            return DocumentSerializers.Batch(data={'knowledge_id': self.data.get('knowledge_id')}).batch_save(
-                document_list)
+            return DocumentSerializers.Batch(data={
+                'knowledge_id': self.data.get('knowledge_id'), 'workspace_id': self.data.get('workspace_id')
+            }).batch_save(document_list)
 
         def save_table(self, instance: Dict, with_valid=True):
             if with_valid:
@@ -851,8 +852,9 @@ class DocumentSerializers(serializers.Serializer):
                 self.is_valid(raise_exception=True)
             file_list = instance.get('file_list')
             document_list = flat_map([self.parse_table_file(file) for file in file_list])
-            return DocumentSerializers.Batch(data={'knowledge_id': self.data.get('knowledge_id')}).batch_save(
-                document_list)
+            return DocumentSerializers.Batch(data={
+                'knowledge_id': self.data.get('knowledge_id'), 'workspace_id': self.data.get('workspace_id')
+            }).batch_save(document_list)
 
         def parse_qa_file(self, file):
             get_buffer = FileBufferHandle().get_buffer
