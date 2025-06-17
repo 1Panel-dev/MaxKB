@@ -29,7 +29,7 @@
     </el-form-item>
     <el-form-item
       :label="$t('views.knowledge.form.EmbeddingModel.label')"
-      prop="embedding_model_id"
+      prop="embedding"
     >
       <ModelSelect
         v-model="form.embedding"

@@ -57,7 +57,7 @@ const submitHandle = async () => {
     }
     KnowledgeApi.postKnowledge(obj, loading).then((res) => {
       MsgSuccess(t('common.createSuccess'))
-      // router.push({ path: `/knowledge/${res.data.id}/${currentFolder.value.id}/document` })
+      router.push({ path: `/knowledge/${res.data.id}/${currentFolder.value.id}/document` })
       emit('refresh')
     })
   } else {

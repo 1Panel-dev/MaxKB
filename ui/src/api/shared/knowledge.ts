@@ -4,22 +4,7 @@ import { type Ref } from 'vue'
 import type { pageRequest } from '@/api/type/common'
 import type { knowledgeData } from '@/api/type/knowledge'
 
-const prefix = '/system/shared'
-
-/**
- * 获得知识库文件夹列表
- * @params 参数
- * {folder_id: string,
- * name: string,
- * user_id: string，
- * desc: string,}
- */
-const getKnowledgeByFolder: (data?: any, loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (
-  data,
-  loading,
-) => {
-  return get(`${prefix}/knowledge`, data, loading)
-}
+const prefix = '/system/shared/knowledge'
 
 /**
  * 知识库列表（无分页）
@@ -35,7 +20,7 @@ const getKnowledgeList: (param?: any, loading?: Ref<boolean>) => Promise<Result<
   param,
   loading,
 ) => {
-  return get(`${prefix}/knowledge`, param, loading)
+  return get(`${prefix}`, param, loading)
 }
 
 /**
@@ -53,7 +38,7 @@ const getKnowledgeListPage: (
   param?: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (page, param, loading) => {
-  return get(`${prefix}/knowledge/${page.current_page}/${page.page_size}`, param, loading)
+  return get(`${prefix}/${page.current_page}/${page.page_size}`, param, loading)
 }
 
 /**
@@ -64,7 +49,7 @@ const getKnowledgeDetail: (knowledge_id: string, loading?: Ref<boolean>) => Prom
   knowledge_id,
   loading,
 ) => {
-  return get(`${prefix}/knowledge/${knowledge_id}`, undefined, loading)
+  return get(`${prefix}/${knowledge_id}`, undefined, loading)
 }
 
 /**
@@ -81,7 +66,7 @@ const putKnowledge: (
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (knowledge_id, data, loading) => {
-  return put(`${prefix}/knowledge/${knowledge_id}`, data, undefined, loading)
+  return put(`${prefix}/${knowledge_id}`, data, undefined, loading)
 }
 
 /**
@@ -103,7 +88,7 @@ const putReEmbeddingKnowledge: (
   knowledge_id: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (knowledge_id, loading) => {
-  return put(`${prefix}/knowledge/${knowledge_id}/embedding`, undefined, undefined, loading)
+  return put(`${prefix}/${knowledge_id}/embedding`, undefined, undefined, loading)
 }
 
 /**
@@ -119,7 +104,7 @@ const exportKnowledge: (
 ) => Promise<any> = (knowledge_name, knowledge_id, loading) => {
   return exportExcel(
     knowledge_name + '.xlsx',
-    `${prefix}/${knowledge_id}/knowledge/${knowledge_id}/export`,
+    `${prefix}/${knowledge_id}/export`,
     undefined,
     loading,
   )
@@ -138,7 +123,7 @@ const exportZipKnowledge: (
 ) => Promise<any> = (knowledge_name, knowledge_id, loading) => {
   return exportFile(
     knowledge_name + '.zip',
-    `${prefix}/${knowledge_id}/knowledge/${knowledge_id}/export_zip`,
+    `${prefix}/${knowledge_id}/export_zip`,
     undefined,
     loading,
   )
@@ -184,7 +169,7 @@ const putSyncWebKnowledge: (
   sync_type: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (knowledge_id, sync_type, loading) => {
-  return put(`${prefix}/knowledge/${knowledge_id}/sync`, undefined, { sync_type }, loading)
+  return put(`${prefix}/${knowledge_id}/sync`, undefined, { sync_type }, loading)
 }
 
 /**
@@ -201,7 +186,7 @@ const postKnowledge: (data: knowledgeData, loading?: Ref<boolean>) => Promise<Re
   data,
   loading,
 ) => {
-  return post(`${prefix}/knowledge/base`, data, undefined, loading, 1000 * 60 * 5)
+  return post(`${prefix}/base`, data, undefined, loading, 1000 * 60 * 5)
 }
 
 /**
@@ -226,7 +211,7 @@ const getKnowledgeEmdeddingModel: (
  * @returns
  */
 const getKnowledgeModel: (loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (loading) => {
-  return get(`${prefix}/knowledge/model`, loading)
+  return get(`${prefix}/model`, loading)
 }
 
 /**
@@ -245,17 +230,25 @@ const postWebKnowledge: (data: any, loading?: Ref<boolean>) => Promise<Result<an
   data,
   loading,
 ) => {
-  return post(`${prefix}/knowledge/web`, data, undefined, loading)
+  return post(`${prefix}/web`, data, undefined, loading)
 }
 const postLarkKnowledge: (data: any, loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (
   data,
   loading,
 ) => {
-  return post(`${prefix}/knowledge/lark/save`, data, null, loading)
+  return post(`${prefix}/lark/save`, data, null, loading)
 }
 
+const putLarkKnowledge: (
+  knowledge_id: string,
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (knowledge_id, data, loading) => {
+  return put(`${prefix}/lark/${knowledge_id}`, data, undefined, loading)
+}
+
+
 export default {
-  getKnowledgeByFolder,
   getKnowledgeList,
   getKnowledgeListPage,
   getKnowledgeDetail,
@@ -270,8 +263,8 @@ export default {
   postKnowledge,
   getKnowledgeModel,
   postWebKnowledge,
-
   postLarkKnowledge,
+  putLarkKnowledge
 } as {
   [key: string]: any
 }

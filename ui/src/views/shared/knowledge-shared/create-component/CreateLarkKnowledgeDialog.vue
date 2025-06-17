@@ -142,13 +142,11 @@ const submitHandle = async () => {
     await KnowledgeFormRef.value.validate((valid: any) => {
       if (valid) {
         const obj = { ...BaseFormRef.value.form, ...datasetForm.value }
-        KnowledgeApi.postLarkKnowledge({ ...obj, embedding_model_id: obj.embedding }, loading).then(
-          (res: any) => {
-            MsgSuccess(t('common.createSuccess'))
-            router.push({ path: `/knowledge/${res.data.id}/document` })
-            emit('refresh')
-          },
-        )
+        KnowledgeApi.postLarkKnowledge(obj, loading).then((res: any) => {
+          MsgSuccess(t('common.createSuccess'))
+          router.push({ path: `/knowledge/${res.data.id}/document` })
+          emit('refresh')
+        })
       } else {
         return false
       }

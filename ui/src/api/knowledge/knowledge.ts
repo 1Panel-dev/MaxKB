@@ -14,21 +14,6 @@ Object.defineProperty(prefix, 'value', {
 })
 
 /**
- * 获得知识库文件夹列表
- * @params 参数
- * {folder_id: string,
- * name: string,
- * user_id: string，
- * desc: string,}
- */
-const getKnowledgeByFolder: (data?: any, loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (
-  data,
-  loading,
-) => {
-  return get(`${prefix.value}`, data, loading)
-}
-
-/**
  * 知识库列表（无分页）
  * @param 参数
  * param  {
@@ -212,7 +197,7 @@ const postKnowledge: (data: knowledgeData, loading?: Ref<boolean>) => Promise<Re
 }
 
 /**
- * 获取当前用户可使用的向量化模型列表
+ * 获取当前用户可使用的向量化模型列表 (没用到)
  * @param application_id
  * @param loading
  * @query  { query_text: string, top_number: number, similarity: number }
@@ -227,9 +212,8 @@ const getKnowledgeEmdeddingModel: (
 
 /**
  * 获取当前用户可使用的模型列表
- * @param application_id
+ * @param
  * @param loading
- * @query  { query_text: string, top_number: number, similarity: number }
  * @returns
  */
 const getKnowledgeModel: (loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (loading) => {
@@ -255,6 +239,7 @@ const postWebKnowledge: (data: any, loading?: Ref<boolean>) => Promise<Result<an
   return post(`${prefix.value}/web`, data, undefined, loading)
 }
 
+// 创建飞书知识库
 const postLarkKnowledge: (data: any, loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (
   data,
   loading,
@@ -262,8 +247,15 @@ const postLarkKnowledge: (data: any, loading?: Ref<boolean>) => Promise<Result<A
   return post(`${prefix.value}/lark/save`, data, null, loading)
 }
 
+const putLarkKnowledge: (
+  knowledge_id: string,
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (knowledge_id, data, loading) => {
+  return put(`${prefix}/lark/${knowledge_id}`, data, undefined, loading)
+}
+
 export default {
-  getKnowledgeByFolder,
   getKnowledgeList,
   getKnowledgeListPage,
   getKnowledgeDetail,
@@ -278,6 +270,6 @@ export default {
   postKnowledge,
   getKnowledgeModel,
   postWebKnowledge,
-
   postLarkKnowledge,
+  putLarkKnowledge
 }

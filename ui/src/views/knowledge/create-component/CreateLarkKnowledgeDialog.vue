@@ -10,21 +10,21 @@
     <!-- 基本信息 -->
     <BaseForm ref="BaseFormRef" v-if="dialogVisible" />
     <el-form
-      ref="DatasetFormRef"
+      ref="knowledgeFormRef"
       :rules="rules"
-      :model="datasetForm"
+      :model="knowledgeForm"
       label-position="top"
       require-asterisk-position="right"
     >
       <el-form-item label="App ID" prop="app_id">
         <el-input
-          v-model="datasetForm.app_id"
+          v-model="knowledgeForm.app_id"
           :placeholder="$t('views.application.applicationAccess.larkSetting.appIdPlaceholder')"
         />
       </el-form-item>
       <el-form-item label="App Secret" prop="app_secret">
         <el-input
-          v-model="datasetForm.app_secret"
+          v-model="knowledgeForm.app_secret"
           type="password"
           show-password
           :placeholder="$t('views.application.applicationAccess.larkSetting.appSecretPlaceholder')"
@@ -32,7 +32,7 @@
       </el-form-item>
       <el-form-item label="Folder Token" prop="folder_token">
         <el-input
-          v-model="datasetForm.folder_token"
+          v-model="knowledgeForm.folder_token"
           :placeholder="
             $t('views.application.applicationAccess.larkSetting.folderTokenPlaceholder')
           "
@@ -63,12 +63,13 @@ const emit = defineEmits(['refresh'])
 
 const router = useRouter()
 const BaseFormRef = ref()
-const DatasetFormRef = ref()
+const knowledgeFormRef = ref()
 
 const loading = ref(false)
 const dialogVisible = ref<boolean>(false)
+const currentFolder = ref<any>(null)
 
-const datasetForm = ref<any>({
+const knowledgeForm = ref<any>({
   type: '0',
   source_url: '',
   selector: '',
@@ -124,29 +125,34 @@ const rules = reactive({
 
 watch(dialogVisible, (bool) => {
   if (!bool) {
-    datasetForm.value = {
+    knowledgeForm.value = {
       type: '0',
       source_url: '',
       selector: '',
     }
-    DatasetFormRef.value?.clearValidate()
+    knowledgeFormRef.value?.clearValidate()
   }
 })
 
-const open = () => {
+const open = (folder: string) => {
+  currentFolder.value = folder
   dialogVisible.value = true
 }
 
 const submitHandle = async () => {
   if (await BaseFormRef.value?.validate()) {
-    await DatasetFormRef.value.validate((valid: any) => {
+    await knowledgeFormRef.value.validate((valid: any) => {
       if (valid) {
-        const obj = { ...BaseFormRef.value.form, ...datasetForm.value }
-        // KnowledgeApi.postLarkKnowledge(obj, loading).then((res) => {
-        //   MsgSuccess(t('common.createSuccess'))
-        //   router.push({ path: `/knowledge/${res.data.id}/document` })
-        //   emit('refresh')
-        // })
+        const obj = {
+          folder_id: currentFolder.value?.id,
+          ...BaseFormRef.value.form,
+          ...knowledgeForm.value,
+        }
+        KnowledgeApi.postLarkKnowledge(obj, loading).then((res: any) => {
+          MsgSuccess(t('common.createSuccess'))
+          router.push({ path: `/knowledge/${res.data.id}/${currentFolder.value.id}/document` })
+          emit('refresh')
+        })
       } else {
         return false
       }
