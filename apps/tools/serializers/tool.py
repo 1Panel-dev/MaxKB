@@ -282,7 +282,7 @@ class ToolSerializer(serializers.Serializer):
         def edit(self, instance, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-                ToolCreateRequest(data=instance).is_valid(raise_exception=True)
+                ToolEditRequest(data=instance).is_valid(raise_exception=True)
             if not QuerySet(Tool).filter(id=self.data.get('id')).exists():
                 raise serializers.ValidationError(_('Tool not found'))
 
