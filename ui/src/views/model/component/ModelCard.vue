@@ -79,6 +79,7 @@
               :disabled="!is_permisstion"
               text
               @click.stop="openEditModel"
+              v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.MODEL_EDIT.getWorkspacePermission]"
             >
               {{ $t('common.modify') }}
             </el-dropdown-item>
@@ -93,6 +94,7 @@
               :disabled="!is_permisstion"
               icon="Setting"
               @click.stop="openParamSetting"
+              v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.MODEL_EDIT.getWorkspacePermission]"
             >
               {{ $t('views.model.modelForm.title.paramSetting') }}
             </el-dropdown-item>
@@ -102,6 +104,7 @@
               :disabled="!is_permisstion"
               text
               @click.stop="deleteModel"
+              v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.MODEL_DELETE.getWorkspacePermission]"
             >
               {{ $t('common.delete') }}
             </el-dropdown-item>
@@ -124,6 +127,9 @@ import {modelType} from '@/enums/model'
 import useStore from '@/stores'
 import ParamSettingDialog from './ParamSettingDialog.vue'
 import {t} from '@/locales'
+import { PermissionConst, EditionConst, RoleConst } from '@/utils/permission/data'
+import { hasPermission } from '@/utils/permission/index'
+import { ComplexPermission } from '@/utils/permission/type'
 
 const props = defineProps<{
   model: Model
