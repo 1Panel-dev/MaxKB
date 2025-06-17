@@ -40,7 +40,7 @@
                 {{ paginationConfig.total }}
               </span>
             </div>
-            <el-button type="primary" @click="handleSave">
+            <el-button type="primary" :disabled="current?.is_auth" @click="handleSave">
               {{ t('common.save') }}
             </el-button>
           </div>
@@ -50,12 +50,13 @@
               <el-select class="complex-search__left" v-model="searchType" style="width: 120px">
                 <el-option :label="$t('views.login.loginForm.username.label')" value="name" />
               </el-select>
-              <el-input v-if="searchType === 'name'" v-model="searchForm.name"
-                @change="getList" :placeholder="$t('common.inputPlaceholder')" style="width: 220px" clearable />
+              <el-input v-if="searchType === 'name'" v-model="searchForm.name" @change="getList"
+                :placeholder="$t('common.inputPlaceholder')" style="width: 220px" clearable />
             </div>
             <div class="flex align-center">
               <div class="color-secondary mr-8">{{ $t('views.chatUser.autoAuthorization') }}</div>
-              <el-switch size="small" v-model="automaticAuthorization"></el-switch>
+              <el-switch size="small" :model-value="current?.is_auth" @click="changeAuth"
+                :loading="loading"></el-switch>
             </div>
           </div>
 
@@ -82,11 +83,12 @@
             </el-table-column>
             <el-table-column :width="140" align="center">
               <template #header>
-                <el-checkbox :model-value="allChecked" :indeterminate="allIndeterminate" :disabled="disabled"
-                  @change="handleCheckAll">{{ $t('views.chatUser.authorization') }}</el-checkbox>
+                <el-checkbox :model-value="allChecked" :indeterminate="allIndeterminate" :disabled="current?.is_auth"
+                  @change="handleCheckAll">{{ $t('views.chatUser.authorization')
+                  }}</el-checkbox>
               </template>
               <template #default="{ row }">
-                <el-checkbox v-model="row.enable" :indeterminate="row.indeterminate" :disabled="disabled"
+                <el-checkbox v-model="row.is_auth" :indeterminate="row.indeterminate" :disabled="current?.is_auth"
                   @change="(value: boolean) => handleRowChange(value, row)" />
               </template>
             </el-table-column>
@@ -104,11 +106,10 @@ import { t } from '@/locales'
 import type { ChatUserGroupItem, ChatUserResourceParams, ChatUserGroupUserItem } from '@/api/type/workspaceChatUser'
 import { useRoute } from 'vue-router'
 import { ChatUserResourceEnum } from '@/enums/workspaceChatUser'
+import { MsgSuccess } from '@/utils/message'
 
 const route = useRoute()
 const resource: ChatUserResourceParams = { resource_id: route.params.id as string, resource_type: route.meta.resourceType as ChatUserResourceEnum }
-
-const disabled = computed(() => false) // TODO
 
 const filterText = ref('')
 const loading = ref(false)
@@ -148,13 +149,24 @@ function clickUserGroup(item: ChatUserGroupItem) {
   current.value = item
 }
 
+async function changeAuth() {
+  const params = [{ user_group_id: current.value?.id as string, is_auth: !current.value?.is_auth }]
+  try {
+    await ChatUserApi.editUserGroupList(resource, params, loading)
+    await getUserGroupList()
+    current.value = { name: current.value?.name as string, id: current.value?.id as string, is_auth: !current.value?.is_auth }
+    getList()
+  } catch (error) {
+    console.error(error)
+  }
+}
+
 const rightLoading = ref(false)
 
 const searchType = ref('name')
 const searchForm = ref<Record<string, any>>({
   name: '',
 })
-const automaticAuthorization = ref(false)
 const paginationConfig = reactive({
   current_page: 1,
   page_size: 20,
@@ -205,6 +217,7 @@ async function handleSave() {
   try {
     const params = tableData.value.map(item => ({ chat_user_id: item.id, is_auth: item.is_auth }))
     await ChatUserApi.putUserGroupUser(resource, current.value?.id as string, params, rightLoading)
+    MsgSuccess(t('common.saveSuccess'))
   } catch (error) {
     console.error(error)
   }

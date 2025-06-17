@@ -78,7 +78,7 @@
           <div class="flex-between mb-16" style="margin-top: 20px;">
             <div>
               <el-button type="primary" @click="createUser()">
-                {{ t('views.userManage.createUser') }}
+                {{ t('views.role.member.add') }}
               </el-button>
               <el-button :disabled="multipleSelection.length === 0" @click="handleDeleteUser()">
                 {{ $t('common.delete') }}
@@ -132,7 +132,7 @@
     </el-card>
   </ContentContainer>
   <CreateOrUpdateGroupDialog ref="createOrUpdateGroupDialogRef" @refresh="refresh" />
-  <CreateGroupUserDialog ref="createGroupUserDialogRef" @refresh="getUserGroupList" />
+  <CreateGroupUserDialog ref="createGroupUserDialogRef" @refresh="getList" />
 </template>
 
 <script lang="ts" setup>
@@ -256,22 +256,22 @@ function createUser() {
   createGroupUserDialogRef.value?.open(current.value?.id);
 }
 
-const multipleSelection = ref<string[]>([])
-function handleSelectionChange(val: string[]) {
+const multipleSelection = ref<any[]>([])
+function handleSelectionChange(val: any[]) {
   multipleSelection.value = val
 }
 
 function handleDeleteUser(item?: ChatUserGroupUserItem) {
   MsgConfirm(
-    item ? `${t('views.workspace.member.delete.confirmTitle')}${item.nick_name} ?` : '',
-    t('views.chatUser.group.batchDeleteMember', { number: multipleSelection.value.length }),
+    item ? `${t('views.workspace.member.delete.confirmTitle')}${item.nick_name} ?` : t('views.chatUser.group.batchDeleteMember', { count: multipleSelection.value.length }),
+    '',
     {
       confirmButtonText: t('common.confirm'),
       confirmButtonClass: 'danger',
     },
   )
     .then(() => {
-      SystemGroupApi.postRemoveMember(current.value?.id as string, item ? [item.id] : multipleSelection.value, loading).then(async () => {
+      SystemGroupApi.postRemoveMember(current.value?.id as string, { group_relation_ids: item ? [item.id] : multipleSelection.value.map(item => (item.id)) }, loading).then(async () => {
         MsgSuccess(t('common.deleteSuccess'))
         await getList()
       })

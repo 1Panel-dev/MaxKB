@@ -55,7 +55,7 @@ const postAddMember: (
  */
 const postRemoveMember: (
   user_group_id: string,
-  body: string[],
+  body: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (user_group_id, body, loading) => {
   return post(`${prefix}/${user_group_id}/remove_member`, body, {}, loading)
