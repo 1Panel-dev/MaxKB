@@ -76,6 +76,9 @@ urlpatterns = [
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/<str:document_id>/paragraph/unassociation',
          views.ParagraphView.UnAssociation.as_view()),
     path(
+        'workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/<str:document_id>/paragraph/adjust_position',
+        views.ParagraphView.AdjustPosition.as_view()),
+    path(
         'workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/<str:document_id>/paragraph/<str:paragraph_id>',
         views.ParagraphView.Operate.as_view()),
     path(

@@ -311,3 +311,49 @@ class ParagraphMigrateAPI(APIMixin):
     @staticmethod
     def get_request():
         return BatchSerializer
+
+
+class ParagraphAdjustOrderAPI(APIMixin):
+    @staticmethod
+    def get_parameters():
+        return [
+            OpenApiParameter(
+                name="workspace_id",
+                description="工作空间id",
+                type=OpenApiTypes.STR,
+                location='path',
+                required=True,
+            ),
+            OpenApiParameter(
+                name="knowledge_id",
+                description="知识库id",
+                type=OpenApiTypes.STR,
+                location='path',
+                required=True,
+            ),
+            OpenApiParameter(
+                name="document_id",
+                description="文档id",
+                type=OpenApiTypes.STR,
+                location='path',
+                required=True,
+            ),
+            OpenApiParameter(
+                name="paragraph_id",
+                description="段落id",
+                type=OpenApiTypes.STR,
+                location='query',
+                required=True,
+            ),
+            OpenApiParameter(
+                name="new_position",
+                description="新的顺序",
+                type=OpenApiTypes.INT,
+                location='query',
+                required=True,
+            ),
+        ]
+
+    @staticmethod
+    def get_response():
+        return DefaultResultSerializer

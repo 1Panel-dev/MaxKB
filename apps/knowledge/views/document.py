@@ -361,7 +361,7 @@ class DocumentView(APIView):
             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
                 get_knowledge_operation_object(keywords.get('knowledge_id')),
                 {'name': f'[{",".join([document.get("name") for document in r.data])}]',
-                 'document_list': r.data}), 
+                 'document_list': r.data}),
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(DocumentSerializers.Batch(

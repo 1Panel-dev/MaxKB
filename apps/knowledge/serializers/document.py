@@ -13,6 +13,7 @@ from celery_once import AlreadyQueued
 from django.core import validators
 from django.db import transaction, models
 from django.db.models import QuerySet
+from django.db.models.aggregates import Max
 from django.db.models.functions import Substr, Reverse
 from django.http import HttpResponse
 from django.utils.translation import gettext_lazy as _, gettext, get_language, to_locale
@@ -417,6 +418,7 @@ class DocumentSerializers(serializers.Serializer):
             if first.type != KnowledgeType.WEB:
                 raise AppApiException(500, _('Synchronization is only supported for web site types'))
 
+        @transaction.atomic
         def sync(self, with_valid=True, with_embedding=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
@@ -454,7 +456,13 @@ class DocumentSerializers(serializers.Serializer):
                     problem_model_list, problem_paragraph_mapping_list = ProblemParagraphManage(
                         problem_paragraph_object_list, document.knowledge_id).to_problem_model_list()
                     # 批量插入段落
-                    QuerySet(Paragraph).bulk_create(paragraph_model_list) if len(paragraph_model_list) > 0 else None
+                    if len(paragraph_model_list) > 0:
+                        max_position = Paragraph.objects.filter(document_id=document_id).aggregate(
+                            max_position=Max('position')
+                        )['max_position'] or 0
+                        for i, paragraph in enumerate(paragraph_model_list):
+                            paragraph.position = max_position + i + 1
+                        QuerySet(Paragraph).bulk_create(paragraph_model_list)
                     # 批量插入问题
                     QuerySet(Problem).bulk_create(problem_model_list) if len(problem_model_list) > 0 else None
                     # 插入关联问题
@@ -757,7 +765,13 @@ class DocumentSerializers(serializers.Serializer):
             # 插入文档
             document_model.save()
             # 批量插入段落
-            QuerySet(Paragraph).bulk_create(paragraph_model_list) if len(paragraph_model_list) > 0 else None
+            if len(paragraph_model_list) > 0:
+                max_position = Paragraph.objects.filter(document_id=document_model.id).aggregate(
+                    max_position=Max('position')
+                )['max_position'] or 0
+                for i, paragraph in enumerate(paragraph_model_list):
+                    paragraph.position = max_position + i + 1
+                QuerySet(Paragraph).bulk_create(paragraph_model_list)
             # 批量插入问题
             QuerySet(Problem).bulk_create(problem_model_list) if len(problem_model_list) > 0 else None
             # 批量插入关联问题
@@ -1031,7 +1045,15 @@ class DocumentSerializers(serializers.Serializer):
             # 插入文档
             QuerySet(Document).bulk_create(document_model_list) if len(document_model_list) > 0 else None
             # 批量插入段落
-            bulk_create_in_batches(Paragraph, paragraph_model_list, batch_size=1000)
+            if len(paragraph_model_list) > 0:
+                for document in document_model_list:
+                    max_position = Paragraph.objects.filter(document_id=document.id).aggregate(
+                        max_position=Max('position')
+                    )['max_position'] or 0
+                    sub_list = [p for p in paragraph_model_list if p.document_id == document.id]
+                    for i, paragraph in enumerate(sub_list):
+                        paragraph.position = max_position + i + 1
+                    QuerySet(Paragraph).bulk_create(sub_list if len(sub_list) > 0 else [])
             # 批量插入问题
             bulk_create_in_batches(Problem, problem_model_list, batch_size=1000)
             # 批量插入关联问题

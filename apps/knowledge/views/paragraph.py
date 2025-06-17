@@ -11,7 +11,7 @@ from common.result import result
 from common.utils.common import query_params_to_single_dict
 from knowledge.api.paragraph import ParagraphReadAPI, ParagraphCreateAPI, ParagraphBatchDeleteAPI, ParagraphEditAPI, \
     ParagraphGetAPI, ProblemCreateAPI, UnAssociationAPI, AssociationAPI, ParagraphPageAPI, \
-    ParagraphBatchGenerateRelatedAPI, ParagraphMigrateAPI
+    ParagraphBatchGenerateRelatedAPI, ParagraphMigrateAPI, ParagraphAdjustOrderAPI
 from knowledge.serializers.common import get_knowledge_operation_object
 from knowledge.serializers.paragraph import ParagraphSerializers
 from knowledge.views import get_knowledge_document_operation_object, get_document_operation_object
@@ -61,7 +61,7 @@ class ParagraphView(APIView):
         get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
             get_knowledge_operation_object(keywords.get('knowledge_id')),
             get_document_operation_object(keywords.get('document_id'))
-        ), 
+        ),
     )
     def post(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
         return result.success(ParagraphSerializers.Create(
@@ -110,7 +110,7 @@ class ParagraphView(APIView):
             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
                 get_knowledge_operation_object(keywords.get('knowledge_id')),
                 get_document_operation_object(keywords.get('document_id'))
-            ), 
+            ),
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str,
                 target_knowledge_id: str, target_document_id):
@@ -146,7 +146,7 @@ class ParagraphView(APIView):
             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
                 get_knowledge_operation_object(keywords.get('knowledge_id')),
                 get_document_operation_object(keywords.get('document_id'))
-            ), 
+            ),
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
             return result.success(ParagraphSerializers.Batch(
@@ -175,7 +175,7 @@ class ParagraphView(APIView):
             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
                 get_knowledge_operation_object(keywords.get('knowledge_id')),
                 get_document_operation_object(keywords.get('document_id'))
-            ), 
+            ),
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str, paragraph_id: str):
             o = ParagraphSerializers.Operate(
@@ -231,7 +231,7 @@ class ParagraphView(APIView):
             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
                 get_knowledge_operation_object(keywords.get('knowledge_id')),
                 get_document_operation_object(keywords.get('document_id'))
-            ), 
+            ),
         )
         def delete(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str, paragraph_id: str):
             o = ParagraphSerializers.Operate(
@@ -267,7 +267,7 @@ class ParagraphView(APIView):
             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
                 get_knowledge_operation_object(keywords.get('knowledge_id')),
                 get_document_operation_object(keywords.get('document_id'))
-            ), 
+            ),
         )
         def post(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str, paragraph_id: str):
             return result.success(ParagraphSerializers.Problem(
@@ -359,7 +359,7 @@ class ParagraphView(APIView):
             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
                 get_knowledge_operation_object(keywords.get('knowledge_id')),
                 get_document_operation_object(keywords.get('document_id'))
-            ), 
+            ),
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
             return result.success(ParagraphSerializers.Association(
@@ -400,3 +400,30 @@ class ParagraphView(APIView):
             )
             d.is_valid(raise_exception=True)
             return result.success(d.page(current_page, page_size))
+
+    class AdjustPosition(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['PUT'],
+            summary=_('Adjust paragraph position'),
+            description=_('Adjust paragraph position'),
+            operation_id=_('Adjust paragraph position'),  # type: ignore
+            parameters=ParagraphAdjustOrderAPI.get_parameters(),
+            request=ParagraphAdjustOrderAPI.get_request(),
+            responses=ParagraphAdjustOrderAPI.get_response(),
+            tags=[_('Knowledge Base/Documentation/Paragraph')]  # type: ignore
+        )
+        @has_permissions(
+            PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+        )
+        def put(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
+            return result.success(ParagraphSerializers.AdjustPosition(
+                data={
+                    'workspace_id': workspace_id,
+                    'knowledge_id': knowledge_id,
+                    'document_id': document_id,
+                    'paragraph_id': request.query_params.get('paragraph_id'),
+                }
+            ).adjust_position(request.query_params.get('new_position')))

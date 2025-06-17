@@ -174,6 +174,7 @@ class Paragraph(AppModelMixin):
     status_meta = models.JSONField(verbose_name="状态数据", default=default_status_meta)
     hit_num = models.IntegerField(verbose_name="命中次数", default=0)
     is_active = models.BooleanField(default=True)
+    position = models.IntegerField(verbose_name="段落顺序", default=0, db_index=True)
 
     class Meta:
         db_table = "paragraph"

@@ -5,7 +5,8 @@ from typing import Dict
 import uuid_utils.compat as uuid
 from celery_once import AlreadyQueued
 from django.db import transaction
-from django.db.models import QuerySet, Count
+from django.db.models import QuerySet, Count, F
+from django.db.models.aggregates import Max
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -28,7 +29,7 @@ from knowledge.task.generate import generate_related_by_paragraph_id_list
 class ParagraphSerializer(serializers.ModelSerializer):
     class Meta:
         model = Paragraph
-        fields = ['id', 'content', 'is_active', 'document_id', 'title', 'create_time', 'update_time']
+        fields = ['id', 'content', 'is_active', 'document_id', 'title', 'create_time', 'update_time', 'position']
 
 
 class ParagraphInstanceSerializer(serializers.Serializer):
@@ -244,6 +245,7 @@ class ParagraphSerializers(serializers.Serializer):
                                              knowledge_id=self.data.get('knowledge_id')).exists():
                 raise AppApiException(500, _('The document id is incorrect'))
 
+        @transaction.atomic
         def save(self, instance: Dict, with_valid=True, with_embedding=True):
             if with_valid:
                 ParagraphSerializers(data=instance).is_valid(raise_exception=True)
@@ -257,7 +259,18 @@ class ParagraphSerializers(serializers.Serializer):
                 ProblemParagraphManage(problem_paragraph_object_list, knowledge_id)
                 .to_problem_model_list())
             # 插入段落
-            paragraph_problem_model.get('paragraph').save()
+            max_position = Paragraph.objects.filter(document_id=document_id).aggregate(
+                max_position=Max('position')
+            )['max_position'] or 0
+            paragraph.position = max_position + 1
+            paragraph.save()
+            # 调整位置
+            ParagraphSerializers.AdjustPosition(data={
+                'paragraph_id': str(paragraph.id),
+                'knowledge_id': knowledge_id,
+                'document_id': document_id,
+                'workspace_id': self.data.get('workspace_id')
+            }).adjust_position(position=instance.get('position', max_position + 1))
             # 插入問題
             QuerySet(Problem).bulk_create(problem_model_list) if len(problem_model_list) > 0 else None
             # 插入问题关联关系
@@ -319,7 +332,7 @@ class ParagraphSerializers(serializers.Serializer):
                     **{'title__icontains': self.data.get('title')})
             if 'content' in self.data:
                 query_set = query_set.filter(**{'content__icontains': self.data.get('content')})
-            query_set = query_set.order_by('create_time', 'id')
+            query_set = query_set.order_by('position', 'create_time')
             return query_set
 
         def list(self):
@@ -540,6 +553,42 @@ class ParagraphSerializers(serializers.Serializer):
                     problem_paragraph_mapping.problem_id = problem.id
                     return problem, True
             return None
+
+    class AdjustPosition(serializers.Serializer):
+        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+        knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
+        document_id = serializers.UUIDField(required=True, label=_('document id'))
+        paragraph_id = serializers.UUIDField(required=True, label=_('paragraph id'))
+
+        @transaction.atomic
+        def adjust_position(self, new_position):
+            """
+            调整段落顺序
+            :param new_position: 新的顺序值
+            """
+            self.is_valid(raise_exception=True)
+            try:
+                new_position = int(new_position)
+            except (TypeError, ValueError):
+                raise serializers.ValidationError(_('new_position must be an integer'))
+            # 获取当前段落
+            paragraph = Paragraph.objects.get(id=self.data.get('paragraph_id'))
+            old_position = paragraph.position
+
+            if old_position < new_position:
+                # 如果新顺序在当前顺序之后，更新受影响段落的顺序
+                Paragraph.objects.filter(
+                    position__gt=old_position, position__lte=new_position
+                ).update(position=F('position') - 1)
+            elif old_position > new_position:
+                # 如果新顺序在当前顺序之前，更新受影响段落的顺序
+                Paragraph.objects.filter(
+                    position__lt=old_position, position__gte=new_position
+                ).update(position=F('position') + 1)
+
+            # 更新当前段落的顺序
+            paragraph.position = new_position
+            paragraph.save()
 
 
 def delete_problems_and_mappings(paragraph_ids):
