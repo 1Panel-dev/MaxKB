@@ -4,7 +4,6 @@ import { type Ref } from 'vue'
 import type { pageRequest } from '@/api/type/common'
 import type { knowledgeData } from '@/api/type/knowledge'
 
-import useStore from '@/stores'
 const prefix = '/system/shared'
 
 /**
