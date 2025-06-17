@@ -270,7 +270,7 @@ class ParagraphSerializers(serializers.Serializer):
                 'knowledge_id': knowledge_id,
                 'document_id': document_id,
                 'workspace_id': self.data.get('workspace_id')
-            }).adjust_position(position=instance.get('position', max_position + 1))
+            }).adjust_position(instance.get('position', max_position + 1))
             # 插入問題
             QuerySet(Problem).bulk_create(problem_model_list) if len(problem_model_list) > 0 else None
             # 插入问题关联关系
