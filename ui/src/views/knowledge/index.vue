@@ -3,11 +3,13 @@
     <template #left>
       <h4 class="p-16 pb-0">{{ $t('views.knowledge.title') }}</h4>
       <folder-tree
+        :source="FolderSource.KNOWLEDGE"
         :data="folderList"
         :currentNodeKey="currentFolder?.id"
         @handleNodeClick="folderClickHandel"
         class="p-8"
         isShared
+        @refreshTree="refreshFolder"
       />
     </template>
     <SharedWorkspace v-if="currentFolder.id === 'share'"></SharedWorkspace>
@@ -44,8 +46,13 @@
             </el-select>
           </div>
           <el-dropdown trigger="click">
-            <el-button type="primary" class="ml-8"
-              v-hasPermission="[RoleConst.ADMIN.getWorkspaceRole,PermissionConst.KNOWLEDGE_CREATE.getWorkspacePermission]"
+            <el-button
+              type="primary"
+              class="ml-8"
+              v-hasPermission="[
+                RoleConst.ADMIN.getWorkspaceRole,
+                PermissionConst.KNOWLEDGE_CREATE.getWorkspacePermission,
+              ]"
             >
               {{ $t('common.create') }}
               <el-icon class="el-icon--right">
@@ -217,8 +224,13 @@
                   <template #mouseEnter>
                     <div @click.stop>
                       <el-dropdown trigger="click">
-                        <el-button text @click.stop
-                          v-hasPermission="[RoleConst.ADMIN.getWorkspaceRole,PermissionConst.KNOWLEDGE_EDIT.getWorkspacePermission]"
+                        <el-button
+                          text
+                          @click.stop
+                          v-hasPermission="[
+                            RoleConst.ADMIN.getWorkspaceRole,
+                            PermissionConst.KNOWLEDGE_EDIT.getWorkspacePermission,
+                          ]"
                         >
                           <el-icon>
                             <MoreFilled />
@@ -297,6 +309,7 @@ import useStore from '@/stores'
 import { numberFormat } from '@/utils/common'
 import { t } from '@/locales'
 import { useRouter } from 'vue-router'
+import { FolderSource } from '@/enums/common'
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
 
@@ -378,7 +391,7 @@ function getList() {
 
 function getFolder() {
   const params = {}
-  folder.asyncGetFolder('KNOWLEDGE', params, loading).then((res: any) => {
+  folder.asyncGetFolder(FolderSource.KNOWLEDGE, params, loading).then((res: any) => {
     folderList.value = res.data
     currentFolder.value = res.data?.[0] || {}
     getList()
@@ -401,7 +414,7 @@ function clickFolder(item: any) {
 const CreateFolderDialogRef = ref()
 
 function openCreateFolder() {
-  CreateFolderDialogRef.value.open('KNOWLEDGE', currentFolder.value.parent_id)
+  CreateFolderDialogRef.value.open(FolderSource.KNOWLEDGE, currentFolder.value.parent_id)
 }
 
 const GenerateRelatedDialogRef = ref<InstanceType<typeof GenerateRelatedDialog>>()

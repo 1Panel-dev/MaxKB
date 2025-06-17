@@ -52,7 +52,7 @@
                   ref="treeRef"
                 >
                   <template #default="{ node, data }">
-                    <div class="custom-tree-node flex align-center lighter">
+                    <div class="flex align-center lighter">
                       <img
                         src="@/assets/fileType/file-icon.svg"
                         alt=""

@@ -52,9 +52,9 @@
               >
                 <template #default="{ row }">
                   <div class="flex-between">
-                    <auto-tooltip :content="row.abstract">
+                    <span :title="row.abstract">
                       {{ row.abstract }}
-                    </auto-tooltip>
+                    </span>
                     <div @click.stop v-show="mouseId === row.id && row.id !== 'new'">
                       <el-dropdown trigger="click" :teleported="false">
                         <el-icon class="rotate-90 mt-4"><MoreFilled /></el-icon>

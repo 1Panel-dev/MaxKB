@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="folder-tree">
     <el-input
       v-model="filterText"
       :placeholder="$t('common.search')"
@@ -28,19 +28,54 @@
       node-key="id"
     >
       <template #default="{ node, data }">
-        <div class="custom-tree-node flex align-center">
-          <AppIcon iconName="app-folder" style="font-size: 16px"></AppIcon>
-          <span class="ml-8">{{ node.label }}</span>
+        <div class="flex-between w-full" @mouseenter.stop="handleMouseEnter(data)">
+          <div class="flex align-center">
+            <AppIcon iconName="app-folder" style="font-size: 16px"></AppIcon>
+            <span class="ml-8">{{ node.label }}</span>
+          </div>
+
+          <div
+            @click.stop
+            v-show="hoverNodeId === data.id"
+            @mouseenter.stop="handleMouseEnter(data)"
+            @mouseleave.stop="handleMouseleave"
+            class="mr-16"
+          >
+            <el-dropdown trigger="click" :teleported="false">
+              <el-button text class="w-full">
+                <el-icon class="rotate-90"><MoreFilled /></el-icon>
+              </el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item @click.stop="openCreateFolder(data)">
+                    <el-icon><EditPen /></el-icon>
+                    {{ '添加子文件夹' }}
+                  </el-dropdown-item>
+                  <el-dropdown-item @click.stop="openEditFolder(data)">
+                    <el-icon><EditPen /></el-icon>
+                    {{ $t('common.edit') }}
+                  </el-dropdown-item>
+                  <el-dropdown-item divided @click.stop="deleteFolder(data)">
+                    <el-icon><Delete /></el-icon>
+                    {{ $t('common.delete') }}
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </div>
         </div>
       </template>
     </el-tree>
+    <CreateFolderDialog ref="CreateFolderDialogRef" @refresh="refreshFolder" :title="title" />
   </div>
 </template>
 
 <script lang="ts" setup>
 import { ref, watch } from 'vue'
 import type { TreeInstance } from 'element-plus'
+import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
 import { t } from '@/locales'
+import folderApi from '@/api/folder'
 defineOptions({ name: 'FolderTree' })
 const props = defineProps({
   data: {
@@ -50,6 +85,10 @@ const props = defineProps({
   currentNodeKey: {
     type: String,
     default: 'root',
+  },
+  source: {
+    type: String,
+    default: 'APPLICATION',
   },
   isShared: {
     type: Boolean,
@@ -68,6 +107,7 @@ interface Tree {
   name: string
   children?: Tree[]
   id?: string
+  show?: boolean
 }
 
 const defaultProps = {
@@ -75,15 +115,23 @@ const defaultProps = {
   label: 'name',
 }
 
-const emit = defineEmits(['handleNodeClick'])
+const emit = defineEmits(['handleNodeClick', 'refreshTree'])
 
 const treeRef = ref<TreeInstance>()
 const filterText = ref('')
+const hoverNodeId = ref<string | undefined>('')
+const title = ref('')
 
 watch(filterText, (val) => {
   treeRef.value!.filter(val)
 })
 
+function handleMouseEnter(data: Tree) {
+  hoverNodeId.value = data.id
+}
+function handleMouseleave() {
+  hoverNodeId.value = ''
+}
 const filterNode = (value: string, data: Tree) => {
   if (!value) return true
   return data.name.includes(value)
@@ -96,6 +144,26 @@ const handleNodeClick = (data: Tree) => {
 const handleSharedNodeClick = () => {
   treeRef.value?.setCurrentKey(undefined)
   emit('handleNodeClick', { id: 'share', name: t(props.shareTitle) })
+}
+
+function deleteFolder(row: Tree) {
+  folderApi.delFolder(row.id as string, props.source).then(() => {
+    emit('refreshTree')
+  })
+}
+
+const CreateFolderDialogRef = ref()
+function openCreateFolder(row: Tree) {
+  title.value = '添加子文件夹'
+  CreateFolderDialogRef.value.open(props.source, row.id)
+}
+function openEditFolder(row: Tree) {
+  title.value = '编辑文件夹'
+  CreateFolderDialogRef.value.open(props.source, row.id, row)
+}
+
+function refreshFolder() {
+  emit('refreshTree')
 }
 </script>
 <style lang="scss" scoped>

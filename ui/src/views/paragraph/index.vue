@@ -169,7 +169,7 @@ const searchType = ref('title')
 
 const handleClick = (e: MouseEvent, ele: any) => {
   e.preventDefault()
-  document.querySelector(`${ele}`).scrollIntoView({ behavior: 'smooth', block: 'start' })
+  document.querySelector(`${ele}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 
 // 批量操作

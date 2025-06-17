@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="$t('components.folder.addFolder')"
+    :title="title"
     v-model="dialogVisible"
     width="720"
     append-to-body
@@ -54,11 +54,19 @@ import { MsgSuccess, MsgAlert } from '@/utils/message'
 import { t } from '@/locales'
 const emit = defineEmits(['refresh'])
 
+const props = defineProps({
+  title: {
+    type: String,
+    default: t('components.folder.addFolder'),
+  },
+})
+
 const FolderFormRef = ref()
 
 const loading = ref(false)
 const dialogVisible = ref<boolean>(false)
 const sourceType = ref<any>('')
+const isEdit = ref<boolean>(false)
 
 const folderForm = ref<any>({
   name: '',
@@ -84,23 +92,37 @@ watch(dialogVisible, (bool) => {
       desc: '',
       parent_id: '',
     }
+    isEdit.value = false
   }
 })
 
-const open = (source: string, id: string) => {
+const open = (source: string, id: string, data?: any) => {
   sourceType.value = source
   folderForm.value.parent_id = id
+  if (data) {
+    folderForm.value.name = data.name
+    folderForm.value.desc = data.desc
+    isEdit.value = true
+  }
   dialogVisible.value = true
 }
 
 const submitHandle = async () => {
   await FolderFormRef.value.validate((valid: any) => {
     if (valid) {
-      folderApi.postFolder( sourceType.value, folderForm.value, loading).then((res) => {
-        MsgSuccess(t('common.createSuccess'))
-        emit('refresh')
-        dialogVisible.value = false
-      })
+      if (isEdit.value) {
+        folderApi.putFolder(sourceType.value, folderForm.value, loading).then((res) => {
+          MsgSuccess(t('common.editSuccess'))
+          emit('refresh')
+          dialogVisible.value = false
+        })
+      } else {
+        folderApi.postFolder(sourceType.value, folderForm.value, loading).then((res) => {
+          MsgSuccess(t('common.createSuccess'))
+          emit('refresh')
+          dialogVisible.value = false
+        })
+      }
     }
   })
 }

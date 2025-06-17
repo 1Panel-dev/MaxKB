@@ -1,16 +1,22 @@
 export enum DeviceType {
   Mobile = 'Mobile',
-  Desktop = 'Desktop'
+  Desktop = 'Desktop',
 }
 
 export enum ValidType {
   Application = 'application',
   Knowledge = 'knowledge',
-  User = 'user'
+  User = 'user',
 }
 
 export enum ValidCount {
   Application = 5,
   Knowledge = 50,
-  User = 2
+  User = 2,
+}
+
+export enum FolderSource {
+  KNOWLEDGE = 'KNOWLEDGE',
+  APPLICATION = 'APPLICATION',
+  TOOL = 'TOOL',
 }
