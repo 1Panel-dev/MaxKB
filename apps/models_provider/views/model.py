@@ -21,7 +21,7 @@ from common.utils.common import query_params_to_single_dict
 from models_provider.api.model import ModelCreateAPI, GetModelApi, ModelEditApi, ModelListResponse, DefaultModelResponse
 from models_provider.api.provide import ProvideApi
 from models_provider.models import Model
-from models_provider.serializers.model_serializer import ModelSerializer
+from models_provider.serializers.model_serializer import ModelSerializer, SharedModelSerializer
 from system_manage.views import encryption_str
 
 
@@ -212,3 +212,21 @@ class ModelSetting(APIView):
         def put(self, request: Request, workspace_id: str, model_id: str):
             return result.success(
                 ModelSerializer.Operate(data={'id': model_id}).pause_download())
+
+
+class SharedModel(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(
+        methods=['Get'],
+        summary=_('Get Share model'),
+        description=_('Get Share model'),
+        operation_id=_('Get Share model'),  # type: ignore
+        parameters=ModelCreateAPI.get_parameters(),
+        responses=ModelListResponse.get_response(),
+        tags=[_('Shared Model')]
+    )  # type: ignore
+    @has_permissions(PermissionConstants.MODEL_READ)
+    def get(self, request: Request, workspace_id: str):
+        return result.success(
+            SharedModelSerializer(data={'workspace_id': workspace_id}).get_share_model_list())

@@ -24,7 +24,7 @@
                 <el-card shadow="never" :class="item.id === selectKnowledge ? 'active' : ''">
                   <el-radio :value="item.id" size="large">
                     <div class="flex align-center">
-                      <KnowledgeIcon :type="item.type" />
+                      <KnowledgeIcon :type="item.type" class="mr-12" />
 
                       <span class="ellipsis" :title="item.name">
                         {{ item.name }}

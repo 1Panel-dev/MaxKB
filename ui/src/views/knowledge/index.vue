@@ -161,6 +161,7 @@
                   :title="item.name"
                   :description="item.desc || $t('common.noData')"
                   class="cursor"
+                  @click="clickFolder(item)"
                 >
                   <template #icon>
                     <el-avatar shape="square" :size="32" style="background: none">
@@ -286,7 +287,7 @@ import CreateLarkKnowledgeDialog from './create-component/CreateLarkKnowledgeDia
 import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
 import GenerateRelatedDialog from '@/components/generate-related-dialog/index.vue'
 import KnowledgeApi from '@/api/knowledge/knowledge'
-import SharedWorkspace from '@/views/knowledge-shared-system/SharedWorkspace.vue'
+import SharedWorkspace from '@/views/shared/knowledge-shared/SharedWorkspace.vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import useStore from '@/stores'
 import { numberFormat } from '@/utils/common'
@@ -358,6 +359,7 @@ const search_type_change = () => {
 }
 
 function getList() {
+  console.log(currentFolder.value?.id)
   const params = {
     folder_id: currentFolder.value?.id || localStorage.getItem('workspace_id'),
     [search_type.value]: search_form.value[search_type.value],
@@ -382,6 +384,12 @@ function folderClickHandel(row: any) {
   currentFolder.value = row
   knowledgeList.value = []
   if (currentFolder.value.id === 'share') return
+  getList()
+}
+
+function clickFolder(item: any) {
+  currentFolder.value.id = item.id
+  knowledgeList.value = []
   getList()
 }
 
@@ -429,6 +437,7 @@ function deleteKnowledge(row: any) {
 }
 
 function refreshFolder() {
+  knowledgeList.value = []
   getFolder()
   getList()
 }

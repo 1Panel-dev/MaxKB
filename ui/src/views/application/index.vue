@@ -97,10 +97,10 @@
                   >
                     <div class="flex align-center">
                       <el-avatar shape="square" class="mt-4" :size="36" style="background: none">
-                        <img src="@/assets/application/icon_import_app.svg" alt="" />
+                        <img src="@/assets/icon_import.svg" alt="" />
                       </el-avatar>
                       <div class="pre-wrap ml-8">
-                        <div class="lighter">{{ $t('views.application.importApplication') }}</div>
+                        <div class="lighter">{{ $t('common.importCreate') }}</div>
                       </div>
                     </div>
                   </el-upload>
@@ -144,6 +144,7 @@
                   :title="item.name"
                   :description="item.desc || $t('common.noData')"
                   class="cursor"
+                  @click="clickFolder(item)"
                 >
                   <template #icon>
                     <el-avatar shape="square" :size="32" style="background: none">
@@ -337,6 +338,12 @@ function folderClickHandel(row: any) {
   getList()
 }
 
+function clickFolder(item: any) {
+  currentFolder.value.id = item.id
+  applicationList.value = []
+  getList()
+}
+
 function getAccessToken(id: string) {
   applicationList.value
     .filter((app) => app.id === id)[0]
@@ -436,6 +443,7 @@ function openCreateFolder() {
   CreateFolderDialogRef.value.open('APPLICATION', currentFolder.value.parent_id)
 }
 function refreshFolder() {
+  applicationList.value = []
   getFolder()
   getList()
 }
@@ -447,6 +455,7 @@ const importApplication = (file: any) => {
   ApplicaitonApi.importApplication(formData, loading)
     .then(async (res: any) => {
       if (res?.data) {
+        applicationList.value = []
         getList()
       }
     })

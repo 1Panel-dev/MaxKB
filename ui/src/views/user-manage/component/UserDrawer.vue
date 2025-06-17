@@ -36,11 +36,11 @@
         >
         </el-input>
       </el-form-item>
-      <el-form-item :label="$t('views.userManage.userForm.email.label')" prop="email">
+      <el-form-item :label="$t('views.login.loginForm.email.label')" prop="email">
         <el-input
           type="email"
           v-model="userForm.email"
-          :placeholder="$t('views.userManage.userForm.email.placeholder')"
+          :placeholder="$t('views.login.loginForm.email.placeholder')"
         >
         </el-input>
       </el-form-item>
@@ -102,7 +102,7 @@ const rules = reactive({
   email: [
     {
       required: true,
-      message: t('views.userManage.form.email.requiredMessage'),
+      message: t('views.login.loginForm.email.requiredMessage'),
       trigger: 'blur',
     },
   ],

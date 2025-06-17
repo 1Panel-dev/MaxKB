@@ -30,6 +30,12 @@ export default {
       requiredMessage: '請輸入確認密碼',
       validatorMessage: '密碼不一致',
     },
+    email: {
+      label: '電子信箱',
+      placeholder: '請輸入電子信箱',
+      requiredMessage: '請輸入電子信箱',
+      validatorEmail: '請輸入有效電子信箱格式！',
+    },
   },
   jump_tip: '即將跳轉至認證源頁面進行認證',
   jump: '跳轉',

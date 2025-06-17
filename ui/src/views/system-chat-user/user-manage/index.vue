@@ -1,48 +1,50 @@
 <template>
-  <div class="p-16-24">
-    <h2 class="mb-16">{{ $t('views.userManage.title') }}</h2>
-    <el-card>
+  <ContentContainer>
+    <template #header>
+      <div class="shared-header">
+        <span class="title">{{ t('views.system.shared_resources') }}</span>
+        <el-icon size="12">
+          <rightOutlined></rightOutlined>
+        </el-icon>
+        <span class="sub-title">{{ t('views.knowledge.title') }}</span>
+      </div>
+    </template>
+    <el-card class="h-full">
       <div class="flex-between mb-16">
-        <el-button type="primary" @click="createUser()">{{
-            $t('views.userManage.createUser')
-          }}
-        </el-button>
+        <div>
+          <el-button type="primary" @click="createUser()">
+            {{ t('views.userManage.createUser') }}
+          </el-button>
+          <el-button :disabled="multipleSelection.length === 0">
+            {{ $t('views.chatUser.syncUsers') }}
+          </el-button>
+          <el-button :disabled="multipleSelection.length === 0">
+            {{ $t('views.chatUser.setUserGroups') }}
+          </el-button>
+          <el-button :disabled="multipleSelection.length === 0">
+            {{ $t('common.delete') }}
+          </el-button>
+        </div>
         <div class="flex-between complex-search">
-          <el-select
-            class="complex-search__left"
-            v-model="search_type"
-            style="width: 120px"
-            @change="search_type_change"
-          >
-            <el-option :label="$t('views.login.loginForm.username.label')" value="name"/>
+          <el-select class="complex-search__left" v-model="search_type" style="width: 120px"
+            @change="search_type_change">
+            <el-option :label="$t('views.login.loginForm.username.label')" value="name" />
           </el-select>
-          <el-input
-            v-if="search_type === 'name'"
-            v-model="search_form.name"
-            @change="getList"
-            :placeholder="$t('common.searchBar.placeholder')"
-            style="width: 220px"
-            clearable
-          />
+          <el-input v-if="search_type === 'name'" v-model="search_form.name" @change="getList"
+            :placeholder="$t('common.searchBar.placeholder')" style="width: 220px" clearable />
         </div>
       </div>
-      <app-table
-        class="mt-16"
-        :data="userTableData"
-        :pagination-config="paginationConfig"
-        @sizeChange="handleSizeChange"
-        @changePage="getList"
-        v-loading="loading"
-      >
-        <el-table-column prop="nick_name" :label="$t('views.userManage.userForm.nick_name.label')"/>
-        <el-table-column prop="username" :label="$t('views.userManage.userForm.username.label')"/>
+      <app-table class="mt-16" :data="userTableData" :pagination-config="paginationConfig"
+        @sizeChange="handleSizeChange" @changePage="getList" v-loading="loading"
+        @selection-change="handleSelectionChange" @sort-change="handleSortChange">
+        <el-table-column type="selection" width="55" />
+        <el-table-column prop="nick_name" :label="$t('views.userManage.userForm.nick_name.label')" />
+        <el-table-column prop="username" :label="$t('common.username')" />
         <el-table-column prop="is_active" :label="$t('common.status.label')">
           <template #default="{ row }">
             <div v-if="row.is_active" class="flex align-center">
-              <el-icon class="color-success mr-8" style="font-size: 16px"
-              >
-                <SuccessFilled
-                />
+              <el-icon class="color-success mr-8" style="font-size: 16px">
+                <SuccessFilled />
               </el-icon>
               <span class="color-secondary">
                 {{ $t('common.status.enabled') }}
@@ -59,7 +61,7 @@
 
         <el-table-column
           prop="email"
-          :label="$t('views.userManage.userForm.email.label')"
+          :label="$t('views.login.loginForm.email.label')"
           show-overflow-tooltip
         >
           <template #default="{ row }">
@@ -69,6 +71,12 @@
         <el-table-column prop="phone" :label="$t('views.userManage.userForm.phone.label')">
           <template #default="{ row }">
             {{ row.phone || '-' }}
+          </template>
+        </el-table-column>
+        <!-- TODO -->
+        <el-table-column prop="user_group_names" :label="$t('views.chatUser.group.title')">
+          <template #default="{ row }">
+            {{ row.user_group_names || '-' }}
           </template>
         </el-table-column>
         <el-table-column prop="source" :label="$t('views.userManage.source.label')">
@@ -98,57 +106,54 @@
         <el-table-column :label="$t('common.operation')" width="160" align="left" fixed="right">
           <template #default="{ row }">
             <span @click.stop>
-              <el-switch
-                size="small"
-                v-model="row.is_active"
-                :before-change="() => changeState(row)"
-              />
+              <el-switch size="small" v-model="row.is_active" :before-change="() => changeState(row)" />
             </span>
-            <el-divider direction="vertical"/>
+            <el-divider direction="vertical" />
             <span class="mr-8">
               <el-button type="primary" text @click.stop="editUser(row)" :title="$t('common.edit')">
-                <el-icon><EditPen/></el-icon>
+                <el-icon>
+                  <EditPen />
+                </el-icon>
               </el-button>
             </span>
 
             <span class="mr-8">
-              <el-button
-                type="primary"
-                text
-                @click.stop="editPwdUser(row)"
-                :title="$t('views.userManage.setting.updatePwd')"
-              >
-                <el-icon><Lock/></el-icon>
+              <el-button type="primary" text @click.stop="editPwdUser(row)"
+                :title="$t('views.userManage.setting.updatePwd')">
+                <el-icon>
+                  <Lock />
+                </el-icon>
               </el-button>
             </span>
             <span>
-              <el-button
-                :disabled="row.role === 'ADMIN'"
-                type="primary"
-                text
-                @click.stop="deleteUserManage(row)"
-                :title="$t('common.delete')"
-              >
-                <el-icon><Delete/></el-icon>
+              <el-button :disabled="row.role === 'ADMIN'" type="primary" text @click.stop="deleteUserManage(row)"
+                :title="$t('common.delete')">
+                <el-icon>
+                  <Delete />
+                </el-icon>
               </el-button>
             </span>
           </template>
         </el-table-column>
       </app-table>
     </el-card>
-    <UserDrawer :title="title" ref="UserDrawerRef" @refresh="refresh"/>
-    <UserPwdDialog ref="UserPwdDialogRef" @refresh="refresh"/>
-  </div>
+  </ContentContainer>
+
+  <UserDrawer :title="title" ref="UserDrawerRef" @refresh="refresh" />
+  <UserPwdDialog ref="UserPwdDialogRef" @refresh="refresh" />
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref, reactive, watch} from 'vue'
+import { onMounted, ref, reactive, watch } from 'vue'
 import UserDrawer from './component/UserDrawer.vue'
 import UserPwdDialog from './component/UserPwdDialog.vue'
 import userManageApi from '@/api/system/chat-user'
-import {datetimeFormat} from '@/utils/time'
-import {MsgSuccess, MsgConfirm} from '@/utils/message'
-import {t} from '@/locales'
+import { datetimeFormat } from '@/utils/time'
+import { MsgSuccess, MsgConfirm } from '@/utils/message'
+import { t } from '@/locales'
+import iconMap from '@/components/app-icon/icons/common'
+
+const rightOutlined = iconMap['right-outlined'].iconReader()
 
 const search_type = ref('name')
 const search_form = ref<{
@@ -156,10 +161,16 @@ const search_form = ref<{
 }>({
   name: '',
 })
+const search_type_change = () => {
+  search_form.value = { name: '' }
+}
 
-const UserDrawerRef = ref()
-const UserPwdDialogRef = ref()
 const loading = ref(false)
+
+const multipleSelection = ref<string[]>([])
+function handleSelectionChange(val: string[]) {
+  multipleSelection.value = val
+}
 
 const paginationConfig = reactive({
   current_page: 1,
@@ -169,15 +180,6 @@ const paginationConfig = reactive({
 
 const userTableData = ref<any[]>([])
 
-const search_type_change = () => {
-  search_form.value = {name: ''}
-}
-
-function handleSizeChange() {
-  paginationConfig.current_page = 1
-  getList()
-}
-
 function getList() {
   return userManageApi
     .getUserManage(paginationConfig, search_form.value.name, loading)
@@ -185,6 +187,17 @@ function getList() {
       userTableData.value = res.data.records
       paginationConfig.total = res.data.total
     })
+}
+
+const orderBy = ref<string>('')
+function handleSortChange({ prop, order }: { prop: string; order: string }) {
+  orderBy.value = order === 'ascending' ? prop : `-${prop}`
+  getList()
+}
+
+function handleSizeChange() {
+  paginationConfig.current_page = 1
+  getList()
 }
 
 function changeState(row: any) {
@@ -205,7 +218,7 @@ function changeState(row: any) {
 }
 
 const title = ref('')
-
+const UserDrawerRef = ref()
 function editUser(row: any) {
   title.value = t('views.userManage.editUser')
   UserDrawerRef.value.open(row)
@@ -236,6 +249,7 @@ function deleteUserManage(row: any) {
     })
 }
 
+const UserPwdDialogRef = ref()
 function editPwdUser(row: any) {
   UserPwdDialogRef.value.open(row)
 }
@@ -249,4 +263,14 @@ onMounted(() => {
 })
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.content-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  :deep(.content-container__main) {
+    flex: 1;
+  }
+}
+</style>

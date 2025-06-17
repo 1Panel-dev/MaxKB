@@ -88,4 +88,6 @@ export default {
   },
   info: '基本信息',
   otherSetting: '其他设置',
+  username: '用户名',
+  importCreate: '导入创建',
 }

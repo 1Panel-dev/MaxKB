@@ -24,11 +24,7 @@ export default {
       label: '姓名',
       placeholder: '請輸入姓名',
     },
-    email: {
-      label: '電子信箱',
-      placeholder: '請輸入電子信箱',
-      requiredMessage: '請輸入電子信箱',
-    },
+
     phone: {
       label: '手機號碼',
       placeholder: '請輸入手機號碼',

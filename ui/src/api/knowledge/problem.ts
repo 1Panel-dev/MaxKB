@@ -3,7 +3,14 @@ import { get, post, del, put } from '@/request/index'
 import type { Ref } from 'vue'
 import type { pageRequest } from '@/api/type/common'
 
-const prefix = '/workspace/' + localStorage.getItem('workspace_id') + '/knowledge'
+import useStore from '@/stores'
+const prefix: any = { _value: '/workspace/' }
+Object.defineProperty(prefix, 'value', {
+  get: function () {
+    const { user } = useStore()
+    return this._value + user.getWorkspaceId() + '/knowledge'
+  },
+})
 
 /**
  * 创建问题
@@ -15,7 +22,7 @@ const postProblems: (
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (knowledge_id, data, loading) => {
-  return post(`${prefix}/${knowledge_id}/problem`, data, undefined, loading)
+  return post(`${prefix.value}/${knowledge_id}/problem`, data, undefined, loading)
 }
 
 /**
@@ -33,7 +40,7 @@ const getProblems: (
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (knowledge_id, page, param, loading) => {
   return get(
-    `${prefix}/${knowledge_id}/problem/${page.current_page}/${page.page_size}`,
+    `${prefix.value}/${knowledge_id}/problem/${page.current_page}/${page.page_size}`,
     param,
     loading,
   )
@@ -53,7 +60,7 @@ const putProblems: (
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (knowledge_id, problem_id, data: any, loading) => {
-  return put(`${prefix}/${knowledge_id}/problem/${problem_id}`, data, undefined, loading)
+  return put(`${prefix.value}/${knowledge_id}/problem/${problem_id}`, data, undefined, loading)
 }
 
 /**
@@ -65,7 +72,7 @@ const delProblems: (
   problem_id: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<boolean>> = (knowledge_id, problem_id, loading) => {
-  return del(`${prefix}/${knowledge_id}/problem/${problem_id}`, loading)
+  return del(`${prefix.value}/${knowledge_id}/problem/${problem_id}`, loading)
 }
 
 /**
@@ -78,7 +85,7 @@ const getDetailProblems: (
   problem_id: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (knowledge_id, problem_id, loading) => {
-  return get(`${prefix}/${knowledge_id}/problem/${problem_id}/paragraph`, undefined, loading)
+  return get(`${prefix.value}/${knowledge_id}/problem/${problem_id}/paragraph`, undefined, loading)
 }
 
 /**
@@ -94,7 +101,7 @@ const putMulAssociationProblem: (
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<boolean>> = (knowledge_id, data, loading) => {
-  return put(`${prefix}/${knowledge_id}/problem/batch_association`, data, undefined, loading)
+  return put(`${prefix.value}/${knowledge_id}/problem/batch_association`, data, undefined, loading)
 }
 
 /**
@@ -107,7 +114,7 @@ const putMulProblem: (
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<boolean>> = (knowledge_id, data, loading) => {
-  return put(`${prefix}/${knowledge_id}/problem/batch_delete`, data, undefined, loading)
+  return put(`${prefix.value}/${knowledge_id}/problem/batch_delete`, data, undefined, loading)
 }
 
 export default {

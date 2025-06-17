@@ -30,6 +30,12 @@ export default {
       requiredMessage: '请输入确认密码',
       validatorMessage: '密码不一致',
     },
+    email: {
+      label: '邮箱',
+      placeholder: '请输入邮箱',
+      requiredMessage: '请输入邮箱',
+      validatorEmail: '请输入有效邮箱格式！',
+    },
   },
   jump_tip: '即将跳转至认证源页面进行认证',
   jump: '跳转',

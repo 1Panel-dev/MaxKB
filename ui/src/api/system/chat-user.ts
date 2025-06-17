@@ -1,22 +1,22 @@
-import {Result} from '@/request/Result'
-import {get, put, post, del} from '@/request/index'
-import type {pageRequest} from '@/api/type/common'
-import type {Ref} from 'vue'
+import { Result } from '@/request/Result'
+import { get, put, post, del } from '@/request/index'
+import type { pageRequest } from '@/api/type/common'
+import type { Ref } from 'vue'
 
 const prefix = '/system/chat_user'
 /**
  * 用户分页列表
  * @query 参数
- email_or_username: string
+ username_or_nickname: string
  */
 const getUserManage: (
   page: pageRequest,
-  email_or_username: string,
+  username_or_nickname: string,
   loading?: Ref<boolean>,
-) => Promise<Result<any>> = (page, email_or_username, loading) => {
+) => Promise<Result<any>> = (page, username_or_nickname, loading) => {
   return get(
     `${prefix}/user_manage/${page.current_page}/${page.page_size}`,
-    email_or_username ? {email_or_username} : undefined,
+    username_or_nickname ? { username_or_nickname } : undefined,
     loading,
   )
 }

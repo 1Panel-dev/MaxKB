@@ -77,7 +77,7 @@ const useUserStore = defineStore('user', {
             this.edition = ok.data.edition
 
             if (this.isEE() || this.isPE()) {
-              // await this.theme()
+              await this.theme()
             } else {
               this.themeInfo = {
                 ...defaultPlatformSetting,

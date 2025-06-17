@@ -1,3 +1,5 @@
+import { ChatUserResourceEnum } from '@/enums/workspaceChatUser'
+
 const DocumentRouter = {
   path: '/knowledge/:id/:folderId',
   name: 'KnowledgeDetail',
@@ -42,6 +44,20 @@ const DocumentRouter = {
         parentName: 'KnowledgeDetail',
       },
       component: () => import('@/views/hit-test/index.vue'),
+    },
+    {
+      path: 'chat-user',
+      name: 'KnowledgeChatUser',
+      meta: {
+        icon: 'app-document',
+        iconActive: 'app-document-active',
+        title: 'views.chatUser.title',
+        active: 'chat-log',
+        parentPath: '/knowledge/:id/:folderId',
+        parentName: 'KnowledgeDetail',
+        resourceType: ChatUserResourceEnum.APPLICATION
+      },
+      component: () => import('@/views/chat-user/index.vue')
     },
     {
       path: 'setting',

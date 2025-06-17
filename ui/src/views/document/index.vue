@@ -602,9 +602,11 @@ const title = ref('')
 const selectKnowledgeDialogRef = ref()
 
 const exportDocument = (document: any) => {
-  documentApi.exportDocument(document.name, document.knowledge_id, document.id, loading).then(() => {
-    MsgSuccess(t('common.exportSuccess'))
-  })
+  documentApi
+    .exportDocument(document.name, document.knowledge_id, document.id, loading)
+    .then(() => {
+      MsgSuccess(t('common.exportSuccess'))
+    })
 }
 const exportDocumentZip = (document: any) => {
   documentApi
@@ -712,8 +714,7 @@ const closeInterval = () => {
 }
 
 function syncDocument(row: any) {
-  console.log('row', row)
-  if (row.type === '1') {
+  if (+row.type === 1) {
     syncWebDocument(row)
   } else {
     syncLarkDocument(row)
@@ -779,7 +780,7 @@ function creatQuickHandle(val: string) {
   loading.value = true
   const obj = [{ name: val }]
   document
-    .asyncPostDocument(id, obj)
+    .asyncPutDocument(id, obj)
     .then(() => {
       getList()
       MsgSuccess(t('common.createSuccess'))

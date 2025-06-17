@@ -79,7 +79,7 @@ const systemRouter = {
             parentPath: '/system',
             parentName: 'system',
           },
-          component: () => import('@/views/knowledge-shared-system/index.vue'),
+          component: () => import('@/views/shared/knowledge-shared/index.vue'),
         },
         {
           path: '/system/shared/tool',
@@ -90,7 +90,7 @@ const systemRouter = {
             parentPath: '/system',
             parentName: 'system',
           },
-          component: () => import('@/views/tool-shared-system/index.vue'),
+          component: () => import('@/views/shared/tool-shared/index.vue'),
         },
         {
           path: '/system/shared/model',
@@ -101,7 +101,7 @@ const systemRouter = {
             parentPath: '/system',
             parentName: 'system',
           },
-          component: () => import('@/views/model-shared-system/index.vue'),
+          component: () => import('@/views/shared/model-shared/index.vue'),
         },
       ],
     },
@@ -111,7 +111,7 @@ const systemRouter = {
       meta: {
         icon: 'app-folder-share',
         iconActive: 'app-folder-share-active',
-        title: '对话用户',
+        title: 'views.chatUser.title',
         activeMenu: '/system',
         parentPath: '/system',
         parentName: 'system',
@@ -121,7 +121,7 @@ const systemRouter = {
           path: '/system/chat/chat-user',
           name: 'ChatUser',
           meta: {
-            title: '对话用户',
+            title: 'views.chatUser.title',
             activeMenu: '/system',
             parentPath: '/system',
             parentName: 'system',
@@ -132,7 +132,7 @@ const systemRouter = {
           path: '/system/chat/group',
           name: 'Group',
           meta: {
-            title: '用户组',
+            title: 'views.chatUser.group.title',
             activeMenu: '/system',
             parentPath: '/system',
             parentName: 'system',
@@ -143,7 +143,7 @@ const systemRouter = {
           path: '/system/chat/authentication',
           name: 'Authentication',
           meta: {
-            title: '登录认证',
+            title: 'views.system.authentication.title',
             activeMenu: '/system',
             parentPath: '/system',
             parentName: 'system',

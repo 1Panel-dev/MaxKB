@@ -14,6 +14,7 @@ import document from './document'
 import paragraph from './paragraph'
 import problem from './problem'
 import chatLog from './chat-log'
+import chatUser from './chat-user'
 import applicationWorkflow from './application-workflow'
 import login from './login'
 import operateLog from './operate-log'
@@ -36,5 +37,6 @@ export default {
   login,
   operateLog,
   role,
-  workspace
+  workspace,
+  chatUser
 }

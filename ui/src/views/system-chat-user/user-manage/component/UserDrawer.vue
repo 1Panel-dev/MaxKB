@@ -36,11 +36,11 @@
         >
         </el-input>
       </el-form-item>
-      <el-form-item :label="$t('views.userManage.userForm.email.label')" prop="email">
+      <el-form-item :label="$t('views.login.loginForm.email.label')" prop="email">
         <el-input
           type="email"
           v-model="userForm.email"
-          :placeholder="$t('views.userManage.userForm.email.placeholder')"
+          :placeholder="$t('views.login.loginForm.email.placeholder')"
         >
         </el-input>
       </el-form-item>
@@ -99,33 +99,33 @@ const rules = reactive({
   username: [
     {
       required: true,
-      message: t('views.userManage.form.username.requiredMessage'),
+      message: t('views.login.loginForm.username.requiredMessage'),
       trigger: 'blur',
     },
     {
       min: 6,
       max: 20,
-      message: t('views.userManage.form.username.lengthMessage'),
+      message: t('views.login.loginForm.username.lengthMessage'),
       trigger: 'blur',
     },
   ],
   email: [
     {
       required: true,
-      message: t('views.userManage.form.email.requiredMessage'),
+      message: t('views.login.loginForm.email.requiredMessage'),
       trigger: 'blur',
     },
   ],
   password: [
     {
       required: true,
-      message: t('views.userManage.form.password.requiredMessage'),
+      message: t('views.login.loginForm.password.requiredMessage'),
       trigger: 'blur',
     },
     {
       min: 6,
       max: 20,
-      message: t('views.userManage.form.password.lengthMessage'),
+      message: t('views.login.loginForm.password.lengthMessage'),
       trigger: 'blur',
     },
   ],

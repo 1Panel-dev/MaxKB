@@ -26,11 +26,6 @@ export default {
       label: 'Name',
       placeholder: 'Please enter name',
     },
-    email: {
-      label: 'Email',
-      placeholder: 'Please enter email',
-      requiredMessage: 'Please enter email',
-    },
     phone: {
       label: 'Phone',
       placeholder: 'Please enter phone',

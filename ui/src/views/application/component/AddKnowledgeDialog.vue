@@ -54,6 +54,7 @@
                 :data="item"
                 v-model="checkList"
                 @change="changeHandle"
+                v-if="item.resource_type !== 'folder'"
               >
                 <span class="ellipsis cursor ml-12" :title="item.name"> {{ item.name }}</span>
               </CardCheckbox>

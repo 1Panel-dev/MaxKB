@@ -4,65 +4,8 @@ import { type Ref } from 'vue'
 import type { pageRequest } from '@/api/type/common'
 import type { knowledgeData } from '@/api/type/knowledge'
 
+import useStore from '@/stores'
 const prefix = '/system/shared'
-const workspace_id = localStorage.getItem('workspace_id') || 'default'
-const getSharedWorkspaceKnowledge: (loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (
-  loading,
-) => {
-  return get(`${prefix}/workspace/${workspace_id}/knowledge`, {}, loading)
-}
-
-const getSharedWorkspaceKnowledgePage: (
-  param: any,
-  loading?: Ref<boolean>,
-) => Promise<Result<Array<any>>> = (param: any, loading) => {
-  return get(`${prefix}/workspace/${workspace_id}/knowledge`, param, loading)
-}
-
-const getSharedAuthorizationKnowledgeGet: (
-  knowledge_id: string,
-  loading?: Ref<boolean>,
-) => Promise<Result<Array<any>>> = (knowledge_id, loading) => {
-  return get(`${prefix}/knowledge/${knowledge_id}/authorization`, {}, loading)
-}
-
-const getSharedAuthorizationKnowledgePost: (
-  knowledge_id: string,
-  param?: any,
-  loading?: Ref<boolean>,
-) => Promise<Result<Array<any>>> = (knowledge_id, param, loading) => {
-  return post(`${prefix}/knowledge/${knowledge_id}/authorization`, param, loading)
-}
-
-const getSharedAuthorizationToolGet: (
-  knowledge_id: string,
-  loading?: Ref<boolean>,
-) => Promise<Result<Array<any>>> = (knowledge_id, loading) => {
-  return get(`${prefix}/tool/${knowledge_id}/authorization`, {}, loading)
-}
-
-const getSharedAuthorizationToolPost: (
-  knowledge_id: string,
-  param?: any,
-  loading?: Ref<boolean>,
-) => Promise<Result<Array<any>>> = (knowledge_id, param, loading) => {
-  return post(`${prefix}/tool/${knowledge_id}/authorization`, param, loading)
-}
-
-const getSharedAuthorizationModelGet: (
-  knowledge_id: string,
-  loading?: Ref<boolean>,
-) => Promise<Result<Array<any>>> = (knowledge_id, loading) => {
-  return get(`${prefix}/model/${knowledge_id}/authorization`, {}, loading)
-}
-
-const getSharedAuthorizationModelPost: (
-  knowledge_id: string,
-  param?: any,
-  loading?: Ref<boolean>,
-) => Promise<Result<Array<any>>> = (knowledge_id, param, loading) => {
-  return post(`${prefix}/model/${knowledge_id}/authorization`, param, loading)
-}
 
 /**
  * 获得知识库文件夹列表
@@ -283,11 +226,8 @@ const getKnowledgeEmdeddingModel: (
  * @query  { query_text: string, top_number: number, similarity: number }
  * @returns
  */
-const getKnowledgeModel: (
-  knowledge_id: string,
-  loading?: Ref<boolean>,
-) => Promise<Result<Array<any>>> = (knowledge_id, loading) => {
-  return get(`${prefix}/${knowledge_id}/model`, loading)
+const getKnowledgeModel: (loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (loading) => {
+  return get(`${prefix}/knowledge/model`, loading)
 }
 
 /**
@@ -356,18 +296,10 @@ export default {
   postKnowledge,
   getKnowledgeModel,
   postWebKnowledge,
-  getSharedWorkspaceKnowledge,
-  getSharedWorkspaceKnowledgePage,
-  getSharedAuthorizationKnowledgeGet,
-  getSharedAuthorizationKnowledgePost,
-  getSharedAuthorizationToolGet,
-  getSharedAuthorizationToolPost,
-  getSharedAuthorizationModelGet,
-  getSharedAuthorizationModelPost,
 
   getLarkDocumentList,
   importLarkDocument,
-  postLarkKnowledge
+  postLarkKnowledge,
 } as {
   [key: string]: any
 }

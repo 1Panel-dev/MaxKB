@@ -12,7 +12,14 @@ import {
 import { type ChatProfile } from '@/api/type/chat'
 import { type Ref } from 'vue'
 
-const prefix = '/workspace/' + localStorage.getItem('workspace_id') + '/application'
+import useStore from '@/stores'
+const prefix: any = { _value: '/workspace/' }
+Object.defineProperty(prefix, 'value', {
+  get: function () {
+    const { user } = useStore()
+    return this._value + user.getWorkspaceId() + '/application'
+  },
+})
 
 /**
  * 打开调试对话id
@@ -22,6 +29,7 @@ const prefix = '/workspace/' + localStorage.getItem('workspace_id') + '/applicat
  */
 const open: (loading?: Ref<boolean>) => Promise<Result<string>> = (loading) => {
   return get('/open', {}, loading)
+ 
 }
 /**
  * 对话

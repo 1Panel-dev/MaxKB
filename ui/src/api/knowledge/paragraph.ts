@@ -2,7 +2,14 @@ import { Result } from '@/request/Result'
 import { get, post, del, put } from '@/request/index'
 import type { pageRequest } from '@/api/type/common'
 import type { Ref } from 'vue'
-const prefix = '/workspace/' + localStorage.getItem('workspace_id') + '/knowledge'
+import useStore from '@/stores'
+const prefix: any = { _value: '/workspace/' }
+Object.defineProperty(prefix, 'value', {
+  get: function () {
+    const { user } = useStore()
+    return this._value + user.getWorkspaceId() + '/knowledge'
+  },
+})
 
 /**
  * 创建段落
@@ -26,7 +33,7 @@ const postParagraph: (
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (knowledge_id, document_id, data, loading) => {
   return post(
-    `${prefix}/${knowledge_id}/document/${document_id}/paragraph`,
+    `${prefix.value}/${knowledge_id}/document/${document_id}/paragraph`,
     data,
     undefined,
     loading,
@@ -49,7 +56,7 @@ const getParagraph: (
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (knowledge_id, document_id, page, param, loading) => {
   return get(
-    `${prefix}/${knowledge_id}/document/${document_id}/paragraph/${page.current_page}/${page.page_size}`,
+    `${prefix.value}/${knowledge_id}/document/${document_id}/paragraph/${page.current_page}/${page.page_size}`,
     param,
     loading,
   )
@@ -78,7 +85,7 @@ const putParagraph: (
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (knowledge_id, document_id, paragraph_id, data, loading) => {
   return put(
-    `${prefix}/${knowledge_id}/document/${document_id}/paragraph/${paragraph_id}`,
+    `${prefix.value}/${knowledge_id}/document/${document_id}/paragraph/${paragraph_id}`,
     data,
     undefined,
     loading,
@@ -96,7 +103,7 @@ const delParagraph: (
   loading?: Ref<boolean>,
 ) => Promise<Result<boolean>> = (knowledge_id, document_id, paragraph_id, loading) => {
   return del(
-    `${prefix}/${knowledge_id}/document/${document_id}/paragraph/${paragraph_id}`,
+    `${prefix.value}/${knowledge_id}/document/${document_id}/paragraph/${paragraph_id}`,
     undefined,
     {},
     loading,
@@ -112,7 +119,7 @@ const getParagraphProblem: (
   document_id: string,
   paragraph_id: string,
 ) => Promise<Result<any>> = (knowledge_id, document_id, paragraph_id: string) => {
-  return get(`${prefix}/${knowledge_id}/document/${document_id}/paragraph/${paragraph_id}/problem`)
+  return get(`${prefix.value}/${knowledge_id}/document/${document_id}/paragraph/${paragraph_id}/problem`)
 }
 
 /**
@@ -131,7 +138,7 @@ const postParagraphProblem: (
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (knowledge_id, document_id, paragraph_id, data: any, loading) => {
   return post(
-    `${prefix}/${knowledge_id}/document/${document_id}/paragraph/${paragraph_id}/problem`,
+    `${prefix.value}/${knowledge_id}/document/${document_id}/paragraph/${paragraph_id}/problem`,
     data,
     {},
     loading,
@@ -154,7 +161,7 @@ const putAssociationProblem: (
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (knowledge_id, document_id, data, loading) => {
   return put(
-    `${prefix}/${knowledge_id}/document/${document_id}/paragraph/association`,
+    `${prefix.value}/${knowledge_id}/document/${document_id}/paragraph/association`,
     {},
     data,
     loading,
@@ -172,7 +179,7 @@ const putMulParagraph: (
   loading?: Ref<boolean>,
 ) => Promise<Result<boolean>> = (knowledge_id, document_id, data, loading) => {
   return put(
-    `${prefix}/${knowledge_id}/document/${document_id}/paragraph/batch_delete`,
+    `${prefix.value}/${knowledge_id}/document/${document_id}/paragraph/batch_delete`,
     { id_list: data },
     undefined,
     loading,
@@ -198,7 +205,7 @@ const putBatchGenerateRelated: (
   loading?: Ref<boolean>,
 ) => Promise<Result<boolean>> = (knowledge_id, document_id, data, loading) => {
   return put(
-    `${prefix}/${knowledge_id}/document/${document_id}/paragraph/batch_generate_related`,
+    `${prefix.value}/${knowledge_id}/document/${document_id}/paragraph/batch_generate_related`,
     data,
     undefined,
     loading,
@@ -225,7 +232,7 @@ const putMigrateMulParagraph: (
   loading,
 ) => {
   return put(
-    `${prefix}/${knowledge_id}/document/${document_id}/paragraph/migrate/knowledge/${target_knowledge_id}/document/${target_document_id}`,
+    `${prefix.value}/${knowledge_id}/document/${document_id}/paragraph/migrate/knowledge/${target_knowledge_id}/document/${target_document_id}`,
     data,
     undefined,
     loading,
@@ -246,7 +253,7 @@ const putDisassociationProblem: (
   loading?: Ref<boolean>,
 ) => Promise<Result<boolean>> = (knowledge_id, document_id, data, loading) => {
   return put(
-    `${prefix}/${knowledge_id}/document/${document_id}/paragraph/unassociation`,
+    `${prefix.value}/${knowledge_id}/document/${document_id}/paragraph/unassociation`,
     {},
     data,
     loading,

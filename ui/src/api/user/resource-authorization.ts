@@ -3,7 +3,15 @@ import { get, put, post, del } from '@/request/index'
 import type { pageRequest } from '@/api/type/common'
 import type { Ref } from 'vue'
 
-const prefix = '/workspace/' + localStorage.getItem('workspace_id')
+import useStore from '@/stores'
+const prefix: any = { _value: '/workspace/' }
+Object.defineProperty(prefix, 'value', {
+  get: function () {
+    const { user } = useStore()
+    return this._value + user.getWorkspaceId()
+  },
+})
+
 
 /**
  * 获取成员列表

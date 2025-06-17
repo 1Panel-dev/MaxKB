@@ -188,7 +188,7 @@ const submitHandle = async (formEl: FormInstance) => {
 function getModel() {
   loading.value = true
   knowledgeApi
-    .getKnowledgeModel(id ? id : knowledgeId.value)
+    .getKnowledgeModel()
     .then((res: any) => {
       modelOptions.value = groupBy(res?.data, 'provider')
       loading.value = false

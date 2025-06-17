@@ -6,12 +6,12 @@ const ModelRouter = {
   redirect: '/knowledge',
   component: () => import('@/layout/layout-template/SimpleLayout.vue'),
   children: [
-   
+
     {
       path: '/knowledge/system/document/upload/shared',
       name: 'UploadDocumentSharedSystem',
       meta: { activeMenu: '/knowledge1/system' },
-      component: () => import('@/views/document-shared-system/UploadDocument.vue'),
+      component: () => import('@/views/shared/document-shared/UploadDocument.vue'),
       hidden: true,
     },
   ],

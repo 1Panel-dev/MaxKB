@@ -84,4 +84,6 @@ export default {
   },
   info: 'Base Information',
   otherSetting: 'Other Settings',
+  username: 'username',
+  importCreate: 'Import Create',
 }

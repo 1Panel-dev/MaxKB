@@ -121,6 +121,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, reactive, watch } from 'vue'
 import ParagraphPreview from '@/views/knowledge/component/ParagraphPreview.vue'
+import { useRoute } from 'vue-router'
 import { cutFilename } from '@/utils/utils'
 import documentApi from '@/api/knowledge/document'
 import useStore from '@/stores'
@@ -128,7 +129,10 @@ import type { KeyValue } from '@/api/type/common'
 const { knowledge } = useStore()
 const documentsFiles = computed(() => knowledge.documentsFiles)
 const splitPatternList = ref<Array<KeyValue<string, string>>>([])
-
+const route = useRoute()
+const {
+  query: { id }, // id为datasetID
+} = route as any
 const radio = ref('1')
 const loading = ref(false)
 const paragraphList = ref<any[]>([])
@@ -145,7 +149,7 @@ const form = reactive<{
 }>({
   patterns: [],
   limit: 500,
-  with_filter: true
+  with_filter: true,
 })
 
 function changeHandle(val: boolean) {
@@ -157,11 +161,11 @@ function changeHandle(val: boolean) {
         problem_list: v.title.trim()
           ? [
               {
-                content: v.title.trim()
-              }
+                content: v.title.trim(),
+              },
             ]
-          : []
-      }))
+          : [],
+      })),
     }))
     firstChecked.value = false
   }
@@ -184,7 +188,7 @@ function splitDocument() {
     })
   }
   documentApi
-    .postSplitDocument(fd)
+    .postSplitDocument(fd, id)
     .then((res: any) => {
       const list = res.data
 
@@ -197,8 +201,8 @@ function splitDocument() {
             v['problem_list'] = v.title.trim()
               ? [
                   {
-                    content: v.title.trim()
-                  }
+                    content: v.title.trim(),
+                  },
                 ]
               : []
           })
@@ -232,7 +236,7 @@ onMounted(() => {
 defineExpose({
   paragraphList,
   checkedConnect,
-  loading
+  loading,
 })
 </script>
 <style scoped lang="scss">
