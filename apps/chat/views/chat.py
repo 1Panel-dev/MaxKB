@@ -21,6 +21,8 @@ from common.auth import TokenAuth
 from common.constants.permission_constants import ChatAuth
 from common.exception.app_exception import AppAuthenticationFailed
 from common.result import result
+from users.api import CaptchaAPI
+from users.serializers.login import CaptchaSerializer
 
 
 class AnonymousAuthentication(APIView):
@@ -122,3 +124,14 @@ class OpenView(APIView):
             data={'application_id': request.auth.application_id,
                   'chat_user_id': request.auth.chat_user_id, 'chat_user_type': request.auth.chat_user_type,
                   'debug': False}).open())
+
+
+class CaptchaView(APIView):
+    @extend_schema(methods=['GET'],
+                   summary=_("Get captcha"),
+                   description=_("Get captcha"),
+                   operation_id=_("Get captcha"),  # type: ignore
+                   tags=[_("User Management")],  # type: ignore
+                   responses=CaptchaAPI.get_response())
+    def get(self, request: Request):
+        return result.success(CaptchaSerializer().generate())
