@@ -44,7 +44,7 @@ const delUserGroup: (user_group_id: string, loading?: Ref<boolean>) => Promise<R
  */
 const postAddMember: (
   user_group_id: string,
-  body: string[],
+  body: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (user_group_id, body, loading) => {
   return post(`${prefix}/${user_group_id}/add_member`, body, {}, loading)

@@ -1,11 +1,15 @@
 <template>
-  <el-dialog :title="$t('views.role.member.add')" v-model="dialogVisible" :close-on-click-modal="false"
-    :close-on-press-escape="false" :destroy-on-close="true">
-    <el-form label-position="top" ref="formRef" :rules="rules" :model="form" require-asterisk-position="right">
+  <el-dialog :title="$t('views.role.member.add')" v-model="dialogVisible"
+             :close-on-click-modal="false"
+             :close-on-press-escape="false" :destroy-on-close="true">
+    <el-form label-position="top" ref="formRef" :rules="rules" :model="form"
+             require-asterisk-position="right">
       <el-form-item :label="$t('views.chatUser.group.usernameOrName')" prop="user">
-        <el-select v-model="form.user" multiple filterable :placeholder="$t('common.selectPlaceholder')"
-          :loading="optionLoading">
-          <el-option v-for="item in chatUserList" :key="item.id" :label="item.nick_name" :value="item.id">
+        <el-select v-model="form.user" multiple filterable
+                   :placeholder="$t('common.selectPlaceholder')"
+                   :loading="optionLoading">
+          <el-option v-for="item in chatUserList" :key="item.id" :label="item.nick_name"
+                     :value="item.id">
           </el-option>
         </el-select>
       </el-form-item>
@@ -22,13 +26,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onBeforeMount } from 'vue'
-import type { FormInstance } from 'element-plus'
-import { MsgSuccess } from '@/utils/message'
-import { t } from '@/locales'
+import {ref, reactive, onBeforeMount} from 'vue'
+import type {FormInstance} from 'element-plus'
+import {MsgSuccess} from '@/utils/message'
+import {t} from '@/locales'
 import SystemGroupApi from '@/api/system/user-group'
 import userManageApi from '@/api/system/chat-user'
-import type { ChatUserItem } from '@/api/type/systemChatUser'
+import type {ChatUserItem} from '@/api/type/systemChatUser'
 
 const emit = defineEmits<{
   (e: 'refresh'): void;
@@ -44,6 +48,7 @@ const form = ref<{ user: string[] }>({
 
 const optionLoading = ref(false)
 const chatUserList = ref<ChatUserItem[]>([])
+
 async function getChatUserList() {
   try {
     const res = await userManageApi.getChatUserList(optionLoading)
@@ -58,8 +63,9 @@ onBeforeMount(() => {
 })
 
 const groupId = ref('');
+
 function open(id: string) {
-  form.value = { ...defaultForm }
+  form.value = {...defaultForm}
   groupId.value = id
   dialogVisible.value = true
 }
@@ -67,7 +73,7 @@ function open(id: string) {
 const formRef = ref<FormInstance>();
 
 const rules = reactive({
-  user: [{ required: true, message: t('common.selectPlaceholder'), trigger: 'blur' }],
+  user: [{required: true, message: t('common.selectPlaceholder'), trigger: 'blur'}],
 })
 
 const loading = ref<boolean>(false)
@@ -75,7 +81,7 @@ const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid) => {
     if (valid) {
-      SystemGroupApi.postAddMember(groupId.value, form.value.user, loading).then(() => {
+      SystemGroupApi.postAddMember(groupId.value, {"user_ids": form.value.user}, loading).then(() => {
         MsgSuccess(t('common.createSuccess'))
         emit('refresh')
         dialogVisible.value = false
@@ -84,5 +90,5 @@ const submit = async (formEl: FormInstance | undefined) => {
   })
 }
 
-defineExpose({ open })
+defineExpose({open})
 </script>
