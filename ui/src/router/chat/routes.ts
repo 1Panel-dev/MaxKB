@@ -4,13 +4,19 @@ export const routes: Array<RouteRecordRaw> = [
   // 对话
   {
     path: '/:accessToken',
-    name: 'Chat',
+    name: 'chat',
     component: () => import('@/views/chat/index.vue'),
   },
   // 对话用户登录
   {
     path: '/user-login/:accessToken',
-    name: 'UserLogin',
+    name: 'user_login',
     component: () => import('@/views/chat/user-login/index.vue'),
+  },
+  // 对话用户登录
+  {
+    path: '/404',
+    name: '404',
+    component: () => import('@/views/404/index.vue'),
   },
 ]

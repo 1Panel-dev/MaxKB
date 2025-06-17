@@ -23,10 +23,10 @@ instance.interceptors.request.use(
     if (config.headers === undefined) {
       config.headers = new AxiosHeaders()
     }
-    const { user, login } = useStore()
-    const token = login.getToken()
-    const language = user.getLanguage()
-    config.headers['Accept-Language'] = `${language}`
+    const { chatUser } = useStore()
+    const token = chatUser.getToken()
+    // const language = chatUser.getLanguage()
+    // config.headers['Accept-Language'] = `${language}`
     if (token) {
       config.headers['AUTHORIZATION'] = `Bearer ${token}`
     }
@@ -203,14 +203,14 @@ export const postStream: (url: string, data?: unknown) => Promise<Result<any> | 
   url,
   data,
 ) => {
-  const { user, login } = useStore()
-  const token = login.getToken()
-  const language = user.getLanguage()
+  const { chatUser } = useStore()
+  const token = chatUser.getToken()
+  // const language = user.getLanguage()
   const headers: HeadersInit = { 'Content-Type': 'application/json' }
   if (token) {
     headers['AUTHORIZATION'] = `Bearer ${token}`
   }
-  headers['Accept-Language'] = `${language}`
+  // headers['Accept-Language'] = `${language}`
   return fetch(url, {
     method: 'POST',
     body: data ? JSON.stringify(data) : undefined,

@@ -20,26 +20,39 @@ const router = createRouter({
 router.beforeEach(
   async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
     NProgress.start()
-    if (to.name === '404') {
+    if (to.path === '/404') {
       next()
       return
     }
-    const { user, login } = useStore()
-
-    const notAuthRouteNameList = ['login', 'ForgotPassword', 'ResetPassword', 'Chat', 'UserLogin']
+    const { chatUser } = useStore()
+    const notAuthRouteNameList = ['UserLogin']
     if (!notAuthRouteNameList.includes(to.name ? to.name.toString() : '')) {
-      if (to.query && to.query.token) {
-        localStorage.setItem('token', to.query.token.toString())
-      }
-      const token = login.getToken()
-      if (!token) {
+      if (to.params && to.params.accessToken) {
+        chatUser.setAccessToken(to.params.accessToken.toString())
+      } else {
         next({
-          path: '/login',
+          path: '/404',
         })
         return
       }
-      if (!user.userInfo) {
-        await user.profile()
+      const token = chatUser.getToken()
+      const authentication = await chatUser.isAuthentication()
+      if (authentication) {
+        if (!token) {
+          next({
+            name: 'UserLogin',
+            params: {
+              accessToken: to.params.accessToken,
+            },
+          })
+          return
+        }
+      } else {
+        await chatUser.anonymousAuthentication()
+      }
+
+      if (!chatUser.application) {
+        await chatUser.applicationProfile()
       }
     }
     // 判断是否有菜单权限

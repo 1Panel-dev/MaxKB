@@ -126,6 +126,8 @@ class ApplicationProfileSerializer(serializers.Serializer):
                                             'user_avatar': application_setting.user_avatar,
                                             'show_user_avatar': application_setting.show_user_avatar,
                                             'float_location': application_setting.float_location}
+        base_node = [node for node in ((application.work_flow or {}).get('nodes', []) or []) if
+                     node.get('id') == 'base-node']
         return {**ApplicationSerializerModel(application).data,
                 'stt_model_id': application.stt_model_id,
                 'tts_model_id': application.tts_model_id,
@@ -136,8 +138,7 @@ class ApplicationProfileSerializer(serializers.Serializer):
                 'stt_autosend': application.stt_autosend,
                 'file_upload_enable': application.file_upload_enable,
                 'file_upload_setting': application.file_upload_setting,
-                'work_flow': {'nodes': [node for node in ((application.work_flow or {}).get('nodes', []) or []) if
-                                        node.get('id') == 'base-node']},
+                'work_flow': {'nodes': base_node} if base_node else None,
                 'show_source': application_access_token.show_source,
                 'language': application_access_token.language,
                 **application_setting_dict}
