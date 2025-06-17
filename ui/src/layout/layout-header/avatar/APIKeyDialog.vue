@@ -70,7 +70,7 @@
 import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { copyClick } from '@/utils/clipboard'
-import systemKeyApi from '@/api/system-api-key'
+import systemKeyApi from '@/api/system/api-key'
 import { datetimeFormat } from '@/utils/time'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { t } from '@/locales'

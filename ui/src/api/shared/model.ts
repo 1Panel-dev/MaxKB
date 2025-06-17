@@ -9,7 +9,7 @@ import type {
 } from '@/api/type/model'
 import type { FormField } from '@/components/dynamics-form/type'
 
-const prefix = '/system/shared'
+const prefix = '/system/shared/model'
 
 /**
  * 获得模型列表
@@ -19,7 +19,7 @@ const getModel: (
   request?: ListModelRequest,
   loading?: Ref<boolean>,
 ) => Promise<Result<Array<Model>>> = (data, loading) => {
-  return get(`${prefix}/model`, data, loading)
+  return get(`${prefix}`, data, loading)
 }
 
 /**
@@ -32,7 +32,7 @@ const getModelParamsForm: (
   model_id: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<Array<FormField>>> = (model_id, loading) => {
-  return get(`${prefix}/model/${model_id}/model_params_form`, {}, loading)
+  return get(`${prefix}/${model_id}/model_params_form`, {}, loading)
 }
 
 /**
@@ -45,7 +45,7 @@ const createModel: (
   request: CreateModelRequest,
   loading?: Ref<boolean>,
 ) => Promise<Result<Model>> = (request, loading) => {
-  return post(`${prefix}/model`, request, {}, loading)
+  return post(`${prefix}`, request, {}, loading)
 }
 
 /**
@@ -59,7 +59,7 @@ const updateModel: (
   request: EditModelRequest,
   loading?: Ref<boolean>,
 ) => Promise<Result<Model>> = (model_id, request, loading) => {
-  return put(`${prefix}/model/${model_id}`, request, {}, loading)
+  return put(`${prefix}/${model_id}`, request, {}, loading)
 }
 
 /**
@@ -73,7 +73,7 @@ const updateModelParamsForm: (
   request: any[],
   loading?: Ref<boolean>,
 ) => Promise<Result<Model>> = (model_id, request, loading) => {
-  return put(`${prefix}/model/${model_id}/model_params_form`, request, {}, loading)
+  return put(`${prefix}/${model_id}/model_params_form`, request, {}, loading)
 }
 
 /**
@@ -86,7 +86,7 @@ const getModelById: (model_id: string, loading?: Ref<boolean>) => Promise<Result
   model_id,
   loading,
 ) => {
-  return get(`${prefix}/model/${model_id}`, {}, loading)
+  return get(`${prefix}/${model_id}`, {}, loading)
 }
 /**
  * 获取模型信息不包括认证信息根据模型id
@@ -98,7 +98,7 @@ const getModelMetaById: (model_id: string, loading?: Ref<boolean>) => Promise<Re
   model_id,
   loading,
 ) => {
-  return get(`${prefix}/model/${model_id}/meta`, {}, loading)
+  return get(`${prefix}/${model_id}/meta`, {}, loading)
 }
 /**
  * 暂停下载
@@ -110,13 +110,13 @@ const pauseDownload: (model_id: string, loading?: Ref<boolean>) => Promise<Resul
   model_id,
   loading,
 ) => {
-  return put(`${prefix}/model/${model_id}/pause_download`, undefined, {}, loading)
+  return put(`${prefix}/${model_id}/pause_download`, undefined, {}, loading)
 }
 const deleteModel: (model_id: string, loading?: Ref<boolean>) => Promise<Result<boolean>> = (
   model_id,
   loading,
 ) => {
-  return del(`${prefix}/model/${model_id}`, undefined, {}, loading)
+  return del(`${prefix}/${model_id}`, undefined, {}, loading)
 }
 
 export default {

@@ -190,7 +190,7 @@ const postKnowledge: (data: knowledgeData, loading?: Ref<boolean>) => Promise<Re
 }
 
 /**
- * 获取当前用户可使用的向量化模型列表
+ * 获取当前用户可使用的向量化模型列表（没用到）
  * @param application_id
  * @param loading
  * @query  { query_text: string, top_number: number, similarity: number }
@@ -232,6 +232,8 @@ const postWebKnowledge: (data: any, loading?: Ref<boolean>) => Promise<Result<an
 ) => {
   return post(`${prefix}/web`, data, undefined, loading)
 }
+
+// 创建飞书知识库
 const postLarkKnowledge: (data: any, loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (
   data,
   loading,

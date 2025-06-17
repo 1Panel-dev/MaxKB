@@ -36,7 +36,7 @@
 
 <script setup lang="ts">
 import { onBeforeMount, ref } from 'vue'
-import WorkspaceApi from '@/api/workspace'
+import WorkspaceApi from '@/api/workspace/workspace'
 import type { WorkspaceItem } from '@/api/type/workspace'
 import useStore from '@/stores'
 const { user } = useStore()

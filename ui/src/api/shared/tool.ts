@@ -4,7 +4,7 @@ import { type Ref } from 'vue'
 import type { pageRequest } from '@/api/type/common'
 import type { toolData } from '@/api/type/tool'
 
-const prefix = '/system/shared'
+const prefix = '/system/shared/tool'
 
 /**
  * 工具列表带分页（无分页）
@@ -14,7 +14,7 @@ const getToolList: (data?: any, loading?: Ref<boolean>) => Promise<Result<Array<
   data,
   loading,
 ) => {
-  return get(`${prefix}/tool`, data, loading)
+  return get(`${prefix}`, data, loading)
 }
 
 /**
@@ -31,7 +31,7 @@ const getToolListPage: (
   param?: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (page, param, loading) => {
-  return get(`${prefix}/tool/${page.current_page}/${page.page_size}`, param, loading)
+  return get(`${prefix}/${page.current_page}/${page.page_size}`, param, loading)
 }
 
 /**
@@ -42,7 +42,7 @@ const postTool: (data: toolData, loading?: Ref<boolean>) => Promise<Result<any>>
   data,
   loading,
 ) => {
-  return post(`${prefix}/tool`, data, undefined, loading)
+  return post(`${prefix}`, data, undefined, loading)
 }
 
 /**
@@ -55,7 +55,7 @@ const putTool: (tool_id: string, data: toolData, loading?: Ref<boolean>) => Prom
   data,
   loading,
 ) => {
-  return put(`${prefix}/tool/${tool_id}`, data, undefined, loading)
+  return put(`${prefix}/${tool_id}`, data, undefined, loading)
 }
 
 /**
@@ -68,7 +68,7 @@ const getToolById: (tool_id: string, loading?: Ref<boolean>) => Promise<Result<a
   tool_id,
   loading,
 ) => {
-  return get(`${prefix}/tool/${tool_id}`, undefined, loading)
+  return get(`${prefix}/${tool_id}`, undefined, loading)
 }
 
 /**
@@ -117,7 +117,7 @@ const postPylint: (code: string, loading?: Ref<boolean>) => Promise<Result<any>>
   code,
   loading,
 ) => {
-  return post(`${prefix}/tool/pylint`, { code }, {}, loading)
+  return post(`${prefix}/pylint`, { code }, {}, loading)
 }
 
 

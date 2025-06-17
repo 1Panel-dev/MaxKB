@@ -8,19 +8,38 @@
         <el-select class="complex-search__left" v-model="searchType" style="width: 120px">
           <el-option :label="$t('views.login.loginForm.username.label')" value="username" />
         </el-select>
-        <el-input v-if="searchType === 'username'" v-model="searchForm.username" @change="getList"
-          :placeholder="$t('common.inputPlaceholder')" style="width: 220px" clearable />
+        <el-input
+          v-if="searchType === 'username'"
+          v-model="searchForm.username"
+          @change="getList"
+          :placeholder="$t('common.inputPlaceholder')"
+          style="width: 220px"
+          clearable
+        />
       </div>
     </div>
-    <app-table class="mt-16" :data="tableData" :pagination-config="paginationConfig" @sizeChange="handleSizeChange"
-      @changePage="getList" v-loading="loading">
+    <app-table
+      class="mt-16"
+      :data="tableData"
+      :pagination-config="paginationConfig"
+      @sizeChange="handleSizeChange"
+      @changePage="getList"
+      v-loading="loading"
+    >
       <el-table-column prop="nick_name" :label="$t('views.userManage.userForm.nick_name.label')" />
       <el-table-column prop="username" :label="$t('views.login.loginForm.username.label')" />
-      <el-table-column v-if="props.currentRole?.type !== RoleTypeEnum.ADMIN" prop="workspace_name"
-        :label="$t('views.role.member.workspace')" />
+      <el-table-column
+        v-if="props.currentRole?.type !== RoleTypeEnum.ADMIN"
+        prop="workspace_name"
+        :label="$t('views.role.member.workspace')"
+      />
       <el-table-column :label="$t('common.operation')" width="100" fixed="right">
         <template #default="{ row }">
-          <el-tooltip effect="dark" :content="`${$t('views.role.member.delete.button')}`" placement="top">
+          <el-tooltip
+            effect="dark"
+            :content="`${$t('views.role.member.delete.button')}`"
+            placement="top"
+          >
             <el-button type="primary" text @click.stop="handleDelete(row)">
               <el-icon>
                 <Delete />
@@ -42,6 +61,7 @@ import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { t } from '@/locales'
 import AddMemberDrawer from './AddMemberDrawer.vue'
 import { RoleTypeEnum } from '@/enums/system'
+import { loadPermissionApi } from '@/utils/permission-api'
 
 const props = defineProps<{
   currentRole?: RoleItem
@@ -66,7 +86,12 @@ async function getList() {
     const params = {
       [searchType.value]: searchForm.value[searchType.value],
     }
-    const res = await RoleApi.getRoleMemberList(props.currentRole?.id as string, paginationConfig, params, loading)
+    const res = await loadPermissionApi('role').getRoleMemberList(
+      props.currentRole?.id as string,
+      paginationConfig,
+      params,
+      loading,
+    )
     tableData.value = res.data.records
     paginationConfig.total = res.data.total
   } catch (error) {
@@ -83,32 +108,33 @@ onMounted(() => {
   getList()
 })
 
-watch(() => props.currentRole?.id, () => {
-  getList()
-})
+watch(
+  () => props.currentRole?.id,
+  () => {
+    getList()
+  },
+)
 
 const addMemberDrawerRef = ref<InstanceType<typeof AddMemberDrawer>>()
 
 function handleAdd() {
-  addMemberDrawerRef.value?.open();
+  addMemberDrawerRef.value?.open()
 }
 
 function handleDelete(row: RoleMemberItem) {
-  MsgConfirm(
-    `${t('views.role.member.delete.confirmTitle')}${row.nick_name} ?`, '',
-    {
-      confirmButtonText: t('common.confirm'),
-      confirmButtonClass: 'danger',
-    },
-  )
+  MsgConfirm(`${t('views.role.member.delete.confirmTitle')}${row.nick_name} ?`, '', {
+    confirmButtonText: t('common.confirm'),
+    confirmButtonClass: 'danger',
+  })
     .then(() => {
       loading.value = true
-      RoleApi.deleteRoleMember(props.currentRole?.id as string, row.user_relation_id, loading).then(() => {
-        MsgSuccess(t('common.deleteSuccess'))
-        getList()
-      })
+      loadPermissionApi('role')
+        .deleteRoleMember(props.currentRole?.id as string, row.user_relation_id, loading)
+        .then(() => {
+          MsgSuccess(t('common.deleteSuccess'))
+          getList()
+        })
     })
-    .catch(() => {
-    })
+    .catch(() => {})
 }
 </script>

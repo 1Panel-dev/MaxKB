@@ -1,8 +1,6 @@
 import { Result } from '@/request/Result'
 import { get, post, del, put, exportFile, exportExcel } from '@/request/index'
 import { type Ref } from 'vue'
-import type { pageRequest } from '@/api/type/common'
-import type { knowledgeData } from '@/api/type/knowledge'
 
 const prefix = '/system/shared'
 

@@ -139,6 +139,29 @@ const postParagraphProblem: (
 }
 
 /**
+ * 段落调整顺序
+ * @param knowledge_id 数据集id
+ * @param document_id 文档id
+ * @param loading 加载器
+ * @query data {
+ *              paragraph_id 段落id  new_position 新顺序
+ *             }
+ */
+const putAdjustPosition: (
+  knowledge_id: string,
+  document_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (knowledge_id, document_id, data, loading) => {
+  return put(
+    `${prefix}/${knowledge_id}/document/${document_id}/paragraph/adjust_position`,
+    {},
+    data,
+    loading,
+  )
+}
+
+/**
  * 添加某段落关联问题
  * @param knowledge_id 数据集id
  * @param document_id 文档id

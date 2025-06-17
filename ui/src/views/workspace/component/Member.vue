@@ -36,7 +36,7 @@ import { onMounted, ref, reactive, watch } from 'vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { t } from '@/locales'
 import AddMemberDrawer from './AddMemberDrawer.vue'
-import WorkspaceApi from '@/api/workspace'
+import WorkspaceApi from '@/api/workspace/workspace'
 import type { WorkspaceMemberItem, WorkspaceItem } from '@/api/type/workspace'
 
 const props = defineProps<{

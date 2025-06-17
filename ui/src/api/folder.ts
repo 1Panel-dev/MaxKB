@@ -44,7 +44,57 @@ const postFolder: (
   return post(`${prefix.value}/${source}/folder`, data, loading)
 }
 
+/**
+ * 获得文件夹详情
+ * @params 参数
+ *  folder_id
+ *  source : APPLICATION, KNOWLEDGE, TOOL
+ */
+const getFolderDetail: (
+  folder_id: string,
+  source: string,
+  loading?: Ref<boolean>,
+) => Promise<Result<Array<any>>> = (folder_id, source, loading) => {
+  return get(`${prefix.value}/${source}/folder/${folder_id}`, null, loading)
+}
+/**
+ * 修改文件夹
+ * @params 参数
+ *  folder_id: string,
+ *  source : APPLICATION, KNOWLEDGE, TOOL
+ {
+ "name": "string",
+ "desc": "string",
+ "parent_id": "root"
+ }
+ */
+const putFolder: (
+  folder_id: string,
+  source: string,
+  data?: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<Array<any>>> = (folder_id, source, data, loading) => {
+  return put(`${prefix.value}/${source}/folder/${folder_id}`, data, {}, loading)
+}
+
+/**
+ * 删除文件夹
+ * @params 参数
+ *  folder_id
+ *  source : APPLICATION, KNOWLEDGE, TOOL
+ */
+const delFolder: (
+  folder_id: string,
+  source: string,
+  loading?: Ref<boolean>,
+) => Promise<Result<boolean>> = (folder_id, source, loading) => {
+  return del(`${prefix.value}/${source}/folder${folder_id}`, undefined, {}, loading)
+}
+
 export default {
   getFolder,
   postFolder,
+  getFolderDetail,
+  putFolder,
+  delFolder,
 }

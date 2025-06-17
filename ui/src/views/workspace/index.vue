@@ -75,7 +75,7 @@
 
 <script lang="ts" setup>
 import { onMounted, ref, watch } from 'vue'
-import WorkspaceApi from '@/api/workspace'
+import WorkspaceApi from '@/api/workspace/workspace'
 import { t } from '@/locales'
 import Member from './component/Member.vue'
 import CreateOrUpdateWorkspaceDialog from './component/CreateOrUpdateWorkspaceDialog.vue'

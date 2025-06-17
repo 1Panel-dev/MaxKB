@@ -24,7 +24,7 @@ import type { FormInstance } from 'element-plus'
 import { MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
 import type { WorkspaceItem } from '@/api/type/workspace'
-import WorkspaceApi from '@/api/workspace'
+import WorkspaceApi from '@/api/workspace/workspace'
 
 const emit = defineEmits<{
   (e: 'refresh', currentWorkspace: WorkspaceItem): void;
