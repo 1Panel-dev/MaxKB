@@ -22,13 +22,13 @@
             </el-avatar>
 
             <LogoIcon
-              v-else-if="isApplication"
+              v-if="isApplication"
               height="28px"
               style="width: 28px; height: 28px; display: block"
               class="mr-12"
             />
             <el-avatar
-              v-if="row.isFolder"
+              v-else-if="row.isFolder"
               class="mr-12"
               shape="square"
               :size="20"
