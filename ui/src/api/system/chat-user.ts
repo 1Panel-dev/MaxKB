@@ -1,9 +1,18 @@
 import { Result } from '@/request/Result'
 import { get, put, post, del } from '@/request/index'
 import type { pageRequest } from '@/api/type/common'
+import type { ChatUserItem } from '@/api/type/systemChatUser'
 import type { Ref } from 'vue'
-
 const prefix = '/system/chat_user'
+
+
+/**
+ * 用户列表
+ */
+const getChatUserList: (loading?: Ref<boolean>) => Promise<Result<ChatUserItem[]>> = (loading) => {
+  return get(`${prefix}/list`, undefined, loading)
+}
+
 /**
  * 用户分页列表
  * @query 参数
@@ -71,4 +80,5 @@ export default {
   delUserManage,
   postUserManage,
   putUserManagePassword,
+  getChatUserList
 }

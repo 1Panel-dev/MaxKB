@@ -37,7 +37,7 @@
               <el-divider direction="vertical" class="mr-8 ml-8" />
               <AppIcon iconName="app-wordspace" style="font-size: 16px" class="color-input-placeholder"></AppIcon>
               <span class="color-input-placeholder ml-4">
-                {{ current?.user_count }}
+                {{ paginationConfig.total }}
               </span>
             </div>
             <el-button type="primary" @click="handleSave">
@@ -48,9 +48,9 @@
           <div class="flex-between mb-16" style="margin-top: 18px;">
             <div class="flex complex-search">
               <el-select class="complex-search__left" v-model="searchType" style="width: 120px">
-                <el-option :label="$t('views.login.loginForm.username.label')" value="username_or_nickname" />
+                <el-option :label="$t('views.login.loginForm.username.label')" value="name" />
               </el-select>
-              <el-input v-if="searchType === 'username_or_nickname'" v-model="searchForm.username_or_nickname"
+              <el-input v-if="searchType === 'name'" v-model="searchForm.name"
                 @change="getList" :placeholder="$t('common.inputPlaceholder')" style="width: 220px" clearable />
             </div>
             <div class="flex align-center">
@@ -60,7 +60,7 @@
           </div>
 
           <app-table :data="tableData" :pagination-config="paginationConfig" @sizeChange="handleSizeChange"
-            @changePage="getList" v-loading="rightLoading">
+            @changePage="getList">
             <el-table-column prop="nick_name" :label="$t('views.userManage.userForm.nick_name.label')" />
             <el-table-column prop="username" :label="$t('views.login.loginForm.username.label')" />
             <el-table-column prop="source" :label="$t('views.userManage.source.label')">
@@ -150,9 +150,9 @@ function clickUserGroup(item: ChatUserGroupItem) {
 
 const rightLoading = ref(false)
 
-const searchType = ref('username_or_nickname')
+const searchType = ref('name')
 const searchForm = ref<Record<string, any>>({
-  username_or_nickname: '',
+  name: '',
 })
 const automaticAuthorization = ref(false)
 const paginationConfig = reactive({
@@ -166,10 +166,7 @@ const tableData = ref<ChatUserGroupUserItem[]>([])
 async function getList() {
   if (!current.value?.id) return
   try {
-    const params = {
-      [searchType.value]: searchForm.value[searchType.value],
-    }
-    const res = await ChatUserApi.getUserGroupUserList(resource, current.value?.id, paginationConfig, params, rightLoading)
+    const res = await ChatUserApi.getUserGroupUserList(resource, current.value?.id, paginationConfig, searchForm.value.name, rightLoading)
     tableData.value = res.data.records
     paginationConfig.total = res.data.total
   } catch (error) {

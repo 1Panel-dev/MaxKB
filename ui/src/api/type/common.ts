@@ -18,4 +18,8 @@ interface PageList<T> {
   records: T
 }
 
-export type { KeyValue, Dict, pageRequest, PageList }
+interface ListItem {
+  name: string,
+  id?: string,
+}
+export type { KeyValue, Dict, pageRequest, PageList, ListItem }
