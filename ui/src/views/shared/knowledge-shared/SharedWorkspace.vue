@@ -135,7 +135,7 @@ import KnowledgeIcon from '@/views/shared/knowledge-shared/component/KnowledgeIc
 import CreateKnowledgeDialog from './create-component/CreateKnowledgeDialog.vue'
 import CreateWebKnowledgeDialog from './create-component/CreateWebKnowledgeDialog.vue'
 import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
-import GenerateRelatedDialog from '@/components/generate-related-dialog/index.vue'
+import GenerateRelatedDialog from '@/components/generate-related-shared-dialog/index.vue'
 import KnowledgeApi from '@/api/shared/knowledge'
 import KnowledgeWorkspaceApi from '@/api/shared/workspace'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'

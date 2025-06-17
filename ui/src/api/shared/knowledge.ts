@@ -226,11 +226,8 @@ const getKnowledgeEmdeddingModel: (
  * @query  { query_text: string, top_number: number, similarity: number }
  * @returns
  */
-const getKnowledgeModel: (
-  knowledge_id: string,
-  loading?: Ref<boolean>,
-) => Promise<Result<Array<any>>> = (knowledge_id, loading) => {
-  return get(`${prefix}/${knowledge_id}/model`, loading)
+const getKnowledgeModel: (loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (loading) => {
+  return get(`${prefix}/knowledge/model`, loading)
 }
 
 /**
