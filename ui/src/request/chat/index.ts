@@ -42,16 +42,8 @@ instance.interceptors.response.use(
   (response: any) => {
     if (response.data) {
       if (response.data.code !== 200 && !(response.data instanceof Blob)) {
-        if (response.config.url.includes('/application/authentication')) {
-          return Promise.reject(response.data)
-        }
-        if (
-          !response.config.url.includes('/valid') &&
-          !response.config.url.includes('/tool/debug')
-        ) {
-          MsgError(response.data.message)
-          return Promise.reject(response.data)
-        }
+        MsgError(response.data.message)
+        return Promise.reject(response.data)
       }
     }
     return response
@@ -61,20 +53,14 @@ instance.interceptors.response.use(
       MsgError(err.message)
       console.error(err)
     }
-    if (err.response?.status === 404) {
-      if (!err.response.config.url.includes('/application/authentication')) {
+    if (err.response?.status === 401) {
+      const { chatUser } = useStore()
+      if (chatUser.accessToken) {
+        router.push({ name: 'login', params: { accessToken: chatUser.accessToken } })
+      } else {
         router.push('/404 ')
       }
     }
-    if (err.response?.status === 401) {
-      if (
-        !err.response.config.url.includes('chat/open') &&
-        !err.response.config.url.includes('application/profile')
-      ) {
-        router.push({ name: 'login' })
-      }
-    }
-
     if (err.response?.status === 403 && !err.response.config.url.includes('chat/open')) {
       MsgError(
         err.response.data && err.response.data.message ? err.response.data.message : '没有权限访问',
