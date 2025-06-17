@@ -158,12 +158,12 @@ const putGenerateRelated: (
  * @query  { query_text: string, top_number: number, similarity: number }
  * @returns
  */
-const getKnowledgeHitTest: (
+const putKnowledgeHitTest: (
   knowledge_id: string,
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<Array<any>>> = (knowledge_id, data, loading) => {
-  return get(`${prefix.value}/${knowledge_id}/hit_test`, data, loading)
+  return put(`${prefix.value}/${knowledge_id}/hit_test`, undefined,  data, loading)
 }
 
 /**
@@ -265,7 +265,7 @@ export default {
   exportKnowledge,
   exportZipKnowledge,
   putGenerateRelated,
-  getKnowledgeHitTest,
+  putKnowledgeHitTest,
   putSyncWebKnowledge,
   postKnowledge,
   getKnowledgeModel,

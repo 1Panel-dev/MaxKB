@@ -119,7 +119,6 @@ import SelectProviderDialog from '@/views/model/component/SelectProviderDialog.v
 import useStore from '@/stores'
 import { t } from '@/locales'
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
-import { hasPermission } from '@/utils/permission/index'
 
 const { model } = useStore()
 

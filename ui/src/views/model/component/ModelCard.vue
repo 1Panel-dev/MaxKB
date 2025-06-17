@@ -128,8 +128,6 @@ import useStore from '@/stores'
 import ParamSettingDialog from './ParamSettingDialog.vue'
 import {t} from '@/locales'
 import { PermissionConst, EditionConst, RoleConst } from '@/utils/permission/data'
-import { hasPermission } from '@/utils/permission/index'
-import { ComplexPermission } from '@/utils/permission/type'
 
 const props = defineProps<{
   model: Model

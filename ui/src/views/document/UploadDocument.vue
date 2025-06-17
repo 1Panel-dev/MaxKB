@@ -71,6 +71,7 @@ const documentsType = computed(() => knowledge.documentsType)
 const router = useRouter()
 const route = useRoute()
 const {
+  params: { folderId },
   query: { id }, // id为knowledgeID，有id的是上传文档
 } = route
 
@@ -96,7 +97,7 @@ async function next() {
         documentApi.postQADocument(id as string, fd, loading).then((res) => {
           MsgSuccess(t('common.submitSuccess'))
           clearStore()
-          router.push({ path: `/knowledge/${id}/document` })
+          router.push({ path: `/knowledge/${id}/${folderId}/document` })
         })
       }
     } else if (documentsType.value === 'table') {
@@ -111,7 +112,7 @@ async function next() {
         documentApi.postTableDocument(id as string, fd, loading).then((res) => {
           MsgSuccess(t('common.submitSuccess'))
           clearStore()
-          router.push({ path: `/knowledge/${id}/document` })
+          router.push({ path: `/knowledge/${id}/${folderId}/document` })
         })
       }
     } else {
@@ -151,7 +152,7 @@ function submit() {
       .then(() => {
         MsgSuccess(t('common.submitSuccess'))
         clearStore()
-        router.push({ path: `/knowledge/${id}/document` })
+        router.push({ path: `/knowledge/${id}/${folderId}/document` })
       })
       .catch(() => {
         loading.value = false

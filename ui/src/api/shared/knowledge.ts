@@ -143,7 +143,6 @@ const putGenerateRelated: (
 ) => Promise<Result<Array<any>>> = (knowledge_id, data, loading) => {
   return put(`${prefix}/${knowledge_id}/generate_related`, data, null, loading)
 }
-
 /**
  * 命中测试列表
  * @param knowledge_id
@@ -151,13 +150,14 @@ const putGenerateRelated: (
  * @query  { query_text: string, top_number: number, similarity: number }
  * @returns
  */
-const getKnowledgeHitTest: (
+const putKnowledgeHitTest: (
   knowledge_id: string,
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<Array<any>>> = (knowledge_id, data, loading) => {
-  return get(`${prefix}/${knowledge_id}/hit_test`, data, loading)
+  return put(`${prefix}/${knowledge_id}/hit_test`, undefined,  data, loading)
 }
+
 
 /**
  * 同步知识库
@@ -260,7 +260,7 @@ export default {
   exportKnowledge,
   exportZipKnowledge,
   putGenerateRelated,
-  getKnowledgeHitTest,
+  putKnowledgeHitTest,
   putSyncWebKnowledge,
   postKnowledge,
   getKnowledgeModel,

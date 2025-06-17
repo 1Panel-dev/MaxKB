@@ -1,6 +1,6 @@
 import { ChatUserResourceEnum } from '@/enums/workspaceChatUser'
 
-import { PermissionConst, RoleConst } from '@/utils/permission/data'
+import { PermissionConst, EditionConst, RoleConst } from '@/utils/permission/data'
 
 const ApplicationDetailRouter = {
   path: '/application/:id/:type',
@@ -49,7 +49,7 @@ const ApplicationDetailRouter = {
         active: 'access',
         parentPath: '/application/:id/:type',
         parentName: 'ApplicationDetail',
-        // permission: new ComplexPermission([], ['x-pack'], 'OR'),
+        permission: [EditionConst.IS_PE, EditionConst.IS_EE],
       },
       component: () => import('@/views/application/ApplicationAccess.vue'),
     },
@@ -75,9 +75,10 @@ const ApplicationDetailRouter = {
         active: 'chat-log',
         parentPath: '/application/:id/:type',
         parentName: 'ApplicationDetail',
-        resourceType: ChatUserResourceEnum.APPLICATION
+        resourceType: ChatUserResourceEnum.APPLICATION,
+        permission: [EditionConst.IS_PE, EditionConst.IS_EE],
       },
-      component: () => import('@/views/chat-user/index.vue')
+      component: () => import('@/views/chat-user/index.vue'),
     },
     {
       path: 'chat-log',

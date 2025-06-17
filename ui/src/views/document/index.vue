@@ -9,7 +9,7 @@
               <el-button
                 v-if="knowledgeDetail.type === 0"
                 type="primary"
-                @click="router.push({ path: '/knowledge/document/upload', query: { id: id } })"
+                @click="router.push({ path: `/knowledge/document/upload/${folderId}`, query: { id: id } })"
                 v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_DOCUMENT_CREATE.getWorkspacePermission]"
                 >{{ $t('views.document.uploadDocument') }}
               </el-button>
@@ -526,7 +526,7 @@
       </div>
     </el-card>
     <div class="mul-operation w-full flex" v-if="multipleSelection.length !== 0">
-      <el-button :disabled="multipleSelection.length === 0" @click="cancelTaskHandle(1, row)"   
+      <el-button :disabled="multipleSelection.length === 0" @click="cancelTaskHandle(1, row)"
       v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_DOCUMENT_VECTOR.getWorkspacePermission]">
         {{ $t('views.document.setting.cancelVectorization') }}
       </el-button>

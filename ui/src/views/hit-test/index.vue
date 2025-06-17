@@ -312,7 +312,7 @@ function getHitTestList() {
     ...formInline.value,
   }
   if (isDataset.value) {
-    KnowledgeApi.getKnowledgeHitTest(id, obj, loading).then((res) => {
+    KnowledgeApi.putKnowledgeHitTest(id, obj, loading).then((res) => {
       paragraphDetail.value = res.data && arraySort(res.data, 'comprehensive_score', true)
       questionTitle.value = inputValue.value
       inputValue.value = ''

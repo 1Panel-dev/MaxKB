@@ -14,7 +14,7 @@ const ModelRouter = {
 
     // 上传文档
     {
-      path: '/knowledge/document/upload',
+      path: '/knowledge/document/upload/:folderId',
       name: 'UploadDocument',
       meta: { activeMenu: '/knowledge' },
       component: () => import('@/views/document/UploadDocument.vue'),

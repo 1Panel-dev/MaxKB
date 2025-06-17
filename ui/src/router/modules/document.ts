@@ -1,5 +1,6 @@
 import { ChatUserResourceEnum } from '@/enums/workspaceChatUser'
 
+import { PermissionConst, EditionConst, RoleConst } from '@/utils/permission/data'
 const DocumentRouter = {
   path: '/knowledge/:id/:folderId',
   name: 'KnowledgeDetail',
@@ -55,9 +56,10 @@ const DocumentRouter = {
         active: 'chat-log',
         parentPath: '/knowledge/:id/:folderId',
         parentName: 'KnowledgeDetail',
-        resourceType: ChatUserResourceEnum.KNOWLEDGE
+        resourceType: ChatUserResourceEnum.KNOWLEDGE,
+        permission: [EditionConst.IS_PE, EditionConst.IS_EE],
       },
-      component: () => import('@/views/chat-user/index.vue')
+      component: () => import('@/views/chat-user/index.vue'),
     },
     {
       path: 'setting',

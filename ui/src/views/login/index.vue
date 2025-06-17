@@ -140,6 +140,9 @@ import QrCodeTab from '@/views/login/scanCompinents/QrCodeTab.vue'
 import { MsgConfirm, MsgError } from '@/utils/message.ts'
 import * as dd from 'dingtalk-jsapi'
 import { loadScript } from '@/utils/utils'
+import { EditionConst } from '@/utils/permission/data'
+import { hasPermission } from '@/utils/permission/index'
+
 const router = useRouter()
 const { login, user, theme } = useStore()
 const { locale } = useI18n({ useScope: 'global' })
@@ -296,7 +299,8 @@ function changeMode(val: string) {
 onBeforeMount(() => {
   loading.value = true
   user.asyncGetProfile().then((res) => {
-    if (user.isEnterprise()) {
+    // 企业版和专业版：第三方登录
+    if (hasPermission([EditionConst.IS_EE, EditionConst.IS_PE], 'OR')) {
       login
         .getAuthType()
         .then((res) => {
