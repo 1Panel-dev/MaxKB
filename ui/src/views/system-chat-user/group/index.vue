@@ -2,11 +2,11 @@
   <ContentContainer>
     <template #header>
       <div class="shared-header">
-        <span class="title">{{ t('views.system.shared_resources') }}</span>
+        <span class="title">{{ t('views.chatUser.title') }}</span>
         <el-icon size="12">
           <rightOutlined></rightOutlined>
         </el-icon>
-        <span class="sub-title">{{ t('views.knowledge.title') }}</span>
+        <span class="sub-title">{{ t('views.chatUser.group.title') }}</span>
       </div>
     </template>
     <el-card style="--el-card-padding: 0" class="user-card">
@@ -293,6 +293,23 @@ function handleDeleteUser(item?: ChatUserGroupUserItem) {
 </script>
 
 <style lang="scss" scoped>
+.shared-header {
+  color: #646a73;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 22px;
+  display: flex;
+  align-items: center;
+
+  :deep(.el-icon i) {
+    height: 12px;
+  }
+
+  .sub-title {
+    color: #1f2329;
+  }
+}
+
 .content-container {
   height: 100%;
   display: flex;

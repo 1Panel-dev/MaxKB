@@ -23,7 +23,7 @@ const getUserGroupList: (resource: ChatUserResourceParams, loading?: Ref<boolean
  * 修改用户组列表授权
  */
 const editUserGroupList: (resource: ChatUserResourceParams, data: { user_group_id: string, is_auth: boolean }[], loading?: Ref<boolean>) => Promise<Result<any>> = (resource, data, loading) => {
-  return put(`${prefix}/${resource.resource_type}/${resource.resource_id}/user_group`, data, undefined, loading)
+  return put(`${prefix.value}/${resource.resource_type}/${resource.resource_id}/user_group`, data, undefined, loading)
 }
 
 /**

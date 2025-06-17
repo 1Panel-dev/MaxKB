@@ -3,7 +3,8 @@
     <template #header>
       <div>
         <h2>{{ $t('views.chatUser.title') }}</h2>
-        <div class="color-secondary">{{ $t('views.user.title') }}</div>
+        <div class="color-secondary">{{ resource.resource_type === ChatUserResourceEnum.APPLICATION ?
+          $t('views.chatUser.applicationTitleTip') : $t('views.chatUser.knowledgeTitleTip') }}</div>
       </div>
     </template>
     <el-card style="--el-card-padding: 0" class="user-card">
@@ -109,7 +110,7 @@ import { ChatUserResourceEnum } from '@/enums/workspaceChatUser'
 import { MsgSuccess } from '@/utils/message'
 
 const route = useRoute()
-const resource: ChatUserResourceParams = { resource_id: route.params.id as string, resource_type: route.meta.resourceType as ChatUserResourceEnum }
+const resource: ChatUserResourceParams = reactive({ resource_id: route.params.id as string, resource_type: route.meta.resourceType as ChatUserResourceEnum })
 
 const filterText = ref('')
 const loading = ref(false)

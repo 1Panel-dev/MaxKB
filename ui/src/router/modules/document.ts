@@ -55,7 +55,7 @@ const DocumentRouter = {
         active: 'chat-log',
         parentPath: '/knowledge/:id/:folderId',
         parentName: 'KnowledgeDetail',
-        resourceType: ChatUserResourceEnum.APPLICATION
+        resourceType: ChatUserResourceEnum.KNOWLEDGE
       },
       component: () => import('@/views/chat-user/index.vue')
     },
