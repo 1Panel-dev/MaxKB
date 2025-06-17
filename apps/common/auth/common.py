@@ -33,7 +33,7 @@ class ChatUserToken:
     def __init__(self, application_id, user_id, access_token, _type, chat_user_type, chat_user_id,
                  authentication: ChatAuthentication):
         self.application_id = application_id
-        self.user_id = user_id,
+        self.user_id = user_id
         self.access_token = access_token
         self.type = _type
         self.chat_user_type = chat_user_type
