@@ -143,7 +143,7 @@ import {MsgConfirm, MsgError} from '@/utils/message.ts'
 // import {loadScript} from '@/utils/utils'
 
 const router = useRouter()
-const {login, user, theme} = useStore()
+const {login, user, theme, chatUser} = useStore()
 const {locale} = useI18n({useScope: 'global'})
 const loading = ref<boolean>(false)
 const route = useRoute()
@@ -297,55 +297,33 @@ function changeMode(val: string) {
 }
 
 onBeforeMount(() => {
-  loading.value = true
-  user.asyncGetProfile().then((res) => {
-    if (user.isEnterprise()) {
-      loginApi
-        .getAuthType(accessToken)
-        .then((res: any) => {
-          res = res.data || {}
-          const direct = res.needDirect
-          res = res.authType || []
-          if (direct) {
-            redirectAuth(res[0], false)
-          } else {
-
-            //如果结果包含LDAP，把LDAP放在第一个
-            const ldapIndex = res.indexOf('LDAP')
-            if (ldapIndex !== -1) {
-              const [ldap] = res.splice(ldapIndex, 1)
-              res.unshift(ldap)
-            }
-            modeList.value = [...modeList.value, ...res].filter((item => item !== ''))
-            loginMode.value = modeList.value[0] || 'LOCAL'
-            console.log(modeList.value)
-          }
-        })
-        .finally(() => (loading.value = false))
-      // user
-      //   .getQrType()
-      //   .then((res) => {
-      //     if (res.length > 0) {
-      //       modeList.value = ['QR_CODE', ...modeList.value]
-      //       QrList.value = res
-      //       QrList.value.forEach((item) => {
-      //         orgOptions.value.push({
-      //           key: item,
-      //           value:
-      //             item === 'wecom'
-      //               ? t('views.system.authentication.scanTheQRCode.wecom')
-      //               : item === 'dingtalk'
-      //                 ? t('views.system.authentication.scanTheQRCode.dingtalk')
-      //                 : t('views.system.authentication.scanTheQRCode.lark'),
-      //         })
-      //       })
-      //     }
-      //   })
-      //   .finally(() => (loading.value = false))
-    } else {
-      loading.value = false
+  if (chatUser.chat_profile?.login_value) {
+    modeList.value = chatUser.chat_profile.login_value
+    loginMode.value = modeList.value[0] || 'LOCAL'
+    if (modeList.value.length == 1 && ['CAS', 'OIDC', 'OAuth2'].includes(modeList.value[0])) {
+      redirectAuth(modeList.value[0])
     }
-  })
+  }
+  // user
+  //   .getQrType()
+  //   .then((res) => {
+  //     if (res.length > 0) {
+  //       modeList.value = ['QR_CODE', ...modeList.value]
+  //       QrList.value = res
+  //       QrList.value.forEach((item) => {
+  //         orgOptions.value.push({
+  //           key: item,
+  //           value:
+  //             item === 'wecom'
+  //               ? t('views.system.authentication.scanTheQRCode.wecom')
+  //               : item === 'dingtalk'
+  //                 ? t('views.system.authentication.scanTheQRCode.dingtalk')
+  //                 : t('views.system.authentication.scanTheQRCode.lark'),
+  //         })
+  //       })
+  //     }
+  //   })
+  //   .finally(() => (loading.value = false))
 })
 //declare const window: any
 
