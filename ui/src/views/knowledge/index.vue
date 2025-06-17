@@ -44,7 +44,9 @@
             </el-select>
           </div>
           <el-dropdown trigger="click">
-            <el-button type="primary" class="ml-8">
+            <el-button type="primary" class="ml-8"
+              v-hasPermission="[RoleConst.ADMIN.getWorkspaceRole,PermissionConst.KNOWLEDGE_CREATE.getWorkspacePermission]"
+            >
               {{ $t('common.create') }}
               <el-icon class="el-icon--right">
                 <arrow-down />
@@ -215,7 +217,9 @@
                   <template #mouseEnter>
                     <div @click.stop>
                       <el-dropdown trigger="click">
-                        <el-button text @click.stop>
+                        <el-button text @click.stop
+                          v-hasPermission="[RoleConst.ADMIN.getWorkspaceRole,PermissionConst.KNOWLEDGE_EDIT.getWorkspacePermission]"
+                        >
                           <el-icon>
                             <MoreFilled />
                           </el-icon>
@@ -293,6 +297,8 @@ import useStore from '@/stores'
 import { numberFormat } from '@/utils/common'
 import { t } from '@/locales'
 import { useRouter } from 'vue-router'
+import { PermissionConst, RoleConst } from '@/utils/permission/data'
+import { hasPermission } from '@/utils/permission/index'
 
 const router = useRouter()
 const { folder } = useStore()

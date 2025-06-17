@@ -55,9 +55,11 @@
               </template>
             </el-select>
           </div>
-          <el-button class="ml-16" type="primary" @click="openCreateModel(active_provider)">
-            {{ $t('views.model.addModel') }}</el-button
+          <el-button class="ml-16" type="primary" @click="openCreateModel(active_provider)"
+            v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.MODEL_CREATE.getWorkspacePermission]"
           >
+            {{ $t('views.model.addModel') }}
+            </el-button>
         </div>
       </template>
 
@@ -116,6 +118,8 @@ import SharedWorkspace from '@/views/shared/model-shared/SharedWorkspace.vue'
 import SelectProviderDialog from '@/views/model/component/SelectProviderDialog.vue'
 import useStore from '@/stores'
 import { t } from '@/locales'
+import { PermissionConst, RoleConst } from '@/utils/permission/data'
+import { hasPermission } from '@/utils/permission/index'
 
 const { model } = useStore()
 
