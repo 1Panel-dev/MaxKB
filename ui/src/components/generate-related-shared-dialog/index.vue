@@ -80,7 +80,8 @@ import { useRoute } from 'vue-router'
 import documentApi from '@/api/shared/document'
 import paragraphApi from '@/api/shared/paragraph'
 import knowledgeApi from '@/api/shared/knowledge'
-import useStore from '@/stores/modules-shared-system'
+import useStoreShared from '@/stores/modules-shared-system'
+import useStore from '@/stores'
 import { groupBy } from 'lodash'
 import { MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
@@ -88,10 +89,10 @@ import type { FormInstance } from 'element-plus'
 
 const route = useRoute()
 const {
-  params: { id, documentId } // id为knowledgeID
+  params: { id, documentId }, // id为knowledgeID
 } = route as any
-
-const { model, prompt, user } = useStore()
+const { model } = useStoreShared()
+const { prompt, user } = useStore()
 
 const emit = defineEmits(['refresh'])
 
