@@ -9,8 +9,8 @@ export const routes: Array<RouteRecordRaw> = [
   },
   // 对话用户登录
   {
-    path: '/user-login/:accessToken',
-    name: 'user_login',
+    path: '/login/:accessToken',
+    name: 'login',
     component: () => import('@/views/chat/user-login/index.vue'),
   },
   // 对话用户登录

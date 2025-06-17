@@ -25,7 +25,7 @@ router.beforeEach(
       return
     }
     const { chatUser } = useStore()
-    const notAuthRouteNameList = ['user_login']
+    const notAuthRouteNameList = ['login']
     if (!notAuthRouteNameList.includes(to.name ? to.name.toString() : '')) {
       if (to.params && to.params.accessToken) {
         chatUser.setAccessToken(to.params.accessToken.toString())
@@ -40,7 +40,7 @@ router.beforeEach(
       if (authentication) {
         if (!token) {
           next({
-            name: 'user_login',
+            name: 'login',
             params: {
               accessToken: to.params.accessToken,
             },
