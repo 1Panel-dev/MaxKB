@@ -98,14 +98,7 @@ const ldapLogin: (accessToken: string, request: LoginRequest, loading?: Ref<bool
  * @param loading 接口加载器
  */
 const getCaptcha: (loading?: Ref<boolean>) => Promise<Result<any>> = (loading) => {
-  return get('/user/captcha', undefined, loading)
-}
-
-/**
- * 获取登录方式
- */
-const getAuthType: (accessToken: string, loading?: Ref<boolean>) => Promise<Result<any>> = (accessToken, loading) => {
-  return get('auth/auth/types/' + accessToken, undefined, loading)
+  return get('/captcha', undefined, loading)
 }
 
 /**
@@ -145,6 +138,13 @@ const getLarkCallback: (code: string, loading?: Ref<boolean>) => Promise<Result<
 ) => {
   return get('lark/oauth2', {code}, loading)
 }
+
+/**
+ * 获取认证设置
+ */
+const getAuthSetting: (auth_type: string, loading?: Ref<boolean>) => Promise<Result<any>> = (auth_type, loading) => {
+  return get(`/chat_user/${auth_type}/detail`, undefined, loading)
+}
 export default {
   open,
   chat,
@@ -153,12 +153,12 @@ export default {
   applicationProfile,
   login,
   getCaptcha,
-  getAuthType,
   getDingCallback,
   getQrType,
   getWecomCallback,
   getDingOauth2Callback,
   getLarkCallback,
   getQrSource,
-  ldapLogin
+  ldapLogin,
+  getAuthSetting
 }

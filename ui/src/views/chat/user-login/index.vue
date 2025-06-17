@@ -132,8 +132,7 @@ import type {FormInstance, FormRules} from 'element-plus'
 import type {LoginRequest} from '@/api/type/login'
 import LoginContainer from '@/layout/login-layout/LoginContainer.vue'
 import UserLoginLayout from '@/layout/login-layout/UserLoginLayout.vue'
-import loginApi from '@/api/chat-user/user-login.ts'
-import authApi from '@/api/chat-user/auth-setting'
+import loginApi from '@/api/chat/chat.ts'
 import {t, getBrowserLang} from '@/locales'
 import useStore from '@/stores'
 import {useI18n} from 'vue-i18n'
@@ -233,7 +232,7 @@ function redirectAuth(authType: string, needMessage: boolean = false) {
   if (authType === 'LDAP' || authType === '') {
     return
   }
-  authApi.getAuthSetting(authType, loading).then((res: any) => {
+  loginApi.getAuthSetting(authType, loading).then((res: any) => {
     if (!res.data || !res.data.config) {
       return;
     }
