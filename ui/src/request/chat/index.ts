@@ -53,19 +53,6 @@ instance.interceptors.response.use(
       MsgError(err.message)
       console.error(err)
     }
-    if (err.response?.status === 401) {
-      const { chatUser } = useStore()
-      if (chatUser.accessToken) {
-        router.push({ name: 'login', params: { accessToken: chatUser.accessToken } })
-      } else {
-        router.push('/404 ')
-      }
-    }
-    if (err.response?.status === 403 && !err.response.config.url.includes('chat/open')) {
-      MsgError(
-        err.response.data && err.response.data.message ? err.response.data.message : '没有权限访问',
-      )
-    }
     return Promise.reject(err)
   },
 )

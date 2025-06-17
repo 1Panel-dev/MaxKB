@@ -33,7 +33,15 @@ router.beforeEach(
       })
       return
     }
-    const authentication = await chatUser.isAuthentication()
+    let authentication = false
+    try {
+      authentication = await chatUser.isAuthentication()
+    } catch (e: any) {
+      next({
+        path: '/404',
+      })
+      return
+    }
     const token = chatUser.getToken()
     if (authentication) {
       if (!token && to.name != 'login') {
@@ -45,22 +53,46 @@ router.beforeEach(
         })
         return
       } else {
-        next()
-        return
+        if (to.name == 'login') {
+          next()
+          return
+        } else {
+          try {
+            await chatUser.applicationProfile()
+          } catch (e: any) {
+            if (e.response?.status === 401) {
+              next({
+                name: 'login',
+                params: {
+                  accessToken: to.params.accessToken,
+                },
+              })
+            }
+            return
+          }
+          next()
+          return
+        }
       }
     } else {
       await chatUser.anonymousAuthentication()
     }
     if (!chatUser.application) {
-      await chatUser.applicationProfile()
+      try {
+        await chatUser.applicationProfile()
+      } catch (e: any) {
+        if (e.response?.status === 401) {
+          next({
+            name: 'login',
+            params: {
+              accessToken: to.params.accessToken,
+            },
+          })
+        }
+        return
+      }
     }
-    // 判断是否有菜单权限
-    if (to.meta.permission ? hasPermission(to.meta.permission as any, 'OR') : true) {
-      next()
-    } else {
-      // 如果没有权限则直接取404页面
-      next('404')
-    }
+    next()
   },
 )
 router.afterEach(() => {
