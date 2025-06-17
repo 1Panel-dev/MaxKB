@@ -56,7 +56,7 @@ class Migration(migrations.Migration):
                 ('scope', models.CharField(choices=[('SHARED', '共享'), ('WORKSPACE', '工作空间可用')], default='WORKSPACE', max_length=20, verbose_name='可用范围')),
                 ('file_size_limit', models.IntegerField(default=100, verbose_name='文件大小限制')),
                 ('meta', models.JSONField(default=dict, verbose_name='元数据')),
-                ('embedding_model', models.ForeignKey(default=knowledge.models.knowledge.default_model, on_delete=django.db.models.deletion.DO_NOTHING, to='models_provider.model', verbose_name='向量模型')),
+                ('embedding_model', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, to='models_provider.model', verbose_name='向量模型')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, to='users.user', verbose_name='所属用户')),
             ],
             options={
