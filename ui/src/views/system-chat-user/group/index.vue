@@ -118,7 +118,7 @@
             <el-table-column :label="$t('common.operation')" width="100" fixed="right">
               <template #default="{ row }">
                 <el-tooltip effect="dark" :content="`${$t('views.role.member.delete.button')}`" placement="top">
-                  <el-button type="primary" text @click.stop="handleDeleteUser([row.id])">
+                  <el-button type="primary" text @click.stop="handleDeleteUser(row)">
                     <el-icon>
                       <EditPen />
                     </el-icon>
@@ -132,21 +132,19 @@
     </el-card>
   </ContentContainer>
   <CreateOrUpdateGroupDialog ref="createOrUpdateGroupDialogRef" @refresh="refresh" />
-  <!-- <CreateGroupUserDialog ref="createGroupUserDialogRef" @refresh="getUserGroupList" /> -->
+  <CreateGroupUserDialog ref="createGroupUserDialogRef" @refresh="getUserGroupList" />
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, watch, reactive, onBeforeMount } from 'vue'
+import { onMounted, ref, watch, reactive } from 'vue'
 import SystemGroupApi from '@/api/system/user-group'
-import userManageApi from '@/api/system/chat-user'
 import { t } from '@/locales'
 import type { ChatUserGroupUserItem } from '@/api/type/systemChatUser'
 import iconMap from '@/components/app-icon/icons/common'
 import CreateOrUpdateGroupDialog from './component/CreateOrUpdateGroupDialog.vue'
-// import CreateGroupUserDialog from './component/CreateGroupUserDialog.vue'
+import CreateGroupUserDialog from './component/CreateGroupUserDialog.vue'
 import type { ListItem } from '@/api/type/common'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
-import type { ChatUserItem } from '@/api/type/systemChatUser'
 
 const filterText = ref('')
 const loading = ref(false)
@@ -253,23 +251,9 @@ watch(() => current.value?.id, () => {
   getList()
 })
 
-const chatUserList = ref<ChatUserItem[]>([])
-async function getChatUserList() {
-  try {
-    const res = await userManageApi.getChatUserList()
-    chatUserList.value = res.data
-  } catch (e) {
-    console.error(e)
-  }
-}
-
-onBeforeMount(() => {
-  getChatUserList()
-})
-
-// const createGroupUserDialogRef = ref<InstanceType<typeof CreateGroupUserDialog>>()
+const createGroupUserDialogRef = ref<InstanceType<typeof CreateGroupUserDialog>>()
 function createUser() {
-  // createGroupUserDialogRef.value?.open();
+  createGroupUserDialogRef.value?.open(current.value?.id);
 }
 
 const multipleSelection = ref<string[]>([])
@@ -277,8 +261,23 @@ function handleSelectionChange(val: string[]) {
   multipleSelection.value = val
 }
 
-function handleDeleteUser(ids?: string[]) {
-  // TODO
+function handleDeleteUser(item?: ChatUserGroupUserItem) {
+  MsgConfirm(
+    item ? `${t('views.workspace.member.delete.confirmTitle')}${item.nick_name} ?` : '',
+    t('views.chatUser.group.batchDeleteMember', { number: multipleSelection.value.length }),
+    {
+      confirmButtonText: t('common.confirm'),
+      confirmButtonClass: 'danger',
+    },
+  )
+    .then(() => {
+      SystemGroupApi.postRemoveMember(current.value?.id as string, item ? [item.id] : multipleSelection.value, loading).then(async () => {
+        MsgSuccess(t('common.deleteSuccess'))
+        await getList()
+      })
+    })
+    .catch(() => {
+    })
 }
 </script>
 

@@ -41,16 +41,10 @@ const delUserGroup: (user_group_id: string, loading?: Ref<boolean>) => Promise<R
 
 /**
  * 给用户组添加用户
- * @param 参数
- * {
- "additionalProp1": "string",
- "additionalProp2": "string",
- "additionalProp3": "string"
- }
  */
 const postAddMember: (
   user_group_id: string,
-  body: Record<string, any>,
+  body: string[],
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (user_group_id, body, loading) => {
   return post(`${prefix}/${user_group_id}/add_member`, body, {}, loading)
@@ -58,15 +52,10 @@ const postAddMember: (
 
 /**
  * 从用户组删除用户
- * @param 参数 {
- "additionalProp1": "string",
- "additionalProp2": "string",
- "additionalProp3": "string"
- }
  */
 const postRemoveMember: (
   user_group_id: string,
-  body: Record<string, any>,
+  body: string[],
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (user_group_id, body, loading) => {
   return post(`${prefix}/${user_group_id}/remove_member`, body, {}, loading)
