@@ -228,7 +228,7 @@ class DocumentView(APIView):
         authentication_classes = [TokenAuth]
 
         @extend_schema(
-            methods=['GET'],
+            methods=['PUT'],
             description=_('Synchronize web site types'),
             summary=_('Synchronize web site types'),
             operation_id=_('Synchronize web site types'),  # type: ignore
@@ -248,7 +248,7 @@ class DocumentView(APIView):
                 get_document_operation_object(keywords.get('document_id'))
             ), 
         )
-        def get(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
+        def put(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
             return result.success(DocumentSerializers.Sync(
                 data={'document_id': document_id, 'knowledge_id': knowledge_id, 'workspace_id': workspace_id}
             ).sync())
