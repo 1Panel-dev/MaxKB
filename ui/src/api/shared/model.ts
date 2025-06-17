@@ -10,7 +10,6 @@ import type {
 import type { FormField } from '@/components/dynamics-form/type'
 
 const prefix = '/system/shared'
-const workspace_id = localStorage.getItem('workspace_id') || 'default'
 
 /**
  * 获得模型列表

@@ -48,15 +48,9 @@ const useUserStore = defineStore('user', {
       changeTheme(data?.['theme'])
       this.themeInfo = cloneDeep(data)
     },
-    async profile(loading?: Ref<boolean>) {
-      return UserApi.getUserProfile(loading).then((ok) => {
-        this.userInfo = ok.data
-        useLocalStorage<string>(localeConfigKey, 'en-US').value =
-          ok?.data?.language || this.getLanguage()
-        const theme = useThemeStore()
-        theme.setTheme()
-        return this.asyncGetProfile()
-      })
+    setWorkspaceId(workspace_id: string) {
+      this.workspace_id = workspace_id
+      localStorage.setItem('workspace_id', workspace_id)
     },
     getWorkspaceId(): string | null {
       if (this.workspace_id) {
@@ -68,28 +62,7 @@ const useUserStore = defineStore('user', {
       }
       return workspace_id
     },
-    async asyncGetProfile() {
-      return new Promise((resolve, reject) => {
-        UserApi.getProfile()
-          .then(async (ok) => {
-            // this.version = ok.data?.version || '-'
-            this.license_is_valid = ok.data.license_is_valid
-            this.edition = ok.data.edition
 
-            if (this.isEE() || this.isPE()) {
-              await this.theme()
-            } else {
-              this.themeInfo = {
-                ...defaultPlatformSetting,
-              }
-            }
-            resolve(ok)
-          })
-          .catch((error) => {
-            reject(error)
-          })
-      })
-    },
     getPermissions() {
       if (this.userInfo) {
         if (this.isEE()) {
@@ -121,16 +94,7 @@ const useUserStore = defineStore('user', {
         return []
       }
     },
-    async theme(loading?: Ref<boolean>) {
-      return await ThemeApi.getThemeInfo(loading).then((ok) => {
-        this.setTheme(ok.data)
-        // window.document.title = this.themeInfo['title'] || 'MaxKB'
-        // const link = document.querySelector('link[rel="icon"]') as any
-        // if (link) {
-        //   link['href'] = this.themeInfo['icon'] || '/favicon.ico'
-        // }
-      })
-    },
+
     showXpack() {
       return this.edition != 'CE'
     },
@@ -154,7 +118,49 @@ const useUserStore = defineStore('user', {
       const login = useLoginStore()
       login.userAccessToken = token || ''
     },
+    async theme(loading?: Ref<boolean>) {
+      return await ThemeApi.getThemeInfo(loading).then((ok) => {
+        this.setTheme(ok.data)
+        // window.document.title = this.themeInfo['title'] || 'MaxKB'
+        // const link = document.querySelector('link[rel="icon"]') as any
+        // if (link) {
+        //   link['href'] = this.themeInfo['icon'] || '/favicon.ico'
+        // }
+      })
+    },
+    async profile(loading?: Ref<boolean>) {
+      return UserApi.getUserProfile(loading).then((ok) => {
+        this.userInfo = ok.data
+        useLocalStorage<string>(localeConfigKey, 'en-US').value =
+          ok?.data?.language || this.getLanguage()
+        const theme = useThemeStore()
+        theme.setTheme()
+        return this.asyncGetProfile()
+      })
+    },
 
+    async asyncGetProfile() {
+      return new Promise((resolve, reject) => {
+        UserApi.getProfile()
+          .then(async (ok) => {
+            // this.version = ok.data?.version || '-'
+            this.license_is_valid = ok.data.license_is_valid
+            this.edition = ok.data.edition
+
+            if (this.isEE() || this.isPE()) {
+              await this.theme()
+            } else {
+              this.themeInfo = {
+                ...defaultPlatformSetting,
+              }
+            }
+            resolve(ok)
+          })
+          .catch((error) => {
+            reject(error)
+          })
+      })
+    },
     async postUserLanguage(lang: string, loading?: Ref<boolean>) {
       return new Promise((resolve, reject) => {
         LoginApi.postLanguage({ language: lang }, loading)

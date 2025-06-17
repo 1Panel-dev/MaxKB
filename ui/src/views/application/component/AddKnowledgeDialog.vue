@@ -99,7 +99,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['addData', 'refresh'])
-const { folder } = useStore()
+const { folder, user } = useStore()
 
 const dialogVisible = ref<boolean>(false)
 const checkList = ref([])
@@ -188,7 +188,7 @@ function getFolder() {
 
 function getList() {
   const params = {
-    folder_id: currentFolder.value?.id || localStorage.getItem('workspace_id'),
+    folder_id: currentFolder.value?.id || user.getWorkspaceId(),
   }
   KnowledgeApi.getKnowledgeList(params, loading).then((res) => {
     searchDate.value = res.data

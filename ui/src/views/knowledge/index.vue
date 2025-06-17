@@ -301,7 +301,7 @@ import { PermissionConst, RoleConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
 
 const router = useRouter()
-const { folder } = useStore()
+const { folder, user } = useStore()
 
 const loading = ref(false)
 
@@ -365,9 +365,8 @@ const search_type_change = () => {
 }
 
 function getList() {
-  console.log(currentFolder.value?.id)
   const params = {
-    folder_id: currentFolder.value?.id || localStorage.getItem('workspace_id'),
+    folder_id: currentFolder.value?.id || user.getWorkspaceId(),
     [search_type.value]: search_form.value[search_type.value],
   }
 

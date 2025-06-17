@@ -34,7 +34,7 @@ const useKnowledgeStore = defineStore('knowledg', {
     async asyncGetRootKnowledge(loading?: Ref<boolean>) {
       return new Promise((resolve, reject) => {
         const params = {
-          folder_id: localStorage.getItem('workspace_id'),
+          folder_id: 'default',
         }
         knowledgeApi
           .getKnowledgeList(params, loading)

@@ -3,13 +3,20 @@ import { Result } from '@/request/Result'
 import { get, put } from '@/request/index'
 import type { ChatUserGroupItem, ChatUserGroupUserItem, ChatUserResourceParams, putUserGroupUserParams } from '@/api/type/workspaceChatUser'
 import type { pageRequest, PageList } from '@/api/type/common'
-const prefix = '/workspace/' + localStorage.getItem('workspace_id')
 
+import useStore from '@/stores'
+const prefix: any = { _value: '/workspace/' }
+Object.defineProperty(prefix, 'value', {
+  get: function () {
+    const { user } = useStore()
+    return this._value + user.getWorkspaceId()
+  },
+})
 /**
  * 获取用户组列表
  */
 const getUserGroupList: (resource: ChatUserResourceParams, loading?: Ref<boolean>) => Promise<Result<ChatUserGroupItem[]>> = (resource, loading) => {
-  return get(`${prefix}/${resource.resource_type}/${resource.resource_id}/user_group`, undefined, loading)
+  return get(`${prefix.value}/${resource.resource_type}/${resource.resource_id}/user_group`, undefined, loading)
 }
 
 /**
@@ -23,7 +30,7 @@ const getUserGroupUserList: (
   loading?: Ref<boolean>,
 ) => Promise<Result<PageList<ChatUserGroupUserItem[]>>> = (resource, user_group_id, page, username_or_nickname, loading) => {
   return get(
-    `${prefix}/${resource.resource_type}/${resource.resource_id}/user_group_id/${user_group_id}/${page.current_page}/${page.page_size}`,
+    `${prefix.value}/${resource.resource_type}/${resource.resource_id}/user_group_id/${user_group_id}/${page.current_page}/${page.page_size}`,
     username_or_nickname ? { username_or_nickname } : undefined,
     loading,
   )
@@ -38,7 +45,7 @@ const putUserGroupUser: (
   data: putUserGroupUserParams[],
   loading?: Ref<boolean>,
 ) => Promise<Result<boolean>> = (resource, user_group_id, data, loading) => {
-  return put(`${prefix}/${resource.resource_type}/${resource.resource_id}/user_group_id/${user_group_id}`, data, undefined, loading)
+  return put(`${prefix.value}/${resource.resource_type}/${resource.resource_id}/user_group_id/${user_group_id}`, data, undefined, loading)
 }
 
 export default {
