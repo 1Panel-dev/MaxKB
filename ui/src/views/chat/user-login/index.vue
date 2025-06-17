@@ -138,6 +138,7 @@ import useStore from '@/stores'
 import {useI18n} from 'vue-i18n'
 import QrCodeTab from '@/views/login/scanCompinents/QrCodeTab.vue'
 import {MsgConfirm, MsgError} from '@/utils/message.ts'
+import useUserStore from "@/stores/modules/user.ts";
 // import * as dd from 'dingtalk-jsapi'
 // import {loadScript} from '@/utils/utils'
 
@@ -184,15 +185,16 @@ const rules = ref<FormRules<LoginRequest>>({
 const loginHandle = () => {
   loginFormRef.value?.validate().then(() => {
     if (loginMode.value === 'LDAP') {
-      login.asyncLdapLogin(loginForm.value, loading).then(() => {
-        locale.value = localStorage.getItem('MaxKB-locale') || getBrowserLang() || 'en-US'
-        router.push({name: 'home'})
+      loginApi.ldapLogin(accessToken, loginForm.value,).then((ok) => {
+        localStorage.setItem('token', ok?.data?.token)
+        const user = useUserStore()
+        return user.profile(loading)
       })
     } else {
-      login.asyncLogin(loginForm.value, loading).then(() => {
-        locale.value = localStorage.getItem('MaxKB-locale') || getBrowserLang() || 'en-US'
-        localStorage.setItem('workspace_id', 'default')
-        router.push({name: 'home'})
+      loginApi.login(accessToken, loginForm.value,).then((ok) => {
+        localStorage.setItem('token', ok?.data?.token)
+        const user = useUserStore()
+        return user.profile(loading)
       })
     }
   })
