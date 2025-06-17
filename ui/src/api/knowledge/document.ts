@@ -374,8 +374,8 @@ const postQADocument: (
  * 分段预览（上传文档）
  * @param 参数  file:file,limit:number,patterns:array,with_filter:boolean
  */
-const postSplitDocument: (data: any) => Promise<Result<any>> = (data) => {
-  return post(`${prefix.value}/document/split`, data, undefined, undefined, 1000 * 60 * 60)
+const postSplitDocument: (data: any, id: string) => Promise<Result<any>> = (data, id) => {
+  return post(`${prefix.value}/${id}/document/split`, data, undefined, undefined, 1000 * 60 * 60)
 }
 
 /**
