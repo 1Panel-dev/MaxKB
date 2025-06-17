@@ -13,6 +13,7 @@ const envDir = './env'
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const ENV = loadEnv(mode, envDir)
+  console.log(ENV)
   const prefix = process.env.VITE_DYNAMIC_PREFIX || ENV.VITE_BASE_PATH
   const proxyConf: Record<string, string | ProxyOptions> = {}
   proxyConf['/api'] = {
@@ -25,10 +26,9 @@ export default defineConfig(({ mode }) => {
     changeOrigin: true,
     rewrite: (path: string) => path.replace(ENV.VITE_BASE_PATH, '/'),
   }
-  proxyConf['/chat'] = {
+  proxyConf['/chat/api'] = {
     target: 'http://127.0.0.1:8080',
     changeOrigin: true,
-    rewrite: (path: string) => path.replace(ENV.VITE_BASE_PATH, '/'),
   }
   proxyConf['/doc'] = {
     target: 'http://127.0.0.1:8080',

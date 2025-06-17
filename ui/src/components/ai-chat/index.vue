@@ -85,9 +85,10 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, nextTick, computed, watch, reactive, onMounted, onBeforeUnmount } from 'vue'
+import { type Ref, ref, nextTick, computed, watch, reactive, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 import applicationApi from '@/api/application/application'
+import chatAPI from '@/api/chat/chat'
 import chatLogApi from '@/api/application/chat-log'
 import { ChatManagement, type chatType } from '@/api/type/application'
 import { randomId } from '@/utils/utils'
@@ -280,23 +281,35 @@ const handleDebounceClick = debounce((val, other_params_data?: any, chat?: chatT
  */
 const openChatId: () => Promise<string> = () => {
   const obj = props.applicationDetails
+  return getOpenChatAPI()(obj.id)
+    .then((res) => {
+      chartOpenId.value = res.data
+      return res.data
+    })
+    .catch((res) => {
+      if (res.response.status === 403) {
+        return application.asyncAppAuthentication(accessToken).then(() => {
+          return openChatId()
+        })
+      }
+      return Promise.reject(res)
+    })
+}
+
+const getChatMessageAPI = () => {
   if (props.type === 'debug-ai-chat') {
-    return applicationApi
-      .open(obj.id)
-      .then((res) => {
-        chartOpenId.value = res.data
-        return res.data
-      })
-      .catch((res) => {
-        if (res.response.status === 403) {
-          return application.asyncAppAuthentication(accessToken).then(() => {
-            return openChatId()
-          })
-        }
-        return Promise.reject(res)
-      })
+    return applicationApi.chat
   } else {
-    return Promise.reject('暂不支持')
+    return chatAPI.chat
+  }
+}
+const getOpenChatAPI = () => {
+  if (props.type === 'debug-ai-chat') {
+    return applicationApi.open
+  } else {
+    return (a?: string, loading?: Ref<boolean>) => {
+      return chatAPI.open(loading)
+    }
   }
 }
 /**
@@ -453,8 +466,7 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean, other_para
       },
     }
     // 对话
-    applicationApi
-      .chat(chartOpenId.value, obj)
+    getChatMessageAPI()(chartOpenId.value, obj)
       .then((response) => {
         if (response.status === 401) {
           application

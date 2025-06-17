@@ -100,7 +100,8 @@ class ChatView(APIView):
         return ChatSerializers(data={'chat_id': chat_id,
                                      'chat_user_id': request.auth.chat_user_id,
                                      'chat_user_type': request.auth.chat_user_type,
-                                     'application_id': request.auth.application_id}
+                                     'application_id': request.auth.application_id,
+                                     'debug': False}
                                ).chat(request.data)
 
 
@@ -116,7 +117,8 @@ class OpenView(APIView):
         responses=None,
         tags=[_('Chat')]  # type: ignore
     )
-    def get(self, request: Request, workspace_id: str, application_id: str):
+    def get(self, request: Request):
         return result.success(OpenChatSerializers(
-            data={'workspace_id': workspace_id, 'application_id': application_id,
-                  'chat_user_id': request.auth.chat_user_id, 'chat_user_type': request.auth.chat_user_type}).open())
+            data={'application_id': request.auth.application_id,
+                  'chat_user_id': request.auth.chat_user_id, 'chat_user_type': request.auth.chat_user_type,
+                  'debug': False}).open())

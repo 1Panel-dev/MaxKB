@@ -315,7 +315,7 @@ class ChatSerializers(serializers.Serializer):
 
 
 class OpenChatSerializers(serializers.Serializer):
-    workspace_id = serializers.CharField(required=True)
+    workspace_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("Workspace ID"))
     application_id = serializers.UUIDField(required=True)
     chat_user_id = serializers.CharField(required=True, label=_("Client id"))
     chat_user_type = serializers.CharField(required=True, label=_("Client Type"))
@@ -325,7 +325,10 @@ class OpenChatSerializers(serializers.Serializer):
         super().is_valid(raise_exception=True)
         workspace_id = self.data.get('workspace_id')
         application_id = self.data.get('application_id')
-        if not QuerySet(Application).filter(id=application_id, workspace_id=workspace_id).exists():
+        query_set = QuerySet(Application).filter(id=application_id)
+        if workspace_id:
+            query_set = query_set.filter(workspace_id=workspace_id)
+        if not query_set.exists():
             raise AppApiException(500, gettext('Application does not exist'))
 
     def open(self):
