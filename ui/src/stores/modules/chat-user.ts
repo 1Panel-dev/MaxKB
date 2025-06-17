@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia'
 import ChatAPI from '@/api/chat/chat'
 import { type ChatProfile } from '@/api/type/chat'
-
+import type { LoginRequest } from '@/api/type/user'
+import type { Ref } from 'vue'
 interface ChatUser {
   // 用户id
   id: string
@@ -59,12 +60,29 @@ const useChatUserStore = defineStore('chat-user', {
       }
       return localStorage.getItem(`accessToken`)
     },
+    setToken(token: string) {
+      this.token = token
+      sessionStorage.setItem(`${this.accessToken}-accessToken`, token)
+      localStorage.setItem(`${this.accessToken}-accessToken`, token)
+    },
     /**
      *匿名认证
      */
     anonymousAuthentication() {
       return ChatAPI.anonymousAuthentication(this.accessToken as string).then((ok) => {
-        this.token = ok.data
+        this.setToken(ok.data)
+        return this.token
+      })
+    },
+    login(request: LoginRequest, loading?: Ref<boolean>) {
+      return ChatAPI.login(this.accessToken as string, request, loading).then((ok) => {
+        this.setToken(ok.data.token)
+        return this.token
+      })
+    },
+    ldapLogin(request: LoginRequest, loading?: Ref<boolean>) {
+      return ChatAPI.ldapLogin(this.accessToken as string, request, loading).then((ok) => {
+        this.setToken(ok.data.token)
         return this.token
       })
     },

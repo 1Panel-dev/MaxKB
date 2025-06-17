@@ -2,7 +2,8 @@
   <UserLoginLayout v-if="!loading" v-loading="loading">
     <LoginContainer :subTitle="theme.themeInfo?.slogan || $t('theme.defaultSlogan')">
       <h2 class="mb-24" v-if="!showQrCodeTab">
-        {{ loginMode == 'LOCAL' ? $t('views.login.title') : loginMode }}</h2>
+        {{ loginMode == 'LOCAL' ? $t('views.login.title') : loginMode }}
+      </h2>
       <div v-if="!showQrCodeTab">
         <el-form
           class="login-form"
@@ -80,7 +81,7 @@
         </div>
       </div>
       <div v-if="showQrCodeTab">
-        <QrCodeTab :tabs="orgOptions"/>
+        <QrCodeTab :tabs="orgOptions" />
       </div>
       <div class="login-gradient-divider lighter mt-24" v-if="modeList.length > 1">
         <span>{{ $t('views.login.moreMethod') }}</span>
@@ -99,7 +100,7 @@
                 'font-size': item === 'OAUTH2' ? '8px' : '10px',
                 color: user.themeInfo?.theme,
               }"
-            >{{ item }}</span
+              >{{ item }}</span
             >
           </el-button>
           <el-button
@@ -109,7 +110,7 @@
             class="login-button-circle color-secondary"
             @click="changeMode('QR_CODE')"
           >
-            <img src="@/assets/scan/icon_qr_outlined.svg" width="25px"/>
+            <img src="@/assets/scan/icon_qr_outlined.svg" width="25px" />
           </el-button>
           <el-button
             v-if="item === 'LOCAL' && loginMode != 'LOCAL'"
@@ -126,30 +127,28 @@
   </UserLoginLayout>
 </template>
 <script setup lang="ts">
-import {onMounted, ref, onBeforeMount} from 'vue'
-import {useRoute, useRouter} from 'vue-router'
-import type {FormInstance, FormRules} from 'element-plus'
-import type {LoginRequest} from '@/api/type/login'
+import { onMounted, ref, onBeforeMount } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import type { FormInstance, FormRules } from 'element-plus'
+import type { LoginRequest } from '@/api/type/login'
 import LoginContainer from '@/layout/login-layout/LoginContainer.vue'
 import UserLoginLayout from '@/layout/login-layout/UserLoginLayout.vue'
 import loginApi from '@/api/chat/chat.ts'
-import {t, getBrowserLang} from '@/locales'
+import { t, getBrowserLang } from '@/locales'
 import useStore from '@/stores'
-import {useI18n} from 'vue-i18n'
+import { useI18n } from 'vue-i18n'
 import QrCodeTab from '@/views/login/scanCompinents/QrCodeTab.vue'
-import {MsgConfirm, MsgError} from '@/utils/message.ts'
-import useUserStore from "@/stores/modules/user.ts";
-// import * as dd from 'dingtalk-jsapi'
-// import {loadScript} from '@/utils/utils'
+import { MsgConfirm, MsgError } from '@/utils/message.ts'
+import useUserStore from '@/stores/modules/user.ts'
 
 const router = useRouter()
-const {login, user, theme, chatUser} = useStore()
-const {locale} = useI18n({useScope: 'global'})
+const { login, user, theme, chatUser } = useStore()
+const { locale } = useI18n({ useScope: 'global' })
 const loading = ref<boolean>(false)
 const route = useRoute()
 const identifyCode = ref<string>('')
 const {
-  params: {accessToken}
+  params: { accessToken },
 } = route as any
 const loginFormRef = ref<FormInstance>()
 const loginForm = ref<LoginRequest>({
@@ -185,16 +184,12 @@ const rules = ref<FormRules<LoginRequest>>({
 const loginHandle = () => {
   loginFormRef.value?.validate().then(() => {
     if (loginMode.value === 'LDAP') {
-      loginApi.ldapLogin(accessToken, loginForm.value,).then((ok) => {
-        localStorage.setItem('token', ok?.data?.token)
-        const user = useUserStore()
-        return user.profile(loading)
+      chatUser.ldapLogin(loginForm.value).then((ok) => {
+        router.push({ name: 'chat', params: { accessToken: chatUser.accessToken } })
       })
     } else {
-      loginApi.login(accessToken, loginForm.value,).then((ok) => {
-        localStorage.setItem('token', ok?.data?.token)
-        const user = useUserStore()
-        return user.profile(loading)
+      chatUser.login(loginForm.value).then((ok) => {
+        router.push({ name: 'chat', params: { accessToken: chatUser.accessToken } })
       })
     }
   })
@@ -236,31 +231,32 @@ function redirectAuth(authType: string, needMessage: boolean = false) {
   }
   loginApi.getAuthSetting(authType, loading).then((res: any) => {
     if (!res.data || !res.data.config) {
-      return;
+      return
     }
 
-    const config = res.data.config;
-    const redirectUrl = eval(`\`${config.redirectUrl}/${accessToken}\``);
-    let url;
+    const config = res.data.config
+    const redirectUrl = eval(`\`${config.redirectUrl}/${accessToken}\``)
+    let url
     if (authType === 'CAS') {
-      url = config.ldpUri;
-      url += url.indexOf('?') !== -1
-        ? `&service=${encodeURIComponent(redirectUrl)}`
-        : `?service=${encodeURIComponent(redirectUrl)}`;
+      url = config.ldpUri
+      url +=
+        url.indexOf('?') !== -1
+          ? `&service=${encodeURIComponent(redirectUrl)}`
+          : `?service=${encodeURIComponent(redirectUrl)}`
     } else if (authType === 'OIDC') {
-      const scope = config.scope || 'openid+profile+email';
-      url = `${config.authEndpoint}?client_id=${config.clientId}&redirect_uri=${redirectUrl}&response_type=code&scope=${scope}`;
+      const scope = config.scope || 'openid+profile+email'
+      url = `${config.authEndpoint}?client_id=${config.clientId}&redirect_uri=${redirectUrl}&response_type=code&scope=${scope}`
       if (config.state) {
-        url += `&state=${config.state}`;
+        url += `&state=${config.state}`
       }
     } else if (authType === 'OAuth2') {
-      url = `${config.authEndpoint}?client_id=${config.clientId}&response_type=code&redirect_uri=${redirectUrl}&state=${uuidv4()}`;
+      url = `${config.authEndpoint}?client_id=${config.clientId}&response_type=code&redirect_uri=${redirectUrl}&state=${uuidv4()}`
       if (config.scope) {
-        url += `&scope=${config.scope}`;
+        url += `&scope=${config.scope}`
       }
     }
     if (!url) {
-      return;
+      return
     }
     if (needMessage) {
       MsgConfirm(t('views.login.jump_tip'), '', {
@@ -269,15 +265,14 @@ function redirectAuth(authType: string, needMessage: boolean = false) {
         confirmButtonClass: '',
       })
         .then(() => {
-          window.location.href = url;
+          window.location.href = url
         })
-        .catch(() => {
-        });
+        .catch(() => {})
     } else {
-      console.log('url', url);
-      window.location.href = url;
+      console.log('url', url)
+      window.location.href = url
     }
-  });
+  })
 }
 
 function changeMode(val: string) {
@@ -305,105 +300,7 @@ onBeforeMount(() => {
       redirectAuth(modeList.value[0])
     }
   }
-  // user
-  //   .getQrType()
-  //   .then((res) => {
-  //     if (res.length > 0) {
-  //       modeList.value = ['QR_CODE', ...modeList.value]
-  //       QrList.value = res
-  //       QrList.value.forEach((item) => {
-  //         orgOptions.value.push({
-  //           key: item,
-  //           value:
-  //             item === 'wecom'
-  //               ? t('views.system.authentication.scanTheQRCode.wecom')
-  //               : item === 'dingtalk'
-  //                 ? t('views.system.authentication.scanTheQRCode.dingtalk')
-  //                 : t('views.system.authentication.scanTheQRCode.lark'),
-  //         })
-  //       })
-  //     }
-  //   })
-  //   .finally(() => (loading.value = false))
 })
-//declare const window: any
-
-// onMounted(() => {
-//   makeCode()
-//   const route = useRoute()
-//   const currentUrl = ref(route.fullPath)
-//   const params = new URLSearchParams(currentUrl.value.split('?')[1])
-//   const client = params.get('client')
-//
-//   const handleDingTalk = () => {
-//     const code = params.get('corpId')
-//     if (code) {
-//       dd.runtime.permission.requestAuthCode({corpId: code}).then((res) => {
-//         console.log('DingTalk client request success:', res)
-//         user.dingOauth2Callback(res.code).then(() => {
-//           router.push({name: 'home'})
-//         })
-//       })
-//     }
-//   }
-//
-//   const handleLark = () => {
-//     const appId = params.get('appId')
-//     const callRequestAuthCode = () => {
-//       window.tt?.requestAuthCode({
-//         appId: appId,
-//         success: (res: any) => {
-//           user.larkCallback(res.code).then(() => {
-//             router.push({name: 'home'})
-//           })
-//         },
-//         fail: (error: any) => {
-//           MsgError(error)
-//         },
-//       })
-//     }
-//
-//     loadScript('https://lf-scm-cn.feishucdn.com/lark/op/h5-js-sdk-1.5.35.js', {
-//       jsId: 'lark-sdk',
-//       forceReload: true,
-//     })
-//       .then(() => {
-//         if (window.tt) {
-//           window.tt.requestAccess({
-//             appID: appId,
-//             scopeList: [],
-//             success: (res: any) => {
-//               user.larkCallback(res.code).then(() => {
-//                 router.push({name: 'home'})
-//               })
-//             },
-//             fail: (error: any) => {
-//               const {errno} = error
-//               if (errno === 103) {
-//                 callRequestAuthCode()
-//               }
-//             },
-//           })
-//         } else {
-//           callRequestAuthCode()
-//         }
-//       })
-//       .catch((error) => {
-//         console.error('SDK 加载失败:', error)
-//       })
-//   }
-//
-//   switch (client) {
-//     case 'dingtalk':
-//       handleDingTalk()
-//       break
-//     case 'lark':
-//       handleLark()
-//       break
-//     default:
-//       break
-//   }
-// })
 </script>
 <style lang="scss" scoped>
 .login-gradient-divider {

@@ -1,4 +1,4 @@
-import {Result} from '@/request/Result'
+import { Result } from '@/request/Result'
 import {
   get,
   post,
@@ -9,16 +9,16 @@ import {
   download,
   exportFile,
 } from '@/request/chat/index'
-import {type ChatProfile} from '@/api/type/chat'
-import {type Ref} from 'vue'
+import { type ChatProfile } from '@/api/type/chat'
+import { type Ref } from 'vue'
 
 import useStore from '@/stores'
-import type {LoginRequest} from "@/api/type/user.ts";
+import type { LoginRequest } from '@/api/type/user'
 
-const prefix: any = {_value: '/workspace/'}
+const prefix: any = { _value: '/workspace/' }
 Object.defineProperty(prefix, 'value', {
   get: function () {
-    const {user} = useStore()
+    const { user } = useStore()
     return this._value + user.getWorkspaceId() + '/application'
   },
 })
@@ -31,7 +31,6 @@ Object.defineProperty(prefix, 'value', {
  */
 const open: (loading?: Ref<boolean>) => Promise<Result<string>> = (loading) => {
   return get('/open', {}, loading)
-
 }
 /**
  * 对话
@@ -46,7 +45,7 @@ const chatProfile: (assessToken: string, loading?: Ref<boolean>) => Promise<Resu
   assessToken,
   loading,
 ) => {
-  return get('/profile', {access_token: assessToken}, loading)
+  return get('/profile', { access_token: assessToken }, loading)
 }
 /**
  * 匿名认证
@@ -58,7 +57,7 @@ const anonymousAuthentication: (
   assessToken: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (assessToken, loading) => {
-  return post('/auth/anonymous', {access_token: assessToken}, {}, loading)
+  return post('/auth/anonymous', { access_token: assessToken }, {}, loading)
 }
 /**
  * 获取应用相关信息
@@ -69,29 +68,27 @@ const applicationProfile: (loading?: Ref<boolean>) => Promise<Result<any>> = (lo
   return get('/application/profile', {}, loading)
 }
 
-
 /**
  * 登录
  * @param request 登录接口请求表单
  * @param loading 接口加载器
  * @returns 认证数据
  */
-const login: (accessToken: string, request: LoginRequest, loading?: Ref<boolean>) => Promise<Result<any>> = (
+const login: (
   accessToken: string,
-  request,
-  loading,
-) => {
+  request: LoginRequest,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (accessToken: string, request, loading) => {
   return post('/auth/login/' + accessToken, request, undefined, loading)
 }
 
-const ldapLogin: (accessToken: string, request: LoginRequest, loading?: Ref<boolean>) => Promise<Result<any>> = (
+const ldapLogin: (
   accessToken: string,
-  request,
-  loading,
-) => {
+  request: LoginRequest,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (accessToken: string, request, loading) => {
   return post('/auth/ldap/login/' + accessToken, request, undefined, loading)
 }
-
 
 /**
  * 获取验证码
@@ -114,35 +111,38 @@ const getQrSource: (loading?: Ref<boolean>) => Promise<Result<any>> = (loading) 
 
 const getDingCallback: (code: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
   code,
-  loading
+  loading,
 ) => {
-  return get('dingtalk', {code}, loading)
+  return get('dingtalk', { code }, loading)
 }
 
 const getDingOauth2Callback: (code: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
   code,
-  loading
+  loading,
 ) => {
-  return get('dingtalk/oauth2', {code}, loading)
+  return get('dingtalk/oauth2', { code }, loading)
 }
 
 const getWecomCallback: (code: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
   code,
-  loading
+  loading,
 ) => {
-  return get('wecom', {code}, loading)
+  return get('wecom', { code }, loading)
 }
 const getLarkCallback: (code: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
   code,
-  loading
+  loading,
 ) => {
-  return get('lark/oauth2', {code}, loading)
+  return get('lark/oauth2', { code }, loading)
 }
 
 /**
  * 获取认证设置
  */
-const getAuthSetting: (auth_type: string, loading?: Ref<boolean>) => Promise<Result<any>> = (auth_type, loading) => {
+const getAuthSetting: (auth_type: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  auth_type,
+  loading,
+) => {
   return get(`/chat_user/${auth_type}/detail`, undefined, loading)
 }
 export default {
@@ -160,5 +160,5 @@ export default {
   getLarkCallback,
   getQrSource,
   ldapLogin,
-  getAuthSetting
+  getAuthSetting,
 }
