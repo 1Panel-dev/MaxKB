@@ -155,7 +155,9 @@ def get_permission_list(user,
             role_permission_mapping_list = QuerySet(role_permission_mapping_model).filter(
                 role_id__in=[workspace_user_role_mapping.role_id for workspace_user_role_mapping in
                              workspace_user_role_mapping_list])
-            role_permission_mapping_dict = group_by(role_permission_mapping_list, lambda item: item.role_id)
+            system_role_permission_mapping_list = get_default_role_permission_mapping_list()
+            role_permission_mapping_dict = group_by(
+                [*role_permission_mapping_list, *system_role_permission_mapping_list], lambda item: item.role_id)
 
             workspace_user_permission_list = QuerySet(WorkspaceUserResourcePermission).filter(
                 workspace_id__in=[workspace_user_role.workspace_id for workspace_user_role in
@@ -224,6 +226,7 @@ def get_role_list(user,
                                  workspace_user_role_mapping in
                                  workspace_user_role_mapping_list] + [user.role]
             cache.set(key, workspace_list, version=version)
+            return workspace_list
         else:
             role_list = [user.role]
             if user.role == RoleConstants.ADMIN.value.__str__():
