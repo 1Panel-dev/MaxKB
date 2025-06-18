@@ -99,7 +99,7 @@ const putToolIcon: (
 }
 
 const exportTool = (id: string, name: string, loading?: Ref<boolean>) => {
-  return exportFile(name + '.fx', `${prefix.value}/${id}/export`, undefined, loading)
+  return exportFile(name + '.tool', `${prefix.value}/${id}/export`, undefined, loading)
 }
 
 /**

@@ -332,7 +332,7 @@ class ToolSerializer(serializers.Serializer):
                 mk_instance = ToolInstance(tool_dict, 'v2')
                 tool_pickle = pickle.dumps(mk_instance)
                 response = HttpResponse(content_type='text/plain', content=tool_pickle)
-                response['Content-Disposition'] = f'attachment; filename="{tool.name}.fx"'
+                response['Content-Disposition'] = f'attachment; filename="{tool.name}.tool"'
                 return response
             except Exception as e:
                 return result.error(str(e), response_status=status.HTTP_500_INTERNAL_SERVER_ERROR)
