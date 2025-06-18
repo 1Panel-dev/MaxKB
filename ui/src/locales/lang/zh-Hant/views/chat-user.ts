@@ -1,11 +1,16 @@
 export default {
   title: '對話用戶',
   syncUsers: '同步用戶',
+  syncUsersTip: '僅同步新增用戶',
   setUserGroups: '設定用戶組',
   knowledgeTitleTip: '該配置需要關聯的應用開啟對話用戶登入認證後才會生效',
   applicationTitleTip: '該配置需要應用開啟登入認證後生效',
   autoAuthorization: '自動授權',
   authorization: '授權',
+  batchDeleteUser: '是否刪除選中的 {count} 個用戶？',
+  settingMethod: '設定方式',
+  append: '追加',
+  replace: '替換',
   group: {
     title: '用戶組',
     name: '用戶組名稱',
@@ -16,4 +21,4 @@ export default {
     },
     batchDeleteMember: '是否移除選中的 {count} 個成員？',
   }
-};
+}

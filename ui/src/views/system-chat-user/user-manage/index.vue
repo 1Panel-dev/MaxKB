@@ -15,13 +15,13 @@
           <el-button type="primary" @click="createUser()">
             {{ t('views.userManage.createUser') }}
           </el-button>
-          <el-button :disabled="multipleSelection.length === 0">
+          <el-button @click="syncUsers">
             {{ $t('views.chatUser.syncUsers') }}
           </el-button>
-          <el-button :disabled="multipleSelection.length === 0">
+          <el-button :disabled="multipleSelection.length === 0" @click="setUserGroups">
             {{ $t('views.chatUser.setUserGroups') }}
           </el-button>
-          <el-button :disabled="multipleSelection.length === 0">
+          <el-button :disabled="multipleSelection.length === 0" @click="handleBatchDelete">
             {{ $t('common.delete') }}
           </el-button>
         </div>
@@ -135,19 +135,28 @@
     </el-card>
   </ContentContainer>
 
-  <UserDrawer :title="title" ref="UserDrawerRef" @refresh="refresh" />
+  <UserDrawer :title="title" :optionLoading="optionLoading" :chatGroupList="chatGroupList" ref="UserDrawerRef"
+    @refresh="refresh" />
   <UserPwdDialog ref="UserPwdDialogRef" @refresh="refresh" />
+  <SetUserGroupsDialog :optionLoading="optionLoading" :chatGroupList="chatGroupList" ref="setUserGroupsRef"
+    @refresh="refresh" />
+  <SyncUsersDialog ref="syncUsersDialogRef" @refresh="refresh" />
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, reactive, watch } from 'vue'
+import { onMounted, ref, reactive } from 'vue'
 import UserDrawer from './component/UserDrawer.vue'
 import UserPwdDialog from './component/UserPwdDialog.vue'
+import SetUserGroupsDialog from './component/SetUserGroupsDialog.vue'
+import SyncUsersDialog from './component/SyncUsersDialog.vue'
 import userManageApi from '@/api/system/chat-user'
 import { datetimeFormat } from '@/utils/time'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { t } from '@/locales'
 import iconMap from '@/components/app-icon/icons/common'
+import type { ChatUserItem } from '@/api/type/systemChatUser'
+import SystemGroupApi from '@/api/system/user-group'
+import type { ListItem } from '@/api/type/common'
 
 const rightOutlined = iconMap['right-outlined'].iconReader()
 
@@ -163,8 +172,8 @@ const search_type_change = () => {
 
 const loading = ref(false)
 
-const multipleSelection = ref<string[]>([])
-function handleSelectionChange(val: string[]) {
+const multipleSelection = ref<any[]>([])
+function handleSelectionChange(val: any[]) {
   multipleSelection.value = val
 }
 
@@ -174,7 +183,7 @@ const paginationConfig = reactive({
   total: 0,
 })
 
-const userTableData = ref<any[]>([])
+const userTableData = ref<ChatUserItem[]>([])
 
 function getList() {
   return userManageApi
@@ -196,14 +205,15 @@ function handleSizeChange() {
   getList()
 }
 
-function changeState(row: any) {
+function changeState(row: ChatUserItem) {
   const obj = {
+    ...row,
     is_active: !row.is_active,
   }
   const str = obj.is_active ? t('common.status.enableSuccess') : t('common.status.disableSuccess')
   userManageApi
     .putUserManage(row.id, obj, loading)
-    .then((res) => {
+    .then(() => {
       getList()
       MsgSuccess(str)
       return true
@@ -215,7 +225,7 @@ function changeState(row: any) {
 
 const title = ref('')
 const UserDrawerRef = ref()
-function editUser(row: any) {
+function editUser(row: ChatUserItem) {
   title.value = t('views.userManage.editUser')
   UserDrawerRef.value.open(row)
 }
@@ -225,10 +235,10 @@ function createUser() {
   UserDrawerRef.value.open()
 }
 
-function deleteUserManage(row: any) {
+function deleteUserManage(row: ChatUserItem) {
   MsgConfirm(
-    `${t('views.user.delete.confirmTitle')}${row.username} ?`,
-    t('views.user.delete.confirmMessage'),
+    `${t('views.userManage.delete.confirmTitle')}${row.username} ?`,
+    '',
     {
       confirmButtonText: t('common.confirm'),
       confirmButtonClass: 'danger',
@@ -246,7 +256,7 @@ function deleteUserManage(row: any) {
 }
 
 const UserPwdDialogRef = ref()
-function editPwdUser(row: any) {
+function editPwdUser(row: ChatUserItem) {
   UserPwdDialogRef.value.open(row)
 }
 
@@ -255,8 +265,49 @@ function refresh() {
 }
 
 onMounted(() => {
+  getChatGroupList()
   getList()
 })
+
+const optionLoading = ref(false)
+const chatGroupList = ref<ListItem[]>([])
+async function getChatGroupList() {
+  try {
+    const res = await SystemGroupApi.getUserGroup(optionLoading)
+    chatGroupList.value = res.data
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+function handleBatchDelete() {
+  MsgConfirm(
+    t('views.chatUser.batchDeleteUser', { count: multipleSelection.value.length }),
+    '',
+    {
+      confirmButtonText: t('common.confirm'),
+      confirmButtonClass: 'danger',
+    },
+  )
+    .then(() => {
+      userManageApi.batchDelete(multipleSelection.value.map(item => (item.id)), loading).then(async () => {
+        MsgSuccess(t('common.deleteSuccess'))
+        await getList()
+      })
+    })
+    .catch(() => {
+    })
+}
+
+const setUserGroupsRef = ref<InstanceType<typeof SetUserGroupsDialog>>()
+function setUserGroups() {
+  setUserGroupsRef.value?.open(multipleSelection.value.map(item => (item.id)))
+}
+
+const syncUsersDialogRef = ref<InstanceType<typeof SyncUsersDialog>>()
+function syncUsers() {
+  syncUsersDialogRef.value?.open()
+}
 </script>
 
 <style lang="scss" scoped>

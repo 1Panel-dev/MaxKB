@@ -12,15 +12,12 @@ interface ChatUserItem {
   user_group_names?: string[],
 }
 
-// TODO
 interface ChatUserGroupUserItem {
   id: string,
-  is_auth: boolean,
   email: string,
   phone: string,
   nick_name: string,
   username: string,
-  password: string,
   source: string,
   is_active: boolean,
   create_time: string,

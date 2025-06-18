@@ -1,4 +1,5 @@
 export default {
+  syncSuccess: '同步成功',
   create: '创建',
   createSuccess: '创建成功',
   copy: '复制',

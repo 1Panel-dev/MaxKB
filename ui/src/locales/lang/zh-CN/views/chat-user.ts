@@ -1,11 +1,16 @@
 export default {
   title: '对话用户',
   syncUsers: '同步用户',
+  syncUsersTip: '仅同步新增用户',
   setUserGroups: '设置用户组',
   knowledgeTitleTip: '该配置需要关联的应用开启对话用户登录认证后才会生效',
   applicationTitleTip: '该配置需要应用开启登录认证后生效',
   autoAuthorization: '自动授权',
   authorization: '授权',
+  batchDeleteUser: '是否删除选中的 {count} 个用户？',
+  settingMethod: '设置方式',
+  append: '追加',
+  replace: '替换',
   group: {
     title: '用户组',
     name: '用户组名称',

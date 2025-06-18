@@ -1,19 +1,24 @@
 export default {
-  title: 'Chat users',
-  syncUsers: 'Synchronize users',
-  setUserGroups: 'Configure user groups',
-  knowledgeTitleTip: 'This configuration will only take effect when the associated application enables chat user login authentication',
+  title: 'Chat Users',
+  syncUsers: 'Sync Users',
+  syncUsersTip: 'Only sync newly added users',
+  setUserGroups: 'Configure User Groups',
+  knowledgeTitleTip: 'This configuration will only take effect after enabling chat user login authentication in the associated application',
   applicationTitleTip: 'This configuration requires login authentication to be enabled in the application',
-  autoAuthorization: 'Auto authorization',
+  autoAuthorization: 'Auto Authorization',
   authorization: 'Authorization',
+  batchDeleteUser: 'Delete selected {count} users?',
+  settingMethod: 'Configuration Method',
+  append: 'Append',
+  replace: 'Replace',
   group: {
-    title: 'User groups',
-    name: 'User group name',
+    title: 'User Groups',
+    name: 'User Group Name',
     usernameOrName: 'Username/Name',
     delete: {
       confirmTitle: 'Confirm to delete user group:',
-      confirmMessage: 'After deletion, all members in this user group will be removed. Please proceed with caution!',
+      confirmMessage: 'All members in this group will be removed after deletion. Proceed with caution!',
     },
     batchDeleteMember: 'Remove selected {count} members?',
   }
-};
+}

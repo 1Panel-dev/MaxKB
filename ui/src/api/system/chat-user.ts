@@ -1,6 +1,6 @@
 import { Result } from '@/request/Result'
 import { get, put, post, del } from '@/request/index'
-import type { pageRequest } from '@/api/type/common'
+import type { pageRequest, PageList } from '@/api/type/common'
 import type { ChatUserItem } from '@/api/type/systemChatUser'
 import type { Ref } from 'vue'
 const prefix = '/system/chat_user'
@@ -22,7 +22,7 @@ const getUserManage: (
   page: pageRequest,
   username_or_nickname: string,
   loading?: Ref<boolean>,
-) => Promise<Result<any>> = (page, username_or_nickname, loading) => {
+) => Promise<Result<PageList<ChatUserItem[]>>> = (page, username_or_nickname, loading) => {
   return get(
     `${prefix}/user_manage/${page.current_page}/${page.page_size}`,
     username_or_nickname ? { username_or_nickname } : undefined,
@@ -73,12 +73,43 @@ const putUserManagePassword: (
   return put(`${prefix}/${user_id}/re_password`, data, undefined, loading)
 }
 
+/**
+ * 设置用户组
+ */
+const batchAddGroup: (data: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  data,
+  loading,
+) => {
+  return post(`${prefix}/batch_add_group`, data, undefined, loading)
+}
 
+/**
+ * 批量删除
+ */
+const batchDelete: (data: string[], loading?: Ref<boolean>) => Promise<Result<any>> = (
+  data,
+  loading,
+) => {
+  return post(`${prefix}/batch_delete`, data, undefined, loading)
+}
+
+/**
+ * 同步用户
+ */
+const batchSync: (sync_type: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  sync_type,
+  loading,
+) => {
+  return post(`${prefix}/sync/${sync_type}`, undefined, undefined, loading)
+}
 export default {
   getUserManage,
   putUserManage,
   delUserManage,
   postUserManage,
   putUserManagePassword,
-  getChatUserList
+  getChatUserList,
+  batchAddGroup,
+  batchDelete,
+  batchSync
 }

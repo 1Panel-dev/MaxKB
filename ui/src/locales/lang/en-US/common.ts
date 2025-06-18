@@ -1,4 +1,5 @@
 export default {
+  syncSuccess: 'Successful',
   create: 'Create',
   createSuccess: 'Successful',
   copy: 'Copy',

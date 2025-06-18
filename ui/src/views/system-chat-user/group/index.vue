@@ -263,7 +263,7 @@ watch(() => current.value?.id, () => {
 const createGroupUserDialogRef = ref<InstanceType<typeof CreateGroupUserDialog>>()
 
 function createUser() {
-  createGroupUserDialogRef.value?.open(current.value?.id);
+  createGroupUserDialogRef.value?.open(current.value?.id as string);
 }
 
 const multipleSelection = ref<any[]>([])

@@ -1,68 +1,43 @@
 <template>
   <el-drawer v-model="visible" size="60%">
     <template #header>
-      <h4>{{ title }}</h4>
+      <h4>{{ props.title }}</h4>
     </template>
     <h4 class="title-decoration-1 mb-16 mt-8">{{ $t('common.info') }}</h4>
-    <el-form
-      ref="userFormRef"
-      :model="userForm"
-      :rules="rules"
-      label-position="top"
-      require-asterisk-position="right"
-      @submit.prevent
-      :close-on-click-modal="false"
-      :close-on-press-escape="false"
-    >
-      <el-form-item
-        :prop="isEdit ? '' : 'username'"
-        :label="$t('views.login.loginForm.username.label')"
-      >
-        <el-input
-          v-model="userForm.username"
-          :placeholder="$t('views.login.loginForm.username.placeholder')"
-          maxlength="20"
-          show-word-limit
-          :disabled="isEdit"
-        >
+    <el-form ref="userFormRef" :model="userForm" :rules="rules" label-position="top" require-asterisk-position="right"
+      @submit.prevent :close-on-click-modal="false" :close-on-press-escape="false">
+      <el-form-item :prop="isEdit ? '' : 'username'" :label="$t('views.login.loginForm.username.label')">
+        <el-input v-model="userForm.username" :placeholder="$t('views.login.loginForm.username.placeholder')"
+          maxlength="20" show-word-limit :disabled="isEdit">
         </el-input>
       </el-form-item>
-      <el-form-item :label="$t('views.userManage.userForm.nick_name.label')">
-        <el-input
-          v-model="userForm.nick_name"
-          :placeholder="$t('views.userManage.userForm.nick_name.placeholder')"
-          maxlength="64"
-          show-word-limit
-        >
+      <el-form-item prop="nick_name" :label="$t('views.userManage.userForm.nick_name.label')">
+        <el-input v-model="userForm.nick_name" :placeholder="$t('views.userManage.userForm.nick_name.placeholder')"
+          maxlength="64" show-word-limit>
         </el-input>
       </el-form-item>
       <el-form-item :label="$t('views.login.loginForm.email.label')" prop="email">
-        <el-input
-          type="email"
-          v-model="userForm.email"
-          :placeholder="$t('views.login.loginForm.email.placeholder')"
-        >
+        <el-input type="email" v-model="userForm.email" :placeholder="$t('views.login.loginForm.email.placeholder')">
         </el-input>
       </el-form-item>
       <el-form-item :label="$t('views.userManage.userForm.phone.label')">
-        <el-input
-          v-model="userForm.phone"
-          :placeholder="$t('views.userManage.userForm.phone.placeholder')"
-        >
+        <el-input v-model="userForm.phone" :placeholder="$t('views.userManage.userForm.phone.placeholder')">
         </el-input>
       </el-form-item>
-      <el-form-item
-        :label="$t('views.userManage.form.password.label')"
-        prop="password"
-        v-if="!isEdit"
-      >
-        <el-input
-          type="password"
-          v-model="userForm.password"
-          :placeholder="$t('views.userManage.form.password.placeholder')"
-          show-password
-        >
-        </el-input>
+      <el-form-item label="默认密码" v-if="!isEdit">
+        <span class="mr-8">{{ userForm.password }}</span>
+        <el-button type="primary" link @click="copyClick(userForm.password)">
+          <AppIcon iconName="app-copy"></AppIcon>
+        </el-button>
+      </el-form-item>
+      <h4 class="title-decoration-1 mb-16 mt-8">{{ $t('views.chatUser.group.title') }}</h4>
+      <el-form-item :label="$t('views.chatUser.group.title')" prop="user_group_ids">
+        <el-select v-model="userForm.user_group_ids" multiple filterable
+          :placeholder="`${$t('common.selectPlaceholder')}${$t('views.chatUser.group.title')}`"
+          :loading="props.optionLoading">
+          <el-option v-for="item in props.chatGroupList" :key="item.id" :label="item.name" :value="item.id">
+          </el-option>
+        </el-select>
       </el-form-item>
     </el-form>
     <template #footer>
@@ -74,15 +49,20 @@
   </el-drawer>
 </template>
 <script setup lang="ts">
-import {ref, reactive, watch} from 'vue'
-import type {FormInstance} from 'element-plus'
-import userManageApi from '@/api/system/chat-user'
-import {MsgSuccess} from '@/utils/message'
-import {t} from '@/locales'
+import { ref, reactive, watch } from 'vue'
+import type { FormInstance } from 'element-plus'
+import chatUserApi from '@/api/system/chat-user'
+import userManageApi from '@/api/user/user-manage'
+import { MsgSuccess } from '@/utils/message'
+import { t } from '@/locales'
+import type { ListItem } from '@/api/type/common'
+import { copyClick } from '@/utils/clipboard'
 
-const props = defineProps({
-  title: String,
-})
+const props = defineProps<{
+  title: string,
+  optionLoading: boolean,
+  chatGroupList: ListItem[],
+}>()
 
 const emit = defineEmits(['refresh'])
 
@@ -93,6 +73,7 @@ const userForm = ref<any>({
   password: '',
   phone: '',
   nick_name: '',
+  user_group_ids: []
 })
 
 const rules = reactive({
@@ -109,23 +90,10 @@ const rules = reactive({
       trigger: 'blur',
     },
   ],
-  email: [
+  nick_name: [
     {
       required: true,
-      message: t('views.login.loginForm.email.requiredMessage'),
-      trigger: 'blur',
-    },
-  ],
-  password: [
-    {
-      required: true,
-      message: t('views.login.loginForm.password.requiredMessage'),
-      trigger: 'blur',
-    },
-    {
-      min: 6,
-      max: 20,
-      message: t('views.login.loginForm.password.lengthMessage'),
+      message: t('views.userManage.userForm.nick_name.placeholder'),
       trigger: 'blur',
     },
   ],
@@ -142,6 +110,7 @@ watch(visible, (bool) => {
       password: '',
       phone: '',
       nick_name: '',
+      user_group_ids: []
     }
     isEdit.value = false
     userFormRef.value?.clearValidate()
@@ -153,11 +122,16 @@ const open = (data: any) => {
     userForm.value['id'] = data.id
     userForm.value.username = data.username
     userForm.value.email = data.email
-    userForm.value.password = data.password
     userForm.value.phone = data.phone
     userForm.value.nick_name = data.nick_name
+    userForm.value.user_group_ids = data.user_group_ids
     isEdit.value = true
+  } else {
+    userManageApi.getSystemDefaultPassword().then((res: any) => {
+      userForm.value.password = res.data.password
+    })
   }
+
   visible.value = true
 }
 
@@ -166,13 +140,13 @@ const submit = async (formEl: FormInstance | undefined) => {
   await formEl.validate((valid, fields) => {
     if (valid) {
       if (isEdit.value) {
-        userManageApi.putUserManage(userForm.value.id, userForm.value, loading).then((res) => {
+        chatUserApi.putUserManage(userForm.value.id, userForm.value, loading).then((res) => {
           emit('refresh')
           MsgSuccess(t('common.editSuccess'))
           visible.value = false
         })
       } else {
-        userManageApi.postUserManage(userForm.value, loading).then((res) => {
+        chatUserApi.postUserManage(userForm.value, loading).then((res) => {
           emit('refresh')
           MsgSuccess(t('common.createSuccess'))
           visible.value = false
@@ -182,6 +156,10 @@ const submit = async (formEl: FormInstance | undefined) => {
   })
 }
 
-defineExpose({open})
+defineExpose({ open })
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+:deep(.el-form-item__content) {
+  font-weight: 400
+}
+</style>

@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="$t('views.userManage.setting.updatePwd')" v-model="dialogVisible">
+  <el-dialog :title="$t('views.login.resetPassword')" v-model="dialogVisible">
     <el-form
       ref="userFormRef"
       :model="userForm"
@@ -44,7 +44,7 @@ import { ref, reactive, watch } from 'vue'
 import useStore from '@/stores'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { ResetPasswordRequest } from '@/api/type/user'
-import userManageApi from '@/api/user/user-manage'
+import userManageApi from '@/api/system/chat-user'
 import { MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
 const emit = defineEmits(['refresh'])
