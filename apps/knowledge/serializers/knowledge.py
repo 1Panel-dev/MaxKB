@@ -51,14 +51,14 @@ class KnowledgeBaseCreateRequest(serializers.Serializer):
     name = serializers.CharField(required=True, label=_('knowledge name'))
     folder_id = serializers.CharField(required=True, label=_('folder id'))
     desc = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('knowledge description'))
-    embedding = serializers.CharField(required=True, label=_('knowledge embedding'))
+    embedding_model_id = serializers.CharField(required=True, label=_('knowledge embedding'))
 
 
 class KnowledgeWebCreateRequest(serializers.Serializer):
     name = serializers.CharField(required=True, label=_('knowledge name'))
     folder_id = serializers.CharField(required=True, label=_('folder id'))
     desc = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('knowledge description'))
-    embedding = serializers.CharField(required=True, label=_('knowledge embedding'))
+    embedding_model_id = serializers.CharField(required=True, label=_('knowledge embedding'))
     source_url = serializers.CharField(required=True, label=_('source url'))
     selector = serializers.CharField(required=True, label=_('knowledge selector'))
 
