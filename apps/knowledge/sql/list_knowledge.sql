@@ -13,6 +13,7 @@ FROM (SELECT "temp_knowledge".id::text, "temp_knowledge".name,
              "temp_knowledge"."scope",
              "temp_knowledge"."embedding_model_id"::text,
              "document_temp"."char_length",
+             to_json("temp_knowledge".meta)::jsonb       as meta,
              CASE
                  WHEN
                      "app_knowledge_temp"."count" IS NULL THEN 0
@@ -43,6 +44,7 @@ FROM (SELECT "temp_knowledge".id::text, "temp_knowledge".name,
              'WORKSPACE' as "scope",
              ''          as "embedding_model_id",
              0 as char_length,
+             '{}'::jsonb as meta,
                 0 as application_mapping_count,
                 0 as document_count
       from knowledge_folder ${folder_query_set}) temp

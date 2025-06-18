@@ -1,4 +1,5 @@
 import io
+import json
 import logging
 import os
 import re
@@ -288,9 +289,11 @@ class KnowledgeSerializer(serializers.Serializer):
                 'folder_query_set': QuerySet(KnowledgeFolder)
             }
             all_application_list = [str(adm.get('id')) for adm in self.list_application(with_valid=False)]
+            knowledge_dict = native_search(query_set_dict, select_string=get_file_content(
+                os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'list_knowledge.sql')), with_search_one=True)
             return {
-                **native_search(query_set_dict, select_string=get_file_content(
-                    os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'list_knowledge.sql')), with_search_one=True),
+                **knowledge_dict,
+                'meta': json.loads(knowledge_dict.get('meta', '{}')),
                 'application_id_list': list(filter(
                     lambda application_id: all_application_list.__contains__(application_id),
                     [
