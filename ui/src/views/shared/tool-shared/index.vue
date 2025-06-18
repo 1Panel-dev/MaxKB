@@ -69,7 +69,7 @@
                 </template>
                 <template #subTitle>
                   <el-text class="color-secondary lighter" size="small">
-                    {{ $t('common.creator') }}: {{ item.username }}
+                    {{ $t('common.creator') }}: {{ item.nick_name }}
                   </el-text>
                 </template>
               </CardBox>
@@ -92,7 +92,7 @@
                 </template>
                 <template #subTitle>
                   <el-text class="color-secondary lighter" size="small">
-                    {{ $t('common.creator') }}: {{ item.username }}
+                    {{ $t('common.creator') }}: {{ item.nick_name }}
                   </el-text>
                 </template>
 
