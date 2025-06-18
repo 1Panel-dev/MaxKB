@@ -56,7 +56,7 @@
 </template>
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import ToolApi from '@/api/shared/tool'
+import ToolApi from '@/api/tool/tool'
 import { cloneDeep } from 'lodash'
 import { MsgError, MsgSuccess } from '@/utils/message'
 import { defaultIcon, isAppIcon } from '@/utils/common'
