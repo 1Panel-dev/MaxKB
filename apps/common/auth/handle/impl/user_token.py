@@ -151,13 +151,13 @@ def get_permission_list(user,
             workspace_user_role_mapping_list = QuerySet(workspace_user_role_mapping_model).filter(user_id=user_id)
             workspace_user_role_mapping_dict = group_by(workspace_user_role_mapping_list,
                                                         lambda item: item.workspace_id)
+            role_id_list = list(set([workspace_user_role_mapping.role_id for workspace_user_role_mapping in
+                                     workspace_user_role_mapping_list]))
             # 获取角色权限映射数据
             role_permission_mapping_list = QuerySet(role_permission_mapping_model).filter(
-                role_id__in=[workspace_user_role_mapping.role_id for workspace_user_role_mapping in
-                             workspace_user_role_mapping_list])
-            system_role_permission_mapping_list = get_default_role_permission_mapping_list()
+                role_id__in=role_id_list)
             role_permission_mapping_dict = group_by(
-                [*role_permission_mapping_list, *system_role_permission_mapping_list], lambda item: item.role_id)
+                role_permission_mapping_list, lambda item: item.role_id)
 
             workspace_user_permission_list = QuerySet(WorkspaceUserResourcePermission).filter(
                 workspace_id__in=[workspace_user_role.workspace_id for workspace_user_role in
@@ -170,11 +170,15 @@ def get_permission_list(user,
 
             workspace_permission_list = get_workspace_permission_list(role_permission_mapping_dict,
                                                                       workspace_user_role_mapping_list)
+            system_role_permission_mapping_list = list(set([role_permission.permission_id for role_permission in
+                                                            get_default_role_permission_mapping_list() if
+                                                            role_id_list.__contains__(role_permission.role_id)]))
             # 系统权限
             system_permission_list = [role_permission_mapping.permission_id for role_permission_mapping in
                                       role_permission_mapping_list]
             # 合并权限
-            permission_list = system_permission_list + workspace_permission_list + workspace_resource_permission_list
+            permission_list = system_permission_list + workspace_permission_list + workspace_resource_permission_list + system_role_permission_mapping_list
+            permission_list = list(set(permission_list))
             cache.set(key, permission_list, version=version)
         else:
             workspace_id_list = ['default']
@@ -199,6 +203,7 @@ def get_permission_list(user,
                                       [user.role].__contains__(role_permission_mapping.role_id)]
             # 合并权限
             permission_list = system_permission_list + workspace_permission_list + workspace_resource_permission_list
+            permission_list = list(set(permission_list))
             cache.set(key, permission_list, version=version)
     return permission_list
 
@@ -220,13 +225,13 @@ def get_role_list(user,
         if is_query_model:
             # 获取工作空间 用户 角色映射数据
             workspace_user_role_mapping_list = QuerySet(workspace_user_role_mapping_model).filter(user_id=user.id)
-            workspace_list = [
-                                 f"{workspace_user_role_mapping.role_id}:/WORKSPACE/{workspace_user_role_mapping.workspace_id}"
-                                 for
-                                 workspace_user_role_mapping in
-                                 workspace_user_role_mapping_list] + [user.role]
+            role_list = [
+                            f"{workspace_user_role_mapping.role_id}:/WORKSPACE/{workspace_user_role_mapping.workspace_id}"
+                            for
+                            workspace_user_role_mapping in
+                            workspace_user_role_mapping_list] + [user.role]
             cache.set(key, workspace_list, version=version)
-            return workspace_list
+            return role_list
         else:
             role_list = [user.role]
             if user.role == RoleConstants.ADMIN.value.__str__():
