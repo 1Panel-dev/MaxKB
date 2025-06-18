@@ -355,7 +355,7 @@ class ModelSerializer(serializers.Serializer):
                     'status': model.status,
                     'meta': model.meta,
                     'user_id': model.user_id,
-                    'username': model.user.username
+                    'username': model.user.nick_name
                 }
                 for model in Model.objects.filter(**query_params).order_by("-create_time")
             ]
@@ -409,7 +409,7 @@ class SharedModelSerializer(serializers.Serializer):
                 'status': model.status,
                 'meta': model.meta,
                 'user_id': model.user_id,
-                'username': model.user.username
+                'username': model.user.nick_name
             }
             for model in queryset.order_by("-create_time")
         ]
