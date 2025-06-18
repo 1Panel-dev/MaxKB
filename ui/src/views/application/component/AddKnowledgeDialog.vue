@@ -110,7 +110,7 @@ const loading = ref(false)
 
 const filterData = computed(() => {
   return currentEmbedding.value
-    ? searchDate.value.filter((v) => v.embedding_mode_id === currentEmbedding.value)
+    ? searchDate.value.filter((v) => v.embedding_model_id === currentEmbedding.value)
     : searchDate.value
 })
 
@@ -134,7 +134,7 @@ function changeHandle() {
   if (checkList.value.length > 0) {
     currentEmbedding.value = props.data.filter(
       (v) => v.id === checkList.value[0],
-    )[0].embedding_mode_id
+    )[0].embedding_model_id
   } else if (checkList.value.length === 0) {
     currentEmbedding.value = ''
   }
@@ -150,7 +150,7 @@ const open = (checked: any) => {
   if (checkList.value.length > 0) {
     currentEmbedding.value = props.data.filter(
       (v) => v.id === checkList.value[0],
-    )[0].embedding_mode_id
+    )[0].embedding_model_id
   }
 
   dialogVisible.value = true

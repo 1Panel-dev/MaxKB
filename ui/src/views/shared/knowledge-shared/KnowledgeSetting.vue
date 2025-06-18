@@ -224,7 +224,7 @@ async function submit() {
                 ...BaseFormRef.value.form,
               }
 
-        if (cloneModelId.value !== BaseFormRef.value.form.embedding_mode_id) {
+        if (cloneModelId.value !== BaseFormRef.value.form.embedding_model_id) {
           MsgConfirm(t('common.tip'), t('views.knowledge.tip.updateModeMessage'), {
             confirmButtonText: t('views.knowledge.setting.vectorization'),
           })
@@ -265,7 +265,7 @@ async function submit() {
 function getDetail() {
   knowledge.asyncGetKnowledgeDetail(id, loading).then((res: any) => {
     detail.value = res.data
-    cloneModelId.value = res.data?.embedding_mode_id
+    cloneModelId.value = res.data?.embedding_model_id
     if (detail.value.type === '1' || detail.value.type === '2') {
       form.value = res.data.meta
     }
