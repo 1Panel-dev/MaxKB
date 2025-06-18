@@ -25,7 +25,7 @@ import { useRoute } from 'vue-router'
 const route = useRoute()
 
 const isShared = computed(() => {
-  return route.path.endsWith('hared')
+  return route.path.endsWith('hared') || route.name.includes('ResourceManagement')
 })
 const { user } = useStore()
 </script>

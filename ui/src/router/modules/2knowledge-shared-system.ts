@@ -10,7 +10,7 @@ const ModelRouter = {
     {
       path: '/knowledge/system/document/upload/shared',
       name: 'UploadDocumentSharedSystem',
-      meta: { activeMenu: '/knowledge1/system' },
+      meta: { activeMenu: '/knowledge/system' },
       component: () => import('@/views/shared/document-shared/UploadDocument.vue'),
       hidden: true,
     },

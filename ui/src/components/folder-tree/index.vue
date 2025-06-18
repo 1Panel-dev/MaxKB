@@ -125,12 +125,18 @@ const title = ref('')
 watch(filterText, (val) => {
   treeRef.value!.filter(val)
 })
+let time
 
 function handleMouseEnter(data: Tree) {
+  clearTimeout(time)
   hoverNodeId.value = data.id
 }
 function handleMouseleave() {
-  hoverNodeId.value = ''
+  time = setTimeout(() => {
+    clearTimeout(time)
+    hoverNodeId.value = ''
+    document.body.click()
+  }, 300)
 }
 const filterNode = (value: string, data: Tree) => {
   if (!value) return true

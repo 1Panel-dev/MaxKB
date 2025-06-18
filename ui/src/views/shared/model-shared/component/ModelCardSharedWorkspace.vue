@@ -61,68 +61,7 @@
         </el-button>
       </div>
     </div>
-
-    <template #mouseEnter>
-      <el-dropdown trigger="click">
-        <el-button text @click.stop>
-          <el-icon>
-            <MoreFilled />
-          </el-icon>
-        </el-button>
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item
-              icon="EditPen"
-              :disabled="!is_permisstion"
-              text
-              @click.stop="openEditModel"
-              v-hasPermission="[
-                RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                PermissionConst.MODEL_EDIT.getWorkspacePermission,
-              ]"
-            >
-              {{ $t('common.modify') }}
-            </el-dropdown-item>
-            <el-dropdown-item icon="Lock" @click.stop="openAuthorizedWorkspaceDialog(scope.row)">{{
-              $t('views.system.authorized_workspace')
-            }}</el-dropdown-item>
-
-            <el-dropdown-item
-              v-if="
-                currentModel.model_type === 'TTS' ||
-                currentModel.model_type === 'LLM' ||
-                currentModel.model_type === 'IMAGE' ||
-                currentModel.model_type === 'TTI'
-              "
-              :disabled="!is_permisstion"
-              icon="Setting"
-              @click.stop="openParamSetting"
-              v-hasPermission="[
-                RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                PermissionConst.MODEL_EDIT.getWorkspacePermission,
-              ]"
-            >
-              {{ $t('views.model.modelForm.title.paramSetting') }}
-            </el-dropdown-item>
-            <el-dropdown-item
-              divided
-              icon="Delete"
-              :disabled="!is_permisstion"
-              text
-              @click.stop="deleteModel"
-              v-hasPermission="[
-                RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                PermissionConst.MODEL_DELETE.getWorkspacePermission,
-              ]"
-            >
-              {{ $t('common.delete') }}
-            </el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
-    </template>
     <EditModel ref="editModelRef" @submit="emit('change')"></EditModel>
-    <AuthorizedWorkspace ref="AuthorizedWorkspaceDialogRef"></AuthorizedWorkspace>
     <ParamSettingDialog ref="paramSettingRef" :model="model" />
   </card-box>
 </template>
@@ -135,10 +74,9 @@ import EditModel from '@/views/shared/model-shared/component/EditModel.vue'
 import { MsgConfirm } from '@/utils/message'
 import { modelType } from '@/enums/model'
 import useStore from '@/stores'
+import AuthorizedWorkspace from '@/views/shared/AuthorizedWorkspaceDialog.vue'
 import ParamSettingDialog from './ParamSettingDialog.vue'
 import { t } from '@/locales'
-import { PermissionConst, EditionConst, RoleConst } from '@/utils/permission/data'
-import AuthorizedWorkspace from '@/views/shared/AuthorizedWorkspaceDialog.vue'
 
 const props = defineProps<{
   model: Model
@@ -148,7 +86,6 @@ const props = defineProps<{
 
 const { user } = useStore()
 const downModel = ref<Model>()
-const AuthorizedWorkspaceDialogRef = ref()
 
 const is_permisstion = computed(() => {
   return user.userInfo?.id == props.model.user_id
@@ -160,11 +97,7 @@ const currentModel = computed(() => {
     return props.model
   }
 })
-function openAuthorizedWorkspaceDialog(row: any) {
-  if (AuthorizedWorkspaceDialogRef.value) {
-    AuthorizedWorkspaceDialogRef.value.open(row, 'Model')
-  }
-}
+
 const errMessage = computed(() => {
   if (currentModel.value.meta && currentModel.value.meta.message) {
     if (currentModel.value.meta.message === 'pull model manifest: file does not exist') {

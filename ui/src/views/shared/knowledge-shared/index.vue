@@ -171,9 +171,6 @@
                   @click="
                     router.push({
                       path: `/knowledge/system/${item.id}/documentShared`,
-                      query: {
-                        from: 'shared',
-                      },
                     })
                   "
                 >
@@ -240,9 +237,6 @@
                               @click.stop="
                                 router.push({
                                   path: `/knowledge/system/${item.id}/settingShared`,
-                                  query: {
-                                    from: 'shared',
-                                  },
                                 })
                               "
                             >
