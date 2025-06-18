@@ -38,14 +38,14 @@
         <el-checkbox-group v-model="checkedWorkspace" @change="handleCheckedWorkspaceChange">
           <el-checkbox
             v-for="space in workspaceWithKeywords"
-            :key="space"
-            :label="space"
+            :key="space.id"
+            :label="space.name"
             :value="space"
           >
             <el-icon size="20">
               <momentsCategories></momentsCategories>
             </el-icon>
-            {{ space }}
+            {{ space.name }}
           </el-checkbox>
         </el-checkbox-group>
       </div>
@@ -58,7 +58,7 @@
           <el-icon size="20">
             <momentsCategories></momentsCategories>
           </el-icon>
-          <div class="label">{{ ele }}</div>
+          <div class="label">{{ ele.name }}</div>
           <el-icon @click="clearWorkspace(ele)" class="close" size="16">
             <closeIcon></closeIcon>
           </el-icon>
@@ -98,7 +98,7 @@ const closeIcon = iconMap['close-outlined'].iconReader()
 const momentsCategories = iconMap['moments-categories'].iconReader()
 
 const workspaceWithKeywords = computed(() => {
-  return workspace.value.filter((ele) => (ele as string).includes(search.value))
+  return workspace.value.filter((ele) => (ele.name as string).includes(search.value))
 })
 const handleCheckAllChange = (val: CheckboxValueType) => {
   checkedWorkspace.value = val ? workspace.value : []
@@ -117,7 +117,7 @@ const handleCheckedWorkspaceChange = (value: CheckboxValueType[]) => {
   checkAll.value = checkedCount === workspace.value.length
   isIndeterminate.value = checkedCount > 0 && checkedCount < workspace.value.length
   auth_list = [
-    ...value.map((ele) => ({ authentication_type: listType.value, workspace_id: ele })),
+    ...value.map((ele) => ({ authentication_type: listType.value, workspace_id: ele.id, name: ele.name })),
     ...auth_list.filter((ele) => ele.authentication_type !== listType.value),
   ]
 }
@@ -133,7 +133,10 @@ const open = ({ id }: any, type = 'Knowledge') => {
     .then((res: any) => {
       auth_list = (res.data || {}).auth_list || []
       un_auth_list = (res.data || {}).un_auth_list || []
-      workspace.value = [...un_auth_list, ...auth_list.map((ele) => ele.workspace_id)] as any
+      workspace.value = [
+        ...un_auth_list,
+        ...auth_list.map((ele) => ({ id: ele.workspace_id, name: ele.name })),
+      ] as any
       handleListTypeChange(listType.value)
     })
     .finally(() => {
@@ -144,7 +147,7 @@ const open = ({ id }: any, type = 'Knowledge') => {
 
 const handleConfirm = () => {
   authorizationApi[`postSharedAuthorization${currentType}`](knowledge_id, {
-    workspace_id_list: checkedWorkspace.value,
+    workspace_id_list: checkedWorkspace.value.map(ele => ele.id),
     authentication_type: listType.value,
   }).then(() => {
     centerDialogVisible.value = false
@@ -152,8 +155,8 @@ const handleConfirm = () => {
 }
 
 const clearWorkspace = (val: any) => {
-  checkedWorkspace.value = checkedWorkspace.value.filter((ele) => ele !== val)
-  auth_list = auth_list.filter((ele) => ele.workspace_id !== val)
+  checkedWorkspace.value = checkedWorkspace.value.filter((ele) => ele.id !== val.id)
+  auth_list = auth_list.filter((ele) => ele.workspace_id !== val.id)
 }
 
 const clearWorkspaceAll = () => {
@@ -165,7 +168,7 @@ const clearWorkspaceAll = () => {
 const handleListTypeChange = (val: any) => {
   checkedWorkspace.value = auth_list
     .filter((ele) => ele.authentication_type === val)
-    .map((ele) => ele.workspace_id) as any
+    .map((ele) => ({ id: ele.workspace_id, name: ele.name })) as any
   handleCheckedWorkspaceChange(checkedWorkspace.value)
 }
 defineExpose({
