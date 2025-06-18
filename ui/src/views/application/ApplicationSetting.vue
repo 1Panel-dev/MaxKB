@@ -4,7 +4,9 @@
       <h3>
         {{ $t('common.setting') }}
       </h3>
-      <el-button type="primary" @click="submit(applicationFormRef)" :disabled="loading">
+      <el-button type="primary" @click="submit(applicationFormRef)" :disabled="loading"
+        v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.APPLICATION_OVERVIEW_PUBLIC.getWorkspacePermission]"
+      >
         {{ $t('views.application.buttons.publish') }}
       </el-button>
     </div>
@@ -439,6 +441,8 @@ import useStore from '@/stores'
 import { t } from '@/locales'
 import TTSModeParamSettingDialog from './component/TTSModeParamSettingDialog.vue'
 import ReasoningParamSettingDialog from './component/ReasoningParamSettingDialog.vue'
+import { PermissionConst, RoleConst } from '@/utils/permission/data'
+import { hasPermission } from '@/utils/permission/index'
 
 const { knowledge, model, application } = useStore()
 

@@ -75,11 +75,11 @@
         <template #dropdown>
           <el-dropdown-menu>
             <el-dropdown-item
+              v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.MODEL_EDIT.getWorkspacePermission],'OR')"
               icon="EditPen"
               :disabled="!is_permisstion"
               text
               @click.stop="openEditModel"
-              v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.MODEL_EDIT.getWorkspacePermission]"
             >
               {{ $t('common.modify') }}
             </el-dropdown-item>
@@ -89,12 +89,12 @@
                 currentModel.model_type === 'TTS' ||
                 currentModel.model_type === 'LLM' ||
                 currentModel.model_type === 'IMAGE' ||
-                currentModel.model_type === 'TTI'
+                currentModel.model_type === 'TTI' ||
+                hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.MODEL_EDIT.getWorkspacePermission],'OR')
               "
               :disabled="!is_permisstion"
               icon="Setting"
               @click.stop="openParamSetting"
-              v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.MODEL_EDIT.getWorkspacePermission]"
             >
               {{ $t('views.model.modelForm.title.paramSetting') }}
             </el-dropdown-item>
@@ -104,7 +104,7 @@
               :disabled="!is_permisstion"
               text
               @click.stop="deleteModel"
-              v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.MODEL_DELETE.getWorkspacePermission]"
+              v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.MODEL_DELETE.getWorkspacePermission],'OR')"
             >
               {{ $t('common.delete') }}
             </el-dropdown-item>
@@ -127,7 +127,8 @@ import {modelType} from '@/enums/model'
 import useStore from '@/stores'
 import ParamSettingDialog from './ParamSettingDialog.vue'
 import {t} from '@/locales'
-import { PermissionConst, EditionConst, RoleConst } from '@/utils/permission/data'
+import { PermissionConst, RoleConst } from '@/utils/permission/data'
+import { hasPermission } from '@/utils/permission'
 
 const props = defineProps<{
   model: Model

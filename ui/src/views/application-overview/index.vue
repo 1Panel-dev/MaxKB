@@ -53,6 +53,7 @@
                     :active-text="$t('views.applicationOverview.appInfo.openText')"
                     :inactive-text="$t('views.applicationOverview.appInfo.closeText')"
                     :before-change="() => changeState(accessToken.is_active)"
+                    v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.APPLICATION_EDIT.getWorkspacePermission]"
                   />
                 </div>
 
@@ -91,15 +92,21 @@
                     <AppIcon iconName="app-create-chat" class="mr-4"></AppIcon>
                     {{ $t('views.application.operation.toChat') }}
                   </el-button>
-                  <el-button :disabled="!accessToken?.is_active" @click="openDialog">
+                  <el-button :disabled="!accessToken?.is_active" @click="openDialog"
+                    v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.APPLICATION_OVERVIEW_EMBEDDED.getWorkspacePermission]"
+                  >
                     <AppIcon iconName="app-export" class="mr-4"></AppIcon>
                     {{ $t('views.applicationOverview.appInfo.embedInWebsite') }}
                   </el-button>
-                  <el-button @click="openLimitDialog">
+                  <el-button @click="openLimitDialog"
+                    v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.APPLICATION_OVERVIEW_ACCESS.getWorkspacePermission]"
+                  >
                     <el-icon class="mr-4"><Lock /></el-icon>
                     {{ $t('views.applicationOverview.appInfo.accessControl') }}
                   </el-button>
-                  <el-button @click="openDisplaySettingDialog">
+                  <el-button @click="openDisplaySettingDialog"
+                    v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.APPLICATION_OVERVIEW_DISPLAY.getWorkspacePermission]"
+                  >
                     <el-icon class="mr-4"><Setting /></el-icon>
                     {{ $t('views.applicationOverview.appInfo.displaySetting') }}
                   </el-button>
@@ -139,7 +146,9 @@
                   </div>
                 </div>
                 <div>
-                  <el-button @click="openAPIKeyDialog">
+                  <el-button @click="openAPIKeyDialog"
+                  v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.APPLICATION_OVERVIEW_API_KEY.getWorkspacePermission]"
+                  >
                     <el-icon class="mr-4"><Key /></el-icon>
                     {{ $t('views.applicationOverview.appInfo.apiKey') }}</el-button
                   >
@@ -215,6 +224,8 @@ import { copyClick } from '@/utils/clipboard'
 import { isAppIcon } from '@/utils/common'
 import useStore from '@/stores'
 import { t } from '@/locales'
+import { PermissionConst, RoleConst } from '@/utils/permission/data'
+import { hasPermission } from '@/utils/permission/index'
 const { user, application } = useStore()
 const route = useRoute()
 const {

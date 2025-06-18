@@ -38,12 +38,19 @@
           clearable
         />
         <div style="display: flex; align-items: center" class="float-right">
-          <el-button @click="dialogVisible = true">{{
-            $t('views.chatLog.buttons.clearStrategy')
-          }}</el-button>
-          <el-button @click="exportLog">{{ $t('common.export') }}</el-button>
+          <el-button @click="dialogVisible = true"
+            v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.APPLICATION_CHAT_LOG_POLICY.getWorkspacePermission]"
+          >
+            {{$t('views.chatLog.buttons.clearStrategy')}}
+          </el-button>
+          <el-button @click="exportLog"
+            v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.APPLICATION_CHAT_LOG_EXPORT.getWorkspacePermission]"
+          >
+            {{ $t('common.export') }}
+          </el-button>
           <el-button @click="openDocumentDialog" :disabled="multipleSelection.length === 0"
-            >{{ $t('views.chatLog.addToKnowledge') }}
+            v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.APPLICATION_CHAT_LOG_EXPORT.getWorkspacePermission]"
+          >{{ $t('views.chatLog.addToKnowledge') }}
           </el-button>
         </div>
       </div>
@@ -278,6 +285,8 @@ import type { Dict } from '@/api/type/common'
 import { t } from '@/locales'
 import type { FormInstance, FormRules } from 'element-plus'
 import { ElTable } from 'element-plus'
+import { PermissionConst, RoleConst } from '@/utils/permission/data'
+import { hasPermission } from '@/utils/permission/index'
 
 const { application, chatLog, document, user } = useStore()
 const route = useRoute()
