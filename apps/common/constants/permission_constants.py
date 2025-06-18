@@ -629,31 +629,31 @@ class PermissionConstants(Enum):
                                            parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
                                            resource_permission_group_list=[ResourcePermissionGroup.VIEW],
                                            )
-    APPLICATION_OVERVIEW_EMBEDDED = Permission(group=Group.OVERVIEW, operate=Operate.READ,
+    APPLICATION_OVERVIEW_EMBEDDED = Permission(group=Group.OVERVIEW, operate=Operate.EDIT,
                                                role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                                parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
                                                resource_permission_group_list=[ResourcePermissionGroup.VIEW],
                                                label=_('Embed third party')
                                                )
-    APPLICATION_OVERVIEW_ACCESS = Permission(group=Group.OVERVIEW, operate=Operate.READ,
+    APPLICATION_OVERVIEW_ACCESS = Permission(group=Group.OVERVIEW, operate=Operate.CREATE,
                                              role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                              parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
                                              resource_permission_group_list=[ResourcePermissionGroup.VIEW],
                                              label=_('Access restrictions')
                                              )
-    APPLICATION_OVERVIEW_DISPLAY = Permission(group=Group.OVERVIEW, operate=Operate.READ,
+    APPLICATION_OVERVIEW_DISPLAY = Permission(group=Group.OVERVIEW, operate=Operate.DELETE,
                                               role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                               parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
                                               resource_permission_group_list=[ResourcePermissionGroup.VIEW],
                                               label=_('Display settings')
                                               )
-    APPLICATION_OVERVIEW_API_KEY = Permission(group=Group.OVERVIEW, operate=Operate.READ,
+    APPLICATION_OVERVIEW_API_KEY = Permission(group=Group.OVERVIEW, operate=Operate.DEBUG,
                                               role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                               parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
                                               resource_permission_group_list=[ResourcePermissionGroup.VIEW],
                                               label=_('API Key')
                                               )
-    APPLICATION_OVERVIEW_PUBLIC = Permission(group=Group.OVERVIEW, operate=Operate.READ,
+    APPLICATION_OVERVIEW_PUBLIC = Permission(group=Group.OVERVIEW, operate=Operate.ADD_MEMBER,
                                              role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                              parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
                                              resource_permission_group_list=[ResourcePermissionGroup.VIEW],
@@ -693,12 +693,28 @@ class PermissionConstants(Enum):
                                          parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
                                          resource_permission_group_list=[ResourcePermissionGroup.VIEW],
                                          )
+    ABOUT_READ = Permission(group=Group.OTHER, operate=Operate.READ,
+                            role_list=[RoleConstants.ADMIN],
+                            parent_group=[SystemGroup.OTHER],
+                            label=_('About')
+                            )
+    SWITCH_LANGUAGE = Permission(group=Group.OTHER, operate=Operate.EDIT,
+                                 role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                 parent_group=[SystemGroup.OTHER, WorkspaceGroup.OTHER, UserGroup.OTHER],
+                                 label=_('Switch Language')
+                                 )
+    CHANGE_PASSWORD = Permission(group=Group.OTHER, operate=Operate.CREATE,
+                                 role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                 parent_group=[SystemGroup.OTHER, WorkspaceGroup.OTHER, UserGroup.OTHER],
+                                 label=_('Change Password')
+                                 )
 
-    SYSTEM_API_KEY_EDIT = Permission(group=Group.OTHER, operate=Operate.EDIT,
+    SYSTEM_API_KEY_EDIT = Permission(group=Group.OTHER, operate=Operate.DELETE,
                                      role_list=[RoleConstants.ADMIN],
                                      parent_group=[SystemGroup.OTHER],
                                      label=_('System API Key')
                                      )
+
     APPEARANCE_SETTINGS_READ = Permission(group=Group.APPEARANCE_SETTINGS, operate=Operate.READ,
                                           role_list=[RoleConstants.ADMIN],
                                           parent_group=[SystemGroup.SYSTEM_SETTING]
