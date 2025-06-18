@@ -227,10 +227,6 @@
                         <el-button
                           text
                           @click.stop
-                          v-hasPermission="[
-                            RoleConst.ADMIN.getWorkspaceRole,
-                            PermissionConst.KNOWLEDGE_EDIT.getWorkspacePermission,
-                          ]"
                         >
                           <el-icon>
                             <MoreFilled />
@@ -241,10 +237,14 @@
                             <el-dropdown-item
                               icon="Refresh"
                               @click.stop="syncKnowledge(item)"
-                              v-if="item.type === 1"
+                              v-if="item.type === 1 ||
+                              hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_SYNC.getWorkspacePermission],'OR')
+                              "
                               >{{ $t('views.knowledge.setting.sync') }}
                             </el-dropdown-item>
-                            <el-dropdown-item @click.stop="reEmbeddingKnowledge(item)">
+                            <el-dropdown-item @click.stop="reEmbeddingKnowledge(item)"
+                              v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_VECTOR.getWorkspacePermission],'OR')"
+                            >
                               <AppIcon iconName="app-vectorization"></AppIcon>
                               {{ $t('views.knowledge.setting.vectorization') }}
                             </el-dropdown-item>
@@ -252,28 +252,36 @@
                             <el-dropdown-item
                               icon="Connection"
                               @click.stop="openGenerateDialog(item)"
-                              >{{ $t('views.document.generateQuestion.title') }}</el-dropdown-item
-                            >
+                              v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_PROBLEM_CREATE.getWorkspacePermission],'OR')"
+                              >{{ $t('views.document.generateQuestion.title') }}
+                            </el-dropdown-item>
                             <el-dropdown-item
                               icon="Setting"
                               @click.stop="
                                 router.push({
                                   path: `/knowledge/${item.id}/${currentFolder.value}/setting`,
-                                })
-                              "
+                                })"
+                              v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_EDIT.getWorkspacePermission],'OR')"
                             >
-                              {{ $t('common.setting') }}</el-dropdown-item
+                              {{ $t('common.setting') }}
+                            </el-dropdown-item
                             >
-                            <el-dropdown-item @click.stop="exportKnowledge(item)">
+                            <el-dropdown-item @click.stop="exportKnowledge(item)"
+                              v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_EXPORT.getWorkspacePermission],'OR')"
+                            >
                               <AppIcon iconName="app-export"></AppIcon
-                              >{{ $t('views.document.setting.export') }} Excel</el-dropdown-item
+                              >{{ $t('views.document.setting.export') }} Excel
+                            </el-dropdown-item>
+                            <el-dropdown-item @click.stop="exportZipKnowledge(item)"
+                              v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_EXPORT.getWorkspacePermission],'OR')"
                             >
-                            <el-dropdown-item @click.stop="exportZipKnowledge(item)">
                               <AppIcon iconName="app-export"></AppIcon
                               >{{ $t('views.document.setting.export') }} ZIP</el-dropdown-item
                             >
-                            <el-dropdown-item icon="Delete" @click.stop="deleteKnowledge(item)">{{
-                              $t('common.delete')
+                            <el-dropdown-item icon="Delete" @click.stop="deleteKnowledge(item)"
+                              v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_EXPORT.getWorkspacePermission],'OR')"
+                            >
+                              {{$t('common.delete')
                             }}</el-dropdown-item>
                           </el-dropdown-menu>
                         </template>

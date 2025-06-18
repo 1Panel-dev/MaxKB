@@ -28,9 +28,12 @@
                 v-model="item.isActive"
                 @change="changeStatus(item.key, item.isActive)"
                 :disabled="!item.exists"
+                v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.APPLICATION_ACCESS_EDIT.getWorkspacePermission]"
               />
               <el-divider direction="vertical" />
-              <el-button class="mr-4" @click="openDrawer(item.key)">{{
+              <el-button class="mr-4" @click="openDrawer(item.key)"
+                v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.APPLICATION_ACCESS_EDIT.getWorkspacePermission]"
+              >{{
                 $t('views.application.applicationAccess.setting')
               }}</el-button>
             </div>
@@ -49,6 +52,8 @@ import applicationApi from '@/api/application/application'
 import { MsgSuccess } from '@/utils/message'
 import { useRoute } from 'vue-router'
 import { t } from '@/locales'
+import { PermissionConst, RoleConst } from '@/utils/permission/data'
+import { hasPermission } from '@/utils/permission/index'
 
 // 平台数据
 const platforms = reactive([
