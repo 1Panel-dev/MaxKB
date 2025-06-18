@@ -45,8 +45,15 @@ def save_image(image_list):
                             QuerySet(File).filter(id__in=[i.id for i in image_list]).values('id')]
         save_image_list = [image for image in image_list if not exist_image_list.__contains__(str(image.id))]
         save_image_list = list({img.id: img for img in save_image_list}.values())
-        if len(save_image_list) > 0:
-            QuerySet(File).bulk_create(save_image_list)
+        print('Saving images:', len(save_image_list))
+        # for file in save_image_list:
+        #     file_bytes = file.meta.pop('content')
+        #     file.meta['knowledge_id'] = self.data.get('knowledge_id')
+        #     file.source_type = FileSourceType.KNOWLEDGE
+        #     file.source_id = self.data.get('knowledge_id')
+        #     file.save(file_bytes)
+        # if len(save_image_list) > 0:
+        #     QuerySet(File).bulk_create(save_image_list)
 
 
 default_split_handle = TextSplitHandle()
