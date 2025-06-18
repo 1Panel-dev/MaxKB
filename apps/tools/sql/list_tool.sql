@@ -1,29 +1,33 @@
 select *
-from (select "id"::text,
-             "name",
-             "desc",
-             "tool_type",
-             'tool' as "resource_type",
-             "workspace_id",
-             "folder_id",
-             "user_id",
-             "icon",
-             "create_time",
-             "update_time",
-             "is_active"
-      from tool ${tool_scope_query_set}
+from (select tool."id"::text,
+             tool."name",
+             tool."desc",
+             tool."tool_type",
+             'tool'           as "resource_type",
+             tool."workspace_id",
+             tool."folder_id",
+             tool."user_id",
+             "user".nick_name as "nick_name",
+             tool."icon",
+             tool."create_time",
+             tool."update_time",
+             tool."is_active"
+      from tool
+               left join "user" on "user".id = user_id ${tool_scope_query_set}
       UNION
-      select "id",
-             "name",
-             "desc",
-             'folder'    as "tool_type",
-             'folder'    as "resource_type",
-             "workspace_id",
-             "parent_id" as "folder_id",
-             "user_id",
-             '' as "icon",
-             "create_time",
-             "update_time",
-             'true' as "is_active"
-      from tool_folder ${folder_query_set}) temp
+      select tool_folder."id",
+             tool_folder."name",
+             tool_folder."desc",
+             'folder'                as "tool_type",
+             'folder'                as "resource_type",
+             tool_folder."workspace_id",
+             tool_folder."parent_id" as "folder_id",
+             tool_folder."user_id",
+             "user".nick_name        as "nick_name",
+             ''                      as "icon",
+             tool_folder."create_time",
+             tool_folder."update_time",
+             'true'                  as "is_active"
+      from tool_folder
+               left join "user" on "user".id = user_id ${folder_query_set}) temp
     ${tool_query_set}

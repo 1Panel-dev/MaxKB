@@ -6,6 +6,7 @@ FROM (SELECT "temp_knowledge".id::text, "temp_knowledge".name,
              "temp_knowledge".workspace_id,
              "temp_knowledge".folder_id,
              "temp_knowledge".user_id,
+             "user"."nick_name"                        as nick_name,
              "temp_knowledge".create_time,
              "temp_knowledge".update_time,
              "temp_knowledge".file_size_limit,
@@ -39,22 +40,25 @@ FROM (SELECT "temp_knowledge".id::text, "temp_knowledge".name,
                           FROM application_knowledge_mapping
                           GROUP BY knowledge_id) app_knowledge_temp
                          ON temp_knowledge."id" = "app_knowledge_temp".knowledge_id
+               left join "user" on "user".id = temp_knowledge.user_id
       UNION
-      SELECT "id",
-             "name",
-             "desc",
-             0           as "type",
-             'folder'    as "resource_type",
-             "workspace_id",
-             "parent_id" as "folder_id",
-             "user_id",
-             "create_time",
-             "update_time",
-             0           as file_size_limit,
-             0           as file_count_limit,
-             'WORKSPACE' as "scope",
+      SELECT knowledge_folder."id",
+             knowledge_folder."name",
+             knowledge_folder."desc",
+             0                            as "type",
+             'folder'                     as "resource_type",
+             knowledge_folder."workspace_id",
+             knowledge_folder."parent_id" as "folder_id",
+             knowledge_folder."user_id",
+             "user".nick_name             as "nick_name",
+             knowledge_folder."create_time",
+             knowledge_folder."update_time",
+             0                            as file_size_limit,
+             0                            as file_count_limit,
+             'WORKSPACE'                  as "scope",
              0 as char_length,
                 0 as application_mapping_count,
                 0 as document_count
-      from knowledge_folder ${folder_query_set}) temp
+      from knowledge_folder left join "user"
+      on "user".id = user_id ${folder_query_set}) temp
     ${default_sql}
