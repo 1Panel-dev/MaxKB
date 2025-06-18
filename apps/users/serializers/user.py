@@ -202,13 +202,13 @@ class UserManageSerializer(serializers.Serializer):
                 user_role_relations = (
                     user_role_relation_model.objects
                     .filter(user_id__in=user_ids)
-                    .select_related('role_id')  # 预加载外键数据
+                    .select_related('role')  # 预加载外键数据
                 )
 
                 # 构建用户ID到角色名称列表的映射
                 user_role_mapping = defaultdict(list)
                 for relation in user_role_relations:
-                    user_role_mapping[relation.user_id].append(relation.role_id.name)
+                    user_role_mapping[relation.user_id].append(relation.role.role_name)
 
                 return user_role_mapping
 
@@ -450,7 +450,7 @@ class UserManageSerializer(serializers.Serializer):
                         'id': user_id,
                         'nick_name': relation.user.nick_name,
                         'email': relation.user.email,
-                        'roles': [relation.role.name]
+                        'roles': [relation.role.role_name]
                     }
                 else:
                     user_dict[user_id]['roles'].append(relation.role.name)
