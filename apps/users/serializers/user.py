@@ -67,7 +67,7 @@ def is_workspace_manage(user_id: str, workspace_id: str):
     if is_x_pack_ee:
         return QuerySet(workspace_user_role_mapping_model).select_related('role', 'user').filter(
             workspace_id=workspace_id, user_id=user_id,
-            role_type=RoleConstants.WORKSPACE_MANAGE.value.__str__()).exists()
+            role=RoleConstants.WORKSPACE_MANAGE.value.__str__()).exists()
     return QuerySet(User).filter(id=user_id, role=RoleConstants.ADMIN.value.__str__()).exists()
 
 

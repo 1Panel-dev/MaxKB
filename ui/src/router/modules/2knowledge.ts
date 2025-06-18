@@ -1,7 +1,7 @@
 const ModelRouter = {
   path: '/knowledge',
   name: 'knowledge',
-  meta: { title: 'views.knowledge.title', permission: 'KNOWLEDGE:READ' },
+  meta: { title: 'views.knowledge.title' },
   redirect: '/knowledge',
   component: () => import('@/layout/layout-template/SimpleLayout.vue'),
   children: [
@@ -19,7 +19,7 @@ const ModelRouter = {
       meta: { activeMenu: '/knowledge' },
       component: () => import('@/views/document/UploadDocument.vue'),
       hidden: true,
-    }
+    },
   ],
 }
 

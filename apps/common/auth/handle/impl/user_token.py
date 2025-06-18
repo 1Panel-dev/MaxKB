@@ -109,7 +109,7 @@ def get_workspace_resource_permission_list_by_workspace_user_permission(
     @return: 工作空间用户资源的权限列表
     """
 
-    role_permission_mapping_list = [role_permission_mapping_dict.get(workspace_user_role_mapping.role_id) for
+    role_permission_mapping_list = [role_permission_mapping_dict.get(workspace_user_role_mapping.role_id, []) for
                                     workspace_user_role_mapping in
                                     workspace_user_role_mapping_dict.get(
                                         workspace_user_resource_permission.workspace_id)]
