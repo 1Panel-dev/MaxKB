@@ -66,7 +66,7 @@
             :label="$t('views.application.form.appType.label')"
             width="120"
           />
-          <el-table-column width="100" property="workspace_id">
+          <el-table-column width="100" property="workspace_name">
             <template #header>
               <div class="flex align-center">
                 {{ $t('views.role.member.workspace') }}
@@ -102,7 +102,7 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column property="creator" :label="$t('common.creator')" />
+          <el-table-column property="nick_name" :label="$t('common.creator')" />
           <el-table-column
             property="update_time"
             sortable
@@ -444,7 +444,6 @@ function importTool(file: any) {
 function getList() {
   const params = {
     folder_id: currentFolder.value?.id || localStorage.getItem('workspace_id'),
-    scope: 'WORKSPACE',
   }
   ToolApi.getToolList(paginationConfig, params, loading).then((res) => {
     paginationConfig.total = res.data?.total
