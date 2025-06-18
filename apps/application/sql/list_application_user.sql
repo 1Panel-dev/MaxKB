@@ -1,31 +1,33 @@
 select *
-from (select "id"::text,
-             "name",
-             "desc",
-             "is_publish",
-             "type",
+from (select application."id"::text,
+             application."name",
+             application. "desc",
+             application. "is_publish",
+             application."type",
              'application' as "resource_type",
-             "workspace_id",
-             "folder_id",
-             "user_id",
-             "create_time",
-             "update_time"
-      from application
+             application."workspace_id",
+             application. "folder_id",
+             application."user_id",
+             "user"."nick_name" as "nick_name",
+             application."create_time",
+             application."update_time"
+      from application left join "user" on user_id = "user".id
       where id in (select target
                    from workspace_user_resource_permission
                    where auth_target_type = 'APPLICATION'
                      and 'VIEW' = any (permission_list))
       UNION
-      select "id",
-             "name",
-             "desc",
-              true  as "is_publish",
+      select application_folder."id",
+             application_folder."name",
+             application_folder."desc",
+             true  as "is_publish",
              'folder' as "type",
              'folder' as "resource_type",
-              "workspace_id",
-              "parent_id" as  "folder_id",
-             "user_id",
-             "create_time",
-             "update_time"
-      from application_folder ${folder_query_set}) temp
+             application_folder."workspace_id",
+             application_folder."parent_id" as  "folder_id",
+             application_folder."user_id",
+             "user"."nick_name" as "nick_name",
+             application_folder."create_time",
+             application_folder."update_time"
+      from application_folder left join "user" on user_id = "user".id ${folder_query_set}) temp
 ${application_query_set}

@@ -153,7 +153,7 @@
                   </template>
                   <template #subTitle>
                     <el-text class="color-secondary lighter" size="small">
-                      {{ $t('common.creator') }}: {{ item.username }}
+                      {{ $t('common.creator') }}: {{ item.nick_name }}
                     </el-text>
                   </template>
                 </CardBox>
@@ -171,7 +171,7 @@
                   <template #subTitle>
                     <el-text class="color-secondary" size="small">
                       <auto-tooltip :content="item.username">
-                        {{ $t('common.creator') }}: {{ item.username }}
+                        {{ $t('common.creator') }}: {{ item.nick_name }}
                       </auto-tooltip>
                     </el-text>
                   </template>
