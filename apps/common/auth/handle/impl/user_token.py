@@ -170,14 +170,11 @@ def get_permission_list(user,
 
             workspace_permission_list = get_workspace_permission_list(role_permission_mapping_dict,
                                                                       workspace_user_role_mapping_list)
-            system_role_permission_mapping_list = list(set([role_permission.permission_id for role_permission in
-                                                            get_default_role_permission_mapping_list() if
-                                                            role_id_list.__contains__(role_permission.role_id)]))
             # 系统权限
             system_permission_list = [role_permission_mapping.permission_id for role_permission_mapping in
                                       role_permission_mapping_list]
             # 合并权限
-            permission_list = system_permission_list + workspace_permission_list + workspace_resource_permission_list + system_role_permission_mapping_list
+            permission_list = system_permission_list + workspace_permission_list + workspace_resource_permission_list
             permission_list = list(set(permission_list))
             cache.set(key, permission_list, version=version)
         else:
