@@ -235,7 +235,7 @@ class SharedModel(APIView):
         responses=ModelListResponse.get_response(),
         tags=[_('Shared Model')]
     )  # type: ignore
-    @has_permissions(PermissionConstants.MODEL_READ, RoleConstants.WORKSPACE_MANAGE.get_workspace_role()())
+    @has_permissions(PermissionConstants.MODEL_READ, RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def get(self, request: Request, workspace_id: str):
         return result.success(
             SharedModelSerializer(data={'workspace_id': workspace_id}).get_share_model_list())
