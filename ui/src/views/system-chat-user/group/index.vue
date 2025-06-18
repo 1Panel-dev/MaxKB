@@ -14,9 +14,8 @@
         <div class="user-left border-r p-16">
           <div class="user-left_title flex-between">
             <h4 class="medium">{{ $t('views.chatUser.group.title') }}</h4>
-            <el-tooltip effect="dark"
-                        :content="`${$t('common.create')}${$t('views.chatUser.group.title')}`"
-                        placement="top">
+            <el-tooltip effect="dark" :content="`${$t('common.create')}${$t('views.chatUser.group.title')}`"
+              placement="top">
               <el-button type="primary" text @click="createOrUpdate()">
                 <AppIcon iconName="app-copy"></AppIcon>
               </el-button>
@@ -24,19 +23,18 @@
           </div>
 
           <div class="p-8">
-            <el-input v-model="filterText" :placeholder="$t('common.search')" prefix-icon="Search"
-                      clearable/>
+            <el-input v-model="filterText" :placeholder="$t('common.search')" prefix-icon="Search" clearable />
           </div>
           <div class="list-height-left">
             <el-scrollbar v-loading="loading">
               <common-list :data="filterList" @click="clickUserGroup" :default-active="current?.id">
                 <template #default="{ row }">
                   <div class="flex-between">
-                    <span>{{ row.name }}</span>
+                    <span class="ellipsis" style="max-width: initial;">{{ row.name }}</span>
                     <el-dropdown :teleported="false">
                       <el-button text>
                         <el-icon class="color-secondary">
-                          <MoreFilled/>
+                          <MoreFilled />
                         </el-icon>
                       </el-button>
                       <template #dropdown>
@@ -70,9 +68,8 @@
         <div class="user-right" v-loading="rightLoading">
           <div class="flex align-center">
             <h4 class="medium">{{ current?.name }}</h4>
-            <el-divider direction="vertical" class="mr-8 ml-8"/>
-            <AppIcon iconName="app-wordspace" style="font-size: 16px"
-                     class="color-input-placeholder"></AppIcon>
+            <el-divider direction="vertical" class="mr-8 ml-8" />
+            <AppIcon iconName="app-wordspace" style="font-size: 16px" class="color-input-placeholder"></AppIcon>
             <span class="color-input-placeholder ml-4">
               {{ paginationConfig.total }}
             </span>
@@ -89,22 +86,18 @@
             </div>
             <div class="flex-between complex-search">
               <el-select class="complex-search__left" v-model="searchType" style="width: 120px">
-                <el-option :label="$t('views.login.loginForm.username.label')" value="username"/>
+                <el-option :label="$t('views.login.loginForm.username.label')" value="username" />
               </el-select>
-              <el-input v-if="searchType === 'username'" v-model="searchForm.username"
-                        @change="getList"
-                        :placeholder="$t('common.searchBar.placeholder')" style="width: 220px"
-                        clearable/>
+              <el-input v-if="searchType === 'username'" v-model="searchForm.username" @change="getList"
+                :placeholder="$t('common.searchBar.placeholder')" style="width: 220px" clearable />
             </div>
           </div>
 
-          <app-table :data="tableData" :pagination-config="paginationConfig"
-                     @sizeChange="handleSizeChange"
-                     @changePage="getList" @selection-change="handleSelectionChange">
-            <el-table-column type="selection" width="55"/>
-            <el-table-column prop="nick_name"
-                             :label="$t('views.userManage.userForm.nick_name.label')"/>
-            <el-table-column prop="username" :label="$t('views.login.loginForm.username.label')"/>
+          <app-table :data="tableData" :pagination-config="paginationConfig" @sizeChange="handleSizeChange"
+            @changePage="getList" @selection-change="handleSelectionChange">
+            <el-table-column type="selection" width="55" />
+            <el-table-column prop="nick_name" :label="$t('views.userManage.userForm.nick_name.label')" />
+            <el-table-column prop="username" :label="$t('views.login.loginForm.username.label')" />
             <el-table-column prop="source" :label="$t('views.userManage.source.label')">
               <template #default="{ row }">
                 {{
@@ -124,11 +117,10 @@
             </el-table-column>
             <el-table-column :label="$t('common.operation')" width="100" fixed="right">
               <template #default="{ row }">
-                <el-tooltip effect="dark" :content="`${$t('views.role.member.delete.button')}`"
-                            placement="top">
+                <el-tooltip effect="dark" :content="`${$t('views.role.member.delete.button')}`" placement="top">
                   <el-button type="primary" text @click.stop="handleDeleteUser(row)">
                     <el-icon>
-                      <EditPen/>
+                      <EditPen />
                     </el-icon>
                   </el-button>
                 </el-tooltip>
@@ -139,20 +131,20 @@
       </div>
     </el-card>
   </ContentContainer>
-  <CreateOrUpdateGroupDialog ref="createOrUpdateGroupDialogRef" @refresh="refresh"/>
-  <CreateGroupUserDialog ref="createGroupUserDialogRef" @refresh="getList"/>
+  <CreateOrUpdateGroupDialog ref="createOrUpdateGroupDialogRef" @refresh="refresh" />
+  <CreateGroupUserDialog ref="createGroupUserDialogRef" @refresh="getList" />
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref, watch, reactive} from 'vue'
+import { onMounted, ref, watch, reactive } from 'vue'
 import SystemGroupApi from '@/api/system/user-group'
-import {t} from '@/locales'
-import type {ChatUserGroupUserItem} from '@/api/type/systemChatUser'
+import { t } from '@/locales'
+import type { ChatUserGroupUserItem } from '@/api/type/systemChatUser'
 import iconMap from '@/components/app-icon/icons/common'
 import CreateOrUpdateGroupDialog from './component/CreateOrUpdateGroupDialog.vue'
 import CreateGroupUserDialog from './component/CreateGroupUserDialog.vue'
-import type {ListItem} from '@/api/type/common'
-import {MsgSuccess, MsgConfirm} from '@/utils/message'
+import type { ListItem } from '@/api/type/common'
+import { MsgSuccess, MsgConfirm } from '@/utils/message'
 
 const filterText = ref('')
 const loading = ref(false)
@@ -274,7 +266,7 @@ function handleSelectionChange(val: any[]) {
 
 function handleDeleteUser(item?: ChatUserGroupUserItem) {
   MsgConfirm(
-    item ? `${t('views.workspace.member.delete.confirmTitle')}${item.nick_name} ?` : t('views.chatUser.group.batchDeleteMember', {count: multipleSelection.value.length}),
+    item ? `${t('views.workspace.member.delete.confirmTitle')}${item.nick_name} ?` : t('views.chatUser.group.batchDeleteMember', { count: multipleSelection.value.length }),
     '',
     {
       confirmButtonText: t('common.confirm'),
@@ -282,7 +274,7 @@ function handleDeleteUser(item?: ChatUserGroupUserItem) {
     },
   )
     .then(() => {
-      SystemGroupApi.postRemoveMember(current.value?.id as string, {group_relation_ids: item ? [item.user_group_relation_id] : multipleSelection.value.map(item => (item.user_group_relation_id))}, loading).then(async () => {
+      SystemGroupApi.postRemoveMember(current.value?.id as string, { group_relation_ids: item ? [item.user_group_relation_id] : multipleSelection.value.map(item => (item.user_group_relation_id)) }, loading).then(async () => {
         MsgSuccess(t('common.deleteSuccess'))
         await getList()
       })

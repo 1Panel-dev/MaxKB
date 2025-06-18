@@ -20,7 +20,7 @@
               <common-list :data="filterList" @click="clickWorkspace" :default-active="currentWorkspace?.id">
                 <template #default="{ row }">
                   <div class="flex-between">
-                    <span>{{ row.name }}</span>
+                    <span class="ellipsis" style="max-width: initial;">{{ row.name }}</span>
                     <el-dropdown :teleported="false">
                       <el-button text>
                         <el-icon class="color-secondary">
