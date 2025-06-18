@@ -46,8 +46,8 @@
 <script setup lang="ts">
 import { ref, watch, reactive } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import BaseForm from '@/views/shared/knowledge-shared/component/BaseForm.vue'
-import KnowledgeApi from '@/api/shared/knowledge'
+import BaseForm from '@/views/resource-management/knowledge/component/BaseForm.vue'
+import KnowledgeApi from '@/api/resource-management/knowledge'
 import { MsgSuccess, MsgAlert } from '@/utils/message'
 import { t } from '@/locales'
 const emit = defineEmits(['refresh'])
@@ -103,9 +103,7 @@ const submitHandle = async () => {
         }
         KnowledgeApi.postWebKnowledge(obj, loading).then((res) => {
           MsgSuccess(t('common.createSuccess'))
-          router.push({
-            path: `/knowledge/system/${res.data.id}/documentShared`,
-          })
+          router.push({ path: `/knowledge/resource/${res.data.id}/documentResource` })
           emit('refresh')
         })
       } else {
