@@ -62,6 +62,7 @@ class Group(Enum):
     OVERVIEW = "OVERVIEW"
     APPLICATION_ACCESS = "APPLICATION_ACCESS"
     APPLICATION_CHAT_LOG = "APPLICATION_CHAT_LOG"
+    OPERATION_LOG = "OPERATION_LOG"
 
 
 class SystemGroup(Enum):
@@ -1076,6 +1077,10 @@ class PermissionConstants(Enum):
     RESOURCE_KNOWLEDGE_PROBLEM_DELETE = Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE_PROBLEM, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.RESOURCE_KNOWLEDGE]
+    )
+    OPERATION_LOG_READ = Permission(
+        group=Group.OPERATION_LOG, operate=Operate.READ, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.OPERATION_LOG]
     )
 
     def get_workspace_application_permission(self):
