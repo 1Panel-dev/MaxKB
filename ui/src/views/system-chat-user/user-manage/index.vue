@@ -1,145 +1,147 @@
 <template>
-  <ContentContainer>
-    <template #header>
-      <div class="shared-header">
-        <span class="title">{{ t('views.chatUser.title') }}</span>
-        <el-icon size="12">
-          <rightOutlined></rightOutlined>
-        </el-icon>
-        <span class="sub-title">{{ t('views.chatUser.title') }}</span>
-      </div>
-    </template>
-    <el-card class="h-full">
-      <div class="flex-between mb-16">
-        <div>
-          <el-button type="primary" @click="createUser()">
-            {{ t('views.userManage.createUser') }}
-          </el-button>
-          <el-button @click="syncUsers">
-            {{ $t('views.chatUser.syncUsers') }}
-          </el-button>
-          <el-button :disabled="multipleSelection.length === 0" @click="setUserGroups">
-            {{ $t('views.chatUser.setUserGroups') }}
-          </el-button>
-          <el-button :disabled="multipleSelection.length === 0" @click="handleBatchDelete">
-            {{ $t('common.delete') }}
-          </el-button>
+  <div class="h-full">
+    <ContentContainer>
+      <template #header>
+        <div class="shared-header">
+          <span class="title">{{ t('views.chatUser.title') }}</span>
+          <el-icon size="12">
+            <rightOutlined></rightOutlined>
+          </el-icon>
+          <span class="sub-title">{{ t('views.chatUser.title') }}</span>
         </div>
-        <div class="flex-between complex-search">
-          <el-select class="complex-search__left" v-model="search_type" style="width: 120px"
-            @change="search_type_change">
-            <el-option :label="$t('views.login.loginForm.username.label')" value="name" />
-          </el-select>
-          <el-input v-if="search_type === 'name'" v-model="search_form.name" @change="getList"
-            :placeholder="$t('common.searchBar.placeholder')" style="width: 220px" clearable />
+      </template>
+      <el-card class="h-full">
+        <div class="flex-between mb-16">
+          <div>
+            <el-button type="primary" @click="createUser()">
+              {{ t('views.userManage.createUser') }}
+            </el-button>
+            <el-button @click="syncUsers">
+              {{ $t('views.chatUser.syncUsers') }}
+            </el-button>
+            <el-button :disabled="multipleSelection.length === 0" @click="setUserGroups">
+              {{ $t('views.chatUser.setUserGroups') }}
+            </el-button>
+            <el-button :disabled="multipleSelection.length === 0" @click="handleBatchDelete">
+              {{ $t('common.delete') }}
+            </el-button>
+          </div>
+          <div class="flex-between complex-search">
+            <el-select class="complex-search__left" v-model="search_type" style="width: 120px"
+              @change="search_type_change">
+              <el-option :label="$t('views.login.loginForm.username.label')" value="name" />
+            </el-select>
+            <el-input v-if="search_type === 'name'" v-model="search_form.name" @change="getList"
+              :placeholder="$t('common.searchBar.placeholder')" style="width: 220px" clearable />
+          </div>
         </div>
-      </div>
-      <app-table class="mt-16" :data="userTableData" :pagination-config="paginationConfig"
-        @sizeChange="handleSizeChange" @changePage="getList" v-loading="loading"
-        @selection-change="handleSelectionChange" @sort-change="handleSortChange">
-        <el-table-column type="selection" width="55" />
-        <el-table-column prop="nick_name" :label="$t('views.userManage.userForm.nick_name.label')" />
-        <el-table-column prop="username" :label="$t('common.username')" />
-        <el-table-column prop="is_active" :label="$t('common.status.label')">
-          <template #default="{ row }">
-            <div v-if="row.is_active" class="flex align-center">
-              <el-icon class="color-success mr-8" style="font-size: 16px">
-                <SuccessFilled />
-              </el-icon>
-              <span class="color-secondary">
-                {{ $t('common.status.enabled') }}
+        <app-table class="mt-16" :data="userTableData" :pagination-config="paginationConfig"
+          @sizeChange="handleSizeChange" @changePage="getList" v-loading="loading"
+          @selection-change="handleSelectionChange" @sort-change="handleSortChange">
+          <el-table-column type="selection" width="55" />
+          <el-table-column prop="nick_name" :label="$t('views.userManage.userForm.nick_name.label')" />
+          <el-table-column prop="username" :label="$t('common.username')" />
+          <el-table-column prop="is_active" :label="$t('common.status.label')">
+            <template #default="{ row }">
+              <div v-if="row.is_active" class="flex align-center">
+                <el-icon class="color-success mr-8" style="font-size: 16px">
+                  <SuccessFilled />
+                </el-icon>
+                <span class="color-secondary">
+                  {{ $t('common.status.enabled') }}
+                </span>
+              </div>
+              <div v-else class="flex align-center">
+                <AppIcon iconName="app-disabled" class="color-secondary mr-8"></AppIcon>
+                <span class="color-secondary">
+                  {{ $t('common.status.disabled') }}
+                </span>
+              </div>
+            </template>
+          </el-table-column>
+
+          <el-table-column prop="email" :label="$t('views.login.loginForm.email.label')" show-overflow-tooltip>
+            <template #default="{ row }">
+              {{ row.email || '-' }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="phone" :label="$t('views.userManage.userForm.phone.label')">
+            <template #default="{ row }">
+              {{ row.phone || '-' }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="user_group_names" :label="$t('views.chatUser.group.title')">
+            <template #default="{ row }">
+              <TagGroup :tags="row.user_group_names" />
+            </template>
+          </el-table-column>
+          <el-table-column prop="source" :label="$t('views.userManage.source.label')">
+            <template #default="{ row }">
+              {{
+                row.source === 'LOCAL'
+                  ? $t('views.userManage.source.local')
+                  : row.source === 'wecom'
+                    ? $t('views.userManage.source.wecom')
+                    : row.source === 'lark'
+                      ? $t('views.userManage.source.lark')
+                      : row.source === 'dingtalk'
+                        ? $t('views.userManage.source.dingtalk')
+                        : row.source === 'OAUTH2' || row.source === 'OAuth2'
+                          ? 'OAuth2'
+                          : row.source
+              }}
+            </template>
+          </el-table-column>
+
+          <el-table-column :label="$t('common.createTime')" width="180">
+            <template #default="{ row }">
+              {{ datetimeFormat(row.create_time) }}
+            </template>
+          </el-table-column>
+
+          <el-table-column :label="$t('common.operation')" width="160" align="left" fixed="right">
+            <template #default="{ row }">
+              <span @click.stop>
+                <el-switch size="small" v-model="row.is_active" :before-change="() => changeState(row)" />
               </span>
-            </div>
-            <div v-else class="flex align-center">
-              <AppIcon iconName="app-disabled" class="color-secondary mr-8"></AppIcon>
-              <span class="color-secondary">
-                {{ $t('common.status.disabled') }}
+              <el-divider direction="vertical" />
+              <span class="mr-8">
+                <el-button type="primary" text @click.stop="editUser(row)" :title="$t('common.edit')">
+                  <el-icon>
+                    <EditPen />
+                  </el-icon>
+                </el-button>
               </span>
-            </div>
-          </template>
-        </el-table-column>
 
-        <el-table-column prop="email" :label="$t('views.login.loginForm.email.label')" show-overflow-tooltip>
-          <template #default="{ row }">
-            {{ row.email || '-' }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="phone" :label="$t('views.userManage.userForm.phone.label')">
-          <template #default="{ row }">
-            {{ row.phone || '-' }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="user_group_names" :label="$t('views.chatUser.group.title')">
-          <template #default="{ row }">
-            <TagGroup :tags="row.user_group_names" />
-          </template>
-        </el-table-column>
-        <el-table-column prop="source" :label="$t('views.userManage.source.label')">
-          <template #default="{ row }">
-            {{
-              row.source === 'LOCAL'
-                ? $t('views.userManage.source.local')
-                : row.source === 'wecom'
-                  ? $t('views.userManage.source.wecom')
-                  : row.source === 'lark'
-                    ? $t('views.userManage.source.lark')
-                    : row.source === 'dingtalk'
-                      ? $t('views.userManage.source.dingtalk')
-                      : row.source === 'OAUTH2' || row.source === 'OAuth2'
-                        ? 'OAuth2'
-                        : row.source
-            }}
-          </template>
-        </el-table-column>
+              <span class="mr-8">
+                <el-button type="primary" text @click.stop="editPwdUser(row)"
+                  :title="$t('views.userManage.setting.updatePwd')">
+                  <el-icon>
+                    <Lock />
+                  </el-icon>
+                </el-button>
+              </span>
+              <span>
+                <el-button :disabled="row.role === 'ADMIN'" type="primary" text @click.stop="deleteUserManage(row)"
+                  :title="$t('common.delete')">
+                  <el-icon>
+                    <Delete />
+                  </el-icon>
+                </el-button>
+              </span>
+            </template>
+          </el-table-column>
+        </app-table>
+      </el-card>
+    </ContentContainer>
 
-        <el-table-column :label="$t('common.createTime')" width="180">
-          <template #default="{ row }">
-            {{ datetimeFormat(row.create_time) }}
-          </template>
-        </el-table-column>
-
-        <el-table-column :label="$t('common.operation')" width="160" align="left" fixed="right">
-          <template #default="{ row }">
-            <span @click.stop>
-              <el-switch size="small" v-model="row.is_active" :before-change="() => changeState(row)" />
-            </span>
-            <el-divider direction="vertical" />
-            <span class="mr-8">
-              <el-button type="primary" text @click.stop="editUser(row)" :title="$t('common.edit')">
-                <el-icon>
-                  <EditPen />
-                </el-icon>
-              </el-button>
-            </span>
-
-            <span class="mr-8">
-              <el-button type="primary" text @click.stop="editPwdUser(row)"
-                :title="$t('views.userManage.setting.updatePwd')">
-                <el-icon>
-                  <Lock />
-                </el-icon>
-              </el-button>
-            </span>
-            <span>
-              <el-button :disabled="row.role === 'ADMIN'" type="primary" text @click.stop="deleteUserManage(row)"
-                :title="$t('common.delete')">
-                <el-icon>
-                  <Delete />
-                </el-icon>
-              </el-button>
-            </span>
-          </template>
-        </el-table-column>
-      </app-table>
-    </el-card>
-  </ContentContainer>
-
-  <UserDrawer :title="title" :optionLoading="optionLoading" :chatGroupList="chatGroupList" ref="UserDrawerRef"
-    @refresh="refresh" />
-  <UserPwdDialog ref="UserPwdDialogRef" @refresh="refresh" />
-  <SetUserGroupsDialog :optionLoading="optionLoading" :chatGroupList="chatGroupList" ref="setUserGroupsRef"
-    @refresh="refresh" />
-  <SyncUsersDialog ref="syncUsersDialogRef" @refresh="refresh" />
+    <UserDrawer :title="title" :optionLoading="optionLoading" :chatGroupList="chatGroupList" ref="UserDrawerRef"
+      @refresh="refresh" />
+    <UserPwdDialog ref="UserPwdDialogRef" @refresh="refresh" />
+    <SetUserGroupsDialog :optionLoading="optionLoading" :chatGroupList="chatGroupList" ref="setUserGroupsRef"
+      @refresh="refresh" />
+    <SyncUsersDialog ref="syncUsersDialogRef" @refresh="refresh" />
+  </div>
 </template>
 
 <script lang="ts" setup>

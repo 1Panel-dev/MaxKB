@@ -1,138 +1,140 @@
 <template>
-  <ContentContainer>
-    <template #header>
-      <div class="shared-header">
-        <span class="title">{{ t('views.chatUser.title') }}</span>
-        <el-icon size="12">
-          <rightOutlined></rightOutlined>
-        </el-icon>
-        <span class="sub-title">{{ t('views.chatUser.group.title') }}</span>
-      </div>
-    </template>
-    <el-card style="--el-card-padding: 0" class="user-card">
-      <div class="flex h-full">
-        <div class="user-left border-r p-16">
-          <div class="user-left_title flex-between">
-            <h4 class="medium">{{ $t('views.chatUser.group.title') }}</h4>
-            <el-tooltip effect="dark" :content="`${$t('common.create')}${$t('views.chatUser.group.title')}`"
-              placement="top">
-              <el-button type="primary" text @click="createOrUpdate()">
-                <AppIcon iconName="app-copy"></AppIcon>
-              </el-button>
-            </el-tooltip>
+  <div class="h-full">
+    <ContentContainer>
+      <template #header>
+        <div class="shared-header">
+          <span class="title">{{ t('views.chatUser.title') }}</span>
+          <el-icon size="12">
+            <rightOutlined></rightOutlined>
+          </el-icon>
+          <span class="sub-title">{{ t('views.chatUser.group.title') }}</span>
+        </div>
+      </template>
+      <el-card style="--el-card-padding: 0" class="user-card">
+        <div class="flex h-full">
+          <div class="user-left border-r p-16">
+            <div class="user-left_title flex-between">
+              <h4 class="medium">{{ $t('views.chatUser.group.title') }}</h4>
+              <el-tooltip effect="dark" :content="`${$t('common.create')}${$t('views.chatUser.group.title')}`"
+                placement="top">
+                <el-button type="primary" text @click="createOrUpdate()">
+                  <AppIcon iconName="app-copy"></AppIcon>
+                </el-button>
+              </el-tooltip>
+            </div>
+
+            <div class="p-8">
+              <el-input v-model="filterText" :placeholder="$t('common.search')" prefix-icon="Search" clearable />
+            </div>
+            <div class="list-height-left">
+              <el-scrollbar v-loading="loading">
+                <common-list :data="filterList" @click="clickUserGroup" :default-active="current?.id">
+                  <template #default="{ row }">
+                    <div class="flex-between">
+                      <span class="ellipsis" style="max-width: initial;">{{ row.name }}</span>
+                      <el-dropdown :teleported="false">
+                        <el-button text>
+                          <el-icon class="color-secondary">
+                            <MoreFilled />
+                          </el-icon>
+                        </el-button>
+                        <template #dropdown>
+                          <el-dropdown-menu style="min-width: 80px">
+                            <el-dropdown-item @click.stop="createOrUpdate(row)" class="p-8">
+                              <AppIcon iconName="app-copy"></AppIcon>
+                              {{
+                                $t('common.rename')
+                              }}
+                            </el-dropdown-item>
+                            <el-dropdown-item @click.stop="deleteGroup(row)" class="border-t p-8">
+                              <AppIcon iconName="app-copy"></AppIcon>
+                              {{
+                                $t('common.delete')
+                              }}
+                            </el-dropdown-item>
+                          </el-dropdown-menu>
+                        </template>
+                      </el-dropdown>
+                    </div>
+                  </template>
+                  <template #empty>
+                    <span></span>
+                  </template>
+                </common-list>
+              </el-scrollbar>
+            </div>
           </div>
 
-          <div class="p-8">
-            <el-input v-model="filterText" :placeholder="$t('common.search')" prefix-icon="Search" clearable />
-          </div>
-          <div class="list-height-left">
-            <el-scrollbar v-loading="loading">
-              <common-list :data="filterList" @click="clickUserGroup" :default-active="current?.id">
+          <!-- 右边 -->
+          <div class="user-right" v-loading="rightLoading">
+            <div class="flex align-center">
+              <h4 class="medium">{{ current?.name }}</h4>
+              <el-divider direction="vertical" class="mr-8 ml-8" />
+              <AppIcon iconName="app-wordspace" style="font-size: 16px" class="color-input-placeholder"></AppIcon>
+              <span class="color-input-placeholder ml-4">
+                {{ paginationConfig.total }}
+              </span>
+            </div>
+
+            <div class="flex-between mb-16" style="margin-top: 20px;">
+              <div>
+                <el-button type="primary" @click="createUser()">
+                  {{ t('views.role.member.add') }}
+                </el-button>
+                <el-button :disabled="multipleSelection.length === 0" @click="handleDeleteUser()">
+                  {{ $t('common.delete') }}
+                </el-button>
+              </div>
+              <div class="flex-between complex-search">
+                <el-select class="complex-search__left" v-model="searchType" style="width: 120px">
+                  <el-option :label="$t('views.login.loginForm.username.label')" value="username" />
+                </el-select>
+                <el-input v-if="searchType === 'username'" v-model="searchForm.username" @change="getList"
+                  :placeholder="$t('common.searchBar.placeholder')" style="width: 220px" clearable />
+              </div>
+            </div>
+
+            <app-table :data="tableData" :pagination-config="paginationConfig" @sizeChange="handleSizeChange"
+              @changePage="getList" @selection-change="handleSelectionChange">
+              <el-table-column type="selection" width="55" />
+              <el-table-column prop="nick_name" :label="$t('views.userManage.userForm.nick_name.label')" />
+              <el-table-column prop="username" :label="$t('views.login.loginForm.username.label')" />
+              <el-table-column prop="source" :label="$t('views.userManage.source.label')">
                 <template #default="{ row }">
-                  <div class="flex-between">
-                    <span class="ellipsis" style="max-width: initial;">{{ row.name }}</span>
-                    <el-dropdown :teleported="false">
-                      <el-button text>
-                        <el-icon class="color-secondary">
-                          <MoreFilled />
-                        </el-icon>
-                      </el-button>
-                      <template #dropdown>
-                        <el-dropdown-menu style="min-width: 80px">
-                          <el-dropdown-item @click.stop="createOrUpdate(row)" class="p-8">
-                            <AppIcon iconName="app-copy"></AppIcon>
-                            {{
-                              $t('common.rename')
-                            }}
-                          </el-dropdown-item>
-                          <el-dropdown-item @click.stop="deleteGroup(row)" class="border-t p-8">
-                            <AppIcon iconName="app-copy"></AppIcon>
-                            {{
-                              $t('common.delete')
-                            }}
-                          </el-dropdown-item>
-                        </el-dropdown-menu>
-                      </template>
-                    </el-dropdown>
-                  </div>
+                  {{
+                    row.source === 'LOCAL'
+                      ? $t('views.userManage.source.local')
+                      : row.source === 'wecom'
+                        ? $t('views.userManage.source.wecom')
+                        : row.source === 'lark'
+                          ? $t('views.userManage.source.lark')
+                          : row.source === 'dingtalk'
+                            ? $t('views.userManage.source.dingtalk')
+                            : row.source === 'OAUTH2' || row.source === 'OAuth2'
+                              ? 'OAuth2'
+                              : row.source
+                  }}
                 </template>
-                <template #empty>
-                  <span></span>
+              </el-table-column>
+              <el-table-column :label="$t('common.operation')" width="100" fixed="right">
+                <template #default="{ row }">
+                  <el-tooltip effect="dark" :content="`${$t('views.role.member.delete.button')}`" placement="top">
+                    <el-button type="primary" text @click.stop="handleDeleteUser(row)">
+                      <el-icon>
+                        <EditPen />
+                      </el-icon>
+                    </el-button>
+                  </el-tooltip>
                 </template>
-              </common-list>
-            </el-scrollbar>
+              </el-table-column>
+            </app-table>
           </div>
         </div>
-
-        <!-- 右边 -->
-        <div class="user-right" v-loading="rightLoading">
-          <div class="flex align-center">
-            <h4 class="medium">{{ current?.name }}</h4>
-            <el-divider direction="vertical" class="mr-8 ml-8" />
-            <AppIcon iconName="app-wordspace" style="font-size: 16px" class="color-input-placeholder"></AppIcon>
-            <span class="color-input-placeholder ml-4">
-              {{ paginationConfig.total }}
-            </span>
-          </div>
-
-          <div class="flex-between mb-16" style="margin-top: 20px;">
-            <div>
-              <el-button type="primary" @click="createUser()">
-                {{ t('views.role.member.add') }}
-              </el-button>
-              <el-button :disabled="multipleSelection.length === 0" @click="handleDeleteUser()">
-                {{ $t('common.delete') }}
-              </el-button>
-            </div>
-            <div class="flex-between complex-search">
-              <el-select class="complex-search__left" v-model="searchType" style="width: 120px">
-                <el-option :label="$t('views.login.loginForm.username.label')" value="username" />
-              </el-select>
-              <el-input v-if="searchType === 'username'" v-model="searchForm.username" @change="getList"
-                :placeholder="$t('common.searchBar.placeholder')" style="width: 220px" clearable />
-            </div>
-          </div>
-
-          <app-table :data="tableData" :pagination-config="paginationConfig" @sizeChange="handleSizeChange"
-            @changePage="getList" @selection-change="handleSelectionChange">
-            <el-table-column type="selection" width="55" />
-            <el-table-column prop="nick_name" :label="$t('views.userManage.userForm.nick_name.label')" />
-            <el-table-column prop="username" :label="$t('views.login.loginForm.username.label')" />
-            <el-table-column prop="source" :label="$t('views.userManage.source.label')">
-              <template #default="{ row }">
-                {{
-                  row.source === 'LOCAL'
-                    ? $t('views.userManage.source.local')
-                    : row.source === 'wecom'
-                      ? $t('views.userManage.source.wecom')
-                      : row.source === 'lark'
-                        ? $t('views.userManage.source.lark')
-                        : row.source === 'dingtalk'
-                          ? $t('views.userManage.source.dingtalk')
-                          : row.source === 'OAUTH2' || row.source === 'OAuth2'
-                            ? 'OAuth2'
-                            : row.source
-                }}
-              </template>
-            </el-table-column>
-            <el-table-column :label="$t('common.operation')" width="100" fixed="right">
-              <template #default="{ row }">
-                <el-tooltip effect="dark" :content="`${$t('views.role.member.delete.button')}`" placement="top">
-                  <el-button type="primary" text @click.stop="handleDeleteUser(row)">
-                    <el-icon>
-                      <EditPen />
-                    </el-icon>
-                  </el-button>
-                </el-tooltip>
-              </template>
-            </el-table-column>
-          </app-table>
-        </div>
-      </div>
-    </el-card>
-  </ContentContainer>
-  <CreateOrUpdateGroupDialog ref="createOrUpdateGroupDialogRef" @refresh="refresh" />
-  <CreateGroupUserDialog ref="createGroupUserDialogRef" @refresh="getList" />
+      </el-card>
+    </ContentContainer>
+    <CreateOrUpdateGroupDialog ref="createOrUpdateGroupDialogRef" @refresh="refresh" />
+    <CreateGroupUserDialog ref="createGroupUserDialogRef" @refresh="getList" />
+  </div>
 </template>
 
 <script lang="ts" setup>
