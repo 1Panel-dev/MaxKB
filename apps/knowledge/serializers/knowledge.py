@@ -480,7 +480,7 @@ class KnowledgeSerializer(serializers.Serializer):
                 user_id=self.data.get('user_id'),
                 scope=self.data.get('scope', KnowledgeScope.WORKSPACE),
                 folder_id=folder_id,
-                embedding_model_id=instance.get('embedding'),
+                embedding_model_id=instance.get('embedding_model_id'),
                 meta=instance.get('meta', {}),
             )
 
@@ -542,11 +542,11 @@ class KnowledgeSerializer(serializers.Serializer):
                 scope=self.data.get('scope', KnowledgeScope.WORKSPACE),
                 folder_id=folder_id,
                 workspace_id=self.data.get('workspace_id'),
-                embedding_model_id=instance.get('embedding'),
+                embedding_model_id=instance.get('embedding_model_id'),
                 meta={
                     'source_url': instance.get('source_url'),
                     'selector': instance.get('selector'),
-                    'embedding_model_id': instance.get('embedding')
+                    'embedding_model_id': instance.get('embedding_model_id')
                 },
             )
             knowledge.save()
