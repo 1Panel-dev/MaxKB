@@ -165,7 +165,7 @@ class EmbeddingSearch(ISearch):
                search_mode: SearchMode):
         exec_sql, exec_params = generate_sql_by_query_dict({'embedding_query': query_set},
                                                            select_string=get_file_content(
-                                                               os.path.join(PROJECT_DIR, "apps", "embedding", 'sql',
+                                                               os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql',
                                                                             'embedding_search.sql')),
                                                            with_table_name=True)
         embedding_model = select_list(exec_sql,
@@ -186,7 +186,7 @@ class KeywordsSearch(ISearch):
                search_mode: SearchMode):
         exec_sql, exec_params = generate_sql_by_query_dict({'keywords_query': query_set},
                                                            select_string=get_file_content(
-                                                               os.path.join(PROJECT_DIR, "apps", "embedding", 'sql',
+                                                               os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql',
                                                                             'keywords_search.sql')),
                                                            with_table_name=True)
         embedding_model = select_list(exec_sql,
@@ -207,7 +207,7 @@ class BlendSearch(ISearch):
                search_mode: SearchMode):
         exec_sql, exec_params = generate_sql_by_query_dict({'embedding_query': query_set},
                                                            select_string=get_file_content(
-                                                               os.path.join(PROJECT_DIR, "apps", "embedding", 'sql',
+                                                               os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql',
                                                                             'blend_search.sql')),
                                                            with_table_name=True)
         embedding_model = select_list(exec_sql,
