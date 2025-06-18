@@ -189,8 +189,8 @@ function openCreateDialog(data?: any) {
 
 function getList() {
   const params = {
-    folder_id: currentFolder.value?.id || 'root',
-    scope: 'WORKSPACE',
+    folder_id: currentFolder.value?.id || 'default',
+    scope: 'SHARED',
   }
   ToolWorkspaceApi.getSharedWorkspaceToolPage(params, loading).then((res) => {
     toolList.value = [...res.data]
