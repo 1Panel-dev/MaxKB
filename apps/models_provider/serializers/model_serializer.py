@@ -100,7 +100,8 @@ class ModelSerializer(serializers.Serializer):
             'credential': ModelProvideConstants[model.provider].value.get_model_credential(
                 model.model_type, model.model_name
             ).encryption_dict(credential),
-            'workspace_id': model.workspace_id
+            'workspace_id': model.workspace_id,
+            'username': model.user.nick_name
         }
 
     class Operate(serializers.Serializer):
