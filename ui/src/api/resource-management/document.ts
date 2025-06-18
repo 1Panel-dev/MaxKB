@@ -71,7 +71,7 @@ const delDocument: (
 
 /**
  * 批量取消文档任务
- * @param 参数 knowledge_id, document_id,
+ * @param 参数 knowledge_id,
  *{
   "id_list": [
     "3fa85f64-5717-4562-b3fc-2c963f66afa6"
@@ -85,7 +85,7 @@ const putBatchCancelTask: (
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<boolean>> = (knowledge_id, data, loading) => {
-  return put(`${prefix}/${knowledge_id}/document/cancel_task/_batch`, data, undefined, loading)
+  return put(`${prefix}/${knowledge_id}/document/batch_cancel_task`, data, undefined, loading)
 }
 
 /**
@@ -367,7 +367,7 @@ const postQADocument: (
  * 分段预览（上传文档）
  * @param 参数  file:file,limit:number,patterns:array,with_filter:boolean
  */
-const postSplitDocument: (data: any, id:string) => Promise<Result<any>> = (data, id) => {
+const postSplitDocument: (data: any, id: string) => Promise<Result<any>> = (data, id) => {
   return post(`${prefix}/${id}/document/split`, data, undefined, undefined, 1000 * 60 * 60)
 }
 

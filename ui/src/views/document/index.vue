@@ -580,7 +580,7 @@
     <div class="mul-operation w-full flex" v-if="multipleSelection.length !== 0">
       <el-button
         :disabled="multipleSelection.length === 0"
-        @click="cancelTaskHandle(1, row)"
+        @click="cancelTaskHandle(1)"
         v-hasPermission="[
           RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
           PermissionConst.KNOWLEDGE_DOCUMENT_VECTOR.getWorkspacePermission,
@@ -590,7 +590,7 @@
       </el-button>
       <el-button
         :disabled="multipleSelection.length === 0"
-        @click="cancelTaskHandle(2, row)"
+        @click="cancelTaskHandle(2)"
         v-hasPermission="[
           RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
           PermissionConst.KNOWLEDGE_DOCUMENT_GENERATE.getWorkspacePermission,
@@ -705,7 +705,7 @@ const exportDocumentZip = (document: any) => {
     })
 }
 
-function cancelTaskHandle(val: any, row: any) {
+function cancelTaskHandle(val: any) {
   const arr: string[] = []
   multipleSelection.value.map((v) => {
     if (v) {
@@ -716,7 +716,7 @@ function cancelTaskHandle(val: any, row: any) {
     id_list: arr,
     type: val,
   }
-  documentApi.putBatchCancelTask(id, row.id, obj, loading).then(() => {
+  documentApi.putBatchCancelTask(id, obj, loading).then(() => {
     MsgSuccess(t('views.document.tip.cancelSuccess'))
     multipleTableRef.value?.clearSelection()
   })
@@ -1081,9 +1081,7 @@ onBeforeUnmount(() => {
 })
 </script>
 <style lang="scss" scoped>
-.document-main {
-  box-sizing: border-box;
-
+.document {
   .mul-operation {
     position: fixed;
     margin-left: var(--sidebar-width);

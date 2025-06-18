@@ -71,7 +71,7 @@ const delDocument: (
 
 /**
  * 批量取消文档任务
- * @param 参数 knowledge_id, document_id,
+ * @param 参数 knowledge_id,
  *{
   "id_list": [
     "3fa85f64-5717-4562-b3fc-2c963f66afa6"
@@ -82,12 +82,11 @@ const delDocument: (
 
 const putBatchCancelTask: (
   knowledge_id: string,
-  document_id: string,
   data: any,
   loading?: Ref<boolean>,
-) => Promise<Result<boolean>> = (knowledge_id, document_id, data, loading) => {
+) => Promise<Result<boolean>> = (knowledge_id, data, loading) => {
   return put(
-    `${prefix}/${knowledge_id}/document/${document_id}/batch_cancel_task`,
+    `${prefix}/${knowledge_id}/document/batch_cancel_task`,
     data,
     undefined,
     loading,
