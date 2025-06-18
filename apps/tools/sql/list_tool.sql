@@ -9,7 +9,8 @@ from (select "id"::text,
              "user_id",
              "icon",
              "create_time",
-             "update_time"
+             "update_time",
+             "is_active"
       from tool ${tool_scope_query_set}
       UNION
       select "id",
@@ -22,6 +23,7 @@ from (select "id"::text,
              "user_id",
              '' as "icon",
              "create_time",
-             "update_time"
+             "update_time",
+             'true' as "is_active"
       from tool_folder ${folder_query_set}) temp
     ${tool_query_set}
