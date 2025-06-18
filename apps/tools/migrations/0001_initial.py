@@ -71,5 +71,5 @@ class Migration(migrations.Migration):
                 'db_table': 'tool',
             },
         ),
-        migrations.RunSQL(get_file_content(os.path.join(PROJECT_DIR, "apps", "tools", 'migrations', 'internal_tool.sql')))
+        # migrations.RunSQL(get_file_content(os.path.join(PROJECT_DIR, "apps", "tools", 'migrations', 'internal_tool.sql')))
     ]
