@@ -516,6 +516,10 @@ class PermissionConstants(Enum):
         group=Group.WORKSPACE_USER_RESOURCE_PERMISSION, operate=Operate.READ,
         role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE]
     )
+    WORKSPACE_USER_RESOURCE_PERMISSION_EDIT = Permission(
+        group=Group.WORKSPACE_USER_RESOURCE_PERMISSION, operate=Operate.EDIT,
+        role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE]
+    )
     EMAIL_SETTING_READ = Permission(
         group=Group.EMAIL_SETTING, operate=Operate.READ, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.SYSTEM_SETTING]
