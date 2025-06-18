@@ -8346,3 +8346,6 @@ msgstr ""
 #: apps/xpack/views/system_params.py:41
 msgid "Update appearance settings"
 msgstr ""
+
+msgid "Application Access"
+msgstr ""

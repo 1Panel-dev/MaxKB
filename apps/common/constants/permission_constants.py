@@ -270,6 +270,7 @@ Permission_Label = {
     Group.WORKSPACE_WORKSPACE.value: _("Workspace"),
     Group.APPLICATION_CHAT_LOG.value: _("Dialogue log"),
     Group.WORKSPACE_ROLE.value: _("Role"),
+    Group.APPLICATION_ACCESS.value: _("Application Access"),
 }
 
 

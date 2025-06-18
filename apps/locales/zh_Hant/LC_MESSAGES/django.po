@@ -8472,3 +8472,6 @@ msgstr "查看外觀設置"
 #: apps/xpack/views/system_params.py:41
 msgid "Update appearance settings"
 msgstr "更新外觀設置"
+
+msgid "Application Access"
+msgstr "應用介入"
