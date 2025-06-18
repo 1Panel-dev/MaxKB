@@ -55,7 +55,7 @@ async function getWorkspaceList() {
 
 onBeforeMount(async () => {
   await getWorkspaceList()
-  const id = user.getWorkspaceId() ?? 'default'
+  const id = localStorage.getItem('workspace_id') ?? 'default'
   currentWorkspace.value = workspaceList.value.find((item) => item.id === id)
 })
 

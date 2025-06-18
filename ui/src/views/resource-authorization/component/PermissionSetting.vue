@@ -20,13 +20,6 @@
             >
               <img :src="row?.icon" alt="" />
             </el-avatar>
-
-            <LogoIcon
-              v-if="isApplication"
-              height="28px"
-              style="width: 28px; height: 28px; display: block"
-              class="mr-12"
-            />
             <el-avatar
               v-else-if="row.isFolder"
               class="mr-12"
@@ -40,11 +33,18 @@
                 alt=""
               />
             </el-avatar>
+            <LogoIcon
+              v-else-if="isApplication"
+              height="28px"
+              style="width: 28px; height: 28px; display: block"
+              class="mr-12"
+            />
+
             <KnowledgeIcon class="mr-12" :size="20" v-else-if="isKnowledge" :type="row.icon" />
 
-            <auto-tooltip :content="row?.name">
+            <span :title="row?.name">
               {{ row?.name }}
-            </auto-tooltip>
+            </span>
           </div>
         </template>
       </el-table-column>

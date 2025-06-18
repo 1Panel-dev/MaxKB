@@ -32,7 +32,7 @@ const useUserStore = defineStore('user', {
     license_is_valid: false,
     edition: 'CE',
     themeInfo: null,
-    workspace_id: 'default',
+    workspace_id: '',
   }),
   actions: {
     getLanguage() {
@@ -53,14 +53,8 @@ const useUserStore = defineStore('user', {
       localStorage.setItem('workspace_id', workspace_id)
     },
     getWorkspaceId(): string | null {
-      if (this.workspace_id) {
-        return this.workspace_id
-      }
-      const workspace_id = localStorage.getItem('workspace_id')
-      if (workspace_id) {
-        this.workspace_id = workspace_id
-      }
-      return workspace_id
+      this.workspace_id = this.workspace_id || localStorage.getItem('workspace_id') || 'default'
+      return this.workspace_id
     },
 
     getPermissions() {

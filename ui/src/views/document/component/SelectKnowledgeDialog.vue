@@ -8,36 +8,14 @@
     :close-on-press-escape="false"
   >
     <template #header="{ titleId, titleClass }">
-      <div class="my-header flex">
-        <h4 :id="titleId" :class="titleClass">{{ $t('views.chatLog.selectKnowledge') }}</h4>
-        <el-button link class="ml-16" @click="refresh">
-          <el-icon class="mr-4"><Refresh /></el-icon>{{ $t('common.refresh') }}
-        </el-button>
-      </div>
+      <h4 :id="titleId" :class="titleClass">{{ $t('views.chatLog.selectKnowledge') }}</h4>
     </template>
-    <div class="content-height">
-      <el-radio-group v-model="selectKnowledge" class="card__radio">
-        <el-scrollbar height="500">
-          <div class="p-16">
-            <el-row :gutter="12" v-loading="loading">
-              <el-col :span="12" v-for="(item, index) in knowledgeList" :key="index" class="mb-16">
-                <el-card shadow="never" :class="item.id === selectKnowledge ? 'active' : ''">
-                  <el-radio :value="item.id" size="large">
-                    <div class="flex align-center">
-                      <KnowledgeIcon :type="item.type" class="mr-12" />
 
-                      <span class="ellipsis" :title="item.name">
-                        {{ item.name }}
-                      </span>
-                    </div>
-                  </el-radio>
-                </el-card>
-              </el-col>
-            </el-row>
-          </div>
-        </el-scrollbar>
-      </el-radio-group>
-    </div>
+    <el-tree-select v-model="selectKnowledge" :data="knowledgeList" style="width: 240px">
+      <template #default="{ data: { label } }">
+        {{ label }}<span style="color: gray">(suffix)</span>
+      </template>
+    </el-tree-select>
     <template #footer>
       <span class="dialog-footer">
         <el-button @click.prevent="dialogVisible = false"> {{ $t('common.cancel') }} </el-button>
