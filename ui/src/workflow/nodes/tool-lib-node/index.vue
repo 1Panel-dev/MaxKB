@@ -22,7 +22,7 @@
                   item.source === 'reference'
                     ? $t('views.tool.functionForm.form.param.selectPlaceholder')
                     : $t('views.tool.functionForm.form.param.inputPlaceholder'),
-                trigger: 'blur'
+                trigger: 'blur',
               }"
             >
               <template #label>
@@ -64,10 +64,9 @@
         <template #label>
           <div class="flex align-center">
             <div class="mr-4">
-              <span
-                >{{ $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')
-                }}</span
-              >
+              <span>{{
+                $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')
+              }}</span>
             </div>
             <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
               <template #content>
@@ -90,16 +89,14 @@ import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'
 import { isLastNode } from '@/workflow/common/data'
 import applicationApi from '@/api/application/application'
-import { app } from '@/main'
+
 const props = defineProps<{ nodeModel: any }>()
 
 const nodeCascaderRef = ref()
-const {
-  params: { id }
-} = app.config.globalProperties.$route as any
+
 const form = {
   input_field_list: [],
-  is_result: false
+  is_result: false,
 }
 
 const chat_data = computed({
@@ -113,7 +110,7 @@ const chat_data = computed({
   },
   set: (value) => {
     set(props.nodeModel.properties, 'node_data', value)
-  }
+  },
 })
 
 const FunctionNodeFormRef = ref<FormInstance>()

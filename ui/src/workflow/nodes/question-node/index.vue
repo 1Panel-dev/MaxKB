@@ -133,7 +133,7 @@
 </template>
 <script setup lang="ts">
 import { set, groupBy } from 'lodash'
-import { app } from '@/main'
+
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import AIModeParamSettingDialog from '@/views/application/component/AIModeParamSettingDialog.vue'
 import type { FormInstance } from 'element-plus'
@@ -142,6 +142,11 @@ import applicationApi from '@/api/application/application'
 import useStore from '@/stores'
 import { isLastNode } from '@/workflow/common/data'
 import { t } from '@/locales'
+import { useRoute } from 'vue-router'
+const route = useRoute()
+const {
+  params: { id },
+} = route as any
 const { model } = useStore()
 const AIModeParamSettingDialogRef = ref<InstanceType<typeof AIModeParamSettingDialog>>()
 
@@ -169,9 +174,6 @@ function submitDialog(val: string) {
 function submitSystemDialog(val: string) {
   set(props.nodeModel.properties.node_data, 'system', val)
 }
-const {
-  params: { id },
-} = app.config.globalProperties.$route as any
 
 // @ts-ignore
 const defaultPrompt = `${t('views.applicationWorkflow.nodes.questionNode.defaultPrompt1')}{{${t('views.applicationWorkflow.nodes.startNode.label')}.question}}

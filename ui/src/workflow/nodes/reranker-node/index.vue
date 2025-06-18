@@ -69,10 +69,14 @@
             </el-col>
           </el-row>
         </el-form-item>
-        <el-form-item :label="$t('views.applicationWorkflow.nodes.searchKnowledgeNode.searchParam')">
+        <el-form-item
+          :label="$t('views.applicationWorkflow.nodes.searchKnowledgeNode.searchParam')"
+        >
           <template #label>
             <div class="flex-between">
-              <span>{{ $t('views.applicationWorkflow.nodes.searchKnowledgeNode.searchParam') }}</span>
+              <span>{{
+                $t('views.applicationWorkflow.nodes.searchKnowledgeNode.searchParam')
+              }}</span>
               <el-button type="primary" link @click="openParamSettingDialog">
                 <el-icon><Setting /></el-icon>
               </el-button>
@@ -175,15 +179,17 @@ import { ref, computed, onMounted } from 'vue'
 
 import applicationApi from '@/api/application/application'
 import useStore from '@/stores'
-import { app } from '@/main'
 
+import { useRoute } from 'vue-router'
+const route = useRoute()
+const {
+  params: { id },
+} = route as any
 const { model } = useStore()
 const props = defineProps<{ nodeModel: any }>()
 
 const ParamSettingDialogRef = ref<InstanceType<typeof ParamSettingDialog>>()
-const {
-  params: { id },
-} = app.config.globalProperties.$route as any
+
 const form = {
   reranker_reference_list: [[]],
   reranker_model_id: '',

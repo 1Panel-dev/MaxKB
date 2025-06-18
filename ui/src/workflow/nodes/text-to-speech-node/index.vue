@@ -17,7 +17,7 @@
           :rules="{
             required: true,
             message: $t('views.application.form.voicePlay.placeholder'),
-            trigger: 'change'
+            trigger: 'change',
           }"
         >
           <template #label>
@@ -55,7 +55,7 @@
           :rules="{
             message: $t('views.applicationWorkflow.nodes.textToSpeechNode.content.label'),
             trigger: 'blur',
-            required: true
+            required: true,
           }"
         >
           <template #label>
@@ -109,20 +109,20 @@ import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import { computed, onMounted, ref } from 'vue'
 import { groupBy, set } from 'lodash'
 import applicationApi from '@/api/application/application'
-import { app } from '@/main'
 import useStore from '@/stores'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import type { FormInstance } from 'element-plus'
 import { MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
+import { useRoute } from 'vue-router'
+const route = useRoute()
+const {
+  params: { id },
+} = route as any
 import TTSModeParamSettingDialog from '@/views/application/component/TTSModeParamSettingDialog.vue'
 
 const TTSModeParamSettingDialogRef = ref<InstanceType<typeof TTSModeParamSettingDialog>>()
 const { model } = useStore()
-
-const {
-  params: { id }
-} = app.config.globalProperties.$route as any
 
 const props = defineProps<{ nodeModel: any }>()
 const modelOptions = ref<any>(null)
@@ -132,7 +132,7 @@ const nodeCascaderRef = ref()
 const validate = () => {
   return Promise.all([
     nodeCascaderRef.value ? nodeCascaderRef.value.validate() : Promise.resolve(''),
-    aiChatNodeFormRef.value?.validate()
+    aiChatNodeFormRef.value?.validate(),
   ]).catch((err: any) => {
     return Promise.reject({ node: props.nodeModel, errMessage: err })
   })
@@ -152,7 +152,7 @@ const form = {
   tts_model_id: '',
   is_result: true,
   content_list: [],
-  model_params_setting: {}
+  model_params_setting: {},
 }
 
 const form_data = computed({
@@ -166,7 +166,7 @@ const form_data = computed({
   },
   set: (value) => {
     set(props.nodeModel.properties, 'node_data', value)
-  }
+  },
 })
 
 // todo

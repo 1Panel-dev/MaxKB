@@ -15,10 +15,10 @@
           prop="question_reference_address"
           :rules="{
             message: $t(
-              'views.applicationWorkflow.nodes.searchKnowledgeNode.searchQuestion.requiredMessage'
+              'views.applicationWorkflow.nodes.searchKnowledgeNode.searchQuestion.requiredMessage',
             ),
             trigger: 'blur',
-            required: true
+            required: true,
           }"
         >
           <NodeCascader
@@ -39,7 +39,7 @@
           :rules="{
             message: $t('views.chatLog.documentPlaceholder'),
             trigger: 'blur',
-            required: false
+            required: false,
           }"
         >
           <NodeCascader
@@ -57,10 +57,10 @@
           prop="image_list"
           :rules="{
             message: $t(
-              'views.applicationWorkflow.nodes.imageUnderstandNode.image.requiredMessage'
+              'views.applicationWorkflow.nodes.imageUnderstandNode.image.requiredMessage',
             ),
             trigger: 'blur',
-            required: false
+            required: false,
           }"
         >
           <NodeCascader
@@ -81,7 +81,7 @@
           :rules="{
             message: $t('views.applicationWorkflow.nodes.speechToTextNode.audio.placeholder'),
             trigger: 'blur',
-            required: false
+            required: false,
           }"
         >
           <NodeCascader
@@ -100,8 +100,8 @@
               {
                 required: field.is_required,
                 message: `${$t('common.inputPlaceholder')}${field.variable}`,
-                trigger: 'blur'
-              }
+                trigger: 'blur',
+              },
             ]"
           >
             <NodeCascader
@@ -124,8 +124,8 @@
               {
                 required: field.required,
                 message: `${$t('common.inputPlaceholder')}${field.label}`,
-                trigger: 'blur'
-              }
+                trigger: 'blur',
+              },
             ]"
           >
             <NodeCascader
@@ -167,26 +167,26 @@
 
 <script setup lang="ts">
 import { set, groupBy, create, cloneDeep } from 'lodash'
-import { app } from '@/main'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import { ref, computed, onMounted, onActivated } from 'vue'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import type { FormInstance } from 'element-plus'
 import applicationApi from '@/api/application/application'
 import { isWorkFlow } from '@/utils/application'
-
+import { useRoute } from 'vue-router'
+const route = useRoute()
 const form = {
   question_reference_address: ['start-node', 'question'],
   api_input_field_list: [],
   user_input_field_list: [],
   document_list: ['start-node', 'document'],
   image_list: ['start-node', 'image'],
-  audio_list: ['start-node', 'audio']
+  audio_list: ['start-node', 'audio'],
 }
 
 const {
-  params: { id }
-} = app.config.globalProperties.$route as any
+  params: { id },
+} = route as any
 
 const applicationNodeFormRef = ref<FormInstance>()
 
@@ -201,7 +201,7 @@ const form_data = computed({
   },
   set: (value) => {
     set(props.nodeModel.properties, 'node_data', value)
-  }
+  },
 })
 
 function handleFileUpload(type: string, isEnabled: boolean) {
