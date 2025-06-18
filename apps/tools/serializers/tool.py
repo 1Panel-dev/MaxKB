@@ -157,22 +157,13 @@ class ToolCreateRequest(serializers.Serializer):
 
 
 class ToolEditRequest(serializers.Serializer):
-    name = serializers.CharField(required=False, label=_('tool name'))
-
-    desc = serializers.CharField(required=False, allow_null=True, allow_blank=True,
-                                 label=_('tool description'))
-
-    code = serializers.CharField(required=False, label=_('tool content'))
-
-    input_field_list = serializers.ListField(child=ToolInputField(), required=False, default=list,
-                                             label=_('input field list'))
-
-    init_field_list = serializers.ListField(child=InitField(), required=False, default=list, label=_('init field list'))
-
-    init_params = serializers.DictField(required=False, default=dict, label=_('init params'))
-
-    is_active = serializers.BooleanField(required=False, label=_('Is active'))
-
+    name = serializers.CharField(required=False, label=_('tool name'), allow_null=True)
+    desc = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('tool description'))
+    code = serializers.CharField(required=False, label=_('tool content'), allow_null=True,)
+    input_field_list = serializers.ListField(child=ToolInputField(), required=False, default=list, allow_null=True, label=_('input field list'))
+    init_field_list = serializers.ListField(child=InitField(), required=False, default=list, allow_null=True, label=_('init field list'))
+    init_params = serializers.DictField(required=False, default=dict, allow_null=True, label=_('init params'))
+    is_active = serializers.BooleanField(required=False, label=_('Is active'), allow_null=True,)
     folder_id = serializers.CharField(required=False, allow_null=True)
 
 
