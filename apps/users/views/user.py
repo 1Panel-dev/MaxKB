@@ -16,7 +16,7 @@ from rest_framework.views import APIView
 from common.auth.authenticate import TokenAuth
 from common.auth.authentication import has_permissions
 from common.constants.cache_version import Cache_Version
-from common.constants.permission_constants import PermissionConstants, Permission, Group, Operate
+from common.constants.permission_constants import PermissionConstants, Permission, Group, Operate, RoleConstants
 from common.log.log import log
 from common.result import result
 from maxkb.const import CONFIG
@@ -164,7 +164,7 @@ class UserManage(APIView):
                    tags=[_("User Management")],  # type: ignore
                    request=UserProfileAPI.get_request(),
                    responses=UserProfileAPI.get_response())
-    @has_permissions(PermissionConstants.USER_CREATE)
+    @has_permissions(PermissionConstants.USER_CREATE, RoleConstants.ADMIN)
     @log(menu='User management', operate='Add user',
          get_operation_object=lambda r, k: {'name': r.data.get('username', None)})
     def post(self, request: Request):

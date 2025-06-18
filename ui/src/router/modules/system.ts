@@ -2,7 +2,7 @@ import { PermissionConst, EditionConst, RoleConst } from '@/utils/permission/dat
 const systemRouter = {
   path: '/system',
   name: 'system',
-  meta: { title: 'views.system.title', permission: 'USER_MANAGEMENT:READ' },
+  meta: { title: 'views.system.title' },
   hidden: true,
   component: () => import('@/layout/layout-template/SystemMainLayout.vue'),
   children: [
