@@ -93,6 +93,8 @@ class SwitchUserLanguageView(APIView):
                    )
     @log(menu='User management', operate='Switch Language',
          get_operation_object=lambda r, k: {'name': r.user.username})
+    @has_permissions(PermissionConstants.SWITCH_LANGUAGE, RoleConstants.ADMIN, RoleConstants.USER,
+                     RoleConstants.WORKSPACE_MANAGE)
     def post(self, request: Request):
         data = {**request.data, 'user_id': request.user.id}
         return result.success(SwitchLanguageSerializer(data=data).switch())
@@ -206,7 +208,7 @@ class UserManage(APIView):
                        tags=[_("User Management")],  # type: ignore
                        request=DeleteUserApi.get_parameters(),
                        responses=UserProfileAPI.get_response())
-        @has_permissions(PermissionConstants.USER_READ,RoleConstants.ADMIN)
+        @has_permissions(PermissionConstants.USER_READ, RoleConstants.ADMIN)
         def get(self, request: Request, user_id):
             return result.success(UserManageSerializer.Operate(data={'id': user_id}).one(with_valid=True))
 
@@ -269,7 +271,7 @@ class UserManage(APIView):
                        tags=[_("User Management")],  # type: ignore
                        parameters=UserPageApi.get_parameters(),
                        responses=UserPageApi.get_response())
-        @has_permissions(PermissionConstants.USER_READ,RoleConstants.ADMIN)
+        @has_permissions(PermissionConstants.USER_READ, RoleConstants.ADMIN)
         def get(self, request: Request, current_page, page_size):
             d = UserManageSerializer.Query(
                 data={'email_or_username': request.query_params.get('email_or_username', None),
@@ -359,6 +361,8 @@ class ResetCurrentUserPasswordView(APIView):
     @log(menu='User management', operate='Modify current user password',
          get_operation_object=lambda r, k: {'name': r.user.username},
          get_details=get_re_password_details)
+    @has_permissions(PermissionConstants.CHANGE_PASSWORD, RoleConstants.ADMIN, RoleConstants.USER,
+                     RoleConstants.WORKSPACE_MANAGE)
     def post(self, request: Request):
         serializer_obj = RePasswordSerializer(data=request.data)
         if serializer_obj.reset_password(request.user.id):
