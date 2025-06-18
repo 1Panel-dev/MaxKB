@@ -26,7 +26,7 @@ import MemberFormContent from '@/views/role/component/MemberFormContent.vue'
 import { t } from '@/locales'
 import { MsgSuccess } from '@/utils/message'
 import type { CreateWorkspaceMemberParamsItem, WorkspaceItem } from '@/api/type/workspace'
-import type {  FormItemModel } from '@/api/type/role'
+import type { FormItemModel } from '@/api/type/role'
 
 const props = defineProps<{
   currentWorkspace?: WorkspaceItem
@@ -117,14 +117,14 @@ function handleCancel() {
 
 const memberFormContentRef = ref<InstanceType<typeof MemberFormContent>>()
 function handleAdd() {
-  // memberFormContentRef.value?.validate().then(async (valid) => {
-  //   if (valid) {
-  //     await WorkspaceApi.CreateWorkspaceMember(props.currentWorkspace?.id as string, list.value, loading)
-  //     MsgSuccess(t('common.addSuccess'))
-  //     handleCancel();
-  //     emit('refresh')
-  //   }
-  // })
+  memberFormContentRef.value?.validate().then(async (valid: any) => {
+    if (valid) {
+      await WorkspaceApi.CreateWorkspaceMember(props.currentWorkspace?.id as string, list.value, loading)
+      MsgSuccess(t('common.addSuccess'))
+      handleCancel();
+      emit('refresh')
+    }
+  })
 }
 
 defineExpose({ open })
