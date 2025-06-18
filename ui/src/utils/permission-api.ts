@@ -18,11 +18,13 @@ const workspaceApiMap = {
  */
 
 export function loadPermissionApi(type: string) {
-  if (hasPermission([EditionConst.IS_EE, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole], 'AND')) {
-    // 加载企业版工作空间管理员 API
-    return workspaceApiMap[type]
-  } else {
-    // 加载系统管理员 API
-    return systemApiMap[type]
+  if (hasPermission(EditionConst.IS_EE, 'OR')) {
+    if (hasPermission([RoleConst.ADMIN], 'OR')) {
+      // 加载企业版工作空间管理员 API
+      return systemApiMap[type]
+    } else if (hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole], 'OR')) {
+      // 加载系统管理员 API
+      return workspaceApiMap[type]
+    }
   }
 }

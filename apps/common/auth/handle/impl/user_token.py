@@ -218,11 +218,12 @@ def get_role_list(user,
         if is_query_model:
             # 获取工作空间 用户 角色映射数据
             workspace_user_role_mapping_list = QuerySet(workspace_user_role_mapping_model).filter(user_id=user.id)
-            cache.set(key,
-                      [f"{workspace_user_role_mapping.role_id}:/WORKSPACE/{workspace_user_role_mapping.workspace_id}"
-                       for
-                       workspace_user_role_mapping in
-                       workspace_user_role_mapping_list] + [user.role], version=version)
+            workspace_list = [
+                                 f"{workspace_user_role_mapping.role_id}:/WORKSPACE/{workspace_user_role_mapping.workspace_id}"
+                                 for
+                                 workspace_user_role_mapping in
+                                 workspace_user_role_mapping_list] + [user.role]
+            cache.set(key, workspace_list, version=version)
         else:
             role_list = [user.role]
             if user.role == RoleConstants.ADMIN.value.__str__():
