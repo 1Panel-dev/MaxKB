@@ -69,10 +69,9 @@ class Config(dict):
         return {
             'default': {
                 'BACKEND': 'django_redis.cache.RedisCache',
-                'LOCATION': f'redis://{self.get("REDIS_HOST")}:{self.get("REDIS_PORT")}',
+                'LOCATION': f'redis://{self.get("REDIS_HOST")}:{self.get("REDIS_PORT")}/{self.get("REDIS_DB")}',
                 'OPTIONS': {
                     'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-                    "DB": self.get("REDIS_DB"),
                     "PASSWORD": self.get("REDIS_PASSWORD"),
                     "CONNECTION_POOL_KWARGS": {"max_connections": int(self.get("REDIS_MAX_CONNECTIONS"))}
                 },
