@@ -7,13 +7,12 @@
     @desc:
 """
 from drf_spectacular.utils import extend_schema
-from networkx.algorithms.traversal import dfs_successors
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
-from common.constants.permission_constants import PermissionConstants
+from common.constants.permission_constants import PermissionConstants, RoleConstants
 
 from django.utils.translation import gettext_lazy as _
 
@@ -56,7 +55,7 @@ class SystemSetting(APIView):
                        tags=[_('Email Settings')])  # type: ignore
         @log(menu='Email settings', operate='Create or update email settings',
              get_details=get_email_details)
-        @has_permissions(PermissionConstants.EMAIL_SETTING_EDIT)
+        @has_permissions(PermissionConstants.EMAIL_SETTING_EDIT, RoleConstants.ADMIN)
         def put(self, request: Request):
             return result.success(
                 EmailSettingSerializer.Create(
@@ -70,7 +69,7 @@ class SystemSetting(APIView):
             responses=DefaultModelResponse.get_response(),
             tags=[_('Email Settings')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.EMAIL_SETTING_EDIT)
+        @has_permissions(PermissionConstants.EMAIL_SETTING_EDIT, RoleConstants.ADMIN)
         @log(menu='Email settings', operate='Test email settings',
              get_details=get_email_details
              )
@@ -85,7 +84,7 @@ class SystemSetting(APIView):
                        operation_id=_('Get email settings'),  # type: ignore
                        responses=DefaultModelResponse.get_response(),
                        tags=[_('Email Settings')])  # type: ignore
-        @has_permissions(PermissionConstants.EMAIL_SETTING_READ)
+        @has_permissions(PermissionConstants.EMAIL_SETTING_READ, RoleConstants.ADMIN)
         def get(self, request: Request):
             return result.success(
                 EmailSettingSerializer.one())

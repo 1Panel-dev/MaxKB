@@ -76,7 +76,7 @@ class TestPermissionsUserView(APIView):
                    operation_id="测试",
                    tags=[_("User Management")],  # type: ignore
                    responses=UserProfileAPI.get_response())
-    @has_permissions(PermissionConstants.USER_EDIT)
+    @has_permissions(PermissionConstants.USER_EDIT, RoleConstants.ADMIN)
     def get(self, request: Request):
         return result.success(UserProfileSerializer().profile(request.user, request.auth))
 
@@ -108,7 +108,7 @@ class TestWorkspacePermissionUserView(APIView):
                    tags=[_("User Management")],  # type: ignore
                    responses=UserProfileAPI.get_response(),
                    parameters=TestWorkspacePermissionUserApi.get_parameters())
-    @has_permissions(PermissionConstants.USER_EDIT.get_workspace_permission())
+    @has_permissions(PermissionConstants.USER_EDIT.get_workspace_permission(), RoleConstants.ADMIN)
     def get(self, request: Request, workspace_id):
         return result.success(UserProfileSerializer().profile(request.user, request.auth))
 
@@ -179,7 +179,7 @@ class UserManage(APIView):
                        operation_id=_("Get default password"),  # type: ignore
                        tags=[_("User Management")],  # type: ignore
                        responses=UserPasswordResponse.get_response())
-        @has_permissions(PermissionConstants.USER_CREATE)
+        @has_permissions(PermissionConstants.USER_CREATE, RoleConstants.ADMIN)
         def get(self, request: Request):
             return result.success(data={'password': default_password})
 
@@ -193,7 +193,7 @@ class UserManage(APIView):
                        tags=[_("User Management")],  # type: ignore
                        parameters=DeleteUserApi.get_parameters(),
                        responses=DefaultModelResponse.get_response())
-        @has_permissions(PermissionConstants.USER_DELETE)
+        @has_permissions(PermissionConstants.USER_DELETE, RoleConstants.ADMIN)
         @log(menu='User management', operate='Delete user',
              get_operation_object=lambda r, k: get_user_operation_object(k.get('user_id')))
         def delete(self, request: Request, user_id):
@@ -206,7 +206,7 @@ class UserManage(APIView):
                        tags=[_("User Management")],  # type: ignore
                        request=DeleteUserApi.get_parameters(),
                        responses=UserProfileAPI.get_response())
-        @has_permissions(PermissionConstants.USER_READ)
+        @has_permissions(PermissionConstants.USER_READ,RoleConstants.ADMIN)
         def get(self, request: Request, user_id):
             return result.success(UserManageSerializer.Operate(data={'id': user_id}).one(with_valid=True))
 
@@ -218,7 +218,7 @@ class UserManage(APIView):
                        parameters=DeleteUserApi.get_parameters(),
                        request=EditUserApi.get_request(),
                        responses=UserProfileAPI.get_response())
-        @has_permissions(PermissionConstants.USER_EDIT)
+        @has_permissions(PermissionConstants.USER_EDIT, RoleConstants.ADMIN)
         @log(menu='User management', operate='Update user information',
              get_operation_object=lambda r, k: get_user_operation_object(k.get('user_id')))
         def put(self, request: Request, user_id):
@@ -235,7 +235,7 @@ class UserManage(APIView):
                        tags=[_("User Management")],  # type: ignore
                        request=DeleteUserApi.get_request(),
                        responses=DefaultModelResponse.get_response())
-        @has_permissions(PermissionConstants.USER_DELETE)
+        @has_permissions(PermissionConstants.USER_DELETE, RoleConstants.ADMIN)
         @log(menu='User management', operate='Batch delete user',
              get_operation_object=lambda r, k: get_user_operation_object(k.get('user_id')))
         def post(self, request: Request):
@@ -269,7 +269,7 @@ class UserManage(APIView):
                        tags=[_("User Management")],  # type: ignore
                        parameters=UserPageApi.get_parameters(),
                        responses=UserPageApi.get_response())
-        @has_permissions(PermissionConstants.USER_READ)
+        @has_permissions(PermissionConstants.USER_READ,RoleConstants.ADMIN)
         def get(self, request: Request, current_page, page_size):
             d = UserManageSerializer.Query(
                 data={'email_or_username': request.query_params.get('email_or_username', None),
