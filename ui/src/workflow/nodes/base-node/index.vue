@@ -167,7 +167,6 @@
   </NodeContainer>
 </template>
 <script setup lang="ts">
-import { app } from '@/main'
 import { groupBy, set } from 'lodash'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import type { FormInstance } from 'element-plus'
@@ -180,10 +179,11 @@ import TTSModeParamSettingDialog from '@/views/application/component/TTSModePara
 import ApiInputFieldTable from './component/ApiInputFieldTable.vue'
 import UserInputFieldTable from './component/UserInputFieldTable.vue'
 import FileUploadSettingDialog from '@/workflow/nodes/base-node/component/FileUploadSettingDialog.vue'
-
+import { useRoute } from 'vue-router'
+const route = useRoute()
 const {
   params: { id },
-} = app.config.globalProperties.$route as any
+} = route as any
 
 const props = defineProps<{ nodeModel: any }>()
 

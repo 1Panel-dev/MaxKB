@@ -170,7 +170,6 @@
 </template>
 <script setup lang="ts">
 import { cloneDeep, set, groupBy } from 'lodash'
-import { app } from '@/main'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'
@@ -182,6 +181,8 @@ import AIModeParamSettingDialog from '@/views/application/component/AIModeParamS
 import { t } from '@/locales'
 import ReasoningParamSettingDialog from '@/views/application/component/ReasoningParamSettingDialog.vue'
 import McpServersDialog from '@/views/application/component/McpServersDialog.vue'
+import { useRoute } from 'vue-router'
+const route = useRoute()
 const { model } = useStore()
 
 const wheel = (e: any) => {
@@ -211,7 +212,7 @@ const model_change = (model_id?: string) => {
 }
 const {
   params: { id },
-} = app.config.globalProperties.$route as any
+} = route as any
 
 // @ts-ignore
 const defaultPrompt = `${t('views.applicationWorkflow.nodes.aiChatNode.defaultPrompt')}：

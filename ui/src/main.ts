@@ -28,21 +28,21 @@ import 'highlight.js/styles/atom-one-dark.css'
 config({
   editorExtensions: {
     highlight: {
-      instance: highlight
+      instance: highlight,
     },
     screenfull: {
-      instance: screenfull
+      instance: screenfull,
     },
     katex: {
-      instance: katex
+      instance: katex,
     },
     cropper: {
-      instance: Cropper
+      instance: Cropper,
     },
     mermaid: {
-      instance: mermaid
-    }
-  }
+      instance: mermaid,
+    },
+  },
 })
 const app = createApp(App)
 app.use(createPinia())
@@ -62,4 +62,3 @@ app.use(router)
 app.use(i18n)
 app.use(Components)
 app.mount('#app')
-export { app }

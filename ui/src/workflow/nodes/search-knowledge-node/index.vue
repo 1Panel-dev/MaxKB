@@ -39,10 +39,14 @@
             </template>
           </div>
         </el-form-item>
-        <el-form-item :label="$t('views.applicationWorkflow.nodes.searchknowledgeNode.searchParam')">
+        <el-form-item
+          :label="$t('views.applicationWorkflow.nodes.searchknowledgeNode.searchParam')"
+        >
           <template #label>
             <div class="flex-between">
-              <span>{{ $t('views.applicationWorkflow.nodes.searchknowledgeNode.searchParam') }}</span>
+              <span>{{
+                $t('views.applicationWorkflow.nodes.searchknowledgeNode.searchParam')
+              }}</span>
               <el-button type="primary" link @click="openParamSettingDialog">
                 <el-icon><Setting /></el-icon>
               </el-button>
@@ -112,7 +116,7 @@
 </template>
 <script setup lang="ts">
 import { set } from 'lodash'
-import { app } from '@/main'
+
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import AddknowledgeDialog from '@/views/application/component/AddKnowledgeDialog.vue'
@@ -123,9 +127,6 @@ import { relatedObject } from '@/utils/utils'
 import { SearchMode } from '@/enums/application'
 import useStore from '@/stores'
 const { knowledge, application, user } = useStore()
-const {
-  params: { id },
-} = app.config.globalProperties.$route as any
 
 const props = defineProps<{ nodeModel: any }>()
 const nodeCascaderRef = ref()

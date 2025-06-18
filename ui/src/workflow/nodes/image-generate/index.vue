@@ -156,16 +156,18 @@ import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import { computed, onMounted, ref } from 'vue'
 import { groupBy, set } from 'lodash'
 import applicationApi from '@/api/application/application'
-import { app } from '@/main'
+
 import useStore from '@/stores'
 import type { FormInstance } from 'element-plus'
 import AIModeParamSettingDialog from '@/views/application/component/AIModeParamSettingDialog.vue'
 import { t } from '@/locales'
 const { model } = useStore()
 
+import { useRoute } from 'vue-router'
+const route = useRoute()
 const {
   params: { id },
-} = app.config.globalProperties.$route as any
+} = route as any
 
 const props = defineProps<{ nodeModel: any }>()
 const modelOptions = ref<any>(null)

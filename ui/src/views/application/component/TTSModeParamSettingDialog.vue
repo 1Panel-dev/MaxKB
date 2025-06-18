@@ -46,13 +46,11 @@ import type { FormField } from '@/components/dynamics-form/type'
 import modelAPi from '@/api/model/model'
 import applicationApi from '@/api/application/application'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
-import { keys } from 'lodash'
-import { app } from '@/main'
-import { MsgError } from '@/utils/message'
-
+import { useRoute } from 'vue-router'
+const route = useRoute()
 const {
-  params: { id }
-} = app.config.globalProperties.$route as any
+  params: { id },
+} = route as any
 
 const tts_model_id = ref('')
 const model_form_field = ref<Array<FormField>>([])
@@ -75,7 +73,7 @@ const open = (model_id: string, application_id?: string, model_setting_data?: an
     model_form_field.value = ok.data
     const resp = ok.data
       .map((item: any) => ({
-        [item.field]: item.show_default_value !== false ? item.default_value : undefined
+        [item.field]: item.show_default_value !== false ? item.default_value : undefined,
       }))
       .reduce((x, y) => ({ ...x, ...y }), {})
     // 删除不存在的字段
@@ -99,7 +97,7 @@ const reset_default = (model_id: string, application_id?: string) => {
     model_form_field.value = ok.data
     const model_setting_data = ok.data
       .map((item) => ({
-        [item.field]: item.show_default_value !== false ? item.default_value : undefined
+        [item.field]: item.show_default_value !== false ? item.default_value : undefined,
       }))
       .reduce((x, y) => ({ ...x, ...y }), {})
 
@@ -118,7 +116,7 @@ const audioPlayer = ref<HTMLAudioElement | null>(null)
 const testPlay = () => {
   const data = {
     ...form_data.value,
-    tts_model_id: tts_model_id.value
+    tts_model_id: tts_model_id.value,
   }
   // applicationApi
   //   .playDemoText(id as string, data, playLoading)

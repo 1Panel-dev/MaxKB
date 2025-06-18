@@ -166,7 +166,6 @@
 </template>
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { app } from '@/main'
 import DropdownMenu from '@/views/application-workflow/component/DropdownMenu.vue'
 import { set } from 'lodash'
 import { iconComponent } from '../icons/utils'
@@ -175,9 +174,11 @@ import { WorkflowType } from '@/enums/application'
 import { MsgError, MsgConfirm } from '@/utils/message'
 import type { FormInstance } from 'element-plus'
 import { t } from '@/locales'
+import { useRoute } from 'vue-router'
+const route = useRoute()
 const {
   params: { id },
-} = app.config.globalProperties.$route as any
+} = route as any
 
 const height = ref<{
   stepContainerHeight: number
