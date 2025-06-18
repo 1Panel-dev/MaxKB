@@ -1,70 +1,56 @@
 <template>
   <el-dialog
-    :title="$t('views.log.selectDataset')"
+    :title="$t('views.chatLog.selectKnowledge')"
     v-model="dialogVisible"
     width="600"
-    class="select-dataset-dialog"
+    class="select-knowledge-dialog"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
   >
     <template #header="{ titleId, titleClass }">
-      <div class="my-header flex">
-        <h4 :id="titleId" :class="titleClass">{{ $t('views.log.selectDataset') }}</h4>
-        <el-button link class="ml-16" @click="refresh">
-          <el-icon class="mr-4"><Refresh /></el-icon>{{ $t('common.refresh') }}
-        </el-button>
-      </div>
+      <h4 :id="titleId" :class="titleClass">{{ '文档迁移到' }}</h4>
     </template>
-    <div class="content-height">
-      <el-radio-group v-model="selectDataset" class="card__radio">
-        <el-scrollbar height="500">
-          <div class="p-16">
-            <el-row :gutter="12" v-loading="loading">
-              <el-col :span="12" v-for="(item, index) in datasetList" :key="index" class="mb-16">
-                <el-card shadow="never" :class="item.id === selectDataset ? 'active' : ''">
-                  <el-radio :value="item.id" size="large">
-                    <div class="flex align-center">
-                      <el-avatar
-                        v-if="item?.type === '0'"
-                        class="mr-8 avatar-blue"
-                        shape="square"
-                        :size="32"
-                      >
-                        <img src="@/assets/knowledge/icon_document.svg" style="width: 58%" alt="" />
-                      </el-avatar>
-                      <el-avatar
-                        v-if="item?.type === '1'"
-                        class="mr-8 avatar-purple"
-                        shape="square"
-                        :size="32"
-                      >
-                        <img src="@/assets/knowledge/icon_web.svg" style="width: 58%" alt="" />
-                      </el-avatar>
-                      <el-avatar
-                        v-if="item?.type === '2'"
-                        class="mr-8 avatar-purple"
-                        shape="square"
-                        :size="32"
-                        style="background: none"
-                      >
-                        <img src="@/assets/knowledge/logo_lark.svg" style="width: 100%" alt="" />
-                      </el-avatar>
-                      <span class="ellipsis" :title="item.name">
-                        {{ item.name }}
-                      </span>
-                    </div>
-                  </el-radio>
-                </el-card>
-              </el-col>
-            </el-row>
-          </div>
-        </el-scrollbar>
-      </el-radio-group>
-    </div>
+    <el-form
+      class="p-24"
+      ref="FormRef"
+      :model="form"
+      label-position="top"
+      require-asterisk-position="right"
+      v-loading="loading"
+    >
+      <el-form-item :label="$t('views.chatLog.selectKnowledge')" required>
+        <el-tree-select
+          v-model="form.selectKnowledge"
+          :data="knowledgeList"
+          :props="defaultProps"
+          node-key="id"
+        >
+          <template #default="{ data }">
+            <div class="flex align-center">
+              <KnowledgeIcon class="mr-12" :size="20" v-if="data.resource_type" :type="data.type" />
+              <el-avatar v-else class="mr-12" shape="square" :size="20" style="background: none">
+                <img
+                  src="@/assets/knowledge/icon_file-folder_colorful.svg"
+                  style="width: 100%"
+                  alt=""
+                />
+              </el-avatar>
+
+              {{ data.name }}
+            </div>
+          </template>
+        </el-tree-select>
+      </el-form-item>
+    </el-form>
+
     <template #footer>
       <span class="dialog-footer">
         <el-button @click.prevent="dialogVisible = false"> {{ $t('common.cancel') }} </el-button>
-        <el-button type="primary" @click="submitHandle" :disabled="!selectDataset || loading">
+        <el-button
+          type="primary"
+          @click="submitHandle"
+          :disabled="!form.selectKnowledge || loading"
+        >
           {{ $t('common.confirm') }}
         </el-button>
       </span>
@@ -80,7 +66,7 @@ import useStore from '@/stores/modules-shared-system'
 const { knowledge } = useStore()
 const route = useRoute()
 const {
-  params: { id } // id为datasetID
+  params: { id }, // id为knowledgeID
 } = route as any
 
 const emit = defineEmits(['refresh'])
@@ -88,46 +74,55 @@ const emit = defineEmits(['refresh'])
 const loading = ref<boolean>(false)
 
 const dialogVisible = ref<boolean>(false)
-const selectDataset = ref('')
-const datasetList = ref<any>([])
+const knowledgeList = ref<any>([])
 const documentList = ref<any>([])
+
+const defaultProps = {
+  children: 'children',
+  label: 'name',
+  disabled: (data: any, node: any) => {
+    console.log(data, node)
+    return data.id === id || (node?.isLeaf && !data.resource_type)
+  },
+}
+
+const form = ref<any>({
+  selectKnowledge: '',
+})
 
 watch(dialogVisible, (bool) => {
   if (!bool) {
-    selectDataset.value = ''
-    datasetList.value = []
+    form.value.selectKnowledge = ''
+    knowledgeList.value = []
     documentList.value = []
   }
 })
 
 const open = (list: any) => {
   documentList.value = list
-  getDataset()
+  getKnowledge()
   dialogVisible.value = true
 }
 const submitHandle = () => {
   documentApi
-    .putMigrateMulDocument(id, selectDataset.value, documentList.value, loading)
+    .putMigrateMulDocument(id, form.value.selectKnowledge, documentList.value, loading)
     .then((res) => {
       emit('refresh')
       dialogVisible.value = false
     })
 }
 
-function getDataset() {
-  knowledge.asyncGetRootKnowledge(loading).then((res: any) => {
-    datasetList.value = res.data?.filter((v: any) => v.id !== id)
+function getKnowledge() {
+  knowledge.asyncGetTreeRootKnowledge(loading).then((res: any) => {
+    knowledgeList.value = res || []
+    console.log(knowledgeList.value)
   })
-}
-
-const refresh = () => {
-  getDataset()
 }
 
 defineExpose({ open })
 </script>
 <style lang="scss">
-.select-dataset-dialog {
+.select-knowledge-dialog {
   padding: 0;
   .el-dialog__header {
     padding: 24px 24px 0 24px;

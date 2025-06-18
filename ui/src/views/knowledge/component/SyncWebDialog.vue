@@ -36,9 +36,7 @@
 </template>
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-
-import useStore from '@/stores'
-const { knowledge } = useStore()
+import knowledgeApi from '@/api/knowledge/knowledge'
 
 const emit = defineEmits(['refresh'])
 const loading = ref<boolean>(false)
@@ -59,7 +57,7 @@ const open = (id: string) => {
 }
 
 const submit = () => {
-  knowledge.asyncSyncKnowledge(knowledgeId.value, method.value, loading).then((res: any) => {
+  knowledgeApi.putSyncWebKnowledge(knowledgeId.value, method.value, loading).then((res: any) => {
     emit('refresh', res.data)
     dialogVisible.value = false
   })

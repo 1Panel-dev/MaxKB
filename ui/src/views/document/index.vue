@@ -9,30 +9,70 @@
               <el-button
                 v-if="knowledgeDetail.type === 0"
                 type="primary"
-                @click="router.push({ path: `/knowledge/document/upload/${folderId}`, query: { id: id } })"
-                v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_DOCUMENT_CREATE.getWorkspacePermission]"
+                @click="
+                  router.push({ path: `/knowledge/document/upload/${folderId}`, query: { id: id } })
+                "
+                v-hasPermission="[
+                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                  PermissionConst.KNOWLEDGE_DOCUMENT_CREATE.getWorkspacePermission,
+                ]"
                 >{{ $t('views.document.uploadDocument') }}
               </el-button>
-              <el-button v-if="knowledgeDetail.type === 1" type="primary" @click="importDoc"
-                v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_DOCUMENT_CREATE.getWorkspacePermission]"
-              >{{ $t('views.document.importDocument') }}
+              <el-button
+                v-if="knowledgeDetail.type === 1"
+                type="primary"
+                @click="importDoc"
+                v-hasPermission="[
+                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                  PermissionConst.KNOWLEDGE_DOCUMENT_CREATE.getWorkspacePermission,
+                ]"
+                >{{ $t('views.document.importDocument') }}
               </el-button>
-
-              <el-button @click="batchRefresh" :disabled="multipleSelection.length === 0"
-              v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_DOCUMENT_VECTOR.getWorkspacePermission]"
-              >{{ $t('views.knowledge.setting.vectorization') }}
+              <el-button
+                v-if="knowledgeDetail.type === 2"
+                type="primary"
+                @click="
+                  router.push({
+                    path: `/knowledge/import`,
+                    query: { id: id, folder_token: knowledgeDetail.meta.folder_token },
+                  })
+                "
+                >{{ $t('views.document.importDocument') }}
               </el-button>
-              <el-button @click="openGenerateDialog()" :disabled="multipleSelection.length === 0"
-              v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_DOCUMENT_GENERATE.getWorkspacePermission]"
-              >{{ $t('views.document.generateQuestion.title') }}
+              <el-button
+                @click="batchRefresh"
+                :disabled="multipleSelection.length === 0"
+                v-hasPermission="[
+                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                  PermissionConst.KNOWLEDGE_DOCUMENT_VECTOR.getWorkspacePermission,
+                ]"
+                >{{ $t('views.knowledge.setting.vectorization') }}
               </el-button>
-              <el-button @click="openknowledgeDialog()" :disabled="multipleSelection.length === 0"
-              v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_DOCUMENT_MIGRATE.getWorkspacePermission]"
-              >{{ $t('views.document.setting.migration') }}
+              <el-button
+                @click="openGenerateDialog()"
+                :disabled="multipleSelection.length === 0"
+                v-hasPermission="[
+                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                  PermissionConst.KNOWLEDGE_DOCUMENT_GENERATE.getWorkspacePermission,
+                ]"
+                >{{ $t('views.document.generateQuestion.title') }}
+              </el-button>
+              <el-button
+                @click="openknowledgeDialog()"
+                :disabled="multipleSelection.length === 0"
+                v-hasPermission="[
+                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                  PermissionConst.KNOWLEDGE_DOCUMENT_MIGRATE.getWorkspacePermission,
+                ]"
+                >{{ $t('views.document.setting.migration') }}
               </el-button>
               <el-dropdown>
-                <el-button class="ml-12 mr-12"
-                  v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_DOCUMENT_EDIT.getWorkspacePermission]"
+                <el-button
+                  class="ml-12 mr-12"
+                  v-hasPermission="[
+                    RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                    PermissionConst.KNOWLEDGE_DOCUMENT_EDIT.getWorkspacePermission,
+                  ]"
                 >
                   <el-icon><MoreFilled /></el-icon>
                 </el-button>
@@ -50,18 +90,6 @@
                       :disabled="multipleSelection.length === 0"
                       v-if="knowledgeDetail.type === 1"
                       >{{ $t('views.document.syncDocument') }}
-                    </el-dropdown-item>
-                    <el-dropdown-item
-                      divided
-                      v-if="knowledgeDetail.type === 2"
-                      type="primary"
-                      @click="
-                        router.push({
-                          path: '/knowledge/import',
-                          query: { id: id, folder_token: knowledgeDetail.meta.folder_token },
-                        })
-                      "
-                      >{{ $t('views.document.importDocument') }}
                     </el-dropdown-item>
                     <el-dropdown-item
                       divided
@@ -357,7 +385,10 @@
                       text
                       @click.stop="cancelTask(row, TaskType.EMBEDDING)"
                       :title="$t('views.document.setting.cancelVectorization')"
-                      v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_DOCUMENT_VECTOR.getWorkspacePermission]"
+                      v-hasPermission="[
+                        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                        PermissionConst.KNOWLEDGE_DOCUMENT_VECTOR.getWorkspacePermission,
+                      ]"
                     >
                       <AppIcon iconName="app-close" style="font-size: 16px"></AppIcon>
                     </el-button>
@@ -368,7 +399,10 @@
                       text
                       @click.stop="refreshDocument(row)"
                       :title="$t('views.knowledge.setting.vectorization')"
-                      v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_DOCUMENT_VECTOR.getWorkspacePermission]"
+                      v-hasPermission="[
+                        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                        PermissionConst.KNOWLEDGE_DOCUMENT_VECTOR.getWorkspacePermission,
+                      ]"
                     >
                       <AppIcon iconName="app-document-refresh" style="font-size: 16px"></AppIcon>
                     </el-button>
@@ -379,15 +413,23 @@
                       text
                       @click.stop="settingDoc(row)"
                       :title="$t('common.setting')"
-                      v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_DOCUMENT_EDIT.getWorkspacePermission]"
+                      v-hasPermission="[
+                        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                        PermissionConst.KNOWLEDGE_DOCUMENT_EDIT.getWorkspacePermission,
+                      ]"
                     >
                       <el-icon><Setting /></el-icon>
                     </el-button>
                   </span>
                   <span @click.stop>
                     <el-dropdown trigger="click">
-                      <el-button text type="primary"
-                      v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_DOCUMENT_EDIT.getWorkspacePermission]"
+                      <el-button
+                        text
+                        type="primary"
+                        v-hasPermission="[
+                          RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                          PermissionConst.KNOWLEDGE_DOCUMENT_EDIT.getWorkspacePermission,
+                        ]"
                       >
                         <el-icon><MoreFilled /></el-icon>
                       </el-button>
@@ -399,7 +441,8 @@
                                 getTaskState(row.status, TaskType.GENERATE_PROBLEM),
                               )
                             "
-                            @click="cancelTask(row, TaskType.GENERATE_PROBLEM)">
+                            @click="cancelTask(row, TaskType.GENERATE_PROBLEM)"
+                          >
                             <el-icon><Connection /></el-icon>
                             {{ $t('views.document.setting.cancelGenerateQuestion') }}
                           </el-dropdown-item>
@@ -420,7 +463,8 @@
                             {{ $t('views.document.setting.export') }} Zip
                           </el-dropdown-item>
                           <el-dropdown-item icon="Delete" @click.stop="deleteDocument(row)">
-                          {{$t('common.delete')}}</el-dropdown-item>
+                            {{ $t('common.delete') }}</el-dropdown-item
+                          >
                         </el-dropdown-menu>
                       </template>
                     </el-dropdown>
@@ -433,7 +477,10 @@
                       text
                       @click.stop="syncDocument(row)"
                       :title="$t('views.knowledge.setting.sync')"
-                      v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_SYNC.getWorkspacePermission]"
+                      v-hasPermission="[
+                        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                        PermissionConst.KNOWLEDGE_SYNC.getWorkspacePermission,
+                      ]"
                     >
                       <el-icon><Refresh /></el-icon>
                     </el-button>
@@ -449,8 +496,11 @@
                       text
                       @click.stop="cancelTask(row, TaskType.EMBEDDING)"
                       :title="$t('views.document.setting.cancelVectorization')"
-                      v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_DOCUMENT_VECTOR.getWorkspacePermission]"
-                      >
+                      v-hasPermission="[
+                        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                        PermissionConst.KNOWLEDGE_DOCUMENT_VECTOR.getWorkspacePermission,
+                      ]"
+                    >
                       <AppIcon iconName="app-close" style="font-size: 16px"></AppIcon>
                     </el-button>
 
@@ -460,23 +510,30 @@
                       text
                       @click.stop="refreshDocument(row)"
                       :title="$t('views.knowledge.setting.vectorization')"
-                      v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_DOCUMENT_VECTOR.getWorkspacePermission]"
-                      >
+                      v-hasPermission="[
+                        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                        PermissionConst.KNOWLEDGE_DOCUMENT_VECTOR.getWorkspacePermission,
+                      ]"
+                    >
                       <AppIcon iconName="app-document-refresh" style="font-size: 16px"></AppIcon>
                     </el-button>
                   </span>
 
                   <span @click.stop>
                     <el-dropdown trigger="click">
-                      <el-button text type="primary"
-                        v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_DOCUMENT_EDIT.getWorkspacePermission]"
+                      <el-button
+                        text
+                        type="primary"
+                        v-hasPermission="[
+                          RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                          PermissionConst.KNOWLEDGE_DOCUMENT_EDIT.getWorkspacePermission,
+                        ]"
                       >
                         <el-icon><MoreFilled /></el-icon>
                       </el-button>
                       <template #dropdown>
                         <el-dropdown-menu>
-                          <el-dropdown-item icon="Setting" @click="settingDoc(row)"
-                          >{{
+                          <el-dropdown-item icon="Setting" @click="settingDoc(row)">{{
                             $t('common.setting')
                           }}</el-dropdown-item>
                           <el-dropdown-item
@@ -490,29 +547,24 @@
                             <el-icon><Connection /></el-icon>
                             {{ $t('views.document.setting.cancelGenerateQuestion') }}
                           </el-dropdown-item>
-                          <el-dropdown-item v-else @click="openGenerateDialog(row)"
-                          >
+                          <el-dropdown-item v-else @click="openGenerateDialog(row)">
                             <el-icon><Connection /></el-icon>
                             {{ $t('views.document.generateQuestion.title') }}
                           </el-dropdown-item>
-                          <el-dropdown-item @click="openknowledgeDialog(row)"
-                          >
+                          <el-dropdown-item @click="openknowledgeDialog(row)">
                             <AppIcon iconName="app-migrate"></AppIcon>
                             {{ $t('views.document.setting.migration') }}
                           </el-dropdown-item>
-                          <el-dropdown-item @click="exportDocument(row)"
-                          >
+                          <el-dropdown-item @click="exportDocument(row)">
                             <AppIcon iconName="app-export"></AppIcon>
                             {{ $t('views.document.setting.export') }} Excel
                           </el-dropdown-item>
-                          <el-dropdown-item @click="exportDocumentZip(row)"
-                          >
+                          <el-dropdown-item @click="exportDocumentZip(row)">
                             <AppIcon iconName="app-export"></AppIcon>
                             {{ $t('views.document.setting.export') }} Zip
                           </el-dropdown-item>
-                          <el-dropdown-item icon="Delete" @click.stop="deleteDocument(row)"
-                          >
-                            {{$t('common.delete')}}
+                          <el-dropdown-item icon="Delete" @click.stop="deleteDocument(row)">
+                            {{ $t('common.delete') }}
                           </el-dropdown-item>
                         </el-dropdown-menu>
                       </template>
@@ -526,14 +578,24 @@
       </div>
     </el-card>
     <div class="mul-operation w-full flex" v-if="multipleSelection.length !== 0">
-      <el-button :disabled="multipleSelection.length === 0" @click="cancelTaskHandle(1, row)"
-      v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_DOCUMENT_VECTOR.getWorkspacePermission]">
+      <el-button
+        :disabled="multipleSelection.length === 0"
+        @click="cancelTaskHandle(1, row)"
+        v-hasPermission="[
+          RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+          PermissionConst.KNOWLEDGE_DOCUMENT_VECTOR.getWorkspacePermission,
+        ]"
+      >
         {{ $t('views.document.setting.cancelVectorization') }}
       </el-button>
-      <el-button :disabled="multipleSelection.length === 0" @click="cancelTaskHandle(2, row)"
-      v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_DOCUMENT_GENERATE.getWorkspacePermission]"
+      <el-button
+        :disabled="multipleSelection.length === 0"
+        @click="cancelTaskHandle(2, row)"
+        v-hasPermission="[
+          RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+          PermissionConst.KNOWLEDGE_DOCUMENT_GENERATE.getWorkspacePermission,
+        ]"
       >
-
         {{ $t('views.document.setting.cancelGenerate') }}
       </el-button>
       <el-text type="info" class="secondary ml-24">

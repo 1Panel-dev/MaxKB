@@ -21,6 +21,18 @@
                 >{{ $t('views.document.importDocument') }}
               </el-button>
 
+              <el-button
+                v-if="knowledgeDetail.type === 2"
+                type="primary"
+                @click="
+                  router.push({
+                    path: `/knowledge/import`,
+                    query: { id: id, folder_token: knowledgeDetail.meta.folder_token },
+                  })
+                "
+                >{{ $t('views.document.importDocument') }}
+              </el-button>
+
               <el-button @click="batchRefresh" :disabled="multipleSelection.length === 0">
                 {{ $t('views.knowledge.setting.vectorization') }}
               </el-button>
@@ -49,18 +61,7 @@
                       v-if="knowledgeDetail.type === 1"
                       >{{ $t('views.document.syncDocument') }}</el-dropdown-item
                     >
-                    <el-dropdown-item
-                      divided
-                      v-if="knowledgeDetail.type === 2"
-                      type="primary"
-                      @click="
-                        router.push({
-                          path: '/knowledge/import',
-                          query: { id: id, folder_token: knowledgeDetail.meta.folder_token },
-                        })
-                      "
-                      >{{ $t('views.document.importDocument') }}</el-dropdown-item
-                    >
+
                     <el-dropdown-item
                       divided
                       @click="syncLarkMulDocument"

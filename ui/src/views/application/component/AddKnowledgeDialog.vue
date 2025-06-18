@@ -215,7 +215,7 @@ defineExpose({ open })
   }
   .max-height {
     max-height: calc(100vh - 260px);
-    min-height: 300px;
+    min-height: 500px;
   }
 }
 </style>

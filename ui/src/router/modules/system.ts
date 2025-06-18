@@ -218,7 +218,7 @@ const systemRouter = {
         },
         {
           path: '/system/authentication',
-          name: 'authentication',
+          name: 'SystemAuthentication',
           meta: {
             title: 'views.system.authentication.title',
             activeMenu: '/system',

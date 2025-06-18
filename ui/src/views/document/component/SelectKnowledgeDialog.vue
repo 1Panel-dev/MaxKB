@@ -8,18 +8,49 @@
     :close-on-press-escape="false"
   >
     <template #header="{ titleId, titleClass }">
-      <h4 :id="titleId" :class="titleClass">{{ $t('views.chatLog.selectKnowledge') }}</h4>
+      <h4 :id="titleId" :class="titleClass">{{ '文档迁移到' }}</h4>
     </template>
+    <el-form
+      class="p-24"
+      ref="FormRef"
+      :model="form"
+      label-position="top"
+      require-asterisk-position="right"
+      v-loading="loading"
+    >
+      <el-form-item :label="$t('views.chatLog.selectKnowledge')" required>
+        <el-tree-select
+          v-model="form.selectKnowledge"
+          :data="knowledgeList"
+          :props="defaultProps"
+          node-key="id"
+        >
+          <template #default="{ data }">
+            <div class="flex align-center">
+              <KnowledgeIcon class="mr-12" :size="20" v-if="data.resource_type" :type="data.type" />
+              <el-avatar v-else class="mr-12" shape="square" :size="20" style="background: none">
+                <img
+                  src="@/assets/knowledge/icon_file-folder_colorful.svg"
+                  style="width: 100%"
+                  alt=""
+                />
+              </el-avatar>
 
-    <el-tree-select v-model="selectKnowledge" :data="knowledgeList" style="width: 240px">
-      <template #default="{ data: { label } }">
-        {{ label }}<span style="color: gray">(suffix)</span>
-      </template>
-    </el-tree-select>
+              {{ data.name }}
+            </div>
+          </template>
+        </el-tree-select>
+      </el-form-item>
+    </el-form>
+
     <template #footer>
       <span class="dialog-footer">
         <el-button @click.prevent="dialogVisible = false"> {{ $t('common.cancel') }} </el-button>
-        <el-button type="primary" @click="submitHandle" :disabled="!selectKnowledge || loading">
+        <el-button
+          type="primary"
+          @click="submitHandle"
+          :disabled="!form.selectKnowledge || loading"
+        >
           {{ $t('common.confirm') }}
         </el-button>
       </span>
@@ -43,13 +74,25 @@ const emit = defineEmits(['refresh'])
 const loading = ref<boolean>(false)
 
 const dialogVisible = ref<boolean>(false)
-const selectKnowledge = ref('')
 const knowledgeList = ref<any>([])
 const documentList = ref<any>([])
 
+const defaultProps = {
+  children: 'children',
+  label: 'name',
+  disabled: (data: any, node: any) => {
+    console.log(data, node)
+    return data.id === id || (node?.isLeaf && !data.resource_type)
+  },
+}
+
+const form = ref<any>({
+  selectKnowledge: '',
+})
+
 watch(dialogVisible, (bool) => {
   if (!bool) {
-    selectKnowledge.value = ''
+    form.value.selectKnowledge = ''
     knowledgeList.value = []
     documentList.value = []
   }
@@ -62,7 +105,7 @@ const open = (list: any) => {
 }
 const submitHandle = () => {
   documentApi
-    .putMigrateMulDocument(id, selectKnowledge.value, documentList.value, loading)
+    .putMigrateMulDocument(id, form.value.selectKnowledge, documentList.value, loading)
     .then((res) => {
       emit('refresh')
       dialogVisible.value = false
@@ -70,13 +113,10 @@ const submitHandle = () => {
 }
 
 function getKnowledge() {
-  knowledge.asyncGetRootKnowledge(loading).then((res: any) => {
-    knowledgeList.value = res.data?.filter((v: any) => v.id !== id)
+  knowledge.asyncGetTreeRootKnowledge(loading).then((res: any) => {
+    knowledgeList.value = res || []
+    console.log(knowledgeList.value)
   })
-}
-
-const refresh = () => {
-  getKnowledge()
 }
 
 defineExpose({ open })

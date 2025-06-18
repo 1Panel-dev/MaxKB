@@ -3,6 +3,7 @@ import type { knowledgeData } from '@/api/type/knowledge'
 import type { UploadUserFile } from 'element-plus'
 import knowledgeApi from '@/api/knowledge/knowledge'
 import { type Ref } from 'vue'
+import useFolderStore from './folder'
 
 export interface knowledgeStateTypes {
   baseInfo: knowledgeData | null
@@ -46,22 +47,50 @@ const useKnowledgeStore = defineStore('knowledge', {
           })
       })
     },
+    async asyncGetTreeRootKnowledge(loading?: Ref<boolean>) {
+      const folder = useFolderStore()
+      return Promise.all([
+        folder.asyncGetFolder('KNOWLEDGE', {}, loading),
+        this.asyncGetRootKnowledge(loading),
+      ])
+        .then((res: any) => {
+          const folderList = res[0].data
+          const knowledgeList = res[1].data
+          const arrMap: any = {}
+          function buildIdMap(arr: any) {
+            arr.forEach((item: any) => {
+              arrMap[item.id] = item
+              // 递归处理子节点
+              if (item.children && item.children.length > 0) {
+                buildIdMap(item.children)
+              }
+            })
+          }
+          buildIdMap(folderList)
+          knowledgeList
+            .filter((v: any) => v.resource_type !== 'folder')
+            .forEach((item: any) => {
+              const targetFolder = arrMap[item.folder_id]
+              if (targetFolder) {
+                // 检查是否已有相同ID的子节点（避免重复插入）
+                const existingChild = targetFolder.children.find(
+                  (child: any) => child.id === item.id,
+                )
+                if (!existingChild) {
+                  targetFolder.children.push(item)
+                }
+              }
+            })
+          return Promise.resolve(folderList)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
     async asyncGetKnowledgeDetail(knowledge_id: string, loading?: Ref<boolean>) {
       return new Promise((resolve, reject) => {
         knowledgeApi
           .getKnowledgeDetail(knowledge_id, loading)
-          .then((data) => {
-            resolve(data)
-          })
-          .catch((error) => {
-            reject(error)
-          })
-      })
-    },
-    async asyncSyncKnowledge(id: string, sync_type: string, loading?: Ref<boolean>) {
-      return new Promise((resolve, reject) => {
-        knowledgeApi
-          .putSyncWebKnowledge(id, sync_type, loading)
           .then((data) => {
             resolve(data)
           })

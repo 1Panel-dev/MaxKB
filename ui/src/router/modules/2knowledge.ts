@@ -20,6 +20,13 @@ const ModelRouter = {
       component: () => import('@/views/document/UploadDocument.vue'),
       hidden: true,
     },
+      {
+      path: '/knowledge/import',
+      name: 'ImportLarkDocument',
+      meta: { activeMenu: '/knowledge' },
+      component: () => import('@/views/document/ImportLarkDocument.vue'),
+      hidden: true
+    },
   ],
 }
 

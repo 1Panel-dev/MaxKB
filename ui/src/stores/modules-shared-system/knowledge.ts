@@ -58,18 +58,6 @@ const useKnowledgeStore = defineStore('knowledg', {
           })
       })
     },
-    async asyncSyncKnowledge(id: string, sync_type: string, loading?: Ref<boolean>) {
-      return new Promise((resolve, reject) => {
-        knowledgeApi
-          .putSyncWebKnowledge(id, sync_type, loading)
-          .then((data) => {
-            resolve(data)
-          })
-          .catch((error) => {
-            reject(error)
-          })
-      })
-    },
   },
 })
 
