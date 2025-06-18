@@ -77,7 +77,7 @@ const rules = reactive({
       trigger: 'blur',
     },
   ],
-  embedding: [
+  embedding_model_id: [
     {
       required: true,
       message: t('views.knowledge.form.EmbeddingModel.requiredMessage'),
