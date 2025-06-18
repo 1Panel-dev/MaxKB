@@ -6,7 +6,7 @@
   >
     <template #header="{ titleId, titleClass }">
       <div class="logo flex-center" :id="titleId" :class="titleClass">
-        <LogoFull height="59px" />
+        <LogoFull height="59px"/>
       </div>
     </template>
     <div class="about-ui" v-loading="loading">
@@ -16,20 +16,21 @@
       </div>
       <div class="flex">
         <span class="label">{{ $t('layout.about.expiredTime') }}</span>
-        <!-- <span
-          >{{ licenseInfo?.expired || '-' }}
-          <span class="color-danger" v-if="licenseInfo?.expired && fromNowDate(licenseInfo?.expired)"
-            >（{{ fromNowDate(licenseInfo?.expired) }}）</span
-          ></span
-        > -->
+<!--        <span-->
+<!--        >{{ licenseInfo?.expired || '-' }}-->
+<!--          <span class="color-danger"-->
+<!--                v-if="licenseInfo?.expired && fromNowDate(licenseInfo?.expired)"-->
+<!--          >（{{ fromNowDate(licenseInfo?.expired) }}）</span-->
+<!--          ></span-->
+<!--        >-->
       </div>
       <div class="flex">
         <span class="label">{{ $t('layout.about.edition.label') }}</span>
         <span>{{
-          user.showXpack()
-            ? $t('layout.about.edition.professional')
-            : $t('layout.about.edition.community')
-        }}</span>
+            user.showXpack()
+              ? $t('layout.about.edition.professional')
+              : $t('layout.about.edition.community')
+          }}</span>
       </div>
       <div class="flex">
         <span class="label">{{ $t('layout.about.version') }}</span
@@ -53,7 +54,8 @@
           v-hasPermission="new Role('ADMIN')"
         >
           <el-button class="border-primary mr-16"
-            >{{ $t('layout.about.update') }} License</el-button
+          >{{ $t('layout.about.update') }} License
+          </el-button
           >
         </el-upload>
       </div>
@@ -64,12 +66,13 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-// import licenseApi from '@/api/license'
-// import { fromNowDate } from '@/utils/time'
-import { Role } from '@/utils/permission/type'
+import {ref, computed, watch} from 'vue'
+import licenseApi from '@/api/system/license'
+//import {fromNowDate} from '@/utils/time'
+import {Role} from '@/utils/permission/type'
 import useStore from '@/stores'
-const { user, theme } = useStore()
+
+const {user, theme} = useStore()
 const isDefaultTheme = computed(() => {
   return theme.isDefaultTheme()
 })
@@ -98,38 +101,43 @@ const open = () => {
 const onChange = (file: any) => {
   const fd = new FormData()
   fd.append('license_file', file.raw)
-  // licenseApi.putLicense(fd, loading).then((res: any) => {
-  //   getLicenseInfo()
-  //   isUpdate.value = true
-  // })
-}
-function getLicenseInfo() {
-  // licenseApi.getLicense(loading).then((res: any) => {
-  //   licenseInfo.value = res.data?.license
-  // })
+  licenseApi.putLicense(fd, loading).then((res: any) => {
+    getLicenseInfo()
+    isUpdate.value = true
+  })
 }
 
-defineExpose({ open })
+function getLicenseInfo() {
+  licenseApi.getLicense(loading).then((res: any) => {
+    licenseInfo.value = res.data?.license
+  })
+}
+
+defineExpose({open})
 </script>
 <style lang="scss" scope>
 .about-dialog {
   padding: 0 0 24px 0;
   width: 620px;
   font-weight: 400;
+
   .el-dialog__header {
     background: var(--app-header-bg-color);
     margin-right: 0;
     height: 140px;
     box-sizing: border-box;
     border-radius: 4px 4px 0 0;
+
     &.show-close {
       padding-right: 0;
     }
   }
+
   .el-dialog__title {
     height: 140px;
     box-sizing: border-box;
   }
+
   .about-ui {
     margin: 0 auto;
     font-weight: 400;
@@ -144,6 +152,7 @@ defineExpose({ open })
       color: var(--app-text-color-secondary);
     }
   }
+
   &.dialog-custom-header {
     .el-dialog__header {
       background: var(--el-color-primary-light-9) !important;
