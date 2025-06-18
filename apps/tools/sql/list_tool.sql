@@ -7,6 +7,7 @@ from (select "id"::text,
              "workspace_id",
              "folder_id",
              "user_id",
+             "icon",
              "create_time",
              "update_time"
       from tool ${tool_scope_query_set}
@@ -19,6 +20,7 @@ from (select "id"::text,
              "workspace_id",
              "parent_id" as "folder_id",
              "user_id",
+             '' as "icon",
              "create_time",
              "update_time"
       from tool_folder ${folder_query_set}) temp
