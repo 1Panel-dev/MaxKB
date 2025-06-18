@@ -187,7 +187,7 @@ class ApplicationAPI(APIView):
             tags=[_('Application')]  # type: ignore
         )
         @has_permissions(PermissionConstants.WORKSPACE_READ.get_workspace_application_permission(),
-                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
+                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.ADMIN)
         def get(self, request: Request, workspace_id: str, application_id: str):
             return result.success(ApplicationOperateSerializer(
                 data={'application_id': application_id, 'user_id': request.user.id}).one())
