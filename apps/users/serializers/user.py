@@ -509,6 +509,8 @@ def update_user_role(instance, user):
                 workspace_id=workspace_id,
                 user_id=user.id
             )
+        permission_get_key, permission_version = Cache_Version.PERMISSION_LIST.value
+        cache.delete(permission_get_key(str(user.id)), version=permission_version)
 
 
 class RePasswordSerializer(serializers.Serializer):

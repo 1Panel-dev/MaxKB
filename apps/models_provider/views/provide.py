@@ -23,7 +23,6 @@ class Provide(APIView):
                    operation_id=_('Get a list of model suppliers'),  # type: ignore
                    responses=ProvideApi.get_response(),
                    tags=[_('Model')])  # type: ignore
-    @has_permissions(PermissionConstants.MODEL_READ)
     def get(self, request: Request):
         model_type = request.query_params.get('model_type')
         if model_type:
@@ -47,7 +46,6 @@ class Provide(APIView):
                        parameters=ProvideApi.ModelTypeList.get_query_params_api(),
                        responses=ProvideApi.ModelTypeList.get_response(),
                        tags=[_('Model')])  # type: ignore
-        @has_permissions(PermissionConstants.MODEL_READ)
         def get(self, request: Request):
             provider = request.query_params.get('provider')
             return result.success(ModelProvideConstants[provider].value.get_model_type_list())
@@ -62,7 +60,6 @@ class Provide(APIView):
                        parameters=ProvideApi.ModelList.get_query_params_api(),
                        responses=ProvideApi.ModelList.get_response(),
                        tags=[_('Model')])  # type: ignore
-        @has_permissions(PermissionConstants.MODEL_READ)
         def get(self, request: Request):
             provider = request.query_params.get('provider')
             model_type = request.query_params.get('model_type')
@@ -81,7 +78,6 @@ class Provide(APIView):
                        parameters=ProvideApi.ModelParamsForm.get_query_params_api(),
                        responses=ProvideApi.ModelParamsForm.get_response(),
                        tags=[_('Model')])  # type: ignore
-        @has_permissions(PermissionConstants.MODEL_READ)
         def get(self, request: Request):
             provider = request.query_params.get('provider')
             model_type = request.query_params.get('model_type')
@@ -99,7 +95,6 @@ class Provide(APIView):
                        parameters=ProvideApi.ModelParamsForm.get_query_params_api(),
                        responses=ProvideApi.ModelParamsForm.get_response(),
                        tags=[_('Model')])  # type: ignore
-        @has_permissions(PermissionConstants.MODEL_READ)
         def get(self, request: Request):
             provider = request.query_params.get('provider')
             model_type = request.query_params.get('model_type')
