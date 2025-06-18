@@ -4,6 +4,7 @@
     class="paragraph-box cursor"
     @mouseenter="cardEnter()"
     @mouseleave="cardLeave()"
+    @click.stop="editParagraph(data)"
   >
     <h2 class="mb-16">{{ data.title || '-' }}</h2>
     <div v-show="show" class="mk-sticky">
@@ -11,6 +12,7 @@
         class="paragraph-box-operation mt-8 mr-8"
         shadow="always"
         style="--el-card-padding: 8px 12px; --el-card-border-radius: 8px"
+        @click.stop
       >
         <el-switch
           :loading="changeStateloading"
@@ -21,7 +23,7 @@
 
         <el-divider direction="vertical" />
         <span class="mr-8">
-          <el-button link @click="editParagraph(data)">
+          <el-button link @click.stop="editParagraph(data)">
             <el-icon :size="16" :title="$t('views.applicationWorkflow.control.zoomOut')">
               <EditPen />
             </el-icon>
@@ -40,11 +42,11 @@
           </el-button>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item @click="openGenerateDialog(data)">
+              <el-dropdown-item @click.stop="openGenerateDialog(data)">
                 <el-icon><Connection /></el-icon>
                 {{ $t('views.document.generateQuestion.title') }}</el-dropdown-item
               >
-              <el-dropdown-item @click="openSelectDocumentDialog(data)">
+              <el-dropdown-item @click.stop="openSelectDocumentDialog(data)">
                 <AppIcon iconName="app-migrate"></AppIcon>
                 {{ $t('views.document.setting.migration') }}</el-dropdown-item
               >
@@ -77,6 +79,7 @@ import GenerateRelatedDialog from '@/components/generate-related-dialog/index.vu
 import ParagraphDialog from '@/views/paragraph/component/ParagraphDialog.vue'
 import SelectDocumentDialog from '@/views/paragraph/component/SelectDocumentDialog.vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
+import { elPaginationKey } from 'element-plus'
 
 const { paragraph } = useStore()
 
@@ -121,7 +124,7 @@ function changeState(row: any) {
 const GenerateRelatedDialogRef = ref<InstanceType<typeof GenerateRelatedDialog>>()
 function openGenerateDialog(row: any) {
   if (GenerateRelatedDialogRef.value) {
-    GenerateRelatedDialogRef.value.open([], 'knowledge', row.id)
+    GenerateRelatedDialogRef.value.open([], 'paragraph', row.id)
   }
 }
 function openSelectDocumentDialog(row?: any) {
@@ -165,8 +168,8 @@ function refreshMigrateParagraph() {}
   background: var(--app-layout-bg-color);
   border: 1px solid #ffffff;
   box-shadow: none !important;
-  position: relative;
-  overflow: inherit;
+  // position: relative;
+  // overflow: inherit;
   &:hover {
     background: rgba(31, 35, 41, 0.1);
     border: 1px solid #dee0e3;
@@ -181,13 +184,13 @@ function refreshMigrateParagraph() {}
     float: right;
   }
 
-  .mk-sticky {
-    height: 0;
-    position: sticky;
-    right: 0;
-    top: 0;
-    overflow: inherit;
-    z-index: 10;
-  }
+  // .mk-sticky {
+  //   height: 0;
+  //   position: sticky;
+  //   right: 0;
+  //   top: 0;
+  //   overflow: inherit;
+  //   z-index: 10;
+  // }
 }
 </style>

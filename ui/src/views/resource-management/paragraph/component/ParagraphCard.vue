@@ -4,6 +4,7 @@
     class="paragraph-box cursor"
     @mouseenter="cardEnter()"
     @mouseleave="cardLeave()"
+    @click.stop="editParagraph(data)"
   >
     <h2 class="mb-16">{{ data.title || '-' }}</h2>
     <div v-show="show" class="mk-sticky">
@@ -11,6 +12,7 @@
         class="paragraph-box-operation mt-8 mr-8"
         shadow="always"
         style="--el-card-padding: 8px 12px; --el-card-border-radius: 8px"
+        @click.stop
       >
         <el-switch
           :loading="changeStateloading"
@@ -121,7 +123,7 @@ function changeState(row: any) {
 const GenerateRelatedDialogRef = ref<InstanceType<typeof GenerateRelatedDialog>>()
 function openGenerateDialog(row: any) {
   if (GenerateRelatedDialogRef.value) {
-    GenerateRelatedDialogRef.value.open([], 'knowledge', row.id)
+    GenerateRelatedDialogRef.value.open([], 'paragraph', row.id)
   }
 }
 function openSelectDocumentDialog(row?: any) {

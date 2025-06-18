@@ -88,6 +88,7 @@
   width: 280px;
   .el-dropdown-menu__item {
     padding: 8px 12px;
+    width: 100%;
     &:hover {
       background: var(--app-text-color-light-1);
     }
@@ -121,7 +122,6 @@
     color: var(--app-text-color);
   }
 }
-
 
 .card__radio {
   width: 100%;
@@ -173,3 +173,8 @@
   }
 }
 
+.import-button {
+  .el-upload {
+    display: block !important;
+  }
+}

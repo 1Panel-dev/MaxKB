@@ -45,8 +45,13 @@
             </el-select>
           </div>
           <el-dropdown trigger="click">
-            <el-button type="primary" class="ml-8"
-              v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.TOOL_CREATE.getWorkspacePermission]"
+            <el-button
+              type="primary"
+              class="ml-8"
+              v-hasPermission="[
+                RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                PermissionConst.TOOL_CREATE.getWorkspacePermission,
+              ]"
             >
               {{ $t('common.create') }}
               <el-icon class="el-icon--right">
@@ -65,18 +70,19 @@
                     </div>
                   </div>
                 </el-dropdown-item>
-                <el-dropdown-item>
-                  <el-upload
-                    ref="elUploadRef"
-                    :file-list="[]"
-                    action="#"
-                    multiple
-                    :auto-upload="false"
-                    :show-file-list="false"
-                    :limit="1"
-                    :on-change="(file: any, fileList: any) => importTool(file)"
-                  >
-                    <div class="flex align-center">
+                <el-upload
+                  ref="elUploadRef"
+                  :file-list="[]"
+                  action="#"
+                  multiple
+                  :auto-upload="false"
+                  :show-file-list="false"
+                  :limit="1"
+                  :on-change="(file: any, fileList: any) => importTool(file)"
+                  class="import-button"
+                >
+                  <el-dropdown-item class="w-full">
+                    <div class="flex align-center w-full">
                       <el-avatar shape="square" class="mt-4" :size="36" style="background: none">
                         <img src="@/assets/icon_import.svg" alt="" />
                       </el-avatar>
@@ -84,8 +90,8 @@
                         <div class="lighter">{{ $t('common.importCreate') }}</div>
                       </div>
                     </div>
-                  </el-upload>
-                </el-dropdown-item>
+                  </el-dropdown-item>
+                </el-upload>
                 <el-dropdown-item @click="openCreateFolder" divided>
                   <div class="flex align-center">
                     <AppIcon iconName="app-folder" style="font-size: 32px"></AppIcon>
@@ -177,7 +183,10 @@
                       :before-change="() => changeState(item)"
                       size="small"
                       class="mr-4"
-                      v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.TOOL_EDIT.getWorkspacePermission]"
+                      v-hasPermission="[
+                        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                        PermissionConst.TOOL_EDIT.getWorkspacePermission,
+                      ]"
                     />
                     <el-divider direction="vertical" />
                     <el-dropdown trigger="click">
@@ -189,7 +198,16 @@
                       <template #dropdown>
                         <el-dropdown-menu>
                           <el-dropdown-item
-                            v-if="!item.template_id&&hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.TOOL_EDIT.getWorkspacePermission],'OR')"
+                            v-if="
+                              !item.template_id &&
+                              hasPermission(
+                                [
+                                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                                  PermissionConst.TOOL_EDIT.getWorkspacePermission,
+                                ],
+                                'OR',
+                              )
+                            "
                             :disabled="!canEdit(item)"
                             @click.stop="openCreateDialog(item)"
                           >
@@ -200,7 +218,16 @@
                           </el-dropdown-item>
                           <el-dropdown-item
                             :disabled="!canEdit(item)"
-                            v-if="!item.template_id&&hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.TOOL_EXPORT.getWorkspacePermission],'OR')"
+                            v-if="
+                              !item.template_id &&
+                              hasPermission(
+                                [
+                                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                                  PermissionConst.TOOL_EXPORT.getWorkspacePermission,
+                                ],
+                                'OR',
+                              )
+                            "
                             @click.stop="copyTool(item)"
                           >
                             <AppIcon iconName="app-copy"></AppIcon>
@@ -215,7 +242,16 @@
                             {{ $t('common.param.initParam') }}
                           </el-dropdown-item>
                           <el-dropdown-item
-                            v-if="!item.template_id&&hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.TOOL_EXPORT.getWorkspacePermission],'OR')"
+                            v-if="
+                              !item.template_id &&
+                              hasPermission(
+                                [
+                                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                                  PermissionConst.TOOL_EXPORT.getWorkspacePermission,
+                                ],
+                                'OR',
+                              )
+                            "
                             :disabled="!canEdit(item)"
                             @click.stop="exportTool(item)"
                           >
@@ -223,7 +259,15 @@
                             {{ $t('common.export') }}
                           </el-dropdown-item>
                           <el-dropdown-item
-                            v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.TOOL_DELETE.getWorkspacePermission],'OR')"
+                            v-if="
+                              hasPermission(
+                                [
+                                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                                  PermissionConst.TOOL_DELETE.getWorkspacePermission,
+                                ],
+                                'OR',
+                              )
+                            "
                             :disabled="!canEdit(item)"
                             divided
                             @click.stop="deleteTool(item)"
@@ -263,7 +307,6 @@ import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import SharedWorkspace from '@/views/shared/tool-shared/SharedWorkspace.vue'
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
-
 
 const { folder, user } = useStore()
 

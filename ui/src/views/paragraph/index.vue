@@ -344,9 +344,10 @@ onMounted(() => {
     max-width: 1000px;
     margin: 16px auto;
 
-    // .el-checkbox-group {
-    //   display: flex;
-    // }
+    .el-checkbox-group {
+      font-size: inherit;
+      line-height: inherit;
+    }
   }
 
   &__main {

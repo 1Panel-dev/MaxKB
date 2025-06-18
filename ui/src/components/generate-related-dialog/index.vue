@@ -27,10 +27,7 @@
             <p>{{ $t('views.document.generateQuestion.tip4') }}</p>
           </div>
         </div>
-        <el-form-item
-          :label="$t('views.application.form.aiModel.label')"
-          prop="model_id"
-        >
+        <el-form-item :label="$t('views.application.form.aiModel.label')" prop="model_id">
           <ModelSelect
             v-model="form.model_id"
             :placeholder="$t('views.application.form.aiModel.placeholder')"
@@ -39,10 +36,7 @@
             :model-type="'LLM'"
           ></ModelSelect>
         </el-form-item>
-        <el-form-item
-          :label="$t('views.application.form.prompt.label')"
-          prop="prompt"
-        >
+        <el-form-item :label="$t('views.application.form.prompt.label')" prop="prompt">
           <el-input
             v-model="form.prompt"
             :placeholder="$t('views.application.form.prompt.placeholder')"
@@ -88,7 +82,7 @@ import type { FormInstance } from 'element-plus'
 
 const route = useRoute()
 const {
-  params: { id, documentId } // id为knowledgeID
+  params: { id, documentId }, // id为knowledgeID
 } = route as any
 
 const { model, prompt, user } = useStore()
@@ -104,7 +98,7 @@ const apiType = ref('') // 文档document或段落paragraph
 const state = ref<'all' | 'error'>('error')
 const stateMap = {
   all: ['0', '1', '2', '3', '4', '5', 'n'],
-  error: ['0', '1', '3', '4', '5', 'n']
+  error: ['0', '1', '3', '4', '5', 'n'],
 }
 const FormRef = ref()
 const knowledgeId = ref<string>()
@@ -115,16 +109,16 @@ const rules = reactive({
     {
       required: true,
       message: t('views.application.form.aiModel.placeholder'),
-      trigger: 'blur'
-    }
+      trigger: 'blur',
+    },
   ],
   prompt: [
     {
       required: true,
       message: t('views.application.form.prompt.placeholder'),
-      trigger: 'blur'
-    }
-  ]
+      trigger: 'blur',
+    },
+  ],
 })
 
 watch(dialogVisible, (bool) => {
@@ -153,7 +147,7 @@ const submitHandle = async (formEl: FormInstance) => {
       if (apiType.value === 'paragraph') {
         const data = {
           ...form.value,
-          paragraph_id_list: idList.value
+          paragraph_id_list: idList.value,
         }
         paragraphApi.putBatchGenerateRelated(id, documentId, data, loading).then(() => {
           MsgSuccess(t('views.document.generateQuestion.successMessage'))
@@ -164,7 +158,7 @@ const submitHandle = async (formEl: FormInstance) => {
         const data = {
           ...form.value,
           document_id_list: idList.value,
-          state_list: stateMap[state.value]
+          state_list: stateMap[state.value],
         }
         documentApi.putBatchGenerateRelated(id, data, loading).then(() => {
           MsgSuccess(t('views.document.generateQuestion.successMessage'))
@@ -174,7 +168,7 @@ const submitHandle = async (formEl: FormInstance) => {
       } else if (apiType.value === 'knowledge') {
         const data = {
           ...form.value,
-          state_list: stateMap[state.value]
+          state_list: stateMap[state.value],
         }
         knowledgeApi.putGenerateRelated(id ? id : knowledgeId.value, data, loading).then(() => {
           MsgSuccess(t('views.document.generateQuestion.successMessage'))

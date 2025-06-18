@@ -42,8 +42,14 @@
             </el-select>
           </div>
           <el-dropdown trigger="click">
-            <el-button type="primary" class="ml-8"
-              v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.APPLICATION_EDIT.getWorkspacePermission]">
+            <el-button
+              type="primary"
+              class="ml-8"
+              v-hasPermission="[
+                RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                PermissionConst.APPLICATION_EDIT.getWorkspacePermission,
+              ]"
+            >
               {{ $t('common.create') }}
               <el-icon class="el-icon--right">
                 <arrow-down />
@@ -87,6 +93,7 @@
                 </el-dropdown-item>
                 <el-dropdown-item>
                   <el-upload
+                    class="import-button"
                     ref="elUploadRef"
                     :file-list="[]"
                     action="#"
@@ -218,14 +225,33 @@
                               <AppIcon iconName="app-create-chat"></AppIcon>
                               {{ $t('views.application.operation.toChat') }}
                             </el-dropdown-item>
-                            <el-dropdown-item @click.stop="settingApplication(item)"
-                              v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.APPLICATION_EDIT.getWorkspacePermission],'OR')"
+                            <el-dropdown-item
+                              @click.stop="settingApplication(item)"
+                              v-if="
+                                hasPermission(
+                                  [
+                                    RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                                    PermissionConst.APPLICATION_EDIT.getWorkspacePermission,
+                                  ],
+                                  'OR',
+                                )
+                              "
                             >
                               <el-icon><Setting /></el-icon>
                               {{ $t('common.setting') }}
                             </el-dropdown-item>
-                            <el-dropdown-item divided @click.stop="exportApplication(item)"
-                              v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.APPLICATION_EXPORT.getWorkspacePermission],'OR')"
+                            <el-dropdown-item
+                              divided
+                              @click.stop="exportApplication(item)"
+                              v-if="
+                                hasPermission(
+                                  [
+                                    RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                                    PermissionConst.APPLICATION_EXPORT.getWorkspacePermission,
+                                  ],
+                                  'OR',
+                                )
+                              "
                             >
                               <AppIcon iconName="app-export"></AppIcon>
                               {{ $t('common.export') }}
@@ -234,7 +260,15 @@
                               divided
                               icon="Delete"
                               @click.stop="deleteApplication(item)"
-                              v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.APPLICATION_DELETE.getWorkspacePermission],'OR')"
+                              v-if="
+                                hasPermission(
+                                  [
+                                    RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                                    PermissionConst.APPLICATION_DELETE.getWorkspacePermission,
+                                  ],
+                                  'OR',
+                                )
+                              "
                               >{{ $t('common.delete') }}</el-dropdown-item
                             >
                           </el-dropdown-menu>
