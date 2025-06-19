@@ -8349,3 +8349,15 @@ msgstr ""
 
 msgid "Application Access"
 msgstr ""
+
+msgid "Display execution details"
+msgstr ""
+
+msgid "LOCAL"
+msgstr "Account login"
+
+msgid "CAS"
+msgstr "CAS"
+
+msgid "LDAP"
+msgstr "LDAP"

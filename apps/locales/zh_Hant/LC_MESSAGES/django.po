@@ -8475,3 +8475,15 @@ msgstr "更新外觀設置"
 
 msgid "Application Access"
 msgstr "應用介入"
+
+msgid "Display execution details"
+msgstr "是否顯示執行詳情"
+
+msgid "LOCAL"
+msgstr "帳號登入"
+
+msgid "CAS"
+msgstr "CAS"
+
+msgid "LDAP"
+msgstr "LDAP"

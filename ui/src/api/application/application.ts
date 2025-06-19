@@ -92,6 +92,18 @@ const getAccessToken: (application_id: string, loading?: Ref<boolean>) => Promis
 ) => {
   return get(`${prefix.value}/${application_id}/access_token`, undefined, loading)
 }
+/**
+ * 获取应用设置
+ * @param application_id 应用id
+ * @param loading 加载器
+ * @returns
+ */
+const getApplicationSetting: (
+  application_id: string,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (application_id, loading) => {
+  return get(`${prefix.value}/${application_id}/setting`, undefined, loading)
+}
 
 /**
  * 修改AccessToken
@@ -167,7 +179,14 @@ const open: (application_id: string, loading?: Ref<boolean>) => Promise<Result<s
 const chat: (chat_id: string, data: any) => Promise<any> = (chat_id, data) => {
   return postStream(`/api/chat_message/${chat_id}`, data)
 }
-
+/**
+ * 获取对话用户认证类型
+ * @param loading 加载器
+ * @returns
+ */
+const getChatUserAuthType: (loading?: Ref<boolean>) => Promise<any> = (loading) => {
+  return get(`/chat_user/auth/types`, {}, loading)
+}
 export default {
   getAllApplication,
   getApplication,
@@ -182,4 +201,6 @@ export default {
   getStatistics,
   open,
   chat,
+  getChatUserAuthType,
+  getApplicationSetting,
 }
