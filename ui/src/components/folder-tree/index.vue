@@ -25,6 +25,7 @@
       :default-expanded-keys="[currentNodeKey]"
       :current-node-key="currentNodeKey"
       highlight-current
+      class="overflow-inherit_node__children"
       node-key="id"
     >
       <template #default="{ node, data }">
@@ -134,7 +135,6 @@ function handleMouseEnter(data: Tree) {
 function handleMouseleave() {
   time = setTimeout(() => {
     clearTimeout(time)
-    hoverNodeId.value = ''
     document.body.click()
   }, 300)
 }
@@ -201,6 +201,11 @@ function refreshFolder() {
     left: 0;
     width: 100%;
     height: 1px;
+  }
+}
+:deep(.overflow-inherit_node__children) {
+  .el-tree-node__children {
+    overflow: inherit;
   }
 }
 </style>
