@@ -22,6 +22,7 @@ export interface userStateTypes {
   edition: 'CE' | 'PE' | 'EE'
   themeInfo: any
   workspace_id: string
+  workspace_list: Array<any>
 }
 
 const useUserStore = defineStore('user', {
@@ -33,6 +34,7 @@ const useUserStore = defineStore('user', {
     edition: 'CE',
     themeInfo: null,
     workspace_id: '',
+    workspace_list: [],
   }),
   actions: {
     getLanguage() {
@@ -125,6 +127,15 @@ const useUserStore = defineStore('user', {
     async profile(loading?: Ref<boolean>) {
       return UserApi.getUserProfile(loading).then((ok) => {
         this.userInfo = ok.data
+        const workspace_list =
+          ok.data.workspace_list && ok.data.workspace_list.length > 0
+            ? ok.data.workspace_list
+            : [{ id: 'default', name: 'default' }]
+        const workspace_id = this.getWorkspaceId()
+        if (!workspace_id || !workspace_list.some((w) => w.id == workspace_id)) {
+          this.setWorkspaceId(workspace_list[0].id)
+        }
+        this.workspace_list = workspace_list
         useLocalStorage<string>(localeConfigKey, 'en-US').value =
           ok?.data?.language || this.getLanguage()
         const theme = useThemeStore()

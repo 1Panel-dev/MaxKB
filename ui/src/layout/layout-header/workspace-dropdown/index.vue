@@ -12,7 +12,7 @@
     <template #dropdown>
       <el-dropdown-menu v-loading="loading">
         <el-dropdown-item
-          v-for="item in workspaceList"
+          v-for="item in user.workspace_list"
           :key="item.id"
           :class="item.id === currentWorkspace?.id ? 'active' : ''"
           @click="changeWorkspace(item)"
@@ -35,33 +35,20 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeMount, ref } from 'vue'
-import WorkspaceApi from '@/api/workspace/workspace'
+import { computed, ref } from 'vue'
 import type { WorkspaceItem } from '@/api/type/workspace'
 import useStore from '@/stores'
+
 const { user } = useStore()
 const loading = ref(false)
-const workspaceList = ref<WorkspaceItem[]>([])
-const currentWorkspace = ref()
 
-async function getWorkspaceList() {
-  try {
-    const res = await WorkspaceApi.getWorkspaceListByUser(loading)
-    workspaceList.value = res.data
-  } catch (e) {
-    console.error(e)
-  }
-}
-
-onBeforeMount(async () => {
-  await getWorkspaceList()
-  const id = localStorage.getItem('workspace_id') ?? 'default'
-  currentWorkspace.value = workspaceList.value.find((item) => item.id === id)
+const currentWorkspace = computed(() => {
+  return user.workspace_list.find((w) => w.id == user.workspace_id)
 })
 
 function changeWorkspace(item: WorkspaceItem) {
-  if (item.id === currentWorkspace.value.id) return
-  currentWorkspace.value = item
+  if (item.id === user.workspace_id) return
+
   user.setWorkspaceId(item.id || 'default')
   window.location.reload()
 }

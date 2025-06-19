@@ -11,7 +11,6 @@ import os
 import random
 import re
 from collections import defaultdict
-from itertools import product
 
 from django.core.cache import cache
 from django.core.mail.backends.smtp import EmailBackend
@@ -71,6 +70,14 @@ def is_workspace_manage(user_id: str, workspace_id: str):
     return QuerySet(User).filter(id=user_id, role=RoleConstants.ADMIN.value.__str__()).exists()
 
 
+def get_workspace_list_by_user(user_id):
+    get_workspace_list = DatabaseModelManage.get_model('get_workspace_list_by_user')
+    license_is_valid = DatabaseModelManage.get_model('license_is_valid') or (lambda: False)
+    if get_workspace_list is not None and license_is_valid():
+        return get_workspace_list(user_id)
+    return [{'id': 'default', 'name': 'default'}]
+
+
 class UserProfileSerializer(serializers.Serializer):
     @staticmethod
     def profile(user: User, auth: Auth):
@@ -80,6 +87,7 @@ class UserProfileSerializer(serializers.Serializer):
         @param auth: 认证对象
         @return:
         """
+        workspace_list = get_workspace_list_by_user(user.id)
         return {
             'id': user.id,
             'username': user.username,
@@ -89,6 +97,7 @@ class UserProfileSerializer(serializers.Serializer):
             'permissions': auth.permission_list,
             'is_edit_password': user.role == RoleConstants.ADMIN.name and user.password == 'd880e722c47a34d8e9fce789fc62389d',
             'language': user.language,
+            'workspace_list': workspace_list
         }
 
 

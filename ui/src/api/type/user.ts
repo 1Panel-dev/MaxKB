@@ -27,6 +27,7 @@ interface User {
   IS_XPACK?: boolean
   XPACK_LICENSE_IS_VALID?: boolean
   language?: string
+  workspace_list?: Array<any>
 }
 
 interface LoginRequest {
