@@ -3,6 +3,7 @@
     <template #left>
       <h4 class="p-16 pb-0">{{ $t('views.tool.title') }}</h4>
       <folder-tree
+        :source="FolderSource.TOOL"
         :data="folderList"
         :currentNodeKey="currentFolder?.id"
         @handleNodeClick="folderClickHandel"
@@ -307,6 +308,7 @@ import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import SharedWorkspace from '@/views/shared/tool-shared/SharedWorkspace.vue'
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
+import { FolderSource } from '@/enums/common'
 
 const { folder, user } = useStore()
 
@@ -373,7 +375,7 @@ function getList() {
 
 function getFolder() {
   const params = {}
-  folder.asyncGetFolder('TOOL', params, loading).then((res: any) => {
+  folder.asyncGetFolder(FolderSource.TOOL, params, loading).then((res: any) => {
     folderList.value = res.data
     currentFolder.value = res.data?.[0] || {}
     getList()
@@ -506,7 +508,7 @@ function configInitParams(item: any) {
 
 const CreateFolderDialogRef = ref()
 function openCreateFolder() {
-  CreateFolderDialogRef.value.open('TOOL', currentFolder.value.parent_id)
+  CreateFolderDialogRef.value.open(FolderSource.TOOL, currentFolder.value.parent_id)
 }
 
 const elUploadRef = ref()

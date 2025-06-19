@@ -24,7 +24,46 @@
           $t('views.applicationOverview.appInfo.LimitDialog.timesDays')
         }}</span>
       </el-form-item>
-
+      <!--     身份验证 -->
+      <el-form-item :label="$t('views.applicationOverview.appInfo.LimitDialog.authentication')">
+        <el-switch size="small" v-model="form.authentication" @change="firstGeneration"></el-switch>
+      </el-form-item>
+      <el-form-item
+        prop="authentication_value"
+        v-if="form.authentication"
+        :label="$t('views.applicationOverview.appInfo.LimitDialog.authenticationValue')"
+      >
+        <el-input
+          class="authentication-append-input"
+          v-model="form.authentication_value"
+          readonly
+          style="width: 268px"
+          disabled
+        >
+          <template #append>
+            <el-tooltip :content="$t('common.copy')" placement="top">
+              <el-button
+                type="primary"
+                text
+                @click="copyClick(form.authentication_value)"
+                style="margin: 0 4px !important"
+              >
+                <AppIcon iconName="app-copy"></AppIcon>
+              </el-button>
+            </el-tooltip>
+            <el-tooltip :content="$t('common.refresh')" placement="top">
+              <el-button
+                @click="refreshAuthentication"
+                type="primary"
+                text
+                style="margin: 0 4px 0 0 !important"
+              >
+                <el-icon><RefreshRight /></el-icon>
+              </el-button>
+            </el-tooltip>
+          </template>
+        </el-input>
+      </el-form-item>
       <el-form-item
         :label="$t('views.applicationOverview.appInfo.LimitDialog.whitelistLabel')"
         @click.prevent
@@ -57,6 +96,7 @@ import type { FormInstance, FormRules } from 'element-plus'
 import applicationApi from '@/api/application/application'
 import { MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
+import { copyClick } from '@/utils/clipboard'
 
 const route = useRoute()
 const {
@@ -116,8 +156,30 @@ const submit = async (formEl: FormInstance | undefined) => {
     }
   })
 }
+function generateAuthenticationValue(length: number = 10) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  const randomValues = new Uint8Array(length)
+  window.crypto.getRandomValues(randomValues)
+  return Array.from(randomValues)
+    .map((value) => chars[value % chars.length])
+    .join('')
+}
+function refreshAuthentication() {
+  form.value.authentication_value = generateAuthenticationValue()
+}
+
+function firstGeneration() {
+  if (form.value.authentication && !form.value.authentication_value) {
+    form.value.authentication_value = generateAuthenticationValue()
+  }
+}
+
 defineExpose({ open })
 </script>
 <style lang="scss" scoped>
-
+.authentication-append-input {
+  .el-input-group__append {
+    padding: 0 !important;
+  }
+}
 </style>

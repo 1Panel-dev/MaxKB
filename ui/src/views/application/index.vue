@@ -3,6 +3,7 @@
     <template #left>
       <h4 class="p-16 pb-0">{{ $t('views.application.title') }}</h4>
       <folder-tree
+        :source="FolderSource.TOOL"
         :data="folderList"
         :currentNodeKey="currentFolder?.id"
         @handleNodeClick="folderClickHandel"
@@ -304,6 +305,7 @@ import { isWorkFlow } from '@/utils/application'
 import { dateFormat } from '@/utils/time'
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
+import { FolderSource } from '@/enums/common'
 
 const router = useRouter()
 const { folder, application, user } = useStore()
@@ -367,7 +369,7 @@ function getList() {
 
 function getFolder() {
   const params = {}
-  folder.asyncGetFolder('APPLICATION', params, loading).then((res: any) => {
+  folder.asyncGetFolder(FolderSource.APPLICATION, params, loading).then((res: any) => {
     folderList.value = res.data
     currentFolder.value = res.data?.[0] || {}
     getList()
@@ -482,7 +484,7 @@ const exportApplication = (application: any) => {
 
 const CreateFolderDialogRef = ref()
 function openCreateFolder() {
-  CreateFolderDialogRef.value.open('APPLICATION', currentFolder.value.parent_id)
+  CreateFolderDialogRef.value.open(FolderSource.APPLICATION, currentFolder.value.parent_id)
 }
 function refreshFolder() {
   applicationList.value = []
