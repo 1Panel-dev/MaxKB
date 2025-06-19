@@ -1,7 +1,10 @@
 <template>
   <div class="p-24 pt-0">
     <div class="flex-between mb-16">
-      <el-button type="primary" @click="handleAdd">
+      <el-button type="primary" @click="handleAdd"
+        v-hasPermission="new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+        [PermissionConst.ROLE_ADD_MEMBER.getWorkspacePermission],[], 'OR')"
+      >
         {{ $t('views.role.member.add') }}
       </el-button>
       <div class="flex complex-search">
@@ -40,7 +43,10 @@
             :content="`${$t('views.role.member.delete.button')}`"
             placement="top"
           >
-            <el-button type="primary" text @click.stop="handleDelete(row)">
+            <el-button type="primary" text @click.stop="handleDelete(row)"
+              v-hasPermission="new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+              [PermissionConst.ROLE_REMOVE_MEMBER.getWorkspacePermission],[], 'OR')"
+            >
               <el-icon>
                 <Delete />
               </el-icon>
@@ -62,7 +68,8 @@ import { t } from '@/locales'
 import AddMemberDrawer from './AddMemberDrawer.vue'
 import { RoleTypeEnum } from '@/enums/system'
 import { loadPermissionApi } from '@/utils/permission-api'
-
+import { PermissionConst, RoleConst } from '@/utils/permission/data'
+import { ComplexPermission } from '@/utils/permission/type'
 const props = defineProps<{
   currentRole?: RoleItem
 }>()

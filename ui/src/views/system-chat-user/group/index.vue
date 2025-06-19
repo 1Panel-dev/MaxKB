@@ -17,7 +17,9 @@
               <h4 class="medium">{{ $t('views.chatUser.group.title') }}</h4>
               <el-tooltip effect="dark" :content="`${$t('common.create')}${$t('views.chatUser.group.title')}`"
                 placement="top">
-                <el-button type="primary" text @click="createOrUpdate()">
+                <el-button type="primary" text @click="createOrUpdate()"
+                  v-hasPermission="new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+                  [PermissionConst.WORKSPACE_USER_GROUP_CREATE.getWorkspacePermission], [], 'OR')">
                   <AppIcon iconName="app-copy"></AppIcon>
                 </el-button>
               </el-tooltip>
@@ -40,13 +42,21 @@
                         </el-button>
                         <template #dropdown>
                           <el-dropdown-menu style="min-width: 80px">
-                            <el-dropdown-item @click.stop="createOrUpdate(row)" class="p-8">
+                            <el-dropdown-item @click.stop="createOrUpdate(row)" class="p-8"
+                              v-if="hasPermission(new ComplexPermission(
+                              [RoleConst.ADMIN,RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+                              [PermissionConst.WORKSPACE_USER_GROUP_EDIT.getWorkspacePermission], [], 'OR'), 'OR')">
                               <AppIcon iconName="app-copy"></AppIcon>
                               {{
                                 $t('common.rename')
                               }}
                             </el-dropdown-item>
-                            <el-dropdown-item @click.stop="deleteGroup(row)" class="border-t p-8" v-if="row.id !== 'default'">
+                            <el-dropdown-item @click.stop="deleteGroup(row)" class="border-t p-8"
+                              v-if="row.id !== 'default'&&
+                              hasPermission(new ComplexPermission(
+                              [RoleConst.ADMIN,RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+                              [PermissionConst.WORKSPACE_USER_GROUP_DELETE.getWorkspacePermission], [], 'OR'), 'OR')"
+                            >
                               <AppIcon iconName="app-copy"></AppIcon>
                               {{
                                 $t('common.delete')
@@ -78,10 +88,16 @@
 
             <div class="flex-between mb-16" style="margin-top: 20px;">
               <div>
-                <el-button type="primary" @click="createUser()">
+                <el-button type="primary" @click="createUser()"
+                  v-hasPermission="new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+                  [PermissionConst.WORKSPACE_USER_GROUP_ADD_MEMBER.getWorkspacePermission], [], 'OR')"
+                >
                   {{ t('views.role.member.add') }}
                 </el-button>
-                <el-button :disabled="multipleSelection.length === 0" @click="handleDeleteUser()">
+                <el-button :disabled="multipleSelection.length === 0" @click="handleDeleteUser()"
+                  v-hasPermission="new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+                  [PermissionConst.WORKSPACE_USER_GROUP_DELETE.getWorkspacePermission], [], 'OR')"
+                >
                   {{ $t('common.delete') }}
                 </el-button>
               </div>
@@ -119,7 +135,10 @@
               <el-table-column :label="$t('common.operation')" width="100" fixed="right">
                 <template #default="{ row }">
                   <el-tooltip effect="dark" :content="`${$t('views.role.member.delete.button')}`" placement="top">
-                    <el-button type="primary" text @click.stop="handleDeleteUser(row)">
+                    <el-button type="primary" text @click.stop="handleDeleteUser(row)"
+                      v-hasPermission="new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+                      [PermissionConst.WORKSPACE_USER_GROUP_REMOVE_MEMBER.getWorkspacePermission], [], 'OR')"
+                    >
                       <el-icon>
                         <EditPen />
                       </el-icon>
@@ -147,6 +166,9 @@ import CreateOrUpdateGroupDialog from './component/CreateOrUpdateGroupDialog.vue
 import CreateGroupUserDialog from './component/CreateGroupUserDialog.vue'
 import type { ListItem } from '@/api/type/common'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
+import { PermissionConst, RoleConst } from '@/utils/permission/data'
+import { ComplexPermission } from '@/utils/permission/type'
+import { hasPermission } from '@/utils/permission/index'
 
 const filterText = ref('')
 const loading = ref(false)

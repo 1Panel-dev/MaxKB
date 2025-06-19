@@ -7,7 +7,9 @@
           <div class="workspace-left_title">
             <h4 class="medium">{{ $t('views.workspace.list') }}</h4>
             <el-tooltip effect="dark" :content="`${$t('common.create')}${$t('views.workspace.title')}`" placement="top">
-              <el-button type="primary" text @click="createOrUpdateWorkspace()">
+              <el-button type="primary" text @click="createOrUpdateWorkspace()"
+                v-hasPermission="[RoleConst.ADMIN, PermissionConst.WORKSPACE_CREATE]"
+              >
                 <AppIcon iconName="app-copy"></AppIcon>
               </el-button>
             </el-tooltip>
@@ -81,6 +83,8 @@ import Member from './component/Member.vue'
 import CreateOrUpdateWorkspaceDialog from './component/CreateOrUpdateWorkspaceDialog.vue'
 import type { WorkspaceItem } from '@/api/type/workspace'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
+import { PermissionConst, RoleConst } from '@/utils/permission/data'
+import { hasPermission } from '@/utils/permission/index'
 
 const filterText = ref('')
 const loading = ref(false)

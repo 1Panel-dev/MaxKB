@@ -69,10 +69,6 @@
               <el-dropdown>
                 <el-button
                   class="ml-12 mr-12"
-                  v-hasPermission="[
-                    RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                    PermissionConst.KNOWLEDGE_DOCUMENT_EDIT.getWorkspacePermission,
-                  ]"
                 >
                   <el-icon><MoreFilled /></el-icon>
                 </el-button>
@@ -81,6 +77,7 @@
                     <el-dropdown-item
                       @click="openBatchEditDocument"
                       :disabled="multipleSelection.length === 0"
+                      v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_DOCUMENT_EDIT.getWorkspacePermission],'OR')"
                     >
                       {{ $t('common.setting') }}
                     </el-dropdown-item>
@@ -88,7 +85,8 @@
                       divided
                       @click="syncMulDocument"
                       :disabled="multipleSelection.length === 0"
-                      v-if="knowledgeDetail.type === 1"
+                      v-if="knowledgeDetail.type === 1 &&
+                      hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_DOCUMENT_SYNC.getWorkspacePermission],'OR')"
                       >{{ $t('views.document.syncDocument') }}
                     </el-dropdown-item>
                     <el-dropdown-item
@@ -439,30 +437,41 @@
                             v-if="
                               ([State.STARTED, State.PENDING] as Array<string>).includes(
                                 getTaskState(row.status, TaskType.GENERATE_PROBLEM),
-                              )
+                              )&&
+                              hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_PROBLEM_CREATE.getWorkspacePermission],'OR')
                             "
                             @click="cancelTask(row, TaskType.GENERATE_PROBLEM)"
                           >
                             <el-icon><Connection /></el-icon>
                             {{ $t('views.document.setting.cancelGenerateQuestion') }}
                           </el-dropdown-item>
-                          <el-dropdown-item v-else @click="openGenerateDialog(row)">
+                          <el-dropdown-item v-else @click="openGenerateDialog(row)"
+                            v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_PROBLEM_CREATE.getWorkspacePermission],'OR')"
+                          >
                             <el-icon><Connection /></el-icon>
                             {{ $t('views.document.generateQuestion.title') }}
                           </el-dropdown-item>
-                          <el-dropdown-item @click="openknowledgeDialog(row)">
+                          <el-dropdown-item @click="openknowledgeDialog(row)"
+                            v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_DOCUMENT_MIGRATE.getWorkspacePermission],'OR')"
+                          >
                             <AppIcon iconName="app-migrate"></AppIcon>
                             {{ $t('views.document.setting.migration') }}
                           </el-dropdown-item>
-                          <el-dropdown-item @click="exportDocument(row)">
+                          <el-dropdown-item @click="exportDocument(row)"
+                            v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_DOCUMENT_EXPORT.getWorkspacePermission],'OR')"
+                          >
                             <AppIcon iconName="app-export"></AppIcon>
                             {{ $t('views.document.setting.export') }} Excel
                           </el-dropdown-item>
-                          <el-dropdown-item @click="exportDocumentZip(row)">
+                          <el-dropdown-item @click="exportDocumentZip(row)"
+                            v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_DOCUMENT_EXPORT.getWorkspacePermission],'OR')"
+                          >
                             <AppIcon iconName="app-export"></AppIcon>
                             {{ $t('views.document.setting.export') }} Zip
                           </el-dropdown-item>
-                          <el-dropdown-item icon="Delete" @click.stop="deleteDocument(row)">
+                          <el-dropdown-item icon="Delete" @click.stop="deleteDocument(row)"
+                            v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_DOCUMENT_DELETE.getWorkspacePermission],'OR')"
+                          >
                             {{ $t('common.delete') }}</el-dropdown-item
                           >
                         </el-dropdown-menu>

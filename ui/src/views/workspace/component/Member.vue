@@ -1,6 +1,8 @@
 <template>
   <div class="flex-between mb-16">
-    <el-button type="primary" @click="handleAdd">
+    <el-button type="primary" @click="handleAdd"
+      v-hasPermission="RoleConst.ADMIN,PermissionConst.WORKSPACE_ADD_MEMBER"
+    >
       {{ $t('views.role.member.add') }}
     </el-button>
     <div class="flex complex-search">
@@ -19,7 +21,9 @@
     <el-table-column :label="$t('common.operation')" width="100" fixed="right">
       <template #default="{ row }">
         <el-tooltip effect="dark" :content="`${$t('views.role.member.delete.button')}`" placement="top">
-          <el-button type="primary" text @click.stop="handleDelete(row)">
+          <el-button type="primary" text @click.stop="handleDelete(row)"
+            v-hasPermission="RoleConst.ADMIN,PermissionConst.WORKSPACE_REMOVE_MEMBER"
+          >
             <el-icon>
               <EditPen />
             </el-icon>
@@ -38,6 +42,7 @@ import { t } from '@/locales'
 import AddMemberDrawer from './AddMemberDrawer.vue'
 import WorkspaceApi from '@/api/workspace/workspace'
 import type { WorkspaceMemberItem, WorkspaceItem } from '@/api/type/workspace'
+import { PermissionConst, RoleConst } from '@/utils/permission/data'
 
 const props = defineProps<{
   currentWorkspace?: WorkspaceItem

@@ -60,7 +60,10 @@
                   :content="`${$t('common.create')}${$t('views.role.customRole')}`"
                   placement="top"
                 >
-                  <el-button type="primary" text @click="createOrUpdateRole()">
+                  <el-button type="primary" text @click="createOrUpdateRole()"
+                    v-hasPermission="new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+                    [PermissionConst.ROLE_CREATE.getWorkspacePermission],[], 'OR')"
+                  >
                     <AppIcon iconName="app-copy"></AppIcon>
                   </el-button>
                 </el-tooltip>
@@ -160,6 +163,8 @@ import { RoleTypeEnum } from '@/enums/system'
 import { roleTypeMap } from './index'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { loadPermissionApi } from '@/utils/permission-api'
+import { PermissionConst, RoleConst } from '@/utils/permission/data'
+import { ComplexPermission } from '@/utils/permission/type'
 
 const filterText = ref('')
 const loading = ref(false)
