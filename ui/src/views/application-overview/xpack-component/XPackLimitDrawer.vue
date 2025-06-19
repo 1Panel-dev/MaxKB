@@ -40,7 +40,7 @@
           class="mb-16"
           :class="form.authentication_value.type === 'password' ? 'active' : ''"
         >
-          <el-radio value="replace" size="large">
+          <el-radio value="password" size="large">
             <p class="mb-4 lighter">
               {{ $t('views.applicationOverview.appInfo.LimitDialog.authenticationValue') }}
             </p>
