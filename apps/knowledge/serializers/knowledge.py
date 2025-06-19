@@ -60,7 +60,7 @@ class KnowledgeWebCreateRequest(serializers.Serializer):
     desc = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('knowledge description'))
     embedding_model_id = serializers.CharField(required=True, label=_('knowledge embedding'))
     source_url = serializers.CharField(required=True, label=_('source url'))
-    selector = serializers.CharField(required=True, label=_('knowledge selector'))
+    selector = serializers.CharField(required=False, label=_('knowledge selector'), allow_null=True, allow_blank=True)
 
 
 class KnowledgeEditRequest(serializers.Serializer):
@@ -550,7 +550,7 @@ class KnowledgeSerializer(serializers.Serializer):
                 embedding_model_id=instance.get('embedding_model_id'),
                 meta={
                     'source_url': instance.get('source_url'),
-                    'selector': instance.get('selector'),
+                    'selector': instance.get('selector', 'body'),
                     'embedding_model_id': instance.get('embedding_model_id')
                 },
             )
