@@ -331,7 +331,13 @@ function openDisplaySettingDialog() {
     currentDisplaySettingDialog.value = DisplaySettingDialog
   }
   nextTick(() => {
-    DisplaySettingDialogRef.value?.open(accessToken.value, detail.value)
+    if (currentDisplaySettingDialog.value == XPackDisplaySettingDialog) {
+      applicationApi.getApplicationSetting(id).then((ok) => {
+        DisplaySettingDialogRef.value?.open(ok.data, detail.value)
+      })
+    } else {
+      DisplaySettingDialogRef.value?.open(accessToken.value, detail.value)
+    }
   })
 }
 

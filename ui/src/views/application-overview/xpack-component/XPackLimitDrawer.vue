@@ -30,8 +30,16 @@
       <el-form-item :label="$t('views.applicationOverview.appInfo.LimitDialog.authentication')">
         <el-switch size="small" v-model="form.authentication" @change="firstGeneration"></el-switch>
       </el-form-item>
-      <el-radio-group v-if="form.authentication" v-model="form.method" class="card__radio">
-        <el-card shadow="never" class="mb-16" :class="form.method === 'replace' ? 'active' : ''">
+      <el-radio-group
+        v-if="form.authentication"
+        v-model="form.authentication_value.type"
+        class="card__radio"
+      >
+        <el-card
+          shadow="never"
+          class="mb-16"
+          :class="form.authentication_value.type === 'password' ? 'active' : ''"
+        >
           <el-radio value="replace" size="large">
             <p class="mb-4 lighter">
               {{ $t('views.applicationOverview.appInfo.LimitDialog.authenticationValue') }}
@@ -40,7 +48,7 @@
           <el-form-item class="ml-24">
             <el-input
               class="authentication-append-input"
-              v-model="form.authentication_value"
+              v-model="form.authentication_value.password_value"
               readonly
               style="width: 268px"
             >
@@ -69,9 +77,12 @@
             </el-input>
           </el-form-item>
         </el-card>
-
-        <el-card shadow="never" class="mb-16" :class="form.method === 'complete' ? 'active' : ''">
-          <el-radio value="complete" size="large">
+        <el-card
+          shadow="never"
+          class="mb-16"
+          :class="form.authentication_value.type === 'login' ? 'active' : ''"
+        >
+          <el-radio value="login" size="large">
             <p class="mb-16 lighter">
               {{ $t('views.system.authentication.title') }}
               <el-button type="primary" link @click="router.push({ path: '' })">
@@ -88,18 +99,14 @@
                 trigger: 'change',
               },
             ]"
-            prop="checkList"
+            prop="authentication_value.login_value"
             class="ml-24 border-t"
             style="padding-top: 16px"
           >
-            <el-checkbox-group v-model="form.checkList">
-              <el-checkbox label="账号登录" value="账号登录" />
-              <el-checkbox label="LDAP" value="LDAP" />
-              <el-checkbox label="OIDC" value="OIDC" />
-              <el-checkbox label="CAS" value="CAS" />
-              <el-checkbox label="企业微信" value="企业微信" />
-              <el-checkbox label="钉钉" value="钉钉" />
-              <el-checkbox label="飞书" value="飞书" />
+            <el-checkbox-group v-model="form.authentication_value.login_value">
+              <template v-for="t in auth_list" :key="t.value">
+                <el-checkbox :label="t.label" :value="t.value" />
+              </template>
             </el-checkbox-group>
           </el-form-item>
         </el-card>
@@ -146,13 +153,13 @@ const {
 } = route
 
 const emit = defineEmits(['refresh'])
-
+const auth_list = ref<Array<{ label: string; value: string }>>([])
 const limitFormRef = ref()
 const form = ref<any>({
   access_num: 0,
   white_active: true,
   white_list: '',
-  authentication_value: '',
+  authentication_value: {},
   authentication: false,
 })
 
@@ -168,7 +175,16 @@ watch(dialogVisible, (bool) => {
     }
   }
 })
-
+watch(
+  () => form.authentication,
+  (b) => {
+    if (b) {
+      applicationApi.getChatUserAuthType().then((ok) => {
+        auth_list.value = ok.data
+      })
+    }
+  },
+)
 const open = (data: any) => {
   form.value.access_num = data.access_num
   form.value.white_active = data.white_active
@@ -176,6 +192,9 @@ const open = (data: any) => {
   form.value.authentication_value = data.authentication_value
   form.value.authentication = data.authentication
   dialogVisible.value = true
+  applicationApi.getChatUserAuthType().then((ok) => {
+    auth_list.value = ok.data
+  })
 }
 
 const submit = async (formEl: FormInstance | undefined) => {
@@ -207,7 +226,7 @@ function generateAuthenticationValue(length: number = 10) {
     .join('')
 }
 function refreshAuthentication() {
-  form.value.authentication_value = generateAuthenticationValue()
+  form.value.authentication_value.password_value = generateAuthenticationValue()
 }
 
 function firstGeneration() {
