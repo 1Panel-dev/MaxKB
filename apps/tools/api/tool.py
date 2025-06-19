@@ -5,7 +5,7 @@ from drf_spectacular.utils import OpenApiParameter
 from common.mixins.api_mixin import APIMixin
 from common.result import ResultSerializer, DefaultResultSerializer
 from tools.serializers.tool import ToolModelSerializer, ToolCreateRequest, ToolDebugRequest, ToolEditRequest, \
-    PylintInstance
+    PylintInstance, AddInternalToolRequest
 
 
 class ToolCreateResponse(ResultSerializer):
@@ -275,3 +275,50 @@ class EditIconAPI(APIMixin):
     @staticmethod
     def get_response():
         return DefaultResultSerializer
+
+
+class GetInternalToolAPI(APIMixin):
+    @staticmethod
+    def get_parameters():
+        return [
+            OpenApiParameter(
+                name="name",
+                description="工具名称",
+                type=OpenApiTypes.STR,
+                location='query',
+                required=False,
+            )
+        ]
+
+    @staticmethod
+    def get_response():
+        return DefaultResultSerializer()
+
+
+class AddInternalToolAPI(APIMixin):
+    @staticmethod
+    def get_request():
+        return AddInternalToolRequest
+
+    @staticmethod
+    def get_response():
+        return DefaultResultSerializer
+
+    @staticmethod
+    def get_parameters():
+        return [
+            OpenApiParameter(
+                name="workspace_id",
+                description="工作空间id",
+                type=OpenApiTypes.STR,
+                location='path',
+                required=True,
+            ),
+            OpenApiParameter(
+                name="tool_id",
+                description="工具id",
+                type=OpenApiTypes.STR,
+                location='path',
+                required=True,
+            ),
+        ]
