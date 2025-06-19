@@ -188,6 +188,10 @@ class KnowledgeSerializer(serializers.Serializer):
 
         def list(self):
             self.is_valid(raise_exception=True)
+            folder_id = self.data.get('folder_id', self.data.get("workspace_id"))
+            root = KnowledgeFolder.objects.filter(id=folder_id).first()
+            if not root:
+                raise serializers.ValidationError(_('Folder not found'))
             workspace_manage = is_workspace_manage(self.data.get('user_id'), self.data.get('workspace_id'))
 
             return native_search(
@@ -200,7 +204,8 @@ class KnowledgeSerializer(serializers.Serializer):
                         'list_knowledge.sql' if workspace_manage else (
                             'list_knowledge_user_ee.sql' if self.is_x_pack_ee() else 'list_knowledge_user.sql'
                         )
-                    ))
+                    )
+                ),
             )
 
     class Operate(serializers.Serializer):

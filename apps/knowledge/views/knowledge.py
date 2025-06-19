@@ -41,7 +41,7 @@ class KnowledgeView(APIView):
                 'name': request.query_params.get('name'),
                 'desc': request.query_params.get("desc"),
                 'scope': KnowledgeScope.WORKSPACE,
-                'user_id': request.query_params.get('user_id')
+                'user_id': request.user.id
             }
         ).list())
 
