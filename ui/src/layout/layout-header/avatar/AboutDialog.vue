@@ -16,20 +16,18 @@
       </div>
       <div class="flex">
         <span class="label">{{ $t('layout.about.expiredTime') }}</span>
-<!--        <span-->
-<!--        >{{ licenseInfo?.expired || '-' }}-->
+        <span
+        >{{ licenseInfo?.expired || '-' }}
 <!--          <span class="color-danger"-->
 <!--                v-if="licenseInfo?.expired && fromNowDate(licenseInfo?.expired)"-->
-<!--          >（{{ fromNowDate(licenseInfo?.expired) }}）</span-->
-<!--          ></span-->
-<!--        >-->
+<!--          >（{{ fromNowDate(licenseInfo?.expired) }}）</span>-->
+        </span
+        >
       </div>
       <div class="flex">
         <span class="label">{{ $t('layout.about.edition.label') }}</span>
         <span>{{
-            user.showXpack()
-              ? $t('layout.about.edition.professional')
-              : $t('layout.about.edition.community')
+            editionText
           }}</span>
       </div>
       <div class="flex">
@@ -71,7 +69,7 @@ import licenseApi from '@/api/system/license'
 //import {fromNowDate} from '@/utils/time'
 import {Role} from '@/utils/permission/type'
 import useStore from '@/stores'
-
+import { t } from '@/locales'
 const {user, theme} = useStore()
 const isDefaultTheme = computed(() => {
   return theme.isDefaultTheme()
@@ -98,6 +96,7 @@ const open = () => {
   aboutDialogVisible.value = true
 }
 
+
 const onChange = (file: any) => {
   const fd = new FormData()
   fd.append('license_file', file.raw)
@@ -107,9 +106,20 @@ const onChange = (file: any) => {
   })
 }
 
+const editionText = computed(() => {
+  if (!user) return '-'
+  if (user.isPE()) {
+    return t('layout.about.edition.professional')
+  } else if (user.isEE()) {
+    return t('layout.about.edition.enterprise')
+  } else {
+    return t('layout.about.edition.community')
+  }
+})
 function getLicenseInfo() {
   licenseApi.getLicense(loading).then((res: any) => {
     licenseInfo.value = res.data?.license
+    console.log(licenseInfo.value)
   })
 }
 
