@@ -11,7 +11,7 @@ from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage, AI
 from application.flow.i_step_node import NodeResult, INode
 from application.flow.step_node.image_understand_step_node.i_image_understand_node import IImageUnderstandNode
 from knowledge.models import File
-from models_provider.tools import get_model_instance_by_model_user_id
+from models_provider.tools import get_model_instance_by_model_workspace_id
 
 
 def _write_context(node_variable: Dict, workflow_variable: Dict, node: INode, workflow, answer: str):
@@ -79,9 +79,9 @@ class BaseImageUnderstandNode(IImageUnderstandNode):
         # 处理不正确的参数
         if image is None or not isinstance(image, list):
             image = []
-        print(model_params_setting)
-        image_model = get_model_instance_by_model_user_id(model_id, self.flow_params_serializer.data.get('user_id'),
-                                                          **model_params_setting)
+        workspace_id = self.workflow_manage.get_body().get('workspace_id')
+        image_model = get_model_instance_by_model_workspace_id(model_id, workspace_id,
+                                                               **model_params_setting)
         # 执行详情中的历史消息不需要图片内容
         history_message = self.get_history_message_for_details(history_chat_record, dialogue_number)
         self.context['history_message'] = history_message

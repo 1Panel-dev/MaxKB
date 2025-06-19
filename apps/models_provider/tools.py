@@ -103,21 +103,25 @@ def is_valid_credential(provider, model_type, model_name, model_credential: Dict
                                                       raise_exception)
 
 
-def get_model_by_id(_id, user_id):
+def get_model_by_id(_id, workspace_id):
     model = QuerySet(Model).filter(id=_id).first()
     # 手动关闭数据库连接
     connection.close()
     if model is None:
         raise Exception(_('Model does not exist'))
+    if model.workspace_id:
+        if model.workspace_id != workspace_id:
+            raise Exception(_('Model does not exist'))
+
     return model
 
 
-def get_model_instance_by_model_user_id(model_id, user_id, **kwargs):
+def get_model_instance_by_model_workspace_id(model_id, workspace_id, **kwargs):
     """
     获取模型实例,根据模型相关数据
-    @param model_id:  模型id
-    @param user_id:   用户id
-    @return:          模型实例
+    @param model_id:        模型id
+    @param workspace_id:    工作空间id
+    @return:                模型实例
     """
-    model = get_model_by_id(model_id, user_id)
+    model = get_model_by_id(model_id, workspace_id)
     return ModelManage.get_model(model_id, lambda _id: get_model(model, **kwargs))

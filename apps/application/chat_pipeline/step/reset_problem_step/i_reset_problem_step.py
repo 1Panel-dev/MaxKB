@@ -27,7 +27,7 @@ class IResetProblemStep(IBaseChatPipelineStep):
                                                     label=_("History Questions"))
         # 大语言模型
         model_id = serializers.UUIDField(required=False, allow_null=True, label=_("Model id"))
-        user_id = serializers.UUIDField(required=True, label=_("User ID"))
+        workspace_id = serializers.CharField(required=True, label=_("User ID"))
         problem_optimization_prompt = serializers.CharField(required=False, max_length=102400,
                                                             label=_("Question completion prompt"))
 
@@ -50,6 +50,6 @@ class IResetProblemStep(IBaseChatPipelineStep):
     @abstractmethod
     def execute(self, problem_text: str, history_chat_record: List[ChatRecord] = None, model_id: str = None,
                 problem_optimization_prompt=None,
-                user_id=None,
+                workspace_id=None,
                 **kwargs):
         pass

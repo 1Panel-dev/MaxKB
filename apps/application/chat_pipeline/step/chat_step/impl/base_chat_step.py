@@ -26,7 +26,7 @@ from application.chat_pipeline.pipeline_manage import PipelineManage
 from application.chat_pipeline.step.chat_step.i_chat_step import IChatStep, PostResponseHandler
 from application.flow.tools import Reasoning
 from application.models import ApplicationChatUserStats, ChatUserType
-from models_provider.tools import get_model_instance_by_model_user_id
+from models_provider.tools import get_model_instance_by_model_workspace_id
 
 
 def add_access_num(chat_user_id=None, chat_user_type=None, application_id=None):
@@ -157,7 +157,7 @@ class BaseChatStep(IChatStep):
                 problem_text,
                 post_response_handler: PostResponseHandler,
                 model_id: str = None,
-                user_id: str = None,
+                workspace_id: str = None,
                 paragraph_list=None,
                 manage: PipelineManage = None,
                 padding_problem_text: str = None,
@@ -167,8 +167,8 @@ class BaseChatStep(IChatStep):
                 model_params_setting=None,
                 model_setting=None,
                 **kwargs):
-        chat_model = get_model_instance_by_model_user_id(model_id, user_id,
-                                                         **model_params_setting) if model_id is not None else None
+        chat_model = get_model_instance_by_model_workspace_id(model_id, workspace_id,
+                                                              **model_params_setting) if model_id is not None else None
         if stream:
             return self.execute_stream(message_list, chat_id, problem_text, post_response_handler, chat_model,
                                        paragraph_list,

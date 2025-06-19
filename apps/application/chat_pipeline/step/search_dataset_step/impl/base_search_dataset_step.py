@@ -25,13 +25,13 @@ from models_provider.models import Model
 from models_provider.tools import get_model
 
 
-def get_model_by_id(_id, user_id):
-    model = QuerySet(Model).filter(id=_id).first()
+def get_model_by_id(_id, workspace_id):
+    model = QuerySet(Model).filter(id=_id, model_type="EMBEDDING").first()
     if model is None:
         raise Exception(_("Model does not exist"))
-    if model.permission_type == 'PRIVATE' and str(model.user_id) != str(user_id):
-        message = lazy_format(_('No permission to use this model {model_name}'), model_name=model.name)
-        raise Exception(message)
+    if model.workspace_id is not None:
+        if model.workspace_id != workspace_id:
+            raise Exception(_("Model does not exist"))
     return model
 
 
@@ -50,13 +50,13 @@ class BaseSearchDatasetStep(ISearchDatasetStep):
     def execute(self, problem_text: str, knowledge_id_list: list[str], exclude_document_id_list: list[str],
                 exclude_paragraph_id_list: list[str], top_n: int, similarity: float, padding_problem_text: str = None,
                 search_mode: str = None,
-                user_id=None,
+                workspace_id=None,
                 **kwargs) -> List[ParagraphPipelineModel]:
         if len(knowledge_id_list) == 0:
             return []
         exec_problem_text = padding_problem_text if padding_problem_text is not None else problem_text
         model_id = get_embedding_id(knowledge_id_list)
-        model = get_model_by_id(model_id, user_id)
+        model = get_model_by_id(model_id, workspace_id)
         self.context['model_name'] = model.name
         embedding_model = ModelManage.get_model(model_id, lambda _id: get_model(model))
         embedding_value = embedding_model.embed_query(exec_problem_text)

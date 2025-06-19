@@ -19,7 +19,7 @@ from common.db.search import native_search
 from common.utils.common import get_file_content
 from knowledge.models import Document, Paragraph, Knowledge, SearchMode
 from maxkb.conf import PROJECT_DIR
-from models_provider.tools import get_model_instance_by_model_user_id
+from models_provider.tools import get_model_instance_by_model_workspace_id
 
 
 def get_embedding_id(dataset_id_list):
@@ -67,7 +67,8 @@ class BaseSearchDatasetNode(ISearchDatasetStepNode):
         if len(dataset_id_list) == 0:
             return get_none_result(question)
         model_id = get_embedding_id(dataset_id_list)
-        embedding_model = get_model_instance_by_model_user_id(model_id, self.flow_params_serializer.data.get('user_id'))
+        workspace_id = self.workflow_manage.get_body().get('workspace_id')
+        embedding_model = get_model_instance_by_model_workspace_id(model_id, workspace_id)
         embedding_value = embedding_model.embed_query(question)
         vector = VectorStore.get_embedding_vector()
         exclude_document_id_list = [str(document.id) for document in

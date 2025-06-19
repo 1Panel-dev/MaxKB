@@ -6,8 +6,8 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.text_to_speech_step_node.i_text_to_speech_node import ITextToSpeechNode
+from models_provider.tools import get_model_instance_by_model_workspace_id
 from oss.serializers.file import FileSerializer
-from models_provider.tools import get_model_instance_by_model_user_id
 
 
 def bytes_to_uploaded_file(file_bytes, file_name="generated_audio.mp3"):
@@ -42,8 +42,9 @@ class BaseTextToSpeechNode(ITextToSpeechNode):
                 content, model_params_setting=None,
                 **kwargs) -> NodeResult:
         self.context['content'] = content
-        model = get_model_instance_by_model_user_id(tts_model_id, self.flow_params_serializer.data.get('user_id'),
-                                                    **model_params_setting)
+        workspace_id = self.workflow_manage.get_body().get('workspace_id')
+        model = get_model_instance_by_model_workspace_id(tts_model_id, workspace_id,
+                                                         **model_params_setting)
         audio_byte = model.text_to_speech(content)
         # 需要把这个音频文件存储到数据库中
         file_name = 'generated_audio.mp3'
