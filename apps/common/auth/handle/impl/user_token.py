@@ -205,6 +205,12 @@ def get_permission_list(user,
     return permission_list
 
 
+def reset_workspace_role(role, workspace_id):
+    if role == RoleConstants.ADMIN.value.__str__():
+        return role
+    return f"{role}:/WORKSPACE/{workspace_id}"
+
+
 def get_role_list(user,
                   workspace_user_role_mapping_model,
                   workspace_model,
@@ -222,11 +228,11 @@ def get_role_list(user,
         if is_query_model:
             # 获取工作空间 用户 角色映射数据
             workspace_user_role_mapping_list = QuerySet(workspace_user_role_mapping_model).filter(user_id=user.id)
-            role_list = [
-                            f"{workspace_user_role_mapping.role_id}:/WORKSPACE/{workspace_user_role_mapping.workspace_id}"
-                            for
-                            workspace_user_role_mapping in
-                            workspace_user_role_mapping_list] + [user.role]
+            role_list = [reset_workspace_role(workspace_user_role_mapping.role_id,
+                                              workspace_user_role_mapping.workspace_id)
+                         for
+                         workspace_user_role_mapping in
+                         workspace_user_role_mapping_list] + [user.role]
             cache.set(key, workspace_list, version=version)
             return role_list
         else:
