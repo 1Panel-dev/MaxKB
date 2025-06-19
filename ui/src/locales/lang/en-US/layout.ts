@@ -13,14 +13,15 @@ export default {
     edition: {
       label: 'Edition',
       community: 'Community Edition',
-      professional: 'Professional Edition'
+      professional: 'Professional Edition',
+      enterprise: 'Enterprise Edition',
     },
     version: 'Version',
     serialNo: 'Serial No.',
     remark: 'Remarks',
     update: 'Update',
     authorize: 'Authorized',
-    
+
   },
   time: {
     daysLater: 'days later',

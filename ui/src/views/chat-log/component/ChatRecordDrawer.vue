@@ -61,14 +61,14 @@ const props = withDefaults(
 
     next_disable: boolean
   }>(),
-  {}
+  {},
 )
 
 const emit = defineEmits(['update:chatId', 'update:currentAbstract', 'refresh'])
 
 const route = useRoute()
 const {
-  params: { id }
+  params: { id },
 } = route
 const loading = ref(false)
 const visible = ref(false)
@@ -77,7 +77,7 @@ const recordList = ref<chatType[]>([])
 const paginationConfig = reactive({
   current_page: 1,
   page_size: 20,
-  total: 0
+  total: 0,
 })
 
 function closeHandle() {
@@ -93,7 +93,7 @@ function getChatRecord() {
       paginationConfig.total = res.data.total
       const list = res.data.records
       recordList.value = [...list, ...recordList.value].sort((a, b) =>
-        a.create_time.localeCompare(b.create_time)
+        a.create_time.localeCompare(b.create_time),
       )
       if (paginationConfig.current_page === 1) {
         nextTick(() => {
@@ -113,7 +113,7 @@ watch(
     if (props.chatId) {
       getChatRecord()
     }
-  }
+  },
 )
 
 watch(visible, (bool) => {
@@ -143,7 +143,7 @@ const open = () => {
 }
 
 defineExpose({
-  open
+  open,
 })
 </script>
 <style lang="scss">
@@ -157,10 +157,6 @@ defineExpose({
   .el-drawer__body {
     background: var(--app-layout-bg-color);
     padding: 0;
-  }
-
-  :deep(.el-divider__text) {
-    background: var(--app-layout-bg-color);
   }
 }
 </style>

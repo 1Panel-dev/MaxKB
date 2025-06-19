@@ -538,6 +538,7 @@ class ApplicationSerializer(serializers.Serializer):
 class ApplicationOperateSerializer(serializers.Serializer):
     application_id = serializers.UUIDField(required=True, label=_("Application ID"))
     user_id = serializers.UUIDField(required=True, label=_("User ID"))
+    workspace_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("Workspace ID"))
 
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)
@@ -682,7 +683,6 @@ class ApplicationOperateSerializer(serializers.Serializer):
         for update_key in update_keys:
             if update_key in instance and instance.get(update_key) is not None:
                 application.__setattr__(update_key, instance.get(update_key))
-        print(application.name)
         application.save()
 
         if 'knowledge_id_list' in instance:
@@ -690,11 +690,11 @@ class ApplicationOperateSerializer(serializers.Serializer):
             # 当前用户可修改关联的知识库列表
             application_knowledge_id_list = [str(knowledge.id) for knowledge in
                                              self.list_knowledge(with_valid=False)]
-            for dataset_id in knowledge_id_list:
-                if not application_knowledge_id_list.__contains__(dataset_id):
+            for knowledge_id in knowledge_id_list:
+                if not application_knowledge_id_list.__contains__(knowledge_id):
                     message = lazy_format(_('Unknown knowledge base id {dataset_id}, unable to associate'),
-                                          dataset_id=dataset_id)
-                    raise AppApiException(500, message)
+                                          dataset_id=knowledge_id)
+                    raise AppApiException(500, str(message))
 
             self.save_application_knowledge_mapping(application_knowledge_id_list, knowledge_id_list, application_id)
         return self.one(with_valid=False)
@@ -707,8 +707,8 @@ class ApplicationOperateSerializer(serializers.Serializer):
         knowledge_list = self.list_knowledge(with_valid=False)
         mapping_knowledge_id_list = [akm.knowledge_id for akm in
                                      QuerySet(ApplicationKnowledgeMapping).filter(application_id=application_id)]
-        knowledge_id_list = [d.get('id') for d in
-                             list(filter(lambda row: mapping_knowledge_id_list.__contains__(row.get('id')),
+        knowledge_id_list = [d.id for d in
+                             list(filter(lambda row: mapping_knowledge_id_list.__contains__(row.id),
                                          knowledge_list))]
         return {**ApplicationSerializerModel(application).data,
                 'knowledge_id_list': knowledge_id_list}
@@ -729,5 +729,5 @@ class ApplicationOperateSerializer(serializers.Serializer):
                                                      application_id=application_id).delete()
         # 插入
         QuerySet(ApplicationKnowledgeMapping).bulk_create(
-            [ApplicationKnowledgeMapping(application_id=application_id, dataset_id=dataset_id) for dataset_id in
+            [ApplicationKnowledgeMapping(application_id=application_id, knowledge_id=knowledge_id) for knowledge_id in
              knowledge_id_list]) if len(knowledge_id_list) > 0 else None

@@ -358,7 +358,7 @@ const search_type_change = () => {
 
 function getList() {
   const params = {
-    folder_id: currentFolder.value?.id || 'root',
+    folder_id: currentFolder.value?.id || 'default',
     [search_type.value]: search_form.value[search_type.value],
   }
 
@@ -386,7 +386,7 @@ function folderClickHandel(row: any) {
 const CreateFolderDialogRef = ref()
 
 function openCreateFolder() {
-  CreateFolderDialogRef.value.open('KNOWLEDGE', currentFolder.value.parent_id)
+  CreateFolderDialogRef.value.open('KNOWLEDGE', currentFolder.value.id)
 }
 
 const GenerateRelatedDialogRef = ref<InstanceType<typeof GenerateRelatedDialog>>()

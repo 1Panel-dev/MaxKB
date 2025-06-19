@@ -52,7 +52,8 @@
                               }}
                             </el-dropdown-item>
                             <el-dropdown-item @click.stop="deleteGroup(row)" class="border-t p-8"
-                              v-if="hasPermission(new ComplexPermission(
+                              v-if="row.id !== 'default'&&
+                              hasPermission(new ComplexPermission(
                               [RoleConst.ADMIN,RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
                               [PermissionConst.WORKSPACE_USER_GROUP_DELETE.getWorkspacePermission], [], 'OR'), 'OR')"
                             >

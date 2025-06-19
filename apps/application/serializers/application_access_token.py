@@ -33,6 +33,8 @@ class AccessTokenEditSerializer(serializers.Serializer):
                                             label=_("Whitelist")),
     show_source = serializers.BooleanField(required=False,
                                            label=_("Whether to display knowledge sources"))
+    show_exec = serializers.BooleanField(required=False,
+                                         label=_("Display execution details"))
     language = serializers.CharField(required=False, allow_blank=True, allow_null=True,
                                      label=_("language"))
     authentication = serializers.BooleanField(default=False, label="Do you need authentication")
@@ -60,6 +62,8 @@ class AccessTokenSerializer(serializers.Serializer):
             application_access_token.white_list = instance.get('white_list')
         if 'show_source' in instance and instance.get('show_source') is not None:
             application_access_token.show_source = instance.get('show_source')
+        if 'show_exec' in instance and instance.get('show_exec') is not None:
+            application_access_token.show_exec = instance.get('show_exec')
         if 'language' in instance and instance.get('language') is not None:
             application_access_token.language = instance.get('language')
         if 'language' not in instance or instance.get('language') is None:

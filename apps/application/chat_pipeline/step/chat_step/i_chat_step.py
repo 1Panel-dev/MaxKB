@@ -75,7 +75,7 @@ class IChatStep(IBaseChatPipelineStep):
         no_references_setting = NoReferencesSetting(required=True,
                                                     label=_("No reference segment settings"))
 
-        user_id = serializers.UUIDField(required=True, label=_("User ID"))
+        workspace_id = serializers.CharField(required=True, label=_("Workspace ID"))
 
         model_setting = serializers.DictField(required=True, allow_null=True,
                                               label=_("Model settings"))
@@ -102,7 +102,7 @@ class IChatStep(IBaseChatPipelineStep):
                 chat_id, problem_text,
                 post_response_handler: PostResponseHandler,
                 model_id: str = None,
-                user_id: str = None,
+                workspace_id: str = None,
                 paragraph_list=None,
                 manage: PipelineManage = None,
                 padding_problem_text: str = None, stream: bool = True, chat_user_id=None, chat_user_type=None,

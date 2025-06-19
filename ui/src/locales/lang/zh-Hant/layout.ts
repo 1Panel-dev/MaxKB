@@ -14,7 +14,8 @@ export default {
     edition: {
       label: '版本',
       community: '社群版',
-      professional: '專業版'
+      professional: '專業版',
+      enterprise: '企業版'
     },
     version: '版本號',
     serialNo: '序列號',

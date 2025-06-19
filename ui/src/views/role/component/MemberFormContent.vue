@@ -4,10 +4,10 @@
       <div v-for="(element, index) in form" :key="index" class="flex w-full">
         <el-form-item v-for="model of props.models" :key="model.path" :prop="`[${index}].${model.path}`"
           :rules="model.rules" :label="index === 0 && model.label ? model.label : ''" class="mr-8" style="flex: 1">
-          <el-select v-model="element[model.path]"
-            :placeholder="model.selectProps.placeholder ?? $t('common.selectPlaceholder')" clearable filterable multiple
-            style="width: 100%" collapse-tags collapse-tags-tooltip>
-            <el-option v-for="opt in model.selectProps.options" :key="opt.value" :label="opt.label"
+          <el-select v-show="!model?.hidden?.(element)" v-model="element[model.path]"
+            :placeholder="model.selectProps?.placeholder ?? $t('common.selectPlaceholder')" clearable filterable
+            multiple style="width: 100%" collapse-tags collapse-tags-tooltip v-bind="model.selectProps">
+            <el-option v-for="opt in model.selectProps?.options" :key="opt.value" :label="opt.label"
               :value="opt.value" />
           </el-select>
         </el-form-item>
@@ -26,7 +26,7 @@
       <el-icon class="mr-4">
         <Plus />
       </el-icon>
-      {{ $t('views.role.member.add') }}
+      {{ props.addText ?? $t('views.role.member.add') }}
     </el-button>
   </el-form>
 </template>
@@ -37,6 +37,7 @@ import type { FormItemModel } from '@/api/type/role'
 
 const props = defineProps<{
   models: FormItemModel[];
+  addText?: string;
 }>()
 
 const formRef = ref()

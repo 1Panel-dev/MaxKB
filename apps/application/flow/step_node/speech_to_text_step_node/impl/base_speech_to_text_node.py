@@ -9,7 +9,7 @@ from application.flow.i_step_node import NodeResult
 from application.flow.step_node.speech_to_text_step_node.i_speech_to_text_node import ISpeechToTextNode
 from common.utils.common import split_and_transcribe, any_to_mp3
 from knowledge.models import File
-from models_provider.tools import get_model_instance_by_model_user_id
+from models_provider.tools import get_model_instance_by_model_workspace_id
 
 
 class BaseSpeechToTextNode(ISpeechToTextNode):
@@ -20,7 +20,8 @@ class BaseSpeechToTextNode(ISpeechToTextNode):
             self.answer_text = details.get('answer')
 
     def execute(self, stt_model_id, chat_id, audio, **kwargs) -> NodeResult:
-        stt_model = get_model_instance_by_model_user_id(stt_model_id, self.flow_params_serializer.data.get('user_id'))
+        workspace_id = self.workflow_manage.get_body().get('workspace_id')
+        stt_model = get_model_instance_by_model_workspace_id(stt_model_id, workspace_id)
         audio_list = audio
         self.context['audio_list'] = audio
 

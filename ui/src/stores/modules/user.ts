@@ -105,7 +105,7 @@ const useUserStore = defineStore('user', {
       return this.edition == 'PE' && this.license_is_valid
     },
     isEE() {
-      return this.edition == 'EE'
+      return this.edition == 'EE' && this.license_is_valid
     },
     changeUserType(num: number, token?: string) {
       this.userType = num

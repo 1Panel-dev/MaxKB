@@ -120,7 +120,7 @@ class ModelSerializer(serializers.Serializer):
 
         def one(self, with_valid=False):
             if with_valid:
-                self.is_valid(raise_exception=True)
+                super().is_valid(raise_exception=True)
             model = QuerySet(Model).get(
                 id=self.data.get('id')
             )
@@ -147,7 +147,7 @@ class ModelSerializer(serializers.Serializer):
 
         def delete(self, with_valid=True):
             if with_valid:
-                self.is_valid(raise_exception=True)
+                super().is_valid(raise_exception=True)
             model_id = self.data.get('id')
             model = Model.objects.filter(id=model_id).first()
             # TODO : 这里可以添加模型删除的逻辑,需要注意删除模型时的权限和关联关系
@@ -172,7 +172,7 @@ class ModelSerializer(serializers.Serializer):
 
         def edit(self, instance: Dict, user_id: str, with_valid=True):
             if with_valid:
-                self.is_valid(raise_exception=True)
+                super().is_valid(raise_exception=True)
             model = QuerySet(Model).filter(id=self.data.get('id')).first()
 
             credential, model_credential, provider_handler = ModelSerializer.Edit(

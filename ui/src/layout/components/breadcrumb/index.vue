@@ -1,7 +1,27 @@
 <template>
   <div class="breadcrumb ml-4 mt-4 mb-12 flex">
     <back-button :to="activeMenu" class="mt-4"></back-button>
-    <el-dropdown
+    <div class="flex align-center">
+      <el-avatar
+        v-if="isApplication && isAppIcon(current?.icon)"
+        shape="square"
+        :size="24"
+        style="background: none"
+        class="mr-8"
+      >
+        <img :src="current?.icon" alt="" />
+      </el-avatar>
+      <LogoIcon
+        v-else-if="isApplication"
+        height="28px"
+        style="width: 28px; height: 28px; display: block"
+        class="mr-8"
+      />
+      <KnowledgeIcon v-else-if="isKnowledge" :type="current?.type" class="mr-8" />
+
+      <div class="ellipsis" :title="current?.name">{{ current?.name }}</div>
+    </div>
+    <!-- <el-dropdown
       placement="bottom"
       trigger="click"
       @command="changeMenu"
@@ -19,13 +39,10 @@
           >
             <img :src="current?.icon" alt="" />
           </el-avatar>
-          <el-avatar
+          <LogoIcon
             v-else-if="isApplication"
-            :name="current?.name"
-            pinyinColor
-            shape="square"
-            class="mr-8"
-            :size="24"
+            height="28px"
+            style="width: 28px; height: 28px; display: block"
           />
           <KnowledgeIcon v-else-if="isKnowledge" :type="current?.type" />
 
@@ -91,7 +108,7 @@
           </template>
         </div>
       </template>
-    </el-dropdown>
+    </el-dropdown> -->
   </div>
 </template>
 
@@ -120,10 +137,10 @@ const list = ref<any[]>([])
 const loading = ref(false)
 
 const breadcrumbData = computed(() => common.breadcrumb)
-
-const current = computed(() => {
-  return list.value?.filter((v) => v.id === id)?.[0]
-})
+const current = ref<any>(null)
+// const current = computed(() => {
+//   return list.value?.filter((v) => v.id === id)?.[0]
+// })
 
 const isApplication = computed(() => {
   return activeMenu.includes('application')
@@ -131,6 +148,32 @@ const isApplication = computed(() => {
 const isKnowledge = computed(() => {
   return activeMenu.includes('knowledge')
 })
+
+function getKnowledgeDetail() {
+  loading.value = true
+  knowledge
+    .asyncGetKnowledgeDetail(id)
+    .then((res: any) => {
+      current.value = res.data
+      loading.value = false
+    })
+    .catch(() => {
+      loading.value = false
+    })
+}
+
+function getApplicationDetail() {
+  loading.value = true
+  application
+    .asyncGetApplicationDetail(id)
+    .then((res: any) => {
+      current.value = res.data
+      loading.value = false
+    })
+    .catch(() => {
+      loading.value = false
+    })
+}
 
 function openCreateDialog() {
   if (isKnowledge.value) {
@@ -165,7 +208,7 @@ function changeMenu(id: string) {
 function getKnowledge() {
   loading.value = true
   knowledge
-    .asyncGetRootKnowledge()
+    .asyncGetFolderKnowledge()
     .then((res: any) => {
       list.value = res.data
       common.saveBreadcrumb(list.value)
@@ -192,15 +235,20 @@ function refresh() {
   common.saveBreadcrumb(null)
 }
 onMounted(() => {
-  if (!breadcrumbData.value) {
-    if (isKnowledge.value) {
-      getKnowledge()
-    } else if (isApplication.value) {
-      getApplication()
-    }
-  } else {
-    list.value = breadcrumbData.value
+  if (isKnowledge.value) {
+    getKnowledgeDetail()
+  } else if (isApplication.value) {
+    getApplicationDetail()
   }
+  // if (!breadcrumbData.value) {
+  //   if (isKnowledge.value) {
+  //     getKnowledge()
+  //   } else if (isApplication.value) {
+  //     getApplication()
+  //   }
+  // } else {
+  //   list.value = breadcrumbData.value
+  // }
 })
 </script>
 

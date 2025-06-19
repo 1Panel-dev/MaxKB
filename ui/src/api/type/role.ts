@@ -60,9 +60,11 @@ interface FormItemModel {
   path: string
   label?: string
   rules?: Arrayable<FormItemRule>,
-  selectProps: {
+  hidden?: (e: any) => boolean,
+  selectProps?: {
     options?: { label: string, value: string }[]
     placeholder?: string
+    multiple?: boolean
   }
 }
 

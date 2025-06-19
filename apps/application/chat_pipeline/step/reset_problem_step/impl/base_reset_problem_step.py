@@ -14,7 +14,7 @@ from langchain.schema import HumanMessage
 from application.chat_pipeline.step.reset_problem_step.i_reset_problem_step import IResetProblemStep
 from application.models import ChatRecord
 from common.utils.split_model import flat_map
-from models_provider.tools import get_model_instance_by_model_user_id
+from models_provider.tools import get_model_instance_by_model_workspace_id
 
 prompt = _(
     "() contains the user's question. Answer the guessed user's question based on the context ({question}) Requirement: Output a complete question and put it in the <data></data> tag")
@@ -23,9 +23,9 @@ prompt = _(
 class BaseResetProblemStep(IResetProblemStep):
     def execute(self, problem_text: str, history_chat_record: List[ChatRecord] = None, model_id: str = None,
                 problem_optimization_prompt=None,
-                user_id=None,
+                workspace_id=None,
                 **kwargs) -> str:
-        chat_model = get_model_instance_by_model_user_id(model_id, user_id) if model_id is not None else None
+        chat_model = get_model_instance_by_model_workspace_id(model_id, workspace_id) if model_id is not None else None
         if chat_model is None:
             return problem_text
         start_index = len(history_chat_record) - 3

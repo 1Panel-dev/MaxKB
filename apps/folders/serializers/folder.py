@@ -157,7 +157,7 @@ class FolderSerializer(serializers.Serializer):
 
             # 模块间的移动
             parent_id = instance.get('parent_id')
-            if parent_id is not None and current_id != current_node.workspace_id:
+            if parent_id is not None and current_id != current_node.workspace_id and current_node.parent_id != parent_id:
                 # Folder 不能超过3层
                 current_depth = get_max_depth(current_node)
                 check_depth(self.data.get('source'), parent_id, current_node.workspace_id, current_depth)

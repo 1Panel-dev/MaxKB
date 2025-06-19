@@ -88,7 +88,7 @@ const delFolder: (
   source: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<boolean>> = (folder_id, source, loading) => {
-  return del(`${prefix.value}/${source}/folder${folder_id}`, undefined, {}, loading)
+  return del(`${prefix.value}/${source}/folder/${folder_id}`, undefined, {}, loading)
 }
 
 export default {

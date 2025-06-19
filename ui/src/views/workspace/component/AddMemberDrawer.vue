@@ -27,6 +27,7 @@ import { t } from '@/locales'
 import { MsgSuccess } from '@/utils/message'
 import type { CreateWorkspaceMemberParamsItem, WorkspaceItem } from '@/api/type/workspace'
 import type { FormItemModel } from '@/api/type/role'
+import { RoleTypeEnum } from '@/enums/system'
 
 const props = defineProps<{
   currentWorkspace?: WorkspaceItem
@@ -83,7 +84,7 @@ async function getRoleFormItem() {
         },
       ],
       selectProps: {
-        options: res.data?.map(item => ({
+        options: res.data.filter(item => item.type !== RoleTypeEnum.ADMIN)?.map(item => ({
           label: item.name,
           value: item.id
         })) || [],

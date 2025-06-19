@@ -11,7 +11,6 @@ import json
 import re
 import time
 from functools import reduce
-from types import AsyncGeneratorType
 from typing import List, Dict
 
 from django.db.models import QuerySet
@@ -24,7 +23,7 @@ from application.flow.i_step_node import NodeResult, INode
 from application.flow.step_node.ai_chat_step_node.i_chat_node import IChatNode
 from application.flow.tools import Reasoning
 from models_provider.models import Model
-from models_provider.tools import get_model_credential, get_model_instance_by_model_user_id
+from models_provider.tools import get_model_credential, get_model_instance_by_model_workspace_id
 
 tool_message_template = """
 <details>
@@ -206,8 +205,9 @@ class BaseChatNode(IChatNode):
             model_setting = {'reasoning_content_enable': False, 'reasoning_content_end': '</think>',
                              'reasoning_content_start': '<think>'}
         self.context['model_setting'] = model_setting
-        chat_model = get_model_instance_by_model_user_id(model_id, self.flow_params_serializer.data.get('user_id'),
-                                                         **model_params_setting)
+        workspace_id = self.workflow_manage.get_body().get('workspace_id')
+        chat_model = get_model_instance_by_model_workspace_id(model_id, workspace_id,
+                                                              **model_params_setting)
         history_message = self.get_history_message(history_chat_record, dialogue_number, dialogue_type,
                                                    self.runtime_node_id)
         self.context['history_message'] = history_message

@@ -6,7 +6,7 @@
         <div class="set-rules__right">
           <el-scrollbar>
             <div class="left-height" @click.stop>
-              <el-radio-group v-model="radio" class="set-rules__radio">
+              <el-radio-group v-model="radio" class="card__radio">
                 <el-card shadow="never" class="mb-16" :class="radio === '1' ? 'active' : ''">
                   <el-radio value="1" size="large">
                     <p class="mb-4">{{ $t('views.document.setRules.intelligent.label') }}</p>
@@ -218,7 +218,7 @@ function splitDocument() {
 }
 
 const initSplitPatternList = () => {
-  documentApi.listSplitPattern(id,patternLoading).then((ok) => {
+  documentApi.listSplitPattern(id, patternLoading).then((ok) => {
     splitPatternList.value = ok.data
   })
 }
@@ -247,32 +247,6 @@ defineExpose({
     max-height: calc(var(--create-knowledge-height) - 110px);
     overflow-x: hidden;
   }
-
-  &__radio {
-    width: 100%;
-    display: block;
-
-    .el-radio {
-      white-space: break-spaces;
-      width: 100%;
-      height: 100%;
-      line-height: 22px;
-      color: var(--app-text-color);
-    }
-
-    :deep(.el-radio__label) {
-      padding-left: 30px;
-      width: 100%;
-    }
-    :deep(.el-radio__input) {
-      position: absolute;
-      top: 16px;
-    }
-    .active {
-      border: 1px solid var(--el-color-primary);
-    }
-  }
-
   &__form {
     .title {
       font-size: 14px;

@@ -3,9 +3,11 @@
     <template #left>
       <h4 class="p-16 pb-0">{{ $t('views.tool.title') }}</h4>
       <folder-tree
+        :source="FolderSource.TOOL"
         :data="folderList"
         :currentNodeKey="currentFolder?.id"
         @handleNodeClick="folderClickHandel"
+        @refreshTree ="refreshFolder"
         shareTitle="views.system.share_tool"
         isShared
         class="p-8"
@@ -108,183 +110,195 @@
         </div>
       </template>
 
-      <div>
-        <el-row v-if="toolList.length > 0" :gutter="15">
-          <template v-for="(item, index) in toolList" :key="index">
-            <el-col
-              v-if="item.resource_type === 'folder'"
-              :xs="24"
-              :sm="12"
-              :md="12"
-              :lg="8"
-              :xl="6"
-              class="mb-16"
-            >
-              <CardBox
-                :title="item.name"
-                :description="item.desc || $t('common.noData')"
-                class="cursor"
-                @click="clickFolder(item)"
+      <div
+        v-loading.fullscreen.lock="paginationConfig.current_page === 1 && loading"
+        style="max-height: calc(100vh - 140px)"
+      >
+        <InfiniteScroll
+          :size="toolList.length"
+          :total="paginationConfig.total"
+          :page_size="paginationConfig.page_size"
+          v-model:current_page="paginationConfig.current_page"
+          @load="getList"
+          :loading="loading"
+        >
+          <el-row v-if="toolList.length > 0" :gutter="15">
+            <template v-for="(item, index) in toolList" :key="index">
+              <el-col
+                v-if="item.resource_type === 'folder'"
+                :xs="24"
+                :sm="12"
+                :md="12"
+                :lg="8"
+                :xl="6"
+                class="mb-16"
               >
-                <template #icon>
-                  <el-avatar shape="square" :size="32" style="background: none">
-                    <AppIcon iconName="app-folder" style="font-size: 32px"></AppIcon>
-                  </el-avatar>
-                </template>
-                <template #subTitle>
-                  <el-text class="color-secondary lighter" size="small">
-                    {{ $t('common.creator') }}: {{ item.nick_name }}
-                  </el-text>
-                </template>
-              </CardBox>
-            </el-col>
-            <el-col v-else :xs="24" :sm="12" :md="12" :lg="8" :xl="6" class="mb-16">
-              <CardBox :title="item.name" :description="item.desc" class="cursor">
-                <template #icon>
-                  <el-avatar
-                    v-if="isAppIcon(item?.icon)"
-                    shape="square"
-                    :size="32"
-                    style="background: none"
-                    class="mr-8"
-                  >
-                    <img :src="item?.icon" alt="" />
-                  </el-avatar>
-                  <el-avatar v-else class="avatar-green" shape="square" :size="32">
-                    <img src="@/assets/node/icon_tool.svg" style="width: 58%" alt="" />
-                  </el-avatar>
-                </template>
-                <template #subTitle>
-                  <el-text class="color-secondary lighter" size="small">
-                    {{ $t('common.creator') }}: {{ item.nick_name }}
-                  </el-text>
-                </template>
+                <CardBox
+                  :title="item.name"
+                  :description="item.desc || $t('common.noData')"
+                  class="cursor"
+                  @click="clickFolder(item)"
+                >
+                  <template #icon>
+                    <el-avatar shape="square" :size="32" style="background: none">
+                      <AppIcon iconName="app-folder" style="font-size: 32px"></AppIcon>
+                    </el-avatar>
+                  </template>
+                  <template #subTitle>
+                    <el-text class="color-secondary lighter" size="small">
+                      {{ $t('common.creator') }}: {{ item.nick_name }}
+                    </el-text>
+                  </template>
+                </CardBox>
+              </el-col>
+              <el-col v-else :xs="24" :sm="12" :md="12" :lg="8" :xl="6" class="mb-16">
+                <CardBox :title="item.name" :description="item.desc" class="cursor">
+                  <template #icon>
+                    <el-avatar
+                      v-if="isAppIcon(item?.icon)"
+                      shape="square"
+                      :size="32"
+                      style="background: none"
+                      class="mr-8"
+                    >
+                      <img :src="item?.icon" alt="" />
+                    </el-avatar>
+                    <el-avatar v-else class="avatar-green" shape="square" :size="32">
+                      <img src="@/assets/node/icon_tool.svg" style="width: 58%" alt="" />
+                    </el-avatar>
+                  </template>
+                  <template #subTitle>
+                    <el-text class="color-secondary lighter" size="small">
+                      {{ $t('common.creator') }}: {{ item.nick_name }}
+                    </el-text>
+                  </template>
 
-                <template #footer>
-                  <div v-if="item.is_active" class="flex align-center">
-                    <el-icon class="color-success mr-8" style="font-size: 16px">
-                      <SuccessFilled />
-                    </el-icon>
-                    <span class="color-secondary">
-                      {{ $t('common.status.enabled') }}
-                    </span>
-                  </div>
-                  <div v-else class="flex align-center">
-                    <AppIcon iconName="app-disabled" class="color-secondary mr-8"></AppIcon>
-                    <span class="color-secondary">
-                      {{ $t('common.status.disabled') }}
-                    </span>
-                  </div>
-                </template>
-                <template #mouseEnter>
-                  <div @click.stop>
-                    <el-switch
-                      v-model="item.is_active"
-                      :before-change="() => changeState(item)"
-                      size="small"
-                      class="mr-4"
-                      v-hasPermission="[
-                        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                        PermissionConst.TOOL_EDIT.getWorkspacePermission,
-                      ]"
-                    />
-                    <el-divider direction="vertical" />
-                    <el-dropdown trigger="click">
-                      <el-button text @click.stop>
-                        <el-icon>
-                          <MoreFilled />
-                        </el-icon>
-                      </el-button>
-                      <template #dropdown>
-                        <el-dropdown-menu>
-                          <el-dropdown-item
-                            v-if="
-                              !item.template_id &&
-                              hasPermission(
-                                [
-                                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                                  PermissionConst.TOOL_EDIT.getWorkspacePermission,
-                                ],
-                                'OR',
-                              )
-                            "
-                            :disabled="!canEdit(item)"
-                            @click.stop="openCreateDialog(item)"
-                          >
-                            <el-icon>
-                              <EditPen />
-                            </el-icon>
-                            {{ $t('common.edit') }}
-                          </el-dropdown-item>
-                          <el-dropdown-item
-                            :disabled="!canEdit(item)"
-                            v-if="
-                              !item.template_id &&
-                              hasPermission(
-                                [
-                                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                                  PermissionConst.TOOL_EXPORT.getWorkspacePermission,
-                                ],
-                                'OR',
-                              )
-                            "
-                            @click.stop="copyTool(item)"
-                          >
-                            <AppIcon iconName="app-copy"></AppIcon>
-                            {{ $t('common.copy') }}
-                          </el-dropdown-item>
-                          <el-dropdown-item
-                            v-if="item.init_field_list?.length > 0"
-                            :disabled="!canEdit(item)"
-                            @click.stop="configInitParams(item)"
-                          >
-                            <AppIcon iconName="app-operation" class="mr-4"></AppIcon>
-                            {{ $t('common.param.initParam') }}
-                          </el-dropdown-item>
-                          <el-dropdown-item
-                            v-if="
-                              !item.template_id &&
-                              hasPermission(
-                                [
-                                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                                  PermissionConst.TOOL_EXPORT.getWorkspacePermission,
-                                ],
-                                'OR',
-                              )
-                            "
-                            :disabled="!canEdit(item)"
-                            @click.stop="exportTool(item)"
-                          >
-                            <AppIcon iconName="app-export"></AppIcon>
-                            {{ $t('common.export') }}
-                          </el-dropdown-item>
-                          <el-dropdown-item
-                            v-if="
-                              hasPermission(
-                                [
-                                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                                  PermissionConst.TOOL_DELETE.getWorkspacePermission,
-                                ],
-                                'OR',
-                              )
-                            "
-                            :disabled="!canEdit(item)"
-                            divided
-                            @click.stop="deleteTool(item)"
-                          >
-                            <el-icon><Delete /></el-icon>
-                            {{ $t('common.delete') }}
-                          </el-dropdown-item>
-                        </el-dropdown-menu>
-                      </template>
-                    </el-dropdown>
-                  </div>
-                </template>
-              </CardBox>
-            </el-col>
-          </template>
-        </el-row>
-        <el-empty :description="$t('common.noData')" v-else />
+                  <template #footer>
+                    <div v-if="item.is_active" class="flex align-center">
+                      <el-icon class="color-success mr-8" style="font-size: 16px">
+                        <SuccessFilled />
+                      </el-icon>
+                      <span class="color-secondary">
+                        {{ $t('common.status.enabled') }}
+                      </span>
+                    </div>
+                    <div v-else class="flex align-center">
+                      <AppIcon iconName="app-disabled" class="color-secondary mr-8"></AppIcon>
+                      <span class="color-secondary">
+                        {{ $t('common.status.disabled') }}
+                      </span>
+                    </div>
+                  </template>
+                  <template #mouseEnter>
+                    <div @click.stop>
+                      <el-switch
+                        v-model="item.is_active"
+                        :before-change="() => changeState(item)"
+                        size="small"
+                        class="mr-4"
+                        v-hasPermission="[
+                          RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                          PermissionConst.TOOL_EDIT.getWorkspacePermission,
+                        ]"
+                      />
+                      <el-divider direction="vertical" />
+                      <el-dropdown trigger="click">
+                        <el-button text @click.stop>
+                          <el-icon>
+                            <MoreFilled />
+                          </el-icon>
+                        </el-button>
+                        <template #dropdown>
+                          <el-dropdown-menu>
+                            <el-dropdown-item
+                              v-if="
+                                !item.template_id &&
+                                hasPermission(
+                                  [
+                                    RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                                    PermissionConst.TOOL_EDIT.getWorkspacePermission,
+                                  ],
+                                  'OR',
+                                )
+                              "
+                              :disabled="!canEdit(item)"
+                              @click.stop="openCreateDialog(item)"
+                            >
+                              <el-icon>
+                                <EditPen />
+                              </el-icon>
+                              {{ $t('common.edit') }}
+                            </el-dropdown-item>
+                            <el-dropdown-item
+                              :disabled="!canEdit(item)"
+                              v-if="
+                                !item.template_id &&
+                                hasPermission(
+                                  [
+                                    RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                                    PermissionConst.TOOL_EXPORT.getWorkspacePermission,
+                                  ],
+                                  'OR',
+                                )
+                              "
+                              @click.stop="copyTool(item)"
+                            >
+                              <AppIcon iconName="app-copy"></AppIcon>
+                              {{ $t('common.copy') }}
+                            </el-dropdown-item>
+                            <el-dropdown-item
+                              v-if="item.init_field_list?.length > 0"
+                              :disabled="!canEdit(item)"
+                              @click.stop="configInitParams(item)"
+                            >
+                              <AppIcon iconName="app-operation" class="mr-4"></AppIcon>
+                              {{ $t('common.param.initParam') }}
+                            </el-dropdown-item>
+                            <el-dropdown-item
+                              v-if="
+                                !item.template_id &&
+                                hasPermission(
+                                  [
+                                    RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                                    PermissionConst.TOOL_EXPORT.getWorkspacePermission,
+                                  ],
+                                  'OR',
+                                )
+                              "
+                              :disabled="!canEdit(item)"
+                              @click.stop="exportTool(item)"
+                            >
+                              <AppIcon iconName="app-export"></AppIcon>
+                              {{ $t('common.export') }}
+                            </el-dropdown-item>
+                            <el-dropdown-item
+                              v-if="
+                                hasPermission(
+                                  [
+                                    RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                                    PermissionConst.TOOL_DELETE.getWorkspacePermission,
+                                  ],
+                                  'OR',
+                                )
+                              "
+                              :disabled="!canEdit(item)"
+                              divided
+                              @click.stop="deleteTool(item)"
+                            >
+                              <el-icon><Delete /></el-icon>
+                              {{ $t('common.delete') }}
+                            </el-dropdown-item>
+                          </el-dropdown-menu>
+                        </template>
+                      </el-dropdown>
+                    </div>
+                  </template>
+                </CardBox>
+              </el-col>
+            </template>
+          </el-row>
+          <el-empty :description="$t('common.noData')" v-else />
+        </InfiniteScroll>
       </div>
     </ContentContainer>
     <InitParamDrawer ref="InitParamDrawerRef" @refresh="refresh" />
@@ -307,6 +321,7 @@ import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import SharedWorkspace from '@/views/shared/tool-shared/SharedWorkspace.vue'
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
+import { FolderSource } from '@/enums/common'
 
 const { folder, user } = useStore()
 
@@ -371,15 +386,11 @@ function getList() {
   })
 }
 
-function getFolder() {
-  const params = {}
-  folder.asyncGetFolder('TOOL', params, loading).then((res: any) => {
-    folderList.value = res.data
-    currentFolder.value = res.data?.[0] || {}
-    getList()
-  })
+function clickFolder(item: any) {
+  currentFolder.value.id = item.id
+  toolList.value = []
+  getList()
 }
-
 async function changeState(row: any) {
   if (row.is_active) {
     MsgConfirm(
@@ -442,24 +453,6 @@ function refresh(data: any) {
   getList()
 }
 
-function refreshFolder() {
-  toolList.value = []
-  getFolder()
-  getList()
-}
-
-function folderClickHandel(row: any) {
-  currentFolder.value = row
-  toolList.value = []
-  getList()
-}
-
-function clickFolder(item: any) {
-  currentFolder.value.id = item.id
-  toolList.value = []
-  getList()
-}
-
 function copyTool(row: any) {
   ToolDrawertitle.value = t('views.tool.copyTool')
   const obj = cloneDeep(row)
@@ -504,11 +497,6 @@ function configInitParams(item: any) {
   })
 }
 
-const CreateFolderDialogRef = ref()
-function openCreateFolder() {
-  CreateFolderDialogRef.value.open('TOOL', currentFolder.value.parent_id)
-}
-
 const elUploadRef = ref()
 function importTool(file: any) {
   const formData = new FormData()
@@ -533,8 +521,36 @@ function importTool(file: any) {
     })
 }
 
-onMounted(() => {
+// 文件夹相关
+const CreateFolderDialogRef = ref()
+function openCreateFolder() {
+  CreateFolderDialogRef.value.open(FolderSource.TOOL, currentFolder.value.id)
+}
+function getFolder(bool?: boolean) {
+  const params = {}
+  folder.asyncGetFolder(FolderSource.TOOL, params, loading).then((res: any) => {
+    folderList.value = res.data
+    if (bool) {
+      // 初始化刷新
+      currentFolder.value = res.data?.[0] || {}
+    }
+    getList()
+  })
+}
+function refreshFolder() {
+  toolList.value = []
   getFolder()
+}
+
+function folderClickHandel(row: any) {
+  currentFolder.value = row
+  toolList.value = []
+  getList()
+}
+
+
+onMounted(() => {
+  getFolder(true)
 })
 </script>
 

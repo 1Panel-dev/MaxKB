@@ -25,7 +25,6 @@
 <script setup lang="ts">
 import { onBeforeMount, ref } from 'vue'
 import type { CreateMemberParamsItem, FormItemModel } from '@/api/type/role'
-import RoleApi from '@/api/system/role'
 import UserApi from '@/api/user/user'
 import WorkspaceApi from '@/api/workspace/workspace'
 import MemberFormContent from './MemberFormContent.vue'

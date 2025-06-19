@@ -60,7 +60,7 @@ class KnowledgeWebCreateRequest(serializers.Serializer):
     desc = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('knowledge description'))
     embedding_model_id = serializers.CharField(required=True, label=_('knowledge embedding'))
     source_url = serializers.CharField(required=True, label=_('source url'))
-    selector = serializers.CharField(required=True, label=_('knowledge selector'))
+    selector = serializers.CharField(required=False, label=_('knowledge selector'), allow_null=True, allow_blank=True)
 
 
 class KnowledgeEditRequest(serializers.Serializer):
@@ -188,6 +188,10 @@ class KnowledgeSerializer(serializers.Serializer):
 
         def list(self):
             self.is_valid(raise_exception=True)
+            folder_id = self.data.get('folder_id', self.data.get("workspace_id"))
+            root = KnowledgeFolder.objects.filter(id=folder_id).first()
+            if not root:
+                raise serializers.ValidationError(_('Folder not found'))
             workspace_manage = is_workspace_manage(self.data.get('user_id'), self.data.get('workspace_id'))
 
             return native_search(
@@ -200,7 +204,8 @@ class KnowledgeSerializer(serializers.Serializer):
                         'list_knowledge.sql' if workspace_manage else (
                             'list_knowledge_user_ee.sql' if self.is_x_pack_ee() else 'list_knowledge_user.sql'
                         )
-                    ))
+                    )
+                ),
             )
 
     class Operate(serializers.Serializer):
@@ -545,7 +550,7 @@ class KnowledgeSerializer(serializers.Serializer):
                 embedding_model_id=instance.get('embedding_model_id'),
                 meta={
                     'source_url': instance.get('source_url'),
-                    'selector': instance.get('selector'),
+                    'selector': instance.get('selector', 'body'),
                     'embedding_model_id': instance.get('embedding_model_id')
                 },
             )

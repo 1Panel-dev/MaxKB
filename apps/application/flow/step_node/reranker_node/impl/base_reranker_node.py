@@ -12,7 +12,7 @@ from langchain_core.documents import Document
 
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.reranker_node.i_reranker_node import IRerankerNode
-from models_provider.tools import get_model_instance_by_model_user_id
+from models_provider.tools import get_model_instance_by_model_workspace_id
 
 
 def merge_reranker_list(reranker_list, result=None):
@@ -78,8 +78,9 @@ class BaseRerankerNode(IRerankerNode):
         self.context['document_list'] = [{'page_content': document.page_content, 'metadata': document.metadata} for
                                          document in documents]
         self.context['question'] = question
-        reranker_model = get_model_instance_by_model_user_id(reranker_model_id,
-                                                             self.flow_params_serializer.data.get('user_id'),
+        workspace_id = self.workflow_manage.get_body().get('workspace_id')
+        reranker_model = get_model_instance_by_model_workspace_id(reranker_model_id,
+                                                             workspace_id,
                                                              top_n=top_n)
         result = reranker_model.compress_documents(
             documents,

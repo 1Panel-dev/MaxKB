@@ -24,7 +24,7 @@ from common.utils.rsa_util import rsa_long_decrypt, rsa_long_encrypt
 from common.utils.tool_code import ToolExecutor
 from knowledge.models import File, FileSourceType
 from maxkb.const import CONFIG, PROJECT_DIR
-from tools.models import Tool, ToolScope, ToolFolder
+from tools.models import Tool, ToolScope, ToolFolder, ToolType
 from tools.serializers.tool_folder import ToolFolderFlatSerializer
 
 tool_executor = ToolExecutor(CONFIG.get('SANDBOX'))
@@ -102,7 +102,7 @@ class ToolModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tool
         fields = ['id', 'name', 'icon', 'desc', 'code', 'input_field_list', 'init_field_list', 'init_params',
-                  'scope', 'is_active', 'user_id', 'template_id', 'workspace_id', 'folder_id',
+                  'scope', 'is_active', 'user_id', 'template_id', 'workspace_id', 'folder_id', 'tool_type',
                   'create_time', 'update_time']
 
 
@@ -157,12 +157,17 @@ class ToolCreateRequest(serializers.Serializer):
 class ToolEditRequest(serializers.Serializer):
     name = serializers.CharField(required=False, label=_('tool name'), allow_null=True)
     desc = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('tool description'))
-    code = serializers.CharField(required=False, label=_('tool content'), allow_null=True,)
+    code = serializers.CharField(required=False, label=_('tool content'), allow_null=True, )
     input_field_list = serializers.ListField(required=False, default=list, allow_null=True, label=_('input field list'))
     init_field_list = serializers.ListField(required=False, default=list, allow_null=True, label=_('init field list'))
     init_params = serializers.DictField(required=False, default=dict, allow_null=True, label=_('init params'))
-    is_active = serializers.BooleanField(required=False, label=_('Is active'), allow_null=True,)
+    is_active = serializers.BooleanField(required=False, label=_('Is active'), allow_null=True, )
     folder_id = serializers.CharField(required=False, allow_null=True)
+
+
+class AddInternalToolRequest(serializers.Serializer):
+    name = serializers.CharField(required=False, label=_("tool name"), allow_null=True, allow_blank=True)
+    folder_id = serializers.CharField(required=False, allow_null=True, label=_("folder id"))
 
 
 class DebugField(serializers.Serializer):
@@ -318,7 +323,10 @@ class ToolSerializer(serializers.Serializer):
                     for k in tool.init_params:
                         if k in password_fields and tool.init_params[k]:
                             tool.init_params[k] = encryption(tool.init_params[k])
-            return ToolModelSerializer(tool).data
+            return {
+                **ToolModelSerializer(tool).data,
+                'init_params': tool.init_params if tool.init_params else {},
+            }
 
         def export(self):
             try:
@@ -419,6 +427,60 @@ class ToolSerializer(serializers.Serializer):
             tool.save()
 
             return tool.icon
+
+    class InternalTool(serializers.Serializer):
+        user_id = serializers.UUIDField(required=True, label=_("User ID"))
+        name = serializers.CharField(required=False, label=_("tool name"), allow_null=True, allow_blank=True)
+
+        def get_internal_tools(self):
+            self.is_valid(raise_exception=True)
+            query_set = QuerySet(Tool)
+
+            if self.data.get('name', '') != '':
+                query_set = query_set.filter(
+                    Q(name__icontains=self.data.get('name')) |
+                    Q(desc__icontains=self.data.get('name'))
+                )
+
+            query_set = query_set.filter(
+                Q(scope=ToolScope.INTERNAL) &
+                Q(is_active=True)
+            )
+
+            return ToolModelSerializer(query_set, many=True).data
+
+    class AddInternalTool(serializers.Serializer):
+        user_id = serializers.UUIDField(required=True, label=_("User ID"))
+        workspace_id = serializers.CharField(required=True, label=_("workspace id"))
+        tool_id = serializers.UUIDField(required=True, label=_("tool id"))
+
+        def add(self, instance, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+                AddInternalToolRequest(data=instance).is_valid(raise_exception=True)
+
+            internal_tool = QuerySet(Tool).filter(id=self.data.get('tool_id')).first()
+            if internal_tool is None:
+                raise AppApiException(500, _('Tool does not exist'))
+
+            tool = Tool(
+                id=uuid.uuid7(),
+                name=instance.get('name', internal_tool.name),
+                desc=internal_tool.desc,
+                code=internal_tool.code,
+                user_id=self.data.get('user_id'),
+                workspace_id=self.data.get('workspace_id'),
+                input_field_list=internal_tool.input_field_list,
+                init_field_list=internal_tool.init_field_list,
+                scope=ToolScope.WORKSPACE,
+                tool_type=ToolType.CUSTOM,
+                folder_id=instance.get('folder_id', self.data.get('workspace_id')),
+                template_id=instance.id,
+                is_active=False
+            )
+            tool.save()
+
+            return ToolModelSerializer(tool).data
 
 
 class ToolTreeSerializer(serializers.Serializer):
@@ -522,5 +584,10 @@ class ToolTreeSerializer(serializers.Serializer):
 
             return native_page_search(
                 current_page, page_size, self.get_query_set(),
-                get_file_content(os.path.join(PROJECT_DIR, "apps", "tools", 'sql', 'list_tool.sql'))
+                get_file_content(os.path.join(PROJECT_DIR, "apps", "tools", 'sql', 'list_tool.sql')),
+                post_records_handler=lambda record: {
+                    **record,
+                    'input_field_list': json.loads(record.get('input_field_list', '[]')),
+                    'init_field_list': json.loads(record.get('init_field_list', '[]')),
+                },
             )

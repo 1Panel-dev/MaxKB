@@ -11,23 +11,28 @@
       <h4 :id="titleId" :class="titleClass">{{ '文档迁移到' }}</h4>
     </template>
     <el-form
-      class="p-24"
       ref="FormRef"
       :model="form"
       label-position="top"
       require-asterisk-position="right"
-      v-loading="loading"
     >
       <el-form-item :label="$t('views.chatLog.selectKnowledge')" required>
         <el-tree-select
           v-model="form.selectKnowledge"
-          :data="knowledgeList"
           :props="defaultProps"
           node-key="id"
+          :default-expanded-keys="['default']"
+          lazy
+          :load="loadTree"
         >
           <template #default="{ data }">
             <div class="flex align-center">
-              <KnowledgeIcon class="mr-12" :size="20" v-if="data.resource_type" :type="data.type" />
+              <KnowledgeIcon
+                class="mr-12"
+                :size="20"
+                v-if="data.resource_type !== 'folder'"
+                :type="data.type"
+              />
               <el-avatar v-else class="mr-12" shape="square" :size="20" style="background: none">
                 <img
                   src="@/assets/knowledge/icon_file-folder_colorful.svg"
@@ -80,9 +85,9 @@ const documentList = ref<any>([])
 const defaultProps = {
   children: 'children',
   label: 'name',
+  isLeaf: (data: any) => data.resource_type && data.resource_type !== 'folder',
   disabled: (data: any, node: any) => {
-    console.log(data, node)
-    return data.id === id || (node?.isLeaf && !data.resource_type)
+    return data.id === id
   },
 }
 
@@ -100,8 +105,16 @@ watch(dialogVisible, (bool) => {
 
 const open = (list: any) => {
   documentList.value = list
-  getKnowledge()
   dialogVisible.value = true
+}
+
+const loadTree = (node: any, resolve: any) => {
+  console.log(node)
+  if (node.isLeaf) return resolve([])
+  const folder_id = node.level === 0 ? '' : node.data.id
+  knowledge.asyncGetFolderKnowledge(folder_id, loading).then((res: any) => {
+    resolve(res.data)
+  })
 }
 const submitHandle = () => {
   documentApi
@@ -112,26 +125,19 @@ const submitHandle = () => {
     })
 }
 
-function getKnowledge() {
-  knowledge.asyncGetTreeRootKnowledge(loading).then((res: any) => {
-    knowledgeList.value = res || []
-    console.log(knowledgeList.value)
-  })
-}
-
 defineExpose({ open })
 </script>
 <style lang="scss">
-.select-knowledge-dialog {
-  padding: 0;
-  .el-dialog__header {
-    padding: 24px 24px 0 24px;
-  }
-  .el-dialog__body {
-    padding: 8px !important;
-  }
-  .el-dialog__footer {
-    padding: 0 24px 24px;
-  }
-}
+// .select-knowledge-dialog {
+//   padding: 0;
+//   .el-dialog__header {
+//     padding: 24px 24px 0 24px;
+//   }
+//   .el-dialog__body {
+//     padding: 8px !important;
+//   }
+//   .el-dialog__footer {
+//     padding: 0 24px 24px;
+//   }
+// }
 </style>

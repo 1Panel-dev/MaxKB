@@ -199,26 +199,45 @@ class UserManageSerializer(serializers.Serializer):
                     return {}
 
                 # 获取所有相关角色关系，并预加载角色信息
+                # 获取所有相关角色关系，并预加载角色信息
                 user_role_relations = (
                     user_role_relation_model.objects
                     .filter(user_id__in=user_ids)
-                    .select_related('role')  # 预加载外键数据
+                    .select_related('role')
+                    .distinct('user_id', 'role_id', 'workspace_id')  # 确保组合唯一性
                 )
 
                 # 构建用户ID到角色名称列表的映射
                 user_role_mapping = defaultdict(list)
-                for relation in user_role_relations:
-                    user_role_mapping[relation.user_id].append(relation.role.role_name)
+                # 构建用户ID到角色ID与工作空间ID映射
+                user_role_setting_mapping = defaultdict(lambda: defaultdict(list))
 
-                return user_role_mapping
+                for relation in user_role_relations:
+                    user_id = str(relation.user_id)
+                    role_id = relation.role_id
+                    workspace_id = relation.workspace_id
+
+                    user_role_mapping[user_id].append(relation.role.role_name)
+                    user_role_setting_mapping[user_id][role_id].append(workspace_id)
+
+                # 转换为所需的结构
+                result_user_role_setting_mapping = {
+                    user_id: [{"role_id": role_id, "workspace_ids": workspace_ids}
+                              for role_id, workspace_ids in roles.items()]
+                    for user_id, roles in user_role_setting_mapping.items()
+                }
+
+                return user_role_mapping, result_user_role_setting_mapping
 
             if role_model and user_role_relation_model:
                 user_ids = [user['id'] for user in result['records']]
-                user_role_mapping = _get_user_roles(user_ids)
+                user_role_mapping, user_role_setting_mapping = _get_user_roles(user_ids)
 
                 # 将角色信息添加回用户数据中
                 for user in result['records']:
-                    user['role'] = user_role_mapping.get(user['id'], [])
+                    user_id = str(user['id'])
+                    user['role'] = user_role_mapping.get(user_id, [])
+                    user['role_setting'] = user_role_setting_mapping.get(user_id, [])
             return result
 
     @valid_license(model=User, count=2,
@@ -453,7 +472,7 @@ class UserManageSerializer(serializers.Serializer):
                         'roles': [relation.role.role_name]
                     }
                 else:
-                    user_dict[user_id]['roles'].append(relation.role.name)
+                    user_dict[user_id]['roles'].append(relation.role.role_name)
 
             # 将字典值转换为列表形式
             return list(user_dict.values())
@@ -486,22 +505,17 @@ class UserManageSerializer(serializers.Serializer):
 
 def update_user_role(instance, user):
     workspace_user_role_mapping_model = DatabaseModelManage.get_model("workspace_user_role_mapping")
-    role_setting_model = DatabaseModelManage.get_model("role_model")
     if workspace_user_role_mapping_model:
         role_setting = instance.get('role_setting')
+        if not role_setting:
+            return
         workspace_user_role_mapping_model.objects.filter(user_id=user.id).delete()
         relations = set()
         for item in role_setting:
-            for role_id, workspace_ids in item.items():
-                relations.update(set(product([role_id], workspace_ids)))
-
-        role_ids = {role_id for item in role_setting for role_id in item}
-        role_ids_is_system = role_setting_model.objects.filter(id__in=role_ids,
-                                                               type=RoleConstants.ADMIN.name).values_list(
-            'id', flat=True)
-        if role_ids_is_system:
-            relations = {(role_id, 'SYSTEM') if role_id in role_ids_is_system else (role_id, workspace_id)
-                         for role_id, workspace_id in relations}
+            role_id = item['role_id']
+            workspace_ids = item['workspace_ids'] if item['workspace_ids'] else ['None']
+            for workspace_id in workspace_ids:
+                relations.add((role_id, workspace_id))
         for role_id, workspace_id in relations:
             workspace_user_role_mapping_model.objects.create(
                 id=uuid.uuid7(),

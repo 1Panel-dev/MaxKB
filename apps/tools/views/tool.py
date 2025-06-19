@@ -11,7 +11,7 @@ from common.constants.permission_constants import PermissionConstants, RoleConst
 from common.log.log import log
 from common.result import result
 from tools.api.tool import ToolCreateAPI, ToolEditAPI, ToolReadAPI, ToolDeleteAPI, ToolTreeReadAPI, ToolDebugApi, \
-    ToolExportAPI, ToolImportAPI, ToolPageAPI, PylintAPI, EditIconAPI
+    ToolExportAPI, ToolImportAPI, ToolPageAPI, PylintAPI, EditIconAPI, GetInternalToolAPI, AddInternalToolAPI
 from tools.models import ToolScope, Tool
 from tools.serializers.tool import ToolSerializer, ToolTreeSerializer
 
@@ -44,7 +44,7 @@ class ToolView(APIView):
     )
     @log(
         menu="Tool", operate="Create tool",
-        get_operation_object=lambda r, k: r.data.get('name'), 
+        get_operation_object=lambda r, k: r.data.get('name'),
     )
     def post(self, request: Request, workspace_id: str):
         return result.success(ToolSerializer.Create(
@@ -110,7 +110,7 @@ class ToolView(APIView):
         @log(
             menu='Tool', operate='Update tool',
             get_operation_object=lambda r, k: get_tool_operation_object(k.get('tool_id')),
-            
+
         )
         def put(self, request: Request, workspace_id: str, tool_id: str):
             return result.success(ToolSerializer.Operate(
@@ -152,7 +152,7 @@ class ToolView(APIView):
         @log(
             menu='Tool', operate="Delete tool",
             get_operation_object=lambda r, k: get_tool_operation_object(k.get('tool_id')),
-            
+
         )
         def delete(self, request: Request, workspace_id: str, tool_id: str):
             return result.success(ToolSerializer.Operate(
@@ -227,9 +227,8 @@ class ToolView(APIView):
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
         )
         @log(
-            menu='Tool', operate="Export function",
-            get_operation_object=lambda r, k: get_tool_operation_object(k.get('id')),
-            
+            menu='Tool', operate="Export tool",
+            get_operation_object=lambda r, k: get_tool_operation_object(k.get('tool_id')),
         )
         def get(self, request: Request, tool_id: str, workspace_id: str):
             return ToolSerializer.Operate(
@@ -284,3 +283,49 @@ class ToolView(APIView):
                 'user_id': request.user.id,
                 'image': request.FILES.get('file')
             }).edit(request.data))
+
+    class InternalTool(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['GET'],
+            description=_("Get internal tool"),
+            summary=_("Get internal tool"),
+            operation_id=_("Get internal tool"),  # type: ignore
+            parameters=GetInternalToolAPI.get_parameters(),
+            responses=GetInternalToolAPI.get_response(),
+            tags=[_("Tool")]  # type: ignore
+        )
+        def get(self, request: Request):
+            return result.success(ToolSerializer.InternalTool(data={
+                'user_id': request.user.id,
+                'name': request.query_params.get('name', ''),
+            }).get_internal_tools())
+
+    class AddInternalTool(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['POST'],
+            description=_("Add internal tool"),
+            summary=_("Add internal tool"),
+            operation_id=_("Add internal tool"),  # type: ignore
+            parameters=AddInternalToolAPI.get_parameters(),
+            request=AddInternalToolAPI.get_request(),
+            responses=AddInternalToolAPI.get_response(),
+            tags=[_("Tool")]  # type: ignore
+        )
+        @has_permissions(
+            PermissionConstants.TOOL_CREATE.get_workspace_permission(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+        )
+        @log(
+            menu='Tool', operate="Add internal tool",
+            get_operation_object=lambda r, k: get_tool_operation_object(k.get('tool_id')),
+        )
+        def post(self, request: Request, tool_id: str, workspace_id: str):
+            return result.success(ToolSerializer.AddInternalTool(data={
+                'tool_id': tool_id,
+                'user_id': request.user.id,
+                'workspace_id': workspace_id
+            }).add(request.data))

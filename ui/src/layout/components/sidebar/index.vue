@@ -1,8 +1,8 @@
 <template>
   <div class="sidebar p-8">
-    <!-- <div v-if="showBreadcrumb">
+    <div v-if="showBreadcrumb">
       <AppBreadcrumb />
-    </div> -->
+    </div>
     <el-scrollbar wrap-class="scrollbar-wrapper">
       <el-menu :default-active="activeMenu" router>
         <sidebar-item

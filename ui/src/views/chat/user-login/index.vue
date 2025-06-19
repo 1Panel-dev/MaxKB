@@ -1,6 +1,13 @@
 <template>
   <UserLoginLayout v-if="!loading" v-loading="loading">
-    <LoginContainer :subTitle="theme.themeInfo?.slogan || $t('theme.defaultSlogan')">
+    <LoginContainer
+      v-if="chatUser.chat_profile?.authentication_type == 'password'"
+      :subTitle="theme.themeInfo?.slogan || $t('theme.defaultSlogan')"
+    >
+      <PasswordAuth></PasswordAuth>
+    </LoginContainer>
+
+    <LoginContainer v-else :subTitle="theme.themeInfo?.slogan || $t('theme.defaultSlogan')">
       <h2 class="mb-24" v-if="!showQrCodeTab">
         {{ loginMode == 'LOCAL' ? $t('views.login.title') : loginMode }}
       </h2>
@@ -139,6 +146,7 @@ import useStore from '@/stores'
 import { useI18n } from 'vue-i18n'
 import QrCodeTab from '@/views/login/scanCompinents/QrCodeTab.vue'
 import { MsgConfirm, MsgError } from '@/utils/message.ts'
+import PasswordAuth from '@/views/chat/auth/component/password.vue'
 import useUserStore from '@/stores/modules/user.ts'
 
 const router = useRouter()

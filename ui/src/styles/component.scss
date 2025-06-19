@@ -135,13 +135,13 @@
     color: var(--app-text-color);
   }
 
-  :deep(.el-radio__label) {
-    padding-left: 30px;
+  .el-radio__label {
+    padding-left: 24px;
     width: 100%;
   }
-  :deep(.el-radio__input) {
+  .el-radio__input {
     position: absolute;
-    top: 16px;
+    top: 5px;
   }
   .active {
     border: 1px solid var(--el-color-primary);

@@ -308,7 +308,7 @@ class DocumentTreeReadAPI(APIMixin):
                 description="文件夹id",
                 type=OpenApiTypes.STR,
                 location='query',
-                required=True,
+                required=False,
             ),
             OpenApiParameter(
                 name="user_id",

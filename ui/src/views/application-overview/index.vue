@@ -1,7 +1,6 @@
 <template>
   <div class="p-16-24">
     <h2 class="mb-16">{{ $t('views.applicationOverview.title') }}</h2>
-
     <el-scrollbar>
       <div class="main-calc-height">
         <el-card style="--el-card-padding: 24px">
@@ -53,7 +52,10 @@
                     :active-text="$t('views.applicationOverview.appInfo.openText')"
                     :inactive-text="$t('views.applicationOverview.appInfo.closeText')"
                     :before-change="() => changeState(accessToken.is_active)"
-                    v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.APPLICATION_EDIT.getWorkspacePermission]"
+                    v-hasPermission="[
+                      RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                      PermissionConst.APPLICATION_EDIT.getWorkspacePermission,
+                    ]"
                   />
                 </div>
 
@@ -92,20 +94,35 @@
                     <AppIcon iconName="app-create-chat" class="mr-4"></AppIcon>
                     {{ $t('views.application.operation.toChat') }}
                   </el-button>
-                  <el-button :disabled="!accessToken?.is_active" @click="openDialog"
-                    v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.APPLICATION_OVERVIEW_EMBEDDED.getWorkspacePermission]"
+                  <el-button
+                    :disabled="!accessToken?.is_active"
+                    @click="openDialog"
+                    v-hasPermission="[
+                      RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                      PermissionConst.APPLICATION_OVERVIEW_EMBEDDED.getWorkspacePermission,
+                    ]"
                   >
                     <AppIcon iconName="app-export" class="mr-4"></AppIcon>
                     {{ $t('views.applicationOverview.appInfo.embedInWebsite') }}
                   </el-button>
-                  <el-button @click="openLimitDialog"
-                    v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.APPLICATION_OVERVIEW_ACCESS.getWorkspacePermission]"
+                  <!-- 访问限制 -->
+                  <el-button
+                    @click="openLimitDialog"
+                    v-hasPermission="[
+                      RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                      PermissionConst.APPLICATION_OVERVIEW_ACCESS.getWorkspacePermission,
+                    ]"
                   >
                     <el-icon class="mr-4"><Lock /></el-icon>
                     {{ $t('views.applicationOverview.appInfo.accessControl') }}
                   </el-button>
-                  <el-button @click="openDisplaySettingDialog"
-                    v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.APPLICATION_OVERVIEW_DISPLAY.getWorkspacePermission]"
+                  <!-- 显示设置 -->
+                  <el-button
+                    @click="openDisplaySettingDialog"
+                    v-hasPermission="[
+                      RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                      PermissionConst.APPLICATION_OVERVIEW_DISPLAY.getWorkspacePermission,
+                    ]"
                   >
                     <el-icon class="mr-4"><Setting /></el-icon>
                     {{ $t('views.applicationOverview.appInfo.displaySetting') }}
@@ -146,8 +163,12 @@
                   </div>
                 </div>
                 <div>
-                  <el-button @click="openAPIKeyDialog"
-                  v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.APPLICATION_OVERVIEW_API_KEY.getWorkspacePermission]"
+                  <el-button
+                    @click="openAPIKeyDialog"
+                    v-hasPermission="[
+                      RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                      PermissionConst.APPLICATION_OVERVIEW_API_KEY.getWorkspacePermission,
+                    ]"
                   >
                     <el-icon class="mr-4"><Key /></el-icon>
                     {{ $t('views.applicationOverview.appInfo.apiKey') }}</el-button
@@ -199,32 +220,33 @@
       :api-input-params="mapToUrlParams(apiInputParams)"
     />
     <APIKeyDialog ref="APIKeyDialogRef" />
-    <LimitDialog ref="LimitDialogRef" @refresh="refresh" />
     <EditAvatarDialog ref="EditAvatarDialogRef" @refresh="refreshIcon" />
-    <XPackDisplaySettingDialog ref="XPackDisplaySettingDialogRef" @refresh="refresh" />
-    <!-- v-if="user.isEnterprise()" -->
-    <DisplaySettingDialog ref="DisplaySettingDialogRef" @refresh="refresh" />
+
+    <!-- 社区版访问限制 -->
+    <component :is="currentLimitDialog" ref="LimitDialogRef" @refresh="refresh" />
+    <!-- 显示设置 -->
+    <component :is="currentDisplaySettingDialog" ref="DisplaySettingDialogRef" @refresh="refresh" />
   </div>
 </template>
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, shallowRef, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import EmbedDialog from './component/EmbedDialog.vue'
 import APIKeyDialog from './component/APIKeyDialog.vue'
 import LimitDialog from './component/LimitDialog.vue'
+import XPackLimitDrawer from './xpack-component/XPackLimitDrawer.vue'
 import DisplaySettingDialog from './component/DisplaySettingDialog.vue'
-import XPackDisplaySettingDialog from './component/XPackDisplaySettingDialog.vue'
+import XPackDisplaySettingDialog from './xpack-component/XPackDisplaySettingDialog.vue'
 import EditAvatarDialog from './component/EditAvatarDialog.vue'
 import StatisticsCharts from './component/StatisticsCharts.vue'
 import applicationApi from '@/api/application/application'
-import overviewApi from '@/api/application/application-key'
 import { nowDate, beforeDay } from '@/utils/time'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { copyClick } from '@/utils/clipboard'
 import { isAppIcon } from '@/utils/common'
 import useStore from '@/stores'
 import { t } from '@/locales'
-import { PermissionConst, RoleConst } from '@/utils/permission/data'
+import { PermissionConst, RoleConst, EditionConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
 const { user, application } = useStore()
 const route = useRoute()
@@ -236,10 +258,7 @@ const apiUrl = window.location.origin + '/doc/chat/'
 
 const baseUrl = window.location.origin + '/api/application/'
 
-const DisplaySettingDialogRef = ref()
-const XPackDisplaySettingDialogRef = ref()
 const EditAvatarDialogRef = ref()
-const LimitDialogRef = ref()
 const APIKeyDialogRef = ref()
 const EmbedDialogRef = ref()
 
@@ -299,13 +318,45 @@ const apiInputParams = ref([])
 function toUrl(url: string) {
   window.open(url, '_blank')
 }
+
+// 显示设置
+const DisplaySettingDialogRef = ref()
+const currentDisplaySettingDialog = shallowRef<any>(null)
 function openDisplaySettingDialog() {
-  // if (user.isEnterprise()) {
-  XPackDisplaySettingDialogRef.value?.open(accessToken.value, detail.value)
-  // } else {
-  //   DisplaySettingDialogRef.value?.open(accessToken.value, detail.value)
-  // }
+  // 企业版和专业版
+  if (hasPermission([EditionConst.IS_EE, EditionConst.IS_PE], 'OR')) {
+    currentDisplaySettingDialog.value = XPackDisplaySettingDialog
+  } else {
+    // 社区版
+    currentDisplaySettingDialog.value = DisplaySettingDialog
+  }
+  nextTick(() => {
+    if (currentDisplaySettingDialog.value == XPackDisplaySettingDialog) {
+      applicationApi.getApplicationSetting(id).then((ok) => {
+        DisplaySettingDialogRef.value?.open(ok.data, detail.value)
+      })
+    } else {
+      DisplaySettingDialogRef.value?.open(accessToken.value, detail.value)
+    }
+  })
 }
+
+// 访问限制
+const LimitDialogRef = ref()
+const currentLimitDialog = shallowRef<any>(null)
+function openLimitDialog() {
+  // 企业版和专业版
+  if (hasPermission([EditionConst.IS_EE, EditionConst.IS_PE], 'OR')) {
+    currentLimitDialog.value = XPackLimitDrawer
+  } else {
+    // 社区版
+    currentLimitDialog.value = LimitDialog
+  }
+  nextTick(() => {
+    LimitDialogRef.value.open(accessToken.value)
+  })
+}
+
 function openEditAvatar() {
   EditAvatarDialogRef.value.open(detail.value)
 }
@@ -368,10 +419,6 @@ async function updateAccessToken(obj: any, str: string) {
     accessToken.value = res?.data
     MsgSuccess(str)
   })
-}
-
-function openLimitDialog() {
-  LimitDialogRef.value.open(accessToken.value)
 }
 
 function openAPIKeyDialog() {

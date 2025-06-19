@@ -25,7 +25,9 @@
       :default-expanded-keys="[currentNodeKey]"
       :current-node-key="currentNodeKey"
       highlight-current
+      class="overflow-inherit_node__children"
       node-key="id"
+      v-loading="loading"
     >
       <template #default="{ node, data }">
         <div class="flex-between w-full" @mouseenter.stop="handleMouseEnter(data)">
@@ -35,6 +37,7 @@
           </div>
 
           <div
+            v-if="canOperation"
             @click.stop
             v-show="hoverNodeId === data.id"
             @mouseenter.stop="handleMouseEnter(data)"
@@ -48,14 +51,18 @@
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item @click.stop="openCreateFolder(data)">
-                    <el-icon><EditPen /></el-icon>
+                    <AppIcon iconName="app-add-folder"></AppIcon>
                     {{ '添加子文件夹' }}
                   </el-dropdown-item>
                   <el-dropdown-item @click.stop="openEditFolder(data)">
                     <el-icon><EditPen /></el-icon>
                     {{ $t('common.edit') }}
                   </el-dropdown-item>
-                  <el-dropdown-item divided @click.stop="deleteFolder(data)">
+                  <el-dropdown-item
+                    divided
+                    @click.stop="deleteFolder(data)"
+                    :disabled="data.id === 'default'"
+                  >
                     <el-icon><Delete /></el-icon>
                     {{ $t('common.delete') }}
                   </el-dropdown-item>
@@ -102,6 +109,10 @@ const props = defineProps({
     type: String,
     default: 'views.system.share_knowledge',
   },
+  canOperation: {
+    type: Boolean,
+    default: true,
+  },
 })
 interface Tree {
   name: string
@@ -121,11 +132,12 @@ const treeRef = ref<TreeInstance>()
 const filterText = ref('')
 const hoverNodeId = ref<string | undefined>('')
 const title = ref('')
+const loading = ref(false)
 
 watch(filterText, (val) => {
   treeRef.value!.filter(val)
 })
-let time
+let time: any
 
 function handleMouseEnter(data: Tree) {
   clearTimeout(time)
@@ -134,7 +146,6 @@ function handleMouseEnter(data: Tree) {
 function handleMouseleave() {
   time = setTimeout(() => {
     clearTimeout(time)
-    hoverNodeId.value = ''
     document.body.click()
   }, 300)
 }
@@ -153,7 +164,7 @@ const handleSharedNodeClick = () => {
 }
 
 function deleteFolder(row: Tree) {
-  folderApi.delFolder(row.id as string, props.source).then(() => {
+  folderApi.delFolder(row.id as string, props.source, loading).then(() => {
     emit('refreshTree')
   })
 }
@@ -201,6 +212,11 @@ function refreshFolder() {
     left: 0;
     width: 100%;
     height: 1px;
+  }
+}
+:deep(.overflow-inherit_node__children) {
+  .el-tree-node__children {
+    overflow: inherit !important;
   }
 }
 </style>

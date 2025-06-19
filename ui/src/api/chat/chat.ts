@@ -60,6 +60,20 @@ const anonymousAuthentication: (
   return post('/auth/anonymous', { access_token: assessToken }, {}, loading)
 }
 /**
+ * 密码认证
+ * @param assessToken
+ * @param password
+ * @param loading
+ * @returns
+ */
+const passwordAuthentication: (
+  assessToken: string,
+  password: string,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (assessToken, password, loading) => {
+  return post('auth/password', { access_token: assessToken, password: password }, {}, loading)
+}
+/**
  * 获取应用相关信息
  * @param loading
  * @returns
@@ -161,4 +175,5 @@ export default {
   getQrSource,
   ldapLogin,
   getAuthSetting,
+  passwordAuthentication,
 }

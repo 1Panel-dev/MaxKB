@@ -150,21 +150,6 @@
                       @click.stop="openGenerateDialog(scope.row)"
                       >{{ $t('views.document.generateQuestion.title') }}</el-dropdown-item
                     >
-                    <el-dropdown-item
-                      icon="Lock"
-                      @click.stop="openAuthorizedWorkspaceDialog(scope.row)"
-                      >{{ $t('views.system.authorized_workspace') }}</el-dropdown-item
-                    >
-                    <el-dropdown-item
-                      icon="Setting"
-                      @click.stop="
-                        router.push({
-                          path: `/knowledge/resource/${scope.row.id}/settingResource`,
-                        })
-                      "
-                    >
-                      {{ $t('common.setting') }}</el-dropdown-item
-                    >
                     <el-dropdown-item @click.stop="exportKnowledge(scope.row)">
                       <AppIcon iconName="app-export"></AppIcon
                       >{{ $t('views.document.setting.export') }} Excel</el-dropdown-item
@@ -315,15 +300,7 @@ function getList() {
 
   KnowledgeApi.getKnowledgeListPage(paginationConfig, params, loading).then((res) => {
     paginationConfig.total = res.data.total
-    knowledgeList.value = [...knowledgeList.value, ...res.data.records]
-  })
-}
-
-function getAllList() {
-  const params = {}
-
-  KnowledgeApi.getKnowledgeList(params, loading).then((res) => {
-    knowledgeListbp = [...res.data]
+    knowledgeListbp = [...res.data.records]
     workspaces = [...new Set(knowledgeListbp.map((ele) => ele.workspace_id))]
     checkedWorkspaces.value = [...workspaces]
     checkAll.value = true
@@ -347,7 +324,7 @@ function clickFolder(item: any) {
 const CreateFolderDialogRef = ref()
 
 function openCreateFolder() {
-  CreateFolderDialogRef.value.open('KNOWLEDGE', currentFolder.value.parent_id)
+  CreateFolderDialogRef.value.open('KNOWLEDGE', currentFolder.value.id)
 }
 
 const GenerateRelatedDialogRef = ref<InstanceType<typeof GenerateRelatedDialog>>()

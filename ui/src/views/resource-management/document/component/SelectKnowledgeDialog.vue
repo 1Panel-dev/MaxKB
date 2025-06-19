@@ -92,7 +92,7 @@ const submitHandle = () => {
 }
 
 function getKnowledge() {
-  knowledge.asyncGetRootKnowledge(loading).then((res: any) => {
+  knowledge.asyncGetFolderKnowledge(loading).then((res: any) => {
     knowledgeList.value = res.data?.filter((v: any) => v.id !== id)
   })
 }
