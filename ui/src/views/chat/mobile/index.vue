@@ -4,7 +4,7 @@
     v-loading="loading"
     :style="{
       '--el-color-primary': applicationDetail?.custom_theme?.theme_color,
-      '--el-color-primary-light-9': hexToRgba(applicationDetail?.custom_theme?.theme_color, 0.1)
+      '--el-color-primary-light-9': hexToRgba(applicationDetail?.custom_theme?.theme_color, 0.1),
     }"
   >
     <div class="chat-embed__header" :style="customStyle">
@@ -18,13 +18,7 @@
           >
             <img :src="applicationDetail?.icon" alt="" />
           </el-avatar>
-          <el-avatar
-            v-else-if="applicationDetail?.name"
-            :name="applicationDetail?.name"
-            pinyinColor
-            shape="square"
-            :size="32"
-          />
+          <LogoIcon v-else height="28px" style="width: 28px; height: 28px; display: block" />
         </div>
 
         <h4>{{ applicationDetail?.name }}</h4>
@@ -63,7 +57,7 @@
         <AppIcon
           iconName="app-history-outlined"
           :style="{
-            color: applicationDetail?.custom_theme?.header_font_color
+            color: applicationDetail?.custom_theme?.header_font_color,
           }"
         ></AppIcon>
       </div>
@@ -149,12 +143,12 @@ const applicationDetail = computed({
   get: () => {
     return props.application_profile
   },
-  set: (v) => {}
+  set: (v) => {},
 })
 const paginationConfig = reactive({
   current_page: 1,
   page_size: 20,
-  total: 0
+  total: 0,
 })
 
 const currentRecordList = ref<any>([])
@@ -165,14 +159,14 @@ const mouseId = ref('')
 const customStyle = computed(() => {
   return {
     background: applicationDetail.value?.custom_theme?.theme_color,
-    color: applicationDetail.value?.custom_theme?.header_font_color
+    color: applicationDetail.value?.custom_theme?.header_font_color,
   }
 })
 
 function editName(val: string, item: any) {
   if (val) {
     const obj = {
-      abstract: val
+      abstract: val,
     }
 
     chatLog.asyncPutChatClientLog(applicationDetail.value.id, item.id, obj, loading).then(() => {
@@ -237,7 +231,7 @@ function newChat() {
 function getChatLog(id: string) {
   const page = {
     current_page: 1,
-    page_size: 20
+    page_size: 20,
   }
 
   chatLog.asyncGetChatLogClient(id, page, left_loading).then((res: any) => {
@@ -259,7 +253,7 @@ function getChatRecord() {
       currentChatId.value,
       paginationConfig,
       loading,
-      false
+      false,
     )
     .then((res: any) => {
       paginationConfig.total = res.data.total
@@ -269,7 +263,7 @@ function getChatRecord() {
         v['record_id'] = v.id
       })
       currentRecordList.value = [...list, ...currentRecordList.value].sort((a, b) =>
-        a.create_time.localeCompare(b.create_time)
+        a.create_time.localeCompare(b.create_time),
       )
       if (paginationConfig.current_page === 1) {
         nextTick(() => {

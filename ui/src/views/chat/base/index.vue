@@ -11,13 +11,7 @@
           >
             <img :src="applicationDetail?.icon" alt="" />
           </el-avatar>
-          <el-avatar
-            v-else-if="applicationDetail?.name"
-            :name="applicationDetail?.name"
-            pinyinColor
-            shape="square"
-            :size="32"
-          />
+          <LogoIcon v-else height="28px" style="width: 28px; height: 28px; display: block" />
         </div>
 
         <h2>{{ applicationDetail?.name }}</h2>
@@ -64,7 +58,7 @@ const applicationDetail = computed({
   get: () => {
     return props.application_profile
   },
-  set: (v) => {}
+  set: (v) => {},
 })
 const recordList = ref([])
 const currentChatId = ref('')

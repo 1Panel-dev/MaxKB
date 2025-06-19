@@ -47,6 +47,18 @@ const useKnowledgeStore = defineStore('knowledge', {
           })
       })
     },
+    async asyncGetKnowledgeDetail(knowledge_id: string, loading?: Ref<boolean>) {
+      return new Promise((resolve, reject) => {
+        knowledgeApi
+          .getKnowledgeDetail(knowledge_id, loading)
+          .then((data) => {
+            resolve(data)
+          })
+          .catch((error) => {
+            reject(error)
+          })
+      })
+    },
     // async asyncGetTreeRootKnowledge(loading?: Ref<boolean>) {
     //   const folder = useFolderStore()
     //   return Promise.all([
@@ -87,18 +99,6 @@ const useKnowledgeStore = defineStore('knowledge', {
     //       return Promise.reject(error)
     //     })
     // },
-    async asyncGetKnowledgeDetail(knowledge_id: string, loading?: Ref<boolean>) {
-      return new Promise((resolve, reject) => {
-        knowledgeApi
-          .getKnowledgeDetail(knowledge_id, loading)
-          .then((data) => {
-            resolve(data)
-          })
-          .catch((error) => {
-            reject(error)
-          })
-      })
-    },
   },
 })
 
