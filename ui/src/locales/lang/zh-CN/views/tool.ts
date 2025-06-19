@@ -4,6 +4,7 @@ export default {
   editTool: '编辑工具',
   copyTool: '复制函数',
   importTool: '导入函数',
+  enabled: '启用',
   disabled: {
     confirmTitle: '是否禁用工具：',
     confirmMessage: '禁用后，引用了该工具的应用提问时会报错 ，请谨慎操作。',
