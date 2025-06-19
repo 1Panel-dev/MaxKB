@@ -61,7 +61,7 @@ import paragraphApi from '@/api/knowledge/paragraph'
 import useStore from '@/stores'
 
 const props = defineProps({
-  problemId: String,
+  paragraphId: String,
   docId: String,
   knowledgeId: String,
 })
@@ -83,7 +83,7 @@ const problemOptions = ref<any[]>([])
 const optionLoading = ref(false)
 
 watch(
-  () => props.problemId,
+  () => props.paragraphId,
   (value) => {
     if (value) {
       getProblemList()
@@ -100,7 +100,7 @@ function delProblemHandle(item: any, index: number) {
       .asyncDisassociationProblem(
         props.knowledgeId || id,
         documentId || props.docId,
-        props.problemId || '',
+        props.paragraphId || '',
         item.id,
         loading,
       )
@@ -115,7 +115,7 @@ function delProblemHandle(item: any, index: number) {
 function getProblemList() {
   loading.value = true
   paragraphApi
-    .getParagraphProblem(props.knowledgeId || id, documentId || props.docId, props.problemId || '')
+    .getParagraphProblem(props.knowledgeId || id, documentId || props.docId, props.paragraphId || '')
     .then((res) => {
       problemList.value = res.data
       loading.value = false
@@ -132,19 +132,19 @@ function addProblem() {
   })
 }
 function addProblemHandle(val: string) {
-  if (props.problemId) {
+  if (props.paragraphId) {
     const api = problemOptions.value.some((option) => option.id === val)
       ? paragraph.asyncAssociationProblem(
           props.knowledgeId || id,
           documentId || props.docId,
-          props.problemId,
+          props.paragraphId,
           val,
           loading,
         )
       : paragraphApi.postParagraphProblem(
           props.knowledgeId || id,
           documentId || props.docId,
-          props.problemId,
+          props.paragraphId,
           {
             content: val,
           },

@@ -81,19 +81,14 @@
                       handle=".handle"
                       :animation="150"
                       ghostClass="ghost"
+                      @end="onEnd"
                     >
                       <template v-for="(item, index) in paragraphDetail" :key="item.id">
                         <div :id="`m${item.id}`" class="flex mb-16">
                           <!-- 批量操作 -->
                           <div class="paragraph-card flex w-full" v-if="isBatch === true">
                             <el-checkbox :value="item.id" />
-                            <ParagraphCard
-                              :data="item"
-                              class="mb-8 w-full"
-                              @refresh="refresh"
-                              @refreshMigrateParagraph="refreshMigrateParagraph"
-                              :disabled="true"
-                            />
+                            <ParagraphCard :data="item" class="mb-8 w-full" :disabled="true" />
                           </div>
                           <!-- 非批量操作 -->
                           <div class="handle paragraph-card flex w-full" :id="item.id" v-else>
@@ -109,6 +104,8 @@
                               class="mb-8 w-full"
                               @changeState="changeState"
                               @deleteParagraph="deleteParagraph"
+                              @refresh="refresh"
+                              @refreshMigrateParagraph="refreshMigrateParagraph"
                             />
                           </div>
                         </div>
@@ -265,16 +262,9 @@ function addParagraph() {
 }
 
 function getDetail() {
-  loading.value = true
-  documentApi
-    .getDocumentDetail(id, documentId)
-    .then((res) => {
-      documentDetail.value = res.data
-      loading.value = false
-    })
-    .catch(() => {
-      loading.value = false
-    })
+  documentApi.getDocumentDetail(id, documentId, loading).then((res) => {
+    documentDetail.value = res.data
+  })
 }
 
 function getParagraphList() {
@@ -320,17 +310,11 @@ function openGenerateDialog(row?: any) {
 }
 
 function onEnd(event?: any) {
-  const { oldIndex, newIndex } = event
-  if (oldIndex === undefined || newIndex === undefined) return
-  const list = cloneDeep(paragraphDetail.value)
-  if (oldIndex === list.length - 1 || newIndex === list.length - 1) {
-    return
+  const obj = {
+    paragraph_id: paragraphDetail.value[event.newIndex].id,
+    new_position: paragraphDetail.value[event.newIndex].position,
   }
-  const newInstance = { ...list[oldIndex], type: list[newIndex].type, id: list[newIndex].id }
-  const oldInstance = { ...list[newIndex], type: list[oldIndex].type, id: list[oldIndex].id }
-  list[newIndex] = newInstance
-  list[oldIndex] = oldInstance
-  paragraphDetail.value = list
+  paragraphApi.putAdjustPosition(id, documentId, obj, loading)
 }
 
 onMounted(() => {

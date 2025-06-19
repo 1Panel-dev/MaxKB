@@ -27,15 +27,19 @@ const getDocument: (
   )
 }
 
+
 /**
  * 文档详情
  * @param 参数 knowledge_id
  */
-const getDocumentDetail: (knowledge_id: string, document_id: string) => Promise<Result<any>> = (
-  knowledge_id,
-  document_id,
-) => {
-  return get(`${prefix}/${knowledge_id}/document/${document_id}`)
+const getDocumentDetail: (
+  knowledge_id: string,
+  document_id: string,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (knowledge_id, document_id, loading) => {
+  return get(`${prefix}/${knowledge_id}/document/${document_id}`,
+    {},
+    loading,)
 }
 
 /**

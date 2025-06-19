@@ -300,5 +300,6 @@ export default {
   putMulParagraph,
   putBatchGenerateRelated,
   putMigrateMulParagraph,
-  putDisassociationProblem
+  putDisassociationProblem,
+  putAdjustPosition
 }

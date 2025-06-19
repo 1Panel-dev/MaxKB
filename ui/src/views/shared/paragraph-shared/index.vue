@@ -252,16 +252,9 @@ function addParagraph() {
 }
 
 function getDetail() {
-  loading.value = true
-  documentApi
-    .getDocumentDetail(id, documentId)
-    .then((res) => {
-      documentDetail.value = res.data
-      loading.value = false
-    })
-    .catch(() => {
-      loading.value = false
-    })
+  documentApi.getDocumentDetail(id, documentId, loading).then((res) => {
+    documentDetail.value = res.data
+  })
 }
 
 function getParagraphList() {

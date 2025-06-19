@@ -5,6 +5,7 @@
     @mouseenter="cardEnter()"
     @mouseleave="cardLeave()"
     @click.stop="editParagraph(data)"
+    v-loading="loading"
   >
     <h2 class="mb-16">{{ data.title || '-' }}</h2>
     <div v-show="show" class="mk-sticky" v-if="!disabled">
@@ -30,7 +31,7 @@
           </el-button>
         </span>
         <span class="mr-8">
-          <el-button link>
+          <el-button link @click.stop="addParagraph(data)">
             <el-icon :size="16" :title="$t('views.applicationWorkflow.control.zoomOut')">
               <el-icon><CirclePlus /></el-icon>
             </el-icon>
@@ -152,6 +153,11 @@ function editParagraph(row: any) {
     title.value = t('views.paragraph.paragraphDetail')
     ParagraphDialogRef.value.open(row)
   }
+}
+
+function addParagraph(row: any) {
+  title.value = t('views.paragraph.addParagraph')
+  ParagraphDialogRef.value.open(row, 'add')
 }
 
 const SelectDocumentDialogRef = ref()

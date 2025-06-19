@@ -7,13 +7,14 @@
     destroy-on-close
     :close-on-click-modal="false"
     :close-on-press-escape="false"
+    @click.stop
   >
     <el-row v-loading="loading">
       <el-col :span="18">
         <el-scrollbar height="500" wrap-class="paragraph-scrollbar">
           <div class="p-24" style="padding-bottom: 8px">
             <div style="position: absolute; right: 20px; top: 20px">
-              <el-button text @click="isEdit = true" v-if="problemId && !isEdit">
+              <el-button text @click="isEdit = true" v-if="paragraphId && !isEdit">
                 <el-icon><EditPen /></el-icon>
               </el-button>
             </div>
@@ -21,7 +22,7 @@
             <ParagraphForm ref="paragraphFormRef" :data="detail" :isEdit="isEdit" />
           </div>
         </el-scrollbar>
-        <div class="text-right p-24 pt-0" v-if="problemId && isEdit">
+        <div class="text-right p-24 pt-0" v-if="paragraphId && isEdit">
           <el-button @click.prevent="cancelEdit"> {{ $t('common.cancel') }} </el-button>
           <el-button type="primary" :disabled="loading" @click="handleDebounceClick">
             {{ $t('common.save') }}
@@ -31,14 +32,14 @@
       <el-col :span="6" class="border-l" style="width: 300px">
         <!-- 关联问题 -->
         <ProblemComponent
-          :problemId="problemId"
+          :paragraphId="paragraphId"
           :docId="document_id"
           :knowledgeId="dataset_id"
           ref="ProblemRef"
         />
       </el-col>
     </el-row>
-    <template #footer v-if="!problemId">
+    <template #footer v-if="!paragraphId">
       <span class="dialog-footer">
         <el-button @click.prevent="dialogVisible = false"> {{ $t('common.cancel') }} </el-button>
         <el-button :disabled="loading" type="primary" @click="handleDebounceClick">
@@ -76,16 +77,17 @@ const paragraphFormRef = ref<any>()
 const dialogVisible = ref<boolean>(false)
 
 const loading = ref(false)
-const problemId = ref('')
+const paragraphId = ref('')
 const detail = ref<any>({})
 const isEdit = ref(false)
 const document_id = ref('')
 const dataset_id = ref('')
 const cloneData = ref(null)
+const position = ref(null)
 
 watch(dialogVisible, (bool) => {
   if (!bool) {
-    problemId.value = ''
+    paragraphId.value = ''
     detail.value = {}
     isEdit.value = false
     document_id.value = ''
@@ -99,28 +101,31 @@ const cancelEdit = () => {
   detail.value = cloneDeep(cloneData.value)
 }
 
-const open = (data: any) => {
-  if (data) {
+const open = (data: any, str: any) => {
+  if (data && !str) {
     detail.value.title = data.title
     detail.value.content = data.content
     cloneData.value = cloneDeep(detail.value)
-    problemId.value = data.id
+    paragraphId.value = data.id
     document_id.value = data.document_id
     dataset_id.value = data.dataset_id || id
   } else {
     isEdit.value = true
+    if (str === 'add') {
+      position.value = data.position
+    }
   }
   dialogVisible.value = true
 }
 const submitHandle = async () => {
   if (await paragraphFormRef.value?.validate()) {
     loading.value = true
-    if (problemId.value) {
+    if (paragraphId.value) {
       paragraph
         .asyncPutParagraph(
           dataset_id.value,
           documentId || document_id.value,
-          problemId.value,
+          paragraphId.value,
           paragraphFormRef.value?.form,
           loading,
         )
@@ -132,10 +137,14 @@ const submitHandle = async () => {
       const obj =
         ProblemRef.value.problemList.length > 0
           ? {
+              position: String(position.value) ? position.value : null,
               problem_list: ProblemRef.value.problemList,
               ...paragraphFormRef.value?.form,
             }
-          : paragraphFormRef.value?.form
+          : {
+              position: String(position.value) ? position.value : null,
+              ...paragraphFormRef.value?.form,
+            }
       paragraphApi.postParagraph(id, documentId, obj, loading).then((res) => {
         dialogVisible.value = false
         emit('refresh')

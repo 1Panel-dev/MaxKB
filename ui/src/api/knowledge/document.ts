@@ -54,11 +54,14 @@ const getDocumentPage: (
  * 文档详情
  * @param 参数 knowledge_id
  */
-const getDocumentDetail: (knowledge_id: string, document_id: string) => Promise<Result<any>> = (
-  knowledge_id,
-  document_id,
-) => {
-  return get(`${prefix.value}/${knowledge_id}/document/${document_id}`)
+const getDocumentDetail: (
+  knowledge_id: string,
+  document_id: string,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (knowledge_id, document_id, loading) => {
+  return get(`${prefix.value}/${knowledge_id}/document/${document_id}`,
+    {},
+    loading,)
 }
 
 /**
@@ -108,12 +111,7 @@ const putBatchCancelTask: (
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<boolean>> = (knowledge_id, data, loading) => {
-  return put(
-    `${prefix.value}/${knowledge_id}/document/batch_cancel_task`,
-    data,
-    undefined,
-    loading,
-  )
+  return put(`${prefix.value}/${knowledge_id}/document/batch_cancel_task`, data, undefined, loading)
 }
 
 /**
@@ -560,11 +558,10 @@ const putMulLarkSyncDocument: (
 const importLarkDocument: (
   knowledge_id: string,
   data: any,
-  loading?: Ref<boolean>
+  loading?: Ref<boolean>,
 ) => Promise<Result<Array<any>>> = (knowledge_id, data, loading) => {
   return post(`${prefix.value}/lark/${knowledge_id}/import`, data, null, loading)
 }
-
 
 export default {
   getDocumentList,
@@ -596,5 +593,5 @@ export default {
   getLarkDocumentList,
   putLarkDocumentSync,
   putMulLarkSyncDocument,
-  importLarkDocument
+  importLarkDocument,
 }
