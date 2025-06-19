@@ -98,7 +98,7 @@ class ChatInfo:
                 self.application.model_params_setting.keys()) == 0 else self.application.model_params_setting,
             'search_mode': self.application.knowledge_setting.get('search_mode') or 'embedding',
             'no_references_setting': self.get_no_references_setting(self.application.knowledge_setting, model_setting),
-            'user_id': self.application.user_id,
+            'workspace_id': self.application.workspace_id,
             'application_id': self.application.id
         }
 

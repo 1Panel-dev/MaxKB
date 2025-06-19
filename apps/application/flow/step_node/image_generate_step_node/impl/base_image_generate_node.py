@@ -9,7 +9,7 @@ from application.flow.i_step_node import NodeResult
 from application.flow.step_node.image_generate_step_node.i_image_generate_node import IImageGenerateNode
 from common.utils.common import bytes_to_uploaded_file
 from oss.serializers.file import FileSerializer
-from models_provider.tools import get_model_instance_by_model_user_id
+from models_provider.tools import get_model_instance_by_model_workspace_id
 
 
 class BaseImageGenerateNode(IImageGenerateNode):
@@ -25,8 +25,9 @@ class BaseImageGenerateNode(IImageGenerateNode):
                 **kwargs) -> NodeResult:
         print(model_params_setting)
         application = self.workflow_manage.work_flow_post_handler.chat_info.application
-        tti_model = get_model_instance_by_model_user_id(model_id, self.flow_params_serializer.data.get('user_id'),
-                                                        **model_params_setting)
+        workspace_id = self.workflow_manage.get_body().get('workspace_id')
+        tti_model = get_model_instance_by_model_workspace_id(model_id, workspace_id,
+                                                             **model_params_setting)
         history_message = self.get_history_message(history_chat_record, dialogue_number)
         self.context['history_message'] = history_message
         question = self.generate_prompt_question(prompt)

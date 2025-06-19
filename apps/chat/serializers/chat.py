@@ -366,7 +366,7 @@ class OpenChatSerializers(serializers.Serializer):
         chat_user_id = self.data.get("chat_user_id")
         chat_user_type = self.data.get("chat_user_type")
         debug = self.data.get("debug")
-        knowledge_id_list = [str(row.dataset_id) for row in
+        knowledge_id_list = [str(row.knowledge_id) for row in
                              QuerySet(ApplicationKnowledgeMapping).filter(
                                  application_id=application_id)]
         chat_id = str(uuid.uuid7())
