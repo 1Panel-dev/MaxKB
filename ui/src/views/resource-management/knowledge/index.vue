@@ -315,15 +315,7 @@ function getList() {
 
   KnowledgeApi.getKnowledgeListPage(paginationConfig, params, loading).then((res) => {
     paginationConfig.total = res.data.total
-    knowledgeList.value = [...knowledgeList.value, ...res.data.records]
-  })
-}
-
-function getAllList() {
-  const params = {}
-
-  KnowledgeApi.getKnowledgeList(params, loading).then((res) => {
-    knowledgeListbp = [...res.data]
+    knowledgeListbp = [...res.data.records]
     workspaces = [...new Set(knowledgeListbp.map((ele) => ele.workspace_id))]
     checkedWorkspaces.value = [...workspaces]
     checkAll.value = true

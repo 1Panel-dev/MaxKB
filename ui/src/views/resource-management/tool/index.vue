@@ -66,6 +66,18 @@
             :label="$t('views.application.form.appType.label')"
             width="120"
           />
+          <el-table-column :label="$t('common.status.label')" width="120">
+            <template #default="scope">
+              <div class="flex align-center">
+                <el-icon class="mr-8" size="16">
+                  <AppIcon
+                    :iconName="scope.row.is_active ? 'app-close_colorful' : 'app-succeed'"
+                  ></AppIcon>
+                </el-icon>
+                {{ $t(scope.row.is_active ? 'views.tool.enabled' : 'common.status.disable') }}
+              </div>
+            </template>
+          </el-table-column>
           <el-table-column width="100" property="workspace_name">
             <template #header>
               <div class="flex align-center">
@@ -151,7 +163,7 @@
                 @click.stop="configInitParams(scope.row)"
               >
                 <el-icon size="16">
-                  <AppIcon iconName="app-operation" class="mr-4"></AppIcon>
+                  <AppIcon iconName="app-blue_lock"></AppIcon>
                 </el-icon>
               </el-button>
               <el-button
