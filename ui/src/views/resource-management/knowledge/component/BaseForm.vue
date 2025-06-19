@@ -32,7 +32,7 @@
       prop="embedding_model_id"
     >
       <ModelSelect
-        v-model="form.embedding"
+        v-model="form.embedding_model_id"
         :placeholder="$t('views.knowledge.form.EmbeddingModel.placeholder')"
         :options="modelOptions"
         :model-type="'EMBEDDING'"
@@ -59,7 +59,7 @@ const {model} = useStore()
 const form = ref<knowledgeData>({
   name: '',
   desc: '',
-  embedding: '',
+  embedding_model_id: '',
 })
 
 const rules = reactive({
@@ -77,7 +77,7 @@ const rules = reactive({
       trigger: 'blur',
     },
   ],
-  embedding: [
+  embedding_model_id: [
     {
       required: true,
       message: t('views.knowledge.form.EmbeddingModel.requiredMessage'),
@@ -96,7 +96,7 @@ watch(
     if (value && JSON.stringify(value) !== '{}') {
       form.value.name = value.name
       form.value.desc = value.desc
-      form.value.embedding = value.embedding
+      form.value.embedding_model_id = value.embedding_model_id
     }
   },
   {
@@ -134,7 +134,7 @@ onUnmounted(() => {
   form.value = {
     name: '',
     desc: '',
-    embedding: '',
+    embedding_model_id: '',
   }
   FormRef.value?.clearValidate()
 })
