@@ -237,9 +237,8 @@
                             <el-dropdown-item
                               icon="Refresh"
                               @click.stop="syncKnowledge(item)"
-                              v-if="item.type === 1 ||
-                              hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_SYNC.getWorkspacePermission],'OR')
-                              "
+                              v-if="item.type === 1 &&
+                              hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_SYNC.getWorkspacePermission],'OR')"
                               >{{ $t('views.knowledge.setting.sync') }}
                             </el-dropdown-item>
                             <el-dropdown-item @click.stop="reEmbeddingKnowledge(item)"

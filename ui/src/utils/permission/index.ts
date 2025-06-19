@@ -45,7 +45,8 @@ const hasPermissionChild = (
     const roleOk = roleList.some((r) =>
       role.includes(isFunction(r) ? (r as CRF)().toString() : r.toString()),
     )
-    const editionOK = permission.editionList.includes(edition.toString())
+    const  editionList= permission.editionList
+    const editionOK = permission.editionList.length>0?editionList.some(e=>edition.toString()==e.toString()):true
 
     return permission.compare === 'AND'
       ? permissionOk && roleOk && editionOK

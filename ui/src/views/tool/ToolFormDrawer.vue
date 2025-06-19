@@ -79,7 +79,9 @@
         <h4 class="title-decoration-1 mb-16">
           {{ $t('common.param.initParam') }}
         </h4>
-        <el-button link type="primary" @click="openAddInitDialog()">
+        <el-button link type="primary" @click="openAddInitDialog()"
+          v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.TOOL_EDIT.getWorkspacePermission]"
+        >
           <el-icon class="mr-4">
             <Plus/>
           </el-icon>
@@ -161,7 +163,9 @@
             {{ $t('views.tool.form.param.paramInfo1') }}
           </el-text>
         </h4>
-        <el-button link type="primary" @click="openAddDialog()">
+        <el-button link type="primary" @click="openAddDialog()"
+          v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.TOOL_EDIT.getWorkspacePermission]"
+        >
           <el-icon class="mr-4">
             <Plus/>
           </el-icon>
@@ -240,8 +244,12 @@
     <template #footer>
       <div>
         <el-button :loading="loading" @click="visible = false">{{ $t('common.cancel') }}</el-button>
-        <el-button :loading="loading" @click="openDebug">{{ $t('common.debug') }}</el-button>
-        <el-button type="primary" @click="submit(FormRef)" :loading="loading">
+        <el-button :loading="loading" @click="openDebug"
+          v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.TOOL_DEBUG.getWorkspacePermission]"  
+        >{{ $t('common.debug') }}</el-button>
+        <el-button type="primary" @click="submit(FormRef)" :loading="loading"
+          v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.TOOL_EDIT.getWorkspacePermission]"
+        >
           {{ isEdit ? $t('common.save') : $t('common.create') }}
         </el-button
         >
@@ -269,6 +277,8 @@ import {cloneDeep} from 'lodash'
 import {PermissionType, PermissionDesc} from '@/enums/model'
 import {t} from '@/locales'
 import {isAppIcon} from '@/utils/common'
+import { PermissionConst, RoleConst } from '@/utils/permission/data'
+import { hasPermission } from '@/utils/permission/index'
 
 const props = defineProps({
   title: String,

@@ -13,16 +13,25 @@
       <el-card class="h-full">
         <div class="flex-between mb-16">
           <div>
-            <el-button type="primary" @click="createUser()">
+            <el-button type="primary" @click="createUser()"
+              v-hasPermission="new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+              [PermissionConst.WORKSPACE_CHAT_USER_CREATE.getWorkspacePermission],[],'OR')"
+            >
               {{ t('views.userManage.createUser') }}
             </el-button>
             <el-button @click="syncUsers">
               {{ $t('views.chatUser.syncUsers') }}
             </el-button>
-            <el-button :disabled="multipleSelection.length === 0" @click="setUserGroups">
+            <el-button :disabled="multipleSelection.length === 0" @click="setUserGroups"
+              v-hasPermission="new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+                [PermissionConst.WORKSPACE_CHAT_USER_GROUP.getWorkspacePermission],[],'OR')"
+            >
               {{ $t('views.chatUser.setUserGroups') }}
             </el-button>
-            <el-button :disabled="multipleSelection.length === 0" @click="handleBatchDelete">
+            <el-button :disabled="multipleSelection.length === 0" @click="handleBatchDelete"
+              v-hasPermission="new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+                [PermissionConst.WORKSPACE_CHAT_USER_DELETE.getWorkspacePermission],[],'OR')"
+            >
               {{ $t('common.delete') }}
             </el-button>
           </div>
@@ -106,7 +115,10 @@
               </span>
               <el-divider direction="vertical" />
               <span class="mr-8">
-                <el-button type="primary" text @click.stop="editUser(row)" :title="$t('common.edit')">
+                <el-button type="primary" text @click.stop="editUser(row)" :title="$t('common.edit')"
+                  v-hasPermission="new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+                    [PermissionConst.WORKSPACE_CHAT_USER_EDIT.getWorkspacePermission],[],'OR')"
+                >
                   <el-icon>
                     <EditPen />
                   </el-icon>
@@ -115,7 +127,10 @@
 
               <span class="mr-8">
                 <el-button type="primary" text @click.stop="editPwdUser(row)"
-                  :title="$t('views.userManage.setting.updatePwd')">
+                  :title="$t('views.userManage.setting.updatePwd')"
+                  v-hasPermission="new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+                [PermissionConst.WORKSPACE_CHAT_USER_EDIT.getWorkspacePermission],[],'OR')"
+                  >
                   <el-icon>
                     <Lock />
                   </el-icon>
@@ -123,7 +138,10 @@
               </span>
               <span>
                 <el-button :disabled="row.role === 'ADMIN'" type="primary" text @click.stop="deleteUserManage(row)"
-                  :title="$t('common.delete')">
+                  :title="$t('common.delete')"
+                  v-hasPermission="new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+                [PermissionConst.WORKSPACE_CHAT_USER_DELETE.getWorkspacePermission],[],'OR')"
+                  >
                   <el-icon>
                     <Delete />
                   </el-icon>
@@ -159,6 +177,8 @@ import iconMap from '@/components/app-icon/icons/common'
 import type { ChatUserItem } from '@/api/type/systemChatUser'
 import SystemGroupApi from '@/api/system/user-group'
 import type { ListItem } from '@/api/type/common'
+import { PermissionConst, RoleConst } from '@/utils/permission/data'
+import { ComplexPermission } from '@/utils/permission/type'
 
 const rightOutlined = iconMap['right-outlined'].iconReader()
 
