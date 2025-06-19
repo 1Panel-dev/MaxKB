@@ -23,6 +23,9 @@ class XInferenceReranker(MaxKBBaseModel, BaseDocumentCompressor):
     api_key: Optional[str]
 
     @staticmethod
+    def is_cache_model():
+        return False
+    @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         return XInferenceReranker(server_url=model_credential.get('server_url'), model_uid=model_name,
                                   api_key=model_credential.get('api_key'), top_n=model_kwargs.get('top_n', 3))
