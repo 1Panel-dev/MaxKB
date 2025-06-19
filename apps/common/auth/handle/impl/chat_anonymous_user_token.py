@@ -45,7 +45,7 @@ class ChatAnonymousUserToken(AuthBaseHandle):
         if application_setting_model is not None:
             application_setting = QuerySet(application_setting_model).filter(application_id=application_id).first()
             if application_setting.authentication:
-                if 'password' != chat_user_token.authentication.auth_type:
+                if 'password' != application_setting.authentication_value.get('type', ''):
                     raise AppAuthenticationFailed(1002, _('Authentication information is incorrect'))
         return None, ChatAuth(
             current_role_list=[RoleConstants.CHAT_ANONYMOUS_USER],

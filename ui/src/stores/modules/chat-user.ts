@@ -74,6 +74,12 @@ const useChatUserStore = defineStore('chat-user', {
         return this.token
       })
     },
+    passwordAuthentication(password: string) {
+      return ChatAPI.passwordAuthentication(this.accessToken as string, password).then((ok) => {
+        this.setToken(ok.data)
+        return this.token
+      })
+    },
     login(request: LoginRequest, loading?: Ref<boolean>) {
       return ChatAPI.login(this.accessToken as string, request, loading).then((ok) => {
         this.setToken(ok.data.token)

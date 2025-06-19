@@ -1,53 +1,31 @@
 <template>
-  <el-dialog
-    :modelValue="show"
-    modal-class="positioned-mask"
-    width="300"
-    :title="$t('chat.passwordValidator.title')"
-    custom-class="no-close-button"
-    :close-on-click-modal="false"
-    :close-on-press-escape="false"
-    :show-close="false"
-    top="25vh"
-    center
-    :modal="true"
-  >
-    <el-form ref="FormRef" :model="form" @submit.prevent="validator">
-      <el-form-item prop="value" :rules="rules.value">
-        <el-input show-password v-model="form.value" />
-      </el-form-item>
-      <el-button class="w-full mt-8" type="primary" @click="validator" :loading="loading">
-        {{ $t('common.confirm') }}</el-button
-      >
-    </el-form>
-  </el-dialog>
+  <el-form ref="FormRef" :model="form" @submit.prevent="validator">
+    <el-form-item prop="value" :rules="rules.password">
+      <el-input show-password v-model="form.password" />
+    </el-form-item>
+    <el-button class="w-full mt-8" type="primary" @click="validator" :loading="loading">
+      {{ $t('common.confirm') }}</el-button
+    >
+  </el-form>
 </template>
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useRoute } from 'vue-router'
+
 import useStore from '@/stores'
 import { t } from '@/locales'
+import { useRoute, useRouter } from 'vue-router'
 const route = useRoute()
 const FormRef = ref()
-const {
-  params: { accessToken }
-} = route as any
-const { application } = useStore()
+
+const { chatUser } = useStore()
 const props = defineProps<{ applicationProfile: any; modelValue: boolean }>()
 const loading = ref<boolean>(false)
-const show = computed(() => {
-  if (props.applicationProfile) {
-    if (props.modelValue) {
-      return false
-    }
-    return props.applicationProfile.authentication
-  }
-  return false
-})
+const router = useRouter()
+
 const emit = defineEmits(['update:modelValue'])
 const auth = () => {
-  return application.asyncAppAuthentication(accessToken, loading, form.value).then(() => {
-    emit('update:modelValue', true)
+  return chatUser.passwordAuthentication(form.value.password).then((ok) => {
+    router.push({ name: 'chat', params: { accessToken: chatUser.accessToken } })
   })
 }
 const validator_auth = (rule: any, value: string, callback: any) => {
@@ -64,12 +42,11 @@ const validator = () => {
 }
 
 const rules = {
-  value: [{ required: true, validator: validator_auth, trigger: 'manual' }]
+  password: [{ required: true, validator: validator_auth, trigger: 'manual' }],
 }
 
 const form = ref({
-  type: 'password',
-  value: ''
+  password: '',
 })
 </script>
 <style lang="scss">
