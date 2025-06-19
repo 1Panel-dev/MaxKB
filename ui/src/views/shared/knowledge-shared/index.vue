@@ -358,7 +358,7 @@ const search_type_change = () => {
 
 function getList() {
   const params = {
-    folder_id: currentFolder.value?.id || 'root',
+    folder_id: currentFolder.value?.id || 'default',
     [search_type.value]: search_form.value[search_type.value],
   }
 
