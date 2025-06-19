@@ -323,7 +323,10 @@ class ToolSerializer(serializers.Serializer):
                     for k in tool.init_params:
                         if k in password_fields and tool.init_params[k]:
                             tool.init_params[k] = encryption(tool.init_params[k])
-            return ToolModelSerializer(tool).data
+            return {
+                **ToolModelSerializer(tool).data,
+                'init_params': tool.init_params if tool.init_params else {},
+            }
 
         def export(self):
             try:
