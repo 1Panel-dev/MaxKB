@@ -43,6 +43,7 @@
           @handleNodeClick="folderClickHandel"
           class="p-8"
           v-loading="folderLoading"
+          :canOperation="false"
         />
       </template>
       <el-scrollbar>

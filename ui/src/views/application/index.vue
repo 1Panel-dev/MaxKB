@@ -7,6 +7,7 @@
         :data="folderList"
         :currentNodeKey="currentFolder?.id"
         @handleNodeClick="folderClickHandel"
+        @refreshTree="refreshFolder"
         class="p-8"
       />
     </template>
@@ -129,7 +130,10 @@
           </el-dropdown>
         </div>
       </template>
-      <div v-loading.fullscreen.lock="paginationConfig.current_page === 1 && loading">
+      <div
+        v-loading.fullscreen.lock="paginationConfig.current_page === 1 && loading"
+        style="max-height: calc(100vh - 140px)"
+      >
         <InfiniteScroll
           :size="applicationList.length"
           :total="paginationConfig.total"
@@ -367,21 +371,6 @@ function getList() {
   })
 }
 
-function getFolder() {
-  const params = {}
-  folder.asyncGetFolder(FolderSource.APPLICATION, params, loading).then((res: any) => {
-    folderList.value = res.data
-    currentFolder.value = res.data?.[0] || {}
-    getList()
-  })
-}
-
-function folderClickHandel(row: any) {
-  currentFolder.value = row
-  applicationList.value = []
-  getList()
-}
-
 function clickFolder(item: any) {
   currentFolder.value.id = item.id
   applicationList.value = []
@@ -482,15 +471,6 @@ const exportApplication = (application: any) => {
   })
 }
 
-const CreateFolderDialogRef = ref()
-function openCreateFolder() {
-  CreateFolderDialogRef.value.open(FolderSource.APPLICATION, currentFolder.value.parent_id)
-}
-function refreshFolder() {
-  applicationList.value = []
-  getFolder()
-  getList()
-}
 const elUploadRef = ref()
 const importApplication = (file: any) => {
   const formData = new FormData()
@@ -515,8 +495,34 @@ const importApplication = (file: any) => {
     })
 }
 
-onMounted(() => {
+// 文件夹相关
+const CreateFolderDialogRef = ref()
+function openCreateFolder() {
+  CreateFolderDialogRef.value.open(FolderSource.APPLICATION, currentFolder.value.id)
+}
+
+function getFolder(bool?: boolean) {
+  const params = {}
+  folder.asyncGetFolder(FolderSource.APPLICATION, params, loading).then((res: any) => {
+    folderList.value = res.data
+    if (bool) {
+      // 初始化刷新
+      currentFolder.value = res.data?.[0] || {}
+    }
+    getList()
+  })
+}
+function folderClickHandel(row: any) {
+  currentFolder.value = row
+  applicationList.value = []
+  getList()
+}
+function refreshFolder() {
+  applicationList.value = []
   getFolder()
+}
+onMounted(() => {
+  getFolder(true)
 })
 </script>
 

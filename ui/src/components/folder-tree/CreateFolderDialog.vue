@@ -41,7 +41,7 @@
           {{ $t('common.cancel') }}
         </el-button>
         <el-button type="primary" @click="submitHandle" :loading="loading">
-          {{ $t('common.add') }}
+          {{ isEdit ? $t('common.confirm') : $t('common.add') }}
         </el-button>
       </span>
     </template>
@@ -67,6 +67,7 @@ const loading = ref(false)
 const dialogVisible = ref<boolean>(false)
 const sourceType = ref<any>('')
 const isEdit = ref<boolean>(false)
+const editId = ref<string>('')
 
 const folderForm = ref<any>({
   name: '',
@@ -98,11 +99,16 @@ watch(dialogVisible, (bool) => {
 
 const open = (source: string, id: string, data?: any) => {
   sourceType.value = source
-  folderForm.value.parent_id = id
   if (data) {
+    //  编辑当前id
+    editId.value = data.id
     folderForm.value.name = data.name
     folderForm.value.desc = data.desc
+    folderForm.value.parent_id = data.parent_id
     isEdit.value = true
+  } else {
+    //  给当前id添加子id
+    folderForm.value.parent_id = id
   }
   dialogVisible.value = true
 }
@@ -111,11 +117,13 @@ const submitHandle = async () => {
   await FolderFormRef.value.validate((valid: any) => {
     if (valid) {
       if (isEdit.value) {
-        folderApi.putFolder(sourceType.value, folderForm.value, loading).then((res) => {
-          MsgSuccess(t('common.editSuccess'))
-          emit('refresh')
-          dialogVisible.value = false
-        })
+        folderApi
+          .putFolder(editId.value, sourceType.value, folderForm.value, loading)
+          .then((res) => {
+            MsgSuccess(t('common.editSuccess'))
+            emit('refresh')
+            dialogVisible.value = false
+          })
       } else {
         folderApi.postFolder(sourceType.value, folderForm.value, loading).then((res) => {
           MsgSuccess(t('common.createSuccess'))

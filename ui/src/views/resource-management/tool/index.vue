@@ -426,7 +426,7 @@ function configInitParams(item: any) {
 
 const CreateFolderDialogRef = ref()
 function openCreateFolder() {
-  CreateFolderDialogRef.value.open('TOOL', currentFolder.value.parent_id)
+  CreateFolderDialogRef.value.open('TOOL', currentFolder.value.id)
 }
 
 const elUploadRef = ref()

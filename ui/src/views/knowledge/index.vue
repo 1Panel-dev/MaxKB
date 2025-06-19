@@ -146,7 +146,11 @@
           </el-dropdown>
         </div>
       </template>
-      <div v-loading.fullscreen.lock="paginationConfig.current_page === 1 && loading">
+
+      <div
+        v-loading.fullscreen.lock="paginationConfig.current_page === 1 && loading"
+        style="max-height: calc(100vh - 140px)"
+      >
         <InfiniteScroll
           :size="knowledgeList.length"
           :total="paginationConfig.total"
@@ -456,32 +460,10 @@ function getList() {
   })
 }
 
-function getFolder() {
-  const params = {}
-  folder.asyncGetFolder(FolderSource.KNOWLEDGE, params, loading).then((res: any) => {
-    folderList.value = res.data
-    currentFolder.value = res.data?.[0] || {}
-    getList()
-  })
-}
-
-function folderClickHandel(row: any) {
-  currentFolder.value = row
-  knowledgeList.value = []
-  if (currentFolder.value.id === 'share') return
-  getList()
-}
-
 function clickFolder(item: any) {
   currentFolder.value.id = item.id
   knowledgeList.value = []
   getList()
-}
-
-const CreateFolderDialogRef = ref()
-
-function openCreateFolder() {
-  CreateFolderDialogRef.value.open(FolderSource.KNOWLEDGE, currentFolder.value.parent_id)
 }
 
 const GenerateRelatedDialogRef = ref<InstanceType<typeof GenerateRelatedDialog>>()
@@ -521,14 +503,36 @@ function deleteKnowledge(row: any) {
     .catch(() => {})
 }
 
+// 文件夹相关
+const CreateFolderDialogRef = ref()
+function openCreateFolder() {
+  CreateFolderDialogRef.value.open(FolderSource.KNOWLEDGE, currentFolder.value.id)
+}
+function getFolder(bool?: boolean) {
+  const params = {}
+  folder.asyncGetFolder(FolderSource.KNOWLEDGE, params, loading).then((res: any) => {
+    folderList.value = res.data
+    if (bool) {
+      // 初始化刷新
+      currentFolder.value = res.data?.[0] || {}
+    }
+    getList()
+  })
+}
+function folderClickHandel(row: any) {
+  currentFolder.value = row
+  knowledgeList.value = []
+  if (currentFolder.value.id === 'share') return
+  getList()
+}
 function refreshFolder() {
+  console.log(currentFolder.value)
   knowledgeList.value = []
   getFolder()
-  getList()
 }
 
 onMounted(() => {
-  getFolder()
+  getFolder(true)
 })
 </script>
 

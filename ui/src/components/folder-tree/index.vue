@@ -27,6 +27,7 @@
       highlight-current
       class="overflow-inherit_node__children"
       node-key="id"
+      v-loading="loading"
     >
       <template #default="{ node, data }">
         <div class="flex-between w-full" @mouseenter.stop="handleMouseEnter(data)">
@@ -36,6 +37,7 @@
           </div>
 
           <div
+            v-if="canOperation"
             @click.stop
             v-show="hoverNodeId === data.id"
             @mouseenter.stop="handleMouseEnter(data)"
@@ -103,6 +105,10 @@ const props = defineProps({
     type: String,
     default: 'views.system.share_knowledge',
   },
+  canOperation: {
+    type: Boolean,
+    default: true,
+  },
 })
 interface Tree {
   name: string
@@ -122,11 +128,12 @@ const treeRef = ref<TreeInstance>()
 const filterText = ref('')
 const hoverNodeId = ref<string | undefined>('')
 const title = ref('')
+const loading = ref(false)
 
 watch(filterText, (val) => {
   treeRef.value!.filter(val)
 })
-let time
+let time: any
 
 function handleMouseEnter(data: Tree) {
   clearTimeout(time)
@@ -153,7 +160,7 @@ const handleSharedNodeClick = () => {
 }
 
 function deleteFolder(row: Tree) {
-  folderApi.delFolder(row.id as string, props.source).then(() => {
+  folderApi.delFolder(row.id as string, props.source, loading).then(() => {
     emit('refreshTree')
   })
 }

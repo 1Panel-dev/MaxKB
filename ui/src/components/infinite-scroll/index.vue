@@ -2,11 +2,11 @@
   <div v-infinite-scroll="loadData" :infinite-scroll-disabled="disabledScroll">
     <slot />
   </div>
-  <div style="padding: 16px 10px">
-    <el-divider v-if="size > 0 && loading">
+  <div style="padding: 0 10px 16px">
+    <el-divider v-if="size > 0 && loading" style="background: none">
       <el-text type="info"> {{ $t('components.loading') }}...</el-text>
     </el-divider>
-    <el-divider v-if="noMore">
+    <el-divider v-if="noMore" style="background: none !important">
       <el-text type="info"> {{ $t('components.noMore') }}</el-text>
     </el-divider>
   </div>
@@ -21,27 +21,27 @@ const props = defineProps({
    */
   size: {
     type: Number,
-    default: 0
+    default: 0,
   },
   /**
    * 总数
    */
   total: {
     type: Number,
-    default: 0
+    default: 0,
   },
   /**
    * 总数
    */
   page_size: {
     type: Number,
-    default: 0
+    default: 0,
   },
   current_page: {
     type: Number,
-    default: 0
+    default: 0,
   },
-  loading: Boolean
+  loading: Boolean,
 })
 
 const emit = defineEmits(['update:current_page', 'load'])
@@ -53,12 +53,12 @@ watch(
     if (val === 1) {
       current.value = 1
     }
-  }
+  },
 )
 
 const noMore = computed(
   () =>
-    props.size > 0 && props.size === props.total && props.total > props.page_size && !props.loading
+    props.size > 0 && props.size === props.total && props.total > props.page_size && !props.loading,
 )
 const disabledScroll = computed(() => props.size > 0 && (props.loading || noMore.value))
 

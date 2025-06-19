@@ -324,7 +324,7 @@ function clickFolder(item: any) {
 const CreateFolderDialogRef = ref()
 
 function openCreateFolder() {
-  CreateFolderDialogRef.value.open('KNOWLEDGE', currentFolder.value.parent_id)
+  CreateFolderDialogRef.value.open('KNOWLEDGE', currentFolder.value.id)
 }
 
 const GenerateRelatedDialogRef = ref<InstanceType<typeof GenerateRelatedDialog>>()

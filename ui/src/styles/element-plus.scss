@@ -241,3 +241,7 @@
 .el-form--label-top .el-form-item .el-form-item__label {
   padding-right: 0;
 }
+
+.el-divider__text {
+  background: var(--app-layout-bg-color);
+}
