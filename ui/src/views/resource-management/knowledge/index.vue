@@ -150,21 +150,6 @@
                       @click.stop="openGenerateDialog(scope.row)"
                       >{{ $t('views.document.generateQuestion.title') }}</el-dropdown-item
                     >
-                    <el-dropdown-item
-                      icon="Lock"
-                      @click.stop="openAuthorizedWorkspaceDialog(scope.row)"
-                      >{{ $t('views.system.authorized_workspace') }}</el-dropdown-item
-                    >
-                    <el-dropdown-item
-                      icon="Setting"
-                      @click.stop="
-                        router.push({
-                          path: `/knowledge/resource/${scope.row.id}/settingResource`,
-                        })
-                      "
-                    >
-                      {{ $t('common.setting') }}</el-dropdown-item
-                    >
                     <el-dropdown-item @click.stop="exportKnowledge(scope.row)">
                       <AppIcon iconName="app-export"></AppIcon
                       >{{ $t('views.document.setting.export') }} Excel</el-dropdown-item
