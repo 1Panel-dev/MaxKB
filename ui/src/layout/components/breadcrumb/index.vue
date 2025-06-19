@@ -165,7 +165,7 @@ function changeMenu(id: string) {
 function getKnowledge() {
   loading.value = true
   knowledge
-    .asyncGetRootKnowledge()
+    .asyncGetFolderKnowledge()
     .then((res: any) => {
       list.value = res.data
       common.saveBreadcrumb(list.value)

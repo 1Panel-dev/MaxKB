@@ -144,7 +144,7 @@ function getDocument(id: string) {
 }
 
 function getknowledge() {
-  knowledge.asyncGetRootKnowledge(loading).then((res: any) => {
+  knowledge.asyncGetFolderKnowledge(loading).then((res: any) => {
     knowledgeList.value = res.data
   })
 }

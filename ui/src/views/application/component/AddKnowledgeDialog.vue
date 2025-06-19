@@ -49,13 +49,17 @@
       <el-scrollbar>
         <div class="max-height layout-bg p-16-24">
           <el-row :gutter="12" v-loading="loading">
-            <el-col :span="12" v-for="(item, index) in filterData" :key="index" class="mb-16">
+            <el-col
+              :span="12"
+              v-for="(item, index) in filterData.filter((v:any) => v.resource_type !== 'folder')"
+              :key="index"
+              class="mb-16"
+            >
               <CardCheckbox
                 value-field="id"
                 :data="item"
                 v-model="checkList"
                 @change="changeHandle"
-                v-if="item.resource_type !== 'folder'"
               >
                 <span class="ellipsis cursor ml-12" :title="item.name"> {{ item.name }}</span>
               </CardCheckbox>
@@ -100,7 +104,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['addData', 'refresh'])
-const { folder, user } = useStore()
+const { folder, user,knowledge } = useStore()
 
 const dialogVisible = ref<boolean>(false)
 const checkList = ref([])
@@ -191,7 +195,7 @@ function getList() {
   const params = {
     folder_id: currentFolder.value?.id || user.getWorkspaceId(),
   }
-  KnowledgeApi.getKnowledgeList(params, loading).then((res) => {
+  knowledge.asyncGetFolderKnowledge(params, loading).then((res) => {
     searchDate.value = res.data
   })
 }

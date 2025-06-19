@@ -31,7 +31,7 @@ const useKnowledgeStore = defineStore('knowled', {
     saveDocumentsFile(file: UploadUserFile[]) {
       this.documentsFiles = file
     },
-    async asyncGetRootKnowledge(loading?: Ref<boolean>) {
+    async asyncGetFolderKnowledge(loading?: Ref<boolean>) {
       return new Promise((resolve, reject) => {
         const params = {
           folder_id: localStorage.getItem('workspace_id'),

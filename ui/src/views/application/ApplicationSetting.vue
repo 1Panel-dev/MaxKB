@@ -633,7 +633,7 @@ function getDetail() {
 }
 
 function getKnowledge() {
-  knowledge.asyncGetRootKnowledge(knowledgeLoading).then((res: any) => {
+  knowledge.asyncGetFolderKnowledge(knowledgeLoading).then((res: any) => {
     knowledgeList.value = res.data
   })
 }
