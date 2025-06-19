@@ -581,5 +581,10 @@ class ToolTreeSerializer(serializers.Serializer):
 
             return native_page_search(
                 current_page, page_size, self.get_query_set(),
-                get_file_content(os.path.join(PROJECT_DIR, "apps", "tools", 'sql', 'list_tool.sql'))
+                get_file_content(os.path.join(PROJECT_DIR, "apps", "tools", 'sql', 'list_tool.sql')),
+                post_records_handler=lambda record: {
+                    **record,
+                    'input_field_list': json.loads(record.get('input_field_list', '[]')),
+                    'init_field_list': json.loads(record.get('init_field_list', '[]')),
+                },
             )

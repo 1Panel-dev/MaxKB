@@ -13,6 +13,8 @@ from (select tool."id"::text,
              tool."template_id"::text,
              tool."create_time",
              tool."update_time",
+             tool.init_field_list,
+             tool.input_field_list,
              tool."is_active"
       from tool
                left join "user" on "user".id = user_id ${tool_scope_query_set}
@@ -31,6 +33,8 @@ from (select tool."id"::text,
              ''                      as "template_id",
              tool_folder."create_time",
              tool_folder."update_time",
+             '[]'::jsonb             as init_field_list,
+             '[]'::jsonb             as input_field_list,
              'true'                  as "is_active"
       from tool_folder
                left join "user" on "user".id = user_id ${folder_query_set}) temp
