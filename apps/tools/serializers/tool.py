@@ -472,6 +472,7 @@ class ToolSerializer(serializers.Serializer):
                 scope=ToolScope.WORKSPACE,
                 tool_type=ToolType.CUSTOM,
                 folder_id=instance.get('folder_id', self.data.get('workspace_id')),
+                template_id=instance.id,
                 is_active=False
             )
             tool.save()
