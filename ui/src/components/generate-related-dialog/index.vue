@@ -5,6 +5,7 @@
     width="650"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
+    @click.stop
   >
     <div class="content-height">
       <el-form

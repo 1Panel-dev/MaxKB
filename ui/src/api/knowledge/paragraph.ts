@@ -239,6 +239,11 @@ const putBatchGenerateRelated: (
 /**
  * 批量迁移段落
  * @param 参数 knowledge_id,target_knowledge_id,
+ * {
+      "id_list": [
+        "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+      ]
+    }
  */
 const putMigrateMulParagraph: (
   knowledge_id: string,

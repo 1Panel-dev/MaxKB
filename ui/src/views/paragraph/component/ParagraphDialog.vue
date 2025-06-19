@@ -12,7 +12,7 @@
       <el-col :span="18">
         <el-scrollbar height="500" wrap-class="paragraph-scrollbar">
           <div class="p-24" style="padding-bottom: 8px">
-            <div style="position: absolute; right: 20px; top: 20px; ">
+            <div style="position: absolute; right: 20px; top: 20px">
               <el-button text @click="isEdit = true" v-if="problemId && !isEdit">
                 <el-icon><EditPen /></el-icon>
               </el-button>
@@ -22,9 +22,9 @@
           </div>
         </el-scrollbar>
         <div class="text-right p-24 pt-0" v-if="problemId && isEdit">
-          <el-button @click.prevent="cancelEdit"> {{$t('common.cancel')}} </el-button>
+          <el-button @click.prevent="cancelEdit"> {{ $t('common.cancel') }} </el-button>
           <el-button type="primary" :disabled="loading" @click="handleDebounceClick">
-            {{$t('common.save')}}
+            {{ $t('common.save') }}
           </el-button>
         </div>
       </el-col>
@@ -40,9 +40,9 @@
     </el-row>
     <template #footer v-if="!problemId">
       <span class="dialog-footer">
-        <el-button @click.prevent="dialogVisible = false"> {{$t('common.cancel')}} </el-button>
+        <el-button @click.prevent="dialogVisible = false"> {{ $t('common.cancel') }} </el-button>
         <el-button :disabled="loading" type="primary" @click="handleDebounceClick">
-          {{$t('common.submit')}}
+          {{ $t('common.submit') }}
         </el-button>
       </span>
     </template>
@@ -58,14 +58,14 @@ import paragraphApi from '@/api/knowledge/paragraph'
 import useStore from '@/stores'
 
 const props = defineProps({
-  title: String
+  title: String,
 })
 
 const { paragraph } = useStore()
 
 const route = useRoute()
 const {
-  params: { id, documentId }
+  params: { id, documentId },
 } = route as any
 
 const emit = defineEmits(['refresh'])
@@ -122,7 +122,7 @@ const submitHandle = async () => {
           documentId || document_id.value,
           problemId.value,
           paragraphFormRef.value?.form,
-          loading
+          loading,
         )
         .then((res: any) => {
           isEdit.value = false
@@ -133,7 +133,7 @@ const submitHandle = async () => {
         ProblemRef.value.problemList.length > 0
           ? {
               problem_list: ProblemRef.value.problemList,
-              ...paragraphFormRef.value?.form
+              ...paragraphFormRef.value?.form,
             }
           : paragraphFormRef.value?.form
       paragraphApi.postParagraph(id, documentId, obj, loading).then((res) => {

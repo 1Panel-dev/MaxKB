@@ -5,10 +5,10 @@ import { type Ref } from 'vue'
 const useDocumentStore = defineStore('document', {
   state: () => ({}),
   actions: {
-    async asyncGetAllDocument(id: string, loading?: Ref<boolean>) {
+    async asyncGetKnowledgeDocument(id: string, loading?: Ref<boolean>) {
       return new Promise((resolve, reject) => {
         documentApi
-          .getAllDocument(id, loading)
+          .getDocumentList(id, loading)
           .then((res) => {
             resolve(res)
           })

@@ -14,10 +14,26 @@ Object.defineProperty(prefix, 'value', {
 })
 
 /**
- * 文档分页列表
+ * 文档列表（无分页）
  * @param 参数  knowledge_id,
  * param {
  "   name": "string",
+  }
+ */
+
+const getDocumentList: (knowledge_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  knowledge_id,
+  loading,
+) => {
+  return get(`${prefix.value}/${knowledge_id}/document`, undefined, loading)
+}
+
+/**
+ * 文档分页列表
+ * @param 参数  knowledge_id,
+ * param {
+      "name": "string",
+      folder_id: "string",
   }
  */
 
@@ -549,15 +565,9 @@ const importLarkDocument: (
   return post(`${prefix.value}/lark/${knowledge_id}/import`, data, null, loading)
 }
 
-// todo
-const getAllDocument: (knowledge_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
-  knowledge_id,
-  loading,
-) => {
-  return get(`${prefix.value}/${knowledge_id}/document`, undefined, loading)
-}
 
 export default {
+  getDocumentList,
   getDocumentPage,
   getDocumentDetail,
   putDocument,

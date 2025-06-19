@@ -7,7 +7,7 @@
     @click.stop="editParagraph(data)"
   >
     <h2 class="mb-16">{{ data.title || '-' }}</h2>
-    <div v-show="show" class="mk-sticky">
+    <div v-show="show" class="mk-sticky" v-if="!disabled">
       <el-card
         class="paragraph-box-operation mt-8 mr-8"
         shadow="always"
@@ -79,7 +79,6 @@ import GenerateRelatedDialog from '@/components/generate-related-dialog/index.vu
 import ParagraphDialog from '@/views/paragraph/component/ParagraphDialog.vue'
 import SelectDocumentDialog from '@/views/paragraph/component/SelectDocumentDialog.vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
-import { elPaginationKey } from 'element-plus'
 
 const { paragraph } = useStore()
 
@@ -89,9 +88,10 @@ const {
 } = route as any
 const props = defineProps<{
   data: any
+  disabled?: boolean
 }>()
 
-const emit = defineEmits(['changeState', 'deleteParagraph'])
+const emit = defineEmits(['changeState', 'deleteParagraph', 'refresh', 'refreshMigrateParagraph'])
 const loading = ref(false)
 const changeStateloading = ref(false)
 const show = ref(false)
@@ -127,13 +127,6 @@ function openGenerateDialog(row: any) {
     GenerateRelatedDialogRef.value.open([], 'paragraph', row.id)
   }
 }
-function openSelectDocumentDialog(row?: any) {
-  //   if (row) {
-  //     multipleSelection.value = [row.id]
-  //   }
-  //   SelectDocumentDialogRef.value.open(multipleSelection.value)
-}
-
 function deleteParagraph(row: any) {
   MsgConfirm(
     `${t('views.paragraph.delete.confirmTitle')} ${row.title || '-'} ?`,
@@ -151,17 +144,28 @@ function deleteParagraph(row: any) {
     })
     .catch(() => {})
 }
-const SelectDocumentDialogRef = ref()
+
 const ParagraphDialogRef = ref()
 const title = ref('')
 function editParagraph(row: any) {
-  title.value = t('views.paragraph.paragraphDetail')
-  ParagraphDialogRef.value.open(row)
+  if (!props.disabled) {
+    title.value = t('views.paragraph.paragraphDetail')
+    ParagraphDialogRef.value.open(row)
+  }
 }
 
-function refresh() {}
+const SelectDocumentDialogRef = ref()
+function openSelectDocumentDialog(row?: any) {
+  SelectDocumentDialogRef.value.open([row.id])
+}
 
-function refreshMigrateParagraph() {}
+function refresh(data?: any) {
+  emit('refresh', data)
+}
+
+function refreshMigrateParagraph() {
+  emit('refreshMigrateParagraph', props.data)
+}
 </script>
 <style lang="scss" scoped>
 .paragraph-box {

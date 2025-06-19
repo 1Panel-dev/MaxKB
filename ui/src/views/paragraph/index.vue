@@ -83,27 +83,34 @@
                       ghostClass="ghost"
                     >
                       <template v-for="(item, index) in paragraphDetail" :key="item.id">
-                        <div :id="`m${item.id}`" style="display: flex; margin-bottom: 16px">
+                        <div :id="`m${item.id}`" class="flex mb-16">
                           <!-- 批量操作 -->
-                          <div class="paragraph-card flex" v-if="isBatch === true">
+                          <div class="paragraph-card flex w-full" v-if="isBatch === true">
                             <el-checkbox :value="item.id" />
-                            <ParagraphCard :data="item" class="mb-8 w-full" />
+                            <ParagraphCard
+                              :data="item"
+                              class="mb-8 w-full"
+                              @refresh="refresh"
+                              @refreshMigrateParagraph="refreshMigrateParagraph"
+                              :disabled="true"
+                            />
                           </div>
                           <!-- 非批量操作 -->
-                          <div class="handle paragraph-card flex" :id="item.id" v-else>
+                          <div class="handle paragraph-card flex w-full" :id="item.id" v-else>
                             <img
                               src="@/assets/sort.svg"
                               alt=""
                               height="15"
                               class="handle-img mr-8 mt-24 cursor"
                             />
+
+                            <ParagraphCard
+                              :data="item"
+                              class="mb-8 w-full"
+                              @changeState="changeState"
+                              @deleteParagraph="deleteParagraph"
+                            />
                           </div>
-                          <ParagraphCard
-                            :data="item"
-                            class="mb-8 w-full"
-                            @changeState="changeState"
-                            @deleteParagraph="deleteParagraph"
-                          />
                         </div>
                       </template>
                     </VueDraggable>
@@ -151,6 +158,7 @@ import { VueDraggable } from 'vue-draggable-plus'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import useStore from '@/stores'
 import { t } from '@/locales'
+import disable$ from 'dingtalk-jsapi/api/ui/pullToRefresh/disable'
 const { paragraph } = useStore()
 const route = useRoute()
 const {
@@ -192,7 +200,10 @@ function changeState(id: string) {
   paragraphDetail.value[index].is_active = !paragraphDetail.value[index].is_active
 }
 
-function refreshMigrateParagraph() {
+function refreshMigrateParagraph(data: any) {
+  if (data) {
+    multipleSelection.value = data
+  }
   paragraphDetail.value = paragraphDetail.value.filter(
     (v) => !multipleSelection.value.includes(v.id),
   )

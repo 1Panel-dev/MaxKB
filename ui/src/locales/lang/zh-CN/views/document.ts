@@ -4,6 +4,7 @@ export default {
   syncDocument: '同步文档',
   selected: '已选',
   items: '项',
+  migrateDocument:'文档迁移到',
   searchBar: {
     placeholder: '按 文档名称 搜索'
   },

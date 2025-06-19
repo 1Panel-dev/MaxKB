@@ -5,6 +5,7 @@
     width="500"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
+    @click.stop
   >
     <el-form
       ref="formRef"
@@ -14,22 +15,37 @@
       :rules="rules"
       @submit.prevent
     >
-      <el-form-item :label="$t('views.chatLog.selectKnowledge')" prop="dataset_id">
-        <el-select
-          v-model="form.dataset_id"
-          filterable
+      <el-form-item :label="$t('views.chatLog.selectKnowledge')" prop="knowledge_id">
+        <el-tree-select
+          v-model="form.knowledge_id"
+          :props="defaultProps"
+          node-key="id"
+          lazy
+          :load="loadTree"
           :placeholder="$t('views.chatLog.selectKnowledgePlaceholder')"
+          @change="changeKnowledge"
           :loading="optionLoading"
-          @change="changeDataset"
         >
-          <el-option v-for="item in datasetList" :key="item.id" :label="item.name" :value="item.id">
-            <span class="flex align-center">
-              <KnowledgeIcon v-if="!item.dataset_id" :type="item.type" />
+          <template #default="{ data }">
+            <div class="flex align-center">
+              <KnowledgeIcon
+                class="mr-12"
+                :size="20"
+                v-if="data.resource_type !== 'folder'"
+                :type="data.type"
+              />
+              <el-avatar v-else class="mr-12" shape="square" :size="20" style="background: none">
+                <img
+                  src="@/assets/knowledge/icon_file-folder_colorful.svg"
+                  style="width: 100%"
+                  alt=""
+                />
+              </el-avatar>
 
-              {{ item.name }}
-            </span>
-          </el-option>
-        </el-select>
+              {{ data.name }}
+            </div>
+          </template>
+        </el-tree-select>
       </el-form-item>
       <el-form-item :label="$t('views.chatLog.saveToDocument')" prop="document_id">
         <el-select
@@ -70,7 +86,7 @@ const { knowledge, document } = useStore()
 
 const route = useRoute()
 const {
-  params: { id, documentId },
+  params: { id, documentId }, // id为knowledgeID
 } = route as any
 
 const emit = defineEmits(['refresh'])
@@ -80,18 +96,19 @@ const dialogVisible = ref<boolean>(false)
 const loading = ref(false)
 
 const form = ref<any>({
-  dataset_id: '',
+  knowledge_id: '',
   document_id: '',
 })
 
 const rules = reactive<FormRules>({
-  dataset_id: [
+  knowledge_id: [
     { required: true, message: t('views.chatLog.selectKnowledgePlaceholder'), trigger: 'change' },
   ],
-  document_id: [{ required: true, message: t('views.chatLog.documentPlaceholder'), trigger: 'change' }],
+  document_id: [
+    { required: true, message: t('views.chatLog.documentPlaceholder'), trigger: 'change' },
+  ],
 })
 
-const datasetList = ref<any[]>([])
 const documentList = ref<any[]>([])
 const optionLoading = ref(false)
 const paragraphList = ref<string[]>([])
@@ -99,36 +116,46 @@ const paragraphList = ref<string[]>([])
 watch(dialogVisible, (bool) => {
   if (!bool) {
     form.value = {
-      dataset_id: '',
+      knowledge_id: '',
       document_id: '',
     }
-    datasetList.value = []
     documentList.value = []
     paragraphList.value = []
     formRef.value?.clearValidate()
   }
 })
 
-function changeDataset(id: string) {
+const defaultProps = {
+  children: 'children',
+  label: 'name',
+  isLeaf: (data: any) => data.resource_type && data.resource_type !== 'folder',
+  disabled: (data: any, node: any) => {
+    return data.id === id
+  },
+}
+
+const loadTree = (node: any, resolve: any) => {
+  console.log(node)
+  if (node.isLeaf) return resolve([])
+  const folder_id = node.level === 0 ? '' : node.data.id
+  knowledge.asyncGetFolderKnowledge(folder_id, optionLoading).then((res: any) => {
+    resolve(res.data)
+  })
+}
+
+function changeKnowledge(id: string) {
   form.value.document_id = ''
   getDocument(id)
 }
 
 function getDocument(id: string) {
-  document.asyncGetAllDocument(id, loading).then((res: any) => {
+  document.asyncGetKnowledgeDocument(id, optionLoading).then((res: any) => {
     documentList.value = res.data?.filter((v: any) => v.id !== documentId)
-  })
-}
-
-function getDataset() {
-  knowledge.asyncGetFolderKnowledge(loading).then((res: any) => {
-    datasetList.value = res.data
   })
 }
 
 const open = (list: any) => {
   paragraphList.value = list
-  getDataset()
   formRef.value?.clearValidate()
   dialogVisible.value = true
 }
@@ -136,13 +163,16 @@ const submitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid, fields) => {
     if (valid) {
+      const obj = {
+        id_list: paragraphList.value,
+      }
       paragraphApi
         .putMigrateMulParagraph(
           id,
           documentId,
-          form.value.dataset_id,
+          form.value.knowledge_id,
           form.value.document_id,
-          paragraphList.value,
+          obj,
           loading,
         )
         .then(() => {

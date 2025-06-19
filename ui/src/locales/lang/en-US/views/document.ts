@@ -4,15 +4,16 @@ export default {
   syncDocument: 'Sync Document',
   selected: 'Selected',
   items: 'Items',
+  migrateDocument: 'Migrate to',
   searchBar: {
-    placeholder: 'Search by document name'
+    placeholder: 'Search by document name',
   },
   setting: {
     migration: 'Move',
     cancelGenerateQuestion: 'Cancel Generating Questions',
     cancelVectorization: 'Cancel Vectorization',
     cancelGenerate: 'Cancel Generation',
-    export: 'Export to'
+    export: 'Export to',
   },
   tip: {
     saveMessage: 'Current changes have not been saved. Confirm exit?',
@@ -21,7 +22,7 @@ export default {
     vectorizationSuccess: 'Successful',
     nameMessage: 'Document name cannot be empty!',
     importMessage: 'Successful',
-    migrationSuccess: 'Successful'
+    migrationSuccess: 'Successful',
   },
   upload: {
     selectFile: 'Select File',
@@ -34,71 +35,71 @@ export default {
     errorMessage3: 'File cannot be empty',
     errorMessage4: 'Up to 50 files can be uploaded at once',
     template: 'Template',
-    download: 'Download'
+    download: 'Download',
   },
 
   fileType: {
     txt: {
       label: 'Text File',
       tip1: '1. It is recommended to standardize the segment markers in the file before uploading.',
-      tip2: '2. Up to 50 files can be uploaded at once, with each file not exceeding 100MB.'
+      tip2: '2. Up to 50 files can be uploaded at once, with each file not exceeding 100MB.',
     },
     table: {
       label: 'Table',
       tip1: '1. Click to download the corresponding template and complete the information:',
       tip2: '2. The first row must be column headers, and the column headers must be meaningful terms. Each record in the table will be treated as a segment.',
       tip3: '3. Each sheet in the uploaded spreadsheet file will be treated as a document, with the sheet name as the document name.',
-      tip4: '4. Up to 50 files can be uploaded at once, with each file not exceeding 100MB.'
+      tip4: '4. Up to 50 files can be uploaded at once, with each file not exceeding 100MB.',
     },
     QA: {
       label: 'QA Pairs',
       tip1: '1. Click to download the corresponding template and complete the information:',
       tip2: '2. Each sheet in the uploaded spreadsheet file will be treated as a document, with the sheet name as the document name.',
-      tip3: '3. Up to 50 files can be uploaded at once, with each file not exceeding 100MB.'
-    }
+      tip3: '3. Up to 50 files can be uploaded at once, with each file not exceeding 100MB.',
+    },
   },
   setRules: {
     title: {
       setting: 'Set Segment Rules',
-      preview: 'Preview'
+      preview: 'Preview',
     },
     intelligent: {
       label: 'Automatic Segmentation (Recommended)',
-      text: 'If you are unsure how to set segmentation rules, it is recommended to use automatic segmentation.'
+      text: 'If you are unsure how to set segmentation rules, it is recommended to use automatic segmentation.',
     },
     advanced: {
       label: 'Advanced Segmentation',
-      text: 'Users can customize segmentation delimiters, segment length, and cleaning rules based on document standards.'
+      text: 'Users can customize segmentation delimiters, segment length, and cleaning rules based on document standards.',
     },
     patterns: {
       label: 'Segment Delimiters',
       tooltip:
         'Recursively split according to the selected symbols in order. If the split result exceeds the segment length, it will be truncated to the segment length.',
-      placeholder: 'Please select'
+      placeholder: 'Please select',
     },
     limit: {
-      label: 'Segment Length'
+      label: 'Segment Length',
     },
     with_filter: {
       label: 'Auto Clean',
-      text: 'Remove duplicate extra symbols, spaces, blank lines, and tab words.'
+      text: 'Remove duplicate extra symbols, spaces, blank lines, and tab words.',
     },
     checkedConnect: {
-      label: 'Add "Related Questions" section for question-based QA pairs during import.'
-    }
+      label: 'Add "Related Questions" section for question-based QA pairs during import.',
+    },
   },
   buttons: {
     prev: 'Previous',
     next: 'Next',
     import: 'Start Import',
-    preview: 'Apply'
+    preview: 'Apply',
   },
   table: {
     name: 'Document Name',
     char_length: 'Character',
     paragraph: 'Segment',
     all: 'All',
-    updateTime: 'Update Time'
+    updateTime: 'Update Time',
   },
   fileStatus: {
     label: 'File Status',
@@ -109,12 +110,12 @@ export default {
     GENERATE: 'Generating',
     SYNC: 'Syncing',
     REVOKE: 'Cancelling',
-    finish: 'Finish'
+    finish: 'Finish',
   },
   enableStatus: {
     label: 'Status',
     enable: 'Enabled',
-    close: 'Disabled'
+    close: 'Disabled',
   },
   sync: {
     label: 'Sync',
@@ -122,7 +123,7 @@ export default {
     confirmMessage1:
       'Syncing will delete existing data and retrieve new data. Please proceed with caution.',
     confirmMessage2: 'Cannot sync, please set the document URL first.',
-    successMessage: 'Successful'
+    successMessage: 'Successful',
   },
   delete: {
     confirmTitle1: 'Confirm batch deletion of',
@@ -132,31 +133,31 @@ export default {
     successMessage: 'Successful',
     confirmTitle3: 'Confirm deleting document:',
     confirmMessage1: 'Under this document',
-    confirmMessage2: 'All segments will be deleted, please operate with caution. '
+    confirmMessage2: 'All segments will be deleted, please operate with caution. ',
   },
   form: {
     source_url: {
       label: 'Document URL',
       placeholder: 'Enter document URL, one per line. Incorrect URL will cause import failure.',
-      requiredMessage: 'Please enter a document URL'
+      requiredMessage: 'Please enter a document URL',
     },
     selector: {
       label: 'Selector',
-      placeholder: 'Default is body, you can input .classname/#idname/tagname'
+      placeholder: 'Default is body, you can input .classname/#idname/tagname',
     },
     hit_handling_method: {
       label: 'Retrieve-Respond',
-      tooltip: 'When user asks a question, handle matched segments according to the set method.'
+      tooltip: 'When user asks a question, handle matched segments according to the set method.',
     },
     similarity: {
       label: 'Similarity Higher Than',
       placeholder: 'Directly return segment content',
-      requiredMessage: 'Please enter similarity value'
-    }
+      requiredMessage: 'Please enter similarity value',
+    },
   },
   hitHandlingMethod: {
     optimization: 'Model optimization',
-    directly_return: 'Respond directly'
+    directly_return: 'Respond directly',
   },
   generateQuestion: {
     title: 'Generate Questions',
@@ -167,12 +168,12 @@ export default {
     tip4: 'The generation effect depends on the selected model and prompt. Users can adjust to achieve the best effect.',
     prompt1:
       'Content: {data}\n \n Please summarize the above and generate 5 questions based on the summary. \nAnswer requirements: \n - Please output only questions; \n - Please place each question in',
-    prompt2: 'tag.'
+    prompt2: 'tag.',
   },
   feishu: {
     selectDocument: 'Select Document',
     tip1: 'Only documents and tables are supported. Documents will be segmented based on titles, and tables will be converted to Markdown format before segmentation.',
     tip2: 'The system does not store the original document. Before importing the document, it is recommended to standardize the document segmentation markers.',
-    allCheck: 'Select All'
-  }
+    allCheck: 'Select All',
+  },
 }

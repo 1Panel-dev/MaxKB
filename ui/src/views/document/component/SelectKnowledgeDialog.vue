@@ -1,29 +1,22 @@
 <template>
   <el-dialog
-    :title="$t('views.chatLog.selectKnowledge')"
+    :title="`${$t('views.document.migrateDocument')}`"
     v-model="dialogVisible"
     width="600"
     class="select-knowledge-dialog"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
   >
-    <template #header="{ titleId, titleClass }">
-      <h4 :id="titleId" :class="titleClass">{{ '文档迁移到' }}</h4>
-    </template>
-    <el-form
-      ref="FormRef"
-      :model="form"
-      label-position="top"
-      require-asterisk-position="right"
-    >
+    <el-form ref="FormRef" :model="form" label-position="top" require-asterisk-position="right">
       <el-form-item :label="$t('views.chatLog.selectKnowledge')" required>
         <el-tree-select
           v-model="form.selectKnowledge"
           :props="defaultProps"
           node-key="id"
-          :default-expanded-keys="['default']"
           lazy
           :load="loadTree"
+          :placeholder="$t('views.chatLog.selectKnowledgePlaceholder')"
+          :loading="loading"
         >
           <template #default="{ data }">
             <div class="flex align-center">
@@ -81,6 +74,9 @@ const loading = ref<boolean>(false)
 const dialogVisible = ref<boolean>(false)
 const knowledgeList = ref<any>([])
 const documentList = ref<any>([])
+const form = ref<any>({
+  selectKnowledge: '',
+})
 
 const defaultProps = {
   children: 'children',
@@ -91,9 +87,14 @@ const defaultProps = {
   },
 }
 
-const form = ref<any>({
-  selectKnowledge: '',
-})
+const loadTree = (node: any, resolve: any) => {
+  console.log(node)
+  if (node.isLeaf) return resolve([])
+  const folder_id = node.level === 0 ? '' : node.data.id
+  knowledge.asyncGetFolderKnowledge(folder_id, loading).then((res: any) => {
+    resolve(res.data)
+  })
+}
 
 watch(dialogVisible, (bool) => {
   if (!bool) {
@@ -108,14 +109,6 @@ const open = (list: any) => {
   dialogVisible.value = true
 }
 
-const loadTree = (node: any, resolve: any) => {
-  console.log(node)
-  if (node.isLeaf) return resolve([])
-  const folder_id = node.level === 0 ? '' : node.data.id
-  knowledge.asyncGetFolderKnowledge(folder_id, loading).then((res: any) => {
-    resolve(res.data)
-  })
-}
 const submitHandle = () => {
   documentApi
     .putMigrateMulDocument(id, form.value.selectKnowledge, documentList.value, loading)
