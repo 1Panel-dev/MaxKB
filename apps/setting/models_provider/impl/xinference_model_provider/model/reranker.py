@@ -53,6 +53,5 @@ class XInferenceReranker(MaxKBBaseModel, BaseDocumentCompressor):
         client = RESTfulClient(self.server_url, self.api_key)
         model: RESTfulRerankModelHandle = client.get_model(self.model_uid)
         res = model.rerank([document.page_content for document in documents], query, self.top_n, return_documents=True)
-        print(self.top_n)
         return [Document(page_content=d.get('document', {}).get('text'),
                          metadata={'relevance_score': d.get('relevance_score')}) for d in res.get('results', [])]
