@@ -267,8 +267,8 @@ function openCreateDialog(data?: any) {
 
 function getList() {
   const params = {
-    folder_id: currentFolder.value?.id || 'root',
-    scope: 'WORKSPACE',
+    folder_id: currentFolder.value?.id || 'default',
+    scope: 'SHARED',
   }
   ToolApi.getToolListPage(paginationConfig, params, loading).then((res) => {
     paginationConfig.total = res.data?.total
@@ -421,7 +421,7 @@ function configInitParams(item: any) {
 // }
 
 onMounted(() => {
-  getFolder()
+  getList()
 })
 </script>
 
