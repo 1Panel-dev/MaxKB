@@ -51,14 +51,18 @@
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item @click.stop="openCreateFolder(data)">
-                    <el-icon><EditPen /></el-icon>
+                    <AppIcon iconName="app-add-folder"></AppIcon>
                     {{ '添加子文件夹' }}
                   </el-dropdown-item>
                   <el-dropdown-item @click.stop="openEditFolder(data)">
                     <el-icon><EditPen /></el-icon>
                     {{ $t('common.edit') }}
                   </el-dropdown-item>
-                  <el-dropdown-item divided @click.stop="deleteFolder(data)">
+                  <el-dropdown-item
+                    divided
+                    @click.stop="deleteFolder(data)"
+                    :disabled="data.id === 'default'"
+                  >
                     <el-icon><Delete /></el-icon>
                     {{ $t('common.delete') }}
                   </el-dropdown-item>
@@ -212,7 +216,7 @@ function refreshFolder() {
 }
 :deep(.overflow-inherit_node__children) {
   .el-tree-node__children {
-    overflow: inherit;
+    overflow: inherit !important;
   }
 }
 </style>
