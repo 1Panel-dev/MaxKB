@@ -54,7 +54,7 @@
     </el-form>
     <h4 class="title-decoration-1 mb-16 mt-8">{{ $t('views.userManage.roleSetting') }}</h4>
     <MemberFormContent ref="memberFormContentRef" :models="formItemModel" v-model:form="list"
-      v-loading="memberFormContentLoading" />
+      v-loading="memberFormContentLoading" :addText="$t('views.userManage.addRole')" />
     <template #footer>
       <el-button @click.prevent="visible = false"> {{ $t('common.cancel') }}</el-button>
       <el-button type="primary" @click="submit(userFormRef)" :loading="loading">
@@ -201,6 +201,7 @@ watch(visible, (bool) => {
       nick_name: '',
     }
     isEdit.value = false
+    list.value = [{ role_id: '', workspace_ids: [] }]
     userFormRef.value?.clearValidate()
   }
 })
@@ -213,6 +214,7 @@ const open = (data: any) => {
     userForm.value.password = data.password
     userForm.value.phone = data.phone
     userForm.value.nick_name = data.nick_name
+    list.value = data.role_setting
     isEdit.value = true
   } else {
     //需要查询默认密码是啥zxl

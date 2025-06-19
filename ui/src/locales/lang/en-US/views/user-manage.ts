@@ -3,6 +3,7 @@ export default {
   createUser: 'Create User',
   editUser: 'Edit User',
   roleSetting: 'Role Setting',
+  addRole: 'Add role',
   setting: {
     updatePwd: 'Change Password',
   },

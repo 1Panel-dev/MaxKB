@@ -3,6 +3,7 @@ export default {
   createUser: '创建用户',
   editUser: '编辑用户',
   roleSetting: '角色设置',
+  addRole: '添加角色',
   setting: {
     updatePwd: '修改用户密码',
   },

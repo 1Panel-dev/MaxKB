@@ -26,7 +26,7 @@
       <el-icon class="mr-4">
         <Plus />
       </el-icon>
-      {{ $t('views.role.member.add') }}
+      {{ props.addText ?? $t('views.role.member.add') }}
     </el-button>
   </el-form>
 </template>
@@ -37,6 +37,7 @@ import type { FormItemModel } from '@/api/type/role'
 
 const props = defineProps<{
   models: FormItemModel[];
+  addText?: string;
 }>()
 
 const formRef = ref()
