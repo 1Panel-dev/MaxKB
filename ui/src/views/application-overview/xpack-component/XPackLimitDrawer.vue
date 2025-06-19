@@ -1,12 +1,14 @@
 <template>
-  <el-dialog
-    :title="$t('views.applicationOverview.appInfo.accessControl')"
-    v-model="dialogVisible"
-    :close-on-click-modal="false"
-    :close-on-press-escape="false"
-    width="650"
-  >
-    <el-form label-position="top" ref="limitFormRef" :model="form">
+  <el-drawer v-model="dialogVisible" size="60%">
+    <template #header>
+      <h4>{{ $t('views.applicationOverview.appInfo.accessControl') }}</h4>
+    </template>
+    <el-form
+      label-position="top"
+      ref="limitFormRef"
+      :model="form"
+      require-asterisk-position="right"
+    >
       <el-form-item
         :label="$t('views.applicationOverview.appInfo.LimitDialog.clientQueryLimitLabel')"
       >
@@ -28,42 +30,81 @@
       <el-form-item :label="$t('views.applicationOverview.appInfo.LimitDialog.authentication')">
         <el-switch size="small" v-model="form.authentication" @change="firstGeneration"></el-switch>
       </el-form-item>
-      <el-form-item
-        prop="authentication_value"
-        v-if="form.authentication"
-        :label="$t('views.applicationOverview.appInfo.LimitDialog.authenticationValue')"
-      >
-        <el-input
-          class="authentication-append-input"
-          v-model="form.authentication_value"
-          readonly
-          style="width: 268px"
-          disabled
-        >
-          <template #append>
-            <el-tooltip :content="$t('common.copy')" placement="top">
-              <el-button
-                type="primary"
-                text
-                @click="copyClick(form.authentication_value)"
-                style="margin: 0 4px !important"
-              >
-                <AppIcon iconName="app-copy"></AppIcon>
+      <el-radio-group v-if="form.authentication" v-model="form.method" class="card__radio">
+        <el-card shadow="never" class="mb-16" :class="form.method === 'replace' ? 'active' : ''">
+          <el-radio value="replace" size="large">
+            <p class="mb-4 lighter">
+              {{ $t('views.applicationOverview.appInfo.LimitDialog.authenticationValue') }}
+            </p>
+          </el-radio>
+          <el-form-item class="ml-24">
+            <el-input
+              class="authentication-append-input"
+              v-model="form.authentication_value"
+              readonly
+              style="width: 268px"
+            >
+              <template #append>
+                <el-tooltip :content="$t('common.copy')" placement="top">
+                  <el-button
+                    type="primary"
+                    text
+                    @click="copyClick(form.authentication_value)"
+                    style="margin: 0 0 0 4px !important"
+                  >
+                    <AppIcon iconName="app-copy"></AppIcon>
+                  </el-button>
+                </el-tooltip>
+                <el-tooltip :content="$t('common.refresh')" placement="top">
+                  <el-button
+                    @click="refreshAuthentication"
+                    type="primary"
+                    text
+                    style="margin: 0 4px 0 0 !important"
+                  >
+                    <el-icon><RefreshRight /></el-icon>
+                  </el-button>
+                </el-tooltip>
+              </template>
+            </el-input>
+          </el-form-item>
+        </el-card>
+
+        <el-card shadow="never" class="mb-16" :class="form.method === 'complete' ? 'active' : ''">
+          <el-radio value="complete" size="large">
+            <p class="mb-16 lighter">
+              {{ $t('views.system.authentication.title') }}
+              <el-button type="primary" link @click="router.push({ path: '' })">
+                {{ '去配置对话用户' }}
               </el-button>
-            </el-tooltip>
-            <el-tooltip :content="$t('common.refresh')" placement="top">
-              <el-button
-                @click="refreshAuthentication"
-                type="primary"
-                text
-                style="margin: 0 4px 0 0 !important"
-              >
-                <el-icon><RefreshRight /></el-icon>
-              </el-button>
-            </el-tooltip>
-          </template>
-        </el-input>
-      </el-form-item>
+            </p>
+          </el-radio>
+          <el-form-item
+            label="登录方式"
+            :rules="[
+              {
+                required: true,
+                message: $t('请选择登录方式'),
+                trigger: 'change',
+              },
+            ]"
+            prop="checkList"
+            class="ml-24 border-t"
+            style="padding-top: 16px"
+          >
+            <el-checkbox-group v-model="form.checkList">
+              <el-checkbox label="账号登录" value="账号登录" />
+              <el-checkbox label="LDAP" value="LDAP" />
+              <el-checkbox label="OIDC" value="OIDC" />
+              <el-checkbox label="CAS" value="CAS" />
+              <el-checkbox label="企业微信" value="企业微信" />
+              <el-checkbox label="钉钉" value="钉钉" />
+              <el-checkbox label="飞书" value="飞书" />
+            </el-checkbox-group>
+          </el-form-item>
+        </el-card>
+      </el-radio-group>
+
       <el-form-item
         :label="$t('views.applicationOverview.appInfo.LimitDialog.whitelistLabel')"
         @click.prevent
@@ -80,24 +121,25 @@
       </el-form-item>
     </el-form>
     <template #footer>
-      <span class="dialog-footer">
+      <div>
         <el-button @click.prevent="dialogVisible = false">{{ $t('common.cancel') }} </el-button>
         <el-button type="primary" @click="submit(limitFormRef)" :loading="loading">
-          {{ $t('common.save') }}
+          {{ $t('common.create') }}
         </el-button>
-      </span>
+      </div>
     </template>
-  </el-dialog>
+  </el-drawer>
 </template>
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
 import applicationApi from '@/api/application/application'
 import { MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
 import { copyClick } from '@/utils/clipboard'
 
+const router = useRouter()
 const route = useRoute()
 const {
   params: { id },
@@ -178,7 +220,7 @@ defineExpose({ open })
 </script>
 <style lang="scss" scoped>
 .authentication-append-input {
-  .el-input-group__append {
+  :deep(.el-input-group__append) {
     padding: 0 !important;
   }
 }

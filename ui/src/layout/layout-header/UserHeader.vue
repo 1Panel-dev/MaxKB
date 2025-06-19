@@ -5,15 +5,12 @@
       <LogoFull />
     </div>
 
-    <el-divider
-      direction="vertical"
-      class="ml-24 mr-24"
-      v-if="hasPermission(EditionConst.IS_EE, 'OR')"
-    />
-    <!-- 企业版: 工作空间下拉框-->
-    <WorkspaceDropdown v-if="hasPermission(EditionConst.IS_EE, 'OR')" />
     <div class="flex-between w-full">
-      <div></div>
+      <div class="ml-24 flex align-center">
+        <!-- 企业版: 工作空间下拉框-->
+        <el-divider class="mr-16" direction="vertical" v-if="hasPermission(EditionConst.IS_EE, 'OR')" />
+        <WorkspaceDropdown v-if="hasPermission(EditionConst.IS_EE, 'OR')" />
+      </div>
       <TopMenu></TopMenu>
       <TopAbout></TopAbout>
     </div>

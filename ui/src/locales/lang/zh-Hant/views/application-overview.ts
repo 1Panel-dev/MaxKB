@@ -38,7 +38,7 @@ export default {
       clientQueryLimitLabel: '每個用戶端提問限制',
       timesDays: '次/天',
       authentication: '身份驗證',
-      authenticationValue: '驗證密碼',
+      authenticationValue: '密碼驗證',
       whitelistLabel: '白名單',
       whitelistPlaceholder:
         '請輸入允許嵌入第三方的來源位址，一行一個，如：\nhttp://127.0.0.1:5678\nhttps://dataease.io'

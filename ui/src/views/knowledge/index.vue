@@ -224,10 +224,7 @@
                   <template #mouseEnter>
                     <div @click.stop>
                       <el-dropdown trigger="click">
-                        <el-button
-                          text
-                          @click.stop
-                        >
+                        <el-button text @click.stop>
                           <el-icon>
                             <MoreFilled />
                           </el-icon>
@@ -237,13 +234,29 @@
                             <el-dropdown-item
                               icon="Refresh"
                               @click.stop="syncKnowledge(item)"
-                              v-if="item.type === 1 ||
-                              hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_SYNC.getWorkspacePermission],'OR')
+                              v-if="
+                                item.type === 1 ||
+                                hasPermission(
+                                  [
+                                    RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                                    PermissionConst.KNOWLEDGE_SYNC.getWorkspacePermission,
+                                  ],
+                                  'OR',
+                                )
                               "
                               >{{ $t('views.knowledge.setting.sync') }}
                             </el-dropdown-item>
-                            <el-dropdown-item @click.stop="reEmbeddingKnowledge(item)"
-                              v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_VECTOR.getWorkspacePermission],'OR')"
+                            <el-dropdown-item
+                              @click.stop="reEmbeddingKnowledge(item)"
+                              v-if="
+                                hasPermission(
+                                  [
+                                    RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                                    PermissionConst.KNOWLEDGE_VECTOR.getWorkspacePermission,
+                                  ],
+                                  'OR',
+                                )
+                              "
                             >
                               <AppIcon iconName="app-vectorization"></AppIcon>
                               {{ $t('views.knowledge.setting.vectorization') }}
@@ -252,7 +265,15 @@
                             <el-dropdown-item
                               icon="Connection"
                               @click.stop="openGenerateDialog(item)"
-                              v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_PROBLEM_CREATE.getWorkspacePermission],'OR')"
+                              v-if="
+                                hasPermission(
+                                  [
+                                    RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                                    PermissionConst.KNOWLEDGE_PROBLEM_CREATE.getWorkspacePermission,
+                                  ],
+                                  'OR',
+                                )
+                              "
                               >{{ $t('views.document.generateQuestion.title') }}
                             </el-dropdown-item>
                             <el-dropdown-item
@@ -260,29 +281,65 @@
                               @click.stop="
                                 router.push({
                                   path: `/knowledge/${item.id}/${currentFolder.value}/setting`,
-                                })"
-                              v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_EDIT.getWorkspacePermission],'OR')"
+                                })
+                              "
+                              v-if="
+                                hasPermission(
+                                  [
+                                    RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                                    PermissionConst.KNOWLEDGE_EDIT.getWorkspacePermission,
+                                  ],
+                                  'OR',
+                                )
+                              "
                             >
                               {{ $t('common.setting') }}
-                            </el-dropdown-item
-                            >
-                            <el-dropdown-item @click.stop="exportKnowledge(item)"
-                              v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_EXPORT.getWorkspacePermission],'OR')"
+                            </el-dropdown-item>
+                            <el-dropdown-item
+                              @click.stop="exportKnowledge(item)"
+                              v-if="
+                                hasPermission(
+                                  [
+                                    RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                                    PermissionConst.KNOWLEDGE_EXPORT.getWorkspacePermission,
+                                  ],
+                                  'OR',
+                                )
+                              "
                             >
                               <AppIcon iconName="app-export"></AppIcon
                               >{{ $t('views.document.setting.export') }} Excel
                             </el-dropdown-item>
-                            <el-dropdown-item @click.stop="exportZipKnowledge(item)"
-                              v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_EXPORT.getWorkspacePermission],'OR')"
+                            <el-dropdown-item
+                              @click.stop="exportZipKnowledge(item)"
+                              v-if="
+                                hasPermission(
+                                  [
+                                    RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                                    PermissionConst.KNOWLEDGE_EXPORT.getWorkspacePermission,
+                                  ],
+                                  'OR',
+                                )
+                              "
                             >
                               <AppIcon iconName="app-export"></AppIcon
                               >{{ $t('views.document.setting.export') }} ZIP</el-dropdown-item
                             >
-                            <el-dropdown-item icon="Delete" @click.stop="deleteKnowledge(item)"
-                              v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_EXPORT.getWorkspacePermission],'OR')"
+                            <el-dropdown-item
+                              icon="Delete"
+                              @click.stop="deleteKnowledge(item)"
+                              v-if="
+                                hasPermission(
+                                  [
+                                    RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                                    PermissionConst.KNOWLEDGE_EXPORT.getWorkspacePermission,
+                                  ],
+                                  'OR',
+                                )
+                              "
                             >
-                              {{$t('common.delete')
-                            }}</el-dropdown-item>
+                              {{ $t('common.delete') }}</el-dropdown-item
+                            >
                           </el-dropdown-menu>
                         </template>
                       </el-dropdown>
@@ -300,6 +357,7 @@
     <component :is="currentCreateDialog" ref="CreateKnowledgeDialogRef" />
     <CreateFolderDialog ref="CreateFolderDialogRef" @refresh="refreshFolder" />
     <GenerateRelatedDialog ref="GenerateRelatedDialogRef" />
+    <SyncWebDialog ref="SyncWebDialogRef" />
   </LayoutContainer>
 </template>
 
@@ -308,6 +366,7 @@ import { onMounted, ref, reactive, shallowRef, nextTick } from 'vue'
 import CreateKnowledgeDialog from './create-component/CreateKnowledgeDialog.vue'
 import CreateWebKnowledgeDialog from './create-component/CreateWebKnowledgeDialog.vue'
 import CreateLarkKnowledgeDialog from './create-component/CreateLarkKnowledgeDialog.vue'
+import SyncWebDialog from './component/SyncWebDialog.vue'
 import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
 import GenerateRelatedDialog from '@/components/generate-related-dialog/index.vue'
 import KnowledgeApi from '@/api/knowledge/knowledge'

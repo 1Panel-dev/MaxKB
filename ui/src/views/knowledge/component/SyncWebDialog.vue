@@ -37,6 +37,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import knowledgeApi from '@/api/knowledge/knowledge'
+import { MsgSuccess } from '@/utils/message'
 
 const emit = defineEmits(['refresh'])
 const loading = ref<boolean>(false)
@@ -59,6 +60,7 @@ const open = (id: string) => {
 const submit = () => {
   knowledgeApi.putSyncWebKnowledge(knowledgeId.value, method.value, loading).then((res: any) => {
     emit('refresh', res.data)
+    MsgSuccess(t('views.knowledge.tip.syncSuccess'))
     dialogVisible.value = false
   })
 }

@@ -377,10 +377,6 @@
             "
           />
           <el-checkbox
-            v-model="xpackForm.show_history"
-            :label="$t('views.applicationOverview.appInfo.SettingDisplayDialog.showHistory')"
-          />
-          <el-checkbox
             v-model="xpackForm.show_guide"
             :label="$t('views.applicationOverview.appInfo.SettingDisplayDialog.displayGuide')"
           />

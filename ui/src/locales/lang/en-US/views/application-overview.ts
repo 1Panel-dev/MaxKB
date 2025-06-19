@@ -38,7 +38,7 @@ export default {
       showSourceLabel: 'Show Knowledge Source',
       clientQueryLimitLabel: 'Query Limit per Client',
       authentication: 'Authentication',
-      authenticationValue: 'Access Password',
+      authenticationValue: 'Password Access',
       timesDays: 'queries per day',
       whitelistLabel: 'Allowed Domains',
       whitelistPlaceholder:
