@@ -45,16 +45,16 @@
         </el-input>
       </el-form-item>
       <el-form-item :label="$t('views.userManage.userForm.phone.label')">
-        <el-input
-          v-model="userForm.phone"
-          :placeholder="$t('views.userManage.userForm.phone.placeholder')"
-        >
+        <el-input v-model="userForm.phone" :placeholder="$t('views.userManage.userForm.phone.placeholder')">
         </el-input>
       </el-form-item>
       <el-form-item label="默认密码" v-if="!isEdit">
-        <span>{{userForm.password}}</span>
+        <span>{{ userForm.password }}</span>
       </el-form-item>
     </el-form>
+    <h4 class="title-decoration-1 mb-16 mt-8">{{ $t('views.userManage.roleSetting') }}</h4>
+    <MemberFormContent ref="memberFormContentRef" :models="formItemModel" v-model:form="list"
+      v-loading="memberFormContentLoading" />
     <template #footer>
       <el-button @click.prevent="visible = false"> {{ $t('common.cancel') }}</el-button>
       <el-button type="primary" @click="submit(userFormRef)" :loading="loading">
@@ -64,11 +64,15 @@
   </el-drawer>
 </template>
 <script setup lang="ts">
-import {ref, reactive, watch} from 'vue'
-import type {FormInstance} from 'element-plus'
+import { ref, reactive, watch, onBeforeMount } from 'vue'
+import type { FormInstance } from 'element-plus'
 import userManageApi from '@/api/user/user-manage'
-import {MsgSuccess} from '@/utils/message'
-import {t} from '@/locales'
+import { MsgSuccess } from '@/utils/message'
+import { t } from '@/locales'
+import type { FormItemModel } from '@/api/type/role'
+import WorkspaceApi from '@/api/workspace/workspace'
+import MemberFormContent from '@/views/role/component/MemberFormContent.vue'
+import { RoleTypeEnum } from '@/enums/system'
 
 const props = defineProps({
   title: String,
@@ -83,6 +87,69 @@ const userForm = ref<any>({
   password: '',
   phone: '',
   nick_name: '',
+})
+
+const list = ref<any[]>([]);
+const memberFormContentLoading = ref(false);
+const formItemModel = ref<FormItemModel[]>([]);
+const roleFormItem = ref<FormItemModel[]>([]);
+const adminRoleList = ref<any[]>([])
+const workspaceFormItem = ref<FormItemModel[]>([])
+
+async function getRoleFormItem() {
+  try {
+    const res = await WorkspaceApi.getWorkspaceRoleList(memberFormContentLoading);
+    roleFormItem.value = [{
+      path: 'role_id',
+      label: t('views.role.member.role'),
+      rules: [
+        {
+          required: true,
+          message: `${t('common.selectPlaceholder')}${t('views.role.member.role')}`,
+        },
+      ],
+      selectProps: {
+        options: res.data?.map(item => ({
+          label: item.name,
+          value: item.id
+        })) || [],
+        placeholder: `${t('common.selectPlaceholder')}${t('views.role.member.role')}`,
+        multiple: false
+      }
+    }]
+    adminRoleList.value = res.data.filter(item => item.type === RoleTypeEnum.ADMIN)
+  } catch (e) {
+    console.error(e);
+  }
+}
+async function getWorkspaceFormItem() {
+  try {
+    const res = await WorkspaceApi.getWorkspaceList(memberFormContentLoading)
+    workspaceFormItem.value = [
+      {
+        path: 'workspace_ids',
+        label: t('views.role.member.workspace'),
+        hidden: (e) => adminRoleList.value.find(item => item.id === e.role_id),
+        selectProps: {
+          options:
+            res.data?.map((item) => ({
+              label: item.name,
+              value: item.id,
+            })) || [],
+          placeholder: `${t('common.selectPlaceholder')}${t('views.role.member.workspace')}`,
+        },
+      },
+    ]
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+onBeforeMount(async () => {
+  await getRoleFormItem();
+  await getWorkspaceFormItem();
+  formItemModel.value = [...roleFormItem.value, ...workspaceFormItem.value]
+  list.value = [{ role_id: '', workspace_ids: [] }]
 })
 
 const rules = reactive({
@@ -157,27 +224,36 @@ const open = (data: any) => {
   visible.value = true
 }
 
+const memberFormContentRef = ref<InstanceType<typeof MemberFormContent>>()
 const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid, fields) => {
     if (valid) {
-      if (isEdit.value) {
-        userManageApi.putUserManage(userForm.value.id, userForm.value, loading).then((res) => {
-          emit('refresh')
-          MsgSuccess(t('common.editSuccess'))
-          visible.value = false
-        })
-      } else {
-        userManageApi.postUserManage(userForm.value, loading).then((res) => {
-          emit('refresh')
-          MsgSuccess(t('common.createSuccess'))
-          visible.value = false
-        })
-      }
+      memberFormContentRef.value?.validate().then(async (valid: any) => {
+        if (valid) {
+          const params = {
+            ...userForm.value,
+            role_setting: list.value
+          }
+          if (isEdit.value) {
+            userManageApi.putUserManage(userForm.value.id, params, loading).then((res) => {
+              emit('refresh')
+              MsgSuccess(t('common.editSuccess'))
+              visible.value = false
+            })
+          } else {
+            userManageApi.postUserManage(params, loading).then((res) => {
+              emit('refresh')
+              MsgSuccess(t('common.createSuccess'))
+              visible.value = false
+            })
+          }
+        }
+      })
     }
   })
 }
 
-defineExpose({open})
+defineExpose({ open })
 </script>
 <style lang="scss" scoped></style>
