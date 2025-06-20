@@ -17,5 +17,5 @@ class Migration(migrations.Migration):
             name='label',
             field=models.CharField(max_length=128, null=True, verbose_name='标签'),
         ),
-        migrations.RunSQL(get_file_content(os.path.join(PROJECT_DIR, "apps", "tools", 'migrations', 'internal_tool.sql')))
+        # migrations.RunSQL(get_file_content(os.path.join(PROJECT_DIR, "apps", "tools", 'migrations', 'internal_tool.sql')))
     ]
