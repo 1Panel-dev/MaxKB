@@ -107,12 +107,15 @@ class ModelSerializer(serializers.Serializer):
     class Operate(serializers.Serializer):
         id = serializers.UUIDField(required=True, label=_("model id"))
         user_id = serializers.UUIDField(required=False, label=_("user id"))
+        workspace_id = serializers.CharField(required=False, label=_("workspace id"))
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
-            model = QuerySet(Model).filter(
-                id=self.data.get("id")
-            ).first()
+            workspace_id = self.data.get("workspace_id")
+            model_query = QuerySet(Model).filter(id=self.data.get("id"))
+            if workspace_id is not None:
+                model_query = model_query.filter(workspace_id=workspace_id)
+            model = model_query.first()
             if model is None:
                 raise AppApiException(500, _('Model does not exist'))
             if model.workspace_id == 'None':
@@ -122,7 +125,7 @@ class ModelSerializer(serializers.Serializer):
             if with_valid:
                 super().is_valid(raise_exception=True)
             model = QuerySet(Model).get(
-                id=self.data.get('id')
+                id=self.data.get('id'), workspace_id=self.data.get('workspace_id')
             )
             return ModelSerializer.model_to_dict(model)
 
@@ -130,13 +133,15 @@ class ModelSerializer(serializers.Serializer):
             model = None
             if with_valid:
                 super().is_valid(raise_exception=True)
-                model = QuerySet(Model).filter(id=self.data.get("id")).first()
+                model = QuerySet(Model).filter(id=self.data.get("id"),
+                                               workspace_id=self.data.get('workspace_id')).first()
                 if model is None:
                     raise AppApiException(500, _('Model does not exist'))
             return {'id': str(model.id), 'provider': model.provider, 'name': model.name, 'model_type': model.model_type,
                     'model_name': model.model_name,
                     'status': model.status,
-                    'meta': model.meta
+                    'meta': model.meta,
+                    'workspace_id': model.workspace_id,
                     }
 
         def pause_download(self, with_valid=True):

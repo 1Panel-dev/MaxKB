@@ -121,8 +121,9 @@ class ModelSetting(APIView):
              )
         def put(self, request: Request, workspace_id, model_id: str):
             return result.success(
-                ModelSerializer.Operate(data={'id': model_id, 'user_id': request.user.id}).edit(request.data,
-                                                                                                str(request.user.id)))
+                ModelSerializer.Operate(
+                    data={'id': model_id, 'user_id': request.user.id, 'workspace_id': workspace_id}).edit(request.data,
+                                                                                                          str(request.user.id)))
 
         @extend_schema(methods=['DELETE'],
                        summary=_('Delete model'),
@@ -138,7 +139,8 @@ class ModelSetting(APIView):
              )
         def delete(self, request: Request, workspace_id: str, model_id: str):
             return result.success(
-                ModelSerializer.Operate(data={'id': model_id, 'user_id': request.user.id}).delete())
+                ModelSerializer.Operate(
+                    data={'id': model_id, 'user_id': request.user.id, 'workspace_id': workspace_id}).delete())
 
         @extend_schema(methods=['GET'],
                        summary=_('Query model details'),
@@ -151,7 +153,9 @@ class ModelSetting(APIView):
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str, model_id: str):
             return result.success(
-                ModelSerializer.Operate(data={'id': model_id, 'user_id': request.user.id}).one(with_valid=True))
+                ModelSerializer.Operate(
+                    data={'id': model_id, 'user_id': request.user.id, 'workspace_id': workspace_id}).one(
+                    with_valid=True))
 
     class ModelParamsForm(APIView):
         authentication_classes = [TokenAuth]
@@ -203,7 +207,7 @@ class ModelSetting(APIView):
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str, model_id: str):
             return result.success(
-                ModelSerializer.Operate(data={'id': model_id}).one_meta(with_valid=True))
+                ModelSerializer.Operate(data={'id': model_id, 'workspace_id': workspace_id}).one_meta(with_valid=True))
 
     class PauseDownload(APIView):
         authentication_classes = [TokenAuth]
@@ -220,7 +224,7 @@ class ModelSetting(APIView):
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def put(self, request: Request, workspace_id: str, model_id: str):
             return result.success(
-                ModelSerializer.Operate(data={'id': model_id}).pause_download())
+                ModelSerializer.Operate(data={'id': model_id, 'workspace_id': workspace_id}).pause_download())
 
 
 class SharedModel(APIView):
