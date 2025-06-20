@@ -1104,6 +1104,11 @@ class PermissionConstants(Enum):
                                             resource_path=
                                             f"/WORKSPACE/{kwargs.get('workspace_id')}")
 
+    def get_workspace_permission_workspace_manage_role(self):
+        return lambda r, kwargs: Permission(group=self.value.group, operate=self.value.operate,
+                                            resource_path=
+                                            f"/WORKSPACE/{kwargs.get('workspace_id')}:ROLE/{RoleConstants.WORKSPACE_MANAGE.value.__str__()}")
+
     def __eq__(self, other):
         if isinstance(other, PermissionConstants):
             return other == self
