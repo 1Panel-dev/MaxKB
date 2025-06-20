@@ -20,6 +20,7 @@ from rest_framework import serializers
 
 from application.models import ApplicationKnowledgeMapping
 from common.config.embedding_config import VectorStore
+from common.constants.permission_constants import ResourceAuthType, ResourcePermissionGroup
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import native_search, get_dynamics_model, native_page_search
 from common.db.sql_execute import select_list
@@ -38,6 +39,7 @@ from knowledge.task.generate import generate_related_by_knowledge_id
 from knowledge.task.sync import sync_web_knowledge, sync_replace_web_knowledge
 from maxkb.conf import PROJECT_DIR
 from models_provider.models import Model
+from system_manage.models import WorkspaceUserResourcePermission, AuthTargetType
 from users.serializers.user import is_workspace_manage
 
 
@@ -520,6 +522,16 @@ class KnowledgeSerializer(serializers.Serializer):
                 problem_paragraph_mapping_list
             ) if len(problem_paragraph_mapping_list) > 0 else None
 
+            # 自动授权给创建者
+            WorkspaceUserResourcePermission(
+                target=knowledge_id,
+                auth_target_type=AuthTargetType.KNOWLEDGE,
+                permission_list=[ResourcePermissionGroup.VIEW, ResourcePermissionGroup.MANAGE],
+                workspace_id=self.data.get('workspace_id'),
+                user_id=self.data.get('user_id'),
+                auth_type=ResourceAuthType.RESOURCE_PERMISSION_GROUP
+            ).save()
+
             return {
                 **KnowledgeModelSerializer(knowledge).data,
                 'user_id': self.data.get('user_id'),
@@ -557,6 +569,15 @@ class KnowledgeSerializer(serializers.Serializer):
                 },
             )
             knowledge.save()
+            # 自动授权给创建者
+            WorkspaceUserResourcePermission(
+                target=knowledge_id,
+                auth_target_type=AuthTargetType.KNOWLEDGE,
+                permission_list=[ResourcePermissionGroup.VIEW, ResourcePermissionGroup.MANAGE],
+                workspace_id=self.data.get('workspace_id'),
+                user_id=self.data.get('user_id'),
+                auth_type=ResourceAuthType.RESOURCE_PERMISSION_GROUP
+            ).save()
             sync_web_knowledge.delay(str(knowledge_id), instance.get('source_url'), instance.get('selector'))
             return {**KnowledgeModelSerializer(knowledge).data, 'document_list': []}
 
