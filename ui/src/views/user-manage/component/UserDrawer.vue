@@ -45,16 +45,19 @@
         </el-input>
       </el-form-item>
       <el-form-item :label="$t('views.userManage.userForm.phone.label')">
-        <el-input v-model="userForm.phone" :placeholder="$t('views.userManage.userForm.phone.placeholder')">
+        <el-input v-model="userForm.phone"
+                  :placeholder="$t('views.userManage.userForm.phone.placeholder')">
         </el-input>
       </el-form-item>
       <el-form-item label="默认密码" v-if="!isEdit">
         <span>{{ userForm.password }}</span>
       </el-form-item>
     </el-form>
-    <h4 class="title-decoration-1 mb-16 mt-8">{{ $t('views.userManage.roleSetting') }}</h4>
+    <h4 class="title-decoration-1 mb-16 mt-8" v-if="user.isEE()">
+      {{ $t('views.userManage.roleSetting') }}</h4>
     <MemberFormContent ref="memberFormContentRef" :models="formItemModel" v-model:form="list"
-      v-loading="memberFormContentLoading" :addText="$t('views.userManage.addRole')" />
+                       v-loading="memberFormContentLoading"
+                       :addText="$t('views.userManage.addRole')" v-if="user.isEE()"/>
     <template #footer>
       <el-button @click.prevent="visible = false"> {{ $t('common.cancel') }}</el-button>
       <el-button type="primary" @click="submit(userFormRef)" :loading="loading">
@@ -64,16 +67,18 @@
   </el-drawer>
 </template>
 <script setup lang="ts">
-import { ref, reactive, watch, onBeforeMount } from 'vue'
-import type { FormInstance } from 'element-plus'
+import {ref, reactive, watch, onBeforeMount} from 'vue'
+import type {FormInstance} from 'element-plus'
 import userManageApi from '@/api/user/user-manage'
-import { MsgSuccess } from '@/utils/message'
-import { t } from '@/locales'
-import type { FormItemModel } from '@/api/type/role'
+import {MsgSuccess} from '@/utils/message'
+import {t} from '@/locales'
+import type {FormItemModel} from '@/api/type/role'
 import WorkspaceApi from '@/api/workspace/workspace'
 import MemberFormContent from '@/views/role/component/MemberFormContent.vue'
-import { RoleTypeEnum } from '@/enums/system'
+import {RoleTypeEnum} from '@/enums/system'
+import useStore from "@/stores";
 
+const {user} = useStore()
 const props = defineProps({
   title: String,
 })
@@ -122,6 +127,7 @@ async function getRoleFormItem() {
     console.error(e);
   }
 }
+
 async function getWorkspaceFormItem() {
   try {
     const res = await WorkspaceApi.getWorkspaceList(memberFormContentLoading)
@@ -146,10 +152,12 @@ async function getWorkspaceFormItem() {
 }
 
 onBeforeMount(async () => {
-  await getRoleFormItem();
-  await getWorkspaceFormItem();
-  formItemModel.value = [...roleFormItem.value, ...workspaceFormItem.value]
-  list.value = [{ role_id: '', workspace_ids: [] }]
+  if (user.isEE()) {
+    await getRoleFormItem();
+    await getWorkspaceFormItem();
+    formItemModel.value = [...roleFormItem.value, ...workspaceFormItem.value]
+  }
+  list.value = [{role_id: '', workspace_ids: []}]
 })
 
 const rules = reactive({
@@ -201,7 +209,7 @@ watch(visible, (bool) => {
       nick_name: '',
     }
     isEdit.value = false
-    list.value = [{ role_id: '', workspace_ids: [] }]
+    list.value = [{role_id: '', workspace_ids: []}]
     userFormRef.value?.clearValidate()
   }
 })
@@ -256,6 +264,6 @@ const submit = async (formEl: FormInstance | undefined) => {
   })
 }
 
-defineExpose({ open })
+defineExpose({open})
 </script>
 <style lang="scss" scoped></style>

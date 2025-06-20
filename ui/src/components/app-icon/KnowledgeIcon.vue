@@ -1,9 +1,9 @@
 <template>
-  <el-avatar v-if="type === 1" class="avatar-purple" shape="square" :size="size">
+  <el-avatar v-if="type == 1" class="avatar-purple" shape="square" :size="size">
     <img src="@/assets/knowledge/icon_web.svg" style="width: 58%" alt="" />
   </el-avatar>
   <el-avatar
-    v-else-if="type === 2"
+    v-else-if="type == 2"
     class="avatar-purple"
     shape="square"
     :size="size"

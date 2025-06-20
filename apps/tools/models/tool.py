@@ -51,6 +51,7 @@ class Tool(AppModelMixin):
     folder = models.ForeignKey(ToolFolder, on_delete=models.DO_NOTHING, verbose_name="文件夹id", default='default')
     workspace_id = models.CharField(max_length=64, verbose_name="工作空间id", default="default", db_index=True)
     init_params = models.CharField(max_length=102400, verbose_name="初始化参数", null=True)
+    label = models.CharField(max_length=128, verbose_name="标签", null=True)
 
     class Meta:
         db_table = "tool"

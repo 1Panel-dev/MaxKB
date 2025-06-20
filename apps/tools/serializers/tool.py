@@ -102,7 +102,7 @@ class ToolModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tool
         fields = ['id', 'name', 'icon', 'desc', 'code', 'input_field_list', 'init_field_list', 'init_params',
-                  'scope', 'is_active', 'user_id', 'template_id', 'workspace_id', 'folder_id', 'tool_type',
+                  'scope', 'is_active', 'user_id', 'template_id', 'workspace_id', 'folder_id', 'tool_type', 'label',
                   'create_time', 'update_time']
 
 
