@@ -40,7 +40,9 @@ class ApplicationChat(APIView):
         responses=ApplicationChatQueryAPI.get_response(),
         tags=[_("Application/Conversation Log")]  # type: ignore
     )
-    @has_permissions(PermissionConstants.APPLICATION_CHAT_LOG.get_workspace_application_permission(),
+    @has_permissions(PermissionConstants.APPLICATION_CHAT_LOG_READ.get_workspace_application_permission(),
+                     PermissionConstants.APPLICATION_CHAT_LOG_READ.get_workspace_permission_workspace_manage_role(),
+                     RoleConstants.USER.get_workspace_role(),
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def get(self, request: Request, workspace_id: str, application_id: str):
         return result.success(ApplicationChatQuerySerializers(
@@ -60,7 +62,9 @@ class ApplicationChat(APIView):
             responses=ApplicationChatQueryPageAPI.get_response(),
             tags=[_("Application/Conversation Log")]  # type: ignore
         )
-        @has_permissions(PermissionConstants.APPLICATION_CHAT_LOG.get_workspace_application_permission(),
+        @has_permissions(PermissionConstants.APPLICATION_CHAT_LOG_READ.get_workspace_application_permission(),
+                         PermissionConstants.APPLICATION_CHAT_LOG_READ.get_workspace_permission_workspace_manage_role(),
+                         RoleConstants.USER.get_workspace_role(),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str, application_id: str, current_page: int, page_size: int):
             return result.success(ApplicationChatQuerySerializers(
@@ -82,6 +86,8 @@ class ApplicationChat(APIView):
             tags=[_("Application/Conversation Log")]  # type: ignore
         )
         @has_permissions(PermissionConstants.APPLICATION_CHAT_LOG_EXPORT.get_workspace_application_permission(),
+                         PermissionConstants.APPLICATION_CHAT_LOG_EXPORT.get_workspace_permission_workspace_manage_role(),
+                         RoleConstants.USER.get_workspace_role(),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def post(self, request: Request, workspace_id: str, application_id: str):
             return ApplicationChatQuerySerializers(
@@ -101,6 +107,10 @@ class OpenView(APIView):
         responses=None,
         tags=[_('Application')]  # type: ignore
     )
+    @has_permissions(PermissionConstants.APPLICATION_DEBUG.get_workspace_application_permission(),
+                     PermissionConstants.APPLICATION_DEBUG.get_workspace_permission_workspace_manage_role(),
+                     RoleConstants.USER.get_workspace_role(),
+                     RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def get(self, request: Request, workspace_id: str, application_id: str):
         return result.success(OpenChatSerializers(
             data={'workspace_id': workspace_id, 'application_id': application_id,
@@ -121,5 +131,9 @@ class ChatView(APIView):
         responses=None,
         tags=[_('Application')]  # type: ignore
     )
+    @has_permissions(
+        PermissionConstants.APPLICATION_DEBUG,
+        RoleConstants.USER.get_workspace_role(),
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def post(self, request: Request, chat_id: str):
         return DebugChatSerializers(data={'chat_id': chat_id}).chat(request.data)

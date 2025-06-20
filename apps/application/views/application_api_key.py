@@ -5,13 +5,13 @@ from rest_framework.request import Request
 from rest_framework.views import APIView
 
 from application.api.application_api_key import ApplicationKeyAPI
-from application.models import ApplicationApiKey, Application
+from application.models import Application
 from application.serializers.application_api_key import ApplicationKeySerializer
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
 from common.constants.permission_constants import PermissionConstants, RoleConstants
 from common.log.log import log
-from common.result import result, success, DefaultResultSerializer
+from common.result import result, DefaultResultSerializer
 
 
 def get_application_operation_object(application_id):
@@ -40,6 +40,8 @@ class ApplicationKey(APIView):
          get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')),
          )
     @has_permissions(PermissionConstants.APPLICATION_OVERVIEW_API_KEY.get_workspace_application_permission(),
+                     PermissionConstants.APPLICATION_READ.get_workspace_permission_workspace_manage_role(),
+                     RoleConstants.USER.get_workspace_role(),
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
                      )
     def post(self, request: Request, workspace_id: str, application_id: str):
@@ -57,6 +59,8 @@ class ApplicationKey(APIView):
         tags=[_('Application Api Key')]  # type: ignore
     )
     @has_permissions(PermissionConstants.APPLICATION_OVERVIEW_API_KEY.get_workspace_application_permission(),
+                     PermissionConstants.APPLICATION_OVERVIEW_API_KEY.get_workspace_permission_workspace_manage_role(),
+                     RoleConstants.USER.get_workspace_role(),
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def get(self, request: Request, workspace_id: str, application_id: str):
         return result.success(ApplicationKeySerializer(
@@ -77,6 +81,8 @@ class ApplicationKey(APIView):
             tags=[_('Application Api Key')]  # type: ignore
         )
         @has_permissions(PermissionConstants.APPLICATION_OVERVIEW_API_KEY.get_workspace_application_permission(),
+                         PermissionConstants.APPLICATION_OVERVIEW_API_KEY.get_workspace_permission_workspace_manage_role(),
+                         RoleConstants.USER.get_workspace_role(),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         @log(menu='Application', operate="Modify application API_KEY",
              get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')),
@@ -99,6 +105,8 @@ class ApplicationKey(APIView):
             tags=[_('Application Api Key')]  # type: ignore
         )
         @has_permissions(PermissionConstants.APPLICATION_OVERVIEW_API_KEY.get_workspace_application_permission(),
+                         PermissionConstants.APPLICATION_OVERVIEW_API_KEY.get_workspace_permission_workspace_manage_role(),
+                         RoleConstants.USER.get_workspace_role(),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         @log(menu='Application', operate="Delete application API_KEY",
              get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')),
