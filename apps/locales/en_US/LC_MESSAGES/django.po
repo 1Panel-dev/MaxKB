@@ -8361,3 +8361,6 @@ msgstr "CAS"
 
 msgid "LDAP"
 msgstr "LDAP"
+
+msgid "Get tool list"
+msgstr ""
