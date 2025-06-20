@@ -414,7 +414,7 @@ class PermissionConstants(Enum):
     )
     KNOWLEDGE_EXPORT = Permission(
         group=Group.KNOWLEDGE, operate=Operate.EXPORT, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        resource_permission_group_list=[ResourcePermissionGroup.VIEW, ResourcePermissionGroup.MANAGE],
+        resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
         parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
     KNOWLEDGE_VECTOR = Permission(
