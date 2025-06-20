@@ -148,9 +148,11 @@ const handleClick = (e: MouseEvent) => {
 const addLoading = ref(false)
 async function handleAdd(tool: any) {
   try {
+    // TODO 点击添加弹出弹窗可以编辑名字
     await ToolApi.addInternalTool(tool.id, { name: tool.name, folder_id: tool.folder_id }, addLoading)
-    dialogVisible.value = false
     emit('refresh')
+    MsgSuccess(t('common.addSuccess'))
+    dialogVisible.value = false
   } catch (error) {
     console.error(error)
   }

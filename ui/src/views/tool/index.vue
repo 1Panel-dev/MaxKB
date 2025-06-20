@@ -97,7 +97,8 @@
                     </div>
                   </el-dropdown-item>
                 </el-upload>
-                <el-dropdown-item @click="openToolStoreDialog()">
+                <!-- TODO 从工具商店创建 -->
+                <!-- <el-dropdown-item @click="openToolStoreDialog()">
                   <div class="flex align-center">
                     <el-avatar class="avatar-green" shape="square" :size="32">
                       <img src="@/assets/node/icon_tool.svg" style="width: 58%" alt="" />
@@ -106,7 +107,7 @@
                       <div class="lighter">{{ $t('views.tool.toolStore.createFromToolStore') }}</div>
                     </div>
                   </div>
-                </el-dropdown-item>
+                </el-dropdown-item> -->
                 <el-dropdown-item @click="openCreateFolder" divided>
                   <div class="flex align-center">
                     <AppIcon iconName="app-folder" style="font-size: 32px"></AppIcon>
