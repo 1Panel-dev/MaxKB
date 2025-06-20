@@ -239,7 +239,9 @@
                               icon="Refresh"
                               @click.stop="syncKnowledge(item)"
                               v-if="item.type === 1 &&
-                              hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_SYNC.getWorkspacePermission],'OR')"
+                              hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                              RoleConst.USER.getWorkspaceRole,
+                              PermissionConst.KNOWLEDGE_SYNC.getKnowledgeWorkspaceResourcePermission(item.id)],'OR')"
                               >{{ $t('views.knowledge.setting.sync') }}
                             </el-dropdown-item>
                             <el-dropdown-item
@@ -248,7 +250,8 @@
                                 hasPermission(
                                   [
                                     RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                                    PermissionConst.KNOWLEDGE_VECTOR.getWorkspacePermission,
+                                    RoleConst.USER.getWorkspaceRole,
+                                    PermissionConst.KNOWLEDGE_VECTOR.getKnowledgeWorkspaceResourcePermission(item.id),
                                   ],
                                   'OR',
                                 )
@@ -265,7 +268,8 @@
                                 hasPermission(
                                   [
                                     RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                                    PermissionConst.KNOWLEDGE_PROBLEM_CREATE.getWorkspacePermission,
+                                    RoleConst.USER.getWorkspaceRole,
+                                    PermissionConst.KNOWLEDGE_PROBLEM_CREATE.getKnowledgeWorkspaceResourcePermission(item.id),
                                   ],
                                   'OR',
                                 )
@@ -283,7 +287,8 @@
                                 hasPermission(
                                   [
                                     RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                                    PermissionConst.KNOWLEDGE_EDIT.getWorkspacePermission,
+                                    RoleConst.USER.getWorkspaceRole,
+                                    PermissionConst.KNOWLEDGE_EDIT.getKnowledgeWorkspaceResourcePermission(item.id),
                                   ],
                                   'OR',
                                 )
@@ -297,7 +302,8 @@
                                 hasPermission(
                                   [
                                     RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                                    PermissionConst.KNOWLEDGE_EXPORT.getWorkspacePermission,
+                                    RoleConst.USER.getWorkspaceRole,
+                                    PermissionConst.KNOWLEDGE_EXPORT.getKnowledgeWorkspaceResourcePermission(item.id),
                                   ],
                                   'OR',
                                 )
@@ -312,7 +318,8 @@
                                 hasPermission(
                                   [
                                     RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                                    PermissionConst.KNOWLEDGE_EXPORT.getWorkspacePermission,
+                                    RoleConst.USER.getWorkspaceRole,
+                                    PermissionConst.KNOWLEDGE_EXPORT.getKnowledgeWorkspaceResourcePermission(item.id),
                                   ],
                                   'OR',
                                 )
@@ -323,12 +330,14 @@
                             >
                             <el-dropdown-item
                               icon="Delete"
+                              type="danger"
                               @click.stop="deleteKnowledge(item)"
                               v-if="
                                 hasPermission(
                                   [
                                     RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                                    PermissionConst.KNOWLEDGE_EXPORT.getWorkspacePermission,
+                                    RoleConst.USER.getWorkspaceRole,
+                                    PermissionConst.KNOWLEDGE_DELETE.getKnowledgeWorkspaceResourcePermission(item.id),
                                   ],
                                   'OR',
                                 )

@@ -5,7 +5,9 @@
         {{ $t('common.setting') }}
       </h3>
       <el-button type="primary" @click="submit(applicationFormRef)" :disabled="loading"
-        v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.APPLICATION_OVERVIEW_PUBLIC.getWorkspacePermission]"
+        v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        RoleConst.USER.getWorkspaceRole,
+        PermissionConst.APPLICATION_OVERVIEW_PUBLIC.getWorkspacePermission]"
       >
         {{ $t('views.application.buttons.publish') }}
       </el-button>

@@ -39,17 +39,23 @@
         />
         <div style="display: flex; align-items: center" class="float-right">
           <el-button @click="dialogVisible = true"
-            v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.APPLICATION_CHAT_LOG_POLICY.getWorkspacePermission]"
+            v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+            RoleConst.USER.getWorkspaceRole,
+            PermissionConst.APPLICATION_CHAT_LOG_POLICY.getWorkspacePermission]"
           >
             {{$t('views.chatLog.buttons.clearStrategy')}}
           </el-button>
           <el-button @click="exportLog"
-            v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.APPLICATION_CHAT_LOG_EXPORT.getWorkspacePermission]"
+            v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+            RoleConst.USER.getWorkspaceRole,
+            PermissionConst.APPLICATION_CHAT_LOG_EXPORT.getWorkspacePermission]"
           >
             {{ $t('common.export') }}
           </el-button>
           <el-button @click="openDocumentDialog" :disabled="multipleSelection.length === 0"
-            v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.APPLICATION_CHAT_LOG_EXPORT.getWorkspacePermission]"
+            v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+            RoleConst.USER.getWorkspaceRole,
+            PermissionConst.APPLICATION_CHAT_LOG_EXPORT.getWorkspacePermission]"
           >{{ $t('views.chatLog.addToKnowledge') }}
           </el-button>
         </div>

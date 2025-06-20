@@ -78,6 +78,7 @@
               @click.stop="openEditModel"
               v-hasPermission="[
                 RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                RoleConst.USER.getWorkspaceRole,
                 PermissionConst.MODEL_EDIT.getWorkspacePermission,
               ]"
             >
@@ -99,6 +100,7 @@
               @click.stop="openParamSetting"
               v-hasPermission="[
                 RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                RoleConst.USER.getWorkspaceRole,
                 PermissionConst.MODEL_EDIT.getWorkspacePermission,
               ]"
             >
@@ -112,6 +114,7 @@
               @click.stop="deleteModel"
               v-hasPermission="[
                 RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                RoleConst.USER.getWorkspaceRole,
                 PermissionConst.MODEL_DELETE.getWorkspacePermission,
               ]"
             >

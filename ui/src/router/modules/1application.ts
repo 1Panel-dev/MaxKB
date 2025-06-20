@@ -1,4 +1,3 @@
-import { ComplexPermission } from '@/utils/permission/type'
 
 const applicationRouter = {
   path: '/application',

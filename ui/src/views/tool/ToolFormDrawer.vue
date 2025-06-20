@@ -80,7 +80,9 @@
           {{ $t('common.param.initParam') }}
         </h4>
         <el-button link type="primary" @click="openAddInitDialog()"
-          v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.TOOL_EDIT.getWorkspacePermission]"
+          v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+          RoleConst.USER.getWorkspaceRole,
+          PermissionConst.TOOL_EDIT.getWorkspacePermission]"
         >
           <el-icon class="mr-4">
             <Plus/>
@@ -164,7 +166,9 @@
           </el-text>
         </h4>
         <el-button link type="primary" @click="openAddDialog()"
-          v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.TOOL_EDIT.getWorkspacePermission]"
+          v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+          RoleConst.USER.getWorkspaceRole,
+          PermissionConst.TOOL_EDIT.getWorkspacePermission]"
         >
           <el-icon class="mr-4">
             <Plus/>
@@ -245,10 +249,14 @@
       <div>
         <el-button :loading="loading" @click="visible = false">{{ $t('common.cancel') }}</el-button>
         <el-button :loading="loading" @click="openDebug"
-          v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.TOOL_DEBUG.getWorkspacePermission]"  
+          v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+          RoleConst.USER.getWorkspaceRole,
+          PermissionConst.TOOL_DEBUG.getWorkspacePermission]"  
         >{{ $t('common.debug') }}</el-button>
         <el-button type="primary" @click="submit(FormRef)" :loading="loading"
-          v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.TOOL_EDIT.getWorkspacePermission]"
+          v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+          RoleConst.USER.getWorkspaceRole,
+          PermissionConst.TOOL_EDIT.getWorkspacePermission]"
         >
           {{ isEdit ? $t('common.save') : $t('common.create') }}
         </el-button

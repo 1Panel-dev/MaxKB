@@ -54,6 +54,7 @@
               class="ml-8"
               v-hasPermission="[
                 RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                RoleConst.USER.getWorkspaceRole,
                 PermissionConst.TOOL_CREATE.getWorkspacePermission,
               ]"
             >
@@ -200,6 +201,7 @@
                         class="mr-4"
                         v-hasPermission="[
                           RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                          RoleConst.USER.getWorkspaceRole,
                           PermissionConst.TOOL_EDIT.getWorkspacePermission,
                         ]"
                       />
@@ -218,6 +220,7 @@
                                 hasPermission(
                                   [
                                     RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                                    RoleConst.USER.getWorkspaceRole,
                                     PermissionConst.TOOL_EDIT.getWorkspacePermission,
                                   ],
                                   'OR',
@@ -238,6 +241,7 @@
                                 hasPermission(
                                   [
                                     RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                                    RoleConst.USER.getWorkspaceRole,
                                     PermissionConst.TOOL_EXPORT.getWorkspacePermission,
                                   ],
                                   'OR',
@@ -262,6 +266,7 @@
                                 hasPermission(
                                   [
                                     RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                                    RoleConst.USER.getWorkspaceRole,
                                     PermissionConst.TOOL_EXPORT.getWorkspacePermission,
                                   ],
                                   'OR',
@@ -278,6 +283,7 @@
                                 hasPermission(
                                   [
                                     RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                                    RoleConst.USER.getWorkspaceRole,
                                     PermissionConst.TOOL_DELETE.getWorkspacePermission,
                                   ],
                                   'OR',
