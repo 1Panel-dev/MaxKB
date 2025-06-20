@@ -236,7 +236,6 @@
                                   'OR',
                                 )
                               "
-                              :disabled="!canEdit(item)"
                               @click.stop="openCreateDialog(item)"
                             >
                               <el-icon>
@@ -245,7 +244,6 @@
                               {{ $t('common.edit') }}
                             </el-dropdown-item>
                             <el-dropdown-item
-                              :disabled="!canEdit(item)"
                               v-if="
                                 !item.template_id &&
                                 hasPermission(
@@ -264,7 +262,6 @@
                             </el-dropdown-item>
                             <el-dropdown-item
                               v-if="item.init_field_list?.length > 0"
-                              :disabled="!canEdit(item)"
                               @click.stop="configInitParams(item)"
                             >
                               <AppIcon iconName="app-operation" class="mr-4"></AppIcon>
@@ -282,7 +279,6 @@
                                   'OR',
                                 )
                               "
-                              :disabled="!canEdit(item)"
                               @click.stop="exportTool(item)"
                             >
                               <AppIcon iconName="app-export"></AppIcon>
@@ -299,7 +295,6 @@
                                   'OR',
                                 )
                               "
-                              :disabled="!canEdit(item)"
                               divided
                               @click.stop="deleteTool(item)"
                             >
@@ -372,10 +367,6 @@ const currentFolder = ref<any>({})
 const search_type_change = () => {
   search_form.value = { name: '', create_user: '' }
 }
-const canEdit = (row: any) => {
-  return user.userInfo?.id === row?.user_id
-}
-
 const ToolFormDrawerRef = ref()
 const ToolDrawertitle = ref('')
 
@@ -386,11 +377,9 @@ function openCreateDialog(data?: any) {
   }
   ToolDrawertitle.value = data ? t('views.tool.editTool') : t('views.tool.createTool')
   if (data) {
-    if (canEdit(data)) {
-      ToolApi.getToolById(data?.id, changeStateloading).then((res) => {
+    ToolApi.getToolById(data?.id, changeStateloading).then((res) => {
         ToolFormDrawerRef.value.open(res.data)
       })
-    }
   } else {
     ToolFormDrawerRef.value.open(data)
   }
