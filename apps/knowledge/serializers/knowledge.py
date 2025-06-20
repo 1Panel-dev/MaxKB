@@ -296,6 +296,8 @@ class KnowledgeSerializer(serializers.Serializer):
             all_application_list = [str(adm.get('id')) for adm in self.list_application(with_valid=False)]
             knowledge_dict = native_search(query_set_dict, select_string=get_file_content(
                 os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'list_knowledge.sql')), with_search_one=True)
+            if knowledge_dict is None:
+                return None
             return {
                 **knowledge_dict,
                 'meta': json.loads(knowledge_dict.get('meta', '{}')),
