@@ -13,7 +13,12 @@
           direction="vertical"
           v-if="hasPermission(EditionConst.IS_EE, 'OR')"
         />
-        <WorkspaceDropdown v-if="hasPermission(EditionConst.IS_EE, 'OR')" />
+        <WorkspaceDropdown
+          v-if="hasPermission(EditionConst.IS_EE, 'OR')"
+          :data="user.workspace_list"
+          :currentWorkspace="currentWorkspace"
+          @changeWorkspace="changeWorkspace"
+        />
       </div>
       <TopMenu></TopMenu>
       <TopAbout></TopAbout>
@@ -22,11 +27,24 @@
   </div>
 </template>
 <script setup lang="ts">
+import { computed, ref } from 'vue'
 import TopMenu from './top-menu/index.vue'
 import Avatar from './avatar/index.vue'
 import TopAbout from './top-about/index.vue'
 import { EditionConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
+import type { WorkspaceItem } from '@/api/type/workspace'
+import useStore from '@/stores'
+const { user } = useStore()
+const currentWorkspace = computed(() => {
+  return user.workspace_list.find((w) => w.id == user.workspace_id)
+})
+
+function changeWorkspace(item: WorkspaceItem) {
+  if (item.id === user.workspace_id) return
+  user.setWorkspaceId(item.id || 'default')
+  window.location.reload()
+}
 </script>
 <style lang="scss" scoped>
 .app-top-bar-container {

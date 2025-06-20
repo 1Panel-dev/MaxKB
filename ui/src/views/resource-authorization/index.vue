@@ -8,7 +8,12 @@
         direction="vertical"
         v-if="hasPermission(EditionConst.IS_EE, 'OR')"
       />
-      <WorkspaceDropdown v-if="hasPermission(EditionConst.IS_EE, 'OR')" />
+      <WorkspaceDropdown
+        v-if="hasPermission(EditionConst.IS_EE, 'OR')"
+        :data="workspaceList"
+        :currentWorkspace="currentWorkspace"
+        @changeWorkspace="changeWorkspace"
+      />
     </div>
 
     <el-card style="--el-card-padding: 0">
@@ -76,7 +81,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, reactive, watch } from 'vue'
+import { onMounted, ref, reactive, watch, computed } from 'vue'
 import AuthorizationApi from '@/api/user/resource-authorization'
 import PermissionSetting from './component/PermissionSetting.vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
@@ -86,6 +91,8 @@ import useStore from '@/stores'
 import { cloneDeep } from 'lodash'
 import { EditionConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
+import WorkspaceApi from '@/api/workspace/workspace.ts'
+import type { WorkspaceItem } from '@/api/type/workspace'
 
 const loading = ref(false)
 const rLoading = ref(false)
@@ -97,7 +104,7 @@ const filterText = ref('')
 
 const activeName = ref(AuthorizationEnum.KNOWLEDGE)
 const tableHeight = ref(0)
-const { folder } = useStore()
+const { user } = useStore()
 
 const settingTags = reactive([
   {
@@ -153,6 +160,7 @@ function submitPermissions() {
       return [...pre, ...next]
     }, [])
   AuthorizationApi.putResourceAuthorization(
+    currentWorkspaceId.value || 'default',
     currentUser.value,
     { user_resource_permission_list: user_resource_permission_list },
     rLoading,
@@ -169,7 +177,7 @@ function clickMemberHandle(item: any) {
 }
 
 function getMember(id?: string) {
-  AuthorizationApi.getUserMember(loading).then((res) => {
+  AuthorizationApi.getUserMember(currentWorkspaceId.value || 'default', loading).then((res) => {
     memberList.value = res.data
     filterMember.value = res.data
 
@@ -256,13 +264,20 @@ const dfsFolder = (arr: any[] = [], folderIdMap: any) => {
 }
 
 function getFolder() {
-  return folder.asyncGetFolder('KNOWLEDGE', {}, loading)
+  return AuthorizationApi.getSystemFolder(
+    currentWorkspaceId.value || 'default',
+    'KNOWLEDGE',
+    {},
+    loading,
+  )
 }
-
 function getResourcePermissions(user_id: string) {
-  return AuthorizationApi.getResourceAuthorization(user_id, rLoading)
+  return AuthorizationApi.getResourceAuthorization(
+    currentWorkspaceId.value || 'default',
+    user_id,
+    rLoading,
+  )
 }
-
 const getWholeTree = async (user_id: string) => {
   const [parentRes, childrenRes] = await Promise.all([getFolder(), getResourcePermissions(user_id)])
   if (!childrenRes.data || Object.keys(childrenRes.data).length > 0) {
@@ -313,7 +328,11 @@ const getFolderIdMap = (arr: any = []) => {
   }, {})
 }
 function ResourcePermissions(user_id: string) {
-  AuthorizationApi.getResourceAuthorization(user_id, rLoading).then((res) => {
+  AuthorizationApi.getResourceAuthorization(
+    currentWorkspaceId.value || 'default',
+    user_id,
+    rLoading,
+  ).then((res) => {
     if (!res.data || Object.keys(res.data).length > 0) {
       settingTags.map((item: any) => {
         if (Object.keys(res.data).indexOf(item.value) !== -1) {
@@ -325,6 +344,23 @@ function ResourcePermissions(user_id: string) {
   })
 }
 
+const workspaceList = ref<WorkspaceItem[]>([])
+const currentWorkspaceId = ref<string | undefined>('')
+const currentWorkspace = computed(() => {
+  return workspaceList.value.find((w) => w.id == currentWorkspaceId.value)
+})
+async function getWorkspaceList() {
+  if (user.isEE()) {
+    const res = await WorkspaceApi.getSystemWorkspaceList(loading)
+    workspaceList.value = res.data
+    currentWorkspaceId.value = 'default'
+  }
+}
+
+function changeWorkspace(item: WorkspaceItem) {
+  currentWorkspaceId.value = item.id
+  getMember()
+}
 function refresh(data?: string[]) {}
 
 onMounted(() => {
@@ -334,6 +370,7 @@ onMounted(() => {
       tableHeight.value = window.innerHeight - 330
     })()
   }
+  getWorkspaceList()
   getMember()
 })
 </script>

@@ -4,22 +4,22 @@ import type { pageRequest } from '@/api/type/common'
 import type { Ref } from 'vue'
 
 import useStore from '@/stores'
-const prefix: any = { _value: '/workspace/' }
-Object.defineProperty(prefix, 'value', {
-  get: function () {
-    const { user } = useStore()
-    return this._value + user.getWorkspaceId()
-  },
-})
+const prefix = '/workspace'
+
 /**
  * 获取资源权限
  * @query 参数
  */
 const getResourceAuthorization: (
+  workspace_id: string,
   user_id: string,
   loading?: Ref<boolean>,
-) => Promise<Result<any>> = (user_id, loading) => {
-  return get(`${prefix.value}/user_resource_permission/user/${user_id}`, undefined, loading)
+) => Promise<Result<any>> = (workspace_id, user_id, loading) => {
+  return get(
+    `${prefix}/${workspace_id}/user_resource_permission/user/${user_id}`,
+    undefined,
+    loading,
+  )
 }
 
 /**
@@ -41,24 +41,45 @@ const getResourceAuthorization: (
         }
  */
 const putResourceAuthorization: (
+  workspace_id: string,
   user_id: string,
   body: any,
   loading?: Ref<boolean>,
-) => Promise<Result<any>> = (user_id, body, loading) => {
-  return put(`${prefix.value}/user_resource_permission/user/${user_id}`, body, loading)
+) => Promise<Result<any>> = (workspace_id, user_id, body, loading) => {
+  return put(`${prefix}/${workspace_id}/user_resource_permission/user/${user_id}`, body, loading)
 }
-
 
 /**
  * 获取成员列表
  * @query 参数
  */
-const getUserList: (loading?: Ref<boolean>) => Promise<Result<any>> = (loading) => {
-  return get(`${prefix.value}/user_list`, undefined, loading)
+const getUserList: (workspace_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  workspace_id,
+  loading,
+) => {
+  return get(`${prefix}/${workspace_id}/user_list`, undefined, loading)
 }
 
-const getUserMember: (loading?: Ref<boolean>) => Promise<Result<any>> = (loading) => {
-  return get(`${prefix.value}/user_member`, undefined, loading)
+const getUserMember: (workspace_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  workspace_id,
+  loading,
+) => {
+  return get(`${prefix}/${workspace_id}/user_member`, undefined, loading)
+}
+
+/**
+ * 获得系统文件夹列表
+ * @params 参数
+ *  source : APPLICATION, KNOWLEDGE, TOOL
+ *  data : {name: string}
+ */
+const getSystemFolder: (
+  workspace_id: string,
+  source: string,
+  data?: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<Array<any>>> = (workspace_id, source, data, loading) => {
+  return get(`${prefix}/${workspace_id}/${source}/folder`, data, loading)
 }
 
 export default {
@@ -66,4 +87,5 @@ export default {
   putResourceAuthorization,
   getUserList,
   getUserMember,
+  getSystemFolder,
 }

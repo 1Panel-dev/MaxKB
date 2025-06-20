@@ -12,7 +12,7 @@
     <template #dropdown>
       <el-dropdown-menu v-loading="loading">
         <el-dropdown-item
-          v-for="item in user.workspace_list"
+          v-for="item in data"
           :key="item.id"
           :class="item.id === currentWorkspace?.id ? 'active' : ''"
           @click="changeWorkspace(item)"
@@ -37,19 +37,21 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import type { WorkspaceItem } from '@/api/type/workspace'
-import useStore from '@/stores'
 
-const { user } = useStore()
-const loading = ref(false)
-
-const currentWorkspace = computed(() => {
-  return user.workspace_list.find((w) => w.id == user.workspace_id)
+const props = defineProps({
+  data: {
+    type: Array,
+    default: () => [],
+  },
+  currentWorkspace: {
+    type: Object,
+    default: () => {},
+  },
 })
-
+const loading = ref(false)
+const emit = defineEmits(['changeWorkspace'])
 function changeWorkspace(item: WorkspaceItem) {
-  if (item.id === user.workspace_id) return
-  user.setWorkspaceId(item.id || 'default')
-  window.location.reload()
+  emit('changeWorkspace', item)
 }
 </script>
 <style lang="scss" scoped>
