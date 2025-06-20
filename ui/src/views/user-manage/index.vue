@@ -143,7 +143,7 @@
 import { onMounted, ref, reactive, watch } from 'vue'
 import UserDrawer from './component/UserDrawer.vue'
 import UserPwdDialog from './component/UserPwdDialog.vue'
-import userManageApi from '@/api/user/user-manage'
+import userManageApi from '@/api/system/user-manage'
 import { datetimeFormat } from '@/utils/time'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { t } from '@/locales'

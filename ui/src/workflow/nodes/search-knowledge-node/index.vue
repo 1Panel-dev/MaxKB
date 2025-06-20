@@ -190,7 +190,7 @@ function getknowledge() {
   //     knowledgeList.value = res.data
   //   })
   // } else {
-  knowledge.asyncGetFolderKnowledge(knowledgeLoading).then((res: any) => {
+  knowledge.asyncGetFolderKnowledge('',knowledgeLoading).then((res: any) => {
     knowledgeList.value = res.data?.filter((v: any) => v.user_id === user.userInfo?.id)
   })
   // }

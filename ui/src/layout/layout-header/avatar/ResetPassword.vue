@@ -47,7 +47,7 @@
 import { ref } from 'vue'
 import type { ResetCurrentUserPasswordRequest } from '@/api/type/user'
 import type { FormInstance, FormRules } from 'element-plus'
-import UserApi from '@/api/user/user-manage'
+import UserApi from '@/api/system/user-manage'
 import useStore from '@/stores'
 import { useRouter } from 'vue-router'
 import { t } from '@/locales'

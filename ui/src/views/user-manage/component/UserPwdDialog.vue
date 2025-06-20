@@ -44,7 +44,7 @@ import { ref, reactive, watch } from 'vue'
 import useStore from '@/stores'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { ResetPasswordRequest } from '@/api/type/user'
-import userManageApi from '@/api/user/user-manage'
+import userManageApi from '@/api/system/user-manage'
 import { MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
 const emit = defineEmits(['refresh'])

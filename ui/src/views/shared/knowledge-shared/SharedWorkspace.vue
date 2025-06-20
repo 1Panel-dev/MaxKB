@@ -134,11 +134,10 @@ import CreateWebKnowledgeDialog from './create-component/CreateWebKnowledgeDialo
 import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
 import GenerateRelatedDialog from '@/components/generate-related-shared-dialog/index.vue'
 import KnowledgeApi from '@/api/shared/knowledge'
-import KnowledgeWorkspaceApi from '@/api/shared/workspace'
+import KnowledgeWorkspaceApi from '@/api/shared-workspace'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import useStore from '@/stores/modules-shared-system'
 import { numberFormat } from '@/utils/common'
-import iconMap from '@/components/app-icon/icons/common'
 import { t } from '@/locales'
 import { useRouter } from 'vue-router'
 import AuthorizedWorkspace from '@/views/shared/AuthorizedWorkspaceDialog.vue'
@@ -147,7 +146,6 @@ const router = useRouter()
 const { folder } = useStore()
 
 const loading = ref(false)
-const rightOutlined = iconMap['right-outlined'].iconReader()
 
 const search_type = ref('name')
 const search_form = ref<any>({

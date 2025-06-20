@@ -9,7 +9,7 @@
     />
     <div
       @click="handleSharedNodeClick"
-      v-if="!!shareTitle"
+      v-if="showShared && hasPermission(EditionConst.IS_EE, 'OR')"
       class="shared-knowledge"
       :class="currentNodeKey === 'share' && 'active'"
     >
@@ -83,6 +83,8 @@ import type { TreeInstance } from 'element-plus'
 import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
 import { t } from '@/locales'
 import folderApi from '@/api/folder'
+import { EditionConst } from '@/utils/permission/data'
+import { hasPermission } from '@/utils/permission/index'
 defineOptions({ name: 'FolderTree' })
 const props = defineProps({
   data: {
@@ -97,7 +99,7 @@ const props = defineProps({
     type: String,
     default: 'APPLICATION',
   },
-  isShared: {
+  showShared: {
     type: Boolean,
     default: false,
   },

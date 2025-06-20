@@ -86,7 +86,7 @@
 
 <script lang="ts" setup>
 import { onMounted, ref, reactive, watch, computed } from 'vue'
-import AuthorizationApi from '@/api/user/resource-authorization'
+import AuthorizationApi from '@/api/system/resource-authorization'
 import PermissionSetting from './component/PermissionSetting.vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { AuthorizationEnum } from '@/enums/system'

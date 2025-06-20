@@ -69,7 +69,7 @@
 <script setup lang="ts">
 import {ref, reactive, watch, onBeforeMount} from 'vue'
 import type {FormInstance} from 'element-plus'
-import userManageApi from '@/api/user/user-manage'
+import userManageApi from '@/api/system/user-manage'
 import {MsgSuccess} from '@/utils/message'
 import {t} from '@/locales'
 import type {FormItemModel} from '@/api/type/role'

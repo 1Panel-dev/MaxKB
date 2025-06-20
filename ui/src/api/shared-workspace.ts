@@ -15,13 +15,13 @@ Object.defineProperty(prefix_workspace, 'value', {
   },
 })
 
-const getSharedWorkspaceKnowledge: (loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (
+const getKnowledgeList: (loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (
   loading,
 ) => {
   return get(`${prefix}/${prefix_workspace.value}/knowledge`, {}, loading)
 }
 
-const getSharedWorkspaceKnowledgePage: (
+const getKnowledgeListPage: (
   page: pageRequest,
   param: any,
   loading?: Ref<boolean>,
@@ -33,46 +33,31 @@ const getSharedWorkspaceKnowledgePage: (
   )
 }
 
-const getSharedWorkspaceModel: (loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (
-  loading,
-) => {
-  return get(`${prefix}/${prefix_workspace.value}/model`, {}, loading)
-}
-
-const getCESharedWorkspaceModel: (loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (
-  loading,
-) => {
-  return get(`/${prefix_workspace.value}/model`, {}, loading)
-
-}
-
-const getSharedWorkspaceModelPage: (
+const getModel: (
   param: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<Array<any>>> = (param: any, loading) => {
-  console.log(`${prefix}/${prefix_workspace.value}/model`)
   return get(`${prefix}/${prefix_workspace.value}/model`, param, loading)
 }
 
-const getSharedWorkspaceTool: (loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (
+const getToolList: (loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (
   loading,
 ) => {
   return get(`${prefix}/${prefix_workspace.value}/tool`, {}, loading)
 }
 
-const getSharedWorkspaceToolPage: (
-  param: any,
+const getToolListPage: (
+  page: pageRequest,
+  param?: any,
   loading?: Ref<boolean>,
-) => Promise<Result<Array<any>>> = (param: any, loading) => {
-  return get(`${prefix}/${prefix_workspace.value}/tool`, param, loading)
+) => Promise<Result<any>> = (page, param, loading) => {
+  return get(`${prefix}/${prefix_workspace.value}/tool/${page.current_page}/${page.page_size}`, param, loading)
 }
 
 export default {
-  getSharedWorkspaceKnowledge,
-  getSharedWorkspaceKnowledgePage,
-  getSharedWorkspaceModel,
-  getSharedWorkspaceModelPage,
-  getSharedWorkspaceTool,
-  getSharedWorkspaceToolPage,
-  getCESharedWorkspaceModel
+  getKnowledgeList,
+  getKnowledgeListPage,
+  getModel,
+  getToolList,
+  getToolListPage
 }

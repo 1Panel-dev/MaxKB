@@ -8,12 +8,11 @@
         :currentNodeKey="currentFolder?.id"
         @handleNodeClick="folderClickHandel"
         class="p-8"
-        isShared
+        showShared
         @refreshTree="refreshFolder"
       />
     </template>
-    <SharedWorkspace v-if="currentFolder.id === 'share'"></SharedWorkspace>
-    <ContentContainer v-else :header="currentFolder?.name">
+    <ContentContainer :header="currentFolder?.name">
       <template #search>
         <div class="flex">
           <div class="flex-between complex-search">
@@ -45,7 +44,7 @@
               <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.username" />
             </el-select>
           </div>
-          <el-dropdown trigger="click">
+          <el-dropdown trigger="click" v-if="!isShared">
             <el-button
               type="primary"
               class="ml-8"
@@ -193,7 +192,6 @@
                 <CardBox
                   :title="item.name"
                   :description="item.desc"
-                  :isShared="currentFolder.id === 'share'"
                   class="cursor"
                   @click="
                     router.push({ path: `/knowledge/${item.id}/${currentFolder.id}/document` })
@@ -207,7 +205,11 @@
                       {{ $t('common.creator') }}: {{ item.nick_name }}
                     </el-text>
                   </template>
-
+                  <template #tag>
+                    <el-tag v-if="isShared" type="info" class="info-tag">
+                      {{ t('views.system.shared') }}
+                    </el-tag>
+                  </template>
                   <template #footer>
                     <div class="footer-content flex-between">
                       <div>
@@ -227,7 +229,7 @@
                     </div>
                   </template>
                   <template #mouseEnter>
-                    <div @click.stop>
+                    <div @click.stop v-if="!isShared">
                       <el-dropdown trigger="click">
                         <el-button text @click.stop>
                           <el-icon>
@@ -338,7 +340,7 @@
                             <el-dropdown-item
                               icon="Delete"
                               type="danger"
-                              @click.stop="deleteKnowledge(item)" 
+                              @click.stop="deleteKnowledge(item)"
                               v-if="
                                 hasPermission(
                                   [
@@ -367,15 +369,15 @@
       </div>
     </ContentContainer>
 
-    <component :is="currentCreateDialog" ref="CreateKnowledgeDialogRef" />
-    <CreateFolderDialog ref="CreateFolderDialogRef" @refresh="refreshFolder" />
+    <component :is="currentCreateDialog" ref="CreateKnowledgeDialogRef" v-if="!isShared" />
+    <CreateFolderDialog ref="CreateFolderDialogRef" @refresh="refreshFolder" v-if="!isShared" />
     <GenerateRelatedDialog ref="GenerateRelatedDialogRef" />
-    <SyncWebDialog ref="SyncWebDialogRef" />
+    <SyncWebDialog ref="SyncWebDialogRef" v-if="!isShared" />
   </LayoutContainer>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, reactive, shallowRef, nextTick } from 'vue'
+import { onMounted, ref, reactive, shallowRef, nextTick, computed } from 'vue'
 import CreateKnowledgeDialog from './create-component/CreateKnowledgeDialog.vue'
 import CreateWebKnowledgeDialog from './create-component/CreateWebKnowledgeDialog.vue'
 import CreateLarkKnowledgeDialog from './create-component/CreateLarkKnowledgeDialog.vue'
@@ -383,7 +385,6 @@ import SyncWebDialog from './component/SyncWebDialog.vue'
 import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
 import GenerateRelatedDialog from '@/components/generate-related-dialog/index.vue'
 import KnowledgeApi from '@/api/knowledge/knowledge'
-import SharedWorkspace from '@/views/shared/knowledge-shared/SharedWorkspace.vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import useStore from '@/stores'
 import { numberFormat } from '@/utils/common'
@@ -392,6 +393,7 @@ import { useRouter } from 'vue-router'
 import { FolderSource } from '@/enums/common'
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 const router = useRouter()
 const { folder, user } = useStore()
@@ -419,6 +421,9 @@ const currentFolder = ref<any>({})
 const CreateKnowledgeDialogRef = ref()
 const currentCreateDialog = shallowRef<any>(null)
 
+const isShared = computed(() => {
+  return currentFolder.value.id === 'share'
+})
 function openCreateDialog(data: any) {
   currentCreateDialog.value = data
   nextTick(() => {
@@ -463,10 +468,12 @@ function getList() {
     [search_type.value]: search_form.value[search_type.value],
   }
 
-  KnowledgeApi.getKnowledgeListPage(paginationConfig, params, loading).then((res) => {
-    paginationConfig.total = res.data.total
-    knowledgeList.value = [...knowledgeList.value, ...res.data.records]
-  })
+  loadSharedApi('knowledge', isShared.value)
+    .getKnowledgeListPage(paginationConfig, params, loading)
+    .then((res: any) => {
+      paginationConfig.total = res.data.total
+      knowledgeList.value = [...knowledgeList.value, ...res.data.records]
+    })
 }
 
 function clickFolder(item: any) {
@@ -531,11 +538,9 @@ function getFolder(bool?: boolean) {
 function folderClickHandel(row: any) {
   currentFolder.value = row
   knowledgeList.value = []
-  if (currentFolder.value.id === 'share') return
   getList()
 }
 function refreshFolder() {
-  console.log(currentFolder.value)
   knowledgeList.value = []
   getFolder()
 }

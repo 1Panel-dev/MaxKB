@@ -162,7 +162,7 @@ import type { RoleItem } from '@/api/type/role'
 import { RoleTypeEnum } from '@/enums/system'
 import { roleTypeMap } from './index'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
-import { loadPermissionApi } from '@/utils/permission-api'
+import { loadPermissionApi } from '@/utils/dynamics-api/permission-api'
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
 import { ComplexPermission } from '@/utils/permission/type'
 

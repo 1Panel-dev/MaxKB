@@ -4,9 +4,9 @@
       <div class="p-8">
         <div
           @click="handleSharedNodeClick"
-          class="shared-knowledge"
-          v-if="isShared"
-          :class="currentNodeKey === 'share' && 'active'"
+          class="shared-model"
+          v-if="isShared && hasPermission(EditionConst.IS_EE, 'OR')"
+          :class="active?.provider === 'share' && 'active'"
         >
           <AppIcon iconName="app-folder-share-active" style="font-size: 18px"></AppIcon>
           <span class="ml-8 lighter">{{ $t('views.system.share_model') }}</span>
@@ -102,6 +102,9 @@
 import { watch, ref } from 'vue'
 import type { Provider, Model } from '@/api/type/model'
 import { modelTypeList, allObj } from '@/views/model/component/data'
+import { EditionConst } from '@/utils/permission/data'
+import { hasPermission } from '@/utils/permission/index'
+import { t } from '@/locales'
 const props = defineProps<{
   data: Array<Provider>
   loading: boolean
@@ -142,7 +145,7 @@ const clickListHandle = (item: Provider) => {
 }
 
 const handleSharedNodeClick = () => {
-  emit('click', { id: 'share' })
+  emit('click', { provider: 'share', name: t('views.system.share_model') })
 }
 </script>
 <style lang="scss" scoped>
@@ -188,7 +191,7 @@ const handleSharedNodeClick = () => {
       padding-bottom: 0 !important;
     }
   }
-  .shared-knowledge {
+  .shared-model {
     padding-left: 8px;
     display: flex;
     align-items: center;

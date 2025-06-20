@@ -11,8 +11,7 @@
         :active="active_provider"
       />
     </template>
-    <SharedWorkspace v-if="active_provider && active_provider.id === 'share'"></SharedWorkspace>
-    <ContentContainer v-else :header="active_provider?.name" v-loading="list_model_loading">
+    <ContentContainer :header="active_provider?.name" v-loading="list_model_loading">
       <template #search>
         <div class="flex">
           <div class="flex-between complex-search">
@@ -55,13 +54,19 @@
               </template>
             </el-select>
           </div>
-          <el-button class="ml-16" type="primary" @click="openCreateModel(active_provider)"
-            v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-            RoleConst.USER.getWorkspaceRole,
-            PermissionConst.MODEL_CREATE.getWorkspacePermission]"
+          <el-button
+            v-if="!isShared"
+            class="ml-16"
+            type="primary"
+            @click="openCreateModel(active_provider)"
+            v-hasPermission="[
+              RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+              RoleConst.USER.getWorkspaceRole,
+              PermissionConst.MODEL_CREATE.getWorkspacePermission,
+            ]"
           >
             {{ $t('views.model.addModel') }}
-            </el-button>
+          </el-button>
         </div>
       </template>
 
@@ -84,6 +89,7 @@
                   :updateModelById="updateModelById"
                   :model="model"
                   :provider_list="provider_list"
+                  :isShared="isShared"
                 >
                 </ModelCard>
               </el-col>
@@ -98,11 +104,13 @@
       ref="createModelRef"
       @submit="list_model"
       @change="openCreateModel($event)"
+      v-if="!isShared"
     ></CreateModelDialog>
 
     <SelectProviderDialog
       ref="selectProviderRef"
       @change="(provider, modelType) => openCreateModel(provider, modelType)"
+      v-if="!isShared"
     ></SelectProviderDialog>
   </LayoutContainer>
 </template>
@@ -116,13 +124,10 @@ import ProviderComponent from '@/views/model/component/Provider.vue'
 import { splitArray } from '@/utils/common'
 import { modelTypeList, allObj } from '@/views/model/component/data'
 import CreateModelDialog from '@/views/model/component/CreateModelDialog.vue'
-import SharedWorkspace from '@/views/shared/model-shared/SharedWorkspace.vue'
 import SelectProviderDialog from '@/views/model/component/SelectProviderDialog.vue'
-import useStore from '@/stores'
 import { t } from '@/locales'
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
-
-const { model } = useStore()
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 const commonList1 = ref()
 const commonList2 = ref()
@@ -145,6 +150,9 @@ const provider_list = ref<Array<Provider>>([])
 
 const model_list = ref<Array<Model>>([])
 
+const isShared = computed(() => {
+  return active_provider.value && active_provider.value.provider === 'share'
+})
 const updateModelById = (model_id: string, model: Model) => {
   model_list.value
     .filter((m) => m.id == model_id)
@@ -177,8 +185,8 @@ const openCreateModel = (provider?: Provider, model_type?: string) => {
 
 const list_model = () => {
   const params = active_provider.value?.provider ? { provider: active_provider.value.provider } : {}
-  model
-    .asyncGetModel( { ...model_search_form.value, ...params }, list_model_loading)
+  loadSharedApi('model', isShared.value)
+    .getModel({ ...model_search_form.value, ...params }, list_model_loading)
     .then((ok: any) => {
       model_list.value = ok.data
       const v = model_list.value.map((m) => ({ id: m.user_id, username: m.username }))

@@ -9,7 +9,6 @@ import type {
 } from '@/api/type/model'
 import type { FormField } from '@/components/dynamics-form/type'
 
-
 import useStore from '@/stores'
 const prefix: any = { _value: '/workspace/' }
 Object.defineProperty(prefix, 'value', {
@@ -24,7 +23,7 @@ Object.defineProperty(prefix, 'value', {
  * @params 参数 name, model_type, model_name
  */
 const getModel: (
-  request?: ListModelRequest,
+  data?: ListModelRequest,
   loading?: Ref<boolean>,
 ) => Promise<Result<Array<Model>>> = (data, loading) => {
   return get(`${prefix.value}`, data, loading)

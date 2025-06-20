@@ -105,7 +105,7 @@
 import { onMounted, ref, computed } from 'vue'
 import ProviderApi from '@/api/shared/provider'
 import ModelApi from '@/api/shared/model'
-import ModelWorkspaceApi from '@/api/shared/workspace'
+import ModelWorkspaceApi from '@/api/shared-workspace'
 import type { Provider, Model } from '@/api/type/model'
 import ModelCard from '@/views/shared/model-shared/component/ModelCardSharedWorkspace.vue'
 import ProviderComponent from '@/views/shared/model-shared/component/Provider.vue'

@@ -4,10 +4,15 @@
       <h3>
         {{ $t('common.setting') }}
       </h3>
-      <el-button type="primary" @click="submit(applicationFormRef)" :disabled="loading"
-        v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-        RoleConst.USER.getWorkspaceRole,
-        PermissionConst.APPLICATION_OVERVIEW_PUBLIC.getWorkspacePermission]"
+      <el-button
+        type="primary"
+        @click="submit(applicationFormRef)"
+        :disabled="loading"
+        v-hasPermission="[
+          RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+          RoleConst.USER.getWorkspaceRole,
+          PermissionConst.APPLICATION_OVERVIEW_PUBLIC.getWorkspacePermission,
+        ]"
       >
         {{ $t('views.application.buttons.publish') }}
       </el-button>
@@ -635,7 +640,7 @@ function getDetail() {
 }
 
 function getKnowledge() {
-  knowledge.asyncGetFolderKnowledge(knowledgeLoading).then((res: any) => {
+  knowledge.asyncGetFolderKnowledge('', knowledgeLoading).then((res: any) => {
     knowledgeList.value = res.data
   })
 }

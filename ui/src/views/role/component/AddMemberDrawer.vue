@@ -32,7 +32,7 @@ import { t } from '@/locales'
 import type { RoleItem } from '@/api/type/role'
 import { MsgSuccess } from '@/utils/message'
 import { RoleTypeEnum } from '@/enums/system'
-import { loadPermissionApi } from '@/utils/permission-api'
+import { loadPermissionApi } from '@/utils/dynamics-api/permission-api'
 
 const props = defineProps<{
   currentRole?: RoleItem

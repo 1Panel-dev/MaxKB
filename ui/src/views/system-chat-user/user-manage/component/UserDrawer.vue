@@ -52,7 +52,7 @@
 import { ref, reactive, watch } from 'vue'
 import type { FormInstance } from 'element-plus'
 import chatUserApi from '@/api/system/chat-user'
-import userManageApi from '@/api/user/user-manage'
+import userManageApi from '@/api/system/user-manage'
 import { MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
 import type { ListItem } from '@/api/type/common'

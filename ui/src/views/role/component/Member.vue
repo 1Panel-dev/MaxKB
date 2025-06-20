@@ -67,7 +67,7 @@ import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { t } from '@/locales'
 import AddMemberDrawer from './AddMemberDrawer.vue'
 import { RoleTypeEnum } from '@/enums/system'
-import { loadPermissionApi } from '@/utils/permission-api'
+import { loadPermissionApi } from '@/utils/dynamics-api/permission-api'
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
 import { ComplexPermission } from '@/utils/permission/type'
 const props = defineProps<{

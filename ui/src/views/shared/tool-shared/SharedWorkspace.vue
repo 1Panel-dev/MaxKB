@@ -119,7 +119,7 @@
 import { onMounted, ref, reactive, computed } from 'vue'
 import { cloneDeep, get } from 'lodash'
 import ToolApi from '@/api/shared/tool'
-import ToolWorkspaceApi from '@/api/shared/workspace'
+import ToolWorkspaceApi from '@/api/shared-workspace'
 import useStore from '@/stores/modules-shared-system'
 import InitParamDrawer from '@/views/shared/tool-shared/component/InitParamDrawer.vue'
 import ToolFormDrawer from './ToolFormDrawer.vue'

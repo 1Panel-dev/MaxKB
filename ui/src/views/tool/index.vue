@@ -7,16 +7,25 @@
         :data="folderList"
         :currentNodeKey="currentFolder?.id"
         @handleNodeClick="folderClickHandel"
-        @refreshTree ="refreshFolder"
-        :shareTitle="hasPermission(new ComplexPermission(
-          [RoleConst.ADMIN],[PermissionConst.SHARED_TOOL_READ],[EditionConst.IS_EE],'OR'
-        ), 'OR')?'views.system.share_tool':null"
-        isShared
+        @refreshTree="refreshFolder"
+        :shareTitle="
+          hasPermission(
+            new ComplexPermission(
+              [RoleConst.ADMIN],
+              [PermissionConst.SHARED_TOOL_READ],
+              [EditionConst.IS_EE],
+              'OR',
+            ),
+            'OR',
+          )
+            ? 'views.system.share_tool'
+            : null
+        "
+        showShared
         class="p-8"
       />
     </template>
-    <SharedWorkspace v-if="currentFolder.id === 'share'"></SharedWorkspace>
-    <ContentContainer v-else :header="currentFolder?.name">
+    <ContentContainer :header="currentFolder?.name">
       <template #search>
         <div class="flex">
           <div class="flex-between complex-search">
@@ -48,7 +57,7 @@
               <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.username" />
             </el-select>
           </div>
-          <el-dropdown trigger="click">
+          <el-dropdown trigger="click" v-if="!isShared">
             <el-button
               type="primary"
               class="ml-8"
@@ -104,7 +113,9 @@
                       <img src="@/assets/node/icon_tool.svg" style="width: 58%" alt="" />
                     </el-avatar>
                     <div class="pre-wrap ml-8">
-                      <div class="lighter">{{ $t('views.tool.toolStore.createFromToolStore') }}</div>
+                      <div class="lighter">
+                        {{ $t('views.tool.toolStore.createFromToolStore') }}
+                      </div>
                     </div>
                   </div>
                 </el-dropdown-item> -->
@@ -186,6 +197,11 @@
                       {{ $t('common.creator') }}: {{ item.nick_name }}
                     </el-text>
                   </template>
+                  <template #tag>
+                    <el-tag v-if="isShared" type="info" class="info-tag">
+                      {{ t('views.system.shared') }}
+                    </el-tag>
+                  </template>
 
                   <template #footer>
                     <div v-if="item.is_active" class="flex align-center">
@@ -204,7 +220,7 @@
                     </div>
                   </template>
                   <template #mouseEnter>
-                    <div @click.stop>
+                    <div @click.stop v-if="!isShared">
                       <el-switch
                         v-model="item.is_active"
                         :before-change="() => changeState(item)"
@@ -318,7 +334,7 @@
     </ContentContainer>
     <InitParamDrawer ref="InitParamDrawerRef" @refresh="refresh" />
     <ToolFormDrawer ref="ToolFormDrawerRef" @refresh="refresh" :title="ToolDrawertitle" />
-    <CreateFolderDialog ref="CreateFolderDialogRef" @refresh="refreshFolder" />
+    <CreateFolderDialog ref="CreateFolderDialogRef" @refresh="refreshFolder" v-if="!isShared" />
     <ToolStoreDialog ref="toolStoreDialogRef" @refresh="refresh" />
   </LayoutContainer>
 </template>
@@ -334,12 +350,12 @@ import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
 import { t } from '@/locales'
 import { isAppIcon } from '@/utils/common'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
-import SharedWorkspace from '@/views/shared/tool-shared/SharedWorkspace.vue'
 import { EditionConst, PermissionConst, RoleConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
 import { FolderSource } from '@/enums/common'
 import { ComplexPermission } from '@/utils/permission/type'
 import ToolStoreDialog from './component/ToolStoreDialog.vue'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 const { folder, user } = useStore()
 
@@ -365,6 +381,10 @@ const paginationConfig = reactive({
 const folderList = ref<any[]>([])
 const toolList = ref<any[]>([])
 const currentFolder = ref<any>({})
+
+const isShared = computed(() => {
+  return currentFolder.value.id === 'share'
+})
 
 const search_type_change = () => {
   search_form.value = { name: '', create_user: '' }
@@ -392,10 +412,12 @@ function getList() {
     folder_id: currentFolder.value?.id || user.getWorkspaceId(),
     scope: 'WORKSPACE',
   }
-  ToolApi.getToolListPage(paginationConfig, params, loading).then((res) => {
-    paginationConfig.total = res.data?.total
-    toolList.value = [...toolList.value, ...res.data?.records]
-  })
+  loadSharedApi('tool', isShared.value)
+    .getToolListPage(paginationConfig, params, loading)
+    .then((res: any) => {
+      paginationConfig.total = res.data?.total
+      toolList.value = [...toolList.value, ...res.data?.records]
+    })
 }
 
 function clickFolder(item: any) {
@@ -564,7 +586,6 @@ function folderClickHandel(row: any) {
   toolList.value = []
   getList()
 }
-
 
 onMounted(() => {
   getFolder(true)

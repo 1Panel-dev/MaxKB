@@ -44,6 +44,7 @@
           class="p-8"
           v-loading="folderLoading"
           :canOperation="false"
+          showShared
         />
       </template>
       <el-scrollbar>
@@ -51,7 +52,7 @@
           <el-row :gutter="12" v-loading="loading">
             <el-col
               :span="12"
-              v-for="(item, index) in filterData.filter((v:any) => v.resource_type !== 'folder')"
+              v-for="(item, index) in filterData.filter((v: any) => v.resource_type !== 'folder')"
               :key="index"
               class="mb-16"
             >
@@ -104,7 +105,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['addData', 'refresh'])
-const { folder, user,knowledge } = useStore()
+const { folder, user, knowledge } = useStore()
 
 const dialogVisible = ref<boolean>(false)
 const checkList = ref([])
@@ -192,10 +193,8 @@ function getFolder() {
 }
 
 function getList() {
-  const params = {
-    folder_id: currentFolder.value?.id || user.getWorkspaceId(),
-  }
-  knowledge.asyncGetFolderKnowledge(params, loading).then((res) => {
+  const folder_id = currentFolder.value?.id || user.getWorkspaceId()
+  knowledge.asyncGetFolderKnowledge(folder_id, loading).then((res: any) => {
     searchDate.value = res.data
   })
 }

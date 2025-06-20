@@ -2,8 +2,6 @@ import { Result } from '@/request/Result'
 import { get, put, post, del } from '@/request/index'
 import type { pageRequest } from '@/api/type/common'
 import type { Ref } from 'vue'
-
-import useStore from '@/stores'
 const prefix = '/workspace'
 
 /**

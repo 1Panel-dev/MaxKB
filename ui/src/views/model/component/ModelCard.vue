@@ -8,7 +8,7 @@
         {{ model.name }}
         <span v-if="currentModel.status === 'ERROR'">
           <el-tooltip effect="dark" :content="errMessage" placement="top">
-            <el-icon class="danger ml-4" size="18"><Warning/></el-icon>
+            <el-icon class="danger ml-4" size="18"><Warning /></el-icon>
           </el-tooltip>
         </span>
         <span v-if="currentModel.status === 'PAUSE_DOWNLOAD'">
@@ -17,7 +17,7 @@
             :content="`${$t('views.model.modelForm.base_model.label')}: ${props.model.model_name} ${$t('views.model.tip.downloadError')}`"
             placement="top"
           >
-            <el-icon class="danger ml-4" size="18"><Warning/></el-icon>
+            <el-icon class="danger ml-4" size="18"><Warning /></el-icon>
           </el-tooltip>
         </span>
       </div>
@@ -27,20 +27,23 @@
         {{ $t('common.creator') }}: {{ model.username }}
       </el-text>
     </template>
+    <template #tag>
+      <el-tag v-if="isShared" type="info" class="info-tag">
+        {{ t('views.system.shared') }}
+      </el-tag>
+    </template>
     <ul>
       <li class="flex mb-4">
-        <el-text type="info" class="color-secondary">{{
-            $t('views.model.modelForm.model_type.label')
-          }}
+        <el-text type="info" class="color-secondary"
+          >{{ $t('views.model.modelForm.model_type.label') }}
         </el-text>
         <span class="ellipsis ml-16">
           {{ $t(modelType[model.model_type as keyof typeof modelType]) }}</span
         >
       </li>
       <li class="flex">
-        <el-text type="info" class="color-secondary">{{
-            $t('views.model.modelForm.base_model.label')
-          }}
+        <el-text type="info" class="color-secondary"
+          >{{ $t('views.model.modelForm.base_model.label') }}
         </el-text>
         <span class="ellipsis-1 ml-16" style="height: 20px; width: 70%">
           {{ model.model_name }}</span
@@ -59,25 +62,31 @@
           class="ml-16"
           :disabled="!is_permisstion"
           @click.stop="cancelDownload"
-        >{{ $t('views.model.download.cancelDownload') }}
-        </el-button
-        >
+          >{{ $t('views.model.download.cancelDownload') }}
+        </el-button>
       </div>
     </div>
 
     <template #mouseEnter>
-      <el-dropdown trigger="click">
+      <el-dropdown trigger="click" v-if="!isShared">
         <el-button text @click.stop>
           <el-icon>
-            <MoreFilled/>
+            <MoreFilled />
           </el-icon>
         </el-button>
         <template #dropdown>
           <el-dropdown-menu>
             <el-dropdown-item
-              v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-              RoleConst.USER.getWorkspaceRole,
-              PermissionConst.MODEL_EDIT.getWorkspacePermission],'OR')"
+              v-if="
+                hasPermission(
+                  [
+                    RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                    RoleConst.USER.getWorkspaceRole,
+                    PermissionConst.MODEL_EDIT.getWorkspacePermission,
+                  ],
+                  'OR',
+                )
+              "
               icon="EditPen"
               :disabled="!is_permisstion"
               text
@@ -92,9 +101,14 @@
                 currentModel.model_type === 'LLM' ||
                 currentModel.model_type === 'IMAGE' ||
                 currentModel.model_type === 'TTI' ||
-                hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                RoleConst.USER.getWorkspaceRole,
-                PermissionConst.MODEL_EDIT.getWorkspacePermission],'OR')
+                hasPermission(
+                  [
+                    RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                    RoleConst.USER.getWorkspaceRole,
+                    PermissionConst.MODEL_EDIT.getWorkspacePermission,
+                  ],
+                  'OR',
+                )
               "
               :disabled="!is_permisstion"
               icon="Setting"
@@ -108,9 +122,16 @@
               :disabled="!is_permisstion"
               text
               @click.stop="deleteModel"
-              v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-              RoleConst.USER.getWorkspaceRole,
-              PermissionConst.MODEL_DELETE.getWorkspacePermission],'OR')"
+              v-if="
+                hasPermission(
+                  [
+                    RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                    RoleConst.USER.getWorkspaceRole,
+                    PermissionConst.MODEL_DELETE.getWorkspacePermission,
+                  ],
+                  'OR',
+                )
+              "
             >
               {{ $t('common.delete') }}
             </el-dropdown-item>
@@ -119,20 +140,20 @@
       </el-dropdown>
     </template>
     <EditModel ref="editModelRef" @submit="emit('change')"></EditModel>
-    <ParamSettingDialog ref="paramSettingRef" :model="model"/>
+    <ParamSettingDialog ref="paramSettingRef" :model="model" />
   </card-box>
 </template>
 <script setup lang="ts">
-import type {Provider, Model} from '@/api/type/model'
+import type { Provider, Model } from '@/api/type/model'
 import ModelApi from '@/api/model/model'
-import {computed, ref, onMounted, onBeforeUnmount} from 'vue'
+import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import EditModel from '@/views/model/component/EditModel.vue'
 // import DownloadLoading from '@/components/loading/DownloadLoading.vue'
-import {MsgConfirm} from '@/utils/message'
-import {modelType} from '@/enums/model'
+import { MsgConfirm } from '@/utils/message'
+import { modelType } from '@/enums/model'
 import useStore from '@/stores'
 import ParamSettingDialog from './ParamSettingDialog.vue'
-import {t} from '@/locales'
+import { t } from '@/locales'
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission'
 
@@ -140,9 +161,10 @@ const props = defineProps<{
   model: Model
   provider_list: Array<Provider>
   updateModelById: (model_id: string, model: Model) => void
+  isShared?: boolean | undefined
 }>()
 
-const {user} = useStore()
+const { user } = useStore()
 const downModel = ref<Model>()
 
 const is_permisstion = computed(() => {
@@ -182,8 +204,7 @@ const deleteModel = () => {
         emit('change')
       })
     })
-    .catch(() => {
-    })
+    .catch(() => {})
 }
 
 const cancelDownload = () => {

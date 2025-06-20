@@ -135,7 +135,6 @@ const defaultProps = {
 }
 
 const loadTree = (node: any, resolve: any) => {
-  console.log(node)
   if (node.isLeaf) return resolve([])
   const folder_id = node.level === 0 ? '' : node.data.id
   knowledge.asyncGetFolderKnowledge(folder_id, optionLoading).then((res: any) => {
