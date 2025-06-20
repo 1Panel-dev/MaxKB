@@ -28,11 +28,15 @@
                 v-model="item.isActive"
                 @change="changeStatus(item.key, item.isActive)"
                 :disabled="!item.exists"
-                v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.APPLICATION_ACCESS_EDIT.getWorkspacePermission]"
+                v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                RoleConst.USER.getWorkspaceRole,
+                PermissionConst.APPLICATION_ACCESS_EDIT.getWorkspacePermission]"
               />
               <el-divider direction="vertical" />
               <el-button class="mr-4" @click="openDrawer(item.key)"
-                v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.APPLICATION_ACCESS_EDIT.getWorkspacePermission]"
+                v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                RoleConst.USER.getWorkspaceRole,
+                PermissionConst.APPLICATION_ACCESS_EDIT.getWorkspacePermission]"
               >{{
                 $t('views.application.applicationAccess.setting')
               }}</el-button>

@@ -48,7 +48,7 @@ export class Permission {
    */
   getWorkspacePermissionWorkspaceManageRole = () => {
     const { user } = useStore()
-    return `${this.permission}:/WORKSPACE/${user.getWorkspaceId()}:ROLE/$WORKSPACE_MANAGE`
+    return `${this.permission}:/WORKSPACE/${user.getWorkspaceId()}:ROLE/WORKSPACE_MANAGE`
   }
   /**
    * 工作空间资源权限

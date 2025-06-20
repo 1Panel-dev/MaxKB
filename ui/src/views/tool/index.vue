@@ -221,6 +221,7 @@
                                   [
                                     RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
                                     RoleConst.USER.getWorkspaceRole,
+                                    PermissionConst.TOOL_EDIT.getWorkspacePermissionWorkspaceManageRole,
                                     PermissionConst.TOOL_EDIT.getWorkspacePermission,
                                   ],
                                   'OR',
