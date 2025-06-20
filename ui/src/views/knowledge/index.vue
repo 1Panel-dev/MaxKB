@@ -50,7 +50,7 @@
               type="primary"
               class="ml-8"
               v-hasPermission="[
-                RoleConst.ADMIN.getWorkspaceRole,
+                RoleConst.ADMIN,
                 PermissionConst.KNOWLEDGE_CREATE.getWorkspacePermission,
               ]"
             >
