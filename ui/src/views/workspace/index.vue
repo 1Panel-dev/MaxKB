@@ -37,7 +37,7 @@
                               $t('common.rename')
                             }}
                           </el-dropdown-item>
-                          <el-dropdown-item @click.stop="deleteWorkspace(row)" class="border-t p-8">
+                          <el-dropdown-item @click.stop="deleteWorkspace(row)" class="border-t p-8" v-if ="row.id !== 'default'">
                             <AppIcon iconName="app-copy"></AppIcon>
                             {{
                               $t('common.delete')
