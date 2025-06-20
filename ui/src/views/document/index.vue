@@ -15,6 +15,7 @@
                 v-hasPermission="[
                   RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
                   RoleConst.USER.getWorkspaceRole,
+                  PermissionConst.KNOWLEDGE_DOCUMENT_CREATE.getWorkspacePermissionWorkspaceManageRole,
                   PermissionConst.KNOWLEDGE_DOCUMENT_CREATE.getKnowledgeWorkspaceResourcePermission(id),
                 ]"
                 >{{ $t('views.document.uploadDocument') }}
@@ -25,6 +26,7 @@
                 @click="importDoc"
                 v-hasPermission="[
                   RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,RoleConst.USER.getWorkspaceRole,
+                  PermissionConst.KNOWLEDGE_DOCUMENT_CREATE.getWorkspacePermissionWorkspaceManageRole,
                   PermissionConst.KNOWLEDGE_DOCUMENT_CREATE.getKnowledgeWorkspaceResourcePermission(id),
                 ]"
                 >{{ $t('views.document.importDocument') }}
@@ -45,6 +47,7 @@
                 :disabled="multipleSelection.length === 0"
                 v-hasPermission="[
                   RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,RoleConst.USER.getWorkspaceRole,
+                  PermissionConst.KNOWLEDGE_DOCUMENT_VECTOR.getWorkspacePermissionWorkspaceManageRole,
                   PermissionConst.KNOWLEDGE_DOCUMENT_VECTOR.getWorkspacePermission,
                 ]"
                 >{{ $t('views.knowledge.setting.vectorization') }}
@@ -54,6 +57,7 @@
                 :disabled="multipleSelection.length === 0"
                 v-hasPermission="[
                   RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,RoleConst.USER.getWorkspaceRole,
+                  PermissionConst.KNOWLEDGE_DOCUMENT_GENERATE.getWorkspacePermissionWorkspaceManageRole,
                   PermissionConst.KNOWLEDGE_DOCUMENT_GENERATE.getWorkspacePermission,
                 ]"
                 >{{ $t('views.document.generateQuestion.title') }}
@@ -63,6 +67,7 @@
                 :disabled="multipleSelection.length === 0"
                 v-hasPermission="[
                   RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,RoleConst.USER.getWorkspaceRole,
+                  PermissionConst.KNOWLEDGE_DOCUMENT_MIGRATE.getWorkspacePermissionWorkspaceManageRole,
                   PermissionConst.KNOWLEDGE_DOCUMENT_MIGRATE.getWorkspacePermission,
                 ]"
                 >{{ $t('views.document.setting.migration') }}
@@ -80,6 +85,7 @@
                       :disabled="multipleSelection.length === 0"
                       v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
                       RoleConst.USER.getWorkspaceRole,
+                      PermissionConst.KNOWLEDGE_DOCUMENT_EDIT.getWorkspacePermissionWorkspaceManageRole,
                       PermissionConst.KNOWLEDGE_DOCUMENT_EDIT.getWorkspacePermission],'OR')"
                     >
                       {{ $t('common.setting') }}
@@ -127,7 +133,10 @@
             class="mt-16"
             :data="documentData"
             :pagination-config="paginationConfig"
-            :quick-create="knowledgeDetail.type === 0"
+            :quick-create="knowledgeDetail.type === 0&&hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                      RoleConst.USER.getWorkspaceRole,
+                      PermissionConst.KNOWLEDGE_DOCUMENT_CREATE.getWorkspacePermissionWorkspaceManageRole,
+                      PermissionConst.KNOWLEDGE_DOCUMENT_CREATE.getWorkspacePermission],'OR')"
             @sizeChange="handleSizeChange"
             @changePage="getList"
             @cell-mouse-enter="cellMouseEnter"
