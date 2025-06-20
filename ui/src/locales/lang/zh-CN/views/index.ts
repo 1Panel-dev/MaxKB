@@ -17,7 +17,7 @@ import chatLog from './chat-log'
 import chatUser from './chat-user'
 // import notFound from './404'
 
-// import operateLog from './operate-log'
+import operateLog from './operate-log'
 export default {
   login,
   model,
@@ -38,5 +38,5 @@ export default {
   chatUser,
   // notFound,
 
-  // operateLog
+  operateLog
 }

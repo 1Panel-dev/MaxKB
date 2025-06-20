@@ -16,4 +16,5 @@ export default {
   common,
   chat,
   components,
+
 }
