@@ -83,7 +83,7 @@
             >
               {{ $t('common.modify') }}
             </el-dropdown-item>
-            <el-dropdown-item icon="Lock" @click.stop="openAuthorizedWorkspaceDialog(scope.row)">{{
+            <el-dropdown-item icon="Lock" @click.stop="openAuthorizedWorkspaceDialog(model)">{{
               $t('views.system.authorized_workspace')
             }}</el-dropdown-item>
 
