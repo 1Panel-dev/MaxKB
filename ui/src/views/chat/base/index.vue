@@ -43,10 +43,10 @@ import { ref, computed } from 'vue'
 import { isAppIcon } from '@/utils/common'
 import useStore from '@/stores'
 
-const { user } = useStore()
+const { theme } = useStore()
 
 const isDefaultTheme = computed(() => {
-  return user.isDefaultTheme()
+  return theme.isDefaultTheme()
 })
 
 const loading = ref(false)

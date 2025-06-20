@@ -1,6 +1,6 @@
 <template>
   <div class="app-layout">
-    <div class="app-header">
+    <div class="app-header" :class="!isDefaultTheme ? 'custom-header' : ''">
       <SystemHeader v-if="isShared"></SystemHeader>
       <UserHeader v-else />
     </div>
@@ -27,7 +27,10 @@ const route = useRoute()
 const isShared = computed(() => {
   return route.path.endsWith('hared') || route.name.includes('ResourceManagement')
 })
-const { user } = useStore()
+const { theme } = useStore()
+const isDefaultTheme = computed(() => {
+  return theme.isDefaultTheme()
+})
 </script>
 <style lang="scss" scoped>
 @use './index.scss';

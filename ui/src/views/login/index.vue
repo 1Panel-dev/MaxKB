@@ -96,7 +96,7 @@
             <span
               :style="{
                 'font-size': item === 'OAUTH2' ? '8px' : '10px',
-                color: user.themeInfo?.theme,
+                color: theme.themeInfo?.theme,
               }"
               >{{ item }}</span
             >

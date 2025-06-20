@@ -2,7 +2,7 @@
   <login-layout v-if="!loading" v-loading="loading || sendLoading">
     <LoginContainer
       :subTitle="
-        user.themeInfo?.slogan ? user.themeInfo?.slogan : $t('views.system.theme.defaultSlogan')
+        theme.themeInfo?.slogan ? theme.themeInfo?.slogan : $t('views.system.theme.defaultSlogan')
       "
     >
       <h2 class="mb-24">{{ $t('views.login.forgotPassword') }}</h2>
@@ -81,7 +81,7 @@ import { t } from '@/locales'
 import useStore from '@/stores'
 
 const router = useRouter()
-const { user } = useStore()
+const { theme } = useStore()
 
 const CheckEmailForm = ref<CheckCodeRequest>({
   email: '',

@@ -143,12 +143,12 @@ import { WorkFlowInstance } from '@/workflow/common/validate'
 import { hasPermission } from '@/utils/permission'
 import { t } from '@/locales'
 
-const { user, application } = useStore()
+const { theme, application } = useStore()
 const router = useRouter()
 const route = useRoute()
 
 const isDefaultTheme = computed(() => {
-  return user.isDefaultTheme()
+  return theme.isDefaultTheme()
 })
 const {
   params: { id },

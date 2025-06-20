@@ -263,16 +263,16 @@ import { MsgSuccess, MsgError } from '@/utils/message'
 import useStore from '@/stores'
 import { t } from '@/locales'
 
-const { user } = useStore()
+const { theme } = useStore()
 const router = useRouter()
 
 onBeforeRouteLeave((to, from) => {
-  user.setTheme(cloneTheme.value)
+  theme.setTheme(cloneTheme.value)
 })
 
-const themeInfo = computed(() => user.themeInfo)
+const themeInfo = computed(() => theme.themeInfo)
 const isDefaultTheme = computed(() => {
-  return user.isDefaultTheme()
+  return theme.isDefaultTheme()
 })
 
 const themeFormRef = ref<FormInstance>()
@@ -308,23 +308,23 @@ const onChange = (file: any, fileList: UploadFiles, attr: string) => {
   } else {
     themeForm.value[attr] = file.raw
   }
-  user.setTheme(themeForm.value)
+  theme.setTheme(themeForm.value)
 }
 
 function changeThemeHandle(val: string) {
   if (val !== 'custom') {
     themeForm.value.theme = val
-    user.setTheme(themeForm.value)
+    theme.setTheme(themeForm.value)
   }
 }
 
 function customColorHandle(val: string) {
   themeForm.value.theme = val
-  user.setTheme(themeForm.value)
+  theme.setTheme(themeForm.value)
 }
 
 function resetTheme() {
-  user.setTheme(cloneTheme.value)
+  theme.setTheme(cloneTheme.value)
   themeForm.value = cloneDeep(themeInfo.value)
 }
 
@@ -342,7 +342,7 @@ function resetForm(val: string) {
           ...defaultPlatformSetting,
         }
 
-  user.setTheme(themeForm.value)
+  theme.setTheme(themeForm.value)
 }
 
 const updateTheme = async (formEl: FormInstance | undefined, test?: string) => {
@@ -354,7 +354,7 @@ const updateTheme = async (formEl: FormInstance | undefined, test?: string) => {
         fd.append(item, themeForm.value[item])
       })
       ThemeApi.postThemeInfo(fd, loading).then((res) => {
-        user.theme()
+        theme.theme()
         cloneTheme.value = cloneDeep(themeForm.value)
         MsgSuccess(t('views.system.theme.saveSuccess'))
       })

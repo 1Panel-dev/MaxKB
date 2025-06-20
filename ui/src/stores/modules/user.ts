@@ -20,7 +20,6 @@ export interface userStateTypes {
   version?: string
   license_is_valid: boolean
   edition: 'CE' | 'PE' | 'EE'
-  themeInfo: any
   workspace_id: string
   workspace_list: Array<any>
 }
@@ -32,7 +31,6 @@ const useUserStore = defineStore('user', {
     version: '',
     license_is_valid: false,
     edition: 'CE',
-    themeInfo: null,
     workspace_id: '',
     workspace_list: [],
   }),
@@ -42,14 +40,7 @@ const useUserStore = defineStore('user', {
         ? localStorage.getItem('MaxKB-locale') || getBrowserLang()
         : sessionStorage.getItem('language') || getBrowserLang()
     },
-    isDefaultTheme() {
-      return !this.themeInfo?.theme || this.themeInfo?.theme === '#3370FF'
-    },
-    setTheme(data: any) {
-      const { changeTheme } = useElementPlusTheme(this.themeInfo?.theme)
-      changeTheme(data?.['theme'])
-      this.themeInfo = cloneDeep(data)
-    },
+
     setWorkspaceId(workspace_id: string) {
       this.workspace_id = workspace_id
       localStorage.setItem('workspace_id', workspace_id)
@@ -114,16 +105,7 @@ const useUserStore = defineStore('user', {
       const login = useLoginStore()
       login.userAccessToken = token || ''
     },
-    async theme(loading?: Ref<boolean>) {
-      return await ThemeApi.getThemeInfo(loading).then((ok) => {
-        this.setTheme(ok.data)
-        // window.document.title = this.themeInfo['title'] || 'MaxKB'
-        // const link = document.querySelector('link[rel="icon"]') as any
-        // if (link) {
-        //   link['href'] = this.themeInfo['icon'] || '/favicon.ico'
-        // }
-      })
-    },
+
     async profile(loading?: Ref<boolean>) {
       return UserApi.getUserProfile(loading).then((ok) => {
         this.userInfo = ok.data
@@ -151,11 +133,11 @@ const useUserStore = defineStore('user', {
             // this.version = ok.data?.version || '-'
             this.license_is_valid = ok.data.license_is_valid
             this.edition = ok.data.edition
-
+            const theme = useThemeStore()
             if (this.isEE() || this.isPE()) {
-              await this.theme()
+              await theme.theme()
             } else {
-              this.themeInfo = {
+              theme.themeInfo = {
                 ...defaultPlatformSetting,
               }
             }
