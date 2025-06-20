@@ -81,7 +81,7 @@ class UserResourcePermissionSerializer(serializers.Serializer):
             'application_query_set': QuerySet(Application)
             .filter(workspace_id=self.data.get('workspace_id')),
             'workspace_user_resource_permission_query_set': QuerySet(WorkspaceUserResourcePermission).filter(
-                workspace_id=self.data.get('workspace_id'))
+                workspace_id=self.data.get('workspace_id'), user=self.data.get('user_id'))
         }
 
     def list(self, user, with_valid=True):
@@ -129,7 +129,7 @@ class UserResourcePermissionSerializer(serializers.Serializer):
         save_list = []
         user_resource_permission_list = instance.get('user_resource_permission_list')
         workspace_user_resource_permission_exist_list = QuerySet(WorkspaceUserResourcePermission).filter(
-            workspace_id=workspace_id)
+            workspace_id=workspace_id, user_id=user_id)
         for user_resource_permission in user_resource_permission_list:
             exist_list = [user_resource_permission_exist for user_resource_permission_exist in
                           workspace_user_resource_permission_exist_list if
