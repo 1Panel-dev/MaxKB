@@ -32,7 +32,9 @@ class ApplicationStats(APIView):
         responses=ApplicationStatsAPI.get_response(),
         tags=[_('Application')]  # type: ignore
     )
-    @has_permissions(PermissionConstants.APPLICATION_READ.get_workspace_application_permission(),
+    @has_permissions(PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_application_permission(),
+                     PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_permission_workspace_manage_role(),
+                     RoleConstants.USER.get_workspace_role(),
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def get(self, request: Request, workspace_id: str, application_id: str):
         return result.success(

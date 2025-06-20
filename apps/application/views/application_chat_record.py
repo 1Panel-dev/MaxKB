@@ -36,7 +36,9 @@ class ApplicationChatRecord(APIView):
         responses=ApplicationChatRecordQueryAPI.get_response(),
         tags=[_("Application/Conversation Log")]  # type: ignore
     )
-    @has_permissions(PermissionConstants.APPLICATION_CHAT_LOG.get_workspace_application_permission(),
+    @has_permissions(PermissionConstants.APPLICATION_CHAT_LOG_READ.get_workspace_application_permission(),
+                     PermissionConstants.APPLICATION_CHAT_LOG_READ.get_workspace_permission_workspace_manage_role(),
+                     RoleConstants.USER.get_workspace_role(),
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def get(self, request: Request, workspace_id: str, application_id: str, chat_id: str):
         return result.success(ApplicationChatRecordQuerySerializers(
@@ -57,7 +59,9 @@ class ApplicationChatRecord(APIView):
             responses=ApplicationChatRecordQueryAPI.get_response(),
             tags=[_("Application/Conversation Log")]  # type: ignore
         )
-        @has_permissions(PermissionConstants.APPLICATION_CHAT_LOG.get_workspace_application_permission(),
+        @has_permissions(PermissionConstants.APPLICATION_CHAT_LOG_READ.get_workspace_application_permission(),
+                         PermissionConstants.APPLICATION_CHAT_LOG_READ.get_workspace_permission_workspace_manage_role(),
+                         RoleConstants.USER.get_workspace_role(),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str, application_id: str, chat_id: str, current_page: int,
                 page_size: int):
@@ -81,7 +85,9 @@ class ApplicationChatRecordOperateAPI(APIView):
         responses=ApplicationChatRecordQueryAPI.get_response(),
         tags=[_("Application/Conversation Log")]  # type: ignore
     )
-    @has_permissions(PermissionConstants.APPLICATION_CHAT_LOG.get_workspace_application_permission(),
+    @has_permissions(PermissionConstants.APPLICATION_CHAT_LOG_READ.get_workspace_application_permission(),
+                     PermissionConstants.APPLICATION_CHAT_LOG_READ.get_workspace_permission_workspace_manage_role(),
+                     RoleConstants.USER.get_workspace_role(),
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def get(self, request: Request, workspace_id: str, application_id: str, chat_id: str, chat_record_id: str):
         return result.success(ChatRecordOperateSerializer(
@@ -105,7 +111,9 @@ class ApplicationChatRecordAddKnowledge(APIView):
         responses=ApplicationChatRecordAddKnowledgeAPI.get_response(),
         tags=[_("Application/Conversation Log")]  # type: ignore
     )
-    @has_permissions(PermissionConstants.APPLICATION_CHAT_LOG.get_workspace_application_permission(),
+    @has_permissions(PermissionConstants.APPLICATION_CHAT_LOG_ADD_KNOWLEDGE.get_workspace_application_permission(),
+                     PermissionConstants.APPLICATION_CHAT_LOG_ADD_KNOWLEDGE.get_workspace_permission_workspace_manage_role(),
+                     RoleConstants.USER.get_workspace_role(),
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def post(self, request: Request, workspace_id: str, application_id: str):
         return result.success(ApplicationChatRecordAddKnowledgeSerializer().post_improve(request.data))
@@ -124,7 +132,9 @@ class ApplicationChatRecordImprove(APIView):
         responses=ApplicationChatRecordQueryAPI.get_response(),
         tags=[_("Application/Conversation Log")]  # type: ignore
     )
-    @has_permissions(PermissionConstants.APPLICATION_CHAT_LOG.get_workspace_application_permission(),
+    @has_permissions(PermissionConstants.APPLICATION_CHAT_LOG_ANNOTATION.get_workspace_application_permission(),
+                     PermissionConstants.APPLICATION_CHAT_LOG_ANNOTATION.get_workspace_permission_workspace_manage_role(),
+                     RoleConstants.USER.get_workspace_role(),
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def get(self, request: Request, workspace_id: str, application_id: str, chat_id: str, chat_record_id: str):
         return result.success(ChatRecordImproveSerializer(
@@ -145,6 +155,8 @@ class ApplicationChatRecordImproveParagraph(APIView):
         tags=[_("Application/Conversation Log")]  # type: ignore
     )
     @has_permissions(PermissionConstants.APPLICATION_CHAT_LOG_ANNOTATION.get_workspace_application_permission(),
+                     PermissionConstants.APPLICATION_CHAT_LOG_ANNOTATION.get_workspace_permission_workspace_manage_role(),
+                     RoleConstants.USER.get_workspace_role(),
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def put(self, request: Request,
             workspace_id: str,
@@ -171,6 +183,8 @@ class ApplicationChatRecordImproveParagraph(APIView):
             tags=[_("Application/Conversation Log")]  # type: ignore
         )
         @has_permissions(PermissionConstants.APPLICATION_CHAT_LOG_ANNOTATION.get_workspace_application_permission(),
+                         PermissionConstants.APPLICATION_CHAT_LOG_ANNOTATION.get_workspace_permission_workspace_manage_role(),
+                         RoleConstants.USER.get_workspace_role(),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def delete(self, request: Request, workspace_id: str, application_id: str, chat_id: str, chat_record_id: str,
                    knowledge_id: str,

@@ -46,7 +46,8 @@ class ApplicationAPI(APIView):
         responses=ApplicationCreateAPI.get_response(),
         tags=[_('Application')]  # type: ignore
     )
-    @has_permissions(PermissionConstants.APPLICATION_READ.get_workspace_permission(),
+    @has_permissions(PermissionConstants.APPLICATION_CREATE.get_workspace_permission(),
+                     RoleConstants.USER.get_workspace_role(),
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     @log(menu='Application', operate='Create an application',
          get_operation_object=lambda r, k: {'name': r.data.get('name')},
@@ -65,6 +66,7 @@ class ApplicationAPI(APIView):
         tags=[_('Application')]  # type: ignore
     )
     @has_permissions(PermissionConstants.APPLICATION_READ.get_workspace_permission(),
+                     RoleConstants.USER.get_workspace_role(),
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def get(self, request: Request, workspace_id: str):
         return result.success(Query(data={'workspace_id': workspace_id, 'user_id': request.user.id}).list(request.data))
@@ -82,6 +84,7 @@ class ApplicationAPI(APIView):
             tags=[_('Application')]  # type: ignore
         )
         @has_permissions(PermissionConstants.APPLICATION_READ.get_workspace_permission(),
+                         RoleConstants.USER.get_workspace_role(),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str, current_page: int, page_size: int):
             return result.success(
@@ -102,7 +105,9 @@ class ApplicationAPI(APIView):
             responses=result.DefaultResultSerializer,
             tags=[_('Application')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.APPLICATION_READ, RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
+        @has_permissions(PermissionConstants.APPLICATION_IMPORT.get_workspace_permission(),
+                         RoleConstants.USER.get_workspace_role(),
+                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         @log(menu='Application', operate="Import Application", )
         def post(self, request: Request, workspace_id: str):
             return result.success(ApplicationSerializer(
@@ -123,6 +128,8 @@ class ApplicationAPI(APIView):
             tags=[_('Application')]  # type: ignore
         )
         @has_permissions(PermissionConstants.APPLICATION_EXPORT.get_workspace_application_permission(),
+                         PermissionConstants.APPLICATION_EXPORT.get_workspace_permission_workspace_manage_role(),
+                         RoleConstants.USER.get_workspace_role(),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         @log(menu='Application', operate="Export Application",
              get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')),
@@ -146,6 +153,8 @@ class ApplicationAPI(APIView):
             tags=[_('Application')]  # type: ignore
         )
         @has_permissions(PermissionConstants.APPLICATION_DELETE.get_workspace_application_permission(),
+                         PermissionConstants.APPLICATION_DELETE.get_workspace_permission_workspace_manage_role(),
+                         RoleConstants.USER.get_workspace_role(),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         @log(menu='Application', operate='Deleting application',
              get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')),
@@ -168,6 +177,8 @@ class ApplicationAPI(APIView):
             tags=[_('Application')]  # type: ignore
         )
         @has_permissions(PermissionConstants.APPLICATION_EDIT.get_workspace_application_permission(),
+                         PermissionConstants.APPLICATION_EDIT.get_workspace_permission_workspace_manage_role(),
+                         RoleConstants.USER.get_workspace_role(),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         @log(menu='Application', operate="Modify the application",
              get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')),
@@ -189,8 +200,10 @@ class ApplicationAPI(APIView):
             responses=result.DefaultResultSerializer,
             tags=[_('Application')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.WORKSPACE_READ.get_workspace_application_permission(),
-                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.ADMIN)
+        @has_permissions(PermissionConstants.APPLICATION_READ.get_workspace_application_permission(),
+                         PermissionConstants.APPLICATION_READ.get_workspace_permission_workspace_manage_role(),
+                         RoleConstants.USER.get_workspace_role(),
+                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str, application_id: str):
             return result.success(ApplicationOperateSerializer(
                 data={'application_id': application_id, 'user_id': request.user.id,
@@ -209,10 +222,12 @@ class ApplicationAPI(APIView):
             responses=result.DefaultResultSerializer,
             tags=[_('Application')]  # type: ignore
         )
+        @has_permissions(PermissionConstants.APPLICATION_EDIT.get_workspace_application_permission(),
+                         PermissionConstants.APPLICATION_EDIT.get_workspace_permission_workspace_manage_role(),
+                         RoleConstants.USER.get_workspace_role(),
+                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         @log(menu='Application', operate='Publishing an application',
-             get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')),
-
-             )
+             get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')))
         def put(self, request: Request, workspace_id: str, application_id: str):
             return result.success(
                 ApplicationOperateSerializer(

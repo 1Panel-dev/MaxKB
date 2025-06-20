@@ -35,6 +35,8 @@ class ApplicationVersionView(APIView):
         tags=[_('Application/Version')]  # type: ignore
     )
     @has_permissions(PermissionConstants.APPLICATION_READ.get_workspace_application_permission(),
+                     PermissionConstants.APPLICATION_READ.get_workspace_permission_workspace_manage_role(),
+                     RoleConstants.USER.get_workspace_role(),
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def get(self, request: Request, workspace_id, application_id: str):
         return result.success(
@@ -55,6 +57,8 @@ class ApplicationVersionView(APIView):
             tags=[_('Application/Version')]  # type: ignore
         )
         @has_permissions(PermissionConstants.APPLICATION_READ.get_workspace_application_permission(),
+                         PermissionConstants.APPLICATION_READ.get_workspace_permission_workspace_manage_role(),
+                         RoleConstants.USER.get_workspace_role(),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str, application_id: str, current_page: int, page_size: int):
             return result.success(
@@ -76,6 +80,8 @@ class ApplicationVersionView(APIView):
             tags=[_('Application/Version')]  # type: ignore
         )
         @has_permissions(PermissionConstants.APPLICATION_EDIT.get_workspace_application_permission(),
+                         PermissionConstants.APPLICATION_EDIT.get_workspace_permission_workspace_manage_role(),
+                         RoleConstants.USER.get_workspace_role(),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str, application_id: str, work_flow_version_id: str):
             return result.success(
@@ -94,6 +100,8 @@ class ApplicationVersionView(APIView):
             tags=[_('Application/Version')]  # type: ignore
         )
         @has_permissions(PermissionConstants.APPLICATION_EDIT.get_workspace_application_permission(),
+                         PermissionConstants.APPLICATION_EDIT.get_workspace_permission_workspace_manage_role(),
+                         RoleConstants.USER.get_workspace_role(),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         @log(menu='Application', operate="Modify application version information",
              get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')),

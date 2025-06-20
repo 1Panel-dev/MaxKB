@@ -18,8 +18,16 @@ class Group(Enum):
     权限组 一个组一般对应前端一个菜单
     """
     USER = "USER_MANAGEMENT"
-
+    # 应用
     APPLICATION = "APPLICATION"
+    # 应用概览
+    APPLICATION_OVERVIEW = "APPLICATION_OVERVIEW"
+    # 应用接入
+    APPLICATION_ACCESS = "APPLICATION_ACCESS"
+    # 应用 对话用户
+    APPLICATION_CHAT_USER = "APPLICATION_CHAT_USER"
+    # 应用对话日志
+    APPLICATION_CHAT_LOG = "APPLICATION_CHAT_LOG"
 
     KNOWLEDGE = "KNOWLEDGE"
     SYSTEM_KNOWLEDGE = "SYSTEM_KNOWLEDGE"
@@ -60,8 +68,6 @@ class Group(Enum):
     CHAT_USER_AUTH = "CHAT_USER_AUTH"
     OTHER = "OTHER"
     OVERVIEW = "OVERVIEW"
-    APPLICATION_ACCESS = "APPLICATION_ACCESS"
-    APPLICATION_CHAT_LOG = "APPLICATION_CHAT_LOG"
     OPERATION_LOG = "OPERATION_LOG"
 
 
@@ -128,6 +134,19 @@ class Operate(Enum):
     USER_GROUP = "READ+USER_GROUP"  # 用户组
     ANNOTATION = "READ+ANNOTATION"  # 标注
     CLEAR_POLICY = "READ+CLEAR_POLICY"
+    EMBED = "READ+EMBED"  # 嵌入
+    ACCESS = "READ+ACCESS"  # 访问限制
+    DISPLAY = "READ+DISPLAY"  # 显示设置
+    API_KET = "READ+API_KEY"  # API_KEY
+    PUBLIC_ACCESS = "READ+PUBLIC_ACCESS"  # 公共访问链接
+    Q_WEIXIN = "READ+Q_WEIXIN"  # 企业微信
+    FEISHU = "READ+FEISHU"  # 飞书
+    DD = "READ+DD"  # 钉钉
+    WEIXIN_PUBLIC_ACCOUNT = "READ+WEIXIN_PUBLIC_ACCOUNT"  # 微信公众号
+    SLACK = "READ+SLACK"  # SLACK
+    ADD_KNOWLEDGE = "READ+ADD_KNOWLEDGE"  # 添加到知识库
+    TO_CHAT = "READ+TO_CHAT"  # 去对话
+    SETTING = "READ+SETTING"  # 管理
 
 
 class RoleGroup(Enum):
@@ -247,6 +266,22 @@ Permission_Label = {
     Operate.RELATE.value: _("Relate"),
     Operate.ANNOTATION.value: _("Annotation"),
     Operate.CLEAR_POLICY.value: _("Clear Policy"),
+
+    Operate.EMBED: _('Embed third party'),
+    Operate.ACCESS: _('Access restrictions'),
+    Operate.DISPLAY: _('Display Settings'),
+    Operate.API_KET: _('API_KET'),
+    Operate.PUBLIC_ACCESS: _('Public access link'),
+    Operate.Q_WEIXIN: _('Enterprise WeiXin'),
+    Operate.FEISHU: _('Feishu'),
+    Operate.DD: _('Dingding'),
+    Operate.WEIXIN_PUBLIC_ACCOUNT: _('Weixin Public Account'),
+    Operate.ADD_KNOWLEDGE: _('Add to Knowledge Base'),
+    Group.APPLICATION_OVERVIEW: _('Overview'),
+    Group.APPLICATION_ACCESS: _('Application Access'),
+    Group.APPLICATION_CHAT_USER: _('Dialogue users'),
+    Group.APPLICATION_CHAT_LOG: _('Conversation log'),
+
     Group.LOGIN_AUTH.value: _("Login Auth"),
     Group.DISPLAY_SETTINGS.value: _("Display Settings"),
     Group.SYSTEM_API_KEY.value: _("System API Key"),
@@ -616,11 +651,39 @@ class PermissionConstants(Enum):
                                   parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
                                   resource_permission_group_list=[ResourcePermissionGroup.VIEW],
                                   )
+    APPLICATION_TO_CHAT = Permission(group=Group.APPLICATION, operate=Operate.TO_CHAT,
+                                     role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                     parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
+                                     resource_permission_group_list=[ResourcePermissionGroup.VIEW],
+                                     )
+    APPLICATION_DEBUG = Permission(group=Group.APPLICATION, operate=Operate.DEBUG,
+                                   role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                   parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
+                                   resource_permission_group_list=[ResourcePermissionGroup.VIEW],
+                                   )
+
+    APPLICATION_SETTING = Permission(group=Group.APPLICATION, operate=Operate.SETTING,
+                                     role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                     parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
+                                     resource_permission_group_list=[ResourcePermissionGroup.VIEW],
+                                     )
+
+    APPLICATION_CREATE = Permission(group=Group.APPLICATION, operate=Operate.CREATE,
+                                    role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                    parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
+                                    resource_permission_group_list=[ResourcePermissionGroup.VIEW],
+                                    )
+    APPLICATION_IMPORT = Permission(group=Group.APPLICATION, operate=Operate.IMPORT,
+                                    role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                    parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
+                                    resource_permission_group_list=[ResourcePermissionGroup.MANAGE]
+                                    )
     APPLICATION_EXPORT = Permission(group=Group.APPLICATION, operate=Operate.EXPORT,
                                     role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                     resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
                                     parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
                                     )
+
     APPLICATION_DELETE = Permission(group=Group.APPLICATION, operate=Operate.DELETE,
                                     role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                     parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
@@ -631,75 +694,121 @@ class PermissionConstants(Enum):
                                   parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
                                   resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
                                   )
-    APPLICATION_OVERVIEW_READ = Permission(group=Group.OVERVIEW, operate=Operate.READ,
+
+    APPLICATION_OVERVIEW_READ = Permission(group=Group.APPLICATION_OVERVIEW, operate=Operate.READ,
                                            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                            parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
                                            resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
                                            )
-    APPLICATION_OVERVIEW_EMBEDDED = Permission(group=Group.OVERVIEW, operate=Operate.EDIT,
-                                               role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-                                               parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                               resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
-                                               label=_('Embed third party')
-                                               )
-    APPLICATION_OVERVIEW_ACCESS = Permission(group=Group.OVERVIEW, operate=Operate.CREATE,
+
+    APPLICATION_OVERVIEW_EMBED = Permission(group=Group.APPLICATION_OVERVIEW, operate=Operate.EMBED,
+                                            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                            parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
+                                            resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+
+                                            )
+
+    APPLICATION_OVERVIEW_ACCESS = Permission(group=Group.APPLICATION_OVERVIEW, operate=Operate.ACCESS,
                                              role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                              parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
                                              resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
-                                             label=_('Access restrictions')
+
                                              )
-    APPLICATION_OVERVIEW_DISPLAY = Permission(group=Group.OVERVIEW, operate=Operate.DELETE,
+    APPLICATION_OVERVIEW_DISPLAY = Permission(group=Group.APPLICATION_OVERVIEW, operate=Operate.DISPLAY,
                                               role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                               parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
                                               resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
-                                              label=_('Display settings')
+
                                               )
-    APPLICATION_OVERVIEW_API_KEY = Permission(group=Group.OVERVIEW, operate=Operate.DEBUG,
+    APPLICATION_OVERVIEW_API_KEY = Permission(group=Group.APPLICATION_OVERVIEW, operate=Operate.API_KET,
                                               role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                               parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
                                               resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
-                                              label=_('API Key')
+
                                               )
-    APPLICATION_OVERVIEW_PUBLIC = Permission(group=Group.OVERVIEW, operate=Operate.ADD_MEMBER,
+    APPLICATION_OVERVIEW_PUBLIC = Permission(group=Group.APPLICATION_OVERVIEW, operate=Operate.PUBLIC_ACCESS,
                                              role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                              parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
                                              resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
-                                             label=_('Public settings')
+
                                              )
-    APPLICATION_CHAT_LOG = Permission(group=Group.APPLICATION_CHAT_LOG, operate=Operate.READ,
-                                      role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-                                      parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                      resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
-                                      label=_('Dialogue log'))
+    # 应用接入
+    APPLICATION_ACCESS_READ = Permission(group=Group.APPLICATION_ACCESS, operate=Operate.READ,
+                                         role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                         parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
+                                         resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+
+                                         )
+    APPLICATION_ACCESS_Q_WEIXIN = Permission(group=Group.APPLICATION_ACCESS, operate=Operate.Q_WEIXIN,
+                                             role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                             parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
+                                             resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+                                             )
+
+    APPLICATION_ACCESS_FEISHU = Permission(group=Group.APPLICATION_ACCESS, operate=Operate.FEISHU,
+                                           role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                           parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
+                                           resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+                                           )
+    APPLICATION_ACCESS_DD = Permission(group=Group.APPLICATION_ACCESS, operate=Operate.DD,
+                                       role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                       parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
+                                       resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+                                       )
+    APPLICATION_ACCESS_WEIXIN_PUBLIC_ACCOUNT = Permission(group=Group.APPLICATION_ACCESS,
+                                                          operate=Operate.WEIXIN_PUBLIC_ACCOUNT,
+                                                          role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                                          parent_group=[WorkspaceGroup.APPLICATION,
+                                                                        UserGroup.APPLICATION],
+                                                          resource_permission_group_list=[
+                                                              ResourcePermissionGroup.MANAGE],
+                                                          )
+    APPLICATION_ACCESS_SLACK = Permission(group=Group.APPLICATION_ACCESS, operate=Operate.SLACK,
+                                          role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                          parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
+                                          resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+                                          )
+
+    APPLICATION_CHAT_USER_READ = Permission(group=Group.CHAT_USER, operate=Operate.READ,
+                                            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                            parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
+                                            resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+                                            )
+    APPLICATION_CHAT_USER_EDIT = Permission(group=Group.CHAT_USER, operate=Operate.EDIT,
+                                            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                            parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
+                                            resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+                                            )
+
+    APPLICATION_CHAT_LOG_READ = Permission(group=Group.APPLICATION_CHAT_LOG, operate=Operate.READ,
+                                           role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                           parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
+                                           resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+                                           )
 
     APPLICATION_CHAT_LOG_ANNOTATION = Permission(group=Group.APPLICATION_CHAT_LOG, operate=Operate.ANNOTATION,
                                                  role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                                  parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
                                                  resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
-                                                 label=_('Dialogue log'))
+                                                 )
 
     APPLICATION_CHAT_LOG_EXPORT = Permission(group=Group.APPLICATION_CHAT_LOG, operate=Operate.EXPORT,
                                              role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                              parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
                                              resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
-                                             label=_('Dialogue log'))
+                                             )
 
     APPLICATION_CHAT_LOG_CLEAR_POLICY = Permission(group=Group.APPLICATION_CHAT_LOG, operate=Operate.CLEAR_POLICY,
                                                    role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                                    parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
                                                    resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
-                                                   label=_('Dialogue log'))
+                                                   )
+    APPLICATION_CHAT_LOG_ADD_KNOWLEDGE = Permission(group=Group.APPLICATION_CHAT_LOG, operate=Operate.ADD_KNOWLEDGE,
+                                                    role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                                    parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
+                                                    resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+                                                    )
 
-    APPLICATION_ACCESS_READ = Permission(group=Group.APPLICATION_ACCESS, operate=Operate.READ,
-                                         role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-                                         parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                         resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
-                                         )
-    APPLICATION_ACCESS_EDIT = Permission(group=Group.APPLICATION_ACCESS, operate=Operate.EDIT,
-                                         role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-                                         parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                         resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
-                                         )
     ABOUT_READ = Permission(group=Group.OTHER, operate=Operate.READ,
                             role_list=[RoleConstants.ADMIN],
                             parent_group=[SystemGroup.OTHER],
