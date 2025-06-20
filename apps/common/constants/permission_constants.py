@@ -654,24 +654,24 @@ class PermissionConstants(Enum):
     APPLICATION_TO_CHAT = Permission(group=Group.APPLICATION, operate=Operate.TO_CHAT,
                                      role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                      parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                     resource_permission_group_list=[ResourcePermissionGroup.VIEW],
+                                     resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
                                      )
     APPLICATION_DEBUG = Permission(group=Group.APPLICATION, operate=Operate.DEBUG,
                                    role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                    parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                   resource_permission_group_list=[ResourcePermissionGroup.VIEW],
+                                   resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
                                    )
 
     APPLICATION_SETTING = Permission(group=Group.APPLICATION, operate=Operate.SETTING,
                                      role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                      parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                     resource_permission_group_list=[ResourcePermissionGroup.VIEW],
+                                     resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
                                      )
 
     APPLICATION_CREATE = Permission(group=Group.APPLICATION, operate=Operate.CREATE,
                                     role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                     parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                    resource_permission_group_list=[ResourcePermissionGroup.VIEW],
+                                    resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
                                     )
     APPLICATION_IMPORT = Permission(group=Group.APPLICATION, operate=Operate.IMPORT,
                                     role_list=[RoleConstants.ADMIN, RoleConstants.USER],
@@ -698,7 +698,7 @@ class PermissionConstants(Enum):
     APPLICATION_OVERVIEW_READ = Permission(group=Group.APPLICATION_OVERVIEW, operate=Operate.READ,
                                            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                            parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                           resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+                                           resource_permission_group_list=[ResourcePermissionGroup.VIEW],
                                            )
 
     APPLICATION_OVERVIEW_EMBED = Permission(group=Group.APPLICATION_OVERVIEW, operate=Operate.EMBED,
@@ -736,38 +736,13 @@ class PermissionConstants(Enum):
     APPLICATION_ACCESS_READ = Permission(group=Group.APPLICATION_ACCESS, operate=Operate.READ,
                                          role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                          parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                         resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+                                         resource_permission_group_list=[ResourcePermissionGroup.VIEW],
 
                                          )
-    APPLICATION_ACCESS_Q_WEIXIN = Permission(group=Group.APPLICATION_ACCESS, operate=Operate.Q_WEIXIN,
-                                             role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-                                             parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                             resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
-                                             )
-
-    APPLICATION_ACCESS_FEISHU = Permission(group=Group.APPLICATION_ACCESS, operate=Operate.FEISHU,
-                                           role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-                                           parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                           resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
-                                           )
-    APPLICATION_ACCESS_DD = Permission(group=Group.APPLICATION_ACCESS, operate=Operate.DD,
-                                       role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-                                       parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                       resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
-                                       )
-    APPLICATION_ACCESS_WEIXIN_PUBLIC_ACCOUNT = Permission(group=Group.APPLICATION_ACCESS,
-                                                          operate=Operate.WEIXIN_PUBLIC_ACCOUNT,
-                                                          role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-                                                          parent_group=[WorkspaceGroup.APPLICATION,
-                                                                        UserGroup.APPLICATION],
-                                                          resource_permission_group_list=[
-                                                              ResourcePermissionGroup.MANAGE],
-                                                          )
-    APPLICATION_ACCESS_SLACK = Permission(group=Group.APPLICATION_ACCESS, operate=Operate.SLACK,
-                                          role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-                                          parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                          resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
-                                          )
+    APPLICATION_ACCESS_EDIT = Permission(group=Group.APPLICATION_ACCESS, operate=Operate.EDIT,
+                                         role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                         parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
+                                         resource_permission_group_list=[ResourcePermissionGroup.MANAGE])
 
     APPLICATION_CHAT_USER_READ = Permission(group=Group.CHAT_USER, operate=Operate.READ,
                                             role_list=[RoleConstants.ADMIN, RoleConstants.USER],
