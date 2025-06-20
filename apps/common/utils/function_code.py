@@ -51,7 +51,7 @@ try:
     import os
     env = dict(os.environ)
     for key in list(env.keys()):
-        if key in os.environ and (key.startswith('MAXKB') or key.startswith('POSTGRES') or key.startswith('PG')):
+        if key in os.environ and (key.startswith('MAXKB') or key.startswith('POSTGRES') or key.startswith('PG') or key.startswith('REDIS')):
             del os.environ[key]
     locals_v={'{}'}
     keywords={keywords}
