@@ -52,7 +52,11 @@
         <div class="permission-setting p-16 flex" v-loading="rLoading">
           <div class="resource-authorization__table">
             <h4 class="mb-4">{{ $t('views.resourceAuthorization.permissionSetting') }}</h4>
-            <el-tabs v-model="activeName" class="resource-authorization__tabs">
+            <el-tabs
+              v-model="activeName"
+              @tab-change="handleTabChange"
+              class="resource-authorization__tabs"
+            >
               <el-tab-pane
                 v-for="(item, index) in settingTags"
                 :key="item.value"
@@ -263,10 +267,14 @@ const dfsFolder = (arr: any[] = [], folderIdMap: any) => {
   })
 }
 
+const handleTabChange = () => {
+  getWholeTree(currentUser.value)
+}
+
 function getFolder() {
   return AuthorizationApi.getSystemFolder(
     currentWorkspaceId.value || 'default',
-    'KNOWLEDGE',
+    activeName.value,
     {},
     loading,
   )
