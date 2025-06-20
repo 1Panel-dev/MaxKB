@@ -39,12 +39,12 @@ class FolderView(APIView):
     @has_permissions(
         lambda r, kwargs: Permission(group=Group(kwargs.get('source')), operate=Operate.CREATE,
                                      resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}"),
-        RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
     )
     @log(
         menu='folder', operate='Create folder',
         get_operation_object=lambda r, k: {'name': r.data.get('name')},
-        
+
     )
     def post(self, request: Request, workspace_id: str, source: str):
         return result.success(FolderSerializer.Create(
@@ -65,7 +65,7 @@ class FolderView(APIView):
     @has_permissions(
         lambda r, kwargs: Permission(group=Group(kwargs.get('source')), operate=Operate.READ,
                                      resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}"),
-        RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
     )
     def get(self, request: Request, workspace_id: str, source: str):
         return result.success(FolderTreeSerializer(
@@ -88,12 +88,11 @@ class FolderView(APIView):
         @has_permissions(
             lambda r, kwargs: Permission(group=Group(kwargs.get('source')), operate=Operate.EDIT,
                                          resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}"),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
         )
         @log(
             menu='folder', operate='Edit folder',
             get_operation_object=lambda r, k: get_folder_operation_object(k.get('folder_id'), k.get('source')),
-            
         )
         def put(self, request: Request, workspace_id: str, source: str, folder_id: str):
             return result.success(FolderSerializer.Operate(
@@ -112,7 +111,7 @@ class FolderView(APIView):
         @has_permissions(
             lambda r, kwargs: Permission(group=Group(kwargs.get('source')), operate=Operate.READ,
                                          resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}"),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
         )
         def get(self, request: Request, workspace_id: str, source: str, folder_id: str):
             return result.success(FolderSerializer.Operate(
@@ -131,12 +130,11 @@ class FolderView(APIView):
         @has_permissions(
             lambda r, kwargs: Permission(group=Group(kwargs.get('source')), operate=Operate.DELETE,
                                          resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}"),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
         )
         @log(
             menu='folder', operate='Delete folder',
             get_operation_object=lambda r, k: get_folder_operation_object(k.get('folder_id'), k.get('source')),
-            
         )
         def delete(self, request: Request, workspace_id: str, source: str, folder_id: str):
             return result.success(FolderSerializer.Operate(

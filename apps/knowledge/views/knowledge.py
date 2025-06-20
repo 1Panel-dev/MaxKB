@@ -31,7 +31,7 @@ class KnowledgeView(APIView):
     )
     @has_permissions(
         PermissionConstants.KNOWLEDGE_READ.get_workspace_permission(),
-        RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
     )
     def get(self, request: Request, workspace_id: str):
         return result.success(KnowledgeSerializer.Query(
@@ -60,12 +60,12 @@ class KnowledgeView(APIView):
         )
         @has_permissions(
             PermissionConstants.KNOWLEDGE_EDIT.get_workspace_knowledge_permission(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
         )
         @log(
             menu='Knowledge Base', operate="Modify knowledge base information",
             get_operation_object=lambda r, keywords: get_knowledge_operation_object(keywords.get('knowledge_id')),
-            
+
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(KnowledgeSerializer.Operate(
@@ -84,12 +84,12 @@ class KnowledgeView(APIView):
         )
         @has_permissions(
             PermissionConstants.KNOWLEDGE_DELETE.get_workspace_knowledge_permission(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
         )
         @log(
             menu='Knowledge Base', operate="Delete knowledge base",
             get_operation_object=lambda r, keywords: get_knowledge_operation_object(keywords.get('knowledge_id')),
-            
+
         )
         def delete(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(KnowledgeSerializer.Operate(
@@ -107,7 +107,7 @@ class KnowledgeView(APIView):
         )
         @has_permissions(
             PermissionConstants.KNOWLEDGE_READ.get_workspace_knowledge_permission(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
         )
         def get(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(KnowledgeSerializer.Operate(
@@ -128,7 +128,7 @@ class KnowledgeView(APIView):
         )
         @has_permissions(
             PermissionConstants.KNOWLEDGE_READ.get_workspace_permission(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
         )
         def get(self, request: Request, workspace_id: str, current_page: int, page_size: int):
             return result.success(KnowledgeSerializer.Query(
@@ -157,12 +157,12 @@ class KnowledgeView(APIView):
         )
         @has_permissions(
             PermissionConstants.KNOWLEDGE_SYNC.get_workspace_knowledge_permission(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
         )
         @log(
             menu='Knowledge Base', operate="Synchronize the knowledge base of the website",
             get_operation_object=lambda r, keywords: get_knowledge_operation_object(keywords.get('knowledge_id')),
-            
+
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(KnowledgeSerializer.SyncWeb(
@@ -189,7 +189,7 @@ class KnowledgeView(APIView):
         )
         @has_permissions(
             PermissionConstants.KNOWLEDGE_EDIT.get_workspace_knowledge_permission(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(KnowledgeSerializer.HitTest(
@@ -219,12 +219,12 @@ class KnowledgeView(APIView):
         )
         @has_permissions(
             PermissionConstants.KNOWLEDGE_VECTOR.get_workspace_knowledge_permission(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
         )
         @log(
             menu='Knowledge Base', operate='Re-vectorize',
             get_operation_object=lambda r, k: get_knowledge_operation_object(k.get('knowledge_id')),
-            
+
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(KnowledgeSerializer.Operate(
@@ -243,12 +243,12 @@ class KnowledgeView(APIView):
         )
         @has_permissions(
             PermissionConstants.KNOWLEDGE_EXPORT.get_workspace_knowledge_permission(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
         )
         @log(
             menu='Knowledge Base', operate="Export knowledge base",
             get_operation_object=lambda r, keywords: get_knowledge_operation_object(keywords.get('knowledge_id')),
-            
+
         )
         def get(self, request: Request, workspace_id: str, knowledge_id: str):
             return KnowledgeSerializer.Operate(data={
@@ -267,12 +267,12 @@ class KnowledgeView(APIView):
         )
         @has_permissions(
             PermissionConstants.KNOWLEDGE_EXPORT.get_workspace_knowledge_permission(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
         )
         @log(
             menu='Knowledge Base', operate="Export knowledge base containing images",
             get_operation_object=lambda r, keywords: get_knowledge_operation_object(keywords.get('knowledge_id')),
-            
+
         )
         def get(self, request: Request, workspace_id: str, knowledge_id: str):
             return KnowledgeSerializer.Operate(data={
@@ -294,12 +294,12 @@ class KnowledgeView(APIView):
         )
         @has_permissions(
             PermissionConstants.KNOWLEDGE_GENERATE.get_workspace_knowledge_permission(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
         )
         @log(
             menu='document', operate='Generate related documents',
             get_operation_object=lambda r, k: get_knowledge_operation_object(k.get('knowledge_id')),
-            
+
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(KnowledgeSerializer.Operate(
@@ -320,7 +320,7 @@ class KnowledgeView(APIView):
         )
         @has_permissions(
             PermissionConstants.KNOWLEDGE_EDIT.get_workspace_permission(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
         )
         def get(self, request: Request, workspace_id: str):
             return result.success(ModelSerializer.Query(
@@ -344,7 +344,7 @@ class KnowledgeView(APIView):
         )
         @has_permissions(
             PermissionConstants.KNOWLEDGE_EDIT.get_workspace_permission(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
         )
         def get(self, request: Request, workspace_id: str):
             return result.success(ModelSerializer.Query(
@@ -370,12 +370,12 @@ class KnowledgeBaseView(APIView):
     )
     @has_permissions(
         PermissionConstants.KNOWLEDGE_CREATE.get_workspace_permission(),
-        RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
     )
     @log(
         menu='knowledge Base', operate='Create base knowledge',
         get_operation_object=lambda r, k: {'name': r.data.get('name'), 'desc': r.data.get('desc')},
-        
+
     )
     def post(self, request: Request, workspace_id: str):
         return result.success(KnowledgeSerializer.Create(
@@ -398,7 +398,7 @@ class KnowledgeWebView(APIView):
     )
     @has_permissions(
         PermissionConstants.KNOWLEDGE_CREATE.get_workspace_permission(),
-        RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
     )
     @log(
         menu='Knowledge Base', operate="Create a web site knowledge base",
@@ -407,7 +407,7 @@ class KnowledgeWebView(APIView):
                                            'meta': {'source_url': r.data.get('source_url'),
                                                     'selector': r.data.get('selector'),
                                                     'embedding_model_id': r.data.get('embedding_model_id')}}
-        , 
+        ,
     )
     def post(self, request: Request, workspace_id: str):
         return result.success(KnowledgeSerializer.Create(
