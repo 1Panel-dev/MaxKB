@@ -1,32 +1,27 @@
 export default {
   title: 'Resource Authorization',
-  member:'Member',
+  member: 'Member',
   manage: 'Owner',
   permissionSetting: 'Permission Setting',
   addMember: 'Add Member',
   addSubTitle: 'After members log in,they can access the data you have authorized.',
   searchBar: {
-    placeholder: 'Please enter the username to search'
+    placeholder: 'Please enter the username to search',
   },
   delete: {
     button: 'Remove',
     confirmTitle: 'Wheather to remove the member:',
-    confirmMessage: "After removal, the member's knowledge base and application permissions will be revoked. "
+    confirmMessage:
+      "After removal, the member's knowledge base and application permissions will be revoked. ",
   },
   setting: {
     management: ' management',
-    check: 'check'
+    check: 'check',
+    authorization: 'authorization',
   },
-  teamForm: {
-    form: {
-      userName: {
-        label: 'Username/Email',
-        placeholder: "Please enter the member's username or email",
-        requiredMessage: 'Please enter Username/Email',
-      },
-
-    },
-
-  }
+  priority: {
+    label: 'Resource permission priority',
+    role: 'Role',
+    customize: 'Customize',
+  },
 }
-

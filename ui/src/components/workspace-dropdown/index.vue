@@ -1,8 +1,8 @@
 <template>
-  <el-dropdown placement="bottom-start">
-    <el-button text>
+  <el-dropdown placement="bottom-start" class="workspace-dropdown">
+    <el-button text style="font-size: 14px" class="workspace-dropdown__button">
       <AppIcon iconName="app-wordspace" style="font-size: 18px"></AppIcon>
-      <span class="dropdown-title ellipsis">
+      <span class="ellipsis" style="max-width: 155px">
         {{ currentWorkspace?.name }}
       </span>
       <el-icon class="el-icon--right">
@@ -18,7 +18,7 @@
           @click="changeWorkspace(item)"
         >
           <AppIcon class="mr-8" iconName="app-wordspace" style="font-size: 16px"></AppIcon>
-          <span class="dropdown-item ellipsis">
+          <span class="ellipsis" style="max-width: 230px">
             {{ item.name }}
           </span>
           <el-icon
@@ -48,27 +48,16 @@ const currentWorkspace = computed(() => {
 
 function changeWorkspace(item: WorkspaceItem) {
   if (item.id === user.workspace_id) return
-
   user.setWorkspaceId(item.id || 'default')
   window.location.reload()
 }
 </script>
 <style lang="scss" scoped>
-:deep(.el-button.is-text) {
-  color: var(--el-text-color-primary);
-  max-height: 32px;
-}
-
-.dropdown-title {
-  max-width: 155px;
-  font-size: 14px;
-}
-
-.dropdown-item {
-  max-width: 230px;
-}
-
-:deep(.el-dropdown-menu__item.active) {
-  color: var(--el-color-primary);
+.workspace-dropdown {
+  &__button {
+    font-size: 14px;
+    padding: 0 12px !important;
+    max-height: 32px;
+  }
 }
 </style>

@@ -79,7 +79,7 @@
               {{ row.phone || '-' }}
             </template>
           </el-table-column>
-          <el-table-column prop="user_group_names" :label="$t('views.chatUser.group.title')">
+          <el-table-column prop="user_group_names" :label="$t('views.chatUser.group.title')" min-width="100">
             <template #default="{ row }">
               <TagGroup :tags="row.user_group_names" />
             </template>
@@ -172,7 +172,6 @@ import userManageApi from '@/api/system/chat-user'
 import { datetimeFormat } from '@/utils/time'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { t } from '@/locales'
-import TagGroup from '@/components/tag-group/index.vue'
 import iconMap from '@/components/app-icon/icons/common'
 import type { ChatUserItem } from '@/api/type/systemChatUser'
 import SystemGroupApi from '@/api/system/user-group'

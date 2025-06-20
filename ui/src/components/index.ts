@@ -23,6 +23,8 @@ import TagEllipsis from './tag-ellipsis/index.vue'
 import CardCheckbox from './card-checkbox/index.vue'
 import AiChat from './ai-chat/index.vue'
 import KnowledgeIcon from './app-icon/KnowledgeIcon.vue'
+import TagGroup from './tag-group/index.vue'
+import WorkspaceDropdown from './workspace-dropdown/index.vue'
 export default {
   install(app: App) {
     app.component('LogoFull', LogoFull)
@@ -49,5 +51,7 @@ export default {
     app.component('CardCheckbox', CardCheckbox)
     app.component('AiChat', AiChat)
     app.component('KnowledgeIcon', KnowledgeIcon)
+    app.component('TagGroup', TagGroup)
+    app.component('WorkspaceDropdown', WorkspaceDropdown)
   },
 }

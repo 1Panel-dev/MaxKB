@@ -8,7 +8,6 @@ import system from './system'
 import tool from './tool'
 import userManage from './user-manage'
 import resourceAuthorization from './resource-authorization'
-import team from './team'
 import model from './model'
 import document from './document'
 import paragraph from './paragraph'
@@ -26,7 +25,6 @@ export default {
   tool,
   userManage,
   resourceAuthorization,
-  team,
   model,
   knowledge,
   applicationWorkflow,

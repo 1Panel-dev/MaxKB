@@ -8,7 +8,11 @@
     <div class="flex-between w-full">
       <div class="ml-24 flex align-center">
         <!-- 企业版: 工作空间下拉框-->
-        <el-divider class="mr-16" direction="vertical" v-if="hasPermission(EditionConst.IS_EE, 'OR')" />
+        <el-divider
+          class="mr-8"
+          direction="vertical"
+          v-if="hasPermission(EditionConst.IS_EE, 'OR')"
+        />
         <WorkspaceDropdown v-if="hasPermission(EditionConst.IS_EE, 'OR')" />
       </div>
       <TopMenu></TopMenu>
@@ -23,12 +27,6 @@ import Avatar from './avatar/index.vue'
 import TopAbout from './top-about/index.vue'
 import { EditionConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
-import WorkspaceDropdown from './workspace-dropdown/index.vue'
-
-import { useRouter } from 'vue-router'
-import useStore from '@/stores'
-const router = useRouter()
-const { user } = useStore()
 </script>
 <style lang="scss" scoped>
 .app-top-bar-container {

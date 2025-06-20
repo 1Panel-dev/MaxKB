@@ -65,8 +65,11 @@
   }
   &:focus {
     color: var(--el-button-text-color);
-    background-color: var(--el-button-bg-color);
-    border-color: var(--el-button-border-color);
+    background-color: none;
+    border-color: none;
+  }
+  &:focus-visible {
+    outline: none !important;
   }
   &.is-link:focus {
     background: none;
@@ -104,6 +107,9 @@
   &.is-active:hover {
     color: var(--el-menu-active-color);
     background: var(--el-color-primary-light-9);
+  }
+  &.active {
+    color: var(--el-color-primary);
   }
 }
 

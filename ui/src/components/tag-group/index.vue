@@ -1,10 +1,10 @@
 <template>
   <div class="tag-group" v-if="props.tags.length">
-    <el-tag class="default-tag" style="max-width: 100%;">
-      <span class="ellipsis" style="max-width: 100%;">{{ props.tags[0] }}</span>
+    <el-tag class="default-tag" style="max-width: 100%">
+      <span class="ellipsis" style="max-width: 100%">{{ props.tags[0] }}</span>
     </el-tag>
     <el-tooltip effect="light">
-      <el-tag class="info-tag ml-4" v-if="props.tags?.length > 1">
+      <el-tag class="info-tag ml-4 cursor" v-if="props.tags?.length > 1">
         +{{ props.tags?.length - 1 }}
       </el-tag>
       <template #content>
@@ -17,9 +17,8 @@
 </template>
 <script setup lang="ts">
 const props = defineProps<{
-  tags: string[],
+  tags: string[]
 }>()
-
 </script>
 
 <style lang="scss" scoped>

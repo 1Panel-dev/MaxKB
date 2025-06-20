@@ -1,13 +1,35 @@
 <template>
-  <el-input
-    v-model="filterText"
-    :placeholder="$t('common.search')"
-    prefix-icon="Search"
-    class="mb-16 mt-4 1"
-    clearable
-  />
-  <div class="pt-0">
-    <el-table default-expand-all row-key="id" :data="filterData" :max-height="tableHeight">
+  <div class="w-full">
+    <div class="flex-between mb-16">
+      <div class="flex align-center" v-if="hasPermission(EditionConst.IS_EE, 'OR')">
+        <!-- 企业版: 选优先级-->
+        <span class="lighter mr-16">{{ $t('views.resourceAuthorization.priority.label') }}</span>
+        <el-radio-group v-model="isRole">
+          <el-radio :value="true" size="large">{{
+            $t('views.resourceAuthorization.priority.role')
+          }}</el-radio>
+          <el-radio :value="false" size="large">{{
+            $t('views.resourceAuthorization.priority.customize')
+          }}</el-radio>
+        </el-radio-group>
+      </div>
+      <el-input
+        v-model="filterText"
+        :placeholder="$t('common.search')"
+        prefix-icon="Search"
+        class="mt-4"
+        :class="hasPermission(EditionConst.IS_EE, 'OR') ? 'w-240' : ''"
+        clearable
+      />
+    </div>
+
+    <el-table
+      row-key="id"
+      :data="filterData"
+      :max-height="tableHeight"
+      :expand-row-keys="['default']"
+      style="width: 100%"
+    >
       <el-table-column class-name="folder-flex" prop="name" :label="$t('common.name')">
         <template #default="{ row }">
           <div class="flex align-center">
@@ -49,10 +71,40 @@
         </template>
       </el-table-column>
       <el-table-column
+        v-if="isRole"
+        :label="$t('views.resourceAuthorization.setting.authorization')"
+        align="center"
+        width="100"
+      >
+        <!-- <template #header>
+          <el-checkbox
+            :disabled="props.manage"
+            v-model="allChecked[AuthorizationEnum.MANAGE]"
+            :indeterminate="allIndeterminate[AuthorizationEnum.MANAGE]"
+            :label="$t('views.resourceAuthorization.setting.management')"
+          />
+        </template> -->
+        <template #default="{ row }">
+          <el-checkbox
+            v-if="row.isFolder"
+            :disabled="props.manage"
+            v-model="row.permission[AuthorizationEnum.ROLE]"
+            :indeterminate="row.permissionHalf[AuthorizationEnum.ROLE]"
+            @change="(e: boolean) => checkedOperateChange(AuthorizationEnum.ROLE, row, e)"
+          />
+          <el-checkbox
+            v-else
+            :disabled="props.manage"
+            v-model="row.permission[AuthorizationEnum.ROLE]"
+            @change="(e: boolean) => checkedOperateChange(AuthorizationEnum.ROLE, row, e)"
+          />
+        </template>
+      </el-table-column>
+      <el-table-column
+        v-if="!isRole"
         :label="$t('views.resourceAuthorization.setting.management')"
         align="center"
         width="100"
-        fixed="right"
       >
         <!-- <template #header>
           <el-checkbox
@@ -79,10 +131,10 @@
         </template>
       </el-table-column>
       <el-table-column
+        v-if="!isRole"
         :label="$t('views.resourceAuthorization.setting.check')"
         align="center"
         width="100"
-        fixed="right"
       >
         <!-- <template #header>
           <el-checkbox
@@ -115,6 +167,8 @@
 import { ref, onMounted, watch, computed } from 'vue'
 import { AuthorizationEnum } from '@/enums/system'
 import { isAppIcon } from '@/utils/common'
+import { EditionConst } from '@/utils/permission/data'
+import { hasPermission } from '@/utils/permission/index'
 
 const props = defineProps({
   data: {
@@ -126,6 +180,8 @@ const props = defineProps({
   tableHeight: Number,
   manage: Boolean,
 })
+
+const isRole = ref(false)
 
 const isKnowledge = computed(() => props.type === AuthorizationEnum.KNOWLEDGE)
 const isApplication = computed(() => props.type === AuthorizationEnum.APPLICATION)

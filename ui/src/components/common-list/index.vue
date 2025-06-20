@@ -77,6 +77,7 @@ defineExpose({
     font-size: 14px;
     margin-bottom: 4px;
     &.active {
+      background: var(--el-color-primary-light-9);
       border-radius: 4px;
       color: var(--el-color-primary);
       font-weight: 500;
