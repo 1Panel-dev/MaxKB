@@ -28,15 +28,21 @@
             </template>
           </div>
         </div>
-        <el-dropdown-item class="border-t p-8" @click="openResetPassword">
+        <el-dropdown-item class="border-t p-8" @click="openResetPassword"
+          v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.CHANGE_PASSWORD],'OR')"
+        >
           {{ $t('views.login.resetPassword') }}
         </el-dropdown-item>
         <div v-hasPermission="new ComplexPermission([], ['x-pack'], 'OR')">
-          <el-dropdown-item class="p-8" @click="openAPIKeyDialog">
+          <el-dropdown-item class="p-8" @click="openAPIKeyDialog"
+            v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.SYSTEM_API_KEY_EDIT],'OR')"
+          >
             {{ $t('layout.apiKey') }}
           </el-dropdown-item>
         </div>
-        <el-dropdown-item style="padding: 0" @click.stop>
+        <el-dropdown-item style="padding: 0" @click.stop
+          v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.SWITCH_LANGUAGE],'OR')"
+        >
           <el-dropdown class="w-full" trigger="hover" placement="left-start">
             <div class="flex-between w-full" style="line-height: 22px; padding: 12px 11px">
               <span> {{ $t('layout.language') }}</span>
@@ -69,7 +75,9 @@
             </template>
           </el-dropdown>
         </el-dropdown-item>
-        <el-dropdown-item @click="openAbout">
+        <el-dropdown-item @click="openAbout"
+          v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.ABOUT_READ],'OR')"
+        >
           {{ $t('layout.about.title') }}
         </el-dropdown-item>
 
@@ -102,6 +110,8 @@ import AboutDialog from './AboutDialog.vue'
 import APIKeyDialog from './APIKeyDialog.vue'
 import {ComplexPermission} from '@/utils/permission/type'
 import {langList} from '@/locales/index'
+import { hasPermission } from '@/utils/permission'
+import { PermissionConst, RoleConst } from '@/utils/permission/data'
 
 const {user, login} = useStore()
 const router = useRouter()

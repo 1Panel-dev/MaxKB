@@ -8,7 +8,9 @@
         :currentNodeKey="currentFolder?.id"
         @handleNodeClick="folderClickHandel"
         @refreshTree ="refreshFolder"
-        shareTitle="views.system.share_tool"
+        :shareTitle="hasPermission(new ComplexPermission(
+          [RoleConst.ADMIN],[PermissionConst.SHARED_TOOL_READ],[EditionConst.IS_EE],'OR'
+        ), 'OR')?'views.system.share_tool':null"
         isShared
         class="p-8"
       />
@@ -319,9 +321,10 @@ import { t } from '@/locales'
 import { isAppIcon } from '@/utils/common'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import SharedWorkspace from '@/views/shared/tool-shared/SharedWorkspace.vue'
-import { PermissionConst, RoleConst } from '@/utils/permission/data'
+import { EditionConst, PermissionConst, RoleConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
 import { FolderSource } from '@/enums/common'
+import { ComplexPermission } from '@/utils/permission/type'
 
 const { folder, user } = useStore()
 

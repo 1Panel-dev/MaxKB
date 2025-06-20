@@ -53,6 +53,22 @@ export class Permission {
     const { user } = useStore()
     return `${this.permission}:/WORKSPACE/${user.getWorkspaceId()}/${resource}/${resource_id}`
   }
+  /**
+   *
+   * @param resource_id 资源id
+   * @returns 工作空间下知识库资源权限
+   */
+  getKnowledgeWorkspaceResourcePermission=( resource_id: string)=>{
+   return this.getWorkspaceResourcePermission('KNOWLEDGE',resource_id)
+  }
+  /**
+   *
+   * @param resource_id  资源id
+   * @returns 工作空间下应用资源权限
+   */
+  getApplicationWorkspaceResourcePermission=( resource_id: string)=>{
+   return this.getWorkspaceResourcePermission('APPLICATION',resource_id)
+  }
   toString() {
     return this.permission
   }
