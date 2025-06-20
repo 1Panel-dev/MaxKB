@@ -91,4 +91,5 @@ export default {
   otherSetting: '其他设置',
   username: '用户名',
   importCreate: '导入创建',
+  detail: '详情'
 }

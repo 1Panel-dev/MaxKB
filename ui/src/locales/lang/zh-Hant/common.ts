@@ -87,4 +87,5 @@ export default {
   otherSetting: '其他設定',
   username: '用戶名',
   importCreate: '導入創建',
+  detail: '详情'
 }

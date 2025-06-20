@@ -1,0 +1,66 @@
+<template>
+  <CardBox :title="props.tool.name" :description="props.tool.desc" class="cursor">
+    <template #icon>
+      <!-- TODO -->
+      <LogoIcon style="width: 28px; height: 28px; display: block" />
+    </template>
+    <template #subTitle>
+      <el-text class="color-secondary" size="small">
+        {{ getSubTitle(props.tool) }}
+      </el-text>
+    </template>
+    <template #footer>
+      <span class="card-footer-left color-secondary">
+        {{ `${$t('common.author')}: MaxKB` }}
+      </span>
+      <div class="card-footer-operation" @click.stop>
+        <el-button>
+          {{ $t('common.detail') }}
+        </el-button>
+        <el-button type="primary" :loading="props.addLoading" @click="emit('handleAdd')">
+          {{ $t('common.add') }}
+        </el-button>
+      </div>
+    </template>
+  </CardBox>
+</template>
+
+<script setup lang="ts">
+const props = defineProps<{
+  tool: any,
+  getSubTitle: (v: any) => string
+  addLoading: boolean
+}>()
+
+const emit = defineEmits<{
+  (e: 'handleAdd'): void;
+}>();
+</script>
+
+<style lang="scss" scoped>
+.el-card {
+  :deep(.card-footer) {
+    &>div:first-of-type {
+      flex: 1;
+    }
+
+    .card-footer-operation {
+      display: none;
+    }
+  }
+
+  &:hover {
+    .card-footer-left {
+      display: none;
+    }
+
+    .card-footer-operation {
+      display: flex !important;
+
+      .el-button {
+        flex: 1;
+      }
+    }
+  }
+}
+</style>

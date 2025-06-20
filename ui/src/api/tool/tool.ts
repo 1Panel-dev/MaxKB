@@ -2,7 +2,7 @@ import { Result } from '@/request/Result'
 import { get, post, del, put, exportFile } from '@/request/index'
 import { type Ref } from 'vue'
 import type { pageRequest } from '@/api/type/common'
-import type { toolData } from '@/api/type/tool'
+import type { toolData,AddInternalToolParam } from '@/api/type/tool'
 
 
 import useStore from '@/stores'
@@ -84,16 +84,16 @@ const getToolById: (tool_id: string, loading?: Ref<boolean>) => Promise<Result<a
  * @param 参数 tool_id
  */
 const delTool: (
-  tool_id: String,
+  tool_id: string,
   loading?: Ref<boolean>
 ) => Promise<Result<boolean>> = (tool_id, loading) => {
   return del(`${prefix.value}/${tool_id}`, undefined, {}, loading)
 }
 
 const putToolIcon: (
-    id: string,
-    data: any,
-    loading?: Ref<boolean>
+  id: string,
+  data: any,
+  loading?: Ref<boolean>
 ) => Promise<Result<any>> = (id, data, loading) => {
   return put(`${prefix.value}/${id}/edit_icon`, data, undefined, loading)
 }
@@ -128,6 +128,26 @@ const postPylint: (code: string, loading?: Ref<boolean>) => Promise<Result<any>>
   return post(`${prefix.value}/pylint`, { code }, {}, loading)
 }
 
+/**
+ * 工具商店-系统内置列表
+ */
+const getInternalToolList: (
+  param?: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (param, loading) => {
+  return get('/workspace/internal/tool', param, loading)
+}
+
+/**
+ * 工具商店-添加系统内置
+ */
+const addInternalTool: (tool_id: string, param: AddInternalToolParam, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  tool_id,
+  param,
+  loading,
+) => {
+  return post(`${prefix.value}/${tool_id}/add_internal_tool`, param, undefined, loading)
+}
 export default {
   getToolList,
   getToolListPage,
@@ -139,5 +159,7 @@ export default {
   postPylint,
   exportTool,
   putToolIcon,
-  delTool
+  delTool,
+  getInternalToolList,
+  addInternalTool
 }

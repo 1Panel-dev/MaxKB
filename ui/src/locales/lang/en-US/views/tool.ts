@@ -6,6 +6,17 @@ export default {
   editTool: 'Edit Tool',
   copyTool: 'Copy Tool',
   importTool: 'Import Tool',
+  toolStore: {
+    title: 'Tool Store',
+    createFromToolStore: 'Create from Tool Store',
+    recommend: 'Recommended',
+    webSearch: 'Web Search',
+    databaseQuery: 'Database Query',
+    image: 'Image',
+    developer: 'Developer',
+    communication: 'Communication',
+    searchResult: '{count} search results for'
+  },
   searchBar: {
     placeholder: 'Search by tool name',
   },

@@ -97,6 +97,16 @@
                     </div>
                   </el-dropdown-item>
                 </el-upload>
+                <el-dropdown-item @click="openToolStoreDialog()">
+                  <div class="flex align-center">
+                    <el-avatar class="avatar-green" shape="square" :size="32">
+                      <img src="@/assets/node/icon_tool.svg" style="width: 58%" alt="" />
+                    </el-avatar>
+                    <div class="pre-wrap ml-8">
+                      <div class="lighter">{{ $t('views.tool.toolStore.createFromToolStore') }}</div>
+                    </div>
+                  </div>
+                </el-dropdown-item>
                 <el-dropdown-item @click="openCreateFolder" divided>
                   <div class="flex align-center">
                     <AppIcon iconName="app-folder" style="font-size: 32px"></AppIcon>
@@ -312,6 +322,7 @@
     <InitParamDrawer ref="InitParamDrawerRef" @refresh="refresh" />
     <ToolFormDrawer ref="ToolFormDrawerRef" @refresh="refresh" :title="ToolDrawertitle" />
     <CreateFolderDialog ref="CreateFolderDialogRef" @refresh="refreshFolder" />
+    <ToolStoreDialog ref="toolStoreDialogRef" @refresh="refresh" />
   </LayoutContainer>
 </template>
 
@@ -331,6 +342,7 @@ import { EditionConst, PermissionConst, RoleConst } from '@/utils/permission/dat
 import { hasPermission } from '@/utils/permission/index'
 import { FolderSource } from '@/enums/common'
 import { ComplexPermission } from '@/utils/permission/type'
+import ToolStoreDialog from './component/ToolStoreDialog.vue'
 
 const { folder, user } = useStore()
 
@@ -504,6 +516,11 @@ function configInitParams(item: any) {
   ToolApi.getToolById(item?.id, changeStateloading).then((res) => {
     InitParamDrawerRef.value.open(res.data)
   })
+}
+
+const toolStoreDialogRef = ref<InstanceType<typeof ToolStoreDialog>>()
+function openToolStoreDialog() {
+  toolStoreDialogRef.value?.open()
 }
 
 const elUploadRef = ref()

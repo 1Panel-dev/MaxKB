@@ -10,4 +10,9 @@ interface toolData {
   folder_id?: string
 }
 
-export type { toolData }
+interface AddInternalToolParam {
+  name: string,
+  folder_id: string
+}
+
+export type { toolData, AddInternalToolParam }

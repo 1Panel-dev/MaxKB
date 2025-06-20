@@ -6,6 +6,17 @@ export default {
   editTool: '編輯工具',
   copyTool: '複製工具',
   importTool: '匯入工具',
+  toolStore: {
+    title: '工具商店',
+    createFromToolStore: '從工具商店創建',
+    recommend: '推薦',
+    webSearch: '聯網搜索',
+    databaseQuery: '數據庫查詢',
+    image: '圖像',
+    developer: '開發者',
+    communication: '通信',
+    searchResult: '的搜索結果 {count} 個'
+  },
   searchBar: {
     placeholder: '按工具名稱搜尋',
   },

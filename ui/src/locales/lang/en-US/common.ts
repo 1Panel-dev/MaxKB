@@ -87,4 +87,5 @@ export default {
   otherSetting: 'Other Settings',
   username: 'username',
   importCreate: 'Import Create',
+  detail: 'Detail'
 }

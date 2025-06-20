@@ -4,6 +4,17 @@ export default {
   editTool: '编辑工具',
   copyTool: '复制函数',
   importTool: '导入函数',
+  toolStore: {
+    title: '工具商店',
+    createFromToolStore: '从工具商店创建',
+    recommend: '推荐',
+    webSearch: '联网搜索',
+    databaseQuery: '数据库查询',
+    image: '图像',
+    developer: '开发者',
+    communication: '通信',
+    searchResult: '的搜索结果 {count} 个'
+  },
   enabled: '启用',
   disabled: {
     confirmTitle: '是否禁用工具：',
