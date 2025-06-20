@@ -160,10 +160,10 @@ const PermissionConst = {
 
 
 
-
-
-
-  SYSTEM_API_KEY_EDIT:new Permission('OTHER: READ+EDIT')
+  ABOUT_READ:new Permission('OTHER:READ'),
+  SWITCH_LANGUAGE:new Permission('OTHER:READ+EDIT'),
+  CHANGE_PASSWORD:new Permission('OTHER:READ+CREATE'),
+  SYSTEM_API_KEY_EDIT:new Permission('OTHER:READ+DELETE')
 
 
 

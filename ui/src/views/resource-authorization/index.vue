@@ -6,29 +6,19 @@
         <div class="resource-authorization__left border-r p-8">
           <div class="p-8">
             <h4 class="mb-12">{{ $t('views.resourceAuthorization.member') }}</h4>
-            <el-input
-              v-model="filterText"
-              :placeholder="$t('common.search')"
-              prefix-icon="Search"
-              clearable
-            />
+            <el-input v-model="filterText" :placeholder="$t('common.search')" prefix-icon="Search" clearable />
           </div>
           <div class="list-height-left">
             <el-scrollbar>
-              <common-list
-                :data="filterMember"
-                class="mt-8"
-                v-loading="loading"
-                @click="clickMemberHandle"
-                :default-active="currentUser"
-              >
+              <common-list :data="filterMember" class="mt-8" v-loading="loading" @click="clickMemberHandle"
+                :default-active="currentUser">
                 <template #default="{ row }">
                   <div class="flex-between">
                     <div>
                       <span class="mr-8">{{ row.nick_name }}</span>
                       <el-tag v-if="isManage(row.type)" class="default-tag">{{
                         $t('views.resourceAuthorization.manage')
-                      }}</el-tag>
+                        }}</el-tag>
                     </div>
                   </div>
                 </template>
@@ -40,20 +30,10 @@
           <div class="resource-authorization__table">
             <h4 class="mb-4">{{ $t('views.resourceAuthorization.permissionSetting') }}</h4>
             <el-tabs v-model="activeName" class="resource-authorization__tabs">
-              <el-tab-pane
-                v-for="(item, index) in settingTags"
-                :key="item.value"
-                :label="item.label"
-                :name="item.value"
-              >
-                <PermissionSetting
-                  :key="index"
-                  :data="item.data"
-                  :type="item.value"
-                  :tableHeight="tableHeight"
-                  :manage="isManage(currentType)"
-                  @refreshData="refreshData"
-                ></PermissionSetting>
+              <el-tab-pane v-for="(item, index) in settingTags" :key="item.value" :label="item.label"
+                :name="item.value">
+                <PermissionSetting :key="index" :data="item.data" :type="item.value" :tableHeight="tableHeight"
+                  :manage="isManage(currentType)" @refreshData="refreshData"></PermissionSetting>
               </el-tab-pane>
             </el-tabs>
           </div>
@@ -116,23 +96,31 @@ function isManage(type: string) {
   return type === 'manage'
 }
 
+const flotTree = (tree: Array<any>, result: Array<any>) => {
+  tree.forEach(tItem => {
+    result.push(tItem)
+    if (tItem.children) {
+      flotTree(tItem.children, result)
+    }
+  })
+  return result
+}
 function submitPermissions() {
-  const obj: any = {
-    user_resource_permission_list: [],
-  }
-  settingTags.map((item: any) => {
-    item.data.map((v: any) => {
-      obj['user_resource_permission_list'].push({
+  const user_resource_permission_list = settingTags.map((item: any) => {
+    return flotTree(item.data, []).filter((v: any) => !v.isFolder).map((v: any) => {
+      return {
         target_id: v.id,
-        auth_target_type: v.auth_target_type,
+        auth_target_type: item.value,
         permission: v.permission,
         auth_type: 'RESOURCE_PERMISSION_GROUP',
-      })
+      }
     })
-  })
-  AuthorizationApi.putResourceAuthorization(currentUser.value, obj, rLoading).then(() => {
+  }).reduce((pre, next) => {
+    return [...pre, ...next]
+  }, [])
+  AuthorizationApi.putResourceAuthorization(currentUser.value, { user_resource_permission_list: user_resource_permission_list }, rLoading).then(() => {
     MsgSuccess(t('common.submitSuccess'))
-    ResourcePermissions(currentUser.value)
+    getWholeTree(currentUser.value)
   })
 }
 
