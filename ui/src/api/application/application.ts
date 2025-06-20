@@ -1,14 +1,14 @@
-import { Result } from '@/request/Result'
-import { get, post, postStream, del, put, request, download, exportFile } from '@/request/index'
-import type { pageRequest } from '@/api/type/common'
-import type { ApplicationFormType } from '@/api/type/application'
-import { type Ref } from 'vue'
+import {Result} from '@/request/Result'
+import {get, post, postStream, del, put, request, download, exportFile} from '@/request/index'
+import type {pageRequest} from '@/api/type/common'
+import type {ApplicationFormType} from '@/api/type/application'
+import {type Ref} from 'vue'
 import useStore from '@/stores'
 
-const prefix: any = { _value: '/workspace/' }
+const prefix: any = {_value: '/workspace/'}
 Object.defineProperty(prefix, 'value', {
   get: function () {
-    const { user } = useStore()
+    const {user} = useStore()
     return this._value + user.getWorkspaceId() + '/application'
   },
 })
@@ -187,6 +187,32 @@ const chat: (chat_id: string, data: any) => Promise<any> = (chat_id, data) => {
 const getChatUserAuthType: (loading?: Ref<boolean>) => Promise<any> = (loading) => {
   return get(`/chat_user/auth/types`, {}, loading)
 }
+
+/**
+ * 获取平台状态
+ */
+const getPlatformStatus: (application_id: string) => Promise<Result<any>> = (application_id) => {
+  return get(`${prefix.value}/${application_id}/platform/status`)
+}
+/**
+ * 更新平台状态
+ */
+const updatePlatformStatus: (application_id: string, data: any) => Promise<Result<any>> = (
+  application_id,
+  data
+) => {
+  return post(`${prefix.value}/${application_id}/platform/status`, data)
+}
+/**
+ * 获取平台配置
+ */
+const getPlatformConfig: (application_id: string, type: string) => Promise<Result<any>> = (
+  application_id,
+  type
+) => {
+  return get(`${prefix.value}/${application_id}/platform/${type}`)
+}
+
 export default {
   getAllApplication,
   getApplication,
@@ -203,4 +229,7 @@ export default {
   chat,
   getChatUserAuthType,
   getApplicationSetting,
+  getPlatformStatus,
+  updatePlatformStatus,
+  getPlatformConfig
 }
