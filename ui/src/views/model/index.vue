@@ -56,7 +56,9 @@
             </el-select>
           </div>
           <el-button class="ml-16" type="primary" @click="openCreateModel(active_provider)"
-            v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.MODEL_CREATE.getWorkspacePermission]"
+            v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+            RoleConst.USER.getWorkspaceRole,
+            PermissionConst.MODEL_CREATE.getWorkspacePermission]"
           >
             {{ $t('views.model.addModel') }}
             </el-button>

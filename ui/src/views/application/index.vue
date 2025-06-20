@@ -49,6 +49,7 @@
               class="ml-8"
               v-hasPermission="[
                 RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                RoleConst.USER.getWorkspaceRole,
                 PermissionConst.APPLICATION_EDIT.getWorkspacePermission,
               ]"
             >
@@ -236,6 +237,7 @@
                                 hasPermission(
                                   [
                                     RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                                    RoleConst.USER.getWorkspaceRole,
                                     PermissionConst.APPLICATION_EDIT.getWorkspacePermission,
                                   ],
                                   'OR',
@@ -252,6 +254,7 @@
                                 hasPermission(
                                   [
                                     RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                                    RoleConst.USER.getWorkspaceRole,
                                     PermissionConst.APPLICATION_EXPORT.getWorkspacePermission,
                                   ],
                                   'OR',
@@ -269,6 +272,7 @@
                                 hasPermission(
                                   [
                                     RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                                    RoleConst.USER.getWorkspaceRole,
                                     PermissionConst.APPLICATION_DELETE.getWorkspacePermission,
                                   ],
                                   'OR',

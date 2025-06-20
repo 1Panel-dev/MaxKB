@@ -14,7 +14,8 @@
                 "
                 v-hasPermission="[
                   RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                  PermissionConst.KNOWLEDGE_DOCUMENT_CREATE.getWorkspacePermission,
+                  RoleConst.USER.getWorkspaceRole,
+                  PermissionConst.KNOWLEDGE_DOCUMENT_CREATE.getKnowledgeWorkspaceResourcePermission(id),
                 ]"
                 >{{ $t('views.document.uploadDocument') }}
               </el-button>
@@ -23,8 +24,8 @@
                 type="primary"
                 @click="importDoc"
                 v-hasPermission="[
-                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                  PermissionConst.KNOWLEDGE_DOCUMENT_CREATE.getWorkspacePermission,
+                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,RoleConst.USER.getWorkspaceRole,
+                  PermissionConst.KNOWLEDGE_DOCUMENT_CREATE.getKnowledgeWorkspaceResourcePermission(id),
                 ]"
                 >{{ $t('views.document.importDocument') }}
               </el-button>
@@ -43,7 +44,7 @@
                 @click="batchRefresh"
                 :disabled="multipleSelection.length === 0"
                 v-hasPermission="[
-                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,RoleConst.USER.getWorkspaceRole,
                   PermissionConst.KNOWLEDGE_DOCUMENT_VECTOR.getWorkspacePermission,
                 ]"
                 >{{ $t('views.knowledge.setting.vectorization') }}
@@ -52,7 +53,7 @@
                 @click="openGenerateDialog()"
                 :disabled="multipleSelection.length === 0"
                 v-hasPermission="[
-                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,RoleConst.USER.getWorkspaceRole,
                   PermissionConst.KNOWLEDGE_DOCUMENT_GENERATE.getWorkspacePermission,
                 ]"
                 >{{ $t('views.document.generateQuestion.title') }}
@@ -61,7 +62,7 @@
                 @click="openknowledgeDialog()"
                 :disabled="multipleSelection.length === 0"
                 v-hasPermission="[
-                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,RoleConst.USER.getWorkspaceRole,
                   PermissionConst.KNOWLEDGE_DOCUMENT_MIGRATE.getWorkspacePermission,
                 ]"
                 >{{ $t('views.document.setting.migration') }}
@@ -77,7 +78,9 @@
                     <el-dropdown-item
                       @click="openBatchEditDocument"
                       :disabled="multipleSelection.length === 0"
-                      v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_DOCUMENT_EDIT.getWorkspacePermission],'OR')"
+                      v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                      RoleConst.USER.getWorkspaceRole,
+                      PermissionConst.KNOWLEDGE_DOCUMENT_EDIT.getWorkspacePermission],'OR')"
                     >
                       {{ $t('common.setting') }}
                     </el-dropdown-item>
@@ -86,7 +89,9 @@
                       @click="syncMulDocument"
                       :disabled="multipleSelection.length === 0"
                       v-if="knowledgeDetail.type === 1 &&
-                      hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_DOCUMENT_SYNC.getWorkspacePermission],'OR')"
+                      hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                      RoleConst.USER.getWorkspaceRole,
+                      PermissionConst.KNOWLEDGE_DOCUMENT_SYNC.getWorkspacePermission],'OR')"
                       >{{ $t('views.document.syncDocument') }}
                     </el-dropdown-item>
                     <el-dropdown-item
@@ -384,7 +389,7 @@
                       @click.stop="cancelTask(row, TaskType.EMBEDDING)"
                       :title="$t('views.document.setting.cancelVectorization')"
                       v-hasPermission="[
-                        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,RoleConst.USER.getWorkspaceRole,
                         PermissionConst.KNOWLEDGE_DOCUMENT_VECTOR.getWorkspacePermission,
                       ]"
                     >
@@ -398,7 +403,7 @@
                       @click.stop="refreshDocument(row)"
                       :title="$t('views.knowledge.setting.vectorization')"
                       v-hasPermission="[
-                        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,RoleConst.USER.getWorkspaceRole,
                         PermissionConst.KNOWLEDGE_DOCUMENT_VECTOR.getWorkspacePermission,
                       ]"
                     >
@@ -412,7 +417,7 @@
                       @click.stop="settingDoc(row)"
                       :title="$t('common.setting')"
                       v-hasPermission="[
-                        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,RoleConst.USER.getWorkspaceRole,
                         PermissionConst.KNOWLEDGE_DOCUMENT_EDIT.getWorkspacePermission,
                       ]"
                     >
@@ -425,7 +430,7 @@
                         text
                         type="primary"
                         v-hasPermission="[
-                          RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                          RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,RoleConst.USER.getWorkspaceRole,
                           PermissionConst.KNOWLEDGE_DOCUMENT_EDIT.getWorkspacePermission,
                         ]"
                       >
@@ -438,7 +443,9 @@
                               ([State.STARTED, State.PENDING] as Array<string>).includes(
                                 getTaskState(row.status, TaskType.GENERATE_PROBLEM),
                               )&&
-                              hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_PROBLEM_CREATE.getWorkspacePermission],'OR')
+                              hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                              RoleConst.USER.getWorkspaceRole,
+                              PermissionConst.KNOWLEDGE_PROBLEM_CREATE.getWorkspacePermission],'OR')
                             "
                             @click="cancelTask(row, TaskType.GENERATE_PROBLEM)"
                           >
@@ -446,31 +453,41 @@
                             {{ $t('views.document.setting.cancelGenerateQuestion') }}
                           </el-dropdown-item>
                           <el-dropdown-item v-else @click="openGenerateDialog(row)"
-                            v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_PROBLEM_CREATE.getWorkspacePermission],'OR')"
+                            v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                            RoleConst.USER.getWorkspaceRole,
+                            PermissionConst.KNOWLEDGE_PROBLEM_CREATE.getWorkspacePermission],'OR')"
                           >
                             <el-icon><Connection /></el-icon>
                             {{ $t('views.document.generateQuestion.title') }}
                           </el-dropdown-item>
                           <el-dropdown-item @click="openknowledgeDialog(row)"
-                            v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_DOCUMENT_MIGRATE.getWorkspacePermission],'OR')"
+                            v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                            RoleConst.USER.getWorkspaceRole,
+                            PermissionConst.KNOWLEDGE_DOCUMENT_MIGRATE.getWorkspacePermission],'OR')"
                           >
                             <AppIcon iconName="app-migrate"></AppIcon>
                             {{ $t('views.document.setting.migration') }}
                           </el-dropdown-item>
                           <el-dropdown-item @click="exportDocument(row)"
-                            v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_DOCUMENT_EXPORT.getWorkspacePermission],'OR')"
+                            v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                            RoleConst.USER.getWorkspaceRole,
+                            PermissionConst.KNOWLEDGE_DOCUMENT_EXPORT.getWorkspacePermission],'OR')"
                           >
                             <AppIcon iconName="app-export"></AppIcon>
                             {{ $t('views.document.setting.export') }} Excel
                           </el-dropdown-item>
                           <el-dropdown-item @click="exportDocumentZip(row)"
-                            v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_DOCUMENT_EXPORT.getWorkspacePermission],'OR')"
+                            v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                            RoleConst.USER.getWorkspaceRole,
+                            PermissionConst.KNOWLEDGE_DOCUMENT_EXPORT.getWorkspacePermission],'OR')"
                           >
                             <AppIcon iconName="app-export"></AppIcon>
                             {{ $t('views.document.setting.export') }} Zip
                           </el-dropdown-item>
                           <el-dropdown-item icon="Delete" @click.stop="deleteDocument(row)"
-                            v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.KNOWLEDGE_DOCUMENT_DELETE.getWorkspacePermission],'OR')"
+                            v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                            RoleConst.USER.getWorkspaceRole,
+                            PermissionConst.KNOWLEDGE_DOCUMENT_DELETE.getWorkspacePermission],'OR')"
                           >
                             {{ $t('common.delete') }}</el-dropdown-item
                           >
@@ -487,7 +504,7 @@
                       @click.stop="syncDocument(row)"
                       :title="$t('views.knowledge.setting.sync')"
                       v-hasPermission="[
-                        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,RoleConst.USER.getWorkspaceRole,
                         PermissionConst.KNOWLEDGE_SYNC.getWorkspacePermission,
                       ]"
                     >
@@ -506,7 +523,7 @@
                       @click.stop="cancelTask(row, TaskType.EMBEDDING)"
                       :title="$t('views.document.setting.cancelVectorization')"
                       v-hasPermission="[
-                        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,RoleConst.USER.getWorkspaceRole,
                         PermissionConst.KNOWLEDGE_DOCUMENT_VECTOR.getWorkspacePermission,
                       ]"
                     >
@@ -520,7 +537,7 @@
                       @click.stop="refreshDocument(row)"
                       :title="$t('views.knowledge.setting.vectorization')"
                       v-hasPermission="[
-                        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,RoleConst.USER.getWorkspaceRole,
                         PermissionConst.KNOWLEDGE_DOCUMENT_VECTOR.getWorkspacePermission,
                       ]"
                     >
@@ -534,7 +551,7 @@
                         text
                         type="primary"
                         v-hasPermission="[
-                          RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                          RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,RoleConst.USER.getWorkspaceRole,
                           PermissionConst.KNOWLEDGE_DOCUMENT_EDIT.getWorkspacePermission,
                         ]"
                       >
@@ -591,7 +608,7 @@
         :disabled="multipleSelection.length === 0"
         @click="cancelTaskHandle(1)"
         v-hasPermission="[
-          RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+          RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,RoleConst.USER.getWorkspaceRole,
           PermissionConst.KNOWLEDGE_DOCUMENT_VECTOR.getWorkspacePermission,
         ]"
       >
@@ -601,7 +618,7 @@
         :disabled="multipleSelection.length === 0"
         @click="cancelTaskHandle(2)"
         v-hasPermission="[
-          RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+          RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,RoleConst.USER.getWorkspaceRole,
           PermissionConst.KNOWLEDGE_DOCUMENT_GENERATE.getWorkspacePermission,
         ]"
       >

@@ -75,7 +75,9 @@
         <template #dropdown>
           <el-dropdown-menu>
             <el-dropdown-item
-              v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.MODEL_EDIT.getWorkspacePermission],'OR')"
+              v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+              RoleConst.USER.getWorkspaceRole,
+              PermissionConst.MODEL_EDIT.getWorkspacePermission],'OR')"
               icon="EditPen"
               :disabled="!is_permisstion"
               text
@@ -90,7 +92,9 @@
                 currentModel.model_type === 'LLM' ||
                 currentModel.model_type === 'IMAGE' ||
                 currentModel.model_type === 'TTI' ||
-                hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.MODEL_EDIT.getWorkspacePermission],'OR')
+                hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                RoleConst.USER.getWorkspaceRole,
+                PermissionConst.MODEL_EDIT.getWorkspacePermission],'OR')
               "
               :disabled="!is_permisstion"
               icon="Setting"
@@ -104,7 +108,9 @@
               :disabled="!is_permisstion"
               text
               @click.stop="deleteModel"
-              v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.MODEL_DELETE.getWorkspacePermission],'OR')"
+              v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+              RoleConst.USER.getWorkspaceRole,
+              PermissionConst.MODEL_DELETE.getWorkspacePermission],'OR')"
             >
               {{ $t('common.delete') }}
             </el-dropdown-item>

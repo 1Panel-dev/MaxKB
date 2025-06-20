@@ -54,6 +54,7 @@
                     :before-change="() => changeState(accessToken.is_active)"
                     v-hasPermission="[
                       RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                      RoleConst.USER.getWorkspaceRole,
                       PermissionConst.APPLICATION_EDIT.getWorkspacePermission,
                     ]"
                   />
@@ -99,6 +100,7 @@
                     @click="openDialog"
                     v-hasPermission="[
                       RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                      RoleConst.USER.getWorkspaceRole,
                       PermissionConst.APPLICATION_OVERVIEW_EMBEDDED.getWorkspacePermission,
                     ]"
                   >
@@ -110,6 +112,7 @@
                     @click="openLimitDialog"
                     v-hasPermission="[
                       RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                      RoleConst.USER.getWorkspaceRole,
                       PermissionConst.APPLICATION_OVERVIEW_ACCESS.getWorkspacePermission,
                     ]"
                   >
@@ -121,6 +124,7 @@
                     @click="openDisplaySettingDialog"
                     v-hasPermission="[
                       RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                      RoleConst.USER.getWorkspaceRole,
                       PermissionConst.APPLICATION_OVERVIEW_DISPLAY.getWorkspacePermission,
                     ]"
                   >
@@ -167,6 +171,7 @@
                     @click="openAPIKeyDialog"
                     v-hasPermission="[
                       RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                      RoleConst.USER.getWorkspaceRole,
                       PermissionConst.APPLICATION_OVERVIEW_API_KEY.getWorkspacePermission,
                     ]"
                   >
