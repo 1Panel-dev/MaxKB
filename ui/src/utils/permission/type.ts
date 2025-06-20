@@ -43,6 +43,14 @@ export class Permission {
     return `${this.permission}:/WORKSPACE/${user.getWorkspaceId()}`
   }
   /**
+   * 自定义工作空间管理员权限
+   * @returns
+   */
+  getWorkspacePermissionWorkspaceManageRole = () => {
+    const { user } = useStore()
+    return `${this.permission}:/WORKSPACE/${user.getWorkspaceId()}:ROLE/$WORKSPACE_MANAGE`
+  }
+  /**
    * 工作空间资源权限
    * @param workspace_id 工作空间id
    * @param resource     资源
@@ -58,16 +66,16 @@ export class Permission {
    * @param resource_id 资源id
    * @returns 工作空间下知识库资源权限
    */
-  getKnowledgeWorkspaceResourcePermission=( resource_id: string)=>{
-   return this.getWorkspaceResourcePermission('KNOWLEDGE',resource_id)
+  getKnowledgeWorkspaceResourcePermission = (resource_id: string) => {
+    return this.getWorkspaceResourcePermission('KNOWLEDGE', resource_id)
   }
   /**
    *
    * @param resource_id  资源id
    * @returns 工作空间下应用资源权限
    */
-  getApplicationWorkspaceResourcePermission=( resource_id: string)=>{
-   return this.getWorkspaceResourcePermission('APPLICATION',resource_id)
+  getApplicationWorkspaceResourcePermission = (resource_id: string) => {
+    return this.getWorkspaceResourcePermission('APPLICATION', resource_id)
   }
   toString() {
     return this.permission
