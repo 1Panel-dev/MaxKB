@@ -275,10 +275,10 @@ const delMulDocument: (
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<boolean>> = (knowledge_id, data, loading) => {
-  return del(
-    `${prefix.value}/${knowledge_id}/document/bach_delete`,
-    undefined,
+  return put(
+    `${prefix.value}/${knowledge_id}/document/batch_delete`,
     { id_list: data },
+    undefined,
     loading,
   )
 }
