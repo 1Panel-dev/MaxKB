@@ -386,6 +386,7 @@ class ToolSerializer(serializers.Serializer):
                 workspace_id=self.data.get('workspace_id'),
                 input_field_list=tool.get('input_field_list'),
                 init_field_list=tool.get('init_field_list', []),
+                folder_id=self.data.get('workspace_id'),
                 scope=scope,
                 is_active=False
             )
