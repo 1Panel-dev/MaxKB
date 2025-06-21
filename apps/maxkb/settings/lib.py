@@ -9,7 +9,7 @@
 import os
 import shutil
 
-from maxkb.const import CONFIG, PROJECT_DIR
+from maxkb.const import CONFIG, PROJECT_DIR, LOG_DIR
 
 # celery相关配置
 celery_data_dir = os.path.join(PROJECT_DIR, 'data', 'celery_task')
@@ -45,4 +45,4 @@ CELERY_ONCE = {
     'settings': {'location': celery_once_path}
 }
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
-CELERY_LOG_DIR = os.path.join(PROJECT_DIR, 'logs', 'celery')
+CELERY_LOG_DIR = os.path.join(LOG_DIR, 'celery')

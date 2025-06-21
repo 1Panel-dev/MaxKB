@@ -2,7 +2,7 @@ import logging
 import os
 import sys
 
-from maxkb.const import CONFIG, PROJECT_DIR
+from maxkb.const import CONFIG, PROJECT_DIR, LOG_DIR
 
 try:
     from apps.maxkb import const
@@ -19,7 +19,6 @@ HTTP_HOST = '0.0.0.0'
 HTTP_PORT = CONFIG.HTTP_LISTEN_PORT or 8080
 DEBUG = CONFIG.DEBUG or False
 
-LOG_DIR = os.path.join(PROJECT_DIR, 'data', 'logs')
 APPS_DIR = os.path.join(PROJECT_DIR, 'apps')
 TMP_DIR = os.path.join(PROJECT_DIR, 'tmp')
 if not os.path.exists(TMP_DIR):
