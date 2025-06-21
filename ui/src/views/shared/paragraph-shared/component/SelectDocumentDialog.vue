@@ -86,7 +86,7 @@
 import { ref, watch, reactive } from 'vue'
 import { useRoute } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
-import paragraphApi from '@/api/shared/paragraph'
+import paragraphApi from '@/api/system-shared/paragraph'
 import useStore from '@/stores'
 import { t } from '@/locales'
 const { knowledge, document } = useStore()

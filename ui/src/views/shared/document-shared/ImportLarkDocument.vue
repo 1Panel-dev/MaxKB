@@ -140,7 +140,7 @@ import { MsgConfirm, MsgSuccess, MsgWarning } from '@/utils/message'
 import { getImgUrl } from '@/utils/utils'
 import { t } from '@/locales'
 import type Node from 'element-plus/es/components/tree/src/model/node'
-import documentApi from '@/api/shared/document'
+import documentApi from '@/api/system-shared/document'
 
 const router = useRouter()
 const route = useRoute()

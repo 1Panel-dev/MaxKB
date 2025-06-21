@@ -55,7 +55,7 @@
 import { ref, watch, reactive } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import BaseForm from '@/views/shared/knowledge-shared/component/BaseForm.vue'
-import KnowledgeApi from '@/api/shared/knowledge'
+import KnowledgeApi from '@/api/system-shared/knowledge'
 import { MsgSuccess, MsgAlert } from '@/utils/message'
 import { t } from '@/locales'
 import { ComplexPermission } from '@/utils/permission/type'

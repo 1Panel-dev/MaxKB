@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import paragraphApi from '@/api/shared/paragraph'
+import paragraphApi from '@/api/system-shared/paragraph'
 import type { Ref } from 'vue'
 
 const useParagraphStore = defineStore('paragrap', {

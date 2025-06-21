@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import type { knowledgeData } from '@/api/type/knowledge'
 import type { UploadUserFile } from 'element-plus'
-import knowledgeApi from '@/api/shared/knowledge'
+import knowledgeApi from '@/api/system-shared/knowledge'
 import { type Ref } from 'vue'
 
 export interface knowledgeStateTypes {

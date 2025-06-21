@@ -123,7 +123,7 @@ import { ref, computed, onMounted, reactive, watch } from 'vue'
 import ParagraphPreview from '@/views/knowledge/component/ParagraphPreview.vue'
 import { useRoute } from 'vue-router'
 import { cutFilename } from '@/utils/utils'
-import documentApi from '@/api/shared/document'
+import documentApi from '@/api/system-shared/document'
 import useStore from '@/stores/modules-shared-system'
 import type { KeyValue } from '@/api/type/common'
 const { knowledge } = useStore()

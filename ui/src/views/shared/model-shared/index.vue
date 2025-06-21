@@ -124,7 +124,7 @@
 
 <script lang="ts" setup>
 import { onMounted, ref, computed } from 'vue'
-import ProviderApi from '@/api/shared/provider'
+import ProviderApi from '@/api/model/provider'
 import type { Provider, Model } from '@/api/type/model'
 import ModelCard from '@/views/shared/model-shared/component/ModelCard.vue'
 import ProviderComponent from '@/views/shared/model-shared/component/Provider.vue'

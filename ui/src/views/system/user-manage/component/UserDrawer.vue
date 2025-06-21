@@ -74,7 +74,7 @@ import {MsgSuccess} from '@/utils/message'
 import {t} from '@/locales'
 import type {FormItemModel} from '@/api/type/role'
 import WorkspaceApi from '@/api/workspace/workspace'
-import MemberFormContent from '@/views/role/component/MemberFormContent.vue'
+import MemberFormContent from '@/views/system/role/component/MemberFormContent.vue'
 import {RoleTypeEnum} from '@/enums/system'
 import useStore from "@/stores";
 

@@ -539,7 +539,7 @@
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import { useRouter, useRoute, onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router'
 import { ElTable } from 'element-plus'
-import documentApi from '@/api/shared/document'
+import documentApi from '@/api/system-shared/document'
 import ImportDocumentDialog from './component/ImportDocumentDialog.vue'
 import SyncWebDialog from '@/views/knowledge/component/SyncWebDialog.vue'
 import SelectKnowledgeDialog from './component/SelectKnowledgeDialog.vue'

@@ -282,7 +282,7 @@ import CreateWebKnowledgeDialog from './create-component/CreateWebKnowledgeDialo
 import CreateLarkKnowledgeDialog from './create-component/CreateLarkKnowledgeDialog.vue'
 import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
 import GenerateRelatedDialog from '@/components/generate-related-shared-dialog/index.vue'
-import KnowledgeApi from '@/api/shared/knowledge'
+import KnowledgeApi from '@/api/system-shared/knowledge'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import useStore from '@/stores/modules-shared-system'
 import { numberFormat } from '@/utils/common'

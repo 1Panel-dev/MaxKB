@@ -54,7 +54,7 @@ import { useRoute } from 'vue-router'
 import { cloneDeep, debounce } from 'lodash'
 import ParagraphForm from '@/views/paragraph/component/ParagraphForm.vue'
 import ProblemComponent from '@/views/paragraph/component/ProblemComponent.vue'
-import paragraphApi from '@/api/shared/paragraph'
+import paragraphApi from '@/api/system-shared/paragraph'
 import useStore from '@/stores'
 
 const props = defineProps({

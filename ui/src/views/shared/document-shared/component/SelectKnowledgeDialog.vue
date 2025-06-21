@@ -60,7 +60,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import documentApi from '@/api/shared/document'
+import documentApi from '@/api/system-shared/document'
 
 import useStore from '@/stores/modules-shared-system'
 const { knowledge } = useStore()

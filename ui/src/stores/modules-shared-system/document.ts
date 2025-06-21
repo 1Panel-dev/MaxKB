@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import documentApi from '@/api/shared/document'
+import documentApi from '@/api/system-shared/document'
 import { type Ref } from 'vue'
 
 const useDocumentStore = defineStore('documen', {

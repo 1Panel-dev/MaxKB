@@ -1,7 +1,7 @@
 import {defineStore} from 'pinia'
 import {type Ref} from 'vue'
-import ModelApi from '@/api/shared/model'
-import ProviderApi from '@/api/shared/provider'
+import ModelApi from '@/api/system-shared/model'
+import ProviderApi from '@/api/model/provider'
 import type {ListModelRequest} from '@/api/type/model'
 
 const useModelStore = defineStore('mode', {

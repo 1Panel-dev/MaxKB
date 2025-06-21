@@ -110,7 +110,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, watch } from 'vue'
-import ToolApi from '@/api/shared/tool'
+import ToolApi from '@/api/system-shared/tool'
 import type { FormInstance } from 'element-plus'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
 

@@ -152,7 +152,7 @@
 import { ref, onMounted, reactive } from 'vue'
 import { useRoute } from 'vue-router'
 import BaseForm from '@/views/shared/knowledge-shared/component/BaseForm.vue'
-import KnowledgeApi from '@/api/shared/knowledge'
+import KnowledgeApi from '@/api/system-shared/knowledge'
 import type { ApplicationFormType } from '@/api/type/application'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { isAppIcon } from '@/utils/common'

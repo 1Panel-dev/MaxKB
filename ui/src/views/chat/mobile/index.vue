@@ -49,11 +49,7 @@
       </div>
 
       <!-- 历史记录弹出层 -->
-      <div
-        v-if="applicationDetail.show_history || !user.isEnterprise()"
-        @click.prevent.stop="show = !show"
-        class="chat-popover-button cursor color-secondary"
-      >
+      <div @click.prevent.stop="show = !show" class="chat-popover-button cursor color-secondary">
         <AppIcon
           iconName="app-history-outlined"
           :style="{
@@ -294,9 +290,7 @@ function refresh(id: string) {
  *初始化历史对话记录
  */
 const init = () => {
-  if (applicationDetail.value.show_history || !user.isEnterprise()) {
-    getChatLog(applicationDetail.value.id)
-  }
+  getChatLog(applicationDetail.value.id)
 }
 
 onMounted(() => {

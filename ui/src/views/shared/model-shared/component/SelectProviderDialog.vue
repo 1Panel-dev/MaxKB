@@ -47,7 +47,7 @@
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
-import ProviderApi from '@/api/shared/provider'
+import ProviderApi from '@/api/model/provider'
 import type { Provider } from '@/api/type/model'
 import { modelTypeList } from './data'
 import { t } from '@/locales'

@@ -377,12 +377,13 @@ async function exportHTML(): Promise<void> {
  *初始化历史对话记录
  */
 const init = () => {
-  if (
-    (applicationDetail.value.show_history || !user.isEnterprise()) &&
-    props.applicationAvailable
-  ) {
-    getChatLog(applicationDetail.value.id)
-  }
+  // if (
+  //   (applicationDetail.value.show_history || !user.isEnterprise()) &&
+  //   props.applicationAvailable
+  // ) {
+  //   getChatLog(applicationDetail.value.id)
+  // }
+  getChatLog(applicationDetail.value.id)
 }
 onMounted(() => {
   init()

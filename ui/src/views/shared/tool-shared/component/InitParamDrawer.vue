@@ -28,7 +28,7 @@
 
 <script setup lang="ts">
 import {ref, watch} from 'vue'
-import ToolApi from '@/api/shared/tool'
+import ToolApi from '@/api/system-shared/tool'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
 import {MsgSuccess} from '@/utils/message'
 import {t} from '@/locales'

@@ -80,7 +80,7 @@ import { ref, computed } from 'vue'
 import type { CheckboxValueType } from 'element-plus'
 import iconMap from '@/components/app-icon/icons/common'
 import { Search } from '@element-plus/icons-vue'
-import authorizationApi from '@/api/shared/authorization'
+import authorizationApi from '@/api/system-shared/authorization'
 
 const checkAll = ref(false)
 const isIndeterminate = ref(true)

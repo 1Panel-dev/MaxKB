@@ -215,7 +215,7 @@
 import { nextTick, ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { cloneDeep } from 'lodash'
-import KnowledgeApi from '@/api/shared/knowledge'
+import KnowledgeApi from '@/api/system-shared/knowledge'
 // import applicationApi from '@/api/application/application'
 import ParagraphDialog from '@/views/paragraph/component/ParagraphDialog.vue'
 import { arraySort } from '@/utils/common'

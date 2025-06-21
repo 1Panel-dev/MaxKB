@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { type Ref } from 'vue'
-import problemApi from '@/api/shared/problem'
+import problemApi from '@/api/system-shared/problem'
 import type { pageRequest } from '@/api/type/common'
 
 const useProblemStore = defineStore('proble', {

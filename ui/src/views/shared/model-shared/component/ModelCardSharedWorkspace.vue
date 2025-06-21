@@ -67,7 +67,7 @@
 </template>
 <script setup lang="ts">
 import type { Provider, Model } from '@/api/type/model'
-import ModelApi from '@/api/shared/model'
+import ModelApi from '@/api/system-shared/model'
 import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import EditModel from '@/views/shared/model-shared/component/EditModel.vue'
 // import DownloadLoading from '@/components/loading/DownloadLoading.vue'

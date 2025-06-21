@@ -83,7 +83,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import problemApi from '@/api/shared/problem'
+import problemApi from '@/api/system-shared/problem'
 import ParagraphDialog from '@/views/paragraph/component/ParagraphDialog.vue'
 import RelateProblemDialog from './RelateProblemDialog.vue'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'

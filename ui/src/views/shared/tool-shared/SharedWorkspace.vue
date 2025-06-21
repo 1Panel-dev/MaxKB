@@ -118,7 +118,7 @@
 <script lang="ts" setup>
 import { onMounted, ref, reactive, computed } from 'vue'
 import { cloneDeep, get } from 'lodash'
-import ToolApi from '@/api/shared/tool'
+import ToolApi from '@/api/system-shared/tool'
 import ToolWorkspaceApi from '@/api/shared-workspace'
 import useStore from '@/stores/modules-shared-system'
 import InitParamDrawer from '@/views/shared/tool-shared/component/InitParamDrawer.vue'

@@ -36,7 +36,7 @@
 </template>
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import knowledgeApi from '@/api/shared/knowledge'
+import knowledgeApi from '@/api/system-shared/knowledge'
 
 const emit = defineEmits(['refresh'])
 const loading = ref<boolean>(false)

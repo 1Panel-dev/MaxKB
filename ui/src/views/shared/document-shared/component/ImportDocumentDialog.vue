@@ -95,7 +95,7 @@
 import { ref, reactive, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import type { FormInstance } from 'element-plus'
-import documentApi from '@/api/shared/document'
+import documentApi from '@/api/system-shared/document'
 import { MsgSuccess } from '@/utils/message'
 import { hitHandlingMethod } from '@/enums/document'
 import { t } from '@/locales'

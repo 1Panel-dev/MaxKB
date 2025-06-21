@@ -111,8 +111,8 @@
 <script setup lang="ts">
 import { ref, watch, reactive } from 'vue'
 import { useRoute } from 'vue-router'
-import problemApi from '@/api/shared/problem'
-import paragraphApi from '@/api/shared/paragraph'
+import problemApi from '@/api/system-shared/problem'
+import paragraphApi from '@/api/system-shared/paragraph'
 import useStore from '@/stores/modules-shared-system'
 import { MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'

@@ -136,7 +136,7 @@
 import { ref, onMounted, reactive, onBeforeUnmount, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElTable } from 'element-plus'
-import problemApi from '@/api/shared/problem'
+import problemApi from '@/api/system-shared/problem'
 import CreateProblemDialog from './component/CreateProblemDialog.vue'
 import DetailProblemDrawer from './component/DetailProblemDrawer.vue'
 import RelateProblemDialog from './component/RelateProblemDialog.vue'

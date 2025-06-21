@@ -1,10 +1,10 @@
-import {PermissionConst, EditionConst, RoleConst} from '@/utils/permission/data'
-import {ComplexPermission} from '@/utils/permission/type'
+import { PermissionConst, EditionConst, RoleConst } from '@/utils/permission/data'
+import { ComplexPermission } from '@/utils/permission/type'
 
 const systemRouter = {
   path: '/system',
   name: 'system',
-  meta: {title: 'views.system.title'},
+  meta: { title: 'views.system.title' },
   hidden: true,
   component: () => import('@/layout/layout-template/SystemMainLayout.vue'),
   children: [
@@ -20,7 +20,49 @@ const systemRouter = {
         parentName: 'system',
         permission: [RoleConst.ADMIN, EditionConst.IS_EE],
       },
-      component: () => import('@/views/user-manage/index.vue'),
+      component: () => import('@/views/system/user-manage/index.vue'),
+    },
+    {
+      path: '/system/role',
+      name: 'role',
+      meta: {
+        icon: 'app-resource-authorization', // TODO
+        iconActive: 'app-resource-authorization-active', // TODO
+        title: 'views.role.title',
+        activeMenu: '/system',
+        parentPath: '/system',
+        parentName: 'system',
+        permission: [
+          new ComplexPermission(
+            [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+            [PermissionConst.ROLE_READ],
+            [EditionConst.IS_EE],
+            'OR',
+          ),
+        ],
+      },
+      component: () => import('@/views/system/role/index.vue'),
+    },
+    {
+      path: '/system/workspace',
+      name: 'workspace',
+      meta: {
+        icon: 'app-resource-authorization', // TODO
+        iconActive: 'app-resource-authorization-active', // TODO
+        title: 'views.workspace.title',
+        activeMenu: '/system',
+        parentPath: '/system',
+        parentName: 'system',
+        permission: [
+          new ComplexPermission(
+            [RoleConst.WORKSPACE_MANAGE.getWorkspaceRole, RoleConst.ADMIN],
+            [PermissionConst.WORKSPACE_WORKSPACE_READ],
+            [EditionConst.IS_EE],
+            'OR',
+          ),
+        ],
+      },
+      component: () => import('@/views/system/workspace/index.vue'),
     },
     {
       path: '/system/resource-management',
@@ -69,49 +111,7 @@ const systemRouter = {
         parentPath: '/system',
         parentName: 'system',
       },
-      component: () => import('@/views/resource-authorization/index.vue'),
-    },
-    {
-      path: '/system/role',
-      name: 'role',
-      meta: {
-        icon: 'app-resource-authorization', // TODO
-        iconActive: 'app-resource-authorization-active', // TODO
-        title: 'views.role.title',
-        activeMenu: '/system',
-        parentPath: '/system',
-        parentName: 'system',
-        permission: [
-          new ComplexPermission(
-            [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
-            [PermissionConst.ROLE_READ],
-            [EditionConst.IS_EE],
-            'OR',
-          ),
-        ],
-      },
-      component: () => import('@/views/role/index.vue'),
-    },
-    {
-      path: '/system/workspace',
-      name: 'workspace',
-      meta: {
-        icon: 'app-resource-authorization', // TODO
-        iconActive: 'app-resource-authorization-active', // TODO
-        title: 'views.workspace.title',
-        activeMenu: '/system',
-        parentPath: '/system',
-        parentName: 'system',
-        permission: [
-          new ComplexPermission(
-            [RoleConst.WORKSPACE_MANAGE.getWorkspaceRole, RoleConst.ADMIN],
-            [PermissionConst.WORKSPACE_WORKSPACE_READ],
-            [EditionConst.IS_EE],
-            'OR',
-          ),
-        ],
-      },
-      component: () => import('@/views/workspace/index.vue'),
+      component: () => import('@/views/system/resource-authorization/index.vue'),
     },
     {
       path: '/system/shared',
@@ -262,7 +262,7 @@ const systemRouter = {
             parentName: 'system',
             permission: [EditionConst.IS_PE, EditionConst.IS_EE],
           },
-          component: () => import('@/views/theme/index.vue'),
+          component: () => import('@/views/system-setting/theme/index.vue'),
         },
         {
           path: '/system/authentication',
@@ -274,7 +274,7 @@ const systemRouter = {
             parentName: 'system',
             permission: [EditionConst.IS_PE, EditionConst.IS_EE],
           },
-          component: () => import('@/views/authentication/index.vue'),
+          component: () => import('@/views/system-setting/authentication/index.vue'),
         },
         {
           path: '/system/email',
@@ -286,7 +286,7 @@ const systemRouter = {
             parentName: 'system',
             //permission: new Role('ADMIN')
           },
-          component: () => import('@/views/email/index.vue'),
+          component: () => import('@/views/system-setting/email/index.vue'),
         },
       ],
     },
@@ -302,8 +302,8 @@ const systemRouter = {
         parentName: 'system',
         permission: [EditionConst.IS_PE, EditionConst.IS_EE],
       },
-      component: () => import('@/views/operate-log/index.vue')
-    }
+      component: () => import('@/views/system/operate-log/index.vue'),
+    },
   ],
 }
 

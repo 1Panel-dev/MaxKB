@@ -199,7 +199,7 @@ import { ref, reactive, onUnmounted, onMounted, computed, watch, nextTick } from
 import type { UploadFiles } from 'element-plus'
 import { filesize, getImgUrl, isRightType } from '@/utils/utils'
 import { MsgError } from '@/utils/message'
-import documentApi from '@/api/shared/document'
+import documentApi from '@/api/system-shared/document'
 import useStore from '@/stores/modules-shared-system'
 import { t } from '@/locales'
 const { knowledge } = useStore()

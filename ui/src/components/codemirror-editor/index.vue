@@ -44,7 +44,7 @@ import {Codemirror} from 'vue-codemirror'
 import {python} from '@codemirror/lang-python'
 import {oneDark} from '@codemirror/theme-one-dark'
 import {linter, type Diagnostic} from '@codemirror/lint'
-import ToolApi from '@/api/shared/tool'
+import ToolApi from '@/api/system-shared/tool'
 
 defineOptions({name: 'CodemirrorEditor'})
 

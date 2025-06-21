@@ -57,7 +57,7 @@
 <script setup lang="ts">
 import { ref, nextTick, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import paragraphApi from '@/api/shared/paragraph'
+import paragraphApi from '@/api/system-shared/paragraph'
 import useStore from '@/stores'
 
 const props = defineProps({
