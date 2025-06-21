@@ -12,7 +12,7 @@ from (select application."id"::text,
              application."create_time",
              application."update_time"
       from application left join "user" on user_id = "user".id
-      where id in (select target
+      where application."id" in (select target
                    from workspace_user_resource_permission
                    where auth_target_type = 'APPLICATION'
                      and case
