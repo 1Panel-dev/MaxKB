@@ -10,6 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from common.config.embedding_config import ModelManage
+from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.exception.app_exception import AppApiException
 from common.utils.rsa_util import rsa_long_encrypt, rsa_long_decrypt
 from models_provider.base_model_provider import ValidCode, DownModelChunkStatus
@@ -394,7 +395,22 @@ class ModelSerializer(serializers.Serializer):
             return True
 
 
-class SharedModelSerializer(serializers.Serializer):
+def get_authorized_tool(tool_query_set, workspace_id, model_workspace_authorization):
+    white_authorized_tool_ids = QuerySet(model_workspace_authorization).filter(
+        workspace_id=workspace_id, authentication_type='WHITE_LIST'
+    ).values_list('model_id', flat=True)
+    black_authorized_tool_ids = QuerySet(model_workspace_authorization).filter(
+        workspace_id=workspace_id, authentication_type='BLACK_LIST'
+    ).values_list('model_id', flat=True)
+    tool_query_set = tool_query_set.filter(
+        id__in=white_authorized_tool_ids
+    ).exclude(
+        id__in=black_authorized_tool_ids
+    )
+    return tool_query_set
+
+
+class WorkspaceSharedModelSerializer(serializers.Serializer):
     workspace_id = serializers.CharField(required=True, label=_('workspace id'))
     name = serializers.CharField(required=False, max_length=64, label=_('model name'))
     model_type = serializers.CharField(required=False, label=_('model type'))
@@ -404,7 +420,10 @@ class SharedModelSerializer(serializers.Serializer):
 
     def get_share_model_list(self):
         self.is_valid(raise_exception=True)
-        queryset = QuerySet(Model).filter(workspace_id='None')
+        workspace_id = self.data.get('workspace_id')
+
+        queryset = self._build_queryset(workspace_id)
+
         return [
             {
                 'id': str(model.id),
@@ -419,3 +438,23 @@ class SharedModelSerializer(serializers.Serializer):
             }
             for model in queryset.order_by("-create_time")
         ]
+
+    def _build_queryset(self, workspace_id):
+        queryset = QuerySet(Model)
+        if workspace_id:
+            model_workspace_authorization = DatabaseModelManage.get_model("model_workspace_authorization")
+            if model_workspace_authorization is not None:
+                queryset = get_authorized_tool(queryset, workspace_id,
+                                               model_workspace_authorization=model_workspace_authorization)
+
+        for field in ['name', 'model_type', 'model_name', 'provider', 'create_user']:
+            value = self.data.get(field)
+            if value is not None:
+                if field == 'name':
+                    queryset = queryset.filter(**{f'{field}__icontains': value})
+                elif field == 'create_user':
+                    queryset = queryset.filter(user_id=value)
+                else:
+                    queryset = queryset.filter(**{field: value})
+
+        return queryset

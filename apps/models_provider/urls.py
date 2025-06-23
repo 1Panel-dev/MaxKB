@@ -18,7 +18,7 @@ urlpatterns = [
     path('workspace/<str:workspace_id>/model/<str:model_id>/pause_download',
          views.ModelSetting.PauseDownload.as_view()),
     path('workspace/<str:workspace_id>/model/<str:model_id>/meta', views.ModelSetting.ModelMeta.as_view()),
-    path('workspace/<str:workspace_id>/shared/model', views.SharedModel.as_view()),
+    path('system/shared/workspace/<str:workspace_id>/model', views.WorkspaceSharedModelSetting.as_view()),
 ]
 
 if os.environ.get('SERVER_NAME', 'web') == 'local_model':
