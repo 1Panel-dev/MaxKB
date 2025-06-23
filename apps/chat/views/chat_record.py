@@ -6,13 +6,14 @@
     @date：2025/6/23 10:42
     @desc:
 """
+from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
 from rest_framework.request import Request
 from rest_framework.views import APIView
-from django.utils.translation import gettext_lazy as _
 
+from chat.api.chat_api import HistoricalConversationAPI, PageHistoricalConversationAPI
 from chat.api.vote_api import VoteAPI
-from chat.serializers.chat_record import VoteSerializer
+from chat.serializers.chat_record import VoteSerializer, ChatRecordSerializer
 from common import result
 from common.auth import TokenAuth
 
@@ -35,3 +36,42 @@ class VoteView(APIView):
             data={'chat_id': chat_id,
                   'chat_record_id': chat_record_id
                   }).vote(request.data))
+
+
+class HistoricalConversationView(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(
+        methods=['GET'],
+        description=_("Get historical conversation"),
+        summary=_("Get historical conversation"),
+        operation_id=_("Get historical conversation"),  # type: ignore
+        parameters=HistoricalConversationAPI.get_parameters(),
+        responses=HistoricalConversationAPI.get_response(),
+        tags=[_('Chat')]  # type: ignore
+    )
+    def get(self, request: Request):
+        return result.success(ChatRecordSerializer(
+            data={
+                'application_id': request.auth.application_id,
+                'chat_user_id': request.auth.chat_user_id,
+            }).list())
+
+    class PageView(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['GET'],
+            description=_("Get historical conversation by page"),
+            summary=_("Get historical conversation by page"),
+            operation_id=_("Get historical conversation by page"),  # type: ignore
+            parameters=PageHistoricalConversationAPI.get_parameters(),
+            responses=PageHistoricalConversationAPI.get_response(),
+            tags=[_('Chat')]  # type: ignore
+        )
+        def get(self, request: Request, current_page: int, page_size: int):
+            return result.success(ChatRecordSerializer(
+                data={
+                    'application_id': request.auth.application_id,
+                    'chat_user_id': request.auth.chat_user_id,
+                }).page(current_page, page_size))

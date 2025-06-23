@@ -182,6 +182,13 @@ const vote: (
     loading,
   )
 }
+const pageChat: (
+  current_page: number,
+  page_size: number,
+  loading?: Ref<boolean>,
+) => Promise<Result<boolean>> = (current_page, page_size, loading) => {
+  return get(`/historical_conversation/${current_page}/${page_size}`, undefined, loading)
+}
 export default {
   open,
   chat,
@@ -200,4 +207,5 @@ export default {
   getAuthSetting,
   passwordAuthentication,
   vote,
+  pageChat,
 }

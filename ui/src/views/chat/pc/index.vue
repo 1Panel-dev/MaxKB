@@ -153,6 +153,7 @@
 import { ref, onMounted, nextTick, computed } from 'vue'
 import { marked } from 'marked'
 import { saveAs } from 'file-saver'
+import chatAPI from '@/api/chat/chat'
 import { isAppIcon } from '@/utils/common'
 import useStore from '@/stores'
 import useResize from '@/layout/hooks/useResize'
@@ -278,7 +279,7 @@ function getChatLog(id: string, refresh?: boolean) {
     page_size: 20,
   }
 
-  chatLog.asyncGetChatLogClient(id, page, left_loading).then((res: any) => {
+  chatAPI.pageChat(page.current_page, page.page_size, left_loading).then((res: any) => {
     chatLogData.value = res.data.records
     if (refresh) {
       currentChatName.value = chatLogData.value?.[0]?.abstract

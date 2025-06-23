@@ -13,7 +13,8 @@ from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _, gettext
 from rest_framework import serializers
 
-from application.models import VoteChoices, ChatRecord
+from application.models import VoteChoices, ChatRecord, Chat
+from common.db.search import page_search
 from common.exception.app_exception import AppApiException
 from common.utils.lock import try_lock, un_lock
 
@@ -21,6 +22,16 @@ from common.utils.lock import try_lock, un_lock
 class VoteRequest(serializers.Serializer):
     vote_status = serializers.ChoiceField(choices=VoteChoices.choices,
                                           label=_("Bidding Status"))
+
+
+class HistoryChatRecordModel(serializers.ModelSerializer):
+    class Meta:
+        model = Chat
+        fields = ['id',
+                  'application_id',
+                  'abstract',
+                  'create_time',
+                  'update_time']
 
 
 class VoteSerializer(serializers.Serializer):
@@ -63,3 +74,22 @@ class VoteSerializer(serializers.Serializer):
         finally:
             un_lock(self.data.get('chat_record_id'))
         return True
+
+
+class ChatRecordSerializer(serializers.Serializer):
+    application_id = serializers.UUIDField(required=True, label=_('Application ID'))
+    chat_user_id = serializers.UUIDField(required=True, label=_('Chat User ID'))
+
+    def get_queryset(self):
+        chat_user_id = self.data.get('chat_user_id')
+        application_id = self.data.get("application_id")
+        return QuerySet(Chat).filter(application_id=application_id, chat_user_id=chat_user_id, is_deleted=False)
+
+    def list(self):
+        self.is_valid(raise_exception=True)
+        queryset = self.get_queryset()
+        return [HistoryChatRecordModel(r).data for r in queryset]
+
+    def page(self, current_page, page_size):
+        self.is_valid(raise_exception=True)
+        return page_search(current_page, page_size, self.get_queryset(), lambda r: HistoryChatRecordModel(r).data)

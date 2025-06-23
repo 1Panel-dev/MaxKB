@@ -13,4 +13,8 @@ urlpatterns = [
     path('open', views.OpenView.as_view()),
     path('captcha', views.CaptchaView.as_view(), name='captcha'),
     path('vote/chat/<str:chat_id>/chat_record/<str:chat_record_id>', views.VoteView.as_view(), name='vote'),
+    path('historical_conversation', views.HistoricalConversationView.as_view(), name='historical_conversation'),
+    path('historical_conversation/<int:current_page>/<int:page_size>',
+         views.HistoricalConversationView.PageView.as_view(),
+         name='historical_conversation')
 ]
