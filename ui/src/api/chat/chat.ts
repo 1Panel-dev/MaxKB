@@ -159,6 +159,29 @@ const getAuthSetting: (auth_type: string, loading?: Ref<boolean>) => Promise<Res
 ) => {
   return get(`/chat_user/${auth_type}/detail`, undefined, loading)
 }
+/**
+ * 点赞点踩
+ * @param chat_id         对话id
+ * @param chat_record_id  对话记录id
+ * @param vote_status     点赞状态
+ * @param loading         加载器
+ * @returns
+ */
+const vote: (
+  chat_id: string,
+  chat_record_id: string,
+  vote_status: string,
+  loading?: Ref<boolean>,
+) => Promise<Result<boolean>> = (chat_id, chat_record_id, vote_status, loading) => {
+  return put(
+    `/vote/chat/${chat_id}/chat_record/${chat_record_id}`,
+    {
+      vote_status,
+    },
+    undefined,
+    loading,
+  )
+}
 export default {
   open,
   chat,
@@ -176,4 +199,5 @@ export default {
   ldapLogin,
   getAuthSetting,
   passwordAuthentication,
+  vote,
 }
