@@ -9,7 +9,7 @@
 import logging
 import time
 import traceback
-import uuid
+import uuid_utils.compat as uuid
 from typing import List
 
 from django.db.models import QuerySet
@@ -238,7 +238,7 @@ class BaseChatStep(IChatStep):
                        model_setting=None):
         chat_result, is_ai_chat = self.get_stream_result(message_list, chat_model, paragraph_list,
                                                          no_references_setting, problem_text)
-        chat_record_id = uuid.uuid1()
+        chat_record_id = uuid.uuid7()
         r = StreamingHttpResponse(
             streaming_content=event_content(chat_result, chat_id, chat_record_id, paragraph_list,
                                             post_response_handler, manage, self, chat_model, message_list, problem_text,
@@ -286,7 +286,7 @@ class BaseChatStep(IChatStep):
         reasoning_content_end = model_setting.get('reasoning_content_end', '</think>')
         reasoning = Reasoning(reasoning_content_start,
                               reasoning_content_end)
-        chat_record_id = uuid.uuid1()
+        chat_record_id = uuid.uuid7()
         # 调用模型
         try:
             chat_result, is_ai_chat = self.get_block_result(message_list, chat_model, paragraph_list,

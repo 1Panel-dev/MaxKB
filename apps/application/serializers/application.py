@@ -246,7 +246,7 @@ class ApplicationCreateSerializer(serializers.Serializer):
 
         @staticmethod
         def to_application_model(user_id: str, application: Dict):
-            return Application(id=uuid.uuid1(), name=application.get('name'), desc=application.get('desc'),
+            return Application(id=uuid.uuid7(), name=application.get('name'), desc=application.get('desc'),
                                prologue=application.get('prologue'),
                                dialogue_number=application.get('dialogue_number', 0),
                                user_id=user_id, model_id=application.get('model_id'),
@@ -429,12 +429,12 @@ class ApplicationSerializer(serializers.Serializer):
         application_model.save()
         # 插入认证信息
         ApplicationAccessToken(application_id=application_model.id,
-                               access_token=hashlib.md5(str(uuid.uuid1()).encode()).hexdigest()[8:24]).save()
+                               access_token=hashlib.md5(str(uuid.uuid7()).encode()).hexdigest()[8:24]).save()
         return ApplicationCreateSerializer.ApplicationResponse(application_model).data
 
     @staticmethod
     def to_application_knowledge_mapping(application_id: str, dataset_id: str):
-        return ApplicationKnowledgeMapping(id=uuid.uuid1(), application_id=application_id, dataset_id=dataset_id)
+        return ApplicationKnowledgeMapping(id=uuid.uuid7(), application_id=application_id, dataset_id=dataset_id)
 
     def insert_simple(self, instance: Dict):
         self.is_valid(raise_exception=True)
@@ -449,7 +449,7 @@ class ApplicationSerializer(serializers.Serializer):
         application_model.save()
         # 插入认证信息
         ApplicationAccessToken(application_id=application_model.id,
-                               access_token=hashlib.md5(str(uuid.uuid1()).encode()).hexdigest()[8:24]).save()
+                               access_token=hashlib.md5(str(uuid.uuid7()).encode()).hexdigest()[8:24]).save()
         # 插入关联数据
         QuerySet(ApplicationKnowledgeMapping).bulk_create(application_knowledge_mapping_model_list)
         return ApplicationCreateSerializer.ApplicationResponse(application_model).data
@@ -484,7 +484,7 @@ class ApplicationSerializer(serializers.Serializer):
         application_model.save()
         # 插入认证信息
         ApplicationAccessToken(application_id=application_model.id,
-                               access_token=hashlib.md5(str(uuid.uuid1()).encode()).hexdigest()[8:24]).save()
+                               access_token=hashlib.md5(str(uuid.uuid7()).encode()).hexdigest()[8:24]).save()
         QuerySet(Tool).bulk_create(tool_model_list) if len(tool_model_list) > 0 else None
         return True
 
@@ -511,7 +511,7 @@ class ApplicationSerializer(serializers.Serializer):
         for node in work_flow.get('nodes', []):
             if node.get('type') == 'search-dataset-node':
                 node.get('properties', {}).get('node_data', {})['dataset_id_list'] = []
-        return Application(id=uuid.uuid1(),
+        return Application(id=uuid.uuid7(),
                            user_id=user_id,
                            name=application.get('name'),
                            workspace_id=workspace_id,

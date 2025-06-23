@@ -6,7 +6,7 @@
     @date：2025/6/6 13:48
     @desc:
 """
-import uuid
+import uuid_utils.compat as uuid
 
 from django.core import signing
 from django.core.cache import cache
@@ -41,7 +41,7 @@ class AnonymousAuthenticationSerializer(serializers.Serializer):
         access_token = self.data.get("access_token")
         application_access_token = QuerySet(ApplicationAccessToken).filter(access_token=access_token).first()
         if application_access_token is not None and application_access_token.is_active:
-            chat_user_id = token_details.get('chat_user_id') or str(uuid.uuid1())
+            chat_user_id = token_details.get('chat_user_id') or str(uuid.uuid7())
             _type = AuthenticationType.CHAT_ANONYMOUS_USER
             return ChatUserToken(application_access_token.application_id, None, access_token, _type,
                                  ChatUserType.ANONYMOUS_USER,

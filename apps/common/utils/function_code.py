@@ -10,7 +10,7 @@ import os
 import pickle
 import subprocess
 import sys
-import uuid
+import uuid_utils.compat as uuid
 from textwrap import dedent
 
 from maxkb.const import BASE_DIR
@@ -42,7 +42,7 @@ class FunctionExecutor:
             os.umask(old_mask)
 
     def exec_code(self, code_str, keywords):
-        _id = str(uuid.uuid1())
+        _id = str(uuid.uuid7())
         success = '{"code":200,"msg":"成功","data":exec_result}'
         err = '{"code":500,"msg":str(e),"data":None}'
         result_path = f'{self.sandbox_path}/result/{_id}.result'

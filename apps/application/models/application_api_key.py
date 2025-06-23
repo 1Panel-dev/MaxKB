@@ -1,4 +1,4 @@
-import uuid
+import uuid_utils.compat as uuid
 
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
@@ -9,7 +9,7 @@ from users.models import User
 
 
 class ApplicationApiKey(AppModelMixin):
-    id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid1, editable=False, verbose_name="主键id")
+    id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
     secret_key = models.CharField(max_length=1024, verbose_name="秘钥", unique=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="用户id")
     workspace_id = models.CharField(max_length=64, verbose_name="工作空间id", default="default", db_index=True)

@@ -7,7 +7,7 @@
     @desc:
 """
 import os
-import uuid
+import uuid_utils.compat as uuid
 
 from django.db.models import QuerySet
 from django.http import HttpResponse
@@ -78,7 +78,7 @@ class ChatEmbedSerializer(serializers.Serializer):
                  'x_value': float_location.get('x', {}).get('value', 0),
                  'y_type': float_location.get('y', {}).get('type', 'bottom'),
                  'y_value': float_location.get('y', {}).get('value', 30),
-                 'max_kb_id': str(uuid.uuid1()).replace('-', ''),
+                 'max_kb_id': str(uuid.uuid7()).replace('-', ''),
                  'header_font_color': header_font_color}))
         response = HttpResponse(s, status=200, headers={'Content-Type': 'text/javascript'})
         return response

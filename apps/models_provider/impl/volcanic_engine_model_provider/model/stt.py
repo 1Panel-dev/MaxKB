@@ -13,7 +13,7 @@ import hmac
 import json
 import os
 import ssl
-import uuid
+import uuid_utils.compat as uuid
 import wave
 from hashlib import sha256
 from io import BytesIO
@@ -285,7 +285,7 @@ class VolcanicEngineSpeechToText(MaxKBBaseModel, BaseSpeechToText):
         return header_dicts
 
     async def segment_data_processor(self, wav_data: bytes, segment_size: int):
-        reqid = str(uuid.uuid4())
+        reqid = str(uuid.uuid7())
         # 构建 full client request，并序列化压缩
         request_params = self.construct_request(reqid)
         payload_bytes = str.encode(json.dumps(request_params))

@@ -7,7 +7,7 @@
     @desc:
 """
 import hashlib
-import uuid
+import uuid_utils.compat as uuid
 
 from django.core.cache import cache
 from django.db.models import QuerySet
@@ -53,7 +53,7 @@ class AccessTokenSerializer(serializers.Serializer):
         if 'is_active' in instance:
             application_access_token.is_active = instance.get("is_active")
         if 'access_token_reset' in instance and instance.get('access_token_reset'):
-            application_access_token.access_token = hashlib.md5(str(uuid.uuid1()).encode()).hexdigest()[8:24]
+            application_access_token.access_token = hashlib.md5(str(uuid.uuid7()).encode()).hexdigest()[8:24]
         if 'access_num' in instance and instance.get('access_num') is not None:
             application_access_token.access_num = instance.get("access_num")
         if 'white_active' in instance and instance.get('white_active') is not None:
@@ -91,7 +91,7 @@ class AccessTokenSerializer(serializers.Serializer):
         if application_access_token is None:
             application_access_token = ApplicationAccessToken(application_id=application_id,
                                                               access_token=hashlib.md5(
-                                                                  str(uuid.uuid1()).encode()).hexdigest()[
+                                                                  str(uuid.uuid7()).encode()).hexdigest()[
                                                                            8:24], is_active=True)
             application_access_token.save()
         application_setting_model = DatabaseModelManage.get_model('application_setting')

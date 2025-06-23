@@ -14,7 +14,7 @@ import gzip
 import json
 import re
 import ssl
-import uuid
+import uuid_utils.compat as uuid
 from typing import Dict
 
 import websockets
@@ -92,7 +92,7 @@ class VolcanicEngineTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
                          "pitch_ratio": 1.0,
                      } | self.params,
             "request": {
-                "reqid": str(uuid.uuid4()),
+                "reqid": str(uuid.uuid7()),
                 "text": '',
                 "text_type": "plain",
                 "operation": "xxx"
@@ -119,7 +119,7 @@ class VolcanicEngineTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
             for line in lines:
                 if self.is_table_format_chars_only(line):
                     continue
-                submit_request_json["request"]["reqid"] = str(uuid.uuid4())
+                submit_request_json["request"]["reqid"] = str(uuid.uuid7())
                 submit_request_json["request"]["text"] = line
                 payload_bytes = str.encode(json.dumps(submit_request_json))
                 payload_bytes = gzip.compress(payload_bytes)  # if no compression, comment this line

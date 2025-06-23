@@ -90,7 +90,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('create_time', models.DateTimeField(auto_now_add=True, verbose_name='创建时间')),
                 ('update_time', models.DateTimeField(auto_now=True, verbose_name='修改时间')),
-                ('id', models.UUIDField(default=uuid.uuid1, editable=False, primary_key=True, serialize=False, verbose_name='主键id')),
+                ('id', models.UUIDField(default=uuid_utils.compat.uuid7, editable=False, primary_key=True, serialize=False, verbose_name='主键id')),
                 ('secret_key', models.CharField(max_length=1024, unique=True, verbose_name='秘钥')),
                 ('workspace_id', models.CharField(db_index=True, default='default', max_length=64, verbose_name='工作空间id')),
                 ('is_active', models.BooleanField(default=True, verbose_name='是否开启')),
@@ -162,7 +162,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('create_time', models.DateTimeField(auto_now_add=True, verbose_name='创建时间')),
                 ('update_time', models.DateTimeField(auto_now=True, verbose_name='修改时间')),
-                ('id', models.UUIDField(default=uuid_utils.compat.uuid1, editable=False, primary_key=True, serialize=False, verbose_name='主键id')),
+                ('id', models.UUIDField(default=uuid_utils.compat.uuid7, editable=False, primary_key=True, serialize=False, verbose_name='主键id')),
                 ('vote_status', models.CharField(choices=[('-1', '未投票'), ('0', '赞同'), ('1', '反对')], default='-1', max_length=10, verbose_name='投票')),
                 ('problem_text', models.CharField(max_length=10240, verbose_name='问题')),
                 ('answer_text', models.CharField(max_length=40960, verbose_name='答案')),
@@ -185,7 +185,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('create_time', models.DateTimeField(auto_now_add=True, verbose_name='创建时间')),
                 ('update_time', models.DateTimeField(auto_now=True, verbose_name='修改时间')),
-                ('id', models.UUIDField(default=uuid_utils.compat.uuid1, editable=False, primary_key=True, serialize=False, verbose_name='主键id')),
+                ('id', models.UUIDField(default=uuid_utils.compat.uuid7, editable=False, primary_key=True, serialize=False, verbose_name='主键id')),
                 ('workspace_id', models.CharField(db_index=True, default='default', max_length=64, verbose_name='工作空间id')),
                 ('name', models.CharField(default='', max_length=128, verbose_name='版本名称')),
                 ('publish_user_id', models.UUIDField(default=None, null=True, verbose_name='发布者id')),

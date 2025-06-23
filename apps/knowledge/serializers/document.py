@@ -336,7 +336,7 @@ class DocumentSerializers(serializers.Serializer):
                     problem_paragraph_mapping.problem_id = problem.id
                     return problem, False
                 else:
-                    problem = Problem(id=uuid.uuid1(), knowledge_id=target_knowledge_id, content=problem_content)
+                    problem = Problem(id=uuid.uuid7(), knowledge_id=target_knowledge_id, content=problem_content)
                     target_problem_list.append(problem)
                     problem_paragraph_mapping.problem_id = problem.id
                     return problem, True

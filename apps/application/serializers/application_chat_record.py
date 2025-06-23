@@ -6,7 +6,7 @@
     @date：2025/6/10 15:10
     @desc:
 """
-import uuid
+import uuid_utils.compat as uuid
 from functools import reduce
 from typing import Dict
 
@@ -208,7 +208,7 @@ class ApplicationChatRecordAddKnowledgeSerializer(serializers.Serializer):
         problem_paragraph_mappings = []
         for chat_record in chat_record_list:
             paragraph = Paragraph(
-                id=uuid.uuid1(),
+                id=uuid.uuid7(),
                 document_id=document_id,
                 content=chat_record.answer_text,
                 knowledge_id=knowledge_id,
@@ -216,7 +216,7 @@ class ApplicationChatRecordAddKnowledgeSerializer(serializers.Serializer):
             )
             problem, _ = Problem.objects.get_or_create(content=chat_record.problem_text, knowledge_id=knowledge_id)
             problem_paragraph_mapping = ProblemParagraphMapping(
-                id=uuid.uuid1(),
+                id=uuid.uuid7(),
                 knowledge_id=knowledge_id,
                 document_id=document_id,
                 problem_id=problem.id,
@@ -284,7 +284,7 @@ class ApplicationChatRecordImproveSerializer(serializers.Serializer):
             max_position=Max('position')
         )['max_position'] or 0
         paragraph = Paragraph(
-            id=uuid.uuid1(),
+            id=uuid.uuid7(),
             document_id=document_id,
             content=instance.get("content"),
             knowledge_id=knowledge_id,
@@ -294,7 +294,7 @@ class ApplicationChatRecordImproveSerializer(serializers.Serializer):
         problem_text = instance.get('problem_text') if instance.get(
             'problem_text') is not None else chat_record.problem_text
         problem, _ = QuerySet(Problem).get_or_create(content=problem_text, knowledge_id=knowledge_id)
-        problem_paragraph_mapping = ProblemParagraphMapping(id=uuid.uuid1(), knowledge_id=knowledge_id,
+        problem_paragraph_mapping = ProblemParagraphMapping(id=uuid.uuid7(), knowledge_id=knowledge_id,
                                                             document_id=document_id,
                                                             problem_id=problem.id,
                                                             paragraph_id=paragraph.id)

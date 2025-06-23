@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('create_time', models.DateTimeField(auto_now_add=True, verbose_name='创建时间')),
                 ('update_time', models.DateTimeField(auto_now=True, verbose_name='修改时间')),
-                ('id', models.UUIDField(default=uuid.uuid1, editable=False, primary_key=True, serialize=False, verbose_name='主键id')),
+                ('id', models.UUIDField(default=uuid_utils.compat.uuid7, editable=False, primary_key=True, serialize=False, verbose_name='主键id')),
                 ('menu', models.CharField(max_length=128, verbose_name='操作菜单')),
                 ('operate', models.CharField(max_length=128, verbose_name='操作')),
                 ('operation_object', models.JSONField(default=dict, encoder=common.encoder.encoder.SystemEncoder, verbose_name='操作对象')),

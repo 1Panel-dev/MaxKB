@@ -6,7 +6,7 @@
     @date：2025/6/10 11:00
     @desc:
 """
-import uuid
+import uuid_utils.compat as uuid
 
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
@@ -114,7 +114,7 @@ class OpenView(APIView):
     def get(self, request: Request, workspace_id: str, application_id: str):
         return result.success(OpenChatSerializers(
             data={'workspace_id': workspace_id, 'application_id': application_id,
-                  'chat_user_id': str(uuid.uuid1()), 'chat_user_type': ChatUserType.ANONYMOUS_USER,
+                  'chat_user_id': str(uuid.uuid7()), 'chat_user_type': ChatUserType.ANONYMOUS_USER,
                   'debug': True}).open())
 
 
