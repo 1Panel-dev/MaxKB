@@ -7050,7 +7050,7 @@ msgstr "知识库资源"
 
 #: apps/workspace/serializers/workspace_serializers.py:130
 msgid "This workspace contains %s, cannot be deleted."
-msgstr "此工作空间包含 %s，不能被删除。"
+msgstr "改工作空间下存在 %s，不能被删除。"
 
 #: apps/workspace/serializers/workspace_serializers.py:166
 msgid "Role IDs"
