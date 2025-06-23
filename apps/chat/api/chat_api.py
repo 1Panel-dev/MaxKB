@@ -10,7 +10,9 @@ from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter
 
 from chat.serializers.chat import ChatMessageSerializers
+from chat.serializers.chat_record import HistoryChatRecordModel
 from common.mixins.api_mixin import APIMixin
+from common.result import ResultSerializer, ResultPageSerializer
 
 
 class ChatAPI(APIMixin):
@@ -27,3 +29,33 @@ class ChatAPI(APIMixin):
     @staticmethod
     def get_request():
         return ChatMessageSerializers
+
+
+class ApplicationCreateResponse(ResultSerializer):
+    def get_data(self):
+        return HistoryChatRecordModel(many=True)
+
+
+class PageApplicationCreateResponse(ResultPageSerializer):
+    def get_data(self):
+        return HistoryChatRecordModel(many=True)
+
+
+class HistoricalConversationAPI(APIMixin):
+    @staticmethod
+    def get_parameters():
+        return []
+
+    @staticmethod
+    def get_response():
+        return ApplicationCreateResponse
+
+
+class PageHistoricalConversationAPI(APIMixin):
+    @staticmethod
+    def get_parameters():
+        return []
+
+    @staticmethod
+    def get_response():
+        return PageApplicationCreateResponse
