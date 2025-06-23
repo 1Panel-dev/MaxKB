@@ -294,7 +294,7 @@ class Query(serializers.Serializer):
     workspace_id = serializers.CharField(required=False, label=_('Workspace ID'))
     user_id = serializers.UUIDField(required=True, label=_("User ID"))
 
-    def get_query_set(self, instance: Dict, workspace_manage: bool):
+    def get_query_set(self, instance: Dict, workspace_manage: bool, is_x_pack_ee: bool):
         folder_query_set = QuerySet(ApplicationFolder)
         application_query_set = QuerySet(Application)
         workspace_id = self.data.get('workspace_id')
@@ -321,10 +321,11 @@ class Query(serializers.Serializer):
             'folder_query_set': folder_query_set,
             'application_query_set': application_query_set,
             'application_custom_sql': application_custom_sql_query_set
-        } if workspace_manage else {'folder_query_set': folder_query_set,
-                                    'application_query_set': application_query_set,
-                                    'user_query_set': QuerySet(workspace_user_role_mapping_model).filter(
-                                        user_id=user_id, workspace_id=workspace_id)}
+        } if (workspace_manage and is_x_pack_ee) else {'folder_query_set': folder_query_set,
+                                                       'application_query_set': application_query_set,
+                                                       'user_query_set': QuerySet(
+                                                           workspace_user_role_mapping_model).filter(
+                                                           user_id=user_id, workspace_id=workspace_id)}
 
     @staticmethod
     def is_x_pack_ee():
@@ -338,12 +339,13 @@ class Query(serializers.Serializer):
         user_id = self.data.get("user_id")
         ApplicationQueryRequest(data=instance).is_valid(raise_exception=True)
         workspace_manage = is_workspace_manage(user_id, workspace_id)
-
-        return native_search(self.get_query_set(instance, workspace_manage), select_string=get_file_content(
-            os.path.join(PROJECT_DIR, "apps", "application", 'sql',
-                         'list_application.sql' if workspace_manage else (
-                             'list_application_user_ee.sql' if self.is_x_pack_ee() else 'list_application_user.sql')
-                         )))
+        is_x_pack_ee = self.is_x_pack_ee()
+        return native_search(self.get_query_set(instance, workspace_manage, is_x_pack_ee),
+                             select_string=get_file_content(
+                                 os.path.join(PROJECT_DIR, "apps", "application", 'sql',
+                                              'list_application.sql' if workspace_manage else (
+                                                  'list_application_user_ee.sql' if is_x_pack_ee else 'list_application_user.sql')
+                                              )))
 
     def page(self, current_page: int, page_size: int, instance: Dict):
         self.is_valid(raise_exception=True)
@@ -351,11 +353,12 @@ class Query(serializers.Serializer):
         workspace_id = self.data.get('workspace_id')
         user_id = self.data.get("user_id")
         workspace_manage = is_workspace_manage(user_id, workspace_id)
-        return native_page_search(current_page, page_size, self.get_query_set(instance, workspace_manage),
+        is_x_pack_ee = self.is_x_pack_ee()
+        return native_page_search(current_page, page_size, self.get_query_set(instance, workspace_manage, is_x_pack_ee),
                                   get_file_content(
                                       os.path.join(PROJECT_DIR, "apps", "application", 'sql',
                                                    'list_application.sql' if workspace_manage else (
-                                                       'list_application_user_ee.sql' if self.is_x_pack_ee() else 'list_application_user.sql'))),
+                                                       'list_application_user_ee.sql' if is_x_pack_ee else 'list_application_user.sql'))),
                                   )
 
 
