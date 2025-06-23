@@ -7,7 +7,7 @@
         @click="clickListHandle"
         :loading="loading"
         shareTitle="views.system.share_tool"
-        isShared
+        :showShared="permissionPrecise['is_share']()"
         :active="active_provider"
       />
     </template>
@@ -55,15 +55,12 @@
             </el-select>
           </div>
           <el-button
-            v-if="!isShared"
+            v-if="!isShared && 
+            permissionPrecise.addModel() 
+            "
             class="ml-16"
             type="primary"
             @click="openCreateModel(active_provider)"
-            v-hasPermission="[
-              RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-              RoleConst.USER.getWorkspaceRole,
-              PermissionConst.MODEL_CREATE.getWorkspacePermission,
-            ]"
           >
             {{ $t('views.model.addModel') }}
           </el-button>
@@ -128,6 +125,26 @@ import SelectProviderDialog from '@/views/model/component/SelectProviderDialog.v
 import { t } from '@/locales'
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import { useRoute } from 'vue-router'
+import useStore from '@/stores'
+import permissionMap from '@/permission'
+
+
+const route = useRoute()
+const { folder, user } = useStore()
+
+const type = computed(() => {
+  if (route.path.includes('shared')) {
+    return 'systemShare'
+  } else if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
+const permissionPrecise = computed(() => {
+  return permissionMap['model'][type.value]
+})
 
 const commonList1 = ref()
 const commonList2 = ref()

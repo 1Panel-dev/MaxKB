@@ -6,21 +6,16 @@ const workspace = {
     hasPermission(
       new ComplexPermission(
         [RoleConst.ADMIN],
-        [PermissionConst.SHARED_TOOL_READ],
+        [PermissionConst.MODEL_READ],
         [EditionConst.IS_EE],
         'OR',
       ),
       'OR',
     ),
-  delete: () =>
-    hasPermission(
-      [
-        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-        RoleConst.USER.getWorkspaceRole,
-        PermissionConst.TOOL_DELETE.getWorkspacePermission,
-      ],
-      'OR',
-    ),
+  addModel: () => false,
+  modify: () => false,
+  paramSetting: () => false,
+  delete: () => false,
 }
 
 export default workspace

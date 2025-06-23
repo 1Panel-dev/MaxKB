@@ -77,16 +77,7 @@
         <template #dropdown>
           <el-dropdown-menu>
             <el-dropdown-item
-              v-if="
-                hasPermission(
-                  [
-                    RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                    RoleConst.USER.getWorkspaceRole,
-                    PermissionConst.MODEL_EDIT.getWorkspacePermission,
-                  ],
-                  'OR',
-                )
-              "
+              v-if="permissionPrecise.modify()"
               icon="EditPen"
               :disabled="!is_permisstion"
               text
@@ -101,14 +92,8 @@
                 currentModel.model_type === 'LLM' ||
                 currentModel.model_type === 'IMAGE' ||
                 currentModel.model_type === 'TTI' ||
-                hasPermission(
-                  [
-                    RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                    RoleConst.USER.getWorkspaceRole,
-                    PermissionConst.MODEL_EDIT.getWorkspacePermission,
-                  ],
-                  'OR',
-                )
+                permissionPrecise.paramSetting()
+
               "
               :disabled="!is_permisstion"
               icon="Setting"
@@ -123,14 +108,7 @@
               text
               @click.stop="deleteModel"
               v-if="
-                hasPermission(
-                  [
-                    RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                    RoleConst.USER.getWorkspaceRole,
-                    PermissionConst.MODEL_DELETE.getWorkspacePermission,
-                  ],
-                  'OR',
-                )
+                permissionPrecise.delete()
               "
             >
               {{ $t('common.delete') }}
@@ -156,6 +134,24 @@ import ParamSettingDialog from './ParamSettingDialog.vue'
 import { t } from '@/locales'
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission'
+import { useRoute } from 'vue-router'
+import permissionMap from '@/permission'
+
+
+const route = useRoute()
+
+const type = computed(() => {
+  if (route.path.includes('shared')) {
+    return 'systemShare'
+  } else if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
+const permissionPrecise = computed(() => {
+  return permissionMap['model'][type.value]
+})
 
 const props = defineProps<{
   model: Model
