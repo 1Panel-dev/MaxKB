@@ -6,11 +6,51 @@ const workspace = {
     hasPermission(
       new ComplexPermission(
         [RoleConst.ADMIN],
-        [PermissionConst.SHARED_TOOL_READ],
+        [PermissionConst.MODEL_READ],
         [EditionConst.IS_EE],
         'OR',
       ),
       'OR',
+    ),
+  addModel: () =>
+    hasPermission(
+      [
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        RoleConst.USER.getWorkspaceRole,
+        PermissionConst.MODEL_CREATE.getWorkspacePermission,
+        PermissionConst.MODEL_CREATE.getWorkspacePermissionWorkspaceManageRole
+      ],
+      'OR'
+    ),
+  modify: () =>
+    hasPermission(
+      [
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        RoleConst.USER.getWorkspaceRole,
+        PermissionConst.MODEL_EDIT.getWorkspacePermission,
+        PermissionConst.MODEL_EDIT.getWorkspacePermissionWorkspaceManageRole
+      ],
+      'OR'
+    ),
+  paramSetting: () =>
+    hasPermission(
+      [
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        RoleConst.USER.getWorkspaceRole,
+        PermissionConst.MODEL_EDIT.getWorkspacePermission,
+        PermissionConst.MODEL_EDIT.getWorkspacePermissionWorkspaceManageRole
+      ],
+      'OR'
+    ),
+  delete: () =>
+    hasPermission(
+      [
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        RoleConst.USER.getWorkspaceRole,
+        PermissionConst.MODEL_DELETE.getWorkspacePermission,
+        PermissionConst.MODEL_DELETE.getWorkspacePermissionWorkspaceManageRole
+      ],
+      'OR'
     ),
 }
 
