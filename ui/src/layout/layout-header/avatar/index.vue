@@ -33,11 +33,10 @@
         >
           {{ $t('views.login.resetPassword') }}
         </el-dropdown-item>
-        <div v-hasPermission="new ComplexPermission([], [], [EditionConst.IS_EE, EditionConst.IS_PE], 'OR')">
+        <div>
           <el-dropdown-item class="p-8" @click="openAPIKeyDialog"
             v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.SYSTEM_API_KEY_EDIT],'OR')"
           >
- 
             {{ $t('layout.apiKey') }}
           </el-dropdown-item>
         </div>
