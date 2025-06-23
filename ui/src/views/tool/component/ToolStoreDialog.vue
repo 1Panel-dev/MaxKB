@@ -61,6 +61,7 @@ import { onBeforeMount, ref } from 'vue'
 import ToolApi from '@/api/tool/tool'
 import { t } from '@/locales'
 import ToolCard from './ToolCard.vue'
+import { MsgSuccess } from '@/utils/message'
 
 interface ToolCategory {
   id: string

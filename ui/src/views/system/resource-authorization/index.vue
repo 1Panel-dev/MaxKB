@@ -392,6 +392,8 @@ onMounted(() => {
   }
 
   .permission-setting {
+    flex:1;
+    overflow: hidden;
     box-sizing: border-box;
     width: 100%;
     flex-direction: column;
