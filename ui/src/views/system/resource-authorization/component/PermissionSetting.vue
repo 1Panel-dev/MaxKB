@@ -4,7 +4,7 @@
       <div class="flex align-center" v-if="hasPermission(EditionConst.IS_EE, 'OR')">
         <!-- 企业版: 选优先级-->
         <span class="lighter mr-16">{{ $t('views.resourceAuthorization.priority.label') }}</span>
-        <el-radio-group v-model="isRole">
+        <el-radio-group v-model="radioRole">
           <el-radio :value="true" size="large">{{
             $t('views.resourceAuthorization.priority.role')
           }}</el-radio>
@@ -179,10 +179,16 @@ const props = defineProps({
   type: String,
   tableHeight: Number,
   manage: Boolean,
+  isRole: Boolean,
 })
+const emit = defineEmits(['update:data', 'refreshData','update:isRole'])
+const radioRole = computed({
+  get: () => props.isRole,
+  set: (v:boolean) => {
+    emit('update:isRole', v)
 
-const isRole = ref(false)
-
+  }
+})
 const isKnowledge = computed(() => props.type === AuthorizationEnum.KNOWLEDGE)
 const isApplication = computed(() => props.type === AuthorizationEnum.APPLICATION)
 
@@ -208,7 +214,7 @@ const dfsPermission = (arr: any = [], Name: string | number, e: boolean, idArr: 
   })
 }
 
-const emit = defineEmits(['update:data', 'refreshData'])
+
 
 const filterText = ref('')
 

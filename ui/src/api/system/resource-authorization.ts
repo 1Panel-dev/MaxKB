@@ -44,7 +44,12 @@ const putResourceAuthorization: (
   body: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (workspace_id, user_id, body, loading) => {
-  return put(`${prefix}/${workspace_id}/user_resource_permission/user/${user_id}`, body, loading)
+  return put(
+    `${prefix}/${workspace_id}/user_resource_permission/user/${user_id}`,
+    body,
+    {},
+    loading,
+  )
 }
 
 /**

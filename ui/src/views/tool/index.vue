@@ -160,7 +160,23 @@
                 </CardBox>
               </el-col>
               <el-col v-else :xs="24" :sm="12" :md="12" :lg="8" :xl="6" class="mb-16">
-                <CardBox :title="item.name" :description="item.desc" class="cursor">
+                <CardBox
+                  :title="item.name"
+                  :description="item.desc"
+                  class="cursor"
+                  @click.stop="openCreateDialog(item)"
+                  :disabled="
+                    hasPermission(
+                      [
+                        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                        RoleConst.USER.getWorkspaceRole,
+                        PermissionConst.TOOL_EDIT.getWorkspacePermissionWorkspaceManageRole,
+                        PermissionConst.TOOL_EDIT.getWorkspacePermission,
+                      ],
+                      'OR',
+                    )
+                  "
+                >
                   <template #icon>
                     <el-avatar
                       v-if="isAppIcon(item?.icon)"
@@ -370,7 +386,7 @@ function openCreateDialog(data?: any) {
   }
   ToolDrawertitle.value = data ? t('views.tool.editTool') : t('views.tool.createTool')
   if (data) {
-    ToolApi.getToolById(data?.id, changeStateloading).then((res) => {
+    ToolApi.getToolById(data?.id, loading).then((res) => {
       ToolFormDrawerRef.value.open(res.data)
     })
   } else {
@@ -411,6 +427,8 @@ async function changeState(row: any) {
       }
       ToolApi.putTool(row.id, obj, changeStateloading)
         .then(() => {
+          const index = toolList.value.findIndex((v) => v.id === row.id)
+          toolList.value[index].is_active = !row.is_active
           return true
         })
         .catch(() => {
@@ -434,6 +452,8 @@ async function changeState(row: any) {
     }
     ToolApi.putTool(row.id, obj, changeStateloading)
       .then(() => {
+        const index = toolList.value.findIndex((v) => v.id === row.id)
+        toolList.value[index].is_active = !row.is_active
         return true
       })
       .catch(() => {

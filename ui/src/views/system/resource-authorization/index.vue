@@ -70,6 +70,7 @@
                   :tableHeight="tableHeight"
                   :manage="isManage(currentType)"
                   @refreshData="refreshData"
+                  v-model:isRole="item.isRole"
                 ></PermissionSetting>
               </el-tab-pane>
             </el-tabs>
@@ -98,6 +99,7 @@ import { hasPermission } from '@/utils/permission/index'
 import WorkspaceApi from '@/api/workspace/workspace.ts'
 import type { WorkspaceItem } from '@/api/type/workspace'
 
+const PermissionSettingRef = ref()
 const loading = ref(false)
 const rLoading = ref(false)
 const memberList = ref<any[]>([]) // 全部成员
@@ -115,11 +117,13 @@ const settingTags = reactive([
     label: t('views.knowledge.title'),
     value: AuthorizationEnum.KNOWLEDGE,
     data: [] as any,
+    isRole: false,
   },
   {
     label: t('views.application.title'),
     value: AuthorizationEnum.APPLICATION,
     data: [] as any,
+    isRole: false,
   },
 ])
 
@@ -147,22 +151,19 @@ const flotTree = (tree: Array<any>, result: Array<any>) => {
   return result
 }
 function submitPermissions() {
-  const user_resource_permission_list = settingTags
-    .map((item: any) => {
-      return flotTree(item.data, [])
-        .filter((v: any) => !v.isFolder)
-        .map((v: any) => {
-          return {
-            target_id: v.id,
-            auth_target_type: item.value,
-            permission: v.permission,
-            auth_type: 'RESOURCE_PERMISSION_GROUP',
-          }
-        })
-    })
-    .reduce((pre, next) => {
-      return [...pre, ...next]
-    }, [])
+  const user_resource_permission_list = settingTags.map((item: any, index: number) => {
+    return flotTree(item.data, [])
+      .filter((v: any) => !v.isFolder)
+      .map((v: any) => {
+        return {
+          target_id: v.id,
+          auth_target_type: item.value,
+          permission: v.permission,
+          auth_type: item.isRole ? 'ROLE' : 'RESOURCE_PERMISSION_GROUP',
+        }
+      })
+  })
+
   AuthorizationApi.putResourceAuthorization(
     currentWorkspaceId.value || 'default',
     currentUser.value,
@@ -392,7 +393,7 @@ onMounted(() => {
   }
 
   .permission-setting {
-    flex:1;
+    flex: 1;
     overflow: hidden;
     box-sizing: border-box;
     width: 100%;
