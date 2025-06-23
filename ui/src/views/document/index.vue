@@ -14,7 +14,7 @@
                 "
                 v-hasPermission="[
                   RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                  RoleConst.USER.getWorkspaceRole,
+                  RoleConst.ADMIN,
                   PermissionConst.KNOWLEDGE_DOCUMENT_CREATE.getWorkspacePermissionWorkspaceManageRole,
                   PermissionConst.KNOWLEDGE_DOCUMENT_CREATE.getKnowledgeWorkspaceResourcePermission(id),
                 ]"
@@ -25,7 +25,7 @@
                 type="primary"
                 @click="importDoc"
                 v-hasPermission="[
-                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,RoleConst.USER.getWorkspaceRole,
+                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,RoleConst.ADMIN,
                   PermissionConst.KNOWLEDGE_DOCUMENT_CREATE.getWorkspacePermissionWorkspaceManageRole,
                   PermissionConst.KNOWLEDGE_DOCUMENT_CREATE.getKnowledgeWorkspaceResourcePermission(id),
                 ]"
@@ -38,17 +38,21 @@
                   router.push({
                     path: `/knowledge/import`,
                     query: { id: id, folder_token: knowledgeDetail.meta.folder_token },
-                  })
-                "
+                  })"
+                v-hasPermission="[
+                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,RoleConst.ADMIN,
+                  PermissionConst.KNOWLEDGE_DOCUMENT_CREATE.getWorkspacePermissionWorkspaceManageRole,
+                  PermissionConst.KNOWLEDGE_DOCUMENT_CREATE.getKnowledgeWorkspaceResourcePermission(id),
+                ]"
                 >{{ $t('views.document.importDocument') }}
               </el-button>
               <el-button
                 @click="batchRefresh"
                 :disabled="multipleSelection.length === 0"
                 v-hasPermission="[
-                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,RoleConst.USER.getWorkspaceRole,
+                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,RoleConst.ADMIN,
                   PermissionConst.KNOWLEDGE_DOCUMENT_VECTOR.getWorkspacePermissionWorkspaceManageRole,
-                  PermissionConst.KNOWLEDGE_DOCUMENT_VECTOR.getWorkspacePermission,
+                  PermissionConst.KNOWLEDGE_DOCUMENT_VECTOR.getKnowledgeWorkspaceResourcePermission(id),
                 ]"
                 >{{ $t('views.knowledge.setting.vectorization') }}
               </el-button>
@@ -56,9 +60,9 @@
                 @click="openGenerateDialog()"
                 :disabled="multipleSelection.length === 0"
                 v-hasPermission="[
-                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,RoleConst.USER.getWorkspaceRole,
+                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,RoleConst.ADMIN,
                   PermissionConst.KNOWLEDGE_DOCUMENT_GENERATE.getWorkspacePermissionWorkspaceManageRole,
-                  PermissionConst.KNOWLEDGE_DOCUMENT_GENERATE.getWorkspacePermission,
+                  PermissionConst.KNOWLEDGE_DOCUMENT_GENERATE.getKnowledgeWorkspaceResourcePermission(id),
                 ]"
                 >{{ $t('views.document.generateQuestion.title') }}
               </el-button>
@@ -66,9 +70,9 @@
                 @click="openknowledgeDialog()"
                 :disabled="multipleSelection.length === 0"
                 v-hasPermission="[
-                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,RoleConst.USER.getWorkspaceRole,
+                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,RoleConst.ADMIN,
                   PermissionConst.KNOWLEDGE_DOCUMENT_MIGRATE.getWorkspacePermissionWorkspaceManageRole,
-                  PermissionConst.KNOWLEDGE_DOCUMENT_MIGRATE.getWorkspacePermission,
+                  PermissionConst.KNOWLEDGE_DOCUMENT_MIGRATE.getKnowledgeWorkspaceResourcePermission(id),
                 ]"
                 >{{ $t('views.document.setting.migration') }}
               </el-button>
@@ -84,9 +88,9 @@
                       @click="openBatchEditDocument"
                       :disabled="multipleSelection.length === 0"
                       v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                      RoleConst.USER.getWorkspaceRole,
+                      RoleConst.ADMIN,
                       PermissionConst.KNOWLEDGE_DOCUMENT_EDIT.getWorkspacePermissionWorkspaceManageRole,
-                      PermissionConst.KNOWLEDGE_DOCUMENT_EDIT.getWorkspacePermission],'OR')"
+                      PermissionConst.KNOWLEDGE_DOCUMENT_EDIT.getKnowledgeWorkspaceResourcePermission(id)],'OR')"
                     >
                       {{ $t('common.setting') }}
                     </el-dropdown-item>
@@ -96,15 +100,20 @@
                       :disabled="multipleSelection.length === 0"
                       v-if="knowledgeDetail.type === 1 &&
                       hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                      RoleConst.USER.getWorkspaceRole,
-                      PermissionConst.KNOWLEDGE_DOCUMENT_SYNC.getWorkspacePermission],'OR')"
+                      RoleConst.ADMIN,
+                      PermissionConst.KNOWLEDGE_DOCUMENT_SYNC.getWorkspacePermission,
+                      PermissionConst.KNOWLEDGE_DOCUMENT_SYNC.getKnowledgeWorkspaceResourcePermission(id)],'OR')"
                       >{{ $t('views.document.syncDocument') }}
                     </el-dropdown-item>
                     <el-dropdown-item
                       divided
                       @click="syncLarkMulDocument"
                       :disabled="multipleSelection.length === 0"
-                      v-if="knowledgeDetail.type === 2"
+                      v-if="knowledgeDetail.type === 2 &&
+                      hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                      RoleConst.ADMIN,
+                      PermissionConst.KNOWLEDGE_DOCUMENT_SYNC.getWorkspacePermission,
+                      PermissionConst.KNOWLEDGE_DOCUMENT_SYNC.getKnowledgeWorkspaceResourcePermission(id)],'OR')"
                       >{{ $t('views.document.syncDocument') }}
                     </el-dropdown-item>
 
@@ -112,6 +121,12 @@
                       divided
                       @click="deleteMulDocument"
                       :disabled="multipleSelection.length === 0"
+                      v-if="
+                      hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                      RoleConst.ADMIN,
+                      PermissionConst.KNOWLEDGE_DOCUMENT_DELETE.getWorkspacePermission,
+                      PermissionConst.KNOWLEDGE_DOCUMENT_DELETE.getKnowledgeWorkspaceResourcePermission(id)],'OR')
+                      "
                       >{{ $t('common.delete') }}
                     </el-dropdown-item>
                   </el-dropdown-menu>

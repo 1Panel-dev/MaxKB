@@ -140,7 +140,12 @@
               </el-form-item>
             </el-form>
             <div class="text-right">
-              <el-button @click="submit" type="primary"> {{ $t('common.save') }}</el-button>
+              <el-button @click="submit" type="primary"
+                v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                      RoleConst.ADMIN,
+                      PermissionConst.KNOWLEDGE_EDIT.getWorkspacePermissionWorkspaceManageRole,
+                      PermissionConst.KNOWLEDGE_EDIT.getKnowledgeWorkspaceResourcePermission(id)]"
+              > {{ $t('common.save') }}</el-button>
             </div>
           </div>
         </el-scrollbar>
@@ -158,6 +163,8 @@ import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { isAppIcon } from '@/utils/common'
 import useStore from '@/stores'
 import { t } from '@/locales'
+import { PermissionConst, RoleConst } from '@/utils/permission/data'
+import { hasPermission } from '@/utils/permission/index'
 
 const route = useRoute()
 const {

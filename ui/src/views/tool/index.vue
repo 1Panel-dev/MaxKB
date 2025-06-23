@@ -49,11 +49,7 @@
             <el-button
               type="primary"
               class="ml-8"
-              v-hasPermission="[
-              RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-              RoleConst.USER.getWorkspaceRole,
-              PermissionConst.TOOL_CREATE.getWorkspacePermission,
-              ]"
+              v-if="permissionPrecise.create()"
             >
               {{ $t('common.create') }}
               <el-icon class="el-icon--right">
@@ -213,11 +209,7 @@
                         :before-change="() => changeState(item)"
                         size="small"
                         class="mr-4"
-                        v-hasPermission="[
-                          RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                          RoleConst.USER.getWorkspaceRole,
-                          PermissionConst.TOOL_EDIT.getWorkspacePermission,
-                        ]"
+                        v-if="permissionPrecise.switch()"
                       />
                       <el-divider direction="vertical" />
                       <el-dropdown trigger="click">
@@ -237,16 +229,7 @@
                             <el-dropdown-item
                               v-if="
                               !item.template_id &&
-                              hasPermission(
-                                [
-                                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                                  RoleConst.USER.getWorkspaceRole,
-                                    PermissionConst.TOOL_EDIT
-                                      .getWorkspacePermissionWorkspaceManageRole,
-                                  PermissionConst.TOOL_EDIT.getWorkspacePermission,
-                                ],
-                                'OR',
-                              )
+                              permissionPrecise.edit()
                               "
                               @click.stop="openCreateDialog(item)"
                             >
@@ -258,14 +241,7 @@
                             <el-dropdown-item
                               v-if="
                               !item.template_id &&
-                              hasPermission(
-                                [
-                                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                                  RoleConst.USER.getWorkspaceRole,
-                                  PermissionConst.TOOL_EXPORT.getWorkspacePermission,
-                                ],
-                                'OR',
-                              )
+                              permissionPrecise.copy()
                               "
                               @click.stop="copyTool(item)"
                             >
@@ -282,14 +258,7 @@
                             <el-dropdown-item
                               v-if="
                               !item.template_id &&
-                              hasPermission(
-                                [
-                                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                                  RoleConst.USER.getWorkspaceRole,
-                                  PermissionConst.TOOL_EXPORT.getWorkspacePermission,
-                                ],
-                                'OR',
-                              )
+                              permissionPrecise.export()
                               "
                               @click.stop="exportTool(item)"
                             >

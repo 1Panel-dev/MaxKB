@@ -48,8 +48,9 @@
               type="primary"
               class="ml-8"
               v-hasPermission="[
+                RoleConst.ADMIN,
                 RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                RoleConst.USER.getWorkspaceRole,
+                PermissionConst.APPLICATION_EDIT.getWorkspacePermissionWorkspaceManageRole,
                 PermissionConst.APPLICATION_EDIT.getWorkspacePermission,
               ]"
             >
