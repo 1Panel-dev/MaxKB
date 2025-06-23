@@ -29,7 +29,9 @@ class ProblemView(APIView):
     )
     @has_permissions(
         PermissionConstants.KNOWLEDGE_PROBLEM_READ.get_workspace_knowledge_permission(),
-        RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
+        PermissionConstants.KNOWLEDGE_PROBLEM_READ.get_workspace_permission_workspace_manage_role(),
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+        RoleConstants.USER.get_workspace_role()
     )
     def get(self, request: Request, workspace_id: str, knowledge_id: str):
         q = ProblemSerializers.Query(
@@ -54,7 +56,9 @@ class ProblemView(APIView):
     )
     @has_permissions(
         PermissionConstants.KNOWLEDGE_PROBLEM_EDIT.get_workspace_knowledge_permission(),
-        RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
+        PermissionConstants.KNOWLEDGE_PROBLEM_EDIT.get_workspace_permission_workspace_manage_role(),
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+        RoleConstants.USER.get_workspace_role()
     )
     @log(
         menu='problem', operate='Create question',
@@ -79,7 +83,9 @@ class ProblemView(APIView):
         )
         @has_permissions(
             PermissionConstants.KNOWLEDGE_PROBLEM_EDIT.get_workspace_knowledge_permission(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
+            PermissionConstants.KNOWLEDGE_PROBLEM_EDIT.get_workspace_permission_workspace_manage_role(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            RoleConstants.USER.get_workspace_role()
         )
         def get(self, request: Request, workspace_id: str, knowledge_id: str, problem_id: str):
             return result.success(ProblemSerializers.Operate(
@@ -105,7 +111,9 @@ class ProblemView(APIView):
         )
         @has_permissions(
             PermissionConstants.KNOWLEDGE_PROBLEM_EDIT.get_workspace_knowledge_permission(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
+            PermissionConstants.KNOWLEDGE_PROBLEM_EDIT.get_workspace_permission_workspace_manage_role(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            RoleConstants.USER.get_workspace_role()
         )
         @log(
             menu='problem', operate='Batch associated paragraphs',
@@ -132,7 +140,9 @@ class ProblemView(APIView):
         )
         @has_permissions(
             PermissionConstants.KNOWLEDGE_PROBLEM_EDIT.get_workspace_knowledge_permission(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
+            PermissionConstants.KNOWLEDGE_PROBLEM_EDIT.get_workspace_permission_workspace_manage_role(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            RoleConstants.USER.get_workspace_role()
         )
         @log(
             menu='problem', operate='Batch deletion issues',
@@ -158,7 +168,9 @@ class ProblemView(APIView):
         )
         @has_permissions(
             PermissionConstants.KNOWLEDGE_PROBLEM_DELETE.get_workspace_knowledge_permission(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
+            PermissionConstants.KNOWLEDGE_PROBLEM_DELETE.get_workspace_permission_workspace_manage_role(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            RoleConstants.USER.get_workspace_role()
         )
         @log(
             menu='problem', operate='Delete question',
@@ -187,7 +199,9 @@ class ProblemView(APIView):
         )
         @has_permissions(
             PermissionConstants.KNOWLEDGE_PROBLEM_EDIT.get_workspace_knowledge_permission(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
+            PermissionConstants.KNOWLEDGE_PROBLEM_EDIT.get_workspace_permission_workspace_manage_role(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            RoleConstants.USER.get_workspace_role()
         )
         @log(
             menu='problem', operate='Modify question',
@@ -217,7 +231,9 @@ class ProblemView(APIView):
         )
         @has_permissions(
             PermissionConstants.KNOWLEDGE_PROBLEM_READ.get_workspace_knowledge_permission(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
+            PermissionConstants.KNOWLEDGE_PROBLEM_READ.get_workspace_permission_workspace_manage_role(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            RoleConstants.USER.get_workspace_role()
         )
         def get(self, request: Request, workspace_id: str, knowledge_id: str, current_page, page_size):
             d = ProblemSerializers.Query(
