@@ -248,3 +248,22 @@ class WorkspaceSharedModelSetting(APIView):
     def get(self, request: Request, workspace_id: str):
         return result.success(
             WorkspaceSharedModelSerializer(data={'workspace_id': workspace_id}).get_share_model_list())
+
+
+class ModelList(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(methods=['GET'],
+                   summary=_('Query all model list'),
+                   description=_('Query all model list'),
+                   operation_id=_('Query all model list'),  # type: ignore
+                   parameters=ModelListResponse.get_parameters(),
+                   responses=ModelListResponse.get_response(),
+                   tags=[_('Model')])  # type: ignore
+    @has_permissions(PermissionConstants.MODEL_READ.get_workspace_permission(),
+                     RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role())
+    def get(self, request: Request, workspace_id: str):
+        return result.success(
+            ModelSerializer.Query(
+                data={**query_params_to_single_dict(request.query_params)}).model_list(workspace_id=workspace_id,
+                                                                                 with_valid=True))
