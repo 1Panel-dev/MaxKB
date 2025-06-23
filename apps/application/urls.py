@@ -11,6 +11,8 @@ urlpatterns = [
     path('workspace/<str:workspace_id>/application/<int:current_page>/<int:page_size>',
          views.ApplicationAPI.Page.as_view(), name='application_page'),
     path('workspace/<str:workspace_id>/application/<str:application_id>', views.ApplicationAPI.Operate.as_view()),
+    path('workspace/<str:workspace_id>/application/<str:application_id>/publish',
+         views.ApplicationAPI.Publish.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/application_key',
          views.ApplicationKey.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/application_stats',

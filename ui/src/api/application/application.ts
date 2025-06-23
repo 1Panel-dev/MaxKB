@@ -1,14 +1,14 @@
-import {Result} from '@/request/Result'
-import {get, post, postStream, del, put, request, download, exportFile} from '@/request/index'
-import type {pageRequest} from '@/api/type/common'
-import type {ApplicationFormType} from '@/api/type/application'
-import {type Ref} from 'vue'
+import { Result } from '@/request/Result'
+import { get, post, postStream, del, put, request, download, exportFile } from '@/request/index'
+import type { pageRequest } from '@/api/type/common'
+import type { ApplicationFormType } from '@/api/type/application'
+import { type Ref } from 'vue'
 import useStore from '@/stores'
 
-const prefix: any = {_value: '/workspace/'}
+const prefix: any = { _value: '/workspace/' }
 Object.defineProperty(prefix, 'value', {
   get: function () {
-    const {user} = useStore()
+    const { user } = useStore()
     return this._value + user.getWorkspaceId() + '/application'
   },
 })
@@ -199,7 +199,7 @@ const getPlatformStatus: (application_id: string) => Promise<Result<any>> = (app
  */
 const updatePlatformStatus: (application_id: string, data: any) => Promise<Result<any>> = (
   application_id,
-  data
+  data,
 ) => {
   return post(`${prefix.value}/${application_id}/platform/status`, data)
 }
@@ -208,11 +208,23 @@ const updatePlatformStatus: (application_id: string, data: any) => Promise<Resul
  */
 const getPlatformConfig: (application_id: string, type: string) => Promise<Result<any>> = (
   application_id,
-  type
+  type,
 ) => {
   return get(`${prefix.value}/${application_id}/platform/${type}`)
 }
-
+/**
+ * 应用发布
+ * @param application_id
+ * @param loading
+ * @returns
+ */
+const publish: (
+  application_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (application_id, data, loading) => {
+  return put(`${prefix.value}/${application_id}/publish`, data, {}, loading)
+}
 export default {
   getAllApplication,
   getApplication,
@@ -231,5 +243,6 @@ export default {
   getApplicationSetting,
   getPlatformStatus,
   updatePlatformStatus,
-  getPlatformConfig
+  getPlatformConfig,
+  publish,
 }
