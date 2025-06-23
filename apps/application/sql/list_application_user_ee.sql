@@ -12,15 +12,17 @@ from (select application."id"::text,
              application."create_time",
              application."update_time"
       from application left join "user" on user_id = "user".id
-      where application."id" in (select target
+      where "application".id in (select target
                    from workspace_user_resource_permission
                    where auth_target_type = 'APPLICATION'
                      and case
                              when auth_type = 'ROLE' then
-                                 'APPLICATION_READ' in (select permission_id
-                                                        from role_permission
-                                                        where role_id in (select role_id
-                                                                          from user_role_relation))
+                                 'APPLICATION:READ' in (select (case when user_role_relation.role_id = any (array ['USER']) THEN 'APPLICATION:READ' else role_permission.permission_id END)
+                                                        from role_permission role_permission
+                                                        right join user_role_relation user_role_relation
+                                                            on user_role_relation.role_id=role_permission.role_id
+                                                        ${user_query_set})
+
                              else
                                  'VIEW' = any (permission_list)
                        end)
