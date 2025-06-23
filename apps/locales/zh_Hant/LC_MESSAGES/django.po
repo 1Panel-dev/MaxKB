@@ -8490,3 +8490,6 @@ msgstr "LDAP"
 
 msgid "Get tool list"
 msgstr "獲取工具列表"
+
+msgid "Setting"
+msgstr "設置"

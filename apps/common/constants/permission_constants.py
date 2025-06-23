@@ -653,6 +653,7 @@ class PermissionConstants(Enum):
                                      role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                      parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
                                      resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+                                     label=_('Chat')
                                      )
     APPLICATION_DEBUG = Permission(group=Group.APPLICATION, operate=Operate.DEBUG,
                                    role_list=[RoleConstants.ADMIN, RoleConstants.USER],
@@ -664,6 +665,7 @@ class PermissionConstants(Enum):
                                      role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                      parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
                                      resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+                                     label=_('Setting')
                                      )
 
     APPLICATION_CREATE = Permission(group=Group.APPLICATION, operate=Operate.CREATE,

@@ -282,7 +282,7 @@ class UserManageSerializer(serializers.Serializer):
             )]
         )
         nick_name = serializers.CharField(
-            required=True,
+            required=False,
             label=_("Name"),
             max_length=20,
         )

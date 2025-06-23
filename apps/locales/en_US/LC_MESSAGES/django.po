@@ -8364,3 +8364,6 @@ msgstr "LDAP"
 
 msgid "Get tool list"
 msgstr ""
+
+msgid "Setting"
+msgstr ""
