@@ -8,20 +8,23 @@
             <div>
               <el-button type="primary" @click="createProblem"
                 v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                RoleConst.USER.getWorkspaceRole,
-                PermissionConst.KNOWLEDGE_PROBLEM_CREATE.getWorkspacePermission]">
+                RoleConst.ADMIN,
+                PermissionConst.KNOWLEDGE_PROBLEM_CREATE.getWorkspacePermissionWorkspaceManageRole,
+                PermissionConst.KNOWLEDGE_PROBLEM_CREATE.getKnowledgeWorkspaceResourcePermission(id),]">
                 {{ $t('views.problem.createProblem') }}
               </el-button>
               <el-button @click="relateProblem()" :disabled="multipleSelection.length === 0"
                 v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                RoleConst.USER.getWorkspaceRole,
-                PermissionConst.KNOWLEDGE_PROBLEM_RELATE.getWorkspacePermission]">
+                RoleConst.ADMIN,
+                PermissionConst.KNOWLEDGE_PROBLEM_RELATE.getWorkspacePermissionWorkspaceManageRole,
+                PermissionConst.KNOWLEDGE_PROBLEM_RELATE.getKnowledgeWorkspaceResourcePermission(id)]">
                 {{ $t('views.problem.relateParagraph.title') }}
               </el-button>
               <el-button @click="deleteMulDocument" :disabled="multipleSelection.length === 0"
                 v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                RoleConst.USER.getWorkspaceRole,
-                PermissionConst.KNOWLEDGE_PROBLEM_DELETE.getWorkspacePermission]">
+                RoleConst.ADMIN,
+                PermissionConst.KNOWLEDGE_PROBLEM_DELETE.getWorkspacePermissionWorkspaceManageRole,
+                PermissionConst.KNOWLEDGE_PROBLEM_DELETE.getKnowledgeWorkspaceResourcePermission(id)]">
                 {{ $t('views.problem.setting.batchDelete') }}
               </el-button>
             </div>
@@ -110,8 +113,9 @@
                     >
                       <el-button type="primary" text @click.stop="relateProblem(row)"
                       v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                      RoleConst.USER.getWorkspaceRole,
-                      PermissionConst.KNOWLEDGE_PROBLEM_RELATE.getWorkspacePermission]">
+                      RoleConst.ADMIN,
+                      PermissionConst.KNOWLEDGE_PROBLEM_RELATE.getWorkspacePermissionWorkspaceManageRole,
+                      PermissionConst.KNOWLEDGE_PROBLEM_RELATE.getKnowledgeWorkspaceResourcePermission(id)]">
                         <el-icon><Connection /></el-icon>
                       </el-button>
                     </el-tooltip>
@@ -120,8 +124,9 @@
                     <el-tooltip effect="dark" :content="$t('common.delete')" placement="top">
                       <el-button type="primary" text @click.stop="deleteProblem(row)"
                       v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                      RoleConst.USER.getWorkspaceRole,
-                      PermissionConst.KNOWLEDGE_PROBLEM_DELETE.getWorkspacePermission]">
+                      RoleConst.ADMIN,
+                      PermissionConst.KNOWLEDGE_PROBLEM_DELETE.getWorkspacePermissionWorkspaceManageRole,
+                      PermissionConst.KNOWLEDGE_PROBLEM_DELETE.getKnowledgeWorkspaceResourcePermission(id)]">
                         <el-icon><Delete /></el-icon>
                       </el-button>
                     </el-tooltip>

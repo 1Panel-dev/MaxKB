@@ -79,11 +79,7 @@
         <h4 class="title-decoration-1 mb-16">
           {{ $t('common.param.initParam') }}
         </h4>
-        <el-button link type="primary" @click="openAddInitDialog()"
-          v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-          RoleConst.USER.getWorkspaceRole,
-          PermissionConst.TOOL_EDIT.getWorkspacePermission]"
-        >
+        <el-button link type="danger" @click="openAddInitDialog()">
           <el-icon class="mr-4">
             <Plus/>
           </el-icon>
@@ -165,11 +161,7 @@
             {{ $t('views.tool.form.param.paramInfo1') }}
           </el-text>
         </h4>
-        <el-button link type="primary" @click="openAddDialog()"
-          v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-          RoleConst.USER.getWorkspaceRole,
-          PermissionConst.TOOL_EDIT.getWorkspacePermission]"
-        >
+        <el-button link type="primary" @click="openAddDialog()">
           <el-icon class="mr-4">
             <Plus/>
           </el-icon>
@@ -249,14 +241,9 @@
       <div>
         <el-button :loading="loading" @click="visible = false">{{ $t('common.cancel') }}</el-button>
         <el-button :loading="loading" @click="openDebug"
-          v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-          RoleConst.USER.getWorkspaceRole,
-          PermissionConst.TOOL_DEBUG.getWorkspacePermission]"  
+        v-if="permissionPrecise.debug()"
         >{{ $t('common.debug') }}</el-button>
         <el-button type="primary" @click="submit(FormRef)" :loading="loading"
-          v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-          RoleConst.USER.getWorkspaceRole,
-          PermissionConst.TOOL_EDIT.getWorkspacePermission]"
         >
           {{ isEdit ? $t('common.save') : $t('common.create') }}
         </el-button
@@ -272,7 +259,7 @@
 </template>
 
 <script setup lang="ts">
-import {ref, reactive, watch, nextTick} from 'vue'
+import {ref, reactive, watch, nextTick, computed} from 'vue'
 import FieldFormDialog from '@/views/tool/component/FieldFormDialog.vue'
 import ToolDebugDrawer from './ToolDebugDrawer.vue'
 import UserFieldFormDialog from '@/views/tool/component/UserFieldFormDialog.vue'
@@ -287,6 +274,26 @@ import {t} from '@/locales'
 import {isAppIcon} from '@/utils/common'
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
+import { useRoute } from 'vue-router'
+import useStore from '@/stores'
+import permissionMap from '@/permission'
+
+
+const route = useRoute()
+const { folder, user } = useStore()
+
+const type = computed(() => {
+  if (route.path.includes('shared')) {
+    return 'systemShare'
+  } else if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
+const permissionPrecise = computed(() => {
+  return permissionMap['tool'][type.value]
+})
 
 const props = defineProps({
   title: String,

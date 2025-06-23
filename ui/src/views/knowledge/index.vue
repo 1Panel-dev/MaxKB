@@ -50,6 +50,8 @@
               class="ml-8"
               v-hasPermission="[
                 RoleConst.ADMIN,
+                RoleConst.USER.getWorkspaceRole,
+                RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
                 PermissionConst.KNOWLEDGE_CREATE.getWorkspacePermissionWorkspaceManageRole,
                 PermissionConst.KNOWLEDGE_CREATE.getWorkspacePermission,
               ]"
@@ -196,6 +198,11 @@
                   @click="
                     router.push({ path: `/knowledge/${item.id}/${currentFolder.id}/document` })
                   "
+                  v-hasPermission="[
+                  RoleConst.ADMIN,
+                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                  PermissionConst.KNOWLEDGE_DOCUMENT_READ.getWorkspacePermissionWorkspaceManageRole,
+                  PermissionConst.KNOWLEDGE_DOCUMENT_READ.getKnowledgeWorkspaceResourcePermission(item.id),]"
                 >
                   <template #icon>
                     <KnowledgeIcon :type="item.type" />
@@ -242,8 +249,9 @@
                               icon="Refresh"
                               @click.stop="syncKnowledge(item)"
                               v-if="item.type === 1 &&
-                              hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                              RoleConst.USER.getWorkspaceRole,
+                              hasPermission([
+                              RoleConst.ADMIN,
+                              RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
                               PermissionConst.KNOWLEDGE_SYNC.getWorkspacePermissionWorkspaceManageRole,
                               PermissionConst.KNOWLEDGE_SYNC.getKnowledgeWorkspaceResourcePermission(item.id)],'OR')"
                               >{{ $t('views.knowledge.setting.sync') }}
@@ -254,7 +262,7 @@
                                 hasPermission(
                                   [
                                     RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                                    RoleConst.USER.getWorkspaceRole,
+                                    RoleConst.ADMIN,
                                     PermissionConst.KNOWLEDGE_VECTOR.getWorkspacePermissionWorkspaceManageRole,
                                     PermissionConst.KNOWLEDGE_VECTOR.getKnowledgeWorkspaceResourcePermission(item.id),
                                   ],
@@ -273,7 +281,7 @@
                                 hasPermission(
                                   [
                                     RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                                    RoleConst.USER.getWorkspaceRole,
+                                    RoleConst.ADMIN,
                                     PermissionConst.KNOWLEDGE_PROBLEM_CREATE.getWorkspacePermissionWorkspaceManageRole,
                                     PermissionConst.KNOWLEDGE_PROBLEM_CREATE.getKnowledgeWorkspaceResourcePermission(item.id),
                                   ],
@@ -293,7 +301,7 @@
                                 hasPermission(
                                   [
                                     RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                                    RoleConst.USER.getWorkspaceRole,
+                                    RoleConst.ADMIN,
                                     PermissionConst.KNOWLEDGE_EDIT.getWorkspacePermissionWorkspaceManageRole,
                                     PermissionConst.KNOWLEDGE_EDIT.getKnowledgeWorkspaceResourcePermission(item.id),
                                   ],
@@ -309,7 +317,7 @@
                                 hasPermission(
                                   [
                                     RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                                    RoleConst.USER.getWorkspaceRole,
+                                    RoleConst.ADMIN,
                                     PermissionConst.KNOWLEDGE_EXPORT.getWorkspacePermissionWorkspaceManageRole,
                                     PermissionConst.KNOWLEDGE_EXPORT.getKnowledgeWorkspaceResourcePermission(item.id),
                                   ],
@@ -326,7 +334,7 @@
                                 hasPermission(
                                   [
                                     RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                                    RoleConst.USER.getWorkspaceRole,
+                                    RoleConst.ADMIN,
                                     PermissionConst.KNOWLEDGE_EXPORT.getWorkspacePermissionWorkspaceManageRole,
                                     PermissionConst.KNOWLEDGE_EXPORT.getKnowledgeWorkspaceResourcePermission(item.id),
                                   ],
@@ -345,7 +353,7 @@
                                 hasPermission(
                                   [
                                     RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                                    RoleConst.USER.getWorkspaceRole,
+                                    RoleConst.ADMIN,
                                     PermissionConst.KNOWLEDGE_DELETE.getWorkspacePermissionWorkspaceManageRole,
                                     PermissionConst.KNOWLEDGE_DELETE.getKnowledgeWorkspaceResourcePermission(item.id),
                                   ],
