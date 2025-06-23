@@ -36,7 +36,7 @@
           <AppIcon iconName="app-save-outlined" class="mr-4"></AppIcon>
           {{ $t('common.save') }}
         </el-button>
-        <el-button type="primary" @click="publicHandle">
+        <el-button type="primary" @click="publish">
           {{ $t('views.applicationWorkflow.setting.public') }}
         </el-button>
 
@@ -256,29 +256,20 @@ function onmousedown(item: any) {
 function clickoutside() {
   showPopover.value = false
 }
-async function publicHandle() {
-  // 后执行发布
-  workflowRef.value
-    ?.validate()
-    .then(async () => {
-      const obj = {
-        work_flow: getGraphData(),
-      }
-      await application.asyncPutApplication(id, obj, loading)
-      const workflow = new WorkFlowInstance(obj.work_flow)
-      try {
-        workflow.is_valid()
-      } catch (e: any) {
-        MsgError(e.toString())
-        return
-      }
-      // applicationApi.putPublishApplication(id as string, obj, loading).then(() => {
-
-      //   application.asyncGetApplicationDetail(id, loading).then((res: any) => {
-      //     detail.value.name = res.data.name
-      //     MsgSuccess(t('views.applicationWorkflow.tip.publicSuccess'))
-      //   })
-      // })
+const publish = () => {
+  const workflow = getGraphData()
+  const workflowInstance = new WorkFlowInstance(workflow)
+  try {
+    workflowInstance.is_valid()
+  } catch (e: any) {
+    MsgError(e.toString())
+    return
+  }
+  applicationApi
+    .publish(id, { work_flow: workflow }, loading)
+    .then((ok: any) => {
+      detail.value.name = ok.data.name
+      MsgSuccess(t('views.applicationWorkflow.tip.publicSuccess'))
     })
     .catch((res: any) => {
       const node = res.node
