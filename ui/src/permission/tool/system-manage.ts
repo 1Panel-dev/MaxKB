@@ -13,6 +13,13 @@ const workspace = {
       'OR',
     ),
   delete: () => false,
+  create: () => false,
+  switch: () => false,
+  edit: () => false,
+  copy: () => false,
+  export: () => false,
+  debug: () => false,
+
 }
 
 export default workspace

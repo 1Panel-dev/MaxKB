@@ -4,5 +4,11 @@ import { EditionConst, PermissionConst, RoleConst } from '@/utils/permission/dat
 const share = {
   is_share: () => false,
   delete: () => false,
+  create: () => false,
+  switch: () => false,
+  edit: () => false,
+  copy: () => false,
+  export: () => false,
+  debug: () => false,
 }
 export default share
