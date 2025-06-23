@@ -33,7 +33,7 @@
             <el-row :gutter="16">
               <el-col v-for="tool in category.tools" :key="tool.id" :span="8" class="mb-16">
                 <ToolCard :tool="tool" :addLoading="addLoading" :get-sub-title="getSubTitle"
-                  @handleAdd="handleAdd(tool)" />
+                  @handleAdd="handleOpenAdd(tool)" @handleDetail="handleDetail(tool)" />
               </el-col>
             </el-row>
           </div>
@@ -46,7 +46,7 @@
           <el-row :gutter="16" v-if="filterList.length">
             <el-col v-for="tool in filterList" :key="tool.id" :span="8" class="mb-16">
               <ToolCard :tool="tool" :addLoading="addLoading" :get-sub-title="getSubTitle"
-                @handleAdd="handleAdd(tool)" />
+                @handleAdd="handleOpenAdd(tool)" @handleDetail="handleDetail(tool)" />
             </el-col>
           </el-row>
           <el-empty v-else :description="$t('common.noData')" />
@@ -54,6 +54,8 @@
       </el-scrollbar>
     </LayoutContainer>
   </el-dialog>
+  <InternalDescDrawer ref="internalDescDrawerRef" @addFunction="handleOpenAdd" />
+  <AddInternalFunctionDialog ref="addInternalFunctionDialogRef" @refresh="handleAdd" />
 </template>
 
 <script setup lang="ts">
@@ -62,6 +64,8 @@ import ToolApi from '@/api/tool/tool'
 import { t } from '@/locales'
 import ToolCard from './ToolCard.vue'
 import { MsgSuccess } from '@/utils/message'
+import InternalDescDrawer from './InternalDescDrawer.vue'
+import AddInternalFunctionDialog from './AddInternalFunctionDialog.vue'
 
 interface ToolCategory {
   id: string
@@ -74,6 +78,7 @@ const emit = defineEmits(['refresh'])
 const dialogVisible = ref(false)
 const loading = ref(false)
 const searchValue = ref('')
+const folderId = ref('')
 
 const categories = ref<ToolCategory[]>([
   {
@@ -113,7 +118,8 @@ function getSubTitle(tool: any) {
   return categories.value.find(i => i.id === tool.label)?.title ?? ''
 }
 
-function open() {
+function open(id: string) {
+  folderId.value = id
   filterList.value = null
   dialogVisible.value = true
 }
@@ -146,11 +152,23 @@ const handleClick = (e: MouseEvent) => {
   e.preventDefault()
 }
 
+const internalDescDrawerRef = ref<InstanceType<typeof InternalDescDrawer>>()
+async function handleDetail(tool: any) {
+  const index = tool.icon.replace('icon.png', 'detail.md')
+  const response = await fetch(index)
+  const content = await response.text()
+  internalDescDrawerRef.value?.open(content, tool)
+}
+
+const addInternalFunctionDialogRef = ref<InstanceType<typeof AddInternalFunctionDialog>>()
+function handleOpenAdd(data?: any, isEdit?: boolean) {
+  addInternalFunctionDialogRef.value?.open(data, isEdit)
+}
+
 const addLoading = ref(false)
 async function handleAdd(tool: any) {
   try {
-    // TODO 点击添加弹出弹窗可以编辑名字
-    await ToolApi.addInternalTool(tool.id, { name: tool.name, folder_id: tool.folder_id }, addLoading)
+    await ToolApi.addInternalTool(tool.id, { name: tool.name, folder_id: folderId.value }, addLoading)
     emit('refresh')
     MsgSuccess(t('common.addSuccess'))
     dialogVisible.value = false

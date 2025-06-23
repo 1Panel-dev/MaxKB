@@ -50,9 +50,9 @@
               type="primary"
               class="ml-8"
               v-hasPermission="[
-                RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                RoleConst.USER.getWorkspaceRole,
-                PermissionConst.TOOL_CREATE.getWorkspacePermission,
+              RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+              RoleConst.USER.getWorkspaceRole,
+              PermissionConst.TOOL_CREATE.getWorkspacePermission,
               ]"
             >
               {{ $t('common.create') }}
@@ -94,8 +94,7 @@
                     </div>
                   </el-dropdown-item>
                 </el-upload>
-                <!-- TODO 从工具商店创建 -->
-                <!-- <el-dropdown-item @click="openToolStoreDialog()">
+                <el-dropdown-item @click="openToolStoreDialog()">
                   <div class="flex align-center">
                     <el-avatar class="avatar-green" shape="square" :size="32">
                       <img src="@/assets/node/icon_tool.svg" style="width: 58%" alt="" />
@@ -106,7 +105,7 @@
                       </div>
                     </div>
                   </div>
-                </el-dropdown-item> -->
+                </el-dropdown-item>
                 <el-dropdown-item @click="openCreateFolder" divided>
                   <div class="flex align-center">
                     <AppIcon iconName="app-folder" style="font-size: 32px"></AppIcon>
@@ -229,19 +228,25 @@
                         </el-button>
                         <template #dropdown>
                           <el-dropdown-menu>
+                            <el-dropdown-item v-if="item.template_id" @click.stop="addInternalFunction(item, true)">
+                              <el-icon>
+                                <EditPen />
+                              </el-icon>
+                              {{ $t('common.edit') }}
+                            </el-dropdown-item>
                             <el-dropdown-item
                               v-if="
-                                !item.template_id &&
-                                hasPermission(
-                                  [
-                                    RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                                    RoleConst.USER.getWorkspaceRole,
+                              !item.template_id &&
+                              hasPermission(
+                                [
+                                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                                  RoleConst.USER.getWorkspaceRole,
                                     PermissionConst.TOOL_EDIT
                                       .getWorkspacePermissionWorkspaceManageRole,
-                                    PermissionConst.TOOL_EDIT.getWorkspacePermission,
-                                  ],
-                                  'OR',
-                                )
+                                  PermissionConst.TOOL_EDIT.getWorkspacePermission,
+                                ],
+                                'OR',
+                              )
                               "
                               @click.stop="openCreateDialog(item)"
                             >
@@ -252,15 +257,15 @@
                             </el-dropdown-item>
                             <el-dropdown-item
                               v-if="
-                                !item.template_id &&
-                                hasPermission(
-                                  [
-                                    RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                                    RoleConst.USER.getWorkspaceRole,
-                                    PermissionConst.TOOL_EXPORT.getWorkspacePermission,
-                                  ],
-                                  'OR',
-                                )
+                              !item.template_id &&
+                              hasPermission(
+                                [
+                                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                                  RoleConst.USER.getWorkspaceRole,
+                                  PermissionConst.TOOL_EXPORT.getWorkspacePermission,
+                                ],
+                                'OR',
+                              )
                               "
                               @click.stop="copyTool(item)"
                             >
@@ -276,15 +281,15 @@
                             </el-dropdown-item>
                             <el-dropdown-item
                               v-if="
-                                !item.template_id &&
-                                hasPermission(
-                                  [
-                                    RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                                    RoleConst.USER.getWorkspaceRole,
-                                    PermissionConst.TOOL_EXPORT.getWorkspacePermission,
-                                  ],
-                                  'OR',
-                                )
+                              !item.template_id &&
+                              hasPermission(
+                                [
+                                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                                  RoleConst.USER.getWorkspaceRole,
+                                  PermissionConst.TOOL_EXPORT.getWorkspacePermission,
+                                ],
+                                'OR',
+                              )
                               "
                               @click.stop="exportTool(item)"
                             >
@@ -316,6 +321,7 @@
     <ToolFormDrawer ref="ToolFormDrawerRef" @refresh="refresh" :title="ToolDrawertitle" />
     <CreateFolderDialog ref="CreateFolderDialogRef" @refresh="refreshFolder" v-if="!isShared" />
     <ToolStoreDialog ref="toolStoreDialogRef" @refresh="refresh" />
+    <AddInternalFunctionDialog ref="addInternalFunctionDialogRef" @refresh="confirmAddInternalFunction" />
   </LayoutContainer>
 </template>
 
@@ -335,6 +341,7 @@ import { hasPermission } from '@/utils/permission/index'
 import { FolderSource } from '@/enums/common'
 import { ComplexPermission } from '@/utils/permission/type'
 import ToolStoreDialog from './component/ToolStoreDialog.vue'
+import AddInternalFunctionDialog from './component/AddInternalFunctionDialog.vue'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import permissionMap from '@/permission'
 import { useRoute } from 'vue-router'
@@ -466,7 +473,7 @@ async function changeState(row: any) {
   }
 }
 
-function refresh(data: any) {
+function refresh(data?: any) {
   if (data) {
     const index = toolList.value.findIndex((v) => v.id === data.id)
     // if (user.userInfo && data.user_id === user.userInfo.id) {
@@ -528,7 +535,21 @@ function configInitParams(item: any) {
 
 const toolStoreDialogRef = ref<InstanceType<typeof ToolStoreDialog>>()
 function openToolStoreDialog() {
-  toolStoreDialogRef.value?.open()
+  toolStoreDialogRef.value?.open(currentFolder.value.id)
+}
+
+const addInternalFunctionDialogRef = ref<InstanceType<typeof AddInternalFunctionDialog>>()
+function addInternalFunction(data?: any, isEdit?: boolean) {
+  addInternalFunctionDialogRef.value?.open(data, isEdit)
+}
+
+function confirmAddInternalFunction(data?: any, isEdit?: boolean) {
+  if (isEdit) {
+    ToolApi.putTool(data?.id as string, { name: data.name }, loading).then((res) => {
+      MsgSuccess(t('common.saveSuccess'))
+      refresh()
+    })
+  }
 }
 
 const elUploadRef = ref()

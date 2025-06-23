@@ -15,7 +15,7 @@
       :model="form"
       require-asterisk-position="right"
     >
-      <el-form-item prop="name">
+      <el-form-item prop="name" :label="$t('common.name')">
         <el-input v-model="form.name" maxlength="64" show-word-limit></el-input>
       </el-form-item>
     </el-form>
@@ -65,7 +65,7 @@ watch(dialogVisible, (bool) => {
   }
 })
 
-const open = (row: any, edit: boolean) => {
+const open = (row: any, edit?: boolean) => {
   if (row) {
     form.value = cloneDeep(row)
   }

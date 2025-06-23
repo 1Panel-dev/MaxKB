@@ -1,8 +1,10 @@
 <template>
   <CardBox :title="props.tool.name" :description="props.tool.desc" class="cursor">
     <template #icon>
-      <!-- TODO -->
-      <LogoIcon style="width: 28px; height: 28px; display: block" />
+      <el-avatar v-if="isAppIcon(props.tool?.icon)" shape="square" :size="32" style="background: none">
+        <img :src="props.tool?.icon" alt="" />
+      </el-avatar>
+      <el-avatar v-else-if="props.tool?.name" :name="props.tool?.name" pinyinColor shape="square" :size="32" />
     </template>
     <template #subTitle>
       <el-text class="color-secondary" size="small">
@@ -14,7 +16,7 @@
         {{ `${$t('common.author')}: MaxKB` }}
       </span>
       <div class="card-footer-operation" @click.stop>
-        <el-button>
+        <el-button @click="emit('handleDetail')">
           {{ $t('common.detail') }}
         </el-button>
         <el-button type="primary" :loading="props.addLoading" @click="emit('handleAdd')">
@@ -26,6 +28,9 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
+import { isAppIcon } from '@/utils/common'
+
 const props = defineProps<{
   tool: any,
   getSubTitle: (v: any) => string
@@ -34,6 +39,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'handleAdd'): void;
+  (e: 'handleDetail'): void;
 }>();
 </script>
 
