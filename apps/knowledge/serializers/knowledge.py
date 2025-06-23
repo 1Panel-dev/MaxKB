@@ -142,9 +142,6 @@ class KnowledgeSerializer(serializers.Serializer):
             if "name" in self.data and self.data.get('name') is not None:
                 query_set = query_set.filter(**{'temp.name__icontains': self.data.get("name")})
                 folder_query_set = folder_query_set.filter(**{'name__icontains': self.data.get("name")})
-            if "user_id" in self.data and self.data.get('user_id') is not None:
-                query_set = query_set.filter(**{'temp.user_id': self.data.get("user_id")})
-                folder_query_set = folder_query_set.filter(**{'user_id': self.data.get("user_id")})
             if "workspace_id" in self.data and self.data.get('workspace_id') is not None:
                 query_set = query_set.filter(**{'temp.workspace_id': self.data.get("workspace_id")})
                 folder_query_set = folder_query_set.filter(**{'workspace_id': self.data.get("workspace_id")})
@@ -161,7 +158,7 @@ class KnowledgeSerializer(serializers.Serializer):
             })).filter(**{'knowledge.workspace_id': workspace_id})
             query_set_dict['folder_query_set'] = folder_query_set
             workspace_user_role_mapping_model = DatabaseModelManage.get_model('workspace_user_role_mapping')
-            if workspace_manage and is_x_pack_ee:
+            if not workspace_manage and is_x_pack_ee:
                 query_set_dict['user_query_set'] = QuerySet(workspace_user_role_mapping_model).filter(
                     user_id=self.data.get("user_id"), workspace_id=workspace_id)
             return query_set_dict
