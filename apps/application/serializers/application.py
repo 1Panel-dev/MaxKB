@@ -245,8 +245,9 @@ class ApplicationCreateSerializer(serializers.Serializer):
                                             'knowledge_id_list': self.data.get('knowledge_id_list')}).is_valid()
 
         @staticmethod
-        def to_application_model(user_id: str, application: Dict):
+        def to_application_model(user_id: str, workspace_id: str, application: Dict):
             return Application(id=uuid.uuid7(), name=application.get('name'), desc=application.get('desc'),
+                               workspace_id=workspace_id,
                                prologue=application.get('prologue'),
                                dialogue_number=application.get('dialogue_number', 0),
                                user_id=user_id, model_id=application.get('model_id'),
@@ -321,7 +322,7 @@ class Query(serializers.Serializer):
             'folder_query_set': folder_query_set,
             'application_query_set': application_query_set,
             'application_custom_sql': application_custom_sql_query_set
-        } if (workspace_manage and is_x_pack_ee) else {'folder_query_set': folder_query_set,
+        } if (workspace_manage and not is_x_pack_ee) else {'folder_query_set': folder_query_set,
                                                        'application_query_set': application_query_set,
                                                        'user_query_set': QuerySet(
                                                            workspace_user_role_mapping_model).filter(
@@ -442,8 +443,10 @@ class ApplicationSerializer(serializers.Serializer):
     def insert_simple(self, instance: Dict):
         self.is_valid(raise_exception=True)
         user_id = self.data.get('user_id')
+        workspace_id = self.data.get("workspace_id")
         ApplicationCreateSerializer.SimplateRequest(data=instance).is_valid(user_id=user_id, raise_exception=True)
-        application_model = ApplicationCreateSerializer.SimplateRequest.to_application_model(user_id, instance)
+        application_model = ApplicationCreateSerializer.SimplateRequest.to_application_model(user_id, workspace_id,
+                                                                                             instance)
         dataset_id_list = instance.get('knowledge_id_list', [])
         application_knowledge_mapping_model_list = [
             self.to_application_knowledge_mapping(application_model.id, dataset_id) for

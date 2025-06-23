@@ -196,9 +196,9 @@ class KnowledgeSerializer(serializers.Serializer):
             if not root:
                 raise serializers.ValidationError(_('Folder not found'))
             workspace_manage = is_workspace_manage(self.data.get('user_id'), self.data.get('workspace_id'))
-
+            is_x_pack_ee = self.is_x_pack_ee()
             return native_search(
-                self.get_query_set(),
+                self.get_query_set(workspace_manage, is_x_pack_ee),
                 select_string=get_file_content(
                     os.path.join(
                         PROJECT_DIR,

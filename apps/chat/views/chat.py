@@ -128,9 +128,9 @@ class OpenView(APIView):
 
 class CaptchaView(APIView):
     @extend_schema(methods=['GET'],
-                   summary=_("Get captcha"),
-                   description=_("Get captcha"),
-                   operation_id=_("Get captcha"),  # type: ignore
+                   summary=_("Get Chat captcha"),
+                   description=_("Get Chat captcha"),
+                   operation_id=_("Get Chat captcha"),  # type: ignore
                    tags=[_("User Management")],  # type: ignore
                    responses=CaptchaAPI.get_response())
     def get(self, request: Request):

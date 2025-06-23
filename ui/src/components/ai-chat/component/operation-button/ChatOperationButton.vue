@@ -103,6 +103,7 @@ import { nextTick, onMounted, ref, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 import { copyClick } from '@/utils/clipboard'
 import applicationApi from '@/api/application/application'
+import chatAPI from '@/api/chat/chat'
 import { datetimeFormat } from '@/utils/time'
 import { MsgError } from '@/utils/message'
 import bus from '@/bus'
@@ -118,7 +119,7 @@ const copy = (data: any) => {
 }
 const route = useRoute()
 const {
-  params: { id }
+  params: { id },
 } = route as any
 
 const props = withDefaults(
@@ -134,8 +135,8 @@ const props = withDefaults(
   }>(),
   {
     data: () => ({}),
-    type: 'ai-chat'
-  }
+    type: 'ai-chat',
+  },
 )
 
 const emit = defineEmits(['update:data', 'regeneration'])
@@ -152,12 +153,10 @@ function regeneration() {
 }
 
 function voteHandle(val: string) {
-  applicationApi
-    .putChatVote(props.applicationId, props.chatId, props.data.record_id, val, loading)
-    .then(() => {
-      buttonData.value['vote_status'] = val
-      emit('update:data', buttonData.value)
-    })
+  chatAPI.vote(props.chatId, props.data.record_id, val, loading).then(() => {
+    buttonData.value['vote_status'] = val
+    emit('update:data', buttonData.value)
+  })
 }
 
 function markdownToPlainText(md: string) {
@@ -203,9 +202,9 @@ function smartSplit(
     0: 10,
     1: 25,
     3: 50,
-    5: 100
+    5: 100,
   },
-  is_end = false
+  is_end = false,
 ) {
   // 匹配中文逗号/句号，且后面至少还有20个字符（含任何字符，包括换行）
   const regex = /([。？\n])|(<audio[^>]*><\/audio>)/g
@@ -261,7 +260,7 @@ enum AudioStatus {
   /**
    * 错误
    */
-  ERROR = 'ERROR'
+  ERROR = 'ERROR',
 }
 class AudioManage {
   textList: Array<string>
@@ -318,7 +317,7 @@ class AudioManage {
             .postTextToSpeech(
               (props.applicationId as string) || (id as string),
               { text: text },
-              loading
+              loading,
             )
             .then(async (res: any) => {
               if (res.type === 'application/json') {
@@ -347,7 +346,7 @@ class AudioManage {
         this.audioList.push(audioElement)
       } else {
         const speechSynthesisUtterance: SpeechSynthesisUtterance = new SpeechSynthesisUtterance(
-          text
+          text,
         )
         speechSynthesisUtterance.onend = () => {
           this.statusList[index] = AudioStatus.END
@@ -381,7 +380,7 @@ class AudioManage {
             .postTextToSpeech(
               (props.applicationId as string) || (id as string),
               { text: text },
-              loading
+              loading,
             )
             .then(async (res: any) => {
               if (res.type === 'application/json') {
@@ -432,7 +431,7 @@ class AudioManage {
 
     // 需要播放的内容
     const index = this.statusList.findIndex((status) =>
-      [AudioStatus.MOUNTED, AudioStatus.READY].includes(status)
+      [AudioStatus.MOUNTED, AudioStatus.READY].includes(status),
     )
     if (index < 0 || this.statusList[index] === AudioStatus.MOUNTED) {
       return
@@ -502,9 +501,9 @@ class AudioManage {
       {
         0: 20,
         1: 50,
-        5: 100
+        5: 100,
       },
-      is_end
+      is_end,
     )
 
     return split
