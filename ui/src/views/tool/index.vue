@@ -8,20 +8,8 @@
         :currentNodeKey="currentFolder?.id"
         @handleNodeClick="folderClickHandel"
         @refreshTree="refreshFolder"
-        :shareTitle="
-          hasPermission(
-            new ComplexPermission(
-              [RoleConst.ADMIN],
-              [PermissionConst.SHARED_TOOL_READ],
-              [EditionConst.IS_EE],
-              'OR',
-            ),
-            'OR',
-          )
-            ? 'views.system.share_tool'
-            : null
-        "
-        showShared
+        :shareTitle="$t('views.system.share_tool')"
+        :showShared="permissionPrecise['is_share']()"
         class="p-8"
       />
     </template>
@@ -248,7 +236,8 @@
                                   [
                                     RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
                                     RoleConst.USER.getWorkspaceRole,
-                                    PermissionConst.TOOL_EDIT.getWorkspacePermissionWorkspaceManageRole,
+                                    PermissionConst.TOOL_EDIT
+                                      .getWorkspacePermissionWorkspaceManageRole,
                                     PermissionConst.TOOL_EDIT.getWorkspacePermission,
                                   ],
                                   'OR',
@@ -303,16 +292,7 @@
                               {{ $t('common.export') }}
                             </el-dropdown-item>
                             <el-dropdown-item
-                              v-if="
-                                hasPermission(
-                                  [
-                                    RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                                    RoleConst.USER.getWorkspaceRole,
-                                    PermissionConst.TOOL_DELETE.getWorkspacePermission,
-                                  ],
-                                  'OR',
-                                )
-                              "
+                              v-if="permissionPrecise.delete()"
                               divided
                               @click.stop="deleteTool(item)"
                             >
@@ -356,8 +336,23 @@ import { FolderSource } from '@/enums/common'
 import { ComplexPermission } from '@/utils/permission/type'
 import ToolStoreDialog from './component/ToolStoreDialog.vue'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
-
+import permissionMap from '@/permission'
+import { useRoute } from 'vue-router'
+const route = useRoute()
 const { folder, user } = useStore()
+
+const type = computed(() => {
+  if (route.path.includes('shared')) {
+    return 'systemShare'
+  } else if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
+const permissionPrecise = computed(() => {
+  return permissionMap['tool'][type.value]
+})
 
 const InitParamDrawerRef = ref()
 const search_type = ref('name')
@@ -400,8 +395,8 @@ function openCreateDialog(data?: any) {
   ToolDrawertitle.value = data ? t('views.tool.editTool') : t('views.tool.createTool')
   if (data) {
     ToolApi.getToolById(data?.id, changeStateloading).then((res) => {
-        ToolFormDrawerRef.value.open(res.data)
-      })
+      ToolFormDrawerRef.value.open(res.data)
+    })
   } else {
     ToolFormDrawerRef.value.open(data)
   }
