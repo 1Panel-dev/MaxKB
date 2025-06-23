@@ -6,27 +6,31 @@
         <div class="workspace-left border-r p-16">
           <div class="workspace-left_title">
             <h4 class="medium">{{ $t('views.workspace.list') }}</h4>
-            <el-tooltip effect="dark" :content="`${$t('common.create')}${$t('views.workspace.title')}`" placement="top">
+            <el-tooltip effect="dark"
+                        :content="`${$t('common.create')}${$t('views.workspace.title')}`"
+                        placement="top">
               <el-button type="primary" text @click="createOrUpdateWorkspace()"
-                v-hasPermission="[RoleConst.ADMIN, PermissionConst.WORKSPACE_CREATE]"
+                         v-hasPermission="[RoleConst.ADMIN, PermissionConst.WORKSPACE_CREATE]"
               >
                 <AppIcon iconName="app-copy"></AppIcon>
               </el-button>
             </el-tooltip>
           </div>
           <div class="p-8">
-            <el-input v-model="filterText" :placeholder="$t('common.search')" prefix-icon="Search" clearable />
+            <el-input v-model="filterText" :placeholder="$t('common.search')" prefix-icon="Search"
+                      clearable/>
           </div>
           <div class="list-height-left">
             <el-scrollbar v-loading="loading">
-              <common-list :data="filterList" @click="clickWorkspace" :default-active="currentWorkspace?.id">
+              <common-list :data="filterList" @click="clickWorkspace"
+                           :default-active="currentWorkspace?.id">
                 <template #default="{ row }">
                   <div class="flex-between">
                     <span class="ellipsis" style="max-width: initial;">{{ row.name }}</span>
                     <el-dropdown :teleported="false">
                       <el-button text>
                         <el-icon class="color-secondary">
-                          <MoreFilled />
+                          <MoreFilled/>
                         </el-icon>
                       </el-button>
                       <template #dropdown>
@@ -37,7 +41,8 @@
                               $t('common.rename')
                             }}
                           </el-dropdown-item>
-                          <el-dropdown-item @click.stop="deleteWorkspace(row)" class="border-t p-8" v-if ="row.id !== 'default'">
+                          <el-dropdown-item @click.stop="deleteWorkspace(row)" class="border-t p-8"
+                                            v-if="row.id !== 'default'">
                             <AppIcon iconName="app-copy"></AppIcon>
                             {{
                               $t('common.delete')
@@ -60,31 +65,32 @@
         <div class="workspace-right" v-loading="loading">
           <div class="flex align-center" style="margin-bottom: 20px;">
             <h4 class="medium">{{ currentWorkspace?.name }}</h4>
-            <el-divider direction="vertical" class="mr-8 ml-8" />
-            <AppIcon iconName="app-wordspace" style="font-size: 16px" class="color-input-placeholder"></AppIcon>
+            <el-divider direction="vertical" class="mr-8 ml-8"/>
+            <AppIcon iconName="app-wordspace" style="font-size: 16px"
+                     class="color-input-placeholder"></AppIcon>
             <span class="color-input-placeholder ml-4">
               {{ currentWorkspace?.user_count }}
             </span>
           </div>
-          <Member :currentWorkspace="currentWorkspace" />
+          <Member :currentWorkspace="currentWorkspace"/>
         </div>
       </div>
     </el-card>
 
-    <CreateOrUpdateWorkspaceDialog ref="createOrUpdateWorkspaceDialogRef" @refresh="refresh" />
+    <CreateOrUpdateWorkspaceDialog ref="createOrUpdateWorkspaceDialogRef" @refresh="refresh"/>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, watch } from 'vue'
+import {onMounted, ref, watch} from 'vue'
 import WorkspaceApi from '@/api/workspace/workspace'
-import { t } from '@/locales'
+import {t} from '@/locales'
 import Member from './component/Member.vue'
 import CreateOrUpdateWorkspaceDialog from './component/CreateOrUpdateWorkspaceDialog.vue'
-import type { WorkspaceItem } from '@/api/type/workspace'
-import { MsgSuccess, MsgConfirm } from '@/utils/message'
-import { PermissionConst, RoleConst } from '@/utils/permission/data'
-import { hasPermission } from '@/utils/permission/index'
+import type {WorkspaceItem} from '@/api/type/workspace'
+import {MsgSuccess, MsgConfirm} from '@/utils/message'
+import {PermissionConst, RoleConst} from '@/utils/permission/data'
+import {hasPermission} from '@/utils/permission/index'
 
 const filterText = ref('')
 const loading = ref(false)
@@ -146,7 +152,8 @@ async function check(id: string) {
 
 async function deleteWorkspace(item: WorkspaceItem) {
   // 判断是否能删除
-  const canDelete = await check(item.id as string);
+  const res = await check(item.id as string);
+  const canDelete = res ? res.data.can_delete : true;
   if (canDelete) {
     MsgConfirm(
       `${t('views.workspace.delete.confirmTitle')}${item.name} ?`,
@@ -166,7 +173,7 @@ async function deleteWorkspace(item: WorkspaceItem) {
   } else {
     MsgConfirm(
       `${t('views.workspace.delete.confirmTitle')}${item.name} ?`,
-      t('views.workspace.delete.confirmContentNotDelete'),
+      res ? res.data.message : t('views.workspace.delete.confirmContent'),
       {
         showConfirmButton: false,
         cancelButtonText: t('common.close'),
