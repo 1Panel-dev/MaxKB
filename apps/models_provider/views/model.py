@@ -21,7 +21,7 @@ from common.utils.common import query_params_to_single_dict
 from models_provider.api.model import ModelCreateAPI, GetModelApi, ModelEditApi, ModelListResponse, DefaultModelResponse
 from models_provider.api.provide import ProvideApi
 from models_provider.models import Model
-from models_provider.serializers.model_serializer import ModelSerializer, SharedModelSerializer, \
+from models_provider.serializers.model_serializer import ModelSerializer, \
     WorkspaceSharedModelSerializer
 from system_manage.views import encryption_str
 
