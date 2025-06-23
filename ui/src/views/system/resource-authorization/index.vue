@@ -162,6 +162,7 @@ function submitPermissions() {
           auth_type: item.isRole ? 'ROLE' : 'RESOURCE_PERMISSION_GROUP',
         }
       })
+      .reduce((pre: any, next: any) => [...pre, ...next], [])
   })
 
   AuthorizationApi.putResourceAuthorization(
