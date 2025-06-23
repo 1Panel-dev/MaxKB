@@ -1,5 +1,5 @@
 const DocumentRouter = {
-  path: '/knowledge/resource/:id/',
+  path: '/knowledge/resource-management/:id/',
   name: 'KnowledgeDetailResourceManagement',
   meta: { title: 'common.fileUpload.document', activeMenu: '/knowledge', breadcrumb: true },
   component: () => import('@/layout/layout-template/MainLayout.vue'),

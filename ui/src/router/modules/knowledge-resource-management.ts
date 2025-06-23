@@ -1,5 +1,5 @@
 const ModelRouter = {
-  path: '/knowledge/resource',
+  path: '/knowledge/resource-management',
   name: 'knowledgeResourceManagement',
   meta: { title: 'views.knowledge.title', permission: 'KNOWLEDGE:READ' },
   hidden: true,
@@ -8,7 +8,7 @@ const ModelRouter = {
   children: [
 
     {
-      path: '/knowledge/resource/document/upload/management',
+      path: '/knowledge/resource-management/document/upload',
       name: 'UploadDocumentResourceManagement',
       meta: { activeMenu: '/knowledge/resource' },
       component: () => import('@/views/resource-management/document/UploadDocument.vue'),
