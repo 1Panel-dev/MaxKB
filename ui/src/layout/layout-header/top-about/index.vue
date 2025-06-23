@@ -34,7 +34,7 @@
     >
       <AppIcon
         iconName="app-help"
-        class="cursor color-secondary mr-16 ml-8"
+        class="cursor color-secondary mr-8 ml-8"
         style="font-size: 20px"
         @click="toUrl(theme.themeInfo?.forumUrl)"
       ></AppIcon>

@@ -99,7 +99,6 @@ import { hasPermission } from '@/utils/permission/index'
 import WorkspaceApi from '@/api/workspace/workspace.ts'
 import type { WorkspaceItem } from '@/api/type/workspace'
 
-const PermissionSettingRef = ref()
 const loading = ref(false)
 const rLoading = ref(false)
 const memberList = ref<any[]>([]) // 全部成员
@@ -162,8 +161,8 @@ function submitPermissions() {
           auth_type: item.isRole ? 'ROLE' : 'RESOURCE_PERMISSION_GROUP',
         }
       })
-      .reduce((pre: any, next: any) => [...pre, ...next], [])
-  })
+
+  }).reduce((pre: any, next: any) => [...pre, ...next], [])
 
   AuthorizationApi.putResourceAuthorization(
     currentWorkspaceId.value || 'default',
@@ -295,6 +294,7 @@ const getWholeTree = async (user_id: string) => {
       let folderIdMap = []
       const folderTree = cloneDeep((parentRes as unknown as any).data)
       if (Object.keys(childrenRes.data).indexOf(item.value) !== -1) {
+        item.isRole = childrenRes.data[item.value].length>0 && childrenRes.data[item.value][0].permission.ROLE
         folderIdMap = getFolderIdMap(childrenRes.data[item.value])
         dfsFolder(folderTree, folderIdMap)
         const permissionHalf = {
@@ -337,22 +337,6 @@ const getFolderIdMap = (arr: any = []) => {
     return pre
   }, {})
 }
-function ResourcePermissions(user_id: string) {
-  AuthorizationApi.getResourceAuthorization(
-    currentWorkspaceId.value || 'default',
-    user_id,
-    rLoading,
-  ).then((res) => {
-    if (!res.data || Object.keys(res.data).length > 0) {
-      settingTags.map((item: any) => {
-        if (Object.keys(res.data).indexOf(item.value) !== -1) {
-          item.data = res.data[item.value]
-          getFolderIdMap(item.data)
-        }
-      })
-    }
-  })
-}
 
 const workspaceList = ref<WorkspaceItem[]>([])
 const currentWorkspaceId = ref<string | undefined>('')
@@ -360,11 +344,9 @@ const currentWorkspace = computed(() => {
   return workspaceList.value.find((w) => w.id == currentWorkspaceId.value)
 })
 async function getWorkspaceList() {
-  if (user.isEE()) {
-    const res = await WorkspaceApi.getSystemWorkspaceList(loading)
-    workspaceList.value = res.data
-    currentWorkspaceId.value = 'default'
-  }
+  const res = await WorkspaceApi.getSystemWorkspaceList(loading)
+  workspaceList.value = res.data
+  currentWorkspaceId.value = 'default'
 }
 
 function changeWorkspace(item: WorkspaceItem) {
@@ -380,7 +362,9 @@ onMounted(() => {
       tableHeight.value = window.innerHeight - 330
     })()
   }
-  getWorkspaceList()
+  if (user.isEE()) {
+    getWorkspaceList()
+  }
   getMember()
 })
 </script>

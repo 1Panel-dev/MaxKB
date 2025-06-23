@@ -5,16 +5,15 @@
       <LogoFull />
     </div>
 
-    <div class="flex-between w-full">
+    <div class="flex-between w-full align-center">
       <h4><el-divider class="ml-16 mr-16" direction="vertical" />{{ $t('views.system.title') }}</h4>
-      <div>
-        <TopAbout></TopAbout>
-        <span class="mr-8 lighter flex align-center"
-          ><el-divider class="ml-8 mr-8" direction="vertical" />
-          <el-button link @click="router.push({ path: '/' })">
-            <AppIcon class="mr-8" iconName="app-wordspace" style="font-size: 16px"></AppIcon>
-            {{ '返回工作空间' }}</el-button>
-        </span>
+      <div class="flex align-center mr-8">
+        <TopAbout class="mt-4"></TopAbout>
+        <el-divider class="ml-8 mr-8" direction="vertical" />
+        <el-button link @click="router.push({ path: '/' })">
+          <AppIcon class="mr-8" iconName="app-wordspace" style="font-size: 16px"></AppIcon>
+          {{ '返回工作空间' }}</el-button
+        >
       </div>
     </div>
     <Avatar></Avatar>
