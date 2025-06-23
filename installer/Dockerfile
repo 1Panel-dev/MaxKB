@@ -3,8 +3,8 @@ FROM node:18-alpine3.18 AS web-build
 COPY ui ui
 RUN cd ui && \
     npm install && \
-    npm run build-only && \
-    npm run build-only-chat && \
+    NODE_OPTIONS="--max-old-space-size=4096" npm run build-only && \
+    NODE_OPTIONS="--max-old-space-size=4096" npm run build-only-chat && \
     rm -rf ./node_modules
 FROM ghcr.io/1panel-dev/maxkb-base:python3.11-pg17.4 AS stage-build
 
@@ -75,7 +75,8 @@ RUN chmod 755 /opt/maxkb-app/installer/*.sh && \
     useradd --no-create-home --home /opt/maxkb-app/sandbox sandbox -g root && \
     chown -R sandbox:root /opt/maxkb-app/sandbox && \
     chmod g-x /usr/local/bin/* /usr/bin/* /bin/* /usr/sbin/* /sbin/* /usr/lib/postgresql/17/bin/* && \
-    chmod g+x /usr/local/bin/python*
+    chmod g+x /usr/local/bin/python* && \
+    python3 -m venv /opt/maxkb-app/sandbox/py3 && . /opt/maxkb-app/sandbox/py3/bin/activate && pip install diskcache2
 
 EXPOSE 8080
 VOLUME /opt/maxkb
