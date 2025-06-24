@@ -8493,3 +8493,9 @@ msgstr "获取工具列表"
 
 msgid "Setting"
 msgstr "设置"
+
+msgid "Get verification results"
+msgstr "获取验证结果"
+
+msgid "Validation"
+msgstr "验证"

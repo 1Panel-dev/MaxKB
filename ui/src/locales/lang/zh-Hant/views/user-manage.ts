@@ -24,6 +24,7 @@ export default {
     nick_name: {
       label: '姓名',
       placeholder: '請輸入姓名',
+      lengthMessage: '長度須介於 2 到 20 個字元之間',
     },
 
     phone: {

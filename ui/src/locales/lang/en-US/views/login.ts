@@ -5,7 +5,7 @@ export default {
       label: 'Username',
       placeholder: 'Please enter username',
       requiredMessage: 'Please enter username',
-      lengthMessage: 'Length must be between 6 and 20 words',
+      lengthMessage: 'Length must be between 4 and 20 words',
     },
     password: {
       label: 'Login Password',

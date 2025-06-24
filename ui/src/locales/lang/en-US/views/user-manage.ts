@@ -26,6 +26,7 @@ export default {
     nick_name: {
       label: 'Name',
       placeholder: 'Please enter name',
+      lengthMessage: 'Length must be between 2 and 20 characters',
     },
     phone: {
       label: 'Phone',

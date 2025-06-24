@@ -5,7 +5,7 @@ export default {
       label: '用户名',
       placeholder: '请输入用户名',
       requiredMessage: '请输入用户名',
-      lengthMessage: '长度在 6 到 20 个字符',
+      lengthMessage: '长度在 4 到 20 个字符',
     },
     password: {
       label: '登录密码',
