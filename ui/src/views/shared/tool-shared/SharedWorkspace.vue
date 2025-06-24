@@ -1,6 +1,6 @@
 <template>
   <div class="tool-shared">
-    <ContentContainer :header="$t('views.system.share_tool')">
+    <ContentContainer :header="$t('views.system.shared.shared_tool')">
       <template #search>
         <div class="flex">
           <div class="flex-between complex-search">

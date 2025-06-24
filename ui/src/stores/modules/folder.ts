@@ -1,10 +1,15 @@
-import {defineStore} from 'pinia'
-import {type Ref} from 'vue'
+import { defineStore } from 'pinia'
+import { type Ref } from 'vue'
 import folderApi from '@/api/folder'
 
 const useFolderStore = defineStore('folder', {
-  state: () => ({}),
+  state: () => ({
+    currentFolder: {} as any,
+  }),
   actions: {
+    setCurrentFolder(folder: any) {
+      this.currentFolder = folder
+    },
     async asyncGetFolder(source: string, data: any, loading?: Ref<boolean>) {
       return new Promise((resolve, reject) => {
         folderApi

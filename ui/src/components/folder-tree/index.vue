@@ -14,7 +14,7 @@
       :class="currentNodeKey === 'share' && 'active'"
     >
       <AppIcon :iconName="iconName" style="font-size: 18px"></AppIcon>
-      <span class="ml-8 lighter">{{ $t(shareTitle) }}</span>
+      <span class="ml-8 lighter">{{ shareTitle }}</span>
     </div>
     <el-tree
       ref="treeRef"
@@ -37,7 +37,7 @@
           </div>
 
           <div
-            v-if="canOperation"
+            v-if="canOperation && node.level !== 3"
             @click.stop
             v-show="hoverNodeId === data.id"
             @mouseenter.stop="handleMouseEnter(data)"
@@ -61,7 +61,7 @@
                   <el-dropdown-item
                     divided
                     @click.stop="deleteFolder(data)"
-                    :disabled="data.id === 'default'"
+                    :disabled="!data.parent_id"
                   >
                     <el-icon><Delete /></el-icon>
                     {{ $t('common.delete') }}
@@ -109,7 +109,7 @@ const props = defineProps({
   },
   shareTitle: {
     type: String,
-    default: 'views.system.share_knowledge',
+    default: 'views.system.shared.shared_knowledge',
   },
   canOperation: {
     type: Boolean,
@@ -162,7 +162,7 @@ const handleNodeClick = (data: Tree) => {
 
 const handleSharedNodeClick = () => {
   treeRef.value?.setCurrentKey(undefined)
-  emit('handleNodeClick', { id: 'share', name: t(props.shareTitle) })
+  emit('handleNodeClick', { id: 'share', name: props.shareTitle })
 }
 
 function deleteFolder(row: Tree) {

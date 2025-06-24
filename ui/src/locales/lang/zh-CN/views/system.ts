@@ -1,13 +1,6 @@
 export default {
   title: '系统管理',
   subTitle: '系统设置',
-  shared: '共享',
-  shared_resources: '共享资源',
-  resource_management: '资源管理',
-  share_tool: '共享工具',
-  share_model: '共享模型',
-  share_knowledge: '共享知识库',
-  authorized_workspace: '授权工作空间',
   test: '测试连接',
   testSuccess: '测试连接成功',
   testFailed: '测试连接失败',
@@ -183,5 +176,16 @@ export default {
         requiredMessage: '请输入用户名/邮箱',
       },
     },
+  },
+  shared: {
+    label: '共享',
+    shared_resources: '共享资源',
+    shared_tool: '共享工具',
+    shared_model: '共享模型',
+    shared_knowledge: '共享知识库',
+    authorized_workspace: '授权工作空间',
+  },
+  resource_management: {
+    label: '资源管理',
   },
 }

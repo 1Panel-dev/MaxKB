@@ -12,6 +12,7 @@ import useDocumentStore from './modules/document'
 import useApplicationStore from './modules/application'
 import useChatLogStore from './modules/chat-log'
 import useChatUserStore from './modules/chat-user'
+import useToolStore from './modules/tool'
 const useStore = () => ({
   common: useCommonStore(),
   login: useLoginStore(),
@@ -27,6 +28,7 @@ const useStore = () => ({
   application: useApplicationStore(),
   chatLog: useChatLogStore(),
   chatUser: useChatUserStore(),
+  tool: useToolStore(),
 })
 
 export default useStore

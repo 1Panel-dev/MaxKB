@@ -9,7 +9,7 @@
           :class="active?.provider === 'share' && 'active'"
         >
           <AppIcon iconName="app-folder-share-active" style="font-size: 18px"></AppIcon>
-          <span class="ml-8 lighter">{{ $t('views.system.share_model') }}</span>
+          <span class="ml-8 lighter">{{ $t('views.system.shared.shared_model') }}</span>
         </div>
         <div
           class="all-mode flex cursor"
@@ -145,7 +145,7 @@ const clickListHandle = (item: Provider) => {
 }
 
 const handleSharedNodeClick = () => {
-  emit('click', { provider: 'share', name: t('views.system.share_model') })
+  emit('click', { provider: 'share', name: t('views.system.shared.shared_model') })
 }
 </script>
 <style lang="scss" scoped>

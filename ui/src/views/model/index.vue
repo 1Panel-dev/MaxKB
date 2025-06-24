@@ -6,7 +6,7 @@
         :data="provider_list"
         @click="clickListHandle"
         :loading="loading"
-        shareTitle="views.system.share_tool"
+        shareTitle="views.system.shared.shared_tool"
         :showShared="permissionPrecise['is_share']()"
         :active="active_provider"
       />
@@ -55,8 +55,8 @@
             </el-select>
           </div>
           <el-button
-            v-if="!isShared && 
-            permissionPrecise.addModel() 
+            v-if="!isShared &&
+            permissionPrecise.addModel()
             "
             class="ml-16"
             type="primary"
@@ -202,7 +202,7 @@ const openCreateModel = (provider?: Provider, model_type?: string) => {
 
 const list_model = () => {
   const params = active_provider.value?.provider ? { provider: active_provider.value.provider } : {}
-  loadSharedApi('model', isShared.value)
+  loadSharedApi({ type: 'model', isShared: isShared.value })
     .getModel({ ...model_search_form.value, ...params }, list_model_loading)
     .then((ok: any) => {
       model_list.value = ok.data

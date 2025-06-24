@@ -199,10 +199,14 @@
                     router.push({ path: `/knowledge/${item.id}/${currentFolder.id}/document` })
                   "
                   v-hasPermission="[
-                  RoleConst.ADMIN,
-                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                  PermissionConst.KNOWLEDGE_DOCUMENT_READ.getWorkspacePermissionWorkspaceManageRole,
-                  PermissionConst.KNOWLEDGE_DOCUMENT_READ.getKnowledgeWorkspaceResourcePermission(item.id),]"
+                    RoleConst.ADMIN,
+                    RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                    PermissionConst.KNOWLEDGE_DOCUMENT_READ
+                      .getWorkspacePermissionWorkspaceManageRole,
+                    PermissionConst.KNOWLEDGE_DOCUMENT_READ.getKnowledgeWorkspaceResourcePermission(
+                      item.id,
+                    ),
+                  ]"
                 >
                   <template #icon>
                     <KnowledgeIcon :type="item.type" />
@@ -214,7 +218,7 @@
                   </template>
                   <template #tag>
                     <el-tag v-if="isShared" type="info" class="info-tag">
-                      {{ t('views.system.shared') }}
+                      {{ t('views.system.shared.label') }}
                     </el-tag>
                   </template>
                   <template #footer>
@@ -248,12 +252,21 @@
                             <el-dropdown-item
                               icon="Refresh"
                               @click.stop="syncKnowledge(item)"
-                              v-if="item.type === 1 &&
-                              hasPermission([
-                              RoleConst.ADMIN,
-                              RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                              PermissionConst.KNOWLEDGE_SYNC.getWorkspacePermissionWorkspaceManageRole,
-                              PermissionConst.KNOWLEDGE_SYNC.getKnowledgeWorkspaceResourcePermission(item.id)],'OR')"
+                              v-if="
+                                item.type === 1 &&
+                                hasPermission(
+                                  [
+                                    RoleConst.ADMIN,
+                                    RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                                    PermissionConst.KNOWLEDGE_SYNC
+                                      .getWorkspacePermissionWorkspaceManageRole,
+                                    PermissionConst.KNOWLEDGE_SYNC.getKnowledgeWorkspaceResourcePermission(
+                                      item.id,
+                                    ),
+                                  ],
+                                  'OR',
+                                )
+                              "
                               >{{ $t('views.knowledge.setting.sync') }}
                             </el-dropdown-item>
                             <el-dropdown-item
@@ -263,8 +276,11 @@
                                   [
                                     RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
                                     RoleConst.ADMIN,
-                                    PermissionConst.KNOWLEDGE_VECTOR.getWorkspacePermissionWorkspaceManageRole,
-                                    PermissionConst.KNOWLEDGE_VECTOR.getKnowledgeWorkspaceResourcePermission(item.id),
+                                    PermissionConst.KNOWLEDGE_VECTOR
+                                      .getWorkspacePermissionWorkspaceManageRole,
+                                    PermissionConst.KNOWLEDGE_VECTOR.getKnowledgeWorkspaceResourcePermission(
+                                      item.id,
+                                    ),
                                   ],
                                   'OR',
                                 )
@@ -282,8 +298,11 @@
                                   [
                                     RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
                                     RoleConst.ADMIN,
-                                    PermissionConst.KNOWLEDGE_PROBLEM_CREATE.getWorkspacePermissionWorkspaceManageRole,
-                                    PermissionConst.KNOWLEDGE_PROBLEM_CREATE.getKnowledgeWorkspaceResourcePermission(item.id),
+                                    PermissionConst.KNOWLEDGE_PROBLEM_CREATE
+                                      .getWorkspacePermissionWorkspaceManageRole,
+                                    PermissionConst.KNOWLEDGE_PROBLEM_CREATE.getKnowledgeWorkspaceResourcePermission(
+                                      item.id,
+                                    ),
                                   ],
                                   'OR',
                                 )
@@ -302,8 +321,11 @@
                                   [
                                     RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
                                     RoleConst.ADMIN,
-                                    PermissionConst.KNOWLEDGE_EDIT.getWorkspacePermissionWorkspaceManageRole,
-                                    PermissionConst.KNOWLEDGE_EDIT.getKnowledgeWorkspaceResourcePermission(item.id),
+                                    PermissionConst.KNOWLEDGE_EDIT
+                                      .getWorkspacePermissionWorkspaceManageRole,
+                                    PermissionConst.KNOWLEDGE_EDIT.getKnowledgeWorkspaceResourcePermission(
+                                      item.id,
+                                    ),
                                   ],
                                   'OR',
                                 )
@@ -318,8 +340,11 @@
                                   [
                                     RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
                                     RoleConst.ADMIN,
-                                    PermissionConst.KNOWLEDGE_EXPORT.getWorkspacePermissionWorkspaceManageRole,
-                                    PermissionConst.KNOWLEDGE_EXPORT.getKnowledgeWorkspaceResourcePermission(item.id),
+                                    PermissionConst.KNOWLEDGE_EXPORT
+                                      .getWorkspacePermissionWorkspaceManageRole,
+                                    PermissionConst.KNOWLEDGE_EXPORT.getKnowledgeWorkspaceResourcePermission(
+                                      item.id,
+                                    ),
                                   ],
                                   'OR',
                                 )
@@ -335,8 +360,11 @@
                                   [
                                     RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
                                     RoleConst.ADMIN,
-                                    PermissionConst.KNOWLEDGE_EXPORT.getWorkspacePermissionWorkspaceManageRole,
-                                    PermissionConst.KNOWLEDGE_EXPORT.getKnowledgeWorkspaceResourcePermission(item.id),
+                                    PermissionConst.KNOWLEDGE_EXPORT
+                                      .getWorkspacePermissionWorkspaceManageRole,
+                                    PermissionConst.KNOWLEDGE_EXPORT.getKnowledgeWorkspaceResourcePermission(
+                                      item.id,
+                                    ),
                                   ],
                                   'OR',
                                 )
@@ -354,8 +382,11 @@
                                   [
                                     RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
                                     RoleConst.ADMIN,
-                                    PermissionConst.KNOWLEDGE_DELETE.getWorkspacePermissionWorkspaceManageRole,
-                                    PermissionConst.KNOWLEDGE_DELETE.getKnowledgeWorkspaceResourcePermission(item.id),
+                                    PermissionConst.KNOWLEDGE_DELETE
+                                      .getWorkspacePermissionWorkspaceManageRole,
+                                    PermissionConst.KNOWLEDGE_DELETE.getKnowledgeWorkspaceResourcePermission(
+                                      item.id,
+                                    ),
                                   ],
                                   'OR',
                                 )
@@ -476,7 +507,7 @@ function getList() {
     [search_type.value]: search_form.value[search_type.value],
   }
 
-  loadSharedApi('knowledge', isShared.value)
+  loadSharedApi({ type: 'knowledge', isShared: isShared.value })
     .getKnowledgeListPage(paginationConfig, params, loading)
     .then((res: any) => {
       paginationConfig.total = res.data.total

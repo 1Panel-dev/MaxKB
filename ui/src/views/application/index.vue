@@ -3,7 +3,7 @@
     <template #left>
       <h4 class="p-16 pb-0">{{ $t('views.application.title') }}</h4>
       <folder-tree
-        :source="FolderSource.TOOL"
+        :source="FolderSource.APPLICATION"
         :data="folderList"
         :currentNodeKey="currentFolder?.id"
         @handleNodeClick="folderClickHandel"

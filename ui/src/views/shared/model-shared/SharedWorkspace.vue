@@ -1,7 +1,7 @@
 <template>
   <div class="model-shared">
     <ContentContainer
-        :header="t('views.system.share_model')"
+        :header="t('views.system.shared.shared_model')"
         v-loading="list_model_loading"
       >
         <template #search>

@@ -110,4 +110,15 @@ export default {
     enableSSL: '啟用 SSL（如果 SMTP 端口是 465，通常需要啟用 SSL）',
     enableTLS: '啟用 TLS（如果 SMTP 端口是 587，通常需要啟用 TLS）',
   },
+  shared: {
+    label: '共享',
+    shared_resources: '共享资源',
+    shared_tool: '共享工具',
+    shared_model: '共享模型',
+    shared_knowledge: '共享知识',
+    authorized_workspace: '授权工作区',
+  },
+  resource_management: {
+    label: '资源管理',
+  },
 }

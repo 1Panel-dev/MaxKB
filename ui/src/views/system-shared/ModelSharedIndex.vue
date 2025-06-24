@@ -2,7 +2,7 @@
   <ContentContainer>
     <template #header>
       <div class="shared-header">
-        <span class="title">{{ t('views.system.shared_resources') }}</span>
+        <span class="title">{{ t('views.system.shared.shared_resources') }}</span>
         <el-icon size="12">
           <rightOutlined></rightOutlined>
         </el-icon>
@@ -17,7 +17,7 @@
             :data="provider_list"
             @click="clickListHandle"
             :loading="loading"
-            shareTitle="views.system.share_tool"
+            :shareTitle="$t('views.system.shared.shared_tool')"
             isShared
             :active="active_provider"
           />

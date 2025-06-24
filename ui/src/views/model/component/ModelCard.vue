@@ -29,7 +29,7 @@
     </template>
     <template #tag>
       <el-tag v-if="isShared" type="info" class="info-tag">
-        {{ t('views.system.shared') }}
+        {{ t('views.system.shared.label') }}
       </el-tag>
     </template>
     <ul>

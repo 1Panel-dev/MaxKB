@@ -1,7 +1,7 @@
 <template>
   <div class="model-shared">
     <div class="shared-header">
-      <span class="title">{{ t('views.system.shared_resources') }}</span>
+      <span class="title">{{ t('views.system.shared.shared_resources') }}</span>
       <el-icon size="12">
         <rightOutlined></rightOutlined>
       </el-icon>

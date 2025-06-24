@@ -70,7 +70,7 @@ const systemRouter = {
       meta: {
         icon: 'app-folder-share',
         iconActive: 'app-folder-share-active',
-        title: 'views.system.resource_management',
+        title: 'views.system.resource_management.label',
         activeMenu: '/system',
         parentPath: '/system',
         parentName: 'system',
@@ -119,7 +119,7 @@ const systemRouter = {
       meta: {
         icon: 'app-folder-share',
         iconActive: 'app-folder-share-active',
-        title: 'views.system.shared_resources',
+        title: 'views.system.shared.shared_resources',
         activeMenu: '/system',
         parentPath: '/system',
         parentName: 'system',
@@ -146,7 +146,7 @@ const systemRouter = {
             parentPath: '/system',
             parentName: 'system',
           },
-          component: () => import('@/views/shared/tool-shared/index.vue'),
+          component: () => import('@/views/system-shared/ToolSharedIndex.vue'),
         },
         {
           path: '/system/shared/model',

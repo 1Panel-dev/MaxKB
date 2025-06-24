@@ -1,7 +1,7 @@
 <template>
   <div class="resource-manage_tool">
     <div class="shared-header">
-      <span class="title">{{ t('views.system.resource_management') }}</span>
+      <span class="title">{{ t('views.system.resource_management.label') }}</span>
       <el-icon size="12">
         <rightOutlined></rightOutlined>
       </el-icon>

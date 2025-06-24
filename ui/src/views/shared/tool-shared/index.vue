@@ -3,7 +3,7 @@
     <ContentContainer>
       <template #header>
         <div class="shared-header">
-          <span class="title">{{ t('views.system.shared_resources') }}</span>
+          <span class="title">{{ t('views.system.shared.shared_resources') }}</span>
           <el-icon size="12">
             <rightOutlined></rightOutlined>
           </el-icon>
@@ -132,7 +132,7 @@
                           <el-dropdown-item
                             icon="Lock"
                             @click.stop="openAuthorizedWorkspaceDialog(item)"
-                            >{{ $t('views.system.authorized_workspace') }}</el-dropdown-item
+                            >{{ $t('views.system.shared.authorized_workspace') }}</el-dropdown-item
                           >
                           <el-dropdown-item
                             v-if="!item.template_id"

@@ -52,6 +52,8 @@ import { ref, watch, reactive } from 'vue'
 import folderApi from '@/api/folder'
 import { MsgSuccess, MsgAlert } from '@/utils/message'
 import { t } from '@/locales'
+import useStore from '@/stores'
+const { tool } = useStore()
 const emit = defineEmits(['refresh'])
 
 const props = defineProps({
@@ -122,12 +124,14 @@ const submitHandle = async () => {
           .then((res) => {
             MsgSuccess(t('common.editSuccess'))
             emit('refresh')
+            tool.setToolList([])
             dialogVisible.value = false
           })
       } else {
         folderApi.postFolder(sourceType.value, folderForm.value, loading).then((res) => {
           MsgSuccess(t('common.createSuccess'))
           emit('refresh')
+          tool.setToolList([])
           dialogVisible.value = false
         })
       }

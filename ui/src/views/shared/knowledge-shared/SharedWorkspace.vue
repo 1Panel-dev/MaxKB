@@ -1,6 +1,6 @@
 <template>
   <div class="knowledge-shared">
-    <ContentContainer :header="$t('views.system.share_knowledge')">
+    <ContentContainer :header="$t('views.system.shared.shared_knowledge')">
       <template #search>
         <div class="flex">
           <div class="flex-between complex-search">

@@ -25,6 +25,7 @@ import AiChat from './ai-chat/index.vue'
 import KnowledgeIcon from './app-icon/KnowledgeIcon.vue'
 import TagGroup from './tag-group/index.vue'
 import WorkspaceDropdown from './workspace-dropdown/index.vue'
+import FolderBreadcrumb from './folder-breadcrumb/index.vue'
 export default {
   install(app: App) {
     app.component('LogoFull', LogoFull)
@@ -53,5 +54,6 @@ export default {
     app.component('KnowledgeIcon', KnowledgeIcon)
     app.component('TagGroup', TagGroup)
     app.component('WorkspaceDropdown', WorkspaceDropdown)
+    app.component('FolderBreadcrumb', FolderBreadcrumb)
   },
 }

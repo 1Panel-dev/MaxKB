@@ -1,10 +1,6 @@
 export default {
   title: 'System',
   subTitle: 'Syetem Settings',
-  shared: 'Shared',
-  shared_resources: 'Shared Resources',
-  share_knowledge: 'Shared Knowledge',
-  authorized_workspace: 'Authorize Workspace',
   test: 'Test Connection',
   testSuccess: 'Successful',
   testFailed: 'Test connection failed',
@@ -23,7 +19,7 @@ export default {
       ldap_filterPlaceholder: 'Please enter user filter',
       ldap_mapping: 'LDAP Attribute Mapping',
       ldap_mappingPlaceholder: 'Please enter LDAP attribute mapping',
-      enableAuthentication: 'Enable LDAP Authentication'
+      enableAuthentication: 'Enable LDAP Authentication',
     },
     cas: {
       title: 'CAS',
@@ -33,7 +29,7 @@ export default {
       validateUrlPlaceholder: 'Please enter validation address',
       redirectUrl: 'Callback Address',
       redirectUrlPlaceholder: 'Please enter callback address',
-      enableAuthentication: 'Enable CAS Authentication'
+      enableAuthentication: 'Enable CAS Authentication',
     },
     oidc: {
       title: 'OIDC',
@@ -52,7 +48,7 @@ export default {
       logoutEndpointPlaceholder: 'Please enter logout endpoint',
       redirectUrl: 'Redirect URL',
       redirectUrlPlaceholder: 'Please enter redirect URL',
-      enableAuthentication: 'Enable OIDC Authentication'
+      enableAuthentication: 'Enable OIDC Authentication',
     },
 
     oauth2: {
@@ -73,7 +69,7 @@ export default {
       redirectUrlPlaceholder: 'Please enter redirect URL',
       filedMapping: 'Field Mapping',
       filedMappingPlaceholder: 'Please enter field mapping',
-      enableAuthentication: 'Enable OAuth2 Authentication'
+      enableAuthentication: 'Enable OAuth2 Authentication',
     },
     scanTheQRCode: {
       title: 'Scan the QR code',
@@ -95,10 +91,10 @@ export default {
       larkQrCode: 'Lark Scan Code Login',
       dingtalkQrCode: 'DingTalk Scan Code Login',
       setting: ' Setting',
-      access: 'Access'
-    }
+      access: 'Access',
+    },
   },
-    theme: {
+  theme: {
     title: 'Appearance Settings',
     platformDisplayTheme: 'Platform Display Theme',
     customTheme: 'Custom Theme',
@@ -115,8 +111,10 @@ export default {
     loginLogo: 'Login Logo',
     websiteLogo: 'Website Logo',
     replacePicture: 'Replace Picture',
-    websiteLogoTip: "The logo displayed on the top of the website. The recommended size is 48*48. It supports JPG, PNG, and GIF formats, with a size not exceeding 10MB.",
-    loginLogoTip: "Login page right-side logo. Recommended size is 204*52. Supports JPG, PNG, GIF formats, with a maximum file size of 10 MB.",
+    websiteLogoTip:
+      'The logo displayed on the top of the website. The recommended size is 48*48. It supports JPG, PNG, and GIF formats, with a size not exceeding 10MB.',
+    loginLogoTip:
+      'Login page right-side logo. Recommended size is 204*52. Supports JPG, PNG, GIF formats, with a maximum file size of 10 MB.',
     loginBackgroundTip:
       'Left background image, vector image recommended size 576 * 900, bitmap recommended size 1152 * 1800; Supports JPG, PNG, GIF, with a size not exceeding 10 MB.',
     websiteName: 'Website Name',
@@ -146,14 +144,14 @@ export default {
     smtpPortPlaceholder: 'Please enter SMTP port',
     smtpUser: 'SMTP User',
     smtpUserPlaceholder: 'Please enter SMTP user',
-    sendEmail: 'Sender\'s Email',
-    sendEmailPlaceholder: 'Please enter the sender\'s email',
+    sendEmail: "Sender's Email",
+    sendEmailPlaceholder: "Please enter the sender's email",
     smtpPassword: 'SMTP Password',
     smtpPasswordPlaceholder: 'Please enter SMTP password',
     enableSSL: 'Enable SSL (if the SMTP port is 465, you usually need to enable SSL)',
-    enableTLS: 'Enable TLS (if the SMTP port is 587, you usually need to enable TLS)'
+    enableTLS: 'Enable TLS (if the SMTP port is 587, you usually need to enable TLS)',
   },
-    group: {
+  group: {
     title: 'Team Member',
     member: 'Member',
     manage: 'Owner',
@@ -166,7 +164,8 @@ export default {
     delete: {
       button: 'Remove',
       confirmTitle: 'Wheather to remove the member:',
-      confirmMessage: "After removal, the member's knowledge base and application permissions will be revoked.",
+      confirmMessage:
+        "After removal, the member's knowledge base and application permissions will be revoked.",
     },
     setting: {
       management: 'manegement',
@@ -180,5 +179,16 @@ export default {
         requiredMessage: 'Please enter Username/Email',
       },
     },
-  },  
+  },
+  shared: {
+    label: 'Shared',
+    shared_resources: 'Shared Resources',
+    shared_tool: 'Shared Tool',
+    shared_model: 'Shared Model',
+    shared_knowledge: 'Shared Knowledge',
+    authorized_workspace: 'Authorize Workspace',
+  },
+  resource_management: {
+    label: 'Resource Management',
+  },
 }
