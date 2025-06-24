@@ -76,11 +76,12 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { ref, watch, reactive } from 'vue'
+import { ref, watch, reactive, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
 import paragraphApi from '@/api/knowledge/paragraph'
 import useStore from '@/stores'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { t } from '@/locales'
 const { knowledge, document } = useStore()
 
@@ -89,6 +90,15 @@ const {
   params: { id, documentId }, // id为knowledgeID
 } = route as any
 
+const type = computed(() => {
+  if (route.path.includes('shared')) {
+    return 'systemShare'
+  } else if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
 const emit = defineEmits(['refresh'])
 const formRef = ref()
 
@@ -137,9 +147,11 @@ const defaultProps = {
 const loadTree = (node: any, resolve: any) => {
   if (node.isLeaf) return resolve([])
   const folder_id = node.level === 0 ? '' : node.data.id
-  knowledge.asyncGetFolderKnowledge(folder_id, optionLoading).then((res: any) => {
-    resolve(res.data)
-  })
+  loadSharedApi({ type: 'knowledge', systemType: type.value })
+    .getKnowledgeList(folder_id, optionLoading)
+    .then((res: any) => {
+      resolve(res.data)
+    })
 }
 
 function changeKnowledge(id: string) {

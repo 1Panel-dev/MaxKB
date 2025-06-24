@@ -94,7 +94,6 @@
 </template>
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import KnowledgeApi from '@/api/knowledge/knowledge'
 import useStore from '@/stores'
 const props = defineProps({
   data: {

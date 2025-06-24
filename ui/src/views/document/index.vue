@@ -7,9 +7,7 @@
           <div class="flex-between">
             <div>
               <el-button
-                v-if="knowledgeDetail.type === 0 &&
-                permissionPrecise.doc_create(id)
-                "
+                v-if="knowledgeDetail.type === 0 && permissionPrecise.doc_create(id)"
                 type="danger"
                 @click="
                   router.push({ path: `/knowledge/document/upload/${folderId}`, query: { id: id } })
@@ -17,23 +15,20 @@
                 >{{ $t('views.document.uploadDocument') }}
               </el-button>
               <el-button
-                v-if="knowledgeDetail.type === 1 &&
-                permissionPrecise.doc_create(id)
-                "
+                v-if="knowledgeDetail.type === 1 && permissionPrecise.doc_create(id)"
                 type="primary"
                 @click="importDoc"
                 >{{ $t('views.document.importDocument') }}
               </el-button>
               <el-button
-                v-if="knowledgeDetail.type === 2 &&
-                permissionPrecise.doc_create(id)
-                "
+                v-if="knowledgeDetail.type === 2 && permissionPrecise.doc_create(id)"
                 type="primary"
                 @click="
                   router.push({
                     path: `/knowledge/import`,
                     query: { id: id, folder_token: knowledgeDetail.meta.folder_token },
-                  })"
+                  })
+                "
                 >{{ $t('views.document.importDocument') }}
               </el-button>
               <el-button
@@ -55,9 +50,7 @@
                 >{{ $t('views.document.setting.migration') }}
               </el-button>
               <el-dropdown>
-                <el-button
-                  class="ml-12 mr-12"
-                >
+                <el-button class="ml-12 mr-12">
                   <el-icon><MoreFilled /></el-icon>
                 </el-button>
                 <template #dropdown>
@@ -73,18 +66,14 @@
                       divided
                       @click="syncMulDocument"
                       :disabled="multipleSelection.length === 0"
-                      v-if="
-                        permissionPrecise.doc_sync(id)
-                      "
+                      v-if="permissionPrecise.doc_sync(id)"
                       >{{ $t('views.document.syncDocument') }}
                     </el-dropdown-item>
                     <el-dropdown-item
                       divided
                       @click="syncLarkMulDocument"
                       :disabled="multipleSelection.length === 0"
-                      v-if="knowledgeDetail.type === 2 &&
-                        permissionPrecise.doc_sync(id)
-                      "
+                      v-if="knowledgeDetail.type === 2 && permissionPrecise.doc_sync(id)"
                       >{{ $t('views.document.syncDocument') }}
                     </el-dropdown-item>
 
@@ -92,9 +81,7 @@
                       divided
                       @click="deleteMulDocument"
                       :disabled="multipleSelection.length === 0"
-                      v-if="
-                      permissionPrecise.doc_delete(id)
-                      "
+                      v-if="permissionPrecise.doc_delete(id)"
                       >{{ $t('common.delete') }}
                     </el-dropdown-item>
                   </el-dropdown-menu>
@@ -116,8 +103,7 @@
             class="mt-16"
             :data="documentData"
             :pagination-config="paginationConfig"
-            :quick-create="knowledgeDetail.type === 0 && 
-            permissionPrecise.doc_create(id)"
+            :quick-create="knowledgeDetail.type === 0 && permissionPrecise.doc_create(id)"
             @sizeChange="handleSizeChange"
             @changePage="getList"
             @cell-mouse-enter="cellMouseEnter"
@@ -408,10 +394,7 @@
                   </span>
                   <span @click.stop>
                     <el-dropdown trigger="click">
-                      <el-button
-                        text
-                        type="primary"
-                      >
+                      <el-button text type="primary">
                         <el-icon><MoreFilled /></el-icon>
                       </el-button>
                       <template #dropdown>
@@ -420,38 +403,45 @@
                             v-if="
                               ([State.STARTED, State.PENDING] as Array<string>).includes(
                                 getTaskState(row.status, TaskType.GENERATE_PROBLEM),
-                              )&&
-                              permissionPrecise.doc_generate(id)"
+                              ) && permissionPrecise.doc_generate(id)
+                            "
                             @click="cancelTask(row, TaskType.GENERATE_PROBLEM)"
                           >
                             <el-icon><Connection /></el-icon>
                             {{ $t('views.document.setting.cancelGenerateQuestion') }}
                           </el-dropdown-item>
-                          <el-dropdown-item v-else @click="openGenerateDialog(row)"
+                          <el-dropdown-item
+                            v-else
+                            @click="openGenerateDialog(row)"
                             v-if="permissionPrecise.doc_generate(id)"
                           >
                             <el-icon><Connection /></el-icon>
                             {{ $t('views.document.generateQuestion.title') }}
                           </el-dropdown-item>
-                          <el-dropdown-item @click="openknowledgeDialog(row)"
+                          <el-dropdown-item
+                            @click="openknowledgeDialog(row)"
                             v-if="permissionPrecise.doc_migrate(id)"
                           >
                             <AppIcon iconName="app-migrate"></AppIcon>
                             {{ $t('views.document.setting.migration') }}
                           </el-dropdown-item>
-                          <el-dropdown-item @click="exportDocument(row)"
+                          <el-dropdown-item
+                            @click="exportDocument(row)"
                             v-if="permissionPrecise.doc_export(id)"
                           >
                             <AppIcon iconName="app-export"></AppIcon>
                             {{ $t('views.document.setting.export') }} Excel
                           </el-dropdown-item>
-                          <el-dropdown-item @click="exportDocumentZip(row)"
+                          <el-dropdown-item
+                            @click="exportDocumentZip(row)"
                             v-if="permissionPrecise.doc_export(id)"
                           >
                             <AppIcon iconName="app-export"></AppIcon>
                             {{ $t('views.document.setting.export') }} Zip
                           </el-dropdown-item>
-                          <el-dropdown-item icon="Delete" @click.stop="deleteDocument(row)"
+                          <el-dropdown-item
+                            icon="Delete"
+                            @click.stop="deleteDocument(row)"
                             v-if="permissionPrecise.doc_delete(id)"
                           >
                             {{ $t('common.delete') }}</el-dropdown-item
@@ -478,8 +468,7 @@
                       v-if="
                         ([State.STARTED, State.PENDING] as Array<string>).includes(
                           getTaskState(row.status, TaskType.EMBEDDING),
-                        ) &&
-                        permissionPrecise.doc_vector(id)
+                        ) && permissionPrecise.doc_vector(id)
                       "
                       type="primary"
                       text
@@ -503,10 +492,7 @@
 
                   <span @click.stop>
                     <el-dropdown trigger="click">
-                      <el-button
-                        text
-                        type="primary"
-                      >
+                      <el-button text type="primary">
                         <el-icon><MoreFilled /></el-icon>
                       </el-button>
                       <template #dropdown>
@@ -609,7 +595,7 @@ import { t } from '@/locales'
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
 import permissionMap from '@/permission'
-
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 const route = useRoute()
 const { folder, user } = useStore()
@@ -1018,9 +1004,11 @@ function getList(bool?: boolean) {
 }
 
 function getDetail() {
-  knowledge.asyncGetKnowledgeDetail(id, loading).then((res: any) => {
-    knowledgeDetail.value = res.data
-  })
+  loadSharedApi({ type: 'knowledge', systemType: type.value })
+    .getKnowledgeDetail(id, loading)
+    .then((res: any) => {
+      knowledgeDetail.value = res.data
+    })
 }
 
 function refreshMigrate() {

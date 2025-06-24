@@ -56,17 +56,25 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import documentApi from '@/api/knowledge/document'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 import useStore from '@/stores'
-const { knowledge } = useStore()
 const route = useRoute()
 const {
   params: { id }, // id为knowledgeID
 } = route as any
-
+const type = computed(() => {
+  if (route.path.includes('shared')) {
+    return 'systemShare'
+  } else if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
 const emit = defineEmits(['refresh'])
 
 const loading = ref<boolean>(false)
@@ -91,9 +99,11 @@ const loadTree = (node: any, resolve: any) => {
   console.log(node)
   if (node.isLeaf) return resolve([])
   const folder_id = node.level === 0 ? '' : node.data.id
-  knowledge.asyncGetFolderKnowledge(folder_id, loading).then((res: any) => {
-    resolve(res.data)
-  })
+  loadSharedApi({ type: 'knowledge', systemType: type.value })
+    .getKnowledgeList(folder_id, loading)
+    .then((res: any) => {
+      resolve(res.data)
+    })
 }
 
 watch(dialogVisible, (bool) => {

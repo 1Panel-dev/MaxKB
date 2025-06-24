@@ -24,7 +24,6 @@
 <script lang="ts" setup>
 import { onMounted, ref, reactive, shallowRef, nextTick, computed } from 'vue'
 import KnowledgeListContainer from '@/views/knowledge/component/KnowledgeListContainer.vue'
-import KnowledgeApi from '@/api/knowledge/knowledge'
 import { FolderSource } from '@/enums/common'
 import permissionMap from '@/permission'
 import { useRoute } from 'vue-router'

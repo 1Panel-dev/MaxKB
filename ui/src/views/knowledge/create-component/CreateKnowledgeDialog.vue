@@ -23,15 +23,25 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { ref, watch, reactive } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import BaseForm from '@/views/knowledge/component/BaseForm.vue'
-import KnowledgeApi from '@/api/knowledge/knowledge'
 import { MsgSuccess, MsgAlert } from '@/utils/message'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { t } from '@/locales'
 const emit = defineEmits(['refresh'])
 
 const router = useRouter()
+const route = useRoute()
+const type = computed(() => {
+  if (route.path.includes('shared')) {
+    return 'systemShare'
+  } else if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
 const BaseFormRef = ref()
 
 const loading = ref(false)
@@ -55,11 +65,13 @@ const submitHandle = async () => {
       folder_id: currentFolder.value?.id,
       ...BaseFormRef.value.form,
     }
-    KnowledgeApi.postKnowledge(obj, loading).then((res) => {
-      MsgSuccess(t('common.createSuccess'))
-      router.push({ path: `/knowledge/${res.data.id}/${currentFolder.value.id}/document` })
-      emit('refresh')
-    })
+    loadSharedApi({ type: 'knowledge', systemType: type.value })
+      .postKnowledge(obj, loading)
+      .then((res: any) => {
+        MsgSuccess(t('common.createSuccess'))
+        router.push({ path: `/knowledge/${res.data.id}/${currentFolder.value.id}/document` })
+        emit('refresh')
+      })
   } else {
     return false
   }

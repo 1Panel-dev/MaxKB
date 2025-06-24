@@ -35,10 +35,22 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-import knowledgeApi from '@/api/knowledge/knowledge'
+import { ref, watch, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { MsgSuccess } from '@/utils/message'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import { t } from '@/locales'
 
+const route = useRoute()
+const type = computed(() => {
+  if (route.path.includes('shared')) {
+    return 'systemShare'
+  } else if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
 const emit = defineEmits(['refresh'])
 const loading = ref<boolean>(false)
 const method = ref('replace')
@@ -58,11 +70,13 @@ const open = (id: string) => {
 }
 
 const submit = () => {
-  knowledgeApi.putSyncWebKnowledge(knowledgeId.value, method.value, loading).then((res: any) => {
-    emit('refresh', res.data)
-    MsgSuccess(t('views.knowledge.tip.syncSuccess'))
-    dialogVisible.value = false
-  })
+  loadSharedApi({ type: 'knowledge', systemType: type.value })
+    .putSyncWebKnowledge(knowledgeId.value, method.value, loading)
+    .then((res: any) => {
+      emit('refresh', res.data)
+      MsgSuccess(t('views.knowledge.tip.syncSuccess'))
+      dialogVisible.value = false
+    })
 }
 
 defineExpose({ open })

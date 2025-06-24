@@ -140,12 +140,18 @@
               </el-form-item>
             </el-form>
             <div class="text-right">
-              <el-button @click="submit" type="primary"
-                v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                      RoleConst.ADMIN,
-                      PermissionConst.KNOWLEDGE_EDIT.getWorkspacePermissionWorkspaceManageRole,
-                      PermissionConst.KNOWLEDGE_EDIT.getKnowledgeWorkspaceResourcePermission(id)]"
-              > {{ $t('common.save') }}</el-button>
+              <el-button
+                @click="submit"
+                type="primary"
+                v-hasPermission="[
+                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+                  RoleConst.ADMIN,
+                  PermissionConst.KNOWLEDGE_EDIT.getWorkspacePermissionWorkspaceManageRole,
+                  PermissionConst.KNOWLEDGE_EDIT.getKnowledgeWorkspaceResourcePermission(id),
+                ]"
+              >
+                {{ $t('common.save') }}</el-button
+              >
             </div>
           </div>
         </el-scrollbar>
@@ -154,24 +160,28 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, reactive } from 'vue'
+import { ref, onMounted, reactive, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import BaseForm from '@/views/knowledge/component/BaseForm.vue'
-import KnowledgeApi from '@/api/knowledge/knowledge'
-import type { ApplicationFormType } from '@/api/type/application'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
-import { isAppIcon } from '@/utils/common'
-import useStore from '@/stores'
 import { t } from '@/locales'
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
-import { hasPermission } from '@/utils/permission/index'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 const route = useRoute()
 const {
   params: { id },
 } = route as any
 
-const { knowledge } = useStore()
+const type = computed(() => {
+  if (route.path.includes('shared')) {
+    return 'systemShare'
+  } else if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
 const webFormRef = ref()
 const BaseFormRef = ref()
 const loading = ref(false)
@@ -238,31 +248,45 @@ async function submit() {
           })
             .then(() => {
               if (detail.value.type === 2) {
-                // KnowledgeApi.putLarkKnowledge(id, obj, loading).then((res) => {
-                //   KnowledgeApi.putReEmbeddingKnowledge(id).then(() => {
-                //     MsgSuccess(t('common.saveSuccess'))
-                //   })
-                // })
-              } else {
-                KnowledgeApi.putKnowledge(id, obj, loading).then((res) => {
-                  KnowledgeApi.putReEmbeddingKnowledge(id).then(() => {
-                    MsgSuccess(t('common.saveSuccess'))
+                loadSharedApi({ type: 'knowledge', systemType: type.value })
+                  .putLarkKnowledge(id, obj, loading)
+                  .then(() => {
+                    loadSharedApi({ type: 'knowledge', systemType: type.value })
+                      .putReEmbeddingKnowledge(id)
+                      .then(() => {
+                        MsgSuccess(t('common.saveSuccess'))
+                      })
                   })
-                })
+              } else {
+                loadSharedApi({ type: 'knowledge', systemType: type.value })
+                  .putKnowledge(id, obj, loading)
+                  .then(() => {
+                    loadSharedApi({ type: 'knowledge', systemType: type.value })
+                      .putReEmbeddingKnowledge(id)
+                      .then(() => {
+                        MsgSuccess(t('common.saveSuccess'))
+                      })
+                  })
               }
             })
             .catch(() => {})
         } else {
           if (detail.value.type === 2) {
-            // KnowledgeApi.putLarkKnowledge(id, obj, loading).then((res) => {
-            //   KnowledgeApi.putReEmbeddingKnowledge(id).then(() => {
-            //     MsgSuccess(t('common.saveSuccess'))
-            //   })
-            // })
+            loadSharedApi({ type: 'knowledge', systemType: type.value })
+              .putLarkKnowledge(id, obj, loading)
+              .then(() => {
+                loadSharedApi({ type: 'knowledge', systemType: type.value })
+                  .putReEmbeddingKnowledge(id)
+                  .then(() => {
+                    MsgSuccess(t('common.saveSuccess'))
+                  })
+              })
           } else {
-            KnowledgeApi.putKnowledge(id, obj, loading).then((res) => {
-              MsgSuccess(t('common.saveSuccess'))
-            })
+            loadSharedApi({ type: 'knowledge', systemType: type.value })
+              .putKnowledge(id, obj, loading)
+              .then(() => {
+                MsgSuccess(t('common.saveSuccess'))
+              })
           }
         }
       }
@@ -271,13 +295,15 @@ async function submit() {
 }
 
 function getDetail() {
-  knowledge.asyncGetKnowledgeDetail(id, loading).then((res: any) => {
-    detail.value = res.data
-    cloneModelId.value = res.data?.embedding_model_id
-    if (detail.value.type === '1' || detail.value.type === '2') {
-      form.value = res.data.meta
-    }
-  })
+  loadSharedApi({ type: 'knowledge', systemType: type.value })
+    .getKnowledgeDetail(id, loading)
+    .then((res: any) => {
+      detail.value = res.data
+      cloneModelId.value = res.data?.embedding_model_id
+      if (detail.value.type === '1' || detail.value.type === '2') {
+        form.value = res.data.meta
+      }
+    })
 }
 
 onMounted(() => {
