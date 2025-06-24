@@ -137,6 +137,7 @@ class UserResourcePermissionSerializer(serializers.Serializer):
             if len(exist_list) > 0:
                 exist_list[0].permission_list = [key for key in user_resource_permission.get('permission').keys() if
                                                  user_resource_permission.get('permission').get(key)]
+                exist_list[0].auth_type = user_resource_permission.get('auth_type')
                 update_list.append(exist_list[0])
             else:
                 save_list.append(WorkspaceUserResourcePermission(target=user_resource_permission.get('target_id'),
@@ -151,7 +152,7 @@ class UserResourcePermissionSerializer(serializers.Serializer):
                                                                  user_id=user_id,
                                                                  auth_type=user_resource_permission.get('auth_type')))
         # 批量更新
-        QuerySet(WorkspaceUserResourcePermission).bulk_update(update_list, ['permission_list']) if len(
+        QuerySet(WorkspaceUserResourcePermission).bulk_update(update_list, ['permission_list', 'auth_type']) if len(
             update_list) > 0 else None
         # 批量插入
         QuerySet(WorkspaceUserResourcePermission).bulk_create(save_list) if len(save_list) > 0 else None
