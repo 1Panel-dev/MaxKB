@@ -9,6 +9,7 @@ export default {
   toolStore: {
     title: '工具商店',
     createFromToolStore: '從工具商店創建',
+    internal: '系统内置',
     recommend: '推薦',
     webSearch: '聯網搜索',
     databaseQuery: '數據庫查詢',
