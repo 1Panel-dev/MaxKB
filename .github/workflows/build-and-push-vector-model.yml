@@ -65,4 +65,5 @@ jobs:
           password: ${{ secrets.GH_TOKEN }}
       - name: Docker Buildx (build-and-push)
         run: |
+          rm -f .dockerignore
           docker buildx build --output "type=image,push=true" ${{ steps.prepare.outputs.buildx_args }} -f installer/Dockerfile-vector-model
