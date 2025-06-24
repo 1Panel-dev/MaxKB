@@ -11,9 +11,11 @@ from drf_spectacular.utils import extend_schema
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
-from chat.api.chat_api import HistoricalConversationAPI, PageHistoricalConversationAPI
+from chat.api.chat_api import HistoricalConversationAPI, PageHistoricalConversationAPI, \
+    PageHistoricalConversationRecordAPI, HistoricalConversationRecordAPI
 from chat.api.vote_api import VoteAPI
-from chat.serializers.chat_record import VoteSerializer, ChatRecordSerializer
+from chat.serializers.chat_record import VoteSerializer, HistoricalConversationSerializer, \
+    HistoricalConversationRecordSerializer
 from common import result
 from common.auth import TokenAuth
 
@@ -51,7 +53,7 @@ class HistoricalConversationView(APIView):
         tags=[_('Chat')]  # type: ignore
     )
     def get(self, request: Request):
-        return result.success(ChatRecordSerializer(
+        return result.success(HistoricalConversationSerializer(
             data={
                 'application_id': request.auth.application_id,
                 'chat_user_id': request.auth.chat_user_id,
@@ -70,8 +72,49 @@ class HistoricalConversationView(APIView):
             tags=[_('Chat')]  # type: ignore
         )
         def get(self, request: Request, current_page: int, page_size: int):
-            return result.success(ChatRecordSerializer(
+            return result.success(HistoricalConversationSerializer(
                 data={
+                    'application_id': request.auth.application_id,
+                    'chat_user_id': request.auth.chat_user_id,
+                }).page(current_page, page_size))
+
+
+class HistoricalConversationRecordView(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(
+        methods=['GET'],
+        description=_("Get historical conversation records"),
+        summary=_("Get historical conversation records"),
+        operation_id=_("Get historical conversation records"),  # type: ignore
+        parameters=HistoricalConversationRecordAPI.get_parameters(),
+        responses=HistoricalConversationRecordAPI.get_response(),
+        tags=[_('Chat')]  # type: ignore
+    )
+    def get(self, request: Request, chat_id: str):
+        return result.success(HistoricalConversationRecordSerializer(
+            data={
+                'chat_id': chat_id,
+                'application_id': request.auth.application_id,
+                'chat_user_id': request.auth.chat_user_id,
+            }).list())
+
+    class PageView(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['GET'],
+            description=_("Get historical conversation records by page "),
+            summary=_("Get historical conversation records by page"),
+            operation_id=_("Get historical conversation records by page"),  # type: ignore
+            parameters=PageHistoricalConversationRecordAPI.get_parameters(),
+            responses=PageHistoricalConversationRecordAPI.get_response(),
+            tags=[_('Chat')]  # type: ignore
+        )
+        def get(self, request: Request, chat_id: str, current_page: int, page_size: int):
+            return result.success(HistoricalConversationRecordSerializer(
+                data={
+                    'chat_id': chat_id,
                     'application_id': request.auth.application_id,
                     'chat_user_id': request.auth.chat_user_id,
                 }).page(current_page, page_size))

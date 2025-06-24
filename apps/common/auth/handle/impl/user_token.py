@@ -216,7 +216,7 @@ def get_permission_list(user,
 
 
 def reset_workspace_role(role, workspace_id):
-    if role == RoleConstants.ADMIN.value.__str__():
+    if role == RoleConstants.ADMIN.value.__str__() or workspace_id is None:
         return role
     return f"{role}:/WORKSPACE/{workspace_id}"
 

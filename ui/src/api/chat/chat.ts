@@ -189,6 +189,18 @@ const pageChat: (
 ) => Promise<Result<boolean>> = (current_page, page_size, loading) => {
   return get(`/historical_conversation/${current_page}/${page_size}`, undefined, loading)
 }
+const pageChatRecord: (
+  chat_id: string,
+  current_page: number,
+  page_size: number,
+  loading?: Ref<boolean>,
+) => Promise<Result<boolean>> = (chat_id, current_page, page_size, loading) => {
+  return get(
+    `/historical_conversation_record/${chat_id}/${current_page}/${page_size}`,
+    undefined,
+    loading,
+  )
+}
 export default {
   open,
   chat,
@@ -208,4 +220,5 @@ export default {
   passwordAuthentication,
   vote,
   pageChat,
+  pageChatRecord,
 }
