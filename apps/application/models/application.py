@@ -59,13 +59,14 @@ def get_model_setting_dict():
 class Application(AppModelMixin):
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
     workspace_id = models.CharField(max_length=64, verbose_name="工作空间id", default="default", db_index=True)
-    folder = models.ForeignKey(ApplicationFolder, on_delete=models.DO_NOTHING, verbose_name="文件夹id", default='default')
+    folder = models.ForeignKey(ApplicationFolder, on_delete=models.DO_NOTHING, verbose_name="文件夹id",
+                               default='default')
     is_publish = models.BooleanField(verbose_name="是否发布", default=False)
     name = models.CharField(max_length=128, verbose_name="应用名称")
     desc = models.CharField(max_length=512, verbose_name="引用描述", default="")
     prologue = models.CharField(max_length=40960, verbose_name="开场白", default="")
     dialogue_number = models.IntegerField(default=0, verbose_name="会话数量")
-    user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, db_constraint=False, blank=True, null=True)
     model = models.ForeignKey(Model, on_delete=models.SET_NULL, db_constraint=False, blank=True, null=True)
     knowledge_setting = models.JSONField(verbose_name="数据集参数设置", default=get_dataset_setting_dict)
     model_setting = models.JSONField(verbose_name="模型参数相关设置", default=get_model_setting_dict)
