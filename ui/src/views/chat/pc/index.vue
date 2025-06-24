@@ -297,13 +297,12 @@ function getChatLog(id: string, refresh?: boolean) {
 }
 
 function getChatRecord() {
-  return chatLog
-    .asyncChatRecordLog(
-      applicationDetail.value.id,
+  return chatAPI
+    .pageChatRecord(
       currentChatId.value,
-      paginationConfig.value,
+      paginationConfig.value.current_page,
+      paginationConfig.value.page_size,
       loading,
-      false,
     )
     .then((res: any) => {
       paginationConfig.value.total = res.data.total

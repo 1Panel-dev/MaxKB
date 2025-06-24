@@ -7,6 +7,7 @@ const dynamicIcons = Object.values(iconsImport).reduce(
   }),
   {} as Record<string, any>,
 )
+console.log(dynamicIcons)
 export const iconMap: any = {
   'app-warning': {
     iconReader: () => {
