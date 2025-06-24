@@ -5,7 +5,7 @@ RUN cd ui && \
     npm install && \
     NODE_OPTIONS="--max-old-space-size=4096" npm run build-only && \
     NODE_OPTIONS="--max-old-space-size=4096" npm run build-only-chat && \
-    rm -rf ./node_modules
+    find . -maxdepth 1 ! -name '.' ! -name 'dist' ! -name 'public' -exec rm -rf {} +
 FROM ghcr.io/1panel-dev/maxkb-base:python3.11-pg17.4 AS stage-build
 
 ARG DEPENDENCIES="                    \
@@ -28,6 +28,7 @@ RUN python3 -m venv /opt/py3 && \
     . /opt/py3/bin/activate && \
     if [ "$(uname -m)" = "x86_64" ]; then sed -i 's/^torch.*/torch = {version = "2.7.1+cpu", source = "pytorch"}/g' pyproject.toml; fi && \
     poetry install && \
+    find /opt/maxkb-app  -depth \( -name ".git*" -o -name ".docker*" -o -name ".idea*" -o -name ".editorconfig*" -o -name ".prettierrc*" \) -exec rm -rf {} +
     export MAXKB_CONFIG_TYPE=ENV && python3 /opt/maxkb-app/apps/manage.py compilemessages && \
     export PIP_TARGET=/opt/maxkb-app/sandbox/python-packages && \
     pip install diskcache2 requests pymysql psycopg2-binary
