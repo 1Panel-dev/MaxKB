@@ -173,6 +173,36 @@ const workspace = {
       ],
       'OR',
     ),       
+  problem_create: (source_id:string) =>
+    hasPermission(
+      [
+        RoleConst.ADMIN,
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.KNOWLEDGE_PROBLEM_CREATE.getKnowledgeWorkspaceResourcePermission(source_id),
+        PermissionConst.KNOWLEDGE_PROBLEM_CREATE.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),
+  problem_relate: (source_id:string) =>
+    hasPermission(
+      [
+        RoleConst.ADMIN,
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.KNOWLEDGE_PROBLEM_RELATE.getKnowledgeWorkspaceResourcePermission(source_id),
+        PermissionConst.KNOWLEDGE_PROBLEM_RELATE.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),
+  problem_delete: (source_id:string) =>
+    hasPermission(
+      [
+        RoleConst.ADMIN,
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.KNOWLEDGE_PROBLEM_DELETE.getKnowledgeWorkspaceResourcePermission(source_id),
+        PermissionConst.KNOWLEDGE_PROBLEM_DELETE.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),                  
 }
 
 export default workspace

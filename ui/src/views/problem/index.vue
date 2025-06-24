@@ -7,24 +7,18 @@
           <div class="flex-between">
             <div>
               <el-button type="primary" @click="createProblem"
-                v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                RoleConst.ADMIN,
-                PermissionConst.KNOWLEDGE_PROBLEM_CREATE.getWorkspacePermissionWorkspaceManageRole,
-                PermissionConst.KNOWLEDGE_PROBLEM_CREATE.getKnowledgeWorkspaceResourcePermission(id),]">
+                v-if="permissionPrecise.problem_create(id)"  
+              >
                 {{ $t('views.problem.createProblem') }}
               </el-button>
               <el-button @click="relateProblem()" :disabled="multipleSelection.length === 0"
-                v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                RoleConst.ADMIN,
-                PermissionConst.KNOWLEDGE_PROBLEM_RELATE.getWorkspacePermissionWorkspaceManageRole,
-                PermissionConst.KNOWLEDGE_PROBLEM_RELATE.getKnowledgeWorkspaceResourcePermission(id)]">
+                v-if="permissionPrecise.problem_relate(id)"  
+              >
                 {{ $t('views.problem.relateParagraph.title') }}
               </el-button>
               <el-button @click="deleteMulDocument" :disabled="multipleSelection.length === 0"
-                v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                RoleConst.ADMIN,
-                PermissionConst.KNOWLEDGE_PROBLEM_DELETE.getWorkspacePermissionWorkspaceManageRole,
-                PermissionConst.KNOWLEDGE_PROBLEM_DELETE.getKnowledgeWorkspaceResourcePermission(id)]">
+                v-if="permissionPrecise.problem_delete(id)"  
+              >
                 {{ $t('views.problem.setting.batchDelete') }}
               </el-button>
             </div>
@@ -43,8 +37,7 @@
             class="mt-16"
             :data="problemData"
             :pagination-config="paginationConfig"
-            :quick-create="permissionPrecise.doc_create(id)""
-
+            :quick-create="permissionPrecise.doc_create(id)"
             :quickCreateName="$t('views.problem.quickCreateName')"
             :quickCreatePlaceholder="$t('views.problem.quickCreateProblem')"
             :quickCreateMaxlength="256"
@@ -114,10 +107,7 @@
                       placement="top"
                     >
                       <el-button type="primary" text @click.stop="relateProblem(row)"
-                      v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                      RoleConst.ADMIN,
-                      PermissionConst.KNOWLEDGE_PROBLEM_RELATE.getWorkspacePermissionWorkspaceManageRole,
-                      PermissionConst.KNOWLEDGE_PROBLEM_RELATE.getKnowledgeWorkspaceResourcePermission(id)]">
+                      v-if="permissionPrecise.problem_relate(id)"  >
                         <el-icon><Connection /></el-icon>
                       </el-button>
                     </el-tooltip>
@@ -125,10 +115,7 @@
                   <span>
                     <el-tooltip effect="dark" :content="$t('common.delete')" placement="top">
                       <el-button type="primary" text @click.stop="deleteProblem(row)"
-                      v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                      RoleConst.ADMIN,
-                      PermissionConst.KNOWLEDGE_PROBLEM_DELETE.getWorkspacePermissionWorkspaceManageRole,
-                      PermissionConst.KNOWLEDGE_PROBLEM_DELETE.getKnowledgeWorkspaceResourcePermission(id)]">
+                      v-if="permissionPrecise.problem_delete(id)"  >
                         <el-icon><Delete /></el-icon>
                       </el-button>
                     </el-tooltip>
