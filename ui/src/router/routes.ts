@@ -1,13 +1,41 @@
 import type { RouteRecordRaw } from 'vue-router'
 const modules: any = import.meta.glob('./modules/*.ts', { eager: true })
+import { hasPermission, set_next_route } from '@/utils/permission/index'
 const rolesRoutes: RouteRecordRaw[] = [...Object.keys(modules).map((key) => modules[key].default)]
 
 export const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'home',
-    redirect: '/application',
-    children: [...rolesRoutes],
+    redirect: (to: any) => {
+      const route = rolesRoutes.find((route: any) => {
+        return (
+          route.meta?.menu &&
+          (route.meta.permission ? hasPermission(route.meta.permission as any, 'OR') : true)
+        )
+      })
+      if (route?.name) {
+        return { name: route?.name }
+      }
+      return { name: 'noPermission' }
+    },
+    children: [
+      ...rolesRoutes,
+      {
+        path: '/no-permission',
+        name: 'noPermission',
+        redirect: '/no-permission',
+        meta: {},
+        children: [
+          {
+            path: '/no-permission',
+            name: 'noPermissionD',
+            component: () => import('@/views/no-permission/index.vue'),
+          },
+        ],
+        component: () => import('@/layout/layout-template/SimpleLayout.vue'),
+      },
+    ],
   },
 
   // 高级编排

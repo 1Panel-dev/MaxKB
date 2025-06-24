@@ -1,6 +1,6 @@
 import role from '@/api/system/role'
 import { ChatUserResourceEnum } from '@/enums/workspaceChatUser'
-import {get_next_route} from "@/utils/permission"
+import { get_next_route } from '@/utils/permission'
 import { PermissionConst, EditionConst, RoleConst } from '@/utils/permission/data'
 const DocumentRouter = {
   path: '/knowledge/:id/:folderId',
@@ -22,13 +22,13 @@ const DocumentRouter = {
         permission: [
           RoleConst.ADMIN,
           RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-             () => {
+          () => {
             const to: any = get_next_route()
             return PermissionConst.KNOWLEDGE_DOCUMENT_READ.getKnowledgeWorkspaceResourcePermission(
               to ? to.params.id : '',
             )
           },
-        PermissionConst.KNOWLEDGE_READ.getWorkspacePermissionWorkspaceManageRole,
+          PermissionConst.KNOWLEDGE_READ.getWorkspacePermissionWorkspaceManageRole,
         ],
       },
       component: () => import('@/views/document/index.vue'),
@@ -52,7 +52,7 @@ const DocumentRouter = {
               to ? to.params.id : '',
             )
           },
-          PermissionConst.KNOWLEDGE_PROBLEM_READ.getWorkspacePermissionWorkspaceManageRole
+          PermissionConst.KNOWLEDGE_PROBLEM_READ.getWorkspacePermissionWorkspaceManageRole,
         ],
       },
       component: () => import('@/views/problem/index.vue'),
@@ -89,7 +89,7 @@ const DocumentRouter = {
               to ? to.params.id : '',
             )
           },
-          PermissionConst.WORKSPACE_CHAT_USER_READ.getWorkspacePermissionWorkspaceManageRole
+          PermissionConst.WORKSPACE_CHAT_USER_READ.getWorkspacePermissionWorkspaceManageRole,
         ],
       },
       component: () => import('@/views/chat-user/index.vue'),
@@ -113,9 +113,8 @@ const DocumentRouter = {
               to ? to.params.id : '',
             )
           },
-          PermissionConst.KNOWLEDGE_EDIT.getWorkspacePermissionWorkspaceManageRole
-        ]
-        
+          PermissionConst.KNOWLEDGE_EDIT.getWorkspacePermissionWorkspaceManageRole,
+        ],
       },
       component: () => import('@/views/knowledge/KnowledgeSetting.vue'),
     },
