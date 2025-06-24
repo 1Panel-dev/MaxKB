@@ -76,7 +76,9 @@ RUN chmod 755 /opt/maxkb-app/installer/*.sh && \
     chown -R sandbox:root /opt/maxkb-app/sandbox && \
     chmod g-x /usr/local/bin/* /usr/bin/* /bin/* /usr/sbin/* /sbin/* /usr/lib/postgresql/17/bin/* && \
     chmod g+x /usr/local/bin/python* && \
-    python3 -m venv /opt/maxkb-app/sandbox/py3 && . /opt/maxkb-app/sandbox/py3/bin/activate && pip install diskcache2
+    python3 -m venv /opt/maxkb-app/sandbox/py3 && \
+    . /opt/maxkb-app/sandbox/py3/bin/activate && \
+    /opt/maxkb-app/sandbox/py3/bin/pip install diskcache2
 
 EXPOSE 8080
 VOLUME /opt/maxkb
