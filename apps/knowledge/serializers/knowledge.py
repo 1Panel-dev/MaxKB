@@ -120,7 +120,7 @@ class KnowledgeSerializer(serializers.Serializer):
             role_permission_mapping_model = DatabaseModelManage.get_model("role_permission_mapping_model")
             return workspace_user_role_mapping_model is not None and role_permission_mapping_model is not None
 
-        def get_query_set(self):
+        def get_query_set(self, workspace_manage, is_x_pack_ee):
             workspace_id = self.data.get("workspace_id")
             query_set_dict = {}
             query_set = QuerySet(model=get_dynamics_model({
@@ -157,6 +157,12 @@ class KnowledgeSerializer(serializers.Serializer):
                 'knowledge.workspace_id': models.CharField(),
             })).filter(**{'knowledge.workspace_id': workspace_id})
             query_set_dict['folder_query_set'] = folder_query_set
+            if not workspace_manage and is_x_pack_ee:
+                query_set_dict['workspace_user_resource_permission_query_set'] = QuerySet(
+                    WorkspaceUserResourcePermission).filter(
+                    auth_target_type="",
+                    workspace_id=workspace_id,
+                    user_id=self.data.get("user_id"))
             return query_set_dict
 
         def page(self, current_page: int, page_size: int):
@@ -167,17 +173,18 @@ class KnowledgeSerializer(serializers.Serializer):
             if not root:
                 raise serializers.ValidationError(_('Folder not found'))
             workspace_manage = is_workspace_manage(self.data.get('user_id'), self.data.get('workspace_id'))
+            is_x_pack_ee = self.is_x_pack_ee()
             return native_page_search(
                 current_page,
                 page_size,
-                self.get_query_set(),
+                self.get_query_set(workspace_manage, is_x_pack_ee),
                 select_string=get_file_content(
                     os.path.join(
                         PROJECT_DIR,
                         "apps",
                         "knowledge", 'sql',
                         'list_knowledge.sql' if workspace_manage else (
-                            'list_knowledge_user_ee.sql' if self.is_x_pack_ee() else 'list_knowledge_user.sql'
+                            'list_knowledge_user_ee.sql' if is_x_pack_ee else 'list_knowledge_user.sql'
                         )
                     )
                 ),
@@ -191,8 +198,9 @@ class KnowledgeSerializer(serializers.Serializer):
             if not root:
                 raise serializers.ValidationError(_('Folder not found'))
             workspace_manage = is_workspace_manage(self.data.get('user_id'), self.data.get('workspace_id'))
+            is_x_pack_ee = self.is_x_pack_ee()
             return native_search(
-                self.get_query_set(),
+                self.get_query_set(workspace_manage, is_x_pack_ee),
                 select_string=get_file_content(
                     os.path.join(
                         PROJECT_DIR,

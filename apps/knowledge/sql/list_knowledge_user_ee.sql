@@ -22,7 +22,7 @@ FROM (SELECT "temp_knowledge".id::text, "temp_knowledge".name,
             FROM knowledge knowledge ${knowledge_custom_sql}
             AND "knowledge".id in (select target
                    from workspace_user_resource_permission
-                   where auth_target_type = 'KNOWLEDGE'
+                   ${workspace_user_resource_permission_query_set}
                      and case
                              when auth_type = 'ROLE' then
                                  'ROLE' = any (permission_list)
