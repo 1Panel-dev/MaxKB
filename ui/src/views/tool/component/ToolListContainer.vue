@@ -386,7 +386,7 @@ function openCreateDialog(data?: any) {
   if (data) {
     loadSharedApi({ type: 'tool', systemType: type.value })
       .getToolById(data?.id, loading)
-      .then((res：) => {
+      .then((res: any) => {
         ToolFormDrawerRef.value.open(res.data)
       })
   } else {
