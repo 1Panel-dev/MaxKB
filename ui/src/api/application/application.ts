@@ -1,14 +1,14 @@
-import { Result } from '@/request/Result'
-import { get, post, postStream, del, put, request, download, exportFile } from '@/request/index'
-import type { pageRequest } from '@/api/type/common'
-import type { ApplicationFormType } from '@/api/type/application'
-import { type Ref } from 'vue'
+import {Result} from '@/request/Result'
+import {get, post, postStream, del, put, request, download, exportFile} from '@/request/index'
+import type {pageRequest} from '@/api/type/common'
+import type {ApplicationFormType} from '@/api/type/application'
+import {type Ref} from 'vue'
 import useStore from '@/stores'
 
-const prefix: any = { _value: '/workspace/' }
+const prefix: any = {_value: '/workspace/'}
 Object.defineProperty(prefix, 'value', {
   get: function () {
-    const { user } = useStore()
+    const {user} = useStore()
     return this._value + user.getWorkspaceId() + '/application'
   },
 })
@@ -213,6 +213,17 @@ const getPlatformConfig: (application_id: string, type: string) => Promise<Resul
   return get(`${prefix.value}/${application_id}/platform/${type}`)
 }
 /**
+ * 更新平台配置
+ */
+const updatePlatformConfig: (
+  application_id: string,
+  type: string,
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (application_id, type, data, loading) => {
+  return post(`${prefix.value}/${application_id}/platform/${type}`, data, undefined, loading)
+}
+/**
  * 应用发布
  * @param application_id
  * @param loading
@@ -245,4 +256,5 @@ export default {
   updatePlatformStatus,
   getPlatformConfig,
   publish,
+  updatePlatformConfig
 }
