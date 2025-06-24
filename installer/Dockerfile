@@ -1,4 +1,4 @@
-FROM ghcr.io/1panel-dev/maxkb-vector-model:v1.0.1 AS vector-model
+FROM ghcr.io/1panel-dev/maxkb-vector-model:v2.0.0 AS vector-model
 FROM node:18-alpine3.18 AS web-build
 COPY ui ui
 RUN cd ui && \
@@ -63,22 +63,14 @@ ENV MAXKB_VERSION="${DOCKER_IMAGE_TAG} (build at ${BUILD_AT}, commit: ${GITHUB_C
 WORKDIR /opt/maxkb-app
 COPY --from=stage-build /opt/maxkb-app /opt/maxkb-app
 COPY --from=stage-build /opt/py3 /opt/py3
-COPY --from=vector-model /opt/maxkb/app/model /opt/maxkb-app/model
+COPY --from=vector-model /opt/maxkb-app/model /opt/maxkb-app/model
 
-RUN chmod 755 /opt/maxkb-app/installer/*.sh && \
-    cp -f /opt/maxkb-app/installer/*.sh /usr/bin/ && \
-    cp -f /opt/maxkb-app/installer/init.sql /docker-entrypoint-initdb.d && \
-    rm -rf /opt/maxkb-app/installer && \
-    cp -r /opt/maxkb-app/model/base/hub /opt/maxkb-app/model/tokenizer && \
-    curl -L --connect-timeout 120 -m 1800 https://resource.fit2cloud.com/maxkb/ffmpeg/get-ffmpeg-linux | sh && \
-    mkdir -p /opt/maxkb-app/sandbox/ &&  \
+RUN curl -L --connect-timeout 120 -m 1800 https://resource.fit2cloud.com/maxkb/ffmpeg/get-ffmpeg-linux | sh && \
     find /opt/maxkb-app -mindepth 1 -not -name 'sandbox' -exec chmod 700 {} + && \
-    chmod 755 /tmp && \
     useradd --no-create-home --home /opt/maxkb-app/sandbox sandbox -g root && \
     chown -R sandbox:root /opt/maxkb-app/sandbox && \
     chmod g-x /usr/local/bin/* /usr/bin/* /bin/* /usr/sbin/* /sbin/* /usr/lib/postgresql/17/bin/* && \
-    chmod g+x /usr/local/bin/python* && \
-    find /etc/ -type f ! -path '/etc/resolv.conf' ! -path '/etc/hosts' | xargs chmod g-rx
+    chmod g+x /usr/local/bin/python*
 
 EXPOSE 8080
 VOLUME /opt/maxkb

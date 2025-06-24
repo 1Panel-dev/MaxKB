@@ -1,6 +1,10 @@
 FROM python:3.11-slim-bullseye AS python-stage
 FROM postgres:17.4-bullseye
 
+COPY --from=python-stage /usr/local /usr/local
+COPY installer/*.sh /usr/bin/
+COPY installer/init.sql /docker-entrypoint-initdb.d/
+
 ARG DEPENDENCIES="                    \
         libexpat1-dev                 \
         libffi-dev                    \
@@ -17,9 +21,10 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     echo "Asia/Shanghai" > /etc/timezone && \
     apt-get update && apt-get install -y --no-install-recommends $DEPENDENCIES && \
     apt-get clean all  && \
-    rm -rf /var/lib/apt/lists/*
-
-COPY --from=python-stage /usr/local /usr/local
+    rm -rf /var/lib/apt/lists/* && \
+    chmod 755 /usr/bin/start-*.sh && \
+    chmod 755 /tmp && \
+    find /etc/ -type f ! -path '/etc/resolv.conf' ! -path '/etc/hosts' | xargs chmod g-rx
 
 ENV PGDATA=/opt/maxkb/data/postgresql/pgdata \
     POSTGRES_USER=root \
