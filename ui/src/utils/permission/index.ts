@@ -45,8 +45,11 @@ const hasPermissionChild = (
     const roleOk = roleList.some((r) =>
       role.includes(isFunction(r) ? (r as CRF)().toString() : r.toString()),
     )
-    const  editionList= permission.editionList
-    const editionOK = permission.editionList.length>0?editionList.some(e=>edition.toString()==e.toString()):true
+    const editionList = permission.editionList
+    const editionOK =
+      permission.editionList.length > 0
+        ? editionList.some((e) => edition.toString() == e.toString())
+        : true
 
     return permission.compare === 'AND'
       ? permissionOk && roleOk && editionOK
@@ -83,4 +86,15 @@ export const hasPermission = (
   } else {
     return hasPermissionChild(permission)
   }
+}
+
+const R = {
+  to: null,
+}
+export const get_next_route = () => {
+  return R.to
+}
+
+export const set_next_route = (to: any) => {
+  R.to = to
 }
