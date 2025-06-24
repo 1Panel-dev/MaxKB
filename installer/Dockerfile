@@ -28,7 +28,9 @@ RUN python3 -m venv /opt/py3 && \
     . /opt/py3/bin/activate && \
     if [ "$(uname -m)" = "x86_64" ]; then sed -i 's/^torch.*/torch = {version = "2.7.1+cpu", source = "pytorch"}/g' pyproject.toml; fi && \
     poetry install && \
-    export MAXKB_CONFIG_TYPE=ENV && python3 /opt/maxkb-app/apps/manage.py compilemessages
+    export MAXKB_CONFIG_TYPE=ENV && python3 /opt/maxkb-app/apps/manage.py compilemessages && \
+    export PIP_TARGET=/opt/maxkb-app/sandbox/python-packages && \
+    pip install diskcache2 requests pymysql psycopg2-binary
 
 FROM ghcr.io/1panel-dev/maxkb-base:python3.11-pg17.4
 ARG DOCKER_IMAGE_TAG=dev \
@@ -75,10 +77,7 @@ RUN chmod 755 /opt/maxkb-app/installer/*.sh && \
     useradd --no-create-home --home /opt/maxkb-app/sandbox sandbox -g root && \
     chown -R sandbox:root /opt/maxkb-app/sandbox && \
     chmod g-x /usr/local/bin/* /usr/bin/* /bin/* /usr/sbin/* /sbin/* /usr/lib/postgresql/17/bin/* && \
-    chmod g+x /usr/local/bin/python* && \
-    python3 -m venv /opt/maxkb-app/sandbox/py3 && \
-    . /opt/maxkb-app/sandbox/py3/bin/activate && \
-    /opt/maxkb-app/sandbox/py3/bin/pip install diskcache2
+    chmod g+x /usr/local/bin/python*
 
 EXPOSE 8080
 VOLUME /opt/maxkb

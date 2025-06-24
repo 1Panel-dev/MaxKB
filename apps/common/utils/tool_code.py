@@ -11,7 +11,7 @@ from diskcache import Cache
 from maxkb.const import BASE_DIR
 from maxkb.const import PROJECT_DIR
 
-python_directory = '/opt/maxkb-app/sandbox/py3/bin/python'
+python_directory = sys.executable
 
 
 class ToolExecutor:
@@ -45,6 +45,7 @@ try:
     import sys
     path_to_exclude = '/opt/py3/lib/python3.11/site-packages'
     sys.path = [p for p in sys.path if p != path_to_exclude]
+    sys.path.append('/opt/maxkb-app/sandbox/python-packages')
     env = dict(os.environ)
     for key in list(env.keys()):
         if key in os.environ and (key.startswith('MAXKB') or key.startswith('POSTGRES') or key.startswith('PG')):
@@ -93,4 +94,4 @@ except Exception as e:
 
     @staticmethod
     def _exec(_code):
-        return subprocess.run([sys.executable, '-c', _code], text=True, capture_output=True)
+        return subprocess.run([python_directory, '-c', _code], text=True, capture_output=True)
