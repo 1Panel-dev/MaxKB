@@ -1746,7 +1746,7 @@ msgstr "密码和确认密码不一致"
 
 #: apps/common/constants/exception_code_constants.py:44
 msgid "The nickname is already registered"
-msgstr "昵称已注册"
+msgstr "姓名已注册"
 
 #: apps/common/constants/permission_constants.py:209
 msgid "System Setting"
@@ -5706,7 +5706,7 @@ msgstr "用户名"
 #: apps/role_setting/api/role_setting.py:146 apps/workspace/api/workspace.py:84
 #: apps/xpack/api/chat_user.py:106
 msgid "Nickname"
-msgstr "昵称"
+msgstr "姓名"
 
 #: apps/role_setting/api/role_setting.py:148
 msgid "Workspace Name"
@@ -6786,7 +6786,7 @@ msgstr "邮箱"
 #: apps/users/serializers/user.py:59 apps/users/serializers/user.py:140
 #: apps/xpack/serializers/chat_user.py:88
 msgid "Nick name"
-msgstr "昵称"
+msgstr "姓名"
 
 #: apps/users/serializers/user.py:60 apps/users/serializers/user.py:145
 #: apps/users/serializers/user.py:263 apps/xpack/api/chat_user.py:108
@@ -7326,7 +7326,7 @@ msgstr "用户组名称"
 #: apps/xpack/api/chat_user.py:132 apps/xpack/serializers/chat_user.py:120
 #: apps/xpack/serializers/resource_chat_user.py:37
 msgid "Username or Nickname"
-msgstr "用户名或昵称"
+msgstr "用户名或姓名"
 
 #: apps/xpack/api/chat_user.py:148 apps/xpack/serializers/chat_user.py:360
 msgid "Sync Type"

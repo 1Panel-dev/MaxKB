@@ -88,7 +88,7 @@
             <template #default="{ row }">
               {{
                 row.source === 'LOCAL'
-                  ? $t('views.userManage.source.local')
+                  ? $t('views.userManage.source.localCreate')
                   : row.source === 'wecom'
                     ? $t('views.userManage.source.wecom')
                     : row.source === 'lark'
@@ -258,7 +258,7 @@ function createUser() {
 
 function deleteUserManage(row: ChatUserItem) {
   MsgConfirm(
-    `${t('views.userManage.delete.confirmTitle')}${row.username} ?`,
+    `${t('views.userManage.delete.confirmTitle')}${row.nick_name} ?`,
     '',
     {
       confirmButtonText: t('common.confirm'),

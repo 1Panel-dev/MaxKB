@@ -30,11 +30,13 @@ export default {
     phone: {
       label: '手機號碼',
       placeholder: '請輸入手機號碼',
+      invalidMessage: '手機號碼格式不正確',
     },
   },
   source: {
     label: '使用者來源',
     local: '系統使用者',
+     localCreate: '本地建立',
     wecom: '企業微信',
     lark: '飛書',
     dingtalk: '釘釘',

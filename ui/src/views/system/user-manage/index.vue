@@ -234,7 +234,7 @@ function createUser() {
 
 function deleteUserManage(row: any) {
   MsgConfirm(
-    `${t('views.userManage.delete.confirmTitle')}${row.username} ?`,
+    `${t('views.userManage.delete.confirmTitle')}${row.nick_name} ?`,
     t('views.userManage.delete.confirmMessage'),
     {
       confirmButtonText: t('common.confirm'),

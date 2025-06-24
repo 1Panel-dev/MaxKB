@@ -33,7 +33,7 @@ class Model(AppModelMixin):
 
     model_name = models.CharField(max_length=128, verbose_name="模型名称")
 
-    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name="成员用户id")
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, db_constraint=False, blank=True, null=True)
 
     provider = models.CharField(max_length=128, verbose_name='供应商')
 

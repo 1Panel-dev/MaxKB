@@ -29,11 +29,13 @@ export default {
     phone: {
       label: '手机号',
       placeholder: '请输入手机号',
+      invalidMessage: '手机号格式不正确',
     },
   },
   source: {
     label: '用户来源',
     local: '系统用户',
+    localCreate: '本地创建',
     wecom: '企业微信',
     lark: '飞书',
     dingtalk: '钉钉',

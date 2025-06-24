@@ -120,7 +120,7 @@ class Knowledge(AppModelMixin):
     name = models.CharField(max_length=150, verbose_name="知识库名称")
     workspace_id = models.CharField(max_length=64, verbose_name="工作空间id", default="default", db_index=True)
     desc = models.CharField(max_length=256, verbose_name="描述")
-    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name="所属用户")
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, db_constraint=False, blank=True, null=True)
     type = models.IntegerField(verbose_name='类型', choices=KnowledgeType.choices, default=KnowledgeType.BASE)
     scope = models.CharField(max_length=20, verbose_name='可用范围', choices=KnowledgeScope.choices,
                              default=KnowledgeScope.WORKSPACE)

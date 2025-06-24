@@ -31,11 +31,13 @@ export default {
     phone: {
       label: 'Phone',
       placeholder: 'Please enter phone',
+      invalidMessage: 'Invalid phone format',
     },
   },
   source: {
     label: 'User Source',
     local: 'System User',
+    localCreate: 'Local Create',
     wecom: 'WeCom',
     lark: 'Lark',
     dingtalk: 'DingTalk',

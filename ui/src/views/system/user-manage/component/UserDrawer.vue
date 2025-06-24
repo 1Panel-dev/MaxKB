@@ -44,7 +44,7 @@
         >
         </el-input>
       </el-form-item>
-      <el-form-item :label="$t('views.userManage.userForm.phone.label')">
+      <el-form-item :label="$t('views.userManage.userForm.phone.label')" prop="phone">
         <el-input v-model="userForm.phone"
                   :placeholder="$t('views.userManage.userForm.phone.placeholder')">
         </el-input>
@@ -204,6 +204,13 @@ const rules = reactive({
       min: 6,
       max: 20,
       message: t('views.login.loginForm.password.lengthMessage'),
+      trigger: 'blur',
+    },
+  ],
+  phone: [
+    {
+      pattern: /^1[3-9]\d{9}$/,
+      message: t('views.userManage.userForm.phone.invalidMessage'),
       trigger: 'blur',
     },
   ],
