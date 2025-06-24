@@ -25,11 +25,14 @@ FROM (SELECT "temp_knowledge".id::text, "temp_knowledge".name,
                    where auth_target_type = 'KNOWLEDGE'
                      and case
                              when auth_type = 'ROLE' then
+                                 'ROLE' = any (permission_list)
+                                  and
                                  'KNOWLEDGE:READ' in (select (case when user_role_relation.role_id = any (array ['USER']) THEN 'KNOWLEDGE:READ' else role_permission.permission_id END)
                                                         from role_permission role_permission
                                                         right join user_role_relation user_role_relation
                                                             on user_role_relation.role_id=role_permission.role_id
-                                                        ${user_query_set})
+                                                        where user_role_relation.user_id=workspace_user_resource_permission.user_id
+                                                        and  user_role_relation.workspace_id=workspace_user_resource_permission.workspace_id)
                              else
                                  'VIEW' = any (permission_list)
                        end
