@@ -47,6 +47,13 @@ router.beforeEach(
     if (to.meta.permission ? hasPermission(to.meta.permission as any, 'OR') : true) {
       next()
     } else {
+      console.log('s')
+      if (to.meta.get_permission_route) {
+        const t = to.meta.get_permission_route()
+        console.log(t)
+        next(t)
+        return
+      }
       // 如果没有权限则直接取404页面
       next({ path: '/no-permission' })
     }

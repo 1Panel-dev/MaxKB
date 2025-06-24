@@ -2,25 +2,31 @@ import type { RouteRecordRaw } from 'vue-router'
 const modules: any = import.meta.glob('./modules/*.ts', { eager: true })
 import { hasPermission, set_next_route } from '@/utils/permission/index'
 const rolesRoutes: RouteRecordRaw[] = [...Object.keys(modules).map((key) => modules[key].default)]
+const get_workspace_permission_route = () => {
+  const route = rolesRoutes.find((route: any) => {
+    return (
+      route.meta?.menu &&
+      (route.meta.permission ? hasPermission(route.meta.permission as any, 'OR') : true)
+    )
+  })
+  if (route?.name) {
+    return { name: route?.name }
+  }
+  return { name: 'noPermission' }
+}
 
 export const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'home',
-    redirect: (to: any) => {
-      const route = rolesRoutes.find((route: any) => {
-        return (
-          route.meta?.menu &&
-          (route.meta.permission ? hasPermission(route.meta.permission as any, 'OR') : true)
-        )
-      })
-      if (route?.name) {
-        return { name: route?.name }
-      }
-      return { name: 'noPermission' }
-    },
+    redirect: '/application',
     children: [
-      ...rolesRoutes,
+      ...rolesRoutes.map((r) => {
+        if (r.meta) {
+          r.meta.get_permission_route = get_workspace_permission_route
+        }
+        return r
+      }),
       {
         path: '/no-permission',
         name: 'noPermission',
