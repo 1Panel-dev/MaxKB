@@ -6,21 +6,33 @@ const workspace = {
     hasPermission(
       new ComplexPermission(
         [RoleConst.ADMIN],
-        [PermissionConst.SHARED_TOOL_READ],
+        [PermissionConst.SHARED_KNOWLEDGE_READ],
         [EditionConst.IS_EE],
         'OR',
       ),
       'OR',
     ),
-  delete: () =>
-    hasPermission(
-      [
-        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-        RoleConst.USER.getWorkspaceRole,
-        PermissionConst.TOOL_DELETE.getWorkspacePermission,
-      ],
-      'OR',
-    ),
+  create: () => false,
+  single: () => false,
+  sync: () => false,
+  vector: () => false,
+  generate: () => false,
+  setting: () => false,
+  export: () => false,
+  delete: () => false,
+
+  doc_create: () => false,
+  doc_vector: () => false,
+  doc_generate: () => false,
+  doc_migrate: () => false,
+  doc_edit: () => false,
+  doc_sync: () => false,
+  doc_delete: () => false,
+  doc_export: () => false,
+
+  problem_create: () => false,
+  problem_relate: () => false,
+  problem_delete: () => false,
 }
 
 export default workspace
