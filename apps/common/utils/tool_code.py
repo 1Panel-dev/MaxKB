@@ -43,8 +43,8 @@ class ToolExecutor:
 try:
     import os
     import sys
-    path_to_exclude = '/opt/py3/lib/python3.11/site-packages'
-    sys.path = [p for p in sys.path if p != path_to_exclude]
+    path_to_exclude = ['/opt/py3/lib/python3.11/site-packages', '/opt/maxkb-app/apps']
+    sys.path = [p for p in sys.path if p not in path_to_exclude]
     sys.path.append('/opt/maxkb-app/sandbox/python-packages')
     sys.path.append('/opt/maxkb/python-packages')
     env = dict(os.environ)
