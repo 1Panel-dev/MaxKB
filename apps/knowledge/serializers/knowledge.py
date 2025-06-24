@@ -160,7 +160,7 @@ class KnowledgeSerializer(serializers.Serializer):
             if not workspace_manage and is_x_pack_ee:
                 query_set_dict['workspace_user_resource_permission_query_set'] = QuerySet(
                     WorkspaceUserResourcePermission).filter(
-                    auth_target_type="",
+                    auth_target_type="KNOWLEDGE",
                     workspace_id=workspace_id,
                     user_id=self.data.get("user_id"))
             return query_set_dict

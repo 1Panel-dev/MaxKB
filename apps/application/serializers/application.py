@@ -322,7 +322,7 @@ class Query(serializers.Serializer):
         return {'folder_query_set': folder_query_set,
                 'application_query_set': application_query_set,
                 'workspace_user_resource_permission_query_set': QuerySet(WorkspaceUserResourcePermission).filter(
-                    auth_target_type="KNOWLEDGE",
+                    auth_target_type="APPLICATION",
                     workspace_id=workspace_id,
                     user_id=user_id)} if (
                 not workspace_manage and is_x_pack_ee) else {
