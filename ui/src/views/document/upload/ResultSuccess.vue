@@ -16,12 +16,24 @@
         </div>
       </template>
       <template #extra>
-        <el-button @click="router.push({ path: `/knowledge` })">{{
-          $t('views.knowledge.ResultSuccess.buttons.toknowledge')
-        }}</el-button>
+        <el-button
+          @click="
+            router.push({
+              path: `/knowledge`,
+              query: {
+                type: apiType,
+              },
+            })
+          "
+          >{{ $t('views.knowledge.ResultSuccess.buttons.toknowledge') }}</el-button
+        >
         <el-button
           type="primary"
-          @click="router.push({ path: `/knowledge/${data?.id}/${folderId}/document` })"
+          @click="
+            router.push({
+              path: `/knowledge/${data?.id}/${folderId}/document`,
+            })
+          "
           >{{ $t('views.knowledge.ResultSuccess.buttons.toDocument') }}</el-button
         >
       </template>
@@ -68,18 +80,29 @@ import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { numberFormat } from '@/utils/utils'
 import { filesize, getImgUrl } from '@/utils/utils'
-const route = useRoute()
+
 const props = defineProps({
   data: {
     type: Object,
     default: () => {},
   },
 })
-
+const router = useRouter()
+const route = useRoute()
 const {
   params: { id, folderId }, // id为knowledgeID
 } = route as any
-const router = useRouter()
+
+const apiType = computed(() => {
+  if (route.path.includes('shared')) {
+    return 'systemShare'
+  } else if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
+
 const paragraph_count = computed(() =>
   props.data?.document_list.reduce((sum: number, obj: any) => (sum += obj.paragraph_count), 0),
 )

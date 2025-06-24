@@ -60,7 +60,7 @@ import { useRouter, useRoute } from 'vue-router'
 import SetRules from './upload/SetRules.vue'
 import ResultSuccess from './upload/ResultSuccess.vue'
 import UploadComponent from './upload/UploadComponent.vue'
-import documentApi from '@/api/knowledge/document'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
 import useStore from '@/stores'
@@ -74,6 +74,16 @@ const {
   params: { folderId },
   query: { id }, // id为knowledgeID，有id的是上传文档
 } = route
+
+const apiType = computed(() => {
+  if (route.path.includes('shared')) {
+    return 'systemShare'
+  } else if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
 
 const SetRulesRef = ref()
 const UploadComponentRef = ref()
@@ -94,11 +104,15 @@ async function next() {
       })
       if (id) {
         // QA文档上传
-        documentApi.postQADocument(id as string, fd, loading).then((res) => {
-          MsgSuccess(t('common.submitSuccess'))
-          clearStore()
-          router.push({ path: `/knowledge/${id}/${folderId}/document` })
-        })
+        loadSharedApi({ type: 'document', systemType: apiType.value })
+          .postQADocument(id as string, fd, loading)
+          .then(() => {
+            MsgSuccess(t('common.submitSuccess'))
+            clearStore()
+            router.push({
+              path: `/knowledge/${id}/${folderId}/document`,
+            })
+          })
       }
     } else if (documentsType.value === 'table') {
       const fd = new FormData()
@@ -109,11 +123,15 @@ async function next() {
       })
       if (id) {
         // table文档上传
-        documentApi.postTableDocument(id as string, fd, loading).then((res) => {
-          MsgSuccess(t('common.submitSuccess'))
-          clearStore()
-          router.push({ path: `/knowledge/${id}/${folderId}/document` })
-        })
+        loadSharedApi({ type: 'document', systemType: apiType.value })
+          .postTableDocument(id as string, fd, loading)
+          .then(() => {
+            MsgSuccess(t('common.submitSuccess'))
+            clearStore()
+            router.push({
+              path: `/knowledge/${id}/${folderId}/document`,
+            })
+          })
       }
     } else {
       if (active.value++ > 2) active.value = 0
@@ -152,7 +170,9 @@ function submit() {
       .then(() => {
         MsgSuccess(t('common.submitSuccess'))
         clearStore()
-        router.push({ path: `/knowledge/${id}/${folderId}/document` })
+        router.push({
+          path: `/knowledge/${id}/${folderId}/document`,
+        })
       })
       .catch(() => {
         loading.value = false

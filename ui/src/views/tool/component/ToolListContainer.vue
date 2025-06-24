@@ -313,7 +313,7 @@ import { t } from '@/locales'
 const route = useRoute()
 const { folder, user, tool } = useStore()
 
-const type = computed(() => {
+const apiType = computed(() => {
   if (route.path.includes('shared')) {
     return 'systemShare'
   } else if (route.path.includes('resource-management')) {
@@ -327,11 +327,11 @@ const isShared = computed(() => {
   return folder.currentFolder.id === 'share'
 })
 const isSystemShare = computed(() => {
-  return type.value === 'systemShare'
+  return apiType.value === 'systemShare'
 })
 
 const permissionPrecise = computed(() => {
-  return permissionMap['tool'][type.value]
+  return permissionMap['tool'][apiType.value]
 })
 
 const InitParamDrawerRef = ref()
@@ -370,7 +370,7 @@ function openCreateDialog(data?: any) {
   }
   ToolDrawertitle.value = data ? t('views.tool.editTool') : t('views.tool.createTool')
   if (data) {
-    loadSharedApi({ type: 'tool', systemType: type.value })
+    loadSharedApi({ type: 'tool', systemType: apiType.value })
       .getToolById(data?.id, loading)
       .then((res: any) => {
         ToolFormDrawerRef.value.open(res.data)
@@ -393,7 +393,7 @@ async function changeState(row: any) {
       const obj = {
         is_active: !row.is_active,
       }
-      loadSharedApi({ type: 'tool', systemType: type.value })
+      loadSharedApi({ type: 'tool', systemType: apiType.value })
         .putTool(row.id, obj, changeStateloading)
         .then(() => {
           const list = cloneDeep(tool.toolList)
@@ -407,7 +407,7 @@ async function changeState(row: any) {
         })
     })
   } else {
-    const res = await loadSharedApi({ type: 'tool', systemType: type.value }).getToolById(
+    const res = await loadSharedApi({ type: 'tool', systemType: apiType.value }).getToolById(
       row.id,
       changeStateloading,
     )
@@ -424,7 +424,7 @@ async function changeState(row: any) {
     const obj = {
       is_active: !row.is_active,
     }
-    loadSharedApi({ type: 'tool', systemType: type.value })
+    loadSharedApi({ type: 'tool', systemType: apiType.value })
       .putTool(row.id, obj, changeStateloading)
       .then(() => {
         const list = cloneDeep(tool.toolList)
@@ -462,7 +462,7 @@ function copyTool(row: any) {
 }
 
 function exportTool(row: any) {
-  loadSharedApi({ type: 'tool', systemType: type.value })
+  loadSharedApi({ type: 'tool', systemType: apiType.value })
     .exportTool(row.id, row.name, loading)
     .catch((e: any) => {
       if (e.response.status !== 403) {
@@ -484,7 +484,7 @@ function deleteTool(row: any) {
     },
   )
     .then(() => {
-      loadSharedApi({ type: 'tool', systemType: type.value })
+      loadSharedApi({ type: 'tool', systemType: apiType.value })
         .delTool(row.id, loading)
         .then(() => {
           const list = cloneDeep(tool.toolList)
@@ -498,7 +498,7 @@ function deleteTool(row: any) {
 }
 
 function configInitParams(item: any) {
-  loadSharedApi({ type: 'tool', systemType: type.value })
+  loadSharedApi({ type: 'tool', systemType: apiType.value })
     .getToolById(item?.id, changeStateloading)
     .then((res: any) => {
       InitParamDrawerRef.value.open(res.data)
@@ -517,7 +517,7 @@ function addInternalFunction(data?: any, isEdit?: boolean) {
 
 function confirmAddInternalFunction(data?: any, isEdit?: boolean) {
   if (isEdit) {
-    loadSharedApi({ type: 'tool', systemType: type.value })
+    loadSharedApi({ type: 'tool', systemType: apiType.value })
       .putTool(data?.id as string, { name: data.name }, loading)
       .then((res: any) => {
         MsgSuccess(t('common.saveSuccess'))
@@ -531,7 +531,7 @@ function importTool(file: any) {
   const formData = new FormData()
   formData.append('file', file.raw, file.name)
   elUploadRef.value.clearFiles()
-  loadSharedApi({ type: 'tool', systemType: type.value })
+  loadSharedApi({ type: 'tool', systemType: apiType.value })
     .postImportTool(formData, loading)
     .then(async (res: any) => {
       if (res?.data) {
@@ -572,7 +572,7 @@ function getList() {
     [search_type.value]: search_form.value[search_type.value],
   }
   tool
-    .asyncGetToolListPage(paginationConfig, isShared.value, type.value, params, loading)
+    .asyncGetToolListPage(paginationConfig, isShared.value, apiType.value, params, loading)
     .then((res: any) => {
       paginationConfig.total = res.data?.total
       tool.setToolList([...tool.toolList, ...res.data?.records])
@@ -584,7 +584,7 @@ function clickFolder(item: any) {
 }
 
 onMounted(() => {
-  if (type.value !== 'workspace') {
+  if (apiType.value !== 'workspace') {
     getList()
   }
 })

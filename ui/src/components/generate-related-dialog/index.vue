@@ -46,7 +46,7 @@
           />
         </el-form-item>
         <el-form-item
-          v-if="['document', 'knowledge'].includes(apiType)"
+          v-if="['document', 'knowledge'].includes(apiSubmitType)"
           :label="$t('components.selectParagraph.title')"
           prop="state"
         >
@@ -72,8 +72,6 @@
 <script setup lang="ts">
 import { reactive, ref, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import documentApi from '@/api/knowledge/document'
-import paragraphApi from '@/api/knowledge/paragraph'
 import useStore from '@/stores'
 import { groupBy } from 'lodash'
 import { MsgSuccess } from '@/utils/message'
@@ -81,19 +79,15 @@ import { t } from '@/locales'
 import type { FormInstance } from 'element-plus'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
+const props = defineProps<{
+  apiType: 'systemShare' | 'workspace' | 'systemManage'
+}>()
+
 const route = useRoute()
 const {
   params: { id, documentId }, // id为knowledgeID
 } = route as any
-const type = computed(() => {
-  if (route.path.includes('shared')) {
-    return 'systemShare'
-  } else if (route.path.includes('resource-management')) {
-    return 'systemManage'
-  } else {
-    return 'workspace'
-  }
-})
+
 const { model, prompt, user } = useStore()
 
 const emit = defineEmits(['refresh'])
@@ -103,7 +97,7 @@ const loading = ref<boolean>(false)
 const dialogVisible = ref<boolean>(false)
 const modelOptions = ref<any>(null)
 const idList = ref<string[]>([])
-const apiType = ref('') // 文档document或段落paragraph
+const apiSubmitType = ref('') // 文档document或段落paragraph
 const state = ref<'all' | 'error'>('error')
 const stateMap = {
   all: ['0', '1', '2', '3', '4', '5', 'n'],
@@ -141,7 +135,7 @@ const open = (ids: string[], type: string, _knowledgeId?: string) => {
   knowledgeId.value = _knowledgeId
   getModel()
   idList.value = ids
-  apiType.value = type
+  apiSubmitType.value = type
   dialogVisible.value = true
 }
 
@@ -153,33 +147,37 @@ const submitHandle = async (formEl: FormInstance) => {
     if (valid) {
       // 保存提示词
       prompt.save(user.userInfo?.id as string, form.value)
-      if (apiType.value === 'paragraph') {
+      if (apiSubmitType.value === 'paragraph') {
         const data = {
           ...form.value,
           paragraph_id_list: idList.value,
         }
-        paragraphApi.putBatchGenerateRelated(id, documentId, data, loading).then(() => {
-          MsgSuccess(t('views.document.generateQuestion.successMessage'))
-          emit('refresh')
-          dialogVisible.value = false
-        })
-      } else if (apiType.value === 'document') {
+        loadSharedApi({ type: 'paragraph', systemType: props.apiType })
+          .putBatchGenerateRelated(id, documentId, data, loading)
+          .then(() => {
+            MsgSuccess(t('views.document.generateQuestion.successMessage'))
+            emit('refresh')
+            dialogVisible.value = false
+          })
+      } else if (apiSubmitType.value === 'document') {
         const data = {
           ...form.value,
           document_id_list: idList.value,
           state_list: stateMap[state.value],
         }
-        documentApi.putBatchGenerateRelated(id, data, loading).then(() => {
-          MsgSuccess(t('views.document.generateQuestion.successMessage'))
-          emit('refresh')
-          dialogVisible.value = false
-        })
-      } else if (apiType.value === 'knowledge') {
+        loadSharedApi({ type: 'knowledge', systemType: props.apiType })
+          .putBatchGenerateRelated(id, data, loading)
+          .then(() => {
+            MsgSuccess(t('views.document.generateQuestion.successMessage'))
+            emit('refresh')
+            dialogVisible.value = false
+          })
+      } else if (apiSubmitType.value === 'knowledge') {
         const data = {
           ...form.value,
           state_list: stateMap[state.value],
         }
-        loadSharedApi({ type: 'knowledge', systemType: type.value })
+        loadSharedApi({ type: 'knowledge', systemType: props.apiType })
           .putGenerateRelated(id ? id : knowledgeId.value, data, loading)
           .then(() => {
             MsgSuccess(t('views.document.generateQuestion.successMessage'))
@@ -192,7 +190,7 @@ const submitHandle = async (formEl: FormInstance) => {
 
 function getModel() {
   loading.value = true
-  loadSharedApi({ type: 'knowledge', systemType: type.value })
+  loadSharedApi({ type: 'knowledge', systemType: props.apiType })
     .getKnowledgeModel()
     .then((res: any) => {
       modelOptions.value = groupBy(res?.data, 'provider')

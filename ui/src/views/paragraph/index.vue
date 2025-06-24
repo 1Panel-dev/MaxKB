@@ -138,29 +138,30 @@
     </el-card>
     <ParagraphDialog ref="ParagraphDialogRef" :title="title" @refresh="refresh" />
     <SelectDocumentDialog ref="SelectDocumentDialogRef" @refresh="refreshMigrateParagraph" />
-    <GenerateRelatedDialog ref="GenerateRelatedDialogRef" @refresh="refresh" />
+    <GenerateRelatedDialog ref="GenerateRelatedDialogRef" @refresh="refresh" :apiType="apiType" />
   </div>
 </template>
 <script setup lang="ts">
 import { reactive, ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { cloneDeep } from 'lodash'
-import documentApi from '@/api/knowledge/document'
-import paragraphApi from '@/api/knowledge/paragraph'
 import ParagraphDialog from './component/ParagraphDialog.vue'
 import ParagraphCard from './component/ParagraphCard.vue'
 import SelectDocumentDialog from './component/SelectDocumentDialog.vue'
 import GenerateRelatedDialog from '@/components/generate-related-dialog/index.vue'
 import { VueDraggable } from 'vue-draggable-plus'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import useStore from '@/stores'
 import { t } from '@/locales'
-import disable$ from 'dingtalk-jsapi/api/ui/pullToRefresh/disable'
-const { paragraph } = useStore()
 const route = useRoute()
 const {
   params: { id, documentId },
+  query: { type },
 } = route as any
+
+const apiType = computed(() => {
+  return type as 'systemShare' | 'workspace' | 'systemManage'
+})
 
 const SelectDocumentDialogRef = ref()
 const ParagraphDialogRef = ref()
@@ -224,7 +225,7 @@ function deleteMulParagraph() {
     },
   )
     .then(() => {
-      paragraphApi
+      loadSharedApi({ type: 'paragraph', systemType: apiType.value })
         .putMulParagraph(id, documentId, multipleSelection.value, changeStateloading)
         .then(() => {
           paragraphDetail.value = paragraphDetail.value.filter(
@@ -242,14 +243,6 @@ function batchSelectedHandle(bool: boolean) {
   multipleSelection.value = []
 }
 
-function selectHandle(id: string) {
-  if (multipleSelection.value.includes(id)) {
-    multipleSelection.value.splice(multipleSelection.value.indexOf(id), 1)
-  } else {
-    multipleSelection.value.push(id)
-  }
-}
-
 function searchHandle() {
   paginationConfig.current_page = 1
   paragraphDetail.value = []
@@ -262,13 +255,15 @@ function addParagraph() {
 }
 
 function getDetail() {
-  documentApi.getDocumentDetail(id, documentId, loading).then((res) => {
-    documentDetail.value = res.data
-  })
+  loadSharedApi({ type: 'document', systemType: apiType.value })
+    .getDocumentDetail(id, documentId, loading)
+    .then((res: any) => {
+      documentDetail.value = res.data
+    })
 }
 
 function getParagraphList() {
-  paragraphApi
+  loadSharedApi({ type: 'paragraph', systemType: apiType.value })
     .getParagraphPage(
       id,
       documentId,
@@ -276,7 +271,7 @@ function getParagraphList() {
       search.value && { [searchType.value]: search.value },
       loading,
     )
-    .then((res) => {
+    .then((res: any) => {
       paragraphDetail.value = [...paragraphDetail.value, ...res.data.records]
       paginationConfig.total = res.data.total
     })
@@ -314,7 +309,12 @@ function onEnd(event?: any) {
     paragraph_id: paragraphDetail.value[event.newIndex].id,
     new_position: paragraphDetail.value[event.newIndex].position,
   }
-  paragraphApi.putAdjustPosition(id, documentId, obj, loading)
+  loadSharedApi({ type: 'paragraph', systemType: apiType.value }).putAdjustPosition(
+    id,
+    documentId,
+    obj,
+    loading,
+  )
 }
 
 onMounted(() => {

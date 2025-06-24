@@ -39,7 +39,7 @@ const emit = defineEmits(['refresh'])
 
 const route = useRoute()
 
-const type = computed(() => {
+const apiType = computed(() => {
   if (route.path.includes('shared')) {
     return 'systemShare'
   } else if (route.path.includes('resource-management')) {
@@ -68,7 +68,7 @@ watch(debugVisible, (bool) => {
 
 const submit = async () => {
   dynamicsFormRef.value.validate().then(() => {
-    loadSharedApi({ type: 'tool', systemType: type.value })
+    loadSharedApi({ type: 'tool', systemType: apiType.value })
       .putTool(form.value?.id as string, form.value, loading)
       .then((res: any) => {
         MsgSuccess(t('common.editSuccess'))

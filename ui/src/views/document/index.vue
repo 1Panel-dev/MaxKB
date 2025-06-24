@@ -7,26 +7,32 @@
           <div class="flex-between">
             <div>
               <el-button
-                v-if="knowledgeDetail.type === 0 && permissionPrecise.doc_create(id)"
-                type="danger"
+                v-if="knowledgeDetail?.type === 0 && permissionPrecise.doc_create(id)"
+                type="primary"
                 @click="
-                  router.push({ path: `/knowledge/document/upload/${folderId}`, query: { id: id } })
+                  router.push({
+                    path: `/knowledge/document/upload/${folderId}`,
+                    query: { id: id },
+                  })
                 "
                 >{{ $t('views.document.uploadDocument') }}
               </el-button>
               <el-button
-                v-if="knowledgeDetail.type === 1 && permissionPrecise.doc_create(id)"
+                v-if="knowledgeDetail?.type === 1 && permissionPrecise.doc_create(id)"
                 type="primary"
                 @click="importDoc"
                 >{{ $t('views.document.importDocument') }}
               </el-button>
               <el-button
-                v-if="knowledgeDetail.type === 2 && permissionPrecise.doc_create(id)"
+                v-if="knowledgeDetail?.type === 2 && permissionPrecise.doc_create(id)"
                 type="primary"
                 @click="
                   router.push({
                     path: `/knowledge/import`,
-                    query: { id: id, folder_token: knowledgeDetail.meta.folder_token },
+                    query: {
+                      id: id,
+                      folder_token: knowledgeDetail?.meta.folder_token,
+                    },
                   })
                 "
                 >{{ $t('views.document.importDocument') }}
@@ -73,7 +79,7 @@
                       divided
                       @click="syncLarkMulDocument"
                       :disabled="multipleSelection.length === 0"
-                      v-if="knowledgeDetail.type === 2 && permissionPrecise.doc_sync(id)"
+                      v-if="knowledgeDetail?.type === 2 && permissionPrecise.doc_sync(id)"
                       >{{ $t('views.document.syncDocument') }}
                     </el-dropdown-item>
 
@@ -103,7 +109,7 @@
             class="mt-16"
             :data="documentData"
             :pagination-config="paginationConfig"
-            :quick-create="knowledgeDetail.type === 0 && permissionPrecise.doc_create(id)"
+            :quick-create="knowledgeDetail?.type === 0 && permissionPrecise.doc_create(id)"
             @sizeChange="handleSizeChange"
             @changePage="getList"
             @cell-mouse-enter="cellMouseEnter"
@@ -351,7 +357,7 @@
                   />
                 </span>
                 <el-divider direction="vertical" />
-                <template v-if="knowledgeDetail.type === 0">
+                <template v-if="knowledgeDetail?.type === 0">
                   <span
                     class="mr-4"
                     v-if="
@@ -451,7 +457,7 @@
                     </el-dropdown>
                   </span>
                 </template>
-                <template v-if="knowledgeDetail.type === 1 || knowledgeDetail.type === 2">
+                <template v-if="knowledgeDetail?.type === 1 || knowledgeDetail?.type === 2">
                   <span class="mr-4">
                     <el-button
                       type="primary"
@@ -571,14 +577,13 @@
     <SyncWebDialog ref="SyncWebDialogRef" @refresh="refresh" />
     <!-- 选择知识库 -->
     <SelectKnowledgeDialog ref="selectKnowledgeDialogRef" @refresh="refreshMigrate" />
-    <GenerateRelatedDialog ref="GenerateRelatedDialogRef" @refresh="getList" />
+    <GenerateRelatedDialog ref="GenerateRelatedDialogRef" @refresh="getList" :apiType="apiType" />
   </div>
 </template>
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import { useRouter, useRoute, onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router'
 import { ElTable } from 'element-plus'
-import documentApi from '@/api/knowledge/document'
 import ImportDocumentDialog from './component/ImportDocumentDialog.vue'
 import SyncWebDialog from '@/views/knowledge/component/SyncWebDialog.vue'
 import SelectKnowledgeDialog from './component/SelectKnowledgeDialog.vue'
@@ -598,32 +603,12 @@ import permissionMap from '@/permission'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 const route = useRoute()
-const { folder, user } = useStore()
-
-const type = computed(() => {
-  if (route.path.includes('shared')) {
-    return 'systemShare'
-  } else if (route.path.includes('resource-management')) {
-    return 'systemManage'
-  } else {
-    return 'workspace'
-  }
-})
-const permissionPrecise = computed(() => {
-  return permissionMap['knowledge'][type.value]
-})
-
 const router = useRouter()
 const {
   params: { id, folderId }, // id为knowledgeID
 } = route as any
-
-const { common, knowledge, document } = useStore()
+const { common, document } = useStore()
 const storeKey = 'documents'
-const getTaskState = (status: string, taskType: number) => {
-  const statusList = status.split('').reverse()
-  return taskType - 1 > statusList.length + 1 ? 'n' : statusList[taskType - 1]
-}
 onBeforeRouteUpdate(() => {
   common.savePage(storeKey, null)
   common.saveCondition(storeKey, null)
@@ -639,6 +624,25 @@ onBeforeRouteLeave((to: any) => {
     })
   }
 })
+
+const apiType = computed(() => {
+  if (route.path.includes('shared')) {
+    return 'systemShare'
+  } else if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
+const permissionPrecise = computed(() => {
+  return permissionMap['knowledge'][apiType.value]
+})
+
+const getTaskState = (status: string, taskType: number) => {
+  const statusList = status.split('').reverse()
+  return taskType - 1 > statusList.length + 1 ? 'n' : statusList[taskType - 1]
+}
+
 const beforePagination = computed(() => common.paginationConfig[storeKey])
 const beforeSearch = computed(() => common.search[storeKey])
 const embeddingContentDialogRef = ref<InstanceType<typeof EmbeddingContentDialog>>()
@@ -666,14 +670,14 @@ const title = ref('')
 const selectKnowledgeDialogRef = ref()
 
 const exportDocument = (document: any) => {
-  documentApi
+  loadSharedApi({ type: 'document', systemType: apiType.value })
     .exportDocument(document.name, document.knowledge_id, document.id, loading)
     .then(() => {
       MsgSuccess(t('common.exportSuccess'))
     })
 }
 const exportDocumentZip = (document: any) => {
-  documentApi
+  loadSharedApi({ type: 'document', systemType: apiType.value })
     .exportDocumentZip(document.name, document.knowledge_id, document.id, loading)
     .then(() => {
       MsgSuccess(t('common.exportSuccess'))
@@ -691,10 +695,12 @@ function cancelTaskHandle(val: any) {
     id_list: arr,
     type: val,
   }
-  documentApi.putBatchCancelTask(id, obj, loading).then(() => {
-    MsgSuccess(t('views.document.tip.cancelSuccess'))
-    multipleTableRef.value?.clearSelection()
-  })
+  loadSharedApi({ type: 'document', systemType: apiType.value })
+    .putBatchCancelTask(id, obj, loading)
+    .then(() => {
+      MsgSuccess(t('views.document.tip.cancelSuccess'))
+      multipleTableRef.value?.clearSelection()
+    })
 }
 
 function clearSelection() {
@@ -734,9 +740,11 @@ function beforeCommand(attr: string, val: any, task_type?: number) {
 }
 
 const cancelTask = (row: any, task_type: number) => {
-  documentApi.putCancelTask(id, row.id, { type: task_type }).then(() => {
-    MsgSuccess(t('views.document.tip.sendMessage'))
-  })
+  loadSharedApi({ type: 'document', systemType: apiType.value })
+    .putCancelTask(id, row.id, { type: task_type })
+    .then(() => {
+      MsgSuccess(t('views.document.tip.sendMessage'))
+    })
 }
 
 function importDoc() {
@@ -791,9 +799,11 @@ function syncLarkDocument(row: any) {
     confirmButtonClass: 'color-danger',
   })
     .then(() => {
-      documentApi.putLarkDocumentSync(id, row.id).then(() => {
-        getList()
-      })
+      loadSharedApi({ type: 'document', systemType: apiType.value })
+        .putLarkDocumentSync(id, row.id)
+        .then(() => {
+          getList()
+        })
     })
     .catch(() => {})
 }
@@ -805,9 +815,11 @@ function syncWebDocument(row: any) {
       confirmButtonClass: 'color-danger',
     })
       .then(() => {
-        documentApi.putDocumentSync(row.knowledge_id, row.id).then(() => {
-          getList()
-        })
+        loadSharedApi({ type: 'document', systemType: apiType.value })
+          .putDocumentSync(row.knowledge_id, row.id)
+          .then(() => {
+            getList()
+          })
       })
       .catch(() => {})
   } else {
@@ -822,9 +834,11 @@ function syncWebDocument(row: any) {
 
 function refreshDocument(row: any) {
   const embeddingDocument = (stateList: Array<string>) => {
-    return documentApi.putDocumentRefresh(row.knowledge_id, row.id, stateList).then(() => {
-      getList()
-    })
+    return loadSharedApi({ type: 'document', systemType: apiType.value })
+      .putDocumentRefresh(row.knowledge_id, row.id, stateList)
+      .then(() => {
+        getList()
+      })
   }
   embeddingContentDialogRef.value?.open(embeddingDocument)
 }
@@ -834,7 +848,7 @@ function rowClickHandle(row: any, column: any) {
     return
   }
 
-  router.push({ path: `/paragraph/${id}/${row.id}` })
+  router.push({ path: `/paragraph/${id}/${row.id}`, query: { type: apiType.value } })
 }
 
 /*
@@ -861,10 +875,12 @@ function syncMulDocument() {
       arr.push(v.id)
     }
   })
-  documentApi.putMulSyncDocument(id, arr, loading).then(() => {
-    MsgSuccess(t('views.document.sync.successMessage'))
-    getList()
-  })
+  loadSharedApi({ type: 'document', systemType: apiType.value })
+    .putMulSyncDocument(id, arr, loading)
+    .then(() => {
+      MsgSuccess(t('views.document.sync.successMessage'))
+      getList()
+    })
 }
 
 function syncLarkMulDocument() {
@@ -874,10 +890,12 @@ function syncLarkMulDocument() {
       arr.push(v.id)
     }
   })
-  documentApi.delMulLarkSyncDocument(id, arr, loading).then(() => {
-    MsgSuccess(t('views.document.sync.successMessage'))
-    getList()
-  })
+  loadSharedApi({ type: 'document', systemType: apiType.value })
+    .delMulLarkSyncDocument(id, arr, loading)
+    .then(() => {
+      MsgSuccess(t('views.document.sync.successMessage'))
+      getList()
+    })
 }
 
 function deleteMulDocument() {
@@ -896,11 +914,13 @@ function deleteMulDocument() {
           arr.push(v.id)
         }
       })
-      documentApi.delMulDocument(id, arr, loading).then(() => {
-        MsgSuccess(t('views.document.delete.successMessage'))
-        multipleTableRef.value?.clearSelection()
-        getList()
-      })
+      loadSharedApi({ type: 'document', systemType: apiType.value })
+        .delMulDocument(id, arr, loading)
+        .then(() => {
+          MsgSuccess(t('views.document.delete.successMessage'))
+          multipleTableRef.value?.clearSelection()
+          getList()
+        })
     })
     .catch(() => {})
 }
@@ -908,10 +928,12 @@ function deleteMulDocument() {
 function batchRefresh() {
   const arr: string[] = multipleSelection.value.map((v) => v.id)
   const embeddingBatchDocument = (stateList: Array<string>) => {
-    documentApi.putBatchRefresh(id, arr, stateList, loading).then(() => {
-      MsgSuccess(t('views.document.tip.vectorizationSuccess'))
-      multipleTableRef.value?.clearSelection()
-    })
+    loadSharedApi({ type: 'document', systemType: apiType.value })
+      .putBatchRefresh(id, arr, stateList, loading)
+      .then(() => {
+        MsgSuccess(t('views.document.tip.vectorizationSuccess'))
+        multipleTableRef.value?.clearSelection()
+      })
   }
   embeddingContentDialogRef.value?.open(embeddingBatchDocument)
 }
@@ -926,10 +948,12 @@ function deleteDocument(row: any) {
     },
   )
     .then(() => {
-      documentApi.delDocument(id, row.id, loading).then(() => {
-        MsgSuccess(t('common.deleteSuccess'))
-        getList()
-      })
+      loadSharedApi({ type: 'document', systemType: apiType.value })
+        .delDocument(id, row.id, loading)
+        .then(() => {
+          MsgSuccess(t('common.deleteSuccess'))
+          getList()
+        })
     })
     .catch(() => {})
 }
@@ -938,9 +962,9 @@ function deleteDocument(row: any) {
   更新名称或状态
 */
 function updateData(documentId: string, data: any, msg: string) {
-  documentApi
+  loadSharedApi({ type: 'document', systemType: apiType.value })
     .putDocument(id, documentId, data, loading)
-    .then((res) => {
+    .then((res: any) => {
       const index = documentData.value.findIndex((v) => v.id === documentId)
       documentData.value.splice(index, 1, res.data)
       MsgSuccess(msg)
@@ -995,16 +1019,16 @@ function getList(bool?: boolean) {
     order_by: orderBy.value,
     folder_id: folderId,
   }
-  documentApi
+  loadSharedApi({ type: 'document', systemType: apiType.value })
     .getDocumentPage(id as string, paginationConfig.value, param, bool ? undefined : loading)
-    .then((res) => {
+    .then((res: any) => {
       documentData.value = res.data.records
       paginationConfig.value.total = res.data.total
     })
 }
 
 function getDetail() {
-  loadSharedApi({ type: 'knowledge', systemType: type.value })
+  loadSharedApi({ type: 'knowledge', systemType: apiType.value })
     .getKnowledgeDetail(id, loading)
     .then((res: any) => {
       knowledgeDetail.value = res.data

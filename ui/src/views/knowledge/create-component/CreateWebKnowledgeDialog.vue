@@ -54,7 +54,7 @@ const emit = defineEmits(['refresh'])
 
 const router = useRouter()
 const route = useRoute()
-const type = computed(() => {
+const apiType = computed(() => {
   if (route.path.includes('shared')) {
     return 'systemShare'
   } else if (route.path.includes('resource-management')) {
@@ -111,11 +111,16 @@ const submitHandle = async () => {
           ...BaseFormRef.value.form,
           ...knowledgeForm.value,
         }
-        loadSharedApi({ type: 'knowledge', systemType: type.value })
+        loadSharedApi({ type: 'knowledge', systemType: apiType.value })
           .postWebKnowledge(obj, loading)
           .then((res: any) => {
             MsgSuccess(t('common.createSuccess'))
-            router.push({ path: `/knowledge/${res.data.id}/${currentFolder.value.id}/document` })
+            router.push({
+              path: `/knowledge/${res.data.id}/${currentFolder.value.id}/document`,
+              query: {
+                type: apiType.value,
+              },
+            })
             emit('refresh')
           })
       } else {

@@ -1,16 +1,22 @@
 import knowledgeWorkspaceApi from '@/api/knowledge/knowledge'
+import documentWorkspaceApi from '@/api/knowledge/document'
+import paragraphWorkspaceApi from '@/api/knowledge/paragraph'
 import modelWorkspaceApi from '@/api/model/model'
 import toolWorkspaceApi from '@/api/tool/tool'
 import sharedWorkspaceApi from '@/api/shared-workspace'
 import toolSystemShareApi from '@/api/system-shared/tool'
 import modelSystemShareApi from '@/api/system-shared/model'
 import knowledgeSystemShareApi from '@/api/system-shared/knowledge'
+import documentSystemShareApi from '@/api/system-shared/document'
+import paragraphSystemShareApi from '@/api/system-shared/paragraph'
 
 // 普通 API
 const workspaceApiMap = {
   knowledge: knowledgeWorkspaceApi,
   model: modelWorkspaceApi,
   tool: toolWorkspaceApi,
+  document: documentWorkspaceApi,
+  paragraph: paragraphWorkspaceApi,
 } as any
 
 // 系统分享 API
@@ -18,6 +24,8 @@ const systemShareApiMap = {
   knowledge: knowledgeSystemShareApi,
   model: modelSystemShareApi,
   tool: toolSystemShareApi,
+  document: documentSystemShareApi,
+  paragraph: paragraphSystemShareApi,
 } as any
 
 // 资源管理 API

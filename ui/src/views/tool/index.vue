@@ -31,7 +31,7 @@ import useStore from '@/stores'
 const route = useRoute()
 const { folder, tool } = useStore()
 
-const type = computed(() => {
+const apiType = computed(() => {
   if (route.path.includes('shared')) {
     return 'systemShare'
   } else if (route.path.includes('resource-management')) {
@@ -41,7 +41,7 @@ const type = computed(() => {
   }
 })
 const permissionPrecise = computed(() => {
-  return permissionMap['tool'][type.value]
+  return permissionMap['tool'][apiType.value]
 })
 
 const loading = ref(false)

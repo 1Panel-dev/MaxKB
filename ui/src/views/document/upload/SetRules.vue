@@ -123,9 +123,9 @@ import { ref, computed, onMounted, reactive, watch } from 'vue'
 import ParagraphPreview from '@/views/knowledge/component/ParagraphPreview.vue'
 import { useRoute } from 'vue-router'
 import { cutFilename } from '@/utils/utils'
-import documentApi from '@/api/knowledge/document'
 import useStore from '@/stores'
 import type { KeyValue } from '@/api/type/common'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 const { knowledge } = useStore()
 const documentsFiles = computed(() => knowledge.documentsFiles)
 const splitPatternList = ref<Array<KeyValue<string, string>>>([])
@@ -133,6 +133,17 @@ const route = useRoute()
 const {
   query: { id }, // id为knowledgeID
 } = route as any
+
+const apiType = computed(() => {
+  if (route.path.includes('shared')) {
+    return 'systemShare'
+  } else if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
+
 const radio = ref('1')
 const loading = ref(false)
 const paragraphList = ref<any[]>([])
@@ -187,7 +198,7 @@ function splitDocument() {
       }
     })
   }
-  documentApi
+  loadSharedApi({ type: 'document', systemType: apiType.value })
     .postSplitDocument(id, fd)
     .then((res: any) => {
       const list = res.data
@@ -218,9 +229,11 @@ function splitDocument() {
 }
 
 const initSplitPatternList = () => {
-  documentApi.listSplitPattern(id, patternLoading).then((ok) => {
-    splitPatternList.value = ok.data
-  })
+  loadSharedApi({ type: 'document', systemType: apiType.value })
+    .listSplitPattern(id, patternLoading)
+    .then((ok) => {
+      splitPatternList.value = ok.data
+    })
 }
 
 watch(radio, () => {

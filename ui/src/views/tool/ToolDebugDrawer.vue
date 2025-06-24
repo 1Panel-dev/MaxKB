@@ -117,7 +117,7 @@ import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 const route = useRoute()
 
-const type = computed(() => {
+const apiType = computed(() => {
   if (route.path.includes('shared')) {
     return 'systemShare'
   } else if (route.path.includes('resource-management')) {
@@ -160,7 +160,7 @@ watch(debugVisible, (bool) => {
 const submit = async (formEl: FormInstance | undefined) => {
   const validate = formEl ? formEl.validate() : Promise.resolve()
   Promise.all([dynamicsFormRef.value?.validate(), validate]).then(() => {
-    loadSharedApi({ type: 'tool', systemType: type.value })
+    loadSharedApi({ type: 'tool', systemType: apiType.value })
       .postToolDebug(form.value, loading)
       .then((res: any) => {
         if (res.code === 500) {

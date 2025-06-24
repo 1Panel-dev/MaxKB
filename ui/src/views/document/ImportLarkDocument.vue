@@ -144,6 +144,7 @@ import { getImgUrl } from '@/utils/utils'
 import { t } from '@/locales'
 import type Node from 'element-plus/es/components/tree/src/model/node'
 import documentApi from '@/api/knowledge/document'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 const router = useRouter()
 const route = useRoute()

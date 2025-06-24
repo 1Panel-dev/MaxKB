@@ -66,7 +66,8 @@ const route = useRoute()
 const {
   params: { id }, // id为knowledgeID
 } = route as any
-const type = computed(() => {
+
+const apiType = computed(() => {
   if (route.path.includes('shared')) {
     return 'systemShare'
   } else if (route.path.includes('resource-management')) {
@@ -99,7 +100,7 @@ const loadTree = (node: any, resolve: any) => {
   console.log(node)
   if (node.isLeaf) return resolve([])
   const folder_id = node.level === 0 ? '' : node.data.id
-  loadSharedApi({ type: 'knowledge', systemType: type.value })
+  loadSharedApi({ type: 'knowledge', systemType: apiType.value })
     .getKnowledgeList(folder_id, loading)
     .then((res: any) => {
       resolve(res.data)

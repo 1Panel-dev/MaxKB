@@ -176,7 +176,9 @@
                 :description="item.desc"
                 class="cursor"
                 @click="
-                  router.push({ path: `/knowledge/${item.id}/${folder.currentFolder.id}/document` })
+                  router.push({
+                    path: `/knowledge/${item.id}/${folder.currentFolder.id || 'shared'}/document`,
+                  })
                 "
               >
                 <template #icon>
@@ -188,7 +190,7 @@
                   </el-text>
                 </template>
                 <template #tag>
-                  <el-tag v-if="isShared" type="info" class="info-tag">
+                  <el-tag v-if="isShared || isSystemShare" type="info" class="info-tag">
                     {{ t('views.system.shared.label') }}
                   </el-tag>
                 </template>
@@ -250,7 +252,7 @@
                             icon="Setting"
                             @click.stop="
                               router.push({
-                                path: `/knowledge/${item.id}/${folder.currentFolder.id}/setting`,
+                                path: `/knowledge/${item.id}/${folder.currentFolder.id || 'shared'}/setting`,
                               })
                             "
                             v-if="permissionPrecise.setting(item.id)"
@@ -295,7 +297,7 @@
 
   <component :is="currentCreateDialog" ref="CreateKnowledgeDialogRef" v-if="!isShared" />
   <CreateFolderDialog ref="CreateFolderDialogRef" v-if="!isShared" />
-  <GenerateRelatedDialog ref="GenerateRelatedDialogRef" />
+  <GenerateRelatedDialog ref="GenerateRelatedDialogRef" :apiType="apiType" />
   <SyncWebDialog ref="SyncWebDialogRef" v-if="!isShared" />
   <AuthorizedWorkspace
     ref="AuthorizedWorkspaceDialogRef"
@@ -328,7 +330,7 @@ const router = useRouter()
 const route = useRoute()
 const { folder, user, knowledge } = useStore()
 
-const type = computed(() => {
+const apiType = computed(() => {
   if (route.path.includes('shared')) {
     return 'systemShare'
   } else if (route.path.includes('resource-management')) {
@@ -338,14 +340,14 @@ const type = computed(() => {
   }
 })
 const permissionPrecise = computed(() => {
-  return permissionMap['knowledge'][type.value]
+  return permissionMap['knowledge'][apiType.value]
 })
 
 const isShared = computed(() => {
   return folder.currentFolder.id === 'share'
 })
 const isSystemShare = computed(() => {
-  return type.value === 'systemShare'
+  return apiType.value === 'systemShare'
 })
 
 const loading = ref(false)
@@ -365,7 +367,6 @@ const paginationConfig = reactive({
 })
 
 const knowledgeList = ref<any[]>([])
-const currentFolder = ref<any>({})
 
 const CreateKnowledgeDialogRef = ref()
 const currentCreateDialog = shallowRef<any>(null)
@@ -393,7 +394,7 @@ function openCreateDialog(data: any) {
 }
 
 function reEmbeddingKnowledge(row: any) {
-  loadSharedApi({ type: 'knowledge', systemType: type.value })
+  loadSharedApi({ type: 'knowledge', systemType: apiType.value })
     .putReEmbeddingKnowledge(row.id)
     .then(() => {
       MsgSuccess(t('common.submitSuccess'))
@@ -418,14 +419,14 @@ function openGenerateDialog(row: any) {
 }
 
 const exportKnowledge = (item: any) => {
-  loadSharedApi({ type: 'knowledge', systemType: type.value })
+  loadSharedApi({ type: 'knowledge', systemType: apiType.value })
     .exportKnowledge(item.name, item.id, loading)
     .then(() => {
       MsgSuccess(t('common.exportSuccess'))
     })
 }
 const exportZipKnowledge = (item: any) => {
-  loadSharedApi({ type: 'knowledge', systemType: type.value })
+  loadSharedApi({ type: 'knowledge', systemType: apiType.value })
     .exportZipKnowledge(item.name, item.id, loading)
     .then(() => {
       MsgSuccess(t('common.exportSuccess'))
@@ -442,7 +443,7 @@ function deleteKnowledge(row: any) {
     },
   )
     .then(() => {
-      loadSharedApi({ type: 'knowledge', systemType: type.value })
+      loadSharedApi({ type: 'knowledge', systemType: apiType.value })
         .delKnowledge(row.id, loading)
         .then(() => {
           const list = cloneDeep(knowledge.knowledgeList)
@@ -483,7 +484,7 @@ function getList() {
     [search_type.value]: search_form.value[search_type.value],
   }
   knowledge
-    .asyncGetKnowledgeListPage(paginationConfig, isShared.value, type.value, params, loading)
+    .asyncGetKnowledgeListPage(paginationConfig, isShared.value, apiType.value, params, loading)
     .then((res: any) => {
       paginationConfig.total = res.data?.total
       knowledge.setKnowledgeList([...knowledgeList.value, ...res.data.records])
@@ -495,7 +496,10 @@ function clickFolder(item: any) {
 }
 
 onMounted(() => {
-  if (type.value !== 'workspace') {
+  if (apiType.value !== 'workspace') {
+    folder.setCurrentFolder({
+      id: '',
+    })
     getList()
   }
 })

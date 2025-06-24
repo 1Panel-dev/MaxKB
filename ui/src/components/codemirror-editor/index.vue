@@ -57,7 +57,7 @@ const emit = defineEmits(['update:modelValue', 'submitDialog'])
 
 const route = useRoute()
 
-const type = computed(() => {
+const apiType = computed(() => {
   if (route.path.includes('shared')) {
     return 'systemShare'
   } else if (route.path.includes('resource-management')) {
@@ -88,7 +88,7 @@ function getRangeFromLineAndColumn(state: any, line: number, column: number, end
 
 const regexpLinter = linter(async (view) => {
   const diagnostics: Diagnostic[] = []
-  await loadSharedApi({ type: 'tool', systemType: type.value })
+  await loadSharedApi({ type: 'tool', systemType: apiType.value })
     .postPylint(view.state.doc.toString())
     .then((ok: any) => {
       ok.data.forEach((element: any) => {

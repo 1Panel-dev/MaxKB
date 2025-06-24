@@ -7,17 +7,17 @@
           <div class="flex-between">
             <div>
               <el-button type="primary" @click="createProblem"
-                v-if="permissionPrecise.problem_create(id)"  
+                v-if="permissionPrecise.problem_create(id)"
               >
                 {{ $t('views.problem.createProblem') }}
               </el-button>
               <el-button @click="relateProblem()" :disabled="multipleSelection.length === 0"
-                v-if="permissionPrecise.problem_relate(id)"  
+                v-if="permissionPrecise.problem_relate(id)"
               >
                 {{ $t('views.problem.relateParagraph.title') }}
               </el-button>
               <el-button @click="deleteMulDocument" :disabled="multipleSelection.length === 0"
-                v-if="permissionPrecise.problem_delete(id)"  
+                v-if="permissionPrecise.problem_delete(id)"
               >
                 {{ $t('views.problem.setting.batchDelete') }}
               </el-button>
@@ -160,9 +160,12 @@ import permissionMap from '@/permission'
 
 
 const route = useRoute()
+const {
+  params: { id }, // 知识库id
+} = route as any
 const { folder, user } = useStore()
 
-const type = computed(() => {
+const apiType = computed(() => {
   if (route.path.includes('shared')) {
     return 'systemShare'
   } else if (route.path.includes('resource-management')) {
@@ -172,11 +175,9 @@ const type = computed(() => {
   }
 })
 const permissionPrecise = computed(() => {
-  return permissionMap['knowledge'][type.value]
+  return permissionMap['knowledge'][apiType.value]
 })
-const {
-  params: { id }, // 知识库id
-} = route as any
+
 
 const { problem } = useStore()
 

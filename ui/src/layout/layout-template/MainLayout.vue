@@ -23,9 +23,12 @@ import AppMain from '@/layout/app-main/index.vue'
 import useStore from '@/stores'
 import { useRoute } from 'vue-router'
 const route = useRoute()
+const {
+  params: { folderId }, // id为knowledgeID
+} = route as any
 
 const isShared = computed(() => {
-  return route.path.endsWith('hared') || route.name.includes('ResourceManagement')
+  return folderId === 'shared' || route.name.includes('ResourceManagement')
 })
 const { theme } = useStore()
 const isDefaultTheme = computed(() => {

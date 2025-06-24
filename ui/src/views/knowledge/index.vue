@@ -30,8 +30,7 @@ import { useRoute } from 'vue-router'
 import useStore from '@/stores'
 const route = useRoute()
 const { folder, knowledge } = useStore()
-
-const type = computed(() => {
+const apiType = computed(() => {
   if (route.path.includes('shared')) {
     return 'systemShare'
   } else if (route.path.includes('resource-management')) {
@@ -41,7 +40,7 @@ const type = computed(() => {
   }
 })
 const permissionPrecise = computed(() => {
-  return permissionMap['knowledge'][type.value]
+  return permissionMap['knowledge'][apiType.value]
 })
 const loading = ref(false)
 

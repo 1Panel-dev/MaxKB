@@ -22,7 +22,7 @@
                   shadow="never"
                   class="mb-8 w-full"
                   style="line-height: 22px"
-                  v-if="detail.type === 0"
+                  v-if="detail?.type === 0"
                 >
                   <div class="flex align-center">
                     <el-avatar class="mr-8 avatar-blue" shape="square" :size="32">
@@ -78,7 +78,7 @@
               <el-form-item
                 :label="$t('views.knowledge.form.source_url.label')"
                 prop="source_url"
-                v-if="detail.type === 1"
+                v-if="detail?.type === 1"
               >
                 <el-input
                   v-model="form.source_url"
@@ -88,7 +88,7 @@
               </el-form-item>
               <el-form-item
                 :label="$t('views.knowledge.form.selector.label')"
-                v-if="detail.type === 1"
+                v-if="detail?.type === 1"
               >
                 <el-input
                   v-model="form.selector"
@@ -96,7 +96,7 @@
                   @blur="form.selector = form.selector.trim()"
                 />
               </el-form-item>
-              <el-form-item label="App ID" prop="app_id" v-if="detail.type === 2">
+              <el-form-item label="App ID" prop="app_id" v-if="detail?.type === 2">
                 <el-input
                   v-model="form.app_id"
                   :placeholder="
@@ -104,7 +104,7 @@
                   "
                 />
               </el-form-item>
-              <el-form-item label="App Secret" prop="app_id" v-if="detail.type === 2">
+              <el-form-item label="App Secret" prop="app_id" v-if="detail?.type === 2">
                 <el-input
                   v-model="form.app_secret"
                   type="password"
@@ -114,7 +114,7 @@
                   "
                 />
               </el-form-item>
-              <el-form-item label="Folder Token" prop="folder_token" v-if="detail.type === 2">
+              <el-form-item label="Folder Token" prop="folder_token" v-if="detail?.type === 2">
                 <el-input
                   v-model="form.folder_token"
                   :placeholder="
@@ -123,7 +123,7 @@
                 />
               </el-form-item>
 
-              <div v-if="detail.type === 0">
+              <div v-if="detail?.type === 0">
                 <h4 class="title-decoration-1 mb-16">
                   {{ $t('common.otherSetting') }}
                 </h4>
@@ -173,7 +173,7 @@ const {
   params: { id },
 } = route as any
 
-const type = computed(() => {
+const apiType = computed(() => {
   if (route.path.includes('shared')) {
     return 'systemShare'
   } else if (route.path.includes('resource-management')) {
@@ -248,20 +248,20 @@ async function submit() {
           })
             .then(() => {
               if (detail.value.type === 2) {
-                loadSharedApi({ type: 'knowledge', systemType: type.value })
+                loadSharedApi({ type: 'knowledge', systemType: apiType.value })
                   .putLarkKnowledge(id, obj, loading)
                   .then(() => {
-                    loadSharedApi({ type: 'knowledge', systemType: type.value })
+                    loadSharedApi({ type: 'knowledge', systemType: apiType.value })
                       .putReEmbeddingKnowledge(id)
                       .then(() => {
                         MsgSuccess(t('common.saveSuccess'))
                       })
                   })
               } else {
-                loadSharedApi({ type: 'knowledge', systemType: type.value })
+                loadSharedApi({ type: 'knowledge', systemType: apiType.value })
                   .putKnowledge(id, obj, loading)
                   .then(() => {
-                    loadSharedApi({ type: 'knowledge', systemType: type.value })
+                    loadSharedApi({ type: 'knowledge', systemType: apiType.value })
                       .putReEmbeddingKnowledge(id)
                       .then(() => {
                         MsgSuccess(t('common.saveSuccess'))
@@ -272,17 +272,17 @@ async function submit() {
             .catch(() => {})
         } else {
           if (detail.value.type === 2) {
-            loadSharedApi({ type: 'knowledge', systemType: type.value })
+            loadSharedApi({ type: 'knowledge', systemType: apiType.value })
               .putLarkKnowledge(id, obj, loading)
               .then(() => {
-                loadSharedApi({ type: 'knowledge', systemType: type.value })
+                loadSharedApi({ type: 'knowledge', systemType: apiType.value })
                   .putReEmbeddingKnowledge(id)
                   .then(() => {
                     MsgSuccess(t('common.saveSuccess'))
                   })
               })
           } else {
-            loadSharedApi({ type: 'knowledge', systemType: type.value })
+            loadSharedApi({ type: 'knowledge', systemType: apiType.value })
               .putKnowledge(id, obj, loading)
               .then(() => {
                 MsgSuccess(t('common.saveSuccess'))
@@ -295,12 +295,12 @@ async function submit() {
 }
 
 function getDetail() {
-  loadSharedApi({ type: 'knowledge', systemType: type.value })
+  loadSharedApi({ type: 'knowledge', systemType: apiType.value })
     .getKnowledgeDetail(id, loading)
     .then((res: any) => {
       detail.value = res.data
       cloneModelId.value = res.data?.embedding_model_id
-      if (detail.value.type === '1' || detail.value.type === '2') {
+      if (detail.value?.type === 1 || detail.value?.type === 2) {
         form.value = res.data.meta
       }
     })

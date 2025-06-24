@@ -202,6 +202,7 @@ import { MsgError } from '@/utils/message'
 import documentApi from '@/api/resource-management/document'
 import useStore from '@/stores/modules-resource-management'
 import { t } from '@/locales'
+
 const { knowledge } = useStore()
 const documentsFiles = computed(() => knowledge.documentsFiles)
 const documentsType = computed(() => knowledge.documentsType)

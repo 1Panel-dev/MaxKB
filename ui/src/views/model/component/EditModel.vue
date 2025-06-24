@@ -134,7 +134,7 @@ import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 const route = useRoute()
 
-const type = computed(() => {
+const apiType = computed(() => {
   if (route.path.includes('shared')) {
     return 'systemShare'
   } else if (route.path.includes('resource-management')) {
@@ -222,7 +222,7 @@ const list_base_model = (model_type: any, change?: boolean) => {
 }
 const open = (provider: Provider, model: Model) => {
   modelValue.value = model
-  loadSharedApi({ type: 'model', systemType: type.value })
+  loadSharedApi({ type: 'model', systemType: apiType.value })
     .getModelById(model.id, formLoading)
     .then((ok: any) => {
       modelValue.value = ok.data
@@ -255,7 +255,7 @@ const close = () => {
 const submit = () => {
   dynamicsFormRef.value?.validate().then(() => {
     if (modelValue.value) {
-      loadSharedApi({ type: 'model', systemType: type.value })
+      loadSharedApi({ type: 'model', systemType: apiType.value })
         .updateModel(
           modelValue.value.id,
           {

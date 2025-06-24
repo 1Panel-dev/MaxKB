@@ -252,7 +252,7 @@ import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 const route = useRoute()
 
-const type = computed(() => {
+const apiType = computed(() => {
   if (route.path.includes('shared')) {
     return 'systemShare'
   } else if (route.path.includes('resource-management')) {
@@ -390,7 +390,7 @@ const submit = () => {
     ?.validate()
     .then(() => {
       if (providerValue.value) {
-        loadSharedApi({ type: 'model', systemType: type.value })
+        loadSharedApi({ type: 'model', systemType: apiType.value })
           .createModel(
             {
               ...base_form_data.value,

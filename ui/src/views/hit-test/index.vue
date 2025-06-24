@@ -230,7 +230,7 @@ const {
   meta: { activeMenu },
   params: { id },
 } = route as any
-const type = computed(() => {
+const apiType = computed(() => {
   if (route.path.includes('shared')) {
     return 'systemShare'
   } else if (route.path.includes('resource-management')) {
@@ -324,7 +324,7 @@ function getHitTestList() {
     ...formInline.value,
   }
   if (isDataset.value) {
-    loadSharedApi({ type: 'knowledge', systemType: type.value })
+    loadSharedApi({ type: 'knowledge', systemType: apiType.value })
       .putKnowledgeHitTest(id, obj, loading)
       .then((res: any) => {
         paragraphDetail.value = res.data && arraySort(res.data, 'comprehensive_score', true)

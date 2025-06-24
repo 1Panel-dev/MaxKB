@@ -264,10 +264,13 @@ import useStore from '@/stores'
 import permissionMap from '@/permission'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
+const props = defineProps({
+  title: String,
+})
 const route = useRoute()
 const { folder, user } = useStore()
 
-const type = computed(() => {
+const apiType = computed(() => {
   if (route.path.includes('shared')) {
     return 'systemShare'
   } else if (route.path.includes('resource-management')) {
@@ -277,12 +280,10 @@ const type = computed(() => {
   }
 })
 const permissionPrecise = computed(() => {
-  return permissionMap['tool'][type.value]
+  return permissionMap['tool'][apiType.value]
 })
 
-const props = defineProps({
-  title: String,
-})
+
 
 const emit = defineEmits(['refresh'])
 const FieldFormDialogRef = ref()
@@ -424,7 +425,7 @@ const submit = async (formEl: FormInstance | undefined) => {
   await formEl.validate((valid: any) => {
     if (valid) {
       if (isEdit.value) {
-        loadSharedApi({ type: 'tool', systemType: type.value })
+        loadSharedApi({ type: 'tool', systemType: apiType.value })
           .putTool(form.value?.id as string, form.value, loading)
           .then((res: any) => {
             MsgSuccess(t('common.editSuccess'))
@@ -436,7 +437,7 @@ const submit = async (formEl: FormInstance | undefined) => {
           folder_id: folder.currentFolder?.id,
           ...form.value,
         }
-        loadSharedApi({ type: 'tool', systemType: type.value })
+        loadSharedApi({ type: 'tool', systemType: apiType.value })
           .postTool(obj, loading)
           .then((res: any) => {
             MsgSuccess(t('common.createSuccess'))

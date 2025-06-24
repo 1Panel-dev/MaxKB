@@ -196,24 +196,37 @@
 </template>
 <script setup lang="ts">
 import { ref, reactive, onUnmounted, onMounted, computed, watch, nextTick } from 'vue'
+import { useRoute } from 'vue-router'
 import type { UploadFiles } from 'element-plus'
 import { filesize, getImgUrl, isRightType } from '@/utils/utils'
 import { MsgError } from '@/utils/message'
-import documentApi from '@/api/knowledge/document'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import useStore from '@/stores'
 import { t } from '@/locales'
+
+const route = useRoute()
+
+const apiType = computed(() => {
+  if (route.path.includes('shared')) {
+    return 'systemShare'
+  } else if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
 const { knowledge } = useStore()
 const documentsFiles = computed(() => knowledge.documentsFiles)
 const documentsType = computed(() => knowledge.documentsType)
 const form = ref({
   fileType: 'txt',
-  fileList: [] as any
+  fileList: [] as any,
 })
 
 const rules = reactive({
   fileList: [
-    { required: true, message: t('views.document.upload.requiredMessage'), trigger: 'change' }
-  ]
+    { required: true, message: t('views.document.upload.requiredMessage'), trigger: 'change' },
+  ],
 })
 const FormRef = ref()
 
@@ -223,16 +236,16 @@ watch(form.value, (value) => {
 })
 
 function downloadTemplate(type: string) {
-  documentApi.exportQATemplate(
+  loadSharedApi({ type: 'document', systemType: apiType.value }).exportQATemplate(
     `${type}${t('views.document.upload.template')}.${type == 'csv' ? type : 'xlsx'}`,
-    type
+    type,
   )
 }
 
 function downloadTableTemplate(type: string) {
-  documentApi.exportTableTemplate(
+  loadSharedApi({ type: 'document', systemType: apiType.value }).exportTableTemplate(
     `${type}${t('views.document.upload.template')}.${type == 'csv' ? type : 'xlsx'}`,
-    type
+    type,
   )
 }
 
@@ -303,13 +316,13 @@ onMounted(() => {
 onUnmounted(() => {
   form.value = {
     fileType: 'txt',
-    fileList: []
+    fileList: [],
   }
 })
 
 defineExpose({
   validate,
-  form
+  form,
 })
 </script>
 <style scoped lang="scss">
@@ -323,5 +336,4 @@ defineExpose({
     color: var(--el-color-primary-light-5);
   }
 }
-
 </style>

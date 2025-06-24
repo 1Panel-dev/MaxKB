@@ -204,7 +204,7 @@ const deleteModel = () => {
 }
 
 const cancelDownload = () => {
-  loadSharedApi({ type: 'model', systemType: type.value })
+  loadSharedApi({ type: 'model', systemType: apiType.value })
     .pauseDownload(props.model.id)
     .then(() => {
       downModel.value = undefined
@@ -227,7 +227,7 @@ const icon = computed(() => {
 const initInterval = () => {
   interval = setInterval(() => {
     if (currentModel.value.status === 'DOWNLOAD') {
-      loadSharedApi({ type: 'model', systemType: type.value })
+      loadSharedApi({ type: 'model', systemType: apiType.value })
         .getModelMetaById(props.model.id)
         .then((ok: any) => {
           downModel.value = ok.data

@@ -68,11 +68,11 @@
 
     <ParagraphDialog ref="ParagraphDialogRef" :title="title" @refresh="refresh" />
     <SelectDocumentDialog ref="SelectDocumentDialogRef" @refresh="refreshMigrateParagraph" />
-    <GenerateRelatedDialog ref="GenerateRelatedDialogRef" @refresh="refresh" />
+    <GenerateRelatedDialog ref="GenerateRelatedDialogRef" @refresh="refresh" :apiType="apiType" />
   </el-card>
 </template>
 <script setup lang="ts">
-import { ref, useSlots } from 'vue'
+import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { t } from '@/locales'
 import useStore from '@/stores'
@@ -80,17 +80,21 @@ import GenerateRelatedDialog from '@/components/generate-related-dialog/index.vu
 import ParagraphDialog from '@/views/paragraph/component/ParagraphDialog.vue'
 import SelectDocumentDialog from '@/views/paragraph/component/SelectDocumentDialog.vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
-
+const props = defineProps<{
+  data: any
+  disabled?: boolean
+}>()
 const { paragraph } = useStore()
 
 const route = useRoute()
 const {
   params: { id, documentId },
+  query: { type },
 } = route as any
-const props = defineProps<{
-  data: any
-  disabled?: boolean
-}>()
+
+const apiType = computed(() => {
+  return type as 'systemShare' | 'workspace' | 'systemManage'
+})
 
 const emit = defineEmits(['changeState', 'deleteParagraph', 'refresh', 'refreshMigrateParagraph'])
 const loading = ref(false)

@@ -95,7 +95,7 @@ const props = defineProps<{
 
 const route = useRoute()
 
-const type = computed(() => {
+const apiType = computed(() => {
   if (route.path.includes('shared')) {
     return 'systemShare'
   } else if (route.path.includes('resource-management')) {
@@ -112,7 +112,7 @@ const AddParamRef = ref()
 const open = () => {
   dialogVisible.value = true
   loading.value = true
-  loadSharedApi({ type: 'model', systemType: type.value })
+  loadSharedApi({ type: 'model', systemType: apiType.value })
     .getModelParamsForm(props.model.id, loading)
     .then((ok: any) => {
       loading.value = false
@@ -164,7 +164,7 @@ function refresh(data: any, index: any) {
 }
 
 function submit() {
-  loadSharedApi({ type: 'model', systemType: type.value })
+  loadSharedApi({ type: 'model', systemType: apiType.value })
     .updateModelParamsForm(props.model.id, modelParamsForm.value, loading)
     .then((ok: any) => {
       MsgSuccess(t('views.model.tip.saveSuccessMessage'))

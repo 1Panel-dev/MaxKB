@@ -150,9 +150,9 @@ const systemRouter = {
                 [RoleConst.ADMIN],
                 [PermissionConst.SHARED_TOOL_READ],
                 [EditionConst.IS_EE],
-                'OR'
-              )
-            ]
+                'OR',
+              ),
+            ],
           },
           component: () => import('@/views/system-shared/ToolSharedIndex.vue'),
         },
@@ -169,9 +169,9 @@ const systemRouter = {
                 [RoleConst.ADMIN],
                 [PermissionConst.SHARED_MODEL_READ],
                 [EditionConst.IS_EE],
-                'OR'
-              )
-            ]
+                'OR',
+              ),
+            ],
           },
           component: () => import('@/views/system-shared/ModelSharedIndex.vue'),
         },

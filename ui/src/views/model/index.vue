@@ -131,7 +131,7 @@ import permissionMap from '@/permission'
 
 const route = useRoute()
 
-const type = computed(() => {
+const apiType = computed(() => {
   if (route.path.includes('shared')) {
     return 'systemShare'
   } else if (route.path.includes('resource-management')) {
@@ -141,10 +141,10 @@ const type = computed(() => {
   }
 })
 const permissionPrecise = computed(() => {
-  return permissionMap['model'][type.value]
+  return permissionMap['model'][apiType.value]
 })
 const isSystemShare = computed(() => {
-  return type.value === 'systemShare'
+  return apiType.value === 'systemShare'
 })
 const commonList1 = ref()
 const commonList2 = ref()
@@ -202,7 +202,7 @@ const openCreateModel = (provider?: Provider, model_type?: string) => {
 
 const list_model = () => {
   const params = active_provider.value?.provider ? { provider: active_provider.value.provider } : {}
-  loadSharedApi({ type: 'model', isShared: isShared.value, systemType: type.value })
+  loadSharedApi({ type: 'model', isShared: isShared.value, systemType: apiType.value })
     .getModel({ ...model_search_form.value, ...params }, list_model_loading)
     .then((ok: any) => {
       model_list.value = ok.data

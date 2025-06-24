@@ -134,14 +134,13 @@
     </el-card>
     <ParagraphDialog ref="ParagraphDialogRef" :title="title" @refresh="refresh" />
     <SelectDocumentDialog ref="SelectDocumentDialogRef" @refresh="refreshMigrateParagraph" />
-    <GenerateRelatedDialog ref="GenerateRelatedDialogRef" @refresh="refresh" />
+    <GenerateRelatedDialog ref="GenerateRelatedDialogRef" @refresh="refresh" :apiType="apiType" />
   </div>
 </template>
 <script setup lang="ts">
 import { reactive, ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { cloneDeep } from 'lodash'
-import documentApi from '@/api/resource-management/document'
 import paragraphApi from '@/api/resource-management/paragraph'
 import ParagraphDialog from './component/ParagraphDialog.vue'
 import ParagraphCard from './component/ParagraphCard.vue'
@@ -149,13 +148,17 @@ import SelectDocumentDialog from './component/SelectDocumentDialog.vue'
 import GenerateRelatedDialog from '@/components/generate-related-dialog/index.vue'
 import { VueDraggable } from 'vue-draggable-plus'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
-import useStore from '@/stores/modules-resource-management'
 import { t } from '@/locales'
-const { paragraph } = useStore()
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 const route = useRoute()
 const {
   params: { id, documentId },
+  query: { type },
 } = route as any
+
+const apiType = computed(() => {
+  return type as 'systemShare' | 'workspace' | 'systemManage'
+})
 
 const SelectDocumentDialogRef = ref()
 const ParagraphDialogRef = ref()
@@ -254,9 +257,11 @@ function addParagraph() {
 }
 
 function getDetail() {
-  documentApi.getDocumentDetail(id, documentId, loading).then((res) => {
-    documentDetail.value = res.data
-  })
+  loadSharedApi({ type: 'document', systemType: apiType.value })
+    .getDocumentDetail(id, documentId, loading)
+    .then((res) => {
+      documentDetail.value = res.data
+    })
 }
 
 function getParagraphList() {

@@ -42,7 +42,7 @@ import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { t } from '@/locales'
 
 const route = useRoute()
-const type = computed(() => {
+const apiType = computed(() => {
   if (route.path.includes('shared')) {
     return 'systemShare'
   } else if (route.path.includes('resource-management')) {
@@ -70,7 +70,7 @@ const open = (id: string) => {
 }
 
 const submit = () => {
-  loadSharedApi({ type: 'knowledge', systemType: type.value })
+  loadSharedApi({ type: 'knowledge', systemType: apiType.value })
     .putSyncWebKnowledge(knowledgeId.value, method.value, loading)
     .then((res: any) => {
       emit('refresh', res.data)
