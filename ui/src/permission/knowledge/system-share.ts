@@ -20,7 +20,10 @@ const share = {
   doc_sync: () => false,
   doc_delete: () => false,
   doc_export: () => false,
-
+  
+  problem_create: () => false,
+  problem_relate: () => false,
+  problem_delete: () => false,
   
 }
 export default share
