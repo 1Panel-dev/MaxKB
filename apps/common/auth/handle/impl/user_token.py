@@ -242,7 +242,7 @@ def get_role_list(user,
                                               workspace_user_role_mapping.workspace_id)
                          for
                          workspace_user_role_mapping in
-                         workspace_user_role_mapping_list] + [user.role]
+                         workspace_user_role_mapping_list]
             cache.set(key, workspace_list, version=version)
             return role_list
         else:
