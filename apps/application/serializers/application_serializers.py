@@ -1325,6 +1325,8 @@ class ApplicationSerializer(serializers.Serializer):
         def get_mcp_servers(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
+                if '"stdio"' in self.data.get('mcp_servers'):
+                    raise AppApiException(500, _('stdio is not supported'))
             servers = json.loads(self.data.get('mcp_servers'))
 
             async def get_mcp_tools(servers):

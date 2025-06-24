@@ -219,7 +219,7 @@ class BaseChatNode(IChatNode):
         message_list = self.generate_message_list(system, prompt, history_message)
         self.context['message_list'] = message_list
 
-        if mcp_enable and mcp_servers is not None:
+        if mcp_enable and mcp_servers is not None and '"stdio"' not in mcp_servers:
             r = mcp_response_generator(chat_model, message_list, mcp_servers)
             return NodeResult(
                 {'result': r, 'chat_model': chat_model, 'message_list': message_list,
