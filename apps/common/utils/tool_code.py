@@ -46,6 +46,7 @@ try:
     path_to_exclude = '/opt/py3/lib/python3.11/site-packages'
     sys.path = [p for p in sys.path if p != path_to_exclude]
     sys.path.append('/opt/maxkb-app/sandbox/python-packages')
+    sys.path.append('/opt/maxkb/python-packages')
     env = dict(os.environ)
     for key in list(env.keys()):
         if key in os.environ and (key.startswith('MAXKB') or key.startswith('POSTGRES') or key.startswith('PG')):

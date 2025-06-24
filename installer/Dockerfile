@@ -57,7 +57,6 @@ ENV MAXKB_VERSION="${DOCKER_IMAGE_TAG} (build at ${BUILD_AT}, commit: ${GITHUB_C
     MAXKB_SANDBOX=1 \
     PATH=/opt/py3/bin:$PATH \
     PIP_TARGET=/opt/maxkb/python-packages \
-    PYTHONPATH=/opt/maxkb/python-packages \
     PYTHONUNBUFFERED=1
 
 WORKDIR /opt/maxkb-app
