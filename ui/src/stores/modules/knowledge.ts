@@ -6,6 +6,7 @@ import { type Ref } from 'vue'
 import useUserStore from './user'
 import useFolderStore from './folder'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import knowledgeApi from '@/api/knowledge/knowledge'
 
 export interface knowledgeStateTypes {
   baseInfo: knowledgeData | null
@@ -41,7 +42,7 @@ const useKnowledgeStore = defineStore('knowledge', {
     },
     async asyncGetKnowledgeListPage(
       page: pageRequest,
-      isShared?: boolean | undefined,
+      isShared: boolean | undefined,
       systemType: 'systemShare' | 'workspace' | 'systemManage' = 'workspace',
       paramsData: any,
       loading?: Ref<boolean>,

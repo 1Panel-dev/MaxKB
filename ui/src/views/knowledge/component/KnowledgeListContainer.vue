@@ -90,7 +90,7 @@
                   </div>
                 </div>
               </el-dropdown-item>
-              <el-dropdown-item>
+              <!-- <el-dropdown-item>
                 <div class="flex">
                   <el-avatar
                     class="avatar-purple mt-4"
@@ -109,7 +109,7 @@
                     </el-text>
                   </div>
                 </div>
-              </el-dropdown-item>
+              </el-dropdown-item> -->
               <el-dropdown-item @click="openCreateFolder" divided>
                 <div class="flex align-center">
                   <AppIcon iconName="app-folder" style="font-size: 32px"></AppIcon>
@@ -283,7 +283,7 @@
   </ContentContainer>
 
   <component :is="currentCreateDialog" ref="CreateKnowledgeDialogRef" v-if="!isShared" />
-  <CreateFolderDialog ref="CreateFolderDialogRef" @refresh="refreshFolder" v-if="!isShared" />
+  <CreateFolderDialog ref="CreateFolderDialogRef"  v-if="!isShared" />
   <GenerateRelatedDialog ref="GenerateRelatedDialogRef" />
   <SyncWebDialog ref="SyncWebDialogRef" v-if="!isShared" />
 </template>
