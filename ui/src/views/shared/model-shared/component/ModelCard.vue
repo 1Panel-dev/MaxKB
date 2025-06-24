@@ -141,7 +141,7 @@ import useStore from '@/stores'
 import ParamSettingDialog from './ParamSettingDialog.vue'
 import { t } from '@/locales'
 import { PermissionConst, EditionConst, RoleConst } from '@/utils/permission/data'
-import AuthorizedWorkspace from '@/views/shared/AuthorizedWorkspaceDialog.vue'
+import AuthorizedWorkspace from '@/views/system-shared/AuthorizedWorkspaceDialog.vue'
 
 const props = defineProps<{
   model: Model

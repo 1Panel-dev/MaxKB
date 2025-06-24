@@ -309,14 +309,14 @@ import { useRoute } from 'vue-router'
 import InitParamDrawer from '@/views/tool/component/InitParamDrawer.vue'
 import ToolFormDrawer from '@/views/tool/ToolFormDrawer.vue'
 import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
-import AuthorizedWorkspace from '@/views/shared/AuthorizedWorkspaceDialog.vue'
+import AuthorizedWorkspace from '@/views/system-shared/AuthorizedWorkspaceDialog.vue'
 import { isAppIcon } from '@/utils/common'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import { EditionConst, PermissionConst, RoleConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
 import { FolderSource } from '@/enums/common'
-import ToolStoreDialog from '@/views/tool/component/ToolStoreDialog.vue'
-import AddInternalFunctionDialog from '@/views/tool/component/AddInternalFunctionDialog.vue'
+import ToolStoreDialog from '@/views/tool/toolStore/ToolStoreDialog.vue'
+import AddInternalFunctionDialog from '@/views/tool/toolStore/AddInternalFunctionDialog.vue'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import permissionMap from '@/permission'
 import useStore from '@/stores'
@@ -386,7 +386,7 @@ function openCreateDialog(data?: any) {
   if (data) {
     loadSharedApi({ type: 'tool', systemType: type.value })
       .getToolById(data?.id, loading)
-      .then((res) => {
+      .then((res：) => {
         ToolFormDrawerRef.value.open(res.data)
       })
   } else {

@@ -74,7 +74,7 @@ import EditModel from '@/views/shared/model-shared/component/EditModel.vue'
 import { MsgConfirm } from '@/utils/message'
 import { modelType } from '@/enums/model'
 import useStore from '@/stores'
-import AuthorizedWorkspace from '@/views/shared/AuthorizedWorkspaceDialog.vue'
+import AuthorizedWorkspace from '@/views/system-shared/AuthorizedWorkspaceDialog.vue'
 import ParamSettingDialog from './ParamSettingDialog.vue'
 import { t } from '@/locales'
 

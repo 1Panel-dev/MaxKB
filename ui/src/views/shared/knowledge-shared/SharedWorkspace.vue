@@ -140,7 +140,7 @@ import useStore from '@/stores/modules-shared-system'
 import { numberFormat } from '@/utils/common'
 import { t } from '@/locales'
 import { useRouter } from 'vue-router'
-import AuthorizedWorkspace from '@/views/shared/AuthorizedWorkspaceDialog.vue'
+import AuthorizedWorkspace from '@/views/system-shared/AuthorizedWorkspaceDialog.vue'
 
 const router = useRouter()
 const { folder } = useStore()
