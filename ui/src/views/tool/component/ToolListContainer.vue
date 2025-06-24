@@ -115,7 +115,7 @@
         @load="getList"
         :loading="loading"
       >
-        <el-row v-if="tool.toolList.length > 0" :gutter="15">
+        <el-row v-if="tool.toolList.length > 0" :gutter="15" class="w-full">
           <template v-for="(item, index) in tool.toolList" :key="index">
             <el-col
               v-if="item.resource_type === 'folder'"
@@ -304,7 +304,6 @@
 <script lang="ts" setup>
 import { onMounted, ref, reactive, computed, watch } from 'vue'
 import { cloneDeep, get } from 'lodash'
-import ToolApi from '@/api/tool/tool'
 import { useRoute } from 'vue-router'
 import InitParamDrawer from '@/views/tool/component/InitParamDrawer.vue'
 import ToolFormDrawer from '@/views/tool/ToolFormDrawer.vue'
@@ -407,7 +406,8 @@ async function changeState(row: any) {
       const obj = {
         is_active: !row.is_active,
       }
-      ToolApi.putTool(row.id, obj, changeStateloading)
+      loadSharedApi({ type: 'tool', systemType: type.value })
+        .putTool(row.id, obj, changeStateloading)
         .then(() => {
           const list = cloneDeep(tool.toolList)
           const index = list.findIndex((v) => v.id === row.id)
@@ -513,7 +513,7 @@ function deleteTool(row: any) {
 function configInitParams(item: any) {
   loadSharedApi({ type: 'tool', systemType: type.value })
     .getToolById(item?.id, changeStateloading)
-    .then((res) => {
+    .then((res: any) => {
       InitParamDrawerRef.value.open(res.data)
     })
 }
@@ -532,7 +532,7 @@ function confirmAddInternalFunction(data?: any, isEdit?: boolean) {
   if (isEdit) {
     loadSharedApi({ type: 'tool', systemType: type.value })
       .putTool(data?.id as string, { name: data.name }, loading)
-      .then((res) => {
+      .then((res: any) => {
         MsgSuccess(t('common.saveSuccess'))
         refresh()
       })

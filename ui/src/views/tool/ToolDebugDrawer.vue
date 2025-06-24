@@ -109,11 +109,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue'
-import ToolApi from '@/api/tool/tool'
+import { ref, reactive, watch, computed } from 'vue'
 import type { FormInstance } from 'element-plus'
+import { useRoute } from 'vue-router'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
+const route = useRoute()
+
+const type = computed(() => {
+  if (route.path.includes('shared')) {
+    return 'systemShare'
+  } else if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
 const FormRef = ref()
 const dynamicsFormRef = ref()
 const loading = ref(false)
@@ -148,17 +160,19 @@ watch(debugVisible, (bool) => {
 const submit = async (formEl: FormInstance | undefined) => {
   const validate = formEl ? formEl.validate() : Promise.resolve()
   Promise.all([dynamicsFormRef.value?.validate(), validate]).then(() => {
-    ToolApi.postToolDebug(form.value, loading).then((res) => {
-      if (res.code === 500) {
-        showResult.value = true
-        isSuccess.value = false
-        result.value = res.message
-      } else {
-        showResult.value = true
-        isSuccess.value = true
-        result.value = res.data
-      }
-    })
+    loadSharedApi({ type: 'tool', systemType: type.value })
+      .postToolDebug(form.value, loading)
+      .then((res: any) => {
+        if (res.code === 500) {
+          showResult.value = true
+          isSuccess.value = false
+          result.value = res.message
+        } else {
+          showResult.value = true
+          isSuccess.value = true
+          result.value = res.data
+        }
+      })
   })
 }
 

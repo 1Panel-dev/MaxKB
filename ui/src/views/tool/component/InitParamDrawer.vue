@@ -27,14 +27,27 @@
 </template>
 
 <script setup lang="ts">
-import {ref, watch} from 'vue'
-import ToolApi from '@/api/tool/tool'
+import { ref, watch, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
-import {MsgSuccess} from '@/utils/message'
-import {t} from '@/locales'
-import {cloneDeep} from 'lodash'
+import { MsgSuccess } from '@/utils/message'
+import { t } from '@/locales'
+import { cloneDeep } from 'lodash'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 const emit = defineEmits(['refresh'])
+
+const route = useRoute()
+
+const type = computed(() => {
+  if (route.path.includes('shared')) {
+    return 'systemShare'
+  } else if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
 
 const dynamicsFormRef = ref()
 const loading = ref(false)
@@ -55,11 +68,13 @@ watch(debugVisible, (bool) => {
 
 const submit = async () => {
   dynamicsFormRef.value.validate().then(() => {
-    ToolApi.putTool(form.value?.id as string, form.value, loading).then((res) => {
-      MsgSuccess(t('common.editSuccess'))
-      emit('refresh')
-      debugVisible.value = false
-    })
+    loadSharedApi({ type: 'tool', systemType: type.value })
+      .putTool(form.value?.id as string, form.value, loading)
+      .then((res: any) => {
+        MsgSuccess(t('common.editSuccess'))
+        emit('refresh')
+        debugVisible.value = false
+      })
   })
 }
 
@@ -71,12 +86,12 @@ const open = (data: any, is_active: boolean) => {
   const init_params = form.value.init_field_list
     .map((item: any) => {
       if (item.show_default_value === false) {
-        return {[item.field]: undefined}
+        return { [item.field]: undefined }
       }
-      return {[item.field]: item.default_value}
+      return { [item.field]: item.default_value }
     })
-    .reduce((x: any, y: any) => ({...x, ...y}), {})
-  form.value.init_params = {...init_params, ...form.value.init_params}
+    .reduce((x: any, y: any) => ({ ...x, ...y }), {})
+  form.value.init_params = { ...init_params, ...form.value.init_params }
   debugVisible.value = true
 }
 

@@ -21,7 +21,7 @@
         />
       </div>
       <TopMenu></TopMenu>
-      <TopAbout></TopAbout>
+      <TopAbout class="mt-4 mr-12"></TopAbout>
     </div>
     <Avatar></Avatar>
   </div>

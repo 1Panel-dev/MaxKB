@@ -5,7 +5,7 @@
         <el-breadcrumb separator-icon="ArrowRight">
           <el-breadcrumb-item>{{ t('views.system.shared.shared_resources') }}</el-breadcrumb-item>
           <el-breadcrumb-item>
-            {{ t('views.tool.title') }}
+            <h5 class="ml-4 color-text-primary">{{ t('views.tool.title') }}</h5>
           </el-breadcrumb-item>
         </el-breadcrumb>
       </template>
@@ -23,24 +23,4 @@ import { t } from '@/locales'
 onMounted(() => {})
 </script>
 
-<style lang="scss" scoped>
-.tool-shared {
-  padding-left: 8px;
-  .shared-header {
-    color: #646a73;
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 22px;
-    display: flex;
-    align-items: center;
-
-    :deep(.el-icon i) {
-      height: 12px;
-    }
-
-    .sub-title {
-      color: #1f2329;
-    }
-  }
-}
-</style>
+<style lang="scss" scoped></style>

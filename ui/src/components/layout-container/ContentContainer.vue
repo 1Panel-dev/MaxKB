@@ -11,11 +11,12 @@
         <slot name="search"> </slot>
       </div>
     </div>
-    <el-scrollbar>
-      <div class="content-container__main p-16">
+
+    <div class="content-container__main">
+      <el-scrollbar class="p-16" style="padding-right: 0;">
         <slot></slot>
-      </div>
-    </el-scrollbar>
+      </el-scrollbar>
+    </div>
   </div>
 </template>
 

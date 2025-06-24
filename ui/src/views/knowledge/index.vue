@@ -8,7 +8,7 @@
         :currentNodeKey="currentFolder?.id"
         @handleNodeClick="folderClickHandel"
         class="p-8"
-        :shareTitle="$t('views.system.share_knowledge')"
+        :shareTitle="$t('views.system.shared.shared_knowledge')"
         :showShared="permissionPrecise['is_share']()"
         @refreshTree="refreshFolder"
       />
@@ -46,11 +46,7 @@
             </el-select>
           </div>
           <el-dropdown trigger="click" v-if="!isShared">
-            <el-button
-              type="primary"
-              class="ml-8"
-              v-if="permissionPrecise.create()"
-            >
+            <el-button type="primary" class="ml-8" v-if="permissionPrecise.create()">
               {{ $t('common.create') }}
               <el-icon class="el-icon--right">
                 <arrow-down />
@@ -156,7 +152,7 @@
           @load="getList"
           :loading="loading"
         >
-          <el-row v-if="knowledgeList.length > 0" :gutter="15">
+          <el-row v-if="knowledgeList.length > 0" :gutter="15" class="w-full">
             <template v-for="(item, index) in knowledgeList" :key="index">
               <el-col
                 v-if="item.resource_type === 'folder'"
@@ -239,16 +235,12 @@
                             <el-dropdown-item
                               icon="Refresh"
                               @click.stop="syncKnowledge(item)"
-                              v-if="item.type === 1 &&
-                              permissionPrecise.sync(item.id)
-                              "
+                              v-if="item.type === 1 && permissionPrecise.sync(item.id)"
                               >{{ $t('views.knowledge.setting.sync') }}
                             </el-dropdown-item>
                             <el-dropdown-item
                               @click.stop="reEmbeddingKnowledge(item)"
-                              v-if="
-                                permissionPrecise.vector(item.id)
-                              "
+                              v-if="permissionPrecise.vector(item.id)"
                             >
                               <AppIcon iconName="app-vectorization"></AppIcon>
                               {{ $t('views.knowledge.setting.vectorization') }}
@@ -257,9 +249,7 @@
                             <el-dropdown-item
                               icon="Connection"
                               @click.stop="openGenerateDialog(item)"
-                              v-if="
-                                permissionPrecise.doc_generate(item.id)
-                              "
+                              v-if="permissionPrecise.doc_generate(item.id)"
                               >{{ $t('views.document.generateQuestion.title') }}
                             </el-dropdown-item>
                             <el-dropdown-item
@@ -269,26 +259,20 @@
                                   path: `/knowledge/${item.id}/${currentFolder.value}/setting`,
                                 })
                               "
-                              v-if="
-                                permissionPrecise.setting(item.id)
-                              "
+                              v-if="permissionPrecise.setting(item.id)"
                             >
                               {{ $t('common.setting') }}
                             </el-dropdown-item>
                             <el-dropdown-item
                               @click.stop="exportKnowledge(item)"
-                              v-if="
-                                permissionPrecise.export(item.id)
-                              "
+                              v-if="permissionPrecise.export(item.id)"
                             >
                               <AppIcon iconName="app-export"></AppIcon
                               >{{ $t('views.document.setting.export') }} Excel
                             </el-dropdown-item>
                             <el-dropdown-item
                               @click.stop="exportZipKnowledge(item)"
-                              v-if="
-                                permissionPrecise.export(item.id)
-                              "
+                              v-if="permissionPrecise.export(item.id)"
                             >
                               <AppIcon iconName="app-export"></AppIcon
                               >{{ $t('views.document.setting.export') }} ZIP</el-dropdown-item
@@ -297,9 +281,7 @@
                               icon="Delete"
                               type="danger"
                               @click.stop="deleteKnowledge(item)"
-                              v-if="
-                                permissionPrecise.delete(item.id)
-                              "
+                              v-if="permissionPrecise.delete(item.id)"
                             >
                               {{ $t('common.delete') }}</el-dropdown-item
                             >
@@ -337,15 +319,14 @@ import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import useStore from '@/stores'
 import { numberFormat } from '@/utils/common'
 import { t } from '@/locales'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { FolderSource } from '@/enums/common'
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
-import { useRoute } from 'vue-router'
 import permissionMap from '@/permission'
 
-
+const router = useRouter()
 const route = useRoute()
 const { folder, user } = useStore()
 
@@ -361,8 +342,6 @@ const type = computed(() => {
 const permissionPrecise = computed(() => {
   return permissionMap['knowledge'][type.value]
 })
-
-const router = useRouter()
 
 const loading = ref(false)
 

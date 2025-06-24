@@ -39,20 +39,34 @@
 </template>
 
 <script setup lang="ts">
-import {ref, computed, watch} from 'vue'
-import {Codemirror} from 'vue-codemirror'
-import {python} from '@codemirror/lang-python'
-import {oneDark} from '@codemirror/theme-one-dark'
-import {linter, type Diagnostic} from '@codemirror/lint'
-import ToolApi from '@/api/system-shared/tool'
+import { ref, computed, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import { Codemirror } from 'vue-codemirror'
+import { python } from '@codemirror/lang-python'
+import { oneDark } from '@codemirror/theme-one-dark'
+import { linter, type Diagnostic } from '@codemirror/lint'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
-defineOptions({name: 'CodemirrorEditor'})
+defineOptions({ name: 'CodemirrorEditor' })
 
 const props = defineProps<{
   title: string
   modelValue: any
 }>()
 const emit = defineEmits(['update:modelValue', 'submitDialog'])
+
+const route = useRoute()
+
+const type = computed(() => {
+  if (route.path.includes('shared')) {
+    return 'systemShare'
+  } else if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
+
 const data = computed({
   set: (value) => {
     emit('update:modelValue', value)
@@ -74,23 +88,25 @@ function getRangeFromLineAndColumn(state: any, line: number, column: number, end
 
 const regexpLinter = linter(async (view) => {
   const diagnostics: Diagnostic[] = []
-  await ToolApi.postPylint(view.state.doc.toString()).then((ok) => {
-    ok.data.forEach((element: any) => {
-      const range = getRangeFromLineAndColumn(
-        view.state,
-        element.line,
-        element.column,
-        element.endColumn,
-      )
+  await loadSharedApi({ type: 'tool', systemType: type.value })
+    .postPylint(view.state.doc.toString())
+    .then((ok: any) => {
+      ok.data.forEach((element: any) => {
+        const range = getRangeFromLineAndColumn(
+          view.state,
+          element.line,
+          element.column,
+          element.endColumn,
+        )
 
-      diagnostics.push({
-        from: range.form,
-        to: range.to,
-        severity: element.type,
-        message: element.message,
+        diagnostics.push({
+          from: range.form,
+          to: range.to,
+          severity: element.type,
+          message: element.message,
+        })
       })
     })
-  })
   return diagnostics
 })
 const extensions = [python(), regexpLinter, oneDark]

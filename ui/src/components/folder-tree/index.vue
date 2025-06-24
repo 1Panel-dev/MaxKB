@@ -33,7 +33,7 @@
         <div class="flex-between w-full" @mouseenter.stop="handleMouseEnter(data)">
           <div class="flex align-center">
             <AppIcon iconName="app-folder" style="font-size: 16px"></AppIcon>
-            <span class="ml-8">{{ node.label }}</span>
+            <span class="ml-8 ellipsis" style="max-width:110px" :label="node.label">{{ node.label }}</span>
           </div>
 
           <div
@@ -109,7 +109,7 @@ const props = defineProps({
   },
   shareTitle: {
     type: String,
-    default: 'views.system.shared.shared_knowledge',
+    default: '',
   },
   canOperation: {
     type: Boolean,

@@ -24,12 +24,7 @@
 <script lang="ts" setup>
 import { onMounted, ref, reactive, computed } from 'vue'
 import ToolListContainer from '@/views/tool/component/ToolListContainer.vue'
-import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
 import { FolderSource } from '@/enums/common'
-import { ComplexPermission } from '@/utils/permission/type'
-import ToolStoreDialog from './toolStore/ToolStoreDialog.vue'
-import AddInternalFunctionDialog from './toolStore/AddInternalFunctionDialog.vue'
-import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import permissionMap from '@/permission'
 import { useRoute } from 'vue-router'
 import useStore from '@/stores'

@@ -157,7 +157,7 @@ const systemRouter = {
             parentPath: '/system',
             parentName: 'system',
           },
-          component: () => import('@/views/shared/model-shared/index.vue'),
+          component: () => import('@/views/system-shared/ModelSharedIndex.vue'),
         },
       ],
     },

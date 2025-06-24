@@ -5,7 +5,7 @@
         <div
           @click="handleSharedNodeClick"
           class="shared-model"
-          v-if="isShared && hasPermission(EditionConst.IS_EE, 'OR')"
+          v-if="showShared && hasPermission(EditionConst.IS_EE, 'OR')"
           :class="active?.provider === 'share' && 'active'"
         >
           <AppIcon iconName="app-folder-share-active" style="font-size: 18px"></AppIcon>
@@ -108,7 +108,7 @@ import { t } from '@/locales'
 const props = defineProps<{
   data: Array<Provider>
   loading: boolean
-  isShared?: boolean
+  showShared?: boolean
   active?: Provider
 }>()
 const emit = defineEmits(['click'])

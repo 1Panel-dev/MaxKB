@@ -6,12 +6,15 @@
         :data="provider_list"
         @click="clickListHandle"
         :loading="loading"
-        shareTitle="views.system.shared.shared_tool"
         :showShared="permissionPrecise['is_share']()"
         :active="active_provider"
       />
     </template>
-    <ContentContainer :header="active_provider?.name" v-loading="list_model_loading">
+    <ContentContainer
+      :header="active_provider?.name"
+      v-loading="list_model_loading"
+      style="padding: 0"
+    >
       <template #search>
         <div class="flex">
           <div class="flex-between complex-search">
@@ -55,9 +58,7 @@
             </el-select>
           </div>
           <el-button
-            v-if="!isShared &&
-            permissionPrecise.addModel()
-            "
+            v-if="!isShared && permissionPrecise.addModel()"
             class="ml-16"
             type="primary"
             @click="openCreateModel(active_provider)"
@@ -68,32 +69,30 @@
       </template>
 
       <div class="model-list-height">
-        <el-scrollbar>
-          <el-row v-if="model_split_list.length > 0" :gutter="15" class="w-full">
-            <template v-for="(row, index) in model_split_list" :key="index">
-              <el-col
-                :xs="24"
-                :sm="12"
-                :md="12"
-                :lg="8"
-                :xl="6"
-                class="mb-16"
-                v-for="(model, i) in row"
-                :key="i"
+        <el-row v-if="model_split_list.length > 0" :gutter="15" class="w-full">
+          <template v-for="(row, index) in model_split_list" :key="index">
+            <el-col
+              :xs="24"
+              :sm="12"
+              :md="12"
+              :lg="8"
+              :xl="6"
+              class="mb-16"
+              v-for="(model, i) in row"
+              :key="i"
+            >
+              <ModelCard
+                @change="list_model"
+                :updateModelById="updateModelById"
+                :model="model"
+                :provider_list="provider_list"
+                :isShared="isShared"
               >
-                <ModelCard
-                  @change="list_model"
-                  :updateModelById="updateModelById"
-                  :model="model"
-                  :provider_list="provider_list"
-                  :isShared="isShared"
-                >
-                </ModelCard>
-              </el-col>
-            </template>
-          </el-row>
-          <el-empty :description="$t('common.noData')" v-else />
-        </el-scrollbar>
+              </ModelCard>
+            </el-col>
+          </template>
+        </el-row>
+        <el-empty :description="$t('common.noData')" v-else />
       </div>
     </ContentContainer>
 
@@ -128,7 +127,6 @@ import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { useRoute } from 'vue-router'
 import useStore from '@/stores'
 import permissionMap from '@/permission'
-
 
 const route = useRoute()
 const { folder, user } = useStore()
@@ -231,6 +229,7 @@ onMounted(() => {
 .model-manage {
   .model-list-height {
     height: calc(var(--app-main-height));
+    padding-right: 0 !important;
   }
 }
 </style>
