@@ -150,19 +150,20 @@ const flotTree = (tree: Array<any>, result: Array<any>) => {
   return result
 }
 function submitPermissions() {
-  const user_resource_permission_list = settingTags.map((item: any, index: number) => {
-    return flotTree(item.data, [])
-      .filter((v: any) => !v.isFolder)
-      .map((v: any) => {
-        return {
-          target_id: v.id,
-          auth_target_type: item.value,
-          permission: v.permission,
-          auth_type: item.isRole ? 'ROLE' : 'RESOURCE_PERMISSION_GROUP',
-        }
-      })
-
-  }).reduce((pre: any, next: any) => [...pre, ...next], [])
+  const user_resource_permission_list = settingTags
+    .map((item: any, index: number) => {
+      return flotTree(item.data, [])
+        .filter((v: any) => !v.isFolder)
+        .map((v: any) => {
+          return {
+            target_id: v.id,
+            auth_target_type: item.value,
+            permission: v.permission,
+            auth_type: item.isRole ? 'ROLE' : 'RESOURCE_PERMISSION_GROUP',
+          }
+        })
+    })
+    .reduce((pre: any, next: any) => [...pre, ...next], [])
 
   AuthorizationApi.putResourceAuthorization(
     currentWorkspaceId.value || 'default',
@@ -294,7 +295,9 @@ const getWholeTree = async (user_id: string) => {
       let folderIdMap = []
       const folderTree = cloneDeep((parentRes as unknown as any).data)
       if (Object.keys(childrenRes.data).indexOf(item.value) !== -1) {
-        item.isRole = childrenRes.data[item.value].length>0 && childrenRes.data[item.value][0].permission.ROLE
+        item.isRole =
+          childrenRes.data[item.value].length > 0 &&
+          childrenRes.data[item.value][0].auth_type == 'ROLE'
         folderIdMap = getFolderIdMap(childrenRes.data[item.value])
         dfsFolder(folderTree, folderIdMap)
         const permissionHalf = {

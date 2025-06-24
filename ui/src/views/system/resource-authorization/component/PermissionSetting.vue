@@ -181,13 +181,12 @@ const props = defineProps({
   manage: Boolean,
   isRole: Boolean,
 })
-const emit = defineEmits(['update:data', 'refreshData','update:isRole'])
+const emit = defineEmits(['update:data', 'refreshData', 'update:isRole'])
 const radioRole = computed({
   get: () => props.isRole,
-  set: (v:boolean) => {
+  set: (v: boolean) => {
     emit('update:isRole', v)
-
-  }
+  },
 })
 const isKnowledge = computed(() => props.type === AuthorizationEnum.KNOWLEDGE)
 const isApplication = computed(() => props.type === AuthorizationEnum.APPLICATION)
@@ -213,8 +212,6 @@ const dfsPermission = (arr: any = [], Name: string | number, e: boolean, idArr: 
     }
   })
 }
-
-
 
 const filterText = ref('')
 
