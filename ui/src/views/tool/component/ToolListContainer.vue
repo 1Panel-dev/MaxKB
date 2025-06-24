@@ -150,9 +150,7 @@
                 :description="item.desc"
                 class="cursor"
                 @click.stop="openCreateDialog(item)"
-                :disabled="
-                  permissionPrecise.edit()
-                "
+                :disabled="permissionPrecise.edit()"
               >
                 <template #icon>
                   <el-avatar
@@ -338,10 +336,7 @@ const permissionPrecise = computed(() => {
 
 const InitParamDrawerRef = ref()
 const search_type = ref('name')
-const search_form = ref<{
-  name: string
-  create_user: string
-}>({
+const search_form = ref<any>({
   name: '',
   create_user: '',
 })
@@ -573,8 +568,11 @@ watch(
   { deep: true, immediate: true },
 )
 function getList() {
+  const params = {
+    [search_type.value]: search_form.value[search_type.value],
+  }
   tool
-    .asyncGetToolListPage(paginationConfig, isShared.value, type.value, loading)
+    .asyncGetToolListPage(paginationConfig, isShared.value, type.value, params, loading)
     .then((res: any) => {
       paginationConfig.total = res.data?.total
       tool.setToolList([...tool.toolList, ...res.data?.records])

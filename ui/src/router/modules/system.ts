@@ -135,7 +135,7 @@ const systemRouter = {
             parentPath: '/system',
             parentName: 'system',
           },
-          component: () => import('@/views/shared/knowledge-shared/index.vue'),
+          component: () => import('@/views/system-shared/KnowLedgeSharedIndex.vue'),
         },
         {
           path: '/system/shared/tool',

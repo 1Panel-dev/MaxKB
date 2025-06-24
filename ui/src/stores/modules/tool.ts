@@ -15,8 +15,9 @@ const useToolStore = defineStore('tool', {
     },
     async asyncGetToolListPage(
       page: pageRequest,
-      isShared?: boolean | undefined,
+      isShared: boolean | undefined,
       systemType: 'systemShare' | 'workspace' | 'systemManage' = 'workspace',
+      paramsData: any,
       loading?: Ref<boolean>,
     ) {
       return new Promise((resolve, reject) => {
@@ -25,6 +26,7 @@ const useToolStore = defineStore('tool', {
         const params = {
           folder_id: folder.currentFolder?.id || user.getWorkspaceId(),
           scope: systemType === 'systemShare' ? 'SHARED' : 'WORKSPACE',
+          ...paramsData,
         }
         loadSharedApi({ type: 'tool', isShared, systemType })
           .getToolListPage(page, params, loading)

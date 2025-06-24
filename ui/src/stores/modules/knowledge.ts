@@ -1,15 +1,18 @@
 import { defineStore } from 'pinia'
 import type { knowledgeData } from '@/api/type/knowledge'
 import type { UploadUserFile } from 'element-plus'
-import knowledgeApi from '@/api/knowledge/knowledge'
+import type { pageRequest } from '@/api/type/common'
 import { type Ref } from 'vue'
+import useUserStore from './user'
 import useFolderStore from './folder'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 export interface knowledgeStateTypes {
   baseInfo: knowledgeData | null
   webInfo: any
   documentsType: string
   documentsFiles: UploadUserFile[]
+  knowledgeList: knowledgeData[]
 }
 
 const useKnowledgeStore = defineStore('knowledge', {
@@ -18,6 +21,7 @@ const useKnowledgeStore = defineStore('knowledge', {
     webInfo: null,
     documentsType: '',
     documentsFiles: [],
+    knowledgeList: [],
   }),
   actions: {
     saveBaseInfo(info: knowledgeData | null) {
@@ -31,6 +35,34 @@ const useKnowledgeStore = defineStore('knowledge', {
     },
     saveDocumentsFile(file: UploadUserFile[]) {
       this.documentsFiles = file
+    },
+    setKnowledgeList(list: any[]) {
+      this.knowledgeList = list
+    },
+    async asyncGetKnowledgeListPage(
+      page: pageRequest,
+      isShared?: boolean | undefined,
+      systemType: 'systemShare' | 'workspace' | 'systemManage' = 'workspace',
+      paramsData: any,
+      loading?: Ref<boolean>,
+    ) {
+      return new Promise((resolve, reject) => {
+        const folder = useFolderStore()
+        const user = useUserStore()
+        const params = {
+          folder_id: folder.currentFolder?.id || user.getWorkspaceId(),
+          scope: systemType === 'systemShare' ? 'SHARED' : 'WORKSPACE',
+          ...paramsData,
+        }
+        loadSharedApi({ type: 'knowledge', isShared, systemType })
+          .getToolListPage(page, params, loading)
+          .then((res: any) => {
+            resolve(res)
+          })
+          .catch((error: any) => {
+            reject(error)
+          })
+      })
     },
     async asyncGetFolderKnowledge(folder_id?: string, loading?: Ref<boolean>) {
       return new Promise((resolve, reject) => {
@@ -59,46 +91,6 @@ const useKnowledgeStore = defineStore('knowledge', {
           })
       })
     },
-    // async asyncGetTreeRootKnowledge(loading?: Ref<boolean>) {
-    //   const folder = useFolderStore()
-    //   return Promise.all([
-    //     folder.asyncGetFolder('KNOWLEDGE', {}, loading),
-    //     this.asyncGetFolderKnowledge(loading),
-    //   ])
-    //     .then((res: any) => {
-    //       const folderList = res[0].data
-    //       const knowledgeList = res[1].data
-    //       const arrMap: any = {}
-    //       function buildIdMap(arr: any) {
-    //         arr.forEach((item: any) => {
-    //           arrMap[item.id] = item
-    //           // 递归处理子节点
-    //           if (item.children && item.children.length > 0) {
-    //             buildIdMap(item.children)
-    //           }
-    //         })
-    //       }
-    //       buildIdMap(folderList)
-    //       knowledgeList
-    //         .filter((v: any) => v.resource_type !== 'folder')
-    //         .forEach((item: any) => {
-    //           const targetFolder = arrMap[item.folder_id]
-    //           if (targetFolder) {
-    //             // 检查是否已有相同ID的子节点（避免重复插入）
-    //             const existingChild = targetFolder.children.find(
-    //               (child: any) => child.id === item.id,
-    //             )
-    //             if (!existingChild) {
-    //               targetFolder.children.push(item)
-    //             }
-    //           }
-    //         })
-    //       return Promise.resolve(folderList)
-    //     })
-    //     .catch((error) => {
-    //       return Promise.reject(error)
-    //     })
-    // },
   },
 })
 

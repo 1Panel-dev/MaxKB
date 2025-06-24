@@ -194,7 +194,7 @@ import CreateLarkKnowledgeDialog from './create-component/CreateLarkKnowledgeDia
 import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
 import GenerateRelatedDialog from '@/components/generate-related-dialog/index.vue'
 import KnowledgeApi from '@/api/resource-management/knowledge'
-import SharedWorkspace from '@/views/shared/knowledge-shared/SharedWorkspace.vue'
+
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import useStore from '@/stores/modules-resource-management'
 import { numberFormat } from '@/utils/common'
