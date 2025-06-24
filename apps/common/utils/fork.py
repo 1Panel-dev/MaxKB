@@ -173,6 +173,6 @@ class Fork:
 
 
 def handler(base_url, response: Fork.Response):
-    print(base_url.url, base_url.tag.text if base_url.tag else None, response.content)
+    logging.getLogger("max_kb").info(base_url.url, base_url.tag.text if base_url.tag else None, response.content)
 
 # ForkManage('https://bbs.fit2cloud.com/c/de/6', ['.md-content']).fork(3, set(), handler)

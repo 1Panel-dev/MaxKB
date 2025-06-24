@@ -7,6 +7,7 @@
     @desc:
 """
 import io
+import logging
 import os
 import re
 import traceback
@@ -78,7 +79,7 @@ def get_paragraph_element_txt(paragraph_element, doc: Document, images_list, get
             return paragraph_element.text
         return ""
     except Exception as e:
-        print(e)
+        logging.getLogger("max_kb_error").error(f'Error getting paragraph element text: {e}')
     return ""
 
 

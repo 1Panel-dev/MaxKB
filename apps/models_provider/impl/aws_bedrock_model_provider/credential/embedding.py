@@ -32,7 +32,6 @@ class BedrockEmbeddingCredential(BaseForm, BaseModelCredential):
         try:
             model: BedrockEmbeddingModel = provider.get_model(model_type, model_name, model_credential)
             aa = model.embed_query(_('Hello'))
-            print(aa)
         except AppApiException:
             raise
         except Exception as e:

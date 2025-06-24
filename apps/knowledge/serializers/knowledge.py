@@ -617,7 +617,7 @@ class KnowledgeSerializer(serializers.Serializer):
                         document_name = child_link.tag.text if child_link.tag is not None and len(
                             child_link.tag.text.strip()) > 0 else child_link.url
                         paragraphs = get_split_model('web.md').parse(response.content)
-                        print(child_link.url.strip())
+                        logging.getLogger("max_kb").info(child_link.url.strip())
                         first = QuerySet(Document).filter(
                             meta__source_url=child_link.url.strip(),
                             knowledge=knowledge

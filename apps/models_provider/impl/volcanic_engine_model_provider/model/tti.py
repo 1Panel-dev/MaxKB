@@ -12,6 +12,7 @@ import datetime
 import hashlib
 import hmac
 import json
+import logging
 import sys
 from typing import Dict
 
@@ -33,6 +34,8 @@ req_key_dict = {
     'anime_v1.3': 'high_aes',
     'anime_v1.3.1': 'high_aes',
 }
+
+max_kb = logging.getLogger("max_kb")
 
 
 def sign(key, msg):
@@ -57,7 +60,7 @@ def formatQuery(parameters):
 
 def signV4Request(access_key, secret_key, service, req_query, req_body):
     if access_key is None or secret_key is None:
-        print('No access key is available.')
+        max_kb.info('No access key is available.')
         sys.exit()
 
     t = datetime.datetime.utcnow()
@@ -74,47 +77,46 @@ def signV4Request(access_key, secret_key, service, req_query, req_body):
                         '\n' + 'x-date:' + current_date + '\n'
     canonical_request = method + '\n' + canonical_uri + '\n' + canonical_querystring + \
                         '\n' + canonical_headers + '\n' + signed_headers + '\n' + payload_hash
-    # print(canonical_request)
+    # max_kb.info(canonical_request)
     algorithm = 'HMAC-SHA256'
     credential_scope = datestamp + '/' + region + '/' + service + '/' + 'request'
     string_to_sign = algorithm + '\n' + current_date + '\n' + credential_scope + '\n' + hashlib.sha256(
         canonical_request.encode('utf-8')).hexdigest()
-    # print(string_to_sign)
+    # max_kb.info(string_to_sign)
     signing_key = getSignatureKey(secret_key, datestamp, region, service)
-    # print(signing_key)
+    # max_kb.info(signing_key)
     signature = hmac.new(signing_key, (string_to_sign).encode(
         'utf-8'), hashlib.sha256).hexdigest()
-    # print(signature)
+    # max_kb.info(signature)
 
     authorization_header = algorithm + ' ' + 'Credential=' + access_key + '/' + \
                            credential_scope + ', ' + 'SignedHeaders=' + \
                            signed_headers + ', ' + 'Signature=' + signature
-    # print(authorization_header)
+    # max_kb.info(authorization_header)
     headers = {'X-Date': current_date,
                'Authorization': authorization_header,
                'X-Content-Sha256': payload_hash,
                'Content-Type': content_type
                }
-    # print(headers)
+    # max_kb.info(headers)
 
     # ************* SEND THE REQUEST *************
     request_url = endpoint + '?' + canonical_querystring
 
-    print('\nBEGIN REQUEST++++++++++++++++++++++++++++++++++++')
-    print('Request URL = ' + request_url)
+    max_kb.info('\nBEGIN REQUEST++++++++++++++++++++++++++++++++++++')
+    max_kb.info('Request URL = ' + request_url)
     try:
         r = requests.post(request_url, headers=headers, data=req_body)
     except Exception as err:
-        print(f'error occurred: {err}')
+        max_kb.info(f'error occurred: {err}')
         raise
     else:
-        print('\nRESPONSE++++++++++++++++++++++++++++++++++++')
-        print(f'Response code: {r.status_code}\n')
+        max_kb.info('\nRESPONSE++++++++++++++++++++++++++++++++++++')
+        max_kb.info(f'Response code: {r.status_code}\n')
         # 使用 replace 方法将 \u0026 替换为 &
         resp_str = r.text.replace("\\u0026", "&")
         if r.status_code != 200:
             raise Exception(f'Error: {resp_str}')
-        print(f'Response body: {resp_str}\n')
         return json.loads(resp_str)['data']['image_urls']
 
 
@@ -146,7 +148,6 @@ class VolcanicEngineTextToImage(MaxKBBaseModel, BaseTextToImage):
 
     def check_auth(self):
         res = self.generate_image('生成一张小猫图片')
-        print(res)
 
     def generate_image(self, prompt: str, negative_prompt: str = None):
         # 请求Query，按照接口文档中填入即可

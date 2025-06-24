@@ -1,6 +1,7 @@
 # coding=utf-8
 
 import json
+import logging
 from typing import Dict
 
 from django.utils.translation import gettext as _
@@ -13,6 +14,7 @@ from tencentcloud.hunyuan.v20230901 import hunyuan_client, models
 from models_provider.base_model_provider import MaxKBBaseModel
 from models_provider.impl.base_tti import BaseTextToImage
 from models_provider.impl.tencent_model_provider.model.hunyuan import ChatHunyuan
+max_kb_error = logging.getLogger("max_kb_error")
 
 
 class TencentTextToImageModel(MaxKBBaseModel, BaseTextToImage):
@@ -82,11 +84,9 @@ class TencentTextToImageModel(MaxKBBaseModel, BaseTextToImage):
 
             # 返回的resp是一个TextToImageLiteResponse的实例，与请求对象对应
             resp = client.TextToImageLite(req)
-            # 输出json格式的字符串回包
-            print(resp.to_json_string())
             file_urls = []
 
             file_urls.append(resp.ResultImage)
             return file_urls
         except TencentCloudSDKException as err:
-            print(err)
+            max_kb_error.error(f"Tencent Text to Image API call failed: {err}")

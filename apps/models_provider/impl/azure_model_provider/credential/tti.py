@@ -66,7 +66,6 @@ class AzureOpenAITextToImageModelCredential(BaseForm, BaseModelCredential):
         try:
             model = provider.get_model(model_type, model_name, model_credential, **model_params)
             res = model.check_auth()
-            print(res)
         except Exception as e:
             traceback.print_exc()
             if isinstance(e, AppApiException):

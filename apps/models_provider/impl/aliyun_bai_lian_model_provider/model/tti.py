@@ -6,9 +6,11 @@ from dashscope import ImageSynthesis
 from django.utils.translation import gettext
 from langchain_community.chat_models import ChatTongyi
 from langchain_core.messages import HumanMessage
-
+import logging
 from models_provider.base_model_provider import MaxKBBaseModel
 from models_provider.impl.base_tti import BaseTextToImage
+
+max_kb_error = logging.getLogger("max_kb_error")
 
 
 class QwenTextToImageModel(MaxKBBaseModel, BaseTextToImage):
@@ -54,6 +56,6 @@ class QwenTextToImageModel(MaxKBBaseModel, BaseTextToImage):
             for result in rsp.output.results:
                 file_urls.append(result.url)
         else:
-            print('sync_call Failed, status_code: %s, code: %s, message: %s' %
-                  (rsp.status_code, rsp.code, rsp.message))
+            max_kb_error.error('sync_call Failed, status_code: %s, code: %s, message: %s' %
+                               (rsp.status_code, rsp.code, rsp.message))
         return file_urls

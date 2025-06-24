@@ -1,3 +1,4 @@
+import logging
 from logging import StreamHandler
 from threading import get_ident
 
@@ -208,7 +209,7 @@ class CeleryThreadTaskFileHandler(CeleryThreadingLoggerHandler):
             f.flush()
 
     def handle_task_start(self, task_id):
-        print('handle_task_start')
+        logging.getLogger("max_kb").info('handle_task_start')
         log_path = get_celery_task_log_path(task_id)
         thread_id = self.get_current_thread_id()
         self.task_id_thread_id_mapper[task_id] = thread_id

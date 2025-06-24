@@ -49,7 +49,6 @@ class AliyunBaiLianTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
         if audio is None:
             raise Exception('Failed to generate audio')
         if type(audio) == str:
-            print(audio)
             raise Exception(audio)
         return audio
 
