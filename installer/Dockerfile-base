@@ -24,7 +24,8 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     rm -rf /var/lib/apt/lists/* && \
     chmod 755 /usr/bin/start-*.sh && \
     chmod 755 /tmp && \
-    find /etc/ -type f ! -path '/etc/resolv.conf' ! -path '/etc/hosts' | xargs chmod g-rx
+    find /etc/ -type f ! -path '/etc/resolv.conf' ! -path '/etc/hosts' | xargs chmod g-rx && \
+    curl -L --connect-timeout 120 -m 1800 https://resource.fit2cloud.com/maxkb/ffmpeg/get-ffmpeg-linux | sh
 
 ENV PGDATA=/opt/maxkb/data/postgresql/pgdata \
     POSTGRES_USER=root \

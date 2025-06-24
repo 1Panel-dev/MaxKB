@@ -65,8 +65,7 @@ COPY --from=stage-build /opt/maxkb-app /opt/maxkb-app
 COPY --from=stage-build /opt/py3 /opt/py3
 COPY --from=vector-model /opt/maxkb-app/model /opt/maxkb-app/model
 
-RUN curl -L --connect-timeout 120 -m 1800 https://resource.fit2cloud.com/maxkb/ffmpeg/get-ffmpeg-linux | sh && \
-    find /opt/maxkb-app -mindepth 1 -not -name 'sandbox' -exec chmod 700 {} + && \
+RUN find /opt/maxkb-app -mindepth 1 -not -name 'sandbox' -exec chmod 700 {} + && \
     useradd --no-create-home --home /opt/maxkb-app/sandbox sandbox -g root && \
     chown -R sandbox:root /opt/maxkb-app/sandbox && \
     chmod g-x /usr/local/bin/* /usr/bin/* /bin/* /usr/sbin/* /sbin/* /usr/lib/postgresql/17/bin/* && \
