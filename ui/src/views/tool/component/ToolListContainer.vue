@@ -254,6 +254,12 @@
                             {{ $t('common.param.initParam') }}
                           </el-dropdown-item>
                           <el-dropdown-item
+                            v-if="isSystemShare"
+                            icon="Lock"
+                            @click.stop="openAuthorizedWorkspaceDialog(item)"
+                            >{{ $t('views.system.shared.authorized_workspace') }}</el-dropdown-item
+                          >
+                          <el-dropdown-item
                             v-if="!item.template_id && permissionPrecise.export()"
                             @click.stop="exportTool(item)"
                           >
@@ -289,6 +295,10 @@
     ref="addInternalFunctionDialogRef"
     @refresh="confirmAddInternalFunction"
   />
+  <AuthorizedWorkspace
+    ref="AuthorizedWorkspaceDialogRef"
+    v-if="isSystemShare"
+  ></AuthorizedWorkspace>
 </template>
 
 <script lang="ts" setup>
@@ -299,6 +309,7 @@ import { useRoute } from 'vue-router'
 import InitParamDrawer from '@/views/tool/component/InitParamDrawer.vue'
 import ToolFormDrawer from '@/views/tool/ToolFormDrawer.vue'
 import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
+import AuthorizedWorkspace from '@/views/shared/AuthorizedWorkspaceDialog.vue'
 import { isAppIcon } from '@/utils/common'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import { EditionConst, PermissionConst, RoleConst } from '@/utils/permission/data'
@@ -322,6 +333,14 @@ const type = computed(() => {
     return 'workspace'
   }
 })
+
+const isShared = computed(() => {
+  return folder.currentFolder.id === 'share'
+})
+const isSystemShare = computed(() => {
+  return type.value === 'systemShare'
+})
+
 const permissionPrecise = computed(() => {
   return permissionMap['tool'][type.value]
 })
@@ -345,17 +364,18 @@ const paginationConfig = reactive({
   total: 0,
 })
 
-const currentFolder = ref<any>({})
-
-const isShared = computed(() => {
-  return folder.currentFolder.id === 'share'
-})
-
 const search_type_change = () => {
   search_form.value = { name: '', create_user: '' }
 }
 const ToolFormDrawerRef = ref()
 const ToolDrawertitle = ref('')
+
+const AuthorizedWorkspaceDialogRef = ref()
+function openAuthorizedWorkspaceDialog(row: any) {
+  if (AuthorizedWorkspaceDialogRef.value) {
+    AuthorizedWorkspaceDialogRef.value.open(row, 'Tool')
+  }
+}
 
 function openCreateDialog(data?: any) {
   // 有template_id的不允许编辑，是模板转换来的
@@ -500,7 +520,7 @@ function configInitParams(item: any) {
 
 const toolStoreDialogRef = ref<InstanceType<typeof ToolStoreDialog>>()
 function openToolStoreDialog() {
-  toolStoreDialogRef.value?.open(currentFolder.value.id)
+  toolStoreDialogRef.value?.open(folder.currentFolder.id)
 }
 
 const addInternalFunctionDialogRef = ref<InstanceType<typeof AddInternalFunctionDialog>>()
