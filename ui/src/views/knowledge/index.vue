@@ -8,7 +8,8 @@
         :currentNodeKey="currentFolder?.id"
         @handleNodeClick="folderClickHandel"
         class="p-8"
-        showShared
+        :shareTitle="$t('views.system.share_knowledge')"
+        :showShared="permissionPrecise['is_share']()"
         @refreshTree="refreshFolder"
       />
     </template>
@@ -48,13 +49,7 @@
             <el-button
               type="primary"
               class="ml-8"
-              v-hasPermission="[
-                RoleConst.ADMIN,
-                RoleConst.USER.getWorkspaceRole,
-                RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                PermissionConst.KNOWLEDGE_CREATE.getWorkspacePermissionWorkspaceManageRole,
-                PermissionConst.KNOWLEDGE_CREATE.getWorkspacePermission,
-              ]"
+              v-if="permissionPrecise.create()"
             >
               {{ $t('common.create') }}
               <el-icon class="el-icon--right">
@@ -198,15 +193,7 @@
                   @click="
                     router.push({ path: `/knowledge/${item.id}/${currentFolder.id}/document` })
                   "
-                  v-hasPermission="[
-                    RoleConst.ADMIN,
-                    RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                    PermissionConst.KNOWLEDGE_DOCUMENT_READ
-                      .getWorkspacePermissionWorkspaceManageRole,
-                    PermissionConst.KNOWLEDGE_DOCUMENT_READ.getKnowledgeWorkspaceResourcePermission(
-                      item.id,
-                    ),
-                  ]"
+                  v-if="permissionPrecise.single(item.id)"
                 >
                   <template #icon>
                     <KnowledgeIcon :type="item.type" />
@@ -252,38 +239,15 @@
                             <el-dropdown-item
                               icon="Refresh"
                               @click.stop="syncKnowledge(item)"
-                              v-if="
-                                item.type === 1 &&
-                                hasPermission(
-                                  [
-                                    RoleConst.ADMIN,
-                                    RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                                    PermissionConst.KNOWLEDGE_SYNC
-                                      .getWorkspacePermissionWorkspaceManageRole,
-                                    PermissionConst.KNOWLEDGE_SYNC.getKnowledgeWorkspaceResourcePermission(
-                                      item.id,
-                                    ),
-                                  ],
-                                  'OR',
-                                )
+                              v-if="item.type === 1 &&
+                              permissionPrecise.sync(item.id)
                               "
                               >{{ $t('views.knowledge.setting.sync') }}
                             </el-dropdown-item>
                             <el-dropdown-item
                               @click.stop="reEmbeddingKnowledge(item)"
                               v-if="
-                                hasPermission(
-                                  [
-                                    RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                                    RoleConst.ADMIN,
-                                    PermissionConst.KNOWLEDGE_VECTOR
-                                      .getWorkspacePermissionWorkspaceManageRole,
-                                    PermissionConst.KNOWLEDGE_VECTOR.getKnowledgeWorkspaceResourcePermission(
-                                      item.id,
-                                    ),
-                                  ],
-                                  'OR',
-                                )
+                                permissionPrecise.vector(item.id)
                               "
                             >
                               <AppIcon iconName="app-vectorization"></AppIcon>
@@ -294,18 +258,7 @@
                               icon="Connection"
                               @click.stop="openGenerateDialog(item)"
                               v-if="
-                                hasPermission(
-                                  [
-                                    RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                                    RoleConst.ADMIN,
-                                    PermissionConst.KNOWLEDGE_PROBLEM_CREATE
-                                      .getWorkspacePermissionWorkspaceManageRole,
-                                    PermissionConst.KNOWLEDGE_PROBLEM_CREATE.getKnowledgeWorkspaceResourcePermission(
-                                      item.id,
-                                    ),
-                                  ],
-                                  'OR',
-                                )
+                                permissionPrecise.doc_generate(item.id)
                               "
                               >{{ $t('views.document.generateQuestion.title') }}
                             </el-dropdown-item>
@@ -317,18 +270,7 @@
                                 })
                               "
                               v-if="
-                                hasPermission(
-                                  [
-                                    RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                                    RoleConst.ADMIN,
-                                    PermissionConst.KNOWLEDGE_EDIT
-                                      .getWorkspacePermissionWorkspaceManageRole,
-                                    PermissionConst.KNOWLEDGE_EDIT.getKnowledgeWorkspaceResourcePermission(
-                                      item.id,
-                                    ),
-                                  ],
-                                  'OR',
-                                )
+                                permissionPrecise.setting(item.id)
                               "
                             >
                               {{ $t('common.setting') }}
@@ -336,18 +278,7 @@
                             <el-dropdown-item
                               @click.stop="exportKnowledge(item)"
                               v-if="
-                                hasPermission(
-                                  [
-                                    RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                                    RoleConst.ADMIN,
-                                    PermissionConst.KNOWLEDGE_EXPORT
-                                      .getWorkspacePermissionWorkspaceManageRole,
-                                    PermissionConst.KNOWLEDGE_EXPORT.getKnowledgeWorkspaceResourcePermission(
-                                      item.id,
-                                    ),
-                                  ],
-                                  'OR',
-                                )
+                                permissionPrecise.export(item.id)
                               "
                             >
                               <AppIcon iconName="app-export"></AppIcon
@@ -356,18 +287,7 @@
                             <el-dropdown-item
                               @click.stop="exportZipKnowledge(item)"
                               v-if="
-                                hasPermission(
-                                  [
-                                    RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                                    RoleConst.ADMIN,
-                                    PermissionConst.KNOWLEDGE_EXPORT
-                                      .getWorkspacePermissionWorkspaceManageRole,
-                                    PermissionConst.KNOWLEDGE_EXPORT.getKnowledgeWorkspaceResourcePermission(
-                                      item.id,
-                                    ),
-                                  ],
-                                  'OR',
-                                )
+                                permissionPrecise.export(item.id)
                               "
                             >
                               <AppIcon iconName="app-export"></AppIcon
@@ -378,18 +298,7 @@
                               type="danger"
                               @click.stop="deleteKnowledge(item)"
                               v-if="
-                                hasPermission(
-                                  [
-                                    RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                                    RoleConst.ADMIN,
-                                    PermissionConst.KNOWLEDGE_DELETE
-                                      .getWorkspacePermissionWorkspaceManageRole,
-                                    PermissionConst.KNOWLEDGE_DELETE.getKnowledgeWorkspaceResourcePermission(
-                                      item.id,
-                                    ),
-                                  ],
-                                  'OR',
-                                )
+                                permissionPrecise.delete(item.id)
                               "
                             >
                               {{ $t('common.delete') }}</el-dropdown-item
@@ -433,9 +342,27 @@ import { FolderSource } from '@/enums/common'
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import { useRoute } from 'vue-router'
+import permissionMap from '@/permission'
+
+
+const route = useRoute()
+const { folder, user } = useStore()
+
+const type = computed(() => {
+  if (route.path.includes('shared')) {
+    return 'systemShare'
+  } else if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
+const permissionPrecise = computed(() => {
+  return permissionMap['knowledge'][type.value]
+})
 
 const router = useRouter()
-const { folder, user } = useStore()
 
 const loading = ref(false)
 

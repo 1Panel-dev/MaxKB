@@ -43,10 +43,12 @@
             class="mt-16"
             :data="problemData"
             :pagination-config="paginationConfig"
-            quick-create
+            :quick-create="permissionPrecise.doc_create(id)""
+
             :quickCreateName="$t('views.problem.quickCreateName')"
             :quickCreatePlaceholder="$t('views.problem.quickCreateProblem')"
             :quickCreateMaxlength="256"
+
             @sizeChange="handleSizeChange"
             @changePage="getList"
             @cell-mouse-enter="cellMouseEnter"
@@ -167,8 +169,24 @@ import useStore from '@/stores'
 import { t } from '@/locales'
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
+import permissionMap from '@/permission'
+
 
 const route = useRoute()
+const { folder, user } = useStore()
+
+const type = computed(() => {
+  if (route.path.includes('shared')) {
+    return 'systemShare'
+  } else if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
+const permissionPrecise = computed(() => {
+  return permissionMap['knowledge'][type.value]
+})
 const {
   params: { id }, // 知识库id
 } = route as any

@@ -1,4 +1,5 @@
 import useStore from '@/stores'
+import { useRoute } from 'vue-router'
 export type PF = () => Role | string | Permission | ComplexPermission
 export type CRF = () => Role | string
 export type CPF = () => Permission | string
@@ -68,6 +69,12 @@ export class Permission {
    */
   getKnowledgeWorkspaceResourcePermission = (resource_id: string) => {
     return this.getWorkspaceResourcePermission('KNOWLEDGE', resource_id)
+  }
+  getTest=()=>{
+    const route=useRoute()
+    debugger
+    console.log(route)
+    return ""
   }
   /**
    *
