@@ -31,7 +31,8 @@ RUN python3 -m venv /opt/py3 && \
     find /opt/maxkb-app  -depth \( -name ".git*" -o -name ".docker*" -o -name ".idea*" -o -name ".editorconfig*" -o -name ".prettierrc*" -o -name "README.md" -o -name "poetry.lock" -o -name "pyproject.toml"  \) -exec rm -rf {} + && \
     export MAXKB_CONFIG_TYPE=ENV && python3 /opt/maxkb-app/apps/manage.py compilemessages && \
     export PIP_TARGET=/opt/maxkb-app/sandbox/python-packages && \
-    pip install diskcache2 requests pymysql psycopg2-binary
+    pip install diskcache2 requests pymysql psycopg2-binary && \
+    rm -rf /opt/maxkb-app/installer
 
 FROM ghcr.io/1panel-dev/maxkb-base:python3.11-pg17.4
 ARG DOCKER_IMAGE_TAG=dev \
