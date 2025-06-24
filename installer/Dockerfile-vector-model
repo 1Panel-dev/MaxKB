@@ -6,7 +6,7 @@ FROM ghcr.io/1panel-dev/maxkb-vector-model:v1.0.1 AS vector-model
 #    pip install transformers && \
 #    python3 install_model.py && \
 #    cp -r model/base/hub model/tokenizer
-RUN cp -r /opt/maxkb/app/model/base/hub /opt/maxkb/app/model/tokenizer
 
 FROM scratch
 COPY --from=vector-model /opt/maxkb/app/model /opt/maxkb-app/model
+COPY --from=vector-model /opt/maxkb/app/model/base/hub /opt/maxkb-app/model/tokenizer
