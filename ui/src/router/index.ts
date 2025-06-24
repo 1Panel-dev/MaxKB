@@ -1,4 +1,4 @@
-import { hasPermission } from '@/utils/permission/index'
+import { hasPermission, set_next_route } from '@/utils/permission/index'
 import NProgress from 'nprogress'
 import {
   createRouter,
@@ -42,6 +42,7 @@ router.beforeEach(
         await user.profile()
       }
     }
+    set_next_route(to)
     // 判断是否有菜单权限
     if (to.meta.permission ? hasPermission(to.meta.permission as any, 'OR') : true) {
       next()
