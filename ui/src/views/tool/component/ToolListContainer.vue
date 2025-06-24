@@ -34,8 +34,8 @@
             <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.username" />
           </el-select>
         </div>
-        <el-dropdown trigger="click" v-if="!isShared">
-          <el-button type="primary" class="ml-8" v-if="permissionPrecise.create()">
+        <el-dropdown trigger="click" v-if="!isShared && permissionPrecise.create()">
+          <el-button type="primary" class="ml-8">
             {{ $t('common.create') }}
             <el-icon class="el-icon--right">
               <arrow-down />
@@ -151,15 +151,7 @@
                 class="cursor"
                 @click.stop="openCreateDialog(item)"
                 :disabled="
-                  hasPermission(
-                    [
-                      RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                      RoleConst.USER.getWorkspaceRole,
-                      PermissionConst.TOOL_EDIT.getWorkspacePermissionWorkspaceManageRole,
-                      PermissionConst.TOOL_EDIT.getWorkspacePermission,
-                    ],
-                    'OR',
-                  )
+                  permissionPrecise.edit()
                 "
               >
                 <template #icon>
