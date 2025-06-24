@@ -144,7 +144,7 @@
           @load="getList"
           :loading="loading"
         >
-          <el-row v-if="applicationList.length > 0" :gutter="15">
+          <el-row v-if="applicationList.length > 0" :gutter="15" class="w-full">
             <template v-for="(item, index) in applicationList" :key="index">
               <el-col
                 v-if="item.resource_type === 'folder'"

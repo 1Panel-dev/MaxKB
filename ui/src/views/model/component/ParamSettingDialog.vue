@@ -81,17 +81,29 @@
 </template>
 
 <script setup lang="ts">
+import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import type { Model } from '@/api/type/model'
-import { ref } from 'vue'
 import AddParamDrawer from './AddParamDrawer.vue'
 import { MsgError, MsgSuccess } from '@/utils/message'
-import ModelApi from '@/api/model/model'
 import { input_type_list } from '@/components/dynamics-form/constructor/data'
 import { t } from '@/locales'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 const props = defineProps<{
   model: Model
 }>()
 
+const route = useRoute()
+
+const type = computed(() => {
+  if (route.path.includes('shared')) {
+    return 'systemShare'
+  } else if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
 const loading = ref<boolean>(false)
 const dialogVisible = ref<boolean>(false)
 const modelParamsForm = ref<any[]>([])
@@ -100,8 +112,9 @@ const AddParamRef = ref()
 const open = () => {
   dialogVisible.value = true
   loading.value = true
-  ModelApi.getModelParamsForm(props.model.id, loading)
-    .then((ok) => {
+  loadSharedApi({ type: 'model', systemType: type.value })
+    .getModelParamsForm(props.model.id, loading)
+    .then((ok: any) => {
       loading.value = false
       modelParamsForm.value = ok.data
     })
@@ -151,13 +164,13 @@ function refresh(data: any, index: any) {
 }
 
 function submit() {
-  ModelApi.updateModelParamsForm(props.model.id, modelParamsForm.value, loading).then(
-    (ok) => {
+  loadSharedApi({ type: 'model', systemType: type.value })
+    .updateModelParamsForm(props.model.id, modelParamsForm.value, loading)
+    .then((ok: any) => {
       MsgSuccess(t('views.model.tip.saveSuccessMessage'))
       close()
       // emit('submit')
-    },
-  )
+    })
 }
 
 defineExpose({ open, close })

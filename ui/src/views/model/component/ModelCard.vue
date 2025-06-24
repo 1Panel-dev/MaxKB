@@ -28,7 +28,7 @@
       </el-text>
     </template>
     <template #tag>
-      <el-tag v-if="isShared" type="info" class="info-tag">
+      <el-tag v-if="isShared || isSystemShare" type="info" class="info-tag">
         {{ t('views.system.shared.label') }}
       </el-tag>
     </template>
@@ -85,6 +85,12 @@
             >
               {{ $t('common.modify') }}
             </el-dropdown-item>
+            <el-dropdown-item
+              v-if="isSystemShare"
+              icon="Lock"
+              @click.stop="openAuthorizedWorkspaceDialog(model)"
+              >{{ $t('views.system.shared.authorized_workspace') }}</el-dropdown-item
+            >
 
             <el-dropdown-item
               v-if="
@@ -93,7 +99,6 @@
                 currentModel.model_type === 'IMAGE' ||
                 currentModel.model_type === 'TTI' ||
                 permissionPrecise.paramSetting()
-
               "
               :disabled="!is_permisstion"
               icon="Setting"
@@ -107,9 +112,7 @@
               :disabled="!is_permisstion"
               text
               @click.stop="deleteModel"
-              v-if="
-                permissionPrecise.delete()
-              "
+              v-if="permissionPrecise.delete()"
             >
               {{ $t('common.delete') }}
             </el-dropdown-item>
@@ -119,11 +122,14 @@
     </template>
     <EditModel ref="editModelRef" @submit="emit('change')"></EditModel>
     <ParamSettingDialog ref="paramSettingRef" :model="model" />
+    <AuthorizedWorkspace
+      ref="AuthorizedWorkspaceDialogRef"
+      v-if="isSystemShare"
+    ></AuthorizedWorkspace>
   </card-box>
 </template>
 <script setup lang="ts">
 import type { Provider, Model } from '@/api/type/model'
-import ModelApi from '@/api/model/model'
 import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import EditModel from '@/views/model/component/EditModel.vue'
 // import DownloadLoading from '@/components/loading/DownloadLoading.vue'
@@ -131,36 +137,28 @@ import { MsgConfirm } from '@/utils/message'
 import { modelType } from '@/enums/model'
 import useStore from '@/stores'
 import ParamSettingDialog from './ParamSettingDialog.vue'
+import AuthorizedWorkspace from '@/views/system-shared/AuthorizedWorkspaceDialog.vue'
 import { t } from '@/locales'
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission'
-import { useRoute } from 'vue-router'
 import permissionMap from '@/permission'
-
-
-const route = useRoute()
-
-const type = computed(() => {
-  if (route.path.includes('shared')) {
-    return 'systemShare'
-  } else if (route.path.includes('resource-management')) {
-    return 'systemManage'
-  } else {
-    return 'workspace'
-  }
-})
-const permissionPrecise = computed(() => {
-  return permissionMap['model'][type.value]
-})
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 const props = defineProps<{
   model: Model
   provider_list: Array<Provider>
   updateModelById: (model_id: string, model: Model) => void
   isShared?: boolean | undefined
+  isSystemShare?: boolean | undefined
+  sharedType: 'systemShare' | 'workspace' | 'systemManage'
 }>()
 
 const { user } = useStore()
+
+const permissionPrecise = computed(() => {
+  return permissionMap['model'][props.sharedType]
+})
+
 const downModel = ref<Model>()
 
 const is_permisstion = computed(() => {
@@ -196,18 +194,22 @@ const deleteModel = () => {
     },
   )
     .then(() => {
-      ModelApi.deleteModel(props.model.id).then(() => {
-        emit('change')
-      })
+      loadSharedApi({ type: 'model', systemType: props.sharedType })
+        .deleteModel(props.model.id)
+        .then(() => {
+          emit('change')
+        })
     })
     .catch(() => {})
 }
 
 const cancelDownload = () => {
-  ModelApi.pauseDownload(props.model.id).then(() => {
-    downModel.value = undefined
-    emit('change')
-  })
+  loadSharedApi({ type: 'model', systemType: type.value })
+    .pauseDownload(props.model.id)
+    .then(() => {
+      downModel.value = undefined
+      emit('change')
+    })
 }
 const openEditModel = () => {
   const provider = props.provider_list.find((p) => p.provider === props.model.provider)
@@ -225,9 +227,11 @@ const icon = computed(() => {
 const initInterval = () => {
   interval = setInterval(() => {
     if (currentModel.value.status === 'DOWNLOAD') {
-      ModelApi.getModelMetaById(props.model.id).then((ok) => {
-        downModel.value = ok.data
-      })
+      loadSharedApi({ type: 'model', systemType: type.value })
+        .getModelMetaById(props.model.id)
+        .then((ok: any) => {
+          downModel.value = ok.data
+        })
     } else {
       if (downModel.value) {
         props.updateModelById(props.model.id, downModel.value)
@@ -249,6 +253,13 @@ const closeInterval = () => {
 const paramSettingRef = ref<InstanceType<typeof ParamSettingDialog>>()
 const openParamSetting = () => {
   paramSettingRef.value?.open()
+}
+
+const AuthorizedWorkspaceDialogRef = ref()
+function openAuthorizedWorkspaceDialog(row: any) {
+  if (AuthorizedWorkspaceDialogRef.value) {
+    AuthorizedWorkspaceDialogRef.value.open(row, 'Model')
+  }
 }
 
 onMounted(() => {

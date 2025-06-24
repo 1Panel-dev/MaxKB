@@ -10,7 +10,7 @@
     <template #header="{ close, titleId, titleClass }">
       <el-breadcrumb separator=">">
         <el-breadcrumb-item
-        ><span class="active-breadcrumb">{{
+          ><span class="active-breadcrumb">{{
             `${$t('common.edit')} ${providerValue?.name}`
           }}</span></el-breadcrumb-item
         >
@@ -74,8 +74,8 @@
               <div class="mr-4">
                 <span>{{ $t('views.model.modelForm.base_model.label') }} </span>
                 <span class="danger ml-4">{{
-                    $t('views.model.modelForm.base_model.tooltip')
-                  }}</span>
+                  $t('views.model.modelForm.base_model.tooltip')
+                }}</span>
               </div>
             </div>
           </template>
@@ -119,17 +119,30 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import {ref, computed} from 'vue'
-import type {Provider, BaseModel, Model} from '@/api/type/model'
-import type {Dict, KeyValue} from '@/api/type/common'
-import ModelApi from '@/api/model/model'
+import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
+import type { Provider, BaseModel, Model } from '@/api/type/model'
+import type { Dict, KeyValue } from '@/api/type/common'
 import ProviderApi from '@/api/model/provider'
-import type {FormField} from '@/components/dynamics-form/type'
+import type { FormField } from '@/components/dynamics-form/type'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
-import type {FormRules} from 'element-plus'
-import {MsgSuccess} from '@/utils/message'
-import {PermissionType, PermissionDesc} from '@/enums/model'
-import {t} from '@/locales'
+import type { FormRules } from 'element-plus'
+import { MsgSuccess } from '@/utils/message'
+import { PermissionType, PermissionDesc } from '@/enums/model'
+import { t } from '@/locales'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+
+const route = useRoute()
+
+const type = computed(() => {
+  if (route.path.includes('shared')) {
+    return 'systemShare'
+  } else if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
 
 const providerValue = ref<Provider>()
 const dynamicsFormRef = ref<InstanceType<typeof DynamicsForm>>()
@@ -167,13 +180,13 @@ const base_form_data = ref<{
   model_type: string
 
   model_name: string
-}>({name: '', model_type: '', model_name: ''})
+}>({ name: '', model_type: '', model_name: '' })
 
 const credential_form_data = ref<Dict<any>>({})
 
 const form_data = computed({
   get: () => {
-    return {...credential_form_data.value, ...base_form_data.value}
+    return { ...credential_form_data.value, ...base_form_data.value }
   },
   set: (event: any) => {
     credential_form_data.value = event
@@ -209,27 +222,29 @@ const list_base_model = (model_type: any, change?: boolean) => {
 }
 const open = (provider: Provider, model: Model) => {
   modelValue.value = model
-  ModelApi.getModelById(model.id, formLoading).then((ok) => {
-    modelValue.value = ok.data
-    ProviderApi.listModelType(model.provider, model_type_loading).then((ok) => {
-      model_type_list.value = ok.data
-      list_base_model(model.model_type)
-    })
-    providerValue.value = provider
+  loadSharedApi({ type: 'model', systemType: type.value })
+    .getModelById(model.id, formLoading)
+    .then((ok: any) => {
+      modelValue.value = ok.data
+      ProviderApi.listModelType(model.provider, model_type_loading).then((ok) => {
+        model_type_list.value = ok.data
+        list_base_model(model.model_type)
+      })
+      providerValue.value = provider
 
-    base_form_data.value = {
-      name: model.name,
-      model_type: model.model_type,
-      model_name: model.model_name,
-    }
-    form_data.value = model.credential
-    getModelForm(model.model_name)
-  })
+      base_form_data.value = {
+        name: model.name,
+        model_type: model.model_type,
+        model_name: model.model_name,
+      }
+      form_data.value = model.credential
+      getModelForm(model.model_name)
+    })
   dialogVisible.value = true
 }
 
 const close = () => {
-  base_form_data.value = {name: '', model_type: '', model_name: ''}
+  base_form_data.value = { name: '', model_type: '', model_name: '' }
   dynamicsFormRef.value?.ruleFormRef?.resetFields()
   credential_form_data.value = {}
   model_form_field.value = []
@@ -240,23 +255,25 @@ const close = () => {
 const submit = () => {
   dynamicsFormRef.value?.validate().then(() => {
     if (modelValue.value) {
-      ModelApi.updateModel(
-        modelValue.value.id,
-        {
-          ...base_form_data.value,
-          credential: credential_form_data.value,
-        },
-        loading,
-      ).then((ok) => {
-        MsgSuccess(t('views.model.tip.updateSuccessMessage'))
-        close()
-        emit('submit')
-      })
+      loadSharedApi({ type: 'model', systemType: type.value })
+        .updateModel(
+          modelValue.value.id,
+          {
+            ...base_form_data.value,
+            credential: credential_form_data.value,
+          },
+          loading,
+        )
+        .then((ok: any) => {
+          MsgSuccess(t('views.model.tip.updateSuccessMessage'))
+          close()
+          emit('submit')
+        })
     }
   })
 }
 
-defineExpose({open, close})
+defineExpose({ open, close })
 </script>
 <style lang="scss" scoped>
 .select-provider {

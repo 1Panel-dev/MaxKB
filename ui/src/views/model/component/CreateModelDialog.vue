@@ -236,9 +236,9 @@
 </template>
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import type { Provider, BaseModel } from '@/api/type/model'
 import type { Dict, KeyValue } from '@/api/type/common'
-import ModelApi from '@/api/model/model'
 import ProviderApi from '@/api/model/provider'
 import type { FormField } from '@/components/dynamics-form/type'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
@@ -248,7 +248,19 @@ import { PermissionType, PermissionDesc } from '@/enums/model'
 import { input_type_list } from '@/components/dynamics-form/constructor/data'
 import AddParamDrawer from '@/views/model/component/AddParamDrawer.vue'
 import { t } from '@/locales'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
+const route = useRoute()
+
+const type = computed(() => {
+  if (route.path.includes('shared')) {
+    return 'systemShare'
+  } else if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
 const providerValue = ref<Provider>()
 const dynamicsFormRef = ref<InstanceType<typeof DynamicsForm>>()
 const emit = defineEmits(['change', 'submit'])
@@ -378,18 +390,20 @@ const submit = () => {
     ?.validate()
     .then(() => {
       if (providerValue.value) {
-        ModelApi.createModel(
-          {
-            ...base_form_data.value,
-            credential: credential_form_data.value,
-            provider: providerValue.value.provider,
-          },
-          loading,
-        ).then((ok) => {
-          close()
-          MsgSuccess(t('views.model.tip.createSuccessMessage'))
-          emit('submit')
-        })
+        loadSharedApi({ type: 'model', systemType: type.value })
+          .createModel(
+            {
+              ...base_form_data.value,
+              credential: credential_form_data.value,
+              provider: providerValue.value.provider,
+            },
+            loading,
+          )
+          .then((ok: any) => {
+            close()
+            MsgSuccess(t('views.model.tip.createSuccessMessage'))
+            emit('submit')
+          })
       }
     })
     .catch(() => {

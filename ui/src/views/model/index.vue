@@ -75,8 +75,8 @@
               :xs="24"
               :sm="12"
               :md="12"
-              :lg="8"
-              :xl="6"
+              :lg="isSystemShare ? 12 : 8"
+              :xl="isSystemShare ? 12 : 8"
               class="mb-16"
               v-for="(model, i) in row"
               :key="i"
@@ -87,6 +87,8 @@
                 :model="model"
                 :provider_list="provider_list"
                 :isShared="isShared"
+                :isSystemShare="isSystemShare"
+                :sharedType="type"
               >
               </ModelCard>
             </el-col>
@@ -125,11 +127,9 @@ import { t } from '@/locales'
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { useRoute } from 'vue-router'
-import useStore from '@/stores'
 import permissionMap from '@/permission'
 
 const route = useRoute()
-const { folder, user } = useStore()
 
 const type = computed(() => {
   if (route.path.includes('shared')) {
@@ -143,7 +143,9 @@ const type = computed(() => {
 const permissionPrecise = computed(() => {
   return permissionMap['model'][type.value]
 })
-
+const isSystemShare = computed(() => {
+  return type.value === 'systemShare'
+})
 const commonList1 = ref()
 const commonList2 = ref()
 const loading = ref<boolean>(false)
@@ -200,7 +202,7 @@ const openCreateModel = (provider?: Provider, model_type?: string) => {
 
 const list_model = () => {
   const params = active_provider.value?.provider ? { provider: active_provider.value.provider } : {}
-  loadSharedApi({ type: 'model', isShared: isShared.value })
+  loadSharedApi({ type: 'model', isShared: isShared.value, systemType: type.value })
     .getModel({ ...model_search_form.value, ...params }, list_model_loading)
     .then((ok: any) => {
       model_list.value = ok.data
