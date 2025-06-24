@@ -1,4 +1,4 @@
-name: build-and-push-python-pg
+name: build-and-push-base
 
 on:
   workflow_dispatch:
