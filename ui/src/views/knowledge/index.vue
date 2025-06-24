@@ -189,7 +189,6 @@
                   @click="
                     router.push({ path: `/knowledge/${item.id}/${currentFolder.id}/document` })
                   "
-                  v-if="permissionPrecise.single(item.id)"
                 >
                   <template #icon>
                     <KnowledgeIcon :type="item.type" />

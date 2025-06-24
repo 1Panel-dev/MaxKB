@@ -3,12 +3,61 @@ import { ComplexPermission } from '@/utils/permission/type'
 import { EditionConst, PermissionConst, RoleConst } from '@/utils/permission/data'
 const share = {
   is_share: () => false,
-  delete: () => false,
-  create: () => false,
-  switch: () => false,
-  edit: () => false,
-  copy: () => false,
-  export: () => false,
-  debug: () => false,
+  create: () =>
+    hasPermission(
+      [
+        RoleConst.ADMIN,
+        PermissionConst.SHARED_TOOL_CREATE,
+      ],
+      'OR',
+    ),
+    delete: () =>
+    hasPermission(
+      [
+        RoleConst.ADMIN,
+        PermissionConst.SHARED_TOOL_DELETE,
+      ],
+      'OR',
+    ),
+    switch: () =>
+    hasPermission(
+      [
+        RoleConst.ADMIN,
+        PermissionConst.SHARED_TOOL_EDIT,
+      ],
+      'OR',
+    ),
+    edit: () =>
+    hasPermission(
+      [
+        RoleConst.ADMIN,
+        PermissionConst.SHARED_TOOL_EDIT,
+      ],
+      'OR',
+    ),
+    copy: () =>
+    hasPermission(
+      [
+        RoleConst.ADMIN,
+        PermissionConst.SHARED_TOOL_CREATE,
+      ],
+      'OR',
+    ),
+    export: () =>
+    hasPermission(
+      [
+        RoleConst.ADMIN,
+        PermissionConst.SHARED_TOOL_EXPORT,
+      ],
+      'OR',
+    ),
+    debug: () =>
+    hasPermission(
+      [
+        RoleConst.ADMIN,
+        PermissionConst.SHARED_TOOL_DEBUG,
+      ],
+      'OR',
+    ),
 }
 export default share

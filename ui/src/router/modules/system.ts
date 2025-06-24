@@ -145,6 +145,14 @@ const systemRouter = {
             activeMenu: '/system',
             parentPath: '/system',
             parentName: 'system',
+            permission: [
+              new ComplexPermission(
+                [RoleConst.ADMIN],
+                [PermissionConst.SHARED_TOOL_READ],
+                [EditionConst.IS_EE],
+                'OR'
+              )
+            ]
           },
           component: () => import('@/views/system-shared/ToolSharedIndex.vue'),
         },
