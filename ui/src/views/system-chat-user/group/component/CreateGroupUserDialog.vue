@@ -18,7 +18,7 @@
       <span class="dialog-footer">
         <el-button @click.prevent="dialogVisible = false"> {{ $t('common.cancel') }} </el-button>
         <el-button type="primary" @click="submit(formRef)" :loading="loading">
-          {{ $t('common.create') }}
+          {{ $t('common.add') }}
         </el-button>
       </span>
     </template>
@@ -82,7 +82,7 @@ const submit = async (formEl: FormInstance | undefined) => {
   await formEl.validate((valid) => {
     if (valid) {
       SystemGroupApi.postAddMember(groupId.value, {"user_ids": form.value.user}, loading).then(() => {
-        MsgSuccess(t('common.createSuccess'))
+        MsgSuccess(t('common.addSuccess'))
         emit('refresh')
         dialogVisible.value = false
       })

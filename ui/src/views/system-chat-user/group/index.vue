@@ -98,7 +98,7 @@
                   v-hasPermission="new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
                   [PermissionConst.WORKSPACE_USER_GROUP_DELETE.getWorkspacePermission], [], 'OR')"
                 >
-                  {{ $t('common.delete') }}
+                  {{ $t('common.remove') }}
                 </el-button>
               </div>
               <div class="flex-between complex-search">
@@ -134,7 +134,7 @@
               </el-table-column>
               <el-table-column :label="$t('common.operation')" width="100" fixed="right">
                 <template #default="{ row }">
-                  <el-tooltip effect="dark" :content="`${$t('views.role.member.delete.button')}`" placement="top">
+                  <el-tooltip effect="dark" :content="`${$t('common.remove')}`" placement="top">
                     <el-button type="primary" text @click.stop="handleDeleteUser(row)"
                       v-hasPermission="new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
                       [PermissionConst.WORKSPACE_USER_GROUP_REMOVE_MEMBER.getWorkspacePermission], [], 'OR')"
@@ -299,7 +299,7 @@ function handleDeleteUser(item?: ChatUserGroupUserItem) {
   )
     .then(() => {
       SystemGroupApi.postRemoveMember(current.value?.id as string, { group_relation_ids: item ? [item.user_group_relation_id] : multipleSelection.value.map(item => (item.user_group_relation_id)) }, loading).then(async () => {
-        MsgSuccess(t('common.deleteSuccess'))
+        MsgSuccess(t('common.removeSuccess'))
         await getList()
       })
     })

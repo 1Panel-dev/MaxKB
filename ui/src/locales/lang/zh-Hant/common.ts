@@ -43,6 +43,8 @@ export default {
   required: '必填',
   noData: '暂无数据',
   result: '結果',
+  remove: '移除',
+  removeSuccess: '移除成功',
   searchBar: {
     placeholder: '按名稱搜尋',
   },

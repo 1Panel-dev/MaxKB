@@ -43,6 +43,8 @@ export default {
   required: 'Required',
   noData: 'No data',
   result: 'Result',
+  remove: 'Remove',
+  removeSuccess: 'Successful',
   searchBar: {
     placeholder: 'Search by name',
   },
