@@ -318,15 +318,16 @@ class Query(serializers.Serializer):
         application_custom_sql_query_set = application_query_set
         application_query_set = application_query_set.order_by("-update_time")
         workspace_user_role_mapping_model = DatabaseModelManage.get_model('workspace_user_role_mapping')
-        return {
+
+        return {'folder_query_set': folder_query_set,
+                'application_query_set': application_query_set,
+                'user_query_set': QuerySet(
+                    workspace_user_role_mapping_model).filter(
+                    user_id=user_id, workspace_id=workspace_id)} if (not workspace_manage and is_x_pack_ee) else {
             'folder_query_set': folder_query_set,
             'application_query_set': application_query_set,
             'application_custom_sql': application_custom_sql_query_set
-        } if (workspace_manage and not is_x_pack_ee) else {'folder_query_set': folder_query_set,
-                                                       'application_query_set': application_query_set,
-                                                       'user_query_set': QuerySet(
-                                                           workspace_user_role_mapping_model).filter(
-                                                           user_id=user_id, workspace_id=workspace_id)}
+        }
 
     @staticmethod
     def is_x_pack_ee():
