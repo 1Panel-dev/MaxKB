@@ -31,7 +31,7 @@ class WorkspaceUserResourcePermission(models.Model):
 
     workspace_id = models.CharField(max_length=128, verbose_name="工作空间id", default="default")
 
-    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name="工作空间下的用户")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="工作空间下的用户")
 
     auth_target_type = models.CharField(verbose_name='授权目标', max_length=128, choices=AuthTargetType.choices,
                                         default=AuthTargetType.KNOWLEDGE)
