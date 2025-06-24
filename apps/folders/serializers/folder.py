@@ -102,6 +102,7 @@ class FolderSerializer(serializers.Serializer):
     parent_id = serializers.CharField(required=False, label=_('parent id'))
 
     class Create(serializers.Serializer):
+        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
         user_id = serializers.UUIDField(required=True, label=_('user id'))
         source = serializers.CharField(required=True, label=_('source'))
 
