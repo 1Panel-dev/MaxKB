@@ -478,9 +478,10 @@ function refresh(data?: any) {
   getList()
 }
 
-function copyTool(row: any) {
+async function copyTool(row: any) {
   ToolDrawertitle.value = t('views.tool.copyTool')
-  const obj = cloneDeep(row)
+  const res = await ToolApi.getToolById(row.id, changeStateloading)
+  const obj = cloneDeep(res.data)
   delete obj['id']
   obj['name'] = obj['name'] + `  ${t('views.tool.form.title.copy')}`
   ToolFormDrawerRef.value.open(obj)
