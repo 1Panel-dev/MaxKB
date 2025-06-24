@@ -1,7 +1,18 @@
+import { PermissionConst, EditionConst, RoleConst } from '@/utils/permission/data'
 const ModelRouter = {
   path: '/knowledge',
   name: 'knowledge',
-  meta: { title: 'views.knowledge.title' },
+  meta: {
+    title: 'views.knowledge.title',
+    menu: true,
+    permission: [
+      RoleConst.ADMIN,
+      RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+      PermissionConst.KNOWLEDGE_READ.getWorkspacePermission,
+      PermissionConst.KNOWLEDGE_READ.getWorkspacePermissionWorkspaceManageRole,
+    ],
+    order: 2,
+  },
   redirect: '/knowledge',
   component: () => import('@/layout/layout-template/SimpleLayout.vue'),
   children: [
@@ -20,12 +31,12 @@ const ModelRouter = {
       component: () => import('@/views/document/UploadDocument.vue'),
       hidden: true,
     },
-      {
+    {
       path: '/knowledge/import',
       name: 'ImportLarkDocument',
       meta: { activeMenu: '/knowledge' },
       component: () => import('@/views/document/ImportLarkDocument.vue'),
-      hidden: true
+      hidden: true,
     },
   ],
 }

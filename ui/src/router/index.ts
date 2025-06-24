@@ -48,7 +48,7 @@ router.beforeEach(
       next()
     } else {
       // 如果没有权限则直接取404页面
-      next('404')
+      next({ path: '/no-permission' })
     }
   },
 )
