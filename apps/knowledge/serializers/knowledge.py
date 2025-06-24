@@ -11,6 +11,7 @@ from typing import Dict, List
 import uuid_utils.compat as uuid
 from celery_once import AlreadyQueued
 from django.core import validators
+from django.core.cache import cache
 from django.db import transaction, models
 from django.db.models import QuerySet
 from django.db.models.functions import Reverse, Substr
@@ -20,6 +21,7 @@ from rest_framework import serializers
 
 from application.models import ApplicationKnowledgeMapping
 from common.config.embedding_config import VectorStore
+from common.constants.cache_version import Cache_Version
 from common.constants.permission_constants import ResourceAuthType, ResourcePermissionGroup
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import native_search, get_dynamics_model, native_page_search
@@ -534,6 +536,10 @@ class KnowledgeSerializer(serializers.Serializer):
                 user_id=self.data.get('user_id'),
                 auth_type=ResourceAuthType.RESOURCE_PERMISSION_GROUP
             ).save()
+            # 刷新缓存
+            version = Cache_Version.PERMISSION_LIST.get_version()
+            key = Cache_Version.PERMISSION_LIST.get_key(user_id=self.data.get('user_id'))
+            cache.delete(key, version=version)
 
             return {
                 **KnowledgeModelSerializer(knowledge).data,
@@ -581,6 +587,11 @@ class KnowledgeSerializer(serializers.Serializer):
                 user_id=self.data.get('user_id'),
                 auth_type=ResourceAuthType.RESOURCE_PERMISSION_GROUP
             ).save()
+            # 刷新缓存
+            version = Cache_Version.PERMISSION_LIST.get_version()
+            key = Cache_Version.PERMISSION_LIST.get_key(user_id=self.data.get('user_id'))
+            cache.delete(key, version=version)
+
             sync_web_knowledge.delay(str(knowledge_id), instance.get('source_url'), instance.get('selector'))
             return {**KnowledgeModelSerializer(knowledge).data, 'document_list': []}
 
