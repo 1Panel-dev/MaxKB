@@ -2,10 +2,12 @@
   <el-dialog v-model="dialogVisible" width="1000" append-to-body class="tool-store-dialog" align-center
     :close-on-click-modal="false" :close-on-press-escape="false">
     <template #header="{ titleId }">
-      <div class="flex-between mb-8">
+      <div class="dialog-header flex-between mb-8">
         <h4 :id="titleId" class="medium">
           {{ $t('views.tool.toolStore.title') }}
         </h4>
+        
+        <el-tag class="store-type default-tag">{{t('views.tool.toolStore.internal')}}</el-tag>
 
         <div class="flex align-center" style="margin-right: 28px;">
           <el-input v-model="searchValue" :placeholder="$t('common.search')" prefix-icon="Search" class="w-240 mr-8"
@@ -81,11 +83,12 @@ const searchValue = ref('')
 const folderId = ref('')
 
 const categories = ref<ToolCategory[]>([
-  {
-    id: 'recommend',
-    title: t('views.tool.toolStore.recommend'),
-    tools: []
-  },
+  // 第一版不上
+  // {
+  //   id: 'recommend',
+  //   title: t('views.tool.toolStore.recommend'),
+  //   tools: []
+  // },
   {
     id: 'web_search',
     title: t('views.tool.toolStore.webSearch'),
@@ -96,21 +99,21 @@ const categories = ref<ToolCategory[]>([
     title: t('views.tool.toolStore.databaseQuery'),
     tools: []
   },
-  {
-    id: 'image',
-    title: t('views.tool.toolStore.image'),
-    tools: []
-  },
-  {
-    id: 'developer',
-    title: t('views.tool.toolStore.developer'),
-    tools: []
-  },
-  {
-    id: 'communication',
-    title: t('views.tool.toolStore.communication'),
-    tools: []
-  }
+  // {
+  //   id: 'image',
+  //   title: t('views.tool.toolStore.image'),
+  //   tools: []
+  // },
+  // {
+  //   id: 'developer',
+  //   title: t('views.tool.toolStore.developer'),
+  //   tools: []
+  // },
+  // {
+  //   id: 'communication',
+  //   title: t('views.tool.toolStore.communication'),
+  //   tools: []
+  // }
 ])
 const filterList = ref<any>(null)
 
@@ -136,11 +139,11 @@ async function getList() {
     } else {
       filterList.value = null
       categories.value.forEach(category => {
-        if (category.id === 'recommend') {
-          category.tools = res.data
-        } else {
+        // if (category.id === 'recommend') {
+        //   category.tools = res.data
+        // } else {
           category.tools = res.data.filter((tool: any) => tool.label === category.id)
-        }
+        // }
       })
     }
   } catch (error) {
@@ -186,6 +189,16 @@ defineExpose({ open })
   .el-dialog__header {
     padding: 12px 20px 4px 24px;
     border-bottom: 1px solid var(--el-border-color-light);
+
+    .dialog-header {
+      position: relative;
+      .store-type {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+    }
   }
 
   .layout-container__left {

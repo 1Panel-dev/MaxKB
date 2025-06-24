@@ -4,15 +4,16 @@
     :class="classObj"
     v-loading="loading"
     :style="{
-      '--el-color-primary': applicationDetail?.custom_theme?.theme_color,
-      '--el-color-primary-light-9': hexToRgba(applicationDetail?.custom_theme?.theme_color, 0.1),
+    '--el-color-primary': applicationDetail?.custom_theme?.theme_color,
+    '--el-color-primary-light-9': hexToRgba(applicationDetail?.custom_theme?.theme_color, 0.1),
     }"
   >
-    <div class="flex">
-      <div class="chat-pc__left border-r">
-        <div class="p-16-24 pb-0">
-          <div class="flex align-center mb-16">
-            <div class="flex">
+    <div class="flex h-full w-full">
+      <div class="chat-pc__left">
+        <el-menu class="w-full h-full" :default-active="currentChatId" :collapse="isPcCollapse" collapse-transition popper-class="chat-pc-popper">
+          <div style="padding: 16px 18px 0 18px;">
+            <div class="flex align-center mb-16">
+              <div class="flex">
               <el-avatar
                 v-if="isAppIcon(applicationDetail?.icon)"
                 shape="square"
@@ -23,70 +24,123 @@
               </el-avatar>
               <LogoIcon v-else height="28px" style="width: 28px; height: 28px; display: block" />
             </div>
-            <h4>{{ applicationDetail?.name }}</h4>
+            <h4 v-show="!isPcCollapse">{{ applicationDetail?.name }}</h4>
           </div>
-          <el-button class="add-button w-full primary" @click="newChat">
+          <el-button v-show="!isPcCollapse" class="add-button w-full primary" @click="newChat">
             <AppIcon iconName="app-create-chat"></AppIcon>
             <span class="ml-4">{{ $t('chat.createChat') }}</span>
           </el-button>
-          <p class="mt-20 mb-8">{{ $t('chat.history') }}</p>
-        </div>
-        <div class="left-height pt-0">
-          <el-scrollbar>
-            <div class="p-8 pt-0">
-              <common-list
-                :style="{
-                  '--el-color-primary': applicationDetail?.custom_theme?.theme_color,
-                  '--el-color-primary-light-9': hexToRgba(
-                    applicationDetail?.custom_theme?.theme_color,
-                    0.1,
-                  ),
-                }"
-                :data="chatLogData"
-                class="mt-8"
-                v-loading="left_loading"
-                :defaultActive="currentChatId"
-                @click="clickListHandle"
-                @mouseenter="mouseenter"
-                @mouseleave="mouseId = ''"
-              >
-                <template #default="{ row }">
-                  <div class="flex-between">
-                    <span :title="row.abstract">
-                      {{ row.abstract }}
-                    </span>
-                    <div @click.stop v-show="mouseId === row.id && row.id !== 'new'">
-                      <el-dropdown trigger="click" :teleported="false">
-                        <el-icon class="rotate-90 mt-4"><MoreFilled /></el-icon>
-                        <template #dropdown>
-                          <el-dropdown-menu>
-                            <el-dropdown-item @click.stop="editLogTitle(row)">
-                              <el-icon><EditPen /></el-icon>
-                              {{ $t('common.edit') }}
-                            </el-dropdown-item>
-                            <el-dropdown-item @click.stop="deleteLog(row)">
-                              <el-icon><Delete /></el-icon>
-                              {{ $t('common.delete') }}
-                            </el-dropdown-item>
-                          </el-dropdown-menu>
-                        </template>
-                      </el-dropdown>
+          <p v-show="!isPcCollapse" class="mt-20 mb-8">{{ $t('chat.history') }}</p>
+          </div>
+          <div v-show="!isPcCollapse" class="left-height pt-0">
+            <el-scrollbar>
+              <div class="p-8 pt-0">
+                <common-list
+                  :style="{
+                    '--el-color-primary': applicationDetail?.custom_theme?.theme_color,
+                    '--el-color-primary-light-9': hexToRgba(
+                      applicationDetail?.custom_theme?.theme_color,
+                      0.1,
+                    ),
+                  }"
+                  :data="chatLogData"
+                  class="mt-8"
+                  v-loading="left_loading"
+                  :defaultActive="currentChatId"
+                  @click="clickListHandle"
+                  @mouseenter="mouseenter"
+                  @mouseleave="mouseId = ''"
+                >
+                  <template #default="{ row }">
+                    <div class="flex-between">
+                      <span :title="row.abstract">
+                        {{ row.abstract }}
+                      </span>
+                      <div @click.stop v-show="mouseId === row.id && row.id !== 'new'">
+                        <el-dropdown trigger="click" :teleported="false">
+                          <el-icon class="rotate-90 mt-4"><MoreFilled /></el-icon>
+                          <template #dropdown>
+                            <el-dropdown-menu>
+                              <el-dropdown-item @click.stop="editLogTitle(row)">
+                                <el-icon><EditPen /></el-icon>
+                                {{ $t('common.edit') }}
+                              </el-dropdown-item>
+                              <el-dropdown-item @click.stop="deleteLog(row)">
+                                <el-icon><Delete /></el-icon>
+                                {{ $t('common.delete') }}
+                              </el-dropdown-item>
+                            </el-dropdown-menu>
+                          </template>
+                        </el-dropdown>
+                      </div>
                     </div>
-                  </div>
-                </template>
+                  </template>
 
-                <template #empty>
-                  <div class="text-center">
-                    <el-text type="info">{{ $t('chat.noHistory') }}</el-text>
+                  <template #empty>
+                    <div class="text-center">
+                      <el-text type="info">{{ $t('chat.noHistory') }}</el-text>
+                    </div>
+                  </template>
+                </common-list>
+              </div>
+              <div v-if="chatLogData?.length" class="gradient-divider lighter mt-8">
+                <span>{{ $t('chat.only20history') }}</span>
+              </div>
+            </el-scrollbar>
+          </div>
+          <el-menu-item index="1" v-show="isPcCollapse" @click="newChat">
+            <AppIcon iconName="app-create-chat"></AppIcon>
+            <template #title>{{ $t('chat.createChat') }}</template>
+          </el-menu-item>
+          <el-sub-menu v-show="isPcCollapse" index="2">
+            <template #title>
+              <el-icon>
+                <location />
+              </el-icon>
+            </template>
+            <el-menu-item-group v-loading="left_loading">
+              <template #title><span>{{ $t('chat.history') }}</span></template>
+              <el-menu-item v-for="row in chatLogData" :index="row.id" :key="row.id" @click="clickListHandle(row)">
+                <div class="flex-between w-full lighter">
+                  <span :title="row.abstract">
+                    {{ row.abstract }}
+                  </span>
+                  <div @click.stop class="flex" v-show="mouseId === row.id && row.id !== 'new'">
+                    <el-dropdown trigger="click" :teleported="false">
+                      <el-icon class="rotate-90 mt-4">
+                        <MoreFilled />
+                      </el-icon>
+                      <template #dropdown>
+                        <el-dropdown-menu>
+                          <el-dropdown-item @click.stop="editLogTitle(row)">
+                            <el-icon>
+                              <EditPen />
+                            </el-icon>
+                            {{ $t('common.edit') }}
+                          </el-dropdown-item>
+                          <el-dropdown-item @click.stop="deleteLog(row)">
+                            <el-icon>
+                              <Delete />
+                            </el-icon>
+                            {{ $t('common.delete') }}
+                          </el-dropdown-item>
+                        </el-dropdown-menu>
+                      </template>
+                    </el-dropdown>
                   </div>
-                </template>
-              </common-list>
+                </div>
+              </el-menu-item>
+            </el-menu-item-group>
+            <div v-if="!chatLogData?.length" class="text-center">
+              <el-text type="info">{{ $t('chat.noHistory') }}</el-text>
             </div>
-            <div v-if="chatLogData?.length" class="gradient-divider lighter mt-8">
-              <span>{{ $t('chat.only20history') }}</span>
-            </div>
-          </el-scrollbar>
-        </div>
+          </el-sub-menu>
+        </el-menu>
+        <el-button v-if="!common.isMobile()" class="pc-collapse" circle size="small" @click="isPcCollapse = !isPcCollapse">
+          <el-icon>
+            <component :is=" isPcCollapse ? 'Fold' : 'Expand'" />
+          </el-icon>
+        </el-button>
       </div>
       <div class="chat-pc__right">
         <div class="mb-24 p-16-24 flex-between">
@@ -150,7 +204,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick, computed } from 'vue'
+import { ref, onMounted, nextTick, computed, watch } from 'vue'
 import { marked } from 'marked'
 import { saveAs } from 'file-saver'
 import chatAPI from '@/api/chat/chat'
@@ -167,6 +221,12 @@ const { user, chatLog, common } = useStore()
 const EditTitleDialogRef = ref()
 
 const isCollapse = ref(false)
+const isPcCollapse = ref(false)
+watch(()=> common.device, () => {
+  if(common.isMobile()) {
+    isPcCollapse.value = false
+  }
+})
 
 const customStyle = computed(() => {
   return {
@@ -383,7 +443,7 @@ const init = () => {
   // ) {
   //   getChatLog(applicationDetail.value.id)
   // }
-  getChatLog(applicationDetail.value.id)
+  getChatLog(applicationDetail.value?.id)
 }
 onMounted(() => {
   init()
@@ -391,6 +451,7 @@ onMounted(() => {
 </script>
 <style lang="scss">
 .chat-pc {
+  height: 100%;
   overflow: hidden;
   background: #eef1f4;
 
@@ -408,11 +469,40 @@ onMounted(() => {
   }
 
   &__left {
-    background:
-      linear-gradient(187.61deg, rgba(235, 241, 255, 0.5) 39.6%, rgba(231, 249, 255, 0.5) 94.3%),
-      #eef1f4;
+    position: relative;
 
-    width: 280px;
+    .el-menu {
+      background:
+        linear-gradient(187.61deg, rgba(235, 241, 255, 0.5) 39.6%, rgba(231, 249, 255, 0.5) 94.3%),
+        #eef1f4;
+
+      &:not(.el-menu--collapse) {
+        width: 280px;
+      }
+
+      .el-menu-item:hover {
+        background: transparent;
+      }
+
+      &.el-menu--collapse {
+        .el-menu-item,.el-menu-tooltip__trigger,.el-sub-menu__title {
+          padding: 0;
+        }
+
+        .el-menu-item .el-menu-tooltip__trigger,.el-sub-menu__title {
+          position: static;
+          width: 40px;
+          height: 40px;
+          border-radius: 6px;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto;
+        }
+        .el-menu-item:hover .el-menu-tooltip__trigger,.el-sub-menu__title:hover {
+          background-color: #1F23291A;
+        }
+      }
+    }
 
     .add-button {
       border: 1px solid var(--el-color-primary);
@@ -421,10 +511,17 @@ onMounted(() => {
     .left-height {
       height: calc(100vh - 140px);
     }
+
+    .pc-collapse {
+      position: absolute;
+      top: 20px;
+      right: -12px;
+      box-shadow: 0px 5px 10px 0px #1F23291A;
+    }
   }
 
   &__right {
-    width: calc(100% - 280px);
+    flex: 1;
     overflow: hidden;
     position: relative;
     box-sizing: border-box;
@@ -464,6 +561,27 @@ onMounted(() => {
     display: none;
   }
 }
+
+.chat-pc-popper {
+  .el-menu-item-group__title {
+    padding-bottom: 16px;
+    font-weight: 500;
+    color: var(--app-text-color-secondary);
+  }
+  .el-menu-item {
+    border-radius: 6px;
+    height: 40px;
+    margin: 0 8px;
+    padding-left: 8px;
+    padding-right: 8px;
+    &:hover {
+      background-color: #1F23291A;
+    }
+    &.is-active {
+      background-color: #3370FF1A;
+    }
+  }
+}
 // 适配移动端
 .mobile {
   .chat-pc {
@@ -489,6 +607,9 @@ onMounted(() => {
         width: 100%;
         z-index: 99;
         height: calc(100vh);
+        .el-menu {
+          width: 100%;
+        }
       }
     }
     .collapse {

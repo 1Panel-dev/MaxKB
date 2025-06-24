@@ -9,6 +9,7 @@ export default {
   toolStore: {
     title: 'Tool Store',
     createFromToolStore: 'Create from Tool Store',
+    internal: 'Built in system',
     recommend: 'Recommended',
     webSearch: 'Web Search',
     databaseQuery: 'Database Query',

@@ -7,6 +7,7 @@ export default {
   toolStore: {
     title: '工具商店',
     createFromToolStore: '从工具商店创建',
+    internal: '系统内置',
     recommend: '推荐',
     webSearch: '联网搜索',
     databaseQuery: '数据库查询',
