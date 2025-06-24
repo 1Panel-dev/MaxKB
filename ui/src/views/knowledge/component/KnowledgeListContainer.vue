@@ -1,5 +1,8 @@
 <template>
-  <ContentContainer :header="currentFolder?.name">
+  <ContentContainer>
+    <template #header>
+      <slot name="header"> </slot>
+    </template>
     <template #search>
       <div class="flex">
         <div class="flex-between complex-search">
@@ -31,8 +34,8 @@
             <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.username" />
           </el-select>
         </div>
-        <el-dropdown trigger="click" v-if="!isShared">
-          <el-button type="primary" class="ml-8" v-if="permissionPrecise.create()">
+        <el-dropdown trigger="click" v-if="!isShared && permissionPrecise.create()">
+          <el-button type="primary" class="ml-8">
             {{ $t('common.create') }}
             <el-icon class="el-icon--right">
               <arrow-down />
@@ -131,15 +134,15 @@
       style="max-height: calc(100vh - 140px)"
     >
       <InfiniteScroll
-        :size="knowledgeList.length"
+        :size="knowledge.knowledgeList.length"
         :total="paginationConfig.total"
         :page_size="paginationConfig.page_size"
         v-model:current_page="paginationConfig.current_page"
         @load="getList"
         :loading="loading"
       >
-        <el-row v-if="knowledgeList.length > 0" :gutter="15" class="w-full">
-          <template v-for="(item, index) in knowledgeList" :key="index">
+        <el-row v-if="knowledge.knowledgeList.length > 0" :gutter="15" class="w-full">
+          <template v-for="(item, index) in knowledge.knowledgeList" :key="index">
             <el-col
               v-if="item.resource_type === 'folder'"
               :xs="24"
@@ -172,7 +175,9 @@
                 :title="item.name"
                 :description="item.desc"
                 class="cursor"
-                @click="router.push({ path: `/knowledge/${item.id}/${currentFolder.id}/document` })"
+                @click="
+                  router.push({ path: `/knowledge/${item.id}/${folder.currentFolder.id}/document` })
+                "
               >
                 <template #icon>
                   <KnowledgeIcon :type="item.type" />
@@ -236,10 +241,16 @@
                             >{{ $t('views.document.generateQuestion.title') }}
                           </el-dropdown-item>
                           <el-dropdown-item
+                            v-if="isSystemShare"
+                            icon="Lock"
+                            @click.stop="openAuthorizedWorkspaceDialog(item)"
+                            >{{ $t('views.system.shared.authorized_workspace') }}</el-dropdown-item
+                          >
+                          <el-dropdown-item
                             icon="Setting"
                             @click.stop="
                               router.push({
-                                path: `/knowledge/${item.id}/${currentFolder.value}/setting`,
+                                path: `/knowledge/${item.id}/${folder.currentFolder.id}/setting`,
                               })
                             "
                             v-if="permissionPrecise.setting(item.id)"
@@ -283,20 +294,25 @@
   </ContentContainer>
 
   <component :is="currentCreateDialog" ref="CreateKnowledgeDialogRef" v-if="!isShared" />
-  <CreateFolderDialog ref="CreateFolderDialogRef"  v-if="!isShared" />
+  <CreateFolderDialog ref="CreateFolderDialogRef" v-if="!isShared" />
   <GenerateRelatedDialog ref="GenerateRelatedDialogRef" />
   <SyncWebDialog ref="SyncWebDialogRef" v-if="!isShared" />
+  <AuthorizedWorkspace
+    ref="AuthorizedWorkspaceDialogRef"
+    v-if="isSystemShare"
+  ></AuthorizedWorkspace>
 </template>
 
 <script lang="ts" setup>
 import { onMounted, ref, reactive, shallowRef, nextTick, computed, watch } from 'vue'
+import { cloneDeep, get } from 'lodash'
 import CreateKnowledgeDialog from '@/views/knowledge/create-component/CreateKnowledgeDialog.vue'
 import CreateWebKnowledgeDialog from '@/views/knowledge/create-component/CreateWebKnowledgeDialog.vue'
 import CreateLarkKnowledgeDialog from '@/views/knowledge/create-component/CreateLarkKnowledgeDialog.vue'
 import SyncWebDialog from '@/views/knowledge/component/SyncWebDialog.vue'
 import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
 import GenerateRelatedDialog from '@/components/generate-related-dialog/index.vue'
-import KnowledgeApi from '@/api/knowledge/knowledge'
+import AuthorizedWorkspace from '@/views/system-shared/AuthorizedWorkspaceDialog.vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import useStore from '@/stores'
 import { numberFormat } from '@/utils/common'
@@ -348,7 +364,6 @@ const paginationConfig = reactive({
   total: 0,
 })
 
-const folderList = ref<any[]>([])
 const knowledgeList = ref<any[]>([])
 const currentFolder = ref<any>({})
 
@@ -358,7 +373,7 @@ const currentCreateDialog = shallowRef<any>(null)
 function openCreateDialog(data: any) {
   currentCreateDialog.value = data
   nextTick(() => {
-    CreateKnowledgeDialogRef.value.open(currentFolder.value)
+    CreateKnowledgeDialogRef.value.open(folder.currentFolder)
   })
 
   // common.asyncGetValid(ValidType.Dataset, ValidCount.Dataset, loading).then(async (res: any) => {
@@ -378,9 +393,11 @@ function openCreateDialog(data: any) {
 }
 
 function reEmbeddingKnowledge(row: any) {
-  KnowledgeApi.putReEmbeddingKnowledge(row.id).then(() => {
-    MsgSuccess(t('common.submitSuccess'))
-  })
+  loadSharedApi({ type: 'knowledge', systemType: type.value })
+    .putReEmbeddingKnowledge(row.id)
+    .then(() => {
+      MsgSuccess(t('common.submitSuccess'))
+    })
 }
 
 const SyncWebDialogRef = ref()
@@ -401,14 +418,18 @@ function openGenerateDialog(row: any) {
 }
 
 const exportKnowledge = (item: any) => {
-  KnowledgeApi.exportKnowledge(item.name, item.id, loading).then((ok) => {
-    MsgSuccess(t('common.exportSuccess'))
-  })
+  loadSharedApi({ type: 'knowledge', systemType: type.value })
+    .exportKnowledge(item.name, item.id, loading)
+    .then(() => {
+      MsgSuccess(t('common.exportSuccess'))
+    })
 }
 const exportZipKnowledge = (item: any) => {
-  KnowledgeApi.exportZipKnowledge(item.name, item.id, loading).then((ok) => {
-    MsgSuccess(t('common.exportSuccess'))
-  })
+  loadSharedApi({ type: 'knowledge', systemType: type.value })
+    .exportZipKnowledge(item.name, item.id, loading)
+    .then(() => {
+      MsgSuccess(t('common.exportSuccess'))
+    })
 }
 
 function deleteKnowledge(row: any) {
@@ -421,19 +442,30 @@ function deleteKnowledge(row: any) {
     },
   )
     .then(() => {
-      KnowledgeApi.delKnowledge(row.id, loading).then(() => {
-        const index = knowledgeList.value.findIndex((v) => v.id === row.id)
-        knowledgeList.value.splice(index, 1)
-        MsgSuccess(t('common.deleteSuccess'))
-      })
+      loadSharedApi({ type: 'knowledge', systemType: type.value })
+        .delKnowledge(row.id, loading)
+        .then(() => {
+          const list = cloneDeep(knowledge.knowledgeList)
+          const index = list.findIndex((v) => v.id === row.id)
+          list.splice(index, 1)
+          knowledge.setKnowledgeList(list)
+          MsgSuccess(t('common.deleteSuccess'))
+        })
     })
     .catch(() => {})
+}
+
+const AuthorizedWorkspaceDialogRef = ref()
+function openAuthorizedWorkspaceDialog(row: any) {
+  if (AuthorizedWorkspaceDialogRef.value) {
+    AuthorizedWorkspaceDialogRef.value.open(row)
+  }
 }
 
 // 文件夹相关
 const CreateFolderDialogRef = ref()
 function openCreateFolder() {
-  CreateFolderDialogRef.value.open(FolderSource.KNOWLEDGE, currentFolder.value.id)
+  CreateFolderDialogRef.value.open(FolderSource.KNOWLEDGE, folder.currentFolder.id)
 }
 watch(
   () => folder.currentFolder,

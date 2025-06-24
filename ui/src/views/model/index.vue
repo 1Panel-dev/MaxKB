@@ -74,7 +74,7 @@
             <el-col
               :xs="24"
               :sm="12"
-              :md="12"
+              :md="isSystemShare ? 24 : 12"
               :lg="isSystemShare ? 12 : 8"
               :xl="isSystemShare ? 12 : 8"
               class="mb-16"

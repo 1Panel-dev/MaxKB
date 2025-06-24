@@ -4,7 +4,11 @@
       {{ $t('views.application.hitTest.title') }}
       <el-text type="info" class="ml-4"> {{ $t('views.application.hitTest.text') }}</el-text>
     </h4>
-    <el-card style="--el-card-padding: 0" class="hit-test__main p-16 mt-16 mb-16" v-loading="loading">
+    <el-card
+      style="--el-card-padding: 0"
+      class="hit-test__main p-16 mt-16 mb-16"
+      v-loading="loading"
+    >
       <div class="question-title" :style="{ visibility: questionTitle ? 'visible' : 'hidden' }">
         <div class="avatar">
           <el-avatar>
@@ -215,18 +219,26 @@
 import { nextTick, ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { cloneDeep } from 'lodash'
-import KnowledgeApi from '@/api/knowledge/knowledge'
 // import applicationApi from '@/api/application/application'
 import ParagraphDialog from '@/views/paragraph/component/ParagraphDialog.vue'
 import { arraySort } from '@/utils/common'
 import emptyImg from '@/assets/hit-test-empty.png'
 import { t } from '@/locales'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 const route = useRoute()
 const {
   meta: { activeMenu },
   params: { id },
 } = route as any
-
+const type = computed(() => {
+  if (route.path.includes('shared')) {
+    return 'systemShare'
+  } else if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
 const quickInputRef = ref()
 const ParagraphDialogRef = ref()
 const loading = ref(false)
@@ -312,12 +324,14 @@ function getHitTestList() {
     ...formInline.value,
   }
   if (isDataset.value) {
-    KnowledgeApi.putKnowledgeHitTest(id, obj, loading).then((res) => {
-      paragraphDetail.value = res.data && arraySort(res.data, 'comprehensive_score', true)
-      questionTitle.value = inputValue.value
-      inputValue.value = ''
-      first.value = false
-    })
+    loadSharedApi({ type: 'knowledge', systemType: type.value })
+      .putKnowledgeHitTest(id, obj, loading)
+      .then((res: any) => {
+        paragraphDetail.value = res.data && arraySort(res.data, 'comprehensive_score', true)
+        questionTitle.value = inputValue.value
+        inputValue.value = ''
+        first.value = false
+      })
   } else if (isApplication.value) {
     // applicationApi.getApplicationHitTest(id, obj, loading).then((res) => {
     //   paragraphDetail.value = res.data && arraySort(res.data, 'comprehensive_score', true)

@@ -70,22 +70,30 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { reactive, ref, watch } from 'vue'
+import { reactive, ref, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import documentApi from '@/api/knowledge/document'
 import paragraphApi from '@/api/knowledge/paragraph'
-import knowledgeApi from '@/api/knowledge/knowledge'
 import useStore from '@/stores'
 import { groupBy } from 'lodash'
 import { MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
 import type { FormInstance } from 'element-plus'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 const route = useRoute()
 const {
   params: { id, documentId }, // id为knowledgeID
 } = route as any
-
+const type = computed(() => {
+  if (route.path.includes('shared')) {
+    return 'systemShare'
+  } else if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
 const { model, prompt, user } = useStore()
 
 const emit = defineEmits(['refresh'])
@@ -171,10 +179,12 @@ const submitHandle = async (formEl: FormInstance) => {
           ...form.value,
           state_list: stateMap[state.value],
         }
-        knowledgeApi.putGenerateRelated(id ? id : knowledgeId.value, data, loading).then(() => {
-          MsgSuccess(t('views.document.generateQuestion.successMessage'))
-          dialogVisible.value = false
-        })
+        loadSharedApi({ type: 'knowledge', systemType: type.value })
+          .putGenerateRelated(id ? id : knowledgeId.value, data, loading)
+          .then(() => {
+            MsgSuccess(t('views.document.generateQuestion.successMessage'))
+            dialogVisible.value = false
+          })
       }
     }
   })
@@ -182,7 +192,7 @@ const submitHandle = async (formEl: FormInstance) => {
 
 function getModel() {
   loading.value = true
-  knowledgeApi
+  loadSharedApi({ type: 'knowledge', systemType: type.value })
     .getKnowledgeModel()
     .then((res: any) => {
       modelOptions.value = groupBy(res?.data, 'provider')

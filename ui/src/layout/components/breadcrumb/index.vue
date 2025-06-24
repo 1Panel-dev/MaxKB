@@ -115,32 +115,35 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { onBeforeRouteLeave, useRouter, useRoute } from 'vue-router'
-import { isWorkFlow } from '@/utils/application'
 import { isAppIcon } from '@/utils/common'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 import useStore from '@/stores'
-const { common, knowledge, application } = useStore()
+const { common, application } = useStore()
 const route = useRoute()
-const router = useRouter()
+
 const {
   meta: { activeMenu },
   params: { id },
 } = route as any
 
+const type = computed(() => {
+  if (route.path.includes('shared')) {
+    return 'systemShare'
+  } else if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
+
 onBeforeRouteLeave((to, from) => {
   common.saveBreadcrumb(null)
 })
 
-const CreateKnowledgeDialogRef = ref()
-const CreateApplicationDialogRef = ref()
-const list = ref<any[]>([])
 const loading = ref(false)
 
-const breadcrumbData = computed(() => common.breadcrumb)
 const current = ref<any>(null)
-// const current = computed(() => {
-//   return list.value?.filter((v) => v.id === id)?.[0]
-// })
 
 const isApplication = computed(() => {
   return activeMenu.includes('application')
@@ -151,8 +154,8 @@ const isKnowledge = computed(() => {
 
 function getKnowledgeDetail() {
   loading.value = true
-  knowledge
-    .asyncGetKnowledgeDetail(id)
+  loadSharedApi({ type: 'knowledge', systemType: type.value })
+    .getKnowledgeDetail(id)
     .then((res: any) => {
       current.value = res.data
       loading.value = false
@@ -175,80 +178,12 @@ function getApplicationDetail() {
     })
 }
 
-function openCreateDialog() {
-  if (isKnowledge.value) {
-    CreateKnowledgeDialogRef.value.open()
-  } else if (isApplication.value) {
-    CreateApplicationDialogRef.value.open()
-  }
-}
-
-function changeMenu(id: string) {
-  const lastMatched = route.matched[route.matched.length - 1]
-  if (lastMatched) {
-    if (isKnowledge.value) {
-      router.push({ name: lastMatched.name, params: { id: id } })
-    } else if (isApplication.value) {
-      const type = list.value?.filter((v) => v.id === id)?.[0]?.type
-      if (
-        isWorkFlow(type) &&
-        (lastMatched.name === 'AppSetting' || lastMatched.name === 'AppHitTest')
-      ) {
-        router.push({ path: `/application/${id}/${type}/overview` })
-      } else {
-        router.push({
-          name: lastMatched.name,
-          params: { id: id, type: type },
-        })
-      }
-    }
-  }
-}
-
-function getKnowledge() {
-  loading.value = true
-  knowledge
-    .asyncGetFolderKnowledge()
-    .then((res: any) => {
-      list.value = res.data
-      common.saveBreadcrumb(list.value)
-      loading.value = false
-    })
-    .catch(() => {
-      loading.value = false
-    })
-}
-function getApplication() {
-  loading.value = true
-  application
-    .asyncGetAllApplication()
-    .then((res: any) => {
-      list.value = res.data
-      common.saveBreadcrumb(list.value)
-      loading.value = false
-    })
-    .catch(() => {
-      loading.value = false
-    })
-}
-function refresh() {
-  common.saveBreadcrumb(null)
-}
 onMounted(() => {
   if (isKnowledge.value) {
     getKnowledgeDetail()
   } else if (isApplication.value) {
     getApplicationDetail()
   }
-  // if (!breadcrumbData.value) {
-  //   if (isKnowledge.value) {
-  //     getKnowledge()
-  //   } else if (isApplication.value) {
-  //     getApplication()
-  //   }
-  // } else {
-  //   list.value = breadcrumbData.value
-  // }
 })
 </script>
 

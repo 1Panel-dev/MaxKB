@@ -13,7 +13,7 @@ export interface knowledgeStateTypes {
   webInfo: any
   documentsType: string
   documentsFiles: UploadUserFile[]
-  knowledgeList: knowledgeData[]
+  knowledgeList: any[]
 }
 
 const useKnowledgeStore = defineStore('knowledge', {
@@ -56,7 +56,7 @@ const useKnowledgeStore = defineStore('knowledge', {
           ...paramsData,
         }
         loadSharedApi({ type: 'knowledge', isShared, systemType })
-          .getToolListPage(page, params, loading)
+          .getKnowledgeListPage(page, params, loading)
           .then((res: any) => {
             resolve(res)
           })
@@ -72,18 +72,6 @@ const useKnowledgeStore = defineStore('knowledge', {
         }
         knowledgeApi
           .getKnowledgeList(params, loading)
-          .then((data) => {
-            resolve(data)
-          })
-          .catch((error) => {
-            reject(error)
-          })
-      })
-    },
-    async asyncGetKnowledgeDetail(knowledge_id: string, loading?: Ref<boolean>) {
-      return new Promise((resolve, reject) => {
-        knowledgeApi
-          .getKnowledgeDetail(knowledge_id, loading)
           .then((data) => {
             resolve(data)
           })
