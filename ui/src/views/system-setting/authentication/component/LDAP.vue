@@ -30,7 +30,7 @@
           <el-form-item :label="$t('views.system.password')" prop="config.password">
             <el-input
               v-model="form.config.password"
-              :placeholder="$t('views.userManage.form.password.placeholder')"
+              :placeholder="$t('views.login.loginForm.password.placeholder')"
               show-password
             />
           </el-form-item>
@@ -120,7 +120,7 @@ const rules = reactive<FormRules<any>>({
   'config.password': [
     {
       required: true,
-      message: t('views.userManage.form.password.requiredMessage'),
+      message: t('views.login.loginForm.password.placeholder'),
       trigger: 'blur'
     }
   ],

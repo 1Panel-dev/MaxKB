@@ -177,7 +177,7 @@ const open = async (platform: Platform) => {
       currentPlatform.config.callback_url = `${defaultCallbackUrl}/api/dingtalk`
       break
     case 'lark':
-      currentPlatform.config.callback_url = `${defaultCallbackUrl}/api/feishu`
+      currentPlatform.config.callback_url = `${defaultCallbackUrl}/api/lark`
       break
     default:
       break

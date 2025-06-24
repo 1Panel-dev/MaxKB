@@ -148,7 +148,7 @@ function createPlatform(key: string, name: string): Platform {
 
   return {
     key,
-    logoSrc: new URL(`../../../assets/scan/logo_${logo}.svg`, import.meta.url).href,
+    logoSrc: new URL(`../../../../assets/scan/logo_${logo}.svg`, import.meta.url).href,
     name,
     isActive: false,
     isValid: false,
