@@ -217,7 +217,7 @@ class CeleryThreadTaskFileHandler(CeleryThreadingLoggerHandler):
         self.thread_id_fd_mapper[thread_id] = f
 
     def handle_task_end(self, task_id):
-        print('handle_task_end')
+        logging.getLogger('max_kb').info('handle_task_end')
         ident_id = self.task_id_thread_id_mapper.get(task_id, '')
         f = self.thread_id_fd_mapper.pop(ident_id, None)
         if f and not f.closed:

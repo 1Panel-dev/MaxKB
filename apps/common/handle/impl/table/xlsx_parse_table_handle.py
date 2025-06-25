@@ -87,7 +87,7 @@ class XlsxParseTableHandle(BaseParseTableHandle):
                 if len(image_dict) > 0:
                     save_image(image_dict.values())
             except Exception as e:
-                print(f'{e}')
+                logging.getLogger("max_kb").error(f'Exception: {e}')
                 image_dict = {}
             md_tables = ''
             # 如果未指定 sheet_name，则使用第一个工作表

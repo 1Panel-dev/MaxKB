@@ -62,7 +62,7 @@ def get_celery_status():
     active_queue_worker = set([n.split('@')[0] for n in active_nodes if n])
     # Celery Worker 数量: 2
     if len(active_queue_worker) < 2:
-        print("Not all celery worker worked")
+        logging.getLogger('max_kb').info("Not all celery worker worked")
         return False
     else:
         return True

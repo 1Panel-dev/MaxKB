@@ -25,7 +25,6 @@ class XlsParseTableHandle(BaseParseTableHandle):
             for sheet in sheets:
                 # 获取合并单元格的范围信息
                 merged_cells = sheet.merged_cells
-                print(merged_cells)
                 data = []
                 paragraphs = []
                 # 获取第一行作为标题行

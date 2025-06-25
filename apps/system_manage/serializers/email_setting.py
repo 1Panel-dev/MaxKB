@@ -6,6 +6,8 @@
     @date：2024/3/19 16:29
     @desc:
 """
+import logging
+
 from django.core.mail.backends.smtp import EmailBackend
 from django.db.models import QuerySet
 from rest_framework import serializers
@@ -45,7 +47,7 @@ class EmailSettingSerializer(serializers.Serializer):
                              self.data.get("email_use_ssl")
                              ).open()
             except Exception as e:
-                print(e)
+                logging.getLogger("max_kb").error(f'Exception: {e}')
                 raise AppApiException(1004, _('Email verification failed'))
 
         def update_or_save(self):

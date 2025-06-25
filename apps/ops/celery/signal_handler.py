@@ -65,7 +65,7 @@ def add_celery_logger_handler(sender=None, logger=None, loglevel=None, format=No
 
 @task_revoked.connect
 def on_task_revoked(request, terminated, signum, expired, **kwargs):
-    print('task_revoked', terminated)
+    logging.getLogger('max_kb').info('task_revoked', terminated)
 
 
 @task_prerun.connect

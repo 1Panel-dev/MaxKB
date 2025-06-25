@@ -8,6 +8,7 @@
 """
 import asyncio
 import json
+import logging
 import re
 import time
 from functools import reduce
@@ -125,7 +126,7 @@ def mcp_response_generator(chat_model, message_list, mcp_servers):
             except StopAsyncIteration:
                 break
     except Exception as e:
-        print(f'exception: {e}')
+        logging.getLogger("max_kb").error(f'Exception: {e}')
     finally:
         loop.close()
 

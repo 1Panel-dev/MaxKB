@@ -23,7 +23,6 @@ class BaseImageGenerateNode(IImageGenerateNode):
                 model_params_setting,
                 chat_record_id,
                 **kwargs) -> NodeResult:
-        print(model_params_setting)
         application = self.workflow_manage.work_flow_post_handler.chat_info.application
         workspace_id = self.workflow_manage.get_body().get('workspace_id')
         tti_model = get_model_instance_by_model_workspace_id(model_id, workspace_id,
@@ -35,7 +34,6 @@ class BaseImageGenerateNode(IImageGenerateNode):
         message_list = self.generate_message_list(question, history_message)
         self.context['message_list'] = message_list
         self.context['dialogue_type'] = dialogue_type
-        print(message_list)
         image_urls = tti_model.generate_image(question, negative_prompt)
         # 保存图片
         file_urls = []
