@@ -11,6 +11,11 @@
 # 不知道为什么用上面的脚本重新拉一遍向量模型比之前的大很多，所以还是用下面的脚本复用原来已经构建好的向量模型
 
 FROM ghcr.io/1panel-dev/maxkb-vector-model:v1.0.1 AS vector-model
-FROM scratch
+
+FROM alpine AS tmp-stage
 COPY --from=vector-model /opt/maxkb/app/model /opt/maxkb-app/model
 COPY --from=vector-model /opt/maxkb/app/model/base/hub /opt/maxkb-app/model/tokenizer
+RUN rm -rf /opt/maxkb-app/model/embedding/shibing624_text2vec-base-chinese/onnx
+
+FROM scratch
+COPY --from=tmp-stage /opt/maxkb-app/model /opt/maxkb-app/model

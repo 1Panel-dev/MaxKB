@@ -21,7 +21,7 @@ RUN mkdir -p /opt/maxkb-app /opt/maxkb-app/model && \
     rm -rf /opt/maxkb-app/ui
 
 COPY --from=web-build ui /opt/maxkb-app/ui
-COPY --from=vector-model /opt/maxkb-app/model /opt/maxkb-app/model
+
 WORKDIR /opt/maxkb-app
 RUN python3 -m venv /opt/py3 && \
     pip install poetry==1.8.5 --break-system-packages && \
@@ -65,6 +65,7 @@ ENV MAXKB_VERSION="${DOCKER_IMAGE_TAG} (build at ${BUILD_AT}, commit: ${GITHUB_C
 WORKDIR /opt/maxkb-app
 COPY --from=stage-build /opt/maxkb-app /opt/maxkb-app
 COPY --from=stage-build /opt/py3 /opt/py3
+COPY --from=vector-model /opt/maxkb-app/model /opt/maxkb-app/model
 
 RUN chmod 755 /tmp && \
     find /opt/maxkb-app -mindepth 1 -not -name 'sandbox' -exec chmod 700 {} + && \
