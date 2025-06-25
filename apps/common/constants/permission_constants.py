@@ -147,6 +147,7 @@ class Operate(Enum):
     ADD_KNOWLEDGE = "READ+ADD_KNOWLEDGE"  # 添加到知识库
     TO_CHAT = "READ+TO_CHAT"  # 去对话
     SETTING = "READ+SETTING"  # 管理
+    DOWNLOAD = "READ+DOWNLOAD"  # 下载
 
 
 class RoleGroup(Enum):
@@ -266,7 +267,7 @@ Permission_Label = {
     Operate.RELATE.value: _("Relate"),
     Operate.ANNOTATION.value: _("Annotation"),
     Operate.CLEAR_POLICY.value: _("Clear Policy"),
-
+    Operate.DOWNLOAD.value: _('Download'),
     Operate.EMBED.value: _('Embed third party'),
     Operate.ACCESS.value: _('Access restrictions'),
     Operate.DISPLAY.value: _('Display Settings'),
@@ -494,7 +495,7 @@ class PermissionConstants(Enum):
         parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
     KNOWLEDGE_DOCUMENT_DOWNLOAD_SOURCE_FILE = Permission(
-        group=Group.KNOWLEDGE_DOCUMENT, operate=Operate.EXPORT,
+        group=Group.KNOWLEDGE_DOCUMENT, operate=Operate.DOWNLOAD,
         role_list=[RoleConstants.ADMIN, RoleConstants.USER],
         resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
         parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
