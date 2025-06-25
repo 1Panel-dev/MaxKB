@@ -3,6 +3,7 @@ from django.urls import path
 from . import views
 
 app_name = "tool"
+# @formatter:off
 urlpatterns = [
     path('workspace/internal/tool', views.ToolView.InternalTool.as_view()),
     path('workspace/<str:workspace_id>/tool', views.ToolView.as_view()),
