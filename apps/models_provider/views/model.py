@@ -73,8 +73,9 @@ class ModelSetting(APIView):
          )
     def post(self, request: Request, workspace_id: str):
         return result.success(
-            ModelSerializer.Create(data={**request.data, 'user_id': request.user.id}).insert(workspace_id,
-                                                                                             with_valid=True))
+            ModelSerializer.Create(
+                data={**request.data, 'user_id': request.user.id, 'workspace_id': workspace_id}).insert(workspace_id,
+                                                                                                        with_valid=True))
 
     # @extend_schema(methods=['PUT'],
     #                summary=_('Update model'),
@@ -266,4 +267,4 @@ class ModelList(APIView):
         return result.success(
             ModelSerializer.Query(
                 data={**query_params_to_single_dict(request.query_params)}).model_list(workspace_id=workspace_id,
-                                                                                 with_valid=True))
+                                                                                       with_valid=True))

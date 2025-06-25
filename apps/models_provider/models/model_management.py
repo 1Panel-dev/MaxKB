@@ -46,4 +46,4 @@ class Model(AppModelMixin):
 
     class Meta:
         db_table = "model"
-        unique_together = ['name', 'user_id']
+        unique_together = ['name', 'workspace_id']
