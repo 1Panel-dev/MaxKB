@@ -412,7 +412,7 @@ async function changeState(row: any) {
       changeStateloading,
     )
     if (
-      !res.data.init_params &&
+      (!res.data.init_params || Object.keys(res.data.init_params).length === 0) &&
       res.data.init_field_list &&
       res.data.init_field_list.length > 0 &&
       res.data.init_field_list.filter((item: any) => item.default_value && item.show_default_value)
