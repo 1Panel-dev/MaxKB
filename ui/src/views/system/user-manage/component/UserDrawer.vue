@@ -257,29 +257,28 @@ const open = (data: any) => {
 const memberFormContentRef = ref<InstanceType<typeof MemberFormContent>>()
 const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
-  await formEl.validate((valid, fields) => {
+  await formEl.validate(async(valid, fields) => {
     if (valid) {
-      memberFormContentRef.value?.validate().then(async (valid: any) => {
-        if (valid) {
-          const params = {
-            ...userForm.value,
-            role_setting: list.value
-          }
-          if (isEdit.value) {
-            userManageApi.putUserManage(userForm.value.id, params, loading).then((res) => {
-              emit('refresh')
-              MsgSuccess(t('common.editSuccess'))
+      if (memberFormContentRef.value) {
+       await memberFormContentRef.value?.validate()
+      }
+      const params = {
+        ...userForm.value,
+        role_setting: list.value
+      }
+      if (isEdit.value) {
+        userManageApi.putUserManage(userForm.value.id, params, loading).then((res) => {
+          emit('refresh')
+          MsgSuccess(t('common.editSuccess'))
+          visible.value = false
+        })
+      } else {
+        userManageApi.postUserManage(params, loading).then((res) => {
+          emit('refresh')
+          MsgSuccess(t('common.createSuccess'))
               visible.value = false
             })
-          } else {
-            userManageApi.postUserManage(params, loading).then((res) => {
-              emit('refresh')
-              MsgSuccess(t('common.createSuccess'))
-              visible.value = false
-            })
           }
-        }
-      })
     }
   })
 }
