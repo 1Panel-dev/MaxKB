@@ -35,14 +35,17 @@ def _get_user(request):
         return {
 
         }
-    return {
+    user_info = {
         "id": str(user.id),
         "email": user.email,
         "phone": user.phone,
         "nick_name": user.nick_name,
         "username": user.username,
-        "role": user.role,
     }
+    # 如果是 User 模型且有 role 属性
+    if hasattr(user, 'role'):
+        user_info['role'] = user.role
+    return user_info
 
 
 def _get_details(request):
