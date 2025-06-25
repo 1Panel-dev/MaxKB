@@ -23,16 +23,6 @@ const workspace = {
       ],
       'OR',
     ),
-  single: (source_id:string) =>
-    hasPermission(
-      [
-        RoleConst.ADMIN,
-        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-        PermissionConst.KNOWLEDGE_READ.getKnowledgeWorkspaceResourcePermission(source_id),
-        PermissionConst.KNOWLEDGE_READ.getWorkspacePermissionWorkspaceManageRole,
-      ],
-      'OR',
-    ),
   sync: (source_id:string) =>
     hasPermission(
       [
