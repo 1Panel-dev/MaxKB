@@ -1,19 +1,24 @@
-import {defineStore} from 'pinia'
-import {type Ref} from 'vue'
-import ModelApi from '@/api/model/model'
+import { defineStore } from 'pinia'
+import { type Ref } from 'vue'
 import ProviderApi from '@/api/model/provider'
-import type {ListModelRequest} from '@/api/type/model'
+import type { ListModelRequest } from '@/api/type/model'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 const useModelStore = defineStore('model', {
   state: () => ({}),
   actions: {
-    async asyncGetModel(data?: ListModelRequest, loading?: Ref<boolean>) {
+    async asyncGetModel(
+      data?: ListModelRequest,
+      systemType: 'systemShare' | 'workspace' | 'systemManage' = 'workspace',
+      loading?: Ref<boolean>,
+    ) {
       return new Promise((resolve, reject) => {
-        ModelApi.getModel(data, loading)
-          .then((res) => {
+        loadSharedApi({ type: 'model', systemType })
+          .getModel(data, loading)
+          .then((res: any) => {
             resolve(res)
           })
-          .catch((error) => {
+          .catch((error: any) => {
             reject(error)
           })
       })

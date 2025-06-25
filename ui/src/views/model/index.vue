@@ -88,7 +88,7 @@
                 :provider_list="provider_list"
                 :isShared="isShared"
                 :isSystemShare="isSystemShare"
-                :sharedType="apiType"
+                :apiType="apiType"
               >
               </ModelCard>
             </el-col>

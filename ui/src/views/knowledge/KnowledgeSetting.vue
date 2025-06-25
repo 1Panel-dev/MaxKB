@@ -8,7 +8,7 @@
             <h4 class="title-decoration-1 mb-16">
               {{ $t('common.info') }}
             </h4>
-            <BaseForm ref="BaseFormRef" :data="detail" />
+            <BaseForm ref="BaseFormRef" :data="detail" :apiType="apiType" />
 
             <el-form
               ref="webFormRef"

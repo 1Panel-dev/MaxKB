@@ -50,8 +50,8 @@ const useParagraphStore = defineStore('paragraph', {
     ) {
       return new Promise((resolve, reject) => {
         const obj = {
-          paragraphId,
-          problemId,
+          paragraph_id: paragraphId,
+          problem_id: problemId,
         }
         paragraphApi
           .putDisassociationProblem(knowledgeId, documentId, obj, loading)
@@ -72,8 +72,8 @@ const useParagraphStore = defineStore('paragraph', {
     ) {
       return new Promise((resolve, reject) => {
         const obj = {
-          paragraphId,
-          problemId,
+          paragraph_id: paragraphId,
+          problem_id: problemId,
         }
         paragraphApi
           .putAssociationProblem(knowledgeId, documentId, obj, loading)

@@ -569,7 +569,7 @@ function saveCleanTime() {
 function changeKnowledge(knowledge_id: string) {
   localStorage.setItem(id + 'chat_knowledge_id', knowledge_id)
   form.value.document_id = ''
-  getDocumentPage(knowledge_id)
+  getDocument(knowledge_id)
 }
 
 function changeDocument(document_id: string) {
@@ -617,7 +617,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
 }
 
 function getDocument(knowledge_id: string) {
-  document.asyncGetAllDocument(knowledge_id, documentLoading).then((res: any) => {
+  document.asyncGetKnowledgeDocument(knowledge_id, documentLoading).then((res: any) => {
     documentList.value = res.data
     if (localStorage.getItem(id + 'chat_document_id')) {
       form.value.document_id = localStorage.getItem(id + 'chat_document_id') as string

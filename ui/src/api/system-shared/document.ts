@@ -7,6 +7,22 @@ import type { pageRequest } from '@/api/type/common'
 const prefix = '/system/shared/knowledge'
 
 /**
+ * 文档列表（无分页）
+ * @param 参数  knowledge_id,
+ * param {
+ "   name": "string",
+  }
+ */
+
+const getDocumentList: (knowledge_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  knowledge_id,
+  loading,
+) => {
+  return get(`${prefix}/${knowledge_id}/document`, undefined, loading)
+}
+
+
+/**
  * 文档分页列表
  * @param 参数  knowledge_id,
  * param {
@@ -506,14 +522,9 @@ const importLarkDocument: (
   return post(`${prefix}/lark/${knowledge_id}/import`, data, null, loading)
 }
 
-const getAllDocument: (knowledge_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
-  knowledge_id,
-  loading,
-) => {
-  return get(`${prefix}/${knowledge_id}/document`, undefined, loading)
-}
 
 export default {
+  getDocumentList,
   getDocumentPage,
   getDocumentDetail,
   putDocument,

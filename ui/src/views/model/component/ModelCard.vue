@@ -146,13 +146,13 @@ const props = defineProps<{
   updateModelById: (model_id: string, model: Model) => void
   isShared?: boolean | undefined
   isSystemShare?: boolean | undefined
-  sharedType: 'systemShare' | 'workspace' | 'systemManage'
+  apiType: 'systemShare' | 'workspace' | 'systemManage'
 }>()
 
 const { user } = useStore()
 
 const permissionPrecise = computed(() => {
-  return permissionMap['model'][props.sharedType]
+  return permissionMap['model'][props.apiType]
 })
 
 const downModel = ref<Model>()
@@ -188,7 +188,7 @@ const deleteModel = () => {
     },
   )
     .then(() => {
-      loadSharedApi({ type: 'model', systemType: props.sharedType })
+      loadSharedApi({ type: 'model', systemType: props.apiType })
         .deleteModel(props.model.id)
         .then(() => {
           emit('change')
@@ -198,7 +198,7 @@ const deleteModel = () => {
 }
 
 const cancelDownload = () => {
-  loadSharedApi({ type: 'model', systemType: props.sharedType })
+  loadSharedApi({ type: 'model', systemType: props.apiType })
     .pauseDownload(props.model.id)
     .then(() => {
       downModel.value = undefined
@@ -221,7 +221,7 @@ const icon = computed(() => {
 const initInterval = () => {
   interval = setInterval(() => {
     if (currentModel.value.status === 'DOWNLOAD') {
-      loadSharedApi({ type: 'model', systemType: props.sharedType })
+      loadSharedApi({ type: 'model', systemType: props.apiType })
         .getModelMetaById(props.model.id)
         .then((ok: any) => {
           downModel.value = ok.data

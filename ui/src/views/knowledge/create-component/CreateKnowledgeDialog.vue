@@ -8,7 +8,7 @@
     :close-on-press-escape="false"
   >
     <!-- 基本信息 -->
-    <BaseForm ref="BaseFormRef" v-if="dialogVisible" />
+    <BaseForm ref="BaseFormRef" v-if="dialogVisible" :apiType="apiType" />
 
     <template #footer>
       <span class="dialog-footer">

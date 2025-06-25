@@ -42,20 +42,20 @@
   </el-form>
 </template>
 <script setup lang="ts">
-import {ref, reactive, onMounted, onUnmounted, computed, watch} from 'vue'
-import {groupBy} from 'lodash'
+import { ref, reactive, onMounted, onUnmounted, computed, watch } from 'vue'
+import { groupBy } from 'lodash'
 import useStore from '@/stores'
-import type {knowledgeData} from '@/api/type/knowledge'
-import {t} from '@/locales'
+import type { knowledgeData } from '@/api/type/knowledge'
+import { t } from '@/locales'
 
-const props = defineProps({
+const props = defineProps<{
   data: {
-    type: Object,
-    default: () => {
-    },
-  },
-})
-const {model} = useStore()
+    type: Object
+    default: () => {}
+  }
+  apiType: 'systemShare' | 'workspace' | 'systemManage'
+}>()
+const { model } = useStore()
 const form = ref<knowledgeData>({
   name: '',
   desc: '',
@@ -92,7 +92,7 @@ const modelOptions = ref<any>([])
 
 watch(
   () => props.data,
-  (value) => {
+  (value: any) => {
     if (value && JSON.stringify(value) !== '{}') {
       form.value.name = value.name
       form.value.desc = value.desc
@@ -117,7 +117,7 @@ function validate() {
 function getModel() {
   loading.value = true
   model
-    .asyncGetModel({model_type: 'EMBEDDING'})
+    .asyncGetModel({ model_type: 'EMBEDDING' }, props.apiType)
     .then((res: any) => {
       modelOptions.value = groupBy(res?.data, 'provider')
       loading.value = false

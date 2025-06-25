@@ -217,7 +217,7 @@ function changeDocument(document_id: string) {
 }
 
 function getDocument(knowledge_id: string) {
-  document.asyncGetAllDocument(knowledge_id, loading).then((res: any) => {
+  document.asyncGetKnowledgeDocument(knowledge_id, loading).then((res: any) => {
     documentList.value = res.data
     if (localStorage.getItem(id + 'chat_document_id')) {
       form.value.document_id = localStorage.getItem(id + 'chat_document_id') as string
