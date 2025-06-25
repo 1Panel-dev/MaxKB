@@ -13,7 +13,7 @@
       </el-form-item>
       <el-form-item prop="nick_name" :label="$t('views.userManage.userForm.nick_name.label')">
         <el-input v-model="userForm.nick_name" :placeholder="$t('views.userManage.userForm.nick_name.placeholder')"
-          maxlength="64" show-word-limit>
+          maxlength="20" show-word-limit>
         </el-input>
       </el-form-item>
       <el-form-item :label="$t('views.login.loginForm.email.label')" prop="email">
@@ -94,6 +94,12 @@ const rules = reactive({
     {
       required: true,
       message: t('views.userManage.userForm.nick_name.placeholder'),
+      trigger: 'blur',
+    },
+    {
+      min: 1,
+      max: 20,
+      message: t('views.userManage.userForm.nick_name.lengthMessage'),
       trigger: 'blur',
     },
   ],

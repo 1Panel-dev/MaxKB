@@ -27,11 +27,11 @@
         >
         </el-input>
       </el-form-item>
-      <el-form-item :label="$t('views.userManage.userForm.nick_name.label')" prop="nick_name" >
+      <el-form-item :label="$t('views.userManage.userForm.nick_name.label')" prop="nick_name">
         <el-input
           v-model="userForm.nick_name"
           :placeholder="$t('views.userManage.userForm.nick_name.placeholder')"
-          maxlength="64"
+          maxlength="20"
           show-word-limit
         >
         </el-input>
@@ -257,10 +257,10 @@ const open = (data: any) => {
 const memberFormContentRef = ref<InstanceType<typeof MemberFormContent>>()
 const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
-  await formEl.validate(async(valid, fields) => {
+  await formEl.validate(async (valid, fields) => {
     if (valid) {
       if (memberFormContentRef.value) {
-       await memberFormContentRef.value?.validate()
+        await memberFormContentRef.value?.validate()
       }
       const params = {
         ...userForm.value,
@@ -276,9 +276,9 @@ const submit = async (formEl: FormInstance | undefined) => {
         userManageApi.postUserManage(params, loading).then((res) => {
           emit('refresh')
           MsgSuccess(t('common.createSuccess'))
-              visible.value = false
-            })
-          }
+          visible.value = false
+        })
+      }
     }
   })
 }

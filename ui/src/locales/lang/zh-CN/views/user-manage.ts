@@ -23,7 +23,7 @@ export default {
     nick_name: {
       label: '姓名',
       placeholder: '请输入姓名',
-      lengthMessage: '长度在 2 到 20 个字符',
+      lengthMessage: '长度在 1 到 20 个字符',
     },
 
     phone: {
