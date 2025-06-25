@@ -59,8 +59,8 @@ export const getSameRouteList: (
  */
 export const getPermissionRoute = (routes: Array<RouteRecordRaw>, to: RouteLocationNormalized) => {
   const routeName: string = to.meta
-    ? to.meta.permissionRoute
-      ? (to.meta.permissionRoute as string)
+    ? to.meta.sameRoute
+      ? (to.meta.sameRoute as string)
       : (to.name as string)
     : (to.name as string)
   const routeList = getSameRouteList(routes, routeName)
