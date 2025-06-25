@@ -22,7 +22,7 @@ def save_default_embedding_model(apps, schema_editor):
                        model_type="EMBEDDING", model_name=model_name, user_id='f0dd8f71-e4ee-11ee-8c84-a8a1595801ab',
                        provider='model_local_provider',
                        credential=rsa_long_encrypt(model_credential_str), meta={},
-                       workspace_id='None')
+                       workspace_id='default')
     model.save()
 
 
