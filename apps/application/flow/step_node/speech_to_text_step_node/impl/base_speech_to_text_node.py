@@ -30,7 +30,7 @@ class BaseSpeechToTextNode(ISpeechToTextNode):
             # 根据file_name 吧文件转成mp3格式
             file_format = file.file_name.split('.')[-1]
             with tempfile.NamedTemporaryFile(delete=False, suffix=f'.{file_format}') as temp_file:
-                temp_file.write(file.get_byte().tobytes())
+                temp_file.write(file.get_bytes().tobytes())
                 temp_file_path = temp_file.name
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp3') as temp_amr_file:
                 temp_mp3_path = temp_amr_file.name

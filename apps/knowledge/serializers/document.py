@@ -558,7 +558,8 @@ class DocumentSerializers(serializers.Serializer):
 
         def download_source_file(self):
             self.is_valid(raise_exception=True)
-            return FileSerializer.Operate(id=self.data.get('knowledge_id')).get(with_valid=True)
+            file = QuerySet(File).filter(source_id=self.data.get('document_id')).first()
+            return FileSerializer.Operate(id=file.id).get(with_valid=True)
 
         def one(self, with_valid=False):
             if with_valid:

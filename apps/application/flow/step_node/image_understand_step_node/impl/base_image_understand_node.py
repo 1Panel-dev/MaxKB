@@ -59,7 +59,7 @@ def write_context(node_variable: Dict, workflow_variable: Dict, node: INode, wor
 
 def file_id_to_base64(file_id: str):
     file = QuerySet(File).filter(id=file_id).first()
-    file_bytes = file.get_byte()
+    file_bytes = file.get_bytes()
     base64_image = base64.b64encode(file_bytes).decode("utf-8")
     return [base64_image, what(None, file_bytes.tobytes())]
 
@@ -171,7 +171,7 @@ class BaseImageUnderstandNode(IImageUnderstandNode):
             for img in image:
                 file_id = img['file_id']
                 file = QuerySet(File).filter(id=file_id).first()
-                image_bytes = file.get_byte()
+                image_bytes = file.get_bytes()
                 base64_image = base64.b64encode(image_bytes).decode("utf-8")
                 image_format = what(None, image_bytes.tobytes())
                 images.append(
