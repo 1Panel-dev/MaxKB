@@ -105,8 +105,6 @@ def is_valid_credential(provider, model_type, model_name, model_credential: Dict
 
 def get_model_by_id(_id, workspace_id):
     model = QuerySet(Model).filter(id=_id).first()
-    # 手动关闭数据库连接
-    connection.close()
     if model is None:
         raise Exception(_('Model does not exist'))
     if model.workspace_id:
