@@ -470,6 +470,7 @@ class ToolSerializer(serializers.Serializer):
                 desc=internal_tool.desc,
                 code=internal_tool.code,
                 user_id=self.data.get('user_id'),
+                icon=internal_tool.icon,
                 workspace_id=self.data.get('workspace_id'),
                 input_field_list=internal_tool.input_field_list,
                 init_field_list=internal_tool.init_field_list,
