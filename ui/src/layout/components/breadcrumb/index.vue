@@ -1,6 +1,6 @@
 <template>
   <div class="breadcrumb ml-4 mt-4 mb-12 flex">
-    <back-button to="-1" class="mt-4"></back-button>
+    <back-button :to="toBackPath" class="mt-4"></back-button>
     <div class="flex align-center">
       <el-avatar
         v-if="isApplication && isAppIcon(current?.icon)"
@@ -29,7 +29,6 @@ import { ref, onMounted, computed } from 'vue'
 import { onBeforeRouteLeave, useRouter, useRoute } from 'vue-router'
 import { isAppIcon } from '@/utils/common'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
-
 import useStore from '@/stores'
 const { common, application } = useStore()
 const route = useRoute()
@@ -62,6 +61,16 @@ const isApplication = computed(() => {
 })
 const isKnowledge = computed(() => {
   return activeMenu.includes('knowledge')
+})
+
+const toBackPath = computed(() => {
+  if (route.path.includes('shared')) {
+    return '/system/shared' + activeMenu
+  } else if (route.path.includes('resource-management')) {
+    return '/system/resource-management' + activeMenu
+  } else {
+    return activeMenu
+  }
 })
 
 function getKnowledgeDetail() {

@@ -232,4 +232,9 @@ function refreshFolder() {
     height: calc(100vh - 210px);
   }
 }
+:deep(.overflow-inherit_node__children) {
+  .el-tree-node__children {
+    overflow: inherit !important;
+  }
+}
 </style>
