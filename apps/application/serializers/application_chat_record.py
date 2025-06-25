@@ -17,12 +17,12 @@ from django.utils.translation import gettext_lazy as _, gettext
 from rest_framework import serializers
 from rest_framework.utils.formatting import lazy_format
 
-from application.models import ChatRecord, ApplicationAccessToken
+from application.models import ChatRecord, ApplicationAccessToken, Application
 from application.serializers.common import ChatInfo
 from common.db.search import page_search
 from common.exception.app_exception import AppApiException
 from common.utils.common import post
-from knowledge.models import Paragraph, Document, Problem, ProblemParagraphMapping
+from knowledge.models import Paragraph, Document, Problem, ProblemParagraphMapping, Knowledge
 from knowledge.serializers.common import get_embedding_model_id_by_knowledge_id, update_document_char_length
 from knowledge.serializers.paragraph import ParagraphSerializers
 from knowledge.task.embedding import embedding_by_paragraph, embedding_by_paragraph_list
@@ -39,12 +39,18 @@ class ChatRecordSerializerModel(serializers.ModelSerializer):
 
 class ChatRecordOperateSerializer(serializers.Serializer):
     chat_id = serializers.UUIDField(required=True, label=_("Conversation ID"))
-    workspace_id = serializers.CharField(required=False, label=_("Workspace ID"))
+    workspace_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("Workspace ID"))
     application_id = serializers.UUIDField(required=True, label=_("Application ID"))
     chat_record_id = serializers.UUIDField(required=True, label=_("Conversation record id"))
 
     def is_valid(self, *, debug=False, raise_exception=False):
         super().is_valid(raise_exception=True)
+        workspace_id = self.data.get('workspace_id')
+        query_set = QuerySet(Application).filter(id=self.data.get('application_id'))
+        if workspace_id:
+            query_set = query_set.filter(workspace_id=workspace_id)
+        if not query_set.exists():
+            raise AppApiException(500, _('Application id does not exist'))
         application_access_token = QuerySet(ApplicationAccessToken).filter(
             application_id=self.data.get('application_id')).first()
         if application_access_token is None:
@@ -72,9 +78,19 @@ class ChatRecordOperateSerializer(serializers.Serializer):
 
 
 class ApplicationChatRecordQuerySerializers(serializers.Serializer):
+    workspace_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("Workspace ID"))
     application_id = serializers.UUIDField(required=True, label=_("Application ID"))
     chat_id = serializers.UUIDField(required=True, label=_("Chat ID"))
     order_asc = serializers.BooleanField(required=False, allow_null=True, label=_("Is it in order"))
+
+    def is_valid(self, *, raise_exception=False):
+        super().is_valid(raise_exception=True)
+        workspace_id = self.data.get('workspace_id')
+        query_set = QuerySet(Application).filter(id=self.data.get('application_id'))
+        if workspace_id:
+            query_set = query_set.filter(workspace_id=workspace_id)
+        if not query_set.exists():
+            raise AppApiException(500, _('Application id does not exist'))
 
     def list(self, with_valid=True):
         if with_valid:
@@ -137,10 +153,23 @@ class ParagraphModel(serializers.ModelSerializer):
 
 
 class ChatRecordImproveSerializer(serializers.Serializer):
+    workspace_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("Workspace ID"))
+
+    application_id = serializers.UUIDField(required=True, label=_("Application ID"))
+
     chat_id = serializers.UUIDField(required=True, label=_("Conversation ID"))
 
     chat_record_id = serializers.UUIDField(required=True,
                                            label=_("Conversation record id"))
+
+    def is_valid(self, *, raise_exception=False):
+        super().is_valid(raise_exception=True)
+        workspace_id = self.data.get('workspace_id')
+        query_set = QuerySet(Application).filter(id=self.data.get('application_id'))
+        if workspace_id:
+            query_set = query_set.filter(workspace_id=workspace_id)
+        if not query_set.exists():
+            raise AppApiException(500, _('Application id does not exist'))
 
     def get(self, with_valid=True):
         if with_valid:
@@ -173,6 +202,8 @@ class ApplicationChatRecordImproveInstanceSerializer(serializers.Serializer):
 
 
 class ApplicationChatRecordAddKnowledgeSerializer(serializers.Serializer):
+    workspace_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("Workspace ID"))
+    application_id = serializers.UUIDField(required=True, label=_("Application ID"))
     knowledge_id = serializers.UUIDField(required=True, label=_("Knowledge base id"))
     document_id = serializers.UUIDField(required=True, label=_("Document id"))
     chat_ids = serializers.ListSerializer(child=serializers.UUIDField(), required=True,
@@ -180,6 +211,12 @@ class ApplicationChatRecordAddKnowledgeSerializer(serializers.Serializer):
 
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)
+        workspace_id = self.data.get('workspace_id')
+        query_set = QuerySet(Application).filter(id=self.data.get('application_id'))
+        if workspace_id:
+            query_set = query_set.filter(workspace_id=workspace_id)
+        if not query_set.exists():
+            raise AppApiException(500, _('Application id does not exist'))
         if not Document.objects.filter(id=self.data['document_id'], knowledge_id=self.data['knowledge_id']).exists():
             raise AppApiException(500, gettext("The document id is incorrect"))
 
@@ -255,6 +292,19 @@ class ApplicationChatRecordImproveSerializer(serializers.Serializer):
 
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)
+        workspace_id = self.data.get('workspace_id')
+        query_set = QuerySet(Application).filter(id=self.data.get('application_id'))
+        if workspace_id:
+            query_set = query_set.filter(workspace_id=workspace_id)
+        if not query_set.exists():
+            raise AppApiException(500, _('Application id does not exist'))
+
+        query_set = QuerySet(Knowledge).filter(id=self.data.get('knowledge_id'))
+        if workspace_id:
+            query_set = query_set.filter(workspace_id=workspace_id)
+        if not query_set.exists():
+            raise AppApiException(500, _('Knowledge id does not exist'))
+
         if not QuerySet(Document).filter(id=self.data.get('document_id'),
                                          knowledge_id=self.data.get('knowledge_id')).exists():
             raise AppApiException(500, gettext("The document id is incorrect"))

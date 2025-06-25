@@ -325,7 +325,7 @@ class Query(serializers.Serializer):
                     auth_target_type="APPLICATION",
                     workspace_id=workspace_id,
                     user_id=user_id)} if (
-                not workspace_manage and is_x_pack_ee) else {
+            not workspace_manage) else {
             'folder_query_set': folder_query_set,
             'application_query_set': application_query_set,
             'application_custom_sql': application_custom_sql_query_set
@@ -551,7 +551,11 @@ class ApplicationOperateSerializer(serializers.Serializer):
 
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)
-        if not QuerySet(Application).filter(id=self.data.get('application_id')).exists():
+        workspace_id = self.data.get('workspace_id')
+        query_set = QuerySet(Application).filter(id=self.data.get('application_id'))
+        if workspace_id:
+            query_set = query_set.filter(workspace_id=workspace_id)
+        if not query_set.exists():
             raise AppApiException(500, _('Application id does not exist'))
 
     def delete(self, with_valid=True):

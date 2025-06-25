@@ -30,15 +30,17 @@ class EditApplicationKeySerializer(serializers.Serializer):
 
 
 class ApplicationKeySerializer(serializers.Serializer):
-    workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+    workspace_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("Workspace ID"))
     application_id = serializers.UUIDField(required=True, label=_('application id'))
 
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)
-        application_id = self.data.get("application_id")
-        application = QuerySet(Application).filter(id=application_id).first()
-        if application is None:
-            raise AppApiException(1001, _("Application does not exist"))
+        workspace_id = self.data.get('workspace_id')
+        query_set = QuerySet(Application).filter(id=self.data.get('application_id'))
+        if workspace_id:
+            query_set = query_set.filter(workspace_id=workspace_id)
+        if not query_set.exists():
+            raise AppApiException(500, _('Application id does not exist'))
 
     def generate(self, with_valid=True):
         if with_valid:
@@ -61,9 +63,18 @@ class ApplicationKeySerializer(serializers.Serializer):
                 QuerySet(ApplicationApiKey).filter(application_id=application_id)]
 
     class Operate(serializers.Serializer):
-        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+        workspace_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("Workspace ID"))
         application_id = serializers.UUIDField(required=True, label=_('application id'))
         api_key_id = serializers.UUIDField(required=True, label=_('ApiKeyId'))
+
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            workspace_id = self.data.get('workspace_id')
+            query_set = QuerySet(Application).filter(id=self.data.get('application_id'))
+            if workspace_id:
+                query_set = query_set.filter(workspace_id=workspace_id)
+            if not query_set.exists():
+                raise AppApiException(500, _('Application id does not exist'))
 
         def delete(self, with_valid=True):
             if with_valid:

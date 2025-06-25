@@ -22,8 +22,9 @@ from django.utils.translation import gettext_lazy as _, gettext
 from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
 from rest_framework import serializers
 
-from application.models import Chat
+from application.models import Chat, Application
 from common.db.search import get_dynamics_model, native_search, native_page_search
+from common.exception.app_exception import AppApiException
 from common.utils.common import get_file_content
 from maxkb.conf import PROJECT_DIR
 from maxkb.settings import TIME_ZONE
@@ -48,6 +49,7 @@ class ApplicationChatRecordExportRequest(serializers.Serializer):
 
 
 class ApplicationChatQuerySerializers(serializers.Serializer):
+    workspace_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("Workspace ID"))
     abstract = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_("summary"))
     start_time = serializers.DateField(format='%Y-%m-%d', label=_("Start time"))
     end_time = serializers.DateField(format='%Y-%m-%d', label=_("End time"))
@@ -60,6 +62,15 @@ class ApplicationChatQuerySerializers(serializers.Serializer):
         validators.RegexValidator(regex=re.compile("^and|or$"),
                                   message=_("Only supports and|or"), code=500)
     ])
+
+    def is_valid(self, *, raise_exception=False):
+        super().is_valid(raise_exception=True)
+        workspace_id = self.data.get('workspace_id')
+        query_set = QuerySet(Application).filter(id=self.data.get('application_id'))
+        if workspace_id:
+            query_set = query_set.filter(workspace_id=workspace_id)
+        if not query_set.exists():
+            raise AppApiException(500, _('Application id does not exist'))
 
     def get_end_time(self):
         return datetime.datetime.combine(

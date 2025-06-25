@@ -1,7 +1,6 @@
 from rest_framework import serializers
 
 from application.models import ApplicationFolder
-from knowledge.models import KnowledgeFolder
 
 
 class ApplicationFolderTreeSerializer(serializers.ModelSerializer):

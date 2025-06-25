@@ -42,7 +42,8 @@ class ApplicationChatRecord(APIView):
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def get(self, request: Request, workspace_id: str, application_id: str, chat_id: str):
         return result.success(ApplicationChatRecordQuerySerializers(
-            data={**query_params_to_single_dict(request.query_params), 'application_id': application_id,
+            data={**query_params_to_single_dict(request.query_params), 'workspace_id': workspace_id,
+                  'application_id': application_id,
                   'chat_id': chat_id
                   }).list())
 
@@ -66,7 +67,8 @@ class ApplicationChatRecord(APIView):
         def get(self, request: Request, workspace_id: str, application_id: str, chat_id: str, current_page: int,
                 page_size: int):
             return result.success(ApplicationChatRecordQuerySerializers(
-                data={**query_params_to_single_dict(request.query_params), 'application_id': application_id,
+                data={**query_params_to_single_dict(request.query_params), 'workspace_id': workspace_id,
+                      'application_id': application_id,
                       'chat_id': chat_id}).page(
                 current_page=current_page,
                 page_size=page_size))
@@ -116,7 +118,8 @@ class ApplicationChatRecordAddKnowledge(APIView):
                      RoleConstants.USER.get_workspace_role(),
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def post(self, request: Request, workspace_id: str, application_id: str):
-        return result.success(ApplicationChatRecordAddKnowledgeSerializer().post_improve(request.data))
+        return result.success(ApplicationChatRecordAddKnowledgeSerializer(
+            data={'workspace_id': workspace_id, 'application_id': application_id}).post_improve(request.data))
 
 
 class ApplicationChatRecordImprove(APIView):
@@ -138,7 +141,8 @@ class ApplicationChatRecordImprove(APIView):
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def get(self, request: Request, workspace_id: str, application_id: str, chat_id: str, chat_record_id: str):
         return result.success(ChatRecordImproveSerializer(
-            data={'chat_id': chat_id, 'chat_record_id': chat_record_id}).get())
+            data={'workspace_id': workspace_id, 'application_id': application_id, 'chat_id': chat_id,
+                  'chat_record_id': chat_record_id}).get())
 
 
 class ApplicationChatRecordImproveParagraph(APIView):
@@ -166,7 +170,8 @@ class ApplicationChatRecordImproveParagraph(APIView):
             knowledge_id: str,
             document_id: str):
         return result.success(ApplicationChatRecordImproveSerializer(
-            data={'chat_id': chat_id, 'chat_record_id': chat_record_id,
+            data={'workspace_id': workspace_id, 'application_id': application_id, 'chat_id': chat_id,
+                  'chat_record_id': chat_record_id,
                   'knowledge_id': knowledge_id, 'document_id': document_id}).improve(request.data))
 
     class Operate(APIView):
@@ -191,5 +196,6 @@ class ApplicationChatRecordImproveParagraph(APIView):
                    document_id: str, paragraph_id: str):
             return result.success(ApplicationChatRecordImproveSerializer.Operate(
                 data={'chat_id': chat_id, 'chat_record_id': chat_record_id, 'workspace_id': workspace_id,
+                      'application_id': application_id,
                       'knowledge_id': knowledge_id, 'document_id': document_id,
                       'paragraph_id': paragraph_id}).delete())
