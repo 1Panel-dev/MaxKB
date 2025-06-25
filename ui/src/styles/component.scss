@@ -179,3 +179,26 @@
     display: block !important;
   }
 }
+
+// 下载中
+.dotting {
+  display: inline-block;
+  width: 10px;
+  min-height: 2px;
+  padding-right: 2px;
+  margin-left: 2px;
+  padding-left: 2px;
+  border-left: 2px solid currentColor;
+  border-right: 2px solid currentColor;
+  background-color: currentColor;
+  background-clip: content-box;
+  box-sizing: border-box;
+  -webkit-animation: dot 0.8s infinite step-start both;
+  animation: dot 0.8s infinite step-start both;
+  &:before {
+    content: '...';
+  }
+  &::before {
+    content: '';
+  }
+}

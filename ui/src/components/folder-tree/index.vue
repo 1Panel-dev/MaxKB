@@ -10,71 +10,75 @@
     <div
       @click="handleSharedNodeClick"
       v-if="showShared && hasPermission(EditionConst.IS_EE, 'OR')"
-      class="shared-knowledge"
+      class="shared-button flex cursor"
       :class="currentNodeKey === 'share' && 'active'"
     >
-      <AppIcon :iconName="iconName" style="font-size: 18px"></AppIcon>
+      <AppIcon iconName="app-folder-share-active" style="font-size: 18px"></AppIcon>
       <span class="ml-8 lighter">{{ shareTitle }}</span>
     </div>
-    <el-tree
-      ref="treeRef"
-      :data="data"
-      :props="defaultProps"
-      @node-click="handleNodeClick"
-      :filter-node-method="filterNode"
-      :default-expanded-keys="[currentNodeKey]"
-      :current-node-key="currentNodeKey"
-      highlight-current
-      class="overflow-inherit_node__children"
-      node-key="id"
-      v-loading="loading"
-    >
-      <template #default="{ node, data }">
-        <div class="flex-between w-full" @mouseenter.stop="handleMouseEnter(data)">
-          <div class="flex align-center">
-            <AppIcon iconName="app-folder" style="font-size: 16px"></AppIcon>
-            <span class="ml-8 ellipsis" style="max-width: 110px" :label="node.label">{{
-              node.label
-            }}</span>
-          </div>
+    <div class="tree-height border-t" :style="treeStyle">
+      <el-scrollbar>
+        <el-tree
+          ref="treeRef"
+          :data="data"
+          :props="defaultProps"
+          @node-click="handleNodeClick"
+          :filter-node-method="filterNode"
+          :default-expanded-keys="[currentNodeKey]"
+          :current-node-key="currentNodeKey"
+          highlight-current
+          class="overflow-inherit_node__children"
+          node-key="id"
+          v-loading="loading"
+        >
+          <template #default="{ node, data }">
+            <div class="flex-between w-full" @mouseenter.stop="handleMouseEnter(data)">
+              <div class="flex align-center">
+                <AppIcon iconName="app-folder" style="font-size: 16px"></AppIcon>
+                <span class="ml-8 ellipsis" style="max-width: 110px" :title="node.label">{{
+                  node.label
+                }}</span>
+              </div>
 
-          <div
-            v-if="canOperation && node.level !== 3"
-            @click.stop
-            v-show="hoverNodeId === data.id"
-            @mouseenter.stop="handleMouseEnter(data)"
-            @mouseleave.stop="handleMouseleave"
-            class="mr-16"
-          >
-            <el-dropdown trigger="click" :teleported="false">
-              <el-button text class="w-full">
-                <el-icon class="rotate-90"><MoreFilled /></el-icon>
-              </el-button>
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item @click.stop="openCreateFolder(data)">
-                    <AppIcon iconName="app-add-folder"></AppIcon>
-                    {{ '添加子文件夹' }}
-                  </el-dropdown-item>
-                  <el-dropdown-item @click.stop="openEditFolder(data)">
-                    <el-icon><EditPen /></el-icon>
-                    {{ $t('common.edit') }}
-                  </el-dropdown-item>
-                  <el-dropdown-item
-                    divided
-                    @click.stop="deleteFolder(data)"
-                    :disabled="!data.parent_id"
-                  >
-                    <el-icon><Delete /></el-icon>
-                    {{ $t('common.delete') }}
-                  </el-dropdown-item>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown>
-          </div>
-        </div>
-      </template>
-    </el-tree>
+              <div
+                v-if="canOperation && node.level !== 3"
+                @click.stop
+                v-show="hoverNodeId === data.id"
+                @mouseenter.stop="handleMouseEnter(data)"
+                @mouseleave.stop="handleMouseleave"
+                class="mr-16"
+              >
+                <el-dropdown trigger="click" :teleported="false">
+                  <el-button text class="w-full">
+                    <el-icon class="rotate-90"><MoreFilled /></el-icon>
+                  </el-button>
+                  <template #dropdown>
+                    <el-dropdown-menu>
+                      <el-dropdown-item @click.stop="openCreateFolder(data)">
+                        <AppIcon iconName="app-add-folder"></AppIcon>
+                        {{ $t('components.folder.addChildFolder') }}
+                      </el-dropdown-item>
+                      <el-dropdown-item @click.stop="openEditFolder(data)">
+                        <el-icon><EditPen /></el-icon>
+                        {{ $t('common.edit') }}
+                      </el-dropdown-item>
+                      <el-dropdown-item
+                        divided
+                        @click.stop="deleteFolder(data)"
+                        :disabled="!data.parent_id"
+                      >
+                        <el-icon><Delete /></el-icon>
+                        {{ $t('common.delete') }}
+                      </el-dropdown-item>
+                    </el-dropdown-menu>
+                  </template>
+                </el-dropdown>
+              </div>
+            </div>
+          </template>
+        </el-tree>
+      </el-scrollbar>
+    </div>
     <CreateFolderDialog ref="CreateFolderDialogRef" @refresh="refreshFolder" :title="title" />
   </div>
 </template>
@@ -108,10 +112,6 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  iconName: {
-    type: String,
-    default: 'app-folder-share-active',
-  },
   shareTitle: {
     type: String,
     default: '',
@@ -119,6 +119,10 @@ const props = defineProps({
   canOperation: {
     type: Boolean,
     default: true,
+  },
+  treeStyle: {
+    type: Object,
+    default: () => ({}),
   },
 })
 
@@ -184,11 +188,11 @@ function deleteFolder(row: Tree) {
 
 const CreateFolderDialogRef = ref()
 function openCreateFolder(row: Tree) {
-  title.value = '添加子文件夹'
+  title.value = t('components.folder.addChildFolder')
   CreateFolderDialogRef.value.open(props.source, row.id)
 }
 function openEditFolder(row: Tree) {
-  title.value = '编辑文件夹'
+  title.value = t('components.folder.editFolder')
   CreateFolderDialogRef.value.open(props.source, row.id, row)
 }
 
@@ -197,39 +201,35 @@ function refreshFolder() {
 }
 </script>
 <style lang="scss" scoped>
-.shared-knowledge {
-  padding-left: 8px;
-  display: flex;
-  align-items: center;
-  height: 40px;
-  position: relative;
-  margin-bottom: 8px;
-  border-radius: 4px;
-  cursor: pointer;
-
-  &:hover {
-    background: var(--app-text-color-light-1);
-    color: var(--el-menu-text-color);
+.folder-tree {
+  .shared-button {
+    padding: 10px 8px;
+    font-weight: 400;
+    font-size: 14px;
+    margin-bottom: 4px;
+    &.active {
+      background: var(--el-color-primary-light-9);
+      border-radius: 4px;
+      color: var(--el-color-primary);
+      font-weight: 500;
+      &:hover {
+        background: var(--el-color-primary-light-9);
+      }
+    }
+    &:hover {
+      border-radius: 4px;
+      background: var(--app-text-color-light-1);
+    }
+    &.is-active {
+      &:hover {
+        color: var(--el-color-primary);
+        background: var(--el-color-primary-light-9);
+      }
+    }
   }
-
-  &.active {
-    color: var(--el-color-primary);
-    background: var(--el-color-primary-light-9);
-  }
-
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: -4px;
-    background-color: #1f232926;
-    left: 0;
-    width: 100%;
-    height: 1px;
-  }
-}
-:deep(.overflow-inherit_node__children) {
-  .el-tree-node__children {
-    overflow: inherit !important;
+  .tree-height {
+    padding-top: 4px;
+    height: calc(100vh - 210px);
   }
 }
 </style>

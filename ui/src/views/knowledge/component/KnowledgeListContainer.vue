@@ -19,7 +19,7 @@
           <el-input
             v-if="search_type === 'name'"
             v-model="search_form.name"
-            @change="getList"
+            @change="searchHandel"
             :placeholder="$t('common.searchBar.placeholder')"
             style="width: 220px"
             clearable
@@ -27,7 +27,7 @@
           <el-select
             v-else-if="search_type === 'create_user'"
             v-model="search_form.create_user"
-            @change="getList"
+            @change="searchHandel"
             clearable
             style="width: 220px"
           >
@@ -364,7 +364,6 @@ const paginationConfig = reactive({
   total: 0,
 })
 
-const knowledgeList = ref<any[]>([])
 
 const CreateKnowledgeDialogRef = ref()
 const currentCreateDialog = shallowRef<any>(null)
@@ -487,12 +486,18 @@ function getList() {
     .getKnowledgeListPage(paginationConfig, params, loading)
     .then((res: any) => {
       paginationConfig.total = res.data?.total
-      knowledge.setKnowledgeList([...knowledgeList.value, ...res.data.records])
+      knowledge.setKnowledgeList([...knowledge.knowledgeList, ...res.data.records])
     })
 }
 
 function clickFolder(item: any) {
   folder.setCurrentFolder(item)
+}
+
+function searchHandel() {
+  paginationConfig.current_page = 1
+  knowledge.setKnowledgeList([])
+  getList()
 }
 
 onMounted(() => {

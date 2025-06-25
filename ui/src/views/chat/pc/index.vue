@@ -22,7 +22,7 @@
               >
                   <img :src="applicationDetail?.icon" alt="" />
                 </el-avatar>
-                <LogoIcon v-else height="28px" style="width: 28px; height: 28px; display: block" />
+                <LogoIcon v-else height="32px" />
               </div>
               <h4 v-show="!isPcCollapse">{{ applicationDetail?.name }}</h4>
             </div>
@@ -143,7 +143,7 @@
               <!-- TODO -->
               <span v-show="!isPcCollapse" class="ml-8 color-text-primary">{{ 222 }}</span>
             </div>
-            
+
             <template #dropdown>
               <el-dropdown-menu class="avatar-dropdown">
                 <div class="flex align-center" style="padding: 12px;">

@@ -45,29 +45,33 @@
           v-loading="folderLoading"
           :canOperation="false"
           showShared
+          :shareTitle="$t('views.system.shared.shared_knowledge')"
+          :treeStyle="{ height: 'calc(100vh - 320px)' }"
         />
       </template>
-      <el-scrollbar>
-        <div class="max-height layout-bg p-16-24">
-          <el-row :gutter="12" v-loading="loading">
-            <el-col
-              :span="12"
-              v-for="(item, index) in filterData.filter((v: any) => v.resource_type !== 'folder')"
-              :key="index"
-              class="mb-16"
-            >
-              <CardCheckbox
-                value-field="id"
-                :data="item"
-                v-model="checkList"
-                @change="changeHandle"
+      <div class="layout-bg h-full">
+        <el-scrollbar>
+          <div class="p-16-24">
+            <el-row :gutter="12" v-loading="loading">
+              <el-col
+                :span="12"
+                v-for="(item, index) in filterData.filter((v: any) => v.resource_type !== 'folder')"
+                :key="index"
+                class="mb-16"
               >
-                <span class="ellipsis cursor ml-12" :title="item.name"> {{ item.name }}</span>
-              </CardCheckbox>
-            </el-col>
-          </el-row>
-        </div>
-      </el-scrollbar>
+                <CardCheckbox
+                  value-field="id"
+                  :data="item"
+                  v-model="checkList"
+                  @change="changeHandle"
+                >
+                  <span class="ellipsis cursor ml-12" :title="item.name"> {{ item.name }}</span>
+                </CardCheckbox>
+              </el-col>
+            </el-row>
+          </div>
+        </el-scrollbar>
+      </div>
     </LayoutContainer>
 
     <template #footer>
@@ -215,10 +219,6 @@ defineExpose({ open })
   .el-dialog__headerbtn {
     top: 6px;
     right: 6px;
-  }
-  .max-height {
-    max-height: calc(100vh - 260px);
-    min-height: 500px;
   }
 }
 </style>

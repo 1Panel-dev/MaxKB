@@ -11,6 +11,8 @@ export default {
   },
   folder: {
     addFolder: '添加文件夾',
+    addChildFolder: '添加子文件夾',
+    editFolder: '編輯文件夾',
     folderNamePlaceholder: '請輸入名稱',
     description: '描述',
     descriptionPlaceholder: '請輸入描述',

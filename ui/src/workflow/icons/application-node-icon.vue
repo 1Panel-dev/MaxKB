@@ -8,7 +8,7 @@
   >
     <img :src="item?.icon" alt="" />
   </el-avatar>
-  <LogoIcon v-else height="28px" style="width: 28px; height: 28px; display: block" />
+  <LogoIcon v-else height="32px" />
 </template>
 <script setup lang="ts">
 import { isAppIcon } from '@/utils/common'

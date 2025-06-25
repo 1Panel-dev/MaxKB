@@ -19,7 +19,7 @@
           <el-input
             v-if="search_type === 'name'"
             v-model="search_form.name"
-            @change="getList"
+            @change="searchHandel"
             :placeholder="$t('common.searchBar.placeholder')"
             style="width: 220px"
             clearable
@@ -27,7 +27,7 @@
           <el-select
             v-else-if="search_type === 'create_user'"
             v-model="search_form.create_user"
-            @change="getList"
+            @change="searchHandel"
             clearable
             style="width: 220px"
           >
@@ -573,7 +573,7 @@ function getList() {
   const params = {
     [search_type.value]: search_form.value[search_type.value],
     folder_id: folder.currentFolder?.id || user.getWorkspaceId(),
-    scope: systemType === 'systemShare' ? 'SHARED' : 'WORKSPACE',
+    scope: apiType.value === 'systemShare' ? 'SHARED' : 'WORKSPACE',
   }
   loadSharedApi({ type: 'tool', isShared: isShared.value, systemType: apiType.value })
     .getToolListPage(paginationConfig, params, loading)
@@ -585,6 +585,12 @@ function getList() {
 
 function clickFolder(item: any) {
   folder.setCurrentFolder(item)
+}
+
+function searchHandel() {
+  paginationConfig.current_page = 1
+  tool.setToolList([])
+  getList()
 }
 
 onMounted(() => {

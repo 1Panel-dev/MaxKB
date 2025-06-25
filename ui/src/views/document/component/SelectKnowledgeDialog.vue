@@ -128,17 +128,4 @@ const submitHandle = () => {
 
 defineExpose({ open })
 </script>
-<style lang="scss">
-// .select-knowledge-dialog {
-//   padding: 0;
-//   .el-dialog__header {
-//     padding: 24px 24px 0 24px;
-//   }
-//   .el-dialog__body {
-//     padding: 8px !important;
-//   }
-//   .el-dialog__footer {
-//     padding: 0 24px 24px;
-//   }
-// }
-</style>
+<style lang="scss"></style>

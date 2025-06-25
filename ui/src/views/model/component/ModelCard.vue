@@ -52,15 +52,11 @@
     </ul>
     <!-- progress -->
     <div class="progress-mask" v-if="currentModel.status === 'DOWNLOAD'">
-      <!-- <DownloadLoading class="percentage" /> -->
+      <DownloadLoading class="percentage" />
 
       <div class="percentage-label flex-center">
         {{ $t('views.model.download.downloading') }} <span class="dotting"></span>
-        <el-button
-          link
-          type="primary"
-          class="ml-16"
-          @click.stop="cancelDownload"
+        <el-button link type="primary" class="ml-16" @click.stop="cancelDownload"
           >{{ $t('views.model.download.cancelDownload') }}
         </el-button>
       </div>
@@ -128,7 +124,7 @@
 import type { Provider, Model } from '@/api/type/model'
 import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import EditModel from '@/views/model/component/EditModel.vue'
-// import DownloadLoading from '@/components/loading/DownloadLoading.vue'
+import DownloadLoading from '@/components/loading/DownloadLoading.vue'
 import { MsgConfirm } from '@/utils/message'
 import { modelType } from '@/enums/model'
 import ParamSettingDialog from './ParamSettingDialog.vue'
@@ -146,13 +142,11 @@ const props = defineProps<{
   apiType: 'systemShare' | 'workspace' | 'systemManage'
 }>()
 
-
 const permissionPrecise = computed(() => {
   return permissionMap['model'][props.apiType]
 })
 
 const downModel = ref<Model>()
-
 
 const currentModel = computed(() => {
   if (downModel.value) {
@@ -287,12 +281,6 @@ onBeforeUnmount(() => {
       margin-bottom: 16px;
     }
 
-    // .percentage-value {
-    //   display: flex;
-    //   font-size: 13px;
-    //   align-items: center;
-    //   color: var(--app-text-color-secondary);
-    // }
     .percentage-label {
       margin-top: 50px;
       margin-left: 10px;

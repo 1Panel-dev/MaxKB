@@ -92,7 +92,7 @@
                 >
                   <img :src="detail?.icon" alt="" />
                 </el-avatar>
-                <LogoIcon v-else height="28px" style="width: 28px; height: 28px; display: block" />
+                <LogoIcon v-else height="32px" />
               </div>
 
               <h4>

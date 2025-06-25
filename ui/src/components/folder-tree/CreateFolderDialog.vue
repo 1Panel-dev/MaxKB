@@ -13,6 +13,7 @@
       :model="folderForm"
       label-position="top"
       require-asterisk-position="right"
+      @submit.prevent
     >
       <el-form-item :label="$t('common.name')" prop="name">
         <el-input

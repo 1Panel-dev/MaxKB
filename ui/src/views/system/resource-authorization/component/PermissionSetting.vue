@@ -55,12 +55,7 @@
                 alt=""
               />
             </el-avatar>
-            <LogoIcon
-              v-else-if="isApplication"
-              height="28px"
-              style="width: 28px; height: 28px; display: block"
-              class="mr-12"
-            />
+            <LogoIcon v-else-if="isApplication" height="32px" class="mr-12" />
 
             <KnowledgeIcon class="mr-12" :size="20" v-else-if="isKnowledge" :type="row.icon" />
 

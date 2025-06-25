@@ -28,7 +28,7 @@
             <el-input
               v-if="search_type === 'name'"
               v-model="search_form.name"
-              @change="getList"
+              @change="searchHandel"
               :placeholder="$t('common.searchBar.placeholder')"
               style="width: 220px"
               clearable
@@ -36,7 +36,7 @@
             <el-select
               v-else-if="search_type === 'create_user'"
               v-model="search_form.create_user"
-              @change="getList"
+              @change="searchHandel"
               clearable
               style="width: 220px"
             >
@@ -177,7 +177,7 @@
                   @click="router.push({ path: `/application/${item.id}/${item.type}/overview` })"
                 >
                   <template #icon>
-                    <LogoIcon height="28px" style="width: 28px; height: 28px; display: block" />
+                    <LogoIcon height="32px" />
                   </template>
                   <template #subTitle>
                     <el-text class="color-secondary" size="small">
@@ -507,6 +507,13 @@ function refreshFolder() {
   applicationList.value = []
   getFolder()
 }
+
+function searchHandel() {
+  paginationConfig.current_page = 1
+  applicationList.value = []
+  getList()
+}
+
 onMounted(() => {
   getFolder(true)
 })
