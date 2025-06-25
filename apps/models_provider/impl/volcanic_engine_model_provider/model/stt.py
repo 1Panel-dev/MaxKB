@@ -300,7 +300,7 @@ class VolcanicEngineSpeechToText(MaxKBBaseModel, BaseSpeechToText):
             header = self.token_auth()
         elif self.auth_method == "signature":
             header = self.signature_auth(full_client_request)
-        async with websockets.connect(self.volcanic_api_url, extra_headers=header, max_size=1000000000,
+        async with websockets.connect(self.volcanic_api_url, additional_headers=header, max_size=1000000000,
                                       ssl=ssl_context) as ws:
             # 发送 full client request
             await ws.send(full_client_request)
