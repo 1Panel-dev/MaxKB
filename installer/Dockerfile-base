@@ -31,4 +31,5 @@ ENV PGDATA=/opt/maxkb/data/postgresql/pgdata \
     POSTGRES_PASSWORD=Password123@postgres \
     POSTGRES_MAX_CONNECTIONS=1000 \
     REDIS_PASSWORD=Password123@redis \
-    LANG=en_US.UTF-8
+    LANG=en_US.UTF-8 \
+    MAXKB_LOG_LEVEL=INFO

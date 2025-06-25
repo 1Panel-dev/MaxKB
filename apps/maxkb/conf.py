@@ -81,6 +81,9 @@ class Config(dict):
     def get_language_code(self):
         return self.get('LANGUAGE_CODE', 'zh-CN')
 
+    def get_log_level(self):
+        return self.get('LOG_LEVEL', 'DEBUG')
+
     def __init__(self, *args):
         super().__init__(*args)
 

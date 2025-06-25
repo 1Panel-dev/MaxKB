@@ -7,7 +7,7 @@ from ..const import PROJECT_DIR, CONFIG, LOG_DIR
 MAX_KB_LOG_FILE = os.path.join(LOG_DIR, 'maxkb.log')
 DRF_EXCEPTION_LOG_FILE = os.path.join(LOG_DIR, 'drf_exception.log')
 UNEXPECTED_EXCEPTION_LOG_FILE = os.path.join(LOG_DIR, 'unexpected_exception.log')
-LOG_LEVEL = "DEBUG"
+LOG_LEVEL = CONFIG.get_log_level()
 
 LOGGING = {
     'version': 1,
