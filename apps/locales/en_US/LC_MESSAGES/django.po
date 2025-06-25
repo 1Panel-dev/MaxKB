@@ -8373,3 +8373,9 @@ msgstr ""
 
 msgid "Validation"
 msgstr ""
+
+msgid "Models Resource"
+msgstr ""
+
+msgid "Tools Resource"
+msgstr ""

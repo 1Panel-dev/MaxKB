@@ -8499,3 +8499,9 @@ msgstr "獲取驗證結果"
 
 msgid "Validation"
 msgstr "驗證"
+
+msgid "Models Resource"
+msgstr "模型資源"
+
+msgid "Tools Resource"
+msgstr "工具資源"
