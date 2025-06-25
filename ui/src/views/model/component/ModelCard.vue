@@ -131,12 +131,9 @@ import EditModel from '@/views/model/component/EditModel.vue'
 // import DownloadLoading from '@/components/loading/DownloadLoading.vue'
 import { MsgConfirm } from '@/utils/message'
 import { modelType } from '@/enums/model'
-import useStore from '@/stores'
 import ParamSettingDialog from './ParamSettingDialog.vue'
 import AuthorizedWorkspace from '@/views/system-shared/AuthorizedWorkspaceDialog.vue'
 import { t } from '@/locales'
-import { PermissionConst, RoleConst } from '@/utils/permission/data'
-import { hasPermission } from '@/utils/permission'
 import permissionMap from '@/permission'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
@@ -149,7 +146,6 @@ const props = defineProps<{
   apiType: 'systemShare' | 'workspace' | 'systemManage'
 }>()
 
-const { user } = useStore()
 
 const permissionPrecise = computed(() => {
   return permissionMap['model'][props.apiType]

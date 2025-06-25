@@ -321,8 +321,6 @@ import { numberFormat } from '@/utils/common'
 import { t } from '@/locales'
 import { useRouter, useRoute } from 'vue-router'
 import { FolderSource } from '@/enums/common'
-import { PermissionConst, RoleConst } from '@/utils/permission/data'
-import { hasPermission } from '@/utils/permission/index'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import permissionMap from '@/permission'
 
@@ -481,10 +479,12 @@ watch(
 
 function getList() {
   const params = {
+    folder_id: folder.currentFolder?.id || user.getWorkspaceId(),
+    scope: apiType.value === 'systemShare' ? 'SHARED' : 'WORKSPACE',
     [search_type.value]: search_form.value[search_type.value],
   }
-  knowledge
-    .asyncGetKnowledgeListPage(paginationConfig, isShared.value, apiType.value, params, loading)
+  loadSharedApi({ type: 'knowledge', isShared: isShared.value, systemType: apiType.value })
+    .getKnowledgeListPage(paginationConfig, params, loading)
     .then((res: any) => {
       paginationConfig.total = res.data?.total
       knowledge.setKnowledgeList([...knowledgeList.value, ...res.data.records])

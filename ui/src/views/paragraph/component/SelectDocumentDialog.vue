@@ -79,11 +79,8 @@
 import { ref, watch, reactive, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
-import paragraphApi from '@/api/knowledge/paragraph'
-import useStore from '@/stores'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { t } from '@/locales'
-const { knowledge, document } = useStore()
 
 const route = useRoute()
 const {
@@ -160,9 +157,11 @@ function changeKnowledge(id: string) {
 }
 
 function getDocument(id: string) {
-  document.asyncGetKnowledgeDocument(id, apiType.value, optionLoading).then((res: any) => {
-    documentList.value = res.data?.filter((v: any) => v.id !== documentId)
-  })
+  loadSharedApi({ type: 'document', systemType: apiType.value })
+    .getDocumentList(id, optionLoading)
+    .then((res: any) => {
+      documentList.value = res.data?.filter((v: any) => v.id !== documentId)
+    })
 }
 
 const open = (list: any) => {
@@ -177,7 +176,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
       const obj = {
         id_list: paragraphList.value,
       }
-      paragraphApi
+      loadSharedApi({ type: 'paragraph', systemType: apiType.value })
         .putMigrateMulParagraph(
           id,
           documentId,

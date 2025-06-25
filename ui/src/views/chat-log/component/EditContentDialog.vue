@@ -103,7 +103,7 @@ import imageApi from '@/api/image'
 import documentApi from '@/api/knowledge/document'
 import useStore from '@/stores'
 import { t } from '@/locales'
-const { application, document, user } = useStore()
+const { application, user } = useStore()
 
 const route = useRoute()
 const {

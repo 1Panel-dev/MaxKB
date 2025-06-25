@@ -105,9 +105,10 @@
 </template>
 
 <script setup lang="ts">
-import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import { computed, onMounted, ref } from 'vue'
 import { groupBy, set } from 'lodash'
+import NodeContainer from '@/workflow/common/NodeContainer.vue'
+import TTSModeParamSettingDialog from '@/views/application/component/TTSModeParamSettingDialog.vue'
 import applicationApi from '@/api/application/application'
 import useStore from '@/stores'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
@@ -119,7 +120,6 @@ const route = useRoute()
 const {
   params: { id },
 } = route as any
-import TTSModeParamSettingDialog from '@/views/application/component/TTSModeParamSettingDialog.vue'
 
 const TTSModeParamSettingDialogRef = ref<InstanceType<typeof TTSModeParamSettingDialog>>()
 const { model } = useStore()
@@ -176,7 +176,7 @@ function getSelectModel() {
       modelOptions.value = groupBy(res?.data, 'provider')
     })
   } else {
-    model.asyncGetSelectModel('workspace').then((res: any) => {
+    model.asyncGetSelectModel().then((res: any) => {
       modelOptions.value = groupBy(res?.data, 'provider')
     })
   }

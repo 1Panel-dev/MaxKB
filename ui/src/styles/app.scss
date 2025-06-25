@@ -403,6 +403,17 @@ h5 {
 .color-input-placeholder {
   color: var(--app-input-color-placeholder);
 }
+
+/*
+  头像渐变背景
+*/
+.avatar-gradient {
+  background: var(--app-avatar-gradient-color);
+}
+
+.avatar-light {
+  background: var(--el-color-primary-light-3);
+}
 .avatar-purple {
   background: #7f3bf5;
 }

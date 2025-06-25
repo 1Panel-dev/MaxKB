@@ -176,10 +176,8 @@ import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import ParamSettingDialog from './ParamSettingDialog.vue'
 import { ref, computed, onMounted } from 'vue'
-
 import applicationApi from '@/api/application/application'
 import useStore from '@/stores'
-
 import { useRoute } from 'vue-router'
 const route = useRoute()
 const {
@@ -242,7 +240,7 @@ function getSelectModel() {
       modelOptions.value = groupBy(res?.data, 'provider')
     })
   } else {
-    model.asyncGetSelectModel('workspace', { model_type: 'RERANKER' }).then((res: any) => {
+    model.asyncGetSelectModel({ model_type: 'RERANKER' }).then((res: any) => {
       modelOptions.value = groupBy(res?.data, 'provider')
     })
   }

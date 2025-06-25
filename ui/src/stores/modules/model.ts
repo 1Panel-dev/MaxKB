@@ -1,20 +1,16 @@
 import { defineStore } from 'pinia'
 import { type Ref } from 'vue'
 import ProviderApi from '@/api/model/provider'
+import ModelApi from '@/api/model/model'
 import type { ListModelRequest } from '@/api/type/model'
-import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 const useModelStore = defineStore('model', {
   state: () => ({}),
   actions: {
-    async asyncGetSelectModel(
-      systemType: 'systemShare' | 'workspace' | 'systemManage' = 'workspace',
-      data?: ListModelRequest,
-      loading?: Ref<boolean>,
-    ) {
+    // 仅限在应用下拉列表使用，非共享资源
+    async asyncGetSelectModel(data?: ListModelRequest, loading?: Ref<boolean>) {
       return new Promise((resolve, reject) => {
-        loadSharedApi({ type: 'model', systemType })
-          .getSelectModelList(data, loading)
+        ModelApi.getSelectModelList(data, loading)
           .then((res: any) => {
             resolve(res)
           })

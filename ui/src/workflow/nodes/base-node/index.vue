@@ -171,8 +171,6 @@ import { groupBy, set } from 'lodash'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'
-import applicationApi from '@/api/application/application'
-import modelAPI from '@/api/model/model.ts'
 import { MsgError, MsgSuccess, MsgWarning } from '@/utils/message'
 import { t } from '@/locales'
 import TTSModeParamSettingDialog from '@/views/application/component/TTSModeParamSettingDialog.vue'
@@ -180,11 +178,13 @@ import ApiInputFieldTable from './component/ApiInputFieldTable.vue'
 import UserInputFieldTable from './component/UserInputFieldTable.vue'
 import FileUploadSettingDialog from '@/workflow/nodes/base-node/component/FileUploadSettingDialog.vue'
 import { useRoute } from 'vue-router'
+import useStore from '@/stores'
 const route = useRoute()
+
 const {
   params: { id },
 } = route as any
-
+const { model } = useStore()
 const props = defineProps<{ nodeModel: any }>()
 
 const sttModelOptions = ref<any>(null)
@@ -253,13 +253,13 @@ const validate = () => {
 }
 
 function getSTTModel() {
-  modelAPI.getSelectModelList({ model_type: 'STT' }).then((res: any) => {
+  model.asyncGetSelectModel({ model_type: 'STT' }).then((res: any) => {
     sttModelOptions.value = groupBy(res?.data, 'provider')
   })
 }
 
 function getTTSModel() {
-  modelAPI.getSelectModelList({ model_type: 'TTS' }).then((res: any) => {
+  model.asyncGetSelectModel({ model_type: 'TTS' }).then((res: any) => {
     ttsModelOptions.value = groupBy(res?.data, 'provider')
   })
 }

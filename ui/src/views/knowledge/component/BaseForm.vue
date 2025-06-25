@@ -44,9 +44,9 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, onUnmounted, computed, watch } from 'vue'
 import { groupBy } from 'lodash'
-import useStore from '@/stores'
 import type { knowledgeData } from '@/api/type/knowledge'
 import { t } from '@/locales'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 const props = defineProps<{
   data?: {
@@ -55,7 +55,6 @@ const props = defineProps<{
   }
   apiType: 'systemShare' | 'workspace' | 'systemManage'
 }>()
-const { model } = useStore()
 const form = ref<knowledgeData>({
   name: '',
   desc: '',
@@ -116,11 +115,9 @@ function validate() {
 
 function getSelectModel() {
   loading.value = true
-
-  model
-    .asyncGetSelectModel(props.apiType, { model_type: 'EMBEDDING' })
+  loadSharedApi({ type: 'model', systemType: props.apiType })
+    .getSelectModelList({ model_type: 'EMBEDDING' })
     .then((res: any) => {
-
       modelOptions.value = groupBy(res?.data, 'provider')
       loading.value = false
     })

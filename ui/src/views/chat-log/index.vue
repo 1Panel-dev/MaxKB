@@ -305,7 +305,7 @@ import { ElTable } from 'element-plus'
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
 
-const { application, chatLog, document, user } = useStore()
+const { application, chatLog, user } = useStore()
 const route = useRoute()
 const {
   params: { id },

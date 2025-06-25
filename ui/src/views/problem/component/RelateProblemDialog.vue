@@ -111,12 +111,9 @@
 <script setup lang="ts">
 import { ref, watch, reactive, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import problemApi from '@/api/knowledge/problem'
-import paragraphApi from '@/api/knowledge/paragraph'
-import useStore from '@/stores'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
-const { problem, document, paragraph } = useStore()
 
 const route = useRoute()
 const {
@@ -168,10 +165,12 @@ function mulAssociation() {
       document_id: item.document_id,
     })),
   }
-  problemApi.putMulAssociationProblem(id, data, loading).then(() => {
-    MsgSuccess(t('views.problem.tip.relatedSuccess'))
-    dialogVisible.value = false
-  })
+  loadSharedApi({ type: 'problem', systemType: apiType.value })
+    .putMulAssociationProblem(id, data, loading)
+    .then(() => {
+      MsgSuccess(t('views.problem.tip.relatedSuccess'))
+      dialogVisible.value = false
+    })
 }
 
 function associationClick(item: any) {
@@ -182,27 +181,19 @@ function associationClick(item: any) {
       associationParagraph.value.push(item)
     }
   } else {
+    const obj = {
+      paragraph_id: item.id,
+      problem_id: currentProblemId.value as string,
+    }
     if (isAssociation(item.id)) {
-      paragraph
-        .asyncDisassociationProblem(
-          id,
-          item.document_id,
-          item.id,
-          currentProblemId.value as string,
-          loading,
-        )
+      loadSharedApi({ type: 'paragraph', systemType: apiType.value })
+        .putDisassociationProblem(id, item.document_id, obj, loading)
         .then(() => {
           getRecord(currentProblemId.value)
         })
     } else {
-      paragraph
-        .asyncAssociationProblem(
-          id,
-          item.document_id,
-          item.id,
-          currentProblemId.value as string,
-          loading,
-        )
+      loadSharedApi({ type: 'paragraph', systemType: apiType.value })
+        .putAssociationProblem(id, item.document_id, obj, loading)
         .then(() => {
           getRecord(currentProblemId.value)
         })
@@ -224,16 +215,19 @@ function clickDocumentHandle(item: any) {
 }
 
 function getDocument() {
-  document.asyncGetKnowledgeDocument(id, apiType.value, loading).then((res: any) => {
-    cloneDocumentList.value = res.data
-    documentList.value = res.data
-    currentDocument.value = cloneDocumentList.value?.length > 0 ? cloneDocumentList.value[0].id : ''
-    currentDocument.value && getParagraphList(currentDocument.value)
-  })
+  loadSharedApi({ type: 'document', systemType: apiType.value })
+    .getDocumentList(id, loading)
+    .then((res: any) => {
+      cloneDocumentList.value = res.data
+      documentList.value = res.data
+      currentDocument.value =
+        cloneDocumentList.value?.length > 0 ? cloneDocumentList.value[0].id : ''
+      currentDocument.value && getParagraphList(currentDocument.value)
+    })
 }
 
 function getParagraphList(documentId: string) {
-  paragraphApi
+  loadSharedApi({ type: 'paragraph', systemType: apiType.value })
     .getParagraphPage(
       id,
       (documentId || currentDocument.value) as string,
@@ -241,7 +235,7 @@ function getParagraphList(documentId: string) {
       search.value && { [searchType.value]: search.value },
       loading,
     )
-    .then((res) => {
+    .then((res: any) => {
       paragraphList.value = [...paragraphList.value, ...res.data.records]
       paginationConfig.total = res.data.total
     })
@@ -249,9 +243,11 @@ function getParagraphList(documentId: string) {
 
 // 已关联分段
 function getRecord(problemId: string) {
-  problemApi.getDetailProblems(id as string, problemId as string, loading).then((res) => {
-    associationParagraph.value = res.data
-  })
+  loadSharedApi({ type: 'problem', systemType: apiType.value })
+    .getDetailProblems(id as string, problemId as string, loading)
+    .then((res: any) => {
+      associationParagraph.value = res.data
+    })
 }
 
 function associationCount(documentId: string) {

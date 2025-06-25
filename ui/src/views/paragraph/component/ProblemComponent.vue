@@ -57,21 +57,20 @@
 <script setup lang="ts">
 import { ref, nextTick, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import paragraphApi from '@/api/knowledge/paragraph'
-import useStore from '@/stores'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
-const props = defineProps({
-  paragraphId: String,
-  docId: String,
-  knowledgeId: String,
-})
+const props = defineProps<{
+  paragraphId: String
+  docId: String
+  knowledgeId: String
+  apiType: 'systemShare' | 'workspace' | 'systemManage'
+}>()
 
 const route = useRoute()
 const {
   params: { id, documentId }, // id为knowledgeId
 } = route as any
 
-const { problem, paragraph } = useStore()
 const inputRef = ref()
 const loading = ref(false)
 const isAddProblem = ref(false)
@@ -96,14 +95,12 @@ watch(
 
 function delProblemHandle(item: any, index: number) {
   if (item.id) {
-    paragraph
-      .asyncDisassociationProblem(
-        props.knowledgeId || id,
-        documentId || props.docId,
-        props.paragraphId || '',
-        item.id,
-        loading,
-      )
+    const obj = {
+      paragraph_id: props.paragraphId || '',
+      problem_id: item.id,
+    }
+    loadSharedApi({ type: 'paragraph', systemType: props.apiType })
+      .putDisassociationProblem(props.knowledgeId || id, documentId || props.docId, obj, loading)
       .then((res: any) => {
         getProblemList()
       })
@@ -114,9 +111,13 @@ function delProblemHandle(item: any, index: number) {
 
 function getProblemList() {
   loading.value = true
-  paragraphApi
-    .getParagraphProblem(props.knowledgeId || id, documentId || props.docId, props.paragraphId || '')
-    .then((res) => {
+  loadSharedApi({ type: 'paragraph', systemType: props.apiType })
+    .getParagraphProblem(
+      props.knowledgeId || id,
+      documentId || props.docId,
+      props.paragraphId || '',
+    )
+    .then((res: any) => {
       problemList.value = res.data
       loading.value = false
     })
@@ -133,15 +134,18 @@ function addProblem() {
 }
 function addProblemHandle(val: string) {
   if (props.paragraphId) {
+    const obj = {
+      paragraph_id: props.paragraphId,
+      problem_id: val,
+    }
     const api = problemOptions.value.some((option) => option.id === val)
-      ? paragraph.asyncAssociationProblem(
+      ? loadSharedApi({ type: 'paragraph', systemType: props.apiType }).putAssociationProblem(
           props.knowledgeId || id,
           documentId || props.docId,
-          props.paragraphId,
-          val,
+          obj,
           loading,
         )
-      : paragraphApi.postParagraphProblem(
+      : loadSharedApi({ type: 'paragraph', systemType: props.apiType }).postParagraphProblem(
           props.knowledgeId || id,
           documentId || props.docId,
           props.paragraphId,
@@ -172,8 +176,8 @@ const remoteMethod = (query: string) => {
 }
 
 function getProblemOption(filterText?: string) {
-  return problem
-    .asyncGetProblem(
+  return loadSharedApi({ type: 'problem', systemType: props.apiType })
+    .getProblemsPage(
       props.knowledgeId || (id as string),
       { current_page: 1, page_size: 100 },
       filterText && { content: filterText },

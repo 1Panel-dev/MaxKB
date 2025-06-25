@@ -301,8 +301,6 @@ import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
 import AuthorizedWorkspace from '@/views/system-shared/AuthorizedWorkspaceDialog.vue'
 import { isAppIcon } from '@/utils/common'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
-import { EditionConst, PermissionConst, RoleConst } from '@/utils/permission/data'
-import { hasPermission } from '@/utils/permission/index'
 import { FolderSource } from '@/enums/common'
 import ToolStoreDialog from '@/views/tool/toolStore/ToolStoreDialog.vue'
 import AddInternalFunctionDialog from '@/views/tool/toolStore/AddInternalFunctionDialog.vue'
@@ -574,9 +572,11 @@ watch(
 function getList() {
   const params = {
     [search_type.value]: search_form.value[search_type.value],
+    folder_id: folder.currentFolder?.id || user.getWorkspaceId(),
+    scope: systemType === 'systemShare' ? 'SHARED' : 'WORKSPACE',
   }
-  tool
-    .asyncGetToolListPage(paginationConfig, isShared.value, apiType.value, params, loading)
+  loadSharedApi({ type: 'tool', isShared: isShared.value, systemType: apiType.value })
+    .getToolListPage(paginationConfig, params, loading)
     .then((res: any) => {
       paginationConfig.total = res.data?.total
       tool.setToolList([...tool.toolList, ...res.data?.records])

@@ -599,8 +599,6 @@ import GenerateRelatedDialog from '@/components/generate-related-dialog/index.vu
 import EmbeddingContentDialog from '@/views/document/component/EmbeddingContentDialog.vue'
 import { TaskType, State } from '@/utils/status'
 import { t } from '@/locales'
-import { PermissionConst, RoleConst } from '@/utils/permission/data'
-import { hasPermission } from '@/utils/permission/index'
 import permissionMap from '@/permission'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
@@ -609,7 +607,7 @@ const router = useRouter()
 const {
   params: { id, folderId }, // id为knowledgeID
 } = route as any
-const { common, document } = useStore()
+const { common } = useStore()
 const storeKey = 'documents'
 onBeforeRouteUpdate(() => {
   common.savePage(storeKey, null)

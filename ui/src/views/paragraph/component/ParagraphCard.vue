@@ -66,7 +66,12 @@
       class="maxkb-md"
     />
 
-    <ParagraphDialog ref="ParagraphDialogRef" :title="title" @refresh="refresh" />
+    <ParagraphDialog
+      ref="ParagraphDialogRef"
+      :title="title"
+      @refresh="refresh"
+      :apiType="apiType"
+    />
     <SelectDocumentDialog ref="SelectDocumentDialogRef" @refresh="refreshMigrateParagraph" />
     <GenerateRelatedDialog ref="GenerateRelatedDialogRef" @refresh="refresh" :apiType="apiType" />
   </el-card>
@@ -74,17 +79,16 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { t } from '@/locales'
-import useStore from '@/stores'
 import GenerateRelatedDialog from '@/components/generate-related-dialog/index.vue'
 import ParagraphDialog from '@/views/paragraph/component/ParagraphDialog.vue'
 import SelectDocumentDialog from '@/views/paragraph/component/SelectDocumentDialog.vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import { t } from '@/locales'
 const props = defineProps<{
   data: any
   disabled?: boolean
 }>()
-const { paragraph } = useStore()
 
 const route = useRoute()
 const {
@@ -115,8 +119,8 @@ function changeState(row: any) {
   const obj = {
     is_active: !row.is_active,
   }
-  paragraph
-    .asyncPutParagraph(id, documentId, row.id, obj, changeStateloading)
+  loadSharedApi({ type: 'paragraph', systemType: apiType.value })
+    .putParagraph(id, documentId, row.id, obj, changeStateloading)
     .then((res) => {
       emit('changeState', row.id)
       return true
@@ -142,10 +146,12 @@ function deleteParagraph(row: any) {
     },
   )
     .then(() => {
-      paragraph.asyncDelParagraph(id, documentId, row.id, loading).then(() => {
-        emit('deleteParagraph', row.id)
-        MsgSuccess(t('common.deleteSuccess'))
-      })
+      loadSharedApi({ type: 'paragraph', systemType: apiType.value })
+        .delParagraph(id, documentId, row.id, loading)
+        .then(() => {
+          emit('deleteParagraph', row.id)
+          MsgSuccess(t('common.deleteSuccess'))
+        })
     })
     .catch(() => {})
 }

@@ -64,7 +64,7 @@ import { ref, watch, reactive } from 'vue'
 import { useRoute } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
 import chatLogApi from '@/api/application/chat-log'
-import useStore from '@/stores'
+import paragraphApi from '@/api/knowledge/paragraph'
 import { t } from '@/locales'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 
@@ -72,8 +72,6 @@ const route = useRoute()
 const {
   params: { id },
 } = route as any
-
-const { paragraph } = useStore()
 
 const emit = defineEmits(['refresh'])
 
@@ -119,14 +117,7 @@ function deleteMark() {
 
 function getMark(data: any) {
   chatLogApi
-    .getMarkChatRecord(
-      id as string,
-      data.chat_id,
-      data.id,
-      data.knowledge,
-      data.document,
-      loading,
-    )
+    .getMarkChatRecord(id as string, data.chat_id, data.id, data.knowledge, data.document, loading)
     .then((res: any) => {
       if (res.data.length > 0) {
         form.value = res.data[0]
@@ -143,8 +134,8 @@ const submit = async (formEl: FormInstance) => {
   if (!formEl) return
   await formEl.validate((valid, fields) => {
     if (valid) {
-      paragraph
-        .asyncPutParagraph(
+      paragraphApi
+        .putParagraph(
           form.value.knowledge,
           form.value.document,
           form.value.id,

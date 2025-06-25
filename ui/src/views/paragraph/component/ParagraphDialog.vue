@@ -35,6 +35,7 @@
           :paragraphId="paragraphId"
           :docId="document_id"
           :knowledgeId="dataset_id"
+          :apiType="apiType"
           ref="ProblemRef"
         />
       </el-col>
@@ -55,14 +56,12 @@ import { useRoute } from 'vue-router'
 import { cloneDeep, debounce } from 'lodash'
 import ParagraphForm from '@/views/paragraph/component/ParagraphForm.vue'
 import ProblemComponent from '@/views/paragraph/component/ProblemComponent.vue'
-import paragraphApi from '@/api/knowledge/paragraph'
-import useStore from '@/stores'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
-const props = defineProps({
-  title: String,
-})
-
-const { paragraph } = useStore()
+const props = defineProps<{
+  title: String
+  apiType: 'systemShare' | 'workspace' | 'systemManage'
+}>()
 
 const route = useRoute()
 const {
@@ -121,8 +120,8 @@ const submitHandle = async () => {
   if (await paragraphFormRef.value?.validate()) {
     loading.value = true
     if (paragraphId.value) {
-      paragraph
-        .asyncPutParagraph(
+      loadSharedApi({ type: 'paragraph', systemType: props.apiType })
+        .putParagraph(
           dataset_id.value,
           documentId || document_id.value,
           paragraphId.value,
@@ -145,10 +144,12 @@ const submitHandle = async () => {
               position: String(position.value) ? position.value : null,
               ...paragraphFormRef.value?.form,
             }
-      paragraphApi.postParagraph(id, documentId, obj, loading).then((res) => {
-        dialogVisible.value = false
-        emit('refresh')
-      })
+      loadSharedApi({ type: 'paragraph', systemType: props.apiType })
+        .postParagraph(id, documentId, obj, loading)
+        .then(() => {
+          dialogVisible.value = false
+          emit('refresh')
+        })
     }
   }
 }

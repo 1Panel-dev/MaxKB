@@ -64,7 +64,7 @@ import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
 import useStore from '@/stores'
-const { knowledge, document } = useStore()
+const { knowledge } = useStore()
 const documentsFiles = computed(() => knowledge.documentsFiles)
 const documentsType = computed(() => knowledge.documentsType)
 

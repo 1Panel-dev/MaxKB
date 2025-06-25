@@ -33,28 +33,37 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue'
+import { ref, reactive, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
 import { MsgSuccess } from '@/utils/message'
-import useStore from '@/stores'
 import { t } from '@/locales'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 const route = useRoute()
 const {
-  params: { id }
+  params: { id },
 } = route as any
-const { problem } = useStore()
+
+const apiType = computed(() => {
+  if (route.path.includes('shared')) {
+    return 'systemShare'
+  } else if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
 
 const emit = defineEmits(['refresh'])
 const problemFormRef = ref()
 const loading = ref<boolean>(false)
 
 const form = ref<any>({
-  data: ''
+  data: '',
 })
 
 const rules = reactive({
-  data: [{ required: true, message: t('views.problem.tip.requiredMessage'), trigger: 'blur' }]
+  data: [{ required: true, message: t('views.problem.tip.requiredMessage'), trigger: 'blur' }],
 })
 
 const dialogVisible = ref<boolean>(false)
@@ -62,7 +71,7 @@ const dialogVisible = ref<boolean>(false)
 watch(dialogVisible, (bool) => {
   if (!bool) {
     form.value = {
-      data: ''
+      data: '',
     }
   }
 })
@@ -78,11 +87,13 @@ const submit = async (formEl: FormInstance | undefined) => {
       const arr = form.value.data.split('\n').filter(function (item: string) {
         return item !== ''
       })
-      problem.asyncPostProblem(id, arr, loading).then((res: any) => {
-        MsgSuccess(t('common.createSuccess'))
-        emit('refresh')
-        dialogVisible.value = false
-      })
+      loadSharedApi({ type: 'problem', systemType: apiType.value })
+        .postProblems(id, arr, loading)
+        .then((res: any) => {
+          MsgSuccess(t('common.createSuccess'))
+          emit('refresh')
+          dialogVisible.value = false
+        })
     }
   })
 }

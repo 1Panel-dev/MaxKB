@@ -4,17 +4,20 @@
     :title="data.title || '-'"
     class="paragraph-source-card cursor mb-8 paragraph-source-card-height"
     :class="data.is_active ? '' : 'disabled'"
-    :showIcon="false"
   >
     <template #icon>
       <el-avatar class="mr-12 avatar-light" :size="22"> {{ index + 1 + '' }}</el-avatar>
     </template>
-    <div class="active-button primary">{{ score?.toFixed(3) || data.similarity?.toFixed(3) }}</div>
-    <template #description>
-      <el-scrollbar height="150">
-        <MdPreview ref="editorRef" editorId="preview-only" :modelValue="content" noImgZoomIn />
-      </el-scrollbar>
+    <template #tag>
+      <div class="primary">
+        {{ score?.toFixed(3) || data.similarity?.toFixed(3) }}
+      </div>
     </template>
+
+    <el-scrollbar height="150">
+      <MdPreview ref="editorRef" editorId="preview-only" :modelValue="content" noImgZoomIn />
+    </el-scrollbar>
+
     <template #footer>
       <div class="footer-content flex-between">
         <el-text class="flex align-center item">
@@ -56,20 +59,20 @@ import { computed } from 'vue'
 const props = defineProps({
   data: {
     type: Object,
-    default: () => {}
+    default: () => {},
   },
   content: {
     type: String,
-    default: ''
+    default: '',
   },
   index: {
     type: Number,
-    default: 0
+    default: 0,
   },
   score: {
     type: Number,
-    default: null
-  }
+    default: null,
+  },
 })
 const isMetaObject = computed(() => typeof props.data.meta === 'object')
 const parsedMeta = computed(() => {

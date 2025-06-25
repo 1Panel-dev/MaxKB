@@ -99,7 +99,6 @@ import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import { computed, onMounted, ref } from 'vue'
 import { groupBy, set } from 'lodash'
 import applicationApi from '@/api/application/application'
-
 import useStore from '@/stores'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import type { FormInstance } from 'element-plus'
@@ -161,7 +160,7 @@ function getSelectModel() {
       modelOptions.value = groupBy(res?.data, 'provider')
     })
   } else {
-    model.asyncGetSelectModel('workspace').then((res: any) => {
+    model.asyncGetSelectModel().then((res: any) => {
       modelOptions.value = groupBy(res?.data, 'provider')
     })
   }

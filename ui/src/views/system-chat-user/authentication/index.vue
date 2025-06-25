@@ -20,10 +20,6 @@ import OIDC from './component/OIDC.vue'
 //import SCAN from './component/SCAN.vue'
 import OAuth2 from './component/OAuth2.vue'
 import { t } from '@/locales'
-import useStore from '@/stores'
-
-const { user } = useStore()
-const router = useRouter()
 
 const activeName = ref('LDAP')
 const tabList = [

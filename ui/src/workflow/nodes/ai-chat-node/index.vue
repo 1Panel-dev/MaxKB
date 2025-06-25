@@ -173,8 +173,6 @@ import { cloneDeep, set, groupBy } from 'lodash'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'
-import applicationApi from '@/api/application/application'
-import modelAPI from '@/api/model/model.ts'
 import useStore from '@/stores'
 import { isLastNode } from '@/workflow/common/data'
 import AIModeParamSettingDialog from '@/views/application/component/AIModeParamSettingDialog.vue'
@@ -272,11 +270,11 @@ const validate = () => {
 
 function getSelectModel() {
   if (id) {
-    modelAPI.getSelectModelList({ model_type: 'LLM' }).then((res: any) => {
+    model.asyncGetSelectModel({ model_type: 'LLM' }).then((res: any) => {
       modelOptions.value = groupBy(res?.data, 'provider')
     })
   } else {
-    model.asyncGetSelectModel('workspace').then((res: any) => {
+    model.asyncGetSelectModel().then((res: any) => {
       modelOptions.value = groupBy(res?.data, 'provider')
     })
   }

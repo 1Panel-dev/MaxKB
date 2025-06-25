@@ -15,7 +15,7 @@
             <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
           </el-avatar>
         </div>
-        <div class="content">
+        <div class="content ml-12">
           <h4 class="text break-all">{{ questionTitle }}</h4>
         </div>
       </div>
@@ -51,13 +51,14 @@
                 :description="item.content"
                 class="document-card layout-bg layout-bg cursor"
                 :class="item.is_active ? '' : 'disabled'"
-                :showIcon="false"
                 @click="editParagraph(item)"
               >
                 <template #icon>
-                  <el-avatar class="mr-12 avatar-light" :size="22"> {{ index + 1 + '' }}</el-avatar>
+                  <el-avatar class="avatar-light" :size="22"> {{ index + 1 + '' }}</el-avatar>
                 </template>
-                <div class="active-button primary">{{ item.similarity?.toFixed(3) }}</div>
+                <template #tag>
+                  <div class="primary">{{ item.similarity?.toFixed(3) }}</div>
+                </template>
                 <template #footer>
                   <div class="footer-content flex-between">
                     <el-text>
@@ -84,7 +85,12 @@
         </div>
       </el-scrollbar>
     </el-card>
-    <ParagraphDialog ref="ParagraphDialogRef" :title="title" @refresh="refresh" />
+    <ParagraphDialog
+      ref="ParagraphDialogRef"
+      :title="title"
+      @refresh="refresh"
+      :apiType="apiType"
+    />
 
     <div class="hit-test__operate">
       <el-popover :visible="popoverVisible" placement="right-end" :width="500" trigger="click">
@@ -219,7 +225,6 @@
 import { nextTick, ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { cloneDeep } from 'lodash'
-// import applicationApi from '@/api/application/application'
 import ParagraphDialog from '@/views/paragraph/component/ParagraphDialog.vue'
 import { arraySort } from '@/utils/common'
 import emptyImg from '@/assets/hit-test-empty.png'
@@ -227,7 +232,6 @@ import { t } from '@/locales'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 const route = useRoute()
 const {
-  meta: { activeMenu },
   params: { id },
 } = route as any
 const apiType = computed(() => {
@@ -260,13 +264,6 @@ const popoverVisible = ref(false)
 const questionTitle = ref('')
 
 const isDisabledChart = computed(() => !inputValue.value)
-
-const isApplication = computed(() => {
-  return activeMenu.includes('application')
-})
-const isDataset = computed(() => {
-  return activeMenu.includes('knowledge')
-})
 
 function changeHandle(val: string) {
   if (val === 'keywords') {
@@ -323,23 +320,14 @@ function getHitTestList() {
     query_text: inputValue.value,
     ...formInline.value,
   }
-  if (isDataset.value) {
-    loadSharedApi({ type: 'knowledge', systemType: apiType.value })
-      .putKnowledgeHitTest(id, obj, loading)
-      .then((res: any) => {
-        paragraphDetail.value = res.data && arraySort(res.data, 'comprehensive_score', true)
-        questionTitle.value = inputValue.value
-        inputValue.value = ''
-        first.value = false
-      })
-  } else if (isApplication.value) {
-    // applicationApi.getApplicationHitTest(id, obj, loading).then((res) => {
-    //   paragraphDetail.value = res.data && arraySort(res.data, 'comprehensive_score', true)
-    //   questionTitle.value = inputValue.value
-    //   inputValue.value = ''
-    //   first.value = false
-    // })
-  }
+  loadSharedApi({ type: 'knowledge', systemType: apiType.value })
+    .putKnowledgeHitTest(id, obj, loading)
+    .then((res: any) => {
+      paragraphDetail.value = res.data && arraySort(res.data, 'comprehensive_score', true)
+      questionTitle.value = inputValue.value
+      inputValue.value = ''
+      first.value = false
+    })
 }
 
 function refresh(data: any) {
@@ -437,11 +425,6 @@ onMounted(() => {})
     :deep(.description) {
       -webkit-line-clamp: 5 !important;
       height: 110px;
-    }
-    .active-button {
-      position: absolute;
-      right: 16px;
-      top: 16px;
     }
   }
 }

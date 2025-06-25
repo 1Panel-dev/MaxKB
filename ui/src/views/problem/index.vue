@@ -6,17 +6,23 @@
         <div class="p-24">
           <div class="flex-between">
             <div>
-              <el-button type="primary" @click="createProblem"
+              <el-button
+                type="primary"
+                @click="createProblem"
                 v-if="permissionPrecise.problem_create(id)"
               >
                 {{ $t('views.problem.createProblem') }}
               </el-button>
-              <el-button @click="relateProblem()" :disabled="multipleSelection.length === 0"
+              <el-button
+                @click="relateProblem()"
+                :disabled="multipleSelection.length === 0"
                 v-if="permissionPrecise.problem_relate(id)"
               >
                 {{ $t('views.problem.relateParagraph.title') }}
               </el-button>
-              <el-button @click="deleteMulDocument" :disabled="multipleSelection.length === 0"
+              <el-button
+                @click="deleteMulDocument"
+                :disabled="multipleSelection.length === 0"
                 v-if="permissionPrecise.problem_delete(id)"
               >
                 {{ $t('views.problem.setting.batchDelete') }}
@@ -41,7 +47,6 @@
             :quickCreateName="$t('views.problem.quickCreateName')"
             :quickCreatePlaceholder="$t('views.problem.quickCreateProblem')"
             :quickCreateMaxlength="256"
-
             @sizeChange="handleSizeChange"
             @changePage="getList"
             @cell-mouse-enter="cellMouseEnter"
@@ -106,16 +111,24 @@
                       :content="$t('views.problem.relateParagraph.title')"
                       placement="top"
                     >
-                      <el-button type="primary" text @click.stop="relateProblem(row)"
-                      v-if="permissionPrecise.problem_relate(id)"  >
+                      <el-button
+                        type="primary"
+                        text
+                        @click.stop="relateProblem(row)"
+                        v-if="permissionPrecise.problem_relate(id)"
+                      >
                         <el-icon><Connection /></el-icon>
                       </el-button>
                     </el-tooltip>
                   </span>
                   <span>
                     <el-tooltip effect="dark" :content="$t('common.delete')" placement="top">
-                      <el-button type="primary" text @click.stop="deleteProblem(row)"
-                      v-if="permissionPrecise.problem_delete(id)"  >
+                      <el-button
+                        type="primary"
+                        text
+                        @click.stop="deleteProblem(row)"
+                        v-if="permissionPrecise.problem_delete(id)"
+                      >
                         <el-icon><Delete /></el-icon>
                       </el-button>
                     </el-tooltip>
@@ -145,25 +158,20 @@
 import { ref, onMounted, reactive, onBeforeUnmount, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElTable } from 'element-plus'
-import problemApi from '@/api/knowledge/problem'
 import CreateProblemDialog from './component/CreateProblemDialog.vue'
 import DetailProblemDrawer from './component/DetailProblemDrawer.vue'
 import RelateProblemDialog from './component/RelateProblemDialog.vue'
 import { datetimeFormat } from '@/utils/time'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import type { Dict } from '@/api/type/common'
-import useStore from '@/stores'
 import { t } from '@/locales'
-import { PermissionConst, RoleConst } from '@/utils/permission/data'
-import { hasPermission } from '@/utils/permission/index'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import permissionMap from '@/permission'
-
 
 const route = useRoute()
 const {
   params: { id }, // 知识库id
 } = route as any
-const { folder, user } = useStore()
 
 const apiType = computed(() => {
   if (route.path.includes('shared')) {
@@ -177,9 +185,6 @@ const apiType = computed(() => {
 const permissionPrecise = computed(() => {
   return permissionMap['knowledge'][apiType.value]
 })
-
-
-const { problem } = useStore()
 
 const RelateProblemDialogRef = ref()
 const DetailProblemRef = ref()
@@ -240,9 +245,9 @@ const handleSelectionChange = (val: any[]) => {
 function creatQuickHandle(val: string) {
   loading.value = true
   const obj = [val]
-  problem
-    .asyncPostProblem(id, obj)
-    .then((res) => {
+  loadSharedApi({ type: 'problem', systemType: apiType.value })
+    .postProblems(id, obj)
+    .then(() => {
       getList()
       MsgSuccess(t('common.createSuccess'))
     })
@@ -258,11 +263,13 @@ function deleteMulDocument() {
       arr.push(v.id)
     }
   })
-  problemApi.putMulProblem(id, arr, loading).then(() => {
-    MsgSuccess(t('views.document.delete.successMessage'))
-    multipleTableRef.value?.clearSelection()
-    getList()
-  })
+  loadSharedApi({ type: 'problem', systemType: apiType.value })
+    .putMulProblem(id, arr, loading)
+    .then(() => {
+      MsgSuccess(t('views.document.delete.successMessage'))
+      multipleTableRef.value?.clearSelection()
+      getList()
+    })
 }
 
 function deleteProblem(row: any) {
@@ -275,10 +282,12 @@ function deleteProblem(row: any) {
     },
   )
     .then(() => {
-      problemApi.delProblems(id, row.id, loading).then(() => {
-        MsgSuccess(t('common.deleteSuccess'))
-        getList()
-      })
+      loadSharedApi({ type: 'problem', systemType: apiType.value })
+        .delProblems(id, row.id, loading)
+        .then(() => {
+          MsgSuccess(t('common.deleteSuccess'))
+          getList()
+        })
     })
     .catch(() => {})
 }
@@ -288,10 +297,12 @@ function editName(val: string, problemId: string) {
     const obj = {
       content: val,
     }
-    problemApi.putProblems(id, problemId, obj, loading).then(() => {
-      getList()
-      MsgSuccess(t('common.modifySuccess'))
-    })
+    loadSharedApi({ type: 'problem', systemType: apiType.value })
+      .putProblems(id, problemId, obj, loading)
+      .then(() => {
+        getList()
+        MsgSuccess(t('common.modifySuccess'))
+      })
   } else {
     MsgError(t('views.problem.tip.errorMessage'))
   }
@@ -352,7 +363,7 @@ const preChatRecord = () => {
       return
     }
     paginationConfig.current_page = paginationConfig.current_page - 1
-    getList().then((ok) => {
+    getList().then(() => {
       index = paginationConfig.page_size - 1
       currentClickId.value = problemData.value[index].id
       currentContent.value = problemData.value[index].content
@@ -384,8 +395,8 @@ function handleSizeChange() {
 }
 
 function getList() {
-  return problem
-    .asyncGetProblem(
+  return loadSharedApi({ type: 'problem', systemType: apiType.value })
+    .getProblemsPage(
       id as string,
       paginationConfig,
       filterText.value && { content: filterText.value },

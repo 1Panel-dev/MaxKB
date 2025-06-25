@@ -16,10 +16,10 @@ import { MsgError } from '@/utils/message'
 import useStore from '@/stores'
 import { getBrowserLang } from '@/locales'
 const router = useRouter()
-
+const { login } = useStore()
 const wwLogin = ref({})
 const obj = ref<any>({ isWeComLogin: false })
-const { login } = useStore()
+
 
 const props = defineProps<{
   config: {

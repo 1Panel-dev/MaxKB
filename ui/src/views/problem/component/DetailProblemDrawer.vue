@@ -19,28 +19,26 @@
               <template v-for="(item, index) in paragraphList" :key="index">
                 <CardBox
                   :title="item.title || '-'"
-                  class="paragraph-source-card cursor mb-8"
+                  class="cursor mb-8"
                   :showIcon="false"
                   @click.stop="editParagraph(item)"
+                  style="height: 210px"
                 >
-                  <div class="active-button">
-                    <span class="mr-4">
-                      <el-tooltip
-                        effect="dark"
-                        :content="$t('views.problem.setting.cancelRelated')"
-                        placement="top"
-                      >
-                        <el-button type="primary" text @click.stop="disassociation(item)">
-                          <AppIcon iconName="app-quxiaoguanlian"></AppIcon>
-                        </el-button>
-                      </el-tooltip>
-                    </span>
-                  </div>
-                  <template #description>
-                    <el-scrollbar height="80">
-                      {{ item.content }}
-                    </el-scrollbar>
+                  <template #tag>
+                    <el-tooltip
+                      effect="dark"
+                      :content="$t('views.problem.setting.cancelRelated')"
+                      placement="top"
+                    >
+                      <el-button type="primary" text @click.stop="disassociation(item)">
+                        <AppIcon iconName="app-quxiaoguanlian"></AppIcon>
+                      </el-button>
+                    </el-tooltip>
                   </template>
+                  <el-scrollbar height="110">
+                    {{ item.content }}
+                  </el-scrollbar>
+
                   <template #footer>
                     <div class="footer-content flex-between">
                       <el-text>
@@ -60,6 +58,7 @@
       <ParagraphDialog
         ref="ParagraphDialogRef"
         :title="$t('views.paragraph.editParagraph')"
+        :apiType="apiType"
         @refresh="refresh"
       />
       <RelateProblemDialog ref="RelateProblemDialogRef" @refresh="refresh" />
@@ -83,11 +82,10 @@
 <script setup lang="ts">
 import { ref, reactive, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import problemApi from '@/api/knowledge/problem'
 import ParagraphDialog from '@/views/paragraph/component/ParagraphDialog.vue'
 import RelateProblemDialog from './RelateProblemDialog.vue'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
-import useStore from '@/stores'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { t } from '@/locales'
 const props = withDefaults(
   defineProps<{
@@ -119,7 +117,16 @@ const {
   params: { id },
 } = route
 
-const { paragraph } = useStore()
+const apiType = computed(() => {
+  if (route.path.includes('shared')) {
+    return 'systemShare'
+  } else if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
+
 const RelateProblemDialogRef = ref()
 const ParagraphDialogRef = ref()
 const loading = ref(false)
@@ -127,14 +134,12 @@ const visible = ref(false)
 const paragraphList = ref<any[]>([])
 
 function disassociation(item: any) {
-  paragraph
-    .asyncDisassociationProblem(
-      item.knowledge_id,
-      item.document_id,
-      item.id,
-      props.currentId,
-      loading,
-    )
+  const obj = {
+    paragraph_id: item.id,
+    problem_id: props.currentId,
+  }
+  loadSharedApi({ type: 'paragraph', systemType: apiType.value })
+    .putDisassociationProblem(item.knowledge_id, item.document_id, obj, loading)
     .then(() => {
       getRecord()
     })
@@ -153,10 +158,12 @@ function editName(val: string) {
     const obj = {
       content: val,
     }
-    problemApi.putProblems(id as string, props.currentId, obj, loading).then(() => {
-      emit('update:currentContent', val)
-      MsgSuccess(t('common.modifySuccess'))
-    })
+    loadSharedApi({ type: 'problem', systemType: apiType.value })
+      .putProblems(id as string, props.currentId, obj, loading)
+      .then(() => {
+        emit('update:currentContent', val)
+        MsgSuccess(t('common.modifySuccess'))
+      })
   } else {
     MsgError(t('views.problem.tip.errorMessage'))
   }
@@ -168,9 +175,11 @@ function closeHandle() {
 
 function getRecord() {
   if (props.currentId && visible.value) {
-    problemApi.getDetailProblems(id as string, props.currentId, loading).then((res) => {
-      paragraphList.value = res.data
-    })
+    loadSharedApi({ type: 'problem', systemType: apiType.value })
+      .getDetailProblems(id as string, props.currentId, loading)
+      .then((res: any) => {
+        paragraphList.value = res.data
+      })
   }
 }
 

@@ -140,8 +140,6 @@ import QrCodeTab from '@/views/login/scanCompinents/QrCodeTab.vue'
 import {MsgConfirm, MsgError} from '@/utils/message.ts'
 import * as dd from 'dingtalk-jsapi'
 import {loadScript} from '@/utils/utils'
-import {EditionConst} from '@/utils/permission/data'
-import {hasPermission} from '@/utils/permission/index'
 
 const router = useRouter()
 const {login, user, theme} = useStore()

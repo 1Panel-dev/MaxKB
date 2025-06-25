@@ -227,7 +227,7 @@ function getSelectModel() {
       modelOptions.value = groupBy(res?.data, 'provider')
     })
   } else {
-    model.asyncGetSelectModel('workspace').then((res: any) => {
+    model.asyncGetSelectModel().then((res: any) => {
       modelOptions.value = groupBy(res?.data, 'provider')
     })
   }

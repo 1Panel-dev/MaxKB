@@ -16,7 +16,7 @@
 <script setup lang="ts">
 import { onMounted, ref, defineAsyncComponent } from 'vue'
 import useStore from '@/stores'
-
+const { login } = useStore()
 interface Tab {
   key: string
   value: string
@@ -41,7 +41,7 @@ const activeKey = ref('')
 const allConfigs = ref<PlatformConfig[]>([])
 const config = ref<Config>({ app_key: '', app_secret: '' })
 // const logoUrl = ref('')
-const { login } = useStore()
+
 async function getPlatformInfo() {
   try {
     return await login.getQrSource()

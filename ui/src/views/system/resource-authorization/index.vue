@@ -98,7 +98,7 @@ import { EditionConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
 import WorkspaceApi from '@/api/workspace/workspace.ts'
 import type { WorkspaceItem } from '@/api/type/workspace'
-
+const { user } = useStore()
 const loading = ref(false)
 const rLoading = ref(false)
 const memberList = ref<any[]>([]) // 全部成员
@@ -109,7 +109,7 @@ const filterText = ref('')
 
 const activeName = ref(AuthorizationEnum.KNOWLEDGE)
 const tableHeight = ref(0)
-const { user } = useStore()
+
 
 const settingTags = reactive([
   {

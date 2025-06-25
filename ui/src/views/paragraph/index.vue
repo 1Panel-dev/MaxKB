@@ -136,7 +136,12 @@
         </span>
       </div>
     </el-card>
-    <ParagraphDialog ref="ParagraphDialogRef" :title="title" @refresh="refresh" />
+    <ParagraphDialog
+      ref="ParagraphDialogRef"
+      :title="title"
+      :apiType="apiType"
+      @refresh="refresh"
+    />
     <SelectDocumentDialog ref="SelectDocumentDialogRef" @refresh="refreshMigrateParagraph" />
     <GenerateRelatedDialog ref="GenerateRelatedDialogRef" @refresh="refresh" :apiType="apiType" />
   </div>
@@ -151,7 +156,6 @@ import GenerateRelatedDialog from '@/components/generate-related-dialog/index.vu
 import { VueDraggable } from 'vue-draggable-plus'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
-import useStore from '@/stores'
 import { t } from '@/locales'
 const route = useRoute()
 const {
