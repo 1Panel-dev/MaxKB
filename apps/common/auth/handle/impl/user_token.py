@@ -171,7 +171,8 @@ def get_permission_list(user,
 
             workspace_user_permission_list = QuerySet(WorkspaceUserResourcePermission).filter(
                 workspace_id__in=[workspace_user_role.workspace_id for workspace_user_role in
-                                  workspace_user_role_mapping_list])
+                                  workspace_user_role_mapping_list],
+                user_id=user_id)
 
             # 资源权限
             workspace_resource_permission_list = get_workspace_resource_permission_list(workspace_user_permission_list,
