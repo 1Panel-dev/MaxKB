@@ -113,7 +113,7 @@ class VolcanicEngineTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
         submit_request_json["request"]["operation"] = "submit"
         header = {"Authorization": f"Bearer; {self.volcanic_token}"}
         result = b''
-        async with websockets.connect(self.volcanic_api_url, extra_headers=header, ping_interval=None,
+        async with websockets.connect(self.volcanic_api_url, additional_headers=header, ping_interval=None,
                                       ssl=ssl_context) as ws:
             lines = [text[i:i + 200] for i in range(0, len(text), 200)]
             for line in lines:
