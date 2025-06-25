@@ -280,7 +280,7 @@ class ToolSerializer(serializers.Serializer):
                 raise serializers.ValidationError(_('Tool not found'))
 
             edit_field_list = ['name', 'desc', 'code', 'icon', 'input_field_list', 'init_field_list', 'init_params',
-                               'is_active']
+                               'is_active', 'folder_id']
             edit_dict = {field: instance.get(field) for field in edit_field_list if (
                     field in instance and instance.get(field) is not None)}
 

@@ -337,6 +337,8 @@ class KnowledgeSerializer(serializers.Serializer):
                 knowledge.desc = instance.get("desc")
             if 'meta' in instance:
                 knowledge.meta = instance.get('meta')
+            if 'folder_id' in instance:
+                knowledge.folder_id = instance.get('folder_id')
             if 'file_size_limit' in instance:
                 knowledge.file_size_limit = instance.get('file_size_limit')
             if 'file_count_limit' in instance:

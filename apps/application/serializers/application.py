@@ -690,7 +690,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
                        'stt_model_id', 'tts_model_id', 'tts_model_enable', 'stt_model_enable', 'tts_type',
                        'tts_autoplay', 'stt_autosend', 'file_upload_enable', 'file_upload_setting',
                        'api_key_is_active', 'icon', 'work_flow', 'model_params_setting', 'tts_model_params_setting',
-                       'problem_optimization_prompt', 'clean_time']
+                       'problem_optimization_prompt', 'clean_time', 'folder_id']
         for update_key in update_keys:
             if update_key in instance and instance.get(update_key) is not None:
                 application.__setattr__(update_key, instance.get(update_key))
