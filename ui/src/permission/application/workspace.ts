@@ -95,6 +95,46 @@ const workspace = {
             ],
             'OR'
     ),
+    chat_user_edit: (source_id:string) => 
+        hasPermission(
+            [
+              RoleConst.ADMIN,
+              RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+              PermissionConst.APPLICATION_CHAT_USER_EDIT.getWorkspacePermissionWorkspaceManageRole,
+              PermissionConst.APPLICATION_CHAT_USER_EDIT.getApplicationWorkspaceResourcePermission(source_id)  
+            ],
+            'OR'
+    ),
+    chat_log_clear: (source_id:string) => 
+        hasPermission(
+            [
+              RoleConst.ADMIN,
+              RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+              PermissionConst.APPLICATION_CHAT_LOG_CLEAR_POLICY.getWorkspacePermissionWorkspaceManageRole,
+              PermissionConst.APPLICATION_CHAT_LOG_CLEAR_POLICY.getApplicationWorkspaceResourcePermission(source_id)  
+            ],
+            'OR'
+    ),
+    chat_log_export: (source_id:string) => 
+        hasPermission(
+            [
+              RoleConst.ADMIN,
+              RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+              PermissionConst.APPLICATION_CHAT_LOG_EXPORT.getWorkspacePermissionWorkspaceManageRole,
+              PermissionConst.APPLICATION_CHAT_LOG_EXPORT.getApplicationWorkspaceResourcePermission(source_id)  
+            ],
+            'OR'
+    ),
+    chat_log_add_knowledge: (source_id:string) => 
+        hasPermission(
+            [
+              RoleConst.ADMIN,
+              RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+              PermissionConst.APPLICATION_CHAT_LOG_ADD_KNOWLEDGE.getWorkspacePermissionWorkspaceManageRole,
+              PermissionConst.APPLICATION_CHAT_LOG_ADD_KNOWLEDGE.getApplicationWorkspaceResourcePermission(source_id)  
+            ],
+            'OR'
+    ),
 }
 
 

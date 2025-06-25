@@ -1,4 +1,5 @@
 import { ChatUserResourceEnum } from '@/enums/workspaceChatUser'
+import { get_next_route } from '@/utils/permission'
 
 import { PermissionConst, EditionConst, RoleConst } from '@/utils/permission/data'
 
@@ -19,6 +20,17 @@ const ApplicationDetailRouter = {
         active: 'overview',
         parentPath: '/application/:id/:type',
         parentName: 'ApplicationDetail',
+        permission: [
+          RoleConst.ADMIN,
+          RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+          PermissionConst.APPLICATION_OVERVIEW_READ.getWorkspacePermissionWorkspaceManageRole,
+          () => {
+            const to: any = get_next_route()
+            return PermissionConst.APPLICATION_OVERVIEW_READ.getApplicationWorkspaceResourcePermission(
+              to ? to.params.id : '',
+            )
+          }
+        ]
       },
       component: () => import('@/views/application-overview/index.vue'),
     },
@@ -32,6 +44,17 @@ const ApplicationDetailRouter = {
         active: 'setting',
         parentPath: '/application/:id/:type',
         parentName: 'ApplicationDetail',
+        permission: [
+          RoleConst.ADMIN,
+          RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+          PermissionConst.APPLICATION_EDIT.getWorkspacePermissionWorkspaceManageRole,
+          () => {
+            const to: any = get_next_route()
+            return PermissionConst.APPLICATION_EDIT.getApplicationWorkspaceResourcePermission(
+              to ? to.params.id : '',
+            )
+          }
+        ]
       },
       component: () => import('@/views/application/ApplicationSetting.vue'),
     },
@@ -45,7 +68,17 @@ const ApplicationDetailRouter = {
         active: 'access',
         parentPath: '/application/:id/:type',
         parentName: 'ApplicationDetail',
-        permission: [EditionConst.IS_PE, EditionConst.IS_EE],
+        permission: [
+          RoleConst.ADMIN,
+          RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+          PermissionConst.APPLICATION_ACCESS_READ.getWorkspacePermissionWorkspaceManageRole,
+          () => {
+            const to: any = get_next_route()
+            return PermissionConst.APPLICATION_ACCESS_READ.getApplicationWorkspaceResourcePermission(
+              to ? to.params.id : '',
+            )
+          }
+        ]
       },
       component: () => import('@/views/application/ApplicationAccess.vue'),
     },
@@ -60,7 +93,17 @@ const ApplicationDetailRouter = {
         parentPath: '/application/:id/:type',
         parentName: 'ApplicationDetail',
         resourceType: ChatUserResourceEnum.APPLICATION,
-        permission: [EditionConst.IS_PE, EditionConst.IS_EE],
+        permission: [
+          RoleConst.ADMIN,
+          RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+          PermissionConst.APPLICATION_CHAT_USER_READ.getWorkspacePermissionWorkspaceManageRole,
+          () => {
+            const to: any = get_next_route()
+            return PermissionConst.APPLICATION_CHAT_USER_READ.getApplicationWorkspaceResourcePermission(
+              to ? to.params.id : '',
+            )
+          }
+        ]
       },
       component: () => import('@/views/chat-user/index.vue'),
     },
@@ -74,6 +117,17 @@ const ApplicationDetailRouter = {
         active: 'chat-log',
         parentPath: '/application/:id/:type',
         parentName: 'ApplicationDetail',
+        permission: [
+          RoleConst.ADMIN,
+          RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+          PermissionConst.APPLICATION_CHAT_LOG_READ.getWorkspacePermissionWorkspaceManageRole,
+          () => {
+            const to: any = get_next_route()
+            return PermissionConst.APPLICATION_CHAT_LOG_READ.getApplicationWorkspaceResourcePermission(
+              to ? to.params.id : '',
+            )
+          }
+        ]
       },
       component: () => import('@/views/chat-log/index.vue'),
     },

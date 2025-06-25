@@ -40,32 +40,20 @@
         <div style="display: flex; align-items: center" class="float-right">
           <el-button
             @click="dialogVisible = true"
-            v-hasPermission="[
-              RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-              RoleConst.USER.getWorkspaceRole,
-              PermissionConst.APPLICATION_CHAT_LOG_POLICY.getWorkspacePermission,
-            ]"
+            v-if="permissionPrecise.chat_log_clear(id)"
           >
             {{ $t('views.chatLog.buttons.clearStrategy') }}
           </el-button>
           <el-button
             @click="exportLog"
-            v-hasPermission="[
-              RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-              RoleConst.USER.getWorkspaceRole,
-              PermissionConst.APPLICATION_CHAT_LOG_EXPORT.getWorkspacePermission,
-            ]"
+            v-if="permissionPrecise.chat_log_export(id)"
           >
             {{ $t('common.export') }}
           </el-button>
           <el-button
             @click="openDocumentDialog"
             :disabled="multipleSelection.length === 0"
-            v-hasPermission="[
-              RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-              RoleConst.USER.getWorkspaceRole,
-              PermissionConst.APPLICATION_CHAT_LOG_EXPORT.getWorkspacePermission,
-            ]"
+            v-if="permissionPrecise.chat_log_add_knowledge(id)"
             >{{ $t('views.chatLog.addToKnowledge') }}
           </el-button>
         </div>
@@ -304,9 +292,19 @@ import type { FormInstance, FormRules } from 'element-plus'
 import { ElTable } from 'element-plus'
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
+import permissionMap from '@/permission'
+
+const route = useRoute()
+
+const apiType = computed<'workspace'>(() => {
+    return 'workspace'
+})
+const permissionPrecise = computed(() => {
+  return permissionMap['application'][apiType.value]
+})
+
 
 const { application, chatLog, user } = useStore()
-const route = useRoute()
 const {
   params: { id },
 } = route as any

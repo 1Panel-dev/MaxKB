@@ -41,7 +41,9 @@
                 {{ paginationConfig.total }}
               </span>
             </div>
-            <el-button type="primary" :disabled="current?.is_auth" @click="handleSave">
+            <el-button type="primary" :disabled="current?.is_auth" @click="handleSave"
+              v-if="permissionPrecise.chat_user_edit(id)"
+            >
               {{ t('common.save') }}
             </el-button>
           </div>
@@ -54,10 +56,13 @@
               <el-input v-if="searchType === 'name'" v-model="searchForm.name" @change="getList"
                 :placeholder="$t('common.inputPlaceholder')" style="width: 220px" clearable />
             </div>
-            <div class="flex align-center">
+            <div class="flex align-center"
+              v-if="permissionPrecise.chat_user_edit(id)"
+            >
               <div class="color-secondary mr-8">{{ $t('views.chatUser.autoAuthorization') }}</div>
               <el-switch size="small" :model-value="current?.is_auth" @click="changeAuth"
-                :loading="loading"></el-switch>
+                :loading="loading"
+                ></el-switch>
             </div>
           </div>
 
@@ -108,8 +113,21 @@ import type { ChatUserGroupItem, ChatUserResourceParams, ChatUserGroupUserItem }
 import { useRoute } from 'vue-router'
 import { ChatUserResourceEnum } from '@/enums/workspaceChatUser'
 import { MsgSuccess } from '@/utils/message'
+import permissionMap from '@/permission'
 
 const route = useRoute()
+
+const apiType = computed<'workspace'>(() => {
+    return 'workspace'
+})
+const permissionPrecise = computed(() => {
+  return permissionMap['application'][apiType.value]
+})
+
+const {
+  params: { id },
+} = route as any
+
 const resource: ChatUserResourceParams = reactive({ resource_id: route.params.id as string, resource_type: route.meta.resourceType as ChatUserResourceEnum })
 
 const filterText = ref('')
