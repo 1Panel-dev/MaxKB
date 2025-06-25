@@ -30,6 +30,7 @@ from common.event import ListenerManagement
 from common.exception.app_exception import AppApiException
 from common.utils.common import valid_license, post, get_file_content, parse_image
 from common.utils.fork import Fork, ChildLink
+from common.utils.logger import maxkb_logger
 from common.utils.split_model import get_split_model
 from knowledge.models import Knowledge, KnowledgeScope, KnowledgeType, Document, Paragraph, Problem, \
     ProblemParagraphMapping, TaskType, State, SearchMode, KnowledgeFolder
@@ -630,7 +631,7 @@ class KnowledgeSerializer(serializers.Serializer):
                         document_name = child_link.tag.text if child_link.tag is not None and len(
                             child_link.tag.text.strip()) > 0 else child_link.url
                         paragraphs = get_split_model('web.md').parse(response.content)
-                        logging.getLogger("max_kb").info(child_link.url.strip())
+                        maxkb_logger.info(child_link.url.strip())
                         first = QuerySet(Document).filter(
                             meta__source_url=child_link.url.strip(),
                             knowledge=knowledge

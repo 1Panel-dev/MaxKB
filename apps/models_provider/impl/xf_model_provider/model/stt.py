@@ -28,7 +28,6 @@ ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
 ssl_context.check_hostname = False
 ssl_context.verify_mode = ssl.CERT_NONE
 
-max_kb = logging.getLogger("max_kb")
 
 
 class XFSparkSpeechToText(MaxKBBaseModel, BaseSpeechToText):

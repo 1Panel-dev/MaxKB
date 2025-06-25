@@ -10,6 +10,7 @@ from django_apscheduler.jobstores import DjangoJobStore
 from application.models import Application, Chat, ChatRecord
 from django.db.models import Q, Max
 from common.lock.impl.file_lock import FileLock
+from common.utils.logger import maxkb_logger
 
 from knowledge.models import File
 
@@ -20,7 +21,7 @@ lock = FileLock()
 
 def clean_chat_log_job():
     from django.utils.translation import gettext_lazy as _
-    logging.getLogger("max_kb").info(_('start clean chat log'))
+    maxkb_logger.info(_('start clean chat log'))
     now = timezone.now()
 
     applications = Application.objects.all().values('id', 'clean_time')
@@ -66,7 +67,7 @@ def clean_chat_log_job():
             if deleted_count < batch_size:
                 break
 
-    logging.getLogger("max_kb").info(_('end clean chat log'))
+    maxkb_logger.info(_('end clean chat log'))
 
 
 def run():

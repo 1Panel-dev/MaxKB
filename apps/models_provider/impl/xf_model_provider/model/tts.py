@@ -23,7 +23,6 @@ from common.utils.common import _remove_empty_lines
 from models_provider.base_model_provider import MaxKBBaseModel
 from models_provider.impl.base_tts import BaseTextToSpeech
 
-max_kb = logging.getLogger("max_kb")
 
 STATUS_FIRST_FRAME = 0  # 第一帧的标识
 STATUS_CONTINUE_FRAME = 1  # 中间帧标识

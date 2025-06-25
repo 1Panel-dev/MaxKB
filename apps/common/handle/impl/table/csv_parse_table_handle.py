@@ -4,8 +4,7 @@ import logging
 from charset_normalizer import detect
 
 from common.handle.base_parse_table_handle import BaseParseTableHandle
-
-max_kb = logging.getLogger("max_kb")
+from common.utils.logger import maxkb_logger, maxkb_error_logger
 
 
 class CsvParseTableHandle(BaseParseTableHandle):
@@ -20,7 +19,7 @@ class CsvParseTableHandle(BaseParseTableHandle):
         try:
             content = buffer.decode(detect(buffer)['encoding'])
         except BaseException as e:
-            max_kb.error(f'csv split handle error: {e}')
+            maxkb_logger.error(f'csv split handle error: {e}')
             return [{'name': file.name, 'paragraphs': []}]
 
         csv_model = content.split('\n')
@@ -40,5 +39,5 @@ class CsvParseTableHandle(BaseParseTableHandle):
         try:
             return buffer.decode(detect(buffer)['encoding'])
         except BaseException as e:
-            max_kb.error(f'csv split handle error: {e}')
+            maxkb_error_logger.error(f'csv split handle error: {e}')
             return f'error: {e}'

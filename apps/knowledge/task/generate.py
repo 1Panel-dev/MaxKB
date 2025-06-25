@@ -9,15 +9,13 @@ from langchain_core.messages import HumanMessage
 
 from common.config.embedding_config import ModelManage
 from common.event import ListenerManagement
+from common.utils.logger import maxkb_error_logger, maxkb_logger
 from common.utils.page_utils import page, page_desc
 from knowledge.models import Paragraph, Document, Status, TaskType, State
 from knowledge.task.handler import save_problem
 from models_provider.models import Model
 from models_provider.tools import get_model
 from ops import celery_app
-
-max_kb_error = logging.getLogger("max_kb_error")
-max_kb = logging.getLogger("max_kb")
 
 
 def get_llm_model(model_id):
@@ -102,12 +100,12 @@ def generate_related_by_document_id(document_id, model_id, prompt, state_list=No
         ).filter(task_type_status__in=state_list, document_id=document_id)
         page_desc(query_set, 10, generate_problem, is_the_task_interrupted)
     except Exception as e:
-        max_kb_error.error(f'根据文档生成问题:{document_id}出现错误{str(e)}{traceback.format_exc()}')
-        max_kb_error.error(_('Generate issue based on document: {document_id} error {error}{traceback}').format(
+        maxkb_error_logger.error(f'根据文档生成问题:{document_id}出现错误{str(e)}{traceback.format_exc()}')
+        maxkb_error_logger.error(_('Generate issue based on document: {document_id} error {error}{traceback}').format(
             document_id=document_id, error=str(e), traceback=traceback.format_exc()))
     finally:
         ListenerManagement.post_update_document_status(document_id, TaskType.GENERATE_PROBLEM)
-        max_kb.info(_('End--->Generate problem: {document_id}').format(document_id=document_id))
+        maxkb_logger.info(_('End--->Generate problem: {document_id}').format(document_id=document_id))
 
 
 @celery_app.task(base=QueueOnce, once={'keys': ['paragraph_id_list']},

@@ -15,10 +15,10 @@ from celery_once import QueueOnce
 from django.utils.translation import gettext_lazy as _
 
 from common.utils.fork import ForkManage, Fork
+from common.utils.logger import maxkb_logger, maxkb_error_logger
 from ops import celery_app
 
-max_kb_error = logging.getLogger("max_kb_error")
-max_kb = logging.getLogger("max_kb")
+
 
 
 @celery_app.task(base=QueueOnce, once={'keys': ['knowledge_id']}, name='celery:sync_web_knowledge')
@@ -26,15 +26,15 @@ def sync_web_knowledge(knowledge_id: str, url: str, selector: str):
     from knowledge.task.handler import get_save_handler
 
     try:
-        max_kb.info(
+        maxkb_logger.info(
             _('Start--->Start synchronization web knowledge base:{knowledge_id}').format(knowledge_id=knowledge_id))
         ForkManage(url, selector.split(" ") if selector is not None else []).fork(2, set(),
                                                                                   get_save_handler(knowledge_id,
                                                                                                    selector))
 
-        max_kb.info(_('End--->End synchronization web knowledge base:{knowledge_id}').format(knowledge_id=knowledge_id))
+        maxkb_logger.info(_('End--->End synchronization web knowledge base:{knowledge_id}').format(knowledge_id=knowledge_id))
     except Exception as e:
-        max_kb_error.error(_('Synchronize web knowledge base:{knowledge_id} error{error}{traceback}').format(
+        maxkb_error_logger.error(_('Synchronize web knowledge base:{knowledge_id} error{error}{traceback}').format(
             knowledge_id=knowledge_id, error=str(e), traceback=traceback.format_exc()))
 
 
@@ -43,14 +43,14 @@ def sync_replace_web_knowledge(knowledge_id: str, url: str, selector: str):
     from knowledge.task.handler import get_sync_handler
 
     try:
-        max_kb.info(
+        maxkb_logger.info(
             _('Start--->Start synchronization web knowledge base:{knowledge_id}').format(knowledge_id=knowledge_id))
         ForkManage(url, selector.split(" ") if selector is not None else []).fork(2, set(),
                                                                                   get_sync_handler(knowledge_id
                                                                                                    ))
-        max_kb.info(_('End--->End synchronization web knowledge base:{knowledge_id}').format(knowledge_id=knowledge_id))
+        maxkb_logger.info(_('End--->End synchronization web knowledge base:{knowledge_id}').format(knowledge_id=knowledge_id))
     except Exception as e:
-        max_kb_error.error(_('Synchronize web knowledge base:{knowledge_id} error{error}{traceback}').format(
+        maxkb_error_logger.error(_('Synchronize web knowledge base:{knowledge_id} error{error}{traceback}').format(
             knowledge_id=knowledge_id, error=str(e), traceback=traceback.format_exc()))
 
 

@@ -25,6 +25,7 @@ from application.flow.step_node.ai_chat_step_node.i_chat_node import IChatNode
 from application.flow.tools import Reasoning
 from models_provider.models import Model
 from models_provider.tools import get_model_credential, get_model_instance_by_model_workspace_id
+from common.utils.logger import maxkb_logger
 
 tool_message_template = """
 <details>
@@ -126,7 +127,7 @@ def mcp_response_generator(chat_model, message_list, mcp_servers):
             except StopAsyncIteration:
                 break
     except Exception as e:
-        logging.getLogger("max_kb").error(f'Exception: {e}')
+        maxkb_logger.error(f'Exception: {e}')
     finally:
         loop.close()
 

@@ -9,6 +9,7 @@ from django.utils import timezone
 from django_apscheduler.jobstores import DjangoJobStore
 
 from common.lock.impl.file_lock import FileLock
+from common.utils.logger import maxkb_logger
 from knowledge.models import File
 
 scheduler = BackgroundScheduler()
@@ -18,11 +19,11 @@ lock = FileLock()
 
 def clean_debug_file():
     from django.utils.translation import gettext_lazy as _
-    logging.getLogger("max_kb").info(_('start clean debug file'))
+    maxkb_logger.info(_('start clean debug file'))
     two_hours_ago = timezone.now() - timedelta(hours=2)
     # 删除对应的文件
     File.objects.filter(Q(create_time__lt=two_hours_ago) & Q(meta__debug=True)).delete()
-    logging.getLogger("max_kb").info(_('end clean debug file'))
+    maxkb_logger.info(_('end clean debug file'))
 
 
 def run():

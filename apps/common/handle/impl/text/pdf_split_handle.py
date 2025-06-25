@@ -19,6 +19,7 @@ from django.utils.translation import gettext_lazy as _
 from langchain_community.document_loaders import PyPDFLoader
 
 from common.handle.base_split_handle import BaseSplitHandle
+from common.utils.logger import maxkb_error_logger, maxkb_logger
 from common.utils.split_model import SplitModel
 
 default_pattern_list = [re.compile('(?<=^)# .*|(?<=\\n)# .*'),
@@ -29,7 +30,6 @@ default_pattern_list = [re.compile('(?<=^)# .*|(?<=\\n)# .*'),
                         re.compile("(?<=\\n)(?<!#)###### (?!#).*|(?<=^)(?<!#)###### (?!#).*"),
                         re.compile("(?<!\n)\n\n+")]
 
-max_kb = logging.getLogger("max_kb")
 
 
 def check_links_in_pdf(doc):
@@ -72,7 +72,7 @@ class PdfSplitHandle(BaseSplitHandle):
             else:
                 split_model = SplitModel(default_pattern_list, with_filter=with_filter, limit=limit)
         except BaseException as e:
-            max_kb.error(f"File: {file.name}, error: {e}")
+            maxkb_error_logger.error(f"File: {file.name}, error: {e}")
             return {'name': file.name,
                     'content': []}
         finally:
@@ -109,7 +109,7 @@ class PdfSplitHandle(BaseSplitHandle):
                     raise e
                 except BaseException as e:
                     # 当页出错继续进行下一页，防止一个页面出错导致整个文件解析失败
-                    max_kb.error(f"File: {file.name}, Page: {page_num + 1}, error: {e}")
+                    maxkb_error_logger.error(f"File: {file.name}, Page: {page_num + 1}, error: {e}")
                     continue
                 finally:
                     os.remove(page_num_pdf)
@@ -120,7 +120,7 @@ class PdfSplitHandle(BaseSplitHandle):
             content = content.replace('\0', '')
 
             elapsed_time = time.time() - start_time
-            max_kb.debug(
+            maxkb_logger.debug(
                 f"File: {file.name}, Page: {page_num + 1}, Time : {elapsed_time: .3f}s,   content-length: {len(page_content)}")
 
         return content
@@ -278,7 +278,7 @@ class PdfSplitHandle(BaseSplitHandle):
                     pre_toc[i]['content'] = re.sub(r'(?<!。)\n+', '', pre_toc[i]['content'])
                     pre_toc[i]['content'] = re.sub(r'(?<!.)\n+', '', pre_toc[i]['content'])
             except BaseException as e:
-                max_kb.error(_('This document has no preface and is treated as ordinary text: {e}').format(e=e))
+                maxkb_error_logger.error(_('This document has no preface and is treated as ordinary text: {e}').format(e=e))
                 if pattern_list is not None and len(pattern_list) > 0:
                     split_model = SplitModel(pattern_list, with_filter, limit)
                 else:

@@ -18,6 +18,7 @@ from typing import Dict
 
 import requests
 
+from common.utils.logger import maxkb_logger
 from models_provider.base_model_provider import MaxKBBaseModel
 from models_provider.impl.base_tti import BaseTextToImage
 
@@ -35,7 +36,6 @@ req_key_dict = {
     'anime_v1.3.1': 'high_aes',
 }
 
-max_kb = logging.getLogger("max_kb")
 
 
 def sign(key, msg):
@@ -60,7 +60,7 @@ def formatQuery(parameters):
 
 def signV4Request(access_key, secret_key, service, req_query, req_body):
     if access_key is None or secret_key is None:
-        max_kb.info('No access key is available.')
+        maxkb_logger.info('No access key is available.')
         sys.exit()
 
     t = datetime.datetime.utcnow()
@@ -77,42 +77,36 @@ def signV4Request(access_key, secret_key, service, req_query, req_body):
                         '\n' + 'x-date:' + current_date + '\n'
     canonical_request = method + '\n' + canonical_uri + '\n' + canonical_querystring + \
                         '\n' + canonical_headers + '\n' + signed_headers + '\n' + payload_hash
-    # max_kb.info(canonical_request)
     algorithm = 'HMAC-SHA256'
     credential_scope = datestamp + '/' + region + '/' + service + '/' + 'request'
     string_to_sign = algorithm + '\n' + current_date + '\n' + credential_scope + '\n' + hashlib.sha256(
         canonical_request.encode('utf-8')).hexdigest()
-    # max_kb.info(string_to_sign)
     signing_key = getSignatureKey(secret_key, datestamp, region, service)
-    # max_kb.info(signing_key)
     signature = hmac.new(signing_key, (string_to_sign).encode(
         'utf-8'), hashlib.sha256).hexdigest()
-    # max_kb.info(signature)
 
     authorization_header = algorithm + ' ' + 'Credential=' + access_key + '/' + \
                            credential_scope + ', ' + 'SignedHeaders=' + \
                            signed_headers + ', ' + 'Signature=' + signature
-    # max_kb.info(authorization_header)
     headers = {'X-Date': current_date,
                'Authorization': authorization_header,
                'X-Content-Sha256': payload_hash,
                'Content-Type': content_type
                }
-    # max_kb.info(headers)
 
     # ************* SEND THE REQUEST *************
     request_url = endpoint + '?' + canonical_querystring
 
-    max_kb.info('\nBEGIN REQUEST++++++++++++++++++++++++++++++++++++')
-    max_kb.info('Request URL = ' + request_url)
+    maxkb_logger.info('\nBEGIN REQUEST++++++++++++++++++++++++++++++++++++')
+    maxkb_logger.info('Request URL = ' + request_url)
     try:
         r = requests.post(request_url, headers=headers, data=req_body)
     except Exception as err:
-        max_kb.info(f'error occurred: {err}')
+        maxkb_logger.info(f'error occurred: {err}')
         raise
     else:
-        max_kb.info('\nRESPONSE++++++++++++++++++++++++++++++++++++')
-        max_kb.info(f'Response code: {r.status_code}\n')
+        maxkb_logger.info('\nRESPONSE++++++++++++++++++++++++++++++++++++')
+        maxkb_logger.info(f'Response code: {r.status_code}\n')
         # 使用 replace 方法将 \u0026 替换为 &
         resp_str = r.text.replace("\\u0026", "&")
         if r.status_code != 200:

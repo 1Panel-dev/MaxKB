@@ -9,11 +9,9 @@ from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 
 from common.utils.fork import ChildLink, Fork
+from common.utils.logger import maxkb_error_logger
 from common.utils.split_model import get_split_model
 from knowledge.models.knowledge import KnowledgeType, Document, Knowledge, Status
-
-max_kb_error = logging.getLogger("max_kb_error")
-max_kb = logging.getLogger("max_kb")
 
 
 def get_save_handler(knowledge_id, selector):
@@ -118,4 +116,4 @@ def save_problem(knowledge_id, document_id, paragraph_id, problem):
             }
         ).save(instance={"content": problem}, with_valid=True)
     except Exception as e:
-        max_kb_error.error(_('Association problem failed {error}').format(error=str(e)))
+        maxkb_error_logger.error(_('Association problem failed {error}').format(error=str(e)))

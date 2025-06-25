@@ -11,16 +11,15 @@ from django.utils.translation import gettext_lazy as _
 from common.config.embedding_config import ModelManage
 from common.event import ListenerManagement, UpdateProblemArgs, UpdateEmbeddingKnowledgeIdArgs, \
     UpdateEmbeddingDocumentIdArgs
+from common.utils.logger import maxkb_error_logger, maxkb_logger
 from knowledge.models import Document, TaskType, State
 from models_provider.tools import get_model
 from models_provider.models import Model
 from ops import celery_app
 
-max_kb_error = logging.getLogger("max_kb_error")
-max_kb = logging.getLogger("max_kb")
 
 
-def get_embedding_model(model_id, exception_handler=lambda e: max_kb_error.error(
+def get_embedding_model(model_id, exception_handler=lambda e: maxkb_error_logger.error(
     _('Failed to obtain vector model: {error} {traceback}').format(
         error=str(e),
         traceback=traceback.format_exc()
@@ -70,7 +69,7 @@ def embedding_by_document(document_id, model_id, state_list=None):
     def exception_handler(e):
         ListenerManagement.update_status(QuerySet(Document).filter(id=document_id), TaskType.EMBEDDING,
                                          State.FAILURE)
-        max_kb_error.error(
+        maxkb_error_logger.error(
             _('Failed to obtain vector model: {error} {traceback}').format(
                 error=str(e),
                 traceback=traceback.format_exc()
@@ -100,11 +99,11 @@ def embedding_by_knowledge(knowledge_id, model_id):
           @param model_id 向量模型
           :return: None
           """
-    max_kb.info(_('Start--->Vectorized knowledge: {knowledge_id}').format(knowledge_id=knowledge_id))
+    maxkb_logger.info(_('Start--->Vectorized knowledge: {knowledge_id}').format(knowledge_id=knowledge_id))
     try:
         ListenerManagement.delete_embedding_by_knowledge(knowledge_id)
         document_list = QuerySet(Document).filter(knowledge_id=knowledge_id)
-        max_kb.info(_('Knowledge documentation: {document_names}').format(
+        maxkb_logger.info(_('Knowledge documentation: {document_names}').format(
             document_names=", ".join([d.name for d in document_list])))
         for document in document_list:
             try:
@@ -112,12 +111,12 @@ def embedding_by_knowledge(knowledge_id, model_id):
             except Exception as e:
                 pass
     except Exception as e:
-        max_kb_error.error(
+        maxkb_error_logger.error(
             _('Vectorized knowledge: {knowledge_id} error {error} {traceback}'.format(knowledge_id=knowledge_id,
                                                                                       error=str(e),
                                                                                       traceback=traceback.format_exc())))
     finally:
-        max_kb.info(_('End--->Vectorized knowledge: {knowledge_id}').format(knowledge_id=knowledge_id))
+        maxkb_logger.info(_('End--->Vectorized knowledge: {knowledge_id}').format(knowledge_id=knowledge_id))
 
 
 def embedding_by_problem(args, model_id):
