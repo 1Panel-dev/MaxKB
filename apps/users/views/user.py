@@ -19,6 +19,7 @@ from common.constants.cache_version import Cache_Version
 from common.constants.permission_constants import PermissionConstants, Permission, Group, Operate, RoleConstants
 from common.log.log import log
 from common.result import result
+from common.utils.common import query_params_to_single_dict
 from maxkb.const import CONFIG
 from models_provider.api.model import DefaultModelResponse
 from tools.serializers.tool import encryption
@@ -274,8 +275,7 @@ class UserManage(APIView):
         @has_permissions(PermissionConstants.USER_READ, RoleConstants.ADMIN)
         def get(self, request: Request, current_page, page_size):
             d = UserManageSerializer.Query(
-                data={'email_or_username': request.query_params.get('email_or_username', None),
-                      'user_id': str(request.user.id)})
+                data={**query_params_to_single_dict(request.query_params)})
             return result.success(d.page(current_page, page_size))
 
 

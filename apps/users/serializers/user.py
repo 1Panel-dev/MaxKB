@@ -177,16 +177,35 @@ class UserManageSerializer(serializers.Serializer):
                     raise ExceptionCodeConstants.NICKNAME_IS_EXIST.value.to_app_api_exception()
 
     class Query(serializers.Serializer):
-        email_or_username = serializers.CharField(required=False, allow_null=True,
-                                                  label=_('Email or username'))
+        username = serializers.CharField(
+            required=False,
+            label=_("Username"),
+            max_length=20,
+            allow_blank=True
+        )
+        nick_name = serializers.CharField(
+            required=False,
+            label=_("Nick Name"),
+            max_length=20,
+            allow_blank=True
+        )
+        email = serializers.CharField(
+            required=False,
+            label=_("Email"),
+            allow_blank=True,
+        )
 
         def get_query_set(self):
-            email_or_username = self.data.get('email_or_username')
+            username = self.data.get('username')
+            nick_name = self.data.get('nick_name')
+            email = self.data.get('email')
             query_set = QuerySet(User)
-            if email_or_username is not None:
-                query_set = query_set.filter(
-                    Q(username__contains=email_or_username) | Q(email__contains=email_or_username) | Q(
-                        nick_name__contains=email_or_username))
+            if username is not None:
+                query_set = query_set.filter(username__contains=username)
+            if nick_name is not None:
+                query_set = query_set.filter(nick_name__contains=nick_name)
+            if email is not None:
+                query_set = query_set.filter(email__contains=email)
             query_set = query_set.order_by("-create_time")
             return query_set
 
