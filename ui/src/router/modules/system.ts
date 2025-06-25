@@ -64,42 +64,42 @@ const systemRouter = {
       },
       component: () => import('@/views/system/workspace/index.vue'),
     },
-    {
-      path: '/system/resource-management',
-      name: 'resourceManagement',
-      meta: {
-        icon: 'app-folder-share',
-        iconActive: 'app-folder-share-active',
-        title: 'views.system.resource_management.label',
-        activeMenu: '/system',
-        parentPath: '/system',
-        parentName: 'system',
-      },
-      children: [
-        {
-          path: '/system/resource-management/knowledge',
-          name: 'knowledgeResourceManagement',
-          meta: {
-            title: 'views.knowledge.title',
-            activeMenu: '/system',
-            parentPath: '/system',
-            parentName: 'system',
-          },
-          component: () => import('@/views/resource-management/knowledge/index.vue'),
-        },
-        {
-          path: '/system/resource-management/tool',
-          name: 'toolResourceManagement',
-          meta: {
-            title: 'views.tool.title',
-            activeMenu: '/system',
-            parentPath: '/system',
-            parentName: 'system',
-          },
-          component: () => import('@/views/resource-management/tool/index.vue'),
-        },
-      ],
-    },
+    // {
+    //   path: '/system/resource-management',
+    //   name: 'resourceManagement',
+    //   meta: {
+    //     icon: 'app-folder-share',
+    //     iconActive: 'app-folder-share-active',
+    //     title: 'views.system.resource_management.label',
+    //     activeMenu: '/system',
+    //     parentPath: '/system',
+    //     parentName: 'system',
+    //   },
+    //   children: [
+    //     {
+    //       path: '/system/resource-management/knowledge',
+    //       name: 'knowledgeResourceManagement',
+    //       meta: {
+    //         title: 'views.knowledge.title',
+    //         activeMenu: '/system',
+    //         parentPath: '/system',
+    //         parentName: 'system',
+    //       },
+    //       component: () => import('@/views/resource-management/knowledge/index.vue'),
+    //     },
+    //     {
+    //       path: '/system/resource-management/tool',
+    //       name: 'toolResourceManagement',
+    //       meta: {
+    //         title: 'views.tool.title',
+    //         activeMenu: '/system',
+    //         parentPath: '/system',
+    //         parentName: 'system',
+    //       },
+    //       component: () => import('@/views/resource-management/tool/index.vue'),
+    //     },
+    //   ],
+    // },
     {
       path: '/system/authorization',
       name: 'authorization',
@@ -300,7 +300,6 @@ const systemRouter = {
             activeMenu: '/system',
             parentPath: '/system',
             parentName: 'system',
-            //permission: new Role('ADMIN')
           },
           component: () => import('@/views/system-setting/email/index.vue'),
         },
