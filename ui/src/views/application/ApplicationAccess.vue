@@ -28,15 +28,11 @@
                 v-model="item.isActive"
                 @change="changeStatus(item.key, item.isActive)"
                 :disabled="!item.exists"
-                v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                RoleConst.USER.getWorkspaceRole,
-                PermissionConst.APPLICATION_ACCESS_EDIT.getWorkspacePermission]"
+                v-if="permissionPrecise.access_edit(id)"
               />
               <el-divider direction="vertical" />
               <el-button class="mr-4" @click="openDrawer(item.key)"
-                v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                RoleConst.USER.getWorkspaceRole,
-                PermissionConst.APPLICATION_ACCESS_EDIT.getWorkspacePermission]"
+                v-if="permissionPrecise.access_edit(id)"
               >{{
                 $t('views.application.applicationAccess.setting')
               }}</el-button>
@@ -50,14 +46,22 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, onMounted } from 'vue'
+import { reactive, ref, onMounted, computed } from 'vue'
 import AccessSettingDrawer from './component/AccessSettingDrawer.vue'
 import applicationApi from '@/api/application/application'
 import { MsgSuccess } from '@/utils/message'
 import { useRoute } from 'vue-router'
 import { t } from '@/locales'
-import { PermissionConst, RoleConst } from '@/utils/permission/data'
-import { hasPermission } from '@/utils/permission/index'
+import permissionMap from '@/permission'
+
+const route = useRoute()
+
+const apiType = computed<'workspace'>(() => {
+    return 'workspace'
+})
+const permissionPrecise = computed(() => {
+  return permissionMap['application'][apiType.value]
+})
 
 // 平台数据
 const platforms = reactive([
@@ -105,7 +109,6 @@ const platforms = reactive([
 
 const AccessSettingDrawerRef = ref()
 const loading = ref(false)
-const route = useRoute()
 const {
   params: { id },
 } = route as any

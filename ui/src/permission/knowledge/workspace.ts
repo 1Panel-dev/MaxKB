@@ -32,7 +32,7 @@ const workspace = {
         PermissionConst.KNOWLEDGE_DOCUMENT_SYNC.getWorkspacePermissionWorkspaceManageRole,
       ],
       'OR',
-    ), 
+    ),
   vector: (source_id:string) =>
     hasPermission(
       [
@@ -122,7 +122,7 @@ const workspace = {
         PermissionConst.KNOWLEDGE_DOCUMENT_MIGRATE.getWorkspacePermissionWorkspaceManageRole,
       ],
       'OR',
-    ), 
+    ),
   doc_edit: (source_id:string) =>
     hasPermission(
       [
@@ -142,7 +142,7 @@ const workspace = {
         PermissionConst.KNOWLEDGE_DOCUMENT_SYNC.getWorkspacePermissionWorkspaceManageRole,
       ],
       'OR',
-    ),      
+    ),
   doc_delete: (source_id:string) =>
     hasPermission(
       [
@@ -152,7 +152,7 @@ const workspace = {
         PermissionConst.KNOWLEDGE_DOCUMENT_DELETE.getWorkspacePermissionWorkspaceManageRole,
       ],
       'OR',
-    ), 
+    ),
   doc_export: (source_id:string) =>
     hasPermission(
       [
@@ -162,7 +162,7 @@ const workspace = {
         PermissionConst.KNOWLEDGE_DOCUMENT_EXPORT.getWorkspacePermissionWorkspaceManageRole,
       ],
       'OR',
-    ),       
+    ),
   problem_create: (source_id:string) =>
     hasPermission(
       [
@@ -192,7 +192,7 @@ const workspace = {
         PermissionConst.KNOWLEDGE_PROBLEM_DELETE.getWorkspacePermissionWorkspaceManageRole,
       ],
       'OR',
-    ),                  
+    ),
 }
 
 export default workspace

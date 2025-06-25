@@ -43,16 +43,12 @@
               <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.username" />
             </el-select>
           </div>
-          <el-dropdown trigger="click">
+          <el-dropdown trigger="click"
+            v-if="permissionPrecise.create()"
+          >
             <el-button
               type="primary"
               class="ml-8"
-              v-hasPermission="[
-                RoleConst.ADMIN,
-                RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                PermissionConst.APPLICATION_EDIT.getWorkspacePermissionWorkspaceManageRole,
-                PermissionConst.APPLICATION_EDIT.getWorkspacePermission,
-              ]"
             >
               {{ $t('common.create') }}
               <el-icon class="el-icon--right">
@@ -234,16 +230,7 @@
                             </el-dropdown-item>
                             <el-dropdown-item
                               @click.stop="settingApplication(item)"
-                              v-if="
-                                hasPermission(
-                                  [
-                                    RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                                    RoleConst.USER.getWorkspaceRole,
-                                    PermissionConst.APPLICATION_EDIT.getWorkspacePermission,
-                                  ],
-                                  'OR',
-                                )
-                              "
+                              v-if="permissionPrecise.edit(item.id)"
                             >
                               <el-icon><Setting /></el-icon>
                               {{ $t('common.setting') }}
@@ -252,14 +239,7 @@
                               divided
                               @click.stop="exportApplication(item)"
                               v-if="
-                                hasPermission(
-                                  [
-                                    RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                                    RoleConst.USER.getWorkspaceRole,
-                                    PermissionConst.APPLICATION_EXPORT.getWorkspacePermission,
-                                  ],
-                                  'OR',
-                                )
+                                permissionPrecise.export(item.id)
                               "
                             >
                               <AppIcon iconName="app-export"></AppIcon>
@@ -270,14 +250,7 @@
                               icon="Delete"
                               @click.stop="deleteApplication(item)"
                               v-if="
-                                hasPermission(
-                                  [
-                                    RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                                    RoleConst.USER.getWorkspaceRole,
-                                    PermissionConst.APPLICATION_DELETE.getWorkspacePermission,
-                                  ],
-                                  'OR',
-                                )
+                                permissionPrecise.delete(item.id)
                               "
                               >{{ $t('common.delete') }}</el-dropdown-item
                             >
@@ -309,14 +282,22 @@ import ApplicaitonApi from '@/api/application/application'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import useStore from '@/stores'
 import { t } from '@/locales'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { isWorkFlow } from '@/utils/application'
 import { dateFormat } from '@/utils/time'
-import { PermissionConst, RoleConst } from '@/utils/permission/data'
-import { hasPermission } from '@/utils/permission/index'
 import { FolderSource } from '@/enums/common'
+import permissionMap from '@/permission'
 
 const router = useRouter()
+const route = useRoute()
+
+const apiType = computed<'workspace'>(() => {
+    return 'workspace'
+})
+const permissionPrecise = computed(() => {
+  return permissionMap['application'][apiType.value]
+})
+
 const { folder, application, user } = useStore()
 
 const loading = ref(false)

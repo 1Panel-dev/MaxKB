@@ -8,11 +8,7 @@
         type="primary"
         @click="submit(applicationFormRef)"
         :disabled="loading"
-        v-hasPermission="[
-          RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-          RoleConst.USER.getWorkspaceRole,
-          PermissionConst.APPLICATION_OVERVIEW_PUBLIC.getWorkspacePermission,
-        ]"
+        v-if="permissionPrecise.edit(id)"
       >
         {{ $t('views.application.buttons.publish') }}
       </el-button>
@@ -432,7 +428,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { reactive, ref, onMounted } from 'vue'
+import { reactive, ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { groupBy } from 'lodash'
 import AIModeParamSettingDialog from './component/AIModeParamSettingDialog.vue'
@@ -450,10 +446,19 @@ import TTSModeParamSettingDialog from './component/TTSModeParamSettingDialog.vue
 import ReasoningParamSettingDialog from './component/ReasoningParamSettingDialog.vue'
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
+import permissionMap from '@/permission'
+
+const route = useRoute()
+
+const apiType = computed<'workspace'>(() => {
+    return 'workspace'
+})
+const permissionPrecise = computed(() => {
+  return permissionMap['application'][apiType.value]
+})
 
 const { knowledge, model, application } = useStore()
 
-const route = useRoute()
 const {
   params: { id },
 } = route as any
