@@ -88,7 +88,7 @@
                 :provider_list="provider_list"
                 :isShared="isShared"
                 :isSystemShare="isSystemShare"
-                :sharedType="type"
+                :sharedType="apiType"
               >
               </ModelCard>
             </el-col>
@@ -221,7 +221,6 @@ onMounted(() => {
   ProviderApi.getProvider(loading).then((ok) => {
     active_provider.value = allObj
     provider_list.value = [allObj, ...ok.data]
-
     list_model()
   })
 })

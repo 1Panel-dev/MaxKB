@@ -60,7 +60,6 @@
           link
           type="primary"
           class="ml-16"
-          :disabled="!is_permisstion"
           @click.stop="cancelDownload"
           >{{ $t('views.model.download.cancelDownload') }}
         </el-button>
@@ -79,7 +78,6 @@
             <el-dropdown-item
               v-if="permissionPrecise.modify()"
               icon="EditPen"
-              :disabled="!is_permisstion"
               text
               @click.stop="openEditModel"
             >
@@ -100,7 +98,6 @@
                 currentModel.model_type === 'TTI' ||
                 permissionPrecise.paramSetting()
               "
-              :disabled="!is_permisstion"
               icon="Setting"
               @click.stop="openParamSetting"
             >
@@ -109,7 +106,6 @@
             <el-dropdown-item
               divided
               icon="Delete"
-              :disabled="!is_permisstion"
               text
               @click.stop="deleteModel"
               v-if="permissionPrecise.delete()"
@@ -161,9 +157,7 @@ const permissionPrecise = computed(() => {
 
 const downModel = ref<Model>()
 
-const is_permisstion = computed(() => {
-  return user.userInfo?.id == props.model.user_id
-})
+
 const currentModel = computed(() => {
   if (downModel.value) {
     return downModel.value
@@ -204,7 +198,7 @@ const deleteModel = () => {
 }
 
 const cancelDownload = () => {
-  loadSharedApi({ type: 'model', systemType: apiType.value })
+  loadSharedApi({ type: 'model', systemType: props.sharedType })
     .pauseDownload(props.model.id)
     .then(() => {
       downModel.value = undefined
@@ -227,7 +221,7 @@ const icon = computed(() => {
 const initInterval = () => {
   interval = setInterval(() => {
     if (currentModel.value.status === 'DOWNLOAD') {
-      loadSharedApi({ type: 'model', systemType: apiType.value })
+      loadSharedApi({ type: 'model', systemType: props.sharedType })
         .getModelMetaById(props.model.id)
         .then((ok: any) => {
           downModel.value = ok.data
