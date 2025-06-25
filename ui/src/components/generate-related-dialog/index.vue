@@ -133,7 +133,7 @@ watch(dialogVisible, (bool) => {
 
 const open = (ids: string[], type: string, _knowledgeId?: string) => {
   knowledgeId.value = _knowledgeId
-  getModel()
+  getModelFn()
   idList.value = ids
   apiSubmitType.value = type
   dialogVisible.value = true
@@ -188,7 +188,7 @@ const submitHandle = async (formEl: FormInstance) => {
   })
 }
 
-function getModel() {
+function getModelFn() {
   loading.value = true
   loadSharedApi({ type: 'knowledge', systemType: props.apiType })
     .getKnowledgeModel()

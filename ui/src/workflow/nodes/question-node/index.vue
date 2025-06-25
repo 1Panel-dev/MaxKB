@@ -47,7 +47,7 @@
             v-model="form_data.model_id"
             :placeholder="$t('views.application.form.aiModel.placeholder')"
             :options="modelOptions"
-            @submitModel="getModel"
+            @submitModel="getSelectModel"
             showFooter
             :model-type="'LLM'"
           ></ModelSelect>
@@ -220,21 +220,21 @@ const validate = () => {
   })
 }
 
-function getModel() {
+function getSelectModel() {
   if (id) {
     //todo
-    // applicationApi.getApplicationModel(id).then((res: any) => {
-    //   modelOptions.value = groupBy(res?.data, 'provider')
-    // })
+    applicationApi.getApplicationModel(id).then((res: any) => {
+      modelOptions.value = groupBy(res?.data, 'provider')
+    })
   } else {
-    model.asyncGetModel().then((res: any) => {
+    model.asyncGetSelectModel('workspace').then((res: any) => {
       modelOptions.value = groupBy(res?.data, 'provider')
     })
   }
 }
 
 onMounted(() => {
-  getModel()
+  getSelectModel()
   if (typeof props.nodeModel.properties.node_data?.is_result === 'undefined') {
     if (isLastNode(props.nodeModel)) {
       set(props.nodeModel.properties.node_data, 'is_result', true)

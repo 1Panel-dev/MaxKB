@@ -33,7 +33,7 @@ const getKnowledgeListPage: (
   )
 }
 
-const getModel: (
+const getModelList: (
   param: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<Array<any>>> = (param: any, loading) => {
@@ -57,7 +57,7 @@ const getToolListPage: (
 export default {
   getKnowledgeList,
   getKnowledgeListPage,
-  getModel,
+  getModelList,
   getToolList,
   getToolListPage
 }

@@ -239,14 +239,14 @@ const form_data = computed({
   },
 })
 
-function getModel() {
+function getSelectModel() {
   if (id) {
     //todo
-    // applicationApi.getApplicationImageModel(id).then((res: any) => {
-    //   modelOptions.value = groupBy(res?.data, 'provider')
-    // })
+    applicationApi.getApplicationImageModel(id).then((res: any) => {
+      modelOptions.value = groupBy(res?.data, 'provider')
+    })
   } else {
-    model.asyncGetModel().then((res: any) => {
+    model.asyncGetSelectModel('workspace').then((res: any) => {
       modelOptions.value = groupBy(res?.data, 'provider')
     })
   }
@@ -271,7 +271,7 @@ function refreshParam(data: any) {
 }
 
 onMounted(() => {
-  getModel()
+  getSelectModel()
 
   set(props.nodeModel, 'validate', validate)
 })

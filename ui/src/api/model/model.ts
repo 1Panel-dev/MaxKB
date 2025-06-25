@@ -22,62 +22,24 @@ Object.defineProperty(prefix, 'value', {
  * 获得模型列表
  * @params 参数 name, model_type, model_name
  */
-const getModel: (
+const getModelList: (
   data?: ListModelRequest,
   loading?: Ref<boolean>,
 ) => Promise<Result<Array<Model>>> = (data, loading) => {
-  return get(`${prefix.value}`, data, loading)
-}
-/**
- * 获取工作空间下重排模型列表
- * @param loading 加载器
- * @returns 重排模型列表
- */
-const getRerankerModel: (loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (loading) => {
-  return get(`${prefix.value}`, { model_type: 'RERANKER' }, loading)
+  return get(`${prefix.value}/model`, data, loading)
 }
 
 /**
- * 获取语音转文本模型列表
- * @param loading
- * @returns 语音转文本模型列表
+ * 获得下拉选择框模型列表
+ * @params 参数 name, model_type, model_name
  */
-const getSTTModel: (loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (loading) => {
-  return get(`${prefix.value}`, { model_type: 'STT' }, loading)
+const getSelectModelList: (
+  data?: ListModelRequest,
+  loading?: Ref<boolean>,
+) => Promise<Result<Array<Model>>> = (data, loading) => {
+  return get(`${prefix.value}/model_list`, data, loading)
 }
 
-/**
- * 获取文本转语音模型列表
- * @param loading
- * @returns
- */
-const getTTSModel: (loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (loading) => {
-  return get(`${prefix.value}`, { model_type: 'TTS' }, loading)
-}
-/**
- * 获取图片理解模型列表
- * @param loading
- * @returns 图片理解模型列表
- */
-const getImageModel: (loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (loading) => {
-  return get(`${prefix.value}`, { model_type: 'IMAGE' }, loading)
-}
-/**
- * 获取图片生成模型列表
- * @param loading
- * @returns  图片生成模型列表
- */
-const getTTIModel: (loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (loading) => {
-  return get(`${prefix.value}`, { model_type: 'TTI' }, loading)
-}
-/**
- * 获取大语言模型列表
- * @param loading
- * @returns 大语言模型列表
- */
-const getLLMModel: (loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (loading) => {
-  return get(`${prefix.value}`, { model_type: 'LLM' }, loading)
-}
 /**
  * 获取模型参数表单
  * @param model_id 模型id
@@ -88,7 +50,7 @@ const getModelParamsForm: (
   model_id: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<Array<FormField>>> = (model_id, loading) => {
-  return get(`${prefix.value}/${model_id}/model_params_form`, {}, loading)
+  return get(`${prefix.value}/model/${model_id}/model_params_form`, {}, loading)
 }
 
 /**
@@ -101,7 +63,7 @@ const createModel: (
   request: CreateModelRequest,
   loading?: Ref<boolean>,
 ) => Promise<Result<Model>> = (request, loading) => {
-  return post(`${prefix.value}`, request, {}, loading)
+  return post(`${prefix.value}/model`, request, {}, loading)
 }
 
 /**
@@ -115,7 +77,7 @@ const updateModel: (
   request: EditModelRequest,
   loading?: Ref<boolean>,
 ) => Promise<Result<Model>> = (model_id, request, loading) => {
-  return put(`${prefix.value}/${model_id}`, request, {}, loading)
+  return put(`${prefix.value}/model/${model_id}`, request, {}, loading)
 }
 
 /**
@@ -129,7 +91,7 @@ const updateModelParamsForm: (
   request: any[],
   loading?: Ref<boolean>,
 ) => Promise<Result<Model>> = (model_id, request, loading) => {
-  return put(`${prefix.value}/${model_id}/model_params_form`, request, {}, loading)
+  return put(`${prefix.value}/model/${model_id}/model_params_form`, request, {}, loading)
 }
 
 /**
@@ -142,7 +104,7 @@ const getModelById: (model_id: string, loading?: Ref<boolean>) => Promise<Result
   model_id,
   loading,
 ) => {
-  return get(`${prefix.value}/${model_id}`, {}, loading)
+  return get(`${prefix.value}/model/${model_id}`, {}, loading)
 }
 /**
  * 获取模型信息不包括认证信息根据模型id
@@ -154,7 +116,7 @@ const getModelMetaById: (model_id: string, loading?: Ref<boolean>) => Promise<Re
   model_id,
   loading,
 ) => {
-  return get(`${prefix.value}/${model_id}/meta`, {}, loading)
+  return get(`${prefix.value}/model/${model_id}/meta`, {}, loading)
 }
 /**
  * 暂停下载
@@ -166,16 +128,16 @@ const pauseDownload: (model_id: string, loading?: Ref<boolean>) => Promise<Resul
   model_id,
   loading,
 ) => {
-  return put(`${prefix.value}/${model_id}/pause_download`, undefined, {}, loading)
+  return put(`${prefix.value}/model/${model_id}/pause_download`, undefined, {}, loading)
 }
 const deleteModel: (model_id: string, loading?: Ref<boolean>) => Promise<Result<boolean>> = (
   model_id,
   loading,
 ) => {
-  return del(`${prefix.value}/${model_id}`, undefined, {}, loading)
+  return del(`${prefix.value}/model/${model_id}`, undefined, {}, loading)
 }
 export default {
-  getModel,
+  getModelList,
   createModel,
   updateModel,
   deleteModel,
@@ -184,10 +146,5 @@ export default {
   pauseDownload,
   getModelParamsForm,
   updateModelParamsForm,
-  getRerankerModel,
-  getSTTModel,
-  getTTSModel,
-  getImageModel,
-  getTTIModel,
-  getLLMModel,
+  getSelectModelList,
 }

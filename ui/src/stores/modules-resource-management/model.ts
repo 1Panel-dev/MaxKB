@@ -7,9 +7,9 @@ import type {ListModelRequest} from '@/api/type/model'
 const useModelStore = defineStore('mod', {
   state: () => ({}),
   actions: {
-    async asyncGetModel(data?: ListModelRequest, loading?: Ref<boolean>) {
+    async asyncGetSelectModel(data?: ListModelRequest, loading?: Ref<boolean>) {
       return new Promise((resolve, reject) => {
-        ModelApi.getModel(data, loading)
+        ModelApi.getModelList(data, loading)
           .then((res) => {
             resolve(res)
           })

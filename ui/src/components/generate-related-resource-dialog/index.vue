@@ -137,7 +137,7 @@ watch(dialogVisible, (bool) => {
 
 const open = (ids: string[], type: string, _knowledgeId?: string) => {
   knowledgeId.value = _knowledgeId
-  getModel()
+  getModelFn()
   idList.value = ids
   apiType.value = type
   dialogVisible.value = true
@@ -186,7 +186,7 @@ const submitHandle = async (formEl: FormInstance) => {
   })
 }
 
-function getModel() {
+function getModelFn() {
   loading.value = true
   knowledgeApi
     .getKnowledgeModel()

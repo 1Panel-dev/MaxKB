@@ -160,7 +160,7 @@
               $t('views.applicationWorkflow.nodes.rerankerNode.reranker_model.placeholder')
             "
             :options="modelOptions"
-            @submitModel="getModel"
+            @submitModel="getSelectModel"
             showFooter
             :model-type="'RERANKER'"
           ></ModelSelect>
@@ -235,14 +235,14 @@ const form_data = computed({
 function refreshParam(data: any) {
   set(props.nodeModel.properties.node_data, 'reranker_setting', data)
 }
-function getModel() {
+function getSelectModel() {
   if (id) {
     //todo
-    // applicationApi.getApplicationRerankerModel(id).then((res: any) => {
-    //   modelOptions.value = groupBy(res?.data, 'provider')
-    // })
+    applicationApi.getApplicationRerankerModel(id).then((res: any) => {
+      modelOptions.value = groupBy(res?.data, 'provider')
+    })
   } else {
-    model.asyncGetModel({ model_type: 'RERANKER' }).then((res: any) => {
+    model.asyncGetSelectModel('workspace', { model_type: 'RERANKER' }).then((res: any) => {
       modelOptions.value = groupBy(res?.data, 'provider')
     })
   }
@@ -265,7 +265,7 @@ const validate = () => {
 }
 
 onMounted(() => {
-  getModel()
+  getSelectModel()
   set(props.nodeModel, 'validate', validate)
 })
 </script>

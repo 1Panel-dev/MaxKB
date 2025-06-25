@@ -15,8 +15,19 @@ const prefix = '/system/shared/model'
  * 获得模型列表
  * @params 参数 name, model_type, model_name
  */
-const getModel: (
+const getModelList: (
   request?: ListModelRequest,
+  loading?: Ref<boolean>,
+) => Promise<Result<Array<Model>>> = (data, loading) => {
+  return get(`${prefix}`, data, loading)
+}
+
+/**
+ * 获得下拉选择框模型列表
+ * @params 参数 name, model_type, model_name
+ */
+const getSelectModelList: (
+  data?: ListModelRequest,
   loading?: Ref<boolean>,
 ) => Promise<Result<Array<Model>>> = (data, loading) => {
   return get(`${prefix}`, data, loading)
@@ -120,7 +131,7 @@ const deleteModel: (model_id: string, loading?: Ref<boolean>) => Promise<Result<
 }
 
 export default {
-  getModel,
+  getModelList,
   createModel,
   updateModel,
   deleteModel,
@@ -129,4 +140,5 @@ export default {
   pauseDownload,
   getModelParamsForm,
   updateModelParamsForm,
+  getSelectModelList,
 }

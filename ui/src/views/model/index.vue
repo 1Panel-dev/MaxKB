@@ -203,7 +203,7 @@ const openCreateModel = (provider?: Provider, model_type?: string) => {
 const list_model = () => {
   const params = active_provider.value?.provider ? { provider: active_provider.value.provider } : {}
   loadSharedApi({ type: 'model', isShared: isShared.value, systemType: apiType.value })
-    .getModel({ ...model_search_form.value, ...params }, list_model_loading)
+    .getModelList({ ...model_search_form.value, ...params }, list_model_loading)
     .then((ok: any) => {
       model_list.value = ok.data
       const v = model_list.value.map((m) => ({ id: m.user_id, username: m.username }))

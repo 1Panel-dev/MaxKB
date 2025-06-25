@@ -85,7 +85,7 @@
                     :placeholder="$t('views.application.form.aiModel.placeholder')"
                     :options="modelOptions"
                     @change="model_change"
-                    @submitModel="getModel"
+                    @submitModel="getSelectModel"
                     showFooter
                     :model-type="'LLM'"
                   ></ModelSelect>
@@ -645,10 +645,10 @@ function getKnowledge() {
   })
 }
 
-function getModel() {
+function getSelectModel() {
   loading.value = true
   modelAPI
-    .getLLMModel()
+    .getSelectModelList({ model_type: 'LLM' })
     .then((res: any) => {
       modelOptions.value = groupBy(res?.data, 'provider')
       loading.value = false
@@ -661,7 +661,7 @@ function getModel() {
 function getSTTModel() {
   loading.value = true
   modelAPI
-    .getSTTModel()
+    .getSelectModelList({ model_type: 'STT' })
     .then((res: any) => {
       sttModelOptions.value = groupBy(res?.data, 'provider')
       loading.value = false
@@ -674,7 +674,7 @@ function getSTTModel() {
 function getTTSModel() {
   loading.value = true
   modelAPI
-    .getTTSModel()
+    .getSelectModelList({ model_type: 'TTS' })
     .then((res: any) => {
       ttsModelOptions.value = groupBy(res?.data, 'provider')
       loading.value = false
@@ -717,7 +717,7 @@ function refresh() {
 }
 
 onMounted(() => {
-  getModel()
+  getSelectModel()
   getKnowledge()
   getDetail()
   getSTTModel()

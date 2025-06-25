@@ -49,7 +49,7 @@ import type { knowledgeData } from '@/api/type/knowledge'
 import { t } from '@/locales'
 
 const props = defineProps<{
-  data: {
+  data?: {
     type: Object
     default: () => {}
   }
@@ -114,11 +114,13 @@ function validate() {
   })
 }
 
-function getModel() {
+function getSelectModel() {
   loading.value = true
+
   model
-    .asyncGetModel({ model_type: 'EMBEDDING' }, props.apiType)
+    .asyncGetSelectModel(props.apiType, { model_type: 'EMBEDDING' })
     .then((res: any) => {
+
       modelOptions.value = groupBy(res?.data, 'provider')
       loading.value = false
     })
@@ -128,7 +130,7 @@ function getModel() {
 }
 
 onMounted(() => {
-  getModel()
+  getSelectModel()
 })
 onUnmounted(() => {
   form.value = {

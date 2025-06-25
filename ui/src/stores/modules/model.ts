@@ -7,14 +7,14 @@ import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 const useModelStore = defineStore('model', {
   state: () => ({}),
   actions: {
-    async asyncGetModel(
-      data?: ListModelRequest,
+    async asyncGetSelectModel(
       systemType: 'systemShare' | 'workspace' | 'systemManage' = 'workspace',
+      data?: ListModelRequest,
       loading?: Ref<boolean>,
     ) {
       return new Promise((resolve, reject) => {
         loadSharedApi({ type: 'model', systemType })
-          .getModel(data, loading)
+          .getSelectModelList(data, loading)
           .then((res: any) => {
             resolve(res)
           })

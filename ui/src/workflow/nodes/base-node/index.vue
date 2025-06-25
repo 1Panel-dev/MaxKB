@@ -253,13 +253,13 @@ const validate = () => {
 }
 
 function getSTTModel() {
-  modelAPI.getSTTModel().then((res: any) => {
+  modelAPI.getSelectModelList({ model_type: 'STT' }).then((res: any) => {
     sttModelOptions.value = groupBy(res?.data, 'provider')
   })
 }
 
 function getTTSModel() {
-  modelAPI.getTTSModel().then((res: any) => {
+  modelAPI.getSelectModelList({ model_type: 'TTS' }).then((res: any) => {
     ttsModelOptions.value = groupBy(res?.data, 'provider')
   })
 }
