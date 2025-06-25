@@ -1,5 +1,4 @@
 import { PermissionConst, EditionConst, RoleConst } from '@/utils/permission/data'
-import { get_next_route } from '@/utils/permission'
 const applicationRouter = {
   path: '/application',
   name: 'application',
@@ -12,6 +11,7 @@ const applicationRouter = {
       PermissionConst.APPLICATION_READ.getWorkspacePermissionWorkspaceManageRole,
       PermissionConst.APPLICATION_READ.getWorkspacePermission,
     ],
+    group: 'workspace',
     order: 1,
   },
   redirect: '/application',
@@ -20,7 +20,7 @@ const applicationRouter = {
     {
       path: '/application',
       name: 'application-index',
-      meta: { title: '应用主页', activeMenu: '/application' },
+      meta: { title: '应用主页', activeMenu: '/application', sameRoute: 'application' },
       component: () => import('@/views/application/index.vue'),
       hidden: true,
     },

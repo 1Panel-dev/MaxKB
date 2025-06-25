@@ -11,6 +11,7 @@ const ModelRouter = {
       PermissionConst.KNOWLEDGE_READ.getWorkspacePermission,
       PermissionConst.KNOWLEDGE_READ.getWorkspacePermissionWorkspaceManageRole,
     ],
+    group: 'workspace',
     order: 2,
   },
   redirect: '/knowledge',
@@ -19,7 +20,7 @@ const ModelRouter = {
     {
       path: '/knowledge',
       name: 'knowledge-index',
-      meta: { title: '知识库主页', activeMenu: '/knowledge' },
+      meta: { title: '知识库主页', activeMenu: '/knowledge', sameRoute: 'knowledge' },
       component: () => import('@/views/knowledge/index.vue'),
     },
 
