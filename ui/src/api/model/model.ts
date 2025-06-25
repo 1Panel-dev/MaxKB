@@ -37,7 +37,19 @@ const getSelectModelList: (
   data?: ListModelRequest,
   loading?: Ref<boolean>,
 ) => Promise<Result<Array<Model>>> = (data, loading) => {
-  return get(`${prefix.value}/model_list`, data, loading)
+  return get(`${prefix.value}/model_list`, data, loading).then((ok) => {
+    return {
+      ...ok,
+      data: [
+        ...ok.data.shared_model.map((m: any) => {
+          return { ...m, type: 'share' }
+        }),
+        ...ok.data.model.map((m: any) => {
+          return { ...m, type: 'workspace' }
+        }),
+      ],
+    }
+  })
 }
 
 /**
