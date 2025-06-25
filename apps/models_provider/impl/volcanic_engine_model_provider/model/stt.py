@@ -23,9 +23,9 @@ from urllib.parse import urlparse
 
 import websockets
 
+from common.utils.logger import maxkb_logger
 from models_provider.base_model_provider import MaxKBBaseModel
 from models_provider.impl.base_stt import BaseSpeechToText
-max_kb_error = logging.getLogger("max_kb_error")
 
 audio_format = "mp3"  # wav 或者 mp3，根据实际音频格式设置
 
@@ -147,7 +147,7 @@ def parse_response(res):
         result['code'] = code
         payload_size = int.from_bytes(payload[4:8], "big", signed=False)
         payload_msg = payload[8:]
-        max_kb_error.error(f"Error code: {code}, message: {payload_msg}")
+        maxkb_logger.error(f"Error code: {code}, message: {payload_msg}")
     if payload_msg is None:
         return result
     if message_compression == GZIP:

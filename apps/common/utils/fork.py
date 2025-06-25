@@ -10,7 +10,7 @@ import html2text as ht
 import requests
 from bs4 import BeautifulSoup
 
-from common.utils.logger import maxkb_error_logger, maxkb_logger
+from common.utils.logger import maxkb_logger
 
 requests.packages.urllib3.disable_warnings()
 
@@ -147,7 +147,7 @@ class Fork:
                 try:
                     html_content = response.content.decode(charset)
                 except Exception as e:
-                    maxkb_error_logger.error(f'{e}')
+                    maxkb_logger.error(f'{e}')
                 return BeautifulSoup(html_content, "html.parser")
         return beautiful_soup
 
@@ -161,11 +161,11 @@ class Fork:
             maxkb_logger.info(f'fork:{self.base_fork_url}')
             response = requests.get(self.base_fork_url, verify=False, headers=headers)
             if response.status_code != 200:
-                maxkb_error_logger.error(f"url: {self.base_fork_url} code:{response.status_code}")
+                maxkb_logger.error(f"url: {self.base_fork_url} code:{response.status_code}")
                 return Fork.Response.error(f"url: {self.base_fork_url} code:{response.status_code}")
             bf = self.get_beautiful_soup(response)
         except Exception as e:
-            maxkb_error_logger.error(f'{str(e)}:{traceback.format_exc()}')
+            maxkb_logger.error(f'{str(e)}:{traceback.format_exc()}')
             return Fork.Response.error(str(e))
         bf = self.reset_beautiful_soup(bf)
         link_list = self.get_child_link_list(bf)

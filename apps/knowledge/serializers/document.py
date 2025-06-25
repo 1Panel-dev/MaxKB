@@ -42,6 +42,7 @@ from common.handle.impl.text.xlsx_split_handle import XlsxSplitHandle
 from common.handle.impl.text.zip_split_handle import ZipSplitHandle
 from common.utils.common import post, get_file_content, bulk_create_in_batches, parse_image
 from common.utils.fork import Fork
+from common.utils.logger import maxkb_logger
 from common.utils.split_model import get_split_model, flat_map
 from knowledge.models import Knowledge, Paragraph, Problem, Document, KnowledgeType, ProblemParagraphMapping, State, \
     TaskType, File, FileSourceType
@@ -483,7 +484,7 @@ class DocumentSerializers(serializers.Serializer):
                 else:
                     state = State.FAILURE
             except Exception as e:
-                logging.getLogger("max_kb_error").error(f'{str(e)}:{traceback.format_exc()}')
+                maxkb_logger.error(f'{str(e)}:{traceback.format_exc()}')
                 state = State.FAILURE
             ListenerManagement.update_status(
                 QuerySet(Document).filter(id=document_id),

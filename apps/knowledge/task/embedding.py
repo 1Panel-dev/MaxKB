@@ -11,7 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from common.config.embedding_config import ModelManage
 from common.event import ListenerManagement, UpdateProblemArgs, UpdateEmbeddingKnowledgeIdArgs, \
     UpdateEmbeddingDocumentIdArgs
-from common.utils.logger import maxkb_error_logger, maxkb_logger
+from common.utils.logger import maxkb_logger
 from knowledge.models import Document, TaskType, State
 from models_provider.tools import get_model
 from models_provider.models import Model
@@ -19,7 +19,7 @@ from ops import celery_app
 
 
 
-def get_embedding_model(model_id, exception_handler=lambda e: maxkb_error_logger.error(
+def get_embedding_model(model_id, exception_handler=lambda e: maxkb_logger.error(
     _('Failed to obtain vector model: {error} {traceback}').format(
         error=str(e),
         traceback=traceback.format_exc()
@@ -69,7 +69,7 @@ def embedding_by_document(document_id, model_id, state_list=None):
     def exception_handler(e):
         ListenerManagement.update_status(QuerySet(Document).filter(id=document_id), TaskType.EMBEDDING,
                                          State.FAILURE)
-        maxkb_error_logger.error(
+        maxkb_logger.error(
             _('Failed to obtain vector model: {error} {traceback}').format(
                 error=str(e),
                 traceback=traceback.format_exc()
@@ -111,7 +111,7 @@ def embedding_by_knowledge(knowledge_id, model_id):
             except Exception as e:
                 pass
     except Exception as e:
-        maxkb_error_logger.error(
+        maxkb_logger.error(
             _('Vectorized knowledge: {knowledge_id} error {error} {traceback}'.format(knowledge_id=knowledge_id,
                                                                                       error=str(e),
                                                                                       traceback=traceback.format_exc())))

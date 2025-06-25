@@ -9,7 +9,7 @@ from langchain_core.messages import HumanMessage
 
 from common.config.embedding_config import ModelManage
 from common.event import ListenerManagement
-from common.utils.logger import maxkb_error_logger, maxkb_logger
+from common.utils.logger import maxkb_logger
 from common.utils.page_utils import page, page_desc
 from knowledge.models import Paragraph, Document, Status, TaskType, State
 from knowledge.task.handler import save_problem
@@ -100,8 +100,8 @@ def generate_related_by_document_id(document_id, model_id, prompt, state_list=No
         ).filter(task_type_status__in=state_list, document_id=document_id)
         page_desc(query_set, 10, generate_problem, is_the_task_interrupted)
     except Exception as e:
-        maxkb_error_logger.error(f'根据文档生成问题:{document_id}出现错误{str(e)}{traceback.format_exc()}')
-        maxkb_error_logger.error(_('Generate issue based on document: {document_id} error {error}{traceback}').format(
+        maxkb_logger.error(f'根据文档生成问题:{document_id}出现错误{str(e)}{traceback.format_exc()}')
+        maxkb_logger.error(_('Generate issue based on document: {document_id} error {error}{traceback}').format(
             document_id=document_id, error=str(e), traceback=traceback.format_exc()))
     finally:
         ListenerManagement.post_update_document_status(document_id, TaskType.GENERATE_PROBLEM)

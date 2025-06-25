@@ -21,6 +21,7 @@ from docx.table import Table
 from docx.text.paragraph import Paragraph
 
 from common.handle.base_split_handle import BaseSplitHandle
+from common.utils.logger import maxkb_logger
 from common.utils.split_model import SplitModel
 from knowledge.models import File
 
@@ -79,7 +80,7 @@ def get_paragraph_element_txt(paragraph_element, doc: Document, images_list, get
             return paragraph_element.text
         return ""
     except Exception as e:
-        logging.getLogger("max_kb_error").error(f'Error getting paragraph element text: {e}')
+        maxkb_logger.error(f'Error getting paragraph element text: {e}')
     return ""
 
 

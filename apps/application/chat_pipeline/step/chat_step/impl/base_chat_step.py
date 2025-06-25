@@ -26,6 +26,7 @@ from application.chat_pipeline.pipeline_manage import PipelineManage
 from application.chat_pipeline.step.chat_step.i_chat_step import IChatStep, PostResponseHandler
 from application.flow.tools import Reasoning
 from application.models import ApplicationChatUserStats, ChatUserType
+from common.utils.logger import maxkb_logger
 from models_provider.tools import get_model_instance_by_model_workspace_id
 
 
@@ -135,7 +136,7 @@ def event_content(response,
                                                                       'node_type': 'ai-chat-node'})
         add_access_num(client_id, client_type, manage.context.get('application_id'))
     except Exception as e:
-        logging.getLogger("max_kb_error").error(f'{str(e)}:{traceback.format_exc()}')
+        maxkb_logger.error(f'{str(e)}:{traceback.format_exc()}')
         all_text = 'Exception:' + str(e)
         write_context(step, manage, 0, 0, all_text)
         post_response_handler.handler(chat_id, chat_record_id, paragraph_list, problem_text,

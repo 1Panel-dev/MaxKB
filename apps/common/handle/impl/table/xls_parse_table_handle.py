@@ -4,7 +4,7 @@ import logging
 import xlrd
 
 from common.handle.base_parse_table_handle import BaseParseTableHandle
-from common.utils.logger import maxkb_error_logger
+from common.utils.logger import maxkb_logger
 
 
 class XlsParseTableHandle(BaseParseTableHandle):
@@ -55,7 +55,7 @@ class XlsParseTableHandle(BaseParseTableHandle):
                 result.append({'name': sheet.name, 'paragraphs': paragraphs})
 
         except BaseException as e:
-            maxkb_error_logger.error(f'excel split handle error: {e}')
+            maxkb_logger.error(f'excel split handle error: {e}')
             return [{'name': file.name, 'paragraphs': []}]
         return result
 

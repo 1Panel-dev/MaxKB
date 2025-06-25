@@ -21,7 +21,7 @@ from common.config.embedding_config import VectorStore
 from common.db.search import native_search, get_dynamics_model, native_update
 from common.utils.common import get_file_content
 from common.utils.lock import try_lock, un_lock
-from common.utils.logger import maxkb_logger, maxkb_error_logger
+from common.utils.logger import maxkb_logger
 from common.utils.page_utils import page_desc
 from knowledge.models import Paragraph, Status, Document, ProblemParagraphMapping, TaskType, State,SourceType, SearchMode
 from maxkb.conf import (PROJECT_DIR)
@@ -86,7 +86,7 @@ class ListenerManagement:
             ListenerManagement.embedding_by_paragraph_data_list(data_list, paragraph_id_list=paragraph_id_list,
                                                                 embedding_model=embedding_model)
         except Exception as e:
-            maxkb_error_logger.error(_('Query vector data: {paragraph_id_list} error {error} {traceback}').format(
+            maxkb_logger.error(_('Query vector data: {paragraph_id_list} error {error} {traceback}').format(
                 paragraph_id_list=paragraph_id_list, error=str(e), traceback=traceback.format_exc()))
 
     @staticmethod
@@ -103,7 +103,7 @@ class ListenerManagement:
             # 批量向量化
             VectorStore.get_embedding_vector().batch_save(data_list, embedding_model, is_save_function)
         except Exception as e:
-            maxkb_error_logger.error(_('Vectorized paragraph: {paragraph_id_list} error {error} {traceback}').format(
+            maxkb_logger.error(_('Vectorized paragraph: {paragraph_id_list} error {error} {traceback}').format(
                 paragraph_id_list=paragraph_id_list, error=str(e), traceback=traceback.format_exc()))
             status = Status.error
         finally:
@@ -143,7 +143,7 @@ class ListenerManagement:
             ListenerManagement.update_status(QuerySet(Paragraph).filter(id=paragraph_id), TaskType.EMBEDDING,
                                              State.SUCCESS)
         except Exception as e:
-            maxkb_error_logger.error(_('Vectorized paragraph: {paragraph_id} error {error} {traceback}').format(
+            maxkb_logger.error(_('Vectorized paragraph: {paragraph_id} error {error} {traceback}').format(
                 paragraph_id=paragraph_id, error=str(e), traceback=traceback.format_exc()))
             ListenerManagement.update_status(QuerySet(Paragraph).filter(id=paragraph_id), TaskType.EMBEDDING,
                                              State.FAILURE)
@@ -284,7 +284,7 @@ class ListenerManagement:
                                                                            document_id)),
                       is_the_task_interrupted)
         except Exception as e:
-            maxkb_error_logger.error(_('Vectorized document: {document_id} error {error} {traceback}').format(
+            maxkb_logger.error(_('Vectorized document: {document_id} error {error} {traceback}').format(
                 document_id=document_id, error=str(e), traceback=traceback.format_exc()))
         finally:
             ListenerManagement.post_update_document_status(document_id, TaskType.EMBEDDING)
@@ -308,7 +308,7 @@ class ListenerManagement:
             for document in document_list:
                 ListenerManagement.embedding_by_document(document.id, embedding_model=embedding_model)
         except Exception as e:
-            maxkb_error_logger.error(_('Vectorized knowledge: {knowledge_id} error {error} {traceback}').format(
+            maxkb_logger.error(_('Vectorized knowledge: {knowledge_id} error {error} {traceback}').format(
                 knowledge_id=knowledge_id, error=str(e), traceback=traceback.format_exc()))
         finally:
             maxkb_logger.info(_('End--->Embedding knowledge: {knowledge_id}').format(knowledge_id=knowledge_id))

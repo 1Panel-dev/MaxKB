@@ -647,7 +647,7 @@ class KnowledgeSerializer(serializers.Serializer):
                                           'selector': knowledge.meta.get('selector')},
                                  'type': KnowledgeType.WEB}, with_valid=True)
                     except Exception as e:
-                        logging.getLogger("max_kb_error").error(f'{str(e)}:{traceback.format_exc()}')
+                        maxkb_logger.error(f'{str(e)}:{traceback.format_exc()}')
 
             return handler
 

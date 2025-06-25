@@ -9,7 +9,7 @@ from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 
 from common.utils.fork import ChildLink, Fork
-from common.utils.logger import maxkb_error_logger
+from common.utils.logger import maxkb_logger
 from common.utils.split_model import get_split_model
 from knowledge.models.knowledge import KnowledgeType, Document, Knowledge, Status
 
@@ -32,7 +32,7 @@ def get_save_handler(knowledge_id, selector):
                     'type': KnowledgeType.WEB
                 }, with_valid=True)
             except Exception as e:
-                logging.getLogger("max_kb_error").error(f'{str(e)}:{traceback.format_exc()}')
+                maxkb_logger.error(f'{str(e)}:{traceback.format_exc()}')
 
     return handler
 
@@ -64,7 +64,7 @@ def get_sync_handler(knowledge_id):
                         'type': KnowledgeType.WEB
                     }, with_valid=True)
             except Exception as e:
-                logging.getLogger("max_kb_error").error(f'{str(e)}:{traceback.format_exc()}')
+                maxkb_logger.error(f'{str(e)}:{traceback.format_exc()}')
 
     return handler
 
@@ -82,7 +82,7 @@ def get_sync_web_document_handler(knowledge_id):
                      'meta': {'source_url': source_url, 'selector': selector},
                      'type': KnowledgeType.WEB}, with_valid=True)
             except Exception as e:
-                logging.getLogger("max_kb_error").error(f'{str(e)}:{traceback.format_exc()}')
+                maxkb_logger.error(f'{str(e)}:{traceback.format_exc()}')
         else:
             Document(name=source_url[0:128],
                      knowledge_id=knowledge_id,
@@ -116,4 +116,4 @@ def save_problem(knowledge_id, document_id, paragraph_id, problem):
             }
         ).save(instance={"content": problem}, with_valid=True)
     except Exception as e:
-        maxkb_error_logger.error(_('Association problem failed {error}').format(error=str(e)))
+        maxkb_logger.error(_('Association problem failed {error}').format(error=str(e)))

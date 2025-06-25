@@ -21,6 +21,7 @@ from openpyxl.packaging.relationship import get_rels_path, get_dependents
 from openpyxl.xml.constants import SHEET_DRAWING_NS, REL_NS, SHEET_MAIN_NS
 
 from common.handle.base_parse_qa_handle import get_title_row_index_dict, get_row_value
+from common.utils.logger import maxkb_logger
 from knowledge.models import File
 
 
@@ -75,7 +76,7 @@ def handle_images(deps, archive: ZipFile) -> []:
             image_io = archive.read(dep.target)
             image = openpyxl_Image(BytesIO(image_io))
         except Exception as e:
-            logging.getLogger("max_kb_error").error(f"Error reading image {dep.target}: {e}")
+            maxkb_logger.error(f"Error reading image {dep.target}: {e}")
             continue
         image.embed = dep.id  # 文件rId
         image.target = dep.target  # 文件地址
