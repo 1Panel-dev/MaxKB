@@ -19,10 +19,6 @@ const ApplicationDetailRouter = {
         active: 'overview',
         parentPath: '/application/:id/:type',
         parentName: 'ApplicationDetail',
-        permission: [
-          PermissionConst.APPLICATION_OVERVIEW_READ.getWorkspacePermission,
-          RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-        ],
       },
       component: () => import('@/views/application-overview/index.vue'),
     },
@@ -52,18 +48,6 @@ const ApplicationDetailRouter = {
         permission: [EditionConst.IS_PE, EditionConst.IS_EE],
       },
       component: () => import('@/views/application/ApplicationAccess.vue'),
-    },
-    {
-      path: 'hit-test',
-      name: 'AppHitTest',
-      meta: {
-        icon: 'app-hit-test',
-        title: 'views.application.hitTest.title',
-        active: 'hit-test',
-        parentPath: '/application/:id/:type',
-        parentName: 'ApplicationDetail',
-      },
-      component: () => import('@/views/hit-test/index.vue'),
     },
     {
       path: 'chat-user',
