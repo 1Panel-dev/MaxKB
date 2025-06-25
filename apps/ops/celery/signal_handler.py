@@ -10,6 +10,7 @@ from celery.signals import (
 from django.core.cache import cache
 from django_celery_beat.models import PeriodicTask
 
+from common.utils.logger import maxkb_logger
 from .decorator import get_after_app_ready_tasks, get_after_app_shutdown_clean_tasks
 from .logger import CeleryThreadTaskFileHandler
 
@@ -65,7 +66,7 @@ def add_celery_logger_handler(sender=None, logger=None, loglevel=None, format=No
 
 @task_revoked.connect
 def on_task_revoked(request, terminated, signum, expired, **kwargs):
-    logging.getLogger('max_kb').info('task_revoked', terminated)
+    maxkb_logger.info('task_revoked', terminated)
 
 
 @task_prerun.connect
