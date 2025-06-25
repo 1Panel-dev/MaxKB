@@ -1,5 +1,7 @@
 import { hasPermission, set_next_route } from '@/utils/permission/index'
+import { getChildRouteList } from '@/router/common'
 import NProgress from 'nprogress'
+import { getPermissionRoute } from '@/router/common'
 import {
   createRouter,
   createWebHistory,
@@ -47,44 +49,16 @@ router.beforeEach(
     if (to.meta.permission ? hasPermission(to.meta.permission as any, 'OR') : true) {
       next()
     } else {
-      console.log('s')
-      if (to.meta.get_permission_route) {
-        const t = to.meta.get_permission_route()
-        console.log(t)
-        next(t)
-        return
-      }
-      // 如果没有权限则直接取404页面
-      next({ path: '/no-permission' })
+      const n = getPermissionRoute(routes, to)
+      next(n)
     }
   },
 )
 router.afterEach(() => {
   NProgress.done()
 })
-
 export const getChildRouteListByPathAndName = (path: any, name?: RouteRecordName | any) => {
   return getChildRouteList(routes, path, name)
-}
-
-export const getChildRouteList: (
-  routeList: Array<RouteRecordRaw>,
-  path: string,
-  name?: RouteRecordName | null | undefined,
-) => Array<RouteRecordRaw> = (routeList, path, name) => {
-  for (let index = 0; index < routeList.length; index++) {
-    const route = routeList[index]
-    if (name === route.name && path === route.path) {
-      return route.children || []
-    }
-    if (route.children && route.children.length > 0) {
-      const result = getChildRouteList(route.children, path, name)
-      if (result && result?.length > 0) {
-        return result
-      }
-    }
-  }
-  return []
 }
 
 export default router

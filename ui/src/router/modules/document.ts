@@ -19,6 +19,7 @@ const DocumentRouter = {
         active: 'document',
         parentPath: '/knowledge/:id/:folderId',
         parentName: 'KnowledgeDetail',
+        group: 'KnowledgeDetail',
         permission: [
           RoleConst.ADMIN,
           RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
@@ -43,6 +44,7 @@ const DocumentRouter = {
         active: 'problem',
         parentPath: '/knowledge/:id/:folderId',
         parentName: 'KnowledgeDetail',
+        group: 'KnowledgeDetail',
         permission: [
           RoleConst.ADMIN,
           RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
@@ -66,6 +68,7 @@ const DocumentRouter = {
         active: 'hit-test',
         parentPath: '/knowledge/:id/:folderId',
         parentName: 'KnowledgeDetail',
+        group: 'KnowledgeDetail',
       },
       component: () => import('@/views/hit-test/index.vue'),
     },
@@ -80,6 +83,7 @@ const DocumentRouter = {
         parentPath: '/knowledge/:id/:folderId',
         parentName: 'KnowledgeDetail',
         resourceType: ChatUserResourceEnum.KNOWLEDGE,
+        group: 'KnowledgeDetail',
         permission: [
           RoleConst.ADMIN,
           RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
@@ -104,6 +108,7 @@ const DocumentRouter = {
         active: 'setting',
         parentPath: '/knowledge/:id/:folderId',
         parentName: 'KnowledgeDetail',
+        group: 'KnowledgeDetail',
         permission: [
           RoleConst.ADMIN,
           RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,

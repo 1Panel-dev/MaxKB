@@ -11,6 +11,7 @@ const ModelRouter = {
       PermissionConst.MODEL_READ.getWorkspacePermission,
       PermissionConst.MODEL_READ.getWorkspacePermissionWorkspaceManageRole,
     ],
+    group: 'workspace',
     order: 4,
   },
   redirect: '/model',
@@ -22,6 +23,7 @@ const ModelRouter = {
       meta: {
         title: '模型主页',
         activeMenu: '/model',
+        sameRoute: 'model',
       },
       component: () => import('@/views/model/index.vue'),
     },
