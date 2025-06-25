@@ -565,7 +565,7 @@
         {{ $t('views.document.setting.cancelGenerate') }}
       </el-button>
       <el-text type="info" class="secondary ml-24">
-        {{ $t('views.document.selected') }} {{ multipleSelection.length }}
+        {{ $t('common.selected') }} {{ multipleSelection.length }}
         {{ $t('views.document.items') }}
       </el-text>
       <el-button class="ml-16" type="primary" link @click="clearSelection">

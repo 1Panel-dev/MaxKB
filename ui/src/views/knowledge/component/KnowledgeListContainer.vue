@@ -191,7 +191,7 @@
                 </template>
                 <template #tag>
                   <el-tag v-if="isShared || isSystemShare" type="info" class="info-tag">
-                    {{ t('views.system.shared.label') }}
+                    {{ t('views.shared.title') }}
                   </el-tag>
                 </template>
                 <template #footer>
@@ -246,7 +246,7 @@
                             v-if="isSystemShare"
                             icon="Lock"
                             @click.stop="openAuthorizedWorkspaceDialog(item)"
-                            >{{ $t('views.system.shared.authorized_workspace') }}</el-dropdown-item
+                            >{{ $t('views.shared.authorized_workspace') }}</el-dropdown-item
                           >
                           <el-dropdown-item
                             icon="Setting"

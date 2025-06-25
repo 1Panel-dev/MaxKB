@@ -221,16 +221,9 @@ const validate = () => {
 }
 
 function getSelectModel() {
-  if (id) {
-    //todo
-    applicationApi.getApplicationModel(id).then((res: any) => {
-      modelOptions.value = groupBy(res?.data, 'provider')
-    })
-  } else {
-    model.asyncGetSelectModel().then((res: any) => {
-      modelOptions.value = groupBy(res?.data, 'provider')
-    })
-  }
+  model.asyncGetSelectModel({ model_type: 'LLM' }).then((res: any) => {
+    modelOptions.value = groupBy(res?.data, 'provider')
+  })
 }
 
 onMounted(() => {

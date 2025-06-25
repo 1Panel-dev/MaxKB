@@ -169,17 +169,10 @@ const form_data = computed({
   },
 })
 
-// todo
 function getSelectModel() {
-  if (id) {
-    applicationApi.getApplicationTTSModel(id).then((res: any) => {
-      modelOptions.value = groupBy(res?.data, 'provider')
-    })
-  } else {
-    model.asyncGetSelectModel().then((res: any) => {
-      modelOptions.value = groupBy(res?.data, 'provider')
-    })
-  }
+  model.asyncGetSelectModel({ model_type: 'TTS' }).then((res: any) => {
+    modelOptions.value = groupBy(res?.data, 'provider')
+  })
 }
 
 const openTTSParamSettingDialog = () => {

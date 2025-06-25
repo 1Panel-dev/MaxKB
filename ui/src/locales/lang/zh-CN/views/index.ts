@@ -15,9 +15,8 @@ import applicationWorkflow from './application-workflow'
 import paragraph from './paragraph'
 import chatLog from './chat-log'
 import chatUser from './chat-user'
-// import notFound from './404'
-
 import operateLog from './operate-log'
+import shared from './shared'
 export default {
   login,
   model,
@@ -36,7 +35,6 @@ export default {
   paragraph,
   chatLog,
   chatUser,
-  // notFound,
-
-  operateLog
+  operateLog,
+  shared
 }

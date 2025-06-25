@@ -131,7 +131,7 @@
           {{ $t('common.delete') }}
         </el-button>
         <span class="ml-8">
-          {{ $t('views.document.selected') }} {{ multipleSelection.length }}
+          {{ $t('common.selected') }} {{ multipleSelection.length }}
           {{ $t('views.document.items') }}
         </span>
       </div>

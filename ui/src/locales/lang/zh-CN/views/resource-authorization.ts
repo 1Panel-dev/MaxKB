@@ -1,5 +1,3 @@
-import role from './role'
-
 export default {
   title: '资源授权',
   member: '成员',

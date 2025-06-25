@@ -132,7 +132,7 @@
       </div>
     </template>
     <template v-else>
-      <div class="p-8-12"  v-if="!form_data.mcp_tool">
+      <div class="p-8-12" v-if="!form_data.mcp_tool">
         <el-text type="info">{{ $t('common.noData') }}</el-text>
       </div>
       <div v-else class="border-r-4 p-8-12 mb-8 layout-bg lighter">
@@ -243,7 +243,7 @@ const form = {
   mcp_server: '',
   tool_params: {},
   tool_form_field: [],
-  params_nested: ''
+  params_nested: '',
 }
 
 function submitDialog(val: string) {
@@ -262,26 +262,26 @@ function getTools() {
     return
   }
   // todo
-  // applicationApi
-  //   .getMcpTools({ mcp_servers: form_data.value.mcp_servers }, loading)
-  //   .then((res: any) => {
-  //     form_data.value.mcp_tools = res.data
-  //     MsgSuccess(t('views.applicationWorkflow.nodes.mcpNode.getToolsSuccess'))
-  //     // 修改了json，刷新mcp_server
-  //     form_data.value.mcp_server = form_data.value.mcp_tools.filter(
-  //       (item: any) => item.name === form_data.value.mcp_tool
-  //     )[0].server
-  //   })
+  applicationApi
+    .getMcpTools({ mcp_servers: form_data.value.mcp_servers }, loading)
+    .then((res: any) => {
+      form_data.value.mcp_tools = res.data
+      MsgSuccess(t('views.applicationWorkflow.nodes.mcpNode.getToolsSuccess'))
+      // 修改了json，刷新mcp_server
+      form_data.value.mcp_server = form_data.value.mcp_tools.filter(
+        (item: any) => item.name === form_data.value.mcp_tool,
+      )[0].server
+    })
 }
 
 function changeTool() {
   form_data.value.mcp_server = form_data.value.mcp_tools.filter(
-    (item: any) => item.name === form_data.value.mcp_tool
+    (item: any) => item.name === form_data.value.mcp_tool,
   )[0].server
   // console.log(form_data.value.mcp_server)
 
   const args_schema = form_data.value.mcp_tools.filter(
-    (item: any) => item.name === form_data.value.mcp_tool
+    (item: any) => item.name === form_data.value.mcp_tool,
   )[0].args_schema
   form_data.value.tool_form_field = []
   for (const item in args_schema.properties) {
@@ -308,7 +308,7 @@ function changeTool() {
             input_type: 'TooltipLabel',
             label: item2,
             attrs: { tooltip: params[item2].description },
-            props_info: {}
+            props_info: {},
           },
           input_type: input_type,
           source: 'referencing',
@@ -318,10 +318,10 @@ function changeTool() {
               {
                 required: args_schema.properties[item].required?.indexOf(item2) !== -1,
                 message: t('dynamicsForm.tip.requiredMessage'),
-                trigger: 'blur'
-              }
-            ]
-          }
+                trigger: 'blur',
+              },
+            ],
+          },
         })
       }
     } else {
@@ -345,7 +345,7 @@ function changeTool() {
           input_type: 'TooltipLabel',
           label: item,
           attrs: { tooltip: args_schema.properties[item].description },
-          props_info: {}
+          props_info: {},
         },
         input_type: input_type,
         source: 'referencing',
@@ -355,10 +355,10 @@ function changeTool() {
             {
               required: args_schema.required?.indexOf(item) !== -1,
               message: t('dynamicsForm.tip.requiredMessage'),
-              trigger: 'blur'
-            }
-          ]
-        }
+              trigger: 'blur',
+            },
+          ],
+        },
       })
     }
   }
@@ -381,7 +381,7 @@ const form_data = computed({
   },
   set: (value) => {
     set(props.nodeModel.properties, 'node_data', value)
-  }
+  },
 })
 
 const replyNodeFormRef = ref()
@@ -399,7 +399,7 @@ const validate = async () => {
           if (!form_data.value.tool_params[form_data.value.params_nested][item]) {
             return Promise.reject({
               node: props.nodeModel,
-              errMessage: item + t('dynamicsForm.tip.requiredMessage')
+              errMessage: item + t('dynamicsForm.tip.requiredMessage'),
             })
           }
         } else {
@@ -407,7 +407,7 @@ const validate = async () => {
           if (!form_data.value.tool_params[item]) {
             return Promise.reject({
               node: props.nodeModel,
-              errMessage: item + t('dynamicsForm.tip.requiredMessage')
+              errMessage: item + t('dynamicsForm.tip.requiredMessage'),
             })
           }
         }
@@ -419,13 +419,13 @@ const validate = async () => {
     if (!form.mcp_servers) {
       return Promise.reject({
         node: props.nodeModel,
-        errMessage: t('views.applicationWorkflow.nodes.mcpNode.mcpServerTip')
+        errMessage: t('views.applicationWorkflow.nodes.mcpNode.mcpServerTip'),
       })
     }
     if (!form.mcp_tool) {
       return Promise.reject({
         node: props.nodeModel,
-        errMessage: t('views.applicationWorkflow.nodes.mcpNode.mcpToolTip')
+        errMessage: t('views.applicationWorkflow.nodes.mcpNode.mcpToolTip'),
       })
     }
   }

@@ -1,9 +1,9 @@
 <template>
   <div class="theme-setting p-16-24" v-loading="loading">
-    <h4 class="mb-16">{{ $t('views.system.theme.title') }}</h4>
+    <h4 class="mb-16">{{ $t('theme.title') }}</h4>
     <el-scrollbar>
       <el-card style="--el-card-padding: 16px">
-        <h5 class="mb-16">{{ $t('views.system.theme.platformDisplayTheme') }}</h5>
+        <h5 class="mb-16">{{ $t('theme.platformDisplayTheme') }}</h5>
         <el-radio-group
           v-model="themeRadio"
           class="app-radio-button-group"
@@ -12,21 +12,21 @@
           <template v-for="(item, index) in themeList" :key="index">
             <el-radio-button :label="item.label" :value="item.value" />
           </template>
-          <el-radio-button :label="$t('views.system.theme.custom')" value="custom" />
+          <el-radio-button :label="$t('theme.custom')" value="custom" />
         </el-radio-group>
         <div v-if="themeRadio === 'custom'">
-          <h5 class="mt-16 mb-8">{{ $t('views.system.theme.customTheme') }}</h5>
+          <h5 class="mt-16 mb-8">{{ $t('theme.customTheme') }}</h5>
           <el-color-picker v-model="customColor" @change="customColorHandle" />
         </div>
       </el-card>
 
       <el-card style="--el-card-padding: 16px" class="mt-16">
-        <h5 class="mb-16">{{ $t('views.system.theme.platformLoginSettings') }}</h5>
+        <h5 class="mb-16">{{ $t('theme.platformLoginSettings') }}</h5>
         <el-card shadow="never" class="layout-bg">
           <div class="flex-between">
-            <h5 class="mb-16">{{ $t('views.system.theme.pagePreview') }}</h5>
+            <h5 class="mb-16">{{ $t('theme.pagePreview') }}</h5>
             <el-button type="primary" link @click="resetForm('login')">
-              {{ $t('views.system.theme.restoreDefaults') }}
+              {{ $t('theme.restoreDefaults') }}
             </el-button>
           </div>
           <el-scrollbar>
@@ -39,7 +39,7 @@
                   <div class="theme-form">
                     <el-card shadow="never" class="mb-8">
                       <div class="flex-between mb-8">
-                        <span class="lighter">{{ $t('views.system.theme.websiteLogo') }}</span>
+                        <span class="lighter">{{ $t('theme.websiteLogo') }}</span>
                         <el-upload
                           ref="uploadRef"
                           action="#"
@@ -51,17 +51,17 @@
                           "
                         >
                           <el-button size="small">
-                            {{ $t('views.system.theme.replacePicture') }}
+                            {{ $t('theme.replacePicture') }}
                           </el-button>
                         </el-upload>
                       </div>
                       <el-text type="info" size="small"
-                        >{{ $t('views.system.theme.websiteLogoTip') }}
+                        >{{ $t('theme.websiteLogoTip') }}
                       </el-text>
                     </el-card>
                     <el-card shadow="never" class="mb-8">
                       <div class="flex-between mb-8">
-                        <span class="lighter"> {{ $t('views.system.theme.loginLogo') }}</span>
+                        <span class="lighter"> {{ $t('theme.loginLogo') }}</span>
                         <el-upload
                           ref="uploadRef"
                           action="#"
@@ -73,17 +73,17 @@
                           "
                         >
                           <el-button size="small">
-                            {{ $t('views.system.theme.replacePicture') }}
+                            {{ $t('theme.replacePicture') }}
                           </el-button>
                         </el-upload>
                       </div>
                       <el-text type="info" size="small"
-                        >{{ $t('views.system.theme.loginLogoTip') }}
+                        >{{ $t('theme.loginLogoTip') }}
                       </el-text>
                     </el-card>
                     <el-card shadow="never" class="mb-8">
                       <div class="flex-between mb-8">
-                        <span class="lighter">{{ $t('views.system.theme.loginBackground') }}</span>
+                        <span class="lighter">{{ $t('theme.loginBackground') }}</span>
                         <el-upload
                           ref="uploadRef"
                           action="#"
@@ -95,12 +95,12 @@
                           "
                         >
                           <el-button size="small">
-                            {{ $t('views.system.theme.replacePicture') }}
+                            {{ $t('theme.replacePicture') }}
                           </el-button>
                         </el-upload>
                       </div>
                       <el-text type="info" size="small">
-                        {{ $t('views.system.theme.loginBackgroundTip') }}
+                        {{ $t('theme.loginBackgroundTip') }}
                       </el-text>
                     </el-card>
 
@@ -112,26 +112,26 @@
                       :rules="rules"
                       @submit.prevent
                     >
-                      <el-form-item :label="$t('views.system.theme.websiteName')" prop="title">
+                      <el-form-item :label="$t('theme.websiteName')" prop="title">
                         <el-input
                           v-model="themeForm.title"
-                          :placeholder="$t('views.system.theme.websiteNamePlaceholder')"
+                          :placeholder="$t('theme.websiteNamePlaceholder')"
                         >
                         </el-input>
                         <el-text type="info"
-                          >{{ $t('views.system.theme.websiteNameTip') }}
+                          >{{ $t('theme.websiteNameTip') }}
                         </el-text>
                       </el-form-item>
-                      <el-form-item :label="$t('views.system.theme.websiteSlogan')" prop="slogan">
+                      <el-form-item :label="$t('theme.websiteSlogan')" prop="slogan">
                         <el-input
                           v-model="themeForm.slogan"
-                          :placeholder="$t('views.system.theme.websiteSloganPlaceholder')"
+                          :placeholder="$t('theme.websiteSloganPlaceholder')"
                           maxlength="64"
                           show-word-limit
                         >
                         </el-input>
                         <el-text type="info"
-                          >{{ $t('views.system.theme.websiteSloganTip') }}
+                          >{{ $t('theme.websiteSloganTip') }}
                         </el-text>
                       </el-form-item>
                     </el-form>
@@ -141,17 +141,17 @@
             </div>
           </el-scrollbar>
           <div class="mt-16">
-            <el-text type="info">{{ $t('views.system.theme.logoDefaultTip') }}</el-text>
+            <el-text type="info">{{ $t('theme.logoDefaultTip') }}</el-text>
           </div>
         </el-card>
       </el-card>
       <el-card style="--el-card-padding: 16px" class="mt-16">
-        <h5 class="mb-16">{{ $t('views.system.theme.platformSetting') }}</h5>
+        <h5 class="mb-16">{{ $t('theme.platformSetting') }}</h5>
         <el-card shadow="never" class="layout-bg">
           <div class="flex-between">
-            <h5 class="mb-16">{{ $t('views.system.theme.pagePreview') }}</h5>
+            <h5 class="mb-16">{{ $t('theme.pagePreview') }}</h5>
             <el-button type="primary" link @click="resetForm('platform')">
-              {{ $t('views.system.theme.restoreDefaults') }}
+              {{ $t('theme.restoreDefaults') }}
             </el-button>
           </div>
           <el-scrollbar>
@@ -198,36 +198,36 @@
                     <div>
                       <el-checkbox
                         v-model="themeForm.showUserManual"
-                        :label="$t('views.system.theme.showUserManual')"
+                        :label="$t('theme.showUserManual')"
                       />
                       <div class="ml-24">
                         <el-input
                           v-model="themeForm.userManualUrl"
-                          :placeholder="$t('views.system.theme.urlPlaceholder')"
+                          :placeholder="$t('theme.urlPlaceholder')"
                         />
                       </div>
                     </div>
                     <div class="mt-4">
                       <el-checkbox
                         v-model="themeForm.showForum"
-                        :label="$t('views.system.theme.showForum')"
+                        :label="$t('theme.showForum')"
                       />
                       <div class="ml-24">
                         <el-input
                           v-model="themeForm.forumUrl"
-                          :placeholder="$t('views.system.theme.urlPlaceholder')"
+                          :placeholder="$t('theme.urlPlaceholder')"
                         />
                       </div>
                     </div>
                     <div class="mt-4">
                       <el-checkbox
                         v-model="themeForm.showProject"
-                        :label="$t('views.system.theme.showProject')"
+                        :label="$t('theme.showProject')"
                       />
                       <div class="ml-24">
                         <el-input
                           v-model="themeForm.projectUrl"
-                          :placeholder="$t('views.system.theme.urlPlaceholder')"
+                          :placeholder="$t('theme.urlPlaceholder')"
                         />
                       </div>
                     </div>
@@ -237,15 +237,15 @@
             </div>
           </el-scrollbar>
           <div class="mt-16">
-            <el-text type="info">{{ $t('views.system.theme.defaultTip') }}</el-text>
+            <el-text type="info">{{ $t('theme.defaultTip') }}</el-text>
           </div>
         </el-card>
       </el-card>
     </el-scrollbar>
     <div class="theme-setting__operate w-full p-16-24">
-      <el-button @click="resetTheme">{{ $t('views.system.theme.abandonUpdate') }}</el-button>
+      <el-button @click="resetTheme">{{ $t('theme.abandonUpdate') }}</el-button>
       <el-button type="primary" @click="updateTheme(themeFormRef)">
-        {{ $t('views.system.theme.saveAndApply') }}
+        {{ $t('theme.saveAndApply') }}
       </el-button>
     </div>
   </div>
@@ -284,7 +284,7 @@ const themeForm = ref<any>({
   loginLogo: '',
   loginImage: '',
   title: 'MaxKB',
-  slogan: t('views.system.theme.defaultSlogan'),
+  slogan: t('theme.defaultSlogan'),
   ...defaultPlatformSetting,
 })
 const themeRadio = ref('')
@@ -292,10 +292,10 @@ const customColor = ref('')
 
 const rules = reactive<FormRules>({
   title: [
-    { required: true, message: t('views.system.theme.websiteNamePlaceholder'), trigger: 'blur' },
+    { required: true, message: t('theme.websiteNamePlaceholder'), trigger: 'blur' },
   ],
   slogan: [
-    { required: true, message: t('views.system.theme.websiteSloganPlaceholder'), trigger: 'blur' },
+    { required: true, message: t('theme.websiteSloganPlaceholder'), trigger: 'blur' },
   ],
 })
 
@@ -303,7 +303,7 @@ const onChange = (file: any, fileList: UploadFiles, attr: string) => {
   const isLimit = file?.size / 1024 / 1024 < 10
   if (!isLimit) {
     // @ts-ignore
-    MsgError(t('views.system.theme.fileMessageError'))
+    MsgError(t('theme.fileMessageError'))
     return false
   } else {
     themeForm.value[attr] = file.raw
@@ -356,7 +356,7 @@ const updateTheme = async (formEl: FormInstance | undefined, test?: string) => {
       ThemeApi.postThemeInfo(fd, loading).then((res) => {
         theme.theme()
         cloneTheme.value = cloneDeep(themeForm.value)
-        MsgSuccess(t('views.system.theme.saveSuccess'))
+        MsgSuccess(t('theme.saveSuccess'))
       })
     }
   })

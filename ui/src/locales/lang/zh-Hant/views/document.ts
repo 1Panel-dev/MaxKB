@@ -2,7 +2,6 @@ export default {
   uploadDocument: '上傳文檔',
   importDocument: '導入文檔',
   syncDocument: '同步文檔',
-  selected: '已選',
   items: '項',
   migrateDocument: '文檔遷移到',
   searchBar: {

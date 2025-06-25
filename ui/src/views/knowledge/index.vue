@@ -8,7 +8,7 @@
         :currentNodeKey="currentFolder?.id"
         @handleNodeClick="folderClickHandel"
         class="p-8"
-        :shareTitle="$t('views.system.shared.shared_knowledge')"
+        :shareTitle="$t('views.shared.shared_knowledge')"
         :showShared="permissionPrecise['is_share']()"
         @refreshTree="refreshFolder"
       />

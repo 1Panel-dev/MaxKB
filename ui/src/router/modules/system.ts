@@ -75,8 +75,8 @@ const systemRouter = {
     //   path: '/system/resource-management',
     //   name: 'resourceManagement',
     //   meta: {
-    //     icon: 'app-folder-share',
-    //     iconActive: 'app-folder-share-active',
+    //     icon: 'app-shared',
+    //     iconActive: 'app-shared-active',
     //     title: 'views.system.resource_management.label',
     //     activeMenu: '/system',
     //     parentPath: '/system',
@@ -124,9 +124,9 @@ const systemRouter = {
       path: '/system/shared',
       name: 'shared',
       meta: {
-        icon: 'app-folder-share',
-        iconActive: 'app-folder-share-active',
-        title: 'views.system.shared.shared_resources',
+        icon: 'app-shared',
+        iconActive: 'app-shared-active',
+        title: 'views.shared.shared_resources',
         activeMenu: '/system',
         parentPath: '/system',
         parentName: 'system',
@@ -196,8 +196,8 @@ const systemRouter = {
       path: '/system/chat',
       name: 'SystemChat',
       meta: {
-        icon: 'app-folder-share',
-        iconActive: 'app-folder-share-active',
+        icon: 'app-shared',
+        iconActive: 'app-shared-active',
         title: 'views.chatUser.title',
         activeMenu: '/system',
         parentPath: '/system',
@@ -287,7 +287,7 @@ const systemRouter = {
           path: '/system/setting/theme',
           name: 'theme',
           meta: {
-            title: 'views.system.theme.title',
+            title: 'theme.title',
             activeMenu: '/system',
             parentPath: '/system',
             parentName: 'system',

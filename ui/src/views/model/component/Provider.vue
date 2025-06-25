@@ -8,8 +8,8 @@
           v-if="showShared && hasPermission(EditionConst.IS_EE, 'OR')"
           :class="active?.provider === 'share' && 'active'"
         >
-          <AppIcon iconName="app-folder-share-active" style="font-size: 18px"></AppIcon>
-          <span class="ml-8 lighter">{{ $t('views.system.shared.shared_model') }}</span>
+          <AppIcon iconName="app-shared-active" style="font-size: 18px"></AppIcon>
+          <span class="ml-8 lighter">{{ $t('views.shared.shared_model') }}</span>
         </div>
         <div
           class="all-mode flex cursor"
@@ -145,7 +145,7 @@ const clickListHandle = (item: Provider) => {
 }
 
 const handleSharedNodeClick = () => {
-  emit('click', { provider: 'share', name: t('views.system.shared.shared_model') })
+  emit('click', { provider: 'share', name: t('views.shared.shared_model') })
 }
 </script>
 <style lang="scss" scoped>

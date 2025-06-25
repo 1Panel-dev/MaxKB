@@ -219,16 +219,9 @@ const form_data = computed({
 })
 
 function getSelectModel() {
-  if (id) {
-    // todo
-    applicationApi.getApplicationTTIModel(id).then((res: any) => {
-      modelOptions.value = groupBy(res?.data, 'provider')
-    })
-  } else {
-    model.asyncGetSelectModel().then((res: any) => {
-      modelOptions.value = groupBy(res?.data, 'provider')
-    })
-  }
+  model.asyncGetSelectModel({ model_type: 'TTI' }).then((res: any) => {
+    modelOptions.value = groupBy(res?.data, 'provider')
+  })
 }
 
 const model_change = () => {

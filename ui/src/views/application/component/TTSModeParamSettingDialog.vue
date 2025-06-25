@@ -43,7 +43,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import type { FormField } from '@/components/dynamics-form/type'
-import modelAPi from '@/api/model/model'
+import ModelAPI from '@/api/model/model'
 import applicationApi from '@/api/application/application'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
 import { useRoute } from 'vue-router'
@@ -63,7 +63,7 @@ const playLoading = ref(false)
 const getApi = (model_id: string, application_id?: string) => {
   return application_id
     ? applicationApi.getModelParamsForm(application_id, model_id, loading)
-    : modelAPi.getModelParamsForm(model_id, loading)
+    : ModelAPI.getModelParamsForm(model_id, loading)
 }
 const open = (model_id: string, application_id?: string, model_setting_data?: any) => {
   form_data.value = {}

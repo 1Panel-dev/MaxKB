@@ -2,8 +2,8 @@
   <el-row class="not-found-container">
     <el-col class="img" :xs="0" :sm="0" :md="12" :lg="12" :xl="12"> </el-col>
     <el-col class="message-container" :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-      <div class="title">{{ $t('views.notFound.title') }}</div>
-      <div class="message">{{ $t('views.notFound.message') }}</div>
+      <div class="title">{{ $t('views.common.notFound.title') }}</div>
+      <div class="message">{{ $t('views.common.notFound.message') }}</div>
       <!-- TODO 暂时不处理 -->
       <!-- <div class="operate"><el-button type="primary" @click="router.push('/')">{{ $t('views.notFound.operate') }}</el-button></div> -->
     </el-col>

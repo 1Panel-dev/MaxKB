@@ -1,40 +1,40 @@
-import notFound from './404'
-import application from './application'
-import role from './role'
-import workspace from './workspace'
-import applicationOverview from './application-overview'
+import login from './login'
+import model from './model'
 import knowledge from './knowledge'
-import system from './system'
 import tool from './tool'
+import document from './document'
+import system from './system'
 import userManage from './user-manage'
 import resourceAuthorization from './resource-authorization'
-import model from './model'
-import document from './document'
-import paragraph from './paragraph'
+import role from './role'
+import workspace from './workspace'
+import application from './application'
 import problem from './problem'
+import applicationOverview from './application-overview'
+import applicationWorkflow from './application-workflow'
+import paragraph from './paragraph'
 import chatLog from './chat-log'
 import chatUser from './chat-user'
-import applicationWorkflow from './application-workflow'
-import login from './login'
 import operateLog from './operate-log'
+import shared from './shared'
 export default {
-  notFound,
-  application,
-  applicationOverview,
-  system,
-  tool,
-  userManage,
-  resourceAuthorization,
+  login,
   model,
   knowledge,
-  applicationWorkflow,
+  tool,
   document,
-  paragraph,
-  problem,
-  chatLog,
-  login,
-  operateLog,
+  system,
+  userManage,
+  resourceAuthorization,
   role,
   workspace,
-  chatUser
+  application,
+  problem,
+  applicationOverview,
+  applicationWorkflow,
+  paragraph,
+  chatLog,
+  chatUser,
+  operateLog,
+  shared
 }

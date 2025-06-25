@@ -93,5 +93,11 @@ export default {
   otherSetting: '其他设置',
   username: '用户名',
   importCreate: '导入创建',
-  detail: '详情'
+  detail: '详情',
+  selected: '已选',
+  notFound: {
+    title: '404',
+    message: '无法访问应用',
+    operate: '返回首页',
+  },
 }

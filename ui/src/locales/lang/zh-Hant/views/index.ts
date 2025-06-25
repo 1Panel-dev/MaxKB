@@ -1,4 +1,3 @@
-import notFound from './404'
 import application from './application'
 import role from './role'
 import workspace from './workspace'
@@ -17,8 +16,8 @@ import chatUser from './chat-user'
 import applicationWorkflow from './application-workflow'
 import login from './login'
 import operateLog from './operate-log'
+import shared from './shared'
 export default {
-  notFound,
   application,
   applicationOverview,
   system,
@@ -36,5 +35,6 @@ export default {
   operateLog,
   role,
   workspace,
-  chatUser
+  chatUser,
+  shared
 }

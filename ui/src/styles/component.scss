@@ -202,3 +202,10 @@
     content: '';
   }
 }
+
+// checkbox 一行一个样式
+.checkbox-group-block {
+  .el-checkbox {
+    display: block;
+  }
+}

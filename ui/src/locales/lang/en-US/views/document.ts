@@ -2,7 +2,6 @@ export default {
   uploadDocument: 'Upload Document',
   importDocument: 'Import Document',
   syncDocument: 'Sync Document',
-  selected: 'Selected',
   items: 'Items',
   migrateDocument: 'Migrate to',
   searchBar: {

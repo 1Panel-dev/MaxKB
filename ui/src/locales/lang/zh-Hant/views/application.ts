@@ -121,7 +121,6 @@ export default {
   dialog: {
     addKnowledge: '新增關聯知識庫',
     addKnowledgePlaceholder: '所選知識庫必須使用相同的 Embedding 模型',
-    selected: '已選',
 
     selectSearchMode: '檢索模式',
     vectorSearch: '向量檢索',

@@ -121,8 +121,6 @@ export default {
   dialog: {
     addKnowledge: '添加关联知识库',
     addKnowledgePlaceholder: '所选知识库必须使用相同的 Embedding 模型',
-    selected: '已选',
-
     selectSearchMode: '检索模式',
     vectorSearch: '向量检索',
     vectorSearchTooltip: '向量检索是一种基于向量相似度的检索方式，适用于知识库中的大数据量场景。',

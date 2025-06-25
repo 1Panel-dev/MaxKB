@@ -239,16 +239,9 @@ const form_data = computed({
 })
 
 function getSelectModel() {
-  if (id) {
-    //todo
-    applicationApi.getApplicationImageModel(id).then((res: any) => {
-      modelOptions.value = groupBy(res?.data, 'provider')
-    })
-  } else {
-    model.asyncGetSelectModel().then((res: any) => {
-      modelOptions.value = groupBy(res?.data, 'provider')
-    })
-  }
+  model.asyncGetSelectModel({ model_type: 'IMAGE' }).then((res: any) => {
+    modelOptions.value = groupBy(res?.data, 'provider')
+  })
 }
 
 function submitSystemDialog(val: string) {

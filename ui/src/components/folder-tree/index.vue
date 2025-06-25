@@ -13,7 +13,7 @@
       class="shared-button flex cursor"
       :class="currentNodeKey === 'share' && 'active'"
     >
-      <AppIcon iconName="app-folder-share-active" style="font-size: 18px"></AppIcon>
+      <AppIcon iconName="app-shared-active" style="font-size: 18px"></AppIcon>
       <span class="ml-8 lighter">{{ shareTitle }}</span>
     </div>
     <div class="tree-height border-t" :style="treeStyle">

@@ -89,5 +89,11 @@ export default {
   otherSetting: 'Other Settings',
   username: 'username',
   importCreate: 'Import Create',
-  detail: 'Detail'
+  detail: 'Detail',
+  selected: 'Selected',
+  notFound: {
+    title: '404',
+    message: 'Unable to Access APP',
+    operate: 'Back to Home',
+  },
 }

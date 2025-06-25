@@ -89,5 +89,11 @@ export default {
   otherSetting: '其他設定',
   username: '用戶名',
   importCreate: '導入創建',
-  detail: '详情'
+  detail: '详情',
+  selected: '已選',
+  notFound: {
+    title: '404',
+    message: '無法訪問應用',
+    operate: '返回首頁',
+  },
 }

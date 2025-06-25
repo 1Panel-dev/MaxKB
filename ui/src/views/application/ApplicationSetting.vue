@@ -435,7 +435,6 @@ import AIModeParamSettingDialog from './component/AIModeParamSettingDialog.vue'
 import ParamSettingDialog from './component/ParamSettingDialog.vue'
 import AddKnowledgeDialog from './component/AddKnowledgeDialog.vue'
 import EditAvatarDialog from '@/views/application-overview/component/EditAvatarDialog.vue'
-import modelAPI from '@/api/model/model.ts'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { ApplicationFormType } from '@/api/type/application'
 import { relatedObject } from '@/utils/utils'
@@ -444,14 +443,12 @@ import useStore from '@/stores'
 import { t } from '@/locales'
 import TTSModeParamSettingDialog from './component/TTSModeParamSettingDialog.vue'
 import ReasoningParamSettingDialog from './component/ReasoningParamSettingDialog.vue'
-import { PermissionConst, RoleConst } from '@/utils/permission/data'
-import { hasPermission } from '@/utils/permission/index'
 import permissionMap from '@/permission'
 
 const route = useRoute()
 
 const apiType = computed<'workspace'>(() => {
-    return 'workspace'
+  return 'workspace'
 })
 const permissionPrecise = computed(() => {
   return permissionMap['application'][apiType.value]
@@ -652,8 +649,8 @@ function getKnowledge() {
 
 function getSelectModel() {
   loading.value = true
-  modelAPI
-    .getSelectModelList({ model_type: 'LLM' })
+  model
+    .asyncGetSelectModel({ model_type: 'LLM' })
     .then((res: any) => {
       modelOptions.value = groupBy(res?.data, 'provider')
       loading.value = false
@@ -665,8 +662,8 @@ function getSelectModel() {
 
 function getSTTModel() {
   loading.value = true
-  modelAPI
-    .getSelectModelList({ model_type: 'STT' })
+  model
+    .asyncGetSelectModel({ model_type: 'STT' })
     .then((res: any) => {
       sttModelOptions.value = groupBy(res?.data, 'provider')
       loading.value = false
@@ -678,8 +675,8 @@ function getSTTModel() {
 
 function getTTSModel() {
   loading.value = true
-  modelAPI
-    .getSelectModelList({ model_type: 'TTS' })
+  model
+    .asyncGetSelectModel({ model_type: 'TTS' })
     .then((res: any) => {
       ttsModelOptions.value = groupBy(res?.data, 'provider')
       loading.value = false

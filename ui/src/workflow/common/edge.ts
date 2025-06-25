@@ -47,11 +47,11 @@ class CustomEdge2 extends BezierEdge {
           graphModel,
           (node: any, graph: any) => {
             return { model: node, graph }
-          }
+          },
         )
       } else {
         this.customLineApp = createApp({
-          render: () => vh(CustomLine, { model: this.props.model })
+          render: () => vh(CustomLine, { model: this.props.model }),
         })
         this.customLineApp?.mount(root)
       }
@@ -101,18 +101,18 @@ class CustomEdge2 extends BezierEdge {
       animationDuration,
       animationIterationCount,
       animationTimingFunction,
-      animationDirection
+      animationDirection,
     } = animationStyle
     const positionData = {
       x: (startPoint.x + endPoint.x - customWidth) / 2,
       y: (startPoint.y + endPoint.y - customHeight) / 2,
       width: customWidth,
-      height: customHeight
+      height: customHeight,
     }
     const style = model.getEdgeStyle()
     const wrapperStyle = {
       width: customWidth,
-      height: customHeight
+      height: customHeight,
     }
 
     setTimeout(() => {
@@ -129,7 +129,7 @@ class CustomEdge2 extends BezierEdge {
       h(
         'style' as any,
         { type: 'text/css' },
-        '.lf-edge{stroke:#afafaf}.lf-edge:hover{stroke: #3370FF;}'
+        '.lf-edge{stroke:#afafaf}.lf-edge:hover{stroke: #3370FF;}',
       ),
       h('path', {
         d: path,
@@ -145,10 +145,10 @@ class CustomEdge2 extends BezierEdge {
                 animationDuration,
                 animationIterationCount,
                 animationTimingFunction,
-                animationDirection
-              }
+                animationDirection,
+              },
             }
-          : {})
+          : {}),
       }),
       h(
         'foreignObject',
@@ -156,16 +156,16 @@ class CustomEdge2 extends BezierEdge {
           ...positionData,
           y: positionData.y + 5,
           x: positionData.x + 5,
-          style: {}
+          style: {},
         },
         [
           h('div', {
             id,
             style: { ...wrapperStyle },
-            className: 'lf-custom-edge-wrapper'
-          })
-        ]
-      )
+            className: 'lf-custom-edge-wrapper',
+          }),
+        ],
+      ),
     ])
   }
 }
@@ -201,7 +201,6 @@ class CustomEdgeModel2 extends BezierEdgeModel {
    * 给边自定义方案，使其支持基于锚点的位置更新边的路径
    */
   updatePathByAnchor() {
-    // TODO
     const sourceNodeModel = this.graphModel.getNodeModelById(this.sourceNodeId)
     const sourceAnchor = sourceNodeModel
       .getDefaultAnchor()
@@ -214,12 +213,12 @@ class CustomEdgeModel2 extends BezierEdgeModel {
     if (sourceAnchor && targetAnchor) {
       const startPoint = {
         x: sourceAnchor.x,
-        y: sourceAnchor.y
+        y: sourceAnchor.y,
       }
       this.updateStartPoint(startPoint)
       const endPoint = {
         x: targetAnchor.x,
-        y: targetAnchor.y
+        y: targetAnchor.y,
       }
 
       this.updateEndPoint(endPoint)
@@ -239,5 +238,5 @@ class CustomEdgeModel2 extends BezierEdgeModel {
 export default {
   type: 'app-edge',
   view: CustomEdge2,
-  model: CustomEdgeModel2
+  model: CustomEdgeModel2,
 }

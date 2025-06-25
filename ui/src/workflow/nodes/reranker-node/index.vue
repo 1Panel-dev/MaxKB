@@ -234,16 +234,9 @@ function refreshParam(data: any) {
   set(props.nodeModel.properties.node_data, 'reranker_setting', data)
 }
 function getSelectModel() {
-  if (id) {
-    //todo
-    applicationApi.getApplicationRerankerModel(id).then((res: any) => {
-      modelOptions.value = groupBy(res?.data, 'provider')
-    })
-  } else {
-    model.asyncGetSelectModel({ model_type: 'RERANKER' }).then((res: any) => {
-      modelOptions.value = groupBy(res?.data, 'provider')
-    })
-  }
+  model.asyncGetSelectModel({ model_type: 'RERANKER' }).then((res: any) => {
+    modelOptions.value = groupBy(res?.data, 'provider')
+  })
 }
 
 const add_reranker_reference = () => {
