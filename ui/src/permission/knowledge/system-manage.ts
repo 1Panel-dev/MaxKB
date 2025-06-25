@@ -13,7 +13,6 @@ const workspace = {
       'OR',
     ),
   create: () => false,
-  single: () => false,
   sync: () => false,
   vector: () => false,
   generate: () => false,
