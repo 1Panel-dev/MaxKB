@@ -82,7 +82,6 @@
                       v-if="knowledgeDetail?.type === 2 && permissionPrecise.doc_sync(id)"
                       >{{ $t('views.document.syncDocument') }}
                     </el-dropdown-item>
-
                     <el-dropdown-item
                       divided
                       @click="deleteMulDocument"
@@ -444,6 +443,9 @@
                           >
                             <AppIcon iconName="app-export"></AppIcon>
                             {{ $t('views.document.setting.export') }} Zip
+                          </el-dropdown-item>
+                          <el-dropdown-item icon="Download" @click.stop="downloadDocument(row)">
+                            {{ $t('views.document.setting.download') }}
                           </el-dropdown-item>
                           <el-dropdown-item
                             icon="Delete"
@@ -938,6 +940,14 @@ function batchRefresh() {
   embeddingContentDialogRef.value?.open(embeddingBatchDocument)
 }
 
+function downloadDocument(row: any) {
+  loadSharedApi({ type: 'document', systemType: apiType.value })
+    .getDownloadSourceFile(id, row.id)
+    .then(() => {
+      getList()
+    })
+}
+
 function deleteDocument(row: any) {
   MsgConfirm(
     `${t('views.document.delete.confirmTitle3')} ${row.name} ?`,
@@ -1073,7 +1083,7 @@ onMounted(() => {
   }
   getList()
   // 初始化定时任务
-  // initInterval()
+  initInterval()
 })
 
 onBeforeUnmount(() => {

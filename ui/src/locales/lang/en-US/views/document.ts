@@ -14,6 +14,7 @@ export default {
     cancelVectorization: 'Cancel Vectorization',
     cancelGenerate: 'Cancel Generation',
     export: 'Export to',
+    download: 'Download',
   },
   tip: {
     saveMessage: 'Current changes have not been saved. Confirm exit?',
