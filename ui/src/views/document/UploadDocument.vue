@@ -160,6 +160,7 @@ function submit() {
     documents.push({
       name: item.name,
       paragraphs: item.content,
+      source_file_id: item.source_file_id,
     })
   })
 

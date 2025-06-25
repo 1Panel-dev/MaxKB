@@ -231,7 +231,7 @@ function splitDocument() {
 const initSplitPatternList = () => {
   loadSharedApi({ type: 'document', systemType: apiType.value })
     .listSplitPattern(id, patternLoading)
-    .then((ok) => {
+    .then((ok: any) => {
       splitPatternList.value = ok.data
     })
 }

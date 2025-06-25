@@ -14,7 +14,7 @@ const prefix: any = { _value: '/workspace/' }
 Object.defineProperty(prefix, 'value', {
   get: function () {
     const { user } = useStore()
-    return this._value + user.getWorkspaceId() + '/model'
+    return this._value + user.getWorkspaceId()
   },
 })
 
