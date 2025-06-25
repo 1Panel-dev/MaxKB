@@ -1,8 +1,9 @@
-import { Result } from '@/request/Result'
-import { get, put, post, del } from '@/request/index'
-import type { pageRequest, PageList } from '@/api/type/common'
-import type { ChatUserItem } from '@/api/type/systemChatUser'
-import type { Ref } from 'vue'
+import {Result} from '@/request/Result'
+import {get, put, post, del} from '@/request/index'
+import type {pageRequest, PageList} from '@/api/type/common'
+import type {ChatUserItem} from '@/api/type/systemChatUser'
+import type {Ref} from 'vue'
+
 const prefix = '/system/chat_user'
 
 
@@ -20,12 +21,12 @@ const getChatUserList: (loading?: Ref<boolean>) => Promise<Result<ChatUserItem[]
  */
 const getUserManage: (
   page: pageRequest,
-  username_or_nickname: string,
+  params?: any,
   loading?: Ref<boolean>,
-) => Promise<Result<PageList<ChatUserItem[]>>> = (page, username_or_nickname, loading) => {
+) => Promise<Result<PageList<ChatUserItem[]>>> = (page, params, loading) => {
   return get(
     `${prefix}/user_manage/${page.current_page}/${page.page_size}`,
-    username_or_nickname ? { username_or_nickname } : undefined,
+    params ? params : undefined,
     loading,
   )
 }

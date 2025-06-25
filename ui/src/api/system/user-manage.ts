@@ -12,12 +12,12 @@ const prefix = '/user_manage'
  */
 const getUserManage: (
   page: pageRequest,
-  email_or_username: string,
+  params?: any,
   loading?: Ref<boolean>,
-) => Promise<Result<any>> = (page, email_or_username, loading) => {
+) => Promise<Result<any>> = (page, params, loading) => {
   return get(
     `${prefix}/${page.current_page}/${page.page_size}`,
-    email_or_username ? {email_or_username} : undefined,
+    params ? params : undefined,
     loading,
   )
 }

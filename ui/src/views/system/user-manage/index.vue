@@ -14,13 +14,28 @@
             style="width: 120px"
             @change="search_type_change"
           >
-            <el-option :label="$t('views.login.loginForm.username.label')" value="name"/>
+            <el-option :label="$t('views.login.loginForm.username.label')" value="username"/>
+            <el-option :label="$t('views.userManage.userForm.nick_name.label')" value="nick_name"/>
+            <el-option :label="$t('views.login.loginForm.email.label')" value="email"/>
           </el-select>
           <el-input
-            v-if="search_type === 'name'"
-            v-model="search_form.name"
+            v-if="search_type === 'username'"
+            v-model="search_form.username"
             @change="getList"
-            :placeholder="$t('common.searchBar.placeholder')"
+            style="width: 220px"
+            clearable
+          />
+          <el-input
+            v-else-if="search_type === 'nick_name'"
+            v-model="search_form.nick_name"
+            @change="getList"
+            style="width: 220px"
+            clearable
+          />
+          <el-input
+            v-else-if="search_type === 'email'"
+            v-model="search_form.email"
+            @change="getList"
             style="width: 220px"
             clearable
           />
@@ -71,7 +86,8 @@
             {{ row.phone || '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="role" :label="$t('views.role.member.role')" min-width="100" v-if="user.isEE()">
+        <el-table-column prop="role" :label="$t('views.role.member.role')" min-width="100"
+                         v-if="user.isEE()">
           <template #default="{ row }">
             <TagGroup :tags="row.role"/>
           </template>
@@ -157,12 +173,17 @@ import {MsgSuccess, MsgConfirm} from '@/utils/message'
 import {t} from '@/locales'
 import {ValidCount, ValidType} from "@/enums/common.ts";
 import useStore from "@/stores";
+
 const {user, common} = useStore()
-const search_type = ref('name')
+const search_type = ref('username')
 const search_form = ref<{
-  name: string
+  username: string,
+  nick_name?: string,
+  email?: string
 }>({
-  name: '',
+  username: '',
+  nick_name: '',
+  email: ''
 })
 
 const UserDrawerRef = ref()
@@ -178,7 +199,7 @@ const paginationConfig = reactive({
 const userTableData = ref<any[]>([])
 
 const search_type_change = () => {
-  search_form.value = {name: ''}
+  search_form.value = {username: '', nick_name: '', email: ''}
 }
 
 function handleSizeChange() {
@@ -187,8 +208,11 @@ function handleSizeChange() {
 }
 
 function getList() {
+  const params = {
+    [search_type.value]: search_form.value[search_type.value as keyof typeof search_form.value],
+  }
   return userManageApi
-    .getUserManage(paginationConfig, search_form.value.name, loading)
+    .getUserManage(paginationConfig, params, loading)
     .then((res) => {
       userTableData.value = res.data.records
       paginationConfig.total = res.data.total
