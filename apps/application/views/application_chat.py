@@ -46,7 +46,8 @@ class ApplicationChat(APIView):
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def get(self, request: Request, workspace_id: str, application_id: str):
         return result.success(ApplicationChatQuerySerializers(
-            data={**query_params_to_single_dict(request.query_params), 'application_id': application_id,
+            data={**query_params_to_single_dict(request.query_params), 'workspace_id': workspace_id,
+                  'application_id': application_id,
                   }).list())
 
     class Page(APIView):
@@ -68,7 +69,8 @@ class ApplicationChat(APIView):
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str, application_id: str, current_page: int, page_size: int):
             return result.success(ApplicationChatQuerySerializers(
-                data={**query_params_to_single_dict(request.query_params), 'application_id': application_id,
+                data={**query_params_to_single_dict(request.query_params), 'workspace_id': workspace_id,
+                      'application_id': application_id,
                       }).page(current_page=current_page,
                               page_size=page_size))
 
@@ -91,7 +93,8 @@ class ApplicationChat(APIView):
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def post(self, request: Request, workspace_id: str, application_id: str):
             return ApplicationChatQuerySerializers(
-                data={**query_params_to_single_dict(request.query_params), 'application_id': application_id,
+                data={**query_params_to_single_dict(request.query_params), 'workspace_id': workspace_id,
+                      'application_id': application_id,
                       }).export(request.data)
 
 

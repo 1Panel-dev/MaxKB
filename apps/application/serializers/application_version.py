@@ -12,7 +12,7 @@ from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from application.models import WorkFlowVersion
+from application.models import WorkFlowVersion, Application
 from common.db.search import page_search
 from common.exception.app_exception import AppApiException
 
@@ -40,6 +40,7 @@ class ApplicationVersionSerializer(serializers.Serializer):
     workspace_id = serializers.CharField(required=False, label=_("Workspace ID"))
 
     class Query(serializers.Serializer):
+        workspace_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("Workspace ID"))
 
         def get_query_set(self, query):
             query_set = QuerySet(WorkFlowVersion).filter(application_id=query.get('application_id'))
@@ -64,9 +65,19 @@ class ApplicationVersionSerializer(serializers.Serializer):
                                post_records_handler=lambda v: ApplicationVersionModelSerializer(v).data)
 
     class Operate(serializers.Serializer):
+        workspace_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("Workspace ID"))
         application_id = serializers.UUIDField(required=True, label=_("Application ID"))
         work_flow_version_id = serializers.UUIDField(required=True,
                                                      label=_("Workflow version id"))
+
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            workspace_id = self.data.get('workspace_id')
+            query_set = QuerySet(Application).filter(id=self.data.get('application_id'))
+            if workspace_id:
+                query_set = query_set.filter(workspace_id=workspace_id)
+            if not query_set.exists():
+                raise AppApiException(500, _('Application id does not exist'))
 
         def one(self, with_valid=True):
             if with_valid:

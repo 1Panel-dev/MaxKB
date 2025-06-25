@@ -37,7 +37,7 @@ class AccessToken(APIView):
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def put(self, request: Request, workspace_id: str, application_id: str):
         return result.success(
-            AccessTokenSerializer(data={'application_id': application_id}).edit(
+            AccessTokenSerializer(data={'workspace_id': workspace_id, 'application_id': application_id}).edit(
                 request.data))
 
     @extend_schema(
@@ -54,4 +54,5 @@ class AccessToken(APIView):
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
                      )
     def get(self, request: Request, workspace_id: str, application_id: str):
-        return result.success(AccessTokenSerializer(data={'application_id': application_id}).one())
+        return result.success(
+            AccessTokenSerializer(data={'workspace_id': workspace_id, 'application_id': application_id}).one())

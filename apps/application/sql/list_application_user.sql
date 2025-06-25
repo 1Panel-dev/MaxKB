@@ -14,7 +14,7 @@ from (select application."id"::text,
       from application left join "user" on user_id = "user".id
       where application."id" in (select target
                    from workspace_user_resource_permission
-                   where auth_target_type = 'APPLICATION'
+                   ${workspace_user_resource_permission_query_set}
                      and 'VIEW' = any (permission_list))
       UNION
       select application_folder."id",

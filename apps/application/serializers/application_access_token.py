@@ -7,16 +7,17 @@
     @desc:
 """
 import hashlib
-import uuid_utils.compat as uuid
 
+import uuid_utils.compat as uuid
 from django.core.cache import cache
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from application.models import ApplicationAccessToken
+from application.models import ApplicationAccessToken, Application
 from common.constants.cache_version import Cache_Version
 from common.database_model_manage.database_model_manage import DatabaseModelManage
+from common.exception.app_exception import AppApiException
 
 
 class AccessTokenEditSerializer(serializers.Serializer):
@@ -44,6 +45,16 @@ class AccessTokenEditSerializer(serializers.Serializer):
 
 class AccessTokenSerializer(serializers.Serializer):
     application_id = serializers.UUIDField(required=True, label=_("Application ID"))
+    workspace_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("Workspace ID"))
+
+    def is_valid(self, *, raise_exception=False):
+        super().is_valid(raise_exception=True)
+        workspace_id = self.data.get('workspace_id')
+        query_set = QuerySet(Application).filter(id=self.data.get('application_id'))
+        if workspace_id:
+            query_set = query_set.filter(workspace_id=workspace_id)
+        if not query_set.exists():
+            raise AppApiException(500, _('Application id does not exist'))
 
     def edit(self, instance):
         self.is_valid(raise_exception=True)

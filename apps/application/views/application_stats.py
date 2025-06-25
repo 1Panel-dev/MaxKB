@@ -38,7 +38,7 @@ class ApplicationStats(APIView):
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def get(self, request: Request, workspace_id: str, application_id: str):
         return result.success(
-            ApplicationStatisticsSerializer(data={'application_id': application_id,
+            ApplicationStatisticsSerializer(data={'application_id': application_id, 'workspace_id': workspace_id,
                                                   'start_time': request.query_params.get(
                                                       'start_time'),
                                                   'end_time': request.query_params.get(

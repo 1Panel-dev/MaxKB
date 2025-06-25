@@ -86,7 +86,7 @@ class ApplicationVersionView(APIView):
         def get(self, request: Request, workspace_id: str, application_id: str, work_flow_version_id: str):
             return result.success(
                 ApplicationVersionSerializer.Operate(
-                    data={'user_id': request.user,
+                    data={'user_id': request.user, 'workspace_id': workspace_id,
                           'application_id': application_id, 'work_flow_version_id': work_flow_version_id}).one())
 
         @extend_schema(
@@ -109,6 +109,7 @@ class ApplicationVersionView(APIView):
         def put(self, request: Request, workspace_id: str, application_id: str, work_flow_version_id: str):
             return result.success(
                 ApplicationVersionSerializer.Operate(
-                    data={'application_id': application_id, 'work_flow_version_id': work_flow_version_id,
+                    data={'application_id': application_id, 'workspace_id': workspace_id,
+                          'work_flow_version_id': work_flow_version_id,
                           'user_id': request.user.id}).edit(
                     request.data))

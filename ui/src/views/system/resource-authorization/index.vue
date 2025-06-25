@@ -296,8 +296,9 @@ const getWholeTree = async (user_id: string) => {
       const folderTree = cloneDeep((parentRes as unknown as any).data)
       if (Object.keys(childrenRes.data).indexOf(item.value) !== -1) {
         item.isRole =
-          childrenRes.data[item.value].length > 0 &&
-          childrenRes.data[item.value][0].auth_type == 'ROLE'
+          childrenRes.data[item.value].length > 0 && hasPermission([EditionConst.IS_EE], 'OR')
+            ? childrenRes.data[item.value][0].auth_type == 'ROLE'
+            : false
         folderIdMap = getFolderIdMap(childrenRes.data[item.value])
         dfsFolder(folderTree, folderIdMap)
         const permissionHalf = {
