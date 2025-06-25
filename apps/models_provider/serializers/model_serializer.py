@@ -126,7 +126,7 @@ class ModelSerializer(serializers.Serializer):
             if with_valid:
                 super().is_valid(raise_exception=True)
             model = QuerySet(Model).get(
-                id=self.data.get('id'), workspace_id=self.data.get('workspace_id')
+                id=self.data.get('id'), workspace_id=self.data.get('workspace_id', 'None')
             )
             return ModelSerializer.model_to_dict(model)
 
@@ -135,7 +135,7 @@ class ModelSerializer(serializers.Serializer):
             if with_valid:
                 super().is_valid(raise_exception=True)
                 model = QuerySet(Model).filter(id=self.data.get("id"),
-                                               workspace_id=self.data.get('workspace_id')).first()
+                                               workspace_id=self.data.get('workspace_id', 'None')).first()
                 if model is None:
                     raise AppApiException(500, _('Model does not exist'))
             return {'id': str(model.id), 'provider': model.provider, 'name': model.name, 'model_type': model.model_type,
@@ -269,7 +269,7 @@ class ModelSerializer(serializers.Serializer):
             super().is_valid(raise_exception=True)
             if QuerySet(Model).filter(
                     name=self.data.get('name'),
-                    workspace_id=self.data.get('workspace_id')
+                    workspace_id=self.data.get('workspace_id', 'None')
             ).exists():
                 raise AppApiException(
                     500,
