@@ -140,10 +140,8 @@
 import { ref, reactive, computed, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { MsgConfirm, MsgSuccess, MsgWarning } from '@/utils/message'
-import { getImgUrl } from '@/utils/utils'
 import { t } from '@/locales'
 import type Node from 'element-plus/es/components/tree/src/model/node'
-import documentApi from '@/api/knowledge/document'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 const router = useRouter()
@@ -151,6 +149,15 @@ const route = useRoute()
 const {
   query: { id, folder_token }, // id为knowledgeID，有id的是上传文档 folder_token为飞书文件夹token
 } = route
+const apiType = computed(() => {
+  if (route.path.includes('shared')) {
+    return 'systemShare'
+  } else if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
 const knowledgeId = id as string
 const folderToken = folder_token as string
 
@@ -187,7 +194,7 @@ const props = {
 
 const loadNode = (node: Node, resolve: (nodeData: Tree[]) => void) => {
   const token = node.level === 0 ? folderToken : node.data.token // 根节点使用 folder_token，其他节点使用 node.data.token
-  documentApi
+  loadSharedApi({ type: 'document', systemType: apiType.value })
     .getLarkDocumentList(knowledgeId, token, {}, loading)
     .then((res: any) => {
       const nodes = res.data.files as Tree[]
@@ -199,7 +206,7 @@ const loadNode = (node: Node, resolve: (nodeData: Tree[]) => void) => {
       })
     })
 
-    .catch((err) => {
+    .catch((err: any) => {
       console.error('Failed to load tree nodes:', err)
     })
 }
@@ -238,14 +245,14 @@ function submit() {
     loading.value = false
     return
   }
-  documentApi
+  loadSharedApi({ type: 'document', systemType: apiType.value })
     .importLarkDocument(knowledgeId, newList, loading)
-    .then((res) => {
+    .then(() => {
       MsgSuccess(t('views.document.tip.importMessage'))
       disabled.value = false
       router.go(-1)
     })
-    .catch((err) => {
+    .catch((err: any) => {
       console.error('Failed to load tree nodes:', err)
     })
     .finally(() => {

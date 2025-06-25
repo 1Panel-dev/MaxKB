@@ -857,8 +857,8 @@ function rowClickHandle(row: any, column: any) {
 function creatQuickHandle(val: string) {
   loading.value = true
   const obj = [{ name: val }]
-  document
-    .asyncPutDocument(id, obj)
+  loadSharedApi({ type: 'document', systemType: apiType.value })
+    .putMulDocument(id, obj)
     .then(() => {
       getList()
       MsgSuccess(t('common.createSuccess'))

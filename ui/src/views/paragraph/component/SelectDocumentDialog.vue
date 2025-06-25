@@ -160,7 +160,7 @@ function changeKnowledge(id: string) {
 }
 
 function getDocument(id: string) {
-  document.asyncGetKnowledgeDocument(id, optionLoading).then((res: any) => {
+  document.asyncGetKnowledgeDocument(id, apiType.value, optionLoading).then((res: any) => {
     documentList.value = res.data?.filter((v: any) => v.id !== documentId)
   })
 }

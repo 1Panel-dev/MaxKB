@@ -1,30 +1,22 @@
 import { defineStore } from 'pinia'
-import documentApi from '@/api/knowledge/document'
 import { type Ref } from 'vue'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 const useDocumentStore = defineStore('document', {
   state: () => ({}),
   actions: {
-    async asyncGetKnowledgeDocument(id: string, loading?: Ref<boolean>) {
+    async asyncGetKnowledgeDocument(
+      id: string,
+      systemType: 'systemShare' | 'workspace' | 'systemManage' = 'workspace',
+      loading?: Ref<boolean>,
+    ) {
       return new Promise((resolve, reject) => {
-        documentApi
+        loadSharedApi({ type: 'document', systemType })
           .getDocumentList(id, loading)
-          .then((res) => {
+          .then((res: any) => {
             resolve(res)
           })
-          .catch((error) => {
-            reject(error)
-          })
-      })
-    },
-    async asyncPutDocument(knowledgeId: string, data: any, loading?: Ref<boolean>) {
-      return new Promise((resolve, reject) => {
-        documentApi
-          .putMulDocument(knowledgeId, data, loading)
-          .then((data) => {
-            resolve(data)
-          })
-          .catch((error) => {
+          .catch((error: any) => {
             reject(error)
           })
       })

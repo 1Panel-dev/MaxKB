@@ -58,10 +58,7 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import documentApi from '@/api/knowledge/document'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
-
-import useStore from '@/stores'
 const route = useRoute()
 const {
   params: { id }, // id为knowledgeID
@@ -121,9 +118,9 @@ const open = (list: any) => {
 }
 
 const submitHandle = () => {
-  documentApi
+  loadSharedApi({ type: 'document', systemType: apiType.value })
     .putMigrateMulDocument(id, form.value.selectKnowledge, documentList.value, loading)
-    .then((res) => {
+    .then(() => {
       emit('refresh')
       dialogVisible.value = false
     })

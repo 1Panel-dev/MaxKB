@@ -165,8 +165,8 @@ function submit() {
 
   if (id) {
     // 上传文档
-    document
-      .asyncPutDocument(id as string, documents)
+    loadSharedApi({ type: 'document', systemType: apiType.value })
+      .putMulDocument(id as string, documents)
       .then(() => {
         MsgSuccess(t('common.submitSuccess'))
         clearStore()

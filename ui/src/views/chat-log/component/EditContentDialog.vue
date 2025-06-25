@@ -100,6 +100,7 @@ import { useRoute } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
 import chatLogApi from '@/api/application/chat-log'
 import imageApi from '@/api/image'
+import documentApi from '@/api/knowledge/document'
 import useStore from '@/stores'
 import { t } from '@/locales'
 const { application, document, user } = useStore()
@@ -217,7 +218,7 @@ function changeDocument(document_id: string) {
 }
 
 function getDocument(knowledge_id: string) {
-  document.asyncGetKnowledgeDocument(knowledge_id, loading).then((res: any) => {
+  documentApi.getDocumentList(knowledge_id, loading).then((res: any) => {
     documentList.value = res.data
     if (localStorage.getItem(id + 'chat_document_id')) {
       form.value.document_id = localStorage.getItem(id + 'chat_document_id') as string

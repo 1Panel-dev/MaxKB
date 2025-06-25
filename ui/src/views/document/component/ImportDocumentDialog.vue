@@ -92,20 +92,30 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue'
+import { ref, reactive, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import type { FormInstance } from 'element-plus'
-import documentApi from '@/api/knowledge/document'
 import { MsgSuccess } from '@/utils/message'
 import { hitHandlingMethod } from '@/enums/document'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { t } from '@/locales'
 const route = useRoute()
 const {
-  params: { id }
+  params: { id },
 } = route as any
 
 const props = defineProps({
-  title: String
+  title: String,
+})
+
+const apiType = computed(() => {
+  if (route.path.includes('shared')) {
+    return 'systemShare'
+  } else if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
 })
 
 const emit = defineEmits(['refresh'])
@@ -116,7 +126,7 @@ const form = ref<any>({
   source_url: '',
   selector: '',
   hit_handling_method: 'optimization',
-  directly_return_similarity: 0.9
+  directly_return_similarity: 0.9,
 })
 
 // 文档设置
@@ -131,16 +141,16 @@ const rules = reactive({
     {
       required: true,
       message: t('views.document.form.source_url.requiredMessage'),
-      trigger: 'blur'
-    }
+      trigger: 'blur',
+    },
   ],
   directly_return_similarity: [
     {
       required: true,
       message: t('views.document.form.similarity.requiredMessage'),
-      trigger: 'blur'
-    }
-  ]
+      trigger: 'blur',
+    },
+  ],
 })
 
 const dialogVisible = ref<boolean>(false)
@@ -151,7 +161,7 @@ watch(dialogVisible, (bool) => {
       source_url: '',
       selector: '',
       hit_handling_method: 'optimization',
-      directly_return_similarity: 0.9
+      directly_return_similarity: 0.9,
     }
     isImport.value = false
     documentType.value = ''
@@ -167,7 +177,7 @@ const open = (row: any, list: Array<string>) => {
     form.value = {
       hit_handling_method: row.hit_handling_method,
       directly_return_similarity: row.directly_return_similarity,
-      ...row.meta
+      ...row.meta,
     }
     isImport.value = false
   } else if (list) {
@@ -188,13 +198,15 @@ const submit = async (formEl: FormInstance | undefined) => {
       if (isImport.value) {
         const obj = {
           source_url_list: form.value.source_url.split('\n'),
-          selector: form.value.selector
+          selector: form.value.selector,
         }
-        documentApi.postWebDocument(id, obj, loading).then(() => {
-          MsgSuccess(t('views.document.tip.importMessage'))
-          emit('refresh')
-          dialogVisible.value = false
-        })
+        loadSharedApi({ type: 'document', systemType: apiType.value })
+          .postWebDocument(id, obj, loading)
+          .then(() => {
+            MsgSuccess(t('views.document.tip.importMessage'))
+            emit('refresh')
+            dialogVisible.value = false
+          })
       } else {
         if (documentId.value) {
           const obj = {
@@ -202,26 +214,30 @@ const submit = async (formEl: FormInstance | undefined) => {
             directly_return_similarity: form.value.directly_return_similarity,
             meta: {
               source_url: form.value.source_url,
-              selector: form.value.selector
-            }
+              selector: form.value.selector,
+            },
           }
-          documentApi.putDocument(id, documentId.value, obj, loading).then(() => {
-            MsgSuccess(t('common.settingSuccess'))
-            emit('refresh')
-            dialogVisible.value = false
-          })
+          loadSharedApi({ type: 'document', systemType: apiType.value })
+            .putDocument(id, documentId.value, obj, loading)
+            .then(() => {
+              MsgSuccess(t('common.settingSuccess'))
+              emit('refresh')
+              dialogVisible.value = false
+            })
         } else if (documentList.value.length > 0) {
           // 批量设置
           const obj = {
             hit_handling_method: form.value.hit_handling_method,
             directly_return_similarity: form.value.directly_return_similarity,
-            id_list: documentList.value
+            id_list: documentList.value,
           }
-          documentApi.putBatchEditHitHandling(id, obj, loading).then(() => {
-            MsgSuccess(t('common.settingSuccess'))
-            emit('refresh')
-            dialogVisible.value = false
-          })
+          loadSharedApi({ type: 'document', systemType: apiType.value })
+            .putBatchEditHitHandling(id, obj, loading)
+            .then(() => {
+              MsgSuccess(t('common.settingSuccess'))
+              emit('refresh')
+              dialogVisible.value = false
+            })
         }
       }
     }

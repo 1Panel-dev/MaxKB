@@ -109,7 +109,7 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { ref, watch, reactive } from 'vue'
+import { ref, watch, reactive, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import problemApi from '@/api/knowledge/problem'
 import paragraphApi from '@/api/knowledge/paragraph'
@@ -122,6 +122,16 @@ const route = useRoute()
 const {
   params: { id }, // knowledgeId
 } = route as any
+
+const apiType = computed(() => {
+  if (route.path.includes('shared')) {
+    return 'systemShare'
+  } else if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
 
 const emit = defineEmits(['refresh'])
 
@@ -214,7 +224,7 @@ function clickDocumentHandle(item: any) {
 }
 
 function getDocument() {
-  document.asyncGetKnowledgeDocument(id, loading).then((res: any) => {
+  document.asyncGetKnowledgeDocument(id, apiType.value, loading).then((res: any) => {
     cloneDocumentList.value = res.data
     documentList.value = res.data
     currentDocument.value = cloneDocumentList.value?.length > 0 ? cloneDocumentList.value[0].id : ''

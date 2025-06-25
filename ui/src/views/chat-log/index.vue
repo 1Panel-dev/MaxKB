@@ -26,7 +26,7 @@
           format="YYYY-MM-DD"
           value-format="YYYY-MM-DD"
           @change="changeDayRangeHandle"
-          style="width: 240px;"
+          style="width: 240px"
           class="mr-12"
         />
         <el-input
@@ -38,25 +38,35 @@
           clearable
         />
         <div style="display: flex; align-items: center" class="float-right">
-          <el-button @click="dialogVisible = true"
-            v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-            RoleConst.USER.getWorkspaceRole,
-            PermissionConst.APPLICATION_CHAT_LOG_POLICY.getWorkspacePermission]"
+          <el-button
+            @click="dialogVisible = true"
+            v-hasPermission="[
+              RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+              RoleConst.USER.getWorkspaceRole,
+              PermissionConst.APPLICATION_CHAT_LOG_POLICY.getWorkspacePermission,
+            ]"
           >
-            {{$t('views.chatLog.buttons.clearStrategy')}}
+            {{ $t('views.chatLog.buttons.clearStrategy') }}
           </el-button>
-          <el-button @click="exportLog"
-            v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-            RoleConst.USER.getWorkspaceRole,
-            PermissionConst.APPLICATION_CHAT_LOG_EXPORT.getWorkspacePermission]"
+          <el-button
+            @click="exportLog"
+            v-hasPermission="[
+              RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+              RoleConst.USER.getWorkspaceRole,
+              PermissionConst.APPLICATION_CHAT_LOG_EXPORT.getWorkspacePermission,
+            ]"
           >
             {{ $t('common.export') }}
           </el-button>
-          <el-button @click="openDocumentDialog" :disabled="multipleSelection.length === 0"
-            v-hasPermission="[RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-            RoleConst.USER.getWorkspaceRole,
-            PermissionConst.APPLICATION_CHAT_LOG_EXPORT.getWorkspacePermission]"
-          >{{ $t('views.chatLog.addToKnowledge') }}
+          <el-button
+            @click="openDocumentDialog"
+            :disabled="multipleSelection.length === 0"
+            v-hasPermission="[
+              RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+              RoleConst.USER.getWorkspaceRole,
+              PermissionConst.APPLICATION_CHAT_LOG_EXPORT.getWorkspacePermission,
+            ]"
+            >{{ $t('views.chatLog.addToKnowledge') }}
           </el-button>
         </div>
       </div>
@@ -285,6 +295,7 @@ import { cloneDeep } from 'lodash'
 import ChatRecordDrawer from './component/ChatRecordDrawer.vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import chatLogApi from '@/api/application/chat-log'
+import documentApi from '@/api/knowledge/document'
 import { beforeDay, datetimeFormat, nowDate } from '@/utils/time'
 import useStore from '@/stores'
 import type { Dict } from '@/api/type/common'
@@ -617,7 +628,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
 }
 
 function getDocument(knowledge_id: string) {
-  document.asyncGetKnowledgeDocument(knowledge_id, documentLoading).then((res: any) => {
+  documentApi.getDocumentList(knowledge_id, documentLoading).then((res: any) => {
     documentList.value = res.data
     if (localStorage.getItem(id + 'chat_document_id')) {
       form.value.document_id = localStorage.getItem(id + 'chat_document_id') as string
