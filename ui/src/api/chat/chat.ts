@@ -11,6 +11,7 @@ import {
 } from '@/request/chat/index'
 import { type ChatProfile } from '@/api/type/chat'
 import { type Ref } from 'vue'
+import type { ResetPasswordRequest } from "@/api/type/user.ts";
 
 import useStore from '@/stores'
 import type { LoginRequest } from '@/api/type/user'
@@ -201,6 +202,23 @@ const pageChatRecord: (
     loading,
   )
 }
+
+/**
+ * 登出
+ */
+const logout: (loading?: Ref<boolean>) => Promise<Result<boolean>> = (loading) => {
+  return post('/auth/logout', undefined, undefined, loading)
+}
+
+/**
+ * 重置密码
+ */
+const resetCurrentPassword: (
+  request: ResetPasswordRequest,
+  loading?: Ref<boolean>
+) => Promise<Result<boolean>> = (request, loading) => {
+  return post('/chat_user/current/reset_password', request, undefined, loading)
+}
 export default {
   open,
   chat,
@@ -221,4 +239,6 @@ export default {
   vote,
   pageChat,
   pageChatRecord,
+  logout,
+  resetCurrentPassword
 }

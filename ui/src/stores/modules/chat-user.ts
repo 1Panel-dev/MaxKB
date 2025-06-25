@@ -92,6 +92,14 @@ const useChatUserStore = defineStore('chat-user', {
         return this.token
       })
     },
+    logout() {
+      return ChatAPI.logout().then(() => {
+        sessionStorage.removeItem(`${this.accessToken}-accessToken`)
+        localStorage.removeItem(`${this.accessToken}-accessToken`)
+        this.token = undefined
+        return true
+      })
+    },
   },
 })
 

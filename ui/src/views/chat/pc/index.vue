@@ -20,28 +20,28 @@
                 :size="32"
                 style="background: none"
               >
-                <img :src="applicationDetail?.icon" alt="" />
-              </el-avatar>
-              <LogoIcon v-else height="28px" style="width: 28px; height: 28px; display: block" />
+                  <img :src="applicationDetail?.icon" alt="" />
+                </el-avatar>
+                <LogoIcon v-else height="28px" style="width: 28px; height: 28px; display: block" />
+              </div>
+              <h4 v-show="!isPcCollapse">{{ applicationDetail?.name }}</h4>
             </div>
-            <h4 v-show="!isPcCollapse">{{ applicationDetail?.name }}</h4>
-          </div>
-          <el-button v-show="!isPcCollapse" class="add-button w-full primary" @click="newChat">
-            <AppIcon iconName="app-create-chat"></AppIcon>
-            <span class="ml-4">{{ $t('chat.createChat') }}</span>
-          </el-button>
-          <p v-show="!isPcCollapse" class="mt-20 mb-8">{{ $t('chat.history') }}</p>
+            <el-button v-show="!isPcCollapse" class="add-button w-full primary" @click="newChat">
+              <AppIcon iconName="app-create-chat"></AppIcon>
+              <span class="ml-4">{{ $t('chat.createChat') }}</span>
+            </el-button>
+            <p v-show="!isPcCollapse" class="mt-20 mb-8">{{ $t('chat.history') }}</p>
           </div>
           <div v-show="!isPcCollapse" class="left-height pt-0">
             <el-scrollbar>
               <div class="p-8 pt-0">
                 <common-list
                   :style="{
-                    '--el-color-primary': applicationDetail?.custom_theme?.theme_color,
-                    '--el-color-primary-light-9': hexToRgba(
-                      applicationDetail?.custom_theme?.theme_color,
-                      0.1,
-                    ),
+                  '--el-color-primary': applicationDetail?.custom_theme?.theme_color,
+                  '--el-color-primary-light-9': hexToRgba(
+                    applicationDetail?.custom_theme?.theme_color,
+                    0.1,
+                  ),
                   }"
                   :data="chatLogData"
                   class="mt-8"
@@ -135,10 +135,46 @@
               <el-text type="info">{{ $t('chat.noHistory') }}</el-text>
             </div>
           </el-sub-menu>
+          <el-dropdown trigger="click" type="primary" class="w-full">
+            <div class="flex align-center user-info">
+              <el-avatar :size="32">
+                <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
+              </el-avatar>
+              <!-- TODO -->
+              <span v-show="!isPcCollapse" class="ml-8 color-text-primary">{{ 222 }}</span>
+            </div>
+            
+            <template #dropdown>
+              <el-dropdown-menu class="avatar-dropdown">
+                <div class="flex align-center" style="padding: 12px;">
+                  <div class="mr-8 flex align-center">
+                    <el-avatar :size="40">
+                      <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
+                    </el-avatar>
+                  </div>
+                  <div>
+                    <!-- TODO -->
+                    <h4 class="medium mb-4">{{ 111 }}</h4>
+                    <div class="color-secondary">{{ `${t('common.username')}: 222` }}</div>
+                  </div>
+                </div>
+                <el-dropdown-item class="border-t" style="padding-top: 8px; padding-bottom: 8px;" @click="openResetPassword">
+                  <AppIcon iconName="app-export" />
+                  {{ $t('views.login.resetPassword') }}
+                </el-dropdown-item>
+                <el-dropdown-item class="border-t" @click="logout">
+                  <AppIcon iconName="app-export" />
+                  {{ $t('layout.logout') }}
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+
         </el-menu>
-        <el-button v-if="!common.isMobile()" class="pc-collapse" circle size="small" @click="isPcCollapse = !isPcCollapse">
+        <el-button v-if="!common.isMobile()" class="pc-collapse" circle size="small"
+          @click="isPcCollapse = !isPcCollapse">
           <el-icon>
-            <component :is=" isPcCollapse ? 'Fold' : 'Expand'" />
+            <component :is="isPcCollapse ? 'Fold' : 'Expand'" />
           </el-icon>
         </el-button>
       </div>
@@ -200,6 +236,7 @@
     </div>
 
     <EditTitleDialog ref="EditTitleDialogRef" @refresh="refreshFieldTitle" />
+    <ResetPassword ref="resetPasswordRef" emitConfirm @confirm="handleResetPassword"></ResetPassword>
   </div>
 </template>
 
@@ -213,20 +250,42 @@ import useStore from '@/stores'
 import useResize from '@/layout/hooks/useResize'
 import { hexToRgba } from '@/utils/theme'
 import EditTitleDialog from './EditTitleDialog.vue'
+import { useRouter } from 'vue-router'
+import ResetPassword from '@/layout/layout-header/avatar/ResetPassword.vue'
 import { t } from '@/locales'
+import type { ResetCurrentUserPasswordRequest } from '@/api/type/user'
+
 useResize()
 
-const { user, chatLog, common } = useStore()
+const { user, chatLog, common, chatUser } = useStore()
+const router = useRouter()
 
 const EditTitleDialogRef = ref()
 
 const isCollapse = ref(false)
 const isPcCollapse = ref(false)
-watch(()=> common.device, () => {
-  if(common.isMobile()) {
+watch(() => common.device, () => {
+  if (common.isMobile()) {
     isPcCollapse.value = false
   }
 })
+
+const logout = () => {
+  chatUser.logout().then(() => {
+    router.push({ name: 'login' })
+  })
+}
+
+const resetPasswordRef = ref<InstanceType<typeof ResetPassword>>()
+const openResetPassword = () => {
+  resetPasswordRef.value?.open()
+}
+
+const handleResetPassword = (param: ResetCurrentUserPasswordRequest) => {
+  chatAPI.resetCurrentPassword(param).then(() => {
+    logout()
+  })
+}
 
 const customStyle = computed(() => {
   return {
@@ -472,6 +531,8 @@ onMounted(() => {
     position: relative;
 
     .el-menu {
+      display: flex;
+      flex-direction: column;
       background:
         linear-gradient(187.61deg, rgba(235, 241, 255, 0.5) 39.6%, rgba(231, 249, 255, 0.5) 94.3%),
         #eef1f4;
@@ -484,12 +545,31 @@ onMounted(() => {
         background: transparent;
       }
 
+      .el-dropdown {
+        margin-top: auto;
+        .user-info {
+          width: 100%;
+          cursor: pointer;
+          border-radius: 6px;
+          padding: 4px 8px;
+          margin: 16px;
+          box-sizing: border-box;
+          &:hover {
+            background-color: #1F23291A;
+          }
+        }
+      }
+
       &.el-menu--collapse {
-        .el-menu-item,.el-menu-tooltip__trigger,.el-sub-menu__title {
+
+        .el-menu-item,
+        .el-menu-tooltip__trigger,
+        .el-sub-menu__title {
           padding: 0;
         }
 
-        .el-menu-item .el-menu-tooltip__trigger,.el-sub-menu__title {
+        .el-menu-item .el-menu-tooltip__trigger,
+        .el-sub-menu__title {
           position: static;
           width: 40px;
           height: 40px;
@@ -498,8 +578,14 @@ onMounted(() => {
           justify-content: center;
           margin: 0 auto;
         }
-        .el-menu-item:hover .el-menu-tooltip__trigger,.el-sub-menu__title:hover {
+
+        .el-menu-item:hover .el-menu-tooltip__trigger,
+        .el-sub-menu__title:hover {
           background-color: #1F23291A;
+        }
+
+        .user-info {
+          margin: 16px 8px;
         }
       }
     }
@@ -509,7 +595,7 @@ onMounted(() => {
     }
 
     .left-height {
-      height: calc(100vh - 140px);
+      height: calc(100vh - 212px);
     }
 
     .pc-collapse {
@@ -631,5 +717,11 @@ onMounted(() => {
     max-width: 100% !important;
     margin: 0 auto;
   }
+}
+</style>
+
+<style lang="scss" scoped>
+.avatar-dropdown {
+  min-width: 240px;
 }
 </style>
