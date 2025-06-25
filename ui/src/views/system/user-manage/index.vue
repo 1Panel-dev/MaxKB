@@ -71,6 +71,11 @@
             {{ row.phone || '-' }}
           </template>
         </el-table-column>
+        <el-table-column prop="role" :label="$t('views.role.member.role')" min-width="100" v-if="user.isEE()">
+          <template #default="{ row }">
+            <TagGroup :tags="row.role"/>
+          </template>
+        </el-table-column>
         <el-table-column prop="source" :label="$t('views.userManage.source.label')">
           <template #default="{ row }">
             {{
@@ -152,7 +157,7 @@ import {MsgSuccess, MsgConfirm} from '@/utils/message'
 import {t} from '@/locales'
 import {ValidCount, ValidType} from "@/enums/common.ts";
 import useStore from "@/stores";
-const {common } = useStore()
+const {user, common} = useStore()
 const search_type = ref('name')
 const search_form = ref<{
   name: string
@@ -227,7 +232,8 @@ function createUser() {
         .then(() => {
           window.open('https://maxkb.cn/pricing.html', '_blank')
         })
-        .catch(() => {})
+        .catch(() => {
+        })
     }
   })
 }
