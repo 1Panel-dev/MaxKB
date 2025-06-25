@@ -12,4 +12,12 @@ interface ChatProfile {
   // 登录类型
   login_value?: Array<string>
 }
-export { type ChatProfile }
+
+interface ChatUserProfile {
+  email: string
+  id: string
+  nick_name: string
+  username: string
+  source: string
+}
+export { type ChatProfile, type ChatUserProfile }

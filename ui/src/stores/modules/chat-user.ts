@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import ChatAPI from '@/api/chat/chat'
-import { type ChatProfile } from '@/api/type/chat'
+import type { ChatProfile, ChatUserProfile } from '@/api/type/chat'
 import type { LoginRequest } from '@/api/type/user'
 import type { Ref } from 'vue'
 interface ChatUser {
@@ -11,6 +11,7 @@ interface Application {}
 interface Chat {
   chat_profile?: ChatProfile
   application?: Application
+  chatUserProfile?: ChatUserProfile 
   token?: string
   accessToken?: string
 }
@@ -29,6 +30,10 @@ const useChatUserStore = defineStore('chat-user', {
         this.chat_profile = ok.data
         return this.chat_profile
       })
+    },
+    async getChatUserProfile() {
+      const res = await ChatAPI.getChatUserProfile()
+      this.chatUserProfile = res.data
     },
     applicationProfile() {
       return ChatAPI.applicationProfile().then((ok) => {

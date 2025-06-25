@@ -42,6 +42,10 @@ const open: (loading?: Ref<boolean>) => Promise<Result<string>> = (loading) => {
 const chat: (chat_id: string, data: any) => Promise<any> = (chat_id, data) => {
   return postStream(`/chat/api/chat_message/${chat_id}`, data)
 }
+
+/**
+ * 应用认证信息
+ */
 const chatProfile: (assessToken: string, loading?: Ref<boolean>) => Promise<Result<ChatProfile>> = (
   assessToken,
   loading,
@@ -219,6 +223,13 @@ const resetCurrentPassword: (
 ) => Promise<Result<boolean>> = (request, loading) => {
   return post('/chat_user/current/reset_password', request, undefined, loading)
 }
+
+/**
+ * 获取当前用户信息
+ */
+const getChatUserProfile: (loading?: Ref<boolean>) => Promise<Result<any>> = (loading) => {
+  return get('/chat_user/profile', {}, loading)
+}
 export default {
   open,
   chat,
@@ -240,5 +251,6 @@ export default {
   pageChat,
   pageChatRecord,
   logout,
-  resetCurrentPassword
+  resetCurrentPassword,
+  getChatUserProfile
 }

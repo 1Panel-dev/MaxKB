@@ -59,6 +59,7 @@ router.beforeEach(
         } else {
           try {
             await chatUser.applicationProfile()
+            await chatUser.getChatUserProfile()
           } catch (e: any) {
             if (e.response?.status === 401) {
               next({

@@ -135,34 +135,38 @@
               <el-text type="info">{{ $t('chat.noHistory') }}</el-text>
             </div>
           </el-sub-menu>
-          <el-dropdown trigger="click" type="primary" class="w-full">
+
+          <div v-if="!chatUser.chat_profile?.authentication" class="no-auth-avatar">
+            <el-avatar :size="32">
+              <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
+            </el-avatar>
+          </div>
+          <el-dropdown v-else trigger="click" type="primary" class="w-full">
             <div class="flex align-center user-info">
               <el-avatar :size="32">
                 <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
               </el-avatar>
-              <!-- TODO -->
-              <span v-show="!isPcCollapse" class="ml-8 color-text-primary">{{ 222 }}</span>
+              <span v-show="!isPcCollapse" class="ml-8 color-text-primary">{{ chatUser.chatUserProfile?.nick_name }}</span>
             </div>
 
             <template #dropdown>
               <el-dropdown-menu class="avatar-dropdown">
-                <div class="flex align-center" style="padding: 12px;">
+                <div class="flex align-center" style="padding: 8px 12px;">
                   <div class="mr-8 flex align-center">
                     <el-avatar :size="40">
                       <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
                     </el-avatar>
                   </div>
                   <div>
-                    <!-- TODO -->
-                    <h4 class="medium mb-4">{{ 111 }}</h4>
-                    <div class="color-secondary">{{ `${t('common.username')}: 222` }}</div>
+                    <h4 class="medium mb-4">{{ chatUser.chatUserProfile?.nick_name }}</h4>
+                    <div class="color-secondary">{{ `${t('common.username')}: ${chatUser.chatUserProfile?.username}` }}</div>
                   </div>
                 </div>
-                <el-dropdown-item class="border-t" style="padding-top: 8px; padding-bottom: 8px;" @click="openResetPassword">
+                <el-dropdown-item v-if="chatUser.chatUserProfile?.source === 'LOCAL'" class="border-t" style="padding-top: 8px; padding-bottom: 8px;" @click="openResetPassword">
                   <AppIcon iconName="app-export" />
                   {{ $t('views.login.resetPassword') }}
                 </el-dropdown-item>
-                <el-dropdown-item class="border-t" @click="logout">
+                <el-dropdown-item v-if="chatUser.chatUserProfile?.source === 'LOCAL'" class="border-t" style="padding-top: 8px; padding-bottom: 8px;" @click="logout">
                   <AppIcon iconName="app-export" />
                   {{ $t('layout.logout') }}
                 </el-dropdown-item>
@@ -543,6 +547,14 @@ onMounted(() => {
 
       .el-menu-item:hover {
         background: transparent;
+      }
+
+      .no-auth-avatar {
+        margin-top: auto;
+        padding: 16px;
+        .el-avatar {
+          cursor: default;
+        }
       }
 
       .el-dropdown {
