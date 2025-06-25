@@ -559,6 +559,8 @@ class DocumentSerializers(serializers.Serializer):
         def download_source_file(self):
             self.is_valid(raise_exception=True)
             file = QuerySet(File).filter(source_id=self.data.get('document_id')).first()
+            if not file:
+                raise AppApiException(500, _('file not exist'))
             return FileSerializer.Operate(id=file.id).get(with_valid=True)
 
         def one(self, with_valid=False):
