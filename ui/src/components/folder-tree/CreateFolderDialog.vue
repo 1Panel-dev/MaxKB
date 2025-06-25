@@ -29,7 +29,7 @@
           v-model="folderForm.desc"
           type="textarea"
           :placeholder="$t('components.folder.descriptionPlaceholder')"
-          maxlength="256"
+          maxlength="128"
           show-word-limit
           :autosize="{ minRows: 3 }"
           @blur="folderForm.desc = folderForm.desc.trim()"
