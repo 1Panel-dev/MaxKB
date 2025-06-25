@@ -28,7 +28,7 @@ LOGGING = {
             'format': '%(levelname)s %(message)s'
         },
         'syslog': {
-            'format': 'jumpserver: %(message)s'
+            'format': 'maxkb: %(message)s'
         },
         'msg': {
             'format': '%(message)s'
