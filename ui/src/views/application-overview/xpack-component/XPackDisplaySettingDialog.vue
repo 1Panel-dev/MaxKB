@@ -524,7 +524,7 @@ const onChange = (file: any, fileList: UploadFiles, attr: string) => {
   const isLimit = file?.size / 1024 / 1024 < 10
   if (!isLimit) {
     // @ts-ignore
-    MsgError(t('views.applicationOverview.appInfo.EditAvatarDialog.fileSizeExceeded'))
+    MsgError(t('common.EditAvatarDialog.fileSizeExceeded'))
     return false
   } else {
     xpackForm.value[attr] = file.raw

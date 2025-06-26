@@ -3,7 +3,7 @@
     <template #left>
       <h4 class="p-12-16 pb-0 mt-12">{{ $t('views.application.title') }}</h4>
       <folder-tree
-        :source="FolderSource.APPLICATION"
+        :source="SourceTypeEnum.APPLICATION"
         :data="folderList"
         :currentNodeKey="currentFolder?.id"
         @handleNodeClick="folderClickHandel"
@@ -285,7 +285,7 @@ import { t } from '@/locales'
 import { useRouter, useRoute } from 'vue-router'
 import { isWorkFlow } from '@/utils/application'
 import { dateFormat } from '@/utils/time'
-import { FolderSource } from '@/enums/common'
+import { SourceTypeEnum } from '@/enums/common'
 import permissionMap from '@/permission'
 
 const router = useRouter()
@@ -484,12 +484,12 @@ const importApplication = (file: any) => {
 // 文件夹相关
 const CreateFolderDialogRef = ref()
 function openCreateFolder() {
-  CreateFolderDialogRef.value.open(FolderSource.APPLICATION, currentFolder.value.id)
+  CreateFolderDialogRef.value.open(SourceTypeEnum.APPLICATION, currentFolder.value.id)
 }
 
 function getFolder(bool?: boolean) {
   const params = {}
-  folder.asyncGetFolder(FolderSource.APPLICATION, params, loading).then((res: any) => {
+  folder.asyncGetFolder(SourceTypeEnum.APPLICATION, params, loading).then((res: any) => {
     folderList.value = res.data
     if (bool) {
       // 初始化刷新

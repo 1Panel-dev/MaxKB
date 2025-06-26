@@ -32,7 +32,7 @@ export default {
     notRecyclable: '不可循環連線',
     onlyLeft: '只允許連接左邊的錨點',
     applicationNodeError: '該應用不可用',
-    functionNodeError: '該函數不可用',
+    toolNodeError: '該函數不可用',
     repeatedNodeError: '節點名稱已存在！',
     cannotCopy: '不能被複製',
     copyError: '已複製節點',
@@ -162,7 +162,6 @@ export default {
       content: '內容',
       replyContent: {
         label: '回覆內容',
-        custom: '自定義',
         reference: '引用變量'
       }
     },
@@ -259,7 +258,7 @@ export default {
         label: '選擇文本內容'
       }
     },
-    functionNode: {
+    toolNode: {
       label: '自定義函數',
       text: '通過執行自定義腳本，實現數據處理'
     },

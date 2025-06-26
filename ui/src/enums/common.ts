@@ -15,7 +15,7 @@ export enum ValidCount {
   User = 2,
 }
 
-export enum FolderSource {
+export enum SourceTypeEnum {
   KNOWLEDGE = 'KNOWLEDGE',
   APPLICATION = 'APPLICATION',
   TOOL = 'TOOL',

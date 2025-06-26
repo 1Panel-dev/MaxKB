@@ -27,16 +27,6 @@ export default {
       enabledSuccess: '已启用',
       disabledSuccess: '已禁用'
     },
-    EditAvatarDialog: {
-      title: '应用头像',
-      customizeUpload: '自定义上传',
-      upload: '上传',
-      default: '默认logo',
-      custom: '自定义',
-      sizeTip: '建议尺寸 32*32，支持 JPG、PNG、GIF，大小不超过 10 MB',
-      fileSizeExceeded: '文件大小超过 10 MB',
-      uploadImagePrompt: '请上传一张图片'
-    },
     EmbedDialog: {
       fullscreenModeTitle: '全屏模式',
       copyInstructions: '复制以下代码进行嵌入',
@@ -98,7 +88,6 @@ export default {
       past30Days: '过去30天',
       past90Days: '过去90天',
       past183Days: '过去半年',
-      other: '自定义'
     },
     charts: {
       customerTotal: '用户总数',

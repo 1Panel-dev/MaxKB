@@ -4,7 +4,6 @@ export default {
   platformDisplayTheme: 'Platform Display Theme',
   customTheme: 'Custom Theme',
   platformLoginSettings: 'Platform Login Settings',
-  custom: 'Custom',
   pagePreview: 'Page Preview',
   default: 'Default',
   restoreDefaults: 'Restore Defaults',

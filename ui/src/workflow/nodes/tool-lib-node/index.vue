@@ -4,7 +4,7 @@
     <h5 class="lighter mb-8">{{ $t('common.param.inputParam') }}</h5>
     <el-form
       @submit.prevent
-      ref="FunctionNodeFormRef"
+      ref="ToolNodeFormRef"
       :model="chat_data"
       label-position="top"
       require-asterisk-position="right"
@@ -20,8 +20,8 @@
                 required: item.is_required,
                 message:
                   item.source === 'reference'
-                    ? $t('views.tool.functionForm.form.param.selectPlaceholder')
-                    : $t('views.tool.functionForm.form.param.inputPlaceholder'),
+                    ? $t('views.tool.toolForm.form.param.selectPlaceholder')
+                    : $t('views.tool.toolForm.form.param.inputPlaceholder'),
                 trigger: 'blur',
               }"
             >
@@ -43,13 +43,13 @@
                 ref="nodeCascaderRef"
                 :nodeModel="nodeModel"
                 class="w-full"
-                :placeholder="$t('views.tool.functionForm.form.param.selectPlaceholder')"
+                :placeholder="$t('views.tool.toolForm.form.param.selectPlaceholder')"
                 v-model="item.value"
               />
               <el-input
                 v-else
                 v-model="item.value"
-                :placeholder="$t('views.tool.functionForm.form.param.inputPlaceholder')"
+                :placeholder="$t('views.tool.toolForm.form.param.inputPlaceholder')"
               />
             </el-form-item>
           </template>
@@ -113,37 +113,37 @@ const chat_data = computed({
   },
 })
 
-const FunctionNodeFormRef = ref<FormInstance>()
+const ToolNodeFormRef = ref<FormInstance>()
 
 const validate = () => {
-  return FunctionNodeFormRef.value?.validate().catch((err) => {
+  return ToolNodeFormRef.value?.validate().catch((err) => {
     return Promise.reject({ node: props.nodeModel, errMessage: err })
   })
 }
 
 const update_field = () => {
-  if (!props.nodeModel.properties.node_data.function_lib_id) {
+  if (!props.nodeModel.properties.node_data.tool_lib_id) {
     set(props.nodeModel.properties, 'status', 500)
     return
   }
   //todo
-  // applicationApi
-  //   .getFunctionLib(id, props.nodeModel.properties.node_data.function_lib_id)
-  //   .then((ok) => {
-  //     const old_input_field_list = props.nodeModel.properties.node_data.input_field_list
-  //     const merge_input_field_list = ok.data.input_field_list.map((item: any) => {
-  //       const find_field = old_input_field_list.find((old_item: any) => old_item.name == item.name)
-  //       if (find_field && find_field.source == item.source) {
-  //         return { ...item, value: JSON.parse(JSON.stringify(find_field.value)) }
-  //       }
-  //       return { ...item, value: item.source == 'reference' ? [] : '' }
-  //     })
-  //     set(props.nodeModel.properties.node_data, 'input_field_list', merge_input_field_list)
-  //     set(props.nodeModel.properties, 'status', ok.data.is_active ? 200 : 500)
-  //   })
-  //   .catch((err) => {
-  //     set(props.nodeModel.properties, 'status', 500)
-  //   })
+  applicationApi
+    .getToolLib(id, props.nodeModel.properties.node_data.tool_lib_id)
+    .then((ok) => {
+      const old_input_field_list = props.nodeModel.properties.node_data.input_field_list
+      const merge_input_field_list = ok.data.input_field_list.map((item: any) => {
+        const find_field = old_input_field_list.find((old_item: any) => old_item.name == item.name)
+        if (find_field && find_field.source == item.source) {
+          return { ...item, value: JSON.parse(JSON.stringify(find_field.value)) }
+        }
+        return { ...item, value: item.source == 'reference' ? [] : '' }
+      })
+      set(props.nodeModel.properties.node_data, 'input_field_list', merge_input_field_list)
+      set(props.nodeModel.properties, 'status', ok.data.is_active ? 200 : 500)
+    })
+    .catch((err) => {
+      set(props.nodeModel.properties, 'status', 500)
+    })
 }
 
 onMounted(() => {

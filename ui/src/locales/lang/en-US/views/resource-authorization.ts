@@ -22,6 +22,5 @@ export default {
   priority: {
     label: 'Resource permission priority',
     role: 'Role',
-    customize: 'Customize',
   },
 }

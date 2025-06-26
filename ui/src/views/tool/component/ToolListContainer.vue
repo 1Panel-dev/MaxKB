@@ -213,7 +213,7 @@
                         <el-dropdown-menu>
                           <el-dropdown-item
                             v-if="item.template_id"
-                            @click.stop="addInternalFunction(item, true)"
+                            @click.stop="addInternalTool(item, true)"
                           >
                             <el-icon>
                               <EditPen />
@@ -281,9 +281,9 @@
   <ToolFormDrawer ref="ToolFormDrawerRef" @refresh="refresh" :title="ToolDrawertitle" />
   <CreateFolderDialog ref="CreateFolderDialogRef" v-if="!isShared" />
   <ToolStoreDialog ref="toolStoreDialogRef" @refresh="refresh" />
-  <AddInternalFunctionDialog
-    ref="addInternalFunctionDialogRef"
-    @refresh="confirmAddInternalFunction"
+  <AddInternalToolDialog
+    ref="addInternalToolDialogRef"
+    @refresh="confirmAddInternalTool"
   />
   <AuthorizedWorkspace
     ref="AuthorizedWorkspaceDialogRef"
@@ -301,9 +301,9 @@ import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
 import AuthorizedWorkspace from '@/views/system-shared/AuthorizedWorkspaceDialog.vue'
 import { isAppIcon } from '@/utils/common'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
-import { FolderSource } from '@/enums/common'
+import { SourceTypeEnum } from '@/enums/common'
 import ToolStoreDialog from '@/views/tool/toolStore/ToolStoreDialog.vue'
-import AddInternalFunctionDialog from '@/views/tool/toolStore/AddInternalFunctionDialog.vue'
+import AddInternalToolDialog from '@/views/tool/toolStore/AddInternalToolDialog.vue'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import permissionMap from '@/permission'
 import useStore from '@/stores'
@@ -512,12 +512,12 @@ function openToolStoreDialog() {
   toolStoreDialogRef.value?.open(folder.currentFolder.id)
 }
 
-const addInternalFunctionDialogRef = ref<InstanceType<typeof AddInternalFunctionDialog>>()
-function addInternalFunction(data?: any, isEdit?: boolean) {
-  addInternalFunctionDialogRef.value?.open(data, isEdit)
+const AddInternalToolDialogRef = ref<InstanceType<typeof AddInternalToolDialog>>()
+function addInternalTool(data?: any, isEdit?: boolean) {
+  AddInternalToolDialogRef.value?.open(data, isEdit)
 }
 
-function confirmAddInternalFunction(data?: any, isEdit?: boolean) {
+function confirmAddInternalTool(data?: any, isEdit?: boolean) {
   if (isEdit) {
     loadSharedApi({ type: 'tool', systemType: apiType.value })
       .putTool(data?.id as string, { name: data.name }, loading)
@@ -556,7 +556,7 @@ function importTool(file: any) {
 // 文件夹相关
 const CreateFolderDialogRef = ref()
 function openCreateFolder() {
-  CreateFolderDialogRef.value.open(FolderSource.TOOL, folder.currentFolder.id)
+  CreateFolderDialogRef.value.open(SourceTypeEnum.TOOL, folder.currentFolder.id)
 }
 
 watch(

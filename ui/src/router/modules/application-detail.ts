@@ -1,4 +1,4 @@
-import { ChatUserResourceEnum } from '@/enums/workspaceChatUser'
+import { SourceTypeEnum } from '@/enums/common'
 import { get_next_route } from '@/utils/permission'
 
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
@@ -92,7 +92,7 @@ const ApplicationDetailRouter = {
         active: 'chat-log',
         parentPath: '/application/:id/:type',
         parentName: 'ApplicationDetail',
-        resourceType: ChatUserResourceEnum.APPLICATION,
+        resourceType: SourceTypeEnum.APPLICATION,
         permission: [
           RoleConst.ADMIN,
           RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,

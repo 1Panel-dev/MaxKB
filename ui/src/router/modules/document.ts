@@ -1,4 +1,4 @@
-import { ChatUserResourceEnum } from '@/enums/workspaceChatUser'
+import { SourceTypeEnum } from '@/enums/common'
 import { get_next_route } from '@/utils/permission'
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
 const DocumentRouter = {
@@ -81,7 +81,7 @@ const DocumentRouter = {
         active: 'chat-log',
         parentPath: '/knowledge/:id/:folderId',
         parentName: 'KnowledgeDetail',
-        resourceType: ChatUserResourceEnum.KNOWLEDGE,
+        resourceType: SourceTypeEnum.KNOWLEDGE,
         group: 'KnowledgeDetail',
         permission: [
           RoleConst.ADMIN,

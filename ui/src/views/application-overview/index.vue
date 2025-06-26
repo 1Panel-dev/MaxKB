@@ -288,7 +288,7 @@ const dayOptions = [
   },
   {
     value: 'other',
-    label: t('views.applicationOverview.monitor.pastDayOptions.other'),
+    label: t('common.other'),
   },
 ]
 

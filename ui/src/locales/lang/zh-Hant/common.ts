@@ -80,7 +80,6 @@ export default {
     customizeUpload: '自訂上傳',
     upload: '上傳',
     default: '預設logo',
-    custom: '自訂',
     sizeTip: '建議尺寸 32*32，支援 JPG、PNG、GIF，大小不超過 10 MB',
     fileSizeExceeded: '檔案大小超過 10 MB',
     uploadImagePrompt: '請上傳一張圖片',
@@ -96,4 +95,5 @@ export default {
     message: '無法訪問應用',
     operate: '返回首頁',
   },
+  custom: '自定義',
 }

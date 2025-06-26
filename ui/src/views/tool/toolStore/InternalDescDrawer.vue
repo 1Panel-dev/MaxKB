@@ -16,31 +16,31 @@
         <div class="flex-between">
           <div class="title flex align-center">
             <el-avatar
-              v-if="isAppIcon(functionDetail?.icon)"
+              v-if="isAppIcon(toolDetail?.icon)"
               shape="square"
               :size="64"
               style="background: none"
               class="mr-8"
             >
-              <img :src="functionDetail?.icon" alt="" />
+              <img :src="toolDetail?.icon" alt="" />
             </el-avatar>
             <el-avatar
-              v-else-if="functionDetail?.name"
-              :name="functionDetail?.name"
+              v-else-if="toolDetail?.name"
+              :name="toolDetail?.name"
               pinyinColor
               shape="square"
               :size="64"
               class="mr-8"
             />
             <div class="ml-16">
-              <h3 class="mb-8">{{ functionDetail.name }}</h3>
-              <el-text type="info" v-if="functionDetail?.desc">
-                {{ functionDetail.desc }}
+              <h3 class="mb-8">{{ toolDetail.name }}</h3>
+              <el-text type="info" v-if="toolDetail?.desc">
+                {{ toolDetail.desc }}
               </el-text>
             </div>
           </div>
           <div @click.stop>
-            <el-button type="primary" @click="addInternalFunction(functionDetail)">
+            <el-button type="primary" @click="addInternalTool(toolDetail)">
               {{ $t('common.add') }}
             </el-button>
           </div>
@@ -67,11 +67,11 @@
 import { ref, watch } from 'vue'
 import { cloneDeep } from 'lodash'
 import { isAppIcon } from '@/utils/common'
-const emit = defineEmits(['refresh', 'addFunction'])
+const emit = defineEmits(['refresh', 'addTool'])
 
 const visibleInternalDesc = ref(false)
 const markdownContent = ref('')
-const functionDetail = ref<any>({})
+const toolDetail = ref<any>({})
 
 watch(visibleInternalDesc, (bool) => {
   if (!bool) {
@@ -80,15 +80,15 @@ watch(visibleInternalDesc, (bool) => {
 })
 
 const open = (data: any, detail: any) => {
-  functionDetail.value = detail
+  toolDetail.value = detail
   if (data) {
     markdownContent.value = cloneDeep(data)
   }
   visibleInternalDesc.value = true
 }
 
-const addInternalFunction = (data: any) => {
-  emit('addFunction', data)
+const addInternalTool = (data: any) => {
+  emit('addTool', data)
   visibleInternalDesc.value = false
 }
 

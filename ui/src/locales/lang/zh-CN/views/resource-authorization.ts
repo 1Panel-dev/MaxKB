@@ -21,6 +21,5 @@ export default {
   priority: {
     label: '资源权限优先级',
     role: '按角色',
-    customize: '自定义',
   },
 }

@@ -9,7 +9,7 @@
             $t('views.resourceAuthorization.priority.role')
           }}</el-radio>
           <el-radio :value="false" size="large">{{
-            $t('views.resourceAuthorization.priority.customize')
+            $t('common.custom')
           }}</el-radio>
         </el-radio-group>
       </div>

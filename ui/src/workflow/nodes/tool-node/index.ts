@@ -6,7 +6,7 @@ class ToolLibCustomNode extends AppNode {
   }
 }
 export default {
-  type: 'function-node',
+  type: 'tool-node',
   model: AppNodeModel,
   view: ToolLibCustomNode,
 }

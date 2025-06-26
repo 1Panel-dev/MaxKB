@@ -3,7 +3,7 @@
     <template #left>
       <h4 class="p-12-16 pb-0 mt-12">{{ $t('views.knowledge.title') }}</h4>
       <folder-tree
-        :source="FolderSource.KNOWLEDGE"
+        :source="SourceTypeEnum.KNOWLEDGE"
         :data="folderList"
         :currentNodeKey="currentFolder?.id"
         @handleNodeClick="folderClickHandel"
@@ -24,7 +24,7 @@
 <script lang="ts" setup>
 import { onMounted, ref, reactive, shallowRef, nextTick, computed } from 'vue'
 import KnowledgeListContainer from '@/views/knowledge/component/KnowledgeListContainer.vue'
-import { FolderSource } from '@/enums/common'
+import { SourceTypeEnum } from '@/enums/common'
 import permissionMap from '@/permission'
 import { useRoute } from 'vue-router'
 import useStore from '@/stores'
@@ -49,7 +49,7 @@ const currentFolder = ref<any>({})
 
 function getFolder(bool?: boolean) {
   const params = {}
-  folder.asyncGetFolder(FolderSource.KNOWLEDGE, params, loading).then((res: any) => {
+  folder.asyncGetFolder(SourceTypeEnum.KNOWLEDGE, params, loading).then((res: any) => {
     folderList.value = res.data
     if (bool) {
       // 初始化刷新

@@ -49,7 +49,6 @@ export default {
     },
     source: {
       label: '来源',
-      custom: '自定义',
       reference: '引用参数',
     },
     required: {

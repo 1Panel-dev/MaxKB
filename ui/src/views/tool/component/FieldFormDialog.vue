@@ -31,7 +31,7 @@
       <el-form-item :label="$t('views.tool.form.source.label')">
         <el-select v-model="form.source">
           <el-option :label="$t('views.tool.form.source.reference')" value="reference" />
-          <el-option :label="$t('views.tool.form.source.custom')" value="custom" />
+          <el-option :label="$t('common.custom')" value="custom" />
         </el-select>
       </el-form-item>
       <el-form-item :label="$t('views.tool.form.required.label')" @click.prevent>

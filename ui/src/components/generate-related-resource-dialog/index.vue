@@ -77,9 +77,9 @@
 <script setup lang="ts">
 import { reactive, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import documentApi from '@/api/resource-management/document'
-import paragraphApi from '@/api/resource-management/paragraph'
-import knowledgeApi from '@/api/resource-management/knowledge'
+import documentApi from '@/api/system-resource-management/document'
+import paragraphApi from '@/api/system-resource-management/paragraph'
+import knowledgeApi from '@/api/system-resource-management/knowledge'
 import useStoreShared from '@/stores/modules-resource-management'
 import useStore from '@/stores'
 import { groupBy } from 'lodash'

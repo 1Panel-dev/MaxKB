@@ -1,7 +1,7 @@
 import type { Ref } from 'vue'
 import { Result } from '@/request/Result'
 import { get, put } from '@/request/index'
-import type { ChatUserGroupItem, ChatUserGroupUserItem, ChatUserResourceParams, putUserGroupUserParams } from '@/api/type/workspaceChatUser'
+import type { ChatUserGroupItem, ChatUserGroupUserItem, putUserGroupUserParams } from '@/api/type/workspaceChatUser'
 import type { pageRequest, PageList } from '@/api/type/common'
 
 import useStore from '@/stores'
@@ -15,14 +15,14 @@ Object.defineProperty(prefix, 'value', {
 /**
  * 获取用户组列表
  */
-const getUserGroupList: (resource: ChatUserResourceParams, loading?: Ref<boolean>) => Promise<Result<ChatUserGroupItem[]>> = (resource, loading) => {
+const getUserGroupList: (resource: any, loading?: Ref<boolean>) => Promise<Result<ChatUserGroupItem[]>> = (resource, loading) => {
   return get(`${prefix.value}/${resource.resource_type}/${resource.resource_id}/user_group`, undefined, loading)
 }
 
 /**
  * 修改用户组列表授权
  */
-const editUserGroupList: (resource: ChatUserResourceParams, data: { user_group_id: string, is_auth: boolean }[], loading?: Ref<boolean>) => Promise<Result<any>> = (resource, data, loading) => {
+const editUserGroupList: (resource: any, data: { user_group_id: string, is_auth: boolean }[], loading?: Ref<boolean>) => Promise<Result<any>> = (resource, data, loading) => {
   return put(`${prefix.value}/${resource.resource_type}/${resource.resource_id}/user_group`, data, undefined, loading)
 }
 
@@ -30,7 +30,7 @@ const editUserGroupList: (resource: ChatUserResourceParams, data: { user_group_i
  * 获取用户组的用户列表
  */
 const getUserGroupUserList: (
-  resource: ChatUserResourceParams,
+  resource: any,
   user_group_id: string,
   page: pageRequest,
   username_or_nickname: string,
@@ -47,7 +47,7 @@ const getUserGroupUserList: (
  * 更新用户组的用户列表
  */
 const putUserGroupUser: (
-  resource: ChatUserResourceParams,
+  resource: any,
   user_group_id: string,
   data: putUserGroupUserParams[],
   loading?: Ref<boolean>,

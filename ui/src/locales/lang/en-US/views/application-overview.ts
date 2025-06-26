@@ -88,7 +88,6 @@ export default {
       past30Days: 'Last 30 Days',
       past90Days: 'Last 90 Days',
       past183Days: 'Last 6 Months',
-      other: 'Custom'
     },
     charts: {
       customerTotal: 'Total Users',

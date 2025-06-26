@@ -6,7 +6,7 @@
         <h4 :id="titleId" class="medium">
           {{ $t('views.tool.toolStore.title') }}
         </h4>
-        
+
         <el-tag class="store-type default-tag">{{t('views.tool.toolStore.internal')}}</el-tag>
 
         <div class="flex align-center" style="margin-right: 28px;">
@@ -56,18 +56,18 @@
       </el-scrollbar>
     </LayoutContainer>
   </el-dialog>
-  <InternalDescDrawer ref="internalDescDrawerRef" @addFunction="handleOpenAdd" />
-  <AddInternalFunctionDialog ref="addInternalFunctionDialogRef" @refresh="handleAdd" />
+  <InternalDescDrawer ref="internalDescDrawerRef" @addTool="handleOpenAdd" />
+  <AddInternalToolDialog ref="addInternalToolDialogRef" @refresh="handleAdd" />
 </template>
 
 <script setup lang="ts">
 import { onBeforeMount, ref } from 'vue'
-import ToolApi from '@/api/tool/tool'
+import ToolStoreApi from '@/api/tool/store'
 import { t } from '@/locales'
 import ToolCard from './ToolCard.vue'
 import { MsgSuccess } from '@/utils/message'
 import InternalDescDrawer from './InternalDescDrawer.vue'
-import AddInternalFunctionDialog from './AddInternalFunctionDialog.vue'
+import AddInternalToolDialog from './AddInternalToolDialog.vue'
 
 interface ToolCategory {
   id: string
@@ -133,7 +133,7 @@ onBeforeMount(() => {
 
 async function getList() {
   try {
-    const res = await ToolApi.getInternalToolList({ name: searchValue.value }, loading)
+    const res = await ToolStoreApi.getInternalToolList({ name: searchValue.value }, loading)
     if (searchValue.value.length) {
       filterList.value = res.data
     } else {
@@ -163,15 +163,15 @@ async function handleDetail(tool: any) {
   internalDescDrawerRef.value?.open(content, tool)
 }
 
-const addInternalFunctionDialogRef = ref<InstanceType<typeof AddInternalFunctionDialog>>()
+const addInternalToolDialogRef = ref<InstanceType<typeof AddInternalToolDialog>>()
 function handleOpenAdd(data?: any, isEdit?: boolean) {
-  addInternalFunctionDialogRef.value?.open(data, isEdit)
+  addInternalToolDialogRef.value?.open(data, isEdit)
 }
 
 const addLoading = ref(false)
 async function handleAdd(tool: any) {
   try {
-    await ToolApi.addInternalTool(tool.id, { name: tool.name, folder_id: folderId.value }, addLoading)
+    await ToolStoreApi.addInternalTool(tool.id, { name: tool.name, folder_id: folderId.value }, addLoading)
     emit('refresh')
     MsgSuccess(t('common.addSuccess'))
     dialogVisible.value = false

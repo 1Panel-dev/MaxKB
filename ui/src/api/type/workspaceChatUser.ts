@@ -1,10 +1,5 @@
 
-import { ChatUserResourceEnum } from '@/enums/workspaceChatUser'
-
-interface ChatUserResourceParams {
-  resource_id: string,
-  resource_type: ChatUserResourceEnum
-}
+import { SourceTypeEnum } from '@/enums/common'
 
 interface ChatUserGroupItem {
   id: string,
@@ -30,4 +25,4 @@ interface putUserGroupUserParams {
   chat_user_id: string,
   is_auth: boolean
 }
-export type { ChatUserGroupItem, putUserGroupUserParams, ChatUserResourceParams, ChatUserGroupUserItem }
+export type { ChatUserGroupItem, putUserGroupUserParams, ChatUserGroupUserItem }

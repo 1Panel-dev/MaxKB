@@ -50,7 +50,7 @@
                 value="referencing"
               />
               <el-option
-                :label="$t('views.applicationWorkflow.nodes.replyNode.replyContent.custom')"
+                :label="$t('common.custom')"
                 value="custom"
               />
             </el-select>

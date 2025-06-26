@@ -35,28 +35,28 @@
           </div>
         </el-scrollbar>
       </el-tab-pane>
-      <el-tab-pane :label="$t('views.tool.title')" name="function">
+      <el-tab-pane :label="$t('views.tool.title')" name="tool">
         <el-scrollbar height="400">
           <div
             class="workflow-dropdown-item cursor flex p-8-12"
-            @click.stop="clickNodes(functionNode)"
-            @mousedown.stop="onmousedown(functionNode)"
+            @click.stop="clickNodes(toolNode)"
+            @mousedown.stop="onmousedown(toolNode)"
           >
-            <component :is="iconComponent(`function-lib-node-icon`)" class="mr-8 mt-4" :size="32" />
+            <component :is="iconComponent(`tool-lib-node-icon`)" class="mr-8 mt-4" :size="32" />
             <div class="pre-wrap">
-              <div class="lighter">{{ functionNode.label }}</div>
-              <el-text type="info" size="small">{{ functionNode.text }}</el-text>
+              <div class="lighter">{{ toolNode.label }}</div>
+              <el-text type="info" size="small">{{ toolNode.text }}</el-text>
             </div>
           </div>
 
-          <template v-for="(item, index) in filter_function_lib_list" :key="index">
+          <template v-for="(item, index) in filter_tool_lib_list" :key="index">
             <div
               class="workflow-dropdown-item cursor flex p-8-12 align-center"
-              @click.stop="clickNodes(toolNode, item, 'function')"
-              @mousedown.stop="onmousedown(toolNode, item, 'function')"
+              @click.stop="clickNodes(toolNode, item, 'tool')"
+              @mousedown.stop="onmousedown(toolNode, item, 'tool')"
             >
               <component
-                :is="iconComponent(`function-lib-node-icon`)"
+                :is="iconComponent(`tool-lib-node-icon`)"
                 class="mr-8"
                 :size="32"
                 :item="item"
@@ -130,7 +130,7 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
-import { menuNodes, toolNode, functionNode, applicationNode } from '@/workflow/common/data'
+import { menuNodes, toolNode, toolNode, applicationNode } from '@/workflow/common/data'
 import { iconComponent } from '@/workflow/icons/utils'
 import applicationApi from '@/api/application/application'
 import { isWorkFlow } from '@/utils/application'
@@ -154,7 +154,7 @@ const loading = ref(false)
 const activeName = ref('base')
 
 const toolList = ref<any[]>([])
-const filter_function_lib_list = computed(() => {
+const filter_tool_lib_list = computed(() => {
   return toolList.value.filter((item: any) =>
     item.name.toLocaleLowerCase().includes(search_text.value.toLocaleLowerCase())
   )
@@ -171,13 +171,13 @@ const filter_menu_nodes = computed(() => {
     item.label.toLocaleLowerCase().includes(search_text.value.toLocaleLowerCase())
   )
 })
-function clickNodes(item: any, data?: any, type?: string) {
+tool clickNodes(item: any, data?: any, type?: string) {
   if (data) {
     item['properties']['stepName'] = data.name
-    if (type == 'function') {
+    if (type == 'tool') {
       item['properties']['node_data'] = {
         ...data,
-        function_lib_id: data.id,
+        tool_lib_id: data.id,
         input_field_list: data.input_field_list.map((field: any) => ({
           ...field,
           value: field.source == 'reference' ? [] : ''
@@ -216,13 +216,13 @@ function clickNodes(item: any, data?: any, type?: string) {
   emit('clickNodes', item)
 }
 
-function onmousedown(item: any, data?: any, type?: string) {
+tool onmousedown(item: any, data?: any, type?: string) {
   if (data) {
     item['properties']['stepName'] = data.name
-    if (type == 'function') {
+    if (type == 'tool') {
       item['properties']['node_data'] = {
         ...data,
-        function_lib_id: data.id,
+        tool_lib_id: data.id,
         input_field_list: data.input_field_list.map((field: any) => ({
           ...field,
           value: field.source == 'reference' ? [] : ''
@@ -260,7 +260,7 @@ function onmousedown(item: any, data?: any, type?: string) {
   emit('onmousedown', item)
 }
 
-function getList() {
+tool getList() {
   // applicationApi.listTool(props.id, loading).then((res: any) => {
   //   toolList.value = res.data
   // })

@@ -80,7 +80,6 @@ export default {
     customizeUpload: 'Custom Upload',
     upload: 'Upload',
     default: 'Default Logo',
-    custom: 'Custom',
     sizeTip: 'Recommended size: 32×32 pixels. Supports JPG, PNG, and GIF formats. Max size: 10 MB',
     fileSizeExceeded: 'File size exceeds 10 MB',
     uploadImagePrompt: 'Please upload an image',
@@ -96,4 +95,5 @@ export default {
     message: 'Unable to Access APP',
     operate: 'Back to Home',
   },
+  custom: 'Custom',
 }

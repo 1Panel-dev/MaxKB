@@ -320,7 +320,7 @@ import useStore from '@/stores'
 import { numberFormat } from '@/utils/common'
 import { t } from '@/locales'
 import { useRouter, useRoute } from 'vue-router'
-import { FolderSource } from '@/enums/common'
+import { SourceTypeEnum } from '@/enums/common'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import permissionMap from '@/permission'
 
@@ -463,7 +463,7 @@ function openAuthorizedWorkspaceDialog(row: any) {
 // 文件夹相关
 const CreateFolderDialogRef = ref()
 function openCreateFolder() {
-  CreateFolderDialogRef.value.open(FolderSource.KNOWLEDGE, folder.currentFolder.id)
+  CreateFolderDialogRef.value.open(SourceTypeEnum.KNOWLEDGE, folder.currentFolder.id)
 }
 watch(
   () => folder.currentFolder,

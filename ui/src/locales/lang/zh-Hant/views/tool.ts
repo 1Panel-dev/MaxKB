@@ -52,7 +52,6 @@ export default {
     },
     source: {
       label: '來源',
-      custom: '自定義',
       reference: '引用參數',
     },
     required: {

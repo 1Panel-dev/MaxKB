@@ -178,7 +178,7 @@
           <template #default="{ row }">
             {{
               row.source === 'custom'
-                ? $t('views.tool.form.source.custom')
+                ? $t('common.custom')
                 : $t('views.tool.form.source.reference')
             }}
           </template>

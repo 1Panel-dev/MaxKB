@@ -4,8 +4,8 @@ import { t } from '@/locales'
 const end_nodes: Array<string> = [
   WorkflowType.AiChat,
   WorkflowType.Reply,
-  WorkflowType.FunctionLib,
-  WorkflowType.FunctionLibCustom,
+  WorkflowType.ToolLib,
+  WorkflowType.ToolLibCustom,
   WorkflowType.ImageUnderstandNode,
   WorkflowType.Application,
   WorkflowType.SpeechToTextNode,

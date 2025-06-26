@@ -422,8 +422,8 @@
                   <!-- 函数库 -->
                   <template
                     v-if="
-                      item.type === WorkflowType.FunctionLib ||
-                      item.type === WorkflowType.FunctionLibCustom
+                      item.type === WorkflowType.ToolLib ||
+                      item.type === WorkflowType.ToolLibCustom
                     "
                   >
                     <div class="card-never border-r-6 mt-8">
@@ -716,7 +716,7 @@ import { cloneDeep } from 'lodash'
 import ParagraphCard from './component/ParagraphCard.vue'
 import { arraySort } from '@/utils/utils'
 import { iconComponent } from '@/workflow/icons/utils'
-import { WorkflowType } from '@/enums/workflow'
+import { WorkflowType } from '@/enums/application'
 import { getImgUrl } from '@/utils/utils'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
 

@@ -84,7 +84,6 @@ export default {
     customizeUpload: '自定义上传',
     upload: '上传',
     default: '默认Logo',
-    custom: '自定义',
     sizeTip: '建议尺寸 32*32，支持 JPG、PNG、GIF，大小不超过 10 MB',
     fileSizeExceeded: '文件大小超过 10 MB',
     uploadImagePrompt: '请上传一张图片',
@@ -100,4 +99,5 @@ export default {
     message: '无法访问应用',
     operate: '返回首页',
   },
+  custom: '自定义',
 }

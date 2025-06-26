@@ -3,7 +3,7 @@
     <template #header>
       <div>
         <h2>{{ $t('views.chatUser.title') }}</h2>
-        <div class="color-secondary">{{ resource.resource_type === ChatUserResourceEnum.APPLICATION ?
+        <div class="color-secondary">{{ resource.resource_type === SourceTypeEnum.APPLICATION ?
           $t('views.chatUser.applicationTitleTip') : $t('views.chatUser.knowledgeTitleTip') }}</div>
       </div>
     </template>
@@ -109,9 +109,9 @@
 import { onMounted, ref, watch, reactive, computed } from 'vue'
 import ChatUserApi from '@/api/chat-user/chat-user'
 import { t } from '@/locales'
-import type { ChatUserGroupItem, ChatUserResourceParams, ChatUserGroupUserItem } from '@/api/type/workspaceChatUser'
+import type { ChatUserGroupItem, ChatUserGroupUserItem } from '@/api/type/workspaceChatUser'
 import { useRoute } from 'vue-router'
-import { ChatUserResourceEnum } from '@/enums/workspaceChatUser'
+import { SourceTypeEnum } from '@/enums/common'
 import { MsgSuccess } from '@/utils/message'
 import permissionMap from '@/permission'
 
@@ -128,7 +128,7 @@ const {
   params: { id },
 } = route as any
 
-const resource: ChatUserResourceParams = reactive({ resource_id: route.params.id as string, resource_type: route.meta.resourceType as ChatUserResourceEnum })
+const resource = reactive({ resource_id: route.params.id as string, resource_type: route.meta.resourceType as string })
 
 const filterText = ref('')
 const loading = ref(false)

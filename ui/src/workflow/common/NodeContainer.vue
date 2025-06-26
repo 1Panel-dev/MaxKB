@@ -78,7 +78,7 @@
               :title="
                 props.nodeModel.type === 'application-node'
                   ? $t('views.applicationWorkflow.tip.applicationNodeError')
-                  : $t('views.applicationWorkflow.tip.functionNodeError')
+                  : $t('views.applicationWorkflow.tip.toolNodeError')
               "
               type="error"
               show-icon

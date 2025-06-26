@@ -32,7 +32,7 @@ export default {
     notRecyclable: 'Loop connections are not allowed',
     onlyLeft: 'Connections can only be made to the left anchor',
     applicationNodeError: 'This application is unavailable',
-    functionNodeError: 'This function node is unavailable',
+    toolNodeError: 'This tool node is unavailable',
     repeatedNodeError: 'A node with this name already exists',
     cannotCopy: 'Cannot be copied',
     copyError: 'Node already copied',
@@ -161,7 +161,6 @@ export default {
       content: 'Content',
       replyContent: {
         label: 'Reply Content',
-        custom: 'Custom',
         reference: 'Reference Variable'
       }
     },
@@ -260,8 +259,8 @@ export default {
         label: 'Select Text Content'
       }
     },
-    functionNode: {
-      label: 'Custom Function',
+    toolNode: {
+      label: 'Custom Tool',
       text: 'Execute custom scripts to achieve data processing'
     },
     applicationNode: {

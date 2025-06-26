@@ -4,7 +4,6 @@ export default {
   platformDisplayTheme: '平台顯示主題',
   customTheme: '自定義主題',
   platformLoginSettings: '平台登錄設置',
-  custom: '自定義',
   pagePreview: '頁面預覽',
   default: '默認',
   restoreDefaults: '恢復默認',

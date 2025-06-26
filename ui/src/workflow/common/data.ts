@@ -357,13 +357,13 @@ export const menuNodes = [
 /**
  * 自定义函数配置数据
  */
-export const functionNode = {
-  type: WorkflowType.FunctionLibCustom,
-  text: t('views.applicationWorkflow.nodes.functionNode.text'),
-  label: t('views.applicationWorkflow.nodes.functionNode.label'),
+export const toolNode = {
+  type: WorkflowType.ToolLibCustom,
+  text: t('views.applicationWorkflow.nodes.toolNode.text'),
+  label: t('views.applicationWorkflow.nodes.toolNode.label'),
   height: 260,
   properties: {
-    stepName: t('views.applicationWorkflow.nodes.functionNode.label'),
+    stepName: t('views.applicationWorkflow.nodes.toolNode.label'),
     config: {
       fields: [
         {
@@ -375,12 +375,12 @@ export const functionNode = {
   }
 }
 export const toolNode = {
-  type: WorkflowType.FunctionLib,
-  text: t('views.applicationWorkflow.nodes.functionNode.text'),
-  label: t('views.applicationWorkflow.nodes.functionNode.label'),
+  type: WorkflowType.ToolLib,
+  text: t('views.applicationWorkflow.nodes.toolNode.text'),
+  label: t('views.applicationWorkflow.nodes.toolNode.label'),
   height: 170,
   properties: {
-    stepName: t('views.applicationWorkflow.nodes.functionNode.label'),
+    stepName: t('views.applicationWorkflow.nodes.toolNode.label'),
     config: {
       fields: [
         {
@@ -437,8 +437,8 @@ export const nodeDict: any = {
   [WorkflowType.Base]: baseNode,
   [WorkflowType.Start]: startNode,
   [WorkflowType.Reply]: replyNode,
-  [WorkflowType.FunctionLib]: toolNode,
-  [WorkflowType.FunctionLibCustom]: functionNode,
+  [WorkflowType.ToolLib]: toolNode,
+  [WorkflowType.ToolLibCustom]: toolNode,
   [WorkflowType.RrerankerNode]: rerankerNode,
   [WorkflowType.FormNode]: formNode,
   [WorkflowType.Application]: applicationNode,

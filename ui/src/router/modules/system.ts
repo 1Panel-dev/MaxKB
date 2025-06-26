@@ -67,42 +67,31 @@ const systemRouter = {
       },
       component: () => import('@/views/system/workspace/index.vue'),
     },
-    // {
-    //   path: '/system/resource-management',
-    //   name: 'resourceManagement',
-    //   meta: {
-    //     icon: 'app-shared',
-    //     iconActive: 'app-shared-active',
-    //     title: 'views.system.resource_management.label',
-    //     activeMenu: '/system',
-    //     parentPath: '/system',
-    //     parentName: 'system',
-    //   },
-    //   children: [
-    //     {
-    //       path: '/system/resource-management/knowledge',
-    //       name: 'knowledgeResourceManagement',
-    //       meta: {
-    //         title: 'views.knowledge.title',
-    //         activeMenu: '/system',
-    //         parentPath: '/system',
-    //         parentName: 'system',
-    //       },
-    //       component: () => import('@/views/resource-management/knowledge/index.vue'),
-    //     },
-    //     {
-    //       path: '/system/resource-management/tool',
-    //       name: 'toolResourceManagement',
-    //       meta: {
-    //         title: 'views.tool.title',
-    //         activeMenu: '/system',
-    //         parentPath: '/system',
-    //         parentName: 'system',
-    //       },
-    //       component: () => import('@/views/resource-management/tool/index.vue'),
-    //     },
-    //   ],
-    // },
+    {
+      path: '/system/resource-management',
+      name: 'resourceManagement',
+      meta: {
+        icon: 'app-resource-management',
+        iconActive: 'app-resource-management',
+        title: 'views.system.resource_management.label',
+        activeMenu: '/system',
+        parentPath: '/system',
+        parentName: 'system',
+      },
+      children: [
+        {
+          path: '/system/resource-management/tool',
+          name: 'ToolResourceIndex',
+          meta: {
+            title: 'views.tool.title',
+            activeMenu: '/system',
+            parentPath: '/system',
+            parentName: 'system',
+          },
+          component: () => import('@/views/system-resource-management/ToolResourceIndex.vue'),
+        },
+      ],
+    },
     {
       path: '/system/authorization',
       name: 'authorization',

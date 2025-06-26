@@ -55,7 +55,6 @@ export default {
     },
     source: {
       label: 'Source',
-      custom: 'Custom',
       reference: 'Reference Parameter',
     },
     required: {
