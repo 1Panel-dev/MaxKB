@@ -11,7 +11,7 @@
         <TopAbout class="mt-4"></TopAbout>
         <el-divider class="ml-8 mr-8" direction="vertical" />
         <el-button link @click="router.push({ path: '/' })">
-          <AppIcon class="mr-8" iconName="app-wordspace" style="font-size: 16px"></AppIcon>
+          <AppIcon class="mr-8" iconName="app-workspace" style="font-size: 16px"></AppIcon>
           {{ '返回工作空间' }}</el-button
         >
       </div>

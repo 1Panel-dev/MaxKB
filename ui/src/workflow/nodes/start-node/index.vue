@@ -4,7 +4,7 @@
     <div
       v-for="(item, index) in nodeModel.properties.config.globalFields"
       :key="index"
-      class="flex-between border-r-4 p-8-12 mb-8 layout-bg lighter"
+      class="flex-between border-r-6 p-8-12 mb-8 layout-bg lighter"
       @mouseenter="showicon = true"
       @mouseleave="showicon = false"
     >

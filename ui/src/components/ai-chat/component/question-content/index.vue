@@ -26,7 +26,7 @@
         <div class="mb-8" v-if="image_list.length">
           <el-space wrap>
             <template v-for="(item, index) in image_list" :key="index">
-              <div class="file cursor border-r-4" v-if="item.url">
+              <div class="file cursor border-r-6" v-if="item.url">
                 <el-image
                   :src="item.url"
                   :zoom-rate="1.2"
@@ -37,7 +37,7 @@
                   alt=""
                   fit="cover"
                   style="width: 170px; height: 170px; display: block"
-                  class="border-r-4"
+                  class="border-r-6"
                 />
               </div>
             </template>
@@ -46,12 +46,12 @@
         <div class="mb-8" v-if="audio_list.length">
           <el-space wrap>
             <template v-for="(item, index) in audio_list" :key="index">
-              <div class="file cursor border-r-4" v-if="item.url">
+              <div class="file cursor border-r-6" v-if="item.url">
                 <audio
                   :src="item.url"
                   controls
                   style="width: 350px; height: 43px"
-                  class="border-r-4"
+                  class="border-r-6"
                 />
               </div>
             </template>

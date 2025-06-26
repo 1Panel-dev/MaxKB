@@ -80,7 +80,7 @@
             <div class="flex align-center">
               <h4 class="medium">{{ current?.name }}</h4>
               <el-divider direction="vertical" class="mr-8 ml-8" />
-              <AppIcon iconName="app-wordspace" style="font-size: 16px" class="color-input-placeholder"></AppIcon>
+              <AppIcon iconName="app-workspace" style="font-size: 16px" class="color-input-placeholder"></AppIcon>
               <span class="color-input-placeholder ml-4">
                 {{ paginationConfig.total }}
               </span>

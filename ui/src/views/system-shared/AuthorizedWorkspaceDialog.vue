@@ -48,7 +48,7 @@
               :value="space"
             >
               <div class="flex">
-                <AppIcon iconName="app-wordspace"></AppIcon>
+                <AppIcon iconName="app-workspace"></AppIcon>
                 <span class="ml-4"> {{ space.name }}</span>
               </div>
             </el-checkbox>
@@ -68,7 +68,7 @@
         <template v-for="ele in checkedWorkspace">
           <div class="flex-between">
             <div class="flex align-center">
-              <AppIcon iconName="app-wordspace"></AppIcon>
+              <AppIcon iconName="app-workspace"></AppIcon>
               <span class="ml-4 lighter">{{ ele.name }}</span>
             </div>
             <el-button link>

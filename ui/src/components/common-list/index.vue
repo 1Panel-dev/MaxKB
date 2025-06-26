@@ -79,7 +79,7 @@ defineExpose({
     line-height: 24px;
     &.active {
       background: var(--el-color-primary-light-9);
-      border-radius: 4px;
+      border-radius: var(--app-border-radius-base);
       color: var(--el-color-primary);
       font-weight: 500;
       &:hover {
@@ -87,7 +87,7 @@ defineExpose({
       }
     }
     &:hover {
-      border-radius: 4px;
+      border-radius: var(--app-border-radius-base);
       background: var(--app-text-color-light-1);
     }
     &.is-active {

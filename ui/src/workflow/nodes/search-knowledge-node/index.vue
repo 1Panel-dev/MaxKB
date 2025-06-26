@@ -24,7 +24,7 @@
               {{ $t('views.application.form.relatedKnowledge.placeholder') }}
             </el-text>
             <template v-for="(item, index) in form_data.knowledge_id_list" :key="index" v-else>
-              <div class="flex-between border border-r-4 white-bg mb-4" style="padding: 5px 8px">
+              <div class="flex-between border border-r-6 white-bg mb-4" style="padding: 5px 8px">
                 <div class="flex align-center" style="line-height: 20px">
                   <KnowledgeIcon :type="relatedObject(knowledgeList, item, 'id')?.type" />
 

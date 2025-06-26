@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     v-model="aboutDialogVisible"
-    class="about-dialog border-r-4"
+    class="about-dialog border-r-6"
     :class="!isDefaultTheme ? 'dialog-custom-header' : ''"
   >
     <template #header="{ titleId, titleClass }">

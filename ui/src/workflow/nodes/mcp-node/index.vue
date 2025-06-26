@@ -1,7 +1,7 @@
 <template>
   <NodeContainer :nodeModel="nodeModel">
     <h5 class="title-decoration-1 mb-8">{{ $t('views.applicationWorkflow.nodeSetting') }}</h5>
-    <div class="border-r-4 p-8-12 mb-8 layout-bg lighter">
+    <div class="border-r-6 p-8-12 mb-8 layout-bg lighter">
       <el-form
         @submit.prevent
         :model="form_data"
@@ -63,7 +63,7 @@
       <div class="p-8-12" v-if="!form_data.mcp_tool">
         <el-text type="info">{{ $t('common.noData') }}</el-text>
       </div>
-      <div v-else class="border-r-4 p-8-12 mb-8 layout-bg lighter">
+      <div v-else class="border-r-6 p-8-12 mb-8 layout-bg lighter">
         <el-form
           ref="dynamicsFormRef"
           label-position="top"
@@ -135,7 +135,7 @@
       <div class="p-8-12" v-if="!form_data.mcp_tool">
         <el-text type="info">{{ $t('common.noData') }}</el-text>
       </div>
-      <div v-else class="border-r-4 p-8-12 mb-8 layout-bg lighter">
+      <div v-else class="border-r-6 p-8-12 mb-8 layout-bg lighter">
         <el-form
           ref="dynamicsFormRef"
           label-position="top"

@@ -130,7 +130,7 @@
           <el-space wrap>
             <template v-for="(item, index) in uploadImageList" :key="index">
               <div
-                class="file file-image cursor border border-r-4"
+                class="file file-image cursor border border-r-6"
                 v-if="item.url"
                 @mouseenter.stop="mouseenter(item)"
                 @mouseleave.stop="mouseleave()"
@@ -149,7 +149,7 @@
                   alt=""
                   fit="cover"
                   style="width: 40px; height: 40px; display: block"
-                  class="border-r-4"
+                  class="border-r-6"
                 />
               </div>
             </template>
@@ -432,7 +432,6 @@ const uploadFile = async (file: any, fileList: any) => {
   formData.append('file', file.raw, file.name)
   //
   const extension = file.name.split('.').pop().toUpperCase() // 获取文件后缀名并转为小写
-  console.log(documentExtensions)
   if (imageExtensions.includes(extension)) {
     uploadImageList.value.push(file)
   } else if (documentExtensions.includes(extension)) {

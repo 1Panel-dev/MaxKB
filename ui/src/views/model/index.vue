@@ -186,8 +186,8 @@ const clickListHandle = (item: Provider) => {
   active_provider.value = item
   list_model()
   if (active_provider.value.provider === '') {
-    commonList1.value.clearCurrent()
-    commonList2.value.clearCurrent()
+    commonList1.value?.clearCurrent()
+    commonList2.value?.clearCurrent()
   }
 }
 

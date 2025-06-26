@@ -1,9 +1,9 @@
 <template>
   <div class="flex-between mb-16">
-    <el-button type="primary" @click="handleAdd"
-      v-hasPermission="[
-        RoleConst.ADMIN,
-        PermissionConst.WORKSPACE_ADD_MEMBER]"
+    <el-button
+      type="primary"
+      @click="handleAdd"
+      v-hasPermission="[RoleConst.ADMIN, PermissionConst.WORKSPACE_ADD_MEMBER]"
     >
       {{ $t('views.role.member.add') }}
     </el-button>
@@ -11,30 +11,50 @@
       <el-select class="complex-search__left" v-model="searchType" style="width: 120px">
         <el-option :label="$t('views.login.loginForm.username.label')" value="username" />
       </el-select>
-      <el-input v-if="searchType === 'username'" v-model="searchForm.username" @change="getList"
-        :placeholder="$t('common.inputPlaceholder')" style="width: 220px" clearable />
+      <el-input
+        v-if="searchType === 'username'"
+        v-model="searchForm.username"
+        @change="getList"
+        :placeholder="$t('common.inputPlaceholder')"
+        style="width: 220px"
+        clearable
+      />
     </div>
   </div>
-  <app-table :data="tableData" :pagination-config="paginationConfig" @sizeChange="handleSizeChange"
-    @changePage="getList" v-loading="loading">
+  <app-table
+    :data="tableData"
+    :pagination-config="paginationConfig"
+    @sizeChange="handleSizeChange"
+    @changePage="getList"
+    v-loading="loading"
+  >
     <el-table-column prop="nick_name" :label="$t('views.userManage.userForm.nick_name.label')" />
     <el-table-column prop="username" :label="$t('views.login.loginForm.username.label')" />
     <el-table-column prop="role_name" :label="$t('views.role.member.role')" />
     <el-table-column :label="$t('common.operation')" width="100" fixed="right">
       <template #default="{ row }">
-        <el-tooltip effect="dark" :content="`${$t('views.role.member.delete.button')}`" placement="top">
-          <el-button type="primary" text @click.stop="handleDelete(row)"
-            v-hasPermission="[RoleConst.ADMIN,PermissionConst.WORKSPACE_REMOVE_MEMBER]"
+        <el-tooltip
+          effect="dark"
+          :content="`${$t('views.role.member.delete.button')}`"
+          placement="top"
+        >
+          <el-button
+            type="primary"
+            text
+            @click.stop="handleDelete(row)"
+            v-hasPermission="[RoleConst.ADMIN, PermissionConst.WORKSPACE_REMOVE_MEMBER]"
           >
-            <el-icon>
-              <EditPen />
-            </el-icon>
+            <AppIcon iconName="app-delete-users"></AppIcon>
           </el-button>
         </el-tooltip>
       </template>
     </el-table-column>
   </app-table>
-  <AddMemberDrawer ref="addMemberDrawerRef" :currentWorkspace="props.currentWorkspace" @refresh="getList" />
+  <AddMemberDrawer
+    ref="addMemberDrawerRef"
+    :currentWorkspace="props.currentWorkspace"
+    @refresh="getList"
+  />
 </template>
 
 <script setup lang="ts">
@@ -70,7 +90,12 @@ async function getList() {
     const params = {
       [searchType.value]: searchForm.value[searchType.value],
     }
-    const res = await WorkspaceApi.getWorkspaceMemberList(props.currentWorkspace?.id, paginationConfig, params, loading)
+    const res = await WorkspaceApi.getWorkspaceMemberList(
+      props.currentWorkspace?.id,
+      paginationConfig,
+      params,
+      loading,
+    )
     tableData.value = res.data.records
     paginationConfig.total = res.data.total
   } catch (error) {
@@ -87,30 +112,34 @@ onMounted(() => {
   getList()
 })
 
-watch(() => props.currentWorkspace?.id, () => {
-  getList()
-})
+watch(
+  () => props.currentWorkspace?.id,
+  () => {
+    getList()
+  },
+)
 
 const addMemberDrawerRef = ref<InstanceType<typeof AddMemberDrawer>>()
 function handleAdd() {
-  addMemberDrawerRef.value?.open();
+  addMemberDrawerRef.value?.open()
 }
 
 function handleDelete(row: WorkspaceMemberItem) {
-  MsgConfirm(
-    `${t('views.workspace.member.delete.confirmTitle')}${row.nick_name} ?`, '',
-    {
-      confirmButtonText: t('common.confirm'),
-      confirmButtonClass: 'danger',
-    },
-  )
+  MsgConfirm(`${t('views.workspace.member.delete.confirmTitle')}${row.nick_name} ?`, '', {
+    confirmButtonText: t('common.confirm'),
+    confirmButtonClass: 'danger',
+  })
     .then(() => {
       loading.value = true
-      WorkspaceApi.deleteWorkspaceMember(props.currentWorkspace?.id as string, row.user_relation_id, loading).then(() => {
+      WorkspaceApi.deleteWorkspaceMember(
+        props.currentWorkspace?.id as string,
+        row.user_relation_id,
+        loading,
+      ).then(() => {
         MsgSuccess(t('common.deleteSuccess'))
         getList()
       })
     })
-    .catch(() => { })
+    .catch(() => {})
 }
 </script>

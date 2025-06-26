@@ -1,54 +1,45 @@
 <template>
   <el-scrollbar v-loading="loading">
-    <div class="p-24 pt-0">
-      <app-table :data="tableData" border :span-method="objectSpanMethod">
-        <el-table-column
-          prop="module"
-          :width="130"
-          :label="$t('views.role.permission.moduleName')"
-        />
-        <el-table-column
-          prop="name"
-          :width="150"
-          :label="$t('views.role.permission.operationTarget')"
-        />
-        <el-table-column
-          prop="permission"
-          :label="$t('views.model.modelForm.permissionType.label')"
-        >
-          <template #default="{ row }">
-            <el-checkbox-group v-model="row.perChecked" @change="handleCellChange($event, row)">
-              <el-checkbox
-                v-for="item in row.permission"
-                :key="item.id"
-                :value="item.id"
-                :disabled="disabled"
-              >
-                <div class="ellipsis" style="width: 96px">{{ item.name }}</div>
-              </el-checkbox>
-            </el-checkbox-group>
-          </template>
-        </el-table-column>
-        <el-table-column :width="40">
-          <template #header>
+    <app-table :data="tableData" border :span-method="objectSpanMethod">
+      <el-table-column prop="module" :width="130" :label="$t('views.role.permission.moduleName')" />
+      <el-table-column
+        prop="name"
+        :width="150"
+        :label="$t('views.role.permission.operationTarget')"
+      />
+      <el-table-column prop="permission" :label="$t('views.model.modelForm.permissionType.label')">
+        <template #default="{ row }">
+          <el-checkbox-group v-model="row.perChecked" @change="handleCellChange($event, row)">
             <el-checkbox
-              :model-value="allChecked"
-              :indeterminate="allIndeterminate"
+              v-for="item in row.permission"
+              :key="item.id"
+              :value="item.id"
               :disabled="disabled"
-              @change="handleCheckAll"
-            />
-          </template>
-          <template #default="{ row }">
-            <el-checkbox
-              v-model="row.enable"
-              :indeterminate="row.indeterminate"
-              :disabled="disabled"
-              @change="(value: boolean) => handleRowChange(value, row)"
-            />
-          </template>
-        </el-table-column>
-      </app-table>
-    </div>
+            >
+              <div class="ellipsis" style="width: 96px">{{ item.name }}</div>
+            </el-checkbox>
+          </el-checkbox-group>
+        </template>
+      </el-table-column>
+      <el-table-column :width="40">
+        <template #header>
+          <el-checkbox
+            :model-value="allChecked"
+            :indeterminate="allIndeterminate"
+            :disabled="disabled"
+            @change="handleCheckAll"
+          />
+        </template>
+        <template #default="{ row }">
+          <el-checkbox
+            v-model="row.enable"
+            :indeterminate="row.indeterminate"
+            :disabled="disabled"
+            @change="(value: boolean) => handleRowChange(value, row)"
+          />
+        </template>
+      </el-table-column>
+    </app-table>
   </el-scrollbar>
   <div v-if="!disabled" class="footer border-t">
     <el-button type="primary" style="width: 80px" :loading="loading" @click="handleSave">
@@ -65,7 +56,7 @@ import type {
   RoleTableDataItem,
   ChildrenPermissionItem,
 } from '@/api/type/role'
-import RoleApi from '@/api/system/role'
+import { loadPermissionApi } from '@/utils/dynamics-api/permission-api'
 import { MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
 
@@ -100,7 +91,7 @@ async function getRolePermission() {
   if (!props.currentRole?.id) return
   try {
     tableData.value = []
-    const res = await RoleApi.getRolePermissionList(props.currentRole.id, loading)
+    const res = await loadPermissionApi('role').getRolePermissionList(props.currentRole.id, loading)
     tableData.value = transformData(res.data)
   } catch (error) {
     console.error(error)
@@ -175,7 +166,7 @@ async function handleSave() {
         })
       })
     })
-    await RoleApi.saveRolePermission(props.currentRole?.id as string, permissions, loading)
+    await loadPermissionApi('role').saveRolePermission(props.currentRole?.id as string, permissions, loading)
     MsgSuccess(t('common.saveSuccess'))
   } catch (error) {
     console.log(error)

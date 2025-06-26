@@ -1,7 +1,7 @@
 <template>
   <el-dropdown placement="bottom-start" class="workspace-dropdown">
     <el-button text style="font-size: 14px" class="workspace-dropdown__button">
-      <AppIcon iconName="app-wordspace" style="font-size: 18px"></AppIcon>
+      <AppIcon iconName="app-workspace" style="font-size: 18px"></AppIcon>
       <span class="ellipsis" style="max-width: 155px">
         {{ currentWorkspace?.name }}
       </span>
@@ -17,7 +17,7 @@
           :class="item.id === currentWorkspace?.id ? 'active' : ''"
           @click="changeWorkspace(item)"
         >
-          <AppIcon class="mr-8" iconName="app-wordspace" style="font-size: 16px"></AppIcon>
+          <AppIcon class="mr-8" iconName="app-workspace" style="font-size: 16px"></AppIcon>
           <span class="ellipsis" style="max-width: 230px">
             {{ item.name }}
           </span>

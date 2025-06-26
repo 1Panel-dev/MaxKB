@@ -13,7 +13,7 @@
       class="shared-button flex cursor"
       :class="currentNodeKey === 'share' && 'active'"
     >
-      <AppIcon iconName="app-shared-active" style="font-size: 18px"></AppIcon>
+      <AppIcon iconName="app-shared-active" style="font-size: 18px" class="color-primary"></AppIcon>
       <span class="ml-8 lighter">{{ shareTitle }}</span>
     </div>
     <div class="tree-height border-t" :style="treeStyle">
@@ -209,7 +209,7 @@ function refreshFolder() {
     margin-bottom: 4px;
     &.active {
       background: var(--el-color-primary-light-9);
-      border-radius: 4px;
+      border-radius: var(--app-border-radius-base);
       color: var(--el-color-primary);
       font-weight: 500;
       &:hover {
@@ -217,7 +217,7 @@ function refreshFolder() {
       }
     }
     &:hover {
-      border-radius: 4px;
+      border-radius: var(--app-border-radius-base);
       background: var(--app-text-color-light-1);
     }
     &.is-active {

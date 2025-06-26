@@ -28,7 +28,7 @@
         <p class="lighter" :style="{ visibility: isTouching ? 'visible' : 'hidden' }">
           {{ message }}
         </p>
-        <div class="speech-img flex-center border-r-4 mt-16">
+        <div class="speech-img flex-center border-r-6 mt-16">
           <img v-if="isTouching" src="@/assets/chat/acoustic-color.svg" alt="" />
           <img v-else src="@/assets/chat/acoustic.svg" alt="" />
         </div>

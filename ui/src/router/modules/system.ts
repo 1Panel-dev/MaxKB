@@ -47,8 +47,8 @@ const systemRouter = {
       path: '/system/workspace',
       name: 'workspace',
       meta: {
-        icon: 'app-resource-authorization', // TODO
-        iconActive: 'app-resource-authorization-active', // TODO
+        icon: 'app-workspace',
+        iconActive: 'app-workspace-active',
         title: 'views.workspace.title',
         activeMenu: '/system',
         parentPath: '/system',

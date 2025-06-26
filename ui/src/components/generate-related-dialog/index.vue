@@ -15,7 +15,7 @@
         label-position="top"
         require-asterisk-position="right"
       >
-        <div class="update-info flex border-r-4 mb-16 p-8-12">
+        <div class="update-info flex border-r-6 mb-16 p-8-12">
           <div class="mt-4">
             <AppIcon iconName="app-warning-colorful" style="font-size: 16px"></AppIcon>
           </div>

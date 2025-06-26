@@ -4,11 +4,15 @@
       <div class="p-8">
         <div
           @click="handleSharedNodeClick"
-          class="shared-model"
+          class="shared-button flex cursor border-b"
           v-if="showShared && hasPermission(EditionConst.IS_EE, 'OR')"
           :class="active?.provider === 'share' && 'active'"
         >
-          <AppIcon iconName="app-shared-active" style="font-size: 18px"></AppIcon>
+          <AppIcon
+            iconName="app-shared-active"
+            style="font-size: 18px"
+            class="color-primary"
+          ></AppIcon>
           <span class="ml-8 lighter">{{ $t('views.shared.shared_model') }}</span>
         </div>
         <div
@@ -154,11 +158,19 @@ const handleSharedNodeClick = () => {
   .all-mode {
     padding: 10px 8px;
     font-weight: 400;
+    &:hover {
+      border-radius: var(--app-border-radius-base);
+      background: var(--app-text-color-light-1);
+    }
   }
   .all-mode-active {
-    border-radius: 4px;
+    border-radius: var(--app-border-radius-base);
     color: var(--el-color-primary);
     font-weight: 500 !important;
+    background: var(--el-color-primary-light-9);
+    &:hover {
+      background: var(--el-color-primary-light-9);
+    }
   }
   .model-collapse {
     border-top: none !important;
@@ -172,7 +184,7 @@ const handleSharedNodeClick = () => {
       background: none;
       &:hover {
         background: var(--app-text-color-light-1);
-        border-radius: 4px;
+        border-radius: var(--app-border-radius-base);
       }
     }
     :deep(.el-collapse-item) {
@@ -191,34 +203,29 @@ const handleSharedNodeClick = () => {
       padding-bottom: 0 !important;
     }
   }
-  .shared-model {
-    padding-left: 8px;
-    display: flex;
-    align-items: center;
-    height: 40px;
-    position: relative;
-    margin-bottom: 8px;
-    border-radius: 4px;
-    cursor: pointer;
-
-    &:hover {
-      background: var(--app-text-color-light-1);
-      color: var(--el-menu-text-color);
-    }
-
+  .shared-button {
+    padding: 10px 8px;
+    font-weight: 400;
+    font-size: 14px;
+    margin-bottom: 4px;
     &.active {
-      color: var(--el-color-primary);
       background: var(--el-color-primary-light-9);
+      border-radius: var(--app-border-radius-base);
+      color: var(--el-color-primary);
+      font-weight: 500;
+      &:hover {
+        background: var(--el-color-primary-light-9);
+      }
     }
-
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: -4px;
-      background-color: #1f232926;
-      left: 0;
-      width: 100%;
-      height: 1px;
+    &:hover {
+      border-radius: var(--app-border-radius-base);
+      background: var(--app-text-color-light-1);
+    }
+    &.is-active {
+      &:hover {
+        color: var(--el-color-primary);
+        background: var(--el-color-primary-light-9);
+      }
     }
   }
 }

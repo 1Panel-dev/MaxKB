@@ -28,4 +28,3 @@ export function loadPermissionApi(type: string) {
     }
   }
 }
-

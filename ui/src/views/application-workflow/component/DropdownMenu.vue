@@ -1,5 +1,5 @@
 <template>
-  <div v-show="show" class="workflow-dropdown-menu border border-r-4">
+  <div v-show="show" class="workflow-dropdown-menu border border-r-6">
     <el-tabs v-model="activeName" class="workflow-dropdown-tabs">
       <div style="display: flex; width: 100%; justify-content: center" class="mb-4">
         <el-input

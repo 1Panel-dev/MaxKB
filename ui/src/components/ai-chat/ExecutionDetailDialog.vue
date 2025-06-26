@@ -55,7 +55,7 @@
                       item.type === WorkflowType.Start || item.type === WorkflowType.Application
                     "
                   >
-                    <div class="card-never border-r-4">
+                    <div class="card-never border-r-6">
                       <h5 class="p-8-12">
                         {{ $t('common.param.inputParam') }}
                       </h5>
@@ -104,7 +104,7 @@
                                 alt=""
                                 fit="cover"
                                 style="width: 40px; height: 40px; display: block"
-                                class="border-r-4"
+                                class="border-r-6"
                               />
                             </template>
                           </el-space>
@@ -120,7 +120,7 @@
                                 :src="f.url"
                                 controls
                                 style="width: 300px; height: 43px"
-                                class="border-r-4"
+                                class="border-r-6"
                               />
                             </template>
                           </el-space>
@@ -152,13 +152,13 @@
                   </template>
                   <!-- 知识库检索 -->
                   <template v-if="item.type == WorkflowType.SearchKnowledge">
-                    <div class="card-never border-r-4">
+                    <div class="card-never border-r-6">
                       <h5 class="p-8-12">
                         {{ $t('chat.executionDetails.searchContent') }}
                       </h5>
                       <div class="p-8-12 border-t-dashed lighter">{{ item.question || '-' }}</div>
                     </div>
-                    <div class="card-never border-r-4 mt-8">
+                    <div class="card-never border-r-6 mt-8">
                       <h5 class="p-8-12">
                         {{ $t('chat.executionDetails.searchResult') }}
                       </h5>
@@ -185,7 +185,7 @@
                   </template>
                   <!-- 判断器 -->
                   <template v-if="item.type == WorkflowType.Condition">
-                    <div class="card-never border-r-4">
+                    <div class="card-never border-r-6">
                       <h5 class="p-8-12">
                         {{ $t('chat.executionDetails.conditionResult') }}
                       </h5>
@@ -203,7 +203,7 @@
                     "
                   >
                     <div
-                      class="card-never border-r-4"
+                      class="card-never border-r-6"
                       v-if="item.type !== WorkflowType.Application"
                     >
                       <h5 class="p-8-12">
@@ -214,7 +214,7 @@
                       </div>
                     </div>
                     <div
-                      class="card-never border-r-4 mt-8"
+                      class="card-never border-r-6 mt-8"
                       v-if="item.type !== WorkflowType.Application"
                     >
                       <h5 class="p-8-12">{{ $t('chat.history') }}</h5>
@@ -233,7 +233,7 @@
                       </div>
                     </div>
                     <div
-                      class="card-never border-r-4 mt-8"
+                      class="card-never border-r-6 mt-8"
                       v-if="item.type !== WorkflowType.Application"
                     >
                       <h5 class="p-8-12">
@@ -243,7 +243,7 @@
                         {{ item.question || '-' }}
                       </div>
                     </div>
-                    <div class="card-never border-r-4 mt-8" v-if="item.type == WorkflowType.AiChat">
+                    <div class="card-never border-r-6 mt-8" v-if="item.type == WorkflowType.AiChat">
                       <h5 class="p-8-12">
                         {{ $t('views.applicationWorkflow.nodes.aiChatNode.think') }}
                       </h5>
@@ -251,7 +251,7 @@
                         {{ item.reasoning_content || '-' }}
                       </div>
                     </div>
-                    <div class="card-never border-r-4 mt-8">
+                    <div class="card-never border-r-6 mt-8">
                       <h5 class="p-8-12">
                         {{
                           item.type == WorkflowType.Application
@@ -275,7 +275,7 @@
 
                   <!-- 指定回复 -->
                   <template v-if="item.type === WorkflowType.Reply">
-                    <div class="card-never border-r-4">
+                    <div class="card-never border-r-6">
                       <h5 class="p-8-12">
                         {{ $t('chat.executionDetails.replyContent') }}
                       </h5>
@@ -297,7 +297,7 @@
 
                   <!-- 文档内容提取 -->
                   <template v-if="item.type === WorkflowType.DocumentExtractNode">
-                    <div class="card-never border-r-4">
+                    <div class="card-never border-r-6">
                       <h5 class="p-8-12 flex align-center">
                         <span class="mr-4"> {{ $t('common.param.outputParam') }}</span>
 
@@ -333,7 +333,7 @@
                     </div>
                   </template>
                   <template v-if="item.type === WorkflowType.SpeechToTextNode">
-                    <div class="card-never border-r-4">
+                    <div class="card-never border-r-6">
                       <h5 class="p-8-12">
                         {{ $t('common.param.inputParam') }}
                       </h5>
@@ -350,7 +350,7 @@
                                   :src="f.url"
                                   controls
                                   style="width: 300px; height: 43px"
-                                  class="border-r-4"
+                                  class="border-r-6"
                                 />
                               </template>
                             </el-space>
@@ -358,7 +358,7 @@
                         </div>
                       </div>
                     </div>
-                    <div class="card-never border-r-4">
+                    <div class="card-never border-r-6">
                       <h5 class="p-8-12">
                         {{ $t('common.param.outputParam') }}
                       </h5>
@@ -385,7 +385,7 @@
                   </template>
 
                   <template v-if="item.type === WorkflowType.TextToSpeechNode">
-                    <div class="card-never border-r-4">
+                    <div class="card-never border-r-6">
                       <h5 class="p-8-12">
                         {{ $t('common.param.inputParam') }}
                       </h5>
@@ -406,7 +406,7 @@
                         </div>
                       </div>
                     </div>
-                    <div class="card-never border-r-4">
+                    <div class="card-never border-r-6">
                       <h5 class="p-8-12">
                         {{ $t('common.param.outputParam') }}
                       </h5>
@@ -426,13 +426,13 @@
                       item.type === WorkflowType.FunctionLibCustom
                     "
                   >
-                    <div class="card-never border-r-4 mt-8">
+                    <div class="card-never border-r-6 mt-8">
                       <h5 class="p-8-12">{{ $t('chat.executionDetails.input') }}</h5>
                       <div class="p-8-12 border-t-dashed lighter pre-wrap">
                         {{ item.params || '-' }}
                       </div>
                     </div>
-                    <div class="card-never border-r-4 mt-8">
+                    <div class="card-never border-r-6 mt-8">
                       <h5 class="p-8-12">{{ $t('chat.executionDetails.output') }}</h5>
                       <div class="p-8-12 border-t-dashed lighter pre-wrap">
                         {{ item.result || '-' }}
@@ -441,13 +441,13 @@
                   </template>
                   <!-- 多路召回 -->
                   <template v-if="item.type == WorkflowType.RrerankerNode">
-                    <div class="card-never border-r-4">
+                    <div class="card-never border-r-6">
                       <h5 class="p-8-12">
                         {{ $t('chat.executionDetails.searchContent') }}
                       </h5>
                       <div class="p-8-12 border-t-dashed lighter">{{ item.question || '-' }}</div>
                     </div>
-                    <div class="card-never border-r-4 mt-8">
+                    <div class="card-never border-r-6 mt-8">
                       <h5 class="p-8-12">
                         {{ $t('chat.executionDetails.rerankerContent') }}
                       </h5>
@@ -467,7 +467,7 @@
                         <template v-else> -</template>
                       </div>
                     </div>
-                    <div class="card-never border-r-4 mt-8">
+                    <div class="card-never border-r-6 mt-8">
                       <h5 class="p-8-12">
                         {{ $t('chat.executionDetails.rerankerResult') }}
                       </h5>
@@ -492,7 +492,7 @@
 
                   <!-- 表单收集 -->
                   <template v-if="item.type === WorkflowType.FormNode">
-                    <div class="card-never border-r-4">
+                    <div class="card-never border-r-6">
                       <h5 class="p-8-12">
                         {{ $t('common.param.outputParam')
                         }}<span style="color: #f54a45">{{
@@ -517,7 +517,7 @@
                   <!-- 图片理解 -->
                   <template v-if="item.type == WorkflowType.ImageUnderstandNode">
                     <div
-                      class="card-never border-r-4"
+                      class="card-never border-r-6"
                       v-if="item.type !== WorkflowType.Application"
                     >
                       <h5 class="p-8-12">
@@ -528,7 +528,7 @@
                       </div>
                     </div>
                     <div
-                      class="card-never border-r-4 mt-8"
+                      class="card-never border-r-6 mt-8"
                       v-if="item.type !== WorkflowType.Application"
                     >
                       <h5 class="p-8-12">{{ $t('chat.history') }}</h5>
@@ -549,7 +549,7 @@
                                   alt=""
                                   fit="cover"
                                   style="width: 40px; height: 40px; display: inline-block"
-                                  class="border-r-4 mr-8"
+                                  class="border-r-6 mr-8"
                                 />
 
                                 <span v-else>{{ h.text }}<br /></span>
@@ -562,7 +562,7 @@
                         <template v-else> -</template>
                       </div>
                     </div>
-                    <div class="card-never border-r-4 mt-8">
+                    <div class="card-never border-r-6 mt-8">
                       <h5 class="p-8-12">
                         {{ $t('chat.executionDetails.currentChat') }}
                       </h5>
@@ -575,7 +575,7 @@
                                 alt=""
                                 fit="cover"
                                 style="width: 40px; height: 40px; display: block"
-                                class="border-r-4"
+                                class="border-r-6"
                               />
                             </template>
                           </el-space>
@@ -585,7 +585,7 @@
                         </div>
                       </div>
                     </div>
-                    <div class="card-never border-r-4 mt-8">
+                    <div class="card-never border-r-6 mt-8">
                       <h5 class="p-8-12">
                         {{
                           item.type == WorkflowType.Application
@@ -608,7 +608,7 @@
                   </template>
                   <!-- 图片生成 -->
                   <template v-if="item.type == WorkflowType.ImageGenerateNode">
-                    <div class="card-never border-r-4 mt-8">
+                    <div class="card-never border-r-6 mt-8">
                       <h5 class="p-8-12">
                         {{ $t('chat.executionDetails.currentChat') }}
                       </h5>
@@ -616,7 +616,7 @@
                         {{ item.question || '-' }}
                       </div>
                     </div>
-                    <div class="card-never border-r-4 mt-8">
+                    <div class="card-never border-r-6 mt-8">
                       <h5 class="p-8-12">
                         {{
                           item.type == WorkflowType.Application
@@ -640,7 +640,7 @@
 
                   <!-- 变量赋值 -->
                   <template v-if="item.type === WorkflowType.VariableAssignNode">
-                    <div class="card-never border-r-4">
+                    <div class="card-never border-r-6">
                       <h5 class="p-8-12">
                         {{ $t('common.param.inputParam') }}
                       </h5>
@@ -650,7 +650,7 @@
                         </div>
                       </div>
                     </div>
-                    <div class="card-never border-r-4">
+                    <div class="card-never border-r-6">
                       <h5 class="p-8-12">
                         {{ $t('common.param.outputParam') }}
                       </h5>
@@ -664,7 +664,7 @@
 
                   <!-- MCP 节点 -->
                   <template v-if="item.type === WorkflowType.McpNode">
-                    <div class="card-never border-r-4">
+                    <div class="card-never border-r-6">
                       <h5 class="p-8-12">
                         {{ $t('views.applicationWorkflow.nodes.mcpNode.tool') }}
                       </h5>
@@ -674,7 +674,7 @@
                         </div>
                       </div>
                     </div>
-                    <div class="card-never border-r-4">
+                    <div class="card-never border-r-6">
                       <h5 class="p-8-12">
                         {{ $t('views.applicationWorkflow.nodes.mcpNode.toolParam') }}
                       </h5>
@@ -684,7 +684,7 @@
                         </div>
                       </div>
                     </div>
-                    <div class="card-never border-r-4">
+                    <div class="card-never border-r-6">
                       <h5 class="p-8-12">
                         {{ $t('common.param.outputParam') }}
                       </h5>
@@ -697,7 +697,7 @@
                   </template>
                 </template>
                 <template v-else>
-                  <div class="card-never border-r-4">
+                  <div class="card-never border-r-6">
                     <h5 class="p-8-12">{{ $t('chat.executionDetails.errMessage') }}</h5>
                     <div class="p-8-12 border-t-dashed lighter">{{ item.err_message || '-' }}</div>
                   </div>

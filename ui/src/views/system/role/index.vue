@@ -38,11 +38,11 @@
                           <template #dropdown>
                             <el-dropdown-menu style="min-width: 80px">
                               <el-dropdown-item @click.stop="createOrUpdateRole(row)" class="p-8">
-                                <AppIcon iconName="app-copy"></AppIcon>
+                                <el-icon><EditPen /></el-icon>
                                 {{ $t('common.rename') }}
                               </el-dropdown-item>
                               <el-dropdown-item @click.stop="deleteRole(row)" class="border-t p-8">
-                                <AppIcon iconName="app-copy"></AppIcon>
+                                <el-icon><Delete /></el-icon>
                                 {{ $t('common.delete') }}
                               </el-dropdown-item>
                             </el-dropdown-menu>
@@ -56,7 +56,7 @@
                   </template>
                 </common-list>
 
-                <div class="ml-8 border-t flex-between mb-12" style="padding-top: 12px">
+                <div class="ml-8 border-t flex-between mb-8" style="padding-top: 12px">
                   <span class="color-secondary lighter">{{ $t('views.role.customRole') }}</span>
                   <el-tooltip
                     effect="dark"
@@ -105,11 +105,11 @@
                           <template #dropdown>
                             <el-dropdown-menu style="min-width: 80px">
                               <el-dropdown-item @click.stop="createOrUpdateRole(row)" class="p-8">
-                                <AppIcon iconName="app-copy"></AppIcon>
+                                <el-icon><EditPen /></el-icon>
                                 {{ $t('common.rename') }}
                               </el-dropdown-item>
                               <el-dropdown-item @click.stop="deleteRole(row)" class="border-t p-8">
-                                <AppIcon iconName="app-copy"></AppIcon>
+                                <el-icon><Delete /></el-icon>
                                 {{ $t('common.delete') }}
                               </el-dropdown-item>
                             </el-dropdown-menu>
@@ -128,8 +128,8 @@
         </div>
 
         <!-- 右边 -->
-        <div class="role-right w-full" v-loading="loading">
-          <div class="flex-between mb-16 p-24 pb-0">
+        <div class="role-right p-24" v-loading="loading">
+          <div class="flex-between mb-16">
             <div class="flex align-center">
               <h4>
                 {{ currentRole?.role_name }}
@@ -167,7 +167,6 @@
 
 <script lang="ts" setup>
 import { onMounted, ref, watch } from 'vue'
-import RoleApi from '@/api/system/role'
 import { t } from '@/locales'
 import PermissionConfiguration from './component/PermissionConfiguration.vue'
 import Member from './component/Member.vue'
@@ -243,7 +242,7 @@ function deleteRole(item: RoleItem) {
     },
   )
     .then(() => {
-      RoleApi.deleteRole(item.id, loading).then(async () => {
+      loadPermissionApi('role').deleteRole(item.id, loading).then(async () => {
         MsgSuccess(t('common.deleteSuccess'))
         await getRole()
         currentRole.value =

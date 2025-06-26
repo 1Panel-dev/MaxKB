@@ -27,7 +27,7 @@
     </template>
 
     <div class="flex">
-      <div class="setting-preview border border-r-4 mr-16" style="min-width: 400px">
+      <div class="setting-preview border border-r-6 mr-16" style="min-width: 400px">
         <div class="setting-preview-container">
           <div class="setting-preview-header" :style="customStyle">
             <div class="flex-between">

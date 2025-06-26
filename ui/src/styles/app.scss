@@ -313,10 +313,13 @@ h5 {
   border-bottom: 1px solid var(--el-border-color-lighter);
 }
 .border-r-4 {
-  border-radius: 4px;
+  border-radius: var(--app-border-radius-small);
+}
+.border-r-6 {
+  border-radius: var(--app-border-radius-base);
 }
 .border-r-8 {
-  border-radius: 8px;
+  border-radius: var(--app-border-radius-large);
 }
 
 .border-t-dashed {

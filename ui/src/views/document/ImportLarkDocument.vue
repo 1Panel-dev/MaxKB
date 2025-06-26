@@ -25,7 +25,7 @@
                   </el-radio-button>
                 </el-radio-group>
               </div>
-              <div class="update-info flex p-8-12 border-r-4 mb-16">
+              <div class="update-info flex p-8-12 border-r-6 mb-16">
                 <div class="mt-4">
                   <AppIcon iconName="app-warning-colorful" style="font-size: 16px"></AppIcon>
                 </div>
@@ -34,7 +34,7 @@
                   <p>{{ $t('views.document.feishu.tip2') }}</p>
                 </div>
               </div>
-              <div class="card-never border-r-4 mb-16">
+              <div class="card-never border-r-6 mb-16">
                 <el-checkbox
                   v-model="allCheck"
                   :label="$t('views.document.feishu.allCheck')"

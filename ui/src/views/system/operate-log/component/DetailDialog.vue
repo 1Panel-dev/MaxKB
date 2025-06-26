@@ -5,7 +5,7 @@
     :close-on-click-modal="false"
     :close-on-press-escape="false"
   >
-    <div class="border border-r-4 mb-16" style="white-space: pre-wrap; height: 400px">
+    <div class="border border-r-6 mb-16" style="white-space: pre-wrap; height: 400px">
       <el-scrollbar>
         <div class="p-16">
           {{ details }}

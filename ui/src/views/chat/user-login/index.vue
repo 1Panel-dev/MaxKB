@@ -58,7 +58,7 @@
                   :src="identifyCode"
                   alt=""
                   height="38"
-                  class="ml-8 cursor border border-r-4"
+                  class="ml-8 cursor border border-r-6"
                   @click="makeCode"
                 />
               </div>

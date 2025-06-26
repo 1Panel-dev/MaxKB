@@ -18,7 +18,7 @@
     </div>
 
     <el-form-item prop="fileList" v-if="form.fileType === 'QA'">
-      <div class="update-info flex p-8-12 border-r-4 mb-16 w-full">
+      <div class="update-info flex p-8-12 border-r-6 mb-16 w-full">
         <div class="mt-4">
           <AppIcon iconName="app-warning-colorful" style="font-size: 16px"></AppIcon>
         </div>
@@ -71,7 +71,7 @@
       </el-upload>
     </el-form-item>
     <el-form-item prop="fileList" v-else-if="form.fileType === 'table'">
-      <div class="update-info flex p-8-12 border-r-4 mb-16 w-full">
+      <div class="update-info flex p-8-12 border-r-6 mb-16 w-full">
         <div class="mt-4">
           <AppIcon iconName="app-warning-colorful" style="font-size: 16px"></AppIcon>
         </div>
@@ -125,7 +125,7 @@
       </el-upload>
     </el-form-item>
     <el-form-item prop="fileList" v-else>
-      <div class="update-info flex p-8-12 border-r-4 mb-16 w-full">
+      <div class="update-info flex p-8-12 border-r-6 mb-16 w-full">
         <div class="mt-4">
           <AppIcon iconName="app-warning-colorful" style="font-size: 16px"></AppIcon>
         </div>

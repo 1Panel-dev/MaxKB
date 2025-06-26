@@ -1,5 +1,5 @@
 <template>
-  <div class="p-24 pt-0">
+  <div>
     <div class="flex-between mb-16">
       <el-button
         type="primary"
@@ -64,10 +64,7 @@
                 )
               "
             >
-              <!-- TODO: 删除图标需要换 -->
-              <el-icon>
-                <Delete />
-              </el-icon>
+              <AppIcon iconName="app-delete-users"></AppIcon>
             </el-button>
           </el-tooltip>
         </template>

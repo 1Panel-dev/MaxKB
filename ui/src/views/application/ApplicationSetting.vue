@@ -185,7 +185,7 @@
                         v-for="(item, index) in applicationForm.knowledge_id_list"
                         :key="index"
                       >
-                        <el-card class="relate-knowledge-card border-r-4" shadow="never">
+                        <el-card class="relate-knowledge-card border-r-6" shadow="never">
                           <div class="flex-between">
                             <div class="flex align-center" style="width: 80%">
                               <KnowledgeIcon

@@ -91,7 +91,7 @@
               </h5>
               <template v-for="(item, index) in nodeFields" :key="index">
                 <div
-                  class="flex-between border-r-4 p-8-12 mb-8 layout-bg lighter"
+                  class="flex-between border-r-6 p-8-12 mb-8 layout-bg lighter"
                   @mouseenter="showicon = index"
                   @mouseleave="showicon = null"
                 >
