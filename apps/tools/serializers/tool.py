@@ -18,6 +18,7 @@ from rest_framework import serializers, status
 
 from common.constants.cache_version import Cache_Version
 from common.constants.permission_constants import ResourceAuthType, ResourcePermissionGroup
+from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import page_search, native_page_search
 from common.exception.app_exception import AppApiException
 from common.field.common import UploadedImageField
@@ -30,6 +31,7 @@ from maxkb.const import CONFIG, PROJECT_DIR
 from system_manage.models import AuthTargetType, WorkspaceUserResourcePermission
 from tools.models import Tool, ToolScope, ToolFolder, ToolType
 from tools.serializers.tool_folder import ToolFolderFlatSerializer
+from users.serializers.user import is_workspace_manage
 
 tool_executor = ToolExecutor(CONFIG.get('SANDBOX'))
 
@@ -541,7 +543,7 @@ class ToolTreeSerializer(serializers.Serializer):
         workspace_id = serializers.CharField(required=True, label=_('workspace id'))
         folder_id = serializers.CharField(required=True, label=_('folder id'))
         name = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('tool name'))
-        user_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('user id'))
+        user_id = serializers.UUIDField(required=False, allow_null=True, label=_('user id'))
         scope = serializers.CharField(required=True, label=_('scope'))
 
         def page_tool(self, current_page: int, page_size: int):
@@ -570,9 +572,10 @@ class ToolTreeSerializer(serializers.Serializer):
             return page_search(current_page, page_size, tools, lambda record: ToolModelSerializer(record).data)
 
         def get_query_set(self):
-            tool_query_set = QuerySet(Tool)
-            tool_scope_query_set = QuerySet(Tool)
+            tool_query_set = QuerySet(Tool).filter(workspace_id=self.data.get('workspace_id'))
             folder_query_set = QuerySet(ToolFolder)
+            default_query_set = QuerySet(Tool)
+
             workspace_id = self.data.get('workspace_id')
             user_id = self.data.get('user_id')
             scope = self.data.get('scope')
@@ -582,36 +585,56 @@ class ToolTreeSerializer(serializers.Serializer):
 
             if workspace_id is not None:
                 folder_query_set = folder_query_set.filter(workspace_id=workspace_id)
-                tool_query_set = tool_query_set.filter(workspace_id=workspace_id)
-            if user_id is not None:
-                folder_query_set = folder_query_set.filter(user_id=user_id)
-                tool_query_set = tool_query_set.filter(user_id=user_id)
+                default_query_set = default_query_set.filter(workspace_id=workspace_id)
             if folder_id is not None:
                 folder_query_set = folder_query_set.filter(parent=folder_id)
-                tool_query_set = tool_query_set.filter(folder_id=folder_id)
+                default_query_set = default_query_set.filter(folder_id=folder_id)
             if name is not None:
                 folder_query_set = folder_query_set.filter(name__contains=name)
-                tool_query_set = tool_query_set.filter(name__contains=name)
+                default_query_set = default_query_set.filter(name__contains=name)
             if desc is not None:
                 folder_query_set = folder_query_set.filter(desc__contains=desc)
-                tool_query_set = tool_query_set.filter(desc__contains=desc)
-            tool_query_set = tool_query_set.order_by("-update_time")
+                default_query_set = default_query_set.filter(desc__contains=desc)
+
+            default_query_set = default_query_set.order_by("-create_time")
 
             if scope is not None:
-                tool_scope_query_set = tool_scope_query_set.filter(scope=scope)
+                tool_query_set = tool_query_set.filter(scope=scope)
 
             return {
                 'folder_query_set': folder_query_set,
                 'tool_query_set': tool_query_set,
-                'tool_scope_query_set': tool_scope_query_set
+                'default_query_set': default_query_set,
+                'workspace_user_resource_permission_query_set': QuerySet(WorkspaceUserResourcePermission).filter(
+                    auth_target_type="TOOL",
+                    workspace_id=workspace_id,
+                    user_id=user_id
+                )
             }
+
+        @staticmethod
+        def is_x_pack_ee():
+            workspace_user_role_mapping_model = DatabaseModelManage.get_model("workspace_user_role_mapping")
+            role_permission_mapping_model = DatabaseModelManage.get_model("role_permission_mapping_model")
+            return workspace_user_role_mapping_model is not None and role_permission_mapping_model is not None
 
         def page_tool_with_folders(self, current_page: int, page_size: int):
             self.is_valid(raise_exception=True)
 
+            workspace_manage = is_workspace_manage(self.data.get('user_id'), self.data.get('workspace_id'))
+            is_x_pack_ee = self.is_x_pack_ee()
+
             return native_page_search(
                 current_page, page_size, self.get_query_set(),
-                get_file_content(os.path.join(PROJECT_DIR, "apps", "tools", 'sql', 'list_tool.sql')),
+                get_file_content(
+                    os.path.join(
+                        PROJECT_DIR,
+                        "apps", "tools", 'sql',
+                        'list_tool.sql' if workspace_manage else (
+                            'list_tool_user_ee.sql' if is_x_pack_ee else 'list_tool_user.sql'
+                        )
+                    )
+                ),
                 post_records_handler=lambda record: {
                     **record,
                     'input_field_list': json.loads(record.get('input_field_list', '[]')),

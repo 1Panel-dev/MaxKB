@@ -18,7 +18,7 @@ from (select tool."id"::text,
              tool.input_field_list,
              tool."is_active"
       from tool
-               left join "user" on "user".id = user_id ${tool_scope_query_set}
+               left join "user" on "user".id = user_id ${tool_query_set}
       UNION
       select tool_folder."id",
              tool_folder."name",
@@ -40,4 +40,4 @@ from (select tool."id"::text,
              'true'                  as "is_active"
       from tool_folder
                left join "user" on "user".id = user_id ${folder_query_set}) temp
-    ${tool_query_set}
+     ${default_query_set}
