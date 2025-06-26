@@ -721,9 +721,9 @@ class ApplicationOperateSerializer(serializers.Serializer):
         application_id = self.data.get("application_id")
         application = QuerySet(Application).get(id=application_id)
         knowledge_list = self.list_knowledge(with_valid=False)
-        mapping_knowledge_id_list = [akm.knowledge_id for akm in
+        mapping_knowledge_id_list = [str(akm.knowledge_id) for akm in
                                      QuerySet(ApplicationKnowledgeMapping).filter(application_id=application_id)]
-        knowledge_id_list = [d.id for d in
+        knowledge_id_list = [d.get('id') for d in
                              list(filter(lambda row: mapping_knowledge_id_list.__contains__(row.get('id')),
                                          knowledge_list))]
         return {**ApplicationSerializerModel(application).data,
