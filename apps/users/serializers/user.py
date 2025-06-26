@@ -35,11 +35,11 @@ from django.core.mail import send_mail
 from django.utils.translation import get_language
 
 PASSWORD_REGEX = re.compile(
-    r"^(?![a-zA-Z]+$)(?![A-Z0-9]+$)(?![A-Z_!@#$%^&*`~.()-+=]+$)"
-    r"(?![a-z0-9]+$)(?![a-z_!@#$%^&*`~()-+=]+$)(?![0-9_!@#$%^&*`~()-+=]+$)"
-    r"(?=.*[_!@#$%^&*`~.()-+=])"
+    r"^(?=.*[a-z])(?=.*[_!@#$%^&*`~.()-+=])" 
+    r"(?:(?=.*[A-Z])|(?=.*\d))"              
     r"[a-zA-Z0-9_!@#$%^&*`~.()-+=]{6,20}$"
 )
+
 
 version, get_key = Cache_Version.SYSTEM.value
 
