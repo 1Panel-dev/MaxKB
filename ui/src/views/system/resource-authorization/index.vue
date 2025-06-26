@@ -18,7 +18,7 @@
 
     <el-card style="--el-card-padding: 0">
       <div class="flex main-calc-height">
-        <div class="resource-authorization__left border-r p-8">
+        <div class="resource-authorization__left border-r p-16">
           <div class="p-8">
             <h4 class="mb-12">{{ $t('views.resourceAuthorization.member') }}</h4>
             <el-input
@@ -49,7 +49,7 @@
             </el-scrollbar>
           </div>
         </div>
-        <div class="permission-setting p-16 flex" v-loading="rLoading">
+        <div class="permission-setting p-24 flex" v-loading="rLoading">
           <div class="resource-authorization__table">
             <h4 class="mb-4">{{ $t('views.resourceAuthorization.permissionSetting') }}</h4>
             <el-tabs
@@ -401,7 +401,7 @@ onMounted(() => {
     position: relative;
     .submit-button {
       position: absolute;
-      top: 16px;
+      top: 24px;
       right: 24px;
     }
   }

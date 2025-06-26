@@ -71,7 +71,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import workFlowVersionApi from '@/api/application/work-flow-version'
+import workFlowVersionApi from '@/api/application/workflow-version'
 import { datetimeFormat } from '@/utils/time'
 import { MsgSuccess, MsgError } from '@/utils/message'
 import { t } from '@/locales'

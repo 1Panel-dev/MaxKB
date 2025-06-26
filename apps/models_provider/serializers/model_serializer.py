@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+import os
 import threading
 import time
 from typing import Dict
@@ -11,8 +12,11 @@ from rest_framework import serializers
 from django.db.models.query_utils import Q
 from common.config.embedding_config import ModelManage
 from common.database_model_manage.database_model_manage import DatabaseModelManage
+from common.db.sql_execute import select_list
 from common.exception.app_exception import AppApiException
+from common.utils.common import get_file_content
 from common.utils.rsa_util import rsa_long_encrypt, rsa_long_decrypt
+from maxkb.conf import PROJECT_DIR
 from models_provider.base_model_provider import ValidCode, DownModelChunkStatus
 from models_provider.constants.model_provider_constants import ModelProvideConstants
 from models_provider.models import Model, Status

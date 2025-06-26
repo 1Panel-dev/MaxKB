@@ -57,6 +57,7 @@ import type {
   ChildrenPermissionItem,
 } from '@/api/type/role'
 import { loadPermissionApi } from '@/utils/dynamics-api/permission-api'
+import RoleApi from '@/api/system/role'
 import { MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
 
@@ -91,7 +92,7 @@ async function getRolePermission() {
   if (!props.currentRole?.id) return
   try {
     tableData.value = []
-    const res = await loadPermissionApi('role').getRolePermissionList(props.currentRole.id, loading)
+    const res = await RoleApi.getRolePermissionList(props.currentRole.id, loading)
     tableData.value = transformData(res.data)
   } catch (error) {
     console.error(error)

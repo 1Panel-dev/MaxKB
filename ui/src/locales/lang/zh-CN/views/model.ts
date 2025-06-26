@@ -9,7 +9,7 @@ export default {
   },
   tip: {
     createSuccessMessage: '创建模型成功',
-    createErrorMessage: '基础信息有填写错误',
+    createErrorMessage: '基础信息填写错误',
     errorMessage: '变量已存在: ',
     emptyMessage1: '请先选择基础信息的模型类型和基础模型',
     emptyMessage2: '所选模型不支持参数设置',
