@@ -288,7 +288,7 @@ const dayOptions = [
   },
   {
     value: 'other',
-    label: t('common.other'),
+    label: t('common.custom'),
   },
 ]
 

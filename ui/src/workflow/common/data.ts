@@ -374,7 +374,7 @@ export const toolNode = {
     }
   }
 }
-export const toolNode = {
+export const toolLibNode = {
   type: WorkflowType.ToolLib,
   text: t('views.applicationWorkflow.nodes.toolNode.text'),
   label: t('views.applicationWorkflow.nodes.toolNode.label'),

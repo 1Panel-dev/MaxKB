@@ -59,10 +59,7 @@ const systemRouter = {
         permission: [
           new ComplexPermission(
             [RoleConst.WORKSPACE_MANAGE, RoleConst.ADMIN],
-            [
-              PermissionConst.WORKSPACE_WORKSPACE_READ,
-              PermissionConst.WORKSPACE_READ,
-            ],
+            [PermissionConst.WORKSPACE_WORKSPACE_READ, PermissionConst.WORKSPACE_READ],
             [EditionConst.IS_EE],
             'OR',
           ),
@@ -83,6 +80,17 @@ const systemRouter = {
       },
       children: [
         {
+          path: '/system/resource-management/knowledge',
+          name: 'KnowledgeResourceIndex',
+          meta: {
+            title: 'views.knowledge.title',
+            activeMenu: '/system',
+            parentPath: '/system',
+            parentName: 'system',
+          },
+          component: () => import('@/views/system-resource-management/KnowledgeResourceIndex.vue'),
+        },
+        {
           path: '/system/resource-management/tool',
           name: 'ToolResourceIndex',
           meta: {
@@ -92,6 +100,17 @@ const systemRouter = {
             parentName: 'system',
           },
           component: () => import('@/views/system-resource-management/ToolResourceIndex.vue'),
+        },
+        {
+          path: '/system/resource-management/model',
+          name: 'ModelResourceIndex',
+          meta: {
+            title: 'views.model.title',
+            activeMenu: '/system',
+            parentPath: '/system',
+            parentName: 'system',
+          },
+          component: () => import('@/views/system-resource-management/ModelResourceIndex.vue'),
         },
       ],
     },

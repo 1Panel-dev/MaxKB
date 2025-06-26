@@ -17,7 +17,7 @@
     >
       <template #search>
         <div class="flex">
-          <div class="flex-between complex-search">
+          <div class="complex-search">
             <el-select
               class="complex-search__left"
               v-model="search_type"

@@ -1,9 +1,9 @@
 <template>
-  <div class="resource-manage_tool p-16-24">
+  <div class="p-16-24">
     <el-breadcrumb separator-icon="ArrowRight">
       <el-breadcrumb-item>{{ t('views.system.resource_management.label') }}</el-breadcrumb-item>
       <el-breadcrumb-item>
-        <h5 class="ml-4 color-text-primary">{{ t('views.tool.title') }}</h5>
+        <h5 class="ml-4 color-text-primary">{{ t('views.knowledge.title') }}</h5>
       </el-breadcrumb-item>
     </el-breadcrumb>
     <el-card class="mt-16">
@@ -17,7 +17,7 @@
           >
             <el-option :label="$t('common.creator')" value="create_user" />
 
-            <el-option :label="$t('views.model.modelForm.modeName.label')" value="name" />
+            <el-option :label="$t('common.name')" value="name" />
           </el-select>
           <el-input
             v-if="search_type === 'name'"
@@ -40,7 +40,7 @@
       </div>
 
       <app-table
-        :data="toolList"
+        :data="knowledgeList"
         :pagination-config="paginationConfig"
         @sizeChange="getList"
         @changePage="getList"
@@ -156,10 +156,9 @@
 <script lang="ts" setup>
 import { onMounted, ref, reactive, computed } from 'vue'
 import { cloneDeep, get } from 'lodash'
-import ToolResourceApi from '@/api/system-resource-management/tool'
+import KnowledgeResourceApi from '@/api/system-resource-management/knowledge'
 import { t } from '@/locales'
 import { isAppIcon } from '@/utils/common'
-import { ToolType } from '@/enums/tool'
 import useStore from '@/stores'
 import WorkspaceApi from '@/api/workspace/workspace.ts'
 import { datetimeFormat } from '@/utils/time'
@@ -175,7 +174,7 @@ const user_options = ref<any[]>([])
 
 const loading = ref(false)
 const changeStateloading = ref(false)
-const toolList = ref<any[]>([])
+const knowledgeList = ref<any[]>([])
 const paginationConfig = reactive({
   current_page: 1,
   page_size: 30,
@@ -208,9 +207,9 @@ function getList() {
   const params = {
     [search_type.value]: search_form.value[search_type.value],
   }
-  ToolResourceApi.getToolListPage(paginationConfig, params, loading).then((res) => {
+  KnowledgeResourceApi.getKnowledgeListPage(paginationConfig, params, loading).then((res: any) => {
     paginationConfig.total = res.data?.total
-    toolList.value = res.data?.records
+    knowledgeList.value = res.data?.records
   })
 }
 
