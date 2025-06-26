@@ -133,6 +133,8 @@ class Knowledge(AppModelMixin):
     class Meta:
         db_table = "knowledge"
 
+def get_default_status():
+    return Status('').__str__()
 
 class Document(AppModelMixin):
     """
@@ -142,7 +144,7 @@ class Document(AppModelMixin):
     knowledge = models.ForeignKey(Knowledge, on_delete=models.DO_NOTHING, verbose_name="知识库id")
     name = models.CharField(max_length=150, verbose_name="文档名称")
     char_length = models.IntegerField(verbose_name="文档字符数 冗余字段")
-    status = models.CharField(verbose_name='状态', max_length=20, default=Status('').__str__)
+    status = models.CharField(verbose_name='状态', max_length=20, default=get_default_status)
     status_meta = models.JSONField(verbose_name="状态统计数据", default=default_status_meta)
     is_active = models.BooleanField(default=True)
     type = models.IntegerField(verbose_name='类型', choices=KnowledgeType.choices, default=KnowledgeType.BASE)
@@ -166,7 +168,7 @@ class Paragraph(AppModelMixin):
     knowledge = models.ForeignKey(Knowledge, on_delete=models.DO_NOTHING)
     content = models.CharField(max_length=102400, verbose_name="段落内容")
     title = models.CharField(max_length=256, verbose_name="标题", default="")
-    status = models.CharField(verbose_name='状态', max_length=20, default=Status('').__str__)
+    status = models.CharField(verbose_name='状态', max_length=20, default=get_default_status)
     status_meta = models.JSONField(verbose_name="状态数据", default=default_status_meta)
     hit_num = models.IntegerField(verbose_name="命中次数", default=0)
     is_active = models.BooleanField(default=True)

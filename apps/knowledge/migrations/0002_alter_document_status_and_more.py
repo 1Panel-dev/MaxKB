@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='document',
             name='status',
-            field=models.CharField(default=knowledge.models.knowledge.Status.__str__, max_length=20, verbose_name='状态'),
+            field=models.CharField(default=knowledge.models.knowledge.get_default_status, max_length=20, verbose_name='状态'),
         ),
         migrations.AlterField(
             model_name='knowledge',
@@ -32,6 +32,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='paragraph',
             name='status',
-            field=models.CharField(default=knowledge.models.knowledge.Status.__str__, max_length=20, verbose_name='状态'),
+            field=models.CharField(default=knowledge.models.knowledge.get_default_status, max_length=20, verbose_name='状态'),
         ),
     ]
