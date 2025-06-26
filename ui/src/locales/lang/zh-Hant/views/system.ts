@@ -113,5 +113,6 @@ export default {
 
   resource_management: {
     label: '资源管理',
+    type: '类型',
   },
 }

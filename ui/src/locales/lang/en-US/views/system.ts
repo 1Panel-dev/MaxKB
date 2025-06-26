@@ -111,5 +111,6 @@ export default {
   },
   resource_management: {
     label: 'Resource Management',
+    type: 'Type',
   },
 }

@@ -172,22 +172,6 @@ const putSyncWebKnowledge: (
   return put(`${prefix}/${knowledge_id}/sync`, undefined, { sync_type }, loading)
 }
 
-/**
- * 创建知识库
- * @param 参数
- * {
- "name": "string",
- "folder_id": "string",
- "desc": "string",
- "embedding": "string"
- }
- */
-const postKnowledge: (data: knowledgeData, loading?: Ref<boolean>) => Promise<Result<any>> = (
-  data,
-  loading,
-) => {
-  return post(`${prefix}/base`, data, undefined, loading, 1000 * 60 * 5)
-}
 
 /**
  * 获取当前用户可使用的向量化模型列表（没用到）
@@ -214,33 +198,6 @@ const getKnowledgeModel: (loading?: Ref<boolean>) => Promise<Result<Array<any>>>
   return get(`${prefix}/model`, loading)
 }
 
-/**
- * 创建Web知识库
- * @param 参数
- * {
- "name": "string",
- "folder_id": "string",
- "desc": "string",
- "embedding": "string",
- "source_url": "string",
- "selector": "string"
- }
- */
-const postWebKnowledge: (data: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
-  data,
-  loading,
-) => {
-  return post(`${prefix}/web`, data, undefined, loading)
-}
-
-// 创建飞书知识库
-const postLarkKnowledge: (data: any, loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (
-  data,
-  loading,
-) => {
-  return post(`${prefix}/lark/save`, data, null, loading)
-}
-
 const putLarkKnowledge: (
   knowledge_id: string,
   data: any,
@@ -262,10 +219,7 @@ export default {
   putGenerateRelated,
   putKnowledgeHitTest,
   putSyncWebKnowledge,
-  postKnowledge,
   getKnowledgeModel,
-  postWebKnowledge,
-  postLarkKnowledge,
   putLarkKnowledge
 } as {
   [key: string]: any

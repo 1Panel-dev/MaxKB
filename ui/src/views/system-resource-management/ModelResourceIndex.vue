@@ -77,7 +77,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column prop="tool_type" :label="$t('views.application.form.appType.label')">
+        <el-table-column prop="tool_type" :label="$t('views.system.resource_management.type')">
           <template #default="scope">
             {{ $t(ToolType[scope.row.tool_type as keyof typeof ToolType]) }}
           </template>
@@ -234,7 +234,7 @@ const list_model = () => {
 
 onMounted(() => {
   getWorkspaceList()
-  list_model()
+  // list_model()
 })
 </script>
 

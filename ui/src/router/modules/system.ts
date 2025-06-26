@@ -18,7 +18,7 @@ const systemRouter = {
         activeMenu: '/system',
         parentPath: '/system',
         parentName: 'system',
-        sameRoute:  'user',
+        sameRoute: 'user',
         permission: [RoleConst.ADMIN, PermissionConst.USER_READ],
       },
       component: () => import('@/views/system/user-manage/index.vue'),
@@ -33,7 +33,7 @@ const systemRouter = {
         activeMenu: '/system',
         parentPath: '/system',
         parentName: 'system',
-        sameRoute:  'role',
+        sameRoute: 'role',
         permission: [
           new ComplexPermission(
             [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
@@ -55,7 +55,7 @@ const systemRouter = {
         activeMenu: '/system',
         parentPath: '/system',
         parentName: 'system',
-        sameRoute:  'workspace',
+        sameRoute: 'workspace',
         permission: [
           new ComplexPermission(
             [RoleConst.WORKSPACE_MANAGE, RoleConst.ADMIN],
@@ -79,6 +79,18 @@ const systemRouter = {
         parentName: 'system',
       },
       children: [
+        // {
+        //   path: '/system/resource-management/application',
+        //   name: 'ApplicationResourceIndex',
+        //   meta: {
+        //     title: 'views.application.title',
+        //     activeMenu: '/system',
+        //     parentPath: '/system',
+        //     parentName: 'system',
+        //   },
+        //   component: () =>
+        //     import('@/views/system-resource-management/ApplicationResourceIndex.vue'),
+        // },
         {
           path: '/system/resource-management/knowledge',
           name: 'KnowledgeResourceIndex',
@@ -101,17 +113,17 @@ const systemRouter = {
           },
           component: () => import('@/views/system-resource-management/ToolResourceIndex.vue'),
         },
-        {
-          path: '/system/resource-management/model',
-          name: 'ModelResourceIndex',
-          meta: {
-            title: 'views.model.title',
-            activeMenu: '/system',
-            parentPath: '/system',
-            parentName: 'system',
-          },
-          component: () => import('@/views/system-resource-management/ModelResourceIndex.vue'),
-        },
+        // {
+        //   path: '/system/resource-management/model',
+        //   name: 'ModelResourceIndex',
+        //   meta: {
+        //     title: 'views.model.title',
+        //     activeMenu: '/system',
+        //     parentPath: '/system',
+        //     parentName: 'system',
+        //   },
+        //   component: () => import('@/views/system-resource-management/ModelResourceIndex.vue'),
+        // },
       ],
     },
     {
@@ -124,7 +136,7 @@ const systemRouter = {
         activeMenu: '/system',
         parentPath: '/system',
         parentName: 'system',
-        sameRoute:  'authorization',
+        sameRoute: 'authorization',
       },
       component: () => import('@/views/system/resource-authorization/index.vue'),
     },
@@ -210,7 +222,7 @@ const systemRouter = {
         activeMenu: '/system',
         parentPath: '/system',
         parentName: 'system',
-        sameRoute:  'chat',
+        sameRoute: 'chat',
         permission: [
           new ComplexPermission(
             [RoleConst.WORKSPACE_MANAGE, RoleConst.ADMIN],
@@ -290,7 +302,7 @@ const systemRouter = {
         activeMenu: '/system',
         parentPath: '/system',
         parentName: 'system',
-        sameRoute:  'setting',
+        sameRoute: 'setting',
       },
       children: [
         {
@@ -340,7 +352,7 @@ const systemRouter = {
         activeMenu: '/system',
         parentPath: '/system',
         parentName: 'system',
-        sameRoute:  'operate',
+        sameRoute: 'operate',
         permission: [EditionConst.IS_PE, EditionConst.IS_EE],
       },
       component: () => import('@/views/system/operate-log/index.vue'),
