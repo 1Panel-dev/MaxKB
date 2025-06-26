@@ -1053,6 +1053,10 @@ class PermissionConstants(Enum):
         group=Group.SYSTEM_MODEL, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
         parent_group=[SystemGroup.SHARED_MODEL]
     )
+    RESOURCE_MODEL_READ = Permission(
+        group=Group.SYSTEM_RES_MODEL, operate=Operate.READ, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.RESOURCE_MODEL]
+    )
     RESOURCE_TOOL_READ = Permission(
         group=Group.SYSTEM_RES_TOOL, operate=Operate.READ, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.RESOURCE_TOOL]

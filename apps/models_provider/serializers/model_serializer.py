@@ -428,6 +428,9 @@ class ModelSerializer(serializers.Serializer):
                 'username': model.user.nick_name
             }
 
+        def page(self, current_page, page_size):
+            pass
+
     class ModelParams(serializers.Serializer):
         id = serializers.UUIDField(required=True, label=_('model id'))
 
