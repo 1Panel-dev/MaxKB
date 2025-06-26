@@ -15,6 +15,7 @@ from langchain_core.messages import HumanMessage
 from common import forms
 from common.exception.app_exception import AppApiException
 from common.forms import BaseForm, TooltipLabel
+from common.utils.logger import maxkb_logger
 from models_provider.base_model_provider import BaseModelCredential, ValidCode
 
 
@@ -35,6 +36,8 @@ class TencentVisionModelCredential(BaseForm, BaseModelCredential):
         try:
             model = provider.get_model(model_type, model_name, model_credential, **model_params)
             res = model.stream([HumanMessage(content=[{"type": "text", "text": gettext('Hello')}])])
+            for chunk in res:
+                maxkb_logger.info(chunk)
         except Exception as e:
             traceback.print_exc()
             if isinstance(e, AppApiException):
