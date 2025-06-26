@@ -192,8 +192,8 @@ const systemRouter = {
       path: '/system/chat',
       name: 'SystemChat',
       meta: {
-        icon: 'app-shared',
-        iconActive: 'app-shared-active',
+        icon: 'app-user-chat',
+        iconActive: 'app-user-chat',
         title: 'views.chatUser.title',
         activeMenu: '/system',
         parentPath: '/system',
@@ -225,7 +225,7 @@ const systemRouter = {
               ),
             ],
           },
-          component: () => import('@/views/system-chat-user/user-manage/index.vue'),
+          component: () => import('@/views/system-chat-user/chat-user/index.vue'),
         },
         {
           path: '/system/chat/group',

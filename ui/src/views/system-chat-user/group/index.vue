@@ -1,39 +1,61 @@
 <template>
-  <div class="h-full">
-    <ContentContainer>
-      <template #header>
-        <div class="shared-header">
-          <span class="title">{{ t('views.chatUser.title') }}</span>
-          <el-icon size="12">
-            <rightOutlined></rightOutlined>
-          </el-icon>
-          <span class="sub-title">{{ t('views.chatUser.group.title') }}</span>
-        </div>
-      </template>
-      <el-card style="--el-card-padding: 0" class="user-card">
-        <div class="flex h-full">
-          <div class="user-left border-r p-16">
-            <div class="user-left_title flex-between">
+  <div class="group p-24">
+    <el-breadcrumb separator-icon="ArrowRight" class="mb-16">
+      <el-breadcrumb-item>{{ t('views.chatUser.title') }}</el-breadcrumb-item>
+      <el-breadcrumb-item>
+        <h5 class="ml-4 color-text-primary">{{ t('views.chatUser.group.title') }}</h5>
+      </el-breadcrumb-item>
+    </el-breadcrumb>
+    <el-card style="--el-card-padding: 0">
+      <div class="flex">
+        <div class="user-left border-r p-16">
+          <div class="p-8 pb-0 mb-12">
+            <div class="flex-between mb-16">
               <h4 class="medium">{{ $t('views.chatUser.group.title') }}</h4>
-              <el-tooltip effect="dark" :content="`${$t('common.create')}${$t('views.chatUser.group.title')}`"
-                placement="top">
-                <el-button type="primary" text @click="createOrUpdate()"
-                  v-hasPermission="new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
-                  [PermissionConst.WORKSPACE_USER_GROUP_CREATE.getWorkspacePermission], [], 'OR')">
-                  <AppIcon iconName="app-copy"></AppIcon>
+              <el-tooltip
+                effect="dark"
+                :content="`${$t('common.create')}${$t('views.chatUser.group.title')}`"
+                placement="top"
+              >
+                <el-button
+                  type="primary"
+                  text
+                  @click="createOrUpdate()"
+                  v-hasPermission="
+                    new ComplexPermission(
+                      [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+                      [PermissionConst.WORKSPACE_USER_GROUP_CREATE.getWorkspacePermission],
+                      [],
+                      'OR',
+                    )
+                  "
+                >
+                  <el-icon :size="18"><Plus /></el-icon>
                 </el-button>
               </el-tooltip>
             </div>
 
-            <div class="p-8">
-              <el-input v-model="filterText" :placeholder="$t('common.search')" prefix-icon="Search" clearable />
-            </div>
-            <div class="list-height-left">
-              <el-scrollbar v-loading="loading">
-                <common-list :data="filterList" @click="clickUserGroup" :default-active="current?.id">
-                  <template #default="{ row }">
-                    <div class="flex-between">
-                      <span class="ellipsis" style="max-width: initial;">{{ row.name }}</span>
+            <el-input
+              v-model="filterText"
+              :placeholder="$t('common.search')"
+              prefix-icon="Search"
+              clearable
+            />
+          </div>
+
+          <div class="list-height-left">
+            <el-scrollbar v-loading="loading">
+              <common-list
+                :data="filterList"
+                @click="clickUserGroup"
+                :default-active="current?.id"
+                @mouseenter="mouseenter"
+                @mouseleave="mouseId = ''"
+              >
+                <template #default="{ row }">
+                  <div class="flex-between">
+                    <span class="ellipsis">{{ row.name }}</span>
+                    <div @click.stop v-show="mouseId === row.id">
                       <el-dropdown :teleported="false">
                         <el-button text>
                           <el-icon class="color-secondary">
@@ -42,115 +64,182 @@
                         </el-button>
                         <template #dropdown>
                           <el-dropdown-menu style="min-width: 80px">
-                            <el-dropdown-item @click.stop="createOrUpdate(row)" class="p-8"
-                              v-if="hasPermission(new ComplexPermission(
-                              [RoleConst.ADMIN,RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
-                              [PermissionConst.WORKSPACE_USER_GROUP_EDIT.getWorkspacePermission], [], 'OR'), 'OR')">
-                              <AppIcon iconName="app-copy"></AppIcon>
-                              {{
-                                $t('common.rename')
-                              }}
-                            </el-dropdown-item>
-                            <el-dropdown-item @click.stop="deleteGroup(row)" class="border-t p-8"
-                              v-if="row.id !== 'default'&&
-                              hasPermission(new ComplexPermission(
-                              [RoleConst.ADMIN,RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
-                              [PermissionConst.WORKSPACE_USER_GROUP_DELETE.getWorkspacePermission], [], 'OR'), 'OR')"
+                            <el-dropdown-item
+                              @click.stop="createOrUpdate(row)"
+                              class="p-8"
+                              v-if="
+                                hasPermission(
+                                  new ComplexPermission(
+                                    [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+                                    [
+                                      PermissionConst.WORKSPACE_USER_GROUP_EDIT
+                                        .getWorkspacePermission,
+                                    ],
+                                    [],
+                                    'OR',
+                                  ),
+                                  'OR',
+                                )
+                              "
                             >
-                              <AppIcon iconName="app-copy"></AppIcon>
-                              {{
-                                $t('common.delete')
-                              }}
+                               <el-icon><EditPen /></el-icon>
+                              {{ $t('common.rename') }}
+                            </el-dropdown-item>
+                            <el-dropdown-item
+                              @click.stop="deleteGroup(row)"
+                              class="border-t p-8"
+                              v-if="
+                                row.id !== 'default' &&
+                                hasPermission(
+                                  new ComplexPermission(
+                                    [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+                                    [
+                                      PermissionConst.WORKSPACE_USER_GROUP_DELETE
+                                        .getWorkspacePermission,
+                                    ],
+                                    [],
+                                    'OR',
+                                  ),
+                                  'OR',
+                                )
+                              "
+                            >
+                              <el-icon><Delete /></el-icon>
+                              {{ $t('common.delete') }}
                             </el-dropdown-item>
                           </el-dropdown-menu>
                         </template>
                       </el-dropdown>
                     </div>
-                  </template>
-                  <template #empty>
-                    <span></span>
-                  </template>
-                </common-list>
-              </el-scrollbar>
-            </div>
-          </div>
-
-          <!-- 右边 -->
-          <div class="user-right" v-loading="rightLoading">
-            <div class="flex align-center">
-              <h4 class="medium">{{ current?.name }}</h4>
-              <el-divider direction="vertical" class="mr-8 ml-8" />
-              <AppIcon iconName="app-workspace" style="font-size: 16px" class="color-input-placeholder"></AppIcon>
-              <span class="color-input-placeholder ml-4">
-                {{ paginationConfig.total }}
-              </span>
-            </div>
-
-            <div class="flex-between mb-16" style="margin-top: 20px;">
-              <div>
-                <el-button type="primary" @click="createUser()"
-                  v-hasPermission="new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
-                  [PermissionConst.WORKSPACE_USER_GROUP_ADD_MEMBER.getWorkspacePermission], [], 'OR')"
-                >
-                  {{ t('views.role.member.add') }}
-                </el-button>
-                <el-button :disabled="multipleSelection.length === 0" @click="handleDeleteUser()"
-                  v-hasPermission="new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
-                  [PermissionConst.WORKSPACE_USER_GROUP_DELETE.getWorkspacePermission], [], 'OR')"
-                >
-                  {{ $t('common.remove') }}
-                </el-button>
-              </div>
-              <div class="flex-between complex-search">
-                <el-select class="complex-search__left" v-model="searchType" style="width: 120px">
-                  <el-option :label="$t('views.login.loginForm.username.label')" value="username" />
-                </el-select>
-                <el-input v-if="searchType === 'username'" v-model="searchForm.username" @change="getList"
-                  :placeholder="$t('common.searchBar.placeholder')" style="width: 220px" clearable />
-              </div>
-            </div>
-
-            <app-table :data="tableData" :pagination-config="paginationConfig" @sizeChange="handleSizeChange"
-              @changePage="getList" @selection-change="handleSelectionChange">
-              <el-table-column type="selection" width="55" />
-              <el-table-column prop="nick_name" :label="$t('views.userManage.userForm.nick_name.label')" />
-              <el-table-column prop="username" :label="$t('views.login.loginForm.username.label')" />
-              <el-table-column prop="source" :label="$t('views.userManage.source.label')">
-                <template #default="{ row }">
-                  {{
-                    row.source === 'LOCAL'
-                      ? $t('views.userManage.source.local')
-                      : row.source === 'wecom'
-                        ? $t('views.userManage.source.wecom')
-                        : row.source === 'lark'
-                          ? $t('views.userManage.source.lark')
-                          : row.source === 'dingtalk'
-                            ? $t('views.userManage.source.dingtalk')
-                            : row.source === 'OAUTH2' || row.source === 'OAuth2'
-                              ? 'OAuth2'
-                              : row.source
-                  }}
+                  </div>
                 </template>
-              </el-table-column>
-              <el-table-column :label="$t('common.operation')" width="100" fixed="right">
-                <template #default="{ row }">
-                  <el-tooltip effect="dark" :content="`${$t('common.remove')}`" placement="top">
-                    <el-button type="primary" text @click.stop="handleDeleteUser(row)"
-                      v-hasPermission="new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
-                      [PermissionConst.WORKSPACE_USER_GROUP_REMOVE_MEMBER.getWorkspacePermission], [], 'OR')"
-                    >
-                      <el-icon>
-                        <EditPen />
-                      </el-icon>
-                    </el-button>
-                  </el-tooltip>
+                <template #empty>
+                  <span></span>
                 </template>
-              </el-table-column>
-            </app-table>
+              </common-list>
+            </el-scrollbar>
           </div>
         </div>
-      </el-card>
-    </ContentContainer>
+
+        <!-- 右边 -->
+        <div class="user-right" v-loading="rightLoading">
+          <div class="flex align-center">
+            <h4 class="medium">{{ current?.name }}</h4>
+            <el-divider direction="vertical" class="mr-8 ml-8" />
+            <AppIcon
+              iconName="app-workspace"
+              style="font-size: 16px"
+              class="color-input-placeholder"
+            ></AppIcon>
+            <span class="color-input-placeholder ml-4">
+              {{ paginationConfig.total }}
+            </span>
+          </div>
+
+          <div class="flex-between mb-16" style="margin-top: 20px">
+            <div>
+              <el-button
+                type="primary"
+                @click="createUser()"
+                v-hasPermission="
+                  new ComplexPermission(
+                    [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+                    [PermissionConst.WORKSPACE_USER_GROUP_ADD_MEMBER.getWorkspacePermission],
+                    [],
+                    'OR',
+                  )
+                "
+              >
+                {{ t('views.role.member.add') }}
+              </el-button>
+              <el-button
+                :disabled="multipleSelection.length === 0"
+                @click="handleDeleteUser()"
+                v-hasPermission="
+                  new ComplexPermission(
+                    [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+                    [PermissionConst.WORKSPACE_USER_GROUP_DELETE.getWorkspacePermission],
+                    [],
+                    'OR',
+                  )
+                "
+              >
+                {{ $t('common.remove') }}
+              </el-button>
+            </div>
+            <div class="flex-between complex-search">
+              <el-select class="complex-search__left" v-model="searchType" style="width: 120px">
+                <el-option :label="$t('views.login.loginForm.username.label')" value="username" />
+              </el-select>
+              <el-input
+                v-if="searchType === 'username'"
+                v-model="searchForm.username"
+                @change="getList"
+                :placeholder="$t('common.searchBar.placeholder')"
+                style="width: 220px"
+                clearable
+              />
+            </div>
+          </div>
+
+          <app-table
+            :data="tableData"
+            :pagination-config="paginationConfig"
+            @sizeChange="handleSizeChange"
+            @changePage="getList"
+            @selection-change="handleSelectionChange"
+          >
+            <el-table-column type="selection" width="55" />
+            <el-table-column
+              prop="nick_name"
+              :label="$t('views.userManage.userForm.nick_name.label')"
+            />
+            <el-table-column prop="username" :label="$t('views.login.loginForm.username.label')" />
+            <el-table-column prop="source" :label="$t('views.userManage.source.label')">
+              <template #default="{ row }">
+                {{
+                  row.source === 'LOCAL'
+                    ? $t('views.userManage.source.local')
+                    : row.source === 'wecom'
+                      ? $t('views.userManage.source.wecom')
+                      : row.source === 'lark'
+                        ? $t('views.userManage.source.lark')
+                        : row.source === 'dingtalk'
+                          ? $t('views.userManage.source.dingtalk')
+                          : row.source === 'OAUTH2' || row.source === 'OAuth2'
+                            ? 'OAuth2'
+                            : row.source
+                }}
+              </template>
+            </el-table-column>
+            <el-table-column :label="$t('common.operation')" width="100" fixed="right">
+              <template #default="{ row }">
+                <el-tooltip effect="dark" :content="`${$t('common.remove')}`" placement="top">
+                  <el-button
+                    type="primary"
+                    text
+                    @click.stop="handleDeleteUser(row)"
+                    v-hasPermission="
+                      new ComplexPermission(
+                        [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+                        [PermissionConst.WORKSPACE_USER_GROUP_REMOVE_MEMBER.getWorkspacePermission],
+                        [],
+                        'OR',
+                      )
+                    "
+                  >
+                    <el-icon>
+                      <EditPen />
+                    </el-icon>
+                  </el-button>
+                </el-tooltip>
+              </template>
+            </el-table-column>
+          </app-table>
+        </div>
+      </div>
+    </el-card>
+
     <CreateOrUpdateGroupDialog ref="createOrUpdateGroupDialogRef" @refresh="refresh" />
     <CreateGroupUserDialog ref="createGroupUserDialogRef" @refresh="getList" />
   </div>
@@ -161,7 +250,6 @@ import { onMounted, ref, watch, reactive } from 'vue'
 import SystemGroupApi from '@/api/system/user-group'
 import { t } from '@/locales'
 import type { ChatUserGroupUserItem } from '@/api/type/systemChatUser'
-import iconMap from '@/components/app-icon/icons/common'
 import CreateOrUpdateGroupDialog from './component/CreateOrUpdateGroupDialog.vue'
 import CreateGroupUserDialog from './component/CreateGroupUserDialog.vue'
 import type { ListItem } from '@/api/type/common'
@@ -175,8 +263,6 @@ const loading = ref(false)
 const list = ref<ListItem[]>([])
 const filterList = ref<ListItem[]>([]) // 搜索过滤后列表
 const current = ref<ListItem>()
-
-const rightOutlined = iconMap['right-outlined'].iconReader()
 
 async function getUserGroupList() {
   try {
@@ -197,9 +283,7 @@ function filter(list: ListItem[], filterText: string) {
   if (!filterText.length) {
     return list
   }
-  return list.filter((v: ListItem) =>
-    v.name.toLowerCase().includes(filterText.toLowerCase()),
-  )
+  return list.filter((v: ListItem) => v.name.toLowerCase().includes(filterText.toLowerCase()))
 }
 
 watch(filterText, (val: string) => {
@@ -213,7 +297,7 @@ function clickUserGroup(item: ListItem) {
 const createOrUpdateGroupDialogRef = ref<InstanceType<typeof CreateOrUpdateGroupDialog>>()
 
 function createOrUpdate(item?: ListItem) {
-  createOrUpdateGroupDialogRef.value?.open(item);
+  createOrUpdateGroupDialogRef.value?.open(item)
 }
 
 function deleteGroup(item: ListItem) {
@@ -232,12 +316,11 @@ function deleteGroup(item: ListItem) {
         current.value = item.id === current.value?.id ? list.value[0] : current.value
       })
     })
-    .catch(() => {
-    })
+    .catch(() => {})
 }
 
 async function refresh(group?: ListItem) {
-  await getUserGroupList();
+  await getUserGroupList()
   // 创建角色后选中新建的角色
   current.value = group ? group : current.value
 }
@@ -259,7 +342,12 @@ const tableData = ref<ChatUserGroupUserItem[]>([])
 async function getList() {
   if (!current.value?.id) return
   try {
-    const res = await SystemGroupApi.getUserListByGroup(current.value?.id, paginationConfig, searchForm.value.username, rightLoading)
+    const res = await SystemGroupApi.getUserListByGroup(
+      current.value?.id,
+      paginationConfig,
+      searchForm.value.username,
+      rightLoading,
+    )
     tableData.value = res.data.records
     paginationConfig.total = res.data.total
   } catch (error) {
@@ -272,14 +360,17 @@ function handleSizeChange() {
   getList()
 }
 
-watch(() => current.value?.id, () => {
-  getList()
-})
+watch(
+  () => current.value?.id,
+  () => {
+    getList()
+  },
+)
 
 const createGroupUserDialogRef = ref<InstanceType<typeof CreateGroupUserDialog>>()
 
 function createUser() {
-  createGroupUserDialogRef.value?.open(current.value?.id as string);
+  createGroupUserDialogRef.value?.open(current.value?.id as string)
 }
 
 const multipleSelection = ref<any[]>([])
@@ -290,7 +381,9 @@ function handleSelectionChange(val: any[]) {
 
 function handleDeleteUser(item?: ChatUserGroupUserItem) {
   MsgConfirm(
-    item ? `${t('views.workspace.member.delete.confirmTitle')}${item.nick_name} ?` : t('views.chatUser.group.batchDeleteMember', { count: multipleSelection.value.length }),
+    item
+      ? `${t('views.workspace.member.delete.confirmTitle')}${item.nick_name} ?`
+      : t('views.chatUser.group.batchDeleteMember', { count: multipleSelection.value.length }),
     '',
     {
       confirmButtonText: t('common.confirm'),
@@ -298,66 +391,36 @@ function handleDeleteUser(item?: ChatUserGroupUserItem) {
     },
   )
     .then(() => {
-      SystemGroupApi.postRemoveMember(current.value?.id as string, { group_relation_ids: item ? [item.user_group_relation_id] : multipleSelection.value.map(item => (item.user_group_relation_id)) }, loading).then(async () => {
+      SystemGroupApi.postRemoveMember(
+        current.value?.id as string,
+        {
+          group_relation_ids: item
+            ? [item.user_group_relation_id]
+            : multipleSelection.value.map((item) => item.user_group_relation_id),
+        },
+        loading,
+      ).then(async () => {
         MsgSuccess(t('common.removeSuccess'))
         await getList()
       })
     })
-    .catch(() => {
-    })
+    .catch(() => {})
+}
+const mouseId = ref('')
+
+function mouseenter(row: any) {
+  mouseId.value = row.id
 }
 </script>
 
 <style lang="scss" scoped>
-.shared-header {
-  color: #646a73;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 22px;
-  display: flex;
-  align-items: center;
-
-  :deep(.el-icon i) {
-    height: 12px;
-  }
-
-  .sub-title {
-    color: #1f2329;
-  }
-}
-
-.content-container {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-
-  :deep(.content-container__main) {
-    flex: 1;
-    overflow: hidden;
-  }
-}
-
-:deep(.user-card) {
-  height: 100%;
-  overflow: hidden;
-}
-
 .user-left {
   box-sizing: border-box;
   width: var(--setting-left-width);
   min-width: var(--setting-left-width);
 
-  .user-left_title {
-    padding: 8px;
-  }
-
   .list-height-left {
     height: calc(100vh - 271px);
-
-    :deep(.common-list li) {
-      padding-right: 4px;
-      padding-left: 8px;
-    }
   }
 }
 
