@@ -3,7 +3,12 @@
     <el-button
       type="primary"
       @click="handleAdd"
-      v-hasPermission="[RoleConst.ADMIN, PermissionConst.WORKSPACE_ADD_MEMBER]"
+      v-hasPermission="
+        new ComplexPermission(
+          [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+          [PermissionConst.WORKSPACE_ADD_MEMBER, PermissionConst.WORKSPACE_WORKSPACE_ADD_MEMBER],
+          [],
+            'OR',)"
     >
       {{ $t('views.role.member.add') }}
     </el-button>
@@ -42,7 +47,12 @@
             type="primary"
             text
             @click.stop="handleDelete(row)"
-            v-hasPermission="[RoleConst.ADMIN, PermissionConst.WORKSPACE_REMOVE_MEMBER]"
+            v-hasPermission="
+              new ComplexPermission(
+              [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+              [PermissionConst.WORKSPACE_REMOVE_MEMBER, PermissionConst.WORKSPACE_WORKSPACE_REMOVE_MEMBER],
+              [],
+                'OR',)"
           >
             <AppIcon iconName="app-delete-users"></AppIcon>
           </el-button>
@@ -65,6 +75,8 @@ import AddMemberDrawer from './AddMemberDrawer.vue'
 import WorkspaceApi from '@/api/workspace/workspace'
 import type { WorkspaceMemberItem, WorkspaceItem } from '@/api/type/workspace'
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
+import { ComplexPermission } from '@/utils/permission/type'
+
 
 const props = defineProps<{
   currentWorkspace?: WorkspaceItem

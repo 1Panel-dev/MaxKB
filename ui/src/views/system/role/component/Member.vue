@@ -6,12 +6,11 @@
         @click="handleAdd"
         v-hasPermission="
           new ComplexPermission(
-            [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
-            [PermissionConst.ROLE_ADD_MEMBER.getWorkspacePermission],
+            [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+            [PermissionConst.WORKSPACE_ROLE_ADD_MEMBER, PermissionConst.ROLE_ADD_MEMBER],
             [],
             'OR',
-          )
-        "
+          )"
       >
         {{ $t('views.role.member.add') }}
       </el-button>
@@ -57,8 +56,8 @@
               @click.stop="handleDelete(row)"
               v-hasPermission="
                 new ComplexPermission(
-                  [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
-                  [PermissionConst.ROLE_REMOVE_MEMBER.getWorkspacePermission],
+                  [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+                  [PermissionConst.ROLE_REMOVE_MEMBER, PermissionConst.WORKSPACE_ROLE_REMOVE_MEMBER],
                   [],
                   'OR',
                 )
