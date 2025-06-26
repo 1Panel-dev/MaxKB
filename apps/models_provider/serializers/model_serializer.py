@@ -412,31 +412,6 @@ class ModelSerializer(serializers.Serializer):
             return True
 
 
-def get_authorized_tool(tool_query_set, workspace_id, model_workspace_authorization):
-    # 对所有工作空间拉黑的工具
-    non_auths = QuerySet(model_workspace_authorization).filter(
-        Q(workspace_id='None') & Q(authentication_type='WHITE_LIST')
-    ).values_list('model_id', flat=True)
-    # 授权给所有工作空间的工具
-    all_auths = QuerySet(model_workspace_authorization).filter(
-        Q(workspace_id='None') & Q(authentication_type='BLACK_LIST')
-    ).values_list('model_id', flat=True)
-    # 查询白名单授权的工具
-    white_authorized_tool_ids = QuerySet(model_workspace_authorization).filter(
-        workspace_id=workspace_id, authentication_type='WHITE_LIST'
-    ).values_list('model_id', flat=True)
-    # 查询黑名单授权的工具
-    black_authorized_tool_ids = QuerySet(model_workspace_authorization).filter(
-        workspace_id=workspace_id, authentication_type='BLACK_LIST'
-    ).values_list('model_id', flat=True)
-    tool_query_set = tool_query_set.filter(
-        id__in=list(white_authorized_tool_ids) + list(all_auths)
-    ).exclude(
-        id__in=list(black_authorized_tool_ids) + list(non_auths)
-    )
-    return tool_query_set
-
-
 class WorkspaceSharedModelSerializer(serializers.Serializer):
     workspace_id = serializers.CharField(required=True, label=_('workspace id'))
     name = serializers.CharField(required=False, max_length=64, label=_('model name'))
@@ -469,10 +444,9 @@ class WorkspaceSharedModelSerializer(serializers.Serializer):
     def _build_queryset(self, workspace_id):
         queryset = QuerySet(Model)
         if workspace_id:
-            model_workspace_authorization = DatabaseModelManage.get_model("model_workspace_authorization")
-            if model_workspace_authorization is not None:
-                queryset = get_authorized_tool(queryset, workspace_id,
-                                               model_workspace_authorization=model_workspace_authorization)
+            get_authorized_model = DatabaseModelManage.get_model("get_authorized_model")
+            if get_authorized_model is not None:
+                queryset = get_authorized_model(queryset, workspace_id)
 
         for field in ['name', 'model_type', 'model_name', 'provider', 'create_user']:
             value = self.data.get(field)
