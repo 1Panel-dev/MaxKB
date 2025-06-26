@@ -125,7 +125,7 @@ class Knowledge(AppModelMixin):
     scope = models.CharField(max_length=20, verbose_name='可用范围', choices=KnowledgeScope.choices,
                              default=KnowledgeScope.WORKSPACE)
     folder = models.ForeignKey(KnowledgeFolder, on_delete=models.DO_NOTHING, verbose_name="文件夹id", default='default')
-    embedding_model = models.ForeignKey(Model, on_delete=models.DO_NOTHING, verbose_name="向量模型")
+    embedding_model = models.ForeignKey(Model, on_delete=models.SET_NULL, db_constraint=False, blank=True, null=True)
     file_size_limit = models.IntegerField(verbose_name="文件大小限制", default=100)
     file_count_limit = models.IntegerField(verbose_name="文件数量限制", default=50)
     meta = models.JSONField(verbose_name="元数据", default=dict)
