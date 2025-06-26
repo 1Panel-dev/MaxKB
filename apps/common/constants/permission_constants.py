@@ -745,12 +745,12 @@ class PermissionConstants(Enum):
                                          parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
                                          resource_permission_group_list=[ResourcePermissionGroup.MANAGE])
 
-    APPLICATION_CHAT_USER_READ = Permission(group=Group.CHAT_USER, operate=Operate.READ,
+    APPLICATION_CHAT_USER_READ = Permission(group=Group.APPLICATION_CHAT_USER, operate=Operate.READ,
                                             role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                             parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
                                             resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
                                             )
-    APPLICATION_CHAT_USER_EDIT = Permission(group=Group.CHAT_USER, operate=Operate.EDIT,
+    APPLICATION_CHAT_USER_EDIT = Permission(group=Group.APPLICATION_CHAT_USER, operate=Operate.EDIT,
                                             role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                             parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
                                             resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
@@ -818,7 +818,6 @@ class PermissionConstants(Enum):
     CHAT_USER_READ = Permission(group=Group.CHAT_USER, operate=Operate.READ,
                                 role_list=[RoleConstants.ADMIN],
                                 parent_group=[SystemGroup.CHAT_USER],
-                                label=_('Sync users')
                                 )
     CHAT_USER_CREATE = Permission(group=Group.CHAT_USER, operate=Operate.CREATE,
                                   role_list=[RoleConstants.ADMIN],
