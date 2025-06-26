@@ -281,10 +281,7 @@
   <ToolFormDrawer ref="ToolFormDrawerRef" @refresh="refresh" :title="ToolDrawertitle" />
   <CreateFolderDialog ref="CreateFolderDialogRef" v-if="!isShared" />
   <ToolStoreDialog ref="toolStoreDialogRef" @refresh="refresh" />
-  <AddInternalToolDialog
-    ref="addInternalToolDialogRef"
-    @refresh="confirmAddInternalTool"
-  />
+  <AddInternalToolDialog ref="addInternalToolDialogRef" @refresh="confirmAddInternalTool" />
   <AuthorizedWorkspace
     ref="AuthorizedWorkspaceDialogRef"
     v-if="isSystemShare"
@@ -294,7 +291,7 @@
 <script lang="ts" setup>
 import { onMounted, ref, reactive, computed, watch } from 'vue'
 import { cloneDeep, get } from 'lodash'
-import { useRoute } from 'vue-router'
+import { useRoute, onBeforeRouteLeave } from 'vue-router'
 import InitParamDrawer from '@/views/tool/component/InitParamDrawer.vue'
 import ToolFormDrawer from '@/views/tool/ToolFormDrawer.vue'
 import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
@@ -310,6 +307,9 @@ import useStore from '@/stores'
 import { t } from '@/locales'
 const route = useRoute()
 const { folder, user, tool } = useStore()
+onBeforeRouteLeave((to, from) => {
+  tool.setToolList([])
+})
 
 const apiType = computed(() => {
   if (route.path.includes('shared')) {

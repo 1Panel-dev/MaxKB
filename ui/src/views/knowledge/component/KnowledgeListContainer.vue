@@ -307,6 +307,7 @@
 
 <script lang="ts" setup>
 import { onMounted, ref, reactive, shallowRef, nextTick, computed, watch } from 'vue'
+import { useRouter, useRoute, onBeforeRouteLeave } from 'vue-router'
 import { cloneDeep, get } from 'lodash'
 import CreateKnowledgeDialog from '@/views/knowledge/create-component/CreateKnowledgeDialog.vue'
 import CreateWebKnowledgeDialog from '@/views/knowledge/create-component/CreateWebKnowledgeDialog.vue'
@@ -319,7 +320,6 @@ import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import useStore from '@/stores'
 import { numberFormat } from '@/utils/common'
 import { t } from '@/locales'
-import { useRouter, useRoute } from 'vue-router'
 import { SourceTypeEnum } from '@/enums/common'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import permissionMap from '@/permission'
@@ -327,6 +327,9 @@ import permissionMap from '@/permission'
 const router = useRouter()
 const route = useRoute()
 const { folder, user, knowledge } = useStore()
+onBeforeRouteLeave((to, from) => {
+  knowledge.setKnowledgeList([])
+})
 
 const apiType = computed(() => {
   if (route.path.includes('shared')) {
@@ -363,7 +366,6 @@ const paginationConfig = reactive({
   page_size: 30,
   total: 0,
 })
-
 
 const CreateKnowledgeDialogRef = ref()
 const currentCreateDialog = shallowRef<any>(null)

@@ -78,7 +78,7 @@
         <h4 class="title-decoration-1 mb-16">
           {{ $t('common.param.initParam') }}
         </h4>
-        <el-button link type="danger" @click="openAddInitDialog()">
+        <el-button link type="primary" @click="openAddInitDialog()">
           <el-icon class="mr-4">
             <Plus />
           </el-icon>

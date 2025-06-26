@@ -1,6 +1,7 @@
 import knowledgeWorkspaceApi from '@/api/knowledge/knowledge'
 import documentWorkspaceApi from '@/api/knowledge/document'
 import paragraphWorkspaceApi from '@/api/knowledge/paragraph'
+import problemWorkspaceApi from '@/api/knowledge/problem'
 import modelWorkspaceApi from '@/api/model/model'
 import toolWorkspaceApi from '@/api/tool/tool'
 import sharedWorkspaceApi from '@/api/shared-workspace'
@@ -9,6 +10,7 @@ import modelSystemShareApi from '@/api/system-shared/model'
 import knowledgeSystemShareApi from '@/api/system-shared/knowledge'
 import documentSystemShareApi from '@/api/system-shared/document'
 import paragraphSystemShareApi from '@/api/system-shared/paragraph'
+import problemSystemShareApi from '@/api/system-shared/problem'
 
 // 普通 API
 const workspaceApiMap = {
@@ -17,6 +19,7 @@ const workspaceApiMap = {
   tool: toolWorkspaceApi,
   document: documentWorkspaceApi,
   paragraph: paragraphWorkspaceApi,
+  problem: problemWorkspaceApi,
 } as any
 
 // 系统分享 API
@@ -26,6 +29,7 @@ const systemShareApiMap = {
   tool: toolSystemShareApi,
   document: documentSystemShareApi,
   paragraph: paragraphSystemShareApi,
+  problem: problemSystemShareApi,
 } as any
 
 // 资源管理 API
