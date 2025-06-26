@@ -12,8 +12,8 @@ from common.utils.logger import maxkb_logger
 from models_provider.base_model_provider import BaseModelCredential, ValidCode
 
 class VolcanicEngineImageModelCredential(BaseForm, BaseModelCredential):
-    api_key = forms.PasswordInputField('API Key', required=True)
     api_base = forms.TextInputField('API URL', required=True)
+    api_key = forms.PasswordInputField('API Key', required=True)
 
     def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], model_params, provider,
                  raise_exception=False):
