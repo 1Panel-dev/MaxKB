@@ -101,8 +101,9 @@ class ModelSetting(APIView):
     def get(self, request: Request, workspace_id: str):
         return result.success(
             ModelSerializer.Query(
-                data={**query_params_to_single_dict(request.query_params)}).list(workspace_id=workspace_id,
-                                                                                 with_valid=True))
+                data={**query_params_to_single_dict(request.query_params), 'user_id': str(request.user.id)}).list(
+                workspace_id=workspace_id,
+                with_valid=True))
 
     class Operate(APIView):
         authentication_classes = [TokenAuth]
@@ -266,5 +267,6 @@ class ModelList(APIView):
     def get(self, request: Request, workspace_id: str):
         return result.success(
             ModelSerializer.Query(
-                data={**query_params_to_single_dict(request.query_params)}).model_list(workspace_id=workspace_id,
-                                                                                       with_valid=True))
+                data={**query_params_to_single_dict(request.query_params), 'user_id': str(request.user.id)}).model_list(
+                workspace_id=workspace_id,
+                with_valid=True))
