@@ -1,3 +1,4 @@
+import { Permission } from '@/utils/permission/type'
 import { Result } from '@/request/Result'
 import { get, put, post, del } from '@/request/index'
 import type { pageRequest } from '@/api/type/common'
@@ -82,6 +83,19 @@ const getSystemFolder: (
   data?: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<Array<any>>> = (workspace_id, source, data, loading) => {
+  if (source == 'MODEL') {
+    return Promise.resolve(
+      Result.success([
+        {
+          id: 'default',
+          name: '根目录',
+          desc: null,
+          parent_id: null,
+          children: [],
+        },
+      ]),
+    )
+  }
   return get(`${prefix}/${workspace_id}/${source}/folder`, data, loading)
 }
 

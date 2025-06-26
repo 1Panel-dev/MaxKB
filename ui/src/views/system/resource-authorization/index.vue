@@ -110,7 +110,6 @@ const filterText = ref('')
 const activeName = ref(AuthorizationEnum.KNOWLEDGE)
 const tableHeight = ref(0)
 
-
 const settingTags = reactive([
   {
     label: t('views.knowledge.title'),
@@ -121,6 +120,18 @@ const settingTags = reactive([
   {
     label: t('views.application.title'),
     value: AuthorizationEnum.APPLICATION,
+    data: [] as any,
+    isRole: false,
+  },
+  {
+    label: t('views.tool.title'),
+    value: AuthorizationEnum.TOOL,
+    data: [] as any,
+    isRole: false,
+  },
+  {
+    label: t('views.model.title'),
+    value: AuthorizationEnum.MODEL,
     data: [] as any,
     isRole: false,
   },
