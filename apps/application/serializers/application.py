@@ -16,7 +16,7 @@ from typing import Dict, List
 import uuid_utils.compat as uuid
 from django.core import validators
 from django.db import models, transaction
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Q
 from django.http import HttpResponse
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers, status
@@ -32,7 +32,8 @@ from common.db.search import native_search, native_page_search
 from common.exception.app_exception import AppApiException
 from common.field.common import UploadedFileField
 from common.utils.common import get_file_content, valid_license, restricted_loads
-from knowledge.models import Knowledge
+from knowledge.models import Knowledge, KnowledgeScope
+from knowledge.serializers.knowledge import KnowledgeSerializer, KnowledgeModelSerializer
 from maxkb.conf import PROJECT_DIR
 from models_provider.models import Model
 from system_manage.models import WorkspaceUserResourcePermission
@@ -703,7 +704,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
         if 'knowledge_id_list' in instance:
             knowledge_id_list = instance.get('knowledge_id_list')
             # 当前用户可修改关联的知识库列表
-            application_knowledge_id_list = [str(knowledge.id) for knowledge in
+            application_knowledge_id_list = [str(knowledge.get('id')) for knowledge in
                                              self.list_knowledge(with_valid=False)]
             for knowledge_id in knowledge_id_list:
                 if not application_knowledge_id_list.__contains__(knowledge_id):
@@ -723,7 +724,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
         mapping_knowledge_id_list = [akm.knowledge_id for akm in
                                      QuerySet(ApplicationKnowledgeMapping).filter(application_id=application_id)]
         knowledge_id_list = [d.id for d in
-                             list(filter(lambda row: mapping_knowledge_id_list.__contains__(row.id),
+                             list(filter(lambda row: mapping_knowledge_id_list.__contains__(row.get('id')),
                                          knowledge_list))]
         return {**ApplicationSerializerModel(application).data,
                 'knowledge_id_list': knowledge_id_list}
@@ -732,8 +733,28 @@ class ApplicationOperateSerializer(serializers.Serializer):
         if with_valid:
             self.is_valid(raise_exception=True)
         workspace_id = self.data.get("workspace_id")
-        knowledge_list = QuerySet(Knowledge).filter(workspace_id=workspace_id)
-        return knowledge_list
+        user_id = self.data.get('user_id')
+        knowledge_workspace_authorization_model = DatabaseModelManage.get_model('knowledge_workspace_authorization')
+        share_knowledge_list = []
+        if knowledge_workspace_authorization_model is not None:
+            white_list_condition = Q(authentication_type='WHITE_LIST') & Q(
+                workspace_id_list__contains=[workspace_id])
+            default_condition = ~Q(authentication_type='WHITE_LIST') & ~Q(
+                workspace_id_list__contains=[workspace_id])
+            # 组合查询
+            query = white_list_condition | default_condition
+            inner = QuerySet(knowledge_workspace_authorization_model).filter(query)
+            share_knowledge_list = [KnowledgeModelSerializer(k).data for k in QuerySet(Knowledge).filter(id__in=inner)]
+        workspace_knowledge_list = [k for k in KnowledgeSerializer.Query(
+            data={
+                'folder_id': 'default',
+                'workspace_id': workspace_id,
+                'scope': KnowledgeScope.WORKSPACE,
+                'user_id': user_id
+            }
+        ).list() if k.get('resource_type') == 'knowledge']
+
+        return [*workspace_knowledge_list, *share_knowledge_list]
 
     @staticmethod
     def save_application_knowledge_mapping(application_knowledge_id_list, knowledge_id_list, application_id):
