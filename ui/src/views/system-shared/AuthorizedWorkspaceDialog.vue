@@ -144,6 +144,8 @@ const open = ({ id }: any, type = 'Knowledge') => {
     .then((res: any) => {
       auth_list = (res.data || {}).auth_list || []
       un_auth_list = (res.data || {}).un_auth_list || []
+      // auth_list 中None表示没选中工作空间, 黑名单中表示所有工作空间都可用，白名单表示所有工作空间都不可用
+      auth_list = auth_list.filter((ele) => ele.workspace_id !== 'None')
       workspace.value = [
         ...un_auth_list,
         ...auth_list.map((ele) => ({ id: ele.workspace_id, name: ele.name })),
