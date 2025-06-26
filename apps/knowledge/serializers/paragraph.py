@@ -265,12 +265,18 @@ class ParagraphSerializers(serializers.Serializer):
             paragraph.position = max_position + 1
             paragraph.save()
             # 调整位置
+            if 'position' in instance:
+                if type(instance['position']) is not int:
+                    instance['position'] = max_position + 1
+            else:
+                instance['position'] = max_position + 1
+
             ParagraphSerializers.AdjustPosition(data={
                 'paragraph_id': str(paragraph.id),
                 'knowledge_id': knowledge_id,
                 'document_id': document_id,
                 'workspace_id': self.data.get('workspace_id')
-            }).adjust_position(instance.get('position', max_position + 1))
+            }).adjust_position(instance.get('position'))
             # 插入問題
             QuerySet(Problem).bulk_create(problem_model_list) if len(problem_model_list) > 0 else None
             # 插入问题关联关系
