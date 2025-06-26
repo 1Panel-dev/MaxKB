@@ -1,7 +1,7 @@
 import { ChatUserResourceEnum } from '@/enums/workspaceChatUser'
 import { get_next_route } from '@/utils/permission'
 
-import { PermissionConst, EditionConst, RoleConst } from '@/utils/permission/data'
+import { PermissionConst, RoleConst } from '@/utils/permission/data'
 
 const ApplicationDetailRouter = {
   path: '/application/:id/:type',

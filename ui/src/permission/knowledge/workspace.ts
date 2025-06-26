@@ -163,6 +163,16 @@ const workspace = {
       ],
       'OR',
     ),
+  doc_download: (source_id:string) =>
+    hasPermission(
+      [
+        RoleConst.ADMIN,
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.KNOWLEDGE_DOCUMENT_DOWNLOAD_SOURCE_FILE.getKnowledgeWorkspaceResourcePermission(source_id),
+        PermissionConst.KNOWLEDGE_DOCUMENT_DOWNLOAD_SOURCE_FILE.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),  
   problem_create: (source_id:string) =>
     hasPermission(
       [
