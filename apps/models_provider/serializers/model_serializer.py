@@ -344,12 +344,11 @@ class ModelSerializer(serializers.Serializer):
             if with_valid:
                 self.is_valid(raise_exception=True)
             queryset = self._build_query_params(workspace_id)
-            model_workspace_authorization = DatabaseModelManage.get_model("model_workspace_authorization")
+            get_authorized_model = DatabaseModelManage.get_model("get_authorized_model")
 
             shared_queryset = QuerySet(Model).filter(workspace_id='None')
-            if model_workspace_authorization is not None:
-                shared_queryset = get_authorized_tool(QuerySet(Model), workspace_id,
-                                                      model_workspace_authorization=model_workspace_authorization)
+            if get_authorized_model is not None:
+                shared_queryset = get_authorized_model(QuerySet(Model), workspace_id)
 
             # 构建共享模型和普通模型列表
             shared_model = [self._build_model_data(model) for model in shared_queryset.order_by("-create_time")]
