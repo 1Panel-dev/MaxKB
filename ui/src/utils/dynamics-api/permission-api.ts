@@ -2,6 +2,7 @@ import { PermissionConst, EditionConst, RoleConst } from '@/utils/permission/dat
 import { hasPermission } from '@/utils/permission/index'
 import roleSystemApi from '@/api/system/role'
 import roleWorkspaceApi from '@/api/workspace/role'
+import { ComplexPermission } from '../permission/type'
 
 // 系统管理员 API
 const systemApiMap = {
@@ -19,11 +20,19 @@ const workspaceApiMap = {
 
 export function loadPermissionApi(type: string) {
   if (hasPermission(EditionConst.IS_EE, 'OR')) {
-    if (hasPermission([RoleConst.ADMIN], 'OR')) {
-      // 加载企业版工作空间管理员 API
-      return systemApiMap[type]
-    } else if (hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole], 'OR')) {
+    if (hasPermission(new ComplexPermission (
+      [RoleConst.ADMIN],
+      [PermissionConst.ROLE_READ],
+      [],
+      'OR'),'OR')) {
       // 加载系统管理员 API
+      return systemApiMap[type]
+    } if (hasPermission(new ComplexPermission (
+      [RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+      [PermissionConst.WORKSPACE_ROLE_READ.getWorkspacePermissionWorkspaceManageRole],
+      [],
+      'OR'),'OR' )) {
+      // 加载企业版工作空间管理员 API
       return workspaceApiMap[type]
     }
   }

@@ -75,11 +75,11 @@ const PermissionConst = {
 
 
   ROLE_READ: new Permission('ROLE:READ'),
-  ROLE_CREATE: new Permission('ROLE:READ'),
-  ROLE_EDIT: new Permission('ROLE:READ'),
-  ROLE_DELETE: new Permission('ROLE:READ'),
-  ROLE_ADD_MEMBER: new Permission('ROLE:READ'),
-  ROLE_REMOVE_MEMBER: new Permission('ROLE:READ'),
+  ROLE_CREATE: new Permission('ROLE:READ+CREATE'),
+  ROLE_EDIT: new Permission('ROLE:READ+EDIT'),
+  ROLE_DELETE: new Permission('ROLE:READ+DELETE'),
+  ROLE_ADD_MEMBER: new Permission('ROLE:READ+ADD_MEMBER'),
+  ROLE_REMOVE_MEMBER: new Permission('ROLE:READ+REMOVE_MEMBER'),
 
 
   KNOWLEDGE_READ: new Permission('KNOWLEDGE:READ'),
