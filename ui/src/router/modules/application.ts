@@ -1,4 +1,4 @@
-import { PermissionConst, EditionConst, RoleConst } from '@/utils/permission/data'
+import { PermissionConst, RoleConst } from '@/utils/permission/data'
 const applicationRouter = {
   path: '/application',
   name: 'application',

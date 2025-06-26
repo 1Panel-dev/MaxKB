@@ -18,6 +18,7 @@ const systemRouter = {
         activeMenu: '/system',
         parentPath: '/system',
         parentName: 'system',
+        sameRoute:  'user',
         permission: [RoleConst.ADMIN, PermissionConst.USER_READ],
       },
       component: () => import('@/views/system/user-manage/index.vue'),
@@ -32,6 +33,7 @@ const systemRouter = {
         activeMenu: '/system',
         parentPath: '/system',
         parentName: 'system',
+        sameRoute:  'role',
         permission: [
           new ComplexPermission(
             [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
@@ -53,6 +55,7 @@ const systemRouter = {
         activeMenu: '/system',
         parentPath: '/system',
         parentName: 'system',
+        sameRoute:  'workspace',
         permission: [
           new ComplexPermission(
             [RoleConst.WORKSPACE_MANAGE, RoleConst.ADMIN],
@@ -102,6 +105,7 @@ const systemRouter = {
         activeMenu: '/system',
         parentPath: '/system',
         parentName: 'system',
+        sameRoute:  'authorization',
       },
       component: () => import('@/views/system/resource-authorization/index.vue'),
     },
@@ -187,10 +191,11 @@ const systemRouter = {
         activeMenu: '/system',
         parentPath: '/system',
         parentName: 'system',
+        sameRoute:  'chat',
         permission: [
           new ComplexPermission(
-            [RoleConst.WORKSPACE_MANAGE.getWorkspaceRole, RoleConst.ADMIN],
-            [PermissionConst.WORKSPACE_USER_GROUP_READ],
+            [RoleConst.WORKSPACE_MANAGE, RoleConst.ADMIN],
+            [PermissionConst.WORKSPACE_CHAT_USER_READ, PermissionConst.CHAT_USER_READ],
             [EditionConst.IS_EE, EditionConst.IS_PE],
             'OR',
           ),
@@ -207,8 +212,8 @@ const systemRouter = {
             parentName: 'system',
             permission: [
               new ComplexPermission(
-                [RoleConst.WORKSPACE_MANAGE.getWorkspaceRole, RoleConst.ADMIN],
-                [PermissionConst.WORKSPACE_CHAT_USER_READ],
+                [RoleConst.WORKSPACE_MANAGE, RoleConst.ADMIN],
+                [PermissionConst.CHAT_USER_READ, PermissionConst.WORKSPACE_CHAT_USER_READ],
                 [EditionConst.IS_EE, EditionConst.IS_PE],
                 'OR',
               ),
@@ -226,8 +231,8 @@ const systemRouter = {
             parentName: 'system',
             permission: [
               new ComplexPermission(
-                [RoleConst.WORKSPACE_MANAGE.getWorkspaceRole, RoleConst.ADMIN],
-                [PermissionConst.WORKSPACE_USER_GROUP_READ],
+                [RoleConst.WORKSPACE_MANAGE, RoleConst.ADMIN],
+                [PermissionConst.WORKSPACE_USER_GROUP_READ, PermissionConst.USER_GROUP_READ],
                 [EditionConst.IS_EE, EditionConst.IS_PE],
                 'OR',
               ),
@@ -245,7 +250,7 @@ const systemRouter = {
             parentName: 'system',
             permission: [
               new ComplexPermission(
-                [RoleConst.WORKSPACE_MANAGE.getWorkspaceRole, RoleConst.ADMIN],
+                [RoleConst.ADMIN],
                 [PermissionConst.CHAT_USER_AUTH_READ],
                 [EditionConst.IS_EE, EditionConst.IS_PE],
                 'OR',
@@ -266,6 +271,7 @@ const systemRouter = {
         activeMenu: '/system',
         parentPath: '/system',
         parentName: 'system',
+        sameRoute:  'setting',
       },
       children: [
         {
@@ -315,6 +321,7 @@ const systemRouter = {
         activeMenu: '/system',
         parentPath: '/system',
         parentName: 'system',
+        sameRoute:  'operate',
         permission: [EditionConst.IS_PE, EditionConst.IS_EE],
       },
       component: () => import('@/views/system/operate-log/index.vue'),
