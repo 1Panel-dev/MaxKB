@@ -388,8 +388,8 @@ class KnowledgeSerializer(serializers.Serializer):
         def export_excel(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            document_list = QuerySet(Document).filter(knowledge_id=self.data.get('id'))
-            paragraph_list = native_search(QuerySet(Paragraph).filter(knowledge_id=self.data.get("id")),
+            document_list = QuerySet(Document).filter(knowledge_id=self.data.get('knowledge_id'))
+            paragraph_list = native_search(QuerySet(Paragraph).filter(knowledge_id=self.data.get("knowledge_id")),
                                            get_file_content(
                                                os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql',
                                                             'list_paragraph_document_name.sql')))
@@ -408,8 +408,8 @@ class KnowledgeSerializer(serializers.Serializer):
         def export_zip(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            document_list = QuerySet(Document).filter(knowledge_id=self.data.get('id'))
-            paragraph_list = native_search(QuerySet(Paragraph).filter(knowledge_id=self.data.get("id")),
+            document_list = QuerySet(Document).filter(knowledge_id=self.data.get('knowledge_id'))
+            paragraph_list = native_search(QuerySet(Paragraph).filter(knowledge_id=self.data.get("knowledge_id")),
                                            get_file_content(
                                                os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql',
                                                             'list_paragraph_document_name.sql')))
