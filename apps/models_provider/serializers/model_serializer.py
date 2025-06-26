@@ -416,17 +416,6 @@ class ModelSerializer(serializers.Serializer):
             return True
 
 
-def get_authorized_tool(tool_query_set, workspace_id):
-    model_id_list = select_list(get_file_content(
-        os.path.join(PROJECT_DIR, "apps", "models_provider", 'sql',
-                     'list_share_authorized_model.sql'
-                     )), [workspace_id, workspace_id])
-    tool_query_set = tool_query_set.filter(
-        id__in=[k.get('model_id') for k in model_id_list]
-    )
-    return tool_query_set
-
-
 class WorkspaceSharedModelSerializer(serializers.Serializer):
     workspace_id = serializers.CharField(required=True, label=_('workspace id'))
     name = serializers.CharField(required=False, max_length=64, label=_('model name'))
@@ -459,9 +448,9 @@ class WorkspaceSharedModelSerializer(serializers.Serializer):
     def _build_queryset(self, workspace_id):
         queryset = QuerySet(Model)
         if workspace_id:
-            model_workspace_authorization = DatabaseModelManage.get_model("model_workspace_authorization")
-            if model_workspace_authorization is not None:
-                queryset = get_authorized_tool(queryset, workspace_id)
+            get_authorized_model = DatabaseModelManage.get_model("get_authorized_model")
+            if get_authorized_model is not None:
+                queryset = get_authorized_model(queryset, workspace_id)
 
         for field in ['name', 'model_type', 'model_name', 'provider', 'create_user']:
             value = self.data.get(field)
