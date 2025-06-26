@@ -12,12 +12,10 @@
       />
     </template>
     <template #footer>
-      <div style="flex: auto">
-        <el-button @click="handleCancel">{{ $t('common.cancel') }}</el-button>
-        <el-button type="primary" @click="handleAdd()" :loading="loading">
-          {{ $t('common.add') }}
-        </el-button>
-      </div>
+      <el-button @click="handleCancel">{{ $t('common.cancel') }}</el-button>
+      <el-button type="primary" @click="handleAdd()" :loading="loading">
+        {{ $t('common.add') }}
+      </el-button>
     </template>
   </el-drawer>
 </template>

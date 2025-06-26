@@ -1,10 +1,10 @@
 <template>
-  <div class="role">
+  <div class="role-manage p-16-24">
     <h2 class="mb-16">{{ $t('views.role.title') }}</h2>
-    <el-card style="--el-card-padding: 0" body-class="role-card">
+    <el-card style="--el-card-padding: 0">
       <div class="flex h-full">
-        <div class="role-left border-r p-16">
-          <div class="p-8 pb-0">
+        <div class="role-left border-r">
+          <div class="p-24 pb-0">
             <el-input
               v-model="filterText"
               :placeholder="$t('common.search')"
@@ -12,127 +12,141 @@
               clearable
             />
           </div>
-          <div class="list-height-left mt-8">
+          <div class="list-height-left">
             <el-scrollbar v-loading="loading">
-              <div class="role-left_title color-secondary lighter">
-                <span>{{ $t('views.role.internalRole') }}</span>
-              </div>
-              <common-list
-                :data="filterInternalRole"
-                @click="clickRole"
-                :default-active="currentRole?.id"
-              >
-                <template #default="{ row }">
-                  <div class="flex-between">
-                    <span class="mr-8">{{ row.role_name }}</span>
-                    <el-dropdown :teleported="false">
-                      <el-button text>
-                        <el-icon class="color-secondary">
-                          <MoreFilled />
-                        </el-icon>
-                      </el-button>
-                      <template #dropdown>
-                        <el-dropdown-menu style="min-width: 80px">
-                          <el-dropdown-item @click.stop="createOrUpdateRole(row)" class="p-8">
-                            <AppIcon iconName="app-copy"></AppIcon>
-                            {{ $t('common.rename') }}
-                          </el-dropdown-item>
-                          <el-dropdown-item @click.stop="deleteRole(row)" class="border-t p-8">
-                            <AppIcon iconName="app-copy"></AppIcon>
-                            {{ $t('common.delete') }}
-                          </el-dropdown-item>
-                        </el-dropdown-menu>
-                      </template>
-                    </el-dropdown>
-                  </div>
-                </template>
-                <template #empty>
-                  <span></span>
-                </template>
-              </common-list>
-              <div class="role-left_divider">
-                <el-divider />
-              </div>
-              <div class="role-left_title">
-                <span class="color-secondary lighter">{{ $t('views.role.customRole') }}</span>
-                <el-tooltip
-                  effect="dark"
-                  :content="`${$t('common.create')}${$t('views.role.customRole')}`"
-                  placement="top"
+              <div class="p-16">
+                <div class="color-secondary lighter ml-8 mb-8">
+                  <span>{{ $t('views.role.internalRole') }}</span>
+                </div>
+                <common-list
+                  :data="filterInternalRole"
+                  @click="clickRole"
+                  :default-active="currentRole?.id"
+                  @mouseenter="mouseenter"
+                  @mouseleave="mouseId = ''"
                 >
-                  <el-button type="primary" text @click="createOrUpdateRole()"
-                    v-hasPermission="new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
-                    [PermissionConst.ROLE_CREATE.getWorkspacePermission],[], 'OR')"
+                  <template #default="{ row }">
+                    <div class="flex-between">
+                      <span class="mr-8">{{ row.role_name }}</span>
+                      <div @click.stop v-show="mouseId === row.id">
+                        <el-dropdown :teleported="false">
+                          <el-button text>
+                            <el-icon class="color-secondary">
+                              <MoreFilled />
+                            </el-icon>
+                          </el-button>
+                          <template #dropdown>
+                            <el-dropdown-menu style="min-width: 80px">
+                              <el-dropdown-item @click.stop="createOrUpdateRole(row)" class="p-8">
+                                <AppIcon iconName="app-copy"></AppIcon>
+                                {{ $t('common.rename') }}
+                              </el-dropdown-item>
+                              <el-dropdown-item @click.stop="deleteRole(row)" class="border-t p-8">
+                                <AppIcon iconName="app-copy"></AppIcon>
+                                {{ $t('common.delete') }}
+                              </el-dropdown-item>
+                            </el-dropdown-menu>
+                          </template>
+                        </el-dropdown>
+                      </div>
+                    </div>
+                  </template>
+                  <template #empty>
+                    <span></span>
+                  </template>
+                </common-list>
+
+                <div class="ml-8 border-t flex-between mb-12" style="padding-top: 12px">
+                  <span class="color-secondary lighter">{{ $t('views.role.customRole') }}</span>
+                  <el-tooltip
+                    effect="dark"
+                    :content="`${$t('common.create')}${$t('views.role.customRole')}`"
+                    placement="top"
                   >
-                    <AppIcon iconName="app-copy"></AppIcon>
-                  </el-button>
-                </el-tooltip>
+                    <el-button
+                      type="primary"
+                      text
+                      @click="createOrUpdateRole()"
+                      v-hasPermission="
+                        new ComplexPermission(
+                          [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+                          [PermissionConst.ROLE_CREATE.getWorkspacePermission],
+                          [],
+                          'OR',
+                        )
+                      "
+                    >
+                      <el-icon :size="18"><Plus /></el-icon>
+                    </el-button>
+                  </el-tooltip>
+                </div>
+                <common-list
+                  :data="filterCustomRole"
+                  @click="clickRole"
+                  :default-active="currentRole?.id"
+                  @mouseenter="mouseenter"
+                  @mouseleave="mouseId = ''"
+                >
+                  <template #default="{ row }">
+                    <div class="flex-between">
+                      <span>
+                        {{ row.role_name }}
+                        <span class="color-input-placeholder ml-4"
+                          >({{ roleTypeMap[row.type as RoleTypeEnum] }})</span
+                        >
+                      </span>
+                      <div @click.stop v-show="mouseId === row.id">
+                        <el-dropdown :teleported="false">
+                          <el-button text>
+                            <el-icon class="color-secondary">
+                              <MoreFilled />
+                            </el-icon>
+                          </el-button>
+                          <template #dropdown>
+                            <el-dropdown-menu style="min-width: 80px">
+                              <el-dropdown-item @click.stop="createOrUpdateRole(row)" class="p-8">
+                                <AppIcon iconName="app-copy"></AppIcon>
+                                {{ $t('common.rename') }}
+                              </el-dropdown-item>
+                              <el-dropdown-item @click.stop="deleteRole(row)" class="border-t p-8">
+                                <AppIcon iconName="app-copy"></AppIcon>
+                                {{ $t('common.delete') }}
+                              </el-dropdown-item>
+                            </el-dropdown-menu>
+                          </template>
+                        </el-dropdown>
+                      </div>
+                    </div>
+                  </template>
+                  <template #empty>
+                    <span></span>
+                  </template>
+                </common-list>
               </div>
-              <common-list
-                :data="filterCustomRole"
-                @click="clickRole"
-                :default-active="currentRole?.id"
-              >
-                <template #default="{ row }">
-                  <div class="flex-between">
-                    <span>
-                      {{ row.role_name }}
-                      <span class="color-input-placeholder ml-4"
-                        >({{ roleTypeMap[row.type as RoleTypeEnum] }})</span
-                      >
-                    </span>
-                    <el-dropdown :teleported="false">
-                      <el-button text>
-                        <el-icon class="color-secondary">
-                          <MoreFilled />
-                        </el-icon>
-                      </el-button>
-                      <template #dropdown>
-                        <el-dropdown-menu style="min-width: 80px">
-                          <el-dropdown-item @click.stop="createOrUpdateRole(row)" class="p-8">
-                            <AppIcon iconName="app-copy"></AppIcon>
-                            {{ $t('common.rename') }}
-                          </el-dropdown-item>
-                          <el-dropdown-item @click.stop="deleteRole(row)" class="border-t p-8">
-                            <AppIcon iconName="app-copy"></AppIcon>
-                            {{ $t('common.delete') }}
-                          </el-dropdown-item>
-                        </el-dropdown-menu>
-                      </template>
-                    </el-dropdown>
-                  </div>
-                </template>
-                <template #empty>
-                  <span></span>
-                </template>
-              </common-list>
             </el-scrollbar>
           </div>
         </div>
 
         <!-- 右边 -->
-        <div class="role-right" v-loading="loading">
+        <div class="role-right w-full" v-loading="loading">
           <div class="flex-between mb-16 p-24 pb-0">
             <div class="flex align-center">
-              <span>
+              <h4>
                 {{ currentRole?.role_name }}
-                <span
-                  v-if="currentRole?.type && !currentRole.internal"
-                  class="color-input-placeholder ml-4"
-                  >({{ roleTypeMap[currentRole?.type as RoleTypeEnum] }})
-                </span>
+              </h4>
+              <span
+                v-if="currentRole?.type && !currentRole.internal"
+                class="color-input-placeholder ml-4"
+                >({{ roleTypeMap[currentRole?.type as RoleTypeEnum] }})
               </span>
-              <el-divider direction="vertical" class="mr-8 ml-8" />
-              <AppIcon
-                iconName="app-wordspace"
-                style="font-size: 16px"
-                class="color-input-placeholder"
-              ></AppIcon>
+
+              <el-divider direction="vertical" />
+              <el-icon class="color-input-placeholder"><UserFilled /></el-icon>
               <span class="color-input-placeholder ml-4">
                 {{ currentRole?.user_count }}
               </span>
             </div>
-            <el-radio-group v-model="currentTab">
+            <el-radio-group v-model="currentTab" class="app-radio-button-group">
               <el-radio-button
                 v-for="item in tabList"
                 :key="item.value"
@@ -250,51 +264,24 @@ const tabList = [
     label: t('views.role.member.title'),
   },
 ]
+const mouseId = ref('')
+
+function mouseenter(row: any) {
+  mouseId.value = row.id
+}
 </script>
 
 <style lang="scss" scoped>
-.role {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow: hidden;
-  box-sizing: border-box;
-  padding: 16px 24px;
-
-  :deep(.role-card) {
-    height: 100%;
-    overflow: hidden;
-  }
-
+.role-manage {
   .role-left {
     box-sizing: border-box;
     width: var(--setting-left-width);
     min-width: var(--setting-left-width);
 
-    .role-left_title {
-      padding: 8px;
-      display: flex;
-      justify-content: space-between;
-    }
-
     .list-height-left {
       height: calc(100vh - 213px);
-
-      :deep(.common-list li) {
-        padding-right: 4px;
-        padding-left: 8px;
-      }
-    }
-
-    .role-left_divider {
-      padding: 0 8px;
-
-      :deep(.el-divider) {
-        margin: 4px 0;
-      }
     }
   }
-
   .role-right {
     flex: 1;
     overflow: hidden;

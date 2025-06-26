@@ -18,10 +18,7 @@ const systemRouter = {
         activeMenu: '/system',
         parentPath: '/system',
         parentName: 'system',
-        permission: [
-          RoleConst.ADMIN,
-          PermissionConst.USER_READ
-        ],
+        permission: [RoleConst.ADMIN, PermissionConst.USER_READ],
       },
       component: () => import('@/views/system/user-manage/index.vue'),
     },
@@ -29,8 +26,8 @@ const systemRouter = {
       path: '/system/role',
       name: 'role',
       meta: {
-        icon: 'app-resource-authorization', // TODO
-        iconActive: 'app-resource-authorization-active', // TODO
+        icon: 'app-role',
+        iconActive: 'app-role-active',
         title: 'views.role.title',
         activeMenu: '/system',
         parentPath: '/system',
@@ -59,8 +56,9 @@ const systemRouter = {
         permission: [
           new ComplexPermission(
             [RoleConst.WORKSPACE_MANAGE, RoleConst.ADMIN],
-            [PermissionConst.WORKSPACE_READ.getWorkspacePermissionWorkspaceManageRole,
-             PermissionConst.WORKSPACE_READ 
+            [
+              PermissionConst.WORKSPACE_READ.getWorkspacePermissionWorkspaceManageRole,
+              PermissionConst.WORKSPACE_READ,
             ],
             [EditionConst.IS_EE],
             'OR',
@@ -144,9 +142,9 @@ const systemRouter = {
                 [RoleConst.ADMIN],
                 [PermissionConst.SHARED_KNOWLEDGE_READ],
                 [EditionConst.IS_EE],
-                'OR'
-              )
-            ]
+                'OR',
+              ),
+            ],
           },
           component: () => import('@/views/system-shared/KnowLedgeSharedIndex.vue'),
         },

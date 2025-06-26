@@ -71,11 +71,12 @@ defineExpose({
 /* 通用 ui li样式 */
 .common-list {
   li {
-    padding: 8px 16px;
+    padding: 8px;
     font-weight: 400;
-    color: var(--el-text-color-regular);
     font-size: 14px;
     margin-bottom: 4px;
+    min-height: 24px;
+    line-height: 24px;
     &.active {
       background: var(--el-color-primary-light-9);
       border-radius: 4px;

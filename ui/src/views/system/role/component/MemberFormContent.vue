@@ -12,7 +12,7 @@
           </el-select>
         </el-form-item>
         <!-- 删除按钮 -->
-        <el-button @click="handleDelete(index)"
+        <el-button @click="handleDelete(index)" text
           :style="{ 'margin-top': index === 0 && props.models.some((item) => item.label) ? '30px' : '' }">
           <el-icon>
             <Delete />
