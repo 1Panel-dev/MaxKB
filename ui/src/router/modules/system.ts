@@ -19,12 +19,8 @@ const systemRouter = {
         parentPath: '/system',
         parentName: 'system',
         permission: [
-          new ComplexPermission(
-            [RoleConst.ADMIN,],
-            [PermissionConst.USER_READ],
-            [EditionConst.IS_EE],
-            'OR',
-          ),
+          RoleConst.ADMIN,
+          PermissionConst.USER_READ
         ],
       },
       component: () => import('@/views/system/user-manage/index.vue'),
@@ -63,7 +59,9 @@ const systemRouter = {
         permission: [
           new ComplexPermission(
             [RoleConst.WORKSPACE_MANAGE, RoleConst.ADMIN],
-            [PermissionConst.WORKSPACE_WORKSPACE_READ.getWorkspacePermissionWorkspaceManageRole],
+            [PermissionConst.WORKSPACE_READ.getWorkspacePermissionWorkspaceManageRole,
+             PermissionConst.WORKSPACE_READ 
+            ],
             [EditionConst.IS_EE],
             'OR',
           ),

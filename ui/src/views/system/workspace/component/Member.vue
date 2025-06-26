@@ -1,7 +1,9 @@
 <template>
   <div class="flex-between mb-16">
     <el-button type="primary" @click="handleAdd"
-      v-hasPermission="RoleConst.ADMIN,PermissionConst.WORKSPACE_ADD_MEMBER"
+      v-hasPermission="[
+        RoleConst.ADMIN,
+        PermissionConst.WORKSPACE_ADD_MEMBER]"
     >
       {{ $t('views.role.member.add') }}
     </el-button>
@@ -22,7 +24,7 @@
       <template #default="{ row }">
         <el-tooltip effect="dark" :content="`${$t('views.role.member.delete.button')}`" placement="top">
           <el-button type="primary" text @click.stop="handleDelete(row)"
-            v-hasPermission="RoleConst.ADMIN,PermissionConst.WORKSPACE_REMOVE_MEMBER"
+            v-hasPermission="[RoleConst.ADMIN,PermissionConst.WORKSPACE_REMOVE_MEMBER]"
           >
             <el-icon>
               <EditPen />

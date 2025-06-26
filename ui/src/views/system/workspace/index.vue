@@ -35,14 +35,26 @@
                       </el-button>
                       <template #dropdown>
                         <el-dropdown-menu style="min-width: 80px">
-                          <el-dropdown-item @click.stop="createOrUpdateWorkspace(row)" class="p-8">
+                          <el-dropdown-item @click.stop="createOrUpdateWorkspace(row)" class="p-8"
+                            v-if="hasPermission([
+                                    RoleConst.ADMIN,
+                                    PermissionConst.WORKSPACE_EDIT
+                            ],
+                            'OR')"  
+                          >
                             <AppIcon iconName="app-copy"></AppIcon>
                             {{
                               $t('common.rename')
                             }}
                           </el-dropdown-item>
                           <el-dropdown-item @click.stop="deleteWorkspace(row)" class="border-t p-8"
-                                            v-if="row.id !== 'default'">
+                            v-if="row.id !== 'default' &&
+                            hasPermission([
+                              RoleConst.ADMIN,
+                              PermissionConst.WORKSPACE_DELETE
+                            ],
+                            'OR')
+                            ">
                             <AppIcon iconName="app-copy"></AppIcon>
                             {{
                               $t('common.delete')
