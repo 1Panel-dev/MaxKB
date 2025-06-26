@@ -7,7 +7,7 @@ const applicationRouter = {
     menu: true,
     permission: [
       RoleConst.ADMIN,
-      RoleConst.USER,
+      RoleConst.USER.getWorkspaceRole,
       RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
       PermissionConst.APPLICATION_READ.getWorkspacePermissionWorkspaceManageRole,
       PermissionConst.APPLICATION_READ.getWorkspacePermission,

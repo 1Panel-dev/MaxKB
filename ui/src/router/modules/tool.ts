@@ -7,7 +7,7 @@ const ModelRouter = {
     menu: true,
     permission: [
       RoleConst.ADMIN,
-      RoleConst.USER,
+      RoleConst.USER.getWorkspaceRole,
       RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
       PermissionConst.TOOL_READ.getWorkspacePermission,
       PermissionConst.TOOL_READ.getWorkspacePermissionWorkspaceManageRole,
