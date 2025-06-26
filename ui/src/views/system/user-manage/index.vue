@@ -3,7 +3,12 @@
     <h2 class="mb-16">{{ $t('views.userManage.title') }}</h2>
     <el-card>
       <div class="flex-between mb-16">
-        <el-button type="primary" @click="createUser">{{
+        <el-button type="primary" @click="createUser"
+          v-hasPermission="[
+              RoleConst.ADMIN,
+              PermissionConst.USER_CREATE
+          ]"  
+        >{{
             $t('views.userManage.createUser')
           }}
         </el-button>
@@ -124,11 +129,13 @@
                 size="small"
                 v-model="row.is_active"
                 :before-change="() => changeState(row)"
+                v-if="hasPermission([RoleConst.ADMIN,PermissionConst.USER_EDIT],'OR')"  
               />
             </span>
             <el-divider direction="vertical"/>
             <span class="mr-8">
-              <el-button type="primary" text @click.stop="editUser(row)" :title="$t('common.edit')">
+              <el-button type="primary" text @click.stop="editUser(row)" :title="$t('common.edit')"
+              v-if="hasPermission([RoleConst.ADMIN,PermissionConst.USER_EDIT],'OR')"  >
                 <el-icon><EditPen/></el-icon>
               </el-button>
             </span>
@@ -139,6 +146,7 @@
                 text
                 @click.stop="editPwdUser(row)"
                 :title="$t('views.userManage.setting.updatePwd')"
+                v-if="hasPermission([RoleConst.ADMIN,PermissionConst.USER_EDIT],'OR')"  
               >
                 <el-icon><Lock/></el-icon>
               </el-button>
@@ -150,6 +158,7 @@
                 text
                 @click.stop="deleteUserManage(row)"
                 :title="$t('common.delete')"
+                v-if="hasPermission([RoleConst.ADMIN,PermissionConst.USER_DELETE],'OR')"  
               >
                 <el-icon><Delete/></el-icon>
               </el-button>
@@ -173,6 +182,8 @@ import {MsgSuccess, MsgConfirm} from '@/utils/message'
 import {t} from '@/locales'
 import {ValidCount, ValidType} from "@/enums/common.ts";
 import useStore from "@/stores";
+import { PermissionConst, RoleConst } from '@/utils/permission/data'
+import {hasPermission} from '@/utils/permission/index'
 
 const {user, common} = useStore()
 const search_type = ref('username')
