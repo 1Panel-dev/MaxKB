@@ -124,7 +124,14 @@ const share = {
       ],
       'OR'
     ),
-  
+  doc_download: () => 
+    hasPermission (
+      [
+        RoleConst.ADMIN,
+        PermissionConst.SHARED_KNOWLEDGE_DOCUMENT_DOWNLOAD_SOURCE_FILE
+      ],
+      'OR'
+    ),
   problem_create: () => 
     hasPermission (
       [

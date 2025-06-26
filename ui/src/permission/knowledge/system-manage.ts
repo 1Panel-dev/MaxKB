@@ -28,6 +28,7 @@ const workspace = {
   doc_sync: () => false,
   doc_delete: () => false,
   doc_export: () => false,
+  doc_download: () => false,
 
   problem_create: () => false,
   problem_relate: () => false,

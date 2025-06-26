@@ -444,7 +444,9 @@
                             <AppIcon iconName="app-export"></AppIcon>
                             {{ $t('views.document.setting.export') }} Zip
                           </el-dropdown-item>
-                          <el-dropdown-item icon="Download" @click.stop="downloadDocument(row)">
+                          <el-dropdown-item icon="Download" @click.stop="downloadDocument(row)"
+                            v-if="permissionPrecise.doc_download(id)"
+                          >
                             {{ $t('views.document.setting.download') }}
                           </el-dropdown-item>
                           <el-dropdown-item
