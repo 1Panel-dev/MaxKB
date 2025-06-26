@@ -20,6 +20,8 @@ class AuthTargetType(models.TextChoices):
     """授权目标"""
     KNOWLEDGE = Group.KNOWLEDGE.value, '知识库'
     APPLICATION = Group.APPLICATION.value, '应用'
+    TOOL = Group.TOOL.value, '工具'
+    MODEL = Group.MODEL.value, '模型'
 
 
 class WorkspaceUserResourcePermission(models.Model):

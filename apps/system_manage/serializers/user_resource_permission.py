@@ -26,7 +26,9 @@ from common.utils.common import get_file_content
 from common.utils.split_model import group_by
 from knowledge.models import Knowledge
 from maxkb.conf import PROJECT_DIR
+from models_provider.models import Model
 from system_manage.models import WorkspaceUserResourcePermission, AuthTargetType
+from tools.models import Tool
 
 
 class PermissionSerializer(serializers.Serializer):
@@ -64,7 +66,7 @@ class UpdateUserResourcePermissionRequest(serializers.Serializer):
         illegal_target_id_list = select_list(
             get_file_content(
                 os.path.join(PROJECT_DIR, "apps", "system_manage", 'sql', 'check_member_permission_target_exists.sql')),
-            [json.dumps(user_resource_permission_list), workspace_id, workspace_id])
+            [json.dumps(user_resource_permission_list), workspace_id, workspace_id, workspace_id, workspace_id])
         if illegal_target_id_list is not None and len(illegal_target_id_list) > 0:
             raise AppApiException(500,
                                   _('Non-existent application|knowledge base id[') + str(illegal_target_id_list) + ']')
@@ -77,6 +79,10 @@ class UserResourcePermissionSerializer(serializers.Serializer):
     def get_queryset(self):
         return {
             "knowledge_query_set": QuerySet(Knowledge)
+            .filter(workspace_id=self.data.get('workspace_id')),
+            'tool_query_set': QuerySet(Tool)
+            .filter(workspace_id=self.data.get('workspace_id')),
+            'model_query_set': QuerySet(Model)
             .filter(workspace_id=self.data.get('workspace_id')),
             'application_query_set': QuerySet(Application)
             .filter(workspace_id=self.data.get('workspace_id')),

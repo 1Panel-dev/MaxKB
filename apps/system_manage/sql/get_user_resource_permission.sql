@@ -20,6 +20,26 @@ FROM (SELECT "id",
              folder_id
       FROM application
       ${application_query_set}
+      UNION
+     SELECT "id",
+             "name",
+             'TOOL' AS "auth_target_type",
+             user_id,
+             workspace_id,
+             icon,
+             folder_id
+      FROM tool
+      ${tool_query_set}
+       UNION
+     SELECT "id",
+             "name",
+             'MODEL' AS "auth_target_type",
+             user_id,
+             workspace_id,
+             provider as icon,
+             'default' as folder_id
+      FROM model
+      ${model_query_set}
    ) app_or_knowledge
          LEFT JOIN (SELECT *
                     FROM workspace_user_resource_permission
