@@ -7,7 +7,6 @@
     @click.stop="editParagraph(data)"
     v-loading="loading"
   >
-    <h2 class="mb-16">{{ data.title || '-' }}</h2>
     <div v-show="show" class="mk-sticky" v-if="!disabled">
       <el-card
         class="paragraph-box-operation mt-8 mr-8"
@@ -59,6 +58,7 @@
         </el-dropdown>
       </el-card>
     </div>
+    <h2 class="mb-16">{{ data.title || '-' }}</h2>
     <MdPreview
       ref="editorRef"
       editorId="preview-only"
@@ -188,29 +188,28 @@ function refreshMigrateParagraph() {
   background: var(--app-layout-bg-color);
   border: 1px solid #ffffff;
   box-shadow: none !important;
-  // position: relative;
-  // overflow: inherit;
+  position: relative;
+  overflow: inherit;
   &:hover {
     background: rgba(31, 35, 41, 0.1);
     border: 1px solid #dee0e3;
   }
   .paragraph-box-operation {
     position: absolute;
-    right: 0;
-    top: 0;
+    right: -10px;
+    top: -10px;
     overflow: inherit;
     border: 1px solid #dee0e3;
     z-index: 10;
-    float: right;
   }
 
-  // .mk-sticky {
-  //   height: 0;
-  //   position: sticky;
-  //   right: 0;
-  //   top: 0;
-  //   overflow: inherit;
-  //   z-index: 10;
-  // }
+  .mk-sticky {
+    height: 0;
+    position: sticky;
+    right: 0;
+    top: 0;
+    overflow: inherit;
+    z-index: 10;
+  }
 }
 </style>
