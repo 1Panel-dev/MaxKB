@@ -7,6 +7,7 @@ import re
 
 import uuid_utils.compat as uuid
 from django.core import validators
+from django.core.cache import cache
 from django.db import transaction
 from django.db.models import QuerySet, Q
 from django.http import HttpResponse
@@ -15,6 +16,8 @@ from pylint.lint import Run
 from pylint.reporters import JSON2Reporter
 from rest_framework import serializers, status
 
+from common.constants.cache_version import Cache_Version
+from common.constants.permission_constants import ResourceAuthType, ResourcePermissionGroup
 from common.db.search import page_search, native_page_search
 from common.exception.app_exception import AppApiException
 from common.field.common import UploadedImageField
@@ -24,6 +27,7 @@ from common.utils.rsa_util import rsa_long_decrypt, rsa_long_encrypt
 from common.utils.tool_code import ToolExecutor
 from knowledge.models import File, FileSourceType
 from maxkb.const import CONFIG, PROJECT_DIR
+from system_manage.models import AuthTargetType, WorkspaceUserResourcePermission
 from tools.models import Tool, ToolScope, ToolFolder, ToolType
 from tools.serializers.tool_folder import ToolFolderFlatSerializer
 
@@ -192,23 +196,44 @@ class ToolSerializer(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, label=_('user id'))
         workspace_id = serializers.CharField(required=True, label=_('workspace id'))
 
+        @transaction.atomic
         def insert(self, instance, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
                 ToolCreateRequest(data=instance).is_valid(raise_exception=True)
-            tool = Tool(id=uuid.uuid7(),
-                        name=instance.get('name'),
-                        desc=instance.get('desc'),
-                        code=instance.get('code'),
-                        user_id=self.data.get('user_id'),
-                        workspace_id=self.data.get('workspace_id'),
-                        input_field_list=instance.get('input_field_list', []),
-                        init_field_list=instance.get('init_field_list', []),
-                        scope=instance.get('scope', ToolScope.WORKSPACE),
-                        folder_id=instance.get('folder_id', self.data.get('workspace_id')),
-                        is_active=False)
-            tool.save()
-            return ToolModelSerializer(tool).data
+            tool_id = uuid.uuid7()
+            Tool(
+                id=tool_id,
+                name=instance.get('name'),
+                desc=instance.get('desc'),
+                code=instance.get('code'),
+                user_id=self.data.get('user_id'),
+                workspace_id=self.data.get('workspace_id'),
+                input_field_list=instance.get('input_field_list', []),
+                init_field_list=instance.get('init_field_list', []),
+                scope=instance.get('scope', ToolScope.WORKSPACE),
+                folder_id=instance.get('folder_id', self.data.get('workspace_id')),
+                is_active=False
+            ).save()
+
+            # 自动授权给创建者
+            WorkspaceUserResourcePermission(
+                target=tool_id,
+                auth_target_type=AuthTargetType.TOOL,
+                permission_list=[ResourcePermissionGroup.VIEW, ResourcePermissionGroup.MANAGE],
+                workspace_id=self.data.get('workspace_id'),
+                user_id=self.data.get('user_id'),
+                auth_type=ResourceAuthType.RESOURCE_PERMISSION_GROUP
+            ).save()
+
+            # 刷新缓存
+            version = Cache_Version.PERMISSION_LIST.get_version()
+            key = Cache_Version.PERMISSION_LIST.get_key(user_id=self.data.get('user_id'))
+            cache.delete(key, version=version)
+
+            return ToolSerializer.Operate(data={
+                'id': tool_id, 'workspace_id': self.data.get('workspace_id')
+            }).one()
 
     class Debug(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, label=_('user id'))
