@@ -109,7 +109,7 @@ class HitTestSerializer(serializers.Serializer):
 class KnowledgeSerializer(serializers.Serializer):
     class Query(serializers.Serializer):
         workspace_id = serializers.CharField(required=True)
-        folder_id = serializers.CharField(required=True)
+        folder_id = serializers.CharField(required=False, label=_('folder id'), allow_null=True)
         name = serializers.CharField(required=False, label=_('knowledge name'), allow_null=True, allow_blank=True,
                                      max_length=64, min_length=1)
         desc = serializers.CharField(required=False, label=_('knowledge description'), allow_null=True,
@@ -196,7 +196,9 @@ class KnowledgeSerializer(serializers.Serializer):
 
         def list(self):
             self.is_valid(raise_exception=True)
-            folder_id = self.data.get('folder_id', self.data.get("workspace_id"))
+            folder_id = self.data.get('folder_id')
+            if not folder_id:
+                folder_id = self.data.get('workspace_id')
             root = KnowledgeFolder.objects.filter(id=folder_id).first()
             if not root:
                 raise serializers.ValidationError(_('Folder not found'))
