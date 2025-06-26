@@ -1,7 +1,7 @@
 <template>
   <LayoutContainer class="model-manage">
     <template #left>
-      <h4 class="p-16 mb-8 pb-0">{{ $t('views.model.provider') }}</h4>
+      <h4 class="p-12-16 pb-0 mt-12">{{ $t('views.model.provider') }}</h4>
       <ProviderComponent
         :data="provider_list"
         @click="clickListHandle"

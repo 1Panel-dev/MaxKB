@@ -1,6 +1,6 @@
 <template>
   <el-breadcrumb separator-icon="ArrowRight" style="line-height: 22px">
-    <h4 v-if="breadcrumbData?.length === 1">{{ breadcrumbData[0]?.name }}</h4>
+    <h2 v-if="breadcrumbData?.length === 1">{{ breadcrumbData[0]?.name }}</h2>
     <el-breadcrumb-item v-for="(item, index) in breadcrumbData" :key="index" v-else>
       <h5 class="ml-4" v-if="index === breadcrumbData.length - 1">{{ item.name }}</h5>
       <el-button v-else link @click="handleClick(item)">{{ item.name }}</el-button>

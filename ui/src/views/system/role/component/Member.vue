@@ -76,7 +76,6 @@
 
 <script setup lang="ts">
 import { onMounted, ref, reactive, watch } from 'vue'
-import RoleApi from '@/api/system/role'
 import type { RoleItem, RoleMemberItem } from '@/api/type/role'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { t } from '@/locales'
