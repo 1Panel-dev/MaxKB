@@ -6,7 +6,7 @@
     </template>
 
     <p class="mb-8 lighter">类型</p>
-    <el-radio-group v-model="listType" @change="handleListTypeChange">
+    <el-radio-group v-model="listType">
       <el-radio value="WHITE_LIST">白名单</el-radio>
       <el-radio value="BLACK_LIST">黑名单</el-radio>
     </el-radio-group>
@@ -71,7 +71,7 @@
               <AppIcon iconName="app-wordspace"></AppIcon>
               <span class="ml-4 lighter">{{ ele.name }}</span>
             </div>
-            <el-button @click="clearWorkspaceAll" link>
+            <el-button link>
               <el-icon @click="clearWorkspace(ele)" :size="18"><Close /></el-icon>
             </el-button>
           </div>
@@ -90,7 +90,7 @@
 import { ref, computed } from 'vue'
 import type { CheckboxValueType } from 'element-plus'
 import authorizationApi from '@/api/system-shared/authorization'
-
+import workspaceApi from '@/api/workspace/workspace'
 const checkAll = ref(false)
 const isIndeterminate = ref(true)
 const checkedWorkspace = ref([])
@@ -101,8 +101,6 @@ let knowledge_id = ''
 let currentType = 'Knowledge'
 const loading = ref(false)
 const centerDialogVisible = ref(false)
-let auth_list: any[] = []
-let un_auth_list = []
 
 const workspaceWithKeywords = computed(() => {
   return workspace.value.filter((ele: any) => (ele.name as string).includes(search.value))
@@ -110,51 +108,30 @@ const workspaceWithKeywords = computed(() => {
 const handleCheckAllChange = (val: CheckboxValueType) => {
   checkedWorkspace.value = val ? workspace.value : []
   isIndeterminate.value = false
-  if (val) {
+  if (!val) {
     clearWorkspaceAll()
-  } else {
-    auth_list = [
-      ...workspace.value.map((ele) => ({ authentication_type: listType.value, workspace_id: ele })),
-      ...auth_list.filter((ele) => ele.authentication_type !== listType.value),
-    ]
   }
 }
 const handleCheckedWorkspaceChange = (value: CheckboxValueType[]) => {
   const checkedCount = value.length
   checkAll.value = checkedCount === workspace.value.length
   isIndeterminate.value = checkedCount > 0 && checkedCount < workspace.value.length
-  auth_list = [
-    ...value.map((ele: any) => ({
-      authentication_type: listType.value,
-      workspace_id: ele.id,
-      name: ele.name,
-    })),
-    ...auth_list.filter((ele) => ele.authentication_type !== listType.value),
-  ]
 }
 
-const open = ({ id }: any, type = 'Knowledge') => {
+const open = async ({ id }: any, type = 'Knowledge') => {
   knowledge_id = id
-  auth_list = []
-  un_auth_list = []
-  listType.value = 'WHITE_LIST'
   loading.value = true
   currentType = type
-  authorizationApi[`getSharedAuthorization${type}`](id)
-    .then((res: any) => {
-      auth_list = (res.data || {}).auth_list || []
-      un_auth_list = (res.data || {}).un_auth_list || []
-      // auth_list 中None表示没选中工作空间, 黑名单中表示所有工作空间都可用，白名单表示所有工作空间都不可用
-      auth_list = auth_list.filter((ele) => ele.workspace_id !== 'None')
-      workspace.value = [
-        ...un_auth_list,
-        ...auth_list.map((ele) => ({ id: ele.workspace_id, name: ele.name })),
-      ] as any
-      handleListTypeChange(listType.value)
-    })
-    .finally(() => {
-      loading.value = false
-    })
+  const [authList, systemWorkspaceList] = await Promise.all([
+    authorizationApi[`getSharedAuthorization${type}`](id),
+    workspaceApi.getSystemWorkspaceList(),
+  ])
+  workspace.value = systemWorkspaceList.data as any
+  listType.value = (authList.data || {}).authentication_type || 'WHITE_LIST'
+  let workspace_id_list = (authList.data || {}).workspace_id_list || []
+  checkedWorkspace.value = workspace.value.filter((ele) => workspace_id_list.includes(ele.id))
+  handleCheckedWorkspaceChange(checkedWorkspace.value)
+  loading.value = false
   centerDialogVisible.value = true
 }
 
@@ -169,21 +146,13 @@ const handleConfirm = () => {
 
 const clearWorkspace = (val: any) => {
   checkedWorkspace.value = checkedWorkspace.value.filter((ele: any) => ele.id !== val.id)
-  auth_list = auth_list.filter((ele) => ele.workspace_id !== val.id)
 }
 
 const clearWorkspaceAll = () => {
   checkedWorkspace.value = []
-  auth_list = auth_list.filter((ele) => ele.authentication_type !== listType.value)
   handleCheckedWorkspaceChange([])
 }
 
-const handleListTypeChange = (val: any) => {
-  checkedWorkspace.value = auth_list
-    .filter((ele) => ele.authentication_type === val)
-    .map((ele) => ({ id: ele.workspace_id, name: ele.name })) as any
-  handleCheckedWorkspaceChange(checkedWorkspace.value)
-}
 defineExpose({
   open,
 })
