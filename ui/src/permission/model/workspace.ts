@@ -5,11 +5,9 @@ const workspace = {
   is_share: () =>
     hasPermission(
       new ComplexPermission(
-        [RoleConst.ADMIN],
-        [PermissionConst.MODEL_READ],
-        [EditionConst.IS_EE],
-        'OR',
-      ),
+        [RoleConst.ADMIN,RoleConst.USER.getWorkspaceRole,RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+        [PermissionConst.MODEL_READ.getWorkspacePermission,PermissionConst.MODEL_READ.getWorkspacePermissionWorkspaceManageRole],
+        [EditionConst.IS_EE],'OR'),
       'OR',
     ),
   addModel: () =>

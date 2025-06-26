@@ -4,7 +4,10 @@ import { EditionConst, PermissionConst, RoleConst } from '@/utils/permission/dat
 const workspace = {
   is_share: () =>
     hasPermission(
-      [EditionConst.IS_EE],
+      new ComplexPermission(
+        [RoleConst.ADMIN,RoleConst.USER.getWorkspaceRole,RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+        [PermissionConst.TOOL_READ.getWorkspacePermission,PermissionConst.TOOL_READ.getWorkspacePermissionWorkspaceManageRole],
+        [EditionConst.IS_EE],'OR'),
       'OR',
     ),
   delete: () =>
