@@ -8379,3 +8379,9 @@ msgstr ""
 
 msgid "Tools Resource"
 msgstr ""
+
+msgid "Get resource model list"
+msgstr ""
+
+msgid "System Model"
+msgstr ""

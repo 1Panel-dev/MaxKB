@@ -8505,3 +8505,9 @@ msgstr "模型資源"
 
 msgid "Tools Resource"
 msgstr "工具資源"
+
+msgid "Get resource model list"
+msgstr "獲取資源模型列表"
+
+msgid "System Model"
+msgstr "系統模型"
