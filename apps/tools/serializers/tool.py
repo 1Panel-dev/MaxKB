@@ -571,7 +571,7 @@ class ToolTreeSerializer(serializers.Serializer):
                 )
             return page_search(current_page, page_size, tools, lambda record: ToolModelSerializer(record).data)
 
-        def get_query_set(self):
+        def get_query_set(self, workspace_manage, is_x_pack_ee):
             tool_query_set = QuerySet(Tool).filter(workspace_id=self.data.get('workspace_id'))
             folder_query_set = QuerySet(ToolFolder)
             default_query_set = QuerySet(Tool)
@@ -601,16 +601,19 @@ class ToolTreeSerializer(serializers.Serializer):
             if scope is not None:
                 tool_query_set = tool_query_set.filter(scope=scope)
 
-            return {
+            query_set_dict = {
                 'folder_query_set': folder_query_set,
                 'tool_query_set': tool_query_set,
                 'default_query_set': default_query_set,
-                'workspace_user_resource_permission_query_set': QuerySet(WorkspaceUserResourcePermission).filter(
+            }
+            if not workspace_manage and is_x_pack_ee:
+                query_set_dict['workspace_user_resource_permission_query_set'] = QuerySet(
+                    WorkspaceUserResourcePermission).filter(
                     auth_target_type="TOOL",
                     workspace_id=workspace_id,
                     user_id=user_id
                 )
-            }
+            return query_set_dict
 
         @staticmethod
         def is_x_pack_ee():
@@ -625,7 +628,7 @@ class ToolTreeSerializer(serializers.Serializer):
             is_x_pack_ee = self.is_x_pack_ee()
 
             return native_page_search(
-                current_page, page_size, self.get_query_set(),
+                current_page, page_size, self.get_query_set(workspace_manage, is_x_pack_ee),
                 get_file_content(
                     os.path.join(
                         PROJECT_DIR,
