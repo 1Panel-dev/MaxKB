@@ -149,6 +149,19 @@ class FolderSerializer(serializers.Serializer):
             current_node = Folder.objects.get(id=current_id)
             if current_node is None:
                 raise serializers.ValidationError(_('Folder does not exist'))
+            # 模块间的移动
+            parent_id = instance.get('parent_id')
+            if parent_id is None:
+                parent_id = current_node.parent_id
+            # 如果要修改文件夹名称，检查同级目录下是否存在同名文件夹
+            new_name = instance.get('name')
+            if new_name is not None and new_name != current_node.name:
+                if QuerySet(Folder).filter(
+                        name=new_name,
+                        parent_id=parent_id,
+                        workspace_id=current_node.workspace_id
+                ).exclude(id=current_id).exists():
+                    raise serializers.ValidationError(_('Folder name already exists'))
 
             edit_field_list = ['name', 'desc']
             edit_dict = {field: instance.get(field) for field in edit_field_list if (
@@ -156,8 +169,6 @@ class FolderSerializer(serializers.Serializer):
 
             QuerySet(Folder).filter(id=current_id).update(**edit_dict)
 
-            # 模块间的移动
-            parent_id = instance.get('parent_id')
             if parent_id is not None and current_id != current_node.workspace_id and current_node.parent_id != parent_id:
                 # Folder 不能超过3层
                 current_depth = get_max_depth(current_node)
