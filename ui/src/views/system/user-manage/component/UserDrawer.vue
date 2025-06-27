@@ -53,11 +53,11 @@
         <span>{{ userForm.password }}</span>
       </el-form-item>
     </el-form>
-    <h4 class="title-decoration-1 mb-16 mt-8" v-if="user.isEE()">
+    <h4 class="title-decoration-1 mb-16 mt-8" v-if="user.isEE() || user.isPE()">
       {{ $t('views.userManage.roleSetting') }}</h4>
     <MemberFormContent ref="memberFormContentRef" :models="formItemModel" v-model:form="list"
                        v-loading="memberFormContentLoading"
-                       :addText="$t('views.userManage.addRole')" v-if="user.isEE()"/>
+                       :addText="$t('views.userManage.addRole')" v-if="user.isEE() || user.isPE()"/>
     <template #footer>
       <el-button @click.prevent="visible = false"> {{ $t('common.cancel') }}</el-button>
       <el-button type="primary" @click="submit(userFormRef)" :loading="loading">
@@ -152,9 +152,11 @@ async function getWorkspaceFormItem() {
 }
 
 onBeforeMount(async () => {
-  if (user.isEE()) {
+  if (user.isEE() || user.isPE()) {
     await getRoleFormItem();
-    await getWorkspaceFormItem();
+    if (user.isEE()) {
+      await getWorkspaceFormItem();
+    }
     formItemModel.value = [...roleFormItem.value, ...workspaceFormItem.value]
   }
   list.value = [{role_id: '', workspace_ids: []}]
@@ -262,10 +264,17 @@ const submit = async (formEl: FormInstance | undefined) => {
       if (memberFormContentRef.value) {
         await memberFormContentRef.value?.validate()
       }
+      if (user.isPE()) {
+        list.value = list.value.map(item => ({
+          ...item,
+          workspace_ids: adminRoleList.value.find(item1 => item1.id === item.role_id) ? ['None'] : ['default']
+        }))
+      }
       const params = {
         ...userForm.value,
         role_setting: list.value
       }
+      console.log(list.value)
       if (isEdit.value) {
         userManageApi.putUserManage(userForm.value.id, params, loading).then((res) => {
           emit('refresh')

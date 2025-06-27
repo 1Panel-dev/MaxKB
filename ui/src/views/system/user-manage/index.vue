@@ -7,7 +7,7 @@
           v-hasPermission="[
               RoleConst.ADMIN,
               PermissionConst.USER_CREATE
-          ]"  
+          ]"
         >{{
             $t('views.userManage.createUser')
           }}
@@ -92,7 +92,7 @@
           </template>
         </el-table-column>
         <el-table-column prop="role" :label="$t('views.role.member.role')" min-width="100"
-                         v-if="user.isEE()">
+                         v-if="user.isEE() || user.isPE()">
           <template #default="{ row }">
             <TagGroup :tags="row.role"/>
           </template>
@@ -129,7 +129,7 @@
                 size="small"
                 v-model="row.is_active"
                 :before-change="() => changeState(row)"
-                v-if="hasPermission([RoleConst.ADMIN,PermissionConst.USER_EDIT],'OR')"  
+                v-if="hasPermission([RoleConst.ADMIN,PermissionConst.USER_EDIT],'OR')"
               />
             </span>
             <el-divider direction="vertical"/>
@@ -146,7 +146,7 @@
                 text
                 @click.stop="editPwdUser(row)"
                 :title="$t('views.userManage.setting.updatePwd')"
-                v-if="hasPermission([RoleConst.ADMIN,PermissionConst.USER_EDIT],'OR')"  
+                v-if="hasPermission([RoleConst.ADMIN,PermissionConst.USER_EDIT],'OR')"
               >
                 <el-icon><Lock/></el-icon>
               </el-button>
@@ -158,7 +158,7 @@
                 text
                 @click.stop="deleteUserManage(row)"
                 :title="$t('common.delete')"
-                v-if="hasPermission([RoleConst.ADMIN,PermissionConst.USER_DELETE],'OR')"  
+                v-if="hasPermission([RoleConst.ADMIN,PermissionConst.USER_DELETE],'OR')"
               >
                 <el-icon><Delete/></el-icon>
               </el-button>

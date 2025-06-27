@@ -21,17 +21,19 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeMount, ref } from 'vue'
-import type { CreateMemberParamsItem, FormItemModel } from '@/api/type/role'
+import {onBeforeMount, ref} from 'vue'
+import type {CreateMemberParamsItem, FormItemModel} from '@/api/type/role'
 import UserApi from '@/api/user/user'
 import WorkspaceApi from '@/api/workspace/workspace'
 import MemberFormContent from './MemberFormContent.vue'
-import { t } from '@/locales'
-import type { RoleItem } from '@/api/type/role'
-import { MsgSuccess } from '@/utils/message'
-import { RoleTypeEnum } from '@/enums/system'
-import { loadPermissionApi } from '@/utils/dynamics-api/permission-api'
+import {t} from '@/locales'
+import type {RoleItem} from '@/api/type/role'
+import {MsgSuccess} from '@/utils/message'
+import {RoleTypeEnum} from '@/enums/system'
+import {loadPermissionApi} from '@/utils/dynamics-api/permission-api'
+import useStore from "@/stores";
 
+const {user} = useStore()
 const props = defineProps<{
   currentRole?: RoleItem
 }>()
@@ -108,16 +110,18 @@ async function getWorkspaceFormItem() {
 function init() {
   if (props.currentRole?.type !== RoleTypeEnum.ADMIN) {
     formItemModel.value = [...userFormItem.value, ...workspaceFormItem.value]
-    list.value = [{ user_ids: [], workspace_ids: [] }]
+    list.value = [{user_ids: [], workspace_ids: []}]
   } else {
     formItemModel.value = [...userFormItem.value]
-    list.value = [{ user_ids: [] }]
+    list.value = [{user_ids: []}]
   }
 }
 
 onBeforeMount(async () => {
   await getUserFormItem()
-  await getWorkspaceFormItem()
+  if (user.isEE()) {
+    await getWorkspaceFormItem()
+  }
   init()
 })
 
@@ -131,16 +135,19 @@ function handleCancel() {
 }
 
 const memberFormContentRef = ref<InstanceType<typeof MemberFormContent>>()
+
 function handleAdd() {
   memberFormContentRef.value?.validate().then(async (valid: any) => {
     if (valid) {
       let params
       if (props.currentRole?.type === RoleTypeEnum.ADMIN) {
-        params = list.value.map((item) => ({ user_ids: item.user_ids, workspace_ids: ['None'] }))
+        params = list.value.map((item) => ({user_ids: item.user_ids, workspace_ids: ['None']}))
+      } else if (user.isPE()) {
+        params = list.value.map((item) => ({user_ids: item.user_ids, workspace_ids: ['default']}))
       }
       await loadPermissionApi('role').CreateMember(
         props.currentRole?.id as string,
-        { members: params ?? list.value },
+        {members: params ?? list.value},
         loading,
       )
       MsgSuccess(t('common.addSuccess'))
@@ -150,5 +157,5 @@ function handleAdd() {
   })
 }
 
-defineExpose({ open })
+defineExpose({open})
 </script>
