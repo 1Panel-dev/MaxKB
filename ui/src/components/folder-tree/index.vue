@@ -41,7 +41,7 @@
               </div>
 
               <div
-                v-if="canOperation && node.level !== 3"
+                v-if="canOperation"
                 @click.stop
                 v-show="hoverNodeId === data.id"
                 @mouseenter.stop="handleMouseEnter(data)"
@@ -54,7 +54,10 @@
                   </el-button>
                   <template #dropdown>
                     <el-dropdown-menu>
-                      <el-dropdown-item @click.stop="openCreateFolder(data)">
+                      <el-dropdown-item
+                        @click.stop="openCreateFolder(data)"
+                        v-if="node.level !== 3"
+                      >
                         <AppIcon iconName="app-add-folder"></AppIcon>
                         {{ $t('components.folder.addChildFolder') }}
                       </el-dropdown-item>
