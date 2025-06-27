@@ -312,6 +312,37 @@ const getOpenChatAPI = () => {
     }
   }
 }
+
+/**
+ * 获取对话详情
+ * @param row
+ */
+function getSourceDetail(row: any) {
+  if (row.record_id) {
+    if (props.type === 'debug-ai-chat') {
+      chatLogApi
+        .getChatRecordDetails(id || props.appId, row.chat_id, row.record_id, loading)
+        .then((res) => {
+          const exclude_keys = ['answer_text', 'id', 'answer_text_list']
+          Object.keys(res.data).forEach((key) => {
+            if (!exclude_keys.includes(key)) {
+              row[key] = res.data[key]
+            }
+          })
+        })
+    } else {
+      chatAPI.getChatRecord(row.chat_id, row.record_id, loading).then((res) => {
+        const exclude_keys = ['answer_text', 'id', 'answer_text_list']
+        Object.keys(res.data).forEach((key) => {
+          if (!exclude_keys.includes(key)) {
+            row[key] = res.data[key]
+          }
+        })
+      })
+    }
+  }
+  return true
+}
 /**
  * 对话
  */
@@ -509,26 +540,6 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean, other_para
         errorWrite(chat, e + '')
       })
   }
-}
-
-/**
- * 获取对话详情
- * @param row
- */
-function getSourceDetail(row: any) {
-  if (row.record_id) {
-    chatLogApi
-      .getChatRecordDetails(id || props.appId, row.chat_id, row.record_id, loading)
-      .then((res) => {
-        const exclude_keys = ['answer_text', 'id', 'answer_text_list']
-        Object.keys(res.data).forEach((key) => {
-          if (!exclude_keys.includes(key)) {
-            row[key] = res.data[key]
-          }
-        })
-      })
-  }
-  return true
 }
 
 /**

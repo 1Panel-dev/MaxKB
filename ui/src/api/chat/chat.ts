@@ -11,7 +11,7 @@ import {
 } from '@/request/chat/index'
 import { type ChatProfile } from '@/api/type/chat'
 import { type Ref } from 'vue'
-import type { ResetPasswordRequest } from "@/api/type/user.ts";
+import type { ResetPasswordRequest } from '@/api/type/user.ts'
 
 import useStore from '@/stores'
 import type { LoginRequest } from '@/api/type/user'
@@ -219,7 +219,7 @@ const logout: (loading?: Ref<boolean>) => Promise<Result<boolean>> = (loading) =
  */
 const resetCurrentPassword: (
   request: ResetPasswordRequest,
-  loading?: Ref<boolean>
+  loading?: Ref<boolean>,
 ) => Promise<Result<boolean>> = (request, loading) => {
   return post('/chat_user/current/reset_password', request, undefined, loading)
 }
@@ -230,6 +230,21 @@ const resetCurrentPassword: (
 const getChatUserProfile: (loading?: Ref<boolean>) => Promise<Result<any>> = (loading) => {
   return get('/chat_user/profile', {}, loading)
 }
+/**
+ * 获取对话详情
+ * @param chat_id         对话id
+ * @param chat_record_id  对话记录id
+ * @param loading         加载器
+ * @returns
+ */
+const getChatRecord: (
+  chat_id: string,
+  chat_record_id: string,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (chat_id, chat_record_id, loading) => {
+  return get(`historical_conversation/${chat_id}/record/${chat_record_id}`, {}, loading)
+}
+
 export default {
   open,
   chat,
@@ -252,5 +267,6 @@ export default {
   pageChatRecord,
   logout,
   resetCurrentPassword,
-  getChatUserProfile
+  getChatUserProfile,
+  getChatRecord,
 }
