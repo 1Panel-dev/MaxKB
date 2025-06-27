@@ -13,7 +13,7 @@ from django.db import connection
 from django.db.models import QuerySet
 
 from application.flow.i_step_node import NodeResult
-from application.flow.step_node.search_dataset_node.i_search_dataset_node import ISearchDatasetStepNode
+from application.flow.step_node.search_knowledge_node.i_search_knowledge_node import ISearchKnowledgeStepNode
 from common.config.embedding_config import VectorStore
 from common.db.search import native_search
 from common.utils.common import get_file_content
@@ -44,7 +44,7 @@ def reset_title(title):
         return f"#### {title}\n"
 
 
-class BaseSearchDatasetNode(ISearchDatasetStepNode):
+class BaseSearchKnowledgeNode(ISearchKnowledgeStepNode):
     def save_context(self, details, workflow_manage):
         result = details.get('paragraph_list', [])
         dataset_setting = self.node_params_serializer.data.get('dataset_setting')
@@ -60,24 +60,25 @@ class BaseSearchDatasetNode(ISearchDatasetStepNode):
              result])[0:dataset_setting.get('max_paragraph_char_number', 5000)]
         self.context['directly_return'] = directly_return
 
-    def execute(self, dataset_id_list, dataset_setting, question,
+    def execute(self, knowledge_id_list, knowledge_setting, question,
                 exclude_paragraph_id_list=None,
                 **kwargs) -> NodeResult:
         self.context['question'] = question
-        if len(dataset_id_list) == 0:
+        if len(knowledge_id_list) == 0:
             return get_none_result(question)
-        model_id = get_embedding_id(dataset_id_list)
+        model_id = get_embedding_id(knowledge_id_list)
         workspace_id = self.workflow_manage.get_body().get('workspace_id')
         embedding_model = get_model_instance_by_model_workspace_id(model_id, workspace_id)
         embedding_value = embedding_model.embed_query(question)
         vector = VectorStore.get_embedding_vector()
         exclude_document_id_list = [str(document.id) for document in
                                     QuerySet(Document).filter(
-                                        dataset_id__in=dataset_id_list,
+                                        knowledge_id__in=knowledge_id_list,
                                         is_active=False)]
-        embedding_list = vector.query(question, embedding_value, dataset_id_list, exclude_document_id_list,
-                                      exclude_paragraph_id_list, True, dataset_setting.get('top_n'),
-                                      dataset_setting.get('similarity'), SearchMode(dataset_setting.get('search_mode')))
+        embedding_list = vector.query(question, embedding_value, knowledge_id_list, exclude_document_id_list,
+                                      exclude_paragraph_id_list, True, knowledge_setting.get('top_n'),
+                                      knowledge_setting.get('similarity'),
+                                      SearchMode(knowledge_setting.get('search_mode')))
         # 手动关闭数据库连接
         connection.close()
         if embedding_list is None:
@@ -89,7 +90,7 @@ class BaseSearchDatasetNode(ISearchDatasetStepNode):
                            'is_hit_handling_method_list': [row for row in result if row.get('is_hit_handling_method')],
                            'data': '\n'.join(
                                [f"{reset_title(paragraph.get('title', ''))}{paragraph.get('content')}" for paragraph in
-                                result])[0:dataset_setting.get('max_paragraph_char_number', 5000)],
+                                result])[0:knowledge_setting.get('max_paragraph_char_number', 5000)],
                            'directly_return': '\n'.join(
                                [paragraph.get('content') for paragraph in
                                 result if
@@ -112,7 +113,7 @@ class BaseSearchDatasetNode(ISearchDatasetStepNode):
                 'update_time': paragraph.get('update_time').strftime("%Y-%m-%d %H:%M:%S"),
                 'create_time': paragraph.get('create_time').strftime("%Y-%m-%d %H:%M:%S"),
                 'id': str(paragraph.get('id')),
-                'dataset_id': str(paragraph.get('dataset_id')),
+                'knowledge_id': str(paragraph.get('knowledge_id')),
                 'document_id': str(paragraph.get('document_id'))
             }
 
@@ -124,7 +125,7 @@ class BaseSearchDatasetNode(ISearchDatasetStepNode):
         paragraph_list = native_search(QuerySet(Paragraph).filter(id__in=paragraph_id_list),
                                        get_file_content(
                                            os.path.join(PROJECT_DIR, "apps", "application", 'sql',
-                                                        'list_dataset_paragraph_by_paragraph_id.sql')),
+                                                        'list_knowledge_paragraph_by_paragraph_id.sql')),
                                        with_table_name=True)
         # 如果向量库中存在脏数据 直接删除
         if len(paragraph_list) != len(paragraph_id_list):

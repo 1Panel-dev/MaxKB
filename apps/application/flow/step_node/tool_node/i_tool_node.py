@@ -51,8 +51,8 @@ class FunctionNodeParamsSerializer(serializers.Serializer):
         super().is_valid(raise_exception=True)
 
 
-class IFunctionNode(INode):
-    type = 'function-node'
+class IToolNode(INode):
+    type = 'tool-node'
 
     def get_node_params_serializer_class(self) -> Type[serializers.Serializer]:
         return FunctionNodeParamsSerializer

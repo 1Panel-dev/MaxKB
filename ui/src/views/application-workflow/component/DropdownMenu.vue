@@ -130,7 +130,7 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
-import { menuNodes, toolNode, toolNode, applicationNode } from '@/workflow/common/data'
+import { menuNodes, toolNode, toolLibNode, applicationNode } from '@/workflow/common/data'
 import { iconComponent } from '@/workflow/icons/utils'
 import applicationApi from '@/api/application/application'
 import { isWorkFlow } from '@/utils/application'
@@ -139,13 +139,13 @@ const search_text = ref<string>('')
 const props = defineProps({
   show: {
     type: Boolean,
-    default: false
+    default: false,
   },
   id: {
     type: String,
-    default: ''
+    default: '',
   },
-  workflowRef: Object
+  workflowRef: Object,
 })
 
 const emit = defineEmits(['clickNodes', 'onmousedown'])
@@ -156,22 +156,22 @@ const activeName = ref('base')
 const toolList = ref<any[]>([])
 const filter_tool_lib_list = computed(() => {
   return toolList.value.filter((item: any) =>
-    item.name.toLocaleLowerCase().includes(search_text.value.toLocaleLowerCase())
+    item.name.toLocaleLowerCase().includes(search_text.value.toLocaleLowerCase()),
   )
 })
 const applicationList = ref<any[]>([])
 const filter_application_list = computed(() => {
   return applicationList.value.filter((item: any) =>
-    item.name.toLocaleLowerCase().includes(search_text.value.toLocaleLowerCase())
+    item.name.toLocaleLowerCase().includes(search_text.value.toLocaleLowerCase()),
   )
 })
 
 const filter_menu_nodes = computed(() => {
   return menuNodes.filter((item) =>
-    item.label.toLocaleLowerCase().includes(search_text.value.toLocaleLowerCase())
+    item.label.toLocaleLowerCase().includes(search_text.value.toLocaleLowerCase()),
   )
 })
-tool clickNodes(item: any, data?: any, type?: string) {
+function clickNodes(item: any, data?: any, type?: string) {
   if (data) {
     item['properties']['stepName'] = data.name
     if (type == 'tool') {
@@ -180,8 +180,8 @@ tool clickNodes(item: any, data?: any, type?: string) {
         tool_lib_id: data.id,
         input_field_list: data.input_field_list.map((field: any) => ({
           ...field,
-          value: field.source == 'reference' ? [] : ''
-        }))
+          value: field.source == 'reference' ? [] : '',
+        })),
       }
     }
     if (type == 'application') {
@@ -199,14 +199,14 @@ tool clickNodes(item: any, data?: any, type?: string) {
             : {
                 ...(fileUploadSetting.document ? { document_list: [] } : {}),
                 ...(fileUploadSetting.image ? { image_list: [] } : {}),
-                ...(fileUploadSetting.audio ? { audio_list: [] } : {})
-              })
+                ...(fileUploadSetting.audio ? { audio_list: [] } : {}),
+              }),
         }
       } else {
         item['properties']['node_data'] = {
           name: data.name,
           icon: data.icon,
-          application_id: data.id
+          application_id: data.id,
         }
       }
     }
@@ -216,7 +216,7 @@ tool clickNodes(item: any, data?: any, type?: string) {
   emit('clickNodes', item)
 }
 
-tool onmousedown(item: any, data?: any, type?: string) {
+function onmousedown(item: any, data?: any, type?: string) {
   if (data) {
     item['properties']['stepName'] = data.name
     if (type == 'tool') {
@@ -225,8 +225,8 @@ tool onmousedown(item: any, data?: any, type?: string) {
         tool_lib_id: data.id,
         input_field_list: data.input_field_list.map((field: any) => ({
           ...field,
-          value: field.source == 'reference' ? [] : ''
-        }))
+          value: field.source == 'reference' ? [] : '',
+        })),
       }
     }
     if (type == 'application') {
@@ -244,14 +244,14 @@ tool onmousedown(item: any, data?: any, type?: string) {
             : {
                 ...(fileUploadSetting.document ? { document_list: [] } : {}),
                 ...(fileUploadSetting.image ? { image_list: [] } : {}),
-                ...(fileUploadSetting.audio ? { audio_list: [] } : {})
-              })
+                ...(fileUploadSetting.audio ? { audio_list: [] } : {}),
+              }),
         }
       } else {
         item['properties']['node_data'] = {
           name: data.name,
           icon: data.icon,
-          application_id: data.id
+          application_id: data.id,
         }
       }
     }
@@ -260,7 +260,7 @@ tool onmousedown(item: any, data?: any, type?: string) {
   emit('onmousedown', item)
 }
 
-tool getList() {
+function getList() {
   // applicationApi.listTool(props.id, loading).then((res: any) => {
   //   toolList.value = res.data
   // })

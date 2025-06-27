@@ -14,7 +14,7 @@ from django.db.models import QuerySet
 from django.utils.translation import gettext as _
 
 from application.flow.i_step_node import NodeResult
-from application.flow.step_node.function_lib_node.i_function_lib_node import IFunctionLibNode
+from application.flow.step_node.tool_lib_node.i_tool_lib_node import IToolLibNode
 from common.exception.app_exception import AppApiException
 from common.utils.function_code import FunctionExecutor
 from common.utils.rsa_util import rsa_long_decrypt
@@ -110,7 +110,7 @@ def valid_function(function_lib, user_id):
         raise Exception(_('Function {name} is unavailable').format(name=function_lib.name))
 
 
-class BaseFunctionLibNodeNode(IFunctionLibNode):
+class BaseToolLibNodeNode(IToolLibNode):
     def save_context(self, details, workflow_manage):
         self.context['result'] = details.get('result')
         if self.node_params.get('is_result'):

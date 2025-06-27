@@ -11,7 +11,7 @@ import time
 from typing import Dict
 
 from application.flow.i_step_node import NodeResult
-from application.flow.step_node.function_node.i_function_node import IFunctionNode
+from application.flow.step_node.tool_node.i_tool_node import IToolNode
 from common.utils.function_code import FunctionExecutor
 from maxkb.const import CONFIG
 
@@ -79,7 +79,7 @@ def convert_value(name: str, value, _type, is_required, source, node):
         raise Exception(f'字段:{name}类型:{_type}值:{value}类型错误')
 
 
-class BaseFunctionNodeNode(IFunctionNode):
+class BaseToolNodeNode(IToolNode):
     def save_context(self, details, workflow_manage):
         self.context['result'] = details.get('result')
         if self.node_params.get('is_result', False):

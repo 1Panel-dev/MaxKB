@@ -111,7 +111,7 @@ const emit = defineEmits(['addData', 'refresh'])
 const { folder, user, knowledge } = useStore()
 
 const dialogVisible = ref<boolean>(false)
-const checkList = ref([])
+const checkList = ref<Array<string>>([])
 const currentEmbedding = ref('')
 const searchValue = ref('')
 const searchDate = ref<any[]>([])
@@ -166,7 +166,10 @@ const open = (checked: any) => {
 }
 
 const submitHandle = () => {
-  emit('addData', checkList.value)
+  emit(
+    'addData',
+    searchDate.value.filter((item: any) => checkList.value.includes(item.id)),
+  )
   dialogVisible.value = false
 }
 

@@ -109,7 +109,6 @@
       ref="AddknowledgeDialogRef"
       @addData="addKnowledge"
       :data="knowledgeList"
-      @refresh="refresh"
       :loading="knowledgeLoading"
     />
   </NodeContainer>
@@ -174,29 +173,19 @@ function removeknowledge(id: any) {
   set(props.nodeModel.properties.node_data, 'knowledge_id_list', list)
 }
 
-function addKnowledge(val: Array<string>) {
-  set(props.nodeModel.properties.node_data, 'knowledge_id_list', val)
+function addKnowledge(val: Array<any>) {
+  set(
+    props.nodeModel.properties.node_data,
+    'knowledge_id_list',
+    val.map((item) => item.id),
+  )
+  knowledgeList.value = val
 }
 
 function openknowledgeDialog() {
   if (AddknowledgeDialogRef.value) {
     AddknowledgeDialogRef.value.open(form_data.value.knowledge_id_list)
   }
-}
-
-function getknowledge() {
-  // if (id) {
-  //   application.asyncGetApplicationKnowledge(id, knowledgeLoading).then((res: any) => {
-  //     knowledgeList.value = res.data
-  //   })
-  // } else {
-  knowledge.asyncGetFolderKnowledge('',knowledgeLoading).then((res: any) => {
-    knowledgeList.value = res.data?.filter((v: any) => v.user_id === user.userInfo?.id)
-  })
-  // }
-}
-function refresh() {
-  getknowledge()
 }
 
 const validate = () => {
@@ -209,7 +198,8 @@ const validate = () => {
 }
 
 onMounted(() => {
-  getknowledge()
+  console.log(props.nodeModel.properties.node_data)
+  knowledgeList.value = props.nodeModel.properties.node_data.knowledge_list
   set(props.nodeModel, 'validate', validate)
 })
 </script>
