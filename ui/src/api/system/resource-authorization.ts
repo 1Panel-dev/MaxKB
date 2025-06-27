@@ -12,10 +12,11 @@ const prefix = '/workspace'
 const getResourceAuthorization: (
   workspace_id: string,
   user_id: string,
+  resource: string,
   loading?: Ref<boolean>,
-) => Promise<Result<any>> = (workspace_id, user_id, loading) => {
+) => Promise<Result<any>> = (workspace_id, user_id, resource, loading) => {
   return get(
-    `${prefix}/${workspace_id}/user_resource_permission/user/${user_id}`,
+    `${prefix}/${workspace_id}/user_resource_permission/user/${user_id}/resource/${resource}`,
     undefined,
     loading,
   )
@@ -42,11 +43,12 @@ const getResourceAuthorization: (
 const putResourceAuthorization: (
   workspace_id: string,
   user_id: string,
+  resource: string,
   body: any,
   loading?: Ref<boolean>,
-) => Promise<Result<any>> = (workspace_id, user_id, body, loading) => {
+) => Promise<Result<any>> = (workspace_id, user_id, resource, body, loading) => {
   return put(
-    `${prefix}/${workspace_id}/user_resource_permission/user/${user_id}`,
+    `${prefix}/${workspace_id}/user_resource_permission/user/${user_id}/resource/${resource}`,
     body,
     {},
     loading,

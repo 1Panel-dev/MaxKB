@@ -8,7 +8,11 @@
         </el-breadcrumb-item>
       </el-breadcrumb>
       <!-- 企业版: 工作空间下拉框-->
-      <el-divider class="ml-24" direction="vertical" v-if="hasPermission(EditionConst.IS_EE, 'OR')" />
+      <el-divider
+        class="ml-24"
+        direction="vertical"
+        v-if="hasPermission(EditionConst.IS_EE, 'OR')"
+      />
       <WorkspaceDropdown
         v-if="hasPermission(EditionConst.IS_EE, 'OR')"
         :data="workspaceList"
@@ -189,6 +193,7 @@ function submitPermissions() {
   AuthorizationApi.putResourceAuthorization(
     currentWorkspaceId.value || 'default',
     currentUser.value,
+    (route.meta?.resource as string) || 'APPLICATION',
     { user_resource_permission_list: user_resource_permission_list },
     rLoading,
   ).then(() => {
@@ -290,10 +295,6 @@ const dfsFolder = (arr: any[] = [], folderIdMap: any) => {
   })
 }
 
-const handleTabChange = () => {
-  getWholeTree(currentUser.value)
-}
-
 function getFolder() {
   return AuthorizationApi.getSystemFolder(
     currentWorkspaceId.value || 'default',
@@ -306,6 +307,7 @@ function getResourcePermissions(user_id: string) {
   return AuthorizationApi.getResourceAuthorization(
     currentWorkspaceId.value || 'default',
     user_id,
+    (route.meta?.resource as string) || 'APPLICATION',
     rLoading,
   )
 }
@@ -378,7 +380,6 @@ function changeWorkspace(item: WorkspaceItem) {
   currentWorkspaceId.value = item.id
   getMember()
 }
-function refresh(data?: string[]) {}
 
 onMounted(() => {
   tableHeight.value = window.innerHeight - 330

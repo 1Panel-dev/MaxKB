@@ -12,7 +12,7 @@ from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
 from common.constants.permission_constants import Group, ResourcePermissionGroup, ResourceAuthType, \
-    ResourcePermissionRole
+    ResourcePermissionRole, ResourcePermission
 from users.models import User
 
 
@@ -48,8 +48,8 @@ class WorkspaceUserResourcePermission(models.Model):
                                  default=list,
                                  base_field=models.CharField(max_length=256,
                                                              blank=True,
-                                                             choices=ResourcePermissionGroup.choices + ResourcePermissionRole.choices,
-                                                             default=ResourcePermissionGroup.VIEW))
+                                                             choices=ResourcePermission.choices + ResourcePermissionRole.choices,
+                                                             default=ResourcePermission.VIEW))
 
     create_time = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
 

@@ -20,7 +20,7 @@ from common.constants.cache_version import Cache_Version
 from common.constants.permission_constants import Auth, PermissionConstants, ResourcePermissionGroup, \
     get_permission_list_by_resource_group, ResourceAuthType, \
     ResourcePermissionRole, get_default_role_permission_mapping_list, get_default_workspace_user_role_mapping_list, \
-    RoleConstants
+    RoleConstants, ResourcePermission, Resource
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.exception.app_exception import AppAuthenticationFailed
 from common.utils.common import group_by
@@ -132,9 +132,11 @@ def get_workspace_resource_permission_list_by_workspace_user_permission(
         resource_permission_list = [
             [
                 f"{permission}:/WORKSPACE/{workspace_user_resource_permission.workspace_id}/{workspace_user_resource_permission.auth_target_type}/{workspace_user_resource_permission.target}"
-                for permission in get_permission_list_by_resource_group(ResourcePermissionGroup[resource_permission])]
+                for permission in get_permission_list_by_resource_group(
+                ResourcePermissionGroup(Resource(workspace_user_resource_permission.auth_target_type),
+                                        ResourcePermission(resource_permission)))]
             for resource_permission in workspace_user_resource_permission.permission_list if
-            ResourcePermissionGroup.values.__contains__(resource_permission)]
+            ResourcePermission.values.__contains__(resource_permission)]
         # 将二维数组扁平为一维
         return reduce(lambda x, y: [*x, *y], resource_permission_list, [])
     return []
