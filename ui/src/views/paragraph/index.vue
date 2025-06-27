@@ -314,8 +314,8 @@ function openGenerateDialog(row?: any) {
 
 function onEnd(event?: any) {
   const obj = {
-    paragraph_id: paragraphDetail.value[event.newIndex].id,
-    new_position: paragraphDetail.value[event.newIndex].position,
+    paragraph_id: paragraphDetail.value[event.newIndex].id, // 当前拖动的段落ID
+    new_position: paragraphDetail.value[event.newIndex+1].position, // 新位置的段落位置
   }
   loadSharedApi({ type: 'paragraph', systemType: apiType.value }).putAdjustPosition(
     id,
