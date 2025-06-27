@@ -489,6 +489,19 @@ class ParagraphSerializers(serializers.Serializer):
                                              target_document_id, target_knowledge_id, None)
                 # 修改段落信息
                 paragraph_list.update(document_id=target_document_id)
+
+                # 将当前文档中所有段落的位置向下移动，为新段落腾出空间
+                Paragraph.objects.filter(document_id=target_document_id).exclude(
+                    id__in=paragraph_id_list
+                ).update(position=F('position') + len(paragraph_id_list))
+                # 重新查询迁移的段落
+                paragraph_list = Paragraph.objects.filter(
+                    id__in=paragraph_id_list, document_id=target_document_id
+                )
+                # 将迁移的段落位置设置为从0开始的序号
+                for i, paragraph in enumerate(paragraph_list):
+                    paragraph.position = i
+                    paragraph.save()
             # 不同数据集迁移
             else:
                 problem_list = QuerySet(Problem).filter(
@@ -522,6 +535,19 @@ class ParagraphSerializers(serializers.Serializer):
                 pid_list = [paragraph.id for paragraph in paragraph_list]
                 # 修改段落信息
                 paragraph_list.update(knowledge_id=target_knowledge_id, document_id=target_document_id)
+
+                # 将当前文档中所有段落的位置向下移动，为新段落腾出空间
+                Paragraph.objects.filter(document_id=target_document_id).exclude(
+                    id__in=pid_list
+                ).update(position=F('position') + len(pid_list))
+                # 重新查询迁移的段落
+                paragraph_list = Paragraph.objects.filter(
+                    id__in=pid_list, document_id=target_document_id
+                )
+                # 将迁移的段落位置设置为从0开始的序号
+                for i, paragraph in enumerate(paragraph_list):
+                    paragraph.position = i
+                    paragraph.save()
                 # 修改向量段落信息
                 update_embedding_document_id(pid_list, target_document_id, target_knowledge_id, embedding_model_id)
 
