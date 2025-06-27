@@ -287,6 +287,8 @@ class SplitModel:
     def __init__(self, content_level_pattern, with_filter=True, limit=100000):
         self.content_level_pattern = content_level_pattern
         self.with_filter = with_filter
+        if type(limit) is not int:
+            limit = int(limit)
         if limit is None or limit > 100000:
             limit = 100000
         if limit < 50:
