@@ -14,20 +14,19 @@
             @click="createUser()"
             v-hasPermission="
               new ComplexPermission(
-                [
-                  RoleConst.ADMIN,
-                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                  RoleConst.USER.getWorkspaceRole,
-                ],
-                [PermissionConst.WORKSPACE_CHAT_USER_CREATE.getWorkspacePermission],
-                [],
-                'OR',
-              )
-            "
+                [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+                [PermissionConst.CHAT_USER_CREATE, PermissionConst.WORKSPACE_CHAT_USER_CREATE],
+                [],'OR',)"
           >
             {{ t('views.userManage.createUser') }}
           </el-button>
-          <el-button @click="syncUsers">
+          <el-button @click="syncUsers"
+            v-hasPermission="
+              new ComplexPermission(
+                [RoleConst.ADMIN],
+                [PermissionConst.CHAT_USER_SYNC],
+                [],'OR',)"
+          >
             {{ $t('views.chatUser.syncUsers') }}
           </el-button>
           <el-button
@@ -35,16 +34,9 @@
             @click="setUserGroups"
             v-hasPermission="
               new ComplexPermission(
-                [
-                  RoleConst.ADMIN,
-                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                  RoleConst.USER.getWorkspaceRole,
-                ],
-                [PermissionConst.WORKSPACE_CHAT_USER_GROUP.getWorkspacePermission],
-                [],
-                'OR',
-              )
-            "
+                [RoleConst.ADMIN,RoleConst.WORKSPACE_MANAGE],
+                [PermissionConst.CHAT_USER_GROUP, PermissionConst.WORKSPACE_CHAT_USER_GROUP],
+                [],'OR',)"
           >
             {{ $t('views.chatUser.setUserGroups') }}
           </el-button>
@@ -53,16 +45,9 @@
             @click="handleBatchDelete"
             v-hasPermission="
               new ComplexPermission(
-                [
-                  RoleConst.ADMIN,
-                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                  RoleConst.USER.getWorkspaceRole,
-                ],
-                [PermissionConst.WORKSPACE_CHAT_USER_DELETE.getWorkspacePermission],
-                [],
-                'OR',
-              )
-            "
+                [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+                [PermissionConst.WORKSPACE_CHAT_USER_DELETE, PermissionConst.CHAT_USER_DELETE],
+                [],'OR',)"
           >
             {{ $t('common.delete') }}
           </el-button>
@@ -186,6 +171,10 @@
                 size="small"
                 v-model="row.is_active"
                 :before-change="() => changeState(row)"
+                v-if="hasPermission(new ComplexPermission(
+                  [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+                  [PermissionConst.CHAT_USER_EDIT, PermissionConst.WORKSPACE_CHAT_USER_EDIT],
+                  [],'OR'),'OR')"
               />
             </span>
             <el-divider direction="vertical" />
@@ -195,18 +184,10 @@
                 text
                 @click.stop="editUser(row)"
                 :title="$t('common.edit')"
-                v-hasPermission="
-                  new ComplexPermission(
-                    [
-                      RoleConst.ADMIN,
-                      RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                      RoleConst.USER.getWorkspaceRole,
-                    ],
-                    [PermissionConst.WORKSPACE_CHAT_USER_EDIT.getWorkspacePermission],
-                    [],
-                    'OR',
-                  )
-                "
+                v-if="hasPermission(new ComplexPermission(
+                  [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+                  [PermissionConst.CHAT_USER_EDIT, PermissionConst.WORKSPACE_CHAT_USER_EDIT],
+                  [],'OR'),'OR')"
               >
                 <el-icon>
                   <EditPen />
@@ -220,18 +201,10 @@
                 text
                 @click.stop="editPwdUser(row)"
                 :title="$t('views.userManage.setting.updatePwd')"
-                v-hasPermission="
-                  new ComplexPermission(
-                    [
-                      RoleConst.ADMIN,
-                      RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                      RoleConst.USER.getWorkspaceRole,
-                    ],
-                    [PermissionConst.WORKSPACE_CHAT_USER_EDIT.getWorkspacePermission],
-                    [],
-                    'OR',
-                  )
-                "
+                v-if="hasPermission(new ComplexPermission(
+                  [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+                  [PermissionConst.CHAT_USER_EDIT, PermissionConst.WORKSPACE_CHAT_USER_EDIT],
+                  [],'OR'),'OR')"
               >
                 <el-icon>
                   <Lock />
@@ -245,18 +218,10 @@
                 text
                 @click.stop="deleteUserManage(row)"
                 :title="$t('common.delete')"
-                v-hasPermission="
-                  new ComplexPermission(
-                    [
-                      RoleConst.ADMIN,
-                      RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                      RoleConst.USER.getWorkspaceRole,
-                    ],
-                    [PermissionConst.WORKSPACE_CHAT_USER_DELETE.getWorkspacePermission],
-                    [],
-                    'OR',
-                  )
-                "
+                v-if="hasPermission(new ComplexPermission(
+                  [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+                  [PermissionConst.CHAT_USER_DELETE, PermissionConst.WORKSPACE_CHAT_USER_DELETE],
+                  [],'OR'),'OR')"
               >
                 <el-icon>
                   <Delete />
@@ -301,6 +266,7 @@ import SystemGroupApi from '@/api/system/user-group'
 import type { ListItem } from '@/api/type/common'
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
 import { ComplexPermission } from '@/utils/permission/type'
+import { hasPermission } from '@/utils/permission'
 
 const search_type = ref('username')
 const search_form = ref<{
