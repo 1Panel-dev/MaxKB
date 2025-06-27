@@ -1,13 +1,14 @@
 <template>
   <div class="resource-authorization p-16-24">
     <div class="flex align-center mb-16">
-      <h2>{{ $t('views.resourceAuthorization.title') }}</h2>
+      <el-breadcrumb separator-icon="ArrowRight">
+        <el-breadcrumb-item>{{ t('views.resourceAuthorization.title') }}</el-breadcrumb-item>
+        <el-breadcrumb-item>
+          <h5 class="ml-4 color-text-primary">{{ activeData.label }}</h5>
+        </el-breadcrumb-item>
+      </el-breadcrumb>
       <!-- 企业版: 工作空间下拉框-->
-      <el-divider
-        class="mr-16"
-        direction="vertical"
-        v-if="hasPermission(EditionConst.IS_EE, 'OR')"
-      />
+      <el-divider class="ml-24" direction="vertical" v-if="hasPermission(EditionConst.IS_EE, 'OR')" />
       <WorkspaceDropdown
         v-if="hasPermission(EditionConst.IS_EE, 'OR')"
         :data="workspaceList"
@@ -145,7 +146,6 @@ const activeData = computed(() => {
     return item.type === currentPathType
   })[0]
 })
-
 
 watch(filterText, (val: any) => {
   if (val) {
