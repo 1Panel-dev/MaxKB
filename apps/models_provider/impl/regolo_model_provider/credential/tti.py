@@ -3,35 +3,53 @@ import traceback
 from typing import Dict
 
 from django.utils.translation import gettext_lazy as _, gettext
-from langchain_core.messages import HumanMessage
 
 from common import forms
 from common.exception.app_exception import AppApiException
 from common.forms import BaseForm, TooltipLabel
-from common.utils.logger import maxkb_logger
 from models_provider.base_model_provider import BaseModelCredential, ValidCode
 
 
-class GeminiImageModelParams(BaseForm):
-    temperature = forms.SliderField(TooltipLabel(_('Temperature'),
-                                                 _('Higher values make the output more random, while lower values make it more focused and deterministic')),
-                                    required=True, default_value=0.7,
-                                    _min=0.1,
-                                    _max=1.0,
-                                    _step=0.01,
-                                    precision=2)
+class RegoloTTIModelParams(BaseForm):
+    size = forms.SingleSelect(
+        TooltipLabel(_('Image size'),
+                     _('The image generation endpoint allows you to create raw images based on text prompts. ')),
+        required=True,
+        default_value='1024x1024',
+        option_list=[
+            {'value': '1024x1024', 'label': '1024x1024'},
+            {'value': '1024x1792', 'label': '1024x1792'},
+            {'value': '1792x1024', 'label': '1792x1024'},
+        ],
+        text_field='label',
+        value_field='value'
+    )
 
-    max_tokens = forms.SliderField(
-        TooltipLabel(_('Output the maximum Tokens'),
-                     _('Specify the maximum number of tokens that the model can generate')),
-        required=True, default_value=800,
+    quality = forms.SingleSelect(
+        TooltipLabel(_('Picture quality'), _('''       
+By default, images are produced in standard quality.
+        ''')),
+        required=True,
+        default_value='standard',
+        option_list=[
+            {'value': 'standard', 'label': 'standard'},
+            {'value': 'hd', 'label': 'hd'},
+        ],
+        text_field='label',
+        value_field='value'
+    )
+
+    n = forms.SliderField(
+        TooltipLabel(_('Number of pictures'),
+                     _('1 as default')),
+        required=True, default_value=1,
         _min=1,
-        _max=100000,
+        _max=10,
         _step=1,
         precision=0)
 
 
-class GeminiImageModelCredential(BaseForm, BaseModelCredential):
+class RegoloTextToImageModelCredential(BaseForm, BaseModelCredential):
     api_key = forms.PasswordInputField('API Key', required=True)
 
     def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], model_params, provider,
@@ -49,9 +67,8 @@ class GeminiImageModelCredential(BaseForm, BaseModelCredential):
                     return False
         try:
             model = provider.get_model(model_type, model_name, model_credential, **model_params)
-            res = model.stream([HumanMessage(content=[{"type": "text", "text": gettext('Hello')}])])
-            for chunk in res:
-                maxkb_logger.info(chunk)
+            res = model.check_auth()
+            print(res)
         except Exception as e:
             traceback.print_exc()
             if isinstance(e, AppApiException):
@@ -69,4 +86,4 @@ class GeminiImageModelCredential(BaseForm, BaseModelCredential):
         return {**model, 'api_key': super().encryption(model.get('api_key', ''))}
 
     def get_model_params_setting_form(self, model_name):
-        return GeminiImageModelParams()
+        return RegoloTTIModelParams()

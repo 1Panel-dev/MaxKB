@@ -1,4 +1,11 @@
 # coding=utf-8
+"""
+    @project: MaxKB
+    @Author：虎
+    @file： llm.py
+    @date：2024/7/11 18:32
+    @desc:
+"""
 import traceback
 from typing import Dict
 
@@ -8,11 +15,10 @@ from langchain_core.messages import HumanMessage
 from common import forms
 from common.exception.app_exception import AppApiException
 from common.forms import BaseForm, TooltipLabel
-from common.utils.logger import maxkb_logger
 from models_provider.base_model_provider import BaseModelCredential, ValidCode
 
 
-class GeminiImageModelParams(BaseForm):
+class RegoloLLMModelParams(BaseForm):
     temperature = forms.SliderField(TooltipLabel(_('Temperature'),
                                                  _('Higher values make the output more random, while lower values make it more focused and deterministic')),
                                     required=True, default_value=0.7,
@@ -31,8 +37,7 @@ class GeminiImageModelParams(BaseForm):
         precision=0)
 
 
-class GeminiImageModelCredential(BaseForm, BaseModelCredential):
-    api_key = forms.PasswordInputField('API Key', required=True)
+class RegoloLLMModelCredential(BaseForm, BaseModelCredential):
 
     def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], model_params, provider,
                  raise_exception=False):
@@ -48,10 +53,9 @@ class GeminiImageModelCredential(BaseForm, BaseModelCredential):
                 else:
                     return False
         try:
+
             model = provider.get_model(model_type, model_name, model_credential, **model_params)
-            res = model.stream([HumanMessage(content=[{"type": "text", "text": gettext('Hello')}])])
-            for chunk in res:
-                maxkb_logger.info(chunk)
+            model.invoke([HumanMessage(content=gettext('Hello'))])
         except Exception as e:
             traceback.print_exc()
             if isinstance(e, AppApiException):
@@ -68,5 +72,7 @@ class GeminiImageModelCredential(BaseForm, BaseModelCredential):
     def encryption_dict(self, model: Dict[str, object]):
         return {**model, 'api_key': super().encryption(model.get('api_key', ''))}
 
+    api_key = forms.PasswordInputField('API Key', required=True)
+
     def get_model_params_setting_form(self, model_name):
-        return GeminiImageModelParams()
+        return RegoloLLMModelParams()

@@ -70,11 +70,6 @@ model_info_list = [
               ModelTypeConst.TTI,
               volcanic_engine_tti_model_credential, VolcanicEngineTextToImage
               ),
-    ModelInfo('anime_v1.3',
-              _('Animation 1.3.0-Vincent Picture'),
-              ModelTypeConst.TTI,
-              volcanic_engine_tti_model_credential, VolcanicEngineTextToImage
-              ),
     ModelInfo('anime_v1.3.1',
               _('Animation 1.3.1-Vincent Picture'),
               ModelTypeConst.TTI,
