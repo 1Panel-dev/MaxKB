@@ -115,7 +115,6 @@
 
 <script lang="ts" setup>
 import { onMounted, ref, computed } from 'vue'
-import ProviderApi from '@/api/model/provider'
 import type { Provider, Model } from '@/api/type/model'
 import ModelCard from '@/views/model/component/ModelCard.vue'
 import ProviderComponent from '@/views/model/component/Provider.vue'
@@ -123,13 +122,13 @@ import { splitArray } from '@/utils/common'
 import { modelTypeList, allObj } from '@/views/model/component/data'
 import CreateModelDialog from '@/views/model/component/CreateModelDialog.vue'
 import SelectProviderDialog from '@/views/model/component/SelectProviderDialog.vue'
-import { t } from '@/locales'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import useStore from '@/stores'
 import { useRoute } from 'vue-router'
 import permissionMap from '@/permission'
 
 const route = useRoute()
-
+const { model } = useStore()
 const apiType = computed(() => {
   if (route.path.includes('shared')) {
     return 'systemShare'
@@ -217,7 +216,7 @@ const search_type_change = () => {
 }
 
 onMounted(() => {
-  ProviderApi.getProvider(loading).then((ok) => {
+  model.asyncGetProvider(loading).then((ok: any) => {
     active_provider.value = allObj
     provider_list.value = [allObj, ...ok.data]
     list_model()

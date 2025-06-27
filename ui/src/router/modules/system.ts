@@ -113,17 +113,17 @@ const systemRouter = {
           },
           component: () => import('@/views/system-resource-management/ToolResourceIndex.vue'),
         },
-        // {
-        //   path: '/system/resource-management/model',
-        //   name: 'ModelResourceIndex',
-        //   meta: {
-        //     title: 'views.model.title',
-        //     activeMenu: '/system',
-        //     parentPath: '/system',
-        //     parentName: 'system',
-        //   },
-        //   component: () => import('@/views/system-resource-management/ModelResourceIndex.vue'),
-        // },
+        {
+          path: '/system/resource-management/model',
+          name: 'ModelResourceIndex',
+          meta: {
+            title: 'views.model.title',
+            activeMenu: '/system',
+            parentPath: '/system',
+            parentName: 'system',
+          },
+          component: () => import('@/views/system-resource-management/ModelResourceIndex.vue'),
+        },
       ],
     },
     {

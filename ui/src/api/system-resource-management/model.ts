@@ -7,6 +7,7 @@ import type {
   CreateModelRequest,
   EditModelRequest,
 } from '@/api/type/model'
+import type { pageRequest } from '@/api/type/common'
 import type { FormField } from '@/components/dynamics-form/type'
 
 const prefix = '/system/resource'
@@ -15,11 +16,12 @@ const prefix = '/system/resource'
  * 获得模型列表
  * @params 参数 name, model_type, model_name
  */
-const getModelList: (
+const getModelListPage: (
+  page: pageRequest,
   data?: ListModelRequest,
   loading?: Ref<boolean>,
-) => Promise<Result<Array<Model>>> = (data, loading) => {
-  return get(`${prefix}/model`, data, loading)
+) => Promise<Result<Array<Model>>> = (page, data, loading) => {
+  return get(`${prefix}/model/${page.current_page}/${page.page_size}`, data, loading)
 }
 
 /**
@@ -142,7 +144,7 @@ const deleteModel: (model_id: string, loading?: Ref<boolean>) => Promise<Result<
   return del(`${prefix}/model/${model_id}`, undefined, {}, loading)
 }
 export default {
-  getModelList,
+  getModelListPage,
   createModel,
   updateModel,
   deleteModel,

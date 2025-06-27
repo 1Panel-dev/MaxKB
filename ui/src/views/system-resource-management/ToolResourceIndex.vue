@@ -221,6 +221,5 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-.resource-manage_tool {
-}
+
 </style>

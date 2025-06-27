@@ -22,7 +22,7 @@
           <el-input
             v-if="search_type === 'name'"
             v-model="model_search_form.name"
-            @change="list_model"
+            @change="getList"
             :placeholder="$t('common.searchBar.placeholder')"
             style="width: 220px"
             clearable
@@ -30,7 +30,7 @@
           <el-select
             v-else-if="search_type === 'create_user'"
             v-model="model_search_form.create_user"
-            @change="list_model"
+            @change="getList"
             clearable
             style="width: 220px"
           >
@@ -40,7 +40,7 @@
             v-else-if="search_type === 'model_type'"
             v-model="model_search_form.model_type"
             clearable
-            @change="list_model"
+            @change="getList"
             style="width: 220px"
           >
             <template v-for="item in modelTypeList" :key="item.value">
@@ -51,47 +51,49 @@
       </div>
 
       <app-table
-        :data="model_list"
+        :data="modelList"
         :pagination-config="paginationConfig"
+        @sizeChange="getList"
+        @changePage="getList"
       >
         <!-- <el-table-column type="selection" width="55" /> -->
         <el-table-column width="220" :label="$t('common.name')">
-          <template #default="scope">
-            <div class="table-name flex align-center">
-              <el-icon size="24" class="mr-8">
-                <el-avatar
-                  v-if="isAppIcon(scope.row?.icon)"
-                  shape="square"
-                  :size="24"
-                  style="background: none"
-                  class="mr-8"
-                >
-                  <img :src="scope.row?.icon" alt="" />
-                </el-avatar>
-                <el-avatar v-else class="avatar-green" shape="square" :size="24">
-                  <img src="@/assets/node/icon_tool.svg" style="width: 58%" alt="" />
-                </el-avatar>
-              </el-icon>
-              {{ scope.row.name }}
-            </div>
+          <template #default="{ row }">
+            {{ row.name }}
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="provider"
+          :label="$t('views.system.resource_management.type')"
+          show-overflow-tooltip
+          width="150"
+        >
+          <template #default="{ row }">
+            <el-space :size="8">
+              <span
+                style="width: 24px; height: 24px; display: inline-block"
+                :innerHTML="getRowProvider(row)?.icon"
+              >
+              </span>
+              <span> {{ getRowProvider(row)?.name }}</span>
+            </el-space>
+          </template>
+        </el-table-column>
+        <el-table-column width="120" :label="$t('views.model.modelForm.model_type.label')">
+          <template #default="{ row }">
+            {{ $t(modelType[row.model_type as keyof typeof modelType]) }}
+          </template>
+        </el-table-column>
+        <el-table-column
+          width="220"
+          :label="$t('views.model.modelForm.base_model.label')"
+          show-overflow-tooltip
+        >
+          <template #default="{ row }">
+            {{ row.model_name }}
           </template>
         </el-table-column>
 
-        <el-table-column prop="tool_type" :label="$t('views.system.resource_management.type')">
-          <template #default="scope">
-            {{ $t(ToolType[scope.row.tool_type as keyof typeof ToolType]) }}
-          </template>
-        </el-table-column>
-        <el-table-column :label="$t('common.status.label')" width="120">
-          <template #default="scope">
-            <div class="flex align-center">
-              <AppIcon
-                :iconName="scope.row.is_active ? 'app-close_colorful' : 'app-succeed'"
-              ></AppIcon>
-              {{ $t(scope.row.is_active ? 'views.tool.enabled' : 'common.status.disable') }}
-            </div>
-          </template>
-        </el-table-column>
         <el-table-column
           v-if="user.isEE()"
           width="150"
@@ -163,19 +165,18 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, reactive, computed } from 'vue'
+import { onBeforeMount, onMounted, ref, reactive, nextTick, computed } from 'vue'
 import { cloneDeep, get } from 'lodash'
 import type { Provider, Model } from '@/api/type/model'
 import ModelResourceApi from '@/api/system-resource-management/model'
-import { modelTypeList, allObj } from '@/views/model/component/data'
+import { modelTypeList } from '@/views/model/component/data'
+import { modelType } from '@/enums/model'
 import { t } from '@/locales'
-import { isAppIcon } from '@/utils/common'
-import { ToolType } from '@/enums/tool'
 import useStore from '@/stores'
 import WorkspaceApi from '@/api/workspace/workspace.ts'
 import { datetimeFormat } from '@/utils/time'
 
-const { user } = useStore()
+const { user, model } = useStore()
 
 const search_type = ref('name')
 const model_search_form = ref<{
@@ -190,8 +191,9 @@ const model_search_form = ref<{
 
 const loading = ref(false)
 const changeStateloading = ref(false)
-const model_list = ref<Array<Model>>([])
+const modelList = ref<Array<Model>>([])
 const user_options = ref<any[]>([])
+const provider_list = ref<Array<Provider>>([])
 
 const paginationConfig = reactive({
   current_page: 1,
@@ -202,11 +204,17 @@ const paginationConfig = reactive({
 const workspaceOptions = ref<any[]>([])
 const workspaceVisible = ref(false)
 const workspaceArr = ref<any[]>([])
+
+const getRowProvider = computed(() => {
+  return (row: any) => {
+    return provider_list.value.find((p) => p.provider === row.provider)
+  }
+})
 function filterWorkspaceChange(val: string) {
   if (val === 'clear') {
     workspaceArr.value = []
   }
-  list_model()
+  getList()
   workspaceVisible.value = false
 }
 async function getWorkspaceList() {
@@ -222,19 +230,24 @@ const search_type_change = () => {
   model_search_form.value = { name: '', create_user: '', model_type: '' }
 }
 
-const list_model = () => {
-  ModelResourceApi.getModelList({ ...model_search_form.value }, loading).then((ok: any) => {
-    model_list.value = ok.data
-    const v = model_list.value.map((m) => ({ id: m.user_id, username: m.username }))
-    if (user_options.value.length === 0) {
-      user_options.value = Array.from(new Map(v.map((item) => [item.id, item])).values())
-    }
+function getList() {
+  ModelResourceApi.getModelListPage(paginationConfig, model_search_form.value, loading).then(
+    (res: any) => {
+      paginationConfig.total = res.data?.total
+      modelList.value = res.data?.records
+    },
+  )
+}
+function getProvider() {
+  model.asyncGetProvider(loading).then((res: any) => {
+    provider_list.value = res?.data
+    getList()
   })
 }
 
 onMounted(() => {
   getWorkspaceList()
-  // list_model()
+  getProvider()
 })
 </script>
 

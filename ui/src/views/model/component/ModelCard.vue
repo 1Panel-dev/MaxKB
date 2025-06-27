@@ -38,8 +38,7 @@
           >{{ $t('views.model.modelForm.model_type.label') }}
         </el-text>
         <span class="ellipsis ml-16">
-          {{ $t(modelType[model.model_type as keyof typeof modelType]) }}</span
-        >
+          {{ $t(modelType[model.model_type as keyof typeof modelType]) }}</span>
       </li>
       <li class="flex">
         <el-text type="info" class="color-secondary"
