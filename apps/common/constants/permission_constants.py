@@ -12,6 +12,8 @@ from typing import List
 from django.db import models
 from django.utils.translation import gettext as _
 
+from maxkb import settings
+
 
 class Group(Enum):
     """
@@ -314,7 +316,7 @@ class Permission:
     """
 
     def __init__(self, group: Group, operate: Operate, resource_path=None, role_list=None,
-                 resource_permission_group_list=None, parent_group=None, label=None):
+                 resource_permission_group_list=None, parent_group=None, label=None, is_ee=True):
         if role_list is None:
             role_list = []
         if resource_permission_group_list is None:
@@ -328,6 +330,7 @@ class Permission:
         self.resource_permission_group_list = resource_permission_group_list
         self.parent_group = parent_group  # 新增字段：父级组
         self.label = label
+        self.is_ee = is_ee  # 是否是企业版权限
 
     @staticmethod
     def new_instance(permission_str: str):
@@ -603,39 +606,39 @@ class PermissionConstants(Enum):
 
     WORKSPACE_READ = Permission(
         group=Group.WORKSPACE, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        parent_group=[SystemGroup.WORKSPACE]
+        parent_group=[SystemGroup.WORKSPACE], is_ee=settings.edition == "EE"
     )
     WORKSPACE_CREATE = Permission(
         group=Group.WORKSPACE, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN],
-        parent_group=[SystemGroup.WORKSPACE]
+        parent_group=[SystemGroup.WORKSPACE], is_ee=settings.edition == "EE"
     )
     WORKSPACE_EDIT = Permission(
         group=Group.WORKSPACE, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN],
-        parent_group=[SystemGroup.WORKSPACE]
+        parent_group=[SystemGroup.WORKSPACE], is_ee=settings.edition == "EE"
     )
     WORKSPACE_DELETE = Permission(
         group=Group.WORKSPACE, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN],
-        parent_group=[SystemGroup.WORKSPACE]
+        parent_group=[SystemGroup.WORKSPACE], is_ee=settings.edition == "EE"
     )
     WORKSPACE_ADD_MEMBER = Permission(
         group=Group.WORKSPACE, operate=Operate.ADD_MEMBER, role_list=[RoleConstants.ADMIN],
-        parent_group=[SystemGroup.WORKSPACE]
+        parent_group=[SystemGroup.WORKSPACE], is_ee=settings.edition == "EE"
     )
     WORKSPACE_REMOVE_MEMBER = Permission(
         group=Group.WORKSPACE, operate=Operate.REMOVE_MEMBER, role_list=[RoleConstants.ADMIN],
-        parent_group=[SystemGroup.WORKSPACE]
+        parent_group=[SystemGroup.WORKSPACE], is_ee=settings.edition == "EE"
     )
     WORKSPACE_WORKSPACE_READ = Permission(
         group=Group.WORKSPACE_WORKSPACE, operate=Operate.READ, role_list=[RoleConstants.ADMIN],
-        parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT]
+        parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT], is_ee=settings.edition == "EE"
     )
     WORKSPACE_WORKSPACE_ADD_MEMBER = Permission(
         group=Group.WORKSPACE_WORKSPACE, operate=Operate.ADD_MEMBER, role_list=[RoleConstants.ADMIN],
-        parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT]
+        parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT], is_ee=settings.edition == "EE"
     )
     WORKSPACE_WORKSPACE_REMOVE_MEMBER = Permission(
         group=Group.WORKSPACE_WORKSPACE, operate=Operate.REMOVE_MEMBER, role_list=[RoleConstants.ADMIN],
-        parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT]
+        parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT], is_ee=settings.edition == "EE"
     )
     LOGIN_AUTH_READ = Permission(
         group=Group.LOGIN_AUTH, operate=Operate.READ, role_list=[RoleConstants.ADMIN],
