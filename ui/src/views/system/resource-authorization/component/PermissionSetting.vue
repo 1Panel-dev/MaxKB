@@ -8,9 +8,7 @@
           <el-radio :value="true" size="large">{{
             $t('views.resourceAuthorization.priority.role')
           }}</el-radio>
-          <el-radio :value="false" size="large">{{
-            $t('common.custom')
-          }}</el-radio>
+          <el-radio :value="false" size="large">{{ $t('common.custom') }}</el-radio>
         </el-radio-group>
       </div>
       <el-input
@@ -33,17 +31,9 @@
       <el-table-column class-name="folder-flex" prop="name" :label="$t('common.name')">
         <template #default="{ row }">
           <div class="flex align-center">
+            <!-- 文件夹 icon -->
             <el-avatar
-              v-if="isApplication && isAppIcon(row?.icon)"
-              style="background: none"
-              class="mr-12"
-              shape="square"
-              :size="20"
-            >
-              <img :src="row?.icon" alt="" />
-            </el-avatar>
-            <el-avatar
-              v-else-if="row.isFolder"
+              v-if="row.isFolder"
               class="mr-12"
               shape="square"
               :size="20"
@@ -55,10 +45,31 @@
                 alt=""
               />
             </el-avatar>
-            <LogoIcon v-else-if="isApplication" height="32px" class="mr-12" />
-
+            <!--  知识库 icon -->
             <KnowledgeIcon class="mr-12" :size="20" v-else-if="isKnowledge" :type="row.icon" />
-
+            <!--  应用/工具 自定义 icon -->
+            <el-avatar
+              v-else-if="isAppIcon(row?.icon) && !isModel"
+              style="background: none"
+              class="mr-12"
+              shape="square"
+              :size="20"
+            >
+              <img :src="row?.icon" alt="" />
+            </el-avatar>
+            <!--  应用 icon -->
+            <LogoIcon v-else-if="isApplication" height="20px" class="mr-12" />
+            <!-- 工具 icon -->
+            <el-avatar v-else-if="isTool" class="avatar-green mr-12" shape="square" :size="20">
+              <img src="@/assets/node/icon_tool.svg" style="width: 58%" alt="" />
+            </el-avatar>
+            <!-- 模型 icon -->
+            <span
+              v-else-if="isModel"
+              style="width: 24px; height: 24px; display: inline-block"
+              class="mr-12"
+              :innerHTML="getProviderIcon(row)"
+            ></span>
             <span :title="row?.name">
               {{ row?.name }}
             </span>
@@ -160,11 +171,13 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from 'vue'
+import type { Provider } from '@/api/type/model'
 import { AuthorizationEnum } from '@/enums/system'
 import { isAppIcon } from '@/utils/common'
 import { EditionConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
-
+import useStore from '@/stores'
+const { model } = useStore()
 const props = defineProps({
   data: {
     type: Array,
@@ -185,7 +198,8 @@ const radioRole = computed({
 })
 const isKnowledge = computed(() => props.type === AuthorizationEnum.KNOWLEDGE)
 const isApplication = computed(() => props.type === AuthorizationEnum.APPLICATION)
-
+const isTool = computed(() => props.type === AuthorizationEnum.TOOL)
+const isModel = computed(() => props.type === AuthorizationEnum.MODEL)
 const dfsPermission = (arr: any = [], Name: string | number, e: boolean, idArr: any[]) => {
   arr.map((item: any) => {
     if (idArr.includes(item.id)) {
@@ -218,6 +232,24 @@ function checkedOperateChange(Name: string | number, row: any, e: boolean) {
   dfsPermission(props.data, Name, e, [row.id])
   emit('refreshData')
 }
+
+const provider_list = ref<Array<Provider>>([])
+function getProvider() {
+  model.asyncGetProvider().then((res: any) => {
+    provider_list.value = res?.data
+  })
+}
+
+const getProviderIcon = computed(() => {
+  return (row: any) => {
+    return provider_list.value.find((p) => p.provider === row.icon)?.icon
+  }
+})
+onMounted(() => {
+  if (isModel.value) {
+    getProvider()
+  }
+})
 </script>
 <style lang="scss" scoped>
 :deep(.folder-flex) {

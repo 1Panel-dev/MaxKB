@@ -140,7 +140,53 @@ const systemRouter = {
         parentName: 'system',
         sameRoute: 'authorization',
       },
-      component: () => import('@/views/system/resource-authorization/index.vue'),
+
+      children: [
+        {
+          path: '/system/authorization/application',
+          name: 'authorizationApplication',
+          meta: {
+            title: 'views.application.title',
+            activeMenu: '/system',
+            parentPath: '/system',
+            parentName: 'system',
+          },
+          component: () => import('@/views/system/resource-authorization/index.vue'),
+        },
+        {
+          path: '/system/authorization/knowledge',
+          name: 'authorizationKnowledge',
+          meta: {
+            title: 'views.knowledge.title',
+            activeMenu: '/system',
+            parentPath: '/system',
+            parentName: 'system',
+          },
+          component: () => import('@/views/system/resource-authorization/index.vue'),
+        },
+        {
+          path: '/system/authorization/tool',
+          name: 'authorizationTool',
+          meta: {
+            title: 'views.tool.title',
+            activeMenu: '/system',
+            parentPath: '/system',
+            parentName: 'system',
+          },
+          component: () => import('@/views/system/resource-authorization/index.vue'),
+        },
+        {
+          path: '/system/authorization/model',
+          name: 'authorizationModel',
+          meta: {
+            title: 'views.model.title',
+            activeMenu: '/system',
+            parentPath: '/system',
+            parentName: 'system',
+          },
+          component: () => import('@/views/system/resource-authorization/index.vue'),
+        },
+      ],
     },
     {
       path: '/system/shared',

@@ -52,7 +52,7 @@
         <div class="permission-setting p-24 flex" v-loading="rLoading">
           <div class="resource-authorization__table">
             <h4 class="mb-4">{{ $t('views.resourceAuthorization.permissionSetting') }}</h4>
-            <el-tabs
+            <!-- <el-tabs
               v-model="activeName"
               @tab-change="handleTabChange"
               class="resource-authorization__tabs"
@@ -62,18 +62,17 @@
                 :key="item.value"
                 :label="item.label"
                 :name="item.value"
-              >
-                <PermissionSetting
-                  :key="index"
-                  :data="item.data"
-                  :type="item.value"
-                  :tableHeight="tableHeight"
-                  :manage="isManage(currentType)"
-                  @refreshData="refreshData"
-                  v-model:isRole="item.isRole"
-                ></PermissionSetting>
-              </el-tab-pane>
-            </el-tabs>
+              > -->
+            <PermissionSetting
+              :data="activeData.data"
+              :type="activeData.type"
+              :tableHeight="tableHeight"
+              :manage="isManage(currentType)"
+              @refreshData="refreshData"
+              v-model:isRole="activeData.isRole"
+            ></PermissionSetting>
+            <!-- </el-tab-pane> -->
+            <!-- </el-tabs> -->
           </div>
 
           <div class="submit-button">
@@ -87,6 +86,7 @@
 
 <script lang="ts" setup>
 import { onMounted, ref, reactive, watch, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import AuthorizationApi from '@/api/system/resource-authorization'
 import PermissionSetting from './component/PermissionSetting.vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
@@ -98,6 +98,7 @@ import { EditionConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
 import WorkspaceApi from '@/api/workspace/workspace.ts'
 import type { WorkspaceItem } from '@/api/type/workspace'
+const route = useRoute()
 const { user } = useStore()
 const loading = ref(false)
 const rLoading = ref(false)
@@ -106,36 +107,45 @@ const filterMember = ref<any[]>([]) // 搜索过滤后列表
 const currentUser = ref<string>('')
 const currentType = ref<string>('')
 const filterText = ref('')
-
-const activeName = ref(AuthorizationEnum.KNOWLEDGE)
 const tableHeight = ref(0)
 
 const settingTags = reactive([
   {
     label: t('views.knowledge.title'),
-    value: AuthorizationEnum.KNOWLEDGE,
+    type: AuthorizationEnum.KNOWLEDGE,
     data: [] as any,
     isRole: false,
   },
   {
     label: t('views.application.title'),
-    value: AuthorizationEnum.APPLICATION,
+    type: AuthorizationEnum.APPLICATION,
     data: [] as any,
     isRole: false,
   },
   {
     label: t('views.tool.title'),
-    value: AuthorizationEnum.TOOL,
+    type: AuthorizationEnum.TOOL,
     data: [] as any,
     isRole: false,
   },
   {
     label: t('views.model.title'),
-    value: AuthorizationEnum.MODEL,
+    type: AuthorizationEnum.MODEL,
     data: [] as any,
     isRole: false,
   },
 ])
+
+// 当前激活的数据类型（应用/知识库/模型/工具）
+
+const activeData = computed(() => {
+  var lastIndex = route.path.lastIndexOf('/')
+  const currentPathType = route.path.substring(lastIndex + 1).toUpperCase()
+  return settingTags.filter((item) => {
+    return item.type === currentPathType
+  })[0]
+})
+
 
 watch(filterText, (val: any) => {
   if (val) {
@@ -287,7 +297,7 @@ const handleTabChange = () => {
 function getFolder() {
   return AuthorizationApi.getSystemFolder(
     currentWorkspaceId.value || 'default',
-    activeName.value,
+    activeData.value.type,
     {},
     loading,
   )
@@ -305,12 +315,12 @@ const getWholeTree = async (user_id: string) => {
     settingTags.map((item: any) => {
       let folderIdMap = []
       const folderTree = cloneDeep((parentRes as unknown as any).data)
-      if (Object.keys(childrenRes.data).indexOf(item.value) !== -1) {
+      if (Object.keys(childrenRes.data).indexOf(item.type) !== -1) {
         item.isRole =
-          childrenRes.data[item.value].length > 0 && hasPermission([EditionConst.IS_EE], 'OR')
-            ? childrenRes.data[item.value][0].auth_type == 'ROLE'
+          childrenRes.data[item.type].length > 0 && hasPermission([EditionConst.IS_EE], 'OR')
+            ? childrenRes.data[item.type][0].auth_type == 'ROLE'
             : false
-        folderIdMap = getFolderIdMap(childrenRes.data[item.value])
+        folderIdMap = getFolderIdMap(childrenRes.data[item.type])
         dfsFolder(folderTree, folderIdMap)
         const permissionHalf = {
           VIEW: [],
@@ -329,7 +339,7 @@ const getWholeTree = async (user_id: string) => {
 
 const refreshData = () => {
   settingTags.map((item: any) => {
-    if (activeName.value === item.value) {
+    if (activeData.value.type === item.type) {
       const permissionHalf = {
         VIEW: [],
         MANAGE: [],
