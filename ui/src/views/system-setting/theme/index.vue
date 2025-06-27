@@ -244,7 +244,13 @@
     </el-scrollbar>
     <div class="theme-setting__operate w-full p-16-24">
       <el-button @click="resetTheme">{{ $t('theme.abandonUpdate') }}</el-button>
-      <el-button type="primary" @click="updateTheme(themeFormRef)">
+      <el-button type="primary" @click="updateTheme(themeFormRef)"
+        v-hasPermission="
+                      new ComplexPermission(
+                        [RoleConst.ADMIN],
+                        [PermissionConst.APPEARANCE_SETTINGS_EDIT],
+                        [],'OR',)"
+      >
         {{ $t('theme.saveAndApply') }}
       </el-button>
     </div>
@@ -262,6 +268,8 @@ import ThemeApi from '@/api/system-settings/theme'
 import { MsgSuccess, MsgError } from '@/utils/message'
 import useStore from '@/stores'
 import { t } from '@/locales'
+import { PermissionConst, RoleConst } from '@/utils/permission/data'
+import { ComplexPermission } from '@/utils/permission/type'
 
 const { theme } = useStore()
 const router = useRouter()

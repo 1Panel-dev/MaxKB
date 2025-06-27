@@ -22,6 +22,7 @@ import OAuth2 from './component/OAuth2.vue'
 import { t } from '@/locales'
 import useStore from '@/stores'
 
+
 const { user } = useStore()
 const router = useRouter()
 
