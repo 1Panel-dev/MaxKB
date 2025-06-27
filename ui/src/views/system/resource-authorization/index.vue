@@ -52,7 +52,7 @@
         </div>
         <div class="permission-setting p-24 flex" v-loading="rLoading">
           <div class="resource-authorization__table">
-            <h4 class="mb-4">{{ $t('views.resourceAuthorization.permissionSetting') }}</h4>
+            <h4 class="mb-16">{{ $t('views.resourceAuthorization.permissionSetting') }}</h4>
             <!-- <el-tabs
               v-model="activeName"
               @tab-change="handleTabChange"
