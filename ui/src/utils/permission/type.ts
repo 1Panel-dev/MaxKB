@@ -84,6 +84,23 @@ export class Permission {
   getApplicationWorkspaceResourcePermission = (resource_id: string) => {
     return this.getWorkspaceResourcePermission('APPLICATION', resource_id)
   }
+  /**
+   * 
+   * @param resource_id 资源id
+   * @returns 工作空间下模型资源权限
+   */
+  getModelWorkspaceResourcePermission = (resource_id: string) => {
+    return this.getWorkspaceResourcePermission('MODEL', resource_id)
+  }
+  /**
+   * 
+   * @param resource_id 
+   * @returns 工作空间下工具资源权限
+   */
+  getToolWorkspaceResourcePermission = (resource_id: string) => {
+    return this.getWorkspaceResourcePermission('TOOL', resource_id)
+  }
+
   toString() {
     return this.permission
   }
