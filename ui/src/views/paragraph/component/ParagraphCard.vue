@@ -137,7 +137,7 @@ function changeState(row: any) {
 const GenerateRelatedDialogRef = ref<InstanceType<typeof GenerateRelatedDialog>>()
 function openGenerateDialog(row: any) {
   if (GenerateRelatedDialogRef.value) {
-    GenerateRelatedDialogRef.value.open([], 'paragraph', row.id)
+    GenerateRelatedDialogRef.value.open([row.id], 'paragraph', row.id)
   }
 }
 function deleteParagraph(row: any) {

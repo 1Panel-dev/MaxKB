@@ -190,8 +190,8 @@ const submitHandle = async (formEl: FormInstance) => {
 
 function getModelFn() {
   loading.value = true
-  loadSharedApi({ type: 'knowledge', systemType: props.apiType })
-    .getKnowledgeModel()
+  loadSharedApi({ type: 'model', systemType: props.apiType })
+    .getSelectModelList({ model_type: 'LLM' })
     .then((res: any) => {
       modelOptions.value = groupBy(res?.data, 'provider')
       loading.value = false
