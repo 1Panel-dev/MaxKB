@@ -10,16 +10,7 @@ const workspace = {
         [EditionConst.IS_EE],'OR'),
       'OR',
     ),
-  delete: () =>
-    hasPermission(
-      [
-        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-        RoleConst.USER.getWorkspaceRole,
-        PermissionConst.TOOL_DELETE.getWorkspacePermission,
-        PermissionConst.TOOL_DELETE.getWorkspacePermissionWorkspaceManageRole
-      ],
-      'OR',
-    ),
+
   create: () =>
     hasPermission(
       [
@@ -30,52 +21,59 @@ const workspace = {
       ],
       'OR'
     ),
-  switch: () =>
+  delete: (source_id:string) =>
     hasPermission(
       [
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-        RoleConst.USER.getWorkspaceRole,
-        PermissionConst.TOOL_EDIT.getWorkspacePermission,
+        PermissionConst.TOOL_DELETE.getToolWorkspaceResourcePermission(source_id),
+        PermissionConst.TOOL_DELETE.getWorkspacePermissionWorkspaceManageRole
+      ],
+      'OR',
+    ),
+  switch: (source_id:string) =>
+    hasPermission(
+      [
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.TOOL_EDIT.getToolWorkspaceResourcePermission(source_id),
         PermissionConst.TOOL_EDIT.getWorkspacePermissionWorkspaceManageRole
       ],
       'OR'
     ),
-  edit: () =>
+  edit: (source_id:string) =>
     hasPermission(
       [
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-        RoleConst.USER.getWorkspaceRole,
-        PermissionConst.TOOL_EDIT.getWorkspacePermission,
+        PermissionConst.TOOL_EDIT.getToolWorkspaceResourcePermission(source_id),
         PermissionConst.TOOL_EDIT.getWorkspacePermissionWorkspaceManageRole
       ],
       'OR'
     ),
-  copy: () =>
+  copy: (source_id:string) =>
     hasPermission(
       [
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
         RoleConst.USER.getWorkspaceRole,
-        PermissionConst.TOOL_EXPORT.getWorkspacePermission,
+        PermissionConst.TOOL_EXPORT.getToolWorkspaceResourcePermission(source_id),
         PermissionConst.TOOL_EXPORT.getWorkspacePermissionWorkspaceManageRole
       ],
       'OR'
     ),
-  export: () =>
+  export: (source_id:string) =>
     hasPermission(
       [
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
         RoleConst.USER.getWorkspaceRole,
-        PermissionConst.TOOL_EXPORT.getWorkspacePermission,
+        PermissionConst.TOOL_EXPORT.getToolWorkspaceResourcePermission(source_id),
         PermissionConst.TOOL_EXPORT.getWorkspacePermissionWorkspaceManageRole
       ],
       'OR'
     ), 
-  debug: () =>
+  debug: (source_id:string) =>
     hasPermission(
       [
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
         RoleConst.USER.getWorkspaceRole,
-        PermissionConst.TOOL_DEBUG.getWorkspacePermission,
+        PermissionConst.TOOL_DEBUG.getToolWorkspaceResourcePermission(source_id),
         PermissionConst.TOOL_DEBUG.getWorkspacePermissionWorkspaceManageRole
       ],
       'OR'

@@ -5,47 +5,44 @@ const workspace = {
   is_share: () =>
     hasPermission(
       new ComplexPermission(
-        [RoleConst.ADMIN,RoleConst.USER.getWorkspaceRole,RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+        [RoleConst.USER.getWorkspaceRole,RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
         [PermissionConst.MODEL_READ.getWorkspacePermission,PermissionConst.MODEL_READ.getWorkspacePermissionWorkspaceManageRole],
         [EditionConst.IS_EE],'OR'),
       'OR',
     ),
-  addModel: () =>
+  addModel: (source_id:string) =>
     hasPermission(
       [
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
         RoleConst.USER.getWorkspaceRole,
-        PermissionConst.MODEL_CREATE.getWorkspacePermission,
+        PermissionConst.MODEL_CREATE.getModelWorkspaceResourcePermission(source_id),
         PermissionConst.MODEL_CREATE.getWorkspacePermissionWorkspaceManageRole
       ],
       'OR'
     ),
-  modify: () =>
+  modify: (source_id:string) =>
     hasPermission(
       [
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-        RoleConst.USER.getWorkspaceRole,
-        PermissionConst.MODEL_EDIT.getWorkspacePermission,
+        PermissionConst.MODEL_EDIT.getModelWorkspaceResourcePermission(source_id),
         PermissionConst.MODEL_EDIT.getWorkspacePermissionWorkspaceManageRole
       ],
       'OR'
     ),
-  paramSetting: () =>
+  paramSetting: (source_id:string) =>
     hasPermission(
       [
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-        RoleConst.USER.getWorkspaceRole,
-        PermissionConst.MODEL_EDIT.getWorkspacePermission,
+        PermissionConst.MODEL_EDIT.getModelWorkspaceResourcePermission(source_id),
         PermissionConst.MODEL_EDIT.getWorkspacePermissionWorkspaceManageRole
       ],
       'OR'
     ),
-  delete: () =>
+  delete: (source_id:string) =>
     hasPermission(
       [
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-        RoleConst.USER.getWorkspaceRole,
-        PermissionConst.MODEL_DELETE.getWorkspacePermission,
+        PermissionConst.MODEL_DELETE.getModelWorkspaceResourcePermission(source_id),
         PermissionConst.MODEL_DELETE.getWorkspacePermissionWorkspaceManageRole
       ],
       'OR'

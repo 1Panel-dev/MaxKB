@@ -71,7 +71,7 @@
         <template #dropdown>
           <el-dropdown-menu>
             <el-dropdown-item
-              v-if="permissionPrecise.modify()"
+              v-if="permissionPrecise.modify(id)"
               icon="EditPen"
               text
               @click.stop="openEditModel"
@@ -91,7 +91,7 @@
                 currentModel.model_type === 'LLM' ||
                 currentModel.model_type === 'IMAGE' ||
                 currentModel.model_type === 'TTI' ||
-                permissionPrecise.paramSetting()
+                permissionPrecise.paramSetting(id)
               "
               icon="Setting"
               @click.stop="openParamSetting"
@@ -103,7 +103,7 @@
               icon="Delete"
               text
               @click.stop="deleteModel"
-              v-if="permissionPrecise.delete()"
+              v-if="permissionPrecise.delete(id)"
             >
               {{ $t('common.delete') }}
             </el-dropdown-item>
@@ -130,7 +130,13 @@ import ParamSettingDialog from './ParamSettingDialog.vue'
 import AuthorizedWorkspace from '@/views/system-shared/AuthorizedWorkspaceDialog.vue'
 import { t } from '@/locales'
 import permissionMap from '@/permission'
+import { useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+
+const route = useRoute()
+const {
+  params: {id, folderId},  //id is ModelID
+} = route as any
 
 const props = defineProps<{
   model: Model
