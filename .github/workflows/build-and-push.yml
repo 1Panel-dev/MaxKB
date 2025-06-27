@@ -73,6 +73,8 @@ jobs:
             ${DOCKER_IMAGE_TAGS} .
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
+        with:
+          cache-image: false
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Login to GitHub Container Registry
@@ -131,6 +133,8 @@ jobs:
             ${DOCKER_IMAGE_TAGS} .
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
+        with:
+          cache-image: false
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Login to GitHub Container Registry
