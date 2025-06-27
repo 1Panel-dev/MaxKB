@@ -15,7 +15,7 @@ from rest_framework.views import APIView
 from common import result
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
-from common.constants.permission_constants import PermissionConstants, RoleConstants
+from common.constants.permission_constants import PermissionConstants, RoleConstants, Permission, Group, Operate
 from common.log.log import log
 from common.result import DefaultResultSerializer
 from system_manage.api.user_resource_permission import UserResourcePermissionAPI, EditUserResourcePermissionAPI
@@ -43,11 +43,13 @@ class WorkSpaceUserResourcePermissionView(APIView):
         responses=UserResourcePermissionAPI.get_response(),
         tags=[_('Resources authorization')]  # type: ignore
     )
-    @has_permissions(PermissionConstants.WORKSPACE_USER_RESOURCE_PERMISSION_READ.get_workspace_permission(),
-                     RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
-    def get(self, request: Request, workspace_id: str, user_id: str):
+    @has_permissions(
+        lambda r, kwargs: Permission(group=Group(kwargs.get('resource') + '_WORKSPACE_USER_RESOURCE_PERMISSION'),
+                                     operate=Operate.READ),
+        RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
+    def get(self, request: Request, workspace_id: str, user_id: str, resource: str):
         return result.success(UserResourcePermissionSerializer(
-            data={'workspace_id': workspace_id, 'user_id': user_id}
+            data={'workspace_id': workspace_id, 'user_id': user_id, 'auth_target_type': resource}
         ).list(request.user))
 
     @extend_schema(
@@ -62,9 +64,11 @@ class WorkSpaceUserResourcePermissionView(APIView):
     @log(menu='System', operate='Modify the resource authorization list',
          get_operation_object=lambda r, k: get_user_operation_object(k.get('user_id'))
          )
-    @has_permissions(PermissionConstants.WORKSPACE_USER_RESOURCE_PERMISSION_EDIT.get_workspace_permission(),
-                     RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
-    def put(self, request: Request, workspace_id: str, user_id: str):
+    @has_permissions(
+        lambda r, kwargs: Permission(group=Group(kwargs.get('resource') + '_WORKSPACE_USER_RESOURCE_PERMISSION'),
+                                     operate=Operate.EDIT),
+        RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
+    def put(self, request: Request, workspace_id: str, user_id: str, resource: str):
         return result.success(UserResourcePermissionSerializer(
-            data={'workspace_id': workspace_id, 'user_id': user_id}
+            data={'workspace_id': workspace_id, 'user_id': user_id, 'auth_target_type': resource}
         ).edit(request.data, request.user))

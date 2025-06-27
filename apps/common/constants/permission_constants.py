@@ -53,6 +53,11 @@ class Group(Enum):
 
     WORKSPACE_USER_RESOURCE_PERMISSION = "WORKSPACE_USER_RESOURCE_PERMISSION"
 
+    APPLICATION_WORKSPACE_USER_RESOURCE_PERMISSION = "APPLICATION_WORKSPACE_USER_RESOURCE_PERMISSION"
+    KNOWLEDGE_WORKSPACE_USER_RESOURCE_PERMISSION = "KNOWLEDGE_WORKSPACE_USER_RESOURCE_PERMISSION"
+    TOOL_WORKSPACE_USER_RESOURCE_PERMISSION = "TOOL_WORKSPACE_USER_RESOURCE_PERMISSION"
+    MODEL_WORKSPACE_USER_RESOURCE_PERMISSION = "MODEL_WORKSPACE_USER_RESOURCE_PERMISSION"
+
     EMAIL_SETTING = "EMAIL_SETTING"
     ROLE = "ROLE"
     WORKSPACE_ROLE = "WORKSPACE_ROLE"
@@ -169,7 +174,7 @@ class ResourcePermissionRole(models.TextChoices):
         return str(self) == str(other)
 
 
-class ResourcePermissionGroup(models.TextChoices):
+class ResourcePermission(models.TextChoices):
     """
     资源权限组
     """
@@ -180,6 +185,36 @@ class ResourcePermissionGroup(models.TextChoices):
 
     def __eq__(self, other):
         return str(self) == str(other)
+
+
+class Resource(models.TextChoices):
+    KNOWLEDGE = Group.KNOWLEDGE.value
+    APPLICATION = Group.APPLICATION.value
+    TOOL = Group.TOOL.value
+    MODEL = Group.MODEL.value
+
+    def __eq__(self, other):
+        return str(self) == str(other)
+
+
+class ResourcePermissionGroup:
+    def __init__(self, resource: Resource, permission: ResourcePermission):
+        self.permission = permission
+        self.resource = resource
+
+    def __eq__(self, other):
+        return str(self.permission) == str(other.permission) and str(self.resource) == str(other.resource)
+
+
+class ResourcePermissionConst:
+    KNOWLEDGE_MANGE = ResourcePermissionGroup(Resource.KNOWLEDGE, ResourcePermission.MANAGE)
+    KNOWLEDGE_VIEW = ResourcePermissionGroup(Resource.KNOWLEDGE, ResourcePermission.VIEW)
+    APPLICATION_MANGE = ResourcePermissionGroup(Resource.APPLICATION, ResourcePermission.MANAGE)
+    APPLICATION_VIEW = ResourcePermissionGroup(Resource.APPLICATION, ResourcePermission.VIEW)
+    TOOL_MANGE = ResourcePermissionGroup(Resource.TOOL, ResourcePermission.MANAGE)
+    TOOL_VIEW = ResourcePermissionGroup(Resource.TOOL, ResourcePermission.VIEW)
+    MODEL_MANGE = ResourcePermissionGroup(Resource.MODEL, ResourcePermission.MANAGE)
+    MODEL_VIEW = ResourcePermissionGroup(Resource.MODEL, ResourcePermission.VIEW)
 
 
 class ResourceAuthType(models.TextChoices):
@@ -376,188 +411,224 @@ class PermissionConstants(Enum):
 
     MODEL_CREATE = Permission(
         group=Group.MODEL, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        parent_group=[WorkspaceGroup.MODEL, UserGroup.MODEL]
+        parent_group=[WorkspaceGroup.MODEL, UserGroup.MODEL],
+        resource_permission_group_list=[ResourcePermissionConst.MODEL_MANGE]
     )
 
     MODEL_READ = Permission(
         group=Group.MODEL, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        parent_group=[WorkspaceGroup.MODEL, UserGroup.MODEL]
+        parent_group=[WorkspaceGroup.MODEL, UserGroup.MODEL],
+        resource_permission_group_list=[ResourcePermissionConst.MODEL_VIEW]
     )
 
     MODEL_EDIT = Permission(
         group=Group.MODEL, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        parent_group=[WorkspaceGroup.MODEL, UserGroup.MODEL]
+        parent_group=[WorkspaceGroup.MODEL, UserGroup.MODEL],
+        resource_permission_group_list=[ResourcePermissionConst.MODEL_MANGE]
     )
     MODEL_DELETE = Permission(
         group=Group.MODEL, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        parent_group=[WorkspaceGroup.MODEL, UserGroup.MODEL]
+        parent_group=[WorkspaceGroup.MODEL, UserGroup.MODEL],
+        resource_permission_group_list=[ResourcePermissionConst.MODEL_MANGE]
     )
     TOOL_CREATE = Permission(
         group=Group.TOOL, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL]
+        parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL],
+        resource_permission_group_list=[ResourcePermissionConst.TOOL_MANGE]
     )
 
     TOOL_EDIT = Permission(
         group=Group.TOOL, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL]
+        parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL],
+        resource_permission_group_list=[ResourcePermissionConst.TOOL_MANGE]
     )
 
     TOOL_READ = Permission(
         group=Group.TOOL, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL]
+        parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL],
+        resource_permission_group_list=[ResourcePermissionConst.TOOL_VIEW]
     )
 
     TOOL_DELETE = Permission(
         group=Group.TOOL, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL]
+        parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL],
+        resource_permission_group_list=[ResourcePermissionConst.TOOL_MANGE]
     )
 
     TOOL_DEBUG = Permission(
         group=Group.TOOL, operate=Operate.DEBUG, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL]
+        parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL],
+        resource_permission_group_list=[ResourcePermissionConst.TOOL_MANGE]
     )
     TOOL_IMPORT = Permission(
         group=Group.TOOL, operate=Operate.IMPORT, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL]
+        parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL],
+        resource_permission_group_list=[ResourcePermissionConst.TOOL_MANGE]
     )
     TOOL_EXPORT = Permission(
         group=Group.TOOL, operate=Operate.EXPORT, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL]
+        parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL],
+        resource_permission_group_list=[ResourcePermissionConst.TOOL_MANGE]
     )
     KNOWLEDGE_READ = Permission(
         group=Group.KNOWLEDGE, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        resource_permission_group_list=[ResourcePermissionGroup.VIEW],
+        resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_VIEW],
         parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
     KNOWLEDGE_CREATE = Permission(
         group=Group.KNOWLEDGE, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        resource_permission_group_list=[ResourcePermissionGroup.VIEW],
+        resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_VIEW],
         parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
     KNOWLEDGE_EDIT = Permission(
         group=Group.KNOWLEDGE, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+        resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANGE],
         parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
     KNOWLEDGE_DELETE = Permission(
         group=Group.KNOWLEDGE, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+        resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANGE],
         parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
     KNOWLEDGE_SYNC = Permission(
         group=Group.KNOWLEDGE, operate=Operate.SYNC, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+        resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANGE],
         parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
     KNOWLEDGE_EXPORT = Permission(
         group=Group.KNOWLEDGE, operate=Operate.EXPORT, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+        resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANGE],
         parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
     KNOWLEDGE_VECTOR = Permission(
         group=Group.KNOWLEDGE, operate=Operate.VECTOR, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+        resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANGE],
         parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
     KNOWLEDGE_GENERATE = Permission(
         group=Group.KNOWLEDGE, operate=Operate.GENERATE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+        resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANGE],
         parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
     KNOWLEDGE_DOCUMENT_READ = Permission(
         group=Group.KNOWLEDGE_DOCUMENT, operate=Operate.READ,
         role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        resource_permission_group_list=[ResourcePermissionGroup.VIEW],
+        resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_VIEW],
         parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
     KNOWLEDGE_DOCUMENT_CREATE = Permission(
         group=Group.KNOWLEDGE_DOCUMENT, operate=Operate.CREATE,
         role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+        resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANGE],
         parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
     KNOWLEDGE_DOCUMENT_EDIT = Permission(
         group=Group.KNOWLEDGE_DOCUMENT, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+        resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANGE],
         parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
     KNOWLEDGE_DOCUMENT_DELETE = Permission(
         group=Group.KNOWLEDGE_DOCUMENT, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+        resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANGE],
         parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
     KNOWLEDGE_DOCUMENT_SYNC = Permission(
         group=Group.KNOWLEDGE_DOCUMENT, operate=Operate.SYNC, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+        resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANGE],
         parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
     KNOWLEDGE_DOCUMENT_EXPORT = Permission(
         group=Group.KNOWLEDGE_DOCUMENT, operate=Operate.EXPORT,
         role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+        resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANGE],
         parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
     KNOWLEDGE_DOCUMENT_DOWNLOAD_SOURCE_FILE = Permission(
         group=Group.KNOWLEDGE_DOCUMENT, operate=Operate.DOWNLOAD,
         role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+        resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANGE],
         parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
     KNOWLEDGE_DOCUMENT_GENERATE = Permission(
         group=Group.KNOWLEDGE_DOCUMENT, operate=Operate.GENERATE,
         role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+        resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANGE],
         parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
     KNOWLEDGE_DOCUMENT_VECTOR = Permission(
         group=Group.KNOWLEDGE_DOCUMENT, operate=Operate.VECTOR,
         role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+        resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANGE],
         parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
     KNOWLEDGE_DOCUMENT_MIGRATE = Permission(
         group=Group.KNOWLEDGE_DOCUMENT, operate=Operate.MIGRATE,
         role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+        resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANGE],
         parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
 
     KNOWLEDGE_PROBLEM_READ = Permission(
         group=Group.KNOWLEDGE_PROBLEM, operate=Operate.READ,
         role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        resource_permission_group_list=[ResourcePermissionGroup.VIEW],
+        resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_VIEW],
         parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
     KNOWLEDGE_PROBLEM_CREATE = Permission(
         group=Group.KNOWLEDGE_PROBLEM, operate=Operate.CREATE,
         role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+        resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANGE],
         parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
     KNOWLEDGE_PROBLEM_EDIT = Permission(
         group=Group.KNOWLEDGE_PROBLEM, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+        resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANGE],
         parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
     KNOWLEDGE_PROBLEM_DELETE = Permission(
         group=Group.KNOWLEDGE_PROBLEM, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+        resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANGE],
         parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
     KNOWLEDGE_PROBLEM_RELATE = Permission(
         group=Group.KNOWLEDGE_PROBLEM, operate=Operate.RELATE,
         role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+        resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANGE],
         parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
-    WORKSPACE_USER_RESOURCE_PERMISSION_READ = Permission(
-        group=Group.WORKSPACE_USER_RESOURCE_PERMISSION, operate=Operate.READ,
+    APPLICATION_WORKSPACE_USER_RESOURCE_PERMISSION_READ = Permission(
+        group=Group.APPLICATION_WORKSPACE_USER_RESOURCE_PERMISSION, operate=Operate.READ,
         role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE]
     )
-    WORKSPACE_USER_RESOURCE_PERMISSION_EDIT = Permission(
-        group=Group.WORKSPACE_USER_RESOURCE_PERMISSION, operate=Operate.EDIT,
+    APPLICATION_WORKSPACE_USER_RESOURCE_PERMISSION_EDIT = Permission(
+        group=Group.APPLICATION_WORKSPACE_USER_RESOURCE_PERMISSION, operate=Operate.EDIT,
         role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE]
     )
+    KNOWLEDGE_WORKSPACE_USER_RESOURCE_PERMISSION_READ = Permission(
+        group=Group.KNOWLEDGE_WORKSPACE_USER_RESOURCE_PERMISSION, operate=Operate.READ,
+        role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE]
+    )
+    KNOWLEDGE_WORKSPACE_USER_RESOURCE_PERMISSION_EDIT = Permission(
+        group=Group.KNOWLEDGE_WORKSPACE_USER_RESOURCE_PERMISSION, operate=Operate.EDIT,
+        role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE]
+    )
+    TOOL_WORKSPACE_USER_RESOURCE_PERMISSION_READ = Permission(
+        group=Group.TOOL_WORKSPACE_USER_RESOURCE_PERMISSION, operate=Operate.READ,
+        role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE]
+    )
+    TOOL_WORKSPACE_USER_RESOURCE_PERMISSION_EDIT = Permission(
+        group=Group.TOOL_WORKSPACE_USER_RESOURCE_PERMISSION, operate=Operate.EDIT,
+        role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE]
+    )
+    MODEL_WORKSPACE_USER_RESOURCE_PERMISSION_READ = Permission(
+        group=Group.MODEL_WORKSPACE_USER_RESOURCE_PERMISSION, operate=Operate.READ,
+        role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE]
+    )
+    MODEL_WORKSPACE_USER_RESOURCE_PERMISSION_EDIT = Permission(
+        group=Group.MODEL_WORKSPACE_USER_RESOURCE_PERMISSION, operate=Operate.EDIT,
+        role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE]
+    )
+
     EMAIL_SETTING_READ = Permission(
         group=Group.EMAIL_SETTING, operate=Operate.READ, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.SYSTEM_SETTING]
@@ -651,141 +722,146 @@ class PermissionConstants(Enum):
     APPLICATION_READ = Permission(group=Group.APPLICATION, operate=Operate.READ,
                                   role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                   parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                  resource_permission_group_list=[ResourcePermissionGroup.VIEW],
+                                  resource_permission_group_list=[ResourcePermissionConst.APPLICATION_VIEW],
                                   )
     APPLICATION_TO_CHAT = Permission(group=Group.APPLICATION, operate=Operate.TO_CHAT,
                                      role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                      parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                     resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+                                     resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE],
                                      label=_('Chat')
                                      )
     APPLICATION_DEBUG = Permission(group=Group.APPLICATION, operate=Operate.DEBUG,
                                    role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                    parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                   resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+                                   resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE],
                                    )
 
     APPLICATION_SETTING = Permission(group=Group.APPLICATION, operate=Operate.SETTING,
                                      role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                      parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                     resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+                                     resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE],
                                      label=_('Setting')
                                      )
 
     APPLICATION_CREATE = Permission(group=Group.APPLICATION, operate=Operate.CREATE,
                                     role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                     parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                    resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+                                    resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE],
                                     )
     APPLICATION_IMPORT = Permission(group=Group.APPLICATION, operate=Operate.IMPORT,
                                     role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                     parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                    resource_permission_group_list=[ResourcePermissionGroup.MANAGE]
+                                    resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE]
                                     )
     APPLICATION_EXPORT = Permission(group=Group.APPLICATION, operate=Operate.EXPORT,
                                     role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-                                    resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+                                    resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE],
                                     parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
                                     )
 
     APPLICATION_DELETE = Permission(group=Group.APPLICATION, operate=Operate.DELETE,
                                     role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                     parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                    resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+                                    resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE],
                                     )
     APPLICATION_EDIT = Permission(group=Group.APPLICATION, operate=Operate.EDIT,
                                   role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                   parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                  resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+                                  resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE],
                                   )
 
     APPLICATION_OVERVIEW_READ = Permission(group=Group.APPLICATION_OVERVIEW, operate=Operate.READ,
                                            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                            parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                           resource_permission_group_list=[ResourcePermissionGroup.VIEW],
+                                           resource_permission_group_list=[ResourcePermissionConst.APPLICATION_VIEW],
                                            )
 
     APPLICATION_OVERVIEW_EMBED = Permission(group=Group.APPLICATION_OVERVIEW, operate=Operate.EMBED,
                                             role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                             parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                            resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+                                            resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE],
 
                                             )
 
     APPLICATION_OVERVIEW_ACCESS = Permission(group=Group.APPLICATION_OVERVIEW, operate=Operate.ACCESS,
                                              role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                              parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                             resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+                                             resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE],
 
                                              )
     APPLICATION_OVERVIEW_DISPLAY = Permission(group=Group.APPLICATION_OVERVIEW, operate=Operate.DISPLAY,
                                               role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                               parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                              resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+                                              resource_permission_group_list=[
+                                                  ResourcePermissionConst.APPLICATION_MANGE],
 
                                               )
     APPLICATION_OVERVIEW_API_KEY = Permission(group=Group.APPLICATION_OVERVIEW, operate=Operate.API_KET,
                                               role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                               parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                              resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+                                              resource_permission_group_list=[
+                                                  ResourcePermissionConst.APPLICATION_MANGE],
 
                                               )
     APPLICATION_OVERVIEW_PUBLIC = Permission(group=Group.APPLICATION_OVERVIEW, operate=Operate.PUBLIC_ACCESS,
                                              role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                              parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                             resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+                                             resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE],
 
                                              )
     # 应用接入
     APPLICATION_ACCESS_READ = Permission(group=Group.APPLICATION_ACCESS, operate=Operate.READ,
                                          role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                          parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                         resource_permission_group_list=[ResourcePermissionGroup.VIEW],
+                                         resource_permission_group_list=[ResourcePermissionConst.APPLICATION_VIEW],
 
                                          )
     APPLICATION_ACCESS_EDIT = Permission(group=Group.APPLICATION_ACCESS, operate=Operate.EDIT,
                                          role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                          parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                         resource_permission_group_list=[ResourcePermissionGroup.MANAGE])
+                                         resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE])
 
     APPLICATION_CHAT_USER_READ = Permission(group=Group.APPLICATION_CHAT_USER, operate=Operate.READ,
                                             role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                             parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                            resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+                                            resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE],
                                             )
     APPLICATION_CHAT_USER_EDIT = Permission(group=Group.APPLICATION_CHAT_USER, operate=Operate.EDIT,
                                             role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                             parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                            resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+                                            resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE],
                                             )
 
     APPLICATION_CHAT_LOG_READ = Permission(group=Group.APPLICATION_CHAT_LOG, operate=Operate.READ,
                                            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                            parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                           resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+                                           resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE],
                                            )
 
     APPLICATION_CHAT_LOG_ANNOTATION = Permission(group=Group.APPLICATION_CHAT_LOG, operate=Operate.ANNOTATION,
                                                  role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                                  parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                                 resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+                                                 resource_permission_group_list=[
+                                                     ResourcePermissionConst.APPLICATION_MANGE],
                                                  )
 
     APPLICATION_CHAT_LOG_EXPORT = Permission(group=Group.APPLICATION_CHAT_LOG, operate=Operate.EXPORT,
                                              role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                              parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                             resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+                                             resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE],
                                              )
 
     APPLICATION_CHAT_LOG_CLEAR_POLICY = Permission(group=Group.APPLICATION_CHAT_LOG, operate=Operate.CLEAR_POLICY,
                                                    role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                                    parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                                   resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+                                                   resource_permission_group_list=[
+                                                       ResourcePermissionConst.APPLICATION_MANGE],
                                                    )
     APPLICATION_CHAT_LOG_ADD_KNOWLEDGE = Permission(group=Group.APPLICATION_CHAT_LOG, operate=Operate.ADD_KNOWLEDGE,
                                                     role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                                     parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                                    resource_permission_group_list=[ResourcePermissionGroup.MANAGE],
+                                                    resource_permission_group_list=[
+                                                        ResourcePermissionConst.APPLICATION_MANGE],
                                                     )
 
     ABOUT_READ = Permission(group=Group.OTHER, operate=Operate.READ,
@@ -1183,6 +1259,7 @@ class PermissionConstants(Enum):
         group=Group.OPERATION_LOG, operate=Operate.EXPORT, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.OPERATION_LOG]
     )
+
     def get_workspace_application_permission(self):
         return lambda r, kwargs: Permission(group=self.value.group, operate=self.value.operate,
                                             resource_path=

@@ -17,7 +17,7 @@ from rest_framework import serializers
 from application.models import Application
 from common.constants.cache_version import Cache_Version
 from common.constants.permission_constants import get_default_workspace_user_role_mapping_list, RoleConstants, \
-    ResourcePermissionGroup, ResourcePermissionRole, ResourceAuthType
+    ResourcePermission, ResourcePermissionRole, ResourceAuthType
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import native_search
 from common.db.sql_execute import select_list
@@ -51,7 +51,6 @@ class UserResourcePermissionResponse(serializers.Serializer):
 
 
 class UpdateTeamMemberItemPermissionSerializer(serializers.Serializer):
-    auth_target_type = serializers.ChoiceField(required=True, choices=AuthTargetType.choices, label="授权资源")
     target_id = serializers.CharField(required=True, label=_('target id'))
     auth_type = serializers.ChoiceField(required=True, choices=ResourceAuthType.choices, label="授权类型")
     permission = PermissionSerializer(required=True, many=False)
@@ -60,34 +59,46 @@ class UpdateTeamMemberItemPermissionSerializer(serializers.Serializer):
 class UpdateUserResourcePermissionRequest(serializers.Serializer):
     user_resource_permission_list = UpdateTeamMemberItemPermissionSerializer(required=True, many=True)
 
-    def is_valid(self, *, workspace_id=None, raise_exception=False):
+    def is_valid(self, *, auth_target_type=None, workspace_id=None, raise_exception=False):
         super().is_valid(raise_exception=True)
-        user_resource_permission_list = self.data.get("user_resource_permission_list")
+        user_resource_permission_list = [{'target_id': urp.get('target_id'), 'auth_target_type': auth_target_type} for
+                                         urp in
+                                         self.data.get("user_resource_permission_list")]
         illegal_target_id_list = select_list(
             get_file_content(
                 os.path.join(PROJECT_DIR, "apps", "system_manage", 'sql', 'check_member_permission_target_exists.sql')),
             [json.dumps(user_resource_permission_list), workspace_id, workspace_id, workspace_id, workspace_id])
         if illegal_target_id_list is not None and len(illegal_target_id_list) > 0:
             raise AppApiException(500,
-                                  _('Non-existent application|knowledge base id[') + str(illegal_target_id_list) + ']')
+                                  _('Non-existent id[') + str(illegal_target_id_list) + ']')
+
+
+m_map = {
+    "KNOWLEDGE": Knowledge,
+    'TOOL': Tool,
+    'MODEL': Model,
+    'APPLICATION': Application,
+}
+sql_map = {
+    "KNOWLEDGE": 'get_knowledge_user_resource_permission.sql',
+    'TOOL': 'get_tool_user_resource_permission.sql',
+    'MODEL': 'get_model_user_resource_permission.sql',
+    'APPLICATION': 'get_application_user_resource_permission.sql'
+}
 
 
 class UserResourcePermissionSerializer(serializers.Serializer):
     workspace_id = serializers.CharField(required=True, label=_('workspace id'))
     user_id = serializers.CharField(required=True, label=_('user id'))
+    auth_target_type = serializers.CharField(required=True, label=_('resource'))
 
     def get_queryset(self):
         return {
-            "knowledge_query_set": QuerySet(Knowledge)
-            .filter(workspace_id=self.data.get('workspace_id')),
-            'tool_query_set': QuerySet(Tool)
-            .filter(workspace_id=self.data.get('workspace_id')),
-            'model_query_set': QuerySet(Model)
-            .filter(workspace_id=self.data.get('workspace_id')),
-            'application_query_set': QuerySet(Application)
-            .filter(workspace_id=self.data.get('workspace_id')),
+            'query_set': QuerySet(m_map.get(self.data.get('auth_target_type'))).filter(
+                workspace_id=self.data.get('workspace_id')),
             'workspace_user_resource_permission_query_set': QuerySet(WorkspaceUserResourcePermission).filter(
-                workspace_id=self.data.get('workspace_id'), user=self.data.get('user_id'))
+                workspace_id=self.data.get('workspace_id'), user=self.data.get('user_id'),
+                auth_target_type=self.data.get('auth_target_type'))
         }
 
     def list(self, user, with_valid=True):
@@ -97,7 +108,7 @@ class UserResourcePermissionSerializer(serializers.Serializer):
         user_id = self.data.get("user_id")
         # 用户权限列表
         user_resource_permission_list = native_search(self.get_queryset(), get_file_content(
-            os.path.join(PROJECT_DIR, "apps", "system_manage", 'sql', 'get_user_resource_permission.sql')))
+            os.path.join(PROJECT_DIR, "apps", "system_manage", 'sql', sql_map.get(self.data.get('auth_target_type')))))
         workspace_user_role_mapping_model = DatabaseModelManage.get_model("workspace_user_role_mapping")
         workspace_model = DatabaseModelManage.get_model("workspace_model")
         if workspace_user_role_mapping_model and workspace_model:
@@ -112,14 +123,14 @@ class UserResourcePermissionSerializer(serializers.Serializer):
         if is_workspace_manage:
             user_resource_permission_list = list(
                 map(lambda row: {**row,
-                                 'permission': {ResourcePermissionGroup.VIEW.value: True,
-                                                ResourcePermissionGroup.MANAGE.value: True,
+                                 'permission': {ResourcePermission.VIEW.value: True,
+                                                ResourcePermission.MANAGE.value: True,
                                                 ResourcePermissionRole.ROLE.value: True}},
                     user_resource_permission_list))
         return group_by([{**user_resource_permission, 'permission': {
             permission: True if user_resource_permission.get('permission_list').__contains__(permission) else False for
             permission in
-            [ResourcePermissionGroup.VIEW.value, ResourcePermissionGroup.MANAGE.value,
+            [ResourcePermission.VIEW.value, ResourcePermission.MANAGE.value,
              ResourcePermissionRole.ROLE.value]}}
             for user_resource_permission in user_resource_permission_list],
             key=lambda item: item.get('auth_target_type'))
@@ -128,6 +139,8 @@ class UserResourcePermissionSerializer(serializers.Serializer):
         if with_valid:
             self.is_valid(raise_exception=True)
             UpdateUserResourcePermissionRequest(data=instance).is_valid(raise_exception=True,
+                                                                        auth_target_type=self.data.get(
+                                                                            'auth_target_type'),
                                                                         workspace_id=self.data.get('workspace_id'))
         workspace_id = self.data.get("workspace_id")
         user_id = self.data.get("user_id")
@@ -135,7 +148,7 @@ class UserResourcePermissionSerializer(serializers.Serializer):
         save_list = []
         user_resource_permission_list = instance.get('user_resource_permission_list')
         workspace_user_resource_permission_exist_list = QuerySet(WorkspaceUserResourcePermission).filter(
-            workspace_id=workspace_id, user_id=user_id)
+            workspace_id=workspace_id, user_id=user_id, auth_target_type=self.data.get('auth_target_type'))
         for user_resource_permission in user_resource_permission_list:
             exist_list = [user_resource_permission_exist for user_resource_permission_exist in
                           workspace_user_resource_permission_exist_list if
@@ -147,8 +160,7 @@ class UserResourcePermissionSerializer(serializers.Serializer):
                 update_list.append(exist_list[0])
             else:
                 save_list.append(WorkspaceUserResourcePermission(target=user_resource_permission.get('target_id'),
-                                                                 auth_target_type=user_resource_permission.get(
-                                                                     'auth_target_type'),
+                                                                 auth_target_type=self.data.get('auth_target_type'),
                                                                  permission_list=[key for key in
                                                                                   user_resource_permission.get(
                                                                                       'permission').keys() if
