@@ -9,7 +9,7 @@
 在[博查开放平台](https://open.bochaai.com/overview) 上申请 API 密钥。
 ![API Key](/ui/tool/img/bocha_APIKey.jpg)
 2. 在函数库中配置
-在函数库的博查函数面板中，点击 … > 启用参数，填写 API 密钥，并启用该函数。   
+在函数库的博查函数面板中，点击 … > 启动参数，填写 API 密钥，并启用该函数。   
 ![启动参数](/ui/tool/img/bocha_setting.jpg)
 3. 在应用中使用
 在高级编排应用中，点击添加组件->函数库->博查，设置使用参数。

@@ -43,6 +43,8 @@
           <KnowledgeSource
             :data="chatRecord"
             :type="application.type"
+            :executionIsRightPanel="props.executionIsRightPanel"
+            @open-execution-detail="emit('openExecutionDetail')"
             v-if="showSource(chatRecord) && index === chatRecord.answer_text_list.length - 1"
           />
         </el-card>
@@ -83,11 +85,12 @@ const props = defineProps<{
   sendMessage: (question: string, other_params_data?: any, chat?: chatType) => Promise<boolean>
   chatManagement: any
   type: 'log' | 'ai-chat' | 'debug-ai-chat'
+  executionIsRightPanel?: boolean
 }>()
 
 const { user } = useStore()
 
-const emit = defineEmits(['update:chatRecord'])
+const emit = defineEmits(['update:chatRecord', 'openExecutionDetail'])
 
 const showAvatar = computed(() => {
   return user.isEnterprise() ? props.application.show_avatar : true

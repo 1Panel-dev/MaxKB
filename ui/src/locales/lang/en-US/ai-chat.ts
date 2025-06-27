@@ -1,4 +1,7 @@
 export default {
+  mine: 'Mine',
+  logoutContent: 'Logging out will not lose any data. You can still log in to this account.',
+  confirmModification: 'Confirm modification',
   noHistory: 'No Chat History',
   createChat: 'New Chat',
   history: 'Chat History',

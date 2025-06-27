@@ -183,54 +183,69 @@
         </el-button>
       </div>
       <div class="chat-pc__right">
-        <div class="mb-24 p-16-24 flex-between">
-          <h4 class="ellipsis-1" style="width: 66%">
-            {{ currentChatName }}
-          </h4>
+        <el-splitter>
+          <el-splitter-panel>
+            <div class="mb-24 p-16-24 flex-between">
+              <h4 class="ellipsis-1" style="width: 66%">
+                {{ currentChatName }}
+              </h4>
 
-          <span class="flex align-center" v-if="currentRecordList.length">
-            <AppIcon
-              v-if="paginationConfig.total"
-              iconName="app-chat-record"
-              class="info mr-8"
-              style="font-size: 16px"
-            ></AppIcon>
-            <span v-if="paginationConfig.total" class="lighter">
-              {{ paginationConfig.total }} {{ $t('chat.question_count') }}
-            </span>
-            <el-dropdown class="ml-8">
-              <AppIcon
-                iconName="app-export"
-                class="cursor"
-                :title="$t('chat.exportRecords')"
-              ></AppIcon>
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item @click="exportMarkdown"
-                    >{{ $t('common.export') }} Markdown</el-dropdown-item
-                  >
-                  <el-dropdown-item @click="exportHTML"
-                    >{{ $t('common.export') }} HTML</el-dropdown-item
-                  >
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown>
-          </span>
-        </div>
-        <div class="right-height chat-width">
-          <AiChat
-            ref="AiChatRef"
-            v-model:applicationDetails="applicationDetail"
-            :available="applicationAvailable"
-            type="ai-chat"
-            :appId="applicationDetail?.id"
-            :record="currentRecordList"
-            :chatId="currentChatId"
-            @refresh="refresh"
-            @scroll="handleScroll"
-          >
-          </AiChat>
-        </div>
+              <span class="flex align-center" v-if="currentRecordList.length">
+                <AppIcon
+                  v-if="paginationConfig.total"
+                  iconName="app-chat-record"
+                  class="info mr-8"
+                  style="font-size: 16px"
+                ></AppIcon>
+                <span v-if="paginationConfig.total" class="lighter">
+                  {{ paginationConfig.total }} {{ $t('chat.question_count') }}
+                </span>
+                <el-dropdown class="ml-8">
+                  <AppIcon
+                    iconName="app-export"
+                    class="cursor"
+                    :title="$t('chat.exportRecords')"
+                  ></AppIcon>
+                  <template #dropdown>
+                    <el-dropdown-menu>
+                      <el-dropdown-item @click="exportMarkdown"
+                        >{{ $t('common.export') }} Markdown</el-dropdown-item
+                      >
+                      <el-dropdown-item @click="exportHTML"
+                        >{{ $t('common.export') }} HTML</el-dropdown-item
+                      >
+                    </el-dropdown-menu>
+                  </template>
+                </el-dropdown>
+              </span>
+            </div>
+            <div class="right-height chat-width">
+              <AiChat
+                ref="AiChatRef"
+                v-model:applicationDetails="applicationDetail"
+                :available="applicationAvailable"
+                type="ai-chat"
+                :appId="applicationDetail?.id"
+                :record="currentRecordList"
+                :chatId="currentChatId"
+                executionIsRightPanel
+                @refresh="refresh"
+                @scroll="handleScroll"
+                @open-execution-detail="openExecutionDetail"
+              >
+              </AiChat>
+            </div>
+          </el-splitter-panel>
+          <el-splitter-panel class="execution-detail-panel" v-model:size="rightPanelSize"  :resizable="false" collapsible>
+            <div class="p-16 flex-between border-b">
+              <h4 class="medium">{{ $t('chat.executionDetails.title') }}</h4>
+              <el-icon size="20" class="cursor" @click="closeExecutionDetail"><Close /></el-icon>
+            </div>
+            <div class="execution-detail-content" v-loading="executionLoading">
+              <ExecutionDetailContent :detail="executionDetail" />
+            </div>
+          </el-splitter-panel>
+        </el-splitter>
       </div>
     </div>
     <div class="collapse">
@@ -258,6 +273,8 @@ import { useRouter } from 'vue-router'
 import ResetPassword from '@/layout/layout-header/avatar/ResetPassword.vue'
 import { t } from '@/locales'
 import type { ResetCurrentUserPasswordRequest } from '@/api/type/user'
+import ExecutionDetailContent from '@/components/ai-chat/component/ExecutionDetailContent.vue'
+import { cloneDeep } from 'lodash'
 
 useResize()
 
@@ -511,6 +528,22 @@ const init = () => {
 onMounted(() => {
   init()
 })
+
+const rightPanelSize = ref(0)
+const executionDetail = ref<any[]>([])
+const executionLoading = ref(false)
+async function openExecutionDetail(row: any) {
+  rightPanelSize.value = 400
+  if (row.execution_details) {
+    executionDetail.value = cloneDeep(row.execution_details)
+  } else {
+    const res = await chatAPI.getChatRecord(row.chat_id, row.record_id, executionLoading)
+    executionDetail.value = cloneDeep(res.data.execution_details)
+  }
+}
+function closeExecutionDetail() {
+  rightPanelSize.value = 0
+}
 </script>
 <style lang="scss">
 .chat-pc {
@@ -626,6 +659,24 @@ onMounted(() => {
 
     .right-height {
       height: calc(100vh - 85px);
+    }
+
+    .el-splitter-bar__collapse-icon, .el-splitter-bar__dragger {
+      display: none;
+    }
+    .execution-detail-panel {
+      background: #ffffff;
+      height: 100%;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      .execution-detail-content {
+        flex: 1;
+        overflow: hidden;
+        .execution-details {
+          padding: 16px;
+        }
+      }
     }
   }
 
