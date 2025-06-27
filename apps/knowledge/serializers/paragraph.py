@@ -259,14 +259,14 @@ class ParagraphSerializers(serializers.Serializer):
                 ProblemParagraphManage(problem_paragraph_object_list, knowledge_id)
                 .to_problem_model_list())
             # 新加的在最上面
-            paragraph.position = 0
+            paragraph.position = 1
             paragraph.save()
             # 调整位置
             if 'position' in instance:
                 if type(instance['position']) is not int:
-                    instance['position'] = 0
+                    instance['position'] = 1
             else:
-                instance['position'] = 0
+                instance['position'] = 1
 
             ParagraphSerializers.AdjustPosition(data={
                 'paragraph_id': str(paragraph.id),
@@ -498,9 +498,9 @@ class ParagraphSerializers(serializers.Serializer):
                 paragraph_list = Paragraph.objects.filter(
                     id__in=paragraph_id_list, document_id=target_document_id
                 )
-                # 将迁移的段落位置设置为从0开始的序号
+                # 将迁移的段落位置设置为从1开始的序号
                 for i, paragraph in enumerate(paragraph_list):
-                    paragraph.position = i
+                    paragraph.position = i + 1
                     paragraph.save()
             # 不同数据集迁移
             else:
@@ -544,9 +544,9 @@ class ParagraphSerializers(serializers.Serializer):
                 paragraph_list = Paragraph.objects.filter(
                     id__in=pid_list, document_id=target_document_id
                 )
-                # 将迁移的段落位置设置为从0开始的序号
+                # 将迁移的段落位置设置为从1开始的序号
                 for i, paragraph in enumerate(paragraph_list):
-                    paragraph.position = i
+                    paragraph.position = i + 1
                     paragraph.save()
                 # 修改向量段落信息
                 update_embedding_document_id(pid_list, target_document_id, target_knowledge_id, embedding_model_id)
