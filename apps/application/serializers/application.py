@@ -720,14 +720,48 @@ class ApplicationOperateSerializer(serializers.Serializer):
             self.is_valid()
         application_id = self.data.get("application_id")
         application = QuerySet(Application).get(id=application_id)
-        knowledge_list = self.list_knowledge(with_valid=False)
-        mapping_knowledge_id_list = [str(akm.knowledge_id) for akm in
-                                     QuerySet(ApplicationKnowledgeMapping).filter(application_id=application_id)]
-        knowledge_id_list = [d.get('id') for d in
-                             list(filter(lambda row: mapping_knowledge_id_list.__contains__(row.get('id')),
-                                         knowledge_list))]
+        available_knowledge_list = self.list_knowledge(with_valid=False)
+        available_knowledge_dict = {knowledge.get('id'): knowledge for knowledge in available_knowledge_list}
+        knowledge_list = []
+        knowledge_id_list = []
+        if application.type == 'SIMPLE':
+            mapping_knowledge_list = QuerySet(ApplicationKnowledgeMapping).filter(application_id=application_id)
+            knowledge_list = [available_knowledge_dict.get(str(km.knowledge_id)) for km in mapping_knowledge_list if
+                              available_knowledge_dict.__contains__(str(km.knowledge_id))]
+            knowledge_id_list = [k.get('id') for k in knowledge_list]
+        else:
+            self.update_knowledge_node(application.work_flow, available_knowledge_dict)
+
         return {**ApplicationSerializerModel(application).data,
-                'knowledge_id_list': knowledge_id_list}
+                'knowledge_id_list': knowledge_id_list,
+                'knowledge_list': knowledge_list}
+
+    @staticmethod
+    def get_search_node(work_flow):
+        if work_flow is None:
+            return []
+        return [node for node in work_flow.get('nodes', []) if node.get('type', '') == 'search-knowledge-node']
+
+    def update_knowledge_node(self, workflow, available_knowledge_dict):
+        """
+        修改知识库检索节点 数据
+        定义 all_knowledge_id_list:    所有的关联知识库
+            dataset_id_list:          当前用户可看到的关联知识库列表
+            knowledge_list:           用户
+        @param workflow:              知识库
+        @param available_knowledge_dict:   当前用户可用的知识库
+        @return:
+        """
+        knowledge_node_list = self.get_search_node(workflow)
+        for search_node in knowledge_node_list:
+            node_data = search_node.get('properties', {}).get('node_data', {})
+            # 当前知识库关联的所有知识库
+            knowledge_id_list = node_data.get('knowledge_id_list', [])
+            knowledge_list = [available_knowledge_dict.get(knowledge_id) for knowledge_id in knowledge_id_list if
+                              available_knowledge_dict.__contains__(knowledge_id)]
+            node_data['all_knowledge_id_list'] = knowledge_id_list
+            node_data['knowledge_id_list'] = [knowledge.get('id') for knowledge in knowledge_list]
+            node_data['knowledge_list'] = knowledge_list
 
     def list_knowledge(self, with_valid=True):
         if with_valid:
@@ -744,8 +778,9 @@ class ApplicationOperateSerializer(serializers.Serializer):
             # 组合查询
             query = white_list_condition | default_condition
             inner = QuerySet(knowledge_workspace_authorization_model).filter(query)
-            share_knowledge_list = [KnowledgeModelSerializer(k).data for k in QuerySet(Knowledge).filter(id__in=inner)]
-        workspace_knowledge_list = [k for k in KnowledgeSerializer.Query(
+            share_knowledge_list = [{**KnowledgeModelSerializer(k).data, 'scope': 'SHARED'} for k in
+                                    QuerySet(Knowledge).filter(id__in=inner)]
+        workspace_knowledge_list = [{**k, 'scope': 'WORKSPACE'} for k in KnowledgeSerializer.Query(
             data={
                 'folder_id': 'default',
                 'workspace_id': workspace_id,

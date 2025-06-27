@@ -139,13 +139,13 @@ const search_text = ref<string>('')
 const props = defineProps({
   show: {
     type: Boolean,
-    default: false
+    default: false,
   },
   id: {
     type: String,
-    default: ''
+    default: '',
   },
-  workflowRef: Object
+  workflowRef: Object,
 })
 
 const emit = defineEmits(['clickNodes', 'onmousedown'])
@@ -156,19 +156,19 @@ const activeName = ref('base')
 const toolList = ref<any[]>([])
 const filter_tool_lib_list = computed(() => {
   return toolList.value.filter((item: any) =>
-    item.name.toLocaleLowerCase().includes(search_text.value.toLocaleLowerCase())
+    item.name.toLocaleLowerCase().includes(search_text.value.toLocaleLowerCase()),
   )
 })
 const applicationList = ref<any[]>([])
 const filter_application_list = computed(() => {
   return applicationList.value.filter((item: any) =>
-    item.name.toLocaleLowerCase().includes(search_text.value.toLocaleLowerCase())
+    item.name.toLocaleLowerCase().includes(search_text.value.toLocaleLowerCase()),
   )
 })
 
 const filter_menu_nodes = computed(() => {
   return menuNodes.filter((item) =>
-    item.label.toLocaleLowerCase().includes(search_text.value.toLocaleLowerCase())
+    item.label.toLocaleLowerCase().includes(search_text.value.toLocaleLowerCase()),
   )
 })
 function clickNodes(item: any, data?: any, type?: string) {
@@ -180,8 +180,8 @@ function clickNodes(item: any, data?: any, type?: string) {
         tool_lib_id: data.id,
         input_field_list: data.input_field_list.map((field: any) => ({
           ...field,
-          value: field.source == 'reference' ? [] : ''
-        }))
+          value: field.source == 'reference' ? [] : '',
+        })),
       }
     }
     if (type == 'application') {
@@ -199,14 +199,14 @@ function clickNodes(item: any, data?: any, type?: string) {
             : {
                 ...(fileUploadSetting.document ? { document_list: [] } : {}),
                 ...(fileUploadSetting.image ? { image_list: [] } : {}),
-                ...(fileUploadSetting.audio ? { audio_list: [] } : {})
-              })
+                ...(fileUploadSetting.audio ? { audio_list: [] } : {}),
+              }),
         }
       } else {
         item['properties']['node_data'] = {
           name: data.name,
           icon: data.icon,
-          application_id: data.id
+          application_id: data.id,
         }
       }
     }
@@ -225,8 +225,8 @@ function onmousedown(item: any, data?: any, type?: string) {
         tool_lib_id: data.id,
         input_field_list: data.input_field_list.map((field: any) => ({
           ...field,
-          value: field.source == 'reference' ? [] : ''
-        }))
+          value: field.source == 'reference' ? [] : '',
+        })),
       }
     }
     if (type == 'application') {
@@ -244,14 +244,14 @@ function onmousedown(item: any, data?: any, type?: string) {
             : {
                 ...(fileUploadSetting.document ? { document_list: [] } : {}),
                 ...(fileUploadSetting.image ? { image_list: [] } : {}),
-                ...(fileUploadSetting.audio ? { audio_list: [] } : {})
-              })
+                ...(fileUploadSetting.audio ? { audio_list: [] } : {}),
+              }),
         }
       } else {
         item['properties']['node_data'] = {
           name: data.name,
           icon: data.icon,
-          application_id: data.id
+          application_id: data.id,
         }
       }
     }

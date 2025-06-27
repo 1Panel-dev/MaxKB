@@ -527,10 +527,9 @@ const rules = reactive<FormRules<ApplicationFormType>>({
   ],
 })
 const modelOptions = ref<any>(null)
-const knowledgeList = ref([])
+const knowledgeList = ref<Array<any>>([])
 const sttModelOptions = ref<any>(null)
 const ttsModelOptions = ref<any>(null)
-const showEditIcon = ref(false)
 
 function submitPrologueDialog(val: string) {
   applicationForm.value.prologue = val
@@ -618,8 +617,9 @@ function removeKnowledge(id: any) {
   }
 }
 
-function addKnowledge(val: Array<string>) {
-  applicationForm.value.knowledge_id_list = val
+function addKnowledge(val: Array<any>) {
+  knowledgeList.value = val
+  applicationForm.value.knowledge_id_list = val.map((item) => item.id)
 }
 
 function openKnowledgeDialog() {
@@ -633,17 +633,9 @@ function getDetail() {
     applicationForm.value.stt_model_id = res.data.stt_model
     applicationForm.value.tts_model_id = res.data.tts_model
     applicationForm.value.tts_type = res.data.tts_type
+    knowledgeList.value = res.data.knowledge_list
     applicationForm.value.model_setting.no_references_prompt =
       res.data.model_setting.no_references_prompt || '{question}'
-    application.asyncGetAccessToken(id, loading).then((res: any) => {
-      applicationForm.value = { ...applicationForm.value, ...res.data }
-    })
-  })
-}
-
-function getKnowledge() {
-  knowledge.asyncGetFolderKnowledge('', knowledgeLoading).then((res: any) => {
-    knowledgeList.value = res.data
   })
 }
 
@@ -715,12 +707,11 @@ function refreshIcon() {
 }
 
 function refresh() {
-  getKnowledge()
+  // getDetail()
 }
 
 onMounted(() => {
   getSelectModel()
-  getKnowledge()
   getDetail()
   getSTTModel()
   getTTSModel()

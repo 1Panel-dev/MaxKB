@@ -9,13 +9,12 @@
 from typing import Type
 
 from django.db.models import QuerySet
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from application.flow.i_step_node import INode, NodeResult
 from common.field.common import ObjectField
-
 from tools.models.tool import Tool
-from django.utils.translation import gettext_lazy as _
 
 
 class InputField(serializers.Serializer):
@@ -36,8 +35,8 @@ class FunctionLibNodeParamsSerializer(serializers.Serializer):
             raise Exception(_('The function has been deleted'))
 
 
-class IFunctionLibNode(INode):
-    type = 'function-lib-node'
+class IToolLibNode(INode):
+    type = 'tool-lib-node'
 
     def get_node_params_serializer_class(self) -> Type[serializers.Serializer]:
         return FunctionLibNodeParamsSerializer

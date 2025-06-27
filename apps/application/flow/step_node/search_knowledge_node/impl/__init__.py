@@ -6,4 +6,4 @@
     @date：2024/6/11 15:35
     @desc:
 """
-from .base_search_dataset_node import BaseSearchDatasetNode
+from .base_search_knowledge_node import BaseSearchKnowledgeNode

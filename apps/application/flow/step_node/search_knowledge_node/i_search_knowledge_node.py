@@ -35,9 +35,9 @@ class DatasetSettingSerializer(serializers.Serializer):
 
 class SearchDatasetStepNodeSerializer(serializers.Serializer):
     # 需要查询的数据集id列表
-    dataset_id_list = serializers.ListField(required=True, child=serializers.UUIDField(required=True),
-                                            label=_("Dataset id list"))
-    dataset_setting = DatasetSettingSerializer(required=True)
+    knowledge_id_list = serializers.ListField(required=True, child=serializers.UUIDField(required=True),
+                                              label=_("Dataset id list"))
+    knowledge_setting = DatasetSettingSerializer(required=True)
 
     question_reference_address = serializers.ListField(required=True)
 
@@ -52,8 +52,8 @@ def get_paragraph_list(chat_record, node_id):
                          'paragraph_list', []) is not None and key == node_id])
 
 
-class ISearchDatasetStepNode(INode):
-    type = 'search-dataset-node'
+class ISearchKnowledgeStepNode(INode):
+    type = 'search-knowledge-node'
 
     def get_node_params_serializer_class(self) -> Type[serializers.Serializer]:
         return SearchDatasetStepNodeSerializer
