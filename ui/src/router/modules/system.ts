@@ -39,9 +39,7 @@ const systemRouter = {
             [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
             [PermissionConst.ROLE_READ, PermissionConst.WORKSPACE_ROLE_READ],
             [EditionConst.IS_EE, EditionConst.IS_PE],
-            'OR',
-          ),
-        ],
+            'OR',),],
       },
       component: () => import('@/views/system/role/index.vue'),
     },
@@ -61,9 +59,7 @@ const systemRouter = {
             [RoleConst.WORKSPACE_MANAGE, RoleConst.ADMIN],
             [PermissionConst.WORKSPACE_WORKSPACE_READ, PermissionConst.WORKSPACE_READ],
             [EditionConst.IS_EE],
-            'OR',
-          ),
-        ],
+            'OR',),],
       },
       component: () => import('@/views/system/workspace/index.vue'),
     },
@@ -77,6 +73,20 @@ const systemRouter = {
         activeMenu: '/system',
         parentPath: '/system',
         parentName: 'system',
+        permission: [
+              new ComplexPermission(
+                [RoleConst.ADMIN],
+                [PermissionConst.RESOURCE_KNOWLEDGE_READ],
+                [EditionConst.IS_EE],
+                'OR',),new ComplexPermission(
+                [RoleConst.ADMIN],
+                [PermissionConst.RESOURCE_TOOL_READ],
+                [EditionConst.IS_EE],
+                'OR',),new ComplexPermission(
+                [RoleConst.ADMIN],
+                [PermissionConst.RESOURCE_MODEL_READ],
+                [EditionConst.IS_EE],
+                'OR',),],
       },
       children: [
         // {
@@ -100,6 +110,12 @@ const systemRouter = {
             parentPath: '/system',
             parentName: 'system',
             sameRoute: 'workspace',
+            permission: [
+              new ComplexPermission(
+                [RoleConst.ADMIN],
+                [PermissionConst.RESOURCE_KNOWLEDGE_READ],
+                [EditionConst.IS_EE],
+                'OR',),],
           },
           component: () => import('@/views/system-resource-management/KnowledgeResourceIndex.vue'),
         },
@@ -112,6 +128,12 @@ const systemRouter = {
             parentPath: '/system',
             parentName: 'system',
             sameRoute: 'workspace',
+            permission: [
+              new ComplexPermission(
+                [RoleConst.ADMIN],
+                [PermissionConst.RESOURCE_TOOL_READ],
+                [EditionConst.IS_EE],
+                'OR',),],
           },
           component: () => import('@/views/system-resource-management/ToolResourceIndex.vue'),
         },
@@ -123,6 +145,12 @@ const systemRouter = {
             activeMenu: '/system',
             parentPath: '/system',
             parentName: 'system',
+            permission: [
+              new ComplexPermission(
+                [RoleConst.ADMIN],
+                [PermissionConst.RESOURCE_MODEL_READ],
+                [EditionConst.IS_EE],
+                'OR',),],
           },
           component: () => import('@/views/system-resource-management/ModelResourceIndex.vue'),
         },
@@ -139,6 +167,12 @@ const systemRouter = {
         parentPath: '/system',
         parentName: 'system',
         sameRoute: 'authorization',
+        permission: [
+              new ComplexPermission(
+                [RoleConst.ADMIN],
+                [PermissionConst.SHARED_KNOWLEDGE_READ],
+                [EditionConst.IS_EE],
+                'OR',),],
       },
 
       children: [
@@ -202,7 +236,12 @@ const systemRouter = {
         activeMenu: '/system',
         parentPath: '/system',
         parentName: 'system',
-        permission: [EditionConst.IS_EE],
+        permission: [
+              new ComplexPermission(
+                [RoleConst.ADMIN],
+                [PermissionConst.SHARED_KNOWLEDGE_READ],
+                [EditionConst.IS_EE],
+                'OR',),],
       },
       children: [
         {
@@ -218,9 +257,15 @@ const systemRouter = {
                 [RoleConst.ADMIN],
                 [PermissionConst.SHARED_KNOWLEDGE_READ],
                 [EditionConst.IS_EE],
-                'OR',
-              ),
-            ],
+                'OR',),new ComplexPermission(
+                [RoleConst.ADMIN],
+                [PermissionConst.SHARED_TOOL_READ],
+                [EditionConst.IS_EE],
+                'OR',),new ComplexPermission(
+                [RoleConst.ADMIN],
+                [PermissionConst.SHARED_MODEL_READ],
+                [EditionConst.IS_EE],
+                'OR',),],
           },
           component: () => import('@/views/system-shared/KnowLedgeSharedIndex.vue'),
         },
@@ -237,10 +282,7 @@ const systemRouter = {
                 [RoleConst.ADMIN],
                 [PermissionConst.SHARED_TOOL_READ],
                 [EditionConst.IS_EE],
-                'OR',
-              ),
-            ],
-          },
+                'OR',),],},
           component: () => import('@/views/system-shared/ToolSharedIndex.vue'),
         },
         {
@@ -256,9 +298,7 @@ const systemRouter = {
                 [RoleConst.ADMIN],
                 [PermissionConst.SHARED_MODEL_READ],
                 [EditionConst.IS_EE],
-                'OR',
-              ),
-            ],
+                'OR',),],
           },
           component: () => import('@/views/system-shared/ModelSharedIndex.vue'),
         },
@@ -279,9 +319,15 @@ const systemRouter = {
             [RoleConst.WORKSPACE_MANAGE, RoleConst.ADMIN],
             [PermissionConst.WORKSPACE_CHAT_USER_READ, PermissionConst.CHAT_USER_READ],
             [EditionConst.IS_EE, EditionConst.IS_PE],
-            'OR',
-          ),
-        ],
+            'OR',),new ComplexPermission(
+            [RoleConst.WORKSPACE_MANAGE, RoleConst.ADMIN],
+            [PermissionConst.WORKSPACE_USER_GROUP_READ, PermissionConst.USER_GROUP_READ],
+            [EditionConst.IS_EE, EditionConst.IS_PE],
+            'OR',),new ComplexPermission(
+            [RoleConst.WORKSPACE_MANAGE, RoleConst.ADMIN],
+            [PermissionConst.CHAT_USER_AUTH_READ],
+            [EditionConst.IS_EE, EditionConst.IS_PE],
+            'OR',)],
       },
       children: [
         {
@@ -298,9 +344,7 @@ const systemRouter = {
                 [RoleConst.WORKSPACE_MANAGE, RoleConst.ADMIN],
                 [PermissionConst.CHAT_USER_READ, PermissionConst.WORKSPACE_CHAT_USER_READ],
                 [EditionConst.IS_EE, EditionConst.IS_PE],
-                'OR',
-              ),
-            ],
+                'OR',),],
           },
           component: () => import('@/views/system-chat-user/chat-user/index.vue'),
         },
@@ -318,9 +362,7 @@ const systemRouter = {
                 [RoleConst.WORKSPACE_MANAGE, RoleConst.ADMIN],
                 [PermissionConst.WORKSPACE_USER_GROUP_READ, PermissionConst.USER_GROUP_READ],
                 [EditionConst.IS_EE, EditionConst.IS_PE],
-                'OR',
-              ),
-            ],
+                'OR',),],
           },
           component: () => import('@/views/system-chat-user/group/index.vue'),
         },
@@ -338,9 +380,7 @@ const systemRouter = {
                 [RoleConst.ADMIN],
                 [PermissionConst.CHAT_USER_AUTH_READ],
                 [EditionConst.IS_EE, EditionConst.IS_PE],
-                'OR',
-              ),
-            ],
+                'OR',),],
           },
           component: () => import('@/views/system-chat-user/authentication/index.vue'),
         },
@@ -357,6 +397,20 @@ const systemRouter = {
         parentPath: '/system',
         parentName: 'system',
         sameRoute: 'setting',
+        permission: [
+              new ComplexPermission(
+                [RoleConst.ADMIN],
+                [PermissionConst.APPEARANCE_SETTINGS_READ],
+                [EditionConst.IS_EE, EditionConst.IS_PE],
+                'OR',),new ComplexPermission(
+                [RoleConst.ADMIN],
+                [PermissionConst.LOGIN_AUTH_READ],
+                [EditionConst.IS_EE, EditionConst.IS_PE],
+                'OR',),new ComplexPermission(
+                [RoleConst.ADMIN],
+                [PermissionConst.EMAIL_SETTING_READ],
+                [EditionConst.IS_EE, EditionConst.IS_PE],
+                'OR',),],
       },
       children: [
         {
@@ -373,9 +427,7 @@ const systemRouter = {
                 [RoleConst.ADMIN],
                 [PermissionConst.APPEARANCE_SETTINGS_READ],
                 [EditionConst.IS_EE, EditionConst.IS_PE],
-                'OR',
-              ),
-            ],
+                'OR',),],
           },
           component: () => import('@/views/system-setting/theme/index.vue'),
         },
@@ -393,9 +445,7 @@ const systemRouter = {
                 [RoleConst.ADMIN],
                 [PermissionConst.LOGIN_AUTH_READ],
                 [EditionConst.IS_EE, EditionConst.IS_PE],
-                'OR',
-              ),
-            ],
+                'OR',),],
           },
           component: () => import('@/views/system-setting/authentication/index.vue'),
         },
@@ -413,9 +463,7 @@ const systemRouter = {
                 [RoleConst.ADMIN],
                 [PermissionConst.EMAIL_SETTING_READ],
                 [EditionConst.IS_EE, EditionConst.IS_PE],
-                'OR',
-              ),
-            ],
+                'OR',),],
           },
           component: () => import('@/views/system-setting/email/index.vue'),
         },
@@ -440,6 +488,7 @@ const systemRouter = {
             'OR',
           ),
         ],
+
       },
       component: () => import('@/views/system/operate-log/index.vue'),
     },

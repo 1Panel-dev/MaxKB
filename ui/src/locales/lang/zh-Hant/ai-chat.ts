@@ -1,4 +1,7 @@
 export default {
+  mine: '我的',
+  logoutContent: '退出登入不會遺失任何資料，您仍可登入此帳號。',
+  confirmModification: '確認修改',
   noHistory: '暫無歷史記錄',
   createChat: '新建對話',
   history: '歷史記錄',

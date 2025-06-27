@@ -81,8 +81,14 @@ const props = defineProps({
   type: {
     type: String,
     default: ''
+  },
+  executionIsRightPanel: {
+    type: Boolean,
+    required: false,
   }
 })
+
+const emit = defineEmits(['openExecutionDetail'])
 
 const ParagraphSourceDialogRef = ref()
 const ExecutionDetailDialogRef = ref()
@@ -90,6 +96,10 @@ function openParagraph(row: any, id?: string) {
   ParagraphSourceDialogRef.value.open(row, id)
 }
 function openExecutionDetail(row: any) {
+  if(props.executionIsRightPanel){
+    emit('openExecutionDetail')
+    return
+  }
   ExecutionDetailDialogRef.value.open(row)
 }
 const uniqueParagraphList = computed(() => {

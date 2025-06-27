@@ -48,6 +48,8 @@
               :type="type"
               :send-message="sendMessage"
               :chat-management="ChatManagement"
+              :executionIsRightPanel="props.executionIsRightPanel"
+              @open-execution-detail="emit('openExecutionDetail', chatList[index])"
             ></AnswerContent>
           </template>
           <TransitionContent
@@ -119,6 +121,7 @@ const props = withDefaults(
     record?: Array<chatType>
     available?: boolean
     chatId?: string
+    executionIsRightPanel?: boolean
   }>(),
   {
     applicationDetails: () => ({}),
@@ -126,7 +129,7 @@ const props = withDefaults(
     type: 'ai-chat',
   },
 )
-const emit = defineEmits(['refresh', 'scroll'])
+const emit = defineEmits(['refresh', 'scroll', 'openExecutionDetail'])
 const { application, common } = useStore()
 const isMobile = computed(() => {
   return common.isMobile() || mode === 'embed' || mode === 'mobile'
