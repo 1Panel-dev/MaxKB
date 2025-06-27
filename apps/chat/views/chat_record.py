@@ -11,6 +11,7 @@ from drf_spectacular.utils import extend_schema
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
+from application.serializers.application_chat_record import ChatRecordOperateSerializer
 from chat.api.chat_api import HistoricalConversationAPI, PageHistoricalConversationAPI, \
     PageHistoricalConversationRecordAPI, HistoricalConversationRecordAPI
 from chat.api.vote_api import VoteAPI
@@ -118,3 +119,25 @@ class HistoricalConversationRecordView(APIView):
                     'application_id': request.auth.application_id,
                     'chat_user_id': request.auth.chat_user_id,
                 }).page(current_page, page_size))
+
+
+class ChatRecordView(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(
+        methods=['GET'],
+        description=_("Get conversation details"),
+        summary=_("Get conversation details"),
+        operation_id=_("Get conversation details"),  # type: ignore
+        parameters=PageHistoricalConversationRecordAPI.get_parameters(),
+        responses=PageHistoricalConversationRecordAPI.get_response(),
+        tags=[_('Chat')]  # type: ignore
+    )
+    def get(self, request: Request, chat_id: str, chat_record_id: str):
+        return result.success(ChatRecordOperateSerializer(
+            data={
+                'chat_id': chat_id,
+                'chat_record_id': chat_record_id,
+                'application_id': request.auth.application_id,
+                'chat_user_id': request.auth.chat_user_id,
+            }).one(True))
