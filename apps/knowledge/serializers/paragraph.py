@@ -258,18 +258,15 @@ class ParagraphSerializers(serializers.Serializer):
             problem_model_list, problem_paragraph_mapping_list = (
                 ProblemParagraphManage(problem_paragraph_object_list, knowledge_id)
                 .to_problem_model_list())
-            # 插入段落
-            max_position = Paragraph.objects.filter(document_id=document_id).aggregate(
-                max_position=Max('position')
-            )['max_position'] or 0
-            paragraph.position = max_position + 1
+            # 新加的在最上面
+            paragraph.position = 0
             paragraph.save()
             # 调整位置
             if 'position' in instance:
                 if type(instance['position']) is not int:
-                    instance['position'] = max_position + 1
+                    instance['position'] = 0
             else:
-                instance['position'] = max_position + 1
+                instance['position'] = 0
 
             ParagraphSerializers.AdjustPosition(data={
                 'paragraph_id': str(paragraph.id),
