@@ -23,12 +23,9 @@
                   @click="createOrUpdate()"
                   v-hasPermission="
                     new ComplexPermission(
-                      [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
-                      [PermissionConst.WORKSPACE_USER_GROUP_CREATE.getWorkspacePermission],
-                      [],
-                      'OR',
-                    )
-                  "
+                      [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+                      [PermissionConst.WORKSPACE_USER_GROUP_CREATE, PermissionConst.USER_GROUP_CREATE],
+                      [],'OR',)"
                 >
                   <el-icon :size="18"><Plus /></el-icon>
                 </el-button>
@@ -67,20 +64,10 @@
                             <el-dropdown-item
                               @click.stop="createOrUpdate(row)"
                               class="p-8"
-                              v-if="
-                                hasPermission(
-                                  new ComplexPermission(
-                                    [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
-                                    [
-                                      PermissionConst.WORKSPACE_USER_GROUP_EDIT
-                                        .getWorkspacePermission,
-                                    ],
-                                    [],
-                                    'OR',
-                                  ),
-                                  'OR',
-                                )
-                              "
+                              v-if="hasPermission(new ComplexPermission(
+                                    [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+                                    [PermissionConst.WORKSPACE_USER_GROUP_EDIT, PermissionConst.USER_GROUP_EDIT],
+                                    [],'OR',),'OR',)"
                             >
                                <el-icon><EditPen /></el-icon>
                               {{ $t('common.rename') }}
@@ -88,21 +75,10 @@
                             <el-dropdown-item
                               @click.stop="deleteGroup(row)"
                               class="border-t p-8"
-                              v-if="
-                                row.id !== 'default' &&
-                                hasPermission(
-                                  new ComplexPermission(
-                                    [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
-                                    [
-                                      PermissionConst.WORKSPACE_USER_GROUP_DELETE
-                                        .getWorkspacePermission,
-                                    ],
-                                    [],
-                                    'OR',
-                                  ),
-                                  'OR',
-                                )
-                              "
+                              v-if="hasPermission(new ComplexPermission(
+                                    [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+                                    [PermissionConst.WORKSPACE_USER_GROUP_DELETE, PermissionConst.USER_GROUP_DELETE],
+                                    [],'OR',),'OR',)"
                             >
                               <el-icon><Delete /></el-icon>
                               {{ $t('common.delete') }}
@@ -143,12 +119,9 @@
                 @click="createUser()"
                 v-hasPermission="
                   new ComplexPermission(
-                    [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
-                    [PermissionConst.WORKSPACE_USER_GROUP_ADD_MEMBER.getWorkspacePermission],
-                    [],
-                    'OR',
-                  )
-                "
+                    [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+                    [PermissionConst.WORKSPACE_USER_GROUP_ADD_MEMBER, PermissionConst.USER_GROUP_ADD_MEMBER],
+                    [],'OR',)"
               >
                 {{ t('views.role.member.add') }}
               </el-button>
@@ -157,12 +130,9 @@
                 @click="handleDeleteUser()"
                 v-hasPermission="
                   new ComplexPermission(
-                    [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
-                    [PermissionConst.WORKSPACE_USER_GROUP_DELETE.getWorkspacePermission],
-                    [],
-                    'OR',
-                  )
-                "
+                    [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+                    [PermissionConst.WORKSPACE_USER_GROUP_REMOVE_MEMBER, PermissionConst.USER_GROUP_REMOVE_MEMBER],
+                    [],'OR',)"
               >
                 {{ $t('common.remove') }}
               </el-button>
@@ -221,12 +191,9 @@
                     @click.stop="handleDeleteUser(row)"
                     v-hasPermission="
                       new ComplexPermission(
-                        [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
-                        [PermissionConst.WORKSPACE_USER_GROUP_REMOVE_MEMBER.getWorkspacePermission],
-                        [],
-                        'OR',
-                      )
-                    "
+                        [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+                        [PermissionConst.WORKSPACE_USER_GROUP_REMOVE_MEMBER, PermissionConst.USER_GROUP_REMOVE_MEMBER],
+                        [],'OR',)"
                   >
                     <el-icon>
                       <EditPen />

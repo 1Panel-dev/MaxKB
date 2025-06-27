@@ -44,7 +44,13 @@
         </el-form>
 
         <div class="text-right">
-          <el-button @click="submit(authFormRef)" type="primary" :disabled="loading">
+          <el-button @click="submit(authFormRef)" type="primary" :disabled="loading"
+            v-hasPermission="
+                      new ComplexPermission(
+                        [RoleConst.ADMIN],
+                        [PermissionConst.USER_GROUP_REMOVE_MEMBER],
+                        [],'OR',)"
+          >
             {{ $t('common.save') }}
           </el-button>
         </div>
@@ -58,6 +64,8 @@ import authApi from '@/api/chat-user/auth-setting'
 import type {FormInstance, FormRules} from 'element-plus'
 import {t} from '@/locales'
 import {MsgSuccess} from '@/utils/message'
+import { PermissionConst, RoleConst } from '@/utils/permission/data'
+import { ComplexPermission } from '@/utils/permission/type'
 
 const form = ref<any>({
   id: '',
