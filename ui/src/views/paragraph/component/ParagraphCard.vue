@@ -121,7 +121,7 @@ function changeState(row: any) {
   }
   loadSharedApi({ type: 'paragraph', systemType: apiType.value })
     .putParagraph(id, documentId, row.id, obj, changeStateloading)
-    .then((res) => {
+    .then(() => {
       emit('changeState', row.id)
       return true
     })

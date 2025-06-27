@@ -52,8 +52,8 @@
           <template v-for="(item, index) in filter_tool_lib_list" :key="index">
             <div
               class="workflow-dropdown-item cursor flex p-8-12 align-center"
-              @click.stop="clickNodes(toolNode, item, 'tool')"
-              @mousedown.stop="onmousedown(toolNode, item, 'tool')"
+              @click.stop="clickNodes(toolLibNode, item, 'tool')"
+              @mousedown.stop="onmousedown(toolLibNode, item, 'tool')"
             >
               <component
                 :is="iconComponent(`tool-lib-node-icon`)"
@@ -130,7 +130,7 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
-import { menuNodes, toolNode, toolNode, applicationNode } from '@/workflow/common/data'
+import { menuNodes, toolNode, toolLibNode, applicationNode } from '@/workflow/common/data'
 import { iconComponent } from '@/workflow/icons/utils'
 import applicationApi from '@/api/application/application'
 import { isWorkFlow } from '@/utils/application'
@@ -171,7 +171,7 @@ const filter_menu_nodes = computed(() => {
     item.label.toLocaleLowerCase().includes(search_text.value.toLocaleLowerCase())
   )
 })
-tool clickNodes(item: any, data?: any, type?: string) {
+function clickNodes(item: any, data?: any, type?: string) {
   if (data) {
     item['properties']['stepName'] = data.name
     if (type == 'tool') {
@@ -216,7 +216,7 @@ tool clickNodes(item: any, data?: any, type?: string) {
   emit('clickNodes', item)
 }
 
-tool onmousedown(item: any, data?: any, type?: string) {
+function onmousedown(item: any, data?: any, type?: string) {
   if (data) {
     item['properties']['stepName'] = data.name
     if (type == 'tool') {
@@ -260,7 +260,7 @@ tool onmousedown(item: any, data?: any, type?: string) {
   emit('onmousedown', item)
 }
 
-tool getList() {
+function getList() {
   // applicationApi.listTool(props.id, loading).then((res: any) => {
   //   toolList.value = res.data
   // })
