@@ -57,6 +57,7 @@
       {{ $t('views.userManage.roleSetting') }}</h4>
     <MemberFormContent ref="memberFormContentRef" :models="formItemModel" v-model:form="list"
                        v-loading="memberFormContentLoading"
+                       keepOneLine
                        :addText="$t('views.userManage.addRole')" v-if="user.isEE() || user.isPE()"/>
     <template #footer>
       <el-button @click.prevent="visible = false"> {{ $t('common.cancel') }}</el-button>

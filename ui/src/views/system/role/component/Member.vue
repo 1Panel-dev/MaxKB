@@ -29,12 +29,13 @@
       </div>
     </div>
     <app-table
-      class="mt-16"
+      class="member-table mt-16"
       :data="tableData"
       :pagination-config="paginationConfig"
       @sizeChange="handleSizeChange"
       @changePage="getList"
       v-loading="loading"
+      :span-method="objectSpanMethod"
     >
       <el-table-column prop="nick_name" :label="$t('views.userManage.userForm.nick_name.label')" />
       <el-table-column prop="username" :label="$t('views.login.loginForm.username.label')" />
@@ -135,6 +136,23 @@ watch(
   },
 )
 
+const objectSpanMethod = ({ row, column, rowIndex, columnIndex }: any) => {
+  if (column.property === 'nick_name' || column.property === 'username') {
+    const sameUserRows = tableData.value.filter(item => item.user_id === row.user_id);
+    if (rowIndex === tableData.value.findIndex(item => item.user_id === row.user_id)) {
+      return {
+        rowspan: sameUserRows.length,
+        colspan: 1
+      };
+    } else {
+      return {
+        rowspan: 0,
+        colspan: 0
+      };
+    }
+  }
+};
+
 const addMemberDrawerRef = ref<InstanceType<typeof AddMemberDrawer>>()
 
 function handleAdd() {
@@ -158,3 +176,9 @@ function handleDelete(row: RoleMemberItem) {
     .catch(() => {})
 }
 </script>
+
+<style lang="scss" scoped>
+.member-table :deep(.el-table__cell):nth-child(2) {
+  border-right: 1px solid var(--el-table-border-color);
+}
+</style>

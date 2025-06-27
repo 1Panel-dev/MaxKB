@@ -12,7 +12,7 @@
           </el-select>
         </el-form-item>
         <!-- 删除按钮 -->
-        <el-button @click="handleDelete(index)" text
+        <el-button :disabled="props.keepOneLine && form.length === 1" @click="handleDelete(index)" text
           :style="{ 'margin-top': index === 0 && props.models.some((item) => item.label) ? '30px' : '' }">
           <el-icon>
             <Delete />
@@ -38,6 +38,7 @@ import type { FormItemModel } from '@/api/type/role'
 const props = defineProps<{
   models: FormItemModel[];
   addText?: string;
+  keepOneLine?: boolean; // 至少保留一行
 }>()
 
 const formRef = ref()
