@@ -150,7 +150,7 @@
                 :description="item.desc"
                 class="cursor"
                 @click.stop="openCreateDialog(item)"
-                :disabled="permissionPrecise.edit()"
+                :disabled="permissionPrecise.edit(item.id)"
               >
                 <template #icon>
                   <el-avatar
@@ -200,7 +200,7 @@
                       :before-change="() => changeState(item)"
                       size="small"
                       class="mr-4"
-                      v-if="permissionPrecise.switch()"
+                      v-if="permissionPrecise.switch(item.id)"
                     />
                     <el-divider direction="vertical" />
                     <el-dropdown trigger="click">
@@ -221,7 +221,7 @@
                             {{ $t('common.edit') }}
                           </el-dropdown-item>
                           <el-dropdown-item
-                            v-if="!item.template_id && permissionPrecise.edit()"
+                            v-if="!item.template_id && permissionPrecise.edit(item.id)"
                             @click.stop="openCreateDialog(item)"
                           >
                             <el-icon>
@@ -230,7 +230,7 @@
                             {{ $t('common.edit') }}
                           </el-dropdown-item>
                           <el-dropdown-item
-                            v-if="!item.template_id && permissionPrecise.copy()"
+                            v-if="!item.template_id && permissionPrecise.copy(item.id)"
                             @click.stop="copyTool(item)"
                           >
                             <AppIcon iconName="app-copy"></AppIcon>
@@ -250,14 +250,14 @@
                             >{{ $t('views.shared.authorized_workspace') }}</el-dropdown-item
                           >
                           <el-dropdown-item
-                            v-if="!item.template_id && permissionPrecise.export()"
+                            v-if="!item.template_id && permissionPrecise.export(item.id)"
                             @click.stop="exportTool(item)"
                           >
                             <AppIcon iconName="app-export"></AppIcon>
                             {{ $t('common.export') }}
                           </el-dropdown-item>
                           <el-dropdown-item
-                            v-if="permissionPrecise.delete()"
+                            v-if="permissionPrecise.delete(item.id)"
                             divided
                             @click.stop="deleteTool(item)"
                           >
