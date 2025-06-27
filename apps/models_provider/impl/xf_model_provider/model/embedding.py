@@ -22,6 +22,7 @@ class XFEmbedding(MaxKBBaseModel, SparkLLMTextEmbeddings):
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         return XFEmbedding(
+            base_url=model_credential.get('base_url'),
             spark_app_id=model_credential.get('spark_app_id'),
             spark_api_key=model_credential.get('spark_api_key'),
             spark_api_secret=model_credential.get('spark_api_secret')
