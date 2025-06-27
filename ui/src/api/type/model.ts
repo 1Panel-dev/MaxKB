@@ -54,6 +54,7 @@ interface Model {
   model_type: string
   user_id: string
   username: string
+  nick_name: string
   /**
    * 基础模型
    */
