@@ -1,5 +1,4 @@
 import io
-import logging
 import os
 import re
 import traceback
@@ -347,34 +346,36 @@ class DocumentSerializers(serializers.Serializer):
         # 知识库id
         workspace_id = serializers.CharField(required=True, label=_('workspace id'))
         knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
-        name = serializers.CharField(required=False, max_length=128, min_length=1, allow_null=True, allow_blank=True,
-                                     label=_('document name'))
-        hit_handling_method = serializers.CharField(required=False, label=_('hit handling method'))
-        is_active = serializers.BooleanField(required=False, label=_('document is active'))
+        name = serializers.CharField(
+            required=False, max_length=128, min_length=1, allow_null=True, allow_blank=True, label=_('document name')
+        )
+        hit_handling_method = serializers.CharField(
+            required=False, label=_('hit handling method'), allow_null=True, allow_blank=True
+        )
+        is_active = serializers.BooleanField(required=False, label=_('document is active'), allow_null=True)
         task_type = serializers.IntegerField(required=False, label=_('task type'))
-        status = serializers.CharField(required=False, label=_('status'))
-        order_by = serializers.CharField(required=False, label=_('order by'))
+        status = serializers.CharField(required=False, label=_('status'), allow_null=True, allow_blank=True)
+        order_by = serializers.CharField(required=False, label=_('order by'), allow_null=True, allow_blank=True)
 
         def get_query_set(self):
             query_set = QuerySet(model=Document)
             query_set = query_set.filter(**{'knowledge_id': self.data.get("knowledge_id")})
             if 'name' in self.data and self.data.get('name') is not None:
                 query_set = query_set.filter(**{'name__icontains': self.data.get('name')})
-            if 'hit_handling_method' in self.data and self.data.get('hit_handling_method') is not None:
+            if 'hit_handling_method' in self.data and self.data.get('hit_handling_method') not in [None, '']:
                 query_set = query_set.filter(**{'hit_handling_method': self.data.get('hit_handling_method')})
             if 'is_active' in self.data and self.data.get('is_active') is not None:
                 query_set = query_set.filter(**{'is_active': self.data.get('is_active')})
-            if 'status' in self.data and self.data.get(
-                    'status') is not None:
+            if 'status' in self.data and self.data.get('status') is not None:
                 task_type = self.data.get('task_type')
-                status = self.data.get(
-                    'status')
+                status = self.data.get('status')
                 if task_type is not None:
                     query_set = query_set.annotate(
                         reversed_status=Reverse('status'),
-                        task_type_status=Substr('reversed_status', TaskType(task_type).value,
-                                                1),
-                    ).filter(task_type_status=State(status).value).values('id')
+                        task_type_status=Substr('reversed_status', TaskType(task_type).value, 1),
+                    ).filter(
+                        task_type_status=State(status).value
+                    ).values('id')
                 else:
                     if status != State.SUCCESS.value:
                         query_set = query_set.filter(status__icontains=status)
