@@ -81,11 +81,14 @@ import { useRoute } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { t } from '@/locales'
+import useStore from "@/stores";
 
 const route = useRoute()
 const {
   params: { id, documentId }, // id为knowledgeID
 } = route as any
+
+const { user } = useStore()
 
 const apiType = computed(() => {
   if (route.path.includes('shared')) {
@@ -143,9 +146,9 @@ const defaultProps = {
 
 const loadTree = (node: any, resolve: any) => {
   if (node.isLeaf) return resolve([])
-  const folder_id = node.level === 0 ? '' : node.data.id
+  const folder_id = node.level === 0 ? user.getWorkspaceId() : node.data.id
   loadSharedApi({ type: 'knowledge', systemType: apiType.value })
-    .getKnowledgeList(folder_id, optionLoading)
+    .getKnowledgeList({folder_id: folder_id}, optionLoading)
     .then((res: any) => {
       resolve(res.data)
     })
