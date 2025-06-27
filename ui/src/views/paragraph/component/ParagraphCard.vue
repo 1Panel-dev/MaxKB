@@ -72,7 +72,11 @@
       @refresh="refresh"
       :apiType="apiType"
     />
-    <SelectDocumentDialog ref="SelectDocumentDialogRef" @refresh="refreshMigrateParagraph" />
+    <SelectDocumentDialog
+      ref="SelectDocumentDialogRef"
+      @refresh="refreshMigrateParagraph"
+      :apiType="apiType"
+    />
     <GenerateRelatedDialog ref="GenerateRelatedDialogRef" @refresh="refresh" :apiType="apiType" />
   </el-card>
 </template>

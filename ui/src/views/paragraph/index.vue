@@ -142,7 +142,11 @@
       :apiType="apiType"
       @refresh="refresh"
     />
-    <SelectDocumentDialog ref="SelectDocumentDialogRef" @refresh="refreshMigrateParagraph" />
+    <SelectDocumentDialog
+      ref="SelectDocumentDialogRef"
+      @refresh="refreshMigrateParagraph"
+      :apiType="apiType"
+    />
     <GenerateRelatedDialog ref="GenerateRelatedDialogRef" @refresh="refresh" :apiType="apiType" />
   </div>
 </template>

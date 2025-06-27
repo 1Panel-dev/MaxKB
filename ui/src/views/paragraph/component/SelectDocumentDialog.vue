@@ -80,9 +80,12 @@ import { ref, watch, reactive, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import useStore from '@/stores'
 import { t } from '@/locales'
-import useStore from "@/stores";
 
+const props = defineProps<{
+  apiType: 'systemShare' | 'workspace' | 'systemManage'
+}>()
 const route = useRoute()
 const {
   params: { id, documentId }, // id为knowledgeID
@@ -90,15 +93,6 @@ const {
 
 const { user } = useStore()
 
-const apiType = computed(() => {
-  if (route.path.includes('shared')) {
-    return 'systemShare'
-  } else if (route.path.includes('resource-management')) {
-    return 'systemManage'
-  } else {
-    return 'workspace'
-  }
-})
 const emit = defineEmits(['refresh'])
 const formRef = ref()
 
@@ -138,7 +132,8 @@ watch(dialogVisible, (bool) => {
 const defaultProps = {
   children: 'children',
   label: 'name',
-  isLeaf: (data: any) => data.resource_type && data.resource_type !== 'folder',
+  isLeaf: (data: any) =>
+    data.resource_type ? data.resource_type !== 'folder' : data.workspace_id === 'None',
   disabled: (data: any, node: any) => {
     return data.id === id
   },
@@ -147,8 +142,8 @@ const defaultProps = {
 const loadTree = (node: any, resolve: any) => {
   if (node.isLeaf) return resolve([])
   const folder_id = node.level === 0 ? user.getWorkspaceId() : node.data.id
-  loadSharedApi({ type: 'knowledge', systemType: apiType.value })
-    .getKnowledgeList({folder_id: folder_id}, optionLoading)
+  loadSharedApi({ type: 'knowledge', systemType: props.apiType })
+    .getKnowledgeList({ folder_id: folder_id }, optionLoading)
     .then((res: any) => {
       resolve(res.data)
     })
@@ -160,7 +155,7 @@ function changeKnowledge(id: string) {
 }
 
 function getDocument(id: string) {
-  loadSharedApi({ type: 'document', systemType: apiType.value })
+  loadSharedApi({ type: 'document', systemType: props.apiType })
     .getDocumentList(id, optionLoading)
     .then((res: any) => {
       documentList.value = res.data?.filter((v: any) => v.id !== documentId)
@@ -179,7 +174,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
       const obj = {
         id_list: paragraphList.value,
       }
-      loadSharedApi({ type: 'paragraph', systemType: apiType.value })
+      loadSharedApi({ type: 'paragraph', systemType: props.apiType })
         .putMigrateMulParagraph(
           id,
           documentId,

@@ -59,7 +59,7 @@
 import { ref, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
-import useStore from "@/stores";
+import useStore from '@/stores'
 const route = useRoute()
 const {
   params: { id }, // id为knowledgeID
@@ -90,18 +90,18 @@ const form = ref<any>({
 const defaultProps = {
   children: 'children',
   label: 'name',
-  isLeaf: (data: any) => data.resource_type && data.resource_type !== 'folder',
+  isLeaf: (data: any) =>
+    data.resource_type ? data.resource_type !== 'folder' : data.workspace_id === 'None',
   disabled: (data: any, node: any) => {
     return data.id === id
   },
 }
 
 const loadTree = (node: any, resolve: any) => {
-  console.log(node)
   if (node.isLeaf) return resolve([])
   const folder_id = node.level === 0 ? user.getWorkspaceId() : node.data.id
   loadSharedApi({ type: 'knowledge', systemType: apiType.value })
-    .getKnowledgeList({folder_id: folder_id}, loading)
+    .getKnowledgeList({ folder_id: folder_id }, loading)
     .then((res: any) => {
       resolve(res.data)
     })
