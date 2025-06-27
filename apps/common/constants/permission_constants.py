@@ -1179,7 +1179,10 @@ class PermissionConstants(Enum):
         group=Group.OPERATION_LOG, operate=Operate.READ, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.OPERATION_LOG]
     )
-
+    OPERATION_LOG_EXPORT = Permission(
+        group=Group.OPERATION_LOG, operate=Operate.EXPORT, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.OPERATION_LOG]
+    )
     def get_workspace_application_permission(self):
         return lambda r, kwargs: Permission(group=self.value.group, operate=self.value.operate,
                                             resource_path=

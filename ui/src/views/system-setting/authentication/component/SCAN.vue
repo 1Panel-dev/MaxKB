@@ -13,7 +13,12 @@
             </div>
             <div>
               <el-button type="primary" v-if="!item.isValid" @click="showDialog(item)"
-                >{{ $t('views.system.authentication.scanTheQRCode.access') }}
+                v-hasPermission="
+                      new ComplexPermission(
+                        [RoleConst.ADMIN],
+                        [PermissionConst.LOGIN_AUTH_EDIT],
+                        [],'OR',)"  
+              >{{ $t('views.system.authentication.scanTheQRCode.access') }}
               </el-button>
               <span v-if="item.isValid">
                 <span class="mr-4">{{
@@ -92,6 +97,8 @@ import EditModel from './EditModal.vue'
 import platformApi from '@/api/system-settings/platform-source'
 import { MsgError, MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
+import { PermissionConst, RoleConst } from '@/utils/permission/data'
+import { ComplexPermission } from '@/utils/permission/type'
 
 interface PlatformConfig {
   [key: string]: string

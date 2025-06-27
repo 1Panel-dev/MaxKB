@@ -99,6 +99,7 @@ const systemRouter = {
             activeMenu: '/system',
             parentPath: '/system',
             parentName: 'system',
+            sameRoute: 'workspace',
           },
           component: () => import('@/views/system-resource-management/KnowledgeResourceIndex.vue'),
         },
@@ -110,6 +111,7 @@ const systemRouter = {
             activeMenu: '/system',
             parentPath: '/system',
             parentName: 'system',
+            sameRoute: 'workspace',
           },
           component: () => import('@/views/system-resource-management/ToolResourceIndex.vue'),
         },
@@ -222,7 +224,6 @@ const systemRouter = {
         activeMenu: '/system',
         parentPath: '/system',
         parentName: 'system',
-        sameRoute: 'chat',
         permission: [
           new ComplexPermission(
             [RoleConst.WORKSPACE_MANAGE, RoleConst.ADMIN],
@@ -241,6 +242,7 @@ const systemRouter = {
             activeMenu: '/system',
             parentPath: '/system',
             parentName: 'system',
+            sameRoute: 'SystemChat',
             permission: [
               new ComplexPermission(
                 [RoleConst.WORKSPACE_MANAGE, RoleConst.ADMIN],
@@ -260,6 +262,7 @@ const systemRouter = {
             activeMenu: '/system',
             parentPath: '/system',
             parentName: 'system',
+            sameRoute: 'SystemChat',
             permission: [
               new ComplexPermission(
                 [RoleConst.WORKSPACE_MANAGE, RoleConst.ADMIN],
@@ -279,6 +282,7 @@ const systemRouter = {
             activeMenu: '/system',
             parentPath: '/system',
             parentName: 'system',
+            sameRoute: 'SystemChat',
             permission: [
               new ComplexPermission(
                 [RoleConst.ADMIN],
@@ -313,7 +317,15 @@ const systemRouter = {
             activeMenu: '/system',
             parentPath: '/system',
             parentName: 'system',
-            permission: [EditionConst.IS_PE, EditionConst.IS_EE],
+            sameRoute: 'setting',
+            permission: [
+              new ComplexPermission(
+                [RoleConst.ADMIN],
+                [PermissionConst.APPEARANCE_SETTINGS_READ],
+                [EditionConst.IS_EE, EditionConst.IS_PE],
+                'OR',
+              ),
+            ],
           },
           component: () => import('@/views/system-setting/theme/index.vue'),
         },
@@ -325,7 +337,15 @@ const systemRouter = {
             activeMenu: '/system',
             parentPath: '/system',
             parentName: 'system',
-            permission: [EditionConst.IS_PE, EditionConst.IS_EE],
+            sameRoute: 'setting',
+            permission: [
+              new ComplexPermission(
+                [RoleConst.ADMIN],
+                [PermissionConst.LOGIN_AUTH_READ],
+                [EditionConst.IS_EE, EditionConst.IS_PE],
+                'OR',
+              ),
+            ],
           },
           component: () => import('@/views/system-setting/authentication/index.vue'),
         },
@@ -337,6 +357,15 @@ const systemRouter = {
             activeMenu: '/system',
             parentPath: '/system',
             parentName: 'system',
+            sameRoute: 'setting',
+            permission: [
+              new ComplexPermission(
+                [RoleConst.ADMIN],
+                [PermissionConst.EMAIL_SETTING_READ],
+                [EditionConst.IS_EE, EditionConst.IS_PE],
+                'OR',
+              ),
+            ],
           },
           component: () => import('@/views/system-setting/email/index.vue'),
         },
@@ -353,7 +382,14 @@ const systemRouter = {
         parentPath: '/system',
         parentName: 'system',
         sameRoute: 'operate',
-        permission: [EditionConst.IS_PE, EditionConst.IS_EE],
+        permission: [
+              new ComplexPermission(
+                [RoleConst.ADMIN],
+                [PermissionConst.OPERATION_LOG_READ],
+                [EditionConst.IS_EE, EditionConst.IS_PE],
+                'OR',
+              ),
+            ],
       },
       component: () => import('@/views/system/operate-log/index.vue'),
     },

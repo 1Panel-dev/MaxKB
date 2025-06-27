@@ -48,7 +48,7 @@
             v-hasPermission="
                       new ComplexPermission(
                         [RoleConst.ADMIN],
-                        [PermissionConst.USER_GROUP_REMOVE_MEMBER],
+                        [PermissionConst.CHAT_USER_AUTH_EDIT],
                         [],'OR',)"
           >
             {{ $t('common.save') }}

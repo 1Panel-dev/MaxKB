@@ -52,7 +52,13 @@
                 >{{ $t('views.system.email.enableTLS') }}
               </el-checkbox>
             </el-form-item>
-            <el-button @click="submit(emailFormRef)" type="primary" :disabled="loading">
+            <el-button @click="submit(emailFormRef)" type="primary" :disabled="loading"
+              v-hasPermission="
+                      new ComplexPermission(
+                        [RoleConst.ADMIN],
+                        [PermissionConst.EMAIL_SETTING_EDIT],
+                        [],'OR',)"
+            >
               {{ $t('common.save') }}
             </el-button>
             <el-button @click="submit(emailFormRef, 'test')" :disabled="loading">
@@ -71,6 +77,8 @@ import type { FormInstance, FormRules } from 'element-plus'
 
 import { MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
+import { PermissionConst, RoleConst } from '@/utils/permission/data'
+import { ComplexPermission } from '@/utils/permission/type'
 
 const form = ref<any>({
   email_host: '',
