@@ -14,6 +14,7 @@ from django.core.cache import cache
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 
+from maxkb.const import CONFIG
 from common.auth.handle.auth_base_handle import AuthBaseHandle
 from common.constants.authentication_type import AuthenticationType
 from common.constants.cache_version import Cache_Version
@@ -283,7 +284,9 @@ class UserToken(AuthBaseHandle):
         if cache_token is None:
             raise AppAuthenticationFailed(1002, _('Login expired'))
         auth_details = get_token_details()
-        cache.touch(token, timeout=datetime.timedelta(seconds=60 * 60 * 2).seconds, version=version)
+        timeout = CONFIG.get_session_timeout()
+        print(timeout)
+        cache.touch(token, timeout=datetime.timedelta(seconds=timeout).seconds, version=version)
         user = QuerySet(User).get(id=auth_details['id'])
         auth = get_auth(user)
         return user, auth

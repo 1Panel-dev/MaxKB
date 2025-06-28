@@ -84,6 +84,9 @@ class Config(dict):
     def get_log_level(self):
         return self.get('LOG_LEVEL', 'DEBUG')
 
+    def get_session_timeout(self):
+        return int(self.get('SESSION_TIMEOUT', 25200))
+
     def __init__(self, *args):
         super().__init__(*args)
 
