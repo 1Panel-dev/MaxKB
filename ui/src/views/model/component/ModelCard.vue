@@ -74,7 +74,7 @@
         <template #dropdown>
           <el-dropdown-menu>
             <el-dropdown-item
-              v-if="permissionPrecise.modify(id)"
+              v-if="permissionPrecise.modify(model.id)"
               icon="EditPen"
               text
               @click.stop="openEditModel"
@@ -90,11 +90,11 @@
 
             <el-dropdown-item
               v-if="
-                currentModel.model_type === 'TTS' ||
+                (currentModel.model_type === 'TTS' ||
                 currentModel.model_type === 'LLM' ||
                 currentModel.model_type === 'IMAGE' ||
-                currentModel.model_type === 'TTI' ||
-                permissionPrecise.paramSetting(id)
+                currentModel.model_type === 'TTI') &&
+                permissionPrecise.paramSetting(model.id)
               "
               icon="Setting"
               @click.stop="openParamSetting"
@@ -106,7 +106,7 @@
               icon="Delete"
               text
               @click.stop="deleteModel"
-              v-if="permissionPrecise.delete(id)"
+              v-if="permissionPrecise.delete(model.id)"
             >
               {{ $t('common.delete') }}
             </el-dropdown-item>
@@ -137,9 +137,6 @@ import { useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 const route = useRoute()
-const {
-  params: { id, folderId }, //id is ModelID
-} = route as any
 
 const props = defineProps<{
   model: Model
