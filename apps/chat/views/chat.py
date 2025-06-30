@@ -12,12 +12,15 @@ from drf_spectacular.utils import extend_schema
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
+from application.api.application_api import SpeechToTextAPI, TextToSpeechAPI
+from application.serializers.application import ApplicationOperateSerializer
 from chat.api.chat_api import ChatAPI
 from chat.api.chat_authentication_api import ChatAuthenticationAPI, ChatAuthenticationProfileAPI, ChatOpenAPI
-from chat.serializers.chat import OpenChatSerializers, ChatSerializers
+from chat.serializers.chat import OpenChatSerializers, ChatSerializers, SpeechToTextSerializers, TextToSpeechSerializers
 from chat.serializers.chat_authentication import AnonymousAuthenticationSerializer, ApplicationProfileSerializer, \
     AuthProfileSerializer
 from common.auth import TokenAuth
+from common.auth.authentication import has_permissions
 from common.constants.permission_constants import ChatAuth
 from common.exception.app_exception import AppAuthenticationFailed
 from common.result import result
@@ -135,3 +138,41 @@ class CaptchaView(APIView):
                    responses=CaptchaAPI.get_response())
     def get(self, request: Request):
         return result.success(CaptchaSerializer().generate())
+
+
+class SpeechToText(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(
+        methods=['POST'],
+        description=_("speech to text"),
+        summary=_("speech to text"),
+        operation_id=_("speech to text"),  # type: ignore
+        request=SpeechToTextAPI.get_request(),
+        responses=SpeechToTextAPI.get_response(),
+        tags=[_('Application')]  # type: ignore
+    )
+    def post(self, request: Request):
+        return result.success(
+            SpeechToTextSerializers(
+                data={'application_id': request.auth.application_id})
+            .speech_to_text({'file': request.FILES.get('file')}))
+
+
+class TextToSpeech(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(
+        methods=['POST'],
+        description=_("text to speech"),
+        summary=_("text to speech"),
+        operation_id=_("text to speech"),  # type: ignore
+        request=TextToSpeechAPI.get_request(),
+        responses=TextToSpeechAPI.get_response(),
+        tags=[_('Application')]  # type: ignore
+    )
+    def post(self, request: Request):
+        byte_data = TextToSpeechSerializers(
+            data={'application_id': request.auth.application_id}).text_to_speech(request.data)
+        return HttpResponse(byte_data, status=200, headers={'Content-Type': 'audio/mp3',
+                                                            'Content-Disposition': 'attachment; filename="abc.mp3"'})

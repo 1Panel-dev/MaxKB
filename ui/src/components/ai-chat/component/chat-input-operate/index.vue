@@ -301,7 +301,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, computed, onMounted, nextTick, watch } from 'vue'
+import { ref, computed, onMounted, nextTick, watch, type Ref } from 'vue'
 import Recorder from 'recorder-core'
 import TouchChat from './TouchChat.vue'
 import applicationApi from '@/api/application/application'
@@ -314,6 +314,7 @@ import 'recorder-core/src/engine/mp3'
 import 'recorder-core/src/engine/mp3-engine'
 import { MsgWarning } from '@/utils/message'
 import { t } from '@/locales'
+import chatAPI from '@/api/chat/chat'
 const router = useRouter()
 const route = useRoute()
 const {
@@ -687,7 +688,7 @@ class RecorderManage {
         `${err}
         <div style="width: 100%;height:1px;border-top:1px var(--el-border-color) var(--el-border-style);margin:10px 0;"></div>
         ${t('chat.tip.recorderTip')}
-    <img src="${new URL(`@/assets/tipIMG.jpg`, import.meta.url).href}" style="width: 100%;" />`,
+    <img src="${new URL(`/tipIMG.jpg`, import.meta.url).href}" style="width: 100%;" />`,
         {
           confirmButtonText: t('chat.tip.confirm'),
           dangerouslyUseHTMLString: true,
@@ -697,6 +698,16 @@ class RecorderManage {
     }
   }
 }
+const getSpeechToTextAPI = () => {
+  if (props.type === 'ai-chat') {
+    return (application_id?: string, data?: any, loading?: Ref<boolean>) => {
+      return chatAPI.speechToText(data, loading)
+    }
+  } else {
+    return applicationApi.textToSpeech
+  }
+}
+const speechToTextAPI = getSpeechToTextAPI()
 // 上传录音文件
 const uploadRecording = async (audioBlob: Blob) => {
   try {
@@ -710,8 +721,7 @@ const uploadRecording = async (audioBlob: Blob) => {
     if (props.applicationDetails.stt_autosend) {
       bus.emit('on:transcribing', true)
     }
-    applicationApi
-      .postSpeechToText(props.applicationDetails.id as string, formData, localLoading)
+    speechToTextAPI(props.applicationDetails.id as string, formData, localLoading)
       .then((response) => {
         inputValue.value = typeof response.data === 'string' ? response.data : ''
         // 自动发送

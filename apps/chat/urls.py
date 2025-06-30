@@ -11,6 +11,8 @@ urlpatterns = [
     path('application/profile', views.ApplicationProfile.as_view()),
     path('chat_message/<str:chat_id>', views.ChatView.as_view()),
     path('open', views.OpenView.as_view()),
+    path('text_to_speech', views.TextToSpeech.as_view()),
+    path('speech_to_text', views.SpeechToText.as_view()),
     path('captcha', views.CaptchaView.as_view(), name='captcha'),
     path('vote/chat/<str:chat_id>/chat_record/<str:chat_record_id>', views.VoteView.as_view(), name='vote'),
     path('historical_conversation', views.HistoricalConversationView.as_view(), name='historical_conversation'),

@@ -6,8 +6,10 @@
     @date：2025/5/26 17:03
     @desc:
 """
+import asyncio
 import datetime
 import hashlib
+import json
 import os
 import pickle
 import re
@@ -19,6 +21,7 @@ from django.db import models, transaction
 from django.db.models import QuerySet, Q
 from django.http import HttpResponse
 from django.utils.translation import gettext_lazy as _
+from langchain_mcp_adapters.client import MultiServerMCPClient
 from rest_framework import serializers, status
 from rest_framework.utils.formatting import lazy_format
 
@@ -36,6 +39,7 @@ from knowledge.models import Knowledge, KnowledgeScope
 from knowledge.serializers.knowledge import KnowledgeSerializer, KnowledgeModelSerializer
 from maxkb.conf import PROJECT_DIR
 from models_provider.models import Model
+from models_provider.tools import get_model_instance_by_model_workspace_id
 from system_manage.models import WorkspaceUserResourcePermission
 from tools.models import Tool, ToolScope
 from tools.serializers.tool import ToolModelSerializer
@@ -384,9 +388,9 @@ class ApplicationEditSerializer(serializers.Serializer):
                                                label=_("Historical chat records"))
     prologue = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=102400,
                                      label=_("Opening remarks"))
-    dataset_id_list = serializers.ListSerializer(required=False, child=serializers.UUIDField(required=True),
-                                                 label=_("Related Knowledge Base")
-                                                 )
+    knowledge_id_list = serializers.ListSerializer(required=False, child=serializers.UUIDField(required=True),
+                                                   label=_("Related Knowledge Base")
+                                                   )
     # 数据集相关设置
     knowledge_setting = KnowledgeSettingSerializer(required=False, allow_null=True,
                                                    label=_("Dataset settings"))
@@ -441,8 +445,8 @@ class ApplicationSerializer(serializers.Serializer):
         return ApplicationCreateSerializer.ApplicationResponse(application_model).data
 
     @staticmethod
-    def to_application_knowledge_mapping(application_id: str, dataset_id: str):
-        return ApplicationKnowledgeMapping(id=uuid.uuid7(), application_id=application_id, dataset_id=dataset_id)
+    def to_application_knowledge_mapping(application_id: str, knowledge_id: str):
+        return ApplicationKnowledgeMapping(id=uuid.uuid7(), application_id=application_id, knowledge_id=knowledge_id)
 
     def insert_simple(self, instance: Dict):
         self.is_valid(raise_exception=True)
@@ -451,10 +455,10 @@ class ApplicationSerializer(serializers.Serializer):
         ApplicationCreateSerializer.SimplateRequest(data=instance).is_valid(user_id=user_id, raise_exception=True)
         application_model = ApplicationCreateSerializer.SimplateRequest.to_application_model(user_id, workspace_id,
                                                                                              instance)
-        dataset_id_list = instance.get('knowledge_id_list', [])
+        knowledge_id_list = instance.get('knowledge_id_list', [])
         application_knowledge_mapping_model_list = [
-            self.to_application_knowledge_mapping(application_model.id, dataset_id) for
-            dataset_id in dataset_id_list]
+            self.to_application_knowledge_mapping(application_model.id, knowledge_id) for
+            knowledge_id in knowledge_id_list]
         # 插入应用
         application_model.save()
         # 插入认证信息
@@ -519,15 +523,15 @@ class ApplicationSerializer(serializers.Serializer):
     def to_application(application, workspace_id, user_id):
         work_flow = application.get('work_flow')
         for node in work_flow.get('nodes', []):
-            if node.get('type') == 'search-dataset-node':
-                node.get('properties', {}).get('node_data', {})['dataset_id_list'] = []
+            if node.get('type') == 'search-knowledge-node':
+                node.get('properties', {}).get('node_data', {})['knowledge_id_list'] = []
         return Application(id=uuid.uuid7(),
                            user_id=user_id,
                            name=application.get('name'),
                            workspace_id=workspace_id,
                            desc=application.get('desc'),
                            prologue=application.get('prologue'), dialogue_number=application.get('dialogue_number'),
-                           dataset_setting=application.get('dataset_setting'),
+                           knowledge_setting=application.get('knowledge_setting'),
                            model_setting=application.get('model_setting'),
                            model_params_setting=application.get('model_params_setting'),
                            tts_model_params_setting=application.get('tts_model_params_setting'),
@@ -545,6 +549,27 @@ class ApplicationSerializer(serializers.Serializer):
                            )
 
 
+class TextToSpeechRequest(serializers.Serializer):
+    text = serializers.CharField(required=True, label=_('Text'))
+
+
+class SpeechToTextRequest(serializers.Serializer):
+    file = UploadedFileField(required=True, label=_("file"))
+
+
+class PlayDemoTextRequest(serializers.Serializer):
+    tts_model_id = serializers.UUIDField(required=True, label=_('Text to speech model ID'))
+
+
+async def get_mcp_tools(servers):
+    async with MultiServerMCPClient(servers) as client:
+        return client.get_tools()
+
+
+class McpServersSerializer(serializers.Serializer):
+    mcp_servers = serializers.JSONField(required=True)
+
+
 class ApplicationOperateSerializer(serializers.Serializer):
     application_id = serializers.UUIDField(required=True, label=_("Application ID"))
     user_id = serializers.UUIDField(required=True, label=_("User ID"))
@@ -558,6 +583,23 @@ class ApplicationOperateSerializer(serializers.Serializer):
             query_set = query_set.filter(workspace_id=workspace_id)
         if not query_set.exists():
             raise AppApiException(500, _('Application id does not exist'))
+
+    def get_mcp_servers(self, instance, with_valid=True):
+        if with_valid:
+            self.is_valid(raise_exception=True)
+            McpServersSerializer(data=instance).is_valid(raise_exception=True)
+        servers = json.loads(instance.get('mcp_servers'))
+        tools = []
+        for server in servers:
+            tools += [
+                {
+                    'server': server,
+                    'name': tool.name,
+                    'description': tool.description,
+                    'args_schema': tool.args_schema,
+                }
+                for tool in asyncio.run(get_mcp_tools({server: servers[server]}))]
+        return tools
 
     def delete(self, with_valid=True):
         if with_valid:
@@ -691,7 +733,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
         if application.type == ApplicationTypeChoices.SIMPLE.value:
             application.is_publish = True
         update_keys = ['name', 'desc', 'model_id', 'multiple_rounds_dialogue', 'prologue', 'status',
-                       'dataset_setting', 'model_setting', 'problem_optimization', 'dialogue_number',
+                       'knowledge_setting', 'model_setting', 'problem_optimization', 'dialogue_number',
                        'stt_model_id', 'tts_model_id', 'tts_model_enable', 'stt_model_enable', 'tts_type',
                        'tts_autoplay', 'stt_autosend', 'file_upload_enable', 'file_upload_setting',
                        'api_key_is_active', 'icon', 'work_flow', 'model_params_setting', 'tts_model_params_setting',
@@ -746,7 +788,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
         """
         修改知识库检索节点 数据
         定义 all_knowledge_id_list:    所有的关联知识库
-            dataset_id_list:          当前用户可看到的关联知识库列表
+            knowledge_id_list:          当前用户可看到的关联知识库列表
             knowledge_list:           用户
         @param workflow:              知识库
         @param available_knowledge_dict:   当前用户可用的知识库
@@ -802,3 +844,35 @@ class ApplicationOperateSerializer(serializers.Serializer):
         QuerySet(ApplicationKnowledgeMapping).bulk_create(
             [ApplicationKnowledgeMapping(application_id=application_id, knowledge_id=knowledge_id) for knowledge_id in
              knowledge_id_list]) if len(knowledge_id_list) > 0 else None
+
+    def speech_to_text(self, instance, with_valid=True):
+        if with_valid:
+            self.is_valid(raise_exception=True)
+            SpeechToTextRequest(data=instance).is_valid(raise_exception=True)
+        application_id = self.data.get('application_id')
+        application = QuerySet(Application).filter(id=application_id).first()
+        if application.stt_model_enable:
+            model = get_model_instance_by_model_workspace_id(application.stt_model_id, application.workspace_id)
+            text = model.speech_to_text(instance.get('file'))
+            return text
+
+    def text_to_speech(self, instance, with_valid=True):
+        if with_valid:
+            self.is_valid(raise_exception=True)
+            TextToSpeechRequest(data=instance).is_valid(raise_exception=True)
+        application_id = self.data.get('application_id')
+        application = QuerySet(Application).filter(id=application_id).first()
+        if application.tts_model_enable:
+            model = get_model_instance_by_model_workspace_id(application.tts_model_id, application.workspace_id,
+                                                             **application.tts_model_params_setting)
+
+            return model.text_to_speech(instance.get('text'))
+
+    def play_demo_text(self, instance, with_valid=True):
+        text = '你好，这里是语音播放测试'
+        if with_valid:
+            self.is_valid(raise_exception=True)
+            PlayDemoTextRequest(data=instance).is_valid(raise_exception=True)
+        tts_model_id = instance.pop('tts_model_id')
+        model = get_model_instance_by_model_workspace_id(tts_model_id, self.data.get('workspace_id'), **instance)
+        return model.text_to_speech(text)

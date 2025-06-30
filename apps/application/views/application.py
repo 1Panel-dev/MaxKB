@@ -7,6 +7,7 @@
     @desc:
 """
 from django.db.models import QuerySet
+from django.http import HttpResponse
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
 from rest_framework.parsers import MultiPartParser
@@ -14,13 +15,14 @@ from rest_framework.request import Request
 from rest_framework.views import APIView
 
 from application.api.application_api import ApplicationCreateAPI, ApplicationQueryAPI, ApplicationImportAPI, \
-    ApplicationExportAPI, ApplicationOperateAPI, ApplicationEditAPI
+    ApplicationExportAPI, ApplicationOperateAPI, ApplicationEditAPI, TextToSpeechAPI, SpeechToTextAPI, PlayDemoTextAPI
 from application.models import Application
-from application.serializers.application import ApplicationSerializer, Query, ApplicationOperateSerializer
+from application.serializers.application import ApplicationSerializer, Query, ApplicationOperateSerializer, \
+    McpServersSerializer
 from common import result
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
-from common.constants.permission_constants import PermissionConstants, RoleConstants
+from common.constants.permission_constants import PermissionConstants, RoleConstants, CompareConstants
 from common.log.log import log
 
 
@@ -233,3 +235,101 @@ class ApplicationAPI(APIView):
                 ApplicationOperateSerializer(
                     data={'application_id': application_id, 'user_id': request.user.id,
                           'workspace_id': workspace_id, }).publish(request.data))
+
+
+class McpServers(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(
+        methods=['GET'],
+        description=_("speech to text"),
+        summary=_("speech to text"),
+        operation_id=_("speech to text"),  # type: ignore
+        parameters=SpeechToTextAPI.get_parameters(),
+        request=SpeechToTextAPI.get_request(),
+        responses=SpeechToTextAPI.get_response(),
+        tags=[_('Application')]  # type: ignore
+    )
+    @has_permissions(PermissionConstants.APPLICATION_READ.get_workspace_application_permission(),
+                     PermissionConstants.APPLICATION_READ.get_workspace_permission_workspace_manage_role(),
+                     RoleConstants.USER.get_workspace_role(),
+                     RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
+    def get(self, request: Request, workspace_id, application_id: str):
+        return result.success(ApplicationOperateSerializer(
+            data={'mcp_servers': request.query_params.get('mcp_servers')}).get_mcp_servers())
+
+
+class SpeechToText(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(
+        methods=['POST'],
+        description=_("speech to text"),
+        summary=_("speech to text"),
+        operation_id=_("speech to text"),  # type: ignore
+        parameters=SpeechToTextAPI.get_parameters(),
+        request=SpeechToTextAPI.get_request(),
+        responses=SpeechToTextAPI.get_response(),
+        tags=[_('Application')]  # type: ignore
+    )
+    @has_permissions(PermissionConstants.APPLICATION_EDIT.get_workspace_application_permission(),
+                     PermissionConstants.APPLICATION_EDIT.get_workspace_permission_workspace_manage_role(),
+                     RoleConstants.USER.get_workspace_role(),
+                     RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
+    def post(self, request: Request, workspace_id: str, application_id: str):
+        return result.success(
+            ApplicationOperateSerializer(
+                data={'application_id': application_id, 'workspace_id': workspace_id, 'user_id': request.user.id})
+            .speech_to_text({'file': request.FILES.get('file')}))
+
+
+class TextToSpeech(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(
+        methods=['POST'],
+        description=_("text to speech"),
+        summary=_("text to speech"),
+        operation_id=_("text to speech"),  # type: ignore
+        parameters=TextToSpeechAPI.get_parameters(),
+        request=TextToSpeechAPI.get_request(),
+        responses=TextToSpeechAPI.get_response(),
+        tags=[_('Application')]  # type: ignore
+    )
+    @has_permissions(PermissionConstants.APPLICATION_EDIT.get_workspace_application_permission(),
+                     PermissionConstants.APPLICATION_EDIT.get_workspace_permission_workspace_manage_role(),
+                     RoleConstants.USER.get_workspace_role(),
+                     RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
+    def post(self, request: Request, workspace_id: str, application_id: str):
+        byte_data = ApplicationOperateSerializer(
+            data={'application_id': application_id, 'workspace_id': workspace_id,
+                  'user_id': request.user.id}).text_to_speech(request.data)
+        return HttpResponse(byte_data, status=200, headers={'Content-Type': 'audio/mp3',
+                                                            'Content-Disposition': 'attachment; filename="abc.mp3"'})
+
+
+class PlayDemoText(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(
+        methods=['POST'],
+        description=_("PlayDemo"),
+        summary=_("PlayDemo"),
+        operation_id=_("PlayDemo"),  # type: ignore
+        parameters=PlayDemoTextAPI.get_parameters(),
+        request=PlayDemoTextAPI.get_request(),
+        responses=PlayDemoTextAPI.get_response(),
+        tags=[_('Application')]  # type: ignore
+    )
+    @has_permissions(PermissionConstants.APPLICATION_EDIT.get_workspace_application_permission(),
+                     PermissionConstants.APPLICATION_EDIT.get_workspace_permission_workspace_manage_role(),
+                     RoleConstants.USER.get_workspace_role(),
+                     RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
+    @log(menu='Application', operate="trial listening",
+         get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')))
+    def post(self, request: Request, workspace_id: str, application_id: str):
+        byte_data = ApplicationOperateSerializer(
+            data={'application_id': application_id, 'workspace_id': workspace_id,
+                  'user_id': request.user.id}).play_demo_text(request.data)
+        return HttpResponse(byte_data, status=200, headers={'Content-Type': 'audio/mp3',
+                                                            'Content-Disposition': 'attachment; filename="abc.mp3"'})
