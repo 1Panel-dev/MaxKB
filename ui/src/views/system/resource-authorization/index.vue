@@ -81,7 +81,9 @@
           </div>
 
           <div class="submit-button">
-            <el-button type="primary" @click="submitPermissions">{{ $t('common.save') }}</el-button>
+            <el-button type="primary" @click="submitPermissions"
+              v-if="hasPermission(permissionObj[(route.meta?.resource as string||'APPLICATION')],'OR')"            
+            >{{ $t('common.save') }}</el-button>
           </div>
         </div>
       </div>
@@ -99,10 +101,12 @@ import { AuthorizationEnum } from '@/enums/system'
 import { t } from '@/locales'
 import useStore from '@/stores'
 import { cloneDeep } from 'lodash'
-import { EditionConst } from '@/utils/permission/data'
+import { EditionConst, RoleConst, PermissionConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
 import WorkspaceApi from '@/api/workspace/workspace.ts'
 import type { WorkspaceItem } from '@/api/type/workspace'
+import { ComplexPermission } from '@/utils/permission/type'
+
 const route = useRoute()
 const { user } = useStore()
 const loading = ref(false)
@@ -114,6 +118,21 @@ const currentType = ref<string>('')
 const filterText = ref('')
 const tableHeight = ref(0)
 
+const permissionObj=ref<any>({
+  "APPLICATION":new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+              [PermissionConst.APPLICATION_WORKSPACE_USER_RESOURCE_PERMISSION_EDIT,
+              PermissionConst.APPLICATION_WORKSPACE_USER_RESOURCE_PERMISSION_EDIT.getWorkspacePermissionWorkspaceManageRole],[],'OR'),
+  "KNOWLEDGE":new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+              [PermissionConst.KNOWLEDGE_WORKSPACE_USER_RESOURCE_PERMISSION_EDIT,
+              PermissionConst.KNOWLEDGE_WORKSPACE_USER_RESOURCE_PERMISSION_EDIT.getWorkspacePermissionWorkspaceManageRole],[],'OR'),
+  "TOOL":new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+              [PermissionConst.TOOL_WORKSPACE_USER_RESOURCE_PERMISSION_EDIT,
+              PermissionConst.TOOL_WORKSPACE_USER_RESOURCE_PERMISSION_EDIT.getWorkspacePermissionWorkspaceManageRole],[],'OR'),
+  "MODEL":new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+              [PermissionConst.MODEL_WORKSPACE_USER_RESOURCE_PERMISSION_EDIT,
+              PermissionConst.MODEL_WORKSPACE_USER_RESOURCE_PERMISSION_EDIT.getWorkspacePermissionWorkspaceManageRole],[],'OR')
+})
+console.log(route.meta.resource||'APPLICATION')
 const settingTags = reactive([
   {
     label: t('views.knowledge.title'),
