@@ -40,7 +40,7 @@ class ModelModelSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'name', 'status', 'model_type', 'model_name',
             'user', 'provider', 'credential', 'meta',
-            'model_params_form', 'workspace_id'
+            'model_params_form', 'workspace_id', 'create_time', 'update_time'
         ]
 
 
