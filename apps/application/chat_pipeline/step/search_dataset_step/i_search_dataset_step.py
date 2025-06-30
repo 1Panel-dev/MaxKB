@@ -50,7 +50,7 @@ class ISearchDatasetStep(IBaseChatPipelineStep):
         return self.InstanceSerializer
 
     def _run(self, manage: PipelineManage):
-        paragraph_list = self.execute(**self.context['step_args'])
+        paragraph_list = self.execute(**self.context['step_args'], manage=manage)
         manage.context['paragraph_list'] = paragraph_list
         self.context['paragraph_list'] = paragraph_list
 
@@ -59,6 +59,7 @@ class ISearchDatasetStep(IBaseChatPipelineStep):
                 exclude_paragraph_id_list: list[str], top_n: int, similarity: float, padding_problem_text: str = None,
                 search_mode: str = None,
                 workspace_id=None,
+                manage: PipelineManage = None,
                 **kwargs) -> List[ParagraphPipelineModel]:
         """
         关于 用户和补全问题 说明: 补全问题如果有就使用补全问题去查询 反之就用用户原始问题查询
