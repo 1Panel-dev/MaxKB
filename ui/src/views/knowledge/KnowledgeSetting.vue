@@ -20,7 +20,7 @@
               <el-form-item :label="$t('views.knowledge.knowledgeType.label')" required>
                 <el-card
                   shadow="never"
-                  class="mb-8 w-full"
+                  class="mb-8 w-full layout-bg"
                   style="line-height: 22px"
                   v-if="detail?.type === 0"
                 >
@@ -38,7 +38,7 @@
                 </el-card>
                 <el-card
                   shadow="never"
-                  class="mb-8 w-full"
+                  class="mb-8 w-full layout-bg"
                   style="line-height: 22px"
                   v-if="detail?.type === 1"
                 >
@@ -56,7 +56,7 @@
                 </el-card>
                 <el-card
                   shadow="never"
-                  class="mb-8 w-full"
+                  class="mb-8 w-full layout-bg"
                   style="line-height: 22px"
                   v-if="detail?.type === 2"
                 >
@@ -127,17 +127,39 @@
                 <h4 class="title-decoration-1 mb-16">
                   {{ $t('common.otherSetting') }}
                 </h4>
+                <el-form-item :label="$t('每次上传最多文件数')">
+                  <el-slider
+                    v-model="form.file_count_limit"
+                    show-input
+                    :show-input-controls="false"
+                    :min="1"
+                    :max="1000"
+                    class="custom-slider"
+                  />
+                </el-form-item>
+                <el-form-item>
+                  <template #label>
+                    <div class="flex align-center">
+                      <span class="mr-4">{{ $t('上传的每个文档最大(MB)') }} </span>
+                      <el-tooltip
+                        effect="dark"
+                        :content="$t('建议根据服务器配置调整，否则可能会造成服务宕机')"
+                        placement="right"
+                      >
+                        <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+                      </el-tooltip>
+                    </div>
+                  </template>
+                  <el-slider
+                    v-model="form.file_size_limit"
+                    show-input
+                    :show-input-controls="false"
+                    :min="1"
+                    :max="1000"
+                    class="custom-slider"
+                  />
+                </el-form-item>
               </div>
-              <el-form-item :label="$t('上传的每个文档最大限制')">
-                <el-slider
-                  v-model="form.file_count_limit"
-                  show-input
-                  :show-input-controls="false"
-                  :min="1"
-                  :max="1000"
-                  class="custom-slider"
-                />
-              </el-form-item>
             </el-form>
             <div class="text-right">
               <el-button
@@ -194,7 +216,8 @@ const form = ref<any>({
   app_id: '',
   app_secret: '',
   folder_token: '',
-  file_count_limit: 100,
+  file_count_limit: 50,
+  file_size_limit: 100,
 })
 
 const rules = reactive({
@@ -300,6 +323,10 @@ function getDetail() {
     .then((res: any) => {
       detail.value = res.data
       cloneModelId.value = res.data?.embedding_model_id
+      if (detail.value?.type === 0) {
+        form.value.file_count_limit = res.data.file_count_limit
+        form.value.file_size_limit = res.data.file_size_limit
+      }
       if (detail.value?.type === 1 || detail.value?.type === 2) {
         form.value = res.data.meta
       }
