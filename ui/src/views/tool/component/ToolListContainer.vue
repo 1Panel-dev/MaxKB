@@ -366,6 +366,10 @@ function openCreateDialog(data?: any) {
   if (data?.template_id) {
     return
   }
+  // 共享过来的工具不让编辑
+  if (isShared.value) {
+    return
+  }
   ToolDrawertitle.value = data ? t('views.tool.editTool') : t('views.tool.createTool')
   if (data) {
     loadSharedApi({ type: 'tool', systemType: apiType.value })
