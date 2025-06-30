@@ -219,10 +219,26 @@ def get_permission_list(user,
     return permission_list
 
 
-def reset_workspace_role(role, workspace_id):
-    if role == RoleConstants.ADMIN.value.__str__() or workspace_id is None:
-        return role
-    return f"{role}:/WORKSPACE/{workspace_id}"
+system_role_list = [RoleConstants.ADMIN.value.name, RoleConstants.WORKSPACE_MANAGE.value.name,
+                    RoleConstants.USER.value.name]
+
+system_role = RoleConstants.ADMIN.value.name
+
+
+def reset_workspace_role(role_id, workspace_id, role_dict):
+    if system_role_list.__contains__(role_id):
+        if system_role == role_id:
+            return role_id
+        else:
+            return f"{role_id}:/WORKSPACE/{workspace_id}"
+    else:
+        r = role_dict.get(role_id)
+        if r is not None:
+            return ''
+        role_type = role_dict.get(role_id).type
+        if system_role == role_type:
+            return RoleConstants.EXTENDS_ADMIN.value.name
+        return f"EXTENDS_{role_type}:/WORKSPACE/{workspace_id}"
 
 
 def get_role_list(user,
@@ -242,11 +258,14 @@ def get_role_list(user,
         if is_query_model:
             # 获取工作空间 用户 角色映射数据
             workspace_user_role_mapping_list = QuerySet(workspace_user_role_mapping_model).filter(user_id=user.id)
-            role_list = [reset_workspace_role(workspace_user_role_mapping.role_id,
-                                              workspace_user_role_mapping.workspace_id)
-                         for
-                         workspace_user_role_mapping in
-                         workspace_user_role_mapping_list]
+            role_list = QuerySet(role_model).filter(id__in=[wurm.role_id for wurm in workspace_user_role_mapping_list])
+            role_dict = {r.id: r for r in role_list}
+            role_list = list(set([reset_workspace_role(workspace_user_role_mapping.role_id,
+                                                       workspace_user_role_mapping.workspace_id,
+                                                       role_dict)
+                                  for
+                                  workspace_user_role_mapping in
+                                  workspace_user_role_mapping_list]))
             cache.set(key, workspace_list, version=version)
             return role_list
         else:

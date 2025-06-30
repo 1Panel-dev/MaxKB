@@ -255,6 +255,10 @@ class RoleConstants(Enum):
     CHAT_ANONYMOUS_USER = Role("CHAT_ANONYMOUS_USER", "对话匿名用户", RoleGroup.CHAT_USER)
     CHAT_USER = Role("CHAT_USER", "对话用户", RoleGroup.CHAT_USER)
 
+    EXTENDS_ADMIN = Role("EXTENDS_ADMIN", '继承超级管理员', RoleGroup.SYSTEM_USER)
+    EXTENDS_WORKSPACE_MANAGE = Role("EXTENDS_WORKSPACE_MANAGE", "继承工作空间管理员", RoleGroup.CHAT_USER)
+    EXTENDS_USER = Role("EXTENDS_USER", "继承普通用户", RoleGroup.CHAT_USER)
+
     def get_workspace_role(self):
         return lambda r, kwargs: Role(name=self.value.name,
                                       decs=self.value.decs,

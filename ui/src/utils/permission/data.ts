@@ -253,6 +253,9 @@ const RoleConst = {
   ADMIN: new Role('ADMIN'),
   WORKSPACE_MANAGE: new Role('WORKSPACE_MANAGE'),
   USER: new Role('USER'),
+  EXTENDS_ADMIN: new Role('EXTENDS_ADMIN'),
+  EXTENDS_WORKSPACE_MANAGE: new Role('EXTENDS_WORKSPACE_MANAGE'),
+  EXTENDS_USER: new Role('EXTENDS_USER'),
 }
 const EditionConst = {
   IS_PE: new Edition('X-PACK-PE'),
