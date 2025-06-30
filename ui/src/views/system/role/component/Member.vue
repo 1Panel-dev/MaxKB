@@ -6,10 +6,10 @@
         @click="handleAdd"
         v-hasPermission="
           new ComplexPermission(
-            [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
-            [PermissionConst.WORKSPACE_ROLE_ADD_MEMBER, PermissionConst.ROLE_ADD_MEMBER],
-            [],
-            'OR',
+        [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+        [PermissionConst.WORKSPACE_ROLE_ADD_MEMBER, PermissionConst.ROLE_ADD_MEMBER],
+        [],
+        'OR',
           )"
       >
         {{ $t('views.role.member.add') }}
@@ -29,7 +29,7 @@
       </div>
     </div>
     <app-table
-      class="member-table mt-16"
+      :class="`${props.currentRole?.type !== RoleTypeEnum.ADMIN ? 'member-table' : ''} mt-16`"
       :data="tableData"
       :pagination-config="paginationConfig"
       @sizeChange="handleSizeChange"
@@ -57,11 +57,11 @@
               @click.stop="handleDelete(row)"
               v-hasPermission="
                 new ComplexPermission(
-                  [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
-                  [PermissionConst.ROLE_REMOVE_MEMBER, PermissionConst.WORKSPACE_ROLE_REMOVE_MEMBER],
-                  [],
-                  'OR',
-                )
+              [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+              [PermissionConst.ROLE_REMOVE_MEMBER, PermissionConst.WORKSPACE_ROLE_REMOVE_MEMBER],
+              [],
+              'OR',
+            )
               "
             >
               <AppIcon iconName="app-delete-users"></AppIcon>
