@@ -29,7 +29,10 @@
           </div>
         </div>
         <el-dropdown-item class="border-t p-8" @click="openResetPassword"
-          v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.CHANGE_PASSWORD],'OR')"
+          v-if="hasPermission(new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole, RoleConst.USER.getWorkspaceRole],
+                [PermissionConst.CHANGE_PASSWORD, PermissionConst.CHANGE_PASSWORD.getWorkspacePermissionWorkspaceManageRole,
+                PermissionConst.CHANGE_PASSWORD.getWorkspacePermission],
+                [],'OR'),'OR')"
         >
           {{ $t('views.login.resetPassword') }}
         </el-dropdown-item>
@@ -42,7 +45,10 @@
           </el-dropdown-item>
         </div>
         <el-dropdown-item style="padding: 0" @click.stop
-          v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.SWITCH_LANGUAGE],'OR')"
+          v-if="hasPermission(new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole, RoleConst.USER.getWorkspaceRole],
+                [PermissionConst.SWITCH_LANGUAGE.getWorkspacePermissionWorkspaceManageRole,PermissionConst.SWITCH_LANGUAGE,
+                  PermissionConst.SWITCH_LANGUAGE.getWorkspacePermission
+                ],[],'OR'),'OR')"
         >
           <el-dropdown class="w-full" trigger="hover" placement="left-start">
             <div class="flex-between w-full" style="line-height: 22px; padding: 12px 11px">
@@ -77,12 +83,15 @@
           </el-dropdown>
         </el-dropdown-item>
         <el-dropdown-item @click="openAbout"
-          v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.ABOUT_READ],'OR')"
+          v-if="hasPermission([RoleConst.ADMIN,PermissionConst.ABOUT_READ],'OR')"
         >
           {{ $t('layout.about.title') }}
         </el-dropdown-item>
 
-        <el-dropdown-item @click="router.push({ path: `/system/user` })">
+        <el-dropdown-item @click="router.push({ path: `/system/user` })"
+          v-if="hasPermission([RoleConst.EXTENDS_ADMIN, RoleConst.EXTENDS_WORKSPACE_MANAGE.getWorkspaceRole,
+          RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],'OR')"
+        >
           <div class="flex-between w-full">
             {{ $t('views.system.title') }}
             <AppIcon iconName="app-go"></AppIcon>

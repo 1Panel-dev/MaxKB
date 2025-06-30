@@ -60,7 +60,7 @@ const systemRouter = {
           new ComplexPermission(
             [RoleConst.WORKSPACE_MANAGE, RoleConst.ADMIN],
             [PermissionConst.WORKSPACE_WORKSPACE_READ, PermissionConst.WORKSPACE_READ],
-            [EditionConst.IS_EE],
+            [EditionConst.IS_EE, EditionConst.IS_PE],
             'OR',
           ),
         ],
@@ -176,7 +176,7 @@ const systemRouter = {
               PermissionConst.APPLICATION_WORKSPACE_USER_RESOURCE_PERMISSION_READ.getWorkspacePermissionWorkspaceManageRole],[],'OR'),
               new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
               [PermissionConst.KNOWLEDGE_WORKSPACE_USER_RESOURCE_PERMISSION_READ,
-              PermissionConst.KNOWLEDGE_WORKSPACE_USER_RESOURCE_PERMISSION_READ.getWorkspacePermissionWorkspaceManageRole],[],'OR'),    
+              PermissionConst.KNOWLEDGE_WORKSPACE_USER_RESOURCE_PERMISSION_READ.getWorkspacePermissionWorkspaceManageRole],[],'OR'),
               new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
               [PermissionConst.TOOL_WORKSPACE_USER_RESOURCE_PERMISSION_READ,
               PermissionConst.TOOL_WORKSPACE_USER_RESOURCE_PERMISSION_READ.getWorkspacePermissionWorkspaceManageRole],[],'OR'),
@@ -465,7 +465,7 @@ const systemRouter = {
           new ComplexPermission(
             [RoleConst.ADMIN],
             [PermissionConst.EMAIL_SETTING_READ],
-            [EditionConst.IS_EE, EditionConst.IS_PE],
+            [],
             'OR',
           ),
         ],
@@ -524,7 +524,7 @@ const systemRouter = {
               new ComplexPermission(
                 [RoleConst.ADMIN],
                 [PermissionConst.EMAIL_SETTING_READ],
-                [EditionConst.IS_EE, EditionConst.IS_PE],
+                [],
                 'OR',
               ),
             ],
