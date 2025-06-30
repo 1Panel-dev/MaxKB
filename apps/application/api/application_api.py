@@ -12,7 +12,7 @@ from drf_spectacular.utils import OpenApiParameter
 from rest_framework import serializers
 
 from application.serializers.application import ApplicationCreateSerializer, ApplicationListResponse, \
-    ApplicationImportRequest, ApplicationEditSerializer
+    ApplicationImportRequest, ApplicationEditSerializer, TextToSpeechRequest, SpeechToTextRequest, PlayDemoTextRequest
 from common.mixins.api_mixin import APIMixin
 from common.result import ResultSerializer, ResultPageSerializer, DefaultResultSerializer
 
@@ -167,3 +167,45 @@ class ApplicationEditAPI(APIMixin):
     @staticmethod
     def get_request():
         return ApplicationEditSerializer
+
+
+class TextToSpeechAPI(APIMixin):
+    @staticmethod
+    def get_parameters():
+        return ApplicationOperateAPI.get_parameters()
+
+    @staticmethod
+    def get_request():
+        return TextToSpeechRequest
+
+    @staticmethod
+    def get_response():
+        return DefaultResultSerializer
+
+
+class SpeechToTextAPI(APIMixin):
+    @staticmethod
+    def get_parameters():
+        return ApplicationOperateAPI.get_parameters()
+
+    @staticmethod
+    def get_request():
+        return SpeechToTextRequest
+
+    @staticmethod
+    def get_response():
+        return DefaultResultSerializer
+
+
+class PlayDemoTextAPI(APIMixin):
+    @staticmethod
+    def get_parameters():
+        return ApplicationOperateAPI.get_parameters()
+
+    @staticmethod
+    def get_request():
+        return PlayDemoTextRequest
+
+    @staticmethod
+    def get_response():
+        return DefaultResultSerializer

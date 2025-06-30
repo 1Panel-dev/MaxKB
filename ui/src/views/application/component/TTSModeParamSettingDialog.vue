@@ -47,6 +47,7 @@ import ModelAPI from '@/api/model/model'
 import applicationApi from '@/api/application/application'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
 import { useRoute } from 'vue-router'
+import { MsgError } from '@/utils/message'
 const route = useRoute()
 const {
   params: { id },
@@ -60,16 +61,11 @@ const form_data = ref<any>({})
 const dialogVisible = ref(false)
 const loading = ref(false)
 const playLoading = ref(false)
-const getApi = (model_id: string, application_id?: string) => {
-  return application_id
-    ? applicationApi.getModelParamsForm(application_id, model_id, loading)
-    : ModelAPI.getModelParamsForm(model_id, loading)
-}
+
 const open = (model_id: string, application_id?: string, model_setting_data?: any) => {
   form_data.value = {}
   tts_model_id.value = model_id
-  const api = getApi(model_id, application_id)
-  api.then((ok) => {
+  ModelAPI.getModelParamsForm(model_id, loading).then((ok) => {
     model_form_field.value = ok.data
     const resp = ok.data
       .map((item: any) => ({
@@ -92,8 +88,7 @@ const open = (model_id: string, application_id?: string, model_setting_data?: an
 }
 
 const reset_default = (model_id: string, application_id?: string) => {
-  const api = getApi(model_id, application_id)
-  api.then((ok) => {
+  ModelAPI.getModelParamsForm(model_id, loading).then((ok) => {
     model_form_field.value = ok.data
     const model_setting_data = ok.data
       .map((item) => ({
@@ -118,31 +113,31 @@ const testPlay = () => {
     ...form_data.value,
     tts_model_id: tts_model_id.value,
   }
-  // applicationApi
-  //   .playDemoText(id as string, data, playLoading)
-  //   .then(async (res: any) => {
-  //     if (res.type === 'application/json') {
-  //       const text = await res.text()
-  //       MsgError(text)
-  //       return
-  //     }
-  //     // 创建 Blob 对象
-  //     const blob = new Blob([res], { type: 'audio/mp3' })
+  applicationApi
+    .playDemoText(id as string, data, playLoading)
+    .then(async (res: any) => {
+      if (res.type === 'application/json') {
+        const text = await res.text()
+        MsgError(text)
+        return
+      }
+      // 创建 Blob 对象
+      const blob = new Blob([res], { type: 'audio/mp3' })
 
-  //     // 创建对象 URL
-  //     const url = URL.createObjectURL(blob)
+      // 创建对象 URL
+      const url = URL.createObjectURL(blob)
 
-  //     // 检查 audioPlayer 是否已经引用了 DOM 元素
-  //     if (audioPlayer.value instanceof HTMLAudioElement) {
-  //       audioPlayer.value.src = url
-  //       audioPlayer.value.play() // 自动播放音频
-  //     } else {
-  //       console.error('audioPlayer.value is not an instance of HTMLAudioElement')
-  //     }
-  //   })
-  //   .catch((err) => {
-  //     console.log('err: ', err)
-  //   })
+      // 检查 audioPlayer 是否已经引用了 DOM 元素
+      if (audioPlayer.value instanceof HTMLAudioElement) {
+        audioPlayer.value.src = url
+        audioPlayer.value.play() // 自动播放音频
+      } else {
+        console.error('audioPlayer.value is not an instance of HTMLAudioElement')
+      }
+    })
+    .catch((err) => {
+      console.log('err: ', err)
+    })
 }
 
 defineExpose({ open, reset_default })

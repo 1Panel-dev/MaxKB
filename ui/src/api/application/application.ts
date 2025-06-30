@@ -1,14 +1,14 @@
-import {Result} from '@/request/Result'
-import {get, post, postStream, del, put, request, download, exportFile} from '@/request/index'
-import type {pageRequest} from '@/api/type/common'
-import type {ApplicationFormType} from '@/api/type/application'
-import {type Ref} from 'vue'
+import { Result } from '@/request/Result'
+import { get, post, postStream, del, put, request, download, exportFile } from '@/request/index'
+import type { pageRequest } from '@/api/type/common'
+import type { ApplicationFormType } from '@/api/type/application'
+import { type Ref } from 'vue'
 import useStore from '@/stores'
 
-const prefix: any = {_value: '/workspace/'}
+const prefix: any = { _value: '/workspace/' }
 Object.defineProperty(prefix, 'value', {
   get: function () {
-    const {user} = useStore()
+    const { user } = useStore()
     return this._value + user.getWorkspaceId() + '/application'
   },
 })
@@ -219,7 +219,7 @@ const updatePlatformConfig: (
   application_id: string,
   type: string,
   data: any,
-  loading?: Ref<boolean>
+  loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (application_id, type, data, loading) => {
   return post(`${prefix.value}/${application_id}/platform/${type}`, data, undefined, loading)
 }
@@ -236,6 +236,55 @@ const publish: (
 ) => Promise<Result<any>> = (application_id, data, loading) => {
   return put(`${prefix.value}/${application_id}/publish`, data, {}, loading)
 }
+
+/**
+ *
+ * @param application_id
+ * @param data
+ * @param loading
+ * @returns
+ */
+const playDemoText: (application_id: string, data: any, loading?: Ref<boolean>) => Promise<any> = (
+  application_id,
+  data,
+  loading,
+) => {
+  return download(
+    `${prefix.value}/${application_id}/play_demo_text`,
+    'post',
+    data,
+    undefined,
+    loading,
+  )
+}
+
+/**
+ * 文本转语音
+ */
+const textToSpeech: (
+  application_id: String,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (application_id, data, loading) => {
+  return download(
+    `${prefix.value}/${application_id}/text_to_speech`,
+    'post',
+    data,
+    undefined,
+    loading,
+  )
+}
+/**
+ * 语音转文本
+ */
+const speechToText: (
+  application_id: String,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (application_id, data, loading) => {
+  return post(`${prefix.value}/${application_id}/speech_to_text`, data, undefined, loading)
+}
+
 export default {
   getAllApplication,
   getApplication,
@@ -256,5 +305,8 @@ export default {
   updatePlatformStatus,
   getPlatformConfig,
   publish,
-  updatePlatformConfig
+  updatePlatformConfig,
+  playDemoText,
+  textToSpeech,
+  speechToText,
 }

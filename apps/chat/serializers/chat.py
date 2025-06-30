@@ -27,6 +27,7 @@ from application.flow.i_step_node import WorkFlowPostHandler
 from application.flow.workflow_manage import WorkflowManage
 from application.models import Application, ApplicationTypeChoices, WorkFlowVersion, ApplicationKnowledgeMapping, \
     ChatUserType, ApplicationChatUserStats, ApplicationAccessToken, ChatRecord, Chat
+from application.serializers.application import ApplicationOperateSerializer
 from application.serializers.common import ChatInfo
 from common.exception.app_exception import AppApiException, AppChatNumOutOfBoundsFailed, ChatException
 from common.handle.base_to_response import BaseToResponse
@@ -282,7 +283,7 @@ class ChatSerializers(serializers.Serializer):
 
     def re_open_chat_simple(self, chat_id, application):
         # 数据集id列表
-        knowledge_id_list = [str(row.dataset_id) for row in
+        knowledge_id_list = [str(row.knowledge_id) for row in
                              QuerySet(ApplicationKnowledgeMapping).filter(
                                  application_id=application.id)]
 
@@ -292,7 +293,7 @@ class ChatSerializers(serializers.Serializer):
                                         knowledge_id__in=knowledge_id_list,
                                         is_active=False)]
         chat_info = ChatInfo(chat_id, self.data.get('chat_user_id'), self.data.get('chat_user_type'), knowledge_id_list,
-                             exclude_document_id_list, application)
+                             exclude_document_id_list, application.id, application)
         chat_record_list = list(QuerySet(ChatRecord).filter(chat_id=chat_id).order_by('-create_time')[0:5])
         chat_record_list.sort(key=lambda r: r.create_time)
         for chat_record in chat_record_list:
@@ -378,3 +379,27 @@ class OpenChatSerializers(serializers.Serializer):
                  application_id,
                  application, debug=debug).set_cache()
         return chat_id
+
+
+class TextToSpeechSerializers(serializers.Serializer):
+    application_id = serializers.UUIDField(required=True, label=_("Application ID"))
+
+    def text_to_speech(self, instance):
+        self.is_valid(raise_exception=True)
+        application_id = self.data.get('application_id')
+        application = QuerySet(Application).filter(id=application_id).first()
+        return ApplicationOperateSerializer(
+            data={'application_id': application_id,
+                  'user_id': application.user_id}).text_to_speech(instance)
+
+
+class SpeechToTextSerializers(serializers.Serializer):
+    application_id = serializers.UUIDField(required=True, label=_("Application ID"))
+
+    def speech_to_text(self, instance):
+        self.is_valid(raise_exception=True)
+        application_id = self.data.get('application_id')
+        application = QuerySet(Application).filter(id=application_id).first()
+        return ApplicationOperateSerializer(
+            data={'application_id': application_id,
+                  'user_id': application.user_id}).speech_to_text(instance)

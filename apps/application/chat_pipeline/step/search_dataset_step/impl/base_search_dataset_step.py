@@ -103,7 +103,7 @@ class BaseSearchDatasetStep(ISearchDatasetStep):
         paragraph_list = native_search(QuerySet(Paragraph).filter(id__in=paragraph_id_list),
                                        get_file_content(
                                            os.path.join(PROJECT_DIR, "apps", "application", 'sql',
-                                                        'list_dataset_paragraph_by_paragraph_id.sql')),
+                                                        'list_knowledge_paragraph_by_paragraph_id.sql')),
                                        with_table_name=True)
         # 如果向量库中存在脏数据 直接删除
         if len(paragraph_list) != len(paragraph_id_list):

@@ -99,7 +99,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { nextTick, onMounted, ref, onBeforeUnmount } from 'vue'
+import { nextTick, onMounted, ref, onBeforeUnmount, type Ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { copyClick } from '@/utils/clipboard'
 import applicationApi from '@/api/application/application'
@@ -262,6 +262,16 @@ enum AudioStatus {
    */
   ERROR = 'ERROR',
 }
+const getTextToSpeechAPI = () => {
+  if (props.type === 'ai-chat') {
+    return (application_id?: string, data?: any, loading?: Ref<boolean>) => {
+      return chatAPI.textToSpeech(data, loading)
+    }
+  } else {
+    return applicationApi.textToSpeech
+  }
+}
+const textToSpeechAPI = getTextToSpeechAPI()
 class AudioManage {
   textList: Array<string>
   statusList: Array<AudioStatus>
@@ -313,12 +323,11 @@ class AudioManage {
           audioElement.src = text.match(/src="([^"]*)"/)?.[1] || ''
           this.statusList[index] = AudioStatus.READY
         } else {
-          applicationApi
-            .postTextToSpeech(
-              (props.applicationId as string) || (id as string),
-              { text: text },
-              loading,
-            )
+          textToSpeechAPI(
+            (props.applicationId as string) || (id as string),
+            { text: text },
+            loading,
+          )
             .then(async (res: any) => {
               if (res.type === 'application/json') {
                 const text = await res.text()
@@ -376,12 +385,11 @@ class AudioManage {
         if (audioElement instanceof HTMLAudioElement) {
           const text = this.textList[index]
           this.statusList[index] = AudioStatus.MOUNTED
-          applicationApi
-            .postTextToSpeech(
-              (props.applicationId as string) || (id as string),
-              { text: text },
-              loading,
-            )
+          textToSpeechAPI(
+            (props.applicationId as string) || (id as string),
+            { text: text },
+            loading,
+          )
             .then(async (res: any) => {
               if (res.type === 'application/json') {
                 const text = await res.text()

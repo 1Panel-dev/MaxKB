@@ -42,6 +42,10 @@ router.beforeEach(
       })
       return
     }
+    const p_token = to.query.token
+    if (p_token) {
+      chatUser.setToken(p_token)
+    }
     const token = chatUser.getToken()
     if (authentication) {
       if (!token && to.name != 'login') {
