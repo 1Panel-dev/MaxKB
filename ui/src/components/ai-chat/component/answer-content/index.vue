@@ -45,6 +45,7 @@
             :type="application.type"
             :executionIsRightPanel="props.executionIsRightPanel"
             @open-execution-detail="emit('openExecutionDetail')"
+            @openParagraph="emit('openParagraph')"
             v-if="showSource(chatRecord) && index === chatRecord.answer_text_list.length - 1"
           />
         </el-card>
@@ -90,7 +91,7 @@ const props = defineProps<{
 
 const { user } = useStore()
 
-const emit = defineEmits(['update:chatRecord', 'openExecutionDetail'])
+const emit = defineEmits(['update:chatRecord', 'openExecutionDetail', 'openParagraph'])
 
 const showAvatar = computed(() => {
   return user.isEnterprise() ? props.application.show_avatar : true

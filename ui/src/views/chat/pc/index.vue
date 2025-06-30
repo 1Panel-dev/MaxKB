@@ -232,17 +232,19 @@
                 @refresh="refresh"
                 @scroll="handleScroll"
                 @open-execution-detail="openExecutionDetail"
+                @openParagraph="openKnowledgeSource"
               >
               </AiChat>
             </div>
           </el-splitter-panel>
           <el-splitter-panel class="execution-detail-panel" v-model:size="rightPanelSize"  :resizable="false" collapsible>
             <div class="p-16 flex-between border-b">
-              <h4 class="medium">{{ $t('chat.executionDetails.title') }}</h4>
+              <h4 class="medium">{{ rightPanelTitle }}</h4>
               <el-icon size="20" class="cursor" @click="closeExecutionDetail"><Close /></el-icon>
             </div>
-            <div class="execution-detail-content" v-loading="executionLoading">
-              <ExecutionDetailContent :detail="executionDetail" />
+            <div class="execution-detail-content" v-loading="rightPanelLoading">
+              <ParagraphSourceContent v-if="rightPanelType === 'knowledgeSource'" :detail="rightPanelDetail" />
+              <ExecutionDetailContent v-if="rightPanelType === 'executionDetail'" :detail="executionDetail" />
             </div>
           </el-splitter-panel>
         </el-splitter>
@@ -274,6 +276,7 @@ import ResetPassword from '@/layout/layout-header/avatar/ResetPassword.vue'
 import { t } from '@/locales'
 import type { ResetCurrentUserPasswordRequest } from '@/api/type/user'
 import ExecutionDetailContent from '@/components/ai-chat/component/ExecutionDetailContent.vue'
+import ParagraphSourceContent from '@/components/ai-chat/component/ParagraphSourceContent.vue'
 import { cloneDeep } from 'lodash'
 
 useResize()
@@ -530,17 +533,31 @@ onMounted(() => {
 })
 
 const rightPanelSize = ref(0)
+const rightPanelTitle = ref('')
+const rightPanelType = ref('')
+const rightPanelLoading = ref(false)
 const executionDetail = ref<any[]>([])
-const executionLoading = ref(false)
+const rightPanelDetail = ref<any>()
 async function openExecutionDetail(row: any) {
   rightPanelSize.value = 400
+  rightPanelTitle.value = t('chat.executionDetails.title')
+  rightPanelType.value = 'executionDetail'
   if (row.execution_details) {
     executionDetail.value = cloneDeep(row.execution_details)
   } else {
-    const res = await chatAPI.getChatRecord(row.chat_id, row.record_id, executionLoading)
+    const res = await chatAPI.getChatRecord(row.chat_id, row.record_id, rightPanelLoading)
     executionDetail.value = cloneDeep(res.data.execution_details)
   }
 }
+
+async function openKnowledgeSource (row: any) {
+  rightPanelTitle.value = t('chat.KnowledgeSource.title')
+  rightPanelType.value = 'knowledgeSource'
+  // TODO 数据
+  rightPanelDetail.value = row
+  rightPanelSize.value = 400
+}
+
 function closeExecutionDetail() {
   rightPanelSize.value = 0
 }

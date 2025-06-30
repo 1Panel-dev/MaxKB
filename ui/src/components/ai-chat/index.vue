@@ -50,6 +50,7 @@
               :chat-management="ChatManagement"
               :executionIsRightPanel="props.executionIsRightPanel"
               @open-execution-detail="emit('openExecutionDetail', chatList[index])"
+              @openParagraph="emit('openParagraph', chatList[index])"
             ></AnswerContent>
           </template>
           <TransitionContent
@@ -129,7 +130,7 @@ const props = withDefaults(
     type: 'ai-chat',
   },
 )
-const emit = defineEmits(['refresh', 'scroll', 'openExecutionDetail'])
+const emit = defineEmits(['refresh', 'scroll', 'openExecutionDetail', 'openParagraph'])
 const { application, common } = useStore()
 const isMobile = computed(() => {
   return common.isMobile() || mode === 'embed' || mode === 'mobile'

@@ -88,11 +88,15 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['openExecutionDetail'])
+const emit = defineEmits(['openExecutionDetail', 'openParagraph'])
 
 const ParagraphSourceDialogRef = ref()
 const ExecutionDetailDialogRef = ref()
 function openParagraph(row: any, id?: string) {
+  if (props.executionIsRightPanel) {
+    emit('openParagraph')
+    return
+  }
   ParagraphSourceDialogRef.value.open(row, id)
 }
 function openExecutionDetail(row: any) {

@@ -10,26 +10,7 @@
     :close-on-press-escape="false"
   >
     <div class="mb-8">
-      <el-scrollbar>
-        <div class="paragraph-source-height p-16 pb-0">
-          <el-form label-position="top">
-            <el-form-item :label="$t('chat.paragraphSource.question')">
-              <el-input v-model="detail.problem_text" disabled />
-            </el-form-item>
-            <el-form-item :label="$t('chat.paragraphSource.optimizationQuestion')">
-              <el-input v-model="detail.padding_problem_text" disabled />
-            </el-form-item>
-            <el-form-item :label="$t('chat.KnowledgeSource.referenceParagraph')">
-              <div v-if="detail.paragraph_list.length > 0" class="w-full">
-                <template v-for="(item, index) in detail.paragraph_list" :key="index">
-                  <ParagraphCard :data="item" :content="item.content" :index="index" />
-                </template>
-              </div>
-              <span v-else> - </span>
-            </el-form-item>
-          </el-form>
-        </div>
-      </el-scrollbar>
+      <ParagraphSourceContent :detail="detail"/>
     </div>
   </el-dialog>
 </template>
@@ -37,7 +18,7 @@
 import { ref, watch, onBeforeUnmount } from 'vue'
 import { cloneDeep } from 'lodash'
 import { arraySort } from '@/utils/utils'
-import ParagraphCard from './component/ParagraphCard.vue'
+import ParagraphSourceContent from './component/ParagraphSourceContent.vue'
 const emit = defineEmits(['refresh'])
 
 const dialogVisible = ref(false)
