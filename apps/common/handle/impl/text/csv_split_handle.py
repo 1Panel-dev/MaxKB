@@ -9,11 +9,13 @@
 import csv
 import io
 import os
+import traceback
 from typing import List
 
 from charset_normalizer import detect
 
 from common.handle.base_split_handle import BaseSplitHandle
+from common.utils.logger import maxkb_logger
 
 
 def post_cell(cell_value):
@@ -60,6 +62,7 @@ class CsvSplitHandle(BaseSplitHandle):
                 paragraphs.append({'content': result_item_content, 'title': ''})
             return result
         except Exception as e:
+            maxkb_logger.error(f"Error processing CSV file {file.name}: {e}, {traceback.format_exc()}")
             return result
 
     def get_content(self, file, save_image):

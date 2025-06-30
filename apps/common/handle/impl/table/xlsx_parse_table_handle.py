@@ -1,6 +1,7 @@
 # coding=utf-8
 import io
 import logging
+import traceback
 
 from openpyxl import load_workbook
 
@@ -73,7 +74,7 @@ class XlsxParseTableHandle(BaseParseTableHandle):
                 result.append({'name': sheetname, 'paragraphs': paragraphs})
 
         except BaseException as e:
-            maxkb_logger.error(f'excel split handle error: {e}')
+            maxkb_logger.error(f"Error processing XLSX file {file.name}: {e}, {traceback.format_exc()}")
             return [{'name': file.name, 'paragraphs': []}]
         return result
 

@@ -1,5 +1,6 @@
 # coding=utf-8
 import logging
+import traceback
 
 from charset_normalizer import detect
 
@@ -19,7 +20,7 @@ class CsvParseTableHandle(BaseParseTableHandle):
         try:
             content = buffer.decode(detect(buffer)['encoding'])
         except BaseException as e:
-            maxkb_logger.error(f'csv split handle error: {e}')
+            maxkb_logger.error(f"Error processing CSV file {file.name}: {e}, {traceback.format_exc()}")
             return [{'name': file.name, 'paragraphs': []}]
 
         csv_model = content.split('\n')

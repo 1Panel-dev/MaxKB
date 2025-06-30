@@ -8,10 +8,12 @@
 """
 import csv
 import io
+import traceback
 
 from charset_normalizer import detect
 
 from common.handle.base_parse_qa_handle import BaseParseQAHandle, get_title_row_index_dict, get_row_value
+from common.utils.logger import maxkb_logger
 
 
 def read_csv_standard(file_path):
@@ -56,4 +58,5 @@ class CsvParseQAHandle(BaseParseQAHandle):
                                        'problem_list': problem_list})
             return [{'name': file.name, 'paragraphs': paragraph_list}]
         except Exception as e:
+            maxkb_logger.error(f"Error processing CSV file {file.name}: {e}, {traceback.format_exc()}")
             return [{'name': file.name, 'paragraphs': []}]

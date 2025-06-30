@@ -1,5 +1,6 @@
 # coding=utf-8
 import logging
+import traceback
 
 import xlrd
 
@@ -55,7 +56,7 @@ class XlsParseTableHandle(BaseParseTableHandle):
                 result.append({'name': sheet.name, 'paragraphs': paragraphs})
 
         except BaseException as e:
-            maxkb_logger.error(f'excel split handle error: {e}')
+            maxkb_logger.error(f"Error processing XLS file {file.name}: {e}, {traceback.format_exc()}")
             return [{'name': file.name, 'paragraphs': []}]
         return result
 

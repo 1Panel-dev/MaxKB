@@ -7,7 +7,6 @@
     @desc:
 """
 import io
-import logging
 import os
 import re
 import traceback
@@ -155,7 +154,7 @@ class DocSplitHandle(BaseSplitHandle):
                 return title
 
         except Exception as e:
-            traceback.print_exc()
+            maxkb_logger.error(f"Error processing DOC file: {e}, {traceback.format_exc()}")
             return paragraph.text
         return get_paragraph_txt(paragraph, doc, images_list, get_image_id)
 
@@ -207,12 +206,15 @@ class DocSplitHandle(BaseSplitHandle):
             else:
                 split_model = SplitModel(default_pattern_list, with_filter=with_filter, limit=limit)
         except BaseException as e:
-            traceback.print_exception(e)
-            return {'name': file_name,
-                    'content': []}
-        return {'name': file_name,
-                'content': split_model.parse(content)
-                }
+            maxkb_logger.error(f"Error processing XLSX file {file.name}: {e}, {traceback.format_exc()}")
+            return {
+                'name': file_name,
+                'content': []
+            }
+        return {
+            'name': file_name,
+            'content': split_model.parse(content)
+        }
 
     def support(self, file, get_buffer):
         file_name: str = file.name.lower()

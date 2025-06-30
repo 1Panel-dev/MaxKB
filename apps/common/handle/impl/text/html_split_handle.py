@@ -15,6 +15,7 @@ from charset_normalizer import detect
 from html2text import html2text
 
 from common.handle.base_split_handle import BaseSplitHandle
+from common.utils.logger import maxkb_logger
 from common.utils.split_model import SplitModel
 
 default_pattern_list = [re.compile('(?<=^)# .*|(?<=\\n)# .*'),
@@ -55,11 +56,15 @@ class HTMLSplitHandle(BaseSplitHandle):
             content = buffer.decode(encoding)
             content = html2text(content)
         except BaseException as e:
-            return {'name': file.name,
-                    'content': []}
-        return {'name': file.name,
-                'content': split_model.parse(content)
-                }
+            maxkb_logger.error(f"Error processing HTML file {file.name}: {e}, {traceback.format_exc()}")
+
+            return {
+                'name': file.name, 'content': []
+            }
+        return {
+            'name': file.name,
+            'content': split_model.parse(content)
+        }
 
     def get_content(self, file, save_image):
         buffer = file.read()

@@ -7,12 +7,14 @@
     @desc:
 """
 import io
+import traceback
 from typing import List
 
 import openpyxl
 
 from common.handle.base_split_handle import BaseSplitHandle
 from common.handle.impl.common_handle import xlsx_embed_cells_images
+from common.utils.logger import maxkb_logger
 
 
 def post_cell(image_dict, cell_value):
@@ -64,6 +66,8 @@ class XlsxSplitHandle(BaseSplitHandle):
     def handle(self, file, pattern_list: List, with_filter: bool, limit: int, get_buffer, save_image):
         buffer = get_buffer(file)
         try:
+            if type(limit) is str:
+                limit = int(limit)
             workbook = openpyxl.load_workbook(io.BytesIO(buffer))
             try:
                 image_dict: dict = xlsx_embed_cells_images(io.BytesIO(buffer))
@@ -80,6 +84,7 @@ class XlsxSplitHandle(BaseSplitHandle):
                         sheet.title, sheet, image_dict, limit) for sheet
                      in worksheets] if row is not None]
         except Exception as e:
+            maxkb_logger.error(f"Error processing XLSX file {file.name}: {e}, {traceback.format_exc()}")
             return [{'name': file.name, 'content': []}]
 
     def get_content(self, file, save_image):

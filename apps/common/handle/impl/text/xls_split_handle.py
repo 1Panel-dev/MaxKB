@@ -6,11 +6,13 @@
     @date：2024/5/21 14:59
     @desc:
 """
+import traceback
 from typing import List
 
 import xlrd
 
 from common.handle.base_split_handle import BaseSplitHandle
+from common.utils.logger import maxkb_logger
 
 
 def post_cell(cell_value):
@@ -58,6 +60,8 @@ class XlsSplitHandle(BaseSplitHandle):
     def handle(self, file, pattern_list: List, with_filter: bool, limit: int, get_buffer, save_image):
         buffer = get_buffer(file)
         try:
+            if type(limit) is str:
+                limit = int(limit)
             workbook = xlrd.open_workbook(file_contents=buffer)
             worksheets = workbook.sheets()
             worksheets_size = len(worksheets)
@@ -67,6 +71,7 @@ class XlsSplitHandle(BaseSplitHandle):
                         sheet.name, sheet, limit) for sheet
                      in worksheets] if row is not None]
         except Exception as e:
+            maxkb_logger.error(f"Error processing XLS file {file.name}: {e}, {traceback.format_exc()}")
             return [{'name': file.name, 'content': []}]
 
     def get_content(self, file, save_image):

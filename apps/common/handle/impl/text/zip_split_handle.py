@@ -119,6 +119,8 @@ def filter_image_file(result_list: list, image_list):
 
 class ZipSplitHandle(BaseSplitHandle):
     def handle(self, file, pattern_list: List, with_filter: bool, limit: int, get_buffer, save_image):
+        if type(limit) is str:
+            limit = int(limit)
         buffer = get_buffer(file)
         bytes_io = io.BytesIO(buffer)
         result = []

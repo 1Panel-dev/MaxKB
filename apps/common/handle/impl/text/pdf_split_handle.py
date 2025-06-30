@@ -6,7 +6,6 @@
     @date：2024/3/27 18:19
     @desc:
 """
-import logging
 import os
 import re
 import tempfile
@@ -31,7 +30,6 @@ default_pattern_list = [re.compile('(?<=^)# .*|(?<=\\n)# .*'),
                         re.compile("(?<!\n)\n\n+")]
 
 
-
 def check_links_in_pdf(doc):
     for page_number in range(len(doc)):
         page = doc[page_number]
@@ -54,6 +52,8 @@ class PdfSplitHandle(BaseSplitHandle):
 
         pdf_document = fitz.open(temp_file_path)
         try:
+            if type(limit) is str:
+                limit = int(limit)
             # 处理有目录的pdf
             result = self.handle_toc(pdf_document, limit)
             if result is not None:
@@ -72,17 +72,20 @@ class PdfSplitHandle(BaseSplitHandle):
             else:
                 split_model = SplitModel(default_pattern_list, with_filter=with_filter, limit=limit)
         except BaseException as e:
-            maxkb_logger.error(f"File: {file.name}, error: {e}")
-            return {'name': file.name,
-                    'content': []}
+            maxkb_logger.error(f"File: {file.name}, error: {e}, {traceback.format_exc()}")
+            return {
+                'name': file.name,
+                'content': []
+            }
         finally:
             pdf_document.close()
             # 处理完后可以删除临时文件
             os.remove(temp_file_path)
 
-        return {'name': file.name,
-                'content': split_model.parse(content)
-                }
+        return {
+            'name': file.name,
+            'content': split_model.parse(content)
+        }
 
     @staticmethod
     def handle_pdf_content(file, pdf_document):
