@@ -154,6 +154,15 @@ const workspace = {
         PermissionConst.KNOWLEDGE_DOCUMENT_DOWNLOAD_SOURCE_FILE.getWorkspacePermissionWorkspaceManageRole,
       ],
       'OR',
+    ), 
+  knowledge_chat_user_edit: (source_id:string) => 
+    hasPermission(
+      [
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.KNOWLEDGE_CHAT_USER_EDIT.getKnowledgeWorkspaceResourcePermission(source_id),
+        PermissionConst.KNOWLEDGE_CHAT_USER_EDIT.getWorkspacePermissionWorkspaceManageRole,
+      ]
+      ,'OR'
     ),  
   problem_create: (source_id:string) =>
     hasPermission(

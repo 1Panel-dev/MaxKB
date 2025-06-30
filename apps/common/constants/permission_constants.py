@@ -44,6 +44,7 @@ class Group(Enum):
     KNOWLEDGE_PROBLEM = "KNOWLEDGE_PROBLEM"
     SYSTEM_KNOWLEDGE_PROBLEM = "SYSTEM_KNOWLEDGE_PROBLEM"
     SYSTEM_RES_KNOWLEDGE_PROBLEM = "SYSTEM_RESOURCE_KNOWLEDGE_PROBLEM"
+    SYSTEM_KNOWLEDGE_CHAT_USER = "SYSTEM_KNOWLEDGE_CHAT_USER"
 
     MODEL = "MODEL"
     SYSTEM_MODEL = "SYSTEM_MODEL"
@@ -313,7 +314,7 @@ Permission_Label = {
     Operate.EMBED.value: _('Embed third party'),
     Operate.ACCESS.value: _('Access restrictions'),
     Operate.DISPLAY.value: _('Display Settings'),
-    Operate.API_KEY.value: _('API Key'),
+    Operate.API_KEY.value: _('API_KEY'),
     Operate.PUBLIC_ACCESS.value: _('Public access link'),
     Operate.Q_WEIXIN.value: _('Enterprise WeiXin'),
     Operate.FEISHU.value: _('Feishu'),
@@ -339,6 +340,7 @@ Permission_Label = {
     Group.SYSTEM_KNOWLEDGE.value: _("Knowledge"),
     Group.SYSTEM_KNOWLEDGE_DOCUMENT.value: _("Document"),
     Group.SYSTEM_KNOWLEDGE_PROBLEM.value: _("Problem"),
+    Group.SYSTEM_KNOWLEDGE_CHAT_USER.value: _("Dialogue users"),
     Group.SYSTEM_RES_TOOL.value: _("Tool"),
     Group.SYSTEM_RES_MODEL.value: _("Model"),
     Group.SYSTEM_RES_KNOWLEDGE.value: _("Knowledge"),
@@ -1144,7 +1146,14 @@ class PermissionConstants(Enum):
         group=Group.SYSTEM_KNOWLEDGE_PROBLEM, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.SHARED_KNOWLEDGE]
     )
-
+    SHARED_KNOWLEDGE_CHAT_USER_READ = Permission(
+        group=Group.SYSTEM_KNOWLEDGE_CHAT_USER, operate=Operate.READ, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.SHARED_KNOWLEDGE]
+    )
+    SHARED_KNOWLEDGE_CHAT_USER_EDIT = Permission(
+        group=Group.SYSTEM_KNOWLEDGE_CHAT_USER, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.SHARED_KNOWLEDGE]
+    )
     SHARED_MODEL_CREATE = Permission(
         group=Group.SYSTEM_MODEL, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
         parent_group=[SystemGroup.SHARED_MODEL]

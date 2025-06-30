@@ -140,6 +140,15 @@ const share = {
       ],
       'OR'
     ),
+  knowledge_chat_user_edit: () => 
+    hasPermission(
+      [
+        RoleConst.ADMIN,
+        PermissionConst.SHARED_KNOWLEDGE_CHAT_USER_EDIT
+      ],
+      'OR'
+    )
+    ,
   problem_relate: () => 
     hasPermission (
       [
