@@ -79,6 +79,11 @@ export default {
     cannotEndNode: 'This node cannot be used as an end node'
   },
   nodes: {
+    classify: {
+      aiCapability: 'AI capability',
+      businessLogic: 'Business logic',
+      other: 'Other'
+    },
     startNode: {
       label: 'Start',
       question: 'User Question',

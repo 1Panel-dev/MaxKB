@@ -80,6 +80,11 @@ export default {
     cannotEndNode: '节点不能当做结束节点'
   },
   nodes: {
+    classify: {
+      aiCapability: 'AI能力',
+      businessLogic: '业务逻辑',
+      other: '其他'
+    },
     startNode: {
       label: '开始',
       question: '用户问题',

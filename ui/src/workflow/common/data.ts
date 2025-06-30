@@ -338,20 +338,10 @@ export const textToSpeechNode = {
   }
 }
 export const menuNodes = [
-  aiChatNode,
-  imageUnderstandNode,
-  imageGenerateNode,
-  searchKnowledgeNode,
-  rerankerNode,
-  conditionNode,
-  replyNode,
-  formNode,
-  questionNode,
-  documentExtractNode,
-  speechToTextNode,
-  textToSpeechNode,
-  variableAssignNode,
-  mcpNode
+  { label: t('views.applicationWorkflow.nodes.classify.aiCapability'), list: [aiChatNode, questionNode, imageGenerateNode, imageUnderstandNode, textToSpeechNode, speechToTextNode] },
+  { label: t('views.knowledge.title'), list: [searchKnowledgeNode, rerankerNode] },
+  { label: t('views.applicationWorkflow.nodes.classify.businessLogic'), list: [conditionNode, formNode, variableAssignNode, replyNode] },
+  { label: t('views.applicationWorkflow.nodes.classify.other'), list: [mcpNode, documentExtractNode] },
 ]
 
 /**
