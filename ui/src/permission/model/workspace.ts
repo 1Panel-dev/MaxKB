@@ -10,12 +10,12 @@ const workspace = {
         [EditionConst.IS_EE],'OR'),
       'OR',
     ),
-  addModel: (source_id:string) =>
+  addModel: () =>
     hasPermission(
       [
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
         RoleConst.USER.getWorkspaceRole,
-        PermissionConst.MODEL_CREATE.getModelWorkspaceResourcePermission(source_id),
+        PermissionConst.MODEL_CREATE.getWorkspacePermission,
         PermissionConst.MODEL_CREATE.getWorkspacePermissionWorkspaceManageRole
       ],
       'OR'
