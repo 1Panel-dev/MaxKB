@@ -35,7 +35,8 @@
         </el-dropdown-item>
         <div>
           <el-dropdown-item class="p-8" @click="openAPIKeyDialog"
-            v-if="hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,PermissionConst.SYSTEM_API_KEY_EDIT],'OR')"
+            v-if="hasPermission(new ComplexPermission([RoleConst.ADMIN],[PermissionConst.SYSTEM_API_KEY_EDIT],
+            [EditionConst.IS_EE,EditionConst.IS_PE],'OR'),'OR')"
           >
             {{ $t('layout.apiKey') }}
           </el-dropdown-item>
