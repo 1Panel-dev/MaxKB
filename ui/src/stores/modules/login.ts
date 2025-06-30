@@ -1,7 +1,7 @@
-import { defineStore } from 'pinia'
-import { type Ref } from 'vue'
+import {defineStore} from 'pinia'
+import {type Ref} from 'vue'
 import LoginApi from '@/api/user/login'
-import type { LoginRequest } from '@/api/type/login'
+import type {LoginRequest} from '@/api/type/login'
 import useUserStore from './user'
 
 const useLoginStore = defineStore('login', {
@@ -47,32 +47,32 @@ const useLoginStore = defineStore('login', {
     },
     async dingCallback(code: string) {
       return LoginApi.getDingCallback(code).then((ok) => {
-        this.token = ok.data
-        localStorage.setItem('token', ok.data)
+        this.token = ok?.data?.token
+        localStorage.setItem('token', ok?.data?.token)
         const user = useUserStore()
         return user.profile()
       })
     },
     async dingOauth2Callback(code: string) {
       return LoginApi.getDingOauth2Callback(code).then((ok) => {
-        this.token = ok.data
-        localStorage.setItem('token', ok.data)
+        this.token = ok?.data?.token
+        localStorage.setItem('token', ok?.data?.token)
         const user = useUserStore()
         return user.profile()
       })
     },
     async wecomCallback(code: string) {
       return LoginApi.getWecomCallback(code).then((ok) => {
-        this.token = ok.data
-        localStorage.setItem('token', ok.data)
+        this.token = ok?.data?.token
+        localStorage.setItem('token', ok?.data?.token)
         const user = useUserStore()
         return user.profile()
       })
     },
     async larkCallback(code: string) {
       return LoginApi.getLarkCallback(code).then((ok) => {
-        this.token = ok.data
-        localStorage.setItem('token', ok.data)
+        this.token = ok?.data?.token
+        localStorage.setItem('token', ok?.data?.token)
         const user = useUserStore()
         return user.profile()
       })
