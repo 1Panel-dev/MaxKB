@@ -35,8 +35,8 @@ class OpenAIChatModel(MaxKBBaseModel, BaseChatOpenAI):
             streaming = False
         chat_open_ai = OpenAIChatModel(
             model=model_name,
-            api_base=model_credential.get('api_base'),
-            api_key=model_credential.get('api_key'),
+            openai_api_base=model_credential.get('api_base'),
+            openai_api_key=model_credential.get('api_key'),
             extra_body=optional_params,
             streaming=streaming,
             custom_get_token_ids=custom_get_token_ids
