@@ -195,6 +195,8 @@ class DocSplitHandle(BaseSplitHandle):
     def handle(self, file, pattern_list: List, with_filter: bool, limit: int, get_buffer, save_image):
         file_name = os.path.basename(file.name)
         try:
+            if type(limit) is str:
+                limit = int(limit)
             image_list = []
             buffer = get_buffer(file)
             doc = Document(io.BytesIO(buffer))

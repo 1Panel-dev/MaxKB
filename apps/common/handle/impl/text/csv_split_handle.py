@@ -34,6 +34,8 @@ class CsvSplitHandle(BaseSplitHandle):
         file_name = os.path.basename(file.name)
         result = {'name': file_name, 'content': paragraphs}
         try:
+            if type(limit) is str:
+                limit = int(limit)
             reader = csv.reader(io.TextIOWrapper(io.BytesIO(buffer), encoding=detect(buffer)['encoding']))
             try:
                 title_row_list = reader.__next__()
