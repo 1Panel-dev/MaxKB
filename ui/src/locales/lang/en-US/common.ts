@@ -96,4 +96,5 @@ export default {
     operate: 'Back to Home',
   },
   custom: 'Custom',
+  moveTo: 'Move To',
 }

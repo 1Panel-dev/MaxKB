@@ -30,6 +30,7 @@
           class="overflow-inherit_node__children"
           node-key="id"
           v-loading="loading"
+          v-bind="$attrs"
         >
           <template #default="{ node, data }">
             <div class="flex-between w-full" @mouseenter.stop="handleMouseEnter(data)">

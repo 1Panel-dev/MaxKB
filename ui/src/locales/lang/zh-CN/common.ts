@@ -100,4 +100,5 @@ export default {
     operate: '返回首页',
   },
   custom: '自定义',
+  moveTo: '转移到',
 }

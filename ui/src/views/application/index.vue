@@ -234,6 +234,14 @@
                               {{ $t('common.setting') }}
                             </el-dropdown-item>
                             <el-dropdown-item
+                              @click.stop="openMoveToDialog(item)"
+                              v-if="permissionPrecise.edit(item.id) && apiType === 'workspace'"
+                            >
+                              <AppIcon iconName="app-migrate"></AppIcon>
+                              {{ $t('common.moveTo') }}
+                            </el-dropdown-item>
+
+                            <el-dropdown-item
                               divided
                               @click.stop="exportApplication(item)"
                               v-if="permissionPrecise.export(item.id)"
@@ -264,6 +272,12 @@
     <CreateApplicationDialog ref="CreateApplicationDialogRef" />
     <CopyApplicationDialog ref="CopyApplicationDialogRef" />
     <CreateFolderDialog ref="CreateFolderDialogRef" @refresh="refreshFolder" />
+    <MoveToDialog
+      ref="MoveToDialogRef"
+      :source="SourceTypeEnum.APPLICATION"
+      @refresh="refreshApplicationList"
+      v-if="apiType === 'workspace'"
+    />
   </LayoutContainer>
 </template>
 
@@ -272,6 +286,7 @@ import { onMounted, ref, reactive, computed } from 'vue'
 import CreateApplicationDialog from '@/views/application/component/CreateApplicationDialog.vue'
 import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
 import CopyApplicationDialog from '@/views/application/component/CopyApplicationDialog.vue'
+import MoveToDialog from '@/components/folder-tree/MoveToDialog.vue'
 import ApplicationApi from '@/api/application/application'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import useStore from '@/stores'
@@ -316,8 +331,17 @@ const paginationConfig = reactive({
 const folderList = ref<any[]>([])
 const applicationList = ref<any[]>([])
 const CopyApplicationDialogRef = ref()
-const CreateApplicationDialogRef = ref()
 
+const MoveToDialogRef = ref()
+function openMoveToDialog(data: any) {
+  MoveToDialogRef.value?.open(data)
+}
+function refreshApplicationList(row: any) {
+  const index = applicationList.value.findIndex((v) => v.id === row.id)
+  applicationList.value.splice(index, 1)
+}
+
+const CreateApplicationDialogRef = ref()
 function openCreateDialog(type?: string) {
   common
     .asyncGetValid(ValidType.Application, ValidCount.Application, loading)

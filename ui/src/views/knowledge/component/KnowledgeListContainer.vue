@@ -248,6 +248,15 @@
                             @click.stop="openAuthorizedWorkspaceDialog(item)"
                             >{{ $t('views.shared.authorized_workspace') }}</el-dropdown-item
                           >
+
+                          <el-dropdown-item
+                            @click.stop="openMoveToDialog(item)"
+                            v-if="permissionPrecise.setting(item.id) && apiType === 'workspace'"
+                          >
+                            <AppIcon iconName="app-migrate"></AppIcon>
+                            {{ $t('common.moveTo') }}
+                          </el-dropdown-item>
+
                           <el-dropdown-item
                             icon="Setting"
                             @click.stop="
@@ -303,6 +312,12 @@
     ref="AuthorizedWorkspaceDialogRef"
     v-if="isSystemShare"
   ></AuthorizedWorkspace>
+  <MoveToDialog
+    ref="MoveToDialogRef"
+    :source="SourceTypeEnum.KNOWLEDGE"
+    @refresh="refreshKnowledgeList"
+    v-if="apiType === 'workspace'"
+  />
 </template>
 
 <script lang="ts" setup>
@@ -314,6 +329,7 @@ import CreateWebKnowledgeDialog from '@/views/knowledge/create-component/CreateW
 import CreateLarkKnowledgeDialog from '@/views/knowledge/create-component/CreateLarkKnowledgeDialog.vue'
 import SyncWebDialog from '@/views/knowledge/component/SyncWebDialog.vue'
 import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
+import MoveToDialog from '@/components/folder-tree/MoveToDialog.vue'
 import GenerateRelatedDialog from '@/components/generate-related-dialog/index.vue'
 import AuthorizedWorkspace from '@/views/system-shared/AuthorizedWorkspaceDialog.vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
@@ -366,6 +382,18 @@ const paginationConfig = reactive({
   page_size: 30,
   total: 0,
 })
+
+const MoveToDialogRef = ref()
+function openMoveToDialog(data: any) {
+  MoveToDialogRef.value?.open(data)
+}
+
+function refreshKnowledgeList(row: any) {
+  const list = cloneDeep(knowledge.knowledgeList)
+  const index = list.findIndex((v) => v.id === row.id)
+  list.splice(index, 1)
+  knowledge.setKnowledgeList(list)
+}
 
 const CreateKnowledgeDialogRef = ref()
 const currentCreateDialog = shallowRef<any>(null)

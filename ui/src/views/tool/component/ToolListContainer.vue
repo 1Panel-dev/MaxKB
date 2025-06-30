@@ -244,6 +244,13 @@
                             {{ $t('common.param.initParam') }}
                           </el-dropdown-item>
                           <el-dropdown-item
+                            @click.stop="openMoveToDialog(item)"
+                            v-if="permissionPrecise.copy(item.id) && apiType === 'workspace'"
+                          >
+                            <AppIcon iconName="app-migrate"></AppIcon>
+                            {{ $t('common.moveTo') }}
+                          </el-dropdown-item>
+                          <el-dropdown-item
                             v-if="isSystemShare"
                             icon="Lock"
                             @click.stop="openAuthorizedWorkspaceDialog(item)"
@@ -286,6 +293,12 @@
     ref="AuthorizedWorkspaceDialogRef"
     v-if="isSystemShare"
   ></AuthorizedWorkspace>
+  <MoveToDialog
+    ref="MoveToDialogRef"
+    :source="SourceTypeEnum.TOOL"
+    @refresh="refreshToolList"
+    v-if="apiType === 'workspace'"
+  />
 </template>
 
 <script lang="ts" setup>
@@ -296,6 +309,7 @@ import InitParamDrawer from '@/views/tool/component/InitParamDrawer.vue'
 import ToolFormDrawer from '@/views/tool/ToolFormDrawer.vue'
 import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
 import AuthorizedWorkspace from '@/views/system-shared/AuthorizedWorkspaceDialog.vue'
+import MoveToDialog from '@/components/folder-tree/MoveToDialog.vue'
 import { isAppIcon } from '@/utils/common'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import { SourceTypeEnum } from '@/enums/common'
@@ -353,6 +367,18 @@ const search_type_change = () => {
 }
 const ToolFormDrawerRef = ref()
 const ToolDrawertitle = ref('')
+
+const MoveToDialogRef = ref()
+function openMoveToDialog(data: any) {
+  MoveToDialogRef.value?.open(data)
+}
+
+function refreshToolList(row: any) {
+  const list = cloneDeep(tool.toolList)
+  const index = list.findIndex((v) => v.id === row.id)
+  list.splice(index, 1)
+  tool.setToolList(list)
+}
 
 const AuthorizedWorkspaceDialogRef = ref()
 function openAuthorizedWorkspaceDialog(row: any) {
@@ -438,20 +464,6 @@ async function changeState(row: any) {
       .catch(() => {
         return false
       })
-  }
-}
-
-function refresh(data?: any) {
-  if (data) {
-    const list = cloneDeep(tool.toolList)
-    const index = list.findIndex((v) => v.id === data.id)
-    list.splice(index, 1, data)
-    tool.setToolList(list)
-  } else {
-    paginationConfig.total = 0
-    paginationConfig.current_page = 1
-    tool.setToolList([])
-    getList()
   }
 }
 
@@ -555,6 +567,20 @@ function importTool(file: any) {
         })
       }
     })
+}
+
+function refresh(data?: any) {
+  if (data) {
+    const list = cloneDeep(tool.toolList)
+    const index = list.findIndex((v) => v.id === data.id)
+    list.splice(index, 1, data)
+    tool.setToolList(list)
+  } else {
+    paginationConfig.total = 0
+    paginationConfig.current_page = 1
+    tool.setToolList([])
+    getList()
+  }
 }
 
 // 文件夹相关

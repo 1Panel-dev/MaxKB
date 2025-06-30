@@ -16,5 +16,6 @@ export default {
     folderNamePlaceholder: '请输入名称',
     description: '描述',
     descriptionPlaceholder: '请输入描述',
+    requiredMessage: '请选择文件夹',
   },
 }

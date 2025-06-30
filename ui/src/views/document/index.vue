@@ -372,7 +372,7 @@
                       :title="$t('views.document.setting.cancelVectorization')"
                       v-if="permissionPrecise.doc_vector(id)"
                     >
-                      <AppIcon iconName="app-close" style="font-size: 16px"></AppIcon>
+                      <el-icon><Close /></el-icon>
                     </el-button>
                   </span>
                   <span class="mr-4" v-else>
@@ -444,7 +444,9 @@
                             <AppIcon iconName="app-export"></AppIcon>
                             {{ $t('views.document.setting.export') }} Zip
                           </el-dropdown-item>
-                          <el-dropdown-item icon="Download" @click.stop="downloadDocument(row)"
+                          <el-dropdown-item
+                            icon="Download"
+                            @click.stop="downloadDocument(row)"
                             v-if="permissionPrecise.doc_download(id)"
                           >
                             {{ $t('views.document.setting.download') }}
@@ -485,7 +487,7 @@
                       @click.stop="cancelTask(row, TaskType.EMBEDDING)"
                       :title="$t('views.document.setting.cancelVectorization')"
                     >
-                      <AppIcon iconName="app-close" style="font-size: 16px"></AppIcon>
+                      <el-icon><Close /></el-icon>
                     </el-button>
 
                     <el-button

@@ -74,12 +74,20 @@
           </template>
         </el-table-column>
         <el-table-column :label="$t('common.status.label')" width="120">
-          <template #default="scope">
-            <div class="flex align-center">
-              <AppIcon
-                :iconName="scope.row.is_active ? 'app-close_colorful' : 'app-succeed'"
-              ></AppIcon>
-              {{ $t(scope.row.is_active ? 'views.tool.enabled' : 'common.status.disable') }}
+          <template #default="{ row }">
+            <div v-if="row.is_active" class="flex align-center">
+              <el-icon class="color-success mr-8" style="font-size: 16px">
+                <SuccessFilled />
+              </el-icon>
+              <span class="color-secondary">
+                {{ $t('common.status.enabled') }}
+              </span>
+            </div>
+            <div v-else class="flex align-center">
+              <AppIcon iconName="app-disabled" class="color-secondary mr-8"></AppIcon>
+              <span class="color-secondary">
+                {{ $t('common.status.disabled') }}
+              </span>
             </div>
           </template>
         </el-table-column>
@@ -220,6 +228,4 @@ onMounted(() => {
 })
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>

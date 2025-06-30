@@ -96,4 +96,5 @@ export default {
     operate: '返回首頁',
   },
   custom: '自定義',
+  moveTo: '移動到',
 }
