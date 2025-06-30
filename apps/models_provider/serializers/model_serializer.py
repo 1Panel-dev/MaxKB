@@ -233,10 +233,11 @@ class ModelSerializer(serializers.Serializer):
 
         credential = serializers.DictField(required=False,
                                            label=(_("certification information")))
+        workspace_id = serializers.CharField(required=False, label=(_("workspace id")))
 
         def is_valid(self, model=None, raise_exception=False):
             super().is_valid(raise_exception=True)
-            filter_params = {'workspace_id': self.data.get('workspace_id')}
+            filter_params = {'workspace_id': model.workspace_id}
             if 'name' in self.data and self.data.get('name') is not None:
                 filter_params['name'] = self.data.get('name')
                 if QuerySet(Model).exclude(id=model.id).filter(**filter_params).exists():
