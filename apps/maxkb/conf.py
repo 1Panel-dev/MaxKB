@@ -91,7 +91,6 @@ class Config(dict):
                 'SENTINELS': sentinels,
                 'SENTINEL_MASTER': self.get('REDIS_SENTINEL_MASTER'),
                 'PASSWORD': self.get("REDIS_PASSWORD"),
-                'SOCKET_TIMEOUT': 1,
             })
 
         return redis_config
