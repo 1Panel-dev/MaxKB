@@ -53,11 +53,12 @@ class BaseSearchDatasetStep(ISearchDatasetStep):
                 exclude_paragraph_id_list: list[str], top_n: int, similarity: float, padding_problem_text: str = None,
                 search_mode: str = None,
                 workspace_id=None,
+                manage=None,
                 **kwargs) -> List[ParagraphPipelineModel]:
         get_knowledge_list_of_authorized = DatabaseModelManage.get_model('get_knowledge_list_of_authorized')
-        chat_user_type = self.context.get('chat_user_type')
+        chat_user_type = manage.context.get('chat_user_type')
         if get_knowledge_list_of_authorized is not None and RoleConstants.CHAT_USER.value.name == chat_user_type:
-            knowledge_id_list = get_knowledge_list_of_authorized(self.context.get('chat_user_id'),
+            knowledge_id_list = get_knowledge_list_of_authorized(manage.context.get('chat_user_id'),
                                                                  knowledge_id_list)
         if len(knowledge_id_list) == 0:
             return []

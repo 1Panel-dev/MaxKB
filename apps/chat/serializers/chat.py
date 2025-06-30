@@ -307,6 +307,7 @@ class ChatSerializers(serializers.Serializer):
             raise ChatException(500, _("The application has not been published. Please use it after publishing."))
 
         chat_info = ChatInfo(chat_id, self.data.get('chat_user_id'), self.data.get('chat_user_type'), [], [],
+                             application.id,
                              application, work_flow_version)
         chat_record_list = list(QuerySet(ChatRecord).filter(chat_id=chat_id).order_by('-create_time')[0:5])
         chat_record_list.sort(key=lambda r: r.create_time)
