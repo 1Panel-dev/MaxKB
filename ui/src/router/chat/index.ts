@@ -44,7 +44,7 @@ router.beforeEach(
     }
     const p_token = to.query.token
     if (p_token) {
-      chatUser.setToken(p_token)
+      chatUser.setToken(p_token as string)
     }
     const token = chatUser.getToken()
     if (authentication) {
@@ -75,7 +75,12 @@ router.beforeEach(
             }
             return
           }
-          next()
+          if (p_token) {
+            next({ ...to, query: {} })
+          } else {
+            next()
+          }
+
           return
         }
       }
