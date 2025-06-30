@@ -9,11 +9,10 @@ import uuid_utils.compat as uuid
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
-from django.db.models.query_utils import Q
+
 from common.config.embedding_config import ModelManage
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import native_search
-from common.db.sql_execute import select_list
 from common.exception.app_exception import AppApiException
 from common.utils.common import get_file_content
 from common.utils.rsa_util import rsa_long_encrypt, rsa_long_decrypt
@@ -375,19 +374,23 @@ class ModelSerializer(serializers.Serializer):
 
             shared_queryset = QuerySet(Model).filter(workspace_id='None')
             if get_authorized_model is not None:
-                shared_queryset = self._build_query_params('None', False, user_id)
+                shared_queryset = self._build_query_params('None', False, user_id)['model_query_set']
                 shared_queryset = get_authorized_model(shared_queryset, workspace_id)
 
             # 构建共享模型和普通模型列表
             shared_model = [self._build_model_data(model) for model in shared_queryset.order_by("-create_time")]
 
             is_x_pack_ee = self.is_x_pack_ee()
-            normal_model = native_search(queryset,
-                                         select_string=get_file_content(
-                                             os.path.join(PROJECT_DIR, "apps", "models_provider", 'sql',
-                                                          'list_model.sql' if workspace_manage else (
-                                                              'list_model_user_ee.sql' if is_x_pack_ee else 'list_model_user.sql')
-                                                          )))
+            normal_model = native_search(
+                queryset,
+                select_string=get_file_content(
+                    os.path.join(
+                        PROJECT_DIR, "apps", "models_provider", 'sql',
+                        'list_model.sql' if workspace_manage else (
+                            'list_model_user_ee.sql' if is_x_pack_ee else 'list_model_user.sql')
+                    )
+                )
+            )
             return {
                 "shared_model": shared_model,
                 "model": normal_model
