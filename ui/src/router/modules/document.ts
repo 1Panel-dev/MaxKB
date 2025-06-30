@@ -88,11 +88,11 @@ const DocumentRouter = {
           RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
           () => {
             const to: any = get_next_route()
-            return PermissionConst.WORKSPACE_CHAT_USER_READ.getKnowledgeWorkspaceResourcePermission(
+            return PermissionConst.KNOWLEDGE_CHAT_USER_READ.getKnowledgeWorkspaceResourcePermission(
               to ? to.params.id : '',
             )
           },
-          PermissionConst.WORKSPACE_CHAT_USER_READ.getWorkspacePermissionWorkspaceManageRole,
+          PermissionConst.KNOWLEDGE_CHAT_USER_READ.getWorkspacePermissionWorkspaceManageRole,
         ],
       },
       component: () => import('@/views/chat-user/index.vue'),

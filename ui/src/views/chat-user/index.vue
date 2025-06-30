@@ -42,7 +42,7 @@
               </span>
             </div>
             <el-button type="primary" :disabled="current?.is_auth" @click="handleSave"
-              v-if="permissionPrecise.chat_user_edit(id)"
+              v-if="hasPermission(permissionObj[(route.meta?.resourceType as string)],'OR')"
             >
               {{ t('common.save') }}
             </el-button>
@@ -57,7 +57,7 @@
                 :placeholder="$t('common.inputPlaceholder')" style="width: 220px" clearable />
             </div>
             <div class="flex align-center"
-              v-if="permissionPrecise.chat_user_edit(id)"
+              v-if="hasPermission(permissionObj[(route.meta?.resourceType as string)],'OR')"
             >
               <div class="color-secondary mr-8">{{ $t('views.chatUser.autoAuthorization') }}</div>
               <el-switch size="small" :model-value="current?.is_auth" @click="changeAuth"
@@ -114,6 +114,11 @@ import { useRoute } from 'vue-router'
 import { SourceTypeEnum } from '@/enums/common'
 import { MsgSuccess } from '@/utils/message'
 import permissionMap from '@/permission'
+import { ComplexPermission } from '@/utils/permission/type'
+import { EditionConst, RoleConst, PermissionConst } from '@/utils/permission/data'
+import { hasPermission } from '@/utils/permission/index'
+
+
 
 const route = useRoute()
 
@@ -127,6 +132,15 @@ const permissionPrecise = computed(() => {
 const {
   params: { id },
 } = route as any
+
+const permissionObj=ref<any>({
+  "APPLICATION": new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+                [PermissionConst.APPLICATION_CHAT_USER_EDIT, 
+                PermissionConst.APPLICATION_CHAT_USER_EDIT.getApplicationWorkspaceResourcePermission(id)],[],'OR'),
+  "KNOWLEDGE": new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+                [PermissionConst.KNOWLEDGE_CHAT_USER_EDIT, 
+                PermissionConst.KNOWLEDGE_CHAT_USER_EDIT.getKnowledgeWorkspaceResourcePermission(id)],[],'OR'),
+})
 
 const resource = reactive({ resource_id: route.params.id as string, resource_type: route.meta.resourceType as string })
 
