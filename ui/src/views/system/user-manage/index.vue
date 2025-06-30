@@ -4,7 +4,7 @@
     <el-card>
       <div class="flex-between mb-16">
         <el-button type="primary" @click="createUser"
-          v-hasPermission="[
+                   v-hasPermission="[
               RoleConst.ADMIN,
               PermissionConst.USER_CREATE
           ]"
@@ -135,7 +135,7 @@
             <el-divider direction="vertical"/>
             <span class="mr-8">
               <el-button type="primary" text @click.stop="editUser(row)" :title="$t('common.edit')"
-              v-if="hasPermission([RoleConst.ADMIN,PermissionConst.USER_EDIT],'OR')"  >
+                         v-if="hasPermission([RoleConst.ADMIN,PermissionConst.USER_EDIT],'OR')">
                 <el-icon><EditPen/></el-icon>
               </el-button>
             </span>
@@ -182,7 +182,7 @@ import {MsgSuccess, MsgConfirm} from '@/utils/message'
 import {t} from '@/locales'
 import {ValidCount, ValidType} from "@/enums/common.ts";
 import useStore from "@/stores";
-import { PermissionConst, RoleConst } from '@/utils/permission/data'
+import {PermissionConst, RoleConst} from '@/utils/permission/data'
 import {hasPermission} from '@/utils/permission/index'
 
 const {user, common} = useStore()
@@ -255,22 +255,23 @@ function editUser(row: any) {
 }
 
 function createUser() {
-  common.asyncGetValid(ValidType.User, ValidCount.User, loading).then(async (res: any) => {
-    if (res?.data) {
-      title.value = t('views.userManage.createUser')
-      UserDrawerRef.value.open()
-    } else if (res?.code === 400) {
-      MsgConfirm(t('common.tip'), t('views.userManage.tip.professionalMessage'), {
-        cancelButtonText: t('common.confirm'),
-        confirmButtonText: t('common.professional'),
-      })
-        .then(() => {
-          window.open('https://maxkb.cn/pricing.html', '_blank')
-        })
-        .catch(() => {
-        })
-    }
-  })
+  title.value = t('views.userManage.createUser')
+  UserDrawerRef.value.open()
+  // common.asyncGetValid(ValidType.User, ValidCount.User, loading).then(async (res: any) => {
+  //   if (res?.data) {
+  //     title.value = t('views.userManage.createUser')
+  //     UserDrawerRef.value.open()
+  //   } else if (res?.code === 400) {
+  //     MsgConfirm(t('common.tip'), t('views.userManage.tip.professionalMessage'), {
+  //       cancelButtonText: t('common.confirm'),
+  //       confirmButtonText: t('common.professional'),
+  //     })
+  //       .then(() => {
+  //         window.open('https://maxkb.cn/pricing.html', '_blank')
+  //       })
+  //       .catch(() => {})
+  //   }
+  // })
 }
 
 function deleteUserManage(row: any) {
