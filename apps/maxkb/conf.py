@@ -78,12 +78,26 @@ class Config(dict):
             },
         }
         if self.get('REDIS_SENTINEL_SENTINELS') is not None:
-            del redis_config['default']['LOCATION']
-            redis_config['default']['OPTIONS']['SENTINEL_SENTINELS'] = self.get('REDIS_SENTINEL_SENTINELS').split(',')
-            redis_config['default']['OPTIONS']['SENTINEL_MASTER_SET'] = self.get('REDIS_SENTINEL_MASTER_SET')
-            return redis_config
-        else:
-            return redis_config
+            sentinels_str = self.get('REDIS_SENTINEL_SENTINELS')
+            sentinels = [
+                (host.strip(), int(port))
+                for hostport in sentinels_str.split(',')
+                for host, port in [hostport.strip().split(':')]
+            ]
+
+            redis_config['default']['LOCATION'] = f'redis://{self.get("REDIS_SENTINEL_MASTER")}/{self.get("REDIS_DB")}'
+            redis_config['default']['OPTIONS'].update({
+                'CLIENT_CLASS': 'django_redis.client.SentinelClient',
+                'SENTINELS': sentinels,
+                'SENTINEL_MASTER': self.get('REDIS_SENTINEL_MASTER'),
+                'PASSWORD': self.get("REDIS_PASSWORD"),
+                'SOCKET_TIMEOUT': 1,
+            })
+
+            # 必须移除和 Sentinel 不兼容的项
+            redis_config['default']['OPTIONS'].pop('CONNECTION_POOL_KWARGS', None)
+
+        return redis_config
 
     def get_language_code(self):
         return self.get('LANGUAGE_CODE', 'zh-CN')
