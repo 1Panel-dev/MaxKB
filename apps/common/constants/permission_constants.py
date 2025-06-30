@@ -28,6 +28,8 @@ class Group(Enum):
     APPLICATION_ACCESS = "APPLICATION_ACCESS"
     # 应用 对话用户
     APPLICATION_CHAT_USER = "APPLICATION_CHAT_USER"
+    # 知识库 对话用户
+    KNOWLEDGE_CHAT_USER = "KNOWLEDGE_CHAT_USER"
     # 应用对话日志
     APPLICATION_CHAT_LOG = "APPLICATION_CHAT_LOG"
 
@@ -318,6 +320,7 @@ Permission_Label = {
     Group.APPLICATION_ACCESS.value: _('Application Access'),
     Group.APPLICATION_CHAT_USER.value: _('Dialogue users'),
     Group.APPLICATION_CHAT_LOG.value: _('Conversation log'),
+    Group.KNOWLEDGE_CHAT_USER.value: _('Dialogue users'),
 
     Group.LOGIN_AUTH.value: _("Login Auth"),
     Group.DISPLAY_SETTINGS.value: _("Display Settings"),
@@ -843,6 +846,17 @@ class PermissionConstants(Enum):
                                             parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
                                             resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE],
                                             )
+    KNOWLEDGE_CHAT_USER_READ = Permission(group=Group.KNOWLEDGE_CHAT_USER, operate=Operate.READ,
+                                          role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                          parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE],
+                                          resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_VIEW],
+                                          )
+
+    KNOWLEDGE_CHAT_USER_EDIT = Permission(group=Group.KNOWLEDGE_CHAT_USER, operate=Operate.EDIT,
+                                          role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                          parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE],
+                                          resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANGE],
+                                          )
 
     APPLICATION_CHAT_LOG_READ = Permission(group=Group.APPLICATION_CHAT_LOG, operate=Operate.READ,
                                            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
