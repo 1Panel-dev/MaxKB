@@ -45,7 +45,7 @@
               {{ $t('views.applicationOverview.appInfo.LimitDialog.authenticationValue') }}
             </p>
           </el-radio>
-          <el-form-item class="ml-24">
+          <el-form-item class="ml-24" v-if="form.authentication_value.type === 'password'">
             <el-input
               class="authentication-append-input"
               v-model="form.authentication_value.password_value"
@@ -118,7 +118,7 @@
       >
         <el-switch size="small" v-model="form.white_active"></el-switch>
       </el-form-item>
-      <el-form-item>
+      <el-form-item v-if="form.white_active">
         <el-input
           v-model="form.white_list"
           :placeholder="$t('views.applicationOverview.appInfo.LimitDialog.whitelistPlaceholder')"
