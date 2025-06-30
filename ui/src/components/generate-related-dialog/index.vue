@@ -165,7 +165,7 @@ const submitHandle = async (formEl: FormInstance) => {
           document_id_list: idList.value,
           state_list: stateMap[state.value],
         }
-        loadSharedApi({ type: 'knowledge', systemType: props.apiType })
+        loadSharedApi({ type: 'document', systemType: props.apiType })
           .putBatchGenerateRelated(id, data, loading)
           .then(() => {
             MsgSuccess(t('views.document.generateQuestion.successMessage'))
