@@ -77,10 +77,10 @@ class Config(dict):
                 },
             },
         }
-        if self.get('REDIS_SENTINEL') == 'true':
+        if self.get('REDIS_SENTINEL_SENTINELS') is not None:
+            del redis_config['default']['LOCATION']
             redis_config['default']['OPTIONS']['SENTINEL_SENTINELS'] = self.get('REDIS_SENTINEL_SENTINELS').split(',')
             redis_config['default']['OPTIONS']['SENTINEL_MASTER_SET'] = self.get('REDIS_SENTINEL_MASTER_SET')
-            redis_config['default']['OPTIONS']['SENTINEL_DB'] = self.get('REDIS_SENTINEL_DB')
             return redis_config
         else:
             return redis_config
