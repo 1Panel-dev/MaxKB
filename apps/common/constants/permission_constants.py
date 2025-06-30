@@ -104,6 +104,7 @@ class WorkspaceGroup(Enum):
     MODEL = "MODEL"
     TOOL = "TOOL"
     OTHER = "OTHER"
+    RESOURCE_PERMISSION = "RESOURCE_PERMISSION"
 
 
 class UserGroup(Enum):
@@ -340,6 +341,10 @@ Permission_Label = {
     Group.WORKSPACE_CHAT_USER.value: _("Chat User"),
     Group.WORKSPACE_WORKSPACE.value: _("Workspace"),
     Group.WORKSPACE_ROLE.value: _("Role"),
+    Group.APPLICATION_WORKSPACE_USER_RESOURCE_PERMISSION.value: _("Application"),
+    Group.KNOWLEDGE_WORKSPACE_USER_RESOURCE_PERMISSION.value: _("Knowledge"),
+    Group.MODEL_WORKSPACE_USER_RESOURCE_PERMISSION.value: _("Model"),
+    Group.TOOL_WORKSPACE_USER_RESOURCE_PERMISSION.value: _("Tool"),
 }
 
 
@@ -596,35 +601,44 @@ class PermissionConstants(Enum):
     )
     APPLICATION_WORKSPACE_USER_RESOURCE_PERMISSION_READ = Permission(
         group=Group.APPLICATION_WORKSPACE_USER_RESOURCE_PERMISSION, operate=Operate.READ,
-        role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE]
+        role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
+        parent_group=[SystemGroup.RESOURCE_PERMISSION, WorkspaceGroup.RESOURCE_PERMISSION]
     )
     APPLICATION_WORKSPACE_USER_RESOURCE_PERMISSION_EDIT = Permission(
         group=Group.APPLICATION_WORKSPACE_USER_RESOURCE_PERMISSION, operate=Operate.EDIT,
-        role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE]
+        role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
+        parent_group=[SystemGroup.RESOURCE_PERMISSION, WorkspaceGroup.RESOURCE_PERMISSION]
     )
     KNOWLEDGE_WORKSPACE_USER_RESOURCE_PERMISSION_READ = Permission(
         group=Group.KNOWLEDGE_WORKSPACE_USER_RESOURCE_PERMISSION, operate=Operate.READ,
-        role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE]
+        role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
+        parent_group=[SystemGroup.RESOURCE_PERMISSION, WorkspaceGroup.RESOURCE_PERMISSION]
     )
     KNOWLEDGE_WORKSPACE_USER_RESOURCE_PERMISSION_EDIT = Permission(
         group=Group.KNOWLEDGE_WORKSPACE_USER_RESOURCE_PERMISSION, operate=Operate.EDIT,
-        role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE]
+        role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
+        parent_group=[SystemGroup.RESOURCE_PERMISSION, WorkspaceGroup.RESOURCE_PERMISSION]
     )
     TOOL_WORKSPACE_USER_RESOURCE_PERMISSION_READ = Permission(
         group=Group.TOOL_WORKSPACE_USER_RESOURCE_PERMISSION, operate=Operate.READ,
-        role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE]
+        role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
+        parent_group=[SystemGroup.RESOURCE_PERMISSION, WorkspaceGroup.RESOURCE_PERMISSION]
     )
     TOOL_WORKSPACE_USER_RESOURCE_PERMISSION_EDIT = Permission(
         group=Group.TOOL_WORKSPACE_USER_RESOURCE_PERMISSION, operate=Operate.EDIT,
-        role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE]
+        role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
+        parent_group=[SystemGroup.RESOURCE_PERMISSION, WorkspaceGroup.RESOURCE_PERMISSION]
+
     )
     MODEL_WORKSPACE_USER_RESOURCE_PERMISSION_READ = Permission(
         group=Group.MODEL_WORKSPACE_USER_RESOURCE_PERMISSION, operate=Operate.READ,
-        role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE]
+        role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
+        parent_group=[SystemGroup.RESOURCE_PERMISSION, WorkspaceGroup.RESOURCE_PERMISSION]
     )
     MODEL_WORKSPACE_USER_RESOURCE_PERMISSION_EDIT = Permission(
         group=Group.MODEL_WORKSPACE_USER_RESOURCE_PERMISSION, operate=Operate.EDIT,
-        role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE]
+        role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
+        parent_group=[SystemGroup.RESOURCE_PERMISSION, WorkspaceGroup.RESOURCE_PERMISSION]
     )
 
     EMAIL_SETTING_READ = Permission(
@@ -1267,6 +1281,16 @@ class PermissionConstants(Enum):
         return lambda r, kwargs: Permission(group=self.value.group, operate=self.value.operate,
                                             resource_path=
                                             f"/WORKSPACE/{kwargs.get('workspace_id')}/KNOWLEDGE/{kwargs.get('knowledge_id')}")
+
+    def get_workspace_model_permission(self):
+        return lambda r, kwargs: Permission(group=self.value.group, operate=self.value.operate,
+                                            resource_path=
+                                            f"/WORKSPACE/{kwargs.get('workspace_id')}/MODEL/{kwargs.get('knowledge_id')}")
+
+    def get_workspace_tool_permission(self):
+        return lambda r, kwargs: Permission(group=self.value.group, operate=self.value.operate,
+                                            resource_path=
+                                            f"/WORKSPACE/{kwargs.get('workspace_id')}/TOOL/{kwargs.get('knowledge_id')}")
 
     def get_workspace_permission(self):
         return lambda r, kwargs: Permission(group=self.value.group, operate=self.value.operate,
