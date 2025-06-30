@@ -127,7 +127,7 @@
                 <h4 class="title-decoration-1 mb-16">
                   {{ $t('common.otherSetting') }}
                 </h4>
-                <el-form-item :label="$t('每次上传最多文件数')">
+                <el-form-item :label="$t('views.knowledge.form.file_count_limit.label')">
                   <el-slider
                     v-model="form.file_count_limit"
                     show-input
@@ -140,10 +140,12 @@
                 <el-form-item>
                   <template #label>
                     <div class="flex align-center">
-                      <span class="mr-4">{{ $t('上传的每个文档最大(MB)') }} </span>
+                      <span class="mr-4"
+                        >{{ $t('views.knowledge.form.file_size_limit.label') }}
+                      </span>
                       <el-tooltip
                         effect="dark"
-                        :content="$t('建议根据服务器配置调整，否则可能会造成服务宕机')"
+                        :content="$t('views.knowledge.form.file_size_limit.placeholder')"
                         placement="right"
                       >
                         <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>

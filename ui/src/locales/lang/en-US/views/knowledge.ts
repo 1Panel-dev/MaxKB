@@ -64,6 +64,13 @@ export default {
       label: 'Selector',
       placeholder: 'Default is body, can input .classname/#idname/tagname',
     },
+    file_count_limit: {
+      label: 'Maximum number of files uploaded at once',
+    },
+    file_size_limit: {
+      label: 'Maximum size of each document(MB)',
+      placeholder: 'Suggest based on server configuration, otherwise may cause service shutdown',
+    },
   },
 
   ResultSuccess: {

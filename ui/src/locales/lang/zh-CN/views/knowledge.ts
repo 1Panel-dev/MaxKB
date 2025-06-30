@@ -64,8 +64,13 @@ export default {
       label: '选择器',
       placeholder: '默认为 body，可输入 .classname/#idname/tagname',
     },
-
-
+    file_count_limit: {
+      label: '每次上传最多文件数',
+    },
+    file_size_limit: {
+      label: '上传的每个文档最大(MB)',
+      placeholder: '建议根据服务器配置调整，否则可能会造成服务宕机',
+    },
   },
 
   ResultSuccess: {

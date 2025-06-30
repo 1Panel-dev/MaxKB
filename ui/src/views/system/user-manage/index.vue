@@ -257,21 +257,6 @@ function editUser(row: any) {
 function createUser() {
   title.value = t('views.userManage.createUser')
   UserDrawerRef.value.open()
-  // common.asyncGetValid(ValidType.User, ValidCount.User, loading).then(async (res: any) => {
-  //   if (res?.data) {
-  //     title.value = t('views.userManage.createUser')
-  //     UserDrawerRef.value.open()
-  //   } else if (res?.code === 400) {
-  //     MsgConfirm(t('common.tip'), t('views.userManage.tip.professionalMessage'), {
-  //       cancelButtonText: t('common.confirm'),
-  //       confirmButtonText: t('common.professional'),
-  //     })
-  //       .then(() => {
-  //         window.open('https://maxkb.cn/pricing.html', '_blank')
-  //       })
-  //       .catch(() => {})
-  //   }
-  // })
 }
 
 function deleteUserManage(row: any) {

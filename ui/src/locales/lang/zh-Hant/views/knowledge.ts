@@ -58,6 +58,13 @@ export default {
       label: '選擇器',
       placeholder: '預設為 body，可輸入 .classname/#idname/tagname',
     },
+    file_count_limit: {
+      label: '每次上傳最多文件數',
+    },
+    file_size_limit: {
+      label: '上傳的每個文件最大(MB)',
+      placeholder: '建议根据服务器配置调整，否則會造成服務宕机',
+    },
   },
 
   ResultSuccess: {

@@ -5,7 +5,7 @@
       <folder-tree
         :source="SourceTypeEnum.TOOL"
         :data="folderList"
-        :currentNodeKey="currentFolder?.id"
+        :currentNodeKey="folder.currentFolder?.id"
         @handleNodeClick="folderClickHandel"
         @refreshTree="refreshFolder"
         :shareTitle="$t('views.shared.shared_tool')"
@@ -47,7 +47,6 @@ const permissionPrecise = computed(() => {
 const loading = ref(false)
 
 const folderList = ref<any[]>([])
-const currentFolder = ref<any>({})
 
 function getFolder(bool?: boolean) {
   const params = {}
@@ -55,15 +54,13 @@ function getFolder(bool?: boolean) {
     folderList.value = res.data
     if (bool) {
       // 初始化刷新
-      currentFolder.value = res.data?.[0] || {}
-      folder.setCurrentFolder(currentFolder.value)
+      folder.setCurrentFolder(res.data?.[0] || {})
     }
   })
 }
 
 function folderClickHandel(row: any) {
-  currentFolder.value = row
-  folder.setCurrentFolder(currentFolder.value)
+  folder.setCurrentFolder(row)
   tool.setToolList([])
 }
 

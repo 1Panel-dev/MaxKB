@@ -6,6 +6,7 @@
     :rules="rules"
     label-position="top"
     require-asterisk-position="right"
+    v-loading="loading"
   >
     <div class="mt-16 mb-16">
       <el-radio-group v-model="form.fileType" @change="radioChange" class="app-radio-button-group">
@@ -35,7 +36,11 @@
             </el-button>
           </p>
           <p>{{ $t('views.document.fileType.QA.tip2') }}</p>
-          <p>{{ $t('views.document.fileType.QA.tip3') }}</p>
+          <p>
+            3、{{ $t('views.document.tip.fileLimitCountTip1') }} {{ file_count_limit }}
+            {{ $t('views.document.tip.fileLimitCountTip2') }},
+            {{ $t('views.document.tip.fileLimitSizeTip1') }} {{ file_size_limit }} MB
+          </p>
         </div>
       </div>
       <el-upload
@@ -48,7 +53,7 @@
         :auto-upload="false"
         :show-file-list="false"
         accept=".xlsx, .xls, .csv,.zip"
-        :limit="50"
+        :limit="file_count_limit"
         :on-exceed="onExceed"
         :on-change="fileHandleChange"
         @click.prevent="handlePreview(false)"
@@ -89,7 +94,11 @@
           </p>
           <p>{{ $t('views.document.fileType.table.tip2') }}</p>
           <p>{{ $t('views.document.fileType.table.tip3') }}</p>
-          <p>{{ $t('views.document.fileType.table.tip4') }}</p>
+          <p>
+            4、{{ $t('views.document.tip.fileLimitCountTip1') }} {{ file_count_limit }}
+            {{ $t('views.document.tip.fileLimitCountTip2') }},
+            {{ $t('views.document.tip.fileLimitSizeTip1') }} {{ file_size_limit }} MB
+          </p>
         </div>
       </div>
       <el-upload
@@ -102,7 +111,7 @@
         :auto-upload="false"
         :show-file-list="false"
         accept=".xlsx, .xls, .csv"
-        :limit="50"
+        :limit="file_count_limit"
         :on-exceed="onExceed"
         :on-change="fileHandleChange"
         @click.prevent="handlePreview(false)"
@@ -131,7 +140,11 @@
         </div>
         <div class="ml-16 lighter">
           <p>{{ $t('views.document.fileType.txt.tip1') }}</p>
-          <p>{{ $t('views.document.fileType.txt.tip2') }}</p>
+          <p>
+            2、{{ $t('views.document.tip.fileLimitCountTip1') }} {{ file_count_limit }}
+            {{ $t('views.document.tip.fileLimitCountTip2') }},
+            {{ $t('views.document.tip.fileLimitSizeTip1') }} {{ file_size_limit }} MB
+          </p>
         </div>
       </div>
       <el-upload
@@ -144,7 +157,7 @@
         :auto-upload="false"
         :show-file-list="false"
         accept=".txt, .md, .log, .docx, .pdf, .html,.zip,.xlsx,.xls,.csv"
-        :limit="50"
+        :limit="file_count_limit"
         :on-exceed="onExceed"
         :on-change="fileHandleChange"
         @click.prevent="handlePreview(false)"
@@ -205,6 +218,9 @@ import useStore from '@/stores'
 import { t } from '@/locales'
 
 const route = useRoute()
+const {
+  query: { id }, // id为knowledgeID，有id的是上传文档
+} = route
 
 const apiType = computed(() => {
   if (route.path.includes('shared')) {
@@ -218,6 +234,10 @@ const apiType = computed(() => {
 const { knowledge } = useStore()
 const documentsFiles = computed(() => knowledge.documentsFiles)
 const documentsType = computed(() => knowledge.documentsType)
+
+const FormRef = ref()
+const loading = ref(false)
+
 const form = ref({
   fileType: 'txt',
   fileList: [] as any,
@@ -228,7 +248,9 @@ const rules = reactive({
     { required: true, message: t('views.document.upload.requiredMessage'), trigger: 'change' },
   ],
 })
-const FormRef = ref()
+
+const file_count_limit = ref(50)
+const file_size_limit = ref(100)
 
 watch(form.value, (value) => {
   knowledge.saveDocumentsType(value.fileType)
@@ -260,9 +282,9 @@ function deleteFile(index: number) {
 // 上传on-change事件
 const fileHandleChange = (file: any, fileList: UploadFiles) => {
   //1、判断文件大小是否合法，文件限制不能大于100M
-  const isLimit = file?.size / 1024 / 1024 < 100
+  const isLimit = file?.size / 1024 / 1024 < file_size_limit.value
   if (!isLimit) {
-    MsgError(t('views.document.upload.errorMessage1'))
+    MsgError(t('views.document.tip.fileLimitSizeTip1') + file_size_limit.value + 'MB')
     fileList.splice(-1, 1) //移除当前超出大小的文件
     return false
   }
@@ -282,7 +304,11 @@ const fileHandleChange = (file: any, fileList: UploadFiles) => {
 }
 
 const onExceed = () => {
-  MsgError(t('views.document.upload.errorMessage4'))
+  MsgError(
+    t('views.document.tip.fileLimitCountTip1') +
+      file_count_limit.value +
+      t('views.document.tip.fileLimitCountTip2')
+  )
 }
 
 const handlePreview = (bool: boolean) => {
@@ -305,6 +331,15 @@ function validate() {
   })
 }
 
+function getDetail() {
+  loadSharedApi({ type: 'knowledge', systemType: apiType.value })
+    .getKnowledgeDetail(id, loading)
+    .then((res: any) => {
+      file_count_limit.value = res.data.file_count_limit
+      file_size_limit.value = res.data.file_size_limit
+    })
+}
+
 onMounted(() => {
   if (documentsType.value) {
     form.value.fileType = documentsType.value
@@ -312,6 +347,7 @@ onMounted(() => {
   if (documentsFiles.value) {
     form.value.fileList = documentsFiles.value
   }
+  getDetail()
 })
 onUnmounted(() => {
   form.value = {

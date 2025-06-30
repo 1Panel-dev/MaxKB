@@ -375,21 +375,6 @@ function openCreateDialog(data: any) {
   nextTick(() => {
     CreateKnowledgeDialogRef.value.open(folder.currentFolder)
   })
-
-  // common.asyncGetValid(ValidType.Dataset, ValidCount.Dataset, loading).then(async (res: any) => {
-  //   if (res?.data) {
-  //     CreateDatasetDialogRef.value.open()
-  //   } else if (res?.code === 400) {
-  //     MsgConfirm(t('common.tip'), t('views.knowledge.tip.professionalMessage'), {
-  //       cancelButtonText: t('common.confirm'),
-  //       confirmButtonText: t('common.professional'),
-  //     })
-  //       .then(() => {
-  //         window.open('https://maxkb.cn/pricing.html', '_blank')
-  //       })
-  //       .catch(() => {})
-  //   }
-  // })
 }
 
 function reEmbeddingKnowledge(row: any) {

@@ -5,13 +5,16 @@
       <folder-tree
         :source="SourceTypeEnum.APPLICATION"
         :data="folderList"
-        :currentNodeKey="currentFolder?.id"
+        :currentNodeKey="folder.currentFolder?.id"
         @handleNodeClick="folderClickHandel"
         @refreshTree="refreshFolder"
         class="p-8"
       />
     </template>
-    <ContentContainer :header="currentFolder?.name">
+    <ContentContainer>
+      <template #header>
+        <FolderBreadcrumb :folderList="folderList" @click="folderClickHandel" />
+      </template>
       <template #search>
         <div class="flex">
           <div class="flex-between complex-search">
@@ -43,13 +46,8 @@
               <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.username" />
             </el-select>
           </div>
-          <el-dropdown trigger="click"
-            v-if="permissionPrecise.create()"
-          >
-            <el-button
-              type="primary"
-              class="ml-8"
-            >
+          <el-dropdown trigger="click" v-if="permissionPrecise.create()">
+            <el-button type="primary" class="ml-8">
               {{ $t('common.create') }}
               <el-icon class="el-icon--right">
                 <arrow-down />
@@ -238,9 +236,7 @@
                             <el-dropdown-item
                               divided
                               @click.stop="exportApplication(item)"
-                              v-if="
-                                permissionPrecise.export(item.id)
-                              "
+                              v-if="permissionPrecise.export(item.id)"
                             >
                               <AppIcon iconName="app-export"></AppIcon>
                               {{ $t('common.export') }}
@@ -249,9 +245,7 @@
                               divided
                               icon="Delete"
                               @click.stop="deleteApplication(item)"
-                              v-if="
-                                permissionPrecise.delete(item.id)
-                              "
+                              v-if="permissionPrecise.delete(item.id)"
                               >{{ $t('common.delete') }}</el-dropdown-item
                             >
                           </el-dropdown-menu>
@@ -285,20 +279,20 @@ import { t } from '@/locales'
 import { useRouter, useRoute } from 'vue-router'
 import { isWorkFlow } from '@/utils/application'
 import { dateFormat } from '@/utils/time'
-import { SourceTypeEnum } from '@/enums/common'
+import { SourceTypeEnum, ValidType, ValidCount } from '@/enums/common'
 import permissionMap from '@/permission'
 
 const router = useRouter()
 const route = useRoute()
 
 const apiType = computed<'workspace'>(() => {
-    return 'workspace'
+  return 'workspace'
 })
 const permissionPrecise = computed(() => {
   return permissionMap['application'][apiType.value]
 })
 
-const { folder, application, user } = useStore()
+const { folder, application, user, common } = useStore()
 
 const loading = ref(false)
 
@@ -321,46 +315,28 @@ const paginationConfig = reactive({
 
 const folderList = ref<any[]>([])
 const applicationList = ref<any[]>([])
-const currentFolder = ref<any>({})
 const CopyApplicationDialogRef = ref()
 const CreateApplicationDialogRef = ref()
 
 function openCreateDialog(type?: string) {
-  CreateApplicationDialogRef.value.open(currentFolder.value?.id || 'root', type)
-  // common
-  //   .asyncGetValid(ValidType.Application, ValidCount.Application, loading)
-  //   .then(async (res: any) => {
-  //     if (res?.data) {
-  //       CreateApplicationDialogRef.value.open()
-  //     } else if (res?.code === 400) {
-  //       MsgConfirm(t('common.tip'), t('views.application.tip.professionalMessage'), {
-  //         cancelButtonText: t('common.confirm'),
-  //         confirmButtonText: t('common.professional'),
-  //       }).then(() => {
-  //         window.open('https://maxkb.cn/pricing.html', '_blank')
-  //       })
-  //     }
-  //   })
+  common
+    .asyncGetValid(ValidType.Application, ValidCount.Application, loading)
+    .then(async (res: any) => {
+      if (res?.data) {
+        CreateApplicationDialogRef.value.open(folder.currentFolder?.id || 'default', type)
+      } else if (res?.code === 400) {
+        MsgConfirm(t('common.tip'), t('views.application.tip.professionalMessage'), {
+          cancelButtonText: t('common.confirm'),
+          confirmButtonText: t('common.professional'),
+        }).then(() => {
+          window.open('https://maxkb.cn/pricing.html', '_blank')
+        })
+      }
+    })
 }
 
 const search_type_change = () => {
   search_form.value = { name: '', create_user: '' }
-}
-
-function getList() {
-  const params = {
-    folder_id: currentFolder.value?.id || 'root',
-  }
-  ApplicaitonApi.getApplication(paginationConfig, params, loading).then((res) => {
-    paginationConfig.total = res.data.total
-    applicationList.value = [...applicationList.value, ...res.data.records]
-  })
-}
-
-function clickFolder(item: any) {
-  currentFolder.value.id = item.id
-  applicationList.value = []
-  getList()
 }
 
 function getAccessToken(id: string) {
@@ -484,7 +460,7 @@ const importApplication = (file: any) => {
 // 文件夹相关
 const CreateFolderDialogRef = ref()
 function openCreateFolder() {
-  CreateFolderDialogRef.value.open(SourceTypeEnum.APPLICATION, currentFolder.value.id)
+  CreateFolderDialogRef.value.open(SourceTypeEnum.APPLICATION, folder.currentFolder.id)
 }
 
 function getFolder(bool?: boolean) {
@@ -493,13 +469,19 @@ function getFolder(bool?: boolean) {
     folderList.value = res.data
     if (bool) {
       // 初始化刷新
-      currentFolder.value = res.data?.[0] || {}
+      folder.setCurrentFolder(res.data?.[0] || {})
     }
     getList()
   })
 }
+
+function clickFolder(item: any) {
+  folder.setCurrentFolder(item)
+  applicationList.value = []
+  getList()
+}
 function folderClickHandel(row: any) {
-  currentFolder.value = row
+  folder.setCurrentFolder(row)
   applicationList.value = []
   getList()
 }
@@ -512,6 +494,16 @@ function searchHandel() {
   paginationConfig.current_page = 1
   applicationList.value = []
   getList()
+}
+
+function getList() {
+  const params = {
+    folder_id: folder.currentFolder?.id || 'default',
+  }
+  ApplicaitonApi.getApplication(paginationConfig, params, loading).then((res) => {
+    paginationConfig.total = res.data.total
+    applicationList.value = [...applicationList.value, ...res.data.records]
+  })
 }
 
 onMounted(() => {

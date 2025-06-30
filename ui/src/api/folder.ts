@@ -32,7 +32,7 @@ const getFolder: (
  {
  "name": "string",
  "desc": "string",
- "parent_id": "root"
+ "parent_id": "default"
  }
  */
 const postFolder: (
@@ -64,7 +64,7 @@ const getFolderDetail: (
  {
  "name": "string",
  "desc": "string",
- "parent_id": "root"
+ "parent_id": "default"
  }
  */
 const putFolder: (
