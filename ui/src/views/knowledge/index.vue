@@ -6,7 +6,7 @@
         :source="SourceTypeEnum.KNOWLEDGE"
         :data="folderList"
         :currentNodeKey="folder.currentFolder?.id"
-        @handleNodeClick="folderClickHandel"
+        @handleNodeClick="folderClickHandle"
         class="p-8"
         :shareTitle="$t('views.shared.shared_knowledge')"
         :showShared="permissionPrecise['is_share']()"
@@ -15,7 +15,7 @@
     </template>
     <KnowledgeListContainer>
       <template #header>
-        <FolderBreadcrumb :folderList="folderList" @click="folderClickHandel" />
+        <FolderBreadcrumb :folderList="folderList" @click="folderClickHandle" />
       </template>
     </KnowledgeListContainer>
   </LayoutContainer>
@@ -57,7 +57,7 @@ function getFolder(bool?: boolean) {
   })
 }
 
-function folderClickHandel(row: any) {
+function folderClickHandle(row: any) {
   folder.setCurrentFolder(row)
   knowledge.setKnowledgeList([])
 }

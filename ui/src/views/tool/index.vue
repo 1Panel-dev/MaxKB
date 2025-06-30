@@ -6,7 +6,7 @@
         :source="SourceTypeEnum.TOOL"
         :data="folderList"
         :currentNodeKey="folder.currentFolder?.id"
-        @handleNodeClick="folderClickHandel"
+        @handleNodeClick="folderClickHandle"
         @refreshTree="refreshFolder"
         :shareTitle="$t('views.shared.shared_tool')"
         :showShared="permissionPrecise['is_share']()"
@@ -15,7 +15,7 @@
     </template>
     <ToolListContainer>
       <template #header>
-        <FolderBreadcrumb :folderList="folderList" @click="folderClickHandel" />
+        <FolderBreadcrumb :folderList="folderList" @click="folderClickHandle" />
       </template>
     </ToolListContainer>
   </LayoutContainer>
@@ -59,7 +59,7 @@ function getFolder(bool?: boolean) {
   })
 }
 
-function folderClickHandel(row: any) {
+function folderClickHandle(row: any) {
   folder.setCurrentFolder(row)
   tool.setToolList([])
 }

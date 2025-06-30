@@ -19,11 +19,11 @@ export default {
   member: {
     title: 'Members',
     add: 'Add Member',
-    workspace: 'worksapce',
+    workspace: 'workspace',
     role: 'role',
     delete: {
       button: 'remove',
-      confirmTitle: 'Whether to remove the member:',    
+      confirmTitle: 'Whether to remove the member:',
   }
 }
 }

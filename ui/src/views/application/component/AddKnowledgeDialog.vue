@@ -40,7 +40,7 @@
         <folder-tree
           :data="folderList"
           :currentNodeKey="currentFolder?.id"
-          @handleNodeClick="folderClickHandel"
+          @handleNodeClick="folderClickHandle"
           class="p-8"
           v-loading="folderLoading"
           :canOperation="false"
@@ -182,7 +182,7 @@ const knowledgeList = ref<any[]>([])
 const currentFolder = ref<any>({})
 const folderLoading = ref(false)
 // 文件
-function folderClickHandel(row: any) {
+function folderClickHandle(row: any) {
   currentFolder.value = row
   knowledgeList.value = []
   if (currentFolder.value.id === 'share') return

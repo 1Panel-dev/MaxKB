@@ -10,7 +10,7 @@ export default {
   },
   delete: {
     button: 'Remove',
-    confirmTitle: 'Wheather to remove the member:',
+    confirmTitle: 'Whether to remove the member:',
     confirmMessage:
       "After removal, the member's knowledge base and application permissions will be revoked. ",
   },

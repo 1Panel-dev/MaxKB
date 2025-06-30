@@ -6,14 +6,14 @@
         :source="SourceTypeEnum.APPLICATION"
         :data="folderList"
         :currentNodeKey="folder.currentFolder?.id"
-        @handleNodeClick="folderClickHandel"
+        @handleNodeClick="folderClickHandle"
         @refreshTree="refreshFolder"
         class="p-8"
       />
     </template>
     <ContentContainer>
       <template #header>
-        <FolderBreadcrumb :folderList="folderList" @click="folderClickHandel" />
+        <FolderBreadcrumb :folderList="folderList" @click="folderClickHandle" />
       </template>
       <template #search>
         <div class="flex">
@@ -31,7 +31,7 @@
             <el-input
               v-if="search_type === 'name'"
               v-model="search_form.name"
-              @change="searchHandel"
+              @change="searchHandle"
               :placeholder="$t('common.searchBar.placeholder')"
               style="width: 220px"
               clearable
@@ -39,7 +39,7 @@
             <el-select
               v-else-if="search_type === 'create_user'"
               v-model="search_form.create_user"
-              @change="searchHandel"
+              @change="searchHandle"
               clearable
               style="width: 220px"
             >
@@ -272,7 +272,7 @@ import { onMounted, ref, reactive, computed } from 'vue'
 import CreateApplicationDialog from '@/views/application/component/CreateApplicationDialog.vue'
 import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
 import CopyApplicationDialog from '@/views/application/component/CopyApplicationDialog.vue'
-import ApplicaitonApi from '@/api/application/application'
+import ApplicationApi from '@/api/application/application'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import useStore from '@/stores'
 import { t } from '@/locales'
@@ -414,7 +414,7 @@ function deleteApplication(row: any) {
     },
   )
     .then(() => {
-      ApplicaitonApi.delApplication(row.id, loading).then(() => {
+      ApplicationApi.delApplication(row.id, loading).then(() => {
         const index = applicationList.value.findIndex((v) => v.id === row.id)
         applicationList.value.splice(index, 1)
         MsgSuccess(t('common.deleteSuccess'))
@@ -424,7 +424,7 @@ function deleteApplication(row: any) {
 }
 
 const exportApplication = (application: any) => {
-  ApplicaitonApi.exportApplication(application.id, application.name, loading).catch((e) => {
+  ApplicationApi.exportApplication(application.id, application.name, loading).catch((e) => {
     if (e.response.status !== 403) {
       e.response.data.text().then((res: string) => {
         MsgError(`${t('views.application.tip.ExportError')}:${JSON.parse(res).message}`)
@@ -438,7 +438,7 @@ const importApplication = (file: any) => {
   const formData = new FormData()
   formData.append('file', file.raw, file.name)
   elUploadRef.value.clearFiles()
-  ApplicaitonApi.importApplication(formData, loading)
+  ApplicationApi.importApplication(formData, loading)
     .then(async (res: any) => {
       if (res?.data) {
         applicationList.value = []
@@ -480,7 +480,7 @@ function clickFolder(item: any) {
   applicationList.value = []
   getList()
 }
-function folderClickHandel(row: any) {
+function folderClickHandle(row: any) {
   folder.setCurrentFolder(row)
   applicationList.value = []
   getList()
@@ -490,7 +490,7 @@ function refreshFolder() {
   getFolder()
 }
 
-function searchHandel() {
+function searchHandle() {
   paginationConfig.current_page = 1
   applicationList.value = []
   getList()
@@ -500,7 +500,7 @@ function getList() {
   const params = {
     folder_id: folder.currentFolder?.id || 'default',
   }
-  ApplicaitonApi.getApplication(paginationConfig, params, loading).then((res) => {
+  ApplicationApi.getApplication(paginationConfig, params, loading).then((res) => {
     paginationConfig.total = res.data.total
     applicationList.value = [...applicationList.value, ...res.data.records]
   })
