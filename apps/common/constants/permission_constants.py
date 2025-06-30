@@ -145,7 +145,7 @@ class Operate(Enum):
     EMBED = "READ+EMBED"  # 嵌入
     ACCESS = "READ+ACCESS"  # 访问限制
     DISPLAY = "READ+DISPLAY"  # 显示设置
-    API_KET = "READ+API_KEY"  # API_KEY
+    API_KEY = "READ+API_KEY"  # API_KEY
     PUBLIC_ACCESS = "READ+PUBLIC_ACCESS"  # 公共访问链接
     Q_WEIXIN = "READ+Q_WEIXIN"  # 企业微信
     FEISHU = "READ+FEISHU"  # 飞书
@@ -313,7 +313,7 @@ Permission_Label = {
     Operate.EMBED.value: _('Embed third party'),
     Operate.ACCESS.value: _('Access restrictions'),
     Operate.DISPLAY.value: _('Display Settings'),
-    Operate.API_KET.value: _('API_KET'),
+    Operate.API_KEY.value: _('API Key'),
     Operate.PUBLIC_ACCESS.value: _('Public access link'),
     Operate.Q_WEIXIN.value: _('Enterprise WeiXin'),
     Operate.FEISHU.value: _('Feishu'),
@@ -815,7 +815,7 @@ class PermissionConstants(Enum):
                                                   ResourcePermissionConst.APPLICATION_MANGE],
 
                                               )
-    APPLICATION_OVERVIEW_API_KEY = Permission(group=Group.APPLICATION_OVERVIEW, operate=Operate.API_KET,
+    APPLICATION_OVERVIEW_API_KEY = Permission(group=Group.APPLICATION_OVERVIEW, operate=Operate.API_KEY,
                                               role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                               parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
                                               resource_permission_group_list=[

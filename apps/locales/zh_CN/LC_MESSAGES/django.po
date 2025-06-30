@@ -8511,3 +8511,12 @@ msgstr "获取资源管理模型列表"
 
 msgid "System Model"
 msgstr "系统模型"
+
+msgid "Dialogue users"
+msgstr "对话用户"
+
+msgid "Conversation log"
+msgstr "对话日志"
+
+msgid "Public access link"
+msgstr "公共访问链接"
