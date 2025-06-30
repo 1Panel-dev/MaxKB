@@ -22,7 +22,7 @@ from rest_framework import serializers
 from application.models import ApplicationKnowledgeMapping
 from common.config.embedding_config import VectorStore
 from common.constants.cache_version import Cache_Version
-from common.constants.permission_constants import ResourceAuthType, ResourcePermissionGroup
+from common.constants.permission_constants import ResourceAuthType, ResourcePermissionGroup, ResourcePermission
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import native_search, get_dynamics_model, native_page_search
 from common.db.sql_execute import select_list
@@ -536,7 +536,7 @@ class KnowledgeSerializer(serializers.Serializer):
             WorkspaceUserResourcePermission(
                 target=knowledge_id,
                 auth_target_type=AuthTargetType.KNOWLEDGE,
-                permission_list=[ResourcePermissionGroup.VIEW, ResourcePermissionGroup.MANAGE],
+                permission_list=[ResourcePermission.VIEW, ResourcePermission.MANAGE],
                 workspace_id=self.data.get('workspace_id'),
                 user_id=self.data.get('user_id'),
                 auth_type=ResourceAuthType.RESOURCE_PERMISSION_GROUP
@@ -587,7 +587,7 @@ class KnowledgeSerializer(serializers.Serializer):
             WorkspaceUserResourcePermission(
                 target=knowledge_id,
                 auth_target_type=AuthTargetType.KNOWLEDGE,
-                permission_list=[ResourcePermissionGroup.VIEW, ResourcePermissionGroup.MANAGE],
+                permission_list=[ResourcePermission.VIEW, ResourcePermission.MANAGE],
                 workspace_id=self.data.get('workspace_id'),
                 user_id=self.data.get('user_id'),
                 auth_type=ResourceAuthType.RESOURCE_PERMISSION_GROUP
