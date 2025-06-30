@@ -94,9 +94,6 @@ class Config(dict):
                 'SOCKET_TIMEOUT': 1,
             })
 
-            # 必须移除和 Sentinel 不兼容的项
-            redis_config['default']['OPTIONS'].pop('CONNECTION_POOL_KWARGS', None)
-
         return redis_config
 
     def get_language_code(self):
