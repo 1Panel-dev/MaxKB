@@ -33,7 +33,7 @@ class Config(dict):
         # 语言
         'LANGUAGE_CODE': 'zh-CN',
         "DEBUG": False,
-        # redis 目前先支持单机 哨兵的配置后期加上
+        # redis host
         'REDIS_HOST': '127.0.0.1',
         # 端口
         'REDIS_PORT': 6379,
@@ -102,7 +102,7 @@ class Config(dict):
         return self.get('LOG_LEVEL', 'DEBUG')
 
     def get_session_timeout(self):
-        return int(self.get('SESSION_TIMEOUT', 25200))
+        return int(self.get('SESSION_TIMEOUT', 28800))
 
     def __init__(self, *args):
         super().__init__(*args)
