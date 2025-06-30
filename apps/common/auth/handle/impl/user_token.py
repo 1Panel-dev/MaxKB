@@ -233,7 +233,7 @@ def reset_workspace_role(role_id, workspace_id, role_dict):
             return f"{role_id}:/WORKSPACE/{workspace_id}"
     else:
         r = role_dict.get(role_id)
-        if r is not None:
+        if r is None:
             return ''
         role_type = role_dict.get(role_id).type
         if system_role == role_type:
