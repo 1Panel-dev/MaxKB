@@ -95,7 +95,7 @@ const workspace = {
             ],
             'OR'
     ),
-    chat_user_edit: (source_id:string) => 
+    application_chat_user_edit: (source_id:string) => 
         hasPermission(
             [
               RoleConst.ADMIN,

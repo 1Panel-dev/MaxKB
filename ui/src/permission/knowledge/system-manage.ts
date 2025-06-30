@@ -30,6 +30,8 @@ const workspace = {
   doc_export: () => false,
   doc_download: () => false,
 
+  knowledge_chat_user_edit: () => false,
+
   problem_create: () => false,
   problem_relate: () => false,
   problem_delete: () => false,
