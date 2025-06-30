@@ -15,6 +15,8 @@ from django.db.models import QuerySet
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.search_knowledge_node.i_search_knowledge_node import ISearchKnowledgeStepNode
 from common.config.embedding_config import VectorStore
+from common.constants.permission_constants import RoleConstants
+from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import native_search
 from common.utils.common import get_file_content
 from knowledge.models import Document, Paragraph, Knowledge, SearchMode
@@ -64,6 +66,11 @@ class BaseSearchKnowledgeNode(ISearchKnowledgeStepNode):
                 exclude_paragraph_id_list=None,
                 **kwargs) -> NodeResult:
         self.context['question'] = question
+        get_knowledge_list_of_authorized = DatabaseModelManage.get_model('get_knowledge_list_of_authorized')
+        chat_user_type = self.workflow_manage.get_body().get('chat_user_type')
+        if get_knowledge_list_of_authorized is not None and RoleConstants.CHAT_USER.value.name == chat_user_type:
+            knowledge_id_list = get_knowledge_list_of_authorized(self.workflow_manage.get_body().get('chat_user_id'),
+                                                                 knowledge_id_list)
         if len(knowledge_id_list) == 0:
             return get_none_result(question)
         model_id = get_embedding_id(knowledge_id_list)

@@ -16,6 +16,8 @@ from rest_framework.utils.formatting import lazy_format
 from application.chat_pipeline.I_base_chat_pipeline import ParagraphPipelineModel
 from application.chat_pipeline.step.search_dataset_step.i_search_dataset_step import ISearchDatasetStep
 from common.config.embedding_config import VectorStore, ModelManage
+from common.constants.permission_constants import RoleConstants
+from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import native_search
 from common.utils.common import get_file_content
 from knowledge.models import Paragraph, Knowledge
@@ -52,6 +54,11 @@ class BaseSearchDatasetStep(ISearchDatasetStep):
                 search_mode: str = None,
                 workspace_id=None,
                 **kwargs) -> List[ParagraphPipelineModel]:
+        get_knowledge_list_of_authorized = DatabaseModelManage.get_model('get_knowledge_list_of_authorized')
+        chat_user_type = self.context.get('chat_user_type')
+        if get_knowledge_list_of_authorized is not None and RoleConstants.CHAT_USER.value.name == chat_user_type:
+            knowledge_id_list = get_knowledge_list_of_authorized(self.context.get('chat_user_id'),
+                                                                 knowledge_id_list)
         if len(knowledge_id_list) == 0:
             return []
         exec_problem_text = padding_problem_text if padding_problem_text is not None else problem_text
