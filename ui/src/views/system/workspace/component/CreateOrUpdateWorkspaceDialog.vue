@@ -1,7 +1,7 @@
 <template>
   <el-dialog :title="`${!form.id ? $t('common.create') : $t('common.rename')}${$t('views.workspace.title')}`"
     v-model="dialogVisible" :close-on-click-modal="false" :close-on-press-escape="false" :destroy-on-close="true">
-    <el-form label-position="top" ref="formRef" :rules="rules" :model="form" require-asterisk-position="right">
+    <el-form label-position="top" ref="formRef" :rules="rules" :model="form" require-asterisk-position="right" @submit.prevent>
       <el-form-item :label="$t('views.workspace.name')" prop="name">
         <el-input v-model="form.name" maxlength="64"
           :placeholder="`${$t('common.inputPlaceholder')}${$t('views.workspace.name')}`" />
