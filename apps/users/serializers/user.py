@@ -270,9 +270,6 @@ class UserManageSerializer(serializers.Serializer):
                     user['role_setting'] = user_role_setting_mapping.get(user_id, [])
             return result
 
-    @valid_license(model=User, count=2,
-                   message=_(
-                       'The community version supports up to 2 users. If you need more users, please contact us (https://fit2cloud.com/).'))
     @transaction.atomic
     def save(self, instance, with_valid=True):
         if with_valid:

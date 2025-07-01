@@ -22,16 +22,23 @@ class ChatUserType(models.TextChoices):
     CHAT_USER = "CHAT_USER", "对话用户"
     SYSTEM_API_KEY = "SYSTEM_API_KEY", "系统API_KEY"
     APPLICATION_API_KEY = "APPLICATION_API_KEY", "应用API_KEY"
+    PLATFORM_USER = "PLATFORM_USER", "平台用户"
+
+
+def default_asker():
+    return {'user_name': '游客'}
 
 
 class Chat(AppModelMixin):
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
     application = models.ForeignKey(Application, on_delete=models.CASCADE)
     abstract = models.CharField(max_length=1024, verbose_name="摘要")
-    chat_user_id = models.UUIDField(verbose_name="客户端id", default=None, null=True)
+    chat_user_id = models.CharField(verbose_name="对话用户id", default=None, null=True)
     chat_user_type = models.CharField(max_length=64, verbose_name="客户端类型", choices=ChatUserType.choices,
                                       default=ChatUserType.ANONYMOUS_USER)
     is_deleted = models.BooleanField(verbose_name="逻辑删除", default=False)
+    asker = models.JSONField(verbose_name="访问者", default=default_asker, encoder=SystemEncoder)
+    meta = models.JSONField(verbose_name="元数据", default=dict)
 
     class Meta:
         db_table = "application_chat"

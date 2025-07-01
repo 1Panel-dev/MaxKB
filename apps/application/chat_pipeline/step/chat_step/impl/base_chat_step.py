@@ -309,9 +309,8 @@ class BaseChatStep(IChatStep):
                     'reasoning_content')
             asker = manage.context.get('form_data', {}).get('asker', None)
             post_response_handler.handler(chat_id, chat_record_id, paragraph_list, problem_text,
-                                          content, manage, self, padding_problem_text, client_id,
-                                          reasoning_content=reasoning_content if reasoning_content_enable else '',
-                                          asker=asker)
+                                          chat_id, manage, self, padding_problem_text,
+                                          reasoning_content=reasoning_content if reasoning_content_enable else '')
             add_access_num(client_id, client_type, manage.context.get('application_id'))
             return manage.get_base_to_response().to_block_response(str(chat_id), str(chat_record_id),
                                                                    content, True,
@@ -327,8 +326,8 @@ class BaseChatStep(IChatStep):
             write_context(self, manage, 0, 0, all_text)
             asker = manage.context.get('form_data', {}).get('asker', None)
             post_response_handler.handler(chat_id, chat_record_id, paragraph_list, problem_text,
-                                          all_text, manage, self, padding_problem_text, client_id, reasoning_content='',
-                                          asker=asker)
+                                          chat_id, manage, self, padding_problem_text,
+                                          reasoning_content='')
             add_access_num(client_id, client_type, manage.context.get('application_id'))
             return manage.get_base_to_response().to_block_response(str(chat_id), str(chat_record_id), all_text, True, 0,
                                                                    0, _status=status.HTTP_500_INTERNAL_SERVER_ERROR)
