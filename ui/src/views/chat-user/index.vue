@@ -1,31 +1,30 @@
 <template>
-  <ContentContainer>
-    <template #header>
-      <div>
-        <h2>{{ $t('views.chatUser.title') }}</h2>
-        <div class="color-secondary">
-          {{
-            resource.resource_type === SourceTypeEnum.APPLICATION
-              ? $t('views.chatUser.applicationTitleTip')
-              : $t('views.chatUser.knowledgeTitleTip')
-          }}
-        </div>
+  <div class="group p-16-24">
+    <div class="mb-16">
+      <h2>{{ $t('views.chatUser.title') }}</h2>
+      <div class="color-secondary">
+        {{
+          resource.resource_type === SourceTypeEnum.APPLICATION
+            ? $t('views.chatUser.applicationTitleTip')
+            : $t('views.chatUser.knowledgeTitleTip')
+        }}
       </div>
-    </template>
-    <el-card style="--el-card-padding: 0" class="user-card">
-      <div class="flex h-full">
+    </div>
+    <el-card style="--el-card-padding: 0">
+      <div class="flex">
         <div class="user-left border-r p-16">
-          <div class="user-left_title">
+          <div class="p-8 pb-0 mb-12">
             <h4 class="medium">{{ $t('views.chatUser.group.title') }}</h4>
           </div>
-          <div class="p-8">
-            <el-input
-              v-model="filterText"
-              :placeholder="$t('common.search')"
-              prefix-icon="Search"
-              clearable
-            />
-          </div>
+
+          <el-input
+            v-model="filterText"
+            :placeholder="$t('common.search')"
+            prefix-icon="Search"
+            clearable
+            class="mb-8"
+          />
+
           <div class="list-height-left">
             <el-scrollbar v-loading="loading">
               <common-list :data="filterList" @click="clickUserGroup" :default-active="current?.id">
@@ -46,11 +45,8 @@
             <div class="flex align-center">
               <h4 class="medium">{{ current?.name }}</h4>
               <el-divider direction="vertical" class="mr-8 ml-8" />
-              <AppIcon
-                iconName="app-workspace"
-                style="font-size: 16px"
-                class="color-input-placeholder"
-              ></AppIcon>
+
+              <el-icon class="color-input-placeholder"><UserFilled /></el-icon>
               <span class="color-input-placeholder ml-4">
                 {{ paginationConfig.total }}
               </span>
@@ -162,13 +158,12 @@
         </div>
       </div>
     </el-card>
-  </ContentContainer>
+  </div>
 </template>
 
 <script lang="ts" setup>
 import { onMounted, ref, watch, reactive, computed } from 'vue'
-import ChatUserApi from '@/api/chat-user/chat-user'
-import SharedChatUserApi from '@/api/system-shared/chat-user'
+
 import { t } from '@/locales'
 import type { ChatUserGroupItem, ChatUserGroupUserItem } from '@/api/type/workspaceChatUser'
 import { useRoute } from 'vue-router'
@@ -367,38 +362,13 @@ async function handleSave() {
 </script>
 
 <style lang="scss" scoped>
-.content-container {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-
-  :deep(.content-container__main) {
-    flex: 1;
-    overflow: hidden;
-  }
-}
-
-:deep(.user-card) {
-  height: 100%;
-  overflow: hidden;
-}
-
 .user-left {
   box-sizing: border-box;
   width: var(--setting-left-width);
   min-width: var(--setting-left-width);
 
-  .user-left_title {
-    padding: 8px;
-  }
-
   .list-height-left {
     height: calc(100vh - 271px);
-
-    :deep(.common-list li) {
-      padding-right: 4px;
-      padding-left: 8px;
-    }
   }
 }
 

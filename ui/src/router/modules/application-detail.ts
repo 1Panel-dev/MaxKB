@@ -86,10 +86,10 @@ const ApplicationDetailRouter = {
       path: 'chat-user',
       name: 'applicationChatUser',
       meta: {
-        icon: 'app-document',
-        iconActive: 'app-document-active',
+        icon: 'app-user-chat',
+        iconActive: 'app-user-chat',
         title: 'views.chatUser.title',
-        active: 'chat-log',
+        active: 'chat-user',
         parentPath: '/application/:id/:type',
         parentName: 'ApplicationDetail',
         resourceType: SourceTypeEnum.APPLICATION,

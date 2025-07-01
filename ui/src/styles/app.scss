@@ -508,6 +508,16 @@ h5 {
 }
 
 /*
+   图标旋转90度
+*/
+.rotate-90 {
+  transform: rotateZ(90deg);
+}
+.rotate-180 {
+  transform: rotateZ(180deg);
+}
+
+/*
   内容部分 自适应高度
 */
 .main-calc-height {

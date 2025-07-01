@@ -1,9 +1,12 @@
 <template>
   <div v-show="show" class="workflow-dropdown-menu border border-r-6">
     <el-tabs v-model="activeName" class="workflow-dropdown-tabs">
-      <div style="display: flex; width: 100%; justify-content: center;" class="mb-12">
-        <el-input v-model="search_text" class="mr-12 ml-12"
-          :placeholder="$t('views.applicationWorkflow.searchBar.placeholder')">
+      <div style="display: flex; width: 100%; justify-content: center" class="mb-12">
+        <el-input
+          v-model="search_text"
+          class="mr-12 ml-12"
+          :placeholder="$t('views.applicationWorkflow.searchBar.placeholder')"
+        >
           <template #suffix>
             <el-icon class="el-input__icon"><search /></el-icon>
           </template>
@@ -14,23 +17,39 @@
         <el-scrollbar height="400">
           <div v-if="filter_menu_nodes.length > 0">
             <template v-for="(node, index) in filter_menu_nodes" :key="index">
-              <el-text type="info" size="small" class="color-secondary ml-12">{{ node.label }}</el-text>
+              <el-text type="info" size="small" class="color-secondary ml-12">{{
+                node.label
+              }}</el-text>
               <div class="flex-wrap mt-8">
                 <template v-for="(item, index) in node.list" :key="index">
                   <el-popover placement="right" :width="280">
                     <template #reference>
-                      <div class="flex align-center border border-r-6 mb-12 p-8-12 cursor ml-12" style="width: 39%; " @click.stop="clickNodes(item)"
-                        @mousedown.stop="onmousedown(item)">
-                        <component :is="iconComponent(`${item.type}-icon`)" class="mr-8" :size="32" />
+                      <div
+                        class="flex align-center border border-r-6 mb-12 p-8-12 cursor ml-12"
+                        style="width: 39%"
+                        @click.stop="clickNodes(item)"
+                        @mousedown.stop="onmousedown(item)"
+                      >
+                        <component
+                          :is="iconComponent(`${item.type}-icon`)"
+                          class="mr-8"
+                          :size="32"
+                        />
                         <div class="lighter">{{ item.label }}</div>
                       </div>
                     </template>
                     <template #default>
                       <div class="flex align-center mb-8">
-                        <component :is="iconComponent(`${item.type}-icon`)" class="mr-8" :size="32" />
+                        <component
+                          :is="iconComponent(`${item.type}-icon`)"
+                          class="mr-8"
+                          :size="32"
+                        />
                         <div class="lighter color-text-primary">{{ item.label }}</div>
                       </div>
-                      <el-text type="info" size="small" class="color-secondary lighter">{{ item.text }}</el-text>
+                      <el-text type="info" size="small" class="color-secondary lighter">{{
+                        item.text
+                      }}</el-text>
                     </template>
                   </el-popover>
                 </template>
@@ -174,21 +193,21 @@ const filter_application_list = computed(() => {
 })
 
 const filter_menu_nodes = computed(() => {
-  if (!search_text.value) return menuNodes;
-  const searchTerm = search_text.value.toLowerCase();
-  
+  if (!search_text.value) return menuNodes
+  const searchTerm = search_text.value.toLowerCase()
+
   return menuNodes.reduce((result: any[], item) => {
-    const filteredList = item.list.filter(listItem => 
-      listItem.label.toLowerCase().includes(searchTerm)
-    );
-    
+    const filteredList = item.list.filter((listItem) =>
+      listItem.label.toLowerCase().includes(searchTerm),
+    )
+
     if (filteredList.length) {
-      result.push({ ...item, list: filteredList });
+      result.push({ ...item, list: filteredList })
     }
-    
-    return result;
-  }, []);
-});
+
+    return result
+  }, [])
+})
 function clickNodes(item: any, data?: any, type?: string) {
   if (data) {
     item['properties']['stepName'] = data.name
@@ -215,10 +234,10 @@ function clickNodes(item: any, data?: any, type?: string) {
           ...(!fileUploadSetting
             ? {}
             : {
-              ...(fileUploadSetting.document ? { document_list: [] } : {}),
-              ...(fileUploadSetting.image ? { image_list: [] } : {}),
-              ...(fileUploadSetting.audio ? { audio_list: [] } : {}),
-            }),
+                ...(fileUploadSetting.document ? { document_list: [] } : {}),
+                ...(fileUploadSetting.image ? { image_list: [] } : {}),
+                ...(fileUploadSetting.audio ? { audio_list: [] } : {}),
+              }),
         }
       } else {
         item['properties']['node_data'] = {
@@ -260,10 +279,10 @@ function onmousedown(item: any, data?: any, type?: string) {
           ...(!fileUploadSetting
             ? {}
             : {
-              ...(fileUploadSetting.document ? { document_list: [] } : {}),
-              ...(fileUploadSetting.image ? { image_list: [] } : {}),
-              ...(fileUploadSetting.audio ? { audio_list: [] } : {}),
-            }),
+                ...(fileUploadSetting.document ? { document_list: [] } : {}),
+                ...(fileUploadSetting.image ? { image_list: [] } : {}),
+                ...(fileUploadSetting.audio ? { audio_list: [] } : {}),
+              }),
         }
       } else {
         item['properties']['node_data'] = {
@@ -301,7 +320,7 @@ onMounted(() => {
   user-select: none; /* CSS3属性 */
   position: absolute;
   top: 49px;
-  right: 122px;
+  right: 16px;
   z-index: 99;
   width: 400px;
   box-shadow: 0px 4px 8px 0px var(--app-text-color-light-1);

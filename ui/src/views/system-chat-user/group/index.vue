@@ -24,11 +24,17 @@
                   v-hasPermission="
                     new ComplexPermission(
                       [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
-                      [PermissionConst.WORKSPACE_USER_GROUP_CREATE, PermissionConst.USER_GROUP_CREATE],
-                      [],'OR',)"
+                      [
+                        PermissionConst.WORKSPACE_USER_GROUP_CREATE,
+                        PermissionConst.USER_GROUP_CREATE,
+                      ],
+                      [],
+                      'OR',
+                    )
+                  "
                 >
                   <el-icon :size="18">
-                    <Plus/>
+                    <Plus />
                   </el-icon>
                 </el-button>
               </el-tooltip>
@@ -59,7 +65,7 @@
                       <el-dropdown :teleported="false">
                         <el-button text>
                           <el-icon class="color-secondary">
-                            <MoreFilled/>
+                            <MoreFilled />
                           </el-icon>
                         </el-button>
                         <template #dropdown>
@@ -67,26 +73,46 @@
                             <el-dropdown-item
                               @click.stop="createOrUpdate(row)"
                               class="p-8"
-                              v-if="hasPermission(new ComplexPermission(
+                              v-if="
+                                hasPermission(
+                                  new ComplexPermission(
                                     [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
-                                    [PermissionConst.WORKSPACE_USER_GROUP_EDIT, PermissionConst.USER_GROUP_EDIT],
-                                    [],'OR',),'OR',)"
+                                    [
+                                      PermissionConst.WORKSPACE_USER_GROUP_EDIT,
+                                      PermissionConst.USER_GROUP_EDIT,
+                                    ],
+                                    [],
+                                    'OR',
+                                  ),
+                                  'OR',
+                                )
+                              "
                             >
                               <el-icon>
-                                <EditPen/>
+                                <EditPen />
                               </el-icon>
                               {{ $t('common.rename') }}
                             </el-dropdown-item>
                             <el-dropdown-item
                               @click.stop="deleteGroup(row)"
                               class="border-t p-8"
-                              v-if="hasPermission(new ComplexPermission(
+                              v-if="
+                                hasPermission(
+                                  new ComplexPermission(
                                     [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
-                                    [PermissionConst.WORKSPACE_USER_GROUP_DELETE, PermissionConst.USER_GROUP_DELETE],
-                                    [],'OR',),'OR',)"
+                                    [
+                                      PermissionConst.WORKSPACE_USER_GROUP_DELETE,
+                                      PermissionConst.USER_GROUP_DELETE,
+                                    ],
+                                    [],
+                                    'OR',
+                                  ),
+                                  'OR',
+                                )
+                              "
                             >
                               <el-icon>
-                                <Delete/>
+                                <Delete />
                               </el-icon>
                               {{ $t('common.delete') }}
                             </el-dropdown-item>
@@ -108,7 +134,7 @@
         <div class="user-right" v-loading="rightLoading">
           <div class="flex align-center">
             <h4 class="medium">{{ current?.name }}</h4>
-            <el-divider direction="vertical" class="mr-8 ml-8"/>
+            <el-divider direction="vertical" class="mr-8 ml-8" />
             <AppIcon
               iconName="app-workspace"
               style="font-size: 16px"
@@ -127,8 +153,14 @@
                 v-hasPermission="
                   new ComplexPermission(
                     [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
-                    [PermissionConst.WORKSPACE_USER_GROUP_ADD_MEMBER, PermissionConst.USER_GROUP_ADD_MEMBER],
-                    [],'OR',)"
+                    [
+                      PermissionConst.WORKSPACE_USER_GROUP_ADD_MEMBER,
+                      PermissionConst.USER_GROUP_ADD_MEMBER,
+                    ],
+                    [],
+                    'OR',
+                  )
+                "
               >
                 {{ t('views.role.member.add') }}
               </el-button>
@@ -138,17 +170,25 @@
                 v-hasPermission="
                   new ComplexPermission(
                     [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
-                    [PermissionConst.WORKSPACE_USER_GROUP_REMOVE_MEMBER, PermissionConst.USER_GROUP_REMOVE_MEMBER],
-                    [],'OR',)"
+                    [
+                      PermissionConst.WORKSPACE_USER_GROUP_REMOVE_MEMBER,
+                      PermissionConst.USER_GROUP_REMOVE_MEMBER,
+                    ],
+                    [],
+                    'OR',
+                  )
+                "
               >
                 {{ $t('common.remove') }}
               </el-button>
             </div>
             <div class="flex-between complex-search">
               <el-select class="complex-search__left" v-model="searchType" style="width: 120px">
-                <el-option :label="$t('views.login.loginForm.username.label')" value="username"/>
-                <el-option :label="$t('views.userManage.userForm.nick_name.label')"
-                           value="nick_name"/>
+                <el-option :label="$t('views.login.loginForm.username.label')" value="username" />
+                <el-option
+                  :label="$t('views.userManage.userForm.nick_name.label')"
+                  value="nick_name"
+                />
               </el-select>
               <el-input
                 v-if="searchType === 'username'"
@@ -176,12 +216,12 @@
             @changePage="getList"
             @selection-change="handleSelectionChange"
           >
-            <el-table-column type="selection" width="55"/>
+            <el-table-column type="selection" width="55" />
             <el-table-column
               prop="nick_name"
               :label="$t('views.userManage.userForm.nick_name.label')"
             />
-            <el-table-column prop="username" :label="$t('views.login.loginForm.username.label')"/>
+            <el-table-column prop="username" :label="$t('views.login.loginForm.username.label')" />
             <el-table-column prop="source" :label="$t('views.userManage.source.label')">
               <template #default="{ row }">
                 {{
@@ -209,11 +249,17 @@
                     v-hasPermission="
                       new ComplexPermission(
                         [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
-                        [PermissionConst.WORKSPACE_USER_GROUP_REMOVE_MEMBER, PermissionConst.USER_GROUP_REMOVE_MEMBER],
-                        [],'OR',)"
+                        [
+                          PermissionConst.WORKSPACE_USER_GROUP_REMOVE_MEMBER,
+                          PermissionConst.USER_GROUP_REMOVE_MEMBER,
+                        ],
+                        [],
+                        'OR',
+                      )
+                    "
                   >
                     <el-icon>
-                      <EditPen/>
+                      <EditPen />
                     </el-icon>
                   </el-button>
                 </el-tooltip>
@@ -224,24 +270,24 @@
       </div>
     </el-card>
 
-    <CreateOrUpdateGroupDialog ref="createOrUpdateGroupDialogRef" @refresh="refresh"/>
-    <CreateGroupUserDialog ref="createGroupUserDialogRef" @refresh="getList"/>
+    <CreateOrUpdateGroupDialog ref="createOrUpdateGroupDialogRef" @refresh="refresh" />
+    <CreateGroupUserDialog ref="createGroupUserDialogRef" @refresh="getList" />
   </div>
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref, watch, reactive} from 'vue'
+import { onMounted, ref, watch, reactive } from 'vue'
 import SystemGroupApi from '@/api/system/user-group'
-import {t} from '@/locales'
-import type {ChatUserGroupUserItem} from '@/api/type/systemChatUser'
+import { t } from '@/locales'
+import type { ChatUserGroupUserItem } from '@/api/type/systemChatUser'
 import CreateOrUpdateGroupDialog from './component/CreateOrUpdateGroupDialog.vue'
 import CreateGroupUserDialog from './component/CreateGroupUserDialog.vue'
-import type {ListItem} from '@/api/type/common'
-import {MsgSuccess, MsgConfirm} from '@/utils/message'
-import {PermissionConst, RoleConst} from '@/utils/permission/data'
-import {ComplexPermission} from '@/utils/permission/type'
-import {hasPermission} from '@/utils/permission/index'
-import {loadPermissionApi} from "@/utils/dynamics-api/permission-api.ts";
+import type { ListItem } from '@/api/type/common'
+import { MsgSuccess, MsgConfirm } from '@/utils/message'
+import { PermissionConst, RoleConst } from '@/utils/permission/data'
+import { ComplexPermission } from '@/utils/permission/type'
+import { hasPermission } from '@/utils/permission/index'
+import { loadPermissionApi } from '@/utils/dynamics-api/permission-api.ts'
 
 const filterText = ref('')
 const loading = ref(false)
@@ -295,23 +341,24 @@ function deleteGroup(item: ListItem) {
     },
   )
     .then(() => {
-      loadPermissionApi('userGroup').delUserGroup(item.id as string, loading).then(async () => {
-        MsgSuccess(t('common.deleteSuccess'))
-        await getUserGroupList()
-        current.value = item.id === current.value?.id ? list.value[0] : current.value
-      })
+      loadPermissionApi('userGroup')
+        .delUserGroup(item.id as string, loading)
+        .then(async () => {
+          MsgSuccess(t('common.deleteSuccess'))
+          await getUserGroupList()
+          current.value = item.id === current.value?.id ? list.value[0] : current.value
+        })
     })
-    .catch(() => {
-    })
+    .catch(() => {})
 }
 
 async function refresh(group?: ListItem) {
   await getUserGroupList()
   // 创建后选中新建的
-   if (group) {
+  if (group) {
     current.value = group
   } else {
-    current.value = list.value.find(item => item.id === current.value?.id)
+    current.value = list.value.find((item) => item.id === current.value?.id)
   }
 }
 
@@ -377,7 +424,7 @@ function handleDeleteUser(item?: ChatUserGroupUserItem) {
   MsgConfirm(
     item
       ? `${t('views.workspace.member.delete.confirmTitle')}${item.nick_name} ?`
-      : t('views.chatUser.group.batchDeleteMember', {count: multipleSelection.value.length}),
+      : t('views.chatUser.group.batchDeleteMember', { count: multipleSelection.value.length }),
     '',
     {
       confirmButtonText: t('common.confirm'),
@@ -385,21 +432,22 @@ function handleDeleteUser(item?: ChatUserGroupUserItem) {
     },
   )
     .then(() => {
-      loadPermissionApi('userGroup').postRemoveMember(
-        current.value?.id as string,
-        {
-          group_relation_ids: item
-            ? [item.user_group_relation_id]
-            : multipleSelection.value.map((item) => item.user_group_relation_id),
-        },
-        loading,
-      ).then(async () => {
-        MsgSuccess(t('common.removeSuccess'))
-        await getList()
-      })
+      loadPermissionApi('userGroup')
+        .postRemoveMember(
+          current.value?.id as string,
+          {
+            group_relation_ids: item
+              ? [item.user_group_relation_id]
+              : multipleSelection.value.map((item) => item.user_group_relation_id),
+          },
+          loading,
+        )
+        .then(async () => {
+          MsgSuccess(t('common.removeSuccess'))
+          await getList()
+        })
     })
-    .catch(() => {
-    })
+    .catch(() => {})
 }
 
 const mouseId = ref('')

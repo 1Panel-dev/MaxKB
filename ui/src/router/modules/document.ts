@@ -75,8 +75,8 @@ const DocumentRouter = {
       path: 'chat-user',
       name: 'KnowledgeChatUser',
       meta: {
-        icon: 'app-document',
-        iconActive: 'app-document-active',
+        icon: 'app-user-chat',
+        iconActive: 'app-user-chat',
         title: 'views.chatUser.title',
         active: 'chat-log',
         parentPath: '/knowledge/:id/:folderId',
@@ -98,14 +98,19 @@ const DocumentRouter = {
             if (to.params.folderId == 'shared') {
               return PermissionConst.SHARED_KNOWLEDGE_CHAT_USER_READ
             } else {
-              return PermissionConst.KNOWLEDGE_CHAT_USER_READ.getKnowledgeWorkspaceResourcePermission(to ? to.params.id : '',)
+              return PermissionConst.KNOWLEDGE_CHAT_USER_READ.getKnowledgeWorkspaceResourcePermission(
+                to ? to.params.id : '',
+              )
             }
           },
           () => {
             const to: any = get_next_route()
             if (to.params.folder_id == 'shared') {
               return RoleConst.ADMIN
-            } else { return PermissionConst.KNOWLEDGE_CHAT_USER_READ.getWorkspacePermissionWorkspaceManageRole }
+            } else {
+              return PermissionConst.KNOWLEDGE_CHAT_USER_READ
+                .getWorkspacePermissionWorkspaceManageRole
+            }
           },
         ],
       },
