@@ -160,7 +160,7 @@ class KnowledgeSerializer(serializers.Serializer):
                 'knowledge.workspace_id': models.CharField(),
             })).filter(**{'knowledge.workspace_id': workspace_id})
             query_set_dict['folder_query_set'] = folder_query_set
-            if not workspace_manage and is_x_pack_ee:
+            if not workspace_manage:
                 query_set_dict['workspace_user_resource_permission_query_set'] = QuerySet(
                     WorkspaceUserResourcePermission).filter(
                     auth_target_type="KNOWLEDGE",

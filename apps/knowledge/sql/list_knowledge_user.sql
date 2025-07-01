@@ -22,7 +22,7 @@ FROM (SELECT "temp_knowledge".id::text, "temp_knowledge".name,
             FROM knowledge knowledge ${knowledge_custom_sql}
             AND id in (select target
                    from workspace_user_resource_permission
-                   where auth_target_type = 'KNOWLEDGE'
+                   ${workspace_user_resource_permission_query_set}
                      and 'VIEW' = any (permission_list))) temp_knowledge
                LEFT JOIN (SELECT "count"("id") AS document_count, "sum"("char_length") "char_length", knowledge_id
                           FROM "document"
