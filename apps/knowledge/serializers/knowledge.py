@@ -474,9 +474,6 @@ class KnowledgeSerializer(serializers.Serializer):
             embedding_by_knowledge.delay(knowledge_id, model_id)
             return document_list
 
-        @valid_license(model=Knowledge, count=50,
-                       message=_(
-                           'The community version supports up to 50 knowledge bases. If you need more knowledge bases, please contact us (https://fit2cloud.com/).'))
         @post(post_function=post_embedding_knowledge)
         @transaction.atomic
         def save_base(self, instance, with_valid=True):
