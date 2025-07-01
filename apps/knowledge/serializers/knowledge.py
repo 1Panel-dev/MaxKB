@@ -49,7 +49,8 @@ from users.serializers.user import is_workspace_manage
 class KnowledgeModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Knowledge
-        fields = ['id', 'name', 'desc', 'meta', 'folder_id', 'type', 'workspace_id', 'create_time', 'update_time']
+        fields = ['id', 'name', 'desc', 'meta', 'folder_id', 'type', 'workspace_id', 'create_time',
+                  'update_time', 'file_size_limit', 'file_count_limit', 'embedding_model_id']
 
 
 class KnowledgeBaseCreateRequest(serializers.Serializer):
