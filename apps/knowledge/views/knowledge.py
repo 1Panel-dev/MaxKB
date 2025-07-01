@@ -196,8 +196,8 @@ class KnowledgeView(APIView):
             tags=[_('Knowledge Base')]  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.KNOWLEDGE_EDIT.get_workspace_knowledge_permission(),
-            PermissionConstants.KNOWLEDGE_EDIT.get_workspace_permission_workspace_manage_role(),
+            PermissionConstants.KNOWLEDGE_HIT_TEST.get_workspace_knowledge_permission(),
+            PermissionConstants.KNOWLEDGE_HIT_TEST.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
             RoleConstants.USER.get_workspace_role()
         )

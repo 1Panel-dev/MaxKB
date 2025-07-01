@@ -60,7 +60,7 @@ const systemRouter = {
           new ComplexPermission(
             [RoleConst.WORKSPACE_MANAGE, RoleConst.ADMIN],
             [PermissionConst.WORKSPACE_WORKSPACE_READ, PermissionConst.WORKSPACE_READ],
-            [EditionConst.IS_EE, EditionConst.IS_PE],
+            [EditionConst.IS_EE],
             'OR',
           ),
         ],

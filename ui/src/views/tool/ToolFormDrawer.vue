@@ -231,7 +231,7 @@
     <template #footer>
       <div>
         <el-button :loading="loading" @click="visible = false">{{ $t('common.cancel') }}</el-button>
-        <el-button :loading="loading" @click="openDebug" v-if="permissionPrecise.debug(id)">{{
+        <el-button :loading="loading" @click="openDebug" v-if="permissionPrecise.debug(form?.id||'or')">{{
           $t('common.debug')
         }}</el-button>
         <el-button type="primary" @click="submit(FormRef)" :loading="loading">
@@ -265,9 +265,6 @@ import permissionMap from '@/permission'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 const route = useRoute()
-const {
-  params: { id, folderId }, // id为knowledgeID
-} = route as any
 
 const props = defineProps({
   title: String,
