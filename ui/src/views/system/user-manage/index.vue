@@ -91,10 +91,10 @@
             {{ row.phone || '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="role" :label="$t('views.role.member.role')" min-width="100"
+        <el-table-column prop="role_name" :label="$t('views.role.member.role')" min-width="100"
                          v-if="user.isEE() || user.isPE()">
           <template #default="{ row }">
-            <TagGroup :tags="row.role"/>
+            <TagGroup :tags="row.role_name"/>
           </template>
         </el-table-column>
         <el-table-column prop="source" :label="$t('views.userManage.source.label')">
