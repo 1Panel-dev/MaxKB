@@ -6,11 +6,14 @@ import time
 from typing import Dict
 
 import uuid_utils.compat as uuid
+from django.core.cache import cache
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from common.config.embedding_config import ModelManage
+from common.constants.cache_version import Cache_Version
+from common.constants.permission_constants import ResourcePermission, ResourceAuthType
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import native_search
 from common.exception.app_exception import AppApiException
@@ -21,7 +24,7 @@ from models_provider.base_model_provider import ValidCode, DownModelChunkStatus
 from models_provider.constants.model_provider_constants import ModelProvideConstants
 from models_provider.models import Model, Status
 from models_provider.tools import get_model_credential
-from system_manage.models import WorkspaceUserResourcePermission
+from system_manage.models import WorkspaceUserResourcePermission, AuthTargetType
 from users.serializers.user import is_workspace_manage
 
 
@@ -318,6 +321,19 @@ class ModelSerializer(serializers.Serializer):
             model = Model(**model_data)
             try:
                 model.save()
+                # 自动授权给创建者
+                WorkspaceUserResourcePermission(
+                    target=model.id,
+                    auth_target_type=AuthTargetType.MODEL,
+                    permission_list=[ResourcePermission.VIEW, ResourcePermission.MANAGE],
+                    workspace_id=workspace_id,
+                    user_id=self.data.get('user_id'),
+                    auth_type=ResourceAuthType.RESOURCE_PERMISSION_GROUP
+                ).save()
+                # 刷新缓存
+                version = Cache_Version.PERMISSION_LIST.get_version()
+                key = Cache_Version.PERMISSION_LIST.get_key(user_id=self.data.get('user_id'))
+                cache.delete(key, version=version)
             except Exception as save_error:
                 # 可添加日志记录
                 raise AppApiException(500, _("Model saving failed")) from save_error

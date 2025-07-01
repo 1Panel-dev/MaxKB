@@ -222,6 +222,9 @@ class UserManageSerializer(serializers.Serializer):
                                  post_records_handler=lambda u: UserInstanceSerializer(u).data)
             role_model = DatabaseModelManage.get_model("role_model")
             user_role_relation_model = DatabaseModelManage.get_model("workspace_user_role_mapping")
+            workspace_model = DatabaseModelManage.get_model("workspace_model")
+            workspace_mapping = {str(workspace_model.id): workspace_model.name for workspace_model in
+                                 workspace_model.objects.all()}
 
             def _get_user_roles(user_ids):
                 if not (role_model and user_role_relation_model):
@@ -237,17 +240,23 @@ class UserManageSerializer(serializers.Serializer):
                 )
 
                 # 构建用户ID到角色名称列表的映射
-                user_role_mapping = defaultdict(list)
+                user_role_mapping = defaultdict(set)  # 使用 set 去重
                 # 构建用户ID到角色ID与工作空间ID映射
                 user_role_setting_mapping = defaultdict(lambda: defaultdict(list))
+                user_role_workspace_mapping = defaultdict(lambda: defaultdict(list))
 
                 for relation in user_role_relations:
                     user_id = str(relation.user_id)
                     role_id = relation.role_id
                     workspace_id = relation.workspace_id
 
-                    user_role_mapping[user_id].append(relation.role.role_name)
+                    user_role_mapping[user_id].add(relation.role.role_name)
                     user_role_setting_mapping[user_id][role_id].append(workspace_id)
+                    user_role_workspace_mapping[user_id][relation.role.role_name].append(
+                        workspace_mapping.get(workspace_id, workspace_id))
+
+                    # 将 set 转换为 list 以符合返回格式
+                user_role_mapping = {uid: list(roles) for uid, roles in user_role_mapping.items()}
 
                 # 转换为所需的结构
                 result_user_role_setting_mapping = {
@@ -255,18 +264,24 @@ class UserManageSerializer(serializers.Serializer):
                               for role_id, workspace_ids in roles.items()]
                     for user_id, roles in user_role_setting_mapping.items()
                 }
+                result_user_role_workspace_mapping = {
+                    user_id: {role_name: workspace_names
+                              for role_name, workspace_names in roles.items()}
+                    for user_id, roles in user_role_workspace_mapping.items()
+                }
 
-                return user_role_mapping, result_user_role_setting_mapping
+                return user_role_mapping, result_user_role_setting_mapping, result_user_role_workspace_mapping
 
             if role_model and user_role_relation_model:
                 user_ids = [user['id'] for user in result['records']]
-                user_role_mapping, user_role_setting_mapping = _get_user_roles(user_ids)
+                user_role_mapping, user_role_setting_mapping, user_role_workspace_mapping = _get_user_roles(user_ids)
 
                 # 将角色信息添加回用户数据中
                 for user in result['records']:
                     user_id = str(user['id'])
                     user['role_name'] = user_role_mapping.get(user_id, [])
                     user['role_setting'] = user_role_setting_mapping.get(user_id, [])
+                    user['role_workspace'] = user_role_workspace_mapping.get(user_id, [])
             return result
 
     @transaction.atomic
