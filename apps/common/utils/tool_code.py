@@ -3,12 +3,12 @@
 import os
 import subprocess
 import sys
-import uuid_utils.compat as uuid
 from textwrap import dedent
 
+import uuid_utils.compat as uuid
 from diskcache import Cache
 
-from maxkb.const import BASE_DIR
+from maxkb.const import BASE_DIR, CONFIG
 from maxkb.const import PROJECT_DIR
 
 python_directory = sys.executable
@@ -39,14 +39,14 @@ class ToolExecutor:
         success = '{"code":200,"msg":"成功","data":exec_result}'
         err = '{"code":500,"msg":str(e),"data":None}'
         path = r'' + self.sandbox_path + ''
+        python_paths = CONFIG.get_sandbox_python_package_paths().split(',')
         _exec_code = f"""
 try:
     import os
     import sys
     path_to_exclude = ['/opt/py3/lib/python3.11/site-packages', '/opt/maxkb-app/apps']
     sys.path = [p for p in sys.path if p not in path_to_exclude]
-    sys.path.append('/opt/maxkb-app/sandbox/python-packages')
-    sys.path.append('/opt/maxkb/python-packages')
+    sys.path += {python_paths}
     env = dict(os.environ)
     for key in list(env.keys()):
         if key in os.environ and (key.startswith('MAXKB') or key.startswith('POSTGRES') or key.startswith('PG')):
