@@ -134,9 +134,5 @@ class ChatView(APIView):
         responses=None,
         tags=[_('Application')]  # type: ignore
     )
-    @has_permissions(
-        PermissionConstants.APPLICATION_DEBUG,
-        RoleConstants.USER.get_workspace_role(),
-        RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def post(self, request: Request, chat_id: str):
         return DebugChatSerializers(data={'chat_id': chat_id}).chat(request.data)
