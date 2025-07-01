@@ -131,7 +131,7 @@
       <div>
         <el-button @click.prevent="dialogVisible = false">{{ $t('common.cancel') }} </el-button>
         <el-button type="primary" @click="submit(limitFormRef)" :loading="loading">
-          {{ $t('common.create') }}
+          {{ $t('common.save') }}
         </el-button>
       </div>
     </template>
