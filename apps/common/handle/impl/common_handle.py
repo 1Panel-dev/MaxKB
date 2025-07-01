@@ -7,20 +7,18 @@
     @desc:
 """
 import io
-import logging
-
-import uuid_utils.compat as uuid
+import traceback
 from functools import reduce
 from io import BytesIO
 from xml.etree.ElementTree import fromstring
 from zipfile import ZipFile
 
+import uuid_utils.compat as uuid
 from PIL import Image as PILImage
 from openpyxl.drawing.image import Image as openpyxl_Image
 from openpyxl.packaging.relationship import get_rels_path, get_dependents
 from openpyxl.xml.constants import SHEET_DRAWING_NS, REL_NS, SHEET_MAIN_NS
 
-from common.handle.base_parse_qa_handle import get_title_row_index_dict, get_row_value
 from common.utils.logger import maxkb_logger
 from knowledge.models import File
 
@@ -76,7 +74,7 @@ def handle_images(deps, archive: ZipFile) -> []:
             image_io = archive.read(dep.target)
             image = openpyxl_Image(BytesIO(image_io))
         except Exception as e:
-            maxkb_logger.error(f"Error reading image {dep.target}: {e}")
+            maxkb_logger.error(f"Error reading image {dep.target}: {e}, {traceback.format_exc()}")
             continue
         image.embed = dep.id  # 文件rId
         image.target = dep.target  # 文件地址
@@ -107,6 +105,9 @@ def xlsx_embed_cells_images(buffer) -> {}:
         image_excel_id_list = [_xl for _xl in
                                reduce(lambda x, y: [*x, *y], [sheet for sheet_id, sheet in sheet_list.items()], []) if
                                key in _xl]
+        # print(key, img)
+        if img is None:
+            continue
         if len(image_excel_id_list) > 0:
             image_excel_id = image_excel_id_list[-1]
             f = archive.open(img.target)
