@@ -265,7 +265,7 @@ function deleteUserManage(row: any) {
     t('views.userManage.delete.confirmMessage'),
     {
       confirmButtonText: t('common.confirm'),
-      confirmButtonClass: 'danger',
+      confirmButtonClass: 'color-danger',
     },
   )
     .then(() => {

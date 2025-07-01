@@ -25,7 +25,7 @@
               <div>
                 <span
                   >{{ $t('views.applicationWorkflow.nodes.textToSpeechNode.tts_model.label')
-                  }}<span class="danger">*</span></span
+                  }}<span class="color-danger">*</span></span
                 >
               </div>
               <el-button
@@ -63,7 +63,7 @@
               <div>
                 <span
                   >{{ $t('views.applicationWorkflow.nodes.textToSpeechNode.content.label')
-                  }}<span class="danger">*</span></span
+                  }}<span class="color-danger">*</span></span
                 >
               </div>
             </div>

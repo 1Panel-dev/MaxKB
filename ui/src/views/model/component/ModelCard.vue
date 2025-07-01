@@ -10,7 +10,7 @@
         </span>
         <span v-if="currentModel.status === 'ERROR'">
           <el-tooltip effect="dark" :content="errMessage" placement="top">
-            <el-icon class="danger ml-4" size="18"><Warning /></el-icon>
+            <el-icon class="color-danger ml-4" size="18"><Warning /></el-icon>
           </el-tooltip>
         </span>
         <span v-if="currentModel.status === 'PAUSE_DOWNLOAD'">
@@ -19,7 +19,7 @@
             :content="`${$t('views.model.modelForm.base_model.label')}: ${props.model.model_name} ${$t('views.model.tip.downloadError')}`"
             placement="top"
           >
-            <el-icon class="danger ml-4" size="18"><Warning /></el-icon>
+            <el-icon class="color-danger ml-4" size="18"><Warning /></el-icon>
           </el-tooltip>
         </span>
       </div>
@@ -179,7 +179,7 @@ const deleteModel = () => {
     `${t('views.model.delete.confirmMessage')}${props.model.name} ?`,
     {
       confirmButtonText: t('common.confirm'),
-      confirmButtonClass: 'danger',
+      confirmButtonClass: 'color-danger',
     },
   )
     .then(() => {

@@ -82,7 +82,7 @@
               <div class="flex-between">
                 <div>
                   <TooltipLabel :label="item.label.label" :tooltip="item.label.attrs.tooltip" />
-                  <span v-if="item.required" class="danger">*</span>
+                  <span v-if="item.required" class="color-danger">*</span>
                 </div>
                 <el-select
                   :teleported="false"
@@ -154,7 +154,7 @@
               <div class="flex-between">
                 <div>
                   <TooltipLabel :label="item.label.label" :tooltip="item.label.attrs.tooltip" />
-                  <span v-if="item.required" class="danger">*</span>
+                  <span v-if="item.required" class="color-danger">*</span>
                 </div>
                 <el-select
                   :teleported="false"

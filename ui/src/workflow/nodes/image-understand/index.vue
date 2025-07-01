@@ -27,7 +27,7 @@
               <div>
                 <span
                   >{{ t('views.applicationWorkflow.nodes.imageUnderstandNode.model.label')
-                  }}<span class="danger">*</span></span
+                  }}<span class="color-danger">*</span></span
                 >
               </div>
               <el-button
@@ -78,7 +78,7 @@
               <div class="mr-4">
                 <span
                   >{{ $t('views.application.form.prompt.label')
-                  }}<span class="danger">*</span></span
+                  }}<span class="color-danger">*</span></span
                 >
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
@@ -128,7 +128,7 @@
         >
           <template #label
             >{{ $t('views.applicationWorkflow.nodes.imageUnderstandNode.image.label')
-            }}<span class="danger">*</span></template
+            }}<span class="color-danger">*</span></template
           >
           <NodeCascader
             ref="nodeCascaderRef"

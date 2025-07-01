@@ -269,7 +269,7 @@ function deleteRole(item: RoleItem) {
     t('views.role.delete.confirmMessage'),
     {
       confirmButtonText: t('common.confirm'),
-      confirmButtonClass: 'danger',
+      confirmButtonClass: 'color-danger',
     },
   )
     .then(() => {

@@ -54,7 +54,7 @@
                 <template #label>
                   <div class="flex">
                     <span
-                      >{{ item.name }} <span class="danger" v-if="item.is_required">*</span></span
+                      >{{ item.name }} <span class="color-danger" v-if="item.is_required">*</span></span
                     >
                     <el-tag type="info" class="info-tag ml-4">{{ item.type }}</el-tag>
                   </div>
@@ -96,7 +96,7 @@
         <p class="lighter mb-8">{{ $t('views.tool.form.debug.output') }}</p>
 
         <el-card
-          :class="isSuccess ? '' : 'danger'"
+          :class="isSuccess ? '' : 'color-danger'"
           class="pre-wrap"
           shadow="never"
           style="max-height: 350px; overflow: scroll"

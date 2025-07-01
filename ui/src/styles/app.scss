@@ -431,6 +431,10 @@ h5 {
   background: var(--app-layout-bg-color);
 }
 
+.white-bg {
+  background: #ffffff;
+}
+
 /*
   标题前带竖线样式
 */
@@ -493,6 +497,14 @@ h5 {
 .update-info {
   background: #d6e2ff;
   line-height: 25px;
+}
+
+/*
+  card 无边框无阴影 灰色背景
+*/
+.card-never {
+  background: var(--app-layout-bg-color);
+  border: none !important;
 }
 
 /*

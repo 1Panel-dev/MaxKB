@@ -248,3 +248,12 @@
 .el-divider__text {
   background: var(--app-layout-bg-color);
 }
+
+// el-cascader
+.el-cascader-node {
+  padding-left: 2px;
+}
+.el-cascader-node__prefix {
+  right: 10px;
+  left: auto;
+}

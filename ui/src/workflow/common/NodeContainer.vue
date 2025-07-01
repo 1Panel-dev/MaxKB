@@ -275,7 +275,7 @@ const copyNode = () => {
 const deleteNode = () => {
   MsgConfirm(t('common.tip'), t('views.applicationWorkflow.delete.confirmTitle'), {
     confirmButtonText: t('common.confirm'),
-    confirmButtonClass: 'danger',
+    confirmButtonClass: 'color-danger',
   }).then(() => {
     props.nodeModel.graphModel.deleteNode(props.nodeModel.id)
   })

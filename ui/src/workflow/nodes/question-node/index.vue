@@ -7,7 +7,6 @@
         :model="form_data"
         label-position="top"
         require-asterisk-position="right"
-        class="mb-24"
         label-width="auto"
         ref="questionNodeFormRef"
         hide-required-asterisk
@@ -26,7 +25,7 @@
               <div>
                 <span
                   >{{ $t('views.application.form.aiModel.label')
-                  }}<span class="danger">*</span></span
+                  }}<span class="color-danger">*</span></span
                 >
               </div>
               <el-button
@@ -75,7 +74,7 @@
               <div class="mr-4">
                 <span
                   >{{ $t('views.application.form.prompt.label')
-                  }}<span class="danger">*</span></span
+                  }}<span class="color-danger">*</span></span
                 >
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">

@@ -158,7 +158,7 @@ function handleAdd() {
 function handleDelete(row: WorkspaceMemberItem) {
   MsgConfirm(`${t('views.workspace.member.delete.confirmTitle')}${row.nick_name} ?`, '', {
     confirmButtonText: t('common.confirm'),
-    confirmButtonClass: 'danger',
+    confirmButtonClass: 'color-danger',
   })
     .then(() => {
       loading.value = true

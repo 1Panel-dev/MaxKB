@@ -25,7 +25,7 @@
               <div class="mr-4">
                 <span
                   >{{ $t('views.applicationWorkflow.nodes.formNode.formContent.label')
-                  }}<span class="danger">*</span></span
+                  }}<span class="color-danger">*</span></span
                 >
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">

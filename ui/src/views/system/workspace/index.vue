@@ -191,7 +191,7 @@ async function deleteWorkspace(item: WorkspaceItem) {
       t('views.workspace.delete.confirmContent'),
       {
         confirmButtonText: t('common.confirm'),
-        confirmButtonClass: 'danger',
+        confirmButtonClass: 'color-danger',
       },
     ).then(() => {
       WorkspaceApi.deleteWorkspace(item.id as string, loading).then(async () => {

@@ -25,7 +25,7 @@
               <div>
                 <span
                   >{{ $t('views.applicationWorkflow.nodes.speechToTextNode.stt_model.label')
-                  }}<span class="danger">*</span></span
+                  }}<span class="color-danger">*</span></span
                 >
               </div>
             </div>
@@ -54,7 +54,7 @@
               <div>
                 <span
                   >{{ $t('views.applicationWorkflow.nodes.speechToTextNode.audio.label')
-                  }}<span class="danger">*</span></span
+                  }}<span class="color-danger">*</span></span
                 >
               </div>
             </div>

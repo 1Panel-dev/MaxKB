@@ -26,7 +26,7 @@
             <div class="flex-between">
               <span
                 >{{ $t('views.applicationWorkflow.nodes.rerankerNode.rerankerContent.label')
-                }}<span class="danger">*</span></span
+                }}<span class="color-danger">*</span></span
               >
               <el-button @click="add_reranker_reference" link type="primary">
                 <el-icon class="mr-4"><Plus /></el-icon>
@@ -38,6 +38,7 @@
             style="margin-bottom: 8px"
             v-for="(reranker_reference, index) in form_data.reranker_reference_list"
             :key="index"
+            class="w-full"
           >
             <el-col :span="22">
               <el-form-item
@@ -62,8 +63,8 @@
                 />
               </el-form-item>
             </el-col>
-            <el-col :span="1">
-              <el-button link type="info" class="mt-4" @click="deleteCondition(index)">
+            <el-col :span="2">
+              <el-button link type="info" @click="deleteCondition(index)">
                 <el-icon><Delete /></el-icon>
               </el-button>
             </el-col>
@@ -121,7 +122,7 @@
             <div class="flex-between">
               <span
                 >{{ $t('views.applicationWorkflow.nodes.searchKnowledgeNode.searchQuestion.label')
-                }}<span class="danger">*</span></span
+                }}<span class="color-danger">*</span></span
               >
             </div>
           </template>
@@ -148,7 +149,7 @@
             <div class="flex-between">
               <span
                 >{{ $t('views.applicationWorkflow.nodes.rerankerNode.reranker_model.label')
-                }}<span class="danger">*</span></span
+                }}<span class="color-danger">*</span></span
               >
             </div>
           </template>

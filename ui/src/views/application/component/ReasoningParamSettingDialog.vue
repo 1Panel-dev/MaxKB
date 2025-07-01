@@ -9,7 +9,7 @@
     :close-on-click-modal="false"
     :close-on-press-escape="false"
   >
-    <el-form label-position="top" ref="paramFormRef" :model="form" class="p-12-16">
+    <el-form label-position="top" ref="paramFormRef" :model="form">
       <el-text type="info" class="color-secondary">{{
         $t('views.application.form.reasoningContent.tooltip')
       }}</el-text>

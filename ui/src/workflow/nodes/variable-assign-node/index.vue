@@ -16,7 +16,7 @@
               <div class="flex-between">
                 <div>
                   {{ $t('views.applicationWorkflow.variable.label') }}
-                  <span class="danger">*</span>
+                  <span class="color-danger">*</span>
                 </div>
                 <el-button
                   text
@@ -42,7 +42,7 @@
           <div class="flex-between mb-8">
             <span class="lighter"
               >{{ $t('views.applicationWorkflow.nodes.variableAssignNode.assign')
-              }}<span class="danger">*</span></span
+              }}<span class="color-danger">*</span></span
             >
             <el-select :teleported="false" v-model="item.source" size="small" style="width: 85px">
               <el-option
