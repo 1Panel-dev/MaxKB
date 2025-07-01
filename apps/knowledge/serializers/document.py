@@ -863,17 +863,47 @@ class DocumentSerializers(serializers.Serializer):
             }).batch_save(document_list)
 
         def parse_qa_file(self, file):
+            #  保存源文件
+            source_file_id = uuid.uuid7()
+            source_file = File(
+                id=source_file_id,
+                file_name=file.name,
+                source_type=FileSourceType.KNOWLEDGE,
+                source_id=self.data.get('knowledge_id'),
+                meta={}
+            )
+            source_file.save(file.read())
+            file.seek(0)
+
             get_buffer = FileBufferHandle().get_buffer
             for parse_qa_handle in parse_qa_handle_list:
                 if parse_qa_handle.support(file, get_buffer):
-                    return parse_qa_handle.handle(file, get_buffer, self.save_image)
+                    documents = parse_qa_handle.handle(file, get_buffer, self.save_image)
+                    for doc in documents:
+                        doc['source_file_id'] = source_file_id
+                    return documents
             raise AppApiException(500, _('Unsupported file format'))
 
         def parse_table_file(self, file):
+            #  保存源文件
+            source_file_id = uuid.uuid7()
+            source_file = File(
+                id=source_file_id,
+                file_name=file.name,
+                source_type=FileSourceType.KNOWLEDGE,
+                source_id=self.data.get('knowledge_id'),
+                meta={}
+            )
+            source_file.save(file.read())
+            file.seek(0)
+
             get_buffer = FileBufferHandle().get_buffer
             for parse_table_handle in parse_table_handle_list:
                 if parse_table_handle.support(file, get_buffer):
-                    return parse_table_handle.handle(file, get_buffer, self.save_image)
+                    documents = parse_table_handle.handle(file, get_buffer, self.save_image)
+                    for doc in documents:
+                        doc['source_file_id'] = source_file_id
+                    return documents
             raise AppApiException(500, _('Unsupported file format'))
 
         def save_image(self, image_list):
