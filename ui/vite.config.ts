@@ -1,3 +1,4 @@
+import { model } from '@/permission/model'
 import { fileURLToPath, URL } from 'node:url'
 import type { ProxyOptions } from 'vite'
 import { defineConfig, loadEnv } from 'vite'
@@ -6,21 +7,39 @@ import vueJsx from '@vitejs/plugin-vue-jsx'
 import DefineOptions from 'unplugin-vue-define-options/vite'
 import path from 'path'
 import { createHtmlPlugin } from 'vite-plugin-html'
-
+import fs from 'fs'
 // import vueDevTools from 'vite-plugin-vue-devtools'
 const envDir = './env'
+// 自定义插件：重命名入口文件
+const renameHtmlPlugin = (outDir: string, entry: string) => {
+  return {
+    name: 'rename-html',
+    closeBundle: () => {
+      const buildDir = path.resolve(__dirname, outDir)
+      const oldFile = path.join(buildDir, entry)
+      const newFile = path.join(buildDir, 'index.html')
 
+      // 检查文件是否存在
+      if (fs.existsSync(oldFile)) {
+        // 删除已存在的 index.html
+        if (fs.existsSync(newFile)) {
+          fs.unlinkSync(newFile)
+        }
+        // 重命名文件
+        fs.renameSync(oldFile, newFile)
+      }
+    },
+  }
+}
 // https://vite.dev/config/
-export default defineConfig(({ mode }) => {
+export default defineConfig((conf: any) => {
+  const mode = conf.mode
   const ENV = loadEnv(mode, envDir)
-  console.log(ENV)
-  const prefix = process.env.VITE_DYNAMIC_PREFIX || ENV.VITE_BASE_PATH
   const proxyConf: Record<string, string | ProxyOptions> = {}
-  proxyConf['/api'] = {
+  proxyConf['/admin/api'] = {
     // target: 'http://47.92.195.88:8080',
     target: 'http://127.0.0.1:8080',
     changeOrigin: true,
-    rewrite: (path: string) => path.replace(ENV.VITE_BASE_PATH, '/'),
   }
   proxyConf['/oss'] = {
     target: 'http://127.0.0.1:8080',
@@ -46,12 +65,19 @@ export default defineConfig(({ mode }) => {
     changeOrigin: true,
     rewrite: (path: string) => path.replace(ENV.VITE_BASE_PATH, '/'),
   }
+
   return {
     preflight: false,
     lintOnSave: false,
-    base: prefix,
+    base: './',
     envDir: envDir,
-    plugins: [vue(), vueJsx(), DefineOptions(), createHtmlPlugin({ template: ENV.VITE_ENTRY })],
+    plugins: [
+      vue(),
+      vueJsx(),
+      DefineOptions(),
+      createHtmlPlugin({ template: ENV.VITE_ENTRY }),
+      renameHtmlPlugin(`dist${ENV.VITE_BASE_PATH}`, ENV.VITE_ENTRY),
+    ],
     server: {
       cors: true,
       host: '0.0.0.0',
@@ -62,7 +88,7 @@ export default defineConfig(({ mode }) => {
     build: {
       outDir: `dist${ENV.VITE_BASE_PATH}`,
       rollupOptions: {
-        input: path.resolve(__dirname, ENV.VITE_ENTRY),
+        input: ENV.VITE_ENTRY,
       },
     },
     resolve: {

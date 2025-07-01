@@ -9,7 +9,7 @@ import router from '@/router'
 import { ref, type WritableComputedRef } from 'vue'
 
 const axiosConfig = {
-  baseURL: '/api',
+  baseURL: (window.MaxKB?.prefix ? window.MaxKB?.prefix : '/admin') + '/api',
   withCredentials: false,
   timeout: 600000,
   headers: {},
