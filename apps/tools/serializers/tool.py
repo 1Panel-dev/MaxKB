@@ -17,7 +17,7 @@ from pylint.reporters import JSON2Reporter
 from rest_framework import serializers, status
 
 from common.constants.cache_version import Cache_Version
-from common.constants.permission_constants import ResourceAuthType, ResourcePermissionGroup, ResourcePermission
+from common.constants.permission_constants import ResourceAuthType, ResourcePermission
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import page_search, native_page_search
 from common.exception.app_exception import AppApiException
@@ -474,8 +474,14 @@ class ToolSerializer(serializers.Serializer):
                 Q(scope=ToolScope.INTERNAL) &
                 Q(is_active=True)
             )
-
-            return ToolModelSerializer(query_set, many=True).data
+            # 处理动态url
+            prefix = CONFIG.get_admin_path()
+            return [
+                {
+                    **tool,
+                    'icon': tool['icon'].replace('/admin', prefix),
+                } for tool in ToolModelSerializer(query_set, many=True).data
+            ]
 
     class AddInternalTool(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, label=_("User ID"))
