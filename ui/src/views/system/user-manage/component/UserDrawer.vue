@@ -137,6 +137,20 @@ async function getWorkspaceFormItem() {
         path: 'workspace_ids',
         label: t('views.role.member.workspace'),
         hidden: (e) => adminRoleList.value.find(item => item.id === e.role_id),
+        rules: [
+          {
+            validator: (rule, value, callback) => {
+              const match = rule.field?.match(/\[(\d+)\]/);
+              const isAdmin = adminRoleList.value.some(role => role.id === list.value[parseInt(match?.[1] ?? '', 10)].role_id);
+              if (!isAdmin && (!value || value.length === 0)) {
+                callback(new Error(`${t('common.selectPlaceholder')}${t('views.role.member.workspace')}`));
+              } else {
+                callback();
+              }
+            },
+            trigger: 'change',
+          },
+        ],
         selectProps: {
           options:
             res.data?.map((item) => ({
@@ -275,7 +289,6 @@ const submit = async (formEl: FormInstance | undefined) => {
         ...userForm.value,
         role_setting: list.value
       }
-      console.log(list.value)
       if (isEdit.value) {
         userManageApi.putUserManage(userForm.value.id, params, loading).then((res) => {
           emit('refresh')

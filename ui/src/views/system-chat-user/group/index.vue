@@ -310,7 +310,7 @@ async function refresh(group?: ListItem) {
    if (group) {
     current.value = group
   } else {
-    current.value = list.value.find(item => item.id === current.value.id)
+    current.value = list.value.find(item => item.id === current.value?.id)
   }
 }
 

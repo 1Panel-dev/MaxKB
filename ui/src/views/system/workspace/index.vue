@@ -96,11 +96,7 @@
           <div class="flex align-center mb-16">
             <h4 class="medium">{{ currentWorkspace?.name }}</h4>
             <el-divider direction="vertical" class="mr-8 ml-8" />
-            <AppIcon
-              iconName="app-workspace"
-              style="font-size: 16px"
-              class="color-input-placeholder"
-            ></AppIcon>
+            <el-icon class="color-input-placeholder"><UserFilled /></el-icon>
             <span class="color-input-placeholder ml-4">
               {{ currentWorkspace?.user_count }}
             </span>
@@ -152,7 +148,7 @@ async function refresh(workspace?: WorkspaceItem) {
   if (workspace) {
     currentWorkspace.value = workspace
   } else {
-    currentWorkspace.value = list.value.find(item => item.id === currentWorkspace.value.id)
+    currentWorkspace.value = list.value.find(item => item.id === currentWorkspace.value?.id)
   }
 }
 

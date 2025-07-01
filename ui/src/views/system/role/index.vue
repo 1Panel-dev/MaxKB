@@ -202,7 +202,7 @@ async function refresh(role?: RoleItem) {
   if (role) {
     currentRole.value = role
   } else {
-    currentRole.value = customRoleList.value.find(item => item.id === currentRole.value.id)
+    currentRole.value = customRoleList.value.find(item => item.id === currentRole.value?.id)
   }
 }
 

@@ -177,7 +177,7 @@ const filter_menu_nodes = computed(() => {
   if (!search_text.value) return menuNodes;
   const searchTerm = search_text.value.toLowerCase();
   
-  return menuNodes.reduce((result, item) => {
+  return menuNodes.reduce((result: any[], item) => {
     const filteredList = item.list.filter(listItem => 
       listItem.label.toLowerCase().includes(searchTerm)
     );

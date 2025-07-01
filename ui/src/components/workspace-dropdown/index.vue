@@ -40,7 +40,7 @@ import type { WorkspaceItem } from '@/api/type/workspace'
 
 const props = defineProps({
   data: {
-    type: Array,
+    type: Array<any>,
     default: () => [],
   },
   currentWorkspace: {

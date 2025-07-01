@@ -4,7 +4,7 @@
       <div v-for="(element, index) in form" :key="index" class="flex w-full">
         <el-form-item v-for="model of props.models" :key="model.path" :prop="`[${index}].${model.path}`"
           :rules="model.rules" :label="index === 0 && model.label ? model.label : ''" class="mr-8" style="flex: 1">
-          <el-select v-show="!model?.hidden?.(element)" v-model="element[model.path]"
+          <el-select v-if="!model?.hidden?.(element)" v-model="element[model.path]"
             :placeholder="model.selectProps?.placeholder ?? $t('common.selectPlaceholder')" clearable filterable
             multiple style="width: 100%" collapse-tags collapse-tags-tooltip v-bind="model.selectProps">
             <el-option v-for="opt in model.selectProps?.options" :key="opt.value" :label="opt.label"

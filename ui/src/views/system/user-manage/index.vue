@@ -125,7 +125,7 @@
           <template #default="{ row }">
             <span @click.stop>
               <el-switch
-                :disabled="row.role === 'ADMIN'"
+                :disabled="row.role === 'ADMIN' || row.id === user.userInfo?.id"
                 size="small"
                 v-model="row.is_active"
                 :before-change="() => changeState(row)"
@@ -153,7 +153,7 @@
             </span>
             <span>
               <el-button
-                :disabled="row.role === 'ADMIN'"
+                :disabled="row.role === 'ADMIN' || row.id === user.userInfo?.id"
                 type="primary"
                 text
                 @click.stop="deleteUserManage(row)"
