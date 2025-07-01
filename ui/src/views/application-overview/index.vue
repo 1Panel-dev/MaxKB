@@ -99,10 +99,7 @@
                     {{ $t('views.applicationOverview.appInfo.embedInWebsite') }}
                   </el-button>
                   <!-- 访问限制 -->
-                  <el-button
-                    @click="openLimitDialog"
-                    v-if="permissionPrecise.overview_access(id)"
-                  >
+                  <el-button @click="openLimitDialog" v-if="permissionPrecise.overview_access(id)">
                     <el-icon class="mr-4"><Lock /></el-icon>
                     {{ $t('views.applicationOverview.appInfo.accessControl') }}
                   </el-button>
@@ -237,7 +234,7 @@ import permissionMap from '@/permission'
 const route = useRoute()
 
 const apiType = computed<'workspace'>(() => {
-    return 'workspace'
+  return 'workspace'
 })
 const permissionPrecise = computed(() => {
   return permissionMap['application'][apiType.value]
@@ -265,7 +262,7 @@ const urlParams = computed(() =>
   mapToUrlParams(apiInputParams.value) ? '?' + mapToUrlParams(apiInputParams.value) : '',
 )
 const shareUrl = computed(
-  () => application.location + accessToken.value.access_token + urlParams.value,
+  () => `${window.location.origin}/chat/` + accessToken.value.access_token + urlParams.value,
 )
 
 const dayOptions = [
