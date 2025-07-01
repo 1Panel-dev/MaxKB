@@ -606,7 +606,7 @@ class ToolTreeSerializer(serializers.Serializer):
                 'tool_query_set': tool_query_set,
                 'default_query_set': default_query_set,
             }
-            if not workspace_manage and is_x_pack_ee:
+            if not workspace_manage:
                 query_set_dict['workspace_user_resource_permission_query_set'] = QuerySet(
                     WorkspaceUserResourcePermission).filter(
                     auth_target_type="TOOL",

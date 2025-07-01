@@ -21,7 +21,7 @@ FROM (SELECT tool."id"::text,
             FROM tool tool ${tool_query_set}
              AND tool.id IN (SELECT target
                           FROM workspace_user_resource_permission
-                          WHERE auth_target_type = 'TOOL'
+                          ${workspace_user_resource_permission_query_set}
                             AND 'VIEW' = ANY (permission_list))) AS tool
                LEFT JOIN "user" ON "user".id = user_id
 
