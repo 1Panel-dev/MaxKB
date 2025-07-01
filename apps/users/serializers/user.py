@@ -89,6 +89,17 @@ class UserProfileSerializer(serializers.Serializer):
         @return:
         """
         workspace_list = get_workspace_list_by_user(user.id)
+        user_role_relation_model = DatabaseModelManage.get_model("workspace_user_role_mapping")
+        role_name = user.role
+        if user_role_relation_model:
+            user_role_relations = (
+                user_role_relation_model.objects
+                .filter(user_id=user.id)
+                .select_related('role')
+                .distinct('role_id')
+            )
+            role_name = [relation.role.role_name for relation in user_role_relations]
+
         return {
             'id': user.id,
             'username': user.username,
@@ -98,7 +109,8 @@ class UserProfileSerializer(serializers.Serializer):
             'permissions': auth.permission_list,
             'is_edit_password': user.role == RoleConstants.ADMIN.name and user.password == 'd880e722c47a34d8e9fce789fc62389d',
             'language': user.language,
-            'workspace_list': workspace_list
+            'workspace_list': workspace_list,
+            'role_name': role_name
         }
 
 
@@ -230,7 +242,6 @@ class UserManageSerializer(serializers.Serializer):
                 if not (role_model and user_role_relation_model):
                     return {}
 
-                # 获取所有相关角色关系，并预加载角色信息
                 # 获取所有相关角色关系，并预加载角色信息
                 user_role_relations = (
                     user_role_relation_model.objects
