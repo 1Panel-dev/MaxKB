@@ -40,12 +40,12 @@
           </div>
         </el-form-item>
         <el-form-item
-          :label="$t('views.applicationWorkflow.nodes.searchknowledgeNode.searchParam')"
+          :label="$t('views.applicationWorkflow.nodes.searchKnowledgeNode.searchParam')"
         >
           <template #label>
             <div class="flex-between">
               <span>{{
-                $t('views.applicationWorkflow.nodes.searchknowledgeNode.searchParam')
+                $t('views.applicationWorkflow.nodes.searchKnowledgeNode.searchParam')
               }}</span>
               <el-button type="primary" link @click="openParamSettingDialog">
                 <el-icon><Setting /></el-icon>
@@ -82,11 +82,11 @@
           </div>
         </el-form-item>
         <el-form-item
-          :label="$t('views.applicationWorkflow.nodes.searchknowledgeNode.searchQuestion.label')"
+          :label="$t('views.applicationWorkflow.nodes.searchKnowledgeNode.searchQuestion.label')"
           prop="question_reference_address"
           :rules="{
             message: $t(
-              'views.applicationWorkflow.nodes.searchknowledgeNode.searchQuestion.requiredMessage',
+              'views.applicationWorkflow.nodes.searchKnowledgeNode.searchQuestion.requiredMessage',
             ),
             trigger: 'blur',
             required: true,
@@ -97,7 +97,7 @@
             :nodeModel="nodeModel"
             class="w-full"
             :placeholder="
-              $t('views.applicationWorkflow.nodes.searchknowledgeNode.searchQuestion.placeholder')
+              $t('views.applicationWorkflow.nodes.searchKnowledgeNode.searchQuestion.placeholder')
             "
             v-model="form_data.question_reference_address"
           />
