@@ -72,7 +72,7 @@
                       divided
                       @click="syncMulDocument"
                       :disabled="multipleSelection.length === 0"
-                      v-if="permissionPrecise.doc_sync(id)"
+                      v-if="knowledgeDetail?.type === 1 &&permissionPrecise.doc_sync(id)"
                       >{{ $t('views.document.syncDocument') }}
                     </el-dropdown-item>
                     <el-dropdown-item

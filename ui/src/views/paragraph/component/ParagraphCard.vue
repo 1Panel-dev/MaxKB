@@ -24,14 +24,14 @@
         <el-divider direction="vertical" />
         <span class="mr-8">
           <el-button link @click.stop="editParagraph(data)">
-            <el-icon :size="16" :title="$t('views.applicationWorkflow.control.zoomOut')">
+            <el-icon :size="16" :title="$t('common.edit')">
               <EditPen />
             </el-icon>
           </el-button>
         </span>
         <span class="mr-8">
           <el-button link @click.stop="addParagraph(data)">
-            <el-icon :size="16" :title="$t('views.applicationWorkflow.control.zoomOut')">
+            <el-icon :size="16" :title="$t('common.add')">
               <el-icon><CirclePlus /></el-icon>
             </el-icon>
           </el-button>
