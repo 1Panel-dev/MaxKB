@@ -262,7 +262,7 @@ const playDemoText: (application_id: string, data: any, loading?: Ref<boolean>) 
 /**
  * 文本转语音
  */
-const textToSpeech: (
+const postTextToSpeech: (
   application_id: String,
   data: any,
   loading?: Ref<boolean>,
@@ -318,7 +318,7 @@ export default {
   publish,
   updatePlatformConfig,
   playDemoText,
-  textToSpeech,
+  postTextToSpeech,
   speechToText,
   getMcpTools,
 }

@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-form ref="FormRef" :model="form" @submit.prevent="validator">
-      <el-form-item prop="value" :rules="rules.value">
+      <el-form-item prop="value" :rules="rules">
         <el-input show-password v-model="form.value" />
       </el-form-item>
       <el-button class="w-full mt-8" type="primary" @click="validator" :loading="loading">
@@ -11,7 +11,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, reactive } from 'vue'
 import { useRoute } from 'vue-router'
 import useStore from '@/stores'
 import { t } from '@/locales'
@@ -38,9 +38,9 @@ const validator = () => {
   FormRef.value.validate()
 }
 
-const rules = {
+const rules = reactive({
   value: [{ required: true, validator: validator_auth, trigger: 'manual' }],
-}
+})
 
 const form = ref({
   type: 'password',

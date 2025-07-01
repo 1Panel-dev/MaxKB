@@ -10,19 +10,15 @@
 </template>
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-
 import useStore from '@/stores'
 import { t } from '@/locales'
 import { useRoute, useRouter } from 'vue-router'
-const route = useRoute()
 const FormRef = ref()
 
 const { chatUser } = useStore()
-const props = defineProps<{ applicationProfile: any; modelValue: boolean }>()
 const loading = ref<boolean>(false)
 const router = useRouter()
 
-const emit = defineEmits(['update:modelValue'])
 const auth = () => {
   return chatUser.passwordAuthentication(form.value.password).then((ok) => {
     router.push({ name: 'chat', params: { accessToken: chatUser.accessToken } })

@@ -122,11 +122,12 @@ function submit() {
   } else if (radioType.value === 'custom' && iconFile.value) {
     const fd = new FormData()
     fd.append('file', iconFile.value.raw)
-    overviewApi.putAppIcon(id as string, fd, loading).then((res: any) => {
-      emit('refresh')
-      MsgSuccess(t('common.saveSuccess'))
-      dialogVisible.value = false
-    })
+    // todo
+    // overviewApi.putAppIcon(id as string, fd, loading).then((res: any) => {
+    //   emit('refresh')
+    //   MsgSuccess(t('common.saveSuccess'))
+    //   dialogVisible.value = false
+    // })
   } else {
     MsgError(t('common.EditAvatarDialog.uploadImagePrompt'))
   }

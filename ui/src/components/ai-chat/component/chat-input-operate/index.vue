@@ -704,7 +704,7 @@ const getSpeechToTextAPI = () => {
       return chatAPI.speechToText(data, loading)
     }
   } else {
-    return applicationApi.textToSpeech
+    return applicationApi.postTextToSpeech
   }
 }
 const speechToTextAPI = getSpeechToTextAPI()

@@ -28,7 +28,7 @@ const {
 } = route as any
 
 const isShared = computed(() => {
-  return folderId === 'shared' || route.name?.includes('ResourceManagement')
+  return folderId === 'shared'
 })
 const { theme } = useStore()
 const isDefaultTheme = computed(() => {

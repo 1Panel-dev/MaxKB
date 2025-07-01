@@ -176,7 +176,7 @@ watch(dialogVisible, (bool) => {
   }
 })
 watch(
-  () => form.authentication,
+  () => form.value.authentication,
   (b) => {
     if (b) {
       applicationApi.getChatUserAuthType().then((ok) => {
