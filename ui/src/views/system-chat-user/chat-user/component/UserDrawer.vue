@@ -154,13 +154,13 @@ const submit = async (formEl: FormInstance | undefined) => {
   await formEl.validate((valid, fields) => {
     if (valid) {
       if (isEdit.value) {
-        loadPermissionApi('chatUser').putUserManage(userForm.value.id, userForm.value, loading).then((res) => {
+        loadPermissionApi('chatUser').putUserManage(userForm.value.id, userForm.value, loading).then(() => {
           emit('refresh')
           MsgSuccess(t('common.editSuccess'))
           visible.value = false
         })
       } else {
-        loadPermissionApi('chatUser').postUserManage(userForm.value, loading).then((res) => {
+        loadPermissionApi('chatUser').postUserManage(userForm.value, loading).then(() => {
           emit('refresh')
           MsgSuccess(t('common.createSuccess'))
           visible.value = false

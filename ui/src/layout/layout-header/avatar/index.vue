@@ -20,11 +20,8 @@
           </div>
           <div style="width: 90%">
             <p class="bold mb-4" style="font-size: 14px">{{ user.userInfo?.username }}</p>
-            <template v-if="user.userInfo?.role && user.userInfo.role.length > 0">
-              <el-tag size="small" class="default-tag">{{ user.userInfo?.role[0] }}</el-tag>
-              <el-tag size="small" class="default-tag ml-4" v-if="user.userInfo?.role?.length > 1"
-                >+{{ user.userInfo?.role?.length - 1 }}
-              </el-tag>
+            <template v-if="user.userInfo?.role_name && user.userInfo.role_name.length > 0">
+              <TagGroup size="small" :tags="user.userInfo?.role_name"/>
             </template>
           </div>
         </div>

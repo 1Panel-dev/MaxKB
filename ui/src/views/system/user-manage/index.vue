@@ -94,7 +94,19 @@
         <el-table-column prop="role_name" :label="$t('views.role.member.role')" min-width="100"
                          v-if="user.isEE() || user.isPE()">
           <template #default="{ row }">
-            <TagGroup :tags="row.role_name"/>
+            <el-popover :width="400">
+              <template #reference>
+                <TagGroup class="cursor" :tags="row.role_name" tooltipDisabled />
+              </template>
+              <template #default>
+                <el-table :data="row.role_workspace">
+                  <el-table-column prop="role" :label="$t('views.role.member.role')">
+                  </el-table-column>
+                  <el-table-column prop="workspace" :label="$t('views.workspace.title')">
+                  </el-table-column>
+                </el-table>
+              </template>
+            </el-popover>
           </template>
         </el-table-column>
         <el-table-column prop="source" :label="$t('views.userManage.source.label')">
@@ -225,7 +237,13 @@ function getList() {
   return userManageApi
     .getUserManage(paginationConfig, params, loading)
     .then((res) => {
-      userTableData.value = res.data.records
+      userTableData.value = res.data.records.map((item: any) => ({
+        ...item, 
+        role_workspace: Object.entries(item.role_workspace).map(([role, workspaces]) => ({
+          role,
+          workspace: (workspaces as string[])?.[0] === 'None' ? '-': (workspaces as string[])?.join(", ")
+        }))
+      }))
       paginationConfig.total = res.data.total
     })
 }

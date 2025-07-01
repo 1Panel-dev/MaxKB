@@ -85,7 +85,7 @@ async function getRoleFormItem() {
         },
       ],
       selectProps: {
-        options: res.data.filter(item => item.type !== RoleTypeEnum.ADMIN)?.map(item => ({
+        options: res.data.filter((item: any) => item.type !== RoleTypeEnum.ADMIN)?.map((item: any) => ({
           label: item.name,
           value: item.id
         })) || [],

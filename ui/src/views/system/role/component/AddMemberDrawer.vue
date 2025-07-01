@@ -94,7 +94,7 @@ async function getWorkspaceFormItem() {
         ],
         selectProps: {
           options:
-            res.data?.map((item) => ({
+            res.data?.map((item: any) => ({
               label: item.name,
               value: item.id,
             })) || [],

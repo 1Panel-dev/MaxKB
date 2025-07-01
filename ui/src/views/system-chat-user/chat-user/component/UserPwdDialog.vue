@@ -119,7 +119,7 @@ const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid, fields) => {
     if (valid) {
-      loadPermissionApi('chatUser').putUserManagePassword(userId.value, userForm.value, loading).then((res) => {
+      loadPermissionApi('chatUser').putUserManagePassword(userId.value, userForm.value, loading).then(() => {
         emit('refresh')
         user.profile()
         MsgSuccess(t('views.userManage.tip.updatePwdSuccess'))

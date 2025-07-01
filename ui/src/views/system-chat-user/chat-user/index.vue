@@ -301,7 +301,7 @@ function getList() {
   const params = {
     [search_type.value]: search_form.value[search_type.value as keyof typeof search_form.value],
   }
-  return loadPermissionApi('chatUser').getUserManage(paginationConfig, params, loading).then((res) => {
+  return loadPermissionApi('chatUser').getUserManage(paginationConfig, params, loading).then((res: any) => {
     userTableData.value = res.data.records
     paginationConfig.total = res.data.total
   })
