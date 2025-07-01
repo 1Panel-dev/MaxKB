@@ -1,6 +1,5 @@
 import io
 import json
-import logging
 import os
 import re
 import traceback
@@ -22,13 +21,13 @@ from rest_framework import serializers
 from application.models import ApplicationKnowledgeMapping
 from common.config.embedding_config import VectorStore
 from common.constants.cache_version import Cache_Version
-from common.constants.permission_constants import ResourceAuthType, ResourcePermissionGroup, ResourcePermission
+from common.constants.permission_constants import ResourceAuthType, ResourcePermission
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import native_search, get_dynamics_model, native_page_search
 from common.db.sql_execute import select_list
 from common.event import ListenerManagement
 from common.exception.app_exception import AppApiException
-from common.utils.common import valid_license, post, get_file_content, parse_image
+from common.utils.common import post, get_file_content, parse_image
 from common.utils.fork import Fork, ChildLink
 from common.utils.logger import maxkb_logger
 from common.utils.split_model import get_split_model
@@ -328,7 +327,8 @@ class KnowledgeSerializer(serializers.Serializer):
             self.is_valid()
             if QuerySet(Knowledge).filter(
                     workspace_id=self.data.get('workspace_id'),
-                    name=instance.get('name')
+                    name=instance.get('name'),
+                    folder_id=instance.get('folder_id', self.data.get('workspace_id'))
             ).exclude(id=self.data.get('knowledge_id')).exists():
                 raise AppApiException(500, _('Knowledge base name duplicate!'))
             knowledge = QuerySet(Knowledge).get(id=self.data.get("knowledge_id"))
