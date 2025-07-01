@@ -2,7 +2,7 @@ import {Result} from '@/request/Result'
 import {get, put, post, del} from '@/request/index'
 import type {pageRequest} from '@/api/type/common'
 import type {Ref} from 'vue'
-import type {CheckCodeRequest, ResetPasswordRequest} from "@/api/type/user.ts";
+
 
 const prefix = '/user_manage'
 /**
@@ -65,31 +65,7 @@ const putUserManagePassword: (
   return put(`${prefix}/${user_id}/re_password`, data, undefined, loading)
 }
 
-/**
- * 重置密码
- * @param request 重置密码请求参数
- * @param loading 接口加载器
- * @returns
- */
-const resetPassword: (
-  request: ResetPasswordRequest,
-  loading?: Ref<boolean>
-) => Promise<Result<boolean>> = (request, loading) => {
-  return post('/user/re_password', request, undefined, loading)
-}
 
-/**
- * 重置密码
- * @param request 重置密码请求参数
- * @param loading 接口加载器
- * @returns
- */
-const resetCurrentPassword: (
-  request: ResetPasswordRequest,
-  loading?: Ref<boolean>
-) => Promise<Result<boolean>> = (request, loading) => {
-  return post('/user/current/reset_password', request, undefined, loading)
-}
 
 /**
  * 获取系统默认密码
@@ -114,32 +90,6 @@ const getValid: (
   return get(`/valid/${valid_type}/${valid_count}`, undefined, loading)
 }
 
-/**
- * 校验验证码
- * @param request 请求对象
- * @param loading 接口加载器
- * @returns
- */
-const checkCode: (request: CheckCodeRequest, loading?: Ref<boolean>) => Promise<Result<boolean>> = (
-  request,
-  loading
-) => {
-  return post('/user/check_code', request, undefined, loading)
-}
-
-/**
- * 发送邮件
- * @param email  邮件地址
- * @param loading 接口加载器
- * @returns
- */
-const sendEmit: (
-  email: string,
-  type: 'register' | 'reset_password',
-  loading?: Ref<boolean>
-) => Promise<Result<boolean>> = (email, type, loading) => {
-  return post('/user/send_email', {email, type}, undefined, loading)
-}
 
 export default {
   getUserManage,
@@ -147,10 +97,7 @@ export default {
   delUserManage,
   postUserManage,
   putUserManagePassword,
-  resetPassword,
-  resetCurrentPassword,
   getSystemDefaultPassword,
   getValid,
-  checkCode,
-  sendEmit
+
 }

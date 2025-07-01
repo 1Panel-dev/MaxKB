@@ -61,7 +61,7 @@ import type { ResetPasswordRequest } from '@/api/type/user'
 import { useRouter, useRoute } from 'vue-router'
 import { MsgSuccess } from '@/utils/message'
 import type { FormInstance, FormRules } from 'element-plus'
-import UserApi from '@/api/system/user-manage'
+import UserApi from '@/api/user/user'
 import { t } from '@/locales'
 const router = useRouter()
 const route = useRoute()
@@ -127,7 +127,7 @@ const loading = ref<boolean>(false)
 const resetPassword = () => {
   resetPasswordFormRef.value
     ?.validate()
-    .then(() => UserApi.resetPassword(resetPasswordForm.value, loading))
+    .then(() => UserApi.postResetPassword(resetPasswordForm.value, loading))
     .then(() => {
       MsgSuccess(t('common.modifySuccess'))
       router.push({ name: 'login' })

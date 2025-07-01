@@ -127,7 +127,7 @@ const loading = ref<boolean>(false)
 const resetPassword = () => {
   resetPasswordFormRef.value
     ?.validate()
-    .then(() => UserApi.resetPassword(resetPasswordForm.value, loading))
+    .then(() => UserApi.postResetPassword(resetPasswordForm.value, loading))
     .then(() => {
       MsgSuccess(t('common.modifySuccess'))
       router.push({ name: 'login' })
