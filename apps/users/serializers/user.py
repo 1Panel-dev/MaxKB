@@ -35,11 +35,10 @@ from django.core.mail import send_mail
 from django.utils.translation import get_language
 
 PASSWORD_REGEX = re.compile(
-    r"^(?=.*[a-z])(?=.*[_!@#$%^&*`~.()-+=])" 
-    r"(?:(?=.*[A-Z])|(?=.*\d))"              
+    r"^(?=.*[a-z])(?=.*[_!@#$%^&*`~.()-+=])"
+    r"(?:(?=.*[A-Z])|(?=.*\d))"
     r"[a-zA-Z0-9_!@#$%^&*`~.()-+=]{6,20}$"
 )
-
 
 version, get_key = Cache_Version.SYSTEM.value
 
@@ -266,7 +265,7 @@ class UserManageSerializer(serializers.Serializer):
                 # 将角色信息添加回用户数据中
                 for user in result['records']:
                     user_id = str(user['id'])
-                    user['role'] = user_role_mapping.get(user_id, [])
+                    user['role_name'] = user_role_mapping.get(user_id, [])
                     user['role_setting'] = user_role_setting_mapping.get(user_id, [])
             return result
 
@@ -390,7 +389,7 @@ class UserManageSerializer(serializers.Serializer):
 
         def _check_not_admin(self):
             user = User.objects.filter(id=self.data.get('id')).first()
-            if user.role == RoleConstants.ADMIN.name:
+            if user.role == RoleConstants.ADMIN.name or str(user.id) == 'f0dd8f71-e4ee-11ee-8c84-a8a1595801ab':
                 raise AppApiException(1004, _('Unable to delete administrator'))
 
         def edit(self, instance, with_valid=True):
@@ -540,6 +539,27 @@ def update_user_role(instance, user):
         role_setting = instance.get('role_setting')
         if not role_setting:
             return
+        if str(user.id) == 'f0dd8f71-e4ee-11ee-8c84-a8a1595801ab':
+            # 需要判断当前角色的权限 不能删除系统管理员 空间管理员 普通管理员等角色
+            # role_setting是一个数组 结构式 [{role_id:1,workspace_ids:[1,2]}]
+            # 如果role_id不包含ADMIN 就直接报错   如果WORKSPACE_MANAGE 或者USER 必须判断workspace_ids是否包含默认工作空间 不包含就报错
+            admin_role_id = RoleConstants.ADMIN.value
+
+            if not any(item['role_id'] == str(admin_role_id) for item in role_setting):
+                raise AppApiException(1004, _("Cannot delete built-in role"))
+
+            # 验证 WORKSPACE_MANAGE 或 USER 是否包含默认工作空间
+            workspace_manage_role_id = RoleConstants.WORKSPACE_MANAGE.value
+            default_workspace_id = 'default'
+
+            for item in role_setting:
+                role_id = item['role_id']
+                workspace_ids = item.get('workspace_ids', [])
+
+                if role_id == str(workspace_manage_role_id) or role_id == str(RoleConstants.USER.value):
+                    if default_workspace_id not in workspace_ids:
+                        raise AppApiException(1004, _("Cannot delete built-in role"))
+
         workspace_user_role_mapping_model.objects.filter(user_id=user.id).delete()
         relations = set()
         for item in role_setting:
