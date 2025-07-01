@@ -286,6 +286,16 @@ const speechToText: (
   return post(`${prefix.value}/${application_id}/speech_to_text`, data, undefined, loading)
 }
 
+/**
+ * mcp 节点
+ */
+const getMcpTools: (application_id: String, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  application_id,
+  loading,
+) => {
+  return get(`${prefix.value}/${application_id}/mcp_tools`, undefined, loading)
+}
+
 export default {
   getAllApplication,
   getApplication,
@@ -310,4 +320,5 @@ export default {
   playDemoText,
   textToSpeech,
   speechToText,
+  getMcpTools,
 }

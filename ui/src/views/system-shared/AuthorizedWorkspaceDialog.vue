@@ -93,8 +93,8 @@ import authorizationApi from '@/api/system-shared/authorization'
 import workspaceApi from '@/api/workspace/workspace'
 const checkAll = ref(false)
 const isIndeterminate = ref(true)
-const checkedWorkspace = ref([])
-const workspace = ref([])
+const checkedWorkspace = ref<any[]>([])
+const workspace = ref<any[]>([])
 const listType = ref('WHITE_LIST')
 const search = ref('')
 let knowledge_id = ''
@@ -158,6 +158,4 @@ defineExpose({
 })
 </script>
 <style lang="scss">
-.authorized-workspace {
-}
 </style>

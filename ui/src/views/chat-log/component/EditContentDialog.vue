@@ -48,42 +48,14 @@
         >
         </el-input>
       </el-form-item>
-      <el-form-item :label="$t('views.chatLog.selectKnowledge')" prop="knowledge_id">
-        <el-select
-          v-model="form.knowledge_id"
-          filterable
-          :placeholder="$t('views.chatLog.selectKnowledgePlaceholder')"
-          :loading="optionLoading"
-          @change="changeKnowledge"
-        >
-          <el-option v-for="item in knowledgeList" :key="item.id" :label="item.name" :value="item.id">
-            <span class="flex align-center">
-              <KnowledgeIcon v-if="item.knowledge_id" :type="item.type" />
-
-              {{ item.name }}
-            </span>
-          </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item :label="$t('views.chatLog.saveToDocument')" prop="document_id">
-        <el-select
-          v-model="form.document_id"
-          filterable
-          :placeholder="$t('views.chatLog.documentPlaceholder')"
-          :loading="optionLoading"
-          @change="changeDocument"
-        >
-          <el-option
-            v-for="item in documentList"
-            :key="item.id"
-            :label="item.name"
-            :value="item.id"
-          >
-            {{ item.name }}
-          </el-option>
-        </el-select>
-      </el-form-item>
     </el-form>
+    <SelectKnowledgeDocument
+      ref="SelectKnowledgeDocumentRef"
+      :apiType="apiType"
+      @changeKnowledge="changeKnowledge"
+      @changeDocument="changeDocument"
+      :isApplicaton="true"
+    />
     <template #footer>
       <span class="dialog-footer">
         <el-button @click.prevent="dialogVisible = false"> {{ $t('common.cancel') }} </el-button>
@@ -95,15 +67,13 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { ref, watch, reactive } from 'vue'
+import { ref, watch, reactive, computed } from 'vue'
 import { useRoute } from 'vue-router'
+import SelectKnowledgeDocument from '@/components/select-knowledge-document/index.vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import chatLogApi from '@/api/application/chat-log'
 import imageApi from '@/api/image'
-import documentApi from '@/api/knowledge/document'
-import useStore from '@/stores'
 import { t } from '@/locales'
-const { application, user } = useStore()
 
 const route = useRoute()
 const {
@@ -111,6 +81,10 @@ const {
 } = route as any
 
 const emit = defineEmits(['refresh'])
+
+const apiType = computed<'workspace'>(() => {
+  return 'workspace'
+})
 const formRef = ref()
 
 const toolbars = [
@@ -145,6 +119,7 @@ const toolbars = [
 
 const footers = ['markdownTotal', 0, '=', 1, 'scrollSwitch']
 
+const SelectKnowledgeDocumentRef = ref()
 const dialogVisible = ref<boolean>(false)
 const loading = ref(false)
 
@@ -154,21 +129,13 @@ const form = ref<any>({
   problem_text: '',
   title: '',
   content: '',
-  knowledge_id: '',
-  document_id: '',
 })
 
 const rules = reactive<FormRules>({
-  content: [{ required: true, message: t('views.chatLog.form.content.placeholder'), trigger: 'blur' }],
-  knowledge_id: [
-    { required: true, message: t('views.chatLog.selectKnowledgePlaceholder'), trigger: 'change' },
+  content: [
+    { required: true, message: t('views.chatLog.form.content.placeholder'), trigger: 'blur' },
   ],
-  document_id: [{ required: true, message: t('views.chatLog.documentPlaceholder'), trigger: 'change' }],
 })
-
-const knowledgeList = ref<any[]>([])
-const documentList = ref<any[]>([])
-const optionLoading = ref(false)
 
 watch(dialogVisible, (bool) => {
   if (!bool) {
@@ -178,12 +145,9 @@ watch(dialogVisible, (bool) => {
       problem_text: '',
       title: '',
       content: '',
-      knowledge_id: '',
-      document_id: '',
     }
-    knowledgeList.value = []
-    documentList.value = []
     formRef.value?.clearValidate()
+    SelectKnowledgeDocumentRef.value?.clearValidate()
   }
 })
 
@@ -209,43 +173,13 @@ const onUploadImg = async (files: any, callback: any) => {
 
 function changeKnowledge(knowledge_id: string) {
   localStorage.setItem(id + 'chat_knowledge_id', knowledge_id)
-  form.value.document_id = ''
-  getDocument(knowledge_id)
 }
 
 function changeDocument(document_id: string) {
   localStorage.setItem(id + 'chat_document_id', document_id)
 }
 
-function getDocument(knowledge_id: string) {
-  documentApi.getDocumentList(knowledge_id, loading).then((res: any) => {
-    documentList.value = res.data
-    if (localStorage.getItem(id + 'chat_document_id')) {
-      form.value.document_id = localStorage.getItem(id + 'chat_document_id') as string
-    }
-    if (!documentList.value.find((v) => v.id === form.value.document_id)) {
-      form.value.document_id = ''
-    }
-  })
-}
-
-function getKnowledge_id() {
-  application.asyncGetApplicationKnowledge(id, loading).then((res: any) => {
-    knowledgeList.value = res.data
-    if (localStorage.getItem(id + 'chat_knowledge_id')) {
-      form.value.knowledge_id = localStorage.getItem(id + 'chat_knowledge_id') as string
-      if (!knowledgeList.value.find((v) => v.id === form.value.knowledge_id)) {
-        form.value.knowledge_id = ''
-        form.value.document_id = ''
-      } else {
-        getDocument(form.value.knowledge_id)
-      }
-    }
-  })
-}
-
 const open = (data: any) => {
-  getKnowledge_id()
   form.value.chat_id = data.chat_id
   form.value.record_id = data.id
   form.value.problem_text = data.problem_text ? data.problem_text.substring(0, 256) : ''
@@ -255,27 +189,29 @@ const open = (data: any) => {
 }
 const submitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
-  await formEl.validate((valid) => {
+  await formEl.validate(async (valid) => {
     if (valid) {
-      const obj = {
-        title: form.value.title,
-        content: form.value.content,
-        problem_text: form.value.problem_text,
+      if (await SelectKnowledgeDocumentRef.value?.validate()) {
+        const obj = {
+          title: form.value.title,
+          content: form.value.content,
+          problem_text: form.value.problem_text,
+        }
+        chatLogApi
+          .putChatRecordLog(
+            id,
+            form.value.chat_id,
+            form.value.record_id,
+            SelectKnowledgeDocumentRef.value.form.knowledge_id,
+            SelectKnowledgeDocumentRef.value.form.document_id,
+            obj,
+            loading,
+          )
+          .then((res: any) => {
+            emit('refresh', res.data)
+            dialogVisible.value = false
+          })
       }
-      chatLogApi
-        .putChatRecordLog(
-          id,
-          form.value.chat_id,
-          form.value.record_id,
-          form.value.knowledge_id,
-          form.value.document_id,
-          obj,
-          loading,
-        )
-        .then((res: any) => {
-          emit('refresh', res.data)
-          dialogVisible.value = false
-        })
     }
   })
 }

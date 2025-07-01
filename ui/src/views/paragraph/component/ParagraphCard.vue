@@ -64,6 +64,7 @@
       editorId="preview-only"
       :modelValue="data.content"
       class="maxkb-md"
+      style="background: none"
     />
 
     <ParagraphDialog

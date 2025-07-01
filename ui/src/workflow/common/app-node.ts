@@ -1,7 +1,7 @@
 import Components from '@/components'
 import ElementPlus from 'element-plus'
 import * as ElementPlusIcons from '@element-plus/icons-vue'
-import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
+import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import { HtmlResize } from '@logicflow/extension'
 import { h as lh } from '@logicflow/core'
 import { createApp, h } from 'vue'

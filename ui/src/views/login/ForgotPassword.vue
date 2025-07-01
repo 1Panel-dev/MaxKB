@@ -1,9 +1,7 @@
 <template>
   <login-layout v-if="!loading" v-loading="loading || sendLoading">
     <LoginContainer
-      :subTitle="
-        theme.themeInfo?.slogan ? theme.themeInfo?.slogan : $t('theme.defaultSlogan')
-      "
+      :subTitle="theme.themeInfo?.slogan ? theme.themeInfo?.slogan : $t('theme.defaultSlogan')"
     >
       <h2 class="mb-24">{{ $t('views.login.forgotPassword') }}</h2>
       <el-form
@@ -81,12 +79,12 @@ import { t } from '@/locales'
 import useStore from '@/stores'
 
 const router = useRouter()
-const { theme, user} = useStore()
+const { theme, user } = useStore()
 
 const CheckEmailForm = ref<CheckCodeRequest>({
   email: '',
   code: '',
-  type: 'reset_password'
+  type: 'reset_password',
 })
 
 const resetPasswordFormRef = ref<FormInstance>()
@@ -95,7 +93,7 @@ const rules = ref<FormRules<CheckCodeRequest>>({
     {
       required: true,
       message: t('views.login.loginForm.email.requiredMessage'),
-      trigger: 'blur'
+      trigger: 'blur',
     },
     {
       validator: (rule, value, callback) => {
@@ -106,10 +104,10 @@ const rules = ref<FormRules<CheckCodeRequest>>({
           callback()
         }
       },
-      trigger: 'blur'
-    }
+      trigger: 'blur',
+    },
   ],
-  code: [{ required: true, message: t('views.login.verificationCode.placeholder') }]
+  code: [{ required: true, message: t('views.login.verificationCode.placeholder') }],
 })
 const loading = ref<boolean>(false)
 const isDisabled = ref<boolean>(false)

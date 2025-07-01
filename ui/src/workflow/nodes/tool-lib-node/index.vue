@@ -89,6 +89,7 @@ import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'
 import { isLastNode } from '@/workflow/common/data'
 import applicationApi from '@/api/application/application'
+import ToolApi from '@/api/tool/tool'
 
 const props = defineProps<{ nodeModel: any }>()
 
@@ -127,8 +128,7 @@ const update_field = () => {
     return
   }
   //todo
-  applicationApi
-    .getToolLib(id, props.nodeModel.properties.node_data.tool_lib_id)
+  ToolApi.getToolById(props.nodeModel.properties.node_data.tool_lib_id)
     .then((ok) => {
       const old_input_field_list = props.nodeModel.properties.node_data.input_field_list
       const merge_input_field_list = ok.data.input_field_list.map((item: any) => {
@@ -141,7 +141,7 @@ const update_field = () => {
       set(props.nodeModel.properties.node_data, 'input_field_list', merge_input_field_list)
       set(props.nodeModel.properties, 'status', ok.data.is_active ? 200 : 500)
     })
-    .catch((err) => {
+    .catch(() => {
       set(props.nodeModel.properties, 'status', 500)
     })
 }

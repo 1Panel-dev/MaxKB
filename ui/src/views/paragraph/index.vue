@@ -207,13 +207,16 @@ function changeState(id: string) {
 }
 
 function refreshMigrateParagraph(data: any) {
+  console.log(data)
   if (data) {
-    multipleSelection.value = [data]
+    multipleSelection.value = [data.id]
   }
+  console.log(paragraphDetail.value)
+  console.log(multipleSelection.value)
   paragraphDetail.value = paragraphDetail.value.filter(
     (v) => !multipleSelection.value.includes(v.id),
   )
-  getParagraphList()
+  console.log(paragraphDetail.value)
   multipleSelection.value = []
   MsgSuccess(t('views.document.tip.migrationSuccess'))
 }
@@ -316,7 +319,7 @@ function openGenerateDialog(row?: any) {
 function onEnd(event?: any) {
   const obj = {
     paragraph_id: paragraphDetail.value[event.newIndex].id, // 当前拖动的段落ID
-    new_position: paragraphDetail.value[event.newIndex+1].position, // 新位置的段落位置
+    new_position: paragraphDetail.value[event.newIndex + 1].position, // 新位置的段落位置
   }
   loadSharedApi({ type: 'paragraph', systemType: apiType.value }).putAdjustPosition(
     id,

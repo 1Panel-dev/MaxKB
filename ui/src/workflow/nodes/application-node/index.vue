@@ -223,33 +223,35 @@ const update_field = () => {
   }
   // todo
   applicationApi
-    .getApplicationById(id, props.nodeModel.properties.node_data.application_id)
+    .getApplicationDetail(id)
     .then((ok) => {
       const old_api_input_field_list = cloneDeep(
-        props.nodeModel.properties.node_data.api_input_field_list
+        props.nodeModel.properties.node_data.api_input_field_list,
       )
       const old_user_input_field_list = cloneDeep(
-        props.nodeModel.properties.node_data.user_input_field_list
+        props.nodeModel.properties.node_data.user_input_field_list,
       )
       if (isWorkFlow(ok.data.type)) {
         const nodeData = ok.data.work_flow.nodes[0].properties.node_data
         const new_api_input_field_list = cloneDeep(
-          ok.data.work_flow.nodes[0].properties.api_input_field_list
+          ok.data.work_flow.nodes[0].properties.api_input_field_list,
         )
         const new_user_input_field_list = cloneDeep(
-          ok.data.work_flow.nodes[0].properties.user_input_field_list
+          ok.data.work_flow.nodes[0].properties.user_input_field_list,
         )
 
         const merge_api_input_field_list = (new_api_input_field_list || []).map((item: any) => {
           const find_field = old_api_input_field_list.find(
-            (old_item: any) => old_item.variable == item.variable
+            (old_item: any) => old_item.variable == item.variable,
           )
           if (find_field) {
             return {
               ...item,
               value: find_field.value,
               label:
-                typeof item.label === 'object' && item.label != null ? item.label.label : item.label
+                typeof item.label === 'object' && item.label != null
+                  ? item.label.label
+                  : item.label,
             }
           } else {
             return item
@@ -258,18 +260,20 @@ const update_field = () => {
         set(
           props.nodeModel.properties.node_data,
           'api_input_field_list',
-          merge_api_input_field_list
+          merge_api_input_field_list,
         )
         const merge_user_input_field_list = (new_user_input_field_list || []).map((item: any) => {
           const find_field = old_user_input_field_list.find(
-            (old_item: any) => old_item.field == item.field
+            (old_item: any) => old_item.field == item.field,
           )
           if (find_field) {
             return {
               ...item,
               value: find_field.value,
               label:
-                typeof item.label === 'object' && item.label != null ? item.label.label : item.label
+                typeof item.label === 'object' && item.label != null
+                  ? item.label.label
+                  : item.label,
             }
           } else {
             return item
@@ -278,7 +282,7 @@ const update_field = () => {
         set(
           props.nodeModel.properties.node_data,
           'user_input_field_list',
-          merge_user_input_field_list
+          merge_user_input_field_list,
         )
         const fileEnable = nodeData.file_upload_enable
         const fileUploadSetting = nodeData.file_upload_setting

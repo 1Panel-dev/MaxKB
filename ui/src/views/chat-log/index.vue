@@ -38,16 +38,10 @@
           clearable
         />
         <div style="display: flex; align-items: center" class="float-right">
-          <el-button
-            @click="dialogVisible = true"
-            v-if="permissionPrecise.chat_log_clear(id)"
-          >
+          <el-button @click="dialogVisible = true" v-if="permissionPrecise.chat_log_clear(id)">
             {{ $t('views.chatLog.buttons.clearStrategy') }}
           </el-button>
-          <el-button
-            @click="exportLog"
-            v-if="permissionPrecise.chat_log_export(id)"
-          >
+          <el-button @click="exportLog" v-if="permissionPrecise.chat_log_export(id)">
             {{ $t('common.export') }}
           </el-button>
           <el-button
@@ -215,60 +209,13 @@
       :close-on-click-modal="false"
       :close-on-press-escape="false"
     >
-      <el-form
-        ref="formRef"
-        :model="form"
-        label-position="top"
-        require-asterisk-position="right"
-        :rules="rules"
-        @submit.prevent
-      >
-        <el-form-item :label="$t('views.chatLog.selectKnowledge')" prop="knowledge_id">
-          <el-select
-            v-model="form.knowledge_id"
-            filterable
-            :placeholder="$t('views.chatLog.selectKnowledgePlaceholder')"
-            :loading="optionLoading"
-            @change="changeKnowledge"
-          >
-            <el-option
-              v-for="item in knowledgeList"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
-            >
-              <span class="flex align-center">
-                <KnowledgeIcon :type="item.type" v-if="!item.knowledge_id" />
-                {{ item.name }}
-              </span>
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item :label="$t('views.chatLog.saveToDocument')" prop="document_id">
-          <el-select
-            v-model="form.document_id"
-            filterable
-            :placeholder="$t('views.chatLog.documentPlaceholder')"
-            :loading="optionLoading"
-            @change="changeDocument"
-          >
-            <el-option
-              v-for="item in documentList"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
-            >
-              {{ item.name }}
-            </el-option>
-          </el-select>
-        </el-form-item>
-      </el-form>
+      <SelectKnowledgeDocument ref="SelectKnowledgeDocumentRef" :apiType="apiType" />
       <template #footer>
         <span class="dialog-footer">
           <el-button @click.prevent="documentDialogVisible = false">
             {{ $t('common.cancel') }}
           </el-button>
-          <el-button type="primary" @click="submitForm(formRef)" :loading="documentLoading">
+          <el-button type="primary" @click="submitForm" :loading="documentLoading">
             {{ $t('common.save') }}
           </el-button>
         </span>
@@ -281,28 +228,24 @@ import { ref, type Ref, onMounted, reactive, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { cloneDeep } from 'lodash'
 import ChatRecordDrawer from './component/ChatRecordDrawer.vue'
+import SelectKnowledgeDocument from '@/components/select-knowledge-document/index.vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import chatLogApi from '@/api/application/chat-log'
-import documentApi from '@/api/knowledge/document'
 import { beforeDay, datetimeFormat, nowDate } from '@/utils/time'
 import useStore from '@/stores'
 import type { Dict } from '@/api/type/common'
 import { t } from '@/locales'
-import type { FormInstance, FormRules } from 'element-plus'
 import { ElTable } from 'element-plus'
-import { PermissionConst, RoleConst } from '@/utils/permission/data'
-import { hasPermission } from '@/utils/permission/index'
 import permissionMap from '@/permission'
 
 const route = useRoute()
 
 const apiType = computed<'workspace'>(() => {
-    return 'workspace'
+  return 'workspace'
 })
 const permissionPrecise = computed(() => {
   return permissionMap['application'][apiType.value]
 })
-
 
 const { application, chatLog, user } = useStore()
 const {
@@ -383,25 +326,6 @@ const filter = ref<any>({
   comparer: 'and',
 })
 
-const form = ref<any>({
-  knowledge_id: '',
-  document_id: '',
-})
-
-const rules = reactive<FormRules>({
-  knowledge_id: [
-    { required: true, message: t('views.chatLog.selectKnowledgePlaceholder'), trigger: 'change' },
-  ],
-  document_id: [
-    {
-      required: true,
-      message: t('views.chatLog.documentPlaceholder'),
-      trigger: 'change',
-    },
-  ],
-})
-
-const optionLoading = ref(false)
 const documentList = ref<any[]>([])
 
 function filterChange(val: string) {
@@ -575,71 +499,28 @@ function saveCleanTime() {
     })
 }
 
-function changeKnowledge(knowledge_id: string) {
-  localStorage.setItem(id + 'chat_knowledge_id', knowledge_id)
-  form.value.document_id = ''
-  getDocument(knowledge_id)
-}
-
-function changeDocument(document_id: string) {
-  localStorage.setItem(id + 'chat_document_id', document_id)
-}
-
-const knowledgeList = ref<any[]>([])
-
-function getKnowledge() {
-  application.asyncGetApplicationKnowledge(id, documentLoading).then((res: any) => {
-    knowledgeList.value = res.data
-    if (localStorage.getItem(id + 'chat_knowledge_id')) {
-      form.value.knowledge_id = localStorage.getItem(id + 'chat_knowledge_id') as string
-      if (!knowledgeList.value.find((v) => v.id === form.value.knowledge_id)) {
-        form.value.knowledge_id = ''
-        form.value.document_id = ''
-      } else {
-        getDocument(form.value.knowledge_id)
+const SelectKnowledgeDocumentRef = ref()
+const submitForm = async () => {
+  if (await SelectKnowledgeDocumentRef.value?.validate()) {
+    const arr: string[] = []
+    multipleSelection.value.map((v) => {
+      if (v) {
+        arr.push(v.id)
       }
+    })
+    const obj = {
+      ...SelectKnowledgeDocumentRef.value.form,
+      chat_ids: arr,
     }
-  })
-}
-
-const submitForm = async (formEl: FormInstance | undefined) => {
-  if (!formEl) return
-  const arr: string[] = []
-  multipleSelection.value.map((v) => {
-    if (v) {
-      arr.push(v.id)
-    }
-  })
-  await formEl.validate((valid) => {
-    if (valid) {
-      const obj = {
-        document_id: form.value.document_id,
-        knowledge_id: form.value.knowledge_id,
-        chat_ids: arr,
-      }
-      chatLogApi.postChatLogAddKnowledge(id, obj, documentLoading).then((res: any) => {
-        multipleTableRef.value?.clearSelection()
-        documentDialogVisible.value = false
-      })
-    }
-  })
-}
-
-function getDocument(knowledge_id: string) {
-  documentApi.getDocumentList(knowledge_id, documentLoading).then((res: any) => {
-    documentList.value = res.data
-    if (localStorage.getItem(id + 'chat_document_id')) {
-      form.value.document_id = localStorage.getItem(id + 'chat_document_id') as string
-    }
-    if (!documentList.value.find((v) => v.id === form.value.document_id)) {
-      form.value.document_id = ''
-    }
-  })
+    chatLogApi.postChatLogAddKnowledge(id, obj, documentLoading).then((res: any) => {
+      multipleTableRef.value?.clearSelection()
+      documentDialogVisible.value = false
+    })
+  }
 }
 
 function openDocumentDialog() {
-  getKnowledge()
-  formRef.value?.clearValidate()
+  SelectKnowledgeDocumentRef.value?.clearValidate()
   documentDialogVisible.value = true
 }
 
