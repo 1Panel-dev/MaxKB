@@ -1,8 +1,8 @@
-import { Result } from '@/request/Result'
-import { get, post, del } from '@/request/index'
-import type { Ref } from 'vue'
-import type { ChatUserGroupUserItem, } from '@/api/type/systemChatUser'
-import type { pageRequest, PageList, ListItem } from '@/api/type/common'
+import {Result} from '@/request/Result'
+import {get, post, del} from '@/request/index'
+import type {Ref} from 'vue'
+import type {ChatUserGroupUserItem,} from '@/api/type/systemChatUser'
+import type {pageRequest, PageList, ListItem} from '@/api/type/common'
 
 const prefix = '/system/group'
 
@@ -67,12 +67,12 @@ const postRemoveMember: (
 const getUserListByGroup: (
   user_group_id: string,
   page: pageRequest,
-  username: string,
+  params ?: any,
   loading?: Ref<boolean>,
-) => Promise<Result<PageList<ChatUserGroupUserItem[]>>> = (user_group_id, page, username, loading) => {
+) => Promise<Result<PageList<ChatUserGroupUserItem[]>>> = (user_group_id, page, params, loading) => {
   return get(
     `${prefix}/${user_group_id}/user_list/${page.current_page}/${page.page_size}`,
-    username ? { username } : undefined,
+    params ? params : undefined,
     loading,
   )
 }
