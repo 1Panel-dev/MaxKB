@@ -105,7 +105,7 @@ class Config(dict):
         return self.get('SANDBOX_PYTHON_PACKAGE_PATHS', '/opt/py3/lib/python3.11/site-packages,/opt/maxkb-app/sandbox/python-packages,/opt/maxkb/python-packages')
 
     def get_admin_path(self):
-        return self.get('ADMIN_PATH', '/admin')
+        return self.get('ADMIN_PATH', 'admin')
 
     def get_session_timeout(self):
         return int(self.get('SESSION_TIMEOUT', 28800))
