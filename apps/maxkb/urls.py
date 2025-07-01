@@ -15,8 +15,10 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 import os
+from pathlib import Path
 
-from django.http import HttpResponse,HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
+from django.templatetags.static import static as _static
 from django.urls import path, re_path, include
 from django.views import static
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
@@ -82,6 +84,22 @@ def get_index_html(index_path):
     return content
 
 
+def get_all_files(directory):
+    base_path = Path(directory)
+    file_paths = [
+        '/' + str(file.relative_to(base_path)).replace('\\', '/')
+        for file in base_path.rglob('*')
+        if file.is_file()
+    ]
+    return sorted(file_paths, key=len, reverse=True)
+
+
+static_dict = {
+    chat_ui_prefix: get_all_files(os.path.join(PROJECT_DIR, 'apps', "static", 'chat')),
+    admin_ui_prefix: get_all_files(os.path.join(PROJECT_DIR, 'apps', "static", 'admin'))
+}
+
+
 def page_not_found(request, exception):
     """
     页面不存在处理
@@ -91,6 +109,10 @@ def page_not_found(request, exception):
     if request.path.startswith(chat_ui_prefix + '/api/'):
         return Result(response_status=status.HTTP_404_NOT_FOUND, code=404, message="HTTP_404_NOT_FOUND")
     if request.path.startswith(chat_ui_prefix):
+        in_ = [url for url in static_dict.get(chat_ui_prefix) if request.path.endswith(url)]
+        if len(in_) > 0:
+            a = admin_ui_prefix + in_[0]
+            return HttpResponseRedirect(_static(a))
         index_path = os.path.join(PROJECT_DIR, 'apps', "static", 'chat', 'index.html')
         content = get_index_html(index_path)
         content.replace("prefix: '/chat'", f"prefix: {CONFIG.get_chat_path()}")
@@ -98,6 +120,10 @@ def page_not_found(request, exception):
             return HttpResponse("页面不存在", status=404)
         return HttpResponse(content, status=200)
     elif request.path.startswith(admin_ui_prefix):
+        in_ = [url for url in static_dict.get(admin_ui_prefix) if request.path.endswith(url)]
+        if len(in_) > 0:
+            a = admin_ui_prefix + in_[0]
+            return HttpResponseRedirect(_static(a))
         index_path = os.path.join(PROJECT_DIR, 'apps', "static", 'admin', 'index.html')
         if not os.path.exists(index_path):
             return HttpResponse("页面不存在", status=404)
@@ -105,7 +131,7 @@ def page_not_found(request, exception):
         content = content.replace("prefix: '/admin'", f"prefix: '{CONFIG.get_admin_path()}'")
         return HttpResponse(content, status=200)
     else:
-        return HttpResponseRedirect(admin_ui_prefix+'/')
+        return HttpResponseRedirect(admin_ui_prefix + '/')
 
 
 handler404 = page_not_found
