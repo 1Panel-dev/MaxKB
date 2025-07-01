@@ -19,6 +19,7 @@ class Group(Enum):
     """
     权限组 一个组一般对应前端一个菜单
     """
+
     USER = "USER_MANAGEMENT"
     # 应用
     APPLICATION = "APPLICATION"
@@ -36,7 +37,7 @@ class Group(Enum):
     KNOWLEDGE = "KNOWLEDGE"
     SYSTEM_KNOWLEDGE = "SYSTEM_KNOWLEDGE"
     SYSTEM_RES_KNOWLEDGE = "SYSTEM_RESOURCE_KNOWLEDGE"
-
+    KNOWLEDGE_HIT_TEST = "KNOWLEDGE_HIT_TEST"
     KNOWLEDGE_DOCUMENT = "KNOWLEDGE_DOCUMENT"
     SYSTEM_KNOWLEDGE_DOCUMENT = "SYSTEM_KNOWLEDGE_DOCUMENT"
     SYSTEM_RES_KNOWLEDGE_DOCUMENT = "SYSTEM_RESOURCE_KNOWLEDGE_DOCUMENT"
@@ -44,6 +45,8 @@ class Group(Enum):
     KNOWLEDGE_PROBLEM = "KNOWLEDGE_PROBLEM"
     SYSTEM_KNOWLEDGE_PROBLEM = "SYSTEM_KNOWLEDGE_PROBLEM"
     SYSTEM_RES_KNOWLEDGE_PROBLEM = "SYSTEM_RESOURCE_KNOWLEDGE_PROBLEM"
+
+    SYSTEM_KNOWLEDGE_HIT_TEST = "SYSTEM_KNOWLEDGE_HIT_TEST"
     SYSTEM_KNOWLEDGE_CHAT_USER = "SYSTEM_KNOWLEDGE_CHAT_USER"
 
     MODEL = "MODEL"
@@ -157,7 +160,6 @@ class Operate(Enum):
     TO_CHAT = "READ+TO_CHAT"  # 去对话
     SETTING = "READ+SETTING"  # 管理
     DOWNLOAD = "READ+DOWNLOAD"  # 下载
-
 
 class RoleGroup(Enum):
     # 系统用户
@@ -298,6 +300,7 @@ Permission_Label = {
     Group.KNOWLEDGE.value: _("Knowledge"),
     Group.KNOWLEDGE_DOCUMENT.value: _("Document"),
     Group.KNOWLEDGE_PROBLEM.value: _("Problem"),
+    Group.KNOWLEDGE_HIT_TEST.value: _("Hit-Test"),
     Operate.IMPORT.value: _("Import"),
     Operate.EXPORT.value: _("Export"),
     Operate.DEBUG.value: _("Debug"),
@@ -340,6 +343,7 @@ Permission_Label = {
     Group.SYSTEM_KNOWLEDGE.value: _("Knowledge"),
     Group.SYSTEM_KNOWLEDGE_DOCUMENT.value: _("Document"),
     Group.SYSTEM_KNOWLEDGE_PROBLEM.value: _("Problem"),
+    Group.SYSTEM_KNOWLEDGE_HIT_TEST.value: _("Hit-test"),
     Group.SYSTEM_KNOWLEDGE_CHAT_USER.value: _("Dialogue users"),
     Group.SYSTEM_RES_TOOL.value: _("Tool"),
     Group.SYSTEM_RES_MODEL.value: _("Model"),
@@ -579,7 +583,12 @@ class PermissionConstants(Enum):
         resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANGE],
         parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
-
+    KNOWLEDGE_HIT_TEST = Permission(
+        group=Group.KNOWLEDGE_HIT_TEST, operate=Operate.READ,
+        role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_VIEW],
+        parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
+    )
     KNOWLEDGE_PROBLEM_READ = Permission(
         group=Group.KNOWLEDGE_PROBLEM, operate=Operate.READ,
         role_list=[RoleConstants.ADMIN, RoleConstants.USER],
@@ -1144,6 +1153,10 @@ class PermissionConstants(Enum):
     )
     SHARED_KNOWLEDGE_PROBLEM_DELETE = Permission(
         group=Group.SYSTEM_KNOWLEDGE_PROBLEM, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.SHARED_KNOWLEDGE]
+    )
+    SHARED_KNOWLEDGE_HIT_TEST = Permission(
+        group=Group.SYSTEM_KNOWLEDGE_HIT_TEST, operate=Operate.READ, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.SHARED_KNOWLEDGE]
     )
     SHARED_KNOWLEDGE_CHAT_USER_READ = Permission(

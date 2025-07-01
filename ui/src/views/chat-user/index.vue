@@ -42,7 +42,7 @@
               </span>
             </div>
             <el-button type="primary" :disabled="current?.is_auth" @click="handleSave"
-              v-if="hasPermission(permissionObj[(route.meta?.resourceType as string)],'OR')"
+              v-if="hasPermission(permissionObj[route.path.includes('shared')?'SHAREDKNOWLEDGE':(route.meta?.resourceType as string)],'OR')"
             >
               {{ t('common.save') }}
             </el-button>
@@ -57,7 +57,7 @@
                 :placeholder="$t('common.inputPlaceholder')" style="width: 220px" clearable />
             </div>
             <div class="flex align-center"
-              v-if="hasPermission(permissionObj[(route.meta?.resourceType as string)],'OR')"
+              v-if="hasPermission(permissionObj[route.path.includes('shared')?'SHAREDKNOWLEDGE':(route.meta?.resourceType as string)],'OR')"
             >
               <div class="color-secondary mr-8">{{ $t('views.chatUser.autoAuthorization') }}</div>
               <el-switch size="small" :model-value="current?.is_auth" @click="changeAuth"
@@ -108,6 +108,7 @@
 <script lang="ts" setup>
 import { onMounted, ref, watch, reactive, computed } from 'vue'
 import ChatUserApi from '@/api/chat-user/chat-user'
+import SharedChatUserApi from "@/api/system-shared/knowledge-chat-user"
 import { t } from '@/locales'
 import type { ChatUserGroupItem, ChatUserGroupUserItem } from '@/api/type/workspaceChatUser'
 import { useRoute } from 'vue-router'
@@ -132,7 +133,7 @@ const permissionPrecise = computed(() => {
 const {
   params: { id },
 } = route as any
-
+ 
 const permissionObj=ref<any>({
   "APPLICATION": new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
                 [PermissionConst.APPLICATION_CHAT_USER_EDIT, 
@@ -140,6 +141,7 @@ const permissionObj=ref<any>({
   "KNOWLEDGE": new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
                 [PermissionConst.KNOWLEDGE_CHAT_USER_EDIT, 
                 PermissionConst.KNOWLEDGE_CHAT_USER_EDIT.getKnowledgeWorkspaceResourcePermission(id)],[],'OR'),
+  "SHAREDKNOWLEDGE": new ComplexPermission([RoleConst.ADMIN],[PermissionConst.SHARED_KNOWLEDGE_CHAT_USER_EDIT],[],'OR')
 })
 
 const resource = reactive({ resource_id: route.params.id as string, resource_type: route.meta.resourceType as string })
@@ -149,10 +151,17 @@ const loading = ref(false)
 const list = ref<ChatUserGroupItem[]>([])
 const filterList = ref<ChatUserGroupItem[]>([]) // 搜索过滤后列表
 const current = ref<ChatUserGroupItem>()
+const chatUserAuthAPI=computed(()=>{
+  if(route.path.includes('shared')){
+    return SharedChatUserApi
+  }else{
+    return ChatUserApi
+  }
+})
 
 async function getUserGroupList() {
   try {
-    const res = await ChatUserApi.getUserGroupList(resource, loading)
+    const res = await chatUserAuthAPI.value.getUserGroupList(resource, loading)
     list.value = res.data
     filterList.value = filter(list.value, filterText.value)
   } catch (error) {
@@ -185,7 +194,7 @@ function clickUserGroup(item: ChatUserGroupItem) {
 async function changeAuth() {
   const params = [{ user_group_id: current.value?.id as string, is_auth: !current.value?.is_auth }]
   try {
-    await ChatUserApi.editUserGroupList(resource, params, loading)
+    await chatUserAuthAPI.value.editUserGroupList(resource, params, loading)
     await getUserGroupList()
     current.value = { name: current.value?.name as string, id: current.value?.id as string, is_auth: !current.value?.is_auth }
     getList()
@@ -211,7 +220,7 @@ const tableData = ref<ChatUserGroupUserItem[]>([])
 async function getList() {
   if (!current.value?.id) return
   try {
-    const res = await ChatUserApi.getUserGroupUserList(resource, current.value?.id, paginationConfig, searchForm.value.name, rightLoading)
+    const res = await chatUserAuthAPI.value.getUserGroupUserList(resource, current.value?.id, paginationConfig, searchForm.value.name, rightLoading)
     tableData.value = res.data.records
     paginationConfig.total = res.data.total
   } catch (error) {
@@ -249,7 +258,7 @@ const handleRowChange = (value: boolean, row: ChatUserGroupUserItem) => {
 async function handleSave() {
   try {
     const params = tableData.value.map(item => ({ chat_user_id: item.id, is_auth: item.is_auth }))
-    await ChatUserApi.putUserGroupUser(resource, current.value?.id as string, params, rightLoading)
+    await chatUserAuthAPI.value.putUserGroupUser(resource, current.value?.id as string, params, rightLoading)
     MsgSuccess(t('common.saveSuccess'))
   } catch (error) {
     console.error(error)

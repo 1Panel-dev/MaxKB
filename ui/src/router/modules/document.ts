@@ -85,14 +85,28 @@ const DocumentRouter = {
         group: 'KnowledgeDetail',
         permission: [
           RoleConst.ADMIN,
-          RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
           () => {
             const to: any = get_next_route()
-            return PermissionConst.KNOWLEDGE_CHAT_USER_READ.getKnowledgeWorkspaceResourcePermission(
-              to ? to.params.id : '',
-            )
+            if (to.params.folderId == 'shared') {
+              return RoleConst.ADMIN
+            } else {
+              return RoleConst.WORKSPACE_MANAGE.getWorkspaceRole
+            }
           },
-          PermissionConst.KNOWLEDGE_CHAT_USER_READ.getWorkspacePermissionWorkspaceManageRole,
+          () => {
+            const to: any = get_next_route()
+            if (to.params.folderId == 'shared') {
+              return PermissionConst.SHARED_KNOWLEDGE_CHAT_USER_READ
+            } else {
+              return PermissionConst.KNOWLEDGE_CHAT_USER_READ.getKnowledgeWorkspaceResourcePermission(to ? to.params.id : '',)
+            }
+          },
+          () => {
+            const to: any = get_next_route()
+            if (to.params.folder_id == 'shared') {
+              return RoleConst.ADMIN
+            } else { return PermissionConst.KNOWLEDGE_CHAT_USER_READ.getWorkspacePermissionWorkspaceManageRole }
+          },
         ],
       },
       component: () => import('@/views/chat-user/index.vue'),
