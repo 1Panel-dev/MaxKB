@@ -7,8 +7,13 @@
     <base target="_blank" />
     <title>%VITE_APP_TITLE%</title>
   </head>
+  <script>
+    window.MaxKB = {
+      prefix: '/chat',
+    }
+  </script>
   <body>
     <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
+    <script type="module" src="/src/chat.ts"></script>
   </body>
 </html>

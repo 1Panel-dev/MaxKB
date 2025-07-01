@@ -177,7 +177,8 @@ const open: (application_id: string, loading?: Ref<boolean>) => Promise<Result<s
  * data
  */
 const chat: (chat_id: string, data: any) => Promise<any> = (chat_id, data) => {
-  return postStream(`/api/chat_message/${chat_id}`, data)
+  const prefix = (window.MaxKB?.prefix ? window.MaxKB?.prefix : '/admin') + '/api'
+  return postStream(`${prefix}/chat_message/${chat_id}`, data)
 }
 /**
  * 获取对话用户认证类型

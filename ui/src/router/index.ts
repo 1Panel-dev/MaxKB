@@ -7,14 +7,13 @@ import {
   createWebHistory,
   type NavigationGuardNext,
   type RouteLocationNormalized,
-  type RouteRecordRaw,
   type RouteRecordName,
 } from 'vue-router'
 import useStore from '@/stores'
 import { routes } from '@/router/routes'
 NProgress.configure({ showSpinner: false, speed: 500, minimum: 0.3 })
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(window.MaxKB?.prefix ? window.MaxKB?.prefix : import.meta.env.BASE_URL),
   routes: routes,
 })
 

@@ -4,12 +4,11 @@ import type { NProgress } from 'nprogress'
 import type { Ref } from 'vue'
 import type { Result } from '@/request/Result'
 import useStore from '@/stores'
-import router from '@/router'
 
 import { ref, type WritableComputedRef } from 'vue'
 
 const axiosConfig = {
-  baseURL: '/chat/api',
+  baseURL: (window.MaxKB?.prefix ? window.MaxKB?.prefix : '/chat') + '/api',
   withCredentials: false,
   timeout: 600000,
   headers: {},

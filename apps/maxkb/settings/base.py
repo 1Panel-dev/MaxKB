@@ -55,7 +55,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
+
 ]
 
 REST_FRAMEWORK = {
@@ -63,7 +63,7 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_AUTHENTICATION_CLASSES': ['common.auth.authenticate.AnonymousAuthentication']
 }
-STATICFILES_DIRS = [(os.path.join(PROJECT_DIR, 'ui', 'dist')), (os.path.join(PROJECT_DIR, 'chat', 'dist'))]
+STATICFILES_DIRS = [(os.path.join(PROJECT_DIR, 'ui', 'dist'))]
 STATIC_ROOT = os.path.join(BASE_DIR.parent, 'static')
 ROOT_URLCONF = 'maxkb.urls'
 APPS_DIR = os.path.join(PROJECT_DIR, 'apps')
@@ -71,7 +71,7 @@ APPS_DIR = os.path.join(PROJECT_DIR, 'apps')
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ["apps/static/ui"],
+        'DIRS': ["apps/static/admin"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
