@@ -3,8 +3,13 @@
     <template #header>
       <div>
         <h2>{{ $t('views.chatUser.title') }}</h2>
-        <div class="color-secondary">{{ resource.resource_type === SourceTypeEnum.APPLICATION ?
-          $t('views.chatUser.applicationTitleTip') : $t('views.chatUser.knowledgeTitleTip') }}</div>
+        <div class="color-secondary">
+          {{
+            resource.resource_type === SourceTypeEnum.APPLICATION
+              ? $t('views.chatUser.applicationTitleTip')
+              : $t('views.chatUser.knowledgeTitleTip')
+          }}
+        </div>
       </div>
     </template>
     <el-card style="--el-card-padding: 0" class="user-card">
@@ -14,7 +19,12 @@
             <h4 class="medium">{{ $t('views.chatUser.group.title') }}</h4>
           </div>
           <div class="p-8">
-            <el-input v-model="filterText" :placeholder="$t('common.search')" prefix-icon="Search" clearable />
+            <el-input
+              v-model="filterText"
+              :placeholder="$t('common.search')"
+              prefix-icon="Search"
+              clearable
+            />
           </div>
           <div class="list-height-left">
             <el-scrollbar v-loading="loading">
@@ -36,39 +46,81 @@
             <div class="flex align-center">
               <h4 class="medium">{{ current?.name }}</h4>
               <el-divider direction="vertical" class="mr-8 ml-8" />
-              <AppIcon iconName="app-workspace" style="font-size: 16px" class="color-input-placeholder"></AppIcon>
+              <AppIcon
+                iconName="app-workspace"
+                style="font-size: 16px"
+                class="color-input-placeholder"
+              ></AppIcon>
               <span class="color-input-placeholder ml-4">
                 {{ paginationConfig.total }}
               </span>
             </div>
-            <el-button type="primary" :disabled="current?.is_auth" @click="handleSave"
-              v-if="hasPermission(permissionObj[route.path.includes('shared')?'SHAREDKNOWLEDGE':(route.meta?.resourceType as string)],'OR')"
+            <el-button
+              type="primary"
+              :disabled="current?.is_auth"
+              @click="handleSave"
+              v-if="
+                hasPermission(
+                  permissionObj[
+                    route.path.includes('shared')
+                      ? 'SHAREDKNOWLEDGE'
+                      : (route.meta?.resourceType as string)
+                  ],
+                  'OR',
+                )
+              "
             >
               {{ t('common.save') }}
             </el-button>
           </div>
 
-          <div class="flex-between mb-16" style="margin-top: 18px;">
+          <div class="flex-between mb-16" style="margin-top: 18px">
             <div class="flex complex-search">
               <el-select class="complex-search__left" v-model="searchType" style="width: 120px">
                 <el-option :label="$t('views.login.loginForm.username.label')" value="name" />
               </el-select>
-              <el-input v-if="searchType === 'name'" v-model="searchForm.name" @change="getList"
-                :placeholder="$t('common.inputPlaceholder')" style="width: 220px" clearable />
+              <el-input
+                v-if="searchType === 'name'"
+                v-model="searchForm.name"
+                @change="getList"
+                :placeholder="$t('common.inputPlaceholder')"
+                style="width: 220px"
+                clearable
+              />
             </div>
-            <div class="flex align-center"
-              v-if="hasPermission(permissionObj[route.path.includes('shared')?'SHAREDKNOWLEDGE':(route.meta?.resourceType as string)],'OR')"
+            <div
+              class="flex align-center"
+              v-if="
+                hasPermission(
+                  permissionObj[
+                    route.path.includes('shared')
+                      ? 'SHAREDKNOWLEDGE'
+                      : (route.meta?.resourceType as string)
+                  ],
+                  'OR',
+                )
+              "
             >
               <div class="color-secondary mr-8">{{ $t('views.chatUser.autoAuthorization') }}</div>
-              <el-switch size="small" :model-value="current?.is_auth" @click="changeAuth"
+              <el-switch
+                size="small"
+                :model-value="current?.is_auth"
+                @click="changeAuth"
                 :loading="loading"
-                ></el-switch>
+              ></el-switch>
             </div>
           </div>
 
-          <app-table :data="tableData" :pagination-config="paginationConfig" @sizeChange="handleSizeChange"
-            @changePage="getList">
-            <el-table-column prop="nick_name" :label="$t('views.userManage.userForm.nick_name.label')" />
+          <app-table
+            :data="tableData"
+            :pagination-config="paginationConfig"
+            @sizeChange="handleSizeChange"
+            @changePage="getList"
+          >
+            <el-table-column
+              prop="nick_name"
+              :label="$t('views.userManage.userForm.nick_name.label')"
+            />
             <el-table-column prop="username" :label="$t('views.login.loginForm.username.label')" />
             <el-table-column prop="source" :label="$t('views.userManage.source.label')">
               <template #default="{ row }">
@@ -89,13 +141,21 @@
             </el-table-column>
             <el-table-column :width="140" align="center">
               <template #header>
-                <el-checkbox :model-value="allChecked" :indeterminate="allIndeterminate" :disabled="current?.is_auth"
-                  @change="handleCheckAll">{{ $t('views.chatUser.authorization')
-                  }}</el-checkbox>
+                <el-checkbox
+                  :model-value="allChecked"
+                  :indeterminate="allIndeterminate"
+                  :disabled="current?.is_auth"
+                  @change="handleCheckAll"
+                  >{{ $t('views.chatUser.authorization') }}</el-checkbox
+                >
               </template>
               <template #default="{ row }">
-                <el-checkbox v-model="row.is_auth" :indeterminate="row.indeterminate" :disabled="current?.is_auth"
-                  @change="(value: boolean) => handleRowChange(value, row)" />
+                <el-checkbox
+                  v-model="row.is_auth"
+                  :indeterminate="row.indeterminate"
+                  :disabled="current?.is_auth"
+                  @change="(value: boolean) => handleRowChange(value, row)"
+                />
               </template>
             </el-table-column>
           </app-table>
@@ -108,60 +168,76 @@
 <script lang="ts" setup>
 import { onMounted, ref, watch, reactive, computed } from 'vue'
 import ChatUserApi from '@/api/chat-user/chat-user'
-import SharedChatUserApi from "@/api/system-shared/knowledge-chat-user"
+import SharedChatUserApi from '@/api/system-shared/chat-user'
 import { t } from '@/locales'
 import type { ChatUserGroupItem, ChatUserGroupUserItem } from '@/api/type/workspaceChatUser'
 import { useRoute } from 'vue-router'
 import { SourceTypeEnum } from '@/enums/common'
 import { MsgSuccess } from '@/utils/message'
-import permissionMap from '@/permission'
 import { ComplexPermission } from '@/utils/permission/type'
 import { EditionConst, RoleConst, PermissionConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
-
-
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 const route = useRoute()
-
-const apiType = computed<'workspace'>(() => {
-    return 'workspace'
-})
-const permissionPrecise = computed(() => {
-  return permissionMap['application'][apiType.value]
-})
 
 const {
   params: { id },
 } = route as any
- 
-const permissionObj=ref<any>({
-  "APPLICATION": new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
-                [PermissionConst.APPLICATION_CHAT_USER_EDIT, 
-                PermissionConst.APPLICATION_CHAT_USER_EDIT.getApplicationWorkspaceResourcePermission(id)],[],'OR'),
-  "KNOWLEDGE": new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
-                [PermissionConst.KNOWLEDGE_CHAT_USER_EDIT, 
-                PermissionConst.KNOWLEDGE_CHAT_USER_EDIT.getKnowledgeWorkspaceResourcePermission(id)],[],'OR'),
-  "SHAREDKNOWLEDGE": new ComplexPermission([RoleConst.ADMIN],[PermissionConst.SHARED_KNOWLEDGE_CHAT_USER_EDIT],[],'OR')
+
+const permissionObj = ref<any>({
+  APPLICATION: new ComplexPermission(
+    [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+    [
+      PermissionConst.APPLICATION_CHAT_USER_EDIT,
+      PermissionConst.APPLICATION_CHAT_USER_EDIT.getApplicationWorkspaceResourcePermission(id),
+    ],
+    [],
+    'OR',
+  ),
+  KNOWLEDGE: new ComplexPermission(
+    [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+    [
+      PermissionConst.KNOWLEDGE_CHAT_USER_EDIT,
+      PermissionConst.KNOWLEDGE_CHAT_USER_EDIT.getKnowledgeWorkspaceResourcePermission(id),
+    ],
+    [],
+    'OR',
+  ),
+  SHAREDKNOWLEDGE: new ComplexPermission(
+    [RoleConst.ADMIN],
+    [PermissionConst.SHARED_KNOWLEDGE_CHAT_USER_EDIT],
+    [],
+    'OR',
+  ),
 })
 
-const resource = reactive({ resource_id: route.params.id as string, resource_type: route.meta.resourceType as string })
+const resource = reactive({
+  resource_id: route.params.id as string,
+  resource_type: route.meta.resourceType as string,
+})
 
 const filterText = ref('')
 const loading = ref(false)
 const list = ref<ChatUserGroupItem[]>([])
 const filterList = ref<ChatUserGroupItem[]>([]) // 搜索过滤后列表
 const current = ref<ChatUserGroupItem>()
-const chatUserAuthAPI=computed(()=>{
-  if(route.path.includes('shared')){
-    return SharedChatUserApi
-  }else{
-    return ChatUserApi
+const apiType = computed(() => {
+  if (route.path.includes('shared')) {
+    return 'systemShare'
+  } else if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
   }
 })
 
 async function getUserGroupList() {
   try {
-    const res = await chatUserAuthAPI.value.getUserGroupList(resource, loading)
+    const res = await loadSharedApi({
+      type: 'chatUser',
+      systemType: apiType.value,
+    }).getUserGroupList(resource, loading)
     list.value = res.data
     filterList.value = filter(list.value, filterText.value)
   } catch (error) {
@@ -194,9 +270,16 @@ function clickUserGroup(item: ChatUserGroupItem) {
 async function changeAuth() {
   const params = [{ user_group_id: current.value?.id as string, is_auth: !current.value?.is_auth }]
   try {
-    await chatUserAuthAPI.value.editUserGroupList(resource, params, loading)
+    await loadSharedApi({
+      type: 'chatUser',
+      systemType: apiType.value,
+    }).editUserGroupList(resource, params, loading)
     await getUserGroupList()
-    current.value = { name: current.value?.name as string, id: current.value?.id as string, is_auth: !current.value?.is_auth }
+    current.value = {
+      name: current.value?.name as string,
+      id: current.value?.id as string,
+      is_auth: !current.value?.is_auth,
+    }
     getList()
   } catch (error) {
     console.error(error)
@@ -220,7 +303,16 @@ const tableData = ref<ChatUserGroupUserItem[]>([])
 async function getList() {
   if (!current.value?.id) return
   try {
-    const res = await chatUserAuthAPI.value.getUserGroupUserList(resource, current.value?.id, paginationConfig, searchForm.value.name, rightLoading)
+    const res = await loadSharedApi({
+      type: 'chatUser',
+      systemType: apiType.value,
+    }).getUserGroupUserList(
+      resource,
+      current.value?.id,
+      paginationConfig,
+      searchForm.value.name,
+      rightLoading,
+    )
     tableData.value = res.data.records
     paginationConfig.total = res.data.total
   } catch (error) {
@@ -233,32 +325,40 @@ function handleSizeChange() {
   getList()
 }
 
-watch(() => current.value?.id, () => {
-  getList()
-})
+watch(
+  () => current.value?.id,
+  () => {
+    getList()
+  },
+)
 
-const allChecked = computed(() =>
-  tableData.value.length > 0 && tableData.value.every((item: ChatUserGroupUserItem) => item.is_auth)
-);
+const allChecked = computed(
+  () =>
+    tableData.value.length > 0 &&
+    tableData.value.every((item: ChatUserGroupUserItem) => item.is_auth),
+)
 
-const allIndeterminate = computed(() =>
-  !allChecked.value && tableData.value.some((item: ChatUserGroupUserItem) => item.is_auth)
-);
+const allIndeterminate = computed(
+  () => !allChecked.value && tableData.value.some((item: ChatUserGroupUserItem) => item.is_auth),
+)
 
 const handleCheckAll = (checked: boolean) => {
   tableData.value.forEach((item: ChatUserGroupUserItem) => {
-    item.is_auth = checked;
-  });
-};
+    item.is_auth = checked
+  })
+}
 
 const handleRowChange = (value: boolean, row: ChatUserGroupUserItem) => {
-  row.is_auth = value;
-};
+  row.is_auth = value
+}
 
 async function handleSave() {
   try {
-    const params = tableData.value.map(item => ({ chat_user_id: item.id, is_auth: item.is_auth }))
-    await chatUserAuthAPI.value.putUserGroupUser(resource, current.value?.id as string, params, rightLoading)
+    const params = tableData.value.map((item) => ({ chat_user_id: item.id, is_auth: item.is_auth }))
+    await loadSharedApi({
+      type: 'chatUser',
+      systemType: apiType.value,
+    }).putUserGroupUser(resource, current.value?.id as string, params, rightLoading)
     MsgSuccess(t('common.saveSuccess'))
   } catch (error) {
     console.error(error)

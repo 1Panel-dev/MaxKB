@@ -4,6 +4,7 @@ import paragraphWorkspaceApi from '@/api/knowledge/paragraph'
 import problemWorkspaceApi from '@/api/knowledge/problem'
 import modelWorkspaceApi from '@/api/model/model'
 import toolWorkspaceApi from '@/api/tool/tool'
+import chatUserWorkspaceApi from '@/api/chat-user/chat-user'
 import sharedWorkspaceApi from '@/api/shared-workspace'
 import toolSystemShareApi from '@/api/system-shared/tool'
 import modelSystemShareApi from '@/api/system-shared/model'
@@ -11,6 +12,7 @@ import knowledgeSystemShareApi from '@/api/system-shared/knowledge'
 import documentSystemShareApi from '@/api/system-shared/document'
 import paragraphSystemShareApi from '@/api/system-shared/paragraph'
 import problemSystemShareApi from '@/api/system-shared/problem'
+import chatUserSystemShareApi from '@/api/system-shared/chat-user'
 
 // 普通 API
 const workspaceApiMap = {
@@ -20,6 +22,7 @@ const workspaceApiMap = {
   document: documentWorkspaceApi,
   paragraph: paragraphWorkspaceApi,
   problem: problemWorkspaceApi,
+  chatUser: chatUserWorkspaceApi,
 } as any
 
 // 系统分享 API
@@ -30,6 +33,7 @@ const systemShareApiMap = {
   document: documentSystemShareApi,
   paragraph: paragraphSystemShareApi,
   problem: problemSystemShareApi,
+  chatUser: chatUserSystemShareApi,
 } as any
 
 // 资源管理 API
