@@ -7,13 +7,17 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from application.models.application import Application, ApplicationFolder
+from application.serializers.application import ApplicationOperateSerializer
 from application.serializers.application_folder import ApplicationFolderTreeSerializer
 from common.constants.permission_constants import Group, ResourcePermission, ResourcePermissionRole
+from common.exception.app_exception import AppApiException
 from folders.api.folder import FolderCreateRequest
 from knowledge.models import KnowledgeFolder, Knowledge
+from knowledge.serializers.knowledge import KnowledgeSerializer
 from knowledge.serializers.knowledge_folder import KnowledgeFolderTreeSerializer
 from system_manage.models import WorkspaceUserResourcePermission
 from tools.models import ToolFolder, Tool
+from tools.serializers.tool import ToolSerializer
 from tools.serializers.tool_folder import ToolFolderTreeSerializer
 from users.serializers.user import is_workspace_manage
 
@@ -34,7 +38,6 @@ def get_folder_type(source):
         return ToolFolder
     elif source == Group.APPLICATION.name:
         return ApplicationFolder
-        # return ApplicationFolder
     elif source == Group.KNOWLEDGE.name:
         return KnowledgeFolder
     else:
@@ -205,7 +208,7 @@ class FolderSerializer(serializers.Serializer):
                 for node in nodes:
                     # print(node)
                     # 删除相关的资源
-                    Source.objects.filter(folder_id=node.id).delete()
+                    self.delete_source(node)
                     # 删除节点
                     node.delete()
             # 普通用户删除的文件夹内全部都得是自己有权限的资源
@@ -223,10 +226,33 @@ class FolderSerializer(serializers.Serializer):
                         Q(permission_list__overlap=[ResourcePermission.MANAGE, ResourcePermissionRole.ROLE])
                     ).count()
                     if auth_list != len(source_ids):
-                        raise serializers.ValidationError(_('This folder contains resources that you do not have permission to delete'))
-                    # print('Deleting folder:', node.id)
-                    Source.objects.filter(folder_id=node.id).delete()
+                        raise AppApiException(500, _('This folder contains resources that you dont have permission'))
+                    self.delete_source(node)
                     node.delete()
+
+        def delete_source(self, node):
+            Source = get_source_type(self.data.get('source'))  # noqa
+            source_ids = Source.objects.filter(folder_id=node.id).values_list('id', flat=True)
+            source = self.data.get('source')
+
+            for source_id in source_ids:
+                if source == Group.TOOL.name:
+                    ToolSerializer.Operate(data={
+                        'workspace_id': self.data.get('workspace_id'),
+                        'id': source_id,
+                    }).delete()
+                elif source == Group.APPLICATION.name:
+                    ApplicationOperateSerializer(data={
+                        'workspace_id': self.data.get('workspace_id'),
+                        'application_id': source_id,
+                        'user_id': self.data.get('user_id'),
+                    }).delete()
+                elif source == Group.KNOWLEDGE.name:
+                    KnowledgeSerializer.Operate(data={
+                        'workspace_id': self.data.get('workspace_id'),
+                        'knowledge_id': source_id,
+                        'user_id': self.data.get('user_id'),
+                    }).delete()
 
 
 class FolderTreeSerializer(serializers.Serializer):
