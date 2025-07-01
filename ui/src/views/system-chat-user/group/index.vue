@@ -306,8 +306,12 @@ function deleteGroup(item: ListItem) {
 
 async function refresh(group?: ListItem) {
   await getUserGroupList()
-  // 创建角色后选中新建的角色
-  current.value = group ? group : current.value
+  // 创建后选中新建的
+   if (group) {
+    current.value = group
+  } else {
+    current.value = list.value.find(item => item.id === current.value.id)
+  }
 }
 
 const rightLoading = ref(false)

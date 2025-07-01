@@ -54,10 +54,10 @@
                               @click.stop="createOrUpdateWorkspace(row)"
                               class="p-8"
                               v-if="
-                                hasPermission(
-                                  [RoleConst.ADMIN, PermissionConst.WORKSPACE_EDIT],
-                                  'OR',
-                                )
+                              hasPermission(
+                                [RoleConst.ADMIN, PermissionConst.WORKSPACE_EDIT],
+                                'OR',
+                              )
                               "
                             >
                               <el-icon><EditPen /></el-icon>
@@ -67,11 +67,11 @@
                               @click.stop="deleteWorkspace(row)"
                               class="border-t p-8"
                               v-if="
-                                row.id !== 'default' &&
-                                hasPermission(
-                                  [RoleConst.ADMIN, PermissionConst.WORKSPACE_DELETE],
-                                  'OR',
-                                )
+                              row.id !== 'default' &&
+                              hasPermission(
+                                [RoleConst.ADMIN, PermissionConst.WORKSPACE_DELETE],
+                                'OR',
+                              )
                               "
                             >
                               <el-icon><Delete /></el-icon>
@@ -148,8 +148,12 @@ onMounted(async () => {
 
 async function refresh(workspace?: WorkspaceItem) {
   await getWorkspace()
-  // 创建角色后选中新建的角色
-  currentWorkspace.value = workspace ? workspace : currentWorkspace.value
+  // 创建后选中新建的
+  if (workspace) {
+    currentWorkspace.value = workspace
+  } else {
+    currentWorkspace.value = list.value.find(item => item.id === currentWorkspace.value.id)
+  }
 }
 
 function filter(list: WorkspaceItem[], filterText: string) {

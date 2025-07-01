@@ -26,46 +26,7 @@
                   @mouseleave="mouseId = ''"
                 >
                   <template #default="{ row }">
-                    <div class="flex-between">
-                      <span class="mr-8">{{ row.role_name }}</span>
-                      <div @click.stop v-show="mouseId === row.id">
-                        <el-dropdown :teleported="false">
-                          <el-button text>
-                            <el-icon class="color-secondary">
-                              <MoreFilled />
-                            </el-icon>
-                          </el-button>
-                          <template #dropdown>
-                            <el-dropdown-menu style="min-width: 80px">
-                              <el-dropdown-item @click.stop="createOrUpdateRole(row)" class="p-8"
-                                v-if="hasPermission(
-                                  new ComplexPermission(
-                                    [RoleConst.ADMIN],
-                                    [PermissionConst.ROLE_EDIT],
-                                    [],'OR'
-                                  ),'OR'
-                                  )"
-                              >
-                                <el-icon><EditPen /></el-icon>
-                                {{ $t('common.rename') }}
-                              </el-dropdown-item>
-                              <el-dropdown-item @click.stop="deleteRole(row)" class="border-t p-8"
-                                v-if="hasPermission(
-                                  new ComplexPermission(
-                                    [RoleConst.ADMIN],
-                                    [PermissionConst.ROLE_DELETE],
-                                    [],'OR'
-                                  ),'OR'
-                                  )"
-                              >
-                                <el-icon><Delete /></el-icon>
-                                {{ $t('common.delete') }}
-                              </el-dropdown-item>
-                            </el-dropdown-menu>
-                          </template>
-                        </el-dropdown>
-                      </div>
-                    </div>
+                      <span>{{ row.role_name }}</span>
                   </template>
                   <template #empty>
                     <span></span>
@@ -238,7 +199,11 @@ onMounted(async () => {
 async function refresh(role?: RoleItem) {
   await getRole()
   // 创建角色后选中新建的角色
-  currentRole.value = role ? role : currentRole.value
+  if (role) {
+    currentRole.value = role
+  } else {
+    currentRole.value = customRoleList.value.find(item => item.id === currentRole.value.id)
+  }
 }
 
 function filter(list: RoleItem[], filterText: string) {
