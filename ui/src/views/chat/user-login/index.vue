@@ -303,6 +303,9 @@ function changeMode(val: string) {
 onBeforeMount(() => {
   if (chatUser.chat_profile?.login_value) {
     modeList.value = chatUser.chat_profile.login_value
+    if (modeList.value.includes('LOCAL')) {
+      modeList.value = ['LOCAL', ...modeList.value.filter((item) => item !== 'LOCAL')]
+    }
     loginMode.value = modeList.value[0] || 'LOCAL'
     if (modeList.value.length == 1 && ['CAS', 'OIDC', 'OAuth2'].includes(modeList.value[0])) {
       redirectAuth(modeList.value[0])

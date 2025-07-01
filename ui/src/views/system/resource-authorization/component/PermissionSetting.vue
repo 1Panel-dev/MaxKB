@@ -1,13 +1,15 @@
 <template>
   <div class="w-full">
     <div class="flex-between mb-16">
-      <div class="flex align-center" v-if="hasPermission(EditionConst.IS_EE, 'OR')">
+      <div class="flex align-center"
+           v-if="hasPermission([EditionConst.IS_EE,EditionConst.IS_PE], 'OR')">
         <!-- 企业版: 选优先级-->
         <span class="lighter mr-16">{{ $t('views.resourceAuthorization.priority.label') }}</span>
         <el-radio-group v-model="radioRole">
           <el-radio :value="true" size="large">{{
-            $t('views.resourceAuthorization.priority.role')
-          }}</el-radio>
+              $t('views.resourceAuthorization.priority.role')
+            }}
+          </el-radio>
           <el-radio :value="false" size="large">{{ $t('common.custom') }}</el-radio>
         </el-radio-group>
       </div>
@@ -16,7 +18,7 @@
         :placeholder="$t('common.search')"
         prefix-icon="Search"
         class="mt-4"
-        :class="hasPermission(EditionConst.IS_EE, 'OR') ? 'w-240' : ''"
+        :class="hasPermission([EditionConst.IS_EE,EditionConst.IS_PE], 'OR') ? 'w-240' : ''"
         clearable
       />
     </div>
@@ -46,7 +48,7 @@
               />
             </el-avatar>
             <!--  知识库 icon -->
-            <KnowledgeIcon class="mr-12" :size="20" v-else-if="isKnowledge" :type="row.icon" />
+            <KnowledgeIcon class="mr-12" :size="20" v-else-if="isKnowledge" :type="row.icon"/>
             <!--  应用/工具 自定义 icon -->
             <el-avatar
               v-else-if="isAppIcon(row?.icon) && !isModel"
@@ -55,13 +57,13 @@
               shape="square"
               :size="20"
             >
-              <img :src="row?.icon" alt="" />
+              <img :src="row?.icon" alt=""/>
             </el-avatar>
             <!--  应用 icon -->
-            <LogoIcon v-else-if="isApplication" height="20px" class="mr-12" />
+            <LogoIcon v-else-if="isApplication" height="20px" class="mr-12"/>
             <!-- 工具 icon -->
             <el-avatar v-else-if="isTool" class="avatar-green mr-12" shape="square" :size="20">
-              <img src="@/assets/node/icon_tool.svg" style="width: 58%" alt="" />
+              <img src="@/assets/node/icon_tool.svg" style="width: 58%" alt=""/>
             </el-avatar>
             <!-- 模型 icon -->
             <span
@@ -170,14 +172,15 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, watch, computed } from 'vue'
-import type { Provider } from '@/api/type/model'
-import { AuthorizationEnum } from '@/enums/system'
-import { isAppIcon } from '@/utils/common'
-import { EditionConst } from '@/utils/permission/data'
-import { hasPermission } from '@/utils/permission/index'
+import {ref, onMounted, watch, computed} from 'vue'
+import type {Provider} from '@/api/type/model'
+import {AuthorizationEnum} from '@/enums/system'
+import {isAppIcon} from '@/utils/common'
+import {EditionConst} from '@/utils/permission/data'
+import {hasPermission} from '@/utils/permission/index'
 import useStore from '@/stores'
-const { model } = useStore()
+
+const {model} = useStore()
 const props = defineProps({
   data: {
     type: Array,
@@ -234,6 +237,7 @@ function checkedOperateChange(Name: string | number, row: any, e: boolean) {
 }
 
 const provider_list = ref<Array<Provider>>([])
+
 function getProvider() {
   model.asyncGetProvider().then((res: any) => {
     provider_list.value = res?.data

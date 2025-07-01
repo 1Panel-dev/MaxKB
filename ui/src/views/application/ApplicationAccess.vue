@@ -90,7 +90,7 @@ const platforms = reactive([
     exists: false,
   },
   {
-    key: 'feishu',
+    key: 'lark',
     logoSrc: new URL(`../../assets/logo/logo_lark.svg`, import.meta.url).href,
     name: t('views.application.applicationAccess.lark'),
     description: t('views.application.applicationAccess.larkTip'),
@@ -143,7 +143,7 @@ function changeStatus(type: string, value: boolean) {
 }
 
 onMounted(() => {
-  // getPlatformStatus()
+  getPlatformStatus()
 })
 </script>
 

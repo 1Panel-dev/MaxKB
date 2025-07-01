@@ -37,6 +37,7 @@
               :placeholder="$t('common.search')"
               prefix-icon="Search"
               clearable
+              filterable
             />
           </div>
 

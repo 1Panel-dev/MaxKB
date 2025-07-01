@@ -7,7 +7,9 @@
       <el-form-item :label="$t('views.chatUser.group.usernameOrName')" prop="user">
         <el-select v-model="form.user" multiple filterable
                    :placeholder="$t('common.selectPlaceholder')"
-                   :loading="optionLoading">
+                   :loading="optionLoading"
+                   :filter-method="filterUser"
+        >
           <el-option v-for="item in chatUserList" :key="item.id" :label="item.nick_name"
                      :value="item.id">
           </el-option>
@@ -57,6 +59,16 @@ async function getChatUserList() {
     console.error(e)
   }
 }
+
+const filterUser = (query: string, item: ChatUserItem) => {
+  if (!query) return true;
+  const q = query.toLowerCase();
+  return (
+    item.nick_name?.toLowerCase().includes(q) ||
+    item.username?.toLowerCase().includes(q) ||
+    false
+  );
+};
 
 onBeforeMount(() => {
   getChatUserList()

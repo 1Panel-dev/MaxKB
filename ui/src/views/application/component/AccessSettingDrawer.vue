@@ -77,7 +77,7 @@
             >{{ $t('views.application.applicationAccess.wecomPlatform') }}</a
           >{{ $t('views.application.applicationAccess.wecomSetting.urlInfo') }}
         </el-text>
-        <el-text type="info" v-if="configType === 'feishu'">
+        <el-text type="info" v-if="configType === 'lark'">
           {{ $t('views.application.applicationAccess.copyUrl') }}
           <a class="primary" href="https://open.feishu.cn/app/" target="_blank">{{
             $t('views.application.applicationAccess.larkPlatform')
@@ -107,7 +107,7 @@ import { MsgError, MsgSuccess } from '@/utils/message'
 import { copyClick } from '@/utils/clipboard'
 import { t } from '@/locales'
 
-type PlatformType = 'wechat' | 'dingtalk' | 'wecom' | 'feishu' | 'slack'
+type PlatformType = 'wechat' | 'dingtalk' | 'wecom' | 'lark' | 'slack'
 
 const formRef = ref<FormInstance>()
 const visible = ref(false)
@@ -138,7 +138,7 @@ const form = reactive<any>({
     encoding_aes_key: '',
     callback_url: ''
   },
-  feishu: { app_id: '', app_secret: '', verification_token: '', callback_url: '' },
+  lark: { app_id: '', app_secret: '', verification_token: '', callback_url: '' },
   slack: { signing_secret: '', bot_user_token: '', callback_url: '' }
 })
 
@@ -226,7 +226,7 @@ const rules = reactive<{ [propName: string]: any }>({
       }
     ]
   },
-  feishu: {
+  lark: {
     app_id: [
       {
         required: true,
@@ -297,7 +297,7 @@ const configFields: { [propName: string]: { [propName: string]: any } } = {
     token: { label: 'Token', placeholder: '' },
     encoding_aes_key: { label: 'EncodingAESKey', placeholder: '' }
   },
-  feishu: {
+  lark: {
     app_id: { label: 'App ID', placeholder: '' },
     app_secret: { label: 'App Secret', placeholder: '' },
     verification_token: { label: 'Verification Token', placeholder: '' }
@@ -322,7 +322,7 @@ const drawerTitle = computed(
       wechat: t('views.application.applicationAccess.wechatSetting.title'),
       dingtalk: t('views.application.applicationAccess.dingtalkSetting.title'),
       wecom: t('views.application.applicationAccess.wecomSetting.title'),
-      feishu: t('views.application.applicationAccess.larkSetting.title'),
+      lark: t('views.application.applicationAccess.larkSetting.title'),
       slack: t('views.application.applicationAccess.slackSetting.title')
     }[configType.value])
 )
@@ -333,7 +333,7 @@ const infoTitle = computed(
       wechat: t('views.applicationOverview.appInfo.header'),
       dingtalk: t('views.applicationOverview.appInfo.header'),
       wecom: t('views.applicationOverview.appInfo.header'),
-      feishu: t('views.applicationOverview.appInfo.header'),
+      lark: t('views.applicationOverview.appInfo.header'),
       slack: t('views.applicationOverview.appInfo.header')
     }[configType.value])
 )
