@@ -101,6 +101,9 @@ class Config(dict):
     def get_log_level(self):
         return self.get('LOG_LEVEL', 'DEBUG')
 
+    def get_sandbox_python_package_paths(self):
+        return self.get('SANDBOX_PYTHON_PACKAGE_PATHS', '/opt/py3/lib/python3.11/site-packages,/opt/maxkb-app/sandbox/python-packages,/opt/maxkb/python-packages')
+
     def get_session_timeout(self):
         return int(self.get('SESSION_TIMEOUT', 28800))
 
