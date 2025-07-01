@@ -81,7 +81,7 @@ import { t } from '@/locales'
 import useStore from '@/stores'
 
 const router = useRouter()
-const { theme } = useStore()
+const { theme, user} = useStore()
 
 const CheckEmailForm = ref<CheckCodeRequest>({
   email: '',
