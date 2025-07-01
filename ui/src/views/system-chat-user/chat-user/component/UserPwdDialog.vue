@@ -47,6 +47,7 @@ import type { ResetPasswordRequest } from '@/api/type/user'
 import userManageApi from '@/api/system/chat-user'
 import { MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
+import {loadPermissionApi} from "@/utils/dynamics-api/permission-api.ts";
 const emit = defineEmits(['refresh'])
 
 const { user } = useStore()
@@ -118,7 +119,7 @@ const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid, fields) => {
     if (valid) {
-      userManageApi.putUserManagePassword(userId.value, userForm.value, loading).then((res) => {
+      loadPermissionApi('chatUser').putUserManagePassword(userId.value, userForm.value, loading).then((res) => {
         emit('refresh')
         user.profile()
         MsgSuccess(t('views.userManage.tip.updatePwdSuccess'))

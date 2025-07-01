@@ -120,6 +120,7 @@ import type { WorkspaceItem } from '@/api/type/workspace'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
+import {loadPermissionApi} from "@/utils/dynamics-api/permission-api.ts";
 
 const filterText = ref('')
 const loading = ref(false)
@@ -129,7 +130,7 @@ const currentWorkspace = ref<WorkspaceItem>()
 
 async function getWorkspace() {
   try {
-    const res = await WorkspaceApi.getSystemWorkspaceList(loading)
+    const res = await loadPermissionApi('workspace').getSystemWorkspaceList(loading)
     list.value = res.data
     filterList.value = filter(list.value, filterText.value)
   } catch (error) {
@@ -175,7 +176,7 @@ function createOrUpdateWorkspace(item?: WorkspaceItem) {
 
 async function check(id: string) {
   try {
-    return await WorkspaceApi.deleteWorkspaceCheck(id)
+    return await loadPermissionApi('workspace').deleteWorkspaceCheck(id)
   } catch (error) {
     console.log(error)
   }
@@ -194,7 +195,7 @@ async function deleteWorkspace(item: WorkspaceItem) {
         confirmButtonClass: 'color-danger',
       },
     ).then(() => {
-      WorkspaceApi.deleteWorkspace(item.id as string, loading).then(async () => {
+      loadPermissionApi('workspace').deleteWorkspace(item.id as string, loading).then(async () => {
         MsgSuccess(t('common.deleteSuccess'))
         await getWorkspace()
         currentWorkspace.value =

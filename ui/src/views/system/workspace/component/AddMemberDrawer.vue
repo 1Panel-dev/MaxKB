@@ -28,6 +28,7 @@ import { MsgSuccess } from '@/utils/message'
 import type { CreateWorkspaceMemberParamsItem, WorkspaceItem } from '@/api/type/workspace'
 import type { FormItemModel } from '@/api/type/role'
 import { RoleTypeEnum } from '@/enums/system'
+import {loadPermissionApi} from "@/utils/dynamics-api/permission-api.ts";
 
 const props = defineProps<{
   currentWorkspace?: WorkspaceItem
@@ -73,7 +74,7 @@ async function getUserFormItem() {
 
 async function getRoleFormItem() {
   try {
-    const res = await WorkspaceApi.getWorkspaceRoleList(memberFormContentLoading);
+    const res = await loadPermissionApi('workspace').getWorkspaceRoleList(memberFormContentLoading);
     roleFormItem.value = [{
       path: 'role_ids',
       label: t('views.role.member.role'),
@@ -120,7 +121,7 @@ const memberFormContentRef = ref<InstanceType<typeof MemberFormContent>>()
 function handleAdd() {
   memberFormContentRef.value?.validate().then(async (valid: any) => {
     if (valid) {
-      await WorkspaceApi.CreateWorkspaceMember(props.currentWorkspace?.id as string, list.value, loading)
+      await loadPermissionApi('workspace').CreateWorkspaceMember(props.currentWorkspace?.id as string, list.value, loading)
       MsgSuccess(t('common.addSuccess'))
       handleCancel();
       emit('refresh')

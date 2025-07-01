@@ -25,6 +25,7 @@ import { MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
 import SystemGroupApi from '@/api/system/user-group'
 import type { ListItem } from '@/api/type/common'
+import {loadPermissionApi} from "@/utils/dynamics-api/permission-api.ts";
 
 
 const emit = defineEmits<{
@@ -58,7 +59,7 @@ const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid) => {
     if (valid) {
-      SystemGroupApi.postUserGroup(form.value, loading).then((res: any) => {
+      loadPermissionApi('userGroup').postUserGroup(form.value, loading).then((res: any) => {
         MsgSuccess(!form.value.id ? t('common.createSuccess') : t('common.renameSuccess'))
         emit('refresh', res.data)
         dialogVisible.value = false

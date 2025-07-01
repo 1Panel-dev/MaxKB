@@ -81,7 +81,7 @@ async function getUserFormItem() {
 
 async function getWorkspaceFormItem() {
   try {
-    const res = await WorkspaceApi.getWorkspaceList(memberFormContentLoading)
+    const res = await loadPermissionApi('workspace').getWorkspaceList(memberFormContentLoading)
     workspaceFormItem.value = [
       {
         path: 'workspace_ids',

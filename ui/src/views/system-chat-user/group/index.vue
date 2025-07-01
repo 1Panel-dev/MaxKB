@@ -241,6 +241,7 @@ import {MsgSuccess, MsgConfirm} from '@/utils/message'
 import {PermissionConst, RoleConst} from '@/utils/permission/data'
 import {ComplexPermission} from '@/utils/permission/type'
 import {hasPermission} from '@/utils/permission/index'
+import {loadPermissionApi} from "@/utils/dynamics-api/permission-api.ts";
 
 const filterText = ref('')
 const loading = ref(false)
@@ -250,7 +251,7 @@ const current = ref<ListItem>()
 
 async function getUserGroupList() {
   try {
-    const res = await SystemGroupApi.getUserGroup(loading)
+    const res = await loadPermissionApi('userGroup').getUserGroup(loading)
     list.value = res.data
     filterList.value = filter(list.value, filterText.value)
   } catch (error) {
@@ -294,7 +295,7 @@ function deleteGroup(item: ListItem) {
     },
   )
     .then(() => {
-      SystemGroupApi.delUserGroup(item.id as string, loading).then(async () => {
+      loadPermissionApi('userGroup').delUserGroup(item.id as string, loading).then(async () => {
         MsgSuccess(t('common.deleteSuccess'))
         await getUserGroupList()
         current.value = item.id === current.value?.id ? list.value[0] : current.value
@@ -335,7 +336,7 @@ async function getList() {
     const params = {
       [searchType.value]: searchForm.value[searchType.value as keyof typeof searchForm.value],
     }
-    const res = await SystemGroupApi.getUserListByGroup(
+    const res = await loadPermissionApi('userGroup').getUserListByGroup(
       current.value?.id,
       paginationConfig,
       params,
@@ -384,7 +385,7 @@ function handleDeleteUser(item?: ChatUserGroupUserItem) {
     },
   )
     .then(() => {
-      SystemGroupApi.postRemoveMember(
+      loadPermissionApi('userGroup').postRemoveMember(
         current.value?.id as string,
         {
           group_relation_ids: item

@@ -35,6 +35,7 @@ import {t} from '@/locales'
 import SystemGroupApi from '@/api/system/user-group'
 import userManageApi from '@/api/system/chat-user'
 import type {ChatUserItem} from '@/api/type/systemChatUser'
+import {loadPermissionApi} from "@/utils/dynamics-api/permission-api.ts";
 
 const emit = defineEmits<{
   (e: 'refresh'): void;
@@ -53,7 +54,7 @@ const chatUserList = ref<ChatUserItem[]>([])
 
 async function getChatUserList() {
   try {
-    const res = await userManageApi.getChatUserList(optionLoading)
+    const res = await loadPermissionApi('chatUser').getChatUserList(optionLoading)
     chatUserList.value = res.data
   } catch (e) {
     console.error(e)
@@ -93,7 +94,7 @@ const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid) => {
     if (valid) {
-      SystemGroupApi.postAddMember(groupId.value, {"user_ids": form.value.user}, loading).then(() => {
+      loadPermissionApi('userGroup').postAddMember(groupId.value, {"user_ids": form.value.user}, loading).then(() => {
         MsgSuccess(t('common.addSuccess'))
         emit('refresh')
         dialogVisible.value = false

@@ -34,6 +34,7 @@ import { MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
 import userManageApi from '@/api/system/chat-user'
 import type { ListItem } from '@/api/type/common'
+import {loadPermissionApi} from "@/utils/dynamics-api/permission-api.ts";
 
 const props = defineProps<{
   optionLoading: boolean,
@@ -73,7 +74,7 @@ const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid) => {
     if (valid) {
-      userManageApi.batchAddGroup(form.value, loading).then(() => {
+      loadPermissionApi('chatUser').batchAddGroup(form.value, loading).then(() => {
         MsgSuccess(t('common.settingSuccess'))
         emit('refresh')
         dialogVisible.value = false

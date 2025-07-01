@@ -57,6 +57,7 @@ import { MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
 import type { ListItem } from '@/api/type/common'
 import { copyClick } from '@/utils/clipboard'
+import {loadPermissionApi} from "@/utils/dynamics-api/permission-api.ts";
 
 const props = defineProps<{
   title: string,
@@ -153,13 +154,13 @@ const submit = async (formEl: FormInstance | undefined) => {
   await formEl.validate((valid, fields) => {
     if (valid) {
       if (isEdit.value) {
-        chatUserApi.putUserManage(userForm.value.id, userForm.value, loading).then((res) => {
+        loadPermissionApi('chatUser').putUserManage(userForm.value.id, userForm.value, loading).then((res) => {
           emit('refresh')
           MsgSuccess(t('common.editSuccess'))
           visible.value = false
         })
       } else {
-        chatUserApi.postUserManage(userForm.value, loading).then((res) => {
+        loadPermissionApi('chatUser').postUserManage(userForm.value, loading).then((res) => {
           emit('refresh')
           MsgSuccess(t('common.createSuccess'))
           visible.value = false

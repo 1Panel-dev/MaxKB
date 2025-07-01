@@ -78,6 +78,7 @@ import WorkspaceApi from '@/api/workspace/workspace'
 import type { WorkspaceMemberItem, WorkspaceItem } from '@/api/type/workspace'
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
 import { ComplexPermission } from '@/utils/permission/type'
+import {loadPermissionApi} from "@/utils/dynamics-api/permission-api.ts";
 
 
 const props = defineProps<{
@@ -104,7 +105,7 @@ async function getList() {
     const params = {
       [searchType.value]: searchForm.value[searchType.value],
     }
-    const res = await WorkspaceApi.getWorkspaceMemberList(
+    const res = await loadPermissionApi('workspace').getWorkspaceMemberList(
       props.currentWorkspace?.id,
       paginationConfig,
       params,
@@ -162,7 +163,7 @@ function handleDelete(row: WorkspaceMemberItem) {
   })
     .then(() => {
       loading.value = true
-      WorkspaceApi.deleteWorkspaceMember(
+      loadPermissionApi('workspace').deleteWorkspaceMember(
         props.currentWorkspace?.id as string,
         row.user_relation_id,
         loading,

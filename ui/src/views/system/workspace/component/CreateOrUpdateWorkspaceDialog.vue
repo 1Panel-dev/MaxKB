@@ -25,6 +25,7 @@ import { MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
 import type { WorkspaceItem } from '@/api/type/workspace'
 import WorkspaceApi from '@/api/workspace/workspace'
+import {loadPermissionApi} from "@/utils/dynamics-api/permission-api.ts";
 
 const emit = defineEmits<{
   (e: 'refresh', currentWorkspace: WorkspaceItem): void;
@@ -57,7 +58,7 @@ const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid) => {
     if (valid) {
-      WorkspaceApi.CreateOrUpdateWorkspace(form.value, loading).then((res: any) => {
+      loadPermissionApi('workspace').CreateOrUpdateWorkspace(form.value, loading).then((res: any) => {
         MsgSuccess(!form.value.id ? t('common.createSuccess') : t('common.renameSuccess'))
         emit('refresh', res.data)
         dialogVisible.value = false

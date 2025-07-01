@@ -32,6 +32,7 @@ import { t } from '@/locales'
 import type { RoleItem, CreateOrUpdateParams } from '@/api/type/role'
 import RoleApi from '@/api/system/role'
 import { roleTypeMap } from '../index'
+import {loadPermissionApi} from "@/utils/dynamics-api/permission-api.ts";
 
 const emit = defineEmits<{
   (e: 'refresh', currentRole: RoleItem): void;
@@ -69,7 +70,7 @@ const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid) => {
     if (valid) {
-      RoleApi.CreateOrUpdateRole(form.value, loading).then((res: any) => {
+      loadPermissionApi('role').CreateOrUpdateRole(form.value, loading).then((res: any) => {
         MsgSuccess(!form.value.role_id ? t('common.createSuccess') : t('common.renameSuccess'))
         emit('refresh', res.data)
         dialogVisible.value = false

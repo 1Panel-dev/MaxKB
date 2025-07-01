@@ -21,7 +21,7 @@
             {{ t('views.userManage.createUser') }}
           </el-button>
           <el-button @click="syncUsers"
-            v-hasPermission="
+                     v-hasPermission="
               new ComplexPermission(
                 [RoleConst.ADMIN],
                 [PermissionConst.CHAT_USER_SYNC],
@@ -59,8 +59,8 @@
             style="width: 120px"
             @change="search_type_change"
           >
-            <el-option :label="$t('views.login.loginForm.username.label')" value="username" />
-            <el-option :label="$t('views.userManage.userForm.nick_name.label')" value="nick_name" />
+            <el-option :label="$t('views.login.loginForm.username.label')" value="username"/>
+            <el-option :label="$t('views.userManage.userForm.nick_name.label')" value="nick_name"/>
           </el-select>
           <el-input
             v-if="search_type === 'username'"
@@ -88,17 +88,17 @@
         @selection-change="handleSelectionChange"
         @sort-change="handleSortChange"
       >
-        <el-table-column type="selection" width="55" />
+        <el-table-column type="selection" width="55"/>
         <el-table-column
           prop="nick_name"
           :label="$t('views.userManage.userForm.nick_name.label')"
         />
-        <el-table-column prop="username" :label="$t('common.username')" />
+        <el-table-column prop="username" :label="$t('common.username')"/>
         <el-table-column prop="is_active" :label="$t('common.status.label')" width="100">
           <template #default="{ row }">
             <div v-if="row.is_active" class="flex align-center">
               <el-icon class="color-success mr-8" style="font-size: 16px">
-                <SuccessFilled />
+                <SuccessFilled/>
               </el-icon>
               <span class="color-secondary">
                 {{ $t('common.status.enabled') }}
@@ -137,7 +137,7 @@
           min-width="110"
         >
           <template #default="{ row }">
-            <TagGroup :tags="row.user_group_names" />
+            <TagGroup :tags="row.user_group_names"/>
           </template>
         </el-table-column>
         <el-table-column prop="source" :label="$t('views.userManage.source.label')">
@@ -177,7 +177,7 @@
                   [],'OR'),'OR')"
               />
             </span>
-            <el-divider direction="vertical" />
+            <el-divider direction="vertical"/>
             <span class="mr-8">
               <el-button
                 type="primary"
@@ -190,7 +190,7 @@
                   [],'OR'),'OR')"
               >
                 <el-icon>
-                  <EditPen />
+                  <EditPen/>
                 </el-icon>
               </el-button>
             </span>
@@ -207,7 +207,7 @@
                   [],'OR'),'OR')"
               >
                 <el-icon>
-                  <Lock />
+                  <Lock/>
                 </el-icon>
               </el-button>
             </span>
@@ -224,7 +224,7 @@
                   [],'OR'),'OR')"
               >
                 <el-icon>
-                  <Delete />
+                  <Delete/>
                 </el-icon>
               </el-button>
             </span>
@@ -240,33 +240,34 @@
       ref="UserDrawerRef"
       @refresh="refresh"
     />
-    <UserPwdDialog ref="UserPwdDialogRef" @refresh="refresh" />
+    <UserPwdDialog ref="UserPwdDialogRef" @refresh="refresh"/>
     <SetUserGroupsDialog
       :optionLoading="optionLoading"
       :chatGroupList="chatGroupList"
       ref="setUserGroupsRef"
       @refresh="refresh"
     />
-    <SyncUsersDialog ref="syncUsersDialogRef" @refresh="refresh" />
+    <SyncUsersDialog ref="syncUsersDialogRef" @refresh="refresh"/>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, reactive } from 'vue'
+import {onMounted, ref, reactive} from 'vue'
 import UserDrawer from './component/UserDrawer.vue'
 import UserPwdDialog from './component/UserPwdDialog.vue'
 import SetUserGroupsDialog from './component/SetUserGroupsDialog.vue'
 import SyncUsersDialog from './component/SyncUsersDialog.vue'
 import userManageApi from '@/api/system/chat-user'
-import { datetimeFormat } from '@/utils/time'
-import { MsgSuccess, MsgConfirm } from '@/utils/message'
-import { t } from '@/locales'
-import type { ChatUserItem } from '@/api/type/systemChatUser'
+import {datetimeFormat} from '@/utils/time'
+import {MsgSuccess, MsgConfirm} from '@/utils/message'
+import {t} from '@/locales'
+import type {ChatUserItem} from '@/api/type/systemChatUser'
 import SystemGroupApi from '@/api/system/user-group'
-import type { ListItem } from '@/api/type/common'
-import { PermissionConst, RoleConst } from '@/utils/permission/data'
-import { ComplexPermission } from '@/utils/permission/type'
-import { hasPermission } from '@/utils/permission'
+import type {ListItem} from '@/api/type/common'
+import {PermissionConst, RoleConst} from '@/utils/permission/data'
+import {ComplexPermission} from '@/utils/permission/type'
+import {hasPermission} from '@/utils/permission'
+import {loadPermissionApi} from "@/utils/dynamics-api/permission-api.ts";
 
 const search_type = ref('username')
 const search_form = ref<{
@@ -277,7 +278,7 @@ const search_form = ref<{
   nick_name: '',
 })
 const search_type_change = () => {
-  search_form.value = { username: '', nick_name: '' }
+  search_form.value = {username: '', nick_name: ''}
 }
 
 const loading = ref(false)
@@ -300,7 +301,7 @@ function getList() {
   const params = {
     [search_type.value]: search_form.value[search_type.value as keyof typeof search_form.value],
   }
-  return userManageApi.getUserManage(paginationConfig, params, loading).then((res) => {
+  return loadPermissionApi('chatUser').getUserManage(paginationConfig, params, loading).then((res) => {
     userTableData.value = res.data.records
     paginationConfig.total = res.data.total
   })
@@ -308,7 +309,7 @@ function getList() {
 
 const orderBy = ref<string>('')
 
-function handleSortChange({ prop, order }: { prop: string; order: string }) {
+function handleSortChange({prop, order}: { prop: string; order: string }) {
   orderBy.value = order === 'ascending' ? prop : `-${prop}`
   getList()
 }
@@ -324,7 +325,7 @@ function changeState(row: ChatUserItem) {
     is_active: !row.is_active,
   }
   const str = obj.is_active ? t('common.status.enableSuccess') : t('common.status.disableSuccess')
-  userManageApi
+  loadPermissionApi('chatUser')
     .putUserManage(row.id, obj, loading)
     .then(() => {
       getList()
@@ -356,12 +357,13 @@ function deleteUserManage(row: ChatUserItem) {
   })
     .then(() => {
       loading.value = true
-      userManageApi.delUserManage(row.id, loading).then(() => {
+      loadPermissionApi('chatUser').delUserManage(row.id, loading).then(() => {
         MsgSuccess(t('common.deleteSuccess'))
         getList()
       })
     })
-    .catch(() => {})
+    .catch(() => {
+    })
 }
 
 const UserPwdDialogRef = ref()
@@ -384,7 +386,7 @@ const chatGroupList = ref<ListItem[]>([])
 
 async function getChatGroupList() {
   try {
-    const res = await SystemGroupApi.getUserGroup(optionLoading)
+    const res = await loadPermissionApi('userGroup').getUserGroup(optionLoading)
     chatGroupList.value = res.data
   } catch (e) {
     console.error(e)
@@ -392,12 +394,12 @@ async function getChatGroupList() {
 }
 
 function handleBatchDelete() {
-  MsgConfirm(t('views.chatUser.batchDeleteUser', { count: multipleSelection.value.length }), '', {
+  MsgConfirm(t('views.chatUser.batchDeleteUser', {count: multipleSelection.value.length}), '', {
     confirmButtonText: t('common.confirm'),
     confirmButtonClass: 'color-danger',
   })
     .then(() => {
-      userManageApi
+      loadPermissionApi('chatUser')
         .batchDelete(
           multipleSelection.value.map((item) => item.id),
           loading,
@@ -407,7 +409,8 @@ function handleBatchDelete() {
           await getList()
         })
     })
-    .catch(() => {})
+    .catch(() => {
+    })
 }
 
 const setUserGroupsRef = ref<InstanceType<typeof SetUserGroupsDialog>>()
