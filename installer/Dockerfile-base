@@ -34,4 +34,4 @@ ENV PGDATA=/opt/maxkb/data/postgresql/pgdata \
     LANG=en_US.UTF-8 \
     MAXKB_LOG_LEVEL=INFO \
     MAXKB_SANDBOX_PYTHON_PACKAGE_PATHS=/opt/py3/lib/python3.11/site-packages,/opt/maxkb-app/sandbox/python-packages,/opt/maxkb/python-packages \
-    MAXKB_ADMIN_PATH=admin
+    MAXKB_ADMIN_PATH=/admin
