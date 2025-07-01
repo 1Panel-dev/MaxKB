@@ -106,7 +106,7 @@ class Config(dict):
                         '/opt/py3/lib/python3.11/site-packages,/opt/maxkb-app/sandbox/python-packages,/opt/maxkb/python-packages')
 
     def get_admin_path(self):
-        return self.get('ADMIN_PATH', 'admin')
+        return self.get('ADMIN_PATH', '/admin')
 
     def get_chat_path(self):
         return self.get('CHAT_PATH', '/chat')
