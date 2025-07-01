@@ -944,7 +944,7 @@ function batchRefresh() {
 
 function downloadDocument(row: any) {
   loadSharedApi({ type: 'document', systemType: apiType.value })
-    .getDownloadSourceFile(id, row.id)
+    .getDownloadSourceFile(id, row.id, row.name)
     .then(() => {
       getList()
     })

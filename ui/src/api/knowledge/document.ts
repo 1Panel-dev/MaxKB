@@ -136,11 +136,12 @@ const putCancelTask: (
  * 下载原文档
  * @param 参数 knowledge_id
  */
-const getDownloadSourceFile: (knowledge_id: string, document_id: string) => Promise<Result<any>> = (
+const getDownloadSourceFile: (knowledge_id: string, document_id: string, document_name: string) => Promise<Result<any>> = (
   knowledge_id,
   document_id,
+  document_name,
 ) => {
-  return get(`${prefix.value}/${knowledge_id}/document/${document_id}/download_source_file`)
+  return exportFile(document_name, `${prefix.value}/${knowledge_id}/document/${document_id}/download_source_file`, {}, undefined)
 }
 
 /**

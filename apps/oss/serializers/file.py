@@ -50,6 +50,7 @@ mime_types = {
     "webm": "video/webm", "flv": "video/x-flv", "m4v": "video/x-m4v", "mng": "video/x-mng",
     "asx": "video/x-ms-asf", "asf": "video/x-ms-asf", "wmv": "video/x-ms-wmv", "avi": "video/x-msvideo",
     "wav": "audio/wav", "flac": "audio/flac", "aac": "audio/aac", "opus": "audio/opus",
+    "csv": "text/csv", "tsv": "text/tab-separated-values", "ics": "text/calendar",
 }
 
 
