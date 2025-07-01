@@ -8,12 +8,14 @@ from rest_framework import serializers
 
 from application.models.application import Application, ApplicationFolder
 from application.serializers.application_folder import ApplicationFolderTreeSerializer
-from common.constants.permission_constants import Group
+from common.constants.permission_constants import Group, ResourcePermission, ResourcePermissionRole
 from folders.api.folder import FolderCreateRequest
 from knowledge.models import KnowledgeFolder, Knowledge
 from knowledge.serializers.knowledge_folder import KnowledgeFolderTreeSerializer
+from system_manage.models import WorkspaceUserResourcePermission
 from tools.models import ToolFolder, Tool
 from tools.serializers.tool_folder import ToolFolderTreeSerializer
+from users.serializers.user import is_workspace_manage
 
 
 def get_source_type(source):
@@ -140,6 +142,7 @@ class FolderSerializer(serializers.Serializer):
         id = serializers.CharField(required=True, label=_('folder id'))
         workspace_id = serializers.CharField(required=True, allow_null=True, allow_blank=True, label=_('workspace id'))
         source = serializers.CharField(required=True, label=_('source'))
+        user_id = serializers.UUIDField(required=True, label=_('user id'))
 
         @transaction.atomic
         def edit(self, instance):
@@ -194,13 +197,36 @@ class FolderSerializer(serializers.Serializer):
                 raise serializers.ValidationError(_('Folder does not exist'))
             if folder.id == folder.workspace_id:
                 raise serializers.ValidationError(_('Cannot delete root folder'))
-            nodes = Folder.objects.filter(id=self.data.get('id')).get_descendants(include_self=True)
-            for node in nodes:
-                # print(node)
-                # 删除相关的资源
-                Source.objects.filter(folder_id=node.id).delete()
-                # 删除节点
-                node.delete()
+
+            # 工作空间管理员可以删除
+            workspace_manage = is_workspace_manage(self.data.get('user_id'), self.data.get('workspace_id'))
+            if workspace_manage:
+                nodes = Folder.objects.filter(id=self.data.get('id')).get_descendants(include_self=True)
+                for node in nodes:
+                    # print(node)
+                    # 删除相关的资源
+                    Source.objects.filter(folder_id=node.id).delete()
+                    # 删除节点
+                    node.delete()
+            # 普通用户删除的文件夹内全部都得是自己有权限的资源
+            else:
+                nodes = Folder.objects.filter(id=self.data.get('id')).get_descendants(include_self=True)
+                for node in nodes:
+                    # 删除相关的资源
+                    source_ids = Source.objects.filter(folder_id=node.id).values_list('id', flat=True)
+                    # 检查文件夹是否存在未授权当前用户的资源
+                    auth_list = QuerySet(WorkspaceUserResourcePermission).filter(
+                        Q(workspace_id=self.data.get('workspace_id')) &
+                        Q(user_id=self.data.get('user_id')) &
+                        Q(auth_target_type=self.data.get('source')) &
+                        Q(target__in=source_ids) &
+                        Q(permission_list__overlap=[ResourcePermission.MANAGE, ResourcePermissionRole.ROLE])
+                    ).count()
+                    if auth_list != len(source_ids):
+                        raise serializers.ValidationError(_('This folder contains resources that you do not have permission to delete'))
+                    # print('Deleting folder:', node.id)
+                    Source.objects.filter(folder_id=node.id).delete()
+                    node.delete()
 
 
 class FolderTreeSerializer(serializers.Serializer):

@@ -96,7 +96,7 @@ class FolderView(APIView):
         )
         def put(self, request: Request, workspace_id: str, source: str, folder_id: str):
             return result.success(FolderSerializer.Operate(
-                data={'id': folder_id, 'workspace_id': workspace_id, 'source': source}
+                data={'id': folder_id, 'workspace_id': workspace_id, 'source': source, 'user_id': request.user.id}
             ).edit(request.data))
 
         @extend_schema(
@@ -115,7 +115,7 @@ class FolderView(APIView):
         )
         def get(self, request: Request, workspace_id: str, source: str, folder_id: str):
             return result.success(FolderSerializer.Operate(
-                data={'id': folder_id, 'workspace_id': workspace_id, 'source': source}
+                data={'id': folder_id, 'workspace_id': workspace_id, 'source': source, 'user_id': request.user.id}
             ).one())
 
         @extend_schema(
@@ -138,5 +138,5 @@ class FolderView(APIView):
         )
         def delete(self, request: Request, workspace_id: str, source: str, folder_id: str):
             return result.success(FolderSerializer.Operate(
-                data={'id': folder_id, 'workspace_id': workspace_id, 'source': source}
+                data={'id': folder_id, 'workspace_id': workspace_id, 'source': source, 'user_id': request.user.id}
             ).delete())
