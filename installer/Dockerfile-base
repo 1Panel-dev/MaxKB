@@ -32,4 +32,5 @@ ENV PGDATA=/opt/maxkb/data/postgresql/pgdata \
     POSTGRES_MAX_CONNECTIONS=1000 \
     REDIS_PASSWORD=Password123@redis \
     LANG=en_US.UTF-8 \
-    MAXKB_LOG_LEVEL=INFO
+    MAXKB_LOG_LEVEL=INFO \
+    MAXKB_SANDBOX_PYTHON_PACKAGE_PATHS=/opt/py3/lib/python3.11/site-packages,/opt/maxkb-app/sandbox/python-packages,/opt/maxkb/python-packages
