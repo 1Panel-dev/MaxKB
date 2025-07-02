@@ -7,6 +7,7 @@ from typing import Dict
 
 import uuid_utils.compat as uuid
 from django.core.cache import cache
+from django.db import transaction
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
@@ -160,11 +161,15 @@ class ModelSerializer(serializers.Serializer):
             QuerySet(Model).filter(id=self.data.get('id')).update(status=Status.PAUSE_DOWNLOAD)
             return True
 
+        @transaction.atomic
         def delete(self, with_valid=True):
             if with_valid:
                 super().is_valid(raise_exception=True)
             model_id = self.data.get('id')
             model = Model.objects.filter(id=model_id).first()
+            if model is None:
+                return True
+            QuerySet(WorkspaceUserResourcePermission).filter(target=model_id).delete()
             # TODO : 这里可以添加模型删除的逻辑,需要注意删除模型时的权限和关联关系
             # if model.model_type == 'LLM':
             #     application_count = Application.objects.filter(model_id=model_id).count()

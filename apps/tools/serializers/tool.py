@@ -336,6 +336,7 @@ class ToolSerializer(serializers.Serializer):
             tool = QuerySet(Tool).filter(id=self.data.get('id')).first()
             if tool.template_id is None and tool.icon != '/ui/favicon.ico':
                 QuerySet(File).filter(id=tool.icon.split('/')[-1]).delete()
+            QuerySet(WorkspaceUserResourcePermission).filter(target=tool.id).delete()
             QuerySet(Tool).filter(id=self.data.get('id')).delete()
 
         def one(self):
