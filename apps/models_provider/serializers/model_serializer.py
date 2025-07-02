@@ -383,8 +383,11 @@ class ModelSerializer(serializers.Serializer):
                 self.is_valid(raise_exception=True)
             user_id = self.data.get("user_id")
             query_params = self._build_query_params(workspace_id, False, user_id)
-            return [self._build_model_data(model) for model in
-                    query_params.get('model_query_set').order_by("-create_time")]
+            return [
+                self._build_model_data(
+                    model
+                ) for model in query_params.get('model_query_set').order_by("-create_time")
+            ]
 
         def model_list(self, workspace_id, with_valid=True):
             if with_valid:
@@ -451,7 +454,8 @@ class ModelSerializer(serializers.Serializer):
                 'status': model.status,
                 'meta': model.meta,
                 'user_id': model.user_id,
-                'username': model.user.nick_name
+                'username': model.user.username,
+                'nick_name': model.user.nick_name,
             }
 
         def page(self, current_page, page_size):
