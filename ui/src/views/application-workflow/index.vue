@@ -46,6 +46,11 @@
           </el-button>
           <template #dropdown>
             <el-dropdown-menu>
+              <el-dropdown-item :href="shareUrl">
+                <AppIcon iconName="app-create-chat" class="mr-4"></AppIcon>
+                {{ $t('views.application.operation.toChat') }}
+              </el-dropdown-item>
+
               <el-dropdown-item @click="openHistory">
                 <AppIcon iconName="app-history-outlined"></AppIcon>
                 {{ $t('views.applicationWorkflow.setting.releaseHistory') }}
@@ -138,6 +143,7 @@ import applicationApi from '@/api/application/application'
 import { isAppIcon } from '@/utils/common'
 import { MsgSuccess, MsgError, MsgConfirm } from '@/utils/message'
 import { datetimeFormat } from '@/utils/time'
+import { mapToUrlParams } from '@/utils/application'
 import useStore from '@/stores'
 import { WorkFlowInstance } from '@/workflow/common/validate'
 import { hasPermission } from '@/utils/permission'
@@ -169,6 +175,15 @@ const showHistory = ref(false)
 const disablePublic = ref(false)
 const currentVersion = ref<any>({})
 const cloneWorkFlow = ref(null)
+
+const apiInputParams = ref([])
+
+const urlParams = computed(() =>
+  mapToUrlParams(apiInputParams.value) ? '?' + mapToUrlParams(apiInputParams.value) : '',
+)
+const shareUrl = computed(
+  () => `${window.location.origin}/chat/` + detail.value.access_token + urlParams.value,
+)
 
 function back() {
   if (JSON.stringify(cloneWorkFlow.value) !== JSON.stringify(getGraphData())) {
@@ -227,9 +242,9 @@ function renderGraphData(item: any) {
 
 function closeHistory() {
   getDetail()
-  // if (hasPermission(`APPLICATION:MANAGE:${id}`, 'AND') && isSave.value) {
-  //   initInterval()
-  // }
+  if (isSave.value) {
+    initInterval()
+  }
   showHistory.value = false
   disablePublic.value = false
 }
@@ -244,12 +259,10 @@ function changeSave(bool: boolean) {
 }
 
 function clickNodes(item: any) {
-  // workflowRef.value?.addNode(item)
   showPopover.value = false
 }
 
 function onmousedown(item: any) {
-  // workflowRef.value?.onmousedown(item)
   showPopover.value = false
 }
 
@@ -328,12 +341,6 @@ const clickShowDebug = () => {
       }
     })
 }
-// function clickoutsideDebug(e: any) {
-//   if (workflowMainRef.value && e && e.target && workflowMainRef.value.contains(e?.target)) {
-//     showDebug.value = false
-//   }
-// }
-
 function getGraphData() {
   return workflowRef.value?.getGraphData()
 }
@@ -348,6 +355,27 @@ function getDetail() {
     detail.value.tts_model_id = res.data.tts_model
     detail.value.tts_type = res.data.tts_type
     saveTime.value = res.data?.update_time
+    detail.value.work_flow?.nodes
+      ?.filter((v: any) => v.id === 'base-node')
+      .map((v: any) => {
+        apiInputParams.value = v.properties.api_input_field_list
+          ? v.properties.api_input_field_list.map((v: any) => {
+              return {
+                name: v.variable,
+                value: v.default_value,
+              }
+            })
+          : v.properties.input_field_list
+            ? v.properties.input_field_list
+                .filter((v: any) => v.assignment_method === 'api_input')
+                .map((v: any) => {
+                  return {
+                    name: v.variable,
+                    value: v.default_value,
+                  }
+                })
+            : []
+      })
     application.asyncGetAccessToken(id, loading).then((res: any) => {
       detail.value = { ...detail.value, ...res.data }
     })
@@ -404,9 +432,9 @@ onMounted(() => {
   const workflowAutoSave = localStorage.getItem('workflowAutoSave')
   isSave.value = workflowAutoSave === 'true' ? true : false
   // 初始化定时任务
-  // if (hasPermission(`APPLICATION:MANAGE:${id}`, 'AND') && isSave.value) {
-  //   initInterval()
-  // }
+  if (isSave.value) {
+    initInterval()
+  }
 })
 
 onBeforeUnmount(() => {

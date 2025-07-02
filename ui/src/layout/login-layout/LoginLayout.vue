@@ -79,7 +79,7 @@ const loginImage = computed(() => {
     return `${fileURL.value}`
   } else {
     const imgName = getThemeImg(theme.themeInfo?.theme)
-    const imgPath = `/ui/theme/${imgName}.jpg`
+    const imgPath = `/theme/${imgName}.jpg`
     const imageUrl = new URL(imgPath, import.meta.url).href
     return imageUrl
   }

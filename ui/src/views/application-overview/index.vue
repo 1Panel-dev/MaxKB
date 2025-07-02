@@ -225,6 +225,7 @@ import { nowDate, beforeDay } from '@/utils/time'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { copyClick } from '@/utils/clipboard'
 import { isAppIcon } from '@/utils/common'
+import { mapToUrlParams } from '@/utils/application'
 import useStore from '@/stores'
 import { t } from '@/locales'
 import { EditionConst } from '@/utils/permission/data'
@@ -457,16 +458,6 @@ function refresh() {
 
 function refreshIcon() {
   getDetail()
-}
-
-function mapToUrlParams(map: any[]) {
-  const params = new URLSearchParams()
-
-  map.forEach((item: any) => {
-    params.append(encodeURIComponent(item.name), encodeURIComponent(item.value))
-  })
-
-  return params.toString() // 返回 URL 查询字符串
 }
 
 onMounted(() => {
