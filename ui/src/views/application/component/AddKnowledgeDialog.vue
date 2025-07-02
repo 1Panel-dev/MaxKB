@@ -98,7 +98,11 @@
 </template>
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import useStore from '@/stores'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import { uniqueArray } from '@/utils/array'
+const route = useRoute()
 const props = defineProps({
   data: {
     type: Array<any>,
@@ -108,19 +112,29 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['addData', 'refresh'])
-const { folder, user, knowledge } = useStore()
+const { folder, user } = useStore()
+const apiType = computed(() => {
+  if (route.path.includes('shared')) {
+    return 'systemShare'
+  } else if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
 
 const dialogVisible = ref<boolean>(false)
 const checkList = ref<Array<string>>([])
 const currentEmbedding = ref('')
 const searchValue = ref('')
-const searchDate = ref<any[]>([])
+const searchData = ref<Array<any>>([])
+const knowledgeList = ref<Array<any>>([])
 const loading = ref(false)
 
 const filterData = computed(() => {
   return currentEmbedding.value
-    ? searchDate.value.filter((v) => v.embedding_model_id === currentEmbedding.value)
-    : searchDate.value
+    ? searchData.value.filter((v) => v.embedding_model_id === currentEmbedding.value)
+    : searchData.value
 })
 
 watch(dialogVisible, (bool) => {
@@ -128,22 +142,24 @@ watch(dialogVisible, (bool) => {
     checkList.value = []
     currentEmbedding.value = ''
     searchValue.value = ''
+    searchData.value = []
+    knowledgeList.value = []
   }
 })
 
 watch(searchValue, (val) => {
   if (val) {
-    searchDate.value = props.data.filter((v) => v.name.includes(val))
+    searchData.value = knowledgeList.value.filter((v) => v.name.includes(val))
   } else {
-    searchDate.value = props.data
+    searchData.value = knowledgeList.value
   }
 })
 
 function changeHandle() {
   if (checkList.value.length > 0) {
-    currentEmbedding.value = props.data.filter(
+    currentEmbedding.value = knowledgeList.value?.find(
       (v) => v.id === checkList.value[0],
-    )[0].embedding_model_id
+    )?.embedding_model_id
   } else if (checkList.value.length === 0) {
     currentEmbedding.value = ''
   }
@@ -168,7 +184,7 @@ const open = (checked: any) => {
 const submitHandle = () => {
   emit(
     'addData',
-    searchDate.value.filter((item: any) => checkList.value.includes(item.id)),
+    knowledgeList.value.filter((item: any) => checkList.value.includes(item.id)),
   )
   dialogVisible.value = false
 }
@@ -178,14 +194,14 @@ const refresh = () => {
 }
 
 const folderList = ref<any[]>([])
-const knowledgeList = ref<any[]>([])
 const currentFolder = ref<any>({})
 const folderLoading = ref(false)
 // 文件
 function folderClickHandle(row: any) {
+  if (row.id === currentFolder.value?.id) {
+    return
+  }
   currentFolder.value = row
-  knowledgeList.value = []
-  if (currentFolder.value.id === 'share') return
   getList()
 }
 
@@ -200,9 +216,16 @@ function getFolder() {
 
 function getList() {
   const folder_id = currentFolder.value?.id || user.getWorkspaceId()
-  knowledge.asyncGetFolderKnowledge(folder_id, loading).then((res: any) => {
-    searchDate.value = res.data
+  loadSharedApi({
+    type: 'knowledge',
+    isShared: folder_id === 'share',
+    systemType: apiType.value,
   })
+    .getKnowledgeList({ folder_id }, loading)
+    .then((res: any) => {
+      knowledgeList.value = uniqueArray([...knowledgeList.value, ...res.data], 'id')
+      searchData.value = res.data
+    })
 }
 
 defineExpose({ open })

@@ -24,7 +24,7 @@
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
-import { getImgUrl } from '@/utils/utils'
+import { getImgUrl } from '@/utils/common'
 import ParagraphList from './ParagraphList.vue'
 
 defineProps({

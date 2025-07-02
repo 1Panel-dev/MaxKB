@@ -122,7 +122,7 @@
 import { ref, computed, onMounted, reactive, watch } from 'vue'
 import ParagraphPreview from '@/views/knowledge/component/ParagraphPreview.vue'
 import { useRoute } from 'vue-router'
-import { cutFilename } from '@/utils/utils'
+import { cutFilename } from '@/utils/common'
 import useStore from '@/stores'
 import type { KeyValue } from '@/api/type/common'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'

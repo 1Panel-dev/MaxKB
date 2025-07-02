@@ -78,8 +78,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { numberFormat } from '@/utils/utils'
-import { filesize, getImgUrl } from '@/utils/utils'
+import { getImgUrl, filesize, numberFormat } from '@/utils/common'
 
 const props = defineProps({
   data: {

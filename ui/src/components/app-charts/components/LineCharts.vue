@@ -4,7 +4,7 @@
 <script lang="ts" setup>
 import { onMounted, nextTick, watch, onBeforeUnmount } from 'vue'
 import * as echarts from 'echarts'
-import { numberFormat } from '@/utils/utils'
+import { numberFormat } from '@/utils/common'
 const props = defineProps({
   id: {
     type: String,

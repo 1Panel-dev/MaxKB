@@ -222,7 +222,8 @@
                         </el-button>
                         <template #dropdown>
                           <el-dropdown-menu>
-                            <el-dropdown-item @click.stop="getAccessToken(item.id)"
+                            <el-dropdown-item
+                              @click.stop="getAccessToken(item.id)"
                               v-if="permissionPrecise.overview_access(item.id)"
                             >
                               <AppIcon iconName="app-create-chat"></AppIcon>
@@ -339,7 +340,7 @@ const MoveToDialogRef = ref()
 function openMoveToDialog(data: any) {
   const obj = {
     id: data.id,
-    folder_id: data.folder
+    folder_id: data.folder,
   }
   MoveToDialogRef.value?.open(obj)
 }
@@ -512,6 +513,9 @@ function clickFolder(item: any) {
   getList()
 }
 function folderClickHandle(row: any) {
+  if (row.id === folder.currentFolder?.id) {
+    return
+  }
   folder.setCurrentFolder(row)
   applicationList.value = []
   getList()

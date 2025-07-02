@@ -26,7 +26,11 @@
             <template v-for="(item, index) in form_data.knowledge_id_list" :key="index" v-else>
               <div class="flex-between border border-r-6 white-bg mb-4" style="padding: 5px 8px">
                 <div class="flex align-center" style="line-height: 20px">
-                  <KnowledgeIcon :type="relatedObject(knowledgeList, item, 'id')?.type" class="mr-8" :size="20"/>
+                  <KnowledgeIcon
+                    :type="relatedObject(knowledgeList, item, 'id')?.type"
+                    class="mr-8"
+                    :size="20"
+                  />
 
                   <div class="ellipsis" :title="relatedObject(knowledgeList, item, 'id')?.name">
                     {{ relatedObject(knowledgeList, item, 'id')?.name }}
@@ -122,7 +126,7 @@ import AddknowledgeDialog from '@/views/application/component/AddKnowledgeDialog
 import ParamSettingDialog from '@/views/application/component/ParamSettingDialog.vue'
 import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'
-import { relatedObject } from '@/utils/utils'
+import { relatedObject } from '@/utils/array'
 import { SearchMode } from '@/enums/application'
 import useStore from '@/stores'
 const { knowledge, application, user } = useStore()

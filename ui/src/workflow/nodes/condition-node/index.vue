@@ -164,7 +164,7 @@ import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted, nextTick } from 'vue'
-import { randomId } from '@/utils/utils'
+import { randomId } from '@/utils/common'
 import { compareList } from '@/workflow/common/data'
 import { VueDraggable } from 'vue-draggable-plus'
 

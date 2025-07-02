@@ -79,7 +79,7 @@
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue'
 import type { Provider } from '@/api/type/model'
-import { relatedObject } from '@/utils/common'
+import { relatedObject } from '@/utils/array'
 import CreateModelDialog from '@/views/model/component/CreateModelDialog.vue'
 import SelectProviderDialog from '@/views/model/component/SelectProviderDialog.vue'
 

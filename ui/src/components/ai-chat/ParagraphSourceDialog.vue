@@ -17,7 +17,7 @@
 <script setup lang="ts">
 import { ref, watch, onBeforeUnmount } from 'vue'
 import { cloneDeep } from 'lodash'
-import { arraySort } from '@/utils/utils'
+import { arraySort } from '@/utils/array'
 import ParagraphSourceContent from './component/ParagraphSourceContent.vue'
 const emit = defineEmits(['refresh'])
 

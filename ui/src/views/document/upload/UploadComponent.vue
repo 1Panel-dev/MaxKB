@@ -211,7 +211,7 @@
 import { ref, reactive, onUnmounted, onMounted, computed, watch, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import type { UploadFiles } from 'element-plus'
-import { filesize, getImgUrl, isRightType } from '@/utils/utils'
+import { filesize, getImgUrl, isRightType } from '@/utils/common'
 import { MsgError } from '@/utils/message'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import useStore from '@/stores'

@@ -260,29 +260,28 @@ function getTools() {
     MsgError(t('views.applicationWorkflow.nodes.mcpNode.mcpServerTip'))
     return
   }
-  // todo
   applicationApi.getMcpTools(id, loading).then((res: any) => {
     form_data.value.mcp_tools = res.data
     MsgSuccess(t('views.applicationWorkflow.nodes.mcpNode.getToolsSuccess'))
     // 修改了json，刷新mcp_server
-    form_data.value.mcp_server = form_data.value.mcp_tools.filter(
+    form_data.value.mcp_server = form_data.value.mcp_tools.find(
       (item: any) => item.name === form_data.value.mcp_tool,
-    )[0].server
+    )?.server
   })
 }
 
 function changeTool() {
-  form_data.value.mcp_server = form_data.value.mcp_tools.filter(
+  form_data.value.mcp_server = form_data.value.mcp_tools.find(
     (item: any) => item.name === form_data.value.mcp_tool,
-  )[0].server
+  )?.server
   // console.log(form_data.value.mcp_server)
 
-  const args_schema = form_data.value.mcp_tools.filter(
+  const args_schema = form_data.value.mcp_tools.find(
     (item: any) => item.name === form_data.value.mcp_tool,
-  )[0].args_schema
+  )?.args_schema
   form_data.value.tool_form_field = []
-  for (const item in args_schema.properties) {
-    const params = args_schema.properties[item].properties
+  for (const item in args_schema?.properties) {
+    const params = args_schema?.properties[item].properties
     if (params) {
       form_data.value.params_nested = item
       for (const item2 in params) {

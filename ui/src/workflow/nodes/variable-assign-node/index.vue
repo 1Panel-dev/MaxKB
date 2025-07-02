@@ -155,7 +155,7 @@ import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import { computed, onMounted, ref } from 'vue'
 import { isLastNode } from '@/workflow/common/data'
-import { randomId } from '@/utils/utils'
+import { randomId } from '@/utils/common'
 import { t } from '@/locales'
 
 const props = defineProps<{ nodeModel: any }>()

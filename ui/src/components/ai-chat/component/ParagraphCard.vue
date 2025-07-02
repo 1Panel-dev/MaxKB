@@ -53,7 +53,7 @@
   </CardBox>
 </template>
 <script setup lang="ts">
-import { getImgUrl, getNormalizedUrl } from '@/utils/utils'
+import { getImgUrl, getNormalizedUrl } from '@/utils/common'
 import { computed } from 'vue'
 
 const props = defineProps({

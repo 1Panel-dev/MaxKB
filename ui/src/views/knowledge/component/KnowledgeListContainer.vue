@@ -73,7 +73,10 @@
                   </div>
                 </div>
               </el-dropdown-item>
-              <el-dropdown-item @click="openCreateDialog(CreateLarkKnowledgeDialog)">
+              <el-dropdown-item
+                @click="openCreateDialog(CreateLarkKnowledgeDialog)"
+                v-if="user.isPE() || user.isEE()"
+              >
                 <div class="flex">
                   <el-avatar
                     class="avatar-purple mt-4"
@@ -388,7 +391,7 @@ function openMoveToDialog(data: any) {
   // 仅2个参数就行
   const obj = {
     id: data.id,
-    folder_id: data.folder
+    folder_id: data.folder,
   }
   MoveToDialogRef.value?.open(obj)
 }
@@ -527,7 +530,7 @@ onMounted(() => {
     })
     getList()
   }
-  loadSharedApi({type: 'workspace', isShared: isShared.value, systemType: apiType.value })
+  loadSharedApi({ type: 'workspace', isShared: isShared.value, systemType: apiType.value })
     .getAllMemberList(user.getWorkspaceId(), loading)
     .then((res: any) => {
       user_options.value = res.data

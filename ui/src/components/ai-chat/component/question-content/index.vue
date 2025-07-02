@@ -96,7 +96,8 @@
 </template>
 <script setup lang="ts">
 import { type chatType } from '@/api/type/application'
-import { getImgUrl, getAttrsArray, downloadByURL } from '@/utils/utils'
+import { getImgUrl, downloadByURL } from '@/utils/common'
+import { getAttrsArray } from '@/utils/array'
 import { onMounted, computed } from 'vue'
 import useStore from '@/stores'
 const props = defineProps<{
@@ -116,7 +117,7 @@ const document_list = computed(() => {
     return props.chatRecord.upload_meta?.document_list || []
   }
   const startNode = props.chatRecord.execution_details?.find(
-    (detail) => detail.type === 'start-node'
+    (detail) => detail.type === 'start-node',
   )
   return startNode?.document_list || []
 })
@@ -125,7 +126,7 @@ const image_list = computed(() => {
     return props.chatRecord.upload_meta?.image_list || []
   }
   const startNode = props.chatRecord.execution_details?.find(
-    (detail) => detail.type === 'start-node'
+    (detail) => detail.type === 'start-node',
   )
   return startNode?.image_list || []
 })
@@ -134,7 +135,7 @@ const audio_list = computed(() => {
     return props.chatRecord.upload_meta?.audio_list || []
   }
   const startNode = props.chatRecord.execution_details?.find(
-    (detail) => detail.type === 'start-node'
+    (detail) => detail.type === 'start-node',
   )
   return startNode?.audio_list || []
 })
@@ -143,7 +144,7 @@ const other_list = computed(() => {
     return props.chatRecord.upload_meta?.other_list || []
   }
   const startNode = props.chatRecord.execution_details?.find(
-    (detail) => detail.type === 'start-node'
+    (detail) => detail.type === 'start-node',
   )
   return startNode?.other_list || []
 })

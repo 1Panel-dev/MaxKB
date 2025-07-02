@@ -700,10 +700,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import ParagraphCard from '@/components/ai-chat/component/ParagraphCard.vue'
-import { arraySort } from '@/utils/utils'
+import { arraySort } from '@/utils/array'
 import { iconComponent } from '@/workflow/icons/utils'
 import { WorkflowType } from '@/enums/application'
-import { getImgUrl } from '@/utils/utils'
+import { getImgUrl } from '@/utils/common'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
 import { isWorkFlow } from '@/utils/application'
 

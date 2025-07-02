@@ -162,7 +162,7 @@ const submitHandle = async () => {
           .then((res: any) => {
             MsgSuccess(t('common.createSuccess'))
             router.push({
-              path: `/knowledge/${res.data.id}/${currentFolder.value.id}/document`,
+              path: `/knowledge/${res.data.id}/${currentFolder.value.id || 'shared'}/document`,
               query: {
                 type: apiType.value,
               },

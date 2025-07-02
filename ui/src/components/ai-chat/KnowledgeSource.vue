@@ -71,7 +71,7 @@ import { computed, ref } from 'vue'
 import ParagraphSourceDialog from './ParagraphSourceDialog.vue'
 import ExecutionDetailDialog from './ExecutionDetailDialog.vue'
 import { isWorkFlow } from '@/utils/application'
-import { getImgUrl, getNormalizedUrl } from '@/utils/utils'
+import { getImgUrl, getNormalizedUrl } from '@/utils/common'
 const props = defineProps({
   data: {
     type: Object,

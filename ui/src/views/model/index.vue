@@ -118,7 +118,7 @@ import { onMounted, ref, computed } from 'vue'
 import type { Provider, Model } from '@/api/type/model'
 import ModelCard from '@/views/model/component/ModelCard.vue'
 import ProviderComponent from '@/views/model/component/Provider.vue'
-import { splitArray } from '@/utils/common'
+import { splitArray } from '@/utils/array'
 import { modelTypeList, allObj } from '@/views/model/component/data'
 import CreateModelDialog from '@/views/model/component/CreateModelDialog.vue'
 import SelectProviderDialog from '@/views/model/component/SelectProviderDialog.vue'
@@ -205,7 +205,7 @@ const list_model = () => {
     .then((ok: any) => {
       model_list.value = ok.data
     })
-    loadSharedApi({type: 'workspace', isShared: isShared.value, systemType: apiType.value })
+  loadSharedApi({ type: 'workspace', isShared: isShared.value, systemType: apiType.value })
     .getAllMemberList(user.getWorkspaceId(), loading)
     .then((res: any) => {
       user_options.value = res.data
