@@ -68,13 +68,19 @@ import ToolCard from './ToolCard.vue'
 import { MsgSuccess } from '@/utils/message'
 import InternalDescDrawer from './InternalDescDrawer.vue'
 import AddInternalToolDialog from './AddInternalToolDialog.vue'
+import {loadSharedApi} from "@/utils/dynamics-api/shared-api.ts";
 
 interface ToolCategory {
   id: string
   title: string
   tools: any[]
 }
-
+const props = defineProps({
+  apiType: {
+    type: String as () => 'workspace' | 'systemShare' | 'systemManage',
+    default: 'workspace'
+  },
+})
 const emit = defineEmits(['refresh'])
 
 const dialogVisible = ref(false)
@@ -171,7 +177,9 @@ function handleOpenAdd(data?: any, isEdit?: boolean) {
 const addLoading = ref(false)
 async function handleAdd(tool: any) {
   try {
-    await ToolStoreApi.addInternalTool(tool.id, { name: tool.name, folder_id: folderId.value }, addLoading)
+    await loadSharedApi({ type: 'tool', systemType: props.apiType })
+      .addInternalTool(tool.id, { name: tool.name, folder_id: folderId.value }, addLoading)
+    // await ToolStoreApi.addInternalTool(tool.id, { name: tool.name, folder_id: folderId.value }, addLoading)
     emit('refresh')
     MsgSuccess(t('common.addSuccess'))
     dialogVisible.value = false

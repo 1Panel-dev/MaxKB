@@ -287,7 +287,7 @@
   <InitParamDrawer ref="InitParamDrawerRef" @refresh="refresh" />
   <ToolFormDrawer ref="ToolFormDrawerRef" @refresh="refresh" :title="ToolDrawertitle" />
   <CreateFolderDialog ref="CreateFolderDialogRef" v-if="!isShared" />
-  <ToolStoreDialog ref="toolStoreDialogRef" @refresh="refresh" />
+  <ToolStoreDialog ref="toolStoreDialogRef" :api-type="apiType" @refresh="refresh" />
   <AddInternalToolDialog ref="AddInternalToolDialogRef" @refresh="confirmAddInternalTool" />
   <AuthorizedWorkspace
     ref="AuthorizedWorkspaceDialogRef"
@@ -319,7 +319,6 @@ import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import permissionMap from '@/permission'
 import useStore from '@/stores'
 import { t } from '@/locales'
-import {loadPermissionApi} from "@/utils/dynamics-api/permission-api.ts";
 const route = useRoute()
 const { folder, user, tool } = useStore()
 onBeforeRouteLeave((to, from) => {

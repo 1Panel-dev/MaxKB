@@ -2,7 +2,7 @@ import { Result } from '@/request/Result'
 import { get, post, del, put, exportFile } from '@/request/index'
 import { type Ref } from 'vue'
 import type { pageRequest } from '@/api/type/common'
-import type { toolData } from '@/api/type/tool'
+import type {AddInternalToolParam, toolData} from '@/api/type/tool'
 
 
 import useStore from '@/stores'
@@ -128,6 +128,17 @@ const postPylint: (code: string, loading?: Ref<boolean>) => Promise<Result<any>>
   return post(`${prefix.value}/pylint`, { code }, {}, loading)
 }
 
+/**
+ * 工具商店-添加系统内置
+ */
+const addInternalTool: (
+  tool_id: string,
+  param: AddInternalToolParam,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (tool_id, param, loading) => {
+  return post(`${prefix.value}/${tool_id}/add_internal_tool`, param, undefined, loading)
+}
+
 
 export default {
   getToolList,
@@ -141,4 +152,5 @@ export default {
   exportTool,
   putToolIcon,
   delTool,
+  addInternalTool
 }
