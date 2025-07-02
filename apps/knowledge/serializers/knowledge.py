@@ -325,13 +325,13 @@ class KnowledgeSerializer(serializers.Serializer):
         @transaction.atomic
         def edit(self, instance: Dict):
             self.is_valid()
-            if QuerySet(Knowledge).filter(
-                    workspace_id=self.data.get('workspace_id'),
-                    name=instance.get('name'),
-                    folder_id=instance.get('folder_id', self.data.get('workspace_id'))
-            ).exclude(id=self.data.get('knowledge_id')).exists():
-                raise AppApiException(500, _('Knowledge base name duplicate!'))
             knowledge = QuerySet(Knowledge).get(id=self.data.get("knowledge_id"))
+            if QuerySet(Knowledge).filter(
+                    workspace_id=knowledge.workspace_id,
+                    name=instance.get('name'),
+                    folder_id=knowledge.folder_id
+            ).exclude(id=knowledge.id).exists():
+                raise AppApiException(500, _('Knowledge base name duplicate!'))
             KnowledgeEditRequest(data=instance).is_valid(knowledge=knowledge)
             if 'embedding_model_id' in instance:
                 knowledge.embedding_model_id = instance.get('embedding_model_id')
