@@ -14,3 +14,16 @@ from django.core.wsgi import get_wsgi_application
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'maxkb.settings')
 
 application = get_wsgi_application()
+
+
+
+def post_handler():
+    from common.database_model_manage.database_model_manage import DatabaseModelManage
+    from common import job
+    from common import event
+
+    event.run()
+    job.run()
+    DatabaseModelManage.init()
+
+post_handler()
