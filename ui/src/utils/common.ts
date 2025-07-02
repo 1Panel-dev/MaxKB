@@ -62,7 +62,7 @@ export function filesize(size: number) {
 }
 
 // 头像
-export const defaultIcon = '/ui/favicon.ico'
+export const defaultIcon = '/${window.MaxKB.prefix}/favicon.ico'
 export function isAppIcon(url: string | undefined) {
   return url === defaultIcon ? '' : url
 }

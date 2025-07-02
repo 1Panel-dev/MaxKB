@@ -6,7 +6,7 @@ import { getBrowserLang } from '@/locales/index'
 import useUserStore from './user'
 const useApplicationStore = defineStore('application', {
   state: () => ({
-    location: `${window.location.origin}/ui/chat/`,
+    location: `${window.location.origin}/${window.MaxKB.prefix}/chat/`,
   }),
   actions: {
     async asyncGetAllApplication() {
