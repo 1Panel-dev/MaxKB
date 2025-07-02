@@ -709,7 +709,7 @@ import { isWorkFlow } from '@/utils/application'
 
 const props = defineProps<{
   detail?: any[]
-  type: string
+  type?: string
 }>()
 
 const current = ref<number | string>('')
