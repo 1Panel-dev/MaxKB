@@ -31,7 +31,7 @@ const initActive = async () => {
     appSecret: props.config.app_secret
   }
 
-  const redirectUrl = encodeURIComponent(`${window.location.origin}/api/lark`)
+  const redirectUrl = encodeURIComponent(`${window.location.origin}${window.MaxKB.prefix}/api/lark`)
   const url = `https://passport.feishu.cn/suite/passport/oauth/authorize?client_id=${data.agentId}&redirect_uri=${redirectUrl}&response_type=code&state=fit2cloud-lark-qr`
   const QRLoginObj = window.QRLogin({
     id: 'lark-qr',

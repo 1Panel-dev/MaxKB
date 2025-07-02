@@ -392,7 +392,7 @@ const open = async (id: string, type: PlatformType) => {
     MsgError(t('views.application.tip.loadingErrorMessage'))
   } finally {
     loading.value = false
-    form[configType.value].callback_url = `${window.location.origin}/api/chat/${type}/${id}`
+    form[configType.value].callback_url = `${window.location.origin}${window.MaxKB.prefix}/api/chat/${type}/${id}`
   }
 }
 
