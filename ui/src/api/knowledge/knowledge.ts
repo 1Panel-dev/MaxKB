@@ -252,7 +252,7 @@ const putLarkKnowledge: (
   data: any,
   loading?: Ref<boolean>
 ) => Promise<Result<any>> = (knowledge_id, data, loading) => {
-  return put(`${prefix}/lark/${knowledge_id}`, data, undefined, loading)
+  return put(`${prefix.value}/lark/${knowledge_id}`, data, undefined, loading)
 }
 
 export default {
