@@ -81,9 +81,17 @@
           </div>
 
           <div class="submit-button">
-            <el-button type="primary" @click="submitPermissions"
-              v-if="hasPermission(permissionObj[(route.meta?.resource as string||'APPLICATION')],'OR')"
-            >{{ $t('common.save') }}</el-button>
+            <el-button
+              type="primary"
+              @click="submitPermissions"
+              v-if="
+                hasPermission(
+                  permissionObj[(route.meta?.resource as string) || 'APPLICATION'],
+                  'OR',
+                )
+              "
+              >{{ $t('common.save') }}</el-button
+            >
           </div>
         </div>
       </div>
@@ -105,7 +113,7 @@ import { EditionConst, RoleConst, PermissionConst } from '@/utils/permission/dat
 import { hasPermission } from '@/utils/permission/index'
 import type { WorkspaceItem } from '@/api/type/workspace'
 import { ComplexPermission } from '@/utils/permission/type'
-import {loadPermissionApi} from "@/utils/dynamics-api/permission-api.ts";
+import { loadPermissionApi } from '@/utils/dynamics-api/permission-api.ts'
 
 const route = useRoute()
 const { user } = useStore()
@@ -118,21 +126,49 @@ const currentType = ref<string>('')
 const filterText = ref('')
 const tableHeight = ref(0)
 
-const permissionObj=ref<any>({
-  "APPLICATION":new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
-              [PermissionConst.APPLICATION_WORKSPACE_USER_RESOURCE_PERMISSION_EDIT,
-              PermissionConst.APPLICATION_WORKSPACE_USER_RESOURCE_PERMISSION_EDIT.getWorkspacePermissionWorkspaceManageRole],[],'OR'),
-  "KNOWLEDGE":new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
-              [PermissionConst.KNOWLEDGE_WORKSPACE_USER_RESOURCE_PERMISSION_EDIT,
-              PermissionConst.KNOWLEDGE_WORKSPACE_USER_RESOURCE_PERMISSION_EDIT.getWorkspacePermissionWorkspaceManageRole],[],'OR'),
-  "TOOL":new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
-              [PermissionConst.TOOL_WORKSPACE_USER_RESOURCE_PERMISSION_EDIT,
-              PermissionConst.TOOL_WORKSPACE_USER_RESOURCE_PERMISSION_EDIT.getWorkspacePermissionWorkspaceManageRole],[],'OR'),
-  "MODEL":new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
-              [PermissionConst.MODEL_WORKSPACE_USER_RESOURCE_PERMISSION_EDIT,
-              PermissionConst.MODEL_WORKSPACE_USER_RESOURCE_PERMISSION_EDIT.getWorkspacePermissionWorkspaceManageRole],[],'OR')
+const permissionObj = ref<any>({
+  APPLICATION: new ComplexPermission(
+    [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+    [
+      PermissionConst.APPLICATION_WORKSPACE_USER_RESOURCE_PERMISSION_EDIT,
+      PermissionConst.APPLICATION_WORKSPACE_USER_RESOURCE_PERMISSION_EDIT
+        .getWorkspacePermissionWorkspaceManageRole,
+    ],
+    [],
+    'OR',
+  ),
+  KNOWLEDGE: new ComplexPermission(
+    [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+    [
+      PermissionConst.KNOWLEDGE_WORKSPACE_USER_RESOURCE_PERMISSION_EDIT,
+      PermissionConst.KNOWLEDGE_WORKSPACE_USER_RESOURCE_PERMISSION_EDIT
+        .getWorkspacePermissionWorkspaceManageRole,
+    ],
+    [],
+    'OR',
+  ),
+  TOOL: new ComplexPermission(
+    [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+    [
+      PermissionConst.TOOL_WORKSPACE_USER_RESOURCE_PERMISSION_EDIT,
+      PermissionConst.TOOL_WORKSPACE_USER_RESOURCE_PERMISSION_EDIT
+        .getWorkspacePermissionWorkspaceManageRole,
+    ],
+    [],
+    'OR',
+  ),
+  MODEL: new ComplexPermission(
+    [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+    [
+      PermissionConst.MODEL_WORKSPACE_USER_RESOURCE_PERMISSION_EDIT,
+      PermissionConst.MODEL_WORKSPACE_USER_RESOURCE_PERMISSION_EDIT
+        .getWorkspacePermissionWorkspaceManageRole,
+    ],
+    [],
+    'OR',
+  ),
 })
-console.log(route.meta.resource||'APPLICATION')
+console.log(route.meta.resource || 'APPLICATION')
 const settingTags = reactive([
   {
     label: t('views.knowledge.title'),
@@ -338,7 +374,8 @@ const getWholeTree = async (user_id: string) => {
       const folderTree = cloneDeep((parentRes as unknown as any).data)
       if (Object.keys(childrenRes.data).indexOf(item.type) !== -1) {
         item.isRole =
-          childrenRes.data[item.type].length > 0 && hasPermission([EditionConst.IS_EE], 'OR')
+          childrenRes.data[item.type].length > 0 &&
+          hasPermission([EditionConst.IS_EE, EditionConst.IS_PE], 'OR')
             ? childrenRes.data[item.type][0].auth_type == 'ROLE'
             : false
         folderIdMap = getFolderIdMap(childrenRes.data[item.type])

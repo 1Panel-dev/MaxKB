@@ -9,7 +9,7 @@
         class="problem-button mt-4 mb-4 flex"
         :class="sendMessage ? 'cursor' : 'disabled'"
       >
-        <el-icon class="mr-8" style="margin-top: 2px;">
+        <el-icon class="mr-8" style="margin-top: 2px">
           <EditPen />
         </el-icon>
         {{ item.content }}
@@ -55,7 +55,7 @@ config({
       }
       tokens[idx].attrSet(
         'onerror',
-        'this.src="/ui/assets/load_error.png";this.onerror=null;this.height="33px"'
+        'this.src="/${window.MaxKB.prefix}/assets/load_error.png";this.onerror=null;this.height="33px"',
       )
       return md.renderer.renderToken(tokens, idx, options)
     }
@@ -64,7 +64,7 @@ config({
       return md.renderer.renderToken(tokens, idx, options)
     }
     document.appendChild
-  }
+  },
 })
 const props = withDefaults(
   defineProps<{
@@ -79,14 +79,14 @@ const props = withDefaults(
   }>(),
   {
     source: '',
-    disabled: false
-  }
+    disabled: false,
+  },
 )
 const editorRef = ref()
 const md_view_list = computed(() => {
   const temp_source = props.source
   return split_form_rander(
-    split_echarts_rander(split_html_rander(split_quick_question([temp_source])))
+    split_echarts_rander(split_html_rander(split_quick_question([temp_source]))),
   )
 })
 
@@ -108,7 +108,7 @@ const split_quick_question_ = (source: string) => {
     .filter((item) => !md_quick_question_list?.includes(item))
   const result = Array.from(
     { length: md_quick_question_list.length + split_quick_question_value.length },
-    (v, i) => i
+    (v, i) => i,
   ).map((index) => {
     if (index % 2 == 0) {
       return { type: 'md', content: split_quick_question_value[Math.floor(index / 2)] }
@@ -117,7 +117,7 @@ const split_quick_question_ = (source: string) => {
         type: 'question',
         content: md_quick_question_list[Math.floor(index / 2)]
           .replace('<quick_question>', '')
-          .replace('</quick_question>', '')
+          .replace('</quick_question>', ''),
       }
     }
   })
@@ -142,7 +142,7 @@ const split_html_rander_ = (source: string, type: string) => {
     .filter((item) => !md_quick_question_list?.includes(item))
   const result = Array.from(
     { length: md_quick_question_list.length + split_quick_question_value.length },
-    (v, i) => i
+    (v, i) => i,
   ).map((index) => {
     if (index % 2 == 0) {
       return { type: type, content: split_quick_question_value[Math.floor(index / 2)] }
@@ -151,7 +151,7 @@ const split_html_rander_ = (source: string, type: string) => {
         type: 'html_rander',
         content: md_quick_question_list[Math.floor(index / 2)]
           .replace('<html_rander>', '')
-          .replace('</html_rander>', '')
+          .replace('</html_rander>', ''),
       }
     }
   })
@@ -177,7 +177,7 @@ const split_echarts_rander_ = (source: string, type: string) => {
     .filter((item) => !md_quick_question_list?.includes(item))
   const result = Array.from(
     { length: md_quick_question_list.length + split_quick_question_value.length },
-    (v, i) => i
+    (v, i) => i,
   ).map((index) => {
     if (index % 2 == 0) {
       return { type: type, content: split_quick_question_value[Math.floor(index / 2)] }
@@ -186,7 +186,7 @@ const split_echarts_rander_ = (source: string, type: string) => {
         type: 'echarts_rander',
         content: md_quick_question_list[Math.floor(index / 2)]
           .replace('<echarts_rander>', '')
-          .replace('</echarts_rander>', '')
+          .replace('</echarts_rander>', ''),
       }
     }
   })
@@ -212,7 +212,7 @@ const split_form_rander_ = (source: string, type: string) => {
     .filter((item) => !md_quick_question_list?.includes(item))
   const result = Array.from(
     { length: md_quick_question_list.length + split_quick_question_value.length },
-    (v, i) => i
+    (v, i) => i,
   ).map((index) => {
     if (index % 2 == 0) {
       return { type: type, content: split_quick_question_value[Math.floor(index / 2)] }
@@ -221,7 +221,7 @@ const split_form_rander_ = (source: string, type: string) => {
         type: 'form_rander',
         content: md_quick_question_list[Math.floor(index / 2)]
           .replace('<form_rander>', '')
-          .replace('</form_rander>', '')
+          .replace('</form_rander>', ''),
       }
     }
   })
