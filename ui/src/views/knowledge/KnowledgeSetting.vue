@@ -261,9 +261,13 @@ async function submit() {
           detail.value.type === 1 || detail.value.type === 2
             ? {
                 meta: form.value,
+                file_count_limit: form.value.file_count_limit,
+                file_size_limit: form.value.file_size_limit,
                 ...BaseFormRef.value.form,
               }
             : {
+                file_count_limit: form.value.file_count_limit,
+                file_size_limit: form.value.file_size_limit,
                 ...BaseFormRef.value.form,
               }
 
