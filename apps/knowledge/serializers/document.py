@@ -1099,7 +1099,7 @@ class DocumentSerializers(serializers.Serializer):
             # 查询文档
             query_set = QuerySet(model=Document)
             if len(document_model_list) == 0:
-                return [], knowledge_id
+                return [], knowledge_id, workspace_id
             query_set = query_set.filter(**{'id__in': [d.id for d in document_model_list]})
             return native_search(
                 {
