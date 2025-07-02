@@ -18,7 +18,7 @@ from application.views import get_application_operation_object
 from common import result
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
-from common.constants.permission_constants import PermissionConstants, RoleConstants
+from common.constants.permission_constants import PermissionConstants, RoleConstants, ViewPermission, CompareConstants
 from common.log.log import log
 
 
@@ -36,7 +36,9 @@ class ApplicationVersionView(APIView):
     )
     @has_permissions(PermissionConstants.APPLICATION_READ.get_workspace_application_permission(),
                      PermissionConstants.APPLICATION_READ.get_workspace_permission_workspace_manage_role(),
-                     RoleConstants.USER.get_workspace_role(),
+                     ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                    [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                                    CompareConstants.AND),
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def get(self, request: Request, workspace_id, application_id: str):
         return result.success(
@@ -58,7 +60,9 @@ class ApplicationVersionView(APIView):
         )
         @has_permissions(PermissionConstants.APPLICATION_READ.get_workspace_application_permission(),
                          PermissionConstants.APPLICATION_READ.get_workspace_permission_workspace_manage_role(),
-                         RoleConstants.USER.get_workspace_role(),
+                         ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                        [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                                        CompareConstants.AND),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str, application_id: str, current_page: int, page_size: int):
             return result.success(
@@ -81,7 +85,9 @@ class ApplicationVersionView(APIView):
         )
         @has_permissions(PermissionConstants.APPLICATION_EDIT.get_workspace_application_permission(),
                          PermissionConstants.APPLICATION_EDIT.get_workspace_permission_workspace_manage_role(),
-                         RoleConstants.USER.get_workspace_role(),
+                         ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                        [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                                        CompareConstants.AND),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str, application_id: str, work_flow_version_id: str):
             return result.success(
@@ -101,7 +107,9 @@ class ApplicationVersionView(APIView):
         )
         @has_permissions(PermissionConstants.APPLICATION_EDIT.get_workspace_application_permission(),
                          PermissionConstants.APPLICATION_EDIT.get_workspace_permission_workspace_manage_role(),
-                         RoleConstants.USER.get_workspace_role(),
+                         ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                        [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                                        CompareConstants.AND),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         @log(menu='Application', operate="Modify application version information",
              get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')),

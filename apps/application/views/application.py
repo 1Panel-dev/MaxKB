@@ -16,12 +16,13 @@ from rest_framework.views import APIView
 
 from application.api.application_api import ApplicationCreateAPI, ApplicationQueryAPI, ApplicationImportAPI, \
     ApplicationExportAPI, ApplicationOperateAPI, ApplicationEditAPI, TextToSpeechAPI, SpeechToTextAPI, PlayDemoTextAPI
+from application.flow.step_node.condition_node.compare import Compare
 from application.models import Application
 from application.serializers.application import ApplicationSerializer, Query, ApplicationOperateSerializer
 from common import result
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
-from common.constants.permission_constants import PermissionConstants, RoleConstants
+from common.constants.permission_constants import PermissionConstants, RoleConstants, ViewPermission, CompareConstants
 from common.log.log import log
 
 
@@ -130,7 +131,8 @@ class ApplicationAPI(APIView):
         )
         @has_permissions(PermissionConstants.APPLICATION_EXPORT.get_workspace_application_permission(),
                          PermissionConstants.APPLICATION_EXPORT.get_workspace_permission_workspace_manage_role(),
-                         RoleConstants.USER.get_workspace_role(),
+                         ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                        [PermissionConstants.APPLICATION.get_workspace_application_permission()],CompareConstants.AND),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         @log(menu='Application', operate="Export Application",
              get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')),
@@ -155,7 +157,9 @@ class ApplicationAPI(APIView):
         )
         @has_permissions(PermissionConstants.APPLICATION_DELETE.get_workspace_application_permission(),
                          PermissionConstants.APPLICATION_DELETE.get_workspace_permission_workspace_manage_role(),
-                         RoleConstants.USER.get_workspace_role(),
+                         ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                        [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                                        CompareConstants.AND),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         @log(menu='Application', operate='Deleting application',
              get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')),
@@ -179,7 +183,9 @@ class ApplicationAPI(APIView):
         )
         @has_permissions(PermissionConstants.APPLICATION_EDIT.get_workspace_application_permission(),
                          PermissionConstants.APPLICATION_EDIT.get_workspace_permission_workspace_manage_role(),
-                         RoleConstants.USER.get_workspace_role(),
+                         ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                        [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                                        CompareConstants.AND),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         @log(menu='Application', operate="Modify the application",
              get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')),
@@ -203,7 +209,9 @@ class ApplicationAPI(APIView):
         )
         @has_permissions(PermissionConstants.APPLICATION_READ.get_workspace_application_permission(),
                          PermissionConstants.APPLICATION_READ.get_workspace_permission_workspace_manage_role(),
-                         RoleConstants.USER.get_workspace_role(),
+                         ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                        [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                                        CompareConstants.AND),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str, application_id: str):
             return result.success(ApplicationOperateSerializer(
@@ -225,7 +233,9 @@ class ApplicationAPI(APIView):
         )
         @has_permissions(PermissionConstants.APPLICATION_EDIT.get_workspace_application_permission(),
                          PermissionConstants.APPLICATION_EDIT.get_workspace_permission_workspace_manage_role(),
-                         RoleConstants.USER.get_workspace_role(),
+                         ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                        [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                                        CompareConstants.AND),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         @log(menu='Application', operate='Publishing an application',
              get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')))
@@ -251,7 +261,9 @@ class McpServers(APIView):
     )
     @has_permissions(PermissionConstants.APPLICATION_READ.get_workspace_application_permission(),
                      PermissionConstants.APPLICATION_READ.get_workspace_permission_workspace_manage_role(),
-                     RoleConstants.USER.get_workspace_role(),
+                     ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                    [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                                    CompareConstants.AND),
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def get(self, request: Request, workspace_id, application_id: str):
         return result.success(ApplicationOperateSerializer(
@@ -273,7 +285,9 @@ class SpeechToText(APIView):
     )
     @has_permissions(PermissionConstants.APPLICATION_EDIT.get_workspace_application_permission(),
                      PermissionConstants.APPLICATION_EDIT.get_workspace_permission_workspace_manage_role(),
-                     RoleConstants.USER.get_workspace_role(),
+                     ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                    [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                                    CompareConstants.AND),
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def post(self, request: Request, workspace_id: str, application_id: str):
         return result.success(
@@ -297,7 +311,9 @@ class TextToSpeech(APIView):
     )
     @has_permissions(PermissionConstants.APPLICATION_EDIT.get_workspace_application_permission(),
                      PermissionConstants.APPLICATION_EDIT.get_workspace_permission_workspace_manage_role(),
-                     RoleConstants.USER.get_workspace_role(),
+                     ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                    [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                                    CompareConstants.AND),
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def post(self, request: Request, workspace_id: str, application_id: str):
         byte_data = ApplicationOperateSerializer(
@@ -322,7 +338,9 @@ class PlayDemoText(APIView):
     )
     @has_permissions(PermissionConstants.APPLICATION_EDIT.get_workspace_application_permission(),
                      PermissionConstants.APPLICATION_EDIT.get_workspace_permission_workspace_manage_role(),
-                     RoleConstants.USER.get_workspace_role(),
+                     ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                    [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                                    CompareConstants.AND),
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     @log(menu='Application', operate="trial listening",
          get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')))
