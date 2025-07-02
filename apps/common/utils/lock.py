@@ -20,7 +20,9 @@ def try_lock(key: str, timeout=None):
     :param timeout 超时时间
     :return: 是否获取到锁
     """
-    return memory_cache.add(key, 'lock', timeout=timedelta(hours=1).total_seconds() if timeout is not None else timeout)
+    if timeout is None:
+        timeout = 3600 # 默认超时时间为3600秒
+    return memory_cache.add(key, 'lock', timeout=timeout)
 
 
 def un_lock(key: str):

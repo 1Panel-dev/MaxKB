@@ -253,7 +253,7 @@ class ListenerManagement:
         """
         if state_list is None:
             state_list = [State.PENDING, State.SUCCESS, State.FAILURE, State.REVOKE, State.REVOKED]
-        if not try_lock('embedding' + str(document_id)):
+        if not try_lock('embedding:' + str(document_id)):
             return
         try:
             def is_the_task_interrupted():
@@ -290,7 +290,7 @@ class ListenerManagement:
             ListenerManagement.post_update_document_status(document_id, TaskType.EMBEDDING)
             ListenerManagement.get_aggregation_document_status(document_id)()
             maxkb_logger.info(_('End--->Embedding document: {document_id}').format(document_id=document_id))
-            un_lock('embedding' + str(document_id))
+            un_lock('embedding:' + str(document_id))
 
     @staticmethod
     def embedding_by_knowledge(knowledge_id, embedding_model: Embeddings):
