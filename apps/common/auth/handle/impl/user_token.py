@@ -304,7 +304,7 @@ class UserToken(AuthBaseHandle):
             raise AppAuthenticationFailed(1002, _('Login expired'))
         auth_details = get_token_details()
         timeout = CONFIG.get_session_timeout()
-        cache.touch(token, timeout=datetime.timedelta(seconds=timeout).seconds, version=version)
+        cache.touch(token, timeout=timeout, version=version)
         user = QuerySet(User).get(id=auth_details['id'])
         auth = get_auth(user)
         return user, auth
