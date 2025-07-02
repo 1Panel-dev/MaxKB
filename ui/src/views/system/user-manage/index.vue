@@ -96,7 +96,7 @@
           <template #default="{ row }">
             <el-popover :width="400">
               <template #reference>
-                <TagGroup class="cursor" :tags="row.role_name" tooltipDisabled />
+                <TagGroup class="cursor" :tags="row.role_name" tooltipDisabled/>
               </template>
               <template #default>
                 <el-table :data="row.role_workspace">
@@ -238,10 +238,10 @@ function getList() {
     .getUserManage(paginationConfig, params, loading)
     .then((res) => {
       userTableData.value = res.data.records.map((item: any) => ({
-        ...item, 
-        role_workspace: Object.entries(item.role_workspace).map(([role, workspaces]) => ({
+        ...item,
+        role_workspace: Object.entries(item.role_workspace ?? {}).map(([role, workspaces]) => ({
           role,
-          workspace: (workspaces as string[])?.[0] === 'None' ? '-': (workspaces as string[])?.join(", ")
+          workspace: (workspaces as string[])?.[0] === 'None' ? '-' : (workspaces as string[])?.join(", ")
         }))
       }))
       paginationConfig.total = res.data.total
