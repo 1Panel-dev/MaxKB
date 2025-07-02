@@ -64,6 +64,12 @@ export default defineConfig((conf: any) => {
     changeOrigin: true,
     rewrite: (path: string) => path.replace(ENV.VITE_BASE_PATH, '/'),
   }
+  // 前端静态资源转发到本身
+  proxyConf[ENV.VITE_BASE_PATH] = {
+    target: `http://127.0.0.1:${ENV.VITE_APP_PORT}`,
+    changeOrigin: true,
+    rewrite: (path: string) => path.replace(ENV.VITE_BASE_PATH, '/'),
+  }
 
   return {
     preflight: false,
