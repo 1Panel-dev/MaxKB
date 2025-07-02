@@ -46,10 +46,12 @@
           </el-button>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item :href="shareUrl">
-                <AppIcon iconName="app-create-chat" class="mr-4"></AppIcon>
-                {{ $t('views.application.operation.toChat') }}
-              </el-dropdown-item>
+              <a :href="shareUrl" target="_blank">
+                <el-dropdown-item>
+                  <AppIcon iconName="app-create-chat" class="mr-4"></AppIcon>
+                  {{ $t('views.application.operation.toChat') }}
+                </el-dropdown-item>
+              </a>
 
               <el-dropdown-item @click="openHistory">
                 <AppIcon iconName="app-history-outlined"></AppIcon>
@@ -182,7 +184,7 @@ const urlParams = computed(() =>
   mapToUrlParams(apiInputParams.value) ? '?' + mapToUrlParams(apiInputParams.value) : '',
 )
 const shareUrl = computed(
-  () => `${window.location.origin}/chat/` + detail.value.access_token + urlParams.value,
+  () => `${window.location.origin}/chat/` + detail.value?.access_token + urlParams.value,
 )
 
 function back() {

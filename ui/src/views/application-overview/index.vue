@@ -263,7 +263,7 @@ const urlParams = computed(() =>
   mapToUrlParams(apiInputParams.value) ? '?' + mapToUrlParams(apiInputParams.value) : '',
 )
 const shareUrl = computed(
-  () => `${window.location.origin}/chat/` + accessToken.value.access_token + urlParams.value,
+  () => `${window.location.origin}/chat/` + accessToken.value?.access_token + urlParams.value,
 )
 
 const dayOptions = [
