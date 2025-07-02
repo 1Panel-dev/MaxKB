@@ -288,7 +288,7 @@
   <ToolFormDrawer ref="ToolFormDrawerRef" @refresh="refresh" :title="ToolDrawertitle" />
   <CreateFolderDialog ref="CreateFolderDialogRef" v-if="!isShared" />
   <ToolStoreDialog ref="toolStoreDialogRef" @refresh="refresh" />
-  <AddInternalToolDialog ref="addInternalToolDialogRef" @refresh="confirmAddInternalTool" />
+  <AddInternalToolDialog ref="AddInternalToolDialogRef" @refresh="confirmAddInternalTool" />
   <AuthorizedWorkspace
     ref="AuthorizedWorkspaceDialogRef"
     v-if="isSystemShare"
