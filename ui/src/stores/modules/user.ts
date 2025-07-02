@@ -133,6 +133,7 @@ const useUserStore = defineStore('user', {
             // this.version = ok.data?.version || '-'
             this.license_is_valid = ok.data.license_is_valid
             this.edition = ok.data.edition
+            this.version = ok.data.version
             const theme = useThemeStore()
             if (this.isEE() || this.isPE()) {
               await theme.theme()
