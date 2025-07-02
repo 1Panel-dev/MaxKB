@@ -125,6 +125,7 @@ class Operate(Enum):
     """
      一个权限组的操作权限
     """
+    SELF = ""
     READ = 'READ'
     EDIT = "READ+EDIT"
     CREATE = "READ+CREATE"
@@ -160,6 +161,7 @@ class Operate(Enum):
     TO_CHAT = "READ+TO_CHAT"  # 去对话
     SETTING = "READ+SETTING"  # 管理
     DOWNLOAD = "READ+DOWNLOAD"  # 下载
+
 
 class RoleGroup(Enum):
     # 系统用户
@@ -405,6 +407,19 @@ class PermissionConstants(Enum):
     """
      权限枚举
     """
+    KNOWLEDGE = Permission(
+        group=Group.KNOWLEDGE, operate=Operate.SELF, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
+    )
+    APPLICATION = Permission(
+        group=Group.APPLICATION, operate=Operate.SELF, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+    )
+    MODEL = Permission(
+        group=Group.MODEL, operate=Operate.SELF, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+    )
+    TOOL = Permission(
+        group=Group.TOOL, operate=Operate.SELF, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+    )
+
     USER_READ = Permission(
         group=Group.USER, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
         parent_group=[SystemGroup.USER_MANAGEMENT]
