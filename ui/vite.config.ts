@@ -40,11 +40,6 @@ export default defineConfig((conf: any) => {
     target: 'http://127.0.0.1:8080',
     changeOrigin: true,
   }
-  proxyConf['/oss'] = {
-    target: 'http://127.0.0.1:8080',
-    changeOrigin: true,
-    rewrite: (path: string) => path.replace(ENV.VITE_BASE_PATH, '/'),
-  }
   proxyConf['/chat/api'] = {
     // target: 'http://47.92.195.88:8080/',
     target: 'http://127.0.0.1:8080',
@@ -64,6 +59,17 @@ export default defineConfig((conf: any) => {
     target: 'http://127.0.0.1:8080',
     changeOrigin: true,
     rewrite: (path: string) => path.replace(ENV.VITE_BASE_PATH, '/'),
+  }
+
+  // 前端静态资源转发到本身
+  proxyConf[`^${ENV.VITE_BASE_PATH}.+\/oss\/file\/.*$`] = {
+    target: `http://127.0.0.1:8080`,
+    changeOrigin: true,
+  }
+  // 前端静态资源转发到本身
+  proxyConf[`^${ENV.VITE_BASE_PATH}oss\/file\/.*$`] = {
+    target: `http://127.0.0.1:8080`,
+    changeOrigin: true,
   }
   // 前端静态资源转发到本身
   proxyConf[ENV.VITE_BASE_PATH] = {

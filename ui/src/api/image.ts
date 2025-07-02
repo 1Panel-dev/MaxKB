@@ -1,7 +1,7 @@
 import { Result } from '@/request/Result'
 import { get, post, del, put } from '@/request/index'
 
-const prefix = '/image'
+const prefix = '/oss/file'
 /**
  * 上传图片
  * @param 参数  file:file
@@ -11,5 +11,5 @@ const postImage: (data: any) => Promise<Result<any>> = (data) => {
 }
 
 export default {
-  postImage
+  postImage,
 }
