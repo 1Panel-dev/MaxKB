@@ -234,13 +234,14 @@ class UserManageSerializer(serializers.Serializer):
                                  post_records_handler=lambda u: UserInstanceSerializer(u).data)
             role_model = DatabaseModelManage.get_model("role_model")
             user_role_relation_model = DatabaseModelManage.get_model("workspace_user_role_mapping")
-            workspace_model = DatabaseModelManage.get_model("workspace_model")
-            workspace_mapping = {str(workspace_model.id): workspace_model.name for workspace_model in
-                                 workspace_model.objects.all()}
 
             def _get_user_roles(user_ids):
-                if not (role_model and user_role_relation_model):
+                workspace_model = DatabaseModelManage.get_model("workspace_model")
+                if not (role_model and user_role_relation_model and workspace_model):
                     return {}
+
+                workspace_mapping = {str(workspace_model.id): workspace_model.name for workspace_model in
+                                     workspace_model.objects.all()}
 
                 # 获取所有相关角色关系，并预加载角色信息
                 user_role_relations = (
