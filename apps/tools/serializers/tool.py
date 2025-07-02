@@ -498,8 +498,9 @@ class ToolSerializer(serializers.Serializer):
             if internal_tool is None:
                 raise AppApiException(500, _('Tool does not exist'))
 
+            tool_id = uuid.uuid7()
             tool = Tool(
-                id=uuid.uuid7(),
+                id=tool_id,
                 name=instance.get('name', internal_tool.name),
                 desc=internal_tool.desc,
                 code=internal_tool.code,
@@ -515,6 +516,21 @@ class ToolSerializer(serializers.Serializer):
                 is_active=False
             )
             tool.save()
+
+            # 自动授权给创建者
+            WorkspaceUserResourcePermission(
+                target=tool_id,
+                auth_target_type=AuthTargetType.TOOL,
+                permission_list=[ResourcePermission.VIEW, ResourcePermission.MANAGE],
+                workspace_id=self.data.get('workspace_id'),
+                user_id=self.data.get('user_id'),
+                auth_type=ResourceAuthType.RESOURCE_PERMISSION_GROUP
+            ).save()
+
+            # 刷新缓存
+            version = Cache_Version.PERMISSION_LIST.get_version()
+            key = Cache_Version.PERMISSION_LIST.get_key(user_id=self.data.get('user_id'))
+            cache.delete(key, version=version)
 
             return ToolModelSerializer(tool).data
 
