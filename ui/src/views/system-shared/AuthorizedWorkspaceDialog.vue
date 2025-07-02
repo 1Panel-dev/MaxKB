@@ -72,7 +72,9 @@
               <span class="ml-4 lighter">{{ ele.name }}</span>
             </div>
             <el-button link>
-              <el-icon @click="clearWorkspace(ele)" :size="18"><Close /></el-icon>
+              <el-icon @click="clearWorkspace(ele)" :size="18">
+                <Close/>
+              </el-icon>
             </el-button>
           </div>
         </template>
@@ -81,16 +83,18 @@
 
     <template #footer>
       <el-button @click="centerDialogVisible = false"> {{ $t('common.cancel') }}</el-button>
-      <el-button type="primary" @click="handleConfirm"> {{ $t('common.add') }} </el-button>
+      <el-button type="primary" @click="handleConfirm"> {{ $t('common.add') }}</el-button>
     </template>
   </el-dialog>
 </template>
 
 <script lang="ts" setup>
-import { ref, computed } from 'vue'
-import type { CheckboxValueType } from 'element-plus'
+import {ref, computed} from 'vue'
+import type {CheckboxValueType} from 'element-plus'
 import authorizationApi from '@/api/system-shared/authorization'
 import workspaceApi from '@/api/workspace/workspace'
+import {loadPermissionApi} from "@/utils/dynamics-api/permission-api.ts";
+
 const checkAll = ref(false)
 const isIndeterminate = ref(true)
 const checkedWorkspace = ref<any[]>([])
@@ -118,13 +122,13 @@ const handleCheckedWorkspaceChange = (value: CheckboxValueType[]) => {
   isIndeterminate.value = checkedCount > 0 && checkedCount < workspace.value.length
 }
 
-const open = async ({ id }: any, type = 'Knowledge') => {
+const open = async ({id}: any, type = 'Knowledge') => {
   knowledge_id = id
   loading.value = true
   currentType = type
   const [authList, systemWorkspaceList] = await Promise.all([
     authorizationApi[`getSharedAuthorization${type}`](id),
-    workspaceApi.getSystemWorkspaceList(),
+    loadPermissionApi('workspace').getSystemWorkspaceList(),
   ])
   workspace.value = systemWorkspaceList.data as any
   listType.value = (authList.data || {}).authentication_type || 'WHITE_LIST'
