@@ -167,8 +167,8 @@ def write_image(zip_path: str, image_list: List[str]):
         search = re.search("\(.*\)", image)
         if search:
             text = search.group()
-            if text.startswith('(/oss/file/'):
-                r = text.replace('(/oss/file/', '').replace(')', '')
+            if text.startswith('(./oss/file/'):
+                r = text.replace('(./oss/file/', '').replace(')', '')
                 r = r.strip().split(" ")[0]
                 if not is_valid_uuid(r):
                     break

@@ -452,7 +452,7 @@ class ToolSerializer(serializers.Serializer):
                 )
                 file.save(self.data.get('image').read())
 
-                tool.icon = f'/oss/file/{file_id}'
+                tool.icon = f'./oss/file/{file_id}'
             tool.save()
 
             return tool.icon
@@ -475,14 +475,7 @@ class ToolSerializer(serializers.Serializer):
                 Q(scope=ToolScope.INTERNAL) &
                 Q(is_active=True)
             )
-            # 处理动态url
-            prefix = CONFIG.get_admin_path()
-            return [
-                {
-                    **tool,
-                    'icon': tool['icon'].replace('/admin', prefix),
-                } for tool in ToolModelSerializer(query_set, many=True).data
-            ]
+            return ToolModelSerializer(query_set, many=True).data
 
     class AddInternalTool(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, label=_("User ID"))

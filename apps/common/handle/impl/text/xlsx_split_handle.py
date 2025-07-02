@@ -20,7 +20,7 @@ from common.utils.logger import maxkb_logger
 def post_cell(image_dict, cell_value):
     image = image_dict.get(cell_value, None)
     if image is not None:
-        return f'![](/oss/file/{image.id})'
+        return f'![](./oss/file/{image.id})'
     return cell_value.replace('\n', '<br>').replace('|', '&#124;')
 
 
