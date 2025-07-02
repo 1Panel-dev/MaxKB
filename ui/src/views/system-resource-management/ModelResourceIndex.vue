@@ -166,14 +166,12 @@
 
 <script lang="ts" setup>
 import { onBeforeMount, onMounted, ref, reactive, nextTick, computed } from 'vue'
-import { cloneDeep, get } from 'lodash'
 import type { Provider, Model } from '@/api/type/model'
 import ModelResourceApi from '@/api/system-resource-management/model'
 import { modelTypeList } from '@/views/model/component/data'
 import { modelType } from '@/enums/model'
 import { t } from '@/locales'
 import useStore from '@/stores'
-import WorkspaceApi from '@/api/workspace/workspace.ts'
 import { datetimeFormat } from '@/utils/time'
 import {loadPermissionApi} from "@/utils/dynamics-api/permission-api.ts";
 

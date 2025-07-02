@@ -103,7 +103,6 @@ import useStore from '@/stores'
 import { cloneDeep } from 'lodash'
 import { EditionConst, RoleConst, PermissionConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
-import WorkspaceApi from '@/api/workspace/workspace.ts'
 import type { WorkspaceItem } from '@/api/type/workspace'
 import { ComplexPermission } from '@/utils/permission/type'
 import {loadPermissionApi} from "@/utils/dynamics-api/permission-api.ts";

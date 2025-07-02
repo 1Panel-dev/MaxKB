@@ -155,12 +155,10 @@
 
 <script lang="ts" setup>
 import { onMounted, ref, reactive, computed } from 'vue'
-import { cloneDeep, get } from 'lodash'
 import KnowledgeResourceApi from '@/api/system-resource-management/knowledge'
 import { t } from '@/locales'
 import { isAppIcon } from '@/utils/common'
 import useStore from '@/stores'
-import WorkspaceApi from '@/api/workspace/workspace.ts'
 import { datetimeFormat } from '@/utils/time'
 import {loadPermissionApi} from "@/utils/dynamics-api/permission-api.ts";
 

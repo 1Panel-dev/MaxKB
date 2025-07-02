@@ -163,13 +163,11 @@
 
 <script lang="ts" setup>
 import { onMounted, ref, reactive, computed } from 'vue'
-import { cloneDeep, get } from 'lodash'
 import ToolResourceApi from '@/api/system-resource-management/tool'
 import { t } from '@/locales'
 import { isAppIcon } from '@/utils/common'
 import { ToolType } from '@/enums/tool'
 import useStore from '@/stores'
-import WorkspaceApi from '@/api/workspace/workspace.ts'
 import { datetimeFormat } from '@/utils/time'
 import {loadPermissionApi} from "@/utils/dynamics-api/permission-api.ts";
 
