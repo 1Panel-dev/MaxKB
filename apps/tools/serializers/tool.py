@@ -552,6 +552,7 @@ class ToolTreeSerializer(serializers.Serializer):
         name = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('tool name'))
         user_id = serializers.UUIDField(required=False, allow_null=True, label=_('user id'))
         scope = serializers.CharField(required=True, label=_('scope'))
+        create_user = serializers.UUIDField(required=False, label=_('scope'), allow_null=True)
 
         def page_tool(self, current_page: int, page_size: int):
             self.is_valid(raise_exception=True)
@@ -589,6 +590,7 @@ class ToolTreeSerializer(serializers.Serializer):
             desc = self.data.get('desc')
             name = self.data.get('name')
             folder_id = self.data.get('folder_id')
+            create_user = self.data.get('create_user')
 
             if workspace_id is not None:
                 folder_query_set = folder_query_set.filter(workspace_id=workspace_id)
@@ -602,6 +604,8 @@ class ToolTreeSerializer(serializers.Serializer):
             if desc is not None:
                 folder_query_set = folder_query_set.filter(desc__contains=desc)
                 default_query_set = default_query_set.filter(desc__contains=desc)
+            if create_user is not None:
+                tool_query_set = tool_query_set.filter(user_id=create_user)
 
             default_query_set = default_query_set.order_by("-create_time")
 

@@ -31,7 +31,7 @@
             clearable
             style="width: 220px"
           >
-            <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.username" />
+            <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.nick_name" />
           </el-select>
         </div>
         <el-dropdown trigger="click" v-if="!isShared && permissionPrecise.create()">
@@ -319,6 +319,7 @@ import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import permissionMap from '@/permission'
 import useStore from '@/stores'
 import { t } from '@/locales'
+import {loadPermissionApi} from "@/utils/dynamics-api/permission-api.ts";
 const route = useRoute()
 const { folder, user, tool } = useStore()
 onBeforeRouteLeave((to, from) => {
@@ -631,6 +632,11 @@ onMounted(() => {
   if (apiType.value !== 'workspace') {
     getList()
   }
+  loadSharedApi({type: 'workspace', isShared: isShared.value, systemType: apiType.value })
+    .getWorkspaceAllMemberList(user.getWorkspaceId(), loading)
+    .then((res: any) => {
+      user_options.value = res.data
+    })
 })
 </script>
 

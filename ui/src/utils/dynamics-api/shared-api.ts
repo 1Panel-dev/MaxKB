@@ -13,6 +13,7 @@ import documentSystemShareApi from '@/api/system-shared/document'
 import paragraphSystemShareApi from '@/api/system-shared/paragraph'
 import problemSystemShareApi from '@/api/system-shared/problem'
 import chatUserSystemShareApi from '@/api/system-shared/chat-user'
+import workspaceApi from '@/api/workspace/workspace'
 
 // 普通 API
 const workspaceApiMap = {
@@ -23,6 +24,7 @@ const workspaceApiMap = {
   paragraph: paragraphWorkspaceApi,
   problem: problemWorkspaceApi,
   chatUser: chatUserWorkspaceApi,
+  workspace: workspaceApi,
 } as any
 
 // 系统分享 API

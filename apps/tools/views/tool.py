@@ -183,7 +183,8 @@ class ToolView(APIView):
                     'folder_id': request.query_params.get('folder_id'),
                     'name': request.query_params.get('name'),
                     'scope': request.query_params.get('scope'),
-                    'user_id': request.user.id
+                    'user_id': request.user.id,
+                    'create_user': request.query_params.get('create_user'),
                 }
             ).page_tool_with_folders(current_page, page_size))
 
