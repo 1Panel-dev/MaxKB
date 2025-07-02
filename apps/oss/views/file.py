@@ -12,6 +12,20 @@ from knowledge.api.file import FileUploadAPI, FileGetAPI
 from oss.serializers.file import FileSerializer
 
 
+class FileRetrievalView(APIView):
+    @extend_schema(
+        methods=['GET'],
+        summary=_('Get file'),
+        description=_('Get file'),
+        operation_id=_('Get file'),  # type: ignore
+        parameters=FileGetAPI.get_parameters(),
+        responses=FileGetAPI.get_response(),
+        tags=[_('File')]  # type: ignore
+    )
+    def get(self, request: Request, file_id: str):
+        return FileSerializer.Operate(data={'id': file_id}).get()
+
+
 class FileView(APIView):
     authentication_classes = [TokenAuth]
     parser_classes = [MultiPartParser]
@@ -31,17 +45,7 @@ class FileView(APIView):
         return result.success(FileSerializer(data={'file': request.FILES.get('file')}).upload())
 
     class Operate(APIView):
-        @extend_schema(
-            methods=['GET'],
-            summary=_('Get file'),
-            description=_('Get file'),
-            operation_id=_('Get file'),  # type: ignore
-            parameters=FileGetAPI.get_parameters(),
-            responses=FileGetAPI.get_response(),
-            tags=[_('File')]  # type: ignore
-        )
-        def get(self, request: Request, file_id: str):
-            return FileSerializer.Operate(data={'id': file_id}).get()
+        authentication_classes = [TokenAuth]
 
         @extend_schema(
             methods=['DELETE'],
