@@ -292,8 +292,17 @@ class KnowledgeSerializer(serializers.Serializer):
                 ]
             )
 
+        @staticmethod
+        def is_x_pack_ee():
+            workspace_user_role_mapping_model = DatabaseModelManage.get_model("workspace_user_role_mapping")
+            role_permission_mapping_model = DatabaseModelManage.get_model("role_permission_mapping_model")
+            return workspace_user_role_mapping_model is not None and role_permission_mapping_model is not None
+
         def one(self):
             self.is_valid()
+            workspace_manage = is_workspace_manage(self.data.get('user_id'), self.data.get('workspace_id'))
+            is_x_pack_ee = self.is_x_pack_ee()
+
             query_set_dict = {
                 'default_sql': QuerySet(
                     model=get_dynamics_model({'temp.id': models.CharField()})
@@ -303,11 +312,22 @@ class KnowledgeSerializer(serializers.Serializer):
                 ).filter(**{'knowledge.user_id': self.data.get("user_id")}),
                 'folder_query_set': QuerySet(KnowledgeFolder)
             }
+            if not workspace_manage:
+                query_set_dict['workspace_user_resource_permission_query_set'] = QuerySet(
+                    WorkspaceUserResourcePermission).filter(
+                    auth_target_type="KNOWLEDGE",
+                    workspace_id=self.data.get('workspace_id'),
+                    user_id=self.data.get("user_id")
+                )
             all_application_list = [str(adm.get('id')) for adm in self.list_application(with_valid=False)]
             knowledge_dict = native_search(query_set_dict, select_string=get_file_content(
-                os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'list_knowledge.sql')), with_search_one=True)
-            if knowledge_dict is None:
-                return None
+                os.path.join(
+                    PROJECT_DIR, "apps", "knowledge", 'sql',
+                    'list_knowledge.sql' if workspace_manage else (
+                        'list_knowledge_user_ee.sql' if is_x_pack_ee else 'list_knowledge_user.sql'
+                    )
+                )
+            ), with_search_one=True)
             return {
                 **knowledge_dict,
                 'meta': json.loads(knowledge_dict.get('meta', '{}')),
