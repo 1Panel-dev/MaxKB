@@ -824,7 +824,6 @@ class ApplicationOperateSerializer(serializers.Serializer):
                                     QuerySet(Knowledge).filter(id__in=inner)]
         workspace_knowledge_list = [{**k, 'scope': 'WORKSPACE'} for k in KnowledgeSerializer.Query(
             data={
-                'folder_id': 'default',
                 'workspace_id': workspace_id,
                 'scope': KnowledgeScope.WORKSPACE,
                 'user_id': user_id
