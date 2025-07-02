@@ -127,7 +127,8 @@ def get_workspace_resource_permission_list_by_workspace_user_permission(
                 ResourcePermissionRole.ROLE)):
         return [
             f"{role_permission_mapping.permission_id}:/WORKSPACE/{workspace_user_resource_permission.workspace_id}/{workspace_user_resource_permission.auth_target_type}/{workspace_user_resource_permission.target}"
-            for role_permission_mapping in role_permission_mapping_list]
+            for role_permission_mapping in role_permission_mapping_list] + [
+            f"{workspace_user_resource_permission.auth_target_type}:/WORKSPACE/{workspace_user_resource_permission.workspace_id}/{workspace_user_resource_permission.auth_target_type}/{workspace_user_resource_permission.target}"]
 
     elif workspace_user_resource_permission.auth_type == ResourceAuthType.RESOURCE_PERMISSION_GROUP:
         resource_permission_list = [
@@ -230,7 +231,7 @@ def reset_workspace_role(role_id, workspace_id, role_dict):
         if system_role == role_id:
             return role_id
         else:
-            return f"{role_id}:/WORKSPACE/{workspace_id}"
+            return [f"{role_id}:/WORKSPACE/{workspace_id}", role_id]
     else:
         r = role_dict.get(role_id)
         if r is None:
@@ -238,7 +239,7 @@ def reset_workspace_role(role_id, workspace_id, role_dict):
         role_type = role_dict.get(role_id).type
         if system_role == role_type:
             return RoleConstants.EXTENDS_ADMIN.value.name
-        return f"EXTENDS_{role_type}:/WORKSPACE/{workspace_id}"
+        return [f"EXTENDS_{role_type}:/WORKSPACE/{workspace_id}", f"EXTENDS_{role_type}"]
 
 
 def get_role_list(user,
@@ -260,12 +261,13 @@ def get_role_list(user,
             workspace_user_role_mapping_list = QuerySet(workspace_user_role_mapping_model).filter(user_id=user.id)
             role_list = QuerySet(role_model).filter(id__in=[wurm.role_id for wurm in workspace_user_role_mapping_list])
             role_dict = {r.id: r for r in role_list}
-            role_list = list(set([reset_workspace_role(workspace_user_role_mapping.role_id,
-                                                       workspace_user_role_mapping.workspace_id,
-                                                       role_dict)
-                                  for
-                                  workspace_user_role_mapping in
-                                  workspace_user_role_mapping_list]))
+            role_list = list(
+                set(reduce(lambda x, y: [*x, *y], [reset_workspace_role(workspace_user_role_mapping.role_id,
+                                                                        workspace_user_role_mapping.workspace_id,
+                                                                        role_dict)
+                                                   for
+                                                   workspace_user_role_mapping in
+                                                   workspace_user_role_mapping_list], [])))
             cache.set(key, workspace_list, version=version)
             return role_list
         else:
