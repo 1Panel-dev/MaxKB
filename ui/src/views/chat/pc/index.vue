@@ -4,29 +4,41 @@
     :class="classObj"
     v-loading="loading"
     :style="{
-    '--el-color-primary': applicationDetail?.custom_theme?.theme_color,
-    '--el-color-primary-light-9': hexToRgba(applicationDetail?.custom_theme?.theme_color, 0.1),
+      '--el-color-primary': applicationDetail?.custom_theme?.theme_color,
+      '--el-color-primary-light-9': hexToRgba(applicationDetail?.custom_theme?.theme_color, 0.1),
     }"
   >
     <div class="flex h-full w-full">
       <div class="chat-pc__left">
-        <el-menu class="w-full h-full" :default-active="currentChatId" :collapse="isPcCollapse" collapse-transition popper-class="chat-pc-popper">
-          <div style="padding: 16px 18px 0 18px;">
+        <el-menu
+          class="w-full h-full"
+          :default-active="currentChatId"
+          :collapse="isPcCollapse"
+          collapse-transition
+          popper-class="chat-pc-popper"
+        >
+          <div style="padding: 16px 18px 0 18px">
             <div class="flex align-center mb-16">
-              <div class="flex">
-              <el-avatar
-                v-if="isAppIcon(applicationDetail?.icon)"
-                shape="square"
-                :size="32"
-                style="background: none"
-              >
+              <div class="flex mr-8">
+                <el-avatar
+                  v-if="isAppIcon(applicationDetail?.icon)"
+                  shape="square"
+                  :size="32"
+                  style="background: none"
+                >
                   <img :src="applicationDetail?.icon" alt="" />
                 </el-avatar>
                 <LogoIcon v-else height="32px" />
               </div>
               <h4 v-show="!isPcCollapse">{{ applicationDetail?.name }}</h4>
             </div>
-            <el-button v-show="!isPcCollapse" class="add-button w-full primary" @click="newChat">
+            <el-button
+              type="primary"
+              plain
+              v-show="!isPcCollapse"
+              class="add-button w-full primary"
+              @click="newChat"
+            >
               <AppIcon iconName="app-create-chat"></AppIcon>
               <span class="ml-4">{{ $t('chat.createChat') }}</span>
             </el-button>
@@ -37,11 +49,11 @@
               <div class="p-8 pt-0">
                 <common-list
                   :style="{
-                  '--el-color-primary': applicationDetail?.custom_theme?.theme_color,
-                  '--el-color-primary-light-9': hexToRgba(
-                    applicationDetail?.custom_theme?.theme_color,
-                    0.1,
-                  ),
+                    '--el-color-primary': applicationDetail?.custom_theme?.theme_color,
+                    '--el-color-primary-light-9': hexToRgba(
+                      applicationDetail?.custom_theme?.theme_color,
+                      0.1,
+                    ),
                   }"
                   :data="chatLogData"
                   class="mt-8"
@@ -99,8 +111,15 @@
               </el-icon>
             </template>
             <el-menu-item-group v-loading="left_loading">
-              <template #title><span>{{ $t('chat.history') }}</span></template>
-              <el-menu-item v-for="row in chatLogData" :index="row.id" :key="row.id" @click="clickListHandle(row)">
+              <template #title
+                ><span>{{ $t('chat.history') }}</span></template
+              >
+              <el-menu-item
+                v-for="row in chatLogData"
+                :index="row.id"
+                :key="row.id"
+                @click="clickListHandle(row)"
+              >
                 <div class="flex-between w-full lighter">
                   <span :title="row.abstract">
                     {{ row.abstract }}
@@ -146,12 +165,14 @@
               <el-avatar :size="32">
                 <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
               </el-avatar>
-              <span v-show="!isPcCollapse" class="ml-8 color-text-primary">{{ chatUser.chatUserProfile?.nick_name }}</span>
+              <span v-show="!isPcCollapse" class="ml-8 color-text-primary">{{
+                chatUser.chatUserProfile?.nick_name
+              }}</span>
             </div>
 
             <template #dropdown>
               <el-dropdown-menu class="avatar-dropdown">
-                <div class="flex align-center" style="padding: 8px 12px;">
+                <div class="flex align-center" style="padding: 8px 12px">
                   <div class="mr-8 flex align-center">
                     <el-avatar :size="40">
                       <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
@@ -159,26 +180,41 @@
                   </div>
                   <div>
                     <h4 class="medium mb-4">{{ chatUser.chatUserProfile?.nick_name }}</h4>
-                    <div class="color-secondary">{{ `${t('common.username')}: ${chatUser.chatUserProfile?.username}` }}</div>
+                    <div class="color-secondary">
+                      {{ `${t('common.username')}: ${chatUser.chatUserProfile?.username}` }}
+                    </div>
                   </div>
                 </div>
-                <el-dropdown-item v-if="chatUser.chatUserProfile?.source === 'LOCAL'" class="border-t" style="padding-top: 8px; padding-bottom: 8px;" @click="openResetPassword">
+                <el-dropdown-item
+                  v-if="chatUser.chatUserProfile?.source === 'LOCAL'"
+                  class="border-t"
+                  style="padding-top: 8px; padding-bottom: 8px"
+                  @click="openResetPassword"
+                >
                   <AppIcon iconName="app-export" />
                   {{ $t('views.login.resetPassword') }}
                 </el-dropdown-item>
-                <el-dropdown-item v-if="chatUser.chatUserProfile?.source === 'LOCAL'" class="border-t" style="padding-top: 8px; padding-bottom: 8px;" @click="logout">
+                <el-dropdown-item
+                  v-if="chatUser.chatUserProfile?.source === 'LOCAL'"
+                  class="border-t"
+                  style="padding-top: 8px; padding-bottom: 8px"
+                  @click="logout"
+                >
                   <AppIcon iconName="app-export" />
                   {{ $t('layout.logout') }}
                 </el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
-
         </el-menu>
-        <el-button v-if="!common.isMobile()" class="pc-collapse" circle size="small"
-          @click="isPcCollapse = !isPcCollapse">
+        <el-button
+          v-if="!common.isMobile()"
+          class="pc-collapse cursor"
+          circle
+          @click="isPcCollapse = !isPcCollapse"
+        >
           <el-icon>
-            <component :is="isPcCollapse ? 'Fold' : 'Expand'" />
+            <component :is="isPcCollapse ? 'ArrowRightBold' : 'ArrowLeftBold'" />
           </el-icon>
         </el-button>
       </div>
@@ -237,14 +273,25 @@
               </AiChat>
             </div>
           </el-splitter-panel>
-          <el-splitter-panel class="execution-detail-panel" v-model:size="rightPanelSize"  :resizable="false" collapsible>
+          <el-splitter-panel
+            class="execution-detail-panel"
+            v-model:size="rightPanelSize"
+            :resizable="false"
+            collapsible
+          >
             <div class="p-16 flex-between border-b">
               <h4 class="medium">{{ rightPanelTitle }}</h4>
               <el-icon size="20" class="cursor" @click="closeExecutionDetail"><Close /></el-icon>
             </div>
             <div class="execution-detail-content" v-loading="rightPanelLoading">
-              <ParagraphSourceContent v-if="rightPanelType === 'knowledgeSource'" :detail="rightPanelDetail" />
-              <ExecutionDetailContent v-if="rightPanelType === 'executionDetail'" :detail="executionDetail" />
+              <ParagraphSourceContent
+                v-if="rightPanelType === 'knowledgeSource'"
+                :detail="rightPanelDetail"
+              />
+              <ExecutionDetailContent
+                v-if="rightPanelType === 'executionDetail'"
+                :detail="executionDetail"
+              />
             </div>
           </el-splitter-panel>
         </el-splitter>
@@ -257,7 +304,11 @@
     </div>
 
     <EditTitleDialog ref="EditTitleDialogRef" @refresh="refreshFieldTitle" />
-    <ResetPassword ref="resetPasswordRef" emitConfirm @confirm="handleResetPassword"></ResetPassword>
+    <ResetPassword
+      ref="resetPasswordRef"
+      emitConfirm
+      @confirm="handleResetPassword"
+    ></ResetPassword>
   </div>
 </template>
 
@@ -288,11 +339,14 @@ const EditTitleDialogRef = ref()
 
 const isCollapse = ref(false)
 const isPcCollapse = ref(false)
-watch(() => common.device, () => {
-  if (common.isMobile()) {
-    isPcCollapse.value = false
-  }
-})
+watch(
+  () => common.device,
+  () => {
+    if (common.isMobile()) {
+      isPcCollapse.value = false
+    }
+  },
+)
 
 const logout = () => {
   chatUser.logout().then(() => {
@@ -550,7 +604,7 @@ async function openExecutionDetail(row: any) {
   }
 }
 
-async function openKnowledgeSource (row: any) {
+async function openKnowledgeSource(row: any) {
   rightPanelTitle.value = t('chat.KnowledgeSource.title')
   rightPanelType.value = 'knowledgeSource'
   // TODO 数据
@@ -617,13 +671,12 @@ function closeExecutionDetail() {
           margin: 16px;
           box-sizing: border-box;
           &:hover {
-            background-color: #1F23291A;
+            background-color: #1f23291a;
           }
         }
       }
 
       &.el-menu--collapse {
-
         .el-menu-item,
         .el-menu-tooltip__trigger,
         .el-sub-menu__title {
@@ -643,7 +696,7 @@ function closeExecutionDetail() {
 
         .el-menu-item:hover .el-menu-tooltip__trigger,
         .el-sub-menu__title:hover {
-          background-color: #1F23291A;
+          background-color: #1f23291a;
         }
 
         .user-info {
@@ -663,8 +716,8 @@ function closeExecutionDetail() {
     .pc-collapse {
       position: absolute;
       top: 20px;
-      right: -12px;
-      box-shadow: 0px 5px 10px 0px #1F23291A;
+      right: -15px;
+      box-shadow: 0px 5px 10px 0px #1f23291a;
     }
   }
 
@@ -678,7 +731,8 @@ function closeExecutionDetail() {
       height: calc(100vh - 85px);
     }
 
-    .el-splitter-bar__collapse-icon, .el-splitter-bar__dragger {
+    .el-splitter-bar__collapse-icon,
+    .el-splitter-bar__dragger {
       display: none;
     }
     .execution-detail-panel {
@@ -741,10 +795,10 @@ function closeExecutionDetail() {
     padding-left: 8px;
     padding-right: 8px;
     &:hover {
-      background-color: #1F23291A;
+      background-color: #1f23291a;
     }
     &.is-active {
-      background-color: #3370FF1A;
+      background-color: #3370ff1a;
     }
   }
 }

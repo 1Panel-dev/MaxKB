@@ -169,6 +169,8 @@
         v-else
         ref="quickInputRef"
         v-model="inputValue"
+        :autosize="{ minRows: 1, maxRows: isMobile ? 4 : 10 }"
+        type="textarea"
         :placeholder="
           recorderStatus === 'START'
             ? `${$t('chat.inputPlaceholder.speaking')}...`
@@ -176,27 +178,17 @@
               ? `${$t('chat.inputPlaceholder.recorderLoading')}...`
               : $t('chat.inputPlaceholder.default')
         "
-        :autosize="{ minRows: 1, maxRows: isMobile ? 4 : 10 }"
-        type="textarea"
         :maxlength="100000"
         @keydown.enter="sendChatHandle($event)"
         @paste="handlePaste"
         @drop="handleDrop"
+        class="chat-operate-textarea"
       />
 
       <div class="operate flex-between">
         <div>
-          <!-- <el-button
-          v-if="isUserInput || isAPIInput"
-          class="user-input-button mb-8"
-          type="primary"
-          text
-          @click="toggleUserInput"
-        >
-          <AppIcon iconName="app-user-input"></AppIcon>
-        </el-button> -->
+          <slot name="userInput" />
         </div>
-
         <div>
           <template v-if="props.applicationDetails.stt_model_enable">
             <span v-if="mode === 'mobile'">
@@ -305,6 +297,7 @@ import { ref, computed, onMounted, nextTick, watch, type Ref } from 'vue'
 import Recorder from 'recorder-core'
 import TouchChat from './TouchChat.vue'
 import applicationApi from '@/api/application/application'
+import UserForm from '@/components/ai-chat/component/user-form/index.vue'
 import { MsgAlert } from '@/utils/message'
 import { type chatType } from '@/api/type/application'
 import { useRoute, useRouter } from 'vue-router'
@@ -329,7 +322,6 @@ const props = withDefaults(
     isMobile: boolean
     appId?: string
     chatId: string
-    showUserInput?: boolean
     sendMessage: (question: string, other_params_data?: any, chat?: chatType) => void
     openChatId: () => Promise<string>
     validate: () => Promise<any>
@@ -361,6 +353,31 @@ const localLoading = computed({
     emit('update:loading', v)
   },
 })
+
+const showUserInput = ref(true)
+const form_data = ref<any>({})
+const api_form_data = ref<any>({})
+
+const toggleUserInput = () => {
+  showUserInput.value = !showUserInput.value
+  if (showUserInput.value) {
+    // 保存当前数据作为初始数据（用于可能的恢复）
+    initialFormData.value = JSON.parse(JSON.stringify(form_data.value))
+    initialApiFormData.value = JSON.parse(JSON.stringify(api_form_data.value))
+  }
+}
+
+function UserFormConfirm() {
+  showUserInput.value = false
+}
+
+function UserFormCancel() {
+  // 恢复初始数据
+  form_data.value = JSON.parse(JSON.stringify(initialFormData.value))
+  api_form_data.value = JSON.parse(JSON.stringify(initialApiFormData.value))
+  userFormRef.value?.render(form_data.value)
+  showUserInput.value = false
+}
 
 const upload = ref()
 
@@ -807,7 +824,7 @@ function autoSendMessage() {
       uploadVideoList.value = []
       uploadOtherList.value = []
       if (quickInputRef.value) {
-        quickInputRef.value.textareaStyle.height = '45px'
+        quickInputRef.value.textarea.style.height = '45px'
       }
     })
     .catch(() => {
@@ -901,10 +918,10 @@ onMounted(() => {
     }, 100)
   }
   setTimeout(() => {
-    if (quickInputRef.value && mode === 'embed') {
+    nextTick(() => {
       quickInputRef.value.textarea.style.height = '0'
-    }
-  }, 1800)
+    })
+  }, 800)
 })
 </script>
 <style lang="scss" scoped>
@@ -914,6 +931,7 @@ onMounted(() => {
     width: 100%;
     box-sizing: border-box;
     z-index: 10;
+
     :deep(.operate-textarea) {
       box-shadow: 0px 6px 24px 0px rgba(31, 35, 41, 0.08);
       background-color: #ffffff;
@@ -931,6 +949,8 @@ onMounted(() => {
         resize: none;
         padding: 13px 16px;
         box-sizing: border-box;
+        min-height: 47px !important;
+        height: 0;
       }
 
       .operate {
@@ -985,5 +1005,13 @@ onMounted(() => {
       }
     }
   }
+}
+.popperUserInput {
+  position: absolute;
+  z-index: 999;
+  left: 0;
+  bottom: 50px;
+  width: calc(100% - 50px);
+  max-width: 400px;
 }
 </style>

@@ -77,9 +77,17 @@
         v-if="type !== 'log'"
       >
         <template #operateBefore>
-          <slot name="operateBefore">
-            <span></span>
-          </slot>
+          <slot name="operateBefore"> </slot>
+        </template>
+        <template #userInput>
+          <el-button
+            v-if="isUserInput || isAPIInput"
+            class="user-input-button mb-8"
+            @click="toggleUserInput"
+          >
+            <el-icon :size="16" class="mr-4"><EditPen /></el-icon>
+            {{ $t('chat.userInput') }}
+          </el-button>
         </template>
       </ChatInputOperate>
 
@@ -647,8 +655,8 @@ defineExpose({
 .popperUserInput {
   position: absolute;
   z-index: 999;
-  right: 50px;
-  bottom: 0;
+  left: 0;
+  bottom: 50px;
   width: calc(100% - 50px);
   max-width: 400px;
 }

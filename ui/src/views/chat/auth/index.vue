@@ -30,14 +30,5 @@ const is_auth = computed({
     emit('update:modelValue', v)
   },
 })
-
-const customStyle = computed(() => {
-  return {
-    background: props.application_profile?.custom_theme?.theme_color,
-    color: props.application_profile?.custom_theme?.header_font_color,
-    border: 'none',
-    ...props.style,
-  }
-})
 </script>
 <style lang="scss"></style>

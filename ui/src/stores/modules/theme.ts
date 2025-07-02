@@ -19,8 +19,7 @@ const useThemeStore = defineStore('theme', {
 
     setTheme(data?: any) {
       const { changeTheme } = useElementPlusTheme(this.themeInfo?.theme || defalueColor)
-      changeTheme(defalueColor)
-      changeTheme(data?.['theme'])
+      changeTheme(data?.['theme'] || defalueColor)
       this.themeInfo = cloneDeep(data)
     },
 

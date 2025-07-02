@@ -7,11 +7,10 @@ interface ChatUser {
   // 用户id
   id: string
 }
-interface Application {}
 interface Chat {
   chat_profile?: ChatProfile
-  application?: Application
-  chatUserProfile?: ChatUserProfile 
+  application?: any
+  chatUserProfile?: ChatUserProfile
   token?: string
   accessToken?: string
 }
@@ -28,6 +27,7 @@ const useChatUserStore = defineStore('chat-user', {
     getChatProfile() {
       return ChatAPI.chatProfile(this.accessToken as string).then((ok) => {
         this.chat_profile = ok.data
+
         return this.chat_profile
       })
     },
@@ -38,6 +38,8 @@ const useChatUserStore = defineStore('chat-user', {
     applicationProfile() {
       return ChatAPI.applicationProfile().then((ok) => {
         this.application = ok.data
+        this.application['custom_theme']['theme_color'] =
+          ok.data?.custom_theme.theme_color || '#3370FF'
       })
     },
     isAuthentication() {

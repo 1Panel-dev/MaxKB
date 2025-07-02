@@ -4,7 +4,6 @@ import type { User } from '@/api/type/user'
 import UserApi from '@/api/user/user'
 import LoginApi from '@/api/user/login'
 import { cloneDeep } from 'lodash'
-import ThemeApi from '@/api/system-settings/theme'
 import { useLocalStorage } from '@vueuse/core'
 // import { defaultPlatformSetting } from '@/utils/theme'
 
@@ -141,6 +140,7 @@ const useUserStore = defineStore('user', {
               theme.themeInfo = {
                 ...defaultPlatformSetting,
               }
+              theme.setTheme()
             }
             resolve(ok)
           })
