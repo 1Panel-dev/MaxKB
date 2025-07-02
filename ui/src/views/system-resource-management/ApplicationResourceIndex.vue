@@ -162,6 +162,7 @@ import { isAppIcon } from '@/utils/common'
 import useStore from '@/stores'
 import WorkspaceApi from '@/api/workspace/workspace.ts'
 import { datetimeFormat } from '@/utils/time'
+import {loadPermissionApi} from "@/utils/dynamics-api/permission-api.ts";
 
 const { user } = useStore()
 
@@ -192,7 +193,7 @@ function filterWorkspaceChange(val: string) {
 }
 async function getWorkspaceList() {
   if (user.isEE()) {
-    const res = await WorkspaceApi.getSystemWorkspaceList(loading)
+    const res = await loadPermissionApi('workspace').getSystemWorkspaceList(loading)
     workspaceOptions.value = res.data.map((item: any) => ({
       label: item.name,
       value: item.id,

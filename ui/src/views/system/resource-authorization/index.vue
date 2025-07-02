@@ -82,7 +82,7 @@
 
           <div class="submit-button">
             <el-button type="primary" @click="submitPermissions"
-              v-if="hasPermission(permissionObj[(route.meta?.resource as string||'APPLICATION')],'OR')"            
+              v-if="hasPermission(permissionObj[(route.meta?.resource as string||'APPLICATION')],'OR')"
             >{{ $t('common.save') }}</el-button>
           </div>
         </div>
@@ -106,6 +106,7 @@ import { hasPermission } from '@/utils/permission/index'
 import WorkspaceApi from '@/api/workspace/workspace.ts'
 import type { WorkspaceItem } from '@/api/type/workspace'
 import { ComplexPermission } from '@/utils/permission/type'
+import {loadPermissionApi} from "@/utils/dynamics-api/permission-api.ts";
 
 const route = useRoute()
 const { user } = useStore()
@@ -390,7 +391,7 @@ const currentWorkspace = computed(() => {
   return workspaceList.value.find((w) => w.id == currentWorkspaceId.value)
 })
 async function getWorkspaceList() {
-  const res = await WorkspaceApi.getSystemWorkspaceList(loading)
+  const res = await loadPermissionApi('workspace').getSystemWorkspaceList(loading)
   workspaceList.value = res.data
   currentWorkspaceId.value = 'default'
 }
