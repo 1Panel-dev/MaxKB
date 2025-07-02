@@ -14,16 +14,10 @@
                 @mouseenter="showEditIcon = true"
                 @mouseleave="showEditIcon = false"
               >
-                <el-avatar
-                  v-if="isAppIcon(detail?.icon)"
-                  shape="square"
-                  :size="32"
-                  style="background: none"
-                >
-                  <img :src="detail?.icon" alt="" />
+                <el-avatar shape="square" :size="32" style="background: none">
+                  <img :src="resetUrl(detail?.icon, resetUrl('./favicon.ico'))" alt="" />
                 </el-avatar>
 
-                <LogoIcon v-else height="32px" />
                 <el-avatar
                   v-if="showEditIcon"
                   shape="square"
@@ -224,7 +218,7 @@ import applicationApi from '@/api/application/application'
 import { nowDate, beforeDay } from '@/utils/time'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { copyClick } from '@/utils/clipboard'
-import { isAppIcon } from '@/utils/common'
+import { isAppIcon, resetUrl } from '@/utils/common'
 import { mapToUrlParams } from '@/utils/application'
 import useStore from '@/stores'
 import { t } from '@/locales'

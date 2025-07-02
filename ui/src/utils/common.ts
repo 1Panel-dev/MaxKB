@@ -70,3 +70,10 @@ export function isAppIcon(url: string | undefined) {
 export function isFunction(fn: any) {
   return typeof fn === 'function'
 }
+
+export const resetUrl = (url: string, defaultUrl?: string) => {
+  if (url && url.startsWith('./')) {
+    return `${window.MaxKB.prefix}/${url.substring(2)}`
+  }
+  return url ? url : defaultUrl ? defaultUrl : ''
+}

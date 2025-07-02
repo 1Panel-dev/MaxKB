@@ -45,7 +45,7 @@ class Migration(migrations.Migration):
                 ('model_params_setting', models.JSONField(default=dict, verbose_name='模型参数相关设置')),
                 ('tts_model_params_setting', models.JSONField(default=dict, verbose_name='模型参数相关设置')),
                 ('problem_optimization', models.BooleanField(default=False, verbose_name='问题优化')),
-                ('icon', models.CharField(default='/ui/favicon.ico', max_length=256, verbose_name='应用icon')),
+                ('icon', models.CharField(default='./favicon.ico', max_length=256, verbose_name='应用icon')),
                 ('work_flow', models.JSONField(default=dict, verbose_name='工作流数据')),
                 ('type', models.CharField(choices=[('SIMPLE', '简易'), ('WORK_FLOW', '工作流')], default='SIMPLE', max_length=256, verbose_name='应用类型')),
                 ('problem_optimization_prompt', models.CharField(blank=True, default='()里面是用户问题,根据上下文回答揣测用户问题({question}) 要求: 输出一个补全问题,并且放在<data></data>标签中', max_length=102400, null=True, verbose_name='问题优化提示词')),

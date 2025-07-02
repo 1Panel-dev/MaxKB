@@ -539,7 +539,7 @@ class ApplicationSerializer(serializers.Serializer):
                            model_params_setting=application.get('model_params_setting'),
                            tts_model_params_setting=application.get('tts_model_params_setting'),
                            problem_optimization=application.get('problem_optimization'),
-                           icon="/ui/favicon.ico",
+                           icon="./favicon.ico",
                            work_flow=work_flow,
                            type=application.get('type'),
                            problem_optimization_prompt=application.get('problem_optimization_prompt'),

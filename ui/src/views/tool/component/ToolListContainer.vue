@@ -154,13 +154,13 @@
               >
                 <template #icon>
                   <el-avatar
-                    v-if="isAppIcon(item?.icon)"
+                    v-if="item?.icon"
                     shape="square"
                     :size="32"
                     style="background: none"
                     class="mr-8"
                   >
-                    <img :src="item?.icon" alt="" />
+                    <img :src="resetUrl(item?.icon)" alt="" />
                   </el-avatar>
                   <el-avatar v-else class="avatar-green" shape="square" :size="32">
                     <img src="@/assets/node/icon_tool.svg" style="width: 58%" alt="" />
@@ -310,7 +310,7 @@ import ToolFormDrawer from '@/views/tool/ToolFormDrawer.vue'
 import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
 import AuthorizedWorkspace from '@/views/system-shared/AuthorizedWorkspaceDialog.vue'
 import MoveToDialog from '@/components/folder-tree/MoveToDialog.vue'
-import { isAppIcon } from '@/utils/common'
+import { isAppIcon, resetUrl } from '@/utils/common'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import { SourceTypeEnum } from '@/enums/common'
 import ToolStoreDialog from '@/views/tool/toolStore/ToolStoreDialog.vue'
@@ -372,7 +372,7 @@ const MoveToDialogRef = ref()
 function openMoveToDialog(data: any) {
   const obj = {
     id: data.id,
-    folder_id: data.folder
+    folder_id: data.folder,
   }
   MoveToDialogRef.value?.open(obj)
 }
@@ -631,7 +631,7 @@ onMounted(() => {
   if (apiType.value !== 'workspace') {
     getList()
   }
-  loadSharedApi({type: 'workspace', isShared: isShared.value, systemType: apiType.value })
+  loadSharedApi({ type: 'workspace', isShared: isShared.value, systemType: apiType.value })
     .getAllMemberList(user.getWorkspaceId(), loading)
     .then((res: any) => {
       user_options.value = res.data

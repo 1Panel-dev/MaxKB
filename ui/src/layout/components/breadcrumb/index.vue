@@ -3,13 +3,13 @@
     <back-button :to="toBackPath" class="mt-4"></back-button>
     <div class="flex align-center">
       <el-avatar
-        v-if="isApplication && isAppIcon(current?.icon)"
+        v-if="isApplication"
         shape="square"
         :size="24"
         style="background: none"
         class="mr-8"
       >
-        <img :src="current?.icon" alt="" />
+        <img :src="resetUrl(current?.icon, resetUrl('./favicon.ico'))" alt="" />
       </el-avatar>
       <LogoIcon
         v-else-if="isApplication"
@@ -27,7 +27,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { onBeforeRouteLeave, useRouter, useRoute } from 'vue-router'
-import { isAppIcon } from '@/utils/common'
+import { isAppIcon, resetUrl } from '@/utils/common'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import useStore from '@/stores'
 const { common, application } = useStore()
