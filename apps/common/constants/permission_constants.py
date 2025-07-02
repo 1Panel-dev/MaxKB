@@ -759,14 +759,6 @@ class PermissionConstants(Enum):
                                    parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
                                    resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE],
                                    )
-
-    APPLICATION_SETTING = Permission(group=Group.APPLICATION, operate=Operate.SETTING,
-                                     role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-                                     parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                     resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE],
-                                     label=_('Setting')
-                                     )
-
     APPLICATION_CREATE = Permission(group=Group.APPLICATION, operate=Operate.CREATE,
                                     role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                     parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
