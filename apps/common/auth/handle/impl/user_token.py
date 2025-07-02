@@ -229,7 +229,7 @@ system_role = RoleConstants.ADMIN.value.name
 def reset_workspace_role(role_id, workspace_id, role_dict):
     if system_role_list.__contains__(role_id):
         if system_role == role_id:
-            return role_id
+            return [role_id]
         else:
             return [f"{role_id}:/WORKSPACE/{workspace_id}", role_id]
     else:
@@ -238,7 +238,7 @@ def reset_workspace_role(role_id, workspace_id, role_dict):
             return ''
         role_type = role_dict.get(role_id).type
         if system_role == role_type:
-            return RoleConstants.EXTENDS_ADMIN.value.name
+            return [RoleConstants.EXTENDS_ADMIN.value.name]
         return [f"EXTENDS_{role_type}:/WORKSPACE/{workspace_id}", f"EXTENDS_{role_type}"]
 
 
