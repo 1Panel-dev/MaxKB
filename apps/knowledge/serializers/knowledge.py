@@ -308,8 +308,8 @@ class KnowledgeSerializer(serializers.Serializer):
                     model=get_dynamics_model({'temp.id': models.CharField()})
                 ).filter(**{'temp.id': self.data.get("knowledge_id")}),
                 'knowledge_custom_sql': QuerySet(
-                    model=get_dynamics_model({'knowledge.user_id': models.CharField()})
-                ).filter(**{'knowledge.user_id': self.data.get("user_id")}),
+                    model=get_dynamics_model({'knowledge.id': models.CharField()})
+                ).filter(**{'knowledge.id': self.data.get("knowledge_id")}),
                 'folder_query_set': QuerySet(KnowledgeFolder)
             }
             if not workspace_manage:
