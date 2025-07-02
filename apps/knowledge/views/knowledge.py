@@ -144,7 +144,8 @@ class KnowledgeView(APIView):
                     'name': request.query_params.get('name'),
                     'desc': request.query_params.get("desc"),
                     'scope': KnowledgeScope.WORKSPACE,
-                    'user_id': request.user.id
+                    'user_id': request.user.id,
+                    'create_user': request.query_params.get('create_user'),
                 }
             ).page(current_page, page_size))
 
