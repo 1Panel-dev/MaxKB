@@ -17,12 +17,11 @@ from rest_framework.views import APIView
 from application.api.application_api import ApplicationCreateAPI, ApplicationQueryAPI, ApplicationImportAPI, \
     ApplicationExportAPI, ApplicationOperateAPI, ApplicationEditAPI, TextToSpeechAPI, SpeechToTextAPI, PlayDemoTextAPI
 from application.models import Application
-from application.serializers.application import ApplicationSerializer, Query, ApplicationOperateSerializer, \
-    McpServersSerializer
+from application.serializers.application import ApplicationSerializer, Query, ApplicationOperateSerializer
 from common import result
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
-from common.constants.permission_constants import PermissionConstants, RoleConstants, CompareConstants
+from common.constants.permission_constants import PermissionConstants, RoleConstants
 from common.log.log import log
 
 

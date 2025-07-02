@@ -43,7 +43,7 @@
               clearable
               style="width: 220px"
             >
-              <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.username" />
+              <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.nick_name" />
             </el-select>
           </div>
           <el-dropdown trigger="click" v-if="permissionPrecise.create()">
@@ -298,6 +298,7 @@ import { isWorkFlow } from '@/utils/application'
 import { dateFormat } from '@/utils/time'
 import { SourceTypeEnum, ValidType, ValidCount } from '@/enums/common'
 import permissionMap from '@/permission'
+import WorkspaceApi from '@/api/workspace/workspace'
 
 const router = useRouter()
 const route = useRoute()
@@ -529,6 +530,7 @@ function searchHandle() {
 function getList() {
   const params = {
     folder_id: folder.currentFolder?.id || 'default',
+    [search_type.value]: search_form.value[search_type.value],
   }
   ApplicationApi.getApplication(paginationConfig, params, loading).then((res) => {
     paginationConfig.total = res.data.total
@@ -538,6 +540,10 @@ function getList() {
 
 onMounted(() => {
   getFolder(true)
+
+  WorkspaceApi.getAllMemberList(user.getWorkspaceId(), loading).then((res) => {
+    user_options.value = res.data
+  })
 })
 </script>
 

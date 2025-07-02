@@ -308,6 +308,7 @@ class Query(serializers.Serializer):
         user_id = self.data.get('user_id')
         desc = instance.get('desc')
         name = instance.get('name')
+        create_user = instance.get('create_user')
         if workspace_id is not None:
             folder_query_set = folder_query_set.filter(workspace_id=workspace_id)
             application_query_set = application_query_set.filter(workspace_id=workspace_id)
@@ -321,6 +322,8 @@ class Query(serializers.Serializer):
         if desc is not None:
             folder_query_set = folder_query_set.filter(desc__contains=desc)
             application_query_set = application_query_set.filter(desc__contains=desc)
+        if create_user is not None:
+            application_query_set = application_query_set.filter(user_id=create_user)
         application_custom_sql_query_set = application_query_set
         application_query_set = application_query_set.order_by("-update_time")
 
