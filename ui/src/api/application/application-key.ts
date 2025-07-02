@@ -18,7 +18,7 @@ const getAPIKey: (application_id: string, loading?: Ref<boolean>) => Promise<Res
   application_id,
   loading,
 ) => {
-  return get(`${prefix.value}/${application_id}/application`, undefined, loading)
+  return get(`${prefix.value}/${application_id}/application_key`, undefined, loading)
 }
 
 /**
@@ -29,7 +29,7 @@ const postAPIKey: (application_id: string, loading?: Ref<boolean>) => Promise<Re
   application_id,
   loading,
 ) => {
-  return post(`${prefix.value}/${application_id}/application`, {}, undefined, loading)
+  return post(`${prefix.value}/${application_id}/application_key`, {}, undefined, loading)
 }
 
 /**
@@ -42,7 +42,7 @@ const delAPIKey: (
   loading?: Ref<boolean>,
 ) => Promise<Result<boolean>> = (application_id, api_key_id, loading) => {
   return del(
-    `${prefix.value}/${application_id}/application/${api_key_id}`,
+    `${prefix.value}/${application_id}/application_key/${api_key_id}`,
     undefined,
     undefined,
     loading,
@@ -63,7 +63,7 @@ const putAPIKey: (
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (application_id, api_key_id, data, loading) => {
   return put(
-    `${prefix.value}/${application_id}/application/${api_key_id}`,
+    `${prefix.value}/${application_id}/application_key/${api_key_id}`,
     data,
     undefined,
     loading,

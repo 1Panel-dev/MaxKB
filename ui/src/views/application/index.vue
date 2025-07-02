@@ -222,7 +222,9 @@
                         </el-button>
                         <template #dropdown>
                           <el-dropdown-menu>
-                            <el-dropdown-item @click.stop="getAccessToken(item.id)">
+                            <el-dropdown-item @click.stop="getAccessToken(item.id)"
+                              v-if="permissionPrecise.overview_access(item.id)"
+                            >
                               <AppIcon iconName="app-create-chat"></AppIcon>
                               {{ $t('views.application.operation.toChat') }}
                             </el-dropdown-item>

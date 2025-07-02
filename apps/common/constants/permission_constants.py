@@ -754,12 +754,6 @@ class PermissionConstants(Enum):
                                   parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
                                   resource_permission_group_list=[ResourcePermissionConst.APPLICATION_VIEW],
                                   )
-    APPLICATION_TO_CHAT = Permission(group=Group.APPLICATION, operate=Operate.TO_CHAT,
-                                     role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-                                     parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                     resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE],
-                                     label=_('Chat')
-                                     )
     APPLICATION_DEBUG = Permission(group=Group.APPLICATION, operate=Operate.DEBUG,
                                    role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                    parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
