@@ -336,7 +336,11 @@ const CopyApplicationDialogRef = ref()
 
 const MoveToDialogRef = ref()
 function openMoveToDialog(data: any) {
-  MoveToDialogRef.value?.open(data)
+  const obj = {
+    id: data.id,
+    folder_id: data.folder
+  }
+  MoveToDialogRef.value?.open(obj)
 }
 function refreshApplicationList(row: any) {
   const index = applicationList.value.findIndex((v) => v.id === row.id)
