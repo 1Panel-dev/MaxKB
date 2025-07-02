@@ -22,7 +22,7 @@ from chat.api.chat_authentication_api import ChatOpenAPI
 from chat.serializers.chat import OpenChatSerializers, ChatSerializers, DebugChatSerializers
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
-from common.constants.permission_constants import PermissionConstants, RoleConstants
+from common.constants.permission_constants import PermissionConstants, RoleConstants, ViewPermission, CompareConstants
 from common.result import result
 from common.utils.common import query_params_to_single_dict
 
@@ -42,7 +42,9 @@ class ApplicationChat(APIView):
     )
     @has_permissions(PermissionConstants.APPLICATION_CHAT_LOG_READ.get_workspace_application_permission(),
                      PermissionConstants.APPLICATION_CHAT_LOG_READ.get_workspace_permission_workspace_manage_role(),
-                     RoleConstants.USER.get_workspace_role(),
+                     ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                    [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                                    CompareConstants.AND),
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def get(self, request: Request, workspace_id: str, application_id: str):
         return result.success(ApplicationChatQuerySerializers(
@@ -65,7 +67,9 @@ class ApplicationChat(APIView):
         )
         @has_permissions(PermissionConstants.APPLICATION_CHAT_LOG_READ.get_workspace_application_permission(),
                          PermissionConstants.APPLICATION_CHAT_LOG_READ.get_workspace_permission_workspace_manage_role(),
-                         RoleConstants.USER.get_workspace_role(),
+                         ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                        [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                                        CompareConstants.AND),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str, application_id: str, current_page: int, page_size: int):
             return result.success(ApplicationChatQuerySerializers(
@@ -89,7 +93,9 @@ class ApplicationChat(APIView):
         )
         @has_permissions(PermissionConstants.APPLICATION_CHAT_LOG_EXPORT.get_workspace_application_permission(),
                          PermissionConstants.APPLICATION_CHAT_LOG_EXPORT.get_workspace_permission_workspace_manage_role(),
-                         RoleConstants.USER.get_workspace_role(),
+                         ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                        [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                                        CompareConstants.AND),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def post(self, request: Request, workspace_id: str, application_id: str):
             return ApplicationChatQuerySerializers(
@@ -112,7 +118,9 @@ class OpenView(APIView):
     )
     @has_permissions(PermissionConstants.APPLICATION_DEBUG.get_workspace_application_permission(),
                      PermissionConstants.APPLICATION_DEBUG.get_workspace_permission_workspace_manage_role(),
-                     RoleConstants.USER.get_workspace_role(),
+                     ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                    [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                                    CompareConstants.AND),
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def get(self, request: Request, workspace_id: str, application_id: str):
         return result.success(OpenChatSerializers(
