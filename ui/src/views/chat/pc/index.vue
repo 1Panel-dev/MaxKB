@@ -230,7 +230,7 @@
                 <AppIcon
                   v-if="paginationConfig.total"
                   iconName="app-chat-record"
-                  class="info mr-8"
+                  class="color-secondary mr-8"
                   style="font-size: 16px"
                 ></AppIcon>
                 <span v-if="paginationConfig.total" class="lighter">

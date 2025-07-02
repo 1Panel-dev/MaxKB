@@ -1,13 +1,40 @@
 <template>
   <UserLoginLayout v-if="!loading" v-loading="loading">
-    <LoginContainer
-      v-if="chatUser.chat_profile?.authentication_type == 'password'"
-      :subTitle="theme.themeInfo?.slogan || $t('theme.defaultSlogan')"
-    >
+    <LoginContainer v-if="chatUser.chat_profile?.authentication_type == 'password'">
+      <template #logo>
+        <div class="flex-center">
+          <el-avatar
+            v-if="isAppIcon(chatUser.chat_profile?.icon)"
+            shape="square"
+            :size="32"
+            class="mr-8"
+            style="background: none"
+          >
+            <img :src="chatUser.chat_profile?.icon" alt="" />
+          </el-avatar>
+          <LogoIcon v-else height="32px" class="mr-8" />
+          <h4>{{ chatUser.chat_profile?.application_name }}</h4>
+        </div>
+      </template>
       <PasswordAuth></PasswordAuth>
     </LoginContainer>
 
-    <LoginContainer v-else :subTitle="theme.themeInfo?.slogan || $t('theme.defaultSlogan')">
+    <LoginContainer v-else>
+      <template #logo>
+        <div class="flex-center">
+          <el-avatar
+            v-if="isAppIcon(chatUser.chat_profile?.icon)"
+            shape="square"
+            :size="32"
+            class="mr-8"
+            style="background: none"
+          >
+            <img :src="chatUser.chat_profile?.icon" alt="" />
+          </el-avatar>
+          <LogoIcon v-else height="32px" class="mr-8" />
+          <h4>{{ chatUser.chat_profile?.application_name }}</h4>
+        </div>
+      </template>
       <h2 class="mb-24" v-if="!showQrCodeTab">
         {{ loginMode == 'LOCAL' ? $t('views.login.title') : loginMode }}
       </h2>
@@ -75,17 +102,6 @@
         >
           {{ $t('views.login.buttons.login') }}
         </el-button>
-        <div class="operate-container flex-between mt-12">
-          <el-button
-            :loading="loading"
-            class="forgot-password"
-            @click="router.push('/forgot_password')"
-            link
-            type="primary"
-          >
-            {{ $t('views.login.forgotPassword') }}?
-          </el-button>
-        </div>
       </div>
       <div v-if="showQrCodeTab">
         <QrCodeTab :tabs="orgOptions" />
@@ -147,7 +163,7 @@ import { useI18n } from 'vue-i18n'
 import QrCodeTab from '@/views/login/scanCompinents/QrCodeTab.vue'
 import { MsgConfirm, MsgError } from '@/utils/message.ts'
 import PasswordAuth from '@/views/chat/auth/component/password.vue'
-import useUserStore from '@/stores/modules/user.ts'
+import { isAppIcon } from '@/utils/common'
 
 const router = useRouter()
 const { login, user, theme, chatUser } = useStore()

@@ -2,7 +2,9 @@
   <div class="login-form-container">
     <div class="login-title">
       <div class="logo text-center">
-        <LogoFull height="45px" />
+        <slot name="logo">
+          <LogoFull height="45px" />
+        </slot>
       </div>
       <div class="sub-title text-center" v-if="subTitle">
         <el-text type="info">{{ subTitle }}</el-text>
@@ -16,7 +18,7 @@
 <script setup lang="ts">
 defineProps({
   title: String,
-  subTitle: String
+  subTitle: String,
 })
 </script>
 <style lang="scss" scoped>
@@ -30,7 +32,6 @@ defineProps({
     }
   }
   .login-card {
-    border-radius: 8px;
     padding: 18px;
   }
 }

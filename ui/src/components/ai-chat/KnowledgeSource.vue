@@ -1,6 +1,6 @@
 <template>
   <div class="chat-knowledge-source">
-    <div class="flex align-center mt-16" v-if="!isWorkFlow(props.type)">
+    <div class="flex align-center mt-16">
       <span class="mr-4 color-secondary">{{ $t('chat.KnowledgeSource.title') }}</span>
       <el-divider direction="vertical" />
       <el-button type="primary" class="mr-8" link @click="openParagraph(data)">
@@ -9,7 +9,7 @@
         {{ data.paragraph_list?.length || 0 }}</el-button
       >
     </div>
-    <div class="mt-8" v-if="!isWorkFlow(props.type)">
+    <div class="mt-8">
       <el-row :gutter="8" v-if="uniqueParagraphList?.length">
         <template v-for="(item, index) in uniqueParagraphList" :key="index">
           <el-col :span="12" class="mb-8">
@@ -51,11 +51,10 @@
         >
       </div>
       <el-button
-        v-if="isWorkFlow(props.type)"
         type="primary"
         link
         @click="openExecutionDetail(data.execution_details)"
-        style="padding: 0;"
+        style="padding: 0"
       >
         <el-icon class="mr-4"><Document /></el-icon>
         {{ $t('chat.executionDetails.title') }}</el-button
@@ -76,16 +75,16 @@ import { getImgUrl, getNormalizedUrl } from '@/utils/utils'
 const props = defineProps({
   data: {
     type: Object,
-    default: () => {}
+    default: () => {},
   },
   type: {
     type: String,
-    default: ''
+    default: '',
   },
   executionIsRightPanel: {
     type: Boolean,
     required: false,
-  }
+  },
 })
 
 const emit = defineEmits(['openExecutionDetail', 'openParagraph'])
@@ -100,7 +99,7 @@ function openParagraph(row: any, id?: string) {
   ParagraphSourceDialogRef.value.open(row, id)
 }
 function openExecutionDetail(row: any) {
-  if(props.executionIsRightPanel){
+  if (props.executionIsRightPanel) {
     emit('openExecutionDetail')
     return
   }
