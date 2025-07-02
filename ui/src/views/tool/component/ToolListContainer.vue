@@ -87,7 +87,7 @@
                   </div>
                 </div>
               </el-dropdown-item>
-              <el-dropdown-item @click="openCreateFolder" divided>
+              <el-dropdown-item @click="openCreateFolder" divided v-if="apiType === 'workspace'">
                 <div class="flex align-center">
                   <AppIcon iconName="app-folder" style="font-size: 32px"></AppIcon>
                   <div class="pre-wrap ml-4">
@@ -636,6 +636,7 @@ onMounted(() => {
     .then((res: any) => {
       user_options.value = res.data
     })
+  console.log(apiType.value)
 })
 </script>
 
