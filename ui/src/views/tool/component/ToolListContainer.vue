@@ -633,7 +633,7 @@ onMounted(() => {
     getList()
   }
   loadSharedApi({type: 'workspace', isShared: isShared.value, systemType: apiType.value })
-    .getWorkspaceAllMemberList(user.getWorkspaceId(), loading)
+    .getAllMemberList(user.getWorkspaceId(), loading)
     .then((res: any) => {
       user_options.value = res.data
     })

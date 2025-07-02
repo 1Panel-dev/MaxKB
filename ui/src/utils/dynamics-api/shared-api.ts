@@ -36,6 +36,7 @@ const systemShareApiMap = {
   paragraph: paragraphSystemShareApi,
   problem: problemSystemShareApi,
   chatUser: chatUserSystemShareApi,
+  workspace: workspaceApi, // 共享的应该查全部人吧
 } as any
 
 // 资源管理 API

@@ -47,10 +47,10 @@ const getWorkspaceMemberList: (
 /**
  * 获取工作空间全部成员列表
  */
-const getWorkspaceAllMemberList: (
+const getAllMemberList: (
   workspace_id: string,
   loading?: Ref<boolean>,
-) => Promise<Result<PageList<WorkspaceMemberItem[]>>> = (workspace_id, loading) => {
+) => Promise<Result<any[]>> = (workspace_id, loading) => {
   return get(
     `${prefix}/${workspace_id}/user_list`,
     loading,
@@ -90,7 +90,7 @@ export default {
   getWorkspaceList,
   getSystemWorkspaceList,
   getWorkspaceMemberList,
-  getWorkspaceAllMemberList,
+  getAllMemberList,
   CreateWorkspaceMember,
   deleteWorkspaceMember,
   getWorkspaceRoleList,
