@@ -63,7 +63,7 @@
     <!-- 知识库引用 dialog -->
     <ParagraphSourceDialog ref="ParagraphSourceDialogRef" />
     <!-- 执行详情 dialog -->
-    <ExecutionDetailDialog ref="ExecutionDetailDialogRef" />
+    <ExecutionDetailDialog ref="ExecutionDetailDialogRef" :type="type" />
   </div>
 </template>
 <script setup lang="ts">

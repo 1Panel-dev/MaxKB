@@ -8,13 +8,17 @@
     align-center
     @click.stop
   >
-   <ExecutionDetailContent :detail="detail" />
+   <ExecutionDetailContent :detail="detail" :type="type" />
   </el-dialog>
 </template>
 <script setup lang="ts">
 import { ref, watch, onBeforeUnmount } from 'vue'
 import { cloneDeep } from 'lodash'
 import ExecutionDetailContent from './component/ExecutionDetailContent.vue'
+
+const props = defineProps<{
+  type?: string
+}>()
 
 const dialogVisible = ref(false)
 const detail = ref<any[]>([])

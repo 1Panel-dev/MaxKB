@@ -291,16 +291,12 @@
               <ExecutionDetailContent
                 v-if="rightPanelType === 'executionDetail'"
                 :detail="executionDetail"
+                :type="applicationDetail?.type"
               />
             </div>
           </el-splitter-panel>
         </el-splitter>
       </div>
-    </div>
-    <div class="collapse">
-      <el-button @click="isCollapse = !isCollapse">
-        <el-icon> <component :is="isCollapse ? 'Fold' : 'Expand'" /></el-icon>
-      </el-button>
     </div>
 
     <EditTitleDialog ref="EditTitleDialogRef" @refresh="refreshFieldTitle" />
