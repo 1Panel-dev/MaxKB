@@ -43,7 +43,7 @@
               clearable
               style="width: 220px"
             >
-              <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.username" />
+              <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.nick_name" />
             </el-select>
             <el-select
               v-else-if="search_type === 'model_type'"
@@ -128,7 +128,7 @@ import { useRoute } from 'vue-router'
 import permissionMap from '@/permission'
 
 const route = useRoute()
-const { model } = useStore()
+const { model, user } = useStore()
 const apiType = computed(() => {
   if (route.path.includes('shared')) {
     return 'systemShare'
@@ -204,10 +204,11 @@ const list_model = () => {
     .getModelList({ ...model_search_form.value, ...params }, list_model_loading)
     .then((ok: any) => {
       model_list.value = ok.data
-      const v = model_list.value.map((m) => ({ id: m.user_id, username: m.username }))
-      if (user_options.value.length === 0) {
-        user_options.value = Array.from(new Map(v.map((item) => [item.id, item])).values())
-      }
+    })
+    loadSharedApi({type: 'workspace', isShared: isShared.value, systemType: apiType.value })
+    .getAllMemberList(user.getWorkspaceId(), loading)
+    .then((res: any) => {
+      user_options.value = res.data
     })
 }
 
