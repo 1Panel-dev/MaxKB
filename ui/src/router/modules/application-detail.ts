@@ -2,6 +2,7 @@ import { SourceTypeEnum } from '@/enums/common'
 import { get_next_route } from '@/utils/permission'
 
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
+import { ComplexPermission } from '@/utils/permission/type'
 
 const ApplicationDetailRouter = {
   path: '/application/:id/:type',
@@ -21,7 +22,10 @@ const ApplicationDetailRouter = {
         parentPath: '/application/:id/:type',
         parentName: 'ApplicationDetail',
         permission: [
-          RoleConst.ADMIN,
+          () => {
+              const to: any = get_next_route()
+           return new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission( to ? to.params.id : '',)],[],'AND')},
+          
           RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
           PermissionConst.APPLICATION_OVERVIEW_READ.getWorkspacePermissionWorkspaceManageRole,
           () => {
@@ -45,7 +49,9 @@ const ApplicationDetailRouter = {
         parentPath: '/application/:id/:type',
         parentName: 'ApplicationDetail',
         permission: [
-          RoleConst.ADMIN,
+          () => {
+              const to: any = get_next_route()
+           return new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission( to ? to.params.id : '',)],[],'AND')},
           RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
           PermissionConst.APPLICATION_EDIT.getWorkspacePermissionWorkspaceManageRole,
           () => {
@@ -69,7 +75,9 @@ const ApplicationDetailRouter = {
         parentPath: '/application/:id/:type',
         parentName: 'ApplicationDetail',
         permission: [
-          RoleConst.ADMIN,
+          () => {
+              const to: any = get_next_route()
+           return new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission( to ? to.params.id : '',)],[],'AND')},
           RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
           PermissionConst.APPLICATION_ACCESS_READ.getWorkspacePermissionWorkspaceManageRole,
           () => {
@@ -94,7 +102,9 @@ const ApplicationDetailRouter = {
         parentName: 'ApplicationDetail',
         resourceType: SourceTypeEnum.APPLICATION,
         permission: [
-          RoleConst.ADMIN,
+          () => {
+              const to: any = get_next_route()
+           return new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission( to ? to.params.id : '',)],[],'AND')},
           RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
           PermissionConst.APPLICATION_CHAT_USER_READ.getWorkspacePermissionWorkspaceManageRole,
           () => {
@@ -118,7 +128,9 @@ const ApplicationDetailRouter = {
         parentPath: '/application/:id/:type',
         parentName: 'ApplicationDetail',
         permission: [
-          RoleConst.ADMIN,
+          () => {
+              const to: any = get_next_route()
+           return new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission( to ? to.params.id : '',)],[],'AND')},
           RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
           PermissionConst.APPLICATION_CHAT_LOG_READ.getWorkspacePermissionWorkspaceManageRole,
           () => {

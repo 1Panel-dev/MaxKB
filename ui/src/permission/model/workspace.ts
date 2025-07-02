@@ -23,6 +23,7 @@ const workspace = {
   modify: (source_id:string) =>
     hasPermission(
       [
+        new ComplexPermission([RoleConst.USER],[PermissionConst.MODEL.getModelWorkspaceResourcePermission(source_id)],[],'AND'),
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
         PermissionConst.MODEL_EDIT.getModelWorkspaceResourcePermission(source_id),
         PermissionConst.MODEL_EDIT.getWorkspacePermissionWorkspaceManageRole
@@ -32,7 +33,7 @@ const workspace = {
   paramSetting: (source_id:string) =>
     hasPermission(
       [
-        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        new ComplexPermission([RoleConst.USER],[PermissionConst.MODEL.getModelWorkspaceResourcePermission(source_id)],[],'AND'),
         PermissionConst.MODEL_EDIT.getModelWorkspaceResourcePermission(source_id),
         PermissionConst.MODEL_EDIT.getWorkspacePermissionWorkspaceManageRole
       ],
@@ -41,7 +42,7 @@ const workspace = {
   delete: (source_id:string) =>
     hasPermission(
       [
-        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        new ComplexPermission([RoleConst.USER],[PermissionConst.MODEL.getModelWorkspaceResourcePermission(source_id)],[],'AND'),
         PermissionConst.MODEL_DELETE.getModelWorkspaceResourcePermission(source_id),
         PermissionConst.MODEL_DELETE.getWorkspacePermissionWorkspaceManageRole
       ],

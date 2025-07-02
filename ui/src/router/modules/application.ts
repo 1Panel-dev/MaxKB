@@ -6,7 +6,6 @@ const applicationRouter = {
     title: 'views.application.title',
     menu: true,
     permission: [
-      RoleConst.ADMIN,
       RoleConst.USER.getWorkspaceRole,
       RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
       PermissionConst.APPLICATION_READ.getWorkspacePermissionWorkspaceManageRole,

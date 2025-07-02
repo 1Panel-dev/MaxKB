@@ -24,6 +24,7 @@ const workspace = {
   delete: (source_id:string) =>
     hasPermission(
       [
+        new ComplexPermission([RoleConst.USER],[PermissionConst.TOOL.getToolWorkspaceResourcePermission(source_id)],[],'AND'),
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
         PermissionConst.TOOL_DELETE.getToolWorkspaceResourcePermission(source_id),
         PermissionConst.TOOL_DELETE.getWorkspacePermissionWorkspaceManageRole
@@ -33,6 +34,7 @@ const workspace = {
   switch: (source_id:string) =>
     hasPermission(
       [
+        new ComplexPermission([RoleConst.USER],[PermissionConst.TOOL.getToolWorkspaceResourcePermission(source_id)],[],'AND'),
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
         PermissionConst.TOOL_EDIT.getToolWorkspaceResourcePermission(source_id),
         PermissionConst.TOOL_EDIT.getWorkspacePermissionWorkspaceManageRole
@@ -42,6 +44,7 @@ const workspace = {
   edit: (source_id:string) =>
     hasPermission(
       [
+        new ComplexPermission([RoleConst.USER],[PermissionConst.TOOL.getToolWorkspaceResourcePermission(source_id)],[],'AND'),
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
         PermissionConst.TOOL_EDIT.getToolWorkspaceResourcePermission(source_id),
         PermissionConst.TOOL_EDIT.getWorkspacePermissionWorkspaceManageRole
@@ -51,8 +54,8 @@ const workspace = {
   copy: (source_id:string) =>
     hasPermission(
       [
+        new ComplexPermission([RoleConst.USER],[PermissionConst.TOOL.getToolWorkspaceResourcePermission(source_id)],[],'AND'),
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-        RoleConst.USER.getWorkspaceRole,
         PermissionConst.TOOL_EXPORT.getToolWorkspaceResourcePermission(source_id),
         PermissionConst.TOOL_EXPORT.getWorkspacePermissionWorkspaceManageRole
       ],
@@ -61,8 +64,8 @@ const workspace = {
   export: (source_id:string) =>
     hasPermission(
       [
+        new ComplexPermission([RoleConst.USER],[PermissionConst.TOOL.getToolWorkspaceResourcePermission(source_id)],[],'AND'),
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-        RoleConst.USER.getWorkspaceRole,
         PermissionConst.TOOL_EXPORT.getToolWorkspaceResourcePermission(source_id),
         PermissionConst.TOOL_EXPORT.getWorkspacePermissionWorkspaceManageRole
       ],
@@ -70,9 +73,9 @@ const workspace = {
     ), 
   debug: (source_id:string) =>
     hasPermission(
-      [
+      [ 
+        new ComplexPermission([RoleConst.USER],[PermissionConst.TOOL.getToolWorkspaceResourcePermission(source_id)],[],'AND'),
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-        RoleConst.USER.getWorkspaceRole,
         PermissionConst.TOOL_DEBUG.getToolWorkspaceResourcePermission(source_id),
         PermissionConst.TOOL_DEBUG.getWorkspacePermissionWorkspaceManageRole
       ],
