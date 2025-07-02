@@ -148,7 +148,7 @@ async function getWorkspaceFormItem() {
                 callback();
               }
             },
-            trigger: 'change',
+            trigger: 'blur',
           },
         ],
         selectProps: {

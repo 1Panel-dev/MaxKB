@@ -96,7 +96,7 @@
           <template #default="{ row }">
             <el-popover :width="400">
               <template #reference>
-                <TagGroup class="cursor" :tags="row.role_name" tooltipDisabled/>
+                <TagGroup class="cursor" style="width: fit-content;" :tags="row.role_name" tooltipDisabled/>
               </template>
               <template #default>
                 <el-table :data="row.role_workspace">
