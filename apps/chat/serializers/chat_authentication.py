@@ -125,7 +125,8 @@ class ApplicationProfileSerializer(serializers.Serializer):
                                             'custom_theme': application_setting.custom_theme,
                                             'user_avatar': application_setting.user_avatar,
                                             'show_user_avatar': application_setting.show_user_avatar,
-                                            'float_location': application_setting.float_location}
+                                            'float_location': application_setting.float_location,
+                                            'chat_background': application_setting.chat_background}
         base_node = [node for node in ((application.work_flow or {}).get('nodes', []) or []) if
                      node.get('id') == 'base-node']
         return {**ApplicationSerializerModel(application).data,
