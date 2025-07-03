@@ -570,13 +570,18 @@ def update_user_role(instance, user):
             # 需要判断当前角色的权限 不能删除系统管理员 空间管理员 普通管理员等角色
             # role_setting是一个数组 结构式 [{role_id:1,workspace_ids:[1,2]}]
             # 如果role_id不包含ADMIN 就直接报错   如果WORKSPACE_MANAGE 或者USER 必须判断workspace_ids是否包含默认工作空间 不包含就报错
-            admin_role_id = RoleConstants.ADMIN.value
+            admin_role_id = RoleConstants.ADMIN.name
+            workspace_manage_role_id = RoleConstants.WORKSPACE_MANAGE.name
+            # 判断内置的三个角色是不是不在
+            current_role_ids = {item['role_id'] for item in role_setting}
+            initial_role = [admin_role_id, workspace_manage_role_id, RoleConstants.USER.name]
+            if not set(initial_role).issubset(current_role_ids):
+                raise AppApiException(1004, _("Cannot delete built-in role"))
 
             if not any(item['role_id'] == str(admin_role_id) for item in role_setting):
                 raise AppApiException(1004, _("Cannot delete built-in role"))
 
             # 验证 WORKSPACE_MANAGE 或 USER 是否包含默认工作空间
-            workspace_manage_role_id = RoleConstants.WORKSPACE_MANAGE.value
             default_workspace_id = 'default'
 
             for item in role_setting:
