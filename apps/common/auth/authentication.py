@@ -48,7 +48,11 @@ def exist_permissions_by_view_permission(user_role: List[RoleConstants],
     :param permission:       所属权限
     :return:                 是否存在 True False
     """
-    role_ok = any(list(map(lambda ur: permission.roleList.__contains__(ur), user_role)))
+
+    role_list =  [user_r(request, kwargs) if callable(user_r) else user_r for user_r in
+     permission.roleList]
+    role_ok = any(list(map(lambda up: role_list.__contains__(up),
+                                 role_list)))
     permission_list = [user_p(request, kwargs) if callable(user_p) else user_p for user_p in
                        permission.permissionList
                        ]
