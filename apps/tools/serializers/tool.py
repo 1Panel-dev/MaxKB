@@ -7,7 +7,6 @@ import re
 
 import uuid_utils.compat as uuid
 from django.core import validators
-from django.core.cache import cache
 from django.db import transaction
 from django.db.models import QuerySet, Q
 from django.http import HttpResponse
@@ -16,8 +15,6 @@ from pylint.lint import Run
 from pylint.reporters import JSON2Reporter
 from rest_framework import serializers, status
 
-from common.constants.cache_version import Cache_Version
-from common.constants.permission_constants import ResourceAuthType, ResourcePermission
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import page_search, native_page_search
 from common.exception.app_exception import AppApiException
@@ -512,19 +509,11 @@ class ToolSerializer(serializers.Serializer):
             tool.save()
 
             # 自动授权给创建者
-            WorkspaceUserResourcePermission(
-                target=tool_id,
-                auth_target_type=AuthTargetType.TOOL,
-                permission_list=[ResourcePermission.VIEW, ResourcePermission.MANAGE],
-                workspace_id=self.data.get('workspace_id'),
-                user_id=self.data.get('user_id'),
-                auth_type=ResourceAuthType.RESOURCE_PERMISSION_GROUP
-            ).save()
-
-            # 刷新缓存
-            version = Cache_Version.PERMISSION_LIST.get_version()
-            key = Cache_Version.PERMISSION_LIST.get_key(user_id=self.data.get('user_id'))
-            cache.delete(key, version=version)
+            UserResourcePermissionSerializer(data={
+                'workspace_id': self.data.get('workspace_id'),
+                'user_id': self.data.get('user_id'),
+                'auth_target_type': AuthTargetType.TOOL.value
+            }).auth_resource(str(tool_id))
 
             return ToolModelSerializer(tool).data
 
