@@ -397,8 +397,9 @@ class ToolSerializer(serializers.Serializer):
             except Exception as e:
                 raise AppApiException(1001, _("Unsupported file format"))
             tool = tool_instance.tool
+            tool_id = uuid.uuid7()
             tool_model = Tool(
-                id=uuid.uuid7(),
+                id=tool_id,
                 name=tool.get('name'),
                 desc=tool.get('desc'),
                 code=tool.get('code'),
@@ -411,6 +412,14 @@ class ToolSerializer(serializers.Serializer):
                 is_active=False
             )
             tool_model.save()
+
+            # 自动授权给创建者
+            UserResourcePermissionSerializer(data={
+                'workspace_id': self.data.get('workspace_id'),
+                'user_id': self.data.get('user_id'),
+                'auth_target_type': AuthTargetType.TOOL.value
+            }).auth_resource(str(tool_id))
+
             return True
 
     class IconOperate(serializers.Serializer):
