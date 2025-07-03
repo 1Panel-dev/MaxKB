@@ -65,11 +65,11 @@ const useApplicationStore = defineStore('application', {
         console.log('xxxx')
         applicationApi
           .getAppProfile(loading)
-          .then((res) => {
+          .then((res: any) => {
             sessionStorage.setItem('language', res.data?.language || getBrowserLang())
             resolve(res)
           })
-          .catch((error) => {
+          .catch((error: any) => {
             reject(error)
           })
       })
@@ -83,12 +83,12 @@ const useApplicationStore = defineStore('application', {
       return new Promise((resolve, reject) => {
         applicationApi
           .postAppAuthentication(token, loading, authentication_value)
-          .then((res) => {
+          .then((res: any) => {
             localStorage.setItem(`${token}-accessToken`, res.data)
             sessionStorage.setItem(`${token}-accessToken`, res.data)
             resolve(res)
           })
-          .catch((error) => {
+          .catch((error: any) => {
             reject(error)
           })
       })

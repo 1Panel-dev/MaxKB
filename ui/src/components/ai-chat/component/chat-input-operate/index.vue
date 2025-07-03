@@ -456,7 +456,7 @@ const uploadFile = async (file: any, fileList: any) => {
       formData,
       localLoading,
     )
-    .then((response) => {
+    .then((response: any) => {
       fileList.splice(0, fileList.length)
       uploadImageList.value.forEach((file: any) => {
         const f = response.data.filter(
