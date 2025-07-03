@@ -83,7 +83,7 @@
 
     <template #footer>
       <el-button @click="centerDialogVisible = false"> {{ $t('common.cancel') }}</el-button>
-      <el-button type="primary" @click="handleConfirm"> {{ $t('common.add') }}</el-button>
+      <el-button type="primary" @click="handleConfirm"> {{ $t('common.save') }}</el-button>
     </template>
   </el-dialog>
 </template>

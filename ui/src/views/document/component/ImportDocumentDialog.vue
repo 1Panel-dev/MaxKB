@@ -27,7 +27,7 @@
         />
       </el-form-item>
       <el-form-item
-        v-else-if="!isImport && documentType === '1'"
+        v-else-if="!isImport && documentType === 1"
         :label="$t('views.document.form.source_url.label')"
         prop="source_url"
       >
@@ -36,7 +36,7 @@
           :placeholder="$t('views.document.form.source_url.requiredMessage')"
         />
       </el-form-item>
-      <el-form-item :label="$t('views.document.form.selector.label')" v-if="documentType === '1'">
+      <el-form-item :label="$t('views.document.form.selector.label')" v-if="documentType === 1">
         <el-input
           v-model="form.selector"
           :placeholder="$t('views.document.form.selector.placeholder')"
@@ -185,7 +185,7 @@ const open = (row: any, list: Array<string>) => {
     documentList.value = list
   } else {
     // 导入 只有web文档类型
-    documentType.value = '1'
+    documentType.value = 1
     isImport.value = true
   }
   dialogVisible.value = true
