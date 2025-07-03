@@ -1,7 +1,7 @@
 import { SourceTypeEnum } from '@/enums/common'
 import { get_next_route } from '@/utils/permission'
 
-import { PermissionConst, RoleConst } from '@/utils/permission/data'
+import { EditionConst, PermissionConst, RoleConst } from '@/utils/permission/data'
 import { ComplexPermission } from '@/utils/permission/type'
 
 const ApplicationDetailRouter = {
@@ -77,15 +77,13 @@ const ApplicationDetailRouter = {
         permission: [
           () => {
               const to: any = get_next_route()
-           return new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission( to ? to.params.id : '',)],[],'AND')},
-          RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-          PermissionConst.APPLICATION_ACCESS_READ.getWorkspacePermissionWorkspaceManageRole,
-          () => {
+           return new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission( to ? to.params.id : '',)],[EditionConst.IS_EE, EditionConst.IS_PE],'AND')},
+          new ComplexPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,],[PermissionConst.APPLICATION_ACCESS_READ.getWorkspacePermissionWorkspaceManageRole],[EditionConst.IS_EE, EditionConst.IS_PE],'OR'),
+          new ComplexPermission([],[() => {
             const to: any = get_next_route()
             return PermissionConst.APPLICATION_ACCESS_READ.getApplicationWorkspaceResourcePermission(
-              to ? to.params.id : '',
-            )
-          }
+              to ? to.params.id : '',)
+          }],[EditionConst.IS_EE, EditionConst.IS_PE],'OR'), 
         ]
       },
       component: () => import('@/views/application/ApplicationAccess.vue'),
@@ -104,14 +102,13 @@ const ApplicationDetailRouter = {
         permission: [
           () => {
               const to: any = get_next_route()
-           return new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission( to ? to.params.id : '',)],[],'AND')},
-          RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-          PermissionConst.APPLICATION_CHAT_USER_READ.getWorkspacePermissionWorkspaceManageRole,
+           return new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission( to ? to.params.id : '',)],[EditionConst.IS_EE, EditionConst.IS_PE],'AND')},
+          new ComplexPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],[PermissionConst.APPLICATION_CHAT_USER_READ.getWorkspacePermissionWorkspaceManageRole],[EditionConst.IS_EE, EditionConst.IS_PE],'OR')
+           ,
           () => {
             const to: any = get_next_route()
-            return PermissionConst.APPLICATION_CHAT_USER_READ.getApplicationWorkspaceResourcePermission(
-              to ? to.params.id : '',
-            )
+            return new ComplexPermission([],[PermissionConst.APPLICATION_CHAT_USER_READ.getApplicationWorkspaceResourcePermission(
+              to ? to.params.id : '',)],[EditionConst.IS_EE, EditionConst.IS_PE],'OR')  
           }
         ]
       },
