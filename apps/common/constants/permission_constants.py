@@ -52,6 +52,7 @@ class Group(Enum):
     MODEL = "MODEL"
     SYSTEM_MODEL = "SYSTEM_MODEL"
     SYSTEM_RES_MODEL = "SYSTEM_RESOURCE_MODEL"
+    SYSTEM_RES_APPLICATION = "SYSTEM_RESOURCE_APPLICATION"
 
     TOOL = "TOOL"
     SYSTEM_TOOL = "SYSTEM_TOOL"
@@ -360,6 +361,7 @@ Permission_Label = {
     Group.KNOWLEDGE_WORKSPACE_USER_RESOURCE_PERMISSION.value: _("Knowledge"),
     Group.MODEL_WORKSPACE_USER_RESOURCE_PERMISSION.value: _("Model"),
     Group.TOOL_WORKSPACE_USER_RESOURCE_PERMISSION.value: _("Tool"),
+    Group.SYSTEM_RES_APPLICATION.value: _("Application"),
 }
 
 
@@ -1189,6 +1191,10 @@ class PermissionConstants(Enum):
     RESOURCE_MODEL_READ = Permission(
         group=Group.SYSTEM_RES_MODEL, operate=Operate.READ, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.RESOURCE_MODEL]
+    )
+    RESOURCE_APPLICATION_READ = Permission(
+        group=Group.SYSTEM_RES_APPLICATION, operate=Operate.READ, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.RESOURCE_APPLICATION]
     )
     RESOURCE_TOOL_READ = Permission(
         group=Group.SYSTEM_RES_TOOL, operate=Operate.READ, role_list=[RoleConstants.ADMIN],
