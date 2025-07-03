@@ -70,7 +70,10 @@
                       </span>
                       <div @click.stop v-show="mouseId === row.id && row.id !== 'new'">
                         <el-dropdown trigger="click" :teleported="false">
-                          <el-icon class="rotate-90 mt-4"><MoreFilled /></el-icon>
+                          <el-button text>
+                            <el-icon><MoreFilled /></el-icon>
+                          </el-button>
+
                           <template #dropdown>
                             <el-dropdown-menu>
                               <el-dropdown-item @click.stop="editLogTitle(row)">

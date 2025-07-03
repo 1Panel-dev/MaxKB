@@ -278,7 +278,7 @@ function deleteProblem(row: any) {
     `${t('views.problem.delete.confirmMessage1')} ${row.paragraph_count} ${t('views.problem.delete.confirmMessage2')}`,
     {
       confirmButtonText: t('common.confirm'),
-      confirmButtonClass: 'color-danger',
+      confirmButtonClass: 'danger',
     },
   )
     .then(() => {

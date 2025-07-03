@@ -419,7 +419,7 @@ async function changeState(row: any) {
       t('views.tool.disabled.confirmMessage'),
       {
         confirmButtonText: t('common.status.disable'),
-        confirmButtonClass: 'color-danger',
+        confirmButtonClass: 'danger',
       },
     ).then(() => {
       const obj = {
@@ -497,12 +497,12 @@ function exportTool(row: any) {
 
 function deleteTool(row: any) {
   MsgConfirm(
-    `${t('views.tool.delete.confirmTitle')}${row.name} ?`,
+    `${t('views.tool.delete.confirmTitle')}：${row.name} ?`,
     t('views.tool.delete.confirmMessage'),
     {
       confirmButtonText: t('common.confirm'),
       cancelButtonText: t('common.cancel'),
-      confirmButtonClass: 'color-danger',
+      confirmButtonClass: 'danger',
     },
   )
     .then(() => {

@@ -1,7 +1,5 @@
 export default {
   title: '工具',
-  internalTitle: '內置工具',
-  added: '已新增',
   createTool: '建立工具',
   editTool: '編輯工具',
   copyTool: '複製工具',
@@ -16,7 +14,7 @@ export default {
     image: '圖像',
     developer: '開發者',
     communication: '通信',
-    searchResult: '的搜索結果 {count} 個'
+    searchResult: '的搜索結果 {count} 個',
   },
   searchBar: {
     placeholder: '按工具名稱搜尋',
@@ -26,7 +24,7 @@ export default {
   },
   delete: {
     confirmTitle: '是否刪除工具：',
-    confirmMessage: '刪除後，引用該工具的應用在查詢時會報錯，請謹慎操作。',
+    confirmMessage: '刪除後，引用該函數的應用在查詢時會報錯，請謹慎操作。',
   },
   disabled: {
     confirmTitle: '是否停用工具：',
@@ -35,6 +33,7 @@ export default {
   form: {
     toolName: {
       label: '名稱',
+      name: '工具名稱',
       placeholder: '請輸入工具名稱',
       requiredMessage: '請輸入工具名稱',
     },

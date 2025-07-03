@@ -4,8 +4,8 @@ export default {
   providerPlaceholder: '选择供应商',
   addModel: '添加模型',
   delete: {
-    confirmTitle: '删除模型',
-    confirmMessage: '是否删除模型：',
+    confirmTitle: '是否删除：',
+    confirmMessage: '模型删除后将影响正在使用该模型的资源，请谨慎操作。',
   },
   tip: {
     createSuccessMessage: '创建模型成功',
