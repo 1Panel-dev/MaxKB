@@ -6,7 +6,6 @@ const ModelRouter = {
     title: 'views.knowledge.title',
     menu: true,
     permission: [
-      RoleConst.ADMIN,
       RoleConst.USER.getWorkspaceRole,
       RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
       PermissionConst.KNOWLEDGE_READ.getWorkspacePermission,
