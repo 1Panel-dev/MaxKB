@@ -222,8 +222,8 @@
         </el-button>
       </div>
       <div
-        class="chat-pc__right"
-        :style="{ backgroundImage: `url(${applicationDetail?.custom_theme?.chat_background})` }"
+        class="chat-pc__right chat-background"
+        :style="{ backgroundImage: `url(${applicationDetail?.chat_background})` }"
       >
         <el-splitter>
           <el-splitter-panel>
