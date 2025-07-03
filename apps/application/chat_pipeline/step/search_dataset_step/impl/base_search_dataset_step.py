@@ -28,12 +28,12 @@ from models_provider.tools import get_model
 
 
 def get_model_by_id(_id, workspace_id):
-    model = QuerySet(Model).filter(id=_id, model_type="EMBEDDING").first()
+    model = QuerySet(Model).filter(id=_id, model_type="EMBEDDING")
+    get_authorized_model = DatabaseModelManage.get_model("get_authorized_model")
+    if get_authorized_model is not None:
+        model = get_authorized_model(model, workspace_id)
     if model is None:
         raise Exception(_("Model does not exist"))
-    if model.workspace_id is not None:
-        if model.workspace_id != workspace_id:
-            raise Exception(_("Model does not exist"))
     return model
 
 

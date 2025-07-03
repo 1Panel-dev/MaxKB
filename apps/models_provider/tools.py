@@ -10,6 +10,7 @@ from django.db import connection
 from django.db.models import QuerySet
 
 from common.config.embedding_config import ModelManage
+from common.database_model_manage.database_model_manage import DatabaseModelManage
 from models_provider.models import Model
 from django.utils.translation import gettext_lazy as _
 
@@ -104,13 +105,12 @@ def is_valid_credential(provider, model_type, model_name, model_credential: Dict
 
 
 def get_model_by_id(_id, workspace_id):
-    model = QuerySet(Model).filter(id=_id).first()
+    model = QuerySet(Model).filter(id=_id)
+    get_authorized_model = DatabaseModelManage.get_model("get_authorized_model")
+    if get_authorized_model is not None:
+        model = get_authorized_model(model, workspace_id)
     if model is None:
-        raise Exception(_('Model does not exist'))
-    if model.workspace_id:
-        if model.workspace_id != workspace_id:
-            raise Exception(_('Model does not exist'))
-
+        raise Exception(_("Model does not exist"))
     return model
 
 
