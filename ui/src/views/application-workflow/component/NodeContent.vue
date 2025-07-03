@@ -15,7 +15,7 @@
             <div class="list-item flex align-center border border-r-6 p-8-12 cursor" style="width: 39%"
               @click.stop="emit('clickNodes', item)" @mousedown.stop="emit('onmousedown', item)">
               <el-avatar v-if="isAppIcon(item?.icon)" shape="square" :size="32" style="background: none">
-                <img :src="item?.icon" alt="" />
+                <img :src="resetUrl(item?.icon)" alt="" />
               </el-avatar>
               <el-avatar v-else class="avatar-green" shape="square" :size="32">
                 <img src="@/assets/node/icon_tool.svg" style="width: 58%" alt="" />
@@ -28,7 +28,7 @@
             <div class="flex-between mb-8">
               <div class="flex align-center">
                 <el-avatar v-if="isAppIcon(item?.icon)" shape="square" :size="32" style="background: none">
-                  <img :src="item?.icon" alt="" />
+                  <img :src="resetUrl(item?.icon)" alt="" />
                 </el-avatar>
                 <el-avatar v-else class="avatar-green" shape="square" :size="32">
                   <img src="@/assets/node/icon_tool.svg" style="width: 58%" alt="" />
@@ -54,7 +54,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { isAppIcon } from '@/utils/common'
+import {isAppIcon, resetUrl} from '@/utils/common'
 import { isWorkFlow } from '@/utils/application'
 
 const props = defineProps<{
