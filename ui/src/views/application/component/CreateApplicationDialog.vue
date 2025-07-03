@@ -82,16 +82,17 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import {ref, watch, reactive} from 'vue'
-import {useRouter, useRoute} from 'vue-router'
-import type {ApplicationFormType} from '@/api/type/application'
-import type {FormInstance, FormRules} from 'element-plus'
+import { ref, watch, reactive } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import type { ApplicationFormType } from '@/api/type/application'
+import type { FormInstance, FormRules } from 'element-plus'
 import applicationApi from '@/api/application/application'
-import {MsgSuccess, MsgAlert} from '@/utils/message'
-import {isWorkFlow} from '@/utils/application'
-import {baseNodes} from '@/workflow/common/data'
-import {t} from '@/locales'
-
+import { MsgSuccess, MsgAlert } from '@/utils/message'
+import { isWorkFlow } from '@/utils/application'
+import { baseNodes } from '@/workflow/common/data'
+import { t } from '@/locales'
+import useStore from '@/stores'
+const { user } = useStore()
 const router = useRouter()
 const emit = defineEmits(['refresh'])
 
@@ -227,17 +228,19 @@ const submitHandle = async (formEl: FormInstance | undefined) => {
       }
       console.log(applicationForm.value.type)
       applicationApi
-        .postApplication(
-          {...applicationForm.value, folder_id: currentFolder.value},
-          loading,
-        )
+        .postApplication({ ...applicationForm.value, folder_id: currentFolder.value }, loading)
+        .then((res) => {
+          return user.profile().then(() => {
+            return res
+          })
+        })
         .then((res) => {
           MsgSuccess(t('common.createSuccess'))
           emit('refresh')
           if (isWorkFlow(applicationForm.value.type)) {
-            router.push({path: `/application/${res.data.id}/workflow`})
+            router.push({ path: `/application/${res.data.id}/workflow` })
           } else {
-            router.push({path: `/application/${res.data.id}/${res.data.type}/setting`})
+            router.push({ path: `/application/${res.data.id}/${res.data.type}/setting` })
           }
           dialogVisible.value = false
         })
@@ -249,7 +252,7 @@ function selectedType(type: string) {
   appTemplate.value = type
 }
 
-defineExpose({open})
+defineExpose({ open })
 </script>
 <style lang="scss" scoped>
 .radio-card {

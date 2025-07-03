@@ -40,7 +40,8 @@ from knowledge.serializers.knowledge import KnowledgeSerializer, KnowledgeModelS
 from maxkb.conf import PROJECT_DIR
 from models_provider.models import Model
 from models_provider.tools import get_model_instance_by_model_workspace_id
-from system_manage.models import WorkspaceUserResourcePermission
+from system_manage.models import WorkspaceUserResourcePermission, AuthTargetType
+from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
 from tools.models import Tool, ToolScope
 from tools.serializers.tool import ToolModelSerializer
 from users.models import User
@@ -430,9 +431,15 @@ class ApplicationSerializer(serializers.Serializer):
     def insert(self, instance: Dict):
         application_type = instance.get('type')
         if 'WORK_FLOW' == application_type:
-            return self.insert_workflow(instance)
+            r = self.insert_workflow(instance)
         else:
-            return self.insert_simple(instance)
+            r = self.insert_simple(instance)
+        UserResourcePermissionSerializer(data={
+            'workspace_id': self.data.get('workspace_id'),
+            'user_id': self.data.get('user_id'),
+            'auth_target_type': AuthTargetType.APPLICATION.value
+        }).auth_resource(str(r.get('id')))
+        return r
 
     def insert_workflow(self, instance: Dict):
         self.is_valid(raise_exception=True)
