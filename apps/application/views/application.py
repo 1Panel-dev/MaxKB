@@ -71,7 +71,7 @@ class ApplicationAPI(APIView):
                      RoleConstants.USER.get_workspace_role(),
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def get(self, request: Request, workspace_id: str):
-        return result.success(Query(data={'workspace_id': workspace_id, 'user_id': request.user.id}).list(request.data))
+        return result.success(Query(data={'workspace_id': workspace_id, 'user_id': request.user.id}).list(request.query_params))
 
     class Page(APIView):
         authentication_classes = [TokenAuth]
