@@ -895,7 +895,7 @@ function syncLarkMulDocument() {
     }
   })
   loadSharedApi({ type: 'document', systemType: apiType.value })
-    .delMulLarkSyncDocument(id, arr, loading)
+    .putMulLarkSyncDocument(id, arr, loading)
     .then(() => {
       MsgSuccess(t('views.document.sync.successMessage'))
       getList()
