@@ -18,7 +18,7 @@ Object.defineProperty(prefix, 'value', {
  * 工具列表带分页（无分页）
  * @params 参数 {folder_id: string}
  */
-const getToolList: (data?: any, loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (
+const getToolList: (data?: any, loading?: Ref<boolean>) => Promise<Result<{tools: any[], folders: any[]}>> = (
   data,
   loading,
 ) => {

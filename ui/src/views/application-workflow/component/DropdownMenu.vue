@@ -19,17 +19,13 @@
             <template v-for="(node, index) in filter_menu_nodes" :key="index">
               <el-text type="info" size="small" class="color-secondary ml-12">{{
                 node.label
-              }}</el-text>
+                }}</el-text>
               <div class="flex-wrap mt-8">
                 <template v-for="(item, index) in node.list" :key="index">
                   <el-popover placement="right" :width="280">
                     <template #reference>
-                      <div
-                        class="flex align-center border border-r-6 mb-12 p-8-12 cursor ml-12"
-                        style="width: 39%"
-                        @click.stop="clickNodes(item)"
-                        @mousedown.stop="onmousedown(item)"
-                      >
+                      <div class="list-item flex align-center border border-r-6 mb-12 p-8-12 cursor ml-12"
+                        style="width: 39%" @click.stop="clickNodes(item)" @mousedown.stop="onmousedown(item)">
                         <component
                           :is="iconComponent(`${item.type}-icon`)"
                           class="mr-8"
@@ -49,7 +45,7 @@
                       </div>
                       <el-text type="info" size="small" class="color-secondary lighter">{{
                         item.text
-                      }}</el-text>
+                        }}</el-text>
                     </template>
                   </el-popover>
                 </template>
@@ -63,92 +59,40 @@
       </el-tab-pane>
       <el-tab-pane :label="$t('views.tool.title')" name="tool">
         <el-scrollbar height="400">
-          <div
-            class="workflow-dropdown-item cursor flex p-8-12"
-            @click.stop="clickNodes(toolNode)"
-            @mousedown.stop="onmousedown(toolNode)"
-          >
-            <component :is="iconComponent(`tool-lib-node-icon`)" class="mr-8 mt-4" :size="32" />
-            <div class="pre-wrap">
-              <div class="lighter">{{ toolNode.label }}</div>
-              <el-text type="info" size="small">{{ toolNode.text }}</el-text>
-            </div>
-          </div>
+          <!-- 共享工具 -->
+          <el-collapse expand-icon-position="left">
+            <el-collapse-item name="shared" :icon="CaretRight">
+              <template #title>
+                <div class="flex align-center">
+                  <AppIcon iconName="app-shared-active" style="font-size: 20px" class="color-primary"></AppIcon>
+                  <span class="ml-8 lighter">{{ $t('views.shared.shared_tool') }}</span>
+                </div>
+              </template>
+              <NodeContent :list="sharedToolList" @clickNodes="(val: any) => clickNodes(toolLibNode, val, 'tool')"
+                @onmousedown="(val: any) => onmousedown(toolLibNode, val, 'tool')" />
+            </el-collapse-item>
+          </el-collapse>
 
-          <template v-for="(item, index) in filter_tool_lib_list" :key="index">
-            <div
-              class="workflow-dropdown-item cursor flex p-8-12 align-center"
-              @click.stop="clickNodes(toolLibNode, item, 'tool')"
-              @mousedown.stop="onmousedown(toolLibNode, item, 'tool')"
-            >
-              <component
-                :is="iconComponent(`tool-lib-node-icon`)"
-                class="mr-8"
-                :size="32"
-                :item="item"
-              />
-
-              <div class="pre-wrap">
-                <div class="lighter ellipsis-1" :title="item.name">{{ item.name }}</div>
-                <p>
-                  <el-text
-                    class="ellipsis-1"
-                    type="info"
-                    size="small"
-                    :title="item.desc"
-                    v-if="item.desc"
-                    >{{ item.desc }}</el-text
-                  >
-                </p>
-              </div>
-            </div>
-          </template>
+          <el-tree :data="toolTreeData" node-key="id"
+            :props="{ children: 'children', isLeaf: 'isLeaf', class: getNodeClass }" lazy :load="loadNode">
+            <template #default="{ data, node }">
+              <NodeContent v-if="!data._fake" :data="data" :node="node"
+                @clickNodes="(val: any) => clickNodes(toolLibNode, val, 'tool')"
+                @onmousedown="(val: any) => onmousedown(toolLibNode, val, 'tool')" />
+            </template>
+          </el-tree>
         </el-scrollbar>
       </el-tab-pane>
       <el-tab-pane :label="$t('views.application.title')" name="application">
         <el-scrollbar height="400">
-          <div v-if="filter_application_list.length > 0">
-            <template v-for="(item, index) in filter_application_list" :key="index">
-              <div
-                class="workflow-dropdown-item cursor flex align-center p-8-12"
-                @click.stop="clickNodes(applicationNode, item, 'application')"
-                @mousedown.stop="onmousedown(applicationNode, item, 'application')"
-              >
-                <component
-                  :is="iconComponent(`application-node-icon`)"
-                  class="mr-8"
-                  :size="32"
-                  :item="item"
-                />
-                <div class="pre-wrap" style="width: 60%">
-                  <div class="lighter ellipsis" :title="item.name">
-                    {{ item.name }}
-                  </div>
-                  <p>
-                    <el-text
-                      class="ellipsis"
-                      type="info"
-                      size="small"
-                      :title="item.desc"
-                      v-if="item.desc"
-                      >{{ item.desc }}</el-text
-                    >
-                  </p>
-                </div>
-                <div class="status-tag" style="margin-left: auto">
-                  <el-tag type="warning" v-if="isWorkFlow(item.type)" style="height: 22px">
-                    {{ $t('views.application.workflow') }}</el-tag
-                  >
-                  <el-tag class="blue-tag" v-else style="height: 22px">{{
-                    $t('views.application.simple')
-                  }}</el-tag>
-                </div>
-              </div>
+          <el-tree :data="applicationTreeData" node-key="id"
+            :props="{ children: 'children', isLeaf: 'isLeaf', class: getNodeClass }" lazy :load="loadNode">
+            <template #default="{ data, node }">
+              <NodeContent v-if="!data._fake" :data="data" :node="node"
+                @clickNodes="(val: any) => clickNodes(applicationNode, val, 'application')"
+                @onmousedown="(val: any) => onmousedown(applicationNode, val, 'application')" />
             </template>
-          </div>
-          <div v-else class="ml-16 mt-8">
-            <el-text type="info">{{ $t('views.applicationWorkflow.tip.noData') }}</el-text>
-          </div>
+          </el-tree>
         </el-scrollbar>
       </el-tab-pane>
     </el-tabs>
@@ -156,11 +100,17 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
-import { menuNodes, toolNode, toolLibNode, applicationNode } from '@/workflow/common/data'
+import { menuNodes, toolLibNode, applicationNode } from '@/workflow/common/data'
 import { iconComponent } from '@/workflow/icons/utils'
-import applicationApi from '@/api/application/application'
+import ToolApi from '@/api/tool/tool'
 import { isWorkFlow } from '@/utils/application'
-import { isAppIcon } from '@/utils/common'
+import useStore from '@/stores'
+import NodeContent from './NodeContent.vue'
+import { SourceTypeEnum } from '@/enums/common'
+import sharedWorkspaceApi from '@/api/shared-workspace'
+import { CaretRight } from '@element-plus/icons-vue'
+import ApplicationApi from '@/api/application/application'
+
 const search_text = ref<string>('')
 const props = defineProps({
   show: {
@@ -174,23 +124,11 @@ const props = defineProps({
   workflowRef: Object,
 })
 
+const { folder } = useStore()
 const emit = defineEmits(['clickNodes', 'onmousedown'])
 
 const loading = ref(false)
 const activeName = ref('base')
-
-const toolList = ref<any[]>([])
-const filter_tool_lib_list = computed(() => {
-  return toolList.value.filter((item: any) =>
-    item.name.toLocaleLowerCase().includes(search_text.value.toLocaleLowerCase()),
-  )
-})
-const applicationList = ref<any[]>([])
-const filter_application_list = computed(() => {
-  return applicationList.value.filter((item: any) =>
-    item.name.toLocaleLowerCase().includes(search_text.value.toLocaleLowerCase()),
-  )
-})
 
 const filter_menu_nodes = computed(() => {
   if (!search_text.value) return menuNodes
@@ -234,10 +172,10 @@ function clickNodes(item: any, data?: any, type?: string) {
           ...(!fileUploadSetting
             ? {}
             : {
-                ...(fileUploadSetting.document ? { document_list: [] } : {}),
-                ...(fileUploadSetting.image ? { image_list: [] } : {}),
-                ...(fileUploadSetting.audio ? { audio_list: [] } : {}),
-              }),
+              ...(fileUploadSetting.document ? { document_list: [] } : {}),
+              ...(fileUploadSetting.image ? { image_list: [] } : {}),
+              ...(fileUploadSetting.audio ? { audio_list: [] } : {}),
+            }),
         }
       } else {
         item['properties']['node_data'] = {
@@ -279,10 +217,10 @@ function onmousedown(item: any, data?: any, type?: string) {
           ...(!fileUploadSetting
             ? {}
             : {
-                ...(fileUploadSetting.document ? { document_list: [] } : {}),
-                ...(fileUploadSetting.image ? { image_list: [] } : {}),
-                ...(fileUploadSetting.audio ? { audio_list: [] } : {}),
-              }),
+              ...(fileUploadSetting.document ? { document_list: [] } : {}),
+              ...(fileUploadSetting.image ? { image_list: [] } : {}),
+              ...(fileUploadSetting.audio ? { audio_list: [] } : {}),
+            }),
         }
       } else {
         item['properties']['node_data'] = {
@@ -297,17 +235,72 @@ function onmousedown(item: any, data?: any, type?: string) {
   emit('onmousedown', item)
 }
 
-function getList() {
-  // applicationApi.listTool(props.id, loading).then((res: any) => {
-  //   toolList.value = res.data
-  // })
-  // applicationApi.getApplicationList(props.id, loading).then((res: any) => {
-  //   applicationList.value = res.data
-  // })
+function getNodeClass(data: any) {
+  return data._fake ? 'tree-node--hidden' : ''
+}
+
+const loadNode = async (node: any, resolve: (children: any[]) => void) => {
+  if (node.level === 0) return resolve([])
+  try {
+    let folders
+    if (activeName.value === 'tool') {
+      const res = await ToolApi.getToolList({ folder_id: node.data.id })
+      node.data.cardList = res.data.tools
+      folders = res.data?.folders
+    } else {
+      const res = await ApplicationApi.getAllApplication({ folder_id: node.data.id })
+      node.data.cardList = res.data.filter(item => item.resource_type === "application")
+      folders = res.data.filter(item => item.resource_type === "folder")
+    }
+    const children = folders.map(f => ({
+      ...f,
+      children: [],
+      isLeaf: false,
+    }))
+
+    if (folders.length === 0 && node.data.cardList.length > 0) {
+      // 插一个假子节点，确保树节点是“可折叠”的
+      children.push({
+        id: `__placeholder__${node.data.id}`,
+        isLeaf: true,
+        _fake: true,
+      })
+    }
+
+    resolve(children)
+  } catch (e: any) {
+    resolve([]) // 失败也要 resolve，否则树会卡住              
+  }
+}
+
+const toolTreeData = ref<any[]>([])
+function getToolFolder() {
+  folder.asyncGetFolder(SourceTypeEnum.TOOL, {}, loading).then((res: any) => {
+    toolTreeData.value = res.data
+  })
+}
+
+const sharedToolList = ref<any[]>([])
+async function getShareTool() {
+  try {
+    const res = await sharedWorkspaceApi.getToolList(loading)
+    sharedToolList.value = res.data
+  } catch (error: any) {
+    console.error(error)
+  }
+}
+
+const applicationTreeData = ref<any[]>([])
+function getApplicationFolder() {
+  folder.asyncGetFolder(SourceTypeEnum.APPLICATION, {}, loading).then((res: any) => {
+    applicationTreeData.value = res.data
+  })
 }
 
 onMounted(() => {
-  // getList()
+  getShareTool()
+  getToolFolder()
+  getApplicationFolder()
 })
 </script>
 <style lang="scss" scoped>
@@ -334,6 +327,47 @@ onMounted(() => {
     &:hover {
       background: var(--app-text-color-light-1);
     }
+  }
+
+  .list-item {
+    &:hover {
+      border-color: var(--el-color-primary);
+    }
+  }
+
+  :deep(.el-collapse) {
+    border-top-width: 0;
+    .el-collapse-item__header {
+      height: 40px;
+      gap: 0;
+      .el-collapse-item__arrow {
+        font-size: 16px;
+        color: var(--app-text-color-secondary);
+        padding: 6px;
+      }
+    }
+    .el-collapse-item__content {
+      padding: 0 12px 16px 12px;
+      .list {
+        margin-top: 0;
+        transform: none;
+      }
+    }
+  }
+
+  :deep(.el-tree-node):focus>.el-tree-node__content {
+    background: transparent;
+  }
+  :deep(.el-tree-node__content) {
+    height: auto;
+    align-items: baseline;
+    &:hover {
+      background: transparent;
+    }
+  }
+
+  :deep(.tree-node--hidden) {
+    display: none !important;
   }
 }
 </style>
