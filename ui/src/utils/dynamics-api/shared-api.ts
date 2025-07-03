@@ -14,6 +14,7 @@ import paragraphSystemShareApi from '@/api/system-shared/paragraph'
 import problemSystemShareApi from '@/api/system-shared/problem'
 import chatUserSystemShareApi from '@/api/system-shared/chat-user'
 import workspaceApi from '@/api/workspace/workspace'
+import systemUserApi from '@/api/user/user'
 
 // 普通 API
 const workspaceApiMap = {
@@ -36,7 +37,7 @@ const systemShareApiMap = {
   paragraph: paragraphSystemShareApi,
   problem: problemSystemShareApi,
   chatUser: chatUserSystemShareApi,
-  workspace: workspaceApi, // 共享的应该查全部人吧
+  workspace: systemUserApi, // 共享的应该查全部人吧
 } as any
 
 // 资源管理 API

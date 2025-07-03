@@ -35,6 +35,16 @@ const getUserList: (loading?: Ref<boolean>) => Promise<Result<Record<string, any
 }
 
 /**
+ * 获取全部用户
+ */
+const getAllMemberList: (arg: string, loading?: Ref<boolean>) => Promise<Result<Record<string, any>[]>> = (
+  arg,
+  loading,
+) => {
+  return get('/user/list', undefined, loading)
+}
+
+/**
  * 校验验证码
  * @param request 请求对象
  * @param loading 接口加载器
@@ -91,6 +101,7 @@ export default {
   getUserProfile,
   getProfile,
   getUserList,
+  getAllMemberList,
   postResetPassword,
   checkCode,
   sendEmit,
