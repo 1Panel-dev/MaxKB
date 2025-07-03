@@ -8466,3 +8466,6 @@ msgstr ""
 
 msgid "Shared Knowledge/Document"
 msgstr ""
+
+msgid "System Application"
+msgstr ""

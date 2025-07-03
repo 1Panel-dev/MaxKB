@@ -390,7 +390,7 @@ class ModelSerializer(serializers.Serializer):
             queryset = self._build_query_params(workspace_id, workspace_manage, user_id)
             get_authorized_model = DatabaseModelManage.get_model("get_authorized_model")
 
-            shared_queryset = QuerySet(Model).filter(workspace_id='None')
+            shared_queryset = QuerySet(Model).none()
             if get_authorized_model is not None:
                 shared_queryset = self._build_query_params('None', False, user_id)['model_query_set']
                 shared_queryset = get_authorized_model(shared_queryset, workspace_id)
