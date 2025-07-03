@@ -1,6 +1,8 @@
 <template>
   <div class="flex align-center">
-    <el-button round @click="toUrl('https://maxkb.cn/pricing.html')" class="pricing-button mr-8">
+    <el-button round @click="toUrl('https://maxkb.cn/pricing.html')" class="pricing-button mr-8"
+      v-hasPermission="EditionConst.IS_CE"
+    >
       <AppIcon iconName="app-pricing" class="mr-8"></AppIcon>
       {{ $t('common.upgrade') }}
     </el-button>
@@ -47,6 +49,7 @@
 </template>
 <script setup lang="ts">
 import useStore from '@/stores'
+import { EditionConst, RoleConst } from '@/utils/permission/data';
 const { theme, user } = useStore()
 
 function toUrl(url: string) {
