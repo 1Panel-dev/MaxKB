@@ -7,7 +7,7 @@ from django.db.models import QuerySet
 
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.document_extract_node.i_document_extract_node import IDocumentExtractNode
-from knowledge.models import File
+from knowledge.models import File, FileSourceType
 from knowledge.serializers.document import split_handles, parse_table_handle_list, FileBufferHandle
 from oss.serializers.file import FileSerializer
 
@@ -62,7 +62,12 @@ class BaseDocumentExtractNode(IDocumentExtractNode):
                     'file_id': str(image.id)
                 }
                 file = bytes_to_uploaded_file(image.image, image.image_name)
-                FileSerializer(data={'file': file, 'meta': meta}).upload()
+                FileSerializer(data={
+                    'file': file,
+                    'meta': meta,
+                    'source_id': meta['application_id'],
+                    'source_type': FileSourceType.APPLICATION.value
+                }).upload()
 
         for doc in document:
             file = QuerySet(File).filter(id=doc['file_id']).first()

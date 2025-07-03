@@ -6,6 +6,7 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.text_to_speech_step_node.i_text_to_speech_node import ITextToSpeechNode
+from knowledge.models import FileSourceType
 from models_provider.tools import get_model_instance_by_model_workspace_id
 from oss.serializers.file import FileSerializer
 
@@ -55,7 +56,12 @@ class BaseTextToSpeechNode(ITextToSpeechNode):
             'chat_id': chat_id,
             'application_id': str(application.id) if application.id else None,
         }
-        file_url = FileSerializer(data={'file': file, 'meta': meta}).upload()
+        file_url = FileSerializer(data={
+            'file': file,
+            'meta': meta,
+            'source_id': meta['application_id'],
+            'source_type': FileSourceType.APPLICATION.value
+        }).upload()
         # 拼接一个audio标签的src属性
         audio_label = f'<audio src="{file_url}" controls style = "width: 300px; height: 43px"></audio>'
         file_id = file_url.split('/')[-1]

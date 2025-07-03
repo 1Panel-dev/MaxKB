@@ -8,6 +8,7 @@ from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.image_generate_step_node.i_image_generate_node import IImageGenerateNode
 from common.utils.common import bytes_to_uploaded_file
+from knowledge.models import FileSourceType
 from oss.serializers.file import FileSerializer
 from models_provider.tools import get_model_instance_by_model_workspace_id
 
@@ -45,7 +46,12 @@ class BaseImageGenerateNode(IImageGenerateNode):
                 'chat_id': chat_id,
                 'application_id': str(application.id) if application.id else None,
             }
-            file_url = FileSerializer(data={'file': file, 'meta': meta}).upload()
+            file_url = FileSerializer(data={
+                'file': file,
+                'meta': meta,
+                'source_id': meta['application_id'],
+                'source_type': FileSourceType.APPLICATION.value
+            }).upload()
             file_urls.append(file_url)
         self.context['image_list'] = [{'file_id': path.split('/')[-1], 'url': path} for path in file_urls]
         answer = ' '.join([f"![Image]({path})" for path in file_urls])
