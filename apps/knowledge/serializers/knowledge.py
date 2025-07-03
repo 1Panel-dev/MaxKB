@@ -409,6 +409,7 @@ class KnowledgeSerializer(serializers.Serializer):
             QuerySet(Paragraph).filter(knowledge=knowledge).delete()
             QuerySet(Problem).filter(knowledge=knowledge).delete()
             QuerySet(WorkspaceUserResourcePermission).filter(target=knowledge.id).delete()
+            QuerySet(ApplicationKnowledgeMapping).filter(knowledge_id=knowledge.id).delete()
             knowledge.delete()
             delete_embedding_by_knowledge(self.data.get('knowledge_id'))
             return True
