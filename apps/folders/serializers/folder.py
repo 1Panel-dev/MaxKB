@@ -259,14 +259,37 @@ class FolderTreeSerializer(serializers.Serializer):
     workspace_id = serializers.CharField(required=True, allow_null=True, allow_blank=True, label=_('workspace id'))
     source = serializers.CharField(required=True, label=_('source'))
 
+    @staticmethod
+    def _check_tree_integrity(queryset):
+        """检查树结构完整性"""
+        for folder in queryset:
+            if folder.lft >= folder.rght:
+                return True  # 需要重建
+            if folder.is_leaf_node() and folder.get_children().exists():
+                return True  # 需要重建
+        return False
+
     def get_folder_tree(self, name=None):
         self.is_valid(raise_exception=True)
         Folder = get_folder_type(self.data.get('source'))  # noqa
+
+        # 检查特定工作空间的树结构完整性
+        workspace_folders = Folder.objects.filter(workspace_id=self.data.get('workspace_id'))
+
+        # 如果发现数据不一致，重建整个表（这是 MPTT 的限制）
+        if self._check_tree_integrity(workspace_folders):
+            Folder.objects.rebuild()
+
         if name is not None:
-            nodes = Folder.objects.filter(Q(workspace_id=self.data.get('workspace_id')) &
-                                          Q(name__contains=name)).get_cached_trees()
+            nodes = Folder.objects.filter(
+                Q(workspace_id=self.data.get('workspace_id')) &
+                Q(name__contains=name)
+            ).get_cached_trees()
         else:
-            nodes = Folder.objects.filter(Q(workspace_id=self.data.get('workspace_id'))).get_cached_trees()
+            nodes = Folder.objects.filter(
+                Q(workspace_id=self.data.get('workspace_id'))
+            ).get_cached_trees()
+
         TreeSerializer = get_folder_tree_serializer(self.data.get('source'))  # noqa
         serializer = TreeSerializer(nodes, many=True)
         return serializer.data  # 这是可序列化的字典
