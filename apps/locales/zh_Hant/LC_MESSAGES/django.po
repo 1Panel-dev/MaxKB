@@ -3728,7 +3728,7 @@ msgstr ""
 #: apps/models_provider/impl/xinference_model_provider/credential/tti.py:14
 #: apps/models_provider/impl/zhipu_model_provider/credential/tti.py:15
 msgid "Image size"
-msgstr "每頁大小"
+msgstr "生成图像的宽高像素"
 
 #: apps/models_provider/impl/aliyun_bai_lian_model_provider/credential/tti.py:20
 #: apps/models_provider/impl/azure_model_provider/credential/tti.py:15

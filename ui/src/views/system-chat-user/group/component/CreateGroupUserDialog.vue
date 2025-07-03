@@ -51,23 +51,26 @@ const form = ref<{ user: string[] }>({
 
 const optionLoading = ref(false)
 const chatUserList = ref<ChatUserItem[]>([])
-
+const originalChatUserList = ref<ChatUserItem[]>([]);
 async function getChatUserList() {
   try {
     const res = await loadPermissionApi('chatUser').getChatUserList(optionLoading)
-    chatUserList.value = res.data
+    originalChatUserList.value = res.data;
+    chatUserList.value = [...res.data];
   } catch (e) {
     console.error(e)
   }
 }
 
-const filterUser = (query: string, item: ChatUserItem) => {
-  if (!query) return true;
+const filterUser = (query: string) => {
+  if (!query) {
+    chatUserList.value = originalChatUserList.value;
+    return;
+  }
+
   const q = query.toLowerCase();
-  return (
-    item.nick_name?.toLowerCase().includes(q) ||
-    item.username?.toLowerCase().includes(q) ||
-    false
+  chatUserList.value = originalChatUserList.value.filter(
+    (item) => item.nick_name?.toLowerCase().includes(q) || item.username?.toLowerCase().includes(q)
   );
 };
 

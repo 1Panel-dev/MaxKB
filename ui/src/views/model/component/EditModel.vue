@@ -73,7 +73,7 @@
             <div class="flex align-center" style="display: inline-flex">
               <div class="mr-4">
                 <span>{{ $t('views.model.modelForm.base_model.label') }} </span>
-                <span class="color-danger ml-4">{{
+                <span class="color-danger ml-4" style="color: red">{{
                   $t('views.model.modelForm.base_model.tooltip')
                 }}</span>
               </div>
