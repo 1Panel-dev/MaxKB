@@ -131,7 +131,7 @@ def page_not_found(request, exception):
             return HttpResponse("页面不存在", status=404)
         content = get_index_html(index_path)
         content = content.replace("prefix: '/admin'", f"prefix: '{CONFIG.get_admin_path()}'").replace(
-            "chatPrefix: '/chat'", f"prefix: '{CONFIG.get_chat_path()}'")
+            "chatPrefix: '/chat'", f"chatPrefix: '{CONFIG.get_chat_path()}'")
         return HttpResponse(content, status=200)
     else:
         return HttpResponseRedirect(admin_ui_prefix + '/')
