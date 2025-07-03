@@ -25,7 +25,7 @@ export default {
   refresh: '重新整理',
   search: '搜尋',
   clear: '清除',
-  professional: '購買專業版',
+  upgrade: '升級',
   createDate: '創建日期',
   createTime: '創建時間',
   operation: '操作',

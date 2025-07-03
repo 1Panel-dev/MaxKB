@@ -26,7 +26,7 @@ export default {
   refresh: '刷新',
   search: '搜索',
   clear: '清空',
-  professional: '购买专业版',
+  upgrade: '升级',
   createDate: '创建日期',
   createTime: '创建时间',
   operation: '操作',

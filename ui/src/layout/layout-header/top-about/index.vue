@@ -1,5 +1,9 @@
 <template>
-  <div>
+  <div class="flex align-center">
+    <el-button round @click="toUrl('https://maxkb.cn/pricing.html')" class="pricing-button mr-8">
+      <AppIcon iconName="app-pricing" class="mr-8"></AppIcon>
+      {{ $t('common.upgrade') }}
+    </el-button>
     <el-tooltip
       effect="dark"
       :content="$t('layout.github')"
@@ -43,9 +47,15 @@
 </template>
 <script setup lang="ts">
 import useStore from '@/stores'
-const { theme } = useStore()
+const { theme, user } = useStore()
 
 function toUrl(url: string) {
   window.open(url, '_blank')
 }
 </script>
+<style scoped lang="scss">
+.pricing-button {
+  background: linear-gradient(90deg, #3370ff 0%, #7f3bf5 100%);
+  color: #ffffff;
+}
+</style>

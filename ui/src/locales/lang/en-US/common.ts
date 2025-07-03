@@ -25,7 +25,7 @@ export default {
   refresh: 'Refresh',
   search: 'Search',
   clear: 'Clear',
-  professional: 'Purchase the Professional Edition',
+  upgrade: 'Upgrade',
   createDate: 'Create Date',
   createTime: 'Create Time',
   operation: 'Action',
