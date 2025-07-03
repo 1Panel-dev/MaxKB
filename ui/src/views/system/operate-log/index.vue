@@ -253,7 +253,7 @@ import DetailDialog from './component/DetailDialog.vue'
 import {t} from '@/locales'
 import {beforeDay, datetimeFormat, nowDate} from '@/utils/time'
 import useStore from "@/stores";
-import WorkspaceApi from "@/api/workspace/workspace.ts";
+import WorkspaceApi from "@/api/system/workspace.ts";
 
 const {user} = useStore()
 const popoverVisible = ref(false)

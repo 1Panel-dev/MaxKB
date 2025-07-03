@@ -8394,3 +8394,6 @@ msgstr ""
 
 msgid "Public access link"
 msgstr ""
+
+msgid "User management"
+msgstr "User Management"

@@ -8520,3 +8520,6 @@ msgstr "對話日誌"
 
 msgid "Public access link"
 msgstr "公共訪問鏈接"
+
+msgid "User management"
+msgstr "用戶管理"
