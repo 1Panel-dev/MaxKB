@@ -8397,3 +8397,72 @@ msgstr ""
 
 msgid "User management"
 msgstr "User Management"
+
+msgid "Chat User/logout"
+msgstr ""
+
+msgid "Paragraph"
+msgstr ""
+
+msgid "User group"
+msgstr ""
+
+msgid "Remove member from user group"
+msgstr ""
+
+msgid "Create a web site knowledge base"
+msgstr ""
+
+msgid "Modify knowledge base information"
+msgstr ""
+
+msgid "Delete knowledge base"
+msgstr ""
+
+msgid "model"
+msgstr "Model"
+
+msgid "Batch add user to group"
+msgstr ""
+
+msgid "Add internal tool"
+msgstr ""
+
+msgid "Batch generate related"
+msgstr ""
+
+msgid "Update personal system API_KEY"
+msgstr ""
+
+msgid "Delete user group"
+msgstr ""
+
+msgid "Add user"
+msgstr ""
+
+msgid "folder"
+msgstr "Folder"
+
+msgid "Create or update user group"
+msgstr ""
+
+msgid "Edit folder"
+msgstr ""
+
+msgid "Email settings"
+msgstr ""
+
+msgid "trial listening"
+msgstr ""
+
+msgid "Add personal system API_KEY"
+msgstr ""
+
+msgid "Add member to user group"
+msgstr ""
+
+msgid "System"
+msgstr ""
+
+msgid "Shared Knowledge/Document"
+msgstr ""

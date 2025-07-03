@@ -8523,3 +8523,72 @@ msgstr "公共访问链接"
 
 msgid "User management"
 msgstr "用户管理"
+
+msgid "Chat User/logout"
+msgstr "对话用户/登出"
+
+msgid "Paragraph"
+msgstr "段落"
+
+msgid "User group"
+msgstr "用戶組"
+
+msgid "Remove member from user group"
+msgstr "从用户组中移除成员"
+
+msgid "Create a web site knowledge base"
+msgstr "创建一个web知识库"
+
+msgid "Modify knowledge base information"
+msgstr "修改知识库信息"
+
+msgid "Delete knowledge base"
+msgstr "删除知识库"
+
+msgid "model"
+msgstr "模型"
+
+msgid "Batch add user to group"
+msgstr "批量添加用户到组"
+
+msgid "Add internal tool"
+msgstr "添加内置工具"
+
+msgid "Batch generate related"
+msgstr "批量生成相关"
+
+msgid "Update personal system API_KEY"
+msgstr "更新个人系统 API KEY"
+
+msgid "Delete user group"
+msgstr "删除用户组"
+
+msgid "Add user"
+msgstr "添加用户"
+
+msgid "folder"
+msgstr "文件夹"
+
+msgid "Create or update user group"
+msgstr "创建或更新用户组"
+
+msgid "Edit folder"
+msgstr "编辑文件夹"
+
+msgid "Email settings"
+msgstr "邮箱设置"
+
+msgid "trial listening"
+msgstr "试听"
+
+msgid "Add personal system API_KEY"
+msgstr "添加个人系统 API KEY"
+
+msgid "Add member to user group"
+msgstr "添加成员到用户组"
+
+msgid "System"
+msgstr "系统"
+
+msgid "Shared Knowledge/Document"
+msgstr "共享知识库/文档"
