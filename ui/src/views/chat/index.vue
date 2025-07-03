@@ -13,7 +13,7 @@ import { useRoute } from 'vue-router'
 import useStore from '@/stores'
 
 const route = useRoute()
-const { chatUser } = useStore()
+const { chatUser, common } = useStore()
 
 const components: any = import.meta.glob('@/views/chat/**/index.vue', {
   eager: true,
@@ -27,7 +27,7 @@ const {
 const currentTemplate = computed(() => {
   let modeName = ''
   if (!mode || mode === 'pc') {
-    modeName = 'pc'
+    modeName = common.isMobile() ? 'mobile' : 'pc'
   } else {
     modeName = mode
   }

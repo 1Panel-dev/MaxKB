@@ -57,7 +57,7 @@
                   <el-button
                     type="primary"
                     text
-                    @click="copyClick(form.authentication_value)"
+                    @click="copyClick(form.authentication_value.password_value)"
                     style="margin: 0 0 0 4px !important"
                   >
                     <AppIcon iconName="app-copy"></AppIcon>
