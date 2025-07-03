@@ -97,6 +97,7 @@ watch(dialogVisible, (bool) => {
       parent_id: '',
     }
     isEdit.value = false
+    FolderFormRef.value.resetFields()
   }
 })
 

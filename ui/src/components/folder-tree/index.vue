@@ -1,7 +1,7 @@
 <template>
   <div class="folder-tree">
     <el-input
-      v-model="filterText"
+      v-model.trim="filterText"
       :placeholder="$t('common.search')"
       prefix-icon="Search"
       clearable
@@ -161,6 +161,11 @@ const loading = ref(false)
 watch(filterText, (val) => {
   treeRef.value!.filter(val)
 })
+const filterNode = (value: string, data: Tree) => {
+  if (!value) return true
+  return data.name.toLowerCase().includes(value.toLowerCase())
+}
+
 let time: any
 
 function handleMouseEnter(data: Tree) {
@@ -172,10 +177,6 @@ function handleMouseleave() {
     clearTimeout(time)
     document.body.click()
   }, 300)
-}
-const filterNode = (value: string, data: Tree) => {
-  if (!value) return true
-  return data.name.includes(value)
 }
 
 const handleNodeClick = (data: Tree) => {

@@ -16,7 +16,6 @@
           lazy
           :load="loadTree"
           :placeholder="$t('views.chatLog.selectKnowledgePlaceholder')"
-          :loading="loading"
         >
           <template #default="{ data }">
             <div class="flex align-center">
@@ -93,14 +92,14 @@ const defaultProps = {
   isLeaf: (data: any) =>
     data.resource_type ? data.resource_type !== 'folder' : data.workspace_id === 'None',
   disabled: (data: any, node: any) => {
-    return data.id === id
+    return data.id === id || (data.resource_type === 'folder' && node?.isLeaf)
   },
 }
 
-const loadTree = (node: any, resolve: any) => {
+const loadTree = async (node: any, resolve: any) => {
   if (node.isLeaf) return resolve([])
   const folder_id = node.level === 0 ? user.getWorkspaceId() : node.data.id
-  loadSharedApi({ type: 'knowledge', systemType: apiType.value })
+  await loadSharedApi({ type: 'knowledge', systemType: apiType.value })
     .getKnowledgeList({ folder_id: folder_id }, loading)
     .then((res: any) => {
       resolve(res.data)

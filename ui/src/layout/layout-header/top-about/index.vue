@@ -44,6 +44,7 @@
 <script setup lang="ts">
 import useStore from '@/stores'
 const { theme } = useStore()
+
 function toUrl(url: string) {
   window.open(url, '_blank')
 }

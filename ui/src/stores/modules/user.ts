@@ -3,14 +3,11 @@ import { type Ref } from 'vue'
 import type { User } from '@/api/type/user'
 import UserApi from '@/api/user/user'
 import LoginApi from '@/api/user/login'
-import { cloneDeep } from 'lodash'
 import { useLocalStorage } from '@vueuse/core'
-// import { defaultPlatformSetting } from '@/utils/theme'
 
 import { localeConfigKey, getBrowserLang } from '@/locales/index'
 import useThemeStore from './theme'
-import { useElementPlusTheme } from 'use-element-plus-theme'
-import { defaultPlatformSetting } from '@/utils/theme.ts'
+import { defaultPlatformSetting } from '@/utils/theme'
 import useLoginStore from './login'
 
 export interface userStateTypes {
@@ -137,10 +134,10 @@ const useUserStore = defineStore('user', {
             if (this.isEE() || this.isPE()) {
               await theme.theme()
             } else {
+              theme.setTheme()
               theme.themeInfo = {
                 ...defaultPlatformSetting,
               }
-              theme.setTheme()
             }
             resolve(ok)
           })

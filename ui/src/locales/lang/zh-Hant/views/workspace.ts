@@ -2,6 +2,7 @@ export default {
   title: '工作空間',
   list: '工作空間列表',
   name: '工作空間名稱',
+  toWorkspace: '返回工作空間',
   delete: {
     confirmTitle: '是否刪除工作空間：',
     confirmContent: '刪除後，該空間下的成員都會被移除，請謹慎操作。',
@@ -10,6 +11,6 @@ export default {
   member: {
     delete: {
       confirmTitle: '是否移除成員：',
-    }
-  }
-};
+    },
+  },
+}

@@ -12,7 +12,7 @@
         <el-divider class="ml-8 mr-8" direction="vertical" />
         <el-button link @click="router.push({ path: '/' })">
           <AppIcon class="mr-8" iconName="app-workspace" style="font-size: 16px"></AppIcon>
-          {{ '返回工作空间' }}</el-button
+          {{ $t('views.workspace.toWorkspace') }}</el-button
         >
       </div>
     </div>
