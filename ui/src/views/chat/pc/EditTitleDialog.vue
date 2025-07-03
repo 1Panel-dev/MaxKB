@@ -1,36 +1,16 @@
 <template>
-  <el-dialog
-    class="responsive-dialog"
-    :title="$t('chat.editTitle')"
-    v-model="dialogVisible"
-    :close-on-click-modal="false"
-    :close-on-press-escape="false"
-    :destroy-on-close="true"
-    append-to-body
-  >
-    <el-form
-      label-position="top"
-      ref="fieldFormRef"
-      :model="form"
-      require-asterisk-position="right"
-    >
-      <el-form-item
-        prop="abstract"
-        :rules="[
-          {
-            required: true,
-            message: $t('common.inputPlaceholder'),
-            trigger: 'blur'
-          }
-        ]"
-      >
-        <el-input
-          v-model="form.abstract"
-          maxlength="1024"
-          show-word-limit
-          type="textarea"
-          @blur="form.abstract = form.abstract.trim()"
-        />
+  <el-dialog class="responsive-dialog" :title="$t('chat.editTitle')" v-model="dialogVisible"
+    :close-on-click-modal="false" :close-on-press-escape="false" :destroy-on-close="true" append-to-body>
+    <el-form label-position="top" ref="fieldFormRef" :model="form" require-asterisk-position="right">
+      <el-form-item prop="abstract" :rules="[
+        {
+          required: true,
+          message: $t('common.inputPlaceholder'),
+          trigger: 'blur'
+        }
+      ]">
+        <el-input v-model="form.abstract" maxlength="1024" show-word-limit type="textarea"
+          @blur="form.abstract = form.abstract.trim()" />
       </el-form-item>
     </el-form>
     <template #footer>
@@ -44,12 +24,9 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { reactive, ref, watch } from 'vue'
+import { ref } from 'vue'
 import type { FormInstance } from 'element-plus'
-import useStore from '@/stores'
-import { t } from '@/locales'
-
-const { chatLog } = useStore()
+import chatAPI from '@/api/chat/chat'
 const emit = defineEmits(['refresh'])
 
 const fieldFormRef = ref()
@@ -71,10 +48,11 @@ const open = (row: any, id: string) => {
 }
 
 const submit = async (formEl: FormInstance | undefined) => {
+
   if (!formEl) return
   await formEl.validate((valid) => {
     if (valid) {
-      chatLog.asyncPutChatClientLog(applicationId.value, chatId.value, form.value, loading).then(() => {
+      chatAPI.modifyChat(chatId.value, form.value, loading).then(() => {
         emit('refresh', chatId.value, form.value.abstract)
         dialogVisible.value = false
       })

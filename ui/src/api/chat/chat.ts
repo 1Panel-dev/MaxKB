@@ -264,6 +264,31 @@ const speechToText: (data: any, loading?: Ref<boolean>) => Promise<Result<any>> 
 ) => {
   return post(`speech_to_text`, data, undefined, loading)
 }
+/**
+ * 
+ * @param chat_id  对话ID
+ * @param loading 
+ * @returns 
+ */
+const deleteChat: (chat_id:string, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  chat_id,
+  loading,
+) => {
+  return del(`historical_conversation/${chat_id}`, loading)
+}
+/**
+ * 
+ * @param chat_id 对话id
+ * @param data    对话简介
+ * @param loading 
+ * @returns 
+ */
+const modifyChat: (chat_id:string, data:any, loading?: Ref<boolean> ) => Promise<Result<any>> = (
+  chat_id,data,loading
+) => {
+  return put(`historical_conversation/${chat_id}`, data, undefined, loading)
+}
+
 export default {
   open,
   chat,
@@ -290,4 +315,6 @@ export default {
   getChatRecord,
   textToSpeech,
   speechToText,
+  deleteChat,
+  modifyChat
 }

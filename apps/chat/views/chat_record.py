@@ -13,10 +13,10 @@ from rest_framework.views import APIView
 
 from application.serializers.application_chat_record import ChatRecordOperateSerializer
 from chat.api.chat_api import HistoricalConversationAPI, PageHistoricalConversationAPI, \
-    PageHistoricalConversationRecordAPI, HistoricalConversationRecordAPI
+    PageHistoricalConversationRecordAPI, HistoricalConversationRecordAPI, HistoricalConversationOperateAPI
 from chat.api.vote_api import VoteAPI
 from chat.serializers.chat_record import VoteSerializer, HistoricalConversationSerializer, \
-    HistoricalConversationRecordSerializer
+    HistoricalConversationRecordSerializer, HistoricalConversationOperateSerializer
 from common import result
 from common.auth import TokenAuth
 
@@ -59,6 +59,45 @@ class HistoricalConversationView(APIView):
                 'application_id': request.auth.application_id,
                 'chat_user_id': request.auth.chat_user_id,
             }).list())
+
+    class Operate(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['PUT'],
+            description=_("Modify conversation about"),
+            summary=_("Modify conversation about"),
+            operation_id=_("Modify conversation about"),  # type: ignore
+            parameters=HistoricalConversationOperateAPI.get_parameters(),
+            request=HistoricalConversationOperateAPI.get_request(),
+            responses=HistoricalConversationOperateAPI.get_response(),
+            tags=[_('Chat')]  # type: ignore
+        )
+        def put(self, request: Request, chat_id: str):
+            return result.success(HistoricalConversationOperateSerializer(
+                data={
+                    'application_id': request.auth.application_id,
+                    'chat_user_id': request.auth.chat_user_id,
+                    'chat_id': chat_id,
+                }).edit_abstract(request.data)
+                                  )
+
+        @extend_schema(
+            methods=['DELETE'],
+            description=_("Delete history conversation"),
+            summary=_("Delete history conversation"),
+            operation_id=_("Delete history conversation"),  # type: ignore
+            parameters=HistoricalConversationOperateAPI.get_parameters(),
+            responses=HistoricalConversationOperateAPI.get_response(),
+            tags=[_('Chat')]  # type: ignore
+        )
+        def delete(self, request: Request, chat_id: str):
+            return result.success(HistoricalConversationOperateSerializer(
+                data={
+                    'application_id': request.auth.application_id,
+                    'chat_user_id': request.auth.chat_user_id,
+                    'chat_id': chat_id,
+                }).logic_delete())
 
     class PageView(APIView):
         authentication_classes = [TokenAuth]
