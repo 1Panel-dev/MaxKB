@@ -75,7 +75,9 @@ export default {
       showHistory: '显示历史记录',
       displayGuide: '显示引导图(浮窗模式)',
       disclaimer: '免责声明',
-      disclaimerValue: '「以上内容均由 AI 生成，仅供参考和借鉴」'
+      disclaimerValue: '「以上内容均由 AI 生成，仅供参考和借鉴」',
+      chatBackground: '聊天背景',
+      chatBackgroundMessage: '支持 JPG、PNG、GIF，大小不超过 10 MB',
     }
   },
   monitor: {

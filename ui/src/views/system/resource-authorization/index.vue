@@ -269,8 +269,8 @@ function getMember(id?: string) {
     filterMember.value = res.data
 
     const user = (id && memberList.value.find((p: any) => p.user_id === id)) || null
-    currentUser.value = user ? user.id : memberList.value[0].id
-    currentType.value = user ? user.type : memberList.value[0].type
+    currentUser.value = user ? user.id : memberList.value?.[0].id
+    currentType.value = user ? user.type : memberList.value?.[0].type
     getWholeTree(currentUser.value)
   })
 }

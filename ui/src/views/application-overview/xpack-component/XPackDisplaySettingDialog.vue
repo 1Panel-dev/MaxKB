@@ -28,18 +28,22 @@
 
     <div class="flex">
       <div class="setting-preview border border-r-6 mr-16" style="min-width: 400px">
-        <div class="setting-preview-container">
+        <div
+          class="setting-preview-container"
+          :style="{ backgroundImage: `url(${imgUrl?.chat_background})` }"
+        >
           <div class="setting-preview-header" :style="customStyle">
             <div class="flex-between">
               <div class="flex align-center">
+                <!-- 应用头像 -->
                 <div class="mr-12 ml-24 flex">
                   <el-avatar
-                    v-if="isAppIcon(detail?.icon)"
+                    v-if="isAppIcon(imgUrl?.icon)"
                     shape="square"
                     :size="32"
                     style="background: none"
                   >
-                    <img :src="detail?.icon" alt="" />
+                    <img :src="imgUrl?.icon" alt="" />
                   </el-avatar>
                   <LogoIcon v-else height="32px" />
                 </div>
@@ -146,7 +150,7 @@
             </div>
           </div>
         </div>
-
+        <!-- 悬浮头像 -->
         <div class="float_icon">
           <el-image
             v-if="imgUrl.float_icon"
@@ -201,6 +205,59 @@
             />
           </el-select>
         </el-row>
+        <!-- 应用 LOGO -->
+        <el-card shadow="never" class="mb-8">
+          <div class="flex-between mb-8">
+            <span class="lighter">{{ $t('views.application.title') + ' LOGO' }}</span>
+            <span class="flex align-center">
+              <el-upload
+                class="ml-8"
+                ref="uploadRef"
+                action="#"
+                :auto-upload="false"
+                :show-file-list="false"
+                accept="image/jpeg, image/png, image/gif"
+                :on-change="(file: any, fileList: any) => onChange(file, fileList, 'icon')"
+              >
+                <el-button size="small">
+                  {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.replace') }}
+                </el-button>
+              </el-upload>
+            </span>
+          </div>
+          <el-text type="info" size="small">
+            {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.imageMessage') }}
+          </el-text>
+        </el-card>
+        <!-- 聊天背景 -->
+        <el-card shadow="never" class="mb-8">
+          <div class="flex-between mb-8">
+            <span class="lighter">{{
+              $t('views.applicationOverview.appInfo.SettingDisplayDialog.chatBackground')
+            }}</span>
+            <span class="flex align-center">
+              <el-upload
+                class="ml-8"
+                ref="uploadRef"
+                action="#"
+                :auto-upload="false"
+                :show-file-list="false"
+                accept="image/jpeg, image/png, image/gif"
+                :on-change="
+                  (file: any, fileList: any) => onChange(file, fileList, 'chat_background')
+                "
+              >
+                <el-button size="small">
+                  {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.replace') }}
+                </el-button>
+              </el-upload>
+            </span>
+          </div>
+          <el-text type="info" size="small">
+            {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.chatBackgroundMessage') }}
+          </el-text>
+        </el-card>
+        <!-- AI回复头像 -->
         <el-card shadow="never" class="mb-8">
           <div class="flex-between mb-8">
             <span class="lighter">{{
@@ -229,6 +286,7 @@
             {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.imageMessage') }}
           </el-text>
         </el-card>
+        <!-- 提问头像 -->
         <el-card shadow="never" class="mb-8">
           <div class="flex-between mb-8">
             <span class="lighter">{{
@@ -259,6 +317,7 @@
             >{{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.imageMessage') }}
           </el-text>
         </el-card>
+        <!-- 浮窗图标 -->
         <el-card shadow="never" class="mb-8">
           <div class="flex-between mb-8">
             <span class="lighter">{{
@@ -622,11 +681,13 @@ defineExpose({ open })
     border-radius: 8px;
     border: 1px solid #ffffff;
     background: var(--dialog-bg-gradient-color);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: auto 100%;
     box-shadow: 0px 4px 8px 0px rgba(31, 35, 41, 0.1);
     overflow: hidden;
     width: 330px;
     height: 520px;
-
     .setting-preview-header {
       background: var(--app-header-bg-color);
       height: var(--app-header-height);
@@ -639,11 +700,11 @@ defineExpose({ open })
 
 .display-setting-dialog {
   .el-dialog__header {
-    padding-right: 8px;
+    padding-right: 17px;
   }
 
   .el-dialog__headerbtn {
-    top: 8px;
+    top: 14px;
   }
 }
 </style>

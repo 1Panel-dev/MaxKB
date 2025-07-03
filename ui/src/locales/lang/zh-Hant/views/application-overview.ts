@@ -17,20 +17,20 @@ export default {
       msgConfirm1: '是否重新產生公開訪問連結?',
       msgConfirm2:
         '重新產生公開訪問連結會影響嵌入第三方腳本變更，需要將新腳本重新嵌入第三方，請謹慎操作！',
-      refreshSuccess: '重新整理成功'
+      refreshSuccess: '重新整理成功',
     },
     APIKeyDialog: {
       saveSettings: '儲存設定',
       msgConfirm1: '是否刪除API Key',
       msgConfirm2: '刪除API Key後將無法恢復，請確認是否刪除？',
       enabledSuccess: '已啟用',
-      disabledSuccess: '已停用'
+      disabledSuccess: '已停用',
     },
     EmbedDialog: {
       fullscreenModeTitle: '全螢幕模式',
       copyInstructions: '複製以下程式碼進行嵌入',
       floatingModeTitle: '浮窗模式',
-      mobileModeTitle: '移動端模式'
+      mobileModeTitle: '移動端模式',
     },
     LimitDialog: {
       dialogTitle: '訪問限制',
@@ -41,13 +41,13 @@ export default {
       authenticationValue: '密碼驗證',
       whitelistLabel: '白名單',
       whitelistPlaceholder:
-        '請輸入允許嵌入第三方的來源位址，一行一個，如：\nhttp://127.0.0.1:5678\nhttps://dataease.io'
+        '請輸入允許嵌入第三方的來源位址，一行一個，如：\nhttp://127.0.0.1:5678\nhttps://dataease.io',
     },
     SettingAPIKeyDialog: {
       dialogTitle: '設定',
       allowCrossDomainLabel: '允許跨域位址',
       crossDomainPlaceholder:
-        '請輸入允許的跨域位址，開啟後不輸入跨域位址則不限制。\n跨域位址一行一個，如：\nhttp://127.0.0.1:5678 \nhttps://dataease.io'
+        '請輸入允許的跨域位址，開啟後不輸入跨域位址則不限制。\n跨域位址一行一個，如：\nhttp://127.0.0.1:5678 \nhttps://dataease.io',
     },
     SettingDisplayDialog: {
       dialogTitle: '顯示設定',
@@ -68,14 +68,16 @@ export default {
         left: '左',
         right: '右',
         bottom: '下',
-        top: '上'
+        top: '上',
       },
       draggablePosition: '可拖曳位置',
       showHistory: '顯示歷史紀錄',
       displayGuide: '顯示引導圖(浮窗模式)',
       disclaimer: '免責聲明',
-      disclaimerValue: '「以上內容均由 AI 生成，僅供參考和借鏡」'
-    }
+      disclaimerValue: '「以上內容均由 AI 生成，僅供參考和借鏡」',
+      chatBackground: '聊天背景',
+      chatBackgroundMessage: '圖片格式：JPG, PNG, GIF。最大大小：10MB。',
+    },
   },
   monitor: {
     monitoringStatistics: '監控統計',
@@ -87,7 +89,7 @@ export default {
       past30Days: '過去30天',
       past90Days: '過去90天',
       past183Days: '過去半年',
-      other: '自訂义'
+      other: '自訂义',
     },
     charts: {
       customerTotal: '用戶總數',
@@ -96,7 +98,7 @@ export default {
       tokensTotal: 'Tokens 總數',
       userSatisfaction: '用戶滿意度',
       approval: '贊同',
-      disapproval: '反對'
-    }
-  }
+      disapproval: '反對',
+    },
+  },
 }

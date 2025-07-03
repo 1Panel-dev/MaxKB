@@ -8,7 +8,7 @@
           :rules="rules"
           :model="loginForm"
           ref="loginFormRef"
-          @keyup.enter="login"
+          @keyup.enter="loginHandle"
         >
           <div class="mb-24">
             <el-form-item prop="username">

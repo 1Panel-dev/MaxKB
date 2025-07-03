@@ -17,7 +17,7 @@ export default {
       msgConfirm1: 'Are you sure you want to regenerate the public URL?',
       msgConfirm2:
         'Regenerating the Public URL will affect any existing embedded codes on third-party sites. You will need to update the embed code and re-integrate it into those sites. Proceed with caution!',
-      refreshSuccess: 'Successfully Refreshed'
+      refreshSuccess: 'Successfully Refreshed',
     },
     APIKeyDialog: {
       saveSettings: 'Save Settings',
@@ -25,13 +25,13 @@ export default {
       msgConfirm2:
         'This action is irreversible. Once deleted, the API Key cannot be recovered. Do you still want to proceed?',
       enabledSuccess: 'Enabled',
-      disabledSuccess: 'Disabled'
+      disabledSuccess: 'Disabled',
     },
     EmbedDialog: {
       fullscreenModeTitle: 'Fullscreen Mode',
       copyInstructions: 'Copy the code below to embed',
       floatingModeTitle: 'Floating Mode',
-      mobileModeTitle: 'Mobile Mode'
+      mobileModeTitle: 'Mobile Mode',
     },
     LimitDialog: {
       dialogTitle: 'Access Restrictions',
@@ -42,12 +42,12 @@ export default {
       timesDays: 'queries per day',
       whitelistLabel: 'Allowed Domains',
       whitelistPlaceholder:
-        'Enter allowed third-party domains, one per line. For example:\nhttp://127.0.0.1:5678\nhttps://dataease.io'
+        'Enter allowed third-party domains, one per line. For example:\nhttp://127.0.0.1:5678\nhttps://dataease.io',
     },
     SettingAPIKeyDialog: {
       allowCrossDomainLabel: 'Allow Cross-Domain Access',
       crossDomainPlaceholder:
-        'Enter allowed cross-domain addresses. If enabled but left blank, no restrictions will apply.\nEnter one per line, e.g.:\nhttp://127.0.0.1:5678\nhttps://dataease.io'
+        'Enter allowed cross-domain addresses. If enabled but left blank, no restrictions will apply.\nEnter one per line, e.g.:\nhttp://127.0.0.1:5678\nhttps://dataease.io',
     },
     SettingDisplayDialog: {
       dialogTitle: 'Display Settings',
@@ -69,14 +69,16 @@ export default {
         left: 'Left',
         right: 'Right',
         bottom: 'Bottom',
-        top: 'Top'
+        top: 'Top',
       },
       draggablePosition: 'Draggable Position',
       showHistory: 'Show Chat History',
       displayGuide: 'Show Guide Image (Floating Mode)',
       disclaimer: 'Disclaimer',
-      disclaimerValue: 'This content is AI-generated and for reference only.'
-    }
+      disclaimerValue: 'This content is AI-generated and for reference only.',
+      chatBackground: 'Chat Background',
+      chatBackgroundMessage: 'Supported formats: JPG, PNG, GIF. Max size: 10MB.',
+    },
   },
   monitor: {
     monitoringStatistics: 'Monitoring Statistics',
@@ -96,7 +98,7 @@ export default {
       tokensTotal: 'Total Tokens Used',
       userSatisfaction: 'User Feedback Metrics',
       approval: 'Like',
-      disapproval: 'Dislike'
-    }
-  }
+      disapproval: 'Dislike',
+    },
+  },
 }
