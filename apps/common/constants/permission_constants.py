@@ -396,7 +396,9 @@ class Permission:
         return Permission(group, operate)
 
     def __str__(self):
-        return self.group.value + ":" + self.operate.value + (
+
+        return self.group.value + (
+            (":" + self.operate.value) if self.operate.value else '') + (
             (":" + self.resource_path) if self.resource_path is not None else '')
 
     def __eq__(self, other):
@@ -1326,12 +1328,12 @@ class PermissionConstants(Enum):
     def get_workspace_model_permission(self):
         return lambda r, kwargs: Permission(group=self.value.group, operate=self.value.operate,
                                             resource_path=
-                                            f"/WORKSPACE/{kwargs.get('workspace_id')}/MODEL/{kwargs.get('knowledge_id')}")
+                                            f"/WORKSPACE/{kwargs.get('workspace_id')}/MODEL/{kwargs.get('model_id')}")
 
     def get_workspace_tool_permission(self):
         return lambda r, kwargs: Permission(group=self.value.group, operate=self.value.operate,
                                             resource_path=
-                                            f"/WORKSPACE/{kwargs.get('workspace_id')}/TOOL/{kwargs.get('knowledge_id')}")
+                                            f"/WORKSPACE/{kwargs.get('workspace_id')}/TOOL/{kwargs.get('tool_id')}")
 
     def get_workspace_permission(self):
         return lambda r, kwargs: Permission(group=self.value.group, operate=self.value.operate,
