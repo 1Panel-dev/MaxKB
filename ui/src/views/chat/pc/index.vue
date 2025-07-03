@@ -331,7 +331,7 @@ import { cloneDeep } from 'lodash'
 
 useResize()
 
-const { user, chatLog, common, chatUser } = useStore()
+const { common, chatUser } = useStore()
 const router = useRouter()
 
 const EditTitleDialogRef = ref()
@@ -425,7 +425,7 @@ function refreshFieldTitle(chatId: string, abstract: string) {
   }
 }
 function deleteLog(row: any) {
-  chatLog.asyncDelChatClientLog(applicationDetail.value.id, row.id, left_loading).then(() => {
+  chatAPI.deleteChat(row.id, left_loading).then(() => {
     if (currentChatId.value === row.id) {
       currentChatId.value = 'new'
       currentChatName.value = t('chat.createChat')
@@ -435,6 +435,7 @@ function deleteLog(row: any) {
     }
     getChatLog(applicationDetail.value.id)
   })
+ 
 }
 
 function handleScroll(event: any) {

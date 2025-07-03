@@ -96,6 +96,39 @@ class HistoricalConversationSerializer(serializers.Serializer):
         return page_search(current_page, page_size, self.get_queryset(), lambda r: HistoryChatModel(r).data)
 
 
+class EditAbstractSerializer(serializers.Serializer):
+    abstract = serializers.CharField(required=True, label=_('Abstract'))
+
+
+class HistoricalConversationOperateSerializer(serializers.Serializer):
+    application_id = serializers.UUIDField(required=True, label=_('Application ID'))
+    chat_user_id = serializers.UUIDField(required=True, label=_('Chat User ID'))
+    chat_id = serializers.UUIDField(required=True, label=_('Chat ID'))
+
+    def is_valid(self, *, raise_exception=False):
+        super().is_valid(raise_exception=True)
+        e = QuerySet(Chat).filter(id=self.data.get('chat_id'), application_id=self.data.get('application_id'),
+                                  chat_user_id=self.data.get('chat_user_id')).exists()
+        if not e:
+            raise AppApiException(500, _('Chat is not exist'))
+
+    def edit_abstract(self, instance, with_valid=True):
+        if with_valid:
+            self.is_valid(raise_exception=True)
+            EditAbstractSerializer(data=instance).is_valid(raise_exception=True)
+
+        QuerySet(Chat).filter(id=self.data.get('chat_id'), application_id=self.data.get('application_id'),
+                              chat_user_id=self.data.get('chat_user_id')).update(abstract=instance.get('abstract'))
+        return True
+
+    def logic_delete(self, with_valid=True):
+        if with_valid:
+            self.is_valid(raise_exception=True)
+        QuerySet(Chat).filter(id=self.data.get('chat_id'), application_id=self.data.get('application_id'),
+                              chat_user_id=self.data.get('chat_user_id')).update(is_deleted=True)
+        return True
+
+
 class HistoricalConversationRecordSerializer(serializers.Serializer):
     application_id = serializers.UUIDField(required=True, label=_('Application ID'))
     chat_id = serializers.UUIDField(required=True, label=_('Chat ID'))
