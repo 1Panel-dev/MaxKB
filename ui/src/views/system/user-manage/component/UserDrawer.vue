@@ -279,10 +279,10 @@ const submit = async (formEl: FormInstance | undefined) => {
       if (memberFormContentRef.value) {
         await memberFormContentRef.value?.validate()
       }
-      if (user.isPE()) {
+      if (user.isPE() || user.isEE()) {
         list.value = list.value.map(item => ({
           ...item,
-          workspace_ids: adminRoleList.value.find(item1 => item1.id === item.role_id) ? ['None'] : ['default']
+          workspace_ids: adminRoleList.value.find(item1 => item1.id === item.role_id) ? ['None'] : item.workspace_ids
         }))
       }
       const params = {
