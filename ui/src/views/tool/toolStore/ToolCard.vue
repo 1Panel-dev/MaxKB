@@ -2,7 +2,7 @@
   <CardBox :title="props.tool.name" :description="props.tool.desc" class="cursor">
     <template #icon>
       <el-avatar v-if="isAppIcon(props.tool?.icon)" shape="square" :size="32" style="background: none">
-        <img :src="props.tool?.icon" alt="" />
+        <img :src="resetUrl(props.tool?.icon)" alt="" />
       </el-avatar>
       <el-avatar v-else-if="props.tool?.name" :name="props.tool?.name" pinyinColor shape="square" :size="32" />
     </template>
@@ -29,7 +29,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { isAppIcon } from '@/utils/common'
+import {isAppIcon, resetUrl} from '@/utils/common'
 
 const props = defineProps<{
   tool: any,

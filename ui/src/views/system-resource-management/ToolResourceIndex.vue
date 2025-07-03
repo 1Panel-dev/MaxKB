@@ -57,7 +57,7 @@
                   style="background: none"
                   class="mr-8"
                 >
-                  <img :src="scope.row?.icon" alt="" />
+                  <img :src="resetUrl(scope.row?.icon)" alt="" />
                 </el-avatar>
                 <el-avatar v-else class="avatar-green" shape="square" :size="24">
                   <img src="@/assets/node/icon_tool.svg" style="width: 58%" alt="" />
@@ -165,7 +165,7 @@
 import { onMounted, ref, reactive, computed } from 'vue'
 import ToolResourceApi from '@/api/system-resource-management/tool'
 import { t } from '@/locales'
-import { isAppIcon } from '@/utils/common'
+import {isAppIcon, resetUrl} from '@/utils/common'
 import { ToolType } from '@/enums/tool'
 import useStore from '@/stores'
 import { datetimeFormat } from '@/utils/time'
