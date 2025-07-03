@@ -57,7 +57,7 @@
               shape="square"
               :size="20"
             >
-              <img :src="row?.icon" alt=""/>
+              <img :src="resetUrl(row?.icon)" alt=""/>
             </el-avatar>
             <!--  应用 icon -->
             <LogoIcon v-else-if="isApplication" height="20px" class="mr-12"/>
@@ -175,7 +175,7 @@
 import {ref, onMounted, watch, computed} from 'vue'
 import type {Provider} from '@/api/type/model'
 import {AuthorizationEnum} from '@/enums/system'
-import {isAppIcon} from '@/utils/common'
+import {isAppIcon, resetUrl} from '@/utils/common'
 import {EditionConst} from '@/utils/permission/data'
 import {hasPermission} from '@/utils/permission/index'
 import useStore from '@/stores'
