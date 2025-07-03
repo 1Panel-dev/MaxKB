@@ -1,7 +1,5 @@
 export default {
   title: 'Tool',
-  internalTitle: 'Internal Tool',
-  added: 'Added',
   createTool: 'Create Tool',
   editTool: 'Edit Tool',
   copyTool: 'Copy Tool',
@@ -16,7 +14,7 @@ export default {
     image: 'Image',
     developer: 'Developer',
     communication: 'Communication',
-    searchResult: '{count} search results for'
+    searchResult: '{count} search results for',
   },
   searchBar: {
     placeholder: 'Search by tool name',
@@ -38,6 +36,7 @@ export default {
   form: {
     toolName: {
       label: 'Name',
+      name: 'Tool Name',
       placeholder: 'Please enter the tool name',
       requiredMessage: 'Please enter the tool name',
     },

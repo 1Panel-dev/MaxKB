@@ -29,6 +29,7 @@ from common.utils.tool_code import ToolExecutor
 from knowledge.models import File, FileSourceType
 from maxkb.const import CONFIG, PROJECT_DIR
 from system_manage.models import AuthTargetType, WorkspaceUserResourcePermission
+from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
 from tools.models import Tool, ToolScope, ToolFolder, ToolType
 from tools.serializers.tool_folder import ToolFolderFlatSerializer
 from users.serializers.user import is_workspace_manage
@@ -219,20 +220,11 @@ class ToolSerializer(serializers.Serializer):
             ).save()
 
             # 自动授权给创建者
-            WorkspaceUserResourcePermission(
-                target=tool_id,
-                auth_target_type=AuthTargetType.TOOL,
-                permission_list=[ResourcePermission.VIEW, ResourcePermission.MANAGE],
-                workspace_id=self.data.get('workspace_id'),
-                user_id=self.data.get('user_id'),
-                auth_type=ResourceAuthType.RESOURCE_PERMISSION_GROUP
-            ).save()
-
-            # 刷新缓存
-            version = Cache_Version.PERMISSION_LIST.get_version()
-            key = Cache_Version.PERMISSION_LIST.get_key(user_id=self.data.get('user_id'))
-            cache.delete(key, version=version)
-
+            UserResourcePermissionSerializer(data={
+                'workspace_id': self.data.get('workspace_id'),
+                'user_id': self.data.get('user_id'),
+                'auth_target_type': AuthTargetType.TOOL.value
+            }).auth_resource(str(tool_id))
             return ToolSerializer.Operate(data={
                 'id': tool_id, 'workspace_id': self.data.get('workspace_id')
             }).one()

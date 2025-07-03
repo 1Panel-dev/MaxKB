@@ -5,8 +5,9 @@ export default {
   addModel: 'Add Model',
 
   delete: {
-    confirmTitle: 'Delete Model',
-    confirmMessage: 'Are you sure you want to delete the model:',
+    confirmTitle: 'Delete Model：',
+    confirmMessage:
+      'Deleting the model will affect the resources currently using it. Please proceed with caution.',
   },
   tip: {
     createSuccessMessage: 'Model created successfully',

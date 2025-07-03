@@ -11,6 +11,6 @@
 <style lang="scss" scoped>
 .login-warp {
   height: 100vh;
-  background: url('@/assets/chat/user-login-bg.jpg') no-repeat center;
+  background: url('@/assets/chat/user-login-bg.png') var(--app-layout-bg-color) no-repeat center;
 }
 </style>

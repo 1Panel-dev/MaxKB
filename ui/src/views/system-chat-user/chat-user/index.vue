@@ -353,7 +353,7 @@ function createUser() {
 function deleteUserManage(row: ChatUserItem) {
   MsgConfirm(`${t('views.userManage.delete.confirmTitle')}${row.nick_name} ?`, '', {
     confirmButtonText: t('common.confirm'),
-    confirmButtonClass: 'color-danger',
+    confirmButtonClass: 'danger',
   })
     .then(() => {
       loading.value = true
@@ -396,7 +396,7 @@ async function getChatGroupList() {
 function handleBatchDelete() {
   MsgConfirm(t('views.chatUser.batchDeleteUser', {count: multipleSelection.value.length}), '', {
     confirmButtonText: t('common.confirm'),
-    confirmButtonClass: 'color-danger',
+    confirmButtonClass: 'danger',
   })
     .then(() => {
       loadPermissionApi('chatUser')

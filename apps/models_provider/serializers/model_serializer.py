@@ -26,6 +26,7 @@ from models_provider.constants.model_provider_constants import ModelProvideConst
 from models_provider.models import Model, Status
 from models_provider.tools import get_model_credential
 from system_manage.models import WorkspaceUserResourcePermission, AuthTargetType
+from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
 from users.serializers.user import is_workspace_manage
 
 
@@ -326,19 +327,11 @@ class ModelSerializer(serializers.Serializer):
             model = Model(**model_data)
             try:
                 model.save()
-                # 自动授权给创建者
-                WorkspaceUserResourcePermission(
-                    target=model.id,
-                    auth_target_type=AuthTargetType.MODEL,
-                    permission_list=[ResourcePermission.VIEW, ResourcePermission.MANAGE],
-                    workspace_id=workspace_id,
-                    user_id=self.data.get('user_id'),
-                    auth_type=ResourceAuthType.RESOURCE_PERMISSION_GROUP
-                ).save()
-                # 刷新缓存
-                version = Cache_Version.PERMISSION_LIST.get_version()
-                key = Cache_Version.PERMISSION_LIST.get_key(user_id=self.data.get('user_id'))
-                cache.delete(key, version=version)
+                UserResourcePermissionSerializer(data={
+                    'workspace_id': self.data.get('workspace_id'),
+                    'user_id': self.data.get('user_id'),
+                    'auth_target_type': AuthTargetType.MODEL.value
+                }).auth_resource(str(model.id))
             except Exception as save_error:
                 # 可添加日志记录
                 raise AppApiException(500, _("Model saving failed")) from save_error

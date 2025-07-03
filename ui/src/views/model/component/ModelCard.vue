@@ -91,9 +91,9 @@
             <el-dropdown-item
               v-if="
                 (currentModel.model_type === 'TTS' ||
-                currentModel.model_type === 'LLM' ||
-                currentModel.model_type === 'IMAGE' ||
-                currentModel.model_type === 'TTI') &&
+                  currentModel.model_type === 'LLM' ||
+                  currentModel.model_type === 'IMAGE' ||
+                  currentModel.model_type === 'TTI') &&
                 permissionPrecise.paramSetting(model.id)
               "
               icon="Setting"
@@ -175,11 +175,11 @@ const editModelRef = ref<InstanceType<typeof EditModel>>()
 let interval: any
 const deleteModel = () => {
   MsgConfirm(
-    t('views.model.delete.confirmTitle'),
-    `${t('views.model.delete.confirmMessage')}${props.model.name} ?`,
+    `${t('views.model.delete.confirmTitle')}${props.model.name} ?`,
+    t('views.model.delete.confirmMessage'),
     {
       confirmButtonText: t('common.confirm'),
-      confirmButtonClass: 'color-danger',
+      confirmButtonClass: 'danger',
     },
   )
     .then(() => {

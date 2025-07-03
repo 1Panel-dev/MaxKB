@@ -233,7 +233,7 @@ function deleteMulParagraph() {
     t('views.paragraph.delete.confirmMessage'),
     {
       confirmButtonText: t('common.confirm'),
-      confirmButtonClass: 'color-danger',
+      confirmButtonClass: 'danger',
     },
   )
     .then(() => {

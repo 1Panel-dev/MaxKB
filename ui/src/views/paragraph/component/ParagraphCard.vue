@@ -147,7 +147,7 @@ function deleteParagraph(row: any) {
     t('views.paragraph.delete.confirmMessage'),
     {
       confirmButtonText: t('common.confirm'),
-      confirmButtonClass: 'color-danger',
+      confirmButtonClass: 'danger',
     },
   )
     .then(() => {

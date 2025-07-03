@@ -14,9 +14,12 @@ export default {
     image: '图像',
     developer: '开发者',
     communication: '通信',
-    searchResult: '的搜索结果 {count} 个'
+    searchResult: '的搜索结果 {count} 个',
   },
-  enabled: '启用',
+  delete: {
+    confirmTitle: '是否刪除工具：',
+    confirmMessage: '删除后，引用了该工具的应用提问时会报错 ，请谨慎操作。',
+  },
   disabled: {
     confirmTitle: '是否禁用工具：',
     confirmMessage: '禁用后，引用了该工具的应用提问时会报错 ，请谨慎操作。',

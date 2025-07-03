@@ -337,7 +337,7 @@ function deleteGroup(item: ListItem) {
     t('views.chatUser.group.delete.confirmMessage'),
     {
       confirmButtonText: t('common.confirm'),
-      confirmButtonClass: 'color-danger',
+      confirmButtonClass: 'danger',
     },
   )
     .then(() => {
@@ -428,7 +428,7 @@ function handleDeleteUser(item?: ChatUserGroupUserItem) {
     '',
     {
       confirmButtonText: t('common.confirm'),
-      confirmButtonClass: 'color-danger',
+      confirmButtonClass: 'danger',
     },
   )
     .then(() => {

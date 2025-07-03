@@ -162,7 +162,7 @@ function handleAdd() {
 function handleDelete(row: RoleMemberItem) {
   MsgConfirm(`${t('views.role.member.delete.confirmTitle')}${row.nick_name} ?`, '', {
     confirmButtonText: t('common.confirm'),
-    confirmButtonClass: 'color-danger',
+    confirmButtonClass: 'danger',
   })
     .then(() => {
       loading.value = true
