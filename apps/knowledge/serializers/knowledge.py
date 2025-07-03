@@ -21,7 +21,7 @@ from rest_framework import serializers
 from application.models import ApplicationKnowledgeMapping
 from common.config.embedding_config import VectorStore
 from common.constants.cache_version import Cache_Version
-from common.constants.permission_constants import ResourceAuthType, ResourcePermission
+from common.constants.permission_constants import ResourceAuthType, ResourcePermission, ResourcePermissionRole
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import native_search, get_dynamics_model, native_page_search
 from common.db.sql_execute import select_list
@@ -42,6 +42,7 @@ from knowledge.task.sync import sync_web_knowledge, sync_replace_web_knowledge
 from maxkb.conf import PROJECT_DIR
 from models_provider.models import Model
 from system_manage.models import WorkspaceUserResourcePermission, AuthTargetType
+from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
 from users.serializers.user import is_workspace_manage
 
 
@@ -553,21 +554,12 @@ class KnowledgeSerializer(serializers.Serializer):
             QuerySet(ProblemParagraphMapping).bulk_create(
                 problem_paragraph_mapping_list
             ) if len(problem_paragraph_mapping_list) > 0 else None
-
-            # 自动授权给创建者
-            WorkspaceUserResourcePermission(
-                target=knowledge_id,
-                auth_target_type=AuthTargetType.KNOWLEDGE,
-                permission_list=[ResourcePermission.VIEW, ResourcePermission.MANAGE],
-                workspace_id=self.data.get('workspace_id'),
-                user_id=self.data.get('user_id'),
-                auth_type=ResourceAuthType.RESOURCE_PERMISSION_GROUP
-            ).save()
-            # 刷新缓存
-            version = Cache_Version.PERMISSION_LIST.get_version()
-            key = Cache_Version.PERMISSION_LIST.get_key(user_id=self.data.get('user_id'))
-            cache.delete(key, version=version)
-
+            # 自动资源给授权当前用户
+            UserResourcePermissionSerializer(data={
+                'workspace_id': self.data.get('workspace_id'),
+                'user_id': self.data.get('user_id'),
+                'auth_target_type': AuthTargetType.KNOWLEDGE.value
+            }).auth_resource(str(knowledge_id))
             return {
                 **KnowledgeModelSerializer(knowledge).data,
                 'user_id': self.data.get('user_id'),
