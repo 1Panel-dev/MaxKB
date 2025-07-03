@@ -10,7 +10,7 @@
   >
     <el-row v-if="isConnect">
       <el-col :span="18" class="p-24">
-        <ParagraphForm ref="paragraphFormRef" :data="detail" :isEdit="true" />
+        <ParagraphForm ref="paragraphFormRef" :data="detail" :isEdit="true" :knowledge-id="knowledgeId"/>
       </el-col>
       <el-col :span="6" class="border-l" style="width: 300px">
         <p class="bold title p-24" style="padding-bottom: 0">
@@ -52,7 +52,7 @@
       </el-col>
     </el-row>
     <div v-else class="p-24">
-      <ParagraphForm ref="paragraphFormRef" :data="detail" :isEdit="true" />
+      <ParagraphForm ref="paragraphFormRef" :data="detail" :isEdit="true" :knowledge-id="knowledgeId"/>
     </div>
 
     <template #footer>
@@ -69,7 +69,8 @@ import { cloneDeep } from 'lodash'
 import ParagraphForm from '@/views/paragraph/component/ParagraphForm.vue'
 
 const props = defineProps({
-  isConnect: Boolean
+  isConnect: Boolean,
+  knowledgeId: String
 })
 
 const emit = defineEmits(['updateContent'])

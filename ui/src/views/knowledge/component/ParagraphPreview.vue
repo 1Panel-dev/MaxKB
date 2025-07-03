@@ -15,7 +15,7 @@
         </div>
         <div class="paragraph-list" v-if="activeName == index">
           <el-scrollbar>
-            <ParagraphList v-model="item.content" :isConnect="isConnect"> </ParagraphList>
+            <ParagraphList v-model="item.content" :isConnect="isConnect" :knowledge-id="knowledgeId"/>
           </el-scrollbar>
         </div>
       </el-tab-pane>
@@ -32,7 +32,8 @@ defineProps({
     type: Array<any>,
     default: () => []
   },
-  isConnect: Boolean
+  isConnect: Boolean,
+  knowledgeId: String
 })
 
 const activeName = ref(0)

@@ -112,7 +112,7 @@
         <div v-loading="loading">
           <h4 class="title-decoration-1 mb-8">{{ $t('views.document.setRules.title.preview') }}</h4>
 
-          <ParagraphPreview v-model:data="paragraphList" :isConnect="checkedConnect" />
+          <ParagraphPreview v-model:data="paragraphList" :isConnect="checkedConnect" :knowledge-id="id"/>
         </div>
       </el-col>
     </el-row>

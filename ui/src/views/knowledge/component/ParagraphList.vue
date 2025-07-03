@@ -42,6 +42,7 @@
       ref="EditParagraphDialogRef"
       @updateContent="updateContent"
       :isConnect="isConnect"
+      :knowledge-id="knowledgeId"
     />
   </div>
 </template>
@@ -62,7 +63,14 @@ const editHandle = (item: any, cIndex: number) => {
   EditParagraphDialogRef.value.open(item)
 }
 
-const props = defineProps<{ modelValue: Array<any>; isConnect: boolean }>()
+const props = defineProps({
+  modelValue: {
+    type: Array<any>,
+    default: () => []
+  },
+  isConnect: Boolean,
+  knowledgeId: String
+})
 
 const paragraph_list = computed(() => {
   return props.modelValue.slice(0, page_size.value * (current_page.value - 1) + page_size.value)

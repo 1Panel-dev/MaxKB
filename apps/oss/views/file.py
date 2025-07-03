@@ -42,7 +42,11 @@ class FileView(APIView):
     )
     @log(menu='file', operate='Upload file')
     def post(self, request: Request):
-        return result.success(FileSerializer(data={'file': request.FILES.get('file')}).upload())
+        return result.success(FileSerializer(data={
+            'file': request.FILES.get('file'),
+            'source_id': request.data.get('source_id'),
+            'source_type': request.data.get('source_type'),
+        }).upload())
 
     class Operate(APIView):
         authentication_classes = [TokenAuth]

@@ -19,7 +19,7 @@
               </el-button>
             </div>
 
-            <ParagraphForm ref="paragraphFormRef" :data="detail" :isEdit="isEdit" />
+            <ParagraphForm ref="paragraphFormRef" :data="detail" :isEdit="isEdit" :knowledge-id="dataset_id"/>
           </div>
         </el-scrollbar>
         <div class="text-right p-24 pt-0" v-if="paragraphId && isEdit">

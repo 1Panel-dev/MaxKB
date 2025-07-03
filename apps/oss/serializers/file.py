@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from common.exception.app_exception import NotFound404
-from knowledge.models import File
+from knowledge.models import File, FileSourceType
 from tools.serializers.tool import UploadedFileField
 
 mime_types = {
@@ -57,6 +57,13 @@ mime_types = {
 class FileSerializer(serializers.Serializer):
     file = UploadedFileField(required=True, label=_('file'))
     meta = serializers.JSONField(required=False, allow_null=True)
+    source_id = serializers.CharField(
+        required=False, allow_null=True, label=_('source id'), default=FileSourceType.TEMPORARY_120_MINUTE.value
+    )
+    source_type = serializers.ChoiceField(
+        choices=FileSourceType.choices, required=False, allow_null=True, label=_('source type'),
+        default=FileSourceType.TEMPORARY_120_MINUTE
+    )
 
     def upload(self, with_valid=True):
         if with_valid:
@@ -65,7 +72,13 @@ class FileSerializer(serializers.Serializer):
         if not meta:
             meta = {'debug': True}
         file_id = meta.get('file_id', uuid.uuid7())
-        file = File(id=file_id, file_name=self.data.get('file').name, meta=meta)
+        file = File(
+            id=file_id,
+            file_name=self.data.get('file').name,
+            meta=meta,
+            source_id=self.data.get('source_id') or FileSourceType.TEMPORARY_120_MINUTE.value,
+            source_type=self.data.get('source_type') or FileSourceType.TEMPORARY_120_MINUTE
+        )
         file.save(self.data.get('file').read())
         return f'./oss/file/{file_id}'
 
