@@ -56,10 +56,10 @@ const getWorkspaceMemberList: (
 /**
  * 获取工作空间全部成员列表
  */
-const getAllMemberList: (workspace_id: string, loading?: Ref<boolean>) => Promise<Result<any[]>> = (
-  workspace_id,
-  loading,
-) => {
+const getAllMemberList: (
+  workspace_id: string | null,
+  loading?: Ref<boolean>,
+) => Promise<Result<any[]>> = (workspace_id, loading) => {
   return get(`${prefix}/${workspace_id}/user_list`, undefined, loading)
 }
 

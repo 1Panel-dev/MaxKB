@@ -16,5 +16,7 @@ export default {
     folderNamePlaceholder: 'Please enter a name',
     description: 'Description',
     descriptionPlaceholder: 'Please enter a description',
+    requiredMessage: 'Please select a folder',
+    deleteConfirmMessage: 'Folders with resources will be deleted, please be cautious.',
   },
 }

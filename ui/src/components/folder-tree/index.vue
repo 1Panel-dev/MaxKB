@@ -51,7 +51,7 @@
               >
                 <el-dropdown trigger="click" :teleported="false">
                   <el-button text class="w-full">
-                    <el-icon class="rotate-90"><MoreFilled /></el-icon>
+                    <el-icon><MoreFilled /></el-icon>
                   </el-button>
                   <template #dropdown>
                     <el-dropdown-menu>
@@ -97,6 +97,8 @@ import folderApi from '@/api/folder'
 import { EditionConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
 import useStore from '@/stores'
+import { TreeToFlatten } from '@/utils/array'
+import { MsgConfirm } from '@/utils/message'
 
 defineOptions({ name: 'FolderTree' })
 const props = defineProps({
@@ -106,7 +108,7 @@ const props = defineProps({
   },
   currentNodeKey: {
     type: String,
-    default: 'root',
+    default: 'default',
   },
   source: {
     type: String,
@@ -140,6 +142,7 @@ interface Tree {
   children?: Tree[]
   id?: string
   show?: boolean
+  parent_id?: string
 }
 
 const defaultProps = {
@@ -185,9 +188,23 @@ const handleSharedNodeClick = () => {
 }
 
 function deleteFolder(row: Tree) {
-  folderApi.delFolder(row.id as string, props.source, loading).then(() => {
-    emit('refreshTree')
-  })
+  MsgConfirm(
+    `${t('common.deleteConfirm')}：${row.name}`,
+    t('components.folder.deleteConfirmMessage'),
+    {
+      confirmButtonText: t('common.delete'),
+      confirmButtonClass: 'danger',
+    },
+  )
+    .then(() => {
+      folderApi.delFolder(row.id as string, props.source, loading).then(() => {
+        treeRef.value?.setCurrentKey(row.parent_id || 'default')
+        const prevFolder = TreeToFlatten(props.data).find((item: any) => item.id === row.parent_id)
+        folder.setCurrentFolder(prevFolder)
+        emit('refreshTree')
+      })
+    })
+    .catch(() => {})
 }
 
 const CreateFolderDialogRef = ref()

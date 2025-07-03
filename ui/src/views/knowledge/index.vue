@@ -13,7 +13,7 @@
         @refreshTree="refreshFolder"
       />
     </template>
-    <KnowledgeListContainer>
+    <KnowledgeListContainer @refreshFolder="refreshFolder">
       <template #header>
         <FolderBreadcrumb :folderList="folderList" @click="folderClickHandle" />
       </template>

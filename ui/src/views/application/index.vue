@@ -316,10 +316,7 @@ const { folder, application, user, common } = useStore()
 const loading = ref(false)
 
 const search_type = ref('name')
-const search_form = ref<{
-  name: string
-  create_user: string
-}>({
+const search_form = ref<any>({
   name: '',
   create_user: '',
 })
@@ -544,7 +541,6 @@ function getList() {
 
 onMounted(() => {
   getFolder(true)
-
   WorkspaceApi.getAllMemberList(user.getWorkspaceId(), loading).then((res) => {
     user_options.value = res.data
   })

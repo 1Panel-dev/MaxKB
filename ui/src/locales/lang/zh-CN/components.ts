@@ -17,5 +17,6 @@ export default {
     description: '描述',
     descriptionPlaceholder: '请输入描述',
     requiredMessage: '请选择文件夹',
+    deleteConfirmMessage: '文件夹下的资源会被删除，请谨慎操作。'
   },
 }

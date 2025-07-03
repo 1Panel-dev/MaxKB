@@ -3,14 +3,11 @@
     <h2 class="mb-16">{{ $t('views.userManage.title') }}</h2>
     <el-card>
       <div class="flex-between mb-16">
-        <el-button type="primary" @click="createUser"
-                   v-hasPermission="[
-              RoleConst.ADMIN,
-              PermissionConst.USER_CREATE
-          ]"
-        >{{
-            $t('views.userManage.createUser')
-          }}
+        <el-button
+          type="primary"
+          @click="createUser"
+          v-hasPermission="[RoleConst.ADMIN, PermissionConst.USER_CREATE]"
+          >{{ $t('views.userManage.createUser') }}
         </el-button>
         <div class="flex-between complex-search">
           <el-select
@@ -19,9 +16,9 @@
             style="width: 120px"
             @change="search_type_change"
           >
-            <el-option :label="$t('views.login.loginForm.username.label')" value="username"/>
-            <el-option :label="$t('views.userManage.userForm.nick_name.label')" value="nick_name"/>
-            <el-option :label="$t('views.login.loginForm.email.label')" value="email"/>
+            <el-option :label="$t('views.login.loginForm.username.label')" value="username" />
+            <el-option :label="$t('views.userManage.userForm.nick_name.label')" value="nick_name" />
+            <el-option :label="$t('views.login.loginForm.email.label')" value="email" />
           </el-select>
           <el-input
             v-if="search_type === 'username'"
@@ -54,15 +51,16 @@
         @changePage="getList"
         v-loading="loading"
       >
-        <el-table-column prop="nick_name" :label="$t('views.userManage.userForm.nick_name.label')"/>
-        <el-table-column prop="username" :label="$t('views.login.loginForm.username.label')"/>
+        <el-table-column
+          prop="nick_name"
+          :label="$t('views.userManage.userForm.nick_name.label')"
+        />
+        <el-table-column prop="username" :label="$t('views.login.loginForm.username.label')" />
         <el-table-column prop="is_active" :label="$t('common.status.label')">
           <template #default="{ row }">
             <div v-if="row.is_active" class="flex align-center">
-              <el-icon class="color-success mr-8" style="font-size: 16px"
-              >
-                <SuccessFilled
-                />
+              <el-icon class="color-success mr-8" style="font-size: 16px">
+                <SuccessFilled />
               </el-icon>
               <span class="color-secondary">
                 {{ $t('common.status.enabled') }}
@@ -91,12 +89,21 @@
             {{ row.phone || '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="role_name" :label="$t('views.role.member.role')" min-width="100"
-                         v-if="user.isEE() || user.isPE()">
+        <el-table-column
+          prop="role_name"
+          :label="$t('views.role.member.role')"
+          min-width="100"
+          v-if="user.isEE() || user.isPE()"
+        >
           <template #default="{ row }">
             <el-popover :width="400">
               <template #reference>
-                <TagGroup class="cursor" style="width: fit-content;" :tags="row.role_name" tooltipDisabled/>
+                <TagGroup
+                  class="cursor"
+                  style="width: fit-content"
+                  :tags="row.role_name"
+                  tooltipDisabled
+                />
               </template>
               <template #default>
                 <el-table :data="row.role_workspace">
@@ -141,72 +148,84 @@
                 size="small"
                 v-model="row.is_active"
                 :before-change="() => changeState(row)"
-                v-if="hasPermission([RoleConst.ADMIN,PermissionConst.USER_EDIT],'OR')"
+                v-if="hasPermission([RoleConst.ADMIN, PermissionConst.USER_EDIT], 'OR')"
               />
             </span>
-            <el-divider direction="vertical"/>
-            <span class="mr-8">
-              <el-button type="primary" text @click.stop="editUser(row)" :title="$t('common.edit')"
-                         v-if="hasPermission([RoleConst.ADMIN,PermissionConst.USER_EDIT],'OR')">
-                <el-icon><EditPen/></el-icon>
-              </el-button>
-            </span>
-
-            <span class="mr-8">
-              <el-button
-                type="primary"
-                text
-                @click.stop="editPwdUser(row)"
-                :title="$t('views.userManage.setting.updatePwd')"
-                v-if="hasPermission([RoleConst.ADMIN,PermissionConst.USER_EDIT],'OR')"
-              >
-                <el-icon><Lock/></el-icon>
-              </el-button>
-            </span>
-            <span>
+            <el-divider direction="vertical" />
+            <el-tooltip effect="dark" :content="$t('common.edit')" placement="top">
+              <span class="mr-8">
+                <el-button
+                  type="primary"
+                  text
+                  @click.stop="editUser(row)"
+                  :title="$t('common.edit')"
+                  v-if="hasPermission([RoleConst.ADMIN, PermissionConst.USER_EDIT], 'OR')"
+                >
+                  <el-icon><EditPen /></el-icon>
+                </el-button>
+              </span>
+            </el-tooltip>
+            <el-tooltip
+              effect="dark"
+              :content="$t('views.userManage.setting.updatePwd')"
+              placement="top"
+            >
+              <span class="mr-8">
+                <el-button
+                  type="primary"
+                  text
+                  @click.stop="editPwdUser(row)"
+                  :title="$t('views.userManage.setting.updatePwd')"
+                  v-if="hasPermission([RoleConst.ADMIN, PermissionConst.USER_EDIT], 'OR')"
+                >
+                  <el-icon><Lock /></el-icon>
+                </el-button>
+              </span>
+            </el-tooltip>
+            <el-tooltip effect="dark" :content="$t('common.delete')" placement="top">
               <el-button
                 :disabled="row.role === 'ADMIN' || row.id === user.userInfo?.id"
                 type="primary"
                 text
                 @click.stop="deleteUserManage(row)"
                 :title="$t('common.delete')"
-                v-if="hasPermission([RoleConst.ADMIN,PermissionConst.USER_DELETE],'OR')"
+                v-if="hasPermission([RoleConst.ADMIN, PermissionConst.USER_DELETE], 'OR')"
               >
-                <el-icon><Delete/></el-icon>
+                <el-icon><Delete /></el-icon>
               </el-button>
-            </span>
+            </el-tooltip>
           </template>
         </el-table-column>
       </app-table>
     </el-card>
-    <UserDrawer :title="title" ref="UserDrawerRef" @refresh="refresh"/>
-    <UserPwdDialog ref="UserPwdDialogRef" @refresh="refresh"/>
+    <UserDrawer :title="title" ref="UserDrawerRef" @refresh="refresh" />
+    <UserPwdDialog ref="UserPwdDialogRef" @refresh="refresh" />
   </div>
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref, reactive, watch} from 'vue'
+import { onMounted, ref, reactive, watch } from 'vue'
 import UserDrawer from './component/UserDrawer.vue'
 import UserPwdDialog from './component/UserPwdDialog.vue'
 import userManageApi from '@/api/system/user-manage'
-import {datetimeFormat} from '@/utils/time'
-import {MsgSuccess, MsgConfirm} from '@/utils/message'
-import {t} from '@/locales'
-import {ValidCount, ValidType} from "@/enums/common.ts";
-import useStore from "@/stores";
-import {PermissionConst, RoleConst} from '@/utils/permission/data'
-import {hasPermission} from '@/utils/permission/index'
+import { datetimeFormat } from '@/utils/time'
+import { MsgSuccess, MsgConfirm } from '@/utils/message'
+import { t } from '@/locales'
+import { ValidCount, ValidType } from '@/enums/common.ts'
+import useStore from '@/stores'
+import { PermissionConst, RoleConst } from '@/utils/permission/data'
+import { hasPermission } from '@/utils/permission/index'
 
-const {user, common} = useStore()
+const { user, common } = useStore()
 const search_type = ref('username')
 const search_form = ref<{
-  username: string,
-  nick_name?: string,
+  username: string
+  nick_name?: string
   email?: string
 }>({
   username: '',
   nick_name: '',
-  email: ''
+  email: '',
 })
 
 const UserDrawerRef = ref()
@@ -222,7 +241,7 @@ const paginationConfig = reactive({
 const userTableData = ref<any[]>([])
 
 const search_type_change = () => {
-  search_form.value = {username: '', nick_name: '', email: ''}
+  search_form.value = { username: '', nick_name: '', email: '' }
 }
 
 function handleSizeChange() {
@@ -234,18 +253,17 @@ function getList() {
   const params = {
     [search_type.value]: search_form.value[search_type.value as keyof typeof search_form.value],
   }
-  return userManageApi
-    .getUserManage(paginationConfig, params, loading)
-    .then((res) => {
-      userTableData.value = res.data.records.map((item: any) => ({
-        ...item,
-        role_workspace: Object.entries(item.role_workspace ?? {}).map(([role, workspaces]) => ({
-          role,
-          workspace: (workspaces as string[])?.[0] === 'None' ? '-' : (workspaces as string[])?.join(", ")
-        }))
-      }))
-      paginationConfig.total = res.data.total
-    })
+  return userManageApi.getUserManage(paginationConfig, params, loading).then((res) => {
+    userTableData.value = res.data.records.map((item: any) => ({
+      ...item,
+      role_workspace: Object.entries(item.role_workspace ?? {}).map(([role, workspaces]) => ({
+        role,
+        workspace:
+          (workspaces as string[])?.[0] === 'None' ? '-' : (workspaces as string[])?.join(', '),
+      })),
+    }))
+    paginationConfig.total = res.data.total
+  })
 }
 
 function changeState(row: any) {
@@ -293,8 +311,7 @@ function deleteUserManage(row: any) {
         getList()
       })
     })
-    .catch(() => {
-    })
+    .catch(() => {})
 }
 
 function editPwdUser(row: any) {

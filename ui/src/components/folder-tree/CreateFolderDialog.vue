@@ -54,7 +54,7 @@ import folderApi from '@/api/folder'
 import { MsgSuccess, MsgAlert } from '@/utils/message'
 import { t } from '@/locales'
 import useStore from '@/stores'
-const { tool, knowledge } = useStore()
+const { tool, knowledge, folder } = useStore()
 const emit = defineEmits(['refresh'])
 
 const props = defineProps({
@@ -124,15 +124,17 @@ const submitHandle = async () => {
           .putFolder(editId.value, sourceType.value, folderForm.value, loading)
           .then((res) => {
             MsgSuccess(t('common.editSuccess'))
-            emit('refresh')
             clearData()
+            emit('refresh')
             dialogVisible.value = false
           })
       } else {
         folderApi.postFolder(sourceType.value, folderForm.value, loading).then((res) => {
           MsgSuccess(t('common.createSuccess'))
-          emit('refresh')
+          folder.setCurrentFolder(res.data)
+          folder.asyncGetFolder(sourceType.value, {}, loading)
           clearData()
+          emit('refresh')
           dialogVisible.value = false
         })
       }

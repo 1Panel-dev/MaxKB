@@ -286,7 +286,7 @@
   </ContentContainer>
   <InitParamDrawer ref="InitParamDrawerRef" @refresh="refresh" />
   <ToolFormDrawer ref="ToolFormDrawerRef" @refresh="refresh" :title="ToolDrawertitle" />
-  <CreateFolderDialog ref="CreateFolderDialogRef" v-if="!isShared" />
+  <CreateFolderDialog ref="CreateFolderDialogRef" v-if="!isShared" @refresh="refreshFolder" />
   <ToolStoreDialog ref="toolStoreDialogRef" :api-type="apiType" @refresh="refresh" />
   <AddInternalToolDialog ref="AddInternalToolDialogRef" @refresh="confirmAddInternalTool" />
   <AuthorizedWorkspace
@@ -324,6 +324,7 @@ const { folder, user, tool } = useStore()
 onBeforeRouteLeave((to, from) => {
   tool.setToolList([])
 })
+const emit = defineEmits(['refreshFolder'])
 
 const apiType = computed(() => {
   if (route.path.includes('shared')) {
@@ -619,6 +620,10 @@ function getList() {
 
 function clickFolder(item: any) {
   folder.setCurrentFolder(item)
+}
+
+function refreshFolder() {
+  emit('refreshFolder')
 }
 
 function searchHandle() {

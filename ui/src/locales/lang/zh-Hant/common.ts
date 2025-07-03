@@ -97,4 +97,5 @@ export default {
   },
   custom: '自定義',
   moveTo: '移動到',
+  deleteConfirm: '是否刪除',
 }

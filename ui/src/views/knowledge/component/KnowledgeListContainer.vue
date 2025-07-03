@@ -308,7 +308,7 @@
   </ContentContainer>
 
   <component :is="currentCreateDialog" ref="CreateKnowledgeDialogRef" v-if="!isShared" />
-  <CreateFolderDialog ref="CreateFolderDialogRef" v-if="!isShared" />
+  <CreateFolderDialog ref="CreateFolderDialogRef" v-if="!isShared" @refresh="refreshFolder" />
   <GenerateRelatedDialog ref="GenerateRelatedDialogRef" :apiType="apiType" />
   <SyncWebDialog ref="SyncWebDialogRef" v-if="!isShared" />
   <AuthorizedWorkspace
@@ -349,6 +349,8 @@ const { folder, user, knowledge } = useStore()
 onBeforeRouteLeave((to, from) => {
   knowledge.setKnowledgeList([])
 })
+
+const emit = defineEmits(['refreshFolder'])
 
 const apiType = computed(() => {
   if (route.path.includes('shared')) {
@@ -521,6 +523,10 @@ function searchHandle() {
   paginationConfig.current_page = 1
   knowledge.setKnowledgeList([])
   getList()
+}
+
+function refreshFolder() {
+  emit('refreshFolder')
 }
 
 onMounted(() => {

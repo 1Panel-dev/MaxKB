@@ -97,4 +97,5 @@ export default {
   },
   custom: 'Custom',
   moveTo: 'Move To',
+  deleteConfirm: 'Confirm delete',
 }

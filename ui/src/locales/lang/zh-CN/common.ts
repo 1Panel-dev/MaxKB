@@ -101,4 +101,5 @@ export default {
   },
   custom: '自定义',
   moveTo: '转移到',
+  deleteConfirm: '是否删除',
 }
