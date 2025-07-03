@@ -221,7 +221,10 @@
           </el-icon>
         </el-button>
       </div>
-      <div class="chat-pc__right">
+      <div
+        class="chat-pc__right"
+        :style="{ backgroundImage: `url(${applicationDetail?.custom_theme?.chat_background})` }"
+      >
         <el-splitter>
           <el-splitter-panel>
             <div class="mb-24 p-16-24 flex-between">
@@ -435,7 +438,6 @@ function deleteLog(row: any) {
     }
     getChatLog(applicationDetail.value.id)
   })
- 
 }
 
 function handleScroll(event: any) {
