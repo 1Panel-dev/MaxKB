@@ -38,8 +38,14 @@ const useChatUserStore = defineStore('chat-user', {
     applicationProfile() {
       return ChatAPI.applicationProfile().then((ok) => {
         this.application = ok.data
-        this.application['custom_theme']['theme_color'] =
-          ok.data?.custom_theme.theme_color || '#3370FF'
+        if (this.application.custom_theme) {
+          this.application['custom_theme']['theme_color'] =
+            ok.data?.custom_theme?.theme_color || '#3370FF'
+        } else {
+          this.application.custom_theme = {
+            theme_color: ok.data?.custom_theme?.theme_color || '#3370FF',
+          }
+        }
       })
     },
     isAuthentication() {
