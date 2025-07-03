@@ -195,7 +195,7 @@ def get_permission_list(user,
         else:
             workspace_id_list = ['default']
             workspace_user_resource_permission_list = QuerySet(WorkspaceUserResourcePermission).filter(
-                workspace_id__in=workspace_id_list)
+                workspace_id__in=workspace_id_list, user_id=user_id)
             role_permission_mapping_list = get_default_role_permission_mapping_list()
             role_permission_mapping_dict = group_by(role_permission_mapping_list, lambda item: item.role_id)
             workspace_user_role_mapping_list = get_default_workspace_user_role_mapping_list([user.role])
@@ -206,15 +206,8 @@ def get_permission_list(user,
                 workspace_user_resource_permission_list,
                 role_permission_mapping_dict,
                 workspace_user_role_mapping_dict)
-
-            workspace_permission_list = get_workspace_permission_list(role_permission_mapping_dict,
-                                                                      workspace_user_role_mapping_list, {})
-            # 系统权限
-            system_permission_list = [role_permission_mapping.permission_id for role_permission_mapping in
-                                      role_permission_mapping_list if
-                                      [user.role].__contains__(role_permission_mapping.role_id)]
             # 合并权限
-            permission_list = system_permission_list + workspace_permission_list + workspace_resource_permission_list
+            permission_list = workspace_resource_permission_list
             permission_list = list(set(permission_list))
             cache.set(key, permission_list, version=version)
     return permission_list
@@ -271,9 +264,10 @@ def get_role_list(user,
             cache.set(key, workspace_list, version=version)
             return role_list
         else:
-            role_list = [user.role]
             if user.role == RoleConstants.ADMIN.value.__str__():
                 role_list = [user.role, get_role_permission(RoleConstants.WORKSPACE_MANAGE, 'default')]
+            else:
+                role_list = [user.role, get_role_permission(RoleConstants.USER, 'default')]
             cache.set(key, role_list, version=version)
             return role_list
     return workspace_list
