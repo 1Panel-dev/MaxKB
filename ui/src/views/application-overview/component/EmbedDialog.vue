@@ -89,7 +89,7 @@ const { application } = useStore()
 
 const props = defineProps({
   data: Object,
-  apiInputParams: String
+  apiInputParams: String,
 })
 
 const emit = defineEmits(['addData'])
@@ -104,7 +104,7 @@ const source3 = ref('')
 const urlParams1 = computed(() => (props.apiInputParams ? '?' + props.apiInputParams : ''))
 const urlParams2 = computed(() => (props.apiInputParams ? '&' + props.apiInputParams : ''))
 const urlParams3 = computed(() =>
-  props.apiInputParams ? '?mode=mobile&' + props.apiInputParams : '?mode=mobile'
+  props.apiInputParams ? '?mode=mobile&' + props.apiInputParams : '?mode=mobile',
 )
 watch(dialogVisible, (bool) => {
   if (!bool) {
@@ -126,9 +126,9 @@ allow="microphone">
   source2.value = `<script
 async
 defer
-src="${window.location.origin}/api/application/embed?protocol=${window.location.protocol.replace(
+src="${application.location}api/embed?protocol=${window.location.protocol.replace(
     ':',
-    ''
+    '',
   )}&host=${window.location.host}&token=${val}${urlParams2.value}">
 <\/script>
 `
