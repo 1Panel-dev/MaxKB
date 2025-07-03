@@ -90,7 +90,7 @@ class UserProfileSerializer(serializers.Serializer):
         """
         workspace_list = get_workspace_list_by_user(user.id)
         user_role_relation_model = DatabaseModelManage.get_model("workspace_user_role_mapping")
-        role_name = user.role
+        role_name = [user.role]
         if user_role_relation_model:
             user_role_relations = (
                 user_role_relation_model.objects
