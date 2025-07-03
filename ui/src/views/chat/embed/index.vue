@@ -1,14 +1,15 @@
 <template>
   <div
-    class="chat-embed layout-bg"
+    class="chat-embed layout-bg chat-background"
     :class="{ 'chat-embed--popup': isPopup }"
     v-loading="loading"
     :style="{
       '--el-color-primary': applicationDetail?.custom_theme?.theme_color,
       '--el-color-primary-light-9': hexToRgba(applicationDetail?.custom_theme?.theme_color, 0.1),
+      backgroundImage: `url(${applicationDetail?.chat_background})`,
     }"
   >
-    <div class="chat-embed__header" :style="customStyle">
+    <div class="chat-embed__header" :style="(user.isEE() || user.isPE()) && customStyle">
       <div class="flex align-center">
         <div class="mr-12 ml-24 flex">
           <el-avatar
@@ -19,7 +20,7 @@
           >
             <img :src="applicationDetail?.icon" alt="" />
           </el-avatar>
-          <LogoIcon v-else height="32px"  />
+          <LogoIcon v-else height="32px" />
         </div>
 
         <h4>{{ applicationDetail?.name }}</h4>

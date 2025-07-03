@@ -1,19 +1,31 @@
 <template>
   <div
-    class="chat-mobile layout-bg"
+    class="chat-mobile layout-bg chat-background"
     v-loading="loading"
     :style="{
-    '--el-color-primary': applicationDetail?.custom_theme?.theme_color,
-    '--el-color-primary-light-9': hexToRgba(applicationDetail?.custom_theme?.theme_color, 0.1),
+      '--el-color-primary': applicationDetail?.custom_theme?.theme_color,
+      '--el-color-primary-light-9': hexToRgba(applicationDetail?.custom_theme?.theme_color, 0.1),
+      backgroundImage: `url(${applicationDetail?.chat_background})`,
     }"
   >
-    <div class="chat-embed__header" :style="customStyle">
+    <div class="chat-embed__header" :style="(user.isEE() || user.isPE()) && customStyle">
       <div class="flex align-center">
-        <AppIcon iconName="app-history-outlined" style="font-size: 20px" class="ml-16" :style="{
-          color: applicationDetail?.custom_theme?.header_font_color,
-        }" @click.prevent.stop="show = true" />
+        <AppIcon
+          iconName="app-history-outlined"
+          style="font-size: 20px"
+          class="ml-16"
+          :style="{
+            color: applicationDetail?.custom_theme?.header_font_color,
+          }"
+          @click.prevent.stop="show = true"
+        />
         <div class="mr-12 ml-16 flex">
-          <el-avatar v-if="isAppIcon(applicationDetail?.icon)" shape="square" :size="32" style="background: none">
+          <el-avatar
+            v-if="isAppIcon(applicationDetail?.icon)"
+            shape="square"
+            :size="32"
+            style="background: none"
+          >
             <img :src="applicationDetail?.icon" alt="" />
           </el-avatar>
           <LogoIcon v-else height="32px" />
@@ -46,11 +58,22 @@
         </AiChat>
       </div>
 
-      <el-drawer v-model="show" :with-header="false" class="left-drawer" direction="ltr" :size="280">
+      <el-drawer
+        v-model="show"
+        :with-header="false"
+        class="left-drawer"
+        direction="ltr"
+        :size="280"
+      >
         <div>
           <div class="flex align-center mb-16">
             <div class="flex mr-8">
-              <el-avatar v-if="isAppIcon(applicationDetail?.icon)" shape="square" :size="32" style="background: none">
+              <el-avatar
+                v-if="isAppIcon(applicationDetail?.icon)"
+                shape="square"
+                :size="32"
+                style="background: none"
+              >
                 <img :src="applicationDetail?.icon" alt="" />
               </el-avatar>
               <LogoIcon v-else height="32px" />
@@ -67,14 +90,30 @@
         <div class="left-height pt-0">
           <el-scrollbar>
             <div>
-              <common-list :style="{ '--el-color-primary': applicationDetail?.custom_theme?.theme_color }"
-                :data="chatLogData" v-loading="left_loading" :defaultActive="currentChatId" @click="clickListHandle"
-                @mouseenter="mouseenter" @mouseleave="mouseId = ''">
+              <common-list
+                :style="{ '--el-color-primary': applicationDetail?.custom_theme?.theme_color }"
+                :data="chatLogData"
+                v-loading="left_loading"
+                :defaultActive="currentChatId"
+                @click="clickListHandle"
+                @mouseenter="mouseenter"
+                @mouseleave="mouseId = ''"
+              >
                 <template #default="{ row }">
                   <div class="flex-between">
-                    <ReadWrite @change="editName($event, row)" :data="row.abstract" trigger="manual"
-                      :write="row.writeStatus" @close="closeWrite(row)" :maxlength="1024" />
-                    <div @click.stop v-if="mouseId === row.id && row.id !== 'new' && !row.writeStatus" class="flex">
+                    <ReadWrite
+                      @change="editName($event, row)"
+                      :data="row.abstract"
+                      trigger="manual"
+                      :write="row.writeStatus"
+                      @close="closeWrite(row)"
+                      :maxlength="1024"
+                    />
+                    <div
+                      @click.stop
+                      v-if="mouseId === row.id && row.id !== 'new' && !row.writeStatus"
+                      class="flex"
+                    >
                       <el-button style="padding: 0" link @click.stop="openWrite(row)">
                         <el-icon>
                           <EditPen />
@@ -104,7 +143,9 @@
           <el-avatar :size="32">
             <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
           </el-avatar>
-          <span v-if="chatUser.chat_profile?.authentication" class="ml-8 color-text-primary">{{ chatUser.chatUserProfile?.nick_name }}</span>
+          <span v-if="chatUser.chat_profile?.authentication" class="ml-8 color-text-primary">{{
+            chatUser.chatUserProfile?.nick_name
+          }}</span>
         </div>
       </el-drawer>
     </div>
@@ -299,8 +340,8 @@ onMounted(() => {
 })
 
 const userCenterDrawerShow = ref(false)
-function toUserCenter () {
-  if(!chatUser.chat_profile?.authentication) return
+function toUserCenter() {
+  if (!chatUser.chat_profile?.authentication) return
   userCenterDrawerShow.value = true
 }
 </script>
@@ -332,7 +373,9 @@ function toUserCenter () {
   .left-drawer {
     .el-drawer__body {
       padding: 16px;
-      background: linear-gradient(187.61deg, rgba(235, 241, 255, 0.5) 39.6%, rgba(231, 249, 255, 0.5) 94.3%), #eef1f4;
+      background:
+        linear-gradient(187.61deg, rgba(235, 241, 255, 0.5) 39.6%, rgba(231, 249, 255, 0.5) 94.3%),
+        #eef1f4;
       overflow: hidden;
 
       .add-button {
