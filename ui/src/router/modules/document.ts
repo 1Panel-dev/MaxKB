@@ -31,7 +31,7 @@ const DocumentRouter = {
             if (to.params.folderId == 'shared') {
               return RoleConst.ADMIN
             } else {
-              return RoleConst.WORKSPACE_MANAGE.getWorkspaceRole
+              return RoleConst.WORKSPACE_MANAGE.getWorkspaceRole()
             }
           },
           () => {
@@ -49,7 +49,7 @@ const DocumentRouter = {
           () => {
             const to: any = get_next_route()
             if (to.params.folderId == 'shared') { return RoleConst.ADMIN } else {
-              return PermissionConst.KNOWLEDGE_DOCUMENT_READ.getWorkspacePermissionWorkspaceManageRole
+              return PermissionConst.KNOWLEDGE_DOCUMENT_READ.getWorkspacePermissionWorkspaceManageRole()
             }
           }
         ],
@@ -75,7 +75,7 @@ const DocumentRouter = {
           },
           () => {
             const to: any = get_next_route()
-            if (to.params.folderId == 'shared') { return RoleConst.ADMIN } else { return RoleConst.WORKSPACE_MANAGE.getWorkspaceRole }
+            if (to.params.folderId == 'shared') { return RoleConst.ADMIN } else { return RoleConst.WORKSPACE_MANAGE.getWorkspaceRole() }
           },
           () => {
             const to: any = get_next_route()
@@ -87,7 +87,7 @@ const DocumentRouter = {
           },
           () => {
             const to: any = get_next_route()
-            if (to.params.folderId == 'shared') { return RoleConst.ADMIN } else { return PermissionConst.KNOWLEDGE_PROBLEM_READ.getWorkspacePermissionWorkspaceManageRole }
+            if (to.params.folderId == 'shared') { return RoleConst.ADMIN } else { return PermissionConst.KNOWLEDGE_PROBLEM_READ.getWorkspacePermissionWorkspaceManageRole() }
           },
         ],
       },
@@ -111,7 +111,7 @@ const DocumentRouter = {
           },
           () => {
             const to: any = get_next_route()
-            if (to.params.folderId == 'shared') { return RoleConst.ADMIN } else { return RoleConst.WORKSPACE_MANAGE.getWorkspaceRole }
+            if (to.params.folderId == 'shared') { return RoleConst.ADMIN } else { return RoleConst.WORKSPACE_MANAGE.getWorkspaceRole() }
           },
           () => {
             const to: any = get_next_route()
@@ -123,7 +123,7 @@ const DocumentRouter = {
           },
           () => {
             const to: any = get_next_route()
-            if (to.params.folderId == 'shared') { return RoleConst.ADMIN } else { return PermissionConst.KNOWLEDGE_HIT_TEST_READ.getWorkspacePermissionWorkspaceManageRole }
+            if (to.params.folderId == 'shared') { return RoleConst.ADMIN } else { return PermissionConst.KNOWLEDGE_HIT_TEST_READ.getWorkspacePermissionWorkspaceManageRole() }
           },
         ],
       },
@@ -195,7 +195,7 @@ const DocumentRouter = {
           },
           () => {
             const to: any = get_next_route()
-            if (to.params.folderId == 'shared') { return RoleConst.ADMIN } else { return RoleConst.WORKSPACE_MANAGE.getWorkspaceRole }
+            if (to.params.folderId == 'shared') { return RoleConst.ADMIN } else { return RoleConst.WORKSPACE_MANAGE.getWorkspaceRole() }
           },
           () => {
             const to: any = get_next_route()
@@ -207,7 +207,7 @@ const DocumentRouter = {
           },
           () => {
             const to: any = get_next_route()
-            if (to.params.folderId == 'shared') { return RoleConst.ADMIN } else { return PermissionConst.KNOWLEDGE_EDIT.getWorkspacePermissionWorkspaceManageRole }
+            if (to.params.folderId == 'shared') { return RoleConst.ADMIN } else { return PermissionConst.KNOWLEDGE_EDIT.getWorkspacePermissionWorkspaceManageRole() }
           },
         ],
       },
