@@ -326,7 +326,7 @@ class ToolSerializer(serializers.Serializer):
         def delete(self):
             self.is_valid(raise_exception=True)
             tool = QuerySet(Tool).filter(id=self.data.get('id')).first()
-            if tool.template_id is None and tool.icon != '/ui/favicon.ico':
+            if tool.template_id is None and tool.icon != '':
                 QuerySet(File).filter(id=tool.icon.split('/')[-1]).delete()
             QuerySet(WorkspaceUserResourcePermission).filter(target=tool.id).delete()
             QuerySet(Tool).filter(id=self.data.get('id')).delete()
@@ -426,10 +426,10 @@ class ToolSerializer(serializers.Serializer):
             if tool is None:
                 raise AppApiException(500, _('Function does not exist'))
             # 删除旧的图片
-            if tool.icon != '/ui/favicon.ico':
+            if tool.icon != '':
                 QuerySet(File).filter(id=tool.icon.split('/')[-1]).delete()
             if self.data.get('image') is None:
-                tool.icon = '/ui/favicon.ico'
+                tool.icon = ''
             else:
                 meta = {
                     'debug': False

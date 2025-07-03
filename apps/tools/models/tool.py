@@ -41,7 +41,7 @@ class Tool(AppModelMixin):
     code = models.CharField(max_length=102400, verbose_name="python代码")
     input_field_list = models.JSONField(verbose_name="输入字段列表", default=list)
     init_field_list = models.JSONField(verbose_name="启动字段列表", default=list)
-    icon = models.CharField(max_length=256, verbose_name="工具库icon", default="/ui/favicon.ico")
+    icon = models.CharField(max_length=256, verbose_name="工具库icon", default="")
     is_active = models.BooleanField(default=True)
     scope = models.CharField(max_length=20, verbose_name='可用范围', choices=ToolScope.choices,
                              default=ToolScope.WORKSPACE)
