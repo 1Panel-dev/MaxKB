@@ -7648,7 +7648,7 @@ msgstr "不支持的平臺類型"
 
 #: apps/xpack/serializers/channel/chat_manage.py:100
 msgid "Think: "
-msgstr "思考: "
+msgstr "思考内容: "
 
 #: apps/xpack/serializers/channel/chat_manage.py:103
 #: apps/xpack/serializers/channel/chat_manage.py:105
