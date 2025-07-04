@@ -11,7 +11,7 @@ updates:
       python-dependencies:
         patterns:
           - "*"
-    ignore:
-      - dependency-name: "pymupdf"
-        versions: ["*"]
+#    ignore:
+#      - dependency-name: "pymupdf"
+#        versions: ["*"]
 
