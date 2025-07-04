@@ -108,9 +108,9 @@ const onChange = (file: any) => {
 
 const editionText = computed(() => {
   if (!user) return '-'
-  if (user.isPE()) {
+  if (user.getEditionName() === 'PE') {
     return t('layout.about.edition.professional')
-  } else if (user.isEE()) {
+  } else if (user.getEditionName() === 'EE') {
     return t('layout.about.edition.enterprise')
   } else {
     return t('layout.about.edition.community')
@@ -119,7 +119,6 @@ const editionText = computed(() => {
 function getLicenseInfo() {
   licenseApi.getLicense(loading).then((res: any) => {
     licenseInfo.value = res.data?.license
-    console.log(licenseInfo.value)
   })
 }
 
