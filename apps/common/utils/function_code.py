@@ -23,7 +23,7 @@ class FunctionExecutor:
     def __init__(self, sandbox=False):
         self.sandbox = sandbox
         if sandbox:
-            self.sandbox_path = '/opt/maxkb/app/sandbox'
+            self.sandbox_path = '/opt/maxkb-app/sandbox'
             self.user = 'sandbox'
         else:
             self.sandbox_path = os.path.join(PROJECT_DIR, 'data', 'sandbox')
