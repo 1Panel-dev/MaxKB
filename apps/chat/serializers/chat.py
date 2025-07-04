@@ -274,6 +274,10 @@ class ChatSerializers(serializers.Serializer):
         application = QuerySet(Application).filter(id=chat.application_id).first()
         if application is None:
             raise ChatException(500, _("Application does not exist"))
+        application_version = QuerySet(ApplicationVersion).filter(application_id=application.id).order_by(
+            '-create_time')[0:1].first()
+        if application_version is None:
+            raise ChatException(500, _("The application has not been published. Please use it after publishing."))
         if application.type == ApplicationTypeChoices.SIMPLE:
             return self.re_open_chat_simple(chat_id, application)
         else:
@@ -299,11 +303,6 @@ class ChatSerializers(serializers.Serializer):
         return chat_info
 
     def re_open_chat_work_flow(self, chat_id, application):
-        application_version = QuerySet(ApplicationVersion).filter(application_id=application.id).order_by(
-            '-create_time')[0:1].first()
-        if application_version is None:
-            raise ChatException(500, _("The application has not been published. Please use it after publishing."))
-
         chat_info = ChatInfo(chat_id, self.data.get('chat_user_id'), self.data.get('chat_user_type'), [], [],
                              application.id)
         chat_record_list = list(QuerySet(ChatRecord).filter(chat_id=chat_id).order_by('-create_time')[0:5])
@@ -334,6 +333,14 @@ class OpenChatSerializers(serializers.Serializer):
         self.is_valid(raise_exception=True)
         application_id = self.data.get('application_id')
         application = QuerySet(Application).get(id=application_id)
+        debug = self.data.get("debug")
+        if not debug:
+            application_version = QuerySet(ApplicationVersion).filter(application_id=application_id).order_by(
+                '-create_time')[0:1].first()
+            if application_version is None:
+                raise AppApiException(500,
+                                      gettext(
+                                          "The application has not been published. Please use it after publishing."))
         if application.type == ApplicationTypeChoices.SIMPLE:
             return self.open_simple(application)
         else:
@@ -346,13 +353,6 @@ class OpenChatSerializers(serializers.Serializer):
         chat_user_type = self.data.get("chat_user_type")
         debug = self.data.get("debug")
         chat_id = str(uuid.uuid7())
-        if not debug:
-            application_version = QuerySet(ApplicationVersion).filter(application_id=application_id).order_by(
-                '-create_time')[0:1].first()
-            if application_version is None:
-                raise AppApiException(500,
-                                      gettext(
-                                          "The application has not been published. Please use it after publishing."))
         ChatInfo(chat_id, chat_user_id, chat_user_type, [],
                  [],
                  application_id, debug).set_cache()
