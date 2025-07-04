@@ -32,9 +32,10 @@
             v-model="search_form.create_user"
             @change="getList"
             clearable
+            filterable
             style="width: 220px"
           >
-            <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.username"/>
+            <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.nick_name"/>
           </el-select>
         </div>
       </div>
@@ -237,6 +238,7 @@ import useStore from '@/stores'
 import {datetimeFormat} from '@/utils/time'
 import {loadPermissionApi} from "@/utils/dynamics-api/permission-api.ts";
 import {isWorkFlow} from "@/utils/application.ts";
+import UserApi from "@/api/user/user.ts";
 
 const {user} = useStore()
 
@@ -317,6 +319,10 @@ function getList() {
 onMounted(() => {
   getWorkspaceList()
   getList()
+
+  UserApi.getAllMemberList('').then((res: any) => {
+    user_options.value = res.data
+  })
 })
 </script>
 
