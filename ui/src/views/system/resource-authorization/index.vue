@@ -209,7 +209,7 @@ const activeData = computed(() => {
 watch(filterText, (val: any) => {
   if (val) {
     filterMember.value = memberList.value.filter((v: any) =>
-      v.username.toLowerCase().includes(val.toLowerCase()),
+      v.nick_name.toLowerCase().includes(val.toLowerCase()),
     )
   } else {
     filterMember.value = memberList.value
