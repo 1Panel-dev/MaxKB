@@ -11,6 +11,7 @@ export default {
   green: '松石绿',
   purple: '神秘紫',
   red: '胭脂红',
+  custom: '自定义',
   loginBackground: '登录背景图',
   loginLogo: '登录 Logo',
   websiteLogo: '网站 Logo',
