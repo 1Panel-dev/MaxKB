@@ -193,6 +193,9 @@ function getList() {
   const params = {
     [search_type.value]: search_form.value[search_type.value],
   }
+  if (workspaceArr.value.length > 0) {
+    params.workspace_ids = JSON.stringify(workspaceArr.value)
+  }
   KnowledgeResourceApi.getKnowledgeListPage(paginationConfig, params, loading).then((res: any) => {
     paginationConfig.total = res.data?.total
     knowledgeList.value = res.data?.records

@@ -215,6 +215,9 @@ function getList() {
   const params = {
     [search_type.value]: search_form.value[search_type.value],
   }
+  if (workspaceArr.value.length > 0) {
+    params.workspace_ids = JSON.stringify(workspaceArr.value)
+  }
   ToolResourceApi.getToolListPage(paginationConfig, params, loading).then((res) => {
     paginationConfig.total = res.data?.total
     toolList.value = res.data?.records
