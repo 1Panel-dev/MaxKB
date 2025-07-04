@@ -11,6 +11,7 @@ export default {
   green: 'Green',
   purple: 'Purple',
   red: 'Red',
+  custom: 'theme.custom',
   loginBackground: 'Login Background Image',
   loginLogo: 'Login Logo',
   websiteLogo: 'Website Logo',
@@ -39,4 +40,5 @@ export default {
   saveAndApply: 'Save and Apply',
   fileMessageError: 'File size exceeds 10MB',
   saveSuccess: 'Appearance settings successfully applied',
+
 }

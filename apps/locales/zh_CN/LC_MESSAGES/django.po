@@ -1291,7 +1291,7 @@ msgstr "工作流版本不存在"
 #: apps/application/views/application.py:42
 #: apps/application/views/application.py:43
 msgid "Create an application"
-msgstr "創建一個應用程式"
+msgstr "创建一个应用程序"
 
 #: apps/application/views/application.py:47
 #: apps/application/views/application.py:65
