@@ -90,19 +90,19 @@
                     </div>
                   </div>
                 </el-dropdown-item>
-                <el-dropdown-item>
-                  <el-upload
-                    class="import-button"
-                    ref="elUploadRef"
-                    :file-list="[]"
-                    action="#"
-                    multiple
-                    :auto-upload="false"
-                    :show-file-list="false"
-                    :limit="1"
-                    :on-change="(file: any, fileList: any) => importApplication(file)"
-                  >
-                    <div class="flex align-center">
+                <el-upload
+                  class="import-button"
+                  ref="elUploadRef"
+                  :file-list="[]"
+                  action="#"
+                  multiple
+                  :auto-upload="false"
+                  :show-file-list="false"
+                  :limit="1"
+                  :on-change="(file: any, fileList: any) => importApplication(file)"
+                >
+                  <el-dropdown-item class="w-full">
+                    <div class="flex align-center w-full">
                       <el-avatar shape="square" class="mt-4" :size="36" style="background: none">
                         <img src="@/assets/icon_import.svg" alt="" />
                       </el-avatar>
@@ -110,8 +110,8 @@
                         <div class="lighter">{{ $t('common.importCreate') }}</div>
                       </div>
                     </div>
-                  </el-upload>
-                </el-dropdown-item>
+                  </el-dropdown-item>
+                </el-upload>
                 <el-dropdown-item @click="openCreateFolder" divided>
                   <div class="flex align-center">
                     <AppIcon iconName="app-folder" style="font-size: 32px"></AppIcon>

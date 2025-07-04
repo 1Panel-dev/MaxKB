@@ -86,16 +86,17 @@
             <p class="mb-16 lighter">
               {{ $t('views.system.authentication.title') }}
               <el-button type="primary" link @click="router.push({ path: '' })">
-                {{ '去配置对话用户' }}
+                {{ $t('views.applicationOverview.appInfo.LimitDialog.toSettingChatUser') }}
               </el-button>
             </p>
           </el-radio>
           <el-form-item
-            label="登录方式"
+            v-if="form.authentication_value.type === 'login'"
+            :label="$t('views.applicationOverview.appInfo.LimitDialog.loginMethod')"
             :rules="[
               {
                 required: true,
-                message: $t('请选择登录方式'),
+                message: $t('views.applicationOverview.appInfo.LimitDialog.loginMethodRequired'),
                 trigger: 'change',
               },
             ]"

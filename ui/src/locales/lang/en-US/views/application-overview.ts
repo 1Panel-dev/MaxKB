@@ -43,6 +43,9 @@ export default {
       whitelistLabel: 'Allowed Domains',
       whitelistPlaceholder:
         'Enter allowed third-party domains, one per line. For example:\nhttp://127.0.0.1:5678\nhttps://dataease.io',
+      loginMethod: 'Login Method',
+      loginMethodRequired: 'Please select login method',
+      toSettingChatUser: 'Go to configure chat user',
     },
     SettingAPIKeyDialog: {
       allowCrossDomainLabel: 'Allow Cross-Domain Access',

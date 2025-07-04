@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="$t('views.knowledge.knowledgeType.createGeneralKnowledge')"
+    :title="$t('views.knowledge.knowledgeType.createWebKnowledge')"
     v-model="dialogVisible"
     width="720"
     append-to-body

@@ -17,7 +17,7 @@ export default {
       msgConfirm1: '是否重新生成公开访问链接?',
       msgConfirm2:
         '重新生成公开访问链接会影响嵌入第三方脚本变更，需要将新脚本重新嵌入第三方，请谨慎操作！',
-      refreshSuccess: '刷新成功'
+      refreshSuccess: '刷新成功',
     },
 
     APIKeyDialog: {
@@ -25,13 +25,13 @@ export default {
       msgConfirm1: '是否删除API Key',
       msgConfirm2: '删除API Key后将无法恢复，请确认是否删除？',
       enabledSuccess: '已启用',
-      disabledSuccess: '已禁用'
+      disabledSuccess: '已禁用',
     },
     EmbedDialog: {
       fullscreenModeTitle: '全屏模式',
       copyInstructions: '复制以下代码进行嵌入',
       floatingModeTitle: '浮窗模式',
-      mobileModeTitle: '移动端模式'
+      mobileModeTitle: '移动端模式',
     },
     LimitDialog: {
       showSourceLabel: '显示知识来源',
@@ -41,13 +41,16 @@ export default {
       authenticationValue: '密码验证',
       whitelistLabel: '白名单',
       whitelistPlaceholder:
-        '请输入允许嵌入第三方的源地址，一行一个，如：\nhttp://127.0.0.1:5678\nhttps://dataease.io'
+        '请输入允许嵌入第三方的源地址，一行一个，如：\nhttp://127.0.0.1:5678\nhttps://dataease.io',
+      loginMethod: '登录方式',
+      loginMethodRequired: '请选择登录方式',
+      toSettingChatUser: '去配置对话用户',
     },
     SettingAPIKeyDialog: {
       dialogTitle: '设置',
       allowCrossDomainLabel: '允许跨域地址',
       crossDomainPlaceholder:
-        '请输入允许的跨域地址，开启后不输入跨域地址则不限制。\n跨域地址一行一个，如：\nhttp://127.0.0.1:5678 \nhttps://dataease.io'
+        '请输入允许的跨域地址，开启后不输入跨域地址则不限制。\n跨域地址一行一个，如：\nhttp://127.0.0.1:5678 \nhttps://dataease.io',
     },
     SettingDisplayDialog: {
       dialogTitle: '显示设置',
@@ -69,7 +72,7 @@ export default {
         left: '左',
         right: '右',
         bottom: '下',
-        top: '上'
+        top: '上',
       },
       draggablePosition: '可拖拽位置',
       showHistory: '显示历史记录',
@@ -78,7 +81,7 @@ export default {
       disclaimerValue: '「以上内容均由 AI 生成，仅供参考和借鉴」',
       chatBackground: '聊天背景',
       chatBackgroundMessage: '支持 JPG、PNG、GIF，大小不超过 10 MB',
-    }
+    },
   },
   monitor: {
     monitoringStatistics: '监控统计',
@@ -98,7 +101,7 @@ export default {
       tokensTotal: 'Tokens 总数',
       userSatisfaction: '用户满意度',
       approval: '赞同',
-      disapproval: '反对'
-    }
-  }
+      disapproval: '反对',
+    },
+  },
 }
