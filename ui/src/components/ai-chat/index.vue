@@ -51,6 +51,7 @@
               :executionIsRightPanel="props.executionIsRightPanel"
               @open-execution-detail="emit('openExecutionDetail', chatList[index])"
               @openParagraph="emit('openParagraph', chatList[index])"
+              @openParagraphDocument="(val: any)=>emit('openParagraphDocument', chatList[index], val)"
             ></AnswerContent>
           </template>
           <TransitionContent
@@ -138,7 +139,7 @@ const props = withDefaults(
     type: 'ai-chat',
   },
 )
-const emit = defineEmits(['refresh', 'scroll', 'openExecutionDetail', 'openParagraph'])
+const emit = defineEmits(['refresh', 'scroll', 'openExecutionDetail', 'openParagraph','openParagraphDocument'])
 const { application, common } = useStore()
 const isMobile = computed(() => {
   return common.isMobile() || mode === 'embed' || mode === 'mobile'

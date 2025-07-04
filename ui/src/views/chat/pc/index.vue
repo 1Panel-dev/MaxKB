@@ -275,6 +275,7 @@
                 @scroll="handleScroll"
                 @open-execution-detail="openExecutionDetail"
                 @openParagraph="openKnowledgeSource"
+                @openParagraphDocument="openParagraphDocument"
               >
               </AiChat>
             </div>
@@ -299,6 +300,7 @@
                 :detail="executionDetail"
                 :type="applicationDetail?.type"
               />
+              <ParagraphDocumentContent v-else />
             </div>
           </el-splitter-panel>
         </el-splitter>
@@ -330,6 +332,7 @@ import { t } from '@/locales'
 import type { ResetCurrentUserPasswordRequest } from '@/api/type/user'
 import ExecutionDetailContent from '@/components/ai-chat/component/knowledge-source-component/ExecutionDetailContent.vue'
 import ParagraphSourceContent from '@/components/ai-chat/component/knowledge-source-component/ParagraphSourceContent.vue'
+import ParagraphDocumentContent from '@/components/ai-chat/component/knowledge-source-component/ParagraphDocumentContent.vue'
 import { cloneDeep } from 'lodash'
 
 useResize()
@@ -598,6 +601,12 @@ async function openKnowledgeSource(row: any) {
   rightPanelType.value = 'knowledgeSource'
   // TODO 数据
   rightPanelDetail.value = row
+  rightPanelSize.value = 400
+}
+
+function openParagraphDocument(detail: any, row: any) {
+  rightPanelTitle.value = row.document_name
+  rightPanelType.value = 'paragraphDocument'
   rightPanelSize.value = 400
 }
 

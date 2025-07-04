@@ -46,6 +46,7 @@
             :executionIsRightPanel="props.executionIsRightPanel"
             @open-execution-detail="emit('openExecutionDetail')"
             @openParagraph="emit('openParagraph')"
+            @openParagraphDocument="(val: string)=>emit('openParagraphDocument', val)"
             v-if="showSource(chatRecord) && index === chatRecord.answer_text_list.length - 1"
           />
         </el-card>
@@ -91,7 +92,7 @@ const props = defineProps<{
 
 const { user } = useStore()
 
-const emit = defineEmits(['update:chatRecord', 'openExecutionDetail', 'openParagraph'])
+const emit = defineEmits(['update:chatRecord', 'openExecutionDetail', 'openParagraph','openParagraphDocument'])
 
 const showAvatar = computed(() => {
   return user.isEnterprise() ? props.application.show_avatar : true
