@@ -296,6 +296,30 @@ const getMcpTools: (application_id: String, loading?: Ref<boolean>) => Promise<R
   return get(`${prefix.value}/${application_id}/mcp_tools`, undefined, loading)
 }
 
+/**
+ * 上传文件
+ * @param 参数  file:file
+ */
+const uploadFile: (
+  file: any,
+  sourceId: string,
+  resourceType:
+    | 'KNOWLEDGE'
+    | 'APPLICATION'
+    | 'TOOL'
+    | 'DOCUMENT'
+    | 'CHAT'
+    | 'TEMPORARY_30_MINUTE'
+    | 'TEMPORARY_120_MINUTE'
+    | 'TEMPORARY_1_DAY',
+) => Promise<Result<any>> = (file, sourceId, resourceType) => {
+  const fd = new FormData()
+  fd.append('file', file)
+  fd.append('source_id', sourceId)
+  fd.append('source_type', resourceType)
+  return post(`/oss/file`, fd)
+}
+
 export default {
   getAllApplication,
   getApplication,
@@ -321,4 +345,5 @@ export default {
   postTextToSpeech,
   speechToText,
   getMcpTools,
+  uploadFile,
 }

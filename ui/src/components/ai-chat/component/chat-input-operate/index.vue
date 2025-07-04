@@ -42,7 +42,7 @@
                     </div>
                   </div>
                   <div
-                    @click="deleteFile(index, 'document')"
+                    @click="deleteFile(item)"
                     class="delete-icon color-secondary"
                     v-if="showDelete === item.url"
                   >
@@ -80,7 +80,7 @@
                     </div>
                   </div>
                   <div
-                    @click="deleteFile(index, 'other')"
+                    @click="deleteFile(item)"
                     class="delete-icon color-secondary"
                     v-if="showDelete === item.url"
                   >
@@ -115,7 +115,7 @@
                     </div>
                   </div>
                   <div
-                    @click="deleteFile(index, 'audio')"
+                    @click="deleteFile(item)"
                     class="delete-icon color-secondary"
                     v-if="showDelete === item.url"
                   >
@@ -136,7 +136,7 @@
                 @mouseleave.stop="mouseleave()"
               >
                 <div
-                  @click="deleteFile(index, 'image')"
+                  @click="deleteFile(item)"
                   class="delete-icon color-secondary"
                   v-if="showDelete === item.url"
                 >
@@ -297,7 +297,6 @@ import { ref, computed, onMounted, nextTick, watch, type Ref } from 'vue'
 import Recorder from 'recorder-core'
 import TouchChat from './TouchChat.vue'
 import applicationApi from '@/api/application/application'
-import UserForm from '@/components/ai-chat/component/user-form/index.vue'
 import { MsgAlert } from '@/utils/message'
 import { type chatType } from '@/api/type/application'
 import { useRoute, useRouter } from 'vue-router'
@@ -353,7 +352,6 @@ const localLoading = computed({
     emit('update:loading', v)
   },
 })
-
 
 const upload = ref()
 
@@ -421,92 +419,24 @@ const uploadFile = async (file: any, fileList: any) => {
     fileList.splice(0, fileList.length)
     return
   }
-
-  const formData = new FormData()
-  formData.append('file', file.raw, file.name)
-  //
-  const extension = file.name.split('.').pop().toUpperCase() // 获取文件后缀名并转为小写
-  if (imageExtensions.includes(extension)) {
-    uploadImageList.value.push(file)
-  } else if (documentExtensions.includes(extension)) {
-    uploadDocumentList.value.push(file)
-  } else if (videoExtensions.includes(extension)) {
-    uploadVideoList.value.push(file)
-  } else if (audioExtensions.includes(extension)) {
-    uploadAudioList.value.push(file)
-  } else if (otherExtensions.includes(extension)) {
-    uploadOtherList.value.push(file)
-  }
+  fileAllList.value = fileList
 
   if (!chatId_context.value) {
     const res = await props.openChatId()
     chatId_context.value = res
   }
-
-  if (props.type === 'debug-ai-chat') {
-    formData.append('debug', 'true')
-  } else {
-    formData.append('debug', 'false')
+  const api =
+    props.type === 'debug-ai-chat'
+      ? applicationApi.uploadFile(file.raw, 'TEMPORARY_120_MINUTE', 'TEMPORARY_120_MINUTE')
+      : chatAPI.uploadFile(file.raw, chatId_context.value, 'CHAT')
+  api.then((ok) => {
+    file.url = ok.data
+    const split_path = ok.data.split('/')
+    file.file_id = split_path[split_path.length - 1]
+  })
+  if (!inputValue.value && uploadImageList.value.length > 0) {
+    inputValue.value = t('chat.uploadFile.imageMessage')
   }
-
-  applicationApi
-    .uploadFile(
-      props.applicationDetails.id as string,
-      chatId_context.value as string,
-      formData,
-      localLoading,
-    )
-    .then((response: any) => {
-      fileList.splice(0, fileList.length)
-      uploadImageList.value.forEach((file: any) => {
-        const f = response.data.filter(
-          (f: any) => f.name.replaceAll(' ', '') === file.name.replaceAll(' ', ''),
-        )
-        if (f.length > 0) {
-          file.url = f[0].url
-          file.file_id = f[0].file_id
-        }
-      })
-      uploadDocumentList.value.forEach((file: any) => {
-        const f = response.data.filter(
-          (f: any) => f.name.replaceAll(' ', '') == file.name.replaceAll(' ', ''),
-        )
-        if (f.length > 0) {
-          file.url = f[0].url
-          file.file_id = f[0].file_id
-        }
-      })
-      uploadAudioList.value.forEach((file: any) => {
-        const f = response.data.filter(
-          (f: any) => f.name.replaceAll(' ', '') === file.name.replaceAll(' ', ''),
-        )
-        if (f.length > 0) {
-          file.url = f[0].url
-          file.file_id = f[0].file_id
-        }
-      })
-      uploadVideoList.value.forEach((file: any) => {
-        const f = response.data.filter(
-          (f: any) => f.name.replaceAll(' ', '') === file.name.replaceAll(' ', ''),
-        )
-        if (f.length > 0) {
-          file.url = f[0].url
-          file.file_id = f[0].file_id
-        }
-      })
-      uploadOtherList.value.forEach((file: any) => {
-        const f = response.data.filter(
-          (f: any) => f.name.replaceAll(' ', '') === file.name.replaceAll(' ', ''),
-        )
-        if (f.length > 0) {
-          file.url = f[0].url
-          file.file_id = f[0].file_id
-        }
-      })
-      if (!inputValue.value && uploadImageList.value.length > 0) {
-        inputValue.value = t('chat.uploadFile.imageMessage')
-      }
-    })
 }
 // 粘贴处理
 const handlePaste = (event: ClipboardEvent) => {
@@ -564,11 +494,19 @@ const recorderTime = ref(0)
 const recorderStatus = ref<'START' | 'TRANSCRIBING' | 'STOP'>('STOP')
 
 const inputValue = ref<string>('')
-const uploadImageList = ref<Array<any>>([])
-const uploadDocumentList = ref<Array<any>>([])
-const uploadVideoList = ref<Array<any>>([])
-const uploadAudioList = ref<Array<any>>([])
-const uploadOtherList = ref<Array<any>>([])
+
+const fileAllList = ref<Array<any>>([])
+
+const fileFilter = (fileList: Array<any>, extensionList: Array<string>) => {
+  return fileList.filter((f) => {
+    return extensionList.includes(f.name.split('.').pop().toUpperCase())
+  })
+}
+const uploadImageList = computed(() => fileFilter(fileAllList.value, imageExtensions))
+const uploadDocumentList = computed(() => fileFilter(fileAllList.value, documentExtensions))
+const uploadVideoList = computed(() => fileFilter(fileAllList.value, videoExtensions))
+const uploadAudioList = computed(() => fileFilter(fileAllList.value, audioExtensions))
+const uploadOtherList = computed(() => fileFilter(fileAllList.value, otherExtensions))
 
 const showDelete = ref('')
 
@@ -794,11 +732,11 @@ function autoSendMessage() {
         other_list: uploadOtherList.value,
       })
       inputValue.value = ''
-      uploadImageList.value = []
-      uploadDocumentList.value = []
-      uploadAudioList.value = []
-      uploadVideoList.value = []
-      uploadOtherList.value = []
+      fileAllList.value = []
+      if (upload.value) {
+        upload.value.clearFiles()
+      }
+
       if (quickInputRef.value) {
         quickInputRef.value.textarea.style.height = '45px'
       }
@@ -845,18 +783,8 @@ const insertNewlineAtCursor = (event?: any) => {
   })
 }
 
-function deleteFile(index: number, val: string) {
-  if (val === 'image') {
-    uploadImageList.value.splice(index, 1)
-  } else if (val === 'document') {
-    uploadDocumentList.value.splice(index, 1)
-  } else if (val === 'video') {
-    uploadVideoList.value.splice(index, 1)
-  } else if (val === 'audio') {
-    uploadAudioList.value.splice(index, 1)
-  } else if (val === 'other') {
-    uploadOtherList.value.splice(index, 1)
-  }
+function deleteFile(item: any) {
+  fileAllList.value = fileAllList.value.filter((i) => i != item)
 }
 
 function mouseenter(row: any) {

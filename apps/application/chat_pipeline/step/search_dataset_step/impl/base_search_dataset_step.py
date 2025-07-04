@@ -24,17 +24,7 @@ from knowledge.models import Paragraph, Knowledge
 from knowledge.models import SearchMode
 from maxkb.conf import PROJECT_DIR
 from models_provider.models import Model
-from models_provider.tools import get_model
-
-
-def get_model_by_id(_id, workspace_id):
-    model = QuerySet(Model).filter(id=_id, model_type="EMBEDDING")
-    get_authorized_model = DatabaseModelManage.get_model("get_authorized_model")
-    if get_authorized_model is not None:
-        model = get_authorized_model(model, workspace_id)
-    if model is None:
-        raise Exception(_("Model does not exist"))
-    return model
+from models_provider.tools import get_model, get_model_by_id
 
 
 def get_embedding_id(knowledge_id_list):
@@ -65,6 +55,8 @@ class BaseSearchDatasetStep(ISearchDatasetStep):
         exec_problem_text = padding_problem_text if padding_problem_text is not None else problem_text
         model_id = get_embedding_id(knowledge_id_list)
         model = get_model_by_id(model_id, workspace_id)
+        if model.model_type != "EMBEDDING":
+            raise Exception(_("Model does not exist"))
         self.context['model_name'] = model.name
         embedding_model = ModelManage.get_model(model_id, lambda _id: get_model(model))
         embedding_value = embedding_model.embed_query(exec_problem_text)
