@@ -24,7 +24,7 @@ COPY --from=web-build ui /opt/maxkb-app/ui
 
 WORKDIR /opt/maxkb-app
 RUN python3 -m venv /opt/py3 && \
-    pip install poetry==1.8.5 --break-system-packages && \
+    pip install poetry==2.0.0 --break-system-packages && \
     poetry config virtualenvs.create false && \
     . /opt/py3/bin/activate && \
     if [ "$(uname -m)" = "x86_64" ]; then sed -i 's/^torch.*/torch = {version = "2.7.1+cpu", source = "pytorch"}/g' pyproject.toml; fi && \
