@@ -11,7 +11,17 @@
   >
     <div class="chat-embed__header" :style="(user.isEE() || user.isPE()) && customStyle">
       <div class="flex align-center">
-        <div class="mr-12 ml-24 flex">
+        <!-- TODO icon更换 -->
+        <AppIcon
+          iconName="app-history-outlined"
+          style="font-size: 20px"
+          class="ml-16"
+          :style="{
+            color: applicationDetail?.custom_theme?.header_font_color,
+          }"
+          @click.prevent.stop="show = true"
+        />
+        <div class="mr-12 ml-16 flex">
           <el-avatar
             v-if="isAppIcon(applicationDetail?.icon)"
             shape="square"
@@ -50,24 +60,38 @@
         </AiChat>
       </div>
 
-      <!-- 历史记录弹出层 -->
-      <div @click.prevent.stop="show = !show" class="chat-popover-button cursor color-secondary">
-        <AppIcon
-          iconName="app-history-outlined"
-          :style="{
-            color: applicationDetail?.custom_theme?.header_font_color,
-          }"
-        ></AppIcon>
-      </div>
-
-      <el-collapse-transition>
-        <div v-show="show" class="chat-popover w-full" v-click-outside="clickoutside">
-          <div class="border-b p-16-24">
-            <span>{{ $t('chat.history') }}</span>
+      <el-drawer
+        v-model="show"
+        :with-header="false"
+        class="left-drawer"
+        direction="ltr"
+        :size="280"
+      >
+        <div>
+          <div class="flex align-center mb-16">
+            <div class="flex mr-8">
+              <el-avatar
+                v-if="isAppIcon(applicationDetail?.icon)"
+                shape="square"
+                :size="32"
+                style="background: none"
+              >
+                <img :src="applicationDetail?.icon" alt="" />
+              </el-avatar>
+              <LogoIcon v-else height="32px" />
+            </div>
+            <h4>{{ applicationDetail?.name }}</h4>
           </div>
+          <el-button class="add-button w-full primary" @click="newChat">
+            <AppIcon iconName="app-create-chat"></AppIcon>
+            <span class="ml-4">{{ $t('chat.createChat') }}</span>
+          </el-button>
+          <p class="mt-20 mb-8">{{ $t('chat.history') }}</p>
+        </div>
 
-          <el-scrollbar max-height="300">
-            <div class="p-8">
+        <div class="left-height pt-0">
+          <el-scrollbar>
+            <div>
               <common-list
                 :style="{ '--el-color-primary': applicationDetail?.custom_theme?.theme_color }"
                 :data="chatLogData"
@@ -113,9 +137,18 @@
             </div>
           </el-scrollbar>
         </div>
-      </el-collapse-transition>
-      <div class="chat-popover-mask" v-show="show"></div>
+        <div class="flex align-center user-info" @click="toUserCenter">
+          <el-avatar :size="32">
+            <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
+          </el-avatar>
+          <span v-if="chatUser.chat_profile?.authentication" class="ml-8 color-text-primary">{{
+            chatUser.chatUserProfile?.nick_name
+          }}</span>
+        </div>
+      </el-drawer>
     </div>
+
+    <UserCenter v-model:show="userCenterDrawerShow" />
   </div>
 </template>
 <script setup lang="ts">
@@ -126,7 +159,10 @@ import { hexToRgba } from '@/utils/theme'
 import { MsgError } from '@/utils/message'
 import useStore from '@/stores'
 import { t } from '@/locales'
-const { user, chatLog } = useStore()
+import UserCenter from '../mobile/component/UserCenter.vue'
+import chatAPI from '@/api/chat/chat'
+
+const { user, chatLog, chatUser } = useStore()
 const route = useRoute()
 
 const isPopup = computed(() => {
@@ -219,13 +255,17 @@ function handleScroll(event: any) {
   }
 }
 
-function clickoutside() {
-  show.value = false
+const newObj = {
+  id: 'new',
+  abstract: t('chat.createChat'),
 }
 
 function newChat() {
   paginationConfig.current_page = 1
   currentRecordList.value = []
+  if (!chatLogData.value.some((v) => v.id === 'new')) {
+    chatLogData.value.unshift(newObj)
+  }
   currentChatId.value = 'new'
 }
 
@@ -235,7 +275,7 @@ function getChatLog(id: string) {
     page_size: 20,
   }
 
-  chatLog.asyncGetChatLogClient(id, page, left_loading).then((res: any) => {
+  chatAPI.pageChat(page.current_page, page.page_size, left_loading).then((res: any) => {
     chatLogData.value = res.data.records
     paginationConfig.current_page = 1
     paginationConfig.total = 0
@@ -248,13 +288,12 @@ function getChatLog(id: string) {
 }
 
 function getChatRecord() {
-  return chatLog
-    .asyncChatRecordLog(
-      applicationDetail.value.id,
+  return chatAPI
+    .pageChatRecord(
       currentChatId.value,
-      paginationConfig,
+      paginationConfig.current_page,
+      paginationConfig.page_size,
       loading,
-      false,
     )
     .then((res: any) => {
       paginationConfig.total = res.data.total
@@ -301,6 +340,12 @@ const init = () => {
 onMounted(() => {
   init()
 })
+
+const userCenterDrawerShow = ref(false)
+function toUserCenter() {
+  if (!chatUser.chat_profile?.authentication) return
+  userCenterDrawerShow.value = true
+}
 </script>
 <style lang="scss">
 .chat-embed {
@@ -324,23 +369,34 @@ onMounted(() => {
   }
   .new-chat-button {
     z-index: 11;
+    font-size: 1rem;
   }
   // 历史对话弹出层
-  .chat-popover {
-    position: absolute;
-    top: var(--app-header-height);
-    background: #ffffff;
-    padding-bottom: 24px;
-    z-index: 2009;
+  .left-drawer {
+    .el-drawer__body {
+      padding: 16px;
+      background:
+        linear-gradient(187.61deg, rgba(235, 241, 255, 0.5) 39.6%, rgba(231, 249, 255, 0.5) 94.3%),
+        #eef1f4;
+      overflow: hidden;
+
+      .add-button {
+        border: 1px solid var(--el-color-primary);
+      }
+
+      .left-height {
+        height: calc(100vh - 212px);
+      }
+
+      .user-info {
+        border-radius: 6px;
+        padding: 4px 8px;
+        margin-top: 16px;
+        box-sizing: border-box;
+      }
+    }
   }
-  .chat-popover-button {
-    z-index: 2009;
-    position: absolute;
-    top: 16px;
-    right: 16px;
-    font-size: 22px;
-  }
-  &.chat-embed--popup {
+ &.chat-embed--popup {
     .chat-popover-button {
       right: 85px;
     }

@@ -14,7 +14,8 @@
           <template #reference>
             <div class="list-item flex align-center border border-r-6 p-8-12 cursor" style="width: 39%"
               @click.stop="emit('clickNodes', item)" @mousedown.stop="emit('onmousedown', item)">
-              <el-avatar v-if="isAppIcon(item?.icon)" shape="square" :size="32" style="background: none">
+              <LogoIcon v-if="item.resource_type === 'application'" height="32px" />
+              <el-avatar v-else-if="isAppIcon(item?.icon)" shape="square" :size="32" style="background: none">
                 <img :src="resetUrl(item?.icon)" alt="" />
               </el-avatar>
               <el-avatar v-else class="avatar-green" shape="square" :size="32">
@@ -27,7 +28,8 @@
           <template #default>
             <div class="flex-between mb-8">
               <div class="flex align-center">
-                <el-avatar v-if="isAppIcon(item?.icon)" shape="square" :size="32" style="background: none">
+                <LogoIcon v-if="item.resource_type === 'application'" height="32px" />
+                <el-avatar v-else-if="isAppIcon(item?.icon)" shape="square" :size="32" style="background: none">
                   <img :src="resetUrl(item?.icon)" alt="" />
                 </el-avatar>
                 <el-avatar v-else class="avatar-green" shape="square" :size="32">

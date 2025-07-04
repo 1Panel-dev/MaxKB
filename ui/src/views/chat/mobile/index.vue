@@ -11,6 +11,7 @@
   >
     <div class="chat-embed__header" :style="(user.isEE() || user.isPE()) && customStyle">
       <div class="flex align-center">
+        <!-- TODO icon更换 -->
         <AppIcon
           iconName="app-history-outlined"
           style="font-size: 20px"
