@@ -132,7 +132,8 @@ class ApplicationAPI(APIView):
         @has_permissions(PermissionConstants.APPLICATION_EXPORT.get_workspace_application_permission(),
                          PermissionConstants.APPLICATION_EXPORT.get_workspace_permission_workspace_manage_role(),
                          ViewPermission([RoleConstants.USER.get_workspace_role()],
-                                        [PermissionConstants.APPLICATION.get_workspace_application_permission()],CompareConstants.AND),
+                                        [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                                        CompareConstants.AND),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         @log(menu='Application', operate="Export Application",
              get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')),
@@ -227,7 +228,7 @@ class ApplicationAPI(APIView):
             summary=_("Publishing an application"),
             operation_id=_("Publishing an application"),  # type: ignore
             parameters=ApplicationOperateAPI.get_parameters(),
-            request=ApplicationEditAPI.get_request(),
+            request=None,
             responses=result.DefaultResultSerializer,
             tags=[_('Application')]  # type: ignore
         )

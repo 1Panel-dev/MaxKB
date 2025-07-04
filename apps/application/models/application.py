@@ -90,6 +90,7 @@ class Application(AppModelMixin):
     tts_autoplay = models.BooleanField(verbose_name="自动播放", default=False)
     stt_autosend = models.BooleanField(verbose_name="自动发送", default=False)
     clean_time = models.IntegerField(verbose_name="清理时间", default=180)
+    publish_time = models.DateTimeField(verbose_name="发布时间", default=None, null=True, blank=True)
     file_upload_enable = models.BooleanField(verbose_name="文件上传是否启用", default=False)
     file_upload_setting = models.JSONField(verbose_name="文件上传相关设置", default=dict)
 
@@ -120,14 +121,43 @@ class ApplicationKnowledgeMapping(AppModelMixin):
         db_table = "application_knowledge_mapping"
 
 
-class WorkFlowVersion(AppModelMixin):
+class ApplicationVersion(AppModelMixin):
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
     application = models.ForeignKey(Application, on_delete=models.CASCADE)
-    workspace_id = models.CharField(max_length=64, verbose_name="工作空间id", default="default", db_index=True)
     name = models.CharField(verbose_name="版本名称", max_length=128, default="")
     publish_user_id = models.UUIDField(verbose_name="发布者id", max_length=128, default=None, null=True)
     publish_user_name = models.CharField(verbose_name="发布者名称", max_length=128, default="")
+    workspace_id = models.CharField(max_length=64, verbose_name="工作空间id", default="default", db_index=True)
+    application_name = models.CharField(max_length=128, verbose_name="应用名称")
+    desc = models.CharField(max_length=512, verbose_name="引用描述", default="")
+    prologue = models.CharField(max_length=40960, verbose_name="开场白", default="")
+    dialogue_number = models.IntegerField(default=0, verbose_name="会话数量")
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, db_constraint=False, blank=True, null=True)
+    model_id = models.UUIDField(verbose_name="大语言模型", blank=True, null=True)
+    knowledge_setting = models.JSONField(verbose_name="数据集参数设置", default=get_dataset_setting_dict)
+    model_setting = models.JSONField(verbose_name="模型参数相关设置", default=get_model_setting_dict)
+    model_params_setting = models.JSONField(verbose_name="模型参数相关设置", default=dict)
+    tts_model_params_setting = models.JSONField(verbose_name="模型参数相关设置", default=dict)
+    problem_optimization = models.BooleanField(verbose_name="问题优化", default=False)
+    icon = models.CharField(max_length=256, verbose_name="应用icon", default="./favicon.ico")
     work_flow = models.JSONField(verbose_name="工作流数据", default=dict)
+    type = models.CharField(verbose_name="应用类型", choices=ApplicationTypeChoices.choices,
+                            default=ApplicationTypeChoices.SIMPLE, max_length=256)
+    problem_optimization_prompt = models.CharField(verbose_name="问题优化提示词", max_length=102400, blank=True,
+                                                   null=True,
+                                                   default="()里面是用户问题,根据上下文回答揣测用户问题({question}) 要求: 输出一个补全问题,并且放在<data></data>标签中")
+    tts_model_id = models.UUIDField(verbose_name="文本转语音模型id",
+                                    blank=True, null=True)
+    stt_model_id = models.UUIDField(verbose_name="语音转文本模型id",
+                                    blank=True, null=True)
+    tts_model_enable = models.BooleanField(verbose_name="语音合成模型是否启用", default=False)
+    stt_model_enable = models.BooleanField(verbose_name="语音识别模型是否启用", default=False)
+    tts_type = models.CharField(verbose_name="语音播放类型", max_length=20, default="BROWSER")
+    tts_autoplay = models.BooleanField(verbose_name="自动播放", default=False)
+    stt_autosend = models.BooleanField(verbose_name="自动发送", default=False)
+    clean_time = models.IntegerField(verbose_name="清理时间", default=180)
+    file_upload_enable = models.BooleanField(verbose_name="文件上传是否启用", default=False)
+    file_upload_setting = models.JSONField(verbose_name="文件上传相关设置", default=dict)
 
     class Meta:
-        db_table = "application_work_flow_version"
+        db_table = "application_version"

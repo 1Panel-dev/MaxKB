@@ -10,7 +10,8 @@ from (select application."id"::text,
              application."user_id",
              "user"."nick_name" as "nick_name",
              application."create_time",
-             application."update_time"
+             application."update_time",
+             application."publish_time"
       from application left join "user" on user_id = "user".id
     ${application_custom_sql}
       UNION
@@ -25,6 +26,7 @@ from (select application."id"::text,
              application_folder."user_id",
              "user"."nick_name" as "nick_name",
              application_folder."create_time",
-             application_folder."update_time"
+             application_folder."update_time",
+             null as "publish_time"
       from application_folder left join "user" on user_id = "user".id ${folder_query_set}) temp
 ${application_query_set}

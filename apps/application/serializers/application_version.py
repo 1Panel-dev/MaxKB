@@ -12,7 +12,7 @@ from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from application.models import WorkFlowVersion, Application
+from application.models import Application, ApplicationVersion
 from common.db.search import page_search
 from common.exception.app_exception import AppApiException
 
@@ -25,7 +25,7 @@ class ApplicationVersionQuerySerializer(serializers.Serializer):
 
 class ApplicationVersionModelSerializer(serializers.ModelSerializer):
     class Meta:
-        model = WorkFlowVersion
+        model = ApplicationVersion
         fields = ['id', 'name', 'workspace_id', 'application_id', 'work_flow', 'publish_user_id', 'publish_user_name',
                   'create_time',
                   'update_time']
@@ -43,11 +43,11 @@ class ApplicationVersionSerializer(serializers.Serializer):
         workspace_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("Workspace ID"))
 
         def get_query_set(self, query):
-            query_set = QuerySet(WorkFlowVersion).filter(application_id=query.get('application_id'))
+            query_set = QuerySet(ApplicationVersion).filter(application_id=query.get('application_id'))
             if 'name' in query and query.get('name') is not None:
                 query_set = query_set.filter(name__contains=query.get('name'))
             if 'workspace_id' in self.data and self.data.get('workspace_id') is not None:
-                query_set = query_set.filter(workspace_id=self.data.get('workspace_id').get('name'))
+                query_set = query_set.filter(workspace_id=self.data.get('workspace_id'))
             return query_set.order_by("-create_time")
 
         def list(self, query, with_valid=True):
@@ -67,8 +67,8 @@ class ApplicationVersionSerializer(serializers.Serializer):
     class Operate(serializers.Serializer):
         workspace_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("Workspace ID"))
         application_id = serializers.UUIDField(required=True, label=_("Application ID"))
-        work_flow_version_id = serializers.UUIDField(required=True,
-                                                     label=_("Workflow version id"))
+        application_version_id = serializers.UUIDField(required=True,
+                                                       label=_("Application version ID"))
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
@@ -82,10 +82,11 @@ class ApplicationVersionSerializer(serializers.Serializer):
         def one(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            work_flow_version = QuerySet(WorkFlowVersion).filter(application_id=self.data.get('application_id'),
-                                                                 id=self.data.get('work_flow_version_id')).first()
-            if work_flow_version is not None:
-                return ApplicationVersionModelSerializer(work_flow_version).data
+            application_version = QuerySet(ApplicationVersion).filter(application_id=self.data.get('application_id'),
+                                                                      id=self.data.get(
+                                                                          'application_version_id')).first()
+            if application_version is not None:
+                return ApplicationVersionModelSerializer(application_version).data
             else:
                 raise AppApiException(500, _('Workflow version does not exist'))
 
@@ -93,13 +94,14 @@ class ApplicationVersionSerializer(serializers.Serializer):
             if with_valid:
                 self.is_valid(raise_exception=True)
                 ApplicationVersionEditSerializer(data=instance).is_valid(raise_exception=True)
-            work_flow_version = QuerySet(WorkFlowVersion).filter(application_id=self.data.get('application_id'),
-                                                                 id=self.data.get('work_flow_version_id')).first()
-            if work_flow_version is not None:
+            application_version = QuerySet(ApplicationVersion).filter(application_id=self.data.get('application_id'),
+                                                                      id=self.data.get(
+                                                                          'application_version_id')).first()
+            if application_version is not None:
                 name = instance.get('name', None)
                 if name is not None and len(name) > 0:
-                    work_flow_version.name = name
-                work_flow_version.save()
-                return ApplicationVersionModelSerializer(work_flow_version).data
+                    application_version.name = name
+                application_version.save()
+                return ApplicationVersionModelSerializer(application_version).data
             else:
                 raise AppApiException(500, _('Workflow version does not exist'))

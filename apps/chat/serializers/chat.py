@@ -25,8 +25,8 @@ from application.chat_pipeline.step.search_dataset_step.impl.base_search_dataset
 from application.flow.common import Answer, Workflow
 from application.flow.i_step_node import WorkFlowPostHandler
 from application.flow.workflow_manage import WorkflowManage
-from application.models import Application, ApplicationTypeChoices, WorkFlowVersion, ApplicationKnowledgeMapping, \
-    ChatUserType, ApplicationChatUserStats, ApplicationAccessToken, ChatRecord, Chat
+from application.models import Application, ApplicationTypeChoices, ApplicationKnowledgeMapping, \
+    ChatUserType, ApplicationChatUserStats, ApplicationAccessToken, ChatRecord, Chat, ApplicationVersion
 from application.serializers.application import ApplicationOperateSerializer
 from application.serializers.common import ChatInfo
 from common.exception.app_exception import AppApiException, AppChatNumOutOfBoundsFailed, ChatException
@@ -124,7 +124,7 @@ class ChatSerializers(serializers.Serializer):
 
     def is_valid_chat_id(self, chat_info: ChatInfo):
         if self.data.get('application_id') is not None and self.data.get('application_id') != str(
-                chat_info.application.id):
+                chat_info.application_id):
             raise ChatException(500, _("Conversation does not exist"))
 
     def is_valid_intraday_access_num(self):
@@ -148,10 +148,10 @@ class ChatSerializers(serializers.Serializer):
 
     def is_valid_application_simple(self, *, chat_info: ChatInfo, raise_exception=False):
         self.is_valid_intraday_access_num()
-        model = chat_info.application.model
-        if model is None:
+        model_id = chat_info.application.model_id
+        if model_id is None:
             return chat_info
-        model = QuerySet(Model).filter(id=model.id).first()
+        model = QuerySet(Model).filter(id=model_id).first()
         if model is None:
             return chat_info
         if model.status == Status.ERROR:
@@ -226,10 +226,7 @@ class ChatSerializers(serializers.Serializer):
         if chat_record_id is not None:
             chat_record = self.get_chat_record(chat_info, chat_record_id)
             history_chat_record = [r for r in chat_info.chat_record_list if str(r.id) != chat_record_id]
-        if not debug:
-            work_flow = chat_info.work_flow_version.work_flow
-        else:
-            work_flow = chat_info.application.work_flow
+        work_flow = chat_info.application.work_flow
         work_flow_manage = WorkflowManage(Workflow.new_instance(work_flow),
                                           {'history_chat_record': history_chat_record, 'question': message,
                                            'chat_id': chat_info.chat_id, 'chat_record_id': str(
@@ -252,6 +249,7 @@ class ChatSerializers(serializers.Serializer):
         super().is_valid(raise_exception=True)
         ChatMessageSerializers(data=instance).is_valid(raise_exception=True)
         chat_info = self.get_chat_info()
+        chat_info.get_application()
         self.is_valid_chat_id(chat_info)
         if chat_info.application.type == ApplicationTypeChoices.SIMPLE:
             self.is_valid_application_simple(raise_exception=True, chat_info=chat_info)
@@ -301,14 +299,13 @@ class ChatSerializers(serializers.Serializer):
         return chat_info
 
     def re_open_chat_work_flow(self, chat_id, application):
-        work_flow_version = QuerySet(WorkFlowVersion).filter(application_id=application.id).order_by(
+        application_version = QuerySet(ApplicationVersion).filter(application_id=application.id).order_by(
             '-create_time')[0:1].first()
-        if work_flow_version is None:
+        if application_version is None:
             raise ChatException(500, _("The application has not been published. Please use it after publishing."))
 
         chat_info = ChatInfo(chat_id, self.data.get('chat_user_id'), self.data.get('chat_user_type'), [], [],
-                             application.id,
-                             application, work_flow_version)
+                             application.id)
         chat_record_list = list(QuerySet(ChatRecord).filter(chat_id=chat_id).order_by('-create_time')[0:5])
         chat_record_list.sort(key=lambda r: r.create_time)
         for chat_record in chat_record_list:
@@ -349,18 +346,16 @@ class OpenChatSerializers(serializers.Serializer):
         chat_user_type = self.data.get("chat_user_type")
         debug = self.data.get("debug")
         chat_id = str(uuid.uuid7())
-        work_flow_version = None
         if not debug:
-            work_flow_version = QuerySet(WorkFlowVersion).filter(application_id=application_id).order_by(
+            application_version = QuerySet(ApplicationVersion).filter(application_id=application_id).order_by(
                 '-create_time')[0:1].first()
-            if work_flow_version is None:
+            if application_version is None:
                 raise AppApiException(500,
                                       gettext(
                                           "The application has not been published. Please use it after publishing."))
         ChatInfo(chat_id, chat_user_id, chat_user_type, [],
                  [],
-                 application_id,
-                 application, work_flow_version, debug).set_cache()
+                 application_id, debug).set_cache()
         return chat_id
 
     def open_simple(self, application):
@@ -378,7 +373,7 @@ class OpenChatSerializers(serializers.Serializer):
                       knowledge_id__in=knowledge_id_list,
                       is_active=False)],
                  application_id,
-                 application, debug=debug).set_cache()
+                 debug=debug).set_cache()
         return chat_id
 
 

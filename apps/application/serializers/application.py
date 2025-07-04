@@ -27,7 +27,7 @@ from rest_framework.utils.formatting import lazy_format
 
 from application.flow.common import Workflow
 from application.models.application import Application, ApplicationTypeChoices, ApplicationKnowledgeMapping, \
-    ApplicationFolder, WorkFlowVersion
+    ApplicationFolder, ApplicationVersion
 from application.models.application_access_token import ApplicationAccessToken
 from common import result
 from common.database_model_manage.database_model_manage import DatabaseModelManage
@@ -614,6 +614,8 @@ class ApplicationOperateSerializer(serializers.Serializer):
     def delete(self, with_valid=True):
         if with_valid:
             self.is_valid()
+        QuerySet(ApplicationVersion).filter(application_id=self.data.get('application_id')).delete()
+        QuerySet(ApplicationKnowledgeMapping).filter(application_id=self.data.get('application_id')).delete()
         QuerySet(Application).filter(id=self.data.get('application_id')).delete()
         return True
 
@@ -644,6 +646,27 @@ class ApplicationOperateSerializer(serializers.Serializer):
         except Exception as e:
             return result.error(str(e), response_status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    @staticmethod
+    def reset_application_version(application_version, application):
+        update_field_dict = {
+            'application_name': 'name', 'desc': 'desc', 'prologue': 'prologue', 'dialogue_number': 'dialogue_number',
+            'user_id': 'user_id', 'model_id': 'model_id', 'knowledge_setting': 'knowledge_setting',
+            'model_setting': 'model_setting', 'model_params_setting': 'model_params_setting',
+            'tts_model_params_setting': 'tts_model_params_setting',
+            'problem_optimization': 'problem_optimization', 'icon': 'icon', 'work_flow': 'work_flow',
+            'problem_optimization_prompt': 'problem_optimization_prompt', 'tts_model_id': 'tts_model_id',
+            'stt_model_id': 'stt_model_id', 'tts_model_enable': 'tts_model_enable',
+            'stt_model_enable': 'stt_model_enable', 'tts_type': 'tts_type',
+            'tts_autoplay': 'tts_autoplay', 'stt_autosend': 'stt_autosend', 'file_upload_enable': 'file_upload_enable',
+            'file_upload_setting': 'file_upload_setting',
+            'type': 'type'
+        }
+
+        for (version_field, app_field) in update_field_dict.items():
+            _v = getattr(application, app_field)
+            if _v:
+                setattr(application_version, version_field, _v)
+
     @transaction.atomic
     def publish(self, instance, with_valid=True):
         if with_valid:
@@ -653,25 +676,28 @@ class ApplicationOperateSerializer(serializers.Serializer):
         user = QuerySet(User).filter(id=user_id).first()
         application = QuerySet(Application).filter(id=self.data.get("application_id"),
                                                    workspace_id=workspace_id).first()
-        work_flow = instance.get('work_flow')
-        if work_flow is None:
-            raise AppApiException(500, _("work_flow is a required field"))
-        Workflow.new_instance(work_flow).is_valid()
-        base_node = get_base_node_work_flow(work_flow)
-        if base_node is not None:
-            node_data = base_node.get('properties').get('node_data')
-            if node_data is not None:
-                application.name = node_data.get('name')
-                application.desc = node_data.get('desc')
-                application.prologue = node_data.get('prologue')
-        application.work_flow = work_flow
+        if application.type == ApplicationTypeChoices.WORK_FLOW:
+            work_flow = application.work_flow
+            if work_flow is None:
+                raise AppApiException(500, _("work_flow is a required field"))
+            Workflow.new_instance(work_flow).is_valid()
+            base_node = get_base_node_work_flow(work_flow)
+            if base_node is not None:
+                node_data = base_node.get('properties').get('node_data')
+                if node_data is not None:
+                    application.name = node_data.get('name')
+                    application.desc = node_data.get('desc')
+                    application.prologue = node_data.get('prologue')
+            application.work_flow = work_flow
+        application.publish_time = datetime.datetime.now()
         application.is_publish = True
         application.save()
-        work_flow_version = WorkFlowVersion(work_flow=work_flow, application=application,
-                                            name=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-                                            publish_user_id=user_id,
-                                            publish_user_name=user.username,
-                                            workspace_id=workspace_id)
+        work_flow_version = ApplicationVersion(work_flow=application.work_flow, application=application,
+                                               name=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                                               publish_user_id=user_id,
+                                               publish_user_name=user.username,
+                                               workspace_id=workspace_id)
+        self.reset_application_version(work_flow_version, application)
         work_flow_version.save()
         return self.one(with_valid=False)
 

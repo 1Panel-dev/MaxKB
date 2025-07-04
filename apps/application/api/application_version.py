@@ -55,7 +55,7 @@ class ApplicationVersionOperateAPI(APIMixin):
     def get_parameters():
         return [
             OpenApiParameter(
-                name="work_flow_version_id",
+                name="application_version_id",
                 description="工作流版本id",
                 type=OpenApiTypes.STR,
                 location='path',

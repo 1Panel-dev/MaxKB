@@ -15,7 +15,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from application.models import ApplicationAccessToken, ChatUserType, Application, ApplicationTypeChoices, \
-    WorkFlowVersion
+    ApplicationVersion
 from application.serializers.application import ApplicationSerializerModel
 from common.auth.common import ChatUserToken, ChatAuthentication
 from common.constants.authentication_type import AuthenticationType
@@ -79,6 +79,25 @@ class AuthProfileSerializer(serializers.Serializer):
 class ApplicationProfileSerializer(serializers.Serializer):
     application_id = serializers.UUIDField(required=True, label=_("Application ID"))
 
+    @staticmethod
+    def reset_application(application, application_version):
+        update_field_dict = {
+            'application_name': 'name', 'desc': 'desc', 'prologue': 'prologue', 'dialogue_number': 'dialogue_number',
+            'user_id': 'user_id', 'model_id': 'model_id', 'knowledge_setting': 'knowledge_setting',
+            'model_setting': 'model_setting', 'model_params_setting': 'model_params_setting',
+            'tts_model_params_setting': 'tts_model_params_setting',
+            'problem_optimization': 'problem_optimization', 'icon': 'icon', 'work_flow': 'work_flow',
+            'problem_optimization_prompt': 'problem_optimization_prompt', 'tts_model_id': 'tts_model_id',
+            'stt_model_id': 'stt_model_id', 'tts_model_enable': 'tts_model_enable',
+            'stt_model_enable': 'stt_model_enable', 'tts_type': 'tts_type',
+            'tts_autoplay': 'tts_autoplay', 'stt_autosend': 'stt_autosend', 'file_upload_enable': 'file_upload_enable',
+            'file_upload_setting': 'file_upload_setting'
+        }
+        for (version_field, app_field) in update_field_dict.items():
+            _v = getattr(application_version, version_field)
+            if _v:
+                setattr(application, app_field, _v)
+
     def profile(self, with_valid=True):
         if with_valid:
             self.is_valid()
@@ -88,12 +107,10 @@ class ApplicationProfileSerializer(serializers.Serializer):
         if application_access_token is None:
             raise AppUnauthorizedFailed(500, _("Illegal User"))
         application_setting_model = DatabaseModelManage.get_model('application_setting')
-        if application.type == ApplicationTypeChoices.WORK_FLOW:
-            work_flow_version = QuerySet(WorkFlowVersion).filter(application_id=application.id).order_by(
-                '-create_time')[0:1].first()
-            if work_flow_version is not None:
-                application.work_flow = work_flow_version.work_flow
-
+        application_version = QuerySet(ApplicationVersion).filter(application_id=application.id).order_by(
+            '-create_time')[0:1].first()
+        if application_version is not None:
+            self.reset_application(application, application_version)
         license_is_valid = cache.get(Cache_Version.SYSTEM.get_key(key='license_is_valid'),
                                      version=Cache_Version.SYSTEM.get_version())
         application_setting_dict = {}
