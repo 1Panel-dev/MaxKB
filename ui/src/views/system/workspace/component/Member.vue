@@ -5,8 +5,8 @@
       @click="handleAdd"
       v-hasPermission="
         new ComplexPermission(
-          [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
-          [PermissionConst.WORKSPACE_ADD_MEMBER, PermissionConst.WORKSPACE_WORKSPACE_ADD_MEMBER],
+          [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+          [PermissionConst.WORKSPACE_ADD_MEMBER, PermissionConst.WORKSPACE_WORKSPACE_ADD_MEMBER.getWorkspacePermissionWorkspaceManageRole],
           [],
             'OR',)"
     >
@@ -51,8 +51,8 @@
             @click.stop="handleDelete(row)"
             v-hasPermission="
               new ComplexPermission(
-              [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
-              [PermissionConst.WORKSPACE_REMOVE_MEMBER, PermissionConst.WORKSPACE_WORKSPACE_REMOVE_MEMBER],
+              [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+              [PermissionConst.WORKSPACE_REMOVE_MEMBER, PermissionConst.WORKSPACE_WORKSPACE_REMOVE_MEMBER.getWorkspacePermissionWorkspaceManageRole],
               [],
                 'OR',)"
           >
@@ -74,7 +74,6 @@ import { onMounted, ref, reactive, watch } from 'vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { t } from '@/locales'
 import AddMemberDrawer from './AddMemberDrawer.vue'
-import WorkspaceApi from '@/api/workspace/workspace'
 import type { WorkspaceMemberItem, WorkspaceItem } from '@/api/type/workspace'
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
 import { ComplexPermission } from '@/utils/permission/type'
