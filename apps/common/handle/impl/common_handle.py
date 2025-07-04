@@ -22,6 +22,9 @@ from openpyxl.xml.constants import SHEET_DRAWING_NS, REL_NS, SHEET_MAIN_NS
 from common.utils.logger import maxkb_logger
 from knowledge.models import File
 
+from PIL import ImageFile
+ImageFile.LOAD_TRUNCATED_IMAGES = True
+PILImage.MAX_IMAGE_PIXELS = None
 
 def parse_element(element) -> {}:
     data = {}
