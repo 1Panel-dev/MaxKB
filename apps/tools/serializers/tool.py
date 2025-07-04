@@ -605,6 +605,7 @@ class ToolTreeSerializer(serializers.Serializer):
                 default_query_set = default_query_set.filter(desc__contains=desc)
             if create_user is not None:
                 tool_query_set = tool_query_set.filter(user_id=create_user)
+                folder_query_set = folder_query_set.filter(user_id=create_user)
 
             default_query_set = default_query_set.order_by("-create_time")
 
