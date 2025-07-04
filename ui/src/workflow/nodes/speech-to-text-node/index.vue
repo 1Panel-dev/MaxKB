@@ -154,7 +154,7 @@ const form_data = computed({
 })
 
 function getSelectModel() {
-  model.asyncGetSelectModel({ model_type: 'LLM' }).then((res: any) => {
+  model.asyncGetSelectModel({ model_type: 'STT' }).then((res: any) => {
     modelOptions.value = groupBy(res?.data, 'provider')
   })
 }
