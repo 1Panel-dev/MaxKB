@@ -218,7 +218,6 @@ const open = (folder: string, type?: string) => {
 
 const submitHandle = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
-  console.log(applicationForm.value.type)
   await formEl.validate((valid) => {
     if (valid) {
       if (isWorkFlow(applicationForm.value.type) && appTemplate.value === 'blank') {
@@ -226,7 +225,6 @@ const submitHandle = async (formEl: FormInstance | undefined) => {
         workflowDefault.value.nodes[0].properties.node_data.name = applicationForm.value.name
         applicationForm.value['work_flow'] = workflowDefault.value
       }
-      console.log(applicationForm.value.type)
       applicationApi
         .postApplication({ ...applicationForm.value, folder_id: currentFolder.value }, loading)
         .then((res) => {

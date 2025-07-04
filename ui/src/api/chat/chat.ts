@@ -265,30 +265,57 @@ const speechToText: (data: any, loading?: Ref<boolean>) => Promise<Result<any>> 
   return post(`speech_to_text`, data, undefined, loading)
 }
 /**
- * 
+ *
  * @param chat_id  对话ID
- * @param loading 
- * @returns 
+ * @param loading
+ * @returns
  */
-const deleteChat: (chat_id:string, loading?: Ref<boolean>) => Promise<Result<any>> = (
+const deleteChat: (chat_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
   chat_id,
   loading,
 ) => {
   return del(`historical_conversation/${chat_id}`, loading)
 }
 /**
- * 
+ *
  * @param chat_id 对话id
  * @param data    对话简介
- * @param loading 
- * @returns 
+ * @param loading
+ * @returns
  */
-const modifyChat: (chat_id:string, data:any, loading?: Ref<boolean> ) => Promise<Result<any>> = (
-  chat_id,data,loading
+const modifyChat: (chat_id: string, data: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  chat_id,
+  data,
+  loading,
 ) => {
   return put(`historical_conversation/${chat_id}`, data, undefined, loading)
 }
-
+/**
+ * 上传文件
+ * @param file      文件
+ * @param sourceId  资源id
+ * @param resourceType  资源类型
+ * @returns
+ */
+const uploadFile: (
+  file: any,
+  sourceId: string,
+  resourceType:
+    | 'KNOWLEDGE'
+    | 'APPLICATION'
+    | 'TOOL'
+    | 'DOCUMENT'
+    | 'CHAT'
+    | 'TEMPORARY_30_MINUTE'
+    | 'TEMPORARY_120_MINUTE'
+    | 'TEMPORARY_1_DAY',
+) => Promise<Result<any>> = (file, sourceId, sourceType) => {
+  const fd = new FormData()
+  fd.append('file', file)
+  fd.append('source_id', sourceId)
+  fd.append('source_type', sourceType)
+  return post(`/oss/file`, fd)
+}
 export default {
   open,
   chat,
@@ -316,5 +343,6 @@ export default {
   textToSpeech,
   speechToText,
   deleteChat,
-  modifyChat
+  modifyChat,
+  uploadFile,
 }

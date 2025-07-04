@@ -95,8 +95,6 @@ def default_status_meta():
     return {"state_time": {}}
 
 
-
-
 class KnowledgeFolder(MPTTModel, AppModelMixin):
     id = models.CharField(primary_key=True, max_length=64, editable=False, verbose_name="主键id")
     name = models.CharField(max_length=64, verbose_name="文件夹名称")
@@ -133,8 +131,10 @@ class Knowledge(AppModelMixin):
     class Meta:
         db_table = "knowledge"
 
+
 def get_default_status():
     return Status('').__str__()
+
 
 class Document(AppModelMixin):
     """
@@ -224,10 +224,12 @@ class FileSourceType(models.TextChoices):
     TOOL = "TOOL"
     # 文档
     DOCUMENT = "DOCUMENT"
+    # 对话
+    CHAT = "CHAT"
     # 临时30分钟 数据30分钟后被清理 source_id 为TEMPORARY_30_MINUTE
     TEMPORARY_30_MINUTE = "TEMPORARY_30_MINUTE"
     # 临时120分钟 数据120分钟后被清理 source_id为TEMPORARY_100_MINUTE
-    TEMPORARY_120_MINUTE = "TEMPORARY_100_MINUTE"
+    TEMPORARY_120_MINUTE = "TEMPORARY_120_MINUTE"
     # 临时1天 数据1天后被清理 source_id为TEMPORARY_1_DAY
     TEMPORARY_1_DAY = "TEMPORARY_1_DAY"
 

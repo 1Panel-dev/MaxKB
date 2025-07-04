@@ -9,6 +9,7 @@
 from django.http import HttpResponse
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
+from rest_framework.parsers import MultiPartParser
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
@@ -24,6 +25,8 @@ from common.auth.authentication import has_permissions
 from common.constants.permission_constants import ChatAuth
 from common.exception.app_exception import AppAuthenticationFailed
 from common.result import result
+from knowledge.models import FileSourceType
+from oss.serializers.file import FileSerializer
 from users.api import CaptchaAPI
 from users.serializers.login import CaptchaSerializer
 
@@ -134,7 +137,7 @@ class CaptchaView(APIView):
                    summary=_("Get Chat captcha"),
                    description=_("Get Chat captcha"),
                    operation_id=_("Get Chat captcha"),  # type: ignore
-                   tags=[_("User Management")],  # type: ignore
+                   tags=[_("Chat")],  # type: ignore
                    responses=CaptchaAPI.get_response())
     def get(self, request: Request):
         return result.success(CaptchaSerializer().generate())
@@ -150,7 +153,7 @@ class SpeechToText(APIView):
         operation_id=_("speech to text"),  # type: ignore
         request=SpeechToTextAPI.get_request(),
         responses=SpeechToTextAPI.get_response(),
-        tags=[_('Application')]  # type: ignore
+        tags=[_('Chat')]  # type: ignore
     )
     def post(self, request: Request):
         return result.success(
@@ -169,10 +172,34 @@ class TextToSpeech(APIView):
         operation_id=_("text to speech"),  # type: ignore
         request=TextToSpeechAPI.get_request(),
         responses=TextToSpeechAPI.get_response(),
-        tags=[_('Application')]  # type: ignore
+        tags=[_('Chat')]  # type: ignore
     )
     def post(self, request: Request):
         byte_data = TextToSpeechSerializers(
             data={'application_id': request.auth.application_id}).text_to_speech(request.data)
         return HttpResponse(byte_data, status=200, headers={'Content-Type': 'audio/mp3',
                                                             'Content-Disposition': 'attachment; filename="abc.mp3"'})
+
+
+class UploadFile(APIView):
+    authentication_classes = [TokenAuth]
+    parser_classes = [MultiPartParser]
+
+    @extend_schema(
+        methods=['POST'],
+        description=_("Upload files"),
+        summary=_("Upload files"),
+        operation_id=_("Upload files"),  # type: ignore
+        request=TextToSpeechAPI.get_request(),
+        responses=TextToSpeechAPI.get_response(),
+        tags=[_('Application')]  # type: ignore
+    )
+    def post(self, request: Request, chat_id: str):
+        files = request.FILES.getlist('file')
+        file_ids = []
+        meta = {}
+        for file in files:
+            file_url = FileSerializer(
+                data={'file': file, 'meta': meta, 'source_id': chat_id, 'source_type': FileSourceType.CHAT, }).upload()
+            file_ids.append({'name': file.name, 'url': file_url, 'file_id': file_url.split('/')[-1]})
+        return result.success(file_ids)
