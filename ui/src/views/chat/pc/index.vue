@@ -328,8 +328,8 @@ import { useRouter } from 'vue-router'
 import ResetPassword from '@/layout/layout-header/avatar/ResetPassword.vue'
 import { t } from '@/locales'
 import type { ResetCurrentUserPasswordRequest } from '@/api/type/user'
-import ExecutionDetailContent from '@/components/ai-chat/component/ExecutionDetailContent.vue'
-import ParagraphSourceContent from '@/components/ai-chat/component/ParagraphSourceContent.vue'
+import ExecutionDetailContent from '@/components/ai-chat/component/knowledge-source-component/ExecutionDetailContent.vue'
+import ParagraphSourceContent from '@/components/ai-chat/component/knowledge-source-component/ParagraphSourceContent.vue'
 import { cloneDeep } from 'lodash'
 
 useResize()

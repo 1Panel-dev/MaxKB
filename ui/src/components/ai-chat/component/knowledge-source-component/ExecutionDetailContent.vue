@@ -1,6 +1,6 @@
 <template>
   <el-scrollbar>
-    <div class="execution-details">
+    <div class="execution-details p-8">
       <template
         v-if="isWorkFlow(props.type)"
         v-for="(item, index) in arraySort(props.detail ?? [], 'index')"
@@ -692,14 +692,38 @@
         </el-card>
       </template>
       <template v-else v-for="(item, index) in arraySort(props.detail ?? [], 'index')">
+        <div class="card-never border-r-6 mb-12">
+          <h5 class="p-8-12">
+            {{ '-' }}
+          </h5>
 
+          <div class="p-8-12 border-t-dashed lighter">
+            <div class="mb-8">
+              <span class="color-secondary"> {{ $t('chat.paragraphSource.question') }}:</span>
+
+              {{ item.question || '-' }}
+            </div>
+
+            <template v-if="item.message_list?.length > 0">
+              <p
+                class="mt-4 mb-4"
+                v-for="(content, contentIndex) in item.message_list"
+                :key="contentIndex"
+              >
+                <span class="color-secondary mr-4">{{ content.role }}:</span
+                ><span>{{ content.content }}</span>
+              </p>
+            </template>
+            <template v-else> -</template>
+          </div>
+        </div>
       </template>
     </div>
   </el-scrollbar>
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
-import ParagraphCard from '@/components/ai-chat/component/ParagraphCard.vue'
+import ParagraphCard from '@/components/ai-chat/component/knowledge-source-component/ParagraphCard.vue'
 import { arraySort } from '@/utils/array'
 import { iconComponent } from '@/workflow/icons/utils'
 import { WorkflowType } from '@/enums/application'
@@ -716,6 +740,7 @@ const current = ref<number | string>('')
 </script>
 <style lang="scss" scoped>
 .execution-details {
+  max-height: calc(100vh - 260px);
   .arrow-icon {
     transition: 0.2s;
   }

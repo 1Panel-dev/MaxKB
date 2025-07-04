@@ -40,7 +40,7 @@
             {{ $t('chat.tip.answerLoading') }} <span class="dotting"></span>
           </p>
           <!-- 知识来源 -->
-          <KnowledgeSource
+          <KnowledgeSourceComponent
             :data="chatRecord"
             :type="application.type"
             :executionIsRightPanel="props.executionIsRightPanel"
@@ -72,7 +72,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import KnowledgeSource from '@/components/ai-chat/KnowledgeSource.vue'
+import KnowledgeSourceComponent from '@/components/ai-chat/component/knowledge-source-component/index.vue'
 import MdRenderer from '@/components/markdown/MdRenderer.vue'
 import OperationButton from '@/components/ai-chat/component/operation-button/index.vue'
 import { type chatType } from '@/api/type/application'

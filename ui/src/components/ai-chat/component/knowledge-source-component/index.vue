@@ -13,10 +13,10 @@
       <el-row :gutter="8" v-if="uniqueParagraphList?.length">
         <template v-for="(item, index) in uniqueParagraphList" :key="index">
           <el-col :span="12" class="mb-8">
-            <el-card shadow="never" class="file-List-card" data-width="40">
+            <el-card shadow="never" style="--el-card-padding: 8px">
               <div class="flex-between">
-                <div class="flex">
-                  <img :src="getImgUrl(item && item?.document_name)" alt="" width="20" />
+                <div class="flex align-center">
+                  <img :src="getImgUrl(item && item?.document_name)" alt="" width="24" />
                   <div class="ml-4 ellipsis-1" :title="item?.document_name" v-if="!item.source_url">
                     <p>{{ item && item?.document_name }}</p>
                   </div>
@@ -24,7 +24,7 @@
                     <a
                       :href="getNormalizedUrl(item?.source_url)"
                       target="_blank"
-                      class="ellipsis"
+                      class="ellipsis-1"
                       :title="item?.document_name?.trim()"
                     >
                       <span :title="item?.document_name?.trim()">{{ item?.document_name }}</span>
@@ -60,18 +60,31 @@
         {{ $t('chat.executionDetails.title') }}</el-button
       >
     </div>
-    <!-- 知识库引用 dialog -->
-    <ParagraphSourceDialog ref="ParagraphSourceDialogRef" />
-    <!-- 执行详情 dialog -->
-    <ExecutionDetailDialog ref="ExecutionDetailDialogRef" :type="type" />
+    <!-- 知识库引用/执行详情 dialog -->
+    <el-dialog
+      class="chat-source-dialog"
+      :title="dialogTitle"
+      v-model="dialogVisible"
+      destroy-on-close
+      append-to-body
+      align-center
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+    >
+      <div class="mb-8">
+        <component :is="currentComponent" :detail="currentChatDetail" :type="type"></component>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import ParagraphSourceDialog from './ParagraphSourceDialog.vue'
-import ExecutionDetailDialog from './ExecutionDetailDialog.vue'
-import { isWorkFlow } from '@/utils/application'
+import { computed, ref, shallowRef } from 'vue'
+import { cloneDeep } from 'lodash'
+import ExecutionDetailContent from './ExecutionDetailContent.vue'
+import ParagraphSourceContent from './ParagraphSourceContent.vue'
+import { arraySort } from '@/utils/array'
 import { getImgUrl, getNormalizedUrl } from '@/utils/common'
+import { t } from '@/locales'
 const props = defineProps({
   data: {
     type: Object,
@@ -89,21 +102,34 @@ const props = defineProps({
 
 const emit = defineEmits(['openExecutionDetail', 'openParagraph'])
 
-const ParagraphSourceDialogRef = ref()
-const ExecutionDetailDialogRef = ref()
+const dialogVisible = ref(false)
+const dialogTitle = ref('')
+const currentComponent = shallowRef<any>(null)
+const currentChatDetail = ref<any>(null)
 function openParagraph(row: any, id?: string) {
+  dialogTitle.value = t('chat.KnowledgeSource.title')
+  const obj = cloneDeep(row)
+  obj.paragraph_list = id
+    ? obj.paragraph_list.filter((v: any) => v.knowledge_id === id)
+    : obj.paragraph_list
+  obj.paragraph_list = arraySort(obj.paragraph_list, 'similarity', true)
   if (props.executionIsRightPanel) {
     emit('openParagraph')
     return
   }
-  ParagraphSourceDialogRef.value.open(row, id)
+  currentComponent.value = ParagraphSourceContent
+  currentChatDetail.value = obj
+  dialogVisible.value = true
 }
 function openExecutionDetail(row: any) {
+  dialogTitle.value = t('chat.executionDetails.title')
   if (props.executionIsRightPanel) {
     emit('openExecutionDetail')
     return
   }
-  ExecutionDetailDialogRef.value.open(row)
+  currentComponent.value = ExecutionDetailContent
+  currentChatDetail.value = row
+  dialogVisible.value = true
 }
 const uniqueParagraphList = computed(() => {
   const seen = new Set()

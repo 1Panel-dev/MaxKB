@@ -1,15 +1,13 @@
 <template>
   <CardBox
     shadow="never"
-    :title="data.title || '-'"
+    :title="index + 1 + '.' + data.title || '-'"
     class="paragraph-source-card cursor mb-8 paragraph-source-card-height"
     :class="data.is_active ? '' : 'disabled'"
+    :showIcon="false"
   >
-    <template #icon>
-      <el-avatar class="mr-12 avatar-light" :size="22"> {{ index + 1 + '' }}</el-avatar>
-    </template>
     <template #tag>
-      <div class="primary">
+      <div class="color-primary">
         {{ score?.toFixed(3) || data.similarity?.toFixed(3) }}
       </div>
     </template>
@@ -19,7 +17,7 @@
     </el-scrollbar>
 
     <template #footer>
-      <div class="footer-content flex-between">
+      <el-card shadow="never" style="--el-card-padding: 8px" class="w-full mb-12">
         <el-text class="flex align-center item">
           <img :src="getImgUrl(data?.document_name?.trim())" alt="" width="20" class="mr-4" />
 
@@ -39,15 +37,14 @@
             </span>
           </template>
         </el-text>
-        <div class="flex align-center item" style="line-height: 32px">
-          <el-avatar class="mr-8 avatar-blue" shape="square" :size="18">
-            <img src="@/assets/knowledge/icon_document.svg" style="width: 58%" alt="" />
-          </el-avatar>
-
-          <span class="ellipsis-1 break-all" :title="data?.knowledge_name">
-            {{ data?.knowledge_name }}</span
-          >
-        </div>
+      </el-card>
+      <div class="flex align-center border-t" style="padding: 12px 0 8px">
+        <el-avatar class="mr-8 avatar-blue" shape="square" :size="18">
+          <img src="@/assets/knowledge/icon_document.svg" style="width: 58%" alt="" />
+        </el-avatar>
+        <span class="ellipsis-1 break-all" :title="data?.knowledge_name">
+          {{ data?.knowledge_name || '-' }}
+        </span>
       </div>
     </template>
   </CardBox>
@@ -86,30 +83,13 @@ const parsedMeta = computed(() => {
 const meta = computed(() => (isMetaObject.value ? props.data.meta : parsedMeta.value))
 </script>
 <style lang="scss" scoped>
-.paragraph-source-card {
-  .footer-content {
-    .item {
-      max-width: 50%;
-    }
-  }
-}
-
 .paragraph-source-card-height {
-  height: 260px;
+  height: 300px;
 }
 
-@media only screen and (max-width: 768px) {
-  .paragraph-source-card-height {
-    height: 285px;
-  }
-  .paragraph-source-card {
-    .footer-content {
-      display: block;
-
-      .item {
-        max-width: 100%;
-      }
-    }
-  }
-}
+// @media only screen and (max-width: 768px) {
+//   .paragraph-source-card-height {
+//     height: 285px;
+//   }
+// }
 </style>

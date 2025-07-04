@@ -34,7 +34,7 @@
     </div>
 
     <div class="card-footer flex-between" v-if="$slots.footer || $slots.mouseEnter">
-      <div>
+      <div style="flex: 1">
         <slot name="footer"></slot>
       </div>
       <div @mouseenter="subHoveredEnter">
