@@ -17,14 +17,18 @@ export default {
     published: '已发布',
     unpublished: '未发布',
   },
+
   operation: {
+    addModel: '添加模型',
     toChat: '去对话',
+    publish: '发布',
   },
   delete: {
     confirmTitle: '是否删除应用：',
     confirmMessage: '删除后该应用将不再提供服务，请谨慎操作。',
   },
   tip: {
+    publishSuccess: '发布成功',
     ExportError: '导出失败',
     professionalMessage: '社区版最多支持 5 个应用，如需拥有更多应用，请升级为专业版。',
     saveErrorMessage: '保存失败，请检查输入或稍后再试',
@@ -112,11 +116,6 @@ export default {
       start: '开始',
       end: '结束',
     },
-  },
-  buttons: {
-    save: '保存',
-    publish: '发布',
-    addModel: '添加模型',
   },
 
   dialog: {

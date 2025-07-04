@@ -11,7 +11,7 @@
           :disabled="loading"
           v-if="permissionPrecise.edit(id)"
         >
-          {{ $t('views.application.buttons.save') }}
+          {{ $t('common.save') }}
         </el-button>
         <el-button
           type="primary"
@@ -19,7 +19,7 @@
           :disabled="loading"
           v-if="permissionPrecise.edit(id)"
         >
-          {{ $t('views.application.buttons.publish') }}
+          {{ $t('views.application.operation.publish') }}
         </el-button>
       </div>
     </div>
@@ -567,7 +567,7 @@ const publish = (formEl: FormInstance | undefined) => {
         return ApplicationAPI.publish(id, {}, loading)
       })
       .then((res) => {
-        MsgSuccess(t('common.saveSuccess'))
+        MsgSuccess(t('views.application.tip.publishSuccess'))
       })
   })
 }

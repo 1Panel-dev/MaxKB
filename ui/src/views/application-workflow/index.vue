@@ -37,7 +37,7 @@
           {{ $t('common.save') }}
         </el-button>
         <el-button type="primary" @click="publish">
-          {{ $t('views.applicationWorkflow.setting.public') }}
+          {{ $t('views.application.operation.publish') }}
         </el-button>
 
         <el-dropdown trigger="click">
@@ -287,7 +287,7 @@ const publish = () => {
     })
     .then((ok: any) => {
       detail.value.name = ok.data.name
-      MsgSuccess(t('views.applicationWorkflow.tip.publicSuccess'))
+      MsgSuccess(t('views.application.tip.publishSuccess'))
     })
     .catch((res: any) => {
       const node = res.node

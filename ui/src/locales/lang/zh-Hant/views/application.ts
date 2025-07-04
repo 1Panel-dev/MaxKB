@@ -19,12 +19,15 @@ export default {
   },
   operation: {
     toChat: '去對話',
+    publish: '發布',
+    addModel: '新增模型',
   },
   delete: {
     confirmTitle: '是否刪除應用：',
     confirmMessage: '刪除後該應用將不再提供服務，請謹慎操作。',
   },
   tip: {
+    publishSuccess: '發布成功',
     ExportError: '匯出失敗',
     professionalMessage: '社群版最多支援 5 個應用，如需擁有更多應用，請升級為專業版。',
     saveErrorMessage: '儲存失敗，請檢查輸入或稍後再試',
@@ -112,10 +115,6 @@ export default {
       start: '開始',
       end: '結束',
     },
-  },
-  buttons: {
-    publish: '儲存並發佈',
-    addModel: '新增模型',
   },
 
   dialog: {

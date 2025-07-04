@@ -15,7 +15,6 @@ export default {
     restoreVersion: '恢復版本',
     restoreCurrentVersion: '恢復此版本',
     addComponent: '添加組件',
-    public: '發布',
     releaseHistory: '發布歷史',
     autoSave: '自動保存',
     latestRelease: '最近發布',
@@ -25,7 +24,6 @@ export default {
     exitSave: '保存並退出',
   },
   tip: {
-    publicSuccess: '發布成功',
     noData: '沒有找到相關結果',
     nameMessage: '名字不能為空！',
     onlyRight: '只允許從右邊的錨點連出',

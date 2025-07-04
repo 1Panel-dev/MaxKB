@@ -56,7 +56,7 @@
               <el-icon class="mr-4">
                 <Plus />
               </el-icon>
-              {{ $t('views.application.buttons.addModel') }}
+              {{ $t('views.application.operation.addModel') }}
             </el-button>
           </div>
         </slot>

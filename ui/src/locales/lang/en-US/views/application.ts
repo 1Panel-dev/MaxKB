@@ -19,7 +19,9 @@ export default {
     unpublished: 'Unpublished',
   },
   operation: {
+    addModel: 'Add Model',
     toChat: 'Chat',
+    publish: 'Publish',
   },
   delete: {
     confirmTitle: 'Are you sure you want to delete this APP: ',
@@ -27,6 +29,7 @@ export default {
       'Deleting this APP will no longer provide its services. Please proceed with caution.',
   },
   tip: {
+    publishSuccess: 'Published successfully',
     ExportError: 'Export Failed',
     professionalMessage:
       'The Community Edition supports up to 5 APP. If you need more APP, please upgrade to the Professional Edition.',
@@ -123,10 +126,7 @@ export default {
       end: 'End',
     },
   },
-  buttons: {
-    publish: 'Save&Publish',
-    addModel: 'Add Model',
-  },
+  buttons: {},
   dialog: {
     addKnowledge: 'Add Related Knowledge',
     addKnowledgePlaceholder: 'The selected knowledge must use the same embedding model',

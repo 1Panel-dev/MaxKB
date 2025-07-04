@@ -15,7 +15,6 @@ export default {
     restoreVersion: 'Restore Previous Version"',
     restoreCurrentVersion: 'Restore to This Version',
     addComponent: 'Add',
-    public: 'Publish',
     releaseHistory: 'Release History',
     autoSave: 'Auto Save',
     latestRelease: 'Latest Release',
@@ -25,7 +24,6 @@ export default {
     exitSave: 'Save & Exit',
   },
   tip: {
-    publicSuccess: 'Published successfully',
     noData: 'No related results found',
     nameMessage: 'Name cannot be empty!',
     onlyRight: 'Connections can only be made from the right anchor',
