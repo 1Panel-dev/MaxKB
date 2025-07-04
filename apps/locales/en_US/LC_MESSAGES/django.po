@@ -8469,3 +8469,6 @@ msgstr ""
 
 msgid "System Application"
 msgstr ""
+
+msgid "Hit-Test"
+msgstr ""

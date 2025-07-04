@@ -8595,3 +8595,6 @@ msgstr "共享知识库/文档"
 
 msgid "System Application"
 msgstr "系统应用"
+
+msgid "Hit-Test"
+msgstr "命中测试"
