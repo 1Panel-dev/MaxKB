@@ -1,5 +1,4 @@
 import { nextTick, onBeforeMount, onMounted, onBeforeUnmount } from 'vue'
-import { useRoute } from 'vue-router'
 import useStore from '@/stores'
 import { DeviceType } from '@/enums/common'
 /** 参考 Bootstrap 的响应式设计 WIDTH = 768 */
@@ -32,7 +31,7 @@ export default () => {
     })
   })
 
-  onBeforeUnmount(() => {
-    window.removeEventListener('resize', _resizeHandler)
-  })
+  // onBeforeUnmount(() => {
+  //   window.removeEventListener('resize', _resizeHandler)
+  // })
 }

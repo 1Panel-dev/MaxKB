@@ -21,10 +21,10 @@ const components: any = import.meta.glob('@/views/chat/**/index.vue', {
 
 const {
   query: { mode },
-  params: { accessToken },
 } = route as any
 
 const currentTemplate = computed(() => {
+  console.log(common.isMobile())
   let modeName = ''
   if (!mode || mode === 'pc') {
     modeName = common.isMobile() ? 'mobile' : 'pc'

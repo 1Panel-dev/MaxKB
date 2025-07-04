@@ -2,6 +2,7 @@
   <div
     class="chat-mobile layout-bg chat-background"
     v-loading="loading"
+    :class="classObj"
     :style="{
       '--el-color-primary': applicationDetail?.custom_theme?.theme_color,
       '--el-color-primary-light-9': hexToRgba(applicationDetail?.custom_theme?.theme_color, 0.1),
@@ -164,7 +165,7 @@ import { t } from '@/locales'
 import UserCenter from './component/UserCenter.vue'
 import chatAPI from '@/api/chat/chat'
 
-const { user, chatLog, chatUser } = useStore()
+const { user, chatLog, chatUser, common } = useStore()
 
 const AiChatRef = ref()
 const loading = ref(false)
@@ -196,6 +197,12 @@ const customStyle = computed(() => {
   return {
     background: applicationDetail.value?.custom_theme?.theme_color,
     color: applicationDetail.value?.custom_theme?.header_font_color,
+  }
+})
+
+const classObj = computed(() => {
+  return {
+    mobile: common.isMobile(),
   }
 })
 

@@ -367,13 +367,6 @@ const handleResetPassword = (param: ResetCurrentUserPasswordRequest) => {
   })
 }
 
-const customStyle = computed(() => {
-  return {
-    background: applicationDetail.value?.custom_theme?.theme_color,
-    color: applicationDetail.value?.custom_theme?.header_font_color,
-  }
-})
-
 const classObj = computed(() => {
   return {
     mobile: common.isMobile(),
@@ -576,12 +569,6 @@ async function exportHTML(): Promise<void> {
  *初始化历史对话记录
  */
 const init = () => {
-  // if (
-  //   (applicationDetail.value.show_history || !user.isEnterprise()) &&
-  //   props.applicationAvailable
-  // ) {
-  //   getChatLog(applicationDetail.value.id)
-  // }
   getChatLog(applicationDetail.value?.id)
 }
 onMounted(() => {
@@ -639,6 +626,7 @@ function closeExecutionDetail() {
 
   &__left {
     position: relative;
+    z-index: 1;
 
     .el-menu {
       display: flex;
