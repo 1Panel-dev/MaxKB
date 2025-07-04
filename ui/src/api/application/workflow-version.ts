@@ -18,7 +18,7 @@ const getWorkFlowVersion: (
   application_id: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (application_id, loading) => {
-  return get(`${prefix.value}/${application_id}/work_flow_version`, undefined, loading)
+  return get(`${prefix.value}/${application_id}/application_version`, undefined, loading)
 }
 
 /**
@@ -30,7 +30,7 @@ const getWorkFlowVersionDetail: (
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (application_id, application_version_id, loading) => {
   return get(
-    `${prefix.value}/${application_id}/work_flow_version/${application_version_id}`,
+    `${prefix.value}/${application_id}/application_version/${application_version_id}`,
     undefined,
     loading,
   )
@@ -45,7 +45,7 @@ const putWorkFlowVersion: (
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (application_id, application_version_id, data, loading) => {
   return put(
-    `${prefix.value}/${application_id}/work_flow_version/${application_version_id}`,
+    `${prefix.value}/${application_id}/application_version/${application_version_id}`,
     data,
     undefined,
     loading,

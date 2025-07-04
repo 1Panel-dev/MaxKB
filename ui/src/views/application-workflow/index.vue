@@ -281,7 +281,10 @@ const publish = () => {
     return
   }
   applicationApi
-    .publish(id, { work_flow: workflow }, loading)
+    .putApplication(id, { work_flow: workflow }, loading)
+    .then((ok) => {
+      return applicationApi.publish(id, {}, loading)
+    })
     .then((ok: any) => {
       detail.value.name = ok.data.name
       MsgSuccess(t('views.applicationWorkflow.tip.publicSuccess'))

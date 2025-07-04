@@ -4,14 +4,24 @@
       <h3>
         {{ $t('common.setting') }}
       </h3>
-      <el-button
-        type="primary"
-        @click="submit(applicationFormRef)"
-        :disabled="loading"
-        v-if="permissionPrecise.edit(id)"
-      >
-        {{ $t('views.application.buttons.publish') }}
-      </el-button>
+      <div>
+        <el-button
+          type="primary"
+          @click="submit(applicationFormRef)"
+          :disabled="loading"
+          v-if="permissionPrecise.edit(id)"
+        >
+          {{ $t('views.application.buttons.save') }}
+        </el-button>
+        <el-button
+          type="primary"
+          @click="publish(applicationFormRef)"
+          :disabled="loading"
+          v-if="permissionPrecise.edit(id)"
+        >
+          {{ $t('views.application.buttons.publish') }}
+        </el-button>
+      </div>
     </div>
     <el-card style="--el-card-padding: 0">
       <el-row v-loading="loading">
@@ -444,7 +454,7 @@ import { t } from '@/locales'
 import TTSModeParamSettingDialog from './component/TTSModeParamSettingDialog.vue'
 import ReasoningParamSettingDialog from './component/ReasoningParamSettingDialog.vue'
 import permissionMap from '@/permission'
-
+import ApplicationAPI from '@/api/application/application'
 const route = useRoute()
 
 const apiType = computed<'workspace'>(() => {
@@ -549,7 +559,18 @@ function submitReasoningDialog(val: any) {
     ...val,
   }
 }
-
+const publish = (formEl: FormInstance | undefined) => {
+  if (!formEl) return
+  formEl.validate().then(() => {
+    return ApplicationAPI.putApplication(id, applicationForm.value, loading)
+      .then((ok) => {
+        return ApplicationAPI.publish(id, {}, loading)
+      })
+      .then((res) => {
+        MsgSuccess(t('common.saveSuccess'))
+      })
+  })
+}
 const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid, fields) => {

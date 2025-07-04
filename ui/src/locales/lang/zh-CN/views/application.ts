@@ -114,7 +114,8 @@ export default {
     },
   },
   buttons: {
-    publish: '保存并发布',
+    save: '保存',
+    publish: '发布',
     addModel: '添加模型',
   },
 

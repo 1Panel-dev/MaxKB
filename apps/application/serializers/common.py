@@ -14,8 +14,9 @@ from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 
 from application.chat_pipeline.step.chat_step.i_chat_step import PostResponseHandler
-from application.models import Application, WorkFlowVersion, ChatRecord, Chat
+from application.models import Application, ChatRecord, Chat, ApplicationVersion
 from common.constants.cache_version import Cache_Version
+from common.exception.app_exception import ChatException
 from models_provider.models import Model
 from models_provider.tools import get_model_credential
 
@@ -28,8 +29,6 @@ class ChatInfo:
                  knowledge_id_list: List[str],
                  exclude_document_id_list: list[str],
                  application_id: str,
-                 application: Application,
-                 work_flow_version: WorkFlowVersion = None,
                  debug=False):
         """
         :param chat_id:                     对话id
@@ -38,18 +37,16 @@ class ChatInfo:
         :param knowledge_id_list:           知识库列表
         :param exclude_document_id_list:    排除的文档
         :param application_id               应用id
-        :param application:                 应用信息
         :param debug                        是否是调试
         """
         self.chat_id = chat_id
         self.chat_user_id = chat_user_id
         self.chat_user_type = chat_user_type
-        self.application = application
         self.knowledge_id_list = knowledge_id_list
         self.exclude_document_id_list = exclude_document_id_list
         self.application_id = application_id
         self.chat_record_list: List[ChatRecord] = []
-        self.work_flow_version = work_flow_version
+        self.application = None
         self.debug = debug
 
     @staticmethod
@@ -63,10 +60,24 @@ class ChatInfo:
             no_references_setting['value'] = no_references_prompt if len(no_references_prompt) > 0 else "{question}"
         return no_references_setting
 
+    def get_application(self):
+        if self.debug:
+            application = QuerySet(Application).filter(id=self.application_id).first()
+            if not application:
+                raise ChatException(500, _('The application does not exist'))
+        else:
+            application = QuerySet(ApplicationVersion).filter(application_id=self.application_id).order_by(
+                '-create_time')[0:1].first()
+            if not application:
+                raise ChatException(500, _("The application has not been published. Please use it after publishing."))
+        self.application = application
+        return application
+
     def to_base_pipeline_manage_params(self):
+        self.get_application()
         knowledge_setting = self.application.knowledge_setting
         model_setting = self.application.model_setting
-        model_id = self.application.model.id if self.application.model is not None else None
+        model_id = self.application.model_id
         model_params_setting = None
         if model_id is not None:
             model = QuerySet(Model).filter(id=model_id).first()
@@ -127,7 +138,7 @@ class ChatInfo:
             self.chat_record_list.append(chat_record)
         if not self.debug:
             if not QuerySet(Chat).filter(id=self.chat_id).exists():
-                Chat(id=self.chat_id, application_id=self.application.id, abstract=chat_record.problem_text[0:1024],
+                Chat(id=self.chat_id, application_id=self.application_id, abstract=chat_record.problem_text[0:1024],
                      chat_user_id=self.chat_user_id, chat_user_type=self.chat_user_type).save()
             else:
                 QuerySet(Chat).filter(id=self.chat_id).update(update_time=datetime.now())
