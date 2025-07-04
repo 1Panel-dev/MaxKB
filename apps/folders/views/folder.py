@@ -66,7 +66,7 @@ class FolderView(APIView):
         lambda r, kwargs: Permission(group=Group(kwargs.get('source')), operate=Operate.READ,
                                      resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}"),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role(),
-        RoleConstants.ADMIN
+        RoleConstants.ADMIN, RoleConstants.EXTENDS_ADMIN
     )
     def get(self, request: Request, workspace_id: str, source: str):
         return result.success(FolderTreeSerializer(
@@ -113,7 +113,7 @@ class FolderView(APIView):
             lambda r, kwargs: Permission(group=Group(kwargs.get('source')), operate=Operate.READ,
                                          resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}"),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role(),
-            RoleConstants.ADMIN
+            RoleConstants.ADMIN, RoleConstants.EXTENDS_ADMIN
         )
         def get(self, request: Request, workspace_id: str, source: str, folder_id: str):
             return result.success(FolderSerializer.Operate(
