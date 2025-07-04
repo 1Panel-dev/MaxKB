@@ -66,6 +66,15 @@ def query_mysql(host,port, user, password, database, sql):
     import pymysql
     import json
     from pymysql.cursors import DictCursor
+    from datetime import datetime, date
+
+    def default_serializer(obj):
+        from decimal import Decimal
+        if isinstance(obj, (datetime, date)):
+            return obj.isoformat()  # 将 datetime/date 转换为 ISO 格式字符串
+        elif isinstance(obj, Decimal):
+            return float(obj)  # 将 Decimal 转换为 float
+        raise TypeError(f"Type {type(obj)} not serializable")
 
     try:
         # 创建连接
@@ -94,7 +103,7 @@ def query_mysql(host,port, user, password, database, sql):
                     row[key] = value.decode("utf-8")  # 转换为字符串
 
         # 将数据序列化为 JSON
-        json_data = json.dumps(data, ensure_ascii=False)
+        json_data = json.dumps(data, default=default_serializer, ensure_ascii=False)
         return json_data
 
         # 关闭数据库连接
@@ -111,8 +120,11 @@ def queryPgSQL(database, user, password, host, port, query):
 
     # 自定义 JSON 序列化函数
     def default_serializer(obj):
+        from decimal import Decimal
         if isinstance(obj, datetime):
             return obj.isoformat()  # 将 datetime 转换为 ISO 格式字符串
+        elif isinstance(obj, Decimal):
+            return float(obj)  # 将 Decimal 转换为 float
         raise TypeError(f"Type {type(obj)} not serializable")
 
     # 数据库连接信息
