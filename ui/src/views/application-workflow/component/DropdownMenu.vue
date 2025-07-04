@@ -60,7 +60,7 @@
       <el-tab-pane :label="$t('views.tool.title')" name="tool">
         <el-scrollbar height="400">
           <!-- 共享工具 -->
-          <el-collapse expand-icon-position="left">
+          <el-collapse expand-icon-position="left" v-if="user.isEE()">
             <el-collapse-item name="shared" :icon="CaretRight">
               <template #title>
                 <div class="flex align-center">
@@ -110,7 +110,7 @@ import { SourceTypeEnum } from '@/enums/common'
 import sharedWorkspaceApi from '@/api/shared-workspace'
 import { CaretRight } from '@element-plus/icons-vue'
 import ApplicationApi from '@/api/application/application'
-
+const {user} = useStore()
 const search_text = ref<string>('')
 const props = defineProps({
   show: {
@@ -269,7 +269,7 @@ const loadNode = async (node: any, resolve: (children: any[]) => void) => {
 
     resolve(children)
   } catch (e: any) {
-    resolve([]) // 失败也要 resolve，否则树会卡住              
+    resolve([]) // 失败也要 resolve，否则树会卡住
   }
 }
 
@@ -298,7 +298,9 @@ function getApplicationFolder() {
 }
 
 onMounted(() => {
-  getShareTool()
+  if (user.isEE()) {
+      getShareTool()
+  }
   getToolFolder()
   getApplicationFolder()
 })
