@@ -26,9 +26,8 @@
           </div>
         </div>
         <el-dropdown-item class="border-t p-8" @click="openResetPassword"
-          v-if="hasPermission(new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole, RoleConst.USER.getWorkspaceRole],
-                [PermissionConst.CHANGE_PASSWORD, PermissionConst.CHANGE_PASSWORD.getWorkspacePermissionWorkspaceManageRole,
-                PermissionConst.CHANGE_PASSWORD.getWorkspacePermission],
+          v-if="hasPermission(new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE, RoleConst.USER],
+                [PermissionConst.CHANGE_PASSWORD],
                 [],'OR'),'OR')"
         >
           {{ $t('views.login.resetPassword') }}
@@ -42,10 +41,8 @@
           </el-dropdown-item>
         </div>
         <el-dropdown-item style="padding: 0" @click.stop
-          v-if="hasPermission(new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole, RoleConst.USER.getWorkspaceRole],
-                [PermissionConst.SWITCH_LANGUAGE.getWorkspacePermissionWorkspaceManageRole,PermissionConst.SWITCH_LANGUAGE,
-                  PermissionConst.SWITCH_LANGUAGE.getWorkspacePermission
-                ],[],'OR'),'OR')"
+          v-if="hasPermission(new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE, RoleConst.USER],
+                [PermissionConst.SWITCH_LANGUAGE],[],'OR'),'OR')"
         >
           <el-dropdown class="w-full" trigger="hover" placement="left-start">
             <div class="flex-between w-full" style="line-height: 22px; padding: 12px 11px">
@@ -86,8 +83,8 @@
         </el-dropdown-item>
 
         <el-dropdown-item @click="router.push({ path: `/system/user` })"
-          v-if="hasPermission([RoleConst.EXTENDS_ADMIN, RoleConst.EXTENDS_WORKSPACE_MANAGE.getWorkspaceRole,
-          RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],'OR')"
+          v-if="hasPermission([RoleConst.EXTENDS_ADMIN, RoleConst.EXTENDS_WORKSPACE_MANAGE,
+          RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],'OR')"
         >
           <div class="flex-between w-full">
             {{ $t('views.system.title') }}
