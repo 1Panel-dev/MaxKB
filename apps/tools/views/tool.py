@@ -39,7 +39,8 @@ class ToolView(APIView):
         tags=[_('Tool')]  # type: ignore
     )
     @has_permissions(
-        PermissionConstants.TOOL_CREATE.get_workspace_permission(),
+        PermissionConstants.TOOL_CREATE.get_workspace_tool_permission(),
+        PermissionConstants.TOOL_CREATE.get_workspace_permission_workspace_manage_role(),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
     )
     @log(
@@ -61,7 +62,8 @@ class ToolView(APIView):
         tags=[_('Tool')]  # type: ignore
     )
     @has_permissions(
-        PermissionConstants.TOOL_READ.get_workspace_permission(),
+        PermissionConstants.TOOL_READ.get_workspace_tool_permission(),
+        PermissionConstants.TOOL_READ.get_workspace_permission_workspace_manage_role(),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
     )
     def get(self, request: Request, workspace_id: str):
@@ -82,7 +84,8 @@ class ToolView(APIView):
             tags=[_('Tool')]  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.TOOL_DEBUG.get_workspace_permission(),
+            PermissionConstants.TOOL_DEBUG.get_workspace_tool_permission(),
+            PermissionConstants.TOOL_DEBUG.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
         )
         def post(self, request: Request, workspace_id: str):
@@ -104,7 +107,7 @@ class ToolView(APIView):
             tags=[_('Tool')]  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.TOOL_EDIT.get_workspace_permission(),
+            PermissionConstants.TOOL_EDIT.get_workspace_tool_permission(),
             PermissionConstants.TOOL_EDIT.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
             ViewPermission([RoleConstants.USER.get_workspace_role()],
@@ -131,7 +134,8 @@ class ToolView(APIView):
             tags=[_('Tool')]  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.TOOL_READ.get_workspace_permission(),
+            PermissionConstants.TOOL_READ.get_workspace_tool_permission(),
+            PermissionConstants.TOOL_READ.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), ViewPermission([RoleConstants.USER.get_workspace_role()],
                                         [PermissionConstants.TOOL.get_workspace_tool_permission()],
                                         CompareConstants.AND),
@@ -152,7 +156,8 @@ class ToolView(APIView):
             tags=[_('Tool')]  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.TOOL_DELETE.get_workspace_permission(),
+            PermissionConstants.TOOL_DELETE.get_workspace_tool_permission(),
+            PermissionConstants.TOOL_DELETE.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), ViewPermission([RoleConstants.USER.get_workspace_role()],
                                         [PermissionConstants.TOOL.get_workspace_tool_permission()],
                                         CompareConstants.AND),
@@ -180,7 +185,8 @@ class ToolView(APIView):
             tags=[_('Tool')]  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.TOOL_READ.get_workspace_permission(),
+            PermissionConstants.TOOL_READ.get_workspace_tool_permission(),
+            PermissionConstants.TOOL_READ.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
         )
         @log(menu='Tool', operate='Get tool list')
@@ -211,7 +217,8 @@ class ToolView(APIView):
             tags=[_("Tool")]  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.TOOL_IMPORT.get_workspace_permission(),
+            PermissionConstants.TOOL_IMPORT.get_workspace_tool_permission(),
+            PermissionConstants.TOOL_IMPORT.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
         )
         @log(menu='Tool', operate='Import tool', )
@@ -233,7 +240,8 @@ class ToolView(APIView):
             tags=[_("Tool")]  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.TOOL_EXPORT.get_workspace_permission(),
+            PermissionConstants.TOOL_EXPORT.get_workspace_tool_permission(),
+            PermissionConstants.TOOL_EXPORT.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), ViewPermission([RoleConstants.USER.get_workspace_role()],
                                         [PermissionConstants.TOOL.get_workspace_tool_permission()],
                                         CompareConstants.AND),
@@ -261,8 +269,8 @@ class ToolView(APIView):
             tags=[_('Tool')]  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.TOOL_CREATE.get_workspace_permission(),
-            PermissionConstants.TOOL_EDIT.get_workspace_permission(),
+            PermissionConstants.TOOL_CREATE.get_workspace_tool_permission(),
+            PermissionConstants.TOOL_EDIT.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
             RoleConstants.USER.get_workspace_role()
         )
@@ -286,7 +294,8 @@ class ToolView(APIView):
             tags=[_('Tool')]  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.TOOL_EDIT.get_workspace_permission(),
+            PermissionConstants.TOOL_EDIT.get_workspace_tool_permission(),
+            PermissionConstants.TOOL_EDIT.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), ViewPermission([RoleConstants.USER.get_workspace_role()],
                                         [PermissionConstants.TOOL.get_workspace_tool_permission()],
                                         CompareConstants.AND),
@@ -331,10 +340,10 @@ class ToolView(APIView):
             tags=[_("Tool")]  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.TOOL_CREATE.get_workspace_permission(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), ViewPermission([RoleConstants.USER.get_workspace_role()],
-                                        [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                                        CompareConstants.AND),
+            PermissionConstants.TOOL_CREATE.get_workspace_tool_permission(),
+            PermissionConstants.TOOL_CREATE.get_workspace_permission_workspace_manage_role(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            RoleConstants.USER.get_workspace_role(),
         )
         @log(
             menu='Tool', operate="Add internal tool",
