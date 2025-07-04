@@ -1,5 +1,5 @@
 <template>
-  <LayoutContainer class="tool-manage">
+  <LayoutContainer showCollapse class="tool-manage">
     <template #left>
       <h4 class="p-12-16 pb-0 mt-12">{{ $t('views.tool.title') }}</h4>
       <folder-tree
@@ -13,7 +13,7 @@
         class="p-8"
       />
     </template>
-    <ToolListContainer @refreshFolder="refreshFolder">
+    <ToolListContainer>
       <template #header>
         <FolderBreadcrumb :folderList="folderList" @click="folderClickHandle" />
       </template>
@@ -60,9 +60,6 @@ function getFolder(bool?: boolean) {
 }
 
 function folderClickHandle(row: any) {
-  if (row.id === folder.currentFolder?.id) {
-    return
-  }
   folder.setCurrentFolder(row)
   tool.setToolList([])
 }

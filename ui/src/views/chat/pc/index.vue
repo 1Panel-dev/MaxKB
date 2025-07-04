@@ -708,6 +708,7 @@ function closeExecutionDetail() {
       top: 20px;
       right: -15px;
       box-shadow: 0px 5px 10px 0px #1f23291a;
+      z-index: 1;
     }
   }
 

@@ -46,20 +46,22 @@
           </template>
         </el-input>
       </div>
-      <div class="flex">
-        <div class="paragraph-sidebar p-16 border-r">
-          <el-anchor
-            direction="vertical"
-            type="default"
-            :offset="130"
-            container=".paragraph-scollbar"
-            @click="handleClick"
-          >
-            <template v-for="(item, index) in paragraphDetail" :key="item.id">
-              <el-anchor-link :href="`#m${item.id}`" :title="item.title" v-if="item.title" />
-            </template>
-          </el-anchor>
-        </div>
+      <LayoutContainer showCollapse>
+        <template #left>
+          <div class="paragraph-sidebar p-16">
+            <el-anchor
+              direction="vertical"
+              type="default"
+              :offset="130"
+              container=".paragraph-scollbar"
+              @click="handleClick"
+            >
+              <template v-for="(item, index) in paragraphDetail" :key="item.id">
+                <el-anchor-link :href="`#m${item.id}`" :title="item.title" v-if="item.title" />
+              </template>
+            </el-anchor>
+          </div>
+        </template>
         <div class="w-full">
           <el-empty v-if="paragraphDetail.length == 0" :description="$t('common.noData')" />
           <div v-else>
@@ -117,7 +119,7 @@
             </el-scrollbar>
           </div>
         </div>
-      </div>
+      </LayoutContainer>
 
       <div class="mul-operation border-t w-full" v-if="isBatch === true">
         <el-button :disabled="multipleSelection.length === 0" @click="openGenerateDialog()">
@@ -343,7 +345,9 @@ onMounted(() => {
     top: calc(var(--app-base-px) + 4px);
   }
   .paragraph-sidebar {
-    width: 240px;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
   }
 
   .paragraph-detail {

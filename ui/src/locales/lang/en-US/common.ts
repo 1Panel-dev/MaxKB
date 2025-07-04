@@ -98,4 +98,6 @@ export default {
   custom: 'Custom',
   moveTo: 'Move To',
   deleteConfirm: 'Confirm delete',
+  expand: 'Expand',
+  collapse: 'Collapse',
 }
