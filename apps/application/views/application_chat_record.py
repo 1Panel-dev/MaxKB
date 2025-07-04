@@ -126,8 +126,8 @@ class ApplicationChatRecordAddKnowledge(APIView):
                                     CompareConstants.AND),
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def post(self, request: Request, workspace_id: str, application_id: str):
-        return result.success(ApplicationChatRecordAddKnowledgeSerializer(
-            data={'workspace_id': workspace_id, 'application_id': application_id}).post_improve(request.data))
+        return result.success(ApplicationChatRecordAddKnowledgeSerializer().post_improve(
+            {'workspace_id': workspace_id, 'application_id': application_id, **request.data}))
 
 
 class ApplicationChatRecordImprove(APIView):
