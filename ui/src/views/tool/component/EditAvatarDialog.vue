@@ -55,14 +55,17 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import {computed, ref, watch} from 'vue'
 import ToolApi from '@/api/tool/tool'
 import { cloneDeep } from 'lodash'
 import { MsgError, MsgSuccess } from '@/utils/message'
 import { defaultIcon, isAppIcon } from '@/utils/common'
 import { t } from '@/locales'
+import {loadSharedApi} from "@/utils/dynamics-api/shared-api.ts";
+import {useRoute} from "vue-router";
 
 const emit = defineEmits(['refresh'])
+const route = useRoute()
 
 const iconFile = ref<any>(null)
 const fileURL = ref<any>(null)
@@ -71,6 +74,19 @@ const dialogVisible = ref<boolean>(false)
 const loading = ref(false)
 const detail = ref<any>(null)
 const radioType = ref('default')
+
+const apiType = computed(() => {
+  if (route.path.includes('shared')) {
+    return 'systemShare'
+  } else if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
+const isShared = computed(() => {
+  return route.path.includes('shared')
+})
 
 watch(dialogVisible, (bool) => {
   if (!bool) {
@@ -106,10 +122,11 @@ function submit() {
   } else if (radioType.value === 'custom' && iconFile.value) {
     const fd = new FormData()
     fd.append('file', iconFile.value.raw)
-    ToolApi.putToolIcon(detail.value.id, fd, loading).then((res: any) => {
-      emit('refresh', res.data)
-      dialogVisible.value = false
-    })
+    loadSharedApi({ type: 'tool', systemType: apiType.value })
+      .putToolIcon(detail.value.id, fd, loading).then((res: any) => {
+        emit('refresh', res.data)
+        dialogVisible.value = false
+      })
   } else {
     MsgError(t('common.EditAvatarDialog.uploadImagePrompt'))
   }
