@@ -211,4 +211,5 @@ export default {
     emptyMessage1: '命中的段落顯示在這裡',
     emptyMessage2: '沒有命中的分段',
   },
+  publishTime: '發佈時間',
 }

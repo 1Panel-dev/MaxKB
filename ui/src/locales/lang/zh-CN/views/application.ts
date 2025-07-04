@@ -211,4 +211,5 @@ export default {
     emptyMessage1: '命中段落显示在这里',
     emptyMessage2: '没有命中的分段',
   },
+  publishTime: '发布时间',
 }

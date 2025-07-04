@@ -1,4 +1,4 @@
-import { Permission, Role, Edition } from '@/utils/permission/type'
+import {Permission, Role, Edition} from '@/utils/permission/type'
 // class Operate(Enum):
 //     """
 //      一个权限组的操作权限
@@ -195,7 +195,7 @@ const PermissionConst = {
   SHARED_KNOWLEDGE_PROBLEM_CREATE: new Permission('SYSTEM_KNOWLEDGE_PROBLEM:READ+CREATE'),
   SHARED_KNOWLEDGE_PROBLEM_EDIT: new Permission('SYSTEM_KNOWLEDGE_PROBLEM:READ+EDIT'),
   SHARED_KNOWLEDGE_PROBLEM_DELETE: new Permission('SYSTEM_KNOWLEDGE_PROBLEM:READ+DELETE'),
-  
+
   SHARED_KNOWLEDGE_HIT_TEST_READ: new Permission('SYSTEM_KNOWLEDGE_HIT_TEST:READ'),
   KNOWLEDGE_HIT_TEST_READ: new Permission('KNOWLEDGE_HIT_TEST:READ'),
 
@@ -219,6 +219,7 @@ const PermissionConst = {
   RESOURCE_TOOL_EXPORT: new Permission('SYSTEM_RESOURCE_TOOL:READ+EXPORT'),
 
   RESOURCE_KNOWLEDGE_READ: new Permission('SYSTEM_RESOURCE_KNOWLEDGE:READ'),
+  RESOURCE_APPLICATION_READ: new Permission('SYSTEM_RESOURCE_APPLICATION:READ'),
 
   RESOURCE_MODEL_READ: new Permission('SYSTEM_RESOURCE_MODEL:READ'),
 
@@ -277,4 +278,4 @@ const EditionConst = {
   IS_EE: new Edition('X-PACK-EE'),
   IS_CE: new Edition('X-PACK-CE'),
 }
-export { PermissionConst, RoleConst, EditionConst }
+export {PermissionConst, RoleConst, EditionConst}

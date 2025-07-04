@@ -225,4 +225,5 @@ export default {
     emptyMessage1: 'Retrieval Testing results will show here',
     emptyMessage2: 'No matching sections found',
   },
+  publishTime: 'Publish Time',
 }

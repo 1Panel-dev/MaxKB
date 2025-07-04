@@ -15,9 +15,9 @@
             style="width: 120px"
             @change="search_type_change"
           >
-            <el-option :label="$t('common.creator')" value="create_user" />
+            <el-option :label="$t('common.creator')" value="create_user"/>
 
-            <el-option :label="$t('common.name')" value="name" />
+            <el-option :label="$t('common.name')" value="name"/>
           </el-select>
           <el-input
             v-if="search_type === 'name'"
@@ -34,13 +34,13 @@
             clearable
             style="width: 220px"
           >
-            <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.nick_name" />
+            <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.username"/>
           </el-select>
         </div>
       </div>
 
       <app-table
-        :data="knowledgeList"
+        :data="applicationList"
         :pagination-config="paginationConfig"
         @sizeChange="getList"
         @changePage="getList"
@@ -57,10 +57,10 @@
                   style="background: none"
                   class="mr-8"
                 >
-                  <img :src="scope.row?.icon" alt="" />
+                  <img :src="scope.row?.icon" alt=""/>
                 </el-avatar>
                 <el-avatar v-else class="avatar-green" shape="square" :size="24">
-                  <img src="@/assets/node/icon_tool.svg" style="width: 58%" alt="" />
+                  <img src="@/assets/node/icon_tool.svg" style="width: 58%" alt=""/>
                 </el-avatar>
               </el-icon>
               {{ scope.row.name }}
@@ -71,16 +71,84 @@
         <el-table-column
           prop="tool_type"
           :label="$t('views.system.resource_management.type')"
-          width="110"
+          width="160"
         >
-          <template #default="{ row }">
-            <span v-if="row.type === 1">{{
-              $t('views.knowledge.knowledgeType.webKnowledge')
-            }}</span>
-            <span v-else-if="row.type === 2">{{
-              $t('views.knowledge.knowledgeType.larkKnowledge')
-            }}</span>
-            <span v-else>{{ $t('views.knowledge.knowledgeType.generalKnowledge') }}</span>
+          <template #default="scope">
+            <el-tag type="warning" v-if="isWorkFlow(scope.row.type)" style="height: 22px">
+              {{ $t('views.application.workflow') }}
+            </el-tag>
+            <el-tag class="blue-tag" v-else style="height: 22px">
+              {{ $t('views.application.simple') }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column
+          width="150"
+          prop="is_publish"
+          :label="$t('common.status.label')"
+          show-overflow-tooltip
+        >
+          <template #header>
+            <div>
+              <span>{{ $t('common.status.label') }}</span>
+              <el-popover :width="200" trigger="click" :visible="statusVisible">
+                <template #reference>
+                  <el-button
+                    style="margin-top: -2px"
+                    :type="statusArr && statusArr.length > 0 ? 'primary' : ''"
+                    link
+                    @click="statusVisible = !statusVisible"
+                  >
+                    <el-icon>
+                      <Filter/>
+                    </el-icon>
+                  </el-button>
+                </template>
+                <div class="filter">
+                  <div class="form-item mb-16">
+                    <div @click.stop>
+                      <el-scrollbar height="300" style="margin: 0 0 0 10px">
+                        <el-checkbox-group
+                          v-model="statusArr"
+                          style="display: flex; flex-direction: column"
+                        >
+                          <el-checkbox
+                            v-for="item in statusOptions"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value"
+                          />
+                        </el-checkbox-group>
+                      </el-scrollbar>
+                    </div>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <el-button size="small" @click="filterStatusChange('clear')"
+                  >{{ $t('common.clear') }}
+                  </el-button>
+                  <el-button type="primary" @click="filterStatusChange" size="small"
+                  >{{ $t('common.confirm') }}
+                  </el-button>
+                </div>
+              </el-popover>
+            </div>
+          </template>
+          <template #default="scope">
+            <div v-if="scope.row.is_publish" class="flex align-center">
+              <el-icon class="color-success mr-8" style="font-size: 16px">
+                <SuccessFilled/>
+              </el-icon>
+              <span class="color-secondary">
+                        {{ $t('views.application.status.published') }}
+                      </span>
+            </div>
+            <div v-else class="flex align-center">
+              <AppIcon iconName="app-disabled" class="color-secondary mr-8"></AppIcon>
+              <span class="color-secondary">
+                        {{ $t('views.application.status.unpublished') }}
+                      </span>
+            </div>
           </template>
         </el-table-column>
         <el-table-column
@@ -102,7 +170,7 @@
                     @click="workspaceVisible = !workspaceVisible"
                   >
                     <el-icon>
-                      <Filter />
+                      <Filter/>
                     </el-icon>
                   </el-button>
                 </template>
@@ -127,23 +195,30 @@
                 </div>
                 <div class="text-right">
                   <el-button size="small" @click="filterWorkspaceChange('clear')"
-                    >{{ $t('common.clear') }}
+                  >{{ $t('common.clear') }}
                   </el-button>
                   <el-button type="primary" @click="filterWorkspaceChange" size="small"
-                    >{{ $t('common.confirm') }}
+                  >{{ $t('common.confirm') }}
                   </el-button>
                 </div>
               </el-popover>
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="nick_name" :label="$t('common.creator')" show-overflow-tooltip />
-        <el-table-column :label="$t('views.document.table.updateTime')" width="180">
+
+        <el-table-column prop="nick_name" :label="$t('common.creator')" show-overflow-tooltip
+                         width="120"/>
+        <el-table-column :label="$t('views.application.publishTime')" width="120">
           <template #default="{ row }">
             {{ datetimeFormat(row.update_time) }}
           </template>
         </el-table-column>
-        <el-table-column :label="$t('common.createTime')" width="180">
+        <el-table-column :label="$t('views.document.table.updateTime')" width="120">
+          <template #default="{ row }">
+            {{ datetimeFormat(row.update_time) }}
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('common.createTime')" width="120">
           <template #default="{ row }">
             {{ datetimeFormat(row.create_time) }}
           </template>
@@ -154,16 +229,16 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, reactive, computed } from 'vue'
-import KnowledgeResourceApi from '@/api/system-resource-management/knowledge'
-import { t } from '@/locales'
-import { isAppIcon } from '@/utils/common'
+import {onMounted, ref, reactive, computed} from 'vue'
+import ApplicationResourceApi from '@/api/system-resource-management/application'
+import {t} from '@/locales'
+import {isAppIcon} from '@/utils/common'
 import useStore from '@/stores'
-import { datetimeFormat } from '@/utils/time'
+import {datetimeFormat} from '@/utils/time'
 import {loadPermissionApi} from "@/utils/dynamics-api/permission-api.ts";
-import UserApi from '@/api/user/user.ts'
+import {isWorkFlow} from "@/utils/application.ts";
 
-const { user } = useStore()
+const {user} = useStore()
 
 const search_type = ref('name')
 const search_form = ref<any>({
@@ -174,7 +249,7 @@ const user_options = ref<any[]>([])
 
 const loading = ref(false)
 const changeStateloading = ref(false)
-const knowledgeList = ref<any[]>([])
+const applicationList = ref<any[]>([])
 const paginationConfig = reactive({
   current_page: 1,
   page_size: 30,
@@ -183,6 +258,16 @@ const paginationConfig = reactive({
 const workspaceOptions = ref<any[]>([])
 const workspaceVisible = ref(false)
 const workspaceArr = ref<any[]>([])
+const statusVisible = ref(false)
+const statusArr = ref<any[]>([])
+const statusOptions = ref<any[]>([{
+  label: t('views.application.status.published'),
+  value: true,
+}, {
+  label: t('views.application.status.unpublished'),
+  value: false,
+}])
+
 function filterWorkspaceChange(val: string) {
   if (val === 'clear') {
     workspaceArr.value = []
@@ -190,6 +275,15 @@ function filterWorkspaceChange(val: string) {
   getList()
   workspaceVisible.value = false
 }
+
+function filterStatusChange(val: string) {
+  if (val === 'clear') {
+    statusArr.value = []
+  }
+  getList()
+  statusVisible.value = false
+}
+
 async function getWorkspaceList() {
   if (user.isEE()) {
     const res = await loadPermissionApi('workspace').getSystemWorkspaceList(loading)
@@ -199,27 +293,30 @@ async function getWorkspaceList() {
     }))
   }
 }
+
 const search_type_change = () => {
-  search_form.value = { name: '', create_user: '' }
+  search_form.value = {name: '', create_user: ''}
 }
 
 function getList() {
   const params = {
     [search_type.value]: search_form.value[search_type.value],
   }
-  KnowledgeResourceApi.getKnowledgeListPage(paginationConfig, params, loading).then((res: any) => {
+  if (workspaceArr.value.length > 0) {
+    params['workspace_ids'] = JSON.stringify(workspaceArr.value)
+  }
+  if (statusArr.value.length > 0) {
+    params['status'] =  JSON.stringify(statusArr.value)
+  }
+  ApplicationResourceApi.getApplication(paginationConfig, params, loading).then((res: any) => {
     paginationConfig.total = res.data?.total
-    knowledgeList.value = res.data?.records
+    applicationList.value = res.data?.records
   })
 }
 
 onMounted(() => {
   getWorkspaceList()
   getList()
-
-  UserApi.getAllMemberList('').then((res: any) => {
-    user_options.value = res.data
-  })
 })
 </script>
 
