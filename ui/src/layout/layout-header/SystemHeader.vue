@@ -10,7 +10,11 @@
       <div class="flex align-center mr-8">
         <TopAbout class="mt-4"></TopAbout>
         <el-divider class="ml-8 mr-8" direction="vertical" />
-        <el-button link @click="router.push({ path: '/' })">
+        <el-button link @click="router.push({ path: '/' })"
+          v-if="hasPermission([RoleConst.USER.getWorkspaceRole,RoleConst.EXTENDS_USER.getWorkspaceRole, 
+            RoleConst.EXTENDS_WORKSPACE_MANAGE.getWorkspaceRole, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole
+          ],'OR')"
+        >
           <AppIcon class="mr-8" iconName="app-workspace" style="font-size: 16px"></AppIcon>
           {{ $t('views.workspace.toWorkspace') }}</el-button
         >
@@ -20,9 +24,11 @@
   </div>
 </template>
 <script setup lang="ts">
+import { RoleConst } from '@/utils/permission/data'
 import Avatar from './avatar/index.vue'
 import TopAbout from './top-about/index.vue'
 import { useRouter } from 'vue-router'
+import { hasPermission } from '@/utils/permission'
 
 const router = useRouter()
 </script>
