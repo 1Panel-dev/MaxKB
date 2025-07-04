@@ -250,8 +250,9 @@ function handleSizeChange() {
 }
 
 function getList() {
-  const params = {
-    [search_type.value]: search_form.value[search_type.value as keyof typeof search_form.value],
+  const params: any = {}
+  if (search_form.value[search_type.value as keyof typeof search_form.value]) {
+    params[search_type.value] = search_form.value[search_type.value as keyof typeof search_form.value]
   }
   return userManageApi.getUserManage(paginationConfig, params, loading).then((res) => {
     userTableData.value = res.data.records.map((item: any) => ({

@@ -530,9 +530,11 @@ function searchHandle() {
 }
 
 function getList() {
-  const params = {
+  const params: any = {
     folder_id: folder.currentFolder?.id || 'default',
-    [search_type.value]: search_form.value[search_type.value],
+  }
+  if (search_form.value[search_type.value]) {
+    params[search_type.value] = search_form.value[search_type.value]
   }
   ApplicationApi.getApplication(paginationConfig, params, loading).then((res) => {
     paginationConfig.total = res.data.total

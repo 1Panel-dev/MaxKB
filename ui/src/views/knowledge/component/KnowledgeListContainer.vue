@@ -503,10 +503,12 @@ watch(
 )
 
 function getList() {
-  const params = {
+  const params: any = {
     folder_id: folder.currentFolder?.id || user.getWorkspaceId(),
     scope: apiType.value === 'systemShare' ? 'SHARED' : 'WORKSPACE',
-    [search_type.value]: search_form.value[search_type.value],
+  }
+  if (search_form.value[search_type.value]) {
+    params[search_type.value] = search_form.value[search_type.value]
   }
   loadSharedApi({ type: 'knowledge', isShared: isShared.value, systemType: apiType.value })
     .getKnowledgeListPage(paginationConfig, params, loading)

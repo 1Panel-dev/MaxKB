@@ -298,8 +298,9 @@ const paginationConfig = reactive({
 const userTableData = ref<ChatUserItem[]>([])
 
 function getList() {
-  const params = {
-    [search_type.value]: search_form.value[search_type.value as keyof typeof search_form.value],
+  const params: any = {}
+  if (search_form.value[search_type.value as keyof typeof search_form.value]) {
+    params[search_type.value] = search_form.value[search_type.value as keyof typeof search_form.value]
   }
   return loadPermissionApi('chatUser').getUserManage(paginationConfig, params, loading).then((res: any) => {
     userTableData.value = res.data.records

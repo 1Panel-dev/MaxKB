@@ -606,10 +606,12 @@ watch(
   { deep: true, immediate: true },
 )
 function getList() {
-  const params = {
-    [search_type.value]: search_form.value[search_type.value],
+  const params: any = {
     folder_id: folder.currentFolder?.id || user.getWorkspaceId(),
     scope: apiType.value === 'systemShare' ? 'SHARED' : 'WORKSPACE',
+  }
+  if (search_form.value[search_type.value]) {
+    params[search_type.value] = search_form.value[search_type.value]
   }
   loadSharedApi({ type: 'tool', isShared: isShared.value, systemType: apiType.value })
     .getToolListPage(paginationConfig, params, loading)

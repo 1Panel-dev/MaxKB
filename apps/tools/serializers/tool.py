@@ -551,7 +551,7 @@ class ToolTreeSerializer(serializers.Serializer):
         name = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('tool name'))
         user_id = serializers.UUIDField(required=False, allow_null=True, label=_('user id'))
         scope = serializers.CharField(required=True, label=_('scope'))
-        create_user = serializers.UUIDField(required=False, label=_('scope'), allow_null=True)
+        create_user = serializers.UUIDField(required=False, label=_('create user'), allow_null=True)
 
         def page_tool(self, current_page: int, page_size: int):
             self.is_valid(raise_exception=True)

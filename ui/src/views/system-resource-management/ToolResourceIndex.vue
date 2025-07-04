@@ -214,8 +214,9 @@ const search_type_change = () => {
 }
 
 function getList() {
-  const params = {
-    [search_type.value]: search_form.value[search_type.value],
+  const params: any = {}
+  if (search_form.value[search_type.value]) {
+    params[search_type.value] = search_form.value[search_type.value]
   }
   if (workspaceArr.value.length > 0) {
     params.workspace_ids = JSON.stringify(workspaceArr.value)
