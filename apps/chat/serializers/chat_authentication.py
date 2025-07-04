@@ -158,5 +158,6 @@ class ApplicationProfileSerializer(serializers.Serializer):
                 'file_upload_setting': application.file_upload_setting,
                 'work_flow': {'nodes': base_node} if base_node else None,
                 'show_source': application_access_token.show_source,
+                'show_exec': application_access_token.show_exec,
                 'language': application_access_token.language,
                 **application_setting_dict}
