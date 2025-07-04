@@ -50,8 +50,10 @@ import BaseForm from '@/views/knowledge/component/BaseForm.vue'
 import { MsgSuccess, MsgAlert } from '@/utils/message'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { t } from '@/locales'
+import useStore from "@/stores";
 const emit = defineEmits(['refresh'])
 
+const { user } = useStore()
 const router = useRouter()
 const route = useRoute()
 const apiType = computed(() => {
@@ -113,6 +115,10 @@ const submitHandle = async () => {
         }
         loadSharedApi({ type: 'knowledge', systemType: apiType.value })
           .postWebKnowledge(obj, loading)
+          .then(async (res: any) => {
+            await user.profile();
+            return res
+          })
           .then((res: any) => {
             MsgSuccess(t('common.createSuccess'))
             router.push({
