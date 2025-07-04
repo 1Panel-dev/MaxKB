@@ -108,7 +108,8 @@ class CancelInstanceSerializer(serializers.Serializer):
 
 class DocumentEditInstanceSerializer(serializers.Serializer):
     meta = serializers.DictField(required=False)
-    name = serializers.CharField(required=False, max_length=128, min_length=1, label=_('document name'))
+    name = serializers.CharField(required=False, max_length=128, min_length=1, label=_('document name'),
+                                 source=_('document name'))
     hit_handling_method = serializers.CharField(required=False, validators=[
         validators.RegexValidator(regex=re.compile("^optimization|directly_return$"),
                                   message=_('The type only supports optimization|directly_return'),
