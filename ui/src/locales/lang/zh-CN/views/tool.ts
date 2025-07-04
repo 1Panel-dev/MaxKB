@@ -28,10 +28,6 @@ export default {
     saveMessage: '当前的更改尚未保存，确认退出吗?',
   },
   form: {
-    title: {
-      copy: '副本',
-      baseInfo: '基础信息',
-    },
     toolName: {
       label: '名称',
       name: '工具名称',

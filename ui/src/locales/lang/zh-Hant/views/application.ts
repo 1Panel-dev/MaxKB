@@ -9,7 +9,6 @@ export default {
   simplePlaceholder: '適用於初級用戶使用表單設定構建AI對話助手',
   workflowPlaceholder: '適用於高階用戶使用低代碼拖拉拽方式構建複雜邏輯的AI對話助手',
   appTest: '調試預覽',
-  copy: '副本',
   searchBar: {
     placeholder: '按名稱搜尋',
   },

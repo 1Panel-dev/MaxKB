@@ -10,7 +10,6 @@ export default {
   workflowPlaceholder:
     'Suitable for advanced users to build complex logic AI assistants using low-code drag-and-drop',
   appTest: 'Debug Preview',
-  copy: 'Copy',
   searchBar: {
     placeholder: 'Search by name',
   },

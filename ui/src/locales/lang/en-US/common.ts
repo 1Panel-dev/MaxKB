@@ -100,4 +100,5 @@ export default {
   deleteConfirm: 'Confirm delete',
   expand: 'Expand',
   collapse: 'Collapse',
+  copyTitle: 'Copy',
 }

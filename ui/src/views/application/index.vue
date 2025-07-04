@@ -244,7 +244,13 @@
                               <AppIcon iconName="app-migrate"></AppIcon>
                               {{ $t('common.moveTo') }}
                             </el-dropdown-item>
-
+                            <el-dropdown-item
+                              @click="copyApplication(item)"
+                              v-if="permissionPrecise.create()"
+                            >
+                              <AppIcon iconName="app-copy"></AppIcon>
+                              {{ $t('common.copy') }}
+                            </el-dropdown-item>
                             <el-dropdown-item
                               divided
                               @click.stop="exportApplication(item)"
@@ -405,13 +411,12 @@ const apiInputParams = ref([])
 function copyApplication(row: any) {
   application.asyncGetApplicationDetail(row.id, loading).then((res: any) => {
     if (res?.data) {
-      CopyApplicationDialogRef.value.open({ ...res.data, model_id: res.data.model })
+      CopyApplicationDialogRef.value.open(
+        { ...res.data, model_id: res.data.model },
+        folder.currentFolder?.id || 'default',
+      )
     }
   })
-}
-
-const is_show_copy_button = (row: any) => {
-  return user.userInfo ? user.userInfo.id == row.user_id : false
 }
 
 function settingApplication(row: any) {

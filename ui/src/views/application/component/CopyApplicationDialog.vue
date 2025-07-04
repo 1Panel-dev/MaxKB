@@ -104,6 +104,8 @@ const rules = reactive<FormRules<ApplicationFormType>>({
   ],
 })
 
+const currentFolder = ref('')
+
 watch(dialogVisible, (bool) => {
   if (!bool) {
     applicationForm.value = {
@@ -133,10 +135,11 @@ watch(dialogVisible, (bool) => {
   }
 })
 
-const open = (data: any) => {
+const open = (data: any, folder: string) => {
+  currentFolder.value = folder
   const obj = cloneDeep(data)
   delete obj['id']
-  obj['name'] = obj['name'] + ` ${t('views.application.form.title.copy')}`
+  obj['name'] = obj['name'] + ` ${t('common.copyTitle')}`
   applicationForm.value = obj
   dialogVisible.value = true
 }
@@ -160,15 +163,17 @@ const submitHandle = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid) => {
     if (valid) {
-      applicationApi.postApplication(applicationForm.value, loading).then((res) => {
-        MsgSuccess(t('common.createSuccess'))
-        if (isWorkFlow(applicationForm.value.type)) {
-          router.push({ path: `/application/${res.data.id}/workflow` })
-        } else {
-          router.push({ path: `/application/${res.data.id}/${res.data.type}/setting` })
-        }
-        dialogVisible.value = false
-      })
+      applicationApi
+        .postApplication({ ...applicationForm.value, folder_id: currentFolder.value }, loading)
+        .then((res) => {
+          MsgSuccess(t('common.createSuccess'))
+          if (isWorkFlow(applicationForm.value.type)) {
+            router.push({ path: `/application/${res.data.id}/workflow` })
+          } else {
+            router.push({ path: `/application/${res.data.id}/${res.data.type}/setting` })
+          }
+          dialogVisible.value = false
+        })
     }
   })
 }

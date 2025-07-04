@@ -481,7 +481,7 @@ async function copyTool(row: any) {
   )
   const obj = cloneDeep(res.data)
   delete obj['id']
-  obj['name'] = obj['name'] + `  ${t('views.tool.form.title.copy')}`
+  obj['name'] = obj['name'] + `  ${t('common.copyTitle')}`
   ToolFormDrawerRef.value.open(obj)
 }
 

@@ -100,4 +100,5 @@ export default {
   deleteConfirm: '是否刪除',
   expand: '展開',
   collapse: '收起',
+  copyTitle: '副本',
 }
