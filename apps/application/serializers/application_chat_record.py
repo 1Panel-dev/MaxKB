@@ -289,6 +289,9 @@ class ApplicationChatRecordImproveSerializer(serializers.Serializer):
     knowledge_id = serializers.UUIDField(required=True, label=_("Knowledge base id"))
 
     document_id = serializers.UUIDField(required=True, label=_("Document id"))
+    application_id = serializers.UUIDField(required=True, label=_("Application id"))
+
+    workspace_id = serializers.CharField(required=True, label=_("Workspace ID"))
 
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)
