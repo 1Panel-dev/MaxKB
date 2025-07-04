@@ -28,6 +28,7 @@
             v-else-if="search_type === 'create_user'"
             v-model="search_form.create_user"
             @change="searchHandle"
+            filterable
             clearable
             style="width: 220px"
           >

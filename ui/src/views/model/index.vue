@@ -40,6 +40,7 @@
               v-else-if="search_type === 'create_user'"
               v-model="model_search_form.create_user"
               @change="list_model"
+              filterable
               clearable
               style="width: 220px"
             >
