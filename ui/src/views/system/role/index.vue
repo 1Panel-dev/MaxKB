@@ -64,8 +64,8 @@
                 >
                   <template #default="{ row }">
                     <div class="flex-between">
-                      <span>
-                        {{ row.role_name }}
+                      <span class="flex align-center mr-8">
+                        <div class="ellipsis" style="flex: 1">{{ row.role_name }}</div>
                         <span class="color-input-placeholder ml-4"
                           >({{ roleTypeMap[row.type as RoleTypeEnum] }})</span
                         >
