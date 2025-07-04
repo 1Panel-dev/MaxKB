@@ -11,7 +11,7 @@ class ToolFolder(MPTTModel, AppModelMixin):
     id = models.CharField(primary_key=True, max_length=64, editable=False, verbose_name="主键id")
     name = models.CharField(max_length=64, verbose_name="文件夹名称")
     desc = models.CharField(max_length=200, null=True, blank=True, verbose_name="描述")
-    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name="用户id")
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, db_constraint=False, blank=True, null=True)
     workspace_id = models.CharField(max_length=64, verbose_name="工作空间id", default="default", db_index=True)
     parent = TreeForeignKey('self', on_delete=models.DO_NOTHING, null=True, blank=True, related_name='children')
 
@@ -35,7 +35,7 @@ class ToolType(models.TextChoices):
 
 class Tool(AppModelMixin):
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
-    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name="用户id")
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, db_constraint=False, blank=True, null=True)
     name = models.CharField(max_length=64, verbose_name="工具名称")
     desc = models.CharField(max_length=128, verbose_name="描述")
     code = models.CharField(max_length=102400, verbose_name="python代码")
@@ -46,7 +46,7 @@ class Tool(AppModelMixin):
     scope = models.CharField(max_length=20, verbose_name='可用范围', choices=ToolScope.choices,
                              default=ToolScope.WORKSPACE)
     tool_type = models.CharField(max_length=20, verbose_name='工具类型', choices=ToolType.choices,
-                                     default=ToolType.CUSTOM, db_index=True)
+                                 default=ToolType.CUSTOM, db_index=True)
     template_id = models.UUIDField(max_length=128, verbose_name="模版id", null=True, default=None)
     folder = models.ForeignKey(ToolFolder, on_delete=models.DO_NOTHING, verbose_name="文件夹id", default='default')
     workspace_id = models.CharField(max_length=64, verbose_name="工作空间id", default="default", db_index=True)
