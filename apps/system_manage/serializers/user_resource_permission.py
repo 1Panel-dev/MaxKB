@@ -104,29 +104,27 @@ class UserResourcePermissionSerializer(serializers.Serializer):
 
     def auth_resource(self, resource_id: str):
         self.is_valid(raise_exception=True)
-        workspace_manage = is_workspace_manage(self.data.get('user_id'), self.data.get('workspace_id'))
-        if not workspace_manage:
-            auth_target_type = self.data.get('auth_target_type')
-            workspace_id = self.data.get('workspace_id')
-            user_id = self.data.get('user_id')
-            wurp = QuerySet(WorkspaceUserResourcePermission).filter(auth_target_type=auth_target_type,
-                                                                    workspace_id=workspace_id).first()
-            auth_type = wurp.auth_type if wurp else ResourceAuthType.RESOURCE_PERMISSION_GROUP
-            # 自动授权给创建者
-            WorkspaceUserResourcePermission(
-                target=resource_id,
-                auth_target_type=auth_target_type,
-                permission_list=[ResourcePermission.VIEW,
-                                 ResourcePermission.MANAGE] if auth_type == ResourceAuthType.RESOURCE_PERMISSION_GROUP else [
-                    ResourcePermissionRole.ROLE],
-                workspace_id=workspace_id,
-                user_id=user_id,
-                auth_type=auth_type
-            ).save()
-            # 刷新缓存
-            version = Cache_Version.PERMISSION_LIST.get_version()
-            key = Cache_Version.PERMISSION_LIST.get_key(user_id=user_id)
-            cache.delete(key, version=version)
+        auth_target_type = self.data.get('auth_target_type')
+        workspace_id = self.data.get('workspace_id')
+        user_id = self.data.get('user_id')
+        wurp = QuerySet(WorkspaceUserResourcePermission).filter(auth_target_type=auth_target_type,
+                                                                workspace_id=workspace_id).first()
+        auth_type = wurp.auth_type if wurp else ResourceAuthType.RESOURCE_PERMISSION_GROUP
+        # 自动授权给创建者
+        WorkspaceUserResourcePermission(
+            target=resource_id,
+            auth_target_type=auth_target_type,
+            permission_list=[ResourcePermission.VIEW,
+                                ResourcePermission.MANAGE] if auth_type == ResourceAuthType.RESOURCE_PERMISSION_GROUP else [
+                ResourcePermissionRole.ROLE],
+            workspace_id=workspace_id,
+            user_id=user_id,
+            auth_type=auth_type
+        ).save()
+        # 刷新缓存
+        version = Cache_Version.PERMISSION_LIST.get_version()
+        key = Cache_Version.PERMISSION_LIST.get_key(user_id=user_id)
+        cache.delete(key, version=version)
         return True
 
     def list(self, user, with_valid=True):
