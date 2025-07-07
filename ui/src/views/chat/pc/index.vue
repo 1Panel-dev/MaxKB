@@ -33,6 +33,7 @@
               <h4 v-show="!isPcCollapse">{{ applicationDetail?.name }}</h4>
             </div>
             <el-button
+              size="large" 
               type="primary"
               plain
               v-show="!isPcCollapse"
@@ -637,6 +638,15 @@ function closeExecutionDetail() {
     position: relative;
     z-index: 1;
 
+    .common-list li.active {
+      background-color: #ffffff;
+      font-weight: 500;
+      color: var(--el-text-color-primary);
+      &:hover {
+        background-color: #ffffff;
+      }
+    }
+
     .el-menu {
       display: flex;
       flex-direction: column;
@@ -706,6 +716,12 @@ function closeExecutionDetail() {
 
     .add-button {
       border: 1px solid var(--el-color-primary);
+      background-color: #3370FF1A;
+      color: #3370FF;
+      font-weight: 500;
+      &:hover {
+        background-color: #3370FF33;
+      }
     }
 
     .left-height {
@@ -783,7 +799,12 @@ function closeExecutionDetail() {
 }
 
 .chat-pc-popper {
-  .el-menu-item-group__title {
+  background: linear-gradient(187.61deg, rgba(235, 241, 255, 0.5) 39.6%, rgba(231, 249, 255, 0.5) 94.3%),
+        #eef1f4 !important;
+  .el-menu {
+    background: transparent;
+  }
+        .el-menu-item-group__title {
     padding-bottom: 16px;
     font-weight: 500;
     color: var(--app-text-color-secondary);
@@ -798,7 +819,12 @@ function closeExecutionDetail() {
       background-color: #1f23291a;
     }
     &.is-active {
-      background-color: #3370ff1a;
+      background-color: #ffffff;
+      
+      color: var(--el-text-color-primary);
+      & > div {
+        font-weight: 500;
+      }
     }
   }
 }

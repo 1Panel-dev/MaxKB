@@ -3,7 +3,7 @@
     class="chat-embed layout-bg chat-background"
     :class="{ 'chat-embed--popup': isPopup }"
     v-loading="loading"
-    :style="{
+        :style="{
       '--el-color-primary': applicationDetail?.custom_theme?.theme_color,
       '--el-color-primary-light-9': hexToRgba(applicationDetail?.custom_theme?.theme_color, 0.1),
       backgroundImage: `url(${applicationDetail?.chat_background})`,
@@ -15,7 +15,7 @@
         <AppIcon
           iconName="app-history-outlined"
           style="font-size: 20px"
-          class="ml-16"
+          class="ml-16 cursor"
           :style="{
             color: applicationDetail?.custom_theme?.header_font_color,
           }"
@@ -60,95 +60,11 @@
         </AiChat>
       </div>
 
-      <el-drawer
-        v-model="show"
-        :with-header="false"
-        class="left-drawer"
-        direction="ltr"
-        :size="280"
-      >
-        <div>
-          <div class="flex align-center mb-16">
-            <div class="flex mr-8">
-              <el-avatar
-                v-if="isAppIcon(applicationDetail?.icon)"
-                shape="square"
-                :size="32"
-                style="background: none"
-              >
-                <img :src="applicationDetail?.icon" alt="" />
-              </el-avatar>
-              <LogoIcon v-else height="32px" />
-            </div>
-            <h4>{{ applicationDetail?.name }}</h4>
-          </div>
-          <el-button class="add-button w-full primary" @click="newChat">
-            <AppIcon iconName="app-create-chat"></AppIcon>
-            <span class="ml-4">{{ $t('chat.createChat') }}</span>
-          </el-button>
-          <p class="mt-20 mb-8">{{ $t('chat.history') }}</p>
-        </div>
-
-        <div class="left-height pt-0">
-          <el-scrollbar>
-            <div>
-              <common-list
-                :style="{ '--el-color-primary': applicationDetail?.custom_theme?.theme_color }"
-                :data="chatLogData"
-                v-loading="left_loading"
-                :defaultActive="currentChatId"
-                @click="clickListHandle"
-                @mouseenter="mouseenter"
-                @mouseleave="mouseId = ''"
-              >
-                <template #default="{ row }">
-                  <div class="flex-between">
-                    <ReadWrite
-                      @change="editName($event, row)"
-                      :data="row.abstract"
-                      trigger="manual"
-                      :write="row.writeStatus"
-                      @close="closeWrite(row)"
-                      :maxlength="1024"
-                    />
-                    <div
-                      @click.stop
-                      v-if="mouseId === row.id && row.id !== 'new' && !row.writeStatus"
-                      class="flex"
-                    >
-                      <el-button style="padding: 0" link @click.stop="openWrite(row)">
-                        <el-icon><EditPen /></el-icon>
-                      </el-button>
-                      <el-button style="padding: 0" link @click.stop="deleteLog(row)">
-                        <el-icon><Delete /></el-icon>
-                      </el-button>
-                    </div>
-                  </div>
-                </template>
-                <template #empty>
-                  <div class="text-center mt-24">
-                    <el-text type="info">{{ $t('chat.noHistory') }}</el-text>
-                  </div>
-                </template>
-              </common-list>
-            </div>
-            <div v-if="chatLogData.length" class="gradient-divider lighter mt-8">
-              <span>{{ $t('chat.only20history') }}</span>
-            </div>
-          </el-scrollbar>
-        </div>
-        <div class="flex align-center user-info" @click="toUserCenter">
-          <el-avatar :size="32">
-            <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
-          </el-avatar>
-          <span v-if="chatUser.chat_profile?.authentication" class="ml-8 color-text-primary">{{
-            chatUser.chatUserProfile?.nick_name
-          }}</span>
-        </div>
-      </el-drawer>
+     <ChatHistoryDrawer v-model:show="show" :application-detail="applicationDetail" :chat-log-data="chatLogData"
+        :left-loading="left_loading" :currentChatId="currentChatId" @new-chat="newChat"
+        @clickLog="clickListHandle" @delete-log="deleteLog" />
     </div>
 
-    <UserCenter v-model:show="userCenterDrawerShow" />
   </div>
 </template>
 <script setup lang="ts">
@@ -156,13 +72,12 @@ import { ref, onMounted, reactive, nextTick, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { isAppIcon } from '@/utils/common'
 import { hexToRgba } from '@/utils/theme'
-import { MsgError } from '@/utils/message'
 import useStore from '@/stores'
 import { t } from '@/locales'
-import UserCenter from '../mobile/component/UserCenter.vue'
+import ChatHistoryDrawer from '../mobile/component/ChatHistoryDrawer.vue'
 import chatAPI from '@/api/chat/chat'
 
-const { user, chatLog, chatUser } = useStore()
+const { user, chatLog } = useStore()
 const route = useRoute()
 
 const isPopup = computed(() => {
@@ -192,7 +107,6 @@ const paginationConfig = reactive({
 const currentRecordList = ref<any>([])
 const currentChatId = ref('new') // 当前历史记录Id 默认为'new'
 
-const mouseId = ref('')
 
 const customStyle = computed(() => {
   return {
@@ -201,34 +115,6 @@ const customStyle = computed(() => {
   }
 })
 
-function editName(val: string, item: any) {
-  if (val) {
-    const obj = {
-      abstract: val,
-    }
-    chatLog.asyncPutChatClientLog(applicationDetail.value.id, item.id, obj, loading).then(() => {
-      const find = chatLogData.value.find((row: any) => row.id === item.id)
-      if (find) {
-        find.abstract = val
-      }
-      item['writeStatus'] = false
-    })
-  } else {
-    MsgError(t('views.applicationWorkflow.tip.nameMessage'))
-  }
-}
-
-function openWrite(item: any) {
-  item['writeStatus'] = true
-}
-
-function closeWrite(item: any) {
-  item['writeStatus'] = false
-}
-
-function mouseenter(row: any) {
-  mouseId.value = row.id
-}
 function deleteLog(row: any) {
   chatLog.asyncDelChatClientLog(applicationDetail.value.id, row.id, left_loading).then(() => {
     if (currentChatId.value === row.id) {
@@ -340,12 +226,6 @@ const init = () => {
 onMounted(() => {
   init()
 })
-
-const userCenterDrawerShow = ref(false)
-function toUserCenter() {
-  if (!chatUser.chat_profile?.authentication) return
-  userCenterDrawerShow.value = true
-}
 </script>
 <style lang="scss">
 .chat-embed {
@@ -371,31 +251,6 @@ function toUserCenter() {
     z-index: 11;
     font-size: 1rem;
   }
-  // 历史对话弹出层
-  .left-drawer {
-    .el-drawer__body {
-      padding: 16px;
-      background:
-        linear-gradient(187.61deg, rgba(235, 241, 255, 0.5) 39.6%, rgba(231, 249, 255, 0.5) 94.3%),
-        #eef1f4;
-      overflow: hidden;
-
-      .add-button {
-        border: 1px solid var(--el-color-primary);
-      }
-
-      .left-height {
-        height: calc(100vh - 212px);
-      }
-
-      .user-info {
-        border-radius: 6px;
-        padding: 4px 8px;
-        margin-top: 16px;
-        box-sizing: border-box;
-      }
-    }
-  }
  &.chat-embed--popup {
     .chat-popover-button {
       right: 85px;
@@ -412,29 +267,7 @@ function toUserCenter() {
     top: var(--app-header-height);
     z-index: 2008;
   }
-  .gradient-divider {
-    position: relative;
-    text-align: center;
-    color: var(--el-color-info);
-    ::before {
-      content: '';
-      width: 17%;
-      height: 1px;
-      background: linear-gradient(90deg, rgba(222, 224, 227, 0) 0%, #dee0e3 100%);
-      position: absolute;
-      left: 16px;
-      top: 50%;
-    }
-    ::after {
-      content: '';
-      width: 17%;
-      height: 1px;
-      background: linear-gradient(90deg, #dee0e3 0%, rgba(222, 224, 227, 0) 100%);
-      position: absolute;
-      right: 16px;
-      top: 50%;
-    }
-  }
+
   .AiChat-embed {
     .ai-chat__operate {
       padding-top: 12px;
