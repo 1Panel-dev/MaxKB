@@ -178,6 +178,7 @@ const open = (row: any, list: Array<string>) => {
       hit_handling_method: row.hit_handling_method,
       directly_return_similarity: row.directly_return_similarity,
       ...row.meta,
+      meta: row.meta,
     }
     isImport.value = false
   } else if (list) {
@@ -212,9 +213,13 @@ const submit = async (formEl: FormInstance | undefined) => {
           const obj = {
             hit_handling_method: form.value.hit_handling_method,
             directly_return_similarity: form.value.directly_return_similarity,
+            // 飞书文档需要传递meta信息，不能被页面上的form覆盖
             meta: {
-              source_url: form.value.source_url,
-              selector: form.value.selector,
+              ...form.value.meta,
+              ...{
+                source_url: form.value.source_url,
+                selector: form.value.selector,
+              }
             },
           }
           loadSharedApi({ type: 'document', systemType: apiType.value })

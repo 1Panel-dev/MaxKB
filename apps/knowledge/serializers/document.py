@@ -134,7 +134,8 @@ class DocumentEditInstanceSerializer(serializers.Serializer):
         if 'meta' in self.data and self.data.get('meta') is not None and self.data.get('meta') != {}:
             knowledge_meta_valid_map = self.get_meta_valid_map()
             valid_class = knowledge_meta_valid_map.get(document.type)
-            valid_class(data=self.data.get('meta')).is_valid(raise_exception=True)
+            if valid_class is not None:
+                valid_class(data=self.data.get('meta')).is_valid(raise_exception=True)
 
 
 class DocumentSplitRequest(serializers.Serializer):
