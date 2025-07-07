@@ -431,8 +431,9 @@ const submit = async (formEl: FormInstance | undefined) => {
           .then((res: any) => {
             MsgSuccess(t('common.editSuccess'))
             emit('refresh', res.data)
-            visible.value = false
+            return user.profile()
           })
+          .then(() => {visible.value = false})
       } else {
         const obj = {
           folder_id: folder.currentFolder?.id,
@@ -443,8 +444,9 @@ const submit = async (formEl: FormInstance | undefined) => {
           .then((res: any) => {
             MsgSuccess(t('common.createSuccess'))
             emit('refresh')
-            visible.value = false
+            return user.profile()
           })
+          .then(() => {visible.value = false})
       }
     }
   })
