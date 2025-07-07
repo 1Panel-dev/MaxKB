@@ -247,6 +247,19 @@ export const exportExcel: (
   )
 }
 
+function decodeFilenameBrowser(contentDisposition: string) {
+  // 提取并解码 Base64 部分
+  const base64Part = contentDisposition.match(/=\?utf-8\?b\?(.*?)\?=/i)?.[1];
+  if (!base64Part) return null;
+
+  // 使用 atob 解码 Base64
+  const decoded = decodeURIComponent(escape(atob(base64Part)));
+
+  // 提取文件名
+  const filenameMatch = decoded.match(/filename="(.*?)"/i);
+  return filenameMatch ? filenameMatch[1] : null;
+}
+
 export const exportFile: (
   fileName: string,
   url: string,
@@ -258,7 +271,22 @@ export const exportFile: (
   params: any,
   loading?: NProgress | Ref<boolean>,
 ) => {
-  return promise(request({ url: url, method: 'get', params, responseType: 'blob' }), loading).then(
+  return promise(request({
+    url: url,
+    method: 'get',
+    params,
+    responseType: 'blob',
+    transformResponse: [function (data, headers) {
+      // 在这里可以访问 headers
+      // const contentType = headers['content-type'];
+      const contentDisposition = headers['content-disposition'];
+      // console.log('Content-Type:', contentType);
+      // console.log('Content-Disposition:', decodeFilenameBrowser(contentDisposition));
+      // 如果没有提供文件名，则使用默认名称
+      fileName = decodeFilenameBrowser(contentDisposition) || fileName;
+      return data; // 必须返回数据
+    }]
+  }), loading).then(
     (res: any) => {
       if (res) {
         const blob = new Blob([res], {
