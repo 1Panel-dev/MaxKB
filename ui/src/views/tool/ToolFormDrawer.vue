@@ -5,7 +5,7 @@
     </template>
     <div>
       <h4 class="title-decoration-1 mb-16">
-        {{ $t('views.tool.form.title.baseInfo') }}
+        {{ $t('views.model.modelForm.title.baseInfo') }}
       </h4>
       <el-form
         ref="FormRef"
