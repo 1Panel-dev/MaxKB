@@ -227,9 +227,27 @@ const dfsPermission = (arr: any = [], Name: string | number, e: boolean, idArr: 
 
 const filterText = ref('')
 
-const filterData = computed(() =>
-  props.data.filter((v: any) => v.name.toLowerCase().includes(filterText.value.toLowerCase())),
-)
+const filterData = computed(() => {
+  function filterTree(data: any[]): any[] {
+    return data
+      .map(item => {
+        // 递归过滤 children
+        const children = item.children ? filterTree(item.children) : []
+        // 判断当前节点或其子节点是否匹配
+        const isMatch = item.name.toLowerCase().includes(filterText.value.toLowerCase())
+        if (isMatch || children.length) {
+          return {
+            ...item,
+            children: children.length ? children : undefined,
+          }
+        }
+        return null
+      })
+      .filter(Boolean)
+  }
+
+  return filterTree(props.data)
+})
 
 function checkedOperateChange(Name: string | number, row: any, e: boolean) {
   dfsPermission(props.data, Name, e, [row.id])
