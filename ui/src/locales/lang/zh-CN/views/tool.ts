@@ -17,7 +17,7 @@ export default {
     searchResult: '的搜索结果 {count} 个',
   },
   delete: {
-    confirmTitle: '是否刪除工具：',
+    confirmTitle: '是否刪除工具',
     confirmMessage: '删除后，引用了该工具的应用提问时会报错 ，请谨慎操作。',
   },
   disabled: {

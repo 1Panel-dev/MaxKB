@@ -23,7 +23,7 @@ export default {
     saveMessage: '當前的更改尚未保存，確認退出嗎？',
   },
   delete: {
-    confirmTitle: '是否刪除工具：',
+    confirmTitle: '是否刪除工具',
     confirmMessage: '刪除後，引用該函數的應用在查詢時會報錯，請謹慎操作。',
   },
   disabled: {
