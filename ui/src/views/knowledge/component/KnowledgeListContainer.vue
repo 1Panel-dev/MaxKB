@@ -354,6 +354,7 @@ onBeforeRouteLeave((to, from) => {
 const emit = defineEmits(['refreshFolder'])
 
 const apiType = computed(() => {
+  // 工作空间普通用户的共享是share。系统的共享是shared
   if (route.path.includes('shared')) {
     return 'systemShare'
   } else if (route.path.includes('resource-management')) {

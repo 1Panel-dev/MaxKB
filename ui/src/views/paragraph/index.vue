@@ -12,7 +12,7 @@
         >）
       </el-text>
     </div>
-    <div class="header-button">
+    <div class="header-button" v-if="!shareDisabled">
       <el-button @click="batchSelectedHandle(true)" v-if="isBatch === false">
         {{ $t('views.paragraph.setting.batchSelected') }}
       </el-button>
@@ -81,7 +81,7 @@
                     <VueDraggable
                       ref="el"
                       v-model="paragraphDetail"
-                      :disabled="isBatch === true"
+                      :disabled="isBatch === true || shareDisabled"
                       handle=".handle"
                       :animation="150"
                       ghostClass="ghost"
@@ -110,6 +110,7 @@
                               @deleteParagraph="deleteParagraph"
                               @refresh="refresh"
                               @refreshMigrateParagraph="refreshMigrateParagraph"
+                              :disabled="shareDisabled"
                             />
                           </div>
                         </div>
@@ -168,11 +169,14 @@ import { t } from '@/locales'
 const route = useRoute()
 const {
   params: { id, documentId },
-  query: { type },
+  query: { type, isShared },
 } = route as any
 
 const apiType = computed(() => {
   return type as 'systemShare' | 'workspace' | 'systemManage'
+})
+const shareDisabled = computed(() => {
+  return isShared === 'true'
 })
 
 const SelectDocumentDialogRef = ref()

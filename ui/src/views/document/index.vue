@@ -6,92 +6,94 @@
         <div class="p-24">
           <div class="flex-between">
             <div>
-              <el-button
-                v-if="knowledgeDetail?.type === 0 && permissionPrecise.doc_create(id)"
-                type="primary"
-                @click="
-                  router.push({
-                    path: `/knowledge/document/upload/${folderId}`,
-                    query: { id: id },
-                  })
-                "
-                >{{ $t('views.document.uploadDocument') }}
-              </el-button>
-              <el-button
-                v-if="knowledgeDetail?.type === 1 && permissionPrecise.doc_create(id)"
-                type="primary"
-                @click="importDoc"
-                >{{ $t('views.document.importDocument') }}
-              </el-button>
-              <el-button
-                v-if="knowledgeDetail?.type === 2 && permissionPrecise.doc_create(id)"
-                type="primary"
-                @click="
-                  router.push({
-                    path: `/knowledge/import`,
-                    query: {
-                      id: id,
-                      folder_token: knowledgeDetail?.meta.folder_token,
-                    },
-                  })
-                "
-                >{{ $t('views.document.importDocument') }}
-              </el-button>
-              <el-button
-                @click="batchRefresh"
-                :disabled="multipleSelection.length === 0"
-                v-if="permissionPrecise.doc_vector(id)"
-                >{{ $t('views.knowledge.setting.vectorization') }}
-              </el-button>
-              <el-button
-                @click="openGenerateDialog()"
-                :disabled="multipleSelection.length === 0"
-                v-if="permissionPrecise.doc_generate(id)"
-                >{{ $t('views.document.generateQuestion.title') }}
-              </el-button>
-              <el-button
-                @click="openknowledgeDialog()"
-                :disabled="multipleSelection.length === 0"
-                v-if="permissionPrecise.doc_migrate(id)"
-                >{{ $t('views.document.setting.migration') }}
-              </el-button>
-              <el-dropdown>
-                <el-button class="ml-12 mr-12">
-                  <el-icon><MoreFilled /></el-icon>
+              <template v-if="!isShared">
+                <el-button
+                  v-if="knowledgeDetail?.type === 0 && permissionPrecise.doc_create(id)"
+                  type="primary"
+                  @click="
+                    router.push({
+                      path: `/knowledge/document/upload/${folderId}`,
+                      query: { id: id },
+                    })
+                  "
+                  >{{ $t('views.document.uploadDocument') }}
                 </el-button>
-                <template #dropdown>
-                  <el-dropdown-menu>
-                    <el-dropdown-item
-                      @click="openBatchEditDocument"
-                      :disabled="multipleSelection.length === 0"
-                      v-if="permissionPrecise.doc_edit(id)"
-                    >
-                      {{ $t('common.setting') }}
-                    </el-dropdown-item>
-                    <el-dropdown-item
-                      divided
-                      @click="syncMulDocument"
-                      :disabled="multipleSelection.length === 0"
-                      v-if="knowledgeDetail?.type === 1 &&permissionPrecise.doc_sync(id)"
-                      >{{ $t('views.document.syncDocument') }}
-                    </el-dropdown-item>
-                    <el-dropdown-item
-                      divided
-                      @click="syncLarkMulDocument"
-                      :disabled="multipleSelection.length === 0"
-                      v-if="knowledgeDetail?.type === 2 && permissionPrecise.doc_sync(id)"
-                      >{{ $t('views.document.syncDocument') }}
-                    </el-dropdown-item>
-                    <el-dropdown-item
-                      divided
-                      @click="deleteMulDocument"
-                      :disabled="multipleSelection.length === 0"
-                      v-if="permissionPrecise.doc_delete(id)"
-                      >{{ $t('common.delete') }}
-                    </el-dropdown-item>
-                  </el-dropdown-menu>
-                </template>
-              </el-dropdown>
+                <el-button
+                  v-if="knowledgeDetail?.type === 1 && permissionPrecise.doc_create(id)"
+                  type="primary"
+                  @click="importDoc"
+                  >{{ $t('views.document.importDocument') }}
+                </el-button>
+                <el-button
+                  v-if="knowledgeDetail?.type === 2 && permissionPrecise.doc_create(id)"
+                  type="primary"
+                  @click="
+                    router.push({
+                      path: `/knowledge/import`,
+                      query: {
+                        id: id,
+                        folder_token: knowledgeDetail?.meta.folder_token,
+                      },
+                    })
+                  "
+                  >{{ $t('views.document.importDocument') }}
+                </el-button>
+                <el-button
+                  @click="batchRefresh"
+                  :disabled="multipleSelection.length === 0"
+                  v-if="permissionPrecise.doc_vector(id)"
+                  >{{ $t('views.knowledge.setting.vectorization') }}
+                </el-button>
+                <el-button
+                  @click="openGenerateDialog()"
+                  :disabled="multipleSelection.length === 0"
+                  v-if="permissionPrecise.doc_generate(id)"
+                  >{{ $t('views.document.generateQuestion.title') }}
+                </el-button>
+                <el-button
+                  @click="openknowledgeDialog()"
+                  :disabled="multipleSelection.length === 0"
+                  v-if="permissionPrecise.doc_migrate(id)"
+                  >{{ $t('views.document.setting.migration') }}
+                </el-button>
+                <el-dropdown>
+                  <el-button class="ml-12 mr-12">
+                    <el-icon><MoreFilled /></el-icon>
+                  </el-button>
+                  <template #dropdown>
+                    <el-dropdown-menu>
+                      <el-dropdown-item
+                        @click="openBatchEditDocument"
+                        :disabled="multipleSelection.length === 0"
+                        v-if="permissionPrecise.doc_edit(id)"
+                      >
+                        {{ $t('common.setting') }}
+                      </el-dropdown-item>
+                      <el-dropdown-item
+                        divided
+                        @click="syncMulDocument"
+                        :disabled="multipleSelection.length === 0"
+                        v-if="knowledgeDetail?.type === 1 && permissionPrecise.doc_sync(id)"
+                        >{{ $t('views.document.syncDocument') }}
+                      </el-dropdown-item>
+                      <el-dropdown-item
+                        divided
+                        @click="syncLarkMulDocument"
+                        :disabled="multipleSelection.length === 0"
+                        v-if="knowledgeDetail?.type === 2 && permissionPrecise.doc_sync(id)"
+                        >{{ $t('views.document.syncDocument') }}
+                      </el-dropdown-item>
+                      <el-dropdown-item
+                        divided
+                        @click="deleteMulDocument"
+                        :disabled="multipleSelection.length === 0"
+                        v-if="permissionPrecise.doc_delete(id)"
+                        >{{ $t('common.delete') }}
+                      </el-dropdown-item>
+                    </el-dropdown-menu>
+                  </template>
+                </el-dropdown>
+              </template>
             </div>
 
             <el-input
@@ -108,7 +110,9 @@
             class="mt-16"
             :data="documentData"
             :pagination-config="paginationConfig"
-            :quick-create="knowledgeDetail?.type === 0 && permissionPrecise.doc_create(id)"
+            :quick-create="
+              knowledgeDetail?.type === 0 && permissionPrecise.doc_create(id) && !isShared
+            "
             @sizeChange="handleSizeChange"
             @changePage="getList"
             @cell-mouse-enter="cellMouseEnter"
@@ -121,14 +125,21 @@
             :row-key="(row: any) => row.id"
             :storeKey="storeKey"
           >
-            <el-table-column type="selection" width="55" :reserve-selection="true" />
+            <el-table-column
+              type="selection"
+              width="55"
+              :reserve-selection="true"
+              v-if="!isShared"
+            />
             <el-table-column prop="name" :label="$t('views.document.table.name')" min-width="280">
               <template #default="{ row }">
                 <ReadWrite
+                  v-if="!isShared"
                   @change="editName($event, row.id)"
                   :data="row.name"
                   :showEditIcon="row.id === currentMouseId"
                 />
+                <span v-else>{{ row.name }}</span>
               </template>
             </el-table-column>
             <el-table-column
@@ -344,7 +355,13 @@
                 {{ datetimeFormat(row.update_time) }}
               </template>
             </el-table-column>
-            <el-table-column :label="$t('common.operation')" align="left" width="160" fixed="right">
+            <el-table-column
+              :label="$t('common.operation')"
+              align="left"
+              width="160"
+              fixed="right"
+              v-if="!isShared"
+            >
               <template #default="{ row }">
                 <span @click.stop>
                   <el-switch
@@ -629,6 +646,10 @@ onBeforeRouteLeave((to: any) => {
   }
 })
 
+const isShared = computed(() => {
+  return folderId === 'share'
+})
+
 const apiType = computed(() => {
   if (route.path.includes('shared')) {
     return 'systemShare'
@@ -852,7 +873,10 @@ function rowClickHandle(row: any, column: any) {
     return
   }
 
-  router.push({ path: `/paragraph/${id}/${row.id}`, query: { type: apiType.value } })
+  router.push({
+    path: `/paragraph/${id}/${row.id}`,
+    query: { type: apiType.value, isShared: isShared.value ? 'true' : 'false' },
+  })
 }
 
 /*
