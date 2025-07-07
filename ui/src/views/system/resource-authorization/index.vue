@@ -199,7 +199,7 @@ const settingTags = reactive([
 // 当前激活的数据类型（应用/知识库/模型/工具）
 
 const activeData = computed(() => {
-  var lastIndex = route.path.lastIndexOf('/')
+  const lastIndex = route.path.lastIndexOf('/')
   const currentPathType = route.path.substring(lastIndex + 1).toUpperCase()
   return settingTags.filter((item) => {
     return item.type === currentPathType
@@ -430,7 +430,7 @@ const currentWorkspace = computed(() => {
 async function getWorkspaceList() {
   const res = await loadPermissionApi('workspace').getSystemWorkspaceList(loading)
   workspaceList.value = res.data
-  currentWorkspaceId.value = 'default'
+  currentWorkspaceId.value = user.getWorkspaceId() as string || 'default'
 }
 
 function changeWorkspace(item: WorkspaceItem) {
