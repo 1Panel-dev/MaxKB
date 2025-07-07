@@ -68,8 +68,9 @@ import ToolCard from './ToolCard.vue'
 import { MsgSuccess } from '@/utils/message'
 import InternalDescDrawer from './InternalDescDrawer.vue'
 import AddInternalToolDialog from './AddInternalToolDialog.vue'
-import {loadSharedApi} from "@/utils/dynamics-api/shared-api.ts";
-
+import { loadSharedApi } from "@/utils/dynamics-api/shared-api.ts";
+import useStore from '@/stores'
+const { user } = useStore()
 interface ToolCategory {
   id: string
   title: string
@@ -148,7 +149,7 @@ async function getList() {
         // if (category.id === 'recommend') {
         //   category.tools = res.data
         // } else {
-          category.tools = res.data.filter((tool: any) => tool.label === category.id)
+        category.tools = res.data.filter((tool: any) => tool.label === category.id)
         // }
       })
     }
@@ -179,6 +180,9 @@ async function handleAdd(tool: any) {
   try {
     await loadSharedApi({ type: 'tool', systemType: props.apiType })
       .addInternalTool(tool.id, { name: tool.name, folder_id: folderId.value }, addLoading)
+      .then(() => {
+        return user.profile()
+      })
     // await ToolStoreApi.addInternalTool(tool.id, { name: tool.name, folder_id: folderId.value }, addLoading)
     emit('refresh')
     MsgSuccess(t('common.addSuccess'))
@@ -200,6 +204,7 @@ defineExpose({ open })
 
     .dialog-header {
       position: relative;
+
       .store-type {
         position: absolute;
         top: 50%;
