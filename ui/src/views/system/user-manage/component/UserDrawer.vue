@@ -280,10 +280,22 @@ const submit = async (formEl: FormInstance | undefined) => {
         await memberFormContentRef.value?.validate()
       }
       if (user.isPE() || user.isEE()) {
-        list.value = list.value.map(item => ({
-          ...item,
-          workspace_ids: adminRoleList.value.find(item1 => item1.id === item.role_id) ? ['None'] : item.workspace_ids
-        }))
+        list.value = list.value.map(item => {
+          const isAdminRole = adminRoleList.value.find(item1 => item1.id === item.role_id);
+
+          // 如果是管理员角色，则设置为 ['None']
+          if (isAdminRole) {
+            return {...item, workspace_ids: ['None']};
+          }
+
+          // 如果是普通用户且是 PE 类型，则设置为 ['default']
+          if (user.isPE()) {
+            return {...item, workspace_ids: ['default']};
+          }
+
+          // 其他情况保持原样
+          return item;
+        });
       }
       const params = {
         ...userForm.value,
