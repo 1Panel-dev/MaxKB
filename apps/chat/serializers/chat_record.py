@@ -15,7 +15,8 @@ from rest_framework import serializers
 
 from application.models import VoteChoices, ChatRecord, Chat
 from application.serializers.application_chat import ChatCountSerializer
-from application.serializers.application_chat_record import ChatRecordSerializerModel
+from application.serializers.application_chat_record import ChatRecordSerializerModel, \
+    ApplicationChatRecordQuerySerializers
 from common.db.search import page_search
 from common.exception.app_exception import AppApiException
 from common.utils.lock import try_lock, un_lock
@@ -86,7 +87,8 @@ class HistoricalConversationSerializer(serializers.Serializer):
     def get_queryset(self):
         chat_user_id = self.data.get('chat_user_id')
         application_id = self.data.get("application_id")
-        return QuerySet(Chat).filter(application_id=application_id, chat_user_id=chat_user_id, is_deleted=False)
+        return QuerySet(Chat).filter(application_id=application_id, chat_user_id=chat_user_id,
+                                     is_deleted=False).order_by('-update_time')
 
     def list(self):
         self.is_valid(raise_exception=True)
@@ -157,4 +159,6 @@ class HistoricalConversationRecordSerializer(serializers.Serializer):
 
     def page(self, current_page, page_size):
         self.is_valid(raise_exception=True)
-        return page_search(current_page, page_size, self.get_queryset(), lambda r: ChatRecordSerializerModel(r).data)
+        return ApplicationChatRecordQuerySerializers(
+            data={'application_id': self.data.get('application_id'), 'chat_id': self.data.get('chat_id')}).page(
+            current_page, page_size)

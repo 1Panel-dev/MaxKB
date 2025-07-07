@@ -106,6 +106,20 @@
             v-model="form_data.question_reference_address"
           />
         </el-form-item>
+        <el-form-item
+          :label="$t('views.applicationWorkflow.nodes.searchKnowledgeNode.showKnowledge.label')"
+          prop="show_knowledge"
+          :rules="{
+            message: $t(
+              'views.applicationWorkflow.nodes.searchKnowledgeNode.showKnowledge.requiredMessage',
+            ),
+            trigger: 'blur',
+            required: true,
+          }"
+          @click.prevent
+        >
+          <el-switch size="small" v-model="form_data.show_knowledge" />
+        </el-form-item>
       </el-form>
     </el-card>
     <ParamSettingDialog ref="ParamSettingDialogRef" @refresh="refreshParam" />
@@ -142,6 +156,7 @@ const form = {
     search_mode: 'embedding',
   },
   question_reference_address: [],
+  show_knowledge: false,
 }
 
 const form_data = computed({

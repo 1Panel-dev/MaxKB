@@ -32,6 +32,8 @@ class RerankerStepNodeSerializer(serializers.Serializer):
     question_reference_address = serializers.ListField(required=True)
     reranker_model_id = serializers.UUIDField(required=True)
     reranker_reference_list = serializers.ListField(required=True, child=serializers.ListField(required=True))
+    show_knowledge = serializers.BooleanField(required=True,
+                                              label=_("The results are displayed in the knowledge sources"))
 
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)
@@ -55,6 +57,6 @@ class IRerankerNode(INode):
 
                             reranker_list=reranker_list)
 
-    def execute(self, question, reranker_setting, reranker_list, reranker_model_id,
+    def execute(self, question, reranker_setting, reranker_list, reranker_model_id,show_knowledge,
                 **kwargs) -> NodeResult:
         pass

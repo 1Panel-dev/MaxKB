@@ -62,10 +62,11 @@ class BaseSearchKnowledgeNode(ISearchKnowledgeStepNode):
              result])[0:dataset_setting.get('max_paragraph_char_number', 5000)]
         self.context['directly_return'] = directly_return
 
-    def execute(self, knowledge_id_list, knowledge_setting, question,
+    def execute(self, knowledge_id_list, knowledge_setting, question, show_knowledge,
                 exclude_paragraph_id_list=None,
                 **kwargs) -> NodeResult:
         self.context['question'] = question
+        self.context['show_knowledge'] = show_knowledge
         get_knowledge_list_of_authorized = DatabaseModelManage.get_model('get_knowledge_list_of_authorized')
         chat_user_type = self.workflow_manage.get_body().get('chat_user_type')
         if get_knowledge_list_of_authorized is not None and RoleConstants.CHAT_USER.value.name == chat_user_type:
@@ -145,6 +146,7 @@ class BaseSearchKnowledgeNode(ISearchKnowledgeStepNode):
     def get_details(self, index: int, **kwargs):
         return {
             'name': self.node.properties.get('stepName'),
+            'show_knowledge': self.context.get('show_knowledge'),
             'question': self.context.get('question'),
             "index": index,
             'run_time': self.context.get('run_time'),

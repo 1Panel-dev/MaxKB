@@ -133,6 +133,10 @@ export default {
       result: '检索结果',
       directly_return: '满足直接回答的分段内容',
       searchParam: '检索参数',
+      showKnowledge: {
+        label: '结果显示在知识来源中',
+        requiredMessage: '请设置参数',
+      },
       searchQuestion: {
         label: '检索问题',
         placeholder: '请选择检索问题',
