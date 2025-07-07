@@ -14,8 +14,9 @@ from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 
 from application.chat_pipeline.step.chat_step.i_chat_step import PostResponseHandler
-from application.models import Application, ChatRecord, Chat, ApplicationVersion
+from application.models import Application, ChatRecord, Chat, ApplicationVersion, ChatUserType
 from common.constants.cache_version import Cache_Version
+from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.exception.app_exception import ChatException
 from models_provider.models import Model
 from models_provider.tools import get_model_credential
@@ -47,6 +48,7 @@ class ChatInfo:
         self.application_id = application_id
         self.chat_record_list: List[ChatRecord] = []
         self.application = None
+        self.chat_user = None
         self.debug = debug
 
     @staticmethod
@@ -73,8 +75,30 @@ class ChatInfo:
         self.application = application
         return application
 
+    def get_chat_user(self, asker=None):
+        if self.chat_user:
+            return self.chat_user
+        if self.chat_user_type == ChatUserType.CHAT_USER.value:
+            chat_user_model = DatabaseModelManage.get_model("chat_user")
+            chat_user = QuerySet(chat_user_model).filter(id=self.chat_user_id).first()
+            return {
+                'id': chat_user.id,
+                'email': chat_user.email,
+                'phone': chat_user.phone,
+                'nick_name': chat_user.nick_name,
+                'username': chat_user.username,
+                'source': chat_user.source
+            }
+        else:
+            if asker:
+                self.chat_user = asker
+            else:
+                self.chat_user = {'username': '游客'}
+        return self.chat_user
+
     def to_base_pipeline_manage_params(self):
         self.get_application()
+        self.get_chat_user()
         knowledge_setting = self.application.knowledge_setting
         model_setting = self.application.model_setting
         model_id = self.application.model_id
@@ -139,7 +163,8 @@ class ChatInfo:
         if not self.debug:
             if not QuerySet(Chat).filter(id=self.chat_id).exists():
                 Chat(id=self.chat_id, application_id=self.application_id, abstract=chat_record.problem_text[0:1024],
-                     chat_user_id=self.chat_user_id, chat_user_type=self.chat_user_type).save()
+                     chat_user_id=self.chat_user_id, chat_user_type=self.chat_user_type,
+                     asker=self.get_chat_user()).save()
             else:
                 QuerySet(Chat).filter(id=self.chat_id).update(update_time=datetime.now())
             # 插入会话记录

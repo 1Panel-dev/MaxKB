@@ -236,7 +236,8 @@ class ChatSerializers(serializers.Serializer):
                                            'chat_user_id': chat_user_id,
                                            'chat_user_type': chat_user_type,
                                            'workspace_id': workspace_id,
-                                           'debug': debug},
+                                           'debug': debug,
+                                           'chat_user': chat_info.get_chat_user()},
                                           WorkFlowPostHandler(chat_info),
                                           base_to_response, form_data, image_list, document_list, audio_list,
                                           other_list,
@@ -250,6 +251,7 @@ class ChatSerializers(serializers.Serializer):
         ChatMessageSerializers(data=instance).is_valid(raise_exception=True)
         chat_info = self.get_chat_info()
         chat_info.get_application()
+        chat_info.get_chat_user()
         self.is_valid_chat_id(chat_info)
         if chat_info.application.type == ApplicationTypeChoices.SIMPLE:
             self.is_valid_application_simple(raise_exception=True, chat_info=chat_info)
