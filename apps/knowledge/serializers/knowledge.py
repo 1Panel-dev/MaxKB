@@ -598,19 +598,12 @@ class KnowledgeSerializer(serializers.Serializer):
                 },
             )
             knowledge.save()
-            # 自动授权给创建者
-            WorkspaceUserResourcePermission(
-                target=knowledge_id,
-                auth_target_type=AuthTargetType.KNOWLEDGE,
-                permission_list=[ResourcePermission.VIEW, ResourcePermission.MANAGE],
-                workspace_id=self.data.get('workspace_id'),
-                user_id=self.data.get('user_id'),
-                auth_type=ResourceAuthType.RESOURCE_PERMISSION_GROUP
-            ).save()
-            # 刷新缓存
-            version = Cache_Version.PERMISSION_LIST.get_version()
-            key = Cache_Version.PERMISSION_LIST.get_key(user_id=self.data.get('user_id'))
-            cache.delete(key, version=version)
+            # 自动资源给授权当前用户
+            UserResourcePermissionSerializer(data={
+                'workspace_id': self.data.get('workspace_id'),
+                'user_id': self.data.get('user_id'),
+                'auth_target_type': AuthTargetType.KNOWLEDGE.value
+            }).auth_resource(str(knowledge_id))
 
             sync_web_knowledge.delay(str(knowledge_id), instance.get('source_url'), instance.get('selector'))
             return {**KnowledgeModelSerializer(knowledge).data, 'document_list': []}
