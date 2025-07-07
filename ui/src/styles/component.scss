@@ -50,6 +50,7 @@
     align-items: flex-start;
     height: 100%;
     width: 100%;
+    margin: 0;
   }
   .el-radio__label {
     width: 100%;
@@ -216,7 +217,7 @@
 }
 
 // 带滚动条dialog
-.chat-source-dialog {
+.scrollbar-dialog {
   padding: 16px !important;
   .el-dialog__header {
     padding: 4px 16px 12px 12px;

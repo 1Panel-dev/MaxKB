@@ -62,7 +62,7 @@
     </div>
     <!-- 知识库引用/执行详情 dialog -->
     <el-dialog
-      class="chat-source-dialog"
+      class="scrollbar-dialog"
       :title="dialogTitle"
       v-model="dialogVisible"
       destroy-on-close

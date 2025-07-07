@@ -49,17 +49,19 @@
       <LayoutContainer showCollapse>
         <template #left>
           <div class="paragraph-sidebar p-16">
-            <el-anchor
-              direction="vertical"
-              type="default"
-              :offset="130"
-              container=".paragraph-scollbar"
-              @click="handleClick"
-            >
-              <template v-for="(item, index) in paragraphDetail" :key="item.id">
-                <el-anchor-link :href="`#m${item.id}`" :title="item.title" v-if="item.title" />
-              </template>
-            </el-anchor>
+            <el-scrollbar class="paragraph-scollbar">
+              <el-anchor
+                direction="vertical"
+                type="default"
+                :offset="130"
+                container=".paragraph-scollbar"
+                @click="handleClick"
+              >
+                <template v-for="(item, index) in paragraphDetail" :key="item.id">
+                  <el-anchor-link :href="`#m${item.id}`" :title="item.title" v-if="item.title" />
+                </template>
+              </el-anchor>
+            </el-scrollbar>
           </div>
         </template>
         <div class="w-full">
@@ -346,7 +348,7 @@ onMounted(() => {
   }
   .paragraph-sidebar {
     width: 100%;
-    height: 100%;
+    height: calc(100vh - 215px);
     box-sizing: border-box;
   }
 
