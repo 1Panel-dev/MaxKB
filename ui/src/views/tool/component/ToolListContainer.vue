@@ -65,7 +65,7 @@
                 :on-change="(file: any, fileList: any) => importTool(file)"
                 class="import-button"
               >
-                <el-dropdown-item class="w-full">
+                <el-dropdown-item>
                   <div class="flex align-center w-full">
                     <el-avatar shape="square" class="mt-4" :size="36" style="background: none">
                       <img src="@/assets/icon_import.svg" alt="" />

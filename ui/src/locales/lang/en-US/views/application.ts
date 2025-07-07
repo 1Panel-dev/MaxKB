@@ -53,8 +53,13 @@ export default {
       workflowPlaceholder: 'Suitable for advanced users to customize the workflow of assistant',
     },
     appTemplate: {
-      blankApp: 'Blank APP',
-      assistantApp: 'Knowledge Assistant',
+      blankApp: {
+        title: 'Blank APP',
+      },
+      assistantApp: {
+        title: 'Knowledge Assistant',
+        description: 'Suitable for advanced users to customize the workflow of assistant',
+      },
     },
     aiModel: {
       label: 'AI Model',

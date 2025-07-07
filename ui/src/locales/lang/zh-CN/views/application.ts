@@ -1,3 +1,5 @@
+import type { title } from 'process'
+
 export default {
   title: '应用',
   createApplication: '创建简易应用',
@@ -49,8 +51,13 @@ export default {
       workflowPlaceholder: '适合高级用户自定义小助手的工作流',
     },
     appTemplate: {
-      blankApp: '空白应用',
-      assistantApp: '知识库问答助手',
+      blankApp: {
+        title: '空白创建',
+      },
+      assistantApp: {
+        title: '知识库问答助手',
+        description: '基于用户问题，检索知识库相关内容作为AI模型的参考内容',
+      },
     },
     aiModel: {
       label: 'AI 模型',

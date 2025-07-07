@@ -47,23 +47,35 @@
           <el-row :gutter="16">
             <el-col :span="12">
               <el-card
-                class="radio-card cursor"
+                class="template-radio-card cursor text-center flex-center"
                 shadow="never"
                 @click="selectedType('blank')"
                 :class="appTemplate === 'blank' ? 'active' : ''"
               >
-                {{ $t('views.application.form.appTemplate.blankApp') }}
+                <div class="flex-center p-24">
+                  <el-icon class="mr-12"><Plus /></el-icon>
+                  {{ $t('views.application.form.appTemplate.blankApp.title') }}
+                </div>
               </el-card>
             </el-col>
             <el-col :span="12">
-              <el-card
-                class="radio-card cursor"
+              <CardBox
+                :title="$t('views.application.form.appTemplate.assistantApp.title')"
+                :description="$t('views.application.form.appTemplate.assistantApp.description')"
                 shadow="never"
+                class="template-radio-card cursor"
                 :class="appTemplate === 'assistant' ? 'active' : ''"
                 @click="selectedType('assistant')"
               >
-                {{ $t('views.application.form.appTemplate.assistantApp') }}
-              </el-card>
+                <template #icon>
+                  <LogoIcon height="32px" />
+                </template>
+                <template #subTitle>
+                  <el-text class="color-secondary" size="small">
+                    {{ $t('views.application.workflow') }}
+                  </el-text>
+                </template>
+              </CardBox>
             </el-col>
           </el-row>
         </div>
@@ -90,6 +102,7 @@ import applicationApi from '@/api/application/application'
 import { MsgSuccess, MsgAlert } from '@/utils/message'
 import { isWorkFlow } from '@/utils/application'
 import { baseNodes } from '@/workflow/common/data'
+import { applicationTemplate } from '@/views/application/template'
 import { t } from '@/locales'
 import useStore from '@/stores'
 const { user } = useStore()
@@ -220,7 +233,7 @@ const submitHandle = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid) => {
     if (valid) {
-      if (isWorkFlow(applicationForm.value.type) && appTemplate.value === 'blank') {
+      if (isWorkFlow(applicationForm.value.type)) {
         workflowDefault.value.nodes[0].properties.node_data.desc = applicationForm.value.desc
         workflowDefault.value.nodes[0].properties.node_data.name = applicationForm.value.name
         applicationForm.value['work_flow'] = workflowDefault.value
@@ -248,17 +261,18 @@ const submitHandle = async (formEl: FormInstance | undefined) => {
 
 function selectedType(type: string) {
   appTemplate.value = type
+  workflowDefault.value = applicationTemplate[type]
 }
 
 defineExpose({ open })
 </script>
 <style lang="scss" scoped>
-.radio-card {
-  line-height: 22px;
+.template-radio-card {
+  height: 130px !important;
+  min-height: 130px !important;
 
   &.active {
     border-color: var(--el-color-primary);
-    color: var(--el-color-primary);
   }
 }
 </style>

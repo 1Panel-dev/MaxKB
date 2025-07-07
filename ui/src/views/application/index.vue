@@ -101,7 +101,7 @@
                   :limit="1"
                   :on-change="(file: any, fileList: any) => importApplication(file)"
                 >
-                  <el-dropdown-item class="w-full">
+                  <el-dropdown-item>
                     <div class="flex align-center w-full">
                       <el-avatar shape="square" class="mt-4" :size="36" style="background: none">
                         <img src="@/assets/icon_import.svg" alt="" />
@@ -129,7 +129,7 @@
       </template>
       <div
         v-loading.fullscreen.lock="paginationConfig.current_page === 1 && loading"
-        style="max-height: calc(100vh - 140px)"
+        style="max-height: calc(100vh - 120px)"
       >
         <InfiniteScroll
           :size="applicationList.length"

@@ -251,7 +251,7 @@ function refreshFolder() {
   }
   .tree-height {
     padding-top: 4px;
-    height: calc(100vh - 210px);
+    height: calc(100vh - 175px);
   }
 }
 :deep(.overflow-inherit_node__children) {
