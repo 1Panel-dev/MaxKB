@@ -189,7 +189,7 @@
         <div>
           <slot name="userInput" />
         </div>
-        <div>
+        <div class="flex align-center">
           <template v-if="props.applicationDetails.stt_model_enable">
             <span v-if="mode === 'mobile'">
               <el-button text @click="switchMicrophone(!isMicrophone)">
