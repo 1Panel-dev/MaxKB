@@ -17,7 +17,12 @@
               <div class="flex-between">
                 <div class="flex align-center">
                   <img :src="getImgUrl(item && item?.document_name)" alt="" width="24" />
-                  <div class="ml-4 ellipsis-1" :title="item?.document_name" v-if="!item.source_url" @click="openParagraphDocument(item)">
+                  <div
+                    class="ml-4 ellipsis-1"
+                    :title="item?.document_name"
+                    v-if="!item.source_url"
+                    @click="openParagraphDocument(item)"
+                  >
                     <p>{{ item && item?.document_name }}</p>
                   </div>
                   <div class="ml-8" v-else>
@@ -101,7 +106,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['openExecutionDetail', 'openParagraph','openParagraphDocument'])
+const emit = defineEmits(['openExecutionDetail', 'openParagraph', 'openParagraphDocument'])
 
 const dialogVisible = ref(false)
 const dialogTitle = ref('')
@@ -134,9 +139,10 @@ function openExecutionDetail(row: any) {
 }
 function openParagraphDocument(row: any) {
   if (props.executionIsRightPanel) {
-    emit('openParagraphDocument',row)
+    emit('openParagraphDocument', row)
     return
   }
+
   currentComponent.value = ParagraphDocumentContent
   dialogTitle.value = row.document_name
   currentChatDetail.value = row

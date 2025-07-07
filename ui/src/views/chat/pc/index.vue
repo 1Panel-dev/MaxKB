@@ -33,7 +33,7 @@
               <h4 v-show="!isPcCollapse">{{ applicationDetail?.name }}</h4>
             </div>
             <el-button
-              size="large" 
+              size="large"
               type="primary"
               plain
               v-show="!isPcCollapse"
@@ -301,7 +301,7 @@
                 :detail="executionDetail"
                 :type="applicationDetail?.type"
               />
-              <ParagraphDocumentContent v-else />
+              <ParagraphDocumentContent :detail="rightPanelDetail" v-else />
             </div>
           </el-splitter-panel>
         </el-splitter>
@@ -609,6 +609,7 @@ function openParagraphDocument(detail: any, row: any) {
   rightPanelTitle.value = row.document_name
   rightPanelType.value = 'paragraphDocument'
   rightPanelSize.value = 400
+  rightPanelDetail.value = row
 }
 
 function closeExecutionDetail() {
@@ -716,11 +717,11 @@ function closeExecutionDetail() {
 
     .add-button {
       border: 1px solid var(--el-color-primary);
-      background-color: #3370FF1A;
-      color: #3370FF;
+      background-color: #3370ff1a;
+      color: #3370ff;
       font-weight: 500;
       &:hover {
-        background-color: #3370FF33;
+        background-color: #3370ff33;
       }
     }
 
@@ -799,12 +800,13 @@ function closeExecutionDetail() {
 }
 
 .chat-pc-popper {
-  background: linear-gradient(187.61deg, rgba(235, 241, 255, 0.5) 39.6%, rgba(231, 249, 255, 0.5) 94.3%),
-        #eef1f4 !important;
+  background:
+    linear-gradient(187.61deg, rgba(235, 241, 255, 0.5) 39.6%, rgba(231, 249, 255, 0.5) 94.3%),
+    #eef1f4 !important;
   .el-menu {
     background: transparent;
   }
-        .el-menu-item-group__title {
+  .el-menu-item-group__title {
     padding-bottom: 16px;
     font-weight: 500;
     color: var(--app-text-color-secondary);
@@ -820,7 +822,7 @@ function closeExecutionDetail() {
     }
     &.is-active {
       background-color: #ffffff;
-      
+
       color: var(--el-text-color-primary);
       & > div {
         font-weight: 500;

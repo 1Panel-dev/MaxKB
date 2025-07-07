@@ -9,7 +9,7 @@
         class="content"
         @mouseup="openControl"
         :style="{
-          'padding-right': showUserAvatar ? 'var(--padding-left)' : '0'
+          'padding-right': showUserAvatar ? 'var(--padding-left)' : '0',
         }"
       >
         <el-card shadow="always" class="mb-8 border-r-8" style="--el-card-padding: 6px 16px">
@@ -46,7 +46,7 @@
             :executionIsRightPanel="props.executionIsRightPanel"
             @open-execution-detail="emit('openExecutionDetail')"
             @openParagraph="emit('openParagraph')"
-            @openParagraphDocument="(val: string)=>emit('openParagraphDocument', val)"
+            @openParagraphDocument="(val: string) => emit('openParagraphDocument', val)"
             v-if="showSource(chatRecord) && index === chatRecord.answer_text_list.length - 1"
           />
         </el-card>
@@ -56,7 +56,7 @@
       class="content"
       :style="{
         'padding-left': showAvatar ? 'var(--padding-left)' : '0',
-        'padding-right': showUserAvatar ? 'var(--padding-left)' : '0'
+        'padding-right': showUserAvatar ? 'var(--padding-left)' : '0',
       }"
     >
       <OperationButton
@@ -92,7 +92,12 @@ const props = defineProps<{
 
 const { user } = useStore()
 
-const emit = defineEmits(['update:chatRecord', 'openExecutionDetail', 'openParagraph','openParagraphDocument'])
+const emit = defineEmits([
+  'update:chatRecord',
+  'openExecutionDetail',
+  'openParagraph',
+  'openParagraphDocument',
+])
 
 const showAvatar = computed(() => {
   return user.isEnterprise() ? props.application.show_avatar : true
@@ -130,8 +135,8 @@ const answer_text_list = computed(() => {
           chat_record_id: undefined,
           child_node: undefined,
           runtime_node_id: undefined,
-          reasoning_content: undefined
-        }
+          reasoning_content: undefined,
+        },
       ]
     } else if (item instanceof Array) {
       return item

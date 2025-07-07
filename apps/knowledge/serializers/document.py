@@ -817,6 +817,7 @@ class DocumentSerializers(serializers.Serializer):
 
         @staticmethod
         def get_document_paragraph_model(knowledge_id, instance: Dict):
+            source_meta = {'source_file_id': instance.get('source_file_id')} if instance.get('source_file_id') else {}
             document_model = Document(
                 **{
                     'knowledge_id': knowledge_id,
@@ -826,7 +827,8 @@ class DocumentSerializers(serializers.Serializer):
                         lambda x, y: x + y,
                         [len(p.get('content')) for p in instance.get('paragraphs', [])],
                         0),
-                    'meta': instance.get('meta') if instance.get('meta') is not None else {},
+                    'meta': {**instance.get('meta'), **source_meta} if instance.get(
+                        'meta') is not None else source_meta,
                     'type': instance.get('type') if instance.get('type') is not None else KnowledgeType.BASE
                 })
 

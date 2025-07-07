@@ -3,7 +3,7 @@ SELECT
 	knowledge."name" AS "knowledge_name",
 	knowledge."type" AS "knowledge_type",
 	"document"."name" AS "document_name",
-	"document"."meta" AS "meta",
+	"document"."meta"::json AS "meta",
 	"document"."hit_handling_method" AS "hit_handling_method",
 	"document"."directly_return_similarity" as "directly_return_similarity"
 FROM
