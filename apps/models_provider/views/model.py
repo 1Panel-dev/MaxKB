@@ -66,6 +66,7 @@ class ModelSetting(APIView):
                    request=ModelCreateAPI.get_request(),
                    responses=ModelCreateAPI.get_response())
     @has_permissions(PermissionConstants.MODEL_CREATE.get_workspace_permission(),
+                     PermissionConstants.MODEL_EDIT.get_workspace_permission_workspace_manage_role(),
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role())
     @log(menu='model', operate='Create model',
          get_operation_object=lambda r, k: {'name': r.date.get('name')},
@@ -97,6 +98,7 @@ class ModelSetting(APIView):
                    responses=ModelListResponse.get_response(),
                    tags=[_('Model')])  # type: ignore
     @has_permissions(PermissionConstants.MODEL_READ.get_workspace_permission(),
+                     PermissionConstants.MODEL_READ.get_workspace_permission_workspace_manage_role(),
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role())
     def get(self, request: Request, workspace_id: str):
         return result.success(
@@ -116,8 +118,9 @@ class ModelSetting(APIView):
                        parameters=GetModelApi.get_parameters(),
                        responses=ModelEditApi.get_response(),
                        tags=[_('Model')])  # type: ignore
-        @has_permissions(PermissionConstants.MODEL_EDIT.get_workspace_permission(),
+        @has_permissions(PermissionConstants.MODEL_EDIT.get_workspace_model_permission(),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+                         PermissionConstants.MODEL_EDIT.get_workspace_permission_workspace_manage_role(),
                          ViewPermission([RoleConstants.USER.get_workspace_role()],
                                         [PermissionConstants.MODEL.get_workspace_model_permission()],
                                         CompareConstants.AND),)
@@ -139,6 +142,7 @@ class ModelSetting(APIView):
                        responses=DefaultModelResponse.get_response(),
                        tags=[_('Model')])  # type: ignore
         @has_permissions(PermissionConstants.MODEL_DELETE.get_workspace_model_permission(),
+                         PermissionConstants.MODEL_DELETE.get_workspace_permission_workspace_manage_role(),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), ViewPermission([RoleConstants.USER.get_workspace_role()],
                                         [PermissionConstants.MODEL.get_workspace_model_permission()],
                                         CompareConstants.AND),)
@@ -158,6 +162,7 @@ class ModelSetting(APIView):
                        responses=GetModelApi.get_response(),
                        tags=[_('Model')])  # type: ignore
         @has_permissions(PermissionConstants.MODEL_READ.get_workspace_model_permission(),
+                         PermissionConstants.MODEL_READ.get_workspace_permission_workspace_manage_role(),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), ViewPermission([RoleConstants.USER.get_workspace_role()],
                                         [PermissionConstants.MODEL.get_workspace_model_permission()],
                                         CompareConstants.AND),)
@@ -178,6 +183,7 @@ class ModelSetting(APIView):
                        responses=ProvideApi.ModelParamsForm.get_response(),
                        tags=[_('Model')])  # type: ignore
         @has_permissions(PermissionConstants.MODEL_READ.get_workspace_model_permission(),
+                         PermissionConstants.MODEL_READ.get_workspace_permission_workspace_manage_role(),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), ViewPermission([RoleConstants.USER.get_workspace_role()],
                                         [PermissionConstants.MODEL.get_workspace_model_permission()],
                                         CompareConstants.AND),)
@@ -193,7 +199,8 @@ class ModelSetting(APIView):
                        request=GetModelApi.get_request(),
                        responses=ProvideApi.ModelParamsForm.get_response(),
                        tags=[_('Model')])  # type: ignore
-        @has_permissions(PermissionConstants.MODEL_READ.get_workspace_model_permission(),
+        @has_permissions(PermissionConstants.MODEL_EDIT.get_workspace_model_permission(),
+                         PermissionConstants.MODEL_EDIT.get_workspace_permission_workspace_manage_role(),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), ViewPermission([RoleConstants.USER.get_workspace_role()],
                                         [PermissionConstants.MODEL.get_workspace_model_permission()],
                                         CompareConstants.AND),)
@@ -218,6 +225,7 @@ class ModelSetting(APIView):
                        responses=GetModelApi.get_response(),
                        tags=[_('Model')])  # type: ignore
         @has_permissions(PermissionConstants.MODEL_READ.get_workspace_model_permission(),
+                         PermissionConstants.MODEL_READ.get_workspace_permission_workspace_manage_role(),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), ViewPermission([RoleConstants.USER.get_workspace_role()],
                                         [PermissionConstants.MODEL.get_workspace_model_permission()],
                                         CompareConstants.AND),)
@@ -237,6 +245,7 @@ class ModelSetting(APIView):
                        responses=DefaultModelResponse.get_response(),
                        tags=[_('Model')])  # type: ignore
         @has_permissions(PermissionConstants.MODEL_CREATE.get_workspace_model_permission(),
+                         PermissionConstants.MODEL_CREATE.get_workspace_permission_workspace_manage_role(),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), ViewPermission([RoleConstants.USER.get_workspace_role()],
                                         [PermissionConstants.MODEL.get_workspace_model_permission()],
                                         CompareConstants.AND),)
@@ -259,6 +268,7 @@ class WorkspaceSharedModelSetting(APIView):
     )  # type: ignore
     @has_permissions(
         PermissionConstants.MODEL_READ.get_workspace_permission(),
+        PermissionConstants.MODEL_READ.get_workspace_permission_workspace_manage_role(),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         RoleConstants.USER.get_workspace_role(),
     )
