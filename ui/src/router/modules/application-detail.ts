@@ -25,7 +25,7 @@ const ApplicationDetailRouter = {
           () => {
               const to: any = get_next_route()
            return new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission( to ? to.params.id : '',)],[],'AND')},
-          
+
           RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
           PermissionConst.APPLICATION_OVERVIEW_READ.getWorkspacePermissionWorkspaceManageRole,
           () => {
@@ -83,7 +83,7 @@ const ApplicationDetailRouter = {
             const to: any = get_next_route()
             return PermissionConst.APPLICATION_ACCESS_READ.getApplicationWorkspaceResourcePermission(
               to ? to.params.id : '',)
-          }],[EditionConst.IS_EE, EditionConst.IS_PE],'OR'), 
+          }],[EditionConst.IS_EE, EditionConst.IS_PE],'OR'),
         ]
       },
       component: () => import('@/views/application/ApplicationAccess.vue'),
@@ -108,7 +108,7 @@ const ApplicationDetailRouter = {
           () => {
             const to: any = get_next_route()
             return new ComplexPermission([],[PermissionConst.APPLICATION_CHAT_USER_READ.getApplicationWorkspaceResourcePermission(
-              to ? to.params.id : '',)],[EditionConst.IS_EE, EditionConst.IS_PE],'OR')  
+              to ? to.params.id : '',)],[EditionConst.IS_EE, EditionConst.IS_PE],'OR')
           }
         ]
       },

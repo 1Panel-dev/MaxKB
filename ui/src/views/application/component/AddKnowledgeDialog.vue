@@ -49,7 +49,7 @@
           :treeStyle="{ height: 'calc(100vh - 320px)' }"
         />
       </template>
-      <div class="layout-bg h-full">
+      <div class="layout-bg" style="height: calc(100vh - 160px)">
         <el-scrollbar>
           <div class="p-16-24">
             <el-row :gutter="12" v-loading="loading">
@@ -111,7 +111,7 @@ const props = defineProps({
   loading: Boolean,
 })
 
-const emit = defineEmits(['addData', 'refresh'])
+const emit = defineEmits(['addData'])
 const { folder, user } = useStore()
 const apiType = computed(() => {
   if (route.path.includes('shared')) {
@@ -190,7 +190,7 @@ const submitHandle = () => {
 }
 
 const refresh = () => {
-  emit('refresh')
+  getList()
 }
 
 const folderList = ref<any[]>([])

@@ -19,9 +19,10 @@
               class="model-icon mr-8"
             ></span>
             <span>{{ item.name }}</span>
-            <!-- <el-tag v-if="item.permission_type === 'PUBLIC'" type="info" class="info-tag ml-8 mt-4">
-              {{ $t('common.public') }}
-            </el-tag> -->
+
+            <el-tag v-if="item.type === 'share'" type="info" class="info-tag ml-8 mt-4">
+              {{ t('views.shared.title') }}
+            </el-tag>
           </div>
           <el-icon class="check-icon" v-if="item.id === modelValue">
             <Check />

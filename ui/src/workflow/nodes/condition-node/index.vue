@@ -12,7 +12,6 @@
         ref="el"
         v-bind:modelValue="form_data.branch"
         :disabled="form_data.branch === 2"
-        :filter="'.no-drag'"
         handle=".handle"
         :animation="150"
         ghostClass="ghost"
@@ -24,7 +23,7 @@
             shadow="never"
             class="drag-card card-never mb-8"
             :class="{
-              'no-drag': index === form_data.branch.length - 1 || form_data.branch.length === 2
+              'no-drag': index === form_data.branch.length - 1 || form_data.branch.length === 2,
             }"
             style="--el-card-padding: 12px"
           >
@@ -61,7 +60,7 @@
                         type: 'array',
                         required: true,
                         message: $t('views.applicationWorkflow.variable.placeholder'),
-                        trigger: 'change'
+                        trigger: 'change',
                       }"
                     >
                       <NodeCascader
@@ -79,9 +78,9 @@
                       :rules="{
                         required: true,
                         message: $t(
-                          'views.applicationWorkflow.nodes.conditionNode.conditions.requiredMessage'
+                          'views.applicationWorkflow.nodes.conditionNode.conditions.requiredMessage',
                         ),
-                        trigger: 'change'
+                        trigger: 'change',
                       }"
                     >
                       <el-select
@@ -90,7 +89,7 @@
                         v-model="condition.compare"
                         :placeholder="
                           $t(
-                            'views.applicationWorkflow.nodes.conditionNode.conditions.requiredMessage'
+                            'views.applicationWorkflow.nodes.conditionNode.conditions.requiredMessage',
                           )
                         "
                         clearable
@@ -106,14 +105,14 @@
                     <el-form-item
                       v-if="
                         !['is_null', 'is_not_null', 'is_true', 'is_not_true'].includes(
-                          condition.compare
+                          condition.compare,
                         )
                       "
                       :prop="'branch.' + index + '.conditions.' + cIndex + '.value'"
                       :rules="{
                         required: true,
                         message: $t('views.applicationWorkflow.nodes.conditionNode.valueMessage'),
-                        trigger: 'blur'
+                        trigger: 'blur',
                       }"
                     >
                       <el-input
@@ -177,20 +176,20 @@ const form = {
         {
           field: [],
           compare: '',
-          value: ''
-        }
+          value: '',
+        },
       ],
       id: randomId(),
       type: 'IF',
-      condition: 'and'
+      condition: 'and',
     },
     {
       conditions: [],
       id: randomId(),
       type: 'ELSE',
-      condition: 'and'
-    }
-  ]
+      condition: 'and',
+    },
+  ],
 }
 
 const wheel = (e: any) => {
@@ -206,7 +205,7 @@ const resizeCondition = (wh: any, row: any, index: number) => {
   const branch_condition_list = cloneDeep(
     props.nodeModel.properties.branch_condition_list
       ? props.nodeModel.properties.branch_condition_list
-      : []
+      : [],
   )
   const new_branch_condition_list = branch_condition_list.map((item: any) => {
     if (item.id === row.id) {
@@ -229,7 +228,7 @@ const form_data = computed({
   },
   set: (value) => {
     set(props.nodeModel.properties, 'node_data', value)
-  }
+  },
 })
 
 const ConditionNodeFormRef = ref<FormInstance>()
@@ -237,7 +236,7 @@ const nodeCascaderRef = ref()
 const validate = () => {
   const v_list = [
     ConditionNodeFormRef.value?.validate(),
-    ...nodeCascaderRef.value.map((item: any) => item.validate())
+    ...nodeCascaderRef.value.map((item: any) => item.validate()),
   ]
   return Promise.all(v_list).catch((err) => {
     return Promise.reject({ node: props.nodeModel, errMessage: err })
@@ -265,12 +264,12 @@ function addBranch() {
       {
         field: [],
         compare: '',
-        value: ''
-      }
+        value: '',
+      },
     ],
     type: 'ELSE IF ' + (list.length - 1),
     id: randomId(),
-    condition: 'and'
+    condition: 'and',
   }
   list.splice(list.length - 1, 0, obj)
   refreshBranchAnchor(list, true)
@@ -280,7 +279,7 @@ function refreshBranchAnchor(list: Array<any>, is_add: boolean) {
   const branch_condition_list = cloneDeep(
     props.nodeModel.properties.branch_condition_list
       ? props.nodeModel.properties.branch_condition_list
-      : []
+      : [],
   )
   const new_branch_condition_list = list
     .map((item, index) => {
@@ -304,7 +303,7 @@ function addCondition(index: number) {
   list[index]['conditions'].push({
     field: [],
     compare: '',
-    value: ''
+    value: '',
   })
   set(props.nodeModel.properties.node_data, 'branch', list)
 }
@@ -315,14 +314,14 @@ function deleteCondition(index: number, cIndex: number) {
   if (list[index]['conditions'].length === 0) {
     const delete_edge = list.splice(index, 1)
     const delete_target_anchor_id_list = delete_edge.map(
-      (item: any) => props.nodeModel.id + '_' + item.id + '_right'
+      (item: any) => props.nodeModel.id + '_' + item.id + '_right',
     )
 
     props.nodeModel.graphModel.eventCenter.emit(
       'delete_edge',
       props.nodeModel.outgoing.edges
         .filter((item: any) => delete_target_anchor_id_list.includes(item.sourceAnchorId))
-        .map((item: any) => item.id)
+        .map((item: any) => item.id),
     )
     refreshBranchAnchor(list, false)
 

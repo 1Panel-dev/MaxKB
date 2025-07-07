@@ -30,7 +30,7 @@ import DynamicsFormConstructor from '@/components/dynamics-form/constructor/inde
 import { t } from '@/locales'
 const props = withDefaults(
   defineProps<{ title?: string; editFormField: (form_data: any, index: number) => void }>(),
-  { title: t('views.model.form.title.editParam') }
+  { title: t('common.param.editParam') }
 )
 const dialogVisible = ref<boolean>(false)
 const dynamicsFormConstructorRef = ref<InstanceType<typeof DynamicsFormConstructor>>()

@@ -354,12 +354,7 @@ const dfsFolder = (arr: any[] = [], folderIdMap: any) => {
 
 function getFolder() {
   const workspaceId = currentWorkspaceId.value || user.getWorkspaceId() || 'default'
-  return AuthorizationApi.getSystemFolder(
-    workspaceId,
-    activeData.value.type,
-    {},
-    loading,
-  )
+  return AuthorizationApi.getSystemFolder(workspaceId, activeData.value.type, {}, loading)
 }
 function getResourcePermissions(user_id: string) {
   const workspaceId = currentWorkspaceId.value || user.getWorkspaceId() || 'default'
@@ -372,31 +367,38 @@ function getResourcePermissions(user_id: string) {
 }
 const getWholeTree = async (user_id: string) => {
   const [parentRes, childrenRes] = await Promise.all([getFolder(), getResourcePermissions(user_id)])
-  if (!childrenRes.data || Object.keys(childrenRes.data).length > 0) {
-    settingTags.map((item: any) => {
-      let folderIdMap = []
-      const folderTree = cloneDeep((parentRes as unknown as any).data)
-      if (Object.keys(childrenRes.data).indexOf(item.type) !== -1) {
-        item.isRole =
-          childrenRes.data[item.type].length > 0 &&
-          hasPermission([EditionConst.IS_EE, EditionConst.IS_PE], 'OR')
-            ? childrenRes.data[item.type][0].auth_type == 'ROLE'
-            : false
-        folderIdMap = getFolderIdMap(childrenRes.data[item.type])
-        dfsFolder(folderTree, folderIdMap)
-        const permissionHalf = {
-          VIEW: [],
-          MANAGE: [],
-          ROLE: [],
-        }
-        Object.keys(permissionHalf).forEach((ele) => {
-          dfsPermissionIndeterminateTrue(folderTree, ele)
-          dfsPermissionIndeterminate(folderTree, ele, cloneDeep(permissionHalf), {}, 'default')
-        })
-        item.data = folderTree
-      }
+  // if (!childrenRes.data || Object.keys(childrenRes.data).length > 0) {
+  // settingTags.map((item: any) => {
+  let folderIdMap = []
+  const folderTree = cloneDeep((parentRes as unknown as any).data)
+  if (Object.keys(childrenRes.data).indexOf(activeData.value.type) !== -1) {
+    activeData.value.isRole =
+      childrenRes.data[activeData.value.type].length > 0 &&
+      hasPermission([EditionConst.IS_EE, EditionConst.IS_PE], 'OR')
+        ? childrenRes.data[activeData.value.type][0].auth_type == 'ROLE'
+        : false
+    folderIdMap = getFolderIdMap(childrenRes.data[activeData.value.type])
+    dfsFolder(folderTree, folderIdMap)
+    const permissionHalf = {
+      VIEW: [],
+      MANAGE: [],
+      ROLE: [],
+    }
+    Object.keys(permissionHalf).forEach((ele) => {
+      dfsPermissionIndeterminateTrue(folderTree, ele)
+      dfsPermissionIndeterminate(folderTree, ele, cloneDeep(permissionHalf), {}, 'default')
     })
+
+    if (activeData.value.type === AuthorizationEnum.MODEL) {
+      activeData.value.data = folderTree[0].children
+    } else {
+      activeData.value.data = folderTree
+    }
+  } else {
+    activeData.value.data = []
   }
+  // })
+  // }
 }
 
 const refreshData = () => {
@@ -433,7 +435,7 @@ const currentWorkspace = computed(() => {
 async function getWorkspaceList() {
   const res = await loadPermissionApi('workspace').getSystemWorkspaceList(loading)
   workspaceList.value = res.data
-  currentWorkspaceId.value = user.getWorkspaceId() as string || 'default'
+  currentWorkspaceId.value = (user.getWorkspaceId() as string) || 'default'
 }
 
 function changeWorkspace(item: WorkspaceItem) {
