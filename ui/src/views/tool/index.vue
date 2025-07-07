@@ -60,6 +60,9 @@ function getFolder(bool?: boolean) {
 }
 
 function folderClickHandle(row: any) {
+  if (row.id === folder.currentFolder?.id) {
+    return
+  }
   folder.setCurrentFolder(row)
   tool.setToolList([])
 }

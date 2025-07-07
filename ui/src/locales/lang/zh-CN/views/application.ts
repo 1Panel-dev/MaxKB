@@ -1,5 +1,3 @@
-import type { title } from 'process'
-
 export default {
   title: '应用',
   createApplication: '创建简易应用',
