@@ -213,7 +213,7 @@
                       <template #dropdown>
                         <el-dropdown-menu>
                           <el-dropdown-item
-                            v-if="item.template_id"
+                            v-if="item.template_id && permissionPrecise.edit(item.id)"
                             @click.stop="addInternalTool(item, true)"
                           >
                             <el-icon>
@@ -238,7 +238,7 @@
                             {{ $t('common.copy') }}
                           </el-dropdown-item>
                           <el-dropdown-item
-                            v-if="item.init_field_list?.length > 0"
+                            v-if="item.init_field_list?.length > 0 && permissionPrecise.edit(item.id)"
                             @click.stop="configInitParams(item)"
                           >
                             <AppIcon iconName="app-operation" class="mr-4"></AppIcon>
