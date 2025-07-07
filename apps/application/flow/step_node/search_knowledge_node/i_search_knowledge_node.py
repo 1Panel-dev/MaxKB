@@ -41,6 +41,9 @@ class SearchDatasetStepNodeSerializer(serializers.Serializer):
 
     question_reference_address = serializers.ListField(required=True)
 
+    show_knowledge = serializers.BooleanField(required=True,
+                                              label=_("The results are displayed in the knowledge sources"))
+
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)
 
@@ -73,7 +76,7 @@ class ISearchKnowledgeStepNode(INode):
         return self.execute(**self.node_params_serializer.data, question=str(question),
                             exclude_paragraph_id_list=exclude_paragraph_id_list)
 
-    def execute(self, dataset_id_list, dataset_setting, question,
+    def execute(self, dataset_id_list, dataset_setting, question, show_knowledge,
                 exclude_paragraph_id_list=None,
                 **kwargs) -> NodeResult:
         pass

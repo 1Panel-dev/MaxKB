@@ -18,7 +18,7 @@ from django.utils.translation import gettext as _
 from langchain.chat_models.base import BaseChatModel
 from langchain.schema import BaseMessage
 from langchain.schema.messages import HumanMessage, AIMessage
-from langchain_core.messages import AIMessageChunk
+from langchain_core.messages import AIMessageChunk, SystemMessage
 from rest_framework import status
 
 from application.chat_pipeline.I_base_chat_pipeline import ParagraphPipelineModel
@@ -196,7 +196,8 @@ class BaseChatStep(IChatStep):
 
     @staticmethod
     def reset_message_list(message_list: List[BaseMessage], answer_text):
-        result = [{'role': 'user' if isinstance(message, HumanMessage) else 'ai', 'content': message.content} for
+        result = [{'role': 'user' if isinstance(message, HumanMessage) else (
+            'system' if isinstance(message, SystemMessage) else 'ai'), 'content': message.content} for
                   message
                   in
                   message_list]

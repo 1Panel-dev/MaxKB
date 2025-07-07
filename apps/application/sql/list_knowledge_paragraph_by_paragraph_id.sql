@@ -1,6 +1,7 @@
 SELECT
 	paragraph.*,
 	knowledge."name" AS "knowledge_name",
+	knowledge."type" AS "knowledge_type",
 	"document"."name" AS "document_name",
 	"document"."meta" AS "meta",
 	"document"."hit_handling_method" AS "hit_handling_method",

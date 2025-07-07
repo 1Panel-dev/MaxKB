@@ -18,8 +18,9 @@ from knowledge.models import Paragraph
 class ParagraphPipelineModel:
 
     def __init__(self, _id: str, document_id: str, knowledge_id: str, content: str, title: str, status: str,
-                 is_active: bool, comprehensive_score: float, similarity: float, dataset_name: str, document_name: str,
-                 hit_handling_method: str, directly_return_similarity: float, meta: dict = None):
+                 is_active: bool, comprehensive_score: float, similarity: float, knowledge_name: str,
+                 document_name: str,
+                 hit_handling_method: str, directly_return_similarity: float, knowledge_type, meta: dict = None):
         self.id = _id
         self.document_id = document_id
         self.knowledge_id = knowledge_id
@@ -29,11 +30,12 @@ class ParagraphPipelineModel:
         self.is_active = is_active
         self.comprehensive_score = comprehensive_score
         self.similarity = similarity
-        self.dataset_name = dataset_name
+        self.knowledge_name = knowledge_name
         self.document_name = document_name
         self.hit_handling_method = hit_handling_method
         self.directly_return_similarity = directly_return_similarity
         self.meta = meta
+        self.knowledge_type = knowledge_type
 
     def to_dict(self):
         return {
@@ -46,8 +48,9 @@ class ParagraphPipelineModel:
             'is_active': self.is_active,
             'comprehensive_score': self.comprehensive_score,
             'similarity': self.similarity,
-            'dataset_name': self.dataset_name,
+            'knowledge_name': self.knowledge_name,
             'document_name': self.document_name,
+            'knowledge_type': self.knowledge_type,
             'meta': self.meta,
         }
 
@@ -57,7 +60,8 @@ class ParagraphPipelineModel:
             self.paragraph = {}
             self.comprehensive_score = None
             self.document_name = None
-            self.dataset_name = None
+            self.knowledge_name = None
+            self.knowledge_type = None
             self.hit_handling_method = None
             self.directly_return_similarity = 0.9
             self.meta = {}
@@ -76,8 +80,12 @@ class ParagraphPipelineModel:
                 self.paragraph = paragraph
             return self
 
-        def add_dataset_name(self, dataset_name):
-            self.dataset_name = dataset_name
+        def add_knowledge_name(self, knowledge_name):
+            self.knowledge_name = knowledge_name
+            return self
+
+        def add_knowledge_type(self, knowledge_type):
+            self.knowledge_type = knowledge_type
             return self
 
         def add_document_name(self, document_name):
@@ -110,8 +118,9 @@ class ParagraphPipelineModel:
                                           self.paragraph.get('content'), self.paragraph.get('title'),
                                           self.paragraph.get('status'),
                                           self.paragraph.get('is_active'),
-                                          self.comprehensive_score, self.similarity, self.dataset_name,
+                                          self.comprehensive_score, self.similarity, self.knowledge_name,
                                           self.document_name, self.hit_handling_method, self.directly_return_similarity,
+                                          self.knowledge_type,
                                           self.meta)
 
 

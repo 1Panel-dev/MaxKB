@@ -75,7 +75,15 @@ class ChatRecordOperateSerializer(serializers.Serializer):
         chat_record = self.get_chat_record()
         if chat_record is None:
             raise AppApiException(500, gettext("Conversation does not exist"))
-        return ApplicationChatRecordQuerySerializers.reset_chat_record(chat_record)
+        application_access_token = QuerySet(ApplicationAccessToken).filter(
+            application_id=self.data.get('application_id')).first()
+        show_source = False
+        show_exec = False
+        if application_access_token is not None:
+            show_exec = application_access_token.show_exec
+            show_source = application_access_token.show_source
+        return ApplicationChatRecordQuerySerializers.reset_chat_record(
+            chat_record, show_source, show_exec)
 
 
 class ApplicationChatRecordQuerySerializers(serializers.Serializer):
@@ -103,21 +111,34 @@ class ApplicationChatRecordQuerySerializers(serializers.Serializer):
                 QuerySet(ChatRecord).filter(chat_id=self.data.get('chat_id')).order_by(order_by)]
 
     @staticmethod
-    def reset_chat_record(chat_record):
+    def reset_chat_record(chat_record, show_source, show_exec):
         knowledge_list = []
         paragraph_list = []
-
         if 'search_step' in chat_record.details and chat_record.details.get('search_step').get(
                 'paragraph_list') is not None:
             paragraph_list = chat_record.details.get('search_step').get(
                 'paragraph_list')
-            knowledge_list = [{'id': dataset_id, 'name': name} for dataset_id, name in reduce(lambda x, y: {**x, **y},
-                                                                                              [{row.get(
-                                                                                                  'knowledge_id'): row.get(
-                                                                                                  "knowledge_name")} for
-                                                                                                  row in
-                                                                                                  paragraph_list],
-                                                                                              {}).items()]
+
+        for item in chat_record.details.values():
+            if item.get('type') == 'search-knowledge-node' and item.get('show_knowledge', False):
+                paragraph_list = paragraph_list + item.get(
+                    'paragraph_list')
+
+            if item.get('type') == 'reranker-node' and item.get('show_knowledge', False):
+                paragraph_list = paragraph_list + [rl.get('metadata') for rl in item.get('result_list') if
+                                                   'document_id' in rl.get('metadata') and 'knowledge_id' in rl.get(
+                                                       'metadata')]
+        paragraph_list = list({p.get('id'): p for p in paragraph_list}.values())
+        knowledge_list = knowledge_list + [{'id': knowledge_id, **knowledge} for knowledge_id, knowledge in
+                                           reduce(lambda x, y: {**x, **y},
+                                                  [{row.get(
+                                                      'knowledge_id'): {'knowledge_name': row.get(
+                                                      "knowledge_name"),
+                                                      'knowledge_type': row.get('knowledge_type')}} for
+                                                      row in
+                                                      paragraph_list],
+                                                  {}).items()]
+
         if len(chat_record.improve_paragraph_id_list) > 0:
             paragraph_model_list = QuerySet(Paragraph).filter(id__in=chat_record.improve_paragraph_id_list)
             if len(paragraph_model_list) < len(chat_record.improve_paragraph_id_list):
@@ -126,14 +147,15 @@ class ApplicationChatRecordQuerySerializers(serializers.Serializer):
                     filter(lambda p_id: paragraph_model_id_list.__contains__(p_id),
                            chat_record.improve_paragraph_id_list))
                 chat_record.save()
-
+        show_source_dict = {'knowledge_list': knowledge_list,
+                            'paragraph_list': paragraph_list, }
+        show_exec_dict = {'execution_details': [chat_record.details[key] for key in chat_record.details]}
         return {
             **ChatRecordSerializerModel(chat_record).data,
             'padding_problem_text': chat_record.details.get('problem_padding').get(
                 'padding_problem_text') if 'problem_padding' in chat_record.details else None,
-            'knowledge_list': knowledge_list,
-            'paragraph_list': paragraph_list,
-            'execution_details': [chat_record.details[key] for key in chat_record.details]
+            **(show_source_dict if show_source else {}),
+            **(show_exec_dict if show_exec else {})
         }
 
     def page(self, current_page: int, page_size: int, with_valid=True):
@@ -141,9 +163,17 @@ class ApplicationChatRecordQuerySerializers(serializers.Serializer):
             self.is_valid(raise_exception=True)
         order_by = '-create_time' if self.data.get('order_asc') is None or self.data.get(
             'order_asc') else 'create_time'
+        application_access_token = QuerySet(ApplicationAccessToken).filter(
+            application_id=self.data.get('application_id')).first()
+        show_source = False
+        show_exec = False
+        if application_access_token is not None:
+            show_exec = application_access_token.show_exec
+            show_source = application_access_token.show_source
         page = page_search(current_page, page_size,
                            QuerySet(ChatRecord).filter(chat_id=self.data.get('chat_id')).order_by(order_by),
-                           post_records_handler=lambda chat_record: self.reset_chat_record(chat_record))
+                           post_records_handler=lambda chat_record: self.reset_chat_record(chat_record, show_source,
+                                                                                           show_exec))
         return page
 
 

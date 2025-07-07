@@ -166,6 +166,14 @@
             :model-type="'RERANKER'"
           ></ModelSelect>
         </el-form-item>
+        <el-form-item
+          :label="$t('views.applicationWorkflow.nodes.searchKnowledgeNode.showKnowledge.label')"
+          prop="show_knowledge"
+          required
+          @click.prevent
+        >
+          <el-switch size="small" v-model="form_data.show_knowledge" />
+        </el-form-item>
       </el-form>
     </el-card>
     <ParamSettingDialog ref="ParamSettingDialogRef" @refresh="refreshParam" />
@@ -198,6 +206,7 @@ const form = {
     similarity: 0,
     max_paragraph_char_number: 5000,
   },
+  show_knowledge: false,
 }
 
 const modelOptions = ref<any>(null)

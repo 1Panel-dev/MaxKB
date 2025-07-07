@@ -14,10 +14,12 @@ from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 
 from application.chat_pipeline.step.chat_step.i_chat_step import PostResponseHandler
-from application.models import Application, ChatRecord, Chat, ApplicationVersion, ChatUserType
+from application.models import Application, ChatRecord, Chat, ApplicationVersion, ChatUserType, ApplicationTypeChoices, \
+    ApplicationKnowledgeMapping
 from common.constants.cache_version import Cache_Version
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.exception.app_exception import ChatException
+from knowledge.models import Document
 from models_provider.models import Model
 from models_provider.tools import get_model_credential
 
@@ -72,6 +74,19 @@ class ChatInfo:
                 '-create_time')[0:1].first()
             if not application:
                 raise ChatException(500, _("The application has not been published. Please use it after publishing."))
+        if application.type == ApplicationTypeChoices.SIMPLE.value:
+            # 数据集id列表
+            knowledge_id_list = [str(row.knowledge_id) for row in
+                                 QuerySet(ApplicationKnowledgeMapping).filter(
+                                     application_id=self.application_id)]
+
+            # 需要排除的文档
+            exclude_document_id_list = [str(document.id) for document in
+                                        QuerySet(Document).filter(
+                                            knowledge_id__in=knowledge_id_list,
+                                            is_active=False)]
+            self.knowledge_id_list = knowledge_id_list
+            self.exclude_document_id_list = exclude_document_id_list
         self.application = application
         return application
 
