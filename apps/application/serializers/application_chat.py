@@ -22,12 +22,12 @@ from django.utils.translation import gettext_lazy as _, gettext
 from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
 from rest_framework import serializers
 
-from application.models import Chat, Application
+from application.models import Chat, Application, ChatRecord
 from common.db.search import get_dynamics_model, native_search, native_page_search
 from common.exception.app_exception import AppApiException
 from common.utils.common import get_file_content
 from maxkb.conf import PROJECT_DIR
-from maxkb.settings import TIME_ZONE
+from maxkb.settings import TIME_ZONE, edition
 
 
 class ApplicationChatResponseSerializers(serializers.Serializer):
@@ -120,12 +120,8 @@ class ApplicationChatQuerySerializers(serializers.Serializer):
             condition = base_condition & min_trample_query
         else:
             condition = base_condition
-        inner_queryset = QuerySet(Chat).filter(application_id=self.data.get("application_id"))
-        if 'abstract' in self.data and self.data.get('abstract') is not None:
-            inner_queryset = inner_queryset.filter(abstract__icontains=self.data.get('abstract'))
 
         return {
-            'inner_queryset': inner_queryset,
             'default_queryset': query_set.filter(condition).order_by("-application_chat.update_time")
         }
 
@@ -133,7 +129,8 @@ class ApplicationChatQuerySerializers(serializers.Serializer):
         if with_valid:
             self.is_valid(raise_exception=True)
         return native_search(self.get_query_set(), select_string=get_file_content(
-            os.path.join(PROJECT_DIR, "apps", "application", 'sql', 'list_application_chat.sql')),
+            os.path.join(PROJECT_DIR, "apps", "application", 'sql', ('list_application_chat_ee.sql' if ['PE', 'EE'].__contains__(
+                             edition) else 'list_application_chat.sql'))),
                              with_table_name=False)
 
     @staticmethod
@@ -144,7 +141,7 @@ class ApplicationChatQuerySerializers(serializers.Serializer):
 
     @staticmethod
     def to_row(row: Dict):
-        details = row.get('details')
+        details = row.get('details') or {}
         padding_problem_text = ' '.join(node.get("answer", "") for key, node in details.items() if
                                         node.get("type") == 'question-node')
         search_dataset_node_list = [(key, node) for key, node in details.items() if
@@ -161,7 +158,7 @@ class ApplicationChatQuerySerializers(serializers.Serializer):
                 'name') + ':\n' + ApplicationChatQuerySerializers.paragraph_list_to_string(node.get('paragraph_list',
                                                                                                     [])) for
              key, node in search_dataset_node_list])
-        improve_paragraph_list = row.get('improve_paragraph_list')
+        improve_paragraph_list = row.get('improve_paragraph_list') or []
         vote_status_map = {'-1': '未投票', '0': '赞同', '1': '反对'}
         return [str(row.get('chat_id')), row.get('abstract'), row.get('problem_text'), padding_problem_text,
                 row.get('answer_text'), vote_status_map.get(row.get('vote_status')), reference_paragraph_len,
@@ -169,18 +166,20 @@ class ApplicationChatQuerySerializers(serializers.Serializer):
                 "\n".join([
                     f"{improve_paragraph_list[index].get('title')}\n{improve_paragraph_list[index].get('content')}"
                     for index in range(len(improve_paragraph_list))]),
-                row.get('message_tokens') + row.get('answer_tokens'), row.get('run_time'),
+                (row.get('message_tokens') or 0) + (row.get('answer_tokens') or 0), row.get('run_time'),
                 str(row.get('create_time').astimezone(pytz.timezone(TIME_ZONE)).strftime('%Y-%m-%d %H:%M:%S')
-                    )]
+                    if row.get('create_time') is not None else None)]
 
     def export(self, data, with_valid=True):
         if with_valid:
             self.is_valid(raise_exception=True)
         ApplicationChatRecordExportRequest(data=data).is_valid(raise_exception=True)
+
         data_list = native_search(self.get_query_set(data.get('select_ids')),
                                   select_string=get_file_content(
                                       os.path.join(PROJECT_DIR, "apps", "application", 'sql',
-                                                   'export_application_chat.sql')),
+                                                   ('export_application_chat_ee.sql' if ['PE', 'EE'].__contains__(
+                                                       edition) else 'export_application_chat.sql'))),
                                   with_table_name=False)
 
         batch_size = 500
@@ -232,5 +231,26 @@ class ApplicationChatQuerySerializers(serializers.Serializer):
         if with_valid:
             self.is_valid(raise_exception=True)
         return native_page_search(current_page, page_size, self.get_query_set(), select_string=get_file_content(
-            os.path.join(PROJECT_DIR, "apps", "application", 'sql', 'list_application_chat.sql')),
+            os.path.join(PROJECT_DIR, "apps", "application", 'sql',
+                         ('list_application_chat_ee.sql' if ['PE', 'EE'].__contains__(
+                             edition) else 'list_application_chat.sql'))),
                                   with_table_name=False)
+
+
+class ChatCountSerializer(serializers.Serializer):
+    chat_id = serializers.UUIDField(required=True, label=_("Conversation ID"))
+
+    def get_query_set(self):
+        return QuerySet(ChatRecord).filter(chat_id=self.data.get('chat_id'))
+
+    def update_chat(self):
+        self.is_valid(raise_exception=True)
+        count_chat_record = native_search(self.get_query_set(), get_file_content(
+            os.path.join(PROJECT_DIR, "apps", "application", 'sql', 'count_chat_record.sql')), with_search_one=True)
+        QuerySet(Chat).filter(id=self.data.get('chat_id')).update(star_num=count_chat_record.get('star_num', 0) or 0,
+                                                                  trample_num=count_chat_record.get('trample_num',
+                                                                                                    0) or 0,
+                                                                  chat_record_count=count_chat_record.get(
+                                                                      'chat_record_count', 0) or 0,
+                                                                  mark_sum=count_chat_record.get('mark_sum', 0) or 0)
+        return True

@@ -26,7 +26,7 @@
 import { cloneDeep, set } from 'lodash'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import { copyClick } from '@/utils/clipboard'
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { t } from '@/locales'
 const props = defineProps<{ nodeModel: any }>()
 
@@ -35,9 +35,21 @@ const globalFields = [
   { label: t('views.applicationWorkflow.nodes.startNode.currentTime'), value: 'time' },
   {
     label: t('views.application.form.historyRecord.label'),
-    value: 'history_context'
+    value: 'history_context',
   },
-  { label: t('chat.chatId'), value: 'chat_id' }
+  { label: t('chat.chatId'), value: 'chat_id' },
+  {
+    label: t('chat.chatUserId'),
+    value: 'chat_user_id',
+  },
+  {
+    label: t('chat.chatUserType'),
+    value: 'chat_user_type',
+  },
+  {
+    label: t('chat.chatUser'),
+    value: 'chat_user',
+  },
 ]
 
 const getRefreshFieldList = () => {
@@ -79,7 +91,7 @@ const refreshFileUploadConfig = () => {
       item.value !== 'document' &&
       item.value !== 'audio' &&
       item.value !== 'video' &&
-      item.value !== 'other'
+      item.value !== 'other',
   )
 
   if (form_data.length === 0) {

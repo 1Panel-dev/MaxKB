@@ -18,6 +18,7 @@ from rest_framework import serializers
 from rest_framework.utils.formatting import lazy_format
 
 from application.models import ChatRecord, ApplicationAccessToken, Application
+from application.serializers.application_chat import ChatCountSerializer
 from application.serializers.common import ChatInfo
 from common.db.search import page_search
 from common.exception.app_exception import AppApiException
@@ -359,6 +360,7 @@ class ApplicationChatRecordImproveSerializer(serializers.Serializer):
         update_document_char_length(document_id)
         # 添加标注
         chat_record.save()
+        ChatCountSerializer(data={'chat_id': chat_id}).update_chat()
         return ChatRecordSerializerModel(chat_record).data, paragraph.id, knowledge_id
 
     class Operate(serializers.Serializer):

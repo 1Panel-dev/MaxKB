@@ -39,6 +39,10 @@ class Chat(AppModelMixin):
     is_deleted = models.BooleanField(verbose_name="逻辑删除", default=False)
     asker = models.JSONField(verbose_name="访问者", default=default_asker, encoder=SystemEncoder)
     meta = models.JSONField(verbose_name="元数据", default=dict)
+    star_num = models.IntegerField(verbose_name="点赞数量", default=0)
+    trample_num = models.IntegerField(verbose_name="点踩数量", default=0)
+    chat_record_count = models.IntegerField(verbose_name="对话次数", default=0)
+    mark_sum = models.IntegerField(verbose_name="标记数量", default=0)
 
     class Meta:
         db_table = "application_chat"

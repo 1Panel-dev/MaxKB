@@ -22,12 +22,16 @@ def get_default_global_variable(input_field_list: List):
 
 
 def get_global_variable(node):
+    body = node.workflow_manage.get_body()
     history_chat_record = node.flow_params_serializer.data.get('history_chat_record', [])
     history_context = [{'question': chat_record.problem_text, 'answer': chat_record.answer_text} for chat_record in
                        history_chat_record]
     chat_id = node.flow_params_serializer.data.get('chat_id')
     return {'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'start_time': time.time(),
-            'history_context': history_context, 'chat_id': str(chat_id), **node.workflow_manage.form_data}
+            'history_context': history_context, 'chat_id': str(chat_id), **node.workflow_manage.form_data,
+            'chat_user_id': body.get('chat_user_id'),
+            'chat_user_type': body.get('chat_user_type'),
+            'chat_user': body.get('chat_user')}
 
 
 class BaseStartStepNode(IStarNode):
@@ -64,6 +68,7 @@ class BaseStartStepNode(IStarNode):
             'document': self.workflow_manage.document_list,
             'audio': self.workflow_manage.audio_list,
             'other': self.workflow_manage.other_list,
+
         }
         return NodeResult(node_variable, workflow_variable)
 

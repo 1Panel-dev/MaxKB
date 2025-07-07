@@ -154,8 +154,8 @@ class WorkflowManage:
                 if global_fields is not None:
                     for global_field in global_fields:
                         global_field_list.append({**global_field, 'node_id': node_id, 'node_name': node_name})
-        field_list.sort(key=lambda f: len(f.get('node_name')), reverse=True)
-        global_field_list.sort(key=lambda f: len(f.get('node_name')), reverse=True)
+        field_list.sort(key=lambda f: len(f.get('node_name') + f.get('value')), reverse=True)
+        global_field_list.sort(key=lambda f: len(f.get('node_name') + f.get('value')), reverse=True)
         self.field_list = field_list
         self.global_field_list = global_field_list
 

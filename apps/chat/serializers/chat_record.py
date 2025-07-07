@@ -14,6 +14,7 @@ from django.utils.translation import gettext_lazy as _, gettext
 from rest_framework import serializers
 
 from application.models import VoteChoices, ChatRecord, Chat
+from application.serializers.application_chat import ChatCountSerializer
 from application.serializers.application_chat_record import ChatRecordSerializerModel
 from common.db.search import page_search
 from common.exception.app_exception import AppApiException
@@ -74,6 +75,7 @@ class VoteSerializer(serializers.Serializer):
                     raise AppApiException(500, gettext("Already voted, please cancel first and then vote again"))
         finally:
             un_lock(self.data.get('chat_record_id'))
+        ChatCountSerializer(data={'chat_id': self.data.get('chat_id')}).update_chat()
         return True
 
 
