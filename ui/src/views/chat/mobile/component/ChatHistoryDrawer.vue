@@ -26,7 +26,7 @@
               @mouseenter="mouseenter" @mouseleave="mouseId = ''">
               <template #default="{ row }">
                 <div class="flex-between">
-                  <ReadWrite @change="val => updateChatName(val, row)" :data="row.abstract" trigger="manual"
+                  <ReadWrite @change="(val: string) => updateChatName(val, row)" :data="row.abstract" trigger="manual"
                     :write="row.writeStatus" @close="() => (row.writeStatus = false)" :maxlength="1024" />
                   <div @click.stop v-if="mouseId === row.id && row.id !== 'new' && !row.writeStatus" class="flex">
                     <el-button style="padding: 0" link @click.stop="() => (row.writeStatus = true)">

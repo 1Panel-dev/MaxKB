@@ -5,7 +5,7 @@
     </template>
     <template #default>
       <MemberFormContent ref="memberFormContentRef" :models="formItemModel" v-model:form="list"
-        v-loading="memberFormContentLoading" />
+        v-loading="memberFormContentLoading" keepOneLine />
     </template>
     <template #footer>
       <div style="flex: auto">

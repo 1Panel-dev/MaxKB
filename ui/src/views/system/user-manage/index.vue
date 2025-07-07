@@ -57,9 +57,11 @@
         <el-table-column
           prop="nick_name"
           :label="$t('views.userManage.userForm.nick_name.label')"
+          min-width="180" 
+          show-overflow-tooltip
         />
-        <el-table-column prop="username" :label="$t('views.login.loginForm.username.label')" />
-        <el-table-column prop="is_active" :label="$t('common.status.label')">
+        <el-table-column prop="username" min-width="180" show-overflow-tooltip :label="$t('views.login.loginForm.username.label')" />
+        <el-table-column width="100" prop="is_active" :label="$t('common.status.label')">
           <template #default="{ row }">
             <div v-if="row.is_active" class="flex align-center">
               <el-icon class="color-success mr-8" style="font-size: 16px">
@@ -82,12 +84,13 @@
           prop="email"
           :label="$t('views.login.loginForm.email.label')"
           show-overflow-tooltip
+          min-width="180"
         >
           <template #default="{ row }">
             {{ row.email || '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="phone" :label="$t('views.userManage.userForm.phone.label')">
+        <el-table-column prop="phone" width="120" :label="$t('views.userManage.userForm.phone.label')">
           <template #default="{ row }">
             {{ row.phone || '-' }}
           </template>
@@ -95,7 +98,7 @@
         <el-table-column
           prop="role_name"
           :label="$t('views.role.member.role')"
-          min-width="100"
+          width="210"
           v-if="user.isEE() || user.isPE()"
         >
           <template #default="{ row }">
@@ -119,7 +122,7 @@
             </el-popover>
           </template>
         </el-table-column>
-        <el-table-column prop="source" :label="$t('views.userManage.source.label')">
+        <el-table-column prop="source" width="100" :label="$t('views.userManage.source.label')">
           <template #default="{ row }">
             {{
               row.source === 'LOCAL'

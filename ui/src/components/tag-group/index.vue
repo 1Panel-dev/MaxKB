@@ -1,7 +1,7 @@
 <template>
   <div class="tag-group" v-if="props.tags.length">
-    <el-tag :size="props.size" class="default-tag" style="max-width: 100%">
-      <span class="ellipsis" style="max-width: 100%">{{ props.tags[0] }}</span>
+    <el-tag :size="props.size" class="default-tag">
+      <span class="ellipsis">{{ props.tags[0] }}</span>
     </el-tag>
     <el-tooltip effect="light" :disabled="tooltipDisabled">
       <el-tag :size="props.size" class="info-tag ml-4 cursor" v-if="props.tags?.length > 1">
