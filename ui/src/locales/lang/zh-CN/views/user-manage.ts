@@ -13,7 +13,7 @@ export default {
   },
   delete: {
     confirmTitle: '是否删除用户：',
-    confirmMessage: '删除用户，该用户创建的资源（应用、知识库、模型）都会删除，请谨慎操作。',
+    confirmMessage: '删除用户，该用户创建的资源（应用、知识库、模型）不会删除，请谨慎操作。',
   },
   disabled: {
     confirmTitle: '是否禁用工具：',

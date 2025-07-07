@@ -14,7 +14,7 @@ export default {
   delete: {
     confirmTitle: '是否刪除該使用者？',
     confirmMessage:
-      '刪除該使用者後，該使用者建立的所有資源（應用、知識庫、模型）都會被刪除，請謹慎操作。',
+      '刪除該使用者後，該使用者建立的所有資源（應用、知識庫、模型）都不會被刪除，請謹慎操作。',
   },
   disabled: {
     confirmTitle: '是否停用工具？',

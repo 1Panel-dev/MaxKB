@@ -15,7 +15,7 @@ export default {
   delete: {
     confirmTitle: 'Confirm deletion of user:',
     confirmMessage:
-      'Deleting this user will also delete all resources (APP, knowledge, models) created by this user. Please proceed with caution.',
+      'Deleting this user will also not delete all resources (APP, knowledge, models) created by this user. Please proceed with caution.',
   },
   disabled: {
     confirmTitle: 'Confirm disable tool:',
