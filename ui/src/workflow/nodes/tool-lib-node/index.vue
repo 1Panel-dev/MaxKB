@@ -20,8 +20,8 @@
                 required: item.is_required,
                 message:
                   item.source === 'reference'
-                    ? $t('views.tool.toolForm.form.param.selectPlaceholder')
-                    : $t('views.tool.toolForm.form.param.inputPlaceholder'),
+                    ? $t('views.tool.form.param.selectPlaceholder')
+                    : $t('views.tool.form.param.inputPlaceholder'),
                 trigger: 'blur',
               }"
             >
@@ -43,13 +43,13 @@
                 ref="nodeCascaderRef"
                 :nodeModel="nodeModel"
                 class="w-full"
-                :placeholder="$t('views.tool.toolForm.form.param.selectPlaceholder')"
+                :placeholder="$t('views.tool.form.param.selectPlaceholder')"
                 v-model="item.value"
               />
               <el-input
                 v-else
                 v-model="item.value"
-                :placeholder="$t('views.tool.toolForm.form.param.inputPlaceholder')"
+                :placeholder="$t('views.tool.form.param.inputPlaceholder')"
               />
             </el-form-item>
           </template>
