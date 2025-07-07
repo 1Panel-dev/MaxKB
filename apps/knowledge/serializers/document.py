@@ -131,7 +131,7 @@ class DocumentEditInstanceSerializer(serializers.Serializer):
 
     def is_valid(self, *, document: Document = None):
         super().is_valid(raise_exception=True)
-        if 'meta' in self.data and self.data.get('meta') is not None:
+        if 'meta' in self.data and self.data.get('meta') is not None and self.data.get('meta') != {}:
             knowledge_meta_valid_map = self.get_meta_valid_map()
             valid_class = knowledge_meta_valid_map.get(document.type)
             valid_class(data=self.data.get('meta')).is_valid(raise_exception=True)
