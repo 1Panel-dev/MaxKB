@@ -3,16 +3,14 @@
     v-model="drawer"
     :direction="direction"
     size="600"
-    :destroy-on-close="true"
+    append-to-body
+    :close-on-click-modal="false"
+    :close-on-press-escape="false"
     :before-close="cancelClick"
   >
     <template #header>
       <h4>
-        {{
-          isEdit
-            ? $t('common.param.editParam')
-            : $t('common.param.addParam')
-        }}
+        {{ isEdit ? $t('common.param.editParam') : $t('common.param.addParam') }}
       </h4>
     </template>
     <template #default>

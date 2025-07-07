@@ -37,7 +37,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import type { WorkspaceItem } from '@/api/type/workspace'
-
+import useStore from '@/stores'
 const props = defineProps({
   data: {
     type: Array<any>,
@@ -48,9 +48,12 @@ const props = defineProps({
     default: () => {},
   },
 })
+
+const { folder } = useStore()
 const loading = ref(false)
 const emit = defineEmits(['changeWorkspace'])
 function changeWorkspace(item: WorkspaceItem) {
+  folder.setCurrentFolder({})
   emit('changeWorkspace', item)
 }
 </script>

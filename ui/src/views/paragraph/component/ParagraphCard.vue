@@ -2,6 +2,7 @@
   <el-card
     shadow="hover"
     class="paragraph-box cursor"
+    :class="data.is_active ? '' : 'disabled'"
     @mouseenter="cardEnter()"
     @mouseleave="cardLeave()"
     @click.stop="editParagraph(data)"
@@ -198,6 +199,16 @@ function refreshMigrateParagraph() {
   &:hover {
     background: rgba(31, 35, 41, 0.1);
     border: 1px solid #dee0e3;
+  }
+  &.disabled {
+    color: var(--app-text-color-disable) !important;
+    :deep(.md-editor-preview) {
+      color: var(--app-text-color-disable) !important;
+    }
+    &:hover {
+      background: var(--app-layout-bg-color);
+      border: 1px solid #ffffff;
+    }
   }
   .paragraph-box-operation {
     position: absolute;

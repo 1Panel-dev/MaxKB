@@ -26,6 +26,7 @@
             @change="getList"
             style="width: 220px"
             clearable
+            :placeholder="$t('common.inputPlaceholder')"
           />
           <el-input
             v-else-if="search_type === 'nick_name'"
@@ -33,6 +34,7 @@
             @change="getList"
             style="width: 220px"
             clearable
+            :placeholder="$t('common.inputPlaceholder')"
           />
           <el-input
             v-else-if="search_type === 'email'"
@@ -40,6 +42,7 @@
             @change="getList"
             style="width: 220px"
             clearable
+            :placeholder="$t('common.inputPlaceholder')"
           />
         </div>
       </div>
@@ -252,7 +255,8 @@ function handleSizeChange() {
 function getList() {
   const params: any = {}
   if (search_form.value[search_type.value as keyof typeof search_form.value]) {
-    params[search_type.value] = search_form.value[search_type.value as keyof typeof search_form.value]
+    params[search_type.value] =
+      search_form.value[search_type.value as keyof typeof search_form.value]
   }
   return userManageApi.getUserManage(paginationConfig, params, loading).then((res) => {
     userTableData.value = res.data.records.map((item: any) => ({

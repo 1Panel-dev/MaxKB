@@ -46,7 +46,7 @@ export default {
     EmbeddingModel: {
       label: '向量模型',
       placeholder: '請選擇向量模型',
-      requiredMessage: '請輸入Embedding模型',
+      requiredMessage: '請選擇向量模型',
     },
 
     source_url: {

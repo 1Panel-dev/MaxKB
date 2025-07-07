@@ -8,18 +8,26 @@
     :close-on-click-modal="false"
     :close-on-press-escape="false"
     @click.stop
+    @mousemove.stop
+    @mousedown.stop
+    @keydown.stop
   >
     <el-row v-loading="loading">
       <el-col :span="18">
         <el-scrollbar height="500" wrap-class="paragraph-scrollbar">
           <div class="p-24" style="padding-bottom: 8px">
-            <div style="position: absolute; right: 20px; top: 20px;">
+            <div style="position: absolute; right: 20px; top: 20px">
               <el-button text @click="isEdit = true" v-if="paragraphId && !isEdit">
                 <el-icon><EditPen /></el-icon>
               </el-button>
             </div>
 
-            <ParagraphForm ref="paragraphFormRef" :data="detail" :isEdit="isEdit" :knowledge-id="dataset_id"/>
+            <ParagraphForm
+              ref="paragraphFormRef"
+              :data="detail"
+              :isEdit="isEdit"
+              :knowledge-id="dataset_id"
+            />
           </div>
         </el-scrollbar>
         <div class="text-right p-24 pt-0" v-if="paragraphId && isEdit">
