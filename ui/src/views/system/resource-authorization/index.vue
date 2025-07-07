@@ -244,9 +244,9 @@ function submitPermissions() {
         })
     })
     .reduce((pre: any, next: any) => [...pre, ...next], [])
-
+  const workspaceId = currentWorkspaceId.value || user.getWorkspaceId() || 'default'
   AuthorizationApi.putResourceAuthorization(
-    currentWorkspaceId.value || 'default',
+    workspaceId,
     currentUser.value,
     (route.meta?.resource as string) || 'APPLICATION',
     { user_resource_permission_list: user_resource_permission_list },
@@ -264,7 +264,8 @@ function clickMemberHandle(item: any) {
 }
 
 function getMember(id?: string) {
-  AuthorizationApi.getUserMember(currentWorkspaceId.value || 'default', loading).then((res) => {
+  const workspaceId = currentWorkspaceId.value || user.getWorkspaceId() || 'default'
+  AuthorizationApi.getUserMember(workspaceId, loading).then((res) => {
     memberList.value = res.data
     filterMember.value = res.data
     if (memberList.value.length > 0) {
@@ -352,16 +353,18 @@ const dfsFolder = (arr: any[] = [], folderIdMap: any) => {
 }
 
 function getFolder() {
+  const workspaceId = currentWorkspaceId.value || user.getWorkspaceId() || 'default'
   return AuthorizationApi.getSystemFolder(
-    currentWorkspaceId.value || 'default',
+    workspaceId,
     activeData.value.type,
     {},
     loading,
   )
 }
 function getResourcePermissions(user_id: string) {
+  const workspaceId = currentWorkspaceId.value || user.getWorkspaceId() || 'default'
   return AuthorizationApi.getResourceAuthorization(
-    currentWorkspaceId.value || 'default',
+    workspaceId,
     user_id,
     (route.meta?.resource as string) || 'APPLICATION',
     rLoading,
