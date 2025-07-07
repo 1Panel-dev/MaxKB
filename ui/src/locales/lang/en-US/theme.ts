@@ -1,6 +1,6 @@
 export default {
   title: 'Appearance Settings',
-  defaultSlogan: 'Ready-to-use, flexible RAG Chatbot',
+  defaultSlogan: 'A powerful and easy-to-use enterprise-level AI assistant',
   platformDisplayTheme: 'Platform Display Theme',
   customTheme: 'Custom Theme',
   platformLoginSettings: 'Platform Login Settings',

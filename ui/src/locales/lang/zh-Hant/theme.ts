@@ -1,6 +1,6 @@
 export default {
   title: '外觀設置',
-  defaultSlogan: '歡迎使用 MaxKB 智能知識庫問答系統',
+  defaultSlogan: '強大易用的企業級 AI 助手',
   platformDisplayTheme: '平台顯示主題',
   customTheme: '自定義主題',
   platformLoginSettings: '平台登錄設置',
