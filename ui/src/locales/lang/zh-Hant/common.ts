@@ -101,4 +101,5 @@ export default {
   expand: '展開',
   collapse: '收起',
   copyTitle: '副本',
+  professional: '購買專業版',
 }

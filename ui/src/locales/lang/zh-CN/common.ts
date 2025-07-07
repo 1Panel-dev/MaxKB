@@ -105,4 +105,5 @@ export default {
   expand: '展开',
   collapse: '收起',
   copyTitle: '副本',
+  professional: '购买专业版',
 }

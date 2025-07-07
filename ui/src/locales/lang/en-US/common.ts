@@ -101,4 +101,5 @@ export default {
   expand: 'Expand',
   collapse: 'Collapse',
   copyTitle: 'Copy',
+  professional: 'Purchase the Professional Edition',
 }
