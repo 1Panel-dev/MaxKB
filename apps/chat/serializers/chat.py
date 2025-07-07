@@ -297,7 +297,7 @@ class ChatSerializers(serializers.Serializer):
                                         knowledge_id__in=knowledge_id_list,
                                         is_active=False)]
         chat_info = ChatInfo(chat_id, self.data.get('chat_user_id'), self.data.get('chat_user_type'), knowledge_id_list,
-                             exclude_document_id_list, application.id, application)
+                             exclude_document_id_list, application.id)
         chat_record_list = list(QuerySet(ChatRecord).filter(chat_id=chat_id).order_by('-create_time')[0:5])
         chat_record_list.sort(key=lambda r: r.create_time)
         for chat_record in chat_record_list:
