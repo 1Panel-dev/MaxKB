@@ -289,11 +289,12 @@ const speechToText: (
 /**
  * mcp 节点
  */
-const getMcpTools: (application_id: String, loading?: Ref<boolean>) => Promise<Result<any>> = (
-  application_id,
-  loading,
-) => {
-  return get(`${prefix.value}/${application_id}/mcp_tools`, undefined, loading)
+const getMcpTools: (
+  application_id: String,
+  mcp_servers: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (application_id, mcp_servers, loading) => {
+  return post(`${prefix.value}/${application_id}/mcp_tools`, { mcp_servers }, {}, loading)
 }
 
 /**

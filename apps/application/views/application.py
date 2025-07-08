@@ -71,7 +71,8 @@ class ApplicationAPI(APIView):
                      RoleConstants.USER.get_workspace_role(),
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def get(self, request: Request, workspace_id: str):
-        return result.success(Query(data={'workspace_id': workspace_id, 'user_id': request.user.id}).list(request.query_params))
+        return result.success(
+            Query(data={'workspace_id': workspace_id, 'user_id': request.user.id}).list(request.query_params))
 
     class Page(APIView):
         authentication_classes = [TokenAuth]
@@ -266,9 +267,11 @@ class McpServers(APIView):
                                     [PermissionConstants.APPLICATION.get_workspace_application_permission()],
                                     CompareConstants.AND),
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
-    def get(self, request: Request, workspace_id, application_id: str):
+    def post(self, request: Request, workspace_id, application_id: str):
         return result.success(ApplicationOperateSerializer(
-            data={'mcp_servers': request.query_params.get('mcp_servers')}).get_mcp_servers())
+            data={'mcp_servers': request.query_params.get('mcp_servers'), 'workspace_id': workspace_id,
+                  'user_id': request.user.id,
+                  'application_id': application_id}).get_mcp_servers(request.data))
 
 
 class SpeechToText(APIView):
