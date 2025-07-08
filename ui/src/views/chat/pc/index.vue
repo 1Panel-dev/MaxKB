@@ -157,7 +157,7 @@
             </div>
           </el-sub-menu>
 
-          <div v-if="!chatUser.chat_profile?.authentication" class="no-auth-avatar">
+          <div v-if="!chatUser.chat_profile?.authentication || chatUser.chat_profile.authentication_type === 'password'" class="no-auth-avatar">
             <el-avatar :size="32">
               <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
             </el-avatar>

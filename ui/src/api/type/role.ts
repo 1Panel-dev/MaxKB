@@ -65,6 +65,7 @@ interface FormItemModel {
     options?: { label: string, value: string }[]
     placeholder?: string
     multiple?: boolean
+    clearableFunction?: (e: any) => boolean
   }
 }
 

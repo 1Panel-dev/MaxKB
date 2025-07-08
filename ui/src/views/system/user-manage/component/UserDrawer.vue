@@ -58,7 +58,8 @@
     <MemberFormContent ref="memberFormContentRef" :models="formItemModel" v-model:form="list"
                        v-loading="memberFormContentLoading"
                        keepOneLine
-                       :addText="$t('views.userManage.addRole')" v-if="user.isEE() || user.isPE()"/>
+                       :addText="$t('views.userManage.addRole')" v-if="user.isEE() || user.isPE()"
+                       :deleteButtonDisabled="deleteButtonDisabled"/>
     <template #footer>
       <el-button @click.prevent="visible = false"> {{ $t('common.cancel') }}</el-button>
       <el-button type="primary" @click="submit(userFormRef)" :loading="loading">
@@ -101,6 +102,14 @@ const formItemModel = ref<FormItemModel[]>([]);
 const roleFormItem = ref<FormItemModel[]>([]);
 const adminRoleList = ref<any[]>([])
 const workspaceFormItem = ref<FormItemModel[]>([])
+
+function deleteButtonDisabled(element: any) {
+  // 内置的admin
+  if (userForm.value['id'] === 'f0dd8f71-e4ee-11ee-8c84-a8a1595801ab' && element.role_id === 'ADMIN') {
+    return true
+  }
+  return false
+}
 
 async function getRoleFormItem() {
   try {
@@ -152,12 +161,16 @@ async function getWorkspaceFormItem() {
           },
         ],
         selectProps: {
+          // TODO
           options:
             res.data?.map((item) => ({
               label: item.name,
               value: item.id,
             })) || [],
           placeholder: `${t('common.selectPlaceholder')}${t('views.role.member.workspace')}`,
+          clearableFunction: (e)=>{
+            return !(userForm.value['id'] === 'f0dd8f71-e4ee-11ee-8c84-a8a1595801ab' && ['WORKSPACE_MANAGE', 'USER'].includes(e.role_id))
+          }
         },
       },
     ]

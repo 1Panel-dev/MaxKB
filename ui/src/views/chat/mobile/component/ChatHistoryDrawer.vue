@@ -55,7 +55,7 @@
         </el-scrollbar>
       </div>
       <div class="flex align-center user-info" @click="toUserCenter">
-        <el-avatar :size="32" :class="`${!chatUser.chat_profile?.authentication ? 'cursor-default' : ''}`">
+        <el-avatar :size="32" :class="`${!chatUser.chat_profile?.authentication  || chatUser.chat_profile.authentication_type === 'password' ? 'cursor-default' : ''}`">
           <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
         </el-avatar>
         <span v-if="chatUser.chat_profile?.authentication" class="ml-8 color-text-primary">
@@ -118,7 +118,7 @@ const mouseenter = (row: any) => {
 
 const userCenterDrawerShow = ref(false)
 function toUserCenter() {
-  if (!chatUser.chat_profile?.authentication) return
+  if (!chatUser.chat_profile?.authentication || chatUser.chat_profile.authentication_type === 'password') return
   userCenterDrawerShow.value = true
 }
 </script>

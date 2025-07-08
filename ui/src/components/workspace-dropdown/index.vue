@@ -13,20 +13,23 @@
       <div class="w-full p-8" style="box-sizing: border-box">
         <el-input v-model="filterText" :placeholder="$t('common.search')" prefix-icon="Search" clearable />
       </div>
-      <el-dropdown-menu v-loading="loading">
-        <el-dropdown-item v-for="item in filterData" :key="item.id"
-          :class="`${item.id === currentWorkspace?.id ? 'active' : ''} flex-between`" @click="changeWorkspace(item)">
-          <div class="flex align-center">
-            <AppIcon class="mr-8" iconName="app-workspace" style="font-size: 16px"></AppIcon>
-            <span class="ellipsis">
-              {{ item.name }}
-            </span>
-          </div>
-          <el-icon v-show="item.id === currentWorkspace?.id" class="ml-8" style="font-size: 16px; margin-right: 0">
-            <Check />
-          </el-icon>
-        </el-dropdown-item>
-      </el-dropdown-menu>
+      <el-scrollbar max-height="300">
+        <el-dropdown-menu v-loading="loading">
+          <el-dropdown-item v-for="item in filterData" :key="item.id"
+            :class="`${item.id === currentWorkspace?.id ? 'active' : ''} flex-between`" @click="changeWorkspace(item)">
+            <div class="flex align-center">
+              <AppIcon class="mr-8" iconName="app-workspace" style="font-size: 16px"></AppIcon>
+              <span class="ellipsis">
+                {{ item.name }}
+              </span>
+            </div>
+            <el-icon v-show="item.id === currentWorkspace?.id" class="ml-8" style="font-size: 16px; margin-right: 0">
+              <Check />
+            </el-icon>
+          </el-dropdown-item>
+        </el-dropdown-menu>
+      </el-scrollbar>
+      <div class="no-data color-info" v-if="!filterData.length"> {{ $t('common.noData') }} </div>
     </template>
   </el-dropdown>
 </template>
@@ -73,6 +76,12 @@ watch([() => props.data, () => filterText.value], () => {
     padding: 0 12px !important;
     max-height: 32px;
   }
+}
+
+.no-data {
+  text-align: center;
+  padding-bottom: 16px;
+  font-size: 14px;
 }
 </style>
 <style lang="scss">

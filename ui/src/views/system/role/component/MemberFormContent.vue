@@ -5,15 +5,15 @@
         <el-form-item v-for="model of props.models" :key="model.path" :prop="`[${index}].${model.path}`"
           :rules="model.rules" :label="index === 0 && model.label ? model.label : ''" class="mr-8" style="flex: 1">
           <el-select v-if="!model?.hidden?.(element)" v-model="element[model.path]"
-            :placeholder="model.selectProps?.placeholder ?? $t('common.selectPlaceholder')" clearable filterable
+            :placeholder="model.selectProps?.placeholder ?? $t('common.selectPlaceholder')" :clearable="model.selectProps?.clearableFunction?model.selectProps?.clearableFunction?.(element): true" filterable
             multiple style="width: 100%" collapse-tags collapse-tags-tooltip v-bind="model.selectProps">
             <el-option v-for="opt in model.selectProps?.options" :key="opt.value" :label="opt.label"
               :value="opt.value" />
           </el-select>
         </el-form-item>
         <!-- 删除按钮 -->
-        <el-button :disabled="props.keepOneLine && form.length === 1" @click="handleDelete(index)" text
-          :style="{ 'margin-top': index === 0 && props.models.some((item) => item.label) ? '30px' : '' }">
+        <el-button :disabled="props.keepOneLine && form.length === 1 || props.deleteButtonDisabled?.(element)" @click="handleDelete(index)" text
+          :style="{ 'margin-top': index === 0 && props.models.some((item) => item.label) ? '32px' : '2px' }">
           <el-icon>
             <Delete />
           </el-icon>
@@ -39,6 +39,7 @@ const props = defineProps<{
   models: FormItemModel[];
   addText?: string;
   keepOneLine?: boolean; // 至少保留一行
+  deleteButtonDisabled?: (model: any) => boolean
 }>()
 
 const formRef = ref()
