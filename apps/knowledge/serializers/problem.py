@@ -9,6 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from common.db.search import native_search, native_page_search
+from common.exception.app_exception import AppApiException
 from common.utils.common import get_file_content
 from knowledge.models import Problem, ProblemParagraphMapping, Paragraph, Knowledge, SourceType
 from knowledge.serializers.common import get_embedding_model_id_by_knowledge_id
@@ -59,7 +60,17 @@ class BatchAssociation(serializers.Serializer):
 
 class ProblemSerializers(serializers.Serializer):
     class BatchOperate(serializers.Serializer):
+        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
         knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
+
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            workspace_id = self.data.get('workspace_id')
+            query_set = QuerySet(Knowledge).filter(id=self.data.get('knowledge_id'))
+            if workspace_id:
+                query_set = query_set.filter(workspace_id=workspace_id)
+            if not query_set.exists():
+                raise AppApiException(500, _('Knowledge id does not exist'))
 
         def delete(self, problem_id_list: List, with_valid=True):
             if with_valid:
@@ -123,8 +134,18 @@ class ProblemSerializers(serializers.Serializer):
             embedding_by_data_list(data_list, model_id=model_id)
 
     class Operate(serializers.Serializer):
+        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
         knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
         problem_id = serializers.UUIDField(required=True, label=_('problem id'))
+
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            workspace_id = self.data.get('workspace_id')
+            query_set = QuerySet(Knowledge).filter(id=self.data.get('knowledge_id'))
+            if workspace_id:
+                query_set = query_set.filter(workspace_id=workspace_id)
+            if not query_set.exists():
+                raise AppApiException(500, _('Knowledge id does not exist'))
 
         def list_paragraph(self, with_valid=True):
             if with_valid:
@@ -176,6 +197,15 @@ class ProblemSerializers(serializers.Serializer):
         workspace_id = serializers.CharField(required=True, label=_('workspace id'))
         knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
 
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            workspace_id = self.data.get('workspace_id')
+            query_set = QuerySet(Knowledge).filter(id=self.data.get('knowledge_id'))
+            if workspace_id:
+                query_set = query_set.filter(workspace_id=workspace_id)
+            if not query_set.exists():
+                raise AppApiException(500, _('Knowledge id does not exist'))
+
         def batch(self, problem_list, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
@@ -204,6 +234,15 @@ class ProblemSerializers(serializers.Serializer):
         workspace_id = serializers.CharField(required=True, label=_('workspace id'))
         knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
         content = serializers.CharField(required=False, label=_('content'))
+
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            workspace_id = self.data.get('workspace_id')
+            query_set = QuerySet(Knowledge).filter(id=self.data.get('knowledge_id'))
+            if workspace_id:
+                query_set = query_set.filter(workspace_id=workspace_id)
+            if not query_set.exists():
+                raise AppApiException(500, _('Knowledge id does not exist'))
 
         def get_query_set(self):
             query_set = QuerySet(model=Problem)

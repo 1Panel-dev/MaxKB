@@ -259,6 +259,20 @@ class DocumentSerializers(serializers.Serializer):
         document_id_list = serializers.ListField(required=True, label=_('document list'),
                                                  child=serializers.UUIDField(required=True, label=_('document id')))
 
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            workspace_id = self.data.get('workspace_id')
+            query_set = QuerySet(Knowledge).filter(id=self.data.get('knowledge_id'))
+            if workspace_id:
+                query_set = query_set.filter(workspace_id=workspace_id)
+            if not query_set.exists():
+                raise AppApiException(500, _('Knowledge id does not exist'))
+            query_set = QuerySet(Knowledge).filter(id=self.data.get('target_knowledge_id'))
+            if workspace_id:
+                query_set = query_set.filter(workspace_id=workspace_id)
+            if not query_set.exists():
+                raise AppApiException(500, _('Knowledge id does not exist'))
+
         @transaction.atomic
         def migrate(self, with_valid=True):
             if with_valid:
@@ -416,6 +430,12 @@ class DocumentSerializers(serializers.Serializer):
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
+            workspace_id = self.data.get('workspace_id')
+            query_set = QuerySet(Knowledge).filter(id=self.data.get('knowledge_id'))
+            if workspace_id:
+                query_set = query_set.filter(workspace_id=workspace_id)
+            if not query_set.exists():
+                raise AppApiException(500, _('Knowledge id does not exist'))
             document_id = self.data.get('document_id')
             first = QuerySet(Document).filter(id=document_id).first()
             if first is None:
@@ -510,6 +530,12 @@ class DocumentSerializers(serializers.Serializer):
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
+            workspace_id = self.data.get('workspace_id')
+            query_set = QuerySet(Knowledge).filter(id=self.data.get('knowledge_id'))
+            if workspace_id:
+                query_set = query_set.filter(workspace_id=workspace_id)
+            if not query_set.exists():
+                raise AppApiException(500, _('Knowledge id does not exist'))
             document_id = self.data.get('document_id')
             if not QuerySet(Document).filter(id=document_id).exists():
                 raise AppApiException(500, _('document id not exist'))
@@ -930,6 +956,12 @@ class DocumentSerializers(serializers.Serializer):
 
         def is_valid(self, *, instance=None, raise_exception=True):
             super().is_valid(raise_exception=True)
+            workspace_id = self.data.get('workspace_id')
+            query_set = QuerySet(Knowledge).filter(id=self.data.get('knowledge_id'))
+            if workspace_id:
+                query_set = query_set.filter(workspace_id=workspace_id)
+            if not query_set.exists():
+                raise AppApiException(500, _('Knowledge id does not exist'))
             files = instance.get('file')
             knowledge = Knowledge.objects.filter(id=self.data.get('knowledge_id')).first()
             for f in files:
@@ -1022,6 +1054,15 @@ class DocumentSerializers(serializers.Serializer):
     class Batch(serializers.Serializer):
         workspace_id = serializers.CharField(required=True, label=_('workspace id'))
         knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
+
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            workspace_id = self.data.get('workspace_id')
+            query_set = QuerySet(Knowledge).filter(id=self.data.get('knowledge_id'))
+            if workspace_id:
+                query_set = query_set.filter(workspace_id=workspace_id)
+            if not query_set.exists():
+                raise AppApiException(500, _('Knowledge id does not exist'))
 
         @staticmethod
         def link_file(source_file_id, document_id):
@@ -1205,6 +1246,15 @@ class DocumentSerializers(serializers.Serializer):
     class BatchGenerateRelated(serializers.Serializer):
         workspace_id = serializers.CharField(required=True, label=_('workspace id'))
         knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
+
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            workspace_id = self.data.get('workspace_id')
+            query_set = QuerySet(Knowledge).filter(id=self.data.get('knowledge_id'))
+            if workspace_id:
+                query_set = query_set.filter(workspace_id=workspace_id)
+            if not query_set.exists():
+                raise AppApiException(500, _('Knowledge id does not exist'))
 
         def batch_generate_related(self, instance: Dict, with_valid=True):
             if with_valid:

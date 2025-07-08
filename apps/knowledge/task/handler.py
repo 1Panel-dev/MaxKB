@@ -108,8 +108,10 @@ def save_problem(knowledge_id, document_id, paragraph_id, problem):
     if problem is None or len(problem) == 0:
         return
     try:
+        workspace_id = QuerySet(Knowledge).filter(id=knowledge_id).first().workspace_id
         ParagraphSerializers.Problem(
             data={
+                'workspace_id': workspace_id,
                 "knowledge_id": knowledge_id,
                 'document_id': document_id,
                 'paragraph_id': paragraph_id

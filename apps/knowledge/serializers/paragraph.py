@@ -6,7 +6,6 @@ import uuid_utils.compat as uuid
 from celery_once import AlreadyQueued
 from django.db import transaction
 from django.db.models import QuerySet, Count, F
-from django.db.models.aggregates import Max
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -67,12 +66,19 @@ class ParagraphSerializers(serializers.Serializer):
     content = serializers.CharField(required=True, max_length=102400, label=_('section title'))
 
     class Problem(serializers.Serializer):
+        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
         knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
         document_id = serializers.UUIDField(required=True, label=_('document id'))
         paragraph_id = serializers.UUIDField(required=True, label=_('paragraph id'))
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
+            workspace_id = self.data.get('workspace_id')
+            query_set = QuerySet(Knowledge).filter(id=self.data.get('knowledge_id'))
+            if workspace_id:
+                query_set = query_set.filter(workspace_id=workspace_id)
+            if not query_set.exists():
+                raise AppApiException(500, _('Knowledge id does not exist'))
             if not QuerySet(Paragraph).filter(id=self.data.get('paragraph_id')).exists():
                 raise AppApiException(500, _('Paragraph id does not exist'))
 
@@ -127,7 +133,11 @@ class ParagraphSerializers(serializers.Serializer):
                 }, model_id)
 
             return ProblemSerializers.Operate(
-                data={'knowledge_id': self.data.get('knowledge_id'), 'problem_id': problem.id}
+                data={
+                    'workspace_id':  self.data.get('workspace_id'),
+                    'knowledge_id': self.data.get('knowledge_id'),
+                    'problem_id': problem.id
+                }
             ).one(with_valid=True)
 
     class Operate(serializers.Serializer):
@@ -141,6 +151,12 @@ class ParagraphSerializers(serializers.Serializer):
 
         def is_valid(self, *, raise_exception=True):
             super().is_valid(raise_exception=True)
+            workspace_id = self.data.get('workspace_id')
+            query_set = QuerySet(Knowledge).filter(id=self.data.get('knowledge_id'))
+            if workspace_id:
+                query_set = query_set.filter(workspace_id=workspace_id)
+            if not query_set.exists():
+                raise AppApiException(500, _('Knowledge id does not exist'))
             if not QuerySet(Paragraph).filter(id=self.data.get('paragraph_id')).exists():
                 raise AppApiException(500, _('Paragraph id does not exist'))
 
@@ -321,10 +337,20 @@ class ParagraphSerializers(serializers.Serializer):
                 return Problem(id=uuid.uuid7(), content=content, knowledge_id=knowledge_id)
 
     class Query(serializers.Serializer):
+        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
         knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
         document_id = serializers.UUIDField(required=True, label=_('document id'))
         title = serializers.CharField(required=False, label=_('section title'))
         content = serializers.CharField(required=False)
+
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            workspace_id = self.data.get('workspace_id')
+            query_set = QuerySet(Knowledge).filter(id=self.data.get('knowledge_id'))
+            if workspace_id:
+                query_set = query_set.filter(workspace_id=workspace_id)
+            if not query_set.exists():
+                raise AppApiException(500, _('Knowledge id does not exist'))
 
         def get_query_set(self):
             query_set = QuerySet(model=Paragraph)
@@ -357,6 +383,12 @@ class ParagraphSerializers(serializers.Serializer):
             knowledge_id = self.data.get('knowledge_id')
             paragraph_id = self.data.get('paragraph_id')
             problem_id = self.data.get("problem_id")
+            workspace_id = self.data.get('workspace_id')
+            query_set = QuerySet(Knowledge).filter(id=self.data.get('knowledge_id'))
+            if workspace_id:
+                query_set = query_set.filter(workspace_id=workspace_id)
+            if not query_set.exists():
+                raise AppApiException(500, _('Knowledge id does not exist'))
             if not QuerySet(Paragraph).filter(knowledge_id=knowledge_id, id=paragraph_id).exists():
                 raise AppApiException(500, _('Paragraph does not exist'))
             if not QuerySet(Problem).filter(knowledge_id=knowledge_id, id=problem_id).exists():
@@ -398,8 +430,18 @@ class ParagraphSerializers(serializers.Serializer):
             return True
 
     class Batch(serializers.Serializer):
+        workspace_id = serializers.CharField(required=False, label=_('workspace id'))
         knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
         document_id = serializers.UUIDField(required=True, label=_('document id'))
+
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            workspace_id = self.data.get('workspace_id')
+            query_set = QuerySet(Knowledge).filter(id=self.data.get('knowledge_id'))
+            if workspace_id:
+                query_set = query_set.filter(workspace_id=workspace_id)
+            if not query_set.exists():
+                raise AppApiException(500, _('Knowledge id does not exist'))
 
         @transaction.atomic
         def batch_delete(self, instance: Dict, with_valid=True):
@@ -448,6 +490,12 @@ class ParagraphSerializers(serializers.Serializer):
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
+            workspace_id = self.data.get('workspace_id')
+            query_set = QuerySet(Knowledge).filter(id=self.data.get('knowledge_id'))
+            if workspace_id:
+                query_set = query_set.filter(workspace_id=workspace_id)
+            if not query_set.exists():
+                raise AppApiException(500, _('Knowledge id does not exist'))
             document_list = QuerySet(Document).filter(
                 id__in=[self.data.get('document_id'), self.data.get('target_document_id')])
             document_id = self.data.get('document_id')
@@ -588,6 +636,15 @@ class ParagraphSerializers(serializers.Serializer):
         knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
         document_id = serializers.UUIDField(required=True, label=_('document id'))
         paragraph_id = serializers.UUIDField(required=True, label=_('paragraph id'))
+
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            workspace_id = self.data.get('workspace_id')
+            query_set = QuerySet(Knowledge).filter(id=self.data.get('knowledge_id'))
+            if workspace_id:
+                query_set = query_set.filter(workspace_id=workspace_id)
+            if not query_set.exists():
+                raise AppApiException(500, _('Knowledge id does not exist'))
 
         @transaction.atomic
         def adjust_position(self, new_position):

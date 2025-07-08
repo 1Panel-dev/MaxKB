@@ -10,7 +10,6 @@ from typing import Dict, List
 import uuid_utils.compat as uuid
 from celery_once import AlreadyQueued
 from django.core import validators
-from django.core.cache import cache
 from django.db import transaction, models
 from django.db.models import QuerySet
 from django.db.models.functions import Reverse, Substr
@@ -20,8 +19,6 @@ from rest_framework import serializers
 
 from application.models import ApplicationKnowledgeMapping
 from common.config.embedding_config import VectorStore
-from common.constants.cache_version import Cache_Version
-from common.constants.permission_constants import ResourceAuthType, ResourcePermission, ResourcePermissionRole
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import native_search, get_dynamics_model, native_page_search
 from common.db.sql_execute import select_list
@@ -226,6 +223,15 @@ class KnowledgeSerializer(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, label=_('user id'))
         workspace_id = serializers.CharField(required=True, label=_('workspace id'))
         knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
+
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            workspace_id = self.data.get('workspace_id')
+            query_set = QuerySet(Knowledge).filter(id=self.data.get('knowledge_id'))
+            if workspace_id:
+                query_set = query_set.filter(workspace_id=workspace_id)
+            if not query_set.exists():
+                raise AppApiException(500, _('Knowledge id does not exist'))
 
         @transaction.atomic
         def embedding(self, with_valid=True):
@@ -618,6 +624,12 @@ class KnowledgeSerializer(serializers.Serializer):
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
+            workspace_id = self.data.get('workspace_id')
+            query_set = QuerySet(Knowledge).filter(id=self.data.get('knowledge_id'))
+            if workspace_id:
+                query_set = query_set.filter(workspace_id=workspace_id)
+            if not query_set.exists():
+                raise AppApiException(500, _('Knowledge id does not exist'))
             first = QuerySet(Knowledge).filter(id=self.data.get("knowledge_id")).first()
             if first is None:
                 raise AppApiException(300, _('id does not exist'))
@@ -700,6 +712,12 @@ class KnowledgeSerializer(serializers.Serializer):
 
         def is_valid(self, *, raise_exception=True):
             super().is_valid(raise_exception=True)
+            workspace_id = self.data.get('workspace_id')
+            query_set = QuerySet(Knowledge).filter(id=self.data.get('knowledge_id'))
+            if workspace_id:
+                query_set = query_set.filter(workspace_id=workspace_id)
+            if not query_set.exists():
+                raise AppApiException(500, _('Knowledge id does not exist'))
             if not QuerySet(Knowledge).filter(id=self.data.get("knowledge_id")).exists():
                 raise AppApiException(300, _('id does not exist'))
 
