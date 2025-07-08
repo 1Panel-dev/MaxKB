@@ -1,7 +1,7 @@
 import { hasPermission } from '@/utils/permission/index'
 import { ComplexPermission } from '@/utils/permission/type'
 import { EditionConst, PermissionConst, RoleConst } from '@/utils/permission/data'
-const workspace = {
+const systemManage = {
   is_share: () =>
     hasPermission(
       new ComplexPermission(
@@ -22,4 +22,4 @@ const workspace = {
 
 }
 
-export default workspace
+export default systemManage

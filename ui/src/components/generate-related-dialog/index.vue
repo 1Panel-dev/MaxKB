@@ -80,7 +80,7 @@ import type { FormInstance } from 'element-plus'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 const props = defineProps<{
-  apiType: 'systemShare' | 'workspace' | 'systemManage'
+  apiType: 'systemShare' | 'workspace' | 'systemManage' | 'workspaceShare'
 }>()
 
 const route = useRoute()

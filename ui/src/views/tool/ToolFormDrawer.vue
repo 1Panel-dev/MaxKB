@@ -234,7 +234,7 @@
         <el-button :loading="loading" @click="openDebug" v-if="permissionPrecise.debug(form?.id||'or')">{{
           $t('common.debug')
         }}</el-button>
-        <el-button type="primary" @click="submit(FormRef)" :loading="loading">
+        <el-button type="primary" @click="submit(FormRef)" :loading="loading" v-if="permissionPrecise.edit(form?.id||'or') || permissionPrecise.create()" >
           {{ isEdit ? $t('common.save') : $t('common.create') }}
         </el-button>
       </div>

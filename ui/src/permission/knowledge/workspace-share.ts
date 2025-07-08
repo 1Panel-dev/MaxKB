@@ -1,17 +1,8 @@
 import { hasPermission } from '@/utils/permission/index'
 import { ComplexPermission } from '@/utils/permission/type'
 import { EditionConst, PermissionConst, RoleConst } from '@/utils/permission/data'
-const systemManage = {
-  is_share: () =>
-    hasPermission(
-      new ComplexPermission(
-        [RoleConst.ADMIN],
-        [PermissionConst.SHARED_KNOWLEDGE_READ],
-        [EditionConst.IS_EE],
-        'OR',
-      ),
-      'OR',
-    ),
+const workspaceShare = {
+  is_share: () => true,
   create: () => false,
   sync: () => false,
   vector: () => false,
@@ -37,4 +28,4 @@ const systemManage = {
   problem_delete: () => false,
 }
 
-export default systemManage
+export default workspaceShare

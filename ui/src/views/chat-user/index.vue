@@ -56,7 +56,8 @@
               :disabled="current?.is_auth"
               @click="handleSave"
               v-if="
-                hasPermission(
+                route.path.includes('share/') ? false
+                : hasPermission(
                   permissionObj[
                     route.path.includes('shared')
                       ? 'SHAREDKNOWLEDGE'
@@ -87,7 +88,8 @@
             <div
               class="flex align-center"
               v-if="
-                hasPermission(
+                route.path.includes('share/') ? false
+                : hasPermission(
                   permissionObj[
                     route.path.includes('shared')
                       ? 'SHAREDKNOWLEDGE'

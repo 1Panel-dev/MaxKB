@@ -15,6 +15,7 @@ import problemSystemShareApi from '@/api/system-shared/problem'
 import chatUserSystemShareApi from '@/api/system-shared/chat-user'
 import workspaceApi from '@/api/workspace/workspace'
 import systemUserApi from '@/api/user/user'
+import workspaceShare from '@/permission/knowledge/workspace-share'
 
 // 普通 API
 const workspaceApiMap = {
@@ -51,6 +52,7 @@ const data = {
   systemShare: systemShareApiMap,
   workspace: workspaceApiMap,
   systemManage: systemManageApiMap,
+  workspaceShare: workspaceApiMap
 }
 /** 动态导入 API 模块的函数
  *  loadSharedApi('knowledge', true,'systemShare')
@@ -62,7 +64,7 @@ export function loadSharedApi({
 }: {
   type: string
   isShared?: boolean | undefined
-  systemType?: 'systemShare' | 'workspace' | 'systemManage'
+  systemType?: 'systemShare' | 'workspace' | 'systemManage' | 'workspaceShare'
 }) {
   if (isShared) {
     // 共享 API
