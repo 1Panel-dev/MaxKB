@@ -26,6 +26,7 @@ from common.utils.common import get_file_content
 from common.utils.split_model import group_by
 from knowledge.models import Knowledge
 from maxkb.conf import PROJECT_DIR
+from maxkb.settings import edition
 from models_provider.models import Model
 from system_manage.models import WorkspaceUserResourcePermission, AuthTargetType
 from tools.models import Tool
@@ -109,13 +110,14 @@ class UserResourcePermissionSerializer(serializers.Serializer):
         user_id = self.data.get('user_id')
         wurp = QuerySet(WorkspaceUserResourcePermission).filter(auth_target_type=auth_target_type,
                                                                 workspace_id=workspace_id).first()
-        auth_type = wurp.auth_type if wurp else ResourceAuthType.RESOURCE_PERMISSION_GROUP
+        auth_type = wurp.auth_type if wurp else (
+            ResourceAuthType.RESOURCE_PERMISSION_GROUP if edition == 'CE' else ResourceAuthType.ROLE)
         # 自动授权给创建者
         WorkspaceUserResourcePermission(
             target=resource_id,
             auth_target_type=auth_target_type,
             permission_list=[ResourcePermission.VIEW,
-                                ResourcePermission.MANAGE] if auth_type == ResourceAuthType.RESOURCE_PERMISSION_GROUP else [
+                             ResourcePermission.MANAGE] if auth_type == ResourceAuthType.RESOURCE_PERMISSION_GROUP else [
                 ResourcePermissionRole.ROLE],
             workspace_id=workspace_id,
             user_id=user_id,
