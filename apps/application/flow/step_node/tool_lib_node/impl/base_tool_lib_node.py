@@ -15,10 +15,13 @@ from django.utils.translation import gettext as _
 
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.tool_lib_node.i_tool_lib_node import IToolLibNode
+from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.exception.app_exception import AppApiException
 from common.utils.function_code import FunctionExecutor
 from common.utils.rsa_util import rsa_long_decrypt
 from maxkb.const import CONFIG
+from system_manage.models import AuthTargetType
+from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
 from tools.models import Tool
 
 function_executor = FunctionExecutor(CONFIG.get('SANDBOX'))
@@ -101,13 +104,14 @@ def convert_value(name: str, value, _type, is_required, source, node):
                                                                               value=value))
 
 
-def valid_function(function_lib, user_id):
-    if function_lib is None:
-        raise Exception(_('Function does not exist'))
-    if function_lib.permission_type == 'PRIVATE' and str(function_lib.user_id) != str(user_id):
-        raise Exception(_('No permission to use this function {name}').format(name=function_lib.name))
-    if not function_lib.is_active:
-        raise Exception(_('Function {name} is unavailable').format(name=function_lib.name))
+def valid_function(tool_lib, workspace_id):
+    if tool_lib is None:
+        raise Exception(_('Tool does not exist'))
+    get_authorized_tool = DatabaseModelManage.get_model("get_authorized_tool")
+    if tool_lib and tool_lib.workspace_id != workspace_id and get_authorized_tool is not None:
+        tool_lib = get_authorized_tool(QuerySet(Tool).filter(id=tool_lib.id), workspace_id).first()
+    if tool_lib is None:
+        raise Exception(_("Tool does not exist"))
 
 
 class BaseToolLibNodeNode(IToolLibNode):
@@ -116,9 +120,10 @@ class BaseToolLibNodeNode(IToolLibNode):
         if self.node_params.get('is_result'):
             self.answer_text = str(details.get('result'))
 
-    def execute(self, function_lib_id, input_field_list, **kwargs) -> NodeResult:
-        function_lib = QuerySet(Tool).filter(id=function_lib_id).first()
-        valid_function(function_lib, self.flow_params_serializer.data.get('user_id'))
+    def execute(self, tool_lib_id, input_field_list, **kwargs) -> NodeResult:
+        workspace_id = self.workflow_manage.get_body().get('workspace_id')
+        tool_lib = QuerySet(Tool).filter(id=tool_lib_id).first()
+        valid_function(tool_lib, workspace_id)
         params = {field.get('name'): convert_value(field.get('name'), field.get('value'), field.get('type'),
                                                    field.get('is_required'),
                                                    field.get('source'), self)
@@ -126,15 +131,15 @@ class BaseToolLibNodeNode(IToolLibNode):
                   [{'value': get_field_value(input_field_list, field.get('name'), field.get('is_required'),
                                              ), **field}
                    for field in
-                   function_lib.input_field_list]}
+                   tool_lib.input_field_list]}
 
         self.context['params'] = params
         # 合并初始化参数
-        if function_lib.init_params is not None:
-            all_params = json.loads(rsa_long_decrypt(function_lib.init_params)) | params
+        if tool_lib.init_params is not None:
+            all_params = json.loads(rsa_long_decrypt(tool_lib.init_params)) | params
         else:
             all_params = params
-        result = function_executor.exec_code(function_lib.code, all_params)
+        result = function_executor.exec_code(tool_lib.code, all_params)
         return NodeResult({'result': result}, {}, _write_context=write_context)
 
     def get_details(self, index: int, **kwargs):

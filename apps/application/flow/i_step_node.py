@@ -144,6 +144,8 @@ class FlowParamsSerializer(serializers.Serializer):
 
     workspace_id = serializers.CharField(required=True, label="工作空间id")
 
+    application_id = serializers.CharField(required=True, label="应用id")
+
     re_chat = serializers.BooleanField(required=True, label="换个答案")
 
     debug = serializers.BooleanField(required=True, label="是否debug")
