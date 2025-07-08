@@ -167,7 +167,7 @@
               <el-button
                 @click="submit"
                 type="primary"
-                v-if="!route.path.includes('share/') && permissionPrecise.setting(id)"
+                v-if="!route.path.includes('share/') && permissionPrecise.edit(id)"
               >
                 {{ $t('common.save') }}</el-button
               >
