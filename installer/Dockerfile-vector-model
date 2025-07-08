@@ -10,12 +10,23 @@
 
 # 不知道为什么用上面的脚本重新拉一遍向量模型比之前的大很多，所以还是用下面的脚本复用原来已经构建好的向量模型
 
+FROM python:3.11-slim-bookworm AS tmp-stage1
+COPY installer/install_model_token.py install_model_token.py
+RUN pip3 install --upgrade pip setuptools && \
+    pip install pycrawlers && \
+    pip install transformers && \
+    python3 install_model_token.py && \
+    cp -r model/base/hub model/tokenizer
+
 FROM ghcr.io/1panel-dev/maxkb-vector-model:v1.0.1 AS vector-model
 
-FROM alpine AS tmp-stage
+FROM alpine AS tmp-stage2
 COPY --from=vector-model /opt/maxkb/app/model /opt/maxkb-app/model
 COPY --from=vector-model /opt/maxkb/app/model/base/hub /opt/maxkb-app/model/tokenizer
+COPY --from=tmp-stage1 model/tokenizer /opt/maxkb-app/model/tokenizer
 RUN rm -rf /opt/maxkb-app/model/embedding/shibing624_text2vec-base-chinese/onnx
 
+
+
 FROM scratch
-COPY --from=tmp-stage /opt/maxkb-app/model /opt/maxkb-app/model
+COPY --from=tmp-stage2 /opt/maxkb-app/model /opt/maxkb-app/model
