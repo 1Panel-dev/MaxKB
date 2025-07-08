@@ -15,9 +15,9 @@
             style="width: 120px"
             @change="search_type_change"
           >
-            <el-option :label="$t('common.creator')" value="create_user"/>
+            <el-option :label="$t('common.creator')" value="create_user" />
 
-            <el-option :label="$t('common.name')" value="name"/>
+            <el-option :label="$t('common.name')" value="name" />
           </el-select>
           <el-input
             v-if="search_type === 'name'"
@@ -35,7 +35,7 @@
             filterable
             style="width: 220px"
           >
-            <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.nick_name"/>
+            <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.nick_name" />
           </el-select>
         </div>
       </div>
@@ -58,10 +58,10 @@
                   style="background: none"
                   class="mr-8"
                 >
-                  <img :src="resetUrl(scope.row?.icon)" alt=""/>
+                  <img :src="resetUrl(scope.row?.icon)" alt="" />
                 </el-avatar>
                 <el-avatar v-else class="avatar-green" shape="square" :size="24">
-                  <img src="@/assets/node/icon_tool.svg" style="width: 58%" alt=""/>
+                  <img src="@/assets/node/icon_tool.svg" style="width: 58%" alt="" />
                 </el-avatar>
               </el-icon>
               {{ scope.row.name }}
@@ -101,7 +101,7 @@
                     @click="statusVisible = !statusVisible"
                   >
                     <el-icon>
-                      <Filter/>
+                      <Filter />
                     </el-icon>
                   </el-button>
                 </template>
@@ -126,10 +126,10 @@
                 </div>
                 <div class="text-right">
                   <el-button size="small" @click="filterStatusChange('clear')"
-                  >{{ $t('common.clear') }}
+                    >{{ $t('common.clear') }}
                   </el-button>
                   <el-button type="primary" @click="filterStatusChange" size="small"
-                  >{{ $t('common.confirm') }}
+                    >{{ $t('common.confirm') }}
                   </el-button>
                 </div>
               </el-popover>
@@ -138,17 +138,17 @@
           <template #default="scope">
             <div v-if="scope.row.is_publish" class="flex align-center">
               <el-icon class="color-success mr-8" style="font-size: 16px">
-                <SuccessFilled/>
+                <SuccessFilled />
               </el-icon>
               <span class="color-secondary">
-                        {{ $t('views.application.status.published') }}
-                      </span>
+                {{ $t('views.application.status.published') }}
+              </span>
             </div>
             <div v-else class="flex align-center">
               <AppIcon iconName="app-disabled" class="color-secondary mr-8"></AppIcon>
               <span class="color-secondary">
-                        {{ $t('views.application.status.unpublished') }}
-                      </span>
+                {{ $t('views.application.status.unpublished') }}
+              </span>
             </div>
           </template>
         </el-table-column>
@@ -171,7 +171,7 @@
                     @click="workspaceVisible = !workspaceVisible"
                   >
                     <el-icon>
-                      <Filter/>
+                      <Filter />
                     </el-icon>
                   </el-button>
                 </template>
@@ -196,10 +196,10 @@
                 </div>
                 <div class="text-right">
                   <el-button size="small" @click="filterWorkspaceChange('clear')"
-                  >{{ $t('common.clear') }}
+                    >{{ $t('common.clear') }}
                   </el-button>
                   <el-button type="primary" @click="filterWorkspaceChange" size="small"
-                  >{{ $t('common.confirm') }}
+                    >{{ $t('common.confirm') }}
                   </el-button>
                 </div>
               </el-popover>
@@ -207,19 +207,22 @@
           </template>
         </el-table-column>
 
-        <el-table-column prop="nick_name" :label="$t('common.creator')" show-overflow-tooltip
-                         width="120"/>
-        <el-table-column :label="$t('views.application.publishTime')" width="120">
+        <el-table-column
+          prop="nick_name"
+          :label="$t('common.creator')"
+          show-overflow-tooltip
+        />
+        <el-table-column :label="$t('views.application.publishTime')" width="180">
           <template #default="{ row }">
             {{ datetimeFormat(row.update_time) }}
           </template>
         </el-table-column>
-        <el-table-column :label="$t('views.document.table.updateTime')" width="120">
+        <el-table-column :label="$t('views.document.table.updateTime')" width="180">
           <template #default="{ row }">
             {{ datetimeFormat(row.update_time) }}
           </template>
         </el-table-column>
-        <el-table-column :label="$t('common.createTime')" width="120">
+        <el-table-column :label="$t('common.createTime')" width="180">
           <template #default="{ row }">
             {{ datetimeFormat(row.create_time) }}
           </template>
@@ -230,17 +233,17 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref, reactive, computed} from 'vue'
+import { onMounted, ref, reactive, computed } from 'vue'
 import ApplicationResourceApi from '@/api/system-resource-management/application'
-import {t} from '@/locales'
-import {isAppIcon, resetUrl} from '@/utils/common'
+import { t } from '@/locales'
+import { isAppIcon, resetUrl } from '@/utils/common'
 import useStore from '@/stores'
-import {datetimeFormat} from '@/utils/time'
-import {loadPermissionApi} from "@/utils/dynamics-api/permission-api.ts";
-import {isWorkFlow} from "@/utils/application.ts";
-import UserApi from "@/api/user/user.ts";
+import { datetimeFormat } from '@/utils/time'
+import { loadPermissionApi } from '@/utils/dynamics-api/permission-api.ts'
+import { isWorkFlow } from '@/utils/application.ts'
+import UserApi from '@/api/user/user.ts'
 
-const {user} = useStore()
+const { user } = useStore()
 
 const search_type = ref('name')
 const search_form = ref<any>({
@@ -262,13 +265,16 @@ const workspaceVisible = ref(false)
 const workspaceArr = ref<any[]>([])
 const statusVisible = ref(false)
 const statusArr = ref<any[]>([])
-const statusOptions = ref<any[]>([{
-  label: t('views.application.status.published'),
-  value: true,
-}, {
-  label: t('views.application.status.unpublished'),
-  value: false,
-}])
+const statusOptions = ref<any[]>([
+  {
+    label: t('views.application.status.published'),
+    value: true,
+  },
+  {
+    label: t('views.application.status.unpublished'),
+    value: false,
+  },
+])
 
 function filterWorkspaceChange(val: string) {
   if (val === 'clear') {
@@ -297,7 +303,7 @@ async function getWorkspaceList() {
 }
 
 const search_type_change = () => {
-  search_form.value = {name: '', create_user: ''}
+  search_form.value = { name: '', create_user: '' }
 }
 
 function getList() {
@@ -309,7 +315,7 @@ function getList() {
     params['workspace_ids'] = JSON.stringify(workspaceArr.value)
   }
   if (statusArr.value.length > 0) {
-    params['status'] =  JSON.stringify(statusArr.value)
+    params['status'] = JSON.stringify(statusArr.value)
   }
   ApplicationResourceApi.getApplication(paginationConfig, params, loading).then((res: any) => {
     paginationConfig.total = res.data?.total
