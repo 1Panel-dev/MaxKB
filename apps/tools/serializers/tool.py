@@ -498,15 +498,6 @@ class ToolSerializer(serializers.Serializer):
         workspace_id = serializers.CharField(required=True, label=_("workspace id"))
         tool_id = serializers.UUIDField(required=True, label=_("tool id"))
 
-        def is_valid(self, *, raise_exception=False):
-            super().is_valid(raise_exception=True)
-            workspace_id = self.data.get('workspace_id')
-            query_set = QuerySet(Tool).filter(id=self.data.get('tool_id'))
-            if workspace_id:
-                query_set = query_set.filter(workspace_id=workspace_id)
-            if not query_set.exists():
-                raise AppApiException(500, _('Tool id does not exist'))
-
         def add(self, instance, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
