@@ -508,7 +508,8 @@ class WorkspaceSharedModelSerializer(serializers.Serializer):
                 'status': model.status,
                 'meta': model.meta,
                 'user_id': model.user_id,
-                'username': model.user.nick_name
+                'nick_name': model.user.nick_name,
+                'username': model.user.username
             }
             for model in queryset.order_by("-create_time")
         ]
