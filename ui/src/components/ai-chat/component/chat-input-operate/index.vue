@@ -129,10 +129,8 @@
           </el-row>
           <el-space wrap>
             <template v-for="(item, index) in uploadImageList" :key="index">
-
               <div
                 class="file file-image cursor border border-r-6"
-                v-if="item.url"
                 @mouseenter.stop="mouseenter(item)"
                 @mouseleave.stop="mouseleave()"
               >
@@ -239,6 +237,7 @@
                 :show-file-list="false"
                 :accept="getAcceptList()"
                 :on-change="(file: any, fileList: any) => uploadFile(file, fileList)"
+                v-model:file-list="fileAllList"
                 ref="upload"
               >
                 <el-tooltip

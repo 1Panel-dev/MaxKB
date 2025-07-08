@@ -13,7 +13,7 @@ from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _, gettext
 from rest_framework import serializers
 
-from application.models import VoteChoices, ChatRecord, Chat
+from application.models import VoteChoices, ChatRecord, Chat, ApplicationAccessToken
 from application.serializers.application_chat import ChatCountSerializer
 from application.serializers.application_chat_record import ChatRecordSerializerModel, \
     ApplicationChatRecordQuerySerializers
@@ -159,6 +159,13 @@ class HistoricalConversationRecordSerializer(serializers.Serializer):
 
     def page(self, current_page, page_size):
         self.is_valid(raise_exception=True)
+        application_access_token = QuerySet(ApplicationAccessToken).filter(
+            application_id=self.data.get('application_id')).first()
+        show_source = False
+        show_exec = False
+        if application_access_token is not None:
+            show_exec = application_access_token.show_exec
+            show_source = application_access_token.show_source
         return ApplicationChatRecordQuerySerializers(
             data={'application_id': self.data.get('application_id'), 'chat_id': self.data.get('chat_id')}).page(
-            current_page, page_size)
+            current_page, page_size, show_source=show_source, show_exec=show_exec)
