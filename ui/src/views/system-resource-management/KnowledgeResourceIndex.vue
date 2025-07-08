@@ -165,7 +165,7 @@ const loading = ref(false)
 const knowledgeList = ref<any[]>([])
 const paginationConfig = reactive({
   current_page: 1,
-  page_size: 30,
+  page_size: 20,
   total: 0,
 })
 const workspaceOptions = ref<any[]>([])
