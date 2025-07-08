@@ -4,9 +4,18 @@
       <div class="layout-container__left_content">
         <slot name="left"></slot>
       </div>
-      <el-tooltip :content="isCollapse ? $t('common.expand') : $t('common.collapse')" placement="right">
-        <el-button v-if="props.showCollapse" class="collapse" size="small" circle @click="isCollapse = !isCollapse"
-          :icon="isCollapse ? 'ArrowRightBold' : 'ArrowLeftBold'" />
+      <el-tooltip
+        :content="isCollapse ? $t('common.expand') : $t('common.collapse')"
+        placement="right"
+      >
+        <el-button
+          v-if="props.showCollapse"
+          class="collapse"
+          size="small"
+          circle
+          @click="isCollapse = !isCollapse"
+          :icon="isCollapse ? 'ArrowRightBold' : 'ArrowLeftBold'"
+        />
       </el-tooltip>
     </div>
     <div class="layout-container__right">
@@ -22,7 +31,7 @@ const slots = useSlots()
 const props = defineProps({
   header: String || null,
   backTo: String,
-  showCollapse: Boolean
+  showCollapse: Boolean,
 })
 
 const isCollapse = ref(false)
@@ -47,7 +56,7 @@ const showBack = computed(() => {
       position: absolute;
       top: 36px;
       right: -15px;
-      box-shadow: 0px 5px 10px 0px #1f23291a;
+      box-shadow: 0px 5px 10px 0px rgba(31, 35, 41, 0.1);
       z-index: 1;
     }
 

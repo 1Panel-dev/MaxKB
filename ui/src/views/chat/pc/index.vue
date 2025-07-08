@@ -6,209 +6,80 @@
     :style="{
       '--el-color-primary': applicationDetail?.custom_theme?.theme_color,
       '--el-color-primary-light-9': hexToRgba(applicationDetail?.custom_theme?.theme_color, 0.1),
+      '--el-color-primary-light-6': hexToRgba(applicationDetail?.custom_theme?.theme_color, 0.4),
     }"
   >
     <div class="flex h-full w-full">
       <div class="chat-pc__left">
-        <el-menu
-          class="w-full h-full"
-          :default-active="currentChatId"
-          :collapse="isPcCollapse"
-          collapse-transition
-          popper-class="chat-pc-popper"
+        <history-component
+          :application-detail="applicationDetail"
+          :chat-log-data="chatLogData"
+          :left-loading="left_loading"
+          :currentChatId="currentChatId"
+          @new-chat="newChat"
+          @clickLog="clickListHandle"
+          @delete-log="deleteLog"
+          @refreshFieldTitle="refreshFieldTitle"
+          :isPcCollapse="isPcCollapse"
         >
-          <div style="padding: 16px 18px 0 18px">
-            <div class="flex align-center mb-16">
-              <div class="flex mr-8">
-                <el-avatar
-                  v-if="isAppIcon(applicationDetail?.icon)"
-                  shape="square"
-                  :size="32"
-                  style="background: none"
-                >
-                  <img :src="applicationDetail?.icon" alt="" />
-                </el-avatar>
-                <LogoIcon v-else height="32px" />
-              </div>
-              <h4 v-show="!isPcCollapse">{{ applicationDetail?.name }}</h4>
-            </div>
-            <el-button
-              size="large"
-              type="primary"
-              plain
-              v-show="!isPcCollapse"
-              class="add-button w-full primary"
-              @click="newChat"
+          <div class="user-info p-16 cursor">
+            <el-avatar
+              :size="32"
+              v-if="
+                !chatUser.chat_profile?.authentication ||
+                chatUser.chat_profile.authentication_type === 'password'
+              "
             >
-              <AppIcon iconName="app-create-chat"></AppIcon>
-              <span class="ml-4">{{ $t('chat.createChat') }}</span>
-            </el-button>
-            <p v-show="!isPcCollapse" class="mt-20 mb-8">{{ $t('chat.history') }}</p>
-          </div>
-          <div v-show="!isPcCollapse" class="left-height pt-0">
-            <el-scrollbar>
-              <div class="p-8 pt-0">
-                <common-list
-                  :style="{
-                    '--el-color-primary': applicationDetail?.custom_theme?.theme_color,
-                    '--el-color-primary-light-9': hexToRgba(
-                      applicationDetail?.custom_theme?.theme_color,
-                      0.1,
-                    ),
-                  }"
-                  :data="chatLogData"
-                  class="mt-8"
-                  v-loading="left_loading"
-                  :defaultActive="currentChatId"
-                  @click="clickListHandle"
-                  @mouseenter="mouseenter"
-                  @mouseleave="mouseId = ''"
-                >
-                  <template #default="{ row }">
-                    <div class="flex-between">
-                      <span :title="row.abstract">
-                        {{ row.abstract }}
-                      </span>
-                      <div @click.stop v-show="mouseId === row.id && row.id !== 'new'">
-                        <el-dropdown trigger="click" :teleported="false">
-                          <el-button text>
-                            <el-icon><MoreFilled /></el-icon>
-                          </el-button>
-
-                          <template #dropdown>
-                            <el-dropdown-menu>
-                              <el-dropdown-item @click.stop="editLogTitle(row)">
-                                <el-icon><EditPen /></el-icon>
-                                {{ $t('common.edit') }}
-                              </el-dropdown-item>
-                              <el-dropdown-item @click.stop="deleteLog(row)">
-                                <el-icon><Delete /></el-icon>
-                                {{ $t('common.delete') }}
-                              </el-dropdown-item>
-                            </el-dropdown-menu>
-                          </template>
-                        </el-dropdown>
-                      </div>
-                    </div>
-                  </template>
-
-                  <template #empty>
-                    <div class="text-center">
-                      <el-text type="info">{{ $t('chat.noHistory') }}</el-text>
-                    </div>
-                  </template>
-                </common-list>
-              </div>
-              <div v-if="chatLogData?.length" class="gradient-divider lighter mt-8">
-                <span>{{ $t('chat.only20history') }}</span>
-              </div>
-            </el-scrollbar>
-          </div>
-          <el-menu-item index="1" v-show="isPcCollapse" @click="newChat">
-            <AppIcon iconName="app-create-chat"></AppIcon>
-            <template #title>{{ $t('chat.createChat') }}</template>
-          </el-menu-item>
-          <el-sub-menu v-show="isPcCollapse" index="2">
-            <template #title>
-              <AppIcon iconName="app-history-outlined" />
-            </template>
-            <el-menu-item-group v-loading="left_loading">
-              <template #title
-                ><span>{{ $t('chat.history') }}</span></template
-              >
-              <el-menu-item
-                v-for="row in chatLogData"
-                :index="row.id"
-                :key="row.id"
-                @click="clickListHandle(row)"
-              >
-                <div class="flex-between w-full lighter">
-                  <span :title="row.abstract">
-                    {{ row.abstract }}
-                  </span>
-                  <div @click.stop class="flex" v-show="mouseId === row.id && row.id !== 'new'">
-                    <el-dropdown trigger="click" :teleported="false">
-                      <el-icon class="rotate-90 mt-4">
-                        <MoreFilled />
-                      </el-icon>
-                      <template #dropdown>
-                        <el-dropdown-menu>
-                          <el-dropdown-item @click.stop="editLogTitle(row)">
-                            <el-icon>
-                              <EditPen />
-                            </el-icon>
-                            {{ $t('common.edit') }}
-                          </el-dropdown-item>
-                          <el-dropdown-item @click.stop="deleteLog(row)">
-                            <el-icon>
-                              <Delete />
-                            </el-icon>
-                            {{ $t('common.delete') }}
-                          </el-dropdown-item>
-                        </el-dropdown-menu>
-                      </template>
-                    </el-dropdown>
-                  </div>
-                </div>
-              </el-menu-item>
-            </el-menu-item-group>
-            <div v-if="!chatLogData?.length" class="text-center">
-              <el-text type="info">{{ $t('chat.noHistory') }}</el-text>
-            </div>
-          </el-sub-menu>
-
-          <div v-if="!chatUser.chat_profile?.authentication || chatUser.chat_profile.authentication_type === 'password'" class="no-auth-avatar">
-            <el-avatar :size="32">
               <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
             </el-avatar>
-          </div>
-          <el-dropdown v-else trigger="click" type="primary" class="w-full">
-            <div class="flex align-center user-info">
-              <el-avatar :size="32">
-                <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
-              </el-avatar>
-              <span v-show="!isPcCollapse" class="ml-8 color-text-primary">{{
-                chatUser.chatUserProfile?.nick_name
-              }}</span>
-            </div>
+            <el-dropdown v-else trigger="click" type="primary" class="w-full">
+              <div class="flex align-center">
+                <el-avatar :size="32">
+                  <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
+                </el-avatar>
+                <span v-show="!isPcCollapse" class="ml-8 color-text-primary">{{
+                  chatUser.chatUserProfile?.nick_name
+                }}</span>
+              </div>
 
-            <template #dropdown>
-              <el-dropdown-menu class="avatar-dropdown">
-                <div class="flex align-center" style="padding: 8px 12px">
-                  <div class="mr-8 flex align-center">
-                    <el-avatar :size="40">
-                      <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
-                    </el-avatar>
-                  </div>
-                  <div>
-                    <h4 class="medium mb-4">{{ chatUser.chatUserProfile?.nick_name }}</h4>
-                    <div class="color-secondary">
-                      {{ `${t('common.username')}: ${chatUser.chatUserProfile?.username}` }}
+              <template #dropdown>
+                <el-dropdown-menu class="avatar-dropdown">
+                  <div class="flex align-center" style="padding: 8px 12px">
+                    <div class="mr-8 flex align-center">
+                      <el-avatar :size="40">
+                        <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
+                      </el-avatar>
+                    </div>
+                    <div>
+                      <h4 class="medium mb-4">{{ chatUser.chatUserProfile?.nick_name }}</h4>
+                      <div class="color-secondary">
+                        {{ `${t('common.username')}: ${chatUser.chatUserProfile?.username}` }}
+                      </div>
                     </div>
                   </div>
-                </div>
-                <el-dropdown-item
-                  v-if="chatUser.chatUserProfile?.source === 'LOCAL'"
-                  class="border-t"
-                  style="padding-top: 8px; padding-bottom: 8px"
-                  @click="openResetPassword"
-                >
-                  <AppIcon iconName="app-export" />
-                  {{ $t('views.login.resetPassword') }}
-                </el-dropdown-item>
-                <el-dropdown-item
-                  v-if="chatUser.chatUserProfile?.source === 'LOCAL'"
-                  class="border-t"
-                  style="padding-top: 8px; padding-bottom: 8px"
-                  @click="logout"
-                >
-                  <AppIcon iconName="app-export" />
-                  {{ $t('layout.logout') }}
-                </el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
-        </el-menu>
+                  <el-dropdown-item
+                    v-if="chatUser.chatUserProfile?.source === 'LOCAL'"
+                    class="border-t"
+                    style="padding-top: 8px; padding-bottom: 8px"
+                    @click="openResetPassword"
+                  >
+                    <AppIcon iconName="app-export" />
+                    {{ $t('views.login.resetPassword') }}
+                  </el-dropdown-item>
+                  <el-dropdown-item
+                    v-if="chatUser.chatUserProfile?.source === 'LOCAL'"
+                    class="border-t"
+                    style="padding-top: 8px; padding-bottom: 8px"
+                    @click="logout"
+                  >
+                    <AppIcon iconName="app-export" />
+                    {{ $t('layout.logout') }}
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </div>
+        </history-component>
         <el-button
           v-if="!common.isMobile()"
           class="pc-collapse cursor"
@@ -306,7 +177,6 @@
       </div>
     </div>
 
-    <EditTitleDialog ref="EditTitleDialogRef" @refresh="refreshFieldTitle" />
     <ResetPassword
       ref="resetPasswordRef"
       emitConfirm
@@ -320,11 +190,10 @@ import { ref, onMounted, nextTick, computed, watch } from 'vue'
 import { marked } from 'marked'
 import { saveAs } from 'file-saver'
 import chatAPI from '@/api/chat/chat'
-import { isAppIcon } from '@/utils/common'
+
 import useStore from '@/stores'
 import useResize from '@/layout/hooks/useResize'
 import { hexToRgba } from '@/utils/theme'
-import EditTitleDialog from './EditTitleDialog.vue'
 import { useRouter } from 'vue-router'
 import ResetPassword from '@/layout/layout-header/avatar/ResetPassword.vue'
 import { t } from '@/locales'
@@ -332,14 +201,13 @@ import type { ResetCurrentUserPasswordRequest } from '@/api/type/user'
 import ExecutionDetailContent from '@/components/ai-chat/component/knowledge-source-component/ExecutionDetailContent.vue'
 import ParagraphSourceContent from '@/components/ai-chat/component/knowledge-source-component/ParagraphSourceContent.vue'
 import ParagraphDocumentContent from '@/components/ai-chat/component/knowledge-source-component/ParagraphDocumentContent.vue'
+import HistoryComponent from '@/views/chat/history-component/index.vue'
 import { cloneDeep } from 'lodash'
 
 useResize()
 
 const { common, chatUser } = useStore()
 const router = useRouter()
-
-const EditTitleDialogRef = ref()
 
 const isCollapse = ref(false)
 const isPcCollapse = ref(false)
@@ -407,15 +275,7 @@ const paginationConfig = ref({
 const currentRecordList = ref<any>([])
 const currentChatId = ref('new') // 当前历史记录Id 默认为'new'
 const currentChatName = ref(t('chat.createChat'))
-const mouseId = ref('')
 
-function mouseenter(row: any) {
-  mouseId.value = row.id
-}
-
-function editLogTitle(row: any) {
-  EditTitleDialogRef.value.open(row, applicationDetail.value.id)
-}
 function refreshFieldTitle(chatId: string, abstract: string) {
   const find = chatLogData.value.find((item: any) => item.id == chatId)
   if (find) {
@@ -614,124 +474,21 @@ function closeExecutionDetail() {
   rightPanelSize.value = 0
 }
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 .chat-pc {
   height: 100%;
   overflow: hidden;
   background: #eef1f4;
 
-  &__header {
-    background: var(--app-header-bg-color);
-    position: fixed;
-    width: 100%;
-    left: 0;
-    top: 0;
-    z-index: 100;
-    height: var(--app-header-height);
-    line-height: var(--app-header-height);
-    box-sizing: border-box;
-    border-bottom: 1px solid var(--el-border-color);
-  }
-
   &__left {
     position: relative;
     z-index: 1;
-
-    .common-list li.active {
-      background-color: #ffffff;
-      font-weight: 500;
-      color: var(--el-text-color-primary);
-      &:hover {
-        background-color: #ffffff;
-      }
-    }
-
-    .el-menu {
-      display: flex;
-      flex-direction: column;
-      background:
-        linear-gradient(187.61deg, rgba(235, 241, 255, 0.5) 39.6%, rgba(231, 249, 255, 0.5) 94.3%),
-        #eef1f4;
-
-      &:not(.el-menu--collapse) {
-        width: 280px;
-      }
-
-      .el-menu-item:hover {
-        background: transparent;
-      }
-
-      .no-auth-avatar {
-        margin-top: auto;
-        padding: 16px;
-        .el-avatar {
-          cursor: default;
-        }
-      }
-
-      .el-dropdown {
-        margin-top: auto;
-        .user-info {
-          width: 100%;
-          cursor: pointer;
-          border-radius: 6px;
-          padding: 4px 8px;
-          margin: 16px;
-          box-sizing: border-box;
-          &:hover {
-            background-color: #1f23291a;
-          }
-        }
-      }
-
-      &.el-menu--collapse {
-        .el-menu-item,
-        .el-menu-tooltip__trigger,
-        .el-sub-menu__title {
-          padding: 0;
-        }
-
-        .el-menu-item .el-menu-tooltip__trigger,
-        .el-sub-menu__title {
-          position: static;
-          width: 40px;
-          height: 40px;
-          border-radius: 6px;
-          align-items: center;
-          justify-content: center;
-          margin: 0 auto;
-        }
-
-        .el-menu-item:hover .el-menu-tooltip__trigger,
-        .el-sub-menu__title:hover {
-          background-color: #1f23291a;
-        }
-
-        .user-info {
-          margin: 16px 8px;
-        }
-      }
-    }
-
-    .add-button {
-      border: 1px solid var(--el-color-primary);
-      background-color: #3370ff1a;
-      color: #3370ff;
-      font-weight: 500;
-      &:hover {
-        background-color: #3370ff33;
-      }
-    }
-
-    .left-height {
-      height: calc(100vh - 212px);
-    }
 
     .pc-collapse {
       position: absolute;
       top: 20px;
       right: -15px;
-      box-shadow: 0px 5px 10px 0px #1f23291a;
+      box-shadow: 0px 5px 10px 0px rgba(31, 35, 41, 0.1);
       z-index: 1;
     }
   }
@@ -766,105 +523,8 @@ function closeExecutionDetail() {
     }
   }
 
-  .gradient-divider {
-    position: relative;
-    text-align: center;
-    color: var(--el-color-info);
-
-    ::before {
-      content: '';
-      width: 17%;
-      height: 1px;
-      background: linear-gradient(90deg, rgba(222, 224, 227, 0) 0%, #dee0e3 100%);
-      position: absolute;
-      left: 16px;
-      top: 50%;
-    }
-
-    ::after {
-      content: '';
-      width: 17%;
-      height: 1px;
-      background: linear-gradient(90deg, #dee0e3 0%, rgba(222, 224, 227, 0) 100%);
-      position: absolute;
-      right: 16px;
-      top: 50%;
-    }
-  }
-
   .collapse {
     display: none;
-  }
-}
-
-.chat-pc-popper {
-  background:
-    linear-gradient(187.61deg, rgba(235, 241, 255, 0.5) 39.6%, rgba(231, 249, 255, 0.5) 94.3%),
-    #eef1f4 !important;
-  .el-menu {
-    background: transparent;
-  }
-  .el-menu-item-group__title {
-    padding-bottom: 16px;
-    font-weight: 500;
-    color: var(--app-text-color-secondary);
-  }
-  .el-menu-item {
-    border-radius: 6px;
-    height: 40px;
-    margin: 0 8px;
-    padding-left: 8px;
-    padding-right: 8px;
-    &:hover {
-      background-color: #1f23291a;
-    }
-    &.is-active {
-      background-color: #ffffff;
-
-      color: var(--el-text-color-primary);
-      & > div {
-        font-weight: 500;
-      }
-    }
-  }
-}
-// 适配移动端
-.mobile {
-  .chat-pc {
-    &__right {
-      width: 100%;
-    }
-    &__left {
-      display: none;
-      width: 0;
-    }
-  }
-  .collapse {
-    display: block;
-    position: fixed;
-    bottom: 90px;
-    z-index: 99;
-  }
-  &.openLeft {
-    .chat-pc {
-      &__left {
-        display: block;
-        position: fixed;
-        width: 100%;
-        z-index: 99;
-        height: calc(100vh);
-        .el-menu {
-          width: 100%;
-        }
-      }
-    }
-    .collapse {
-      display: block;
-      position: absolute;
-      bottom: 90px;
-      right: 0;
-      z-index: 99;
-    }
   }
 }
 
@@ -878,9 +538,6 @@ function closeExecutionDetail() {
     margin: 0 auto;
   }
 }
-</style>
-
-<style lang="scss" scoped>
 .avatar-dropdown {
   min-width: 240px;
 }

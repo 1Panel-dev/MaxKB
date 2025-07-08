@@ -237,12 +237,13 @@ class ChatSerializers(serializers.Serializer):
                                            'chat_user_type': chat_user_type,
                                            'workspace_id': workspace_id,
                                            'debug': debug,
-                                           'chat_user': chat_info.get_chat_user()},
+                                           'chat_user': chat_info.get_chat_user(),
+                                           'application_id': chat_info.application_id},
                                           WorkFlowPostHandler(chat_info),
                                           base_to_response, form_data, image_list, document_list, audio_list,
                                           other_list,
-                                          self.data.get('runtime_node_id'),
-                                          self.data.get('node_data'), chat_record, self.data.get('child_node'))
+                                          instance.get('runtime_node_id'),
+                                          instance.get('node_data'), chat_record, instance.get('child_node'))
         r = work_flow_manage.run()
         return r
 

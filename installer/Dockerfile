@@ -1,4 +1,4 @@
-FROM ghcr.io/1panel-dev/maxkb-vector-model:v2.0.1 AS vector-model
+FROM ghcr.io/1panel-dev/maxkb-vector-model:v2.0.2 AS vector-model
 FROM node:18-alpine3.18 AS web-build
 COPY ui ui
 RUN cd ui && \

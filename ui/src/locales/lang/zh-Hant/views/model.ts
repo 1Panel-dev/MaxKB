@@ -18,7 +18,7 @@ export default {
     downloadError: '下載失敗',
     noModel: '模型在Ollama不存在',
   },
-  model: {
+  modelType: {
     allModel: '全部模型',
     publicModel: '公有模型',
     privateModel: '私有模型',

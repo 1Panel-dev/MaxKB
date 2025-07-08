@@ -20,7 +20,7 @@ export default {
     downloadError: 'Download failed',
     noModel: 'Model does not exist in Ollama',
   },
-  model: {
+  modelType: {
     allModel: 'All Models',
     publicModel: 'Public Models',
     privateModel: 'Private Models',

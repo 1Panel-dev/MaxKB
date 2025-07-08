@@ -167,7 +167,7 @@
               <el-button
                 @click="submit"
                 type="primary"
-                v-if=" !route.path.includes('share/') && permissionPrecise.edit(id)"
+                v-if="!route.path.includes('share/') && permissionPrecise.setting(id)"
               >
                 {{ $t('common.save') }}</el-button
               >
@@ -191,7 +191,7 @@ import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 const route = useRoute()
 const {
-  params: { id },
+  params: { id, folderId },
 } = route as any
 
 const apiType = computed(() => {
@@ -206,6 +206,10 @@ const apiType = computed(() => {
 
 const permissionPrecise = computed(() => {
   return permissionMap['knowledge'][apiType.value]
+})
+
+const isShared = computed(() => {
+  return folderId === 'share'
 })
 
 const webFormRef = ref()
@@ -326,7 +330,7 @@ async function submit() {
 }
 
 function getDetail() {
-  loadSharedApi({ type: 'knowledge', systemType: apiType.value })
+  loadSharedApi({ type: 'knowledge', isShared: isShared.value, systemType: apiType.value })
     .getKnowledgeDetail(id, loading)
     .then((res: any) => {
       detail.value = res.data

@@ -2,8 +2,7 @@ import { Result } from '@/request/Result'
 import { get, post, del, put, exportFile } from '@/request/index'
 import { type Ref } from 'vue'
 import type { pageRequest } from '@/api/type/common'
-import type {AddInternalToolParam, toolData} from '@/api/type/tool'
-
+import type { AddInternalToolParam, toolData } from '@/api/type/tool'
 
 import useStore from '@/stores'
 const prefix: any = { _value: '/workspace/' }
@@ -18,10 +17,10 @@ Object.defineProperty(prefix, 'value', {
  * 工具列表带分页（无分页）
  * @params 参数 {folder_id: string}
  */
-const getToolList: (data?: any, loading?: Ref<boolean>) => Promise<Result<{tools: any[], folders: any[]}>> = (
-  data,
-  loading,
-) => {
+const getToolList: (
+  data?: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<{ tools: any[]; folders: any[] }>> = (data, loading) => {
   return get(`${prefix.value}`, data, loading)
 }
 
@@ -83,18 +82,18 @@ const getToolById: (tool_id: string, loading?: Ref<boolean>) => Promise<Result<a
  * 删除工具
  * @param 参数 tool_id
  */
-const delTool: (
-  tool_id: string,
-  loading?: Ref<boolean>
-) => Promise<Result<boolean>> = (tool_id, loading) => {
+const delTool: (tool_id: string, loading?: Ref<boolean>) => Promise<Result<boolean>> = (
+  tool_id,
+  loading,
+) => {
   return del(`${prefix.value}/${tool_id}`, undefined, {}, loading)
 }
 
-const putToolIcon: (
-  id: string,
-  data: any,
-  loading?: Ref<boolean>
-) => Promise<Result<any>> = (id, data, loading) => {
+const putToolIcon: (id: string, data: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  id,
+  data,
+  loading,
+) => {
   return put(`${prefix.value}/${id}/edit_icon`, data, undefined, loading)
 }
 
@@ -139,7 +138,6 @@ const addInternalTool: (
   return post(`${prefix.value}/${tool_id}/add_internal_tool`, param, undefined, loading)
 }
 
-
 export default {
   getToolList,
   getToolListPage,
@@ -152,5 +150,5 @@ export default {
   exportTool,
   putToolIcon,
   delTool,
-  addInternalTool
+  addInternalTool,
 }

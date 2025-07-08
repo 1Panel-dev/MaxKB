@@ -105,9 +105,6 @@ model_info_image_list = [
 ]
 
 model_info_tti_list = [
-    ModelInfo('dall-e-2', '',
-              ModelTypeConst.TTI, openai_tti_model_credential,
-              OpenAITextToImage),
     ModelInfo('dall-e-3', '',
               ModelTypeConst.TTI, openai_tti_model_credential,
               OpenAITextToImage),

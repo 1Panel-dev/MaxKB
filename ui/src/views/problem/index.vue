@@ -170,7 +170,7 @@ import permissionMap from '@/permission'
 
 const route = useRoute()
 const {
-  params: { id }, // 知识库id
+  params: { id, folderId }, // 知识库id
 } = route as any
 
 const apiType = computed(() => {
@@ -186,6 +186,10 @@ const apiType = computed(() => {
 })
 const permissionPrecise = computed(() => {
   return permissionMap['knowledge'][apiType.value]
+})
+
+const isShared = computed(() => {
+  return folderId === 'share'
 })
 
 const RelateProblemDialogRef = ref()
@@ -397,7 +401,7 @@ function handleSizeChange() {
 }
 
 function getList() {
-  return loadSharedApi({ type: 'problem', systemType: apiType.value })
+  return loadSharedApi({ type: 'problem', isShared: isShared.value, systemType: apiType.value })
     .getProblemsPage(
       id as string,
       paginationConfig,

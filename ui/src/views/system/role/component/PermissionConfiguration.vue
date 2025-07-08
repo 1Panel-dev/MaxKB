@@ -1,7 +1,7 @@
 <template>
   <el-scrollbar v-loading="loading">
     <app-table :data="tableData" border :span-method="objectSpanMethod">
-      <el-table-column prop="module" :width="130" :label="$t('views.role.permission.moduleName')" />
+      <el-table-column prop="module" :width="130" :label="$t('views.role.permission.moduleName')"/>
       <el-table-column
         prop="name"
         :width="150"
@@ -49,17 +49,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import {ref, watch, computed} from 'vue'
 import type {
   RoleItem,
   RolePermissionItem,
   RoleTableDataItem,
   ChildrenPermissionItem,
 } from '@/api/type/role'
-import { loadPermissionApi } from '@/utils/dynamics-api/permission-api'
+import {loadPermissionApi} from '@/utils/dynamics-api/permission-api'
 import RoleApi from '@/api/system/role'
-import { MsgSuccess } from '@/utils/message'
-import { t } from '@/locales'
+import {MsgSuccess} from '@/utils/message'
+import {t} from '@/locales'
+import {hasPermission} from "@/utils/permission";
+import {EditionConst, RoleConst} from "@/utils/permission/data.ts";
 
 const props = defineProps<{
   currentRole?: RoleItem
@@ -67,7 +69,29 @@ const props = defineProps<{
 
 const loading = ref(false)
 const tableData = ref<RoleTableDataItem[]>([])
-const disabled = computed(() => props.currentRole?.internal) // TODO 权限
+const needDisable = computed(() => {
+  const isEeOrPe = hasPermission([EditionConst.IS_EE, EditionConst.IS_PE], 'OR')
+  const isAdminOrExtendAdmin = hasPermission([RoleConst.ADMIN, RoleConst.EXTENDS_ADMIN], 'OR')
+  const isWorkspaceManage =
+    hasPermission(
+      [
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        RoleConst.EXTENDS_WORKSPACE_MANAGE.getWorkspaceRole,
+      ],
+      'OR'
+    )
+
+  if (!isEeOrPe) {
+    return false
+  }
+
+  if (isAdminOrExtendAdmin) {
+    return false
+  }
+
+  return isWorkspaceManage
+})
+const disabled = computed(() => props.currentRole?.internal || needDisable.value)
 
 function transformData(data: RolePermissionItem[]) {
   const transformedData: RoleTableDataItem[] = []
@@ -136,7 +160,7 @@ function handleCheckAll(checked: boolean) {
   })
 }
 
-const objectSpanMethod = ({ row, column, rowIndex, columnIndex }: any) => {
+const objectSpanMethod = ({row, column, rowIndex, columnIndex}: any) => {
   if (columnIndex === 0) {
     const sameModuleRows = tableData.value.filter((item) => item.module === row.module)
     const firstRowIndex = tableData.value.findIndex((item) => item.module === row.module)
@@ -154,7 +178,7 @@ const objectSpanMethod = ({ row, column, rowIndex, columnIndex }: any) => {
   }
 }
 
-watch(() => props.currentRole?.id, getRolePermission, { immediate: true })
+watch(() => props.currentRole?.id, getRolePermission, {immediate: true})
 
 async function handleSave() {
   try {

@@ -23,14 +23,14 @@ class InputField(serializers.Serializer):
 
 
 class FunctionLibNodeParamsSerializer(serializers.Serializer):
-    tool_id = serializers.UUIDField(required=True, label=_('Library ID'))
+    tool_lib_id = serializers.UUIDField(required=True, label=_('Library ID'))
     input_field_list = InputField(required=True, many=True)
     is_result = serializers.BooleanField(required=False,
                                          label=_('Whether to return content'))
 
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)
-        f_lib = QuerySet(Tool).filter(id=self.data.get('tool_id')).first()
+        f_lib = QuerySet(Tool).filter(id=self.data.get('tool_lib_id')).first()
         if f_lib is None:
             raise Exception(_('The function has been deleted'))
 
@@ -44,5 +44,5 @@ class IToolLibNode(INode):
     def _run(self):
         return self.execute(**self.node_params_serializer.data, **self.flow_params_serializer.data)
 
-    def execute(self, function_lib_id, input_field_list, **kwargs) -> NodeResult:
+    def execute(self, tool_lib_id, input_field_list, **kwargs) -> NodeResult:
         pass

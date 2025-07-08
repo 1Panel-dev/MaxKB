@@ -129,10 +129,8 @@
           </el-row>
           <el-space wrap>
             <template v-for="(item, index) in uploadImageList" :key="index">
-
               <div
                 class="file file-image cursor border border-r-6"
-                v-if="item.url"
                 @mouseenter.stop="mouseenter(item)"
                 @mouseleave.stop="mouseleave()"
               >
@@ -239,6 +237,7 @@
                 :show-file-list="false"
                 :accept="getAcceptList()"
                 :on-change="(file: any, fileList: any) => uploadFile(file, fileList)"
+                v-model:file-list="fileAllList"
                 ref="upload"
               >
                 <el-tooltip
@@ -360,7 +359,7 @@ const imageExtensions = ['JPG', 'JPEG', 'PNG', 'GIF', 'BMP']
 const documentExtensions = ['PDF', 'DOCX', 'TXT', 'XLS', 'XLSX', 'MD', 'HTML', 'CSV']
 const videoExtensions: any = []
 const audioExtensions = ['MP3', 'WAV', 'OGG', 'AAC', 'M4A']
-let otherExtensions = ['PPT', 'DOC']
+let otherExtensions = ref(['PPT', 'DOC'])
 
 const getAcceptList = () => {
   const { image, document, audio, video, other } = props.applicationDetails.file_upload_setting
@@ -379,8 +378,8 @@ const getAcceptList = () => {
   }
   if (other) {
     // 其他文件类型
-    otherExtensions = props.applicationDetails.file_upload_setting.otherExtensions
-    accepts = [...accepts, ...otherExtensions]
+    otherExtensions.value = props.applicationDetails.file_upload_setting.otherExtensions
+    accepts = [...accepts, ...otherExtensions.value]
   }
 
   if (accepts.length === 0) {
@@ -508,7 +507,12 @@ const uploadImageList = computed(() => fileFilter(fileAllList.value, imageExtens
 const uploadDocumentList = computed(() => fileFilter(fileAllList.value, documentExtensions))
 const uploadVideoList = computed(() => fileFilter(fileAllList.value, videoExtensions))
 const uploadAudioList = computed(() => fileFilter(fileAllList.value, audioExtensions))
-const uploadOtherList = computed(() => fileFilter(fileAllList.value, otherExtensions))
+const uploadOtherList = computed(() =>
+  fileFilter(
+    fileAllList.value,
+    otherExtensions.value.map((item) => item.toUpperCase()),
+  ),
+)
 
 const showDelete = ref('')
 
