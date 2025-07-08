@@ -200,7 +200,7 @@ const openCreateModel = (provider?: Provider, model_type?: string) => {
 }
 
 const list_model = () => {
-  const params = active_provider.value?.provider ? { provider: active_provider.value.provider } : {}
+  const params = active_provider.value?.provider && active_provider.value?.provider !=='share' ? { provider: active_provider.value.provider } : {}
   loadSharedApi({ type: 'model', isShared: isShared.value, systemType: apiType.value })
     .getModelList({ ...model_search_form.value, ...params }, list_model_loading)
     .then((ok: any) => {
