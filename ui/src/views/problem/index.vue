@@ -43,7 +43,7 @@
             class="mt-16"
             :data="problemData"
             :pagination-config="paginationConfig"
-            :quick-create="permissionPrecise.doc_create(id)"
+            :quick-create="permissionPrecise.problem_create(id)"
             :quickCreateName="$t('views.problem.quickCreateName')"
             :quickCreatePlaceholder="$t('views.problem.quickCreateProblem')"
             :quickCreateMaxlength="256"
@@ -178,6 +178,8 @@ const apiType = computed(() => {
     return 'systemShare'
   } else if (route.path.includes('resource-management')) {
     return 'systemManage'
+  } else if (route.path.includes('share/')) {
+    return 'workspaceShare'
   } else {
     return 'workspace'
   }

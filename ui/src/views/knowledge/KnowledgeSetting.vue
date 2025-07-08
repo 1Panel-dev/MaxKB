@@ -167,12 +167,7 @@
               <el-button
                 @click="submit"
                 type="primary"
-                v-hasPermission="[
-                  RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-                  RoleConst.ADMIN,
-                  PermissionConst.KNOWLEDGE_EDIT.getWorkspacePermissionWorkspaceManageRole,
-                  PermissionConst.KNOWLEDGE_EDIT.getKnowledgeWorkspaceResourcePermission(id),
-                ]"
+                v-if=" !route.path.includes('share/') && permissionPrecise.setting(id)"
               >
                 {{ $t('common.save') }}</el-button
               >
@@ -190,6 +185,8 @@ import BaseForm from '@/views/knowledge/component/BaseForm.vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { t } from '@/locales'
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
+import permissionMap from '@/permission'
+
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 const route = useRoute()
@@ -206,6 +203,11 @@ const apiType = computed(() => {
     return 'workspace'
   }
 })
+
+const permissionPrecise = computed(() => {
+  return permissionMap['knowledge'][apiType.value]
+})
+
 const webFormRef = ref()
 const BaseFormRef = ref()
 const loading = ref(false)

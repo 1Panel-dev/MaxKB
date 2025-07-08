@@ -204,6 +204,7 @@
         />
         <div class="operate">
           <el-button
+            v-if="! route.path.includes('share/')"
             text
             class="sent-button"
             :disabled="isDisabledChart || loading"

@@ -655,6 +655,8 @@ const apiType = computed(() => {
     return 'systemShare'
   } else if (route.path.includes('resource-management')) {
     return 'systemManage'
+  } else if (route.path.includes('share/')) {
+    return 'workspaceShare'
   } else {
     return 'workspace'
   }
