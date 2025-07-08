@@ -11,21 +11,9 @@
             <div class="title flex align-center">
               <div
                 class="edit-avatar mr-12"
-                @mouseenter="showEditIcon = true"
-                @mouseleave="showEditIcon = false"
               >
                 <el-avatar shape="square" :size="32" style="background: none">
-                  <img :src="resetUrl(detail?.icon, resetUrl('./favicon.ico'))" alt="" />
-                </el-avatar>
-
-                <el-avatar
-                  v-if="showEditIcon"
-                  shape="square"
-                  class="edit-mask"
-                  :size="32"
-                  @click="openEditAvatar"
-                >
-                  <el-icon><EditPen /></el-icon>
+                  <img :src="resetUrl(detail?.icon, resetUrl('./favicon.ico'))" alt=""/>
                 </el-avatar>
               </div>
 
@@ -36,8 +24,9 @@
               <el-col :span="12" class="mt-16">
                 <div class="flex">
                   <el-text type="info">{{
-                    $t('views.applicationOverview.appInfo.publicAccessLink')
-                  }}</el-text>
+                      $t('views.applicationOverview.appInfo.publicAccessLink')
+                    }}
+                  </el-text>
                   <el-switch
                     v-model="accessToken.is_active"
                     class="ml-8"
@@ -65,7 +54,9 @@
                       text
                       style="margin-left: 1px"
                     >
-                      <el-icon><RefreshRight /></el-icon>
+                      <el-icon>
+                        <RefreshRight/>
+                      </el-icon>
                     </el-button>
                   </el-tooltip>
                 </div>
@@ -94,7 +85,9 @@
                   </el-button>
                   <!-- 访问限制 -->
                   <el-button @click="openLimitDialog" v-if="permissionPrecise.overview_access(id)">
-                    <el-icon class="mr-4"><Lock /></el-icon>
+                    <el-icon class="mr-4">
+                      <Lock/>
+                    </el-icon>
                     {{ $t('views.applicationOverview.appInfo.accessControl') }}
                   </el-button>
                   <!-- 显示设置 -->
@@ -102,7 +95,9 @@
                     @click="openDisplaySettingDialog"
                     v-if="permissionPrecise.overview_display(id)"
                   >
-                    <el-icon class="mr-4"><Setting /></el-icon>
+                    <el-icon class="mr-4">
+                      <Setting/>
+                    </el-icon>
                     {{ $t('views.applicationOverview.appInfo.displaySetting') }}
                   </el-button>
                 </div>
@@ -110,13 +105,15 @@
               <el-col :span="12" class="mt-16">
                 <div class="flex">
                   <el-text type="info"
-                    >{{ $t('views.applicationOverview.appInfo.apiAccessCredentials') }}
+                  >{{ $t('views.applicationOverview.appInfo.apiAccessCredentials') }}
                   </el-text>
                 </div>
                 <div class="mt-4 mb-16 url-height">
                   <div>
-                    <el-text>API {{ $t('common.fileUpload.document') }}：</el-text
-                    ><el-button
+                    <el-text>API {{ $t('common.fileUpload.document') }}：
+                    </el-text
+                    >
+                    <el-button
                       type="primary"
                       link
                       @click="toUrl(apiUrl)"
@@ -131,8 +128,8 @@
                     </span>
 
                     <span class="vertical-middle lighter break-all ellipsis-1">{{
-                      baseUrl + id
-                    }}</span>
+                        baseUrl + id
+                      }}</span>
                     <el-tooltip effect="dark" :content="$t('common.copy')" placement="top">
                       <el-button type="primary" text @click="copyClick(baseUrl + id)">
                         <AppIcon iconName="app-copy"></AppIcon>
@@ -145,8 +142,11 @@
                     @click="openAPIKeyDialog"
                     v-if="permissionPrecise.overview_api_key(id)"
                   >
-                    <el-icon class="mr-4"><Key /></el-icon>
-                    {{ $t('views.applicationOverview.appInfo.apiKey') }}</el-button
+                    <el-icon class="mr-4">
+                      <Key/>
+                    </el-icon>
+                    {{ $t('views.applicationOverview.appInfo.apiKey') }}
+                  </el-button
                   >
                 </div>
               </el-col>
@@ -183,7 +183,7 @@
             />
           </div>
           <div v-loading="statisticsLoading">
-            <StatisticsCharts :data="statisticsData" />
+            <StatisticsCharts :data="statisticsData"/>
           </div>
         </el-card>
       </div>
@@ -194,18 +194,18 @@
       :data="detail"
       :api-input-params="mapToUrlParams(apiInputParams)"
     />
-    <APIKeyDialog ref="APIKeyDialogRef" />
-    <EditAvatarDialog ref="EditAvatarDialogRef" @refresh="refreshIcon" />
+    <APIKeyDialog ref="APIKeyDialogRef"/>
+    <EditAvatarDialog ref="EditAvatarDialogRef" @refresh="refreshIcon"/>
 
     <!-- 社区版访问限制 -->
-    <component :is="currentLimitDialog" ref="LimitDialogRef" @refresh="refresh" />
+    <component :is="currentLimitDialog" ref="LimitDialogRef" @refresh="refresh"/>
     <!-- 显示设置 -->
-    <component :is="currentDisplaySettingDialog" ref="DisplaySettingDialogRef" @refresh="refresh" />
+    <component :is="currentDisplaySettingDialog" ref="DisplaySettingDialogRef" @refresh="refresh"/>
   </div>
 </template>
 <script setup lang="ts">
-import { ref, computed, onMounted, shallowRef, nextTick } from 'vue'
-import { useRoute } from 'vue-router'
+import {ref, computed, onMounted, shallowRef, nextTick} from 'vue'
+import {useRoute} from 'vue-router'
 import EmbedDialog from './component/EmbedDialog.vue'
 import APIKeyDialog from './component/APIKeyDialog.vue'
 import LimitDialog from './component/LimitDialog.vue'
@@ -215,15 +215,15 @@ import XPackDisplaySettingDialog from './xpack-component/XPackDisplaySettingDial
 import EditAvatarDialog from './component/EditAvatarDialog.vue'
 import StatisticsCharts from './component/StatisticsCharts.vue'
 import applicationApi from '@/api/application/application'
-import { nowDate, beforeDay } from '@/utils/time'
-import { MsgSuccess, MsgConfirm } from '@/utils/message'
-import { copyClick } from '@/utils/clipboard'
-import { isAppIcon, resetUrl } from '@/utils/common'
-import { mapToUrlParams } from '@/utils/application'
+import {nowDate, beforeDay} from '@/utils/time'
+import {MsgSuccess, MsgConfirm} from '@/utils/message'
+import {copyClick} from '@/utils/clipboard'
+import {isAppIcon, resetUrl} from '@/utils/common'
+import {mapToUrlParams} from '@/utils/application'
 import useStore from '@/stores'
-import { t } from '@/locales'
-import { EditionConst } from '@/utils/permission/data'
-import { hasPermission } from '@/utils/permission/index'
+import {t} from '@/locales'
+import {EditionConst} from '@/utils/permission/data'
+import {hasPermission} from '@/utils/permission/index'
 import permissionMap from '@/permission'
 
 const route = useRoute()
@@ -235,9 +235,9 @@ const permissionPrecise = computed(() => {
   return permissionMap['application'][apiType.value]
 })
 
-const { user, application } = useStore()
+const {user, application} = useStore()
 const {
-  params: { id },
+  params: {id},
 } = route as any
 
 const apiUrl = window.location.origin + '/doc/chat/'
@@ -308,6 +308,7 @@ function toUrl(url: string) {
 // 显示设置
 const DisplaySettingDialogRef = ref()
 const currentDisplaySettingDialog = shallowRef<any>(null)
+
 function openDisplaySettingDialog() {
   // 企业版和专业版
   if (hasPermission([EditionConst.IS_EE, EditionConst.IS_PE], 'OR')) {
@@ -330,6 +331,7 @@ function openDisplaySettingDialog() {
 // 访问限制
 const LimitDialogRef = ref()
 const currentLimitDialog = shallowRef<any>(null)
+
 function openLimitDialog() {
   // 企业版和专业版
   if (hasPermission([EditionConst.IS_EE, EditionConst.IS_PE], 'OR')) {
@@ -384,8 +386,10 @@ function refreshAccessToken() {
       const str = t('views.applicationOverview.appInfo.refreshToken.refreshSuccess')
       updateAccessToken(obj, str)
     })
-    .catch(() => {})
+    .catch(() => {
+    })
 }
+
 function changeState(bool: boolean) {
   const obj = {
     is_active: !bool,
@@ -410,9 +414,11 @@ async function updateAccessToken(obj: any, str: string) {
 function openAPIKeyDialog() {
   APIKeyDialogRef.value.open()
 }
+
 function openDialog() {
   EmbedDialogRef.value.open(accessToken.value?.access_token)
 }
+
 function getAccessToken() {
   application.asyncGetAccessToken(id, loading).then((res: any) => {
     accessToken.value = res?.data
@@ -427,20 +433,20 @@ function getDetail() {
       .map((v: any) => {
         apiInputParams.value = v.properties.api_input_field_list
           ? v.properties.api_input_field_list.map((v: any) => {
-              return {
-                name: v.variable,
-                value: v.default_value,
-              }
-            })
+            return {
+              name: v.variable,
+              value: v.default_value,
+            }
+          })
           : v.properties.input_field_list
             ? v.properties.input_field_list
-                .filter((v: any) => v.assignment_method === 'api_input')
-                .map((v: any) => {
-                  return {
-                    name: v.variable,
-                    value: v.default_value,
-                  }
-                })
+              .filter((v: any) => v.assignment_method === 'api_input')
+              .map((v: any) => {
+                return {
+                  name: v.variable,
+                  value: v.default_value,
+                }
+              })
             : []
       })
   })
@@ -463,6 +469,7 @@ onMounted(() => {
 <style lang="scss" scoped>
 .overview-card {
   position: relative;
+
   .active-button {
     position: absolute;
     right: 16px;
