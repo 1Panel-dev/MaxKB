@@ -96,7 +96,7 @@ class FileSerializer(serializers.Serializer):
             content_type = mime_types.get(file_type, 'application/octet-stream')
             headers = {
                 'Content-Type': content_type,
-                'Content-Disposition': f'attachment; filename="{file.file_name}"'
+                'Content-Disposition': f'{"inline" if file_type == "pdf" else "attachment"}; filename="{file.file_name}"'
             }
             return HttpResponse(
                 file.get_bytes(),
