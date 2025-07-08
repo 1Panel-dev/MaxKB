@@ -2,25 +2,12 @@ import { defineStore } from 'pinia'
 import applicationApi from '@/api/application/application'
 import applicationXpackApi from '@/api/application/application-xpack'
 import { type Ref } from 'vue'
-import { getBrowserLang } from '@/locales/index'
 import useUserStore from './user'
 const useApplicationStore = defineStore('application', {
   state: () => ({
     location: `${window.location.origin}${window.MaxKB.chatPrefix}/`,
   }),
   actions: {
-    async asyncGetAllApplication() {
-      return new Promise((resolve, reject) => {
-        // applicationApi
-        //   .getAllAppilcation()
-        //   .then((data) => {
-        //     resolve(data)
-        //   })
-        //   .catch((error) => {
-        //     reject(error)
-        //   })
-      })
-    },
 
     async asyncGetApplicationDetail(id: string, loading?: Ref<boolean>) {
       return new Promise((resolve, reject) => {
@@ -60,21 +47,6 @@ const useApplicationStore = defineStore('application', {
       })
     },
 
-    async asyncGetAppProfile(loading?: Ref<boolean>) {
-      return new Promise((resolve, reject) => {
-        console.log('xxxx')
-        applicationApi
-          .getAppProfile(loading)
-          .then((res: any) => {
-            sessionStorage.setItem('language', res.data?.language || getBrowserLang())
-            resolve(res)
-          })
-          .catch((error: any) => {
-            reject(error)
-          })
-      })
-    },
-
     async asyncAppAuthentication(
       token: string,
       loading?: Ref<boolean>,
@@ -107,18 +79,6 @@ const useApplicationStore = defineStore('application', {
           .catch((error) => {
             reject(error)
           })
-      })
-    },
-    async validatePassword(id: string, password: string, loading?: Ref<boolean>) {
-      return new Promise((resolve, reject) => {
-        // applicationApi
-        //   .validatePassword(id, password, loading)
-        //   .then((data) => {
-        //     resolve(data)
-        //   })
-        //   .catch((error) => {
-        //     reject(error)
-        //   })
       })
     },
   },

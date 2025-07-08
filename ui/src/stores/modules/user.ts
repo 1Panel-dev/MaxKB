@@ -99,12 +99,6 @@ const useUserStore = defineStore('user', {
     getEditionName() {
       return this.edition
     },
-    changeUserType(num: number, token?: string) {
-      this.userType = num
-      const login = useLoginStore()
-      login.userAccessToken = token || ''
-    },
-
     async profile(loading?: Ref<boolean>) {
       return UserApi.getUserProfile(loading).then((ok) => {
         this.userInfo = ok.data
