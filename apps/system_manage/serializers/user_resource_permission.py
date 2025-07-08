@@ -103,6 +103,33 @@ class UserResourcePermissionSerializer(serializers.Serializer):
                 auth_target_type=self.data.get('auth_target_type'))
         }
 
+    def is_auth(self, resource_id: str):
+        self.is_valid(raise_exception=True)
+        auth_target_type = self.data.get('auth_target_type')
+        workspace_id = self.data.get('workspace_id')
+        user_id = self.data.get('user_id')
+        workspace_manage = is_workspace_manage(user_id, workspace_id)
+        if workspace_manage:
+            return True
+        wurp = QuerySet(WorkspaceUserResourcePermission).filter(auth_target_type=auth_target_type,
+                                                                workspace_id=workspace_id, user=user_id,
+                                                                target=resource_id).first()
+        if wurp is None:
+            return False
+        workspace_user_role_mapping_model = DatabaseModelManage.get_model("workspace_user_role_mapping")
+        role_permission_mapping_model = DatabaseModelManage.get_model("role_permission_mapping_model")
+
+        if wurp.auth_type == ResourceAuthType.ROLE.value:
+            if workspace_user_role_mapping_model and role_permission_mapping_model:
+                inner = QuerySet(workspace_user_role_mapping_model).filter(workspace_id=workspace_id, user_id=user_id)
+                return QuerySet(role_permission_mapping_model).filter(role_id__in=inner,
+                                                                      permission_id=(
+                                                                              auth_target_type + ':READ')).exists()
+            else:
+                return False
+        else:
+            return wurp.permission_list.__contains__(ResourcePermission.VIEW.value)
+
     def auth_resource(self, resource_id: str):
         self.is_valid(raise_exception=True)
         auth_target_type = self.data.get('auth_target_type')
