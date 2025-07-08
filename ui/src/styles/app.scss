@@ -218,6 +218,9 @@ h5 {
 .p-8-12 {
   padding: calc(var(--app-base-px)) calc(var(--app-base-px) + 4px);
 }
+.p-8-16 {
+  padding: calc(var(--app-base-px)) calc(var(--app-base-px) * 2);
+}
 .p-12-16 {
   padding: calc(var(--app-base-px) + 4px) calc(var(--app-base-px) * 2);
 }

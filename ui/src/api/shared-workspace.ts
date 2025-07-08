@@ -33,6 +33,76 @@ const getKnowledgeListPage: (
   )
 }
 
+/**
+ * 知识库详情
+ * @param 参数 knowledge_id
+ */
+const getKnowledgeDetail: (knowledge_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  knowledge_id,
+  loading,
+) => {
+  return get(`${prefix}/${prefix_workspace.value}/knowledge/${knowledge_id}`, undefined, loading)
+}
+
+/**
+ * 文档分页列表
+ * @param 参数  knowledge_id,
+ * param {
+      "name": "string",
+      folder_id: "string",
+  }
+ */
+
+const getDocumentPage: (
+  knowledge_id: string,
+  page: pageRequest,
+  param: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (knowledge_id, page, param, loading) => {
+  return get(
+    `${prefix}/${prefix_workspace.value}/knowledge/${knowledge_id}/document/${page.current_page}/${page.page_size}`,
+    param,
+    loading,
+  )
+}
+
+/**
+ * 文档详情
+ * @param 参数 knowledge_id
+ */
+const getDocumentDetail: (
+  knowledge_id: string,
+  document_id: string,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (knowledge_id, document_id, loading) => {
+  return get(`${prefix}/${prefix_workspace.value}/knowledge/${knowledge_id}/document/${document_id}`,
+    {},
+    loading,)
+}
+
+/**
+ * 段落分页列表
+ * @param 参数 knowledge_id document_id
+ * param {
+          "title": "string",
+          "content": "string",
+        }
+ */
+const getParagraphPage: (
+  knowledge_id: string,
+  document_id: string,
+  page: pageRequest,
+  param: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (knowledge_id, document_id, page, param, loading) => {
+  return get(
+    `${prefix}/${prefix_workspace.value}/knowledge/${knowledge_id}/document/${document_id}/paragraph/${page.current_page}/${page.page_size}`,
+    param,
+    loading,
+  )
+}
+
+
 const getModelList: (
   param: any,
   loading?: Ref<boolean>,
@@ -57,6 +127,10 @@ const getToolListPage: (
 export default {
   getKnowledgeList,
   getKnowledgeListPage,
+  getKnowledgeDetail,
+  getDocumentPage,
+  getDocumentDetail,
+  getParagraphPage,
   getModelList,
   getToolList,
   getToolListPage

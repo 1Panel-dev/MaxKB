@@ -8,9 +8,9 @@
     </el-breadcrumb>
     <el-card style="--el-card-padding: 0">
       <div class="flex">
-        <div class="user-left border-r p-16">
-          <div class="p-8 pb-0 mb-12">
-            <div class="flex-between mb-16">
+        <div class="user-left border-r">
+          <div class="p-24 pb-0">
+            <div class="flex-between mb-12">
               <h4 class="medium">{{ $t('views.chatUser.group.title') }}</h4>
               <el-tooltip
                 effect="dark"
@@ -51,81 +51,83 @@
 
           <div class="list-height-left">
             <el-scrollbar v-loading="loading">
-              <common-list
-                :data="filterList"
-                @click="clickUserGroup"
-                :default-active="current?.id"
-                @mouseenter="mouseenter"
-                @mouseleave="mouseId = ''"
-              >
-                <template #default="{ row }">
-                  <div class="flex-between">
-                    <span class="ellipsis">{{ row.name }}</span>
-                    <div @click.stop v-show="mouseId === row.id">
-                      <el-dropdown :teleported="false">
-                        <el-button text>
-                          <el-icon class="color-secondary">
-                            <MoreFilled />
-                          </el-icon>
-                        </el-button>
-                        <template #dropdown>
-                          <el-dropdown-menu style="min-width: 80px">
-                            <el-dropdown-item
-                              @click.stop="createOrUpdate(row)"
-                              class="p-8"
-                              v-if="
-                                hasPermission(
-                                  new ComplexPermission(
-                                    [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
-                                    [
-                                      PermissionConst.WORKSPACE_USER_GROUP_EDIT,
-                                      PermissionConst.USER_GROUP_EDIT,
-                                    ],
-                                    [],
+              <div class="p-8-16">
+                <common-list
+                  :data="filterList"
+                  @click="clickUserGroup"
+                  :default-active="current?.id"
+                  @mouseenter="mouseenter"
+                  @mouseleave="mouseId = ''"
+                >
+                  <template #default="{ row }">
+                    <div class="flex-between">
+                      <span class="ellipsis">{{ row.name }}</span>
+                      <div @click.stop v-show="mouseId === row.id">
+                        <el-dropdown :teleported="false" trigger="click">
+                          <el-button text>
+                            <el-icon class="color-secondary">
+                              <MoreFilled />
+                            </el-icon>
+                          </el-button>
+                          <template #dropdown>
+                            <el-dropdown-menu style="min-width: 80px">
+                              <el-dropdown-item
+                                @click.stop="createOrUpdate(row)"
+                                class="p-8"
+                                v-if="
+                                  hasPermission(
+                                    new ComplexPermission(
+                                      [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+                                      [
+                                        PermissionConst.WORKSPACE_USER_GROUP_EDIT,
+                                        PermissionConst.USER_GROUP_EDIT,
+                                      ],
+                                      [],
+                                      'OR',
+                                    ),
                                     'OR',
-                                  ),
-                                  'OR',
-                                )
-                              "
-                            >
-                              <el-icon>
-                                <EditPen />
-                              </el-icon>
-                              {{ $t('common.rename') }}
-                            </el-dropdown-item>
-                            <el-dropdown-item
-                              @click.stop="deleteGroup(row)"
-                              class="border-t p-8"
-                              v-if="
-                                hasPermission(
-                                  new ComplexPermission(
-                                    [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
-                                    [
-                                      PermissionConst.WORKSPACE_USER_GROUP_DELETE,
-                                      PermissionConst.USER_GROUP_DELETE,
-                                    ],
-                                    [],
+                                  )
+                                "
+                              >
+                                <el-icon>
+                                  <EditPen />
+                                </el-icon>
+                                {{ $t('common.rename') }}
+                              </el-dropdown-item>
+                              <el-dropdown-item
+                                @click.stop="deleteGroup(row)"
+                                class="border-t p-8"
+                                v-if="
+                                  hasPermission(
+                                    new ComplexPermission(
+                                      [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+                                      [
+                                        PermissionConst.WORKSPACE_USER_GROUP_DELETE,
+                                        PermissionConst.USER_GROUP_DELETE,
+                                      ],
+                                      [],
+                                      'OR',
+                                    ),
                                     'OR',
-                                  ),
-                                  'OR',
-                                )
-                              "
-                            >
-                              <el-icon>
-                                <Delete />
-                              </el-icon>
-                              {{ $t('common.delete') }}
-                            </el-dropdown-item>
-                          </el-dropdown-menu>
-                        </template>
-                      </el-dropdown>
+                                  )
+                                "
+                              >
+                                <el-icon>
+                                  <Delete />
+                                </el-icon>
+                                {{ $t('common.delete') }}
+                              </el-dropdown-item>
+                            </el-dropdown-menu>
+                          </template>
+                        </el-dropdown>
+                      </div>
                     </div>
-                  </div>
-                </template>
-                <template #empty>
-                  <span></span>
-                </template>
-              </common-list>
+                  </template>
+                  <template #empty>
+                    <span></span>
+                  </template>
+                </common-list>
+              </div>
             </el-scrollbar>
           </div>
         </div>

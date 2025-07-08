@@ -3,8 +3,8 @@
     <h2 class="mb-16">{{ $t('views.workspace.title') }}</h2>
     <el-card style="--el-card-padding: 0">
       <div class="flex main-calc-height">
-        <div class="workspace-left border-r p-16">
-          <div class="p-8 pb-0 mt-8 mb-12">
+        <div class="workspace-left border-r">
+          <div class="p-24 pb-0">
             <div class="flex-between mb-12">
               <h4 class="medium">{{ $t('views.workspace.list') }}</h4>
               <el-tooltip
@@ -31,62 +31,64 @@
           </div>
           <div class="list-height-left">
             <el-scrollbar v-loading="loading">
-              <common-list
-                :data="filterList"
-                @click="clickWorkspace"
-                :default-active="currentWorkspace?.id"
-                @mouseenter="mouseenter"
-                @mouseleave="mouseId = ''"
-              >
-                <template #default="{ row }">
-                  <div class="flex-between">
-                    <span class="ellipsis">{{ row.name }}</span>
-                    <div @click.stop v-show="mouseId === row.id">
-                      <el-dropdown :teleported="false">
-                        <el-button text>
-                          <el-icon class="color-secondary">
-                            <MoreFilled />
-                          </el-icon>
-                        </el-button>
-                        <template #dropdown>
-                          <el-dropdown-menu style="min-width: 80px">
-                            <el-dropdown-item
-                              @click.stop="createOrUpdateWorkspace(row)"
-                              class="p-8"
-                              v-if="
-                              hasPermission(
-                                [RoleConst.ADMIN, PermissionConst.WORKSPACE_EDIT],
-                                'OR',
-                              )
-                              "
-                            >
-                              <el-icon><EditPen /></el-icon>
-                              {{ $t('common.rename') }}
-                            </el-dropdown-item>
-                            <el-dropdown-item
-                              @click.stop="deleteWorkspace(row)"
-                              class="border-t p-8"
-                              v-if="
-                              row.id !== 'default' &&
-                              hasPermission(
-                                [RoleConst.ADMIN, PermissionConst.WORKSPACE_DELETE],
-                                'OR',
-                              )
-                              "
-                            >
-                              <el-icon><Delete /></el-icon>
-                              {{ $t('common.delete') }}
-                            </el-dropdown-item>
-                          </el-dropdown-menu>
-                        </template>
-                      </el-dropdown>
+              <div class="p-8-16">
+                <common-list
+                  :data="filterList"
+                  @click="clickWorkspace"
+                  :default-active="currentWorkspace?.id"
+                  @mouseenter="mouseenter"
+                  @mouseleave="mouseId = ''"
+                >
+                  <template #default="{ row }">
+                    <div class="flex-between">
+                      <span class="ellipsis">{{ row.name }}</span>
+                      <div @click.stop v-show="mouseId === row.id">
+                        <el-dropdown :teleported="false" trigger="click">
+                          <el-button text>
+                            <el-icon class="color-secondary">
+                              <MoreFilled />
+                            </el-icon>
+                          </el-button>
+                          <template #dropdown>
+                            <el-dropdown-menu style="min-width: 80px">
+                              <el-dropdown-item
+                                @click.stop="createOrUpdateWorkspace(row)"
+                                class="p-8"
+                                v-if="
+                                  hasPermission(
+                                    [RoleConst.ADMIN, PermissionConst.WORKSPACE_EDIT],
+                                    'OR',
+                                  )
+                                "
+                              >
+                                <el-icon><EditPen /></el-icon>
+                                {{ $t('common.rename') }}
+                              </el-dropdown-item>
+                              <el-dropdown-item
+                                @click.stop="deleteWorkspace(row)"
+                                class="border-t p-8"
+                                v-if="
+                                  row.id !== 'default' &&
+                                  hasPermission(
+                                    [RoleConst.ADMIN, PermissionConst.WORKSPACE_DELETE],
+                                    'OR',
+                                  )
+                                "
+                              >
+                                <el-icon><Delete /></el-icon>
+                                {{ $t('common.delete') }}
+                              </el-dropdown-item>
+                            </el-dropdown-menu>
+                          </template>
+                        </el-dropdown>
+                      </div>
                     </div>
-                  </div>
-                </template>
-                <template #empty>
-                  <span></span>
-                </template>
-              </common-list>
+                  </template>
+                  <template #empty>
+                    <span></span>
+                  </template>
+                </common-list>
+              </div>
             </el-scrollbar>
           </div>
         </div>
@@ -119,7 +121,7 @@ import type { WorkspaceItem } from '@/api/type/workspace'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
-import {loadPermissionApi} from "@/utils/dynamics-api/permission-api.ts";
+import { loadPermissionApi } from '@/utils/dynamics-api/permission-api.ts'
 
 const filterText = ref('')
 const loading = ref(false)
@@ -148,7 +150,7 @@ async function refresh(workspace?: WorkspaceItem) {
   if (workspace) {
     currentWorkspace.value = workspace
   } else {
-    currentWorkspace.value = list.value.find(item => item.id === currentWorkspace.value?.id)
+    currentWorkspace.value = list.value.find((item) => item.id === currentWorkspace.value?.id)
   }
 }
 
@@ -194,12 +196,14 @@ async function deleteWorkspace(item: WorkspaceItem) {
         confirmButtonClass: 'danger',
       },
     ).then(() => {
-      loadPermissionApi('workspace').deleteWorkspace(item.id as string, loading).then(async () => {
-        MsgSuccess(t('common.deleteSuccess'))
-        await getWorkspace()
-        currentWorkspace.value =
-          item.id === currentWorkspace.value?.id ? list.value[0] : currentWorkspace.value
-      })
+      loadPermissionApi('workspace')
+        .deleteWorkspace(item.id as string, loading)
+        .then(async () => {
+          MsgSuccess(t('common.deleteSuccess'))
+          await getWorkspace()
+          currentWorkspace.value =
+            item.id === currentWorkspace.value?.id ? list.value[0] : currentWorkspace.value
+        })
     })
   } else {
     MsgConfirm(

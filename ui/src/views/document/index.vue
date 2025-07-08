@@ -1066,7 +1066,7 @@ function getList(bool?: boolean) {
 }
 
 function getDetail() {
-  loadSharedApi({ type: 'knowledge', systemType: apiType.value })
+  loadSharedApi({ type: 'knowledge', isShared: isShared.value, systemType: apiType.value })
     .getKnowledgeDetail(id, loading)
     .then((res: any) => {
       knowledgeDetail.value = res.data

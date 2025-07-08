@@ -23,8 +23,8 @@
 
     <el-card style="--el-card-padding: 0">
       <div class="flex main-calc-height">
-        <div class="resource-authorization__left border-r p-16">
-          <div class="p-8">
+        <div class="resource-authorization__left border-r">
+          <div class="p-24 pb-0">
             <h4 class="mb-12">{{ $t('views.resourceAuthorization.member') }}</h4>
             <el-input
               v-model="filterText"
@@ -35,22 +35,23 @@
           </div>
           <div class="list-height-left">
             <el-scrollbar>
-              <common-list
-                :data="filterMember"
-                class="mt-8"
-                v-loading="loading"
-                @click="clickMemberHandle"
-                :default-active="currentUser"
-              >
-                <template #default="{ row }">
-                  <div class="flex-between">
-                    <div class="flex">
-                      <span class="mr-8">{{ row.nick_name }}</span>
-                      <TagGroup :tags="row.roles" />
+              <div class="p-8-16">
+                <common-list
+                  :data="filterMember"
+                  v-loading="loading"
+                  @click="clickMemberHandle"
+                  :default-active="currentUser"
+                >
+                  <template #default="{ row }">
+                    <div class="flex-between">
+                      <div class="flex">
+                        <span class="mr-8">{{ row.nick_name }}</span>
+                        <TagGroup :tags="row.roles" />
+                      </div>
                     </div>
-                  </div>
-                </template>
-              </common-list>
+                  </template>
+                </common-list>
+              </div>
             </el-scrollbar>
           </div>
         </div>

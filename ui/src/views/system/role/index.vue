@@ -26,7 +26,7 @@
                   @mouseleave="mouseId = ''"
                 >
                   <template #default="{ row }">
-                      <span>{{ row.role_name }}</span>
+                    <span>{{ row.role_name }}</span>
                   </template>
                   <template #empty>
                     <span></span>
@@ -49,7 +49,9 @@
                           [RoleConst.ADMIN],
                           [PermissionConst.ROLE_CREATE],
                           [],
-                          'OR',)"
+                          'OR',
+                        )
+                      "
                     >
                       <el-icon :size="18"><Plus /></el-icon>
                     </el-button>
@@ -71,7 +73,7 @@
                         >
                       </span>
                       <div @click.stop v-show="mouseId === row.id">
-                        <el-dropdown :teleported="false">
+                        <el-dropdown :teleported="false" trigger="click">
                           <el-button text>
                             <el-icon class="color-secondary">
                               <MoreFilled />
@@ -79,26 +81,38 @@
                           </el-button>
                           <template #dropdown>
                             <el-dropdown-menu style="min-width: 80px">
-                              <el-dropdown-item @click.stop="createOrUpdateRole(row)" class="p-8"
-                                v-if="hasPermission(
-                                  new ComplexPermission(
-                                    [RoleConst.ADMIN],
-                                    [PermissionConst.ROLE_EDIT],
-                                    [],'OR'
-                                  ),'OR'
-                                  )"
+                              <el-dropdown-item
+                                @click.stop="createOrUpdateRole(row)"
+                                class="p-8"
+                                v-if="
+                                  hasPermission(
+                                    new ComplexPermission(
+                                      [RoleConst.ADMIN],
+                                      [PermissionConst.ROLE_EDIT],
+                                      [],
+                                      'OR',
+                                    ),
+                                    'OR',
+                                  )
+                                "
                               >
                                 <el-icon><EditPen /></el-icon>
                                 {{ $t('common.rename') }}
                               </el-dropdown-item>
-                              <el-dropdown-item @click.stop="deleteRole(row)" class="border-t p-8"
-                                v-if="hasPermission(
-                                  new ComplexPermission(
-                                    [RoleConst.ADMIN],
-                                    [PermissionConst.ROLE_DELETE],
-                                    [],'OR'
-                                  ),'OR'
-                                  )"
+                              <el-dropdown-item
+                                @click.stop="deleteRole(row)"
+                                class="border-t p-8"
+                                v-if="
+                                  hasPermission(
+                                    new ComplexPermission(
+                                      [RoleConst.ADMIN],
+                                      [PermissionConst.ROLE_DELETE],
+                                      [],
+                                      'OR',
+                                    ),
+                                    'OR',
+                                  )
+                                "
                               >
                                 <el-icon><Delete /></el-icon>
                                 {{ $t('common.delete') }}
@@ -202,7 +216,7 @@ async function refresh(role?: RoleItem) {
   if (role) {
     currentRole.value = role
   } else {
-    currentRole.value = customRoleList.value.find(item => item.id === currentRole.value?.id)
+    currentRole.value = customRoleList.value.find((item) => item.id === currentRole.value?.id)
   }
 }
 
@@ -238,12 +252,14 @@ function deleteRole(item: RoleItem) {
     },
   )
     .then(() => {
-      loadPermissionApi('role').deleteRole(item.id, loading).then(async () => {
-        MsgSuccess(t('common.deleteSuccess'))
-        await getRole()
-        currentRole.value =
-          item.id === currentRole.value?.id ? internalRoleList.value[0] : currentRole.value
-      })
+      loadPermissionApi('role')
+        .deleteRole(item.id, loading)
+        .then(async () => {
+          MsgSuccess(t('common.deleteSuccess'))
+          await getRole()
+          currentRole.value =
+            item.id === currentRole.value?.id ? internalRoleList.value[0] : currentRole.value
+        })
     })
     .catch(() => {})
 }
@@ -285,4 +301,3 @@ function mouseenter(row: any) {
   }
 }
 </style>
-

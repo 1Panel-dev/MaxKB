@@ -275,7 +275,7 @@ function addParagraph() {
 }
 
 function getDetail() {
-  loadSharedApi({ type: 'document', systemType: apiType.value })
+  loadSharedApi({ type: 'document', isShared: shareDisabled.value, systemType: apiType.value })
     .getDocumentDetail(id, documentId, loading)
     .then((res: any) => {
       documentDetail.value = res.data
@@ -283,7 +283,7 @@ function getDetail() {
 }
 
 function getParagraphList() {
-  loadSharedApi({ type: 'paragraph', systemType: apiType.value })
+  loadSharedApi({ type: 'paragraph', isShared: shareDisabled.value, systemType: apiType.value })
     .getParagraphPage(
       id,
       documentId,

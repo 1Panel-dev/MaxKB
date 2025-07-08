@@ -35,7 +35,8 @@ const route = useRoute()
 
 const {
   meta: { activeMenu },
-  params: { id },
+  params: { id, folderId },
+  query: { isShared },
 } = route as any
 
 const apiType = computed(() => {
@@ -46,6 +47,10 @@ const apiType = computed(() => {
   } else {
     return 'workspace'
   }
+})
+
+const shareDisabled = computed(() => {
+  return folderId === 'share' || isShared === 'true'
 })
 
 onBeforeRouteLeave((to, from) => {
@@ -75,7 +80,7 @@ const toBackPath = computed(() => {
 
 function getKnowledgeDetail() {
   loading.value = true
-  loadSharedApi({ type: 'knowledge', systemType: apiType.value })
+  loadSharedApi({ type: 'knowledge', isShared: shareDisabled.value, systemType: apiType.value })
     .getKnowledgeDetail(id)
     .then((res: any) => {
       current.value = res.data
