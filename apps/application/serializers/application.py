@@ -572,8 +572,8 @@ class PlayDemoTextRequest(serializers.Serializer):
 
 
 async def get_mcp_tools(servers):
-    async with MultiServerMCPClient(servers) as client:
-        return client.get_tools()
+    client = MultiServerMCPClient(servers)
+    return await client.get_tools()
 
 
 class McpServersSerializer(serializers.Serializer):

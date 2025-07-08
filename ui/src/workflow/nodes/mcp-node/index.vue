@@ -260,7 +260,7 @@ function getTools() {
     MsgError(t('views.applicationWorkflow.nodes.mcpNode.mcpServerTip'))
     return
   }
-  applicationApi.getMcpTools(id, loading).then((res: any) => {
+  applicationApi.getMcpTools(id, form_data.value.mcp_servers, loading).then((res: any) => {
     form_data.value.mcp_tools = res.data
     MsgSuccess(t('views.applicationWorkflow.nodes.mcpNode.getToolsSuccess'))
     // 修改了json，刷新mcp_server
