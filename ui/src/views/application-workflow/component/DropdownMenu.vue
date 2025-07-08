@@ -147,6 +147,7 @@ const filter_menu_nodes = computed(() => {
   }, [])
 })
 function clickNodes(item: any, data?: any, type?: string) {
+  console.log('clickNodes', item, data, type)
   if (data) {
     item['properties']['stepName'] = data.name
     if (type == 'tool') {

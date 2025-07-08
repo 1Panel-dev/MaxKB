@@ -18,7 +18,7 @@
       :default-expanded-keys="['default']"
       :canOperation="false"
       class="move-to-dialog-tree"
-      @handleNodeClick="folderClickHandel"
+      @handleNodeClick="folderClickHandle"
     />
     <template #footer>
       <span class="dialog-footer">
@@ -77,7 +77,7 @@ function getFolder() {
   })
 }
 
-function folderClickHandel(item: any) {
+function folderClickHandle(item: any) {
   selectForderId.value = item.id
 }
 

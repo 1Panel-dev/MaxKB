@@ -3,7 +3,7 @@
     class="chat-embed layout-bg chat-background"
     :class="{ 'chat-embed--popup': isPopup }"
     v-loading="loading"
-        :style="{
+    :style="{
       '--el-color-primary': applicationDetail?.custom_theme?.theme_color,
       '--el-color-primary-light-9': hexToRgba(applicationDetail?.custom_theme?.theme_color, 0.1),
       backgroundImage: `url(${applicationDetail?.chat_background})`,
@@ -13,7 +13,7 @@
       <div class="flex align-center">
         <!-- TODO icon更换 -->
         <AppIcon
-          iconName="app-history-outlined"
+          iconName="app-mobile-open-history"
           style="font-size: 20px"
           class="ml-16 cursor"
           :style="{
@@ -60,11 +60,17 @@
         </AiChat>
       </div>
 
-     <ChatHistoryDrawer v-model:show="show" :application-detail="applicationDetail" :chat-log-data="chatLogData"
-        :left-loading="left_loading" :currentChatId="currentChatId" @new-chat="newChat"
-        @clickLog="clickListHandle" @delete-log="deleteLog" />
+      <ChatHistoryDrawer
+        v-model:show="show"
+        :application-detail="applicationDetail"
+        :chat-log-data="chatLogData"
+        :left-loading="left_loading"
+        :currentChatId="currentChatId"
+        @new-chat="newChat"
+        @clickLog="clickListHandle"
+        @delete-log="deleteLog"
+      />
     </div>
-
   </div>
 </template>
 <script setup lang="ts">
@@ -106,7 +112,6 @@ const paginationConfig = reactive({
 
 const currentRecordList = ref<any>([])
 const currentChatId = ref('new') // 当前历史记录Id 默认为'new'
-
 
 const customStyle = computed(() => {
   return {
@@ -251,7 +256,7 @@ onMounted(() => {
     z-index: 11;
     font-size: 1rem;
   }
- &.chat-embed--popup {
+  &.chat-embed--popup {
     .chat-popover-button {
       right: 85px;
     }

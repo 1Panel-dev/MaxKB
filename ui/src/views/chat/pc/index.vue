@@ -110,9 +110,7 @@
           </el-menu-item>
           <el-sub-menu v-show="isPcCollapse" index="2">
             <template #title>
-              <el-icon>
-                <location />
-              </el-icon>
+              <AppIcon iconName="app-history-outlined" />
             </template>
             <el-menu-item-group v-loading="left_loading">
               <template #title
@@ -228,7 +226,7 @@
       >
         <el-splitter>
           <el-splitter-panel>
-            <div class="mb-24 p-16-24 flex-between">
+            <div class="p-16-24 flex-between">
               <h4 class="ellipsis-1" style="width: 66%">
                 {{ currentChatName }}
               </h4>
@@ -745,7 +743,7 @@ function closeExecutionDetail() {
     box-sizing: border-box;
 
     .right-height {
-      height: calc(100vh - 85px);
+      height: calc(100vh - 60px);
     }
 
     .el-splitter-bar__collapse-icon,

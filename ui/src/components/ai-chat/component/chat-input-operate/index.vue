@@ -129,6 +129,7 @@
           </el-row>
           <el-space wrap>
             <template v-for="(item, index) in uploadImageList" :key="index">
+
               <div
                 class="file file-image cursor border border-r-6"
                 v-if="item.url"
@@ -420,6 +421,7 @@ const uploadFile = async (file: any, fileList: any) => {
     return
   }
   fileAllList.value = fileList
+  console.log(fileAllList.value)
 
   if (!chatId_context.value) {
     const res = await props.openChatId()

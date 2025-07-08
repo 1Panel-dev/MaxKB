@@ -11,9 +11,8 @@
   >
     <div class="chat-embed__header" :style="(user.isEE() || user.isPE()) && customStyle">
       <div class="flex align-center">
-        <!-- TODO icon更换 -->
         <AppIcon
-          iconName="app-history-outlined"
+          iconName="app-mobile-open-history"
           style="font-size: 20px"
           class="ml-16 cursor"
           :style="{
@@ -60,11 +59,17 @@
         </AiChat>
       </div>
 
-     <ChatHistoryDrawer v-model:show="show" :application-detail="applicationDetail" :chat-log-data="chatLogData"
-        :left-loading="left_loading" :currentChatId="currentChatId" @new-chat="newChat"
-        @clickLog="clickListHandle" @delete-log="deleteLog" />
+      <ChatHistoryDrawer
+        v-model:show="show"
+        :application-detail="applicationDetail"
+        :chat-log-data="chatLogData"
+        :left-loading="left_loading"
+        :currentChatId="currentChatId"
+        @new-chat="newChat"
+        @clickLog="clickListHandle"
+        @delete-log="deleteLog"
+      />
     </div>
-
   </div>
 </template>
 <script setup lang="ts">
@@ -101,7 +106,6 @@ const paginationConfig = reactive({
 
 const currentRecordList = ref<any>([])
 const currentChatId = ref('new') // 当前历史记录Id 默认为'new'
-
 
 const customStyle = computed(() => {
   return {

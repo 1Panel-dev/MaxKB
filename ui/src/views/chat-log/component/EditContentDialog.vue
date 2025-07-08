@@ -54,7 +54,7 @@
       :apiType="apiType"
       @changeKnowledge="changeKnowledge"
       @changeDocument="changeDocument"
-      :isApplicaton="true"
+      :isApplication="true"
     />
     <template #footer>
       <span class="dialog-footer">

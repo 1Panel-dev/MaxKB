@@ -65,7 +65,7 @@ const props = defineProps<{
     default: () => {}
   }
   apiType: 'systemShare' | 'workspace' | 'systemManage'
-  isApplicaton?: boolean
+  isApplication?: boolean
 }>()
 
 const { user } = useStore()
@@ -124,7 +124,7 @@ function getDocument(id: string) {
     .getDocumentList(id, optionLoading)
     .then((res: any) => {
       documentList.value = res.data
-      if (props.isApplicaton) {
+      if (props.isApplication) {
         if (localStorage.getItem(id + 'chat_document_id')) {
           form.value.document_id = localStorage.getItem(id + 'chat_document_id') as string
         }
