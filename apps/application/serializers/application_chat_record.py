@@ -155,21 +155,18 @@ class ApplicationChatRecordQuerySerializers(serializers.Serializer):
             'padding_problem_text': chat_record.details.get('problem_padding').get(
                 'padding_problem_text') if 'problem_padding' in chat_record.details else None,
             **(show_source_dict if show_source else {}),
-            **(show_exec_dict if show_exec else {})
+            **(show_exec_dict if show_exec else show_exec_dict)
         }
 
-    def page(self, current_page: int, page_size: int, with_valid=True):
+    def page(self, current_page: int, page_size: int, with_valid=True, show_source=None, show_exec=None):
         if with_valid:
             self.is_valid(raise_exception=True)
         order_by = '-create_time' if self.data.get('order_asc') is None or self.data.get(
             'order_asc') else 'create_time'
-        application_access_token = QuerySet(ApplicationAccessToken).filter(
-            application_id=self.data.get('application_id')).first()
-        show_source = False
-        show_exec = False
-        if application_access_token is not None:
-            show_exec = application_access_token.show_exec
-            show_source = application_access_token.show_source
+        if show_source is None:
+            show_source = True
+        if show_exec is None:
+            show_exec = True
         page = page_search(current_page, page_size,
                            QuerySet(ChatRecord).filter(chat_id=self.data.get('chat_id')).order_by(order_by),
                            post_records_handler=lambda chat_record: self.reset_chat_record(chat_record, show_source,
