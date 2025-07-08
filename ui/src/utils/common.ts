@@ -143,6 +143,12 @@ export function getNormalizedUrl(url: string) {
   }
   return url
 }
+export function getFileUrl(fileId?: string) {
+  if (fileId) {
+    return `${window.MaxKB.prefix}/oss/file/${fileId}`
+  }
+  return ''
+}
 export const resetUrl = (url: string, defaultUrl?: string) => {
   if (url && url.startsWith('./')) {
     return `${window.MaxKB.prefix}/${url.substring(2)}`

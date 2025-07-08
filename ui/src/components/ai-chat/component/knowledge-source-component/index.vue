@@ -20,14 +20,14 @@
                   <div
                     class="ml-4 ellipsis-1"
                     :title="item?.document_name"
-                    v-if="!item.source_url"
+                    v-if="showPDF(item)"
                     @click="openParagraphDocument(item)"
                   >
                     <p>{{ item && item?.document_name }}</p>
                   </div>
                   <div class="ml-8" v-else>
                     <a
-                      :href="getNormalizedUrl(item?.source_url)"
+                      :href="getFileUrl(item?.meta?.source_file_id)"
                       target="_blank"
                       class="ellipsis-1"
                       :title="item?.document_name?.trim()"
@@ -89,7 +89,7 @@ import ExecutionDetailContent from './ExecutionDetailContent.vue'
 import ParagraphDocumentContent from './ParagraphDocumentContent.vue'
 import ParagraphSourceContent from './ParagraphSourceContent.vue'
 import { arraySort } from '@/utils/array'
-import { getImgUrl, getNormalizedUrl } from '@/utils/common'
+import { getImgUrl, getFileUrl } from '@/utils/common'
 import { t } from '@/locales'
 const props = defineProps({
   data: {
@@ -107,7 +107,9 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['openExecutionDetail', 'openParagraph', 'openParagraphDocument'])
-
+const showPDF = (item: any) => {
+  return item.document_name.toLocaleLowerCase().endsWith('.pdf') && item.meta?.source_file_id
+}
 const dialogVisible = ref(false)
 const dialogTitle = ref('')
 const currentComponent = shallowRef<any>(null)
