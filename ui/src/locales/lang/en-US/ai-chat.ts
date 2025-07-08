@@ -4,6 +4,7 @@ export default {
   confirmModification: 'Confirm modification',
   noHistory: 'No Chat History',
   createChat: 'New Chat',
+  clearChat: 'Clear Chat',
   history: 'Chat History',
   only20history: 'Showing only the last 20 chats',
   question_count: 'Questions',
@@ -15,7 +16,7 @@ export default {
   passwordValidator: {
     title: 'Enter Password to Access',
     errorMessage1: 'Password cannot be empty',
-    errorMessage2: 'Incorrect password'
+    errorMessage2: 'Incorrect password',
   },
   operation: {
     play: 'Play',
@@ -32,8 +33,10 @@ export default {
   tip: {
     error500Message: 'Sorry, the service is currently under maintenance. Please try again later!',
     errorIdentifyMessage: 'Unable to verify user identity',
-    errorLimitMessage: 'Sorry, you have reached the maximum number of questions. Please try again tomorrow!',
-    answerMessage: 'Sorry, no relevant content found. Please rephrase your question or provide more details.',
+    errorLimitMessage:
+      'Sorry, you have reached the maximum number of questions. Please try again tomorrow!',
+    answerMessage:
+      'Sorry, no relevant content found. Please rephrase your question or provide more details.',
     stopAnswer: 'Response Stopped',
     answerLoading: 'Generating Response...',
     recorderTip: `<p>This feature requires microphone access. Browsers block recording on insecure pages. Solutions:<br/>
@@ -46,12 +49,12 @@ export default {
     requiredMessage: 'Please fill in all required fields',
     inputParamMessage1: 'Please specify a parameter in the URL',
     inputParamMessage2: 'value',
-    prologueMessage: 'Sorry, the service is currently under maintenance. Please try again later!'
+    prologueMessage: 'Sorry, the service is currently under maintenance. Please try again later!',
   },
   inputPlaceholder: {
     speaking: 'Speaking...',
     recorderLoading: 'Transcribing...',
-    default: 'Type your question'
+    default: 'Type your question',
   },
   uploadFile: {
     label: 'Upload File',
@@ -63,7 +66,7 @@ export default {
     limitMessage2: 'files',
     sizeLimit: 'Each file must not exceed',
     imageMessage: 'Please process the image content',
-    errorMessage: 'Upload Failed'
+    errorMessage: 'Upload Failed',
   },
   executionDetails: {
     title: 'Execution Details',
@@ -82,18 +85,18 @@ export default {
     rerankerResult: 'Re-ranking Results',
     paragraph: 'Segment',
     noSubmit: 'No submission from user',
-    errMessage: 'Error Log'
+    errMessage: 'Error Log',
   },
   KnowledgeSource: {
     title: 'Knowledge Source',
     referenceParagraph: 'Cited Segment',
     consume: 'Tokens',
-    consumeTime: 'Runtime'
+    consumeTime: 'Runtime',
   },
   paragraphSource: {
     title: 'Knowledge Quote',
     question: 'User Question',
-    optimizationQuestion: 'Optimized Question'
+    optimizationQuestion: 'Optimized Question',
   },
   editTitle: 'Edit Title',
 }

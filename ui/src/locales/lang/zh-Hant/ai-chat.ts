@@ -4,6 +4,7 @@ export default {
   confirmModification: '確認修改',
   noHistory: '暫無歷史記錄',
   createChat: '新建對話',
+  clearChat: '清空對話',
   history: '歷史記錄',
   only20history: '僅顯示最近 20 條對話',
   question_count: '條提問',
@@ -15,7 +16,7 @@ export default {
   passwordValidator: {
     title: '請輸入密碼打開連結',
     errorMessage1: '密碼不能為空',
-    errorMessage2: '密碼錯誤'
+    errorMessage2: '密碼錯誤',
   },
   operation: {
     play: '點擊播放',
@@ -46,12 +47,12 @@ export default {
     requiredMessage: '請填寫所有必填欄位',
     inputParamMessage1: '請在 URL 中填寫參數',
     inputParamMessage2: '的值',
-    prologueMessage: '抱歉，當前正在維護，無法提供服務，請稍後再試！'
+    prologueMessage: '抱歉，當前正在維護，無法提供服務，請稍後再試！',
   },
   inputPlaceholder: {
     speaking: '說話中',
     recorderLoading: '轉文字中',
-    default: '請輸入問題'
+    default: '請輸入問題',
   },
   uploadFile: {
     label: '上傳文件',
@@ -63,7 +64,7 @@ export default {
     limitMessage2: '個文件',
     sizeLimit: '單個文件大小不能超過',
     imageMessage: '請解析圖片內容',
-    errorMessage: '上傳失敗'
+    errorMessage: '上傳失敗',
   },
   executionDetails: {
     title: '執行詳細',
@@ -82,18 +83,18 @@ export default {
     rerankerResult: '重排結果',
     paragraph: '段落',
     noSubmit: '用戶未提交',
-    errMessage: '錯誤日誌'
+    errMessage: '錯誤日誌',
   },
   KnowledgeSource: {
     title: '知識來源',
     referenceParagraph: '引用段落',
     consume: '消耗tokens',
-    consumeTime: '耗時'
+    consumeTime: '耗時',
   },
   paragraphSource: {
     title: '知識庫引用',
     question: '用戶問題',
-    optimizationQuestion: '優化後問題'
+    optimizationQuestion: '優化後問題',
   },
   editTitle: '編輯標題',
 }

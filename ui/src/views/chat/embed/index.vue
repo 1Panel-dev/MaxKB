@@ -1,39 +1,43 @@
 <template>
   <div
     class="chat-embed layout-bg chat-background"
-    :class="{ 'chat-embed--popup': isPopup }"
     v-loading="loading"
     :style="{
       '--el-color-primary': applicationDetail?.custom_theme?.theme_color,
       '--el-color-primary-light-9': hexToRgba(applicationDetail?.custom_theme?.theme_color, 0.1),
+      '--el-color-primary-light-6': hexToRgba(applicationDetail?.custom_theme?.theme_color, 0.4),
       backgroundImage: `url(${applicationDetail?.chat_background})`,
     }"
   >
     <div class="chat-embed__header" :style="(user.isEE() || user.isPE()) && customStyle">
-      <div class="flex align-center">
-        <!-- TODO icon更换 -->
-        <AppIcon
-          iconName="app-mobile-open-history"
-          style="font-size: 20px"
-          class="ml-16 cursor"
-          :style="{
-            color: applicationDetail?.custom_theme?.header_font_color,
-          }"
-          @click.prevent.stop="show = true"
-        />
-        <div class="mr-12 ml-16 flex">
-          <el-avatar
-            v-if="isAppIcon(applicationDetail?.icon)"
-            shape="square"
-            :size="32"
-            style="background: none"
-          >
-            <img :src="applicationDetail?.icon" alt="" />
-          </el-avatar>
-          <LogoIcon v-else height="32px" />
-        </div>
+      <div class="flex-between">
+        <div class="flex align-center">
+          <AppIcon
+            iconName="app-mobile-open-history"
+            style="font-size: 20px"
+            class="ml-16 cursor"
+            :style="{
+              color: applicationDetail?.custom_theme?.header_font_color,
+            }"
+            @click.prevent.stop="show = true"
+          />
+          <div class="mr-12 ml-16 flex">
+            <el-avatar
+              v-if="isAppIcon(applicationDetail?.icon)"
+              shape="square"
+              :size="32"
+              style="background: none"
+            >
+              <img :src="applicationDetail?.icon" alt="" />
+            </el-avatar>
+            <LogoIcon v-else height="32px" />
+          </div>
 
-        <h4>{{ applicationDetail?.name }}</h4>
+          <h4>{{ applicationDetail?.name }}</h4>
+        </div>
+        <el-button text @click="newChat" style="margin-right: 85px">
+          <AppIcon iconName="app-create-chat" style="font-size: 20px"></AppIcon>
+        </el-button>
       </div>
     </div>
     <div>
@@ -50,13 +54,6 @@
           @scroll="handleScroll"
           class="AiChat-embed"
         >
-          <template #operateBefore>
-            <div>
-              <el-button type="primary" link class="new-chat-button mb-8" @click="newChat">
-                <el-icon><Plus /></el-icon><span class="ml-4">{{ $t('chat.createChat') }}</span>
-              </el-button>
-            </div>
-          </template>
         </AiChat>
       </div>
 
@@ -75,20 +72,14 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted, reactive, nextTick, computed } from 'vue'
-import { useRoute } from 'vue-router'
 import { isAppIcon } from '@/utils/common'
 import { hexToRgba } from '@/utils/theme'
 import useStore from '@/stores'
 import { t } from '@/locales'
-import ChatHistoryDrawer from '../mobile/component/ChatHistoryDrawer.vue'
+import ChatHistoryDrawer from './component/ChatHistoryDrawer.vue'
 import chatAPI from '@/api/chat/chat'
 
-const { user, chatLog } = useStore()
-const route = useRoute()
-
-const isPopup = computed(() => {
-  return route.query.popup !== 'no'
-})
+const { user } = useStore()
 const AiChatRef = ref()
 const loading = ref(false)
 const left_loading = ref(false)
@@ -121,7 +112,7 @@ const customStyle = computed(() => {
 })
 
 function deleteLog(row: any) {
-  chatLog.asyncDelChatClientLog(applicationDetail.value.id, row.id, left_loading).then(() => {
+  chatAPI.deleteChat(row.id, left_loading).then(() => {
     if (currentChatId.value === row.id) {
       currentChatId.value = 'new'
       paginationConfig.current_page = 1
@@ -252,10 +243,7 @@ onMounted(() => {
     height: calc(100vh - var(--app-header-height) - 16px);
     overflow: hidden;
   }
-  .new-chat-button {
-    z-index: 11;
-    font-size: 1rem;
-  }
+
   &.chat-embed--popup {
     .chat-popover-button {
       right: 85px;

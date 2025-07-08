@@ -4,6 +4,7 @@ export default {
   confirmModification: '确认修改',
   noHistory: '暂无历史记录',
   createChat: '新建对话',
+  clearChat: '清空对话',
   history: '历史记录',
   only20history: '仅显示最近 20 条对话',
   question_count: '条提问',

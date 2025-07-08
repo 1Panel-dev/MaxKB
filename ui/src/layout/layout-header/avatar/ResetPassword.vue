@@ -2,6 +2,9 @@
   <el-dialog
     v-model="resetPasswordDialog"
     :title="$t('views.login.resetPassword')"
+    destroy-on-close
+    append-to-body
+    align-center
     :close-on-click-modal="false"
     :close-on-press-escape="false"
   >
@@ -53,12 +56,12 @@ import { useRouter } from 'vue-router'
 import { t } from '@/locales'
 
 const props = defineProps<{
-  emitConfirm?: boolean; // 在父级调接口
+  emitConfirm?: boolean // 在父级调接口
 }>()
 
 const emit = defineEmits<{
-  (e: 'confirm', value: ResetCurrentUserPasswordRequest): void;
-}>();
+  (e: 'confirm', value: ResetCurrentUserPasswordRequest): void
+}>()
 
 const router = useRouter()
 const { login } = useStore()
@@ -141,13 +144,13 @@ const open = () => {
 }
 const resetPassword = () => {
   resetPasswordFormRef1.value?.validate().then(() => {
-    if(props.emitConfirm) {
+    if (props.emitConfirm) {
       emit('confirm', resetPasswordForm.value)
     } else {
       return UserApi.resetCurrentPassword(resetPasswordForm.value).then(() => {
-            login.logout()
-            router.push({ name: 'login' })
-          })
+        login.logout()
+        router.push({ name: 'login' })
+      })
     }
   })
 }

@@ -34,11 +34,14 @@
         </el-button>
         <div v-show="!isPcCollapse" class="flex-between p-8 pb-0 color-secondary mt-8">
           <span>{{ $t('chat.history') }}</span>
-          <el-button text>
-            <el-icon>
-              <Delete />
-            </el-icon>
-          </el-button>
+          <el-tooltip effect="dark" :content="$t('chat.clearChat')" placement="right">
+            <!-- // TODO: 清空 -->
+            <el-button text>
+              <el-icon>
+                <Delete />
+              </el-icon>
+            </el-button>
+          </el-tooltip>
         </div>
       </div>
       <div v-show="!isPcCollapse" class="left-height">
@@ -55,7 +58,7 @@
             >
               <template #default="{ row }">
                 <div class="flex-between">
-                  <span :title="row.abstract">
+                  <span :title="row.abstract" class="ellipsis" style="max-width: 180px">
                     {{ row.abstract }}
                   </span>
                   <div @click.stop v-show="mouseId === row.id && row.id !== 'new'">
@@ -97,27 +100,40 @@
         <AppIcon iconName="app-create-chat"></AppIcon>
         <template #title>{{ $t('chat.createChat') }}</template>
       </el-menu-item>
+
       <el-sub-menu v-show="isPcCollapse" index="2">
         <template #title>
           <AppIcon iconName="app-history-outlined" />
         </template>
         <el-menu-item-group v-loading="leftLoading">
-          <template #title
-            ><span>{{ $t('chat.history') }}</span></template
-          >
+          <template #title>
+            <div class="flex-between w-full">
+              <span>{{ $t('chat.history') }}</span>
+              <el-tooltip effect="dark" :content="$t('chat.clearChat')" placement="right">
+                <!-- // TODO: 清空 -->
+                <el-button text>
+                  <el-icon>
+                    <Delete />
+                  </el-icon>
+                </el-button>
+              </el-tooltip>
+            </div>
+          </template>
           <el-menu-item
             v-for="row in chatLogData"
             :index="row.id"
             :key="row.id"
             @click="handleClickList(row)"
+            @mouseenter="mouseenter(row)"
+            @mouseleave="mouseId = ''"
           >
             <div class="flex-between w-full lighter">
-              <span :title="row.abstract">
+              <span :title="row.abstract" class="ellipsis">
                 {{ row.abstract }}
               </span>
               <div @click.stop class="flex" v-show="mouseId === row.id && row.id !== 'new'">
                 <el-dropdown trigger="click" :teleported="false">
-                  <el-icon class="rotate-90 mt-4">
+                  <el-icon class="mt-4 lighter">
                     <MoreFilled />
                   </el-icon>
                   <template #dropdown>
@@ -161,7 +177,7 @@ const props = defineProps<{
   chatLogData: any[]
   leftLoading: boolean
   currentChatId: string
-  isPcCollapse: boolean
+  isPcCollapse?: boolean
 }>()
 const emit = defineEmits(['newChat', 'clickLog', 'deleteLog', 'refreshFieldTitle'])
 
@@ -188,8 +204,8 @@ function editLogTitle(row: any) {
   EditTitleDialogRef.value.open(row, props.applicationDetail.id)
 }
 
-function refreshFieldTitle() {
-  emit('refreshFieldTitle')
+function refreshFieldTitle(chatId: string, abstract: string) {
+  emit('refreshFieldTitle', chatId, abstract)
 }
 </script>
 <style lang="scss" scoped>
@@ -200,11 +216,16 @@ function refreshFieldTitle() {
   background:
     linear-gradient(187.61deg, rgba(235, 241, 255, 0.5) 39.6%, rgba(231, 249, 255, 0.5) 94.3%),
     #eef1f4;
-  .el-menu {
+  :deep(.el-menu) {
     background: none;
     border: none;
     &:not(.el-menu--collapse) {
       width: 280px;
+    }
+    &.el-menu--collapse {
+      .el-sub-menu.is-active .el-sub-menu__title {
+        color: var(--el-text-color-primary) !important;
+      }
     }
   }
 
@@ -237,7 +258,7 @@ function refreshFieldTitle() {
     background: transparent;
   }
   .el-menu-item-group__title {
-    padding-bottom: 16px;
+    padding: 8px 8px 8px 16px;
     font-weight: 500;
     color: var(--app-text-color-secondary);
   }
@@ -248,15 +269,14 @@ function refreshFieldTitle() {
     padding-left: 8px;
     padding-right: 8px;
     &:hover {
-      background-color: #1f23291a;
+      background-color: rgba(31, 35, 41, 0.1);
     }
     &.is-active {
       background-color: #ffffff;
-
       color: var(--el-text-color-primary);
-      & > div {
-        font-weight: 500;
-      }
+      // & > div {
+      //   font-weight: 500;
+      // }
     }
   }
 }

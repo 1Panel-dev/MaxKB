@@ -39,4 +39,10 @@ const loading = ref(false)
 
 const applicationAvailable = ref<boolean>(true)
 </script>
-<style lang="scss"></style>
+<style lang="scss">
+@media only screen and (max-width: 768px) {
+  .el-dialog {
+    width: 90% !important;
+  }
+}
+</style>

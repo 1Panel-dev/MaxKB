@@ -9,18 +9,29 @@
 
     <el-form ref="resetPasswordFormRef" :model="resetPasswordForm" :rules="rules">
       <el-form-item prop="password">
-        <el-input type="password" size="large" v-model="resetPasswordForm.password"
-          :placeholder="$t('views.login.loginForm.new_password.placeholder')" show-password>
+        <el-input
+          type="password"
+          size="large"
+          v-model="resetPasswordForm.password"
+          :placeholder="$t('views.login.loginForm.new_password.placeholder')"
+          show-password
+        >
         </el-input>
       </el-form-item>
       <el-form-item prop="re_password">
-        <el-input type="password" size="large" v-model="resetPasswordForm.re_password"
-          :placeholder="$t('views.login.loginForm.re_password.placeholder')" show-password>
+        <el-input
+          type="password"
+          size="large"
+          v-model="resetPasswordForm.re_password"
+          :placeholder="$t('views.login.loginForm.re_password.placeholder')"
+          show-password
+        >
         </el-input>
       </el-form-item>
     </el-form>
-    <el-button type="primary" size="large" class="w-full" @click="resetPassword">{{ $t('chat.confirmModification')
-      }}</el-button>
+    <el-button type="primary" size="large" class="w-full" @click="resetPassword">{{
+      $t('chat.confirmModification')
+    }}</el-button>
   </el-drawer>
 </template>
 
@@ -39,7 +50,7 @@ const { chatUser } = useStore()
 
 const show = defineModel<boolean>('show', {
   required: true,
-});
+})
 
 const resetPasswordFormRef = ref<FormInstance>()
 
@@ -104,7 +115,7 @@ function resetPassword() {
   .el-drawer__body {
     padding: 16px;
     padding-top: 0;
-    background: #FFFFFF;
+    background: #ffffff !important;
 
     .navigation {
       height: 44px;

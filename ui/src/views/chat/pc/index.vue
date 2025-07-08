@@ -11,7 +11,7 @@
   >
     <div class="flex h-full w-full">
       <div class="chat-pc__left">
-        <history-component
+        <HistoryPanel
           :application-detail="applicationDetail"
           :chat-log-data="chatLogData"
           :left-loading="left_loading"
@@ -43,8 +43,8 @@
               </div>
 
               <template #dropdown>
-                <el-dropdown-menu class="avatar-dropdown">
-                  <div class="flex align-center" style="padding: 8px 12px">
+                <el-dropdown-menu style="min-width: 260px">
+                  <div class="flex align-center p-8">
                     <div class="mr-8 flex align-center">
                       <el-avatar :size="40">
                         <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
@@ -63,7 +63,7 @@
                     style="padding-top: 8px; padding-bottom: 8px"
                     @click="openResetPassword"
                   >
-                    <AppIcon iconName="app-export" />
+                    <el-icon><Lock /></el-icon>
                     {{ $t('views.login.resetPassword') }}
                   </el-dropdown-item>
                   <el-dropdown-item
@@ -79,7 +79,7 @@
               </template>
             </el-dropdown>
           </div>
-        </history-component>
+        </HistoryPanel>
         <el-button
           v-if="!common.isMobile()"
           class="pc-collapse cursor"
@@ -201,7 +201,7 @@ import type { ResetCurrentUserPasswordRequest } from '@/api/type/user'
 import ExecutionDetailContent from '@/components/ai-chat/component/knowledge-source-component/ExecutionDetailContent.vue'
 import ParagraphSourceContent from '@/components/ai-chat/component/knowledge-source-component/ParagraphSourceContent.vue'
 import ParagraphDocumentContent from '@/components/ai-chat/component/knowledge-source-component/ParagraphDocumentContent.vue'
-import HistoryComponent from '@/views/chat/history-component/index.vue'
+import HistoryPanel from '@/views/chat/component/HistoryPanel.vue'
 import { cloneDeep } from 'lodash'
 
 useResize()
@@ -487,9 +487,11 @@ function closeExecutionDetail() {
     .pc-collapse {
       position: absolute;
       top: 20px;
-      right: -15px;
+      right: -13px;
       box-shadow: 0px 5px 10px 0px rgba(31, 35, 41, 0.1);
       z-index: 1;
+      width: 24px;
+      height: 24px;
     }
   }
 
@@ -522,10 +524,6 @@ function closeExecutionDetail() {
       }
     }
   }
-
-  .collapse {
-    display: none;
-  }
 }
 
 .chat-width {
@@ -537,8 +535,5 @@ function closeExecutionDetail() {
     max-width: 100% !important;
     margin: 0 auto;
   }
-}
-.avatar-dropdown {
-  min-width: 240px;
 }
 </style>
