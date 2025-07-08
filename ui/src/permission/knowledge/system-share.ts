@@ -35,7 +35,7 @@ const share = {
       ],
       'OR'
     ),
-  setting: () => 
+  edit: () => 
     hasPermission (
       [
         RoleConst.ADMIN,
@@ -165,6 +165,8 @@ const share = {
       ],
       'OR'
     ),
-  
+  folderCreate: () => false,
+  folderEdit: () => false,
+  folderDelete: () => false,
 }
 export default share

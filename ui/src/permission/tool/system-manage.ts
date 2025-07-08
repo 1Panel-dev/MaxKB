@@ -20,6 +20,10 @@ const systemManage = {
   export: () => false,
   debug: () => false,
 
+  folderCreate: () => false,
+  folderEdit: () => false,
+  folderDelete: () => false,
+
 }
 
 export default systemManage

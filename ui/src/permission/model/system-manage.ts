@@ -12,10 +12,14 @@ const systemManage = {
       ),
       'OR',
     ),
-  addModel: () => false,
+  create: () => false,
   modify: () => false,
   paramSetting: () => false,
   delete: () => false,
+
+  folderCreate: () => false,
+  folderEdit: () => false,
+  folderDelete: () => false,
 }
 
 export default systemManage

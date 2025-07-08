@@ -13,6 +13,16 @@ const workspace = {
             ],
             'OR'
     ),
+    folderCreate: () => 
+        hasPermission(
+            [
+              RoleConst.USER.getWorkspaceRole,
+              RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+              PermissionConst.APPLICATION_CREATE.getWorkspacePermission,
+              PermissionConst.APPLICATION_CREATE.getWorkspacePermissionWorkspaceManageRole,  
+            ],
+            'OR'
+    ),
     edit: (source_id:string) => 
         hasPermission(
             [
@@ -20,6 +30,16 @@ const workspace = {
               RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
               PermissionConst.APPLICATION_EDIT.getWorkspacePermissionWorkspaceManageRole,
               PermissionConst.APPLICATION_EDIT.getApplicationWorkspaceResourcePermission(source_id)  
+            ],
+            'OR'
+    ),
+    folderEdit: () => 
+        hasPermission(
+            [
+              RoleConst.USER.getWorkspaceRole,
+              RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+              PermissionConst.APPLICATION_EDIT.getWorkspacePermissionWorkspaceManageRole,
+              PermissionConst.APPLICATION_EDIT.getWorkspacePermission
             ],
             'OR'
     ),
@@ -40,6 +60,16 @@ const workspace = {
               RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
               PermissionConst.APPLICATION_DELETE.getWorkspacePermissionWorkspaceManageRole,
               PermissionConst.APPLICATION_DELETE.getApplicationWorkspaceResourcePermission(source_id)  
+            ],
+            'OR'
+    ),
+    folderDelete: () => 
+        hasPermission(
+            [
+              RoleConst.USER.getWorkspaceRole,
+              RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+              PermissionConst.APPLICATION_DELETE.getWorkspacePermissionWorkspaceManageRole,
+              PermissionConst.APPLICATION_DELETE.getWorkspacePermission
             ],
             'OR'
     ),

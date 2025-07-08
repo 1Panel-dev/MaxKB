@@ -16,7 +16,7 @@ const systemManage = {
   sync: () => false,
   vector: () => false,
   generate: () => false,
-  setting: () => false,
+  edit: () => false,
   export: () => false,
   delete: () => false,
 
@@ -35,6 +35,10 @@ const systemManage = {
   problem_create: () => false,
   problem_relate: () => false,
   problem_delete: () => false,
+  
+  folderCreate: () => false,
+  folderEdit: () => false,
+  folderDelete: () => false,
 }
 
 export default systemManage
