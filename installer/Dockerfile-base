@@ -1,5 +1,5 @@
 FROM python:3.11-slim-bullseye AS python-stage
-FROM postgres:17.4-bullseye
+FROM postgres:17.5-bullseye
 
 COPY --from=python-stage /usr/local /usr/local
 COPY installer/*.sh /usr/bin/

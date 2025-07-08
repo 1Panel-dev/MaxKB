@@ -6,7 +6,7 @@ RUN cd ui && \
     NODE_OPTIONS="--max-old-space-size=4096" npm run build-only && \
     NODE_OPTIONS="--max-old-space-size=4096" npm run build-only-chat && \
     find . -maxdepth 1 ! -name '.' ! -name 'dist' ! -name 'public' -exec rm -rf {} +
-FROM ghcr.io/1panel-dev/maxkb-base:python3.11-pg17.4 AS stage-build
+FROM ghcr.io/1panel-dev/maxkb-base:python3.11-pg17.5 AS stage-build
 
 ARG DEPENDENCIES="                    \
         python3-pip"
@@ -35,7 +35,7 @@ RUN python3 -m venv /opt/py3 && \
     pip install diskcache2 requests pymysql psycopg2-binary && \
     rm -rf /opt/maxkb-app/installer
 
-FROM ghcr.io/1panel-dev/maxkb-base:python3.11-pg17.4
+FROM ghcr.io/1panel-dev/maxkb-base:python3.11-pg17.5
 ARG DOCKER_IMAGE_TAG=dev \
     BUILD_AT \
     GITHUB_COMMIT
