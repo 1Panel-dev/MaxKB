@@ -526,11 +526,13 @@
                       </el-button>
                       <template #dropdown>
                         <el-dropdown-menu>
-                          <el-dropdown-item icon="Setting" @click="settingDoc(row)">{{
+                          <el-dropdown-item icon="Setting" @click="settingDoc(row)"
+                            v-if="permissionPrecise.doc_edit(id)"
+                          >{{
                             $t('common.setting')
                           }}</el-dropdown-item>
                           <el-dropdown-item
-                            v-if="
+                            v-if="permissionPrecise.doc_generate(id) &&
                               ([State.STARTED, State.PENDING] as Array<string>).includes(
                                 getTaskState(row.status, TaskType.GENERATE_PROBLEM),
                               )
@@ -540,23 +542,33 @@
                             <el-icon><Connection /></el-icon>
                             {{ $t('views.document.setting.cancelGenerateQuestion') }}
                           </el-dropdown-item>
-                          <el-dropdown-item v-else @click="openGenerateDialog(row)">
+                          <el-dropdown-item v-else @click="openGenerateDialog(row)"
+                            v-if="permissionPrecise.doc_generate(id)"
+                          >
                             <el-icon><Connection /></el-icon>
                             {{ $t('views.document.generateQuestion.title') }}
                           </el-dropdown-item>
-                          <el-dropdown-item @click="openknowledgeDialog(row)">
+                          <el-dropdown-item @click="openknowledgeDialog(row)"
+                            v-if="permissionPrecise.doc_migrate(id)"
+                          >
                             <AppIcon iconName="app-migrate"></AppIcon>
                             {{ $t('views.document.setting.migration') }}
                           </el-dropdown-item>
-                          <el-dropdown-item @click="exportDocument(row)">
+                          <el-dropdown-item @click="exportDocument(row)"
+                            v-if="permissionPrecise.doc_export(id)"
+                          >
                             <AppIcon iconName="app-export"></AppIcon>
                             {{ $t('views.document.setting.export') }} Excel
                           </el-dropdown-item>
-                          <el-dropdown-item @click="exportDocumentZip(row)">
+                          <el-dropdown-item @click="exportDocumentZip(row)"
+                            v-if="permissionPrecise.doc_export(id)"
+                          >
                             <AppIcon iconName="app-export"></AppIcon>
                             {{ $t('views.document.setting.export') }} Zip
                           </el-dropdown-item>
-                          <el-dropdown-item icon="Delete" @click.stop="deleteDocument(row)">
+                          <el-dropdown-item icon="Delete" @click.stop="deleteDocument(row)"
+                            v-if="permissionPrecise.doc_delete(id)"
+                          >
                             {{ $t('common.delete') }}
                           </el-dropdown-item>
                         </el-dropdown-menu>
