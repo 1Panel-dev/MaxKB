@@ -20,13 +20,11 @@ ARG DEPENDENCIES="                    \
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     echo "Asia/Shanghai" > /etc/timezone && \
     apt-get update && apt-get install -y --no-install-recommends $DEPENDENCIES && \
-    apt-get clean all  && \
-    rm -rf /var/lib/apt/lists/* && \
     chmod 755 /usr/bin/start-*.sh && \
     find /etc/ -type f ! -path '/etc/resolv.conf' ! -path '/etc/hosts' | xargs chmod g-rx && \
-    curl -L --connect-timeout 120 -m 1800 https://resource.fit2cloud.com/maxkb/ffmpeg/get-ffmpeg-linux | sh
-
-EXPOSE 6379
+    curl -L --connect-timeout 120 -m 1800 https://resource.fit2cloud.com/maxkb/ffmpeg/get-ffmpeg-linux | sh && \
+    apt-get clean all && \
+    rm -rf /var/lib/apt/lists/* /usr/share/doc/* /usr/share/man/* /usr/share/info/* /usr/share/locale/* /usr/share/lintian/* /usr/share/linda/* /var/cache/* /var/log/* /var/tmp/* /tmp/*
 
 ENV PGDATA=/opt/maxkb/data/postgresql/pgdata \
     POSTGRES_USER=root \
@@ -37,3 +35,5 @@ ENV PGDATA=/opt/maxkb/data/postgresql/pgdata \
     MAXKB_LOG_LEVEL=INFO \
     MAXKB_SANDBOX_PYTHON_PACKAGE_PATHS=/opt/py3/lib/python3.11/site-packages,/opt/maxkb-app/sandbox/python-packages,/opt/maxkb/python-packages \
     MAXKB_ADMIN_PATH=/admin
+
+EXPOSE 6379
