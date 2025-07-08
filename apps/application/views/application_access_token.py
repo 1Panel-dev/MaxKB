@@ -50,8 +50,8 @@ class AccessToken(APIView):
         parameters=ApplicationAccessTokenAPI.get_parameters(),
         tags=[_('Application')]  # type: ignore
     )
-    @has_permissions(PermissionConstants.APPLICATION_OVERVIEW_ACCESS.get_workspace_application_permission(),
-                     PermissionConstants.APPLICATION_OVERVIEW_ACCESS.get_workspace_permission_workspace_manage_role(),
+    @has_permissions(PermissionConstants.APPLICATION_READ.get_workspace_application_permission(),
+                     PermissionConstants.APPLICATION_READ.get_workspace_permission_workspace_manage_role(),
                      ViewPermission([RoleConstants.USER.get_workspace_role()],
                                     [PermissionConstants.APPLICATION.get_workspace_application_permission()],
                                     CompareConstants.AND),
