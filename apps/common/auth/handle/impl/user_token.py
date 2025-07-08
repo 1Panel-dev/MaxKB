@@ -6,7 +6,6 @@
     @date：2024/3/14 03:02
     @desc:  用户认证
 """
-import datetime
 from functools import reduce
 from typing import List
 
@@ -14,7 +13,6 @@ from django.core.cache import cache
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 
-from maxkb.const import CONFIG
 from common.auth.handle.auth_base_handle import AuthBaseHandle
 from common.constants.authentication_type import AuthenticationType
 from common.constants.cache_version import Cache_Version
@@ -25,6 +23,7 @@ from common.constants.permission_constants import Auth, PermissionConstants, Res
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.exception.app_exception import AppAuthenticationFailed
 from common.utils.common import group_by
+from maxkb.const import CONFIG
 from system_manage.models.workspace_user_permission import WorkspaceUserResourcePermission
 from users.models import User
 
@@ -175,7 +174,9 @@ def get_permission_list(user,
 
             workspace_user_permission_list = QuerySet(WorkspaceUserResourcePermission).filter(
                 workspace_id__in=[workspace_user_role.workspace_id for workspace_user_role in
-                                  workspace_user_role_mapping_list],
+                                  workspace_user_role_mapping_list if
+                                  (role_model_dict.get(workspace_user_role.role_id).type == 'USER' if
+                                   role_model_dict.get(workspace_user_role.role_id) else False)],
                 user_id=user_id)
 
             # 资源权限
