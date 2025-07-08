@@ -16,6 +16,7 @@ from django.utils.translation import gettext_lazy as _
 from application.chat_pipeline.step.chat_step.i_chat_step import PostResponseHandler
 from application.models import Application, ChatRecord, Chat, ApplicationVersion, ChatUserType, ApplicationTypeChoices, \
     ApplicationKnowledgeMapping
+from application.serializers.application_chat import ChatCountSerializer
 from common.constants.cache_version import Cache_Version
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.exception.app_exception import ChatException
@@ -93,8 +94,8 @@ class ChatInfo:
     def get_chat_user(self, asker=None):
         if self.chat_user:
             return self.chat_user
-        if self.chat_user_type == ChatUserType.CHAT_USER.value:
-            chat_user_model = DatabaseModelManage.get_model("chat_user")
+        chat_user_model = DatabaseModelManage.get_model("chat_user")
+        if self.chat_user_type == ChatUserType.CHAT_USER.value and chat_user_model:
             chat_user = QuerySet(chat_user_model).filter(id=self.chat_user_id).first()
             return {
                 'id': chat_user.id,
@@ -184,6 +185,7 @@ class ChatInfo:
                 QuerySet(Chat).filter(id=self.chat_id).update(update_time=datetime.now())
             # 插入会话记录
             chat_record.save()
+            ChatCountSerializer(data={'chat_id': self.chat_id}).update_chat()
 
     def set_cache(self):
         cache.set(Cache_Version.CHAT.get_key(key=self.chat_id), self, version=Cache_Version.CHAT.get_version(),
