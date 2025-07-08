@@ -327,11 +327,12 @@ class ModelSerializer(serializers.Serializer):
             model = Model(**model_data)
             try:
                 model.save()
-                UserResourcePermissionSerializer(data={
-                    'workspace_id': self.data.get('workspace_id'),
-                    'user_id': self.data.get('user_id'),
-                    'auth_target_type': AuthTargetType.MODEL.value
-                }).auth_resource(str(model.id))
+                if workspace_id != 'None':
+                    UserResourcePermissionSerializer(data={
+                        'workspace_id': workspace_id,
+                        'user_id': self.data.get('user_id'),
+                        'auth_target_type': AuthTargetType.MODEL.value
+                    }).auth_resource(str(model.id))
             except Exception as save_error:
                 # 可添加日志记录
                 raise AppApiException(500, _("Model saving failed")) from save_error
