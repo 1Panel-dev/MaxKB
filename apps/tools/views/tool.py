@@ -269,8 +269,8 @@ class ToolView(APIView):
             tags=[_('Tool')]  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.TOOL_CREATE.get_workspace_permission(),
-            PermissionConstants.TOOL_EDIT.get_workspace_permission_workspace_manage_role(),
+            PermissionConstants.TOOL_READ.get_workspace_permission(),
+            PermissionConstants.TOOL_READ.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
             RoleConstants.USER.get_workspace_role()
         )
