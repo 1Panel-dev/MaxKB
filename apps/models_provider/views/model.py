@@ -123,7 +123,7 @@ class ModelSetting(APIView):
                          PermissionConstants.MODEL_EDIT.get_workspace_permission_workspace_manage_role(),
                          ViewPermission([RoleConstants.USER.get_workspace_role()],
                                         [PermissionConstants.MODEL.get_workspace_model_permission()],
-                                        CompareConstants.AND),)
+                                        CompareConstants.AND), )
         @log(menu='model', operate='Update model',
              get_operation_object=lambda r, k: get_model_operation_object(k.get('model_id')),
              get_details=get_edit_model_details,
@@ -143,9 +143,10 @@ class ModelSetting(APIView):
                        tags=[_('Model')])  # type: ignore
         @has_permissions(PermissionConstants.MODEL_DELETE.get_workspace_model_permission(),
                          PermissionConstants.MODEL_DELETE.get_workspace_permission_workspace_manage_role(),
-                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), ViewPermission([RoleConstants.USER.get_workspace_role()],
+                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+                         ViewPermission([RoleConstants.USER.get_workspace_role()],
                                         [PermissionConstants.MODEL.get_workspace_model_permission()],
-                                        CompareConstants.AND),)
+                                        CompareConstants.AND), )
         @log(menu='model', operate='Delete model',
              get_operation_object=lambda r, k: get_model_operation_object(k.get('model_id')),
              )
@@ -163,9 +164,10 @@ class ModelSetting(APIView):
                        tags=[_('Model')])  # type: ignore
         @has_permissions(PermissionConstants.MODEL_READ.get_workspace_model_permission(),
                          PermissionConstants.MODEL_READ.get_workspace_permission_workspace_manage_role(),
-                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), ViewPermission([RoleConstants.USER.get_workspace_role()],
+                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+                         ViewPermission([RoleConstants.USER.get_workspace_role()],
                                         [PermissionConstants.MODEL.get_workspace_model_permission()],
-                                        CompareConstants.AND),)
+                                        CompareConstants.AND), )
         def get(self, request: Request, workspace_id: str, model_id: str):
             return result.success(
                 ModelSerializer.Operate(
@@ -184,9 +186,11 @@ class ModelSetting(APIView):
                        tags=[_('Model')])  # type: ignore
         @has_permissions(PermissionConstants.MODEL_READ.get_workspace_model_permission(),
                          PermissionConstants.MODEL_READ.get_workspace_permission_workspace_manage_role(),
-                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), ViewPermission([RoleConstants.USER.get_workspace_role()],
+                         PermissionConstants.MODEL_READ.get_workspace_permission(),
+                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+                         ViewPermission([RoleConstants.USER.get_workspace_role()],
                                         [PermissionConstants.MODEL.get_workspace_model_permission()],
-                                        CompareConstants.AND),)
+                                        CompareConstants.AND), )
         def get(self, request: Request, workspace_id: str, model_id: str):
             return result.success(
                 ModelSerializer.ModelParams(data={'id': model_id}).get_model_params())
@@ -201,9 +205,11 @@ class ModelSetting(APIView):
                        tags=[_('Model')])  # type: ignore
         @has_permissions(PermissionConstants.MODEL_EDIT.get_workspace_model_permission(),
                          PermissionConstants.MODEL_EDIT.get_workspace_permission_workspace_manage_role(),
-                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), ViewPermission([RoleConstants.USER.get_workspace_role()],
+                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+                         PermissionConstants.MODEL_READ.get_workspace_permission(),
+                         ViewPermission([RoleConstants.USER.get_workspace_role()],
                                         [PermissionConstants.MODEL.get_workspace_model_permission()],
-                                        CompareConstants.AND),)
+                                        CompareConstants.AND), )
         @log(menu='model', operate='Save model parameter form',
              get_operation_object=lambda r, k: get_model_operation_object(k.get('model_id')),
              )
@@ -226,9 +232,11 @@ class ModelSetting(APIView):
                        tags=[_('Model')])  # type: ignore
         @has_permissions(PermissionConstants.MODEL_READ.get_workspace_model_permission(),
                          PermissionConstants.MODEL_READ.get_workspace_permission_workspace_manage_role(),
-                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), ViewPermission([RoleConstants.USER.get_workspace_role()],
+                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+                         PermissionConstants.MODEL_READ.get_workspace_permission(),
+                         ViewPermission([RoleConstants.USER.get_workspace_role()],
                                         [PermissionConstants.MODEL.get_workspace_model_permission()],
-                                        CompareConstants.AND),)
+                                        CompareConstants.AND), )
         def get(self, request: Request, workspace_id: str, model_id: str):
             return result.success(
                 ModelSerializer.Operate(data={'id': model_id, 'workspace_id': workspace_id}).one_meta(with_valid=True))
@@ -246,9 +254,10 @@ class ModelSetting(APIView):
                        tags=[_('Model')])  # type: ignore
         @has_permissions(PermissionConstants.MODEL_CREATE.get_workspace_model_permission(),
                          PermissionConstants.MODEL_CREATE.get_workspace_permission_workspace_manage_role(),
-                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), ViewPermission([RoleConstants.USER.get_workspace_role()],
+                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+                         ViewPermission([RoleConstants.USER.get_workspace_role()],
                                         [PermissionConstants.MODEL.get_workspace_model_permission()],
-                                        CompareConstants.AND),)
+                                        CompareConstants.AND), )
         def put(self, request: Request, workspace_id: str, model_id: str):
             return result.success(
                 ModelSerializer.Operate(data={'id': model_id, 'workspace_id': workspace_id}).pause_download())
