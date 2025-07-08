@@ -19,7 +19,7 @@
                 <img :src="resetUrl(item?.icon)" alt="" />
               </el-avatar>
               <el-avatar v-else class="avatar-green" shape="square" :size="32">
-                <img src="@/assets/node/icon_tool.svg" style="width: 58%" alt="" />
+                <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt="" />
               </el-avatar>
               <span class="ml-8 ellipsis">{{ item.name }}</span>
             </div>
@@ -33,7 +33,7 @@
                   <img :src="resetUrl(item?.icon)" alt="" />
                 </el-avatar>
                 <el-avatar v-else class="avatar-green" shape="square" :size="32">
-                  <img src="@/assets/node/icon_tool.svg" style="width: 58%" alt="" />
+                  <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt="" />
                 </el-avatar>
                 <span class="font-medium ml-8">{{ item.name }}</span>
               </div>

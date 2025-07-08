@@ -47,7 +47,7 @@
               <el-dropdown-item @click="openCreateDialog()">
                 <div class="flex align-center">
                   <el-avatar class="avatar-green" shape="square" :size="32">
-                    <img src="@/assets/node/icon_tool.svg" style="width: 58%" alt="" />
+                    <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt="" />
                   </el-avatar>
                   <div class="pre-wrap ml-8">
                     <div class="lighter">空白创建</div>
@@ -79,7 +79,7 @@
               <el-dropdown-item @click="openToolStoreDialog()">
                 <div class="flex align-center">
                   <el-avatar class="avatar-green" shape="square" :size="32">
-                    <img src="@/assets/node/icon_tool.svg" style="width: 58%" alt="" />
+                    <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt="" />
                   </el-avatar>
                   <div class="pre-wrap ml-8">
                     <div class="lighter">
@@ -164,7 +164,7 @@
                     <img :src="resetUrl(item?.icon)" alt="" />
                   </el-avatar>
                   <el-avatar v-else class="avatar-green" shape="square" :size="32">
-                    <img src="@/assets/node/icon_tool.svg" style="width: 58%" alt="" />
+                    <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt="" />
                   </el-avatar>
                 </template>
                 <template #subTitle>

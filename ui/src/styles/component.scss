@@ -204,6 +204,33 @@
   }
 }
 
+@-webkit-keyframes dot {
+  25% {
+    border-color: transparent;
+    background-color: transparent;
+  }
+  50% {
+    border-right-color: transparent;
+    background-color: transparent;
+  }
+  75% {
+    border-right-color: transparent;
+  }
+}
+@keyframes dot {
+  25% {
+    border-color: transparent;
+    background-color: transparent;
+  }
+  50% {
+    border-right-color: transparent;
+    background-color: transparent;
+  }
+  75% {
+    border-right-color: transparent;
+  }
+}
+
 // checkbox 一行一个样式
 .checkbox-group-block {
   .el-checkbox {

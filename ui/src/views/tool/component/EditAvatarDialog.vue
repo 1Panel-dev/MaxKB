@@ -10,7 +10,7 @@
       <el-radio value="default">
         <p>{{ $t('common.EditAvatarDialog.default') }}</p>
         <el-avatar class="avatar-green" shape="square" :size="32">
-          <img src="@/assets/node/icon_tool.svg" style="width: 58%" alt="" />
+          <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt="" />
         </el-avatar>
       </el-radio>
 

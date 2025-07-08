@@ -1,6 +1,6 @@
 <template>
   <el-avatar shape="square" style="background: #34c724">
-    <img src="@/assets/workflow/icon_tool_outlined.svg" style="width: 75%" alt="" />
+    <img src="@/assets/workflow/icon_tool_custom.svg" style="width: 65%" alt="" />
   </el-avatar>
 </template>
 <script setup lang="ts"></script>

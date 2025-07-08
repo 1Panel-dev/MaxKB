@@ -58,7 +58,11 @@
                 @click="handleClick"
               >
                 <template v-for="(item, index) in paragraphDetail" :key="item.id">
-                  <el-anchor-link :href="`#m${item.id}`" :title="item.title" v-if="item.title" />
+                  <el-anchor-link :href="`#m${item.id}`" :title="item.title" v-if="item.title">
+                    <span :title="item.title">
+                      {{ item.title }}
+                    </span>
+                  </el-anchor-link>
                 </template>
               </el-anchor>
             </el-scrollbar>

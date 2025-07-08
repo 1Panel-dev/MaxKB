@@ -339,6 +339,27 @@ export const textToSpeechNode = {
     },
   },
 }
+
+/**
+ * 自定义工具配置数据
+ */
+export const toolNode = {
+  type: WorkflowType.ToolLibCustom,
+  text: t('views.applicationWorkflow.nodes.toolNode.text'),
+  label: t('views.applicationWorkflow.nodes.toolNode.label'),
+  height: 260,
+  properties: {
+    stepName: t('views.applicationWorkflow.nodes.toolNode.label'),
+    config: {
+      fields: [
+        {
+          label: t('common.result'),
+          value: 'result',
+        },
+      ],
+    },
+  },
+}
 export const menuNodes = [
   {
     label: t('views.applicationWorkflow.nodes.classify.aiCapability'),
@@ -358,30 +379,14 @@ export const menuNodes = [
   },
   {
     label: t('views.applicationWorkflow.nodes.classify.other'),
-    list: [mcpNode, documentExtractNode],
+    list: [mcpNode, documentExtractNode, toolNode],
   },
 ]
 
+
 /**
- * 自定义函数配置数据
+ * 工具配置数据
  */
-export const toolNode = {
-  type: WorkflowType.ToolLibCustom,
-  text: t('views.applicationWorkflow.nodes.toolNode.text'),
-  label: t('views.applicationWorkflow.nodes.toolNode.label'),
-  height: 260,
-  properties: {
-    stepName: t('views.applicationWorkflow.nodes.toolNode.label'),
-    config: {
-      fields: [
-        {
-          label: t('common.result'),
-          value: 'result',
-        },
-      ],
-    },
-  },
-}
 export const toolLibNode = {
   type: WorkflowType.ToolLib,
   text: t('views.applicationWorkflow.nodes.toolNode.text'),

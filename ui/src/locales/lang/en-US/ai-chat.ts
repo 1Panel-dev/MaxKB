@@ -38,7 +38,7 @@ export default {
     answerMessage:
       'Sorry, no relevant content found. Please rephrase your question or provide more details.',
     stopAnswer: 'Response Stopped',
-    answerLoading: 'Generating Response...',
+    answerLoading: 'Generating Response',
     recorderTip: `<p>This feature requires microphone access. Browsers block recording on insecure pages. Solutions:<br/>
 1. Enable HTTPS;<br/>
 2. If HTTPS is not available, adjust browser security settings. For Chrome:<br/>

@@ -61,7 +61,7 @@
                   <img :src="resetUrl(scope.row?.icon)" alt="" />
                 </el-avatar>
                 <el-avatar v-else class="avatar-green" shape="square" :size="24">
-                  <img src="@/assets/node/icon_tool.svg" style="width: 58%" alt="" />
+                  <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt="" />
                 </el-avatar>
               </el-icon>
               {{ scope.row.name }}
