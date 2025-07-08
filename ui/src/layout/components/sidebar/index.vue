@@ -49,6 +49,7 @@ const activeMenu = computed(() => {
     height: 100%;
     border: none;
     background: none;
+    max-height: calc(100vh - 100px);
   }
 }
 </style>

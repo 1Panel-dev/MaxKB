@@ -34,6 +34,7 @@
     v-loading="loading"
     class="member-table"
     :span-method="objectSpanMethod"
+    :maxTableHeight="320"
   >
     <el-table-column prop="nick_name" :label="$t('views.userManage.userForm.nick_name.label')" />
     <el-table-column prop="username" :label="$t('views.login.loginForm.username.label')" />

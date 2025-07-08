@@ -49,7 +49,7 @@
             >
               <div class="flex">
                 <AppIcon iconName="app-workspace"></AppIcon>
-                <span class="ml-4"> {{ space.name }}</span>
+                <span class="ml-4 ellipsis" :title="space.name"> {{ space.name }}</span>
               </div>
             </el-checkbox>
           </el-checkbox-group>
@@ -69,11 +69,11 @@
           <div class="flex-between">
             <div class="flex align-center">
               <AppIcon iconName="app-workspace"></AppIcon>
-              <span class="ml-4 lighter">{{ ele.name }}</span>
+              <span class="ml-4 lighter ellipsis" :title="ele.name">{{ ele.name }}</span>
             </div>
             <el-button link>
               <el-icon @click="clearWorkspace(ele)" :size="18">
-                <Close/>
+                <Close />
               </el-icon>
             </el-button>
           </div>
@@ -89,11 +89,11 @@
 </template>
 
 <script lang="ts" setup>
-import {ref, computed} from 'vue'
-import type {CheckboxValueType} from 'element-plus'
+import { ref, computed } from 'vue'
+import type { CheckboxValueType } from 'element-plus'
 import authorizationApi from '@/api/system-shared/authorization'
 import workspaceApi from '@/api/workspace/workspace'
-import {loadPermissionApi} from "@/utils/dynamics-api/permission-api.ts";
+import { loadPermissionApi } from '@/utils/dynamics-api/permission-api.ts'
 
 const checkAll = ref(false)
 const isIndeterminate = ref(true)
@@ -122,7 +122,7 @@ const handleCheckedWorkspaceChange = (value: CheckboxValueType[]) => {
   isIndeterminate.value = checkedCount > 0 && checkedCount < workspace.value.length
 }
 
-const open = async ({id}: any, type = 'Knowledge') => {
+const open = async ({ id }: any, type = 'Knowledge') => {
   knowledge_id = id
   loading.value = true
   currentType = type
@@ -161,5 +161,4 @@ defineExpose({
   open,
 })
 </script>
-<style lang="scss">
-</style>
+<style lang="scss"></style>

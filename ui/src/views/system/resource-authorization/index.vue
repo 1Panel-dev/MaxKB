@@ -273,6 +273,8 @@ function getMember(id?: string) {
       currentUser.value = member ? member.id : memberList.value?.[0]?.id
       currentType.value = member ? member.type : memberList.value?.[0]?.type
       getWholeTree(currentUser.value)
+    } else {
+      activeData.value.data = []
     }
   })
 }
