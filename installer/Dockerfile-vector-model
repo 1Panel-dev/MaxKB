@@ -11,11 +11,11 @@
 # 不知道为什么用上面的脚本重新拉一遍向量模型比之前的大很多，所以还是用下面的脚本复用原来已经构建好的向量模型
 
 FROM python:3.11-slim-bookworm AS tmp-stage1
-COPY installer/install_model_token.py install_model_token.py
+COPY installer/install_model_bert_base_cased.py install_model_bert_base_cased.py
 RUN pip3 install --upgrade pip setuptools && \
     pip install pycrawlers && \
     pip install transformers && \
-    python3 install_model_token.py && \
+    python3 install_model_bert_base_cased.py && \
     cp -r model/base/hub model/tokenizer
 
 FROM ghcr.io/1panel-dev/maxkb-vector-model:v1.0.1 AS vector-model
