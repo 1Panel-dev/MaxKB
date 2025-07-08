@@ -255,7 +255,7 @@
 
                           <el-dropdown-item
                             @click.stop="openMoveToDialog(item)"
-                            v-if="permissionPrecise.setting(item.id) && apiType === 'workspace'"
+                            v-if="permissionPrecise.edit(item.id) && apiType === 'workspace'"
                           >
                             <AppIcon iconName="app-migrate"></AppIcon>
                             {{ $t('common.moveTo') }}
@@ -268,7 +268,7 @@
                                 path: `/knowledge/${item.id}/${folder.currentFolder.id || 'shared'}/setting`,
                               })
                             "
-                            v-if="permissionPrecise.setting(item.id)"
+                            v-if="permissionPrecise.edit(item.id)"
                           >
                             {{ $t('common.setting') }}
                           </el-dropdown-item>

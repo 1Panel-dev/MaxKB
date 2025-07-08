@@ -59,7 +59,7 @@
             </el-select>
           </div>
           <el-button
-            v-if="!isShared && permissionPrecise.addModel()"
+            v-if="!isShared && permissionPrecise.create()"
             class="ml-16"
             type="primary"
             @click="openCreateModel(active_provider)"

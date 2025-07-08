@@ -57,12 +57,14 @@
                     <el-dropdown-menu>
                       <el-dropdown-item
                         @click.stop="openCreateFolder(data)"
-                        v-if="node.level !== 3"
+                        v-if="node.level !== 3 && permissionPrecise.folderCreate()"
                       >
                         <AppIcon iconName="app-add-folder"></AppIcon>
                         {{ $t('components.folder.addChildFolder') }}
                       </el-dropdown-item>
-                      <el-dropdown-item @click.stop="openEditFolder(data)">
+                      <el-dropdown-item @click.stop="openEditFolder(data)"
+                        v-if="permissionPrecise.folderEdit()"
+                      >
                         <el-icon><EditPen /></el-icon>
                         {{ $t('common.edit') }}
                       </el-dropdown-item>
@@ -70,6 +72,7 @@
                         divided
                         @click.stop="deleteFolder(data)"
                         :disabled="!data.parent_id"
+                        v-if="permissionPrecise.folderDelete()"
                       >
                         <el-icon><Delete /></el-icon>
                         {{ $t('common.delete') }}
@@ -88,7 +91,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 import type { TreeInstance } from 'element-plus'
 import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
@@ -99,6 +102,7 @@ import { hasPermission } from '@/utils/permission/index'
 import useStore from '@/stores'
 import { TreeToFlatten } from '@/utils/array'
 import { MsgConfirm } from '@/utils/message'
+import permissionMap from '@/permission'
 
 defineOptions({ name: 'FolderTree' })
 const props = defineProps({
@@ -130,6 +134,21 @@ const props = defineProps({
     type: Object,
     default: () => ({}),
   },
+})
+const resourceType = computed(() => {
+  if (props.source === 'APPLICATION') {
+    return 'application'
+  } else if (props.source === 'KNOWLEDGE') {
+    return 'knowledge'
+  } else if (props.source === 'MODEL') {
+    return 'model'
+  } else if (props.source === 'TOOL') {
+    return 'tool'
+  }
+})
+
+const permissionPrecise = computed(() => {
+  return permissionMap[resourceType.value!]['workspace']
 })
 
 const { folder } = useStore()
