@@ -59,5 +59,9 @@ const share = {
       ],
       'OR',
     ),
+    
+  folderCreate: () => false,
+  folderEdit: () => false,
+  folderDelete: () => false,
 }
 export default share

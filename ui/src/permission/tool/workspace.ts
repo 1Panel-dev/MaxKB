@@ -10,8 +10,17 @@ const workspace = {
         [EditionConst.IS_EE],'OR'),
       'OR',
     ),
-
   create: () =>
+    hasPermission(
+      [
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        RoleConst.USER.getWorkspaceRole,
+        PermissionConst.TOOL_CREATE.getWorkspacePermission,
+        PermissionConst.TOOL_CREATE.getWorkspacePermissionWorkspaceManageRole
+      ],
+      'OR'
+    ),
+  folderCreate: () =>
     hasPermission(
       [
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
@@ -27,6 +36,16 @@ const workspace = {
         new ComplexPermission([RoleConst.USER],[PermissionConst.TOOL.getToolWorkspaceResourcePermission(source_id)],[],'AND'),
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
         PermissionConst.TOOL_DELETE.getToolWorkspaceResourcePermission(source_id),
+        PermissionConst.TOOL_DELETE.getWorkspacePermissionWorkspaceManageRole
+      ],
+      'OR',
+    ),
+  folderDelete: () =>
+    hasPermission(
+      [
+        RoleConst.USER.getWorkspaceRole,
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.TOOL_DELETE.getWorkspacePermission,
         PermissionConst.TOOL_DELETE.getWorkspacePermissionWorkspaceManageRole
       ],
       'OR',
@@ -50,6 +69,16 @@ const workspace = {
         PermissionConst.TOOL_EDIT.getWorkspacePermissionWorkspaceManageRole
       ],
       'OR'
+    ),
+  folderEdit: () =>
+    hasPermission(
+      [
+        RoleConst.USER.getWorkspaceRole,
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.TOOL_EDIT.getWorkspacePermission,
+        PermissionConst.TOOL_EDIT.getWorkspacePermissionWorkspaceManageRole
+      ],
+      'OR',
     ),
   copy: (source_id:string) =>
     hasPermission(
