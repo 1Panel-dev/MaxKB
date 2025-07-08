@@ -288,6 +288,15 @@ class ToolSerializer(serializers.Serializer):
         id = serializers.UUIDField(required=True, label=_('tool id'))
         workspace_id = serializers.CharField(required=True, label=_('workspace id'))
 
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            workspace_id = self.data.get('workspace_id')
+            query_set = QuerySet(Tool).filter(id=self.data.get('id'))
+            if workspace_id:
+                query_set = query_set.filter(workspace_id=workspace_id)
+            if not query_set.exists():
+                raise AppApiException(500, _('Tool id does not exist'))
+
         def edit(self, instance, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
@@ -425,6 +434,15 @@ class ToolSerializer(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, label=_("User ID"))
         image = UploadedImageField(required=True, label=_("picture"))
 
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            workspace_id = self.data.get('workspace_id')
+            query_set = QuerySet(Tool).filter(id=self.data.get('id'))
+            if workspace_id:
+                query_set = query_set.filter(workspace_id=workspace_id)
+            if not query_set.exists():
+                raise AppApiException(500, _('Tool id does not exist'))
+
         def edit(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
@@ -479,6 +497,15 @@ class ToolSerializer(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, label=_("User ID"))
         workspace_id = serializers.CharField(required=True, label=_("workspace id"))
         tool_id = serializers.UUIDField(required=True, label=_("tool id"))
+
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            workspace_id = self.data.get('workspace_id')
+            query_set = QuerySet(Tool).filter(id=self.data.get('tool_id'))
+            if workspace_id:
+                query_set = query_set.filter(workspace_id=workspace_id)
+            if not query_set.exists():
+                raise AppApiException(500, _('Tool id does not exist'))
 
         def add(self, instance, with_valid=True):
             if with_valid:
