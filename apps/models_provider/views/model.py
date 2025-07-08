@@ -283,7 +283,8 @@ class WorkspaceSharedModelSetting(APIView):
     )
     def get(self, request: Request, workspace_id: str):
         return result.success(
-            WorkspaceSharedModelSerializer(data={'workspace_id': workspace_id}).get_share_model_list())
+            WorkspaceSharedModelSerializer(data={**query_params_to_single_dict(request.query_params),
+                                                 'workspace_id': workspace_id}).get_share_model_list())
 
 
 class ModelList(APIView):
