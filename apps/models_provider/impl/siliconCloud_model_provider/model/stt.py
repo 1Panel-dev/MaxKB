@@ -38,6 +38,10 @@ class SiliconCloudSpeechToText(MaxKBBaseModel, BaseSpeechToText):
             **optional_params,
         )
 
+    @staticmethod
+    def is_cache_model():
+        return False
+
     def check_auth(self):
         client = OpenAI(
             base_url=self.api_base,
@@ -56,4 +60,3 @@ class SiliconCloudSpeechToText(MaxKBBaseModel, BaseSpeechToText):
         buffer.name = "file.mp3"  # this is the important line
         res = client.audio.transcriptions.create(model=self.model, language="zh", file=buffer)
         return res.text
-

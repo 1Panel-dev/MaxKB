@@ -18,3 +18,7 @@ class TencentVision(MaxKBBaseModel, BaseChatOpenAI):
             stream_usage=True,
             extra_body=optional_params
         )
+
+    @staticmethod
+    def is_cache_model():
+        return False

@@ -21,6 +21,10 @@ class AliyunBaiLianTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
         self.params = kwargs.get('params')
 
     @staticmethod
+    def is_cache_model():
+        return False
+
+    @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         optional_params = {'params': {'voice': 'longxiaochun', 'speech_rate': 1.0}}
         for key, value in model_kwargs.items():
@@ -52,5 +56,3 @@ class AliyunBaiLianTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
             raise Exception(audio)
         return audio
 
-    def is_cache_model(self):
-        return False

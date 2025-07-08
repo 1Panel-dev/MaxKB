@@ -201,6 +201,10 @@ class VolcanicEngineSpeechToText(MaxKBBaseModel, BaseSpeechToText):
         self.volcanic_cluster = kwargs.get('volcanic_cluster')
 
     @staticmethod
+    def is_cache_model():
+        return False
+
+    @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         optional_params = {}
         if 'max_tokens' in model_kwargs and model_kwargs['max_tokens'] is not None:

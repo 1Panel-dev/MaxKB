@@ -19,6 +19,10 @@ class OpenAISpeechToText(MaxKBBaseModel, BaseSpeechToText):
     api_key: str
     model: str
 
+    @staticmethod
+    def is_cache_model():
+        return False
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.api_key = kwargs.get('api_key')

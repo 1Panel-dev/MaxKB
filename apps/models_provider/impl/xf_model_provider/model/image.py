@@ -94,3 +94,7 @@ class XFSparkImage(MaxKBBaseModel, ChatSparkLLM):
             if run_manager:
                 run_manager.on_llm_new_token(str(chunk.content), chunk=cg_chunk)
             yield cg_chunk
+
+    @staticmethod
+    def is_cache_model():
+        return False

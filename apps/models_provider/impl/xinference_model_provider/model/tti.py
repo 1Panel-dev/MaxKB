@@ -5,7 +5,7 @@ from openai import OpenAI
 
 from common.config.tokenizer_manage_config import TokenizerManage
 from common.utils.common import bytes_to_uploaded_file
-#from dataset.serializers.file_serializers import FileSerializer
+# from dataset.serializers.file_serializers import FileSerializer
 from models_provider.base_model_provider import MaxKBBaseModel
 from models_provider.impl.base_tti import BaseTextToImage
 
@@ -27,6 +27,10 @@ class XinferenceTextToImage(MaxKBBaseModel, BaseTextToImage):
         self.api_base = kwargs.get('api_base')
         self.model = kwargs.get('model')
         self.params = kwargs.get('params')
+
+    @staticmethod
+    def is_cache_model():
+        return False
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
@@ -57,7 +61,7 @@ class XinferenceTextToImage(MaxKBBaseModel, BaseTextToImage):
             meta = {
                 'debug': True,
             }
-            #file_url = FileSerializer(data={'file': file, 'meta': meta}).upload()
-            #file_urls.append(f'http://localhost:8080{file_url}')
+            # file_url = FileSerializer(data={'file': file, 'meta': meta}).upload()
+            # file_urls.append(f'http://localhost:8080{file_url}')
 
         return file_urls

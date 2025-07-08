@@ -15,6 +15,10 @@ def custom_get_token_ids(text: str):
 class AzureOpenAIImage(MaxKBBaseModel, AzureChatOpenAI):
 
     @staticmethod
+    def is_cache_model():
+        return False
+
+    @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
         return AzureOpenAIImage(

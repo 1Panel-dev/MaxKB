@@ -26,6 +26,10 @@ class OpenAITextToImage(MaxKBBaseModel, BaseTextToImage):
         self.params = kwargs.get('params')
 
     @staticmethod
+    def is_cache_model():
+        return False
+
+    @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         optional_params = {'params': {'size': '1024x1024', 'quality': 'standard', 'n': 1}}
         for key, value in model_kwargs.items():

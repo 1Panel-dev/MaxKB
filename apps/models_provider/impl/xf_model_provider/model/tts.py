@@ -23,7 +23,6 @@ from common.utils.common import _remove_empty_lines
 from models_provider.base_model_provider import MaxKBBaseModel
 from models_provider.impl.base_tts import BaseTextToSpeech
 
-
 STATUS_FIRST_FRAME = 0  # 第一帧的标识
 STATUS_CONTINUE_FRAME = 1  # 中间帧标识
 STATUS_LAST_FRAME = 2  # 最后一帧的标识
@@ -47,6 +46,10 @@ class XFSparkTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
         self.spark_api_key = kwargs.get('spark_api_key')
         self.spark_api_secret = kwargs.get('spark_api_secret')
         self.params = kwargs.get('params')
+
+    @staticmethod
+    def is_cache_model():
+        return False
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):

@@ -13,7 +13,6 @@ from models_provider.base_model_provider import MaxKBBaseModel
 from models_provider.impl.base_tti import BaseTextToImage
 
 
-
 class QwenTextToImageModel(MaxKBBaseModel, BaseTextToImage):
     api_key: str
     model_name: str
@@ -24,6 +23,10 @@ class QwenTextToImageModel(MaxKBBaseModel, BaseTextToImage):
         self.api_key = kwargs.get('api_key')
         self.model_name = kwargs.get('model_name')
         self.params = kwargs.get('params')
+
+    @staticmethod
+    def is_cache_model():
+        return False
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):

@@ -29,7 +29,6 @@ ssl_context.check_hostname = False
 ssl_context.verify_mode = ssl.CERT_NONE
 
 
-
 class XFSparkSpeechToText(MaxKBBaseModel, BaseSpeechToText):
     spark_app_id: str
     spark_api_key: str
@@ -42,6 +41,10 @@ class XFSparkSpeechToText(MaxKBBaseModel, BaseSpeechToText):
         self.spark_app_id = kwargs.get('spark_app_id')
         self.spark_api_key = kwargs.get('spark_api_key')
         self.spark_api_secret = kwargs.get('spark_api_secret')
+
+    @staticmethod
+    def is_cache_model():
+        return False
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):

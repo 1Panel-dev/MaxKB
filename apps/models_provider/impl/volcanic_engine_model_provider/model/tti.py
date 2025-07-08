@@ -37,7 +37,6 @@ req_key_dict = {
 }
 
 
-
 def sign(key, msg):
     return hmac.new(key, msg.encode('utf-8'), hashlib.sha256).digest()
 
@@ -126,6 +125,10 @@ class VolcanicEngineTextToImage(MaxKBBaseModel, BaseTextToImage):
         self.secret_key = kwargs.get('secret_key')
         self.model_version = kwargs.get('model_version')
         self.params = kwargs.get('params')
+
+    @staticmethod
+    def is_cache_model():
+        return False
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
