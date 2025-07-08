@@ -19,13 +19,17 @@
             <template v-for="(node, index) in filter_menu_nodes" :key="index">
               <el-text type="info" size="small" class="color-secondary ml-12">{{
                 node.label
-                }}</el-text>
+              }}</el-text>
               <div class="flex-wrap mt-8">
                 <template v-for="(item, index) in node.list" :key="index">
                   <el-popover placement="right" :width="280">
                     <template #reference>
-                      <div class="list-item flex align-center border border-r-6 mb-12 p-8-12 cursor ml-12"
-                        style="width: 39%" @click.stop="clickNodes(item)" @mousedown.stop="onmousedown(item)">
+                      <div
+                        class="list-item flex align-center border border-r-6 mb-12 p-8-12 cursor ml-12"
+                        style="width: 39%"
+                        @click.stop="clickNodes(item)"
+                        @mousedown.stop="onmousedown(item)"
+                      >
                         <component
                           :is="iconComponent(`${item.type}-icon`)"
                           class="mr-8"
@@ -45,7 +49,7 @@
                       </div>
                       <el-text type="info" size="small" class="color-secondary lighter">{{
                         item.text
-                        }}</el-text>
+                      }}</el-text>
                     </template>
                   </el-popover>
                 </template>
@@ -64,33 +68,58 @@
             <el-collapse-item name="shared" :icon="CaretRight">
               <template #title>
                 <div class="flex align-center">
-                  <AppIcon iconName="app-shared-active" style="font-size: 20px" class="color-primary"></AppIcon>
+                  <AppIcon
+                    iconName="app-shared-active"
+                    style="font-size: 20px"
+                    class="color-primary"
+                  ></AppIcon>
                   <span class="ml-8 lighter">{{ $t('views.shared.shared_tool') }}</span>
                 </div>
               </template>
-              <NodeContent :list="sharedToolList" @clickNodes="(val: any) => clickNodes(toolLibNode, val, 'tool')"
-                @onmousedown="(val: any) => onmousedown(toolLibNode, val, 'tool')" />
+              <NodeContent
+                :list="sharedToolList"
+                @clickNodes="(val: any) => clickNodes(toolLibNode, val, 'tool')"
+                @onmousedown="(val: any) => onmousedown(toolLibNode, val, 'tool')"
+              />
             </el-collapse-item>
           </el-collapse>
 
-          <el-tree :data="toolTreeData" node-key="id"
-            :props="{ children: 'children', isLeaf: 'isLeaf', class: getNodeClass }" lazy :load="loadNode">
+          <el-tree
+            :data="toolTreeData"
+            node-key="id"
+            :props="{ children: 'children', isLeaf: 'isLeaf', class: getNodeClass }"
+            lazy
+            :load="loadNode"
+          >
             <template #default="{ data, node }">
-              <NodeContent v-if="!data._fake" :data="data" :node="node"
+              <NodeContent
+                v-if="!data._fake"
+                :data="data"
+                :node="node"
                 @clickNodes="(val: any) => clickNodes(toolLibNode, val, 'tool')"
-                @onmousedown="(val: any) => onmousedown(toolLibNode, val, 'tool')" />
+                @onmousedown="(val: any) => onmousedown(toolLibNode, val, 'tool')"
+              />
             </template>
           </el-tree>
         </el-scrollbar>
       </el-tab-pane>
       <el-tab-pane :label="$t('views.application.title')" name="application">
         <el-scrollbar height="400">
-          <el-tree :data="applicationTreeData" node-key="id"
-            :props="{ children: 'children', isLeaf: 'isLeaf', class: getNodeClass }" lazy :load="loadNode">
+          <el-tree
+            :data="applicationTreeData"
+            node-key="id"
+            :props="{ children: 'children', isLeaf: 'isLeaf', class: getNodeClass }"
+            lazy
+            :load="loadNode"
+          >
             <template #default="{ data, node }">
-              <NodeContent v-if="!data._fake" :data="data" :node="node"
+              <NodeContent
+                v-if="!data._fake"
+                :data="data"
+                :node="node"
                 @clickNodes="(val: any) => clickNodes(applicationNode, val, 'application')"
-                @onmousedown="(val: any) => onmousedown(applicationNode, val, 'application')" />
+                @onmousedown="(val: any) => onmousedown(applicationNode, val, 'application')"
+              />
             </template>
           </el-tree>
         </el-scrollbar>
@@ -110,7 +139,7 @@ import { SourceTypeEnum } from '@/enums/common'
 import sharedWorkspaceApi from '@/api/shared-workspace'
 import { CaretRight } from '@element-plus/icons-vue'
 import ApplicationApi from '@/api/application/application'
-const {user} = useStore()
+const { user } = useStore()
 const search_text = ref<string>('')
 const props = defineProps({
   show: {
@@ -161,29 +190,10 @@ function clickNodes(item: any, data?: any, type?: string) {
       }
     }
     if (type == 'application') {
-      if (isWorkFlow(data.type)) {
-        const nodeData = data.work_flow.nodes[0].properties.node_data
-        const fileUploadSetting = nodeData.file_upload_setting
-        item['properties']['node_data'] = {
-          name: data.name,
-          icon: data.icon,
-          application_id: data.id,
-          api_input_field_list: data.work_flow.nodes[0].properties.api_input_field_list,
-          user_input_field_list: data.work_flow.nodes[0].properties.user_input_field_list,
-          ...(!fileUploadSetting
-            ? {}
-            : {
-              ...(fileUploadSetting.document ? { document_list: [] } : {}),
-              ...(fileUploadSetting.image ? { image_list: [] } : {}),
-              ...(fileUploadSetting.audio ? { audio_list: [] } : {}),
-            }),
-        }
-      } else {
-        item['properties']['node_data'] = {
-          name: data.name,
-          icon: data.icon,
-          application_id: data.id,
-        }
+      item['properties']['node_data'] = {
+        name: data.name,
+        icon: data.icon,
+        application_id: data.id,
       }
     }
   }
@@ -213,15 +223,6 @@ function onmousedown(item: any, data?: any, type?: string) {
           name: data.name,
           icon: data.icon,
           application_id: data.id,
-          api_input_field_list: data.work_flow.nodes[0].properties.api_input_field_list,
-          user_input_field_list: data.work_flow.nodes[0].properties.user_input_field_list,
-          ...(!fileUploadSetting
-            ? {}
-            : {
-              ...(fileUploadSetting.document ? { document_list: [] } : {}),
-              ...(fileUploadSetting.image ? { image_list: [] } : {}),
-              ...(fileUploadSetting.audio ? { audio_list: [] } : {}),
-            }),
         }
       } else {
         item['properties']['node_data'] = {
@@ -250,10 +251,10 @@ const loadNode = async (node: any, resolve: (children: any[]) => void) => {
       folders = res.data?.folders
     } else {
       const res = await ApplicationApi.getAllApplication({ folder_id: node.data.id })
-      node.data.cardList = res.data.filter(item => item.resource_type === "application")
-      folders = res.data.filter(item => item.resource_type === "folder")
+      node.data.cardList = res.data.filter((item) => item.resource_type === 'application')
+      folders = res.data.filter((item) => item.resource_type === 'folder')
     }
-    const children = folders.map(f => ({
+    const children = folders.map((f) => ({
       ...f,
       children: [],
       isLeaf: false,
@@ -300,7 +301,7 @@ function getApplicationFolder() {
 
 onMounted(() => {
   if (user.isEE()) {
-      getShareTool()
+    getShareTool()
   }
   getToolFolder()
   getApplicationFolder()
@@ -358,7 +359,7 @@ onMounted(() => {
     }
   }
 
-  :deep(.el-tree-node):focus>.el-tree-node__content {
+  :deep(.el-tree-node):focus > .el-tree-node__content {
     background: transparent;
   }
   :deep(.el-tree-node__content) {
