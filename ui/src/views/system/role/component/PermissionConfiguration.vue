@@ -9,16 +9,15 @@
       />
       <el-table-column prop="permission" :label="$t('views.model.modelForm.permissionType.label')">
         <template #default="{ row }">
-          <el-checkbox-group v-model="row.perChecked" @change="handleCellChange($event, row)">
-            <el-checkbox
-              v-for="item in row.permission"
-              :key="item.id"
-              :value="item.id"
-              :disabled="disabled"
-            >
-              <div class="ellipsis" style="width: 96px">{{ item.name }}</div>
-            </el-checkbox>
-          </el-checkbox-group>
+          <el-checkbox
+            v-for="item in row.permission"
+            :key="item.id"
+            v-model="item.enable"
+            :disabled="disabled"
+            @change="(val: boolean) => handleCellChange(val, item, row)"
+          >
+            <div class="ellipsis" style="width: 96px">{{ item.name }}</div>
+          </el-checkbox>
         </template>
       </el-table-column>
       <el-table-column :width="40">
@@ -74,12 +73,12 @@ const needDisable = computed(() => {
   const isAdminOrExtendAdmin = hasPermission([RoleConst.ADMIN, RoleConst.EXTENDS_ADMIN], 'OR')
   const isWorkspaceManage =
     hasPermission(
-      [
-        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-        RoleConst.EXTENDS_WORKSPACE_MANAGE.getWorkspaceRole,
-      ],
+    [
+      RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+      RoleConst.EXTENDS_WORKSPACE_MANAGE.getWorkspaceRole,
+    ],
       'OR'
-    )
+  )
 
   if (!isEeOrPe) {
     return false
@@ -123,23 +122,35 @@ async function getRolePermission() {
   }
 }
 
-function handleCellChange(checkedValues: string[], row: RoleTableDataItem) {
-  row.enable = checkedValues.length === row.permission.length
-  row.indeterminate = checkedValues.length > 0 && checkedValues.length < row.permission.length
+function handleCellChange(
+  value: boolean,
+  item: ChildrenPermissionItem,
+  row: RoleTableDataItem,
+) {
+  item.enable = value
+  const readItem = row.permission.find((p) => /:READ$/.test(p.id))
+  // 如果勾选的不是 READ，则强制把 READ 也勾上
+  if (value && item.id !== readItem?.id && readItem && !readItem.enable) {
+    readItem.enable = true
+  } else if (!value && item.id === readItem?.id) {
+    // 取消 READ 整行其他权限全部取消
+    row.permission.forEach((p) => (p.enable = false))
+  }
 
-  row.permission.forEach((p) => {
-    p.enable = checkedValues.includes(p.id)
-  })
+  const checkedIds = row.permission.filter((p) => p.enable).map((p) => p.id)
+  row.perChecked = checkedIds
+  row.enable = checkedIds.length === row.permission.length
+  row.indeterminate =
+    checkedIds.length > 0 && checkedIds.length < row.permission.length
 }
 
 function handleRowChange(checked: boolean, row: RoleTableDataItem) {
   if (checked) {
-    row.perChecked = row.permission.map((p) => p.id)
     row.permission.forEach((p) => (p.enable = true))
   } else {
-    row.perChecked = []
     row.permission.forEach((p) => (p.enable = false))
   }
+  row.perChecked = checked ? row.permission.map((p) => p.id) : []
   row.indeterminate = false
 }
 
@@ -182,15 +193,9 @@ watch(() => props.currentRole?.id, getRolePermission, {immediate: true})
 
 async function handleSave() {
   try {
-    const permissions: { id: string; enable: boolean }[] = []
-    tableData.value.forEach((e) => {
-      e.permission?.forEach((ele: ChildrenPermissionItem) => {
-        permissions.push({
-          id: ele.id,
-          enable: ele.enable,
-        })
-      })
-    })
+    const permissions = tableData.value.flatMap((row) =>
+      row.permission.map((p) => ({ id: p.id, enable: p.enable })),
+    )
     await loadPermissionApi('role').saveRolePermission(props.currentRole?.id as string, permissions, loading)
     MsgSuccess(t('common.saveSuccess'))
   } catch (error) {
