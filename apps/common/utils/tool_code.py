@@ -49,7 +49,7 @@ try:
     sys.path += {python_paths}
     env = dict(os.environ)
     for key in list(env.keys()):
-        if key in os.environ and (key.startswith('MAXKB') or key.startswith('POSTGRES') or key.startswith('PG')):
+        if key in os.environ and (key.startswith('MAXKB') or key.startswith('POSTGRES') or key.startswith('PG') or key.startswith('REDIS')):
             del os.environ[key]
     locals_v={'{}'}
     keywords={keywords}
@@ -84,7 +84,7 @@ except Exception as e:
         exec_python_file = f'{self.sandbox_path}/{_id}.py'
         with open(exec_python_file, 'w') as file:
             file.write(_code)
-            os.system(f"chown {self.user}:{self.user} {exec_python_file}")
+            os.system(f"chown {self.user}:root {exec_python_file}")
         kwargs = {'cwd': BASE_DIR}
         subprocess_result = subprocess.run(
             ['su', '-s', python_directory, '-c', "exec(open('" + exec_python_file + "').read())", self.user],
