@@ -1,12 +1,12 @@
 # coding=utf-8
 
 import os
+import pickle
 import subprocess
 import sys
 from textwrap import dedent
 
 import uuid_utils.compat as uuid
-from diskcache import Cache
 
 from maxkb.const import BASE_DIR, CONFIG
 from maxkb.const import PROJECT_DIR
@@ -31,6 +31,8 @@ class ToolExecutor:
         old_mask = os.umask(0o077)
         try:
             os.makedirs(self.sandbox_path, 0o700, exist_ok=True)
+            os.makedirs(os.path.join(self.sandbox_path, 'execute'), 0o700, exist_ok=True)
+            os.makedirs(os.path.join(self.sandbox_path, 'result'), 0o700, exist_ok=True)
         finally:
             os.umask(old_mask)
 
@@ -38,7 +40,7 @@ class ToolExecutor:
         _id = str(uuid.uuid7())
         success = '{"code":200,"msg":"成功","data":exec_result}'
         err = '{"code":500,"msg":str(e),"data":None}'
-        path = r'' + self.sandbox_path + ''
+        result_path = f'{self.sandbox_path}/result/{_id}.result'
         python_paths = CONFIG.get_sandbox_python_package_paths().split(',')
         _exec_code = f"""
 try:
@@ -59,13 +61,12 @@ try:
     for local in locals_v:
         globals_v[local] = locals_v[local]
     exec_result=f(**keywords)
-    from diskcache import Cache
-    cache = Cache({path!a})
-    cache.set({_id!a},{success})
+    import pickle
+    with open({result_path!a}, 'wb') as file:
+        file.write(pickle.dumps({success}))
 except Exception as e:
-    from diskcache import Cache
-    cache = Cache({path!a})
-    cache.set({_id!a},{err})
+    with open({result_path!a}, 'wb') as file:
+        file.write(pickle.dumps({err}))
 """
         if self.sandbox:
             subprocess_result = self._exec_sandbox(_exec_code, _id)
@@ -73,15 +74,15 @@ except Exception as e:
             subprocess_result = self._exec(_exec_code)
         if subprocess_result.returncode == 1:
             raise Exception(subprocess_result.stderr)
-        cache = Cache(self.sandbox_path)
-        result = cache.get(_id)
-        cache.delete(_id)
+        with open(result_path, 'rb') as file:
+            result = pickle.loads(file.read())
+        os.remove(result_path)
         if result.get('code') == 200:
             return result.get('data')
         raise Exception(result.get('msg'))
 
     def _exec_sandbox(self, _code, _id):
-        exec_python_file = f'{self.sandbox_path}/{_id}.py'
+        exec_python_file = f'{self.sandbox_path}/execute/{_id}.py'
         with open(exec_python_file, 'w') as file:
             file.write(_code)
             os.system(f"chown {self.user}:root {exec_python_file}")
