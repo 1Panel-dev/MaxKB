@@ -49,6 +49,7 @@ class FunctionExecutor:
         _exec_code = f"""
 try:
     import os
+    import pickle
     env = dict(os.environ)
     for key in list(env.keys()):
         if key in os.environ and (key.startswith('MAXKB') or key.startswith('POSTGRES') or key.startswith('PG')):
@@ -61,7 +62,6 @@ try:
     for local in locals_v:
         globals_v[local] = locals_v[local]
     exec_result=f(**keywords)
-    import pickle
     with open({result_path!a}, 'wb') as file:
         file.write(pickle.dumps({success}))
 except Exception as e:
