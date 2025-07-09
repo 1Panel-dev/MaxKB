@@ -4,7 +4,7 @@ import re
 import time
 import uuid
 from typing import Dict, List
-
+from django.utils.translation import gettext as _
 from application.flow.common import Answer
 from application.flow.i_step_node import NodeResult, INode
 from application.flow.step_node.application_node.i_application_node import IApplicationNode
@@ -177,6 +177,8 @@ class BaseApplicationNode(IApplicationNode):
                 app_document_list=None, app_image_list=None, app_audio_list=None, child_node=None, node_data=None,
                 **kwargs) -> NodeResult:
         from chat.serializers.chat import ChatSerializers
+        if application_id == self.workflow_manage.get_body().get('application_id'):
+            raise Exception(_("The sub application cannot use the current node"))
         # 生成嵌入应用的chat_id
         current_chat_id = string_to_uuid(chat_id + application_id)
         Chat.objects.get_or_create(id=current_chat_id, defaults={
