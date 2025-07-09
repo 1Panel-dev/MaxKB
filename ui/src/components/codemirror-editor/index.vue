@@ -98,19 +98,30 @@ const regexpLinter = linter(async (view) => {
   if (!lintResults || lintResults.length === 0) {
     return diagnostics
   }
-  lintResults.forEach((element: any) => {
-    const range = getRangeFromLineAndColumn(
-      view.state,
-      element.line,
-      element.column,
-      element.endColumn,
-    )
-    diagnostics.push({
-      from: range.form,
-      to: range.to,
-      severity: element.type,
-      message: element.message,
-    })
+  // 限制诊断数量，避免过多诊断信息
+  const maxDiagnostics = 50
+  const limitedResults = lintResults.slice(0, maxDiagnostics)
+
+  limitedResults.forEach((element: any) => {
+    try {
+      const range = getRangeFromLineAndColumn(
+        view.state,
+        element.line,
+        element.column,
+        element.endColumn,
+      )
+      // 验证范围有效性
+      if (range.form >= 0 && range.to >= range.form) {
+        diagnostics.push({
+          from: range.form,
+          to: range.to,
+          severity: element.type === 'error' ? 'error' : 'warning',
+          message: element.message,
+        })
+      }
+    } catch (error) {
+      // console.error('Error processing lint result:', error)
+    }
   })
   return diagnostics
 })
