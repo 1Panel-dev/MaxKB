@@ -150,6 +150,8 @@ import useStore from '@/stores'
 import { WorkFlowInstance } from '@/workflow/common/validate'
 import { hasPermission } from '@/utils/permission'
 import { t } from '@/locales'
+import { ComplexPermission } from '@/utils/permission/type'
+import { EditionConst, PermissionConst, RoleConst } from '@/utils/permission/data'
 
 const { theme, application } = useStore()
 const router = useRouter()
@@ -199,10 +201,10 @@ function back() {
         saveApplication(true, true)
       })
       .catch((action: Action) => {
-        action === 'cancel' && router.push({ path: `/application/${id}/WORK_FLOW/overview` })
+        action === 'cancel' && go()
       })
   } else {
-    router.push({ path: `/application/${id}/WORK_FLOW/overview` })
+    go()
   }
 }
 function clickoutsideHistory() {
@@ -405,7 +407,7 @@ function saveApplication(bool?: boolean, back?: boolean) {
         cloneWorkFlow.value = getGraphData()
         MsgSuccess(t('common.saveSuccess'))
         if (back) {
-          router.push({ path: `/application/${id}/WORK_FLOW/overview` })
+         go()
         }
       }
     })
@@ -413,6 +415,31 @@ function saveApplication(bool?: boolean, back?: boolean) {
       loading.value = false
     })
 }
+const go=()=>{
+ return router.push({ path: get_route() })
+}
+
+const get_route=()=>{
+  if(  hasPermission( [new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(id)],[],'AND'),
+          RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+          PermissionConst.APPLICATION_OVERVIEW_READ.getWorkspacePermissionWorkspaceManageRole,
+          PermissionConst.APPLICATION_OVERVIEW_READ.getApplicationWorkspaceResourcePermission(id)],'OR')){
+            return `/application/${id}/WORK_FLOW/overview` 
+          } else if (hasPermission([new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(id)],[EditionConst.IS_EE, EditionConst.IS_PE],'AND'),
+          new ComplexPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,],[PermissionConst.APPLICATION_ACCESS_READ.getWorkspacePermissionWorkspaceManageRole],[EditionConst.IS_EE, EditionConst.IS_PE],'OR'),
+          new ComplexPermission([],[PermissionConst.APPLICATION_ACCESS_READ.getApplicationWorkspaceResourcePermission(id)],[EditionConst.IS_EE, EditionConst.IS_PE],'OR'),],'OR')) {
+            return `/application/${id}/WORK_FLOW/access`
+          } else if (hasPermission([new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(id)],[EditionConst.IS_EE, EditionConst.IS_PE],'AND'),
+          new ComplexPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],[PermissionConst.APPLICATION_CHAT_USER_READ.getWorkspacePermissionWorkspaceManageRole],[EditionConst.IS_EE, EditionConst.IS_PE],'OR'),
+          new ComplexPermission([],[PermissionConst.APPLICATION_CHAT_USER_READ.getApplicationWorkspaceResourcePermission(id)],[EditionConst.IS_EE, EditionConst.IS_PE],'OR'),],'OR')) {
+            return `/application/${id}/WORK_FLOW/chat-user` 
+          } else if (hasPermission([new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(id)],[],'AND'),
+          PermissionConst.APPLICATION_CHAT_LOG_READ.getWorkspacePermissionWorkspaceManageRole,
+          PermissionConst.APPLICATION_CHAT_LOG_READ.getApplicationWorkspaceResourcePermission(id)],'OR')) {
+            return `/application/${id}/WORK_FLOW/chat-log`
+          } else return  `/application`
+}
+
 
 /**
  * 定时保存

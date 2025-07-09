@@ -166,6 +166,11 @@ const submitHandle = async (formEl: FormInstance | undefined) => {
       applicationApi
         .postApplication({ ...applicationForm.value, folder_id: currentFolder.value }, loading)
         .then((res) => {
+          return user.profile().then(() => {
+            return res
+          })
+        })
+        .then((res) => {
           MsgSuccess(t('common.createSuccess'))
           if (isWorkFlow(applicationForm.value.type)) {
             router.push({ path: `/application/${res.data.id}/workflow` })
