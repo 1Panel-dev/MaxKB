@@ -49,7 +49,7 @@ def reset_title(title):
 class BaseSearchKnowledgeNode(ISearchKnowledgeStepNode):
     def save_context(self, details, workflow_manage):
         result = details.get('paragraph_list', [])
-        dataset_setting = self.node_params_serializer.data.get('dataset_setting')
+        knowledge_setting = self.node_params_serializer.data.get('knowledge_setting')
         directly_return = '\n'.join(
             [f"{paragraph.get('title', '')}:{paragraph.get('content')}" for paragraph in result if
              paragraph.get('is_hit_handling_method')])
@@ -59,7 +59,7 @@ class BaseSearchKnowledgeNode(ISearchKnowledgeStepNode):
         self.context['is_hit_handling_method_list'] = [row for row in result if row.get('is_hit_handling_method')]
         self.context['data'] = '\n'.join(
             [f"{paragraph.get('title', '')}:{paragraph.get('content')}" for paragraph in
-             result])[0:dataset_setting.get('max_paragraph_char_number', 5000)]
+             result])[0:knowledge_setting.get('max_paragraph_char_number', 5000)]
         self.context['directly_return'] = directly_return
 
     def execute(self, knowledge_id_list, knowledge_setting, question, show_knowledge,
