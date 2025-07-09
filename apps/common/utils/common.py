@@ -116,6 +116,9 @@ def markdown_to_plain_text(md: str) -> str:
     text = re.sub(r'\n{2,}', '\n', text)
     # 使用正则表达式去除所有 HTML 标签
     text = re.sub(r'<[^>]+>', '', text)
+    # 先移除特定媒体标签（优先级高于通用HTML标签移除）
+    text = re.sub(r'<(audio|video)[^>]*>.*?</\1>', '', text, flags=re.DOTALL)  # 匹配音频/视频标签
+    text = re.sub(r'<img[^>]*>', '', text)  # 匹配图片标签
     # 去除多余的空白字符（包括换行符、制表符等）
     text = re.sub(r'\s+', ' ', text)
     # 去除表单渲染
