@@ -29,7 +29,7 @@ from common.utils.fork import Fork, ChildLink
 from common.utils.logger import maxkb_logger
 from common.utils.split_model import get_split_model
 from knowledge.models import Knowledge, KnowledgeScope, KnowledgeType, Document, Paragraph, Problem, \
-    ProblemParagraphMapping, TaskType, State, SearchMode, KnowledgeFolder
+    ProblemParagraphMapping, TaskType, State, SearchMode, KnowledgeFolder, File
 from knowledge.serializers.common import ProblemParagraphManage, get_embedding_model_id_by_knowledge_id, MetaSerializer, \
     GenerateRelatedSerializer, get_embedding_model_by_knowledge_id, list_paragraph, write_image, zip_dir
 from knowledge.serializers.document import DocumentSerializers
@@ -417,6 +417,9 @@ class KnowledgeSerializer(serializers.Serializer):
             QuerySet(WorkspaceUserResourcePermission).filter(target=knowledge.id).delete()
             QuerySet(ApplicationKnowledgeMapping).filter(knowledge_id=knowledge.id).delete()
             knowledge.delete()
+            File.objects.filter(
+                source_id=knowledge.id,
+            ).delete()
             delete_embedding_by_knowledge(self.data.get('knowledge_id'))
             return True
 

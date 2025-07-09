@@ -665,6 +665,9 @@ class DocumentSerializers(serializers.Serializer):
         def delete(self):
             document_id = self.data.get("document_id")
             QuerySet(model=Document).filter(id=document_id).delete()
+            source_file_ids = [doc['meta'].get('source_file_id') for doc in
+                               Document.objects.filter(id__=document_id).values("meta")]
+            QuerySet(File).filter(id__in=source_file_ids).delete()
             # 删除段落
             QuerySet(model=Paragraph).filter(document_id=document_id).delete()
             # 删除问题
@@ -1189,6 +1192,9 @@ class DocumentSerializers(serializers.Serializer):
                 BatchSerializer(data=instance).is_valid(model=Document, raise_exception=True)
                 self.is_valid(raise_exception=True)
             document_id_list = instance.get("id_list")
+            source_file_ids = [doc['meta'].get('source_file_id') for doc in
+                               Document.objects.filter(id__in=document_id_list).values("meta")]
+            QuerySet(File).filter(id__in=source_file_ids).delete()
             QuerySet(Document).filter(id__in=document_id_list).delete()
             QuerySet(Paragraph).filter(document_id__in=document_id_list).delete()
             delete_problems_and_mappings(document_id_list)
