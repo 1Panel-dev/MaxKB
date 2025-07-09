@@ -79,7 +79,7 @@ def exist_permissions(user_role: List[RoleConstants], user_permission: List[Perm
 def exist(user_role: List[RoleConstants], user_permission: List[PermissionConstants], permission, request, **kwargs):
     if callable(permission):
         p = permission(request, kwargs)
-        return exist_permissions(user_role, user_permission, p, request)
+        return exist_permissions(user_role, user_permission, p, request,**kwargs)
     return exist_permissions(user_role, user_permission, permission, request, **kwargs)
 
 
