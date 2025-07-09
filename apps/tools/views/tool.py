@@ -67,9 +67,16 @@ class ToolView(APIView):
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
     )
     def get(self, request: Request, workspace_id: str):
-        return result.success(ToolTreeSerializer(
-            data={'workspace_id': workspace_id, 'scope': ToolScope.WORKSPACE, 'user_id': request.user.id}
-        ).get_tools(request.query_params.get('folder_id')))
+        return result.success(ToolTreeSerializer.Query(
+            data={
+                'workspace_id': workspace_id,
+                'folder_id': request.query_params.get('folder_id'),
+                'name': request.query_params.get('name'),
+                'scope': request.query_params.get('scope', ToolScope.WORKSPACE),
+                'user_id': request.user.id,
+                'create_user': request.query_params.get('create_user'),
+            }
+        ).get_tools())
 
     class Debug(APIView):
         authentication_classes = [TokenAuth]
@@ -111,8 +118,8 @@ class ToolView(APIView):
             PermissionConstants.TOOL_EDIT.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
             ViewPermission([RoleConstants.USER.get_workspace_role()],
-                                        [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                                        CompareConstants.AND),
+                           [PermissionConstants.TOOL.get_workspace_tool_permission()],
+                           CompareConstants.AND),
         )
         @log(
             menu='Tool', operate='Update tool',
@@ -136,9 +143,10 @@ class ToolView(APIView):
         @has_permissions(
             PermissionConstants.TOOL_READ.get_workspace_tool_permission(),
             PermissionConstants.TOOL_READ.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), ViewPermission([RoleConstants.USER.get_workspace_role()],
-                                        [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                                        CompareConstants.AND),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            ViewPermission([RoleConstants.USER.get_workspace_role()],
+                           [PermissionConstants.TOOL.get_workspace_tool_permission()],
+                           CompareConstants.AND),
         )
         @log(menu='Tool', operate='Get tool')
         def get(self, request: Request, workspace_id: str, tool_id: str):
@@ -158,9 +166,10 @@ class ToolView(APIView):
         @has_permissions(
             PermissionConstants.TOOL_DELETE.get_workspace_tool_permission(),
             PermissionConstants.TOOL_DELETE.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), ViewPermission([RoleConstants.USER.get_workspace_role()],
-                                        [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                                        CompareConstants.AND),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            ViewPermission([RoleConstants.USER.get_workspace_role()],
+                           [PermissionConstants.TOOL.get_workspace_tool_permission()],
+                           CompareConstants.AND),
         )
         @log(
             menu='Tool', operate="Delete tool",
@@ -242,9 +251,10 @@ class ToolView(APIView):
         @has_permissions(
             PermissionConstants.TOOL_EXPORT.get_workspace_tool_permission(),
             PermissionConstants.TOOL_EXPORT.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), ViewPermission([RoleConstants.USER.get_workspace_role()],
-                                        [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                                        CompareConstants.AND),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            ViewPermission([RoleConstants.USER.get_workspace_role()],
+                           [PermissionConstants.TOOL.get_workspace_tool_permission()],
+                           CompareConstants.AND),
         )
         @log(
             menu='Tool', operate="Export tool",
@@ -296,9 +306,10 @@ class ToolView(APIView):
         @has_permissions(
             PermissionConstants.TOOL_EDIT.get_workspace_tool_permission(),
             PermissionConstants.TOOL_EDIT.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), ViewPermission([RoleConstants.USER.get_workspace_role()],
-                                        [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                                        CompareConstants.AND),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            ViewPermission([RoleConstants.USER.get_workspace_role()],
+                           [PermissionConstants.TOOL.get_workspace_tool_permission()],
+                           CompareConstants.AND),
         )
         def put(self, request: Request, tool_id: str, workspace_id: str):
             return result.success(ToolSerializer.IconOperate(data={

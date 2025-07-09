@@ -16,7 +16,7 @@ from pylint.reporters import JSON2Reporter
 from rest_framework import serializers, status
 
 from common.database_model_manage.database_model_manage import DatabaseModelManage
-from common.db.search import page_search, native_page_search
+from common.db.search import page_search, native_page_search, native_search
 from common.exception.app_exception import AppApiException
 from common.field.common import UploadedImageField
 from common.result import result
@@ -28,7 +28,6 @@ from maxkb.const import CONFIG, PROJECT_DIR
 from system_manage.models import AuthTargetType, WorkspaceUserResourcePermission
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
 from tools.models import Tool, ToolScope, ToolFolder, ToolType
-from tools.serializers.tool_folder import ToolFolderFlatSerializer
 from users.serializers.user import is_workspace_manage
 
 tool_executor = ToolExecutor(CONFIG.get('SANDBOX'))
@@ -537,36 +536,6 @@ class ToolSerializer(serializers.Serializer):
 
 
 class ToolTreeSerializer(serializers.Serializer):
-    workspace_id = serializers.CharField(required=True, label=_('workspace id'))
-    scope = serializers.CharField(required=True, label=_('scope'))
-
-    def get_tools(self, folder_id):
-        self.is_valid(raise_exception=True)
-        if not folder_id:
-            folder_id = self.data.get('workspace_id')
-        # 获取当前文件夹
-        current_folder = ToolFolder.objects.filter(id=folder_id).first()
-        if not current_folder:
-            raise serializers.ValidationError(_('Folder not found'))
-
-        # 获取当前文件夹下的直接子文件夹
-        child_folders = ToolFolder.objects.filter(parent=current_folder)
-        folders_data = ToolFolderFlatSerializer(child_folders, many=True).data
-
-        # 获取当前文件夹下的工具
-        tools = QuerySet(Tool).filter(
-            Q(workspace_id=self.data.get('workspace_id')) &
-            Q(scope=self.data.get('scope')) &
-            Q(folder_id=folder_id)
-        )
-        tools_data = ToolModelSerializer(tools, many=True).data
-
-        # 返回包含文件夹和工具的结构
-        return {
-            'folders': folders_data,
-            'tools': tools_data,
-        }
-
     class Query(serializers.Serializer):
         workspace_id = serializers.CharField(required=True, label=_('workspace id'))
         folder_id = serializers.CharField(required=True, label=_('folder id'))
@@ -677,3 +646,36 @@ class ToolTreeSerializer(serializers.Serializer):
                     'init_field_list': json.loads(record.get('init_field_list', '[]')),
                 },
             )
+
+        def get_tools(self):
+            self.is_valid(raise_exception=True)
+
+            workspace_manage = is_workspace_manage(self.data.get('user_id'), self.data.get('workspace_id'))
+            is_x_pack_ee = self.is_x_pack_ee()
+            results = native_search(
+                self.get_query_set(workspace_manage, is_x_pack_ee),
+                get_file_content(
+                    os.path.join(
+                        PROJECT_DIR,
+                        "apps", "tools", 'sql',
+                        'list_tool.sql' if workspace_manage else (
+                            'list_tool_user_ee.sql' if is_x_pack_ee else 'list_tool_user.sql'
+                        )
+                    )
+                ),
+
+            )
+
+            # 返回包含文件夹和工具的结构
+            return {
+                'folders': [
+                    folder for folder in results if folder['resource_type'] == 'folder'
+                ],
+                'tools': [
+                    {
+                        **tool,
+                        'input_field_list': json.loads(tool.get('input_field_list', '[]')),
+                        'init_field_list': json.loads(tool.get('init_field_list', '[]')),
+                    } for tool in results if tool['resource_type'] == 'tool'
+                ],
+            }
