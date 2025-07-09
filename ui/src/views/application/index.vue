@@ -173,7 +173,7 @@
                   :title="item.name"
                   :description="item.desc"
                   class="cursor"
-                  @click="router.push({ path: `/application/${item.id}/${item.type}/overview` })"
+                  @click="goApp(item)"
                 >
                   <template #icon>
                     <LogoIcon height="32px" />
@@ -225,7 +225,6 @@
                           <el-dropdown-menu>
                             <el-dropdown-item
                               @click.stop="getAccessToken(item.id)"
-                              v-if="permissionPrecise.overview_access(item.id)"
                             >
                               <AppIcon iconName="app-create-chat"></AppIcon>
                               {{ $t('views.application.operation.toChat') }}
@@ -307,6 +306,9 @@ import { dateFormat } from '@/utils/time'
 import { SourceTypeEnum, ValidType, ValidCount } from '@/enums/common'
 import permissionMap from '@/permission'
 import WorkspaceApi from '@/api/workspace/workspace'
+import { hasPermission } from '@/utils/permission'
+import { ComplexPermission } from '@/utils/permission/type'
+import { EditionConst, PermissionConst, RoleConst } from '@/utils/permission/data'
 
 const router = useRouter()
 const route = useRoute()
@@ -351,6 +353,38 @@ function openMoveToDialog(data: any) {
 function refreshApplicationList(row: any) {
   const index = applicationList.value.findIndex((v) => v.id === row.id)
   applicationList.value.splice(index, 1)
+}
+
+const goApp=(item : any) => {
+router.push({ path: get_route(item) })
+}
+
+
+const get_route=(item: any)=>{
+  if(  hasPermission( [new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(item.id)],[],'AND'),
+          RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+          PermissionConst.APPLICATION_OVERVIEW_READ.getWorkspacePermissionWorkspaceManageRole,
+          PermissionConst.APPLICATION_OVERVIEW_READ.getApplicationWorkspaceResourcePermission(item.id)],'OR')){
+            return `/application/${item.id}/${item.type}/overview` 
+          } else if (hasPermission([ new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(item.id)],[],'AND'),
+          RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+          PermissionConst.APPLICATION_EDIT.getWorkspacePermissionWorkspaceManageRole,
+          PermissionConst.APPLICATION_EDIT.getApplicationWorkspaceResourcePermission(item.id)],'OR')){
+            if(item.type=='WORK_FLOW'){ return `/application/${item.id}/workflow`}else{
+                return `/application/${item.id}/${item.type}/setting`}
+          } else if (hasPermission([new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(item.id)],[EditionConst.IS_EE, EditionConst.IS_PE],'AND'),
+          new ComplexPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,],[PermissionConst.APPLICATION_ACCESS_READ.getWorkspacePermissionWorkspaceManageRole],[EditionConst.IS_EE, EditionConst.IS_PE],'OR'),
+          new ComplexPermission([],[PermissionConst.APPLICATION_ACCESS_READ.getApplicationWorkspaceResourcePermission(item.id)],[EditionConst.IS_EE, EditionConst.IS_PE],'OR'),],'OR')) {
+            return `/application/${item.id}/${item.type}/access`
+          } else if (hasPermission([new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(item.id)],[EditionConst.IS_EE, EditionConst.IS_PE],'AND'),
+          new ComplexPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],[PermissionConst.APPLICATION_CHAT_USER_READ.getWorkspacePermissionWorkspaceManageRole],[EditionConst.IS_EE, EditionConst.IS_PE],'OR'),
+          new ComplexPermission([],[PermissionConst.APPLICATION_CHAT_USER_READ.getApplicationWorkspaceResourcePermission(item.id)],[EditionConst.IS_EE, EditionConst.IS_PE],'OR'),],'OR')) {
+            return `/application/${item.id}/${item.type}/chat-user` 
+          } else if (hasPermission([new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(item.id)],[],'AND'),
+          PermissionConst.APPLICATION_CHAT_LOG_READ.getWorkspacePermissionWorkspaceManageRole,
+          PermissionConst.APPLICATION_CHAT_LOG_READ.getApplicationWorkspaceResourcePermission(item.id)],'OR')) {
+            return `/application/${item.id}/${item.type}/chat-log`
+          } else return  `/application/`
 }
 
 const CreateApplicationDialogRef = ref()
