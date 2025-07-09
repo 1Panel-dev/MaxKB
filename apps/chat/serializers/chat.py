@@ -238,7 +238,7 @@ class ChatSerializers(serializers.Serializer):
                                            'workspace_id': workspace_id,
                                            'debug': debug,
                                            'chat_user': chat_info.get_chat_user(),
-                                           'application_id': chat_info.application_id},
+                                           'application_id': str(chat_info.application_id)},
                                           WorkFlowPostHandler(chat_info),
                                           base_to_response, form_data, image_list, document_list, audio_list,
                                           other_list,
