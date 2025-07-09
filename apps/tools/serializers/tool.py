@@ -589,11 +589,11 @@ class ToolTreeSerializer(serializers.Serializer):
                 folder_query_set = folder_query_set.filter(parent=folder_id)
                 default_query_set = default_query_set.filter(folder_id=folder_id)
             if name is not None:
-                folder_query_set = folder_query_set.filter(name__contains=name)
-                default_query_set = default_query_set.filter(name__contains=name)
+                folder_query_set = folder_query_set.filter(name__icontains=name)
+                default_query_set = default_query_set.filter(name__icontains=name)
             if desc is not None:
-                folder_query_set = folder_query_set.filter(desc__contains=desc)
-                default_query_set = default_query_set.filter(desc__contains=desc)
+                folder_query_set = folder_query_set.filter(desc__icontains=desc)
+                default_query_set = default_query_set.filter(desc__icontains=desc)
             if create_user is not None:
                 tool_query_set = tool_query_set.filter(user_id=create_user)
                 folder_query_set = folder_query_set.filter(user_id=create_user)
