@@ -74,7 +74,7 @@ class IApplicationNode(INode):
                 if 'file_id' not in audio:
                     raise ValueError(
                         _("Parameter value error: The uploaded audio lacks file_id, and the audio upload fails."))
-        return self.execute(**self.node_params_serializer.data, **self.flow_params_serializer.data,
+        return self.execute(**{**self.flow_params_serializer.data, **self.node_params_serializer.data},
                             app_document_list=app_document_list, app_image_list=app_image_list,
                             app_audio_list=app_audio_list,
                             message=str(question), **kwargs)
