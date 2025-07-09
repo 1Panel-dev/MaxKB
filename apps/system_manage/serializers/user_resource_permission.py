@@ -136,7 +136,7 @@ class UserResourcePermissionSerializer(serializers.Serializer):
         workspace_id = self.data.get('workspace_id')
         user_id = self.data.get('user_id')
         wurp = QuerySet(WorkspaceUserResourcePermission).filter(auth_target_type=auth_target_type,
-                                                                workspace_id=workspace_id).first()
+                                                                workspace_id=workspace_id, user_id=user_id).first()
         auth_type = wurp.auth_type if wurp else (
             ResourceAuthType.RESOURCE_PERMISSION_GROUP if edition == 'CE' else ResourceAuthType.ROLE)
         # 自动授权给创建者
