@@ -20,6 +20,7 @@ from common.constants.authentication_type import AuthenticationType
 from common.constants.cache_version import Cache_Version
 from common.exception.app_exception import AppApiException
 from common.utils.common import password_encrypt, get_random_chars
+from maxkb.const import CONFIG
 from users.models import User
 
 
@@ -58,7 +59,8 @@ class LoginSerializer(serializers.Serializer):
                                'email': user.email,
                                'type': AuthenticationType.SYSTEM_USER.value})
         version, get_key = Cache_Version.TOKEN.value
-        cache.set(get_key(token), user, timeout=datetime.timedelta(seconds=60 * 60 * 2).seconds, version=version)
+        timeout = CONFIG.get_session_timeout()
+        cache.set(get_key(token), user, timeout=timeout, version=version)
         return {'token': token}
 
 
