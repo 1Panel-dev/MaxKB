@@ -104,16 +104,17 @@ def write_context_stream(node_variable: Dict, workflow_variable: Dict, node: INo
 
 
 async def _yield_mcp_response(chat_model, message_list, mcp_servers):
-    async with MultiServerMCPClient(json.loads(mcp_servers)) as client:
-        agent = create_react_agent(chat_model, client.get_tools())
-        response = agent.astream({"messages": message_list}, stream_mode='messages')
-        async for chunk in response:
-            if isinstance(chunk[0], ToolMessage):
-                content = tool_message_template % (chunk[0].name, chunk[0].content)
-                chunk[0].content = content
-                yield chunk[0]
-            if isinstance(chunk[0], AIMessageChunk):
-                yield chunk[0]
+    client = MultiServerMCPClient(json.loads(mcp_servers))
+    tools = await client.get_tools()
+    agent = create_react_agent(chat_model, tools)
+    response = agent.astream({"messages": message_list}, stream_mode='messages')
+    async for chunk in response:
+        if isinstance(chunk[0], ToolMessage):
+            content = tool_message_template % (chunk[0].name, chunk[0].content)
+            chunk[0].content = content
+            yield chunk[0]
+        if isinstance(chunk[0], AIMessageChunk):
+            yield chunk[0]
 
 
 def mcp_response_generator(chat_model, message_list, mcp_servers):
