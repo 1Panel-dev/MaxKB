@@ -1,4 +1,3 @@
-FROM ghcr.io/1panel-dev/maxkb-vector-model:v2.0.2 AS vector-model
 FROM node:18-alpine3.18 AS web-build
 COPY ui ui
 RUN cd ui && \
@@ -6,6 +5,7 @@ RUN cd ui && \
     NODE_OPTIONS="--max-old-space-size=4096" npm run build-only && \
     NODE_OPTIONS="--max-old-space-size=4096" npm run build-only-chat && \
     find . -maxdepth 1 ! -name '.' ! -name 'dist' ! -name 'public' -exec rm -rf {} +
+
 FROM ghcr.io/1panel-dev/maxkb-base:python3.11-pg17.5 AS stage-build
 
 ARG DEPENDENCIES="                    \
@@ -17,13 +17,10 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 COPY . /opt/maxkb-app
-RUN mkdir -p /opt/maxkb-app /opt/maxkb-app/model && \
-    rm -rf /opt/maxkb-app/ui
-
-COPY --from=web-build ui /opt/maxkb-app/ui
 
 WORKDIR /opt/maxkb-app
-RUN python3 -m venv /opt/py3 && \
+RUN rm -rf /opt/maxkb-app/ui && \
+    python3 -m venv /opt/py3 && \
     pip install poetry==2.0.0 --break-system-packages && \
     poetry config virtualenvs.create false && \
     . /opt/py3/bin/activate && \
@@ -64,15 +61,11 @@ ENV MAXKB_VERSION="${DOCKER_IMAGE_TAG} (build at ${BUILD_AT}, commit: ${GITHUB_C
 
 WORKDIR /opt/maxkb-app
 COPY --from=stage-build /opt/maxkb-app /opt/maxkb-app
+COPY --from=web-build ui /opt/maxkb-app/ui
 COPY --from=stage-build /opt/py3 /opt/py3
-COPY --from=vector-model /opt/maxkb-app/model /opt/maxkb-app/model
 
 RUN chmod 755 /tmp && \
-    find /opt/maxkb-app -mindepth 1 -not -name 'sandbox' -exec chmod 700 {} + && \
-    useradd --no-create-home --home /opt/maxkb-app/sandbox sandbox -g root && \
-    chown -R sandbox:root /opt/maxkb-app/sandbox && \
-    chmod g-x /usr/local/bin/* /usr/bin/* /bin/* /usr/sbin/* /sbin/* /usr/lib/postgresql/17/bin/* && \
-    chmod g+x /usr/local/bin/python*
+    find /opt/maxkb-app -mindepth 1 -not -name 'sandbox' -exec chmod 700 {} +
 
 EXPOSE 8080
 VOLUME /opt/maxkb
