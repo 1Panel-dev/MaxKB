@@ -74,6 +74,17 @@ parse_qa_handle_list = [XlsParseQAHandle(), CsvParseQAHandle(), XlsxParseQAHandl
 parse_table_handle_list = [CsvParseTableHandle(), XlsParseTableHandle(), XlsxParseTableHandle()]
 
 
+def convert_uuid_to_str(obj):
+    if isinstance(obj, dict):
+        return {k: convert_uuid_to_str(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_uuid_to_str(i) for i in obj]
+    elif isinstance(obj, uuid.UUID):
+        return str(obj)
+    else:
+        return obj
+
+
 class BatchCancelInstanceSerializer(serializers.Serializer):
     id_list = serializers.ListField(required=True, child=serializers.UUIDField(required=True), label=_('id list'))
     type = serializers.IntegerField(required=True, label=_('task type'))
@@ -844,6 +855,9 @@ class DocumentSerializers(serializers.Serializer):
         @staticmethod
         def get_document_paragraph_model(knowledge_id, instance: Dict):
             source_meta = {'source_file_id': instance.get('source_file_id')} if instance.get('source_file_id') else {}
+            meta = {**instance.get('meta'), **source_meta} if instance.get('meta') is not None else source_meta
+            meta = convert_uuid_to_str(meta)
+
             document_model = Document(
                 **{
                     'knowledge_id': knowledge_id,
@@ -853,8 +867,7 @@ class DocumentSerializers(serializers.Serializer):
                         lambda x, y: x + y,
                         [len(p.get('content')) for p in instance.get('paragraphs', [])],
                         0),
-                    'meta': {**instance.get('meta'), **source_meta} if instance.get(
-                        'meta') is not None else source_meta,
+                    'meta': meta,
                     'type': instance.get('type') if instance.get('type') is not None else KnowledgeType.BASE
                 })
 
