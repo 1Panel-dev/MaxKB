@@ -97,7 +97,7 @@
                   :size="32"
                   style="background: none"
                 >
-                  <img :src="detail?.icon" alt="" />
+                  <img :src="resetUrl(detail?.icon)" alt="" />
                 </el-avatar>
                 <LogoIcon v-else height="32px" />
               </div>
@@ -142,7 +142,7 @@ import Workflow from '@/workflow/index.vue'
 import DropdownMenu from '@/views/application-workflow/component/DropdownMenu.vue'
 import PublishHistory from '@/views/application-workflow/component/PublishHistory.vue'
 import applicationApi from '@/api/application/application'
-import { isAppIcon } from '@/utils/common'
+import {isAppIcon, resetUrl} from '@/utils/common'
 import { MsgSuccess, MsgError, MsgConfirm } from '@/utils/message'
 import { datetimeFormat } from '@/utils/time'
 import { mapToUrlParams } from '@/utils/application'
@@ -424,7 +424,7 @@ const get_route=()=>{
           RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
           PermissionConst.APPLICATION_OVERVIEW_READ.getWorkspacePermissionWorkspaceManageRole,
           PermissionConst.APPLICATION_OVERVIEW_READ.getApplicationWorkspaceResourcePermission(id)],'OR')){
-            return `/application/${id}/WORK_FLOW/overview` 
+            return `/application/${id}/WORK_FLOW/overview`
           } else if (hasPermission([new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(id)],[EditionConst.IS_EE, EditionConst.IS_PE],'AND'),
           new ComplexPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,],[PermissionConst.APPLICATION_ACCESS_READ.getWorkspacePermissionWorkspaceManageRole],[EditionConst.IS_EE, EditionConst.IS_PE],'OR'),
           new ComplexPermission([],[PermissionConst.APPLICATION_ACCESS_READ.getApplicationWorkspaceResourcePermission(id)],[EditionConst.IS_EE, EditionConst.IS_PE],'OR'),],'OR')) {
@@ -432,7 +432,7 @@ const get_route=()=>{
           } else if (hasPermission([new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(id)],[EditionConst.IS_EE, EditionConst.IS_PE],'AND'),
           new ComplexPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],[PermissionConst.APPLICATION_CHAT_USER_READ.getWorkspacePermissionWorkspaceManageRole],[EditionConst.IS_EE, EditionConst.IS_PE],'OR'),
           new ComplexPermission([],[PermissionConst.APPLICATION_CHAT_USER_READ.getApplicationWorkspaceResourcePermission(id)],[EditionConst.IS_EE, EditionConst.IS_PE],'OR'),],'OR')) {
-            return `/application/${id}/WORK_FLOW/chat-user` 
+            return `/application/${id}/WORK_FLOW/chat-user`
           } else if (hasPermission([new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(id)],[],'AND'),
           PermissionConst.APPLICATION_CHAT_LOG_READ.getWorkspacePermissionWorkspaceManageRole,
           PermissionConst.APPLICATION_CHAT_LOG_READ.getApplicationWorkspaceResourcePermission(id)],'OR')) {
