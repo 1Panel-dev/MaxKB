@@ -12,10 +12,10 @@ from typing import Dict
 
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.tool_node.i_tool_node import IToolNode
-from common.utils.function_code import FunctionExecutor
+from common.utils.tool_code import ToolExecutor
 from maxkb.const import CONFIG
 
-function_executor = FunctionExecutor(CONFIG.get('SANDBOX'))
+function_executor = ToolExecutor(CONFIG.get('SANDBOX'))
 
 
 def write_context(step_variable: Dict, global_variable: Dict, node, workflow):
