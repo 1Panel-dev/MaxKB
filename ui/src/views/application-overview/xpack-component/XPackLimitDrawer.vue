@@ -85,7 +85,7 @@
           <el-radio value="login" size="large">
             <p class="mb-16 lighter">
               {{ $t('views.system.authentication.title') }}
-              <el-button type="primary" link @click="router.push({ path: '' })">
+              <el-button type="primary" link @click="router.push({ name: 'applicationChatUser' })">
                 {{ $t('views.applicationOverview.appInfo.LimitDialog.toSettingChatUser') }}
               </el-button>
             </p>
