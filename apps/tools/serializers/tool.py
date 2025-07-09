@@ -287,6 +287,18 @@ class ToolSerializer(serializers.Serializer):
         id = serializers.UUIDField(required=True, label=_('tool id'))
         workspace_id = serializers.CharField(required=True, label=_('workspace id'))
 
+        def is_one_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            workspace_id = self.data.get('workspace_id')
+            query_set = QuerySet(Tool).filter(id=self.data.get('id'))
+            if workspace_id:
+                query_set = query_set.filter(workspace_id=workspace_id)
+            if not query_set.exists():
+                get_authorized_tool = DatabaseModelManage.get_model('get_authorized_tool')
+                if get_authorized_tool:
+                    return get_authorized_tool(QuerySet(Tool).filter(id=self.data.get('id')), workspace_id).exists()
+                raise AppApiException(500, _('Tool id does not exist'))
+
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
             workspace_id = self.data.get('workspace_id')
@@ -337,7 +349,7 @@ class ToolSerializer(serializers.Serializer):
             QuerySet(Tool).filter(id=self.data.get('id')).delete()
 
         def one(self):
-            self.is_valid(raise_exception=True)
+            self.is_one_valid(raise_exception=True)
             tool = QuerySet(Tool).filter(id=self.data.get('id')).first()
             if tool.init_params:
                 tool.init_params = json.loads(rsa_long_decrypt(tool.init_params))
