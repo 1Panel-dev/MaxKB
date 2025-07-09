@@ -262,7 +262,7 @@ export default {
       }
     },
     toolNode: {
-      label: '自定義函數',
+      label: '自定義工具',
       text: '通過執行自定義腳本，實現數據處理'
     },
     applicationNode: {

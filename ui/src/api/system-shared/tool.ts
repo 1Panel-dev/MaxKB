@@ -62,7 +62,7 @@ const putTool: (tool_id: string, data: toolData, loading?: Ref<boolean>) => Prom
  * 获取工具详情
  * @param tool_id 工具id
  * @param loading 加载器
- * @returns 函数详情
+ * @returns 工具详情
  */
 const getToolById: (tool_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
   tool_id,

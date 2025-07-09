@@ -192,7 +192,7 @@ const systemRouter = {
       meta: {
         icon: 'app-resource-authorization',
         iconActive: 'app-resource-authorization-active',
-        title: 'views.resourceAuthorization.title',
+        title: 'views.system.resourceAuthorization.title',
         activeMenu: '/system',
         parentPath: '/system',
         parentName: 'system',

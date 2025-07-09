@@ -12,29 +12,32 @@
     </div>
     <el-card style="--el-card-padding: 0">
       <div class="flex">
-        <div class="user-left border-r p-16">
-          <div class="p-8 pb-0 mb-12">
-            <h4 class="medium">{{ $t('views.chatUser.group.title') }}</h4>
+        <div class="user-left border-r">
+          <div class="p-24 pb-0">
+            <h4 class="medium mb-12">{{ $t('views.chatUser.group.title') }}</h4>
+            <el-input
+              v-model="filterText"
+              :placeholder="$t('common.search')"
+              prefix-icon="Search"
+              clearable
+            />
           </div>
-
-          <el-input
-            v-model="filterText"
-            :placeholder="$t('common.search')"
-            prefix-icon="Search"
-            clearable
-            class="mb-8"
-          />
-
           <div class="list-height-left">
             <el-scrollbar v-loading="loading">
-              <common-list :data="filterList" @click="clickUserGroup" :default-active="current?.id">
-                <template #default="{ row }">
-                  <span>{{ row.name }}</span>
-                </template>
-                <template #empty>
-                  <span></span>
-                </template>
-              </common-list>
+              <div class="p-16">
+                <common-list
+                  :data="filterList"
+                  @click="clickUserGroup"
+                  :default-active="current?.id"
+                >
+                  <template #default="{ row }">
+                    <span class="ellipsis-1" :title="row.name">{{ row.name }}</span>
+                  </template>
+                  <template #empty>
+                    <span></span>
+                  </template>
+                </common-list>
+              </div>
             </el-scrollbar>
           </div>
         </div>
@@ -43,7 +46,7 @@
         <div class="user-right" v-loading="rightLoading">
           <div class="flex-between">
             <div class="flex align-center">
-              <h4 class="medium">{{ current?.name }}</h4>
+              <h4 class="medium ellipsis" :title="current?.name">{{ current?.name || '-' }}</h4>
               <el-divider direction="vertical" class="mr-8 ml-8" />
 
               <el-icon class="color-input-placeholder"><UserFilled /></el-icon>
@@ -56,15 +59,16 @@
               :disabled="current?.is_auth"
               @click="handleSave"
               v-if="
-                route.path.includes('share/') ? false
-                : hasPermission(
-                  permissionObj[
-                    route.path.includes('shared')
-                      ? 'SHAREDKNOWLEDGE'
-                      : (route.meta?.resourceType as string)
-                  ],
-                  'OR',
-                )
+                route.path.includes('share/')
+                  ? false
+                  : hasPermission(
+                      permissionObj[
+                        route.path.includes('shared')
+                          ? 'SHAREDKNOWLEDGE'
+                          : (route.meta?.resourceType as string)
+                      ],
+                      'OR',
+                    )
               "
             >
               {{ t('common.save') }}
@@ -88,15 +92,16 @@
             <div
               class="flex align-center"
               v-if="
-                route.path.includes('share/') ? false
-                : hasPermission(
-                  permissionObj[
-                    route.path.includes('shared')
-                      ? 'SHAREDKNOWLEDGE'
-                      : (route.meta?.resourceType as string)
-                  ],
-                  'OR',
-                )
+                route.path.includes('share/')
+                  ? false
+                  : hasPermission(
+                      permissionObj[
+                        route.path.includes('shared')
+                          ? 'SHAREDKNOWLEDGE'
+                          : (route.meta?.resourceType as string)
+                      ],
+                      'OR',
+                    )
               "
             >
               <div class="color-secondary mr-8">{{ $t('views.chatUser.autoAuthorization') }}</div>
@@ -114,10 +119,12 @@
             :pagination-config="paginationConfig"
             @sizeChange="handleSizeChange"
             @changePage="getList"
+            :maxTableHeight="350"
           >
             <el-table-column
               prop="nick_name"
               :label="$t('views.userManage.userForm.nick_name.label')"
+              show-overflow-tooltip
             />
             <el-table-column prop="username" :label="$t('views.login.loginForm.username.label')" />
             <el-table-column prop="source" :label="$t('views.userManage.source.label')">
@@ -370,7 +377,7 @@ async function handleSave() {
   min-width: var(--setting-left-width);
 
   .list-height-left {
-    height: calc(100vh - 271px);
+    height: calc(100vh - 251px);
   }
 }
 

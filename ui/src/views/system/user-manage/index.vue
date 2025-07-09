@@ -1,7 +1,7 @@
 <template>
   <div class="p-16-24">
     <h2 class="mb-16">{{ $t('views.userManage.title') }}</h2>
-    <el-card>
+    <el-card class="main-calc-height">
       <div class="flex-between mb-16">
         <el-button
           type="primary"
@@ -53,14 +53,20 @@
         @sizeChange="handleSizeChange"
         @changePage="getList"
         v-loading="loading"
+        :maxTableHeight="280"
       >
         <el-table-column
           prop="nick_name"
           :label="$t('views.userManage.userForm.nick_name.label')"
-          min-width="180" 
+          min-width="180"
           show-overflow-tooltip
         />
-        <el-table-column prop="username" min-width="180" show-overflow-tooltip :label="$t('views.login.loginForm.username.label')" />
+        <el-table-column
+          prop="username"
+          min-width="180"
+          show-overflow-tooltip
+          :label="$t('views.login.loginForm.username.label')"
+        />
         <el-table-column width="100" prop="is_active" :label="$t('common.status.label')">
           <template #default="{ row }">
             <div v-if="row.is_active" class="flex align-center">
@@ -90,7 +96,11 @@
             {{ row.email || '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="phone" width="120" :label="$t('views.userManage.userForm.phone.label')">
+        <el-table-column
+          prop="phone"
+          width="120"
+          :label="$t('views.userManage.userForm.phone.label')"
+        >
           <template #default="{ row }">
             {{ row.phone || '-' }}
           </template>

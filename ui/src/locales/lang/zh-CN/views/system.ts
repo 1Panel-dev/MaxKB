@@ -109,8 +109,22 @@ export default {
     enableSSL: '启用 SSL（如果 SMTP 端口是 465，通常需要启用 SSL）',
     enableTLS: '启用 TLS（如果 SMTP 端口是 587，通常需要启用 TLS）',
   },
+  resourceAuthorization: {
+    title: '资源授权',
+    member: '成员',
+    permissionSetting: '资源权限配置',
+    setting: {
+      management: '管理',
+      check: '查看',
+      authorization: '授权',
+    },
+    priority: {
+      label: '资源权限优先级',
+      role: '按角色',
+    },
+  },
   resource_management: {
     label: '资源管理',
     type: '类型',
-  }
+  },
 }

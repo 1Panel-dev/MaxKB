@@ -61,7 +61,7 @@
                 >
                   <template #default="{ row }">
                     <div class="flex-between">
-                      <span class="ellipsis">{{ row.name }}</span>
+                      <span class="ellipsis" :title="row.name">{{ row.name }}</span>
                       <div @click.stop v-show="mouseId === row.id">
                         <el-dropdown :teleported="false" trigger="click">
                           <el-button text>
@@ -135,7 +135,7 @@
         <!-- 右边 -->
         <div class="user-right" v-loading="rightLoading">
           <div class="flex align-center">
-            <h4 class="medium">{{ current?.name }}</h4>
+            <h4 class="medium ellipsis" :title="current?.name">{{ current?.name }}</h4>
             <el-divider direction="vertical" class="mr-8 ml-8" />
             <AppIcon
               iconName="app-workspace"
@@ -217,11 +217,13 @@
             @sizeChange="handleSizeChange"
             @changePage="getList"
             @selection-change="handleSelectionChange"
+            :maxTableHeight="330"
           >
             <el-table-column type="selection" width="55" />
             <el-table-column
               prop="nick_name"
               :label="$t('views.userManage.userForm.nick_name.label')"
+              show-overflow-tooltip
             />
             <el-table-column prop="username" :label="$t('views.login.loginForm.username.label')" />
             <el-table-column prop="source" :label="$t('views.userManage.source.label')">
@@ -466,7 +468,7 @@ function mouseenter(row: any) {
   min-width: var(--setting-left-width);
 
   .list-height-left {
-    height: calc(100vh - 271px);
+    height: calc(100vh - 231px);
   }
 }
 

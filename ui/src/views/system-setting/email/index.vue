@@ -1,7 +1,7 @@
 <template>
   <div class="email-setting p-16-24">
     <h4 class="mb-16">{{ $t('views.system.email.title') }}</h4>
-    <el-card style="--el-card-padding: 16px" v-loading="loading">
+    <el-card style="--el-card-padding: 16px" v-loading="loading" class="main-calc-height">
       <el-scrollbar>
         <div class="email-setting__main p-16">
           <el-form
@@ -52,12 +52,18 @@
                 >{{ $t('views.system.email.enableTLS') }}
               </el-checkbox>
             </el-form-item>
-            <el-button @click="submit(emailFormRef)" type="primary" :disabled="loading"
+            <el-button
+              @click="submit(emailFormRef)"
+              type="primary"
+              :disabled="loading"
               v-hasPermission="
-                      new ComplexPermission(
-                        [RoleConst.ADMIN],
-                        [PermissionConst.EMAIL_SETTING_EDIT],
-                        [],'OR',)"
+                new ComplexPermission(
+                  [RoleConst.ADMIN],
+                  [PermissionConst.EMAIL_SETTING_EDIT],
+                  [],
+                  'OR',
+                )
+              "
             >
               {{ $t('common.save') }}
             </el-button>

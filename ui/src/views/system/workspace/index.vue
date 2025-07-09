@@ -41,7 +41,7 @@
                 >
                   <template #default="{ row }">
                     <div class="flex-between">
-                      <span class="ellipsis">{{ row.name }}</span>
+                      <span class="ellipsis" :title="row.name">{{ row.name }}</span>
                       <div @click.stop v-show="mouseId === row.id">
                         <el-dropdown :teleported="false" trigger="click">
                           <el-button text>

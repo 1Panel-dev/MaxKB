@@ -6,7 +6,7 @@
         <h5 class="ml-4 color-text-primary">{{ t('views.chatUser.title') }}</h5>
       </el-breadcrumb-item>
     </el-breadcrumb>
-    <el-card>
+    <el-card style="height: calc(var(--app-main-height) + 10px)">
       <div class="flex-between mb-16">
         <div>
           <el-button
@@ -16,16 +16,18 @@
               new ComplexPermission(
                 [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
                 [PermissionConst.CHAT_USER_CREATE, PermissionConst.WORKSPACE_CHAT_USER_CREATE],
-                [],'OR',)"
+                [],
+                'OR',
+              )
+            "
           >
             {{ t('views.userManage.createUser') }}
           </el-button>
-          <el-button @click="syncUsers"
-                     v-hasPermission="
-              new ComplexPermission(
-                [RoleConst.ADMIN],
-                [PermissionConst.CHAT_USER_SYNC],
-                [],'OR',)"
+          <el-button
+            @click="syncUsers"
+            v-hasPermission="
+              new ComplexPermission([RoleConst.ADMIN], [PermissionConst.CHAT_USER_SYNC], [], 'OR')
+            "
           >
             {{ $t('views.chatUser.syncUsers') }}
           </el-button>
@@ -34,9 +36,12 @@
             @click="setUserGroups"
             v-hasPermission="
               new ComplexPermission(
-                [RoleConst.ADMIN,RoleConst.WORKSPACE_MANAGE],
+                [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
                 [PermissionConst.CHAT_USER_GROUP, PermissionConst.WORKSPACE_CHAT_USER_GROUP],
-                [],'OR',)"
+                [],
+                'OR',
+              )
+            "
           >
             {{ $t('views.chatUser.setUserGroups') }}
           </el-button>
@@ -47,7 +52,10 @@
               new ComplexPermission(
                 [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
                 [PermissionConst.WORKSPACE_CHAT_USER_DELETE, PermissionConst.CHAT_USER_DELETE],
-                [],'OR',)"
+                [],
+                'OR',
+              )
+            "
           >
             {{ $t('common.delete') }}
           </el-button>
@@ -59,8 +67,8 @@
             style="width: 120px"
             @change="search_type_change"
           >
-            <el-option :label="$t('views.login.loginForm.username.label')" value="username"/>
-            <el-option :label="$t('views.userManage.userForm.nick_name.label')" value="nick_name"/>
+            <el-option :label="$t('views.login.loginForm.username.label')" value="username" />
+            <el-option :label="$t('views.userManage.userForm.nick_name.label')" value="nick_name" />
           </el-select>
           <el-input
             v-if="search_type === 'username'"
@@ -87,18 +95,20 @@
         v-loading="loading"
         @selection-change="handleSelectionChange"
         @sort-change="handleSortChange"
+        :maxTableHeight="270"
       >
-        <el-table-column type="selection" width="55"/>
+        <el-table-column type="selection" width="55" />
         <el-table-column
           prop="nick_name"
           :label="$t('views.userManage.userForm.nick_name.label')"
+          show-overflow-tooltip
         />
-        <el-table-column prop="username" :label="$t('common.username')"/>
+        <el-table-column prop="username" :label="$t('common.username')" show-overflow-tooltip />
         <el-table-column prop="is_active" :label="$t('common.status.label')" width="100">
           <template #default="{ row }">
             <div v-if="row.is_active" class="flex align-center">
               <el-icon class="color-success mr-8" style="font-size: 16px">
-                <SuccessFilled/>
+                <SuccessFilled />
               </el-icon>
               <span class="color-secondary">
                 {{ $t('common.status.enabled') }}
@@ -134,10 +144,10 @@
         <el-table-column
           prop="user_group_names"
           :label="$t('views.chatUser.group.title')"
-          min-width="110"
+          min-width="120"
         >
           <template #default="{ row }">
-            <TagGroup :tags="row.user_group_names"/>
+            <TagGroup :tags="row.user_group_names" />
           </template>
         </el-table-column>
         <el-table-column prop="source" :label="$t('views.userManage.source.label')">
@@ -171,26 +181,40 @@
                 size="small"
                 v-model="row.is_active"
                 :before-change="() => changeState(row)"
-                v-if="hasPermission(new ComplexPermission(
-                  [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
-                  [PermissionConst.CHAT_USER_EDIT, PermissionConst.WORKSPACE_CHAT_USER_EDIT],
-                  [],'OR'),'OR')"
+                v-if="
+                  hasPermission(
+                    new ComplexPermission(
+                      [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+                      [PermissionConst.CHAT_USER_EDIT, PermissionConst.WORKSPACE_CHAT_USER_EDIT],
+                      [],
+                      'OR',
+                    ),
+                    'OR',
+                  )
+                "
               />
             </span>
-            <el-divider direction="vertical"/>
+            <el-divider direction="vertical" />
             <span class="mr-8">
               <el-button
                 type="primary"
                 text
                 @click.stop="editUser(row)"
                 :title="$t('common.edit')"
-                v-if="hasPermission(new ComplexPermission(
-                  [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
-                  [PermissionConst.CHAT_USER_EDIT, PermissionConst.WORKSPACE_CHAT_USER_EDIT],
-                  [],'OR'),'OR')"
+                v-if="
+                  hasPermission(
+                    new ComplexPermission(
+                      [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+                      [PermissionConst.CHAT_USER_EDIT, PermissionConst.WORKSPACE_CHAT_USER_EDIT],
+                      [],
+                      'OR',
+                    ),
+                    'OR',
+                  )
+                "
               >
                 <el-icon>
-                  <EditPen/>
+                  <EditPen />
                 </el-icon>
               </el-button>
             </span>
@@ -201,13 +225,20 @@
                 text
                 @click.stop="editPwdUser(row)"
                 :title="$t('views.userManage.setting.updatePwd')"
-                v-if="hasPermission(new ComplexPermission(
-                  [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
-                  [PermissionConst.CHAT_USER_EDIT, PermissionConst.WORKSPACE_CHAT_USER_EDIT],
-                  [],'OR'),'OR')"
+                v-if="
+                  hasPermission(
+                    new ComplexPermission(
+                      [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+                      [PermissionConst.CHAT_USER_EDIT, PermissionConst.WORKSPACE_CHAT_USER_EDIT],
+                      [],
+                      'OR',
+                    ),
+                    'OR',
+                  )
+                "
               >
                 <el-icon>
-                  <Lock/>
+                  <Lock />
                 </el-icon>
               </el-button>
             </span>
@@ -218,13 +249,23 @@
                 text
                 @click.stop="deleteUserManage(row)"
                 :title="$t('common.delete')"
-                v-if="hasPermission(new ComplexPermission(
-                  [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
-                  [PermissionConst.CHAT_USER_DELETE, PermissionConst.WORKSPACE_CHAT_USER_DELETE],
-                  [],'OR'),'OR')"
+                v-if="
+                  hasPermission(
+                    new ComplexPermission(
+                      [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+                      [
+                        PermissionConst.CHAT_USER_DELETE,
+                        PermissionConst.WORKSPACE_CHAT_USER_DELETE,
+                      ],
+                      [],
+                      'OR',
+                    ),
+                    'OR',
+                  )
+                "
               >
                 <el-icon>
-                  <Delete/>
+                  <Delete />
                 </el-icon>
               </el-button>
             </span>
@@ -240,34 +281,34 @@
       ref="UserDrawerRef"
       @refresh="refresh"
     />
-    <UserPwdDialog ref="UserPwdDialogRef" @refresh="refresh"/>
+    <UserPwdDialog ref="UserPwdDialogRef" @refresh="refresh" />
     <SetUserGroupsDialog
       :optionLoading="optionLoading"
       :chatGroupList="chatGroupList"
       ref="setUserGroupsRef"
       @refresh="refresh"
     />
-    <SyncUsersDialog ref="syncUsersDialogRef" @refresh="refresh"/>
+    <SyncUsersDialog ref="syncUsersDialogRef" @refresh="refresh" />
   </div>
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref, reactive} from 'vue'
+import { onMounted, ref, reactive } from 'vue'
 import UserDrawer from './component/UserDrawer.vue'
 import UserPwdDialog from './component/UserPwdDialog.vue'
 import SetUserGroupsDialog from './component/SetUserGroupsDialog.vue'
 import SyncUsersDialog from './component/SyncUsersDialog.vue'
 import userManageApi from '@/api/system/chat-user'
-import {datetimeFormat} from '@/utils/time'
-import {MsgSuccess, MsgConfirm} from '@/utils/message'
-import {t} from '@/locales'
-import type {ChatUserItem} from '@/api/type/systemChatUser'
+import { datetimeFormat } from '@/utils/time'
+import { MsgSuccess, MsgConfirm } from '@/utils/message'
+import { t } from '@/locales'
+import type { ChatUserItem } from '@/api/type/systemChatUser'
 import SystemGroupApi from '@/api/system/user-group'
-import type {ListItem} from '@/api/type/common'
-import {PermissionConst, RoleConst} from '@/utils/permission/data'
-import {ComplexPermission} from '@/utils/permission/type'
-import {hasPermission} from '@/utils/permission'
-import {loadPermissionApi} from "@/utils/dynamics-api/permission-api.ts";
+import type { ListItem } from '@/api/type/common'
+import { PermissionConst, RoleConst } from '@/utils/permission/data'
+import { ComplexPermission } from '@/utils/permission/type'
+import { hasPermission } from '@/utils/permission'
+import { loadPermissionApi } from '@/utils/dynamics-api/permission-api.ts'
 
 const search_type = ref('username')
 const search_form = ref<{
@@ -278,7 +319,7 @@ const search_form = ref<{
   nick_name: '',
 })
 const search_type_change = () => {
-  search_form.value = {username: '', nick_name: ''}
+  search_form.value = { username: '', nick_name: '' }
 }
 
 const loading = ref(false)
@@ -300,17 +341,20 @@ const userTableData = ref<ChatUserItem[]>([])
 function getList() {
   const params: any = {}
   if (search_form.value[search_type.value as keyof typeof search_form.value]) {
-    params[search_type.value] = search_form.value[search_type.value as keyof typeof search_form.value]
+    params[search_type.value] =
+      search_form.value[search_type.value as keyof typeof search_form.value]
   }
-  return loadPermissionApi('chatUser').getUserManage(paginationConfig, params, loading).then((res: any) => {
-    userTableData.value = res.data.records
-    paginationConfig.total = res.data.total
-  })
+  return loadPermissionApi('chatUser')
+    .getUserManage(paginationConfig, params, loading)
+    .then((res: any) => {
+      userTableData.value = res.data.records
+      paginationConfig.total = res.data.total
+    })
 }
 
 const orderBy = ref<string>('')
 
-function handleSortChange({prop, order}: { prop: string; order: string }) {
+function handleSortChange({ prop, order }: { prop: string; order: string }) {
   orderBy.value = order === 'ascending' ? prop : `-${prop}`
   getList()
 }
@@ -358,13 +402,14 @@ function deleteUserManage(row: ChatUserItem) {
   })
     .then(() => {
       loading.value = true
-      loadPermissionApi('chatUser').delUserManage(row.id, loading).then(() => {
-        MsgSuccess(t('common.deleteSuccess'))
-        getList()
-      })
+      loadPermissionApi('chatUser')
+        .delUserManage(row.id, loading)
+        .then(() => {
+          MsgSuccess(t('common.deleteSuccess'))
+          getList()
+        })
     })
-    .catch(() => {
-    })
+    .catch(() => {})
 }
 
 const UserPwdDialogRef = ref()
@@ -395,7 +440,7 @@ async function getChatGroupList() {
 }
 
 function handleBatchDelete() {
-  MsgConfirm(t('views.chatUser.batchDeleteUser', {count: multipleSelection.value.length}), '', {
+  MsgConfirm(t('views.chatUser.batchDeleteUser', { count: multipleSelection.value.length }), '', {
     confirmButtonText: t('common.confirm'),
     confirmButtonClass: 'danger',
   })
@@ -410,8 +455,7 @@ function handleBatchDelete() {
           await getList()
         })
     })
-    .catch(() => {
-    })
+    .catch(() => {})
 }
 
 const setUserGroupsRef = ref<InstanceType<typeof SetUserGroupsDialog>>()

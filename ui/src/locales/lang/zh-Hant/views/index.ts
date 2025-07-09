@@ -6,7 +6,6 @@ import knowledge from './knowledge'
 import system from './system'
 import tool from './tool'
 import userManage from './user-manage'
-import resourceAuthorization from './resource-authorization'
 import model from './model'
 import document from './document'
 import paragraph from './paragraph'
@@ -23,7 +22,6 @@ export default {
   system,
   tool,
   userManage,
-  resourceAuthorization,
   model,
   knowledge,
   applicationWorkflow,

@@ -5,7 +5,6 @@ import tool from './tool'
 import document from './document'
 import system from './system'
 import userManage from './user-manage'
-import resourceAuthorization from './resource-authorization'
 import role from './role'
 import workspace from './workspace'
 import application from './application'
@@ -25,7 +24,6 @@ export default {
   document,
   system,
   userManage,
-  resourceAuthorization,
   role,
   workspace,
   application,

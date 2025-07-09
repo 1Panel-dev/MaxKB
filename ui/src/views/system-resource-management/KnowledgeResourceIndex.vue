@@ -6,7 +6,7 @@
         <h5 class="ml-4 color-text-primary">{{ t('views.knowledge.title') }}</h5>
       </el-breadcrumb-item>
     </el-breadcrumb>
-    <el-card class="mt-16">
+    <el-card class="mt-16" style="height: calc(var(--app-main-height) + 20px)">
       <div class="flex-between mb-16">
         <div class="complex-search">
           <el-select
@@ -45,9 +45,10 @@
         :pagination-config="paginationConfig"
         @sizeChange="getList"
         @changePage="getList"
+        :maxTableHeight="260"
       >
         <!-- <el-table-column type="selection" width="55" /> -->
-        <el-table-column width="220" :label="$t('common.name')">
+        <el-table-column width="220" :label="$t('common.name')" show-overflow-tooltip>
           <template #default="{ row }">
             <div class="flex align-center">
               <KnowledgeIcon :type="row.type" />
@@ -149,7 +150,7 @@ import KnowledgeResourceApi from '@/api/system-resource-management/knowledge'
 import { t } from '@/locales'
 import useStore from '@/stores'
 import { datetimeFormat } from '@/utils/time'
-import {loadPermissionApi} from "@/utils/dynamics-api/permission-api.ts";
+import { loadPermissionApi } from '@/utils/dynamics-api/permission-api.ts'
 import UserApi from '@/api/user/user'
 
 const { user } = useStore()

@@ -7,16 +7,20 @@
       clearable
       class="p-8"
     />
-    <div
-      @click="handleSharedNodeClick"
-      v-if="showShared && hasPermission(EditionConst.IS_EE, 'OR')"
-      class="shared-button flex cursor"
-      :class="currentNodeKey === 'share' && 'active'"
-    >
-      <AppIcon iconName="app-shared-active" style="font-size: 18px" class="color-primary"></AppIcon>
-      <span class="ml-8 lighter">{{ shareTitle }}</span>
-    </div>
-    <div class="tree-height border-t" :style="treeStyle">
+    <div class="tree-height" :style="treeStyle">
+      <div
+        @click="handleSharedNodeClick"
+        v-if="showShared && hasPermission(EditionConst.IS_EE, 'OR')"
+        class="shared-button flex cursor border-b"
+        :class="currentNodeKey === 'share' && 'active'"
+      >
+        <AppIcon
+          iconName="app-shared-active"
+          style="font-size: 18px"
+          class="color-primary"
+        ></AppIcon>
+        <span class="ml-8 lighter">{{ shareTitle }}</span>
+      </div>
       <el-scrollbar>
         <el-tree
           ref="treeRef"
@@ -62,7 +66,8 @@
                         <AppIcon iconName="app-add-folder"></AppIcon>
                         {{ $t('components.folder.addChildFolder') }}
                       </el-dropdown-item>
-                      <el-dropdown-item @click.stop="openEditFolder(data)"
+                      <el-dropdown-item
+                        @click.stop="openEditFolder(data)"
                         v-if="permissionPrecise.folderEdit()"
                       >
                         <el-icon><EditPen /></el-icon>
@@ -270,7 +275,7 @@ function refreshFolder() {
   }
   .tree-height {
     padding-top: 4px;
-    height: calc(100vh - 175px);
+    height: calc(100vh - 210px);
   }
 }
 :deep(.overflow-inherit_node__children) {

@@ -6,7 +6,7 @@
         <h5 class="ml-4 color-text-primary">{{ t('views.tool.title') }}</h5>
       </el-breadcrumb-item>
     </el-breadcrumb>
-    <el-card class="mt-16">
+    <el-card class="mt-16" style="height: calc(var(--app-main-height) + 20px)">
       <div class="flex-between mb-16">
         <div class="complex-search">
           <el-select
@@ -45,9 +45,10 @@
         :pagination-config="paginationConfig"
         @sizeChange="getList"
         @changePage="getList"
+        :maxTableHeight="260"
       >
         <!-- <el-table-column type="selection" width="55" /> -->
-        <el-table-column width="220" :label="$t('common.name')">
+        <el-table-column width="220" :label="$t('common.name')" show-overflow-tooltip>
           <template #default="scope">
             <div class="table-name flex align-center">
               <el-icon size="24" class="mr-8">
@@ -166,12 +167,12 @@
 import { onMounted, ref, reactive, computed } from 'vue'
 import ToolResourceApi from '@/api/system-resource-management/tool'
 import { t } from '@/locales'
-import {isAppIcon, resetUrl} from '@/utils/common'
+import { isAppIcon, resetUrl } from '@/utils/common'
 import { ToolType } from '@/enums/tool'
 import useStore from '@/stores'
 import { datetimeFormat } from '@/utils/time'
-import {loadPermissionApi} from "@/utils/dynamics-api/permission-api.ts";
-import UserApi from "@/api/user/user.ts";
+import { loadPermissionApi } from '@/utils/dynamics-api/permission-api.ts'
+import UserApi from '@/api/user/user.ts'
 
 const { user } = useStore()
 

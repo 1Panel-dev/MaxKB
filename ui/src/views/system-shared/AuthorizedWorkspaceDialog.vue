@@ -2,15 +2,15 @@
   <el-dialog modal-class="authorized-workspace" v-model="centerDialogVisible" width="840">
     <template #header="{ titleId, titleClass }">
       <h4 class="mb-8">{{ $t('views.shared.authorized_workspace') }}</h4>
-      <el-text class="color-secondary lighter">被授权的工作空间，可使用当前资源</el-text>
+      <el-text class="color-secondary lighter">{{ $t('views.shared.authorized_tip') }}</el-text>
     </template>
 
-    <p class="mb-8 lighter">类型</p>
+    <p class="mb-8 lighter">{{ $t('views.shared.type') }}</p>
     <el-radio-group v-model="listType">
-      <el-radio value="WHITE_LIST">白名单</el-radio>
-      <el-radio value="BLACK_LIST">黑名单</el-radio>
+      <el-radio value="WHITE_LIST">{{ $t('views.shared.WHITE_LIST') }}</el-radio>
+      <el-radio value="BLACK_LIST">{{ $t('views.shared.BLACK_LIST') }}</el-radio>
     </el-radio-group>
-    <p class="mb-8 lighter mt-16">选择工作空间</p>
+    <p class="mb-8 lighter mt-16">{{ $t('views.shared.select_workspace') }}</p>
     <div class="flex border" v-loading="loading">
       <div class="p-16 border-r">
         <el-input
@@ -34,7 +34,7 @@
             @change="handleCheckAllChange"
             v-if="!search"
           >
-            全选
+            {{ $t('views.shared.allCheck') }}<
           </el-checkbox>
           <el-checkbox-group
             class="checkbox-group-block"

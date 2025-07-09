@@ -135,7 +135,7 @@
 
     <div
       v-loading.fullscreen.lock="paginationConfig.current_page === 1 && loading"
-      style="max-height: calc(100vh - 140px)"
+      style="max-height: calc(100vh - 120px)"
     >
       <InfiniteScroll
         :size="knowledge.knowledgeList.length"

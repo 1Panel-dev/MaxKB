@@ -6,7 +6,7 @@
         <h5 class="ml-4 color-text-primary">{{ t('views.application.title') }}</h5>
       </el-breadcrumb-item>
     </el-breadcrumb>
-    <el-card class="mt-16">
+    <el-card class="mt-16" style="height: calc(var(--app-main-height) + 20px)">
       <div class="flex-between mb-16">
         <div class="complex-search">
           <el-select
@@ -45,9 +45,10 @@
         :pagination-config="paginationConfig"
         @sizeChange="getList"
         @changePage="getList"
+        :maxTableHeight="260"
       >
         <!-- <el-table-column type="selection" width="55" /> -->
-        <el-table-column width="220" :label="$t('common.name')">
+        <el-table-column width="220" :label="$t('common.name')" show-overflow-tooltip>
           <template #default="scope">
             <div class="table-name flex align-center">
               <el-icon size="24" class="mr-8">
@@ -207,11 +208,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column
-          prop="nick_name"
-          :label="$t('common.creator')"
-          show-overflow-tooltip
-        />
+        <el-table-column prop="nick_name" :label="$t('common.creator')" show-overflow-tooltip />
         <el-table-column :label="$t('views.application.publishTime')" width="180">
           <template #default="{ row }">
             {{ datetimeFormat(row.update_time) }}

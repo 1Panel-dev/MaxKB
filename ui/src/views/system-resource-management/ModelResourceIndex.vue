@@ -6,7 +6,7 @@
         <h5 class="ml-4 color-text-primary">{{ t('views.model.title') }}</h5>
       </el-breadcrumb-item>
     </el-breadcrumb>
-    <el-card class="mt-16">
+    <el-card class="mt-16" style="height: calc(var(--app-main-height) + 20px)">
       <div class="flex-between mb-16">
         <div class="complex-search">
           <el-select
@@ -15,9 +15,9 @@
             style="width: 120px"
             @change="search_type_change"
           >
-            <el-option :label="$t('common.creator')" value="create_user"/>
-            <el-option :label="$t('views.model.modelForm.model_type.label')" value="model_type"/>
-            <el-option :label="$t('views.model.modelForm.modeName.label')" value="name"/>
+            <el-option :label="$t('common.creator')" value="create_user" />
+            <el-option :label="$t('views.model.modelForm.model_type.label')" value="model_type" />
+            <el-option :label="$t('views.model.modelForm.modeName.label')" value="name" />
           </el-select>
           <el-input
             v-if="search_type === 'name'"
@@ -35,7 +35,7 @@
             clearable
             style="width: 220px"
           >
-            <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.nick_name"/>
+            <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.nick_name" />
           </el-select>
           <el-select
             v-else-if="search_type === 'model_type'"
@@ -45,7 +45,7 @@
             style="width: 220px"
           >
             <template v-for="item in modelTypeList" :key="item.value">
-              <el-option :label="item.text" :value="item.value"/>
+              <el-option :label="item.text" :value="item.value" />
             </template>
           </el-select>
         </div>
@@ -56,9 +56,10 @@
         :pagination-config="paginationConfig"
         @sizeChange="getList"
         @changePage="getList"
+        :maxTableHeight="260"
       >
         <!-- <el-table-column type="selection" width="55" /> -->
-        <el-table-column width="220" :label="$t('common.name')">
+        <el-table-column width="220" :label="$t('common.name')" show-overflow-tooltip>
           <template #default="{ row }">
             {{ row.name }}
           </template>
@@ -114,7 +115,7 @@
                     @click="workspaceVisible = !workspaceVisible"
                   >
                     <el-icon>
-                      <Filter/>
+                      <Filter />
                     </el-icon>
                   </el-button>
                 </template>
@@ -139,17 +140,17 @@
                 </div>
                 <div class="text-right">
                   <el-button size="small" @click="filterWorkspaceChange('clear')"
-                  >{{ $t('common.clear') }}
+                    >{{ $t('common.clear') }}
                   </el-button>
                   <el-button type="primary" @click="filterWorkspaceChange" size="small"
-                  >{{ $t('common.confirm') }}
+                    >{{ $t('common.confirm') }}
                   </el-button>
                 </div>
               </el-popover>
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="nick_name" :label="$t('common.creator')" show-overflow-tooltip/>
+        <el-table-column prop="nick_name" :label="$t('common.creator')" show-overflow-tooltip />
         <el-table-column :label="$t('views.document.table.updateTime')" width="180">
           <template #default="{ row }">
             {{ datetimeFormat(row.update_time) }}
@@ -166,18 +167,18 @@
 </template>
 
 <script lang="ts" setup>
-import {onBeforeMount, onMounted, ref, reactive, nextTick, computed} from 'vue'
-import type {Provider, Model} from '@/api/type/model'
+import { onBeforeMount, onMounted, ref, reactive, nextTick, computed } from 'vue'
+import type { Provider, Model } from '@/api/type/model'
 import ModelResourceApi from '@/api/system-resource-management/model'
-import {modelTypeList} from '@/views/model/component/data'
-import {modelType} from '@/enums/model'
-import {t} from '@/locales'
+import { modelTypeList } from '@/views/model/component/data'
+import { modelType } from '@/enums/model'
+import { t } from '@/locales'
 import useStore from '@/stores'
-import {datetimeFormat} from '@/utils/time'
-import {loadPermissionApi} from "@/utils/dynamics-api/permission-api.ts";
+import { datetimeFormat } from '@/utils/time'
+import { loadPermissionApi } from '@/utils/dynamics-api/permission-api.ts'
 import UserApi from '@/api/user/user.ts'
 
-const {user, model} = useStore()
+const { user, model } = useStore()
 
 const search_type = ref('name')
 const model_search_form = ref<{
@@ -231,7 +232,7 @@ async function getWorkspaceList() {
 }
 
 const search_type_change = () => {
-  model_search_form.value = {name: '', create_user: '', model_type: ''}
+  model_search_form.value = { name: '', create_user: '', model_type: '' }
 }
 
 function getRequestParams() {

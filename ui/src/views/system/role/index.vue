@@ -1,8 +1,8 @@
 <template>
   <div class="role-manage p-16-24">
     <h2 class="mb-16">{{ $t('views.role.title') }}</h2>
-    <el-card style="--el-card-padding: 0">
-      <div class="flex h-full">
+    <el-card style="--el-card-padding: 0" class="main-calc-height">
+      <div class="flex">
         <div class="role-left border-r">
           <div class="p-24 pb-0">
             <el-input
@@ -26,7 +26,7 @@
                   @mouseleave="mouseId = ''"
                 >
                   <template #default="{ row }">
-                    <span>{{ row.role_name }}</span>
+                    <span class="ellipsis-1" :title="row.role_name">{{ row.role_name }}</span>
                   </template>
                   <template #empty>
                     <span></span>
@@ -290,7 +290,7 @@ function mouseenter(row: any) {
     min-width: var(--setting-left-width);
 
     .list-height-left {
-      height: calc(100vh - 213px);
+      height: calc(100vh - 200px);
     }
   }
   .role-right {

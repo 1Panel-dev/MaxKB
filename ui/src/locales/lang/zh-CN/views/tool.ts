@@ -2,8 +2,8 @@ export default {
   title: '工具',
   createTool: '创建工具',
   editTool: '编辑工具',
-  copyTool: '复制函数',
-  importTool: '导入函数',
+  copyTool: '复制工具',
+  importTool: '导入工具',
   toolStore: {
     title: '工具商店',
     createFromToolStore: '从工具商店创建',

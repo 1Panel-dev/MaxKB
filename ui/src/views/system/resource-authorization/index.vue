@@ -2,7 +2,7 @@
   <div class="resource-authorization p-16-24">
     <div class="flex align-center mb-16">
       <el-breadcrumb separator-icon="ArrowRight">
-        <el-breadcrumb-item>{{ t('views.resourceAuthorization.title') }}</el-breadcrumb-item>
+        <el-breadcrumb-item>{{ t('views.system.resourceAuthorization.title') }}</el-breadcrumb-item>
         <el-breadcrumb-item>
           <h5 class="ml-4 color-text-primary">{{ activeData.label }}</h5>
         </el-breadcrumb-item>
@@ -25,7 +25,7 @@
       <div class="flex main-calc-height">
         <div class="resource-authorization__left border-r">
           <div class="p-24 pb-0">
-            <h4 class="mb-12">{{ $t('views.resourceAuthorization.member') }}</h4>
+            <h4 class="mb-12">{{ $t('views.system.resourceAuthorization.member') }}</h4>
             <el-input
               v-model="filterText"
               :placeholder="$t('common.search')"
@@ -57,7 +57,7 @@
         </div>
         <div class="permission-setting p-24 flex" v-loading="rLoading">
           <div class="resource-authorization__table">
-            <h4 class="mb-16">{{ $t('views.resourceAuthorization.permissionSetting') }}</h4>
+            <h4 class="mb-16">{{ $t('views.system.resourceAuthorization.permissionSetting') }}</h4>
             <!-- <el-tabs
               v-model="activeName"
               @tab-change="handleTabChange"
@@ -447,10 +447,10 @@ function changeWorkspace(item: WorkspaceItem) {
 }
 
 onMounted(() => {
-  tableHeight.value = window.innerHeight - 330
+  tableHeight.value = window.innerHeight - 300
   window.onresize = () => {
     return (() => {
-      tableHeight.value = window.innerHeight - 330
+      tableHeight.value = window.innerHeight - 300
     })()
   }
   if (user.isEE()) {

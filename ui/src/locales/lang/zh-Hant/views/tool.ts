@@ -24,7 +24,7 @@ export default {
   },
   delete: {
     confirmTitle: '是否刪除工具',
-    confirmMessage: '刪除後，引用該函數的應用在查詢時會報錯，請謹慎操作。',
+    confirmMessage: '刪除後，引用該工具的應用在查詢時會報錯，請謹慎操作。',
   },
   disabled: {
     confirmTitle: '是否停用工具：',

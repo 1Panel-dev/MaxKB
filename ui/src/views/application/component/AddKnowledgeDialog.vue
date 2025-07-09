@@ -52,7 +52,7 @@
       <div class="layout-bg" style="height: calc(100vh - 160px)">
         <el-scrollbar>
           <div class="p-16-24">
-            <el-row :gutter="12" v-loading="loading">
+            <el-row :gutter="12" v-loading="loading" v-if="filterData.length">
               <el-col
                 :span="12"
                 v-for="(item, index) in filterData.filter((v: any) => v.resource_type !== 'folder')"
@@ -69,6 +69,7 @@
                 </CardCheckbox>
               </el-col>
             </el-row>
+            <el-empty :description="$t('common.noData')" v-else />
           </div>
         </el-scrollbar>
       </div>

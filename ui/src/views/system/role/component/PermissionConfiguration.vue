@@ -1,6 +1,6 @@
 <template>
   <el-scrollbar v-loading="loading">
-    <app-table :data="tableData" border :span-method="objectSpanMethod">
+    <app-table :data="tableData" border :span-method="objectSpanMethod" :maxTableHeight="280">
       <el-table-column prop="module" :width="130" :label="$t('views.role.permission.moduleName')"/>
       <el-table-column
         prop="name"
@@ -40,8 +40,8 @@
       </el-table-column>
     </app-table>
   </el-scrollbar>
-  <div v-if="!disabled" class="footer border-t">
-    <el-button type="primary" style="width: 80px" :loading="loading" @click="handleSave">
+  <div class="footer border-t">
+    <el-button type="primary" :disabled="disabled" :loading="loading" @click="handleSave">
       {{ $t('common.save') }}
     </el-button>
   </div>
@@ -61,6 +61,7 @@ import {MsgSuccess} from '@/utils/message'
 import {t} from '@/locales'
 import {hasPermission} from "@/utils/permission";
 import {EditionConst, RoleConst} from "@/utils/permission/data.ts";
+import { max } from 'moment'
 
 const props = defineProps<{
   currentRole?: RoleItem

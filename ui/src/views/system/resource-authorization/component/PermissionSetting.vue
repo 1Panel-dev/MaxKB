@@ -4,10 +4,10 @@
       <div class="flex align-center"
            v-if="hasPermission([EditionConst.IS_EE,EditionConst.IS_PE], 'OR')">
         <!-- 企业版: 选优先级-->
-        <span class="lighter mr-16">{{ $t('views.resourceAuthorization.priority.label') }}</span>
+        <span class="lighter mr-16">{{ $t('views.system.resourceAuthorization.priority.label') }}</span>
         <el-radio-group v-model="radioRole">
           <el-radio :value="true" size="large">{{
-              $t('views.resourceAuthorization.priority.role')
+              $t('views.system.resourceAuthorization.priority.role')
             }}
           </el-radio>
           <el-radio :value="false" size="large">{{ $t('common.custom') }}</el-radio>
@@ -80,7 +80,7 @@
       </el-table-column>
       <el-table-column
         v-if="isRole"
-        :label="$t('views.resourceAuthorization.setting.authorization')"
+        :label="$t('views.system.resourceAuthorization.setting.authorization')"
         align="center"
         width="100"
       >
@@ -89,7 +89,7 @@
             :disabled="props.manage"
             v-model="allChecked[AuthorizationEnum.MANAGE]"
             :indeterminate="allIndeterminate[AuthorizationEnum.MANAGE]"
-            :label="$t('views.resourceAuthorization.setting.management')"
+            :label="$t('views.system.resourceAuthorization.setting.management')"
           />
         </template> -->
         <template #default="{ row }">
@@ -110,7 +110,7 @@
       </el-table-column>
       <el-table-column
         v-if="!isRole"
-        :label="$t('views.resourceAuthorization.setting.management')"
+        :label="$t('views.system.resourceAuthorization.setting.management')"
         align="center"
         width="100"
       >
@@ -119,7 +119,7 @@
             :disabled="props.manage"
             v-model="allChecked[AuthorizationEnum.MANAGE]"
             :indeterminate="allIndeterminate[AuthorizationEnum.MANAGE]"
-            :label="$t('views.resourceAuthorization.setting.management')"
+            :label="$t('views.system.resourceAuthorization.setting.management')"
           />
         </template> -->
         <template #default="{ row }">
@@ -140,7 +140,7 @@
       </el-table-column>
       <el-table-column
         v-if="!isRole"
-        :label="$t('views.resourceAuthorization.setting.check')"
+        :label="$t('views.system.resourceAuthorization.setting.check')"
         align="center"
         width="100"
       >
@@ -149,7 +149,7 @@
             :disabled="props.manage"
             v-model="allChecked[AuthorizationEnum.VIEW]"
             :indeterminate="allIndeterminate[AuthorizationEnum.VIEW]"
-            :label="$t('views.resourceAuthorization.setting.check')"
+            :label="$t('views.system.resourceAuthorization.setting.check')"
           />
         </template> -->
         <template #default="{ row }">
