@@ -195,7 +195,6 @@
       :api-input-params="mapToUrlParams(apiInputParams)"
     />
     <APIKeyDialog ref="APIKeyDialogRef"/>
-    <EditAvatarDialog ref="EditAvatarDialogRef" @refresh="refreshIcon"/>
 
     <!-- 社区版访问限制 -->
     <component :is="currentLimitDialog" ref="LimitDialogRef" @refresh="refresh"/>
@@ -212,7 +211,6 @@ import LimitDialog from './component/LimitDialog.vue'
 import XPackLimitDrawer from './xpack-component/XPackLimitDrawer.vue'
 import DisplaySettingDialog from './component/DisplaySettingDialog.vue'
 import XPackDisplaySettingDialog from './xpack-component/XPackDisplaySettingDialog.vue'
-import EditAvatarDialog from './component/EditAvatarDialog.vue'
 import StatisticsCharts from './component/StatisticsCharts.vue'
 import applicationApi from '@/api/application/application'
 import {nowDate, beforeDay} from '@/utils/time'
@@ -244,7 +242,6 @@ const apiUrl = window.location.origin + '/doc/chat/'
 
 const baseUrl = window.location.origin + '/api/application/'
 
-const EditAvatarDialogRef = ref()
 const APIKeyDialogRef = ref()
 const EmbedDialogRef = ref()
 
@@ -343,10 +340,6 @@ function openLimitDialog() {
   nextTick(() => {
     LimitDialogRef.value.open(accessToken.value)
   })
-}
-
-function openEditAvatar() {
-  EditAvatarDialogRef.value.open(detail.value)
 }
 
 function changeDayHandle(val: number | string) {

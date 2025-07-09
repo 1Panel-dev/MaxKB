@@ -23,6 +23,7 @@
         </el-button>
       </div>
     </div>
+
     <el-card style="--el-card-padding: 0">
       <el-row v-loading="loading">
         <el-col :span="10">
@@ -426,11 +427,8 @@
       ref="AddKnowledgeDialogRef"
       @addData="addKnowledge"
       :data="knowledgeList"
-      @refresh="refresh"
       :loading="knowledgeLoading"
     />
-
-    <EditAvatarDialog ref="EditAvatarDialogRef" @refresh="refreshIcon" />
     <ReasoningParamSettingDialog
       ref="ReasoningParamSettingDialogRef"
       @refresh="submitReasoningDialog"
@@ -444,7 +442,6 @@ import { groupBy } from 'lodash'
 import AIModeParamSettingDialog from './component/AIModeParamSettingDialog.vue'
 import ParamSettingDialog from './component/ParamSettingDialog.vue'
 import AddKnowledgeDialog from './component/AddKnowledgeDialog.vue'
-import EditAvatarDialog from '@/views/application-overview/component/EditAvatarDialog.vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { ApplicationFormType } from '@/api/type/application'
 import { relatedObject } from '@/utils/array'
@@ -455,6 +452,8 @@ import TTSModeParamSettingDialog from './component/TTSModeParamSettingDialog.vue
 import ReasoningParamSettingDialog from './component/ReasoningParamSettingDialog.vue'
 import permissionMap from '@/permission'
 import ApplicationAPI from '@/api/application/application'
+import { EditionConst } from '@/utils/permission/data'
+import { hasPermission } from '@/utils/permission/index'
 const route = useRoute()
 
 const apiType = computed<'workspace'>(() => {
@@ -489,10 +488,10 @@ const ParamSettingDialogRef = ref<InstanceType<typeof ParamSettingDialog>>()
 
 const applicationFormRef = ref<FormInstance>()
 const AddKnowledgeDialogRef = ref()
-const EditAvatarDialogRef = ref()
 
 const loading = ref(false)
 const knowledgeLoading = ref(false)
+
 const applicationForm = ref<ApplicationFormType>({
   name: '',
   desc: '',
@@ -526,6 +525,7 @@ const applicationForm = ref<ApplicationFormType>({
   tts_type: 'BROWSER',
   type: 'SIMPLE',
 })
+const themeDetail = ref({})
 
 const rules = reactive<FormRules<ApplicationFormType>>({
   name: [
@@ -657,6 +657,13 @@ function getDetail() {
     knowledgeList.value = res.data.knowledge_list
     applicationForm.value.model_setting.no_references_prompt =
       res.data.model_setting.no_references_prompt || '{question}'
+
+    // 企业版和专业版
+    if (hasPermission([EditionConst.IS_EE, EditionConst.IS_PE], 'OR')) {
+      ApplicationAPI.getApplicationSetting(id).then((ok) => {
+        applicationForm.value = { ...applicationForm.value, ...ok.data }
+      })
+    }
   })
 }
 
@@ -718,17 +725,6 @@ function sttModelEnableChange() {
   if (!applicationForm.value.stt_model_enable) {
     applicationForm.value.stt_model_id = undefined
   }
-}
-
-function openEditAvatar() {
-  EditAvatarDialogRef.value.open(applicationForm.value)
-}
-function refreshIcon() {
-  getDetail()
-}
-
-function refresh() {
-  // getDetail()
 }
 
 onMounted(() => {

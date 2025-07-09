@@ -34,11 +34,12 @@
         v-if="form.authentication"
         v-model="form.authentication_value.type"
         class="card__radio"
+        @change="(val: string) => val === 'password' && refreshAuthentication()"
       >
         <el-card
           shadow="never"
           class="mb-16"
-          :class="form.authentication_value.type === 'password' ? 'active' : ''"
+          :class="form.authentication_value?.type === 'password' ? 'active' : ''"
         >
           <el-radio value="password" size="large">
             <p class="mb-4 lighter">
@@ -160,7 +161,9 @@ const form = ref<any>({
   access_num: 0,
   white_active: true,
   white_list: '',
-  authentication_value: {},
+  authentication_value: {
+    type: 'password',
+  },
   authentication: false,
 })
 
@@ -190,7 +193,12 @@ const open = (data: any) => {
   form.value.access_num = data.access_num
   form.value.white_active = data.white_active
   form.value.white_list = data.white_list?.length ? data.white_list?.join('\n') : ''
-  form.value.authentication_value = data.authentication_value
+  form.value.authentication_value = data.authentication_value || {
+    type: 'password',
+  }
+  if (form.value.authentication_value.type === 'password') {
+    refreshAuthentication()
+  }
   form.value.authentication = data.authentication
   dialogVisible.value = true
   applicationApi.getChatUserAuthType().then((ok) => {

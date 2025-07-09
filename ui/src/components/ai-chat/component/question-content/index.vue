@@ -109,7 +109,7 @@ const props = defineProps<{
 const { user } = useStore()
 
 const showAvatar = computed(() => {
-  return user.isEnterprise() ? props.application.show_user_avatar : true
+  return user.isEE() || user.isPE() ? props.application.show_user_avatar : true
 })
 
 const document_list = computed(() => {

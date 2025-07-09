@@ -58,18 +58,18 @@
         >
         </AiChat>
       </div>
-
-      <ChatHistoryDrawer
-        v-model:show="show"
-        :application-detail="applicationDetail"
-        :chat-log-data="chatLogData"
-        :left-loading="left_loading"
-        :currentChatId="currentChatId"
-        @new-chat="newChat"
-        @clickLog="clickListHandle"
-        @delete-log="deleteLog"
-      />
     </div>
+    <ChatHistoryDrawer
+      v-model:show="show"
+      :application-detail="applicationDetail"
+      :chat-log-data="chatLogData"
+      :left-loading="left_loading"
+      :currentChatId="currentChatId"
+      @new-chat="newChat"
+      @clickLog="clickListHandle"
+      @delete-log="deleteLog"
+      @refreshFieldTitle="refreshFieldTitle"
+    />
   </div>
 </template>
 <script setup lang="ts">
@@ -156,6 +156,7 @@ function newChat() {
     chatLogData.value.unshift(newObj)
   }
   currentChatId.value = 'new'
+  show.value = false
 }
 
 function getChatLog(id: string) {
@@ -212,6 +213,13 @@ const clickListHandle = (item: any) => {
       getChatRecord()
     }
     show.value = false
+  }
+}
+
+function refreshFieldTitle(chatId: string, abstract: string) {
+  const find = chatLogData.value.find((item: any) => item.id == chatId)
+  if (find) {
+    find.abstract = abstract
   }
 }
 

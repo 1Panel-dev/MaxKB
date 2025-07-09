@@ -145,7 +145,7 @@ const open = (data: any, folder: string) => {
 }
 
 const submitValid = (formEl: FormInstance | undefined) => {
-  if (user.isEnterprise()) {
+  if (user.isEE() || user.isPE()) {
     submitHandle(formEl)
   } else {
     common

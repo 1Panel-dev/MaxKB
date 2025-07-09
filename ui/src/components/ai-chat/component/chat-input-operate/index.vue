@@ -1,6 +1,5 @@
 <template>
   <div class="ai-chat__operate p-16">
-    <slot name="operateBefore" />
     <div class="operate-textarea">
       <el-scrollbar max-height="136">
         <div
@@ -170,13 +169,7 @@
         v-model="inputValue"
         :autosize="{ minRows: 1, maxRows: isMobile ? 4 : 10 }"
         type="textarea"
-        :placeholder="
-          recorderStatus === 'START'
-            ? `${$t('chat.inputPlaceholder.speaking')}...`
-            : recorderStatus === 'TRANSCRIBING'
-              ? `${$t('chat.inputPlaceholder.recorderLoading')}...`
-              : $t('chat.inputPlaceholder.default')
-        "
+        :placeholder="inputPlaceholder"
         :maxlength="100000"
         @keydown.enter="sendChatHandle($event)"
         @paste="handlePaste"
@@ -294,6 +287,7 @@
 </template>
 <script setup lang="ts">
 import { ref, computed, onMounted, nextTick, watch, type Ref } from 'vue'
+import { t } from '@/locales'
 import Recorder from 'recorder-core'
 import TouchChat from './TouchChat.vue'
 import applicationApi from '@/api/application/application'
@@ -305,7 +299,7 @@ import bus from '@/bus'
 import 'recorder-core/src/engine/mp3'
 import 'recorder-core/src/engine/mp3-engine'
 import { MsgWarning } from '@/utils/message'
-import { t } from '@/locales'
+import { debounce } from 'lodash'
 import chatAPI from '@/api/chat/chat'
 const router = useRouter()
 const route = useRoute()
@@ -351,6 +345,14 @@ const localLoading = computed({
   set: (v) => {
     emit('update:loading', v)
   },
+})
+
+const inputPlaceholder = computed(() => {
+  return recorderStatus.value === 'START'
+    ? `${t('chat.inputPlaceholder.speaking')}...`
+    : recorderStatus.value === 'TRANSCRIBING'
+      ? `${t('chat.inputPlaceholder.recorderLoading')}...`
+      : `${t('chat.inputPlaceholder.default')}`
 })
 
 const upload = ref()
@@ -800,7 +802,6 @@ function mouseenter(row: any) {
 function mouseleave() {
   showDelete.value = ''
 }
-
 onMounted(() => {
   bus.on('chat-input', (message: string) => {
     inputValue.value = message

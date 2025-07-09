@@ -38,10 +38,10 @@ const props = defineProps<{
 const { user } = useStore()
 
 const showAvatar = computed(() => {
-  return user.isEnterprise() ? props.application.show_avatar : true
+  return (user.isEE() || user.isPE()) ? props.application.show_avatar : true
 })
 const showUserAvatar = computed(() => {
-  return user.isEnterprise() ? props.application.show_user_avatar : true
+  return user.isEE() || user.isPE() ? props.application.show_user_avatar : true
 })
 
 const toQuickQuestion = (match: string, offset: number, input: string) => {

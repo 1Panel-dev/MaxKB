@@ -4,7 +4,6 @@
     :is="currentTemplate"
     :application_profile="chatUser.application"
     :key="route.fullPath"
-    v-loading="loading"
   />
 </template>
 <script setup lang="ts">
@@ -35,14 +34,6 @@ const currentTemplate = computed(() => {
   return components[name].default
 })
 
-const loading = ref(false)
 
 const applicationAvailable = ref<boolean>(true)
 </script>
-<style lang="scss">
-@media only screen and (max-width: 768px) {
-  .el-dialog {
-    width: 90% !important;
-  }
-}
-</style>

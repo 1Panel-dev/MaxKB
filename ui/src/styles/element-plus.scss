@@ -215,6 +215,12 @@
   }
 }
 
+@media only screen and (max-width: 768px) {
+  .el-dialog {
+    width: 90% !important;
+  }
+}
+
 // el-form
 
 .el-form {

@@ -39,9 +39,7 @@
         </el-text>
       </el-card>
       <div class="flex align-center border-t" style="padding: 12px 0 8px">
-        <el-avatar class="mr-8 avatar-blue" shape="square" :size="18">
-          <img src="@/assets/knowledge/icon_document.svg" style="width: 58%" alt="" />
-        </el-avatar>
+        <KnowledgeIcon :type="data?.knowledge_type" :size="18" class="mr-8" />
         <span class="ellipsis-1 break-all" :title="data?.knowledge_name">
           {{ data?.knowledge_name || '-' }}
         </span>

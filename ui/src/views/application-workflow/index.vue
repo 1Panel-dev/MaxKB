@@ -141,8 +141,8 @@ import type { Action } from 'element-plus'
 import Workflow from '@/workflow/index.vue'
 import DropdownMenu from '@/views/application-workflow/component/DropdownMenu.vue'
 import PublishHistory from '@/views/application-workflow/component/PublishHistory.vue'
-import applicationApi from '@/api/application/application'
-import {isAppIcon, resetUrl} from '@/utils/common'
+import ApplicationAPI from '@/api/application/application'
+import { isAppIcon,resetUrl } from '@/utils/common'
 import { MsgSuccess, MsgError, MsgConfirm } from '@/utils/message'
 import { datetimeFormat } from '@/utils/time'
 import { mapToUrlParams } from '@/utils/application'
@@ -274,38 +274,57 @@ function clickoutside() {
   showPopover.value = false
 }
 const publish = () => {
-  const workflow = getGraphData()
-  const workflowInstance = new WorkFlowInstance(workflow)
-  try {
-    workflowInstance.is_valid()
-  } catch (e: any) {
-    MsgError(e.toString())
-    return
-  }
-  applicationApi
-    .putApplication(id, { work_flow: workflow }, loading)
-    .then((ok) => {
-      return applicationApi.publish(id, {}, loading)
-    })
-    .then((ok: any) => {
-      detail.value.name = ok.data.name
-      MsgSuccess(t('views.application.tip.publishSuccess'))
+  workflowRef.value
+    ?.validate()
+    .then(() => {
+      const workflow = getGraphData()
+      const workflowInstance = new WorkFlowInstance(workflow)
+      try {
+        workflowInstance.is_valid()
+      } catch (e: any) {
+        MsgError(e.toString())
+        return
+      }
+      ApplicationAPI.putApplication(id, { work_flow: workflow }, loading)
+        .then((ok) => {
+          return ApplicationAPI.publish(id, {}, loading)
+        })
+        .then((ok: any) => {
+          detail.value.name = ok.data.name
+          MsgSuccess(t('views.application.tip.publishSuccess'))
+        })
+        .catch((res: any) => {
+          const node = res.node
+          const err_message = res.errMessage
+          if (typeof err_message == 'string') {
+            MsgError(
+              res.node.properties?.stepName +
+                ` ${t('views.applicationWorkflow.node').toLowerCase()} ` +
+                err_message.toLowerCase(),
+            )
+          } else {
+            const keys = Object.keys(err_message)
+            MsgError(
+              node.properties?.stepName +
+                ` ${t('views.applicationWorkflow.node').toLowerCase()} ` +
+                err_message[keys[0]]?.[0]?.message.toLowerCase(),
+            )
+          }
+        })
     })
     .catch((res: any) => {
       const node = res.node
       const err_message = res.errMessage
       if (typeof err_message == 'string') {
         MsgError(
-          res.node.properties?.stepName +
-            ` ${t('views.applicationWorkflow.node').toLowerCase()} ` +
-            err_message.toLowerCase(),
+          res.node.properties?.stepName + ` ${t('views.applicationWorkflow.node')}，` + err_message,
         )
       } else {
         const keys = Object.keys(err_message)
         MsgError(
           node.properties?.stepName +
-            ` ${t('views.applicationWorkflow.node').toLowerCase()} ` +
-            err_message[keys[0]]?.[0]?.message.toLowerCase(),
+            ` ${t('views.applicationWorkflow.node')}，` +
+            err_message[keys[0]]?.[0]?.message,
         )
       }
     })
@@ -391,6 +410,12 @@ function getDetail() {
       workflowRef.value?.render(detail.value.work_flow)
       cloneWorkFlow.value = getGraphData()
     })
+    // 企业版和专业版
+    if (hasPermission([EditionConst.IS_EE, EditionConst.IS_PE], 'OR')) {
+      ApplicationAPI.getApplicationSetting(id).then((ok) => {
+        detail.value = { ...detail.value, ...ok.data }
+      })
+    }
   })
 }
 
@@ -407,7 +432,7 @@ function saveApplication(bool?: boolean, back?: boolean) {
         cloneWorkFlow.value = getGraphData()
         MsgSuccess(t('common.saveSuccess'))
         if (back) {
-         go()
+          go()
         }
       }
     })
@@ -415,31 +440,102 @@ function saveApplication(bool?: boolean, back?: boolean) {
       loading.value = false
     })
 }
-const go=()=>{
- return router.push({ path: get_route() })
+const go = () => {
+  return router.push({ path: get_route() })
 }
 
-const get_route=()=>{
-  if(  hasPermission( [new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(id)],[],'AND'),
-          RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-          PermissionConst.APPLICATION_OVERVIEW_READ.getWorkspacePermissionWorkspaceManageRole,
-          PermissionConst.APPLICATION_OVERVIEW_READ.getApplicationWorkspaceResourcePermission(id)],'OR')){
-            return `/application/${id}/WORK_FLOW/overview`
-          } else if (hasPermission([new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(id)],[EditionConst.IS_EE, EditionConst.IS_PE],'AND'),
-          new ComplexPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,],[PermissionConst.APPLICATION_ACCESS_READ.getWorkspacePermissionWorkspaceManageRole],[EditionConst.IS_EE, EditionConst.IS_PE],'OR'),
-          new ComplexPermission([],[PermissionConst.APPLICATION_ACCESS_READ.getApplicationWorkspaceResourcePermission(id)],[EditionConst.IS_EE, EditionConst.IS_PE],'OR'),],'OR')) {
-            return `/application/${id}/WORK_FLOW/access`
-          } else if (hasPermission([new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(id)],[EditionConst.IS_EE, EditionConst.IS_PE],'AND'),
-          new ComplexPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],[PermissionConst.APPLICATION_CHAT_USER_READ.getWorkspacePermissionWorkspaceManageRole],[EditionConst.IS_EE, EditionConst.IS_PE],'OR'),
-          new ComplexPermission([],[PermissionConst.APPLICATION_CHAT_USER_READ.getApplicationWorkspaceResourcePermission(id)],[EditionConst.IS_EE, EditionConst.IS_PE],'OR'),],'OR')) {
-            return `/application/${id}/WORK_FLOW/chat-user`
-          } else if (hasPermission([new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(id)],[],'AND'),
-          PermissionConst.APPLICATION_CHAT_LOG_READ.getWorkspacePermissionWorkspaceManageRole,
-          PermissionConst.APPLICATION_CHAT_LOG_READ.getApplicationWorkspaceResourcePermission(id)],'OR')) {
-            return `/application/${id}/WORK_FLOW/chat-log`
-          } else return  `/application`
+const get_route = () => {
+  if (
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(id)],
+          [],
+          'AND',
+        ),
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.APPLICATION_OVERVIEW_READ.getWorkspacePermissionWorkspaceManageRole,
+        PermissionConst.APPLICATION_OVERVIEW_READ.getApplicationWorkspaceResourcePermission(id),
+      ],
+      'OR',
+    )
+  ) {
+    return `/application/${id}/WORK_FLOW/overview`
+  } else if (
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(id)],
+          [EditionConst.IS_EE, EditionConst.IS_PE],
+          'AND',
+        ),
+        new ComplexPermission(
+          [RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+          [PermissionConst.APPLICATION_ACCESS_READ.getWorkspacePermissionWorkspaceManageRole],
+          [EditionConst.IS_EE, EditionConst.IS_PE],
+          'OR',
+        ),
+        new ComplexPermission(
+          [],
+          [PermissionConst.APPLICATION_ACCESS_READ.getApplicationWorkspaceResourcePermission(id)],
+          [EditionConst.IS_EE, EditionConst.IS_PE],
+          'OR',
+        ),
+      ],
+      'OR',
+    )
+  ) {
+    return `/application/${id}/WORK_FLOW/access`
+  } else if (
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(id)],
+          [EditionConst.IS_EE, EditionConst.IS_PE],
+          'AND',
+        ),
+        new ComplexPermission(
+          [RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+          [PermissionConst.APPLICATION_CHAT_USER_READ.getWorkspacePermissionWorkspaceManageRole],
+          [EditionConst.IS_EE, EditionConst.IS_PE],
+          'OR',
+        ),
+        new ComplexPermission(
+          [],
+          [
+            PermissionConst.APPLICATION_CHAT_USER_READ.getApplicationWorkspaceResourcePermission(
+              id,
+            ),
+          ],
+          [EditionConst.IS_EE, EditionConst.IS_PE],
+          'OR',
+        ),
+      ],
+      'OR',
+    )
+  ) {
+    return `/application/${id}/WORK_FLOW/chat-user`
+  } else if (
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(id)],
+          [],
+          'AND',
+        ),
+        PermissionConst.APPLICATION_CHAT_LOG_READ.getWorkspacePermissionWorkspaceManageRole,
+        PermissionConst.APPLICATION_CHAT_LOG_READ.getApplicationWorkspaceResourcePermission(id),
+      ],
+      'OR',
+    )
+  ) {
+    return `/application/${id}/WORK_FLOW/chat-log`
+  } else return `/application`
 }
-
 
 /**
  * 定时保存

@@ -2,7 +2,7 @@
   <div
     class="chat-pc"
     :class="classObj"
-    v-loading="loading"
+    v-loading="loading || left_loading"
     :style="{
       '--el-color-primary': applicationDetail?.custom_theme?.theme_color,
       '--el-color-primary-light-9': hexToRgba(applicationDetail?.custom_theme?.theme_color, 0.1),

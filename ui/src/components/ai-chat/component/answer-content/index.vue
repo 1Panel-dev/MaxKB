@@ -100,10 +100,10 @@ const emit = defineEmits([
 ])
 
 const showAvatar = computed(() => {
-  return user.isEnterprise() ? props.application.show_avatar : true
+  return (user.isEE() || user.isPE())? props.application.show_avatar : true
 })
 const showUserAvatar = computed(() => {
-  return user.isEnterprise() ? props.application.show_user_avatar : true
+  return user.isEE() || user.isPE() ? props.application.show_user_avatar : true
 })
 const chatMessage = (question: string, type: 'old' | 'new', other_params_data?: any) => {
   if (type === 'old') {
