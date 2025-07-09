@@ -62,7 +62,7 @@ interface FormItemModel {
   rules?: Arrayable<FormItemRule>,
   hidden?: (e: any) => boolean,
   selectProps?: {
-    options?: { label: string, value: string }[]
+    options?: { label: string, value: string, disabledFunction?: (e: any) => boolean }[]
     placeholder?: string
     multiple?: boolean
     clearableFunction?: (e: any) => boolean

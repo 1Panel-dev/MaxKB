@@ -69,7 +69,7 @@
   </el-drawer>
 </template>
 <script setup lang="ts">
-import {ref, reactive, watch, onBeforeMount} from 'vue'
+import {ref, reactive, watch, onBeforeMount, computed} from 'vue'
 import type {FormInstance} from 'element-plus'
 import userManageApi from '@/api/system/user-manage'
 import {MsgSuccess} from '@/utils/message'
@@ -103,9 +103,10 @@ const roleFormItem = ref<FormItemModel[]>([]);
 const adminRoleList = ref<any[]>([])
 const workspaceFormItem = ref<FormItemModel[]>([])
 
+const isAdmin = computed(() => userForm.value['id'] === 'f0dd8f71-e4ee-11ee-8c84-a8a1595801ab')
+
 function deleteButtonDisabled(element: any) {
-  // 内置的admin
-  if (userForm.value['id'] === 'f0dd8f71-e4ee-11ee-8c84-a8a1595801ab' && element.role_id === 'ADMIN') {
+  if (isAdmin.value && ['ADMIN','WORKSPACE_MANAGE', 'USER'].includes(element.role_id)) {
     return true
   }
   return false
@@ -161,15 +162,15 @@ async function getWorkspaceFormItem() {
           },
         ],
         selectProps: {
-          // TODO
           options:
             res.data?.map((item) => ({
               label: item.name,
               value: item.id,
+              disabledFunction: (e: any)=> isAdmin.value && ['WORKSPACE_MANAGE', 'USER'].includes(e.role_id) && item.id === 'default'
             })) || [],
           placeholder: `${t('common.selectPlaceholder')}${t('views.role.member.workspace')}`,
           clearableFunction: (e)=>{
-            return !(userForm.value['id'] === 'f0dd8f71-e4ee-11ee-8c84-a8a1595801ab' && ['WORKSPACE_MANAGE', 'USER'].includes(e.role_id))
+            return !(isAdmin.value && ['WORKSPACE_MANAGE', 'USER'].includes(e.role_id))
           }
         },
       },

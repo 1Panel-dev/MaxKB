@@ -8,7 +8,7 @@
             :placeholder="model.selectProps?.placeholder ?? $t('common.selectPlaceholder')" :clearable="model.selectProps?.clearableFunction?model.selectProps?.clearableFunction?.(element): true" filterable
             multiple style="width: 100%" collapse-tags collapse-tags-tooltip v-bind="model.selectProps">
             <el-option v-for="opt in model.selectProps?.options" :key="opt.value" :label="opt.label"
-              :value="opt.value" />
+              :value="opt.value" :disabled="opt.disabledFunction?.(element)" />
           </el-select>
         </el-form-item>
         <!-- 删除按钮 -->
