@@ -30,7 +30,7 @@ class QwenTextToImageModel(MaxKBBaseModel, BaseTextToImage):
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
-        optional_params = {'params': {'size': '1024*1024', 'style': '<auto>', 'n': 1}}
+        optional_params = {'params': {'size': '1024*1024', 'n': 1}}
         for key, value in model_kwargs.items():
             if key not in ['model_id', 'use_local', 'streaming']:
                 optional_params['params'][key] = value
@@ -41,17 +41,14 @@ class QwenTextToImageModel(MaxKBBaseModel, BaseTextToImage):
         )
         return chat_tong_yi
 
-    def is_cache_model(self):
-        return False
-
     def check_auth(self):
         chat = ChatTongyi(api_key=self.api_key, model_name='qwen-max')
         chat.invoke([HumanMessage([{"type": "text", "text": gettext('Hello')}])])
 
     def generate_image(self, prompt: str, negative_prompt: str = None):
-        # api_base='https://dashscope.aliyuncs.com/compatible-mode/v1',
         rsp = ImageSynthesis.call(api_key=self.api_key,
                                   model=self.model_name,
+                                  base_url='https://dashscope.aliyuncs.com/compatible-mode/v1',
                                   prompt=prompt,
                                   negative_prompt=negative_prompt,
                                   **self.params)
