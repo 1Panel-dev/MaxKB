@@ -24,7 +24,6 @@ from django.utils.translation import gettext_lazy as _
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from rest_framework import serializers, status
 from rest_framework.utils.formatting import lazy_format
-
 from application.flow.common import Workflow
 from application.models.application import Application, ApplicationTypeChoices, ApplicationKnowledgeMapping, \
     ApplicationFolder, ApplicationVersion

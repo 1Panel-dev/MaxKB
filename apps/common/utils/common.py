@@ -291,8 +291,8 @@ def get_sha256_hash(_v: str | bytes):
 ALLOWED_CLASSES = {
     ("builtins", "dict"),
     ('uuid', 'UUID'),
-    ("application.serializers.application_serializers", "MKInstance"),
-    ("function_lib.serializers.function_lib_serializer", "FlibInstance")
+    ("application.serializers.application", "MKInstance"),
+    ("tools.serializers.tool", "ToolInstance")
 }
 
 

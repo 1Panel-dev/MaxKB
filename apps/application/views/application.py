@@ -139,11 +139,11 @@ class ApplicationAPI(APIView):
         @log(menu='Application', operate="Export Application",
              get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')),
              )
-        def post(self, request: Request, workspace_id: str, application_id: str):
+        def get(self, request: Request, workspace_id: str, application_id: str):
             return ApplicationOperateSerializer(
                 data={'application_id': application_id,
                       'workspace_id': workspace_id,
-                      'user_id': request.user.id}).export(request.data)
+                      'user_id': request.user.id}).export()
 
     class Operate(APIView):
         authentication_classes = [TokenAuth]
