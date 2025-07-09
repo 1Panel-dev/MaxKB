@@ -14,6 +14,8 @@ import gzip
 import json
 import re
 import ssl
+
+import requests
 import uuid_utils.compat as uuid
 from typing import Dict
 
