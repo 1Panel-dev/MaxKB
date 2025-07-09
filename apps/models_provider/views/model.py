@@ -188,9 +188,7 @@ class ModelSetting(APIView):
                          PermissionConstants.MODEL_READ.get_workspace_permission_workspace_manage_role(),
                          PermissionConstants.MODEL_READ.get_workspace_permission(),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-                         ViewPermission([RoleConstants.USER.get_workspace_role()],
-                                        [PermissionConstants.MODEL.get_workspace_model_permission()],
-                                        CompareConstants.AND), )
+                         RoleConstants.USER.get_workspace_role(),)
         def get(self, request: Request, workspace_id: str, model_id: str):
             return result.success(
                 ModelSerializer.ModelParams(data={'id': model_id}).get_model_params())
