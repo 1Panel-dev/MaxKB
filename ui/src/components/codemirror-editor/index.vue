@@ -46,6 +46,7 @@ import { python } from '@codemirror/lang-python'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { linter, type Diagnostic } from '@codemirror/lint'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import debounce from 'lodash/debounce'
 
 defineOptions({ name: 'CodemirrorEditor' })
 
@@ -86,27 +87,31 @@ function getRangeFromLineAndColumn(state: any, line: number, column: number, end
   }
 }
 
+const asyncLint = debounce(async (doc: string) => {
+  const res = await loadSharedApi({ type: 'tool', systemType: apiType.value }).postPylint(doc)
+  return res.data
+}, 500)
+
 const regexpLinter = linter(async (view) => {
   const diagnostics: Diagnostic[] = []
-  await loadSharedApi({ type: 'tool', systemType: apiType.value })
-    .postPylint(view.state.doc.toString())
-    .then((ok: any) => {
-      ok.data.forEach((element: any) => {
-        const range = getRangeFromLineAndColumn(
-          view.state,
-          element.line,
-          element.column,
-          element.endColumn,
-        )
-
-        diagnostics.push({
-          from: range.form,
-          to: range.to,
-          severity: element.type,
-          message: element.message,
-        })
-      })
+  const lintResults = await asyncLint(view.state.doc.toString())
+  if (!lintResults || lintResults.length === 0) {
+    return diagnostics
+  }
+  lintResults.forEach((element: any) => {
+    const range = getRangeFromLineAndColumn(
+      view.state,
+      element.line,
+      element.column,
+      element.endColumn,
+    )
+    diagnostics.push({
+      from: range.form,
+      to: range.to,
+      severity: element.type,
+      message: element.message,
     })
+  })
   return diagnostics
 })
 const extensions = [python(), regexpLinter, oneDark]
