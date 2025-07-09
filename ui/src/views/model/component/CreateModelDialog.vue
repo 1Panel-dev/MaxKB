@@ -249,8 +249,10 @@ import { input_type_list } from '@/components/dynamics-form/constructor/data'
 import AddParamDrawer from '@/views/model/component/AddParamDrawer.vue'
 import { t } from '@/locales'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import useStore from '@/stores'
 
 const route = useRoute()
+const { user } = useStore()
 
 const apiType = computed(() => {
   if (route.path.includes('shared')) {
@@ -403,6 +405,7 @@ const submit = () => {
             close()
             MsgSuccess(t('views.model.tip.createSuccessMessage'))
             emit('submit')
+            return user.profile()
           })
       }
     })
