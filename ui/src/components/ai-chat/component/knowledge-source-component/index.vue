@@ -27,7 +27,7 @@
                   </div>
                   <div class="ml-8" v-else>
                     <a
-                      :href="getFileUrl(item?.meta?.source_file_id)"
+                      :href="getFileUrl(item?.meta?.source_file_id || item?.source_url)"
                       target="_blank"
                       class="ellipsis-1"
                       :title="item?.document_name?.trim()"

@@ -1,4 +1,5 @@
 # coding=utf-8
+import urllib
 
 import uuid_utils.compat as uuid
 from django.db.models import QuerySet
@@ -94,9 +95,10 @@ class FileSerializer(serializers.Serializer):
                 raise NotFound404(404, _('File not found'))
             file_type = file.file_name.split(".")[-1].lower()
             content_type = mime_types.get(file_type, 'application/octet-stream')
+            encoded_filename = urllib.parse.quote(file.file_name)
             headers = {
                 'Content-Type': content_type,
-                'Content-Disposition': f'{"inline" if file_type == "pdf" else "attachment"}; filename="{file.file_name}"'
+                'Content-Disposition': f'{"inline" if file_type == "pdf" else "attachment"}; filename={encoded_filename}'
             }
             return HttpResponse(
                 file.get_bytes(),
