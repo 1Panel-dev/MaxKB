@@ -46,6 +46,7 @@ class ToolExecutor:
 try:
     import os
     import sys
+    import pickle
     path_to_exclude = ['/opt/py3/lib/python3.11/site-packages', '/opt/maxkb-app/apps']
     sys.path = [p for p in sys.path if p not in path_to_exclude]
     sys.path += {python_paths}
@@ -61,7 +62,6 @@ try:
     for local in locals_v:
         globals_v[local] = locals_v[local]
     exec_result=f(**keywords)
-    import pickle
     with open({result_path!a}, 'wb') as file:
         file.write(pickle.dumps({success}))
 except Exception as e:
