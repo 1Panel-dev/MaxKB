@@ -133,14 +133,14 @@
                   row.source === 'LOCAL'
                     ? $t('views.userManage.source.local')
                     : row.source === 'wecom'
-                      ? $t('views.userManage.source.wecom')
-                      : row.source === 'lark'
-                        ? $t('views.userManage.source.lark')
-                        : row.source === 'dingtalk'
-                          ? $t('views.userManage.source.dingtalk')
-                          : row.source === 'OAUTH2' || row.source === 'OAuth2'
-                            ? 'OAuth2'
-                            : row.source
+                    ? $t('views.userManage.source.wecom')
+                    : row.source === 'lark'
+                    ? $t('views.userManage.source.lark')
+                    : row.source === 'dingtalk'
+                    ? $t('views.userManage.source.dingtalk')
+                    : row.source === 'OAUTH2' || row.source === 'OAuth2'
+                    ? 'OAuth2'
+                    : row.source
                 }}
               </template>
             </el-table-column>
@@ -267,7 +267,11 @@ watch(filterText, (val: string) => {
   filterList.value = filter(list.value, val)
 })
 
+const checkedMap = reactive<Record<string, boolean>>({}) // 选中的
+
 function clickUserGroup(item: ChatUserGroupItem) {
+  // 清空跨组勾选缓存
+  for (const key in checkedMap) delete checkedMap[key]
   current.value = item
 }
 
@@ -317,6 +321,14 @@ async function getList() {
       searchForm.value.name,
       rightLoading,
     )
+    // 更新缓存和回显状态
+    res.data.records.forEach((item: any) => {
+      if (checkedMap[item.id] === undefined) {
+        checkedMap[item.id] = item.is_auth
+      }
+      item.is_auth = checkedMap[item.id]
+    })
+
     tableData.value = res.data.records
     paginationConfig.total = res.data.total
   } catch (error) {
@@ -329,36 +341,39 @@ function handleSizeChange() {
   getList()
 }
 
-watch(
-  () => current.value?.id,
-  () => {
-    getList()
-  },
+watch(() => current.value?.id, () => {
+  paginationConfig.current_page = 1
+  getList()
+})
+
+const allChecked = computed(() =>
+  tableData.value.length > 0 &&
+  tableData.value.every(item => checkedMap[item.id])
 )
 
-const allChecked = computed(
-  () =>
-    tableData.value.length > 0 &&
-    tableData.value.every((item: ChatUserGroupUserItem) => item.is_auth),
-)
-
-const allIndeterminate = computed(
-  () => !allChecked.value && tableData.value.some((item: ChatUserGroupUserItem) => item.is_auth),
+const allIndeterminate = computed(() =>
+  !allChecked.value &&
+  tableData.value.some(item => checkedMap[item.id])
 )
 
 const handleCheckAll = (checked: boolean) => {
-  tableData.value.forEach((item: ChatUserGroupUserItem) => {
+  tableData.value.forEach(item => {
     item.is_auth = checked
+    checkedMap[item.id] = checked
   })
 }
 
 const handleRowChange = (value: boolean, row: ChatUserGroupUserItem) => {
   row.is_auth = value
+  checkedMap[row.id] = value
 }
 
 async function handleSave() {
   try {
-    const params = tableData.value.map((item) => ({ chat_user_id: item.id, is_auth: item.is_auth }))
+    const params = Object.entries(checkedMap).map(([id, is_auth]) => ({
+      chat_user_id: id,
+      is_auth,
+    }))
     await loadSharedApi({
       type: 'chatUser',
       systemType: apiType.value,
