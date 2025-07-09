@@ -13,6 +13,7 @@ import pickle
 import random
 import re
 import shutil
+import uuid
 from functools import reduce
 from typing import List, Dict
 
@@ -329,3 +330,7 @@ def parse_image(content: str):
     matches = re.finditer("!\[.*?\]\(\/oss\/(image|file)\/.*?\)", content)
     image_list = [match.group() for match in matches]
     return image_list
+
+
+def generate_uuid(tag: str):
+    return str(uuid.uuid5(uuid.NAMESPACE_DNS, tag))
