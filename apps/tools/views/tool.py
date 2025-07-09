@@ -68,7 +68,7 @@ class ToolView(APIView):
     )
     def get(self, request: Request, workspace_id: str):
         return result.success(ToolTreeSerializer(
-            data={'workspace_id': workspace_id}
+            data={'workspace_id': workspace_id, 'scope': ToolScope.WORKSPACE, 'user_id': request.user.id}
         ).get_tools(request.query_params.get('folder_id')))
 
     class Debug(APIView):

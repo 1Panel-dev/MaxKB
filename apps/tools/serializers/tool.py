@@ -538,6 +538,7 @@ class ToolSerializer(serializers.Serializer):
 
 class ToolTreeSerializer(serializers.Serializer):
     workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+    scope = serializers.CharField(required=True, label=_('scope'))
 
     def get_tools(self, folder_id):
         self.is_valid(raise_exception=True)
@@ -553,8 +554,11 @@ class ToolTreeSerializer(serializers.Serializer):
         folders_data = ToolFolderFlatSerializer(child_folders, many=True).data
 
         # 获取当前文件夹下的工具
-        tools = QuerySet(Tool).filter(Q(workspace_id=self.data.get('workspace_id')) &
-                                      Q(folder_id=folder_id))
+        tools = QuerySet(Tool).filter(
+            Q(workspace_id=self.data.get('workspace_id')) &
+            Q(scope=self.data.get('scope')) &
+            Q(folder_id=folder_id)
+        )
         tools_data = ToolModelSerializer(tools, many=True).data
 
         # 返回包含文件夹和工具的结构
