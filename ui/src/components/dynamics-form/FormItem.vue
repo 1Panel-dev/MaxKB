@@ -78,7 +78,7 @@ const itemValue = computed({
     } else {
       bus.emit(props.formfield.field, value)
     }
-  }
+  },
 })
 const componentFormRef = ref<any>()
 const label_attrs = computed(() => {
@@ -114,7 +114,7 @@ const errMsg = computed(() => {
  */
 const to_rule = (rule: any) => {
   if (rule.validator) {
-    const validator = (rule: any, value: string, callback: any) => {}
+    let validator = (rule: any, value: string, callback: any) => {}
     eval(rule.validator)
     return { ...rule, validator }
   }
@@ -130,7 +130,7 @@ const rules = computed(() => {
     : {
         message: errMsg.value,
         trigger: props.formfield.input_type === 'Slider' ? 'blur' : ['blur', 'change'],
-        required: props.formfield.required === false ? false : true
+        required: props.formfield.required === false ? false : true,
       }
 })
 
