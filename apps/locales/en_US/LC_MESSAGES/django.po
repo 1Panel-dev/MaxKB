@@ -8472,3 +8472,12 @@ msgstr ""
 
 msgid "Hit-Test"
 msgstr ""
+
+msgid "Export Application"
+msgstr ""
+
+msgid "Add ApiKey"
+msgstr ""
+
+msgid "Delete application API_KEY"
+msgstr ""

@@ -8598,3 +8598,12 @@ msgstr "系统应用"
 
 msgid "Hit-Test"
 msgstr "命中测试"
+
+msgid "Export Application"
+msgstr "导出应用"
+
+msgid "Add ApiKey"
+msgstr "添加 API KEY"
+
+msgid "Delete application API_KEY"
+msgstr "删除应用 API KEY"
