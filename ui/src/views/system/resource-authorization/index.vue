@@ -46,7 +46,9 @@
                     <div class="flex-between">
                       <div class="flex">
                         <span class="mr-8">{{ row.nick_name }}</span>
-                        <TagGroup :tags="row.roles" />
+                        <TagGroup :tags="row.roles" 
+                          v-if="hasPermission([EditionConst.IS_EE,EditionConst.IS_PE],'OR')"
+                        />
                       </div>
                     </div>
                   </template>
