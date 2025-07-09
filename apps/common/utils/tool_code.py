@@ -52,7 +52,7 @@ try:
     sys.path += {python_paths}
     env = dict(os.environ)
     for key in list(env.keys()):
-        if key in os.environ and (key.startswith('MAXKB') or key.startswith('POSTGRES') or key.startswith('PG') or key.startswith('REDIS')):
+        if key in os.environ and (key.startswith('MAXKB') or key.startswith('POSTGRES') or key.startswith('PG') or key.startswith('REDIS') or key == 'PATH'):
             del os.environ[key]
     locals_v={'{}'}
     keywords={keywords}
