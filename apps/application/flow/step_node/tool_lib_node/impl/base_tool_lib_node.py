@@ -112,6 +112,8 @@ def valid_function(tool_lib, workspace_id):
         tool_lib = get_authorized_tool(QuerySet(Tool).filter(id=tool_lib.id), workspace_id).first()
     if tool_lib is None:
         raise Exception(_("Tool does not exist"))
+    if not tool_lib.is_active:
+        raise Exception(_("Tool is not active"))
 
 
 class BaseToolLibNodeNode(IToolLibNode):
