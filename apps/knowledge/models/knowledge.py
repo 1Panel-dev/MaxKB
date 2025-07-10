@@ -99,7 +99,7 @@ class KnowledgeFolder(MPTTModel, AppModelMixin):
     id = models.CharField(primary_key=True, max_length=64, editable=False, verbose_name="主键id")
     name = models.CharField(max_length=64, verbose_name="文件夹名称")
     desc = models.CharField(max_length=200, null=True, blank=True, verbose_name="描述")
-    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name="用户id")
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, db_constraint=False, blank=True, null=True)
     workspace_id = models.CharField(max_length=64, verbose_name="工作空间id", default="default", db_index=True)
     parent = TreeForeignKey('self', on_delete=models.DO_NOTHING, null=True, blank=True, related_name='children')
 
