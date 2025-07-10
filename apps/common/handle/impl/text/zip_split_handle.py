@@ -121,6 +121,8 @@ class ZipSplitHandle(BaseSplitHandle):
     def handle(self, file, pattern_list: List, with_filter: bool, limit: int, get_buffer, save_image):
         if type(limit) is str:
             limit = int(limit)
+        if type(with_filter) is str:
+            with_filter = with_filter.lower() == 'true'
         buffer = get_buffer(file)
         bytes_io = io.BytesIO(buffer)
         result = []

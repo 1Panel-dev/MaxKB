@@ -48,6 +48,8 @@ class HTMLSplitHandle(BaseSplitHandle):
         buffer = get_buffer(file)
         if type(limit) is str:
             limit = int(limit)
+        if type(with_filter) is str:
+            with_filter = with_filter.lower() == 'true'
         if pattern_list is not None and len(pattern_list) > 0:
             split_model = SplitModel(pattern_list, with_filter, limit)
         else:

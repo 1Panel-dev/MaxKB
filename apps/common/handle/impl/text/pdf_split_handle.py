@@ -54,6 +54,8 @@ class PdfSplitHandle(BaseSplitHandle):
         try:
             if type(limit) is str:
                 limit = int(limit)
+            if type(with_filter) is str:
+                with_filter = with_filter.lower() == 'true'
             # 处理有目录的pdf
             result = self.handle_toc(pdf_document, limit)
             if result is not None:

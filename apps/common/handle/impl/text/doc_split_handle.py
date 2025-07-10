@@ -197,6 +197,8 @@ class DocSplitHandle(BaseSplitHandle):
         try:
             if type(limit) is str:
                 limit = int(limit)
+            if type(with_filter) is str:
+                with_filter = with_filter.lower() == 'true'
             image_list = []
             buffer = get_buffer(file)
             doc = Document(io.BytesIO(buffer))
