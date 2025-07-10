@@ -147,8 +147,8 @@
             <div class="flex align-center">
               <div class="mr-4">
                 <span>{{
-                  $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')
-                }}</span>
+                    $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')
+                  }}</span>
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content>
@@ -158,7 +158,7 @@
               </el-tooltip>
             </div>
           </template>
-          <el-switch size="small" v-model="form_data.is_result" />
+          <el-switch size="small" v-model="form_data.is_result"/>
         </el-form-item>
       </el-form>
     </el-card>
@@ -166,14 +166,15 @@
 </template>
 
 <script setup lang="ts">
-import { set, groupBy, create, cloneDeep } from 'lodash'
+import {set, groupBy, create, cloneDeep} from 'lodash'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
-import { ref, computed, onMounted, onActivated } from 'vue'
+import {ref, computed, onMounted, onActivated} from 'vue'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
-import type { FormInstance } from 'element-plus'
+import type {FormInstance} from 'element-plus'
 import applicationApi from '@/api/application/application'
-import { isWorkFlow } from '@/utils/application'
-import { useRoute } from 'vue-router'
+import {isWorkFlow} from '@/utils/application'
+import {useRoute} from 'vue-router'
+
 const route = useRoute()
 const form = {
   question_reference_address: ['start-node', 'question'],
@@ -185,7 +186,7 @@ const form = {
 }
 
 const {
-  params: { id },
+  params: {id},
 } = route as any
 
 const applicationNodeFormRef = ref<FormInstance>()
@@ -223,7 +224,7 @@ const update_field = () => {
   }
   // todo
   applicationApi
-    .getApplicationDetail(id)
+    .getApplicationDetail(props.nodeModel.properties.node_data.application_id)
     .then((ok) => {
       const old_api_input_field_list = cloneDeep(
         props.nodeModel.properties.node_data.api_input_field_list,
@@ -241,7 +242,7 @@ const update_field = () => {
         )
 
         const merge_api_input_field_list = (new_api_input_field_list || []).map((item: any) => {
-          const find_field = old_api_input_field_list.find(
+          const find_field = old_api_input_field_list?.find(
             (old_item: any) => old_item.variable == item.variable,
           )
           if (find_field) {
@@ -263,7 +264,7 @@ const update_field = () => {
           merge_api_input_field_list,
         )
         const merge_user_input_field_list = (new_user_input_field_list || []).map((item: any) => {
-          const find_field = old_user_input_field_list.find(
+          const find_field = old_user_input_field_list?.find(
             (old_item: any) => old_item.field == item.field,
           )
           if (find_field) {
@@ -309,7 +310,7 @@ const props = defineProps<{ nodeModel: any }>()
 
 const validate = () => {
   return applicationNodeFormRef.value?.validate().catch((err) => {
-    return Promise.reject({ node: props.nodeModel, errMessage: err })
+    return Promise.reject({node: props.nodeModel, errMessage: err})
   })
 }
 
