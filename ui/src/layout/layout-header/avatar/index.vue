@@ -21,7 +21,9 @@
           <div style="width: 90%">
             <p class="bold mb-4" style="font-size: 14px">{{ user.userInfo?.username }}</p>
             <template v-if="user.userInfo?.role_name && user.userInfo.role_name.length > 0">
-              <TagGroup size="small" :tags="user.userInfo?.role_name"/>
+              <TagGroup size="small" :tags="user.userInfo?.role_name"
+                v-if="hasPermission([EditionConst.IS_EE, EditionConst.IS_PE],'OR')"
+              />
             </template>
           </div>
         </div>
