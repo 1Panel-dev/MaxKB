@@ -96,7 +96,8 @@ export default {
   selected: '已选',
   notFound: {
     title: '404',
-    message: '无法访问应用',
+    NoService: '暂时无法访问服务',
+    NoPermission:'没有权限访问',
     operate: '返回首页',
   },
   custom: '自定义',

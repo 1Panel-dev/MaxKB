@@ -92,7 +92,8 @@ export default {
   selected: 'Selected',
   notFound: {
     title: '404',
-    message: 'Unable to Access APP',
+    NoService: 'Currently unable to access services',
+    NoPermission: 'No permission to access',
     operate: 'Back to Home',
   },
   custom: 'Custom',

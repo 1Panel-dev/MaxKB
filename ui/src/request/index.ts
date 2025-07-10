@@ -77,7 +77,9 @@ instance.interceptors.response.use(
 
     if (err.response?.status === 403 && !err.response.config.url.includes('chat/open')) {
       MsgError(
-        err.response.data && err.response.data.message ? err.response.data.message : '没有权限访问',
+        err.response.data && err.response.data.message
+          ? err.response.data.message
+          : 'No permission to access',
       )
     }
     return Promise.reject(err)
@@ -249,15 +251,15 @@ export const exportExcel: (
 
 function decodeFilenameBrowser(contentDisposition: string) {
   // 提取并解码 Base64 部分
-  const base64Part = contentDisposition.match(/=\?utf-8\?b\?(.*?)\?=/i)?.[1];
-  if (!base64Part) return null;
+  const base64Part = contentDisposition.match(/=\?utf-8\?b\?(.*?)\?=/i)?.[1]
+  if (!base64Part) return null
 
   // 使用 atob 解码 Base64
-  const decoded = decodeURIComponent(escape(atob(base64Part)));
+  const decoded = decodeURIComponent(escape(atob(base64Part)))
 
   // 提取文件名
-  const filenameMatch = decoded.match(/filename="(.*?)"/i);
-  return filenameMatch ? filenameMatch[1] : null;
+  const filenameMatch = decoded.match(/filename="(.*?)"/i)
+  return filenameMatch ? filenameMatch[1] : null
 }
 
 export const exportFile: (
@@ -271,37 +273,40 @@ export const exportFile: (
   params: any,
   loading?: NProgress | Ref<boolean>,
 ) => {
-  return promise(request({
-    url: url,
-    method: 'get',
-    params,
-    responseType: 'blob',
-    transformResponse: [function (data, headers) {
-      // 在这里可以访问 headers
-      // const contentType = headers['content-type'];
-      const contentDisposition = headers['content-disposition'];
-      // console.log('Content-Type:', contentType);
-      // console.log('Content-Disposition:', decodeFilenameBrowser(contentDisposition));
-      // 如果没有提供文件名，则使用默认名称
-      fileName = decodeFilenameBrowser(contentDisposition) || fileName;
-      return data; // 必须返回数据
-    }]
-  }), loading).then(
-    (res: any) => {
-      if (res) {
-        const blob = new Blob([res], {
-          type: 'application/octet-stream',
-        })
-        const link = document.createElement('a')
-        link.href = window.URL.createObjectURL(blob)
-        link.download = fileName
-        link.click()
-        //释放内存
-        window.URL.revokeObjectURL(link.href)
-      }
-      return true
-    },
-  )
+  return promise(
+    request({
+      url: url,
+      method: 'get',
+      params,
+      responseType: 'blob',
+      transformResponse: [
+        function (data, headers) {
+          // 在这里可以访问 headers
+          // const contentType = headers['content-type'];
+          const contentDisposition = headers['content-disposition']
+          // console.log('Content-Type:', contentType);
+          // console.log('Content-Disposition:', decodeFilenameBrowser(contentDisposition));
+          // 如果没有提供文件名，则使用默认名称
+          fileName = decodeFilenameBrowser(contentDisposition) || fileName
+          return data // 必须返回数据
+        },
+      ],
+    }),
+    loading,
+  ).then((res: any) => {
+    if (res) {
+      const blob = new Blob([res], {
+        type: 'application/octet-stream',
+      })
+      const link = document.createElement('a')
+      link.href = window.URL.createObjectURL(blob)
+      link.download = fileName
+      link.click()
+      //释放内存
+      window.URL.revokeObjectURL(link.href)
+    }
+    return true
+  })
 }
 
 export const exportExcelPost: (

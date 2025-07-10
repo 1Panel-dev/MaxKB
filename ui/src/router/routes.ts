@@ -1,6 +1,5 @@
 import type { RouteRecordRaw } from 'vue-router'
 const modules: any = import.meta.glob('./modules/*.ts', { eager: true })
-import { hasPermission, set_next_route } from '@/utils/permission/index'
 
 const rolesRoutes: RouteRecordRaw[] = [...Object.keys(modules).map((key) => modules[key].default)]
 
@@ -20,7 +19,7 @@ export const routes: Array<RouteRecordRaw> = [
           {
             path: '/no-permission',
             name: 'noPermissionD',
-            component: () => import('@/views/no-permission/index.vue'),
+            component: () => import('@/views/error/NoPermission.vue'),
           },
         ],
         component: () => import('@/layout/layout-template/SimpleLayout.vue'),
@@ -69,9 +68,14 @@ export const routes: Array<RouteRecordRaw> = [
     name: 'permission',
     component: () => import('@/views/Permission.vue'),
   },
-  // {
-  //   path: '/:pathMatch(.*)',
-  //   name: '404',
-  //   component: () => import('@/views/404/index.vue')
-  // }
+  {
+    path: '/no-service',
+    name: 'NoService',
+    component: () => import('@/views/error/NoService.vue'),
+  },
+  {
+    path: '/:pathMatch(.*)',
+    name: '404',
+    component: () => import('@/views/error/404.vue'),
+  },
 ]
