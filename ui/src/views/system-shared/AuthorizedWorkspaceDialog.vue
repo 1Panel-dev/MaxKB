@@ -34,7 +34,7 @@
             @change="handleCheckAllChange"
             v-if="!search"
           >
-            {{ $t('views.shared.allCheck') }}<
+            {{ $t('views.shared.allCheck') }}
           </el-checkbox>
           <el-checkbox-group
             class="checkbox-group-block"
