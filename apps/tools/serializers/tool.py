@@ -296,7 +296,8 @@ class ToolSerializer(serializers.Serializer):
             if not query_set.exists():
                 get_authorized_tool = DatabaseModelManage.get_model('get_authorized_tool')
                 if get_authorized_tool:
-                    return get_authorized_tool(QuerySet(Tool).filter(id=self.data.get('id')), workspace_id).exists()
+                    if not get_authorized_tool(QuerySet(Tool).filter(id=self.data.get('id')), workspace_id).exists():
+                        raise AppApiException(500, _('Tool id does not exist'))
                 raise AppApiException(500, _('Tool id does not exist'))
 
         def is_valid(self, *, raise_exception=False):
