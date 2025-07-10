@@ -9,11 +9,9 @@
           </h4>
           <el-card shadow="never" class="overview-card" v-loading="loading">
             <div class="title flex align-center">
-              <div
-                class="edit-avatar mr-12"
-              >
+              <div class="edit-avatar mr-12">
                 <el-avatar shape="square" :size="32" style="background: none">
-                  <img :src="resetUrl(detail?.icon, resetUrl('./favicon.ico'))" alt=""/>
+                  <img :src="resetUrl(detail?.icon, resetUrl('./favicon.ico'))" alt="" />
                 </el-avatar>
               </div>
 
@@ -23,9 +21,8 @@
             <el-row :gutter="12">
               <el-col :span="12" class="mt-16">
                 <div class="flex">
-                  <el-text type="info">{{
-                      $t('views.applicationOverview.appInfo.publicAccessLink')
-                    }}
+                  <el-text type="info"
+                    >{{ $t('views.applicationOverview.appInfo.publicAccessLink') }}
                   </el-text>
                   <el-switch
                     v-model="accessToken.is_active"
@@ -55,7 +52,7 @@
                       style="margin-left: 1px"
                     >
                       <el-icon>
-                        <RefreshRight/>
+                        <RefreshRight />
                       </el-icon>
                     </el-button>
                   </el-tooltip>
@@ -86,7 +83,7 @@
                   <!-- 访问限制 -->
                   <el-button @click="openLimitDialog" v-if="permissionPrecise.overview_access(id)">
                     <el-icon class="mr-4">
-                      <Lock/>
+                      <Lock />
                     </el-icon>
                     {{ $t('views.applicationOverview.appInfo.accessControl') }}
                   </el-button>
@@ -96,7 +93,7 @@
                     v-if="permissionPrecise.overview_display(id)"
                   >
                     <el-icon class="mr-4">
-                      <Setting/>
+                      <Setting />
                     </el-icon>
                     {{ $t('views.applicationOverview.appInfo.displaySetting') }}
                   </el-button>
@@ -105,14 +102,12 @@
               <el-col :span="12" class="mt-16">
                 <div class="flex">
                   <el-text type="info"
-                  >{{ $t('views.applicationOverview.appInfo.apiAccessCredentials') }}
+                    >{{ $t('views.applicationOverview.appInfo.apiAccessCredentials') }}
                   </el-text>
                 </div>
                 <div class="mt-4 mb-16 url-height">
                   <div>
-                    <el-text>API {{ $t('common.fileUpload.document') }}：
-                    </el-text
-                    >
+                    <el-text>API {{ $t('common.fileUpload.document') }}： </el-text>
                     <el-button
                       type="primary"
                       link
@@ -128,8 +123,8 @@
                     </span>
 
                     <span class="vertical-middle lighter break-all ellipsis-1">{{
-                        baseUrl + id
-                      }}</span>
+                      baseUrl + id
+                    }}</span>
                     <el-tooltip effect="dark" :content="$t('common.copy')" placement="top">
                       <el-button type="primary" text @click="copyClick(baseUrl + id)">
                         <AppIcon iconName="app-copy"></AppIcon>
@@ -143,11 +138,10 @@
                     v-if="permissionPrecise.overview_api_key(id)"
                   >
                     <el-icon class="mr-4">
-                      <Key/>
+                      <Key />
                     </el-icon>
                     {{ $t('views.applicationOverview.appInfo.apiKey') }}
-                  </el-button
-                  >
+                  </el-button>
                 </div>
               </el-col>
             </el-row>
@@ -183,7 +177,7 @@
             />
           </div>
           <div v-loading="statisticsLoading">
-            <StatisticsCharts :data="statisticsData"/>
+            <StatisticsCharts :data="statisticsData" />
           </div>
         </el-card>
       </div>
@@ -194,17 +188,17 @@
       :data="detail"
       :api-input-params="mapToUrlParams(apiInputParams)"
     />
-    <APIKeyDialog ref="APIKeyDialogRef"/>
+    <APIKeyDialog ref="APIKeyDialogRef" />
 
     <!-- 社区版访问限制 -->
-    <component :is="currentLimitDialog" ref="LimitDialogRef" @refresh="refresh"/>
+    <component :is="currentLimitDialog" ref="LimitDialogRef" @refresh="refresh" />
     <!-- 显示设置 -->
-    <component :is="currentDisplaySettingDialog" ref="DisplaySettingDialogRef" @refresh="refresh"/>
+    <component :is="currentDisplaySettingDialog" ref="DisplaySettingDialogRef" @refresh="refresh" />
   </div>
 </template>
 <script setup lang="ts">
-import {ref, computed, onMounted, shallowRef, nextTick} from 'vue'
-import {useRoute} from 'vue-router'
+import { ref, computed, onMounted, shallowRef, nextTick } from 'vue'
+import { useRoute } from 'vue-router'
 import EmbedDialog from './component/EmbedDialog.vue'
 import APIKeyDialog from './component/APIKeyDialog.vue'
 import LimitDialog from './component/LimitDialog.vue'
@@ -213,15 +207,15 @@ import DisplaySettingDialog from './component/DisplaySettingDialog.vue'
 import XPackDisplaySettingDialog from './xpack-component/XPackDisplaySettingDialog.vue'
 import StatisticsCharts from './component/StatisticsCharts.vue'
 import applicationApi from '@/api/application/application'
-import {nowDate, beforeDay} from '@/utils/time'
-import {MsgSuccess, MsgConfirm} from '@/utils/message'
-import {copyClick} from '@/utils/clipboard'
-import {isAppIcon, resetUrl} from '@/utils/common'
-import {mapToUrlParams} from '@/utils/application'
+import { nowDate, beforeDay } from '@/utils/time'
+import { MsgSuccess, MsgConfirm } from '@/utils/message'
+import { copyClick } from '@/utils/clipboard'
+import { isAppIcon, resetUrl } from '@/utils/common'
+import { mapToUrlParams } from '@/utils/application'
 import useStore from '@/stores'
-import {t} from '@/locales'
-import {EditionConst} from '@/utils/permission/data'
-import {hasPermission} from '@/utils/permission/index'
+import { t } from '@/locales'
+import { EditionConst } from '@/utils/permission/data'
+import { hasPermission } from '@/utils/permission/index'
 import permissionMap from '@/permission'
 
 const route = useRoute()
@@ -233,14 +227,14 @@ const permissionPrecise = computed(() => {
   return permissionMap['application'][apiType.value]
 })
 
-const {user, application} = useStore()
+const { user, application } = useStore()
 const {
-  params: {id},
+  params: { id },
 } = route as any
 
 const apiUrl = window.location.origin + '/doc/chat/'
 
-const baseUrl = window.location.origin + '/api/application/'
+const baseUrl = window.location.origin + `${window.MaxKB.chatPrefix}/api/`
 
 const APIKeyDialogRef = ref()
 const EmbedDialogRef = ref()
@@ -379,8 +373,7 @@ function refreshAccessToken() {
       const str = t('views.applicationOverview.appInfo.refreshToken.refreshSuccess')
       updateAccessToken(obj, str)
     })
-    .catch(() => {
-    })
+    .catch(() => {})
 }
 
 function changeState(bool: boolean) {
@@ -426,20 +419,20 @@ function getDetail() {
       .map((v: any) => {
         apiInputParams.value = v.properties.api_input_field_list
           ? v.properties.api_input_field_list.map((v: any) => {
-            return {
-              name: v.variable,
-              value: v.default_value,
-            }
-          })
+              return {
+                name: v.variable,
+                value: v.default_value,
+              }
+            })
           : v.properties.input_field_list
             ? v.properties.input_field_list
-              .filter((v: any) => v.assignment_method === 'api_input')
-              .map((v: any) => {
-                return {
-                  name: v.variable,
-                  value: v.default_value,
-                }
-              })
+                .filter((v: any) => v.assignment_method === 'api_input')
+                .map((v: any) => {
+                  return {
+                    name: v.variable,
+                    value: v.default_value,
+                  }
+                })
             : []
       })
   })

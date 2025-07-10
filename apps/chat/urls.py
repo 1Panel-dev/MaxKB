@@ -14,6 +14,8 @@ urlpatterns = [
     path('text_to_speech', views.TextToSpeech.as_view()),
     path('speech_to_text', views.SpeechToText.as_view()),
     path('captcha', views.CaptchaView.as_view(), name='captcha'),
+    path('<str:application_id>/chat/completions', views.OpenAIView.as_view(),
+         name='application/chat_completions'),
     path('vote/chat/<str:chat_id>/chat_record/<str:chat_record_id>', views.VoteView.as_view(), name='vote'),
     path('historical_conversation', views.HistoricalConversationView.as_view(), name='historical_conversation'),
     path('historical_conversation/<str:chat_id>/record/<str:chat_record_id>',views.ChatRecordView.as_view(),name='conversation_details'),
