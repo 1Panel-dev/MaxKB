@@ -1069,7 +1069,7 @@ function getList(bool?: boolean) {
     order_by: orderBy.value,
     folder_id: folderId,
   }
-  loadSharedApi({ type: 'document', systemType: apiType.value })
+  loadSharedApi({ type: 'document', isShared: isShared.value, systemType: apiType.value })
     .getDocumentPage(id as string, paginationConfig.value, param, bool ? undefined : loading)
     .then((res: any) => {
       documentData.value = res.data.records

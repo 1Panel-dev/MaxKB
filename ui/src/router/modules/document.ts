@@ -51,6 +51,16 @@ const DocumentRouter = {
             if (to.params.folderId == 'shared') { return RoleConst.ADMIN } else {
               return PermissionConst.KNOWLEDGE_DOCUMENT_READ.getWorkspacePermissionWorkspaceManageRole()
             }
+          },
+          ()=>{
+            const to: any = get_next_route()
+            if(to.params.folderId == 'share') {
+              return new ComplexPermission([RoleConst.EXTENDS_USER.getWorkspaceRole()], [PermissionConst.KNOWLEDGE_DOCUMENT_READ.getWorkspacePermission()], [], 'AND')  } 
+          },
+          ()=>{
+             const to: any = get_next_route()
+               if(to.params.folderId == 'share') {
+              return RoleConst.USER.getWorkspaceRole()  } 
           }
         ],
       },
@@ -89,6 +99,16 @@ const DocumentRouter = {
             const to: any = get_next_route()
             if (to.params.folderId == 'shared') { return RoleConst.ADMIN } else { return PermissionConst.KNOWLEDGE_PROBLEM_READ.getWorkspacePermissionWorkspaceManageRole() }
           },
+          ()=>{
+            const to: any = get_next_route()
+            if(to.params.folderId == 'share') {
+              return new ComplexPermission([RoleConst.EXTENDS_USER.getWorkspaceRole()], [PermissionConst.KNOWLEDGE_PROBLEM_READ.getWorkspacePermission()], [], 'AND')  } 
+          },
+          ()=>{
+             const to: any = get_next_route()
+               if(to.params.folderId == 'share') {
+              return RoleConst.USER.getWorkspaceRole()  } 
+          }
         ],
       },
       component: () => import('@/views/problem/index.vue'),
@@ -125,6 +145,16 @@ const DocumentRouter = {
             const to: any = get_next_route()
             if (to.params.folderId == 'shared') { return RoleConst.ADMIN } else { return PermissionConst.KNOWLEDGE_HIT_TEST_READ.getWorkspacePermissionWorkspaceManageRole() }
           },
+          ()=>{
+            const to: any = get_next_route()
+            if(to.params.folderId == 'share') {
+              return new ComplexPermission([RoleConst.EXTENDS_USER.getWorkspaceRole()], [PermissionConst.KNOWLEDGE_HIT_TEST_READ.getWorkspacePermission()], [], 'AND')  } 
+          },
+          ()=>{
+             const to: any = get_next_route()
+               if(to.params.folderId == 'share') {
+              return RoleConst.USER.getWorkspaceRole()  } 
+          }
         ],
       },
       component: () => import('@/views/hit-test/index.vue'),
@@ -172,6 +202,16 @@ const DocumentRouter = {
             if (to.params.folderId == 'shared') { return RoleConst.ADMIN }
             else { return new ComplexPermission([RoleConst.USER], [PermissionConst.KNOWLEDGE.getKnowledgeWorkspaceResourcePermission(to ? to.params.id : '',)], [EditionConst.IS_EE, EditionConst.IS_PE], 'AND') }
           },
+        ()=>{
+            const to: any = get_next_route()
+            if(to.params.folderId == 'share') {
+              return new ComplexPermission([RoleConst.EXTENDS_USER.getWorkspaceRole()], [PermissionConst.KNOWLEDGE_CHAT_USER_READ.getWorkspacePermission()], [], 'AND')  } 
+          },
+          ()=>{
+             const to: any = get_next_route()
+               if(to.params.folderId == 'share') {
+              return RoleConst.USER.getWorkspaceRole()  } 
+          }  
       ]
       },
       component: () => import('@/views/chat-user/index.vue'),
@@ -209,6 +249,16 @@ const DocumentRouter = {
             const to: any = get_next_route()
             if (to.params.folderId == 'shared') { return RoleConst.ADMIN } else { return PermissionConst.KNOWLEDGE_EDIT.getWorkspacePermissionWorkspaceManageRole() }
           },
+          ()=>{
+            const to: any = get_next_route()
+            if(to.params.folderId == 'share') {
+              return new ComplexPermission([RoleConst.EXTENDS_USER.getWorkspaceRole()], [PermissionConst.KNOWLEDGE_EDIT.getWorkspacePermission()], [], 'AND')  } 
+          },
+          ()=>{
+             const to: any = get_next_route()
+               if(to.params.folderId == 'share') {
+              return RoleConst.USER.getWorkspaceRole()  } 
+          }  
         ],
       },
       component: () => import('@/views/knowledge/KnowledgeSetting.vue'),
