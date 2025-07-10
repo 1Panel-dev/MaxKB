@@ -46,7 +46,7 @@
                     <div class="flex-between">
                       <div class="flex">
                         <span class="mr-8">{{ row.nick_name }}</span>
-                        <TagGroup :tags="row.roles" 
+                        <TagGroup :tags="row.roles"
                           v-if="hasPermission([EditionConst.IS_EE,EditionConst.IS_PE],'OR')"
                         />
                       </div>
@@ -314,13 +314,26 @@ const dfsPermissionIndeterminate = (
     }
 
     if (item.isFolder) {
-      item.permissionHalf[type] = permissionHalfMap[item.id][type].length
-        ? new Set(permissionHalfMap[item.id][type]).size > 1
-        : false
+     // 判断是否存在子项且全部选中或全部未选中
+      const hasPermissions = permissionHalfMap[item.id][type];
+      const allTrue = hasPermissions.length && hasPermissions.every((p: boolean) => p);
+      const allFalse = hasPermissions.length && hasPermissions.every((p: boolean) => !p);
+
+      // 只有在既有选中又有未选中的情况下才设置为半选状态
+      item.permissionHalf[type] = hasPermissions.length && !allTrue && !allFalse;
+
+      // 检查子文件夹是否有半选状态
       if (item.children.some((ele: any) => ele.isFolder && ele.permissionHalf[type])) {
-        item.permissionHalf[type] = true
+        item.permissionHalf[type] = true;
       }
 
+      // 如果所有子项都已选中，确保当前项也被选中而不是半选
+      if (allTrue) {
+        item.permission[type] = true;
+        item.permissionHalf[type] = false
+      }
+
+      // 如果子项中有选中的也有未选中的，则设置为半选状态
       if (
         item.children.some((ele: any) => ele.permission[type]) &&
         item.children.some((ele: any) => !ele.permission[type])
