@@ -1173,17 +1173,21 @@ class DocumentSerializers(serializers.Serializer):
                 with_search_one=False
             ), knowledge_id, workspace_id
 
-        @staticmethod
-        def _batch_sync(document_id_list: List[str]):
-            for document_id in document_id_list:
-                DocumentSerializers.Sync(data={'document_id': document_id}).sync()
-
         def batch_sync(self, instance: Dict, with_valid=True):
             if with_valid:
                 BatchSerializer(data=instance).is_valid(model=Document, raise_exception=True)
                 self.is_valid(raise_exception=True)
             # 异步同步
-            work_thread_pool.submit(self._batch_sync, instance.get('id_list'))
+            work_thread_pool.submit(
+                lambda doc_ids: [
+                    DocumentSerializers.Sync(data={
+                        'document_id': doc_id,
+                        'knowledge_id': self.data.get('knowledge_id'),
+                        'workspace_id': self.data.get('workspace_id')
+                    }).sync() for doc_id in doc_ids
+                ],
+                instance.get('id_list')
+            )
             return True
 
         @transaction.atomic
