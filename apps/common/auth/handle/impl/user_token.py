@@ -303,5 +303,7 @@ class UserToken(AuthBaseHandle):
         timeout = CONFIG.get_session_timeout()
         cache.touch(token, timeout=timeout, version=version)
         user = QuerySet(User).get(id=auth_details['id'])
+        if not user.is_active or user.password != cache_token.password:
+            raise AppAuthenticationFailed(1002, _('Authentication information is incorrect'))
         auth = get_auth(user)
         return user, auth
