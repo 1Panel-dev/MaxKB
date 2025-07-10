@@ -121,6 +121,27 @@ const putAccessToken: (
 }
 
 /**
+ * 替换社区版-修改AccessToken
+ * @param 参数 application_id
+ * data {
+ *  "show_source": boolean,
+ *  "show_history": boolean,
+ *  "draggable": boolean,
+ *  "show_guide": boolean,
+ *  "avatar": file,
+ *  "float_icon": file,
+ * }
+ */
+const putXpackAccessToken: (
+  application_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (application_id, data, loading) => {
+  return put(`${prefix.value}/${application_id}/setting`, data, undefined, loading)
+}
+
+
+/**
  * 导出应用
  */
 
@@ -331,6 +352,7 @@ export default {
   getApplicationDetail,
   getAccessToken,
   putAccessToken,
+  putXpackAccessToken,
   exportApplication,
   importApplication,
   getStatistics,

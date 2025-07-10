@@ -90,6 +90,7 @@ export default {
     referenceParagraph: '引用段落',
     consume: '消耗tokens',
     consumeTime: '耗時',
+    noSource: '沒有检索到知識來源',
   },
   paragraphSource: {
     title: '知識庫引用',

@@ -376,12 +376,12 @@ function refreshAccessToken() {
     .catch(() => {})
 }
 
-function changeState(bool: boolean) {
+async function changeState(bool: boolean) {
   const obj = {
     is_active: !bool,
   }
   const str = obj.is_active ? t('common.status.enableSuccess') : t('common.status.disableSuccess')
-  updateAccessToken(obj, str)
+  await updateAccessToken(obj, str)
     .then(() => {
       return true
     })

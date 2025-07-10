@@ -9,7 +9,7 @@
       class="content"
       v-if="prologue"
       :style="{
-        'padding-right': showUserAvatar ? 'var(--padding-left)' : '0'
+        'padding-right': showUserAvatar ? 'var(--padding-left)' : '0',
       }"
     >
       <el-card shadow="always" class="border-r-8" style="--el-card-padding: 10px 16px 12px">
@@ -35,13 +35,12 @@ const props = defineProps<{
   sendMessage: (question: string, other_params_data?: any, chat?: chatType) => void
 }>()
 
-const { user } = useStore()
 
 const showAvatar = computed(() => {
-  return (user.isEE() || user.isPE()) ? props.application.show_avatar : true
+  return props.application.show_avatar == undefined ? true : props.application.show_avatar
 })
 const showUserAvatar = computed(() => {
-  return user.isEE() || user.isPE() ? props.application.show_user_avatar : true
+  return props.application.show_user_avatar == undefined ? true : props.application.show_user_avatar
 })
 
 const toQuickQuestion = (match: string, offset: number, input: string) => {
@@ -54,7 +53,7 @@ const prologue = computed(() => {
       /<html_rander>[\d\D]*?<\/html_rander>/g,
       /<echarts_rander>[\d\D]*?<\/echarts_rander>/g,
       /<quick_question>[\d\D]*?<\/quick_question>/g,
-      /<form_rander>[\d\D]*?<\/form_rander>/g
+      /<form_rander>[\d\D]*?<\/form_rander>/g,
     ]
     let _temp = temp
     for (const index in tag_list) {

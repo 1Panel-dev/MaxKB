@@ -93,7 +93,7 @@ export default {
   notFound: {
     title: '404',
     NoService: 'Currently unable to access services',
-    NoPermission: 'No permission to access',
+    NoPermission: 'The current user does not have permission to access, please contact the administrator',
     operate: 'Back to Home',
   },
   custom: 'Custom',

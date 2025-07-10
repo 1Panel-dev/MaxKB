@@ -94,6 +94,7 @@ export default {
     referenceParagraph: '引用分段',
     consume: '消耗tokens',
     consumeTime: '耗时',
+    noSource: '没有检索到知识来源'
   },
   paragraphSource: {
     title: '知识库引用',

@@ -2,40 +2,61 @@
   <div class="w-full">
     <div v-if="data" class="flex align-center">
       <AppIcon iconName="app-folder" style="font-size: 20px"></AppIcon>
-      <span class="ml-8 ellipsis color-text-primary lighter" style="max-width: 110px" :title="data.name">
+      <span
+        class="ml-8 ellipsis color-text-primary lighter"
+        style="max-width: 110px"
+        :title="data.name"
+      >
         {{ data.name }}
       </span>
     </div>
 
     <transition name="el-fade-in-linear">
-      <div v-if="props.list?.length || (props.node?.expanded && toolList.length)"
-        class="list border-r-4 layout-bg flex-wrap" @click.stop>
+      <div
+        v-if="props.list?.length || (props.node?.expanded && toolList.length)"
+        class="list border-r-4 layout-bg flex-wrap"
+        @click.stop
+      >
         <el-popover v-for="item in toolList" :key="item.id" placement="right" :width="280">
           <template #reference>
-            <div class="list-item flex align-center border border-r-6 p-8-12 cursor" style="width: 39%"
-              @click.stop="emit('clickNodes', item)" @mousedown.stop="emit('onmousedown', item)">
+            <div
+              class="list-item flex align-center border border-r-6 p-8-12 cursor"
+              style="width: 39%"
+              @click.stop="emit('clickNodes', item)"
+              @mousedown.stop="emit('onmousedown', item)"
+            >
               <LogoIcon v-if="item.resource_type === 'application'" height="32px" />
-              <el-avatar v-else-if="isAppIcon(item?.icon)" shape="square" :size="32" style="background: none">
+              <el-avatar
+                v-else-if="isAppIcon(item?.icon)"
+                shape="square"
+                :size="32"
+                style="background: none"
+              >
                 <img :src="resetUrl(item?.icon)" alt="" />
               </el-avatar>
               <el-avatar v-else class="avatar-green" shape="square" :size="32">
                 <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt="" />
               </el-avatar>
-              <span class="ml-8 ellipsis">{{ item.name }}</span>
+              <span class="ml-8 ellipsis" :title="item.name">{{ item.name }}</span>
             </div>
           </template>
 
           <template #default>
-            <div class="flex-between mb-8">
+            <div class="flex-between">
               <div class="flex align-center">
                 <LogoIcon v-if="item.resource_type === 'application'" height="32px" />
-                <el-avatar v-else-if="isAppIcon(item?.icon)" shape="square" :size="32" style="background: none">
+                <el-avatar
+                  v-else-if="isAppIcon(item?.icon)"
+                  shape="square"
+                  :size="32"
+                  style="background: none"
+                >
                   <img :src="resetUrl(item?.icon)" alt="" />
                 </el-avatar>
                 <el-avatar v-else class="avatar-green" shape="square" :size="32">
                   <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt="" />
                 </el-avatar>
-                <span class="font-medium ml-8">{{ item.name }}</span>
+                <span class="medium ml-8 ellipsis" :title="item.name">{{ item.name }}</span>
               </div>
               <div v-if="item.type" class="status-tag" style="margin-left: auto">
                 <el-tag type="warning" v-if="isWorkFlow(item.type)" style="height: 22px">
@@ -46,7 +67,7 @@
                 </el-tag>
               </div>
             </div>
-            <el-text type="info" size="small">{{ item.desc }}</el-text>
+            <el-text type="info" size="small" class="mt-4">{{ item.desc }}</el-text>
           </template>
         </el-popover>
       </div>
@@ -56,7 +77,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import {isAppIcon, resetUrl} from '@/utils/common'
+import { isAppIcon, resetUrl } from '@/utils/common'
 import { isWorkFlow } from '@/utils/application'
 
 const props = defineProps<{
@@ -66,9 +87,9 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'clickNodes', item: any): void;
-  (e: 'onmousedown', item: any): void;
-}>();
+  (e: 'clickNodes', item: any): void
+  (e: 'onmousedown', item: any): void
+}>()
 
 const toolList = computed(() => props.list ?? props.data?.cardList ?? [])
 </script>

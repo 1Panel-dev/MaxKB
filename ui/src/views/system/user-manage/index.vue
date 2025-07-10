@@ -284,12 +284,12 @@ function getList() {
   })
 }
 
-function changeState(row: any) {
+async function changeState(row: any) {
   const obj = {
     is_active: !row.is_active,
   }
   const str = obj.is_active ? t('common.status.enableSuccess') : t('common.status.disableSuccess')
-  userManageApi
+  await userManageApi
     .putUserManage(row.id, obj, loading)
     .then((res) => {
       getList()

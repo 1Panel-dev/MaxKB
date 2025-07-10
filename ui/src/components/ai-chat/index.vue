@@ -86,7 +86,9 @@
             @click="toggleUserInput"
           >
             <el-icon :size="16" class="mr-4"><EditPen /></el-icon>
-            {{ $t('chat.userInput') }}
+            <span class="ellipsis">
+              {{ userInputTitle || $t('chat.userInput') }}
+            </span>
           </el-button>
         </template>
       </ChatInputOperate>
@@ -170,6 +172,12 @@ const isUserInput = computed(
   () =>
     props.applicationDetails.work_flow?.nodes?.filter((v: any) => v.id === 'base-node')[0]
       .properties.user_input_field_list.length > 0,
+)
+
+const userInputTitle = computed(
+  () =>
+    props.applicationDetails.work_flow?.nodes?.filter((v: any) => v.id === 'base-node')[0]
+      .properties?.user_input_config?.title,
 )
 const isAPIInput = computed(
   () =>
@@ -543,7 +551,7 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean, other_para
         if (props.chatId === 'new') {
           emit('refresh', chartOpenId.value)
         }
-        return (id || props.applicationDetails?.show_source) && getSourceDetail(chat)
+        return (id || props.applicationDetails?.show_source || props.applicationDetails?.show_exec) && getSourceDetail(chat)
       })
       .finally(() => {
         ChatManagement.close(chat.id)

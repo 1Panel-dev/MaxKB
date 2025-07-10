@@ -374,46 +374,51 @@
                 </span>
                 <el-divider direction="vertical" />
                 <template v-if="knowledgeDetail?.type === 0">
-                  <span
-                    class="mr-4"
+                  <el-tooltip
+                    effect="dark"
+                    :content="$t('views.document.setting.cancelVectorization')"
+                    placement="top"
                     v-if="
                       ([State.STARTED, State.PENDING] as Array<string>).includes(
                         getTaskState(row.status, TaskType.EMBEDDING),
                       )
                     "
                   >
-                    <el-button
-                      type="primary"
-                      text
-                      @click.stop="cancelTask(row, TaskType.EMBEDDING)"
-                      :title="$t('views.document.setting.cancelVectorization')"
-                      v-if="permissionPrecise.doc_vector(id)"
-                    >
-                      <el-icon><Close /></el-icon>
-                    </el-button>
-                  </span>
-                  <span class="mr-4" v-else>
-                    <el-button
-                      type="primary"
-                      text
-                      @click.stop="refreshDocument(row)"
-                      :title="$t('views.knowledge.setting.vectorization')"
-                      v-if="permissionPrecise.doc_vector(id)"
-                    >
-                      <AppIcon iconName="app-document-refresh" style="font-size: 16px"></AppIcon>
-                    </el-button>
-                  </span>
-                  <span class="mr-4">
-                    <el-button
-                      type="primary"
-                      text
-                      @click.stop="settingDoc(row)"
-                      :title="$t('common.setting')"
-                      v-if="permissionPrecise.doc_edit(id)"
-                    >
-                      <el-icon><Setting /></el-icon>
-                    </el-button>
-                  </span>
+                    <span class="mr-4">
+                      <el-button
+                        type="primary"
+                        text
+                        @click.stop="cancelTask(row, TaskType.EMBEDDING)"
+                        v-if="permissionPrecise.doc_vector(id)"
+                      >
+                        <el-icon><Close /></el-icon>
+                      </el-button>
+                    </span>
+                  </el-tooltip>
+                  <el-tooltip
+                    effect="dark"
+                    :content="$t('views.knowledge.setting.vectorization')"
+                    placement="top"
+                    v-else
+                  >
+                    <span class="mr-4" v-if="permissionPrecise.doc_vector(id)">
+                      <el-button type="primary" text @click.stop="refreshDocument(row)">
+                        <AppIcon iconName="app-document-refresh" style="font-size: 16px"></AppIcon>
+                      </el-button>
+                    </span>
+                  </el-tooltip>
+                  <el-tooltip
+                    effect="dark"
+                    :content="$t('common.setting')"
+                    placement="top"
+                    v-if="permissionPrecise.doc_edit(id)"
+                  >
+                    <span class="mr-4">
+                      <el-button type="primary" text @click.stop="settingDoc(row)">
+                        <el-icon><Setting /></el-icon>
+                      </el-button>
+                    </span>
+                  </el-tooltip>
                   <span @click.stop>
                     <el-dropdown trigger="click">
                       <el-button text type="primary">
@@ -481,44 +486,50 @@
                   </span>
                 </template>
                 <template v-if="knowledgeDetail?.type === 1 || knowledgeDetail?.type === 2">
-                  <span class="mr-4">
-                    <el-button
-                      type="primary"
-                      text
-                      @click.stop="syncDocument(row)"
-                      :title="$t('views.knowledge.setting.sync')"
-                      v-if="permissionPrecise.sync(id)"
-                    >
-                      <el-icon><Refresh /></el-icon>
-                    </el-button>
-                  </span>
-                  <span class="mr-4">
-                    <el-button
-                      v-if="
-                        ([State.STARTED, State.PENDING] as Array<string>).includes(
-                          getTaskState(row.status, TaskType.EMBEDDING),
-                        ) && permissionPrecise.doc_vector(id)
-                      "
-                      type="primary"
-                      text
-                      @click.stop="cancelTask(row, TaskType.EMBEDDING)"
-                      :title="$t('views.document.setting.cancelVectorization')"
-                    >
-                      <el-icon><Close /></el-icon>
-                    </el-button>
-
-                    <el-button
-                      v-else
-                      type="primary"
-                      text
-                      @click.stop="refreshDocument(row)"
-                      :title="$t('views.knowledge.setting.vectorization')"
-                      v-if="permissionPrecise.vector(id)"
-                    >
-                      <AppIcon iconName="app-document-refresh" style="font-size: 16px"></AppIcon>
-                    </el-button>
-                  </span>
-
+                  <el-tooltip
+                    effect="dark"
+                    :content="$t('views.knowledge.setting.sync')"
+                    placement="top"
+                    v-if="permissionPrecise.sync(id)"
+                  >
+                    <span class="mr-4">
+                      <el-button type="primary" text @click.stop="syncDocument(row)">
+                        <el-icon><Refresh /></el-icon>
+                      </el-button>
+                    </span>
+                  </el-tooltip>
+                  <el-tooltip
+                    effect="dark"
+                    :content="$t('views.document.setting.cancelVectorization')"
+                    placement="top"
+                    v-if="
+                      ([State.STARTED, State.PENDING] as Array<string>).includes(
+                        getTaskState(row.status, TaskType.EMBEDDING),
+                      ) && permissionPrecise.doc_vector(id)
+                    "
+                  >
+                    <span class="mr-4">
+                      <el-button
+                        type="primary"
+                        text
+                        @click.stop="cancelTask(row, TaskType.EMBEDDING)"
+                      >
+                        <el-icon><Close /></el-icon>
+                      </el-button>
+                    </span>
+                  </el-tooltip>
+                  <el-tooltip
+                    effect="dark"
+                    :content="$t('views.knowledge.setting.vectorization')"
+                    placement="top"
+                    v-else="permissionPrecise.vector(id)"
+                  >
+                    <span class="mr-4">
+                      <el-button type="primary" text @click.stop="refreshDocument(row)">
+                        <AppIcon iconName="app-document-refresh" style="font-size: 16px"></AppIcon>
+                      </el-button>
+                    </span>
+                  </el-tooltip>
                   <span @click.stop>
                     <el-dropdown trigger="click">
                       <el-button text type="primary">
@@ -526,13 +537,15 @@
                       </el-button>
                       <template #dropdown>
                         <el-dropdown-menu>
-                          <el-dropdown-item icon="Setting" @click="settingDoc(row)"
-                            v-if="permissionPrecise.doc_edit(id)"
-                          >{{
-                            $t('common.setting')
-                          }}</el-dropdown-item>
                           <el-dropdown-item
-                            v-if="permissionPrecise.doc_generate(id) &&
+                            icon="Setting"
+                            @click="settingDoc(row)"
+                            v-if="permissionPrecise.doc_edit(id)"
+                            >{{ $t('common.setting') }}</el-dropdown-item
+                          >
+                          <el-dropdown-item
+                            v-if="
+                              permissionPrecise.doc_generate(id) &&
                               ([State.STARTED, State.PENDING] as Array<string>).includes(
                                 getTaskState(row.status, TaskType.GENERATE_PROBLEM),
                               )
@@ -542,31 +555,38 @@
                             <el-icon><Connection /></el-icon>
                             {{ $t('views.document.setting.cancelGenerateQuestion') }}
                           </el-dropdown-item>
-                          <el-dropdown-item v-else @click="openGenerateDialog(row)"
+                          <el-dropdown-item
+                            v-else
+                            @click="openGenerateDialog(row)"
                             v-if="permissionPrecise.doc_generate(id)"
                           >
                             <el-icon><Connection /></el-icon>
                             {{ $t('views.document.generateQuestion.title') }}
                           </el-dropdown-item>
-                          <el-dropdown-item @click="openknowledgeDialog(row)"
+                          <el-dropdown-item
+                            @click="openknowledgeDialog(row)"
                             v-if="permissionPrecise.doc_migrate(id)"
                           >
                             <AppIcon iconName="app-migrate"></AppIcon>
                             {{ $t('views.document.setting.migration') }}
                           </el-dropdown-item>
-                          <el-dropdown-item @click="exportDocument(row)"
+                          <el-dropdown-item
+                            @click="exportDocument(row)"
                             v-if="permissionPrecise.doc_export(id)"
                           >
                             <AppIcon iconName="app-export"></AppIcon>
                             {{ $t('views.document.setting.export') }} Excel
                           </el-dropdown-item>
-                          <el-dropdown-item @click="exportDocumentZip(row)"
+                          <el-dropdown-item
+                            @click="exportDocumentZip(row)"
                             v-if="permissionPrecise.doc_export(id)"
                           >
                             <AppIcon iconName="app-export"></AppIcon>
                             {{ $t('views.document.setting.export') }} Zip
                           </el-dropdown-item>
-                          <el-dropdown-item icon="Delete" @click.stop="deleteDocument(row)"
+                          <el-dropdown-item
+                            icon="Delete"
+                            @click.stop="deleteDocument(row)"
                             v-if="permissionPrecise.doc_delete(id)"
                           >
                             {{ $t('common.delete') }}
@@ -1025,12 +1045,12 @@ function updateData(documentId: string, data: any, msg: string) {
     })
 }
 
-function changeState(row: any) {
+async function changeState(row: any) {
   const obj = {
     is_active: !row.is_active,
   }
   const str = !row.is_active ? t('common.status.enableSuccess') : t('common.status.disableSuccess')
-  currentMouseId.value && updateData(row.id, obj, str)
+  await updateData(row.id, obj, str)
 }
 
 function editName(val: string, id: string) {

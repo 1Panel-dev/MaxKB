@@ -121,11 +121,11 @@ function cardLeave() {
   show.value = subHovered.value
 }
 
-function changeState(row: any) {
+async function changeState(row: any) {
   const obj = {
     is_active: !row.is_active,
   }
-  loadSharedApi({ type: 'paragraph', systemType: apiType.value })
+  await loadSharedApi({ type: 'paragraph', systemType: apiType.value })
     .putParagraph(id, documentId, row.id, obj, changeStateloading)
     .then(() => {
       emit('changeState', row.id)

@@ -106,10 +106,8 @@ const props = defineProps<{
   type: 'log' | 'ai-chat' | 'debug-ai-chat'
 }>()
 
-const { user } = useStore()
-
 const showAvatar = computed(() => {
-  return user.isEE() || user.isPE() ? props.application.show_user_avatar : true
+  return props.application.show_avatar == undefined ? true : props.application.show_avatar
 })
 
 const document_list = computed(() => {

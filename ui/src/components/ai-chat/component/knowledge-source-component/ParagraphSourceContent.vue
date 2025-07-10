@@ -6,7 +6,7 @@
           <ParagraphCard :data="item" :content="item.content" :index="index" />
         </template>
       </div>
-      <span v-else> - </span>
+      <span v-else> {{ $t('chat.KnowledgeSource.noSource') }}</span>
     </div>
   </el-scrollbar>
 </template>

@@ -108,14 +108,14 @@ function deleteApiKey(row: any) {
     .catch(() => {})
 }
 
-function changeState(row: any) {
+async function changeState(row: any) {
   const obj = {
     is_active: !row.is_active
   }
   const str = obj.is_active
     ? t('views.applicationOverview.appInfo.APIKeyDialog.enabledSuccess')
     : t('views.applicationOverview.appInfo.APIKeyDialog.disabledSuccess')
-  applicationKeyApi
+  await applicationKeyApi
     .putAPIKey(id as string, row.id, obj, loading)
     .then((res) => {
       MsgSuccess(str)

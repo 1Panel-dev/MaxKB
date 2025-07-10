@@ -1,14 +1,11 @@
 import { defineStore } from 'pinia'
 import applicationApi from '@/api/application/application'
-import applicationXpackApi from '@/api/application/application-xpack'
 import { type Ref } from 'vue'
-import useUserStore from './user'
 const useApplicationStore = defineStore('application', {
   state: () => ({
     location: `${window.location.origin}${window.MaxKB.chatPrefix}/`,
   }),
   actions: {
-
     async asyncGetApplicationDetail(id: string, loading?: Ref<boolean>) {
       return new Promise((resolve, reject) => {
         applicationApi
@@ -24,26 +21,14 @@ const useApplicationStore = defineStore('application', {
 
     async asyncGetAccessToken(id: string, loading?: Ref<boolean>) {
       return new Promise((resolve, reject) => {
-        const user = useUserStore()
-        // if (user.isEE() || user.isPE()) {
-        //   applicationXpackApi
-        //     .getAccessToken(id, loading)
-        //     .then((data) => {
-        //       resolve(data)
-        //     })
-        //     .catch((error) => {
-        //       reject(error)
-        //     })
-        // } else {
-          applicationApi
-            .getAccessToken(id, loading)
-            .then((data) => {
-              resolve(data)
-            })
-            .catch((error) => {
-              reject(error)
-            })
-        // }
+        applicationApi
+          .getAccessToken(id, loading)
+          .then((data) => {
+            resolve(data)
+          })
+          .catch((error) => {
+            reject(error)
+          })
       })
     },
 

@@ -42,6 +42,7 @@
           <!-- 知识来源 -->
           <KnowledgeSourceComponent
             :data="chatRecord"
+            :application="application"
             :type="application.type"
             :executionIsRightPanel="props.executionIsRightPanel"
             @open-execution-detail="emit('openExecutionDetail')"
@@ -90,8 +91,6 @@ const props = defineProps<{
   executionIsRightPanel?: boolean
 }>()
 
-const { user } = useStore()
-
 const emit = defineEmits([
   'update:chatRecord',
   'openExecutionDetail',
@@ -100,10 +99,10 @@ const emit = defineEmits([
 ])
 
 const showAvatar = computed(() => {
-  return user.isEE() || user.isPE() ? props.application.show_avatar : true
+  return props.application.show_avatar == undefined ? true : props.application.show_avatar
 })
 const showUserAvatar = computed(() => {
-  return user.isEE() || user.isPE() ? props.application.show_user_avatar : true
+  return props.application.show_user_avatar == undefined ? true : props.application.show_user_avatar
 })
 const chatMessage = (question: string, type: 'old' | 'new', other_params_data?: any) => {
   if (type === 'old') {
@@ -150,7 +149,11 @@ function showSource(row: any) {
   if (props.type === 'log') {
     return true
   } else if (row.write_ed && 500 !== row.status) {
-    if (props.type === 'debug-ai-chat' || props.application?.show_source) {
+    if (
+      props.type === 'debug-ai-chat' ||
+      props.application?.show_source ||
+      props.application?.show_exec
+    ) {
       return true
     }
   }

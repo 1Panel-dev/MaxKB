@@ -97,7 +97,7 @@ export default {
   notFound: {
     title: '404',
     NoService: '暂时无法访问服务',
-    NoPermission:'没有权限访问',
+    NoPermission:'当前用户暂无权限访问，请联系管理员',
     operate: '返回首页',
   },
   custom: '自定义',

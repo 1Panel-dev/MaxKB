@@ -5,8 +5,14 @@
     v-loading="loading || left_loading"
     :style="{
       '--el-color-primary': applicationDetail?.custom_theme?.theme_color,
-      '--el-color-primary-light-9': hexToRgba(applicationDetail?.custom_theme?.theme_color, 0.1),
-      '--el-color-primary-light-6': hexToRgba(applicationDetail?.custom_theme?.theme_color, 0.4),
+      '--el-color-primary-light-9': hexToRgba(
+        applicationDetail?.custom_theme?.theme_color || '#3370FF',
+        0.1,
+      ),
+      '--el-color-primary-light-6': hexToRgba(
+        applicationDetail?.custom_theme?.theme_color || '#3370FF',
+        0.4,
+      ),
     }"
   >
     <div class="flex h-full w-full">
@@ -157,7 +163,7 @@
             collapsible
           >
             <div class="p-16 flex-between border-b">
-              <h4 class="medium">{{ rightPanelTitle }}</h4>
+              <h4 class="medium ellipsis" :title="rightPanelTitle">{{ rightPanelTitle }}</h4>
               <el-icon size="20" class="cursor" @click="closeExecutionDetail"><Close /></el-icon>
             </div>
             <div class="execution-detail-content" v-loading="rightPanelLoading">
@@ -509,15 +515,14 @@ function closeExecutionDetail() {
     .el-splitter-bar__dragger {
       display: none;
     }
-    .execution-detail-panel {
+    :deep(.execution-detail-panel) {
       background: #ffffff;
       height: 100%;
       overflow: hidden;
-      display: flex;
-      flex-direction: column;
       .execution-detail-content {
         flex: 1;
         overflow: hidden;
+        height: calc(100% - 63px);
         .execution-details {
           padding: 16px;
         }

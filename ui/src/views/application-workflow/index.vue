@@ -3,7 +3,7 @@
     <div class="header border-b flex-between p-12-24 white-bg">
       <div class="flex align-center">
         <back-button @click="back"></back-button>
-        <h4>{{ detail?.name }}</h4>
+        <h4 class="ellipsis" style="max-width: 300px" :title="detail?.name">{{ detail?.name }}</h4>
         <div v-if="showHistory && disablePublic">
           <el-text type="info" class="ml-16 color-secondary"
             >{{ $t('views.applicationWorkflow.info.previewVersion') }}
@@ -102,7 +102,7 @@
                 <LogoIcon v-else height="32px" />
               </div>
 
-              <h4>
+              <h4 class="ellipsis" style="max-width: 270px" :title="detail?.name">
                 {{ detail?.name || $t('views.application.form.appName.label') }}
               </h4>
             </div>
@@ -598,8 +598,8 @@ onBeforeUnmount(() => {
   bottom: 16px;
   right: 16px;
   overflow: hidden;
-  width: 450px;
-  height: 600px;
+  width: 460px;
+  height: 680px;
   .workflow-debug-header {
     background: var(--app-header-bg-color);
     height: var(--app-header-height);

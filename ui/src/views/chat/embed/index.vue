@@ -4,12 +4,18 @@
     v-loading="loading"
     :style="{
       '--el-color-primary': applicationDetail?.custom_theme?.theme_color,
-      '--el-color-primary-light-9': hexToRgba(applicationDetail?.custom_theme?.theme_color, 0.1),
-      '--el-color-primary-light-6': hexToRgba(applicationDetail?.custom_theme?.theme_color, 0.4),
+      '--el-color-primary-light-9': hexToRgba(
+        applicationDetail?.custom_theme?.theme_color || '#3370FF',
+        0.1,
+      ),
+      '--el-color-primary-light-6': hexToRgba(
+        applicationDetail?.custom_theme?.theme_color || '#3370FF',
+        0.4,
+      ),
       backgroundImage: `url(${applicationDetail?.chat_background})`,
     }"
   >
-    <div class="chat-embed__header" :style="(user.isEE() || user.isPE()) && customStyle">
+    <div class="chat-embed__header" :style="customStyle">
       <div class="flex-between">
         <div class="flex align-center">
           <AppIcon
@@ -33,9 +39,16 @@
             <LogoIcon v-else height="32px" />
           </div>
 
-          <h4>{{ applicationDetail?.name }}</h4>
+          <h4 class="ellipsis" style="max-width: 270px" :title="applicationDetail?.name">
+            {{ applicationDetail?.name }}
+          </h4>
         </div>
-        <el-button text @click="newChat" style="margin-right: 85px">
+        <el-button
+          text
+          @click="newChat"
+          style="margin-right: 85px"
+          :style="{ color: applicationDetail?.custom_theme?.header_font_color }"
+        >
           <AppIcon iconName="app-create-chat" style="font-size: 20px"></AppIcon>
         </el-button>
       </div>
@@ -75,12 +88,10 @@
 import { ref, onMounted, reactive, nextTick, computed } from 'vue'
 import { isAppIcon } from '@/utils/common'
 import { hexToRgba } from '@/utils/theme'
-import useStore from '@/stores'
 import { t } from '@/locales'
 import ChatHistoryDrawer from './component/ChatHistoryDrawer.vue'
 import chatAPI from '@/api/chat/chat'
 
-const { user } = useStore()
 const AiChatRef = ref()
 const loading = ref(false)
 const left_loading = ref(false)

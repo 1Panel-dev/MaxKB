@@ -44,15 +44,6 @@ const useChatUserStore = defineStore('chat-user', {
       return ChatAPI.applicationProfile().then((ok) => {
         this.application = ok.data
         localStorage.setItem(`${this.accessToken}-locale`, ok.data?.language || this.getLanguage())
-
-        if (this.application.custom_theme) {
-          this.application['custom_theme']['theme_color'] =
-            ok.data?.custom_theme?.theme_color || '#3370FF'
-        } else {
-          this.application.custom_theme = {
-            theme_color: ok.data?.custom_theme?.theme_color || '#3370FF',
-          }
-        }
       })
     },
     isAuthentication() {

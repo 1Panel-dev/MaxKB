@@ -26,7 +26,7 @@
       </div>
     </template>
 
-    <div class="flex">
+    <div class="flex" style="height: 570px">
       <div class="setting-preview border border-r-6 mr-16" style="min-width: 400px">
         <div
           class="setting-preview-container"
@@ -167,290 +167,303 @@
           />
         </div>
       </div>
-
-      <el-form ref="displayFormRef" :model="xpackForm">
-        <el-row class="w-full mb-8">
-          <el-col :span="12">
-            <h5 class="mb-8">
-              {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.customThemeColor') }}
-            </h5>
-            <div>
-              <el-color-picker v-model="xpackForm.custom_theme.theme_color" />
-              {{
-                !xpackForm.custom_theme.theme_color
-                  ? $t('views.applicationOverview.appInfo.SettingDisplayDialog.default')
-                  : ''
-              }}
-            </div>
-          </el-col>
-          <el-col :span="12">
-            <h5 class="mb-8">
-              {{
-                $t('views.applicationOverview.appInfo.SettingDisplayDialog.headerTitleFontColor')
-              }}
-            </h5>
-            <el-color-picker v-model="xpackForm.custom_theme.header_font_color" />
-          </el-col>
-        </el-row>
-        <el-row class="w-full mb-8">
-          <h5 class="mb-8">
-            {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.languageLabel') }}
-          </h5>
-          <el-select v-model="xpackForm.language" clearable>
-            <el-option
-              v-for="item in langList"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
-        </el-row>
-        <!-- 应用 LOGO -->
-        <el-card shadow="never" class="mb-8">
-          <div class="flex-between mb-8">
-            <span class="lighter">{{ $t('views.application.title') + ' LOGO' }}</span>
-            <span class="flex align-center">
-              <el-upload
-                class="ml-8"
-                ref="uploadRef"
-                action="#"
-                :auto-upload="false"
-                :show-file-list="false"
-                accept="image/jpeg, image/png, image/gif"
-                :on-change="(file: any, fileList: any) => onChange(file, fileList, 'icon')"
-              >
-                <el-button size="small">
-                  {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.replace') }}
-                </el-button>
-              </el-upload>
-            </span>
-          </div>
-          <el-text type="info" size="small">
-            {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.imageMessage') }}
-          </el-text>
-        </el-card>
-        <!-- 聊天背景 -->
-        <el-card shadow="never" class="mb-8">
-          <div class="flex-between mb-8">
-            <span class="lighter">{{
-              $t('views.applicationOverview.appInfo.SettingDisplayDialog.chatBackground')
-            }}</span>
-            <span class="flex align-center">
-              <el-upload
-                class="ml-8"
-                ref="uploadRef"
-                action="#"
-                :auto-upload="false"
-                :show-file-list="false"
-                accept="image/jpeg, image/png, image/gif"
-                :on-change="
-                  (file: any, fileList: any) => onChange(file, fileList, 'chat_background')
-                "
-              >
-                <el-button size="small">
-                  {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.replace') }}
-                </el-button>
-              </el-upload>
-            </span>
-          </div>
-          <el-text type="info" size="small">
-            {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.chatBackgroundMessage') }}
-          </el-text>
-        </el-card>
-        <!-- AI回复头像 -->
-        <el-card shadow="never" class="mb-8">
-          <div class="flex-between mb-8">
-            <span class="lighter">{{
-              $t('views.applicationOverview.appInfo.SettingDisplayDialog.AIAvatar')
-            }}</span>
-            <span class="flex align-center">
-              <el-checkbox v-model="xpackForm.show_avatar">{{
-                $t('views.applicationOverview.appInfo.SettingDisplayDialog.display')
-              }}</el-checkbox>
-              <el-upload
-                class="ml-8"
-                ref="uploadRef"
-                action="#"
-                :auto-upload="false"
-                :show-file-list="false"
-                accept="image/jpeg, image/png, image/gif"
-                :on-change="(file: any, fileList: any) => onChange(file, fileList, 'avatar')"
-              >
-                <el-button size="small">
-                  {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.replace') }}
-                </el-button>
-              </el-upload>
-            </span>
-          </div>
-          <el-text type="info" size="small">
-            {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.imageMessage') }}
-          </el-text>
-        </el-card>
-        <!-- 提问头像 -->
-        <el-card shadow="never" class="mb-8">
-          <div class="flex-between mb-8">
-            <span class="lighter">{{
-              $t('views.applicationOverview.appInfo.SettingDisplayDialog.askUserAvatar')
-            }}</span>
-            <span class="flex align-center">
-              <el-checkbox v-model="xpackForm.show_user_avatar">
-                {{
-                  $t('views.applicationOverview.appInfo.SettingDisplayDialog.display')
-                }}</el-checkbox
-              >
-              <el-upload
-                class="ml-8"
-                ref="uploadRef"
-                action="#"
-                :auto-upload="false"
-                :show-file-list="false"
-                accept="image/jpeg, image/png, image/gif"
-                :on-change="(file: any, fileList: any) => onChange(file, fileList, 'user_avatar')"
-              >
-                <el-button size="small">
-                  {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.replace') }}
-                </el-button>
-              </el-upload>
-            </span>
-          </div>
-          <el-text type="info" size="small"
-            >{{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.imageMessage') }}
-          </el-text>
-        </el-card>
-        <!-- 浮窗图标 -->
-        <el-card shadow="never" class="mb-8">
-          <div class="flex-between mb-8">
-            <span class="lighter">{{
-              $t('views.applicationOverview.appInfo.SettingDisplayDialog.floatIcon')
-            }}</span>
-            <el-upload
-              ref="uploadRef"
-              action="#"
-              :auto-upload="false"
-              :show-file-list="false"
-              accept="image/jpeg, image/png, image/gif"
-              :on-change="(file: any, fileList: any) => onChange(file, fileList, 'float_icon')"
-            >
-              <el-button size="small">
-                {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.replace') }}
-              </el-button>
-            </el-upload>
-          </div>
-          <el-text type="info" size="small">
-            {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.imageMessage') }}
-          </el-text>
-          <div class="border-t mt-8">
-            <div class="flex-between mb-8">
-              <span class="lighter">{{
-                $t('views.applicationOverview.appInfo.SettingDisplayDialog.iconDefaultPosition')
-              }}</span>
-              <el-checkbox
-                v-model="xpackForm.draggable"
-                :label="
-                  $t('views.applicationOverview.appInfo.SettingDisplayDialog.draggablePosition')
-                "
-              />
-            </div>
-            <el-row :gutter="8" class="w-full mb-8">
+      <el-scrollbar>
+        <div class="p-8">
+          <el-form ref="displayFormRef" :model="xpackForm">
+            <el-row class="w-full mb-8">
               <el-col :span="12">
-                <div class="flex align-center">
-                  <el-select v-model="xpackForm.float_location.x.type" style="width: 80px">
-                    <el-option
-                      :label="
-                        $t(
-                          'views.applicationOverview.appInfo.SettingDisplayDialog.iconPosition.left',
-                        )
-                      "
-                      value="left"
-                    />
-                    <el-option
-                      :label="
-                        $t(
-                          'views.applicationOverview.appInfo.SettingDisplayDialog.iconPosition.right',
-                        )
-                      "
-                      value="right"
-                    />
-                  </el-select>
-                  <el-input-number
-                    v-model="xpackForm.float_location.x.value"
-                    :min="0"
-                    :step="1"
-                    :precision="0"
-                    :value-on-clear="0"
-                    step-strictly
-                    controls-position="right"
-                  />
-                  <span class="ml-4">px</span>
+                <h5 class="mb-8">
+                  {{
+                    $t('views.applicationOverview.appInfo.SettingDisplayDialog.customThemeColor')
+                  }}
+                </h5>
+                <div>
+                  <el-color-picker v-model="xpackForm.custom_theme.theme_color" />
+                  {{
+                    !xpackForm.custom_theme.theme_color
+                      ? $t('views.applicationOverview.appInfo.SettingDisplayDialog.default')
+                      : ''
+                  }}
                 </div>
               </el-col>
               <el-col :span="12">
-                <div class="flex align-center">
-                  <el-select v-model="xpackForm.float_location.y.type" style="width: 80px">
-                    <el-option
-                      :label="
-                        $t(
-                          'views.applicationOverview.appInfo.SettingDisplayDialog.iconPosition.top',
-                        )
-                      "
-                      value="top"
-                    />
-                    <el-option
-                      :label="
-                        $t(
-                          'views.applicationOverview.appInfo.SettingDisplayDialog.iconPosition.bottom',
-                        )
-                      "
-                      value="bottom"
-                    />
-                  </el-select>
-                  <el-input-number
-                    v-model="xpackForm.float_location.y.value"
-                    :min="0"
-                    :step="1"
-                    :precision="0"
-                    :value-on-clear="0"
-                    step-strictly
-                    controls-position="right"
-                  />
-                  <span class="ml-4">px</span>
-                </div>
+                <h5 class="mb-8">
+                  {{
+                    $t(
+                      'views.applicationOverview.appInfo.SettingDisplayDialog.headerTitleFontColor',
+                    )
+                  }}
+                </h5>
+                <el-color-picker v-model="xpackForm.custom_theme.header_font_color" />
               </el-col>
             </el-row>
-          </div>
-        </el-card>
+            <el-row class="w-full mb-8">
+              <h5 class="mb-8">
+                {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.languageLabel') }}
+              </h5>
+              <el-select v-model="xpackForm.language" clearable>
+                <el-option
+                  v-for="item in langList"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
+            </el-row>
+            <!-- 应用 LOGO -->
+            <el-card shadow="never" class="mb-8">
+              <div class="flex-between mb-8">
+                <span class="lighter">{{ $t('views.application.title') + ' LOGO' }}</span>
+                <span class="flex align-center">
+                  <el-upload
+                    class="ml-8"
+                    ref="uploadRef"
+                    action="#"
+                    :auto-upload="false"
+                    :show-file-list="false"
+                    accept="image/jpeg, image/png, image/gif"
+                    :on-change="(file: any, fileList: any) => onChange(file, fileList, 'icon')"
+                  >
+                    <el-button size="small">
+                      {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.replace') }}
+                    </el-button>
+                  </el-upload>
+                </span>
+              </div>
+              <el-text type="info" size="small">
+                {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.imageMessage') }}
+              </el-text>
+            </el-card>
+            <!-- 聊天背景 -->
+            <el-card shadow="never" class="mb-8">
+              <div class="flex-between mb-8">
+                <span class="lighter">{{
+                  $t('views.applicationOverview.appInfo.SettingDisplayDialog.chatBackground')
+                }}</span>
+                <span class="flex align-center">
+                  <el-upload
+                    class="ml-8"
+                    ref="uploadRef"
+                    action="#"
+                    :auto-upload="false"
+                    :show-file-list="false"
+                    accept="image/jpeg, image/png, image/gif"
+                    :on-change="
+                      (file: any, fileList: any) => onChange(file, fileList, 'chat_background')
+                    "
+                  >
+                    <el-button size="small">
+                      {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.replace') }}
+                    </el-button>
+                  </el-upload>
+                </span>
+              </div>
+              <el-text type="info" size="small">
+                {{
+                  $t('views.applicationOverview.appInfo.SettingDisplayDialog.chatBackgroundMessage')
+                }}
+              </el-text>
+            </el-card>
+            <!-- AI回复头像 -->
+            <el-card shadow="never" class="mb-8">
+              <div class="flex-between mb-8">
+                <span class="lighter">{{
+                  $t('views.applicationOverview.appInfo.SettingDisplayDialog.AIAvatar')
+                }}</span>
+                <span class="flex align-center">
+                  <el-checkbox v-model="xpackForm.show_avatar">{{
+                    $t('views.applicationOverview.appInfo.SettingDisplayDialog.display')
+                  }}</el-checkbox>
+                  <el-upload
+                    class="ml-8"
+                    ref="uploadRef"
+                    action="#"
+                    :auto-upload="false"
+                    :show-file-list="false"
+                    accept="image/jpeg, image/png, image/gif"
+                    :on-change="(file: any, fileList: any) => onChange(file, fileList, 'avatar')"
+                  >
+                    <el-button size="small">
+                      {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.replace') }}
+                    </el-button>
+                  </el-upload>
+                </span>
+              </div>
+              <el-text type="info" size="small">
+                {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.imageMessage') }}
+              </el-text>
+            </el-card>
+            <!-- 提问头像 -->
+            <el-card shadow="never" class="mb-8">
+              <div class="flex-between mb-8">
+                <span class="lighter">{{
+                  $t('views.applicationOverview.appInfo.SettingDisplayDialog.askUserAvatar')
+                }}</span>
+                <span class="flex align-center">
+                  <el-checkbox v-model="xpackForm.show_user_avatar">
+                    {{
+                      $t('views.applicationOverview.appInfo.SettingDisplayDialog.display')
+                    }}</el-checkbox
+                  >
+                  <el-upload
+                    class="ml-8"
+                    ref="uploadRef"
+                    action="#"
+                    :auto-upload="false"
+                    :show-file-list="false"
+                    accept="image/jpeg, image/png, image/gif"
+                    :on-change="
+                      (file: any, fileList: any) => onChange(file, fileList, 'user_avatar')
+                    "
+                  >
+                    <el-button size="small">
+                      {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.replace') }}
+                    </el-button>
+                  </el-upload>
+                </span>
+              </div>
+              <el-text type="info" size="small"
+                >{{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.imageMessage') }}
+              </el-text>
+            </el-card>
+            <!-- 浮窗图标 -->
+            <el-card shadow="never" class="mb-8">
+              <div class="flex-between mb-8">
+                <span class="lighter">{{
+                  $t('views.applicationOverview.appInfo.SettingDisplayDialog.floatIcon')
+                }}</span>
+                <el-upload
+                  ref="uploadRef"
+                  action="#"
+                  :auto-upload="false"
+                  :show-file-list="false"
+                  accept="image/jpeg, image/png, image/gif"
+                  :on-change="(file: any, fileList: any) => onChange(file, fileList, 'float_icon')"
+                >
+                  <el-button size="small">
+                    {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.replace') }}
+                  </el-button>
+                </el-upload>
+              </div>
+              <el-text type="info" size="small">
+                {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.imageMessage') }}
+              </el-text>
+              <div class="border-t mt-8">
+                <div class="flex-between mb-8">
+                  <span class="lighter">{{
+                    $t('views.applicationOverview.appInfo.SettingDisplayDialog.iconDefaultPosition')
+                  }}</span>
+                  <el-checkbox
+                    v-model="xpackForm.draggable"
+                    :label="
+                      $t('views.applicationOverview.appInfo.SettingDisplayDialog.draggablePosition')
+                    "
+                  />
+                </div>
+                <el-row :gutter="8" class="w-full mb-8">
+                  <el-col :span="12">
+                    <div class="flex align-center">
+                      <el-select v-model="xpackForm.float_location.x.type" style="width: 80px">
+                        <el-option
+                          :label="
+                            $t(
+                              'views.applicationOverview.appInfo.SettingDisplayDialog.iconPosition.left',
+                            )
+                          "
+                          value="left"
+                        />
+                        <el-option
+                          :label="
+                            $t(
+                              'views.applicationOverview.appInfo.SettingDisplayDialog.iconPosition.right',
+                            )
+                          "
+                          value="right"
+                        />
+                      </el-select>
+                      <el-input-number
+                        v-model="xpackForm.float_location.x.value"
+                        :min="0"
+                        :step="1"
+                        :precision="0"
+                        :value-on-clear="0"
+                        step-strictly
+                        controls-position="right"
+                      />
+                      <span class="ml-4">px</span>
+                    </div>
+                  </el-col>
+                  <el-col :span="12">
+                    <div class="flex align-center">
+                      <el-select v-model="xpackForm.float_location.y.type" style="width: 80px">
+                        <el-option
+                          :label="
+                            $t(
+                              'views.applicationOverview.appInfo.SettingDisplayDialog.iconPosition.top',
+                            )
+                          "
+                          value="top"
+                        />
+                        <el-option
+                          :label="
+                            $t(
+                              'views.applicationOverview.appInfo.SettingDisplayDialog.iconPosition.bottom',
+                            )
+                          "
+                          value="bottom"
+                        />
+                      </el-select>
+                      <el-input-number
+                        v-model="xpackForm.float_location.y.value"
+                        :min="0"
+                        :step="1"
+                        :precision="0"
+                        :value-on-clear="0"
+                        step-strictly
+                        controls-position="right"
+                      />
+                      <span class="ml-4">px</span>
+                    </div>
+                  </el-col>
+                </el-row>
+              </div>
+            </el-card>
 
-        <el-space direction="vertical" alignment="start" :size="2">
-          <el-checkbox
-            v-model="xpackForm.show_source"
-            :label="$t('views.applicationOverview.appInfo.SettingDisplayDialog.showSourceLabel')"
-          />
-          <el-checkbox
-            v-model="xpackForm.show_exec"
-            :label="
-              $t('views.applicationOverview.appInfo.SettingDisplayDialog.showExecutionDetail')
-            "
-          />
-          <el-checkbox
-            v-model="xpackForm.show_guide"
-            :label="$t('views.applicationOverview.appInfo.SettingDisplayDialog.displayGuide')"
-          />
-          <el-checkbox
-            v-model="xpackForm.disclaimer"
-            :label="$t('views.applicationOverview.appInfo.SettingDisplayDialog.disclaimer')"
-            @change="changeDisclaimer"
-          />
-          <span v-if="xpackForm.disclaimer"
-            ><el-tooltip :content="xpackForm.disclaimer_value" placement="top">
-              <el-input
-                v-model="xpackForm.disclaimer_value"
-                style="width: 422px; margin-bottom: 10px"
-                @change="changeValue"
-                :maxlength="128"
-              /> </el-tooltip
-          ></span>
-        </el-space>
-      </el-form>
+            <el-space direction="vertical" alignment="start" :size="2">
+              <el-checkbox
+                v-model="xpackForm.show_source"
+                :label="
+                  $t('views.applicationOverview.appInfo.SettingDisplayDialog.showSourceLabel')
+                "
+              />
+              <el-checkbox
+                v-model="xpackForm.show_exec"
+                :label="
+                  $t('views.applicationOverview.appInfo.SettingDisplayDialog.showExecutionDetail')
+                "
+              />
+              <el-checkbox
+                v-model="xpackForm.show_guide"
+                :label="$t('views.applicationOverview.appInfo.SettingDisplayDialog.displayGuide')"
+              />
+              <el-checkbox
+                v-model="xpackForm.disclaimer"
+                :label="$t('views.applicationOverview.appInfo.SettingDisplayDialog.disclaimer')"
+                @change="changeDisclaimer"
+              />
+              <span v-if="xpackForm.disclaimer"
+                ><el-tooltip :content="xpackForm.disclaimer_value" placement="top">
+                  <el-input
+                    v-model="xpackForm.disclaimer_value"
+                    style="width: 422px; margin-bottom: 10px"
+                    @change="changeValue"
+                    :maxlength="128"
+                  /> </el-tooltip
+              ></span>
+            </el-space>
+          </el-form>
+        </div>
+      </el-scrollbar>
     </div>
 
     <template #footer>
@@ -468,7 +481,7 @@ import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import type { FormInstance, FormRules, UploadFiles } from 'element-plus'
 import { isAppIcon } from '@/utils/common'
-import applicationXpackApi from '@/api/application/application-xpack'
+import applicationApi from '@/api/application/application'
 import { MsgSuccess, MsgError } from '@/utils/message'
 import { langList, t } from '@/locales'
 import useStore from '@/stores'
@@ -650,7 +663,7 @@ const submit = async (formEl: FormInstance | undefined) => {
           fd.append(item, xpackForm.value[item])
         }
       })
-      applicationXpackApi.putAccessToken(id as string, fd, loading).then((res) => {
+      applicationApi.putXpackAccessToken(id as string, fd, loading).then((res) => {
         emit('refresh')
         // @ts-ignore
         MsgSuccess(t('common.settingSuccess'))

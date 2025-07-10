@@ -93,7 +93,7 @@ export default {
   notFound: {
     title: '404',
     NoService: '暫時無法訪問服務',
-    NoPermission: '沒有權限訪問',
+    NoPermission: '當前用戶暫無權限訪問，請聯系管理員',
     operate: '返回首頁',
   },
   custom: '自定義',

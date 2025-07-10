@@ -193,7 +193,7 @@
                 >
                   <div class="card-never border-r-6" v-if="item.type !== WorkflowType.Application">
                     <h5 class="p-8-12">
-                      {{ $t('views.application.applicationForm.form.roleSettings.label') }}
+                      {{ $t('views.application.form.roleSettings.label') }}
                     </h5>
                     <div class="p-8-12 border-t-dashed lighter">
                       {{ item.system || '-' }}
@@ -503,7 +503,7 @@
                 <template v-if="item.type == WorkflowType.ImageUnderstandNode">
                   <div class="card-never border-r-6" v-if="item.type !== WorkflowType.Application">
                     <h5 class="p-8-12">
-                      {{ $t('views.application.applicationForm.form.roleSettings.label') }}
+                      {{ $t('views.application.form.roleSettings.label') }}
                     </h5>
                     <div class="p-8-12 border-t-dashed lighter">
                       {{ item.system || '-' }}

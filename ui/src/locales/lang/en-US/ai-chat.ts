@@ -92,6 +92,7 @@ export default {
     referenceParagraph: 'Cited Segment',
     consume: 'Tokens',
     consumeTime: 'Runtime',
+    noSource: 'No source found',
   },
   paragraphSource: {
     title: 'Knowledge Quote',

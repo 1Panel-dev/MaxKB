@@ -5,22 +5,24 @@
     :class="classObj"
     :style="{
       '--el-color-primary': applicationDetail?.custom_theme?.theme_color,
-      '--el-color-primary-light-9': hexToRgba(applicationDetail?.custom_theme?.theme_color, 0.1),
-      '--el-color-primary-light-6': hexToRgba(applicationDetail?.custom_theme?.theme_color, 0.4),
-
+      '--el-color-primary-light-9': hexToRgba(
+        applicationDetail?.custom_theme?.theme_color || '#3370FF',
+        0.1,
+      ),
+      '--el-color-primary-light-6': hexToRgba(
+        applicationDetail?.custom_theme?.theme_color || '#3370FF',
+        0.4,
+      ),
       backgroundImage: `url(${applicationDetail?.chat_background})`,
     }"
   >
-    <div class="chat-mobile__header" :style="(user.isEE() || user.isPE()) && customStyle">
+    <div class="chat-mobile__header" :style="customStyle">
       <div class="flex-between">
         <div class="flex align-center">
           <AppIcon
             iconName="app-mobile-open-history"
             style="font-size: 20px"
             class="ml-16 cursor"
-            :style="{
-              color: applicationDetail?.custom_theme?.header_font_color,
-            }"
             @click.prevent.stop="show = true"
           />
           <div class="mr-12 ml-16 flex">
@@ -35,9 +37,16 @@
             <LogoIcon v-else height="32px" />
           </div>
 
-          <h4>{{ applicationDetail?.name }}</h4>
+          <h4 class="ellipsis" style="max-width: 270px" :title="applicationDetail?.name">
+            {{ applicationDetail?.name }}
+          </h4>
         </div>
-        <el-button text @click="newChat" class="mr-16">
+        <el-button
+          text
+          @click="newChat"
+          class="mr-16"
+          :style="{ color: applicationDetail?.custom_theme?.header_font_color }"
+        >
           <AppIcon iconName="app-create-chat" style="font-size: 20px"></AppIcon>
         </el-button>
       </div>
@@ -81,7 +90,7 @@ import { t } from '@/locales'
 import ChatHistoryDrawer from './component/ChatHistoryDrawer.vue'
 import chatAPI from '@/api/chat/chat'
 
-const { user, common } = useStore()
+const { common } = useStore()
 
 const AiChatRef = ref()
 const loading = ref(false)

@@ -364,13 +364,13 @@ function handleSizeChange() {
   getList()
 }
 
-function changeState(row: ChatUserItem) {
+async function changeState(row: ChatUserItem) {
   const obj = {
     ...row,
     is_active: !row.is_active,
   }
   const str = obj.is_active ? t('common.status.enableSuccess') : t('common.status.disableSuccess')
-  loadPermissionApi('chatUser')
+  await loadPermissionApi('chatUser')
     .putUserManage(row.id, obj, loading)
     .then(() => {
       getList()
