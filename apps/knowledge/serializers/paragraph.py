@@ -305,6 +305,10 @@ class ParagraphSerializers(serializers.Serializer):
             if with_embedding:
                 model_id = get_embedding_model_id_by_knowledge_id(knowledge_id)
                 embedding_by_paragraph(str(paragraph.id), model_id)
+                ListenerManagement.update_status(
+                    QuerySet(Document).filter(id=document_id), TaskType.EMBEDDING, State.SUCCESS
+                )
+                ListenerManagement.get_aggregation_document_status(document_id)()
             return ParagraphSerializers.Operate(
                 data={
                     'paragraph_id': str(paragraph.id),
