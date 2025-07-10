@@ -185,7 +185,11 @@ class ModelSetting(APIView):
                        responses=ProvideApi.ModelParamsForm.get_response(),
                        tags=[_('Model')])  # type: ignore
         @has_permissions(PermissionConstants.MODEL_READ.get_workspace_model_permission(),
+                         PermissionConstants.KNOWLEDGE_READ.get_workspace_permission(),
+                         PermissionConstants.APPLICATION_READ.get_workspace_permission(),
                          PermissionConstants.MODEL_READ.get_workspace_permission_workspace_manage_role(),
+                         PermissionConstants.KNOWLEDGE_READ.get_workspace_permission_workspace_manage_role(),
+                         PermissionConstants.APPLICATION_READ.get_workspace_permission_workspace_manage_role(),
                          PermissionConstants.MODEL_READ.get_workspace_permission(),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
                          RoleConstants.USER.get_workspace_role(),)
