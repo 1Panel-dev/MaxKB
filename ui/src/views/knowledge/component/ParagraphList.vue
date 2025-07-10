@@ -70,14 +70,20 @@ const props = defineProps({
   knowledgeId: String
 })
 
+// 初始化加载数据
+watchEffect(() => {
+  if (props.modelValue && props.modelValue.length > 0) {
+    const end = page_size.value * current_page.value;
+    localParagraphList.value = props.modelValue.slice(0, Math.min(end, props.modelValue.length));
+  }
+})
+
 // 监听分页变化，只加载需要的数据
 watchEffect(() => {
   const start = 0;
   const end = page_size.value * current_page.value;
-  // 只获取所需数量的数据，而不是每次都对整个数组进行切片
-  if (end <= props.modelValue.length) {
-    localParagraphList.value = props.modelValue.slice(start, end);
-  }
+  // 不管数据量多少，都确保获取所有应该显示的数据
+  localParagraphList.value = props.modelValue.slice(start, Math.min(end, props.modelValue.length));
 })
 
 const paragraph_list = computed(() => {
