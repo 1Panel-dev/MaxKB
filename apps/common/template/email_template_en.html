@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="description" content="email code" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+  <!--邮箱验证码模板-->
+  <body>
+    <div style="background-color: #ececec; padding: 35px">
+      <table
+        cellpadding="0"
+        style="
+          width: 800px;
+          height: 100%;
+          margin: 0px auto;
+          text-align: left;
+          position: relative;
+          border-top-left-radius: 5px;
+          border-top-right-radius: 5px;
+          border-bottom-right-radius: 5px;
+          border-bottom-left-radius: 5px;
+          font-size: 14px;
+          line-height: 1.5;
+          box-shadow: rgb(153, 153, 153) 0px 0px 5px;
+          border-collapse: collapse;
+          background-position: initial initial;
+          background-repeat: initial initial;
+          background: #fff;
+        "
+      >
+        <tbody>
+          <tr>
+            <th
+              valign="middle"
+              style="
+                background: linear-gradient(
+                  90deg,
+                  #ebf1ff 24.34%,
+                  #e5fbf8 56.18%,
+                  #f2ebfe 90.18%
+                );
+                height: 25px;
+                line-height: 25px;
+                padding: 15px 35px;
+                border-bottom-width: 1px;
+                border-bottom-color: rgba(51, 112, 255);
+                border-top-left-radius: 5px;
+                border-top-right-radius: 5px;
+                border-bottom-right-radius: 0px;
+                border-bottom-left-radius: 0px;
+              "
+            >
+              <div
+                style="
+                  width: 500px;
+                  background: linear-gradient(180deg, #3370FF 0%, #7f3bf5 100%);
+                  -webkit-background-clip: text;
+                  font-size: 16px;
+                  -webkit-text-fill-color: transparent;
+                  font-style: normal;
+                  font-weight: 900;
+                  color: #1f2329;
+                "
+              >
+                Intelligent Knowledge Q&A System
+              </div>
+            </th>
+          </tr>
+          <tr>
+            <td style="word-break: break-all">
+              <div
+                style="
+                  padding: 25px 35px 40px;
+                  background-color: #fff;
+                  opacity: 0.8;
+                "
+              >
+                <h2 style="margin: 5px 0px">
+                  <font color="#333333" style="line-height: 20px">
+                    <font style="line-height: 22px" size="4">
+
+                    Dear user:</font
+                    >
+                  </font>
+                </h2>
+                <!-- 中文 -->
+                <p>
+                  <font color="#ff8c00" style="font-weight: 900">${code}</font
+                  >&nbsp;&nbsp;This is your dynamic verification code. Please fill it in within 30 minutes. To protect the security of your account, please do not provide this verification code to anyone.
+                </p>
+                <br />
+
+                <div style="width: 100%; margin: 0 auto">
+                  <div
+                    style="
+                      padding: 10px 10px 0;
+                      border-top: 1px solid #ccc;
+                      color: #747474;
+                      margin-bottom: 20px;
+                      line-height: 1.3em;
+                      font-size: 12px;
+                      text-align: right;
+                    "
+                  >
+                    <p>Intelligent knowledge base project team</p>
+                    <br />
+                    <p>
+                      Please do not reply to this system email<br />
+                    </p>
+                    <!--<p>©***</p>-->
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>
