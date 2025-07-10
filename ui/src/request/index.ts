@@ -282,6 +282,17 @@ export const exportFile: (
       transformResponse: [
         function (data, headers) {
           // 在这里可以访问 headers
+          if (data.type === 'application/json') {
+            data.text().then((text: string) => {
+              try {
+                const json = JSON.parse(text)
+                MsgError(json.message || text)
+              } catch {
+                MsgError(text)
+              }
+            })
+            throw new Error('Response is not a valid file')
+          }
           // const contentType = headers['content-type'];
           const contentDisposition = headers['content-disposition']
           // console.log('Content-Type:', contentType);
@@ -306,7 +317,7 @@ export const exportFile: (
       window.URL.revokeObjectURL(link.href)
     }
     return true
-  })
+  }).catch(()=>{})
 }
 
 export const exportExcelPost: (
