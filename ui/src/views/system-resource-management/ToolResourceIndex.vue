@@ -17,7 +17,7 @@
           >
             <el-option :label="$t('common.creator')" value="create_user" />
 
-            <el-option :label="$t('views.model.modelForm.modeName.label')" value="name" />
+            <el-option :label="$t('views.tool.form.toolName.label')" value="name" />
           </el-select>
           <el-input
             v-if="search_type === 'name'"
