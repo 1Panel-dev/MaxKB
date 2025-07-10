@@ -53,7 +53,9 @@
       <template #footer v-if="showFooter">
         <slot name="footer">
           <div class="w-full text-left cursor" @click="openCreateModel(undefined, props.modelType)">
-            <el-button type="primary" link>
+            <el-button type="primary" link
+              v-if="permissionPrecise.create()"
+            >
               <el-icon class="mr-4">
                 <Plus />
               </el-icon>
@@ -86,6 +88,7 @@ import SelectProviderDialog from '@/views/model/component/SelectProviderDialog.v
 
 import { t } from '@/locales'
 import useStore from '@/stores'
+import permissionMap from '@/permission'
 
 defineOptions({ name: 'ModelSelect' })
 const props = defineProps<{
@@ -94,6 +97,10 @@ const props = defineProps<{
   showFooter?: false
   modelType?: ''
 }>()
+
+const permissionPrecise = computed(() => {
+  return permissionMap['model']['workspace']
+})
 
 const emit = defineEmits(['update:modelValue', 'change', 'submitModel'])
 const modelValue = computed({
