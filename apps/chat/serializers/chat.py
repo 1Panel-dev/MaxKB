@@ -8,7 +8,7 @@
 """
 
 from gettext import gettext
-from typing import List
+from typing import List, Dict
 
 import uuid_utils.compat as uuid
 from django.db.models import QuerySet
@@ -31,6 +31,7 @@ from application.serializers.application import ApplicationOperateSerializer
 from application.serializers.common import ChatInfo
 from common.exception.app_exception import AppApiException, AppChatNumOutOfBoundsFailed, ChatException
 from common.handle.base_to_response import BaseToResponse
+from common.handle.impl.response.openai_to_response import OpenaiToResponse
 from common.handle.impl.response.system_to_response import SystemToResponse
 from common.utils.common import flat_map
 from knowledge.models import Document, Paragraph
@@ -109,6 +110,66 @@ class DebugChatSerializers(serializers.Serializer):
             "chat_user_type": chat_info.chat_user_type,
             "application_id": chat_info.application.id, "debug": True
         }).chat(instance, base_to_response)
+
+
+class OpenAIMessage(serializers.Serializer):
+    content = serializers.CharField(required=True, label=_('content'))
+    role = serializers.CharField(required=True, label=_('Role'))
+
+
+class OpenAIInstanceSerializer(serializers.Serializer):
+    messages = serializers.ListField(child=OpenAIMessage())
+    chat_id = serializers.UUIDField(required=False, label=_("Conversation ID"))
+    re_chat = serializers.BooleanField(required=False, label=_("Regenerate"))
+    stream = serializers.BooleanField(required=False, label=_("Streaming Output"))
+
+
+class OpenAIChatSerializer(serializers.Serializer):
+    application_id = serializers.UUIDField(required=True, label=_("Application ID"))
+    chat_user_id = serializers.CharField(required=True, label=_("Client id"))
+    chat_user_type = serializers.CharField(required=True, label=_("Client Type"))
+
+    @staticmethod
+    def get_message(instance):
+        return instance.get('messages')[-1].get('content')
+
+    @staticmethod
+    def generate_chat(chat_id, application_id, message, chat_user_id, chat_user_type):
+        if chat_id is None:
+            chat_id = str(uuid.uuid1())
+        chat_info = ChatInfo(chat_id, chat_user_id, chat_user_type, [], [],
+                             application_id)
+        chat_info.set_cache()
+        return chat_id
+
+    def chat(self, instance: Dict, with_valid=True):
+        if with_valid:
+            self.is_valid(raise_exception=True)
+            OpenAIInstanceSerializer(data=instance).is_valid(raise_exception=True)
+        chat_id = instance.get('chat_id')
+        message = self.get_message(instance)
+        re_chat = instance.get('re_chat', False)
+        stream = instance.get('stream', False)
+        application_id = self.data.get('application_id')
+        chat_user_id = self.data.get('chat_user_id')
+        chat_user_type = self.data.get('chat_user_type')
+        chat_id = self.generate_chat(chat_id, application_id, message, chat_user_id, chat_user_type)
+        return ChatSerializers(
+            data={
+                'chat_id': chat_id,
+                'chat_user_id': chat_user_id,
+                'chat_user_type': chat_user_type,
+                'application_id': application_id
+            }
+        ).chat({'message': message,
+                're_chat': re_chat,
+                'stream': stream,
+                'form_data': instance.get('form_data', {}),
+                'image_list': instance.get('image_list', []),
+                'document_list': instance.get('document_list', []),
+                'audio_list': instance.get('audio_list', []),
+                'other_list': instance.get('other_list', [])},
+               base_to_response=OpenaiToResponse())
 
 
 class ChatSerializers(serializers.Serializer):

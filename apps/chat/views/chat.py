@@ -14,14 +14,13 @@ from rest_framework.request import Request
 from rest_framework.views import APIView
 
 from application.api.application_api import SpeechToTextAPI, TextToSpeechAPI
-from application.serializers.application import ApplicationOperateSerializer
 from chat.api.chat_api import ChatAPI
-from chat.api.chat_authentication_api import ChatAuthenticationAPI, ChatAuthenticationProfileAPI, ChatOpenAPI
-from chat.serializers.chat import OpenChatSerializers, ChatSerializers, SpeechToTextSerializers, TextToSpeechSerializers
+from chat.api.chat_authentication_api import ChatAuthenticationAPI, ChatAuthenticationProfileAPI, ChatOpenAPI, OpenAIAPI
+from chat.serializers.chat import OpenChatSerializers, ChatSerializers, SpeechToTextSerializers, \
+    TextToSpeechSerializers, OpenAIChatSerializer
 from chat.serializers.chat_authentication import AnonymousAuthenticationSerializer, ApplicationProfileSerializer, \
     AuthProfileSerializer
 from common.auth import TokenAuth
-from common.auth.authentication import has_permissions
 from common.constants.permission_constants import ChatAuth
 from common.exception.app_exception import AppAuthenticationFailed
 from common.result import result
@@ -29,6 +28,23 @@ from knowledge.models import FileSourceType
 from oss.serializers.file import FileSerializer
 from users.api import CaptchaAPI
 from users.serializers.login import CaptchaSerializer
+
+
+class OpenAIView(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(
+        methods=['POST'],
+        description=_('OpenAI Interface Dialogue'),
+        summary=_('OpenAI Interface Dialogue'),
+        operation_id=_('OpenAI Interface Dialogue'),  # type: ignore
+        request=OpenAIAPI.get_request(),
+        responses=None,
+        tags=[_('Chat')]  # type: ignore
+    )
+    def post(self, request: Request, application_id: str):
+        return OpenAIChatSerializer(data={'application_id': application_id, 'chat_user_id': request.auth.chat_user_id,
+                                          'chat_user_type': request.auth.chat_user_type}).chat(request.data)
 
 
 class AnonymousAuthentication(APIView):
