@@ -40,6 +40,19 @@ jobs:
     steps:
       - name: Check Disk Space
         run: df -h
+      - name: Free Disk Space (Ubuntu)
+        if: ${{ contains(github.event.inputs.architecture, ',') }}
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: false
+          swap-storage: false
+      - name: Check Disk Space
+        run: df -h
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -86,6 +99,19 @@ jobs:
     if: ${{ contains(github.event.inputs.registry, 'dockerhub') }}
     runs-on: ubuntu-latest
     steps:
+      - name: Check Disk Space
+        run: df -h
+      - name: Free Disk Space (Ubuntu)
+        if: ${{ contains(github.event.inputs.architecture, ',') }}
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: false
+          swap-storage: false
       - name: Check Disk Space
         run: df -h
       - name: Checkout
