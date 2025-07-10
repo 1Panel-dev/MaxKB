@@ -266,7 +266,7 @@ export default {
       label: '文本转语音',
       text: '将文本通过语音合成模型转换为音频',
       tts_model: {
-        label: '语音识别模型'
+        label: '语音合成模型'
       },
       content: {
         label: '选择文本内容'
