@@ -30,6 +30,7 @@ langgraph = "0.5.1"
 torch = "2.7.1"
 qianfan = "0.4.12.3"
 zhipuai = "2.1.5.20250701"
+volcengine-python-sdk = {version = "4.0.4", extras = ["ark"]}
 boto3 = "1.39.3"
 tencentcloud-sdk-python = "3.0.1415"
 xinference-client = "1.7.1.post1"
