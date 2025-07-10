@@ -290,6 +290,7 @@ class RePasswordView(APIView):
     @log(menu='User management', operate='Change password',
          get_operation_object=lambda r, k: {'name': r.user.username},
          get_details=get_re_password_details)
+    @has_permissions(PermissionConstants.USER_EDIT, RoleConstants.ADMIN)
     def post(self, request: Request):
         serializer_obj = RePasswordSerializer(data=request.data)
         return result.success(serializer_obj.reset_password(request.user.id))

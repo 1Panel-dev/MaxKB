@@ -86,7 +86,7 @@ class ApplicationProfileSerializer(serializers.Serializer):
             'user_id': 'user_id', 'model_id': 'model_id', 'knowledge_setting': 'knowledge_setting',
             'model_setting': 'model_setting', 'model_params_setting': 'model_params_setting',
             'tts_model_params_setting': 'tts_model_params_setting',
-            'problem_optimization': 'problem_optimization', 'icon': 'icon', 'work_flow': 'work_flow',
+            'problem_optimization': 'problem_optimization', 'work_flow': 'work_flow',
             'problem_optimization_prompt': 'problem_optimization_prompt', 'tts_model_id': 'tts_model_id',
             'stt_model_id': 'stt_model_id', 'tts_model_enable': 'tts_model_enable',
             'stt_model_enable': 'stt_model_enable', 'tts_type': 'tts_type',
