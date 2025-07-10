@@ -298,7 +298,6 @@ class ToolSerializer(serializers.Serializer):
                 if get_authorized_tool:
                     if not get_authorized_tool(QuerySet(Tool).filter(id=self.data.get('id')), workspace_id).exists():
                         raise AppApiException(500, _('Tool id does not exist'))
-                raise AppApiException(500, _('Tool id does not exist'))
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
