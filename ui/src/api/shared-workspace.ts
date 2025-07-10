@@ -1,10 +1,11 @@
 import { Result } from '@/request/Result'
 import { get, post, del, put, exportFile, exportExcel } from '@/request/index'
 import { type Ref } from 'vue'
-import type { pageRequest } from '@/api/type/common'
+import type { PageList, pageRequest } from '@/api/type/common'
 import type { knowledgeData } from '@/api/type/knowledge'
 
 import useStore from '@/stores'
+import type { ChatUserGroupItem } from './type/workspaceChatUser'
 
 const prefix = '/system/shared'
 const prefix_workspace: any = { _value: 'workspace/' }
@@ -102,6 +103,29 @@ const getProblemsPage: (
 }
 
 /**
+ * 获取工作空间下共享知识库用户组的用户列表
+ */
+const getUserGroupUserList: (
+  resource: any,
+  user_group_id:string,
+  page: pageRequest,
+  username_or_nickname: string,
+  loading?: Ref<boolean>,
+) => Promise<Result<PageList<ChatUserGroupItem[]>>> = (resource, user_group_id, page, username_or_nickname, loading) => {
+  return get (
+    `${prefix}/${prefix_workspace.value}/KNOWLEDGE/${resource.resource_id}/user_group_id/${user_group_id}/${page.current_page}/${page.page_size}`
+    ,username_or_nickname ? {username_or_nickname} : undefined, loading,
+  )
+}
+
+/**
+ * 获取工作空间下共享知识库的用户组 
+ */
+const getUserGroupList: (resource: any, loading?: Ref<boolean>) => Promise<Result<ChatUserGroupItem[]>> = (resource, loading) => {
+  return get (`${prefix}/${prefix_workspace.value}/KNOWLEDGE/${resource.resource_id}/user_group`, undefined, loading)
+}
+
+/**
  * 段落分页列表
  * @param 参数 knowledge_id document_id
  * param {
@@ -157,4 +181,6 @@ export default {
   getModelList,
   getToolList,
   getToolListPage,
+  getUserGroupList,
+  getUserGroupUserList
 }

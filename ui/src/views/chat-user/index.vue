@@ -179,14 +179,14 @@ import { useRoute } from 'vue-router'
 import { SourceTypeEnum } from '@/enums/common'
 import { MsgSuccess } from '@/utils/message'
 import { ComplexPermission } from '@/utils/permission/type'
-import { EditionConst, RoleConst, PermissionConst } from '@/utils/permission/data'
+import { RoleConst, PermissionConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 const route = useRoute()
 
 const {
-  params: { id },
+  params: { id, folderId },
 } = route as any
 
 const permissionObj = ref<any>({
@@ -240,6 +240,7 @@ async function getUserGroupList() {
   try {
     const res = await loadSharedApi({
       type: 'chatUser',
+      isShared: isShared.value,
       systemType: apiType.value,
     }).getUserGroupList(resource, loading)
     list.value = res.data
@@ -308,11 +309,16 @@ const paginationConfig = reactive({
 
 const tableData = ref<ChatUserGroupUserItem[]>([])
 
+const isShared = computed(() => {
+  return folderId === 'share'
+})
+
 async function getList() {
   if (!current.value?.id) return
   try {
     const res = await loadSharedApi({
       type: 'chatUser',
+      isShared: isShared.value,
       systemType: apiType.value,
     }).getUserGroupUserList(
       resource,
