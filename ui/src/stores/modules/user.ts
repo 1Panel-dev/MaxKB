@@ -11,7 +11,6 @@ import { defaultPlatformSetting } from '@/utils/theme'
 import useLoginStore from './login'
 
 export interface userStateTypes {
-  userType: number // 1 系统操作者 2 对话用户
   userInfo: User | null
   version?: string
   license_is_valid: boolean
@@ -22,7 +21,6 @@ export interface userStateTypes {
 
 const useUserStore = defineStore('user', {
   state: (): userStateTypes => ({
-    userType: 1, // 1 系统操作者 2 对话用户
     userInfo: null,
     version: '',
     license_is_valid: false,
@@ -32,11 +30,8 @@ const useUserStore = defineStore('user', {
   }),
   actions: {
     getLanguage() {
-      return this.userType === 1
-        ? localStorage.getItem('MaxKB-locale') || getBrowserLang()
-        : sessionStorage.getItem('language') || getBrowserLang()
+      return localStorage.getItem('MaxKB-locale') || getBrowserLang()
     },
-
     setWorkspaceId(workspace_id: string) {
       this.workspace_id = workspace_id
       localStorage.setItem('workspace_id', workspace_id)

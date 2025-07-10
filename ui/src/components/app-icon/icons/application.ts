@@ -292,7 +292,7 @@ export default {
       ])
     },
   },
-  'app-play-outlined': {
+  'app-debug-outlined': {
     iconReader: () => {
       return h('i', [
         h(

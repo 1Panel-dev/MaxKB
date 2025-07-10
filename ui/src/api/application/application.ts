@@ -301,7 +301,7 @@ const getMcpTools: (
  * 上传文件
  * @param 参数  file:file
  */
-const uploadFile: (
+const postUploadFile: (
   file: any,
   sourceId: string,
   resourceType:
@@ -313,12 +313,13 @@ const uploadFile: (
     | 'TEMPORARY_30_MINUTE'
     | 'TEMPORARY_120_MINUTE'
     | 'TEMPORARY_1_DAY',
-) => Promise<Result<any>> = (file, sourceId, resourceType) => {
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (file, sourceId, resourceType, loading) => {
   const fd = new FormData()
   fd.append('file', file)
   fd.append('source_id', sourceId)
   fd.append('source_type', resourceType)
-  return post(`/oss/file`, fd)
+  return post(`/oss/file`, fd, undefined, loading)
 }
 
 export default {
@@ -346,5 +347,5 @@ export default {
   postTextToSpeech,
   speechToText,
   getMcpTools,
-  uploadFile,
+  postUploadFile,
 }

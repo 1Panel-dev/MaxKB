@@ -297,7 +297,7 @@ const modifyChat: (chat_id: string, data: any, loading?: Ref<boolean>) => Promis
  * @param resourceType  资源类型
  * @returns
  */
-const uploadFile: (
+const postUploadFile: (
   file: any,
   sourceId: string,
   resourceType:
@@ -309,12 +309,13 @@ const uploadFile: (
     | 'TEMPORARY_30_MINUTE'
     | 'TEMPORARY_120_MINUTE'
     | 'TEMPORARY_1_DAY',
-) => Promise<Result<any>> = (file, sourceId, sourceType) => {
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (file, sourceId, sourceType, loading) => {
   const fd = new FormData()
   fd.append('file', file)
   fd.append('source_id', sourceId)
   fd.append('source_type', sourceType)
-  return post(`/oss/file`, fd)
+  return post(`/oss/file`, fd, undefined, loading)
 }
 export default {
   open,
@@ -344,5 +345,5 @@ export default {
   speechToText,
   deleteChat,
   modifyChat,
-  uploadFile,
+  postUploadFile,
 }

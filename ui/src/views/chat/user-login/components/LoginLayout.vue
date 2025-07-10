@@ -16,13 +16,13 @@
                   @click="changeLang(lang.value)"
                   class="flex-between"
                 >
-                  <span :class="lang.value === user.getLanguage() ? 'primary' : ''">{{
+                  <span :class="lang.value === chatUser.getLanguage() ? 'primary' : ''">{{
                     lang.label
                   }}</span>
 
                   <el-icon
-                    :class="lang.value === user.getLanguage() ? 'primary' : ''"
-                    v-if="lang.value === user.getLanguage()"
+                    :class="lang.value === chatUser.getLanguage() ? 'primary' : ''"
+                    v-if="lang.value === chatUser.getLanguage()"
                   >
                     <Check />
                   </el-icon>
@@ -51,7 +51,7 @@ defineProps({
     default: true,
   },
 })
-const { user, theme } = useStore()
+const { chatUser, theme } = useStore()
 
 const changeLang = (lang: string) => {
   useLocalStorage(localeConfigKey, getBrowserLang()).value = lang
@@ -59,7 +59,7 @@ const changeLang = (lang: string) => {
 }
 
 const currentLanguage = computed(() => {
-  return langList.value?.filter((v: any) => v.value === user.getLanguage())?.[0]?.label
+  return langList.value?.filter((v: any) => v.value === chatUser.getLanguage())?.[0]?.label
 })
 
 const fileURL = computed(() => {

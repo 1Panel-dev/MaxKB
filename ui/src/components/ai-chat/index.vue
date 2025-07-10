@@ -51,7 +51,9 @@
               :executionIsRightPanel="props.executionIsRightPanel"
               @open-execution-detail="emit('openExecutionDetail', chatList[index])"
               @openParagraph="emit('openParagraph', chatList[index])"
-              @openParagraphDocument="(val: any)=>emit('openParagraphDocument', chatList[index], val)"
+              @openParagraphDocument="
+                (val: any) => emit('openParagraphDocument', chatList[index], val)
+              "
             ></AnswerContent>
           </template>
           <TransitionContent
@@ -77,9 +79,6 @@
         v-model:show-user-input="showUserInput"
         v-if="type !== 'log'"
       >
-        <template #operateBefore>
-          <slot name="operateBefore"> </slot>
-        </template>
         <template #userInput>
           <el-button
             v-if="isUserInput || isAPIInput"
@@ -105,7 +104,6 @@ import chatLogApi from '@/api/application/chat-log'
 import { ChatManagement, type chatType } from '@/api/type/application'
 import { randomId } from '@/utils/common'
 import useStore from '@/stores'
-import { isWorkFlow } from '@/utils/application'
 import { debounce } from 'lodash'
 import AnswerContent from '@/components/ai-chat/component/answer-content/index.vue'
 import QuestionContent from '@/components/ai-chat/component/question-content/index.vue'
@@ -139,7 +137,13 @@ const props = withDefaults(
     type: 'ai-chat',
   },
 )
-const emit = defineEmits(['refresh', 'scroll', 'openExecutionDetail', 'openParagraph','openParagraphDocument'])
+const emit = defineEmits([
+  'refresh',
+  'scroll',
+  'openExecutionDetail',
+  'openParagraph',
+  'openParagraphDocument',
+])
 const { application, common } = useStore()
 const isMobile = computed(() => {
   return common.isMobile() || mode === 'embed' || mode === 'mobile'
@@ -246,14 +250,18 @@ function sendMessage(val: string, other_params_data?: any, chat?: chatType): Pro
       return userFormRef.value
         ?.validate()
         .then((ok) => {
-          let userFormData = JSON.parse(localStorage.getItem(`${accessToken}userForm`) || '{}')
+          let userFormData = accessToken
+            ? JSON.parse(localStorage.getItem(`${accessToken}userForm`) || '{}')
+            : {}
           const newData = Object.keys(form_data.value).reduce((result: any, key: string) => {
             result[key] = Object.prototype.hasOwnProperty.call(userFormData, key)
               ? userFormData[key]
               : form_data.value[key]
             return result
           }, {})
-          localStorage.setItem(`${accessToken}userForm`, JSON.stringify(newData))
+          if (accessToken) {
+            localStorage.setItem(`${accessToken}userForm`, JSON.stringify(newData))
+          }
 
           showUserInput.value = false
 
@@ -300,11 +308,11 @@ const openChatId: () => Promise<string> = () => {
       return res.data
     })
     .catch((res) => {
-      if (res.response.status === 403) {
-        return application.asyncAppAuthentication(accessToken).then(() => {
-          return openChatId()
-        })
-      }
+      // if (res.response.status === 403) {
+      //   return application.asyncAppAuthentication(accessToken).then(() => {
+      //     return openChatId()
+      //   })
+      // }
       return Promise.reject(res)
     })
 }
@@ -512,16 +520,7 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean, other_para
     // 对话
     getChatMessageAPI()(chartOpenId.value, obj)
       .then((response) => {
-        if (response.status === 401) {
-          application
-            .asyncAppAuthentication(accessToken)
-            .then(() => {
-              chatMessage(chat, problem)
-            })
-            .catch(() => {
-              errorWrite(chat)
-            })
-        } else if (response.status === 460) {
+        if (response.status === 460) {
           return Promise.reject(t('chat.tip.errorIdentifyMessage'))
         } else if (response.status === 461) {
           return Promise.reject(t('chat.tip.errorLimitMessage'))
@@ -660,6 +659,13 @@ defineExpose({
   bottom: 50px;
   width: calc(100% - 50px);
   max-width: 400px;
+}
+
+.video-stop-button {
+  box-shadow: 0px 6px 24px 0px rgba(31, 35, 41, 0.08);
+  &:hover {
+    background: #ffffff;
+  }
 }
 @media only screen and (max-width: 768px) {
   .firstUserInput {

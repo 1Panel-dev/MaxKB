@@ -2,7 +2,7 @@
   <el-dropdown placement="bottom-start" class="workspace-dropdown" popper-class="workspace-dropdown-popper">
     <el-button text style="font-size: 14px" class="workspace-dropdown__button">
       <AppIcon iconName="app-workspace" style="font-size: 18px"></AppIcon>
-      <span class="ellipsis" style="max-width: 155px">
+      <span class="ellipsis" style="max-width: 155px" :title="currentWorkspace?.name">
         {{ currentWorkspace?.name }}
       </span>
       <el-icon class="el-icon--right">
@@ -19,7 +19,7 @@
             :class="`${item.id === currentWorkspace?.id ? 'active' : ''} flex-between`" @click="changeWorkspace(item)">
             <div class="flex align-center">
               <AppIcon class="mr-8" iconName="app-workspace" style="font-size: 16px"></AppIcon>
-              <span class="ellipsis">
+              <span class="ellipsis" :title="item.name">
                 {{ item.name }}
               </span>
             </div>

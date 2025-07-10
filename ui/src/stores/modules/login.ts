@@ -1,32 +1,19 @@
-import {defineStore} from 'pinia'
-import {type Ref} from 'vue'
+import { defineStore } from 'pinia'
+import { type Ref } from 'vue'
 import LoginApi from '@/api/user/login'
-import type {LoginRequest} from '@/api/type/login'
+import type { LoginRequest } from '@/api/type/login'
 import useUserStore from './user'
 
 const useLoginStore = defineStore('login', {
   state: () => ({
     token: '',
-    userAccessToken: '',
   }),
   actions: {
     getToken(): string | null {
       if (this.token) {
         return this.token
       }
-      const user = useUserStore()
-      return user.userType === 1 ? localStorage.getItem('token') : this.getAccessToken()
-    },
-    getAccessToken() {
-      const token = sessionStorage.getItem(`${this.userAccessToken}-accessToken`)
-      if (token) {
-        return token
-      }
-      const local_token = localStorage.getItem(`${token}-accessToken`)
-      if (local_token) {
-        return local_token
-      }
-      return localStorage.getItem(`accessToken`)
+      return localStorage.getItem('token')
     },
 
     async asyncLogin(data: LoginRequest, loading?: Ref<boolean>) {
@@ -99,7 +86,6 @@ const useLoginStore = defineStore('login', {
         return ok.data
       })
     },
-
   },
 })
 

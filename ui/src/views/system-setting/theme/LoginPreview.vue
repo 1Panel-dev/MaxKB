@@ -1,5 +1,5 @@
 <template>
-  <div class="login-preview mr-16">
+  <div class="login-preview mr-16 white-bg">
     <div class="header">
       <div class="tag flex-between">
         <div class="flex align-center">
@@ -78,7 +78,6 @@ const fileURL = computed(() => {
 
 <style lang="scss" scoped>
 .login-preview {
-  background: #ffffff;
   border-radius: 4px;
   transform-origin: center;
   .login-container {

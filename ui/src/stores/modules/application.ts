@@ -47,27 +47,6 @@ const useApplicationStore = defineStore('application', {
       })
     },
 
-    async asyncAppAuthentication(
-      token: string,
-      loading?: Ref<boolean>,
-      authentication_value?: any,
-    ) {
-      return new Promise((resolve, reject) => {
-        applicationApi
-          .postAppAuthentication(token, loading, authentication_value)
-          .then((res: any) => {
-            localStorage.setItem(`${token}-accessToken`, res.data)
-            sessionStorage.setItem(`${token}-accessToken`, res.data)
-            resolve(res)
-          })
-          .catch((error: any) => {
-            reject(error)
-          })
-      })
-    },
-    async refreshAccessToken(token: string) {
-      this.asyncAppAuthentication(token)
-    },
     // 修改应用
     async asyncPutApplication(id: string, data: any, loading?: Ref<boolean>) {
       return new Promise((resolve, reject) => {

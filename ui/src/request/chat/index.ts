@@ -24,8 +24,8 @@ instance.interceptors.request.use(
     }
     const { chatUser } = useStore()
     const token = chatUser.getToken()
-    // const language = chatUser.getLanguage()
-    // config.headers['Accept-Language'] = `${language}`
+    const language = chatUser.getLanguage()
+    config.headers['Accept-Language'] = `${language}`
     if (token) {
       config.headers['AUTHORIZATION'] = `Bearer ${token}`
     }
@@ -177,12 +177,12 @@ export const postStream: (url: string, data?: unknown) => Promise<Result<any> | 
 ) => {
   const { chatUser } = useStore()
   const token = chatUser.getToken()
-  // const language = user.getLanguage()
+  const language = chatUser.getLanguage()
   const headers: HeadersInit = { 'Content-Type': 'application/json' }
   if (token) {
     headers['AUTHORIZATION'] = `Bearer ${token}`
   }
-  // headers['Accept-Language'] = `${language}`
+  headers['Accept-Language'] = `${language}`
   return fetch(url, {
     method: 'POST',
     body: data ? JSON.stringify(data) : undefined,

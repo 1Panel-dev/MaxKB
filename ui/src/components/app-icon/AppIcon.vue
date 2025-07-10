@@ -4,7 +4,7 @@
     :is="
       Object.keys(iconMap).includes(iconName)
         ? iconMap[iconName].iconReader()
-        : iconMap['404'].iconReader()
+        : iconMap['app-404'].iconReader()
     "
     class="el-icon app-icon"
   >
@@ -22,7 +22,7 @@ const props = withDefaults(
     iconName?: string
   }>(),
   {
-    iconName: '404',
+    iconName: 'app-404',
   },
 )
 

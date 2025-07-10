@@ -166,7 +166,7 @@ import PasswordAuth from '@/views/chat/auth/component/password.vue'
 import { isAppIcon } from '@/utils/common'
 
 const router = useRouter()
-const { login, user, theme, chatUser } = useStore()
+const { theme, chatUser } = useStore()
 const { locale } = useI18n({ useScope: 'global' })
 const loading = ref<boolean>(false)
 const route = useRoute()
@@ -226,6 +226,7 @@ function makeCode() {
 }
 
 onBeforeMount(() => {
+  locale.value = chatUser.getLanguage()
   makeCode()
 })
 

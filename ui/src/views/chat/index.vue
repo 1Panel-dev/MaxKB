@@ -7,10 +7,11 @@
   />
 </template>
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onBeforeMount } from 'vue'
 import { useRoute } from 'vue-router'
 import useStore from '@/stores'
-
+import { useI18n } from 'vue-i18n'
+const { locale } = useI18n({ useScope: 'global' })
 const route = useRoute()
 const { chatUser, common } = useStore()
 
@@ -23,7 +24,6 @@ const {
 } = route as any
 
 const currentTemplate = computed(() => {
-  console.log(common.isMobile())
   let modeName = ''
   if (!mode || mode === 'pc') {
     modeName = common.isMobile() ? 'mobile' : 'pc'
@@ -34,6 +34,8 @@ const currentTemplate = computed(() => {
   return components[name].default
 })
 
-
 const applicationAvailable = ref<boolean>(true)
+onBeforeMount(() => {
+  locale.value = chatUser.getLanguage()
+})
 </script>

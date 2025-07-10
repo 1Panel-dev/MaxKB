@@ -1,10 +1,16 @@
 <template>
   <div class="ai-chat__operate p-16">
+    <div class="text-center mb-8" v-if="loading">
+      <el-button class="border-primary video-stop-button" @click="stopChat">
+        <app-icon iconName="app-video-stop" class="mr-8"></app-icon>
+        {{ $t('chat.operation.stopChat') }}</el-button
+      >
+    </div>
     <div class="operate-textarea">
       <el-scrollbar max-height="136">
         <div
           class="p-8-12"
-          v-loading="localLoading"
+          v-loading="uploadLoading"
           v-if="
             uploadDocumentList.length ||
             uploadImageList.length ||
@@ -143,6 +149,7 @@
                   </el-icon>
                 </div>
                 <el-image
+                  v-if="item.url"
                   :src="item.url"
                   alt=""
                   fit="cover"
@@ -299,7 +306,6 @@ import bus from '@/bus'
 import 'recorder-core/src/engine/mp3'
 import 'recorder-core/src/engine/mp3-engine'
 import { MsgWarning } from '@/utils/message'
-import { debounce } from 'lodash'
 import chatAPI from '@/api/chat/chat'
 const router = useRouter()
 const route = useRoute()
@@ -346,6 +352,8 @@ const localLoading = computed({
     emit('update:loading', v)
   },
 })
+
+const uploadLoading = ref(false)
 
 const inputPlaceholder = computed(() => {
   return recorderStatus.value === 'START'
@@ -430,8 +438,13 @@ const uploadFile = async (file: any, fileList: any) => {
   }
   const api =
     props.type === 'debug-ai-chat'
-      ? applicationApi.uploadFile(file.raw, 'TEMPORARY_120_MINUTE', 'TEMPORARY_120_MINUTE')
-      : chatAPI.uploadFile(file.raw, chatId_context.value, 'CHAT')
+      ? applicationApi.postUploadFile(
+          file.raw,
+          'TEMPORARY_120_MINUTE',
+          'TEMPORARY_120_MINUTE',
+          uploadLoading,
+        )
+      : chatAPI.postUploadFile(file.raw, chatId_context.value, 'CHAT', uploadLoading)
   api.then((ok) => {
     file.url = ok.data
     const split_path = ok.data.split('/')
@@ -639,7 +652,7 @@ class RecorderManage {
 }
 const getSpeechToTextAPI = () => {
   if (props.type === 'ai-chat') {
-    return (application_id?: string, data?: any, loading?: Ref<boolean>) => {
+    return (data?: any, loading?: Ref<boolean>) => {
       return chatAPI.speechToText(data, loading)
     }
   } else {
@@ -801,6 +814,10 @@ function mouseenter(row: any) {
 
 function mouseleave() {
   showDelete.value = ''
+}
+
+function stopChat() {
+  bus.emit('chat:stop')
 }
 onMounted(() => {
   bus.on('chat-input', (message: string) => {

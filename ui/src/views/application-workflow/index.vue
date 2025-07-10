@@ -1,6 +1,6 @@
 <template>
   <div class="application-workflow" v-loading="loading">
-    <div class="header border-b flex-between p-12-24">
+    <div class="header border-b flex-between p-12-24 white-bg">
       <div class="flex align-center">
         <back-button @click="back"></back-button>
         <h4>{{ detail?.name }}</h4>
@@ -29,7 +29,7 @@
           {{ $t('views.applicationWorkflow.setting.addComponent') }}
         </el-button>
         <el-button @click="clickShowDebug" :disabled="showDebug">
-          <AppIcon iconName="app-play-outlined" class="mr-4"></AppIcon>
+          <AppIcon iconName="app-debug-outlined" class="mr-4"></AppIcon>
           {{ $t('views.applicationWorkflow.setting.debug') }}</el-button
         >
         <el-button @click="saveApplication(true)">
@@ -142,7 +142,7 @@ import Workflow from '@/workflow/index.vue'
 import DropdownMenu from '@/views/application-workflow/component/DropdownMenu.vue'
 import PublishHistory from '@/views/application-workflow/component/PublishHistory.vue'
 import ApplicationAPI from '@/api/application/application'
-import { isAppIcon,resetUrl } from '@/utils/common'
+import { isAppIcon, resetUrl } from '@/utils/common'
 import { MsgSuccess, MsgError, MsgConfirm } from '@/utils/message'
 import { datetimeFormat } from '@/utils/time'
 import { mapToUrlParams } from '@/utils/application'
@@ -575,9 +575,6 @@ onBeforeUnmount(() => {
 .application-workflow {
   background: var(--app-layout-bg-color);
   height: 100%;
-  .header {
-    background: #ffffff;
-  }
   .workflow-main {
     height: calc(100vh - 62px);
     box-sizing: border-box;

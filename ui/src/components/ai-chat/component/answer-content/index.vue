@@ -73,11 +73,11 @@
   </div>
 </template>
 <script setup lang="ts">
+import { computed, onMounted } from 'vue'
 import KnowledgeSourceComponent from '@/components/ai-chat/component/knowledge-source-component/index.vue'
 import MdRenderer from '@/components/markdown/MdRenderer.vue'
 import OperationButton from '@/components/ai-chat/component/operation-button/index.vue'
 import { type chatType } from '@/api/type/application'
-import { computed } from 'vue'
 import bus from '@/bus'
 import useStore from '@/stores'
 const props = defineProps<{
@@ -100,7 +100,7 @@ const emit = defineEmits([
 ])
 
 const showAvatar = computed(() => {
-  return (user.isEE() || user.isPE())? props.application.show_avatar : true
+  return user.isEE() || user.isPE() ? props.application.show_avatar : true
 })
 const showUserAvatar = computed(() => {
   return user.isEE() || user.isPE() ? props.application.show_user_avatar : true
@@ -165,5 +165,11 @@ const stopChat = (chat: chatType) => {
 const startChat = (chat: chatType) => {
   props.chatManagement.write(chat.id)
 }
+
+onMounted(() => {
+  bus.on('chat:stop', () => {
+    stopChat(props.chatRecord)
+  })
+})
 </script>
 <style lang="scss" scoped></style>

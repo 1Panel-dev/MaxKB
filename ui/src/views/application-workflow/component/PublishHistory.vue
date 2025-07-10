@@ -1,5 +1,5 @@
 <template>
-  <div class="workflow-publish-history border-l">
+  <div class="workflow-publish-history border-l white-bg">
     <h4 class="border-b p-16-24">{{ $t('views.applicationWorkflow.setting.releaseHistory') }}</h4>
     <div class="list-height pt-0">
       <el-scrollbar>
@@ -137,7 +137,6 @@ onMounted(() => {
   position: absolute;
   right: 0;
   top: 57px;
-  background: #ffffff;
   height: calc(100vh - 57px);
   z-index: 9;
   .list-height {

@@ -14,7 +14,11 @@
     </el-button>
     <!-- 使用 custom-class 自定义样式 -->
     <transition name="el-fade-in-linear">
-      <el-card class="custom-speech-card" :class="isTouching ? '' : 'active'" v-if="dialogVisible">
+      <el-card
+        class="custom-speech-card white-bg"
+        :class="isTouching ? '' : 'active'"
+        v-if="dialogVisible"
+      >
         <p>
           <el-text type="info" v-if="isTouching"
             >00:{{ props.time < 10 ? `0${props.time}` : props.time }}</el-text
@@ -43,16 +47,16 @@ import { ref, watch } from 'vue'
 const props = defineProps({
   time: {
     type: Number,
-    default: 0
+    default: 0,
   },
   start: {
     type: Boolean,
-    default: false
+    default: false,
   },
   disabled: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 })
 const emit = defineEmits(['TouchStart', 'TouchEnd'])
 // 移动端语音
@@ -77,7 +81,7 @@ watch(
       dialogVisible.value = false
       isTouching.value = false
     }
-  }
+  },
 )
 watch(
   () => props.start,
@@ -90,7 +94,7 @@ watch(
       dialogVisible.value = false
       isTouching.value = false
     }
-  }
+  },
 )
 
 function onTouchStart(event: any) {
@@ -127,7 +131,6 @@ function onTouchEnd() {
   left: 50%; /* 水平居中 */
   transform: translateX(-50%);
   width: 92%;
-  background: #ffffff;
   border: 1px solid #ffffff;
   box-shadow: 0px 6px 24px 0px rgba(31, 35, 41, 0.08);
   z-index: 999;

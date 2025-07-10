@@ -1,5 +1,5 @@
 <template>
-  <div v-show="show" class="workflow-dropdown-menu border border-r-6">
+  <div v-show="show" class="workflow-dropdown-menu border border-r-6 white-bg">
     <el-tabs v-model="activeName" class="workflow-dropdown-tabs">
       <div style="display: flex; width: 100%; justify-content: center" class="mb-12">
         <el-input
@@ -321,7 +321,6 @@ onMounted(() => {
   z-index: 99;
   width: 400px;
   box-shadow: 0px 4px 8px 0px var(--app-text-color-light-1);
-  background: #ffffff;
   padding-bottom: 8px;
 
   .title {

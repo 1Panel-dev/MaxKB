@@ -3,9 +3,8 @@ import ChatAPI from '@/api/chat/chat'
 import type { ChatProfile, ChatUserProfile } from '@/api/type/chat'
 import type { LoginRequest } from '@/api/type/user'
 import type { Ref } from 'vue'
-import { useLocalStorage } from '@vueuse/core'
-import { localeConfigKey } from '@/locales/index'
-import useUserStore from './user'
+import { getBrowserLang } from '@/locales/index'
+
 interface ChatUser {
   // 用户id
   id: string
@@ -24,6 +23,9 @@ const useChatUserStore = defineStore('chat-user', {
     accessToken: undefined,
   }),
   actions: {
+    getLanguage() {
+      return localStorage.getItem(`${this.accessToken}-locale`) || getBrowserLang()
+    },
     setAccessToken(accessToken: string) {
       this.accessToken = accessToken
     },
@@ -41,9 +43,8 @@ const useChatUserStore = defineStore('chat-user', {
     applicationProfile() {
       return ChatAPI.applicationProfile().then((ok) => {
         this.application = ok.data
-        const user = useUserStore()
-        useLocalStorage<string>(localeConfigKey, 'en-US').value =
-          ok?.data?.language || user.getLanguage()
+        localStorage.setItem(`${this.accessToken}-locale`, ok.data?.language || this.getLanguage())
+
         if (this.application.custom_theme) {
           this.application['custom_theme']['theme_color'] =
             ok.data?.custom_theme?.theme_color || '#3370FF'
