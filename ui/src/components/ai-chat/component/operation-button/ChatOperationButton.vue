@@ -464,11 +464,15 @@ class AudioManage {
       if (window.speechSynthesis.paused) {
         window.speechSynthesis.resume()
       } else {
-        if (window.speechSynthesis.pending) {
+        // 如果不是暂停状态，取消当前播放并重新开始
+        if (window.speechSynthesis.speaking) {
           window.speechSynthesis.cancel()
         }
-        speechSynthesis.speak(audioElement)
-        this.statusList[index] = AudioStatus.PLAY_INT
+        // 等待取消完成后重新播放
+        setTimeout(() => {
+          speechSynthesis.speak(audioElement)
+          this.statusList[index] = AudioStatus.PLAY_INT
+        }, 100)
       }
     }
   }
@@ -489,11 +493,6 @@ class AudioManage {
       this.statusList[index] = AudioStatus.READY
       if (self) {
         window.speechSynthesis.pause()
-        nextTick(() => {
-          if (!window.speechSynthesis.paused) {
-            window.speechSynthesis.cancel()
-          }
-        })
       } else {
         window.speechSynthesis.cancel()
       }
