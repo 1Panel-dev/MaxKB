@@ -48,20 +48,18 @@
 </template>
 <script setup lang="ts">
 import { cloneDeep } from 'lodash'
-import { ref, computed } from 'vue'
+import { ref, computed, watchEffect } from 'vue'
 import EditParagraphDialog from './EditParagraphDialog.vue'
 import { MsgConfirm } from '@/utils/message'
 import { t } from '@/locales'
+
 const page_size = ref<number>(30)
 const current_page = ref<number>(1)
 const currentCIndex = ref<number>(0)
 const EditParagraphDialogRef = ref()
 const emit = defineEmits(['update:modelValue'])
 const loading = ref<boolean>(false)
-const editHandle = (item: any, cIndex: number) => {
-  currentCIndex.value = cIndex
-  EditParagraphDialogRef.value.open(item)
-}
+const localParagraphList = ref<any[]>([])
 
 const props = defineProps({
   modelValue: {
@@ -72,14 +70,32 @@ const props = defineProps({
   knowledgeId: String
 })
 
+// 监听分页变化，只加载需要的数据
+watchEffect(() => {
+  const start = 0;
+  const end = page_size.value * current_page.value;
+  // 只获取所需数量的数据，而不是每次都对整个数组进行切片
+  if (end <= props.modelValue.length) {
+    localParagraphList.value = props.modelValue.slice(start, end);
+  }
+})
+
 const paragraph_list = computed(() => {
-  return props.modelValue.slice(0, page_size.value * (current_page.value - 1) + page_size.value)
+  return localParagraphList.value;
 })
 
 const next = () => {
-  loading.value = true
-  current_page.value += 1
-  loading.value = false
+  loading.value = true;
+  setTimeout(() => {
+    current_page.value += 1;
+    loading.value = false;
+  }, 100); // 添加小延迟让UI有时间更新
+}
+
+const editHandle = (item: any, cIndex: number) => {
+  // 计算实际索引，考虑分页
+  currentCIndex.value = cIndex + (page_size.value * (current_page.value - 1));
+  EditParagraphDialogRef.value.open(item)
 }
 
 const updateContent = (data: any) => {
@@ -95,9 +111,18 @@ const updateContent = (data: any) => {
   }
   new_value[currentCIndex.value] = cloneDeep(data)
   emit('update:modelValue', new_value)
+
+  // 更新本地列表
+  const localIndex = currentCIndex.value - (page_size.value * (current_page.value - 1));
+  if (localIndex >= 0 && localIndex < localParagraphList.value.length) {
+    localParagraphList.value[localIndex] = cloneDeep(data);
+  }
 }
 
 const deleteHandle = (item: any, cIndex: number) => {
+  // 计算实际索引，考虑分页
+  const actualIndex = cIndex + (page_size.value * (current_page.value - 1));
+
   MsgConfirm(
     `${t('views.paragraph.delete.confirmTitle')}${item.title || '-'} ?`,
     t('views.paragraph.delete.confirmMessage'),
@@ -108,8 +133,18 @@ const deleteHandle = (item: any, cIndex: number) => {
   )
     .then(() => {
       const new_value = [...props.modelValue]
-      new_value.splice(cIndex, 1)
+      new_value.splice(actualIndex, 1)
       emit('update:modelValue', new_value)
+
+      // 更新本地列表
+      localParagraphList.value.splice(cIndex, 1);
+      // 如果当前页删除完了，从总数据中再取一条添加到末尾
+      if (props.modelValue.length > localParagraphList.value.length * current_page.value) {
+        const nextItem = props.modelValue[localParagraphList.value.length * current_page.value];
+        if (nextItem) {
+          localParagraphList.value.push(nextItem);
+        }
+      }
     })
     .catch(() => {})
 }
