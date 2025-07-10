@@ -8481,3 +8481,6 @@ msgstr ""
 
 msgid "Delete application API_KEY"
 msgstr ""
+
+msgid "knowledge Base"
+msgstr ""

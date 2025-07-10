@@ -8603,7 +8603,10 @@ msgid "Export Application"
 msgstr "導出應用"
 
 msgid "Add ApiKey"
-msgstr "添加 ApiKey"
+msgstr "添加 API KEY"
 
 msgid "Delete application API_KEY"
 msgstr "删除應用 API KEY"
+
+msgid "knowledge Base"
+msgstr "知識庫"
