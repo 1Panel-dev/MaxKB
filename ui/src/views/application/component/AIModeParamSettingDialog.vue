@@ -24,7 +24,9 @@
         <el-button @click.prevent="dialogVisible = false">
           {{ $t('common.cancel') }}
         </el-button>
-        <el-button type="primary" @click="submit" :loading="loading">
+        <el-button type="primary" @click="submit" :loading="loading"
+          v-if="permissionPrecise.paramSetting(modelID)"
+        >
           {{ $t('common.confirm') }}
         </el-button>
       </span>
@@ -33,11 +35,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import type { FormField } from '@/components/dynamics-form/type'
 import modelAPi from '@/api/model/model'
 import applicationApi from '@/api/application/application'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
+import permissionMap from '@/permission'
+
 const model_form_field = ref<Array<FormField>>([])
 const emit = defineEmits(['refresh'])
 const dynamicsFormRef = ref<InstanceType<typeof DynamicsForm>>()
@@ -47,7 +51,15 @@ const loading = ref(false)
 const getApi = (model_id: string, application_id?: string) => {
   return modelAPi.getModelParamsForm(model_id, loading)
 }
+
+const modelID = ref('')
+
+const permissionPrecise = computed(() => {
+  return permissionMap['model']['workspace']
+})
+
 const open = (model_id: string, application_id?: string, model_setting_data?: any) => {
+  modelID.value = model_id
   form_data.value = {}
   const api = getApi(model_id, application_id)
   api.then((ok) => {
