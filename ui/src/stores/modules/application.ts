@@ -25,16 +25,16 @@ const useApplicationStore = defineStore('application', {
     async asyncGetAccessToken(id: string, loading?: Ref<boolean>) {
       return new Promise((resolve, reject) => {
         const user = useUserStore()
-        if (user.isEE() || user.isPE()) {
-          applicationXpackApi
-            .getAccessToken(id, loading)
-            .then((data) => {
-              resolve(data)
-            })
-            .catch((error) => {
-              reject(error)
-            })
-        } else {
+        // if (user.isEE() || user.isPE()) {
+        //   applicationXpackApi
+        //     .getAccessToken(id, loading)
+        //     .then((data) => {
+        //       resolve(data)
+        //     })
+        //     .catch((error) => {
+        //       reject(error)
+        //     })
+        // } else {
           applicationApi
             .getAccessToken(id, loading)
             .then((data) => {
@@ -43,7 +43,7 @@ const useApplicationStore = defineStore('application', {
             .catch((error) => {
               reject(error)
             })
-        }
+        // }
       })
     },
 

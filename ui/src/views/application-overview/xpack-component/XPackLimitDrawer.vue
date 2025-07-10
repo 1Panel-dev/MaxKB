@@ -34,7 +34,7 @@
         v-if="form.authentication"
         v-model="form.authentication_value.type"
         class="card__radio"
-        @change="(val: string) => val === 'password' && refreshAuthentication()"
+        @change="(val: string) => val === 'password'"
       >
         <el-card
           shadow="never"
@@ -179,16 +179,16 @@ watch(dialogVisible, (bool) => {
     }
   }
 })
-watch(
-  () => form.value.authentication,
-  (b) => {
-    if (b) {
-      applicationApi.getChatUserAuthType().then((ok) => {
-        auth_list.value = ok.data
-      })
-    }
-  },
-)
+// watch(
+//   () => form.value.authentication,
+//   (b) => {
+//     if (b) {
+//       applicationApi.getChatUserAuthType().then((ok) => {
+//         auth_list.value = ok.data
+//       })
+//     }
+//   },
+// )
 const open = (data: any) => {
   form.value.access_num = data.access_num
   form.value.white_active = data.white_active
@@ -196,7 +196,7 @@ const open = (data: any) => {
   form.value.authentication_value = data.authentication_value || {
     type: 'password',
   }
-  if (form.value.authentication_value.type === 'password') {
+  if (form.value.authentication_value.type === 'password' && !form.value.authentication_value.password_value) {
     refreshAuthentication()
   }
   form.value.authentication = data.authentication
@@ -239,6 +239,7 @@ function refreshAuthentication() {
 }
 
 function firstGeneration() {
+  console.log('firstGeneration')
   if (form.value.authentication && !form.value.authentication_value) {
     form.value.authentication_value = generateAuthenticationValue()
   }
