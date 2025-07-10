@@ -61,9 +61,9 @@ class BaseDocumentExtractNode(IDocumentExtractNode):
                     'application_id': str(application.id) if application.id else None,
                     'file_id': str(image.id)
                 }
-                file = bytes_to_uploaded_file(image.image, image.image_name)
+                f = bytes_to_uploaded_file(image.meta['content'], image.file_name)
                 FileSerializer(data={
-                    'file': file,
+                    'file': f,
                     'meta': meta,
                     'source_id': meta['application_id'],
                     'source_type': FileSourceType.APPLICATION.value
