@@ -669,8 +669,8 @@ class SendEmailSerializer(serializers.Serializer):
             raise ExceptionCodeConstants.EMAIL_IS_EXIST.value.to_app_api_exception()
         code_cache_key = self.data.get('email') + ":" + self.data.get("type")
         code_cache_key_lock = code_cache_key + "_lock"
-        ttl = cache.ttl(code_cache_key_lock)
-        if ttl is not None:
+        ttl = cache.ttl(code_cache_key_lock, version=version)
+        if ttl is not None and ttl > 0:
             raise AppApiException(500, _("Do not send emails again within {seconds} seconds").format(
                 seconds=int(ttl.total_seconds())))
         return True
@@ -696,7 +696,7 @@ class SendEmailSerializer(serializers.Serializer):
         code_cache_key = email + ":" + state
         code_cache_key_lock = code_cache_key + "_lock"
         # 设置缓存
-        cache.set(get_key(code_cache_key_lock), code, timeout=datetime.timedelta(minutes=1), version=version)
+        cache.set(get_key(code_cache_key_lock), code, timeout=60, version=version)
         system_setting = QuerySet(SystemSetting).filter(type=SettingType.EMAIL.value).first()
         if system_setting is None:
             cache.delete(get_key(code_cache_key_lock), version=version)
@@ -721,7 +721,7 @@ class SendEmailSerializer(serializers.Serializer):
         except Exception as e:
             cache.delete(get_key(code_cache_key_lock))
             raise AppApiException(500, f"{str(e)}" + _("Email sending failed"))
-        cache.set(get_key(code_cache_key), code, timeout=datetime.timedelta(minutes=30), version=version)
+        cache.set(get_key(code_cache_key), code, timeout=60 * 30, version=version)
         return True
 
 
