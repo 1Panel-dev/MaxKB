@@ -268,6 +268,10 @@ class ParagraphSerializers(serializers.Serializer):
                 self.is_valid()
             knowledge_id = self.data.get("knowledge_id")
             document_id = self.data.get('document_id')
+
+            # 先将同一文档中的所有段落位置向下移动一位
+            Paragraph.objects.filter(document_id=document_id).update(position=F('position') + 1)
+
             paragraph_problem_model = self.get_paragraph_problem_model(knowledge_id, document_id, instance)
             paragraph = paragraph_problem_model.get('paragraph')
             problem_paragraph_object_list = paragraph_problem_model.get('problem_paragraph_object_list')
