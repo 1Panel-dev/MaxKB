@@ -9,6 +9,7 @@
         :models="formItemModel"
         v-model:form="list"
         v-loading="memberFormContentLoading"
+        keepOneLine
       />
     </template>
     <template #footer>

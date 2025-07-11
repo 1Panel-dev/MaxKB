@@ -273,7 +273,7 @@ const open = (data: any) => {
     userForm.value.password = data.password
     userForm.value.phone = data.phone
     userForm.value.nick_name = data.nick_name
-    list.value = data.role_setting
+    list.value = data.role_setting.map(item=>({...item, workspace_ids: item.workspace_ids.includes('None')?[]:item.workspace_ids}))
     isEdit.value = true
   } else {
     //需要查询默认密码是啥zxl

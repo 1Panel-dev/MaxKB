@@ -105,8 +105,7 @@
         class="chat-pc__right chat-background"
         :style="{ backgroundImage: `url(${applicationDetail?.chat_background})` }"
       >
-        <el-splitter>
-          <el-splitter-panel>
+          <div style="flex: 1">
             <div class="p-16-24 flex-between">
               <h4 class="ellipsis-1" style="width: 66%">
                 {{ currentChatName }}
@@ -159,10 +158,10 @@
               >
               </AiChat>
             </div>
-          </el-splitter-panel>
-          <el-splitter-panel
+          </div>
+          <div
             class="execution-detail-panel"
-            v-model:size="rightPanelSize"
+            :style="`width: ${ rightPanelSize }px`"
             :resizable="false"
             collapsible
           >
@@ -182,8 +181,7 @@
               />
               <ParagraphDocumentContent :detail="rightPanelDetail" v-else />
             </div>
-          </el-splitter-panel>
-        </el-splitter>
+          </div>
       </div>
     </div>
 
@@ -510,16 +508,14 @@ function closeExecutionDetail() {
     overflow: hidden;
     position: relative;
     box-sizing: border-box;
+    display: flex;
 
     .right-height {
       height: calc(100vh - 60px);
     }
 
-    .el-splitter-bar__collapse-icon,
-    .el-splitter-bar__dragger {
-      display: none;
-    }
     :deep(.execution-detail-panel) {
+      transition: width 0.4s;
       background: #ffffff;
       height: 100%;
       overflow: hidden;

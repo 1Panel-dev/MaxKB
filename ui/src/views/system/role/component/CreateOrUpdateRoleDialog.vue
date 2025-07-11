@@ -3,7 +3,7 @@
     v-model="dialogVisible" :close-on-click-modal="false" :close-on-press-escape="false" :destroy-on-close="true">
     <el-form label-position="top" ref="formRef" :rules="rules" :model="form" require-asterisk-position="right">
       <el-form-item :label="$t('views.role.roleName')" prop="role_name">
-        <el-input v-model="form.role_name" maxlength="64"
+        <el-input v-model="form.role_name" maxlength="64" show-word-limit
           :placeholder="`${$t('common.inputPlaceholder')}${$t('views.role.roleName')}`" />
       </el-form-item>
       <el-form-item v-if="!form.role_id" :label="$t('views.role.inheritingRole')" prop="role_type">
