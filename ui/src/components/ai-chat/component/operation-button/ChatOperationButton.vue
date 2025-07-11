@@ -293,7 +293,7 @@ class AudioManage {
     const newTextList = textList.slice(this.textList.length)
     // 没有新增段落
     if (newTextList.length <= 0) {
-      return
+      return 0
     }
     newTextList.forEach((text, index) => {
       this.textList.push(text)
@@ -429,7 +429,10 @@ class AudioManage {
     }
     if (text) {
       const textList = this.getTextList(text, is_end ? true : false)
-      this.appendTextList(textList)
+      if (this.appendTextList(textList) !== 0) {
+        // 没有新增段落
+        return
+      }
     }
     // 如果存在在阅读的元素则直接返回
     if (this.statusList.some((item) => [AudioStatus.PLAY_INT].includes(item))) {
@@ -472,7 +475,7 @@ class AudioManage {
         setTimeout(() => {
           speechSynthesis.speak(audioElement)
           this.statusList[index] = AudioStatus.PLAY_INT
-        }, 100)
+        }, 500)
       }
     }
   }
@@ -533,7 +536,7 @@ onMounted(() => {
     const record_id = data.record_id
     bus.emit('play:pause', record_id)
     if (props.data.record_id == record_id) {
-      if (props.tts && props.tts_autoplay) {
+      if (props.tts && props.tts_autoplay && data.is_end) {
         if (audioManage.value) {
           audioManage.value.play(props.data.answer_text, data.is_end)
         }
