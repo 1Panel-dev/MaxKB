@@ -28,6 +28,7 @@
 </template>
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import TopMenu from './top-menu/index.vue'
 import Avatar from './avatar/index.vue'
 import TopAbout from './top-about/index.vue'
@@ -35,15 +36,27 @@ import { EditionConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
 import type { WorkspaceItem } from '@/api/type/workspace'
 import useStore from '@/stores'
+const router = useRouter()
+const route = useRoute()
+
 const { user } = useStore()
 const currentWorkspace = computed(() => {
   return user.workspace_list.find((w) => w.id == user.workspace_id)
 })
 
 function changeWorkspace(item: WorkspaceItem) {
+  const {
+    meta: { activeMenu },
+  } = route as any
   if (item.id === user.workspace_id) return
   user.setWorkspaceId(item.id || 'default')
-  window.location.reload()
+  if (activeMenu.includes('application')) {
+    router.push('/application')
+  } else if (activeMenu.includes('knowledge')) {
+    router.push('/knowledge')
+  } else {
+    window.location.reload()
+  }
 }
 </script>
 <style lang="scss" scoped>

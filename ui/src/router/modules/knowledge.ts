@@ -12,6 +12,7 @@ const ModelRouter = {
       PermissionConst.KNOWLEDGE_READ.getWorkspacePermissionWorkspaceManageRole,
     ],
     group: 'workspace',
+    meta: { activeMenu: '/knowledge' },
     order: 2,
   },
   redirect: '/knowledge',

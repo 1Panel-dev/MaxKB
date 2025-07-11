@@ -2,7 +2,7 @@
   <div class="authentication-setting p-16-24">
     <h4 class="mb-16">{{ $t('views.system.authentication.title') }}</h4>
 
-    <el-tabs v-model="activeName" class="mt-4" @tab-click="handleClick">
+    <el-tabs v-model="activeName" class="mt-4">
       <template v-for="(item, index) in tabList" :key="index">
         <el-tab-pane :label="item.label" :name="item.name">
           <component :is="item.component" />
@@ -50,7 +50,7 @@ const tabList = [
   // },
 ]
 
-function handleClick() {}
+
 
 onMounted(() => {
   // if (user.isExpire()) {

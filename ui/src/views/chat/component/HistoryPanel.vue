@@ -20,7 +20,12 @@
             </el-avatar>
             <LogoIcon v-else height="32px" />
           </div>
-          <h4 v-show="!isPcCollapse">{{ applicationDetail?.name }}</h4>
+          <h4
+            v-show="!isPcCollapse"
+            :style="{ color: applicationDetail?.custom_theme?.header_font_color }"
+          >
+            {{ applicationDetail?.name }}
+          </h4>
         </div>
         <el-button
           type="primary"
@@ -252,7 +257,7 @@ function refreshFieldTitle(chatId: string, abstract: string) {
 </style>
 <style lang="scss">
 .chat-pc-popper {
-  background: #ffffff!important;
+  background: #ffffff !important;
   .el-menu {
     background: var(--el-color-primary-light-06) !important;
   }

@@ -11,6 +11,7 @@ const ModelRouter = {
       PermissionConst.MODEL_READ.getWorkspacePermission,
       PermissionConst.MODEL_READ.getWorkspacePermissionWorkspaceManageRole,
     ],
+    meta: { activeMenu: '/model' },
     group: 'workspace',
     order: 4,
   },

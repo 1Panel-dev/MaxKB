@@ -1,9 +1,16 @@
 <template>
   <div v-show="show" class="workflow-dropdown-menu border border-r-6 white-bg">
-    <el-tabs v-model="activeName" class="workflow-dropdown-tabs">
-      <div v-show="activeName === 'base'" style="display: flex; width: 100%; justify-content: center" class="mb-12 mt-12">
-        <el-input v-model="search_text" class="mr-12 ml-12"
-          :placeholder="$t('views.applicationWorkflow.searchBar.placeholder')">
+    <el-tabs v-model="activeName" class="workflow-dropdown-tabs" @tab-change="handleClick">
+      <div
+        v-show="activeName === 'base'"
+        style="display: flex; width: 100%; justify-content: center"
+        class="mb-12 mt-12"
+      >
+        <el-input
+          v-model="search_text"
+          class="mr-12 ml-12"
+          :placeholder="$t('views.applicationWorkflow.searchBar.placeholder')"
+        >
           <template #suffix>
             <el-icon class="el-input__icon">
               <search />
@@ -18,25 +25,37 @@
             <template v-for="(node, index) in filter_menu_nodes" :key="index">
               <el-text type="info" size="small" class="color-secondary ml-12">{{
                 node.label
-                }}</el-text>
-              <div class="flex-wrap" style="gap: 12px; padding: 12px;">
+              }}</el-text>
+              <div class="flex-wrap" style="gap: 12px; padding: 12px">
                 <template v-for="(item, index) in node.list" :key="index">
                   <el-popover placement="right" :width="280" :show-after="500">
                     <template #reference>
-                      <div class="list-item flex align-center border border-r-6 p-8-12 cursor"
-                        style="width: calc(50% - 6px)" @click.stop="clickNodes(item)" @mousedown.stop="onmousedown(item)">
-                        <component :is="iconComponent(`${item.type}-icon`)" class="mr-8" :size="32" />
+                      <div
+                        class="list-item flex align-center border border-r-6 p-8-12 cursor"
+                        style="width: calc(50% - 6px)"
+                        @click.stop="clickNodes(item)"
+                        @mousedown.stop="onmousedown(item)"
+                      >
+                        <component
+                          :is="iconComponent(`${item.type}-icon`)"
+                          class="mr-8"
+                          :size="32"
+                        />
                         <div class="lighter">{{ item.label }}</div>
                       </div>
                     </template>
                     <template #default>
                       <div class="flex align-center mb-8">
-                        <component :is="iconComponent(`${item.type}-icon`)" class="mr-8" :size="32" />
+                        <component
+                          :is="iconComponent(`${item.type}-icon`)"
+                          class="mr-8"
+                          :size="32"
+                        />
                         <div class="lighter color-text-primary">{{ item.label }}</div>
                       </div>
                       <el-text type="info" size="small" class="color-secondary lighter">{{
                         item.text
-                        }}</el-text>
+                      }}</el-text>
                     </template>
                   </el-popover>
                 </template>
@@ -52,13 +71,23 @@
       <el-tab-pane :label="$t('views.tool.title')" name="tool">
         <LayoutContainer>
           <template #left>
-            <folder-tree :source="SourceTypeEnum.TOOL" :data="toolTreeData" :currentNodeKey="folder.currentFolder?.id"
-              @handleNodeClick="folderClickHandle" :shareTitle="$t('views.shared.shared_tool')"
-              :showShared="user.isEE()" class="p-8" :canOperation="false" />
+            <folder-tree
+              :source="SourceTypeEnum.TOOL"
+              :data="toolTreeData"
+              :currentNodeKey="folder.currentFolder?.id"
+              @handleNodeClick="folderClickHandle"
+              :shareTitle="$t('views.shared.shared_tool')"
+              :showShared="user.isEE()"
+              class="p-8"
+              :canOperation="false"
+            />
           </template>
           <el-scrollbar height="450">
-            <NodeContent :list="toolList" @clickNodes="(val: any) => clickNodes(toolLibNode, val, 'tool')"
-              @onmousedown="(val: any) => onmousedown(toolLibNode, val, 'tool')" />
+            <NodeContent
+              :list="toolList"
+              @clickNodes="(val: any) => clickNodes(toolLibNode, val, 'tool')"
+              @onmousedown="(val: any) => onmousedown(toolLibNode, val, 'tool')"
+            />
           </el-scrollbar>
         </LayoutContainer>
       </el-tab-pane>
@@ -66,14 +95,21 @@
       <el-tab-pane :label="$t('views.application.title')" name="application">
         <LayoutContainer>
           <template #left>
-            <folder-tree :source="SourceTypeEnum.APPLICATION" :data="applicationTreeData"
-              :currentNodeKey="folder.currentFolder?.id" @handleNodeClick="folderClickHandle" class="p-8"
-              :canOperation="false" />
+            <folder-tree
+              :source="SourceTypeEnum.APPLICATION"
+              :data="applicationTreeData"
+              :currentNodeKey="folder.currentFolder?.id"
+              @handleNodeClick="folderClickHandle"
+              class="p-8"
+              :canOperation="false"
+            />
           </template>
           <el-scrollbar height="450">
-            <NodeContent :list="applicationList"
+            <NodeContent
+              :list="applicationList"
               @clickNodes="(val: any) => clickNodes(applicationNode, val, 'application')"
-              @onmousedown="(val: any) => onmousedown(applicationNode, val, 'application')" />
+              @onmousedown="(val: any) => onmousedown(applicationNode, val, 'application')"
+            />
           </el-scrollbar>
         </LayoutContainer>
       </el-tab-pane>
@@ -90,7 +126,6 @@ import useStore from '@/stores'
 import NodeContent from './NodeContent.vue'
 import { SourceTypeEnum } from '@/enums/common'
 import sharedWorkspaceApi from '@/api/shared-workspace'
-import { CaretRight } from '@element-plus/icons-vue'
 import ApplicationApi from '@/api/application/application'
 const { user } = useStore()
 const search_text = ref<string>('')
@@ -209,10 +244,12 @@ async function getShareTool() {
 }
 
 async function getToolList() {
-  if (folder.currentFolder.id === "share") {
+  if (folder.currentFolder.id === 'share') {
     toolList.value = sharedToolList.value
   } else {
-    const res = await ToolApi.getToolList({ folder_id: folder.currentFolder?.id || user.getWorkspaceId() })
+    const res = await ToolApi.getToolList({
+      folder_id: folder.currentFolder?.id || user.getWorkspaceId(),
+    })
     toolList.value = res.data.tools
   }
 }
@@ -223,33 +260,41 @@ const applicationList = ref<any[]>([])
 function getApplicationFolder() {
   folder.asyncGetFolder(SourceTypeEnum.APPLICATION, {}, loading).then((res: any) => {
     applicationTreeData.value = res.data
-  folder.setCurrentFolder(res.data?.[0] || {})
+    folder.setCurrentFolder(res.data?.[0] || {})
   })
 }
 
 async function getApplicationList() {
-  const res = await ApplicationApi.getAllApplication({ folder_id: folder.currentFolder?.id || user.getWorkspaceId() })
+  const res = await ApplicationApi.getAllApplication({
+    folder_id: folder.currentFolder?.id || user.getWorkspaceId(),
+  })
   applicationList.value = res.data.filter((item) => item.resource_type === 'application')
 }
 
 function folderClickHandle(row: any) {
   folder.setCurrentFolder(row)
   if (activeName.value === 'tool') {
-    getToolList();
+    getToolList()
   } else {
     getApplicationList()
   }
 }
 
-onMounted(async () => {
-  if (user.isEE()) {
-    await getShareTool()
+async function handleClick(val: string) {
+  console.log(val)
+  if (val === 'tool') {
+    if (user.isEE()) {
+      await getShareTool()
+    }
+    await getToolFolder()
+    getToolList()
+  } else if (val === 'application') {
+    getApplicationFolder()
+    getApplicationList()
   }
-  await getToolFolder()
-  getToolList()
-  getApplicationFolder()
-  getApplicationList()
-})
+}
+
+onMounted(() => {})
 </script>
 <style lang="scss" scoped>
 .workflow-dropdown-menu {

@@ -26,9 +26,6 @@
             iconName="app-mobile-open-history"
             style="font-size: 20px"
             class="ml-16 cursor"
-            :style="{
-              color: applicationDetail?.custom_theme?.header_font_color,
-            }"
             @click.prevent.stop="show = true"
           />
           <div class="mr-12 ml-16 flex">
