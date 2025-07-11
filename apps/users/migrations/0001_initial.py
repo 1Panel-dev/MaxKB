@@ -7,7 +7,8 @@ from common.constants.permission_constants import RoleConstants
 from common.utils.common import password_encrypt
 from maxkb.const import CONFIG
 
-default_password = CONFIG.get('default_password', 'MaxKB@123..')
+default_password = CONFIG.get('DEFAULT_PASSWORD', 'MaxKB@123..')
+
 
 def insert_default_data(apps, schema_editor):
     UserModel = apps.get_model('users', 'User')
@@ -28,7 +29,9 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='User',
             fields=[
-                ('id', models.UUIDField(default=uuid_utils.compat.uuid7, editable=False, primary_key=True, serialize=False, verbose_name='主键id')),
+                ('id',
+                 models.UUIDField(default=uuid_utils.compat.uuid7, editable=False, primary_key=True, serialize=False,
+                                  verbose_name='主键id')),
                 ('email', models.EmailField(blank=True, max_length=254, null=True, unique=True, verbose_name='邮箱')),
                 ('phone', models.CharField(default='', max_length=20, verbose_name='电话')),
                 ('nick_name', models.CharField(max_length=150, unique=True, verbose_name='昵称')),
