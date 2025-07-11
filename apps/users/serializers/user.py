@@ -607,20 +607,97 @@ def update_user_role(instance, user):
 
 
 class RePasswordSerializer(serializers.Serializer):
-    password = serializers.CharField(required=True, label=_("Password"),
-                                     validators=[validators.RegexValidator(regex=re.compile(
-                                         "^(?![a-zA-Z]+$)(?![A-Z0-9]+$)(?![A-Z_!@#$%^&*`~.()-+=]+$)(?![a-z0-9]+$)(?![a-z_!@#$%^&*`~()-+=]+$)"
-                                         "(?![0-9_!@#$%^&*`~()-+=]+$)[a-zA-Z0-9_!@#$%^&*`~.()-+=]{6,20}$")
-                                         , message=_(
-                                             "The confirmation password must be 6-20 characters long and must be a combination of letters, numbers, and special characters."))])
+    email = serializers.EmailField(
+        required=True,
+        label=_("Email"),
+        validators=[validators.EmailValidator(message=ExceptionCodeConstants.EMAIL_FORMAT_ERROR.value.message,
+                                              code=ExceptionCodeConstants.EMAIL_FORMAT_ERROR.value.code)])
 
-    re_password = serializers.CharField(required=True, label=_("Confirm Password"),
-                                        validators=[validators.RegexValidator(regex=re.compile(
-                                            "^(?![a-zA-Z]+$)(?![A-Z0-9]+$)(?![A-Z_!@#$%^&*`~.()-+=]+$)(?![a-z0-9]+$)(?![a-z_!@#$%^&*`~()-+=]+$)"
-                                            "(?![0-9_!@#$%^&*`~()-+=]+$)[a-zA-Z0-9_!@#$%^&*`~.()-+=]{6,20}$")
-                                            , message=_(
-                                                "The confirmation password must be 6-20 characters long and must be a combination of letters, numbers, and special characters."))]
-                                        )
+    code = serializers.CharField(required=True, label=_("Code"))
+    password = serializers.CharField(
+        required=True,
+        label=_("Password"),
+        max_length=20,
+        min_length=6,
+        validators=[
+            validators.RegexValidator(
+                regex=PASSWORD_REGEX,
+                message=_(
+                    "The password must be 6-20 characters long and must be a combination of letters, numbers, and special characters."
+                )
+            )
+        ]
+    )
+    re_password = serializers.CharField(
+        required=True,
+        label=_("Re Password"),
+        validators=[
+            validators.RegexValidator(
+                regex=PASSWORD_REGEX,
+                message=_(
+                    "The confirmation password must be 6-20 characters long and must be a combination of letters, numbers, and special characters."
+                )
+            )
+        ]
+    )
+
+    class Meta:
+        model = User
+        fields = '__all__'
+
+    def is_valid(self, *, raise_exception=False):
+        super().is_valid(raise_exception=True)
+        email = self.data.get("email")
+        cache_code = cache.get(get_key(email + ':reset_password'), version=version)
+        if self.data.get('password') != self.data.get('re_password'):
+            raise AppApiException(ExceptionCodeConstants.PASSWORD_NOT_EQ_RE_PASSWORD.value.code,
+                                  ExceptionCodeConstants.PASSWORD_NOT_EQ_RE_PASSWORD.value.message)
+        if cache_code != self.data.get('code'):
+            raise AppApiException(ExceptionCodeConstants.CODE_ERROR.value.code,
+                                  ExceptionCodeConstants.CODE_ERROR.value.message)
+        return True
+
+    def reset_password(self):
+        """
+        修改密码
+        :return: 是否成功
+        """
+        if self.is_valid():
+            email = self.data.get("email")
+            QuerySet(User).filter(email=email).update(
+                password=password_encrypt(self.data.get('password')))
+            code_cache_key = email + ":reset_password"
+            cache.delete(get_key(code_cache_key), version=version)
+            return True
+
+
+class ResetCurrentUserPassword(serializers.Serializer):
+    password = serializers.CharField(
+        required=True,
+        label=_("Password"),
+        max_length=20,
+        min_length=6,
+        validators=[
+            validators.RegexValidator(
+                regex=PASSWORD_REGEX,
+                message=_(
+                    "The password must be 6-20 characters long and must be a combination of letters, numbers, and special characters."
+                )
+            )
+        ]
+    )
+    re_password = serializers.CharField(
+        required=True,
+        label=_("Re Password"),
+        validators=[
+            validators.RegexValidator(
+                regex=PASSWORD_REGEX,
+                message=_(
+                    "The confirmation password must be 6-20 characters long and must be a combination of letters, numbers, and special characters."
+                )
+            )
+        ]
+    )
 
     class Meta:
         model = User

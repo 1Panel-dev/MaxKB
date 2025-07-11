@@ -28,7 +28,7 @@ from users.api.user import UserProfileAPI, TestWorkspacePermissionUserApi, Delet
     SendEmailAPI, CheckCodeAPI, SwitchUserLanguageAPI
 from users.models import User
 from users.serializers.user import UserProfileSerializer, UserManageSerializer, CheckCodeSerializer, \
-    SendEmailSerializer, RePasswordSerializer, SwitchLanguageSerializer
+    SendEmailSerializer, RePasswordSerializer, SwitchLanguageSerializer, ResetCurrentUserPassword
 
 default_password = CONFIG.get('DEFAULT_PASSWORD', 'MaxKB@123..')
 
@@ -260,6 +260,7 @@ class UserManage(APIView):
         @log(menu='User management', operate='Change password',
              get_operation_object=lambda r, k: get_user_operation_object(k.get('user_id')),
              get_details=get_re_password_details)
+        @has_permissions(PermissionConstants.USER_EDIT, RoleConstants.ADMIN)
         def put(self, request: Request, user_id):
             return result.success(
                 UserManageSerializer.Operate(data={'id': user_id}).re_password(request.data, with_valid=True))
@@ -293,10 +294,9 @@ class RePasswordView(APIView):
     @log(menu='User management', operate='Change password',
          get_operation_object=lambda r, k: {'name': r.user.username},
          get_details=get_re_password_details)
-    @has_permissions(PermissionConstants.USER_EDIT, RoleConstants.ADMIN)
     def post(self, request: Request):
         serializer_obj = RePasswordSerializer(data=request.data)
-        return result.success(serializer_obj.reset_password(request.user.id))
+        return result.success(serializer_obj.reset_password())
 
 
 class SendEmail(APIView):
@@ -367,7 +367,7 @@ class ResetCurrentUserPasswordView(APIView):
     @has_permissions(PermissionConstants.CHANGE_PASSWORD, RoleConstants.ADMIN, RoleConstants.USER,
                      RoleConstants.WORKSPACE_MANAGE)
     def post(self, request: Request):
-        serializer_obj = RePasswordSerializer(data=request.data)
+        serializer_obj = ResetCurrentUserPassword(data=request.data)
         if serializer_obj.reset_password(request.user.id):
             version, get_key = Cache_Version.TOKEN.value
             cache.delete(get_key(token=request.auth), version=version)
