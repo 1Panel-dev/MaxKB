@@ -121,6 +121,7 @@ class AccessTokenSerializer(serializers.Serializer):
                 'white_active': application_access_token.white_active,
                 'white_list': application_access_token.white_list,
                 'show_source': application_access_token.show_source,
+                'show_exec': application_access_token.show_exec,
                 'language': application_access_token.language,
                 **other,
                 }
