@@ -121,8 +121,8 @@ class ApplicationChatRecordQuerySerializers(serializers.Serializer):
 
         for item in chat_record.details.values():
             if item.get('type') == 'search-knowledge-node' and item.get('show_knowledge', False):
-                paragraph_list = paragraph_list + item.get(
-                    'paragraph_list')
+                paragraph_list = paragraph_list + (item.get(
+                    'paragraph_list') or [])
 
             if item.get('type') == 'reranker-node' and item.get('show_knowledge', False):
                 paragraph_list = paragraph_list + [rl.get('metadata') for rl in item.get('result_list') if

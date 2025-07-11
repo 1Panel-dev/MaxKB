@@ -88,7 +88,7 @@ class WorkFlowPostHandler:
             application_public_access_client = (QuerySet(ApplicationChatUserStats)
                                                 .filter(chat_user_id=workflow_body.get('chat_user_id'),
                                                         chat_user_type=workflow_body.get('chat_user_type'),
-                                                        application_id=self.chat_info.application.id).first())
+                                                        application_id=self.chat_info.application_id).first())
             if application_public_access_client is not None:
                 application_public_access_client.access_num = application_public_access_client.access_num + 1
                 application_public_access_client.intraday_access_num = application_public_access_client.intraday_access_num + 1
