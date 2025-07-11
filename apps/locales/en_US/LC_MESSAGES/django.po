@@ -8484,3 +8484,9 @@ msgstr ""
 
 msgid "knowledge Base"
 msgstr ""
+
+msgid "API KEY"
+msgstr "API KEY"
+
+msgid "Download"
+msgstr ""

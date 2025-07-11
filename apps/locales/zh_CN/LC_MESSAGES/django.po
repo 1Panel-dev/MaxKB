@@ -8610,3 +8610,9 @@ msgstr "删除应用 API KEY"
 
 msgid "knowledge Base"
 msgstr "知识库"
+
+msgid "API KEY"
+msgstr "API KEY"
+
+msgid "Download"
+msgstr "下载"
