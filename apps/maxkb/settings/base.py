@@ -56,6 +56,9 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'common.middleware.gzip.GZipMiddleware',
+    'common.middleware.chat_headers_middleware.ChatHeadersMiddleware',
+    'common.middleware.cross_domain_middleware.CrossDomainMiddleware',
 
 ]
 
