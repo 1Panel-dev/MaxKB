@@ -2,8 +2,8 @@ FROM node:18-alpine3.18 AS web-build
 COPY ui ui
 RUN cd ui && \
     npm install && \
-    NODE_OPTIONS="--max-old-space-size=4096" npm run build-only && \
-    NODE_OPTIONS="--max-old-space-size=4096" npm run build-only-chat && \
+    NODE_OPTIONS="--max-old-space-size=4096" npm run build && \
+    NODE_OPTIONS="--max-old-space-size=4096" npm run build-chat && \
     find . -maxdepth 1 ! -name '.' ! -name 'dist' ! -name 'public' -exec rm -rf {} +
 
 FROM ghcr.io/1panel-dev/maxkb-base:python3.11-pg17.5 AS stage-build
