@@ -1,5 +1,6 @@
-import type { RouteRecordRaw } from 'vue-router'
-const modules: any = import.meta.glob('./modules/*.ts', { eager: true })
+import type {RouteRecordRaw} from 'vue-router'
+
+const modules: any = import.meta.glob('./modules/*.ts', {eager: true})
 
 const rolesRoutes: RouteRecordRaw[] = [...Object.keys(modules).map((key) => modules[key].default)]
 
@@ -31,7 +32,7 @@ export const routes: Array<RouteRecordRaw> = [
   {
     path: '/application/:id/workflow',
     name: 'ApplicationWorkflow',
-    meta: { activeMenu: '/application' },
+    meta: {activeMenu: '/application'},
     component: () => import('@/views/application-workflow/index.vue'),
   },
   // 对话

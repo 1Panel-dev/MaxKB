@@ -50,7 +50,7 @@
         </div>
       </el-form>
       <el-button size="large" type="primary" class="w-full" @click="checkCode"
-        >{{ $t('views.login.buttons.checkCode') }}
+      >{{ $t('views.login.buttons.checkCode') }}
       </el-button>
       <div class="operate-container mt-12">
         <el-button
@@ -67,19 +67,19 @@
   </login-layout>
 </template>
 <script setup lang="ts">
-import { onBeforeMount, ref } from 'vue'
+import {onBeforeMount, ref} from 'vue'
 import LoginContainer from '@/layout/login-layout/LoginContainer.vue'
 import LoginLayout from '@/layout/login-layout/LoginLayout.vue'
-import type { CheckCodeRequest } from '@/api/type/user'
-import { useRouter } from 'vue-router'
-import type { FormInstance, FormRules } from 'element-plus'
+import type {CheckCodeRequest} from '@/api/type/user'
+import {useRouter} from 'vue-router'
+import type {FormInstance, FormRules} from 'element-plus'
 import UserApi from '@/api/user/user'
-import { MsgSuccess } from '@/utils/message'
-import { t } from '@/locales'
+import {MsgSuccess} from '@/utils/message'
+import {t} from '@/locales'
 import useStore from '@/stores'
 
 const router = useRouter()
-const { theme, user } = useStore()
+const {theme, user} = useStore()
 
 const CheckEmailForm = ref<CheckCodeRequest>({
   email: '',
@@ -107,7 +107,7 @@ const rules = ref<FormRules<CheckCodeRequest>>({
       trigger: 'blur',
     },
   ],
-  code: [{ required: true, message: t('views.login.verificationCode.placeholder') }],
+  code: [{required: true, message: t('views.login.verificationCode.placeholder')}],
 })
 const loading = ref<boolean>(false)
 const isDisabled = ref<boolean>(false)
@@ -117,7 +117,7 @@ const checkCode = () => {
   resetPasswordFormRef.value
     ?.validate()
     .then(() => UserApi.checkCode(CheckEmailForm.value, sendLoading))
-    .then(() => router.push({ name: 'reset_password', params: CheckEmailForm.value }))
+    .then(() => router.push({name: 'ResetPassword', params: CheckEmailForm.value}))
 }
 /**
  * 发送验证码
