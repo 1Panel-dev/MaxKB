@@ -71,12 +71,13 @@ router.beforeEach(
                 params: {
                   accessToken: to.params.accessToken,
                 },
+                query: to.query,
               })
             }
             return
           }
           if (p_token) {
-            next({ ...to, query: {} })
+            next({ ...to, query: to.query })
           } else {
             next()
           }
