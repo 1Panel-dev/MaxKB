@@ -10,9 +10,9 @@
             class="mr-8"
             style="background: none"
           >
-            <img :src="chatUser.chat_profile?.icon" alt="" />
+            <img :src="chatUser.chat_profile?.icon" alt=""/>
           </el-avatar>
-          <LogoIcon v-else height="32px" class="mr-8" />
+          <LogoIcon v-else height="32px" class="mr-8"/>
           <h4>{{ chatUser.chat_profile?.application_name }}</h4>
         </div>
       </template>
@@ -29,16 +29,16 @@
             class="mr-8"
             style="background: none"
           >
-            <img :src="chatUser.chat_profile?.icon" alt="" />
+            <img :src="chatUser.chat_profile?.icon" alt=""/>
           </el-avatar>
-          <LogoIcon v-else height="32px" class="mr-8" />
+          <LogoIcon v-else height="32px" class="mr-8"/>
           <h4>{{ chatUser.chat_profile?.application_name }}</h4>
         </div>
       </template>
-      <h2 class="mb-24" v-if="!showQrCodeTab">
+      <h2 class="mb-24" v-if="!showQrCodeTab && (loginMode === 'LDAP' || loginMode === 'LOCAL')">
         {{ loginMode == 'LOCAL' ? $t('views.login.title') : loginMode }}
       </h2>
-      <div v-if="!showQrCodeTab">
+      <div v-if="!showQrCodeTab && (loginMode === 'LDAP' || loginMode === 'LOCAL')">
         <el-form
           class="login-form"
           :rules="rules"
@@ -104,7 +104,7 @@
         </el-button>
       </div>
       <div v-if="showQrCodeTab">
-        <QrCodeTab :tabs="orgOptions" />
+        <QrCodeTab :tabs="orgOptions"/>
       </div>
       <div class="login-gradient-divider lighter mt-24" v-if="modeList.length > 1">
         <span>{{ $t('views.login.moreMethod') }}</span>
@@ -123,7 +123,7 @@
                 'font-size': item === 'OAUTH2' ? '8px' : '10px',
                 color: theme.themeInfo?.theme,
               }"
-              >{{ item }}</span
+            >{{ item }}</span
             >
           </el-button>
           <el-button
@@ -133,7 +133,7 @@
             class="login-button-circle color-secondary"
             @click="changeMode('QR_CODE')"
           >
-            <img src="@/assets/scan/icon_qr_outlined.svg" width="25px" />
+            <img src="@/assets/scan/icon_qr_outlined.svg" width="25px"/>
           </el-button>
           <el-button
             v-if="item === 'LOCAL' && loginMode != 'LOCAL'"
@@ -150,29 +150,29 @@
   </UserLoginLayout>
 </template>
 <script setup lang="ts">
-import { onMounted, ref, onBeforeMount } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import type { FormInstance, FormRules } from 'element-plus'
-import type { LoginRequest } from '@/api/type/login'
+import {onMounted, ref, onBeforeMount} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
+import type {FormInstance, FormRules} from 'element-plus'
+import type {LoginRequest} from '@/api/type/login'
 import LoginContainer from '@/layout/login-layout/LoginContainer.vue'
 import UserLoginLayout from '@/layout/login-layout/UserLoginLayout.vue'
 import loginApi from '@/api/chat/chat.ts'
-import { t, getBrowserLang } from '@/locales'
+import {t, getBrowserLang} from '@/locales'
 import useStore from '@/stores'
-import { useI18n } from 'vue-i18n'
+import {useI18n} from 'vue-i18n'
 import QrCodeTab from '@/views/login/scanCompinents/QrCodeTab.vue'
-import { MsgConfirm, MsgError } from '@/utils/message.ts'
+import {MsgConfirm, MsgError} from '@/utils/message.ts'
 import PasswordAuth from '@/views/chat/auth/component/password.vue'
-import { isAppIcon } from '@/utils/common'
+import {isAppIcon} from '@/utils/common'
 
 const router = useRouter()
-const { theme, chatUser } = useStore()
-const { locale } = useI18n({ useScope: 'global' })
+const {theme, chatUser} = useStore()
+const {locale} = useI18n({useScope: 'global'})
 const loading = ref<boolean>(false)
 const route = useRoute()
 const identifyCode = ref<string>('')
 const {
-  params: { accessToken },
+  params: {accessToken},
 } = route as any
 const loginFormRef = ref<FormInstance>()
 const loginForm = ref<LoginRequest>({
@@ -209,11 +209,11 @@ const loginHandle = () => {
   loginFormRef.value?.validate().then(() => {
     if (loginMode.value === 'LDAP') {
       chatUser.ldapLogin(loginForm.value).then((ok) => {
-        router.push({ name: 'chat', params: { accessToken: chatUser.accessToken } })
+        router.push({name: 'chat', params: {accessToken: chatUser.accessToken}})
       })
     } else {
       chatUser.login(loginForm.value).then((ok) => {
-        router.push({ name: 'chat', params: { accessToken: chatUser.accessToken } })
+        router.push({name: 'chat', params: {accessToken: chatUser.accessToken}})
       })
     }
   })
@@ -292,7 +292,8 @@ function redirectAuth(authType: string, needMessage: boolean = false) {
         .then(() => {
           window.location.href = url
         })
-        .catch(() => {})
+        .catch(() => {
+        })
     } else {
       console.log('url', url)
       window.location.href = url
@@ -322,8 +323,13 @@ onBeforeMount(() => {
     modeList.value = chatUser.chat_profile.login_value
     if (modeList.value.includes('LOCAL')) {
       modeList.value = ['LOCAL', ...modeList.value.filter((item) => item !== 'LOCAL')]
+    } else if (modeList.value.includes('LDAP')) {
+      modeList.value = ['LDAP', ...modeList.value.filter((item) => item !== 'LDAP')]
     }
     loginMode.value = modeList.value[0] || 'LOCAL'
+    if (!modeList.value.includes('LOCAL') && !modeList.value.includes('LDAP')) {
+      loginMode.value = '';
+    }
     if (modeList.value.length == 1 && ['CAS', 'OIDC', 'OAuth2'].includes(modeList.value[0])) {
       redirectAuth(modeList.value[0])
     }
