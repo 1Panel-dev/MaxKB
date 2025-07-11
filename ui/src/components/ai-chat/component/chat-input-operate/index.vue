@@ -293,7 +293,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, computed, onMounted, nextTick, watch, type Ref } from 'vue'
+import { ref, computed, onMounted, nextTick, reactive, type Ref } from 'vue'
 import { t } from '@/locales'
 import Recorder from 'recorder-core'
 import TouchChat from './TouchChat.vue'
@@ -429,9 +429,8 @@ const uploadFile = async (file: any, fileList: any) => {
     fileList.splice(0, fileList.length)
     return
   }
-  fileAllList.value = fileList
-  console.log(fileAllList.value)
-
+  const inner = reactive(file)
+  fileAllList.value.push(inner)
   if (!chatId_context.value) {
     const res = await props.openChatId()
     chatId_context.value = res
@@ -446,9 +445,9 @@ const uploadFile = async (file: any, fileList: any) => {
         )
       : chatAPI.postUploadFile(file.raw, chatId_context.value, 'CHAT', uploadLoading)
   api.then((ok) => {
-    file.url = ok.data
+    inner.url = ok.data
     const split_path = ok.data.split('/')
-    file.file_id = split_path[split_path.length - 1]
+    inner.file_id = split_path[split_path.length - 1]
   })
   if (!inputValue.value && uploadImageList.value.length > 0) {
     inputValue.value = t('chat.uploadFile.imageMessage')
