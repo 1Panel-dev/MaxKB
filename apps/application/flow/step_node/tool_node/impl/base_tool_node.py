@@ -10,6 +10,8 @@ import json
 import time
 from typing import Dict
 
+from django.utils.translation import gettext as _
+
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.tool_node.i_tool_node import IToolNode
 from common.utils.tool_code import ToolExecutor
@@ -30,20 +32,30 @@ def write_context(step_variable: Dict, global_variable: Dict, node, workflow):
 
 
 def valid_reference_value(_type, value, name):
-    if _type == 'int':
-        instance_type = int | float
-    elif _type == 'float':
-        instance_type = float | int
-    elif _type == 'dict':
-        instance_type = dict
-    elif _type == 'array':
-        instance_type = list
-    elif _type == 'string':
-        instance_type = str
-    else:
-        raise Exception(500, f'字段:{name}类型:{_type} 不支持的类型')
+    try:
+        if _type == 'int':
+            instance_type = int | float
+        elif _type == 'float':
+            instance_type = float | int
+        elif _type == 'dict':
+            value = json.loads(value) if isinstance(value, str) else value
+            instance_type = dict
+        elif _type == 'array':
+            value = json.loads(value) if isinstance(value, str) else value
+            instance_type = list
+        elif _type == 'string':
+            instance_type = str
+        else:
+            raise Exception(_(
+                'Field: {name} Type: {_type} Value: {value} Unsupported types'
+            ).format(name=name, _type=_type))
+    except:
+        return value
     if not isinstance(value, instance_type):
-        raise Exception(f'字段:{name}类型:{_type}值:{value}类型错误')
+        raise Exception(_(
+            'Field: {name} Type: {_type} Value: {value} Type error'
+        ).format(name=name, _type=_type, value=value))
+    return value
 
 
 def convert_value(name: str, value, _type, is_required, source, node):
@@ -53,12 +65,8 @@ def convert_value(name: str, value, _type, is_required, source, node):
         value = node.workflow_manage.get_reference_field(
             value[0],
             value[1:])
-        if isinstance(value, str):
-            try:
-                value = json.loads(value)
-            except:
-                pass
-        valid_reference_value(_type, value, name)
+
+        value = valid_reference_value(_type, value, name)
         if _type == 'int':
             return int(value)
         if _type == 'float':

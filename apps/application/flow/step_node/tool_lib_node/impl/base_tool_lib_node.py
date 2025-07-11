@@ -20,8 +20,6 @@ from common.exception.app_exception import AppApiException
 from common.utils.rsa_util import rsa_long_decrypt
 from common.utils.tool_code import ToolExecutor
 from maxkb.const import CONFIG
-from system_manage.models import AuthTargetType
-from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
 from tools.models import Tool
 
 function_executor = ToolExecutor(CONFIG.get('SANDBOX'))
@@ -48,23 +46,30 @@ def get_field_value(debug_field_list, name, is_required):
 
 
 def valid_reference_value(_type, value, name):
-    if _type == 'int':
-        instance_type = int | float
-    elif _type == 'float':
-        instance_type = float | int
-    elif _type == 'dict':
-        instance_type = dict
-    elif _type == 'array':
-        instance_type = list
-    elif _type == 'string':
-        instance_type = str
-    else:
-        raise Exception(_('Field: {name} Type: {_type} Value: {value} Unsupported types').format(name=name,
-                                                                                                 _type=_type))
+    try:
+        if _type == 'int':
+            instance_type = int | float
+        elif _type == 'float':
+            instance_type = float | int
+        elif _type == 'dict':
+            value = json.loads(value) if isinstance(value, str) else value
+            instance_type = dict
+        elif _type == 'array':
+            value = json.loads(value) if isinstance(value, str) else value
+            instance_type = list
+        elif _type == 'string':
+            instance_type = str
+        else:
+            raise Exception(_(
+                'Field: {name} Type: {_type} Value: {value} Unsupported types'
+            ).format(name=name, _type=_type))
+    except:
+        return value
     if not isinstance(value, instance_type):
-        raise Exception(
-            _('Field: {name} Type: {_type} Value: {value} Type error').format(name=name, _type=_type,
-                                                                              value=value))
+        raise Exception(_(
+            'Field: {name} Type: {_type} Value: {value} Type error'
+        ).format(name=name, _type=_type, value=value))
+    return value
 
 
 def convert_value(name: str, value, _type, is_required, source, node):
@@ -76,12 +81,8 @@ def convert_value(name: str, value, _type, is_required, source, node):
         value = node.workflow_manage.get_reference_field(
             value[0],
             value[1:])
-        if isinstance(value, str):
-            try:
-                value = json.loads(value)
-            except:
-                pass
-        valid_reference_value(_type, value, name)
+
+        value = valid_reference_value(_type, value, name)
         if _type == 'int':
             return int(value)
         if _type == 'float':
