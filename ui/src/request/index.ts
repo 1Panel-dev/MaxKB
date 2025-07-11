@@ -249,17 +249,33 @@ export const exportExcel: (
   )
 }
 
-function decodeFilenameBrowser(contentDisposition: string) {
-  // 提取并解码 Base64 部分
-  const base64Part = contentDisposition.match(/=\?utf-8\?b\?(.*?)\?=/i)?.[1]
-  if (!base64Part) return null
+function extractFilename(contentDisposition: string) {
+  if (!contentDisposition) return null;
 
-  // 使用 atob 解码 Base64
-  const decoded = decodeURIComponent(escape(atob(base64Part)))
+  // 处理 URL 编码的文件名
+  const urlEncodedMatch = contentDisposition.match(/filename=([^;]*)/i) ||
+                         contentDisposition.match(/filename\*=UTF-8''([^;]*)/i);
+  if (urlEncodedMatch && urlEncodedMatch[1]) {
+    try {
+      return decodeURIComponent(urlEncodedMatch[1].replace(/"/g, ''));
+    } catch (e) {
+      console.error("解码URL编码文件名失败:", e);
+    }
+  }
 
-  // 提取文件名
-  const filenameMatch = decoded.match(/filename="(.*?)"/i)
-  return filenameMatch ? filenameMatch[1] : null
+  // 处理 Base64 编码的文件名
+  const base64Part = contentDisposition.match(/=\?utf-8\?b\?(.*?)\?=/i)?.[1];
+  if (base64Part) {
+    try {
+      const decoded = decodeURIComponent(escape(atob(base64Part)));
+      const filenameMatch = decoded.match(/filename="(.*?)"/i);
+      return filenameMatch ? filenameMatch[1] : null;
+    } catch (e) {
+      console.error("解码Base64文件名失败:", e);
+    }
+  }
+
+  return null;
 }
 
 export const exportFile: (
@@ -296,9 +312,9 @@ export const exportFile: (
           // const contentType = headers['content-type'];
           const contentDisposition = headers['content-disposition']
           // console.log('Content-Type:', contentType);
-          // console.log('Content-Disposition:', decodeFilenameBrowser(contentDisposition));
+          // console.log('Content-Disposition:', contentDisposition);
           // 如果没有提供文件名，则使用默认名称
-          fileName = decodeFilenameBrowser(contentDisposition) || fileName
+          fileName = extractFilename(contentDisposition) || fileName
           return data // 必须返回数据
         },
       ],
