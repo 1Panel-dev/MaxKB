@@ -21,7 +21,7 @@ from application.models import Application
 from application.serializers.application import ApplicationSerializer, Query, ApplicationOperateSerializer
 from common import result
 from common.auth import TokenAuth
-from common.auth.authentication import has_permissions
+from common.auth.authentication import has_permissions, get_is_permissions
 from common.constants.permission_constants import PermissionConstants, RoleConstants, ViewPermission, CompareConstants
 from common.log.log import log
 
@@ -112,10 +112,15 @@ class ApplicationAPI(APIView):
                          RoleConstants.USER.get_workspace_role(),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         @log(menu='Application', operate="Import Application", )
-        def post(self, request: Request, workspace_id: str):
+        def post(self, request: Request, workspace_id: str, folder_id: str):
+            is_import_tool = get_is_permissions(request, workspace_id=workspace_id, folder_id=folder_id)(
+                PermissionConstants.TOOL_IMPORT.get_workspace_permission(),
+                PermissionConstants.TOOL_IMPORT.get_workspace_permission_workspace_manage_role(),
+                RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
+            )
             return result.success(ApplicationSerializer(
                 data={'user_id': request.user.id, 'workspace_id': workspace_id,
-                      }).import_({'file': request.FILES.get('file')}))
+                      }).import_({'file': request.FILES.get('file'), 'folder_id': folder_id}, is_import_tool))
 
     class Export(APIView):
         authentication_classes = [TokenAuth]

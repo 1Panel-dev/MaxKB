@@ -140,7 +140,6 @@ const putXpackAccessToken: (
   return put(`${prefix.value}/${application_id}/setting`, data, undefined, loading)
 }
 
-
 /**
  * 导出应用
  */
@@ -161,11 +160,12 @@ const exportApplication = (
 /**
  * 导入应用
  */
-const importApplication: (data: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
-  data,
-  loading,
-) => {
-  return post(`${prefix.value}/import`, data, undefined, loading)
+const importApplication: (
+  folder_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (folder_id, data, loading) => {
+  return post(`${prefix.value}/folder/${folder_id}/import`, data, undefined, loading)
 }
 
 /**

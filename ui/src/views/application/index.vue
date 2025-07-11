@@ -13,7 +13,7 @@
     </template>
     <ContentContainer>
       <template #header>
-        <FolderBreadcrumb :folderList="folderList" @click="folderClickHandle"/>
+        <FolderBreadcrumb :folderList="folderList" @click="folderClickHandle" />
       </template>
       <template #search>
         <div class="flex">
@@ -24,9 +24,9 @@
               style="width: 120px"
               @change="search_type_change"
             >
-              <el-option :label="$t('common.creator')" value="create_user"/>
+              <el-option :label="$t('common.creator')" value="create_user" />
 
-              <el-option :label="$t('common.name')" value="name"/>
+              <el-option :label="$t('common.name')" value="name" />
             </el-select>
             <el-input
               v-if="search_type === 'name'"
@@ -44,14 +44,14 @@
               clearable
               style="width: 220px"
             >
-              <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.nick_name"/>
+              <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.nick_name" />
             </el-select>
           </div>
           <el-dropdown trigger="click" v-if="permissionPrecise.create()">
             <el-button type="primary" class="ml-8">
               {{ $t('common.create') }}
               <el-icon class="el-icon--right">
-                <arrow-down/>
+                <arrow-down />
               </el-icon>
             </el-button>
             <template #dropdown>
@@ -68,7 +68,7 @@
                     <div class="pre-wrap ml-8">
                       <div class="lighter">{{ $t('views.application.simple') }}</div>
                       <el-text type="info" size="small"
-                      >{{ $t('views.application.simplePlaceholder') }}
+                        >{{ $t('views.application.simplePlaceholder') }}
                       </el-text>
                     </div>
                   </div>
@@ -85,7 +85,7 @@
                     <div class="pre-wrap ml-8">
                       <div class="lighter">{{ $t('views.application.workflow') }}</div>
                       <el-text type="info" size="small"
-                      >{{ $t('views.application.workflowPlaceholder') }}
+                        >{{ $t('views.application.workflowPlaceholder') }}
                       </el-text>
                     </div>
                   </div>
@@ -104,7 +104,7 @@
                   <el-dropdown-item>
                     <div class="flex align-center w-full">
                       <el-avatar shape="square" class="mt-4" :size="36" style="background: none">
-                        <img src="@/assets/icon_import.svg" alt=""/>
+                        <img src="@/assets/icon_import.svg" alt="" />
                       </el-avatar>
                       <div class="pre-wrap ml-8">
                         <div class="lighter">{{ $t('common.importCreate') }}</div>
@@ -176,7 +176,7 @@
                   @click="goApp(item)"
                 >
                   <template #icon>
-                    <LogoIcon height="32px"/>
+                    <LogoIcon height="32px" />
                   </template>
                   <template #subTitle>
                     <el-text class="color-secondary" size="small">
@@ -197,14 +197,14 @@
                   <template #footer>
                     <div v-if="item.is_publish" class="flex align-center">
                       <el-icon class="color-success mr-8" style="font-size: 16px">
-                        <SuccessFilled/>
+                        <SuccessFilled />
                       </el-icon>
                       <span class="color-secondary">
                         {{ $t('views.application.status.published') }}
                       </span>
-                      <el-divider direction="vertical"/>
+                      <el-divider direction="vertical" />
                       <el-icon class="mr-8">
-                        <Clock/>
+                        <Clock />
                       </el-icon>
                       <span class="color-secondary">{{ dateFormat(item.update_time) }}</span>
                     </div>
@@ -220,14 +220,12 @@
                       <el-dropdown trigger="click">
                         <el-button text @click.stop>
                           <el-icon>
-                            <MoreFilled/>
+                            <MoreFilled />
                           </el-icon>
                         </el-button>
                         <template #dropdown>
                           <el-dropdown-menu>
-                            <el-dropdown-item
-                              @click.stop="getAccessToken(item.id)"
-                            >
+                            <el-dropdown-item @click.stop="getAccessToken(item.id)">
                               <AppIcon iconName="app-create-chat"></AppIcon>
                               {{ $t('views.application.operation.toChat') }}
                             </el-dropdown-item>
@@ -236,7 +234,7 @@
                               v-if="permissionPrecise.edit(item.id)"
                             >
                               <el-icon>
-                                <Setting/>
+                                <Setting />
                               </el-icon>
                               {{ $t('common.setting') }}
                             </el-dropdown-item>
@@ -267,9 +265,8 @@
                               icon="Delete"
                               @click.stop="deleteApplication(item)"
                               v-if="permissionPrecise.delete(item.id)"
-                            >{{ $t('common.delete') }}
-                            </el-dropdown-item
-                            >
+                              >{{ $t('common.delete') }}
+                            </el-dropdown-item>
                           </el-dropdown-menu>
                         </template>
                       </el-dropdown>
@@ -279,13 +276,13 @@
               </el-col>
             </template>
           </el-row>
-          <el-empty :description="$t('common.noData')" v-else/>
+          <el-empty :description="$t('common.noData')" v-else />
         </InfiniteScroll>
       </div>
     </ContentContainer>
-    <CreateApplicationDialog ref="CreateApplicationDialogRef"/>
-    <CopyApplicationDialog ref="CopyApplicationDialogRef"/>
-    <CreateFolderDialog ref="CreateFolderDialogRef" @refresh="refreshFolder"/>
+    <CreateApplicationDialog ref="CreateApplicationDialogRef" />
+    <CopyApplicationDialog ref="CopyApplicationDialogRef" />
+    <CreateFolderDialog ref="CreateFolderDialogRef" @refresh="refreshFolder" />
     <MoveToDialog
       ref="MoveToDialogRef"
       :source="SourceTypeEnum.APPLICATION"
@@ -296,24 +293,24 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref, reactive, computed} from 'vue'
+import { onMounted, ref, reactive, computed } from 'vue'
 import CreateApplicationDialog from '@/views/application/component/CreateApplicationDialog.vue'
 import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
 import CopyApplicationDialog from '@/views/application/component/CopyApplicationDialog.vue'
 import MoveToDialog from '@/components/folder-tree/MoveToDialog.vue'
 import ApplicationApi from '@/api/application/application'
-import {MsgSuccess, MsgConfirm, MsgError} from '@/utils/message'
+import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import useStore from '@/stores'
-import {t} from '@/locales'
-import {useRouter, useRoute} from 'vue-router'
-import {isWorkFlow} from '@/utils/application'
-import {dateFormat} from '@/utils/time'
-import {SourceTypeEnum, ValidType, ValidCount} from '@/enums/common'
+import { t } from '@/locales'
+import { useRouter, useRoute } from 'vue-router'
+import { isWorkFlow } from '@/utils/application'
+import { dateFormat } from '@/utils/time'
+import { SourceTypeEnum, ValidType, ValidCount } from '@/enums/common'
 import permissionMap from '@/permission'
 import WorkspaceApi from '@/api/workspace/workspace'
-import {hasPermission} from '@/utils/permission'
-import {ComplexPermission} from '@/utils/permission/type'
-import {EditionConst, PermissionConst, RoleConst} from '@/utils/permission/data'
+import { hasPermission } from '@/utils/permission'
+import { ComplexPermission } from '@/utils/permission/type'
+import { EditionConst, PermissionConst, RoleConst } from '@/utils/permission/data'
 
 const router = useRouter()
 const route = useRoute()
@@ -325,7 +322,7 @@ const permissionPrecise = computed(() => {
   return permissionMap['application'][apiType.value]
 })
 
-const {folder, application, user, common} = useStore()
+const { folder, application, user, common } = useStore()
 
 const loading = ref(false)
 
@@ -363,36 +360,127 @@ function refreshApplicationList(row: any) {
 }
 
 const goApp = (item: any) => {
-  router.push({path: get_route(item)})
+  router.push({ path: get_route(item) })
 }
 
-
 const get_route = (item: any) => {
-  if (hasPermission([new ComplexPermission([RoleConst.USER], [PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(item.id)], [], 'AND'),
-    RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-    PermissionConst.APPLICATION_OVERVIEW_READ.getWorkspacePermissionWorkspaceManageRole,
-    PermissionConst.APPLICATION_OVERVIEW_READ.getApplicationWorkspaceResourcePermission(item.id)], 'OR')) {
+  if (
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(item.id)],
+          [],
+          'AND',
+        ),
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.APPLICATION_OVERVIEW_READ.getWorkspacePermissionWorkspaceManageRole,
+        PermissionConst.APPLICATION_OVERVIEW_READ.getApplicationWorkspaceResourcePermission(
+          item.id,
+        ),
+      ],
+      'OR',
+    )
+  ) {
     return `/application/${item.id}/${item.type}/overview`
-  } else if (hasPermission([new ComplexPermission([RoleConst.USER], [PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(item.id)], [], 'AND'),
-    RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-    PermissionConst.APPLICATION_EDIT.getWorkspacePermissionWorkspaceManageRole,
-    PermissionConst.APPLICATION_EDIT.getApplicationWorkspaceResourcePermission(item.id)], 'OR')) {
+  } else if (
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(item.id)],
+          [],
+          'AND',
+        ),
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.APPLICATION_EDIT.getWorkspacePermissionWorkspaceManageRole,
+        PermissionConst.APPLICATION_EDIT.getApplicationWorkspaceResourcePermission(item.id),
+      ],
+      'OR',
+    )
+  ) {
     if (item.type == 'WORK_FLOW') {
       return `/application/${item.id}/workflow`
     } else {
       return `/application/${item.id}/${item.type}/setting`
     }
-  } else if (hasPermission([new ComplexPermission([RoleConst.USER], [PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(item.id)], [EditionConst.IS_EE, EditionConst.IS_PE], 'AND'),
-    new ComplexPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,], [PermissionConst.APPLICATION_ACCESS_READ.getWorkspacePermissionWorkspaceManageRole], [EditionConst.IS_EE, EditionConst.IS_PE], 'OR'),
-    new ComplexPermission([], [PermissionConst.APPLICATION_ACCESS_READ.getApplicationWorkspaceResourcePermission(item.id)], [EditionConst.IS_EE, EditionConst.IS_PE], 'OR'),], 'OR')) {
+  } else if (
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(item.id)],
+          [EditionConst.IS_EE, EditionConst.IS_PE],
+          'AND',
+        ),
+        new ComplexPermission(
+          [RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+          [PermissionConst.APPLICATION_ACCESS_READ.getWorkspacePermissionWorkspaceManageRole],
+          [EditionConst.IS_EE, EditionConst.IS_PE],
+          'OR',
+        ),
+        new ComplexPermission(
+          [],
+          [
+            PermissionConst.APPLICATION_ACCESS_READ.getApplicationWorkspaceResourcePermission(
+              item.id,
+            ),
+          ],
+          [EditionConst.IS_EE, EditionConst.IS_PE],
+          'OR',
+        ),
+      ],
+      'OR',
+    )
+  ) {
     return `/application/${item.id}/${item.type}/access`
-  } else if (hasPermission([new ComplexPermission([RoleConst.USER], [PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(item.id)], [EditionConst.IS_EE, EditionConst.IS_PE], 'AND'),
-    new ComplexPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole], [PermissionConst.APPLICATION_CHAT_USER_READ.getWorkspacePermissionWorkspaceManageRole], [EditionConst.IS_EE, EditionConst.IS_PE], 'OR'),
-    new ComplexPermission([], [PermissionConst.APPLICATION_CHAT_USER_READ.getApplicationWorkspaceResourcePermission(item.id)], [EditionConst.IS_EE, EditionConst.IS_PE], 'OR'),], 'OR')) {
+  } else if (
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(item.id)],
+          [EditionConst.IS_EE, EditionConst.IS_PE],
+          'AND',
+        ),
+        new ComplexPermission(
+          [RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+          [PermissionConst.APPLICATION_CHAT_USER_READ.getWorkspacePermissionWorkspaceManageRole],
+          [EditionConst.IS_EE, EditionConst.IS_PE],
+          'OR',
+        ),
+        new ComplexPermission(
+          [],
+          [
+            PermissionConst.APPLICATION_CHAT_USER_READ.getApplicationWorkspaceResourcePermission(
+              item.id,
+            ),
+          ],
+          [EditionConst.IS_EE, EditionConst.IS_PE],
+          'OR',
+        ),
+      ],
+      'OR',
+    )
+  ) {
     return `/application/${item.id}/${item.type}/chat-user`
-  } else if (hasPermission([new ComplexPermission([RoleConst.USER], [PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(item.id)], [], 'AND'),
-    PermissionConst.APPLICATION_CHAT_LOG_READ.getWorkspacePermissionWorkspaceManageRole,
-    PermissionConst.APPLICATION_CHAT_LOG_READ.getApplicationWorkspaceResourcePermission(item.id)], 'OR')) {
+  } else if (
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(item.id)],
+          [],
+          'AND',
+        ),
+        PermissionConst.APPLICATION_CHAT_LOG_READ.getWorkspacePermissionWorkspaceManageRole,
+        PermissionConst.APPLICATION_CHAT_LOG_READ.getApplicationWorkspaceResourcePermission(
+          item.id,
+        ),
+      ],
+      'OR',
+    )
+  ) {
     return `/application/${item.id}/${item.type}/chat-log`
   } else return `/application/`
 }
@@ -404,7 +492,7 @@ function openCreateDialog(type?: string) {
 }
 
 const search_type_change = () => {
-  search_form.value = {name: '', create_user: ''}
+  search_form.value = { name: '', create_user: '' }
 }
 
 function getAccessToken(id: string) {
@@ -414,20 +502,20 @@ function getAccessToken(id: string) {
     .map((v: any) => {
       apiInputParams.value = v.properties.api_input_field_list
         ? v.properties.api_input_field_list.map((v: any) => {
-          return {
-            name: v.variable,
-            value: v.default_value,
-          }
-        })
+            return {
+              name: v.variable,
+              value: v.default_value,
+            }
+          })
         : v.properties.input_field_list
           ? v.properties.input_field_list
-            .filter((v: any) => v.assignment_method === 'api_input')
-            .map((v: any) => {
-              return {
-                name: v.variable,
-                value: v.default_value,
-              }
-            })
+              .filter((v: any) => v.assignment_method === 'api_input')
+              .map((v: any) => {
+                return {
+                  name: v.variable,
+                  value: v.default_value,
+                }
+              })
           : []
     })
   const apiParams = mapToUrlParams(apiInputParams.value)
@@ -444,7 +532,7 @@ function copyApplication(row: any) {
   application.asyncGetApplicationDetail(row.id, loading).then((res: any) => {
     if (res?.data) {
       CopyApplicationDialogRef.value.open(
-        {...res.data, model_id: res.data.model},
+        { ...res.data, model_id: res.data.model },
         folder.currentFolder?.id || 'default',
       )
     }
@@ -453,9 +541,9 @@ function copyApplication(row: any) {
 
 function settingApplication(row: any) {
   if (isWorkFlow(row.type)) {
-    router.push({path: `/application/${row.id}/workflow`})
+    router.push({ path: `/application/${row.id}/workflow` })
   } else {
-    router.push({path: `/application/${row.id}/${row.type}/setting`})
+    router.push({ path: `/application/${row.id}/${row.type}/setting` })
   }
 }
 
@@ -487,8 +575,7 @@ function deleteApplication(row: any) {
         MsgSuccess(t('common.deleteSuccess'))
       })
     })
-    .catch(() => {
-    })
+    .catch(() => {})
 }
 
 const exportApplication = (application: any) => {
@@ -506,7 +593,7 @@ const importApplication = (file: any) => {
   const formData = new FormData()
   formData.append('file', file.raw, file.name)
   elUploadRef.value.clearFiles()
-  ApplicationApi.importApplication(formData, loading)
+  ApplicationApi.importApplication(folder.currentFolder.id, formData, loading)
     .then(async (res: any) => {
       if (res?.data) {
         applicationList.value = []

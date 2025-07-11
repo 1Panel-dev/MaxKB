@@ -7,7 +7,7 @@ app_name = 'application'
 urlpatterns = [
 
     path('workspace/<str:workspace_id>/application', views.ApplicationAPI.as_view(), name='application'),
-    path('workspace/<str:workspace_id>/application/import', views.ApplicationAPI.Import.as_view()),
+    path('workspace/<str:workspace_id>/application/folder/<str:folder_id>/import', views.ApplicationAPI.Import.as_view()),
     path('workspace/<str:workspace_id>/application/<int:current_page>/<int:page_size>', views.ApplicationAPI.Page.as_view(), name='application_page'),
     path('workspace/<str:workspace_id>/application/<str:application_id>', views.ApplicationAPI.Operate.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/publish', views.ApplicationAPI.Publish.as_view()),
