@@ -664,16 +664,20 @@ class DocumentSerializers(serializers.Serializer):
         @transaction.atomic
         def delete(self):
             document_id = self.data.get("document_id")
-            QuerySet(model=Document).filter(id=document_id).delete()
-            source_file_ids = [doc['meta'].get('source_file_id') for doc in
-                               Document.objects.filter(id__=document_id).values("meta")]
+            source_file_ids = [
+                doc['meta'].get(
+                    'source_file_id'
+                ) for doc in Document.objects.filter(id=document_id).values("meta")
+            ]
             QuerySet(File).filter(id__in=source_file_ids).delete()
+            QuerySet(File).filter(source_id=document_id, source_type=FileSourceType.DOCUMENT).delete()
             # 删除段落
             QuerySet(model=Paragraph).filter(document_id=document_id).delete()
             # 删除问题
             delete_problems_and_mappings([document_id])
             # 删除向量库
             delete_embedding_by_document(document_id)
+            QuerySet(model=Document).filter(id=document_id).delete()
             return True
 
         def refresh(self, state_list=None, with_valid=True):
