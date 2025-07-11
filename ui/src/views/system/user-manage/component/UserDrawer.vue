@@ -45,8 +45,10 @@
         </el-input>
       </el-form-item>
       <el-form-item :label="$t('views.userManage.userForm.phone.label')" prop="phone">
-        <el-input v-model="userForm.phone"
-                  :placeholder="$t('views.userManage.userForm.phone.placeholder')">
+        <el-input
+          v-model="userForm.phone"
+          :placeholder="$t('views.userManage.userForm.phone.placeholder')"
+        >
         </el-input>
       </el-form-item>
       <el-form-item label="默认密码" v-if="!isEdit">
@@ -54,12 +56,18 @@
       </el-form-item>
     </el-form>
     <h4 class="title-decoration-1 mb-16 mt-8" v-if="user.isEE() || user.isPE()">
-      {{ $t('views.userManage.roleSetting') }}</h4>
-    <MemberFormContent ref="memberFormContentRef" :models="formItemModel" v-model:form="list"
-                       v-loading="memberFormContentLoading"
-                       keepOneLine
-                       :addText="$t('views.userManage.addRole')" v-if="user.isEE() || user.isPE()"
-                       :deleteButtonDisabled="deleteButtonDisabled"/>
+      {{ $t('views.userManage.roleSetting') }}
+    </h4>
+    <MemberFormContent
+      ref="memberFormContentRef"
+      :models="formItemModel"
+      v-model:form="list"
+      v-loading="memberFormContentLoading"
+      keepOneLine
+      :addText="$t('views.userManage.addRole')"
+      v-if="user.isEE() || user.isPE()"
+      :deleteButtonDisabled="deleteButtonDisabled"
+    />
     <template #footer>
       <el-button @click.prevent="visible = false"> {{ $t('common.cancel') }}</el-button>
       <el-button type="primary" @click="submit(userFormRef)" :loading="loading">
@@ -69,18 +77,18 @@
   </el-drawer>
 </template>
 <script setup lang="ts">
-import {ref, reactive, watch, onBeforeMount, computed} from 'vue'
-import type {FormInstance} from 'element-plus'
+import { ref, reactive, watch, onBeforeMount, computed } from 'vue'
+import type { FormInstance } from 'element-plus'
 import userManageApi from '@/api/system/user-manage'
-import {MsgSuccess} from '@/utils/message'
-import {t} from '@/locales'
-import type {FormItemModel} from '@/api/type/role'
+import { MsgSuccess } from '@/utils/message'
+import { t } from '@/locales'
+import type { FormItemModel } from '@/api/type/role'
 import WorkspaceApi from '@/api/workspace/workspace'
 import MemberFormContent from '@/views/system/role/component/MemberFormContent.vue'
-import {RoleTypeEnum} from '@/enums/system'
-import useStore from "@/stores";
+import { RoleTypeEnum } from '@/enums/system'
+import useStore from '@/stores'
 
-const {user} = useStore()
+const { user } = useStore()
 const props = defineProps({
   title: String,
 })
@@ -96,17 +104,17 @@ const userForm = ref<any>({
   nick_name: '',
 })
 
-const list = ref<any[]>([]);
-const memberFormContentLoading = ref(false);
-const formItemModel = ref<FormItemModel[]>([]);
-const roleFormItem = ref<FormItemModel[]>([]);
+const list = ref<any[]>([])
+const memberFormContentLoading = ref(false)
+const formItemModel = ref<FormItemModel[]>([])
+const roleFormItem = ref<FormItemModel[]>([])
 const adminRoleList = ref<any[]>([])
 const workspaceFormItem = ref<FormItemModel[]>([])
 
 const isAdmin = computed(() => userForm.value['id'] === 'f0dd8f71-e4ee-11ee-8c84-a8a1595801ab')
 
 function deleteButtonDisabled(element: any) {
-  if (isAdmin.value && ['ADMIN','WORKSPACE_MANAGE', 'USER'].includes(element.role_id)) {
+  if (isAdmin.value && ['ADMIN', 'WORKSPACE_MANAGE', 'USER'].includes(element.role_id)) {
     return true
   }
   return false
@@ -114,28 +122,31 @@ function deleteButtonDisabled(element: any) {
 
 async function getRoleFormItem() {
   try {
-    const res = await WorkspaceApi.getWorkspaceRoleList(memberFormContentLoading);
-    roleFormItem.value = [{
-      path: 'role_id',
-      label: t('views.role.member.role'),
-      rules: [
-        {
-          required: true,
-          message: `${t('common.selectPlaceholder')}${t('views.role.member.role')}`,
+    const res = await WorkspaceApi.getWorkspaceRoleList(memberFormContentLoading)
+    roleFormItem.value = [
+      {
+        path: 'role_id',
+        label: t('views.role.member.role'),
+        rules: [
+          {
+            required: true,
+            message: `${t('common.selectPlaceholder')}${t('views.role.member.role')}`,
+          },
+        ],
+        selectProps: {
+          options:
+            res.data?.map((item) => ({
+              label: item.name,
+              value: item.id,
+            })) || [],
+          placeholder: `${t('common.selectPlaceholder')}${t('views.role.member.role')}`,
+          multiple: false,
         },
-      ],
-      selectProps: {
-        options: res.data?.map(item => ({
-          label: item.name,
-          value: item.id
-        })) || [],
-        placeholder: `${t('common.selectPlaceholder')}${t('views.role.member.role')}`,
-        multiple: false
-      }
-    }]
-    adminRoleList.value = res.data.filter(item => item.type === RoleTypeEnum.ADMIN)
+      },
+    ]
+    adminRoleList.value = res.data.filter((item) => item.type === RoleTypeEnum.ADMIN)
   } catch (e) {
-    console.error(e);
+    console.error(e)
   }
 }
 
@@ -146,16 +157,20 @@ async function getWorkspaceFormItem() {
       {
         path: 'workspace_ids',
         label: t('views.role.member.workspace'),
-        hidden: (e) => adminRoleList.value.find(item => item.id === e.role_id),
+        hidden: (e) => adminRoleList.value.find((item) => item.id === e.role_id),
         rules: [
           {
             validator: (rule, value, callback) => {
-              const match = rule.field?.match(/\[(\d+)\]/);
-              const isAdmin = adminRoleList.value.some(role => role.id === list.value[parseInt(match?.[1] ?? '', 10)].role_id);
+              const match = rule.field?.match(/\[(\d+)\]/)
+              const isAdmin = adminRoleList.value.some(
+                (role) => role.id === list.value[parseInt(match?.[1] ?? '', 10)].role_id,
+              )
               if (!isAdmin && (!value || value.length === 0)) {
-                callback(new Error(`${t('common.selectPlaceholder')}${t('views.role.member.workspace')}`));
+                callback(
+                  new Error(`${t('common.selectPlaceholder')}${t('views.role.member.workspace')}`),
+                )
               } else {
-                callback();
+                callback()
               }
             },
             trigger: 'blur',
@@ -166,12 +181,15 @@ async function getWorkspaceFormItem() {
             res.data?.map((item) => ({
               label: item.name,
               value: item.id,
-              disabledFunction: (e: any)=> isAdmin.value && ['WORKSPACE_MANAGE', 'USER'].includes(e.role_id) && item.id === 'default'
+              disabledFunction: (e: any) =>
+                isAdmin.value &&
+                ['WORKSPACE_MANAGE', 'USER'].includes(e.role_id) &&
+                item.id === 'default',
             })) || [],
           placeholder: `${t('common.selectPlaceholder')}${t('views.role.member.workspace')}`,
-          clearableFunction: (e)=>{
+          clearableFunction: (e) => {
             return !(isAdmin.value && ['WORKSPACE_MANAGE', 'USER'].includes(e.role_id))
-          }
+          },
         },
       },
     ]
@@ -182,13 +200,13 @@ async function getWorkspaceFormItem() {
 
 onBeforeMount(async () => {
   if (user.isEE() || user.isPE()) {
-    await getRoleFormItem();
+    await getRoleFormItem()
     if (user.isEE()) {
-      await getWorkspaceFormItem();
+      await getWorkspaceFormItem()
     }
     formItemModel.value = [...roleFormItem.value, ...workspaceFormItem.value]
   }
-  list.value = [{role_id: '', workspace_ids: []}]
+  list.value = [{ role_id: '', workspace_ids: [] }]
 })
 
 const rules = reactive({
@@ -260,7 +278,7 @@ watch(visible, (bool) => {
       nick_name: '',
     }
     isEdit.value = false
-    list.value = [{role_id: '', workspace_ids: []}]
+    list.value = [{ role_id: '', workspace_ids: [] }]
     userFormRef.value?.clearValidate()
   }
 })
@@ -273,7 +291,10 @@ const open = (data: any) => {
     userForm.value.password = data.password
     userForm.value.phone = data.phone
     userForm.value.nick_name = data.nick_name
-    list.value = data.role_setting.map(item=>({...item, workspace_ids: item.workspace_ids.includes('None')?[]:item.workspace_ids}))
+    list.value = data.role_setting.map((item: any) => ({
+      ...item,
+      workspace_ids: item.workspace_ids.includes('None') ? [] : item.workspace_ids,
+    }))
     isEdit.value = true
   } else {
     //需要查询默认密码是啥zxl
@@ -294,26 +315,26 @@ const submit = async (formEl: FormInstance | undefined) => {
         await memberFormContentRef.value?.validate()
       }
       if (user.isPE() || user.isEE()) {
-        list.value = list.value.map(item => {
-          const isAdminRole = adminRoleList.value.find(item1 => item1.id === item.role_id);
+        list.value = list.value.map((item) => {
+          const isAdminRole = adminRoleList.value.find((item1) => item1.id === item.role_id)
 
           // 如果是管理员角色，则设置为 ['None']
           if (isAdminRole) {
-            return {...item, workspace_ids: ['None']};
+            return { ...item, workspace_ids: ['None'] }
           }
 
           // 如果是普通用户且是 PE 类型，则设置为 ['default']
           if (user.isPE()) {
-            return {...item, workspace_ids: ['default']};
+            return { ...item, workspace_ids: ['default'] }
           }
 
           // 其他情况保持原样
-          return item;
-        });
+          return item
+        })
       }
       const params = {
         ...userForm.value,
-        role_setting: list.value
+        role_setting: list.value,
       }
       if (isEdit.value) {
         userManageApi.putUserManage(userForm.value.id, params, loading).then((res) => {
@@ -332,6 +353,6 @@ const submit = async (formEl: FormInstance | undefined) => {
   })
 }
 
-defineExpose({open})
+defineExpose({ open })
 </script>
 <style lang="scss" scoped></style>

@@ -1,14 +1,14 @@
-import {RoleTypeEnum} from '@/enums/system'
-import {t} from '@/locales'
+import { RoleTypeEnum } from '@/enums/system'
+import { t } from '@/locales'
 import useStore from '@/stores'
 
-const {user} = useStore()
-export const roleTypeMap: { [RoleTypeEnum.USER]: string; [RoleTypeEnum.WORKSPACE_MANAGE]: string } = {
+const { user } = useStore()
+export const roleTypeMap: any = {
   ...(user.is_admin()
     ? {
-      [RoleTypeEnum.ADMIN]: t('views.role.systemAdmin'),
-    }
+        [RoleTypeEnum.ADMIN]: t('views.role.systemAdmin'),
+      }
     : {}),
   [RoleTypeEnum.USER]: t('views.role.user'),
   [RoleTypeEnum.WORKSPACE_MANAGE]: t('views.role.workspaceAdmin'),
-};
+}
