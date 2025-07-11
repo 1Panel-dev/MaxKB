@@ -213,9 +213,7 @@ function refreshFieldTitle(chatId: string, abstract: string) {
   display: flex;
   flex-direction: column;
   border-right: 1px solid var(--el-menu-border-color);
-  background:
-    linear-gradient(187.61deg, rgba(235, 241, 255, 0.5) 39.6%, rgba(231, 249, 255, 0.5) 94.3%),
-    #eef1f4;
+  background: var(--el-color-primary-light-06) !important;
   :deep(.el-menu) {
     background: none;
     border: none;
@@ -226,6 +224,9 @@ function refreshFieldTitle(chatId: string, abstract: string) {
       .el-sub-menu.is-active .el-sub-menu__title {
         color: var(--el-text-color-primary) !important;
       }
+    }
+    .el-sub-menu__title:hover {
+      background-color: var(--el-color-primary-light-9) !important;
     }
   }
 
@@ -251,11 +252,9 @@ function refreshFieldTitle(chatId: string, abstract: string) {
 </style>
 <style lang="scss">
 .chat-pc-popper {
-  background:
-    linear-gradient(187.61deg, rgba(235, 241, 255, 0.5) 39.6%, rgba(231, 249, 255, 0.5) 94.3%),
-    #eef1f4 !important;
+  background: #ffffff!important;
   .el-menu {
-    background: transparent;
+    background: var(--el-color-primary-light-06) !important;
   }
   .el-menu-item-group__title {
     padding: 8px 8px 8px 16px;

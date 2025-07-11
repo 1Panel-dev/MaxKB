@@ -13,6 +13,10 @@
         applicationDetail?.custom_theme?.theme_color || '#3370FF',
         0.4,
       ),
+      '--el-color-primary-light-06': hexToRgba(
+        applicationDetail?.custom_theme?.theme_color || '#3370FF',
+        0.04,
+      ),
       backgroundImage: `url(${applicationDetail?.chat_background})`,
     }"
   >
