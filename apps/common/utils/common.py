@@ -24,6 +24,9 @@ from pydub import AudioSegment
 
 from ..database_model_manage.database_model_manage import DatabaseModelManage
 from ..exception.app_exception import AppApiException
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad, unpad
+from base64 import b64encode, b64decode
 
 
 def password_encrypt(row_password):
@@ -85,6 +88,34 @@ def encryption(message: str):
          range(message_len - (int(post_len) if pre_len < max_post_len else max_post_len), message_len)])
     content = "***************"
     return pre_str + content + end_str
+
+
+key = b'J\xbb\xd1\xa3\x93zB\x80/\xf2\x89e\xecb\xfe\x02'
+
+
+def encrypt(message: str) -> str:
+    cipher = AES.new(key, AES.MODE_CBC)
+    ct_bytes = cipher.encrypt(pad(message.encode('utf-8'), AES.block_size))
+    iv = b64encode(cipher.iv).decode('utf-8')
+    ct = b64encode(ct_bytes).decode('utf-8')
+    return f"{iv}:{ct}"
+
+
+def decrypt(encrypted: str) -> str:
+    try:
+        # 判断是否为加密格式 (iv:ciphertext)
+        if ':' not in encrypted:
+            return encrypted  # 非加密字符串直接返回
+
+        iv_str, ct_str = encrypted.split(":", 1)
+        iv = b64decode(iv_str)
+        ct = b64decode(ct_str)
+        cipher = AES.new(key, AES.MODE_CBC, iv)
+        pt = unpad(cipher.decrypt(ct), AES.block_size)
+        return pt.decode('utf-8')
+    except (ValueError, KeyError, IndexError, Exception):
+        # 捕获所有可能的异常，如无效格式、密钥错误等
+        return encrypted  # 如果解密失败，返回原字符串
 
 
 def _remove_empty_lines(text):
