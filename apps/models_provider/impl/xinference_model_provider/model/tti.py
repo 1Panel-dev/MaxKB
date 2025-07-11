@@ -5,9 +5,11 @@ from openai import OpenAI
 
 from common.config.tokenizer_manage_config import TokenizerManage
 from common.utils.common import bytes_to_uploaded_file
+from knowledge.models import FileSourceType
 # from dataset.serializers.file_serializers import FileSerializer
 from models_provider.base_model_provider import MaxKBBaseModel
 from models_provider.impl.base_tti import BaseTextToImage
+from oss.serializers.file import FileSerializer
 
 
 def custom_get_token_ids(text: str):
@@ -45,9 +47,6 @@ class XinferenceTextToImage(MaxKBBaseModel, BaseTextToImage):
             **optional_params,
         )
 
-    def is_cache_model(self):
-        return False
-
     def check_auth(self):
         self.generate_image('生成一个小猫图片')
 
@@ -57,11 +56,6 @@ class XinferenceTextToImage(MaxKBBaseModel, BaseTextToImage):
         file_urls = []
         # 临时文件
         for img in res.data:
-            file = bytes_to_uploaded_file(base64.b64decode(img.b64_json), 'file_name.jpg')
-            meta = {
-                'debug': True,
-            }
-            # file_url = FileSerializer(data={'file': file, 'meta': meta}).upload()
-            # file_urls.append(f'http://localhost:8080{file_url}')
+            file_urls.append(base64.b64decode(img.b64_json))
 
         return file_urls

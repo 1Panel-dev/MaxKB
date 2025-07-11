@@ -40,7 +40,9 @@ class BaseImageGenerateNode(IImageGenerateNode):
         file_urls = []
         for image_url in image_urls:
             file_name = 'generated_image.png'
-            file = bytes_to_uploaded_file(requests.get(image_url).content, file_name)
+            if isinstance(image_url, str) and image_url.startswith('http'):
+                image_url = requests.get(image_url).content
+            file = bytes_to_uploaded_file(image_url, file_name)
             meta = {
                 'debug': False if application.id else True,
                 'chat_id': chat_id,
