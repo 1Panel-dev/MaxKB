@@ -549,6 +549,7 @@ class ApplicationSerializer(serializers.Serializer):
                     user_id=user_id,
                     name=tool.get('name'),
                     code=tool.get('code'),
+                    template_id=tool.get('template_id'),
                     input_field_list=tool.get('input_field_list'),
                     is_active=tool.get('is_active'),
                     scope=ToolScope.WORKSPACE,
