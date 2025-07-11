@@ -600,6 +600,14 @@
                   </div>
                   <div class="card-never border-r-6 mt-8">
                     <h5 class="p-8-12">
+                      {{ $t('views.applicationWorkflow.nodes.imageGenerateNode.negative_prompt.label') }}
+                    </h5>
+                    <div class="p-8-12 border-t-dashed lighter pre-wrap">
+                      {{ item.negative_prompt || '-' }}
+                    </div>
+                  </div>
+                  <div class="card-never border-r-6 mt-8">
+                    <h5 class="p-8-12">
                       {{
                         item.type == WorkflowType.Application
                           ? $t('common.param.outputParam')
