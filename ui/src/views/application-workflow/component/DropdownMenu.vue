@@ -1,14 +1,13 @@
 <template>
   <div v-show="show" class="workflow-dropdown-menu border border-r-6 white-bg">
     <el-tabs v-model="activeName" class="workflow-dropdown-tabs">
-      <div style="display: flex; width: 100%; justify-content: center" class="mb-12">
-        <el-input
-          v-model="search_text"
-          class="mr-12 ml-12"
-          :placeholder="$t('views.applicationWorkflow.searchBar.placeholder')"
-        >
+      <div v-show="activeName === 'base'" style="display: flex; width: 100%; justify-content: center" class="mb-12 mt-12">
+        <el-input v-model="search_text" class="mr-12 ml-12"
+          :placeholder="$t('views.applicationWorkflow.searchBar.placeholder')">
           <template #suffix>
-            <el-icon class="el-input__icon"><search /></el-icon>
+            <el-icon class="el-input__icon">
+              <search />
+            </el-icon>
           </template>
         </el-input>
       </div>
@@ -19,37 +18,25 @@
             <template v-for="(node, index) in filter_menu_nodes" :key="index">
               <el-text type="info" size="small" class="color-secondary ml-12">{{
                 node.label
-              }}</el-text>
-              <div class="flex-wrap mt-8">
+                }}</el-text>
+              <div class="flex-wrap" style="gap: 12px; padding: 12px;">
                 <template v-for="(item, index) in node.list" :key="index">
-                  <el-popover placement="right" :width="280">
+                  <el-popover placement="right" :width="280" :show-after="500">
                     <template #reference>
-                      <div
-                        class="list-item flex align-center border border-r-6 mb-12 p-8-12 cursor ml-12"
-                        style="width: 39%"
-                        @click.stop="clickNodes(item)"
-                        @mousedown.stop="onmousedown(item)"
-                      >
-                        <component
-                          :is="iconComponent(`${item.type}-icon`)"
-                          class="mr-8"
-                          :size="32"
-                        />
+                      <div class="list-item flex align-center border border-r-6 p-8-12 cursor"
+                        style="width: calc(50% - 6px)" @click.stop="clickNodes(item)" @mousedown.stop="onmousedown(item)">
+                        <component :is="iconComponent(`${item.type}-icon`)" class="mr-8" :size="32" />
                         <div class="lighter">{{ item.label }}</div>
                       </div>
                     </template>
                     <template #default>
                       <div class="flex align-center mb-8">
-                        <component
-                          :is="iconComponent(`${item.type}-icon`)"
-                          class="mr-8"
-                          :size="32"
-                        />
+                        <component :is="iconComponent(`${item.type}-icon`)" class="mr-8" :size="32" />
                         <div class="lighter color-text-primary">{{ item.label }}</div>
                       </div>
                       <el-text type="info" size="small" class="color-secondary lighter">{{
                         item.text
-                      }}</el-text>
+                        }}</el-text>
                     </template>
                   </el-popover>
                 </template>
@@ -61,68 +48,34 @@
           </div>
         </el-scrollbar>
       </el-tab-pane>
+      <!-- 工具 -->
       <el-tab-pane :label="$t('views.tool.title')" name="tool">
-        <el-scrollbar height="400">
-          <!-- 共享工具 -->
-          <el-collapse expand-icon-position="left" v-if="user.isEE()">
-            <el-collapse-item name="shared" :icon="CaretRight">
-              <template #title>
-                <div class="flex align-center">
-                  <AppIcon
-                    iconName="app-shared-active"
-                    style="font-size: 20px"
-                    class="color-primary"
-                  ></AppIcon>
-                  <span class="ml-8 lighter">{{ $t('views.shared.shared_tool') }}</span>
-                </div>
-              </template>
-              <NodeContent
-                :list="sharedToolList"
-                @clickNodes="(val: any) => clickNodes(toolLibNode, val, 'tool')"
-                @onmousedown="(val: any) => onmousedown(toolLibNode, val, 'tool')"
-              />
-            </el-collapse-item>
-          </el-collapse>
-
-          <el-tree
-            :data="toolTreeData"
-            node-key="id"
-            :props="{ children: 'children', isLeaf: 'isLeaf', class: getNodeClass }"
-            lazy
-            :load="loadNode"
-          >
-            <template #default="{ data, node }">
-              <NodeContent
-                v-if="!data._fake"
-                :data="data"
-                :node="node"
-                @clickNodes="(val: any) => clickNodes(toolLibNode, val, 'tool')"
-                @onmousedown="(val: any) => onmousedown(toolLibNode, val, 'tool')"
-              />
-            </template>
-          </el-tree>
-        </el-scrollbar>
+        <LayoutContainer>
+          <template #left>
+            <folder-tree :source="SourceTypeEnum.TOOL" :data="toolTreeData" :currentNodeKey="folder.currentFolder?.id"
+              @handleNodeClick="folderClickHandle" :shareTitle="$t('views.shared.shared_tool')"
+              :showShared="user.isEE()" class="p-8" :canOperation="false" />
+          </template>
+          <el-scrollbar height="450">
+            <NodeContent :list="toolList" @clickNodes="(val: any) => clickNodes(toolLibNode, val, 'tool')"
+              @onmousedown="(val: any) => onmousedown(toolLibNode, val, 'tool')" />
+          </el-scrollbar>
+        </LayoutContainer>
       </el-tab-pane>
+      <!-- 应用 -->
       <el-tab-pane :label="$t('views.application.title')" name="application">
-        <el-scrollbar height="400">
-          <el-tree
-            :data="applicationTreeData"
-            node-key="id"
-            :props="{ children: 'children', isLeaf: 'isLeaf', class: getNodeClass }"
-            lazy
-            :load="loadNode"
-          >
-            <template #default="{ data, node }">
-              <NodeContent
-                v-if="!data._fake"
-                :data="data"
-                :node="node"
-                @clickNodes="(val: any) => clickNodes(applicationNode, val, 'application')"
-                @onmousedown="(val: any) => onmousedown(applicationNode, val, 'application')"
-              />
-            </template>
-          </el-tree>
-        </el-scrollbar>
+        <LayoutContainer>
+          <template #left>
+            <folder-tree :source="SourceTypeEnum.APPLICATION" :data="applicationTreeData"
+              :currentNodeKey="folder.currentFolder?.id" @handleNodeClick="folderClickHandle" class="p-8"
+              :canOperation="false" />
+          </template>
+          <el-scrollbar height="450">
+            <NodeContent :list="applicationList"
+              @clickNodes="(val: any) => clickNodes(applicationNode, val, 'application')"
+              @onmousedown="(val: any) => onmousedown(applicationNode, val, 'application')" />
+          </el-scrollbar>
+        </LayoutContainer>
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -176,7 +129,6 @@ const filter_menu_nodes = computed(() => {
   }, [])
 })
 function clickNodes(item: any, data?: any, type?: string) {
-  console.log('clickNodes', item, data, type)
   if (data) {
     item['properties']['stepName'] = data.name
     if (type == 'tool') {
@@ -237,52 +189,16 @@ function onmousedown(item: any, data?: any, type?: string) {
   emit('onmousedown', item)
 }
 
-function getNodeClass(data: any) {
-  return data._fake ? 'tree-node--hidden' : ''
-}
-
-const loadNode = async (node: any, resolve: (children: any[]) => void) => {
-  if (node.level === 0) return resolve([])
-  try {
-    let folders
-    if (activeName.value === 'tool') {
-      const res = await ToolApi.getToolList({ folder_id: node.data.id })
-      node.data.cardList = res.data.tools
-      folders = res.data?.folders
-    } else {
-      const res = await ApplicationApi.getAllApplication({ folder_id: node.data.id })
-      node.data.cardList = res.data.filter((item) => item.resource_type === 'application')
-      folders = res.data.filter((item) => item.resource_type === 'folder')
-    }
-    const children = folders.map((f) => ({
-      ...f,
-      children: [],
-      isLeaf: false,
-    }))
-
-    if (folders.length === 0 && node.data.cardList.length > 0) {
-      // 插一个假子节点，确保树节点是“可折叠”的
-      children.push({
-        id: `__placeholder__${node.data.id}`,
-        isLeaf: true,
-        _fake: true,
-      })
-    }
-
-    resolve(children)
-  } catch (e: any) {
-    resolve([]) // 失败也要 resolve，否则树会卡住
-  }
-}
-
 const toolTreeData = ref<any[]>([])
-function getToolFolder() {
-  folder.asyncGetFolder(SourceTypeEnum.TOOL, {}, loading).then((res: any) => {
-    toolTreeData.value = res.data
-  })
+const toolList = ref<any[]>([])
+const sharedToolList = ref<any[]>([])
+
+async function getToolFolder() {
+  const res: any = await folder.asyncGetFolder(SourceTypeEnum.TOOL, {}, loading)
+  toolTreeData.value = res.data
+  folder.setCurrentFolder(res.data?.[0] || {})
 }
 
-const sharedToolList = ref<any[]>([])
 async function getShareTool() {
   try {
     const res = await sharedWorkspaceApi.getToolList(loading)
@@ -292,19 +208,47 @@ async function getShareTool() {
   }
 }
 
+async function getToolList() {
+  if (folder.currentFolder.id === "share") {
+    toolList.value = sharedToolList.value
+  } else {
+    const res = await ToolApi.getToolList({ folder_id: folder.currentFolder?.id || user.getWorkspaceId() })
+    toolList.value = res.data.tools
+  }
+}
+
 const applicationTreeData = ref<any[]>([])
+const applicationList = ref<any[]>([])
+
 function getApplicationFolder() {
   folder.asyncGetFolder(SourceTypeEnum.APPLICATION, {}, loading).then((res: any) => {
     applicationTreeData.value = res.data
+  folder.setCurrentFolder(res.data?.[0] || {})
   })
 }
 
-onMounted(() => {
-  if (user.isEE()) {
-    getShareTool()
+async function getApplicationList() {
+  const res = await ApplicationApi.getAllApplication({ folder_id: folder.currentFolder?.id || user.getWorkspaceId() })
+  applicationList.value = res.data.filter((item) => item.resource_type === 'application')
+}
+
+function folderClickHandle(row: any) {
+  folder.setCurrentFolder(row)
+  if (activeName.value === 'tool') {
+    getToolList();
+  } else {
+    getApplicationList()
   }
-  getToolFolder()
+}
+
+onMounted(async () => {
+  if (user.isEE()) {
+    await getShareTool()
+  }
+  await getToolFolder()
+  getToolList()
   getApplicationFolder()
+  getApplicationList()
 })
 </script>
 <style lang="scss" scoped>
@@ -319,7 +263,7 @@ onMounted(() => {
   top: 49px;
   right: 16px;
   z-index: 99;
-  width: 400px;
+  width: 600px;
   box-shadow: 0px 4px 8px 0px var(--app-text-color-light-1);
   padding-bottom: 8px;
 
@@ -333,44 +277,18 @@ onMounted(() => {
   }
 
   .list-item {
+    box-sizing: border-box;
     &:hover {
       border-color: var(--el-color-primary);
     }
   }
 
-  :deep(.el-collapse) {
-    border-top-width: 0;
-    .el-collapse-item__header {
-      height: 40px;
-      gap: 0;
-      .el-collapse-item__arrow {
-        font-size: 16px;
-        color: var(--app-text-color-secondary);
-        padding: 6px;
-      }
-    }
-    .el-collapse-item__content {
-      padding: 0 12px 16px 12px;
-      .list {
-        margin-top: 0;
-        transform: none;
-      }
-    }
+  :deep(.el-tabs__header) {
+    margin-bottom: 0;
   }
 
-  :deep(.el-tree-node):focus > .el-tree-node__content {
-    background: transparent;
-  }
-  :deep(.el-tree-node__content) {
-    height: auto;
-    align-items: baseline;
-    &:hover {
-      background: transparent;
-    }
-  }
-
-  :deep(.tree-node--hidden) {
-    display: none !important;
+  :deep(.tree-height) {
+    height: 400px;
   }
 }
 </style>
