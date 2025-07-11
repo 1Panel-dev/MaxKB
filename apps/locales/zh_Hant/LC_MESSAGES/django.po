@@ -6805,7 +6805,7 @@ msgstr "用戶名必須為4-20個字符"
 msgid ""
 "The password must be 6-20 characters long and must be a combination of "
 "letters, numbers, and special characters."
-msgstr "密碼必須為6-20個字符，且必須包含字母、數字和特殊字符。"
+msgstr "密碼必須為6-20個字符，且必須包含大小写字母、數字和特殊字符。"
 
 #: apps/users/serializers/user.py:170
 msgid "Email or username"
