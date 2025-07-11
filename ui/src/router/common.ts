@@ -71,8 +71,38 @@ export const getPermissionRoute = (routes: Array<RouteRecordRaw>, to: RouteLocat
     )
   })
 
-  if (route?.name) {
+  if (route?.name && route.name !== to.name) {
     return { name: route?.name, params: to.params }
   }
+
+  const globalRoute = findAccessibleRoute(routes)
+  if (globalRoute && globalRoute.name !== to.name) {
+    return { name: globalRoute.name, params: to.params}
+  }
   return { name: 'noPermission' }
+}
+
+
+// 寻找有权限的路由
+ 
+const findAccessibleRoute = (routes: Array<RouteRecordRaw>): RouteRecordRaw | null => {
+  for (const route of routes) {
+    const permission = route.meta?.permission
+    if (permission && !hasPermission(permission as any, 'OR')) {
+      continue
+    }
+    if (route.path.includes(':')) {
+      continue
+    }
+    if (route.children && route.children.length > 0) {
+      const child = findAccessibleRoute(route.children)
+      if (child) return child
+    }
+
+    if (!route.children || route.children.length === 0) {
+      return route
+    }
+  }
+
+  return null
 }
