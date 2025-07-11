@@ -3,7 +3,7 @@ import {t} from '@/locales'
 import useStore from '@/stores'
 
 const {user} = useStore()
-export const roleTypeMap: Record<RoleTypeEnum, string> = {
+export const roleTypeMap: { [RoleTypeEnum.USER]: string; [RoleTypeEnum.WORKSPACE_MANAGE]: string } = {
   ...(user.is_admin()
     ? {
       [RoleTypeEnum.ADMIN]: t('views.role.systemAdmin'),
