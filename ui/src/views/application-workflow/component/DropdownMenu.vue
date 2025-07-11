@@ -77,7 +77,7 @@
               :currentNodeKey="folder.currentFolder?.id"
               @handleNodeClick="folderClickHandle"
               :shareTitle="$t('views.shared.shared_tool')"
-              :showShared="user.isEE()"
+              :showShared="permissionPrecise['is_share']()"
               class="p-8"
               :canOperation="false"
             />
@@ -120,14 +120,18 @@
 import { ref, onMounted, computed } from 'vue'
 import { menuNodes, toolLibNode, applicationNode } from '@/workflow/common/data'
 import { iconComponent } from '@/workflow/icons/utils'
-import ToolApi from '@/api/tool/tool'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { isWorkFlow } from '@/utils/application'
 import useStore from '@/stores'
 import NodeContent from './NodeContent.vue'
 import { SourceTypeEnum } from '@/enums/common'
 import sharedWorkspaceApi from '@/api/shared-workspace'
 import ApplicationApi from '@/api/application/application'
-const { user } = useStore()
+import permissionMap from '@/permission'
+import { useRoute } from 'vue-router'
+const route = useRoute()
+const { user, folder } = useStore()
+
 const search_text = ref<string>('')
 const props = defineProps({
   show: {
@@ -141,8 +145,23 @@ const props = defineProps({
   workflowRef: Object,
 })
 
-const { folder } = useStore()
 const emit = defineEmits(['clickNodes', 'onmousedown'])
+
+const apiType = computed(() => {
+  if (route.path.includes('shared')) {
+    return 'systemShare'
+  } else if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
+const permissionPrecise = computed(() => {
+  return permissionMap['tool'][apiType.value]
+})
+const isShared = computed(() => {
+  return folder.currentFolder.id === 'share'
+})
 
 const loading = ref(false)
 const activeName = ref('base')
@@ -226,7 +245,6 @@ function onmousedown(item: any, data?: any, type?: string) {
 
 const toolTreeData = ref<any[]>([])
 const toolList = ref<any[]>([])
-const sharedToolList = ref<any[]>([])
 
 async function getToolFolder() {
   const res: any = await folder.asyncGetFolder(SourceTypeEnum.TOOL, {}, loading)
@@ -234,24 +252,16 @@ async function getToolFolder() {
   folder.setCurrentFolder(res.data?.[0] || {})
 }
 
-async function getShareTool() {
-  try {
-    const res = await sharedWorkspaceApi.getToolList(loading)
-    sharedToolList.value = res.data
-  } catch (error: any) {
-    console.error(error)
-  }
-}
-
 async function getToolList() {
-  if (folder.currentFolder.id === 'share') {
-    toolList.value = sharedToolList.value
-  } else {
-    const res = await ToolApi.getToolList({
-      folder_id: folder.currentFolder?.id || user.getWorkspaceId(),
-    })
-    toolList.value = res.data.tools
-  }
+  const res = await loadSharedApi({
+    type: 'tool',
+    isShared: isShared.value,
+    systemType: apiType.value,
+  }).getToolList({
+    folder_id: folder.currentFolder?.id || user.getWorkspaceId(),
+  })
+  toolList.value = res.data?.tools || res.data || []
+  toolList.value = toolList.value?.filter((item: any) => item.is_active)
 }
 
 const applicationTreeData = ref<any[]>([])
@@ -283,9 +293,6 @@ function folderClickHandle(row: any) {
 async function handleClick(val: string) {
   console.log(val)
   if (val === 'tool') {
-    if (user.isEE()) {
-      await getShareTool()
-    }
     await getToolFolder()
     getToolList()
   } else if (val === 'application') {
