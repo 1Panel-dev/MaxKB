@@ -182,6 +182,9 @@ class UserManage(APIView):
                        operation_id=_("Get default password"),  # type: ignore
                        tags=[_("User Management")],  # type: ignore
                        responses=UserPasswordResponse.get_response())
+        @has_permissions(PermissionConstants.USER_CREATE, PermissionConstants.CHAT_USER_CREATE,
+                         PermissionConstants.WORKSPACE_CHAT_USER_CREATE, RoleConstants.ADMIN,
+                         RoleConstants.WORKSPACE_MANAGE)
         def get(self, request: Request):
             return result.success(data={'password': default_password})
 

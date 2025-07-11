@@ -1,13 +1,13 @@
-import { defineStore } from 'pinia'
-import { type Ref } from 'vue'
-import type { User } from '@/api/type/user'
+import {defineStore} from 'pinia'
+import {type Ref} from 'vue'
+import type {User} from '@/api/type/user'
 import UserApi from '@/api/user/user'
 import LoginApi from '@/api/user/login'
-import { useLocalStorage } from '@vueuse/core'
+import {useLocalStorage} from '@vueuse/core'
 
-import { localeConfigKey, getBrowserLang } from '@/locales/index'
+import {localeConfigKey, getBrowserLang} from '@/locales/index'
 import useThemeStore from './theme'
-import { defaultPlatformSetting } from '@/utils/theme'
+import {defaultPlatformSetting} from '@/utils/theme'
 import useLoginStore from './login'
 
 export interface userStateTypes {
@@ -73,6 +73,9 @@ const useUserStore = defineStore('user', {
       }
     },
 
+    is_admin() {
+      return this.userInfo?.role.includes('ADMIN')
+    },
     showXpack() {
       return this.edition != 'CE'
     },
@@ -91,7 +94,7 @@ const useUserStore = defineStore('user', {
     isEE() {
       return this.edition == 'EE' && this.license_is_valid
     },
-    getEditionName() {
+    getEditionName() {画
       return this.edition
     },
     async profile(loading?: Ref<boolean>) {
@@ -100,7 +103,7 @@ const useUserStore = defineStore('user', {
         const workspace_list =
           ok.data.workspace_list && ok.data.workspace_list.length > 0
             ? ok.data.workspace_list
-            : [{ id: 'default', name: 'default' }]
+            : [{id: 'default', name: 'default'}]
         const workspace_id = this.getWorkspaceId()
         if (!workspace_id || !workspace_list.some((w) => w.id == workspace_id)) {
           this.setWorkspaceId(workspace_list[0].id)
@@ -140,7 +143,7 @@ const useUserStore = defineStore('user', {
     },
     async postUserLanguage(lang: string, loading?: Ref<boolean>) {
       return new Promise((resolve, reject) => {
-        LoginApi.postLanguage({ language: lang }, loading)
+        LoginApi.postLanguage({language: lang}, loading)
           .then(async (ok) => {
             useLocalStorage(localeConfigKey, 'en-US').value = lang
             window.location.reload()
