@@ -214,11 +214,6 @@
             {{ datetimeFormat(row.update_time) }}
           </template>
         </el-table-column>
-        <el-table-column :label="$t('views.document.table.updateTime')" width="180">
-          <template #default="{ row }">
-            {{ datetimeFormat(row.update_time) }}
-          </template>
-        </el-table-column>
         <el-table-column :label="$t('common.createTime')" width="180">
           <template #default="{ row }">
             {{ datetimeFormat(row.create_time) }}
