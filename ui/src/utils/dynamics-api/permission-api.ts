@@ -1,5 +1,5 @@
-import { PermissionConst, EditionConst, RoleConst } from '@/utils/permission/data'
-import { hasPermission } from '@/utils/permission/index'
+import {PermissionConst, EditionConst, RoleConst} from '@/utils/permission/data'
+import {hasPermission} from '@/utils/permission/index'
 import roleSystemApi from '@/api/system/role'
 import roleWorkspaceApi from '@/api/workspace/role'
 import systemWorkspaceApi from '@/api/system/workspace'
@@ -8,6 +8,7 @@ import systemChatUserApi from '@/api/system/chat-user'
 import workspaceChatUserApi from '@/api/workspace/chat-user'
 import systemUserGroupApi from '@/api/system/user-group'
 import workspaceUserGroupApi from '@/api/workspace/user-group'
+import useStore from "@/stores";
 
 // 系统管理员 API
 const systemApiMap = {
@@ -28,9 +29,11 @@ const workspaceApiMap = {
 /** 动态导入 API 模块的函数
  *  loadPermissionApi('role')
  */
+const {user} = useStore()
 
 export function loadPermissionApi(type: string) {
   if (hasPermission([EditionConst.IS_EE, EditionConst.IS_PE], 'OR')) {
+    user.getHasPermissionWorkspaceManage()
     if (hasPermission([RoleConst.ADMIN, RoleConst.EXTENDS_ADMIN], 'OR')) {
       // 加载系统管理员 API
       return systemApiMap[type]

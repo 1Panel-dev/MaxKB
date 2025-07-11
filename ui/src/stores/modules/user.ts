@@ -94,7 +94,19 @@ const useUserStore = defineStore('user', {
     isEE() {
       return this.edition == 'EE' && this.license_is_valid
     },
-    getEditionName() {画
+    getHasPermissionWorkspaceManage() {
+      const workspaceManagePermissions = this.userInfo?.role
+        .filter((permission) => permission.startsWith('WORKSPACE_MANAGE'))
+        .map((permission) => {
+          const parts = permission.split('/WORKSPACE/');
+          return parts.length > 1 ? parts[1] : null; // 提取工作空间ID
+        })
+        .filter((id) => id !== null); // 过滤掉无效的ID
+      if (workspaceManagePermissions && workspaceManagePermissions.length > 0) {
+        this.setWorkspaceId(workspaceManagePermissions[0])
+      }
+    },
+    getEditionName() {
       return this.edition
     },
     async profile(loading?: Ref<boolean>) {
