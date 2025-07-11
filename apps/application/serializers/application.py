@@ -34,7 +34,7 @@ from common.database_model_manage.database_model_manage import DatabaseModelMana
 from common.db.search import native_search, native_page_search
 from common.exception.app_exception import AppApiException
 from common.field.common import UploadedFileField
-from common.utils.common import get_file_content, valid_license, restricted_loads, generate_uuid
+from common.utils.common import get_file_content, restricted_loads, generate_uuid
 from knowledge.models import Knowledge, KnowledgeScope
 from knowledge.serializers.knowledge import KnowledgeSerializer, KnowledgeModelSerializer
 from maxkb.conf import PROJECT_DIR
@@ -377,6 +377,7 @@ class Query(serializers.Serializer):
 
 class ApplicationImportRequest(serializers.Serializer):
     file = UploadedFileField(required=True, label=_("file"))
+    folder_id = serializers.CharField(required=True, label=_("Folder ID"))
 
 
 class ApplicationEditSerializer(serializers.Serializer):
@@ -478,16 +479,14 @@ class ApplicationSerializer(serializers.Serializer):
         QuerySet(ApplicationKnowledgeMapping).bulk_create(application_knowledge_mapping_model_list)
         return ApplicationCreateSerializer.ApplicationResponse(application_model).data
 
-    @valid_license(model=Application, count=5,
-                   message=_(
-                       'The community version supports up to 5 applications. If you need more applications, please contact us (https://fit2cloud.com/).'))
     @transaction.atomic
-    def import_(self, instance: dict, with_valid=True):
+    def import_(self, instance: dict, is_import_tool, with_valid=True):
         if with_valid:
             self.is_valid()
             ApplicationImportRequest(data=instance).is_valid(raise_exception=True)
         user_id = self.data.get('user_id')
         workspace_id = self.data.get("workspace_id")
+        folder_id = instance.get('folder_id')
         mk_instance_bytes = instance.get('file').read()
         try:
             mk_instance = restricted_loads(mk_instance_bytes)
@@ -498,7 +497,7 @@ class ApplicationSerializer(serializers.Serializer):
         update_tool_map = {}
         if len(tool_list) > 0:
             tool_id_list = reduce(lambda x, y: [*x, *y],
-                                  [[tool.get('id'), generate_uuid((tool.get('id') + tool.get('workspace_id') or ''))]
+                                  [[tool.get('id'), generate_uuid((tool.get('id') + workspace_id or ''))]
                                    for tool
                                    in
                                    tool_list], [])
@@ -506,7 +505,7 @@ class ApplicationSerializer(serializers.Serializer):
             exits_tool_id_list = [str(tool.id) for tool in
                                   QuerySet(Tool).filter(id__in=tool_id_list, workspace_id=workspace_id)]
             # 需要更新的工具集合
-            update_tool_map = {tool.get('id'): generate_uuid((tool.get('id') + tool.get('workspace_id') or '')) for tool
+            update_tool_map = {tool.get('id'): generate_uuid((tool.get('id') + workspace_id or '')) for tool
                                in
                                tool_list if
                                not exits_tool_id_list.__contains__(
@@ -515,8 +514,8 @@ class ApplicationSerializer(serializers.Serializer):
             tool_list = [{**tool, 'id': update_tool_map.get(tool.get('id'))} for tool in tool_list if
                          not exits_tool_id_list.__contains__(
                              tool.get('id')) and not exits_tool_id_list.__contains__(
-                             generate_uuid((tool.get('id') + tool.get('workspace_id') or '')))]
-        application_model = self.to_application(application, workspace_id, user_id, update_tool_map)
+                             generate_uuid((tool.get('id') + workspace_id or '')))]
+        application_model = self.to_application(application, workspace_id, user_id, update_tool_map, folder_id)
         tool_model_list = [self.to_tool(f, workspace_id, user_id) for f in tool_list]
         application_model.save()
         # 插入授权数据
@@ -528,7 +527,14 @@ class ApplicationSerializer(serializers.Serializer):
         # 插入认证信息
         ApplicationAccessToken(application_id=application_model.id,
                                access_token=hashlib.md5(str(uuid.uuid7()).encode()).hexdigest()[8:24]).save()
-        QuerySet(Tool).bulk_create(tool_model_list) if len(tool_model_list) > 0 else None
+        if is_import_tool:
+            if len(tool_model_list) > 0:
+                QuerySet(Tool).bulk_create(tool_model_list)
+                UserResourcePermissionSerializer(data={
+                    'workspace_id': self.data.get('workspace_id'),
+                    'user_id': self.data.get('user_id'),
+                    'auth_target_type': AuthTargetType.APPLICATION.value
+                }).auth_resource_batch([t.id for t in tool_model_list])
         return True
 
     @staticmethod
@@ -550,7 +556,7 @@ class ApplicationSerializer(serializers.Serializer):
                     workspace_id=workspace_id)
 
     @staticmethod
-    def to_application(application, workspace_id, user_id, update_tool_map):
+    def to_application(application, workspace_id, user_id, update_tool_map, folder_id):
         work_flow = application.get('work_flow')
         for node in work_flow.get('nodes', []):
             if node.get('type') == 'tool-lib-node':
@@ -563,7 +569,7 @@ class ApplicationSerializer(serializers.Serializer):
                            user_id=user_id,
                            name=application.get('name'),
                            workspace_id=workspace_id,
-                           folder_id=workspace_id,
+                           folder_id=folder_id,
                            desc=application.get('desc'),
                            prologue=application.get('prologue'), dialogue_number=application.get('dialogue_number'),
                            knowledge_setting=application.get('knowledge_setting'),

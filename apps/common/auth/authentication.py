@@ -49,10 +49,10 @@ def exist_permissions_by_view_permission(user_role: List[RoleConstants],
     :return:                 是否存在 True False
     """
 
-    role_list =  [user_r(request, kwargs) if callable(user_r) else user_r for user_r in
-     permission.roleList]
+    role_list = [user_r(request, kwargs) if callable(user_r) else user_r for user_r in
+                 permission.roleList]
     role_ok = any(list(map(lambda up: role_list.__contains__(up),
-                                 user_role)))
+                           user_role)))
     permission_list = [user_p(request, kwargs) if callable(user_p) else user_p for user_p in
                        permission.permissionList
                        ]
@@ -79,8 +79,18 @@ def exist_permissions(user_role: List[RoleConstants], user_permission: List[Perm
 def exist(user_role: List[RoleConstants], user_permission: List[PermissionConstants], permission, request, **kwargs):
     if callable(permission):
         p = permission(request, kwargs)
-        return exist_permissions(user_role, user_permission, p, request,**kwargs)
+        return exist_permissions(user_role, user_permission, p, request, **kwargs)
     return exist_permissions(user_role, user_permission, permission, request, **kwargs)
+
+
+def get_is_permissions(request, **kwargs):
+    def is_permissions(*permission, compare=CompareConstants.OR):
+        exit_list = list(
+            map(lambda p: exist(request.auth.role_list, request.auth.permission_list, p, request, **kwargs),
+                permission))
+        return any(exit_list) if compare == CompareConstants.OR else all(exit_list)
+
+    return is_permissions
 
 
 def has_permissions(*permission, compare=CompareConstants.OR):

@@ -130,6 +130,32 @@ class UserResourcePermissionSerializer(serializers.Serializer):
         else:
             return wurp.permission_list.__contains__(ResourcePermission.VIEW.value)
 
+    def auth_resource_batch(self, resource_id_list: list):
+        self.is_valid(raise_exception=True)
+        auth_target_type = self.data.get('auth_target_type')
+        workspace_id = self.data.get('workspace_id')
+        user_id = self.data.get('user_id')
+        wurp = QuerySet(WorkspaceUserResourcePermission).filter(auth_target_type=auth_target_type,
+                                                                workspace_id=workspace_id, user_id=user_id).first()
+        auth_type = wurp.auth_type if wurp else (
+            ResourceAuthType.RESOURCE_PERMISSION_GROUP if edition == 'CE' else ResourceAuthType.ROLE)
+        workspace_user_resource_permission = [WorkspaceUserResourcePermission(
+            target=resource_id,
+            auth_target_type=auth_target_type,
+            permission_list=[ResourcePermission.VIEW,
+                             ResourcePermission.MANAGE] if auth_type == ResourceAuthType.RESOURCE_PERMISSION_GROUP else [
+                ResourcePermissionRole.ROLE],
+            workspace_id=workspace_id,
+            user_id=user_id,
+            auth_type=auth_type
+        ) for resource_id in resource_id_list]
+        QuerySet(WorkspaceUserResourcePermission).bulk_create(workspace_user_resource_permission)
+        # 刷新缓存
+        version = Cache_Version.PERMISSION_LIST.get_version()
+        key = Cache_Version.PERMISSION_LIST.get_key(user_id=user_id)
+        cache.delete(key, version=version)
+        return True
+
     def auth_resource(self, resource_id: str):
         self.is_valid(raise_exception=True)
         auth_target_type = self.data.get('auth_target_type')
