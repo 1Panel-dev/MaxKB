@@ -1,14 +1,17 @@
 <template>
   <div class="w-full">
     <div class="flex-between mb-16">
-      <div class="flex align-center"
-           v-if="hasPermission([EditionConst.IS_EE,EditionConst.IS_PE], 'OR')">
+      <div
+        class="flex align-center"
+        v-if="hasPermission([EditionConst.IS_EE, EditionConst.IS_PE], 'OR')"
+      >
         <!-- 企业版: 选优先级-->
-        <span class="lighter mr-16">{{ $t('views.system.resourceAuthorization.priority.label') }}</span>
+        <span class="lighter mr-16">{{
+          $t('views.system.resourceAuthorization.priority.label')
+        }}</span>
         <el-radio-group v-model="radioRole">
-          <el-radio :value="true" size="large">{{
-              $t('views.system.resourceAuthorization.priority.role')
-            }}
+          <el-radio :value="true" size="large"
+            >{{ $t('views.system.resourceAuthorization.priority.role') }}
           </el-radio>
           <el-radio :value="false" size="large">{{ $t('common.custom') }}</el-radio>
         </el-radio-group>
@@ -18,7 +21,7 @@
         :placeholder="$t('common.search')"
         prefix-icon="Search"
         class="mt-4"
-        :class="hasPermission([EditionConst.IS_EE,EditionConst.IS_PE], 'OR') ? 'w-240' : ''"
+        :class="hasPermission([EditionConst.IS_EE, EditionConst.IS_PE], 'OR') ? 'w-240' : ''"
         clearable
       />
     </div>
@@ -27,7 +30,7 @@
       row-key="id"
       :data="filterData"
       :max-height="tableHeight"
-      :expand-row-keys="['default']"
+      :expand-row-keys="defaultExpandKeys"
       style="width: 100%"
     >
       <el-table-column class-name="folder-flex" prop="name" :label="$t('common.name')">
@@ -48,7 +51,7 @@
               />
             </el-avatar>
             <!--  知识库 icon -->
-            <KnowledgeIcon class="mr-12" :size="20" v-else-if="isKnowledge" :type="row.icon"/>
+            <KnowledgeIcon class="mr-12" :size="20" v-else-if="isKnowledge" :type="row.icon" />
             <!--  应用/工具 自定义 icon -->
             <el-avatar
               v-else-if="isAppIcon(row?.icon) && !isModel"
@@ -57,13 +60,13 @@
               shape="square"
               :size="20"
             >
-              <img :src="resetUrl(row?.icon)" alt=""/>
+              <img :src="resetUrl(row?.icon)" alt="" />
             </el-avatar>
             <!--  应用 icon -->
-            <LogoIcon v-else-if="isApplication" height="20px" class="mr-12"/>
+            <LogoIcon v-else-if="isApplication" height="20px" class="mr-12" />
             <!-- 工具 icon -->
             <el-avatar v-else-if="isTool" class="avatar-green mr-12" shape="square" :size="20">
-              <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt=""/>
+              <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt="" />
             </el-avatar>
             <!-- 模型 icon -->
             <span
@@ -172,18 +175,18 @@
   </div>
 </template>
 <script setup lang="ts">
-import {ref, onMounted, watch, computed} from 'vue'
-import type {Provider} from '@/api/type/model'
-import {AuthorizationEnum} from '@/enums/system'
-import {isAppIcon, resetUrl} from '@/utils/common'
-import {EditionConst} from '@/utils/permission/data'
-import {hasPermission} from '@/utils/permission/index'
+import { ref, onMounted, watch, computed } from 'vue'
+import type { Provider } from '@/api/type/model'
+import { AuthorizationEnum } from '@/enums/system'
+import { isAppIcon, resetUrl } from '@/utils/common'
+import { EditionConst } from '@/utils/permission/data'
+import { hasPermission } from '@/utils/permission/index'
 import useStore from '@/stores'
 
-const {model} = useStore()
+const { model } = useStore()
 const props = defineProps({
   data: {
-    type: Array,
+    type: Array<any>,
     default: () => [],
   },
   id: String,
@@ -203,6 +206,7 @@ const isKnowledge = computed(() => props.type === AuthorizationEnum.KNOWLEDGE)
 const isApplication = computed(() => props.type === AuthorizationEnum.APPLICATION)
 const isTool = computed(() => props.type === AuthorizationEnum.TOOL)
 const isModel = computed(() => props.type === AuthorizationEnum.MODEL)
+const defaultExpandKeys = computed(() => (props.data?.length > 0 ? [props.data[0]?.id] : []))
 const dfsPermission = (arr: any = [], Name: string | number, e: boolean, idArr: any[]) => {
   arr.map((item: any) => {
     if (idArr.includes(item.id)) {
@@ -230,7 +234,7 @@ const filterText = ref('')
 const filterData = computed(() => {
   function filterTree(data: any[]): any[] {
     return data
-      .map(item => {
+      .map((item) => {
         // 递归过滤 children
         const children = item.children ? filterTree(item.children) : []
         // 判断当前节点或其子节点是否匹配
