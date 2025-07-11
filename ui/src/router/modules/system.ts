@@ -1,10 +1,10 @@
-import {PermissionConst, EditionConst, RoleConst} from '@/utils/permission/data'
-import {ComplexPermission} from '@/utils/permission/type'
+import { PermissionConst, EditionConst, RoleConst } from '@/utils/permission/data'
+import { ComplexPermission } from '@/utils/permission/type'
 
 const systemRouter = {
   path: '/system',
   name: 'system',
-  meta: {title: 'views.system.title'},
+  meta: { title: 'views.system.title' },
   hidden: true,
   component: () => import('@/layout/layout-template/SystemMainLayout.vue'),
   children: [
@@ -22,28 +22,6 @@ const systemRouter = {
         permission: [RoleConst.ADMIN, PermissionConst.USER_READ],
       },
       component: () => import('@/views/system/user-manage/index.vue'),
-    },
-    {
-      path: '/system/role',
-      name: 'role',
-      meta: {
-        icon: 'app-role',
-        iconActive: 'app-role-active',
-        title: 'views.role.title',
-        activeMenu: '/system',
-        parentPath: '/system',
-        parentName: 'system',
-        sameRoute: 'role',
-        permission: [
-          new ComplexPermission(
-            [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
-            [PermissionConst.ROLE_READ, PermissionConst.WORKSPACE_ROLE_READ],
-            [EditionConst.IS_EE, EditionConst.IS_PE],
-            'OR',
-          ),
-        ],
-      },
-      component: () => import('@/views/system/role/index.vue'),
     },
     {
       path: '/system/workspace',
@@ -67,6 +45,29 @@ const systemRouter = {
       },
       component: () => import('@/views/system/workspace/index.vue'),
     },
+    {
+      path: '/system/role',
+      name: 'role',
+      meta: {
+        icon: 'app-role',
+        iconActive: 'app-role-active',
+        title: 'views.role.title',
+        activeMenu: '/system',
+        parentPath: '/system',
+        parentName: 'system',
+        sameRoute: 'role',
+        permission: [
+          new ComplexPermission(
+            [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+            [PermissionConst.ROLE_READ, PermissionConst.WORKSPACE_ROLE_READ],
+            [EditionConst.IS_EE, EditionConst.IS_PE],
+            'OR',
+          ),
+        ],
+      },
+      component: () => import('@/views/system/role/index.vue'),
+    },
+
     {
       path: '/system/resource-management',
       name: 'resourceManagement',
@@ -123,7 +124,8 @@ const systemRouter = {
               ),
             ],
           },
-          component: () => import('@/views/system-resource-management/ApplicationResourceIndex.vue'),
+          component: () =>
+            import('@/views/system-resource-management/ApplicationResourceIndex.vue'),
         },
         {
           path: '/system/resource-management/knowledge',
@@ -197,18 +199,47 @@ const systemRouter = {
         parentPath: '/system',
         parentName: 'system',
         sameRoute: 'authorization',
-        permission: [new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
-          [PermissionConst.APPLICATION_WORKSPACE_USER_RESOURCE_PERMISSION_READ,
-            PermissionConst.APPLICATION_WORKSPACE_USER_RESOURCE_PERMISSION_READ.getWorkspacePermissionWorkspaceManageRole], [], 'OR'),
-          new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
-            [PermissionConst.KNOWLEDGE_WORKSPACE_USER_RESOURCE_PERMISSION_READ,
-              PermissionConst.KNOWLEDGE_WORKSPACE_USER_RESOURCE_PERMISSION_READ.getWorkspacePermissionWorkspaceManageRole], [], 'OR'),
-          new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
-            [PermissionConst.TOOL_WORKSPACE_USER_RESOURCE_PERMISSION_READ,
-              PermissionConst.TOOL_WORKSPACE_USER_RESOURCE_PERMISSION_READ.getWorkspacePermissionWorkspaceManageRole], [], 'OR'),
-          new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
-            [PermissionConst.MODEL_WORKSPACE_USER_RESOURCE_PERMISSION_READ,
-              PermissionConst.MODEL_WORKSPACE_USER_RESOURCE_PERMISSION_READ.getWorkspacePermissionWorkspaceManageRole], [], 'OR'),
+        permission: [
+          new ComplexPermission(
+            [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+            [
+              PermissionConst.APPLICATION_WORKSPACE_USER_RESOURCE_PERMISSION_READ,
+              PermissionConst.APPLICATION_WORKSPACE_USER_RESOURCE_PERMISSION_READ
+                .getWorkspacePermissionWorkspaceManageRole,
+            ],
+            [],
+            'OR',
+          ),
+          new ComplexPermission(
+            [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+            [
+              PermissionConst.KNOWLEDGE_WORKSPACE_USER_RESOURCE_PERMISSION_READ,
+              PermissionConst.KNOWLEDGE_WORKSPACE_USER_RESOURCE_PERMISSION_READ
+                .getWorkspacePermissionWorkspaceManageRole,
+            ],
+            [],
+            'OR',
+          ),
+          new ComplexPermission(
+            [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+            [
+              PermissionConst.TOOL_WORKSPACE_USER_RESOURCE_PERMISSION_READ,
+              PermissionConst.TOOL_WORKSPACE_USER_RESOURCE_PERMISSION_READ
+                .getWorkspacePermissionWorkspaceManageRole,
+            ],
+            [],
+            'OR',
+          ),
+          new ComplexPermission(
+            [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+            [
+              PermissionConst.MODEL_WORKSPACE_USER_RESOURCE_PERMISSION_READ,
+              PermissionConst.MODEL_WORKSPACE_USER_RESOURCE_PERMISSION_READ
+                .getWorkspacePermissionWorkspaceManageRole,
+            ],
+            [],
+            'OR',
+          ),
         ],
       },
 
@@ -223,9 +254,18 @@ const systemRouter = {
             parentName: 'system',
             resource: 'APPLICATION',
             sameRoute: 'authorization',
-            permission: [new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
-              [PermissionConst.APPLICATION_WORKSPACE_USER_RESOURCE_PERMISSION_READ,
-                PermissionConst.APPLICATION_WORKSPACE_USER_RESOURCE_PERMISSION_READ.getWorkspacePermissionWorkspaceManageRole], [], 'OR'),]
+            permission: [
+              new ComplexPermission(
+                [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+                [
+                  PermissionConst.APPLICATION_WORKSPACE_USER_RESOURCE_PERMISSION_READ,
+                  PermissionConst.APPLICATION_WORKSPACE_USER_RESOURCE_PERMISSION_READ
+                    .getWorkspacePermissionWorkspaceManageRole,
+                ],
+                [],
+                'OR',
+              ),
+            ],
           },
           component: () => import('@/views/system/resource-authorization/index.vue'),
         },
@@ -239,9 +279,18 @@ const systemRouter = {
             parentName: 'system',
             resource: 'KNOWLEDGE',
             sameRoute: 'authorization',
-            permission: [new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
-              [PermissionConst.KNOWLEDGE_WORKSPACE_USER_RESOURCE_PERMISSION_READ,
-                PermissionConst.KNOWLEDGE_WORKSPACE_USER_RESOURCE_PERMISSION_READ.getWorkspacePermissionWorkspaceManageRole], [], 'OR'),]
+            permission: [
+              new ComplexPermission(
+                [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+                [
+                  PermissionConst.KNOWLEDGE_WORKSPACE_USER_RESOURCE_PERMISSION_READ,
+                  PermissionConst.KNOWLEDGE_WORKSPACE_USER_RESOURCE_PERMISSION_READ
+                    .getWorkspacePermissionWorkspaceManageRole,
+                ],
+                [],
+                'OR',
+              ),
+            ],
           },
           component: () => import('@/views/system/resource-authorization/index.vue'),
         },
@@ -255,9 +304,18 @@ const systemRouter = {
             parentName: 'system',
             resource: 'TOOL',
             sameRoute: 'authorization',
-            permission: [new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
-              [PermissionConst.TOOL_WORKSPACE_USER_RESOURCE_PERMISSION_READ,
-                PermissionConst.TOOL_WORKSPACE_USER_RESOURCE_PERMISSION_READ.getWorkspacePermissionWorkspaceManageRole], [], 'OR'),]
+            permission: [
+              new ComplexPermission(
+                [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+                [
+                  PermissionConst.TOOL_WORKSPACE_USER_RESOURCE_PERMISSION_READ,
+                  PermissionConst.TOOL_WORKSPACE_USER_RESOURCE_PERMISSION_READ
+                    .getWorkspacePermissionWorkspaceManageRole,
+                ],
+                [],
+                'OR',
+              ),
+            ],
           },
           component: () => import('@/views/system/resource-authorization/index.vue'),
         },
@@ -271,9 +329,18 @@ const systemRouter = {
             parentName: 'system',
             resource: 'MODEL',
             sameRoute: 'authorization',
-            permission: [new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
-              [PermissionConst.MODEL_WORKSPACE_USER_RESOURCE_PERMISSION_READ,
-                PermissionConst.MODEL_WORKSPACE_USER_RESOURCE_PERMISSION_READ.getWorkspacePermissionWorkspaceManageRole], [], 'OR'),]
+            permission: [
+              new ComplexPermission(
+                [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+                [
+                  PermissionConst.MODEL_WORKSPACE_USER_RESOURCE_PERMISSION_READ,
+                  PermissionConst.MODEL_WORKSPACE_USER_RESOURCE_PERMISSION_READ
+                    .getWorkspacePermissionWorkspaceManageRole,
+                ],
+                [],
+                'OR',
+              ),
+            ],
           },
           component: () => import('@/views/system/resource-authorization/index.vue'),
         },
@@ -488,12 +555,7 @@ const systemRouter = {
             [EditionConst.IS_EE, EditionConst.IS_PE],
             'OR',
           ),
-          new ComplexPermission(
-            [RoleConst.ADMIN],
-            [PermissionConst.EMAIL_SETTING_READ],
-            [],
-            'OR',
-          ),
+          new ComplexPermission([RoleConst.ADMIN], [PermissionConst.EMAIL_SETTING_READ], [], 'OR'),
         ],
       },
       children: [
