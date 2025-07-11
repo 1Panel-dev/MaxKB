@@ -1,9 +1,9 @@
 <template>
-  <div class="touch-chat w-full mr-8">
+  <div class="touch-chat p-8 pb-0">
     <el-button
       text
       bg
-      class="microphone-button w-full mt-8 ml-8 mb-8"
+      class="microphone-button w-full"
       style="font-size: 1rem; padding: 1.2rem 0 !important; background-color: #eff0f1"
       @touchstart="onTouchStart"
       @touchmove="onTouchMove"
