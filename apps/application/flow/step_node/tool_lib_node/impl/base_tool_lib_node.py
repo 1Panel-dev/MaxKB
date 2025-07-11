@@ -76,6 +76,11 @@ def convert_value(name: str, value, _type, is_required, source, node):
         value = node.workflow_manage.get_reference_field(
             value[0],
             value[1:])
+        if isinstance(value, str):
+            try:
+                value = json.loads(value)
+            except:
+                pass
         valid_reference_value(_type, value, name)
         if _type == 'int':
             return int(value)
