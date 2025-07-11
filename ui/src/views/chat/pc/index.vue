@@ -167,7 +167,22 @@
           >
             <div class="p-16 flex-between border-b">
               <h4 class="medium ellipsis" :title="rightPanelTitle">{{ rightPanelTitle }}</h4>
-              <el-icon size="20" class="cursor" @click="closeExecutionDetail"><Close /></el-icon>
+              　
+              <div class="flex align-center">
+                <span v-if="rightPanelType === 'paragraphDocument'" class="mr-4">
+                  <el-button text>
+                    <el-icon> <Download /> </el-icon>
+                  </el-button>
+                </span>
+                <span v-if="rightPanelType === 'paragraphDocument'">
+                  <el-button text> <app-icon iconName="app-export" size="20" /></el-button>
+                </span>
+                <span>
+                  <el-button text @click="closeExecutionDetail">
+                    <el-icon size="20"><Close /></el-icon
+                  ></el-button>
+                </span>
+              </div>
             </div>
             <div class="execution-detail-content" v-loading="rightPanelLoading">
               <ParagraphSourceContent

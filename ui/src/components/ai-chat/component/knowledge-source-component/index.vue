@@ -77,6 +77,24 @@
       :close-on-click-modal="false"
       :close-on-press-escape="false"
     >
+      <template #header="{ titleId, titleClass }">
+        <div class="flex-between">
+          <span class="medium ellipsis" :title="dialogTitle" :id="titleId" :class="titleClass">
+            {{ dialogTitle }}
+          </span>
+          <div class="flex align-center mr-8">
+            <span v-if="dialogType === 'pdfDocument'" class="mr-4">
+              <el-button text>
+                <el-icon> <Download /> </el-icon>
+              </el-button>
+            </span>
+            <span v-if="dialogType === 'pdfDocument'">
+              <el-button text> <app-icon iconName="app-export" size="20" /></el-button>
+            </span>
+            <el-divider direction="vertical" />
+          </div>
+        </div>
+      </template>
       <div class="mb-8">
         <component :is="currentComponent" :detail="currentChatDetail" :type="type"></component>
       </div>
@@ -119,6 +137,7 @@ const dialogVisible = ref(false)
 const dialogTitle = ref('')
 const currentComponent = shallowRef<any>(null)
 const currentChatDetail = ref<any>(null)
+const dialogType = ref('')
 function openParagraph(row: any, id?: string) {
   dialogTitle.value = t('chat.KnowledgeSource.title')
   const obj = cloneDeep(row)
@@ -149,7 +168,7 @@ function openParagraphDocument(row: any) {
     emit('openParagraphDocument', row)
     return
   }
-
+  dialogType.value = 'pdfDocument'
   currentComponent.value = ParagraphDocumentContent
   dialogTitle.value = row.document_name
   currentChatDetail.value = row
