@@ -262,9 +262,7 @@
                       )
                     "
                   >
-                    <el-icon>
-                      <EditPen />
-                    </el-icon>
+                    <AppIcon iconName="app-delete-users"></AppIcon>
                   </el-button>
                 </el-tooltip>
               </template>

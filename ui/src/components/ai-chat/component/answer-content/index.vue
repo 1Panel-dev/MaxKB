@@ -80,7 +80,6 @@ import MdRenderer from '@/components/markdown/MdRenderer.vue'
 import OperationButton from '@/components/ai-chat/component/operation-button/index.vue'
 import { type chatType } from '@/api/type/application'
 import bus from '@/bus'
-import useStore from '@/stores'
 const props = defineProps<{
   chatRecord: chatType
   application: any
