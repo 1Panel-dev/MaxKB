@@ -244,6 +244,10 @@ function initMaxkbStyle(root, maxkbId){
         height: 680px;
         display:none;
       }
+ @media only screen and (max-height: 680px) {
+  #maxkb-chat-container{
+    height: 600px}
+ }
   @media only screen and (max-width: 768px) {
         #maxkb-chat-container {
           width: 100%;

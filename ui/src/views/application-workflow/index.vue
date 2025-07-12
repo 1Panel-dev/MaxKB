@@ -622,4 +622,10 @@ onBeforeUnmount(() => {
     margin: 0 auto;
   }
 }
+@media only screen and (max-height: 680px) {
+  .workflow-debug-container {
+    height: 600px;
+  }
+}
+
 </style>

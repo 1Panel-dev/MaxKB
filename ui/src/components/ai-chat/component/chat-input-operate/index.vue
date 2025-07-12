@@ -1,5 +1,5 @@
 <template>
-  <div class="ai-chat__operate p-16">
+  <div class="ai-chat__operate p-16" @drop="handleDrop">
     <div class="text-center mb-8" v-if="loading">
       <el-button class="border-primary video-stop-button" @click="stopChat">
         <app-icon iconName="app-video-stop" class="mr-8"></app-icon>
@@ -180,7 +180,6 @@
         :maxlength="100000"
         @keydown.enter="sendChatHandle($event)"
         @paste="handlePaste"
-        @drop="handleDrop"
         class="chat-operate-textarea"
       />
 
@@ -484,6 +483,7 @@ const handlePaste = (event: ClipboardEvent) => {
 }
 // 新增拖拽处理
 const handleDrop = (event: DragEvent) => {
+  console.log(event)
   if (!props.applicationDetails.file_upload_enable) return
   event.preventDefault()
   const files = event.dataTransfer?.files
