@@ -129,7 +129,8 @@ class ApplicationChatQuerySerializers(serializers.Serializer):
         if with_valid:
             self.is_valid(raise_exception=True)
         return native_search(self.get_query_set(), select_string=get_file_content(
-            os.path.join(PROJECT_DIR, "apps", "application", 'sql', ('list_application_chat_ee.sql' if ['PE', 'EE'].__contains__(
+            os.path.join(PROJECT_DIR, "apps", "application", 'sql',
+                         ('list_application_chat_ee.sql' if ['PE', 'EE'].__contains__(
                              edition) else 'list_application_chat.sql'))),
                              with_table_name=False)
 
@@ -166,6 +167,7 @@ class ApplicationChatQuerySerializers(serializers.Serializer):
                 "\n".join([
                     f"{improve_paragraph_list[index].get('title')}\n{improve_paragraph_list[index].get('content')}"
                     for index in range(len(improve_paragraph_list))]),
+                row.get('asker').get('user_name'),
                 (row.get('message_tokens') or 0) + (row.get('answer_tokens') or 0), row.get('run_time'),
                 str(row.get('create_time').astimezone(pytz.timezone(TIME_ZONE)).strftime('%Y-%m-%d %H:%M:%S')
                     if row.get('create_time') is not None else None)]
@@ -194,7 +196,7 @@ class ApplicationChatQuerySerializers(serializers.Serializer):
                        gettext('answer'), gettext('User feedback'),
                        gettext('Reference segment number'),
                        gettext('Section title + content'),
-                       gettext('Annotation'), gettext('Consuming tokens'),
+                       gettext('Annotation'), gettext('USER'), gettext('Consuming tokens'),
                        gettext('Time consumed (s)'),
                        gettext('Question Time')]
             for col_idx, header in enumerate(headers, 1):

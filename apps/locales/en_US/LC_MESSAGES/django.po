@@ -8490,3 +8490,6 @@ msgstr "API KEY"
 
 msgid "Download"
 msgstr ""
+
+msgid "USER"
+msgstr ""

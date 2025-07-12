@@ -332,7 +332,7 @@ msgstr "排除的向量 ID 列表"
 #: apps/application/serializers/application.py:84
 #: apps/application/serializers/application_chat.py:185
 msgid "Reference segment number"
-msgstr "引用段落數量"
+msgstr "引用分段數"
 
 #: apps/application/chat_pipeline/step/search_dataset_step/i_search_dataset_step.py:42
 msgid "Similarity"
@@ -1106,7 +1106,7 @@ msgstr "對話 ID"
 #: apps/application/serializers/application_chat.py:182
 #: apps/application/serializers/application_version.py:23
 msgid "summary"
-msgstr "總結"
+msgstr "摘要"
 
 #: apps/application/serializers/application_chat.py:35
 msgid "Chat User ID"
@@ -1173,7 +1173,7 @@ msgstr "用戶反饋"
 
 #: apps/application/serializers/application_chat.py:186
 msgid "Section title + content"
-msgstr "章節標題 + 內容"
+msgstr "分段標題 + 內容"
 
 #: apps/application/serializers/application_chat.py:187
 #: apps/application/views/application_chat_record.py:139
@@ -1181,7 +1181,7 @@ msgstr "章節標題 + 內容"
 #: apps/application/views/application_chat_record.py:141
 #: apps/common/constants/permission_constants.py:248
 msgid "Annotation"
-msgstr "注釋"
+msgstr "标注"
 
 #: apps/application/serializers/application_chat.py:187
 msgid "Consuming tokens"
@@ -1189,7 +1189,7 @@ msgstr "消耗的令牌"
 
 #: apps/application/serializers/application_chat.py:188
 msgid "Time consumed (s)"
-msgstr ""
+msgstr "耗时 (s)"
 
 #: apps/application/serializers/application_chat.py:189
 msgid "Question Time"
@@ -8616,3 +8616,6 @@ msgstr "API KEY"
 
 msgid "Download"
 msgstr "下載"
+
+msgid "USER"
+msgstr "用户"
