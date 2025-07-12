@@ -8619,3 +8619,15 @@ msgstr "下載"
 
 msgid "USER"
 msgstr "用户"
+
+msgid "Update personal system API_KEY"
+msgstr "更新個人系統API KEY"
+
+msgid "Delete personal system API_KEY"
+msgstr "删除個人系統API KEY"
+
+msgid "Add personal system API_KEY"
+msgstr "添加個人系統API KEY"
+
+msgid "Generate related documents"
+msgstr "生成相關文檔"

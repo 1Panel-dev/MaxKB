@@ -8486,10 +8486,22 @@ msgid "knowledge Base"
 msgstr ""
 
 msgid "API KEY"
-msgstr "API KEY"
+msgstr ""
 
 msgid "Download"
 msgstr ""
 
 msgid "USER"
+msgstr ""
+
+msgid "Update personal system API_KEY"
+msgstr ""
+
+msgid "Delete personal system API_KEY"
+msgstr ""
+
+msgid "Add personal system API_KEY"
+msgstr ""
+
+msgid "Generate related documents"
 msgstr ""
