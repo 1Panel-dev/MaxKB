@@ -560,8 +560,12 @@ function importTool(file: any) {
     .then(async (res: any) => {
       if (res?.data) {
         tool.setToolList([])
-        getList()
+        return user.profile()
       }
+    })
+    .then(() => {
+      getList()
+      
     })
     .catch((e: any) => {
       if (e.code === 400) {
