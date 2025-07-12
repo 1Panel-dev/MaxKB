@@ -170,7 +170,7 @@
 import { groupBy, set } from 'lodash'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import type { FormInstance } from 'element-plus'
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { MsgError, MsgSuccess, MsgWarning } from '@/utils/message'
 import { t } from '@/locales'
 import TTSModeParamSettingDialog from '@/views/application/component/TTSModeParamSettingDialog.vue'
@@ -265,11 +265,13 @@ function getTTSModel() {
 }
 
 function ttsModelChange() {
-  if (form_data.value.tts_model_id) {
-    TTSModeParamSettingDialogRef.value?.reset_default(form_data.value.tts_model_id, id)
-  } else {
-    refreshTTSForm({})
-  }
+  nextTick(() => {
+    if (form_data.value.tts_model_id) {
+      TTSModeParamSettingDialogRef.value?.reset_default(form_data.value.tts_model_id, id)
+    } else {
+      refreshTTSForm({})
+    }
+  })
 }
 
 function ttsModelEnableChange() {
