@@ -304,6 +304,8 @@ class ApplicationChatRecordAddKnowledgeSerializer(serializers.Serializer):
         # 批量保存聊天记录
         ChatRecord.objects.bulk_update(chat_record_list, ['improve_paragraph_id_list'])
         update_document_char_length(document_id)
+        for chat_id in chat_ids:
+            ChatCountSerializer(data={'chat_id': chat_id}).update_chat()
 
         return paragraph_ids, knowledge_id
 
