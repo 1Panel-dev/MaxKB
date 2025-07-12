@@ -1,4 +1,4 @@
-import { Result } from '@/request/Result'
+import {Result} from '@/request/Result'
 import {
   get,
   post,
@@ -10,14 +10,15 @@ import {
   download,
   exportFile,
 } from '@/request/index'
-import type { pageRequest } from '@/api/type/common'
-import type { ApplicationFormType } from '@/api/type/application'
-import { type Ref } from 'vue'
+import type {pageRequest} from '@/api/type/common'
+import type {ApplicationFormType} from '@/api/type/application'
+import {type Ref} from 'vue'
 import useStore from '@/stores'
-const prefix: any = { _value: '/workspace/' }
+
+const prefix: any = {_value: '/workspace/'}
 Object.defineProperty(prefix, 'value', {
   get: function () {
-    const { user } = useStore()
+    const {user} = useStore()
     return this._value + user.getWorkspaceId() + '/application'
   },
 })
@@ -42,9 +43,9 @@ const postChatLogAddKnowledge: (
  * @param 参数
  * application_id
  * param  {
-              "start_time": "string",
-              "end_time": "string",
-            }
+ "start_time": "string",
+ "end_time": "string",
+ }
  */
 const getChatLog: (
   application_id: String,
@@ -73,7 +74,7 @@ const getChatRecordLog: (
 ) => Promise<Result<any>> = (application_id, chart_id, page, loading, order_asc) => {
   return get(
     `${prefix.value}/${application_id}/chat/${chart_id}/chat_record/${page.current_page}/${page.page_size}`,
-    { order_asc: order_asc !== undefined ? order_asc : true },
+    {order_asc: order_asc !== undefined ? order_asc : true},
     loading,
   )
 }
@@ -81,25 +82,21 @@ const getChatRecordLog: (
 /**
  * 获取标注段落列表信息
  * @param 参数
- * application_id, chart_id,  chart_record_id, knowledge_id, document_id
+ * application_id, chart_id,  chart_record_id
  */
 const getMarkChatRecord: (
-  application_id: String,
-  chart_id: String,
-  chart_record_id: String,
-  knowledge_id: String,
-  document_id: String,
+  application_id: string,
+  chart_id: string,
+  chart_record_id: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (
   application_id,
   chart_id,
   chart_record_id,
-  knowledge_id,
-  document_id,
   loading,
 ) => {
   return get(
-    `${prefix.value}/${application_id}/chat/${chart_id}/chat_record/${chart_record_id}/knowledge/${knowledge_id}/document/${document_id}/improve`,
+    `${prefix.value}/${application_id}/chat/${chart_id}/chat_record/${chart_record_id}/improve`,
     undefined,
     loading,
   )
@@ -110,10 +107,10 @@ const getMarkChatRecord: (
  * @param 参数
  * application_id, chart_id,  chart_record_id, knowledge_id, document_id
  * data {
-          "title": "string",
-          "content": "string",
-          "problem_text": "string"
-        }
+ "title": "string",
+ "content": "string",
+ "problem_text": "string"
+ }
  */
 const putChatRecordLog: (
   application_id: String,
@@ -175,9 +172,9 @@ const delMarkChatRecord: (
  * @param 参数
  * application_id
  * param  {
-              "start_time": "string",
-              "end_time": "string",
-            }
+ "start_time": "string",
+ "end_time": "string",
+ }
  */
 const postExportChatLog: (
   application_id: string,

@@ -12,12 +12,16 @@
         <h4 :id="titleId" :class="titleClass">{{ $t('views.chatLog.editMark') }}</h4>
         <div class="text-right">
           <el-button text @click="isEdit = true" v-if="!isEdit">
-            <el-icon><EditPen /></el-icon>
+            <el-icon>
+              <EditPen/>
+            </el-icon>
           </el-button>
           <el-button text style="margin-left: 4px" @click="deleteMark">
-            <el-icon><Delete /></el-icon>
+            <el-icon>
+              <Delete/>
+            </el-icon>
           </el-button>
-          <el-divider direction="vertical" />
+          <el-divider direction="vertical"/>
         </div>
       </div>
     </template>
@@ -60,17 +64,17 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { ref, watch, reactive } from 'vue'
-import { useRoute } from 'vue-router'
-import type { FormInstance, FormRules } from 'element-plus'
+import {ref, watch, reactive} from 'vue'
+import {useRoute} from 'vue-router'
+import type {FormInstance, FormRules} from 'element-plus'
 import chatLogApi from '@/api/application/chat-log'
 import paragraphApi from '@/api/knowledge/paragraph'
-import { t } from '@/locales'
-import { MsgSuccess, MsgConfirm } from '@/utils/message'
+import {t} from '@/locales'
+import {MsgSuccess, MsgConfirm} from '@/utils/message'
 
 const route = useRoute()
 const {
-  params: { id },
+  params: {id},
 } = route as any
 
 const emit = defineEmits(['refresh'])
@@ -86,7 +90,7 @@ const detail = ref<any>({})
 
 const rules = reactive<FormRules>({
   content: [
-    { required: true, message: t('views.chatLog.form.content.placeholder'), trigger: 'blur' },
+    {required: true, message: t('views.chatLog.form.content.placeholder'), trigger: 'blur'},
   ],
 })
 
@@ -116,8 +120,9 @@ function deleteMark() {
 }
 
 function getMark(data: any) {
+  console.log(data)
   chatLogApi
-    .getMarkChatRecord(id as string, data.chat_id, data.id, data.knowledge, data.document, loading)
+    .getMarkChatRecord(id as string, data.chat_id, data.id, loading)
     .then((res: any) => {
       if (res.data.length > 0) {
         form.value = res.data[0]
@@ -151,13 +156,14 @@ const submit = async (formEl: FormInstance) => {
   })
 }
 
-defineExpose({ open })
+defineExpose({open})
 </script>
 <style lang="scss" scoped>
 .edit-mark-dialog {
   .el-dialog__header.show-close {
     padding-right: 15px;
   }
+
   .el-dialog__headerbtn {
     top: 13px;
   }
