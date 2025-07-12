@@ -191,7 +191,7 @@ const {
 
 const permissionObj = ref<any>({
   APPLICATION: new ComplexPermission(
-    [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+    [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole, RoleConst.USER.getWorkspaceRole],
     [
       PermissionConst.APPLICATION_CHAT_USER_EDIT,
       PermissionConst.APPLICATION_CHAT_USER_EDIT.getApplicationWorkspaceResourcePermission(id),
@@ -200,7 +200,7 @@ const permissionObj = ref<any>({
     'OR',
   ),
   KNOWLEDGE: new ComplexPermission(
-    [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+    [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole, RoleConst.USER.getWorkspaceRole],
     [
       PermissionConst.KNOWLEDGE_CHAT_USER_EDIT,
       PermissionConst.KNOWLEDGE_CHAT_USER_EDIT.getKnowledgeWorkspaceResourcePermission(id),
