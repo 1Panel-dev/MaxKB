@@ -466,6 +466,7 @@ class AudioManage {
     } else {
       if (window.speechSynthesis.paused) {
         window.speechSynthesis.resume()
+        this.statusList[index] = AudioStatus.PLAY_INT
       } else {
         // 如果不是暂停状态，取消当前播放并重新开始
         if (window.speechSynthesis.speaking) {
