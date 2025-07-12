@@ -21,9 +21,10 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.templatetags.static import static as _static
 from django.urls import path, re_path, include
 from django.views import static
-from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 from rest_framework import status
 
+from chat.urls import urlpatterns as chat_urlpatterns
+from common.init.init_doc import init_doc
 from common.result import Result
 from maxkb import settings
 from maxkb.conf import PROJECT_DIR
@@ -47,11 +48,7 @@ urlpatterns = [
     path(f'{admin_ui_prefix[1:]}/', include('oss.retrieval_urls')),
     path(f'{chat_ui_prefix[1:]}/', include('oss.retrieval_urls')),
 ]
-urlpatterns += [
-    path('schema/', SpectacularAPIView.as_view(), name='schema'),  # schema的配置文件的路由，下面两个ui也是根据这个配置文件来生成的
-    path('doc/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),  # swagger-ui的路由
-    path('redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),  # redoc的路由
-]
+init_doc(urlpatterns, chat_urlpatterns)
 urlpatterns.append(
     re_path(r'^static/(?P<path>.*)$', static.serve, {'document_root': settings.STATIC_ROOT}, name='static'),
 )
