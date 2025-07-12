@@ -131,7 +131,11 @@ const props = defineProps({
 
 const emit = defineEmits(['openExecutionDetail', 'openParagraph', 'openParagraphDocument'])
 const showPDF = (item: any) => {
-  return item.document_name.toLocaleLowerCase().endsWith('.pdf') && item.meta?.source_file_id
+  return (
+    item.document_name.toLocaleLowerCase().endsWith('.pdf') &&
+    item.meta?.source_file_id &&
+    !props.executionIsRightPanel
+  )
 }
 const dialogVisible = ref(false)
 const dialogTitle = ref('')
