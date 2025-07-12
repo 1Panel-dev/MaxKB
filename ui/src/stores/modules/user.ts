@@ -103,6 +103,9 @@ const useUserStore = defineStore('user', {
         })
         .filter((id) => id !== null); // 过滤掉无效的ID
       if (workspaceManagePermissions && workspaceManagePermissions.length > 0) {
+        if (workspaceManagePermissions.includes(localStorage.getItem('workspace_id') || 'default')) {
+          return
+        }
         this.setWorkspaceId(workspaceManagePermissions[0])
       }
     },
