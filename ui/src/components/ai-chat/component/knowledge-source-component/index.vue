@@ -149,6 +149,7 @@ function openParagraph(row: any, id?: string) {
     emit('openParagraph')
     return
   }
+  dialogType.value = ''
   currentComponent.value = ParagraphSourceContent
   currentChatDetail.value = obj
   dialogVisible.value = true
@@ -159,6 +160,7 @@ function openExecutionDetail(row: any) {
     emit('openExecutionDetail')
     return
   }
+  dialogType.value = ''
   currentComponent.value = ExecutionDetailContent
   currentChatDetail.value = row
   dialogVisible.value = true

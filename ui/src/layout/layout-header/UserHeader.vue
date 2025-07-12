@@ -50,9 +50,9 @@ function changeWorkspace(item: WorkspaceItem) {
   } = route as any
   if (item.id === user.workspace_id) return
   user.setWorkspaceId(item.id || 'default')
-  if (activeMenu.includes('application')) {
+  if (activeMenu.includes('application') && route.path != '/application') {
     router.push('/application')
-  } else if (activeMenu.includes('knowledge')) {
+  } else if (activeMenu.includes('knowledge') && route.path != '/knowledge') {
     router.push('/knowledge')
   } else {
     window.location.reload()
