@@ -18,9 +18,9 @@
         <span class="label">{{ $t('layout.about.expiredTime') }}</span>
         <span
         >{{ licenseInfo?.expired || '-' }}
-<!--          <span class="color-danger"-->
-<!--                v-if="licenseInfo?.expired && fromNowDate(licenseInfo?.expired)"-->
-<!--          >（{{ fromNowDate(licenseInfo?.expired) }}）</span>-->
+          <span class="color-danger"
+                v-if="licenseInfo?.expired && fromNowDate(licenseInfo?.expired)"
+          >（{{ fromNowDate(licenseInfo?.expired) }}）</span>
         </span
         >
       </div>
@@ -66,7 +66,7 @@
 <script setup lang="ts">
 import {ref, computed, watch} from 'vue'
 import licenseApi from '@/api/system/license'
-//import {fromNowDate} from '@/utils/time'
+import {fromNowDate} from '@/utils/time'
 import {Role} from '@/utils/permission/type'
 import useStore from '@/stores'
 import { t } from '@/locales'
