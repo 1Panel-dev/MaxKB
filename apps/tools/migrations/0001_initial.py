@@ -39,7 +39,7 @@ class Migration(migrations.Migration):
                 ('tree_id', models.PositiveIntegerField(db_index=True, editable=False)),
                 ('level', models.PositiveIntegerField(editable=False)),
                 ('parent', mptt.fields.TreeForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='children', to='tools.toolfolder')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, to='users.user', verbose_name='用户id')),
+                ('user', models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.SET_NULL, to='users.user')),
             ],
             options={
                 'db_table': 'tool_folder',
@@ -65,7 +65,7 @@ class Migration(migrations.Migration):
                 ('workspace_id', models.CharField(db_index=True, default='default', max_length=64, verbose_name='工作空间id')),
                 ('init_params', models.CharField(max_length=102400, null=True, verbose_name='初始化参数')),
                 ('label', models.CharField(max_length=128, null=True, verbose_name='标签')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, to='users.user', verbose_name='用户id')),
+                ('user', models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.SET_NULL, to='users.user')),
                 ('folder', models.ForeignKey(default='default', on_delete=django.db.models.deletion.DO_NOTHING, to='tools.toolfolder', verbose_name='文件夹id')),
             ],
             options={

@@ -27,6 +27,7 @@ def save_default_embedding_model(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
+
     initial = True
 
     dependencies = [
@@ -40,27 +41,21 @@ class Migration(migrations.Migration):
             fields=[
                 ('create_time', models.DateTimeField(auto_now_add=True, verbose_name='创建时间')),
                 ('update_time', models.DateTimeField(auto_now=True, verbose_name='修改时间')),
-                ('id',
-                 models.UUIDField(default=uuid_utils.compat.uuid7, editable=False, primary_key=True, serialize=False,
-                                  verbose_name='主键id')),
+                ('id', models.UUIDField(default=uuid_utils.compat.uuid7, editable=False, primary_key=True, serialize=False, verbose_name='主键id')),
                 ('name', models.CharField(max_length=128, verbose_name='名称')),
-                ('status', models.CharField(choices=[('SUCCESS', '成功'), ('ERROR', '失败'), ('DOWNLOAD', '下载中'),
-                                                     ('PAUSE_DOWNLOAD', '暂停下载')], default='SUCCESS', max_length=20,
-                                            verbose_name='设置类型')),
+                ('status', models.CharField(choices=[('SUCCESS', '成功'), ('ERROR', '失败'), ('DOWNLOAD', '下载中'), ('PAUSE_DOWNLOAD', '暂停下载')], default='SUCCESS', max_length=20, verbose_name='设置类型')),
                 ('model_type', models.CharField(max_length=128, verbose_name='模型类型')),
                 ('model_name', models.CharField(max_length=128, verbose_name='模型名称')),
                 ('provider', models.CharField(max_length=128, verbose_name='供应商')),
                 ('credential', models.CharField(max_length=102400, verbose_name='模型认证信息')),
                 ('meta', models.JSONField(default=dict, verbose_name='模型元数据,用于存储下载,或者错误信息')),
                 ('model_params_form', models.JSONField(default=list, verbose_name='模型参数配置')),
-                ('workspace_id',
-                 models.CharField(db_index=True, default='default', max_length=64, verbose_name='工作空间id')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, to='users.user',
-                                           verbose_name='成员用户id')),
+                ('workspace_id', models.CharField(db_index=True, default='default', max_length=64, verbose_name='工作空间id')),
+                ('user', models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.SET_NULL, to='users.user')),
             ],
             options={
                 'db_table': 'model',
-                'unique_together': {('name', 'user_id')},
+                'unique_together': {('name', 'workspace_id')},
             },
         ),
         migrations.RunPython(save_default_embedding_model),
