@@ -70,10 +70,10 @@ class AuthProfileSerializer(serializers.Serializer):
                 'icon': application_setting.application.icon,
                 'application_name': application_setting.application.name,
                 'bg_icon': application_setting.chat_background,
-                'authentication': application_setting.authentication,
-                'authentication_type': application_setting.authentication_value.get(
+                'authentication': application_access_token.authentication,
+                'authentication_type': application_access_token.authentication_value.get(
                     'type', 'password'),
-                'login_value': application_setting.authentication_value.get('login_value', [])
+                'login_value': application_access_token.authentication_value.get('login_value', [])
             }
         return profile
 
