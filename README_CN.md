@@ -1,5 +1,5 @@
 <p align="center"><img src= "https://github.com/1Panel-dev/maxkb/assets/52996290/c0694996-0eed-40d8-b369-322bf2a380bf" alt="MaxKB" width="300" /></p>
-<h3 align="center">强大易用的企业级 AI 助手</h3>
+<h3 align="center">强大易用的企业级智能体平台</h3>
 <p align="center">
     <a href="https://trendshift.io/repositories/9113" target="_blank"><img src="https://trendshift.io/api/badge/repositories/9113" alt="1Panel-dev%2FMaxKB | Trendshift" style="width: 250px; height: auto;" /></a>
 </p>
@@ -14,7 +14,7 @@
 </p>
 <hr/>
 
-MaxKB = Max Knowledge Brain，是一款强大易用的企业级 AI 助手，支持 RAG 检索增强生成、工作流编排、MCP 工具调用能力。MaxKB 支持对接各种主流大语言模型，广泛应用于智能客服、企业内部知识库问答、员工助手、学术研究与教育等场景。
+MaxKB = Max Knowledge Brain，是一款强大易用的企业级智能体平台，支持 RAG 检索增强生成、工作流编排、MCP 工具调用能力。MaxKB 支持对接各种主流大语言模型，广泛应用于智能客服、企业内部知识库问答、员工助手、学术研究与教育等场景。
 
 - **RAG 检索增强生成**：高效搭建本地 AI 知识库，支持直接上传文档 / 自动爬取在线文档，支持文本自动拆分、向量化，有效减少大模型幻觉，提升问答效果；
 - **灵活编排**：内置强大的工作流引擎、函数库和 MCP 工具调用能力，支持编排 AI 工作过程，满足复杂业务场景下的需求；
