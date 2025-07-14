@@ -113,8 +113,8 @@ class ModelSerializer(serializers.Serializer):
                 model.model_type, model.model_name
             ).encryption_dict(credential),
             'workspace_id': model.workspace_id,
-            'nick_name': model.user.nick_name,
-            'username': model.user.username
+            'nick_name': model.user.nick_name if model.user else '',
+            'username': model.user.username if model.user else ''
         }
 
     class Operate(serializers.Serializer):
