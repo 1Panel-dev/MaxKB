@@ -125,9 +125,10 @@ class ApplicationChatRecordQuerySerializers(serializers.Serializer):
                     'paragraph_list') or [])
 
             if item.get('type') == 'reranker-node' and item.get('show_knowledge', False):
-                paragraph_list = paragraph_list + [rl.get('metadata') for rl in item.get('result_list') if
-                                                   'document_id' in rl.get('metadata') and 'knowledge_id' in rl.get(
-                                                       'metadata')]
+                paragraph_list = paragraph_list + [rl.get('metadata') for rl in (item.get('result_list') or []) if
+                                                   'document_id' in (rl.get('metadata') or {}) and 'knowledge_id' in (
+                                                               rl.get(
+                                                                   'metadata') or {})]
         paragraph_list = list({p.get('id'): p for p in paragraph_list}.values())
         knowledge_list = knowledge_list + [{'id': knowledge_id, **knowledge} for knowledge_id, knowledge in
                                            reduce(lambda x, y: {**x, **y},
