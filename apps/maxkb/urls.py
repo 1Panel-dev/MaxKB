@@ -111,7 +111,7 @@ def page_not_found(request, exception):
     if request.path.startswith(chat_ui_prefix):
         in_ = [url for url in static_dict.get(chat_ui_prefix) if request.path.endswith(url)]
         if len(in_) > 0:
-            a = admin_ui_prefix + in_[0]
+            a = chat_ui_prefix + in_[0]
             return HttpResponseRedirect(_static(a))
         index_path = os.path.join(PROJECT_DIR, 'apps', "static", 'chat', 'index.html')
         content = get_index_html(index_path)
