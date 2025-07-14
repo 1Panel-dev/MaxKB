@@ -1141,7 +1141,7 @@ class PermissionConstants(Enum):
         parent_group=[SystemGroup.SHARED_KNOWLEDGE]
     )
     SHARED_KNOWLEDGE_DOCUMENT_DOWNLOAD_SOURCE_FILE = Permission(
-        group=Group.SYSTEM_KNOWLEDGE_DOCUMENT, operate=Operate.READ, role_list=[RoleConstants.ADMIN],
+        group=Group.SYSTEM_KNOWLEDGE_DOCUMENT, operate=Operate.DOWNLOAD, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.SHARED_KNOWLEDGE]
     )
     SHARED_KNOWLEDGE_PROBLEM_READ = Permission(
@@ -1293,7 +1293,7 @@ class PermissionConstants(Enum):
         parent_group=[SystemGroup.RESOURCE_KNOWLEDGE]
     )
     RESOURCE_KNOWLEDGE_DOCUMENT_DOWNLOAD_SOURCE_FILE = Permission(
-        group=Group.SYSTEM_RES_KNOWLEDGE_DOCUMENT, operate=Operate.READ, role_list=[RoleConstants.ADMIN],
+        group=Group.SYSTEM_RES_KNOWLEDGE_DOCUMENT, operate=Operate.DOWNLOAD, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.RESOURCE_KNOWLEDGE]
     )
     RESOURCE_KNOWLEDGE_PROBLEM_READ = Permission(
