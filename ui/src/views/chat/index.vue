@@ -25,11 +25,16 @@ const {
 
 const currentTemplate = computed(() => {
   let modeName = ''
-  if (!mode || mode === 'pc') {
-    modeName = common.isMobile() ? 'mobile' : 'pc'
+  if (chatUser.application) {
+    if (!mode || mode === 'pc') {
+      modeName = common.isMobile() ? 'mobile' : 'pc'
+    } else {
+      modeName = mode
+    }
   } else {
-    modeName = mode
+    modeName = 'no-service'
   }
+
   const name = `/src/views/chat/${modeName}/index.vue`
   return components[name].default
 })

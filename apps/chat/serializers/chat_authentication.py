@@ -57,6 +57,8 @@ class AuthProfileSerializer(serializers.Serializer):
         self.is_valid(raise_exception=True)
         access_token = self.data.get("access_token")
         application_access_token = QuerySet(ApplicationAccessToken).filter(access_token=access_token).first()
+        if application_access_token is None:
+            raise NotFound404(404, _("Invalid access_token"))
         application_id = application_access_token.application_id
         profile = {
             'authentication': False

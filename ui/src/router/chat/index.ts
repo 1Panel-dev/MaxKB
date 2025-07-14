@@ -37,9 +37,7 @@ router.beforeEach(
     try {
       authentication = await chatUser.isAuthentication()
     } catch (e: any) {
-      next({
-        path: '/404',
-      })
+      next()
       return
     }
     const p_token = to.query.token
@@ -86,7 +84,12 @@ router.beforeEach(
         }
       }
     } else {
-      await chatUser.anonymousAuthentication()
+      try {
+        await chatUser.anonymousAuthentication()
+      } catch (e: any) {
+        next()
+        return
+      }
     }
     if (!chatUser.application) {
       try {
