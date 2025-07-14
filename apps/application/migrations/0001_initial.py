@@ -30,12 +30,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Application',
             fields=[
-                ('create_time', models.DateTimeField(auto_now_add=True, verbose_name='创建时间')),
-                ('update_time', models.DateTimeField(auto_now=True, verbose_name='修改时间')),
+                ('create_time', models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='创建时间')),
+                ('update_time', models.DateTimeField(auto_now=True, db_index=True, verbose_name='修改时间')),
                 ('id', models.UUIDField(default=uuid_utils.compat.uuid7, editable=False, primary_key=True, serialize=False, verbose_name='主键id')),
                 ('workspace_id', models.CharField(db_index=True, default='default', max_length=64, verbose_name='工作空间id')),
                 ('is_publish', models.BooleanField(default=False, verbose_name='是否发布')),
-                ('name', models.CharField(max_length=128, verbose_name='应用名称')),
+                ('name', models.CharField(db_index=True, max_length=128, verbose_name='应用名称')),
                 ('desc', models.CharField(default='', max_length=512, verbose_name='引用描述')),
                 ('prologue', models.CharField(default='', max_length=40960, verbose_name='开场白')),
                 ('dialogue_number', models.IntegerField(default=0, verbose_name='会话数量')),
@@ -69,8 +69,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ApplicationAccessToken',
             fields=[
-                ('create_time', models.DateTimeField(auto_now_add=True, verbose_name='创建时间')),
-                ('update_time', models.DateTimeField(auto_now=True, verbose_name='修改时间')),
+                ('create_time', models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='创建时间')),
+                ('update_time', models.DateTimeField(auto_now=True, db_index=True, verbose_name='修改时间')),
                 ('application', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, primary_key=True, serialize=False, to='application.application', verbose_name='应用id')),
                 ('access_token', models.CharField(max_length=128, unique=True, verbose_name='用户公开访问 认证token')),
                 ('is_active', models.BooleanField(default=True, verbose_name='是否开启公开访问')),
@@ -88,8 +88,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ApplicationApiKey',
             fields=[
-                ('create_time', models.DateTimeField(auto_now_add=True, verbose_name='创建时间')),
-                ('update_time', models.DateTimeField(auto_now=True, verbose_name='修改时间')),
+                ('create_time', models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='创建时间')),
+                ('update_time', models.DateTimeField(auto_now=True, db_index=True, verbose_name='修改时间')),
                 ('id', models.UUIDField(default=uuid_utils.compat.uuid7, editable=False, primary_key=True, serialize=False, verbose_name='主键id')),
                 ('secret_key', models.CharField(max_length=1024, unique=True, verbose_name='秘钥')),
                 ('workspace_id', models.CharField(db_index=True, default='default', max_length=64, verbose_name='工作空间id')),
@@ -106,10 +106,10 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ApplicationFolder',
             fields=[
-                ('create_time', models.DateTimeField(auto_now_add=True, verbose_name='创建时间')),
-                ('update_time', models.DateTimeField(auto_now=True, verbose_name='修改时间')),
+                ('create_time', models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='创建时间')),
+                ('update_time', models.DateTimeField(auto_now=True, db_index=True, verbose_name='修改时间')),
                 ('id', models.CharField(editable=False, max_length=64, primary_key=True, serialize=False, verbose_name='主键id')),
-                ('name', models.CharField(max_length=64, verbose_name='文件夹名称')),
+                ('name', models.CharField(db_index=True, max_length=64, verbose_name='文件夹名称')),
                 ('desc', models.CharField(blank=True, max_length=200, null=True, verbose_name='描述')),
                 ('workspace_id', models.CharField(db_index=True, default='default', max_length=64, verbose_name='工作空间id')),
                 ('lft', models.PositiveIntegerField(editable=False)),
@@ -131,8 +131,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ApplicationKnowledgeMapping',
             fields=[
-                ('create_time', models.DateTimeField(auto_now_add=True, verbose_name='创建时间')),
-                ('update_time', models.DateTimeField(auto_now=True, verbose_name='修改时间')),
+                ('create_time', models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='创建时间')),
+                ('update_time', models.DateTimeField(auto_now=True, db_index=True, verbose_name='修改时间')),
                 ('id', models.UUIDField(default=uuid_utils.compat.uuid7, editable=False, primary_key=True, serialize=False, verbose_name='主键id')),
                 ('application', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, to='application.application')),
                 ('knowledge', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, to='knowledge.knowledge')),
@@ -144,8 +144,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ApplicationVersion',
             fields=[
-                ('create_time', models.DateTimeField(auto_now_add=True, verbose_name='创建时间')),
-                ('update_time', models.DateTimeField(auto_now=True, verbose_name='修改时间')),
+                ('create_time', models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='创建时间')),
+                ('update_time', models.DateTimeField(auto_now=True, db_index=True, verbose_name='修改时间')),
                 ('id', models.UUIDField(default=uuid_utils.compat.uuid7, editable=False, primary_key=True, serialize=False, verbose_name='主键id')),
                 ('name', models.CharField(default='', max_length=128, verbose_name='版本名称')),
                 ('publish_user_id', models.UUIDField(default=None, null=True, verbose_name='发布者id')),
@@ -185,8 +185,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Chat',
             fields=[
-                ('create_time', models.DateTimeField(auto_now_add=True, verbose_name='创建时间')),
-                ('update_time', models.DateTimeField(auto_now=True, verbose_name='修改时间')),
+                ('create_time', models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='创建时间')),
+                ('update_time', models.DateTimeField(auto_now=True, db_index=True, verbose_name='修改时间')),
                 ('id', models.UUIDField(default=uuid_utils.compat.uuid7, editable=False, primary_key=True, serialize=False, verbose_name='主键id')),
                 ('abstract', models.CharField(max_length=1024, verbose_name='摘要')),
                 ('chat_user_id', models.CharField(default=None, null=True, verbose_name='对话用户id')),
@@ -207,8 +207,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ChatRecord',
             fields=[
-                ('create_time', models.DateTimeField(auto_now_add=True, verbose_name='创建时间')),
-                ('update_time', models.DateTimeField(auto_now=True, verbose_name='修改时间')),
+                ('create_time', models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='创建时间')),
+                ('update_time', models.DateTimeField(auto_now=True, db_index=True, verbose_name='修改时间')),
                 ('id', models.UUIDField(default=uuid_utils.compat.uuid7, editable=False, primary_key=True, serialize=False, verbose_name='主键id')),
                 ('vote_status', models.CharField(choices=[('-1', '未投票'), ('0', '赞同'), ('1', '反对')], default='-1', max_length=10, verbose_name='投票')),
                 ('problem_text', models.CharField(max_length=10240, verbose_name='问题')),
@@ -230,8 +230,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ApplicationChatUserStats',
             fields=[
-                ('create_time', models.DateTimeField(auto_now_add=True, verbose_name='创建时间')),
-                ('update_time', models.DateTimeField(auto_now=True, verbose_name='修改时间')),
+                ('create_time', models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='创建时间')),
+                ('update_time', models.DateTimeField(auto_now=True, db_index=True, verbose_name='修改时间')),
                 ('id', models.UUIDField(default=uuid_utils.compat.uuid7, editable=False, primary_key=True, serialize=False, verbose_name='主键id')),
                 ('chat_user_id', models.UUIDField(default=uuid_utils.compat.uuid7, verbose_name='对话用户id')),
                 ('chat_user_type', models.CharField(choices=[('ANONYMOUS_USER', '匿名用户'), ('CHAT_USER', '对话用户'), ('SYSTEM_API_KEY', '系统API_KEY'), ('APPLICATION_API_KEY', '应用API_KEY'), ('PLATFORM_USER', '平台用户')], default='ANONYMOUS_USER', max_length=64, verbose_name='对话用户类型')),

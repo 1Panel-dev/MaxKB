@@ -24,18 +24,18 @@ class Model(AppModelMixin):
     """
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
 
-    name = models.CharField(max_length=128, verbose_name="名称")
+    name = models.CharField(max_length=128, verbose_name="名称", db_index=True)
 
     status = models.CharField(max_length=20, verbose_name='设置类型', choices=Status.choices,
-                              default=Status.SUCCESS)
+                              default=Status.SUCCESS, db_index=True)
 
-    model_type = models.CharField(max_length=128, verbose_name="模型类型")
+    model_type = models.CharField(max_length=128, verbose_name="模型类型", db_index=True)
 
-    model_name = models.CharField(max_length=128, verbose_name="模型名称")
+    model_name = models.CharField(max_length=128, verbose_name="模型名称", db_index=True)
 
     user = models.ForeignKey(User, on_delete=models.SET_NULL, db_constraint=False, blank=True, null=True)
 
-    provider = models.CharField(max_length=128, verbose_name='供应商')
+    provider = models.CharField(max_length=128, verbose_name='供应商', db_index=True)
 
     credential = models.CharField(max_length=102400, verbose_name="模型认证信息")
 

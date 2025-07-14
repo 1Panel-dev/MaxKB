@@ -97,7 +97,7 @@ def default_status_meta():
 
 class KnowledgeFolder(MPTTModel, AppModelMixin):
     id = models.CharField(primary_key=True, max_length=64, editable=False, verbose_name="主键id")
-    name = models.CharField(max_length=64, verbose_name="文件夹名称")
+    name = models.CharField(max_length=64, verbose_name="文件夹名称", db_index=True)
     desc = models.CharField(max_length=200, null=True, blank=True, verbose_name="描述")
     user = models.ForeignKey(User, on_delete=models.SET_NULL, db_constraint=False, blank=True, null=True)
     workspace_id = models.CharField(max_length=64, verbose_name="工作空间id", default="default", db_index=True)
@@ -115,13 +115,13 @@ class Knowledge(AppModelMixin):
     知识库表
     """
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
-    name = models.CharField(max_length=150, verbose_name="知识库名称")
+    name = models.CharField(max_length=150, verbose_name="知识库名称", db_index=True)
     workspace_id = models.CharField(max_length=64, verbose_name="工作空间id", default="default", db_index=True)
     desc = models.CharField(max_length=256, verbose_name="描述")
     user = models.ForeignKey(User, on_delete=models.SET_NULL, db_constraint=False, blank=True, null=True)
-    type = models.IntegerField(verbose_name='类型', choices=KnowledgeType.choices, default=KnowledgeType.BASE)
+    type = models.IntegerField(verbose_name='类型', choices=KnowledgeType.choices, default=KnowledgeType.BASE, db_index=True)
     scope = models.CharField(max_length=20, verbose_name='可用范围', choices=KnowledgeScope.choices,
-                             default=KnowledgeScope.WORKSPACE)
+                             default=KnowledgeScope.WORKSPACE, db_index=True)
     folder = models.ForeignKey(KnowledgeFolder, on_delete=models.DO_NOTHING, verbose_name="文件夹id", default='default')
     embedding_model = models.ForeignKey(Model, on_delete=models.SET_NULL, db_constraint=False, blank=True, null=True)
     file_size_limit = models.IntegerField(verbose_name="文件大小限制", default=100)
@@ -142,12 +142,12 @@ class Document(AppModelMixin):
     """
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
     knowledge = models.ForeignKey(Knowledge, on_delete=models.DO_NOTHING, verbose_name="知识库id")
-    name = models.CharField(max_length=150, verbose_name="文档名称")
+    name = models.CharField(max_length=150, verbose_name="文档名称", db_index=True)
     char_length = models.IntegerField(verbose_name="文档字符数 冗余字段")
-    status = models.CharField(verbose_name='状态', max_length=20, default=get_default_status)
+    status = models.CharField(verbose_name='状态', max_length=20, default=get_default_status, db_index=True)
     status_meta = models.JSONField(verbose_name="状态统计数据", default=default_status_meta)
-    is_active = models.BooleanField(default=True)
-    type = models.IntegerField(verbose_name='类型', choices=KnowledgeType.choices, default=KnowledgeType.BASE)
+    is_active = models.BooleanField(default=True, db_index=True)
+    type = models.IntegerField(verbose_name='类型', choices=KnowledgeType.choices, default=KnowledgeType.BASE, db_index=True)
     hit_handling_method = models.CharField(verbose_name='命中处理方式', max_length=20,
                                            choices=HitHandlingMethod.choices,
                                            default=HitHandlingMethod.optimization)
@@ -166,12 +166,12 @@ class Paragraph(AppModelMixin):
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
     document = models.ForeignKey(Document, on_delete=models.DO_NOTHING, db_constraint=False)
     knowledge = models.ForeignKey(Knowledge, on_delete=models.DO_NOTHING)
-    content = models.CharField(max_length=102400, verbose_name="段落内容")
-    title = models.CharField(max_length=256, verbose_name="标题", default="")
-    status = models.CharField(verbose_name='状态', max_length=20, default=get_default_status)
+    content = models.CharField(max_length=102400, verbose_name="段落内容", db_index=True)
+    title = models.CharField(max_length=256, verbose_name="标题", default="", db_index=True)
+    status = models.CharField(verbose_name='状态', max_length=20, default=get_default_status, db_index=True)
     status_meta = models.JSONField(verbose_name="状态数据", default=default_status_meta)
     hit_num = models.IntegerField(verbose_name="命中次数", default=0)
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True, db_index=True)
     position = models.IntegerField(verbose_name="段落顺序", default=0, db_index=True)
 
     class Meta:
@@ -184,7 +184,7 @@ class Problem(AppModelMixin):
     """
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
     knowledge = models.ForeignKey(Knowledge, on_delete=models.DO_NOTHING, db_constraint=False)
-    content = models.CharField(max_length=256, verbose_name="问题内容")
+    content = models.CharField(max_length=256, verbose_name="问题内容", db_index=True)
     hit_num = models.IntegerField(verbose_name="命中次数", default=0)
 
     class Meta:
@@ -241,9 +241,9 @@ class VectorField(models.Field):
 
 class Embedding(models.Model):
     id = models.CharField(max_length=128, primary_key=True, verbose_name="主键id")
-    source_id = models.CharField(max_length=128, verbose_name="资源id")
+    source_id = models.CharField(max_length=128, verbose_name="资源id", db_index=True)
     source_type = models.CharField(verbose_name='资源类型', max_length=5, choices=SourceType.choices,
-                                   default=SourceType.PROBLEM)
+                                   default=SourceType.PROBLEM, db_index=True)
     is_active = models.BooleanField(verbose_name="是否可用", max_length=1, default=True)
     knowledge = models.ForeignKey(Knowledge, on_delete=models.DO_NOTHING, verbose_name="文档关联", db_constraint=False)
     document = models.ForeignKey(Document, on_delete=models.DO_NOTHING, verbose_name="文档关联", db_constraint=False)
@@ -262,8 +262,8 @@ class File(AppModelMixin):
     file_size = models.IntegerField(verbose_name="文件大小", default=0)
     sha256_hash = models.CharField(verbose_name="文件sha256_hash标识", default="")
     source_type = models.CharField(verbose_name="资源类型", choices=FileSourceType,
-                                   default=FileSourceType.TEMPORARY_120_MINUTE.value)
-    source_id = models.CharField(verbose_name="资源id", default=FileSourceType.TEMPORARY_120_MINUTE.value)
+                                   default=FileSourceType.TEMPORARY_120_MINUTE.value, db_index=True)
+    source_id = models.CharField(verbose_name="资源id", default=FileSourceType.TEMPORARY_120_MINUTE.value, db_index=True)
     loid = models.IntegerField(verbose_name="loid")
     meta = models.JSONField(verbose_name="文件关联数据", default=dict)
 

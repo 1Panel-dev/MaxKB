@@ -22,13 +22,13 @@ class Log(AppModelMixin):
 
     menu = models.CharField(max_length=128, verbose_name="操作菜单")
 
-    operate = models.CharField(max_length=128, verbose_name="操作")
+    operate = models.CharField(max_length=128, verbose_name="操作", db_index=True)
 
     operation_object = models.JSONField(verbose_name="操作对象", default=dict, encoder=SystemEncoder)
 
     user = models.JSONField(verbose_name="用户信息", default=dict)
 
-    status = models.IntegerField(verbose_name="状态")
+    status = models.IntegerField(verbose_name="状态", db_index=True)
 
     ip_address = models.CharField(max_length=128, verbose_name="ip地址")
 

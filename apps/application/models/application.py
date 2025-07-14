@@ -19,7 +19,7 @@ from users.models import User
 
 class ApplicationFolder(MPTTModel, AppModelMixin):
     id = models.CharField(primary_key=True, max_length=64, editable=False, verbose_name="主键id")
-    name = models.CharField(max_length=64, verbose_name="文件夹名称")
+    name = models.CharField(max_length=64, verbose_name="文件夹名称", db_index=True)
     desc = models.CharField(max_length=200, null=True, blank=True, verbose_name="描述")
     user = models.ForeignKey(User, on_delete=models.SET_NULL, db_constraint=False, blank=True, null=True)
     workspace_id = models.CharField(max_length=64, verbose_name="工作空间id", default="default", db_index=True)
@@ -62,7 +62,7 @@ class Application(AppModelMixin):
     folder = models.ForeignKey(ApplicationFolder, on_delete=models.DO_NOTHING, verbose_name="文件夹id",
                                default='default')
     is_publish = models.BooleanField(verbose_name="是否发布", default=False)
-    name = models.CharField(max_length=128, verbose_name="应用名称")
+    name = models.CharField(max_length=128, verbose_name="应用名称", db_index=True)
     desc = models.CharField(max_length=512, verbose_name="引用描述", default="")
     prologue = models.CharField(max_length=40960, verbose_name="开场白", default="")
     dialogue_number = models.IntegerField(default=0, verbose_name="会话数量")
