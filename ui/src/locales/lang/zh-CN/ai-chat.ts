@@ -100,6 +100,12 @@ export default {
     title: '知识库引用',
     question: '用户问题',
     optimizationQuestion: '优化后问题',
+    questionPadded: '优化后问题',
+    system: '角色设定',
+    historyRecord: '历史记录',
+    currentChat: '本次对话',
+    AiResponse: 'AI 回答',
+    knowedMessage: '已知信息',
   },
   editTitle: '编辑标题',
 }

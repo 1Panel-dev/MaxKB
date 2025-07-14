@@ -96,6 +96,12 @@ export default {
     title: '知識庫引用',
     question: '用戶問題',
     optimizationQuestion: '優化後問題',
+    questionPadded: '優化後問題',
+    system: '角色設定',
+    historyRecord: '歷史記錄',
+    currentChat: '本次對話',
+    AiResponse: 'AI 回答',
+    knowedMessage: '已知資訊' 
   },
   editTitle: '編輯標題',
 }

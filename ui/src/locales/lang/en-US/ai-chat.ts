@@ -98,6 +98,12 @@ export default {
     title: 'Knowledge Quote',
     question: 'User Question',
     optimizationQuestion: 'Optimized Question',
+    questionPadded: 'Padded Question',
+    system: 'Role Setting',
+    historyRecord: 'History Record',
+    currentChat: 'Current Chat',
+    AiResponse: 'AiResponse',
+    knowedMessage: 'Knowed Information',
   },
   editTitle: 'Edit Title',
 }

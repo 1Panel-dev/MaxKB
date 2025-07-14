@@ -46,7 +46,18 @@ router.beforeEach(
     set_next_route(to)
     // 判断是否有菜单权限
     if (to.meta.permission ? hasPermission(to.meta.permission as any, 'OR') : true) {
-      next()
+      if(to.name=='noPermissionD'){
+         const n = getPermissionRoute(routes, to)
+         if(n.name=='noPermission'){
+          next()
+          return
+         }else{
+          next(n)
+          return
+         }
+      }else{
+        next()
+      }
     } else {
       const n = getPermissionRoute(routes, to)
       next(n)
