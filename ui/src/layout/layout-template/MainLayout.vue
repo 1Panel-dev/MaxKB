@@ -1,10 +1,18 @@
 <template>
   <div class="app-layout">
     <div class="app-header" :class="!isDefaultTheme ? 'custom-header' : ''">
+      <el-alert
+        v-if="user.isExpire()"
+        :title="$t('layout.isExpire')"
+        type="warning"
+        class="border-b"
+        show-icon
+        :closable="false"
+      />
       <SystemHeader v-if="isShared"></SystemHeader>
       <UserHeader v-else />
     </div>
-    <div class="app-main">
+    <div class="app-main" :class="user.isExpire() ? 'isExpire' : ''">
       <layout-container>
         <template #left>
           <Sidebar />
@@ -30,7 +38,7 @@ const {
 const isShared = computed(() => {
   return folderId === 'shared' || type === 'systemShare'
 })
-const { theme } = useStore()
+const { theme, user } = useStore()
 const isDefaultTheme = computed(() => {
   return theme.isDefaultTheme()
 })

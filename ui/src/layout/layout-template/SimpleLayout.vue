@@ -6,7 +6,7 @@ import AppMain from '@/layout/app-main/index.vue'
 import useStore from '@/stores'
 import { useRoute } from 'vue-router'
 const route = useRoute()
-const { theme } = useStore()
+const { theme, user } = useStore()
 const isDefaultTheme = computed(() => {
   return theme.isDefaultTheme()
 })
@@ -22,10 +22,18 @@ const isShared = computed(() => {
 <template>
   <div class="app-layout">
     <div class="app-header" :class="!isDefaultTheme ? 'custom-header' : ''">
+      <el-alert
+        v-if="user.isExpire()"
+        :title="$t('layout.isExpire')"
+        type="warning"
+        class="border-b"
+        show-icon
+        :closable="false"
+      />
       <SystemHeader v-if="isShared"></SystemHeader>
       <UserHeader v-else />
     </div>
-    <div class="app-main">
+    <div class="app-main" :class="user.isExpire() ? 'isExpire' : ''">
       <AppMain />
     </div>
   </div>

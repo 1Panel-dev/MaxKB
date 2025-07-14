@@ -148,11 +148,7 @@ function showSource(row: any) {
   if (props.type === 'log') {
     return true
   } else if (row.write_ed && 500 !== row.status) {
-    if (
-      props.type === 'debug-ai-chat' ||
-      props.application?.show_source ||
-      props.application?.show_exec
-    ) {
+    if (props.type === 'debug-ai-chat') {
       return true
     }
   }
