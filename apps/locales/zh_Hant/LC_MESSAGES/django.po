@@ -8626,5 +8626,5 @@ msgstr "添加個人系統API KEY"
 msgid "Generate related documents"
 msgstr "生成相關文檔"
 
-msgid "Generate related documents"
+msgid "Modify application access token"
 msgstr "修改應用程序訪問權杖"
