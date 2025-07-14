@@ -29,6 +29,7 @@ from application.models import Application, ApplicationTypeChoices, ApplicationK
     ChatUserType, ApplicationChatUserStats, ApplicationAccessToken, ChatRecord, Chat, ApplicationVersion
 from application.serializers.application import ApplicationOperateSerializer
 from application.serializers.common import ChatInfo
+from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.exception.app_exception import AppApiException, AppChatNumOutOfBoundsFailed, ChatException
 from common.handle.base_to_response import BaseToResponse
 from common.handle.impl.response.openai_to_response import OpenaiToResponse
@@ -308,6 +309,15 @@ class ChatSerializers(serializers.Serializer):
         r = work_flow_manage.run()
         return r
 
+    def is_valid_chat_user(self):
+        chat_user_id = self.data.get('chat_user_id')
+        application_id = self.data.get('application_id')
+        is_auth_chat_user = DatabaseModelManage.get_model("is_auth_chat_user")
+        if self.chat_user_type == ChatUserType.CHAT_USER.value and is_auth_chat_user:
+            is_auth = is_auth_chat_user(chat_user_id, application_id)
+            if not is_auth:
+                raise ChatException(500, _("The chat user is not authorized."))
+
     def chat(self, instance: dict, base_to_response: BaseToResponse = SystemToResponse()):
         super().is_valid(raise_exception=True)
         ChatMessageSerializers(data=instance).is_valid(raise_exception=True)
@@ -315,6 +325,7 @@ class ChatSerializers(serializers.Serializer):
         chat_info.get_application()
         chat_info.get_chat_user()
         self.is_valid_chat_id(chat_info)
+        self.is_valid_chat_user()
         if chat_info.application.type == ApplicationTypeChoices.SIMPLE:
             self.is_valid_application_simple(raise_exception=True, chat_info=chat_info)
             return self.chat_simple(chat_info, instance, base_to_response)
