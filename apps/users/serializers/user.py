@@ -35,9 +35,12 @@ from django.core.mail import send_mail
 from django.utils.translation import get_language
 
 PASSWORD_REGEX = re.compile(
-    r"^(?=.*[a-z])(?=.*[_!@#$%^&*`~.()-+=])"
-    r"(?:(?=.*[A-Z])|(?=.*\d))"
-    r"[a-zA-Z0-9_!@#$%^&*`~.()-+=]{6,20}$"
+    r"^"  # 开始
+    r"(?=.*[a-z])"  # 至少一个小写字母
+    r"(?=.*[-_!@#$%^&*`~.()+=])"  # 至少一个指定的特殊字符
+    r"(?:(?=.*[A-Z])|(?=.*\d))"  # 至少一个大写字母 或 数字
+    r"[a-zA-Z0-9-_!@#$%^&*`~.()+=]{6,20}"  # 总长度6~20个合法字符
+    r"$"  # 结束
 )
 
 version, get_key = Cache_Version.SYSTEM.value
