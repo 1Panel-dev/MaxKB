@@ -171,7 +171,7 @@ class UserManage(APIView):
     @log(menu='User management', operate='Add user',
          get_operation_object=lambda r, k: {'name': r.data.get('username', None)})
     def post(self, request: Request):
-        return result.success(UserManageSerializer().save(request.data))
+        return result.success(UserManageSerializer().save(request.data, str(request.user.id)))
 
     class Password(APIView):
         authentication_classes = [TokenAuth]
@@ -228,7 +228,8 @@ class UserManage(APIView):
              get_operation_object=lambda r, k: get_user_operation_object(k.get('user_id')))
         def put(self, request: Request, user_id):
             return result.success(
-                UserManageSerializer.Operate(data={'id': user_id}).edit(request.data, with_valid=True))
+                UserManageSerializer.Operate(data={'id': user_id}).edit(request.data, str(request.user.id),
+                                                                        with_valid=True))
 
     class BatchDelete(APIView):
         authentication_classes = [TokenAuth]
@@ -279,7 +280,7 @@ class UserManage(APIView):
         def get(self, request: Request, current_page, page_size):
             d = UserManageSerializer.Query(
                 data={**query_params_to_single_dict(request.query_params)})
-            return result.success(d.page(current_page, page_size))
+            return result.success(d.page(current_page, page_size, str(request.user.id)))
 
 
 class RePasswordView(APIView):
