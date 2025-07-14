@@ -1,7 +1,7 @@
 <template>
   <el-scrollbar v-loading="loading">
     <app-table :data="tableData" border :span-method="objectSpanMethod" :maxTableHeight="280">
-      <el-table-column prop="module" :width="130" :label="$t('views.role.permission.moduleName')"/>
+      <el-table-column prop="module" :width="150" :label="$t('views.role.permission.moduleName')"/>
       <el-table-column
         prop="name"
         :width="150"
