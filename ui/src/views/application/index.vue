@@ -158,7 +158,7 @@
                 >
                   <template #icon>
                     <el-avatar shape="square" :size="32" style="background: none">
-                      <AppIcon iconName="app-folder" style="font-size: 32px"></AppIcon>
+                      <img :src="resetUrl(item?.icon, resetUrl('./favicon.ico'))" alt="" />
                     </el-avatar>
                   </template>
                   <template #subTitle>
@@ -304,6 +304,7 @@ import useStore from '@/stores'
 import { t } from '@/locales'
 import { useRouter, useRoute } from 'vue-router'
 import { isWorkFlow } from '@/utils/application'
+import { isAppIcon, resetUrl } from '@/utils/common'
 import { dateFormat } from '@/utils/time'
 import { SourceTypeEnum, ValidType, ValidCount } from '@/enums/common'
 import permissionMap from '@/permission'

@@ -121,7 +121,6 @@ watch(
 watch(
   () => props.isEdit,
   (value) => {
-    console.log(props.data, props.knowledgeId)
     if (!value) {
       paragraphFormRef.value?.clearValidate()
     }
