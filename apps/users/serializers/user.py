@@ -570,7 +570,9 @@ def update_user_role(instance, user, user_id=None):
         is_admin = workspace_user_role_mapping_model.objects.filter(user_id=user_id,
                                                                     role_id=RoleConstants.ADMIN.name).exists()
         role_setting = instance.get('role_setting')
-        if not role_setting:
+        if not role_setting or (len(role_setting) == 1
+                                and role_setting[0].get('role_id') == ''
+                                and len(role_setting[0].get('workspace_ids', [])) == 0):
             return
         if str(user.id) == 'f0dd8f71-e4ee-11ee-8c84-a8a1595801ab':
             # 需要判断当前角色的权限 不能删除系统管理员 空间管理员 普通管理员等角色
