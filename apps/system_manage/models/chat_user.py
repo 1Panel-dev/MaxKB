@@ -48,18 +48,6 @@ class UserGroupRelation(models.Model):
         db_table = "user_group_relation"
 
 
-class ChatUserPlatformSource(models.Model):
-    id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
-    auth_type = models.CharField(max_length=20, unique=True, db_index=True)
-    config = models.JSONField()
-    type = models.CharField(max_length=20, default="SSO", verbose_name="认证类型", db_index=True)
-    is_active = models.BooleanField(default=True, verbose_name="是否开启", db_index=True)
-    is_valid = models.BooleanField(default=True, verbose_name="是否有效", db_index=True)
-
-    class Meta:
-        db_table = "chat_user_platform_source"
-
-
 class ResourceType(models.TextChoices):
     """资源类型"""
     KNOWLEDGE = Group.KNOWLEDGE.value, '知识库'
