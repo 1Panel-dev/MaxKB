@@ -8,6 +8,15 @@
       :size="280"
       style="--el-drawer-padding-primary: 0"
     >
+      <el-button
+        class="collapse cursor"
+        circle
+        @click="show = !show"
+      >
+        <el-icon>
+          <component :is="!show ? 'ArrowRightBold' : 'ArrowLeftBold'" />
+        </el-icon>
+      </el-button>
       <HistoryPanel
         :application-detail="applicationDetail"
         :chat-log-data="chatLogData"
@@ -142,8 +151,20 @@ const logout = () => {
 
 <style lang="scss" scoped>
 :deep(.chat-history-drawer) {
+  overflow: visible;
+
   .el-drawer__body {
     padding: 0 !important;
+
+    .collapse {
+      position: absolute;
+      top: 20px;
+      right: -13px;
+      box-shadow: 0px 5px 10px 0px rgba(31, 35, 41, 0.1);
+      z-index: 1;
+      width: 24px;
+      height: 24px;
+    }
   }
 }
 </style>
