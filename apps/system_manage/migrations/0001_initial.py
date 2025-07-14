@@ -17,6 +17,24 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
+            name='ChatUser',
+            fields=[
+                ('id', models.UUIDField(default=uuid_utils.compat.uuid7, editable=False, primary_key=True, serialize=False, verbose_name='主键id')),
+                ('email', models.EmailField(blank=True, db_index=True, max_length=254, null=True, verbose_name='邮箱')),
+                ('phone', models.CharField(default='', max_length=20, verbose_name='电话')),
+                ('nick_name', models.CharField(db_index=True, max_length=150, unique=True, verbose_name='昵称')),
+                ('username', models.CharField(db_index=True, max_length=150, unique=True, verbose_name='用户名')),
+                ('password', models.CharField(max_length=150, verbose_name='密码')),
+                ('source', models.CharField(db_index=True, default='LOCAL', max_length=10, verbose_name='来源')),
+                ('is_active', models.BooleanField(db_index=True, default=True)),
+                ('create_time', models.DateTimeField(auto_now_add=True, db_index=True, null=True, verbose_name='创建时间')),
+                ('update_time', models.DateTimeField(auto_now=True, db_index=True, null=True, verbose_name='修改时间')),
+            ],
+            options={
+                'db_table': 'chat_user',
+            },
+        ),
+        migrations.CreateModel(
             name='Log',
             fields=[
                 ('create_time', models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='创建时间')),
@@ -48,6 +66,27 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
+            name='UserGroup',
+            fields=[
+                ('id', models.CharField(default=uuid_utils.compat.uuid7, editable=False, max_length=128, primary_key=True, serialize=False, verbose_name='主键id')),
+                ('name', models.CharField(db_index=True, max_length=150, unique=True, verbose_name='名称')),
+            ],
+            options={
+                'db_table': 'user_group',
+            },
+        ),
+        migrations.CreateModel(
+            name='UserGroupRelation',
+            fields=[
+                ('id', models.UUIDField(default=uuid_utils.compat.uuid7, editable=False, primary_key=True, serialize=False, verbose_name='主键id')),
+                ('group', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='system_manage.usergroup', verbose_name='用户组')),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='system_manage.chatuser', verbose_name='用户')),
+            ],
+            options={
+                'db_table': 'user_group_relation',
+            },
+        ),
+        migrations.CreateModel(
             name='WorkspaceUserResourcePermission',
             fields=[
                 ('id', models.UUIDField(default=uuid_utils.compat.uuid7, editable=False, primary_key=True, serialize=False, verbose_name='主键id')),
@@ -62,6 +101,37 @@ class Migration(migrations.Migration):
             ],
             options={
                 'db_table': 'workspace_user_resource_permission',
+            },
+        ),
+        migrations.CreateModel(
+            name='ResourceChatUserGroupAuthorize',
+            fields=[
+                ('id', models.UUIDField(default=uuid_utils.compat.uuid7, editable=False, primary_key=True, serialize=False, verbose_name='主键id')),
+                ('workspace_id', models.CharField(db_index=True, default='default', max_length=64, null=True, verbose_name='工作空间id')),
+                ('resource_id', models.UUIDField(db_index=True, verbose_name='资源id')),
+                ('resource_type', models.CharField(choices=[('KNOWLEDGE', '知识库'), ('APPLICATION', '应用')], db_index=True, verbose_name='资源类型')),
+                ('is_auth', models.BooleanField(verbose_name='是否授权')),
+                ('user_group', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='system_manage.usergroup', verbose_name='用户组')),
+            ],
+            options={
+                'db_table': 'resource_chat_user_group_authorize',
+                'unique_together': {('user_group_id', 'resource_type', 'resource_id')},
+            },
+        ),
+        migrations.CreateModel(
+            name='ResourceChatUserAuthorize',
+            fields=[
+                ('id', models.UUIDField(default=uuid_utils.compat.uuid7, editable=False, primary_key=True, serialize=False, verbose_name='主键id')),
+                ('workspace_id', models.CharField(db_index=True, default='default', max_length=64, null=True, verbose_name='工作空间id')),
+                ('resource_id', models.UUIDField(db_index=True, verbose_name='资源id')),
+                ('resource_type', models.CharField(choices=[('KNOWLEDGE', '知识库'), ('APPLICATION', '应用')], db_index=True, verbose_name='资源类型')),
+                ('is_auth', models.BooleanField(verbose_name='是否授权')),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='system_manage.chatuser', verbose_name='用户')),
+                ('user_group', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='system_manage.usergroup', verbose_name='用户组')),
+            ],
+            options={
+                'db_table': 'resource_chat_user_authorize',
+                'unique_together': {('user_group_id', 'resource_type', 'resource_id', 'user_id')},
             },
         ),
     ]
