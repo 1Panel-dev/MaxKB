@@ -192,12 +192,7 @@ const loginHandle = () => {
       login.asyncLogin(loginForm.value, loading).then(() => {
         locale.value = localStorage.getItem('MaxKB-locale') || getBrowserLang() || 'en-US'
         localStorage.setItem('workspace_id', 'default')
-        if (hasPermission([RoleConst.ADMIN, RoleConst.EXTENDS_ADMIN], 'OR')) {
-          router.push({name: 'user'})
-        } else {
           router.push({name: 'home'})
-        }
-
       })
     }
   })
