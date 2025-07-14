@@ -1,37 +1,25 @@
 <template>
   <el-scrollbar>
     <div class="execution-details p-8">
-      <template
-        v-if="isWorkFlow(props.type)"
-        v-for="(item, index) in arraySort(props.detail ?? [], 'index')"
-        :key="index"
-      >
+      <template v-if="isWorkFlow(props.type)" v-for="(item, index) in arraySort(props.detail ?? [], 'index')"
+        :key="index">
         <el-card class="mb-8" shadow="never" style="--el-card-padding: 12px 16px">
           <div class="flex-between cursor" @click="item['show'] = !item['show']">
             <div class="flex align-center">
               <el-icon class="mr-8 arrow-icon" :class="item['show'] ? 'rotate-90' : ''">
                 <CaretRight />
               </el-icon>
-              <component
-                :is="iconComponent(`${item.type}-icon`)"
-                class="mr-8"
-                :size="24"
-                :item="item.info"
-              />
+              <component :is="iconComponent(`${item.type}-icon`)" class="mr-8" :size="24" :item="item.info" />
               <h4>{{ item.name }}</h4>
             </div>
             <div class="flex align-center">
-              <span
-                class="mr-16 color-secondary"
-                v-if="
-                  item.type === WorkflowType.Question ||
-                  item.type === WorkflowType.AiChat ||
-                  item.type === WorkflowType.ImageUnderstandNode ||
-                  item.type === WorkflowType.ImageGenerateNode ||
-                  item.type === WorkflowType.Application
-                "
-                >{{ item?.message_tokens + item?.answer_tokens }} tokens</span
-              >
+              <span class="mr-16 color-secondary" v-if="
+                item.type === WorkflowType.Question ||
+                item.type === WorkflowType.AiChat ||
+                item.type === WorkflowType.ImageUnderstandNode ||
+                item.type === WorkflowType.ImageGenerateNode ||
+                item.type === WorkflowType.Application
+              ">{{ item?.message_tokens + item?.answer_tokens }} tokens</span>
               <span class="mr-16 color-secondary">{{ item?.run_time?.toFixed(2) || 0.0 }} s</span>
               <el-icon class="color-success" :size="16" v-if="item.status === 200">
                 <CircleCheck />
@@ -45,9 +33,7 @@
             <div class="mt-12" v-if="item['show']">
               <template v-if="item.status === 200">
                 <!-- 开始 -->
-                <template
-                  v-if="item.type === WorkflowType.Start || item.type === WorkflowType.Application"
-                >
+                <template v-if="item.type === WorkflowType.Start || item.type === WorkflowType.Application">
                   <div class="card-never border-r-6">
                     <h5 class="p-8-12">
                       {{ $t('common.param.inputParam') }}
@@ -56,8 +42,7 @@
                     <div class="p-8-12 border-t-dashed lighter">
                       <div class="mb-8">
                         <span class="color-secondary">
-                          {{ $t('chat.paragraphSource.question') }}:</span
-                        >
+                          {{ $t('chat.paragraphSource.question') }}:</span>
 
                         {{ item.question || '-' }}
                       </div>
@@ -70,11 +55,7 @@
 
                         <el-space wrap>
                           <template v-for="(f, i) in item.document_list" :key="i">
-                            <el-card
-                              shadow="never"
-                              style="--el-card-padding: 8px"
-                              class="file cursor"
-                            >
+                            <el-card shadow="never" style="--el-card-padding: 8px" class="file cursor">
                               <div class="flex align-center">
                                 <img :src="getImgUrl(f && f?.name)" alt="" width="24" />
                                 <div class="ml-4 ellipsis" :title="f && f?.name">
@@ -90,13 +71,8 @@
 
                         <el-space wrap>
                           <template v-for="(f, i) in item.image_list" :key="i">
-                            <el-image
-                              :src="f.url"
-                              alt=""
-                              fit="cover"
-                              style="width: 40px; height: 40px; display: block"
-                              class="border-r-6"
-                            />
+                            <el-image :src="f.url" alt="" fit="cover" style="width: 40px; height: 40px; display: block"
+                              class="border-r-6" />
                           </template>
                         </el-space>
                       </div>
@@ -107,12 +83,7 @@
 
                         <el-space wrap>
                           <template v-for="(f, i) in item.audio_list" :key="i">
-                            <audio
-                              :src="f.url"
-                              controls
-                              style="width: 300px; height: 43px"
-                              class="border-r-6"
-                            />
+                            <audio :src="f.url" controls style="width: 300px; height: 43px" class="border-r-6" />
                           </template>
                         </el-space>
                       </div>
@@ -121,11 +92,7 @@
 
                         <el-space wrap>
                           <template v-for="(f, i) in item.other_list" :key="i">
-                            <el-card
-                              shadow="never"
-                              style="--el-card-padding: 8px"
-                              class="file cursor"
-                            >
+                            <el-card shadow="never" style="--el-card-padding: 8px" class="file cursor">
                               <div class="flex align-center">
                                 <img :src="getImgUrl(f && f?.name)" alt="" width="24" />
                                 <div class="ml-4 ellipsis" :title="f && f?.name">
@@ -153,19 +120,12 @@
                     </h5>
                     <div class="p-8-12 border-t-dashed lighter">
                       <template v-if="item.paragraph_list?.length > 0">
-                        <template
-                          v-for="(paragraph, paragraphIndex) in arraySort(
-                            item.paragraph_list,
-                            'similarity',
-                            true,
-                          )"
-                          :key="paragraphIndex"
-                        >
-                          <ParagraphCard
-                            :data="paragraph"
-                            :content="paragraph.content"
-                            :index="paragraphIndex"
-                          />
+                        <template v-for="(paragraph, paragraphIndex) in arraySort(
+                          item.paragraph_list,
+                          'similarity',
+                          true,
+                        )" :key="paragraphIndex">
+                          <ParagraphCard :data="paragraph" :content="paragraph.content" :index="paragraphIndex" />
                         </template>
                       </template>
                       <template v-else> -</template>
@@ -184,13 +144,11 @@
                   </div>
                 </template>
                 <!-- AI 对话 / 问题优化-->
-                <template
-                  v-if="
-                    item.type == WorkflowType.AiChat ||
-                    item.type == WorkflowType.Question ||
-                    item.type == WorkflowType.Application
-                  "
-                >
+                <template v-if="
+                  item.type == WorkflowType.AiChat ||
+                  item.type == WorkflowType.Question ||
+                  item.type == WorkflowType.Application
+                ">
                   <div class="card-never border-r-6" v-if="item.type !== WorkflowType.Application">
                     <h5 class="p-8-12">
                       {{ $t('views.application.form.roleSettings.label') }}
@@ -199,29 +157,20 @@
                       {{ item.system || '-' }}
                     </div>
                   </div>
-                  <div
-                    class="card-never border-r-6 mt-8"
-                    v-if="item.type !== WorkflowType.Application"
-                  >
+                  <div class="card-never border-r-6 mt-8" v-if="item.type !== WorkflowType.Application">
                     <h5 class="p-8-12">{{ $t('chat.history') }}</h5>
                     <div class="p-8-12 border-t-dashed lighter">
                       <template v-if="item.history_message?.length > 0">
-                        <p
-                          class="mt-4 mb-4"
-                          v-for="(history, historyIndex) in item.history_message"
-                          :key="historyIndex"
-                        >
-                          <span class="color-secondary mr-4">{{ history.role }}:</span
-                          ><span>{{ history.content }}</span>
+                        <p class="mt-4 mb-4" v-for="(history, historyIndex) in item.history_message"
+                          :key="historyIndex">
+                          <span class="color-secondary mr-4">{{ history.role }}:</span><span>{{ history.content
+                            }}</span>
                         </p>
                       </template>
                       <template v-else> -</template>
                     </div>
                   </div>
-                  <div
-                    class="card-never border-r-6 mt-8"
-                    v-if="item.type !== WorkflowType.Application"
-                  >
+                  <div class="card-never border-r-6 mt-8" v-if="item.type !== WorkflowType.Application">
                     <h5 class="p-8-12">
                       {{ $t('chat.executionDetails.currentChat') }}
                     </h5>
@@ -246,14 +195,8 @@
                       }}
                     </h5>
                     <div class="p-8-12 border-t-dashed lighter">
-                      <MdPreview
-                        v-if="item.answer"
-                        ref="editorRef"
-                        editorId="preview-only"
-                        :modelValue="item.answer"
-                        style="background: none"
-                        noImgZoomIn
-                      />
+                      <MdPreview v-if="item.answer" ref="editorRef" editorId="preview-only" :modelValue="item.answer"
+                        style="background: none" noImgZoomIn />
                       <template v-else> -</template>
                     </div>
                   </div>
@@ -267,14 +210,8 @@
                     </h5>
                     <div class="p-8-12 border-t-dashed lighter">
                       <el-scrollbar height="150">
-                        <MdPreview
-                          v-if="item.answer"
-                          ref="editorRef"
-                          editorId="preview-only"
-                          :modelValue="item.answer"
-                          style="background: none"
-                          noImgZoomIn
-                        />
+                        <MdPreview v-if="item.answer" ref="editorRef" editorId="preview-only" :modelValue="item.answer"
+                          style="background: none" noImgZoomIn />
                         <template v-else> -</template>
                       </el-scrollbar>
                     </div>
@@ -287,31 +224,17 @@
                     <h5 class="p-8-12 flex align-center">
                       <span class="mr-4"> {{ $t('common.param.outputParam') }}</span>
 
-                      <el-tooltip
-                        effect="dark"
-                        :content="$t('chat.executionDetails.paramOutputTooltip')"
-                        placement="right"
-                      >
+                      <el-tooltip effect="dark" :content="$t('chat.executionDetails.paramOutputTooltip')"
+                        placement="right">
                         <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
                       </el-tooltip>
                     </h5>
                     <div class="p-8-12 border-t-dashed lighter">
                       <el-scrollbar height="150">
-                        <el-card
-                          shadow="never"
-                          style="--el-card-padding: 8px"
-                          v-for="(file_content, index) in item.content"
-                          :key="index"
-                          class="mb-8"
-                        >
-                          <MdPreview
-                            v-if="file_content"
-                            ref="editorRef"
-                            editorId="preview-only"
-                            :modelValue="file_content"
-                            style="background: none"
-                            noImgZoomIn
-                          />
+                        <el-card shadow="never" style="--el-card-padding: 8px"
+                          v-for="(file_content, index) in item.content" :key="index" class="mb-8">
+                          <MdPreview v-if="file_content" ref="editorRef" editorId="preview-only"
+                            :modelValue="file_content" style="background: none" noImgZoomIn />
                           <template v-else> -</template>
                         </el-card>
                       </el-scrollbar>
@@ -332,12 +255,7 @@
 
                           <el-space wrap>
                             <template v-for="(f, i) in item.audio_list" :key="i">
-                              <audio
-                                :src="f.url"
-                                controls
-                                style="width: 300px; height: 43px"
-                                class="border-r-6"
-                              />
+                              <audio :src="f.url" controls style="width: 300px; height: 43px" class="border-r-6" />
                             </template>
                           </el-space>
                         </div>
@@ -349,21 +267,10 @@
                       {{ $t('common.param.outputParam') }}
                     </h5>
                     <div class="p-8-12 border-t-dashed lighter">
-                      <el-card
-                        shadow="never"
-                        style="--el-card-padding: 8px"
-                        v-for="(file_content, index) in item.content"
-                        :key="index"
-                        class="mb-8"
-                      >
-                        <MdPreview
-                          v-if="file_content"
-                          ref="editorRef"
-                          editorId="preview-only"
-                          :modelValue="file_content"
-                          style="background: none"
-                          noImgZoomIn
-                        />
+                      <el-card shadow="never" style="--el-card-padding: 8px"
+                        v-for="(file_content, index) in item.content" :key="index" class="mb-8">
+                        <MdPreview v-if="file_content" ref="editorRef" editorId="preview-only"
+                          :modelValue="file_content" style="background: none" noImgZoomIn />
                         <template v-else> -</template>
                       </el-card>
                     </div>
@@ -381,13 +288,8 @@
                           {{ $t('chat.executionDetails.textContent') }}:
                         </p>
                         <div v-if="item.content">
-                          <MdPreview
-                            ref="editorRef"
-                            editorId="preview-only"
-                            :modelValue="item.content"
-                            style="background: none"
-                            noImgZoomIn
-                          />
+                          <MdPreview ref="editorRef" editorId="preview-only" :modelValue="item.content"
+                            style="background: none" noImgZoomIn />
                         </div>
                       </div>
                     </div>
@@ -406,11 +308,9 @@
                 </template>
 
                 <!-- 工具库 -->
-                <template
-                  v-if="
-                    item.type === WorkflowType.ToolLib || item.type === WorkflowType.ToolLibCustom
-                  "
-                >
+                <template v-if="
+                  item.type === WorkflowType.ToolLib || item.type === WorkflowType.ToolLibCustom
+                ">
                   <div class="card-never border-r-6 mt-8">
                     <h5 class="p-8-12">{{ $t('chat.executionDetails.input') }}</h5>
                     <div class="p-8-12 border-t-dashed lighter pre-wrap">
@@ -438,15 +338,9 @@
                     </h5>
                     <div class="p-8-12 border-t-dashed lighter">
                       <template v-if="item.document_list?.length > 0">
-                        <template
-                          v-for="(paragraph, paragraphIndex) in item.document_list"
-                          :key="paragraphIndex"
-                        >
-                          <ParagraphCard
-                            :data="paragraph.metadata"
-                            :content="paragraph.page_content"
-                            :index="paragraphIndex"
-                          />
+                        <template v-for="(paragraph, paragraphIndex) in item.document_list" :key="paragraphIndex">
+                          <ParagraphCard :data="paragraph.metadata" :content="paragraph.page_content"
+                            :index="paragraphIndex" />
                         </template>
                       </template>
                       <template v-else> -</template>
@@ -458,16 +352,9 @@
                     </h5>
                     <div class="p-8-12 border-t-dashed lighter">
                       <template v-if="item.result_list?.length > 0">
-                        <template
-                          v-for="(paragraph, paragraphIndex) in item.result_list"
-                          :key="paragraphIndex"
-                        >
-                          <ParagraphCard
-                            :data="paragraph.metadata"
-                            :content="paragraph.page_content"
-                            :index="paragraphIndex"
-                            :score="paragraph.metadata?.relevance_score"
-                          />
+                        <template v-for="(paragraph, paragraphIndex) in item.result_list" :key="paragraphIndex">
+                          <ParagraphCard :data="paragraph.metadata" :content="paragraph.page_content"
+                            :index="paragraphIndex" :score="paragraph.metadata?.relevance_score" />
                         </template>
                       </template>
                       <template v-else> -</template>
@@ -482,20 +369,13 @@
                       {{ $t('common.param.outputParam')
                       }}<span style="color: #f54a45">{{
                         item.is_submit ? '' : `(${$t('chat.executionDetails.noSubmit')})`
-                      }}</span>
+                        }}</span>
                     </h5>
 
                     <div class="p-8-12 border-t-dashed lighter">
-                      <DynamicsForm
-                        :disabled="true"
-                        label-position="top"
-                        require-asterisk-position="right"
-                        ref="dynamicsFormRef"
-                        :render_data="item.form_field_list"
-                        label-suffix=":"
-                        v-model="item.form_data"
-                        :model="item.form_data"
-                      ></DynamicsForm>
+                      <DynamicsForm :disabled="true" label-position="top" require-asterisk-position="right"
+                        ref="dynamicsFormRef" :render_data="item.form_field_list" label-suffix=":"
+                        v-model="item.form_data" :model="item.form_data"></DynamicsForm>
                     </div>
                   </div>
                 </template>
@@ -509,30 +389,18 @@
                       {{ item.system || '-' }}
                     </div>
                   </div>
-                  <div
-                    class="card-never border-r-6 mt-8"
-                    v-if="item.type !== WorkflowType.Application"
-                  >
+                  <div class="card-never border-r-6 mt-8" v-if="item.type !== WorkflowType.Application">
                     <h5 class="p-8-12">{{ $t('chat.history') }}</h5>
                     <div class="p-8-12 border-t-dashed lighter">
                       <template v-if="item.history_message?.length > 0">
-                        <p
-                          class="mt-4 mb-4"
-                          v-for="(history, historyIndex) in item.history_message"
-                          :key="historyIndex"
-                        >
+                        <p class="mt-4 mb-4" v-for="(history, historyIndex) in item.history_message"
+                          :key="historyIndex">
                           <span class="color-secondary mr-4">{{ history.role }}:</span>
 
                           <span v-if="Array.isArray(history.content)">
                             <template v-for="(h, i) in history.content" :key="i">
-                              <el-image
-                                v-if="h.type === 'image_url'"
-                                :src="h.image_url.url"
-                                alt=""
-                                fit="cover"
-                                style="width: 40px; height: 40px; display: inline-block"
-                                class="border-r-6 mr-8"
-                              />
+                              <el-image v-if="h.type === 'image_url'" :src="h.image_url.url" alt="" fit="cover"
+                                style="width: 40px; height: 40px; display: inline-block" class="border-r-6 mr-8" />
 
                               <span v-else>{{ h.text }}<br /></span>
                             </template>
@@ -552,13 +420,8 @@
                       <div v-if="item.image_list?.length > 0">
                         <el-space wrap>
                           <template v-for="(f, i) in item.image_list" :key="i">
-                            <el-image
-                              :src="f.url"
-                              alt=""
-                              fit="cover"
-                              style="width: 40px; height: 40px; display: block"
-                              class="border-r-6"
-                            />
+                            <el-image :src="f.url" alt="" fit="cover" style="width: 40px; height: 40px; display: block"
+                              class="border-r-6" />
                           </template>
                         </el-space>
                       </div>
@@ -576,14 +439,8 @@
                       }}
                     </h5>
                     <div class="p-8-12 border-t-dashed lighter">
-                      <MdPreview
-                        v-if="item.answer"
-                        ref="editorRef"
-                        editorId="preview-only"
-                        :modelValue="item.answer"
-                        style="background: none"
-                        noImgZoomIn
-                      />
+                      <MdPreview v-if="item.answer" ref="editorRef" editorId="preview-only" :modelValue="item.answer"
+                        style="background: none" noImgZoomIn />
                       <template v-else> -</template>
                     </div>
                   </div>
@@ -615,14 +472,8 @@
                       }}
                     </h5>
                     <div class="p-8-12 border-t-dashed lighter">
-                      <MdPreview
-                        v-if="item.answer"
-                        ref="editorRef"
-                        editorId="preview-only"
-                        :modelValue="item.answer"
-                        style="background: none"
-                        noImgZoomIn
-                      />
+                      <MdPreview v-if="item.answer" ref="editorRef" editorId="preview-only" :modelValue="item.answer"
+                        style="background: none" noImgZoomIn />
                       <template v-else> -</template>
                     </div>
                   </div>
@@ -699,30 +550,71 @@
           </el-collapse-transition>
         </el-card>
       </template>
-      <template v-else v-for="(item, index) in arraySort(props.detail ?? [], 'index')">
+      <template v-else>
         <div class="card-never border-r-6 mb-12">
           <h5 class="p-8-12">
-            {{ '-' }}
+            {{ $t('chat.paragraphSource.question') }}
           </h5>
-
           <div class="p-8-12 border-t-dashed lighter">
-            <div class="mb-8">
-              <span class="color-secondary"> {{ $t('chat.paragraphSource.question') }}:</span>
 
-              {{ item.question || '-' }}
+            <span class="mb-8">user: {{ problem }}</span>
+
+          </div>
+        </div>
+        <div v-if="paddedProblem" class="card-never border-r-6 mb-12">
+          <h5 class="p-8-12">
+            {{ $t('chat.paragraphSource.questionPadded') }}
+          </h5>
+          <div class="p-8-12 border-t-dashed lighter">
+
+            <span class="mb-8">user: {{ paddedProblem }}</span>
+
+          </div>
+        </div>
+        <div v-if="system" class="card-never border-r-6 mb-12">
+          <h5 class="p-8-12">
+            {{ $t('chat.paragraphSource.system') }}
+          </h5>
+          <div class="p-8-12 border-t-dashed lighter">
+
+            <span class="mb-8">{{ system }}</span>
+
+          </div>
+        </div>
+
+        <div class="card-never border-r-6 mb-12">
+          <h5 class="p-8-12">
+            {{ $t('chat.paragraphSource.historyRecord') }}
+          </h5>
+          <div class="p-8-12 border-t-dashed lighter">
+            <div v-for="(msg, index) in historyRecord" :key="index">
+              <span>{{ msg.role }}: </span>
+              <span>{{ msg.content }}</span>
             </div>
 
-            <template v-if="item.message_list?.length > 0">
-              <p
-                class="mt-4 mb-4"
-                v-for="(content, contentIndex) in item.message_list"
-                :key="contentIndex"
-              >
-                <span class="color-secondary mr-4">{{ content.role }}:</span
-                ><span>{{ content.content }}</span>
-              </p>
-            </template>
-            <template v-else> -</template>
+          </div>
+        </div>
+
+        <div class="card-never border-r-6 mb-12">
+          <h5 class="p-8-12">
+            {{ $t('chat.paragraphSource.currentChat') }}
+          </h5>
+          <div class="p-8-12 border-t-dashed lighter">
+            <div class="mb-8">{{ $t('chat.paragraphSource.knowedMessage') }}:</div>
+            <div v-for="(msg, index) in currentChat" :key="index">
+              <span>{{ msg.content }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-never border-r-6 mb-12">
+          <h5 class="p-8-12">
+            {{ $t('chat.paragraphSource.AiResponse') }}
+          </h5>
+          <div class="p-8-12 border-t-dashed lighter">
+            <div v-for="(msg, index) in AiResponse" :key="index">
+              <span>{{ msg.content }}</span>
+            </div>
           </div>
         </div>
       </template>
@@ -730,7 +622,7 @@
   </el-scrollbar>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import ParagraphCard from '@/components/ai-chat/component/knowledge-source-component/ParagraphCard.vue'
 import { arraySort } from '@/utils/array'
 import { iconComponent } from '@/workflow/icons/utils'
@@ -743,6 +635,75 @@ const props = defineProps<{
   detail?: any[]
   type?: string
 }>()
+
+console.log(props)
+
+const messageList = computed(() => {
+  const chat_step = props.detail?.find(item => item.step_type == "chat_step")
+  if (chat_step) {
+    return chat_step.message_list
+  }
+  return []
+})
+const get_padding_problem = () => {
+  return props.detail?.find(item => item.step_type == "problem_padding")
+}
+
+const get_padded_problem = () => {
+  return props.detail?.find(item => item.step_type == "problem_padding")
+}
+
+const paddedProblem = computed(() => {
+  const problem_padded = get_padded_problem()
+  if (problem_padded) {
+    return problem_padded.padding_problem_text
+  }
+})
+
+const problem = computed(() => {
+  const problem_padding = get_padding_problem()
+  if (problem_padding) {
+    return problem_padding.problem_text
+  }
+  const user_list = messageList.value.filter((item: any) => item.role == "user")
+  if (user_list.length > 0) {
+    return user_list[user_list.length - 1].content
+  }
+})
+
+const system = computed(() => {
+  const user_list = messageList.value.filter((item: any) => item.role == "system")
+  if (user_list.length > 0) {
+    return user_list[user_list.length - 1].content
+  }
+})
+
+const historyRecord = computed<any>(() => {
+
+  if (messageList.value) {
+    const messages = messageList.value.filter((item: any) => item.role != "system")
+    if (messages.length > 2) {
+      return messages.slice(0, messages.length - 2)
+    }
+    return []
+  }
+})
+const messages = messageList.value.filter((item: any) => item.role != "system")
+console.log(messages)
+
+const currentChat = computed(() => {
+  if (messageList.value) {
+    const messages = messageList.value.filter((item: any) => item.role != "system")
+    return messages.slice(messages.length - 2, messages.length - 1)
+  }
+})
+
+const AiResponse = computed(() => {
+  if (messageList.value) {
+    const messages = messageList.value.filter((item: any) => item.role != "system")
+    return messages.slice(messages.length - 1, messages.length)
+  }
+})
 
 const current = ref<number | string>('')
 </script>

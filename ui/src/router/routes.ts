@@ -20,6 +20,7 @@ export const routes: Array<RouteRecordRaw> = [
           {
             path: '/no-permission',
             name: 'noPermissionD',
+            meta: {},
             component: () => import('@/views/error/NoPermission.vue'),
           },
         ],
