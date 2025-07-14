@@ -312,8 +312,9 @@ class ChatSerializers(serializers.Serializer):
     def is_valid_chat_user(self):
         chat_user_id = self.data.get('chat_user_id')
         application_id = self.data.get('application_id')
+        chat_user_type = self.data.get('chat_user_type')
         is_auth_chat_user = DatabaseModelManage.get_model("is_auth_chat_user")
-        if self.chat_user_type == ChatUserType.CHAT_USER.value and is_auth_chat_user:
+        if chat_user_type == ChatUserType.CHAT_USER.value and is_auth_chat_user:
             is_auth = is_auth_chat_user(chat_user_id, application_id)
             if not is_auth:
                 raise ChatException(500, _("The chat user is not authorized."))
