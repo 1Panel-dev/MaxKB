@@ -1,6 +1,9 @@
 <template>
   <div class="chat-knowledge-source">
-    <div class="flex align-center mt-16" v-if="type === 'log' || application.show_source">
+    <div
+      class="flex align-center mt-16"
+      v-if="type === 'log' || type === 'debug-ai-chat' ? true : application.show_source"
+    >
       <span class="mr-4 color-secondary">{{ $t('chat.KnowledgeSource.title') }}</span>
       <el-divider direction="vertical" />
       <el-button type="primary" class="mr-8" link @click="openParagraph(data)">
@@ -9,7 +12,10 @@
         {{ data.paragraph_list?.length || 0 }}</el-button
       >
     </div>
-    <div class="mt-8" v-if="type === 'log' || application.show_source">
+    <div
+      class="mt-8"
+      v-if="type === 'log' || type === 'debug-ai-chat' ? true : application.show_source"
+    >
       <el-row :gutter="8" v-if="uniqueParagraphList?.length">
         <template v-for="(item, index) in uniqueParagraphList" :key="index">
           <el-col :span="12" class="mb-8">
@@ -44,7 +50,7 @@
     </div>
 
     <div
-      v-if="type === 'log' || application.show_exec"
+      v-if="type === 'log' || type === 'debug-ai-chat' ? true : application.show_exec"
       class="execution-details border-t color-secondary flex-between mt-12"
       style="padding-top: 12px; padding-bottom: 8px"
     >
