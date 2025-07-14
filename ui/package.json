@@ -50,7 +50,8 @@
     "vue-draggable-plus": "^0.6.0",
     "vue-i18n": "^11.1.3",
     "vue-router": "^4.5.0",
-    "vue3-menus": "^1.1.2"
+    "vue3-menus": "^1.1.2",
+    "marked": "^12.0.2"
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.1",
