@@ -1,6 +1,6 @@
 export default {
   title: '外观设置',
-  defaultSlogan: '强大易用的企业级 AI 助手',
+  defaultSlogan: '强大易用的企业级智能体平台',
   platformDisplayTheme: '平台显示主题',
   customTheme: '自定义主题',
   platformLoginSettings: '平台登录设置',

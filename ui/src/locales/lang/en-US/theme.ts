@@ -1,6 +1,6 @@
 export default {
   title: 'Appearance Settings',
-  defaultSlogan: 'A powerful and easy-to-use enterprise-level AI assistant',
+  defaultSlogan: 'An open-source platform forbuilding enterprise-grade agents',
   platformDisplayTheme: 'Platform Display Theme',
   customTheme: 'Custom Theme',
   platformLoginSettings: 'Platform Login Settings',
@@ -40,5 +40,4 @@ export default {
   saveAndApply: 'Save and Apply',
   fileMessageError: 'File size exceeds 10MB',
   saveSuccess: 'Appearance settings successfully applied',
-
 }
