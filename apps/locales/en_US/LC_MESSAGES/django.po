@@ -8499,3 +8499,7 @@ msgstr ""
 
 msgid "Generate related documents"
 msgstr ""
+
+msgid "Modify application access token"
+msgstr ""
+

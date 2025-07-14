@@ -8625,3 +8625,6 @@ msgstr "添加个人系统API KEY"
 
 msgid "Generate related documents"
 msgstr "生成相关文档"
+
+msgid "Modify application access token"
+msgstr "修改应用程序访问令牌"
