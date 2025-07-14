@@ -8,13 +8,12 @@ from django.db.models import Q
 from django.utils import timezone
 from django_apscheduler.jobstores import DjangoJobStore
 
-from common.lock.impl.file_lock import FileLock
+from common.utils.lock import un_lock, try_lock
 from common.utils.logger import maxkb_logger
 from knowledge.models import File
 
 scheduler = BackgroundScheduler()
 scheduler.add_jobstore(DjangoJobStore(), "default")
-lock = FileLock()
 
 
 def clean_debug_file():
@@ -27,7 +26,7 @@ def clean_debug_file():
 
 
 def run():
-    if lock.try_lock('clean_debug_file', 30 * 30):
+    if try_lock('clean_debug_file', 30 * 30):
         try:
             scheduler.start()
             clean_debug_file_job = scheduler.get_job(job_id='clean_debug_file')
@@ -35,4 +34,4 @@ def run():
                 clean_debug_file_job.remove()
             scheduler.add_job(clean_debug_file, 'cron', hour='2', minute='0', second='0', id='clean_debug_file')
         finally:
-            lock.un_lock('clean_debug_file')
+            un_lock('clean_debug_file')

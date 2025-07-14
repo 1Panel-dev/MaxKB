@@ -9,14 +9,13 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from django_apscheduler.jobstores import DjangoJobStore
 from application.models import Application, Chat, ChatRecord
 from django.db.models import Q, Max
-from common.lock.impl.file_lock import FileLock
+from common.utils.lock import try_lock, un_lock
 from common.utils.logger import maxkb_logger
 
 from knowledge.models import File
 
 scheduler = BackgroundScheduler()
 scheduler.add_jobstore(DjangoJobStore(), "default")
-lock = FileLock()
 
 
 def clean_chat_log_job():
@@ -71,7 +70,7 @@ def clean_chat_log_job():
 
 
 def run():
-    if lock.try_lock('clean_chat_log_job', 30 * 30):
+    if try_lock('clean_chat_log_job', 30 * 30):
         try:
             scheduler.start()
             existing_job = scheduler.get_job(job_id='clean_chat_log')
@@ -79,4 +78,4 @@ def run():
                 existing_job.remove()
             scheduler.add_job(clean_chat_log_job, 'cron', hour='0', minute='5', id='clean_chat_log')
         finally:
-            lock.un_lock('clean_chat_log_job')
+            un_lock('clean_chat_log_job')
