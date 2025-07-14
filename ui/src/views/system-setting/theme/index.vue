@@ -10,13 +10,13 @@
           @change="changeThemeHandle"
         >
           <template v-for="(item, index) in themeList" :key="index">
-            <el-radio-button :label="item.label" :value="item.value" />
+            <el-radio-button :label="item.label" :value="item.value"/>
           </template>
-          <el-radio-button :label="$t('theme.custom')" value="custom" />
+          <el-radio-button :label="$t('theme.custom')" value="custom"/>
         </el-radio-group>
         <div v-if="themeRadio === 'custom'">
           <h5 class="mt-16 mb-8">{{ $t('theme.customTheme') }}</h5>
-          <el-color-picker v-model="customColor" @change="customColorHandle" />
+          <el-color-picker v-model="customColor" @change="customColorHandle"/>
         </div>
       </el-card>
 
@@ -33,7 +33,7 @@
             <div class="theme-preview">
               <el-row :gutter="8">
                 <el-col :span="16">
-                  <LoginPreview :data="themeForm" />
+                  <LoginPreview :data="themeForm"/>
                 </el-col>
                 <el-col :span="8">
                   <div class="theme-form">
@@ -56,7 +56,7 @@
                         </el-upload>
                       </div>
                       <el-text type="info" size="small"
-                        >{{ $t('theme.websiteLogoTip') }}
+                      >{{ $t('theme.websiteLogoTip') }}
                       </el-text>
                     </el-card>
                     <el-card shadow="never" class="mb-8">
@@ -78,7 +78,7 @@
                         </el-upload>
                       </div>
                       <el-text type="info" size="small"
-                        >{{ $t('theme.loginLogoTip') }}
+                      >{{ $t('theme.loginLogoTip') }}
                       </el-text>
                     </el-card>
                     <el-card shadow="never" class="mb-8">
@@ -116,10 +116,12 @@
                         <el-input
                           v-model="themeForm.title"
                           :placeholder="$t('theme.websiteNamePlaceholder')"
+                          show-word-limit
+                          maxlength="128"
                         >
                         </el-input>
                         <el-text type="info"
-                          >{{ $t('theme.websiteNameTip') }}
+                        >{{ $t('theme.websiteNameTip') }}
                         </el-text>
                       </el-form-item>
                       <el-form-item :label="$t('theme.websiteSlogan')" prop="slogan">
@@ -131,7 +133,7 @@
                         >
                         </el-input>
                         <el-text type="info"
-                          >{{ $t('theme.websiteSloganTip') }}
+                        >{{ $t('theme.websiteSloganTip') }}
                         </el-text>
                       </el-form-item>
                     </el-form>
@@ -166,7 +168,7 @@
                       <div class="flex-center h-full">
                         <div class="app-title-container cursor">
                           <div class="logo flex-center">
-                            <LogoFull height="25px" />
+                            <LogoFull height="25px"/>
                           </div>
                         </div>
                       </div>
@@ -204,6 +206,8 @@
                         <el-input
                           v-model="themeForm.userManualUrl"
                           :placeholder="$t('theme.urlPlaceholder')"
+                          show-word-limit
+                          maxlength="128"
                         />
                       </div>
                     </div>
@@ -216,6 +220,8 @@
                         <el-input
                           v-model="themeForm.forumUrl"
                           :placeholder="$t('theme.urlPlaceholder')"
+                          show-word-limit
+                          maxlength="128"
                         />
                       </div>
                     </div>
@@ -228,6 +234,8 @@
                         <el-input
                           v-model="themeForm.projectUrl"
                           :placeholder="$t('theme.urlPlaceholder')"
+                          show-word-limit
+                          maxlength="128"
                         />
                       </div>
                     </div>
@@ -245,7 +253,7 @@
     <div class="theme-setting__operate w-full p-16-24">
       <el-button @click="resetTheme">{{ $t('theme.abandonUpdate') }}</el-button>
       <el-button type="primary" @click="updateTheme(themeFormRef)"
-        v-hasPermission="
+                 v-hasPermission="
                       new ComplexPermission(
                         [RoleConst.ADMIN],
                         [PermissionConst.APPEARANCE_SETTINGS_EDIT],
@@ -258,20 +266,20 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, onMounted, computed } from 'vue'
-import { useRouter, onBeforeRouteLeave } from 'vue-router'
-import type { FormInstance, FormRules, UploadFiles } from 'element-plus'
-import { cloneDeep } from 'lodash'
+import {ref, reactive, onMounted, computed} from 'vue'
+import {useRouter, onBeforeRouteLeave} from 'vue-router'
+import type {FormInstance, FormRules, UploadFiles} from 'element-plus'
+import {cloneDeep} from 'lodash'
 import LoginPreview from './LoginPreview.vue'
-import { themeList, defaultSetting, defaultPlatformSetting } from '@/utils/theme'
+import {themeList, defaultSetting, defaultPlatformSetting} from '@/utils/theme'
 import ThemeApi from '@/api/system-settings/theme'
-import { MsgSuccess, MsgError } from '@/utils/message'
+import {MsgSuccess, MsgError} from '@/utils/message'
 import useStore from '@/stores'
-import { t } from '@/locales'
-import { PermissionConst, RoleConst } from '@/utils/permission/data'
-import { ComplexPermission } from '@/utils/permission/type'
+import {t} from '@/locales'
+import {PermissionConst, RoleConst} from '@/utils/permission/data'
+import {ComplexPermission} from '@/utils/permission/type'
 
-const { theme } = useStore()
+const {theme} = useStore()
 const router = useRouter()
 
 onBeforeRouteLeave((to, from) => {
@@ -300,10 +308,10 @@ const customColor = ref('')
 
 const rules = reactive<FormRules>({
   title: [
-    { required: true, message: t('theme.websiteNamePlaceholder'), trigger: 'blur' },
+    {required: true, message: t('theme.websiteNamePlaceholder'), trigger: 'blur'},
   ],
   slogan: [
-    { required: true, message: t('theme.websiteSloganPlaceholder'), trigger: 'blur' },
+    {required: true, message: t('theme.websiteSloganPlaceholder'), trigger: 'blur'},
   ],
 })
 
@@ -340,15 +348,15 @@ function resetForm(val: string) {
   themeForm.value =
     val === 'login'
       ? {
-          ...themeForm.value,
-          theme: themeForm.value.theme,
-          ...defaultSetting,
-        }
+        ...themeForm.value,
+        theme: themeForm.value.theme,
+        ...defaultSetting,
+      }
       : {
-          ...themeForm.value,
-          theme: themeForm.value.theme,
-          ...defaultPlatformSetting,
-        }
+        ...themeForm.value,
+        theme: themeForm.value.theme,
+        ...defaultPlatformSetting,
+      }
 
   theme.setTheme(themeForm.value)
 }
