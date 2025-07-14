@@ -565,7 +565,7 @@ function importTool(file: any) {
     })
     .then(() => {
       getList()
-      
+
     })
     .catch((e: any) => {
       if (e.code === 400) {

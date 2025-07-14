@@ -8455,9 +8455,6 @@ msgstr ""
 msgid "trial listening"
 msgstr ""
 
-msgid "Add personal system API_KEY"
-msgstr ""
-
 msgid "Add member to user group"
 msgstr ""
 
@@ -8492,9 +8489,6 @@ msgid "Download"
 msgstr ""
 
 msgid "USER"
-msgstr ""
-
-msgid "Update personal system API_KEY"
 msgstr ""
 
 msgid "Delete personal system API_KEY"

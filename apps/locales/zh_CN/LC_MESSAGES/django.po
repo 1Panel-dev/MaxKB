@@ -8581,9 +8581,6 @@ msgstr "邮箱设置"
 msgid "trial listening"
 msgstr "试听"
 
-msgid "Add personal system API_KEY"
-msgstr "添加个人系统 API KEY"
-
 msgid "Add member to user group"
 msgstr "添加成员到用户组"
 
@@ -8619,9 +8616,6 @@ msgstr "下载"
 
 msgid "USER"
 msgstr "用户"
-
-msgid "Update personal system API_KEY"
-msgstr "更新个人系统API KEY"
 
 msgid "Delete personal system API_KEY"
 msgstr "删除个人系统API KEY"

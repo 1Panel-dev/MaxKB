@@ -38,7 +38,7 @@
         <el-button @click.prevent="dialogVisible = false" :loading="loading">
           {{ $t('common.cancel') }}
         </el-button>
-        <el-button type="primary" @click="submitValid(applicationFormRef)" :loading="loading">
+        <el-button type="primary" @click="submitHandle(applicationFormRef)" :loading="loading">
           {{ $t('common.copy') }}
         </el-button>
       </span>
@@ -144,21 +144,6 @@ const open = (data: any, folder: string) => {
   dialogVisible.value = true
 }
 
-const submitValid = (formEl: FormInstance | undefined) => {
-  if (user.isEE() || user.isPE()) {
-    submitHandle(formEl)
-  } else {
-    common
-      .asyncGetValid(ValidType.Application, ValidCount.Application, loading)
-      .then(async (res: any) => {
-        if (res?.data) {
-          submitHandle(formEl)
-        } else {
-          MsgAlert(t('common.tip'), t('views.application.tip.professionalMessage'))
-        }
-      })
-  }
-}
 const submitHandle = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid) => {
