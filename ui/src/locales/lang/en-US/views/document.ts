@@ -159,6 +159,11 @@ export default {
     optimization: 'Model optimization',
     directly_return: 'Respond directly',
   },
+  movePosition: {
+    title: 'Move position',
+    moveUp: 'Move up',
+    moveDown: 'Move down'
+  },
   generateQuestion: {
     title: 'Generate Questions',
     successMessage: 'Successful',

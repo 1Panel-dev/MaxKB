@@ -156,6 +156,11 @@ export default {
     optimization: '模型优化',
     directly_return: '直接回答',
   },
+  movePosition: {
+    title: '移动位置',
+    moveUp: '上移',
+    moveDown: '下移',
+  },
   generateQuestion: {
     title: '生成问题',
     successMessage: '生成问题成功',

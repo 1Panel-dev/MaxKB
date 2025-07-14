@@ -109,9 +109,12 @@
 
                             <ParagraphCard
                               :data="item"
+                              :showMoveUp="index !== 0"
+                              :showMoveDown="index < paragraphDetail.length-1"
                               class="mb-8 w-full"
                               @changeState="changeState"
                               @deleteParagraph="deleteParagraph"
+                              @move="(val: string)=>onEnd(null, {paragraph_id: item.id,new_position: val==='up'?index-1:index+1}, index)"
                               @refresh="refresh"
                               @refreshMigrateParagraph="refreshMigrateParagraph"
                               :disabled="shareDisabled"
@@ -328,8 +331,8 @@ function openGenerateDialog(row?: any) {
   GenerateRelatedDialogRef.value.open(arr, 'paragraph')
 }
 
-function onEnd(event?: any) {
-  const obj = {
+function onEnd(event?: any, params?: any, index?: number) {
+  const obj =params ?? {
     paragraph_id: paragraphDetail.value[event.newIndex].id, // 当前拖动的段落ID
     new_position: paragraphDetail.value[event.newIndex + 1].position, // 新位置的段落位置
   }
@@ -339,6 +342,10 @@ function onEnd(event?: any) {
     obj,
     loading,
   )
+  if(params) {
+    const movedItem = paragraphDetail.value.splice(index as number, 1)[0]
+    paragraphDetail.value.splice(params.new_position, 0, movedItem)
+  }
 }
 
 onMounted(() => {

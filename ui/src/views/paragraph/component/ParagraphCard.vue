@@ -42,7 +42,7 @@
             <el-icon><MoreFilled /></el-icon>
           </el-button>
           <template #dropdown>
-            <el-dropdown-menu>
+            <el-dropdown-menu style="min-width: 140px;">
               <el-dropdown-item @click.stop="openGenerateDialog(data)">
                 <el-icon><Connection /></el-icon>
                 {{ $t('views.document.generateQuestion.title') }}</el-dropdown-item
@@ -51,6 +51,34 @@
                 <AppIcon iconName="app-migrate"></AppIcon>
                 {{ $t('views.document.setting.migration') }}</el-dropdown-item
               >
+               <el-dropdown-item>
+                <el-dropdown class="w-full" trigger="hover" :show-arrow="false" placement="right-start" popper-class="move-position-popper">
+                  <div class="w-full flex-between" style="line-height: 22px;">
+                    <div class="flex align-center">
+                      <!-- TODO 更换icon -->
+                      <AppIcon iconName="app-migrate"></AppIcon>
+                      {{ $t('views.document.movePosition.title') }}
+                    </div>
+                    <el-icon class="color-input-placeholder" :size="16" style="margin-right: 0;"><ArrowRight /></el-icon>
+                  </div>
+                  <template #dropdown>
+                    <el-dropdown-menu>
+                      <el-dropdown-item
+                        v-if="props.showMoveUp"
+                        @click.stop="emit('move', 'up')"
+                      >
+                        {{ $t('views.document.movePosition.moveUp') }}
+                      </el-dropdown-item>
+                      <el-dropdown-item
+                        v-if="props.showMoveDown"
+                        @click.stop="emit('move', 'down')"
+                      >
+                        {{ $t('views.document.movePosition.moveDown') }}
+                      </el-dropdown-item>
+                    </el-dropdown-menu>
+                  </template>
+                </el-dropdown>
+              </el-dropdown-item>
               <el-dropdown-item icon="Delete" @click.stop="deleteParagraph(data)">{{
                 $t('common.delete')
               }}</el-dropdown-item>
@@ -94,6 +122,8 @@ import { t } from '@/locales'
 const props = defineProps<{
   data: any
   disabled?: boolean
+  showMoveUp?: boolean
+  showMoveDown?: boolean
 }>()
 
 const route = useRoute()
@@ -106,7 +136,7 @@ const apiType = computed(() => {
   return type as 'systemShare' | 'workspace' | 'systemManage'
 })
 
-const emit = defineEmits(['changeState', 'deleteParagraph', 'refresh', 'refreshMigrateParagraph'])
+const emit = defineEmits(['changeState', 'deleteParagraph', 'refresh', 'refreshMigrateParagraph','move'])
 const loading = ref(false)
 const changeStateloading = ref(false)
 const show = ref(false)
@@ -226,6 +256,14 @@ function refreshMigrateParagraph() {
     top: 0;
     overflow: inherit;
     z-index: 10;
+  }
+}
+</style>
+
+<style lang="scss">
+.move-position-popper {
+  .el-popper__arrow {
+    display: none;
   }
 }
 </style>
