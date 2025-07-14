@@ -26,7 +26,7 @@
               ref="paragraphFormRef"
               :data="detail"
               :isEdit="isEdit"
-              :knowledge-id="dataset_id"
+              :knowledge-id="id"
             />
           </div>
         </el-scrollbar>
@@ -42,7 +42,7 @@
         <ProblemComponent
           :paragraphId="paragraphId"
           :docId="document_id"
-          :knowledgeId="dataset_id"
+          :knowledgeId="id"
           :apiType="apiType"
           ref="ProblemRef"
         />
