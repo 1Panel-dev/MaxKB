@@ -79,18 +79,16 @@ class AccessTokenSerializer(serializers.Serializer):
             application_access_token.language = instance.get('language')
         if 'language' not in instance or instance.get('language') is None:
             application_access_token.language = None
+
         application_access_token.save()
-        application_setting_model = DatabaseModelManage.get_model('application_setting')
         license_is_valid = cache.get(Cache_Version.SYSTEM.get_key(key='license_is_valid'),
                                      version=Cache_Version.SYSTEM.get_version())
-        if application_setting_model is not None and license_is_valid:
-            application_setting, _ = application_setting_model.objects.get_or_create(
-                application_id=self.data.get('application_id'))
-            if application_setting is not None and instance.get('authentication') is not None and instance.get(
+        if license_is_valid:
+            if instance.get('authentication') is not None and instance.get(
                     'authentication_value') is not None:
-                application_setting.authentication = instance.get('authentication')
-                application_setting.authentication_value = instance.get('authentication_value')
-                application_setting.save()
+                application_access_token.authentication = instance.get('authentication')
+                application_access_token.authentication_value = instance.get('authentication_value')
+                application_access_token.save()
         return self.one(with_valid=False)
 
     def one(self, with_valid=True):
@@ -105,14 +103,12 @@ class AccessTokenSerializer(serializers.Serializer):
                                                                   str(uuid.uuid7()).encode()).hexdigest()[
                                                                            8:24], is_active=True)
             application_access_token.save()
-        application_setting_model = DatabaseModelManage.get_model('application_setting')
         other = {}
-        if application_setting_model is not None:
-            application_setting, _ = application_setting_model.objects.get_or_create(
-                application_id=self.data.get('application_id'))
-            if application_setting is not None:
-                other = {'authentication': application_setting.authentication,
-                         'authentication_value': application_setting.authentication_value}
+        license_is_valid = cache.get(Cache_Version.SYSTEM.get_key(key='license_is_valid'),
+                                     version=Cache_Version.SYSTEM.get_version())
+        if license_is_valid:
+            other = {'authentication': application_access_token.authentication,
+                     'authentication_value': application_access_token.authentication_value}
 
         return {'application_id': application_access_token.application_id,
                 'access_token': application_access_token.access_token,
