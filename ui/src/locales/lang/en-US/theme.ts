@@ -1,6 +1,6 @@
 export default {
   title: 'Appearance Settings',
-  defaultSlogan: 'An open-source platform forbuilding enterprise-grade agents',
+  defaultSlogan: 'An open-source platform for building enterprise-grade agents',
   platformDisplayTheme: 'Platform Display Theme',
   customTheme: 'Custom Theme',
   platformLoginSettings: 'Platform Login Settings',
