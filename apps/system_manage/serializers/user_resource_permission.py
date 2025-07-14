@@ -228,8 +228,9 @@ class UserResourcePermissionSerializer(serializers.Serializer):
         update_list = []
         save_list = []
         user_resource_permission_list = instance.get('user_resource_permission_list')
-        workspace_user_resource_permission_exist_list = QuerySet(WorkspaceUserResourcePermission).filter(
-            workspace_id=workspace_id, user_id=user_id, auth_target_type=self.data.get('auth_target_type'))
+        QuerySet(WorkspaceUserResourcePermission).filter(
+            workspace_id=workspace_id, user_id=user_id, auth_target_type=self.data.get('auth_target_type')).delete()
+        workspace_user_resource_permission_exist_list = []
         for user_resource_permission in user_resource_permission_list:
             exist_list = [user_resource_permission_exist for user_resource_permission_exist in
                           workspace_user_resource_permission_exist_list if
