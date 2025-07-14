@@ -126,8 +126,6 @@ const updateContent = (data: any) => {
 }
 
 const deleteHandle = (item: any, cIndex: number) => {
-  // 计算实际索引，考虑分页
-  const actualIndex = cIndex + (page_size.value * (current_page.value - 1));
 
   MsgConfirm(
     `${t('views.paragraph.delete.confirmTitle')}${item.title || '-'} ?`,
@@ -139,7 +137,7 @@ const deleteHandle = (item: any, cIndex: number) => {
   )
     .then(() => {
       const new_value = [...props.modelValue]
-      new_value.splice(actualIndex, 1)
+      new_value.splice(cIndex, 1)
       emit('update:modelValue', new_value)
 
       // 更新本地列表
