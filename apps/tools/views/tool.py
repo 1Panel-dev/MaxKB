@@ -236,7 +236,12 @@ class ToolView(APIView):
         @log(menu='Tool', operate='Import tool', )
         def post(self, request: Request, workspace_id: str):
             return result.success(ToolSerializer.Import(
-                data={'workspace_id': workspace_id, 'file': request.FILES.get('file'), 'user_id': request.user.id}
+                data={
+                    'workspace_id': workspace_id,
+                    'file': request.FILES.get('file'),
+                    'user_id': request.user.id,
+                    'folder_id': request.data.get('folder_id')
+                }
             ).import_(ToolScope.WORKSPACE))
 
     class Export(APIView):

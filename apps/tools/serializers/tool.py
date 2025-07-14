@@ -401,6 +401,7 @@ class ToolSerializer(serializers.Serializer):
         file = UploadedFileField(required=True, label=_("file"))
         user_id = serializers.UUIDField(required=True, label=_("User ID"))
         workspace_id = serializers.CharField(required=True, label=_("workspace id"))
+        folder_id = serializers.CharField(required=False, allow_null=True, label=_("folder id"))
 
         #
         @transaction.atomic
@@ -413,6 +414,10 @@ class ToolSerializer(serializers.Serializer):
                 tool_instance = RestrictedUnpickler(io.BytesIO(tool_instance_bytes)).load()
             except Exception as e:
                 raise AppApiException(1001, _("Unsupported file format"))
+            if self.data.get('folder_id') is None:
+                folder_id = self.data.get('workspace_id')
+            else:
+                folder_id = self.data.get('folder_id')
             tool = tool_instance.tool
             tool_id = uuid.uuid7()
             tool_model = Tool(
@@ -424,7 +429,7 @@ class ToolSerializer(serializers.Serializer):
                 workspace_id=self.data.get('workspace_id'),
                 input_field_list=tool.get('input_field_list'),
                 init_field_list=tool.get('init_field_list', []),
-                folder_id=self.data.get('workspace_id'),
+                folder_id=folder_id,
                 scope=scope,
                 is_active=False
             )

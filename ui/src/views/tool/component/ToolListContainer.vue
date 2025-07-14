@@ -554,6 +554,7 @@ const elUploadRef = ref()
 function importTool(file: any) {
   const formData = new FormData()
   formData.append('file', file.raw, file.name)
+  formData.append('folder_id', folder.currentFolder.id || user.getWorkspaceId())
   elUploadRef.value.clearFiles()
   loadSharedApi({ type: 'tool', systemType: apiType.value })
     .postImportTool(formData, loading)
