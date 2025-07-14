@@ -444,16 +444,16 @@ class PermissionConstants(Enum):
         parent_group=[SystemGroup.USER_MANAGEMENT]
     )
 
-    MODEL_CREATE = Permission(
-        group=Group.MODEL, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        parent_group=[WorkspaceGroup.MODEL, UserGroup.MODEL],
-        resource_permission_group_list=[ResourcePermissionConst.MODEL_MANGE]
-    )
-
     MODEL_READ = Permission(
         group=Group.MODEL, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
         parent_group=[WorkspaceGroup.MODEL, UserGroup.MODEL],
         resource_permission_group_list=[ResourcePermissionConst.MODEL_VIEW]
+    )
+
+    MODEL_CREATE = Permission(
+        group=Group.MODEL, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.MODEL, UserGroup.MODEL],
+        resource_permission_group_list=[ResourcePermissionConst.MODEL_MANGE]
     )
 
     MODEL_EDIT = Permission(
@@ -466,6 +466,12 @@ class PermissionConstants(Enum):
         parent_group=[WorkspaceGroup.MODEL, UserGroup.MODEL],
         resource_permission_group_list=[ResourcePermissionConst.MODEL_MANGE]
     )
+    TOOL_READ = Permission(
+        group=Group.TOOL, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL],
+        resource_permission_group_list=[ResourcePermissionConst.TOOL_VIEW]
+    )
+
     TOOL_CREATE = Permission(
         group=Group.TOOL, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
         parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL],
@@ -476,12 +482,6 @@ class PermissionConstants(Enum):
         group=Group.TOOL, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
         parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL],
         resource_permission_group_list=[ResourcePermissionConst.TOOL_MANGE]
-    )
-
-    TOOL_READ = Permission(
-        group=Group.TOOL, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL],
-        resource_permission_group_list=[ResourcePermissionConst.TOOL_VIEW]
     )
 
     TOOL_DELETE = Permission(
@@ -1172,14 +1172,15 @@ class PermissionConstants(Enum):
         group=Group.SYSTEM_KNOWLEDGE_CHAT_USER, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.SHARED_KNOWLEDGE]
     )
-    SHARED_MODEL_CREATE = Permission(
-        group=Group.SYSTEM_MODEL, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        parent_group=[SystemGroup.SHARED_MODEL]
-    )
     SHARED_MODEL_READ = Permission(
         group=Group.SYSTEM_MODEL, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
         parent_group=[SystemGroup.SHARED_MODEL]
     )
+    SHARED_MODEL_CREATE = Permission(
+        group=Group.SYSTEM_MODEL, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[SystemGroup.SHARED_MODEL]
+    )
+
     SHARED_MODEL_EDIT = Permission(
         group=Group.SYSTEM_MODEL, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
         parent_group=[SystemGroup.SHARED_MODEL]
