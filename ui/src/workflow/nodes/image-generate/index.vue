@@ -153,7 +153,7 @@
 
 <script setup lang="ts">
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
-import { computed, onMounted, ref } from 'vue'
+import {computed, nextTick, onMounted, ref} from 'vue'
 import { groupBy, set } from 'lodash'
 import applicationApi from '@/api/application/application'
 import useStore from '@/stores'
@@ -225,11 +225,13 @@ function getSelectModel() {
 }
 
 const model_change = () => {
-  if (form_data.value.model_id) {
-    AIModeParamSettingDialogRef.value?.reset_default(form_data.value.model_id, id)
-  } else {
-    refreshParam({})
-  }
+  nextTick(()=>{
+    if (form_data.value.model_id) {
+      AIModeParamSettingDialogRef.value?.reset_default(form_data.value.model_id, id)
+    } else {
+      refreshParam({})
+    }
+  })
 }
 
 const openAIParamSettingDialog = (modelId: string) => {
