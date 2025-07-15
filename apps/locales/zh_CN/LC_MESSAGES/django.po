@@ -8628,3 +8628,6 @@ msgstr "生成相关文档"
 
 msgid "Modify application access token"
 msgstr "修改应用程序访问令牌"
+
+msgid "File not exist. Only manually uploaded documents are supported"
+msgstr "文件不存在, 仅支持手动上传的文档"
