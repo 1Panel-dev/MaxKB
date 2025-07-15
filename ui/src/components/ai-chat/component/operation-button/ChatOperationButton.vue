@@ -474,6 +474,9 @@ class AudioManage {
         }
         // 等待取消完成后重新播放
         setTimeout(() => {
+          if (speechSynthesis.speaking) {
+            return
+          }
           speechSynthesis.speak(audioElement)
           this.statusList[index] = AudioStatus.PLAY_INT
         }, 500)
