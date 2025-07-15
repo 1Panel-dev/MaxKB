@@ -52,9 +52,10 @@ class WebLocalBaseReranker(MaxKBBaseModel, BaseDocumentCompressor):
             Sequence[Document]:
         if documents is None or len(documents) == 0:
             return []
+        prefix = CONFIG.get_admin_path()
         bind = f'{CONFIG.get("LOCAL_MODEL_HOST")}:{CONFIG.get("LOCAL_MODEL_PORT")}'
         res = requests.post(
-            f'{CONFIG.get("LOCAL_MODEL_PROTOCOL")}://{bind}/api/model/{self.model_id}/compress_documents',
+            f'{CONFIG.get("LOCAL_MODEL_PROTOCOL")}://{bind}{prefix}/api/model/{self.model_id}/compress_documents',
             json={'documents': [{'page_content': document.page_content, 'metadata': document.metadata} for document in
                                 documents], 'query': query}, headers={'Content-Type': 'application/json'})
         result = res.json()
