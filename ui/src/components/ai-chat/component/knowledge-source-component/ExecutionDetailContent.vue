@@ -1,7 +1,7 @@
 <template>
   <el-scrollbar>
     <div class="execution-details p-8">
-      <template v-if="isWorkFlow(props.type)" v-for="(item, index) in arraySort(props.detail ?? [], 'index')"
+      <template v-if="isWorkFlow(props.appType)" v-for="(item, index) in arraySort(props.detail ?? [], 'index')"
         :key="index">
         <el-card class="mb-8" shadow="never" style="--el-card-padding: 12px 16px">
           <div class="flex-between cursor" @click="item['show'] = !item['show']">
@@ -633,7 +633,7 @@ import { isWorkFlow } from '@/utils/application'
 
 const props = defineProps<{
   detail?: any[]
-  type?: string
+  appType?: string
 }>()
 
 console.log(props)

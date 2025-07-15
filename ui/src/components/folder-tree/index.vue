@@ -1,7 +1,7 @@
 <template>
   <div class="folder-tree">
     <el-input
-      v-model.trim="filterText"
+      v-model="filterText"
       :placeholder="$t('common.search')"
       prefix-icon="Search"
       clearable

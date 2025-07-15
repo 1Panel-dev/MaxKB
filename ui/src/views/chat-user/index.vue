@@ -124,7 +124,6 @@
             <el-table-column
               prop="nick_name"
               :label="$t('views.userManage.userForm.nick_name.label')"
-              show-overflow-tooltip
             />
             <el-table-column prop="username" :label="$t('views.login.loginForm.username.label')" />
             <el-table-column prop="source" :label="$t('views.userManage.source.label')">
@@ -133,14 +132,14 @@
                   row.source === 'LOCAL'
                     ? $t('views.userManage.source.local')
                     : row.source === 'wecom'
-                    ? $t('views.userManage.source.wecom')
-                    : row.source === 'lark'
-                    ? $t('views.userManage.source.lark')
-                    : row.source === 'dingtalk'
-                    ? $t('views.userManage.source.dingtalk')
-                    : row.source === 'OAUTH2' || row.source === 'OAuth2'
-                    ? 'OAuth2'
-                    : row.source
+                      ? $t('views.userManage.source.wecom')
+                      : row.source === 'lark'
+                        ? $t('views.userManage.source.lark')
+                        : row.source === 'dingtalk'
+                          ? $t('views.userManage.source.dingtalk')
+                          : row.source === 'OAUTH2' || row.source === 'OAuth2'
+                            ? 'OAuth2'
+                            : row.source
                 }}
               </template>
             </el-table-column>
@@ -347,23 +346,24 @@ function handleSizeChange() {
   getList()
 }
 
-watch(() => current.value?.id, () => {
-  paginationConfig.current_page = 1
-  getList()
-})
-
-const allChecked = computed(() =>
-  tableData.value.length > 0 &&
-  tableData.value.every(item => checkedMap[item.id])
+watch(
+  () => current.value?.id,
+  () => {
+    paginationConfig.current_page = 1
+    getList()
+  },
 )
 
-const allIndeterminate = computed(() =>
-  !allChecked.value &&
-  tableData.value.some(item => checkedMap[item.id])
+const allChecked = computed(
+  () => tableData.value.length > 0 && tableData.value.every((item) => checkedMap[item.id]),
+)
+
+const allIndeterminate = computed(
+  () => !allChecked.value && tableData.value.some((item) => checkedMap[item.id]),
 )
 
 const handleCheckAll = (checked: boolean) => {
-  tableData.value.forEach(item => {
+  tableData.value.forEach((item) => {
     item.is_auth = checked
     checkedMap[item.id] = checked
   })

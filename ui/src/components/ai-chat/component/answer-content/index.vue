@@ -43,7 +43,8 @@
           <KnowledgeSourceComponent
             :data="chatRecord"
             :application="application"
-            :type="application.type"
+            :type="type"
+            :appType="application.type"
             :executionIsRightPanel="props.executionIsRightPanel"
             @open-execution-detail="emit('openExecutionDetail')"
             @openParagraph="emit('openParagraph')"

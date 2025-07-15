@@ -101,9 +101,15 @@
         <el-table-column
           prop="nick_name"
           :label="$t('views.userManage.userForm.nick_name.label')"
+          min-width="180"
           show-overflow-tooltip
         />
-        <el-table-column prop="username" :label="$t('common.username')" show-overflow-tooltip />
+        <el-table-column
+          prop="username"
+          :label="$t('common.username')"
+          min-width="180"
+          show-overflow-tooltip
+        />
         <el-table-column prop="is_active" :label="$t('common.status.label')" width="100">
           <template #default="{ row }">
             <div v-if="row.is_active" class="flex align-center">
@@ -127,6 +133,7 @@
           prop="email"
           :label="$t('views.login.loginForm.email.label')"
           show-overflow-tooltip
+          min-width="180"
         >
           <template #default="{ row }">
             {{ row.email || '-' }}
@@ -144,7 +151,7 @@
         <el-table-column
           prop="user_group_names"
           :label="$t('views.chatUser.group.title')"
-          min-width="120"
+          min-width="150"
         >
           <template #default="{ row }">
             <TagGroup :tags="row.user_group_names" />
