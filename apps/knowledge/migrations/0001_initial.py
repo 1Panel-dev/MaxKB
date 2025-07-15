@@ -116,7 +116,7 @@ class Migration(migrations.Migration):
                 ('create_time', models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='创建时间')),
                 ('update_time', models.DateTimeField(auto_now=True, db_index=True, verbose_name='修改时间')),
                 ('id', models.UUIDField(default=uuid_utils.compat.uuid7, editable=False, primary_key=True, serialize=False, verbose_name='主键id')),
-                ('content', models.CharField(db_index=True, max_length=102400, verbose_name='段落内容')),
+                ('content', models.CharField(max_length=102400, verbose_name='段落内容')),
                 ('title', models.CharField(db_index=True, default='', max_length=256, verbose_name='标题')),
                 ('status', models.CharField(db_index=True, default=knowledge.models.knowledge.get_default_status, max_length=20, verbose_name='状态')),
                 ('status_meta', models.JSONField(default=knowledge.models.knowledge.default_status_meta, verbose_name='状态数据')),

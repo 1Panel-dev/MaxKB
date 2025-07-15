@@ -166,7 +166,7 @@ class Paragraph(AppModelMixin):
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
     document = models.ForeignKey(Document, on_delete=models.DO_NOTHING, db_constraint=False)
     knowledge = models.ForeignKey(Knowledge, on_delete=models.DO_NOTHING)
-    content = models.CharField(max_length=102400, verbose_name="段落内容", db_index=True)
+    content = models.CharField(max_length=102400, verbose_name="段落内容")
     title = models.CharField(max_length=256, verbose_name="标题", default="", db_index=True)
     status = models.CharField(verbose_name='状态', max_length=20, default=get_default_status, db_index=True)
     status_meta = models.JSONField(verbose_name="状态数据", default=default_status_meta)
