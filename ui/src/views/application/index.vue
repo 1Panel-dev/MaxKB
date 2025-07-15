@@ -600,9 +600,12 @@ const importApplication = (file: any) => {
     .then(async (res: any) => {
       if (res?.data) {
         applicationList.value = []
-        getList()
+        user.profile()
       }
     })
+    .then(() => {
+      getList()
+    }) 
     .catch((e) => {
       if (e.code === 400) {
         MsgConfirm(t('common.tip'), t('views.application.tip.professionalMessage'), {
