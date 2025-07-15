@@ -102,9 +102,7 @@ function resetPassword() {
   resetPasswordFormRef.value?.validate().then(() => {
     chatAPI.resetCurrentPassword(resetPasswordForm.value).then(() => {
       MsgSuccess(t('common.modifySuccess'))
-      chatUser.logout().then(() => {
-        router.push({ name: 'login' })
-      })
+      router.push({name: 'login'})
     })
   })
 }

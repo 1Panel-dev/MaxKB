@@ -138,7 +138,7 @@ const openResetPassword = () => {
 
 const handleResetPassword = (param: ResetCurrentUserPasswordRequest) => {
   chatAPI.resetCurrentPassword(param).then(() => {
-    logout()
+    router.push({name: 'login'})
   })
 }
 
