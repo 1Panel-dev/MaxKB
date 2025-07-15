@@ -5,7 +5,7 @@
     :class="data.is_active ? '' : 'disabled'"
     @mouseenter="cardEnter()"
     @mouseleave="cardLeave()"
-    @click.stop="editParagraph(data)"
+    @click.stop="handleClickCard(data)"
     v-loading="loading"
   >
     <div v-show="show" class="mk-sticky" v-if="!disabled">
@@ -94,6 +94,7 @@
       :modelValue="data.content"
       class="maxkb-md"
       style="background: none"
+      @clickPreview="handleClickCard(data)"
     />
 
     <ParagraphDialog
@@ -136,7 +137,7 @@ const apiType = computed(() => {
   return type as 'systemShare' | 'workspace' | 'systemManage'
 })
 
-const emit = defineEmits(['changeState', 'deleteParagraph', 'refresh', 'refreshMigrateParagraph','move'])
+const emit = defineEmits(['clickCard','changeState', 'deleteParagraph', 'refresh', 'refreshMigrateParagraph','move'])
 const loading = ref(false)
 const changeStateloading = ref(false)
 const show = ref(false)
@@ -198,6 +199,14 @@ function editParagraph(row: any) {
   if (!props.disabled) {
     title.value = t('views.paragraph.paragraphDetail')
     ParagraphDialogRef.value.open(row)
+  }
+}
+
+function handleClickCard(row: any) {
+  if (!props.disabled) {
+    editParagraph(row)
+  }else {
+    emit('clickCard')
   }
 }
 

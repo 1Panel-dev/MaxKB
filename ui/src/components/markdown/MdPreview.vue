@@ -1,5 +1,5 @@
 <template>
-  <MdPreview :language="language" noIconfont noPrettier :codeFoldable="false" v-bind="$attrs" />
+  <MdPreview :language="language" noIconfont noPrettier :codeFoldable="false" v-bind="$attrs" @click.stop="handleClick"/>
 </template>
 
 <script setup lang="ts">
@@ -11,6 +11,9 @@ import useStore from '@/stores'
 import ZH_TW from '@vavt/cm-extension/dist/locale/zh-TW'
 
 defineOptions({ name: 'MdPreview' })
+
+const emit = defineEmits(['clickPreview'])
+
 const { user } = useStore()
 const language = computed(() => user.getLanguage() || getBrowserLang() || '')
 config({
@@ -20,6 +23,14 @@ config({
     }
   }
 })
+
+function handleClick(e: MouseEvent) {
+  if ((e.target as HTMLElement).closest('a') || (e.target as HTMLElement).closest('.md-editor-copy-button')) {
+    e.stopPropagation()
+  } else {
+    emit('clickPreview')
+  }
+}
 </script>
 
 <style lang="scss" scoped>

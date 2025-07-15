@@ -96,7 +96,7 @@
                           <!-- 批量操作 -->
                           <div class="paragraph-card flex w-full" v-if="isBatch === true">
                             <el-checkbox :value="item.id" />
-                            <ParagraphCard :data="item" class="mb-8 w-full" :disabled="true" />
+                            <ParagraphCard :data="item" class="mb-8 w-full" :disabled="true" @clickCard="toggleSelect(item.id)"/>
                           </div>
                           <!-- 非批量操作 -->
                           <div class="handle paragraph-card flex w-full" :id="item.id" v-else>
@@ -204,6 +204,15 @@ const handleClick = (e: MouseEvent, ele: any) => {
 // 批量操作
 const isBatch = ref(false)
 const multipleSelection = ref<any[]>([])
+
+function toggleSelect(id: number) {
+  const index = multipleSelection.value.indexOf(id)
+  if (index === -1) {
+    multipleSelection.value.push(id)
+  } else {
+    multipleSelection.value.splice(index, 1)
+  }
+}
 
 const paginationConfig = reactive({
   current_page: 1,
