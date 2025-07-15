@@ -696,8 +696,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
 
         for (version_field, app_field) in update_field_dict.items():
             _v = getattr(application, app_field)
-            if _v:
-                setattr(application_version, version_field, _v)
+            setattr(application_version, version_field, _v)
 
     @transaction.atomic
     def publish(self, instance, with_valid=True):
