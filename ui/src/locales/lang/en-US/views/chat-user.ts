@@ -20,5 +20,10 @@ export default {
       confirmMessage: 'All members in this group will be removed after deletion. Proceed with caution!',
     },
     batchDeleteMember: 'Remove selected {count} members?',
+  },
+  syncMessage: {
+    title: 'Successfully synced {count} users',
+    usernameExist: 'The following usernames already exist:',
+    nicknameExist: 'The following nicknames already exist:',
   }
 }

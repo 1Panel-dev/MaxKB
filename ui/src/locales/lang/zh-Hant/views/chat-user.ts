@@ -20,5 +20,10 @@ export default {
       confirmMessage: '刪除後，該用戶組下的成員將全部移除，請謹慎操作！',
     },
     batchDeleteMember: '是否移除選中的 {count} 個成員？',
+  },
+  syncMessage: {
+    title: '成功同步 {count} 個用戶',
+    usernameExist: '以下用戶名已存在：',
+    nicknameExist: '以下姓名已存在：',
   }
 }
