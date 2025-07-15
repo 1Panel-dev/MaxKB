@@ -2,8 +2,8 @@
   <div class="item-content mb-16 lighter">
     <template v-for="(answer_text, index) in answer_text_list" :key="index">
       <div class="avatar mr-8" v-if="showAvatar">
-        <img v-if="application.avatar" :src="application.avatar" height="28px" width="28px" />
-        <LogoIcon v-else height="28px" width="28px" />
+        <img v-if="application.avatar" :src="application.avatar" height="28px" width="28px"/>
+        <LogoIcon v-else height="28px" width="28px"/>
       </div>
       <div
         class="content"
@@ -74,12 +74,14 @@
   </div>
 </template>
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
-import KnowledgeSourceComponent from '@/components/ai-chat/component/knowledge-source-component/index.vue'
+import {computed, onMounted} from 'vue'
+import KnowledgeSourceComponent
+  from '@/components/ai-chat/component/knowledge-source-component/index.vue'
 import MdRenderer from '@/components/markdown/MdRenderer.vue'
 import OperationButton from '@/components/ai-chat/component/operation-button/index.vue'
-import { type chatType } from '@/api/type/application'
+import {type chatType} from '@/api/type/application'
 import bus from '@/bus'
+
 const props = defineProps<{
   chatRecord: chatType
   application: any
@@ -148,14 +150,13 @@ function showSource(row: any) {
   if (props.type === 'log') {
     return true
   } else if (row.write_ed && 500 !== row.status) {
-    if (props.type === 'debug-ai-chat') {
-      return true
-    }
+    return true
   }
   return false
 }
+
 const regenerationChart = (chat: chatType) => {
-  props.sendMessage(chat.problem_text, { re_chat: true })
+  props.sendMessage(chat.problem_text, {re_chat: true})
 }
 const stopChat = (chat: chatType) => {
   props.chatManagement.stop(chat.id)
