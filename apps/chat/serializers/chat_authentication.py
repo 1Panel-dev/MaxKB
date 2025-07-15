@@ -97,8 +97,7 @@ class ApplicationProfileSerializer(serializers.Serializer):
         }
         for (version_field, app_field) in update_field_dict.items():
             _v = getattr(application_version, version_field)
-            if _v:
-                setattr(application, app_field, _v)
+            setattr(application, app_field, _v)
 
     def profile(self, with_valid=True):
         if with_valid:
@@ -110,7 +109,7 @@ class ApplicationProfileSerializer(serializers.Serializer):
             raise AppUnauthorizedFailed(500, _("Illegal User"))
         application_setting_model = DatabaseModelManage.get_model('application_setting')
         application_version = QuerySet(ApplicationVersion).filter(application_id=application.id).order_by(
-            '-create_time')[0:1].first()
+            '-create_time').first()
         if application_version is not None:
             self.reset_application(application, application_version)
         license_is_valid = cache.get(Cache_Version.SYSTEM.get_key(key='license_is_valid'),
