@@ -2,7 +2,7 @@
   <div class="chat-knowledge-source">
     <div
       class="flex align-center mt-16"
-      v-if="(type === 'log' || type === 'debug-ai-chat') ? true : application.show_source"
+      v-if="type === 'log' || type === 'debug-ai-chat' ? true : application.show_source"
     >
       <span class="mr-4 color-secondary">{{ $t('chat.KnowledgeSource.title') }}</span>
       <el-divider direction="vertical" />
@@ -15,7 +15,7 @@
 
     <div
       class="mt-8"
-      v-if="(type === 'log' || type === 'debug-ai-chat') ? true : application.show_source"
+      v-if="type === 'log' || type === 'debug-ai-chat' ? true : application.show_source"
     >
       <el-row :gutter="8" v-if="uniqueParagraphList?.length">
         <template v-for="(item, index) in uniqueParagraphList" :key="index">
@@ -51,7 +51,7 @@
     </div>
 
     <div
-      v-if="(type === 'log' || type === 'debug-ai-chat') ? true : application.show_exec"
+      v-if="type === 'log' || type === 'debug-ai-chat' ? true : application.show_exec"
       class="execution-details border-t color-secondary flex-between mt-12"
       style="padding-top: 12px; padding-bottom: 8px"
     >
@@ -89,13 +89,13 @@
           <span class="medium ellipsis" :title="dialogTitle" :id="titleId" :class="titleClass">
             {{ dialogTitle }}
           </span>
-          <div class="flex align-center mr-8">
-            <span v-if="dialogType === 'pdfDocument'" class="mr-4">
+          <div class="flex align-center mr-8" v-if="dialogType === 'pdfDocument'">
+            <span class="mr-4">
               <el-button text>
                 <el-icon> <Download /> </el-icon>
               </el-button>
             </span>
-            <span v-if="dialogType === 'pdfDocument'">
+            <span>
               <el-button text> <app-icon iconName="app-export" size="20" /></el-button>
             </span>
             <el-divider direction="vertical" />
@@ -103,7 +103,11 @@
         </div>
       </template>
       <div class="mb-8">
-        <component :is="currentComponent" :detail="currentChatDetail" :appType="appType"></component>
+        <component
+          :is="currentComponent"
+          :detail="currentChatDetail"
+          :appType="appType"
+        ></component>
       </div>
     </el-dialog>
   </div>

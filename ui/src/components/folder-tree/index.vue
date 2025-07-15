@@ -96,7 +96,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, watch } from 'vue'
+import { computed, onUnmounted, ref, watch } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 import type { TreeInstance } from 'element-plus'
 import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
@@ -245,6 +245,16 @@ function openEditFolder(row: Tree) {
 function refreshFolder() {
   emit('refreshTree')
 }
+
+function clearCurrentKey() {
+  treeRef.value?.setCurrentKey(undefined)
+}
+defineExpose({
+  clearCurrentKey,
+})
+onUnmounted(() => {
+  treeRef.value?.setCurrentKey(undefined)
+})
 </script>
 <style lang="scss" scoped>
 .folder-tree {

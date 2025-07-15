@@ -7,6 +7,7 @@
     :close-on-press-escape="false"
   >
     <folder-tree
+      ref="treeRef"
       :source="source"
       :data="folderList"
       :treeStyle="{
@@ -15,7 +16,7 @@
         borderRadius: '6px',
         padding: '8px',
       }"
-      :default-expanded-keys="['default']"
+      :default-expanded-keys="[currentNodeKey]"
       :canOperation="false"
       class="move-to-dialog-tree"
       @handleNodeClick="folderClickHandle"
@@ -50,17 +51,21 @@ const props = defineProps({
   },
 })
 
+const treeRef = ref()
 const loading = ref(false)
 const dialogVisible = ref(false)
 const folderList = ref<any[]>([])
 const detail = ref<any>({})
 const selectForderId = ref<any>('')
+const currentNodeKey = ref<string>('')
 
 watch(dialogVisible, (bool) => {
   if (!bool) {
     detail.value = {}
     selectForderId.value = ''
     folderList.value = []
+    currentNodeKey.value = ''
+    treeRef.value?.clearCurrentKey()
   }
 })
 
@@ -74,6 +79,11 @@ function getFolder() {
   const params = {}
   folder.asyncGetFolder(props.source, params, loading).then((res: any) => {
     folderList.value = res.data
+    if (folderList.value?.length > 0) {
+      currentNodeKey.value = folderList.value[0]?.id
+    } else {
+      currentNodeKey.value = ''
+    }
   })
 }
 

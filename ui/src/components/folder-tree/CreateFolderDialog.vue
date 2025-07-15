@@ -41,7 +41,7 @@
         <el-button @click.prevent="dialogVisible = false" :loading="loading">
           {{ $t('common.cancel') }}
         </el-button>
-        <el-button type="primary" @click="submitHandle" :loading="loading">
+        <el-button type="primary" @click="submitHandle" :disabled="loading" :loading="loading">
           {{ isEdit ? $t('common.confirm') : $t('common.add') }}
         </el-button>
       </span>
@@ -54,6 +54,7 @@ import folderApi from '@/api/folder'
 import { MsgSuccess, MsgAlert } from '@/utils/message'
 import { t } from '@/locales'
 import useStore from '@/stores'
+import disable$ from 'dingtalk-jsapi/api/ui/pullToRefresh/disable'
 const { tool, knowledge, folder } = useStore()
 const emit = defineEmits(['refresh'])
 

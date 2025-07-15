@@ -13,7 +13,7 @@
         class="p-8"
       />
     </template>
-    <ToolListContainer>
+    <ToolListContainer @refreshFolder="refreshFolder">
       <template #header>
         <FolderBreadcrumb :folderList="folderList" @click="folderClickHandle" />
       </template>
