@@ -21,3 +21,10 @@ config({
   }
 })
 </script>
+
+<style lang="scss" scoped>
+:deep(audio) {
+  width: 300px;
+  height: 43px;
+}
+</style>
