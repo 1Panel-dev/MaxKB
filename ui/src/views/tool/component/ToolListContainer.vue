@@ -106,7 +106,7 @@
 
     <div
       v-loading.fullscreen.lock="paginationConfig.current_page === 1 && loading"
-     style="max-height: calc(100vh - 120px)"
+      style="max-height: calc(100vh - 120px)"
     >
       <InfiniteScroll
         :size="tool.toolList.length"
@@ -129,7 +129,7 @@
             >
               <CardBox
                 :title="item.name"
-                :description="item.desc || $t('common.noData')"
+                :description="item.desc || $t('components.noDesc')"
                 class="cursor"
                 @click="clickFolder(item)"
               >
@@ -238,7 +238,9 @@
                             {{ $t('common.copy') }}
                           </el-dropdown-item>
                           <el-dropdown-item
-                            v-if="item.init_field_list?.length > 0 && permissionPrecise.edit(item.id)"
+                            v-if="
+                              item.init_field_list?.length > 0 && permissionPrecise.edit(item.id)
+                            "
                             @click.stop="configInitParams(item)"
                           >
                             <AppIcon iconName="app-operation" class="mr-4"></AppIcon>
@@ -566,7 +568,6 @@ function importTool(file: any) {
     })
     .then(() => {
       getList()
-
     })
     .catch((e: any) => {
       if (e.code === 400) {

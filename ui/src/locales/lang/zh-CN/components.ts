@@ -9,6 +9,7 @@ export default {
     error: '仅执行未成功分段',
     all: '全部分段',
   },
+  noDesc: '暂无描述',
   folder: {
     addFolder: '添加文件夹',
     addChildFolder: '添加子文件夹',

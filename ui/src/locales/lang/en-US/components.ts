@@ -4,6 +4,7 @@ export default {
   noData: 'No Data',
   loading: 'Loading',
   noMore: 'No more! ',
+  noDesc: ' No description',
   selectParagraph: {
     title: 'Select Segments',
     error: 'Process only the failed segments',

@@ -158,7 +158,7 @@
             >
               <CardBox
                 :title="item.name"
-                :description="item.desc || $t('common.noData')"
+                :description="item.desc || $t('components.noDesc')"
                 class="cursor"
                 @click="clickFolder(item)"
               >

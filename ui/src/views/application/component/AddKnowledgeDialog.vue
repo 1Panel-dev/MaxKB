@@ -20,11 +20,9 @@
           </el-text>
         </div>
 
-        <div class="flex align-center mr-8">
-          <el-button link class="mr-16" @click="refresh">
-            <el-icon class="mr-4" :size="18"><Refresh /></el-icon>
-          </el-button>
-        </div>
+        <el-button link class="mr-24" @click="refresh">
+          <el-icon :size="18"><Refresh /></el-icon>
+        </el-button>
       </div>
     </template>
     <LayoutContainer class="application-manage">
@@ -252,7 +250,7 @@ defineExpose({ open })
   }
 
   .el-dialog__headerbtn {
-    top: 6px;
+    top: 3px;
     right: 6px;
   }
 }
