@@ -537,7 +537,7 @@ onMounted(() => {
     const record_id = data.record_id
     bus.emit('play:pause', record_id)
     if (props.data.record_id == record_id) {
-      if (props.tts && props.tts_autoplay && data.is_end) {
+      if (props.tts && props.tts_autoplay) {
         if (audioManage.value) {
           audioManage.value.play(props.data.answer_text, data.is_end)
         }
