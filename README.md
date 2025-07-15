@@ -32,7 +32,7 @@ Access MaxKB web interface at `http://your_server_ip:8080` with default admin cr
 - username: admin
 - password: MaxKB@123..
 
-中国用户如遇到 Docker 镜像 Pull 失败问题，请参照该 [离线安装文档](https://maxkb.cn/docs/installation/offline_installtion/) 进行安装。
+中国用户如遇到 Docker 镜像 Pull 失败问题，请参照该 [离线安装文档](https://maxkb.cn/docs/v1/installation/offline_installtion/) 进行安装。
 
 ## Screenshots
 
