@@ -176,7 +176,9 @@
                   @click="goApp(item)"
                 >
                   <template #icon>
-                    <LogoIcon height="32px" />
+                    <el-avatar shape="square" :size="32" style="background: none">
+                      <img :src="resetUrl(item?.icon, resetUrl('./favicon.ico'))" alt="" />
+                    </el-avatar>
                   </template>
                   <template #subTitle>
                     <el-text class="color-secondary" size="small">

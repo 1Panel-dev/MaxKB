@@ -1,18 +1,22 @@
 <template>
-  <el-input v-model.trim="filterText" :placeholder="$t('common.search')" prefix-icon="Search" clearable
-    style="padding: 12px 12px 0 12px;" />
+  <el-input v-model.trim="filterText" :placeholder="$t('common.search')" prefix-icon="Search"
+            clearable
+            style="padding: 12px 12px 0 12px;"/>
   <div class="list flex-wrap">
     <template v-if="filterList.length">
-      <el-popover v-for="item in filterList" :key="item.id" placement="right" :width="280" :show-after="500">
+      <el-popover v-for="item in filterList" :key="item.id" placement="right" :width="280"
+                  :show-after="500">
         <template #reference>
-          <div class="list-item flex align-center border border-r-6 p-8-12 cursor" style="width: calc(50% - 6px)"
-            @click.stop="emit('clickNodes', item)" @mousedown.stop="emit('onmousedown', item)">
-            <LogoIcon v-if="item.resource_type === 'application'" height="32px" />
-            <el-avatar v-else-if="isAppIcon(item?.icon)" shape="square" :size="32" style="background: none">
-              <img :src="resetUrl(item?.icon)" alt="" />
+          <div class="list-item flex align-center border border-r-6 p-8-12 cursor"
+               style="width: calc(50% - 6px)"
+               @click.stop="emit('clickNodes', item)" @mousedown.stop="emit('onmousedown', item)">
+            <!--            <LogoIcon v-if="item.resource_type === 'application'" height="32px" />-->
+            <el-avatar v-if="isAppIcon(item?.icon)" shape="square" :size="32"
+                       style="background: none">
+              <img :src="resetUrl(item?.icon,resetUrl('./favicon.ico'))" alt=""/>
             </el-avatar>
             <el-avatar v-else class="avatar-green" shape="square" :size="32">
-              <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt="" />
+              <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt=""/>
             </el-avatar>
             <span class="ml-8 ellipsis" :title="item.name">{{ item.name }}</span>
           </div>
@@ -21,12 +25,13 @@
         <template #default>
           <div class="flex-between">
             <div class="flex align-center">
-              <LogoIcon v-if="item.resource_type === 'application'" height="32px" />
-              <el-avatar v-else-if="isAppIcon(item?.icon)" shape="square" :size="32" style="background: none">
-                <img :src="resetUrl(item?.icon)" alt="" />
+              <!--              <LogoIcon v-if="item.resource_type === 'application'" height="32px"/>-->
+              <el-avatar v-if="isAppIcon(item?.icon)" shape="square" :size="32"
+                         style="background: none">
+                <img :src="resetUrl(item?.icon,resetUrl('./favicon.ico'))" alt=""/>
               </el-avatar>
               <el-avatar v-else class="avatar-green" shape="square" :size="32">
-                <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt="" />
+                <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt=""/>
               </el-avatar>
               <span class="font-medium ml-8 break-all" :title="item.name">{{ item.name }}</span>
             </div>
@@ -43,14 +48,14 @@
         </template>
       </el-popover>
     </template>
-    <el-empty v-else :description="$t('common.noData')" />
+    <el-empty v-else :description="$t('common.noData')"/>
   </div>
 </template>
 
 <script setup lang="ts">
-import { watch, ref } from 'vue'
-import { isAppIcon, resetUrl } from '@/utils/common'
-import { isWorkFlow } from '@/utils/application'
+import {watch, ref} from 'vue'
+import {isAppIcon, resetUrl} from '@/utils/common'
+import {isWorkFlow} from '@/utils/application'
 
 const props = defineProps<{
   list: any[]
@@ -63,6 +68,7 @@ const emit = defineEmits<{
 
 const filterText = ref('')
 const filterList = ref<any[]>([])
+
 function filter(list: any[], filterText: string) {
   if (!filterText.length) {
     return list
