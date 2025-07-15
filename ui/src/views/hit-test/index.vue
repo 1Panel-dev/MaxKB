@@ -188,7 +188,9 @@
 
         <div class="text-right">
           <el-button @click="popoverVisible = false">{{ $t('common.cancel') }}</el-button>
-          <el-button type="primary" @click="settingChange('close')">{{
+          <el-button type="primary" @click="settingChange('close')"
+            v-if="! route.path.includes('share/')"
+          >{{
             $t('common.confirm')
           }}</el-button>
         </div>
