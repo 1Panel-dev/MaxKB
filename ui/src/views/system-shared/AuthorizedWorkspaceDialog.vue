@@ -12,12 +12,12 @@
     </el-radio-group>
     <p class="mb-8 lighter mt-16">{{ $t('views.shared.select_workspace') }}</p>
     <div class="flex border" v-loading="loading">
-      <div class="p-16 border-r">
+      <div class="border-r">
         <el-input
           v-model="search"
           :validate-event="false"
           :placeholder="$t('common.search')"
-          style="width: 364px"
+          style="width: 364px; padding: 16px 16px 0 16px;"
           clearable
         >
           <template #prefix>
@@ -29,6 +29,7 @@
         <div class="mt-8">
           <el-checkbox
             class="mb-8"
+            style="margin-left: 16px;"
             v-model="checkAll"
             :indeterminate="isIndeterminate"
             @change="handleCheckAllChange"
@@ -36,6 +37,7 @@
           >
             {{ $t('views.shared.allCheck') }}
           </el-checkbox>
+          <el-scrollbar max-height="205" wrap-class="p-16 pt-0">
           <el-checkbox-group
             class="checkbox-group-block"
             v-model="checkedWorkspace"
@@ -53,10 +55,11 @@
               </div>
             </el-checkbox>
           </el-checkbox-group>
+          </el-scrollbar>
         </div>
       </div>
-      <div class="p-16 w-full">
-        <div class="flex-between mb-16">
+      <div class="w-full">
+        <div class="flex-between p-16">
           <span class="lighter">
             {{ $t('common.selected') }}: {{ checkedWorkspace.length }} 个
           </span>
@@ -65,6 +68,7 @@
             {{ $t('common.clear') }}
           </el-button>
         </div>
+        <el-scrollbar max-height="250" wrap-class="p-16 pt-0">
         <template v-for="ele in checkedWorkspace">
           <div class="flex-between">
             <div class="flex align-center">
@@ -78,6 +82,7 @@
             </el-button>
           </div>
         </template>
+        </el-scrollbar>
       </div>
     </div>
 
