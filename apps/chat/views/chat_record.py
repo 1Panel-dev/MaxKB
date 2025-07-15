@@ -99,6 +99,24 @@ class HistoricalConversationView(APIView):
                     'chat_id': chat_id,
                 }).logic_delete())
 
+    class BatchDelete(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['DELETE'],
+            description=_("Batch delete history conversation"),
+            summary=_("Batch delete history conversation"),
+            operation_id=_("Batch delete history conversation"),  # type: ignore
+            parameters=HistoricalConversationOperateAPI.get_parameters(),
+            responses=HistoricalConversationOperateAPI.get_response(),
+            tags=[_('Chat')]  # type: ignore
+        )
+        def delete(self, request: Request):
+            return result.success(HistoricalConversationOperateSerializer.Clear(data={
+                'application_id': request.auth.application_id,
+                'chat_user_id': request.auth.chat_user_id,
+            }).batch_logic_delete())
+
     class PageView(APIView):
         authentication_classes = [TokenAuth]
 

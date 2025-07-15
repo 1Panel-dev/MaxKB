@@ -20,6 +20,7 @@ urlpatterns = [
     path('historical_conversation', views.HistoricalConversationView.as_view(), name='historical_conversation'),
     path('historical_conversation/<str:chat_id>/record/<str:chat_record_id>',views.ChatRecordView.as_view(),name='conversation_details'),
     path('historical_conversation/<int:current_page>/<int:page_size>', views.HistoricalConversationView.PageView.as_view(), name='historical_conversation'),
+    path('historical_conversation/clear',views.HistoricalConversationView.BatchDelete.as_view(), name='historical_conversation_clear'),
     path('historical_conversation/<str:chat_id>',views.HistoricalConversationView.Operate.as_view(), name='historical_conversation_operate'),
     path('historical_conversation_record/<str:chat_id>', views.HistoricalConversationRecordView.as_view(), name='historical_conversation_record'),
     path('historical_conversation_record/<str:chat_id>/<int:current_page>/<int:page_size>', views.HistoricalConversationRecordView.PageView.as_view(), name='historical_conversation_record')

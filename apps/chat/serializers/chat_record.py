@@ -132,6 +132,17 @@ class HistoricalConversationOperateSerializer(serializers.Serializer):
                               chat_user_id=self.data.get('chat_user_id')).update(is_deleted=True)
         return True
 
+    class Clear(serializers.Serializer):
+        application_id = serializers.UUIDField(required=True, label=_('Application ID'))
+        chat_user_id = serializers.UUIDField(required=True, label=_('Chat User ID'))
+
+        def batch_logic_delete(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            QuerySet(Chat).filter(application_id=self.data.get('application_id'),
+                                  chat_user_id=self.data.get('chat_user_id')).update(is_deleted=True)
+            return True
+
 
 class HistoricalConversationRecordSerializer(serializers.Serializer):
     application_id = serializers.UUIDField(required=True, label=_('Application ID'))
