@@ -41,16 +41,16 @@
                 chatUser.chat_profile.authentication_type === 'password'
               "
             >
-              <img src="@/assets/user-icon.svg" style="width: 54%" alt=""/>
+              <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
             </el-avatar>
             <el-dropdown v-else trigger="click" type="primary" class="w-full">
               <div class="flex align-center">
                 <el-avatar :size="32">
-                  <img src="@/assets/user-icon.svg" style="width: 54%" alt=""/>
+                  <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
                 </el-avatar>
                 <span v-show="!isPcCollapse" class="ml-8 color-text-primary">{{
-                    chatUser.chatUserProfile?.nick_name
-                  }}</span>
+                  chatUser.chatUserProfile?.nick_name
+                }}</span>
               </div>
 
               <template #dropdown>
@@ -58,7 +58,7 @@
                   <div class="flex align-center p-8">
                     <div class="mr-8 flex align-center">
                       <el-avatar :size="40">
-                        <img src="@/assets/user-icon.svg" style="width: 54%" alt=""/>
+                        <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
                       </el-avatar>
                     </div>
                     <div>
@@ -75,7 +75,7 @@
                     @click="openResetPassword"
                   >
                     <el-icon>
-                      <Lock/>
+                      <Lock />
                     </el-icon>
                     {{ $t('views.login.resetPassword') }}
                   </el-dropdown-item>
@@ -85,7 +85,7 @@
                     style="padding-top: 8px; padding-bottom: 8px"
                     @click="logout"
                   >
-                    <AppIcon iconName="app-export"/>
+                    <AppIcon iconName="app-export" />
                     {{ $t('layout.logout') }}
                   </el-dropdown-item>
                 </el-dropdown-menu>
@@ -100,7 +100,7 @@
           @click="isPcCollapse = !isPcCollapse"
         >
           <el-icon>
-            <component :is="isPcCollapse ? 'ArrowRightBold' : 'ArrowLeftBold'"/>
+            <component :is="isPcCollapse ? 'ArrowRightBold' : 'ArrowLeftBold'" />
           </el-icon>
         </el-button>
       </div>
@@ -115,33 +115,33 @@
             </h4>
 
             <span class="flex align-center" v-if="currentRecordList.length">
-                <AppIcon
-                  v-if="paginationConfig.total"
-                  iconName="app-chat-record"
-                  class="color-secondary mr-8"
-                  style="font-size: 16px"
-                ></AppIcon>
-                <span v-if="paginationConfig.total" class="lighter">
-                  {{ paginationConfig.total }} {{ $t('chat.question_count') }}
-                </span>
-                <el-dropdown class="ml-8">
-                  <AppIcon
-                    iconName="app-export"
-                    class="cursor"
-                    :title="$t('chat.exportRecords')"
-                  ></AppIcon>
-                  <template #dropdown>
-                    <el-dropdown-menu>
-                      <el-dropdown-item @click="exportMarkdown"
-                      >{{ $t('common.export') }} Markdown</el-dropdown-item
-                      >
-                      <el-dropdown-item @click="exportHTML"
-                      >{{ $t('common.export') }} HTML</el-dropdown-item
-                      >
-                    </el-dropdown-menu>
-                  </template>
-                </el-dropdown>
+              <AppIcon
+                v-if="paginationConfig.total"
+                iconName="app-chat-record"
+                class="color-secondary mr-8"
+                style="font-size: 16px"
+              ></AppIcon>
+              <span v-if="paginationConfig.total" class="lighter">
+                {{ paginationConfig.total }} {{ $t('chat.question_count') }}
               </span>
+              <el-dropdown class="ml-8">
+                <AppIcon
+                  iconName="app-export"
+                  class="cursor"
+                  :title="$t('chat.exportRecords')"
+                ></AppIcon>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item @click="exportMarkdown"
+                      >{{ $t('common.export') }} Markdown</el-dropdown-item
+                    >
+                    <el-dropdown-item @click="exportHTML"
+                      >{{ $t('common.export') }} HTML</el-dropdown-item
+                    >
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
+            </span>
           </div>
           <div class="right-height chat-width">
             <AiChat
@@ -164,7 +164,7 @@
         </div>
         <div
           class="execution-detail-panel"
-          :style="`width: ${ rightPanelSize }px`"
+          :style="`width: ${rightPanelSize}px`"
           :resizable="false"
           collapsible
         >
@@ -172,19 +172,29 @@
             <h4 class="medium ellipsis" :title="rightPanelTitle">{{ rightPanelTitle }}</h4>
             　
             <div class="flex align-center">
-                <span v-if="rightPanelType === 'paragraphDocument'" class="mr-4">
+              <span v-if="rightPanelType === 'paragraphDocument'" class="mr-4">
+                <a
+                  :href="
+                    getFileUrl(rightPanelDetail?.meta?.source_file_id) ||
+                    rightPanelDetail?.meta?.source_url
+                  "
+                  target="_blank"
+                  class="ellipsis-1"
+                  :title="rightPanelDetail?.document_name?.trim()"
+                >
                   <el-button text>
-                    <el-icon> <Download/> </el-icon>
+                    <el-icon> <Download /> </el-icon>
                   </el-button>
-                </span>
-              <span v-if="rightPanelType === 'paragraphDocument'">
-                  <el-button text> <app-icon iconName="app-export" size="20"/></el-button>
-                </span>
+                </a>
+              </span>
+              <!-- <span v-if="rightPanelType === 'paragraphDocument'">
+                <el-button text> <app-icon iconName="app-export" size="20" /></el-button>
+              </span> -->
               <span>
-                  <el-button text @click="closeExecutionDetail">
-                    <el-icon size="20"><Close/></el-icon
-                    ></el-button>
-                </span>
+                <el-button text @click="closeExecutionDetail">
+                  <el-icon size="20"><Close /></el-icon
+                ></el-button>
+              </span>
             </div>
           </div>
           <div class="execution-detail-content" v-loading="rightPanelLoading">
@@ -197,7 +207,7 @@
               :detail="executionDetail"
               :type="applicationDetail?.type"
             />
-            <ParagraphDocumentContent :detail="rightPanelDetail" v-else/>
+            <ParagraphDocumentContent :detail="rightPanelDetail" v-else />
           </div>
         </div>
       </div>
@@ -212,30 +222,27 @@
 </template>
 
 <script setup lang="ts">
-import {ref, onMounted, nextTick, computed, watch} from 'vue'
-import {marked} from 'marked'
-import {saveAs} from 'file-saver'
+import { ref, onMounted, nextTick, computed, watch } from 'vue'
+import { marked } from 'marked'
+import { saveAs } from 'file-saver'
 import chatAPI from '@/api/chat/chat'
 
 import useStore from '@/stores'
 import useResize from '@/layout/hooks/useResize'
-import {hexToRgba} from '@/utils/theme'
-import {useRouter} from 'vue-router'
+import { hexToRgba } from '@/utils/theme'
+import { useRouter } from 'vue-router'
 import ResetPassword from '@/layout/layout-header/avatar/ResetPassword.vue'
-import {t} from '@/locales'
-import type {ResetCurrentUserPasswordRequest} from '@/api/type/user'
-import ExecutionDetailContent
-  from '@/components/ai-chat/component/knowledge-source-component/ExecutionDetailContent.vue'
-import ParagraphSourceContent
-  from '@/components/ai-chat/component/knowledge-source-component/ParagraphSourceContent.vue'
-import ParagraphDocumentContent
-  from '@/components/ai-chat/component/knowledge-source-component/ParagraphDocumentContent.vue'
+import { t } from '@/locales'
+import type { ResetCurrentUserPasswordRequest } from '@/api/type/user'
+import ExecutionDetailContent from '@/components/ai-chat/component/knowledge-source-component/ExecutionDetailContent.vue'
+import ParagraphSourceContent from '@/components/ai-chat/component/knowledge-source-component/ParagraphSourceContent.vue'
+import ParagraphDocumentContent from '@/components/ai-chat/component/knowledge-source-component/ParagraphDocumentContent.vue'
 import HistoryPanel from '@/views/chat/component/HistoryPanel.vue'
-import {cloneDeep} from 'lodash'
-
+import { cloneDeep } from 'lodash'
+import { getFileUrl } from '@/utils/common'
 useResize()
 
-const {common, chatUser} = useStore()
+const { common, chatUser } = useStore()
 const router = useRouter()
 
 const isCollapse = ref(false)
@@ -251,7 +258,7 @@ watch(
 
 const logout = () => {
   chatUser.logout().then(() => {
-    router.push({name: 'login'})
+    router.push({ name: 'login' })
   })
 }
 
@@ -262,7 +269,7 @@ const openResetPassword = () => {
 
 const handleResetPassword = (param: ResetCurrentUserPasswordRequest) => {
   chatAPI.resetCurrentPassword(param).then(() => {
-    router.push({name: 'login'})
+    router.push({ name: 'login' })
   })
 }
 
@@ -290,8 +297,7 @@ const applicationDetail = computed({
   get: () => {
     return props.application_profile
   },
-  set: (v) => {
-  },
+  set: (v) => {},
 })
 
 const chatLogData = ref<any[]>([])
@@ -326,15 +332,14 @@ function deleteLog(row: any) {
   })
 }
 
-
 function clearChat() {
-  chatAPI.clearChat(left_loading, ).then(() => {
+  chatAPI.clearChat(left_loading).then(() => {
     currentChatId.value = 'new'
-      currentChatName.value = t('chat.createChat')
-      paginationConfig.value.current_page = 1
-      paginationConfig.value.total = 0
-      currentRecordList.value = []
-      getChatLog(applicationDetail.value.id)
+    currentChatName.value = t('chat.createChat')
+    paginationConfig.value.current_page = 1
+    paginationConfig.value.total = 0
+    currentRecordList.value = []
+    getChatLog(applicationDetail.value.id)
   })
 }
 
@@ -455,7 +460,7 @@ async function exportMarkdown(): Promise<void> {
     .map((record: any) => `# ${record.problem_text}\n\n${record.answer_text}\n\n`)
     .join('\n')
 
-  const blob: Blob = new Blob([markdownContent], {type: 'text/markdown;charset=utf-8'})
+  const blob: Blob = new Blob([markdownContent], { type: 'text/markdown;charset=utf-8' })
   saveAs(blob, suggestedName)
 }
 
@@ -466,7 +471,7 @@ async function exportHTML(): Promise<void> {
     .join('\n')
   const htmlContent: any = marked(markdownContent)
 
-  const blob: Blob = new Blob([htmlContent], {type: 'text/html;charset=utf-8'})
+  const blob: Blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' })
   saveAs(blob, suggestedName)
 }
 

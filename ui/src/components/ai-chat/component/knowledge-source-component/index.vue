@@ -89,7 +89,7 @@
           <span class="medium ellipsis" :title="dialogTitle" :id="titleId" :class="titleClass">
             {{ dialogTitle }}
           </span>
-          <div class="flex align-center mr-8" v-if="dialogType === 'pdfDocument'">
+          <!-- <div class="flex align-center mr-8" v-if="dialogType === 'pdfDocument'">
             <span class="mr-4">
               <el-button text>
                 <el-icon> <Download /> </el-icon>
@@ -99,7 +99,7 @@
               <el-button text> <app-icon iconName="app-export" size="20" /></el-button>
             </span>
             <el-divider direction="vertical" />
-          </div>
+          </div> -->
         </div>
       </template>
       <div class="mb-8">
@@ -149,7 +149,7 @@ const showPDF = (item: any) => {
   return (
     item.document_name.toLocaleLowerCase().endsWith('.pdf') &&
     item.meta?.source_file_id &&
-    !props.executionIsRightPanel
+    props.executionIsRightPanel
   )
 }
 const dialogVisible = ref(false)
