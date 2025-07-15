@@ -23,18 +23,18 @@
           step-strictly
         />
         <span class="ml-4">{{
-          $t('views.applicationOverview.appInfo.LimitDialog.timesDays')
-        }}</span>
+            $t('views.applicationOverview.appInfo.LimitDialog.timesDays')
+          }}</span>
       </el-form-item>
       <!--     身份验证 -->
       <el-form-item :label="$t('views.applicationOverview.appInfo.LimitDialog.authentication')">
-        <el-switch size="small" v-model="form.authentication" @change="firstGeneration"></el-switch>
+        <el-switch size="small" v-model="form.authentication"></el-switch>
       </el-form-item>
       <el-radio-group
         v-if="form.authentication"
         v-model="form.authentication_value.type"
         class="card__radio"
-        @change="(val: string) => val === 'password'"
+        @change="firstGeneration"
       >
         <el-card
           shadow="never"
@@ -71,7 +71,9 @@
                     text
                     style="margin: 0 4px 0 0 !important"
                   >
-                    <el-icon><RefreshRight /></el-icon>
+                    <el-icon>
+                      <RefreshRight/>
+                    </el-icon>
                   </el-button>
                 </el-tooltip>
               </template>
@@ -107,7 +109,7 @@
           >
             <el-checkbox-group v-model="form.authentication_value.login_value">
               <template v-for="t in auth_list" :key="t.value">
-                <el-checkbox :label="t.label" :value="t.value" />
+                <el-checkbox :label="t.label" :value="t.value"/>
               </template>
             </el-checkbox-group>
           </el-form-item>
@@ -131,7 +133,7 @@
     </el-form>
     <template #footer>
       <div>
-        <el-button @click.prevent="dialogVisible = false">{{ $t('common.cancel') }} </el-button>
+        <el-button @click.prevent="dialogVisible = false">{{ $t('common.cancel') }}</el-button>
         <el-button type="primary" @click="submit(limitFormRef)" :loading="loading">
           {{ $t('common.save') }}
         </el-button>
@@ -140,18 +142,18 @@
   </el-drawer>
 </template>
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import type { FormInstance, FormRules } from 'element-plus'
+import {ref, watch} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
+import type {FormInstance, FormRules} from 'element-plus'
 import applicationApi from '@/api/application/application'
-import { MsgSuccess } from '@/utils/message'
-import { t } from '@/locales'
-import { copyClick } from '@/utils/clipboard'
+import {MsgSuccess} from '@/utils/message'
+import {t} from '@/locales'
+import {copyClick} from '@/utils/clipboard'
 
 const router = useRouter()
 const route = useRoute()
 const {
-  params: { id },
+  params: {id},
 } = route
 
 const emit = defineEmits(['refresh'])
@@ -226,6 +228,7 @@ const submit = async (formEl: FormInstance | undefined) => {
     }
   })
 }
+
 function generateAuthenticationValue(length: number = 10) {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
   const randomValues = new Uint8Array(length)
@@ -234,18 +237,18 @@ function generateAuthenticationValue(length: number = 10) {
     .map((value) => chars[value % chars.length])
     .join('')
 }
+
 function refreshAuthentication() {
   form.value.authentication_value.password_value = generateAuthenticationValue()
 }
 
 function firstGeneration() {
-  console.log('firstGeneration')
-  if (form.value.authentication && !form.value.authentication_value) {
-    form.value.authentication_value = generateAuthenticationValue()
+  if (form.value.authentication && form.value.authentication_value.type === 'password' && !form.value.authentication_value.password_value) {
+    form.value.authentication_value.password_value = generateAuthenticationValue()
   }
 }
 
-defineExpose({ open })
+defineExpose({open})
 </script>
 <style lang="scss" scoped>
 .authentication-append-input {
