@@ -71,16 +71,17 @@
       <el-tab-pane :label="$t('views.tool.title')" name="tool">
         <LayoutContainer>
           <template #left>
-            <folder-tree
-              :source="SourceTypeEnum.TOOL"
-              :data="toolTreeData"
-              :currentNodeKey="folder.currentFolder?.id"
-              @handleNodeClick="folderClickHandle"
-              :shareTitle="$t('views.shared.shared_tool')"
-              :showShared="permissionPrecise['is_share']()"
-              class="p-8"
-              :canOperation="false"
-            />
+            <div class="p-8">
+              <folder-tree
+                :source="SourceTypeEnum.TOOL"
+                :data="toolTreeData"
+                :currentNodeKey="folder.currentFolder?.id"
+                @handleNodeClick="folderClickHandle"
+                :shareTitle="$t('views.shared.shared_tool')"
+                :showShared="permissionPrecise['is_share']()"
+                :canOperation="false"
+              />
+            </div>
           </template>
           <el-scrollbar height="450">
             <NodeContent
@@ -95,14 +96,15 @@
       <el-tab-pane :label="$t('views.application.title')" name="application">
         <LayoutContainer>
           <template #left>
-            <folder-tree
-              :source="SourceTypeEnum.APPLICATION"
-              :data="applicationTreeData"
-              :currentNodeKey="folder.currentFolder?.id"
-              @handleNodeClick="folderClickHandle"
-              class="p-8"
-              :canOperation="false"
-            />
+            <div class="p-8">
+              <folder-tree
+                :source="SourceTypeEnum.APPLICATION"
+                :data="applicationTreeData"
+                :currentNodeKey="folder.currentFolder?.id"
+                @handleNodeClick="folderClickHandle"
+                :canOperation="false"
+              />
+            </div>
           </template>
           <el-scrollbar height="450">
             <NodeContent

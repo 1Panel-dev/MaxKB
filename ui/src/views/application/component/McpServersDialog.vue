@@ -14,7 +14,7 @@
       :model="form"
       require-asterisk-position="right"
     >
-      <el-form-item label="MCP" prop="mcp_enable">
+      <el-form-item label="MCP" prop="mcp_enable" @click.prevent>
         <el-switch v-model="form.mcp_enable" />
       </el-form-item>
       <el-form-item
@@ -58,7 +58,7 @@ const mcpServerJson = `{
 
 const form = ref<any>({
   mcp_servers: '',
-  mcp_enable: false
+  mcp_enable: false,
 })
 
 const dialogVisible = ref<boolean>(false)
@@ -67,7 +67,7 @@ watch(dialogVisible, (bool) => {
   if (!bool) {
     form.value = {
       mcp_servers: '',
-      mcp_enable: false
+      mcp_enable: false,
     }
   }
 })

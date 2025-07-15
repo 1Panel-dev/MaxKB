@@ -7,7 +7,12 @@
     :model="form_data"
     v-bind="$attrs"
   >
-    <el-form-item :label="$t('dynamicsForm.paramForm.field.label')" :required="true" prop="field" :rules="rules.field">
+    <el-form-item
+      :label="$t('dynamicsForm.paramForm.field.label')"
+      :required="true"
+      prop="field"
+      :rules="rules.field"
+    >
       <el-input
         v-model="form_data.field"
         :maxlength="64"
@@ -15,7 +20,12 @@
         show-word-limit
       />
     </el-form-item>
-    <el-form-item :label="$t('dynamicsForm.paramForm.name.label')" :required="true" prop="label" :rules="rules.label">
+    <el-form-item
+      :label="$t('dynamicsForm.paramForm.name.label')"
+      :required="true"
+      prop="label"
+      :rules="rules.label"
+    >
       <el-input
         v-model="form_data.label"
         :maxlength="64"
@@ -31,11 +41,25 @@
         :placeholder="$t('dynamicsForm.paramForm.tooltip.placeholder')"
       />
     </el-form-item>
-    <el-form-item :label="$t('dynamicsForm.paramForm.required.label')" :required="true" prop="required" :rules="rules.required">
+    <el-form-item
+      :label="$t('dynamicsForm.paramForm.required.label')"
+      :required="true"
+      prop="required"
+      :rules="rules.required"
+      @click.prevent
+    >
       <el-switch v-model="form_data.required" :active-value="true" :inactive-value="false" />
     </el-form-item>
-    <el-form-item :label="$t('dynamicsForm.paramForm.input_type.label')" :required="true" prop="input_type" :rules="rules.input_type">
-      <el-select v-model="form_data.input_type" :placeholder="$t('dynamicsForm.paramForm.input_type.placeholder')">
+    <el-form-item
+      :label="$t('dynamicsForm.paramForm.input_type.label')"
+      :required="true"
+      prop="input_type"
+      :rules="rules.input_type"
+    >
+      <el-select
+        v-model="form_data.input_type"
+        :placeholder="$t('dynamicsForm.paramForm.input_type.placeholder')"
+      >
         <el-option
           v-for="input_type in input_type_list"
           :key="input_type.value"
@@ -65,8 +89,11 @@ const props = withDefaults(
   }>(),
   {
     input_type_list: () =>
-      input_type_list_data.map((item) => ({ label: item.label, value: item.value + 'Constructor' }))
-  }
+      input_type_list_data.map((item) => ({
+        label: item.label,
+        value: item.value + 'Constructor',
+      })),
+  },
 )
 const emit = defineEmits(['update:modelValue'])
 
@@ -78,13 +105,13 @@ const form_data = ref<any>({
   field: '',
   tooltip: '',
   required: false,
-  input_type: ''
+  input_type: '',
 })
 const rules = {
   label: [{ required: true, message: t('dynamicsForm.paramForm.name.requiredMessage') }],
   field: [{ required: true, message: t('dynamicsForm.paramForm.field.requiredMessage') }],
   required: [{ required: true, message: t('dynamicsForm.paramForm.required.requiredMessage') }],
-  input_type: [{ required: true, message: t('dynamicsForm.paramForm.input_type.requiredMessage') }]
+  input_type: [{ required: true, message: t('dynamicsForm.paramForm.input_type.requiredMessage') }],
 }
 const getData = () => {
   let label: string | any = form_data.value.label
@@ -93,7 +120,7 @@ const getData = () => {
       input_type: 'TooltipLabel',
       label: form_data.value.label,
       attrs: { tooltip: form_data.value.tooltip },
-      props_info: {}
+      props_info: {},
     }
   }
   return {
@@ -102,7 +129,7 @@ const getData = () => {
     field: form_data.value.field,
     default_value: form_data.value.default_value,
     show_default_value: form_data.value.show_default_value,
-    ...componentFormRef.value.getData()
+    ...componentFormRef.value.getData(),
   }
 }
 

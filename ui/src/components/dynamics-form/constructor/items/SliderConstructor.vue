@@ -1,5 +1,10 @@
 <template>
-  <el-form-item :label="$t('dynamicsForm.Slider.showInput.label')" required prop="showInput">
+  <el-form-item
+    :label="$t('dynamicsForm.Slider.showInput.label')"
+    required
+    prop="showInput"
+    @click.prevent
+  >
     <el-switch v-model="formValue.showInput" />
   </el-form-item>
   <el-form-item :label="$t('dynamicsForm.Slider.valueRange.label')" required>
@@ -9,8 +14,8 @@
           {
             required: true,
             message: $t('dynamicsForm.Slider.valueRange.minRequired'),
-            trigger: 'change'
-          }
+            trigger: 'change',
+          },
         ]"
         prop="min"
       >
@@ -26,8 +31,8 @@
           {
             required: true,
             message: $t('dynamicsForm.Slider.valueRange.maxRequired'),
-            trigger: 'change'
-          }
+            trigger: 'change',
+          },
         ]"
         prop="max"
         ><el-input-number
@@ -89,7 +94,7 @@ const formValue = computed({
   },
   get: () => {
     return props.modelValue
-  }
+  },
 })
 
 const getData = () => {
@@ -101,19 +106,19 @@ const getData = () => {
       step: formValue.value.step,
       precision: formValue.value.precision,
       'show-input-controls': false,
-      'show-input': formValue.value.showInput
+      'show-input': formValue.value.showInput,
     },
     props_info: {
       rules: [
         {
           message: formValue.value.label + ' ' + t('dynamicsForm.tip.requiredMessage'),
           trigger: 'blur',
-          required: formValue.value.required
-        }
-      ]
+          required: formValue.value.required,
+        },
+      ],
     },
     show_default_value: true,
-    default_value: formValue.value.default_value
+    default_value: formValue.value.default_value,
   }
 }
 watch(
@@ -122,7 +127,7 @@ watch(
     if (formValue.value.min > formValue.value.max) {
       formValue.value.max = formValue.value.min
     }
-  }
+  },
 )
 const rander = (form_data: any) => {
   const attrs = form_data.attrs
@@ -147,8 +152,8 @@ const step_rules = [
       }
       return true
     },
-    trigger: 'blur'
-  }
+    trigger: 'blur',
+  },
 ]
 defineExpose({ getData, rander })
 onBeforeMount(() => {

@@ -5,13 +5,14 @@
     append-to-body
     :close-on-click-modal="false"
     :close-on-press-escape="false"
+    align-center
   >
     <folder-tree
       ref="treeRef"
       :source="source"
       :data="folderList"
       :treeStyle="{
-        height: 'auto',
+        height: 'calc(100vh - 320px)',
         border: '1px solid #ebeef5',
         borderRadius: '6px',
         padding: '8px',

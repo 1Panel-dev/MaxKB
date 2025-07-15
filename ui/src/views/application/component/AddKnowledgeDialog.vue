@@ -29,17 +29,18 @@
     </template>
     <LayoutContainer class="application-manage">
       <template #left>
-        <folder-tree
-          :data="folderList"
-          :currentNodeKey="currentFolder?.id"
-          @handleNodeClick="folderClickHandle"
-          class="p-8"
-          v-loading="folderLoading"
-          :canOperation="false"
-          showShared
-          :shareTitle="$t('views.shared.shared_knowledge')"
-          :treeStyle="{ height: 'calc(100vh - 320px)' }"
-        />
+        <div class="p-8">
+          <folder-tree
+            :data="folderList"
+            :currentNodeKey="currentFolder?.id"
+            @handleNodeClick="folderClickHandle"
+            v-loading="folderLoading"
+            :canOperation="false"
+            showShared
+            :shareTitle="$t('views.shared.shared_knowledge')"
+            :treeStyle="{ height: 'calc(100vh - 320px)' }"
+          />
+        </div>
       </template>
       <div class="layout-bg">
         <div class="flex-between p-16 ml-8">
@@ -197,7 +198,7 @@ const submitHandle = () => {
 
 const refresh = () => {
   searchValue.value = ''
-  knowledgeList.value= []
+  knowledgeList.value = []
   getList()
 }
 

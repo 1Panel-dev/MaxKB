@@ -2,14 +2,15 @@
   <LayoutContainer showCollapse class="application-manage">
     <template #left>
       <h4 class="p-12-16 pb-0 mt-12">{{ $t('views.application.title') }}</h4>
-      <folder-tree
-        :source="SourceTypeEnum.APPLICATION"
-        :data="folderList"
-        :currentNodeKey="folder.currentFolder?.id"
-        @handleNodeClick="folderClickHandle"
-        @refreshTree="refreshFolder"
-        class="p-8"
-      />
+      <div class="p-8">
+        <folder-tree
+          :source="SourceTypeEnum.APPLICATION"
+          :data="folderList"
+          :currentNodeKey="folder.currentFolder?.id"
+          @handleNodeClick="folderClickHandle"
+          @refreshTree="refreshFolder"
+        />
+      </div>
     </template>
     <ContentContainer>
       <template #header>
@@ -605,7 +606,7 @@ const importApplication = (file: any) => {
     })
     .then(() => {
       getList()
-    }) 
+    })
     .catch((e) => {
       if (e.code === 400) {
         MsgConfirm(t('common.tip'), t('views.application.tip.professionalMessage'), {

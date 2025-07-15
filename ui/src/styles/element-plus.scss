@@ -111,6 +111,9 @@
 .el-message {
   --el-message-close-icon-color: var(--app-text-color-secondary);
 }
+.el-message__content {
+  word-break: break-all;
+}
 .el-message-box {
   --el-messagebox-font-size: 16px;
   --el-messagebox-width: 475px;

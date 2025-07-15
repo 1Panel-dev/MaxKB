@@ -156,7 +156,7 @@
               </el-radio-group>
             </el-form>
           </el-form-item>
-   <el-form-item @click.prevent v-if="!isWorkflowType">
+          <el-form-item @click.prevent v-if="!isWorkflowType">
             <template #label>
               <div class="flex align-center">
                 <span class="mr-4">{{
@@ -178,7 +178,6 @@
               :placeholder="defaultPrompt"
             />
           </el-form-item>
-
         </el-form>
       </div>
     </el-scrollbar>
@@ -198,6 +197,7 @@ import { ref, watch, reactive } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { isWorkFlow } from '@/utils/application'
 import { t } from '@/locales'
+import { cloneDeep } from 'lodash'
 const emit = defineEmits(['refresh'])
 
 const paramFormRef = ref()
@@ -285,10 +285,11 @@ watch(dialogVisible, (bool) => {
 const open = (data: any, type?: string) => {
   isWorkflowType.value = isWorkFlow(type)
   form.value = {
-    knowledge_setting: { ...data.knowledge_setting },
+    knowledge_setting: cloneDeep(data.knowledge_setting),
     problem_optimization: data.problem_optimization,
     problem_optimization_prompt: data.problem_optimization_prompt,
   }
+  console.log(form.value.knowledge_setting.no_references_setting.status)
   if (!isWorkflowType.value) {
     noReferencesform.value[form.value.knowledge_setting.no_references_setting.status] =
       form.value.knowledge_setting.no_references_setting.value

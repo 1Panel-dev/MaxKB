@@ -23,11 +23,14 @@
           step-strictly
         />
         <span class="ml-4">{{
-            $t('views.applicationOverview.appInfo.LimitDialog.timesDays')
-          }}</span>
+          $t('views.applicationOverview.appInfo.LimitDialog.timesDays')
+        }}</span>
       </el-form-item>
       <!--     身份验证 -->
-      <el-form-item :label="$t('views.applicationOverview.appInfo.LimitDialog.authentication')">
+      <el-form-item
+        :label="$t('views.applicationOverview.appInfo.LimitDialog.authentication')"
+        @click.prevent
+      >
         <el-switch size="small" v-model="form.authentication"></el-switch>
       </el-form-item>
       <el-radio-group
@@ -72,7 +75,7 @@
                     style="margin: 0 4px 0 0 !important"
                   >
                     <el-icon>
-                      <RefreshRight/>
+                      <RefreshRight />
                     </el-icon>
                   </el-button>
                 </el-tooltip>
@@ -109,7 +112,7 @@
           >
             <el-checkbox-group v-model="form.authentication_value.login_value">
               <template v-for="t in auth_list" :key="t.value">
-                <el-checkbox :label="t.label" :value="t.value"/>
+                <el-checkbox :label="t.label" :value="t.value" />
               </template>
             </el-checkbox-group>
           </el-form-item>
@@ -142,18 +145,18 @@
   </el-drawer>
 </template>
 <script setup lang="ts">
-import {ref, watch} from 'vue'
-import {useRoute, useRouter} from 'vue-router'
-import type {FormInstance, FormRules} from 'element-plus'
+import { ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import type { FormInstance, FormRules } from 'element-plus'
 import applicationApi from '@/api/application/application'
-import {MsgSuccess} from '@/utils/message'
-import {t} from '@/locales'
-import {copyClick} from '@/utils/clipboard'
+import { MsgSuccess } from '@/utils/message'
+import { t } from '@/locales'
+import { copyClick } from '@/utils/clipboard'
 
 const router = useRouter()
 const route = useRoute()
 const {
-  params: {id},
+  params: { id },
 } = route
 
 const emit = defineEmits(['refresh'])
@@ -198,7 +201,10 @@ const open = (data: any) => {
   form.value.authentication_value = data.authentication_value || {
     type: 'password',
   }
-  if (form.value.authentication_value.type === 'password' && !form.value.authentication_value.password_value) {
+  if (
+    form.value.authentication_value.type === 'password' &&
+    !form.value.authentication_value.password_value
+  ) {
     refreshAuthentication()
   }
   form.value.authentication = data.authentication
@@ -243,12 +249,16 @@ function refreshAuthentication() {
 }
 
 function firstGeneration() {
-  if (form.value.authentication && form.value.authentication_value.type === 'password' && !form.value.authentication_value.password_value) {
+  if (
+    form.value.authentication &&
+    form.value.authentication_value.type === 'password' &&
+    !form.value.authentication_value.password_value
+  ) {
     form.value.authentication_value.password_value = generateAuthenticationValue()
   }
 }
 
-defineExpose({open})
+defineExpose({ open })
 </script>
 <style lang="scss" scoped>
 .authentication-append-input {

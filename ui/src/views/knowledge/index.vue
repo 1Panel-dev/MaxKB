@@ -2,16 +2,17 @@
   <LayoutContainer showCollapse class="knowledge-manage">
     <template #left>
       <h4 class="p-12-16 pb-0 mt-12">{{ $t('views.knowledge.title') }}</h4>
-      <folder-tree
-        :source="SourceTypeEnum.KNOWLEDGE"
-        :data="folderList"
-        :currentNodeKey="folder.currentFolder?.id"
-        @handleNodeClick="folderClickHandle"
-        class="p-8"
-        :shareTitle="$t('views.shared.shared_knowledge')"
-        :showShared="permissionPrecise['is_share']()"
-        @refreshTree="refreshFolder"
-      />
+      <div class="p-8">
+        <folder-tree
+          :source="SourceTypeEnum.KNOWLEDGE"
+          :data="folderList"
+          :currentNodeKey="folder.currentFolder?.id"
+          @handleNodeClick="folderClickHandle"
+          :shareTitle="$t('views.shared.shared_knowledge')"
+          :showShared="permissionPrecise['is_share']()"
+          @refreshTree="refreshFolder"
+        />
+      </div>
     </template>
     <KnowledgeListContainer @refreshFolder="refreshFolder">
       <template #header>

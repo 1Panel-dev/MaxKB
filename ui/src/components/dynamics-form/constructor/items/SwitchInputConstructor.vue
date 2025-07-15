@@ -5,9 +5,15 @@
     prop="default_value"
     :rules="
       formValue.required
-        ? [{ required: true, message: `${$t('dynamicsForm.default.label')}${$t('dynamicsForm.default.requiredMessage')}` }]
+        ? [
+            {
+              required: true,
+              message: `${$t('dynamicsForm.default.label')}${$t('dynamicsForm.default.requiredMessage')}`,
+            },
+          ]
         : []
     "
+    @click.prevent
   >
     <el-switch v-model="formValue.default_value" />
   </el-form-item>
@@ -25,7 +31,7 @@ const formValue = computed({
   },
   get: () => {
     return props.modelValue
-  }
+  },
 })
 
 const getData = () => {
@@ -33,7 +39,7 @@ const getData = () => {
     input_type: 'SwitchInput',
     show_default_value: true,
     attrs: {},
-    default_value: formValue.value.default_value
+    default_value: formValue.value.default_value,
   }
 }
 
