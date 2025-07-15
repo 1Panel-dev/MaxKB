@@ -6,9 +6,11 @@
     @date：2023/11/10 10:43
     @desc:
 """
+from django.core.cache import cache
 from django.utils.translation import gettext as _
 
 from .listener_manage import *
+from ..constants.cache_version import Cache_Version
 from ..db.sql_execute import update_execute
 
 update_document_status_sql = """
@@ -31,5 +33,7 @@ def run():
             )
             # 更新文档状态
             update_execute(update_document_status_sql, [])
+            version, get_key = Cache_Version.SYSTEM.value
+            cache.delete(get_key(key='rsa_key'), version=version)
         finally:
             un_lock('event_init')
