@@ -18,15 +18,14 @@ chat_api_prefix = CONFIG.get_chat_path()[1:] + '/api/'
 
 def init_app_doc(system_urlpatterns):
     system_urlpatterns += [
-        path('schema/', SpectacularAPIView.as_view(), name='schema'),  # schema的配置文件的路由，下面两个ui也是根据这个配置文件来生成的
+        path('doc/schema/', SpectacularAPIView.as_view(), name='schema'),  # schema的配置文件的路由，下面两个ui也是根据这个配置文件来生成的
         path('doc/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),  # swagger-ui的路由
-        path('redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),  # redoc的路由
     ]
 
 
 def init_chat_doc(system_urlpatterns, chat_urlpatterns):
     system_urlpatterns += [
-        path('doc_chat_schema/',
+        path('doc_chat/schema/',
              SpectacularAPIView.as_view(patterns=[
                  URLPattern(pattern=f'{chat_api_prefix}{str(url.pattern)}', callback=url.callback,
                             default_args=url.default_args,
@@ -34,7 +33,6 @@ def init_chat_doc(system_urlpatterns, chat_urlpatterns):
                  ['chat', 'open', 'profile'].__contains__(url.name)]),
              name='chat_schema'),  # schema的配置文件的路由，下面两个ui也是根据这个配置文件来生成的
         path('doc_chat/', SpectacularSwaggerView.as_view(url_name='chat_schema'), name='swagger-ui'),  # swagger-ui的路由
-        path('redoc_chat/', SpectacularRedocView.as_view(url_name='chat_schema'), name='redoc'),  # redoc的路由
     ]
 
 

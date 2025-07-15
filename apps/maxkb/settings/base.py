@@ -100,6 +100,19 @@ TEMPLATES = [
          ],
      },
      },
+    {"NAME": "DOC",
+     'BACKEND': 'django.template.backends.django.DjangoTemplates',
+     'DIRS': ["apps/static/drf_spectacular_sidecar"],
+     'APP_DIRS': True,
+     'OPTIONS': {
+         'context_processors': [
+             'django.template.context_processors.debug',
+             'django.template.context_processors.request',
+             'django.contrib.auth.context_processors.auth',
+             'django.contrib.messages.context_processors.messages',
+         ],
+     },
+     },
 ]
 SPECTACULAR_SETTINGS = {
     'TITLE': 'MaxKB API',
@@ -107,9 +120,9 @@ SPECTACULAR_SETTINGS = {
     'VERSION': 'v2',
     'SERVE_INCLUDE_SCHEMA': False,
     # OTHER SETTINGS
-    'SWAGGER_UI_DIST': 'SIDECAR',  # shorthand to use the sidecar instead
-    'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
-    'REDOC_DIST': 'SIDECAR',
+    'SWAGGER_UI_DIST': '/doc/swagger-ui-dist',  # shorthand to use the sidecar instead
+    'SWAGGER_UI_FAVICON_HREF': '/doc/swagger-ui-dist/favicon-32x32.png',
+    'REDOC_DIST': '/doc/redoc',
     'SECURITY_DEFINITIONS': {
         'Bearer': {
             'type': 'apiKey',
