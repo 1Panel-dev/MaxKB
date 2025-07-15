@@ -61,7 +61,7 @@ class Logout(APIView):
          get_operation_object=lambda r, k: {'name': r.user.username})
     def post(self, request: Request):
         version, get_key = Cache_Version.TOKEN.value
-        cache.delete(get_key(token=request.auth), version=version)
+        cache.delete(get_key(token=request.META.get('HTTP_AUTHORIZATION')[7:]), version=version)
         return result.success(True)
 
 

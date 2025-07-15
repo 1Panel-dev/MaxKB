@@ -49,15 +49,12 @@ urlpatterns = [
     path(f'{chat_ui_prefix[1:]}/', include('oss.retrieval_urls')),
 ]
 init_doc(urlpatterns, chat_urlpatterns)
-urlpatterns.append(
-    re_path(r'^static/(?P<path>.*)$', static.serve, {'document_root': settings.STATIC_ROOT}, name='static'),
-)
 
 
 def pro():
-    # 暴露静态主要是swagger资源
     urlpatterns.append(
-        re_path(r'^static/(?P<path>.*)$', static.serve, {'document_root': settings.STATIC_ROOT}, name='static'),
+        re_path(r'^doc/(?P<path>.*)$', static.serve,
+                {'document_root': os.path.join(settings.STATIC_ROOT, "drf_spectacular_sidecar")}, name='doc'),
     )
     # 暴露ui静态资源
     urlpatterns.append(
