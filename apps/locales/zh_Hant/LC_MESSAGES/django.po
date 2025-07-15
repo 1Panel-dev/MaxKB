@@ -3219,7 +3219,7 @@ msgstr "分頁獲取問題列表"
 
 #: apps/maxkb/settings/base.py:101
 msgid "Intelligent customer service platform"
-msgstr "智能客服平臺"
+msgstr "强大易用的企業級智慧體平臺"
 
 #: apps/models_provider/api/model.py:37 apps/models_provider/api/provide.py:17
 #: apps/models_provider/api/provide.py:23
