@@ -81,6 +81,7 @@
         @clickLog="clickListHandle"
         @delete-log="deleteLog"
         @refreshFieldTitle="refreshFieldTitle"
+        @clear-chat="clearChat"
       />
     </div>
   </div>
@@ -123,6 +124,16 @@ const customStyle = computed(() => {
     color: applicationDetail.value?.custom_theme?.header_font_color,
   }
 })
+
+function clearChat() {
+  chatAPI.clearChat(left_loading).then(() => {
+    currentChatId.value = 'new'
+    paginationConfig.current_page = 1
+    paginationConfig.total = 0
+    currentRecordList.value = []
+    getChatLog(applicationDetail.value.id)
+  })
+}
 
 function deleteLog(row: any) {
   chatAPI.deleteChat(row.id, left_loading).then(() => {

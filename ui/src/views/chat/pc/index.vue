@@ -2,7 +2,7 @@
   <div
     class="chat-pc"
     :class="classObj"
-    v-loading="loading || left_loading"
+    v-loading="loading"
     :style="{
       '--el-color-primary': applicationDetail?.custom_theme?.theme_color,
       '--el-color-primary-light-9': hexToRgba(
@@ -205,7 +205,7 @@
             <ExecutionDetailContent
               v-if="rightPanelType === 'executionDetail'"
               :detail="executionDetail"
-              :type="applicationDetail?.type"
+              :appType="applicationDetail?.type"
             />
             <ParagraphDocumentContent :detail="rightPanelDetail" v-else />
           </div>
@@ -450,8 +450,8 @@ const clickListHandle = (item: any) => {
 }
 
 function refresh(id: string) {
-  getChatLog(applicationDetail.value.id, true)
   currentChatId.value = id
+  getChatLog(applicationDetail.value.id, true)
 }
 
 async function exportMarkdown(): Promise<void> {

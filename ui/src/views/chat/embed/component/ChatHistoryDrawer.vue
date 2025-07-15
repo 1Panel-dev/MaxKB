@@ -8,11 +8,7 @@
       :size="280"
       style="--el-drawer-padding-primary: 0"
     >
-      <el-button
-        class="collapse cursor"
-        circle
-        @click="show = !show"
-      >
+      <el-button class="collapse cursor" circle @click="show = !show">
         <el-icon>
           <component :is="!show ? 'ArrowRightBold' : 'ArrowLeftBold'" />
         </el-icon>
@@ -26,6 +22,7 @@
         @clickLog="handleClickList"
         @delete-log="deleteChatLog"
         @refreshFieldTitle="refreshFieldTitle"
+        @clear-chat="clearChat"
       >
         <div class="user-info p-16 cursor">
           <el-avatar
@@ -112,9 +109,13 @@ const props = defineProps<{
   currentChatId: string
 }>()
 
-const emit = defineEmits(['newChat', 'clickLog', 'deleteLog', 'refreshFieldTitle'])
+const emit = defineEmits(['newChat', 'clickLog', 'deleteLog', 'refreshFieldTitle', 'clearChat'])
 
 const { chatUser, chatLog } = useStore()
+
+const clearChat = () => {
+  emit('clearChat')
+}
 
 const newChat = () => {
   emit('newChat')
@@ -138,7 +139,7 @@ const openResetPassword = () => {
 
 const handleResetPassword = (param: ResetCurrentUserPasswordRequest) => {
   chatAPI.resetCurrentPassword(param).then(() => {
-    router.push({name: 'login'})
+    router.push({ name: 'login' })
   })
 }
 

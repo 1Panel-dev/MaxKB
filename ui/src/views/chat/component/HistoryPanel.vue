@@ -40,11 +40,7 @@
         <div v-show="!isPcCollapse" class="flex-between p-8 pb-0 color-secondary mt-8">
           <span>{{ $t('chat.history') }}</span>
           <el-tooltip effect="dark" :content="$t('chat.clearChat')" placement="right">
-            <!-- // TODO: 清空 -->
-            <el-button 
-              text
-              @click="clearChat"            
-            >
+            <el-button text @click.stop="clearChat">
               <el-icon>
                 <Delete />
               </el-icon>
@@ -118,8 +114,7 @@
             <div class="flex-between w-full">
               <span>{{ $t('chat.history') }}</span>
               <el-tooltip effect="dark" :content="$t('chat.clearChat')" placement="right">
-                <!-- // TODO: 清空 -->
-                <el-button text>
+                <el-button text @click.stop="clearChat">
                   <el-icon>
                     <Delete />
                   </el-icon>
@@ -178,16 +173,14 @@
 import { ref } from 'vue'
 import { isAppIcon } from '@/utils/common'
 import EditTitleDialog from './EditTitleDialog.vue'
-import useStore from '@/stores'
-const { common, chatUser } = useStore()
 const props = defineProps<{
   applicationDetail: any
   chatLogData: any[]
-  leftLoading: boolean
+  leftLoading?: boolean
   currentChatId: string
   isPcCollapse?: boolean
 }>()
-const emit = defineEmits(['newChat', 'clickLog', 'deleteLog', 'refreshFieldTitle','clearChat'])
+const emit = defineEmits(['newChat', 'clickLog', 'deleteLog', 'refreshFieldTitle', 'clearChat'])
 
 const EditTitleDialogRef = ref()
 

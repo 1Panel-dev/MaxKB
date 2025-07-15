@@ -1,7 +1,6 @@
 <template>
   <div
     class="chat-mobile layout-bg chat-background"
-    v-loading="loading"
     :class="classObj"
     :style="{
       '--el-color-primary': applicationDetail?.custom_theme?.theme_color,
@@ -82,6 +81,7 @@
       @clickLog="clickListHandle"
       @delete-log="deleteLog"
       @refreshFieldTitle="refreshFieldTitle"
+      @clear-chat="clearChat"
     />
   </div>
 </template>
@@ -132,6 +132,16 @@ const classObj = computed(() => {
     mobile: common.isMobile(),
   }
 })
+
+function clearChat() {
+  chatAPI.clearChat(left_loading).then(() => {
+    currentChatId.value = 'new'
+    paginationConfig.current_page = 1
+    paginationConfig.total = 0
+    currentRecordList.value = []
+    getChatLog(applicationDetail.value.id)
+  })
+}
 
 function deleteLog(row: any) {
   chatAPI.deleteChat(row.id, left_loading).then(() => {

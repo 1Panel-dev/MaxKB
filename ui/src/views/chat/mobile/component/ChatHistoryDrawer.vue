@@ -17,6 +17,7 @@
         @clickLog="handleClickList"
         @delete-log="deleteChatLog"
         @refreshFieldTitle="refreshFieldTitle"
+        @clear-chat="clearChat"
       >
         <div class="flex align-center user-info p-16" @click="toUserCenter">
           <el-avatar
@@ -47,13 +48,17 @@ const show = defineModel<boolean>('show')
 const props = defineProps<{
   applicationDetail: any
   chatLogData: any[]
-  leftLoading: boolean
+  leftLoading?: boolean
   currentChatId: string
 }>()
 
-const emit = defineEmits(['newChat', 'clickLog', 'deleteLog', 'refreshFieldTitle'])
+const emit = defineEmits(['newChat', 'clickLog', 'deleteLog', 'refreshFieldTitle', 'clearChat'])
 
 const { chatUser, chatLog } = useStore()
+
+const clearChat = () => {
+  emit('clearChat')
+}
 
 const newChat = () => {
   emit('newChat')
@@ -69,7 +74,6 @@ const deleteChatLog = (row: any) => {
 function refreshFieldTitle(chatId: string, abstract: string) {
   emit('refreshFieldTitle', chatId, abstract)
 }
-
 
 const userCenterDrawerShow = ref(false)
 function toUserCenter() {
