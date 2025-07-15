@@ -159,7 +159,7 @@ const exportDocument: (
   loading?: Ref<boolean>,
 ) => Promise<any> = (document_name, knowledge_id, document_id, loading) => {
   return exportExcel(
-    document_name + '.xlsx',
+    document_name.trim() + '.xlsx',
     `${prefix.value}/${knowledge_id}/document/${document_id}/export`,
     {},
     loading,
@@ -180,7 +180,7 @@ const exportDocumentZip: (
   loading?: Ref<boolean>,
 ) => Promise<any> = (document_name, knowledge_id, document_id, loading) => {
   return exportFile(
-    document_name + '.zip',
+    document_name.trim() + '.zip',
     `${prefix.value}/${knowledge_id}/document/${document_id}/export_zip`,
     {},
     loading,
