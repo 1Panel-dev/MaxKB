@@ -31,13 +31,12 @@
         :label="$t('views.applicationOverview.appInfo.LimitDialog.authentication')"
         @click.prevent
       >
-        <el-switch size="small" v-model="form.authentication"></el-switch>
+        <el-switch size="small" v-model="form.authentication" @change="firstGeneration"></el-switch>
       </el-form-item>
       <el-radio-group
         v-if="form.authentication"
         v-model="form.authentication_value.type"
         class="card__radio"
-        @change="firstGeneration"
       >
         <el-card
           shadow="never"
@@ -249,12 +248,11 @@ function refreshAuthentication() {
 }
 
 function firstGeneration() {
-  if (
-    form.value.authentication &&
-    form.value.authentication_value.type === 'password' &&
-    !form.value.authentication_value.password_value
-  ) {
-    form.value.authentication_value.password_value = generateAuthenticationValue()
+  if (form.value.authentication && !form.value.authentication_value.password_value) {
+    form.value.authentication_value = {
+      type: 'password',
+      password_value: generateAuthenticationValue(),
+    }
   }
 }
 
