@@ -95,7 +95,9 @@
     <div class="hit-test__operate">
       <el-popover :visible="popoverVisible" placement="right-end" :width="500" trigger="click">
         <template #reference>
-          <el-button icon="Setting" class="mb-8" @click="settingChange('open')">{{
+          <el-button icon="Setting" class="mb-8" @click="settingChange('open')"
+            v-if="! route.path.includes('share/')"
+          >{{
             $t('common.paramSetting')
           }}</el-button>
         </template>
@@ -189,7 +191,6 @@
         <div class="text-right">
           <el-button @click="popoverVisible = false">{{ $t('common.cancel') }}</el-button>
           <el-button type="primary" @click="settingChange('close')"
-            v-if="! route.path.includes('share/')"
           >{{
             $t('common.confirm')
           }}</el-button>
