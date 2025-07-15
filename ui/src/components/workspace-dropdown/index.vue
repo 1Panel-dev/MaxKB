@@ -1,5 +1,5 @@
 <template>
-  <el-dropdown placement="bottom-start" class="workspace-dropdown" popper-class="workspace-dropdown-popper">
+  <el-dropdown trigger="click" placement="bottom-start" class="workspace-dropdown" popper-class="workspace-dropdown-popper">
     <el-button text style="font-size: 14px" class="workspace-dropdown__button">
       <AppIcon iconName="app-workspace" style="font-size: 18px"></AppIcon>
       <span class="ellipsis" style="max-width: 155px" :title="currentWorkspace?.name">
