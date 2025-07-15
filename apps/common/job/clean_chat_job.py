@@ -9,7 +9,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from django_apscheduler.jobstores import DjangoJobStore
 from application.models import Application, Chat, ChatRecord
 from django.db.models import Q, Max
-from common.utils.lock import try_lock, un_lock
+from common.utils.lock import try_lock, un_lock, lock
 from common.utils.logger import maxkb_logger
 
 from knowledge.models import File
@@ -19,6 +19,11 @@ scheduler.add_jobstore(DjangoJobStore(), "default")
 
 
 def clean_chat_log_job():
+    clean_chat_log_job_lock()
+
+
+@lock(lock_key='clean_chat_log_job', timeout=30)
+def clean_chat_log_job_lock():
     from django.utils.translation import gettext_lazy as _
     maxkb_logger.info(_('start clean chat log'))
     now = timezone.now()

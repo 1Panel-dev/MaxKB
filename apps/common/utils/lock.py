@@ -21,7 +21,7 @@ def try_lock(key: str, timeout=None):
     :return: 是否获取到锁
     """
     if timeout is None:
-        timeout = 3600 # 默认超时时间为3600秒
+        timeout = 3600  # 默认超时时间为3600秒
     return memory_cache.add(key, 'lock', timeout=timeout)
 
 
@@ -34,18 +34,20 @@ def un_lock(key: str):
     return memory_cache.delete(key)
 
 
-def lock(lock_key):
+def lock(lock_key, timeout=None):
     """
     给一个函数上锁
-    :param lock_key: 上锁key 字符串|函数  函数返回值为字符串
+    @param lock_key: 上锁key 字符串|函数  函数返回值为字符串
+    @param timeout:  超时时间
     :return: 装饰器函数 当前装饰器主要限制一个key只能一个线程去调用 相同key只能阻塞等待上一个任务执行完毕 不同key不需要等待
+
     """
 
     def inner(func):
         def run(*args, **kwargs):
             key = lock_key(*args, **kwargs) if callable(lock_key) else lock_key
             try:
-                if try_lock(key=key):
+                if try_lock(key=key, timeout=timeout):
                     return func(*args, **kwargs)
             finally:
                 un_lock(key=key)
