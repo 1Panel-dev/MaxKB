@@ -3,6 +3,7 @@
     shadow="never"
     :title="index + 1 + '.' + data.title || '-'"
     class="paragraph-source-card cursor mb-8 paragraph-source-card-height"
+    :style="{ 'height': data?.document_name?.trim() ? '300px' : '260px' }"
     :class="data.is_active ? '' : 'disabled'"
     :showIcon="false"
   >
@@ -17,7 +18,12 @@
     </el-scrollbar>
 
     <template #footer>
-      <el-card shadow="never" style="--el-card-padding: 8px" class="w-full mb-12">
+      <el-card
+        shadow="never"
+        style="--el-card-padding: 8px"
+        class="w-full mb-12"
+        v-if="data?.document_name?.trim()"
+      >
         <el-text class="flex align-center item">
           <img :src="getImgUrl(data?.document_name?.trim())" alt="" width="20" class="mr-4" />
 
@@ -81,9 +87,9 @@ const parsedMeta = computed(() => {
 const meta = computed(() => (isMetaObject.value ? props.data.meta : parsedMeta.value))
 </script>
 <style lang="scss" scoped>
-.paragraph-source-card-height {
-  height: 300px;
-}
+// .paragraph-source-card-height {
+//   height: 300px;
+// }
 
 // @media only screen and (max-width: 768px) {
 //   .paragraph-source-card-height {
