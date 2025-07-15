@@ -353,7 +353,7 @@ class KnowledgeSerializer(serializers.Serializer):
             }
 
         @transaction.atomic
-        def edit(self, instance: Dict):
+        def edit(self, instance: Dict, select_one: True):
             self.is_valid()
             knowledge = QuerySet(Knowledge).get(id=self.data.get("knowledge_id"))
             if QuerySet(Knowledge).filter(
@@ -404,7 +404,9 @@ class KnowledgeSerializer(serializers.Serializer):
                 ]) if len(application_id_list) > 0 else None
 
             knowledge.save()
-            return self.one()
+            if select_one:
+                return self.one()
+            return None
 
         @transaction.atomic
         def delete(self):
