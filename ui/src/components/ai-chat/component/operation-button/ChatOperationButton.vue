@@ -464,7 +464,7 @@ class AudioManage {
         this.statusList[index] = AudioStatus.ERROR
       }
     } else {
-      if (window.speechSynthesis.paused) {
+      if (window.speechSynthesis.paused && self) {
         window.speechSynthesis.resume()
         this.statusList[index] = AudioStatus.PLAY_INT
       } else {
