@@ -21,14 +21,6 @@
         </div>
 
         <div class="flex align-center mr-8">
-          <el-input
-            v-model="searchValue"
-            :placeholder="$t('common.search')"
-            prefix-icon="Search"
-            class="w-240 mr-8"
-            clearable
-          />
-          <el-divider direction="vertical" />
           <el-button link class="mr-16" @click="refresh">
             <el-icon class="mr-4" :size="18"><Refresh /></el-icon>
           </el-button>
@@ -49,9 +41,20 @@
           :treeStyle="{ height: 'calc(100vh - 320px)' }"
         />
       </template>
-      <div class="layout-bg" style="height: calc(100vh - 160px)">
+      <div class="layout-bg">
+        <div class="flex-between p-16 ml-8">
+          <h4>{{ currentFolder?.name }}</h4>
+          <el-input
+            v-model="searchValue"
+            :placeholder="$t('common.search')"
+            prefix-icon="Search"
+            class="w-240 mr-8"
+            clearable
+          />
+        </div>
+
         <el-scrollbar>
-          <div class="p-16-24">
+          <div class="p-16-24 pt-0" style="height: calc(100vh - 200px)">
             <el-row :gutter="12" v-loading="loading" v-if="filterData.length">
               <el-col
                 :span="12"
@@ -150,9 +153,11 @@ watch(dialogVisible, (bool) => {
 
 watch(searchValue, (val) => {
   if (val) {
-    searchData.value = knowledgeList.value.filter((v) => v.name.includes(val))
+    searchData.value = knowledgeList.value.filter(
+      (v) => v.name.includes(val) && v.folder_id === currentFolder.value?.id,
+    )
   } else {
-    searchData.value = knowledgeList.value
+    searchData.value = knowledgeList.value.filter((v) => v.folder_id === currentFolder.value?.id)
   }
 })
 
@@ -191,6 +196,8 @@ const submitHandle = () => {
 }
 
 const refresh = () => {
+  searchValue.value = ''
+  knowledgeList.value= []
   getList()
 }
 
