@@ -20,7 +20,6 @@ psycopg = { extras = ["binary"], version = "3.2.9" }
 # 工具库
 python-dotenv = "1.1.1"
 uuid-utils = "0.11.0"
-diskcache2 = "1.0.0"
 captcha = "0.7.1"
 pytz = "2025.2"
 psutil = "7.0.0"
