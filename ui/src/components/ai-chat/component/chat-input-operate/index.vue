@@ -651,7 +651,7 @@ class RecorderManage {
 }
 const getSpeechToTextAPI = () => {
   if (props.type === 'ai-chat') {
-    return (data?: any, loading?: Ref<boolean>) => {
+    return (id?: any, data?: any, loading?: Ref<boolean>) => {
       return chatAPI.speechToText(data, loading)
     }
   } else {
