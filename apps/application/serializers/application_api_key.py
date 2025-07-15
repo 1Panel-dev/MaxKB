@@ -104,5 +104,5 @@ class ApplicationKeySerializer(serializers.Serializer):
                 application_api_key.cross_domain_list = instance.get('cross_domain_list')
             application_api_key.save()
             # 写入缓存
-            get_application_api_key(application_api_key.secret_key, False)
+            get_application_api_key('Bearer ' + application_api_key.secret_key, False)
             return True
