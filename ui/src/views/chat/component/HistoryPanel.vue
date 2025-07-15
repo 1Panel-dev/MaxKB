@@ -41,7 +41,10 @@
           <span>{{ $t('chat.history') }}</span>
           <el-tooltip effect="dark" :content="$t('chat.clearChat')" placement="right">
             <!-- // TODO: 清空 -->
-            <el-button text>
+            <el-button 
+              text
+              @click="clearChat"            
+            >
               <el-icon>
                 <Delete />
               </el-icon>
@@ -184,7 +187,7 @@ const props = defineProps<{
   currentChatId: string
   isPcCollapse?: boolean
 }>()
-const emit = defineEmits(['newChat', 'clickLog', 'deleteLog', 'refreshFieldTitle'])
+const emit = defineEmits(['newChat', 'clickLog', 'deleteLog', 'refreshFieldTitle','clearChat'])
 
 const EditTitleDialogRef = ref()
 
@@ -203,6 +206,10 @@ const handleClickList = (item: any) => {
 
 const deleteChatLog = (row: any) => {
   emit('deleteLog', row)
+}
+
+const clearChat = () => {
+  emit('clearChat')
 }
 
 function editLogTitle(row: any) {

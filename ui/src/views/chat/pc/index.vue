@@ -29,6 +29,7 @@
           @new-chat="newChat"
           @clickLog="clickListHandle"
           @delete-log="deleteLog"
+          @clear-chat="clearChat"
           @refreshFieldTitle="refreshFieldTitle"
           :isPcCollapse="isPcCollapse"
         >
@@ -322,6 +323,18 @@ function deleteLog(row: any) {
       currentRecordList.value = []
     }
     getChatLog(applicationDetail.value.id)
+  })
+}
+
+
+function clearChat() {
+  chatAPI.clearChat(left_loading, ).then(() => {
+    currentChatId.value = 'new'
+      currentChatName.value = t('chat.createChat')
+      paginationConfig.value.current_page = 1
+      paginationConfig.value.total = 0
+      currentRecordList.value = []
+      getChatLog(applicationDetail.value.id)
   })
 }
 
