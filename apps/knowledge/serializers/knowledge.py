@@ -429,16 +429,20 @@ class KnowledgeSerializer(serializers.Serializer):
             if with_valid:
                 self.is_valid(raise_exception=True)
             document_list = QuerySet(Document).filter(knowledge_id=self.data.get('knowledge_id'))
-            paragraph_list = native_search(QuerySet(Paragraph).filter(knowledge_id=self.data.get("knowledge_id")),
-                                           get_file_content(
-                                               os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql',
-                                                            'list_paragraph_document_name.sql')))
+            paragraph_list = native_search(
+                QuerySet(Paragraph).filter(knowledge_id=self.data.get("knowledge_id")),
+                get_file_content(
+                    os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'list_paragraph_document_name.sql')
+                )
+            )
             problem_mapping_list = native_search(
-                QuerySet(ProblemParagraphMapping).filter(knowledge_id=self.data.get("id")), get_file_content(
-                    os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'list_problem_mapping.sql')),
-                with_table_name=True)
-            data_dict, document_dict = DocumentSerializers.Operate.merge_problem(paragraph_list, problem_mapping_list,
-                                                                                 document_list)
+                QuerySet(ProblemParagraphMapping).filter(knowledge_id=self.data.get("knowledge_id")),
+                get_file_content(os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'list_problem_mapping.sql')),
+                with_table_name=True
+            )
+            data_dict, document_dict = DocumentSerializers.Operate.merge_problem(
+                paragraph_list, problem_mapping_list, document_list
+            )
             workbook = DocumentSerializers.Operate.get_workbook(data_dict, document_dict)
             response = HttpResponse(content_type='application/vnd.ms-excel')
             response['Content-Disposition'] = 'attachment; filename="knowledge.xlsx"'
@@ -449,16 +453,20 @@ class KnowledgeSerializer(serializers.Serializer):
             if with_valid:
                 self.is_valid(raise_exception=True)
             document_list = QuerySet(Document).filter(knowledge_id=self.data.get('knowledge_id'))
-            paragraph_list = native_search(QuerySet(Paragraph).filter(knowledge_id=self.data.get("knowledge_id")),
-                                           get_file_content(
-                                               os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql',
-                                                            'list_paragraph_document_name.sql')))
+            paragraph_list = native_search(
+                QuerySet(Paragraph).filter(knowledge_id=self.data.get("knowledge_id")),
+                get_file_content(
+                    os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'list_paragraph_document_name.sql')
+                )
+            )
             problem_mapping_list = native_search(
-                QuerySet(ProblemParagraphMapping).filter(knowledge_id=self.data.get("id")), get_file_content(
-                    os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'list_problem_mapping.sql')),
-                with_table_name=True)
-            data_dict, document_dict = DocumentSerializers.Operate.merge_problem(paragraph_list, problem_mapping_list,
-                                                                                 document_list)
+                QuerySet(ProblemParagraphMapping).filter(knowledge_id=self.data.get("knowledge_id")),
+                get_file_content(os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'list_problem_mapping.sql')),
+                with_table_name=True
+            )
+            data_dict, document_dict = DocumentSerializers.Operate.merge_problem(
+                paragraph_list, problem_mapping_list, document_list
+            )
             res = [parse_image(paragraph.get('content')) for paragraph in paragraph_list]
 
             workbook = DocumentSerializers.Operate.get_workbook(data_dict, document_dict)
