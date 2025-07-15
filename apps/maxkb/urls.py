@@ -18,7 +18,6 @@ import os
 from pathlib import Path
 
 from django.http import HttpResponse, HttpResponseRedirect
-from django.templatetags.static import static as _static
 from django.urls import path, re_path, include
 from django.views import static
 from rest_framework import status
@@ -109,7 +108,7 @@ def page_not_found(request, exception):
         in_ = [url for url in static_dict.get(chat_ui_prefix) if request.path.endswith(url)]
         if len(in_) > 0:
             a = chat_ui_prefix + in_[0]
-            return HttpResponseRedirect(_static(a))
+            return HttpResponseRedirect(a)
         index_path = os.path.join(PROJECT_DIR, 'apps', "static", 'chat', 'index.html')
         content = get_index_html(index_path)
         content.replace("prefix: '/chat'", f"prefix: {CONFIG.get_chat_path()}")
@@ -120,7 +119,7 @@ def page_not_found(request, exception):
         in_ = [url for url in static_dict.get(admin_ui_prefix) if request.path.endswith(url)]
         if len(in_) > 0:
             a = admin_ui_prefix + in_[0]
-            return HttpResponseRedirect(_static(a))
+            return HttpResponseRedirect(a)
         index_path = os.path.join(PROJECT_DIR, 'apps', "static", 'admin', 'index.html')
         if not os.path.exists(index_path):
             return HttpResponse("页面不存在", status=404)
