@@ -193,7 +193,9 @@
           }}</el-button>
         </div>
       </el-popover>
-      <div class="operate-textarea flex">
+      <div class="operate-textarea flex"
+        v-if="! route.path.includes('share/')"
+      >
         <el-input
           ref="quickInputRef"
           v-model="inputValue"
@@ -204,7 +206,6 @@
         />
         <div class="operate">
           <el-button
-            v-if="! route.path.includes('share/')"
             text
             class="sent-button"
             :disabled="isDisabledChart || loading"
