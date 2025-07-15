@@ -274,7 +274,17 @@ const deleteChat: (chat_id: string, loading?: Ref<boolean>) => Promise<Result<an
   chat_id,
   loading,
 ) => {
-  return del(`historical_conversation/${chat_id}`, loading)
+  return del(`historical_conversation/${chat_id}`,undefined,undefined ,loading)
+}
+/**
+ * 
+ * @param loading 
+ * @returns 
+ */
+const clearChat: (loading?: Ref<boolean>) => Promise<Result<any>> = (
+  loading
+) => {
+  return del(`historical_conversation/clear`,undefined,undefined, loading)
 }
 /**
  *
@@ -344,6 +354,7 @@ export default {
   textToSpeech,
   speechToText,
   deleteChat,
+  clearChat,
   modifyChat,
   postUploadFile,
 }

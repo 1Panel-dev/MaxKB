@@ -29,6 +29,7 @@
           @new-chat="newChat"
           @clickLog="clickListHandle"
           @delete-log="deleteLog"
+          @clear-chat="clearChat"
           @refreshFieldTitle="refreshFieldTitle"
           :isPcCollapse="isPcCollapse"
         >
@@ -230,7 +231,12 @@ import ParagraphSourceContent
 import ParagraphDocumentContent
   from '@/components/ai-chat/component/knowledge-source-component/ParagraphDocumentContent.vue'
 import HistoryPanel from '@/views/chat/component/HistoryPanel.vue'
+<<<<<<< Updated upstream
 import {cloneDeep} from 'lodash'
+=======
+import { cloneDeep } from 'lodash'
+import { ElMessage } from 'element-plus'
+>>>>>>> Stashed changes
 
 useResize()
 
@@ -322,6 +328,19 @@ function deleteLog(row: any) {
       currentRecordList.value = []
     }
     getChatLog(applicationDetail.value.id)
+  })
+}
+
+
+function clearChat() {
+  chatAPI.clearChat(left_loading, ).then(() => {
+    currentChatId.value = 'new'
+      currentChatName.value = t('chat.createChat')
+      paginationConfig.value.current_page = 1
+      paginationConfig.value.total = 0
+      currentRecordList.value = []
+      ElMessage.success(t('success'))
+      getChatLog(applicationDetail.value.id)
   })
 }
 
