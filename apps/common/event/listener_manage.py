@@ -153,7 +153,7 @@ class ListenerManagement:
     @staticmethod
     def embedding_by_data_list(data_list: List, embedding_model: Embeddings):
         # 批量向量化
-        VectorStore.get_embedding_vector().batch_save(data_list, embedding_model, lambda: True)
+        VectorStore.get_embedding_vector().batch_save(data_list, embedding_model, lambda: False)
 
     @staticmethod
     def get_embedding_paragraph_apply(embedding_model, is_the_task_interrupted, post_apply=lambda: None):
