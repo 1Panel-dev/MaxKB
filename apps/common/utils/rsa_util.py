@@ -14,10 +14,11 @@ from Crypto.PublicKey import RSA
 from django.core import cache
 from django.db.models import QuerySet
 
+from common.constants.cache_version import Cache_Version
 from system_manage.models import SystemSetting, SettingType
 
 lock = threading.Lock()
-rsa_cache = cache.caches['default']
+rsa_cache = cache.cache
 cache_key = "rsa_key"
 # 对密钥加密的密码
 secret_code = "mac_kb_password"
@@ -45,7 +46,8 @@ def get_key_pair():
             if rsa_value is not None:
                 return rsa_value
             rsa_value = get_key_pair_by_sql()
-            rsa_cache.set(cache_key, rsa_value)
+            version, get_key = Cache_Version.SYSTEM.value
+            rsa_cache.set(get_key(key='rsa_key'), rsa_value, timeout=None, version=version)
     return rsa_value
 
 
