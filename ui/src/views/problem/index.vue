@@ -384,6 +384,9 @@ function rowClickHandle(row: any, column?: any) {
   if (column && column.type === 'selection') {
     return
   }
+  if (route.path.includes('share/')) {
+    return
+  }
   if (row.paragraph_count) {
     currentClickId.value = row.id
     currentContent.value = row.content
