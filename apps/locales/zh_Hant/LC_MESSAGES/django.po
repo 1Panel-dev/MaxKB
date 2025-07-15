@@ -8632,3 +8632,5 @@ msgstr "修改應用程序訪問權杖"
 msgid "File not exist. Only manually uploaded documents are supported"
 msgstr "文件不存在, 僅支持手動上傳的文檔"
 
+msgid "Resource"
+msgstr "資源管理"

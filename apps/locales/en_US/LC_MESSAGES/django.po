@@ -8505,3 +8505,6 @@ msgstr ""
 
 msgid "File not exist. Only manually uploaded documents are supported"
 msgstr ""
+
+msgid "Resource"
+msgstr "Resource Management"
