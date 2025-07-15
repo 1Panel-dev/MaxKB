@@ -353,7 +353,7 @@ class KnowledgeSerializer(serializers.Serializer):
             }
 
         @transaction.atomic
-        def edit(self, instance: Dict, select_one: True):
+        def edit(self, instance: Dict, select_one=True):
             self.is_valid()
             knowledge = QuerySet(Knowledge).get(id=self.data.get("knowledge_id"))
             if QuerySet(Knowledge).filter(
