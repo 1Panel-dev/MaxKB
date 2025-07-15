@@ -1,5 +1,5 @@
 <template>
-  <div class="ai-chat__operate p-16" @drop="handleDrop">
+  <div class="ai-chat__operate p-16" @drop.prevent="handleDrop" @dragover.prevent>
     <div class="text-center mb-8" v-if="loading">
       <el-button class="border-primary video-stop-button" @click="stopChat">
         <app-icon iconName="app-video-stop" class="mr-8"></app-icon>
