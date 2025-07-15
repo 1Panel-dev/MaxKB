@@ -52,6 +52,7 @@ router.beforeEach(
           params: {
             accessToken: to.params.accessToken,
           },
+          query: to.query,
         })
         return
       } else {
@@ -102,6 +103,7 @@ router.beforeEach(
             params: {
               accessToken: to.params.accessToken,
             },
+            query: to.query,
           })
         }
         return
