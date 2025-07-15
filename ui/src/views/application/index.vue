@@ -158,7 +158,7 @@
                 >
                   <template #icon>
                     <el-avatar shape="square" :size="32" style="background: none">
-                      <img :src="resetUrl(item?.icon, resetUrl('./favicon.ico'))" alt="" />
+                      <AppIcon iconName="app-folder" style="font-size: 32px"></AppIcon>
                     </el-avatar>
                   </template>
                   <template #subTitle>
