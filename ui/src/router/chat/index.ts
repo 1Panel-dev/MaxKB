@@ -75,11 +75,12 @@ router.beforeEach(
             return
           }
           if (p_token) {
-            next({ ...to, query: to.query })
+            const q = to.query
+            delete q.token
+            next({ ...to, query: q })
           } else {
             next()
           }
-
           return
         }
       }
