@@ -131,8 +131,8 @@
                     fit="cover"
                     style="width: 28px; height: 28px; display: block"
                   />
-                  <el-avatar v-else>
-                    <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
+                  <el-avatar v-else :size="28">
+                    <img src="@/assets/user-icon.svg" style="width: 50%" alt="" />
                   </el-avatar>
                 </div>
               </div>
