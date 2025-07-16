@@ -1,6 +1,6 @@
 <template>
   <login-layout v-if="!loading" v-loading="loading">
-    <LoginContainer :subTitle="theme.themeInfo?.slogan || $t('theme.defaultSlogan')">
+    <LoginContainer :subTitle="newDefaultSlogan">
       <h2 class="mb-24" v-if="!showQrCodeTab">{{ loginMode || $t('views.login.title') }}</h2>
       <div v-if="!showQrCodeTab">
         <el-form
@@ -125,7 +125,7 @@
   </login-layout>
 </template>
 <script setup lang="ts">
-import {onMounted, ref, onBeforeMount} from 'vue'
+import {onMounted, ref, onBeforeMount, computed} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import type {FormInstance, FormRules} from 'element-plus'
 import type {LoginRequest} from '@/api/type/login'
@@ -227,7 +227,14 @@ function uuidv4() {
     return v.toString(16)
   })
 }
-
+const newDefaultSlogan=computed(()=>{
+const default_login= '强大易用的企业级智能体平台'
+ if(!theme.themeInfo?.slogan||default_login==theme.themeInfo?.slogan){
+  return t('theme.defaultSlogan')
+ }else{
+ return  theme.themeInfo?.slogan
+ }
+})
 function redirectAuth(authType: string) {
   if (authType === 'LDAP' || authType === '') {
     return
