@@ -8,10 +8,10 @@
     <div class="flex-between w-full align-center">
       <h4><el-divider class="ml-16 mr-16" direction="vertical" />{{ $t('views.system.title') }}</h4>
       <div class="flex align-center mr-8">
-        <TopAbout class="mt-4"></TopAbout>
+        <TopAbout></TopAbout>
         <el-divider class="ml-8 mr-8" direction="vertical" />
         <el-button link @click="router.push({ path: '/' })"
-          v-if="hasPermission([RoleConst.USER.getWorkspaceRole,RoleConst.EXTENDS_USER.getWorkspaceRole, 
+          v-if="hasPermission([RoleConst.USER.getWorkspaceRole,RoleConst.EXTENDS_USER.getWorkspaceRole,
             RoleConst.EXTENDS_WORKSPACE_MANAGE.getWorkspaceRole, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole
           ],'OR')"
         >

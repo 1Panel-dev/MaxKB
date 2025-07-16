@@ -1,5 +1,5 @@
 <template>
-  <el-drawer v-model="visible" size="60%">
+  <el-drawer v-model="visible" size="600">
     <template #header>
       <h4>{{ title }}</h4>
     </template>

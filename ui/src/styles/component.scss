@@ -250,3 +250,14 @@
     padding: 4px 16px 12px 12px;
   }
 }
+
+/* tag超出省略号 */
+.tag-ellipsis {
+  box-sizing: border-box;
+  max-width: 130px;
+  .el-tag__content {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+}

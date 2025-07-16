@@ -1,14 +1,19 @@
 <template>
   <div class="tag-group" v-if="props.tags.length">
-    <el-tag :size="props.size" class="default-tag">
-      <span class="ellipsis">{{ props.tags[0] }}</span>
+    <el-tag :size="props.size" class="default-tag tag-ellipsis" :title="props.tags[0]">
+      {{ props.tags[0] }}
     </el-tag>
     <el-tooltip effect="light" :disabled="tooltipDisabled">
       <el-tag :size="props.size" class="info-tag ml-4 cursor" v-if="props.tags?.length > 1">
         +{{ props.tags?.length - 1 }}
       </el-tag>
       <template #content>
-        <el-tag :size="props.size" v-for="item in props.tags.slice(1)" :key="item" class="default-tag mr-4">
+        <el-tag
+          :size="props.size"
+          v-for="item in props.tags.slice(1)"
+          :key="item"
+          class="default-tag mr-4"
+        >
           {{ item }}
         </el-tag>
       </template>
@@ -16,6 +21,7 @@
   </div>
 </template>
 <script setup lang="ts">
+
 const props = defineProps<{
   tags: string[]
   size?: 'large' | 'default' | 'small'
