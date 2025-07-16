@@ -34,7 +34,7 @@ from common.database_model_manage.database_model_manage import DatabaseModelMana
 from common.db.search import native_search, native_page_search
 from common.exception.app_exception import AppApiException
 from common.field.common import UploadedFileField
-from common.utils.common import get_file_content, restricted_loads, generate_uuid
+from common.utils.common import get_file_content, restricted_loads, generate_uuid, _remove_empty_lines
 from knowledge.models import Knowledge, KnowledgeScope
 from knowledge.serializers.knowledge import KnowledgeSerializer, KnowledgeModelSerializer
 from maxkb.conf import PROJECT_DIR
@@ -931,8 +931,9 @@ class ApplicationOperateSerializer(serializers.Serializer):
         if application.tts_model_enable:
             model = get_model_instance_by_model_workspace_id(application.tts_model_id, application.workspace_id,
                                                              **application.tts_model_params_setting)
+            content = _remove_empty_lines(instance.get('text', ''))
 
-            return model.text_to_speech(instance.get('text'))
+            return model.text_to_speech(content)
 
     def play_demo_text(self, instance, with_valid=True):
         text = '你好，这里是语音播放测试'
