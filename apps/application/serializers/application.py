@@ -800,8 +800,6 @@ class ApplicationOperateSerializer(serializers.Serializer):
         if 'work_flow' in instance:
             # 修改语音配置相关
             self.update_work_flow_model(instance)
-        if application.type == ApplicationTypeChoices.SIMPLE.value:
-            application.is_publish = True
         update_keys = ['name', 'desc', 'model_id', 'multiple_rounds_dialogue', 'prologue', 'status',
                        'knowledge_setting', 'model_setting', 'problem_optimization', 'dialogue_number',
                        'stt_model_id', 'tts_model_id', 'tts_model_enable', 'stt_model_enable', 'tts_type',
