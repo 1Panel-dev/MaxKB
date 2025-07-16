@@ -551,6 +551,7 @@ class ApplicationSerializer(serializers.Serializer):
                     code=tool.get('code'),
                     template_id=tool.get('template_id'),
                     input_field_list=tool.get('input_field_list'),
+                    init_field_list=tool.get('init_field_list'),
                     is_active=tool.get('is_active'),
                     scope=ToolScope.WORKSPACE,
                     folder_id=workspace_id,
