@@ -11,7 +11,7 @@
       <el-radio value="BLACK_LIST">{{ $t('views.shared.BLACK_LIST') }}</el-radio>
     </el-radio-group>
     <p class="mb-8 lighter mt-16">{{ $t('views.shared.select_workspace') }}</p>
-    <div class="flex border" v-loading="loading">
+    <div class="flex border" v-loading="loading" style="overflow: hidden;">
       <div class="border-r">
         <el-input
           v-model="search"
