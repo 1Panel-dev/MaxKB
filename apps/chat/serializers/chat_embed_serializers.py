@@ -41,7 +41,7 @@ class ChatEmbedSerializer(serializers.Serializer):
         show_guide = 'true'
         float_icon = f"{self.data.get('protocol')}://{self.data.get('host')}{CONFIG.get_chat_path()}/MaxKB.gif"
         is_license_valid = DatabaseModelManage.get_model('license_is_valid')
-        X_PACK_LICENSE_IS_VALID = is_license_valid() if is_license_valid() is not None else False
+        X_PACK_LICENSE_IS_VALID = is_license_valid() if is_license_valid is not None else False
         # 获取接入的query参数
         query = self.get_query_api_input(application_access_token.application, params)
         float_location = {"x": {"type": "right", "value": 0}, "y": {"type": "bottom", "value": 30}}
