@@ -38,6 +38,6 @@ def run():
             clean_debug_file_job = scheduler.get_job(job_id='clean_debug_file')
             if clean_debug_file_job is not None:
                 clean_debug_file_job.remove()
-            scheduler.add_job(clean_debug_file, 'cron', hour='*', minute='*/1', second='0', id='clean_debug_file')
+            scheduler.add_job(clean_debug_file, 'cron', hour='*', minute='*/30', second='0', id='clean_debug_file')
         finally:
             un_lock('clean_debug_file')
