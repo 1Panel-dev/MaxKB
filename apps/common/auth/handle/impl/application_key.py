@@ -9,10 +9,9 @@
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 
-from application.models import ApplicationApiKey, ChatUserType
+from application.models import ApplicationApiKey, ChatUserType, ApplicationAccessToken
 from common.auth.handle.auth_base_handle import AuthBaseHandle
 from common.constants.permission_constants import Permission, Group, Operate, RoleConstants, ChatAuth
-from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.exception.app_exception import AppAuthenticationFailed
 
 
@@ -23,12 +22,12 @@ class ApplicationKey(AuthBaseHandle):
             raise AppAuthenticationFailed(500, _('Secret key is invalid'))
         if not application_api_key.is_active:
             raise AppAuthenticationFailed(500, _('Secret key is invalid'))
-        application_setting_model = DatabaseModelManage.get_model("application_setting")
-        if application_setting_model is not None:
-            application_setting = QuerySet(application_setting_model).filter(
-                application_id=application_api_key.application_id).first()
-            if application_setting.authentication:
-                if application_setting.authentication != 'password':
+        application_access_token = QuerySet(ApplicationAccessToken).filter(
+            application_id=application_api_key.application_id).first()
+        if application_access_token is not None:
+            if application_access_token.authentication:
+                if application_access_token.authentication_value.get('type',
+                                                                     'password') != 'password':
                     raise AppAuthenticationFailed(1002, _('Authentication information is incorrect'))
         return None, ChatAuth(
             current_role_list=[RoleConstants.CHAT_ANONYMOUS_USER],
