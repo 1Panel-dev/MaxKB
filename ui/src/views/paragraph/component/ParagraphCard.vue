@@ -20,18 +20,23 @@
           v-model="data.is_active"
           :before-change="() => changeState(data)"
           size="small"
+          v-if="permissionPrecise.doc_edit(id)" 
         />
 
         <el-divider direction="vertical" />
         <span class="mr-8">
-          <el-button link @click.stop="editParagraph(data)">
+          <el-button link @click.stop="editParagraph(data)"
+            v-if="permissionPrecise.doc_edit(id)"
+          >
             <el-icon :size="16" :title="$t('common.edit')">
               <EditPen />
             </el-icon>
           </el-button>
         </span>
         <span class="mr-8">
-          <el-button link @click.stop="addParagraph(data)">
+          <el-button link @click.stop="addParagraph(data)"
+            v-if="permissionPrecise.doc_edit(id)"
+          >
             <el-icon :size="16" :title="$t('common.add')">
               <el-icon><CirclePlus /></el-icon>
             </el-icon>
@@ -43,15 +48,19 @@
           </el-button>
           <template #dropdown>
             <el-dropdown-menu style="min-width: 140px;">
-              <el-dropdown-item @click.stop="openGenerateDialog(data)">
+              <el-dropdown-item @click.stop="openGenerateDialog(data)"
+                v-if="permissionPrecise.doc_generate(id)"
+              >
                 <el-icon><Connection /></el-icon>
                 {{ $t('views.document.generateQuestion.title') }}</el-dropdown-item
               >
-              <el-dropdown-item @click.stop="openSelectDocumentDialog(data)">
+              <el-dropdown-item @click.stop="openSelectDocumentDialog(data)"
+                v-if="permissionPrecise.doc_edit(id)"
+              >
                 <AppIcon iconName="app-migrate"></AppIcon>
                 {{ $t('views.document.setting.migration') }}</el-dropdown-item
               >
-               <el-dropdown-item>
+               <el-dropdown-item v-if="permissionPrecise.doc_edit(id)">
                 <el-dropdown class="w-full" trigger="hover" :show-arrow="false" placement="right-start" popper-class="move-position-popper">
                   <div class="w-full flex-between" style="line-height: 22px;">
                     <div class="flex align-center">
@@ -79,7 +88,9 @@
                   </template>
                 </el-dropdown>
               </el-dropdown-item>
-              <el-dropdown-item icon="Delete" @click.stop="deleteParagraph(data)">{{
+              <el-dropdown-item icon="Delete" @click.stop="deleteParagraph(data)"
+                v-if="permissionPrecise.doc_edit(id)"
+              >{{
                 $t('common.delete')
               }}</el-dropdown-item>
             </el-dropdown-menu>
@@ -119,6 +130,7 @@ import ParagraphDialog from '@/views/paragraph/component/ParagraphDialog.vue'
 import SelectDocumentDialog from '@/views/paragraph/component/SelectDocumentDialog.vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import permissionMap from '@/permission'
 import { t } from '@/locales'
 const props = defineProps<{
   data: any
@@ -126,6 +138,8 @@ const props = defineProps<{
   showMoveUp?: boolean
   showMoveDown?: boolean
 }>()
+
+console.log(props)
 
 const route = useRoute()
 const {
@@ -135,6 +149,10 @@ const {
 
 const apiType = computed(() => {
   return type as 'systemShare' | 'workspace' | 'systemManage'
+})
+
+const permissionPrecise = computed (() => {
+  return permissionMap['knowledge'][apiType.value]
 })
 
 const emit = defineEmits(['clickCard','changeState', 'deleteParagraph', 'refresh', 'refreshMigrateParagraph','move'])
@@ -202,7 +220,11 @@ function editParagraph(row: any) {
   }
 }
 
+const cardClick = permissionPrecise.value.doc_edit(id)
+
 function handleClickCard(row: any) {
+  if (!cardClick) 
+  {return }
   if (!props.disabled) {
     editParagraph(row)
   }else {

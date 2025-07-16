@@ -12,7 +12,7 @@
         >）
       </el-text>
     </div>
-    <div class="header-button" v-if="!shareDisabled">
+    <div class="header-button" v-if="!shareDisabled &&  permissionPrecise.doc_edit(id)">
       <el-button @click="batchSelectedHandle(true)" v-if="isBatch === false">
         {{ $t('views.paragraph.setting.batchSelected') }}
       </el-button>
@@ -172,6 +172,7 @@ import GenerateRelatedDialog from '@/components/generate-related-dialog/index.vu
 import { VueDraggable } from 'vue-draggable-plus'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import permissionMap from '@/permission'
 import { t } from '@/locales'
 const route = useRoute()
 const {
@@ -185,6 +186,10 @@ const apiType = computed(() => {
 const shareDisabled = computed(() => {
   return isShared === 'true'
 })
+const permissionPrecise = computed(() => {
+  return permissionMap['knowledge'][apiType.value]
+})
+
 
 const SelectDocumentDialogRef = ref()
 const ParagraphDialogRef = ref()
