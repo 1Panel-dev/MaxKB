@@ -183,7 +183,7 @@
                   :title="rightPanelDetail?.document_name?.trim()"
                 >
                   <el-button text>
-                    <el-icon> <Download /> </el-icon>
+                    <AppIcon iconName="app-pdf-export" class="cursor"></AppIcon>
                   </el-button>
                 </a>
               </span>

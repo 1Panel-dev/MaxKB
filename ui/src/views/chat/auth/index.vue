@@ -7,7 +7,6 @@
 </template>
 <script setup lang="ts">
 import { computed } from 'vue'
-import { isAppIcon } from '@/utils/common'
 
 const auth_components: any = import.meta.glob('@/views/chat/auth/component/*.vue', {
   eager: true,

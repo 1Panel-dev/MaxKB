@@ -119,7 +119,7 @@ const getUserGroupUserList: (
 }
 
 /**
- * 获取工作空间下共享知识库的用户组 
+ * 获取工作空间下共享知识库的用户组
  */
 const getUserGroupList: (resource: any, loading?: Ref<boolean>) => Promise<Result<ChatUserGroupItem[]>> = (resource, loading) => {
   return get (`${prefix}/${prefix_workspace.value}/KNOWLEDGE/${resource.resource_id}/user_group`, undefined, loading)
@@ -170,6 +170,16 @@ const getToolListPage: (
   )
 }
 
+/**
+ * 获取全部用户
+ */
+const getAllMemberList: (arg: string, loading?: Ref<boolean>) => Promise<Result<Record<string, any>[]>> = (
+  arg,
+  loading,
+) => {
+  return get('/user/list', undefined, loading)
+}
+
 export default {
   getKnowledgeList,
   getKnowledgeListPage,
@@ -182,5 +192,6 @@ export default {
   getToolList,
   getToolListPage,
   getUserGroupList,
-  getUserGroupUserList
+  getUserGroupUserList,
+  getAllMemberList
 }

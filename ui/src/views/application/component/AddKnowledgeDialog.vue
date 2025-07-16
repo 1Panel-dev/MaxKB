@@ -36,7 +36,7 @@
             :canOperation="false"
             showShared
             :shareTitle="$t('views.shared.shared_knowledge')"
-            :treeStyle="{ height: 'calc(100vh - 320px)' }"
+            :treeStyle="{ height: 'calc(100vh - 240px)' }"
           />
         </div>
       </template>
@@ -250,7 +250,7 @@ defineExpose({ open })
   }
 
   .el-dialog__headerbtn {
-    top: 3px;
+    top: 2px;
     right: 6px;
   }
 }

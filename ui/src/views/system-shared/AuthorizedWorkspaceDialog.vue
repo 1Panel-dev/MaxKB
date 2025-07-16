@@ -17,7 +17,7 @@
           v-model="search"
           :validate-event="false"
           :placeholder="$t('common.search')"
-          style="width: 364px; padding: 16px 16px 0 16px;"
+          style="width: 364px; padding: 16px 16px 0 16px"
           clearable
         >
           <template #prefix>
@@ -29,7 +29,7 @@
         <div class="mt-8">
           <el-checkbox
             class="mb-8"
-            style="margin-left: 16px;"
+            style="margin-left: 16px"
             v-model="checkAll"
             :indeterminate="isIndeterminate"
             @change="handleCheckAllChange"
@@ -38,23 +38,23 @@
             {{ $t('views.shared.allCheck') }}
           </el-checkbox>
           <el-scrollbar max-height="205" wrap-class="p-16 pt-0">
-          <el-checkbox-group
-            class="checkbox-group-block"
-            v-model="checkedWorkspace"
-            @change="handleCheckedWorkspaceChange"
-          >
-            <el-checkbox
-              v-for="space in workspaceWithKeywords"
-              :key="space.id"
-              :label="space.name"
-              :value="space"
+            <el-checkbox-group
+              class="checkbox-group-block"
+              v-model="checkedWorkspace"
+              @change="handleCheckedWorkspaceChange"
             >
-              <div class="flex">
-                <AppIcon iconName="app-workspace"></AppIcon>
-                <span class="ml-4 ellipsis" :title="space.name"> {{ space.name }}</span>
-              </div>
-            </el-checkbox>
-          </el-checkbox-group>
+              <el-checkbox
+                v-for="space in workspaceWithKeywords"
+                :key="space.id"
+                :label="space.name"
+                :value="space"
+              >
+                <div class="flex">
+                  <AppIcon iconName="app-workspace"></AppIcon>
+                  <span class="ml-4 ellipsis" :title="space.name"> {{ space.name }}</span>
+                </div>
+              </el-checkbox>
+            </el-checkbox-group>
           </el-scrollbar>
         </div>
       </div>
@@ -69,19 +69,19 @@
           </el-button>
         </div>
         <el-scrollbar max-height="250" wrap-class="p-16 pt-0">
-        <template v-for="ele in checkedWorkspace">
-          <div class="flex-between">
-            <div class="flex align-center">
-              <AppIcon iconName="app-workspace"></AppIcon>
-              <span class="ml-4 lighter ellipsis" :title="ele.name">{{ ele.name }}</span>
+          <template v-for="ele in checkedWorkspace">
+            <div class="flex-between">
+              <div class="flex align-center">
+                <AppIcon iconName="app-workspace"></AppIcon>
+                <span class="ml-4 lighter ellipsis" :title="ele.name">{{ ele.name }}</span>
+              </div>
+              <el-button link>
+                <el-icon @click="clearWorkspace(ele)" :size="18">
+                  <Close />
+                </el-icon>
+              </el-button>
             </div>
-            <el-button link>
-              <el-icon @click="clearWorkspace(ele)" :size="18">
-                <Close />
-              </el-icon>
-            </el-button>
-          </div>
-        </template>
+          </template>
         </el-scrollbar>
       </div>
     </div>
