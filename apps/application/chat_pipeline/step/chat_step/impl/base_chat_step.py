@@ -65,7 +65,7 @@ def event_content(response,
                   message_list: List[BaseMessage],
                   problem_text: str,
                   padding_problem_text: str = None,
-                  client_id=None, client_type=None,
+                  chat_user_id=None, chat_user_type=None,
                   is_ai_chat: bool = None,
                   model_setting=None):
     if model_setting is None:
@@ -134,14 +134,16 @@ def event_content(response,
                                                                      request_token, response_token,
                                                                      {'node_is_end': True, 'view_type': 'many_view',
                                                                       'node_type': 'ai-chat-node'})
-        add_access_num(client_id, client_type, manage.context.get('application_id'))
+        if not manage.debug:
+            add_access_num(chat_user_id, chat_user_type, manage.context.get('application_id'))
     except Exception as e:
         maxkb_logger.error(f'{str(e)}:{traceback.format_exc()}')
         all_text = 'Exception:' + str(e)
         write_context(step, manage, 0, 0, all_text)
         post_response_handler.handler(chat_id, chat_record_id, paragraph_list, problem_text,
                                       all_text, manage, step, padding_problem_text, reasoning_content='')
-        add_access_num(client_id, client_type, manage.context.get('application_id'))
+        if not manage.debug:
+            add_access_num(chat_user_id, chat_user_type, manage.context.get('application_id'))
         yield manage.get_base_to_response().to_stream_chunk_response(chat_id, str(chat_record_id), 'ai-chat-node',
                                                                      [], all_text,
                                                                      False,
@@ -281,7 +283,7 @@ class BaseChatStep(IChatStep):
                       paragraph_list=None,
                       manage: PipelineManage = None,
                       padding_problem_text: str = None,
-                      client_id=None, client_type=None, no_references_setting=None,
+                      chat_user_id=None, chat_user_type=None, no_references_setting=None,
                       model_setting=None):
         reasoning_content_enable = model_setting.get('reasoning_content_enable', False)
         reasoning_content_start = model_setting.get('reasoning_content_start', '<think>')
@@ -311,7 +313,8 @@ class BaseChatStep(IChatStep):
             post_response_handler.handler(chat_id, chat_record_id, paragraph_list, problem_text,
                                           content, manage, self, padding_problem_text,
                                           reasoning_content=reasoning_content)
-            add_access_num(client_id, client_type, manage.context.get('application_id'))
+            if not manage.debug:
+                add_access_num(chat_user_id, chat_user_type, manage.context.get('application_id'))
             return manage.get_base_to_response().to_block_response(str(chat_id), str(chat_record_id),
                                                                    content, True,
                                                                    request_token, response_token,
@@ -326,6 +329,7 @@ class BaseChatStep(IChatStep):
             write_context(self, manage, 0, 0, all_text)
             post_response_handler.handler(chat_id, chat_record_id, paragraph_list, problem_text,
                                           all_text, manage, self, padding_problem_text, reasoning_content='')
-            add_access_num(client_id, client_type, manage.context.get('application_id'))
+            if not manage.debug:
+                add_access_num(chat_user_id, chat_user_type, manage.context.get('application_id'))
             return manage.get_base_to_response().to_block_response(str(chat_id), str(chat_record_id), all_text, True, 0,
                                                                    0, _status=status.HTTP_500_INTERNAL_SERVER_ERROR)
