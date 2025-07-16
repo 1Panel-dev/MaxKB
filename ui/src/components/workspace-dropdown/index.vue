@@ -17,11 +17,17 @@
         <el-dropdown-menu v-loading="loading">
           <el-dropdown-item v-for="item in filterData" :key="item.id"
             :class="`${item.id === currentWorkspace?.id ? 'active' : ''} flex-between`" @click="changeWorkspace(item)">
-            <div class="flex align-center">
+            <div class="flex align-center" style="overflow: hidden;">
               <AppIcon class="mr-8" iconName="app-workspace" style="font-size: 16px"></AppIcon>
-              <span class="ellipsis" :title="item.name">
+              <span class="ellipsis" style="flex:1" :title="item.name">
                 {{ item.name }}
               </span>
+              <TagGroup
+                v-if="item.role_name"
+                class="ml-8"
+                size="small"
+                :tags="item.role_name"
+              />
             </div>
             <el-icon v-show="item.id === currentWorkspace?.id" class="ml-8" style="font-size: 16px; margin-right: 0">
               <Check />
@@ -86,6 +92,6 @@ watch([() => props.data, () => filterText.value], () => {
 </style>
 <style lang="scss">
 .workspace-dropdown-popper {
-  width: 280px;
+  width: 340px;
 }
 </style>
