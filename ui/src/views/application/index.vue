@@ -640,6 +640,7 @@ function getFolder(bool?: boolean) {
 
 function clickFolder(item: any) {
   folder.setCurrentFolder(item)
+  paginationConfig.current_page = 1
   applicationList.value = []
   getList()
 }
@@ -649,11 +650,13 @@ function folderClickHandle(row: any) {
     return
   }
   folder.setCurrentFolder(row)
+  paginationConfig.current_page = 1
   applicationList.value = []
   getList()
 }
 
 function refreshFolder() {
+  paginationConfig.current_page = 1
   applicationList.value = []
   getFolder()
 }
