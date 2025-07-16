@@ -6,7 +6,6 @@
     @date：2024/3/14 11:56
     @desc:
 """
-import logging
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from django.db.models import QuerySet
@@ -27,9 +26,9 @@ def client_access_num_reset_job():
 @lock(lock_key="access_num_reset_execute", timeout=30)
 def client_access_num_reset_job_lock():
     from django.utils.translation import gettext_lazy as _
-    maxkb_logger.info(_('start reset access_num'))
+    maxkb_logger.debug(_('start reset access_num'))
     QuerySet(ApplicationChatUserStats).update(intraday_access_num=0)
-    maxkb_logger.info(_('end reset access_num'))
+    maxkb_logger.debug(_('end reset access_num'))
 
 
 def run():

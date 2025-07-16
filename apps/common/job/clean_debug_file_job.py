@@ -1,5 +1,5 @@
 # coding=utf-8
-
+import time
 from datetime import timedelta
 
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -32,6 +32,7 @@ def clean_debug_file_lock():
         Q(create_time__lt=two_hours_ago, source_type=FileSourceType.TEMPORARY_120_MINUTE.value) |
         Q(create_time__lt=minutes_30_ago, source_type=FileSourceType.TEMPORARY_30_MINUTE.value)).delete()
     maxkb_logger.debug(_('end clean debug file'))
+    time.sleep(2)
 
 
 def run():

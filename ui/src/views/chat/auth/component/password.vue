@@ -13,6 +13,7 @@ import { ref, computed } from 'vue'
 import useStore from '@/stores'
 import { t } from '@/locales'
 import { useRoute, useRouter } from 'vue-router'
+const route = useRoute()
 const FormRef = ref()
 
 const { chatUser } = useStore()

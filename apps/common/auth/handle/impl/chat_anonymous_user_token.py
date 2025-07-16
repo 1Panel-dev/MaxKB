@@ -16,6 +16,7 @@ from common.constants.authentication_type import AuthenticationType
 from common.constants.permission_constants import RoleConstants, Permission, Group, Operate, ChatAuth
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.exception.app_exception import AppAuthenticationFailed
+from maxkb.settings import edition
 
 
 class ChatAnonymousUserToken(AuthBaseHandle):
@@ -41,7 +42,7 @@ class ChatAnonymousUserToken(AuthBaseHandle):
             raise AppAuthenticationFailed(1002, _('Authentication information is incorrect'))
         if not application_access_token.access_token == access_token:
             raise AppAuthenticationFailed(1002, _('Authentication information is incorrect'))
-        if application_access_token.authentication:
+        if application_access_token.authentication and ['PE', 'EE'].__contains__(edition):
             if chat_user_token.authentication.auth_type != application_access_token.authentication_value.get('type',
                                                                                                              ''):
                 raise AppAuthenticationFailed(1002, _('Authentication information is incorrect'))

@@ -1,17 +1,16 @@
 # coding=utf-8
 
-import logging
 import datetime
 
-from django.db import transaction
-from django.utils import timezone
 from apscheduler.schedulers.background import BackgroundScheduler
-from django_apscheduler.jobstores import DjangoJobStore
-from application.models import Application, Chat, ChatRecord
+from django.db import transaction
 from django.db.models import Q, Max
+from django.utils import timezone
+from django_apscheduler.jobstores import DjangoJobStore
+
+from application.models import Application, Chat, ChatRecord
 from common.utils.lock import try_lock, un_lock, lock
 from common.utils.logger import maxkb_logger
-
 from knowledge.models import File
 
 scheduler = BackgroundScheduler()
@@ -25,7 +24,7 @@ def clean_chat_log_job():
 @lock(lock_key='clean_chat_log_job_execute', timeout=30)
 def clean_chat_log_job_lock():
     from django.utils.translation import gettext_lazy as _
-    maxkb_logger.info(_('start clean chat log'))
+    maxkb_logger.debug(_('start clean chat log'))
     now = timezone.now()
 
     applications = Application.objects.all().values('id', 'clean_time')
@@ -71,7 +70,7 @@ def clean_chat_log_job_lock():
             if deleted_count < batch_size:
                 break
 
-    maxkb_logger.info(_('end clean chat log'))
+    maxkb_logger.debug(_('end clean chat log'))
 
 
 def run():
