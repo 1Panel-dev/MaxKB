@@ -21,30 +21,83 @@
           <div style="width: 90%">
             <p class="bold mb-4" style="font-size: 14px">{{ user.userInfo?.username }}</p>
             <template v-if="user.userInfo?.role_name && user.userInfo.role_name.length > 0">
-              <TagGroup size="small" :tags="user.userInfo?.role_name"
-                v-if="hasPermission([EditionConst.IS_EE, EditionConst.IS_PE],'OR')"
+              <TagGroup
+                size="small"
+                :tags="user.userInfo?.role_name"
+                v-if="hasPermission([EditionConst.IS_EE, EditionConst.IS_PE], 'OR')"
               />
             </template>
           </div>
         </div>
-        <el-dropdown-item class="border-t p-8" @click="openResetPassword"
-          v-if="hasPermission(new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE, RoleConst.USER],
+        <el-dropdown-item class="border-t"
+          @click="router.push({ path: `/system/user` })"
+          v-if="
+            hasPermission(
+              [
+                RoleConst.EXTENDS_ADMIN,
+                RoleConst.EXTENDS_WORKSPACE_MANAGE,
+                RoleConst.ADMIN,
+                RoleConst.WORKSPACE_MANAGE,
+              ],
+              'OR',
+            )
+          "
+        >
+          <div class="flex-between w-full">
+            {{ $t('views.system.title') }}
+            <AppIcon iconName="app-go"></AppIcon>
+          </div>
+        </el-dropdown-item>
+        <el-dropdown-item
+
+          @click="openResetPassword"
+          v-if="
+            hasPermission(
+              new ComplexPermission(
+                [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE, RoleConst.USER],
                 [PermissionConst.CHANGE_PASSWORD],
-                [],'OR'),'OR')"
+                [],
+                'OR',
+              ),
+              'OR',
+            )
+          "
         >
           {{ $t('views.login.resetPassword') }}
         </el-dropdown-item>
         <div>
-          <el-dropdown-item class="p-8" @click="openAPIKeyDialog"
-            v-if="hasPermission(new ComplexPermission([RoleConst.ADMIN],[PermissionConst.SYSTEM_API_KEY_EDIT],
-            [EditionConst.IS_EE,EditionConst.IS_PE],'OR'),'OR')"
+          <el-dropdown-item
+            class="p-8"
+            @click="openAPIKeyDialog"
+            v-if="
+              hasPermission(
+                new ComplexPermission(
+                  [RoleConst.ADMIN],
+                  [PermissionConst.SYSTEM_API_KEY_EDIT],
+                  [EditionConst.IS_EE, EditionConst.IS_PE],
+                  'OR',
+                ),
+                'OR',
+              )
+            "
           >
             {{ $t('layout.apiKey') }}
           </el-dropdown-item>
         </div>
-        <el-dropdown-item style="padding: 0" @click.stop
-          v-if="hasPermission(new ComplexPermission([RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE, RoleConst.USER],
-                [PermissionConst.SWITCH_LANGUAGE],[],'OR'),'OR')"
+        <el-dropdown-item
+          style="padding: 0"
+          @click.stop
+          v-if="
+            hasPermission(
+              new ComplexPermission(
+                [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE, RoleConst.USER],
+                [PermissionConst.SWITCH_LANGUAGE],
+                [],
+                'OR',
+              ),
+              'OR',
+            )
+          "
         >
           <el-dropdown class="w-full" trigger="hover" placement="left-start">
             <div class="flex-between w-full" style="line-height: 22px; padding: 12px 11px">
@@ -78,20 +131,11 @@
             </template>
           </el-dropdown>
         </el-dropdown-item>
-        <el-dropdown-item @click="openAbout"
-          v-if="hasPermission([RoleConst.ADMIN,PermissionConst.ABOUT_READ],'OR')"
+        <el-dropdown-item
+          @click="openAbout"
+          v-if="hasPermission([RoleConst.ADMIN, PermissionConst.ABOUT_READ], 'OR')"
         >
           {{ $t('layout.about.title') }}
-        </el-dropdown-item>
-
-        <el-dropdown-item @click="router.push({ path: `/system/user` })"
-          v-if="hasPermission([RoleConst.EXTENDS_ADMIN, RoleConst.EXTENDS_WORKSPACE_MANAGE,
-          RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],'OR')"
-        >
-          <div class="flex-between w-full">
-            {{ $t('views.system.title') }}
-            <AppIcon iconName="app-go"></AppIcon>
-          </div>
         </el-dropdown-item>
 
         <el-dropdown-item class="border-t" @click="logout">
@@ -114,10 +158,10 @@ import ResetPassword from './ResetPassword.vue'
 import AboutDialog from './AboutDialog.vue'
 // import UserPwdDialog from '@/views/user-manage/component/UserPwdDialog.vue'
 import APIKeyDialog from './APIKeyDialog.vue'
-import {ComplexPermission} from '@/utils/permission/type'
-import {langList} from '@/locales/index'
+import { ComplexPermission } from '@/utils/permission/type'
+import { langList } from '@/locales/index'
 import { hasPermission } from '@/utils/permission'
-import { PermissionConst, RoleConst,EditionConst } from '@/utils/permission/data'
+import { PermissionConst, RoleConst, EditionConst } from '@/utils/permission/data'
 
 const { user, login } = useStore()
 const router = useRouter()

@@ -111,8 +111,9 @@ class WorkspaceGroup(Enum):
     KNOWLEDGE = "KNOWLEDGE"
     MODEL = "MODEL"
     TOOL = "TOOL"
-    OTHER = "OTHER"
     RESOURCE_PERMISSION = "RESOURCE_PERMISSION"
+    OTHER = "OTHER"
+
 
 
 class UserGroup(Enum):

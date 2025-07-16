@@ -22,4 +22,4 @@ DEBUG = CONFIG.DEBUG or False
 APPS_DIR = os.path.join(PROJECT_DIR, 'apps')
 TMP_DIR = os.path.join(PROJECT_DIR, 'tmp')
 if not os.path.exists(TMP_DIR):
-    os.makedirs(TMP_DIR)
+    os.makedirs(TMP_DIR, 0o700, exist_ok=True)

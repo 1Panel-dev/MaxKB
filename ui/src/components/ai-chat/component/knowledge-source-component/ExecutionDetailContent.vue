@@ -636,7 +636,6 @@ const props = defineProps<{
   appType?: string
 }>()
 
-console.log(props)
 
 const messageList = computed(() => {
   const chat_step = props.detail?.find(item => item.step_type == "chat_step")
@@ -689,7 +688,6 @@ const historyRecord = computed<any>(() => {
   }
 })
 const messages = messageList.value.filter((item: any) => item.role != "system")
-console.log(messages)
 
 const currentChat = computed(() => {
   if (messageList.value) {

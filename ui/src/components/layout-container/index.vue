@@ -55,7 +55,7 @@ const showBack = computed(() => {
     .collapse {
       position: absolute;
       top: 36px;
-      right: -15px;
+      right: -12px;
       box-shadow: 0px 5px 10px 0px rgba(31, 35, 41, 0.1);
       z-index: 1;
     }

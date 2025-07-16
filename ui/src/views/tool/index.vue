@@ -16,7 +16,10 @@
     </template>
     <ToolListContainer @refreshFolder="refreshFolder">
       <template #header>
-        <FolderBreadcrumb :folderList="folderList" @click="folderClickHandle" />
+        <h2 v-if="folder.currentFolder?.id === 'share'">
+          {{ $t('views.shared.shared_tool') }}
+        </h2>
+        <FolderBreadcrumb :folderList="folderList" @click="folderClickHandle" v-else />
       </template>
     </ToolListContainer>
   </LayoutContainer>

@@ -119,7 +119,8 @@ class Knowledge(AppModelMixin):
     workspace_id = models.CharField(max_length=64, verbose_name="工作空间id", default="default", db_index=True)
     desc = models.CharField(max_length=256, verbose_name="描述")
     user = models.ForeignKey(User, on_delete=models.SET_NULL, db_constraint=False, blank=True, null=True)
-    type = models.IntegerField(verbose_name='类型', choices=KnowledgeType.choices, default=KnowledgeType.BASE, db_index=True)
+    type = models.IntegerField(verbose_name='类型', choices=KnowledgeType.choices, default=KnowledgeType.BASE,
+                               db_index=True)
     scope = models.CharField(max_length=20, verbose_name='可用范围', choices=KnowledgeScope.choices,
                              default=KnowledgeScope.WORKSPACE, db_index=True)
     folder = models.ForeignKey(KnowledgeFolder, on_delete=models.DO_NOTHING, verbose_name="文件夹id", default='default')
@@ -147,7 +148,8 @@ class Document(AppModelMixin):
     status = models.CharField(verbose_name='状态', max_length=20, default=get_default_status, db_index=True)
     status_meta = models.JSONField(verbose_name="状态统计数据", default=default_status_meta)
     is_active = models.BooleanField(default=True, db_index=True)
-    type = models.IntegerField(verbose_name='类型', choices=KnowledgeType.choices, default=KnowledgeType.BASE, db_index=True)
+    type = models.IntegerField(verbose_name='类型', choices=KnowledgeType.choices, default=KnowledgeType.BASE,
+                               db_index=True)
     hit_handling_method = models.CharField(verbose_name='命中处理方式', max_length=20,
                                            choices=HitHandlingMethod.choices,
                                            default=HitHandlingMethod.optimization)
@@ -226,6 +228,7 @@ class FileSourceType(models.TextChoices):
     DOCUMENT = "DOCUMENT"
     # 对话
     CHAT = "CHAT"
+    SYSTEM = "SYSTEM"
     # 临时30分钟 数据30分钟后被清理 source_id 为TEMPORARY_30_MINUTE
     TEMPORARY_30_MINUTE = "TEMPORARY_30_MINUTE"
     # 临时120分钟 数据120分钟后被清理 source_id为TEMPORARY_100_MINUTE
@@ -263,7 +266,8 @@ class File(AppModelMixin):
     sha256_hash = models.CharField(verbose_name="文件sha256_hash标识", default="")
     source_type = models.CharField(verbose_name="资源类型", choices=FileSourceType,
                                    default=FileSourceType.TEMPORARY_120_MINUTE.value, db_index=True)
-    source_id = models.CharField(verbose_name="资源id", default=FileSourceType.TEMPORARY_120_MINUTE.value, db_index=True)
+    source_id = models.CharField(verbose_name="资源id", default=FileSourceType.TEMPORARY_120_MINUTE.value,
+                                 db_index=True)
     loid = models.IntegerField(verbose_name="loid")
     meta = models.JSONField(verbose_name="文件关联数据", default=dict)
 

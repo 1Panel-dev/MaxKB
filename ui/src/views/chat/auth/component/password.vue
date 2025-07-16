@@ -19,6 +19,7 @@ const FormRef = ref()
 const { chatUser } = useStore()
 const loading = ref<boolean>(false)
 const router = useRouter()
+const route = useRoute()
 
 const auth = () => {
   return chatUser.passwordAuthentication(form.value.password).then((ok) => {

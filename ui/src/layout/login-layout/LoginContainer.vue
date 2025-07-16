@@ -1,5 +1,5 @@
 <template>
-  <div class="login-form-container">
+  <div class="login-form-container p-24">
     <div class="login-title">
       <div class="logo text-center">
         <slot name="logo">
@@ -24,6 +24,7 @@ defineProps({
 <style lang="scss" scoped>
 .login-form-container {
   width: 480px;
+
 
   .login-title {
     margin-bottom: 32px;
