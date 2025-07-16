@@ -289,7 +289,6 @@ const open = (data: any, type?: string) => {
     problem_optimization: data.problem_optimization,
     problem_optimization_prompt: data.problem_optimization_prompt,
   }
-  console.log(form.value.knowledge_setting.no_references_setting.status)
   if (!isWorkflowType.value) {
     noReferencesform.value[form.value.knowledge_setting.no_references_setting.status] =
       form.value.knowledge_setting.no_references_setting.value
