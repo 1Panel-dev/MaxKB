@@ -7,16 +7,12 @@
     @desc:
 """
 
-from apscheduler.schedulers.background import BackgroundScheduler
 from django.db.models import QuerySet
-from django_apscheduler.jobstores import DjangoJobStore
 
 from application.models import ApplicationChatUserStats
+from common.job.scheduler import scheduler
 from common.utils.lock import try_lock, un_lock, lock
 from common.utils.logger import maxkb_logger
-
-scheduler = BackgroundScheduler()
-scheduler.add_jobstore(DjangoJobStore(), "default")
 
 
 def client_access_num_reset_job():
@@ -34,7 +30,8 @@ def client_access_num_reset_job_lock():
 def run():
     if try_lock('access_num_reset', 30 * 30):
         try:
-            scheduler.start()
+            maxkb_logger.info('get lock access_num_reset')
+
             access_num_reset = scheduler.get_job(job_id='access_num_reset')
             if access_num_reset is not None:
                 access_num_reset.remove()

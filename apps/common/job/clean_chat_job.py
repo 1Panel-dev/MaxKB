@@ -2,19 +2,15 @@
 
 import datetime
 
-from apscheduler.schedulers.background import BackgroundScheduler
 from django.db import transaction
 from django.db.models import Q, Max
 from django.utils import timezone
-from django_apscheduler.jobstores import DjangoJobStore
 
 from application.models import Application, Chat, ChatRecord
+from common.job.scheduler import scheduler
 from common.utils.lock import try_lock, un_lock, lock
 from common.utils.logger import maxkb_logger
 from knowledge.models import File
-
-scheduler = BackgroundScheduler()
-scheduler.add_jobstore(DjangoJobStore(), "default")
 
 
 def clean_chat_log_job():
@@ -76,7 +72,8 @@ def clean_chat_log_job_lock():
 def run():
     if try_lock('clean_chat_log_job', 30 * 30):
         try:
-            scheduler.start()
+            maxkb_logger.info('get lock clean_chat_log_job')
+
             existing_job = scheduler.get_job(job_id='clean_chat_log')
             if existing_job is not None:
                 existing_job.remove()
