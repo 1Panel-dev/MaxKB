@@ -13,6 +13,7 @@ export default {
   userInput: '用戶輸入',
   quote: '引用',
   download: '點擊下載文件',
+  noDocument: '原文檔不存在',
   passwordValidator: {
     title: '請輸入密碼打開連結',
     errorMessage1: '密碼不能為空',
@@ -101,7 +102,7 @@ export default {
     historyRecord: '歷史記錄',
     currentChat: '本次對話',
     AiResponse: 'AI 回答',
-    knowedMessage: '已知資訊'
+    knowedMessage: '已知資訊',
   },
   editTitle: '編輯標題',
 }

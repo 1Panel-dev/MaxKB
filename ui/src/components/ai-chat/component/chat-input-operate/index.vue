@@ -271,11 +271,15 @@
             <el-button
               text
               class="sent-button"
-              :disabled="isDisabledChat || loading"
+              :disabled="isDisabledChat || loading || !uploadLoading"
               @click="sendChatHandle"
             >
-              <img v-show="isDisabledChat || loading" src="@/assets/icon_send.svg" alt="" />
-              <SendIcon v-show="!isDisabledChat && !loading" />
+              <img
+                v-show="isDisabledChat || loading || uploadLoading"
+                src="@/assets/icon_send.svg"
+                alt=""
+              />
+              <SendIcon v-show="!isDisabledChat && !loading && !uploadLoading" />
             </el-button>
           </template>
         </div>
@@ -777,7 +781,7 @@ function sendChatHandle(event?: any) {
   if (!event?.ctrlKey && !event?.shiftKey && !event?.altKey && !event?.metaKey) {
     // 如果没有按下组合键，则会阻止默认事件
     event?.preventDefault()
-    if (!isDisabledChat.value && !props.loading && !event?.isComposing) {
+    if (!isDisabledChat.value && !props.loading && !event?.isComposing && !uploadLoading.value) {
       if (inputValue.value.trim()) {
         autoSendMessage()
       }

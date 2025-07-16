@@ -3,7 +3,7 @@
     shadow="never"
     :title="index + 1 + '.' + data.title || '-'"
     class="paragraph-source-card cursor mb-8 paragraph-source-card-height"
-    :style="{ 'height': data?.document_name?.trim() ? '300px' : '260px' }"
+    :style="{ height: data?.document_name?.trim() ? '300px' : '260px' }"
     :class="data.is_active ? '' : 'disabled'"
     :showIcon="false"
   >
@@ -26,22 +26,23 @@
       >
         <el-text class="flex align-center item">
           <img :src="getImgUrl(data?.document_name?.trim())" alt="" width="20" class="mr-4" />
-
-          <template v-if="meta?.source_url">
-            <a
-              :href="getNormalizedUrl(meta?.source_url)"
-              target="_blank"
-              class="ellipsis-1 break-all"
-              :title="data?.document_name?.trim()"
-            >
-              {{ data?.document_name?.trim() }}
-            </a>
-          </template>
-          <template v-else>
-            <span class="ellipsis-1 break-all" :title="data?.document_name?.trim()">
-              {{ data?.document_name?.trim() }}
-            </span>
-          </template>
+          <div class="ml-8">
+            <div class="ml-4" v-if="data?.meta?.source_file_id || data?.meta?.source_url">
+              <a
+                :href="getFileUrl(data?.meta?.source_file_id) || data?.meta?.source_url"
+                target="_blank"
+                class="ellipsis-1"
+                :title="data?.document_name?.trim()"
+              >
+                <span :title="data?.document_name?.trim()">{{ data?.document_name }}</span>
+              </a>
+            </div>
+            <div v-else @click="infoMessage">
+              <span class="ellipsis-1 break-all" :title="data?.document_name?.trim()">
+                {{ data?.document_name?.trim() }}
+              </span>
+            </div>
+          </div>
         </el-text>
       </el-card>
       <div class="flex align-center border-t" style="padding: 12px 0 8px">
@@ -54,9 +55,10 @@
   </CardBox>
 </template>
 <script setup lang="ts">
-import { getImgUrl, getNormalizedUrl } from '@/utils/common'
+import { getImgUrl, getFileUrl } from '@/utils/common'
 import { computed } from 'vue'
-
+import { MsgInfo } from '@/utils/message'
+import { t } from '@/locales'
 const props = defineProps({
   data: {
     type: Object,
@@ -85,6 +87,9 @@ const parsedMeta = computed(() => {
 })
 
 const meta = computed(() => (isMetaObject.value ? props.data.meta : parsedMeta.value))
+function infoMessage() {
+  MsgInfo(t('chat.noDocument'))
+}
 </script>
 <style lang="scss" scoped>
 // .paragraph-source-card-height {

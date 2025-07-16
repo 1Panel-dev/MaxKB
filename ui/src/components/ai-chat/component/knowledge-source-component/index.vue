@@ -32,7 +32,10 @@
                   >
                     <p>{{ item && item?.document_name }}</p>
                   </div>
-                  <div class="ml-8" v-else>
+                  <div
+                    class="ml-4"
+                    v-else-if="item?.meta?.source_file_id || item?.meta?.source_url"
+                  >
                     <a
                       :href="getFileUrl(item?.meta?.source_file_id) || item?.meta?.source_url"
                       target="_blank"
@@ -41,6 +44,11 @@
                     >
                       <span :title="item?.document_name?.trim()">{{ item?.document_name }}</span>
                     </a>
+                  </div>
+                  <div v-else @click="infoMessage">
+                    <span class="ellipsis-1 break-all" :title="data?.document_name?.trim()">
+                      {{ data?.document_name?.trim() }}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -121,6 +129,7 @@ import ParagraphSourceContent from './ParagraphSourceContent.vue'
 import { arraySort } from '@/utils/array'
 import { getImgUrl, getFileUrl } from '@/utils/common'
 import { t } from '@/locales'
+import { MsgInfo } from '@/utils/message'
 const props = defineProps({
   data: {
     type: Object,
@@ -157,6 +166,10 @@ const dialogTitle = ref('')
 const currentComponent = shallowRef<any>(null)
 const currentChatDetail = ref<any>(null)
 const dialogType = ref('')
+
+function infoMessage() {
+  MsgInfo(t('chat.noDocument'))
+}
 function openParagraph(row: any, id?: string) {
   dialogTitle.value = t('chat.KnowledgeSource.title')
   const obj = cloneDeep(row)

@@ -17,6 +17,7 @@ export default {
   quote: '引用',
   download: '点击下载文件',
   transcribing: '转文字中',
+  noDocument: '原文档不存在',
   passwordValidator: {
     title: '请输入密码打开链接',
     errorMessage1: '密码不能为空',
@@ -94,7 +95,7 @@ export default {
     referenceParagraph: '引用分段',
     consume: '消耗tokens',
     consumeTime: '耗时',
-    noSource: '没有检索到知识来源'
+    noSource: '没有检索到知识来源',
   },
   paragraphSource: {
     title: '知识库引用',

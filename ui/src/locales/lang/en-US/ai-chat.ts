@@ -13,6 +13,7 @@ export default {
   userInput: 'User Input',
   quote: 'Quote',
   download: 'Click to Download',
+  noDocument: 'Original Document Not Found',
   passwordValidator: {
     title: 'Enter Password to Access',
     errorMessage1: 'Password cannot be empty',
