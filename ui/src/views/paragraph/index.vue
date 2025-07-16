@@ -236,16 +236,12 @@ function changeState(id: string) {
 }
 
 function refreshMigrateParagraph(data: any) {
-  console.log(data)
   if (data) {
     multipleSelection.value = [data.id]
   }
-  console.log(paragraphDetail.value)
-  console.log(multipleSelection.value)
   paragraphDetail.value = paragraphDetail.value.filter(
     (v) => !multipleSelection.value.includes(v.id),
   )
-  console.log(paragraphDetail.value)
   multipleSelection.value = []
   MsgSuccess(t('views.document.tip.migrationSuccess'))
 }

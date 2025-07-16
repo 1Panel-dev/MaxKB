@@ -483,7 +483,6 @@ const handlePaste = (event: ClipboardEvent) => {
 }
 // 新增拖拽处理
 const handleDrop = (event: DragEvent) => {
-  console.log(event)
   if (!props.applicationDetails.file_upload_enable) return
   event.preventDefault()
   const files = event.dataTransfer?.files

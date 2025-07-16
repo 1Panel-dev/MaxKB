@@ -120,7 +120,6 @@ function deleteMark() {
 }
 
 function getMark(data: any) {
-  console.log(data)
   chatLogApi
     .getMarkChatRecord(id as string, data.chat_id, data.id, loading)
     .then((res: any) => {

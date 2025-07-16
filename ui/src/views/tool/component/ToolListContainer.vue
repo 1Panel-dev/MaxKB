@@ -650,7 +650,6 @@ onMounted(() => {
     .then((res: any) => {
       user_options.value = res.data
     })
-  console.log(apiType.value)
 })
 </script>
 

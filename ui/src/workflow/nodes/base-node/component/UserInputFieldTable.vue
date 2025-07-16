@@ -169,8 +169,6 @@ function refreshFieldList(data: any, index: any) {
 function refreshFieldTitle(data: any) {
   inputFieldConfig.value = data
   UserInputTitleDialogRef.value.close()
-
-  // console.log('inputFieldConfig', inputFieldConfig.value)
 }
 
 const getDefaultValue = (row: any) => {

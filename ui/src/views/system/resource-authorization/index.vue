@@ -172,7 +172,6 @@ const permissionObj = ref<any>({
     'OR',
   ),
 })
-console.log(route.meta.resource || 'APPLICATION')
 const settingTags = reactive([
   {
     label: t('views.knowledge.title'),

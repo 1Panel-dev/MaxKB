@@ -217,7 +217,7 @@ const validate = () => {
 }
 
 onMounted(() => {
-  console.log(props.nodeModel.properties.node_data)
+  // console.log(props.nodeModel.properties.node_data)
   knowledgeList.value = props.nodeModel.properties.node_data.knowledge_list
   set(props.nodeModel, 'validate', validate)
 })

@@ -274,7 +274,6 @@ function changeTool() {
   form_data.value.mcp_server = form_data.value.mcp_tools.find(
     (item: any) => item.name === form_data.value.mcp_tool,
   )?.server
-  // console.log(form_data.value.mcp_server)
 
   const args_schema = form_data.value.mcp_tools.find(
     (item: any) => item.name === form_data.value.mcp_tool,
@@ -297,7 +296,6 @@ function changeTool() {
         } else if (params[item2].type === 'object') {
           input_type = 'JsonInput'
         }
-        console.log(params[item2])
         form_data.value.tool_form_field.push({
           field: item2,
           label: {
@@ -334,7 +332,6 @@ function changeTool() {
       } else if (args_schema.properties[item].type === 'object') {
         input_type = 'JsonInput'
       }
-      console.log(args_schema.properties[item])
       form_data.value.tool_form_field.push({
         field: item,
         label: {

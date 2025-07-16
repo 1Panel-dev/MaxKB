@@ -23,8 +23,6 @@ const {
   query: { mode },
 } = route as any
 
-
-console.log(mode)
 const currentTemplate = computed(() => {
   let modeName = ''
   if (chatUser.application) {
