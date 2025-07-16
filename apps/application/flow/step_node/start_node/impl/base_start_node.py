@@ -17,9 +17,11 @@ from application.flow.step_node.start_node.i_start_node import IStarNode
 
 
 def get_default_global_variable(input_field_list: List):
-    return {item.get('variable'): item.get('default_value') for item in input_field_list if
-            item.get('default_value', None) is not None}
-
+    return {
+        item.get('variable') or item.get('field'): item.get('default_value')
+        for item in input_field_list
+        if item.get('default_value', None) is not None
+    }
 
 def get_global_variable(node):
     body = node.workflow_manage.get_body()
