@@ -36,7 +36,7 @@ langchain-google-genai = "2.1.7"
 langchain-mcp-adapters = "0.1.9"
 langchain-huggingface = "0.3.0"
 langchain-ollama = "0.3.4"
-langgraph = "0.5.2"
+langgraph = "0.5.3"
 torch = "2.7.1"
 sentence-transformers = "5.0.0"
 
