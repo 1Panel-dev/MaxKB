@@ -200,6 +200,8 @@ class ToolSerializer(serializers.Serializer):
             if with_valid:
                 self.is_valid(raise_exception=True)
                 ToolCreateRequest(data=instance).is_valid(raise_exception=True)
+                # 校验代码是否包括禁止的关键字
+                ToolExecutor().validate_banned_keywords(instance.get('code', ''))
             tool_id = uuid.uuid7()
             Tool(
                 id=tool_id,
@@ -312,6 +314,8 @@ class ToolSerializer(serializers.Serializer):
             if with_valid:
                 self.is_valid(raise_exception=True)
                 ToolEditRequest(data=instance).is_valid(raise_exception=True)
+                # 校验代码是否包括禁止的关键字
+                ToolExecutor().validate_banned_keywords(instance.get('code', ''))
             if not QuerySet(Tool).filter(id=self.data.get('id')).exists():
                 raise serializers.ValidationError(_('Tool not found'))
 

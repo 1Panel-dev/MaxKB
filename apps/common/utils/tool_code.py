@@ -38,7 +38,7 @@ class ToolExecutor:
             os.umask(old_mask)
 
     def exec_code(self, code_str, keywords):
-        self.validateBannedKeywords(code_str)
+        self.validate_banned_keywords(code_str)
         _id = str(uuid.uuid7())
         success = '{"code":200,"msg":"成功","data":exec_result}'
         err = '{"code":500,"msg":str(e),"data":None}'
@@ -96,7 +96,7 @@ except Exception as e:
         os.remove(exec_python_file)
         return subprocess_result
 
-    def validateBannedKeywords(self, code_str):
+    def validate_banned_keywords(self, code_str):
         matched = next((bad for bad in self.banned_keywords if bad in code_str), None)
         if matched:
             raise Exception(f"keyword '{matched}' is banned in the tool.")
