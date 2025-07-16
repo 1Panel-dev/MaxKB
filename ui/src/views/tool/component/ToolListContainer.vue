@@ -605,6 +605,7 @@ watch(
   () => folder.currentFolder,
   (newValue) => {
     if (newValue && newValue.id) {
+      paginationConfig.current_page = 1
       tool.setToolList([])
       getList()
     }

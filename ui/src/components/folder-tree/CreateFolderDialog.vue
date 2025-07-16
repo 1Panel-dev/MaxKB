@@ -54,7 +54,6 @@ import folderApi from '@/api/folder'
 import { MsgSuccess, MsgAlert } from '@/utils/message'
 import { t } from '@/locales'
 import useStore from '@/stores'
-import disable$ from 'dingtalk-jsapi/api/ui/pullToRefresh/disable'
 const { tool, knowledge, folder } = useStore()
 const emit = defineEmits(['refresh'])
 
@@ -126,7 +125,6 @@ const submitHandle = async () => {
           .putFolder(editId.value, sourceType.value, folderForm.value, loading)
           .then((res) => {
             MsgSuccess(t('common.editSuccess'))
-            clearData()
             emit('refresh')
             dialogVisible.value = false
           })

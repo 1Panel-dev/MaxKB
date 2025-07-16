@@ -343,7 +343,6 @@ import { t } from '@/locales'
 import { SourceTypeEnum } from '@/enums/common'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import permissionMap from '@/permission'
-
 const router = useRouter()
 const route = useRoute()
 const { folder, user, knowledge } = useStore()
@@ -496,6 +495,7 @@ watch(
   () => folder.currentFolder,
   (newValue) => {
     if (newValue && newValue.id) {
+      paginationConfig.current_page = 1
       knowledge.setKnowledgeList([])
       getList()
     }
