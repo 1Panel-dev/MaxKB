@@ -17,7 +17,7 @@
                       new ComplexPermission(
                         [RoleConst.ADMIN],
                         [PermissionConst.LOGIN_AUTH_EDIT],
-                        [],'OR',)"  
+                        [],'OR',)"
               >{{ $t('views.system.authentication.scanTheQRCode.access') }}
               </el-button>
               <span v-if="item.isValid">
@@ -155,7 +155,7 @@ function createPlatform(key: string, name: string): Platform {
 
   return {
     key,
-    logoSrc: new URL(`../../../../assets/scan/logo_${logo}.svg`, import.meta.url).href,
+    logoSrc: new URL(`../../../../assets/logo/logo_${logo}.svg`, import.meta.url).href,
     name,
     isActive: false,
     isValid: false,

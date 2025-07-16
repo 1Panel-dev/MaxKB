@@ -1,6 +1,6 @@
 <template>
   <div class="flex-center mb-16">
-    <img src="@/assets/scan/logo_lark.svg " alt="" width="24px" class="mr-4" />
+    <img src="@/assets/logo/logo_lark.svg " alt="" width="24px" class="mr-4" />
     <h2>{{ $t('views.system.authentication.scanTheQRCode.larkQrCode') }}</h2>
   </div>
   <div id="lark-qr" class="lark-qrName"></div>

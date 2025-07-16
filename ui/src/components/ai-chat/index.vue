@@ -551,7 +551,7 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean, other_para
         if (props.chatId === 'new') {
           emit('refresh', chartOpenId.value)
         }
-        return (id || props.applicationDetails?.show_source || props.applicationDetails?.show_exec) && getSourceDetail(chat)
+        return id && getSourceDetail(chat)
       })
       .finally(() => {
         ChatManagement.close(chat.id)

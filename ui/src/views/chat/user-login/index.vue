@@ -133,7 +133,7 @@
             class="login-button-circle color-secondary"
             @click="changeMode('QR_CODE')"
           >
-            <img src="@/assets/scan/icon_qr_outlined.svg" width="25px" />
+            <img src="@/assets/icon_qr_outlined.svg" width="25px" />
           </el-button>
           <el-button
             v-if="item === 'LOCAL' && loginMode != 'LOCAL'"

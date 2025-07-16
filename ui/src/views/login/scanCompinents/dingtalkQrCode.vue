@@ -1,6 +1,6 @@
 <template>
   <div class="flex-center mb-16">
-    <img src="@/assets/scan/logo_dingtalk.svg" alt="" width="24px" class="mr-4" />
+    <img src="@/assets/logo/logo_dingtalk.svg" alt="" width="24px" class="mr-4" />
     <h2>{{ $t('views.system.authentication.scanTheQRCode.dingtalkQrCode') }}</h2>
   </div>
   <div class="ding-talk-qrName">
