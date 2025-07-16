@@ -165,6 +165,14 @@ const share = {
       ],
       'OR'
     ),
+  problem_edit: () => 
+    hasPermission (
+      [
+        RoleConst.ADMIN,
+        PermissionConst.SHARED_KNOWLEDGE_PROBLEM_EDIT
+      ],
+      'OR'
+    ),
   folderCreate: () => false,
   folderEdit: () => false,
   folderDelete: () => false,
