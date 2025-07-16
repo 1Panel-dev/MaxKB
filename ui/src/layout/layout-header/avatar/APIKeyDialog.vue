@@ -151,6 +151,7 @@ const open = () => {
 
 function getApiKeyList() {
   systemKeyApi.getAPIKey().then((res) => {
+    res.data.sort((x:any,y:any)=>x.name < y.name ? 1 : -1)
     apiKey.value = res.data
   })
 }
