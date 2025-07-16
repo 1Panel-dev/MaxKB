@@ -22,7 +22,7 @@ def clean_debug_file():
 @lock(lock_key='clean_debug_file_execute', timeout=30)
 def clean_debug_file_lock():
     from django.utils.translation import gettext_lazy as _
-    maxkb_logger.info(_('start clean debug file'))
+    maxkb_logger.debug(_('start clean debug file'))
     minutes_30_ago = timezone.now() - timedelta(minutes=30)
     two_hours_ago = timezone.now() - timedelta(hours=2)
     one_days_ago = timezone.now() - timedelta(hours=24)
@@ -31,7 +31,7 @@ def clean_debug_file_lock():
         Q(create_time__lt=one_days_ago, source_type=FileSourceType.TEMPORARY_1_DAY.value) |
         Q(create_time__lt=two_hours_ago, source_type=FileSourceType.TEMPORARY_120_MINUTE.value) |
         Q(create_time__lt=minutes_30_ago, source_type=FileSourceType.TEMPORARY_30_MINUTE.value)).delete()
-    maxkb_logger.info(_('end clean debug file'))
+    maxkb_logger.debug(_('end clean debug file'))
 
 
 def run():
