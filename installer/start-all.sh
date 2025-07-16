@@ -2,7 +2,7 @@
 
 set -e
 
-if [ -f "/var/lib/postgresql/data/PG_VERSION" ]; then
+if [ -f "/opt/maxkb/PG_VERSION" ]; then
   # 如果是v1版本一键安装的的目录则退出
   echo "The existing data is from v1 and is not compatible with v2, installing v2 over v1 is not supported."
   echo "The process will now exit."
