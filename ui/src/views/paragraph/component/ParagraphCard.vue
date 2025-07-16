@@ -123,7 +123,7 @@
   </el-card>
 </template>
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import GenerateRelatedDialog from '@/components/generate-related-dialog/index.vue'
 import ParagraphDialog from '@/views/paragraph/component/ParagraphDialog.vue'
@@ -154,7 +154,7 @@ const permissionPrecise = computed (() => {
   return permissionMap['knowledge'][apiType.value]
 })
 
-const emit = defineEmits(['clickCard','changeState', 'deleteParagraph', 'refresh', 'refreshMigrateParagraph','move'])
+const emit = defineEmits(['dialogVisibleChange','clickCard','changeState', 'deleteParagraph', 'refresh', 'refreshMigrateParagraph','move'])
 const loading = ref(false)
 const changeStateloading = ref(false)
 const show = ref(false)
@@ -222,7 +222,7 @@ function editParagraph(row: any) {
 const cardClick = permissionPrecise.value.doc_edit(id)
 
 function handleClickCard(row: any) {
-  if (!cardClick) 
+  if (!cardClick || dialogVisible.value) 
   {return }
   if (!props.disabled) {
     editParagraph(row)
@@ -248,6 +248,11 @@ function refresh(data?: any) {
 function refreshMigrateParagraph() {
   emit('refreshMigrateParagraph', props.data)
 }
+
+const dialogVisible = computed(()=> ParagraphDialogRef.value?.dialogVisible || SelectDocumentDialogRef.value?.dialogVisible || GenerateRelatedDialogRef.value?.dialogVisible)
+watch(dialogVisible, (val: boolean)=>{
+  emit('dialogVisibleChange', val)
+})
 </script>
 <style lang="scss" scoped>
 .paragraph-box {

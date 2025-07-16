@@ -86,6 +86,6 @@ function changeDocument(document_id: string) {
   localStorage.setItem(id + 'chat_document_id', document_id)
 }
 
-defineExpose({ open })
+defineExpose({ open, dialogVisible })
 </script>
 <style lang="scss" scoped></style>

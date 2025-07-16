@@ -85,7 +85,7 @@
                     <VueDraggable
                       ref="el"
                       v-model="paragraphDetail"
-                      :disabled="isBatch === true || shareDisabled || !permissionPrecise.doc_edit(id)"
+                      :disabled="isBatch === true || shareDisabled || dialogVisible || !permissionPrecise.doc_edit(id)"
                       handle=".handle"
                       :animation="150"
                       ghostClass="ghost"
@@ -118,6 +118,7 @@
                               @refresh="refresh"
                               @refreshMigrateParagraph="refreshMigrateParagraph"
                               :disabled="shareDisabled"
+                              @dialogVisibleChange="dialogVisibleChange"
                             />
                           </div>
                         </div>
@@ -163,7 +164,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { reactive, ref, onMounted, computed } from 'vue'
+import { reactive, ref, onMounted, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import ParagraphDialog from './component/ParagraphDialog.vue'
 import ParagraphCard from './component/ParagraphCard.vue'
@@ -200,6 +201,14 @@ const paragraphDetail = ref<any[]>([])
 const title = ref('')
 const search = ref('')
 const searchType = ref('title')
+
+const dialogVisible = ref(false)
+watch(()=>ParagraphDialogRef.value?.dialogVisible, (val: boolean) => {
+  dialogVisible.value = val
+})
+function dialogVisibleChange(val: boolean) {
+  dialogVisible.value = val
+}
 
 const handleClick = (e: MouseEvent, ele: any) => {
   e.preventDefault()

@@ -8,9 +8,6 @@
     :close-on-click-modal="false"
     :close-on-press-escape="false"
     @click.stop
-    @mousemove.stop
-    @mousedown.stop
-    @keydown.stop
   >
     <el-row v-loading="loading">
       <el-col :span="18">
@@ -165,6 +162,6 @@ const handleDebounceClick = debounce(() => {
   submitHandle()
 }, 200)
 
-defineExpose({ open })
+defineExpose({ open, dialogVisible })
 </script>
 <style lang="scss" scoped></style>
