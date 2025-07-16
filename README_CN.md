@@ -39,7 +39,7 @@ docker run -d --name=maxkb --restart=always -p 8080:8080 -v C:/maxkb:/var/lib/po
 - 你也可以通过 [1Panel 应用商店](https://apps.fit2cloud.com/1panel) 快速部署 MaxKB；
 - 如果是内网环境，推荐使用 [离线安装包](https://community.fit2cloud.com/#/products/maxkb/downloads) 进行安装部署；
 - MaxKB 不同产品产品版本的对比请参见：[MaxKB 产品版本对比](https://maxkb.cn/price)；
-- 如果您需要向团队介绍 MaxKB，可以使用这个 [官方 PPT 材料](https://maxkb.cn/download/introduce-maxkb_202507.pdf)。
+- 如果您需要向团队介绍 MaxKB，可以使用这个 [官方 PPT 材料](https://fit2cloud.com/maxkb/download/introduce-maxkb_202507.pdf)。
 
 如你有更多问题，可以查看使用手册，或者通过论坛与我们交流。
 
