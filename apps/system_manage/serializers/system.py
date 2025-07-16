@@ -38,4 +38,4 @@ class SystemProfileSerializer(serializers.Serializer):
         version = os.environ.get('MAXKB_VERSION')
         license_is_valid = DatabaseModelManage.get_model('license_is_valid') or (lambda: False)
         return {'version': version, 'edition': settings.edition,
-                'license_is_valid': license_is_valid if license_is_valid is not None else False}
+                'license_is_valid': license_is_valid() if license_is_valid() is not None else False}
