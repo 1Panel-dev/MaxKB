@@ -327,7 +327,7 @@ class ChatSerializers(serializers.Serializer):
         ChatMessageSerializers(data=instance).is_valid(raise_exception=True)
         chat_info = self.get_chat_info()
         chat_info.get_application()
-        chat_info.get_chat_user((instance.get('form_data') or {}).get('akser'))
+        chat_info.get_chat_user(asker=(instance.get('form_data') or {}).get('asker'))
         self.is_valid_chat_id(chat_info)
         self.is_valid_chat_user()
         if chat_info.application.type == ApplicationTypeChoices.SIMPLE:
