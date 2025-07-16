@@ -368,6 +368,7 @@ function newChat() {
     paginationConfig.value.total = 0
     currentRecordList.value = []
   }
+  closeExecutionDetail()
   currentChatId.value = 'new'
   currentChatName.value = t('chat.createChat')
   if (common.isMobile()) {
@@ -432,6 +433,7 @@ const clickListHandle = (item: any) => {
     currentRecordList.value = []
     currentChatId.value = item.id
     currentChatName.value = item.abstract
+    closeExecutionDetail()
     if (currentChatId.value !== 'new') {
       getChatRecord()
 
