@@ -462,10 +462,10 @@ class TextToSpeechSerializers(serializers.Serializer):
     def text_to_speech(self, instance):
         self.is_valid(raise_exception=True)
         application_id = self.data.get('application_id')
-        application = QuerySet(Application).filter(id=application_id).first()
+        application = QuerySet(ApplicationVersion).filter(id=application_id).order_by('-create_time').first()
         return ApplicationOperateSerializer(
             data={'application_id': application_id,
-                  'user_id': application.user_id}).text_to_speech(instance)
+                  'user_id': application.user_id}).text_to_speech(instance, False)
 
 
 class SpeechToTextSerializers(serializers.Serializer):
@@ -477,4 +477,4 @@ class SpeechToTextSerializers(serializers.Serializer):
         application = QuerySet(Application).filter(id=application_id).first()
         return ApplicationOperateSerializer(
             data={'application_id': application_id,
-                  'user_id': application.user_id}).speech_to_text(instance)
+                  'user_id': application.user_id}).speech_to_text(instance, False)
