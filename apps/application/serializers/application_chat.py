@@ -192,6 +192,7 @@ class ApplicationChatQuerySerializers(serializers.Serializer):
             worksheet.title = 'Sheet1'
 
             headers = [gettext('Conversation ID'), gettext('summary'), gettext('User Questions'),
+                       gettext('Problem after optimization'),
                        gettext('answer'), gettext('User feedback'),
                        gettext('Reference segment number'),
                        gettext('Section title + content'),
