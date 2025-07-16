@@ -153,7 +153,7 @@
         <el-table-column prop="mark_sum" :label="$t('views.chatLog.table.mark')" align="right" />
         <el-table-column prop="asker" :label="$t('views.chatLog.table.user')">
           <template #default="{ row }">
-            {{ row.asker?.user_name }}
+            {{ row.asker?.username }}
           </template>
         </el-table-column>
         <el-table-column :label="$t('views.chatLog.table.recenTimes')" width="180">

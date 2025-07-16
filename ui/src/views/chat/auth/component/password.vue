@@ -13,6 +13,7 @@ import { ref, computed } from 'vue'
 import useStore from '@/stores'
 import { t } from '@/locales'
 import { useRoute, useRouter } from 'vue-router'
+const route = useRoute()
 const FormRef = ref()
 
 const { chatUser } = useStore()
@@ -21,7 +22,7 @@ const router = useRouter()
 
 const auth = () => {
   return chatUser.passwordAuthentication(form.value.password).then((ok) => {
-    router.push({ name: 'chat', params: { accessToken: chatUser.accessToken } })
+    router.push({ name: 'chat', params: { accessToken: chatUser.accessToken }, query: route.query })
   })
 }
 const validator_auth = (rule: any, value: string, callback: any) => {
