@@ -192,7 +192,7 @@ class ChatSerializers(serializers.Serializer):
     def is_valid_intraday_access_num(self):
         if not self.data.get('debug') and [ChatUserType.ANONYMOUS_USER.value,
                                            ChatUserType.CHAT_USER.value].__contains__(
-                self.data.get('chat_user_type')):
+            self.data.get('chat_user_type')):
             access_client = QuerySet(ApplicationChatUserStats).filter(chat_user_id=self.data.get('chat_user_id'),
                                                                       application_id=self.data.get(
                                                                           'application_id')).first()
@@ -463,7 +463,7 @@ class TextToSpeechSerializers(serializers.Serializer):
     def text_to_speech(self, instance):
         self.is_valid(raise_exception=True)
         application_id = self.data.get('application_id')
-        application = QuerySet(ApplicationVersion).filter(id=application_id).order_by('-create_time').first()
+        application = QuerySet(Application).filter(id=application_id).first()
         return ApplicationOperateSerializer(
             data={'application_id': application_id,
                   'user_id': application.user_id}).text_to_speech(instance, False)
