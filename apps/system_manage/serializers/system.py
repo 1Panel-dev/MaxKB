@@ -13,6 +13,7 @@ from rest_framework import serializers
 from django.core.cache import cache
 
 from common.constants.cache_version import Cache_Version
+from common.database_model_manage.database_model_manage import DatabaseModelManage
 from maxkb import settings
 
 
@@ -35,7 +36,6 @@ class SystemProfileSerializer(serializers.Serializer):
     @staticmethod
     def profile():
         version = os.environ.get('MAXKB_VERSION')
-        license_is_valid = cache.get(Cache_Version.SYSTEM.get_key(key='license_is_valid'),
-                                     version=Cache_Version.SYSTEM.get_version())
+        license_is_valid = DatabaseModelManage.get_model('license_is_valid') or (lambda: False)
         return {'version': version, 'edition': settings.edition,
                 'license_is_valid': license_is_valid if license_is_valid is not None else False}

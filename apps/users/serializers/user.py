@@ -567,9 +567,21 @@ class UserManageSerializer(serializers.Serializer):
 def update_user_role(instance, user, user_id=None):
     workspace_user_role_mapping_model = DatabaseModelManage.get_model("workspace_user_role_mapping")
     if workspace_user_role_mapping_model:
+        role_setting = instance.get('role_setting')
+        license_is_valid = DatabaseModelManage.get_model('license_is_valid') or (lambda: False)
+        license_is_valid = license_is_valid if license_is_valid is not None else False
+        if not license_is_valid and isinstance(role_setting, list) and len(role_setting) == 0:
+            workspace_user_role_mapping_model.objects.create(
+                id=uuid.uuid7(),
+                user_id=user.id,
+                role_id=RoleConstants.USER.name,
+                workspace_id='default'
+            )
+            return
+
         is_admin = workspace_user_role_mapping_model.objects.filter(user_id=user_id,
                                                                     role_id=RoleConstants.ADMIN.name).exists()
-        role_setting = instance.get('role_setting')
+
         if not role_setting or (len(role_setting) == 1
                                 and role_setting[0].get('role_id') == ''
                                 and len(role_setting[0].get('workspace_ids', [])) == 0):
