@@ -24,7 +24,7 @@ def client_access_num_reset_job():
     client_access_num_reset_job_lock()
 
 
-@lock(lock_key="access_num_reset", timeout=30)
+@lock(lock_key="access_num_reset_execute", timeout=30)
 def client_access_num_reset_job_lock():
     from django.utils.translation import gettext_lazy as _
     maxkb_logger.info(_('start reset access_num'))
@@ -33,7 +33,7 @@ def client_access_num_reset_job_lock():
 
 
 def run():
-    if try_lock('access_num_reset', 30):
+    if try_lock('access_num_reset', 30 * 30):
         try:
             scheduler.start()
             access_num_reset = scheduler.get_job(job_id='access_num_reset')

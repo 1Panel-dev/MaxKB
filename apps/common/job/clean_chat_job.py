@@ -22,7 +22,7 @@ def clean_chat_log_job():
     clean_chat_log_job_lock()
 
 
-@lock(lock_key='clean_chat_log_job', timeout=30)
+@lock(lock_key='clean_chat_log_job_execute', timeout=30)
 def clean_chat_log_job_lock():
     from django.utils.translation import gettext_lazy as _
     maxkb_logger.info(_('start clean chat log'))
