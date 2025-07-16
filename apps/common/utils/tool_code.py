@@ -26,6 +26,7 @@ class ToolExecutor:
         self._createdir()
         if self.sandbox:
             os.system(f"chown -R {self.user}:root {self.sandbox_path}")
+        self.banned_keywords = CONFIG.get("SANDBOX_PYTHON_BANNED_KEYWORDS", 'nothing_is_banned').split(',');
 
     def _createdir(self):
         old_mask = os.umask(0o077)
@@ -37,6 +38,7 @@ class ToolExecutor:
             os.umask(old_mask)
 
     def exec_code(self, code_str, keywords):
+        self.validateBannedKeywords(code_str)
         _id = str(uuid.uuid7())
         success = '{"code":200,"msg":"成功","data":exec_result}'
         err = '{"code":500,"msg":str(e),"data":None}'
@@ -93,6 +95,11 @@ except Exception as e:
             capture_output=True, **kwargs)
         os.remove(exec_python_file)
         return subprocess_result
+
+    def validateBannedKeywords(self, code_str):
+        matched = next((bad for bad in self.banned_keywords if bad in code_str), None)
+        if matched:
+            raise Exception(f"keyword '{matched}' is banned in the tool.")
 
     @staticmethod
     def _exec(_code):
