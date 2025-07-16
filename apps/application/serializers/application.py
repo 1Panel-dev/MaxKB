@@ -913,23 +913,31 @@ class ApplicationOperateSerializer(serializers.Serializer):
             [ApplicationKnowledgeMapping(application_id=application_id, knowledge_id=knowledge_id) for knowledge_id in
              knowledge_id_list]) if len(knowledge_id_list) > 0 else None
 
-    def speech_to_text(self, instance, with_valid=True):
+    def speech_to_text(self, instance, debug=True, with_valid=True):
         if with_valid:
             self.is_valid(raise_exception=True)
             SpeechToTextRequest(data=instance).is_valid(raise_exception=True)
         application_id = self.data.get('application_id')
-        application = QuerySet(Application).filter(id=application_id).first()
+        if debug:
+            application = QuerySet(Application).filter(id=application_id).first()
+        else:
+            application = QuerySet(ApplicationVersion).filter(application_id=application_id).order_by(
+                '-create_time').first()
         if application.stt_model_enable:
             model = get_model_instance_by_model_workspace_id(application.stt_model_id, application.workspace_id)
             text = model.speech_to_text(instance.get('file'))
             return text
 
-    def text_to_speech(self, instance, with_valid=True):
+    def text_to_speech(self, instance, debug=True, with_valid=True):
         if with_valid:
             self.is_valid(raise_exception=True)
             TextToSpeechRequest(data=instance).is_valid(raise_exception=True)
         application_id = self.data.get('application_id')
-        application = QuerySet(Application).filter(id=application_id).first()
+        if debug:
+            application = QuerySet(Application).filter(id=application_id).first()
+        else:
+            application = QuerySet(ApplicationVersion).filter(application_id=application_id).order_by(
+                '-create_time').first()
         if application.tts_model_enable:
             model = get_model_instance_by_model_workspace_id(application.tts_model_id, application.workspace_id,
                                                              **application.tts_model_params_setting)
