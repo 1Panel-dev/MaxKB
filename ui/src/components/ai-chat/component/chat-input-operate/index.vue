@@ -271,7 +271,7 @@
             <el-button
               text
               class="sent-button"
-              :disabled="isDisabledChat || loading || !uploadLoading"
+              :disabled="isDisabledChat || loading || uploadLoading"
               @click="sendChatHandle"
             >
               <img
