@@ -2,9 +2,9 @@ export default {
   title: '普通登錄',
   loginForm: {
     username: {
-      label: '使用者名稱',
-      placeholder: '請輸入使用者名稱',
-      requiredMessage: '請輸入使用者名稱',
+      label: '用戶名稱',
+      placeholder: '請輸入用戶名稱',
+      requiredMessage: '請輸入用戶名稱',
       lengthMessage: '長度須介於 4 到 20 個字元之間',
     },
     password: {

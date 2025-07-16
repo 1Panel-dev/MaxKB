@@ -1,20 +1,20 @@
 export default {
-  title: '使用者管理',
-  createUser: '建立使用者',
-  editUser: '編輯使用者',
+  title: '用戶管理',
+  createUser: '建立用戶',
+  editUser: '編輯用戶',
   roleSetting: '角色設定',
   addRole: '添加角色',
   setting: {
-    updatePwd: '修改使用者密碼',
+    updatePwd: '修改用戶密碼',
   },
   tip: {
     professionalMessage: '社群版最多支援 2 個使用者，如需擁有更多使用者，請升級為專業版。',
     updatePwdSuccess: '使用者密碼修改成功',
   },
   delete: {
-    confirmTitle: '是否刪除該使用者？',
+    confirmTitle: '是否刪除該用戶？',
     confirmMessage:
-      '刪除該使用者後，該使用者建立的所有資源（應用、知識庫、模型）都不會被刪除，請謹慎操作。',
+      '刪除該用戶後，該使用者建立的所有資源（應用、知識庫、模型）都不會被刪除，請謹慎操作。',
   },
   disabled: {
     confirmTitle: '是否停用工具？',
@@ -34,8 +34,8 @@ export default {
     },
   },
   source: {
-    label: '使用者來源',
-    local: '系統使用者',
+    label: '用戶來源',
+    local: '系統用戶',
      localCreate: '本地建立',
     wecom: '企業微信',
     lark: '飛書',

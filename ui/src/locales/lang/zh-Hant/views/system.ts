@@ -5,7 +5,7 @@ export default {
   testFailed: '測試連線失敗',
   password: '密碼',
   authentication: {
-    title: '登入認證',
+    title: '登錄認證',
     ldap: {
       title: 'LDAP',
       address: 'LDAP 位址',
@@ -110,21 +110,21 @@ export default {
     enableTLS: '啟用 TLS（如果 SMTP 端口是 587，通常需要啟用 TLS）',
   },
   resourceAuthorization: {
-    title: '资源授权',
-    member: '成员',
-    permissionSetting: '资源权限配置',
+    title: '資源授权',
+    member: '成員',
+    permissionSetting: '資源权限配置',
     setting: {
       management: '管理',
       check: '查看',
       authorization: '授权',
     },
     priority: {
-      label: '资源权限优先级',
+      label: '資源权限优先级',
       role: '按角色',
     },
   },
   resource_management: {
-    label: '资源管理',
+    label: '資源管理',
     type: '类型',
   },
 }

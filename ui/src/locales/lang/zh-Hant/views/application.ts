@@ -13,8 +13,8 @@ export default {
     placeholder: '按名稱搜尋',
   },
   status: {
-    published: '已发布',
-    unpublished: '未发布',
+    published: '已發布',
+    unpublished: '未發布',
   },
   operation: {
     toChat: '去對話',
