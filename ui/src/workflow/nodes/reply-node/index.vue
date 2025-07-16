@@ -97,7 +97,7 @@ const form = {
   reply_type: 'content',
   content: '',
   fields: [],
-  is_result: false
+  is_result: true,
 }
 
 const form_data = computed({

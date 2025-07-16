@@ -99,7 +99,6 @@ import { type chatType } from '@/api/type/application'
 import { getImgUrl, downloadByURL } from '@/utils/common'
 import { getAttrsArray } from '@/utils/array'
 import { onMounted, computed } from 'vue'
-import useStore from '@/stores'
 const props = defineProps<{
   application: any
   chatRecord: chatType
@@ -107,7 +106,7 @@ const props = defineProps<{
 }>()
 
 const showAvatar = computed(() => {
-  return props.application.show_avatar == undefined ? true : props.application.show_avatar
+  return props.application.show_user_avatar == undefined ? true : props.application.show_user_avatar
 })
 
 const document_list = computed(() => {

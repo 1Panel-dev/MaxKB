@@ -223,7 +223,7 @@ const form = {
   system: '',
   prompt: defaultPrompt,
   dialogue_number: 1,
-  is_result: false,
+  is_result: true,
   temperature: null,
   max_tokens: null,
   dialogue_type: 'WORKFLOW',
