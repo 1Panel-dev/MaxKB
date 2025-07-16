@@ -11,7 +11,7 @@
               <ReadWrite
                 @change="editName"
                 :data="currentContent"
-                :showEditIcon="true"
+                :showEditIcon="permissionPrecise.problem_edit(id as string)"
                 :maxlength="256"
               />
             </el-form-item>
@@ -21,7 +21,7 @@
                   :title="item.title || '-'"
                   class="cursor mb-8"
                   :showIcon="false"
-                  @click.stop="editParagraph(item)"
+                  @click.stop="permissionPrecise.doc_edit(id as string) && editParagraph(item)"
                   style="height: 210px"
                 >
                   <template #tag>
@@ -30,7 +30,9 @@
                       :content="$t('views.problem.setting.cancelRelated')"
                       placement="top"
                     >
-                      <el-button type="primary" text @click.stop="disassociation(item)">
+                      <el-button type="primary" text @click.stop="disassociation(item)"
+                        v-if="permissionPrecise.doc_edit(id as string)"
+                      >
                         <AppIcon iconName="app-quxiaoguanlian"></AppIcon>
                       </el-button>
                     </el-tooltip>
@@ -65,7 +67,9 @@
     </div>
     <template #footer>
       <div>
-        <el-button @click="relateProblem">{{
+        <el-button @click="relateProblem"
+          v-if="permissionPrecise.doc_edit(id as string)"
+        >{{
           $t('views.problem.relateParagraph.title')
         }}</el-button>
         <el-button @click="pre" :disabled="pre_disable || loading">{{
@@ -86,6 +90,7 @@ import ParagraphDialog from '@/views/paragraph/component/ParagraphDialog.vue'
 import RelateProblemDialog from './RelateProblemDialog.vue'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import permissionMap from '@/permission'
 import { t } from '@/locales'
 const props = withDefaults(
   defineProps<{
@@ -125,6 +130,10 @@ const apiType = computed(() => {
   } else {
     return 'workspace'
   }
+})
+
+const permissionPrecise = computed(() => {
+  return permissionMap['knowledge'][apiType.value]
 })
 
 const RelateProblemDialogRef = ref()

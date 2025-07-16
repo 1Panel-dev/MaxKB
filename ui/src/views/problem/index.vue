@@ -64,7 +64,7 @@
                 <ReadWrite
                   @change="editName($event, row.id)"
                   :data="row.content"
-                  :showEditIcon="row.id === currentMouseId"
+                  :showEditIcon="permissionPrecise.problem_edit(id) && row.id === currentMouseId"
                   :maxlength="256"
                 />
               </template>

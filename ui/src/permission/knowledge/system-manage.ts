@@ -35,6 +35,7 @@ const systemManage = {
   problem_create: () => false,
   problem_relate: () => false,
   problem_delete: () => false,
+  problem_edit: () => false,
   
   folderCreate: () => false,
   folderEdit: () => false,
