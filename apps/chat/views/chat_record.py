@@ -197,4 +197,4 @@ class ChatRecordView(APIView):
                 'chat_record_id': chat_record_id,
                 'application_id': request.auth.application_id,
                 'chat_user_id': request.auth.chat_user_id,
-            }).one(True))
+            }).one(False))

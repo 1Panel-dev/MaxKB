@@ -167,7 +167,7 @@ class ApplicationChatQuerySerializers(serializers.Serializer):
                 "\n".join([
                     f"{improve_paragraph_list[index].get('title')}\n{improve_paragraph_list[index].get('content')}"
                     for index in range(len(improve_paragraph_list))]),
-                row.get('asker').get('user_name'),
+                row.get('asker').get('username'),
                 (row.get('message_tokens') or 0) + (row.get('answer_tokens') or 0), row.get('run_time'),
                 str(row.get('create_time').astimezone(pytz.timezone(TIME_ZONE)).strftime('%Y-%m-%d %H:%M:%S')
                     if row.get('create_time') is not None else None)]
@@ -192,7 +192,6 @@ class ApplicationChatQuerySerializers(serializers.Serializer):
             worksheet.title = 'Sheet1'
 
             headers = [gettext('Conversation ID'), gettext('summary'), gettext('User Questions'),
-                       gettext('Problem after optimization'),
                        gettext('answer'), gettext('User feedback'),
                        gettext('Reference segment number'),
                        gettext('Section title + content'),
