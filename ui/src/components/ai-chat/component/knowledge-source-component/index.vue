@@ -46,8 +46,8 @@
                     </a>
                   </div>
                   <div v-else @click="infoMessage">
-                    <span class="ellipsis-1 break-all" :title="data?.document_name?.trim()">
-                      {{ data?.document_name?.trim() }}
+                    <span class="ellipsis-1 break-all" :title="item?.document_name?.trim()">
+                      {{ item?.document_name?.trim() }}
                     </span>
                   </div>
                 </div>
