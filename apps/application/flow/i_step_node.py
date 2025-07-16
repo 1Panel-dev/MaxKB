@@ -83,7 +83,8 @@ class WorkFlowPostHandler:
 
         self.chat_info.append_chat_record(chat_record)
         self.chat_info.set_cache()
-        if [ChatUserType.ANONYMOUS_USER.value, ChatUserType.CHAT_USER.value].__contains__(
+
+        if not self.chat_info.debug and [ChatUserType.ANONYMOUS_USER.value, ChatUserType.CHAT_USER.value].__contains__(
                 workflow_body.get('chat_user_type')):
             application_public_access_client = (QuerySet(ApplicationChatUserStats)
                                                 .filter(chat_user_id=workflow_body.get('chat_user_id'),

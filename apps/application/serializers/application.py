@@ -533,7 +533,7 @@ class ApplicationSerializer(serializers.Serializer):
                 UserResourcePermissionSerializer(data={
                     'workspace_id': self.data.get('workspace_id'),
                     'user_id': self.data.get('user_id'),
-                    'auth_target_type': AuthTargetType.APPLICATION.value
+                    'auth_target_type': AuthTargetType.TOOL.value
                 }).auth_resource_batch([t.id for t in tool_model_list])
         return True
 
