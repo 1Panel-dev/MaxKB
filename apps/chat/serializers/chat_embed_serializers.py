@@ -53,7 +53,9 @@ class ChatEmbedSerializer(serializers.Serializer):
             if application_setting is not None:
                 is_draggable = 'true' if application_setting.draggable else 'false'
                 if application_setting.float_icon is not None and len(application_setting.float_icon) > 0:
-                    float_icon = f"{self.data.get('protocol')}://{self.data.get('host')}{CONFIG.get_chat_path()}{application_setting.float_icon}"
+                    float_icon = application_setting.float_icon[1:] if application_setting.float_icon.startswith(
+                        '.') else application_setting.float_icon
+                    float_icon = f"{self.data.get('protocol')}://{self.data.get('host')}{CONFIG.get_chat_path()}{float_icon}"
                 show_guide = 'true' if application_setting.show_guide else 'false'
                 if application_setting.float_location is not None:
                     float_location = application_setting.float_location
