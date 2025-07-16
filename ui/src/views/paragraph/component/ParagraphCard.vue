@@ -139,7 +139,6 @@ const props = defineProps<{
   showMoveDown?: boolean
 }>()
 
-console.log(props)
 
 const route = useRoute()
 const {

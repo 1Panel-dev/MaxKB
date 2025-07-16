@@ -85,7 +85,7 @@
                     <VueDraggable
                       ref="el"
                       v-model="paragraphDetail"
-                      :disabled="isBatch === true || shareDisabled"
+                      :disabled="isBatch === true || shareDisabled || !permissionPrecise.doc_edit(id)"
                       handle=".handle"
                       :animation="150"
                       ghostClass="ghost"
