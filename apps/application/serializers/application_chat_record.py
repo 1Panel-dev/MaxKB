@@ -56,8 +56,6 @@ class ChatRecordOperateSerializer(serializers.Serializer):
             application_id=self.data.get('application_id')).first()
         if application_access_token is None:
             raise AppApiException(500, gettext('Application authentication information does not exist'))
-        if not application_access_token.show_source and not debug:
-            raise AppApiException(500, gettext('Displaying knowledge sources is not enabled'))
 
     def get_chat_record(self):
         chat_record_id = self.data.get('chat_record_id')
@@ -83,7 +81,7 @@ class ChatRecordOperateSerializer(serializers.Serializer):
             show_exec = application_access_token.show_exec
             show_source = application_access_token.show_source
         return ApplicationChatRecordQuerySerializers.reset_chat_record(
-            chat_record, show_source, show_exec)
+            chat_record, True if debug else show_source, True if debug else show_exec)
 
 
 class ApplicationChatRecordQuerySerializers(serializers.Serializer):
@@ -127,8 +125,8 @@ class ApplicationChatRecordQuerySerializers(serializers.Serializer):
             if item.get('type') == 'reranker-node' and item.get('show_knowledge', False):
                 paragraph_list = paragraph_list + [rl.get('metadata') for rl in (item.get('result_list') or []) if
                                                    'document_id' in (rl.get('metadata') or {}) and 'knowledge_id' in (
-                                                               rl.get(
-                                                                   'metadata') or {})]
+                                                           rl.get(
+                                                               'metadata') or {})]
         paragraph_list = list({p.get('id'): p for p in paragraph_list}.values())
         knowledge_list = knowledge_list + [{'id': knowledge_id, **knowledge} for knowledge_id, knowledge in
                                            reduce(lambda x, y: {**x, **y},
