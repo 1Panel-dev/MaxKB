@@ -190,7 +190,8 @@ class ChatSerializers(serializers.Serializer):
             raise ChatException(500, _("Conversation does not exist"))
 
     def is_valid_intraday_access_num(self):
-        if [ChatUserType.ANONYMOUS_USER.value, ChatUserType.CHAT_USER.value].__contains__(
+        if not self.data.get('debug') and [ChatUserType.ANONYMOUS_USER.value,
+                                           ChatUserType.CHAT_USER.value].__contains__(
                 self.data.get('chat_user_type')):
             access_client = QuerySet(ApplicationChatUserStats).filter(chat_user_id=self.data.get('chat_user_id'),
                                                                       application_id=self.data.get(
