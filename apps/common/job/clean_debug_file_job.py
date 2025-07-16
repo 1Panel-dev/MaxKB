@@ -19,7 +19,7 @@ def clean_debug_file():
     clean_debug_file_lock()
 
 
-@lock(lock_key='clean_debug_file', timeout=30)
+@lock(lock_key='clean_debug_file_execute', timeout=30)
 def clean_debug_file_lock():
     from django.utils.translation import gettext_lazy as _
     maxkb_logger.info(_('start clean debug file'))
@@ -35,7 +35,7 @@ def clean_debug_file_lock():
 
 
 def run():
-    if try_lock('clean_debug_file', 30):
+    if try_lock('clean_debug_file', 30 * 30):
         try:
             scheduler.start()
             clean_debug_file_job = scheduler.get_job(job_id='clean_debug_file')
