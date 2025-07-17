@@ -28,7 +28,7 @@ beautifulsoup4 = "4.13.4"
 jieba = "0.42.1"
 
 # LLM及AI相关
-langchain-openai = "0.3.27"
+langchain-openai = "0.3.28"
 langchain-anthropic = "0.3.17"
 langchain-community = "0.3.27"
 langchain-deepseek = "0.1.3"
