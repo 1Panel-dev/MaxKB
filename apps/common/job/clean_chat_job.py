@@ -72,7 +72,7 @@ def clean_chat_log_job_lock():
 def run():
     if try_lock('clean_chat_log_job', 30 * 30):
         try:
-            maxkb_logger.info('get lock clean_chat_log_job')
+            maxkb_logger.debug('get lock clean_chat_log_job')
 
             existing_job = scheduler.get_job(job_id='clean_chat_log')
             if existing_job is not None:

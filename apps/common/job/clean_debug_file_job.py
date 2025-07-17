@@ -32,7 +32,7 @@ def clean_debug_file_lock():
 def run():
     if try_lock('clean_debug_file', 30 * 30):
         try:
-            maxkb_logger.info('get lock clean_debug_file')
+            maxkb_logger.debug('get lock clean_debug_file')
 
             clean_debug_file_job = scheduler.get_job(job_id='clean_debug_file')
             if clean_debug_file_job is not None:

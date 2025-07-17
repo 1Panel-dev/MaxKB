@@ -30,7 +30,7 @@ def client_access_num_reset_job_lock():
 def run():
     if try_lock('access_num_reset', 30 * 30):
         try:
-            maxkb_logger.info('get lock access_num_reset')
+            maxkb_logger.debug('get lock access_num_reset')
 
             access_num_reset = scheduler.get_job(job_id='access_num_reset')
             if access_num_reset is not None:
