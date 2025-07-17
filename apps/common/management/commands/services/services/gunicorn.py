@@ -1,3 +1,5 @@
+import subprocess
+
 from .base import BaseService
 from ..hands import *
 
@@ -35,3 +37,15 @@ class GunicornService(BaseService):
     @property
     def cwd(self):
         return APPS_DIR
+
+    def open_subprocess(self):
+        # 复制当前环境变量，并设置 ENABLE_SCHEDULER=1
+        env = os.environ.copy()
+        env['ENABLE_SCHEDULER'] = '1'
+        kwargs = {
+            'cwd': self.cwd,
+            'stderr': self.log_file,
+            'stdout': self.log_file,
+            'env': env
+        }
+        self._process = subprocess.Popen(self.cmd, **kwargs)

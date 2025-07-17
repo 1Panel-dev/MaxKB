@@ -5,7 +5,7 @@ from django.db.models import Q
 from django.utils import timezone
 
 from common.job.scheduler import scheduler
-from common.utils.lock import un_lock, try_lock, lock
+from common.utils.lock import lock, RedisLock
 from common.utils.logger import maxkb_logger
 from knowledge.models import File, FileSourceType
 
@@ -25,12 +25,14 @@ def clean_debug_file_lock():
     File.objects.filter(
         Q(create_time__lt=one_days_ago, source_type=FileSourceType.TEMPORARY_1_DAY.value) |
         Q(create_time__lt=two_hours_ago, source_type=FileSourceType.TEMPORARY_120_MINUTE.value) |
-        Q(create_time__lt=minutes_30_ago, source_type=FileSourceType.TEMPORARY_30_MINUTE.value)).delete()
+        Q(create_time__lt=minutes_30_ago, source_type=FileSourceType.TEMPORARY_30_MINUTE.value)
+    ).delete()
     maxkb_logger.debug(_('end clean debug file'))
 
 
 def run():
-    if try_lock('clean_debug_file', 30 * 30):
+    rlock = RedisLock()
+    if rlock.try_lock('clean_debug_file', 30 * 30):
         try:
             maxkb_logger.debug('get lock clean_debug_file')
 
@@ -39,4 +41,4 @@ def run():
                 clean_debug_file_job.remove()
             scheduler.add_job(clean_debug_file, 'cron', hour='*', minute='*/30', second='0', id='clean_debug_file')
         finally:
-            un_lock('clean_debug_file')
+            rlock.un_lock('clean_debug_file')

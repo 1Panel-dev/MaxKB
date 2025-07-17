@@ -8,7 +8,7 @@ from django.utils import timezone
 
 from application.models import Application, Chat, ChatRecord
 from common.job.scheduler import scheduler
-from common.utils.lock import try_lock, un_lock, lock
+from common.utils.lock import lock, RedisLock
 from common.utils.logger import maxkb_logger
 from knowledge.models import File
 
@@ -70,7 +70,8 @@ def clean_chat_log_job_lock():
 
 
 def run():
-    if try_lock('clean_chat_log_job', 30 * 30):
+    rlock = RedisLock()
+    if rlock.try_lock('clean_chat_log_job', 30 * 30):
         try:
             maxkb_logger.debug('get lock clean_chat_log_job')
 
@@ -79,4 +80,4 @@ def run():
                 existing_job.remove()
             scheduler.add_job(clean_chat_log_job, 'cron', hour='0', minute='5', id='clean_chat_log')
         finally:
-            un_lock('clean_chat_log_job')
+            rlock.un_lock('clean_chat_log_job')

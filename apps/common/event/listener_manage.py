@@ -20,7 +20,7 @@ from langchain_core.embeddings import Embeddings
 from common.config.embedding_config import VectorStore
 from common.db.search import native_search, get_dynamics_model, native_update
 from common.utils.common import get_file_content
-from common.utils.lock import try_lock, un_lock
+from common.utils.lock import RedisLock
 from common.utils.logger import maxkb_logger
 from common.utils.page_utils import page_desc
 from knowledge.models import Paragraph, Status, Document, ProblemParagraphMapping, TaskType, State,SourceType, SearchMode
@@ -253,7 +253,8 @@ class ListenerManagement:
         """
         if state_list is None:
             state_list = [State.PENDING, State.SUCCESS, State.FAILURE, State.REVOKE, State.REVOKED]
-        if not try_lock('embedding:' + str(document_id)):
+        rlock = RedisLock()
+        if not rlock.try_lock('embedding:' + str(document_id)):
             return
         try:
             def is_the_task_interrupted():
@@ -290,7 +291,7 @@ class ListenerManagement:
             ListenerManagement.post_update_document_status(document_id, TaskType.EMBEDDING)
             ListenerManagement.get_aggregation_document_status(document_id)()
             maxkb_logger.info(_('End--->Embedding document: {document_id}').format(document_id=document_id))
-            un_lock('embedding:' + str(document_id))
+            rlock.un_lock('embedding:' + str(document_id))
 
     @staticmethod
     def embedding_by_knowledge(knowledge_id, embedding_model: Embeddings):

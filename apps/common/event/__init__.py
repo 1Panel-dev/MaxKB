@@ -12,6 +12,7 @@ from django.utils.translation import gettext as _
 from .listener_manage import *
 from ..constants.cache_version import Cache_Version
 from ..db.sql_execute import update_execute
+from ..utils.lock import RedisLock
 
 update_document_status_sql = """
                              UPDATE "public"."document"
@@ -22,8 +23,8 @@ update_document_status_sql = """
 
 def run():
     from models_provider.models import Model, Status
-
-    if try_lock('event_init', 30 * 30):
+    rlock = RedisLock()
+    if rlock.try_lock('event_init', 30 * 30):
         try:
             # 修改Model状态为ERROR
             QuerySet(Model).filter(
@@ -36,4 +37,4 @@ def run():
             version, get_key = Cache_Version.SYSTEM.value
             cache.delete(get_key(key='rsa_key'), version=version)
         finally:
-            un_lock('event_init')
+            rlock.un_lock('event_init')

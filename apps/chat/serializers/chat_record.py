@@ -19,7 +19,7 @@ from application.serializers.application_chat_record import ChatRecordSerializer
     ApplicationChatRecordQuerySerializers
 from common.db.search import page_search
 from common.exception.app_exception import AppApiException
-from common.utils.lock import try_lock, un_lock
+from common.utils.lock import RedisLock
 
 
 class VoteRequest(serializers.Serializer):
@@ -48,7 +48,8 @@ class VoteSerializer(serializers.Serializer):
         if with_valid:
             self.is_valid(raise_exception=True)
             VoteRequest(data=instance).is_valid(raise_exception=True)
-        if not try_lock(self.data.get('chat_record_id')):
+        rlock = RedisLock()
+        if not rlock.try_lock(self.data.get('chat_record_id')):
             raise AppApiException(500,
                                   gettext(
                                       "Voting on the current session minutes, please do not send repeated requests"))
@@ -75,7 +76,7 @@ class VoteSerializer(serializers.Serializer):
                 else:
                     raise AppApiException(500, gettext("Already voted, please cancel first and then vote again"))
         finally:
-            un_lock(self.data.get('chat_record_id'))
+            rlock.un_lock(self.data.get('chat_record_id'))
         ChatCountSerializer(data={'chat_id': self.data.get('chat_id')}).update_chat()
         return True
 

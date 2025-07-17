@@ -11,7 +11,7 @@ from django.db.models import QuerySet
 
 from application.models import ApplicationChatUserStats
 from common.job.scheduler import scheduler
-from common.utils.lock import try_lock, un_lock, lock
+from common.utils.lock import lock, RedisLock
 from common.utils.logger import maxkb_logger
 
 
@@ -28,7 +28,8 @@ def client_access_num_reset_job_lock():
 
 
 def run():
-    if try_lock('access_num_reset', 30 * 30):
+    rlock = RedisLock()
+    if rlock.try_lock('access_num_reset', 30 * 30):
         try:
             maxkb_logger.debug('get lock access_num_reset')
 
@@ -38,4 +39,4 @@ def run():
             scheduler.add_job(client_access_num_reset_job, 'cron', hour='0', minute='0', second='0',
                               id='access_num_reset')
         finally:
-            un_lock('access_num_reset')
+            rlock.un_lock('access_num_reset')
