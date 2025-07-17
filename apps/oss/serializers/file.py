@@ -1,4 +1,5 @@
 # coding=utf-8
+import re
 import urllib
 
 import uuid_utils.compat as uuid
@@ -54,6 +55,9 @@ mime_types = {
     "csv": "text/csv", "tsv": "text/tab-separated-values", "ics": "text/calendar",
 }
 
+# 如果是音频文件并且有range请求，处理部分内容
+audio_types = ['mp3', 'wav', 'ogg', 'flac', 'aac', 'opus', 'm4a']
+
 
 class FileSerializer(serializers.Serializer):
     file = UploadedFileField(required=True, label=_('file'))
@@ -85,6 +89,10 @@ class FileSerializer(serializers.Serializer):
 
     class Operate(serializers.Serializer):
         id = serializers.UUIDField(required=True)
+        http_range = serializers.CharField(
+            required=False, allow_blank=True, allow_null=True, label=_('HTTP Range'),
+            help_text=_('HTTP Range header for partial content requests, e.g., "bytes=0-1023"')
+        )
 
         def get(self, with_valid=True):
             if with_valid:
@@ -96,15 +104,52 @@ class FileSerializer(serializers.Serializer):
             file_type = file.file_name.split(".")[-1].lower()
             content_type = mime_types.get(file_type, 'application/octet-stream')
             encoded_filename = urllib.parse.quote(file.file_name)
+            # 获取文件内容
+            file_bytes = file.get_bytes()
+            file_size = len(file_bytes)
+
+            response = None
+            if file_type in audio_types and self.data.get('http_range'):
+                response = self.handle_audio(file_size, file_bytes, content_type, encoded_filename)
+            if response:
+                return response
+
+            # 对于非范围请求或其他类型文件，返回完整内容
             headers = {
                 'Content-Type': content_type,
                 'Content-Disposition': f'{"inline" if file_type == "pdf" else "attachment"}; filename={encoded_filename}'
             }
             return HttpResponse(
-                file.get_bytes(),
+                file_bytes,
                 status=200,
                 headers=headers
             )
+
+        def handle_audio(self, file_size, file_bytes, content_type, encoded_filename):
+
+            # 解析range请求 (格式如 "bytes=0-1023")
+            range_match = re.match(r'bytes=(\d+)-(\d*)', self.data.get('http_range', ''))
+            if range_match:
+                start = int(range_match.group(1))
+                end = int(range_match.group(2)) if range_match.group(2) else file_size - 1
+
+                # 确保范围合法
+                end = min(end, file_size - 1)
+                length = end - start + 1
+
+                # 创建部分响应
+                response = HttpResponse(
+                    file_bytes[start:start + length],
+                    status=206,
+                    content_type=content_type
+                )
+
+                # 设置部分内容响应头
+                response['Content-Range'] = f'bytes {start}-{end}/{file_size}'
+                response['Accept-Ranges'] = 'bytes'
+                response['Content-Length'] = str(length)
+                response['Content-Disposition'] = f'inline; filename={encoded_filename}'
+                return response
 
         def delete(self):
             self.is_valid(raise_exception=True)

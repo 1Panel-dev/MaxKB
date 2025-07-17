@@ -23,7 +23,10 @@ class FileRetrievalView(APIView):
         tags=[_('File')]  # type: ignore
     )
     def get(self, request: Request, file_id: str):
-        return FileSerializer.Operate(data={'id': file_id}).get()
+        return FileSerializer.Operate(data={
+            'id': file_id,
+            'http_range': request.headers.get('Range', ''),
+        }).get()
 
 
 class FileView(APIView):
