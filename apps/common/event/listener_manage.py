@@ -92,7 +92,7 @@ class ListenerManagement:
     @staticmethod
     def embedding_by_paragraph_data_list(data_list, paragraph_id_list, embedding_model: Embeddings):
         maxkb_logger.info(_('Start--->Embedding paragraph: {paragraph_id_list}').format(paragraph_id_list=paragraph_id_list))
-        status = Status.success
+        status = State.SUCCESS
         try:
             # 删除段落
             VectorStore.get_embedding_vector().delete_by_paragraph_ids(paragraph_id_list)
@@ -105,7 +105,7 @@ class ListenerManagement:
         except Exception as e:
             maxkb_logger.error(_('Vectorized paragraph: {paragraph_id_list} error {error} {traceback}').format(
                 paragraph_id_list=paragraph_id_list, error=str(e), traceback=traceback.format_exc()))
-            status = Status.error
+            status = State.FAILURE
         finally:
             QuerySet(Paragraph).filter(id__in=paragraph_id_list).update(**{'status': status})
             maxkb_logger.info(

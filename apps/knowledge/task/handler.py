@@ -1,7 +1,6 @@
 # coding=utf-8
 
 
-import logging
 import re
 import traceback
 
@@ -11,7 +10,8 @@ from django.utils.translation import gettext_lazy as _
 from common.utils.fork import ChildLink, Fork
 from common.utils.logger import maxkb_logger
 from common.utils.split_model import get_split_model
-from knowledge.models.knowledge import KnowledgeType, Document, Knowledge, Status
+from knowledge.models import State
+from knowledge.models.knowledge import KnowledgeType, Document, Knowledge
 
 
 def get_save_handler(knowledge_id, selector):
@@ -89,7 +89,7 @@ def get_sync_web_document_handler(knowledge_id):
                      meta={'source_url': source_url, 'selector': selector},
                      type=KnowledgeType.WEB,
                      char_length=0,
-                     status=Status.error).save()
+                     status=State.FAILURE).save()
 
     return handler
 
