@@ -554,7 +554,10 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean, other_para
         if (props.type === 'debug-ai-chat') {
           getSourceDetail(chat)
         } else {
-          if (props.applicationDetails && props.applicationDetails.show_exec) {
+          if (
+            props.applicationDetails &&
+            (props.applicationDetails.show_exec || props.applicationDetails.show_source)
+          ) {
             getSourceDetail(chat)
           }
         }
