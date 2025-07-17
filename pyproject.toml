@@ -42,7 +42,7 @@ sentence-transformers = "5.0.0"
 
 # 云服务SDK
 qianfan = "0.4.12.3"
-zhipuai = "2.1.5.20250708"
+zhipuai = "2.1.5.20250716"
 volcengine-python-sdk = {version = "4.0.5", extras = ["ark"]}
 boto3 = "1.39.4"
 tencentcloud-sdk-python = "3.0.1420"
