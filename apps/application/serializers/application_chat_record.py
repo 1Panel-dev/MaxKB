@@ -6,13 +6,13 @@
     @date：2025/6/10 15:10
     @desc:
 """
-import uuid_utils.compat as uuid
 from functools import reduce
 from typing import Dict
 
+import uuid_utils.compat as uuid
 from django.db import transaction
 from django.db.models import QuerySet
-from django.db.models.aggregates import Max
+from django.db.models.aggregates import Max, Min
 from django.utils.translation import gettext_lazy as _, gettext
 from rest_framework import serializers
 from rest_framework.utils.formatting import lazy_format
@@ -291,12 +291,10 @@ class ApplicationChatRecordAddKnowledgeSerializer(serializers.Serializer):
             problem_paragraph_mappings.append(problem_paragraph_mapping)
             chat_record.improve_paragraph_id_list.append(paragraph.id)
 
-        # 批量保存段落和问题映射
-        max_position = Paragraph.objects.filter(document_id=document_id).aggregate(
-            max_position=Max('position')
-        )['max_position']
-        for i, paragraph in enumerate(paragraphs):
-            paragraph.position = max_position + i + 1
+        # 处理段落位置
+        self.prepend_paragraphs(document_id, paragraphs)
+
+        # 批量创建新段落和问题映射
         Paragraph.objects.bulk_create(paragraphs)
         ProblemParagraphMapping.objects.bulk_create(problem_paragraph_mappings)
 
@@ -307,6 +305,30 @@ class ApplicationChatRecordAddKnowledgeSerializer(serializers.Serializer):
             ChatCountSerializer(data={'chat_id': chat_id}).update_chat()
 
         return paragraph_ids, knowledge_id
+
+    @staticmethod
+    def prepend_paragraphs(document_id, paragraphs):
+        # 获取所有现有段落
+        existing_paragraphs = list(Paragraph.objects.filter(
+            document_id=document_id
+        ).order_by('position'))
+
+        # 计算新段落数量
+        new_count = len(paragraphs)
+
+        # 如果已有段落，需要重新调整所有段落的位置
+        if existing_paragraphs:
+            # 为现有段落重新分配位置，从新段落数量+1开始
+            for i, existing_paragraph in enumerate(existing_paragraphs):
+                existing_paragraph.position = new_count + i + 1
+
+            # 批量更新现有段落位置
+            if existing_paragraphs:
+                Paragraph.objects.bulk_update(existing_paragraphs, ['position'])
+
+        # 为新段落分配位置，从1开始
+        for i, paragraph in enumerate(paragraphs):
+            paragraph.position = i + 1
 
 
 class ApplicationChatRecordImproveSerializer(serializers.Serializer):
