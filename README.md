@@ -24,7 +24,7 @@ MaxKB = Max Knowledge Brain, it is an open-source platform for building enterpri
 Execute the script below to start a MaxKB container using Docker:
 
 ```bash
-docker run -d --name=maxkb --restart=always -p 8080:8080 -v ~/.maxkb:/opt/maxkb 1panel/maxkb:v2
+docker run -d --name=maxkb --restart=always -p 8080:8080 -v ~/.maxkb:/opt/maxkb 1panel/maxkb
 ```
 
 Access MaxKB web interface at `http://your_server_ip:8080` with default admin credentials:
