@@ -26,4 +26,8 @@ def post_handler():
     job.run()
     DatabaseModelManage.init()
 
-post_handler()
+# 仅在web中启动定时任务，local_model celery 不需要
+if os.environ.get('ENABLE_SCHEDULER') == '1':
+    post_handler()
+
+
