@@ -175,6 +175,7 @@ import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import permissionMap from '@/permission'
 import { t } from '@/locales'
+import {cloneDeep} from "lodash";
 const route = useRoute()
 const {
   params: { id, documentId },
@@ -351,7 +352,12 @@ function openGenerateDialog(row?: any) {
 }
 
 function onEnd(event?: any, params?: any, index?: number) {
-  const obj =params ?? {
+  // console.log('onEnd', event, params, index)
+  const p  = cloneDeep(params)
+  if (p) {
+    p.new_position = p.new_position + 1 // 由于拖拽时会将当前段落位置作为新位置，所以需要加1
+  }
+  const obj = p ?? {
     paragraph_id: paragraphDetail.value[event.newIndex].id, // 当前拖动的段落ID
     new_position: paragraphDetail.value[event.newIndex + 1].position, // 新位置的段落位置
   }
