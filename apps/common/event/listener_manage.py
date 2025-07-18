@@ -6,15 +6,16 @@
     @date：2023/10/20 14:01
     @desc:
 """
+import datetime
 import os
 import threading
-import datetime
 import traceback
 from typing import List
 
 import django.db.models
 from django.db.models import QuerySet
 from django.db.models.functions import Substr, Reverse
+from django.utils.translation import gettext_lazy as _
 from langchain_core.embeddings import Embeddings
 
 from common.config.embedding_config import VectorStore
@@ -23,10 +24,9 @@ from common.utils.common import get_file_content
 from common.utils.lock import RedisLock
 from common.utils.logger import maxkb_logger
 from common.utils.page_utils import page_desc
-from knowledge.models import Paragraph, Status, Document, ProblemParagraphMapping, TaskType, State,SourceType, SearchMode
+from knowledge.models import Paragraph, Status, Document, ProblemParagraphMapping, TaskType, State, SourceType, \
+    SearchMode
 from maxkb.conf import (PROJECT_DIR)
-from django.utils.translation import gettext_lazy as _
-
 
 lock = threading.Lock()
 
@@ -91,8 +91,9 @@ class ListenerManagement:
 
     @staticmethod
     def embedding_by_paragraph_data_list(data_list, paragraph_id_list, embedding_model: Embeddings):
-        maxkb_logger.info(_('Start--->Embedding paragraph: {paragraph_id_list}').format(paragraph_id_list=paragraph_id_list))
-        status = State.SUCCESS
+        maxkb_logger.info(_('Start--->Embedding paragraph: {paragraph_id_list}').format(
+            paragraph_id_list=paragraph_id_list)
+        )
         try:
             # 删除段落
             VectorStore.get_embedding_vector().delete_by_paragraph_ids(paragraph_id_list)
@@ -102,14 +103,20 @@ class ListenerManagement:
 
             # 批量向量化
             VectorStore.get_embedding_vector().batch_save(data_list, embedding_model, is_save_function)
+            ListenerManagement.update_status(
+                QuerySet(Paragraph).filter(id__in=paragraph_id_list), TaskType.EMBEDDING, State.SUCCESS
+            )
         except Exception as e:
             maxkb_logger.error(_('Vectorized paragraph: {paragraph_id_list} error {error} {traceback}').format(
-                paragraph_id_list=paragraph_id_list, error=str(e), traceback=traceback.format_exc()))
-            status = State.FAILURE
+                paragraph_id_list=paragraph_id_list, error=str(e), traceback=traceback.format_exc())
+            )
+            ListenerManagement.update_status(
+                QuerySet(Paragraph).filter(id__in=paragraph_id_list), TaskType.EMBEDDING, State.FAILURE
+            )
         finally:
-            QuerySet(Paragraph).filter(id__in=paragraph_id_list).update(**{'status': status})
-            maxkb_logger.info(
-                _('End--->Embedding paragraph: {paragraph_id_list}').format(paragraph_id_list=paragraph_id_list))
+            maxkb_logger.info(_('End--->Embedding paragraph: {paragraph_id_list}').format(
+                paragraph_id_list=paragraph_id_list)
+            )
 
     @staticmethod
     def embedding_by_paragraph(paragraph_id, embedding_model: Embeddings):
@@ -266,11 +273,10 @@ class ListenerManagement:
             if is_the_task_interrupted():
                 return
             maxkb_logger.info(_('Start--->Embedding document: {document_id}').format(document_id=document_id)
-                        )
+                              )
             # 批量修改状态为PADDING
             ListenerManagement.update_status(QuerySet(Document).filter(id=document_id), TaskType.EMBEDDING,
                                              State.STARTED)
-
 
             # 根据段落进行向量化处理
             page_desc(QuerySet(Paragraph)
@@ -381,5 +387,6 @@ class ListenerManagement:
                  similarity: float,
                  search_mode: SearchMode,
                  embedding: Embeddings):
-        return VectorStore.get_embedding_vector().hit_test(query_text, knowledge_id, exclude_document_id_list, top_number,
+        return VectorStore.get_embedding_vector().hit_test(query_text, knowledge_id, exclude_document_id_list,
+                                                           top_number,
                                                            similarity, search_mode, embedding)
