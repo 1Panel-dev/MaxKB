@@ -231,10 +231,10 @@
     <template #footer>
       <div>
         <el-button :loading="loading" @click="visible = false">{{ $t('common.cancel') }}</el-button>
-        <el-button :loading="loading" @click="openDebug" v-if="permissionPrecise.debug(form?.id||'or')">{{
+        <el-button :loading="loading" @click="openDebug" v-if="permissionPrecise.debug() ">{{
           $t('common.debug')
         }}</el-button>
-        <el-button type="primary" @click="submit(FormRef)" :loading="loading" v-if="permissionPrecise.edit(form?.id||'or') || permissionPrecise.create()" >
+        <el-button type="primary" @click="submit(FormRef)" :loading="loading" v-if="isEdit ?  permissionPrecise.edit(form?.id as string) : permissionPrecise.create()" >
           {{ isEdit ? $t('common.save') : $t('common.create') }}
         </el-button>
       </div>
