@@ -27,7 +27,7 @@ class GunicornService(BaseService):
             '--max-requests', '10240',
             '--max-requests-jitter', '2048',
             '--access-logformat', log_format,
-            '--access-logfile', '-',
+            '--access-logfile', '/dev/null',
             '--error-logfile', '-'
         ]
         if DEBUG:
