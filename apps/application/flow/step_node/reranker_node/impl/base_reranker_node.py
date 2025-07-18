@@ -61,6 +61,12 @@ def reset_result_list(result_list: List[Document], document_list: List[Document]
     return r
 
 
+def get_none_result(question):
+    return NodeResult(
+        {'document_list': [], 'question': question,
+         'result_list': [], 'result': ''}, {})
+
+
 class BaseRerankerNode(IRerankerNode):
     def save_context(self, details, workflow_manage):
         self.context['document_list'] = details.get('document_list', [])
@@ -73,6 +79,9 @@ class BaseRerankerNode(IRerankerNode):
                 **kwargs) -> NodeResult:
         self.context['show_knowledge'] = show_knowledge
         documents = merge_reranker_list(reranker_list)
+        documents = [d for d in documents if d.page_content and len(d.page_content) > 0]
+        if len(documents) == 0:
+            return get_none_result(question)
         top_n = reranker_setting.get('top_n', 3)
         self.context['document_list'] = [{'page_content': document.page_content, 'metadata': document.metadata} for
                                          document in documents]
