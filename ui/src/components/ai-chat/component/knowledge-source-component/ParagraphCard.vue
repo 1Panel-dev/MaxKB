@@ -91,14 +91,4 @@ function infoMessage() {
   MsgInfo(t('chat.noDocument'))
 }
 </script>
-<style lang="scss" scoped>
-// .paragraph-source-card-height {
-//   height: 300px;
-// }
-
-// @media only screen and (max-width: 768px) {
-//   .paragraph-source-card-height {
-//     height: 285px;
-//   }
-// }
-</style>
+<style lang="scss" scoped></style>

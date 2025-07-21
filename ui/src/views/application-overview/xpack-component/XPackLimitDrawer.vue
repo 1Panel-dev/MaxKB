@@ -183,16 +183,6 @@ watch(dialogVisible, (bool) => {
     }
   }
 })
-// watch(
-//   () => form.value.authentication,
-//   (b) => {
-//     if (b) {
-//       applicationApi.getChatUserAuthType().then((ok) => {
-//         auth_list.value = ok.data
-//       })
-//     }
-//   },
-// )
 const open = (data: any) => {
   form.value.access_num = data.access_num
   form.value.white_active = data.white_active

@@ -36,12 +36,10 @@ export default defineConfig((conf: any) => {
   const ENV = loadEnv(mode, envDir)
   const proxyConf: Record<string, string | ProxyOptions> = {}
   proxyConf['/admin/api'] = {
-    // target: 'http://47.92.195.88:8080/',
     target: 'http://127.0.0.1:8080',
     changeOrigin: true,
   }
   proxyConf['/chat/api'] = {
-    // target: 'http://47.92.195.88:8080/',
     target: 'http://127.0.0.1:8080',
     changeOrigin: true,
   }

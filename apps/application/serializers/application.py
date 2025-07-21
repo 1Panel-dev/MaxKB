@@ -631,9 +631,10 @@ class ApplicationOperateSerializer(serializers.Serializer):
         if with_valid:
             self.is_valid(raise_exception=True)
             McpServersSerializer(data=instance).is_valid(raise_exception=True)
-            if '"stdio"' in instance.get('mcp_servers'):
-                raise AppApiException(500, _('stdio is not supported'))
         servers = json.loads(instance.get('mcp_servers'))
+        for server, config in servers.items():
+            if config.get('transport') not in ['sse', 'streamable_http']:
+                raise AppApiException(500, _('Only support transport=sse or transport=streamable_http'))
         tools = []
         for server in servers:
             tools += [

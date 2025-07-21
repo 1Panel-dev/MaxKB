@@ -43,7 +43,6 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-// import { Close } from '@element-plus/icons-vue'
 const props = defineProps({
   time: {
     type: Number,

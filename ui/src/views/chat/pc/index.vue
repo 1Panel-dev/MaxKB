@@ -509,7 +509,6 @@ async function openExecutionDetail(row: any) {
 async function openKnowledgeSource(row: any) {
   rightPanelTitle.value = t('chat.KnowledgeSource.title')
   rightPanelType.value = 'knowledgeSource'
-  // TODO 数据
   rightPanelDetail.value = row
   rightPanelSize.value = 400
 }

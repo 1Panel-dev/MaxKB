@@ -222,7 +222,6 @@ const update_field = () => {
     set(props.nodeModel.properties, 'status', 500)
     return
   }
-  // todo
   applicationApi
     .getApplicationDetail(props.nodeModel.properties.node_data.application_id)
     .then((ok) => {

@@ -59,12 +59,6 @@ function initChart() {
     tooltip: {
       trigger: 'axis',
       valueFormatter: (value: any) => numberFormat(value),
-      // axisPointer: {
-      //   type: 'cross',
-      //   label: {
-      //     backgroundColor: '#6a7985'
-      //   }
-      // }
     },
     legend: {
       right: 0,

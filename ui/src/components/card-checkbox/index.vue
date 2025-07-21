@@ -30,11 +30,6 @@ const props = defineProps<{
 
 const toModelValue = computed(() => (props.valueField ? props.data[props.valueField] : props.data))
 
-// const isChecked = computed({
-//   get: () => props.modelValue.includes(toModelValue.value)),
-//   set: (val) => val
-// })
-
 const emit = defineEmits(['update:modelValue', 'change'])
 
 const checked = () => {
