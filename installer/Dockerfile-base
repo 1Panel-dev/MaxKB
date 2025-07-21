@@ -27,7 +27,7 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     mkdir -p /opt/maxkb-app/sandbox && \
     useradd --no-create-home --home /opt/maxkb-app/sandbox sandbox -g root && \
     chown -R sandbox:root /opt/maxkb-app/sandbox && \
-    chmod g-x /usr/local/bin/* /usr/bin/* /bin/* /usr/sbin/* /sbin/* /usr/lib/postgresql/17/bin/* && \
+    chmod g-xr /usr/local/bin/* /usr/bin/* /bin/* /usr/sbin/* /sbin/* /usr/lib/postgresql/17/bin/* && \
     chmod g+x /usr/local/bin/python* && \
     apt-get clean all && \
     rm -rf /var/lib/apt/lists/* /usr/share/doc/* /usr/share/man/* /usr/share/info/* /usr/share/locale/* /usr/share/lintian/* /usr/share/linda/* /var/cache/* /var/log/* /var/tmp/* /tmp/*
