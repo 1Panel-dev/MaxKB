@@ -393,7 +393,7 @@ class ToolSerializer(serializers.Serializer):
             file_name = get_file_name()
             with open(file_name, 'w') as file:
                 file.write(code)
-            reporter = JSON2Reporter()
+            reporter = JSON2Reporter(output=io.StringIO())
             Run([file_name,
                  "--disable=line-too-long",
                  '--module-rgx=[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'],
