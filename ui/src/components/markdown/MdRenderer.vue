@@ -9,7 +9,7 @@
         class="problem-button mt-4 mb-4 flex"
         :class="sendMessage ? 'cursor' : 'disabled'"
       >
-        <el-icon class="mr-8" style="margin-top: 2px;">
+        <el-icon class="mr-8" style="margin-top: 2px">
           <EditPen />
         </el-icon>
         {{ item.content }}
@@ -237,7 +237,7 @@ const split_form_rander_ = (source: string, type: string) => {
   padding: 12px;
   box-sizing: border-box;
   color: var(--el-text-color-regular);
-  word-break: break-all;
+  word-break: break-word;
 
   &:hover {
     background: var(--el-color-primary-light-9);
