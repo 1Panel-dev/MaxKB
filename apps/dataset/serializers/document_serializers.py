@@ -856,7 +856,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
 
     class Create(ApiMixin, serializers.Serializer):
         dataset_id = serializers.UUIDField(required=True, error_messages=ErrMessage.char(
-            _('document id')))
+            _('dataset id')))
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
