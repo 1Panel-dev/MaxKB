@@ -7,13 +7,13 @@
     @desc:
 """
 
+from django.utils.translation import gettext_lazy as _
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import action
 from rest_framework.parsers import MultiPartParser
 from rest_framework.views import APIView
 from rest_framework.views import Request
 
-import dataset.models
 from common.auth import TokenAuth, has_permissions
 from common.constants.permission_constants import PermissionConstants, CompareConstants, Permission, Group, Operate, \
     ViewPermission, RoleConstants
@@ -25,7 +25,6 @@ from dataset.serializers.common_serializers import GenerateRelatedSerializer
 from dataset.serializers.dataset_serializers import DataSetSerializers
 from dataset.views.common import get_dataset_operation_object
 from setting.serializers.provider_serializers import ModelSerializer
-from django.utils.translation import gettext_lazy as _
 
 
 class Dataset(APIView):
@@ -141,21 +140,22 @@ class Dataset(APIView):
     class HitTest(APIView):
         authentication_classes = [TokenAuth]
 
-        @action(methods="GET", detail=False)
+        @action(methods="PUT", detail=False)
         @swagger_auto_schema(operation_summary=_('Hit test list'), operation_id=_('Hit test list'),
                              manual_parameters=CommonApi.HitTestApi.get_request_params_api(),
                              responses=result.get_api_array_response(CommonApi.HitTestApi.get_response_body_api()),
                              tags=[_('Knowledge Base')])
         @has_permissions(lambda r, keywords: Permission(group=Group.DATASET, operate=Operate.USE,
                                                         dynamic_tag=keywords.get('dataset_id')))
-        def get(self, request: Request, dataset_id: str):
-            return result.success(
-                DataSetSerializers.HitTest(data={'id': dataset_id, 'user_id': request.user.id,
-                                                 "query_text": request.query_params.get("query_text"),
-                                                 "top_number": request.query_params.get("top_number"),
-                                                 'similarity': request.query_params.get('similarity'),
-                                                 'search_mode': request.query_params.get('search_mode')}).hit_test(
-                ))
+        def put(self, request: Request, dataset_id: str):
+            return result.success(DataSetSerializers.HitTest(data={
+                'id': dataset_id,
+                'user_id': request.user.id,
+                "query_text": request.data.get("query_text"),
+                "top_number": request.data.get("top_number"),
+                'similarity': request.data.get('similarity'),
+                'search_mode': request.data.get('search_mode')}
+            ).hit_test())
 
     class Embedding(APIView):
         authentication_classes = [TokenAuth]

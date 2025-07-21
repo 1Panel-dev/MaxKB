@@ -186,7 +186,7 @@ const getDatasetHitTest: (
   data: any,
   loading?: Ref<boolean>
 ) => Promise<Result<Array<any>>> = (dataset_id, data, loading) => {
-  return get(`${prefix}/${dataset_id}/hit_test`, data, loading)
+  return put(`${prefix}/${dataset_id}/hit_test`, data, undefined, loading)
 }
 
 /**

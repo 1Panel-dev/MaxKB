@@ -227,7 +227,7 @@ const getApplicationHitTest: (
   data: any,
   loading?: Ref<boolean>
 ) => Promise<Result<Array<any>>> = (application_id, data, loading) => {
-  return get(`${prefix}/${application_id}/hit_test`, data, loading)
+  return put(`${prefix}/${application_id}/hit_test`, data, undefined, loading)
 }
 
 /**

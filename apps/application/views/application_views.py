@@ -7,16 +7,6 @@
     @desc:
 """
 
-from django.core import cache
-from django.http import HttpResponse
-from django.utils.translation import gettext_lazy as _, gettext
-from drf_yasg.utils import swagger_auto_schema
-from langchain_core.prompts import PromptTemplate
-from rest_framework.decorators import action
-from rest_framework.parsers import MultiPartParser
-from rest_framework.request import Request
-from rest_framework.views import APIView
-
 from application.serializers.application_serializers import ApplicationSerializer
 from application.serializers.application_statistics_serializers import ApplicationStatisticsSerializer
 from application.swagger_api.application_api import ApplicationApi
@@ -31,6 +21,14 @@ from common.response import result
 from common.swagger_api.common_api import CommonApi
 from common.util.common import query_params_to_single_dict
 from dataset.serializers.dataset_serializers import DataSetSerializers
+from django.core import cache
+from django.http import HttpResponse
+from django.utils.translation import gettext_lazy as _
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework.decorators import action
+from rest_framework.parsers import MultiPartParser
+from rest_framework.request import Request
+from rest_framework.views import APIView
 
 chat_cache = cache.caches['chat_cache']
 
@@ -494,7 +492,7 @@ class Application(APIView):
     class HitTest(APIView):
         authentication_classes = [TokenAuth]
 
-        @action(methods="GET", detail=False)
+        @action(methods="PUT", detail=False)
         @swagger_auto_schema(operation_summary=_("Hit Test List"), operation_id=_("Hit Test List"),
                              manual_parameters=CommonApi.HitTestApi.get_request_params_api(),
                              responses=result.get_api_array_response(CommonApi.HitTestApi.get_response_body_api()),
@@ -505,15 +503,15 @@ class Application(APIView):
             [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
                                             dynamic_tag=keywords.get('application_id'))],
             compare=CompareConstants.AND))
-        def get(self, request: Request, application_id: str):
-            return result.success(
-                ApplicationSerializer.HitTest(data={'id': application_id, 'user_id': request.user.id,
-                                                    "query_text": request.query_params.get("query_text"),
-                                                    "top_number": request.query_params.get("top_number"),
-                                                    'similarity': request.query_params.get('similarity'),
-                                                    'search_mode': request.query_params.get(
-                                                        'search_mode')}).hit_test(
-                ))
+        def put(self, request: Request, application_id: str):
+            return result.success(ApplicationSerializer.HitTest(data={
+                'id': application_id,
+                'user_id': request.user.id,
+                "query_text": request.data.get("query_text"),
+                "top_number": request.data.get("top_number"),
+                'similarity': request.data.get('similarity'),
+                'search_mode': request.data.get('search_mode')}
+            ).hit_test())
 
     class Publish(APIView):
         authentication_classes = [TokenAuth]
