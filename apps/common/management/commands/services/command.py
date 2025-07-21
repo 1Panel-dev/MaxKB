@@ -12,6 +12,7 @@ class Services(TextChoices):
     gunicorn = 'gunicorn', 'gunicorn'
     celery_default = 'celery_default', 'celery_default'
     local_model = 'local_model', 'local_model'
+    scheduler = 'scheduler', 'scheduler'
     web = 'web', 'web'
     celery = 'celery', 'celery'
     celery_model = 'celery_model', 'celery_model'
@@ -24,7 +25,8 @@ class Services(TextChoices):
         services_map = {
             cls.gunicorn.value: services.GunicornService,
             cls.celery_default: services.CeleryDefaultService,
-            cls.local_model: services.GunicornLocalModelService
+            cls.local_model: services.GunicornLocalModelService,
+            cls.scheduler: services.SchedulerService,
         }
         return services_map.get(name)
 
@@ -41,8 +43,12 @@ class Services(TextChoices):
         return cls.celery_services()
 
     @classmethod
+    def scheduler_services(cls):
+        return [cls.scheduler]
+
+    @classmethod
     def all_services(cls):
-        return cls.web_services() + cls.task_services()
+        return cls.web_services() + cls.task_services() + cls.scheduler_services()
 
     @classmethod
     def export_services_values(cls):

@@ -1,21 +1,23 @@
+import subprocess
+
 from .base import BaseService
 from ..hands import *
 
-__all__ = ['GunicornService']
+__all__ = ['SchedulerService']
 
 
-class GunicornService(BaseService):
+class SchedulerService(BaseService):
 
     def __init__(self, **kwargs):
-        self.worker = kwargs['worker_gunicorn']
+        self.worker = 1
         super().__init__(**kwargs)
 
     @property
     def cmd(self):
-        print("\n- Start Gunicorn WSGI HTTP Server")
+        print("\n- Start Scheduler Server")
 
         log_format = '%(h)s %(t)s %(L)ss "%(r)s" %(s)s %(b)s '
-        bind = f'{HTTP_HOST}:{HTTP_PORT}'
+        bind = f'127.0.0.1:6060'
         cmd = [
             'gunicorn', 'maxkb.wsgi:application',
             '-b', bind,
@@ -35,3 +37,15 @@ class GunicornService(BaseService):
     @property
     def cwd(self):
         return APPS_DIR
+
+    def open_subprocess(self):
+        # 复制当前环境变量，并设置 ENABLE_SCHEDULER=1
+        env = os.environ.copy()
+        env['ENABLE_SCHEDULER'] = '1'
+        kwargs = {
+            'cwd': self.cwd,
+            'stderr': self.log_file,
+            'stdout': self.log_file,
+            'env': env
+        }
+        self._process = subprocess.Popen(self.cmd, **kwargs)
