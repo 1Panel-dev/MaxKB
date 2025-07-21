@@ -378,7 +378,7 @@ const isSystemShare = computed(() => {
 const MoreFilledPermission = (item: any) => {
   return (item.type === 1 && permissionPrecise.value.sync(item.id)) ||
   permissionPrecise.value.vector(item.id) || permissionPrecise.value.generate(item.id) || 
-  permissionPrecise.value.edit(item.id) && apiType.value === 'workspace' || 
+  (permissionPrecise.value.edit(item.id) && apiType.value) === 'workspace' || 
   permissionPrecise.value.export(item.id) || permissionPrecise.value.delete(item.id) || isSystemShare.value
 }
 
