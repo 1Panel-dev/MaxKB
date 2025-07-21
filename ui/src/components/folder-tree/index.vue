@@ -54,7 +54,9 @@
                 class="mr-16"
               >
                 <el-dropdown trigger="click" :teleported="false">
-                  <el-button text class="w-full">
+                  <el-button text class="w-full"
+                    v-if="MoreFilledPermission(node)"
+                  >
                     <el-icon><MoreFilled /></el-icon>
                   </el-button>
                   <template #dropdown>
@@ -155,6 +157,14 @@ const resourceType = computed(() => {
 const permissionPrecise = computed(() => {
   return permissionMap[resourceType.value!]['workspace']
 })
+
+const MoreFilledPermission = (node: any) =>{
+  return (
+    (node.level !== 3 && permissionPrecise.value.folderCreate()) ||
+    permissionPrecise.value.folderEdit() ||
+    permissionPrecise.value.folderDelete()
+  )
+}
 
 const { folder } = useStore()
 onBeforeRouteLeave((to, from) => {
