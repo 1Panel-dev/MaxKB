@@ -3,7 +3,7 @@
     <div class="header border-b flex-between p-12-24">
       <div class="flex align-center">
         <back-button @click="back"></back-button>
-        <h4>{{ detail?.name }}</h4>
+        <h4 class="ellipsis-1" style="width: 50%" :title="detail?.name">{{ detail?.name }}</h4>
         <div v-if="showHistory && disablePublic">
           <el-text type="info" class="ml-16 color-secondary"
             >{{ $t('views.applicationWorkflow.info.previewVersion') }}
@@ -101,7 +101,7 @@
                 />
               </div>
 
-              <h4>
+              <h4 class="ellipsis" style="max-width: 270px" :title="detail?.name">
                 {{ detail?.name || $t('views.application.applicationForm.form.appName.label') }}
               </h4>
             </div>
@@ -279,7 +279,6 @@ async function publicHandle() {
         return
       }
       applicationApi.putPublishApplication(id as String, obj, loading).then(() => {
-
         application.asyncGetApplicationDetail(id, loading).then((res: any) => {
           detail.value.name = res.data.name
           MsgSuccess(t('views.applicationWorkflow.tip.publicSuccess'))

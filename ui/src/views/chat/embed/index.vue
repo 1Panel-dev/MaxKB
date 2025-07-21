@@ -28,7 +28,9 @@
           />
         </div>
 
-        <h4>{{ applicationDetail?.name }}</h4>
+        <h4 class="ellipsis-1" style="width: 50%" :title="applicationDetail?.name">
+          {{ applicationDetail?.name }}
+        </h4>
       </div>
     </div>
     <div>
