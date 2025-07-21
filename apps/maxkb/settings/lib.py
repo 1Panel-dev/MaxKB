@@ -68,7 +68,7 @@ else:
         }
     }
 CELERY_result_backend = CELERY_BROKER_URL
-CELERY_timezone = CONFIG.TIME_ZONE
+CELERY_timezone = CONFIG.get_time_zone()
 CELERY_ENABLE_UTC = False
 CELERY_task_serializer = 'pickle'
 CELERY_result_serializer = 'pickle'
