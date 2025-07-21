@@ -23,6 +23,9 @@ export default {
     nameMessage: '文件名稱不能为空！',
     importMessage: '導入成功',
     migrationSuccess: '遷移成功',
+    fileLimitCountTip1: '每次最多上傳',
+    fileLimitCountTip2: '個文件',
+    fileLimitSizeTip1: '每個文件不超過',
   },
   upload: {
     selectFile: '選擇文件',
@@ -159,7 +162,7 @@ export default {
   movePosition: {
     title: '移動位置',
     moveUp: '上移',
-    moveDown: '下移'
+    moveDown: '下移',
   },
   generateQuestion: {
     title: '生成問題',

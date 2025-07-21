@@ -37,7 +37,7 @@
           </p>
           <p>{{ $t('views.document.fileType.QA.tip2') }}</p>
           <p>
-            3、{{ $t('views.document.tip.fileLimitCountTip1') }} {{ file_count_limit }}
+            3. {{ $t('views.document.tip.fileLimitCountTip1') }} {{ file_count_limit }}
             {{ $t('views.document.tip.fileLimitCountTip2') }},
             {{ $t('views.document.tip.fileLimitSizeTip1') }} {{ file_size_limit }} MB
           </p>
@@ -95,7 +95,7 @@
           <p>{{ $t('views.document.fileType.table.tip2') }}</p>
           <p>{{ $t('views.document.fileType.table.tip3') }}</p>
           <p>
-            4、{{ $t('views.document.tip.fileLimitCountTip1') }} {{ file_count_limit }}
+            4. {{ $t('views.document.tip.fileLimitCountTip1') }} {{ file_count_limit }}
             {{ $t('views.document.tip.fileLimitCountTip2') }},
             {{ $t('views.document.tip.fileLimitSizeTip1') }} {{ file_size_limit }} MB
           </p>
@@ -141,7 +141,7 @@
         <div class="ml-16 lighter">
           <p>{{ $t('views.document.fileType.txt.tip1') }}</p>
           <p>
-            2、{{ $t('views.document.tip.fileLimitCountTip1') }} {{ file_count_limit }}
+            2. {{ $t('views.document.tip.fileLimitCountTip1') }} {{ file_count_limit }}
             {{ $t('views.document.tip.fileLimitCountTip2') }},
             {{ $t('views.document.tip.fileLimitSizeTip1') }} {{ file_size_limit }} MB
           </p>
