@@ -7,15 +7,13 @@
     @desc:
 """
 import uuid_utils.compat as uuid
-
 from django.core import signing
 from django.core.cache import cache
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from application.models import ApplicationAccessToken, ChatUserType, Application, ApplicationTypeChoices, \
-    ApplicationVersion
+from application.models import ApplicationAccessToken, ChatUserType, Application, ApplicationVersion
 from application.serializers.application import ApplicationSerializerModel
 from common.auth.common import ChatUserToken, ChatAuthentication
 from common.constants.authentication_type import AuthenticationType
@@ -68,15 +66,16 @@ class AuthProfileSerializer(serializers.Serializer):
         application_setting_model = DatabaseModelManage.get_model('application_setting')
         if application_setting_model:
             application_setting = QuerySet(application_setting_model).filter(application_id=application_id).first()
-            profile = {
-                'icon': application_setting.application.icon,
-                'application_name': application_setting.application.name,
-                'bg_icon': application_setting.chat_background,
-                'authentication': application_access_token.authentication,
-                'authentication_type': application_access_token.authentication_value.get(
-                    'type', 'password'),
-                'login_value': application_access_token.authentication_value.get('login_value', [])
-            }
+            if application_setting is not None:
+                profile = {
+                    'icon': application_setting.application.icon,
+                    'application_name': application_setting.application.name,
+                    'bg_icon': application_setting.chat_background,
+                    'authentication': application_access_token.authentication,
+                    'authentication_type': application_access_token.authentication_value.get(
+                        'type', 'password'),
+                    'login_value': application_access_token.authentication_value.get('login_value', [])
+                }
         return profile
 
 
