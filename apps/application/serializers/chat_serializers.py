@@ -222,7 +222,8 @@ class ChatSerializers(serializers.Serializer):
                     reference_paragraph,
                     "\n".join([
                         f"{improve_paragraph_list[index].get('title')}\n{improve_paragraph_list[index].get('content')}"
-                        for index in range(len(improve_paragraph_list))]),
+                        for index in range(len(improve_paragraph_list))
+                    ]) if improve_paragraph_list is not None else "",
                     row.get('asker').get('user_name'),
                     row.get('message_tokens') + row.get('answer_tokens'), row.get('run_time'),
                     str(row.get('create_time').astimezone(pytz.timezone(TIME_ZONE)).strftime('%Y-%m-%d %H:%M:%S')
