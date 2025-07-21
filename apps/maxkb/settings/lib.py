@@ -17,8 +17,8 @@ celery_data_dir = os.path.join(PROJECT_DIR, 'data', 'celery_task')
 if not os.path.exists(celery_data_dir) or not os.path.isdir(celery_data_dir):
     os.makedirs(celery_data_dir)
 # Celery using redis as broker
-redis_celery_once_db = CONFIG.get("REDIS_CELERY_ONCE_DB", 3)
-redis_celery_db = CONFIG.get('REDIS_CELERY_DB', 2)
+redis_celery_once_db = CONFIG.get("REDIS_DB")
+redis_celery_db = CONFIG.get('REDIS_DB')
 CELERY_BROKER_URL_FORMAT = '%(protocol)s://:%(password)s@%(host)s:%(port)s/%(db)s'
 if CONFIG.get('REDIS_SENTINEL_MASTER') and CONFIG.get('REDIS_SENTINEL_SENTINELS'):
     sentinels_str = CONFIG.get('REDIS_SENTINEL_SENTINELS')
