@@ -127,7 +127,6 @@ const update_field = () => {
     set(props.nodeModel.properties, 'status', 500)
     return
   }
-  //todo
   ToolApi.getToolById(props.nodeModel.properties.node_data.tool_lib_id)
     .then((ok) => {
       const old_input_field_list = props.nodeModel.properties.node_data.input_field_list

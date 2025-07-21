@@ -20,7 +20,7 @@
           v-model="data.is_active"
           :before-change="() => changeState(data)"
           size="small"
-          v-if="permissionPrecise.doc_edit(id)" 
+          v-if="permissionPrecise.doc_edit(id)"
         />
 
         <el-divider direction="vertical" />
@@ -222,7 +222,7 @@ function editParagraph(row: any) {
 const cardClick = permissionPrecise.value.doc_edit(id)
 
 function handleClickCard(row: any) {
-  if (!cardClick || dialogVisible.value) 
+  if (!cardClick || dialogVisible.value)
   {return }
   if (!props.disabled) {
     editParagraph(row)

@@ -316,11 +316,6 @@ const openChatId: () => Promise<string> = () => {
       return res.data
     })
     .catch((res) => {
-      // if (res.response.status === 403) {
-      //   return application.asyncAppAuthentication(accessToken).then(() => {
-      //     return openChatId()
-      //   })
-      // }
       return Promise.reject(res)
     })
 }

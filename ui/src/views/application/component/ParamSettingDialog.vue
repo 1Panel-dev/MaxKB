@@ -260,20 +260,6 @@ const isWorkflowType = ref(false)
 
 watch(dialogVisible, (bool) => {
   if (!bool) {
-    // form.value = {
-    //   knowledge_setting: {
-    //     search_mode: 'embedding',
-    //     top_n: 3,
-    //     similarity: 0.6,
-    //     max_paragraph_char_number: 5000,
-    //     no_references_setting: {
-    //       status: 'ai_questioning',
-    //       value: '{question}'
-    //     }
-    //   },
-    //   problem_optimization: false,
-    //   problem_optimization_prompt: ''
-    // }
     noReferencesform.value = {
       ai_questioning: defaultValue['ai_questioning'],
       designated_answer: defaultValue['designated_answer'],

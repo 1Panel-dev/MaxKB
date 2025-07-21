@@ -40,7 +40,6 @@ const props = defineProps<{ tabs: Tab[] }>()
 const activeKey = ref('')
 const allConfigs = ref<PlatformConfig[]>([])
 const config = ref<Config>({ app_key: '', app_secret: '' })
-// const logoUrl = ref('')
 const { login } = useStore()
 async function getPlatformInfo() {
   try {
