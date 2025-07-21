@@ -33,10 +33,12 @@ from smartdoc.const import CONFIG
 
 function_executor = FunctionExecutor(CONFIG.get('SANDBOX'))
 
+
 class FlibInstance:
     def __init__(self, function_lib: dict, version: str):
         self.function_lib = function_lib
         self.version = version
+
 
 def encryption(message: str):
     """
@@ -68,7 +70,8 @@ def encryption(message: str):
 class FunctionLibModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = FunctionLib
-        fields = ['id', 'name', 'icon', 'desc', 'code', 'input_field_list','init_field_list', 'init_params', 'permission_type', 'is_active', 'user_id', 'template_id',
+        fields = ['id', 'name', 'icon', 'desc', 'code', 'input_field_list', 'init_field_list', 'init_params',
+                  'permission_type', 'is_active', 'user_id', 'template_id',
                   'create_time', 'update_time']
 
 
@@ -147,7 +150,6 @@ class FunctionLibSerializer(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_('user id')))
         select_user_id = serializers.CharField(required=False, allow_null=True, allow_blank=True)
         function_type = serializers.CharField(required=False, allow_null=True, allow_blank=True)
-
 
         def get_query_set(self):
             query_set = QuerySet(FunctionLib).filter(
@@ -269,7 +271,7 @@ class FunctionLibSerializer(serializers.Serializer):
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
-            if not QuerySet(FunctionLib).filter(id=self.data.get('id')).exists():
+            if not QuerySet(FunctionLib).filter(user_id=self.data.get('user_id'), id=self.data.get('id')).exists():
                 raise AppApiException(500, _('Function does not exist'))
 
         def delete(self, with_valid=True):
@@ -285,7 +287,8 @@ class FunctionLibSerializer(serializers.Serializer):
             if with_valid:
                 self.is_valid(raise_exception=True)
                 EditFunctionLib(data=instance).is_valid(raise_exception=True)
-            edit_field_list = ['name', 'desc', 'code', 'icon', 'input_field_list', 'init_field_list', 'init_params', 'permission_type', 'is_active']
+            edit_field_list = ['name', 'desc', 'code', 'icon', 'input_field_list', 'init_field_list', 'init_params',
+                               'permission_type', 'is_active']
             edit_dict = {field: instance.get(field) for field in edit_field_list if (
                     field in instance and instance.get(field) is not None)}
 
@@ -317,7 +320,8 @@ class FunctionLibSerializer(serializers.Serializer):
             if function_lib.init_params:
                 function_lib.init_params = json.loads(rsa_long_decrypt(function_lib.init_params))
             if function_lib.init_field_list:
-                password_fields = [i["field"] for i in function_lib.init_field_list if i.get("input_type") == "PasswordInput"]
+                password_fields = [i["field"] for i in function_lib.init_field_list if
+                                   i.get("input_type") == "PasswordInput"]
                 if function_lib.init_params:
                     for k in function_lib.init_params:
                         if k in password_fields and function_lib.init_params[k]:
