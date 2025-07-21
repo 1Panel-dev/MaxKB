@@ -363,6 +363,18 @@ const systemRouter = {
             [EditionConst.IS_EE],
             'OR',
           ),
+          new ComplexPermission(
+                [RoleConst.ADMIN],
+                [PermissionConst.SHARED_TOOL_READ],
+                [EditionConst.IS_EE],
+                'OR',
+              ),
+          new ComplexPermission(
+                [RoleConst.ADMIN],
+                [PermissionConst.SHARED_MODEL_READ],
+                [EditionConst.IS_EE],
+                'OR',
+              ),
         ],
       },
       children: [
@@ -378,18 +390,6 @@ const systemRouter = {
               new ComplexPermission(
                 [RoleConst.ADMIN],
                 [PermissionConst.SHARED_KNOWLEDGE_READ],
-                [EditionConst.IS_EE],
-                'OR',
-              ),
-              new ComplexPermission(
-                [RoleConst.ADMIN],
-                [PermissionConst.SHARED_TOOL_READ],
-                [EditionConst.IS_EE],
-                'OR',
-              ),
-              new ComplexPermission(
-                [RoleConst.ADMIN],
-                [PermissionConst.SHARED_MODEL_READ],
                 [EditionConst.IS_EE],
                 'OR',
               ),

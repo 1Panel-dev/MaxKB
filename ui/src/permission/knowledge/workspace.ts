@@ -35,8 +35,8 @@ const workspace = {
       [
         new ComplexPermission([RoleConst.USER],[PermissionConst.KNOWLEDGE.getKnowledgeWorkspaceResourcePermission(source_id)],[],'AND'),
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-        PermissionConst.KNOWLEDGE_DOCUMENT_SYNC.getKnowledgeWorkspaceResourcePermission(source_id),
-        PermissionConst.KNOWLEDGE_DOCUMENT_SYNC.getWorkspacePermissionWorkspaceManageRole,
+        PermissionConst.KNOWLEDGE_SYNC.getKnowledgeWorkspaceResourcePermission(source_id),
+        PermissionConst.KNOWLEDGE_SYNC.getWorkspacePermissionWorkspaceManageRole,
       ],
       'OR',
     ),
@@ -45,8 +45,8 @@ const workspace = {
       [
         new ComplexPermission([RoleConst.USER],[PermissionConst.KNOWLEDGE.getKnowledgeWorkspaceResourcePermission(source_id)],[],'AND'),
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-        PermissionConst.KNOWLEDGE_DOCUMENT_VECTOR.getKnowledgeWorkspaceResourcePermission(source_id),
-        PermissionConst.KNOWLEDGE_DOCUMENT_VECTOR.getWorkspacePermissionWorkspaceManageRole,
+        PermissionConst.KNOWLEDGE_VECTOR.getKnowledgeWorkspaceResourcePermission(source_id),
+        PermissionConst.KNOWLEDGE_VECTOR.getWorkspacePermissionWorkspaceManageRole,
       ],
       'OR',
     ),

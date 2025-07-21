@@ -219,7 +219,9 @@
                 <template #mouseEnter>
                   <div @click.stop v-if="!isShared">
                     <el-dropdown trigger="click">
-                      <el-button text @click.stop>
+                      <el-button text @click.stop
+                        v-if="MoreFilledPermission(item)"
+                      >
                         <el-icon>
                           <MoreFilled />
                         </el-icon>
@@ -243,7 +245,7 @@
                           <el-dropdown-item
                             icon="Connection"
                             @click.stop="openGenerateDialog(item)"
-                            v-if="permissionPrecise.doc_generate(item.id)"
+                            v-if="permissionPrecise.generate(item.id)"
                             >{{ $t('views.document.generateQuestion.title') }}
                           </el-dropdown-item>
                           <el-dropdown-item
@@ -372,6 +374,13 @@ const isShared = computed(() => {
 const isSystemShare = computed(() => {
   return apiType.value === 'systemShare'
 })
+
+const MoreFilledPermission = (item: any) => {
+  return (item.type === 1 && permissionPrecise.value.sync(item.id)) ||
+  permissionPrecise.value.vector(item.id) || permissionPrecise.value.generate(item.id) || 
+  permissionPrecise.value.edit(item.id) && apiType.value === 'workspace' || 
+  permissionPrecise.value.export(item.id) || permissionPrecise.value.delete(item.id) || isSystemShare.value
+}
 
 const loading = ref(false)
 
