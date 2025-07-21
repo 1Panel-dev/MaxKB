@@ -141,9 +141,8 @@ class DocumentEditInstanceSerializer(ApiMixin, serializers.Serializer):
         if 'meta' in self.data and self.data.get('meta') is not None:
             dataset_meta_valid_map = self.get_meta_valid_map()
             valid_class = dataset_meta_valid_map.get(document.type)
-            if valid_class is None:
-                return
-            valid_class(data=self.data.get('meta')).is_valid(raise_exception=True)
+            if valid_class is not None:
+                valid_class(data=self.data.get('meta')).is_valid(raise_exception=True)
 
 
 class DocumentWebInstanceSerializer(ApiMixin, serializers.Serializer):
