@@ -11,6 +11,7 @@ from typing import Dict
 import requests
 from langchain_community.embeddings import OpenAIEmbeddings
 
+from common.utils.logger import maxkb_logger
 from models_provider.base_model_provider import MaxKBBaseModel
 
 
@@ -35,7 +36,9 @@ class SiliconCloudEmbeddingModel(MaxKBBaseModel, OpenAIEmbeddings):
 
         response = requests.post(self.openai_api_base + '/embeddings', json=payload, headers=headers)
         data = response.json()
-
+        # print(data)
+        if data['data'] is None or 'code' in data:
+            raise ValueError(f"Embedding API returned no data: {data}")
         # 假设返回结构中有 'data[0].embedding'
         return data["data"][0]["embedding"]
 

@@ -213,10 +213,10 @@ class KnowledgeView(APIView):
                     'workspace_id': workspace_id,
                     'knowledge_id': knowledge_id,
                     'user_id': request.user.id,
-                    "query_text": request.query_params.get("query_text"),
-                    "top_number": request.query_params.get("top_number"),
-                    'similarity': request.query_params.get('similarity'),
-                    'search_mode': request.query_params.get('search_mode')
+                    "query_text": request.data.get("query_text"),
+                    "top_number": request.data.get("top_number"),
+                    'similarity': request.data.get('similarity'),
+                    'search_mode': request.data.get('search_mode')
                 }
             ).hit_test())
 
