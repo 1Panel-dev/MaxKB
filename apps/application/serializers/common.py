@@ -98,7 +98,7 @@ class ChatInfo:
         if self.chat_user_type == ChatUserType.CHAT_USER.value and chat_user_model:
             chat_user = QuerySet(chat_user_model).filter(id=self.chat_user_id).first()
             return {
-                'id': chat_user.id,
+                'id': str(chat_user.id),
                 'email': chat_user.email,
                 'phone': chat_user.phone,
                 'nick_name': chat_user.nick_name,
