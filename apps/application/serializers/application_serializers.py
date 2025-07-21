@@ -16,6 +16,7 @@ import re
 import uuid
 from functools import reduce
 from typing import Dict, List
+
 from django.contrib.postgres.fields import ArrayField
 from django.core import cache, validators
 from django.core import signing
@@ -24,8 +25,8 @@ from django.db.models import QuerySet
 from django.db.models.expressions import RawSQL
 from django.http import HttpResponse
 from django.template import Template, Context
+from django.utils.translation import gettext_lazy as _, get_language, to_locale
 from langchain_mcp_adapters.client import MultiServerMCPClient
-from mcp.client.sse import sse_client
 from rest_framework import serializers, status
 from rest_framework.utils.formatting import lazy_format
 
@@ -38,7 +39,7 @@ from common.config.embedding_config import VectorStore
 from common.constants.authentication_type import AuthenticationType
 from common.db.search import get_dynamics_model, native_search, native_page_search
 from common.db.sql_execute import select_list
-from common.exception.app_exception import AppApiException, NotFound404, AppUnauthorizedFailed, ChatException
+from common.exception.app_exception import AppApiException, NotFound404, AppUnauthorizedFailed
 from common.field.common import UploadedImageField, UploadedFileField
 from common.models.db_model_manage import DBModelManage
 from common.response import result
@@ -57,7 +58,6 @@ from setting.models_provider.tools import get_model_instance_by_model_user_id
 from setting.serializers.provider_serializers import ModelSerializer
 from smartdoc.conf import PROJECT_DIR
 from users.models import User
-from django.utils.translation import gettext_lazy as _, get_language, to_locale
 
 chat_cache = cache.caches['chat_cache']
 
@@ -1328,6 +1328,9 @@ class ApplicationSerializer(serializers.Serializer):
                 if '"stdio"' in self.data.get('mcp_servers'):
                     raise AppApiException(500, _('stdio is not supported'))
             servers = json.loads(self.data.get('mcp_servers'))
+            for server, config in servers.items():
+                if config.get('transport') not in ['sse', 'streamable_http']:
+                    raise AppApiException(500, _('Only support transport=sse or transport=streamable_http'))
 
             async def get_mcp_tools(servers):
                 async with MultiServerMCPClient(servers) as client:
