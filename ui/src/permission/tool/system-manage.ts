@@ -14,6 +14,7 @@ const systemManage = {
     ),
   delete: () => false,
   create: () => false,
+  import: () => false,
   switch: () => false,
   edit: () => false,
   copy: () => false,

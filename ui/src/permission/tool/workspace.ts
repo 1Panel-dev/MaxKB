@@ -20,6 +20,16 @@ const workspace = {
       ],
       'OR'
     ),
+  import: () =>
+    hasPermission(
+      [
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        RoleConst.USER.getWorkspaceRole,
+        PermissionConst.TOOL_IMPORT.getWorkspacePermission,
+        PermissionConst.TOOL_IMPORT.getWorkspacePermissionWorkspaceManageRole
+      ],
+      'OR'
+    ),  
   folderCreate: () =>
     hasPermission(
       [

@@ -65,7 +65,9 @@
                 :on-change="(file: any, fileList: any) => importTool(file)"
                 class="import-button"
               >
-                <el-dropdown-item>
+                <el-dropdown-item 
+                  v-if="permissionPrecise.import()"
+                >
                   <div class="flex align-center w-full">
                     <el-avatar shape="square" class="mt-4" :size="36" style="background: none">
                       <img src="@/assets/icon_import.svg" alt="" />
@@ -195,7 +197,8 @@
                   </div>
                 </template>
                 <template #mouseEnter>
-                  <div @click.stop v-if="!isShared">
+                  <div @click.stop v-if="!isShared && 
+                    MoreFieldPermission(item.id)">
                     <el-switch
                       v-model="item.is_active"
                       :before-change="() => changeState(item)"
@@ -349,6 +352,12 @@ const isSystemShare = computed(() => {
 const permissionPrecise = computed(() => {
   return permissionMap['tool'][apiType.value]
 })
+
+const MoreFieldPermission = (id: any) => {
+  return (permissionPrecise.value.edit(id) || 
+   permissionPrecise.value.export(id) || 
+  permissionPrecise.value.delete(id) || isSystemShare.value)
+}
 
 const InitParamDrawerRef = ref()
 const search_type = ref('name')

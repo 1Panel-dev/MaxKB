@@ -11,6 +11,14 @@ const share = {
       ],
       'OR',
     ),
+    import: () =>
+    hasPermission(
+      [
+        RoleConst.ADMIN,
+        PermissionConst.SHARED_TOOL_IMPORT,
+      ],
+      'OR',
+    ),
     delete: () =>
     hasPermission(
       [
