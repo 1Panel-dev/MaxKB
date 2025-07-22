@@ -8,15 +8,16 @@
         </h4>
       </template>
       <div class="hit-test__main p-16" v-loading="loading">
-        <div class="question-title" :style="{ visibility: questionTitle ? 'visible' : 'hidden' }">
-          <div class="avatar">
-            <AppAvatar>
-              <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
-            </AppAvatar>
-          </div>
-          <div class="content">
-            <h4 class="text break-all">{{ questionTitle }}</h4>
-          </div>
+        <div
+          class="question-title flex align-center"
+          :style="{ visibility: questionTitle ? 'visible' : 'hidden' }"
+        >
+          <AppAvatar>
+            <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
+          </AppAvatar>
+          <h4 class="break-all ellipsis-1 ml-8" style="width: 66%" :title="questionTitle">
+            {{ questionTitle }}
+          </h4>
         </div>
         <el-scrollbar>
           <div class="hit-test-height">
@@ -349,20 +350,6 @@ onMounted(() => {})
 </script>
 <style lang="scss" scoped>
 .hit-test {
-  .question-title {
-    .avatar {
-      float: left;
-    }
-    .content {
-      padding-left: 40px;
-      .text {
-        padding: 6px 0;
-        height: 34px;
-        box-sizing: border-box;
-      }
-    }
-  }
-
   &__operate {
     .operate-textarea {
       box-shadow: 0px 6px 24px 0px rgba(31, 35, 41, 0.08);
