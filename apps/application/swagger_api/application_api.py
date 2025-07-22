@@ -302,7 +302,19 @@ class ApplicationApi(ApiMixin):
                     'no_references_prompt': openapi.Schema(type=openapi.TYPE_STRING,
                                                            title=_("No citation segmentation prompt"),
                                                            default="{question}",
-                                                           description=_("No citation segmentation prompt"))
+                                                           description=_("No citation segmentation prompt")),
+                    'reasoning_content_enable': openapi.Schema(type=openapi.TYPE_BOOLEAN,
+                                                               title=_("Reasoning enable"),
+                                                               default=False,
+                                                               description=_("Reasoning enable")),
+                    'reasoning_content_end': openapi.Schema(type=openapi.TYPE_STRING,
+                                                            title=_("Reasoning end tag"),
+                                                            default="</think>",
+                                                            description=_("Reasoning end tag")),
+                    "reasoning_content_start": openapi.Schema(type=openapi.TYPE_STRING,
+                                                              title=_("Reasoning start tag"),
+                                                              default="<think>",
+                                                              description=_("Reasoning start tag"))
 
                 }
             )

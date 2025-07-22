@@ -7500,3 +7500,12 @@ msgstr ""
 
 msgid "captcha"
 msgstr ""
+
+msgid "Reasoning enable"
+msgstr ""
+
+msgid "Reasoning start tag"
+msgstr ""
+
+msgid "Reasoning end tag"
+msgstr ""

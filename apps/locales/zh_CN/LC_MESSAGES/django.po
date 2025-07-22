@@ -7663,3 +7663,12 @@ msgstr "验证码错误或过期"
 
 msgid "captcha"
 msgstr "验证码"
+
+msgid "Reasoning enable"
+msgstr "开启思考过程"
+
+msgid "Reasoning start tag"
+msgstr "思考过程开始标签"
+
+msgid "Reasoning end tag"
+msgstr "思考过程结束标签"
