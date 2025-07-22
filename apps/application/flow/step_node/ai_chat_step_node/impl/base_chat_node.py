@@ -188,6 +188,7 @@ class BaseChatNode(IChatNode):
         self.context['answer'] = details.get('answer')
         self.context['question'] = details.get('question')
         self.context['reasoning_content'] = details.get('reasoning_content')
+        self.context['model_setting'] = details.get('model_setting')
         if self.node_params.get('is_result', False):
             self.answer_text = details.get('answer')
 
@@ -274,6 +275,7 @@ class BaseChatNode(IChatNode):
             "index": index,
             'run_time': self.context.get('run_time'),
             'system': self.context.get('system'),
+            'model_setting': self.context.get('model_setting'),
             'history_message': [{'content': message.content, 'role': message.type} for message in
                                 (self.context.get('history_message') if self.context.get(
                                     'history_message') is not None else [])],
