@@ -43,7 +43,9 @@
                     <div class="flex-between">
                       <span class="ellipsis" :title="row.name">{{ row.name }}</span>
                       <div @click.stop v-show="mouseId === row.id">
-                        <el-dropdown :teleported="false" trigger="click">
+                        <el-dropdown :teleported="false" trigger="click"
+                          v-if="editPermission() || dlePermission()"  
+                        >
                           <el-button text>
                             <el-icon class="color-secondary">
                               <MoreFilled />
@@ -54,12 +56,7 @@
                               <el-dropdown-item
                                 @click.stop="createOrUpdateWorkspace(row)"
                                 class="p-8"
-                                v-if="
-                                  hasPermission(
-                                    [RoleConst.ADMIN, PermissionConst.WORKSPACE_EDIT],
-                                    'OR',
-                                  )
-                                "
+                                v-if="editPermission()"
                               >
                                 <el-icon><EditPen /></el-icon>
                                 {{ $t('common.rename') }}
@@ -67,13 +64,7 @@
                               <el-dropdown-item
                                 @click.stop="deleteWorkspace(row)"
                                 class="border-t p-8"
-                                v-if="
-                                  row.id !== 'default' &&
-                                  hasPermission(
-                                    [RoleConst.ADMIN, PermissionConst.WORKSPACE_DELETE],
-                                    'OR',
-                                  )
-                                "
+                                v-if="dlePermission()"
                               >
                                 <el-icon><Delete /></el-icon>
                                 {{ $t('common.delete') }}
@@ -143,6 +134,16 @@ onMounted(async () => {
   await getWorkspace()
   currentWorkspace.value = list.value[0]
 })
+
+const editPermission = () => {
+  return hasPermission([RoleConst.ADMIN, 
+  PermissionConst.WORKSPACE_EDIT],'OR',)
+}
+
+const dlePermission = () => {
+  return hasPermission([RoleConst.ADMIN, 
+  PermissionConst.WORKSPACE_DELETE],'OR',)
+}
 
 async function refresh(workspace?: WorkspaceItem) {
   await getWorkspace()
