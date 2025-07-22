@@ -1,5 +1,5 @@
 import { MsgError } from '@/utils/message'
-
+import { nanoid } from 'nanoid'
 export function toThousands(num: any) {
   return num?.toString().replace(/\d+/, function (n: any) {
     return n.replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
@@ -25,7 +25,7 @@ export function filesize(size: number) {
   随机id
 */
 export const randomId = function () {
-  return Math.floor(Math.random() * 10000) + ''
+  return nanoid()
 }
 
 /*
@@ -48,7 +48,9 @@ const typeList: any = {
 export function getImgUrl(name: string) {
   const list = Object.values(typeList).flat()
 
-  const type = list.includes(fileType(name).toLowerCase()) ? fileType(name).toLowerCase() : 'unknown'
+  const type = list.includes(fileType(name).toLowerCase())
+    ? fileType(name).toLowerCase()
+    : 'unknown'
   return new URL(`../assets/fileType/${type}-icon.svg`, import.meta.url).href
 }
 // 是否是白名单后缀
