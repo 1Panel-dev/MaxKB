@@ -6,18 +6,18 @@
     @date：2024/3/14 03:02
     @desc:  用户认证
 """
+from django.core import cache
 from django.db.models import QuerySet
+from django.utils.translation import gettext_lazy as _
 
 from common.auth.handle.auth_base_handle import AuthBaseHandle
 from common.constants.authentication_type import AuthenticationType
 from common.constants.permission_constants import RoleConstants, get_permission_list_by_role, Auth
 from common.exception.app_exception import AppAuthenticationFailed
-from smartdoc.settings import JWT_AUTH
+from smartdoc.const import CONFIG
 from users.models import User
-from django.core import cache
-
 from users.models.user import get_user_dynamics_permission
-from django.utils.translation import gettext_lazy as _
+
 token_cache = cache.caches['token_cache']
 
 
@@ -35,7 +35,7 @@ class UserToken(AuthBaseHandle):
         auth_details = get_token_details()
         user = QuerySet(User).get(id=auth_details['id'])
         # 续期
-        token_cache.touch(token, timeout=JWT_AUTH['JWT_EXPIRATION_DELTA'].total_seconds())
+        token_cache.touch(token, timeout=CONFIG.get_session_timeout())
         rule = RoleConstants[user.role]
         permission_list = get_permission_list_by_role(RoleConstants[user.role])
         # 获取用户的应用和知识库的权限
