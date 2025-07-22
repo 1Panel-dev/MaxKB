@@ -58,7 +58,7 @@ const prologue = computed(() => {
     ]
     let _temp = temp
     for (const index in tag_list) {
-      _temp = _temp.replaceAll(tag_list[index], '')
+      _temp = _temp.replace(new RegExp(tag_list[index], 'g'), '')
     }
     const quick_question_list = _temp.match(/-\s.+/g)
     let result = temp
