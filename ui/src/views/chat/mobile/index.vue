@@ -261,7 +261,7 @@ function getChatRecord() {
       currentChatId.value,
       paginationConfig,
       loading,
-      false
+      true
     )
     .then((res: any) => {
       paginationConfig.total = res.data.total
