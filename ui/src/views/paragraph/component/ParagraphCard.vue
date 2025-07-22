@@ -14,6 +14,7 @@
         shadow="always"
         style="--el-card-padding: 8px 12px; --el-card-border-radius: 8px"
         @click.stop
+        v-if="MoreFieldPermission(id)"
       >
         <el-switch
           :loading="changeStateloading"
@@ -42,7 +43,9 @@
             </el-icon>
           </el-button>
         </span>
-        <el-dropdown trigger="click" :teleported="false">
+        <el-dropdown trigger="click" :teleported="false"
+          v-if="MoreFieldPermission(id)"
+        >
           <el-button text>
             <el-icon><MoreFilled /></el-icon>
           </el-button>
@@ -153,6 +156,11 @@ const apiType = computed(() => {
 const permissionPrecise = computed (() => {
   return permissionMap['knowledge'][apiType.value]
 })
+
+const MoreFieldPermission = (id:any) => {
+  return permissionPrecise.value.doc_generate(id) || 
+  permissionPrecise.value.doc_edit(id) 
+}
 
 const emit = defineEmits(['dialogVisibleChange','clickCard','changeState', 'deleteParagraph', 'refresh', 'refreshMigrateParagraph','move'])
 const loading = ref(false)
