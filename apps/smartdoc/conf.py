@@ -7,6 +7,7 @@
 2. 程序需要, 用户不需要更改的写到settings中
 3. 程序需要, 用户需要更改的写到本config中
 """
+import datetime
 import errno
 import logging
 import os
@@ -118,6 +119,9 @@ class Config(dict):
                 'RECYCLE': 30 * 60
             }
         }
+
+    def get_session_timeout(self):
+        return datetime.timedelta(seconds=self.get('SESSION_TIMEOUT', 28800))
 
     def get_language_code(self):
         return self.get('LANGUAGE_CODE', 'zh-CN')

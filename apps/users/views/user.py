@@ -22,7 +22,7 @@ from common.constants.permission_constants import PermissionConstants, CompareCo
 from common.log.log import log
 from common.response import result
 from common.util.common import encryption
-from smartdoc.settings import JWT_AUTH
+from smartdoc.const import CONFIG
 from users.serializers.user_serializers import RegisterSerializer, LoginSerializer, CheckCodeSerializer, \
     RePasswordSerializer, \
     SendEmailSerializer, UserProfile, UserSerializer, UserManageSerializer, UserInstanceSerializer, SystemSerializer, \
@@ -199,7 +199,7 @@ class Login(APIView):
         # 校验请求参数
         user = login_request.is_valid(raise_exception=True)
         token = login_request.get_user_token()
-        token_cache.set(token, user, timeout=JWT_AUTH['JWT_EXPIRATION_DELTA'])
+        token_cache.set(token, user, timeout=CONFIG.get_session_timeout())
         return result.success(token)
 
 
