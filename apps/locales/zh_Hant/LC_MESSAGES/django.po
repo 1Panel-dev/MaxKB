@@ -7673,3 +7673,12 @@ msgstr "驗證碼錯誤或過期"
 
 msgid "captcha"
 msgstr "驗證碼"
+
+msgid "Reasoning enable"
+msgstr "開啟思考過程"
+
+msgid "Reasoning start tag"
+msgstr "思考過程開始標籤"
+
+msgid "Reasoning end tag"
+msgstr "思考過程結束標籤"
