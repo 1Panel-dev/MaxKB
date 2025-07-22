@@ -29,7 +29,7 @@ echo -e "\033[1;32mMaxKB starting...\033[0m"
 /usr/bin/start-maxkb.sh &
 maxkb_pid=$!
 sleep 10
-wait-for-it 127.0.0.1:8080 --timeout=60 --strict -- echo -e "\033[1;32mMaxKB started.\033[0m"
+wait-for-it 127.0.0.1:8080 --timeout=180 --strict -- echo -e "\033[1;32mMaxKB started.\033[0m"
 
 wait -n
 echo -e "\033[1;31mSystem is shutting down.\033[0m"
