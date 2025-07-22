@@ -182,6 +182,7 @@
           @keydown.enter="sendChatHandle($event)"
           @paste="handlePaste"
           @drop="handleDrop"
+          @dragover.prevent="handleDragOver"
         />
 
         <div class="operate flex align-center">
@@ -488,6 +489,7 @@ const handlePaste = (event: ClipboardEvent) => {
   // 阻止默认粘贴行为
   event.preventDefault()
 }
+
 // 新增拖拽处理
 const handleDrop = (event: DragEvent) => {
   if (!props.applicationDetails.file_upload_enable) return
@@ -506,6 +508,12 @@ const handleDrop = (event: DragEvent) => {
     }
     uploadFile(elFile, [elFile])
   })
+}
+
+const handleDragOver = (event: DragEvent) => {
+  if (event.dataTransfer) {
+    event.dataTransfer.dropEffect = 'copy' // Firefox需要这一行来允许放置操作
+  }
 }
 // 语音录制任务id
 const intervalId = ref<any | null>(null)
