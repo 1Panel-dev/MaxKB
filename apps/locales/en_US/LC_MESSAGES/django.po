@@ -7238,7 +7238,7 @@ msgstr ""
 msgid ""
 "The confirmation password must be 6-20 characters long and must be a "
 "combination of letters, numbers, and special characters."
-msgstr "The confirmation password must be 6-20 characters long and must be a combination of letters, numbers, and special characters.(Special character support:_、!、@、#、$、%、(、) ……)"
+msgstr "The confirmation password must be 6-20 characters long and must be a combination of letters, numbers, and special characters.(Special character support:_、!、@、#、$、(、) ……)"
 
 #: community/apps/users/serializers/user_serializers.py:380
 #, python-brace-format
