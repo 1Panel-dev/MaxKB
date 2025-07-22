@@ -64,7 +64,9 @@
       </div>
     </div>
 
-    <template #mouseEnter>
+    <template #mouseEnter
+      v-if="MoreFilledPermission(model.id)"
+    >
       <el-dropdown trigger="click" v-if="!isShared">
         <el-button text @click.stop>
           <el-icon>
@@ -147,9 +149,20 @@ const props = defineProps<{
   apiType: 'systemShare' | 'workspace' | 'systemManage'
 }>()
 
+const apiType = props.apiType
+
+const isSystemShare = computed(() => {
+  return apiType==='systemShare'
+})
+
 const permissionPrecise = computed(() => {
   return permissionMap['model'][props.apiType]
 })
+
+const MoreFilledPermission = (id: any) => {
+  return permissionPrecise.value.modify(id) || 
+  permissionPrecise.value.delete(id) || isSystemShare.value
+}
 
 const downModel = ref<Model>()
 

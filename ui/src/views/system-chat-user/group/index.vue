@@ -63,7 +63,9 @@
                     <div class="flex-between">
                       <span class="ellipsis" :title="row.name">{{ row.name }}</span>
                       <div @click.stop v-show="mouseId === row.id">
-                        <el-dropdown :teleported="false" trigger="click">
+                        <el-dropdown :teleported="false" trigger="click"
+                          v-if="editPermission() || dlePermission()"
+                        >
                           <el-button text>
                             <el-icon class="color-secondary">
                               <MoreFilled />
@@ -74,20 +76,7 @@
                               <el-dropdown-item
                                 @click.stop="createOrUpdate(row)"
                                 class="p-8"
-                                v-if="
-                                  hasPermission(
-                                    new ComplexPermission(
-                                      [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
-                                      [
-                                        PermissionConst.WORKSPACE_USER_GROUP_EDIT,
-                                        PermissionConst.USER_GROUP_EDIT,
-                                      ],
-                                      [],
-                                      'OR',
-                                    ),
-                                    'OR',
-                                  )
-                                "
+                                v-if="editPermission()"
                               >
                                 <el-icon>
                                   <EditPen />
@@ -97,20 +86,7 @@
                               <el-dropdown-item
                                 @click.stop="deleteGroup(row)"
                                 class="border-t p-8"
-                                v-if="
-                                  hasPermission(
-                                    new ComplexPermission(
-                                      [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
-                                      [
-                                        PermissionConst.WORKSPACE_USER_GROUP_DELETE,
-                                        PermissionConst.USER_GROUP_DELETE,
-                                      ],
-                                      [],
-                                      'OR',
-                                    ),
-                                    'OR',
-                                  )
-                                "
+                                v-if="dlePermission()"
                               >
                                 <el-icon>
                                   <Delete />
@@ -305,6 +281,22 @@ async function getUserGroupList() {
   } catch (error) {
     console.error(error)
   }
+}
+
+const editPermission = () => {
+  return hasPermission(new ComplexPermission(
+                      [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+                      [PermissionConst.WORKSPACE_USER_GROUP_EDIT,
+                       PermissionConst.USER_GROUP_EDIT,],[],
+                       'OR',),'OR',)
+}
+
+const dlePermission = () => {
+  return hasPermission(new ComplexPermission(
+                      [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
+                      [PermissionConst.WORKSPACE_USER_GROUP_DELETE,
+                       PermissionConst.USER_GROUP_DELETE,],[],
+                       'OR',),'OR',)
 }
 
 onMounted(async () => {
