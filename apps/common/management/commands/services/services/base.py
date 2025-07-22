@@ -16,7 +16,7 @@ class BaseService(object):
         self.STOP_TIMEOUT = 10
         self.max_retry = 0
         self.retry = 3
-        self.LOG_KEEP_DAYS = 7
+        self.LOG_KEEP_DAYS = int(CONFIG.get('LOG_RETENTION_DAYS', 7))
         self.EXIT_EVENT = threading.Event()
 
     @property
