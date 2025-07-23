@@ -103,7 +103,7 @@ LOGGING = {
         },
         'django.server': {
             'handlers': ['console', 'file', 'syslog'],
-            'level': LOG_LEVEL,
+            'level': 'ERROR',
             'propagate': False,
         },
         'max_kb': {
