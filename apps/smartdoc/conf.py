@@ -123,7 +123,7 @@ class Config(dict):
         }
 
     def get_session_timeout(self):
-        return datetime.timedelta(seconds=self.get('SESSION_TIMEOUT', 28800))
+        return datetime.timedelta(seconds=int(self.get('SESSION_TIMEOUT', 60 * 60 * 2)))
 
     def get_language_code(self):
         return self.get('LANGUAGE_CODE', 'zh-CN')
