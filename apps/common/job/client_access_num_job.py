@@ -22,9 +22,9 @@ def client_access_num_reset_job():
 @lock(lock_key="access_num_reset_execute", timeout=30)
 def client_access_num_reset_job_lock():
     from django.utils.translation import gettext_lazy as _
-    maxkb_logger.debug(_('start reset access_num'))
+    maxkb_logger.info(_('start reset access_num'))
     QuerySet(ApplicationChatUserStats).update(intraday_access_num=0)
-    maxkb_logger.debug(_('end reset access_num'))
+    maxkb_logger.info(_('end reset access_num'))
 
 
 def run():

@@ -20,7 +20,7 @@ def clean_chat_log_job():
 @lock(lock_key='clean_chat_log_job_execute', timeout=30)
 def clean_chat_log_job_lock():
     from django.utils.translation import gettext_lazy as _
-    maxkb_logger.debug(_('start clean chat log'))
+    maxkb_logger.info(_('start clean chat log'))
     now = timezone.now()
 
     applications = Application.objects.all().values('id', 'clean_time')
@@ -66,7 +66,7 @@ def clean_chat_log_job_lock():
             if deleted_count < batch_size:
                 break
 
-    maxkb_logger.debug(_('end clean chat log'))
+    maxkb_logger.info(_('end clean chat log'))
 
 
 def run():
