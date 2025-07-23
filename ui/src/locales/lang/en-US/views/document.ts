@@ -149,7 +149,7 @@ export default {
       tooltip: 'When user asks a question, handle matched segments according to the set method.'
     },
     similarity: {
-      label: 'Similarity Higher Than',
+      label: 'Similarity not lower than',
       placeholder: 'Directly return segment content',
       requiredMessage: 'Please enter similarity value'
     }

@@ -146,7 +146,7 @@ export default {
       tooltip: '用戶提問時，命中文檔下的分段時按照設置的方式進行處理。'
     },
     similarity: {
-      label: '相似度高于',
+      label: '相似度不低於',
       placeholder: '直接返回分段内容',
       requiredMessage: '请输入相似度'
     }
