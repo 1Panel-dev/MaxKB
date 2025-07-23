@@ -91,6 +91,7 @@ import { ref, computed, onMounted } from 'vue'
 import { isLastNode } from '@/workflow/common/data'
 import applicationApi from '@/api/application'
 import { app } from '@/main'
+import {t} from "@/locales";
 const props = defineProps<{ nodeModel: any }>()
 
 const nodeCascaderRef = ref()
@@ -119,8 +120,16 @@ const chat_data = computed({
 const FunctionNodeFormRef = ref<FormInstance>()
 
 const validate = () => {
+  for (const item of chat_data.value.input_field_list) {
+    if (item.source === 'reference' && item.is_required  && item.value[0] !== 'global') {
+      if (props.nodeModel.graphModel.nodes.filter((node: any) => node.id === item.value[0]).length === 0 ) {
+        item.value = []
+        return Promise.reject({node: props.nodeModel, errMessage: item.name + t('dynamicsForm.tip.requiredMessage')})
+      }
+    }
+  }
   return FunctionNodeFormRef.value?.validate().catch((err) => {
-    return Promise.reject({ node: props.nodeModel, errMessage: err })
+    return Promise.reject({node: props.nodeModel, errMessage: err})
   })
 }
 
