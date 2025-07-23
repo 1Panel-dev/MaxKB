@@ -30,7 +30,7 @@ from common.utils.logger import maxkb_logger
 from common.utils.split_model import get_split_model
 from knowledge.models import Knowledge, KnowledgeScope, KnowledgeType, Document, Paragraph, Problem, \
     ProblemParagraphMapping, TaskType, State, SearchMode, KnowledgeFolder, File
-from knowledge.serializers.common import ProblemParagraphManage, get_embedding_model_id_by_knowledge_id, MetaSerializer, \
+from knowledge.serializers.common import ProblemParagraphManage, drop_knowledge_index, get_embedding_model_id_by_knowledge_id, MetaSerializer, \
     GenerateRelatedSerializer, get_embedding_model_by_knowledge_id, list_paragraph, write_image, zip_dir
 from knowledge.serializers.document import DocumentSerializers
 from knowledge.task.embedding import embedding_by_knowledge, delete_embedding_by_knowledge
@@ -418,6 +418,7 @@ class KnowledgeSerializer(serializers.Serializer):
             QuerySet(Problem).filter(knowledge=knowledge).delete()
             QuerySet(WorkspaceUserResourcePermission).filter(target=knowledge.id).delete()
             QuerySet(ApplicationKnowledgeMapping).filter(knowledge_id=knowledge.id).delete()
+            drop_knowledge_index(knowledge_id=knowledge.id)
             knowledge.delete()
             File.objects.filter(
                 source_id=knowledge.id,

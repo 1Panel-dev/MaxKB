@@ -18,10 +18,12 @@ from rest_framework import serializers
 
 from common.config.embedding_config import ModelManage
 from common.db.search import native_search
-from common.db.sql_execute import update_execute
+from common.db.sql_execute import sql_execute, update_execute
 from common.exception.app_exception import AppApiException
 from common.utils.common import get_file_content
 from common.utils.fork import Fork
+from common.utils.logger import maxkb_logger
+from knowledge.models import Document
 from knowledge.models import Paragraph, Problem, ProblemParagraphMapping, Knowledge, File
 from maxkb.conf import PROJECT_DIR
 from models_provider.tools import get_model
@@ -220,3 +222,44 @@ def get_knowledge_operation_object(knowledge_id: str):
             "update_time": knowledge_model.update_time
         }
     return {}
+
+
+def create_knowledge_index(knowledge_id=None, document_id=None):
+    if knowledge_id is None and document_id is None:
+        raise AppApiException(500, _('Knowledge ID or Document ID must be provided'))
+
+    if knowledge_id is not None:
+        k_id = knowledge_id
+    else:
+        document = QuerySet(Document).filter(id=document_id).first()
+        k_id = document.knowledge_id
+
+    sql = f"SELECT indexname, indexdef FROM pg_indexes WHERE tablename = 'embedding' AND indexname = 'embedding_hnsw_idx_{k_id}'"
+    index = sql_execute(sql, [])
+    if not index:
+        sql = f"SELECT vector_dims(embedding) AS dims FROM embedding WHERE knowledge_id = '{k_id}' LIMIT 1"
+        result = sql_execute(sql, [])
+        if len(result) == 0:
+            return
+        dims = result[0]['dims'] 
+        sql = f"""CREATE INDEX "embedding_hnsw_idx_{k_id}" ON embedding USING hnsw ((embedding::vector({dims})) vector_l2_ops) WHERE knowledge_id = '{k_id}'"""
+        update_execute(sql, [])
+        maxkb_logger.info(f'Created index for knowledge ID: {k_id}')
+
+
+def drop_knowledge_index(knowledge_id=None, document_id=None):
+    if knowledge_id is None and document_id is None:
+        raise AppApiException(500, _('Knowledge ID or Document ID must be provided'))
+
+    if knowledge_id is not None:
+        k_id = knowledge_id
+    else:
+        document = QuerySet(Document).filter(id=document_id).first()
+        k_id = document.knowledge_id
+
+    sql = f"SELECT indexname, indexdef FROM pg_indexes WHERE tablename = 'embedding' AND indexname = 'embedding_hnsw_idx_{k_id}'"
+    index = sql_execute(sql, [])
+    if index:
+        sql = f'DROP INDEX "embedding_hnsw_idx_{k_id}"'
+        update_execute(sql, [])
+        maxkb_logger.info(f'Dropped index for knowledge ID: {k_id}')

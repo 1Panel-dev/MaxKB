@@ -26,6 +26,7 @@ from common.utils.logger import maxkb_logger
 from common.utils.page_utils import page_desc
 from knowledge.models import Paragraph, Status, Document, ProblemParagraphMapping, TaskType, State, SourceType, \
     SearchMode
+from knowledge.serializers.common import create_knowledge_index
 from maxkb.conf import (PROJECT_DIR)
 
 lock = threading.Lock()
@@ -290,6 +291,8 @@ class ListenerManagement:
                                                                        ListenerManagement.get_aggregation_document_status(
                                                                            document_id)),
                       is_the_task_interrupted)
+            # 检查是否存在索引
+            create_knowledge_index(document_id=document_id)
         except Exception as e:
             maxkb_logger.error(_('Vectorized document: {document_id} error {error} {traceback}').format(
                 document_id=document_id, error=str(e), traceback=traceback.format_exc()))
