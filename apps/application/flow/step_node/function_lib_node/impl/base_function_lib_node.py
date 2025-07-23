@@ -45,6 +45,8 @@ def get_field_value(debug_field_list, name, is_required):
 
 
 def valid_reference_value(_type, value, name):
+    if value is None:
+        return
     if _type == 'int':
         instance_type = int | float
     elif _type == 'float':
@@ -70,10 +72,17 @@ def convert_value(name: str, value, _type, is_required, source, node):
     if not is_required and source == 'reference' and (value is None or len(value) == 0):
         return None
     if source == 'reference':
+        if value and isinstance(value, list) and len(value) == 0:
+            if not is_required:
+                return None
+            else:
+                raise Exception(f"字段:{name}类型:{_type}值:{value}必填参数")
         value = node.workflow_manage.get_reference_field(
             value[0],
             value[1:])
         valid_reference_value(_type, value, name)
+        if value is None:
+            return None
         if _type == 'int':
             return int(value)
         if _type == 'float':
