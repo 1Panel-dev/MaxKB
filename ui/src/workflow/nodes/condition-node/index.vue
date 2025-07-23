@@ -12,7 +12,6 @@
         ref="el"
         v-bind:modelValue="form_data.branch"
         :disabled="form_data.branch === 2"
-        :filter="'.no-drag'"
         handle=".handle"
         :animation="150"
         ghostClass="ghost"
