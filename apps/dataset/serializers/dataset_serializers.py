@@ -526,7 +526,7 @@ class DataSetSerializers(serializers.ModelSerializer):
         def get_request_body_api():
             return openapi.Schema(
                 type=openapi.TYPE_OBJECT,
-                required=['name', 'desc'],
+                required=['name', 'desc', 'embedding_mode_id'],
                 properties={
                     'name': openapi.Schema(type=openapi.TYPE_STRING, title=_('dataset name'),
                                            description=_('dataset name')),

@@ -809,27 +809,40 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
         def get_response_body_api():
             return openapi.Schema(
                 type=openapi.TYPE_OBJECT,
-                required=['id', 'name', 'char_length', 'user_id', 'paragraph_count', 'is_active'
-                                                                                     'update_time', 'create_time'],
+                required=['create_time', 'update_time', 'id', 'name', 'char_length', 'status', 'is_active',
+                          'type', 'meta', 'dataset_id', 'hit_handling_method', 'directly_return_similarity',
+                          'status_meta', 'paragraph_count'],
                 properties={
+                    'create_time': openapi.Schema(type=openapi.TYPE_STRING, title=_('create time'),
+                                                  description=_('create time'),
+                                                  default="1970-01-01 00:00:00"),
+                    'update_time': openapi.Schema(type=openapi.TYPE_STRING, title=_('update time'),
+                                                  description=_('update time'),
+                                                  default="1970-01-01 00:00:00"),
                     'id': openapi.Schema(type=openapi.TYPE_STRING, title="id",
                                          description="id", default="xx"),
                     'name': openapi.Schema(type=openapi.TYPE_STRING, title=_('name'),
                                            description=_('name'), default="xx"),
                     'char_length': openapi.Schema(type=openapi.TYPE_INTEGER, title=_('char length'),
                                                   description=_('char length'), default=10),
-                    'user_id': openapi.Schema(type=openapi.TYPE_STRING, title=_('user id'), description=_('user id')),
-                    'paragraph_count': openapi.Schema(type=openapi.TYPE_INTEGER, title="_('document count')",
-                                                      description="_('document count')", default=1),
+                    'status':openapi.Schema(type=openapi.TYPE_STRING, title=_('status'),
+                                           description=_('status'), default="xx"),
                     'is_active': openapi.Schema(type=openapi.TYPE_BOOLEAN, title=_('Is active'),
                                                 description=_('Is active'), default=True),
-                    'update_time': openapi.Schema(type=openapi.TYPE_STRING, title=_('update time'),
-                                                  description=_('update time'),
-                                                  default="1970-01-01 00:00:00"),
-                    'create_time': openapi.Schema(type=openapi.TYPE_STRING, title=_('create time'),
-                                                  description=_('create time'),
-                                                  default="1970-01-01 00:00:00"
-                                                  )
+                    'type': openapi.Schema(type=openapi.TYPE_STRING, title=_('type'),
+                                                description=_('type'), default="xx"),
+                    'meta': openapi.Schema(type=openapi.TYPE_OBJECT, title=_('meta'),
+                                           description=_('meta'), default="{}"),
+                    'dataset_id': openapi.Schema(type=openapi.TYPE_STRING, title=_('dataset_id'),
+                                           description=_('dataset_id'), default="xx"),
+                    'hit_handling_method': openapi.Schema(type=openapi.TYPE_STRING, title=_('hit_handling_method'),
+                                                 description=_('hit_handling_method'), default="xx"),
+                    'directly_return_similarity': openapi.Schema(type=openapi.TYPE_NUMBER, title=_('directly_return_similarity'),
+                                                          description=_('directly_return_similarity'), default="xx"),
+                    'status_meta': openapi.Schema(type=openapi.TYPE_OBJECT, title=_('status_meta'),
+                                           description=_('status_meta'), default="{}"),
+                    'paragraph_count': openapi.Schema(type=openapi.TYPE_INTEGER, title="_('document count')",
+                                                      description="_('document count')", default=1),
                 }
             )
 
