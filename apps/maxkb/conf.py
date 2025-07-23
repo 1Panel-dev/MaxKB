@@ -63,8 +63,8 @@ class Config(dict):
             "POOL_OPTIONS": {
                 "POOL_SIZE": 20,
                 "MAX_OVERFLOW": int(self.get('DB_MAX_OVERFLOW')),
-                'RECYCLE': 1800,
-                'TIMEOUT': 30
+                "RECYCLE": 1800,
+                "TIMEOUT": 30
             }
         }
 
