@@ -113,6 +113,7 @@ class Config(dict):
             "USER": self.get('DB_USER'),
             "PASSWORD": self.get('DB_PASSWORD'),
             "ENGINE": self.get('DB_ENGINE'),
+            "CONN_MAX_AGE": 0,
             "POOL_OPTIONS": {
                 "POOL_SIZE": 20,
                 "MAX_OVERFLOW": int(self.get('DB_MAX_OVERFLOW')),
