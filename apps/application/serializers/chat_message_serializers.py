@@ -395,13 +395,14 @@ class ChatMessageSerializer(serializers.Serializer):
         work_flow_manage = WorkflowManage(Flow.new_instance(chat_info.work_flow_version.work_flow),
                                           {'history_chat_record': history_chat_record, 'question': message,
                                            'chat_id': chat_info.chat_id, 'chat_record_id': str(
-                                              uuid.uuid1()) if chat_record is None else chat_record.id,
+                                              uuid.uuid1()) if chat_record is None else str(chat_record.id),
                                            'stream': stream,
                                            're_chat': re_chat,
                                            'client_id': client_id,
                                            'client_type': client_type,
                                            'user_id': user_id}, WorkFlowPostHandler(chat_info, client_id, client_type),
-                                          base_to_response, form_data, image_list, document_list, audio_list, other_list,
+                                          base_to_response, form_data, image_list, document_list, audio_list,
+                                          other_list,
                                           self.data.get('runtime_node_id'),
                                           self.data.get('node_data'), chat_record, self.data.get('child_node'))
         r = work_flow_manage.run()
