@@ -997,7 +997,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                                       in_=openapi.IN_PATH,
                                       type=openapi.TYPE_STRING,
                                       required=True,
-                                      description=_('document id'))
+                                      description=_('dataset id'))
                     ]
 
     class Split(ApiMixin, serializers.Serializer):
