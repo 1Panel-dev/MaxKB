@@ -79,7 +79,7 @@
         </div>
       </div>
       <div v-if="showQrCodeTab">
-        <QrCodeTab :tabs="orgOptions"/>
+        <QrCodeTab :tabs="orgOptions" />
       </div>
       <div class="login-gradient-divider lighter mt-24" v-if="modeList.length > 1">
         <span>{{ $t('views.login.moreMethod') }}</span>
@@ -98,7 +98,7 @@
                 'font-size': item === 'OAUTH2' ? '8px' : '10px',
                 color: theme.themeInfo?.theme,
               }"
-            >{{ item }}</span
+              >{{ item }}</span
             >
           </el-button>
           <el-button
@@ -108,7 +108,7 @@
             class="login-button-circle color-secondary"
             @click="changeMode('QR_CODE')"
           >
-            <img src="@/assets/icon_qr_outlined.svg" width="25px"/>
+            <img src="@/assets/icon_qr_outlined.svg" width="25px" />
           </el-button>
           <el-button
             v-if="item === '' && loginMode !== ''"
@@ -125,27 +125,25 @@
   </login-layout>
 </template>
 <script setup lang="ts">
-import {onMounted, ref, onBeforeMount, computed} from 'vue'
-import {useRoute, useRouter} from 'vue-router'
-import type {FormInstance, FormRules} from 'element-plus'
-import type {LoginRequest} from '@/api/type/login'
+import { onMounted, ref, onBeforeMount, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import type { FormInstance, FormRules } from 'element-plus'
+import type { LoginRequest } from '@/api/type/login'
 import LoginContainer from '@/layout/login-layout/LoginContainer.vue'
 import LoginLayout from '@/layout/login-layout/LoginLayout.vue'
 import loginApi from '@/api/user/login'
 import authApi from '@/api/system-settings/auth-setting'
-import {t, getBrowserLang} from '@/locales'
+import { t, getBrowserLang } from '@/locales'
 import useStore from '@/stores'
-import {useI18n} from 'vue-i18n'
+import { useI18n } from 'vue-i18n'
 import QrCodeTab from '@/views/login/scanCompinents/QrCodeTab.vue'
-import {MsgConfirm, MsgError} from '@/utils/message.ts'
+import { MsgConfirm, MsgError } from '@/utils/message.ts'
 import * as dd from 'dingtalk-jsapi'
-import {loadScript} from '@/utils/common'
-import {hasPermission} from "@/utils/permission";
-import {RoleConst} from "@/utils/permission/data.ts";
+import { loadScript } from '@/utils/common'
 
 const router = useRouter()
-const {login, user, theme} = useStore()
-const {locale} = useI18n({useScope: 'global'})
+const { login, user, theme } = useStore()
+const { locale } = useI18n({ useScope: 'global' })
 const loading = ref<boolean>(false)
 
 const identifyCode = ref<string>('')
@@ -182,20 +180,32 @@ const rules = ref<FormRules<LoginRequest>>({
 })
 
 const loginHandle = () => {
-  loginFormRef.value?.validate().then(() => {
-    if (loginMode.value === 'LDAP') {
-      login.asyncLdapLogin(loginForm.value, loading).then(() => {
-        locale.value = localStorage.getItem('MaxKB-locale') || getBrowserLang() || 'en-US'
-        router.push({name: 'home'})
-      })
-    } else {
-      login.asyncLogin(loginForm.value, loading).then(() => {
-        locale.value = localStorage.getItem('MaxKB-locale') || getBrowserLang() || 'en-US'
-        localStorage.setItem('workspace_id', 'default')
-          router.push({name: 'home'})
-      })
-    }
-  })
+  loading.value = true
+  loginFormRef.value
+    ?.validate()
+    .then(() => {
+      if (loginMode.value === 'LDAP') {
+        login.asyncLdapLogin(loginForm.value).then(() => {
+          locale.value = localStorage.getItem('MaxKB-locale') || getBrowserLang() || 'en-US'
+          loading.value = false
+          router.push({ name: 'home' })
+        }).catch(() => {
+          loading.value = false
+        })
+      } else {
+        login.asyncLogin(loginForm.value).then(() => {
+          locale.value = localStorage.getItem('MaxKB-locale') || getBrowserLang() || 'en-US'
+          localStorage.setItem('workspace_id', 'default')
+          loading.value = false
+          router.push({ name: 'home' })
+        }).catch(() => {
+          loading.value = false
+        })
+      }
+    })
+    .catch(() => {
+      loading.value = false
+    })
 }
 
 function makeCode() {
@@ -227,13 +237,13 @@ function uuidv4() {
     return v.toString(16)
   })
 }
-const newDefaultSlogan=computed(()=>{
-const default_login= '强大易用的企业级智能体平台'
- if(!theme.themeInfo?.slogan||default_login==theme.themeInfo?.slogan){
-  return t('theme.defaultSlogan')
- }else{
- return  theme.themeInfo?.slogan
- }
+const newDefaultSlogan = computed(() => {
+  const default_login = '强大易用的企业级智能体平台'
+  if (!theme.themeInfo?.slogan || default_login == theme.themeInfo?.slogan) {
+    return t('theme.defaultSlogan')
+  } else {
+    return theme.themeInfo?.slogan
+  }
 })
 function redirectAuth(authType: string) {
   if (authType === 'LDAP' || authType === '') {
@@ -282,8 +292,7 @@ function redirectAuth(authType: string) {
           window.location.href = url
         }
       })
-      .catch(() => {
-      })
+      .catch(() => {})
   })
 }
 
@@ -358,10 +367,10 @@ onMounted(() => {
   const handleDingTalk = () => {
     const code = params.get('corpId')
     if (code) {
-      dd.runtime.permission.requestAuthCode({corpId: code}).then((res) => {
+      dd.runtime.permission.requestAuthCode({ corpId: code }).then((res) => {
         console.log('DingTalk client request success:', res)
         login.dingOauth2Callback(res.code).then(() => {
-          router.push({name: 'home'})
+          router.push({ name: 'home' })
         })
       })
     }
@@ -374,7 +383,7 @@ onMounted(() => {
         appId: appId,
         success: (res: any) => {
           login.larkCallback(res.code).then(() => {
-            router.push({name: 'home'})
+            router.push({ name: 'home' })
           })
         },
         fail: (error: any) => {
@@ -394,11 +403,11 @@ onMounted(() => {
             scopeList: [],
             success: (res: any) => {
               login.larkCallback(res.code).then(() => {
-                router.push({name: 'home'})
+                router.push({ name: 'home' })
               })
             },
             fail: (error: any) => {
-              const {errno} = error
+              const { errno } = error
               if (errno === 103) {
                 callRequestAuthCode()
               }
