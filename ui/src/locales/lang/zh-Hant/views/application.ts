@@ -129,7 +129,7 @@ export default {
       hybridSearch: '混合檢索',
       hybridSearchTooltip:
         '混合檢索是一種基於向量和文本相似度的檢索方式，適用於知識庫中的中等數據量場景。',
-      similarityThreshold: '相似度高於',
+      similarityThreshold: '相似度不低於',
       similarityTooltip: '相似度越高相關性越強。',
       topReferences: '引用分段數 TOP',
       maxCharacters: '最多引用字元數',
