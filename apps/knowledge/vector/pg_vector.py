@@ -172,8 +172,13 @@ class EmbeddingSearch(ISearch):
                                                                os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql',
                                                                             'embedding_search.sql')),
                                                            with_table_name=True)
-        embedding_model = select_list(exec_sql,
-                                      [json.dumps(query_embedding), *exec_params, similarity, top_number])
+        embedding_model = select_list(exec_sql, [
+            len(query_embedding),
+            json.dumps(query_embedding),
+            *exec_params,
+            similarity,
+            top_number
+        ])
         return embedding_model
 
     def support(self, search_mode: SearchMode):
@@ -193,8 +198,12 @@ class KeywordsSearch(ISearch):
                                                                os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql',
                                                                             'keywords_search.sql')),
                                                            with_table_name=True)
-        embedding_model = select_list(exec_sql,
-                                      [to_query(query_text), *exec_params, similarity, top_number])
+        embedding_model = select_list(exec_sql, [
+            to_query(query_text),
+            *exec_params,
+            similarity,
+            top_number
+        ])
         return embedding_model
 
     def support(self, search_mode: SearchMode):
@@ -214,9 +223,13 @@ class BlendSearch(ISearch):
                                                                os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql',
                                                                             'blend_search.sql')),
                                                            with_table_name=True)
-        embedding_model = select_list(exec_sql,
-                                      [json.dumps(query_embedding), to_query(query_text), *exec_params, similarity,
-                                       top_number])
+        embedding_model = select_list(exec_sql, [
+            len(query_embedding),
+            json.dumps(query_embedding),
+            to_query(query_text),
+            *exec_params, similarity,
+            top_number
+        ])
         return embedding_model
 
     def support(self, search_mode: SearchMode):

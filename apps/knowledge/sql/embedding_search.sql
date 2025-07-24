@@ -5,12 +5,12 @@ SELECT
 FROM
 	(
 	SELECT DISTINCT ON
-		("paragraph_id") ( similarity ),* ,similarity AS comprehensive_score
+		("paragraph_id") ( 1 - distince ),* ,(1 - distince) AS comprehensive_score
 	FROM
-		( SELECT *, ( 1 - ( embedding.embedding <=>  %s ) ) AS similarity FROM embedding ${embedding_query}) TEMP
+		( SELECT *, ( embedding.embedding::vector(%s) <=>  %s ) AS distince FROM embedding ${embedding_query} ORDER BY distince) TEMP
 	ORDER BY
 		paragraph_id,
-		similarity DESC
+		distince
 	) DISTINCT_TEMP
 WHERE comprehensive_score>%s
 ORDER BY comprehensive_score DESC

@@ -242,7 +242,7 @@ def create_knowledge_index(knowledge_id=None, document_id=None):
         if len(result) == 0:
             return
         dims = result[0]['dims'] 
-        sql = f"""CREATE INDEX "embedding_hnsw_idx_{k_id}" ON embedding USING hnsw ((embedding::vector({dims})) vector_l2_ops) WHERE knowledge_id = '{k_id}'"""
+        sql = f"""CREATE INDEX "embedding_hnsw_idx_{k_id}" ON embedding USING hnsw ((embedding::vector({dims})) vector_cosine_ops) WHERE knowledge_id = '{k_id}'"""
         update_execute(sql, [])
         maxkb_logger.info(f'Created index for knowledge ID: {k_id}')
 
