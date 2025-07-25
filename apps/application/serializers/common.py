@@ -107,7 +107,10 @@ class ChatInfo:
             }
         else:
             if asker:
-                self.chat_user = asker
+                if isinstance(asker, dict):
+                    self.chat_user = asker
+                else:
+                    self.chat_user = {'username': asker}
             else:
                 self.chat_user = {'username': '游客'}
         return self.chat_user
