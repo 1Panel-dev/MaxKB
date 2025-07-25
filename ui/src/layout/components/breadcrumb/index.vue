@@ -27,7 +27,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { onBeforeRouteLeave, useRouter, useRoute } from 'vue-router'
-import { isAppIcon, resetUrl } from '@/utils/common'
+import { resetUrl } from '@/utils/common'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import useStore from '@/stores'
 const { common, application } = useStore()

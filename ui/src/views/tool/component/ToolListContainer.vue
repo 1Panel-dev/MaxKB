@@ -65,7 +65,7 @@
                 :on-change="(file: any, fileList: any) => importTool(file)"
                 class="import-button"
               >
-                <el-dropdown-item 
+                <el-dropdown-item
                   v-if="permissionPrecise.import()"
                 >
                   <div class="flex align-center w-full">
@@ -197,7 +197,7 @@
                   </div>
                 </template>
                 <template #mouseEnter>
-                  <div @click.stop v-if="!isShared && 
+                  <div @click.stop v-if="!isShared &&
                     MoreFieldPermission(item.id)">
                     <el-switch
                       v-model="item.is_active"
@@ -309,18 +309,18 @@
 
 <script lang="ts" setup>
 import { onMounted, ref, reactive, computed, watch } from 'vue'
-import { cloneDeep, get } from 'lodash'
+import { cloneDeep } from 'lodash'
 import { useRoute, onBeforeRouteLeave } from 'vue-router'
 import InitParamDrawer from '@/views/tool/component/InitParamDrawer.vue'
 import ToolFormDrawer from '@/views/tool/ToolFormDrawer.vue'
 import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
 import AuthorizedWorkspace from '@/views/system-shared/AuthorizedWorkspaceDialog.vue'
-import MoveToDialog from '@/components/folder-tree/MoveToDialog.vue'
-import { isAppIcon, resetUrl } from '@/utils/common'
-import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
-import { SourceTypeEnum } from '@/enums/common'
 import ToolStoreDialog from '@/views/tool/toolStore/ToolStoreDialog.vue'
 import AddInternalToolDialog from '@/views/tool/toolStore/AddInternalToolDialog.vue'
+import MoveToDialog from '@/components/folder-tree/MoveToDialog.vue'
+import { resetUrl } from '@/utils/common'
+import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
+import { SourceTypeEnum } from '@/enums/common'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import permissionMap from '@/permission'
 import useStore from '@/stores'
@@ -354,8 +354,8 @@ const permissionPrecise = computed(() => {
 })
 
 const MoreFieldPermission = (id: any) => {
-  return (permissionPrecise.value.edit(id) || 
-   permissionPrecise.value.export(id) || 
+  return (permissionPrecise.value.edit(id) ||
+   permissionPrecise.value.export(id) ||
   permissionPrecise.value.delete(id) || isSystemShare.value)
 }
 

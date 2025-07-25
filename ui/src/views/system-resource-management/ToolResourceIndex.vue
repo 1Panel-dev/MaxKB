@@ -49,23 +49,23 @@
       >
         <!-- <el-table-column type="selection" width="55" /> -->
         <el-table-column width="220" :label="$t('common.name')" show-overflow-tooltip>
-          <template #default="scope">
+          <template #default="{ row }">
             <div class="table-name flex align-center">
               <el-icon size="24" class="mr-8">
                 <el-avatar
-                  v-if="isAppIcon(scope.row?.icon)"
+                  v-if="row?.icon"
                   shape="square"
                   :size="24"
                   style="background: none"
                   class="mr-8"
                 >
-                  <img :src="resetUrl(scope.row?.icon)" alt="" />
+                  <img :src="resetUrl(row?.icon)" alt="" />
                 </el-avatar>
                 <el-avatar v-else class="avatar-green" shape="square" :size="24">
                   <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt="" />
                 </el-avatar>
               </el-icon>
-              {{ scope.row.name }}
+              {{ row.name }}
             </div>
           </template>
         </el-table-column>
@@ -158,21 +158,136 @@
             {{ datetimeFormat(row.create_time) }}
           </template>
         </el-table-column>
+        <el-table-column :label="$t('common.operation')" align="left" width="160" fixed="right">
+          <template #default="{ row }">
+            <span @click.stop>
+              <el-switch
+                v-model="row.is_active"
+                :before-change="() => changeState(row)"
+                size="small"
+                class="mr-4"
+                v-if="permissionPrecise.switch(row.id)"
+              />
+            </span>
+            <el-divider direction="vertical" />
+
+            <el-tooltip
+              effect="dark"
+              :content="$t('common.edit')"
+              placement="top"
+              v-if="row.template_id && permissionPrecise.edit(row.id)"
+            >
+              <span class="mr-8">
+                <el-button
+                  type="primary"
+                  text
+                  @click.stop="addInternalTool(row, true)"
+                  :title="$t('common.edit')"
+                >
+                  <el-icon>
+                    <EditPen />
+                  </el-icon>
+                </el-button>
+              </span>
+            </el-tooltip>
+            <el-tooltip
+              effect="dark"
+              :content="$t('common.edit')"
+              placement="top"
+              v-if="!row.template_id && permissionPrecise.edit(row.id)"
+            >
+              <span class="mr-8">
+                <el-button
+                  type="primary"
+                  text
+                  @click.stop="openCreateDialog(row)"
+                  :title="$t('common.edit')"
+                >
+                  <el-icon>
+                    <EditPen />
+                  </el-icon>
+                </el-button>
+              </span>
+            </el-tooltip>
+
+            <el-tooltip
+              effect="dark"
+              :content="$t('common.copy')"
+              placement="top"
+              v-if="!row.template_id && permissionPrecise.copy(row.id)"
+            >
+              <span class="mr-8">
+                <el-button
+                  type="primary"
+                  text
+                  @click.stop="copyTool(row)"
+                  :title="$t('common.copy')"
+                >
+                  <AppIcon iconName="app-copy"></AppIcon>
+                </el-button>
+              </span>
+            </el-tooltip>
+            <el-dropdown trigger="click">
+              <el-button text @click.stop>
+                <el-icon>
+                  <MoreFilled />
+                </el-icon>
+              </el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item
+                    v-if="row.init_field_list?.length > 0 && permissionPrecise.edit(row.id)"
+                    @click.stop="configInitParams(row)"
+                  >
+                    <AppIcon iconName="app-operation" class="mr-4"></AppIcon>
+                    {{ $t('common.param.initParam') }}
+                  </el-dropdown-item>
+
+                  <el-dropdown-item
+                    v-if="!row.template_id && permissionPrecise.export(row.id)"
+                    @click.stop="exportTool(row)"
+                  >
+                    <AppIcon iconName="app-export"></AppIcon>
+                    {{ $t('common.export') }}
+                  </el-dropdown-item>
+                  <el-dropdown-item
+                    v-if="permissionPrecise.delete(row.id)"
+                    divided
+                    @click.stop="deleteTool(row)"
+                  >
+                    <el-icon><Delete /></el-icon>
+                    {{ $t('common.delete') }}
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </template>
+        </el-table-column>
       </app-table>
     </el-card>
+
+    <InitParamDrawer ref="InitParamDrawerRef" @refresh="refresh" />
+    <ToolFormDrawer ref="ToolFormDrawerRef" @refresh="refresh" :title="ToolDrawertitle" />
+    <AddInternalToolDialog ref="AddInternalToolDialogRef" @refresh="confirmAddInternalTool" />
   </div>
 </template>
 
 <script lang="ts" setup>
 import { onMounted, ref, reactive, computed } from 'vue'
+import { cloneDeep } from 'lodash'
+import InitParamDrawer from '@/views/tool/component/InitParamDrawer.vue'
 import ToolResourceApi from '@/api/system-resource-management/tool'
+import AddInternalToolDialog from '@/views/tool/toolStore/AddInternalToolDialog.vue'
+import ToolFormDrawer from '@/views/tool/ToolFormDrawer.vue'
 import { t } from '@/locales'
-import { isAppIcon, resetUrl } from '@/utils/common'
+import { resetUrl } from '@/utils/common'
 import { ToolType } from '@/enums/tool'
 import useStore from '@/stores'
 import { datetimeFormat } from '@/utils/time'
 import { loadPermissionApi } from '@/utils/dynamics-api/permission-api.ts'
 import UserApi from '@/api/user/user.ts'
+import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
+import permissionMap from '@/permission'
 
 const { user } = useStore()
 
@@ -194,6 +309,137 @@ const paginationConfig = reactive({
 const workspaceOptions = ref<any[]>([])
 const workspaceVisible = ref(false)
 const workspaceArr = ref<any[]>([])
+
+const permissionPrecise = computed(() => {
+  return permissionMap['tool']['systemManage']
+})
+
+function exportTool(row: any) {
+  ToolResourceApi.exportTool(row.id, row.name, loading).catch((e: any) => {
+    if (e.response.status !== 403) {
+      e.response.data.text().then((res: string) => {
+        MsgError(`${t('views.application.tip.ExportError')}:${JSON.parse(res).message}`)
+      })
+    }
+  })
+}
+
+function deleteTool(row: any) {
+  MsgConfirm(
+    `${t('views.tool.delete.confirmTitle')}：${row.name} ?`,
+    t('views.tool.delete.confirmMessage'),
+    {
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
+      confirmButtonClass: 'danger',
+    },
+  )
+    .then(() => {
+      ToolResourceApi.delTool(row.id, loading).then(() => {
+        getList()
+        MsgSuccess(t('common.deleteSuccess'))
+      })
+    })
+    .catch(() => {})
+}
+
+function configInitParams(item: any) {
+  ToolResourceApi.getToolById(item?.id, changeStateloading).then((res: any) => {
+    InitParamDrawerRef.value.open(res.data)
+  })
+}
+
+async function copyTool(row: any) {
+  ToolDrawertitle.value = t('views.tool.copyTool')
+  const res = await ToolResourceApi.getToolById(row.id, changeStateloading)
+  const obj = cloneDeep(res.data)
+  delete obj['id']
+  obj['name'] = obj['name'] + `  ${t('common.copyTitle')}`
+  ToolFormDrawerRef.value.open(obj)
+}
+
+const ToolFormDrawerRef = ref()
+const ToolDrawertitle = ref('')
+
+function openCreateDialog(data?: any) {
+  // 有template_id的不允许编辑，是模板转换来的
+  if (data?.template_id) {
+    return
+  }
+
+  ToolDrawertitle.value = t('views.tool.editTool')
+  if (data) {
+    ToolResourceApi.getToolById(data?.id, loading).then((res: any) => {
+      ToolFormDrawerRef.value.open(res.data)
+    })
+  } else {
+    ToolFormDrawerRef.value.open(data)
+  }
+}
+
+const AddInternalToolDialogRef = ref<InstanceType<typeof AddInternalToolDialog>>()
+function addInternalTool(data?: any, isEdit?: boolean) {
+  AddInternalToolDialogRef.value?.open(data, isEdit)
+}
+
+function confirmAddInternalTool(data?: any, isEdit?: boolean) {
+  if (isEdit) {
+    ToolResourceApi.putTool(data?.id as string, { name: data.name }, loading).then((res: any) => {
+      MsgSuccess(t('common.saveSuccess'))
+      refresh()
+    })
+  }
+}
+
+const InitParamDrawerRef = ref()
+async function changeState(row: any) {
+  if (row.is_active) {
+    MsgConfirm(
+      `${t('views.tool.disabled.confirmTitle')}${row.name} ?`,
+      t('views.tool.disabled.confirmMessage'),
+      {
+        confirmButtonText: t('common.status.disable'),
+        confirmButtonClass: 'danger',
+      },
+    ).then(() => {
+      const obj = {
+        is_active: !row.is_active,
+      }
+      ToolResourceApi.putTool(row.id, obj, changeStateloading)
+        .then(() => {
+          getList()
+          return true
+        })
+        .catch(() => {
+          return false
+        })
+    })
+  } else {
+    const res = await ToolResourceApi.getToolById(row.id, changeStateloading)
+    if (
+      (!res.data.init_params || Object.keys(res.data.init_params).length === 0) &&
+      res.data.init_field_list &&
+      res.data.init_field_list.length > 0 &&
+      res.data.init_field_list.filter((item: any) => item.default_value && item.show_default_value)
+        .length !== res.data.init_field_list.length
+    ) {
+      InitParamDrawerRef.value.open(res.data, !row.is_active)
+      return false
+    }
+    const obj = {
+      is_active: !row.is_active,
+    }
+    ToolResourceApi.putTool(row.id, obj, changeStateloading)
+      .then(() => {
+        getList()
+        return true
+      })
+      .catch(() => {
+        return false
+      })
+  }
+}
+
 function filterWorkspaceChange(val: string) {
   if (val === 'clear') {
     workspaceArr.value = []
@@ -226,6 +472,16 @@ function getList() {
     paginationConfig.total = res.data?.total
     toolList.value = res.data?.records
   })
+}
+
+function refresh(data?: any) {
+  if (data) {
+    getList()
+  } else {
+    paginationConfig.total = 0
+    paginationConfig.current_page = 1
+    getList()
+  }
 }
 
 onMounted(() => {

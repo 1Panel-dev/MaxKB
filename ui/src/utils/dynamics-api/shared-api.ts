@@ -15,7 +15,7 @@ import problemSystemShareApi from '@/api/system-shared/problem'
 import chatUserSystemShareApi from '@/api/system-shared/chat-user'
 import workspaceApi from '@/api/workspace/workspace'
 import systemUserApi from '@/api/user/user'
-import workspaceShare from '@/permission/knowledge/workspace-share'
+import ToolResourceApi from '@/api/system-resource-management/tool'
 
 // 普通 API
 const workspaceApiMap = {
@@ -45,7 +45,7 @@ const systemShareApiMap = {
 const systemManageApiMap = {
   // knowledge: knowledgeWorkspaceApi,
   // model: modelWorkspaceApi,
-  // tool: toolSystemShareApi,
+  tool: ToolResourceApi,
 } as any
 
 const data = {

@@ -38,6 +38,20 @@ const getToolListPage: (
 }
 
 /**
+ * 获取工具详情
+ * @param tool_id 工具id
+ * @param loading 加载器
+ * @returns 工具详情
+ */
+const getToolById: (tool_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  tool_id,
+  loading,
+) => {
+  return get(`${prefix}/${tool_id}`, undefined, loading)
+}
+
+
+/**
  * 修改工具
  * @param 参数
 
@@ -50,18 +64,6 @@ const putTool: (tool_id: string, data: toolData, loading?: Ref<boolean>) => Prom
   return put(`${prefix}/${tool_id}`, data, undefined, loading)
 }
 
-/**
- * 获取工具详情
- * @param tool_id 工具id
- * @param loading 加载器
- * @returns 工具详情
- */
-const getToolById: (tool_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
-  tool_id,
-  loading,
-) => {
-  return get(`${prefix}/${tool_id}`, undefined, loading)
-}
 
 /**
  * 删除工具
