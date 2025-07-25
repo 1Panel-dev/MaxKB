@@ -21,12 +21,18 @@
             <el-row :gutter="12">
               <el-col :span="12" class="mt-16">
                 <div class="flex">
-                  <el-text type="info">{{ $t('views.applicationOverview.appInfo.publicAccessLink') }}
+                  <el-text type="info"
+                    >{{ $t('views.applicationOverview.appInfo.publicAccessLink') }}
                   </el-text>
-                  <el-switch v-model="accessToken.is_active" class="ml-8" size="small" inline-prompt
+                  <el-switch
+                    v-model="accessToken.is_active"
+                    class="ml-8"
+                    size="small"
+                    inline-prompt
                     :active-text="$t('views.applicationOverview.appInfo.openText')"
                     :inactive-text="$t('views.applicationOverview.appInfo.closeText')"
-                    :before-change="() => changeState(accessToken.is_active)" />
+                    :before-change="() => changeState(accessToken.is_active)"
+                  />
                 </div>
 
                 <div class="mt-4 mb-16 url-height flex align-center" style="margin-bottom: 37px">
@@ -39,7 +45,12 @@
                     </el-button>
                   </el-tooltip>
                   <el-tooltip effect="dark" :content="$t('common.refresh')" placement="top">
-                    <el-button @click="refreshAccessToken" type="primary" text style="margin-left: 1px">
+                    <el-button
+                      @click="refreshAccessToken"
+                      type="primary"
+                      text
+                      style="margin-left: 1px"
+                    >
                       <el-icon>
                         <RefreshRight />
                       </el-icon>
@@ -47,8 +58,13 @@
                   </el-tooltip>
                 </div>
                 <div>
-                  <el-button v-if="accessToken?.is_active" :disabled="!accessToken?.is_active" tag="a" :href="shareUrl"
-                    target="_blank">
+                  <el-button
+                    v-if="accessToken?.is_active"
+                    :disabled="!accessToken?.is_active"
+                    tag="a"
+                    :href="shareUrl"
+                    target="_blank"
+                  >
                     <AppIcon iconName="app-create-chat" class="mr-4"></AppIcon>
                     {{ $t('views.application.operation.toChat') }}
                   </el-button>
@@ -56,8 +72,11 @@
                     <AppIcon iconName="app-create-chat" class="mr-4"></AppIcon>
                     {{ $t('views.application.operation.toChat') }}
                   </el-button>
-                  <el-button :disabled="!accessToken?.is_active" @click="openDialog"
-                    v-if="permissionPrecise.overview_embed(id)">
+                  <el-button
+                    :disabled="!accessToken?.is_active"
+                    @click="openDialog"
+                    v-if="permissionPrecise.overview_embed(id)"
+                  >
                     <AppIcon iconName="app-export" class="mr-4"></AppIcon>
                     {{ $t('views.applicationOverview.appInfo.embedInWebsite') }}
                   </el-button>
@@ -69,7 +88,10 @@
                     {{ $t('views.applicationOverview.appInfo.accessControl') }}
                   </el-button>
                   <!-- 显示设置 -->
-                  <el-button @click="openDisplaySettingDialog" v-if="permissionPrecise.overview_display(id)">
+                  <el-button
+                    @click="openDisplaySettingDialog"
+                    v-if="permissionPrecise.overview_display(id)"
+                  >
                     <el-icon class="mr-4">
                       <Setting />
                     </el-icon>
@@ -79,13 +101,19 @@
               </el-col>
               <el-col :span="12" class="mt-16">
                 <div class="flex">
-                  <el-text type="info">{{ $t('views.applicationOverview.appInfo.apiAccessCredentials') }}
+                  <el-text type="info"
+                    >{{ $t('views.applicationOverview.appInfo.apiAccessCredentials') }}
                   </el-text>
                 </div>
                 <div class="mt-4 mb-16 url-height">
                   <div>
                     <el-text>API {{ $t('common.fileUpload.document') }}： </el-text>
-                    <el-button type="primary" link @click="toUrl(apiUrl)" class="vertical-middle lighter break-all">
+                    <el-button
+                      type="primary"
+                      link
+                      @click="toUrl(apiUrl)"
+                      class="vertical-middle lighter break-all"
+                    >
                       {{ apiUrl }}
                     </el-button>
                   </div>
@@ -96,7 +124,7 @@
 
                     <span class="vertical-middle lighter break-all ellipsis-1">{{
                       baseUrl + id
-                      }}</span>
+                    }}</span>
                     <el-tooltip effect="dark" :content="$t('common.copy')" placement="top">
                       <el-button type="primary" text @click="copyClick(baseUrl + id)">
                         <AppIcon iconName="app-copy"></AppIcon>
@@ -105,7 +133,10 @@
                   </div>
                 </div>
                 <div>
-                  <el-button @click="openAPIKeyDialog" v-if="permissionPrecise.overview_api_key(id)">
+                  <el-button
+                    @click="openAPIKeyDialog"
+                    v-if="permissionPrecise.overview_api_key(id)"
+                  >
                     <el-icon class="mr-4">
                       <Key />
                     </el-icon>
@@ -121,13 +152,29 @@
             {{ $t('views.applicationOverview.monitor.monitoringStatistics') }}
           </h4>
           <div class="mb-16">
-            <el-select v-model="history_day" class="mr-12" @change="changeDayHandle" style="width: 180px">
-              <el-option v-for="item in dayOptions" :key="item.value" :label="item.label" :value="item.value" />
+            <el-select
+              v-model="history_day"
+              class="mr-12"
+              @change="changeDayHandle"
+              style="width: 180px"
+            >
+              <el-option
+                v-for="item in dayOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
             </el-select>
-            <el-date-picker v-if="history_day === 'other'" v-model="daterangeValue" type="daterange"
+            <el-date-picker
+              v-if="history_day === 'other'"
+              v-model="daterangeValue"
+              type="daterange"
               :start-placeholder="$t('views.applicationOverview.monitor.startDatePlaceholder')"
-              :end-placeholder="$t('views.applicationOverview.monitor.endDatePlaceholder')" format="YYYY-MM-DD"
-              value-format="YYYY-MM-DD" @change="changeDayRangeHandle" />
+              :end-placeholder="$t('views.applicationOverview.monitor.endDatePlaceholder')"
+              format="YYYY-MM-DD"
+              value-format="YYYY-MM-DD"
+              @change="changeDayRangeHandle"
+            />
           </div>
           <div v-loading="statisticsLoading">
             <StatisticsCharts :data="statisticsData" />
@@ -136,7 +183,11 @@
       </div>
     </el-scrollbar>
 
-    <EmbedDialog ref="EmbedDialogRef" :data="detail" :api-input-params="mapToUrlParams(apiInputParams)" />
+    <EmbedDialog
+      ref="EmbedDialogRef"
+      :data="detail"
+      :api-input-params="mapToUrlParams(apiInputParams)"
+    />
     <APIKeyDialog ref="APIKeyDialogRef" />
 
     <!-- 社区版访问限制 -->
@@ -197,7 +248,10 @@ const urlParams = computed(() =>
   mapToUrlParams(apiInputParams.value) ? '?' + mapToUrlParams(apiInputParams.value) : '',
 )
 const shareUrl = computed(
-  () => `${window.location.origin}/chat/` + accessToken.value?.access_token + urlParams.value,
+  () =>
+    `${window.location.origin}${window.MaxKB.chatPrefix}/` +
+    accessToken.value?.access_token +
+    urlParams.value,
 )
 
 const dayOptions = [
@@ -322,7 +376,7 @@ function refreshAccessToken() {
       const str = t('views.applicationOverview.appInfo.refreshToken.refreshSuccess')
       updateAccessToken(obj, str)
     })
-    .catch(() => { })
+    .catch(() => {})
 }
 
 async function changeState(bool: boolean) {
@@ -368,20 +422,20 @@ function getDetail() {
       .map((v: any) => {
         apiInputParams.value = v.properties.api_input_field_list
           ? v.properties.api_input_field_list.map((v: any) => {
-            return {
-              name: v.variable,
-              value: v.default_value,
-            }
-          })
+              return {
+                name: v.variable,
+                value: v.default_value,
+              }
+            })
           : v.properties.input_field_list
             ? v.properties.input_field_list
-              .filter((v: any) => v.assignment_method === 'api_input')
-              .map((v: any) => {
-                return {
-                  name: v.variable,
-                  value: v.default_value,
-                }
-              })
+                .filter((v: any) => v.assignment_method === 'api_input')
+                .map((v: any) => {
+                  return {
+                    name: v.variable,
+                    value: v.default_value,
+                  }
+                })
             : []
       })
   })
