@@ -31,8 +31,30 @@ const putAuthSetting: (auth_type: string, data: any, loading?: Ref<boolean>) => 
   return put(`${prefix}/${auth_type}/info`, data, undefined, loading)
 }
 
+const platformPrefix = '/chat_user/auth/platform'
+const getPlatformInfo: (loading?: Ref<boolean>) => Promise<Result<any>> = (loading) => {
+  return get(`${platformPrefix}/source`, undefined, loading)
+}
+
+const updateConfig: (data: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  data,
+  loading
+) => {
+  return post(`${platformPrefix}/source`, data, undefined, loading)
+}
+
+const validateConnection: (data: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  data,
+  loading
+) => {
+  return put(`${platformPrefix}/source`, data, undefined, loading)
+}
+
 export default {
   getAuthSetting,
   postAuthSetting,
-  putAuthSetting
+  putAuthSetting,
+  getPlatformInfo,
+  updateConfig,
+  validateConnection
 }

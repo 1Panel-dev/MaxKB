@@ -15,7 +15,8 @@
 
 <script setup lang="ts">
 import { onMounted, ref, defineAsyncComponent } from 'vue'
-import useStore from '@/stores'
+import useStore from "@/stores";
+const { chatUser } = useStore()
 
 interface Tab {
   key: string
@@ -40,10 +41,9 @@ const props = defineProps<{ tabs: Tab[] }>()
 const activeKey = ref('')
 const allConfigs = ref<PlatformConfig[]>([])
 const config = ref<Config>({ app_key: '', app_secret: '' })
-const { login } = useStore()
 async function getPlatformInfo() {
   try {
-    return await login.getQrSource()
+    return await chatUser.getQrSource()
   } catch (error) {
     return []
   }

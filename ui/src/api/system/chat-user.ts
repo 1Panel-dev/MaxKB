@@ -103,6 +103,14 @@ const batchSync: (sync_type: string, loading?: Ref<boolean>) => Promise<Result<a
 ) => {
   return post(`${prefix}/sync/${sync_type}`, undefined, undefined, loading)
 }
+
+/**
+ * 获取同步类型
+ */
+const getSyncType: (loading?: Ref<boolean>) => Promise<Result<any>> = (loading) => {
+  return get(`${prefix}/sync_types`, undefined, loading)
+}
+
 export default {
   getUserManage,
   putUserManage,
@@ -112,5 +120,6 @@ export default {
   getChatUserList,
   batchAddGroup,
   batchDelete,
-  batchSync
+  batchSync,
+  getSyncType
 }

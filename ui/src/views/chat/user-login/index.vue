@@ -10,9 +10,9 @@
             class="mr-8"
             style="background: none"
           >
-            <img :src="chatUser.chat_profile?.icon" alt="" />
+            <img :src="chatUser.chat_profile?.icon" alt=""/>
           </el-avatar>
-          <LogoIcon v-else height="32px" class="mr-8" />
+          <LogoIcon v-else height="32px" class="mr-8"/>
           <h4>{{ chatUser.chat_profile?.application_name }}</h4>
         </div>
       </template>
@@ -29,9 +29,9 @@
             class="mr-8"
             style="background: none"
           >
-            <img :src="chatUser.chat_profile?.icon" alt="" />
+            <img :src="chatUser.chat_profile?.icon" alt=""/>
           </el-avatar>
-          <LogoIcon v-else height="32px" class="mr-8" />
+          <LogoIcon v-else height="32px" class="mr-8"/>
           <h4>{{ chatUser.chat_profile?.application_name }}</h4>
         </div>
       </template>
@@ -104,7 +104,7 @@
         </el-button>
       </div>
       <div v-if="showQrCodeTab">
-        <QrCodeTab :tabs="orgOptions" />
+        <QrCodeTab :tabs="orgOptions"/>
       </div>
       <div class="login-gradient-divider lighter mt-24" v-if="modeList.length > 1">
         <span>{{ $t('views.login.moreMethod') }}</span>
@@ -123,7 +123,7 @@
                 'font-size': item === 'OAUTH2' ? '8px' : '10px',
                 color: theme.themeInfo?.theme,
               }"
-              >{{ item }}</span
+            >{{ item }}</span
             >
           </el-button>
           <el-button
@@ -133,7 +133,7 @@
             class="login-button-circle color-secondary"
             @click="changeMode('QR_CODE')"
           >
-            <img src="@/assets/icon_qr_outlined.svg" width="25px" />
+            <img src="@/assets/icon_qr_outlined.svg" width="25px"/>
           </el-button>
           <el-button
             v-if="item === 'LOCAL' && loginMode != 'LOCAL'"
@@ -150,29 +150,29 @@
   </UserLoginLayout>
 </template>
 <script setup lang="ts">
-import { onMounted, ref, onBeforeMount } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import type { FormInstance, FormRules } from 'element-plus'
-import type { LoginRequest } from '@/api/type/login'
+import {onMounted, ref, onBeforeMount} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
+import type {FormInstance, FormRules} from 'element-plus'
+import type {LoginRequest} from '@/api/type/login'
 import LoginContainer from '@/layout/login-layout/LoginContainer.vue'
 import UserLoginLayout from '@/layout/login-layout/UserLoginLayout.vue'
 import loginApi from '@/api/chat/chat.ts'
-import { t, getBrowserLang } from '@/locales'
+import {t, getBrowserLang} from '@/locales'
 import useStore from '@/stores'
-import { useI18n } from 'vue-i18n'
-import QrCodeTab from '@/views/login/scanCompinents/QrCodeTab.vue'
-import { MsgConfirm, MsgError } from '@/utils/message.ts'
+import {useI18n} from 'vue-i18n'
+import QrCodeTab from '@/views/chat/user-login/scanCompinents/QrCodeTab.vue'
+import {MsgConfirm, MsgError} from '@/utils/message.ts'
 import PasswordAuth from '@/views/chat/auth/component/password.vue'
-import { isAppIcon } from '@/utils/common'
+import {isAppIcon} from '@/utils/common'
 
 const router = useRouter()
-const { theme, chatUser } = useStore()
-const { locale } = useI18n({ useScope: 'global' })
+const {theme, chatUser} = useStore()
+const {locale} = useI18n({useScope: 'global'})
 const loading = ref<boolean>(false)
 const route = useRoute()
 const identifyCode = ref<string>('')
 const {
-  params: { accessToken },
+  params: {accessToken},
 } = route as any
 const loginFormRef = ref<FormInstance>()
 const loginForm = ref<LoginRequest>({
@@ -211,7 +211,7 @@ const loginHandle = () => {
       chatUser.ldapLogin(loginForm.value).then((ok) => {
         router.push({
           name: 'chat',
-          params: { accessToken: chatUser.accessToken },
+          params: {accessToken: chatUser.accessToken},
           query: route.query,
         })
       })
@@ -219,7 +219,7 @@ const loginHandle = () => {
       chatUser.login(loginForm.value).then((ok) => {
         router.push({
           name: 'chat',
-          params: { accessToken: chatUser.accessToken },
+          params: {accessToken: chatUser.accessToken},
           query: route.query,
         })
       })
@@ -239,7 +239,7 @@ onBeforeMount(() => {
 })
 
 const modeList = ref<string[]>([])
-//const QrList = ref<any[]>([''])
+const QrList = ref<any[]>([''])
 const loginMode = ref('')
 const showQrCodeTab = ref(false)
 
@@ -300,7 +300,8 @@ function redirectAuth(authType: string, needMessage: boolean = false) {
         .then(() => {
           window.location.href = url
         })
-        .catch(() => {})
+        .catch(() => {
+        })
     } else {
       console.log('url', url)
       window.location.href = url
@@ -339,6 +340,25 @@ onBeforeMount(() => {
     }
     if (modeList.value.length == 1 && ['CAS', 'OIDC', 'OAuth2'].includes(modeList.value[0])) {
       redirectAuth(modeList.value[0])
+    }
+    // 这里的modeList 是oauth2 cas ldap oidc 这四个 还会有 lark wecom dingtalk
+    // 获取到的 modeList中除'CAS', 'OIDC', 'OAuth2' LOCAL之外的登录方式
+    QrList.value = modeList.value.filter((item) => !['CAS', 'OIDC', 'OAuth2', 'LOCAL', 'LDAP'].includes(item))
+    // modeList需要去掉lark wecom dingtalk
+    modeList.value = modeList.value.filter((item) => !['lark', 'wecom', 'dingtalk'].includes(item))
+    if (QrList.value.length > 0) {
+      modeList.value.push('QR_CODE')
+      QrList.value.forEach((item) => {
+        orgOptions.value.push({
+          key: item,
+          value:
+            item === 'wecom'
+              ? t('views.system.authentication.scanTheQRCode.wecom')
+              : item === 'dingtalk'
+                ? t('views.system.authentication.scanTheQRCode.dingtalk')
+                : t('views.system.authentication.scanTheQRCode.lark'),
+        })
+      })
     }
   }
 })

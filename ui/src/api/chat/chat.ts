@@ -1,4 +1,4 @@
-import { Result } from '@/request/Result'
+import {Result} from '@/request/Result'
 import {
   get,
   post,
@@ -9,17 +9,17 @@ import {
   download,
   exportFile,
 } from '@/request/chat/index'
-import { type ChatProfile } from '@/api/type/chat'
-import { type Ref } from 'vue'
-import type { ResetPasswordRequest } from '@/api/type/user.ts'
+import {type ChatProfile} from '@/api/type/chat'
+import {type Ref} from 'vue'
+import type {ResetPasswordRequest} from '@/api/type/user.ts'
 
 import useStore from '@/stores'
-import type { LoginRequest } from '@/api/type/user'
+import type {LoginRequest} from '@/api/type/user'
 
-const prefix: any = { _value: '/workspace/' }
+const prefix: any = {_value: '/workspace/'}
 Object.defineProperty(prefix, 'value', {
   get: function () {
-    const { user } = useStore()
+    const {user} = useStore()
     return this._value + user.getWorkspaceId() + '/application'
   },
 })
@@ -51,7 +51,7 @@ const chatProfile: (assessToken: string, loading?: Ref<boolean>) => Promise<Resu
   assessToken,
   loading,
 ) => {
-  return get('/profile', { access_token: assessToken }, loading)
+  return get('/profile', {access_token: assessToken}, loading)
 }
 /**
  * 匿名认证
@@ -63,7 +63,7 @@ const anonymousAuthentication: (
   assessToken: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (assessToken, loading) => {
-  return post('/auth/anonymous', { access_token: assessToken }, {}, loading)
+  return post('/auth/anonymous', {access_token: assessToken}, {}, loading)
 }
 /**
  * 密码认证
@@ -77,7 +77,7 @@ const passwordAuthentication: (
   password: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (assessToken, password, loading) => {
-  return post('auth/password', { access_token: assessToken, password: password }, {}, loading)
+  return post('auth/password', {access_token: assessToken, password: password}, {}, loading)
 }
 /**
  * 获取应用相关信息
@@ -122,38 +122,40 @@ const getCaptcha: (loading?: Ref<boolean>) => Promise<Result<any>> = (loading) =
  * 获取二维码类型
  */
 const getQrType: (loading?: Ref<boolean>) => Promise<Result<any>> = (loading) => {
-  return get('qr_type', undefined, loading)
+  return get('auth/qr_type', undefined, loading)
 }
 
 const getQrSource: (loading?: Ref<boolean>) => Promise<Result<any>> = (loading) => {
-  return get('qr_type/source', undefined, loading)
+  return get('auth/qr_type/source', undefined, loading)
 }
 
-const getDingCallback: (code: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
+const getDingCallback: (code: string, accessToken: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
   code,
+  accessToken,
   loading,
 ) => {
-  return get('dingtalk', { code }, loading)
+  return get('auth/dingtalk', {code, accessToken: accessToken}, loading)
 }
 
 const getDingOauth2Callback: (code: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
   code,
   loading,
 ) => {
-  return get('dingtalk/oauth2', { code }, loading)
+  return get('auth/dingtalk/oauth2', {code}, loading)
 }
 
-const getWecomCallback: (code: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
+const getWecomCallback: (code: string, accessToken: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
   code,
+  accessToken,
   loading,
 ) => {
-  return get('wecom', { code }, loading)
+  return get('auth/wecom', {code, accessToken: accessToken}, loading)
 }
 const getLarkCallback: (code: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
   code,
   loading,
 ) => {
-  return get('lark/oauth2', { code }, loading)
+  return get('auth/lark/oauth2', {code}, loading)
 }
 
 /**
@@ -274,17 +276,17 @@ const deleteChat: (chat_id: string, loading?: Ref<boolean>) => Promise<Result<an
   chat_id,
   loading,
 ) => {
-  return del(`historical_conversation/${chat_id}`,undefined,undefined ,loading)
+  return del(`historical_conversation/${chat_id}`, undefined, undefined, loading)
 }
 /**
- * 
- * @param loading 
- * @returns 
+ *
+ * @param loading
+ * @returns
  */
 const clearChat: (loading?: Ref<boolean>) => Promise<Result<any>> = (
   loading
 ) => {
-  return del(`historical_conversation/clear`,undefined,undefined, loading)
+  return del(`historical_conversation/clear`, undefined, undefined, loading)
 }
 /**
  *

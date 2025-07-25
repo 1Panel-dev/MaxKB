@@ -89,7 +89,7 @@
 import { reactive, ref, onMounted } from 'vue'
 import { copyClick } from '@/utils/clipboard'
 import EditModel from './EditModal.vue'
-import platformApi from '@/api/system/platform-source'
+import platformApi from '@/api/chat-user/auth-setting.ts'
 import { MsgError, MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
 
@@ -148,7 +148,7 @@ function createPlatform(key: string, name: string): Platform {
 
   return {
     key,
-    logoSrc: new URL(`../../../assets/logo/logo_${logo}.svg`, import.meta.url).href,
+    logoSrc: new URL(`../../../../assets/logo/logo_${logo}.svg`, import.meta.url).href,
     name,
     isActive: false,
     isValid: false,

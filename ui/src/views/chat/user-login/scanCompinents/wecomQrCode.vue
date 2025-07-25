@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useRouter } from 'vue-router'
+import {useRoute, useRouter} from 'vue-router'
 import * as ww from '@wecom/jssdk'
 import {
   WWLoginLangType,
@@ -16,10 +16,13 @@ import { MsgError } from '@/utils/message'
 import useStore from '@/stores'
 import { getBrowserLang } from '@/locales'
 const router = useRouter()
-
+const route = useRoute()
+const {
+  params: {accessToken},
+} = route as any
 const wwLogin = ref({})
 const obj = ref<any>({ isWeComLogin: false })
-const { login } = useStore()
+const { chatUser } = useStore()
 
 const props = defineProps<{
   config: {
@@ -53,7 +56,7 @@ const init = async () => {
       },
       onCheckWeComLogin: obj.value,
       async onLoginSuccess({ code }: any) {
-        login.wecomCallback(code).then(() => {
+        chatUser.wecomCallback(code, accessToken).then(() => {
           setTimeout(() => {
             router.push({ name: 'home' })
           })

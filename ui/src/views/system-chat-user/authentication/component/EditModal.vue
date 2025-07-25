@@ -52,7 +52,7 @@ template
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import { ElForm } from 'element-plus'
-import platformApi from '@/api/system/platform-source'
+import platformApi from '@/api/chat-user/auth-setting.ts'
 import { MsgError, MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
 

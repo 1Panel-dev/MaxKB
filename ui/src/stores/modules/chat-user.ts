@@ -1,14 +1,17 @@
-import { defineStore } from 'pinia'
+import {defineStore} from 'pinia'
 import ChatAPI from '@/api/chat/chat'
-import type { ChatProfile, ChatUserProfile } from '@/api/type/chat'
-import type { LoginRequest } from '@/api/type/user'
-import type { Ref } from 'vue'
-import { getBrowserLang } from '@/locales/index'
+import type {ChatProfile, ChatUserProfile} from '@/api/type/chat'
+import type {LoginRequest} from '@/api/type/user'
+import type {Ref} from 'vue'
+import {getBrowserLang} from '@/locales/index'
+import LoginApi from "@/api/user/login.ts";
+import useUserStore from "@/stores/modules/user.ts";
 
 interface ChatUser {
   // 用户id
   id: string
 }
+
 interface Chat {
   chat_profile?: ChatProfile
   application?: any
@@ -16,6 +19,7 @@ interface Chat {
   token?: string
   accessToken?: string
 }
+
 const useChatUserStore = defineStore('chat-user', {
   state: (): Chat => ({
     chat_profile: undefined,
@@ -111,6 +115,41 @@ const useChatUserStore = defineStore('chat-user', {
         return true
       })
     },
+    async dingCallback(code: string, accessToken: string) {
+      return ChatAPI.getDingCallback(code, accessToken).then((ok) => {
+        this.setToken(ok.data.token)
+        return this.token
+      })
+    },
+    async dingOauth2Callback(code: string) {
+      return ChatAPI.getDingOauth2Callback(code).then((ok) => {
+        this.setToken(ok.data.token)
+        return this.token
+      })
+    },
+    async wecomCallback(code: string, accessToken: string) {
+      return ChatAPI.getWecomCallback(code, accessToken).then((ok) => {
+        this.setToken(ok.data.token)
+        return this.token
+      })
+    },
+    async larkCallback(code: string) {
+      return ChatAPI.getLarkCallback(code).then((ok) => {
+        this.setToken(ok.data.token)
+        return this.token
+      })
+    },
+    async getQrType() {
+      return ChatAPI.getQrType().then((ok) => {
+        return ok.data
+      })
+    },
+    async getQrSource() {
+      return ChatAPI.getQrSource().then((ok) => {
+        return ok.data
+      })
+    },
+
   },
 })
 
