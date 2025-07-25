@@ -24,6 +24,7 @@ from common.util.file_util import get_file_content
 from common.util.lock import try_lock, un_lock
 from common.util.page_utils import page_desc
 from dataset.models import Paragraph, Status, Document, ProblemParagraphMapping, TaskType, State
+from dataset.serializers.common_serializers import create_dataset_index
 from embedding.models import SourceType, SearchMode
 from smartdoc.conf import PROJECT_DIR
 from django.utils.translation import gettext_lazy as _
@@ -281,6 +282,8 @@ class ListenerManagement:
                                                                        ListenerManagement.get_aggregation_document_status(
                                                                            document_id)),
                       is_the_task_interrupted)
+            # 检查是否存在索引
+            create_dataset_index(document_id=document_id)
         except Exception as e:
             max_kb_error.error(_('Vectorized document: {document_id} error {error} {traceback}').format(
                 document_id=document_id, error=str(e), traceback=traceback.format_exc()))
