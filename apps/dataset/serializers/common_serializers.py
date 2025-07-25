@@ -18,13 +18,13 @@ from rest_framework import serializers
 
 from common.config.embedding_config import ModelManage
 from common.db.search import native_search
-from common.db.sql_execute import update_execute
+from common.db.sql_execute import update_execute, sql_execute
 from common.exception.app_exception import AppApiException
 from common.mixins.api_mixin import ApiMixin
 from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
 from common.util.fork import Fork
-from dataset.models import Paragraph, Problem, ProblemParagraphMapping, DataSet, File, Image
+from dataset.models import Paragraph, Problem, ProblemParagraphMapping, DataSet, File, Image, Document
 from setting.models_provider import get_model
 from smartdoc.conf import PROJECT_DIR
 from django.utils.translation import gettext_lazy as _
@@ -222,6 +222,46 @@ def get_embedding_model_id_by_dataset_id_list(dataset_id_list: List):
     if len(dataset_list) == 0:
         raise Exception(_('Knowledge base setting error, please reset the knowledge base'))
     return str(dataset_list[0].embedding_mode_id)
+
+
+
+def create_dataset_index(dataset_id=None, document_id=None):
+    if dataset_id is None and document_id is None:
+        raise AppApiException(500, _('Dataset ID or Document ID must be provided'))
+
+    if dataset_id is not None:
+        k_id = dataset_id
+    else:
+        document = QuerySet(Document).filter(id=document_id).first()
+        k_id = document.dataset_id
+
+    sql = f"SELECT indexname, indexdef FROM pg_indexes WHERE tablename = 'embedding' AND indexname = 'embedding_hnsw_idx_{k_id}'"
+    index = sql_execute(sql, [])
+    if not index:
+        sql = f"SELECT vector_dims(embedding) AS dims FROM embedding WHERE dataset_id = '{k_id}' LIMIT 1"
+        result = sql_execute(sql, [])
+        if len(result) == 0:
+            return
+        dims = result[0]['dims']
+        sql = f"""CREATE INDEX "embedding_hnsw_idx_{k_id}" ON embedding USING hnsw ((embedding::vector({dims})) vector_cosine_ops) WHERE dataset_id = '{k_id}'"""
+        update_execute(sql, [])
+
+
+def drop_dataset_index(dataset_id=None, document_id=None):
+    if dataset_id is None and document_id is None:
+        raise AppApiException(500, _('Dataset ID or Document ID must be provided'))
+
+    if dataset_id is not None:
+        k_id = dataset_id
+    else:
+        document = QuerySet(Document).filter(id=document_id).first()
+        k_id = document.dataset_id
+
+    sql = f"SELECT indexname, indexdef FROM pg_indexes WHERE tablename = 'embedding' AND indexname = 'embedding_hnsw_idx_{k_id}'"
+    index = sql_execute(sql, [])
+    if index:
+        sql = f'DROP INDEX "embedding_hnsw_idx_{k_id}"'
+        update_execute(sql, [])
 
 
 class GenerateRelatedSerializer(ApiMixin, serializers.Serializer):

@@ -44,7 +44,7 @@ from dataset.models.data_set import DataSet, Document, Paragraph, Problem, Type,
     State, File, Image
 from dataset.serializers.common_serializers import list_paragraph, MetaSerializer, ProblemParagraphManage, \
     get_embedding_model_by_dataset_id, get_embedding_model_id_by_dataset_id, write_image, zip_dir, \
-    GenerateRelatedSerializer
+    GenerateRelatedSerializer, drop_dataset_index
 from dataset.serializers.document_serializers import DocumentSerializers, DocumentInstanceSerializer
 from dataset.task import sync_web_dataset, sync_replace_web_dataset, generate_related_by_dataset_id
 from embedding.models import SearchMode
@@ -788,6 +788,7 @@ class DataSetSerializers(serializers.ModelSerializer):
             QuerySet(ProblemParagraphMapping).filter(dataset=dataset).delete()
             QuerySet(Paragraph).filter(dataset=dataset).delete()
             QuerySet(Problem).filter(dataset=dataset).delete()
+            drop_dataset_index(knowledge_id=dataset.id)
             dataset.delete()
             delete_embedding_by_dataset(self.data.get('id'))
             return True

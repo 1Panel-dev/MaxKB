@@ -17,6 +17,7 @@ from common.config.embedding_config import ModelManage
 from common.event import ListenerManagement, UpdateProblemArgs, UpdateEmbeddingDatasetIdArgs, \
     UpdateEmbeddingDocumentIdArgs
 from dataset.models import Document, TaskType, State
+from dataset.serializers.common_serializers import drop_dataset_index
 from ops import celery_app
 from setting.models import Model
 from setting.models_provider import get_model
@@ -110,6 +111,7 @@ def embedding_by_dataset(dataset_id, model_id):
     max_kb.info(_('Start--->Vectorized dataset: {dataset_id}').format(dataset_id=dataset_id))
     try:
         ListenerManagement.delete_embedding_by_dataset(dataset_id)
+        drop_dataset_index(dataset_id=dataset_id)
         document_list = QuerySet(Document).filter(dataset_id=dataset_id)
         max_kb.info(_('Dataset documentation: {document_names}').format(
             document_names=", ".join([d.name for d in document_list])))
