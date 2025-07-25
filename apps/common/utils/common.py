@@ -334,3 +334,6 @@ def parse_image(content: str):
 
 def generate_uuid(tag: str):
     return str(uuid.uuid5(uuid.NAMESPACE_DNS, tag))
+
+def filter_workspace(query_list):
+    return [q for q in query_list if q.name!="workspace_id"]
