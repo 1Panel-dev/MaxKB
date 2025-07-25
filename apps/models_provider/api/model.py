@@ -108,6 +108,9 @@ class GetModelApi(APIMixin):
             required=True,
         )
         ]
+    @staticmethod
+    def get_request():
+        return []
 
     @staticmethod
     def get_response():
