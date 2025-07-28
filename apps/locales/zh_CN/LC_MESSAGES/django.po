@@ -5196,7 +5196,7 @@ msgstr "创建系统知识库"
 #: apps/resource_manage/views/document.py:571
 #: apps/resource_manage/views/document.py:585
 msgid "System Knowledge/Documentation"
-msgstr "知识库/文档"
+msgstr "系统知识库/文档"
 
 #: apps/resource_manage/views/document.py:51
 #: apps/resource_manage/views/document.py:52
@@ -5445,7 +5445,7 @@ msgstr "段落列表"
 #: apps/resource_manage/views/paragraph.py:344
 #: apps/resource_manage/views/paragraph.py:370
 msgid "System Knowledge/Documentation/Paragraph"
-msgstr "知识库/文档/段落"
+msgstr "系统知识库/文档/段落"
 
 #: apps/resource_manage/views/paragraph.py:45
 #: apps/resource_manage/views/paragraph.py:46
@@ -5532,7 +5532,7 @@ msgstr "问题列表"
 #: apps/resource_manage/views/problem.py:158
 #: apps/resource_manage/views/problem.py:182
 msgid "System Knowledge/Documentation/Paragraph/Question"
-msgstr "知识库/文档/段落/问题"
+msgstr "系统知识库/文档/段落/问题"
 
 #: apps/resource_manage/views/problem.py:44
 #: apps/resource_manage/views/problem.py:45

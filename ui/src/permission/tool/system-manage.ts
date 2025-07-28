@@ -1,6 +1,7 @@
-import { hasPermission } from '@/utils/permission/index'
-import { ComplexPermission } from '@/utils/permission/type'
-import { EditionConst, PermissionConst, RoleConst } from '@/utils/permission/data'
+import {hasPermission} from '@/utils/permission/index'
+import {ComplexPermission} from '@/utils/permission/type'
+import {EditionConst, PermissionConst, RoleConst} from '@/utils/permission/data'
+
 const systemManage = {
   is_share: () =>
     hasPermission(
@@ -12,14 +13,49 @@ const systemManage = {
       ),
       'OR',
     ),
-  delete: () => false,
+  delete: () =>
+    hasPermission(
+      [
+        RoleConst.ADMIN,
+        PermissionConst.RESOURCE_TOOL_DELETE,
+      ],
+      'OR',
+    ),
   create: () => false,
   import: () => false,
-  switch: () => false,
-  edit: () => false,
+  switch: () =>
+    hasPermission(
+      [
+        RoleConst.ADMIN,
+        PermissionConst.RESOURCE_TOOL_EDIT,
+      ],
+      'OR',
+    ),
+  edit: () =>
+    hasPermission(
+      [
+        RoleConst.ADMIN,
+        PermissionConst.RESOURCE_TOOL_EDIT,
+      ],
+      'OR',
+    ),
   copy: () => false,
-  export: () => false,
-  debug: () => false,
+  export: () =>
+    hasPermission(
+      [
+        RoleConst.ADMIN,
+        PermissionConst.RESOURCE_TOOL_EXPORT,
+      ],
+      'OR',
+    ),
+  debug: () =>
+    hasPermission(
+      [
+        RoleConst.ADMIN,
+        PermissionConst.RESOURCE_TOOL_DEBUG,
+      ],
+      'OR',
+    ),
 
   folderCreate: () => false,
   folderEdit: () => false,
