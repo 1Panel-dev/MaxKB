@@ -103,4 +103,5 @@ export default {
   collapse: 'Collapse',
   copyTitle: 'Copy',
   professional: 'Purchase the Professional Edition',
+  sync: 'Sync',
 }

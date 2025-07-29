@@ -22,7 +22,7 @@
       <span class="dialog-footer">
         <el-button @click.prevent="dialogVisible = false"> {{ $t('common.cancel') }} </el-button>
         <el-button type="primary" @click="submit(formRef)" :loading="loading">
-          {{ $t('common.save') }}
+          {{ $t('common.sync') }}
         </el-button>
       </span>
     </template>

@@ -107,4 +107,5 @@ export default {
   collapse: '收起',
   copyTitle: '副本',
   professional: '购买专业版',
+  sync: '同步',
 }

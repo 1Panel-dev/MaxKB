@@ -37,10 +37,10 @@
             />
           </el-form-item>
           <el-form-item label="Scope" prop="config.scope">
-            <el-input v-model="form.config.scope" placeholder="openid+profile+email " />
+            <el-input v-model="form.config.scope" placeholder="openid+profile+email "/>
           </el-form-item>
           <el-form-item label="State" prop="config.state">
-            <el-input v-model="form.config.state" placeholder="" />
+            <el-input v-model="form.config.state" placeholder=""/>
           </el-form-item>
           <el-form-item
             :label="$t('views.system.authentication.oidc.clientId')"
@@ -81,14 +81,14 @@
           </el-form-item>
           <el-form-item>
             <el-checkbox v-model="form.is_active"
-              >{{ $t('views.system.authentication.oidc.enableAuthentication') }}
+            >{{ $t('views.system.authentication.oidc.enableAuthentication') }}
             </el-checkbox>
           </el-form-item>
         </el-form>
 
         <div class="text-right">
           <el-button @click="submit(authFormRef)" type="primary" :disabled="loading"
-            v-hasPermission="
+                     v-hasPermission="
                       new ComplexPermission(
                         [RoleConst.ADMIN],
                         [PermissionConst.LOGIN_AUTH_EDIT],
@@ -102,13 +102,13 @@
   </div>
 </template>
 <script setup lang="ts">
-import { reactive, ref, watch, onMounted } from 'vue'
+import {reactive, ref, watch, onMounted} from 'vue'
 import authApi from '@/api/system-settings/auth-setting'
-import type { FormInstance, FormRules } from 'element-plus'
-import { t } from '@/locales'
-import { MsgSuccess } from '@/utils/message'
-import { PermissionConst, RoleConst } from '@/utils/permission/data'
-import { ComplexPermission } from '@/utils/permission/type'
+import type {FormInstance, FormRules} from 'element-plus'
+import {t} from '@/locales'
+import {MsgSuccess} from '@/utils/message'
+import {PermissionConst, RoleConst} from '@/utils/permission/data'
+import {ComplexPermission} from '@/utils/permission/type'
 
 const form = ref<any>({
   id: '',
@@ -218,7 +218,7 @@ function getDetail() {
       ) {
         form.value.config.fieldMapping = '{"username": "preferred_username", "email": "email"}'
       }
-      if (!form.value.config.redirectUrl){
+      if (!form.value.config.redirectUrl) {
         form.value.config.redirectUrl = window.location.origin + window.MaxKB.prefix + 'api/oidc'
       }
     }

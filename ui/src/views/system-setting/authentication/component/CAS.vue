@@ -38,14 +38,14 @@
           </el-form-item>
           <el-form-item>
             <el-checkbox v-model="form.is_active"
-              >{{ $t('views.system.authentication.cas.enableAuthentication') }}
+            >{{ $t('views.system.authentication.cas.enableAuthentication') }}
             </el-checkbox>
           </el-form-item>
         </el-form>
 
         <div class="text-right">
           <el-button @click="submit(authFormRef)" type="primary" :disabled="loading"
-            v-hasPermission="
+                     v-hasPermission="
                       new ComplexPermission(
                         [RoleConst.ADMIN],
                         [PermissionConst.LOGIN_AUTH_EDIT],
@@ -59,13 +59,13 @@
   </div>
 </template>
 <script setup lang="ts">
-import { reactive, ref, watch, onMounted } from 'vue'
+import {reactive, ref, watch, onMounted} from 'vue'
 import authApi from '@/api/system-settings/auth-setting'
-import type { FormInstance, FormRules } from 'element-plus'
-import { t } from '@/locales'
-import { MsgSuccess } from '@/utils/message'
-import { PermissionConst, RoleConst } from '@/utils/permission/data'
-import { ComplexPermission } from '@/utils/permission/type'
+import type {FormInstance, FormRules} from 'element-plus'
+import {t} from '@/locales'
+import {MsgSuccess} from '@/utils/message'
+import {PermissionConst, RoleConst} from '@/utils/permission/data'
+import {ComplexPermission} from '@/utils/permission/type'
 
 const form = ref<any>({
   id: '',
@@ -124,7 +124,7 @@ function getDetail() {
         res.data.config.validateUrl = res.data.config.ldpUri
       }
       form.value = res.data
-      if (!form.value.config.redirectUrl){
+      if (!form.value.config.redirectUrl) {
         form.value.config.redirectUrl = window.location.origin + window.MaxKB.prefix + 'api/cas'
       }
     }

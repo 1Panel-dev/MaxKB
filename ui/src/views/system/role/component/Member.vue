@@ -18,10 +18,19 @@
       <div class="flex complex-search">
         <el-select class="complex-search__left" v-model="searchType" style="width: 120px">
           <el-option :label="$t('views.login.loginForm.username.label')" value="username" />
+          <el-option :label="$t('views.userManage.userForm.nick_name.label')" value="nick_name" />
         </el-select>
         <el-input
           v-if="searchType === 'username'"
           v-model="searchForm.username"
+          @change="getList"
+          :placeholder="$t('common.inputPlaceholder')"
+          style="width: 220px"
+          clearable
+        />
+        <el-input
+          v-else-if="searchType === 'nick_name'"
+          v-model="searchForm.nick_name"
           @change="getList"
           :placeholder="$t('common.inputPlaceholder')"
           style="width: 220px"
@@ -98,6 +107,7 @@ const loading = ref(false)
 const searchType = ref('username')
 const searchForm = ref<Record<string, any>>({
   username: '',
+  nick_name: '',
 })
 const paginationConfig = reactive({
   current_page: 1,

@@ -14,7 +14,8 @@
     </el-button>
     <div class="flex complex-search">
       <el-select class="complex-search__left" v-model="searchType" style="width: 120px">
-        <el-option :label="$t('views.login.loginForm.username.label')" value="username" />
+        <el-option :label="$t('views.login.loginForm.username.label')" value="username"/>
+        <el-option :label="$t('views.userManage.userForm.nick_name.label')" value="nick_name"/>
       </el-select>
       <el-input
         v-if="searchType === 'username'"
@@ -24,6 +25,13 @@
         style="width: 220px"
         clearable
       />
+      <el-input
+        v-else-if="searchType === 'nick_name'"
+        v-model="searchForm.nick_name"
+        @change="getList"
+        :placeholder="$t('common.inputPlaceholder')"
+        style="width: 220px"
+        clearable/>
     </div>
   </div>
   <app-table
@@ -36,9 +44,9 @@
     :span-method="objectSpanMethod"
     :maxTableHeight="320"
   >
-    <el-table-column prop="nick_name" :label="$t('views.userManage.userForm.nick_name.label')" />
-    <el-table-column prop="username" :label="$t('views.login.loginForm.username.label')" />
-    <el-table-column prop="role_name" :label="$t('views.role.member.role')" />
+    <el-table-column prop="nick_name" :label="$t('views.userManage.userForm.nick_name.label')"/>
+    <el-table-column prop="username" :label="$t('views.login.loginForm.username.label')"/>
+    <el-table-column prop="role_name" :label="$t('views.role.member.role')"/>
     <el-table-column :label="$t('common.operation')" width="100" fixed="right">
       <template #default="{ row }">
         <el-tooltip
@@ -71,13 +79,13 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, reactive, watch } from 'vue'
-import { MsgSuccess, MsgConfirm } from '@/utils/message'
-import { t } from '@/locales'
+import {onMounted, ref, reactive, watch} from 'vue'
+import {MsgSuccess, MsgConfirm} from '@/utils/message'
+import {t} from '@/locales'
 import AddMemberDrawer from './AddMemberDrawer.vue'
-import type { WorkspaceMemberItem, WorkspaceItem } from '@/api/type/workspace'
-import { PermissionConst, RoleConst } from '@/utils/permission/data'
-import { ComplexPermission } from '@/utils/permission/type'
+import type {WorkspaceMemberItem, WorkspaceItem} from '@/api/type/workspace'
+import {PermissionConst, RoleConst} from '@/utils/permission/data'
+import {ComplexPermission} from '@/utils/permission/type'
 import {loadPermissionApi} from "@/utils/dynamics-api/permission-api.ts";
 
 
@@ -90,6 +98,7 @@ const loading = ref(false)
 const searchType = ref('username')
 const searchForm = ref<Record<string, any>>({
   username: '',
+  nick_name: '',
 })
 const paginationConfig = reactive({
   current_page: 1,
@@ -134,7 +143,7 @@ watch(
   },
 )
 
-const objectSpanMethod = ({ row, column, rowIndex, columnIndex }: any) => {
+const objectSpanMethod = ({row, column, rowIndex, columnIndex}: any) => {
   if (column.property === 'nick_name' || column.property === 'username') {
     const sameUserRows = tableData.value.filter(item => item.user_id === row.user_id);
     if (rowIndex === tableData.value.findIndex(item => item.user_id === row.user_id)) {
@@ -152,6 +161,7 @@ const objectSpanMethod = ({ row, column, rowIndex, columnIndex }: any) => {
 };
 
 const addMemberDrawerRef = ref<InstanceType<typeof AddMemberDrawer>>()
+
 function handleAdd() {
   addMemberDrawerRef.value?.open()
 }
@@ -172,7 +182,8 @@ function handleDelete(row: WorkspaceMemberItem) {
         getList()
       })
     })
-    .catch(() => {})
+    .catch(() => {
+    })
 }
 </script>
 
