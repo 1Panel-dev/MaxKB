@@ -1395,10 +1395,6 @@ class PermissionConstants(Enum):
         group=Group.SYSTEM_RES_TOOL, operate=Operate.READ, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.RESOURCE_TOOL]
     )
-    RESOURCE_TOOL_CREATE = Permission(
-        group=Group.SYSTEM_RES_TOOL, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN],
-        parent_group=[SystemGroup.RESOURCE_TOOL]
-    )
     RESOURCE_TOOL_EDIT = Permission(
         group=Group.SYSTEM_RES_TOOL, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.RESOURCE_TOOL]
@@ -1409,10 +1405,6 @@ class PermissionConstants(Enum):
     )
     RESOURCE_TOOL_DEBUG = Permission(
         group=Group.SYSTEM_RES_TOOL, operate=Operate.DEBUG, role_list=[RoleConstants.ADMIN],
-        parent_group=[SystemGroup.RESOURCE_TOOL]
-    )
-    RESOURCE_TOOL_IMPORT = Permission(
-        group=Group.SYSTEM_RES_TOOL, operate=Operate.IMPORT, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.RESOURCE_TOOL]
     )
     RESOURCE_TOOL_EXPORT = Permission(
