@@ -45,7 +45,7 @@
 
         <div class="text-right">
           <el-button @click="submit(authFormRef)" type="primary" :disabled="loading"
-            v-hasPermission="
+                     v-hasPermission="
                       new ComplexPermission(
                         [RoleConst.ADMIN],
                         [PermissionConst.CHAT_USER_AUTH_EDIT],
@@ -64,8 +64,8 @@ import authApi from '@/api/chat-user/auth-setting'
 import type {FormInstance, FormRules} from 'element-plus'
 import {t} from '@/locales'
 import {MsgSuccess} from '@/utils/message'
-import { PermissionConst, RoleConst } from '@/utils/permission/data'
-import { ComplexPermission } from '@/utils/permission/type'
+import {PermissionConst, RoleConst} from '@/utils/permission/data'
+import {ComplexPermission} from '@/utils/permission/type'
 
 const form = ref<any>({
   id: '',
@@ -124,6 +124,9 @@ function getDetail() {
         res.data.config.validateUrl = res.data.config.ldpUri
       }
       form.value = res.data
+    }
+    if (!form.value.config.redirectUrl) {
+      form.value.config.redirectUrl = window.location.origin + window.MaxKB.chatPrefix + '/api/auth/cas'
     }
   })
 }

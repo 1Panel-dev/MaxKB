@@ -124,6 +124,9 @@ function getDetail() {
         res.data.config.validateUrl = res.data.config.ldpUri
       }
       form.value = res.data
+      if (!form.value.config.redirectUrl){
+        form.value.config.redirectUrl = window.location.origin + window.MaxKB.prefix + 'api/cas'
+      }
     }
   })
 }

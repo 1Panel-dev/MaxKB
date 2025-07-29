@@ -24,6 +24,7 @@
               value="is_active"
             />
             <el-option
+              v-if="user.isEE() || user.isPE()"
               :label="$t('views.userManage.source.label')"
               value="source"
             />

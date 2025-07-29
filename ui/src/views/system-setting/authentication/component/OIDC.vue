@@ -218,6 +218,9 @@ function getDetail() {
       ) {
         form.value.config.fieldMapping = '{"username": "preferred_username", "email": "email"}'
       }
+      if (!form.value.config.redirectUrl){
+        form.value.config.redirectUrl = window.location.origin + window.MaxKB.prefix + 'api/oidc'
+      }
     }
   })
 }

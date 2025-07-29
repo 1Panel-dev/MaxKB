@@ -208,6 +208,9 @@ function getDetail() {
     if (res.data && JSON.stringify(res.data) !== '{}') {
       form.value = res.data
     }
+    if (!form.value.config.redirectUrl) {
+      form.value.config.redirectUrl = window.location.origin + window.MaxKB.chatPrefix + '/api/auth/oauth2'
+    }
   })
 }
 
