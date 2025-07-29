@@ -154,14 +154,14 @@ const open = async (platform: Platform) => {
   Object.assign(currentPlatform, platform)
 
   // 设置默认的 callback_url
-  const defaultCallbackUrl = window.location.origin
+  const defaultCallbackUrl = window.location.origin + window.MaxKB.chatPrefix + '/api'
   switch (platform.key) {
     case 'wecom':
       if (currentPlatform.config.app_key) {
         currentPlatform.config.agent_id = currentPlatform.config.app_key
         delete currentPlatform.config.app_key
       }
-      currentPlatform.config.callback_url = `${defaultCallbackUrl}/chat/api/auth/wecom`
+      currentPlatform.config.callback_url = `${defaultCallbackUrl}/auth/wecom`
       break
     case 'dingtalk':
       if (currentPlatform.config.agent_id) {
@@ -174,10 +174,10 @@ const open = async (platform: Platform) => {
         app_secret: currentPlatform.config.app_secret,
         callback_url: defaultCallbackUrl
       }
-      currentPlatform.config.callback_url = `${defaultCallbackUrl}/chat/api/auth/dingtalk`
+      currentPlatform.config.callback_url = `${defaultCallbackUrl}/auth/dingtalk`
       break
     case 'lark':
-      currentPlatform.config.callback_url = `${defaultCallbackUrl}/chat/api/auth/lark`
+      currentPlatform.config.callback_url = `${defaultCallbackUrl}/auth/lark`
       break
     default:
       break
