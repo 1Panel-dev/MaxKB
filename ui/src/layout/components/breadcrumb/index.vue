@@ -36,13 +36,13 @@ const route = useRoute()
 const {
   meta: { activeMenu },
   params: { id, folderId },
-  query: { isShared },
+  query: { isShared, type },
 } = route as any
 
 const apiType = computed(() => {
   if (route.path.includes('shared')) {
     return 'systemShare'
-  } else if (route.path.includes('resource-management')) {
+  } else if (route.path.includes('resource-management') || type === 'systemManage') {
     return 'systemManage'
   } else {
     return 'workspace'
@@ -71,7 +71,7 @@ const isKnowledge = computed(() => {
 const toBackPath = computed(() => {
   if (route.path.includes('shared')) {
     return '/system/shared' + activeMenu
-  } else if (route.path.includes('resource-management')) {
+  } else if (route.path.includes('resource-management') || type === 'systemManage') {
     return '/system/resource-management' + activeMenu
   } else {
     return activeMenu

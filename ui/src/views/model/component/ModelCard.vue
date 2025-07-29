@@ -64,9 +64,7 @@
       </div>
     </div>
 
-    <template #mouseEnter
-      v-if="MoreFilledPermission(model.id)"
-    >
+    <template #mouseEnter v-if="MoreFilledPermission(model.id)">
       <el-dropdown trigger="click" v-if="!isShared">
         <el-button text @click.stop>
           <el-icon>
@@ -117,7 +115,7 @@
       </el-dropdown>
     </template>
     <EditModel ref="editModelRef" @submit="emit('change')"></EditModel>
-    <ParamSettingDialog ref="paramSettingRef" :model="model" />
+    <ParamSettingDialog ref="paramSettingRef" />
     <AuthorizedWorkspace
       ref="AuthorizedWorkspaceDialogRef"
       v-if="isSystemShare"
@@ -152,7 +150,7 @@ const props = defineProps<{
 const apiType = props.apiType
 
 const isSystemShare = computed(() => {
-  return apiType==='systemShare'
+  return apiType === 'systemShare'
 })
 
 const permissionPrecise = computed(() => {
@@ -160,8 +158,9 @@ const permissionPrecise = computed(() => {
 })
 
 const MoreFilledPermission = (id: any) => {
-  return permissionPrecise.value.modify(id) || 
-  permissionPrecise.value.delete(id) || isSystemShare.value
+  return (
+    permissionPrecise.value.modify(id) || permissionPrecise.value.delete(id) || isSystemShare.value
+  )
 }
 
 const downModel = ref<Model>()
@@ -255,7 +254,7 @@ const closeInterval = () => {
 
 const paramSettingRef = ref<InstanceType<typeof ParamSettingDialog>>()
 const openParamSetting = () => {
-  paramSettingRef.value?.open()
+  paramSettingRef.value?.open(props.model)
 }
 
 const AuthorizedWorkspaceDialogRef = ref()

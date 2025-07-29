@@ -29,7 +29,7 @@
                   type="primary"
                   @click="
                     router.push({
-                      path: `/knowledge/import`,
+                      path: `/knowledge/import/${folderId}`,
                       query: {
                         id: id,
                         folder_token: knowledgeDetail?.meta.folder_token,
@@ -56,9 +56,7 @@
                   v-if="permissionPrecise.doc_migrate(id)"
                   >{{ $t('views.document.setting.migration') }}
                 </el-button>
-                <el-dropdown
-                  v-if="MoreFilledPermission0(id)"
-                >
+                <el-dropdown v-if="MoreFilledPermission0(id)">
                   <el-button class="ml-12 mr-12">
                     <el-icon><MoreFilled /></el-icon>
                   </el-button>
@@ -422,9 +420,7 @@
                     </span>
                   </el-tooltip>
                   <span @click.stop>
-                    <el-dropdown trigger="click"
-                      v-if="MoreFilledPermission1(id)"
-                    >
+                    <el-dropdown trigger="click" v-if="MoreFilledPermission1(id)">
                       <el-button text type="primary">
                         <el-icon><MoreFilled /></el-icon>
                       </el-button>
@@ -535,9 +531,7 @@
                     </span>
                   </el-tooltip>
                   <span @click.stop>
-                    <el-dropdown trigger="click"
-                      v-if="MoreFilledPermission2(id)"
-                    >
+                    <el-dropdown trigger="click" v-if="MoreFilledPermission2(id)">
                       <el-button text type="primary">
                         <el-icon><MoreFilled /></el-icon>
                       </el-button>
@@ -704,22 +698,32 @@ const permissionPrecise = computed(() => {
 })
 
 const MoreFilledPermission0 = (id: string) => {
-  return permissionPrecise.value.doc_edit(id) ||
-  (knowledgeDetail?.value.type === 1 && permissionPrecise.value.doc_sync(id)) ||
-  (knowledgeDetail?.value.type === 2 && permissionPrecise.value.doc_sync(id)) ||
-  permissionPrecise.value.doc_delete(id)
+  return (
+    permissionPrecise.value.doc_edit(id) ||
+    (knowledgeDetail?.value.type === 1 && permissionPrecise.value.doc_sync(id)) ||
+    (knowledgeDetail?.value.type === 2 && permissionPrecise.value.doc_sync(id)) ||
+    permissionPrecise.value.doc_delete(id)
+  )
 }
 
 const MoreFilledPermission1 = (id: string) => {
-  return permissionPrecise.value.doc_generate(id) || permissionPrecise.value.doc_migrate(id) ||
-  permissionPrecise.value.doc_export(id) || permissionPrecise.value.doc_download(id) || 
-  permissionPrecise.value.doc_delete(id)
+  return (
+    permissionPrecise.value.doc_generate(id) ||
+    permissionPrecise.value.doc_migrate(id) ||
+    permissionPrecise.value.doc_export(id) ||
+    permissionPrecise.value.doc_download(id) ||
+    permissionPrecise.value.doc_delete(id)
+  )
 }
 
 const MoreFilledPermission2 = (id: string) => {
-  return permissionPrecise.value.doc_edit(id) || permissionPrecise.value.doc_generate(id) ||
-  permissionPrecise.value.doc_migrate(id) || permissionPrecise.value.doc_export(id) ||
-  permissionPrecise.value.doc_delete(id)
+  return (
+    permissionPrecise.value.doc_edit(id) ||
+    permissionPrecise.value.doc_generate(id) ||
+    permissionPrecise.value.doc_migrate(id) ||
+    permissionPrecise.value.doc_export(id) ||
+    permissionPrecise.value.doc_delete(id)
+  )
 }
 
 const getTaskState = (status: string, taskType: number) => {

@@ -16,6 +16,11 @@ import chatUserSystemShareApi from '@/api/system-shared/chat-user'
 import workspaceApi from '@/api/workspace/workspace'
 import systemUserApi from '@/api/user/user'
 import ToolResourceApi from '@/api/system-resource-management/tool'
+import knowledgeResourceApi from '@/api/system-resource-management/knowledge'
+import documentResourceApi from '@/api/system-resource-management/document'
+import paragraphResourceApi from '@/api/system-resource-management/paragraph'
+import problemResourceApi from '@/api/system-resource-management/problem'
+import modelResourceApi from '@/api/system-resource-management/model'
 
 // 普通 API
 const workspaceApiMap = {
@@ -43,8 +48,11 @@ const systemShareApiMap = {
 
 // 资源管理 API
 const systemManageApiMap = {
-  // knowledge: knowledgeWorkspaceApi,
-  // model: modelWorkspaceApi,
+  knowledge: knowledgeResourceApi,
+  document: documentResourceApi,
+  paragraph: paragraphResourceApi,
+  problem: problemResourceApi,
+  model: modelResourceApi,
   tool: ToolResourceApi,
 } as any
 
@@ -52,7 +60,7 @@ const data = {
   systemShare: systemShareApiMap,
   workspace: workspaceApiMap,
   systemManage: systemManageApiMap,
-  workspaceShare: workspaceApiMap
+  workspaceShare: workspaceApiMap,
 }
 /** 动态导入 API 模块的函数
  *  loadSharedApi('knowledge', true,'systemShare')

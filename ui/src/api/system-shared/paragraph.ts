@@ -288,4 +288,5 @@ export default {
   putBatchGenerateRelated,
   putMigrateMulParagraph,
   putDisassociationProblem,
+  putAdjustPosition,
 }

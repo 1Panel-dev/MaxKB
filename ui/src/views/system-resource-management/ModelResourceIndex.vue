@@ -161,14 +161,71 @@
             {{ datetimeFormat(row.create_time) }}
           </template>
         </el-table-column>
+        <el-table-column :label="$t('common.operation')" align="left" width="120" fixed="right">
+          <template #default="{ row }">
+            <el-tooltip effect="dark" :content="$t('common.modify')" placement="top">
+              <span class="mr-8">
+                <el-button
+                  type="primary"
+                  text
+                  :title="$t('common.modify')"
+                  v-if="permissionPrecise.modify(row.id)"
+                  @click.stop="openEditModel(row)"
+                >
+                  <el-icon><EditPen /></el-icon>
+                </el-button>
+              </span>
+            </el-tooltip>
+            <el-tooltip
+              effect="dark"
+              :content="$t('views.model.modelForm.title.paramSetting')"
+              placement="top"
+            >
+              <span class="mr-8">
+                <el-button
+                  type="primary"
+                  text
+                  :title="$t('views.model.modelForm.title.paramSetting')"
+                  v-if="
+                    (row.model_type === 'TTS' ||
+                      row.model_type === 'LLM' ||
+                      row.model_type === 'IMAGE' ||
+                      row.model_type === 'TTI') &&
+                    permissionPrecise.paramSetting(row.id)
+                  "
+                  @click.stop="openParamSetting(row)"
+                >
+                  <el-icon><Delete /></el-icon>
+                </el-button>
+              </span>
+            </el-tooltip>
+            <el-tooltip effect="dark" :content="$t('common.delete')" placement="top">
+              <span class="mr-8">
+                <el-button
+                  type="primary"
+                  text
+                  :title="$t('common.delete')"
+                  v-if="permissionPrecise.delete(row.id)"
+                  @click.stop="deleteModel(row)"
+                >
+                  <el-icon><Delete /></el-icon>
+                </el-button>
+              </span>
+            </el-tooltip>
+          </template>
+        </el-table-column>
       </app-table>
     </el-card>
+    <EditModel ref="editModelRef" @submit="getList"></EditModel>
+    <ParamSettingDialog ref="paramSettingRef" />
   </div>
 </template>
 
 <script lang="ts" setup>
 import { onBeforeMount, onMounted, ref, reactive, nextTick, computed } from 'vue'
 import type { Provider, Model } from '@/api/type/model'
+import EditModel from '@/views/model/component/EditModel.vue'
+import ParamSettingDialog from '@/views/model/component/ParamSettingDialog.vue'
 import ModelResourceApi from '@/api/system-resource-management/model'
 import { modelTypeList } from '@/views/model/component/data'
 import { modelType } from '@/enums/model'
@@ -177,6 +234,8 @@ import useStore from '@/stores'
 import { datetimeFormat } from '@/utils/time'
 import { loadPermissionApi } from '@/utils/dynamics-api/permission-api.ts'
 import UserApi from '@/api/user/user.ts'
+import permissionMap from '@/permission'
+import { MsgConfirm, MsgSuccess } from '@/utils/message'
 
 const { user, model } = useStore()
 
@@ -192,7 +251,6 @@ const model_search_form = ref<{
 })
 
 const loading = ref(false)
-const changeStateloading = ref(false)
 const modelList = ref<Array<Model>>([])
 const user_options = ref<any[]>([])
 const provider_list = ref<Array<Provider>>([])
@@ -201,6 +259,41 @@ const paginationConfig = reactive({
   current_page: 1,
   page_size: 20,
   total: 0,
+})
+
+const deleteModel = (row: any) => {
+  MsgConfirm(
+    `${t('views.model.delete.confirmTitle')}${row.name} ?`,
+    t('views.model.delete.confirmMessage'),
+    {
+      confirmButtonText: t('common.confirm'),
+      confirmButtonClass: 'danger',
+    },
+  )
+    .then(() => {
+      ModelResourceApi.deleteModel(row.id).then(() => {
+        getList()
+        MsgSuccess(t('common.deleteSuccess'))
+      })
+    })
+    .catch(() => {})
+}
+
+const paramSettingRef = ref<InstanceType<typeof ParamSettingDialog>>()
+const openParamSetting = (row: any) => {
+  paramSettingRef.value?.open(row)
+}
+
+const editModelRef = ref<InstanceType<typeof EditModel>>()
+const openEditModel = (row: any) => {
+  const provider = provider_list.value.find((p) => p.provider === row.provider)
+  if (provider) {
+    editModelRef.value?.open(provider, row)
+  }
+}
+
+const permissionPrecise = computed(() => {
+  return permissionMap['model']['systemManage']
 })
 
 const workspaceOptions = ref<any[]>([])

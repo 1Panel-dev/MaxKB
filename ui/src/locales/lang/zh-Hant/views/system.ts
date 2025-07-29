@@ -125,6 +125,7 @@ export default {
   },
   resource_management: {
     label: '資源管理',
-    type: '类型',
+    type: '類型',
+    management: '管理',
   },
 }

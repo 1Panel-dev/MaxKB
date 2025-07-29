@@ -34,7 +34,7 @@ const ModelRouter = {
       hidden: true,
     },
     {
-      path: '/knowledge/import',
+      path: '/knowledge/import/:folderId',
       name: 'ImportLarkDocument',
       meta: { activeMenu: '/knowledge' },
       component: () => import('@/views/document/ImportLarkDocument.vue'),

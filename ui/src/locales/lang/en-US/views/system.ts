@@ -114,7 +114,7 @@ export default {
     member: 'Member',
     permissionSetting: 'Permission Setting',
     setting: {
-      management: ' management',
+      management: 'management',
       check: 'check',
       authorization: 'authorization',
     },
@@ -126,5 +126,6 @@ export default {
   resource_management: {
     label: 'Resource Management',
     type: 'Type',
+    management: 'management',
   },
 }

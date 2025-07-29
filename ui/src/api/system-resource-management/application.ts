@@ -3,7 +3,6 @@ import {get, post, postStream, del, put, request, download, exportFile} from '@/
 import type {pageRequest} from '@/api/type/common'
 import type {ApplicationFormType} from '@/api/type/application'
 import {type Ref} from 'vue'
-import useStore from '@/stores'
 
 const prefix = '/system/resource/application'
 

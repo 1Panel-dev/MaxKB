@@ -219,7 +219,7 @@ const submit = async (formEl: FormInstance | undefined) => {
               ...{
                 source_url: form.value.source_url,
                 selector: form.value.selector,
-              }
+              },
             },
           }
           loadSharedApi({ type: 'document', systemType: apiType.value })

@@ -131,7 +131,7 @@ const documentsFiles = computed(() => knowledge.documentsFiles)
 const splitPatternList = ref<Array<KeyValue<string, string>>>([])
 const route = useRoute()
 const {
-  query: { id }, // id为knowledgeID
+  query: { id}, // id为knowledgeID
 } = route as any
 
 const apiType = computed(() => {

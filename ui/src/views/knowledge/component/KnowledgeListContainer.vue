@@ -377,8 +377,8 @@ const isSystemShare = computed(() => {
 
 const MoreFilledPermission = (item: any) => {
   return (item.type === 1 && permissionPrecise.value.sync(item.id)) ||
-  permissionPrecise.value.vector(item.id) || permissionPrecise.value.generate(item.id) || 
-  (permissionPrecise.value.edit(item.id) && apiType.value) === 'workspace' || 
+  permissionPrecise.value.vector(item.id) || permissionPrecise.value.generate(item.id) ||
+  (permissionPrecise.value.edit(item.id) && apiType.value) === 'workspace' ||
   permissionPrecise.value.export(item.id) || permissionPrecise.value.delete(item.id) || isSystemShare.value
 }
 
@@ -446,7 +446,7 @@ const search_type_change = () => {
 const GenerateRelatedDialogRef = ref<InstanceType<typeof GenerateRelatedDialog>>()
 function openGenerateDialog(row: any) {
   if (GenerateRelatedDialogRef.value) {
-    GenerateRelatedDialogRef.value.open([], 'knowledge', row.id)
+    GenerateRelatedDialogRef.value.open([], 'knowledge', row)
   }
 }
 

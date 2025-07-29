@@ -36,7 +36,7 @@ const {
   query: { type },
 } = route as any
 const isShared = computed(() => {
-  return folderId === 'shared' || type === 'systemShare'
+  return folderId === 'shared' || type === 'systemShare' || type === 'systemManage'
 })
 const { theme, user } = useStore()
 const isDefaultTheme = computed(() => {

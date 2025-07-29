@@ -51,7 +51,7 @@
         <el-table-column width="220" :label="$t('common.name')" show-overflow-tooltip>
           <template #default="{ row }">
             <div class="flex align-center">
-              <KnowledgeIcon :type="row.type" />
+              <KnowledgeIcon :type="row.type" :size="24" />
               <span class="ml-8">
                 {{ row.name }}
               </span>
@@ -139,21 +139,130 @@
             {{ datetimeFormat(row.create_time) }}
           </template>
         </el-table-column>
+        <el-table-column :label="$t('common.operation')" align="left" width="120" fixed="right">
+          <template #default="{ row }">
+            <el-tooltip
+              effect="dark"
+              :content="$t('views.system.resource_management.management')"
+              placement="top"
+            >
+              <span class="mr-8">
+                <el-button
+                  type="primary"
+                  text
+                  :title="$t('views.system.resource_management.management')"
+                  @click="
+                    router.push({
+                      path: `/knowledge/${row.id}/resource-management/document`,
+                    })
+                  "
+                >
+                  <AppIcon iconName="app-admin-operation"></AppIcon>
+                </el-button>
+              </span>
+            </el-tooltip>
+            <el-tooltip
+              effect="dark"
+              :content="$t('views.knowledge.setting.vectorization')"
+              placement="top"
+            >
+              <span class="mr-8">
+                <el-button
+                  type="primary"
+                  text
+                  :title="$t('views.knowledge.setting.vectorization')"
+                  @click.stop="reEmbeddingKnowledge(row)"
+                  v-if="permissionPrecise.vector(row.id)"
+                >
+                  <AppIcon iconName="app-vectorization"></AppIcon>
+                </el-button>
+              </span>
+            </el-tooltip>
+            <el-dropdown trigger="click">
+              <el-button text @click.stop>
+                <el-icon>
+                  <MoreFilled />
+                </el-icon>
+              </el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item
+                    icon="Refresh"
+                    @click.stop="syncKnowledge(row)"
+                    v-if="row.type === 1 && permissionPrecise.sync(row.id)"
+                    >{{ $t('views.knowledge.setting.sync') }}
+                  </el-dropdown-item>
+
+                  <el-dropdown-item
+                    icon="Connection"
+                    @click.stop="openGenerateDialog(row)"
+                    v-if="permissionPrecise.generate(row.id)"
+                    >{{ $t('views.document.generateQuestion.title') }}
+                  </el-dropdown-item>
+                  <el-dropdown-item
+                    icon="Setting"
+                    @click="
+                      router.push({
+                        path: `/knowledge/${row.id}/resource-management/setting`,
+                      })
+                    "
+                    v-if="permissionPrecise.edit(row.id)"
+                  >
+                    {{ $t('common.setting') }}
+                  </el-dropdown-item>
+                  <el-dropdown-item
+                    @click.stop="exportKnowledge(row)"
+                    v-if="permissionPrecise.export(row.id)"
+                  >
+                    <AppIcon iconName="app-export"></AppIcon
+                    >{{ $t('views.document.setting.export') }} Excel
+                  </el-dropdown-item>
+                  <el-dropdown-item
+                    @click.stop="exportZipKnowledge(row)"
+                    v-if="permissionPrecise.export(row.id)"
+                  >
+                    <AppIcon iconName="app-export"></AppIcon
+                    >{{ $t('views.document.setting.export') }} ZIP</el-dropdown-item
+                  >
+                  <el-dropdown-item
+                    icon="Delete"
+                    type="danger"
+                    @click.stop="deleteKnowledge(row)"
+                    v-if="permissionPrecise.delete(row.id)"
+                  >
+                    {{ $t('common.delete') }}</el-dropdown-item
+                  >
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </template>
+        </el-table-column>
       </app-table>
     </el-card>
+    <SyncWebDialog ref="SyncWebDialogRef" />
+    <GenerateRelatedDialog ref="GenerateRelatedDialogRef" apiType="systemManage" />
   </div>
 </template>
 
 <script lang="ts" setup>
 import { onMounted, ref, reactive, computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import KnowledgeResourceApi from '@/api/system-resource-management/knowledge'
-import { t } from '@/locales'
-import useStore from '@/stores'
+import UserApi from '@/api/user/user'
+import SyncWebDialog from '@/views/knowledge/component/SyncWebDialog.vue'
+import GenerateRelatedDialog from '@/components/generate-related-dialog/index.vue'
 import { datetimeFormat } from '@/utils/time'
 import { loadPermissionApi } from '@/utils/dynamics-api/permission-api.ts'
-import UserApi from '@/api/user/user'
-
+import permissionMap from '@/permission'
+import { MsgSuccess, MsgConfirm } from '@/utils/message'
+import { t } from '@/locales'
+import useStore from '@/stores'
+const router = useRouter()
 const { user } = useStore()
+
+const permissionPrecise = computed(() => {
+  return permissionMap['knowledge']['systemManage']
+})
 
 const search_type = ref('name')
 const search_form = ref<any>({
@@ -169,6 +278,54 @@ const paginationConfig = reactive({
   page_size: 20,
   total: 0,
 })
+
+const exportKnowledge = (item: any) => {
+  KnowledgeResourceApi.exportKnowledge(item.name, item.id, loading).then(() => {
+    MsgSuccess(t('common.exportSuccess'))
+  })
+}
+const exportZipKnowledge = (item: any) => {
+  KnowledgeResourceApi.exportZipKnowledge(item.name, item.id, loading).then(() => {
+    MsgSuccess(t('common.exportSuccess'))
+  })
+}
+
+function deleteKnowledge(row: any) {
+  MsgConfirm(
+    `${t('views.knowledge.delete.confirmTitle')}${row.name} ?`,
+    `${t('views.knowledge.delete.confirmMessage1')} ${row.application_mapping_count} ${t('views.knowledge.delete.confirmMessage2')}`,
+    {
+      confirmButtonText: t('common.confirm'),
+      confirmButtonClass: 'danger',
+    },
+  )
+    .then(() => {
+      KnowledgeResourceApi.delKnowledge(row.id, loading).then(() => {
+        getList()
+        MsgSuccess(t('common.deleteSuccess'))
+      })
+    })
+    .catch(() => {})
+}
+
+const GenerateRelatedDialogRef = ref<InstanceType<typeof GenerateRelatedDialog>>()
+function openGenerateDialog(row: any) {
+  if (GenerateRelatedDialogRef.value) {
+    GenerateRelatedDialogRef.value.open([], 'knowledge', row)
+  }
+}
+
+const SyncWebDialogRef = ref()
+function syncKnowledge(row: any) {
+  SyncWebDialogRef.value.open(row.id)
+}
+
+function reEmbeddingKnowledge(row: any) {
+  KnowledgeResourceApi.putReEmbeddingKnowledge(row.id).then(() => {
+    MsgSuccess(t('common.submitSuccess'))
+  })
+}
+
 const workspaceOptions = ref<any[]>([])
 const workspaceVisible = ref(false)
 const workspaceArr = ref<any[]>([])

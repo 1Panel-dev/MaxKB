@@ -77,6 +77,7 @@ import { groupBy } from 'lodash'
 import { MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
 import type { FormInstance } from 'element-plus'
+import modelResourceApi from '@/api/system-resource-management/model'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 const props = defineProps<{
@@ -104,7 +105,7 @@ const stateMap = {
   error: ['0', '1', '3', '4', '5', 'n'],
 }
 const FormRef = ref()
-const knowledgeId = ref<string>()
+const currentKnowledge = ref<any>(null)
 const userId = user.userInfo?.id as string
 const form = ref(prompt.get(userId))
 const rules = reactive({
@@ -131,8 +132,8 @@ watch(dialogVisible, (bool) => {
   }
 })
 
-const open = (ids: string[], type: string, _knowledgeId?: string) => {
-  knowledgeId.value = _knowledgeId
+const open = (ids: string[], type: string, _knowledge?: any) => {
+  currentKnowledge.value = _knowledge
   getModelFn()
   idList.value = ids
   apiSubmitType.value = type
@@ -178,7 +179,7 @@ const submitHandle = async (formEl: FormInstance) => {
           state_list: stateMap[state.value],
         }
         loadSharedApi({ type: 'knowledge', systemType: props.apiType })
-          .putGenerateRelated(id ? id : knowledgeId.value, data, loading)
+          .putGenerateRelated(id ? id : currentKnowledge.value?.id, data, loading)
           .then(() => {
             MsgSuccess(t('views.document.generateQuestion.successMessage'))
             dialogVisible.value = false
@@ -190,15 +191,27 @@ const submitHandle = async (formEl: FormInstance) => {
 
 function getModelFn() {
   loading.value = true
-  loadSharedApi({ type: 'model', systemType: props.apiType })
-    .getSelectModelList({ model_type: 'LLM' })
-    .then((res: any) => {
-      modelOptions.value = groupBy(res?.data, 'provider')
-      loading.value = false
-    })
-    .catch(() => {
-      loading.value = false
-    })
+  if (props.apiType === 'systemManage') {
+    modelResourceApi
+      .getSelectModelList({ model_type: 'LLM' }, currentKnowledge.value?.workspace_id)
+      .then((res: any) => {
+        modelOptions.value = groupBy(res?.data, 'provider')
+        loading.value = false
+      })
+      .catch(() => {
+        loading.value = false
+      })
+  } else {
+    loadSharedApi({ type: 'model', systemType: props.apiType })
+      .getSelectModelList({ model_type: 'LLM' })
+      .then((res: any) => {
+        modelOptions.value = groupBy(res?.data, 'provider')
+        loading.value = false
+      })
+      .catch(() => {
+        loading.value = false
+      })
+  }
 }
 
 defineExpose({ open, dialogVisible })

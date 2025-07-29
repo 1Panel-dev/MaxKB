@@ -17,12 +17,19 @@
       </template>
       <template #extra>
         <el-button
+          v-if="apiType === 'workspace'"
           @click="
             router.push({
               path: `/knowledge`,
-              query: {
-                type: apiType,
-              },
+            })
+          "
+          >{{ $t('views.knowledge.ResultSuccess.buttons.toknowledge') }}</el-button
+        >
+        <el-button
+          v-else
+          @click="
+            router.push({
+              path: `/system/${folderId}/knowledge`,
             })
           "
           >{{ $t('views.knowledge.ResultSuccess.buttons.toknowledge') }}</el-button

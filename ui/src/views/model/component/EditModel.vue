@@ -128,7 +128,6 @@ import type { FormField } from '@/components/dynamics-form/type'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
 import type { FormRules } from 'element-plus'
 import { MsgSuccess } from '@/utils/message'
-import { PermissionType, PermissionDesc } from '@/enums/model'
 import { t } from '@/locales'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 

@@ -307,7 +307,7 @@ const onExceed = () => {
   MsgError(
     t('views.document.tip.fileLimitCountTip1') +
       file_count_limit.value +
-      t('views.document.tip.fileLimitCountTip2')
+      t('views.document.tip.fileLimitCountTip2'),
   )
 }
 
