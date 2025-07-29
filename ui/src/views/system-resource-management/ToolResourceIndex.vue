@@ -227,7 +227,9 @@
                 </el-button>
               </span>
             </el-tooltip>
-            <el-dropdown trigger="click">
+            <el-dropdown trigger="click"
+              v-if="MoreFilledPermission(row)"
+            >
               <el-button text @click.stop>
                 <el-icon>
                   <MoreFilled />
@@ -313,6 +315,12 @@ const workspaceArr = ref<any[]>([])
 const permissionPrecise = computed(() => {
   return permissionMap['tool']['systemManage']
 })
+
+const MoreFilledPermission = (row: any) => {
+  return permissionPrecise.value.export() || 
+          permissionPrecise.value.delete() || 
+          (row.init_field_list?.length > 0 && permissionPrecise.value.edit())
+}
 
 function exportTool(row: any) {
   ToolResourceApi.exportTool(row.id, row.name, loading).catch((e: any) => {
