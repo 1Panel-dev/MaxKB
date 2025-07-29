@@ -161,7 +161,7 @@ const open = async (platform: Platform) => {
         currentPlatform.config.agent_id = currentPlatform.config.app_key
         delete currentPlatform.config.app_key
       }
-      currentPlatform.config.callback_url = `${defaultCallbackUrl}/api/wecom`
+      currentPlatform.config.callback_url = `${defaultCallbackUrl}/chat/api/auth/wecom`
       break
     case 'dingtalk':
       if (currentPlatform.config.agent_id) {
@@ -174,10 +174,10 @@ const open = async (platform: Platform) => {
         app_secret: currentPlatform.config.app_secret,
         callback_url: defaultCallbackUrl
       }
-      currentPlatform.config.callback_url = `${defaultCallbackUrl}/api/dingtalk`
+      currentPlatform.config.callback_url = `${defaultCallbackUrl}/chat/api/auth/dingtalk`
       break
     case 'lark':
-      currentPlatform.config.callback_url = `${defaultCallbackUrl}/api/feishu`
+      currentPlatform.config.callback_url = `${defaultCallbackUrl}/chat/api/auth/lark`
       break
     default:
       break
