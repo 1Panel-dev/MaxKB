@@ -208,11 +208,23 @@ class UserManageSerializer(serializers.Serializer):
             label=_("Email"),
             allow_blank=True,
         )
+        is_active = serializers.BooleanField(
+            required=False,
+            label=_("Is active"),
+            default=True
+        )
+        source = serializers.CharField(
+            required=False,
+            label=_("Source"),
+            allow_blank=True,
+        )
 
         def get_query_set(self):
             username = self.data.get('username')
             nick_name = self.data.get('nick_name')
             email = self.data.get('email')
+            is_active = self.data.get('is_active', True)
+            source = self.data.get('source', None)
             query_set = QuerySet(User)
             if username is not None:
                 query_set = query_set.filter(username__contains=username)
@@ -220,6 +232,10 @@ class UserManageSerializer(serializers.Serializer):
                 query_set = query_set.filter(nick_name__contains=nick_name)
             if email is not None:
                 query_set = query_set.filter(email__contains=email)
+            if is_active is not None:
+                query_set = query_set.filter(is_active=is_active)
+            if source is not None:
+                query_set = query_set.filter(source=source)
             query_set = query_set.order_by("-create_time")
             return query_set
 
