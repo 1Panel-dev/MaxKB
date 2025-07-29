@@ -361,6 +361,8 @@ Permission_Label = {
     Group.SYSTEM_RES_KNOWLEDGE.value: _("Knowledge"),
     Group.SYSTEM_RES_KNOWLEDGE_DOCUMENT.value: _("Document"),
     Group.SYSTEM_RES_KNOWLEDGE_PROBLEM.value: _("Problem"),
+    Group.SYSTEM_RES_KNOWLEDGE_HIT_TEST.value: _("Hit-Test"),
+    Group.SYSTEM_RES_KNOWLEDGE_CHAT_USER.value: _("Dialogue users"),
     Group.WORKSPACE_USER_GROUP.value: _("User Group"),
     Group.WORKSPACE_CHAT_USER.value: _("Chat User"),
     Group.WORKSPACE_WORKSPACE.value: _("Workspace"),
