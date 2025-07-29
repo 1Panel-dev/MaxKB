@@ -13,9 +13,21 @@ const systemManage = {
       'OR',
     ),
   create: () => false,
-  modify: () => false,
-  paramSetting: () => false,
-  delete: () => false,
+  modify: () => 
+    hasPermission([
+      RoleConst.ADMIN,
+      PermissionConst.RESOURCE_MODEL_EDIT
+    ],'OR'),
+  paramSetting: () => 
+    hasPermission([
+      RoleConst.ADMIN,
+      PermissionConst.RESOURCE_MODEL_EDIT
+    ],'OR'),
+  delete: () => 
+    hasPermission([
+      RoleConst.ADMIN,
+      PermissionConst.RESOURCE_MODEL_DELETE
+    ],'OR'),
 
   folderCreate: () => false,
   folderEdit: () => false,
