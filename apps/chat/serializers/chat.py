@@ -419,8 +419,7 @@ class OpenChatSerializers(serializers.Serializer):
                 '-create_time')[0:1].first()
             if application_version is None:
                 raise AppApiException(500,
-                                      gettext(
-                                          "The application has not been published. Please use it after publishing."))
+                                      _("The application has not been published. Please use it after publishing."))
         if application.type == ApplicationTypeChoices.SIMPLE:
             return self.open_simple(application)
         else:
