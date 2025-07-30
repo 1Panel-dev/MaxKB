@@ -8634,3 +8634,34 @@ msgstr "文件不存在, 僅支持手動上傳的文檔"
 
 msgid "Resource"
 msgstr "資源管理"
+
+
+msgid "Unsupported sync type"
+msgstr "不支持的同步類型"
+
+msgid "LDAP configuration not found or not active"
+msgstr "LDAP 配置未找到或未激活"
+
+msgid "Lark configuration not found or not active"
+msgstr "Lark 配置未找到或未激活"
+
+msgid "Failed to get Lark collaborators"
+msgstr "獲取 Lark 協作者失敗"
+
+msgid "Failed to get Lark user details"
+msgstr "獲取 Lark 用戶詳情失敗"
+
+msgid "WeCom configuration not found or not active"
+msgstr "WeCom 配置未找到或未激活"
+
+msgid "Failed to get WeCom access token"
+msgstr "獲取 WeCom 訪問權杖失敗"
+
+msgid "Failed to get WeCom agent info"
+msgstr "獲取 WeCom 智能助手信息失敗"
+
+msgid "Failed to get WeCom department users"
+msgstr "獲取 WeCom 部門用戶失敗"
+
+msgid "Failed to get WeCom user info"
+msgstr "獲取 WeCom 用戶詳情失敗"

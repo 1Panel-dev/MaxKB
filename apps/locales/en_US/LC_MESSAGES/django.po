@@ -8508,3 +8508,33 @@ msgstr ""
 
 msgid "Resource"
 msgstr "Resource Management"
+
+msgid "Unsupported sync type"
+msgstr ""
+
+msgid "LDAP configuration not found or not active"
+msgstr ""
+
+msgid "Lark configuration not found or not active"
+msgstr ""
+
+msgid "Failed to get Lark collaborators"
+msgstr ""
+
+msgid "Failed to get Lark user details"
+msgstr ""
+
+msgid "WeCom configuration not found or not active"
+msgstr ""
+
+msgid "Failed to get WeCom access token"
+msgstr ""
+
+msgid "Failed to get WeCom agent info"
+msgstr ""
+
+msgid "Failed to get WeCom department users"
+msgstr ""
+
+msgid "Failed to get WeCom user info"
+msgstr ""

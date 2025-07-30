@@ -8634,3 +8634,33 @@ msgstr "文件不存在, 仅支持手动上传的文档"
 
 msgid "Resource"
 msgstr "资源管理"
+
+msgid "Unsupported sync type"
+msgstr "不支持的同步类型"
+
+msgid "LDAP configuration not found or not active"
+msgstr "LDAP 配置未找到或未激活"
+
+msgid "Lark configuration not found or not active"
+msgstr "飞书配置未找到或未激活"
+
+msgid "Failed to get Lark collaborators"
+msgstr "获取飞书协作者失败"
+
+msgid "Failed to get Lark user details"
+msgstr "获取飞书用户详情失败"
+
+msgid "WeCom configuration not found or not active"
+msgstr "企业微信配置未找到或未激活"
+
+msgid "Failed to get WeCom access token"
+msgstr "获取企业微信访问令牌失败"
+
+msgid "Failed to get WeCom agent info"
+msgstr "获取企业微信代理信息失败"
+
+msgid "Failed to get WeCom department users"
+msgstr "获取企业微信部门用户失败"
+
+msgid "Failed to get WeCom user info"
+msgstr "获取企业微信用户信息失败"
