@@ -7,6 +7,7 @@
     :close-on-click-modal="false"
     :close-on-press-escape="false"
     :before-close="cancelClick"
+    destroy-on-close
   >
     <template #header>
       <h4>
