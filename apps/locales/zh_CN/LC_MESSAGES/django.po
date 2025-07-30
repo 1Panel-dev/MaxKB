@@ -8488,6 +8488,21 @@ msgstr "CAS"
 msgid "LDAP"
 msgstr "LDAP"
 
+msgid "OIDC"
+msgstr "OIDC"
+
+msgid "OAuth2"
+msgstr "OAuth2"
+
+msgid "dingtalk"
+msgstr "钉钉"
+
+msgid "wecom"
+msgstr "企业微信"
+
+msgid "lark"
+msgstr "飞书"
+
 msgid "Get tool list"
 msgstr "获取工具列表"
 

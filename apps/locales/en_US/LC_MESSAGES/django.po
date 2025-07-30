@@ -8362,6 +8362,21 @@ msgstr "CAS"
 msgid "LDAP"
 msgstr "LDAP"
 
+msgid "OIDC"
+msgstr "OIDC"
+
+msgid "OAuth2"
+msgstr "OAuth2"
+
+msgid "dingtalk"
+msgstr "DingTalk"
+
+msgid "wecom"
+msgstr "WeCom"
+
+msgid "lark"
+msgstr "Lark"
+
 msgid "Get tool list"
 msgstr ""
 
