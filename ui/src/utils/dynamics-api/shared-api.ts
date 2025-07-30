@@ -21,6 +21,7 @@ import documentResourceApi from '@/api/system-resource-management/document'
 import paragraphResourceApi from '@/api/system-resource-management/paragraph'
 import problemResourceApi from '@/api/system-resource-management/problem'
 import modelResourceApi from '@/api/system-resource-management/model'
+import chatUserResourceApi from '@/api/system-resource-management/chat-user'
 
 // 普通 API
 const workspaceApiMap = {
@@ -54,6 +55,7 @@ const systemManageApiMap = {
   problem: problemResourceApi,
   model: modelResourceApi,
   tool: ToolResourceApi,
+  chatUser: chatUserResourceApi,
 } as any
 
 const data = {

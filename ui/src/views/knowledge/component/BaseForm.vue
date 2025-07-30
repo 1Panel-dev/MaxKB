@@ -120,7 +120,6 @@ function validate() {
 
 function getSelectModel() {
   loading.value = true
-  console.log(workspace_id.value)
   loadSharedApi({ type: 'model', systemType: props.apiType })
     .getSelectModelList({ model_type: 'EMBEDDING', workspace_id: workspace_id.value })
     .then((res: any) => {
