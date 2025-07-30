@@ -195,7 +195,7 @@
                   "
                   @click.stop="openParamSetting(row)"
                 >
-                  <el-icon><Delete /></el-icon>
+                  <el-icon><Setting /></el-icon>
                 </el-button>
               </span>
             </el-tooltip>

@@ -228,7 +228,7 @@
                         </el-button>
                         <template #dropdown>
                           <el-dropdown-menu>
-                            <el-dropdown-item @click.stop="getAccessToken(item.id)">
+                            <el-dropdown-item @click.stop="toChat(item)">
                               <AppIcon iconName="app-create-chat"></AppIcon>
                               {{ $t('views.application.operation.toChat') }}
                             </el-dropdown-item>
@@ -386,7 +386,7 @@ const get_route = (item: any) => {
       'OR',
     )
   ) {
-    return `/application/${item.id}/${item.type}/overview`
+    return `/application/workspace/${item.id}/${item.type}/overview`
   } else if (
     hasPermission(
       [
@@ -404,9 +404,9 @@ const get_route = (item: any) => {
     )
   ) {
     if (item.type == 'WORK_FLOW') {
-      return `/application/${item.id}/workflow`
+      return `/application/workspace/${item.id}/workflow`
     } else {
-      return `/application/${item.id}/${item.type}/setting`
+      return `/application/workspace/${item.id}/${item.type}/setting`
     }
   } else if (
     hasPermission(
@@ -437,7 +437,7 @@ const get_route = (item: any) => {
       'OR',
     )
   ) {
-    return `/application/${item.id}/${item.type}/access`
+    return `/application/workspace/${item.id}/${item.type}/access`
   } else if (
     hasPermission(
       [
@@ -467,7 +467,7 @@ const get_route = (item: any) => {
       'OR',
     )
   ) {
-    return `/application/${item.id}/${item.type}/chat-user`
+    return `/application/workspace/${item.id}/${item.type}/chat-user`
   } else if (
     hasPermission(
       [
@@ -485,7 +485,7 @@ const get_route = (item: any) => {
       'OR',
     )
   ) {
-    return `/application/${item.id}/${item.type}/chat-log`
+    return `/application//workspace${item.id}/${item.type}/chat-log`
   } else return `/application/`
 }
 
@@ -499,10 +499,11 @@ const search_type_change = () => {
   search_form.value = { name: '', create_user: '' }
 }
 
-function getAccessToken(id: string) {
-  applicationList.value
-    .filter((app) => app.id === id)[0]
-    ?.work_flow?.nodes?.filter((v: any) => v.id === 'base-node')
+const apiInputParams = ref([])
+
+function toChat(row: any) {
+  row?.work_flow?.nodes
+    ?.filter((v: any) => v.id === 'base-node')
     .map((v: any) => {
       apiInputParams.value = v.properties.api_input_field_list
         ? v.properties.api_input_field_list.map((v: any) => {
@@ -525,15 +526,23 @@ function getAccessToken(id: string) {
   const apiParams = mapToUrlParams(apiInputParams.value)
     ? '?' + mapToUrlParams(apiInputParams.value)
     : ''
-  application.asyncGetAccessToken(id, loading).then((res: any) => {
+  ApplicationApi.getAccessToken(row.id, loading).then((res: any) => {
     window.open(application.location + res?.data?.access_token + apiParams)
   })
 }
 
-const apiInputParams = ref([])
+function mapToUrlParams(map: any[]) {
+  const params = new URLSearchParams()
+
+  map.forEach((item: any) => {
+    params.append(encodeURIComponent(item.name), encodeURIComponent(item.value))
+  })
+
+  return params.toString() // 返回 URL 查询字符串
+}
 
 function copyApplication(row: any) {
-  application.asyncGetApplicationDetail(row.id, loading).then((res: any) => {
+  ApplicationApi.getApplicationDetail(row.id, loading).then((res: any) => {
     if (res?.data) {
       CopyApplicationDialogRef.value.open(
         { ...res.data, model_id: res.data.model },
@@ -545,20 +554,10 @@ function copyApplication(row: any) {
 
 function settingApplication(row: any) {
   if (isWorkFlow(row.type)) {
-    router.push({ path: `/application/${row.id}/workflow` })
+    router.push({ path: `/application/workspace/${row.id}/workflow` })
   } else {
-    router.push({ path: `/application/${row.id}/${row.type}/setting` })
+    router.push({ path: `/application/workspace/${row.id}/${row.type}/setting` })
   }
-}
-
-function mapToUrlParams(map: any[]) {
-  const params = new URLSearchParams()
-
-  map.forEach((item: any) => {
-    params.append(encodeURIComponent(item.name), encodeURIComponent(item.value))
-  })
-
-  return params.toString() // 返回 URL 查询字符串
 }
 
 function deleteApplication(row: any) {

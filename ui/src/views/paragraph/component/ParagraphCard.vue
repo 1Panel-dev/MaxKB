@@ -146,11 +146,11 @@ const props = defineProps<{
 const route = useRoute()
 const {
   params: { id, documentId },
-  query: { type },
+  query: { from },
 } = route as any
 
 const apiType = computed(() => {
-  return type as 'systemShare' | 'workspace' | 'systemManage'
+  return from as 'systemShare' | 'workspace' | 'systemManage'
 })
 
 const permissionPrecise = computed (() => {
@@ -158,8 +158,8 @@ const permissionPrecise = computed (() => {
 })
 
 const MoreFieldPermission = (id:any) => {
-  return permissionPrecise.value.doc_generate(id) || 
-  permissionPrecise.value.doc_edit(id) 
+  return permissionPrecise.value.doc_generate(id) ||
+  permissionPrecise.value.doc_edit(id)
 }
 
 const emit = defineEmits(['dialogVisibleChange','clickCard','changeState', 'deleteParagraph', 'refresh', 'refreshMigrateParagraph','move'])

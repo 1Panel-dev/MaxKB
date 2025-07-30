@@ -203,18 +203,26 @@ import { cloneDeep, set } from 'lodash'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import { computed, onMounted, ref } from 'vue'
 import { isLastNode } from '@/workflow/common/data'
-import applicationApi from '@/api/application/application'
 import { t } from '@/locales'
 import { MsgError, MsgSuccess } from '@/utils/message'
 import TooltipLabel from '@/components/dynamics-form/items/label/TooltipLabel.vue'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import { useRoute } from 'vue-router'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 const props = defineProps<{ nodeModel: any }>()
 
 const route = useRoute()
 const {
   params: { id },
 } = route as any
+
+const apiType = computed(() => {
+  if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
 
 const dynamicsFormRef = ref()
 const loading = ref(false)
@@ -260,14 +268,16 @@ function getTools() {
     MsgError(t('views.applicationWorkflow.nodes.mcpNode.mcpServerTip'))
     return
   }
-  applicationApi.getMcpTools(id, form_data.value.mcp_servers, loading).then((res: any) => {
-    form_data.value.mcp_tools = res.data
-    MsgSuccess(t('views.applicationWorkflow.nodes.mcpNode.getToolsSuccess'))
-    // 修改了json，刷新mcp_server
-    form_data.value.mcp_server = form_data.value.mcp_tools.find(
-      (item: any) => item.name === form_data.value.mcp_tool,
-    )?.server
-  })
+  loadSharedApi({ type: 'application', systemType: apiType.value })
+    .getMcpTools(id, form_data.value.mcp_servers, loading)
+    .then((res: any) => {
+      form_data.value.mcp_tools = res.data
+      MsgSuccess(t('views.applicationWorkflow.nodes.mcpNode.getToolsSuccess'))
+      // 修改了json，刷新mcp_server
+      form_data.value.mcp_server = form_data.value.mcp_tools.find(
+        (item: any) => item.name === form_data.value.mcp_tool,
+      )?.server
+    })
 }
 
 function changeTool() {

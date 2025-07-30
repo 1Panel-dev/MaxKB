@@ -137,16 +137,25 @@ import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import AIModeParamSettingDialog from '@/views/application/component/AIModeParamSettingDialog.vue'
 import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'
-import applicationApi from '@/api/application/application'
-import useStore from '@/stores'
 import { isLastNode } from '@/workflow/common/data'
 import { t } from '@/locales'
 import { useRoute } from 'vue-router'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+
 const route = useRoute()
+
 const {
   params: { id },
 } = route as any
-const { model } = useStore()
+
+const apiType = computed(() => {
+  if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
+
 const AIModeParamSettingDialogRef = ref<InstanceType<typeof AIModeParamSettingDialog>>()
 
 const wheel = (e: any) => {
@@ -220,9 +229,20 @@ const validate = () => {
 }
 
 function getSelectModel() {
-  model.asyncGetSelectModel({ model_type: 'LLM' }).then((res: any) => {
-    modelOptions.value = groupBy(res?.data, 'provider')
-  })
+  const obj =
+    apiType.value === 'systemManage'
+      ? {
+          model_type: 'LLM',
+          // workspace_id: workspace,
+        }
+      : {
+          model_type: 'LLM',
+        }
+  loadSharedApi({ type: 'model', systemType: apiType.value })
+    .getSelectModelList(obj)
+    .then((res: any) => {
+      modelOptions.value = groupBy(res?.data, 'provider')
+    })
 }
 
 onMounted(() => {

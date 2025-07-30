@@ -34,25 +34,33 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
-import applicationKeyApi from '@/api/application/application-key'
 import overviewSystemApi from '@/api/system/api-key'
 import { MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 const route = useRoute()
 const {
-  params: { id }
+  params: { id },
 } = route
+
+const apiType = computed(() => {
+  if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
 
 const emit = defineEmits(['refresh'])
 
 const settingFormRef = ref()
 const form = ref<any>({
   allow_cross_domain: false,
-  cross_domain_list: ''
+  cross_domain_list: '',
 })
 
 const dialogVisible = ref<boolean>(false)
@@ -65,7 +73,7 @@ watch(dialogVisible, (bool) => {
   if (!bool) {
     form.value = {
       allow_cross_domain: false,
-      cross_domain_list: ''
+      cross_domain_list: '',
     }
   }
 })
@@ -90,15 +98,20 @@ const submit = async (formEl: FormInstance | undefined) => {
           ? form.value.cross_domain_list.split('\n').filter(function (item: string) {
               return item !== ''
             })
-          : []
+          : [],
       }
 
       const apiCall =
         APIType.value === 'APPLICATION'
-          ? applicationKeyApi.putAPIKey(id as string, APIKeyId.value, obj, loading)
+          ? loadSharedApi({ type: 'applicationKey', systemType: apiType.value }).putAPIKey(
+              id as string,
+              APIKeyId.value,
+              obj,
+              loading,
+            )
           : overviewSystemApi.putAPIKey(APIKeyId.value, obj, loading)
 
-      apiCall.then((res) => {
+      apiCall.then(() => {
         emit('refresh')
         //@ts-ignore
         MsgSuccess(t('common.settingSuccess'))

@@ -7,7 +7,6 @@ import useKnowledgeStore from './modules/knowledge'
 import useModelStore from './modules/model'
 import usePromptStore from './modules/prompt'
 import useApplicationStore from './modules/application'
-import useChatLogStore from './modules/chat-log'
 import useChatUserStore from './modules/chat-user'
 import useToolStore from './modules/tool'
 const useStore = () => ({
@@ -20,7 +19,6 @@ const useStore = () => ({
   model: useModelStore(),
   prompt: usePromptStore(),
   application: useApplicationStore(),
-  chatLog: useChatLogStore(),
   chatUser: useChatUserStore(),
   tool: useToolStore(),
 })

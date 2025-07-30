@@ -31,7 +31,7 @@ export const routes: Array<RouteRecordRaw> = [
 
   // 高级编排
   {
-    path: '/application/:id/workflow',
+    path: '/application/:from/:id/workflow',
     name: 'ApplicationWorkflow',
     meta: {activeMenu: '/application'},
     component: () => import('@/views/application-workflow/index.vue'),

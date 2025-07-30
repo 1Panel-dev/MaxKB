@@ -58,18 +58,26 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { copyClick } from '@/utils/clipboard'
-import applicationKeyApi from '@/api/application/application-key'
 import SettingAPIKeyDialog from './SettingAPIKeyDialog.vue'
 import { datetimeFormat } from '@/utils/time'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { t } from '@/locales'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 const route = useRoute()
 const {
-  params: { id }
+  params: { id },
 } = route
+
+const apiType = computed(() => {
+  if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
 
 const emit = defineEmits(['addData'])
 
@@ -96,28 +104,30 @@ function deleteApiKey(row: any) {
     {
       confirmButtonText: t('common.confirm'),
       cancelButtonText: t('common.cancel'),
-      confirmButtonClass: 'color-danger'
-    }
+      confirmButtonClass: 'color-danger',
+    },
   )
     .then(() => {
-      applicationKeyApi.delAPIKey(id as string, row.id, loading).then(() => {
-        MsgSuccess(t('common.deleteSuccess'))
-        getApiKeyList()
-      })
+      loadSharedApi({ type: 'applicationKey', systemType: apiType.value })
+        .delAPIKey(id as string, row.id, loading)
+        .then(() => {
+          MsgSuccess(t('common.deleteSuccess'))
+          getApiKeyList()
+        })
     })
     .catch(() => {})
 }
 
 async function changeState(row: any) {
   const obj = {
-    is_active: !row.is_active
+    is_active: !row.is_active,
   }
   const str = obj.is_active
     ? t('views.applicationOverview.appInfo.APIKeyDialog.enabledSuccess')
     : t('views.applicationOverview.appInfo.APIKeyDialog.disabledSuccess')
-  await applicationKeyApi
+  await loadSharedApi({ type: 'applicationKey', systemType: apiType.value })
     .putAPIKey(id as string, row.id, obj, loading)
-    .then((res) => {
+    .then(() => {
       MsgSuccess(str)
       getApiKeyList()
       return true
@@ -128,9 +138,11 @@ async function changeState(row: any) {
 }
 
 function createApiKey() {
-  applicationKeyApi.postAPIKey(id as string, loading).then((res) => {
-    getApiKeyList()
-  })
+  loadSharedApi({ type: 'applicationKey', systemType: apiType.value })
+    .postAPIKey(id as string, loading)
+    .then(() => {
+      getApiKeyList()
+    })
 }
 
 const open = () => {
@@ -139,10 +151,12 @@ const open = () => {
 }
 
 function getApiKeyList() {
-  applicationKeyApi.getAPIKey(id as string, loading).then((res) => {
-    res.data.sort((x:any,y:any)=>x.name < y.name ? 1 : -1) 
-    apiKey.value = res.data
-  })
+  loadSharedApi({ type: 'applicationKey', systemType: apiType.value })
+    .getAPIKey(id as string, loading)
+    .then((res: any) => {
+      res.data?.sort((x: any, y: any) => (x.name < y.name ? 1 : -1))
+      apiKey.value = res.data
+    })
 }
 
 function refresh() {

@@ -36,13 +36,13 @@ const route = useRoute()
 const {
   meta: { activeMenu },
   params: { id, folderId },
-  query: { isShared, type },
+  query: { isShared },
 } = route as any
 
 const apiType = computed(() => {
   if (route.path.includes('shared')) {
     return 'systemShare'
-  } else if (route.path.includes('resource-management') || type === 'systemManage') {
+  } else if (route.path.includes('resource-management')) {
     return 'systemManage'
   } else {
     return 'workspace'
@@ -71,7 +71,7 @@ const isKnowledge = computed(() => {
 const toBackPath = computed(() => {
   if (route.path.includes('shared')) {
     return '/system/shared' + activeMenu
-  } else if (route.path.includes('resource-management') || type === 'systemManage') {
+  } else if (route.path.includes('resource-management')) {
     return '/system/resource-management' + activeMenu
   } else {
     return activeMenu
@@ -93,8 +93,8 @@ function getKnowledgeDetail() {
 
 function getApplicationDetail() {
   loading.value = true
-  application
-    .asyncGetApplicationDetail(id)
+  loadSharedApi({ type: 'application', systemType: apiType.value })
+    .getApplicationDetail(id)
     .then((res: any) => {
       current.value = res.data
       loading.value = false

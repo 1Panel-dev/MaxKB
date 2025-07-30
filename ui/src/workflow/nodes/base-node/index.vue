@@ -178,13 +178,22 @@ import ApiInputFieldTable from './component/ApiInputFieldTable.vue'
 import UserInputFieldTable from './component/UserInputFieldTable.vue'
 import FileUploadSettingDialog from '@/workflow/nodes/base-node/component/FileUploadSettingDialog.vue'
 import { useRoute } from 'vue-router'
-import useStore from '@/stores'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+
 const route = useRoute()
 
 const {
   params: { id },
 } = route as any
-const { model } = useStore()
+
+const apiType = computed(() => {
+  if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
+
 const props = defineProps<{ nodeModel: any }>()
 
 const sttModelOptions = ref<any>(null)
@@ -253,15 +262,37 @@ const validate = () => {
 }
 
 function getSTTModel() {
-  model.asyncGetSelectModel({ model_type: 'STT' }).then((res: any) => {
-    sttModelOptions.value = groupBy(res?.data, 'provider')
-  })
+  const obj =
+    apiType.value === 'systemManage'
+      ? {
+          model_type: 'STT',
+          // workspace_id: workspace,
+        }
+      : {
+          model_type: 'STT',
+        }
+  loadSharedApi({ type: 'model', systemType: apiType.value })
+    .getSelectModelList(obj)
+    .then((res: any) => {
+      sttModelOptions.value = groupBy(res?.data, 'provider')
+    })
 }
 
 function getTTSModel() {
-  model.asyncGetSelectModel({ model_type: 'TTS' }).then((res: any) => {
-    ttsModelOptions.value = groupBy(res?.data, 'provider')
-  })
+  const obj =
+    apiType.value === 'systemManage'
+      ? {
+          model_type: 'TTS',
+          // workspace_id: workspace,
+        }
+      : {
+          model_type: 'TTS',
+        }
+  loadSharedApi({ type: 'model', systemType: apiType.value })
+    .getSelectModelList(obj)
+    .then((res: any) => {
+      ttsModelOptions.value = groupBy(res?.data, 'provider')
+    })
 }
 
 function ttsModelChange() {

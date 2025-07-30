@@ -43,12 +43,12 @@ import { t } from '@/locales'
 
 const route = useRoute()
 const {
-  query: { type },
+  query: { from },
 } = route
 const apiType = computed(() => {
   if (route.path.includes('shared')) {
     return 'systemShare'
-  } else if (route.path.includes('resource-management') || type === 'systemManage') {
+  } else if (route.path.includes('resource-management') || from === 'systemManage') {
     return 'systemManage'
   } else {
     return 'workspace'

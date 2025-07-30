@@ -109,22 +109,30 @@ import { computed, onMounted, ref } from 'vue'
 import { groupBy, set } from 'lodash'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import TTSModeParamSettingDialog from '@/views/application/component/TTSModeParamSettingDialog.vue'
-import applicationApi from '@/api/application/application'
-import useStore from '@/stores'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import type { FormInstance } from 'element-plus'
 import { MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
 import { useRoute } from 'vue-router'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+
 const route = useRoute()
+
 const {
   params: { id },
 } = route as any
 
-const TTSModeParamSettingDialogRef = ref<InstanceType<typeof TTSModeParamSettingDialog>>()
-const { model } = useStore()
-
+const apiType = computed(() => {
+  if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
 const props = defineProps<{ nodeModel: any }>()
+
+const TTSModeParamSettingDialogRef = ref<InstanceType<typeof TTSModeParamSettingDialog>>()
+
 const modelOptions = ref<any>(null)
 
 const aiChatNodeFormRef = ref<FormInstance>()
@@ -170,9 +178,20 @@ const form_data = computed({
 })
 
 function getSelectModel() {
-  model.asyncGetSelectModel({ model_type: 'TTS' }).then((res: any) => {
-    modelOptions.value = groupBy(res?.data, 'provider')
-  })
+  const obj =
+    apiType.value === 'systemManage'
+      ? {
+          model_type: 'TTS',
+          // workspace_id: workspace,
+        }
+      : {
+          model_type: 'TTS',
+        }
+  loadSharedApi({ type: 'model', systemType: apiType.value })
+    .getSelectModelList(obj)
+    .then((res: any) => {
+      modelOptions.value = groupBy(res?.data, 'provider')
+    })
 }
 
 const openTTSParamSettingDialog = () => {

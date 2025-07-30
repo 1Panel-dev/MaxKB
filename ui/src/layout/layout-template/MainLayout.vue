@@ -33,10 +33,15 @@ import { useRoute } from 'vue-router'
 const route = useRoute()
 const {
   params: { folderId }, // id为knowledgeID
-  query: { type },
+  query: { from },
 } = route as any
 const isShared = computed(() => {
-  return folderId === 'shared' || type === 'systemShare' || type === 'systemManage'
+  return (
+    folderId === 'shared' ||
+    from === 'systemShare' ||
+    from === 'systemManage' ||
+    folderId === 'resource-management'
+  )
 })
 const { theme, user } = useStore()
 const isDefaultTheme = computed(() => {

@@ -5,7 +5,7 @@ import { EditionConst, PermissionConst, RoleConst } from '@/utils/permission/dat
 import { ComplexPermission } from '@/utils/permission/type'
 
 const ApplicationDetailRouter = {
-  path: '/application/:id/:type',
+  path: '/application/:from/:id/:type',
   name: 'ApplicationDetail',
   meta: { title: 'views.applicationOverview.title', activeMenu: '/application', breadcrumb: true },
   component: () => import('@/layout/layout-template/MainLayout.vue'),
@@ -19,7 +19,7 @@ const ApplicationDetailRouter = {
         iconActive: 'app-all-menu-active',
         title: 'views.applicationOverview.title',
         active: 'overview',
-        parentPath: '/application/:id/:type',
+        parentPath: '/application/:from/:id/:type',
         parentName: 'ApplicationDetail',
         permission: [
           () => {
@@ -46,7 +46,7 @@ const ApplicationDetailRouter = {
         iconActive: 'app-setting-active',
         title: 'common.setting',
         active: 'setting',
-        parentPath: '/application/:id/:type',
+        parentPath: '/application/:from/:id/:type',
         parentName: 'ApplicationDetail',
         permission: [
           () => {
@@ -72,7 +72,7 @@ const ApplicationDetailRouter = {
         iconActive: 'app-access-active',
         title: 'views.application.applicationAccess.title',
         active: 'access',
-        parentPath: '/application/:id/:type',
+        parentPath: '/application/:from/:id/:type',
         parentName: 'ApplicationDetail',
         permission: [
           () => {
@@ -96,7 +96,7 @@ const ApplicationDetailRouter = {
         iconActive: 'app-user-chat',
         title: 'views.chatUser.title',
         active: 'chat-user',
-        parentPath: '/application/:id/:type',
+        parentPath: '/application/:from/:id/:type',
         parentName: 'ApplicationDetail',
         resourceType: SourceTypeEnum.APPLICATION,
         permission: [
@@ -122,7 +122,7 @@ const ApplicationDetailRouter = {
         iconActive: 'app-document-active',
         title: 'views.chatLog.title',
         active: 'chat-log',
-        parentPath: '/application/:id/:type',
+        parentPath: '/application/:from/:id/:type',
         parentName: 'ApplicationDetail',
         permission: [
           () => {

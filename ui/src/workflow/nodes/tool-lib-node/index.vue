@@ -83,15 +83,25 @@
 </template>
 <script setup lang="ts">
 import { set } from 'lodash'
+import { useRoute } from 'vue-router'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'
 import { isLastNode } from '@/workflow/common/data'
-import applicationApi from '@/api/application/application'
-import ToolApi from '@/api/tool/tool'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 const props = defineProps<{ nodeModel: any }>()
+
+const route = useRoute()
+
+const apiType = computed(() => {
+  if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
 
 const nodeCascaderRef = ref()
 
@@ -127,8 +137,9 @@ const update_field = () => {
     set(props.nodeModel.properties, 'status', 500)
     return
   }
-  ToolApi.getToolById(props.nodeModel.properties.node_data.tool_lib_id)
-    .then((ok) => {
+  loadSharedApi({ type: 'tool', systemType: apiType.value })
+    .getToolById(props.nodeModel.properties.node_data.tool_lib_id)
+    .then((ok: any) => {
       const old_input_field_list = props.nodeModel.properties.node_data.input_field_list
       const merge_input_field_list = ok.data.input_field_list.map((item: any) => {
         const find_field = old_input_field_list.find((old_item: any) => old_item.name == item.name)

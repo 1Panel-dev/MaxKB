@@ -16,7 +16,7 @@
         <el-card shadow="hover" class="border-none cursor">
           <div class="flex-between">
             <div class="flex align-center ml-8 mr-8">
-              <img :src="item.logoSrc" alt="" class="icon"/>
+              <img :src="item.logoSrc" alt="" class="icon" />
               <div class="ml-12">
                 <h5 class="mb-4">{{ item.name }}</h5>
                 <el-text type="info" style="font-size: 12px">{{ item.description }}</el-text>
@@ -31,11 +31,12 @@
                 v-if="permissionPrecise.access_edit(id)"
               />
               <el-divider direction="vertical" />
-              <el-button class="mr-4" @click="openDrawer(item.key)"
+              <el-button
+                class="mr-4"
+                @click="openDrawer(item.key)"
                 v-if="permissionPrecise.access_edit(id)"
-              >{{
-                $t('views.application.applicationAccess.setting')
-              }}</el-button>
+                >{{ $t('views.application.applicationAccess.setting') }}</el-button
+              >
             </div>
           </div>
         </el-card>
@@ -48,16 +49,19 @@
 <script setup lang="ts">
 import { reactive, ref, onMounted, computed } from 'vue'
 import AccessSettingDrawer from './component/AccessSettingDrawer.vue'
-import applicationApi from '@/api/application/application'
 import { MsgSuccess } from '@/utils/message'
 import { useRoute } from 'vue-router'
 import { t } from '@/locales'
 import permissionMap from '@/permission'
-
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 const route = useRoute()
 
-const apiType = computed<'workspace'>(() => {
+const apiType = computed(() => {
+  if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
     return 'workspace'
+  }
 })
 const permissionPrecise = computed(() => {
   return permissionMap['application'][apiType.value]
@@ -123,13 +127,15 @@ function refresh() {
 
 function getPlatformStatus() {
   loading.value = true
-  applicationApi.getPlatformStatus(id).then((res: any) => {
-    platforms.forEach((platform) => {
-      platform.isActive = res.data[platform.key][1]
-      platform.exists = res.data[platform.key][0]
+  loadSharedApi({ type: 'application', systemType: apiType.value })
+    .getPlatformStatus(id)
+    .then((res: any) => {
+      platforms.forEach((platform) => {
+        platform.isActive = res.data[platform.key][1]
+        platform.exists = res.data[platform.key][0]
+      })
+      loading.value = false
     })
-    loading.value = false
-  })
 }
 
 function changeStatus(type: string, value: boolean) {
@@ -137,9 +143,11 @@ function changeStatus(type: string, value: boolean) {
     type: type,
     status: value,
   }
-  applicationApi.updatePlatformStatus(id, data).then(() => {
-    MsgSuccess(t('common.saveSuccess'))
-  })
+  loadSharedApi({ type: 'application', systemType: apiType.value })
+    .updatePlatformStatus(id, data)
+    .then(() => {
+      MsgSuccess(t('common.saveSuccess'))
+    })
 }
 
 onMounted(() => {

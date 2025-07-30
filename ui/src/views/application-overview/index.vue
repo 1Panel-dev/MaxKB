@@ -206,7 +206,6 @@ import XPackLimitDrawer from './xpack-component/XPackLimitDrawer.vue'
 import DisplaySettingDialog from './component/DisplaySettingDialog.vue'
 import XPackDisplaySettingDialog from './xpack-component/XPackDisplaySettingDialog.vue'
 import StatisticsCharts from './component/StatisticsCharts.vue'
-import applicationApi from '@/api/application/application'
 import { nowDate, beforeDay } from '@/utils/time'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { copyClick } from '@/utils/clipboard'
@@ -217,20 +216,23 @@ import { t } from '@/locales'
 import { EditionConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
 import permissionMap from '@/permission'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 const route = useRoute()
+const {
+  params: { id },
+} = route as any
 
-const apiType = computed<'workspace'>(() => {
-  return 'workspace'
+const apiType = computed(() => {
+  if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
 })
 const permissionPrecise = computed(() => {
   return permissionMap['application'][apiType.value]
 })
-
-const { user, application } = useStore()
-const {
-  params: { id },
-} = route as any
 
 const apiUrl = window.location.origin + '/doc_chat/'
 
@@ -292,7 +294,6 @@ const daterange = ref({
 const statisticsLoading = ref(false)
 const statisticsData = ref([])
 
-const showEditIcon = ref(false)
 const apiInputParams = ref([])
 
 function toUrl(url: string) {
@@ -313,9 +314,11 @@ function openDisplaySettingDialog() {
   }
   nextTick(() => {
     if (currentDisplaySettingDialog.value == XPackDisplaySettingDialog) {
-      applicationApi.getApplicationSetting(id).then((ok) => {
-        DisplaySettingDialogRef.value?.open(ok.data, detail.value)
-      })
+      loadSharedApi({ type: 'application', systemType: apiType.value })
+        .getApplicationSetting(id)
+        .then((ok: any) => {
+          DisplaySettingDialogRef.value?.open(ok.data, detail.value)
+        })
     } else {
       DisplaySettingDialogRef.value?.open(accessToken.value, detail.value)
     }
@@ -354,9 +357,11 @@ function changeDayRangeHandle(val: string) {
 }
 
 function getAppStatistics() {
-  applicationApi.getStatistics(id, daterange.value, statisticsLoading).then((res: any) => {
-    statisticsData.value = res.data
-  })
+  loadSharedApi({ type: 'application', systemType: apiType.value })
+    .getStatistics(id, daterange.value, statisticsLoading)
+    .then((res: any) => {
+      statisticsData.value = res.data
+    })
 }
 
 function refreshAccessToken() {
@@ -394,10 +399,12 @@ async function changeState(bool: boolean) {
 }
 
 async function updateAccessToken(obj: any, str: string) {
-  applicationApi.putAccessToken(id as string, obj, loading).then((res) => {
-    accessToken.value = res?.data
-    MsgSuccess(str)
-  })
+  loadSharedApi({ type: 'application', systemType: apiType.value })
+    .putAccessToken(id as string, obj, loading)
+    .then((res: any) => {
+      accessToken.value = res?.data
+      MsgSuccess(str)
+    })
 }
 
 function openAPIKeyDialog() {
@@ -409,44 +416,44 @@ function openDialog() {
 }
 
 function getAccessToken() {
-  application.asyncGetAccessToken(id, loading).then((res: any) => {
-    accessToken.value = res?.data
-  })
+  loadSharedApi({ type: 'application', systemType: apiType.value })
+    .getAccessToken(id, loading)
+    .then((res: any) => {
+      accessToken.value = res?.data
+    })
 }
 
 function getDetail() {
-  application.asyncGetApplicationDetail(id, loading).then((res: any) => {
-    detail.value = res.data
-    detail.value.work_flow?.nodes
-      ?.filter((v: any) => v.id === 'base-node')
-      .map((v: any) => {
-        apiInputParams.value = v.properties.api_input_field_list
-          ? v.properties.api_input_field_list.map((v: any) => {
-              return {
-                name: v.variable,
-                value: v.default_value,
-              }
-            })
-          : v.properties.input_field_list
-            ? v.properties.input_field_list
-                .filter((v: any) => v.assignment_method === 'api_input')
-                .map((v: any) => {
-                  return {
-                    name: v.variable,
-                    value: v.default_value,
-                  }
-                })
-            : []
-      })
-  })
+  loadSharedApi({ type: 'application', systemType: apiType.value })
+    .getApplicationDetail(id, loading)
+    .then((res: any) => {
+      detail.value = res.data
+      detail.value.work_flow?.nodes
+        ?.filter((v: any) => v.id === 'base-node')
+        .map((v: any) => {
+          apiInputParams.value = v.properties.api_input_field_list
+            ? v.properties.api_input_field_list.map((v: any) => {
+                return {
+                  name: v.variable,
+                  value: v.default_value,
+                }
+              })
+            : v.properties.input_field_list
+              ? v.properties.input_field_list
+                  .filter((v: any) => v.assignment_method === 'api_input')
+                  .map((v: any) => {
+                    return {
+                      name: v.variable,
+                      value: v.default_value,
+                    }
+                  })
+              : []
+        })
+    })
 }
 
 function refresh() {
   getAccessToken()
-}
-
-function refreshIcon() {
-  getDetail()
 }
 
 onMounted(() => {

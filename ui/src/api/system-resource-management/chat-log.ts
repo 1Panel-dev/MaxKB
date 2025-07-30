@@ -1,22 +1,9 @@
-import {Result} from '@/request/Result'
-import {
-  get,
-  post,
-  exportExcelPost,
-  del,
-  put,
-} from '@/request/index'
-import type {pageRequest} from '@/api/type/common'
-import {type Ref} from 'vue'
-import useStore from '@/stores'
+import { Result } from '@/request/Result'
+import { get, post, exportExcelPost, del, put } from '@/request/index'
+import type { pageRequest } from '@/api/type/common'
+import { type Ref } from 'vue'
 
-const prefix: any = {_value: '/workspace/'}
-Object.defineProperty(prefix, 'value', {
-  get: function () {
-    const {user} = useStore()
-    return this._value + user.getWorkspaceId() + '/application'
-  },
-})
+const prefix = '/system/resource/application'
 /**
  * 对话记录提交至知识库
  * @param data
@@ -30,7 +17,7 @@ const postChatLogAddKnowledge: (
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (application_id, data, loading) => {
-  return post(`${prefix.value}/${application_id}/add_knowledge`, data, undefined, loading)
+  return post(`${prefix}/${application_id}/add_knowledge`, data, undefined, loading)
 }
 
 /**
@@ -49,7 +36,7 @@ const getChatLog: (
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (application_id, page, param, loading) => {
   return get(
-    `${prefix.value}/${application_id}/chat/${page.current_page}/${page.page_size}`,
+    `${prefix}/${application_id}/chat/${page.current_page}/${page.page_size}`,
     param,
     loading,
   )
@@ -68,8 +55,8 @@ const getChatRecordLog: (
   order_asc?: boolean,
 ) => Promise<Result<any>> = (application_id, chart_id, page, loading, order_asc) => {
   return get(
-    `${prefix.value}/${application_id}/chat/${chart_id}/chat_record/${page.current_page}/${page.page_size}`,
-    {order_asc: order_asc !== undefined ? order_asc : true},
+    `${prefix}/${application_id}/chat/${chart_id}/chat_record/${page.current_page}/${page.page_size}`,
+    { order_asc: order_asc !== undefined ? order_asc : true },
     loading,
   )
 }
@@ -84,14 +71,9 @@ const getMarkChatRecord: (
   chart_id: string,
   chart_record_id: string,
   loading?: Ref<boolean>,
-) => Promise<Result<any>> = (
-  application_id,
-  chart_id,
-  chart_record_id,
-  loading,
-) => {
+) => Promise<Result<any>> = (application_id, chart_id, chart_record_id, loading) => {
   return get(
-    `${prefix.value}/${application_id}/chat/${chart_id}/chat_record/${chart_record_id}/improve`,
+    `${prefix}/${application_id}/chat/${chart_id}/chat_record/${chart_record_id}/improve`,
     undefined,
     loading,
   )
@@ -125,7 +107,7 @@ const putChatRecordLog: (
   loading,
 ) => {
   return put(
-    `${prefix.value}/${application_id}/chat/${chart_id}/chat_record/${chart_record_id}/knowledge/${knowledge_id}/document/${document_id}/improve`,
+    `${prefix}/${application_id}/chat/${chart_id}/chat_record/${chart_record_id}/knowledge/${knowledge_id}/document/${document_id}/improve`,
     data,
     undefined,
     loading,
@@ -155,7 +137,7 @@ const delMarkChatRecord: (
   loading,
 ) => {
   return del(
-    `${prefix.value}/${application_id}/chat/${chart_id}/chat_record/${chart_record_id}/knowledge/${knowledge_id}/document/${document_id}/paragraph/${paragraph_id}/improve`,
+    `${prefix}/${application_id}/chat/${chart_id}/chat_record/${chart_record_id}/knowledge/${knowledge_id}/document/${document_id}/paragraph/${paragraph_id}/improve`,
     undefined,
     {},
     loading,
@@ -180,7 +162,7 @@ const postExportChatLog: (
 ) => void = (application_id, application_name, param, data, loading) => {
   exportExcelPost(
     application_name + '.xlsx',
-    `${prefix.value}/${application_id}/chat/export`,
+    `${prefix}/${application_id}/chat/export`,
     param,
     data,
     loading,
@@ -193,7 +175,7 @@ const getChatRecordDetails: (
   loading?: Ref<boolean>,
 ) => Promise<any> = (application_id, chat_id, chat_record_id, loading) => {
   return get(
-    `${prefix.value}/${application_id}/chat/${chat_id}/chat_record/${chat_record_id}`,
+    `${prefix}/${application_id}/chat/${chat_id}/chat_record/${chat_record_id}`,
     {},
     loading,
   )

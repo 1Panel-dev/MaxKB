@@ -71,14 +71,21 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import workFlowVersionApi from '@/api/application/workflow-version'
 import { datetimeFormat } from '@/utils/time'
 import { MsgSuccess, MsgError } from '@/utils/message'
 import { t } from '@/locales'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 const route = useRoute()
 const {
-  params: { id }
+  params: { id },
 } = route as any
+const apiType = computed(() => {
+  if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
 
 const emit = defineEmits(['click', 'refreshVersion'])
 const loading = ref(false)
@@ -109,22 +116,26 @@ function closeWrite(item: any) {
 function editName(val: string, item: any) {
   if (val) {
     const obj = {
-      name: val
+      name: val,
     }
-    workFlowVersionApi.putWorkFlowVersion(id as string, item.id, obj, loading).then(() => {
-      MsgSuccess(t('common.modifySuccess'))
-      item['writeStatus'] = false
-      getList()
-    })
+    loadSharedApi({ type: 'workflowVersion', systemType: apiType.value })
+      .putWorkFlowVersion(id as string, item.id, obj, loading)
+      .then(() => {
+        MsgSuccess(t('common.modifySuccess'))
+        item['writeStatus'] = false
+        getList()
+      })
   } else {
     MsgError(t('views.applicationWorkflow.tip.nameMessage'))
   }
 }
 
 function getList() {
-  workFlowVersionApi.getWorkFlowVersion(id, loading).then((res: any) => {
-    LogData.value = res.data
-  })
+  loadSharedApi({ type: 'workflowVersion', systemType: apiType.value })
+    .getWorkFlowVersion(id, loading)
+    .then((res: any) => {
+      LogData.value = res.data
+    })
 }
 
 onMounted(() => {

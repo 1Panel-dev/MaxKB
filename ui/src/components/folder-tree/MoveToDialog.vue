@@ -41,6 +41,7 @@ import { t } from '@/locales'
 import useStore from '@/stores'
 import { SourceTypeEnum } from '@/enums/common'
 import KnowledgeApi from '@/api/knowledge/knowledge'
+import ApplicationApi from '@/api/application/application'
 import ToolApi from '@/api/tool/tool'
 const { folder, application } = useStore()
 const emit = defineEmits(['refresh'])
@@ -119,7 +120,7 @@ const submitHandle = async () => {
         dialogVisible.value = false
       })
     } else if (props.source === SourceTypeEnum.APPLICATION) {
-      application.asyncPutApplication(detail.value.id, obj, loading).then((res) => {
+      ApplicationApi.putApplication(detail.value.id, obj, loading).then((res) => {
         MsgSuccess(t('common.saveSuccess'))
         emit('refresh', detail.value)
         dialogVisible.value = false

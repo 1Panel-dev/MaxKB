@@ -47,18 +47,24 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import type { FormInstance, FormRules, UploadFiles } from 'element-plus'
-import applicationApi from '@/api/application/application'
+import type { FormInstance } from 'element-plus'
 import { MsgSuccess, MsgError } from '@/utils/message'
-import { getBrowserLang, langList, t } from '@/locales'
+import { langList, t } from '@/locales'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 const route = useRoute()
 const {
   params: { id },
 } = route
-
+const apiType = computed(() => {
+  if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
 const emit = defineEmits(['refresh'])
 
 const displayFormRef = ref()
@@ -94,12 +100,14 @@ const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid, fields) => {
     if (valid) {
-      applicationApi.putAccessToken(id as string, form.value, loading).then((res) => {
-        emit('refresh')
-        // @ts-ignore
-        MsgSuccess(t('common.settingSuccess'))
-        dialogVisible.value = false
-      })
+      loadSharedApi({ type: 'application', systemType: apiType.value })
+        .putAccessToken(id as string, form.value, loading)
+        .then(() => {
+          emit('refresh')
+          // @ts-ignore
+          MsgSuccess(t('common.settingSuccess'))
+          dialogVisible.value = false
+        })
     }
   })
 }

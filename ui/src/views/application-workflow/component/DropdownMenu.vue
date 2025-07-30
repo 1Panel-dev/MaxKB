@@ -127,7 +127,6 @@ import { isWorkFlow } from '@/utils/application'
 import useStore from '@/stores'
 import NodeContent from './NodeContent.vue'
 import { SourceTypeEnum } from '@/enums/common'
-import ApplicationApi from '@/api/application/application'
 import permissionMap from '@/permission'
 import { useRoute } from 'vue-router'
 const route = useRoute()
@@ -149,9 +148,7 @@ const props = defineProps({
 const emit = defineEmits(['clickNodes', 'onmousedown'])
 
 const apiType = computed(() => {
-  if (route.path.includes('shared')) {
-    return 'systemShare'
-  } else if (route.path.includes('resource-management')) {
+  if (route.path.includes('resource-management')) {
     return 'systemManage'
   } else {
     return 'workspace'
@@ -256,8 +253,7 @@ async function getToolFolder() {
 async function getToolList() {
   const res = await loadSharedApi({
     type: 'tool',
-    isShared: isShared.value,
-    systemType: apiType.value,
+    systemType: 'workspace',
   }).getToolList({
     folder_id: folder.currentFolder?.id || user.getWorkspaceId(),
   })
@@ -276,10 +272,13 @@ function getApplicationFolder() {
 }
 
 async function getApplicationList() {
-  const res = await ApplicationApi.getAllApplication({
+  const res = await loadSharedApi({
+    type: 'application',
+    systemType: 'workspace',
+  }).getAllApplication({
     folder_id: folder.currentFolder?.id || user.getWorkspaceId(),
   })
-  applicationList.value = res.data.filter((item) => item.resource_type === 'application')
+  applicationList.value = res.data.filter((item: any) => item.resource_type === 'application')
 }
 
 function folderClickHandle(row: any) {

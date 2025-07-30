@@ -1,21 +1,11 @@
-import {Result} from '@/request/Result'
-import {get, post, postStream, del, put, request, download, exportFile} from '@/request/index'
-import type {pageRequest} from '@/api/type/common'
-import type {ApplicationFormType} from '@/api/type/application'
-import {type Ref} from 'vue'
+import { Result } from '@/request/Result'
+import { get, post, postStream, del, put, request, download, exportFile } from '@/request/index'
+import type { pageRequest } from '@/api/type/common'
+import type { ApplicationFormType } from '@/api/type/application'
+import { type Ref } from 'vue'
 
 const prefix = '/system/resource/application'
 
-/**
- * 获取全部应用
- * @param 参数
- */
-const getAllApplication: (param?: any, loading?: Ref<boolean>) => Promise<Result<any[]>> = (
-  param,
-  loading,
-) => {
-  return get(`${prefix}`, param, loading)
-}
 
 /**
  * 获取分页应用
@@ -29,17 +19,6 @@ const getApplication: (
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (page, param, loading) => {
   return get(`${prefix}/${page.current_page}/${page.page_size}`, param, loading)
-}
-
-/**
- * 创建应用
- * @param 参数
- */
-const postApplication: (
-  data: ApplicationFormType,
-  loading?: Ref<boolean>,
-) => Promise<Result<any>> = (data, loading) => {
-  return post(`${prefix}`, data, undefined, loading)
 }
 
 /**
@@ -87,19 +66,6 @@ const getAccessToken: (application_id: string, loading?: Ref<boolean>) => Promis
   return get(`${prefix}/${application_id}/access_token`, undefined, loading)
 }
 /**
- * 获取应用设置
- * @param application_id 应用id
- * @param loading 加载器
- * @returns
- */
-const getApplicationSetting: (
-  application_id: string,
-  loading?: Ref<boolean>,
-) => Promise<Result<any>> = (application_id, loading) => {
-  return get(`${prefix}/${application_id}/setting`, undefined, loading)
-}
-
-/**
  * 修改AccessToken
  * @param 参数 application_id
  * data {
@@ -112,6 +78,93 @@ const putAccessToken: (
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (application_id, data, loading) => {
   return put(`${prefix}/${application_id}/access_token`, data, undefined, loading)
+}
+
+/**
+ * 统计
+ * @param 参数 application_id, data
+ */
+const getStatistics: (
+  application_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (application_id, data, loading) => {
+  return get(`${prefix}/${application_id}/application_stats`, data, loading)
+}
+/**
+ * 打开调试对话id
+ * @param application_id 应用id
+ * @param loading 加载器
+ * @returns
+ */
+const open: (application_id: string, loading?: Ref<boolean>) => Promise<Result<string>> = (
+  application_id,
+  loading,
+) => {
+  return get(`${prefix}/${application_id}/open`, {}, loading)
+}
+
+/**
+ * 应用发布
+ * @param application_id
+ * @param loading
+ * @returns
+ */
+const publish: (
+  application_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (application_id, data, loading) => {
+  return put(`${prefix}/${application_id}/publish`, data, {}, loading)
+}
+
+/**
+ *
+ * @param application_id
+ * @param data
+ * @param loading
+ * @returns
+ */
+const playDemoText: (application_id: string, data: any, loading?: Ref<boolean>) => Promise<any> = (
+  application_id,
+  data,
+  loading,
+) => {
+  return download(`${prefix}/${application_id}/play_demo_text`, 'post', data, undefined, loading)
+}
+
+/**
+ * 文本转语音
+ */
+const postTextToSpeech: (
+  application_id: String,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (application_id, data, loading) => {
+  return download(`${prefix}/${application_id}/text_to_speech`, 'post', data, undefined, loading)
+}
+/**
+ * 语音转文本
+ */
+const speechToText: (
+  application_id: String,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (application_id, data, loading) => {
+  return post(`${prefix}/${application_id}/speech_to_text`, data, undefined, loading)
+}
+
+/**
+ * 获取应用设置
+ * @param application_id 应用id
+ * @param loading 加载器
+ * @returns
+ */
+const getApplicationSetting: (
+  application_id: string,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (application_id, loading) => {
+  return get(`${prefix}/${application_id}/setting`, undefined, loading)
 }
 
 /**
@@ -141,29 +194,6 @@ const importApplication: (data: any, loading?: Ref<boolean>) => Promise<Result<a
   return post(`${prefix}/import`, data, undefined, loading)
 }
 
-/**
- * 统计
- * @param 参数 application_id, data
- */
-const getStatistics: (
-  application_id: string,
-  data: any,
-  loading?: Ref<boolean>,
-) => Promise<Result<any>> = (application_id, data, loading) => {
-  return get(`${prefix}/${application_id}/application_stats`, data, loading)
-}
-/**
- * 打开调试对话id
- * @param application_id 应用id
- * @param loading 加载器
- * @returns
- */
-const open: (application_id: string, loading?: Ref<boolean>) => Promise<Result<string>> = (
-  application_id,
-  loading,
-) => {
-  return get(`${prefix}/${application_id}/open`, {}, loading)
-}
 /**
  * 对话
  * @param 参数
@@ -218,67 +248,6 @@ const updatePlatformConfig: (
 ) => Promise<Result<any>> = (application_id, type, data, loading) => {
   return post(`${prefix}/${application_id}/platform/${type}`, data, undefined, loading)
 }
-/**
- * 应用发布
- * @param application_id
- * @param loading
- * @returns
- */
-const publish: (
-  application_id: string,
-  data: any,
-  loading?: Ref<boolean>,
-) => Promise<Result<any>> = (application_id, data, loading) => {
-  return put(`${prefix}/${application_id}/publish`, data, {}, loading)
-}
-
-/**
- *
- * @param application_id
- * @param data
- * @param loading
- * @returns
- */
-const playDemoText: (application_id: string, data: any, loading?: Ref<boolean>) => Promise<any> = (
-  application_id,
-  data,
-  loading,
-) => {
-  return download(
-    `${prefix}/${application_id}/play_demo_text`,
-    'post',
-    data,
-    undefined,
-    loading,
-  )
-}
-
-/**
- * 文本转语音
- */
-const postTextToSpeech: (
-  application_id: String,
-  data: any,
-  loading?: Ref<boolean>,
-) => Promise<Result<any>> = (application_id, data, loading) => {
-  return download(
-    `${prefix}/${application_id}/text_to_speech`,
-    'post',
-    data,
-    undefined,
-    loading,
-  )
-}
-/**
- * 语音转文本
- */
-const speechToText: (
-  application_id: String,
-  data: any,
-  loading?: Ref<boolean>,
-) => Promise<Result<any>> = (application_id, data, loading) => {
-  return post(`${prefix}/${application_id}/speech_to_text`, data, undefined, loading)
-}
 
 /**
  * mcp 节点
@@ -291,9 +260,7 @@ const getMcpTools: (application_id: String, loading?: Ref<boolean>) => Promise<R
 }
 
 export default {
-  getAllApplication,
   getApplication,
-  postApplication,
   putApplication,
   delApplication,
   getApplicationDetail,

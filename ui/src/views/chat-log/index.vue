@@ -230,24 +230,25 @@ import { cloneDeep } from 'lodash'
 import ChatRecordDrawer from './component/ChatRecordDrawer.vue'
 import SelectKnowledgeDocument from '@/components/select-knowledge-document/index.vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
-import chatLogApi from '@/api/application/chat-log'
 import { beforeDay, datetimeFormat, nowDate } from '@/utils/time'
-import useStore from '@/stores'
 import type { Dict } from '@/api/type/common'
 import { t } from '@/locales'
 import { ElTable } from 'element-plus'
 import permissionMap from '@/permission'
-
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 const route = useRoute()
 
-const apiType = computed<'workspace'>(() => {
-  return 'workspace'
+const apiType = computed(() => {
+  if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
 })
 const permissionPrecise = computed(() => {
   return permissionMap['application'][apiType.value]
 })
 
-const { application, chatLog, user } = useStore()
 const {
   params: { id },
 } = route as any
@@ -325,8 +326,6 @@ const filter = ref<any>({
   min_trample: 0,
   comparer: 'and',
 })
-
-const documentList = ref<any[]>([])
 
 function filterChange(val: string) {
   if (val === 'clear') {
@@ -420,18 +419,20 @@ function getList() {
   if (search.value) {
     obj = { ...obj, abstract: search.value }
   }
-  return chatLog.asyncGetChatLog(id as string, paginationConfig, obj, loading).then((res: any) => {
-    tableData.value = res.data.records
-    if (currentChatId.value) {
-      currentChatId.value = tableData.value[0]?.id
-    }
-    paginationConfig.total = res.data.total
-  })
+  return loadSharedApi({ type: 'chatLog', systemType: apiType.value })
+    .getChatLog(id as string, paginationConfig, obj, loading)
+    .then((res: any) => {
+      tableData.value = res.data.records
+      if (currentChatId.value) {
+        currentChatId.value = tableData.value[0]?.id
+      }
+      paginationConfig.total = res.data.total
+    })
 }
 
 function getDetail(isLoading = false) {
-  application
-    .asyncGetApplicationDetail(id as string, isLoading ? loading : undefined)
+  loadSharedApi({ type: 'application', systemType: apiType.value })
+    .getApplicationDetail(id as string, isLoading ? loading : undefined)
     .then((res: any) => {
       detail.value = res.data
       days.value = res.data.clean_time
@@ -455,7 +456,7 @@ const exportLog = () => {
       obj = { ...obj, abstract: search.value }
     }
 
-    chatLogApi.postExportChatLog(
+    loadSharedApi({ type: 'chatLog', systemType: apiType.value }).postExportChatLog(
       detail.value.id,
       detail.value.name,
       obj,
@@ -487,8 +488,8 @@ function saveCleanTime() {
   const obj = {
     clean_time: days.value,
   }
-  application
-    .asyncPutApplication(id as string, obj, loading)
+  loadSharedApi({ type: 'application', systemType: apiType.value })
+    .putApplication(id as string, obj, loading)
     .then(() => {
       MsgSuccess(t('common.saveSuccess'))
       dialogVisible.value = false
@@ -512,10 +513,12 @@ const submitForm = async () => {
       ...SelectKnowledgeDocumentRef.value.form,
       chat_ids: arr,
     }
-    chatLogApi.postChatLogAddKnowledge(id, obj, documentLoading).then((res: any) => {
-      multipleTableRef.value?.clearSelection()
-      documentDialogVisible.value = false
-    })
+    loadSharedApi({ type: 'chatLog', systemType: apiType.value })
+      .postChatLogAddKnowledge(id, obj, documentLoading)
+      .then((res: any) => {
+        multipleTableRef.value?.clearSelection()
+        documentDialogVisible.value = false
+      })
   }
 }
 

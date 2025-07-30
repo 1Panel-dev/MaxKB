@@ -446,28 +446,31 @@ import type { FormInstance, FormRules } from 'element-plus'
 import type { ApplicationFormType } from '@/api/type/application'
 import { relatedObject } from '@/utils/array'
 import { MsgSuccess, MsgWarning } from '@/utils/message'
-import useStore from '@/stores'
 import { t } from '@/locales'
 import TTSModeParamSettingDialog from './component/TTSModeParamSettingDialog.vue'
 import ReasoningParamSettingDialog from './component/ReasoningParamSettingDialog.vue'
 import permissionMap from '@/permission'
-import ApplicationAPI from '@/api/application/application'
 import { EditionConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 const route = useRoute()
 
-const apiType = computed<'workspace'>(() => {
-  return 'workspace'
+const {
+  params: { id },
+} = route as any
+
+const apiType = computed(() => {
+  if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
 })
 const permissionPrecise = computed(() => {
   return permissionMap['application'][apiType.value]
 })
 
-const { knowledge, model, application } = useStore()
 
-const {
-  params: { id },
-} = route as any
 // @ts-ignore
 const defaultPrompt = t('views.application.form.prompt.defaultPrompt', {
   data: '{data}',
@@ -562,11 +565,16 @@ function submitReasoningDialog(val: any) {
 const publish = (formEl: FormInstance | undefined) => {
   if (!formEl) return
   formEl.validate().then(() => {
-    return ApplicationAPI.putApplication(id, applicationForm.value, loading)
-      .then((ok) => {
-        return ApplicationAPI.publish(id, {}, loading)
+    return loadSharedApi({ type: 'application', systemType: apiType.value })
+      .putApplication(id, applicationForm.value, loading)
+      .then(() => {
+        return loadSharedApi({ type: 'application', systemType: apiType.value }).publish(
+          id,
+          {},
+          loading,
+        )
       })
-      .then((res) => {
+      .then(() => {
         MsgSuccess(t('views.application.tip.publishSuccess'))
       })
   })
@@ -575,9 +583,11 @@ const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid, fields) => {
     if (valid) {
-      application.asyncPutApplication(id, applicationForm.value, loading).then((res) => {
-        MsgSuccess(t('common.saveSuccess'))
-      })
+      loadSharedApi({ type: 'application', systemType: apiType.value })
+        .putApplication(id, applicationForm.value, loading)
+        .then(() => {
+          MsgSuccess(t('common.saveSuccess'))
+        })
     }
   })
 }
@@ -648,29 +658,43 @@ function openKnowledgeDialog() {
 }
 
 function getDetail() {
-  application.asyncGetApplicationDetail(id, loading).then((res: any) => {
-    applicationForm.value = res.data
-    applicationForm.value.model_id = res.data.model
-    applicationForm.value.stt_model_id = res.data.stt_model
-    applicationForm.value.tts_model_id = res.data.tts_model
-    applicationForm.value.tts_type = res.data.tts_type
-    knowledgeList.value = res.data.knowledge_list
-    applicationForm.value.model_setting.no_references_prompt =
-      res.data.model_setting.no_references_prompt || '{question}'
+  loadSharedApi({ type: 'application', systemType: apiType.value })
+    .getApplicationDetail(id, loading)
+    .then((res: any) => {
+      applicationForm.value = res.data
+      applicationForm.value.model_id = res.data.model
+      applicationForm.value.stt_model_id = res.data.stt_model
+      applicationForm.value.tts_model_id = res.data.tts_model
+      applicationForm.value.tts_type = res.data.tts_type
+      knowledgeList.value = res.data.knowledge_list
+      applicationForm.value.model_setting.no_references_prompt =
+        res.data.model_setting.no_references_prompt || '{question}'
 
-    // 企业版和专业版
-    if (hasPermission([EditionConst.IS_EE, EditionConst.IS_PE], 'OR')) {
-      ApplicationAPI.getApplicationSetting(id).then((ok) => {
-        applicationForm.value = { ...applicationForm.value, ...ok.data }
-      })
-    }
-  })
+      // 企业版和专业版
+      if (hasPermission([EditionConst.IS_EE, EditionConst.IS_PE], 'OR')) {
+        loadSharedApi({ type: 'application', systemType: apiType.value })
+          .getApplicationSetting(id)
+          .then((ok: any) => {
+            applicationForm.value = { ...applicationForm.value, ...ok.data }
+          })
+      }
+    })
 }
 
 function getSelectModel() {
   loading.value = true
-  model
-    .asyncGetSelectModel({ model_type: 'LLM' })
+
+  const obj =
+    apiType.value === 'systemManage'
+      ? {
+          model_type: 'LLM',
+          workspace_id: applicationForm.value?.workspace_id,
+        }
+      : {
+          model_type: 'LLM',
+        }
+  loadSharedApi({ type: 'model', systemType: apiType.value })
+    .getSelectModelList(obj)
     .then((res: any) => {
       modelOptions.value = groupBy(res?.data, 'provider')
       loading.value = false
@@ -682,8 +706,17 @@ function getSelectModel() {
 
 function getSTTModel() {
   loading.value = true
-  model
-    .asyncGetSelectModel({ model_type: 'STT' })
+  const obj =
+    apiType.value === 'systemManage'
+      ? {
+          model_type: 'STT',
+          workspace_id: applicationForm.value?.workspace_id,
+        }
+      : {
+          model_type: 'STT',
+        }
+  loadSharedApi({ type: 'model', systemType: apiType.value })
+    .getSelectModelList(obj)
     .then((res: any) => {
       sttModelOptions.value = groupBy(res?.data, 'provider')
       loading.value = false
@@ -695,8 +728,17 @@ function getSTTModel() {
 
 function getTTSModel() {
   loading.value = true
-  model
-    .asyncGetSelectModel({ model_type: 'TTS' })
+  const obj =
+    apiType.value === 'systemManage'
+      ? {
+          model_type: 'TTS',
+          workspace_id: applicationForm.value?.workspace_id,
+        }
+      : {
+          model_type: 'TTS',
+        }
+  loadSharedApi({ type: 'model', systemType: apiType.value })
+    .getSelectModelList(obj)
     .then((res: any) => {
       ttsModelOptions.value = groupBy(res?.data, 'provider')
       loading.value = false

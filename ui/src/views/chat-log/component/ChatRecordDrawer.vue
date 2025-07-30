@@ -31,12 +31,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch, nextTick } from 'vue'
+import { ref, reactive, watch, nextTick, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { type ApplicationFormType, type chatType } from '@/api/type/application'
-import useStore from '@/stores'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 const AiChatRef = ref()
-const { chatLog } = useStore()
 const props = withDefaults(
   defineProps<{
     /**
@@ -70,6 +69,14 @@ const route = useRoute()
 const {
   params: { id },
 } = route
+
+const apiType = computed(() => {
+  if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
 const loading = ref(false)
 const visible = ref(false)
 const recordList = ref<chatType[]>([])
@@ -87,8 +94,8 @@ function closeHandle() {
 }
 
 function getChatRecord() {
-  return chatLog
-    .asyncChatRecordLog(id as string, props.chatId, paginationConfig, loading)
+  return loadSharedApi({ type: 'chatLog', systemType: apiType.value })
+    .getChatRecordLog(id as string, props.chatId, paginationConfig, loading)
     .then((res: any) => {
       paginationConfig.total = res.data.total
       const list = res.data.records

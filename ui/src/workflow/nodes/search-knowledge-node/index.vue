@@ -142,8 +142,6 @@ import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'
 import { relatedObject } from '@/utils/array'
 import { SearchMode } from '@/enums/application'
-import useStore from '@/stores'
-const { knowledge, application, user } = useStore()
 
 const props = defineProps<{ nodeModel: any }>()
 const nodeCascaderRef = ref()

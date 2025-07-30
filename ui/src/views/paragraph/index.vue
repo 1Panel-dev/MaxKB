@@ -12,7 +12,7 @@
         >）
       </el-text>
     </div>
-    <div class="header-button" v-if="!shareDisabled &&  permissionPrecise.doc_edit(id)">
+    <div class="header-button" v-if="!shareDisabled && permissionPrecise.doc_edit(id)">
       <el-button @click="batchSelectedHandle(true)" v-if="isBatch === false">
         {{ $t('views.paragraph.setting.batchSelected') }}
       </el-button>
@@ -85,7 +85,12 @@
                     <VueDraggable
                       ref="el"
                       v-model="paragraphDetail"
-                      :disabled="isBatch === true || shareDisabled || dialogVisible || !permissionPrecise.doc_edit(id)"
+                      :disabled="
+                        isBatch === true ||
+                        shareDisabled ||
+                        dialogVisible ||
+                        !permissionPrecise.doc_edit(id)
+                      "
                       handle=".handle"
                       :animation="150"
                       ghostClass="ghost"
@@ -96,7 +101,12 @@
                           <!-- 批量操作 -->
                           <div class="paragraph-card flex w-full" v-if="isBatch === true">
                             <el-checkbox :value="item.id" />
-                            <ParagraphCard :data="item" class="mb-8 w-full" :disabled="true" @clickCard="toggleSelect(item.id)"/>
+                            <ParagraphCard
+                              :data="item"
+                              class="mb-8 w-full"
+                              :disabled="true"
+                              @clickCard="toggleSelect(item.id)"
+                            />
                           </div>
                           <!-- 非批量操作 -->
                           <div class="handle paragraph-card flex w-full" :id="item.id" v-else>
@@ -110,11 +120,21 @@
                             <ParagraphCard
                               :data="item"
                               :showMoveUp="index !== 0"
-                              :showMoveDown="index < paragraphDetail.length-1"
+                              :showMoveDown="index < paragraphDetail.length - 1"
                               class="mb-8 w-full"
                               @changeState="changeState"
                               @deleteParagraph="deleteParagraph"
-                              @move="(val: string)=>onEnd(null, {paragraph_id: item.id,new_position: val==='up'?index-1:index+1}, index)"
+                              @move="
+                                (val: string) =>
+                                  onEnd(
+                                    null,
+                                    {
+                                      paragraph_id: item.id,
+                                      new_position: val === 'up' ? index - 1 : index + 1,
+                                    },
+                                    index,
+                                  )
+                              "
                               @refresh="refresh"
                               @refreshMigrateParagraph="refreshMigrateParagraph"
                               :disabled="shareDisabled"
@@ -175,15 +195,15 @@ import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import permissionMap from '@/permission'
 import { t } from '@/locales'
-import {cloneDeep} from "lodash";
+import { cloneDeep } from 'lodash'
 const route = useRoute()
 const {
   params: { id, documentId },
-  query: { type, isShared },
+  query: { from, isShared },
 } = route as any
 
 const apiType = computed(() => {
-  return type as 'systemShare' | 'workspace' | 'systemManage'
+  return from as 'systemShare' | 'workspace' | 'systemManage'
 })
 const shareDisabled = computed(() => {
   return isShared === 'true'
@@ -191,7 +211,6 @@ const shareDisabled = computed(() => {
 const permissionPrecise = computed(() => {
   return permissionMap['knowledge'][apiType.value]
 })
-
 
 const SelectDocumentDialogRef = ref()
 const ParagraphDialogRef = ref()
@@ -204,9 +223,12 @@ const search = ref('')
 const searchType = ref('title')
 
 const dialogVisible = ref(false)
-watch(()=>ParagraphDialogRef.value?.dialogVisible, (val: boolean) => {
-  dialogVisible.value = val
-})
+watch(
+  () => ParagraphDialogRef.value?.dialogVisible,
+  (val: boolean) => {
+    dialogVisible.value = val
+  },
+)
 function dialogVisibleChange(val: boolean) {
   dialogVisible.value = val
 }
@@ -353,7 +375,7 @@ function openGenerateDialog(row?: any) {
 
 function onEnd(event?: any, params?: any, index?: number) {
   // console.log('onEnd', event, params, index)
-  const p  = cloneDeep(params)
+  const p = cloneDeep(params)
   if (p) {
     p.new_position = p.new_position + 1 // 由于拖拽时会将当前段落位置作为新位置，所以需要加1
   }
@@ -367,7 +389,7 @@ function onEnd(event?: any, params?: any, index?: number) {
     obj,
     loading,
   )
-  if(params) {
+  if (params) {
     const movedItem = paragraphDetail.value.splice(index as number, 1)[0]
     paragraphDetail.value.splice(params.new_position, 0, movedItem)
   }

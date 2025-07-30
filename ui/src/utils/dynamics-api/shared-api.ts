@@ -5,6 +5,10 @@ import problemWorkspaceApi from '@/api/knowledge/problem'
 import modelWorkspaceApi from '@/api/model/model'
 import toolWorkspaceApi from '@/api/tool/tool'
 import chatUserWorkspaceApi from '@/api/chat-user/chat-user'
+import applicationWorkspaceApi from '@/api/application/application'
+import applicationKeyWorkspaceApi from '@/api/application/application-key'
+import workflowVersionWorkspaceApi from '@/api/application/workflow-version'
+import chatLogWorkspaceApi from '@/api/application/chat-log'
 import sharedWorkspaceApi from '@/api/shared-workspace'
 import toolSystemShareApi from '@/api/system-shared/tool'
 import modelSystemShareApi from '@/api/system-shared/model'
@@ -22,6 +26,10 @@ import paragraphResourceApi from '@/api/system-resource-management/paragraph'
 import problemResourceApi from '@/api/system-resource-management/problem'
 import modelResourceApi from '@/api/system-resource-management/model'
 import chatUserResourceApi from '@/api/system-resource-management/chat-user'
+import applicationResourceApi from '@/api/system-resource-management/application'
+import applicationKeyResourceApi from '@/api/system-resource-management/application-key'
+import workflowVersionResourceApi from '@/api/system-resource-management/workflow-version'
+import chatLogWResourceApi from '@/api/system-resource-management/chat-log'
 
 // 普通 API
 const workspaceApiMap = {
@@ -33,6 +41,10 @@ const workspaceApiMap = {
   problem: problemWorkspaceApi,
   chatUser: chatUserWorkspaceApi,
   workspace: workspaceApi,
+  application: applicationWorkspaceApi,
+  applicationKey: applicationKeyWorkspaceApi,
+  workflowVersion: workflowVersionWorkspaceApi,
+  chatLog: chatLogWorkspaceApi,
 } as any
 
 // 系统分享 API
@@ -56,6 +68,10 @@ const systemManageApiMap = {
   model: modelResourceApi,
   tool: ToolResourceApi,
   chatUser: chatUserResourceApi,
+  application: applicationResourceApi,
+  applicationKey: applicationKeyResourceApi,
+  workflowVersion: workflowVersionResourceApi,
+  chatLog: chatLogWResourceApi,
 } as any
 
 const data = {

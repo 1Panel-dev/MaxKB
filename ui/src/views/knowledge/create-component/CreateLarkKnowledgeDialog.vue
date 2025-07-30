@@ -170,7 +170,7 @@ const submitHandle = async () => {
             router.push({
               path: `/knowledge/${res.data.id}/${currentFolder.value.id || 'shared'}/document`,
               query: {
-                type: apiType.value,
+                from: apiType.value,
               },
             })
             emit('refresh')

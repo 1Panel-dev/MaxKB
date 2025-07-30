@@ -4,7 +4,7 @@ import {PermissionConst, RoleConst} from '@/utils/permission/data'
 const systemManage = {
     create: () => false,
     folderCreate: () => false,
-    edit: () => 
+    edit: () =>
         hasPermission(
             [
               RoleConst.ADMIN,
@@ -13,7 +13,7 @@ const systemManage = {
             'OR'
     ),
     folderEdit: () => false,
-    export: () => 
+    export: () =>
         hasPermission(
             [
               RoleConst.ADMIN,
@@ -21,16 +21,16 @@ const systemManage = {
             ],
             'OR'
     ),
-    delete: () => 
+    delete: () =>
         hasPermission(
             [
               RoleConst.ADMIN,
-              PermissionConst.RESOURCE_APPLICATION_DELETE     
+              PermissionConst.RESOURCE_APPLICATION_DELETE
             ],
             'OR'
     ),
     folderDelete: () => false,
-    overview_embed: () => 
+    overview_embed: () =>
         hasPermission(
             [
               RoleConst.ADMIN,
@@ -38,7 +38,7 @@ const systemManage = {
             ],
             'OR'
     ),
-    overview_access: () => 
+    overview_access: () =>
       hasPermission(
             [
               RoleConst.ADMIN,
@@ -46,7 +46,7 @@ const systemManage = {
             ],
             'OR'
     ),
-    overview_display: () => 
+    overview_display: () =>
         hasPermission(
             [
               RoleConst.ADMIN,
@@ -54,7 +54,7 @@ const systemManage = {
             ],
             'OR'
     ),
-    overview_api_key: () => 
+    overview_api_key: () =>
         hasPermission(
             [
               RoleConst.ADMIN,
@@ -62,7 +62,7 @@ const systemManage = {
             ],
             'OR'
     ),
-    access_edit: () => 
+    access_edit: () =>
         hasPermission(
             [
               RoleConst.ADMIN,
@@ -70,7 +70,7 @@ const systemManage = {
             ],
             'OR'
     ),
-    application_chat_user_edit: () => 
+    application_chat_user_edit: () =>
         hasPermission(
             [
               RoleConst.ADMIN,
@@ -78,7 +78,7 @@ const systemManage = {
             ],
             'OR'
     ),
-    chat_log_clear: () => 
+    chat_log_clear: () =>
         hasPermission(
             [
               RoleConst.ADMIN,
@@ -86,7 +86,7 @@ const systemManage = {
             ],
             'OR'
     ),
-    chat_log_export: () => 
+    chat_log_export: () =>
         hasPermission(
             [
               RoleConst.ADMIN,
@@ -94,12 +94,13 @@ const systemManage = {
             ],
             'OR'
     ),
-    chat_log_add_knowledge: () => 
+    chat_log_add_knowledge: () =>
         hasPermission(
             [
               RoleConst.ADMIN,
               PermissionConst.RESOURCE_APPLICATION_CHAT_LOG_ADD_KNOWLEDGE
             ],
             'OR'
-    ),    
+    ),
 }
+export default systemManage

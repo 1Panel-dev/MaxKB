@@ -13,15 +13,15 @@
         <div class="text-right">
           <el-button text @click="isEdit = true" v-if="!isEdit">
             <el-icon>
-              <EditPen/>
+              <EditPen />
             </el-icon>
           </el-button>
           <el-button text style="margin-left: 4px" @click="deleteMark">
             <el-icon>
-              <Delete/>
+              <Delete />
             </el-icon>
           </el-button>
-          <el-divider direction="vertical"/>
+          <el-divider direction="vertical" />
         </div>
       </div>
     </template>
@@ -64,18 +64,24 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import {ref, watch, reactive} from 'vue'
-import {useRoute} from 'vue-router'
-import type {FormInstance, FormRules} from 'element-plus'
-import chatLogApi from '@/api/application/chat-log'
-import paragraphApi from '@/api/knowledge/paragraph'
-import {t} from '@/locales'
-import {MsgSuccess, MsgConfirm} from '@/utils/message'
+import { ref, watch, reactive, computed } from 'vue'
+import { useRoute } from 'vue-router'
+import type { FormInstance, FormRules } from 'element-plus'
+import { t } from '@/locales'
+import { MsgSuccess, MsgConfirm } from '@/utils/message'
 
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 const route = useRoute()
 const {
-  params: {id},
+  params: { id },
 } = route as any
+const apiType = computed(() => {
+  if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
 
 const emit = defineEmits(['refresh'])
 
@@ -90,7 +96,7 @@ const detail = ref<any>({})
 
 const rules = reactive<FormRules>({
   content: [
-    {required: true, message: t('views.chatLog.form.content.placeholder'), trigger: 'blur'},
+    { required: true, message: t('views.chatLog.form.content.placeholder'), trigger: 'blur' },
   ],
 })
 
@@ -102,7 +108,7 @@ watch(dialogVisible, (bool) => {
 })
 
 function deleteMark() {
-  chatLogApi
+  loadSharedApi({ type: 'chatLog', systemType: apiType.value })
     .delMarkChatRecord(
       id as string,
       detail.value.chat_id,
@@ -120,7 +126,7 @@ function deleteMark() {
 }
 
 function getMark(data: any) {
-  chatLogApi
+  loadSharedApi({ type: 'chatLog', systemType: apiType.value })
     .getMarkChatRecord(id as string, data.chat_id, data.id, loading)
     .then((res: any) => {
       if (res.data.length > 0) {
@@ -138,7 +144,7 @@ const submit = async (formEl: FormInstance) => {
   if (!formEl) return
   await formEl.validate((valid, fields) => {
     if (valid) {
-      paragraphApi
+      loadSharedApi({ type: 'paragraph', systemType: apiType.value })
         .putParagraph(
           form.value.knowledge,
           form.value.document,
@@ -148,14 +154,14 @@ const submit = async (formEl: FormInstance) => {
           },
           loading,
         )
-        .then((res) => {
+        .then(() => {
           dialogVisible.value = false
         })
     }
   })
 }
 
-defineExpose({open})
+defineExpose({ open })
 </script>
 <style lang="scss" scoped>
 .edit-mark-dialog {

@@ -71,20 +71,23 @@ import { ref, watch, reactive, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import SelectKnowledgeDocument from '@/components/select-knowledge-document/index.vue'
 import type { FormInstance, FormRules } from 'element-plus'
-import chatLogApi from '@/api/application/chat-log'
 import imageApi from '@/api/image'
 import { t } from '@/locales'
-
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 const route = useRoute()
 const {
   params: { id },
 } = route as any
+const apiType = computed(() => {
+  if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
 
 const emit = defineEmits(['refresh'])
 
-const apiType = computed<'workspace'>(() => {
-  return 'workspace'
-})
 const formRef = ref()
 
 const toolbars = [
@@ -197,7 +200,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
           content: form.value.content,
           problem_text: form.value.problem_text,
         }
-        chatLogApi
+        loadSharedApi({ type: 'chatLog', systemType: apiType.value })
           .putChatRecordLog(
             id,
             form.value.chat_id,

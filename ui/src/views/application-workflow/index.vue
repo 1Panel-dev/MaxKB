@@ -141,7 +141,6 @@ import type { Action } from 'element-plus'
 import Workflow from '@/workflow/index.vue'
 import DropdownMenu from '@/views/application-workflow/component/DropdownMenu.vue'
 import PublishHistory from '@/views/application-workflow/component/PublishHistory.vue'
-import ApplicationAPI from '@/api/application/application'
 import { isAppIcon, resetUrl } from '@/utils/common'
 import { MsgSuccess, MsgError, MsgConfirm } from '@/utils/message'
 import { datetimeFormat } from '@/utils/time'
@@ -152,17 +151,25 @@ import { hasPermission } from '@/utils/permission'
 import { t } from '@/locales'
 import { ComplexPermission } from '@/utils/permission/type'
 import { EditionConst, PermissionConst, RoleConst } from '@/utils/permission/data'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
-const { theme, application } = useStore()
+const { theme } = useStore()
 const router = useRouter()
 const route = useRoute()
+const {
+  params: { id },
+} = route as any
+const apiType = computed(() => {
+  if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
 
 const isDefaultTheme = computed(() => {
   return theme.isDefaultTheme()
 })
-const {
-  params: { id },
-} = route as any
 
 let interval: any
 const workflowRef = ref()
@@ -285,9 +292,14 @@ const publish = () => {
         MsgError(e.toString())
         return
       }
-      ApplicationAPI.putApplication(id, { work_flow: workflow }, loading)
-        .then((ok) => {
-          return ApplicationAPI.publish(id, {}, loading)
+      loadSharedApi({ type: 'application', systemType: apiType.value })
+        .putApplication(id, { work_flow: workflow }, loading)
+        .then(() => {
+          return loadSharedApi({ type: 'application', systemType: apiType.value }).publish(
+            id,
+            {},
+            loading,
+          )
         })
         .then((ok: any) => {
           detail.value.name = ok.data.name
@@ -372,51 +384,57 @@ function getGraphData() {
 }
 
 function getDetail() {
-  application.asyncGetApplicationDetail(id).then((res: any) => {
-    res.data?.work_flow['nodes'].map((v: any) => {
-      v['properties']['noRender'] = true
-    })
-    detail.value = res.data
-    detail.value.stt_model_id = res.data.stt_model
-    detail.value.tts_model_id = res.data.tts_model
-    detail.value.tts_type = res.data.tts_type
-    saveTime.value = res.data?.update_time
-    detail.value.work_flow?.nodes
-      ?.filter((v: any) => v.id === 'base-node')
-      .map((v: any) => {
-        apiInputParams.value = v.properties.api_input_field_list
-          ? v.properties.api_input_field_list.map((v: any) => {
-              return {
-                name: v.variable,
-                value: v.default_value,
-              }
-            })
-          : v.properties.input_field_list
-            ? v.properties.input_field_list
-                .filter((v: any) => v.assignment_method === 'api_input')
-                .map((v: any) => {
-                  return {
-                    name: v.variable,
-                    value: v.default_value,
-                  }
-                })
-            : []
+  loadSharedApi({ type: 'application', systemType: apiType.value })
+    .getApplicationDetail(id)
+    .then((res: any) => {
+      res.data?.work_flow['nodes'].map((v: any) => {
+        v['properties']['noRender'] = true
       })
-    application.asyncGetAccessToken(id, loading).then((res: any) => {
-      detail.value = { ...detail.value, ...res.data }
-    })
-    workflowRef.value?.clearGraphData()
-    nextTick(() => {
-      workflowRef.value?.render(detail.value.work_flow)
-      cloneWorkFlow.value = getGraphData()
-    })
-    // 企业版和专业版
-    if (hasPermission([EditionConst.IS_EE, EditionConst.IS_PE], 'OR')) {
-      ApplicationAPI.getApplicationSetting(id).then((ok) => {
-        detail.value = { ...detail.value, ...ok.data }
+      detail.value = res.data
+      detail.value.stt_model_id = res.data.stt_model
+      detail.value.tts_model_id = res.data.tts_model
+      detail.value.tts_type = res.data.tts_type
+      saveTime.value = res.data?.update_time
+      detail.value.work_flow?.nodes
+        ?.filter((v: any) => v.id === 'base-node')
+        .map((v: any) => {
+          apiInputParams.value = v.properties.api_input_field_list
+            ? v.properties.api_input_field_list.map((v: any) => {
+                return {
+                  name: v.variable,
+                  value: v.default_value,
+                }
+              })
+            : v.properties.input_field_list
+              ? v.properties.input_field_list
+                  .filter((v: any) => v.assignment_method === 'api_input')
+                  .map((v: any) => {
+                    return {
+                      name: v.variable,
+                      value: v.default_value,
+                    }
+                  })
+              : []
+        })
+      loadSharedApi({ type: 'application', systemType: apiType.value })
+        .getAccessToken(id, loading)
+        .then((res: any) => {
+          detail.value = { ...detail.value, ...res.data }
+        })
+      workflowRef.value?.clearGraphData()
+      nextTick(() => {
+        workflowRef.value?.render(detail.value.work_flow)
+        cloneWorkFlow.value = getGraphData()
       })
-    }
-  })
+      // 企业版和专业版
+      if (hasPermission([EditionConst.IS_EE, EditionConst.IS_PE], 'OR')) {
+        loadSharedApi({ type: 'application', systemType: apiType.value })
+          .getApplicationSetting(id)
+          .then((ok: any) => {
+            detail.value = { ...detail.value, ...ok.data }
+          })
+      }
+    })
 }
 
 function saveApplication(bool?: boolean, back?: boolean) {
@@ -424,9 +442,9 @@ function saveApplication(bool?: boolean, back?: boolean) {
     work_flow: getGraphData(),
   }
   loading.value = back || false
-  application
-    .asyncPutApplication(id, obj)
-    .then((res) => {
+  loadSharedApi({ type: 'application', systemType: apiType.value })
+    .putApplication(id, obj)
+    .then(() => {
       saveTime.value = new Date()
       if (bool) {
         cloneWorkFlow.value = getGraphData()
@@ -627,5 +645,4 @@ onBeforeUnmount(() => {
     height: 600px;
   }
 }
-
 </style>

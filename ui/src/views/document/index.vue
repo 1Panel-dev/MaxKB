@@ -938,7 +938,7 @@ function rowClickHandle(row: any, column: any) {
 
   router.push({
     path: `/paragraph/${id}/${row.id}`,
-    query: { type: apiType.value, isShared: isShared.value ? 'true' : 'false' },
+    query: { from: apiType.value, isShared: isShared.value ? 'true' : 'false' },
   })
 }
 

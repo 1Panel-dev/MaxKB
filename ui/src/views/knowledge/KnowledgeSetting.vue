@@ -184,7 +184,6 @@ import { useRoute } from 'vue-router'
 import BaseForm from '@/views/knowledge/component/BaseForm.vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { t } from '@/locales'
-import { PermissionConst, RoleConst } from '@/utils/permission/data'
 import permissionMap from '@/permission'
 
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
@@ -192,13 +191,12 @@ import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 const route = useRoute()
 const {
   params: { id, folderId },
-  query: { type },
 } = route as any
 
 const apiType = computed(() => {
   if (route.path.includes('shared')) {
     return 'systemShare'
-  } else if (route.path.includes('resource-management') || type === 'systemManage') {
+  } else if (route.path.includes('resource-management')) {
     return 'systemManage'
   } else {
     return 'workspace'

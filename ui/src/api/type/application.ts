@@ -25,6 +25,7 @@ interface ApplicationFormType {
   tts_autoplay?: boolean
   stt_autosend?: boolean
   folder_id?: string
+  workspace_id?: string
 }
 interface Chunk {
   real_node_id: string

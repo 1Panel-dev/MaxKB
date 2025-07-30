@@ -144,13 +144,13 @@
   </el-drawer>
 </template>
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
-import applicationApi from '@/api/application/application'
 import { MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
 import { copyClick } from '@/utils/clipboard'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 const router = useRouter()
 const route = useRoute()
@@ -158,6 +158,13 @@ const {
   params: { id },
 } = route
 
+const apiType = computed(() => {
+  if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
 const emit = defineEmits(['refresh'])
 const auth_list = ref<Array<{ label: string; value: string }>>([])
 const limitFormRef = ref()
@@ -198,9 +205,11 @@ const open = (data: any) => {
   }
   form.value.authentication = data.authentication
   dialogVisible.value = true
-  applicationApi.getChatUserAuthType().then((ok) => {
-    auth_list.value = ok.data
-  })
+  loadSharedApi({ type: 'application', systemType: apiType.value })
+    .getChatUserAuthType()
+    .then((ok: any) => {
+      auth_list.value = ok.data
+    })
 }
 
 const submit = async (formEl: FormInstance | undefined) => {
@@ -214,12 +223,14 @@ const submit = async (formEl: FormInstance | undefined) => {
         authentication: form.value.authentication,
         authentication_value: form.value.authentication_value,
       }
-      applicationApi.putAccessToken(id as string, obj, loading).then((res) => {
-        emit('refresh')
-        // @ts-ignore
-        MsgSuccess(t('common.settingSuccess'))
-        dialogVisible.value = false
-      })
+      loadSharedApi({ type: 'application', systemType: apiType.value })
+        .putAccessToken(id as string, obj, loading)
+        .then(() => {
+          emit('refresh')
+          // @ts-ignore
+          MsgSuccess(t('common.settingSuccess'))
+          dialogVisible.value = false
+        })
     }
   })
 }

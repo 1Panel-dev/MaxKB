@@ -147,8 +147,8 @@
             <div class="flex align-center">
               <div class="mr-4">
                 <span>{{
-                    $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')
-                  }}</span>
+                  $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')
+                }}</span>
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content>
@@ -158,7 +158,7 @@
               </el-tooltip>
             </div>
           </template>
-          <el-switch size="small" v-model="form_data.is_result"/>
+          <el-switch size="small" v-model="form_data.is_result" />
         </el-form-item>
       </el-form>
     </el-card>
@@ -166,16 +166,24 @@
 </template>
 
 <script setup lang="ts">
-import {set, groupBy, create, cloneDeep} from 'lodash'
+import { set, groupBy, create, cloneDeep } from 'lodash'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
-import {ref, computed, onMounted, onActivated} from 'vue'
+import { ref, computed, onMounted, onActivated } from 'vue'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
-import type {FormInstance} from 'element-plus'
-import applicationApi from '@/api/application/application'
-import {isWorkFlow} from '@/utils/application'
-import {useRoute} from 'vue-router'
+import type { FormInstance } from 'element-plus'
+import { isWorkFlow } from '@/utils/application'
+import { useRoute } from 'vue-router'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 const route = useRoute()
+
+const apiType = computed(() => {
+  if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
 const form = {
   question_reference_address: ['start-node', 'question'],
   api_input_field_list: [],
@@ -184,10 +192,6 @@ const form = {
   image_list: ['start-node', 'image'],
   audio_list: ['start-node', 'audio'],
 }
-
-const {
-  params: {id},
-} = route as any
 
 const applicationNodeFormRef = ref<FormInstance>()
 
@@ -222,9 +226,9 @@ const update_field = () => {
     set(props.nodeModel.properties, 'status', 500)
     return
   }
-  applicationApi
+  loadSharedApi({ type: 'application', systemType: apiType.value })
     .getApplicationDetail(props.nodeModel.properties.node_data.application_id)
-    .then((ok) => {
+    .then((ok: any) => {
       const old_api_input_field_list = cloneDeep(
         props.nodeModel.properties.node_data.api_input_field_list,
       )
@@ -299,7 +303,7 @@ const update_field = () => {
         set(props.nodeModel.properties, 'status', ok.data.id ? 200 : 500)
       }
     })
-    .catch((err) => {
+    .catch((err: any) => {
       console.log(err)
       set(props.nodeModel.properties, 'status', 500)
     })
@@ -309,7 +313,7 @@ const props = defineProps<{ nodeModel: any }>()
 
 const validate = () => {
   return applicationNodeFormRef.value?.validate().catch((err) => {
-    return Promise.reject({node: props.nodeModel, errMessage: err})
+    return Promise.reject({ node: props.nodeModel, errMessage: err })
   })
 }
 

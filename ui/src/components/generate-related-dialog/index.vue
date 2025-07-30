@@ -191,27 +191,24 @@ const submitHandle = async (formEl: FormInstance) => {
 
 function getModelFn() {
   loading.value = true
-  if (props.apiType === 'systemManage') {
-    modelResourceApi
-      .getSelectModelList({ model_type: 'LLM' }, currentKnowledge.value?.workspace_id)
-      .then((res: any) => {
-        modelOptions.value = groupBy(res?.data, 'provider')
-        loading.value = false
-      })
-      .catch(() => {
-        loading.value = false
-      })
-  } else {
-    loadSharedApi({ type: 'model', systemType: props.apiType })
-      .getSelectModelList({ model_type: 'LLM' })
-      .then((res: any) => {
-        modelOptions.value = groupBy(res?.data, 'provider')
-        loading.value = false
-      })
-      .catch(() => {
-        loading.value = false
-      })
-  }
+  const obj =
+    props.apiType === 'systemManage'
+      ? {
+          model_type: 'LLM',
+          workspace_id: currentKnowledge.value?.workspace_id,
+        }
+      : {
+          model_type: 'LLM',
+        }
+  loadSharedApi({ type: 'model', systemType: props.apiType })
+    .getSelectModelList(obj)
+    .then((res: any) => {
+      modelOptions.value = groupBy(res?.data, 'provider')
+      loading.value = false
+    })
+    .catch(() => {
+      loading.value = false
+    })
 }
 
 defineExpose({ open, dialogVisible })

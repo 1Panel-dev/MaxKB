@@ -101,24 +101,31 @@
 <script setup lang="ts">
 import { ref, reactive, computed } from 'vue'
 import type { FormInstance } from 'element-plus'
-import applicationApi from '@/api/application/application'
 import { useRoute } from 'vue-router'
 import { MsgError, MsgSuccess } from '@/utils/message'
 import { copyClick } from '@/utils/clipboard'
 import { t } from '@/locales'
-
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 type PlatformType = 'wechat' | 'dingtalk' | 'wecom' | 'lark' | 'slack'
 
+const route = useRoute()
+
+const {
+  params: { id },
+} = route as any
+const apiType = computed(() => {
+  if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
+const emit = defineEmits(['refresh'])
 const formRef = ref<FormInstance>()
 const visible = ref(false)
 const loading = ref(false)
 const dataLoaded = ref(false)
 const configType = ref<PlatformType>('wechat')
-const route = useRoute()
-const emit = defineEmits(['refresh'])
-const {
-  params: { id }
-} = route as any
 
 const form = reactive<any>({
   wechat: {
@@ -127,7 +134,7 @@ const form = reactive<any>({
     token: '',
     encoding_aes_key: '',
     is_certification: false,
-    callback_url: ''
+    callback_url: '',
   },
   dingtalk: { client_id: '', client_secret: '', callback_url: '' },
   wecom: {
@@ -136,10 +143,10 @@ const form = reactive<any>({
     secret: '',
     token: '',
     encoding_aes_key: '',
-    callback_url: ''
+    callback_url: '',
   },
   lark: { app_id: '', app_secret: '', verification_token: '', callback_url: '' },
-  slack: { signing_secret: '', bot_user_token: '', callback_url: '' }
+  slack: { signing_secret: '', bot_user_token: '', callback_url: '' },
 })
 
 const rules = reactive<{ [propName: string]: any }>({
@@ -148,164 +155,164 @@ const rules = reactive<{ [propName: string]: any }>({
       {
         required: true,
         message: t('views.application.applicationAccess.wechatSetting.appIdPlaceholder'),
-        trigger: 'blur'
-      }
+        trigger: 'blur',
+      },
     ],
     app_secret: [
       {
         required: true,
         message: t('views.application.applicationAccess.wechatSetting.appSecretPlaceholder'),
-        trigger: 'blur'
-      }
+        trigger: 'blur',
+      },
     ],
     token: [
       {
         required: true,
         message: t('views.application.applicationAccess.wechatSetting.tokenPlaceholder'),
-        trigger: 'blur'
-      }
+        trigger: 'blur',
+      },
     ],
     encoding_aes_key: [
       {
         required: true,
         message: t('views.application.applicationAccess.wechatSetting.aesKeyPlaceholder'),
-        trigger: 'blur'
-      }
-    ]
+        trigger: 'blur',
+      },
+    ],
   },
   dingtalk: {
     client_id: [
       {
         required: true,
         message: t('views.application.applicationAccess.dingtalkSetting.clientIdPlaceholder'),
-        trigger: 'blur'
-      }
+        trigger: 'blur',
+      },
     ],
     client_secret: [
       {
         required: true,
         message: t('views.application.applicationAccess.dingtalkSetting.clientSecretPlaceholder'),
-        trigger: 'blur'
-      }
-    ]
+        trigger: 'blur',
+      },
+    ],
   },
   wecom: {
     app_id: [
       {
         required: true,
         message: t('views.application.applicationAccess.wecomSetting.cropIdPlaceholder'),
-        trigger: 'blur'
-      }
+        trigger: 'blur',
+      },
     ],
     agent_id: [
       {
         required: true,
         message: t('views.application.applicationAccess.wecomSetting.agentIdPlaceholder'),
-        trigger: 'blur'
-      }
+        trigger: 'blur',
+      },
     ],
     secret: [
       {
         required: true,
         message: t('views.application.applicationAccess.wecomSetting.secretPlaceholder'),
-        trigger: 'blur'
-      }
+        trigger: 'blur',
+      },
     ],
     token: [
       {
         required: true,
         message: t('views.application.applicationAccess.wecomSetting.tokenPlaceholder'),
-        trigger: 'blur'
-      }
+        trigger: 'blur',
+      },
     ],
     encoding_aes_key: [
       {
         required: true,
         message: t('views.application.applicationAccess.wecomSetting.encodingAesKeyPlaceholder'),
-        trigger: 'blur'
-      }
-    ]
+        trigger: 'blur',
+      },
+    ],
   },
   lark: {
     app_id: [
       {
         required: true,
         message: t('views.application.applicationAccess.larkSetting.appIdPlaceholder'),
-        trigger: 'blur'
-      }
+        trigger: 'blur',
+      },
     ],
     app_secret: [
       {
         required: true,
         message: t('views.application.applicationAccess.larkSetting.appSecretPlaceholder'),
-        trigger: 'blur'
-      }
+        trigger: 'blur',
+      },
     ],
     verification_token: [
       {
         required: false,
         message: t('views.application.applicationAccess.larkSetting.verificationTokenPlaceholder'),
-        trigger: 'blur'
-      }
-    ]
+        trigger: 'blur',
+      },
+    ],
   },
   slack: {
     signing_secret: [
       {
         required: true,
         message: t('views.application.applicationAccess.slackSetting.signingSecretPlaceholder'),
-        trigger: 'blur'
-      }
+        trigger: 'blur',
+      },
     ],
     bot_user_token: [
       {
         required: true,
         message: t('views.application.applicationAccess.slackSetting.botUserTokenPlaceholder'),
-        trigger: 'blur'
-      }
-    ]
-  }
+        trigger: 'blur',
+      },
+    ],
+  },
 })
 
 const configFields: { [propName: string]: { [propName: string]: any } } = {
   wechat: {
     app_id: {
       label: t('views.application.applicationAccess.wechatSetting.appId'),
-      placeholder: ''
+      placeholder: '',
     },
     app_secret: {
       label: t('views.application.applicationAccess.wechatSetting.appSecret'),
-      placeholder: ''
+      placeholder: '',
     },
     token: { label: t('views.application.applicationAccess.wechatSetting.token'), placeholder: '' },
     encoding_aes_key: {
       label: t('views.application.applicationAccess.wechatSetting.aesKey'),
-      placeholder: ''
-    }
+      placeholder: '',
+    },
   },
   dingtalk: {
     client_id: { label: 'Client ID', placeholder: '' },
-    client_secret: { label: 'Client Secret', placeholder: '' }
+    client_secret: { label: 'Client Secret', placeholder: '' },
   },
   wecom: {
     app_id: {
       label: t('views.application.applicationAccess.wecomSetting.cropId'),
-      placeholder: ''
+      placeholder: '',
     },
     agent_id: { label: 'Agent ID', placeholder: '' },
     secret: { label: 'Secret', placeholder: '' },
     token: { label: 'Token', placeholder: '' },
-    encoding_aes_key: { label: 'EncodingAESKey', placeholder: '' }
+    encoding_aes_key: { label: 'EncodingAESKey', placeholder: '' },
   },
   lark: {
     app_id: { label: 'App ID', placeholder: '' },
     app_secret: { label: 'App Secret', placeholder: '' },
-    verification_token: { label: 'Verification Token', placeholder: '' }
+    verification_token: { label: 'Verification Token', placeholder: '' },
   },
   slack: {
     signing_secret: { label: 'Signing Secret', placeholder: '' },
-    bot_user_token: { label: 'Bot User Token', placeholder: '' }
-  }
+    bot_user_token: { label: 'Bot User Token', placeholder: '' },
+  },
 }
 
 const passwordFields = new Set([
@@ -313,7 +320,7 @@ const passwordFields = new Set([
   'client_secret',
   'secret',
   'bot_user_token',
-  'signing_secret'
+  'signing_secret',
 ])
 
 const drawerTitle = computed(
@@ -323,8 +330,8 @@ const drawerTitle = computed(
       dingtalk: t('views.application.applicationAccess.dingtalkSetting.title'),
       wecom: t('views.application.applicationAccess.wecomSetting.title'),
       lark: t('views.application.applicationAccess.larkSetting.title'),
-      slack: t('views.application.applicationAccess.slackSetting.title')
-    }[configType.value])
+      slack: t('views.application.applicationAccess.slackSetting.title'),
+    })[configType.value],
 )
 
 const infoTitle = computed(
@@ -334,8 +341,8 @@ const infoTitle = computed(
       dingtalk: t('views.applicationOverview.appInfo.header'),
       wecom: t('views.applicationOverview.appInfo.header'),
       lark: t('views.applicationOverview.appInfo.header'),
-      slack: t('views.applicationOverview.appInfo.header')
-    }[configType.value])
+      slack: t('views.applicationOverview.appInfo.header'),
+    })[configType.value],
 )
 
 const passwordVisible = reactive<Record<string, boolean>>(
@@ -346,8 +353,8 @@ const passwordVisible = reactive<Record<string, boolean>>(
       }
       return acc
     },
-    {} as Record<string, boolean>
-  )
+    {} as Record<string, boolean>,
+  ),
 )
 
 const isPasswordField = (key: any) => passwordFields.has(key)
@@ -362,7 +369,7 @@ const submit = async () => {
   formRef.value?.validate(async (valid) => {
     if (valid) {
       try {
-        applicationApi
+        loadSharedApi({ type: 'application', systemType: apiType.value })
           .updatePlatformConfig(id, configType.value, form[configType.value], loading)
           .then(() => {
             MsgSuccess(t('common.saveSuccess'))
@@ -383,7 +390,10 @@ const open = async (id: string, type: PlatformType) => {
   dataLoaded.value = false
   formRef.value?.resetFields()
   try {
-    const res = await applicationApi.getPlatformConfig(id, type)
+    const res = await loadSharedApi({
+      type: 'application',
+      systemType: apiType.value,
+    }).getPlatformConfig(id, type)
     if (res.data) {
       form[configType.value] = res.data
     }
@@ -392,7 +402,8 @@ const open = async (id: string, type: PlatformType) => {
     MsgError(t('views.application.tip.loadingErrorMessage'))
   } finally {
     loading.value = false
-    form[configType.value].callback_url = `${window.location.origin}${window.MaxKB.prefix}/api/chat/${type}/${id}`
+    form[configType.value].callback_url =
+      `${window.location.origin}${window.MaxKB.prefix}/api/chat/${type}/${id}`
   }
 }
 
