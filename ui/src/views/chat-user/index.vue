@@ -47,9 +47,11 @@
           <div class="flex-between">
             <div class="flex align-center">
               <h4 class="medium ellipsis" :title="current?.name">{{ current?.name || '-' }}</h4>
-              <el-divider direction="vertical" class="mr-8 ml-8" />
+              <el-divider direction="vertical" class="mr-8 ml-8"/>
 
-              <el-icon class="color-input-placeholder"><UserFilled /></el-icon>
+              <el-icon class="color-input-placeholder">
+                <UserFilled/>
+              </el-icon>
               <span class="color-input-placeholder ml-4">
                 {{ paginationConfig.total }}
               </span>
@@ -76,16 +78,69 @@
           <div class="flex-between mb-16" style="margin-top: 18px">
             <div class="flex complex-search">
               <el-select class="complex-search__left" v-model="searchType" style="width: 120px">
-                <el-option :label="$t('views.login.loginForm.username.label')" value="name" />
+                <el-option :label="$t('views.login.loginForm.username.label')" value="username"/>
+                <el-option :label="$t('views.userManage.userForm.nick_name.label')"
+                           value="nick_name"/>
+                <el-option :label="$t('views.userManage.source.label')" value="source"/>
               </el-select>
               <el-input
-                v-if="searchType === 'name'"
-                v-model="searchForm.name"
+                v-if="searchType === 'username'"
+                v-model="searchForm.username"
                 @change="getList"
                 :placeholder="$t('common.inputPlaceholder')"
                 style="width: 220px"
                 clearable
               />
+              <el-input
+                v-else-if="searchType === 'nick_name'"
+                v-model="searchForm.nick_name"
+                @change="getList"
+                :placeholder="$t('common.inputPlaceholder')"
+                style="width: 220px"
+                clearable
+              />
+              <el-select
+                v-else-if="searchType === 'source'"
+                v-model="searchForm.source"
+                @change="getList"
+                :placeholder="$t('common.selectPlaceholder')"
+                style="width: 220px"
+                clearable
+              >
+                <el-option
+                  :label="$t('views.userManage.source.local')"
+                  value="LOCAL"
+                />
+                <el-option
+                  label="CAS"
+                  value="CAS"
+                />
+                <el-option
+                  label="LDAP"
+                  value="LDAP"
+                />
+                <el-option
+                  label="OIDC"
+                  value="OIDC"
+                />
+                <el-option
+                  label="OAuth2"
+                  value="OAuth2"
+                />
+                <el-option
+                  :label="$t('views.userManage.source.wecom')"
+                  value="wecom"
+                />
+                <el-option
+                  :label="$t('views.userManage.source.lark')"
+                  value="lark"
+                />
+                <el-option
+                  :label="$t('views.userManage.source.dingtalk')"
+                  value="dingtalk"
+                />
+              </el-select>
+
             </div>
             <div
               class="flex align-center"
@@ -121,7 +176,7 @@
               prop="nick_name"
               :label="$t('views.userManage.userForm.nick_name.label')"
             />
-            <el-table-column prop="username" :label="$t('views.login.loginForm.username.label')" />
+            <el-table-column prop="username" :label="$t('views.login.loginForm.username.label')"/>
             <el-table-column prop="source" :label="$t('views.userManage.source.label')">
               <template #default="{ row }">
                 {{
@@ -146,7 +201,8 @@
                   :indeterminate="allIndeterminate"
                   :disabled="current?.is_auth"
                   @change="handleCheckAll"
-                  >{{ $t('views.chatUser.authorization') }}</el-checkbox
+                >{{ $t('views.chatUser.authorization') }}
+                </el-checkbox
                 >
               </template>
               <template #default="{ row }">
@@ -166,22 +222,22 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, watch, reactive, computed } from 'vue'
+import {onMounted, ref, watch, reactive, computed} from 'vue'
 
-import { t } from '@/locales'
-import type { ChatUserGroupItem, ChatUserGroupUserItem } from '@/api/type/workspaceChatUser'
-import { useRoute } from 'vue-router'
-import { SourceTypeEnum } from '@/enums/common'
-import { MsgSuccess } from '@/utils/message'
-import { ComplexPermission } from '@/utils/permission/type'
-import { RoleConst, PermissionConst } from '@/utils/permission/data'
-import { hasPermission } from '@/utils/permission/index'
-import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import {t} from '@/locales'
+import type {ChatUserGroupItem, ChatUserGroupUserItem} from '@/api/type/workspaceChatUser'
+import {useRoute} from 'vue-router'
+import {SourceTypeEnum} from '@/enums/common'
+import {MsgSuccess} from '@/utils/message'
+import {ComplexPermission} from '@/utils/permission/type'
+import {RoleConst, PermissionConst} from '@/utils/permission/data'
+import {hasPermission} from '@/utils/permission/index'
+import {loadSharedApi} from '@/utils/dynamics-api/shared-api'
 
 const route = useRoute()
 
 const {
-  params: { id, folderId },
+  params: {id, folderId},
 } = route as any
 
 const permissionObj = ref<any>({
@@ -214,15 +270,17 @@ const permissionObj = ref<any>({
 })
 
 const currentPermissionKey = computed(() => {
-    if (route.path.includes('shared')) return 'SHAREDKNOWLEDGE'
-    if (route.path.includes('resource-management')) {
-      if (route.meta?.resourceType === 'KNOWLEDGE') { return 'RESOURCE_KNOWLEDGE' }
-      else if (route.meta?.resourceType === 'APPLICATION') { return 'RESOURCE_APPLICATION' }
+  if (route.path.includes('shared')) return 'SHAREDKNOWLEDGE'
+  if (route.path.includes('resource-management')) {
+    if (route.meta?.resourceType === 'KNOWLEDGE') {
+      return 'RESOURCE_KNOWLEDGE'
+    } else if (route.meta?.resourceType === 'APPLICATION') {
+      return 'RESOURCE_APPLICATION'
     }
-    return route.meta?.resourceType as string
+  }
+  return route.meta?.resourceType as string
 })
 
-console.log(currentPermissionKey.value)
 
 const resource = reactive({
   resource_id: route.params.id as string,
@@ -285,7 +343,7 @@ function clickUserGroup(item: ChatUserGroupItem) {
 }
 
 async function changeAuth() {
-  const params = [{ user_group_id: current.value?.id as string, is_auth: !current.value?.is_auth }]
+  const params = [{user_group_id: current.value?.id as string, is_auth: !current.value?.is_auth}]
   try {
     await loadSharedApi({
       type: 'chatUser',
@@ -305,9 +363,11 @@ async function changeAuth() {
 
 const rightLoading = ref(false)
 
-const searchType = ref('name')
+const searchType = ref('username')
 const searchForm = ref<Record<string, any>>({
-  name: '',
+  username: '',
+  nick_name: '',
+  source: '',
 })
 const paginationConfig = reactive({
   current_page: 1,
@@ -323,6 +383,11 @@ const isShared = computed(() => {
 
 async function getList() {
   if (!current.value?.id) return
+  const params: any = {}
+  const searchValue = searchForm.value[searchType.value as keyof typeof searchForm.value];
+  if (searchValue !== undefined && searchValue !== null && searchValue !== '') {
+    params[searchType.value] = searchValue;
+  }
   try {
     const res = await loadSharedApi({
       type: 'chatUser',
@@ -332,7 +397,7 @@ async function getList() {
       resource,
       current.value?.id,
       paginationConfig,
-      searchForm.value.name,
+      params,
       rightLoading,
     )
     // 更新缓存和回显状态

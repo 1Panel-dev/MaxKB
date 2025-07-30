@@ -29,12 +29,12 @@ const getUserGroupUserList: (
     resource: any,
     user_group_id: string,
     page: pageRequest,
-    username_or_nickname: string,
+    param?: any,
     loading?: Ref<boolean>,
-) => Promise<Result<PageList<ChatUserGroupUserItem[]>>> = (resource, user_group_id, page, username_or_nickname, loading) => {
+) => Promise<Result<PageList<ChatUserGroupUserItem[]>>> = (resource, user_group_id, page, param, loading) => {
     return get(
         `${prefix}/${resource.resource_type}/${resource.resource_id}/user_group_id/${user_group_id}/${page.current_page}/${page.page_size}`,
-        username_or_nickname ? {username_or_nickname} : undefined,
+        param,
         loading,
     )
 }

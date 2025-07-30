@@ -7,17 +7,17 @@ import type { pageRequest, PageList } from '@/api/type/common'
 
 const prefix = '/system/shared/knowledge'
 /**
- * 获取共享知识库用户组列表 
+ * 获取共享知识库用户组列表
  */
-const getUserGroupList: (resource: any, loading?: Ref<boolean>) => 
+const getUserGroupList: (resource: any, loading?: Ref<boolean>) =>
     Promise<Result<ChatUserGroupItem[]>> = (resource, loading) => {
-        return get(`${prefix}/${resource.resource_type}/${resource.resource_id}/user_group`, undefined, loading) 
+        return get(`${prefix}/${resource.resource_type}/${resource.resource_id}/user_group`, undefined, loading)
     }
 
 /*
  * 修改共享知识库用户组列表授权
  */
-const editUserGroupList: (resource: any, data: { user_group_id: string, is_auth: boolean }[], loading?: Ref<boolean>) => 
+const editUserGroupList: (resource: any, data: { user_group_id: string, is_auth: boolean }[], loading?: Ref<boolean>) =>
     Promise<Result<any>> = (resource, data, loading) => {
         return put(`${prefix}/${resource.resource_type}/${resource.resource_id}/user_group`, data, undefined, loading)
     }
@@ -29,12 +29,12 @@ const getUserGroupUserList: (
     resource: any,
     user_group_id: string,
     page: pageRequest,
-    username_or_nickname: string,
+    params?: any,
     loading?: Ref<boolean>,
-) => Promise<Result<PageList<ChatUserGroupUserItem[]>>> = (resource, user_group_id, page, username_or_nickname, loading) => {
+) => Promise<Result<PageList<ChatUserGroupUserItem[]>>> = (resource, user_group_id, page, params, loading) => {
     return get(
         `${prefix}/${resource.resource_type}/${resource.resource_id}/user_group_id/${user_group_id}/${page.current_page}/${page.page_size}`,
-        username_or_nickname ? {username_or_nickname} : undefined,
+        params,
         loading,
     )
 }

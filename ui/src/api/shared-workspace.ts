@@ -1,17 +1,17 @@
-import { Result } from '@/request/Result'
-import { get, post, del, put, exportFile, exportExcel } from '@/request/index'
-import { type Ref } from 'vue'
-import type { PageList, pageRequest } from '@/api/type/common'
-import type { knowledgeData } from '@/api/type/knowledge'
+import {Result} from '@/request/Result'
+import {get, post, del, put, exportFile, exportExcel} from '@/request/index'
+import {type Ref} from 'vue'
+import type {PageList, pageRequest} from '@/api/type/common'
+import type {knowledgeData} from '@/api/type/knowledge'
 
 import useStore from '@/stores'
-import type { ChatUserGroupItem } from './type/workspaceChatUser'
+import type {ChatUserGroupItem} from './type/workspaceChatUser'
 
 const prefix = '/system/shared'
-const prefix_workspace: any = { _value: 'workspace/' }
+const prefix_workspace: any = {_value: 'workspace/'}
 Object.defineProperty(prefix_workspace, 'value', {
   get: function () {
-    const { user } = useStore()
+    const {user} = useStore()
     return this._value + user.getWorkspaceId()
   },
 })
@@ -47,9 +47,9 @@ const getKnowledgeDetail: (knowledge_id: string, loading?: Ref<boolean>) => Prom
  * 文档分页列表
  * @param 参数  knowledge_id,
  * param {
-      "name": "string",
-      folder_id: "string",
-  }
+ "name": "string",
+ folder_id: "string",
+ }
  */
 
 const getDocumentPage: (
@@ -85,8 +85,8 @@ const getDocumentDetail: (
  * 问题分页列表
  * @param 参数  knowledge_id,
  * query {
-     "content": "string",
-   }
+ "content": "string",
+ }
  */
 
 const getProblemsPage: (
@@ -107,14 +107,14 @@ const getProblemsPage: (
  */
 const getUserGroupUserList: (
   resource: any,
-  user_group_id:string,
+  user_group_id: string,
   page: pageRequest,
-  username_or_nickname: string,
+  params?: any,
   loading?: Ref<boolean>,
-) => Promise<Result<PageList<ChatUserGroupItem[]>>> = (resource, user_group_id, page, username_or_nickname, loading) => {
-  return get (
-    `${prefix}/${prefix_workspace.value}/KNOWLEDGE/${resource.resource_id}/user_group_id/${user_group_id}/${page.current_page}/${page.page_size}`
-    ,username_or_nickname ? {username_or_nickname} : undefined, loading,
+) => Promise<Result<PageList<ChatUserGroupItem[]>>> = (resource, user_group_id, page, params, loading) => {
+  return get(
+    `${prefix}/${prefix_workspace.value}/KNOWLEDGE/${resource.resource_id}/user_group_id/${user_group_id}/${page.current_page}/${page.page_size}`,
+    params, loading,
   )
 }
 
@@ -122,16 +122,16 @@ const getUserGroupUserList: (
  * 获取工作空间下共享知识库的用户组
  */
 const getUserGroupList: (resource: any, loading?: Ref<boolean>) => Promise<Result<ChatUserGroupItem[]>> = (resource, loading) => {
-  return get (`${prefix}/${prefix_workspace.value}/KNOWLEDGE/${resource.resource_id}/user_group`, undefined, loading)
+  return get(`${prefix}/${prefix_workspace.value}/KNOWLEDGE/${resource.resource_id}/user_group`, undefined, loading)
 }
 
 /**
  * 段落分页列表
  * @param 参数 knowledge_id document_id
  * param {
-          "title": "string",
-          "content": "string",
-        }
+ "title": "string",
+ "content": "string",
+ }
  */
 const getParagraphPage: (
   knowledge_id: string,
