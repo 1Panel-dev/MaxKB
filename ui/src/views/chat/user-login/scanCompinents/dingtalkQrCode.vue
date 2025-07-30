@@ -102,26 +102,27 @@ const initActive = async () => {
       {
         redirect_uri: redirectUri,
         client_id: data.appKey,
-        scope: 'openid',
+        scope: 'openid corpid',
         response_type: 'code',
         state: 'fit2cloud-ding-chat-qr',
         prompt: 'consent',
         corpId: data.corp_id
       },
       (loginResult) => {
-        console.log(loginResult)
         const authCode = loginResult.authCode
         chatUser.dingCallback(authCode, accessToken).then(() => {
-          router.push({name: 'home'})
+          router.push({
+            name: 'chat',
+            params: {accessToken: accessToken},
+            query: route.query,
+          })
         })
       },
       (errorMsg: string) => {
-        console.log(errorMsg)
         MsgError(errorMsg)
       }
     )
   } catch (error) {
-    console.error(error)
   }
 }
 

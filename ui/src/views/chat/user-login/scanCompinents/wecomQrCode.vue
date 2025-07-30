@@ -11,18 +11,19 @@ import {
   WWLoginRedirectType,
   WWLoginType
 } from '@wecom/jssdk'
-import { ref, nextTick, defineProps } from 'vue'
-import { MsgError } from '@/utils/message'
+import {ref, nextTick, defineProps} from 'vue'
+import {MsgError} from '@/utils/message'
 import useStore from '@/stores'
-import { getBrowserLang } from '@/locales'
+import {getBrowserLang} from '@/locales'
+
 const router = useRouter()
 const route = useRoute()
 const {
   params: {accessToken},
 } = route as any
 const wwLogin = ref({})
-const obj = ref<any>({ isWeComLogin: false })
-const { chatUser } = useStore()
+const obj = ref<any>({isWeComLogin: false})
+const {chatUser} = useStore()
 
 const props = defineProps<{
   config: {
@@ -55,10 +56,14 @@ const init = async () => {
         panel_size: WWLoginPanelSizeType.small
       },
       onCheckWeComLogin: obj.value,
-      async onLoginSuccess({ code }: any) {
+      async onLoginSuccess({code}: any) {
         chatUser.wecomCallback(code, accessToken).then(() => {
           setTimeout(() => {
-            router.push({ name: 'home' })
+            router.push({
+              name: 'chat',
+              params: {accessToken: accessToken},
+              query: route.query,
+            })
           })
         })
       },
