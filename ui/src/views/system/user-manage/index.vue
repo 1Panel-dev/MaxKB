@@ -312,7 +312,7 @@ const search_form = ref<{
   username: '',
   nick_name: '',
   email: '',
-  is_active: true,
+  is_active: null,
   source: '',
 })
 
