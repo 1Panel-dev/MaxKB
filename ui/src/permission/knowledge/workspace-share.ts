@@ -11,6 +11,7 @@ const workspaceShare = {
   export: () => false,
   delete: () => false,
 
+  doc_read: () => false,  
   doc_create: () => false,
   doc_vector: () => false,
   doc_generate: () => false,
@@ -21,8 +22,10 @@ const workspaceShare = {
   doc_export: () => false,
   doc_download: () => false,
 
+  knowledge_chat_user_read: () => false,
   knowledge_chat_user_edit: () => false,
 
+  problem_read: () => false,
   problem_create: () => false,
   problem_relate: () => false,
   problem_delete: () => false,
@@ -31,6 +34,7 @@ const workspaceShare = {
   folderCreate: () => false,
   folderEdit: () => false,
   folderDelete: () => false,
+  hit_test: () => false,
 }
 
 export default workspaceShare

@@ -50,6 +50,11 @@ const systemManage = {
     ],'OR'
   ),
   // 文档
+  doc_read: () => 
+    hasPermission([
+      RoleConst.ADMIN,
+      PermissionConst.RESOURCE_KNOWLEDGE_DOCUMENT_READ
+    ],'OR'),  
   doc_create: () => hasPermission(
     [
       RoleConst.ADMIN,
@@ -104,13 +109,23 @@ const systemManage = {
       PermissionConst.RESOURCE_KNOWLEDGE_DOCUMENT_DOWNLOAD_SOURCE_FILE
     ],'OR'
   ),
-
+  
+  knowledge_chat_user_read: () => 
+    hasPermission([
+      RoleConst.ADMIN,
+      PermissionConst.RESOURCE_KNOWLEDGE_CHAT_USER_READ
+    ],'OR'),
   knowledge_chat_user_edit: () => 
     hasPermission([
       RoleConst.ADMIN,
       PermissionConst.RESOURCE_KNOWLEDGE_CHAT_USER_EDIT
     ],'OR'),
-
+  
+  problem_read: () => 
+    hasPermission([
+      RoleConst.ADMIN,
+      PermissionConst.RESOURCE_KNOWLEDGE_PROBLEM_READ
+    ],'OR'),  
   problem_create: () => 
     hasPermission([
       RoleConst.ADMIN,
@@ -139,6 +154,11 @@ const systemManage = {
   folderCreate: () => false,
   folderEdit: () => false,
   folderDelete: () => false,
+  hit_test: () => 
+    hasPermission([
+      RoleConst.ADMIN,
+      PermissionConst.RESOURCE_KNOWLEDGE_HIT_TEST
+    ], 'OR'),
 }
 
 export default systemManage

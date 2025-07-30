@@ -61,7 +61,15 @@ const DocumentRouter = {
              const to: any = get_next_route()
                if(to.params.folderId == 'share') {
               return RoleConst.USER.getWorkspaceRole()  } 
-          }
+          },
+          ()=>{
+            const to: any = get_next_route()
+              if (to.params.folderId == 'resource-management') { return RoleConst.ADMIN} 
+          },
+          ()=>{
+            const to: any = get_next_route()
+              if (to.params.folderId == 'resource-management') { return PermissionConst.RESOURCE_KNOWLEDGE_DOCUMENT_READ} 
+          },
         ],
       },
       component: () => import('@/views/document/index.vue'),
@@ -108,7 +116,15 @@ const DocumentRouter = {
              const to: any = get_next_route()
                if(to.params.folderId == 'share') {
               return RoleConst.USER.getWorkspaceRole()  } 
-          }
+          },
+          ()=>{
+            const to: any = get_next_route()
+              if (to.params.folderId == 'resource-management') { return RoleConst.ADMIN} 
+          },
+          ()=>{
+            const to: any = get_next_route()
+              if (to.params.folderId == 'resource-management') { return PermissionConst.RESOURCE_KNOWLEDGE_PROBLEM_READ} 
+          },
         ],
       },
       component: () => import('@/views/problem/index.vue'),
@@ -154,7 +170,15 @@ const DocumentRouter = {
              const to: any = get_next_route()
                if(to.params.folderId == 'share') {
               return RoleConst.USER.getWorkspaceRole()  } 
-          }
+          },
+          ()=>{
+            const to: any = get_next_route()
+              if (to.params.folderId == 'resource-management') { return RoleConst.ADMIN} 
+          },
+          ()=>{
+            const to: any = get_next_route()
+              if (to.params.folderId == 'resource-management') { return PermissionConst.RESOURCE_KNOWLEDGE_HIT_TEST} 
+          },
         ],
       },
       component: () => import('@/views/hit-test/index.vue'),
@@ -211,7 +235,15 @@ const DocumentRouter = {
              const to: any = get_next_route()
                if(to.params.folderId == 'share') {
               return RoleConst.USER.getWorkspaceRole()  } 
-          }  
+          },
+        ()=>{
+            const to: any = get_next_route()
+              if (to.params.folderId == 'resource-management') { return RoleConst.ADMIN} 
+          },
+          ()=>{
+            const to: any = get_next_route()
+              if (to.params.folderId == 'resource-management') { return PermissionConst.RESOURCE_KNOWLEDGE_CHAT_USER_READ} 
+          },    
       ]
       },
       component: () => import('@/views/chat-user/index.vue'),
@@ -258,7 +290,15 @@ const DocumentRouter = {
              const to: any = get_next_route()
                if(to.params.folderId == 'share') {
               return RoleConst.USER.getWorkspaceRole()  } 
-          }  
+          },
+          ()=>{
+            const to: any = get_next_route()
+              if (to.params.folderId == 'resource-management') { return RoleConst.ADMIN} 
+          },
+          ()=>{
+            const to: any = get_next_route()
+              if (to.params.folderId == 'resource-management') { return PermissionConst.RESOURCE_KNOWLEDGE_EDIT} 
+          },  
         ],
       },
       component: () => import('@/views/knowledge/KnowledgeSetting.vue'),

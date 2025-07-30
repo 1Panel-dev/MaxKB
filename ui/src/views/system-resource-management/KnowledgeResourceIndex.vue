@@ -146,7 +146,9 @@
               :content="$t('views.system.resource_management.management')"
               placement="top"
             >
-              <span class="mr-8">
+              <span class="mr-8"
+                v-if="ManagePermission()"
+              >
                 <el-button
                   type="primary"
                   text
@@ -178,7 +180,9 @@
                 </el-button>
               </span>
             </el-tooltip>
-            <el-dropdown trigger="click">
+            <el-dropdown trigger="click"
+              v-if="MoreFilledPermission()"
+            >
               <el-button text @click.stop>
                 <el-icon>
                   <MoreFilled />
@@ -263,6 +267,23 @@ const { user } = useStore()
 const permissionPrecise = computed(() => {
   return permissionMap['knowledge']['systemManage']
 })
+
+const ManagePermission = () => {
+  return permissionPrecise.value.doc_read() || 
+    permissionPrecise.value.problem_read() || 
+    permissionPrecise.value.edit() || 
+    permissionPrecise.value.knowledge_chat_user_read() ||
+    permissionPrecise.value.hit_test()
+}
+// sync generete edit export delete
+const MoreFilledPermission = () => {
+  return permissionPrecise.value.sync() || 
+  permissionPrecise.value.generate() || 
+  permissionPrecise.value.edit() || 
+  permissionPrecise.value.export() || 
+  permissionPrecise.value.delete()
+}
+
 
 const search_type = ref('name')
 const search_form = ref<any>({
