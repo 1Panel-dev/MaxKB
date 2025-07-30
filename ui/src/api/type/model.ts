@@ -37,6 +37,8 @@ interface ListModelRequest {
    * 供应商
    */
   provider?: string
+
+  workspace_id?: string
 }
 
 interface Model {

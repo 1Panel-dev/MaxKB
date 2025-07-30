@@ -60,6 +60,7 @@ const form = ref<knowledgeData>({
   desc: '',
   embedding_model_id: '',
 })
+const workspace_id = ref('')
 
 const rules = reactive({
   name: [
@@ -96,6 +97,10 @@ watch(
       form.value.name = value.name
       form.value.desc = value.desc
       form.value.embedding_model_id = value.embedding_model_id
+      workspace_id.value = value.workspace_id || ''
+
+      // 重新刷新模型列表
+      getSelectModel()
     }
   },
   {
@@ -115,8 +120,9 @@ function validate() {
 
 function getSelectModel() {
   loading.value = true
+  console.log(workspace_id.value)
   loadSharedApi({ type: 'model', systemType: props.apiType })
-    .getSelectModelList({ model_type: 'EMBEDDING' })
+    .getSelectModelList({ model_type: 'EMBEDDING', workspace_id: workspace_id.value })
     .then((res: any) => {
       modelOptions.value = groupBy(res?.data, 'provider')
       loading.value = false
@@ -129,6 +135,7 @@ function getSelectModel() {
 onMounted(() => {
   getSelectModel()
 })
+
 onUnmounted(() => {
   form.value = {
     name: '',

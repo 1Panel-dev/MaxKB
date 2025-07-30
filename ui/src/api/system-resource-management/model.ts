@@ -30,10 +30,9 @@ const getModelListPage: (
  */
 const getSelectModelList: (
   data?: ListModelRequest,
-  workspace_id?: string,
   loading?: Ref<boolean>,
-) => Promise<Result<Array<Model>>> = (data, workspace_id, loading) => {
-  return get(`${prefix}/workspace/${workspace_id}/model/model_list`, data, loading).then((ok) => {
+) => Promise<Result<Array<Model>>> = (data, loading) => {
+  return get(`${prefix}/model/model_list`, data, loading).then((ok) => {
     return {
       ...ok,
       data: [
