@@ -211,7 +211,6 @@ class UserManageSerializer(serializers.Serializer):
         is_active = serializers.BooleanField(
             required=False,
             label=_("Is active"),
-            default=True
         )
         source = serializers.CharField(
             required=False,
@@ -223,7 +222,7 @@ class UserManageSerializer(serializers.Serializer):
             username = self.data.get('username')
             nick_name = self.data.get('nick_name')
             email = self.data.get('email')
-            is_active = self.data.get('is_active', True)
+            is_active = self.data.get('is_active', None)
             source = self.data.get('source', None)
             query_set = QuerySet(User)
             if username is not None:

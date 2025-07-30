@@ -64,8 +64,14 @@ class AuthProfileSerializer(serializers.Serializer):
             'authentication': False
         }
         application_setting_model = DatabaseModelManage.get_model('application_setting')
-        if application_setting_model:
+        chat_platform = DatabaseModelManage.get_model('chat_platform')
+        if application_setting_model and chat_platform:
             application_setting = QuerySet(application_setting_model).filter(application_id=application_id).first()
+            types = QuerySet(chat_platform).filter(is_active=True, is_valid=True).values_list('auth_type', flat=True)
+            login_value = application_access_token.authentication_value.get('login_value', [])
+            final_login_value = list(set(login_value) & set(types))
+            if 'LOCAL' in login_value:
+                final_login_value.insert(0, 'LOCAL')
             if application_setting is not None:
                 profile = {
                     'icon': application_setting.application.icon,
@@ -74,7 +80,7 @@ class AuthProfileSerializer(serializers.Serializer):
                     'authentication': application_access_token.authentication,
                     'authentication_type': application_access_token.authentication_value.get(
                         'type', 'password'),
-                    'login_value': application_access_token.authentication_value.get('login_value', [])
+                    'login_value': final_login_value
                 }
         return profile
 
