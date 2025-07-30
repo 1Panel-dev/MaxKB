@@ -63,9 +63,7 @@
                   ? false
                   : hasPermission(
                       permissionObj[
-                        route.path.includes('shared')
-                          ? 'SHAREDKNOWLEDGE'
-                          : (route.meta?.resourceType as string)
+                        currentPermissionKey
                       ],
                       'OR',
                     )
@@ -96,9 +94,7 @@
                   ? false
                   : hasPermission(
                       permissionObj[
-                        route.path.includes('shared')
-                          ? 'SHAREDKNOWLEDGE'
-                          : (route.meta?.resourceType as string)
+                        currentPermissionKey
                       ],
                       'OR',
                     )
@@ -207,6 +203,8 @@ const permissionObj = ref<any>({
     [],
     'OR',
   ),
+  APPLICATION_KNOWLEDGE: [RoleConst.ADMIN, PermissionConst.RESOURCE_APPLICATION_CHAT_USER_EDIT],
+  RESOURCE_KNOWLEDGE: [RoleConst.ADMIN, PermissionConst.RESOURCE_KNOWLEDGE_CHAT_USER_EDIT],
   SHAREDKNOWLEDGE: new ComplexPermission(
     [RoleConst.ADMIN],
     [PermissionConst.SHARED_KNOWLEDGE_CHAT_USER_EDIT],
@@ -214,6 +212,17 @@ const permissionObj = ref<any>({
     'OR',
   ),
 })
+
+const currentPermissionKey = computed(() => {
+    if (route.path.includes('shared')) return 'SHAREDKNOWLEDGE'
+    if (route.path.includes('resource-management')) {
+      if (route.meta?.resourceType === 'KNOWLEDGE') { return 'RESOURCE_KNOWLEDGE' }
+      else if (route.meta?.resourceType === 'APPLICATION') { return 'RESOURCE_APPLICATION' }
+    }
+    return route.meta?.resourceType as string
+})
+
+console.log(currentPermissionKey.value)
 
 const resource = reactive({
   resource_id: route.params.id as string,

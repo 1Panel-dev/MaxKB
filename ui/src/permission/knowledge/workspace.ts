@@ -110,6 +110,7 @@ const workspace = {
       ],
       'OR',
     ),
+  doc_read: () => false,  
   doc_create: (source_id:string) =>
     hasPermission(
       [
@@ -200,6 +201,7 @@ const workspace = {
       ],
       'OR',
     ), 
+  knowledge_chat_user_read: (source_id:string) => false,  
   knowledge_chat_user_edit: (source_id:string) => 
     hasPermission(
       [
@@ -209,7 +211,8 @@ const workspace = {
         PermissionConst.KNOWLEDGE_CHAT_USER_EDIT.getWorkspacePermissionWorkspaceManageRole,
       ]
       ,'OR'
-    ),  
+    ),
+  problem_read: () => false,    
   problem_create: (source_id:string) =>
     hasPermission(
       [
@@ -250,6 +253,7 @@ const workspace = {
       ],
       'OR',
     ),
+  hit_test: () => false,  
 }
 
 export default workspace

@@ -60,6 +60,7 @@ const share = {
       'OR'
     ),
   
+  doc_read: () => false,  
   doc_create: () => 
     hasPermission (
       [
@@ -140,6 +141,7 @@ const share = {
       ],
       'OR'
     ),
+  knowledge_chat_user_read: () => false,  
   knowledge_chat_user_edit: () => 
     hasPermission(
       [
@@ -147,8 +149,8 @@ const share = {
         PermissionConst.SHARED_KNOWLEDGE_CHAT_USER_EDIT
       ],
       'OR'
-    )
-    ,
+    ),
+  problem_read: () => false,  
   problem_relate: () => 
     hasPermission (
       [
@@ -176,5 +178,6 @@ const share = {
   folderCreate: () => false,
   folderEdit: () => false,
   folderDelete: () => false,
+  hit_test: () => false,
 }
 export default share
