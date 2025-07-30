@@ -111,7 +111,7 @@ def page_not_found(request, exception):
             return HttpResponseRedirect(a)
         index_path = os.path.join(PROJECT_DIR, 'apps', "static", 'chat', 'index.html')
         content = get_index_html(index_path)
-        content = content.replace("prefix: '/chat'", f"prefix: {CONFIG.get_chat_path()}")
+        content = content.replace("prefix: '/chat'", f"prefix: '{CONFIG.get_chat_path()}'")
         if not os.path.exists(index_path):
             return HttpResponse("页面不存在", status=404)
         return HttpResponse(content, status=200)
