@@ -69,9 +69,9 @@ jobs:
           else
             DOCKER_IMAGE_TAGS="--tag ${DOCKER_IMAGE}:${TAG_NAME}"
           fi
-          echo ::set-output name=buildx_args::--platform ${DOCKER_PLATFORMS} --memory-swap -1 \
+          echo "buildx_args=--platform ${DOCKER_PLATFORMS} --memory-swap -1 \
             --build-arg DOCKER_IMAGE_TAG=${{ github.event.inputs.dockerImageTag }} --build-arg BUILD_AT=$(TZ=Asia/Shanghai date +'%Y-%m-%dT%H:%M') --build-arg GITHUB_COMMIT=`git rev-parse --short HEAD` --no-cache \
-            ${DOCKER_IMAGE_TAGS} .
+            ${DOCKER_IMAGE_TAGS} ." >> $GITHUB_OUTPUT
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
         with:
@@ -130,9 +130,9 @@ jobs:
           else
             DOCKER_IMAGE_TAGS="--tag ${DOCKER_IMAGE}:${TAG_NAME}"
           fi
-          echo ::set-output name=buildx_args::--platform ${DOCKER_PLATFORMS} --memory-swap -1 \
+          echo "buildx_args=--platform ${DOCKER_PLATFORMS} --memory-swap -1 \
             --build-arg DOCKER_IMAGE_TAG=${{ github.event.inputs.dockerImageTag }} --build-arg BUILD_AT=$(TZ=Asia/Shanghai date +'%Y-%m-%dT%H:%M') --build-arg GITHUB_COMMIT=`git rev-parse --short HEAD` --no-cache \
-            ${DOCKER_IMAGE_TAGS} .
+            ${DOCKER_IMAGE_TAGS} ." >> $GITHUB_OUTPUT
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
         with:
