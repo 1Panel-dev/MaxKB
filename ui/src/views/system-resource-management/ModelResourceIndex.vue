@@ -169,7 +169,7 @@
                   type="primary"
                   text
                   :title="$t('common.modify')"
-                  v-if="permissionPrecise.modify(row.id)"
+                  v-if="permissionPrecise.modify()"
                   @click.stop="openEditModel(row)"
                 >
                   <el-icon><EditPen /></el-icon>
@@ -191,7 +191,7 @@
                       row.model_type === 'LLM' ||
                       row.model_type === 'IMAGE' ||
                       row.model_type === 'TTI') &&
-                    permissionPrecise.paramSetting(row.id)
+                    permissionPrecise.paramSetting()
                   "
                   @click.stop="openParamSetting(row)"
                 >
@@ -205,7 +205,7 @@
                   type="primary"
                   text
                   :title="$t('common.delete')"
-                  v-if="permissionPrecise.delete(row.id)"
+                  v-if="permissionPrecise.delete()"
                   @click.stop="deleteModel(row)"
                 >
                   <el-icon><Delete /></el-icon>
