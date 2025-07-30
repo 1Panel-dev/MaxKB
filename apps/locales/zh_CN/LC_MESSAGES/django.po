@@ -8650,9 +8650,6 @@ msgstr "文件不存在, 仅支持手动上传的文档"
 msgid "Resource"
 msgstr "资源管理"
 
-msgid "Unsupported sync type"
-msgstr "不支持的同步类型"
-
 msgid "LDAP configuration not found or not active"
 msgstr "LDAP 配置未找到或未激活"
 

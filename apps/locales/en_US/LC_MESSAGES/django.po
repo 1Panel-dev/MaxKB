@@ -8524,9 +8524,6 @@ msgstr ""
 msgid "Resource"
 msgstr "Resource Management"
 
-msgid "Unsupported sync type"
-msgstr ""
-
 msgid "LDAP configuration not found or not active"
 msgstr ""
 
