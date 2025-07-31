@@ -277,12 +277,14 @@ const validate = () => {
   })
 }
 
+const application = getApplicationDetail()
+
 function getSelectModel() {
   const obj =
     apiType.value === 'systemManage'
       ? {
           model_type: 'LLM',
-          // workspace_id: workspace,
+          workspace_id: application.value?.workspace_id,
         }
       : {
           model_type: 'LLM',
@@ -333,8 +335,6 @@ function submitMcpServersDialog(config: any) {
 }
 
 onMounted(() => {
-  const application = getApplicationDetail()
-  console.log(application.value)
   getSelectModel()
   if (typeof props.nodeModel.properties.node_data?.is_result === 'undefined') {
     if (isLastNode(props.nodeModel)) {

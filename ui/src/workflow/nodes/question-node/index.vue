@@ -136,12 +136,12 @@ import { set, groupBy } from 'lodash'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import AIModeParamSettingDialog from '@/views/application/component/AIModeParamSettingDialog.vue'
 import type { FormInstance } from 'element-plus'
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, inject } from 'vue'
 import { isLastNode } from '@/workflow/common/data'
 import { t } from '@/locales'
 import { useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
-
+const getApplicationDetail = inject('getApplicationDetail') as any
 const route = useRoute()
 
 const {
@@ -228,12 +228,13 @@ const validate = () => {
   })
 }
 
+const application = getApplicationDetail()
 function getSelectModel() {
   const obj =
     apiType.value === 'systemManage'
       ? {
           model_type: 'LLM',
-          // workspace_id: workspace,
+          workspace_id: application.value?.workspace_id,
         }
       : {
           model_type: 'LLM',

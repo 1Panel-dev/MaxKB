@@ -5,12 +5,12 @@
     </template>
     <template #title>
       <div class="flex" style="height: 22px">
-        <span class="ellipsis-1 mb-4" :title="model.name" style="width: 80%">
+        <span class="ellipsis-1 mb-4" :title="model.name" style="max-width: 80%">
           {{ model.name }}
         </span>
         <span v-if="currentModel.status === 'ERROR'">
           <el-tooltip effect="dark" :content="errMessage" placement="top">
-            <el-icon class="color-danger ml-4" size="18"><Warning /></el-icon>
+            <el-icon class="color-danger ml-4" size="18"><WarningFilled /></el-icon>
           </el-tooltip>
         </span>
         <span v-if="currentModel.status === 'PAUSE_DOWNLOAD'">
@@ -19,7 +19,7 @@
             :content="`${$t('views.model.modelForm.base_model.label')}: ${props.model.model_name} ${$t('views.model.tip.downloadError')}`"
             placement="top"
           >
-            <el-icon class="color-danger ml-4" size="18"><Warning /></el-icon>
+            <el-icon class="color-danger ml-4" size="18"><WarningFilled /></el-icon>
           </el-tooltip>
         </span>
       </div>

@@ -170,7 +170,7 @@
 import { groupBy, set } from 'lodash'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import type { FormInstance } from 'element-plus'
-import { ref, computed, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted, nextTick, inject } from 'vue'
 import { MsgError, MsgSuccess, MsgWarning } from '@/utils/message'
 import { t } from '@/locales'
 import TTSModeParamSettingDialog from '@/views/application/component/TTSModeParamSettingDialog.vue'
@@ -179,7 +179,7 @@ import UserInputFieldTable from './component/UserInputFieldTable.vue'
 import FileUploadSettingDialog from '@/workflow/nodes/base-node/component/FileUploadSettingDialog.vue'
 import { useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
-
+const getApplicationDetail = inject('getApplicationDetail') as any
 const route = useRoute()
 
 const {
@@ -261,12 +261,13 @@ const validate = () => {
   })
 }
 
+const application = getApplicationDetail()
 function getSTTModel() {
   const obj =
     apiType.value === 'systemManage'
       ? {
           model_type: 'STT',
-          // workspace_id: workspace,
+          workspace_id: application.value?.workspace_id,
         }
       : {
           model_type: 'STT',
@@ -283,7 +284,7 @@ function getTTSModel() {
     apiType.value === 'systemManage'
       ? {
           model_type: 'TTS',
-          // workspace_id: workspace,
+          workspace_id: application.value?.workspace_id,
         }
       : {
           model_type: 'TTS',

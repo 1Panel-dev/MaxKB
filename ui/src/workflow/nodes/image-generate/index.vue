@@ -153,14 +153,14 @@
 
 <script setup lang="ts">
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
-import { computed, nextTick, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref, inject } from 'vue'
 import { groupBy, set } from 'lodash'
 import type { FormInstance } from 'element-plus'
 import AIModeParamSettingDialog from '@/views/application/component/AIModeParamSettingDialog.vue'
 import { t } from '@/locales'
 import { useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
-
+const getApplicationDetail = inject('getApplicationDetail') as any
 const route = useRoute()
 
 const {
@@ -225,12 +225,13 @@ const form_data = computed({
   },
 })
 
+const application = getApplicationDetail()
 function getSelectModel() {
   const obj =
     apiType.value === 'systemManage'
       ? {
           model_type: 'TTI',
-          // workspace_id: workspace,
+          workspace_id: application.value?.workspace_id,
         }
       : {
           model_type: 'TTI',

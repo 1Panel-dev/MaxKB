@@ -184,10 +184,10 @@ import { set, cloneDeep, groupBy } from 'lodash'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import ParamSettingDialog from './ParamSettingDialog.vue'
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, inject } from 'vue'
 import { useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
-
+const getApplicationDetail = inject('getApplicationDetail') as any
 const route = useRoute()
 
 const {
@@ -251,12 +251,14 @@ const form_data = computed({
 function refreshParam(data: any) {
   set(props.nodeModel.properties.node_data, 'reranker_setting', data)
 }
+
+const application = getApplicationDetail()
 function getSelectModel() {
   const obj =
     apiType.value === 'systemManage'
       ? {
           model_type: 'RERANKER',
-          // workspace_id: workspace,
+          workspace_id: application.value?.workspace_id,
         }
       : {
           model_type: 'RERANKER',
