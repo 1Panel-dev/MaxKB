@@ -16,6 +16,7 @@ class BaseSpeechToTextNode(ISpeechToTextNode):
 
     def save_context(self, details, workflow_manage):
         self.context['answer'] = details.get('answer')
+        self.context['result'] = details.get('answer')
         if self.node_params.get('is_result', False):
             self.answer_text = details.get('answer')
 
