@@ -10,6 +10,7 @@ import logging
 import traceback
 
 from rest_framework.exceptions import ValidationError, ErrorDetail, APIException
+from rest_framework.utils.serializer_helpers import ReturnDict
 from rest_framework.views import exception_handler
 
 from common import result
@@ -71,7 +72,10 @@ def find_err_detail(exc_detail):
             if isinstance(_value, ErrorDetail):
                 return f"{_label}:{find_err_detail(_value)}"
             if isinstance(_value, dict) and len(_value.keys()) > 0:
-                return find_err_detail(_value)
+                try:
+                    return find_err_detail(ReturnDict(_value, serializer=exc_detail.serializer.fields[key]))
+                except Exception as e:
+                    return _value
     if isinstance(exc_detail, list):
         for v in exc_detail:
             r = find_err_detail(v)
