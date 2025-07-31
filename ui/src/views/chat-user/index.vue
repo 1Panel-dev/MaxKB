@@ -259,7 +259,7 @@ const permissionObj = ref<any>({
     [],
     'OR',
   ),
-  APPLICATION_KNOWLEDGE: [RoleConst.ADMIN, PermissionConst.RESOURCE_APPLICATION_CHAT_USER_EDIT],
+  RESOURCE_APPLICATION: [RoleConst.ADMIN, PermissionConst.RESOURCE_APPLICATION_CHAT_USER_EDIT],
   RESOURCE_KNOWLEDGE: [RoleConst.ADMIN, PermissionConst.RESOURCE_KNOWLEDGE_CHAT_USER_EDIT],
   SHAREDKNOWLEDGE: new ComplexPermission(
     [RoleConst.ADMIN],

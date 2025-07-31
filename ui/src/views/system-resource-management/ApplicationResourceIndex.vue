@@ -241,19 +241,26 @@
               effect="dark"
               :content="$t('views.system.resource_management.management')"
               placement="top"
+              v-if="managePermission()"
             >
               <span class="mr-8">
                 <el-button
                   type="primary"
                   text
                   :title="$t('views.system.resource_management.management')"
-                  @click="goApp(row)"
+                  @click="
+                    router.push({
+                      path: `/application/resource-management/${row.id}/${row.type}/overview`,
+                    })
+                  "
                 >
                   <AppIcon iconName="app-admin-operation"></AppIcon>
                 </el-button>
               </span>
             </el-tooltip>
-            <el-dropdown trigger="click">
+            <el-dropdown trigger="click"
+              v-if="MoreFilledPermission()"
+            >
               <el-button text @click.stop>
                 <el-icon>
                   <MoreFilled />
@@ -295,9 +302,6 @@ import { datetimeFormat } from '@/utils/time'
 import { loadPermissionApi } from '@/utils/dynamics-api/permission-api.ts'
 import { isWorkFlow } from '@/utils/application.ts'
 import UserApi from '@/api/user/user.ts'
-import { hasPermission } from '@/utils/permission'
-import { ComplexPermission } from '@/utils/permission/type'
-import { EditionConst, PermissionConst, RoleConst } from '@/utils/permission/data'
 import permissionMap from '@/permission'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 
@@ -308,6 +312,19 @@ const { user, application } = useStore()
 const permissionPrecise = computed(() => {
   return permissionMap['application']['systemManage']
 })
+
+const managePermission = () => {
+  return permissionPrecise.value.overview_read() || 
+  permissionPrecise.value.access_read() || 
+  permissionPrecise.value.edit() || 
+  permissionPrecise.value.chat_log_read() || 
+  permissionPrecise.value.chat_user_read()
+}
+
+const MoreFilledPermission = () => {
+  return permissionPrecise.value.export() || 
+  permissionPrecise.value.delete()
+}
 
 const apiInputParams = ref([])
 function toChat(row: any) {
@@ -396,131 +413,6 @@ const paginationConfig = reactive({
   total: 0,
 })
 
-const goApp = (item: any) => {
-  router.push({ path: get_route(item) })
-}
-
-const get_route = (item: any) => {
-  if (
-    hasPermission(
-      [
-        new ComplexPermission(
-          [RoleConst.USER],
-          [PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(item.id)],
-          [],
-          'AND',
-        ),
-        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-        PermissionConst.APPLICATION_OVERVIEW_READ.getWorkspacePermissionWorkspaceManageRole,
-        PermissionConst.APPLICATION_OVERVIEW_READ.getApplicationWorkspaceResourcePermission(
-          item.id,
-        ),
-      ],
-      'OR',
-    )
-  ) {
-    return `/application/resource-management/${item.id}/${item.type}/overview`
-  } else if (
-    hasPermission(
-      [
-        new ComplexPermission(
-          [RoleConst.USER],
-          [PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(item.id)],
-          [],
-          'AND',
-        ),
-        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-        PermissionConst.APPLICATION_EDIT.getWorkspacePermissionWorkspaceManageRole,
-        PermissionConst.APPLICATION_EDIT.getApplicationWorkspaceResourcePermission(item.id),
-      ],
-      'OR',
-    )
-  ) {
-    if (item.type == 'WORK_FLOW') {
-      return `/application/resource-management/${item.id}/workflow`
-    } else {
-      return `/application/resource-management/${item.id}/${item.type}/setting`
-    }
-  } else if (
-    hasPermission(
-      [
-        new ComplexPermission(
-          [RoleConst.USER],
-          [PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(item.id)],
-          [EditionConst.IS_EE, EditionConst.IS_PE],
-          'AND',
-        ),
-        new ComplexPermission(
-          [RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
-          [PermissionConst.APPLICATION_ACCESS_READ.getWorkspacePermissionWorkspaceManageRole],
-          [EditionConst.IS_EE, EditionConst.IS_PE],
-          'OR',
-        ),
-        new ComplexPermission(
-          [],
-          [
-            PermissionConst.APPLICATION_ACCESS_READ.getApplicationWorkspaceResourcePermission(
-              item.id,
-            ),
-          ],
-          [EditionConst.IS_EE, EditionConst.IS_PE],
-          'OR',
-        ),
-      ],
-      'OR',
-    )
-  ) {
-    return `/application/resource-management/${item.id}/${item.type}/access`
-  } else if (
-    hasPermission(
-      [
-        new ComplexPermission(
-          [RoleConst.USER],
-          [PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(item.id)],
-          [EditionConst.IS_EE, EditionConst.IS_PE],
-          'AND',
-        ),
-        new ComplexPermission(
-          [RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
-          [PermissionConst.APPLICATION_CHAT_USER_READ.getWorkspacePermissionWorkspaceManageRole],
-          [EditionConst.IS_EE, EditionConst.IS_PE],
-          'OR',
-        ),
-        new ComplexPermission(
-          [],
-          [
-            PermissionConst.APPLICATION_CHAT_USER_READ.getApplicationWorkspaceResourcePermission(
-              item.id,
-            ),
-          ],
-          [EditionConst.IS_EE, EditionConst.IS_PE],
-          'OR',
-        ),
-      ],
-      'OR',
-    )
-  ) {
-    return `/application/resource-management/${item.id}/${item.type}/chat-user`
-  } else if (
-    hasPermission(
-      [
-        new ComplexPermission(
-          [RoleConst.USER],
-          [PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(item.id)],
-          [],
-          'AND',
-        ),
-        PermissionConst.APPLICATION_CHAT_LOG_READ.getWorkspacePermissionWorkspaceManageRole,
-        PermissionConst.APPLICATION_CHAT_LOG_READ.getApplicationWorkspaceResourcePermission(
-          item.id,
-        ),
-      ],
-      'OR',
-    )
-  ) {
-    return `/application/resource-management/${item.id}/${item.type}/chat-log`
-  } else return `/system/resource-management/application/`
-}
 
 const workspaceOptions = ref<any[]>([])
 const workspaceVisible = ref(false)

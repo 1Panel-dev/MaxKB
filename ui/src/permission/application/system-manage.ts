@@ -102,5 +102,34 @@ const systemManage = {
             ],
             'OR'
     ),
+    overview_read: () => 
+      hasPermission(
+        [
+          RoleConst.ADMIN,
+          PermissionConst.RESOURCE_APPLICATION_OVERVIEW_READ
+        ],
+        'OR'
+    ),
+    access_read: () => 
+      hasPermission(
+        [
+          RoleConst.ADMIN,
+          PermissionConst.RESOURCE_APPLICATION_ACCESS_READ
+        ],'OR'    
+    ),
+    chat_user_read: () => 
+      hasPermission(
+        [
+          RoleConst.ADMIN,
+          PermissionConst.RESOURCE_APPLICATION_CHAT_USER_READ
+        ],'OR'
+    ),
+    chat_log_read: () => 
+      hasPermission(
+        [
+          RoleConst.ADMIN,
+          PermissionConst.RESOURCE_APPLICATION_CHAT_LOG_READ
+        ],
+        'OR')
 }
 export default systemManage
