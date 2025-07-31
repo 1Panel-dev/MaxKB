@@ -172,7 +172,7 @@
 import { cloneDeep, set, groupBy } from 'lodash'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import type { FormInstance } from 'element-plus'
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, inject } from 'vue'
 import { isLastNode } from '@/workflow/common/data'
 import AIModeParamSettingDialog from '@/views/application/component/AIModeParamSettingDialog.vue'
 import { t } from '@/locales'
@@ -180,7 +180,7 @@ import ReasoningParamSettingDialog from '@/views/application/component/Reasoning
 import McpServersDialog from '@/views/application/component/McpServersDialog.vue'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { useRoute } from 'vue-router'
-
+const getApplicationDetail = inject('getApplicationDetail') as any
 const route = useRoute()
 
 const {
@@ -333,6 +333,8 @@ function submitMcpServersDialog(config: any) {
 }
 
 onMounted(() => {
+  const application = getApplicationDetail()
+  console.log(application.value)
   getSelectModel()
   if (typeof props.nodeModel.properties.node_data?.is_result === 'undefined') {
     if (isLastNode(props.nodeModel)) {
