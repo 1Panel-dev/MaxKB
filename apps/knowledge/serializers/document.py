@@ -606,8 +606,7 @@ class DocumentSerializers(serializers.Serializer):
             return FileSerializer.Operate(data={'id': file.id}).get(with_valid=True)
 
         def one(self, with_valid=False):
-            if with_valid:
-                self.is_valid(raise_exception=True)
+            self.is_valid(raise_exception=True)
             query_set = QuerySet(model=Document)
             query_set = query_set.filter(**{'id': self.data.get("document_id")})
             return native_search({

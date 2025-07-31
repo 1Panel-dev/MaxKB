@@ -361,6 +361,7 @@ class ParagraphSerializers(serializers.Serializer):
                 raise AppApiException(500, _('Knowledge id does not exist'))
 
         def get_query_set(self):
+            self.is_valid()
             query_set = QuerySet(model=Paragraph)
             query_set = query_set.filter(
                 **{'knowledge_id': self.data.get('knowledge_id'), 'document_id': self.data.get("document_id")})
