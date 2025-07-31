@@ -9,13 +9,15 @@
           </div>
         </template>
         <div class="mb-16">
-          <el-text type="info"
-            >{{ item.content.length }} {{ $t('views.paragraph.title') }}</el-text
-          >
+          <el-text type="info">{{ item.content.length }} {{ $t('views.paragraph.title') }}</el-text>
         </div>
         <div class="paragraph-list" v-if="activeName == index">
           <el-scrollbar>
-            <ParagraphList v-model="item.content" :isConnect="isConnect" :knowledge-id="knowledgeId"/>
+            <ParagraphList
+              v-model="item.content"
+              :isConnect="isConnect"
+              :knowledge-id="knowledgeId"
+            />
           </el-scrollbar>
         </div>
       </el-tab-pane>
@@ -30,10 +32,10 @@ import ParagraphList from './ParagraphList.vue'
 defineProps({
   data: {
     type: Array<any>,
-    default: () => []
+    default: () => [],
   },
   isConnect: Boolean,
-  knowledgeId: String
+  knowledgeId: String,
 })
 
 const activeName = ref(0)
@@ -66,6 +68,6 @@ const activeName = ref(0)
   }
 }
 .paragraph-list {
-  height: calc(var(--create-dataset-height) - 101px);
+  height: calc(100vh - 319px);
 }
 </style>
