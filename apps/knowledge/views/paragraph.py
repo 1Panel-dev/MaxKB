@@ -44,7 +44,6 @@ class ParagraphView(APIView):
                 'document_id': document_id
             }
         )
-        q.is_valid(raise_exception=True)
         return result.success(q.list())
 
     @extend_schema(
@@ -438,7 +437,6 @@ class ParagraphView(APIView):
                     'document_id': document_id
                 }
             )
-            d.is_valid(raise_exception=True)
             return result.success(d.page(current_page, page_size))
 
     class AdjustPosition(APIView):
