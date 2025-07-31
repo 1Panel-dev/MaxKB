@@ -14,8 +14,6 @@ class BaseMcpNode(IMcpNode):
         self.context['result'] = details.get('result')
         self.context['tool_params'] = details.get('tool_params')
         self.context['mcp_tool'] = details.get('mcp_tool')
-        if self.node_params.get('is_result', False):
-            self.answer_text = details.get('result')
 
     def execute(self, mcp_servers, mcp_server, mcp_tool, tool_params, **kwargs) -> NodeResult:
         servers = json.loads(mcp_servers)

@@ -38,6 +38,7 @@ def bytes_to_uploaded_file(file_bytes, file_name="generated_audio.mp3"):
 class BaseTextToSpeechNode(ITextToSpeechNode):
     def save_context(self, details, workflow_manage):
         self.context['answer'] = details.get('answer')
+        self.context['result'] = details.get('result')
         if self.node_params.get('is_result', False):
             self.answer_text = details.get('answer')
 
