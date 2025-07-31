@@ -54,7 +54,7 @@ const props = defineProps<{
 
 const emit = defineEmits(['newChat', 'clickLog', 'deleteLog', 'refreshFieldTitle', 'clearChat'])
 
-const { chatUser, chatLog } = useStore()
+const { chatUser } = useStore()
 
 const clearChat = () => {
   emit('clearChat')
