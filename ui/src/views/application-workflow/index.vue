@@ -135,7 +135,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, computed, nextTick } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed, nextTick, provide } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import type { Action } from 'element-plus'
 import Workflow from '@/workflow/index.vue'
@@ -152,7 +152,7 @@ import { t } from '@/locales'
 import { ComplexPermission } from '@/utils/permission/type'
 import { EditionConst, PermissionConst, RoleConst } from '@/utils/permission/data'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
-
+provide('getApplicationDetail', () => detail)
 const { theme } = useStore()
 const router = useRouter()
 const route = useRoute()
