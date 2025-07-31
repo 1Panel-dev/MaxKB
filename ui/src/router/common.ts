@@ -71,14 +71,20 @@ export const getPermissionRoute = (routes: Array<RouteRecordRaw>, to: RouteLocat
     )
   })
 
-  if (route?.name && route.name !== to.name) {
-    return { name: route?.name, params: to.params }
+  const finalRoute =
+    route?.children && route.children.length > 0
+      ? findAccessibleRoute(route.children) || route
+      : route
+
+  if (finalRoute?.name && finalRoute.name !== to.name) {
+    return { name: finalRoute.name, params: to.params }
   }
 
   const globalRoute = findAccessibleRoute(routes)
   if (globalRoute && globalRoute.name !== to.name) {
-    return { name: globalRoute.name, params: to.params}
+    return { name: globalRoute.name, params: to.params }
   }
+
   return { name: 'noPermission' }
 }
 

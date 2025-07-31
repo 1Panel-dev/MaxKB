@@ -281,7 +281,6 @@ const currentPermissionKey = computed(() => {
   return route.meta?.resourceType as string
 })
 
-
 const resource = reactive({
   resource_id: route.params.id as string,
   resource_type: route.meta.resourceType as string,
