@@ -1,6 +1,6 @@
 SELECT model."id"::text, model."name",
        model.model_name,
-       model.meta,
+       model.meta::json as meta,
        model.credential,
        model.model_params_form,
        model.model_type,
