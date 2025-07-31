@@ -1212,10 +1212,6 @@ class PermissionConstants(Enum):
         group=Group.SYSTEM_RES_APPLICATION, operate=Operate.DEBUG, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.RESOURCE_APPLICATION]
     )
-    RESOURCE_APPLICATION_IMPORT = Permission(
-        group=Group.SYSTEM_RES_APPLICATION, operate=Operate.IMPORT, role_list=[RoleConstants.ADMIN],
-        parent_group=[SystemGroup.RESOURCE_APPLICATION]
-    )
     RESOURCE_APPLICATION_EXPORT = Permission(
         group=Group.SYSTEM_RES_APPLICATION, operate=Operate.EXPORT, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.RESOURCE_APPLICATION]
