@@ -206,7 +206,7 @@ class ApplicationCreateSerializer(serializers.Serializer):
                                                    min_value=0,
                                                    max_value=1024,
                                                    label=_("Historical chat records"))
-        prologue = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=102400,
+        prologue = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=40960,
                                          label=_("Opening remarks"))
         knowledge_id_list = serializers.ListSerializer(required=False, child=serializers.UUIDField(required=True),
                                                        allow_null=True,
