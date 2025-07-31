@@ -33,7 +33,16 @@ const ApplicationDetailRouter = {
             return PermissionConst.APPLICATION_OVERVIEW_READ.getApplicationWorkspaceResourcePermission(
               to ? to.params.id : '',
             )
-          }
+          },
+          () => {
+            const to: any = get_next_route()
+            if (to.path.includes('resource-management')) {return RoleConst.ADMIN}
+          },
+          () => {
+            const to: any = get_next_route()
+            console.log('ss',to)
+            if (to.path.includes('resource-management')) { return PermissionConst.RESOURCE_APPLICATION_OVERVIEW_READ} 
+          },
         ]
       },
       component: () => import('@/views/application-overview/index.vue'),
@@ -59,7 +68,15 @@ const ApplicationDetailRouter = {
             return PermissionConst.APPLICATION_EDIT.getApplicationWorkspaceResourcePermission(
               to ? to.params.id : '',
             )
-          }
+          },
+          () => {
+            const to: any = get_next_route()
+            if (to.path.includes('resource-management')) {return RoleConst.ADMIN}
+          },
+          ()=>{
+            const to: any = get_next_route()
+              if (to.path.includes('resource-management')) { return PermissionConst.RESOURCE_APPLICATION_EDIT} 
+          },
         ]
       },
       component: () => import('@/views/application/ApplicationSetting.vue'),
@@ -84,6 +101,14 @@ const ApplicationDetailRouter = {
             return PermissionConst.APPLICATION_ACCESS_READ.getApplicationWorkspaceResourcePermission(
               to ? to.params.id : '',)
           }],[EditionConst.IS_EE, EditionConst.IS_PE],'OR'),
+          () => {
+            const to: any = get_next_route()
+            if (to.path.includes('resource-management')) {return RoleConst.ADMIN}
+          },
+          ()=>{
+            const to: any = get_next_route()
+              if (to.path.includes('resource-management')) { return PermissionConst.RESOURCE_APPLICATION_ACCESS_READ} 
+          },
         ]
       },
       component: () => import('@/views/application/ApplicationAccess.vue'),
@@ -109,7 +134,15 @@ const ApplicationDetailRouter = {
             const to: any = get_next_route()
             return new ComplexPermission([],[PermissionConst.APPLICATION_CHAT_USER_READ.getApplicationWorkspaceResourcePermission(
               to ? to.params.id : '',)],[EditionConst.IS_EE, EditionConst.IS_PE],'OR')
-          }
+          },
+          () => {
+            const to: any = get_next_route()
+            if (to.path.includes('resource-management')) {return RoleConst.ADMIN}
+          },
+          ()=>{
+            const to: any = get_next_route()
+              if (to.path.includes('resource-management')) { return PermissionConst.RESOURCE_APPLICATION_CHAT_USER_READ} 
+          },
         ]
       },
       component: () => import('@/views/chat-user/index.vue'),
@@ -135,7 +168,15 @@ const ApplicationDetailRouter = {
             return PermissionConst.APPLICATION_CHAT_LOG_READ.getApplicationWorkspaceResourcePermission(
               to ? to.params.id : '',
             )
-          }
+          },
+          () => {
+            const to: any = get_next_route()
+            if (to.path.includes('resource-management')) {return RoleConst.ADMIN}
+          },
+          ()=>{
+            const to: any = get_next_route()
+              if (to.path.includes('resource-management')) { return PermissionConst.RESOURCE_APPLICATION_CHAT_LOG_READ} 
+          },
         ]
       },
       component: () => import('@/views/chat-log/index.vue'),

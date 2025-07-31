@@ -164,6 +164,10 @@ const workspace = {
             ],
             'OR'
     ),
+    overview_read: () => false,
+    access_read: () => false,
+    chat_user_read: () => false,
+    chat_log_read: () => false
 }
 
 
