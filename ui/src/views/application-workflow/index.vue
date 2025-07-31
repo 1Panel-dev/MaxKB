@@ -157,7 +157,7 @@ const { theme } = useStore()
 const router = useRouter()
 const route = useRoute()
 const {
-  params: { id },
+  params: { id, from },
 } = route as any
 const apiType = computed(() => {
   if (route.path.includes('resource-management')) {
@@ -479,7 +479,7 @@ const get_route = () => {
       'OR',
     )
   ) {
-    return `/application/${id}/WORK_FLOW/overview`
+    return `/application/${from}/${id}/WORK_FLOW/overview`
   } else if (
     hasPermission(
       [
@@ -505,7 +505,7 @@ const get_route = () => {
       'OR',
     )
   ) {
-    return `/application/${id}/WORK_FLOW/access`
+    return `/application/${from}/${id}/WORK_FLOW/access`
   } else if (
     hasPermission(
       [
@@ -535,7 +535,7 @@ const get_route = () => {
       'OR',
     )
   ) {
-    return `/application/${id}/WORK_FLOW/chat-user`
+    return `/application/${from}/${id}/WORK_FLOW/chat-user`
   } else if (
     hasPermission(
       [
@@ -551,7 +551,7 @@ const get_route = () => {
       'OR',
     )
   ) {
-    return `/application/${id}/WORK_FLOW/chat-log`
+    return `/application/${from}/${id}/WORK_FLOW/chat-log`
   } else return `/application`
 }
 

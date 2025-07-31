@@ -66,7 +66,7 @@
         </el-table-column>
         <el-table-column
           prop="provider"
-          :label="$t('views.system.resource_management.type')"
+          :label="$t('views.model.provider')"
           show-overflow-tooltip
           width="150"
         >

@@ -13,6 +13,7 @@
       :rules="rules"
       label-position="top"
       require-asterisk-position="right"
+      @submit.prevent
     >
       <el-form-item :label="$t('views.application.form.appName.label')" prop="name">
         <el-input
