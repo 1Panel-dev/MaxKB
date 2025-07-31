@@ -10,6 +10,7 @@ from django.core import validators
 from django.db import transaction
 from django.db.models import QuerySet, Q
 from django.http import HttpResponse
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from pylint.lint import Run
 from pylint.reporters import JSON2Reporter
@@ -340,6 +341,7 @@ class ToolSerializer(serializers.Serializer):
                             edit_dict['init_params'][key] = old_init_params[key]
                 edit_dict['init_params'] = rsa_long_encrypt(json.dumps(edit_dict['init_params']))
 
+            edit_dict['update_time'] = timezone.now()
             QuerySet(Tool).filter(id=self.data.get('id')).update(**edit_dict)
 
             return self.one()
