@@ -23,6 +23,7 @@ def get_default_global_variable(input_field_list: List):
         if item.get('default_value', None) is not None
     }
 
+
 def get_global_variable(node):
     body = node.workflow_manage.get_body()
     history_chat_record = node.flow_params_serializer.data.get('history_chat_record', [])
@@ -74,6 +75,7 @@ class BaseStartStepNode(IStarNode):
             'other': self.workflow_manage.other_list,
 
         }
+        self.workflow_manage.chat_context = self.workflow_manage.get_chat_info().get_chat_variable()
         return NodeResult(node_variable, workflow_variable)
 
     def get_details(self, index: int, **kwargs):

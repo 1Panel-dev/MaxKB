@@ -52,6 +52,7 @@ export default {
   variable: {
     label: '变量',
     global: '全局变量',
+    chat: '会话变量',
     Referencing: '引用变量',
     ReferencingRequired: '引用变量必填',
     ReferencingError: '引用变量错误',

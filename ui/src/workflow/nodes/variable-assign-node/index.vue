@@ -245,6 +245,11 @@ function variableChange(item: any) {
           item.name = field.label
         }
       })
+      node.properties.config.chatFields.forEach((field: any) => {
+        if (field.value === item.fields[1]) {
+          item.name = field.label
+        }
+      })
     }
   })
 }
