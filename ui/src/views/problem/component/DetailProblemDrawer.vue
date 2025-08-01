@@ -34,7 +34,7 @@
                         type="primary"
                         text
                         @click.stop="disassociation(item)"
-                        v-if="permissionPrecise.doc_edit(id as string)"
+                        v-if="permissionPrecise.problem_relate(id as string)"
                       >
                         <AppIcon iconName="app-quxiaoguanlian"></AppIcon>
                       </el-button>
