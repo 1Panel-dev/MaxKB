@@ -220,9 +220,7 @@
                   )
                 "
               >
-                <el-icon>
-                  <EditPen />
-                </el-icon>
+                <AppIcon iconName="app-edit"></AppIcon>
               </el-button>
             </span>
 
@@ -271,9 +269,7 @@
                   )
                 "
               >
-                <el-icon>
-                  <Delete />
-                </el-icon>
+                <AppIcon iconName="app-delete"></AppIcon>
               </el-button>
             </span>
           </template>

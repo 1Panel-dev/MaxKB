@@ -12,14 +12,10 @@
         <h4 :id="titleId" :class="titleClass">{{ $t('views.chatLog.editMark') }}</h4>
         <div class="text-right">
           <el-button text @click="isEdit = true" v-if="!isEdit">
-            <el-icon>
-              <EditPen />
-            </el-icon>
+            <AppIcon iconName="app-edit"></AppIcon>
           </el-button>
           <el-button text style="margin-left: 4px" @click="deleteMark">
-            <el-icon>
-              <Delete />
-            </el-icon>
+            <AppIcon iconName="app-delete"></AppIcon>
           </el-button>
           <el-divider direction="vertical" />
         </div>

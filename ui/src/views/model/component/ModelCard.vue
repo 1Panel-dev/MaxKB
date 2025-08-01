@@ -67,19 +67,17 @@
     <template #mouseEnter v-if="MoreFilledPermission(model.id)">
       <el-dropdown trigger="click" v-if="!isShared">
         <el-button text @click.stop>
-          <el-icon>
-            <MoreFilled />
-          </el-icon>
+          <AppIcon iconName="app-more"></AppIcon>
         </el-button>
         <template #dropdown>
           <el-dropdown-menu>
             <el-dropdown-item
               v-if="permissionPrecise.modify(model.id)"
-              icon="EditPen"
               text
               @click.stop="openEditModel"
             >
-              {{ $t('common.modify') }}
+              <AppIcon iconName="app-edit"></AppIcon>
+              {{ $t('common.edit') }}
             </el-dropdown-item>
             <el-dropdown-item
               v-if="isSystemShare"
@@ -103,11 +101,11 @@
             </el-dropdown-item>
             <el-dropdown-item
               divided
-              icon="Delete"
               text
               @click.stop="deleteModel"
               v-if="permissionPrecise.delete(model.id)"
             >
+              <AppIcon iconName="app-delete"></AppIcon>
               {{ $t('common.delete') }}
             </el-dropdown-item>
           </el-dropdown-menu>

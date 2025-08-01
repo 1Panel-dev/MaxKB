@@ -1,7 +1,11 @@
 <template>
   <div class="authentication-setting p-16-24">
-    <h4 class="mb-16">{{ $t('views.system.authentication.title') }}</h4>
-
+    <el-breadcrumb separator-icon="ArrowRight" class="mb-16">
+      <el-breadcrumb-item>{{ t('views.system.subTitle') }}</el-breadcrumb-item>
+      <el-breadcrumb-item>
+        <h5 class="ml-4 color-text-primary">{{ $t('views.system.authentication.title') }}</h5>
+      </el-breadcrumb-item>
+    </el-breadcrumb>
     <el-tabs v-model="activeName" class="mt-4">
       <template v-for="(item, index) in tabList" :key="index">
         <el-tab-pane :label="item.label" :name="item.name">
@@ -21,7 +25,6 @@ import SCAN from './component/SCAN.vue'
 import OAuth2 from './component/OAuth2.vue'
 import { t } from '@/locales'
 import useStore from '@/stores'
-
 
 const { user } = useStore()
 const router = useRouter()
@@ -54,7 +57,6 @@ const tabList = [
     component: SCAN,
   },
 ]
-
 
 onMounted(() => {
   if (user.isExpire()) {

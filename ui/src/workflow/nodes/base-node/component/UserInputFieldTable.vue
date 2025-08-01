@@ -1,6 +1,6 @@
 <template>
   <div class="flex-between mb-16">
-    <h5 class="break-all ellipsis lighter" style="max-width:80%" :title="inputFieldConfig.title">
+    <h5 class="break-all ellipsis lighter" style="max-width: 80%" :title="inputFieldConfig.title">
       {{ inputFieldConfig.title }}
     </h5>
     <div>
@@ -92,15 +92,13 @@
         <span class="mr-4">
           <el-tooltip effect="dark" :content="$t('common.modify')" placement="top">
             <el-button type="primary" text @click.stop="openAddDialog(row, $index)">
-              <el-icon><EditPen /></el-icon>
+              <AppIcon iconName="app-edit"></AppIcon>
             </el-button>
           </el-tooltip>
         </span>
         <el-tooltip effect="dark" :content="$t('common.delete')" placement="top">
           <el-button type="primary" text @click="deleteField($index)">
-            <el-icon>
-              <Delete />
-            </el-icon>
+            <AppIcon iconName="app-delete"></AppIcon>
           </el-button>
         </el-tooltip>
       </template>
@@ -209,7 +207,7 @@ function onDragHandle() {
       items.splice(evt.newIndex, 0, movedItem)
       inputFieldList.value = items
       props.nodeModel.graphModel.eventCenter.emit('refreshFieldList')
-    }
+    },
   })
 }
 

@@ -10,10 +10,21 @@
       <div class="flex align-center mr-8">
         <TopAbout></TopAbout>
         <el-divider class="ml-8 mr-8" direction="vertical" />
-        <el-button link @click="router.push({ path: '/' })"
-          v-if="hasPermission([RoleConst.USER.getWorkspaceRole,RoleConst.EXTENDS_USER.getWorkspaceRole,
-            RoleConst.EXTENDS_WORKSPACE_MANAGE.getWorkspaceRole, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole
-          ],'OR')"
+        <el-button
+          link
+          @click="router.push({ path: '/' })"
+          style="color: var(--el-text-color-primary)"
+          v-if="
+            hasPermission(
+              [
+                RoleConst.USER.getWorkspaceRole,
+                RoleConst.EXTENDS_USER.getWorkspaceRole,
+                RoleConst.EXTENDS_WORKSPACE_MANAGE.getWorkspaceRole,
+                RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+              ],
+              'OR',
+            )
+          "
         >
           <AppIcon class="mr-8" iconName="app-workspace" style="font-size: 16px"></AppIcon>
           {{ $t('views.workspace.toWorkspace') }}</el-button

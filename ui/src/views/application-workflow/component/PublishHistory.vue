@@ -38,12 +38,12 @@
                 <div @click.stop v-show="mouseId === row.id">
                   <el-dropdown trigger="click" :teleported="false">
                     <el-button text>
-                      <el-icon><MoreFilled /></el-icon>
+                      <AppIcon iconName="app-more"></AppIcon>
                     </el-button>
                     <template #dropdown>
                       <el-dropdown-menu>
                         <el-dropdown-item @click.stop="openEditVersion(row)">
-                          <el-icon><EditPen /></el-icon>
+                          <AppIcon iconName="app-edit"></AppIcon>
                           {{ $t('common.edit') }}
                         </el-dropdown-item>
                         <el-dropdown-item @click="refreshVersion(row)">

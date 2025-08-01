@@ -65,7 +65,7 @@
             </el-col>
             <el-col :span="2">
               <el-button link type="info" @click="deleteCondition(index)">
-                <el-icon><Delete /></el-icon>
+                <AppIcon iconName="app-delete"></AppIcon>
               </el-button>
             </el-col>
           </el-row>

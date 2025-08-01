@@ -258,13 +258,9 @@
                 </el-button>
               </span>
             </el-tooltip>
-            <el-dropdown trigger="click"
-              v-if="MoreFilledPermission()"
-            >
+            <el-dropdown trigger="click" v-if="MoreFilledPermission()">
               <el-button text @click.stop>
-                <el-icon>
-                  <MoreFilled />
-                </el-icon>
+                <AppIcon iconName="app-more"></AppIcon>
               </el-button>
               <template #dropdown>
                 <el-dropdown-menu>
@@ -276,10 +272,11 @@
                     {{ $t('common.export') }}
                   </el-dropdown-item>
                   <el-dropdown-item
-                    icon="Delete"
                     @click.stop="deleteApplication(row)"
                     v-if="permissionPrecise.delete()"
-                    >{{ $t('common.delete') }}
+                  >
+                    <AppIcon iconName="app-delete"></AppIcon>
+                    {{ $t('common.delete') }}
                   </el-dropdown-item>
                 </el-dropdown-menu>
               </template>
@@ -314,16 +311,17 @@ const permissionPrecise = computed(() => {
 })
 
 const managePermission = () => {
-  return permissionPrecise.value.overview_read() || 
-  permissionPrecise.value.access_read() || 
-  permissionPrecise.value.edit() || 
-  permissionPrecise.value.chat_log_read() || 
-  permissionPrecise.value.chat_user_read()
+  return (
+    permissionPrecise.value.overview_read() ||
+    permissionPrecise.value.access_read() ||
+    permissionPrecise.value.edit() ||
+    permissionPrecise.value.chat_log_read() ||
+    permissionPrecise.value.chat_user_read()
+  )
 }
 
 const MoreFilledPermission = () => {
-  return permissionPrecise.value.export() || 
-  permissionPrecise.value.delete()
+  return permissionPrecise.value.export() || permissionPrecise.value.delete()
 }
 
 const apiInputParams = ref([])
@@ -412,7 +410,6 @@ const paginationConfig = reactive({
   page_size: 20,
   total: 0,
 })
-
 
 const workspaceOptions = ref<any[]>([])
 const workspaceVisible = ref(false)

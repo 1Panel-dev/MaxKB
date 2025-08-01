@@ -65,9 +65,7 @@
                 :on-change="(file: any, fileList: any) => importTool(file)"
                 class="import-button"
               >
-                <el-dropdown-item
-                  v-if="permissionPrecise.import()"
-                >
+                <el-dropdown-item v-if="permissionPrecise.import()">
                   <div class="flex align-center w-full">
                     <el-avatar shape="square" class="mt-4" :size="36" style="background: none">
                       <img src="@/assets/icon_import.svg" alt="" />
@@ -197,8 +195,7 @@
                   </div>
                 </template>
                 <template #mouseEnter>
-                  <div @click.stop v-if="!isShared &&
-                    MoreFieldPermission(item.id)">
+                  <div @click.stop v-if="!isShared && MoreFieldPermission(item.id)">
                     <el-switch
                       v-model="item.is_active"
                       :before-change="() => changeState(item)"
@@ -209,9 +206,7 @@
                     <el-divider direction="vertical" />
                     <el-dropdown trigger="click">
                       <el-button text @click.stop>
-                        <el-icon>
-                          <MoreFilled />
-                        </el-icon>
+                        <AppIcon iconName="app-more"></AppIcon>
                       </el-button>
                       <template #dropdown>
                         <el-dropdown-menu>
@@ -219,18 +214,14 @@
                             v-if="item.template_id && permissionPrecise.edit(item.id)"
                             @click.stop="addInternalTool(item, true)"
                           >
-                            <el-icon>
-                              <EditPen />
-                            </el-icon>
+                            <AppIcon iconName="app-edit"></AppIcon>
                             {{ $t('common.edit') }}
                           </el-dropdown-item>
                           <el-dropdown-item
                             v-if="!item.template_id && permissionPrecise.edit(item.id)"
                             @click.stop="openCreateDialog(item)"
                           >
-                            <el-icon>
-                              <EditPen />
-                            </el-icon>
+                            <AppIcon iconName="app-edit"></AppIcon>
                             {{ $t('common.edit') }}
                           </el-dropdown-item>
                           <el-dropdown-item
@@ -274,7 +265,7 @@
                             divided
                             @click.stop="deleteTool(item)"
                           >
-                            <el-icon><Delete /></el-icon>
+                            <AppIcon iconName="app-delete"></AppIcon>
                             {{ $t('common.delete') }}
                           </el-dropdown-item>
                         </el-dropdown-menu>
@@ -354,9 +345,12 @@ const permissionPrecise = computed(() => {
 })
 
 const MoreFieldPermission = (id: any) => {
-  return (permissionPrecise.value.edit(id) ||
-   permissionPrecise.value.export(id) ||
-  permissionPrecise.value.delete(id) || isSystemShare.value)
+  return (
+    permissionPrecise.value.edit(id) ||
+    permissionPrecise.value.export(id) ||
+    permissionPrecise.value.delete(id) ||
+    isSystemShare.value
+  )
 }
 
 const InitParamDrawerRef = ref()

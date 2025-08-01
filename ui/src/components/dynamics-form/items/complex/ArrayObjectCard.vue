@@ -16,7 +16,7 @@
       ></DynamicsForm>
       <el-tooltip effect="dark" :content="$t('common.delete')" placement="top">
         <el-button text @click.stop="deleteKnowledge(item)" class="delete-button">
-          <el-icon><Delete /></el-icon>
+          <AppIcon iconName="app-delete"></AppIcon>
         </el-button>
       </el-tooltip>
     </el-card>
@@ -66,7 +66,7 @@ const _data = computed<Array<any>>({
   },
   set(value) {
     emit('update:modelValue', value)
-  }
+  },
 })
 
 const props_info = computed(() => {
@@ -110,7 +110,7 @@ const other = computed(() => {
 
 defineExpose({
   validate,
-  field: props.field
+  field: props.field,
 })
 </script>
 <style lang="scss" scoped>
@@ -129,7 +129,7 @@ defineExpose({
     cursor: pointer;
     min-height: var(--card-min-height);
     border: 1px dashed var(--el-color-primary);
-    background: var(--el-disabled-bg-color);;
+    background: var(--el-disabled-bg-color);
     padding-bottom: 20px;
 
     .add-icon {

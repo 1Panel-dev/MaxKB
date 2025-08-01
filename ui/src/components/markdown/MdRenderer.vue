@@ -9,9 +9,7 @@
         class="problem-button mt-4 mb-4 flex"
         :class="sendMessage ? 'cursor' : 'disabled'"
       >
-        <el-icon class="mr-8" style="margin-top: 2px">
-          <EditPen />
-        </el-icon>
+        <AppIcon iconName="app-edit" class="mr-8" style="margin-top: 2px"></AppIcon>
         {{ item.content }}
       </div>
       <HtmlRander v-else-if="item.type === 'html_rander'" :source="item.content"></HtmlRander>

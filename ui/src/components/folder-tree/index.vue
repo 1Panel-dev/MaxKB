@@ -54,10 +54,8 @@
                 class="mr-16"
               >
                 <el-dropdown trigger="click" :teleported="false">
-                  <el-button text class="w-full"
-                    v-if="MoreFilledPermission(node)"
-                  >
-                    <el-icon><MoreFilled /></el-icon>
+                  <el-button text class="w-full" v-if="MoreFilledPermission(node)">
+                    <AppIcon iconName="app-more"></AppIcon>
                   </el-button>
                   <template #dropdown>
                     <el-dropdown-menu>
@@ -72,7 +70,7 @@
                         @click.stop="openEditFolder(data)"
                         v-if="permissionPrecise.folderEdit()"
                       >
-                        <el-icon><EditPen /></el-icon>
+                        <AppIcon iconName="app-edit"></AppIcon>
                         {{ $t('common.edit') }}
                       </el-dropdown-item>
                       <el-dropdown-item
@@ -81,7 +79,7 @@
                         :disabled="!data.parent_id"
                         v-if="permissionPrecise.folderDelete()"
                       >
-                        <el-icon><Delete /></el-icon>
+                        <AppIcon iconName="app-delete"></AppIcon>
                         {{ $t('common.delete') }}
                       </el-dropdown-item>
                     </el-dropdown-menu>
@@ -158,7 +156,7 @@ const permissionPrecise = computed(() => {
   return permissionMap[resourceType.value!]['workspace']
 })
 
-const MoreFilledPermission = (node: any) =>{
+const MoreFilledPermission = (node: any) => {
   return (
     (node.level !== 3 && permissionPrecise.value.folderCreate()) ||
     permissionPrecise.value.folderEdit() ||

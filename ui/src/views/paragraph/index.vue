@@ -104,6 +104,9 @@
                             <ParagraphCard
                               :data="item"
                               class="mb-8 w-full"
+                              :class="{
+                                'is-selected': multipleSelection.includes(item.id),
+                              }"
                               :disabled="true"
                               @clickCard="toggleSelect(item.id)"
                             />
@@ -438,6 +441,9 @@ onMounted(() => {
     }
   }
   .paragraph-card {
+    .is-selected {
+      border: 1px solid var(--el-color-primary);
+    }
     &.handle {
       .handle-img {
         visibility: hidden;

@@ -13,10 +13,10 @@
     </template>
 
     <el-row style="width: 100%" :gutter="10">
-      <el-col :span="10"
-        ><div class="grid-content ep-bg-purple" />
-        {{ $t('dynamicsForm.tag.label') }}</el-col
-      >
+      <el-col :span="10">
+        <div class="grid-content ep-bg-purple" />
+        {{ $t('dynamicsForm.tag.label') }}
+      </el-col>
       <el-col :span="12">
         <div class="grid-content ep-bg-purple" />
         {{ $t('dynamicsForm.Select.label') }}
@@ -29,23 +29,26 @@
       :gutter="10"
       class="mb-8"
     >
-      <el-col :span="10"
-        ><div class="grid-content ep-bg-purple" />
-        <el-input v-model="formValue.option_list[$index].label" :placeholder="$t('dynamicsForm.tag.placeholder')"
-      /></el-col>
-      <el-col :span="12"
-        ><div class="grid-content ep-bg-purple" />
+      <el-col :span="10">
+        <div class="grid-content ep-bg-purple" />
+        <el-input
+          v-model="formValue.option_list[$index].label"
+          :placeholder="$t('dynamicsForm.tag.placeholder')"
+        />
+      </el-col>
+      <el-col :span="12">
+        <div class="grid-content ep-bg-purple" />
         <el-input
           v-model="formValue.option_list[$index].value"
           :placeholder="$t('dynamicsForm.Select.label')"
-      /></el-col>
-      <el-col :span="1"
-        ><div class="grid-content ep-bg-purple" />
+        />
+      </el-col>
+      <el-col :span="1">
+        <div class="grid-content ep-bg-purple" />
         <el-button link class="ml-8" @click.stop="delOption($index)">
-          <el-icon>
-            <Delete />
-          </el-icon> </el-button
-      ></el-col>
+          <AppIcon iconName="app-delete"></AppIcon>
+        </el-button>
+      </el-col>
     </el-row>
   </el-form-item>
   <el-form-item
@@ -55,7 +58,12 @@
     :label="$t('dynamicsForm.default.label')"
     :rules="
       formValue.required
-        ? [{ required: true, message: `${$t('dynamicsForm.default.label')}${$t('dynamicsForm.default.requiredMessage')}` }]
+        ? [
+            {
+              required: true,
+              message: `${$t('dynamicsForm.default.label')}${$t('dynamicsForm.default.requiredMessage')}`,
+            },
+          ]
         : []
     "
   >
@@ -89,7 +97,7 @@ const formValue = computed({
   },
   get: () => {
     return props.modelValue
-  }
+  },
 })
 
 const addOption = () => {
@@ -112,7 +120,7 @@ const getData = () => {
     show_default_value: formValue.value.show_default_value,
     text_field: 'label',
     value_field: 'value',
-    option_list: formValue.value.option_list
+    option_list: formValue.value.option_list,
   }
 }
 const rander = (form_data: any) => {

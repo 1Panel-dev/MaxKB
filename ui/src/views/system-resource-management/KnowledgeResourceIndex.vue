@@ -146,9 +146,7 @@
               :content="$t('views.system.resource_management.management')"
               placement="top"
             >
-              <span class="mr-8"
-                v-if="ManagePermission()"
-              >
+              <span class="mr-8" v-if="ManagePermission()">
                 <el-button
                   type="primary"
                   text
@@ -180,13 +178,9 @@
                 </el-button>
               </span>
             </el-tooltip>
-            <el-dropdown trigger="click"
-              v-if="MoreFilledPermission()"
-            >
+            <el-dropdown trigger="click" v-if="MoreFilledPermission()">
               <el-button text @click.stop>
-                <el-icon>
-                  <MoreFilled />
-                </el-icon>
+                <AppIcon iconName="app-more"></AppIcon>
               </el-button>
               <template #dropdown>
                 <el-dropdown-menu>
@@ -229,11 +223,11 @@
                     >{{ $t('views.document.setting.export') }} ZIP</el-dropdown-item
                   >
                   <el-dropdown-item
-                    icon="Delete"
                     type="danger"
                     @click.stop="deleteKnowledge(row)"
                     v-if="permissionPrecise.delete()"
                   >
+                    <AppIcon iconName="app-delete"></AppIcon>
                     {{ $t('common.delete') }}</el-dropdown-item
                   >
                 </el-dropdown-menu>
@@ -269,21 +263,24 @@ const permissionPrecise = computed(() => {
 })
 
 const ManagePermission = () => {
-  return permissionPrecise.value.doc_read() || 
-    permissionPrecise.value.problem_read() || 
-    permissionPrecise.value.edit() || 
+  return (
+    permissionPrecise.value.doc_read() ||
+    permissionPrecise.value.problem_read() ||
+    permissionPrecise.value.edit() ||
     permissionPrecise.value.knowledge_chat_user_read() ||
     permissionPrecise.value.hit_test()
+  )
 }
 // sync generete edit export delete
 const MoreFilledPermission = () => {
-  return permissionPrecise.value.sync() || 
-  permissionPrecise.value.generate() || 
-  permissionPrecise.value.edit() || 
-  permissionPrecise.value.export() || 
-  permissionPrecise.value.delete()
+  return (
+    permissionPrecise.value.sync() ||
+    permissionPrecise.value.generate() ||
+    permissionPrecise.value.edit() ||
+    permissionPrecise.value.export() ||
+    permissionPrecise.value.delete()
+  )
 }
-
 
 const search_type = ref('name')
 const search_form = ref<any>({

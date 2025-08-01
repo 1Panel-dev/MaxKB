@@ -15,7 +15,7 @@
           {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.dialogTitle') }}
         </h4>
         <div class="flex align-center">
-          <el-button type="primary" @click.prevent="resetForm" link>
+          <el-button @click.prevent="resetForm" link>
             <el-icon class="mr-4">
               <Refresh />
             </el-icon>

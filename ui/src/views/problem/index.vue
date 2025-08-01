@@ -129,7 +129,7 @@
                         @click.stop="deleteProblem(row)"
                         v-if="permissionPrecise.problem_delete(id)"
                       >
-                        <el-icon><Delete /></el-icon>
+                        <AppIcon iconName="app-delete"></AppIcon>
                       </el-button>
                     </el-tooltip>
                   </span>

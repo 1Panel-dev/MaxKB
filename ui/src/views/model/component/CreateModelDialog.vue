@@ -207,15 +207,13 @@
               <span class="mr-4">
                 <el-tooltip effect="dark" :content="$t('common.modify')" placement="top">
                   <el-button type="primary" text @click.stop="openAddDrawer(row, $index)">
-                    <el-icon><EditPen /></el-icon>
+                    <AppIcon iconName="app-edit"></AppIcon>
                   </el-button>
                 </el-tooltip>
               </span>
               <el-tooltip effect="dark" :content="$t('common.delete')" placement="top">
                 <el-button type="primary" text @click="deleteParam($index)">
-                  <el-icon>
-                    <Delete />
-                  </el-icon>
+                  <AppIcon iconName="app-delete"></AppIcon>
                 </el-button>
               </el-tooltip>
             </template>

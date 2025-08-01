@@ -85,7 +85,7 @@
             class="user-input-button mb-8"
             @click="toggleUserInput"
           >
-            <el-icon :size="16" class="mr-4"><EditPen /></el-icon>
+            <AppIcon iconName="app-edit" :size="16" class="mr-4"></AppIcon>
             <span class="ellipsis">
               {{ userInputTitle || $t('chat.userInput') }}
             </span>

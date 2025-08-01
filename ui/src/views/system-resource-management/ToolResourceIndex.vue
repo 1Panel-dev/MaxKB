@@ -184,9 +184,7 @@
                   @click.stop="addInternalTool(row, true)"
                   :title="$t('common.edit')"
                 >
-                  <el-icon>
-                    <EditPen />
-                  </el-icon>
+                  <AppIcon iconName="app-edit"></AppIcon>
                 </el-button>
               </span>
             </el-tooltip>
@@ -203,9 +201,7 @@
                   @click.stop="openCreateDialog(row)"
                   :title="$t('common.edit')"
                 >
-                  <el-icon>
-                    <EditPen />
-                  </el-icon>
+                  <AppIcon iconName="app-edit"></AppIcon>
                 </el-button>
               </span>
             </el-tooltip>
@@ -227,13 +223,9 @@
                 </el-button>
               </span>
             </el-tooltip>
-            <el-dropdown trigger="click"
-              v-if="MoreFilledPermission(row)"
-            >
+            <el-dropdown trigger="click" v-if="MoreFilledPermission(row)">
               <el-button text @click.stop>
-                <el-icon>
-                  <MoreFilled />
-                </el-icon>
+                <AppIcon iconName="app-more"></AppIcon>
               </el-button>
               <template #dropdown>
                 <el-dropdown-menu>
@@ -257,7 +249,7 @@
                     divided
                     @click.stop="deleteTool(row)"
                   >
-                    <el-icon><Delete /></el-icon>
+                    <AppIcon iconName="app-delete"></AppIcon>
                     {{ $t('common.delete') }}
                   </el-dropdown-item>
                 </el-dropdown-menu>
@@ -317,9 +309,11 @@ const permissionPrecise = computed(() => {
 })
 
 const MoreFilledPermission = (row: any) => {
-  return permissionPrecise.value.export() || 
-          permissionPrecise.value.delete() || 
-          (row.init_field_list?.length > 0 && permissionPrecise.value.edit())
+  return (
+    permissionPrecise.value.export() ||
+    permissionPrecise.value.delete() ||
+    (row.init_field_list?.length > 0 && permissionPrecise.value.edit())
+  )
 }
 
 function exportTool(row: any) {

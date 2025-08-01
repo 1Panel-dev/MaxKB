@@ -42,7 +42,7 @@
 
         <el-dropdown trigger="click">
           <el-button text @click.stop class="ml-8 mt-4">
-            <el-icon class="rotate-90"><MoreFilled /></el-icon>
+            <AppIcon iconName="app-more" class="rotate-90"></AppIcon>
           </el-button>
           <template #dropdown>
             <el-dropdown-menu>

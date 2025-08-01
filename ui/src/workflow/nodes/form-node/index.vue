@@ -17,7 +17,7 @@
           :rules="{
             required: true,
             message: $t('views.applicationWorkflow.nodes.formNode.formContent.requiredMessage'),
-            trigger: 'blur'
+            trigger: 'blur',
           }"
         >
           <template #label>
@@ -32,7 +32,7 @@
                 <template #content>
                   {{
                     $t('views.applicationWorkflow.nodes.formNode.formContent.tooltip', {
-                      form: '{ form }'
+                      form: '{ form }',
                     })
                   }}
                 </template>
@@ -123,15 +123,13 @@
                 <span class="mr-4">
                   <el-tooltip effect="dark" :content="$t('common.modify')" placement="top">
                     <el-button type="primary" text @click.stop="openEditFormCollect(row, $index)">
-                      <el-icon><EditPen /></el-icon>
+                      <AppIcon iconName="app-edit"></AppIcon>
                     </el-button>
                   </el-tooltip>
                 </span>
                 <el-tooltip effect="dark" :content="$t('common.delete')" placement="top">
                   <el-button type="primary" text @click="deleteField(row)">
-                    <el-icon>
-                      <Delete />
-                    </el-icon>
+                    <AppIcon iconName="app-delete"></AppIcon>
                   </el-button>
                 </el-tooltip>
               </template>
@@ -180,12 +178,12 @@ const sync_form_field_list = () => {
   const fields = [
     {
       label: t('views.applicationWorkflow.nodes.formNode.formAllContent'),
-      value: 'form_data'
+      value: 'form_data',
     },
     ...form_data.value.form_field_list.map((item: any) => ({
       value: item.field,
-      label: typeof item.label == 'string' ? item.label : item.label.label
-    }))
+      label: typeof item.label == 'string' ? item.label : item.label.label,
+    })),
   ]
   set(props.nodeModel.properties.config, 'fields', fields)
   props.nodeModel.clear_next_node_field(false)
@@ -201,7 +199,7 @@ const openEditFormCollect = (form_field_data: any, index: number) => {
 }
 const deleteField = (form_field_data: any) => {
   form_data.value.form_field_list = form_data.value.form_field_list.filter(
-    (field: any) => field.field !== form_field_data.field
+    (field: any) => field.field !== form_field_data.field,
   )
   sync_form_field_list()
 }
@@ -210,7 +208,7 @@ const form = ref<any>({
   form_content_format: `${t('views.applicationWorkflow.nodes.formNode.form_content_format1')}
 {{form}}
 ${t('views.applicationWorkflow.nodes.formNode.form_content_format2')}`,
-  form_field_list: []
+  form_field_list: [],
 })
 const form_data = computed({
   get: () => {
@@ -223,7 +221,7 @@ const form_data = computed({
   },
   set: (value) => {
     set(props.nodeModel.properties, 'node_data', value)
-  }
+  },
 })
 
 const getDefaultValue = (row: any) => {
@@ -269,7 +267,7 @@ function onDragHandle() {
       items.splice(evt.newIndex, 0, movedItem)
       form_data.value.form_field_list = items
       sync_form_field_list()
-    }
+    },
   })
 }
 onMounted(() => {

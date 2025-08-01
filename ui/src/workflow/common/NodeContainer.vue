@@ -52,7 +52,7 @@
             </el-dropdown>
             <el-dropdown v-if="showOperate(nodeModel.type)" :teleported="false" trigger="click">
               <el-button text>
-                <el-icon class="color-secondary"><MoreFilled /></el-icon>
+                <AppIcon iconName="app-more"></AppIcon>
               </el-button>
               <template #dropdown>
                 <el-dropdown-menu style="min-width: 80px">

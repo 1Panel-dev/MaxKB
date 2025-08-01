@@ -41,9 +41,7 @@
           <span>{{ $t('chat.history') }}</span>
           <el-tooltip effect="dark" :content="$t('chat.clearChat')" placement="right">
             <el-button text @click.stop="clearChat">
-              <el-icon>
-                <Delete />
-              </el-icon>
+              <AppIcon iconName="app-delete"></AppIcon>
             </el-button>
           </el-tooltip>
         </div>
@@ -68,17 +66,17 @@
                   <div @click.stop v-show="mouseId === row.id && row.id !== 'new'">
                     <el-dropdown trigger="click" :teleported="false">
                       <el-button text>
-                        <el-icon><MoreFilled /></el-icon>
+                        <AppIcon iconName="app-more"></AppIcon>
                       </el-button>
 
                       <template #dropdown>
                         <el-dropdown-menu>
                           <el-dropdown-item @click.stop="editLogTitle(row)">
-                            <el-icon><EditPen /></el-icon>
+                            <AppIcon iconName="app-edit"></AppIcon>
                             {{ $t('common.edit') }}
                           </el-dropdown-item>
                           <el-dropdown-item @click.stop="deleteChatLog(row)">
-                            <el-icon><Delete /></el-icon>
+                            <AppIcon iconName="app-delete"></AppIcon>
                             {{ $t('common.delete') }}
                           </el-dropdown-item>
                         </el-dropdown-menu>
@@ -115,9 +113,7 @@
               <span>{{ $t('chat.history') }}</span>
               <el-tooltip effect="dark" :content="$t('chat.clearChat')" placement="right">
                 <el-button text @click.stop="clearChat">
-                  <el-icon>
-                    <Delete />
-                  </el-icon>
+                  <AppIcon iconName="app-delete"></AppIcon>
                 </el-button>
               </el-tooltip>
             </div>
@@ -136,21 +132,15 @@
               </span>
               <div @click.stop class="flex" v-show="mouseId === row.id && row.id !== 'new'">
                 <el-dropdown trigger="click" :teleported="false">
-                  <el-icon class="mt-4 lighter">
-                    <MoreFilled />
-                  </el-icon>
+                  <AppIcon iconName="app-more" class="mt-4 lighter"></AppIcon>
                   <template #dropdown>
                     <el-dropdown-menu>
                       <el-dropdown-item @click.stop="editLogTitle(row)">
-                        <el-icon>
-                          <EditPen />
-                        </el-icon>
+                        <AppIcon iconName="app-edit"></AppIcon>
                         {{ $t('common.edit') }}
                       </el-dropdown-item>
                       <el-dropdown-item @click.stop="deleteChatLog(row)">
-                        <el-icon>
-                          <Delete />
-                        </el-icon>
+                        <AppIcon iconName="app-delete"></AppIcon>
                         {{ $t('common.delete') }}
                       </el-dropdown-item>
                     </el-dropdown-menu>

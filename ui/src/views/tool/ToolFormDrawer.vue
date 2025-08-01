@@ -44,12 +44,10 @@
                 :size="32"
                 @click="openEditAvatar"
               >
-                <el-icon>
-                  <EditPen />
-                </el-icon>
+                <AppIcon iconName="app-edit"></AppIcon>
               </el-Avatar>
             </div>
-            <el-avatar v-else class="avatar-green  mr-12" shape="square" :size="32">
+            <el-avatar v-else class="avatar-green mr-12" shape="square" :size="32">
               <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt="" />
             </el-avatar>
             <el-input
@@ -131,15 +129,13 @@
             <span class="mr-4">
               <el-tooltip effect="dark" :content="$t('common.modify')" placement="top">
                 <el-button type="primary" text @click.stop="openAddInitDialog(row, $index)">
-                  <el-icon><EditPen /></el-icon>
+                  <AppIcon iconName="app-edit"></AppIcon>
                 </el-button>
               </el-tooltip>
             </span>
             <el-tooltip effect="dark" :content="$t('common.delete')" placement="top">
               <el-button type="primary" text @click="deleteInitField($index)">
-                <el-icon>
-                  <Delete />
-                </el-icon>
+                <AppIcon iconName="app-delete"></AppIcon>
               </el-button>
             </el-tooltip>
           </template>
@@ -177,9 +173,7 @@
         <el-table-column prop="source" :label="$t('views.tool.form.source.label')">
           <template #default="{ row }">
             {{
-              row.source === 'custom'
-                ? $t('common.custom')
-                : $t('views.tool.form.source.reference')
+              row.source === 'custom' ? $t('common.custom') : $t('views.tool.form.source.reference')
             }}
           </template>
         </el-table-column>
@@ -188,15 +182,13 @@
             <span class="mr-4">
               <el-tooltip effect="dark" :content="$t('common.modify')" placement="top">
                 <el-button type="primary" text @click.stop="openAddDialog(row, $index)">
-                  <el-icon><EditPen /></el-icon>
+                  <AppIcon iconName="app-edit"></AppIcon>
                 </el-button>
               </el-tooltip>
             </span>
             <el-tooltip effect="dark" :content="$t('common.delete')" placement="top">
               <el-button type="primary" text @click="deleteField($index)">
-                <el-icon>
-                  <Delete />
-                </el-icon>
+                <AppIcon iconName="app-delete"></AppIcon>
               </el-button>
             </el-tooltip>
           </template>
@@ -231,10 +223,15 @@
     <template #footer>
       <div>
         <el-button :loading="loading" @click="visible = false">{{ $t('common.cancel') }}</el-button>
-        <el-button :loading="loading" @click="openDebug" v-if="permissionPrecise.debug() ">{{
+        <el-button :loading="loading" @click="openDebug" v-if="permissionPrecise.debug()">{{
           $t('common.debug')
         }}</el-button>
-        <el-button type="primary" @click="submit(FormRef)" :loading="loading" v-if="isEdit ?  permissionPrecise.edit(form?.id as string) : permissionPrecise.create()" >
+        <el-button
+          type="primary"
+          @click="submit(FormRef)"
+          :loading="loading"
+          v-if="isEdit ? permissionPrecise.edit(form?.id as string) : permissionPrecise.create()"
+        >
           {{ isEdit ? $t('common.save') : $t('common.create') }}
         </el-button>
       </div>
@@ -283,8 +280,6 @@ const apiType = computed(() => {
 const permissionPrecise = computed(() => {
   return permissionMap['tool'][apiType.value]
 })
-
-
 
 const emit = defineEmits(['refresh'])
 const FieldFormDialogRef = ref()
@@ -433,7 +428,9 @@ const submit = async (formEl: FormInstance | undefined) => {
             emit('refresh', res.data)
             return user.profile()
           })
-          .then(() => {visible.value = false})
+          .then(() => {
+            visible.value = false
+          })
       } else {
         const obj = {
           folder_id: folder.currentFolder?.id,
@@ -446,7 +443,9 @@ const submit = async (formEl: FormInstance | undefined) => {
             emit('refresh')
             return user.profile()
           })
-          .then(() => {visible.value = false})
+          .then(() => {
+            visible.value = false
+          })
       }
     }
   })

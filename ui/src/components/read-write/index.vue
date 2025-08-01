@@ -12,7 +12,7 @@
           @click.stop="editNameHandle"
           text
         >
-          <el-icon><EditPen /></el-icon>
+          <AppIcon iconName="app-edit"></AppIcon>
         </el-button>
       </div>
     </slot>
@@ -52,25 +52,25 @@ defineOptions({ name: 'ReadWrite' })
 const props = defineProps({
   data: {
     type: String,
-    default: ''
+    default: '',
   },
   showEditIcon: {
     type: Boolean,
-    default: false
+    default: false,
   },
   maxlength: {
     type: Number,
-    default: () => 0
+    default: () => 0,
   },
   trigger: {
     type: String,
     default: 'default',
-    validator: (value: string) => ['default', 'dblclick', 'manual'].includes(value)
+    validator: (value: string) => ['default', 'dblclick', 'manual'].includes(value),
   },
   write: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 })
 const emit = defineEmits(['change', 'close'])
 const inputRef = ref()
@@ -99,7 +99,7 @@ watch(
     } else {
       isEdit.value = false
     }
-  }
+  },
 )
 
 function dblclick() {

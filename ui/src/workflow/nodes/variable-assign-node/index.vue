@@ -23,9 +23,7 @@
                   @click="deleteVariable(index)"
                   v-if="form_data.variable_list.length > 1"
                 >
-                  <el-icon>
-                    <Delete />
-                  </el-icon>
+                  <AppIcon iconName="app-delete"></AppIcon>
                 </el-button>
               </div>
             </template>
@@ -49,10 +47,7 @@
                 :label="$t('views.applicationWorkflow.nodes.replyNode.replyContent.reference')"
                 value="referencing"
               />
-              <el-option
-                :label="$t('common.custom')"
-                value="custom"
-              />
+              <el-option :label="$t('common.custom')" value="custom" />
             </el-select>
           </div>
 
@@ -72,7 +67,7 @@
               :rules="{
                 message: t('common.inputPlaceholder'),
                 trigger: 'blur',
-                required: true
+                required: true,
               }"
             >
               <el-input
@@ -89,7 +84,7 @@
               :rules="{
                 message: $t('common.inputPlaceholder'),
                 trigger: 'blur',
-                required: true
+                required: true,
               }"
             >
               <el-input-number v-model="item.value"></el-input-number>
@@ -102,7 +97,7 @@
                 {
                   message: $t('common.inputPlaceholder'),
                   trigger: 'blur',
-                  required: true
+                  required: true,
                 },
                 {
                   validator: (rule: any, value: any, callback: any) => {
@@ -113,8 +108,8 @@
                       callback(new Error('Invalid JSON format'))
                     }
                   },
-                  trigger: 'blur'
-                }
+                  trigger: 'blur',
+                },
               ]"
             >
               <CodemirrorEditor
@@ -122,7 +117,7 @@
                 v-model="item.value"
                 :style="{
                   height: '100px',
-                  width: '155px'
+                  width: '155px',
                 }"
                 @submitDialog="(val: string) => (form_data.variable_list[index].value = val)"
               />
@@ -180,9 +175,9 @@ const form = {
       reference: [],
       type: 'string',
       source: 'custom',
-      name: ''
-    }
-  ]
+      name: '',
+    },
+  ],
 }
 
 const form_data = computed({
@@ -196,7 +191,7 @@ const form_data = computed({
   },
   set: (value) => {
     set(props.nodeModel.properties, 'node_data', value)
-  }
+  },
 })
 
 function submitDialog(val: string) {
@@ -211,7 +206,7 @@ const validate = async () => {
   // console.log(replyNodeFormRef.value.validate())
   let ps = [
     replyNodeFormRef.value?.validate(),
-    ...nodeCascaderRef.value.map((item: any) => item.validate())
+    ...nodeCascaderRef.value.map((item: any) => item.validate()),
   ]
   if (nodeCascaderRef2.value) {
     ps = [...ps, ...nodeCascaderRef.value.map((item: any) => item.validate())]
@@ -230,7 +225,7 @@ function addVariable() {
     reference: [],
     type: 'string',
     source: 'custom',
-    name: ''
+    name: '',
   }
   list.push(obj)
   set(props.nodeModel.properties.node_data, 'variable_list', list)

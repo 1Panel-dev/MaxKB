@@ -55,9 +55,7 @@
           </span>
           <el-tooltip effect="dark" :content="$t('common.delete')" placement="top">
             <el-button type="primary" text @click="deleteApiKey(row)">
-              <el-icon>
-                <Delete />
-              </el-icon>
+              <AppIcon iconName="app-delete"></AppIcon>
             </el-button>
           </el-tooltip>
         </template>
@@ -78,14 +76,14 @@ import SettingAPIKeyDialog from '@/views/application-overview/component/SettingA
 
 const route = useRoute()
 const {
-  params: { id }
+  params: { id },
 } = route
 
 const props = defineProps({
   userId: {
     type: String,
-    default: ''
-  }
+    default: '',
+  },
 })
 const emit = defineEmits(['addData'])
 
@@ -113,8 +111,8 @@ function deleteApiKey(row: any) {
     {
       confirmButtonText: t('common.confirm'),
       cancelButtonText: t('common.cancel'),
-      confirmButtonClass: 'color-danger'
-    }
+      confirmButtonClass: 'color-danger',
+    },
   )
     .then(() => {
       systemKeyApi.delAPIKey(row.id, loading).then(() => {
@@ -127,7 +125,7 @@ function deleteApiKey(row: any) {
 
 function changeState(bool: boolean, row: any) {
   const obj = {
-    is_active: bool
+    is_active: bool,
   }
   const str = bool
     ? t('views.applicationOverview.appInfo.APIKeyDialog.enabledSuccess')
@@ -151,7 +149,7 @@ const open = () => {
 
 function getApiKeyList() {
   systemKeyApi.getAPIKey().then((res) => {
-    res.data.sort((x:any,y:any)=>x.name < y.name ? 1 : -1)
+    res.data.sort((x: any, y: any) => (x.name < y.name ? 1 : -1))
     apiKey.value = res.data
   })
 }

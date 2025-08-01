@@ -58,7 +58,7 @@
                 </el-button>
                 <el-dropdown v-if="MoreFilledPermission0(id)">
                   <el-button class="ml-12 mr-12">
-                    <el-icon><MoreFilled /></el-icon>
+                    <AppIcon iconName="app-more"></AppIcon>
                   </el-button>
                   <template #dropdown>
                     <el-dropdown-menu>
@@ -422,7 +422,7 @@
                   <span @click.stop>
                     <el-dropdown trigger="click" v-if="MoreFilledPermission1(id)">
                       <el-button text type="primary">
-                        <el-icon><MoreFilled /></el-icon>
+                        <AppIcon iconName="app-more"></AppIcon>
                       </el-button>
                       <template #dropdown>
                         <el-dropdown-menu>
@@ -474,10 +474,10 @@
                             {{ $t('views.document.setting.download') }}
                           </el-dropdown-item>
                           <el-dropdown-item
-                            icon="Delete"
                             @click.stop="deleteDocument(row)"
                             v-if="permissionPrecise.doc_delete(id)"
                           >
+                            <AppIcon iconName="app-delete"></AppIcon>
                             {{ $t('common.delete') }}</el-dropdown-item
                           >
                         </el-dropdown-menu>
@@ -533,7 +533,7 @@
                   <span @click.stop>
                     <el-dropdown trigger="click" v-if="MoreFilledPermission2(id)">
                       <el-button text type="primary">
-                        <el-icon><MoreFilled /></el-icon>
+                        <AppIcon iconName="app-more"></AppIcon>
                       </el-button>
                       <template #dropdown>
                         <el-dropdown-menu>
@@ -585,10 +585,10 @@
                             {{ $t('views.document.setting.export') }} Zip
                           </el-dropdown-item>
                           <el-dropdown-item
-                            icon="Delete"
                             @click.stop="deleteDocument(row)"
                             v-if="permissionPrecise.doc_delete(id)"
                           >
+                            <AppIcon iconName="app-delete"></AppIcon>
                             {{ $t('common.delete') }}
                           </el-dropdown-item>
                         </el-dropdown-menu>

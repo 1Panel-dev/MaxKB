@@ -219,12 +219,8 @@
                 <template #mouseEnter>
                   <div @click.stop v-if="!isShared">
                     <el-dropdown trigger="click">
-                      <el-button text @click.stop
-                        v-if="MoreFilledPermission(item)"
-                      >
-                        <el-icon>
-                          <MoreFilled />
-                        </el-icon>
+                      <el-button text @click.stop v-if="MoreFilledPermission(item)">
+                        <AppIcon iconName="app-more"></AppIcon>
                       </el-button>
                       <template #dropdown>
                         <el-dropdown-menu>
@@ -289,11 +285,11 @@
                             >{{ $t('views.document.setting.export') }} ZIP</el-dropdown-item
                           >
                           <el-dropdown-item
-                            icon="Delete"
                             type="danger"
                             @click.stop="deleteKnowledge(item)"
                             v-if="permissionPrecise.delete(item.id)"
                           >
+                            <AppIcon iconName="app-delete"></AppIcon>
                             {{ $t('common.delete') }}</el-dropdown-item
                           >
                         </el-dropdown-menu>
@@ -376,10 +372,15 @@ const isSystemShare = computed(() => {
 })
 
 const MoreFilledPermission = (item: any) => {
-  return (item.type === 1 && permissionPrecise.value.sync(item.id)) ||
-  permissionPrecise.value.vector(item.id) || permissionPrecise.value.generate(item.id) ||
-  (permissionPrecise.value.edit(item.id) && apiType.value) === 'workspace' ||
-  permissionPrecise.value.export(item.id) || permissionPrecise.value.delete(item.id) || isSystemShare.value
+  return (
+    (item.type === 1 && permissionPrecise.value.sync(item.id)) ||
+    permissionPrecise.value.vector(item.id) ||
+    permissionPrecise.value.generate(item.id) ||
+    (permissionPrecise.value.edit(item.id) && apiType.value) === 'workspace' ||
+    permissionPrecise.value.export(item.id) ||
+    permissionPrecise.value.delete(item.id) ||
+    isSystemShare.value
+  )
 }
 
 const loading = ref(false)

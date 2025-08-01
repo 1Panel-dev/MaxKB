@@ -19,11 +19,11 @@
           <div>
             <!-- 编辑分段按钮 -->
             <el-button link @click="editHandle(child, cIndex)">
-              <el-icon><EditPen /></el-icon>
+              <AppIcon iconName="app-edit"></AppIcon>
             </el-button>
             <!-- 删除分段按钮  -->
             <el-button link @click="deleteHandle(child, cIndex)">
-              <el-icon><Delete /></el-icon>
+              <AppIcon iconName="app-delete"></AppIcon>
             </el-button>
           </div>
         </div>
@@ -64,43 +64,43 @@ const localParagraphList = ref<any[]>([])
 const props = defineProps({
   modelValue: {
     type: Array<any>,
-    default: () => []
+    default: () => [],
   },
   isConnect: Boolean,
-  knowledgeId: String
+  knowledgeId: String,
 })
 
 // 初始化加载数据
 watchEffect(() => {
   if (props.modelValue && props.modelValue.length > 0) {
-    const end = page_size.value * current_page.value;
-    localParagraphList.value = props.modelValue.slice(0, Math.min(end, props.modelValue.length));
+    const end = page_size.value * current_page.value
+    localParagraphList.value = props.modelValue.slice(0, Math.min(end, props.modelValue.length))
   }
 })
 
 // 监听分页变化，只加载需要的数据
 watchEffect(() => {
-  const start = 0;
-  const end = page_size.value * current_page.value;
+  const start = 0
+  const end = page_size.value * current_page.value
   // 不管数据量多少，都确保获取所有应该显示的数据
-  localParagraphList.value = props.modelValue.slice(start, Math.min(end, props.modelValue.length));
+  localParagraphList.value = props.modelValue.slice(start, Math.min(end, props.modelValue.length))
 })
 
 const paragraph_list = computed(() => {
-  return localParagraphList.value;
+  return localParagraphList.value
 })
 
 const next = () => {
-  loading.value = true;
+  loading.value = true
   setTimeout(() => {
-    current_page.value += 1;
-    loading.value = false;
-  }, 100); // 添加小延迟让UI有时间更新
+    current_page.value += 1
+    loading.value = false
+  }, 100) // 添加小延迟让UI有时间更新
 }
 
 const editHandle = (item: any, cIndex: number) => {
   // 计算实际索引，考虑分页
-  currentCIndex.value = cIndex + (page_size.value * (current_page.value - 1));
+  currentCIndex.value = cIndex + page_size.value * (current_page.value - 1)
   EditParagraphDialogRef.value.open(item)
 }
 
@@ -112,28 +112,27 @@ const updateContent = (data: any) => {
     !data?.problem_list.some((item: any) => item.content === data.title.trim())
   ) {
     data['problem_list'].push({
-      content: data.title.trim()
+      content: data.title.trim(),
     })
   }
   new_value[currentCIndex.value] = cloneDeep(data)
   emit('update:modelValue', new_value)
 
   // 更新本地列表
-  const localIndex = currentCIndex.value - (page_size.value * (current_page.value - 1));
+  const localIndex = currentCIndex.value - page_size.value * (current_page.value - 1)
   if (localIndex >= 0 && localIndex < localParagraphList.value.length) {
-    localParagraphList.value[localIndex] = cloneDeep(data);
+    localParagraphList.value[localIndex] = cloneDeep(data)
   }
 }
 
 const deleteHandle = (item: any, cIndex: number) => {
-
   MsgConfirm(
     `${t('views.paragraph.delete.confirmTitle')}${item.title || '-'} ?`,
     t('views.paragraph.delete.confirmMessage'),
     {
       confirmButtonText: t('common.confirm'),
-      confirmButtonClass: 'color-danger'
-    }
+      confirmButtonClass: 'color-danger',
+    },
   )
     .then(() => {
       const new_value = [...props.modelValue]
@@ -141,12 +140,12 @@ const deleteHandle = (item: any, cIndex: number) => {
       emit('update:modelValue', new_value)
 
       // 更新本地列表
-      localParagraphList.value.splice(cIndex, 1);
+      localParagraphList.value.splice(cIndex, 1)
       // 如果当前页删除完了，从总数据中再取一条添加到末尾
       if (props.modelValue.length > localParagraphList.value.length * current_page.value) {
-        const nextItem = props.modelValue[localParagraphList.value.length * current_page.value];
+        const nextItem = props.modelValue[localParagraphList.value.length * current_page.value]
         if (nextItem) {
-          localParagraphList.value.push(nextItem);
+          localParagraphList.value.push(nextItem)
         }
       }
     })

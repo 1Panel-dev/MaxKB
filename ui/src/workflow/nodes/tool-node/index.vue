@@ -27,7 +27,7 @@
                   item.source === 'reference'
                     ? $t('views.tool.form.param.selectPlaceholder')
                     : $t('views.tool.form.param.inputPlaceholder'),
-                trigger: 'blur'
+                trigger: 'blur',
               }"
             >
               <template #label>
@@ -43,12 +43,10 @@
                   </div>
                   <div>
                     <el-button text @click.stop="openAddDialog(item, index)">
-                      <el-icon><EditPen /></el-icon>
+                      <AppIcon iconName="app-edit"></AppIcon>
                     </el-button>
                     <el-button text @click="deleteField(index)" style="margin-left: 4px !important">
-                      <el-icon>
-                        <Delete />
-                      </el-icon>
+                      <AppIcon iconName="app-delete"></AppIcon>
                     </el-button>
                   </div>
                 </div>
@@ -138,7 +136,7 @@ const nodeCascaderRef = ref()
 const form = {
   code: '',
   input_field_list: [],
-  is_result: false
+  is_result: false,
 }
 
 const currentIndex = ref<any>(null)
@@ -155,7 +153,7 @@ const chat_data = computed({
   },
   set: (value) => {
     set(props.nodeModel.properties, 'node_data', value)
-  }
+  },
 })
 
 const ToolNodeFormRef = ref<FormInstance>()
@@ -188,7 +186,7 @@ function refreshFieldList(data: any) {
   const list = cloneDeep(props.nodeModel.properties.node_data.input_field_list)
   const obj = {
     ...data,
-    value: data.source === 'reference' ? [] : ''
+    value: data.source === 'reference' ? [] : '',
   }
   if (currentIndex.value !== null) {
     list.splice(currentIndex.value, 1, obj)

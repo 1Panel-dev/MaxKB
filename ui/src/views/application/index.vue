@@ -222,9 +222,7 @@
                     <div @click.stop>
                       <el-dropdown trigger="click">
                         <el-button text @click.stop>
-                          <el-icon>
-                            <MoreFilled />
-                          </el-icon>
+                          <AppIcon iconName="app-more"></AppIcon>
                         </el-button>
                         <template #dropdown>
                           <el-dropdown-menu>
@@ -265,10 +263,11 @@
                             </el-dropdown-item>
                             <el-dropdown-item
                               divided
-                              icon="Delete"
                               @click.stop="deleteApplication(item)"
                               v-if="permissionPrecise.delete(item.id)"
-                              >{{ $t('common.delete') }}
+                            >
+                              <AppIcon iconName="app-delete"></AppIcon>
+                              {{ $t('common.delete') }}
                             </el-dropdown-item>
                           </el-dropdown-menu>
                         </template>

@@ -1,6 +1,11 @@
 <template>
   <div class="email-setting p-16-24">
-    <h4 class="mb-16">{{ $t('views.system.email.title') }}</h4>
+    <el-breadcrumb separator-icon="ArrowRight" class="mb-16">
+      <el-breadcrumb-item>{{ t('views.system.subTitle') }}</el-breadcrumb-item>
+      <el-breadcrumb-item>
+        <h5 class="ml-4 color-text-primary">{{ $t('views.system.email.title') }}</h5>
+      </el-breadcrumb-item>
+    </el-breadcrumb>
     <el-card style="--el-card-padding: 16px" v-loading="loading">
       <el-scrollbar>
         <div class="email-setting__main p-16">

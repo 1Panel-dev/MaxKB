@@ -131,7 +131,7 @@
                       class="mt-4"
                       @click="deleteCondition(index, cIndex)"
                     >
-                      <el-icon><Delete /></el-icon>
+                      <AppIcon iconName="app-delete"></AppIcon>
                     </el-button>
                   </el-col>
                 </el-row>

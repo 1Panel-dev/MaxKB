@@ -48,7 +48,9 @@
 // button
 .el-button {
   --el-button-font-weight: 400;
+  --el-button-text-color: var(--el-text-color-primary);
   padding: 5px 12px;
+  // color: var(--el-text-color-primary);
   &.is-text {
     padding: 4px !important;
     font-size: 16px;
@@ -58,7 +60,6 @@
     }
   }
   &:focus {
-    color: var(--el-button-text-color);
     background-color: none;
     border-color: none;
   }
@@ -79,7 +80,9 @@
 .el-button--large {
   font-size: 16px;
 }
-
+.el-button--primary {
+  --el-button-text-color: var(--el-color-white);
+}
 // dropdown
 .el-dropdown {
   color: var(--el-text-color-primary);
@@ -265,4 +268,17 @@
 .el-cascader-node__prefix {
   right: 10px;
   left: auto;
+}
+
+.el-anchor {
+  --el-anchor-font-size: 14px;
+}
+
+.el-breadcrumb__separator.el-icon {
+  font-size: 12px;
+}
+
+// el-tag
+.el-tag {
+  padding: 0 6px;
 }

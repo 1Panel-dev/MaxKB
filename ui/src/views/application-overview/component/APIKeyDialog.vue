@@ -48,7 +48,7 @@
           </span>
           <el-tooltip effect="dark" :content="$t('common.delete')" placement="top">
             <el-button type="primary" text @click="deleteApiKey(row)">
-              <el-icon><Delete /></el-icon>
+              <AppIcon iconName="app-delete"></AppIcon>
             </el-button>
           </el-tooltip>
         </template>

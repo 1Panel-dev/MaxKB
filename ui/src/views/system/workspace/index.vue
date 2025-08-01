@@ -43,13 +43,13 @@
                     <div class="flex-between">
                       <span class="ellipsis" :title="row.name">{{ row.name }}</span>
                       <div @click.stop v-show="mouseId === row.id">
-                        <el-dropdown :teleported="false" trigger="click"
-                          v-if="editPermission() || dlePermission()"  
+                        <el-dropdown
+                          :teleported="false"
+                          trigger="click"
+                          v-if="editPermission() || dlePermission()"
                         >
                           <el-button text>
-                            <el-icon class="color-secondary">
-                              <MoreFilled />
-                            </el-icon>
+                            <AppIcon iconName="app-more"></AppIcon>
                           </el-button>
                           <template #dropdown>
                             <el-dropdown-menu style="min-width: 80px">
@@ -58,7 +58,7 @@
                                 class="p-8"
                                 v-if="editPermission()"
                               >
-                                <el-icon><EditPen /></el-icon>
+                                <AppIcon iconName="app-edit"></AppIcon>
                                 {{ $t('common.rename') }}
                               </el-dropdown-item>
                               <el-dropdown-item
@@ -66,7 +66,7 @@
                                 class="border-t p-8"
                                 v-if="dlePermission()"
                               >
-                                <el-icon><Delete /></el-icon>
+                                <AppIcon iconName="app-delete"></AppIcon>
                                 {{ $t('common.delete') }}
                               </el-dropdown-item>
                             </el-dropdown-menu>
@@ -136,13 +136,11 @@ onMounted(async () => {
 })
 
 const editPermission = () => {
-  return hasPermission([RoleConst.ADMIN, 
-  PermissionConst.WORKSPACE_EDIT],'OR',)
+  return hasPermission([RoleConst.ADMIN, PermissionConst.WORKSPACE_EDIT], 'OR')
 }
 
 const dlePermission = () => {
-  return hasPermission([RoleConst.ADMIN, 
-  PermissionConst.WORKSPACE_DELETE],'OR',)
+  return hasPermission([RoleConst.ADMIN, PermissionConst.WORKSPACE_DELETE], 'OR')
 }
 
 async function refresh(workspace?: WorkspaceItem) {

@@ -176,7 +176,7 @@
                   :title="$t('common.modify')"
                   @click.stop="openEditModel(row)"
                 >
-                  <el-icon><EditPen /></el-icon>
+                  <AppIcon iconName="app-edit"></AppIcon>
                 </el-button>
               </span>
             </el-tooltip>
@@ -216,7 +216,7 @@
                   :title="$t('common.delete')"
                   @click.stop="deleteModel(row)"
                 >
-                  <el-icon><Delete /></el-icon>
+                  <AppIcon iconName="app-delete"></AppIcon>
                 </el-button>
               </span>
             </el-tooltip>

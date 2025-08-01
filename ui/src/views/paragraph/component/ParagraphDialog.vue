@@ -15,7 +15,7 @@
           <div class="p-24" style="padding-bottom: 8px">
             <div style="position: absolute; right: 20px; top: 20px">
               <el-button text @click="isEdit = true" v-if="paragraphId && !isEdit">
-                <el-icon><EditPen /></el-icon>
+                <AppIcon iconName="app-edit"></AppIcon>
               </el-button>
             </div>
 

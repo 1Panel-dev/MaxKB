@@ -199,7 +199,7 @@
               </div>
             </div>
             <el-button text @click="deleteFile(index)">
-              <el-icon><Delete /></el-icon>
+              <AppIcon iconName="app-delete"></AppIcon>
             </el-button>
           </div>
         </el-card>

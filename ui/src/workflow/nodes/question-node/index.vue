@@ -80,7 +80,6 @@
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content>{{ $t('views.application.form.prompt.tooltip') }}</template>
                 <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
-                <el-icon><EditPen /></el-icon>
               </el-tooltip>
             </div>
           </template>
