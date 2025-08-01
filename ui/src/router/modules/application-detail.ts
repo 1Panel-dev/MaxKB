@@ -23,25 +23,34 @@ const ApplicationDetailRouter = {
         parentName: 'ApplicationDetail',
         permission: [
           () => {
-              const to: any = get_next_route()
-           return new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission( to ? to.params.id : '',)],[],'AND')},
-
-          RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-          PermissionConst.APPLICATION_OVERVIEW_READ.getWorkspacePermissionWorkspaceManageRole,
-          () => {
             const to: any = get_next_route()
-            return PermissionConst.APPLICATION_OVERVIEW_READ.getApplicationWorkspaceResourcePermission(
-              to ? to.params.id : '',
-            )
+            if (to.params.from == 'resource-management') { } else {
+              return new ComplexPermission([RoleConst.USER], [PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(to ? to.params.id : '',)], [], 'AND')
+            }
           },
           () => {
             const to: any = get_next_route()
-            if (to.path.includes('resource-management')) {return RoleConst.ADMIN}
+            if (to.params.from == 'resource-management') { } else { return RoleConst.WORKSPACE_MANAGE.getWorkspaceRole }
           },
           () => {
             const to: any = get_next_route()
-            console.log('ss',to)
-            if (to.path.includes('resource-management')) { return PermissionConst.RESOURCE_APPLICATION_OVERVIEW_READ} 
+            if (to.params.from == 'resource-management') { } else { return PermissionConst.APPLICATION_OVERVIEW_READ.getWorkspacePermissionWorkspaceManageRole }
+          },
+          () => {
+            const to: any = get_next_route()
+            if (to.params.from == 'resource-management') { } else {
+              return PermissionConst.APPLICATION_OVERVIEW_READ.getApplicationWorkspaceResourcePermission(
+                to ? to.params.id : '',
+              )
+            }
+          },
+          () => {
+            const to: any = get_next_route()
+            if (to.path.includes('resource-management')) { return RoleConst.ADMIN }
+          },
+          () => {
+            const to: any = get_next_route()
+            if (to.path.includes('resource-management')) { return PermissionConst.RESOURCE_APPLICATION_OVERVIEW_READ }
           },
         ]
       },
@@ -59,23 +68,38 @@ const ApplicationDetailRouter = {
         parentName: 'ApplicationDetail',
         permission: [
           () => {
-              const to: any = get_next_route()
-           return new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission( to ? to.params.id : '',)],[],'AND')},
-          RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-          PermissionConst.APPLICATION_EDIT.getWorkspacePermissionWorkspaceManageRole,
-          () => {
             const to: any = get_next_route()
-            return PermissionConst.APPLICATION_EDIT.getApplicationWorkspaceResourcePermission(
-              to ? to.params.id : '',
-            )
+            if (to.params.from == 'resource-management') { } else {
+              return new ComplexPermission([RoleConst.USER], [PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(to ? to.params.id : '',)], [], 'AND')
+            }
           },
           () => {
             const to: any = get_next_route()
-            if (to.path.includes('resource-management')) {return RoleConst.ADMIN}
+            if (to.params.from == 'resource-management') { } else {
+              return RoleConst.WORKSPACE_MANAGE.getWorkspaceRole
+            }
           },
-          ()=>{
+          () => {
             const to: any = get_next_route()
-              if (to.path.includes('resource-management')) { return PermissionConst.RESOURCE_APPLICATION_EDIT} 
+            if (to.params.from == 'resource-management') { } else {
+              return PermissionConst.APPLICATION_EDIT.getWorkspacePermissionWorkspaceManageRole
+            }
+          },
+          () => {
+            const to: any = get_next_route()
+            if (to.params.from == 'resource-management') { } else {
+              return PermissionConst.APPLICATION_EDIT.getApplicationWorkspaceResourcePermission(
+                to ? to.params.id : '',
+              )
+            }
+          },
+          () => {
+            const to: any = get_next_route()
+            if (to.path.includes('resource-management')) { return RoleConst.ADMIN }
+          },
+          () => {
+            const to: any = get_next_route()
+            if (to.path.includes('resource-management')) { return PermissionConst.RESOURCE_APPLICATION_EDIT }
           },
         ]
       },
@@ -93,21 +117,34 @@ const ApplicationDetailRouter = {
         parentName: 'ApplicationDetail',
         permission: [
           () => {
-              const to: any = get_next_route()
-           return new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission( to ? to.params.id : '',)],[EditionConst.IS_EE, EditionConst.IS_PE],'AND')},
-          new ComplexPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,],[PermissionConst.APPLICATION_ACCESS_READ.getWorkspacePermissionWorkspaceManageRole],[EditionConst.IS_EE, EditionConst.IS_PE],'OR'),
-          new ComplexPermission([],[() => {
             const to: any = get_next_route()
-            return PermissionConst.APPLICATION_ACCESS_READ.getApplicationWorkspaceResourcePermission(
-              to ? to.params.id : '',)
-          }],[EditionConst.IS_EE, EditionConst.IS_PE],'OR'),
+            if (to.params.from == 'resource-management') { } else {
+              return new ComplexPermission([RoleConst.USER], [PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(to ? to.params.id : '',)], [EditionConst.IS_EE, EditionConst.IS_PE], 'AND')
+            }
+          },
           () => {
             const to: any = get_next_route()
-            if (to.path.includes('resource-management')) {return RoleConst.ADMIN}
+            if (to.params.from == 'resource-management') { } else {
+              return new ComplexPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,], [PermissionConst.APPLICATION_ACCESS_READ.getWorkspacePermissionWorkspaceManageRole], [EditionConst.IS_EE, EditionConst.IS_PE], 'OR')
+            }
           },
-          ()=>{
+          () => {
             const to: any = get_next_route()
-              if (to.path.includes('resource-management')) { return PermissionConst.RESOURCE_APPLICATION_ACCESS_READ} 
+            if (to.params.from == 'resource-management') { } else {
+              return new ComplexPermission([], [() => {
+                const to: any = get_next_route()
+                return PermissionConst.APPLICATION_ACCESS_READ.getApplicationWorkspaceResourcePermission(
+                  to ? to.params.id : '',)
+              }], [EditionConst.IS_EE, EditionConst.IS_PE], 'OR')
+            }
+          },
+          () => {
+            const to: any = get_next_route()
+            if (to.path.includes('resource-management')) { return RoleConst.ADMIN }
+          },
+          () => {
+            const to: any = get_next_route()
+            if (to.path.includes('resource-management')) { return PermissionConst.RESOURCE_APPLICATION_ACCESS_READ }
           },
         ]
       },
@@ -126,22 +163,31 @@ const ApplicationDetailRouter = {
         resourceType: SourceTypeEnum.APPLICATION,
         permission: [
           () => {
-              const to: any = get_next_route()
-           return new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission( to ? to.params.id : '',)],[EditionConst.IS_EE, EditionConst.IS_PE],'AND')},
-          new ComplexPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],[PermissionConst.APPLICATION_CHAT_USER_READ.getWorkspacePermissionWorkspaceManageRole],[EditionConst.IS_EE, EditionConst.IS_PE],'OR')
-           ,
-          () => {
             const to: any = get_next_route()
-            return new ComplexPermission([],[PermissionConst.APPLICATION_CHAT_USER_READ.getApplicationWorkspaceResourcePermission(
-              to ? to.params.id : '',)],[EditionConst.IS_EE, EditionConst.IS_PE],'OR')
+            if (to.params.from == 'resource-management') { } else {
+              return new ComplexPermission([RoleConst.USER], [PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(to ? to.params.id : '',)], [EditionConst.IS_EE, EditionConst.IS_PE], 'AND')
+            }
           },
           () => {
             const to: any = get_next_route()
-            if (to.path.includes('resource-management')) {return RoleConst.ADMIN}
+            if (to.params.from == 'resource-management') { } else {
+              return new ComplexPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole], [PermissionConst.APPLICATION_CHAT_USER_READ.getWorkspacePermissionWorkspaceManageRole], [EditionConst.IS_EE, EditionConst.IS_PE], 'OR')
+            }
           },
-          ()=>{
+          () => {
             const to: any = get_next_route()
-              if (to.path.includes('resource-management')) { return PermissionConst.RESOURCE_APPLICATION_CHAT_USER_READ} 
+            if (to.params.from == 'resource-management') { } else {
+              return new ComplexPermission([], [PermissionConst.APPLICATION_CHAT_USER_READ.getApplicationWorkspaceResourcePermission(
+                to ? to.params.id : '',)], [EditionConst.IS_EE, EditionConst.IS_PE], 'OR')
+            }
+          },
+          () => {
+            const to: any = get_next_route()
+            if (to.path.includes('resource-management')) { return RoleConst.ADMIN }
+          },
+          () => {
+            const to: any = get_next_route()
+            if (to.path.includes('resource-management')) { return PermissionConst.RESOURCE_APPLICATION_CHAT_USER_READ }
           },
         ]
       },
@@ -159,23 +205,38 @@ const ApplicationDetailRouter = {
         parentName: 'ApplicationDetail',
         permission: [
           () => {
-              const to: any = get_next_route()
-           return new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission( to ? to.params.id : '',)],[],'AND')},
-          RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-          PermissionConst.APPLICATION_CHAT_LOG_READ.getWorkspacePermissionWorkspaceManageRole,
-          () => {
             const to: any = get_next_route()
-            return PermissionConst.APPLICATION_CHAT_LOG_READ.getApplicationWorkspaceResourcePermission(
-              to ? to.params.id : '',
-            )
+            if (to.params.from == 'resource-management') { } else {
+              return new ComplexPermission([RoleConst.USER], [PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(to ? to.params.id : '',)], [], 'AND')
+            }
           },
           () => {
             const to: any = get_next_route()
-            if (to.path.includes('resource-management')) {return RoleConst.ADMIN}
+            if (to.params.from == 'resource-management') { } else {
+              return RoleConst.WORKSPACE_MANAGE.getWorkspaceRole
+            }
           },
-          ()=>{
+          () => {
             const to: any = get_next_route()
-              if (to.path.includes('resource-management')) { return PermissionConst.RESOURCE_APPLICATION_CHAT_LOG_READ} 
+            if (to.params.from == 'resource-management') { } else {
+              return PermissionConst.APPLICATION_CHAT_LOG_READ.getWorkspacePermissionWorkspaceManageRole
+            }
+          },
+          () => {
+            const to: any = get_next_route()
+            if (to.params.from == 'resource-management') { } else {
+              return PermissionConst.APPLICATION_CHAT_LOG_READ.getApplicationWorkspaceResourcePermission(
+                to ? to.params.id : '',
+              )
+            }
+          },
+          () => {
+            const to: any = get_next_route()
+            if (to.path.includes('resource-management')) { return RoleConst.ADMIN }
+          },
+          () => {
+            const to: any = get_next_route()
+            if (to.path.includes('resource-management')) { return PermissionConst.RESOURCE_APPLICATION_CHAT_LOG_READ }
           },
         ]
       },
