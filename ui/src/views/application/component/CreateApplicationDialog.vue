@@ -249,9 +249,9 @@ const submitHandle = async (formEl: FormInstance | undefined) => {
           MsgSuccess(t('common.createSuccess'))
           emit('refresh')
           if (isWorkFlow(applicationForm.value.type)) {
-            router.push({ path: `/application/${res.data.id}/workflow` })
+            router.push({ path: `/application/workspace/${res.data.id}/workflow` })
           } else {
-            router.push({ path: `/application/${res.data.id}/${res.data.type}/setting` })
+            router.push({ path: `/application/workspace/${res.data.id}/${res.data.type}/setting` })
           }
           dialogVisible.value = false
         })

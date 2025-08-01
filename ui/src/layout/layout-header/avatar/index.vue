@@ -29,7 +29,8 @@
             </template>
           </div>
         </div>
-        <el-dropdown-item class="border-t"
+        <el-dropdown-item
+          class="border-t"
           @click="router.push({ path: `/system/user` })"
           v-if="
             hasPermission(
@@ -45,11 +46,9 @@
         >
           <div class="flex-between w-full">
             {{ $t('views.system.title') }}
-            <AppIcon iconName="app-go"></AppIcon>
           </div>
         </el-dropdown-item>
         <el-dropdown-item
-
           @click="openResetPassword"
           v-if="
             hasPermission(

@@ -23,7 +23,7 @@
           show-input
           :show-input-controls="false"
           :min="1"
-          :max="10"
+          :max="100"
         />
       </el-form-item>
       <el-form-item
@@ -34,7 +34,7 @@
           show-input
           :show-input-controls="false"
           :min="1"
-          :max="100"
+          :max="1000"
         />
       </el-form-item>
       <el-form-item
