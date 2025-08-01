@@ -30,11 +30,11 @@ const ApplicationDetailRouter = {
           },
           () => {
             const to: any = get_next_route()
-            if (to.params.from == 'resource-management') { } else { return RoleConst.WORKSPACE_MANAGE.getWorkspaceRole }
+            if (to.params.from == 'resource-management') { } else { return RoleConst.WORKSPACE_MANAGE.getWorkspaceRole() }
           },
           () => {
             const to: any = get_next_route()
-            if (to.params.from == 'resource-management') { } else { return PermissionConst.APPLICATION_OVERVIEW_READ.getWorkspacePermissionWorkspaceManageRole }
+            if (to.params.from == 'resource-management') { } else { return PermissionConst.APPLICATION_OVERVIEW_READ.getWorkspacePermissionWorkspaceManageRole() }
           },
           () => {
             const to: any = get_next_route()
@@ -76,13 +76,13 @@ const ApplicationDetailRouter = {
           () => {
             const to: any = get_next_route()
             if (to.params.from == 'resource-management') { } else {
-              return RoleConst.WORKSPACE_MANAGE.getWorkspaceRole
+              return RoleConst.WORKSPACE_MANAGE.getWorkspaceRole()
             }
           },
           () => {
             const to: any = get_next_route()
             if (to.params.from == 'resource-management') { } else {
-              return PermissionConst.APPLICATION_EDIT.getWorkspacePermissionWorkspaceManageRole
+              return PermissionConst.APPLICATION_EDIT.getWorkspacePermissionWorkspaceManageRole()
             }
           },
           () => {
@@ -213,13 +213,13 @@ const ApplicationDetailRouter = {
           () => {
             const to: any = get_next_route()
             if (to.params.from == 'resource-management') { } else {
-              return RoleConst.WORKSPACE_MANAGE.getWorkspaceRole
+              return RoleConst.WORKSPACE_MANAGE.getWorkspaceRole()
             }
           },
           () => {
             const to: any = get_next_route()
             if (to.params.from == 'resource-management') { } else {
-              return PermissionConst.APPLICATION_CHAT_LOG_READ.getWorkspacePermissionWorkspaceManageRole
+              return PermissionConst.APPLICATION_CHAT_LOG_READ.getWorkspacePermissionWorkspaceManageRole()
             }
           },
           () => {
