@@ -3,7 +3,9 @@
     <span class="flex align-center">
       <span>{{ $t('views.paragraph.relatedProblem.title') }}</span>
       <el-divider direction="vertical" class="mr-4" />
-      <el-button text @click="addProblem">
+      <el-button text @click="addProblem"
+        v-if="permissionPrecise.problem_relate(id)"
+      >
         <el-icon><Plus /></el-icon>
       </el-button>
     </span>
@@ -43,7 +45,7 @@
             class="question-tag"
             type="info"
             effect="plain"
-            closable
+            v-bind="permissionPrecise.problem_relate(id) ? {closable:true} : {} "
           >
             <auto-tooltip :content="item.content">
               {{ item.content }}
@@ -55,9 +57,11 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, nextTick, onMounted, onUnmounted, watch } from 'vue'
+import { ref, nextTick, onMounted, onUnmounted, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import permissionMap from '@/permission'
+
 
 const props = defineProps<{
   paragraphId: String
@@ -70,6 +74,10 @@ const route = useRoute()
 const {
   params: { id, documentId }, // id为knowledgeId
 } = route as any
+
+const permissionPrecise = computed(() => {
+  return permissionMap['knowledge'][props.apiType]
+})
 
 const inputRef = ref()
 const loading = ref(false)
