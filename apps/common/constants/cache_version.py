@@ -29,6 +29,9 @@ class Cache_Version(Enum):
 
     # 对话
     CHAT = "CHAT", lambda key: key
+
+    CHAT_VARIABLE = "CHAT_VARIABLE", lambda key: key
+
     # 应用API KEY
     APPLICATION_API_KEY = "APPLICATION_API_KEY", lambda secret_key, use_get_data: secret_key
 

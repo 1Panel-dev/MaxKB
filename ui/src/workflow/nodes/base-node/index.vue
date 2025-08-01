@@ -83,6 +83,7 @@
       </el-form-item>
       <UserInputFieldTable ref="UserInputFieldTableFef" :node-model="nodeModel" />
       <ApiInputFieldTable ref="ApiInputFieldTableFef" :node-model="nodeModel" />
+      <ChatFieldTable ref="ChatFieldTeble" :node-model="nodeModel"></ChatFieldTable>
       <el-form-item>
         <template #label>
           <div class="flex-between">
@@ -177,6 +178,7 @@ import TTSModeParamSettingDialog from '@/views/application/component/TTSModePara
 import ApiInputFieldTable from './component/ApiInputFieldTable.vue'
 import UserInputFieldTable from './component/UserInputFieldTable.vue'
 import FileUploadSettingDialog from '@/workflow/nodes/base-node/component/FileUploadSettingDialog.vue'
+import ChatFieldTable from './component/ChatFieldTable.vue'
 import { useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 const getApplicationDetail = inject('getApplicationDetail') as any

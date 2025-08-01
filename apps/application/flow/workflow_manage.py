@@ -117,6 +117,7 @@ class WorkflowManage:
         self.params = params
         self.flow = flow
         self.context = {}
+        self.chat_context = {}
         self.node_chunk_manage = NodeChunkManage(self)
         self.work_flow_post_handler = work_flow_post_handler
         self.current_node = None
@@ -131,6 +132,7 @@ class WorkflowManage:
         self.lock = threading.Lock()
         self.field_list = []
         self.global_field_list = []
+        self.chat_field_list = []
         self.init_fields()
         if start_node_id is not None:
             self.load_node(chat_record, start_node_id, start_node_data)
@@ -140,6 +142,7 @@ class WorkflowManage:
     def init_fields(self):
         field_list = []
         global_field_list = []
+        chat_field_list = []
         for node in self.flow.nodes:
             properties = node.properties
             node_name = properties.get('stepName')
@@ -154,10 +157,16 @@ class WorkflowManage:
                 if global_fields is not None:
                     for global_field in global_fields:
                         global_field_list.append({**global_field, 'node_id': node_id, 'node_name': node_name})
+                chat_fields = node_config.get('chatFields')
+                if chat_fields is not None:
+                    for chat_field in chat_fields:
+                        chat_field_list.append({**chat_field, 'node_id': node_id, 'node_name': node_name})
         field_list.sort(key=lambda f: len(f.get('node_name') + f.get('value')), reverse=True)
         global_field_list.sort(key=lambda f: len(f.get('node_name') + f.get('value')), reverse=True)
+        chat_field_list.sort(key=lambda f: len(f.get('node_name') + f.get('value')), reverse=True)
         self.field_list = field_list
         self.global_field_list = global_field_list
+        self.chat_field_list = chat_field_list
 
     def append_answer(self, content):
         self.answer += content
@@ -445,6 +454,9 @@ class WorkflowManage:
         return current_node.node_params.get('is_result', not self._has_next_node(
             current_node, current_node_result)) if current_node.node_params is not None else False
 
+    def get_chat_info(self):
+        return self.work_flow_post_handler.chat_info
+
     def get_chunk_content(self, chunk, is_end=False):
         return 'data: ' + json.dumps(
             {'chat_id': self.params['chat_id'], 'id': self.params['chat_record_id'], 'operate': True,
@@ -587,12 +599,15 @@ class WorkflowManage:
         """
         if node_id == 'global':
             return INode.get_field(self.context, fields)
+        elif node_id == 'chat':
+            return INode.get_field(self.chat_context, fields)
         else:
             return self.get_node_by_id(node_id).get_reference_field(fields)
 
     def get_workflow_content(self):
         context = {
             'global': self.context,
+            'chat': self.chat_context
         }
 
         for node in self.node_context:
@@ -610,6 +625,10 @@ class WorkflowManage:
             globeLabelNew = f"global.{field.get('value')}"
             globeValue = f"context.get('global').get('{field.get('value', '')}','')"
             prompt = prompt.replace(globeLabel, globeValue).replace(globeLabelNew, globeValue)
+        for field in self.chat_field_list:
+            chatLabel = f"chat.{field.get('value')}"
+            chatValue = f"context.get('chat').get('{field.get('value', '')}','')"
+            prompt = prompt.replace(chatLabel, chatValue)
         return prompt
 
     def generate_prompt(self, prompt: str):
