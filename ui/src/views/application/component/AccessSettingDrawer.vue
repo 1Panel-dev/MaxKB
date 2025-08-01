@@ -53,7 +53,7 @@
         <el-text type="info" v-if="configType === 'wechat'">
           {{ $t('views.application.applicationAccess.copyUrl') }}
           <a
-            class="primary"
+            class="color-primary"
             href="https://mp.weixin.qq.com/advanced/advanced?action=dev&t=advanced/dev"
             target="_blank"
             >{{ $t('views.application.applicationAccess.wechatPlatform') }}</a
@@ -62,7 +62,7 @@
         <el-text type="info" v-if="configType === 'dingtalk'">
           {{ $t('views.application.applicationAccess.copyUrl') }}
           <a
-            class="primary"
+            class="color-primary"
             href="https://open-dev.dingtalk.com/fe/app?hash=%23%2Fcorp%2Fapp#/corp/app"
             target="_blank"
             >{{ $t('views.application.applicationAccess.dingtalkPlatform') }}</a
@@ -71,7 +71,7 @@
         <el-text type="info" v-if="configType === 'wecom'">
           {{ $t('views.application.applicationAccess.copyUrl') }}
           <a
-            class="primary"
+            class="color-primary"
             href="https://work.weixin.qq.com/wework_admin/frame#apps"
             target="_blank"
             >{{ $t('views.application.applicationAccess.wecomPlatform') }}</a

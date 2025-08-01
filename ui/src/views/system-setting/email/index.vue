@@ -1,7 +1,7 @@
 <template>
   <div class="email-setting p-16-24">
     <h4 class="mb-16">{{ $t('views.system.email.title') }}</h4>
-    <el-card style="--el-card-padding: 16px" v-loading="loading" class="main-calc-height">
+    <el-card style="--el-card-padding: 16px" v-loading="loading">
       <el-scrollbar>
         <div class="email-setting__main p-16">
           <el-form
@@ -152,6 +152,7 @@ onMounted(() => {
   &__main {
     width: 70%;
     margin: 0 auto;
+    height: calc(100vh - 200px);
   }
 
   :deep(.el-checkbox__label) {

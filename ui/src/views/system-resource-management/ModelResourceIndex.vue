@@ -163,13 +163,17 @@
         </el-table-column>
         <el-table-column :label="$t('common.operation')" align="left" width="120" fixed="right">
           <template #default="{ row }">
-            <el-tooltip effect="dark" :content="$t('common.modify')" placement="top">
+            <el-tooltip
+              effect="dark"
+              :content="$t('common.modify')"
+              placement="top"
+              v-if="permissionPrecise.modify()"
+            >
               <span class="mr-8">
                 <el-button
                   type="primary"
                   text
                   :title="$t('common.modify')"
-                  v-if="permissionPrecise.modify()"
                   @click.stop="openEditModel(row)"
                 >
                   <el-icon><EditPen /></el-icon>
@@ -180,32 +184,36 @@
               effect="dark"
               :content="$t('views.model.modelForm.title.paramSetting')"
               placement="top"
+              v-if="
+                (row.model_type === 'TTS' ||
+                  row.model_type === 'LLM' ||
+                  row.model_type === 'IMAGE' ||
+                  row.model_type === 'TTI') &&
+                permissionPrecise.paramSetting()
+              "
             >
               <span class="mr-8">
                 <el-button
                   type="primary"
                   text
                   :title="$t('views.model.modelForm.title.paramSetting')"
-                  v-if="
-                    (row.model_type === 'TTS' ||
-                      row.model_type === 'LLM' ||
-                      row.model_type === 'IMAGE' ||
-                      row.model_type === 'TTI') &&
-                    permissionPrecise.paramSetting()
-                  "
                   @click.stop="openParamSetting(row)"
                 >
                   <el-icon><Setting /></el-icon>
                 </el-button>
               </span>
             </el-tooltip>
-            <el-tooltip effect="dark" :content="$t('common.delete')" placement="top">
+            <el-tooltip
+              effect="dark"
+              :content="$t('common.delete')"
+              placement="top"
+              v-if="permissionPrecise.delete()"
+            >
               <span class="mr-8">
                 <el-button
                   type="primary"
                   text
                   :title="$t('common.delete')"
-                  v-if="permissionPrecise.delete()"
                   @click.stop="deleteModel(row)"
                 >
                   <el-icon><Delete /></el-icon>

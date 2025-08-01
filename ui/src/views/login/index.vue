@@ -180,32 +180,38 @@ const rules = ref<FormRules<LoginRequest>>({
 })
 
 const loginHandle = () => {
-  loading.value = true
-  loginFormRef.value
-    ?.validate()
-    .then(() => {
+  if (!loginFormRef.value) {
+    return
+  }
+  loginFormRef.value.validate((valid) => {
+    if (valid) {
+      loading.value = true
       if (loginMode.value === 'LDAP') {
-        login.asyncLdapLogin(loginForm.value).then(() => {
-          locale.value = localStorage.getItem('MaxKB-locale') || getBrowserLang() || 'en-US'
-          loading.value = false
-          router.push({ name: 'home' })
-        }).catch(() => {
-          loading.value = false
-        })
+        login
+          .asyncLdapLogin(loginForm.value)
+          .then(() => {
+            locale.value = localStorage.getItem('MaxKB-locale') || getBrowserLang() || 'en-US'
+            loading.value = false
+            router.push({ name: 'home' })
+          })
+          .catch(() => {
+            loading.value = false
+          })
       } else {
-        login.asyncLogin(loginForm.value).then(() => {
-          locale.value = localStorage.getItem('MaxKB-locale') || getBrowserLang() || 'en-US'
-          localStorage.setItem('workspace_id', 'default')
-          loading.value = false
-          router.push({ name: 'home' })
-        }).catch(() => {
-          loading.value = false
-        })
+        login
+          .asyncLogin(loginForm.value)
+          .then(() => {
+            locale.value = localStorage.getItem('MaxKB-locale') || getBrowserLang() || 'en-US'
+            localStorage.setItem('workspace_id', 'default')
+            loading.value = false
+            router.push({ name: 'home' })
+          })
+          .catch(() => {
+            loading.value = false
+          })
       }
-    })
-    .catch(() => {
-      loading.value = false
-    })
+    }
+  })
 }
 
 function makeCode() {

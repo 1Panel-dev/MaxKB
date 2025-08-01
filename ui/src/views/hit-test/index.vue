@@ -16,7 +16,9 @@
           </el-avatar>
         </div>
         <div class="content ml-12">
-          <h4 class="text break-all">{{ questionTitle }}</h4>
+          <h4 class="text break-all ellipsis-1" style="width: 66%" :title="questionTitle">
+            {{ questionTitle }}
+          </h4>
         </div>
       </div>
       <el-scrollbar>
@@ -95,11 +97,13 @@
     <div class="hit-test__operate">
       <el-popover :visible="popoverVisible" placement="right-end" :width="500" trigger="click">
         <template #reference>
-          <el-button icon="Setting" class="mb-8" @click="settingChange('open')"
-            v-if="! route.path.includes('share/')"
-          >{{
-            $t('common.paramSetting')
-          }}</el-button>
+          <el-button
+            icon="Setting"
+            class="mb-8"
+            @click="settingChange('open')"
+            v-if="!route.path.includes('share/')"
+            >{{ $t('common.paramSetting') }}</el-button
+          >
         </template>
         <div class="mb-16">
           <div class="title mb-8">
@@ -190,21 +194,18 @@
 
         <div class="text-right">
           <el-button @click="popoverVisible = false">{{ $t('common.cancel') }}</el-button>
-          <el-button type="primary" @click="settingChange('close')"
-          >{{
+          <el-button type="primary" @click="settingChange('close')">{{
             $t('common.confirm')
           }}</el-button>
         </div>
       </el-popover>
-      <div class="operate-textarea flex"
-        v-if="! route.path.includes('share/')"
-      >
+      <div class="operate-textarea flex" v-if="!route.path.includes('share/')">
         <el-input
           ref="quickInputRef"
           v-model="inputValue"
           type="textarea"
           :placeholder="$t('common.inputPlaceholder')"
-          :autosize="{ minRows: 1, maxRows: 8 }"
+          :autosize="{ minRows: 1, maxRows: 1 }"
           @keydown.enter="sendChatHandle($event)"
         />
         <div class="operate">
