@@ -1,0 +1,35 @@
+# MaxKB 向量模型镜像 Dockerfile
+FROM python:3.11-slim-bookworm AS model-download
+
+# 安装必要工具
+RUN pip3 install --upgrade pip setuptools && \
+    pip install pycrawlers transformers
+
+# 复制模型安装脚本
+COPY installer/install_model.py /tmp/install_model.py
+COPY installer/install_model_bert_base_cased.py /tmp/install_model_bert_base_cased.py
+
+# 设置工作目录
+WORKDIR /opt/maxkb-app
+
+# 下载模型文件
+RUN python3 /tmp/install_model_bert_base_cased.py && \
+    cp -r model/base/hub model/tokenizer
+
+# 最终镜像 - 仅包含模型文件
+FROM alpine:latest
+
+# 复制模型文件
+COPY --from=model-download /opt/maxkb-app/model /opt/maxkb-app/model
+
+# 创建模型信息文件
+RUN echo "MaxKB Vector Models v2.0" > /opt/maxkb-app/model/VERSION && \
+    echo "Built at: $(date)" >> /opt/maxkb-app/model/VERSION && \
+    find /opt/maxkb-app/model -type f -name "*.bin" -o -name "*.safetensors" | wc -l > /opt/maxkb-app/model/model_count.txt
+
+# 设置权限
+RUN chmod -R 755 /opt/maxkb-app/model
+
+VOLUME ["/opt/maxkb-app/model"]
+
+CMD ["echo", "MaxKB Vector Models container. Use as volume source."]

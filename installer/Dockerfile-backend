@@ -1,0 +1,123 @@
+# MaxKB 后台应用 Dockerfile
+FROM python:3.11-slim-bullseye AS backend-build
+
+# 安装系统依赖
+ARG DEPENDENCIES="                    \
+        libexpat1-dev                 \
+        libffi-dev                    \
+        curl                          \
+        ca-certificates               \
+        gettext                       \
+        postgresql-client             \
+        build-essential               \
+        git"
+
+RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
+    echo "Asia/Shanghai" > /etc/timezone && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends $DEPENDENCIES && \
+    apt-get clean all && \
+    rm -rf /var/lib/apt/lists/*
+
+# 设置工作目录
+WORKDIR /opt/maxkb-app
+
+# 复制应用代码 (排除前端和安装文件)
+COPY . /opt/maxkb-app
+RUN rm -rf /opt/maxkb-app/ui && \
+    rm -rf /opt/maxkb-app/installer
+
+# 创建 Python 虚拟环境并安装依赖
+RUN python3 -m venv /opt/py3 && \
+    pip install poetry==2.0.0 --break-system-packages && \
+    poetry config virtualenvs.create false && \
+    . /opt/py3/bin/activate && \
+    if [ "$(uname -m)" = "x86_64" ]; then sed -i 's/^torch.*/torch = {version = "2.7.1+cpu", source = "pytorch"}/g' pyproject.toml; fi && \
+    poetry install --only=main && \
+    pip install requests pymysql psycopg2-binary
+
+# 编译国际化文件
+RUN . /opt/py3/bin/activate && \
+    export MAXKB_CONFIG_TYPE=ENV && \
+    python3 /opt/maxkb-app/apps/manage.py compilemessages
+
+# 创建沙箱环境
+RUN mkdir -p /opt/maxkb-app/sandbox && \
+    useradd --no-create-home --home /opt/maxkb-app/sandbox sandbox -g root && \
+    chown -R sandbox:root /opt/maxkb-app/sandbox
+
+# 最终镜像
+FROM python:3.11-slim-bullseye
+
+# 安装运行时依赖
+RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
+    echo "Asia/Shanghai" > /etc/timezone && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+        curl \
+        ca-certificates \
+        postgresql-client \
+        wait-for-it && \
+    apt-get clean all && \
+    rm -rf /var/lib/apt/lists/*
+
+# 设置环境变量
+ENV MAXKB_CONFIG_TYPE=ENV \
+    MAXKB_DB_NAME=maxkb \
+    MAXKB_DB_HOST=maxkb-postgres \
+    MAXKB_DB_PORT=5432 \
+    MAXKB_DB_USER=maxkb \
+    MAXKB_DB_ENGINE=dj_db_conn_pool.backends.postgresql \
+    MAXKB_DB_MAX_OVERFLOW=80 \
+    MAXKB_REDIS_HOST=maxkb-redis \
+    MAXKB_REDIS_PORT=6379 \
+    MAXKB_REDIS_DB=0 \
+    MAXKB_REDIS_MAX_CONNECTIONS=100 \
+    MAXKB_LOCAL_MODEL_HOST=127.0.0.1 \
+    MAXKB_LOCAL_MODEL_PORT=11636 \
+    MAXKB_LOCAL_MODEL_PROTOCOL=http \
+    MAXKB_SANDBOX=1 \
+    MAXKB_LOG_LEVEL=INFO \
+    MAXKB_SANDBOX_PYTHON_PACKAGE_PATHS="/opt/py3/lib/python3.11/site-packages,/opt/maxkb-app/sandbox/python-packages,/opt/maxkb/python-packages" \
+    MAXKB_SANDBOX_PYTHON_BANNED_KEYWORDS="subprocess.,system(,exec(,pty.,eval(,compile(,shutil.,input(,__import__" \
+    MAXKB_ADMIN_PATH=/admin \
+    MAXKB_CHAT_PATH=/chat \
+    PATH=/opt/py3/bin:$PATH \
+    PYTHONUNBUFFERED=1 \
+    LANG=en_US.UTF-8
+
+# 复制应用和虚拟环境
+COPY --from=backend-build /opt/maxkb-app /opt/maxkb-app
+COPY --from=backend-build /opt/py3 /opt/py3
+
+# 创建启动脚本
+RUN echo '#!/bin/bash\n\
+set -e\n\
+\n\
+echo "等待数据库连接..."\n\
+wait-for-it ${MAXKB_DB_HOST}:${MAXKB_DB_PORT} --timeout=120 --strict\n\
+\n\
+echo "等待 Redis 连接..."\n\
+wait-for-it ${MAXKB_REDIS_HOST}:${MAXKB_REDIS_PORT} --timeout=60 --strict\n\
+\n\
+echo "创建必要目录..."\n\
+mkdir -p /opt/maxkb/logs\n\
+mkdir -p /opt/maxkb/local\n\
+mkdir -p /opt/maxkb/python-packages\n\
+\n\
+echo "清理临时文件..."\n\
+rm -f /opt/maxkb-app/tmp/*.pid\n\
+\n\
+echo "启动 MaxKB 后台应用..."\n\
+cd /opt/maxkb-app\n\
+python main.py start' > /usr/local/bin/start-maxkb-backend.sh && \
+    chmod +x /usr/local/bin/start-maxkb-backend.sh
+
+WORKDIR /opt/maxkb-app
+
+EXPOSE 8080
+
+# 数据卷
+VOLUME ["/opt/maxkb/logs", "/opt/maxkb/local", "/opt/maxkb-app/model"]
+
+CMD ["/usr/local/bin/start-maxkb-backend.sh"]
