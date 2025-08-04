@@ -54,6 +54,7 @@
             v-else-if="search_type === 'is_active'"
             v-model="search_form.is_active"
             @change="getList"
+            clearable
             style="width: 220px"
           >
             <el-option :label="$t('common.status.enabled')" :value="true" />
