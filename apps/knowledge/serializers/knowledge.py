@@ -171,6 +171,7 @@ class KnowledgeSerializer(serializers.Serializer):
             return query_set_dict
 
         def page(self, current_page: int, page_size: int):
+            self.is_valid(raise_exception=True)
             folder_id = self.data.get('folder_id', self.data.get("workspace_id"))
             root = KnowledgeFolder.objects.filter(id=folder_id).first()
             if not root:
@@ -195,6 +196,7 @@ class KnowledgeSerializer(serializers.Serializer):
             )
 
         def list(self):
+            self.is_valid(raise_exception=True)
             folder_id = self.data.get('folder_id')
             if not folder_id:
                 folder_id = self.data.get('workspace_id')
