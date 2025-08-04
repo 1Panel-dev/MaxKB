@@ -14,7 +14,8 @@ Object.defineProperty(prefix, 'value', {
 })
 /**
  * 获取全部应用
- * @param 参数
+ * @param param
+ * @param loading
  */
 const getAllApplication: (param?: any, loading?: Ref<boolean>) => Promise<Result<any[]>> = (
   param,
@@ -39,7 +40,8 @@ const getApplication: (
 
 /**
  * 创建应用
- * @param 参数
+ * @param data
+ * @param loading
  */
 const postApplication: (
   data: ApplicationFormType,
@@ -50,7 +52,9 @@ const postApplication: (
 
 /**
  * 修改应用
- * @param 参数
+ * @param application_id
+ * @param data
+ * @param loading
  */
 const putApplication: (
   application_id: string,
@@ -62,7 +66,8 @@ const putApplication: (
 
 /**
  * 删除应用
- * @param 参数 application_id
+ * @param application_id
+ * @param loading
  */
 const delApplication: (
   application_id: string,
@@ -73,7 +78,8 @@ const delApplication: (
 
 /**
  * 应用详情
- * @param 参数 application_id
+ * @param application_id
+ * @param loading
  */
 const getApplicationDetail: (
   application_id: string,
@@ -84,7 +90,8 @@ const getApplicationDetail: (
 
 /**
  * 获取AccessToken
- * @param 参数 application_id
+ * @param application_id
+ * @param loading
  */
 const getAccessToken: (application_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
   application_id,
@@ -107,10 +114,12 @@ const getApplicationSetting: (
 
 /**
  * 修改AccessToken
- * @param 参数 application_id
  * data {
  *  "is_active": true
  * }
+ * @param application_id
+ * @param data
+ * @param loading
  */
 const putAccessToken: (
   application_id: string,
@@ -122,7 +131,6 @@ const putAccessToken: (
 
 /**
  * 替换社区版-修改AccessToken
- * @param 参数 application_id
  * data {
  *  "show_source": boolean,
  *  "show_history": boolean,
@@ -131,6 +139,9 @@ const putAccessToken: (
  *  "avatar": file,
  *  "float_icon": file,
  * }
+ * @param application_id
+ * @param data
+ * @param loading
  */
 const putXpackAccessToken: (
   application_id: string,
@@ -170,7 +181,9 @@ const importApplication: (
 
 /**
  * 统计
- * @param 参数 application_id, data
+ * @param application_id
+ * @param data
+ * @param loading
  */
 const getStatistics: (
   application_id: string,
@@ -193,9 +206,10 @@ const open: (application_id: string, loading?: Ref<boolean>) => Promise<Result<s
 }
 /**
  * 对话
- * @param 参数
  * chat_id: string
  * data
+ * @param chat_id
+ * @param data
  */
 const chat: (chat_id: string, data: any) => Promise<any> = (chat_id, data) => {
   const prefix = (window.MaxKB?.prefix ? window.MaxKB?.prefix : '/admin') + '/api'
@@ -248,6 +262,7 @@ const updatePlatformConfig: (
 /**
  * 应用发布
  * @param application_id
+ * @param data
  * @param loading
  * @returns
  */
@@ -284,7 +299,7 @@ const playDemoText: (application_id: string, data: any, loading?: Ref<boolean>) 
  * 文本转语音
  */
 const postTextToSpeech: (
-  application_id: String,
+  application_id: string,
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (application_id, data, loading) => {
@@ -300,7 +315,7 @@ const postTextToSpeech: (
  * 语音转文本
  */
 const speechToText: (
-  application_id: String,
+  application_id: string,
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (application_id, data, loading) => {
@@ -311,7 +326,7 @@ const speechToText: (
  * mcp 节点
  */
 const getMcpTools: (
-  application_id: String,
+  application_id: string,
   mcp_servers: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (application_id, mcp_servers, loading) => {
@@ -320,7 +335,10 @@ const getMcpTools: (
 
 /**
  * 上传文件
- * @param 参数  file:file
+ * @param file
+ * @param sourceId
+ * @param resourceType
+ * @param loading
  */
 const postUploadFile: (
   file: any,
