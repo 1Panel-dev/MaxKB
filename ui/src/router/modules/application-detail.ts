@@ -125,7 +125,7 @@ const ApplicationDetailRouter = {
           () => {
             const to: any = get_next_route()
             if (to.params.from == 'resource-management') { } else {
-              return new ComplexPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,], [PermissionConst.APPLICATION_ACCESS_READ.getWorkspacePermissionWorkspaceManageRole], [EditionConst.IS_EE, EditionConst.IS_PE], 'OR')
+              return new ComplexPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole(),], [PermissionConst.APPLICATION_ACCESS_READ.getWorkspacePermissionWorkspaceManageRole()], [EditionConst.IS_EE, EditionConst.IS_PE], 'OR')
             }
           },
           () => {
@@ -171,7 +171,7 @@ const ApplicationDetailRouter = {
           () => {
             const to: any = get_next_route()
             if (to.params.from == 'resource-management') { } else {
-              return new ComplexPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole], [PermissionConst.APPLICATION_CHAT_USER_READ.getWorkspacePermissionWorkspaceManageRole], [EditionConst.IS_EE, EditionConst.IS_PE], 'OR')
+              return new ComplexPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole()], [PermissionConst.APPLICATION_CHAT_USER_READ.getWorkspacePermissionWorkspaceManageRole()], [EditionConst.IS_EE, EditionConst.IS_PE], 'OR')
             }
           },
           () => {
