@@ -47,41 +47,43 @@
           <div class="flex-between">
             <div class="flex align-center">
               <h4 class="medium ellipsis" :title="current?.name">{{ current?.name || '-' }}</h4>
-              <el-divider direction="vertical" class="mr-8 ml-8"/>
+              <el-divider direction="vertical" class="mr-8 ml-8" />
 
               <el-icon class="color-input-placeholder">
-                <UserFilled/>
+                <UserFilled />
               </el-icon>
               <span class="color-input-placeholder ml-4">
                 {{ paginationConfig.total }}
               </span>
             </div>
-            <el-button
-              type="primary"
-              :disabled="current?.is_auth"
-              @click="handleSave"
+
+            <div
+              class="flex align-center"
               v-if="
                 route.path.includes('share/')
                   ? false
-                  : hasPermission(
-                      permissionObj[
-                        currentPermissionKey
-                      ],
-                      'OR',
-                    )
+                  : hasPermission(permissionObj[currentPermissionKey], 'OR')
               "
             >
-              {{ t('common.save') }}
-            </el-button>
+              <div class="color-secondary mr-8">{{ $t('views.chatUser.autoAuthorization') }}</div>
+              <el-switch
+                size="small"
+                :model-value="current?.is_auth"
+                @click="changeAuth"
+                :loading="loading"
+              ></el-switch>
+            </div>
           </div>
 
           <div class="flex-between mb-16" style="margin-top: 18px">
             <div class="flex complex-search">
               <el-select class="complex-search__left" v-model="searchType" style="width: 120px">
-                <el-option :label="$t('views.login.loginForm.username.label')" value="username"/>
-                <el-option :label="$t('views.userManage.userForm.nick_name.label')"
-                           value="nick_name"/>
-                <el-option :label="$t('views.userManage.source.label')" value="source"/>
+                <el-option :label="$t('views.login.loginForm.username.label')" value="username" />
+                <el-option
+                  :label="$t('views.userManage.userForm.nick_name.label')"
+                  value="nick_name"
+                />
+                <el-option :label="$t('views.userManage.source.label')" value="source" />
               </el-select>
               <el-input
                 v-if="searchType === 'username'"
@@ -107,62 +109,28 @@
                 style="width: 220px"
                 clearable
               >
-                <el-option
-                  :label="$t('views.userManage.source.local')"
-                  value="LOCAL"
-                />
-                <el-option
-                  label="CAS"
-                  value="CAS"
-                />
-                <el-option
-                  label="LDAP"
-                  value="LDAP"
-                />
-                <el-option
-                  label="OIDC"
-                  value="OIDC"
-                />
-                <el-option
-                  label="OAuth2"
-                  value="OAuth2"
-                />
-                <el-option
-                  :label="$t('views.userManage.source.wecom')"
-                  value="wecom"
-                />
-                <el-option
-                  :label="$t('views.userManage.source.lark')"
-                  value="lark"
-                />
-                <el-option
-                  :label="$t('views.userManage.source.dingtalk')"
-                  value="dingtalk"
-                />
+                <el-option :label="$t('views.userManage.source.local')" value="LOCAL" />
+                <el-option label="CAS" value="CAS" />
+                <el-option label="LDAP" value="LDAP" />
+                <el-option label="OIDC" value="OIDC" />
+                <el-option label="OAuth2" value="OAuth2" />
+                <el-option :label="$t('views.userManage.source.wecom')" value="wecom" />
+                <el-option :label="$t('views.userManage.source.lark')" value="lark" />
+                <el-option :label="$t('views.userManage.source.dingtalk')" value="dingtalk" />
               </el-select>
-
             </div>
-            <div
-              class="flex align-center"
+            <el-button
+              type="primary"
+              :disabled="current?.is_auth"
+              @click="handleSave"
               v-if="
                 route.path.includes('share/')
                   ? false
-                  : hasPermission(
-                      permissionObj[
-                        currentPermissionKey
-                      ],
-                      'OR',
-                    )
+                  : hasPermission(permissionObj[currentPermissionKey], 'OR')
               "
             >
-              <div class="color-secondary mr-8">{{ $t('views.chatUser.autoAuthorization') }}</div>
-              <el-switch
-                size="small"
-                :model-value="current?.is_auth"
-                @click="changeAuth"
-                :loading="loading"
-              ></el-switch>
-            </div>
+              {{ t('common.save') }}
+            </el-button>
           </div>
 
           <app-table
@@ -176,7 +144,7 @@
               prop="nick_name"
               :label="$t('views.userManage.userForm.nick_name.label')"
             />
-            <el-table-column prop="username" :label="$t('views.login.loginForm.username.label')"/>
+            <el-table-column prop="username" :label="$t('views.login.loginForm.username.label')" />
             <el-table-column prop="source" :label="$t('views.userManage.source.label')">
               <template #default="{ row }">
                 {{
@@ -201,9 +169,8 @@
                   :indeterminate="allIndeterminate"
                   :disabled="current?.is_auth"
                   @change="handleCheckAll"
-                >{{ $t('views.chatUser.authorization') }}
-                </el-checkbox
-                >
+                  >{{ $t('views.chatUser.authorization') }}
+                </el-checkbox>
               </template>
               <template #default="{ row }">
                 <el-checkbox
@@ -222,22 +189,22 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref, watch, reactive, computed} from 'vue'
+import { onMounted, ref, watch, reactive, computed } from 'vue'
 
-import {t} from '@/locales'
-import type {ChatUserGroupItem, ChatUserGroupUserItem} from '@/api/type/workspaceChatUser'
-import {useRoute} from 'vue-router'
-import {SourceTypeEnum} from '@/enums/common'
-import {MsgSuccess} from '@/utils/message'
-import {ComplexPermission} from '@/utils/permission/type'
-import {RoleConst, PermissionConst} from '@/utils/permission/data'
-import {hasPermission} from '@/utils/permission/index'
-import {loadSharedApi} from '@/utils/dynamics-api/shared-api'
+import { t } from '@/locales'
+import type { ChatUserGroupItem, ChatUserGroupUserItem } from '@/api/type/workspaceChatUser'
+import { useRoute } from 'vue-router'
+import { SourceTypeEnum } from '@/enums/common'
+import { MsgSuccess } from '@/utils/message'
+import { ComplexPermission } from '@/utils/permission/type'
+import { RoleConst, PermissionConst } from '@/utils/permission/data'
+import { hasPermission } from '@/utils/permission/index'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 const route = useRoute()
 
 const {
-  params: {id, folderId},
+  params: { id, folderId },
 } = route as any
 
 const permissionObj = ref<any>({
@@ -342,7 +309,7 @@ function clickUserGroup(item: ChatUserGroupItem) {
 }
 
 async function changeAuth() {
-  const params = [{user_group_id: current.value?.id as string, is_auth: !current.value?.is_auth}]
+  const params = [{ user_group_id: current.value?.id as string, is_auth: !current.value?.is_auth }]
   try {
     await loadSharedApi({
       type: 'chatUser',
@@ -383,22 +350,16 @@ const isShared = computed(() => {
 async function getList() {
   if (!current.value?.id) return
   const params: any = {}
-  const searchValue = searchForm.value[searchType.value as keyof typeof searchForm.value];
+  const searchValue = searchForm.value[searchType.value as keyof typeof searchForm.value]
   if (searchValue !== undefined && searchValue !== null && searchValue !== '') {
-    params[searchType.value] = searchValue;
+    params[searchType.value] = searchValue
   }
   try {
     const res = await loadSharedApi({
       type: 'chatUser',
       isShared: isShared.value,
       systemType: apiType.value,
-    }).getUserGroupUserList(
-      resource,
-      current.value?.id,
-      paginationConfig,
-      params,
-      rightLoading,
-    )
+    }).getUserGroupUserList(resource, current.value?.id, paginationConfig, params, rightLoading)
     // 更新缓存和回显状态
     res.data.records.forEach((item: any) => {
       if (checkedMap[item.id] === undefined) {

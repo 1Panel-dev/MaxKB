@@ -454,6 +454,8 @@ const uploadFile = async (file: any, fileList: any) => {
   })
   if (!inputValue.value && uploadImageList.value.length > 0) {
     inputValue.value = t('chat.uploadFile.imageMessage')
+  } else {
+    inputValue.value = t('chat.uploadFile.fileMessage')
   }
 }
 // 粘贴处理
