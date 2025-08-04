@@ -28,6 +28,8 @@
               <el-option :label="$t('common.creator')" value="create_user" />
 
               <el-option :label="$t('common.name')" value="name" />
+
+              <el-option :label="$t('common.publishStatus')" value="publish_status" />
             </el-select>
             <el-input
               v-if="search_type === 'name'"
@@ -46,6 +48,17 @@
               style="width: 220px"
             >
               <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.nick_name" />
+            </el-select>
+            <el-select
+              v-else-if="search_type === 'publish_status'"
+              v-model="search_form.publish_status"
+              @change="searchHandle"
+              filterable
+              clearable
+              style="width: 220px"
+            >
+              <el-option :label="$t('common.published')" value="published" />
+              <el-option :label="$t('common.unpublished')" value="unpublished" />
             </el-select>
           </div>
           <el-dropdown trigger="click" v-if="permissionPrecise.create()">
@@ -333,6 +346,7 @@ const search_type = ref('name')
 const search_form = ref<any>({
   name: '',
   create_user: '',
+  publish_status: undefined,
 })
 
 const user_options = ref<any[]>([])

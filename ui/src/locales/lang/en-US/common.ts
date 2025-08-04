@@ -4,6 +4,9 @@ export default {
   createSuccess: 'Successful',
   copy: 'Copy',
   copySuccess: 'Successful',
+  publishStatus: 'Publish Status',
+  published: 'Published',
+  unpublished: 'Unpublished',
   copyError: 'Copy Failed',
   save: 'Save',
   saveSuccess: 'Successful',
@@ -93,7 +96,8 @@ export default {
   notFound: {
     title: '404',
     NoService: 'Currently unable to access services',
-    NoPermission: 'The current user does not have permission to access, please contact the administrator',
+    NoPermission:
+      'The current user does not have permission to access, please contact the administrator',
     operate: 'Back to Home',
   },
   custom: 'Custom',

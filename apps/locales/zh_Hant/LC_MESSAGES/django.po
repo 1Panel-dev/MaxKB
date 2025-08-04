@@ -8676,3 +8676,12 @@ msgstr "獲取 WeCom 部門用戶失敗"
 
 msgid "Failed to get WeCom user info"
 msgstr "獲取 WeCom 用戶詳情失敗"
+
+msgid "Publish status"
+msgstr "發佈狀態"
+
+msgid "Unpublished"
+msgstr "未發佈"
+
+msgid "Published"
+msgstr "已發佈"
