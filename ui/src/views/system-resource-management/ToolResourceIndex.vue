@@ -72,7 +72,7 @@
 
         <el-table-column prop="tool_type" :label="$t('views.system.resource_management.type')">
           <template #default="scope">
-            {{ $t(ToolType[scope.row.tool_type as keyof typeof ToolType]) }}
+            {{ $t(ToolType[scope.row.template_id ? 'INTERNAL' : 'CUSTOM' as keyof typeof ToolType]) }}
           </template>
         </el-table-column>
         <el-table-column :label="$t('common.status.label')" width="120">
