@@ -631,7 +631,7 @@
     <ImportDocumentDialog ref="ImportDocumentDialogRef" :title="title" @refresh="refresh" />
     <SyncWebDialog ref="SyncWebDialogRef" @refresh="refresh" />
     <!-- 选择知识库 -->
-    <SelectKnowledgeDialog ref="selectKnowledgeDialogRef" @refresh="refreshMigrate" />
+    <SelectKnowledgeDialog ref="selectKnowledgeDialogRef" @refresh="refreshMigrate" :workspaceId="knowledgeDetail?.workspace_id"/>
     <GenerateRelatedDialog ref="GenerateRelatedDialogRef" @refresh="getList" :apiType="apiType" />
   </div>
 </template>
