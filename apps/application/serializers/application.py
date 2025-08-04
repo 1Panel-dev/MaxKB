@@ -25,11 +25,13 @@ from django.utils.translation import gettext_lazy as _
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from rest_framework import serializers, status
 from rest_framework.utils.formatting import lazy_format
+
 from application.flow.common import Workflow
 from application.models.application import Application, ApplicationTypeChoices, ApplicationKnowledgeMapping, \
     ApplicationFolder, ApplicationVersion
 from application.models.application_access_token import ApplicationAccessToken
 from common import result
+from common.cache_data.application_access_token_cache import del_application_access_token
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import native_search, native_page_search
 from common.exception.app_exception import AppApiException
@@ -734,6 +736,18 @@ class ApplicationOperateSerializer(serializers.Serializer):
                                                workspace_id=workspace_id)
         self.reset_application_version(work_flow_version, application)
         work_flow_version.save()
+        access_token = hashlib.md5(
+            str(uuid.uuid7()).encode()).hexdigest()[
+                       8:24]
+        application_access_token = QuerySet(ApplicationAccessToken).filter(
+            application_id=application.id).first()
+        if application_access_token is None:
+            application_access_token = ApplicationAccessToken(application_id=application.id,
+                                                              access_token=access_token, is_active=True)
+            application_access_token.save()
+        else:
+            access_token = application_access_token.access_token
+        del_application_access_token(access_token)
         return self.one(with_valid=False)
 
     @staticmethod
