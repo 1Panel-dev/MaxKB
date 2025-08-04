@@ -1,6 +1,6 @@
 <template>
   <el-card shadow="always" style="--el-card-padding: 8px 12px; --el-card-border-radius: 8px">
-    <el-button link @click="zoomOut">
+    <el-button link @click="zoomOut" style="border: none">
       <el-tooltip
         effect="dark"
         :content="$t('views.applicationWorkflow.control.zoomOut')"
@@ -11,7 +11,7 @@
         /></el-icon>
       </el-tooltip>
     </el-button>
-    <el-button link @click="zoomIn">
+    <el-button link @click="zoomIn" style="border: none">
       <el-tooltip
         effect="dark"
         :content="$t('views.applicationWorkflow.control.zoomIn')"
@@ -22,7 +22,7 @@
         /></el-icon>
       </el-tooltip>
     </el-button>
-    <el-button link @click="fitView">
+    <el-button link @click="fitView" style="border: none">
       <el-tooltip
         effect="dark"
         :content="$t('views.applicationWorkflow.control.fitView')"
@@ -35,7 +35,7 @@
       </el-tooltip>
     </el-button>
     <el-divider direction="vertical" />
-    <el-button link @click="retract">
+    <el-button link @click="retract" style="border: none">
       <el-tooltip
         effect="dark"
         :content="$t('views.applicationWorkflow.control.retract')"
@@ -48,7 +48,7 @@
         ></AppIcon>
       </el-tooltip>
     </el-button>
-    <el-button link @click="extend">
+    <el-button link @click="extend" style="border: none">
       <el-tooltip
         effect="dark"
         :content="$t('views.applicationWorkflow.control.extend')"
@@ -61,7 +61,7 @@
         ></AppIcon>
       </el-tooltip>
     </el-button>
-    <el-button link @click="layout">
+    <el-button link @click="layout" style="border: none">
       <el-tooltip
         effect="dark"
         :content="$t('views.applicationWorkflow.control.beautify')"
@@ -79,7 +79,7 @@
 
 <script setup lang="ts">
 const props = defineProps({
-  lf: Object || String || null
+  lf: Object || String || null,
 })
 
 function zoomIn() {

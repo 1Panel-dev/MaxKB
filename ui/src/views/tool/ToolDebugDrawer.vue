@@ -99,7 +99,6 @@
           :class="isSuccess ? '' : 'color-danger'"
           class="pre-wrap"
           shadow="never"
-          style="max-height: 350px; overflow: scroll"
         >
           {{ String(result) == '0' ? 0 : result || '-' }}
         </el-card>
