@@ -1,5 +1,5 @@
 <template>
-  <MdPreview :language="language" noIconfont noPrettier :codeFoldable="false" v-bind="$attrs" @click.stop="handleClick"/>
+  <MdPreview :language="language" noIconfont noPrettier :codeFoldable="false" v-bind="$attrs" />
 </template>
 
 <script setup lang="ts">
@@ -19,18 +19,10 @@ const language = computed(() => user.getLanguage() || getBrowserLang() || '')
 config({
   editorConfig: {
     languageUserDefined: {
-      'zh-Hant': ZH_TW
-    }
-  }
+      'zh-Hant': ZH_TW,
+    },
+  },
 })
-
-function handleClick(e: MouseEvent) {
-  if ((e.target as HTMLElement).closest('a') || (e.target as HTMLElement).closest('.md-editor-copy-button')) {
-    e.stopPropagation()
-  } else {
-    emit('clickPreview')
-  }
-}
 </script>
 
 <style lang="scss" scoped>
