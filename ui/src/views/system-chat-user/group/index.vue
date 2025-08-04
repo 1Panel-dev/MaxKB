@@ -34,7 +34,7 @@
                   "
                 >
                   <el-icon :size="18">
-                    <Plus />
+                    <Plus/>
                   </el-icon>
                 </el-button>
               </el-tooltip>
@@ -108,7 +108,7 @@
         <div class="user-right" v-loading="rightLoading">
           <div class="flex align-center">
             <h4 class="medium ellipsis" :title="current?.name">{{ current?.name }}</h4>
-            <el-divider direction="vertical" class="mr-8 ml-8" />
+            <el-divider direction="vertical" class="mr-8 ml-8"/>
             <AppIcon
               iconName="app-workspace"
               style="font-size: 16px"
@@ -158,10 +158,14 @@
             </div>
             <div class="flex-between complex-search">
               <el-select class="complex-search__left" v-model="searchType" style="width: 120px">
-                <el-option :label="$t('views.login.loginForm.username.label')" value="username" />
+                <el-option :label="$t('views.login.loginForm.username.label')" value="username"/>
                 <el-option
                   :label="$t('views.userManage.userForm.nick_name.label')"
                   value="nick_name"
+                />
+                <el-option
+                  :label="$t('views.userManage.source.label')"
+                  value="source"
                 />
               </el-select>
               <el-input
@@ -180,6 +184,23 @@
                 style="width: 220px"
                 clearable
               />
+              <el-select
+                v-else-if="searchType === 'source'"
+                v-model="searchForm.source"
+                @change="getList"
+                style="width: 220px"
+                clearable
+                :placeholder="$t('common.inputPlaceholder')"
+              >
+                <el-option :label="$t('views.userManage.source.local')" value="LOCAL"/>
+                <el-option label="CAS" value="CAS"/>
+                <el-option label="LDAP" value="LDAP"/>
+                <el-option label="OIDC" value="OIDC"/>
+                <el-option label="OAuth2" value="OAuth2"/>
+                <el-option :label="$t('views.userManage.source.wecom')" value="wecom"/>
+                <el-option :label="$t('views.userManage.source.lark')" value="lark"/>
+                <el-option :label="$t('views.userManage.source.dingtalk')" value="dingtalk"/>
+              </el-select>
             </div>
           </div>
 
@@ -191,13 +212,13 @@
             @selection-change="handleSelectionChange"
             :maxTableHeight="330"
           >
-            <el-table-column type="selection" width="55" />
+            <el-table-column type="selection" width="55"/>
             <el-table-column
               prop="nick_name"
               :label="$t('views.userManage.userForm.nick_name.label')"
               show-overflow-tooltip
             />
-            <el-table-column prop="username" :label="$t('views.login.loginForm.username.label')" />
+            <el-table-column prop="username" :label="$t('views.login.loginForm.username.label')"/>
             <el-table-column prop="source" :label="$t('views.userManage.source.label')">
               <template #default="{ row }">
                 {{
@@ -244,24 +265,24 @@
       </div>
     </el-card>
 
-    <CreateOrUpdateGroupDialog ref="createOrUpdateGroupDialogRef" @refresh="refresh" />
-    <CreateGroupUserDialog ref="createGroupUserDialogRef" @refresh="getList" />
+    <CreateOrUpdateGroupDialog ref="createOrUpdateGroupDialogRef" @refresh="refresh"/>
+    <CreateGroupUserDialog ref="createGroupUserDialogRef" @refresh="getList"/>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, watch, reactive } from 'vue'
+import {onMounted, ref, watch, reactive} from 'vue'
 import SystemGroupApi from '@/api/system/user-group'
-import { t } from '@/locales'
-import type { ChatUserGroupUserItem } from '@/api/type/systemChatUser'
+import {t} from '@/locales'
+import type {ChatUserGroupUserItem} from '@/api/type/systemChatUser'
 import CreateOrUpdateGroupDialog from './component/CreateOrUpdateGroupDialog.vue'
 import CreateGroupUserDialog from './component/CreateGroupUserDialog.vue'
-import type { ListItem } from '@/api/type/common'
-import { MsgSuccess, MsgConfirm } from '@/utils/message'
-import { PermissionConst, RoleConst } from '@/utils/permission/data'
-import { ComplexPermission } from '@/utils/permission/type'
-import { hasPermission } from '@/utils/permission/index'
-import { loadPermissionApi } from '@/utils/dynamics-api/permission-api.ts'
+import type {ListItem} from '@/api/type/common'
+import {MsgSuccess, MsgConfirm} from '@/utils/message'
+import {PermissionConst, RoleConst} from '@/utils/permission/data'
+import {ComplexPermission} from '@/utils/permission/type'
+import {hasPermission} from '@/utils/permission/index'
+import {loadPermissionApi} from '@/utils/dynamics-api/permission-api.ts'
 
 const filterText = ref('')
 const loading = ref(false)
@@ -347,7 +368,8 @@ function deleteGroup(item: ListItem) {
           current.value = item.id === current.value?.id ? list.value[0] : current.value
         })
     })
-    .catch(() => {})
+    .catch(() => {
+    })
 }
 
 async function refresh(group?: ListItem) {
@@ -366,6 +388,7 @@ const searchType = ref('username')
 const searchForm = ref<Record<string, any>>({
   username: '',
   nick_name: '',
+  source: '',
 })
 const paginationConfig = reactive({
   current_page: 1,
@@ -422,7 +445,7 @@ function handleDeleteUser(item?: ChatUserGroupUserItem) {
   MsgConfirm(
     item
       ? `${t('views.workspace.member.delete.confirmTitle')}${item.nick_name} ?`
-      : t('views.chatUser.group.batchDeleteMember', { count: multipleSelection.value.length }),
+      : t('views.chatUser.group.batchDeleteMember', {count: multipleSelection.value.length}),
     '',
     {
       confirmButtonText: t('common.confirm'),
@@ -445,7 +468,8 @@ function handleDeleteUser(item?: ChatUserGroupUserItem) {
           await getList()
         })
     })
-    .catch(() => {})
+    .catch(() => {
+    })
 }
 
 const mouseId = ref('')
