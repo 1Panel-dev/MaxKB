@@ -157,9 +157,6 @@ const apiType = computed(() => {
 const permissionPrecise = computed(() => {
   return permissionMap['tool'][apiType.value]
 })
-const isShared = computed(() => {
-  return folder.currentFolder.id === 'share'
-})
 
 const loading = ref(false)
 const activeName = ref('base')
@@ -278,7 +275,9 @@ async function getApplicationList() {
   }).getAllApplication({
     folder_id: folder.currentFolder?.id || user.getWorkspaceId(),
   })
-  applicationList.value = res.data.filter((item: any) => item.resource_type === 'application')
+  applicationList.value = res.data.filter(
+    (item: any) => item.resource_type === 'application' && item.id !== props.id,
+  )
 }
 
 function folderClickHandle(row: any) {

@@ -165,6 +165,7 @@
     border-radius: var(--el-border-radius-base) !important;
     padding: 5px 8px;
     font-weight: 400;
+    color: var(--el-text-color-primary) !important;
   }
   .el-radio-button__original-radio:checked + .el-radio-button__inner {
     color: var(--el-color-primary) !important;
