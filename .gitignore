@@ -183,7 +183,6 @@ apps/xpack
 data
 .dev
 poetry.lock
-apps/setting/models_provider/impl/*/icon/
+apps/models_provider/impl/*/icon/
 tmp/
-config.yml
 config.yml
