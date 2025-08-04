@@ -219,9 +219,8 @@
                         {{ $t('views.application.status.published') }}
                       </span>
                       <el-divider direction="vertical" />
-                      <el-icon class="mr-8">
-                        <Clock />
-                      </el-icon>
+                      <AppIcon iconName="app-clock" class="color-secondary mr-8"></AppIcon>
+
                       <span class="color-secondary">{{ dateFormat(item.update_time) }}</span>
                     </div>
                     <div v-else class="flex align-center">

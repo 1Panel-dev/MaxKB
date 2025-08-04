@@ -39,7 +39,7 @@
           <template #default="{ node, data }">
             <div class="flex-between w-full" @mouseenter.stop="handleMouseEnter(data)">
               <div class="flex align-center">
-                <AppIcon iconName="app-folder" style="font-size: 16px"></AppIcon>
+                <AppIcon iconName="app-folder" style="font-size: 20px"></AppIcon>
                 <span class="ml-8 ellipsis" style="max-width: 110px" :title="node.label">{{
                   node.label
                 }}</span>
