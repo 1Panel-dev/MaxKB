@@ -227,7 +227,7 @@
                   :title="$t('views.userManage.setting.updatePwd')"
                   v-if="hasPermission([RoleConst.ADMIN, PermissionConst.USER_EDIT], 'OR')"
                 >
-                  <el-icon><Lock /></el-icon>
+                  <AppIcon iconName="app-key"></AppIcon>
                 </el-button>
               </span>
             </el-tooltip>

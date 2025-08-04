@@ -67,13 +67,10 @@
             style="width: 120px"
             @change="search_type_change"
           >
-            <el-option :label="$t('views.login.loginForm.username.label')" value="username"/>
-            <el-option :label="$t('views.userManage.userForm.nick_name.label')" value="nick_name"/>
-            <el-option :label="$t('common.status.label')" value="is_active"/>
-            <el-option
-              :label="$t('views.userManage.source.label')"
-              value="source"
-            />
+            <el-option :label="$t('views.login.loginForm.username.label')" value="username" />
+            <el-option :label="$t('views.userManage.userForm.nick_name.label')" value="nick_name" />
+            <el-option :label="$t('common.status.label')" value="is_active" />
+            <el-option :label="$t('views.userManage.source.label')" value="source" />
           </el-select>
           <el-input
             v-if="search_type === 'username'"
@@ -96,8 +93,8 @@
             clearable
             style="width: 220px"
           >
-            <el-option :label="$t('common.status.enabled')" :value="true"/>
-            <el-option :label="$t('common.status.disabled')" :value="false"/>
+            <el-option :label="$t('common.status.enabled')" :value="true" />
+            <el-option :label="$t('common.status.disabled')" :value="false" />
           </el-select>
           <el-select
             v-else-if="search_type === 'source'"
@@ -107,14 +104,14 @@
             clearable
             :placeholder="$t('common.inputPlaceholder')"
           >
-            <el-option :label="$t('views.userManage.source.local')" value="LOCAL"/>
-            <el-option label="CAS" value="CAS"/>
-            <el-option label="LDAP" value="LDAP"/>
-            <el-option label="OIDC" value="OIDC"/>
-            <el-option label="OAuth2" value="OAuth2"/>
-            <el-option :label="$t('views.userManage.source.wecom')" value="wecom"/>
-            <el-option :label="$t('views.userManage.source.lark')" value="lark"/>
-            <el-option :label="$t('views.userManage.source.dingtalk')" value="dingtalk"/>
+            <el-option :label="$t('views.userManage.source.local')" value="LOCAL" />
+            <el-option label="CAS" value="CAS" />
+            <el-option label="LDAP" value="LDAP" />
+            <el-option label="OIDC" value="OIDC" />
+            <el-option label="OAuth2" value="OAuth2" />
+            <el-option :label="$t('views.userManage.source.wecom')" value="wecom" />
+            <el-option :label="$t('views.userManage.source.lark')" value="lark" />
+            <el-option :label="$t('views.userManage.source.dingtalk')" value="dingtalk" />
           </el-select>
         </div>
       </div>
@@ -129,7 +126,7 @@
         @sort-change="handleSortChange"
         :maxTableHeight="270"
       >
-        <el-table-column type="selection" width="55"/>
+        <el-table-column type="selection" width="55" />
         <el-table-column
           prop="nick_name"
           :label="$t('views.userManage.userForm.nick_name.label')"
@@ -146,7 +143,7 @@
           <template #default="{ row }">
             <div v-if="row.is_active" class="flex align-center">
               <el-icon class="color-success mr-8" style="font-size: 16px">
-                <SuccessFilled/>
+                <SuccessFilled />
               </el-icon>
               <span class="color-secondary">
                 {{ $t('common.status.enabled') }}
@@ -186,7 +183,7 @@
           min-width="150"
         >
           <template #default="{ row }">
-            <TagGroup :tags="row.user_group_names"/>
+            <TagGroup :tags="row.user_group_names" />
           </template>
         </el-table-column>
         <el-table-column prop="source" :label="$t('views.userManage.source.label')">
@@ -233,7 +230,7 @@
                 "
               />
             </span>
-            <el-divider direction="vertical"/>
+            <el-divider direction="vertical" />
             <span class="mr-8">
               <el-button
                 type="primary"
@@ -274,9 +271,7 @@
                   )
                 "
               >
-                <el-icon>
-                  <Lock/>
-                </el-icon>
+                <AppIcon iconName="app-key"></AppIcon>
               </el-button>
             </span>
             <span>
@@ -316,34 +311,34 @@
       ref="UserDrawerRef"
       @refresh="refresh"
     />
-    <UserPwdDialog ref="UserPwdDialogRef" @refresh="refresh"/>
+    <UserPwdDialog ref="UserPwdDialogRef" @refresh="refresh" />
     <SetUserGroupsDialog
       :optionLoading="optionLoading"
       :chatGroupList="chatGroupList"
       ref="setUserGroupsRef"
       @refresh="refresh"
     />
-    <SyncUsersDialog ref="syncUsersDialogRef" @refresh="refresh"/>
+    <SyncUsersDialog ref="syncUsersDialogRef" @refresh="refresh" />
   </div>
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref, reactive} from 'vue'
+import { onMounted, ref, reactive } from 'vue'
 import UserDrawer from './component/UserDrawer.vue'
 import UserPwdDialog from './component/UserPwdDialog.vue'
 import SetUserGroupsDialog from './component/SetUserGroupsDialog.vue'
 import SyncUsersDialog from './component/SyncUsersDialog.vue'
 import userManageApi from '@/api/system/chat-user'
-import {datetimeFormat} from '@/utils/time'
-import {MsgSuccess, MsgConfirm} from '@/utils/message'
-import {t} from '@/locales'
-import type {ChatUserItem} from '@/api/type/systemChatUser'
+import { datetimeFormat } from '@/utils/time'
+import { MsgSuccess, MsgConfirm } from '@/utils/message'
+import { t } from '@/locales'
+import type { ChatUserItem } from '@/api/type/systemChatUser'
 import SystemGroupApi from '@/api/system/user-group'
-import type {ListItem} from '@/api/type/common'
-import {PermissionConst, RoleConst} from '@/utils/permission/data'
-import {ComplexPermission} from '@/utils/permission/type'
-import {hasPermission} from '@/utils/permission'
-import {loadPermissionApi} from '@/utils/dynamics-api/permission-api.ts'
+import type { ListItem } from '@/api/type/common'
+import { PermissionConst, RoleConst } from '@/utils/permission/data'
+import { ComplexPermission } from '@/utils/permission/type'
+import { hasPermission } from '@/utils/permission'
+import { loadPermissionApi } from '@/utils/dynamics-api/permission-api.ts'
 
 const search_type = ref('username')
 const search_form = ref<{
@@ -358,7 +353,7 @@ const search_form = ref<{
   is_active: null,
 })
 const search_type_change = () => {
-  search_form.value = {username: '', nick_name: '', source: '', is_active: null}
+  search_form.value = { username: '', nick_name: '', source: '', is_active: null }
 }
 
 const loading = ref(false)
@@ -393,7 +388,7 @@ function getList() {
 
 const orderBy = ref<string>('')
 
-function handleSortChange({prop, order}: { prop: string; order: string }) {
+function handleSortChange({ prop, order }: { prop: string; order: string }) {
   orderBy.value = order === 'ascending' ? prop : `-${prop}`
   getList()
 }
@@ -448,8 +443,7 @@ function deleteUserManage(row: ChatUserItem) {
           getList()
         })
     })
-    .catch(() => {
-    })
+    .catch(() => {})
 }
 
 const UserPwdDialogRef = ref()
@@ -480,7 +474,7 @@ async function getChatGroupList() {
 }
 
 function handleBatchDelete() {
-  MsgConfirm(t('views.chatUser.batchDeleteUser', {count: multipleSelection.value.length}), '', {
+  MsgConfirm(t('views.chatUser.batchDeleteUser', { count: multipleSelection.value.length }), '', {
     confirmButtonText: t('common.confirm'),
     confirmButtonClass: 'danger',
   })
@@ -495,8 +489,7 @@ function handleBatchDelete() {
           await getList()
         })
     })
-    .catch(() => {
-    })
+    .catch(() => {})
 }
 
 const setUserGroupsRef = ref<InstanceType<typeof SetUserGroupsDialog>>()

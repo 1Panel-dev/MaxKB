@@ -82,9 +82,7 @@
                   </el-button>
                   <!-- 访问限制 -->
                   <el-button @click="openLimitDialog" v-if="permissionPrecise.overview_access(id)">
-                    <el-icon class="mr-4">
-                      <Lock />
-                    </el-icon>
+                    <AppIcon iconName="app-key" class="mr-4"></AppIcon>
                     {{ $t('views.applicationOverview.appInfo.accessControl') }}
                   </el-button>
                   <!-- 显示设置 -->

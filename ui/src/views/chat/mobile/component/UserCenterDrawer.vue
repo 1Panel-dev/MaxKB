@@ -22,7 +22,7 @@
       @click="resetPassword"
     >
       <div class="flex align-center">
-        <el-icon class="mr-12"><Lock /></el-icon>
+        <AppIcon iconName="app-key" class="mr-12"></AppIcon>
         <h4 class="lighter">{{ $t('views.login.resetPassword') }}</h4>
       </div>
       <el-icon size="16">

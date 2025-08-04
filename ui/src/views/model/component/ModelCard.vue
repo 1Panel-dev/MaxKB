@@ -81,9 +81,10 @@
             </el-dropdown-item>
             <el-dropdown-item
               v-if="isSystemShare"
-              icon="Lock"
               @click.stop="openAuthorizedWorkspaceDialog(model)"
-              >{{ $t('views.shared.authorized_workspace') }}
+            >
+              <AppIcon iconName="app-key"></AppIcon>
+              {{ $t('views.shared.authorized_workspace') }}
             </el-dropdown-item>
 
             <el-dropdown-item

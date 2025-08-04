@@ -279,23 +279,12 @@ function deleteMulDocument() {
 }
 
 function deleteProblem(row: any) {
-  MsgConfirm(
-    `${t('views.problem.delete.confirmTitle')} ${row.content} ?`,
-    `${t('views.problem.delete.confirmMessage1')} ${row.paragraph_count} ${t('views.problem.delete.confirmMessage2')}`,
-    {
-      confirmButtonText: t('common.confirm'),
-      confirmButtonClass: 'danger',
-    },
-  )
+  loadSharedApi({ type: 'problem', systemType: apiType.value })
+    .delProblems(id, row.id, loading)
     .then(() => {
-      loadSharedApi({ type: 'problem', systemType: apiType.value })
-        .delProblems(id, row.id, loading)
-        .then(() => {
-          MsgSuccess(t('common.deleteSuccess'))
-          getList()
-        })
+      MsgSuccess(t('common.deleteSuccess'))
+      getList()
     })
-    .catch(() => {})
 }
 
 function editName(val: string, problemId: string) {
