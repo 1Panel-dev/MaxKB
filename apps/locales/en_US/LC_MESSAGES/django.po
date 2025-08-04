@@ -8550,3 +8550,12 @@ msgstr ""
 
 msgid "Failed to get WeCom user info"
 msgstr ""
+
+msgid "Publish status"
+msgstr ""
+
+msgid "Unpublished"
+msgstr ""
+
+msgid "Published"
+msgstr ""

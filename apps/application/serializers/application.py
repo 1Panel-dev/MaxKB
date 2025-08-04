@@ -284,6 +284,9 @@ class ApplicationQueryRequest(serializers.Serializer):
     folder_id = serializers.CharField(required=False, label=_("folder id"))
     name = serializers.CharField(required=False, label=_('Application Name'))
     desc = serializers.CharField(required=False, label=_("Application Description"))
+    publish_status = serializers.ChoiceField(required=False, label=_("Publish status"),
+                                             choices=[('published', _("Published")),
+                                                      ('unpublished', _("Unpublished"))])
     user_id = serializers.UUIDField(required=False, label=_("User ID"))
 
 
@@ -311,7 +314,11 @@ class Query(serializers.Serializer):
         user_id = self.data.get('user_id')
         desc = instance.get('desc')
         name = instance.get('name')
+        publish_status = instance.get("publish_status")
         create_user = instance.get('create_user')
+        if publish_status is not None:
+            is_publish = True if publish_status == "published" else False
+            application_query_set = application_query_set.filter(is_publish=is_publish)
         if workspace_id is not None:
             folder_query_set = folder_query_set.filter(workspace_id=workspace_id)
             application_query_set = application_query_set.filter(workspace_id=workspace_id)

@@ -8676,3 +8676,12 @@ msgstr "获取企业微信部门用户失败"
 
 msgid "Failed to get WeCom user info"
 msgstr "获取企业微信用户信息失败"
+
+msgid "Publish status"
+msgstr "发布状态"
+
+msgid "Unpublished"
+msgstr "未发布"
+
+msgid "Published"
+msgstr "已发布"

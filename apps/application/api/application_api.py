@@ -88,6 +88,13 @@ class ApplicationQueryAPI(APIMixin):
                 type=OpenApiTypes.STR,
                 location='query',
                 required=False,
+            ),
+            OpenApiParameter(
+                name="publish_status",
+                description=_("Publish status") + '(published|unpublished)',
+                type=OpenApiTypes.STR,
+                location='query',
+                required=False,
             )
         ]
 
