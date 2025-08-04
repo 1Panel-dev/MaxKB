@@ -69,6 +69,7 @@
           >
             <el-option :label="$t('views.login.loginForm.username.label')" value="username"/>
             <el-option :label="$t('views.userManage.userForm.nick_name.label')" value="nick_name"/>
+            <el-option :label="$t('common.status.label')" value="is_active"/>
             <el-option
               :label="$t('views.userManage.source.label')"
               value="source"
@@ -88,6 +89,15 @@
             style="width: 220px"
             clearable
           />
+          <el-select
+            v-else-if="search_type === 'is_active'"
+            v-model="search_form.is_active"
+            @change="getList"
+            style="width: 220px"
+          >
+            <el-option :label="$t('common.status.enabled')" :value="true"/>
+            <el-option :label="$t('common.status.disabled')" :value="false"/>
+          </el-select>
           <el-select
             v-else-if="search_type === 'source'"
             v-model="search_form.source"
@@ -339,13 +349,15 @@ const search_form = ref<{
   username: string
   nick_name?: string
   source?: string
+  is_active?: boolean | null
 }>({
   username: '',
   nick_name: '',
   source: '',
+  is_active: null,
 })
 const search_type_change = () => {
-  search_form.value = {username: '', nick_name: '', source: ''}
+  search_form.value = {username: '', nick_name: '', source: '', is_active: null}
 }
 
 const loading = ref(false)
@@ -366,9 +378,9 @@ const userTableData = ref<ChatUserItem[]>([])
 
 function getList() {
   const params: any = {}
-  if (search_form.value[search_type.value as keyof typeof search_form.value]) {
-    params[search_type.value] =
-      search_form.value[search_type.value as keyof typeof search_form.value]
+  const searchValue = search_form.value[search_type.value as keyof typeof search_form.value]
+  if (searchValue !== undefined && searchValue !== null && searchValue !== '') {
+    params[search_type.value] = searchValue
   }
   return loadPermissionApi('chatUser')
     .getUserManage(paginationConfig, params, loading)
