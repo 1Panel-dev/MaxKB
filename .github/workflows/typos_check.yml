@@ -16,3 +16,5 @@ jobs:
 
     - name: Check spelling
       uses: crate-ci/typos@master
+      with:
+        args: '--exclude "**/*_svg" --exclude "**/migrations/**"'
