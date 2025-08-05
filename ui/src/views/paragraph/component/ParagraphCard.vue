@@ -47,7 +47,7 @@
                 @click.stop="openGenerateDialog(data)"
                 v-if="permissionPrecise.doc_generate(id)"
               >
-                <el-icon><Connection /></el-icon>
+                <AppIcon iconName="app-generate-question"></AppIcon>
                 {{ $t('views.document.generateQuestion.title') }}</el-dropdown-item
               >
               <el-dropdown-item

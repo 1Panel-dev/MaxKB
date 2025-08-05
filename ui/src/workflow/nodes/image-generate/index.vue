@@ -35,7 +35,7 @@
                 @click="openAIParamSettingDialog(form_data.model_id)"
                 @refreshForm="refreshParam"
               >
-                <el-icon><Setting /></el-icon>
+                <AppIcon iconName="app-setting"></AppIcon>
               </el-button>
             </div>
           </template>

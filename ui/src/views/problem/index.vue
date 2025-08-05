@@ -117,7 +117,7 @@
                         @click.stop="relateProblem(row)"
                         v-if="permissionPrecise.problem_relate(id)"
                       >
-                        <el-icon><Connection /></el-icon>
+                        <AppIcon iconName="app-generate-question"></AppIcon>
                       </el-button>
                     </el-tooltip>
                   </span>

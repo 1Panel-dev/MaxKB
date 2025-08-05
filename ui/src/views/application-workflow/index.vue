@@ -5,12 +5,15 @@
         <back-button @click="back"></back-button>
         <h4 class="ellipsis" style="max-width: 300px" :title="detail?.name">{{ detail?.name }}</h4>
         <div v-if="showHistory && disablePublic">
-          <el-text type="info" class="ml-16 color-secondary">{{ $t('views.applicationWorkflow.info.previewVersion') }}
-            {{ currentVersion.name || datetimeFormat(currentVersion.update_time) }}</el-text>
+          <el-text type="info" class="ml-16 color-secondary"
+            >{{ $t('views.applicationWorkflow.info.previewVersion') }}
+            {{ currentVersion.name || datetimeFormat(currentVersion.update_time) }}</el-text
+          >
         </div>
-        <el-text type="info" class="ml-16 color-secondary" v-else-if="saveTime">{{
-          $t('views.applicationWorkflow.info.saveTime')
-          }}{{ datetimeFormat(saveTime) }}</el-text>
+        <el-text type="info" class="ml-16 color-secondary" v-else-if="saveTime"
+          >{{ $t('views.applicationWorkflow.info.saveTime')
+          }}{{ datetimeFormat(saveTime) }}</el-text
+        >
       </div>
       <div v-if="showHistory && disablePublic">
         <el-button type="primary" class="mr-8" @click="refreshVersion()">
@@ -47,17 +50,17 @@
             <el-dropdown-menu>
               <a :href="shareUrl" target="_blank">
                 <el-dropdown-item>
-                  <AppIcon iconName="app-create-chat" class="mr-4"></AppIcon>
+                  <AppIcon iconName="app-create-chat" class="color-secondary"></AppIcon>
                   {{ $t('views.application.operation.toChat') }}
                 </el-dropdown-item>
               </a>
 
               <el-dropdown-item @click="openHistory">
-                <AppIcon iconName="app-history-outlined"></AppIcon>
+                <AppIcon iconName="app-history-outlined" class="color-secondary"></AppIcon>
                 {{ $t('views.applicationWorkflow.setting.releaseHistory') }}
               </el-dropdown-item>
               <el-dropdown-item>
-                <AppIcon iconName="app-save-outlined"></AppIcon>
+                <AppIcon iconName="app-save-outlined" class="color-secondary"></AppIcon>
                 {{ $t('views.applicationWorkflow.setting.autoSave') }}
                 <div class="ml-4">
                   <el-switch size="small" v-model="isSave" @change="changeSave" />
@@ -70,8 +73,14 @@
     </div>
     <!-- 下拉框 -->
     <el-collapse-transition>
-      <DropdownMenu :show="showPopover" :id="id" v-click-outside="clickoutside" @clickNodes="clickNodes"
-        @onmousedown="onmousedown" :workflowRef="workflowRef" />
+      <DropdownMenu
+        :show="showPopover"
+        :id="id"
+        v-click-outside="clickoutside"
+        @clickNodes="clickNodes"
+        @onmousedown="onmousedown"
+        :workflowRef="workflowRef"
+      />
     </el-collapse-transition>
     <!-- 主画布 -->
     <div class="workflow-main" ref="workflowMainRef">
@@ -84,7 +93,12 @@
           <div class="flex-between">
             <div class="flex align-center">
               <div class="mr-12 ml-24 flex">
-                <el-avatar v-if="isAppIcon(detail?.icon)" shape="square" :size="32" style="background: none">
+                <el-avatar
+                  v-if="isAppIcon(detail?.icon)"
+                  shape="square"
+                  :size="32"
+                  style="background: none"
+                >
                   <img :src="resetUrl(detail?.icon)" alt="" />
                 </el-avatar>
                 <LogoIcon v-else height="32px" />
@@ -96,8 +110,11 @@
             </div>
             <div class="mr-16">
               <el-button link @click="enlarge = !enlarge">
-                <AppIcon :iconName="enlarge ? 'app-minify' : 'app-magnify'" class="color-secondary"
-                  style="font-size: 20px">
+                <AppIcon
+                  :iconName="enlarge ? 'app-minify' : 'app-magnify'"
+                  class="color-secondary"
+                  style="font-size: 20px"
+                >
                 </AppIcon>
               </el-button>
               <el-button link @click="showDebug = false">
@@ -114,8 +131,12 @@
       </div>
     </el-collapse-transition>
     <!-- 发布历史 -->
-    <PublishHistory v-if="showHistory" @click="checkVersion" v-click-outside="clickoutsideHistory"
-      @refreshVersion="refreshVersion" />
+    <PublishHistory
+      v-if="showHistory"
+      @click="checkVersion"
+      v-click-outside="clickoutsideHistory"
+      @refreshVersion="refreshVersion"
+    />
   </div>
 </template>
 <script setup lang="ts">
@@ -295,15 +316,15 @@ const publish = () => {
           if (typeof err_message == 'string') {
             MsgError(
               res.node.properties?.stepName +
-              ` ${t('views.applicationWorkflow.node').toLowerCase()} ` +
-              err_message.toLowerCase(),
+                ` ${t('views.applicationWorkflow.node').toLowerCase()} ` +
+                err_message.toLowerCase(),
             )
           } else {
             const keys = Object.keys(err_message)
             MsgError(
               node.properties?.stepName +
-              ` ${t('views.applicationWorkflow.node').toLowerCase()} ` +
-              err_message[keys[0]]?.[0]?.message.toLowerCase(),
+                ` ${t('views.applicationWorkflow.node').toLowerCase()} ` +
+                err_message[keys[0]]?.[0]?.message.toLowerCase(),
             )
           }
         })
@@ -319,8 +340,8 @@ const publish = () => {
         const keys = Object.keys(err_message)
         MsgError(
           node.properties?.stepName +
-          ` ${t('views.applicationWorkflow.node')}，` +
-          err_message[keys[0]]?.[0]?.message,
+            ` ${t('views.applicationWorkflow.node')}，` +
+            err_message[keys[0]]?.[0]?.message,
         )
       }
     })
@@ -357,8 +378,8 @@ const clickShowDebug = () => {
         const keys = Object.keys(err_message)
         MsgError(
           node.properties?.stepName +
-          ` ${t('views.applicationWorkflow.node')}，` +
-          err_message[keys[0]]?.[0]?.message,
+            ` ${t('views.applicationWorkflow.node')}，` +
+            err_message[keys[0]]?.[0]?.message,
         )
       }
     })
@@ -384,20 +405,20 @@ function getDetail() {
         .map((v: any) => {
           apiInputParams.value = v.properties.api_input_field_list
             ? v.properties.api_input_field_list.map((v: any) => {
-              return {
-                name: v.variable,
-                value: v.default_value,
-              }
-            })
+                return {
+                  name: v.variable,
+                  value: v.default_value,
+                }
+              })
             : v.properties.input_field_list
               ? v.properties.input_field_list
-                .filter((v: any) => v.assignment_method === 'api_input')
-                .map((v: any) => {
-                  return {
-                    name: v.variable,
-                    value: v.default_value,
-                  }
-                })
+                  .filter((v: any) => v.assignment_method === 'api_input')
+                  .map((v: any) => {
+                    return {
+                      name: v.variable,
+                      value: v.default_value,
+                    }
+                  })
               : []
         })
       loadSharedApi({ type: 'application', systemType: apiType.value })
@@ -443,20 +464,31 @@ function saveApplication(bool?: boolean, back?: boolean) {
     })
 }
 const go = () => {
-  if (route.path.includes('workspace')) { return router.push({ path: get_route() }) }
-  else { return router.push({ path: get_resource_management_route() }) }
-};
+  if (route.path.includes('workspace')) {
+    return router.push({ path: get_route() })
+  } else {
+    return router.push({ path: get_resource_management_route() })
+  }
+}
 
 const get_resource_management_route = () => {
-  if (hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_APPLICATION_OVERVIEW_READ], 'OR')) { return `/application/${from}/${id}/WORK_FLOW/overview` } else if
-    (hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_APPLICATION_ACCESS_READ], 'OR')) {
+  if (hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_APPLICATION_OVERVIEW_READ], 'OR')) {
+    return `/application/${from}/${id}/WORK_FLOW/overview`
+  } else if (
+    hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_APPLICATION_ACCESS_READ], 'OR')
+  ) {
     return `/application/${from}/${id}/WORK_FLOW/access`
-  } else if (hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_APPLICATION_CHAT_USER_READ], 'OR')) {
+  } else if (
+    hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_APPLICATION_CHAT_USER_READ], 'OR')
+  ) {
     return `/application/${from}/${id}/WORK_FLOW/chat-user`
-  } else if (hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_APPLICATION_CHAT_LOG_READ], 'OR')) {
+  } else if (
+    hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_APPLICATION_CHAT_LOG_READ], 'OR')
+  ) {
     return `/application/${from}/${id}/WORK_FLOW/chat-log`
-  } else { return `/system/resource-management/application` }
-
+  } else {
+    return `/system/resource-management/application`
+  }
 }
 
 const get_route = () => {

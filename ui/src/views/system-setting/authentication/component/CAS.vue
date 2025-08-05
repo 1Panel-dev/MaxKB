@@ -43,7 +43,7 @@
           </el-form-item>
         </el-form>
 
-        <div class="text-right">
+        <div>
           <el-button @click="submit(authFormRef)" type="primary" :disabled="loading"
                      v-hasPermission="
                       new ComplexPermission(

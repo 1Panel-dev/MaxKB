@@ -68,9 +68,7 @@
                 @click="openFileUploadSettingDialog"
                 class="mr-4"
               >
-                <el-icon class="mr-4">
-                  <Setting />
-                </el-icon>
+                <AppIcon iconName="app-setting" class="mr-4"></AppIcon>
               </el-button>
               <el-switch
                 size="small"

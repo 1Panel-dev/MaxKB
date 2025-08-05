@@ -63,7 +63,7 @@
                   style="padding-top: 8px; padding-bottom: 8px"
                   @click="openResetPassword"
                 >
-                  <AppIcon iconName="app-key"></AppIcon>
+                  <AppIcon iconName="app-key" class="color-secondary"></AppIcon>
                   {{ $t('views.login.resetPassword') }}
                 </el-dropdown-item>
                 <el-dropdown-item
@@ -72,7 +72,7 @@
                   style="padding-top: 8px; padding-bottom: 8px"
                   @click="logout"
                 >
-                  <AppIcon iconName="app-export" />
+                  <AppIcon iconName="app-export" class="color-secondary" />
                   {{ $t('layout.logout') }}
                 </el-dropdown-item>
               </el-dropdown-menu>

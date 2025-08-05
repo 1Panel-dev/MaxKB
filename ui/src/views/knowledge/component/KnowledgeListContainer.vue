@@ -225,30 +225,37 @@
                       <template #dropdown>
                         <el-dropdown-menu>
                           <el-dropdown-item
-                            icon="Refresh"
                             @click.stop="syncKnowledge(item)"
                             v-if="item.type === 1 && permissionPrecise.sync(item.id)"
-                            >{{ $t('views.knowledge.setting.sync') }}
+                          >
+                            <AppIcon iconName="app-sync" class="color-secondary"></AppIcon>
+
+                            {{ $t('views.knowledge.setting.sync') }}
                           </el-dropdown-item>
                           <el-dropdown-item
                             @click.stop="reEmbeddingKnowledge(item)"
                             v-if="permissionPrecise.vector(item.id)"
                           >
-                            <AppIcon iconName="app-vectorization"></AppIcon>
+                            <AppIcon iconName="app-vectorization" class="color-secondary"></AppIcon>
                             {{ $t('views.knowledge.setting.vectorization') }}
                           </el-dropdown-item>
 
                           <el-dropdown-item
-                            icon="Connection"
                             @click.stop="openGenerateDialog(item)"
                             v-if="permissionPrecise.generate(item.id)"
-                            >{{ $t('views.document.generateQuestion.title') }}
+                          >
+                            <AppIcon
+                              iconName="app-generate-question"
+                              class="color-secondary"
+                            ></AppIcon>
+
+                            {{ $t('views.document.generateQuestion.title') }}
                           </el-dropdown-item>
                           <el-dropdown-item
                             v-if="isSystemShare"
                             @click.stop="openAuthorizedWorkspaceDialog(item)"
                           >
-                            <AppIcon iconName="app-key"></AppIcon>
+                            <AppIcon iconName="app-lock" class="color-secondary"></AppIcon>
                             {{ $t('views.shared.authorized_workspace') }}</el-dropdown-item
                           >
 
@@ -256,12 +263,11 @@
                             @click.stop="openMoveToDialog(item)"
                             v-if="permissionPrecise.edit(item.id) && apiType === 'workspace'"
                           >
-                            <AppIcon iconName="app-migrate"></AppIcon>
+                            <AppIcon iconName="app-migrate" class="color-secondary"></AppIcon>
                             {{ $t('common.moveTo') }}
                           </el-dropdown-item>
 
                           <el-dropdown-item
-                            icon="Setting"
                             @click.stop="
                               router.push({
                                 path: `/knowledge/${item.id}/${folder.currentFolder.id || 'shared'}/setting`,
@@ -269,20 +275,21 @@
                             "
                             v-if="permissionPrecise.edit(item.id)"
                           >
+                            <AppIcon iconName="app-setting" class="color-secondary"></AppIcon>
                             {{ $t('common.setting') }}
                           </el-dropdown-item>
                           <el-dropdown-item
                             @click.stop="exportKnowledge(item)"
                             v-if="permissionPrecise.export(item.id)"
                           >
-                            <AppIcon iconName="app-export"></AppIcon
+                            <AppIcon iconName="app-export" class="color-secondary"></AppIcon
                             >{{ $t('views.document.setting.export') }} Excel
                           </el-dropdown-item>
                           <el-dropdown-item
                             @click.stop="exportZipKnowledge(item)"
                             v-if="permissionPrecise.export(item.id)"
                           >
-                            <AppIcon iconName="app-export"></AppIcon
+                            <AppIcon iconName="app-export" class="color-secondary"></AppIcon
                             >{{ $t('views.document.setting.export') }} ZIP</el-dropdown-item
                           >
                           <el-dropdown-item
@@ -290,7 +297,7 @@
                             @click.stop="deleteKnowledge(item)"
                             v-if="permissionPrecise.delete(item.id)"
                           >
-                            <AppIcon iconName="app-delete"></AppIcon>
+                            <AppIcon iconName="app-delete" class="color-secondary"></AppIcon>
                             {{ $t('common.delete') }}</el-dropdown-item
                           >
                         </el-dropdown-menu>

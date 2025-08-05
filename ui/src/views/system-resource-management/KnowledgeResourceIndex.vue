@@ -185,20 +185,21 @@
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item
-                    icon="Refresh"
                     @click.stop="syncKnowledge(row)"
                     v-if="row.type === 1 && permissionPrecise.sync()"
-                    >{{ $t('views.knowledge.setting.sync') }}
+                  >
+                    <AppIcon iconName="app-sync" class="color-secondary"></AppIcon>
+                    {{ $t('views.knowledge.setting.sync') }}
                   </el-dropdown-item>
 
                   <el-dropdown-item
-                    icon="Connection"
                     @click.stop="openGenerateDialog(row)"
                     v-if="permissionPrecise.generate()"
-                    >{{ $t('views.document.generateQuestion.title') }}
+                  >
+                    <AppIcon iconName="app-generate-question" class="color-secondary"></AppIcon>
+                    {{ $t('views.document.generateQuestion.title') }}
                   </el-dropdown-item>
                   <el-dropdown-item
-                    icon="Setting"
                     @click="
                       router.push({
                         path: `/knowledge/${row.id}/resource-management/setting`,
@@ -206,20 +207,21 @@
                     "
                     v-if="permissionPrecise.edit()"
                   >
+                    <AppIcon iconName="app-setting" class="color-secondary"></AppIcon>
                     {{ $t('common.setting') }}
                   </el-dropdown-item>
                   <el-dropdown-item
                     @click.stop="exportKnowledge(row)"
                     v-if="permissionPrecise.export()"
                   >
-                    <AppIcon iconName="app-export"></AppIcon
+                    <AppIcon iconName="app-export" class="color-secondary"></AppIcon
                     >{{ $t('views.document.setting.export') }} Excel
                   </el-dropdown-item>
                   <el-dropdown-item
                     @click.stop="exportZipKnowledge(row)"
                     v-if="permissionPrecise.export()"
                   >
-                    <AppIcon iconName="app-export"></AppIcon
+                    <AppIcon iconName="app-export" class="color-secondary"></AppIcon
                     >{{ $t('views.document.setting.export') }} ZIP</el-dropdown-item
                   >
                   <el-dropdown-item
@@ -227,7 +229,7 @@
                     @click.stop="deleteKnowledge(row)"
                     v-if="permissionPrecise.delete()"
                   >
-                    <AppIcon iconName="app-delete"></AppIcon>
+                    <AppIcon iconName="app-delete" class="color-secondary"></AppIcon>
                     {{ $t('common.delete') }}</el-dropdown-item
                   >
                 </el-dropdown-menu>

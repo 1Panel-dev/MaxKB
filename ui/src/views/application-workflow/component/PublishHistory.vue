@@ -43,11 +43,11 @@
                     <template #dropdown>
                       <el-dropdown-menu>
                         <el-dropdown-item @click.stop="openEditVersion(row)">
-                          <AppIcon iconName="app-edit"></AppIcon>
+                          <AppIcon iconName="app-edit" class="color-secondary"></AppIcon>
                           {{ $t('common.edit') }}
                         </el-dropdown-item>
                         <el-dropdown-item @click="refreshVersion(row)">
-                          <el-icon><RefreshLeft /></el-icon>
+                          <el-icon class="color-secondary"><RefreshLeft /></el-icon>
                           {{ $t('views.applicationWorkflow.setting.restoreCurrentVersion') }}
                         </el-dropdown-item>
                       </el-dropdown-menu>

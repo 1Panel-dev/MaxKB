@@ -214,21 +214,21 @@
                             v-if="item.template_id && permissionPrecise.edit(item.id)"
                             @click.stop="addInternalTool(item, true)"
                           >
-                            <AppIcon iconName="app-edit"></AppIcon>
+                            <AppIcon iconName="app-edit" class="color-secondary"></AppIcon>
                             {{ $t('common.edit') }}
                           </el-dropdown-item>
                           <el-dropdown-item
                             v-if="!item.template_id && permissionPrecise.edit(item.id)"
                             @click.stop="openCreateDialog(item)"
                           >
-                            <AppIcon iconName="app-edit"></AppIcon>
+                            <AppIcon iconName="app-edit" class="color-secondary"></AppIcon>
                             {{ $t('common.edit') }}
                           </el-dropdown-item>
                           <el-dropdown-item
                             v-if="!item.template_id && permissionPrecise.copy(item.id)"
                             @click.stop="copyTool(item)"
                           >
-                            <AppIcon iconName="app-copy"></AppIcon>
+                            <AppIcon iconName="app-copy" class="color-secondary"></AppIcon>
                             {{ $t('common.copy') }}
                           </el-dropdown-item>
                           <el-dropdown-item
@@ -237,28 +237,28 @@
                             "
                             @click.stop="configInitParams(item)"
                           >
-                            <AppIcon iconName="app-operation" class="mr-4"></AppIcon>
+                            <AppIcon iconName="app-operation" class="color-secondary"></AppIcon>
                             {{ $t('common.param.initParam') }}
                           </el-dropdown-item>
                           <el-dropdown-item
                             @click.stop="openMoveToDialog(item)"
                             v-if="permissionPrecise.copy(item.id) && apiType === 'workspace'"
                           >
-                            <AppIcon iconName="app-migrate"></AppIcon>
+                            <AppIcon iconName="app-migrate" class="color-secondary"></AppIcon>
                             {{ $t('common.moveTo') }}
                           </el-dropdown-item>
                           <el-dropdown-item
                             v-if="isSystemShare"
                             @click.stop="openAuthorizedWorkspaceDialog(item)"
                           >
-                            <AppIcon iconName="app-key"></AppIcon>
+                            <AppIcon iconName="app-lock" class="color-secondary"></AppIcon>
                             {{ $t('views.shared.authorized_workspace') }}</el-dropdown-item
                           >
                           <el-dropdown-item
                             v-if="!item.template_id && permissionPrecise.export(item.id)"
                             @click.stop="exportTool(item)"
                           >
-                            <AppIcon iconName="app-export"></AppIcon>
+                            <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
                             {{ $t('common.export') }}
                           </el-dropdown-item>
                           <el-dropdown-item
@@ -266,7 +266,7 @@
                             divided
                             @click.stop="deleteTool(item)"
                           >
-                            <AppIcon iconName="app-delete"></AppIcon>
+                            <AppIcon iconName="app-delete" class="color-secondary"></AppIcon>
                             {{ $t('common.delete') }}
                           </el-dropdown-item>
                         </el-dropdown-menu>

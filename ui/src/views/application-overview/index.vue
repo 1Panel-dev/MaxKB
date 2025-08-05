@@ -82,7 +82,7 @@
                   </el-button>
                   <!-- 访问限制 -->
                   <el-button @click="openLimitDialog" v-if="permissionPrecise.overview_access(id)">
-                    <AppIcon iconName="app-key" class="mr-4"></AppIcon>
+                    <AppIcon iconName="app-lock" class="mr-4"></AppIcon>
                     {{ $t('views.applicationOverview.appInfo.accessControl') }}
                   </el-button>
                   <!-- 显示设置 -->
@@ -90,9 +90,7 @@
                     @click="openDisplaySettingDialog"
                     v-if="permissionPrecise.overview_display(id)"
                   >
-                    <el-icon class="mr-4">
-                      <Setting />
-                    </el-icon>
+                    <AppIcon iconName="app-setting" class="mr-4"></AppIcon>
                     {{ $t('views.applicationOverview.appInfo.displaySetting') }}
                   </el-button>
                 </div>
