@@ -150,12 +150,19 @@ const share = {
       ],
       'OR'
     ),
-  problem_read: () => false,  
-  problem_relate: () => 
+  problem_read: () => 
     hasPermission (
       [
         RoleConst.ADMIN,
         PermissionConst.SHARED_KNOWLEDGE_PROBLEM_READ
+      ],
+      'OR'
+    ), 
+  problem_relate: () => 
+    hasPermission (
+      [
+        RoleConst.ADMIN,
+        PermissionConst.SHARED_KNOWLEDGE_PROBLEM_RELATE
       ],
       'OR'
     ),

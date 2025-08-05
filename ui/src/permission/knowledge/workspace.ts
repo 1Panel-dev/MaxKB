@@ -212,7 +212,16 @@ const workspace = {
       ]
       ,'OR'
     ),
-  problem_read: () => false,    
+  problem_read: (source_id:string) =>
+    hasPermission(
+      [
+        new ComplexPermission([RoleConst.USER],[PermissionConst.KNOWLEDGE.getKnowledgeWorkspaceResourcePermission(source_id)],[],'AND'),
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.KNOWLEDGE_PROBLEM_READ.getKnowledgeWorkspaceResourcePermission(source_id),
+        PermissionConst.KNOWLEDGE_PROBLEM_READ.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),   
   problem_create: (source_id:string) =>
     hasPermission(
       [
