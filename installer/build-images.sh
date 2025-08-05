@@ -42,6 +42,7 @@ print_help() {
     echo "  $0 --registry harbor.company.com/maxkb --push all"
     echo "  $0 --registry myregistry.com --tag v2.0.1 backend frontend"
     echo "  $0 --registry localhost:5000 --no-cache models"
+    echo "  $0 --registry myregistry.com --optimized --push backend  # 使用优化版构建后端"
 }
 
 # 日志函数
@@ -80,11 +81,16 @@ check_docker() {
 check_files() {
     local files=(
         "installer/Dockerfile-backend"
-        "installer/Dockerfile-frontend"
+        "installer/Dockerfile-frontend" 
         "installer/Dockerfile-models"
         "ui/package.json"
         "pyproject.toml"
     )
+    
+    # 如果使用优化版，也检查优化版 Dockerfile
+    if [ "$OPTIMIZED" = "true" ]; then
+        files+=("installer/Dockerfile-backend-optimized")
+    fi
     
     for file in "${files[@]}"; do
         if [ ! -f "$file" ]; then

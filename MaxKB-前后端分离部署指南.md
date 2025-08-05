@@ -450,6 +450,173 @@ docker logs -f maxkb-backend
 sudo journalctl -u nginx -f
 ```
 
+## 开发阶段图片修改指南
+
+### 🎨 快速修改主题图片（无需重构代码）
+
+由于当前架构中主题图片和工具图标存储在后端，开发阶段修改图片有以下几种简单方法：
+
+#### 方法一：直接替换容器内图片（最快）
+
+```bash
+# 1. 查看当前主题图片
+docker exec maxkb-backend ls -la /opt/maxkb/apps/static/theme/
+
+# 2. 复制新图片到容器（替换default.jpg为例）
+docker cp /path/to/your/new-image.jpg maxkb-backend:/opt/maxkb/apps/static/theme/default.jpg
+
+# 3. 重启容器应用更改
+docker restart maxkb-backend
+
+# 4. 验证更改
+curl -I http://localhost/static/theme/default.jpg
+```
+
+#### 方法二：使用卷挂载（推荐开发环境）
+
+```bash
+# 1. 创建本地图片目录
+mkdir -p /opt/maxkb-dev/static/{theme,tool}
+
+# 2. 复制现有图片到本地
+docker cp maxkb-backend:/opt/maxkb/apps/static/theme/ /opt/maxkb-dev/static/
+docker cp maxkb-backend:/opt/maxkb/apps/static/tool/ /opt/maxkb-dev/static/
+
+# 3. 重新启动容器并挂载目录
+docker stop maxkb-backend
+docker rm maxkb-backend
+
+docker run -d \
+  --name maxkb-backend \
+  --restart unless-stopped \
+  -p 8080:8080 \
+  -e MAXKB_CONFIG_TYPE=ENV \
+  -e MAXKB_DB_HOST=your-db-host \
+  -e MAXKB_DB_PASSWORD=your-db-password \
+  -e MAXKB_REDIS_HOST=your-redis-host \
+  -e MAXKB_REDIS_PASSWORD=your-redis-password \
+  -v /opt/maxkb/logs:/opt/maxkb/logs \
+  -v /opt/maxkb/local:/opt/maxkb/local \
+  -v /opt/maxkb-dev/static/theme:/opt/maxkb/apps/static/theme \
+  -v /opt/maxkb-dev/static/tool:/opt/maxkb/apps/static/tool \
+  your-registry.com/maxkb/backend:v2.0
+
+# 4. 现在可以直接修改本地文件
+cp /path/to/your/new-theme.jpg /opt/maxkb-dev/static/theme/default.jpg
+# 立即生效，无需重启容器
+```
+
+#### 方法三：批量图片更新脚本
+
+创建 `update-images.sh`:
+
+```bash
+#!/bin/bash
+# 图片快速更新脚本
+
+set -e
+
+CONTAINER_NAME="maxkb-backend"
+LOCAL_IMAGES_DIR="/path/to/your/images"
+
+echo "=== MaxKB 图片更新工具 ==="
+
+# 检查容器是否运行
+if ! docker ps --filter "name=$CONTAINER_NAME" --format "{{.Names}}" | grep -q "$CONTAINER_NAME"; then
+    echo "❌ 容器 $CONTAINER_NAME 未运行"
+    exit 1
+fi
+
+echo "📦 容器状态正常"
+
+# 更新主题图片
+if [ -d "$LOCAL_IMAGES_DIR/theme" ]; then
+    echo "🎨 更新主题图片..."
+    for img in "$LOCAL_IMAGES_DIR/theme"/*.jpg; do
+        if [ -f "$img" ]; then
+            filename=$(basename "$img")
+            docker cp "$img" "$CONTAINER_NAME:/opt/maxkb/apps/static/theme/$filename"
+            echo "  ✅ 已更新: theme/$filename"
+        fi
+    done
+fi
+
+# 更新工具图标
+if [ -d "$LOCAL_IMAGES_DIR/tool" ]; then
+    echo "🔧 更新工具图标..."
+    find "$LOCAL_IMAGES_DIR/tool" -name "*.png" -o -name "*.jpg" -o -name "*.svg" | while read img; do
+        relative_path=${img#$LOCAL_IMAGES_DIR/tool/}
+        docker cp "$img" "$CONTAINER_NAME:/opt/maxkb/apps/static/tool/$relative_path"
+        echo "  ✅ 已更新: tool/$relative_path"
+    done
+fi
+
+echo "🎉 图片更新完成！"
+echo "💡 提示：图片已立即生效，无需重启容器"
+
+# 可选：验证图片
+echo ""
+echo "🔍 验证图片访问："
+echo "主题图片: curl -I http://localhost/static/theme/default.jpg"
+echo "工具图标: curl -I http://localhost/static/tool/mysql/icon.png"
+```
+
+使用方法：
+
+```bash
+# 1. 准备图片目录结构
+mkdir -p /opt/maxkb-images/{theme,tool/mysql,tool/redis}
+
+# 2. 放置你的新图片
+cp your-new-theme.jpg /opt/maxkb-images/theme/default.jpg
+cp your-mysql-icon.png /opt/maxkb-images/tool/mysql/icon.png
+
+# 3. 编辑脚本中的路径
+nano update-images.sh
+# 修改: LOCAL_IMAGES_DIR="/opt/maxkb-images"
+
+# 4. 运行更新脚本
+chmod +x update-images.sh
+./update-images.sh
+```
+
+### 📁 图片目录结构参考
+
+```
+/opt/maxkb-images/
+├── theme/
+│   ├── default.jpg     # 默认主题背景
+│   ├── orange.jpg      # 橙色主题背景
+│   ├── green.jpg       # 绿色主题背景
+│   ├── purple.jpg      # 紫色主题背景
+│   └── red.jpg         # 红色主题背景
+└── tool/
+    ├── mysql/
+    │   └── icon.png    # MySQL图标
+    ├── redis/
+    │   └── icon.png    # Redis图标
+    ├── elasticsearch/
+    │   └── icon.png    # ES图标
+    └── ...
+```
+
+### 🔄 开发流程建议
+
+```bash
+# 开发阶段：使用方法二（卷挂载）
+# 1. 初次设置挂载目录
+./setup-dev-volumes.sh
+
+# 2. 日常图片修改
+cp new-image.jpg /opt/maxkb-dev/static/theme/default.jpg
+# 立即生效
+
+# 3. 生产部署前：将图片打包到镜像
+# 构建时复制本地图片到构建目录
+cp -r /opt/maxkb-dev/static/* ui/dist/admin/
+./installer/build-images.sh --registry $REGISTRY --tag $NEW_TAG backend
+```
+
 ## 维护升级
 
 ### 更新前端
@@ -479,6 +646,23 @@ docker run -d --name maxkb-backend-new $REGISTRY/backend:$NEW_TAG
 # 4. 测试无误后移除旧容器
 docker rm maxkb-backend
 docker rename maxkb-backend-new maxkb-backend
+```
+
+### 更新后端（包含新图片）
+
+```bash
+# 如果使用了卷挂载方式，升级时保持图片
+docker stop maxkb-backend
+docker rm maxkb-backend
+
+# 重新启动新版本容器，保持挂载
+docker run -d \
+  --name maxkb-backend \
+  --restart unless-stopped \
+  -p 8080:8080 \
+  -v /opt/maxkb-dev/static/theme:/opt/maxkb/apps/static/theme \
+  -v /opt/maxkb-dev/static/tool:/opt/maxkb/apps/static/tool \
+  your-registry.com/maxkb/backend:$NEW_TAG
 ```
 
 ### 备份恢复

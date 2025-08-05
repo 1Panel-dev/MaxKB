@@ -28,23 +28,23 @@ WORKDIR /build
 # 复制依赖定义文件
 COPY pyproject.toml /build/
 
-# 创建虚拟环境并安装依赖
+# 创建虚拟环境并安装 Poetry
 RUN python3 -m venv /opt/py3 && \
     /opt/py3/bin/pip install --upgrade pip setuptools wheel && \
     /opt/py3/bin/pip install poetry==2.0.0 && \
-    /opt/py3/bin/poetry config virtualenvs.create false
+    /opt/py3/bin/poetry config virtualenvs.create false && \
+    /opt/py3/bin/poetry config installer.parallel true
 
-# 为 x86_64 架构优化 torch 版本
+# 为 x86_64 架构优化 torch 版本，提升构建速度
 RUN if [ "$(uname -m)" = "x86_64" ]; then \
         sed -i 's/^torch.*/torch = {version = "2.7.1+cpu", source = "pytorch"}/g' pyproject.toml; \
     fi
 
-# 安装生产依赖（排除开发工具）
+# 安装生产依赖（使用缓存优化）
 RUN . /opt/py3/bin/activate && \
-    rm -f poetry.lock && \
-    poetry lock && \
-    poetry install --only=main --no-dev && \
-    pip install requests pymysql psycopg2-binary
+    poetry lock --no-update && \
+    poetry install --only=main --no-cache && \
+    pip install --no-cache-dir requests pymysql psycopg2-binary
 
 # 复制应用代码（仅后端部分）
 COPY apps/ /build/apps/
@@ -56,15 +56,20 @@ RUN . /opt/py3/bin/activate && \
     python3 /build/apps/manage.py compilemessages
 
 # 清理构建缓存和临时文件
-RUN find /opt/py3 -type d -name "__pycache__" -exec rm -rf {} + && \
+RUN find /opt/py3 -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true && \
     find /opt/py3 -type f -name "*.pyc" -delete && \
     find /opt/py3 -type f -name "*.pyo" -delete && \
-    find /opt/py3 -type d -name "*.egg-info" -exec rm -rf {} + && \
-    find /opt/py3 -type d -name ".pytest_cache" -exec rm -rf {} + && \
-    # 删除不必要的包文件
+    find /opt/py3 -type d -name "*.egg-info" -exec rm -rf {} + 2>/dev/null || true && \
+    find /opt/py3 -type d -name ".pytest_cache" -exec rm -rf {} + 2>/dev/null || true && \
+    # 删除不必要的包文件和文档
     rm -rf /opt/py3/lib/python3.11/site-packages/pip* && \
     rm -rf /opt/py3/lib/python3.11/site-packages/setuptools* && \
-    rm -rf /opt/py3/lib/python3.11/site-packages/wheel*
+    rm -rf /opt/py3/lib/python3.11/site-packages/wheel* && \
+    rm -rf /opt/py3/lib/python3.11/site-packages/poetry* && \
+    # 删除测试文件和文档
+    find /opt/py3/lib/python3.11/site-packages -type d -name "tests" -exec rm -rf {} + 2>/dev/null || true && \
+    find /opt/py3/lib/python3.11/site-packages -type d -name "test" -exec rm -rf {} + 2>/dev/null || true && \
+    find /opt/py3/lib/python3.11/site-packages -name "*.dist-info" -exec rm -rf {} + 2>/dev/null || true
 
 # 阶段2: 最终运行环境
 FROM python:3.11-slim-bookworm AS backend-runtime
