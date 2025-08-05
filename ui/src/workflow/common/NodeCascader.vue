@@ -90,7 +90,11 @@ const validate = () => {
 defineExpose({ validate })
 onMounted(() => {
   options.value = props.global
-    ? props.nodeModel.get_up_node_field_list(false, true).filter((v: any) => v.value === 'global')
+    ? props.nodeModel
+        .get_up_node_field_list(false, true)
+        .filter(
+          (v: any) => ['global', 'chat'].includes(v.value) && v.children && v.children.length > 0,
+        )
     : props.nodeModel.get_up_node_field_list(false, true)
 })
 </script>
