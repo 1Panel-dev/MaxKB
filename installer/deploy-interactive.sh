@@ -657,7 +657,27 @@ create_network() {
 create_data_dirs() {
     log_info "创建数据持久化目录"
     mkdir -p "$DATA_DIR"/{redis,postgres-data,postgres-init,maxkb-logs,maxkb-local,maxkb-models,nginx}
+    
+    # 设置合适的目录权限，确保容器内应用可以写入
     chmod 755 "$DATA_DIR"
+    chmod 777 "$DATA_DIR"/maxkb-logs    # 日志目录需要写权限
+    chmod 777 "$DATA_DIR"/maxkb-local   # 本地存储需要写权限
+    chmod 777 "$DATA_DIR"/maxkb-models  # 模型目录需要写权限
+    chmod 755 "$DATA_DIR"/redis
+    chmod 755 "$DATA_DIR"/postgres-data
+    chmod 755 "$DATA_DIR"/postgres-init
+    chmod 755 "$DATA_DIR"/nginx
+    
+    # 预创建关键日志文件，避免权限问题
+    touch "$DATA_DIR"/maxkb-logs/drf_exception.log
+    touch "$DATA_DIR"/maxkb-logs/maxkb.log
+    chmod 666 "$DATA_DIR"/maxkb-logs/*.log 2>/dev/null || true
+    
+    # 设置目录所有者（如果是root运行）
+    if [ "$(id -u)" = "0" ]; then
+        chown -R 1000:1000 "$DATA_DIR"/maxkb-logs "$DATA_DIR"/maxkb-local "$DATA_DIR"/maxkb-models 2>/dev/null || true
+    fi
+    
     log_info "数据目录创建完成: $DATA_DIR"
 }
 

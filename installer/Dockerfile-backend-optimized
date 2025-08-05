@@ -2,7 +2,7 @@
 # 多阶段构建，减少最终镜像大小
 
 # 阶段1: 构建环境
-FROM python:3.11-slim-bookworm AS backend-builder
+FROM ghcr.io/1panel-dev/maxkb-base:python3.11-pg17.5 AS backend-builder
 
 # 设置 APT 使用更少的缓存
 ENV DEBIAN_FRONTEND=noninteractive
@@ -73,7 +73,7 @@ RUN find /opt/py3 -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || t
     find /opt/py3/lib/python3.11/site-packages -name "*.dist-info" -exec rm -rf {} + 2>/dev/null || true
 
 # 阶段2: 最终运行环境
-FROM python:3.11-slim-bookworm AS backend-runtime
+FROM ghcr.io/1panel-dev/maxkb-base:python3.11-pg17.5 AS backend-runtime
 
 # 设置时区和语言环境
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \

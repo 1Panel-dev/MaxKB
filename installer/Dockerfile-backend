@@ -1,5 +1,5 @@
 # MaxKB 后台应用 Dockerfile
-FROM python:3.11-slim-bullseye AS backend-build
+FROM ghcr.io/1panel-dev/maxkb-base:python3.11-pg17.5 AS backend-build
 
 # 安装系统依赖
 ARG DEPENDENCIES="                    \
@@ -49,7 +49,7 @@ RUN mkdir -p /opt/maxkb-app/sandbox && \
     chown -R sandbox:root /opt/maxkb-app/sandbox
 
 # 最终镜像
-FROM python:3.11-slim-bullseye
+FROM ghcr.io/1panel-dev/maxkb-base:python3.11-pg17.5
 
 # 安装运行时依赖
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
