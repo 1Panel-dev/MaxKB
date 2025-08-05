@@ -1,14 +1,32 @@
 #!/bin/bash
 
 # MaxKB v2.0 镜像构建脚本
-# 用于构建并推送镜像到私有仓库
+# 支持本地测试和私有仓库部署
 
 set -e
 
+# 快速开始信息
+show_quick_start() {
+    echo "==============================================="
+    echo "  MaxKB v2.0 本地开发测试快速开始"
+    echo "==============================================="
+    echo ""
+    echo "常用命令："
+    echo "  $0 --local all                     # 构建所有镜像（本地测试）"
+    echo "  $0 --local --test backend          # 构建后端并启动测试容器"
+    echo "  $0 --local --optimized all         # 使用优化构建（推荐）"
+    echo "  $0 --status                        # 查看本地镜像和容器状态"
+    echo "  $0 --clean                         # 清理所有本地镜像"
+    echo ""
+    echo "如需帮助，请运行: $0 --help"
+    echo "==============================================="
+}
+
 # 默认配置
-DEFAULT_REGISTRY=""
-DEFAULT_TAG="v2.0"
+DEFAULT_REGISTRY="localhost"
+DEFAULT_TAG="dev"
 DEFAULT_PLATFORM="linux/amd64"
+DEFAULT_LOCAL_MODE="false"
 
 # 颜色输出
 RED='\033[0;31m'
@@ -19,7 +37,7 @@ NC='\033[0m' # No Color
 
 # 打印帮助信息
 print_help() {
-    echo "MaxKB v2.0 镜像构建脚本"
+    echo "MaxKB v2.0 镜像构建脚本 - 支持本地测试和私有部署"
     echo ""
     echo "用法: $0 [选项] <组件>"
     echo ""
@@ -30,19 +48,28 @@ print_help() {
     echo "  all         构建所有镜像"
     echo ""
     echo "选项:"
-    echo "  --registry <url>    私有镜像仓库地址 (必需)"
-    echo "  --tag <tag>         镜像标签 (默认: v2.0)"
+    echo "  --local             本地测试模式 (无需指定 registry)"
+    echo "  --registry <url>    私有镜像仓库地址 (本地模式下可选)"
+    echo "  --tag <tag>         镜像标签 (默认: dev)"
     echo "  --platform <arch>   目标平台 (默认: linux/amd64)"
     echo "  --push              构建后推送到仓库"
     echo "  --no-cache          不使用缓存构建"
     echo "  --optimized         使用优化版 Dockerfile（减少镜像大小）"
+    echo "  --test              构建后启动容器进行测试"
+    echo "  --clean             清理本地 MaxKB 相关镜像"
+    echo "  --status            查看本地镜像和容器状态"
     echo "  --help              显示此帮助信息"
     echo ""
-    echo "示例:"
+    echo "本地测试示例:"
+    echo "  $0 --local all                    # 本地构建所有镜像"
+    echo "  $0 --local --test backend         # 构建后端并启动测试容器"
+    echo "  $0 --local --no-cache --optimized all  # 优化构建不使用缓存"
+    echo "  $0 --clean                        # 清理本地镜像"
+    echo ""
+    echo "私有仓库示例:"
     echo "  $0 --registry harbor.company.com/maxkb --push all"
     echo "  $0 --registry myregistry.com --tag v2.0.1 backend frontend"
     echo "  $0 --registry localhost:5000 --no-cache models"
-    echo "  $0 --registry myregistry.com --optimized --push backend  # 使用优化版构建后端"
 }
 
 # 日志函数
@@ -180,10 +207,137 @@ build_models() {
 
 # 登录私有仓库
 docker_login() {
-    if [ -n "$REGISTRY" ] && [ "$REGISTRY" != "docker.io" ]; then
+    if [ -n "$REGISTRY" ] && [ "$REGISTRY" != "docker.io" ] && [ "$REGISTRY" != "localhost" ] && [ "$LOCAL_MODE" != "true" ]; then
         log_info "登录私有镜像仓库: $REGISTRY"
         echo "请输入仓库用户名和密码"
         docker login "$REGISTRY"
+    fi
+}
+
+# 查看本地状态
+show_local_status() {
+    log_info "=== MaxKB 本地状态检查 ==="
+    echo ""
+    
+    # 检查 MaxKB 相关镜像
+    log_info "镜像列表:"
+    local images=$(docker images --filter "reference=*/maxkb/*" --filter "reference=maxkb/*" --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}\t{{.CreatedAt}}" 2>/dev/null)
+    if [ -n "$images" ]; then
+        echo "$images"
+    else
+        echo "未找到 MaxKB 相关镜像"
+    fi
+    
+    echo ""
+    
+    # 检查 MaxKB 相关容器
+    log_info "容器列表:"
+    local containers=$(docker ps -a --filter "name=maxkb" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" 2>/dev/null)
+    if [ -n "$containers" ]; then
+        echo "$containers"
+    else
+        echo "未找到 MaxKB 相关容器"
+    fi
+    
+    echo ""
+    
+    # 检查正在运行的服务
+    log_info "运行中的服务:"
+    local running=$(docker ps --filter "name=maxkb" --format "{{.Names}}: {{.Status}}" 2>/dev/null)
+    if [ -n "$running" ]; then
+        echo "$running"
+        
+        echo ""
+        log_info "服务访问地址:"
+        if docker ps --filter "name=maxkb-backend" --format "{{.Names}}" | grep -q maxkb-backend; then
+            echo "后端服务: http://localhost:8080"
+        fi
+        if docker ps --filter "name=maxkb-frontend" --format "{{.Names}}" | grep -q maxkb-frontend; then
+            echo "前端服务: http://localhost"
+        fi
+        if docker ps --filter "name=maxkb-models" --format "{{.Names}}" | grep -q maxkb-models; then
+            echo "模型服务: http://localhost:6333"
+        fi
+    else
+        echo "没有正在运行的 MaxKB 服务"
+        
+        echo ""
+        log_info "快速启动命令:"
+        echo "$0 --local --test all    # 构建并启动所有服务"
+    fi
+    
+    echo ""
+}
+
+# 清理本地镜像
+clean_images() {
+    log_info "清理本地 MaxKB 相关镜像..."
+    
+    # 停止并删除 MaxKB 相关容器
+    local containers=$(docker ps -a --filter "name=maxkb" --format "{{.Names}}" 2>/dev/null || true)
+    if [ -n "$containers" ]; then
+        log_info "停止并删除相关容器..."
+        echo "$containers" | xargs docker rm -f 2>/dev/null || true
+    fi
+    
+    # 删除 MaxKB 相关镜像
+    local images=$(docker images --filter "reference=*/maxkb/*" --filter "reference=maxkb/*" --format "{{.Repository}}:{{.Tag}}" 2>/dev/null || true)
+    if [ -n "$images" ]; then
+        log_info "删除相关镜像..."
+        echo "$images" | xargs docker rmi -f 2>/dev/null || true
+    fi
+    
+    # 清理悬空镜像
+    docker image prune -f 2>/dev/null || true
+    
+    log_info "清理完成！"
+}
+
+# 启动测试容器
+start_test_container() {
+    local component="$1"
+    local image_name
+    
+    case $component in
+        backend)
+            image_name="$REGISTRY/maxkb/backend:$TAG"
+            log_info "启动后端测试容器..."
+            docker run -d --name maxkb-backend-test \
+                -p 8080:8080 \
+                -e DEBUG=true \
+                -e DJANGO_SETTINGS_MODULE=maxkb.settings.dev \
+                "$image_name"
+            log_info "后端服务已启动: http://localhost:8080"
+            ;;
+        frontend)
+            image_name="$REGISTRY/maxkb/frontend:$TAG"
+            log_info "启动前端测试容器..."
+            docker run -d --name maxkb-frontend-test \
+                -p 80:80 \
+                "$image_name"
+            log_info "前端服务已启动: http://localhost"
+            ;;
+        models)
+            image_name="$REGISTRY/maxkb/models:$TAG"
+            log_info "启动模型服务测试容器..."
+            docker run -d --name maxkb-models-test \
+                -p 6333:6333 \
+                "$image_name"
+            log_info "模型服务已启动: http://localhost:6333"
+            ;;
+    esac
+    
+    # 等待容器启动
+    sleep 3
+    
+    # 检查容器状态
+    if docker ps --filter "name=maxkb-${component}-test" --format "{{.Names}}" | grep -q maxkb; then
+        log_info "${component} 测试容器启动成功"
+        echo "查看日志: docker logs maxkb-${component}-test"
+        echo "停止容器: docker stop maxkb-${component}-test"
+    else
+        log_error "${component} 测试容器启动失败"
+        docker logs "maxkb-${component}-test" 2>/dev/null || true
     fi
 }
 
@@ -191,7 +345,8 @@ docker_login() {
 show_summary() {
     echo ""
     log_info "=== 构建摘要 ==="
-    echo "仓库地址: $REGISTRY"
+    echo "运行模式: $([ "$LOCAL_MODE" = "true" ] && echo "本地测试" || echo "私有仓库")"
+    echo "镜像前缀: $REGISTRY"
     echo "镜像标签: $TAG"
     echo "目标平台: $PLATFORM"
     echo "推送状态: $([ "$PUSH" = "true" ] && echo "已推送" || echo "仅本地构建")"
@@ -218,6 +373,44 @@ show_summary() {
                 ;;
         esac
     done
+    
+    # 本地模式的额外信息
+    if [ "$LOCAL_MODE" = "true" ]; then
+        echo ""
+        log_info "=== 本地测试命令 ==="
+        echo "查看镜像: docker images | grep maxkb"
+        echo "清理镜像: $0 --clean"
+        
+        if [ "$TEST_MODE" = "true" ]; then
+            echo ""
+            log_info "=== 测试容器信息 ==="
+            echo "查看容器: docker ps --filter 'name=maxkb'"
+            echo "查看日志: docker logs <容器名>"
+            echo "停止容器: docker stop <容器名>"
+        else
+            echo ""
+            log_info "=== 启动测试容器 ==="
+            for component in "${COMPONENTS[@]}"; do
+                case $component in
+                    backend)
+                        echo "启动后端: docker run -d --name maxkb-backend-test -p 8080:8080 $REGISTRY/maxkb/backend:$TAG"
+                        ;;
+                    frontend)
+                        echo "启动前端: docker run -d --name maxkb-frontend-test -p 80:80 $REGISTRY/maxkb/frontend:$TAG"
+                        ;;
+                    models)
+                        echo "启动模型: docker run -d --name maxkb-models-test -p 6333:6333 $REGISTRY/maxkb/models:$TAG"
+                        ;;
+                    all)
+                        echo "启动后端: docker run -d --name maxkb-backend-test -p 8080:8080 $REGISTRY/maxkb/backend:$TAG"
+                        echo "启动前端: docker run -d --name maxkb-frontend-test -p 80:80 $REGISTRY/maxkb/frontend:$TAG"
+                        echo "启动模型: docker run -d --name maxkb-models-test -p 6333:6333 $REGISTRY/maxkb/models:$TAG"
+                        break
+                        ;;
+                esac
+            done
+        fi
+    fi
     
     echo ""
     log_info "构建完成！"
@@ -355,14 +548,32 @@ main() {
     PUSH="false"
     NO_CACHE="false"
     OPTIMIZED="false"
+    LOCAL_MODE="$DEFAULT_LOCAL_MODE"
+    TEST_MODE="false"
+    CLEAN_MODE="false"
+    
+    # 如果没有参数，显示快速开始信息
+    if [ $# -eq 0 ]; then
+        show_quick_start
+        exit 0
+    fi
     
     # 解析命令行参数
     COMPONENTS=()
     
     while [[ $# -gt 0 ]]; do
         case $1 in
+            --local)
+                LOCAL_MODE="true"
+                # 本地模式下设置默认仓库前缀
+                if [ "$REGISTRY" = "$DEFAULT_REGISTRY" ]; then
+                    REGISTRY="maxkb"
+                fi
+                shift
+                ;;
             --registry)
                 REGISTRY="$2"
+                LOCAL_MODE="false"  # 明确指定仓库时关闭本地模式
                 shift 2
                 ;;
             --tag)
@@ -385,6 +596,18 @@ main() {
                 OPTIMIZED="true"
                 shift
                 ;;
+            --test)
+                TEST_MODE="true"
+                shift
+                ;;
+            --clean)
+                CLEAN_MODE="true"
+                shift
+                ;;
+            --status)
+                show_local_status
+                exit 0
+                ;;
             --help)
                 print_help
                 exit 0
@@ -401,9 +624,15 @@ main() {
         esac
     done
     
+    # 处理清理模式
+    if [ "$CLEAN_MODE" = "true" ]; then
+        clean_images
+        exit 0
+    fi
+    
     # 检查必需参数
-    if [ -z "$REGISTRY" ]; then
-        log_error "请指定私有镜像仓库地址 (--registry)"
+    if [ "$LOCAL_MODE" = "false" ] && [ -z "$REGISTRY" ]; then
+        log_error "请指定私有镜像仓库地址 (--registry) 或使用本地模式 (--local)"
         print_help
         exit 1
     fi
@@ -418,8 +647,19 @@ main() {
     check_docker
     check_files
     
-    # 登录仓库
-    if [ "$PUSH" = "true" ]; then
+    # 本地模式提示信息
+    if [ "$LOCAL_MODE" = "true" ]; then
+        log_info "=== 本地测试模式 ==="
+        log_info "镜像前缀: $REGISTRY"
+        log_info "镜像标签: $TAG"
+        if [ "$TEST_MODE" = "true" ]; then
+            log_info "构建完成后将启动测试容器"
+        fi
+        echo ""
+    fi
+    
+    # 登录仓库 (仅在推送且非本地模式时)
+    if [ "$PUSH" = "true" ] && [ "$LOCAL_MODE" = "false" ]; then
         docker_login
     fi
     
@@ -428,23 +668,40 @@ main() {
         case $component in
             backend)
                 build_backend
+                if [ "$TEST_MODE" = "true" ]; then
+                    start_test_container "backend"
+                fi
                 ;;
             frontend)
                 build_frontend
+                if [ "$TEST_MODE" = "true" ]; then
+                    start_test_container "frontend"
+                fi
                 ;;
             models)
                 build_models
+                if [ "$TEST_MODE" = "true" ]; then
+                    start_test_container "models"
+                fi
                 ;;
             all)
                 build_backend
                 build_frontend
                 build_models
+                if [ "$TEST_MODE" = "true" ]; then
+                    log_info "启动所有测试容器..."
+                    start_test_container "backend"
+                    start_test_container "frontend"
+                    start_test_container "models"
+                fi
                 ;;
         esac
     done
     
-    # 生成部署指南
-    create_deploy_guide
+    # 仅在非本地模式时生成部署指南
+    if [ "$LOCAL_MODE" = "false" ]; then
+        create_deploy_guide
+    fi
     
     # 显示摘要
     show_summary
