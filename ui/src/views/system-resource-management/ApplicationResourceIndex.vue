@@ -93,7 +93,7 @@
           <template #header>
             <div>
               <span>{{ $t('common.status.label') }}</span>
-              <el-popover :width="200" trigger="click" :visible="statusVisible">
+              <el-popover :width="100" trigger="click" :visible="statusVisible">
                 <template #reference>
                   <el-button
                     style="margin-top: -2px"
@@ -109,19 +109,17 @@
                 <div class="filter">
                   <div class="form-item mb-16">
                     <div @click.stop>
-                      <el-scrollbar height="300" style="margin: 0 0 0 10px">
-                        <el-checkbox-group
-                          v-model="statusArr"
-                          style="display: flex; flex-direction: column"
-                        >
-                          <el-checkbox
-                            v-for="item in statusOptions"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.value"
-                          />
-                        </el-checkbox-group>
-                      </el-scrollbar>
+                      <el-checkbox-group
+                        v-model="statusArr"
+                        style="display: flex; flex-direction: column"
+                      >
+                        <el-checkbox
+                          v-for="item in statusOptions"
+                          :key="item.value"
+                          :label="item.label"
+                          :value="item.value"
+                        />
+                      </el-checkbox-group>
                     </div>
                   </div>
                 </div>
@@ -177,21 +175,28 @@
                   </el-button>
                 </template>
                 <div class="filter">
-                  <div class="form-item mb-16">
+                  <div class="form-item mb-16 ml-4">
                     <div @click.stop>
-                      <el-scrollbar height="300" style="margin: 0 0 0 10px">
+                      <el-input
+                        v-model="filterText"
+                        :placeholder="$t('common.search')"
+                        prefix-icon="Search"
+                        clearable
+                      />
+                      <el-scrollbar height="300" v-if="filterData.length">
                         <el-checkbox-group
                           v-model="workspaceArr"
                           style="display: flex; flex-direction: column"
                         >
                           <el-checkbox
-                            v-for="item in workspaceOptions"
+                            v-for="item in filterData"
                             :key="item.value"
                             :label="item.label"
                             :value="item.value"
                           />
                         </el-checkbox-group>
                       </el-scrollbar>
+                      <el-empty v-else :description="$t('common.noData')" />
                     </div>
                   </div>
                 </div>
@@ -289,7 +294,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, reactive, computed } from 'vue'
+import { onMounted, ref, reactive, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import ApplicationResourceApi from '@/api/system-resource-management/application'
 import { t } from '@/locales'
@@ -427,10 +432,28 @@ const statusOptions = ref<any[]>([
   },
 ])
 
+const filterText = ref('')
+const filterData = ref<any[]>([])
+
+watch(
+  [() => workspaceOptions.value, () => filterText.value],
+  () => {
+    if (!filterText.value.length) {
+      filterData.value = workspaceOptions.value
+    }
+    filterData.value = workspaceOptions.value.filter((v: any) =>
+      v.label.toLowerCase().includes(filterText.value.toLowerCase()),
+    )
+  },
+  { immediate: true },
+)
+
+
 function filterWorkspaceChange(val: string) {
   if (val === 'clear') {
     workspaceArr.value = []
   }
+  filterText.value = ''
   getList()
   workspaceVisible.value = false
 }
