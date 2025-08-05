@@ -12,6 +12,20 @@ import { nodeDict } from '@/workflow/common/data'
 import { isActive, connect, disconnect } from './teleport'
 import { t } from '@/locales'
 import { type Dict } from '@/api/type/common'
+const getNodeName = (nodes: Array<any>, baseName: string) => {
+  let index = 0
+  let name = baseName
+  while (true) {
+    if (index > 0) {
+      name = baseName + index
+      console.log(name)
+    }
+    if (!nodes.some((node: any) => node.properties.stepName === name.trim())) {
+      return name
+    }
+    index++
+  }
+}
 class AppNode extends HtmlResize.view {
   isMounted
   r?: any
@@ -32,23 +46,14 @@ class AppNode extends HtmlResize.view {
     if (props.model.properties.noRender) {
       delete props.model.properties.noRender
     } else {
-      const filterNodes = props.graphModel.nodes.filter((v: any) => v.type === props.model.type)
-      const filterNameSameNodes = filterNodes.filter(
-        (v: any) => v.properties.stepName === props.model.properties.stepName,
+      console.log('ss', props.model.properties.stepName)
+      console.log(props.graphModel.nodes, this)
+      props.model.properties.stepName = getNodeName(
+        props.graphModel.nodes.filter((node: any) => node.id !== props.model.id),
+        props.model.properties.stepName,
       )
-      if (filterNameSameNodes.length - 1 > 0) {
-        getNodesName(filterNameSameNodes.length - 1)
-      }
     }
-    function getNodesName(num: number) {
-      const number = num
-      const name = props.model.properties.stepName + number
-      if (!props.graphModel.nodes?.some((node: any) => node.properties.stepName === name.trim())) {
-        props.model.properties.stepName = name
-      } else {
-        getNodesName(number + 1)
-      }
-    }
+
     props.model.properties.config = nodeDict[props.model.type].properties.config
     if (props.model.properties.height) {
       props.model.height = props.model.properties.height
