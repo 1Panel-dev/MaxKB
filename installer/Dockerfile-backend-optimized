@@ -25,25 +25,26 @@ RUN apt-get update && \
 # 设置工作目录
 WORKDIR /build
 
-# 复制依赖定义文件
-COPY pyproject.toml /build/
-
 # 创建虚拟环境并安装 Poetry
 RUN python3 -m venv /opt/py3 && \
-    /opt/py3/bin/pip install --upgrade pip setuptools wheel && \
-    /opt/py3/bin/pip install poetry==2.0.0 && \
-    /opt/py3/bin/poetry config virtualenvs.create false && \
-    /opt/py3/bin/poetry config installer.parallel true
+    . /opt/py3/bin/activate && \
+    pip install --upgrade pip setuptools wheel && \
+    pip install poetry==2.0.0 && \
+    poetry config virtualenvs.create false
+
+# 复制依赖定义文件
+COPY pyproject.toml /build/
 
 # 为 x86_64 架构优化 torch 版本，提升构建速度
 RUN if [ "$(uname -m)" = "x86_64" ]; then \
         sed -i 's/^torch.*/torch = {version = "2.7.1+cpu", source = "pytorch"}/g' pyproject.toml; \
     fi
 
-# 安装生产依赖（使用缓存优化）
+# 生成并安装依赖
 RUN . /opt/py3/bin/activate && \
-    poetry lock --no-update && \
-    poetry install --only=main --no-cache && \
+    rm -f poetry.lock && \
+    poetry lock && \
+    poetry install --only=main && \
     pip install --no-cache-dir requests pymysql psycopg2-binary
 
 # 复制应用代码（仅后端部分）
