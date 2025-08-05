@@ -30,7 +30,7 @@
         <el-button icon="Plus" @click="showPopover = !showPopover">
           {{ $t('views.applicationWorkflow.setting.addComponent') }}
         </el-button>
-        <el-button @click="clickShowDebug" :disabled="showDebug">
+        <el-button @click="clickShowDebug" :disabled="showDebug" v-if="permissionPrecise.debug(id)">
           <AppIcon iconName="app-debug-outlined" class="mr-4"></AppIcon>
           {{ $t('views.applicationWorkflow.setting.debug') }}
         </el-button>
@@ -156,6 +156,7 @@ import { hasPermission } from '@/utils/permission'
 import { t } from '@/locales'
 import { ComplexPermission } from '@/utils/permission/type'
 import { EditionConst, PermissionConst, RoleConst } from '@/utils/permission/data'
+import permissionMap from '@/permission'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 provide('getApplicationDetail', () => detail)
 const { theme } = useStore()
@@ -170,6 +171,10 @@ const apiType = computed(() => {
   } else {
     return 'workspace'
   }
+})
+
+const permissionPrecise = computed(() => {
+  return permissionMap['application'][apiType.value]
 })
 
 const isDefaultTheme = computed(() => {
