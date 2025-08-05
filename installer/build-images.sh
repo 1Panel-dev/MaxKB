@@ -310,10 +310,48 @@ network_troubleshooting() {
     echo "   curl -I https://mirrors.aliyun.com/pypi/simple/"
     
     echo ""
-    log_info "5. 如果问题持续，尝试:"
+    log_info "5. Poetry 相关问题:"
+    echo "   # 清理 Poetry 缓存"
+    echo "   poetry cache clear pypi --all"
+    echo "   poetry cache clear poetry --all"
+    
+    echo ""
+    log_info "6. 如果问题持续，尝试:"
     echo "   - 使用 --no-cache 重新构建"
     echo "   - 检查 DNS 设置"
+    echo "   - 降级到 Poetry 1.8.0 版本"
     echo "   - 联系网络管理员"
+    
+    echo ""
+}
+
+# Poetry 故障排除
+poetry_troubleshooting() {
+    log_error "构建过程中遇到 Poetry 问题！"
+    echo ""
+    log_info "=== Poetry 故障排除建议 ==="
+    echo ""
+    
+    log_info "1. Poetry 版本兼容性问题:"
+    echo "   当前使用: Poetry 2.0.0"
+    echo "   如果遇到命令参数错误，可能需要调整语法"
+    
+    echo ""
+    log_info "2. 源配置问题:"
+    echo "   检查是否有重复的源配置"
+    echo "   使用: poetry source show"
+    
+    echo ""
+    log_info "3. 网络和缓存问题:"
+    echo "   # 清理 Poetry 缓存"
+    echo "   poetry cache clear pypi --all"
+    echo "   poetry cache clear poetry --all"
+    echo "   # 重新生成锁定文件"
+    echo "   rm -f poetry.lock && poetry lock"
+    
+    echo ""
+    log_info "4. 快速解决方案:"
+    echo "   $0 --local --china --no-cache --optimized backend"
     
     echo ""
 }
@@ -325,8 +363,13 @@ handle_build_error() {
     
     log_error "${component} 镜像构建失败 (退出码: $exit_code)"
     
-    # 检查是否是网络相关错误
-    if docker logs $(docker ps -lq) 2>&1 | grep -qi "timeout\|connection\|network\|ssl\|certificate"; then
+    # 获取最后一个容器的日志
+    local last_logs=$(docker logs $(docker ps -lq) 2>&1 || echo "无法获取容器日志")
+    
+    # 检查是否是特定类型的错误
+    if echo "$last_logs" | grep -qi "poetry.*timeout\|poetry.*option.*does not exist\|poetry.*source.*already exists"; then
+        poetry_troubleshooting
+    elif echo "$last_logs" | grep -qi "timeout\|connection\|network\|ssl\|certificate"; then
         network_troubleshooting
     else
         echo ""
@@ -336,6 +379,8 @@ handle_build_error() {
         echo "3. 确保所有依赖文件存在"
         echo "4. 尝试使用 --no-cache 重新构建"
         echo ""
+        log_info "最近的构建日志:"
+        echo "$last_logs" | tail -10
     fi
     
     exit $exit_code

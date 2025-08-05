@@ -39,15 +39,20 @@ RUN mkdir -p /root/.pip && \
 RUN python3 -m venv /opt/py3 && \
     pip install poetry==2.0.0 --break-system-packages --timeout 300 --retries 5 \
         -i https://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com && \
+    # 配置 Poetry 基本设置
     poetry config virtualenvs.create false && \
-    poetry config repositories.aliyun https://mirrors.aliyun.com/pypi/simple/ && \
-    poetry config repositories.tsinghua https://pypi.tuna.tsinghua.edu.cn/simple/ && \
+    poetry config installer.max-workers 10 && \
+    poetry config installer.timeout 300 && \
     . /opt/py3/bin/activate && \
     if [ "$(uname -m)" = "x86_64" ]; then sed -i 's/^torch.*/torch = {version = "2.7.1+cpu", source = "pytorch"}/g' pyproject.toml; fi && \
-    poetry source add pytorch https://download.pytorch.org/whl/cpu && \
+    # 检查并添加镜像源（避免重复添加）
+    if ! poetry source show aliyun >/dev/null 2>&1; then \
+        poetry source add --priority=primary aliyun https://mirrors.aliyun.com/pypi/simple/; \
+    fi && \
+    poetry source show && \
     rm -f poetry.lock && \
-    poetry lock --timeout 300 && \
-    poetry install --only=main --timeout 300 && \
+    poetry lock && \
+    poetry install --only=main && \
     pip install --timeout 300 --retries 5 \
         -i https://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com \
         requests pymysql psycopg2-binary

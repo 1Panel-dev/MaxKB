@@ -41,9 +41,11 @@ RUN python3 -m venv /opt/py3 && \
 # 分步安装 Poetry（提高稳定性）
 RUN . /opt/py3/bin/activate && \
     pip install poetry==2.0.0 --timeout 300 --retries 5 && \
+    # 配置 Poetry 基本设置
     poetry config virtualenvs.create false && \
-    poetry config repositories.aliyun https://mirrors.aliyun.com/pypi/simple/ && \
-    poetry config repositories.tsinghua https://pypi.tuna.tsinghua.edu.cn/simple/
+    poetry config installer.max-workers 10 && \
+    # 配置网络超时（Poetry 2.0+ 语法）
+    poetry config installer.timeout 300
 
 # 复制依赖定义文件
 COPY pyproject.toml /build/
@@ -56,12 +58,16 @@ RUN if [ "$(uname -m)" = "x86_64" ]; then \
 # 生成并安装依赖（使用镜像源）
 RUN . /opt/py3/bin/activate && \
     rm -f poetry.lock && \
-    # 添加 PyTorch 镜像源配置
-    poetry source add pytorch https://download.pytorch.org/whl/cpu && \
+    # 检查并添加镜像源（避免重复添加）
+    if ! poetry source show aliyun >/dev/null 2>&1; then \
+        poetry source add --priority=primary aliyun https://mirrors.aliyun.com/pypi/simple/; \
+    fi && \
+    # 显示配置的源
+    poetry source show && \
     # 生成依赖锁定文件
-    poetry lock --timeout 300 && \
-    # 安装主要依赖，使用阿里云镜像源
-    poetry install --only=main --timeout 300 && \
+    poetry lock && \
+    # 安装主要依赖
+    poetry install --only=main && \
     # 安装额外依赖
     pip install --no-cache-dir --timeout 300 --retries 5 \
         -i https://mirrors.aliyun.com/pypi/simple/ \
