@@ -2,7 +2,7 @@
   <el-tabs v-model="activeKey" @tab-change="selectTab">
     <template v-for="item in tabs" :key="item.key">
       <el-tab-pane :label="item.value" :name="item.key">
-        <div class="text-center mt-16" v-if="item.key === activeKey">
+        <div class="text-center" v-if="item.key === activeKey">
           <component
             :is="defineAsyncComponent(() => import(`./${item.key}QrCode.vue`))"
             :config="config"

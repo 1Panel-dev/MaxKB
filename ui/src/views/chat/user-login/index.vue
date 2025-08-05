@@ -48,7 +48,7 @@
         <PasswordAuth></PasswordAuth>
       </el-card>
 
-      <el-card class="login-card" v-else>
+      <el-card class="login-card" v-else style="--el-card-padding: 0">
         <h2 class="mb-24" v-if="!showQrCodeTab && (loginMode === 'LDAP' || loginMode === 'LOCAL')">
           {{ loginMode == 'LOCAL' ? $t('views.login.title') : loginMode }}
         </h2>
