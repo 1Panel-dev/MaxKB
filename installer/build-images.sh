@@ -13,8 +13,8 @@ show_quick_start() {
     echo ""
     echo "常用命令："
     echo "  $0 --local all                     # 构建所有镜像（本地测试）"
+    echo "  $0 --local --china --optimized all # 中国网络优化构建（推荐）"
     echo "  $0 --local --test backend          # 构建后端并启动测试容器"
-    echo "  $0 --local --optimized all         # 使用优化构建（推荐）"
     echo "  $0 --status                        # 查看本地镜像和容器状态"
     echo "  $0 --clean                         # 清理所有本地镜像"
     echo ""
@@ -58,13 +58,15 @@ print_help() {
     echo "  --test              构建后启动容器进行测试"
     echo "  --clean             清理本地 MaxKB 相关镜像"
     echo "  --status            查看本地镜像和容器状态"
+    echo "  --china             中国网络优化模式 (使用国内镜像源)"
     echo "  --help              显示此帮助信息"
     echo ""
     echo "本地测试示例:"
-    echo "  $0 --local all                    # 本地构建所有镜像"
-    echo "  $0 --local --test backend         # 构建后端并启动测试容器"
-    echo "  $0 --local --no-cache --optimized all  # 优化构建不使用缓存"
-    echo "  $0 --clean                        # 清理本地镜像"
+    echo "  $0 --local all                           # 本地构建所有镜像"
+    echo "  $0 --local --china --optimized all       # 中国网络优化构建（推荐）"
+    echo "  $0 --local --test backend                # 构建后端并启动测试容器"
+    echo "  $0 --local --no-cache --optimized all    # 优化构建不使用缓存"
+    echo "  $0 --clean                               # 清理本地镜像"
     echo ""
     echo "私有仓库示例:"
     echo "  $0 --registry harbor.company.com/maxkb --push all"
@@ -146,14 +148,20 @@ build_backend() {
         log_info "使用优化版 Dockerfile，预计可减少 30-50% 镜像大小"
     fi
     
-    docker build $build_args \
+    # 执行构建
+    if ! docker build $build_args \
         -f "$dockerfile" \
         -t "$image_name" \
-        .
+        .; then
+        handle_build_error "backend" $?
+    fi
     
     if [ "$PUSH" = "true" ]; then
         log_info "推送镜像: $image_name"
-        docker push "$image_name"
+        if ! docker push "$image_name"; then
+            log_error "推送镜像失败"
+            exit 1
+        fi
     fi
     
     log_info "后台应用镜像构建完成"
@@ -267,6 +275,70 @@ show_local_status() {
     fi
     
     echo ""
+}
+
+# 网络故障排除
+network_troubleshooting() {
+    log_error "构建过程中遇到网络问题！"
+    echo ""
+    log_info "=== 网络故障排除建议 ==="
+    echo ""
+    
+    log_info "1. 检查网络连接:"
+    echo "   - 确保可以访问互联网"
+    echo "   - 检查防火墙和代理设置"
+    
+    echo ""
+    log_info "2. 使用中国网络优化模式:"
+    echo "   $0 --local --china --optimized all"
+    
+    echo ""
+    log_info "3. 手动配置 Docker 代理 (如果使用代理):"
+    echo "   # 创建或编辑 Docker daemon 配置"
+    echo "   sudo mkdir -p /etc/systemd/system/docker.service.d"
+    echo "   sudo cat > /etc/systemd/system/docker.service.d/http-proxy.conf << EOF"
+    echo "   [Service]"
+    echo "   Environment=\"HTTP_PROXY=http://proxy.example.com:8080\""
+    echo "   Environment=\"HTTPS_PROXY=http://proxy.example.com:8080\""
+    echo "   EOF"
+    echo "   sudo systemctl daemon-reload"
+    echo "   sudo systemctl restart docker"
+    
+    echo ""
+    log_info "4. 测试网络连接:"
+    echo "   ping -c 4 mirrors.aliyun.com"
+    echo "   curl -I https://mirrors.aliyun.com/pypi/simple/"
+    
+    echo ""
+    log_info "5. 如果问题持续，尝试:"
+    echo "   - 使用 --no-cache 重新构建"
+    echo "   - 检查 DNS 设置"
+    echo "   - 联系网络管理员"
+    
+    echo ""
+}
+
+# 构建错误处理
+handle_build_error() {
+    local component="$1"
+    local exit_code="$2"
+    
+    log_error "${component} 镜像构建失败 (退出码: $exit_code)"
+    
+    # 检查是否是网络相关错误
+    if docker logs $(docker ps -lq) 2>&1 | grep -qi "timeout\|connection\|network\|ssl\|certificate"; then
+        network_troubleshooting
+    else
+        echo ""
+        log_info "=== 故障排除建议 ==="
+        echo "1. 查看详细错误信息"
+        echo "2. 检查 Dockerfile 语法"
+        echo "3. 确保所有依赖文件存在"
+        echo "4. 尝试使用 --no-cache 重新构建"
+        echo ""
+    fi
+    
+    exit $exit_code
 }
 
 # 清理本地镜像
@@ -551,6 +623,7 @@ main() {
     LOCAL_MODE="$DEFAULT_LOCAL_MODE"
     TEST_MODE="false"
     CLEAN_MODE="false"
+    CHINA_MODE="false"
     
     # 如果没有参数，显示快速开始信息
     if [ $# -eq 0 ]; then
@@ -608,6 +681,10 @@ main() {
                 show_local_status
                 exit 0
                 ;;
+            --china)
+                CHINA_MODE="true"
+                shift
+                ;;
             --help)
                 print_help
                 exit 0
@@ -652,6 +729,18 @@ main() {
         log_info "=== 本地测试模式 ==="
         log_info "镜像前缀: $REGISTRY"
         log_info "镜像标签: $TAG"
+        
+        # 检测是否在中国网络环境
+        if [ "$CHINA_MODE" = "false" ]; then
+            # 简单检测中国网络环境
+            if ping -c 1 -W 2 mirrors.aliyun.com &>/dev/null; then
+                log_warn "检测到可能的中国网络环境，建议使用 --china 参数优化构建速度"
+                echo "   优化命令: $0 --local --china --optimized all"
+            fi
+        else
+            log_info "中国网络优化: 已启用"
+        fi
+        
         if [ "$TEST_MODE" = "true" ]; then
             log_info "构建完成后将启动测试容器"
         fi

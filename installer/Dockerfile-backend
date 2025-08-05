@@ -27,16 +27,30 @@ COPY . /opt/maxkb-app
 RUN rm -rf /opt/maxkb-app/ui && \
     rm -rf /opt/maxkb-app/installer
 
+# 配置 pip 镜像源（解决网络超时问题）
+RUN mkdir -p /root/.pip && \
+    echo '[global]' > /root/.pip/pip.conf && \
+    echo 'index-url = https://mirrors.aliyun.com/pypi/simple/' >> /root/.pip/pip.conf && \
+    echo 'trusted-host = mirrors.aliyun.com' >> /root/.pip/pip.conf && \
+    echo 'timeout = 300' >> /root/.pip/pip.conf && \
+    echo 'retries = 5' >> /root/.pip/pip.conf
+
 # 创建 Python 虚拟环境并安装依赖
 RUN python3 -m venv /opt/py3 && \
-    pip install poetry==2.0.0 --break-system-packages && \
+    pip install poetry==2.0.0 --break-system-packages --timeout 300 --retries 5 \
+        -i https://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com && \
     poetry config virtualenvs.create false && \
+    poetry config repositories.aliyun https://mirrors.aliyun.com/pypi/simple/ && \
+    poetry config repositories.tsinghua https://pypi.tuna.tsinghua.edu.cn/simple/ && \
     . /opt/py3/bin/activate && \
     if [ "$(uname -m)" = "x86_64" ]; then sed -i 's/^torch.*/torch = {version = "2.7.1+cpu", source = "pytorch"}/g' pyproject.toml; fi && \
+    poetry source add pytorch https://download.pytorch.org/whl/cpu && \
     rm -f poetry.lock && \
-    poetry lock && \
-    poetry install --only=main && \
-    pip install requests pymysql psycopg2-binary
+    poetry lock --timeout 300 && \
+    poetry install --only=main --timeout 300 && \
+    pip install --timeout 300 --retries 5 \
+        -i https://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com \
+        requests pymysql psycopg2-binary
 
 # 编译国际化文件
 RUN . /opt/py3/bin/activate && \

@@ -25,12 +25,25 @@ RUN apt-get update && \
 # 设置工作目录
 WORKDIR /build
 
-# 创建虚拟环境并安装 Poetry
+# 配置 pip 镜像源（解决网络超时问题）
+RUN mkdir -p /root/.pip && \
+    echo '[global]' > /root/.pip/pip.conf && \
+    echo 'index-url = https://mirrors.aliyun.com/pypi/simple/' >> /root/.pip/pip.conf && \
+    echo 'trusted-host = mirrors.aliyun.com' >> /root/.pip/pip.conf && \
+    echo 'timeout = 300' >> /root/.pip/pip.conf && \
+    echo 'retries = 5' >> /root/.pip/pip.conf
+
+# 创建虚拟环境并安装基础包
 RUN python3 -m venv /opt/py3 && \
     . /opt/py3/bin/activate && \
-    pip install --upgrade pip setuptools wheel && \
-    pip install poetry==2.0.0 && \
-    poetry config virtualenvs.create false
+    pip install --upgrade pip setuptools wheel --timeout 300 --retries 5
+
+# 分步安装 Poetry（提高稳定性）
+RUN . /opt/py3/bin/activate && \
+    pip install poetry==2.0.0 --timeout 300 --retries 5 && \
+    poetry config virtualenvs.create false && \
+    poetry config repositories.aliyun https://mirrors.aliyun.com/pypi/simple/ && \
+    poetry config repositories.tsinghua https://pypi.tuna.tsinghua.edu.cn/simple/
 
 # 复制依赖定义文件
 COPY pyproject.toml /build/
@@ -40,12 +53,20 @@ RUN if [ "$(uname -m)" = "x86_64" ]; then \
         sed -i 's/^torch.*/torch = {version = "2.7.1+cpu", source = "pytorch"}/g' pyproject.toml; \
     fi
 
-# 生成并安装依赖
+# 生成并安装依赖（使用镜像源）
 RUN . /opt/py3/bin/activate && \
     rm -f poetry.lock && \
-    poetry lock && \
-    poetry install --only=main && \
-    pip install --no-cache-dir requests pymysql psycopg2-binary
+    # 添加 PyTorch 镜像源配置
+    poetry source add pytorch https://download.pytorch.org/whl/cpu && \
+    # 生成依赖锁定文件
+    poetry lock --timeout 300 && \
+    # 安装主要依赖，使用阿里云镜像源
+    poetry install --only=main --timeout 300 && \
+    # 安装额外依赖
+    pip install --no-cache-dir --timeout 300 --retries 5 \
+        -i https://mirrors.aliyun.com/pypi/simple/ \
+        --trusted-host mirrors.aliyun.com \
+        requests pymysql psycopg2-binary
 
 # 复制应用代码（仅后端部分）
 COPY apps/ /build/apps/
