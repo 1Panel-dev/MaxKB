@@ -45,7 +45,7 @@ from models_provider.tools import get_model_instance_by_model_workspace_id
 from system_manage.models import WorkspaceUserResourcePermission, AuthTargetType
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
 from tools.models import Tool, ToolScope
-from tools.serializers.tool import ToolModelSerializer
+from tools.serializers.tool import ToolExportModelSerializer
 from users.models import User
 from users.serializers.user import is_workspace_manage
 
@@ -554,6 +554,7 @@ class ApplicationSerializer(serializers.Serializer):
         @param tool: 工具
         @return:
         """
+
         return Tool(id=tool.get('id'),
                     user_id=user_id,
                     name=tool.get('name'),
@@ -561,7 +562,7 @@ class ApplicationSerializer(serializers.Serializer):
                     template_id=tool.get('template_id'),
                     input_field_list=tool.get('input_field_list'),
                     init_field_list=tool.get('init_field_list'),
-                    is_active=tool.get('is_active'),
+                    is_active=tool.get('is_active') if len((tool.get('init_field_list') or [])) > 0 else False,
                     scope=ToolScope.WORKSPACE,
                     folder_id=workspace_id,
                     workspace_id=workspace_id)
@@ -682,7 +683,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
             mk_instance = MKInstance(application_dict,
                                      [],
                                      'v2',
-                                     [ToolModelSerializer(tool).data for tool in
+                                     [ToolExportModelSerializer(tool).data for tool in
                                       tool_list])
             application_pickle = pickle.dumps(mk_instance)
             response = HttpResponse(content_type='text/plain', content=application_pickle)
