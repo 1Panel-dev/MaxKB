@@ -33,6 +33,8 @@ RUN python3 -m venv /opt/py3 && \
     poetry config virtualenvs.create false && \
     . /opt/py3/bin/activate && \
     if [ "$(uname -m)" = "x86_64" ]; then sed -i 's/^torch.*/torch = {version = "2.7.1+cpu", source = "pytorch"}/g' pyproject.toml; fi && \
+    rm -f poetry.lock && \
+    poetry lock && \
     poetry install --only=main && \
     pip install requests pymysql psycopg2-binary
 

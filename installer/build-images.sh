@@ -35,6 +35,7 @@ print_help() {
     echo "  --platform <arch>   目标平台 (默认: linux/amd64)"
     echo "  --push              构建后推送到仓库"
     echo "  --no-cache          不使用缓存构建"
+    echo "  --optimized         使用优化版 Dockerfile（减少镜像大小）"
     echo "  --help              显示此帮助信息"
     echo ""
     echo "示例:"
@@ -105,8 +106,15 @@ build_backend() {
         build_args="$build_args --no-cache"
     fi
     
+    # 选择 Dockerfile
+    local dockerfile="installer/Dockerfile-backend"
+    if [ "$OPTIMIZED" = "true" ]; then
+        dockerfile="installer/Dockerfile-backend-optimized"
+        log_info "使用优化版 Dockerfile，预计可减少 30-50% 镜像大小"
+    fi
+    
     docker build $build_args \
-        -f installer/Dockerfile-backend \
+        -f "$dockerfile" \
         -t "$image_name" \
         .
     
@@ -340,6 +348,7 @@ main() {
     PLATFORM="$DEFAULT_PLATFORM"
     PUSH="false"
     NO_CACHE="false"
+    OPTIMIZED="false"
     
     # 解析命令行参数
     COMPONENTS=()
@@ -364,6 +373,10 @@ main() {
                 ;;
             --no-cache)
                 NO_CACHE="true"
+                shift
+                ;;
+            --optimized)
+                OPTIMIZED="true"
                 shift
                 ;;
             --help)

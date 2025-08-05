@@ -1,2 +1,87 @@
+# Git 相关
 .git*
+.github/
+
+# IDE 相关
 .idea*
+.vscode/
+*.swp
+*.swo
+*~
+
+# Python 相关
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# 虚拟环境
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# 前端相关
+ui/node_modules/
+ui/dist/
+ui/.nuxt/
+ui/.output/
+ui/.vuepress/dist/
+
+# 测试相关
+.coverage
+.pytest_cache/
+htmlcov/
+.tox/
+.nox/
+
+# 日志文件
+*.log
+logs/
+
+# 临时文件
+tmp/
+temp/
+.tmp/
+
+# 文档和示例
+*.md
+docs/
+examples/
+
+# 安装和部署相关
+installer/
+deployment/
+scripts/
+*.sh
+
+# 数据文件
+*.sql
+*.db
+*.sqlite3
+
+# 配置文件
+config*.yml
+config*.yaml
+.env*
+
+# 其他
+.DS_Store
+Thumbs.db

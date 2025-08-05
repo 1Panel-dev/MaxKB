@@ -35,45 +35,78 @@ export default defineConfig((conf: any) => {
   const mode = conf.mode
   const ENV = loadEnv(mode, envDir)
   const proxyConf: Record<string, string | ProxyOptions> = {}
+  
+  // ===== API 代理 =====
+  // 管理后台API
   proxyConf['/admin/api'] = {
-    target: 'http://127.0.0.1:8080',
+    target: 'http://jin-Virtual-Machine:8080',
     changeOrigin: true,
   }
+  
+  // 聊天API
   proxyConf['/chat/api'] = {
-    target: 'http://127.0.0.1:8080',
+    target: 'http://jin-Virtual-Machine:8080',
     changeOrigin: true,
   }
+  
+  // ===== 文档和Schema =====
+  // Swagger-UI静态文件特殊处理
+  proxyConf['/doc/swagger-ui-dist'] = {
+    target: 'http://jin-Virtual-Machine:8080',
+    changeOrigin: true,
+    rewrite: (path: string) => path.replace('/doc/swagger-ui-dist', '/static/drf_spectacular_sidecar/swagger-ui-dist'),
+  }
+  
+  // API文档
   proxyConf['/doc'] = {
-    target: 'http://127.0.0.1:8080',
+    target: 'http://jin-Virtual-Machine:8080',
     changeOrigin: true,
-    rewrite: (path: string) => path.replace(ENV.VITE_BASE_PATH, '/'),
   }
+  
+  // API Schema
   proxyConf['/schema'] = {
-    target: 'http://127.0.0.1:8080',
+    target: 'http://jin-Virtual-Machine:8080',
     changeOrigin: true,
-    rewrite: (path: string) => path.replace(ENV.VITE_BASE_PATH, '/'),
   }
+  
+  // ===== 静态资源代理 =====
+  // 直接代理/static路径（用于直接访问）
   proxyConf['/static'] = {
-    target: 'http://127.0.0.1:8080',
-    changeOrigin: true,
-    rewrite: (path: string) => path.replace(ENV.VITE_BASE_PATH, '/'),
-  }
-
-  // 前端静态资源转发到本身
-  proxyConf[`^${ENV.VITE_BASE_PATH}.+\/oss\/file\/.*$`] = {
-    target: `http://127.0.0.1:8080`,
+    target: 'http://jin-Virtual-Machine:8080',
     changeOrigin: true,
   }
-  // 前端静态资源转发到本身
-  proxyConf[`^${ENV.VITE_BASE_PATH}oss\/file\/.*$`] = {
-    target: `http://127.0.0.1:8080`,
+  
+  // 代理所有/admin/路径下的静态文件（通过文件扩展名识别）
+  proxyConf['^/admin/.*\\.(png|jpg|jpeg|gif|svg|ico|css|js|woff|woff2|ttf|eot|mp4|webm)$'] = {
+    target: 'http://jin-Virtual-Machine:8080',
     changeOrigin: true,
+    rewrite: (path: string) => path.replace('/admin', '/static'),
   }
-  // 前端静态资源转发到本身
-  proxyConf[ENV.VITE_BASE_PATH] = {
-    target: `http://127.0.0.1:${ENV.VITE_APP_PORT}`,
+  
+  // 代理/admin/路径下的特定目录
+  proxyConf['/admin/theme'] = {
+    target: 'http://jin-Virtual-Machine:8080',
     changeOrigin: true,
-    rewrite: (path: string) => path.replace(ENV.VITE_BASE_PATH, '/'),
+    rewrite: (path: string) => path.replace('/admin', '/static'),
+  }
+  
+  proxyConf['/admin/tool'] = {
+    target: 'http://jin-Virtual-Machine:8080',
+    changeOrigin: true,
+    rewrite: (path: string) => path.replace('/admin', '/static'),
+  }
+  
+  proxyConf['/admin/assets'] = {
+    target: 'http://jin-Virtual-Machine:8080',
+    changeOrigin: true,
+    rewrite: (path: string) => path.replace('/admin', '/static'),
+  }
+  
+  // ===== OSS文件代理 =====
+  // OSS文件上传/下载
+  proxyConf['/oss'] = {
+    target: 'http://jin-Virtual-Machine:8080',
+    changeOrigin: true,
   }
 
   return {
