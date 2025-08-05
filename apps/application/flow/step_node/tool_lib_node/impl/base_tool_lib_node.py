@@ -73,15 +73,19 @@ def valid_reference_value(_type, value, name):
 
 
 def convert_value(name: str, value, _type, is_required, source, node):
-    if not is_required and (value is None or (isinstance(value, str) and len(value) == 0)):
-        return None
-    if not is_required and source == 'reference' and (value is None or len(value) == 0):
+    if not is_required and (value is None or ((isinstance(value, str) or isinstance(value, list)) and len(value) == 0)):
         return None
     if source == 'reference':
         value = node.workflow_manage.get_reference_field(
             value[0],
             value[1:])
-
+        if value is None:
+            if not is_required:
+                return None
+            else:
+                raise Exception(_(
+                    'Field: {name} Type: {_type} is required'
+                ).format(name=name, _type=_type))
         value = valid_reference_value(_type, value, name)
         if _type == 'int':
             return int(value)
