@@ -37,15 +37,15 @@ RUN mkdir -p /root/.pip && \
 
 # 创建 Python 虚拟环境并安装依赖
 RUN python3 -m venv /opt/py3 && \
-    pip install poetry==2.0.0 --break-system-packages --timeout 300 --retries 5 \
-        -i https://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com && \
-    # 配置 Poetry 基本设置
+    . /opt/py3/bin/activate && \
+    pip install poetry==2.0.0 && \
+    # 配置 Poetry
     poetry config virtualenvs.create false && \
     poetry config installer.max-workers 10 && \
     poetry config installer.timeout 300 && \
-    . /opt/py3/bin/activate && \
+    # 处理 x86 架构下的 torch 依赖
     if [ "$(uname -m)" = "x86_64" ]; then sed -i 's/^torch.*/torch = {version = "2.7.1+cpu", source = "pytorch"}/g' pyproject.toml; fi && \
-    # 检查并添加镜像源（避免重复添加）
+    # 检查并添加 PyPI 源
     if ! poetry source show aliyun >/dev/null 2>&1; then \
         poetry source add --priority=primary aliyun https://mirrors.aliyun.com/pypi/simple/; \
     fi && \
@@ -53,9 +53,7 @@ RUN python3 -m venv /opt/py3 && \
     rm -f poetry.lock && \
     poetry lock && \
     poetry install --only=main && \
-    pip install --timeout 300 --retries 5 \
-        -i https://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com \
-        requests pymysql psycopg2-binary
+    pip install requests pymysql psycopg2-binary
 
 # 编译国际化文件
 RUN . /opt/py3/bin/activate && \

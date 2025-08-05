@@ -33,18 +33,14 @@ RUN mkdir -p /root/.pip && \
     echo 'timeout = 300' >> /root/.pip/pip.conf && \
     echo 'retries = 5' >> /root/.pip/pip.conf
 
-# 创建虚拟环境并安装基础包
+# 创建虚拟环境并安装 Poetry
 RUN python3 -m venv /opt/py3 && \
     . /opt/py3/bin/activate && \
-    pip install --upgrade pip setuptools wheel --timeout 300 --retries 5
-
-# 分步安装 Poetry（提高稳定性）
-RUN . /opt/py3/bin/activate && \
-    pip install poetry==2.0.0 --timeout 300 --retries 5 && \
-    # 配置 Poetry 基本设置
+    pip install --upgrade pip setuptools wheel && \
+    pip install poetry==2.0.0 && \
+    # 配置 Poetry
     poetry config virtualenvs.create false && \
     poetry config installer.max-workers 10 && \
-    # 配置网络超时（Poetry 2.0+ 语法）
     poetry config installer.timeout 300
 
 # 复制依赖定义文件
