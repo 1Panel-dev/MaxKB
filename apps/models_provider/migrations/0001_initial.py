@@ -26,7 +26,6 @@ def save_default_embedding_model(apps, schema_editor):
                        workspace_id='default')
     model.save()
 
-
 class Migration(migrations.Migration):
 
     initial = True
