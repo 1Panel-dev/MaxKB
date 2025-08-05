@@ -268,14 +268,14 @@
                     @click.stop="exportApplication(row)"
                     v-if="permissionPrecise.export()"
                   >
-                    <AppIcon iconName="app-export"></AppIcon>
+                    <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
                     {{ $t('common.export') }}
                   </el-dropdown-item>
                   <el-dropdown-item
                     @click.stop="deleteApplication(row)"
                     v-if="permissionPrecise.delete()"
                   >
-                    <AppIcon iconName="app-delete"></AppIcon>
+                    <AppIcon iconName="app-delete" class="color-secondary"></AppIcon>
                     {{ $t('common.delete') }}
                   </el-dropdown-item>
                 </el-dropdown-menu>

@@ -199,7 +199,7 @@
                   :title="$t('views.model.modelForm.title.paramSetting')"
                   @click.stop="openParamSetting(row)"
                 >
-                  <el-icon><Setting /></el-icon>
+                  <AppIcon iconName="app-setting"></AppIcon>
                 </el-button>
               </span>
             </el-tooltip>

@@ -415,7 +415,7 @@
                   >
                     <span class="mr-4">
                       <el-button type="primary" text @click.stop="settingDoc(row)">
-                        <el-icon><Setting /></el-icon>
+                        <AppIcon iconName="app-setting"></AppIcon>
                       </el-button>
                     </span>
                   </el-tooltip>
@@ -434,7 +434,10 @@
                             "
                             @click="cancelTask(row, TaskType.GENERATE_PROBLEM)"
                           >
-                            <el-icon><Connection /></el-icon>
+                            <AppIcon
+                              iconName="app-generate-question"
+                              class="color-secondary"
+                            ></AppIcon>
                             {{ $t('views.document.setting.cancelGenerateQuestion') }}
                           </el-dropdown-item>
                           <el-dropdown-item
@@ -442,42 +445,47 @@
                             @click="openGenerateDialog(row)"
                             v-if="permissionPrecise.doc_generate(id)"
                           >
-                            <el-icon><Connection /></el-icon>
+                            <AppIcon
+                              iconName="app-generate-question"
+                              class="color-secondary"
+                            ></AppIcon>
                             {{ $t('views.document.generateQuestion.title') }}
                           </el-dropdown-item>
                           <el-dropdown-item
                             @click="openknowledgeDialog(row)"
                             v-if="permissionPrecise.doc_migrate(id)"
                           >
-                            <AppIcon iconName="app-migrate"></AppIcon>
+                            <AppIcon iconName="app-migrate" class="color-secondary"></AppIcon>
                             {{ $t('views.document.setting.migration') }}
                           </el-dropdown-item>
                           <el-dropdown-item
                             @click="exportDocument(row)"
                             v-if="permissionPrecise.doc_export(id)"
                           >
-                            <AppIcon iconName="app-export"></AppIcon>
+                            <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
                             {{ $t('views.document.setting.export') }} Excel
                           </el-dropdown-item>
                           <el-dropdown-item
                             @click="exportDocumentZip(row)"
                             v-if="permissionPrecise.doc_export(id)"
                           >
-                            <AppIcon iconName="app-export"></AppIcon>
+                            <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
                             {{ $t('views.document.setting.export') }} Zip
                           </el-dropdown-item>
                           <el-dropdown-item
-                            icon="Download"
                             @click.stop="downloadDocument(row)"
                             v-if="permissionPrecise.doc_download(id)"
                           >
+                            <el-icon class="color-secondary">
+                              <Download />
+                            </el-icon>
                             {{ $t('views.document.setting.download') }}
                           </el-dropdown-item>
                           <el-dropdown-item
                             @click.stop="deleteDocument(row)"
                             v-if="permissionPrecise.doc_delete(id)"
                           >
-                            <AppIcon iconName="app-delete"></AppIcon>
+                            <AppIcon iconName="app-delete" class="color-secondary"></AppIcon>
                             {{ $t('common.delete') }}</el-dropdown-item
                           >
                         </el-dropdown-menu>
@@ -494,7 +502,7 @@
                   >
                     <span class="mr-4">
                       <el-button type="primary" text @click.stop="syncDocument(row)">
-                        <el-icon><Refresh /></el-icon>
+                        <AppIcon iconName="app-sync"></AppIcon>
                       </el-button>
                     </span>
                   </el-tooltip>
@@ -538,10 +546,11 @@
                       <template #dropdown>
                         <el-dropdown-menu>
                           <el-dropdown-item
-                            icon="Setting"
                             @click="settingDoc(row)"
                             v-if="permissionPrecise.doc_edit(id)"
-                            >{{ $t('common.setting') }}</el-dropdown-item
+                          >
+                            <AppIcon iconName="app-setting"></AppIcon>
+                            {{ $t('common.setting') }}</el-dropdown-item
                           >
                           <el-dropdown-item
                             v-if="
@@ -552,7 +561,7 @@
                             "
                             @click="cancelTask(row, TaskType.GENERATE_PROBLEM)"
                           >
-                            <el-icon><Connection /></el-icon>
+                            <AppIcon iconName="app-generate-question"></AppIcon>
                             {{ $t('views.document.setting.cancelGenerateQuestion') }}
                           </el-dropdown-item>
                           <el-dropdown-item
@@ -560,7 +569,7 @@
                             @click="openGenerateDialog(row)"
                             v-if="permissionPrecise.doc_generate(id)"
                           >
-                            <el-icon><Connection /></el-icon>
+                            <AppIcon iconName="app-generate-question"></AppIcon>
                             {{ $t('views.document.generateQuestion.title') }}
                           </el-dropdown-item>
                           <el-dropdown-item
@@ -631,7 +640,11 @@
     <ImportDocumentDialog ref="ImportDocumentDialogRef" :title="title" @refresh="refresh" />
     <SyncWebDialog ref="SyncWebDialogRef" @refresh="refresh" />
     <!-- 选择知识库 -->
-    <SelectKnowledgeDialog ref="selectKnowledgeDialogRef" @refresh="refreshMigrate" :workspaceId="knowledgeDetail?.workspace_id"/>
+    <SelectKnowledgeDialog
+      ref="selectKnowledgeDialogRef"
+      @refresh="refreshMigrate"
+      :workspaceId="knowledgeDetail?.workspace_id"
+    />
     <GenerateRelatedDialog ref="GenerateRelatedDialogRef" @refresh="getList" :apiType="apiType" />
   </div>
 </template>

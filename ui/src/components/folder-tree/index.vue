@@ -63,14 +63,14 @@
                         @click.stop="openCreateFolder(data)"
                         v-if="node.level !== 3 && permissionPrecise.folderCreate()"
                       >
-                        <AppIcon iconName="app-add-folder"></AppIcon>
+                        <AppIcon iconName="app-add-folder" class="color-secondary"></AppIcon>
                         {{ $t('components.folder.addChildFolder') }}
                       </el-dropdown-item>
                       <el-dropdown-item
                         @click.stop="openEditFolder(data)"
                         v-if="permissionPrecise.folderEdit()"
                       >
-                        <AppIcon iconName="app-edit"></AppIcon>
+                        <AppIcon iconName="app-edit" class="color-secondary"></AppIcon>
                         {{ $t('common.edit') }}
                       </el-dropdown-item>
                       <el-dropdown-item
@@ -79,7 +79,7 @@
                         :disabled="!data.parent_id"
                         v-if="permissionPrecise.folderDelete()"
                       >
-                        <AppIcon iconName="app-delete"></AppIcon>
+                        <AppIcon iconName="app-delete" class="color-secondary"></AppIcon>
                         {{ $t('common.delete') }}
                       </el-dropdown-item>
                     </el-dropdown-menu>
