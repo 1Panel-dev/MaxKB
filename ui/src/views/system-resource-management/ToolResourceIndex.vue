@@ -72,7 +72,9 @@
 
         <el-table-column prop="tool_type" :label="$t('views.system.resource_management.type')">
           <template #default="scope">
-            {{ $t(ToolType[scope.row.template_id ? 'INTERNAL' : 'CUSTOM' as keyof typeof ToolType]) }}
+            {{
+              $t(ToolType[scope.row.template_id ? 'INTERNAL' : ('CUSTOM' as keyof typeof ToolType)])
+            }}
           </template>
         </el-table-column>
         <el-table-column :label="$t('common.status.label')" width="120">
@@ -233,7 +235,7 @@
                     v-if="row.init_field_list?.length > 0 && permissionPrecise.edit()"
                     @click.stop="configInitParams(row)"
                   >
-                    <AppIcon iconName="app-operation" class="mr-4"></AppIcon>
+                    <AppIcon iconName="app-operation" class="color-secondary"></AppIcon>
                     {{ $t('common.param.initParam') }}
                   </el-dropdown-item>
 
@@ -241,7 +243,7 @@
                     v-if="!row.template_id && permissionPrecise.export()"
                     @click.stop="exportTool(row)"
                   >
-                    <AppIcon iconName="app-export"></AppIcon>
+                    <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
                     {{ $t('common.export') }}
                   </el-dropdown-item>
                   <el-dropdown-item
@@ -249,7 +251,7 @@
                     divided
                     @click.stop="deleteTool(row)"
                   >
-                    <AppIcon iconName="app-delete"></AppIcon>
+                    <AppIcon iconName="app-delete" class="color-secondary"></AppIcon>
                     {{ $t('common.delete') }}
                   </el-dropdown-item>
                 </el-dropdown-menu>

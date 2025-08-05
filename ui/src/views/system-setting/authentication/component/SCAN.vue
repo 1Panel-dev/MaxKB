@@ -12,13 +12,19 @@
               </el-tag>
             </div>
             <div>
-              <el-button type="primary" v-if="!item.isValid" @click="showDialog(item)"
+              <el-button
+                type="primary"
+                v-if="!item.isValid"
+                @click="showDialog(item)"
                 v-hasPermission="
-                      new ComplexPermission(
-                        [RoleConst.ADMIN],
-                        [PermissionConst.LOGIN_AUTH_EDIT],
-                        [],'OR',)"
-              >{{ $t('views.system.authentication.scanTheQRCode.access') }}
+                  new ComplexPermission(
+                    [RoleConst.ADMIN],
+                    [PermissionConst.LOGIN_AUTH_EDIT],
+                    [],
+                    'OR',
+                  )
+                "
+                >{{ $t('views.system.authentication.scanTheQRCode.access') }}
               </el-button>
               <span v-if="item.isValid">
                 <span class="mr-4">{{
@@ -56,22 +62,29 @@
                       class="vertical-middle lighter break-all ellipsis-1"
                       >{{ value }}</span
                     >
-                    <el-button type="primary" text @click="() => copyClick(value)">
-                      <AppIcon iconName="app-copy" />
-                    </el-button>
-                    <el-button
-                      v-if="key === 'app_secret'"
-                      type="primary"
-                      text
-                      @click="toggleShowPassword(item.key)"
-                    >
-                      <el-icon v-if="key === 'app_secret' && !showPassword[item.key]?.[key]">
-                        <Hide />
-                      </el-icon>
-                      <el-icon v-if="key === 'app_secret' && showPassword[item.key]?.[key]">
-                        <View />
-                      </el-icon>
-                    </el-button>
+                    <span>
+                      <el-button type="primary" text @click="() => copyClick(value)">
+                        <AppIcon iconName="app-copy" />
+                      </el-button>
+                    </span>
+
+                    <span class="ml-4">
+                      <el-button
+                        v-if="key === 'app_secret'"
+                        type="primary"
+                        text
+                        @click="toggleShowPassword(item.key)"
+                      >
+                        <AppIcon
+                          iconName="app-password-hide"
+                          v-if="key === 'app_secret' && !showPassword[item.key]?.[key]"
+                        />
+
+                        <el-icon v-if="key === 'app_secret' && showPassword[item.key]?.[key]">
+                          <View />
+                        </el-icon>
+                      </el-button>
+                    </span>
                   </div>
                 </el-col>
               </el-row>
@@ -126,7 +139,7 @@ function initializePlatforms(): Platform[] {
   return [
     createPlatform('wecom', t('views.system.authentication.scanTheQRCode.wecom')),
     createPlatform('dingtalk', t('views.system.authentication.scanTheQRCode.dingtalk')),
-    createPlatform('lark', t('views.system.authentication.scanTheQRCode.lark'))
+    createPlatform('lark', t('views.system.authentication.scanTheQRCode.lark')),
   ]
 }
 
@@ -150,7 +163,7 @@ function createPlatform(key: string, name: string): Platform {
   const config = {
     ...(key === 'wecom' ? { corp_id: '', agent_id: '' } : { app_key: '' }),
     app_secret: '',
-    callback_url: ''
+    callback_url: '',
   }
 
   return {
@@ -159,7 +172,7 @@ function createPlatform(key: string, name: string): Platform {
     name,
     isActive: false,
     isValid: false,
-    config
+    config,
   }
 }
 
@@ -169,7 +182,7 @@ function formatFieldName(key?: any, item?: Platform): string {
     app_key: item?.key != 'lark' ? 'APP Key' : 'App ID',
     app_secret: 'APP Secret',
     agent_id: 'Agent ID',
-    callback_url: t('views.application.applicationAccess.callback')
+    callback_url: t('views.application.applicationAccess.callback'),
   }
   return (
     fieldNames[key as keyof typeof fieldNames] ||
@@ -187,7 +200,7 @@ function getPlatformInfo() {
           Object.assign(platform, {
             isValid: data.is_valid,
             isActive: data.is_active,
-            config: data.config
+            config: data.config,
           })
           if (platform.key === 'dingtalk') {
             const { corp_id, app_key, app_secret } = platform.config
@@ -195,7 +208,7 @@ function getPlatformInfo() {
               corp_id,
               app_key,
               app_secret,
-              callback_url: platform.config.callback_url
+              callback_url: platform.config.callback_url,
             }
           }
           showPassword[platform.key] = {}

@@ -76,14 +76,14 @@
               text
               @click.stop="openEditModel"
             >
-              <AppIcon iconName="app-edit"></AppIcon>
+              <AppIcon iconName="app-edit" class="color-secondary"></AppIcon>
               {{ $t('common.edit') }}
             </el-dropdown-item>
             <el-dropdown-item
               v-if="isSystemShare"
               @click.stop="openAuthorizedWorkspaceDialog(model)"
             >
-              <AppIcon iconName="app-key"></AppIcon>
+              <AppIcon iconName="app-lock" class="color-secondary"></AppIcon>
               {{ $t('views.shared.authorized_workspace') }}
             </el-dropdown-item>
 
@@ -95,9 +95,9 @@
                   currentModel.model_type === 'TTI') &&
                 permissionPrecise.paramSetting(model.id)
               "
-              icon="Setting"
               @click.stop="openParamSetting"
             >
+              <AppIcon iconName="app-setting" class="color-secondary"></AppIcon>
               {{ $t('views.model.modelForm.title.paramSetting') }}
             </el-dropdown-item>
             <el-dropdown-item
@@ -106,7 +106,7 @@
               @click.stop="deleteModel"
               v-if="permissionPrecise.delete(model.id)"
             >
-              <AppIcon iconName="app-delete"></AppIcon>
+              <AppIcon iconName="app-delete" class="color-secondary"></AppIcon>
               {{ $t('common.delete') }}
             </el-dropdown-item>
           </el-dropdown-menu>

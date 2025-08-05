@@ -79,7 +79,7 @@
                 $t('views.applicationWorkflow.nodes.searchKnowledgeNode.searchParam')
               }}</span>
               <el-button type="primary" link @click="openParamSettingDialog">
-                <el-icon><Setting /></el-icon>
+                <AppIcon iconName="app-setting"></AppIcon>
               </el-button>
             </div>
           </template>
