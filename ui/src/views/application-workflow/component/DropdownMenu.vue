@@ -277,7 +277,7 @@ async function getApplicationList() {
     folder_id: folder.currentFolder?.id || user.getWorkspaceId(),
   })
   applicationList.value = res.data.filter(
-    (item: any) => item.resource_type === 'application' && item.id !== props.id,
+    (item: any) => item.resource_type === 'application' && item.id !== props.id && item.is_publish,
   )
 }
 
