@@ -250,6 +250,7 @@ async function getToolFolder() {
 async function getToolList() {
   const res = await loadSharedApi({
     type: 'tool',
+    isShared: folder.currentFolder?.id === 'share',
     systemType: 'workspace',
   }).getToolList({
     folder_id: folder.currentFolder?.id || user.getWorkspaceId(),
