@@ -46,8 +46,6 @@ class AppNode extends HtmlResize.view {
     if (props.model.properties.noRender) {
       delete props.model.properties.noRender
     } else {
-      console.log('ss', props.model.properties.stepName)
-      console.log(props.graphModel.nodes, this)
       props.model.properties.stepName = getNodeName(
         props.graphModel.nodes.filter((node: any) => node.id !== props.model.id),
         props.model.properties.stepName,
