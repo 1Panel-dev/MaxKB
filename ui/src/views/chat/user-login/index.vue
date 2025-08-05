@@ -299,7 +299,12 @@ function redirectAuth(authType: string, needMessage: boolean = false) {
     }
 
     const config = res.data.config
-    const redirectUrl = eval(`\`${config.redirectUrl}/${accessToken}\``)
+    const queryParams = new URLSearchParams(route.query as any).toString()
+    // 构造带查询参数的redirectUrl
+    let redirectUrl = `${config.redirectUrl}/${accessToken}`
+    if (queryParams) {
+      redirectUrl += `?${queryParams}`
+    }
     let url
     if (authType === 'CAS') {
       url = config.ldpUri
@@ -380,7 +385,6 @@ onBeforeMount(() => {
     // modeList需要去掉lark wecom dingtalk
     modeList.value = modeList.value.filter((item) => !['lark', 'wecom', 'dingtalk'].includes(item))
     if (QrList.value.length > 0) {
-      modeList.value = ['QR_CODE', ...modeList.value]
       QrList.value.forEach((item) => {
         orgOptions.value.push({
           key: item,
@@ -392,6 +396,11 @@ onBeforeMount(() => {
                 : t('views.system.authentication.scanTheQRCode.lark'),
         })
       })
+      if (modeList.value.length === 0) {
+        showQrCodeTab.value = true
+      } else {
+        modeList.value = ['QR_CODE', ...modeList.value]
+      }
     }
   }
 })
