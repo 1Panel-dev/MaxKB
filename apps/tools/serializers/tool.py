@@ -110,6 +110,14 @@ class ToolModelSerializer(serializers.ModelSerializer):
                   'create_time', 'update_time']
 
 
+class ToolExportModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tool
+        fields = ['id', 'name', 'icon', 'desc', 'code', 'input_field_list', 'init_field_list',
+                  'scope', 'is_active', 'user_id', 'template_id', 'workspace_id', 'folder_id', 'tool_type', 'label',
+                  'create_time', 'update_time']
+
+
 class UploadedFileField(serializers.FileField):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -376,7 +384,7 @@ class ToolSerializer(serializers.Serializer):
                 self.is_valid()
                 id = self.data.get('id')
                 tool = QuerySet(Tool).filter(id=id).first()
-                tool_dict = ToolModelSerializer(tool).data
+                tool_dict = ToolExportModelSerializer(tool).data
                 mk_instance = ToolInstance(tool_dict, 'v2')
                 tool_pickle = pickle.dumps(mk_instance)
                 response = HttpResponse(content_type='text/plain', content=tool_pickle)
