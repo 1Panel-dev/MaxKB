@@ -30,21 +30,27 @@ const workspaceApiMap = {
  *  loadPermissionApi('role')
  */
 const {user} = useStore()
+const systemPermissionMap = {
+  workspace: [PermissionConst.WORKSPACE_READ],
+  role: [PermissionConst.ROLE_READ],
+  chatUser: [PermissionConst.CHAT_USER_READ],
+  userGroup: [PermissionConst.USER_GROUP_READ],
+}
+const workspacePermissionMap = {
+  workspace: [PermissionConst.WORKSPACE_WORKSPACE_READ],
+  role: [PermissionConst.WORKSPACE_ROLE_READ],
+  chatUser: [PermissionConst.WORKSPACE_CHAT_USER_READ],
+  userGroup: [PermissionConst.WORKSPACE_USER_GROUP_READ],
+}
 
 export function loadPermissionApi(type: string) {
   if (hasPermission([EditionConst.IS_EE, EditionConst.IS_PE], 'OR')) {
     user.getHasPermissionWorkspaceManage()
-    if (hasPermission([RoleConst.ADMIN, RoleConst.EXTENDS_ADMIN], 'OR')) {
+    if (hasPermission(systemPermissionMap[type as keyof typeof systemPermissionMap], 'OR')) {
       // 加载系统管理员 API
       return systemApiMap[type]
     } else if (
-      hasPermission(
-        [
-          RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-          RoleConst.EXTENDS_WORKSPACE_MANAGE.getWorkspaceRole,
-        ],
-        'OR',
-      )
+      hasPermission(workspacePermissionMap[type as keyof typeof workspacePermissionMap], 'OR')
     ) {
       // 加载企业版工作空间管理员 API
       return workspaceApiMap[type]
