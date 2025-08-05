@@ -122,12 +122,13 @@
       ref="SelectDocumentDialogRef"
       @refresh="refreshMigrateParagraph"
       :apiType="apiType"
+      :workspace-id="knowledgeDetail.workspace_id"
     />
     <GenerateRelatedDialog ref="GenerateRelatedDialogRef" @refresh="refresh" :apiType="apiType" />
   </el-card>
 </template>
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import {ref, computed, watch, onMounted} from 'vue'
 import { useRoute } from 'vue-router'
 import GenerateRelatedDialog from '@/components/generate-related-dialog/index.vue'
 import ParagraphDialog from '@/views/paragraph/component/ParagraphDialog.vue'
@@ -172,6 +173,7 @@ const emit = defineEmits([
 ])
 const loading = ref(false)
 const changeStateloading = ref(false)
+const knowledgeDetail = ref<any>({})
 const show = ref(false)
 // card上面存在dropdown菜单
 const subHovered = ref(false)
@@ -198,6 +200,14 @@ async function changeState(row: any) {
       return false
     })
 }
+function getDetail() {
+  loadSharedApi({ type: 'knowledge', systemType: apiType.value })
+    .getKnowledgeDetail(id, loading)
+    .then((res: any) => {
+      knowledgeDetail.value = res.data
+    })
+}
+
 
 const GenerateRelatedDialogRef = ref<InstanceType<typeof GenerateRelatedDialog>>()
 function openGenerateDialog(row: any) {
@@ -271,6 +281,11 @@ const dialogVisible = computed(
     SelectDocumentDialogRef.value?.dialogVisible ||
     GenerateRelatedDialogRef.value?.dialogVisible,
 )
+
+onMounted(() => {
+  getDetail()
+})
+
 watch(dialogVisible, (val: boolean) => {
   emit('dialogVisibleChange', val)
 })

@@ -65,7 +65,8 @@ const props = defineProps<{
     default: () => {}
   }
   apiType: 'systemShare' | 'workspace' | 'systemManage'
-  isApplication?: boolean
+  isApplication?: boolean,
+  workspaceId?: string,
 }>()
 
 const { user } = useStore()
@@ -99,8 +100,17 @@ const defaultProps = {
 const loadTree = async (node: any, resolve: any) => {
   if (node.isLeaf) return resolve([])
   const folder_id = node.level === 0 ? user.getWorkspaceId() : node.data.id
+  const obj =
+   props.apiType === 'systemManage'
+      ? {
+          workspace_id: props.workspaceId,
+          folder_id:  node.level === 0 ? props.workspaceId : node.data.id,
+        }
+      : {
+          folder_id: folder_id,
+        }
   await loadSharedApi({ type: 'knowledge', systemType: props.apiType })
-    .getKnowledgeList({ folder_id: folder_id }, optionLoading)
+    .getKnowledgeList(obj, optionLoading)
     .then((res: any) => {
       resolve(res.data)
     })

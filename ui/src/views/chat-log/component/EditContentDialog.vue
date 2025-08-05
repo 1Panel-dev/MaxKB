@@ -55,6 +55,7 @@
       @changeKnowledge="changeKnowledge"
       @changeDocument="changeDocument"
       :isApplication="true"
+      :workspace-id="detail.workspace_id"
     />
     <template #footer>
       <span class="dialog-footer">
@@ -67,7 +68,7 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { ref, watch, reactive, computed } from 'vue'
+import {ref, watch, reactive, computed, onMounted} from 'vue'
 import { useRoute } from 'vue-router'
 import SelectKnowledgeDocument from '@/components/select-knowledge-document/index.vue'
 import type { FormInstance, FormRules } from 'element-plus'
@@ -125,6 +126,7 @@ const footers = ['markdownTotal', 0, '=', 1, 'scrollSwitch']
 const SelectKnowledgeDocumentRef = ref()
 const dialogVisible = ref<boolean>(false)
 const loading = ref(false)
+const detail = ref<any>({})
 
 const form = ref<any>({
   chat_id: '',
@@ -218,6 +220,18 @@ const submitForm = async (formEl: FormInstance | undefined) => {
     }
   })
 }
+
+function getDetail(isLoading = false) {
+  loadSharedApi({ type: 'application', systemType: apiType.value })
+    .getApplicationDetail(id as string, isLoading ? loading : undefined)
+    .then((res: any) => {
+      detail.value = res.data
+    })
+}
+
+onMounted(()=>{
+  getDetail()
+})
 
 defineExpose({ open })
 </script>

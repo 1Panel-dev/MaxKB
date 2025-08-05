@@ -13,6 +13,7 @@
       @changeKnowledge="changeKnowledge"
       @changeDocument="changeDocument"
       :isApplication="true"
+      :workspace-id="knowledgeDetail.workspace_id"
     />
     <template #footer>
       <span class="dialog-footer">
@@ -25,7 +26,7 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { ref, watch, reactive, computed } from 'vue'
+import {ref, watch, reactive, computed, onMounted} from 'vue'
 import { useRoute } from 'vue-router'
 import SelectKnowledgeDocument from '@/components/select-knowledge-document/index.vue'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
@@ -40,7 +41,7 @@ const {
 
 const emit = defineEmits(['refresh'])
 const SelectKnowledgeDocumentRef = ref()
-
+const knowledgeDetail = ref<any>({})
 const dialogVisible = ref<boolean>(false)
 const loading = ref(false)
 
@@ -77,6 +78,19 @@ const submitForm = async () => {
       })
   }
 }
+
+function getDetail() {
+  loadSharedApi({ type: 'knowledge', systemType: props.apiType })
+    .getKnowledgeDetail(id, loading)
+    .then((res: any) => {
+      knowledgeDetail.value = res.data
+    })
+}
+
+onMounted(() => {
+  getDetail()
+})
+
 
 function changeKnowledge(dataset_id: string) {
   localStorage.setItem(id + 'chat_dataset_id', dataset_id)
