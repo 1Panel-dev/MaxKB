@@ -53,8 +53,16 @@ function visibleChange(bool: boolean) {
     options.value = props.global
       ? props.nodeModel
           .get_up_node_field_list(false, true)
-          .filter((v: any) => ['global', 'chat'].includes(v.value))
-      : props.nodeModel.get_up_node_field_list(false, true)
+          .map((v: any) => {
+            console.log(v)
+            return v
+          })
+          .filter(
+            (v: any) => ['global', 'chat'].includes(v.value) && v.children && v.children.length > 0,
+          )
+      : props.nodeModel
+          .get_up_node_field_list(false, true)
+          .filter((v: any) => v.children && v.children.length > 0)
   }
 }
 
