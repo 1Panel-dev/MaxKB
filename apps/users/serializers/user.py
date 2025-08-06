@@ -629,7 +629,7 @@ def update_user_role(instance, user, user_id=None):
             workspace_user_role_mapping_model.objects.filter(user_id=user.id).delete()
         else:
             workspace_user_role_mapping_model.objects.filter(user_id=user.id).exclude(
-                role_id=RoleConstants.ADMIN.name).delete()
+                role__type=RoleConstants.ADMIN.name).delete()
         relations = set()
         for item in role_setting:
             role_id = item['role_id']
