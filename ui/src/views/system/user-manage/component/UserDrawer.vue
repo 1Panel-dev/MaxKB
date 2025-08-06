@@ -336,17 +336,31 @@ const submit = async (formEl: FormInstance | undefined) => {
         role_setting: list.value,
       }
       if (isEdit.value) {
-        userManageApi.putUserManage(userForm.value.id, params, loading).then((res) => {
-          emit('refresh')
-          MsgSuccess(t('common.editSuccess'))
-          visible.value = false
-        })
+        userManageApi
+          .putUserManage(userForm.value.id, params, loading)
+          .then((res) => {
+            return user.profile(loading).then(() => {
+              return res
+            })
+          })
+          .then((res) => {
+            emit('refresh')
+            MsgSuccess(t('common.editSuccess'))
+            visible.value = false
+          })
       } else {
-        userManageApi.postUserManage(params, loading).then((res) => {
-          emit('refresh')
-          MsgSuccess(t('common.createSuccess'))
-          visible.value = false
-        })
+        userManageApi
+          .postUserManage(params, loading)
+          .then((res) => {
+            return user.profile(loading).then(() => {
+              return res
+            })
+          })
+          .then((res) => {
+            emit('refresh')
+            MsgSuccess(t('common.createSuccess'))
+            visible.value = false
+          })
       }
     }
   })
