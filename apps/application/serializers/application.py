@@ -562,7 +562,7 @@ class ApplicationSerializer(serializers.Serializer):
                     template_id=tool.get('template_id'),
                     input_field_list=tool.get('input_field_list'),
                     init_field_list=tool.get('init_field_list'),
-                    is_active=tool.get('is_active') if len((tool.get('init_field_list') or [])) > 0 else False,
+                    is_active=False if len((tool.get('init_field_list') or [])) > 0 else tool.get('is_active'),
                     scope=ToolScope.WORKSPACE,
                     folder_id=workspace_id,
                     workspace_id=workspace_id)
