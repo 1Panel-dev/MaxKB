@@ -99,7 +99,7 @@ class BaseChatOpenAI(ChatOpenAI):
             except Exception as e:
                 tokenizer = TokenizerManage.get_tokenizer()
                 return sum([len(tokenizer.encode(get_buffer_string([m]))) for m in messages])
-        return self.usage_metadata.get('input_tokens', 0)
+        return self.usage_metadata.get('input_tokens', self.usage_metadata.get('prompt_tokens', 0))
 
     def get_num_tokens(self, text: str) -> int:
         if self.usage_metadata is None or self.usage_metadata == {}:
@@ -108,7 +108,8 @@ class BaseChatOpenAI(ChatOpenAI):
             except Exception as e:
                 tokenizer = TokenizerManage.get_tokenizer()
                 return len(tokenizer.encode(text))
-        return self.get_last_generation_info().get('output_tokens', 0)
+        return self.get_last_generation_info().get('output_tokens',
+                                                   self.get_last_generation_info().get('completion_tokens', 0))
 
     def _stream(self, *args: Any, **kwargs: Any) -> Iterator[ChatGenerationChunk]:
         kwargs['stream_usage'] = True
@@ -133,7 +134,7 @@ class BaseChatOpenAI(ChatOpenAI):
         )
 
         usage_metadata: Optional[UsageMetadata] = (
-            _create_usage_metadata(token_usage) if token_usage else None
+            _create_usage_metadata(token_usage) if token_usage and token_usage.get("prompt_tokens") else None
         )
         if len(choices) == 0:
             # logprobs is implicitly None
