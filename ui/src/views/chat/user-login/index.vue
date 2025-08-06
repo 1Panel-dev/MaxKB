@@ -346,7 +346,7 @@ function redirectAuth(authType: string, needMessage: boolean = false) {
 }
 
 function changeMode(val: string) {
-  loginMode.value = val === 'LDAP' ? val : 'LOCAL'
+  loginMode.value = val === 'LDAP' ? val : ''
   if (val === 'QR_CODE') {
     loginMode.value = val
     showQrCodeTab.value = true
@@ -396,11 +396,8 @@ onBeforeMount(() => {
                 : t('views.system.authentication.scanTheQRCode.lark'),
         })
       })
-      if (modeList.value.length === 0) {
-        showQrCodeTab.value = true
-      } else {
-        modeList.value = ['QR_CODE', ...modeList.value]
-      }
+      showQrCodeTab.value = true
+      modeList.value = ['QR_CODE', ...modeList.value]
     }
   }
 })
