@@ -31,16 +31,16 @@ const workspaceApiMap = {
  */
 const {user} = useStore()
 const systemPermissionMap = {
-  workspace: [PermissionConst.WORKSPACE_READ],
-  role: [PermissionConst.ROLE_READ],
-  chatUser: [PermissionConst.CHAT_USER_READ],
-  userGroup: [PermissionConst.USER_GROUP_READ],
+  workspace: [PermissionConst.WORKSPACE_READ, RoleConst.ADMIN],
+  role: [PermissionConst.ROLE_READ, RoleConst.ADMIN],
+  chatUser: [PermissionConst.CHAT_USER_READ, RoleConst.ADMIN],
+  userGroup: [PermissionConst.USER_GROUP_READ, RoleConst.ADMIN],
 }
 const workspacePermissionMap = {
-  workspace: [PermissionConst.WORKSPACE_WORKSPACE_READ],
-  role: [PermissionConst.WORKSPACE_ROLE_READ],
-  chatUser: [PermissionConst.WORKSPACE_CHAT_USER_READ],
-  userGroup: [PermissionConst.WORKSPACE_USER_GROUP_READ],
+  workspace: [PermissionConst.WORKSPACE_WORKSPACE_READ, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+  role: [PermissionConst.WORKSPACE_ROLE_READ, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+  chatUser: [PermissionConst.WORKSPACE_CHAT_USER_READ, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+  userGroup: [PermissionConst.WORKSPACE_USER_GROUP_READ, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
 }
 
 export function loadPermissionApi(type: string) {
