@@ -399,7 +399,9 @@ onBeforeMount(() => {
                 : t('views.system.authentication.scanTheQRCode.lark'),
         })
       })
-      showQrCodeTab.value = true
+      if (!modeList.value.includes('LOCAL') && !modeList.value.includes('LDAP')) {
+        showQrCodeTab.value = true
+      }
       modeList.value = ['QR_CODE', ...modeList.value]
     }
   }
