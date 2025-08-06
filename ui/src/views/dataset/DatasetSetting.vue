@@ -256,9 +256,7 @@ async function submit() {
         } else {
           if (detail.value.type === '2') {
             datasetApi.putLarkDataset(id, obj, loading).then((res) => {
-              datasetApi.putReEmbeddingDataset(id).then(() => {
-                MsgSuccess(t('common.saveSuccess'))
-              })
+              MsgSuccess(t('common.saveSuccess'))
             })
           } else {
             datasetApi.putDataset(id, obj, loading).then((res) => {
