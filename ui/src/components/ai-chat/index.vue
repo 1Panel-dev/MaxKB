@@ -56,6 +56,7 @@ import { useRoute } from 'vue-router'
 import applicationApi from '@/api/application/application'
 import chatAPI from '@/api/chat/chat'
 import SystemResourceManagementApplicationAPI from "@/api/system-resource-management/application.ts"
+import syetrmResourceManagementChatLogApi from '@/api/system-resource-management/chat-log'
 import chatLogApi from '@/api/application/chat-log'
 import { ChatManagement, type chatType } from '@/api/type/application'
 import { randomId } from '@/utils/common'
@@ -295,35 +296,36 @@ const getOpenChatAPI = () => {
   }
 }
 
+const getChatRecordDetailsAPI = (row: any) => {
+  if (row.record_id) {
+    if (props.type === 'debug-ai-chat') {
+      if (route.path.includes('resource-management')) {
+        return syetrmResourceManagementChatLogApi
+          .getChatRecordDetails(id || props.appId, row.chat_id, row.record_id, loading)
+      } else {
+        return chatLogApi
+          .getChatRecordDetails(id || props.appId, row.chat_id, row.record_id, loading)
+      }
+    } else {
+      return chatAPI.getChatRecord(row.chat_id, row.record_id, loading)
+    }
+  }
+  return Promise.reject("404")
+}
 /**
  * 获取对话详情
  * @param row
  */
 function getSourceDetail(row: any) {
-  if (row.record_id) {
-    if (props.type === 'debug-ai-chat') {
-      chatLogApi
-        .getChatRecordDetails(id || props.appId, row.chat_id, row.record_id, loading)
-        .then((res) => {
-          const exclude_keys = ['answer_text', 'id', 'answer_text_list']
-          Object.keys(res.data).forEach((key) => {
-            if (!exclude_keys.includes(key)) {
-              row[key] = res.data[key]
-            }
-          })
-        })
-    } else {
-      chatAPI.getChatRecord(row.chat_id, row.record_id, loading).then((res) => {
-        const exclude_keys = ['answer_text', 'id', 'answer_text_list']
-        Object.keys(res.data).forEach((key) => {
-          if (!exclude_keys.includes(key)) {
-            row[key] = res.data[key]
-          }
-        })
-      })
-    }
-  }
-  return true
+  return getChatRecordDetailsAPI(row).then((res) => {
+    const exclude_keys = ['answer_text', 'id', 'answer_text_list']
+    Object.keys(res.data).forEach((key) => {
+      if (!exclude_keys.includes(key)) {
+        row[key] = res.data[key]
+      }
+    })
+  })
+
 }
 /**
  * 对话
