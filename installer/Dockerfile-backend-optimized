@@ -1,10 +1,6 @@
-# MaxKB 后台应用优化版 Dockerfile
-# 多阶段构建，减少最终镜像大小
-
 # 阶段1: 构建环境
 FROM ghcr.io/1panel-dev/maxkb-base:python3.11-pg17.5 AS backend-builder
 
-# 设置 APT 使用更少的缓存
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PIP_NO_CACHE_DIR=1
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1
@@ -19,13 +15,12 @@ RUN apt-get update && \
         curl \
         ca-certificates \
         gettext \
-    && rm -rf /var/lib/apt/lists/* \
-    && apt-get clean
+    && rm -rf /var/lib/apt/lists/* && \
+    apt-get clean
 
-# 设置工作目录
 WORKDIR /build
 
-# 配置 pip 镜像源（解决网络超时问题）
+# 配置 pip 镜像源
 RUN mkdir -p /root/.pip && \
     echo '[global]' > /root/.pip/pip.conf && \
     echo 'index-url = https://mirrors.aliyun.com/pypi/simple/' >> /root/.pip/pip.conf && \
@@ -33,89 +28,72 @@ RUN mkdir -p /root/.pip && \
     echo 'timeout = 300' >> /root/.pip/pip.conf && \
     echo 'retries = 5' >> /root/.pip/pip.conf
 
-# 创建虚拟环境并安装 Poetry
+# 安装虚拟环境和 Poetry
 RUN python3 -m venv /opt/py3 && \
     . /opt/py3/bin/activate && \
     pip install --upgrade pip setuptools wheel && \
     pip install poetry==2.0.0 && \
-    # 配置 Poetry
-    poetry config virtualenvs.create false && \
-    poetry config installer.max-workers 10 && \
-    poetry config installer.timeout 300
+    poetry config virtualenvs.create false
 
-# 复制依赖定义文件
 COPY pyproject.toml /build/
 
-# 为 x86_64 架构优化 torch 版本，提升构建速度
+# 优化 PyTorch 构建
 RUN if [ "$(uname -m)" = "x86_64" ]; then \
         sed -i 's/^torch.*/torch = {version = "2.7.1+cpu", source = "pytorch"}/g' pyproject.toml; \
     fi
 
-# 生成并安装依赖（使用镜像源）
 RUN . /opt/py3/bin/activate && \
     rm -f poetry.lock && \
-    # 检查并添加镜像源（避免重复添加）
     if ! poetry source show aliyun >/dev/null 2>&1; then \
         poetry source add --priority=primary aliyun https://mirrors.aliyun.com/pypi/simple/; \
     fi && \
-    # 显示配置的源
     poetry source show && \
-    # 生成依赖锁定文件
     poetry lock && \
-    # 安装主要依赖
-    poetry install --only=main && \
-    # 安装额外依赖
+    poetry install && \
     pip install --no-cache-dir --timeout 300 --retries 5 \
         -i https://mirrors.aliyun.com/pypi/simple/ \
         --trusted-host mirrors.aliyun.com \
         requests pymysql psycopg2-binary
 
-# 复制应用代码（仅后端部分）
 COPY apps/ /build/apps/
 COPY main.py /build/
 
-# 编译国际化文件
 RUN . /opt/py3/bin/activate && \
     export MAXKB_CONFIG_TYPE=ENV && \
     python3 /build/apps/manage.py compilemessages
 
-# 清理构建缓存和临时文件
-RUN find /opt/py3 -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true && \
-    find /opt/py3 -type f -name "*.pyc" -delete && \
-    find /opt/py3 -type f -name "*.pyo" -delete && \
-    find /opt/py3 -type d -name "*.egg-info" -exec rm -rf {} + 2>/dev/null || true && \
-    find /opt/py3 -type d -name ".pytest_cache" -exec rm -rf {} + 2>/dev/null || true && \
-    # 删除不必要的包文件和文档
-    rm -rf /opt/py3/lib/python3.11/site-packages/pip* && \
-    rm -rf /opt/py3/lib/python3.11/site-packages/setuptools* && \
-    rm -rf /opt/py3/lib/python3.11/site-packages/wheel* && \
-    rm -rf /opt/py3/lib/python3.11/site-packages/poetry* && \
-    # 删除测试文件和文档
-    find /opt/py3/lib/python3.11/site-packages -type d -name "tests" -exec rm -rf {} + 2>/dev/null || true && \
-    find /opt/py3/lib/python3.11/site-packages -type d -name "test" -exec rm -rf {} + 2>/dev/null || true && \
-    find /opt/py3/lib/python3.11/site-packages -name "*.dist-info" -exec rm -rf {} + 2>/dev/null || true
+# 清理缓存、文档、测试包等
+RUN find /opt/py3 -type d -name "__pycache__" -exec rm -rf {} + && \
+    find /opt/py3 -type f -name "*.py[co]" -delete && \
+    find /opt/py3 -type d -name "*.egg-info" -exec rm -rf {} + && \
+    find /opt/py3 -type d -name ".pytest_cache" -exec rm -rf {} + && \
+    rm -rf \
+        /opt/py3/lib/python3.11/site-packages/pip* \
+        /opt/py3/lib/python3.11/site-packages/setuptools* \
+        /opt/py3/lib/python3.11/site-packages/wheel* \
+        /opt/py3/lib/python3.11/site-packages/poetry* && \
+    find /opt/py3/lib/python3.11/site-packages -type d -name "tests" -exec rm -rf {} + && \
+    find /opt/py3/lib/python3.11/site-packages -name "*.dist-info" -exec rm -rf {} +
 
-# 阶段2: 最终运行环境
+# 阶段2: 运行时镜像
 FROM ghcr.io/1panel-dev/maxkb-base:python3.11-pg17.5 AS backend-runtime
 
-# 设置时区和语言环境
+# 设置时区
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     echo "Asia/Shanghai" > /etc/timezone
 
-# 只安装运行时必需的依赖
+# 安装必要运行库
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         curl \
         ca-certificates \
         postgresql-client \
         wait-for-it \
-        # 音频处理需要的系统库
         libsndfile1 \
-        # 如果需要 ffmpeg，可以安装 ffmpeg-static 或使用更轻量级的替代
-    && rm -rf /var/lib/apt/lists/* \
-    && apt-get clean
+    && rm -rf /var/lib/apt/lists/* && \
+    apt-get clean
 
-# 设置环境变量
+# 环境变量
 ENV MAXKB_CONFIG_TYPE=ENV \
     MAXKB_DB_NAME=maxkb \
     MAXKB_DB_HOST=maxkb-postgres \
@@ -141,24 +119,23 @@ ENV MAXKB_CONFIG_TYPE=ENV \
     PYTHONDONTWRITEBYTECODE=1 \
     LANG=en_US.UTF-8
 
-# 创建应用用户（安全性）
+# 添加用户
 RUN useradd --no-create-home --home /opt/maxkb-app --shell /bin/bash maxkb -g root
 
-# 复制构建好的应用和虚拟环境
+# 复制应用文件
 COPY --from=backend-builder /build /opt/maxkb-app
 COPY --from=backend-builder /opt/py3 /opt/py3
 
-# 创建必要目录并设置权限
+# 创建目录并修复权限
 RUN mkdir -p /opt/maxkb-app/sandbox \
              /opt/maxkb/logs \
              /opt/maxkb/local \
              /opt/maxkb/python-packages && \
-    chown -R maxkb:root /opt/maxkb-app \
-                        /opt/maxkb && \
-    chmod -R 755 /opt/maxkb-app \
-                 /opt/maxkb
+    chown -R maxkb:root /opt/maxkb-app /opt/maxkb && \
+    chmod -R 755 /opt/maxkb-app /opt/maxkb && \
+    chmod +rx /bin/bash /bin/ls /usr/bin/env  # ✅ 关键权限修复
 
-# 创建轻量级启动脚本
+# 轻量启动脚本
 COPY --chmod=755 <<'EOF' /usr/local/bin/start-maxkb-backend.sh
 #!/bin/bash
 set -e
@@ -182,12 +159,10 @@ EOF
 
 WORKDIR /opt/maxkb-app
 
-# 切换到应用用户
-USER maxkb
+# USER maxkb
 
 EXPOSE 8080
 
-# 数据卷
 VOLUME ["/opt/maxkb/logs", "/opt/maxkb/local", "/opt/maxkb-app/model"]
 
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \

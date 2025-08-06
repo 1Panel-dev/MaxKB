@@ -9,14 +9,15 @@ package-mode = false
 [tool.poetry.dependencies]
 python = "^3.11"
 
+prompt_toolkit = "^3.0.43"
 # Web框架
 django = "5.2.4"
 drf-spectacular = { extras = ["sidecar"], version = "0.28.0" }
 django-redis = "6.0.0"
 django-db-connection-pool = "1.2.6"
 django-mptt = "0.17.0"
-psycopg = { extras = ["binary"], version = "3.2.9" }
-
+# psycopg = { extras = ["binary"], version = "3.2.9" }
+psycopg2-binary = ">=2.9"
 # 工具库
 python-dotenv = "1.1.1"
 uuid-utils = "0.11.0"
