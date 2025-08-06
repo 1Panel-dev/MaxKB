@@ -346,7 +346,10 @@ function redirectAuth(authType: string, needMessage: boolean = false) {
 }
 
 function changeMode(val: string) {
-  loginMode.value = val === 'LDAP' ? val : ''
+  loginMode.value = val === 'LDAP' ? val : 'LOCAL'
+  if (val !== 'LOCAL') {
+    loginMode.value = val
+  }
   if (val === 'QR_CODE') {
     loginMode.value = val
     showQrCodeTab.value = true
