@@ -62,18 +62,11 @@ RUN . /opt/py3/bin/activate && \
     export MAXKB_CONFIG_TYPE=ENV && \
     python3 /build/apps/manage.py compilemessages
 
-# 清理缓存、文档、测试包等
-RUN find /opt/py3 -type d -name "__pycache__" -exec rm -rf {} + && \
-    find /opt/py3 -type f -name "*.py[co]" -delete && \
-    find /opt/py3 -type d -name "*.egg-info" -exec rm -rf {} + && \
-    find /opt/py3 -type d -name ".pytest_cache" -exec rm -rf {} + && \
-    rm -rf \
-        /opt/py3/lib/python3.11/site-packages/pip* \
-        /opt/py3/lib/python3.11/site-packages/setuptools* \
-        /opt/py3/lib/python3.11/site-packages/wheel* \
-        /opt/py3/lib/python3.11/site-packages/poetry* && \
-    find /opt/py3/lib/python3.11/site-packages -type d -name "tests" -exec rm -rf {} + && \
-    find /opt/py3/lib/python3.11/site-packages -name "*.dist-info" -exec rm -rf {} +
+# 安全清理：只清理缓存、字节码、测试目录，保留 dist-info 和 pip
+RUN find /opt/py3 -type d -name "__pycache__" -exec rm -rf {} + \
+ && find /opt/py3 -type f -name "*.py[co]" -delete \
+ && find /opt/py3/lib/python3.11/site-packages -type d -name "tests" -exec rm -rf {} + \
+ && find /opt/py3 -type d -name ".pytest_cache" -exec rm -rf {} +
 
 # 阶段2: 运行时镜像
 FROM ghcr.io/1panel-dev/maxkb-base:python3.11-pg17.5 AS backend-runtime
@@ -126,6 +119,8 @@ RUN useradd --no-create-home --home /opt/maxkb-app --shell /bin/bash maxkb -g ro
 COPY --from=backend-builder /build /opt/maxkb-app
 COPY --from=backend-builder /opt/py3 /opt/py3
 
+ENV PYTHONPATH=/opt/maxkb-app/apps
+
 # 创建目录并修复权限
 RUN mkdir -p /opt/maxkb-app/sandbox \
              /opt/maxkb/logs \
@@ -139,6 +134,8 @@ RUN mkdir -p /opt/maxkb-app/sandbox \
 COPY --chmod=755 <<'EOF' /usr/local/bin/start-maxkb-backend.sh
 #!/bin/bash
 set -e
+
+export PYTHONPATH="${PYTHONPATH:-/opt/maxkb-app/apps}"
 
 echo "等待数据库连接..."
 wait-for-it ${MAXKB_DB_HOST}:${MAXKB_DB_PORT} --timeout=120 --strict
