@@ -249,10 +249,66 @@ configure_postgres() {
     echo ""
 }
 
+# 配置后台应用的镜像
+configure_backend_image() {
+    echo -e "${CYAN}=== 配置后台应用镜像 ===${NC}"
+    
+    # 设置默认镜像
+    local default_image="maxkb/backend:v2.0"
+    if [ -n "$REGISTRY" ]; then
+        default_image="$REGISTRY/gs_kh/maxkb/backend:v2.0"
+    fi
+    
+    echo -e "${YELLOW}请选择后台镜像配置方式:${NC}"
+    echo "  1) 使用默认镜像: $default_image"
+    echo "  2) 自定义镜像名称"
+    echo -e "请选择 [1-2，默认1]: "
+    
+    read -r image_choice
+    case $image_choice in
+        2)
+            echo -e "${YELLOW}请输入自定义的后台镜像名称:${NC}"
+            if [ -n "$REGISTRY" ]; then
+                echo -e "${CYAN}💡 当前私有仓库: $REGISTRY${NC}"
+                echo -e "${CYAN}💡 示例: gs_kh/gsbackend:v2.2 (将自动添加仓库前缀)${NC}"
+                echo -e "${CYAN}💡 示例: custom-project/backend:latest${NC}"
+            else
+                echo -e "${CYAN}💡 示例: maxkb/maxkb/backend:2.2${NC}"
+                echo -e "${CYAN}💡 示例: your-registry.com/your-project/backend:latest${NC}"
+            fi
+            
+            read_input "后台镜像名称" "" "CUSTOM_IMAGE_NAME"
+            
+            # 验证镜像名称不为空
+            while [ -z "$CUSTOM_IMAGE_NAME" ]; do
+                echo -e "${RED}镜像名称不能为空，请重新输入${NC}"
+                read_input "后台镜像名称" "" "CUSTOM_IMAGE_NAME"
+            done
+            
+            # 如果有私有仓库且镜像名不包含仓库地址，自动添加前缀
+            if [ -n "$REGISTRY" ] && [[ "$CUSTOM_IMAGE_NAME" != *"://"* ]] && [[ "$CUSTOM_IMAGE_NAME" != "$REGISTRY"* ]]; then
+                BACKEND_IMAGE="$REGISTRY/$CUSTOM_IMAGE_NAME"
+                log_info "使用自定义镜像: $BACKEND_IMAGE (已添加仓库前缀)"
+            else
+                BACKEND_IMAGE="$CUSTOM_IMAGE_NAME"
+                log_info "使用自定义镜像: $BACKEND_IMAGE"
+            fi
+            ;;
+        *)
+            BACKEND_IMAGE="$default_image"
+            log_info "使用默认镜像: $BACKEND_IMAGE"
+            ;;
+    esac
+    echo ""
+}
+
 # 配置后台应用参数
 configure_backend() {
     log_step "配置 GS-KH 后台应用参数"
     echo ""
+    
+    # 配置后台镜像
+    configure_backend_image
     
     # 配置数据库连接
     configure_backend_database
@@ -265,6 +321,7 @@ configure_backend() {
     
     echo ""
     log_info "后台应用配置完成"
+    echo "  - 镜像: $BACKEND_IMAGE"
     echo "  - 端口: $BACKEND_PORT"
     echo "  - 数据库连接: $DB_HOST:$DB_PORT/$DB_NAME"
     echo "  - Redis 连接: $REDIS_HOST:$REDIS_PORT"
@@ -449,10 +506,8 @@ get_component_images() {
                 images+=("$postgres_image")
                 ;;
             backend)
-                local backend_image="maxkb/backend:v2.0"
-                if [ -n "$REGISTRY" ]; then
-                    backend_image="$REGISTRY/gs_kh/maxkb/backend:v2.0"
-                fi
+                # 直接使用配置的后台镜像（已在 configure_backend_image 中处理了仓库前缀）
+                local backend_image="${BACKEND_IMAGE:-maxkb/backend:v2.0}"
                 images+=("$backend_image")
                 ;;
             frontend)
@@ -496,11 +551,8 @@ get_deployment_images() {
                 fi
                 ;;
             backend)
-                # 后台应用总是需要镜像
-                local backend_image="maxkb/backend:v2.0"
-                if [ -n "$REGISTRY" ]; then
-                    backend_image="$REGISTRY/gs_kh/maxkb/backend:v2.0"
-                fi
+                # 后台应用总是需要镜像（已在 configure_backend_image 中处理了仓库前缀）
+                local backend_image="${BACKEND_IMAGE:-maxkb/backend:v2.0}"
                 images+=("$backend_image")
                 ;;
             frontend)
@@ -754,10 +806,8 @@ EOF
 deploy_backend() {
     log_info "部署 MaxKB 后台应用..."
     
-    local image="maxkb/backend:v2.0"
-    if [ -n "$REGISTRY" ]; then
-        image="$REGISTRY/gs_kh/maxkb/backend:v2.0"
-    fi
+    # 使用配置的后台镜像（已在 configure_backend_image 中处理了仓库前缀）
+    local image="${BACKEND_IMAGE:-maxkb/backend:v2.0}"
     
     # 停止并删除现有容器
     docker stop gs-backend 2>/dev/null || true
@@ -893,6 +943,7 @@ DB_USER=${DB_USER:-}
 DB_PASSWORD=${DB_PASSWORD:-}
 
 # 后台应用配置 (如果部署)
+BACKEND_IMAGE=${BACKEND_IMAGE:-}
 BACKEND_HOST=${BACKEND_HOST:-}
 BACKEND_PORT=${BACKEND_PORT:-}
 LOG_LEVEL=${LOG_LEVEL:-}
@@ -981,13 +1032,7 @@ main() {
     # 配置通用参数（包含私有仓库信息）
     configure_general
     
-    # Docker 仓库登录（在检查镜像前登录）
-    docker_login
-    
-    # 立即检查和下载组件镜像
-    check_and_pull_images
-    
-    # 根据选择的组件配置参数
+    # 根据选择的组件配置参数（在检查镜像前先配置，特别是后台镜像）
     for component in "${SELECTED_COMPONENTS[@]}"; do
         case $component in
             redis)
@@ -1004,6 +1049,12 @@ main() {
                 ;;
         esac
     done
+    
+    # Docker 仓库登录（在检查镜像前登录）
+    docker_login
+    
+    # 检查和下载组件镜像（配置完成后检查）
+    check_and_pull_images
     
     # 确认部署
     echo ""
