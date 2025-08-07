@@ -187,3 +187,5 @@ apps/setting/models_provider/impl/*/icon/
 tmp/
 config.yml
 config.yml
+.cursorignore
+.gitignore
