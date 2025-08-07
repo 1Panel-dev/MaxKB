@@ -298,7 +298,7 @@ const themeForm = ref<any>({
   icon: '',
   loginLogo: '',
   loginImage: '',
-  title: 'MaxKB',
+  title: 'GoServiceKH',
   slogan: t('theme.defaultSlogan'),
   ...defaultPlatformSetting,
 })

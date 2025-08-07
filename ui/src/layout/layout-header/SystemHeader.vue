@@ -37,7 +37,7 @@
 <script setup lang="ts">
 import { RoleConst } from '@/utils/permission/data'
 import Avatar from './avatar/index.vue'
-import TopAbout from './top-about/index.vue'
+//import TopAbout from './top-about/index.vue'
 import { useRouter } from 'vue-router'
 import { hasPermission } from '@/utils/permission'
 

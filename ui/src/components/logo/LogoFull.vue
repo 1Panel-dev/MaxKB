@@ -55,7 +55,10 @@
         />
       </g>
     </svg>
-    <img v-else src="@/assets/logo/MaxKB-logo.svg" :height="height" />
+    <div v-else class="logo-with-text logo-center">
+      <img src="@/assets/logo/GoServiceLogo.png" :height="height" />
+      <span class="nav-logo">GoService</span>
+    </div>
   </template>
 </template>
 <script setup lang="ts">
@@ -66,7 +69,7 @@ defineOptions({ name: 'LogoFull' })
 defineProps({
   height: {
     type: String,
-    default: '36px',
+    default: '44px',
   },
 })
 const { theme } = useStore()
@@ -91,5 +94,31 @@ const fileURL = computed(() => {
   path {
     fill: var(--el-color-primary);
   }
+}
+</style>
+
+<style lang="scss" scoped>
+.logo-with-text {
+  display: flex;
+  align-items: center;
+}
+.logo-center {
+  justify-content: center;
+}
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  font-size: 32px;
+  color: var(--text-primary);
+  text-decoration: none;
+  background: var(--gradient-primary, linear-gradient(90deg, #3b82f6 0%, #a78bfa 100%));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 8px rgba(43, 71, 235, 0.3));
+  transition: all 0.3s ease;
+  margin-left: 10px;
 }
 </style>

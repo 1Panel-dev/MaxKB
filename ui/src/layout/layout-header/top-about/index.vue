@@ -6,7 +6,7 @@
       <AppIcon iconName="app-pricing" class="mr-8"></AppIcon>
       {{ $t('common.upgrade') }}
     </el-button>
-    <el-tooltip
+    <!-- <el-tooltip
       effect="dark"
       :content="$t('layout.github')"
       placement="top"
@@ -18,7 +18,7 @@
         style="font-size: 20px"
         @click="toUrl(theme.themeInfo?.projectUrl)"
       ></AppIcon>
-    </el-tooltip>
+    </el-tooltip> -->
     <el-tooltip
       effect="dark"
       :content="$t('layout.wiki')"
