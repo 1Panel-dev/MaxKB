@@ -18,8 +18,10 @@ from common.auth.authentication import has_permissions
 from common.constants.permission_constants import PermissionConstants, RoleConstants, Permission, Group, Operate
 from common.log.log import log
 from common.result import DefaultResultSerializer
-from system_manage.api.user_resource_permission import UserResourcePermissionAPI, EditUserResourcePermissionAPI
-from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
+from system_manage.api.user_resource_permission import UserResourcePermissionAPI, EditUserResourcePermissionAPI, \
+    ResourceUserPermissionAPI, ResourceUserPermissionPageAPI
+from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer, \
+    ResourceUserPermissionSerializer
 from users.models import User
 
 
@@ -72,3 +74,42 @@ class WorkSpaceUserResourcePermissionView(APIView):
         return result.success(UserResourcePermissionSerializer(
             data={'workspace_id': workspace_id, 'user_id': user_id, 'auth_target_type': resource}
         ).edit(request.data, request.user))
+
+
+class WorkspaceResourceUserPermissionView(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(
+        methods=['GET'],
+        description=_('Get user authorization status of resource'),
+        summary=_('Get user authorization status of resource'),
+        operation_id=_('Get user authorization status of resource'),  # type: ignore
+        parameters=ResourceUserPermissionAPI.get_parameters(),
+        responses=ResourceUserPermissionAPI.get_response(),
+        tags=[_('Resources authorization')]  # type: ignore
+    )
+    def get(self, request: Request, workspace_id: str, target: str, resource: str):
+        return result.success(ResourceUserPermissionSerializer(
+            data={'workspace_id': workspace_id, "target": target, 'auth_target_type': resource,
+                  }).list(
+            {'username': request.query_params.get("username"), 'nick_name': request.query_params.get("nick_name")}))
+
+    class Page(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['GET'],
+            description=_('Get user authorization status of resource by page'),
+            summary=_('Get user authorization status of resource by page'),
+            operation_id=_('Get user authorization status of resource by page'),  # type: ignore
+            parameters=ResourceUserPermissionPageAPI.get_parameters(),
+            responses=ResourceUserPermissionPageAPI.get_response(),
+            tags=[_('Resources authorization')]  # type: ignore
+        )
+        def get(self, request: Request, workspace_id: str, target: str, resource: str, current_page: int,
+                page_size: int):
+            return result.success(ResourceUserPermissionSerializer(
+                data={'workspace_id': workspace_id, "target": target, 'auth_target_type': resource, }
+            ).page({'username': request.query_params.get("username"),
+                    'nick_name': request.query_params.get("nick_name")}, current_page, page_size,
+                   ))
