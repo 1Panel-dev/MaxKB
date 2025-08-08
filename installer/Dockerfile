@@ -16,7 +16,7 @@ RUN apt-get update && \
     apt-get clean all  && \
     rm -rf /var/lib/apt/lists/*
 
-COPY . /opt/maxkb-app
+COPY --chmod=700 . /opt/maxkb-app
 
 WORKDIR /opt/maxkb-app
 RUN rm -rf /opt/maxkb-app/ui && \
@@ -31,6 +31,7 @@ RUN rm -rf /opt/maxkb-app/ui && \
     export PIP_TARGET=/opt/maxkb-app/sandbox/python-packages && \
     pip install requests pymysql psycopg2-binary && \
     rm -rf /opt/maxkb-app/installer
+COPY --from=web-build --chmod=700 ui /opt/maxkb-app/ui
 
 FROM ghcr.io/1panel-dev/maxkb-base:python3.11-pg17.5
 ARG DOCKER_IMAGE_TAG=dev \
@@ -61,11 +62,9 @@ ENV MAXKB_VERSION="${DOCKER_IMAGE_TAG} (build at ${BUILD_AT}, commit: ${GITHUB_C
 
 WORKDIR /opt/maxkb-app
 COPY --from=stage-build /opt/maxkb-app /opt/maxkb-app
-COPY --from=web-build ui /opt/maxkb-app/ui
 COPY --from=stage-build /opt/py3 /opt/py3
 
-RUN chmod 755 /tmp && \
-    find /opt/maxkb-app -mindepth 1 -not -name 'sandbox' -exec chmod 700 {} +
+RUN chmod 755 /tmp
 
 EXPOSE 8080
 VOLUME /opt/maxkb
