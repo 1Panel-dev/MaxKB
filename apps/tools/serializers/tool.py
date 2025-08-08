@@ -62,7 +62,7 @@ def get_file_name():
     file_name = f"{uuid.uuid7()}"
     pylint_dir = os.path.join(PROJECT_DIR, 'data', 'pylint')
     if not os.path.exists(pylint_dir):
-        os.makedirs(pylint_dir)
+        os.makedirs(pylint_dir, 0o700, exist_ok=True)
     return os.path.join(pylint_dir, file_name)
 
 

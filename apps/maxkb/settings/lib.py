@@ -15,7 +15,7 @@ from maxkb.const import CONFIG, PROJECT_DIR, LOG_DIR
 # celery相关配置
 celery_data_dir = os.path.join(PROJECT_DIR, 'data', 'celery_task')
 if not os.path.exists(celery_data_dir) or not os.path.isdir(celery_data_dir):
-    os.makedirs(celery_data_dir)
+    os.makedirs(celery_data_dir, 0o700, exist_ok=True)
 # Celery using redis as broker
 redis_celery_once_db = CONFIG.get("REDIS_DB")
 redis_celery_db = CONFIG.get('REDIS_DB')
