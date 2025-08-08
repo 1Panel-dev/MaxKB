@@ -63,6 +63,7 @@ def get_file_name():
     pylint_dir = os.path.join(PROJECT_DIR, 'data', 'pylint')
     if not os.path.exists(pylint_dir):
         os.makedirs(pylint_dir, 0o700, exist_ok=True)
+        os.chmod(os.path.dirname(pylint_dir), 0o700)
     return os.path.join(pylint_dir, file_name)
 
 
