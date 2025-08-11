@@ -8,19 +8,7 @@
   >
     <div class="display-settings">
       <!-- 应用图标 -->
-      <el-card shadow="never" class="mb-16">
-        <div class="flex-between mb-8">
-          <span class="setting-title">{{ $t('views.application.appIcon') }}</span>
-          <el-button size="small" @click="openIconDialog">
-            {{ $t('views.application.edit') }}
-          </el-button>
-        </div>
-        <div class="preview-item">
-          <el-avatar shape="square" :size="40" style="background: none">
-            <img :src="resetUrl(detail?.icon, resetUrl('./favicon.ico'))" alt="" />
-          </el-avatar>
-        </div>
-      </el-card>
+
 
       <!-- 聊天背景 -->
       <el-card shadow="never" class="mb-16">
@@ -40,7 +28,7 @@
       <!-- AI头像 -->
       <el-card shadow="never" class="mb-16">
         <div class="flex-between mb-8">
-          <span class="setting-title">{{ $t('views.application.aiAvatar') }}</span>
+          <span class="setting-title">{{ $t('views.application.aiAvatar') }}(485*485)</span>
           <el-button size="small" @click="openAvatarDialog">
             {{ $t('views.application.edit') }}
           </el-button>
@@ -56,7 +44,7 @@
       <!-- 用户头像 -->
       <el-card shadow="never" class="mb-16">
         <div class="flex-between mb-8">
-          <span class="setting-title">{{ $t('views.application.userAvatar') }}</span>
+          <span class="setting-title">{{ $t('views.application.userAvatar') }}(485*485)</span>
           <el-button size="small" @click="openUserAvatarDialog">
             {{ $t('views.application.edit') }}
           </el-button>
@@ -72,7 +60,7 @@
       <!-- 浮窗图标 -->
       <el-card shadow="never" class="mb-16">
         <div class="flex-between mb-8">
-          <span class="setting-title">{{ $t('views.application.floatIcon') }}</span>
+          <span class="setting-title">{{ $t('views.application.floatIcon') }}(64*64)</span>
           <el-button size="small" @click="openFloatIconDialog">
             {{ $t('views.application.edit') }}
           </el-button>
