@@ -421,5 +421,10 @@ onMounted(() => {
       background: var(--app-header-bg-color);
     }
   }
+  .theme-form {
+    :deep(.el-checkbox__input.is-checked + .el-checkbox__label) {
+      color: var(--el-checkbox-text-color);
+    }
+  }
 }
 </style>

@@ -201,9 +201,9 @@ const DocumentRouter = {
       name: 'KnowledgeChatUser',
       meta: {
         icon: 'app-user-chat',
-        iconActive: 'app-user-chat',
+        iconActive: 'app-user-chat-active',
         title: 'views.chatUser.title',
-        active: 'chat-log',
+        active: 'chat-user',
         parentPath: '/knowledge/:id/:folderId',
         parentName: 'KnowledgeDetail',
         resourceType: SourceTypeEnum.KNOWLEDGE,
