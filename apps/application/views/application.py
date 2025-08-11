@@ -13,12 +13,13 @@ from drf_spectacular.utils import extend_schema
 from rest_framework.parsers import MultiPartParser
 from rest_framework.request import Request
 from rest_framework.views import APIView
+from rest_framework.parsers import MultiPartParser
 
 from application.api.application_api import ApplicationCreateAPI, ApplicationQueryAPI, ApplicationImportAPI, \
-    ApplicationExportAPI, ApplicationOperateAPI, ApplicationEditAPI, TextToSpeechAPI, SpeechToTextAPI, PlayDemoTextAPI
+    ApplicationExportAPI, ApplicationOperateAPI, ApplicationEditAPI, TextToSpeechAPI, SpeechToTextAPI, PlayDemoTextAPI, ApplicationIconAPI
 from application.flow.step_node.condition_node.compare import Compare
 from application.models import Application
-from application.serializers.application import ApplicationSerializer, Query, ApplicationOperateSerializer
+from application.serializers.application import ApplicationSerializer, Query, ApplicationOperateSerializer, ApplicationIconSerializer
 from common import result
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions, get_is_permissions
@@ -359,3 +360,34 @@ class PlayDemoText(APIView):
                   'user_id': request.user.id}).play_demo_text(request.data)
         return HttpResponse(byte_data, status=200, headers={'Content-Type': 'audio/mp3',
                                                             'Content-Disposition': 'attachment; filename="abc.mp3"'})
+
+
+class ApplicationIcon(APIView):
+    authentication_classes = [TokenAuth]
+    parser_classes = [MultiPartParser]
+
+    @extend_schema(
+        methods=['PUT'],
+        summary=_('Edit application icon'),
+        operation_id=_('Edit application icon'),  # type: ignore
+        description=_('Edit application icon'),
+        request=ApplicationIconAPI.get_request(),
+        responses=ApplicationIconAPI.get_response(),
+        parameters=ApplicationIconAPI.get_parameters(),
+        tags=[_('Application')]  # type: ignore
+    )
+    @has_permissions(PermissionConstants.APPLICATION_EDIT.get_workspace_application_permission(),
+                     PermissionConstants.APPLICATION_EDIT.get_workspace_permission_workspace_manage_role(),
+                     ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                    [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                                    CompareConstants.AND),
+                     RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
+    @log(menu='Application', operate="Edit application icon",
+         get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')))
+    def put(self, request: Request, workspace_id: str, application_id: str):
+        return result.success(ApplicationIconSerializer(data={
+            'application_id': application_id,
+            'workspace_id': workspace_id,
+            'user_id': request.user.id,
+            'image': request.FILES.get('file')
+        }).edit())

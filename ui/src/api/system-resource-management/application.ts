@@ -259,6 +259,23 @@ const getMcpTools: (application_id: String, loading?: Ref<boolean>) => Promise<R
   return get(`${prefix}/${application_id}/mcp_tools`, undefined, loading)
 }
 
+/**
+ * 修改应用图标
+ * @param application_id 应用id
+ * @param file 图标文件
+ * @param loading 加载器
+ * @returns
+ */
+const putApplicationIcon: (
+  application_id: string,
+  file: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (application_id, file, loading) => {
+  const fd = new FormData()
+  fd.append('file', file)
+  return put(`${prefix}/${application_id}/icon`, fd, undefined, loading)
+}
+
 export default {
   getApplication,
   putApplication,
@@ -282,4 +299,5 @@ export default {
   postTextToSpeech,
   speechToText,
   getMcpTools,
+  putApplicationIcon,
 }

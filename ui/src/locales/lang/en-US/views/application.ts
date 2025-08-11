@@ -35,6 +35,11 @@ export default {
     saveErrorMessage: 'Saving failed, please check your input or try again later',
     loadingErrorMessage: 'Failed to load configuration, please check your input or try again later',
   },
+  editIcon: 'Edit Icon',
+  iconType: 'Icon Type',
+  defaultIcon: 'Default Icon',
+  customIcon: 'Custom Icon',
+  iconUploadTip: 'Supports JPG, PNG, GIF formats, maximum size 10MB',
 
   form: {
     appName: {

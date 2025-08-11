@@ -9,10 +9,13 @@
           </h4>
           <el-card shadow="never" class="overview-card" v-loading="loading">
             <div class="title flex align-center">
-              <div class="edit-avatar mr-12">
+              <div class="edit-avatar mr-12 cursor" @click="openEditIconDialog">
                 <el-avatar shape="square" :size="32" style="background: none">
                   <img :src="resetUrl(detail?.icon, resetUrl('./favicon.ico'))" alt="" />
                 </el-avatar>
+                <div class="edit-overlay">
+                  <el-icon><Edit /></el-icon>
+                </div>
               </div>
 
               <h4>{{ detail?.name || '-' }}</h4>
@@ -194,11 +197,14 @@
     <component :is="currentLimitDialog" ref="LimitDialogRef" @refresh="refresh" />
     <!-- 显示设置 -->
     <component :is="currentDisplaySettingDialog" ref="DisplaySettingDialogRef" @refresh="refresh" />
+    <!-- 图标编辑 -->
+    <EditApplicationIconDialog ref="EditApplicationIconDialogRef" @refresh="refreshIcon" />
   </div>
 </template>
 <script setup lang="ts">
 import { ref, computed, onMounted, shallowRef, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
+import { Edit } from '@element-plus/icons-vue'
 import EmbedDialog from './component/EmbedDialog.vue'
 import APIKeyDialog from './component/APIKeyDialog.vue'
 import LimitDialog from './component/LimitDialog.vue'
@@ -206,6 +212,7 @@ import XPackLimitDrawer from './xpack-component/XPackLimitDrawer.vue'
 import DisplaySettingDialog from './component/DisplaySettingDialog.vue'
 import XPackDisplaySettingDialog from './xpack-component/XPackDisplaySettingDialog.vue'
 import StatisticsCharts from './component/StatisticsCharts.vue'
+import EditApplicationIconDialog from './component/EditApplicationIconDialog.vue'
 import { nowDate, beforeDay } from '@/utils/time'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { copyClick } from '@/utils/clipboard'
@@ -240,6 +247,7 @@ const baseUrl = window.location.origin + `${window.MaxKB.chatPrefix}/api/`
 
 const APIKeyDialogRef = ref()
 const EmbedDialogRef = ref()
+const EditApplicationIconDialogRef = ref()
 
 const accessToken = ref<any>({})
 const detail = ref<any>(null)
@@ -456,6 +464,16 @@ function refresh() {
   getAccessToken()
 }
 
+function openEditIconDialog() {
+  EditApplicationIconDialogRef.value?.open(detail.value)
+}
+
+function refreshIcon(newIcon: string) {
+  if (detail.value) {
+    detail.value.icon = newIcon
+  }
+}
+
 onMounted(() => {
   getDetail()
   getAccessToken()
@@ -470,6 +488,30 @@ onMounted(() => {
     position: absolute;
     right: 16px;
     top: 21px;
+  }
+}
+
+.edit-avatar {
+  position: relative;
+
+  .edit-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s;
+    border-radius: 6px;
+    color: white;
+  }
+
+  &:hover .edit-overlay {
+    opacity: 1;
   }
 }
 </style>

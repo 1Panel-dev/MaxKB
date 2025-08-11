@@ -32,6 +32,11 @@ export default {
     saveErrorMessage: '儲存失敗，請檢查輸入或稍後再試',
     loadingErrorMessage: '載入配置失敗，請檢查輸入或稍後再試',
   },
+  editIcon: '編輯圖示',
+  iconType: '圖示類型',
+  defaultIcon: '預設圖示',
+  customIcon: '自訂圖示',
+  iconUploadTip: '支援 JPG、PNG、GIF 格式，大小不超過 10MB',
   form: {
     appName: {
       label: '名稱',

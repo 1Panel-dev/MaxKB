@@ -33,9 +33,9 @@ from common import result
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import native_search, native_page_search
 from common.exception.app_exception import AppApiException
-from common.field.common import UploadedFileField
+from common.field.common import UploadedFileField, UploadedImageField
 from common.utils.common import get_file_content, restricted_loads, generate_uuid, _remove_empty_lines
-from knowledge.models import Knowledge, KnowledgeScope
+from knowledge.models import Knowledge, KnowledgeScope, File, FileSourceType
 from knowledge.serializers.knowledge import KnowledgeSerializer, KnowledgeModelSerializer
 from maxkb.conf import PROJECT_DIR
 from models_provider.models import Model
@@ -953,3 +953,54 @@ class ApplicationOperateSerializer(serializers.Serializer):
         tts_model_id = instance.pop('tts_model_id')
         model = get_model_instance_by_model_workspace_id(tts_model_id, self.data.get('workspace_id'), **instance)
         return model.text_to_speech(text)
+
+
+class ApplicationIconSerializer(serializers.Serializer):
+    application_id = serializers.UUIDField(required=True, label=_("Application ID"))
+    workspace_id = serializers.CharField(required=True, label=_("Workspace ID"))
+    user_id = serializers.UUIDField(required=True, label=_("User ID"))
+    image = UploadedImageField(required=False, allow_null=True, label=_("Application Icon"))
+
+    def is_valid(self, *, raise_exception=False):
+        super().is_valid(raise_exception=True)
+        workspace_id = self.data.get('workspace_id')
+        query_set = QuerySet(Application).filter(id=self.data.get('application_id'))
+        if workspace_id:
+            query_set = query_set.filter(workspace_id=workspace_id)
+        if not query_set.exists():
+            raise AppApiException(500, _('Application id does not exist'))
+
+    def edit(self, with_valid=True):
+        if with_valid:
+            self.is_valid(raise_exception=True)
+        application = QuerySet(Application).filter(id=self.data.get('application_id')).first()
+        if application is None:
+            raise AppApiException(500, _('Application does not exist'))
+
+        # 删除旧的图片
+        if application.icon and application.icon != './favicon.ico' and application.icon.startswith('./oss/file/'):
+            old_file_id = application.icon.split('/')[-1]
+            QuerySet(File).filter(id=old_file_id).delete()
+
+        # 处理新图片
+        if self.data.get('image') is None:
+            # 重置为默认图标
+            application.icon = './favicon.ico'
+        else:
+            # 上传新图片
+            meta = {
+                'debug': False
+            }
+            file_id = uuid.uuid7()
+            file = File(
+                id=file_id,
+                file_name=self.data.get('image').name,
+                source_type=FileSourceType.APPLICATION,
+                source_id=application.id,
+                meta=meta
+            )
+            file.save(self.data.get('image').read())
+            application.icon = f'./oss/file/{file_id}'
+
+        application.save()
+        return application.icon

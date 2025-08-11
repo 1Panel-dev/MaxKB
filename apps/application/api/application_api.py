@@ -209,3 +209,42 @@ class PlayDemoTextAPI(APIMixin):
     @staticmethod
     def get_response():
         return DefaultResultSerializer
+
+
+class ApplicationIconAPI(APIMixin):
+    @staticmethod
+    def get_parameters():
+        return [
+            OpenApiParameter(
+                name="workspace_id",
+                description="工作空间id",
+                type=OpenApiTypes.STR,
+                location='path',
+                required=True,
+            ),
+            OpenApiParameter(
+                name="application_id",
+                description="应用id",
+                type=OpenApiTypes.STR,
+                location='path',
+                required=True,
+            ),
+        ]
+
+    @staticmethod
+    def get_request():
+        return {
+            'multipart/form-data': {
+                'type': 'object',
+                'properties': {
+                    'file': {
+                        'type': 'string',
+                        'format': 'binary'  # Tells Swagger it's a file
+                    }
+                }
+            }
+        }
+
+    @staticmethod
+    def get_response():
+        return DefaultResultSerializer

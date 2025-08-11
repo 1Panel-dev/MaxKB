@@ -33,6 +33,11 @@ export default {
     saveErrorMessage: '保存失败，请检查输入或稍后再试',
     loadingErrorMessage: '加载配置失败，请检查输入或稍后再试',
   },
+  editIcon: '编辑图标',
+  iconType: '图标类型',
+  defaultIcon: '默认图标',
+  customIcon: '自定义图标',
+  iconUploadTip: '支持 JPG、PNG、GIF 格式，大小不超过 10MB',
   form: {
     appName: {
       label: '名称',

@@ -34,6 +34,7 @@ urlpatterns = [
     path('workspace/<str:workspace_id>/application/<str:application_id>/speech_to_text', views.SpeechToText.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/play_demo_text', views.PlayDemoText.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/mcp_tools', views.McpServers.as_view()),
+    path('workspace/<str:workspace_id>/application/<str:application_id>/icon', views.ApplicationIcon.as_view()),
     path('chat_message/<str:chat_id>', views.ChatView.as_view()),
 
 ]
