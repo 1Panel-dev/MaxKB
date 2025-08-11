@@ -8685,3 +8685,15 @@ msgstr "未发布"
 
 msgid "Published"
 msgstr "已发布"
+
+msgid "users_permission"
+msgstr "用户权限"
+
+msgid "Get user authorization status of resource"
+msgstr "获取资源对用户的授权状态"
+
+msgid "Edit user authorization status of resource"
+msgstr "修改资源对用户的授权状态"
+
+msgid "Get user authorization status of resource by page"
+msgstr "分页获取资源对用户的授权状态"
