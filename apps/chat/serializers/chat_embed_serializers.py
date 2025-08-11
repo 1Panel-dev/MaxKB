@@ -63,6 +63,27 @@ class ChatEmbedSerializer(serializers.Serializer):
                         application_setting.custom_theme.get('header_font_color', 'rgb(100, 106, 115)')) > 0:
                     header_font_color = application_setting.custom_theme.get('header_font_color',
                                                                              'rgb(100, 106, 115)')
+        else:
+            # 社区版：从 Application 或 ApplicationVersion 读取 float_icon
+            application = application_access_token.application
+            # 首先尝试从最新的 ApplicationVersion 获取
+            from application.models import ApplicationVersion
+            latest_version = QuerySet(ApplicationVersion).filter(
+                application_id=application.id).order_by('-create_time').first()
+
+            # 如果有版本记录且有 float_icon，使用版本中的数据
+            if latest_version and hasattr(latest_version, 'float_icon') and latest_version.float_icon:
+                community_float_icon = latest_version.float_icon
+            # 否则使用 Application 中的数据
+            elif hasattr(application, 'float_icon') and application.float_icon:
+                community_float_icon = application.float_icon
+            else:
+                community_float_icon = None
+
+            # 如果找到了自定义的 float_icon，使用它
+            if community_float_icon:
+                float_icon = community_float_icon[1:] if community_float_icon.startswith('.') else community_float_icon
+                float_icon = f"{self.data.get('protocol')}://{self.data.get('host')}{CONFIG.get_chat_path()}{float_icon}"
 
         is_auth = 'true' if application_access_token is not None and application_access_token.is_active else 'false'
         t = Template(content)

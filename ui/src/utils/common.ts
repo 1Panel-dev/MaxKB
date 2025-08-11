@@ -25,7 +25,12 @@ export function filesize(size: number) {
 // 头像
 export const defaultIcon = '/${window.MaxKB.prefix}/favicon.ico'
 export function isAppIcon(url: string | undefined) {
-  return url === defaultIcon ? '' : url
+  // 如果没有URL或者是默认图标，返回false
+  if (!url || url === './favicon.ico' || url === defaultIcon) {
+    return false
+  }
+  // 自定义图标（以./oss/file/开头）或其他非默认图标返回true
+  return true
 }
 
 export function isFunction(fn: any) {
