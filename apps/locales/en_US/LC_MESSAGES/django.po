@@ -8559,3 +8559,15 @@ msgstr ""
 
 msgid "Published"
 msgstr ""
+
+msgid "users_permission"
+msgstr ""
+
+msgid "Get user authorization status of resource"
+msgstr ""
+
+msgid "Edit user authorization status of resource"
+msgstr ""
+
+msgid "Get user authorization status of resource by page"
+msgstr ""
