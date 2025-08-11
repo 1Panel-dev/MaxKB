@@ -73,6 +73,7 @@ class ToolView(APIView):
                 'folder_id': request.query_params.get('folder_id'),
                 'name': request.query_params.get('name'),
                 'scope': request.query_params.get('scope', ToolScope.WORKSPACE),
+                'tool_type': request.query_params.get('tool_type'),
                 'user_id': request.user.id,
                 'create_user': request.query_params.get('create_user'),
             }
@@ -209,10 +210,42 @@ class ToolView(APIView):
                     'folder_id': request.query_params.get('folder_id'),
                     'name': request.query_params.get('name'),
                     'scope': request.query_params.get('scope'),
+                    'tool_type': request.query_params.get('tool_type'),
                     'user_id': request.user.id,
                     'create_user': request.query_params.get('create_user'),
                 }
             ).page_tool_with_folders(current_page, page_size))
+
+    class Query(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['GET'],
+            description=_('Get tool list '),
+            summary=_('Get tool list'),
+            operation_id=_('Get tool list'),  # type: ignore
+            parameters=ToolReadAPI.get_parameters(),
+            responses=ToolReadAPI.get_response(),
+            tags=[_('Tool')]  # type: ignore
+        )
+        @has_permissions(
+            PermissionConstants.TOOL_READ.get_workspace_permission(),
+            PermissionConstants.TOOL_READ.get_workspace_permission_workspace_manage_role(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
+        )
+        @log(menu='Tool', operate='Get tool list')
+        def get(self, request: Request, workspace_id: str):
+            return result.success(ToolSerializer.Query(
+                data={
+                    'workspace_id': workspace_id,
+                    'folder_id': request.query_params.get('folder_id'),
+                    'name': request.query_params.get('name'),
+                    'scope': request.query_params.get('scope'),
+                    'tool_type': request.query_params.get('tool_type'),
+                    'user_id': request.user.id,
+                    'create_user': request.query_params.get('create_user'),
+                }
+            ).get_tools())
 
     class Import(APIView):
         authentication_classes = [TokenAuth]

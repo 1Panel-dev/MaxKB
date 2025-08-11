@@ -18,6 +18,16 @@ const getToolList: (data?: any, loading?: Ref<boolean>) => Promise<Result<Array<
 }
 
 /**
+ * 工具列表带分页（无分页）
+ */
+const getAllToolList: (data?: any, loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (
+  data,
+  loading,
+) => {
+  return get(`${prefix}/tool_list`, data, loading)
+}
+
+/**
  * 工具列表带分页
  * @param 参数
  * param  {
@@ -135,6 +145,7 @@ const addInternalTool: (
 
 export default {
   getToolList,
+  getAllToolList,
   getToolListPage,
   putTool,
   getToolById,

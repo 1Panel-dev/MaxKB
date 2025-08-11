@@ -20,6 +20,13 @@
           {{ $t('views.shared.shared_tool') }}
         </h2>
         <FolderBreadcrumb :folderList="folderList" @click="folderClickHandle" v-else />
+        <div class="mt-16 mb-16">
+          <el-radio-group v-model="toolType" @change="radioChange" class="app-radio-button-group">
+            <el-radio-button value="">{{ $t('views.tool.all') }}</el-radio-button>
+            <el-radio-button value="CUSTOM">{{ $t('views.tool.title') }}</el-radio-button>
+            <el-radio-button value="MCP">MCP</el-radio-button>
+          </el-radio-group>
+        </div>
       </template>
     </ToolListContainer>
   </LayoutContainer>
@@ -49,6 +56,7 @@ const permissionPrecise = computed(() => {
 })
 
 const loading = ref(false)
+const toolType = ref('')
 
 const folderList = ref<any[]>([])
 
@@ -69,6 +77,10 @@ function folderClickHandle(row: any) {
   }
   folder.setCurrentFolder(row)
   tool.setToolList([])
+}
+
+function radioChange() {
+  tool.setToolType(toolType.value)
 }
 
 function refreshFolder() {

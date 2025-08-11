@@ -31,6 +31,7 @@ class ToolScope(models.TextChoices):
 class ToolType(models.TextChoices):
     INTERNAL = "INTERNAL", '内置'
     CUSTOM = "CUSTOM", "自定义"
+    MCP = "MCP", "MCP工具"
 
 
 class Tool(AppModelMixin):

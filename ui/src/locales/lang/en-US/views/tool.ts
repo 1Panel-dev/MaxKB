@@ -1,5 +1,6 @@
 export default {
   title: 'Tool',
+  all: 'All',
   createTool: 'Create Tool',
   editTool: 'Edit Tool',
   copyTool: 'Copy Tool',
@@ -65,6 +66,11 @@ export default {
       code: 'Content (Python)',
       selectPlaceholder: 'Please select parameter',
       inputPlaceholder: 'Please enter parameter values',
+    },
+    mcp: {
+      label: 'MCP Server Config',
+      placeholder: 'Please enter MCP Server config',
+      tip: 'Only supports SSE and Streamable HTTP calling methods',
     },
     debug: {
       run: 'Run',
