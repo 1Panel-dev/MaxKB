@@ -100,7 +100,8 @@ class ApplicationProfileSerializer(serializers.Serializer):
             'stt_model_id': 'stt_model_id', 'tts_model_enable': 'tts_model_enable',
             'stt_model_enable': 'stt_model_enable', 'tts_type': 'tts_type',
             'tts_autoplay': 'tts_autoplay', 'stt_autosend': 'stt_autosend', 'file_upload_enable': 'file_upload_enable',
-            'file_upload_setting': 'file_upload_setting'
+            'file_upload_setting': 'file_upload_setting', 'icon': 'icon', 'chat_background': 'chat_background',
+            'avatar': 'avatar', 'user_avatar': 'user_avatar', 'float_icon': 'float_icon'
         }
         for (version_field, app_field) in update_field_dict.items():
             _v = getattr(application_version, version_field)
