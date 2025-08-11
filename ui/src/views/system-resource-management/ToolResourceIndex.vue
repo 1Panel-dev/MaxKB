@@ -72,9 +72,14 @@
 
         <el-table-column prop="tool_type" :label="$t('views.system.resource_management.type')">
           <template #default="scope">
+            <span v-if="scope.row.tool_type === 'MCP'">
+              MCP
+            </span>
+            <span v-else>
             {{
-              $t(ToolType[scope.row.template_id ? 'INTERNAL' : ('CUSTOM' as keyof typeof ToolType)])
+                $t(ToolType[scope.row.template_id ? 'INTERNAL' : ('CUSTOM' as keyof typeof ToolType)])
             }}
+            </span>
           </template>
         </el-table-column>
         <el-table-column :label="$t('common.status.label')" width="120">

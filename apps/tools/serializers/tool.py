@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
+import asyncio
 import io
 import json
 import os
 import pickle
 import re
+from typing import Dict
 
 import uuid_utils.compat as uuid
 from django.core import validators
@@ -12,6 +14,7 @@ from django.db.models import QuerySet, Q
 from django.http import HttpResponse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from langchain_mcp_adapters.client import MultiServerMCPClient
 from pylint.lint import Run
 from pylint.reporters import JSON2Reporter
 from rest_framework import serializers, status
@@ -22,6 +25,7 @@ from common.exception.app_exception import AppApiException
 from common.field.common import UploadedImageField
 from common.result import result
 from common.utils.common import get_file_content
+from common.utils.logger import maxkb_logger
 from common.utils.rsa_util import rsa_long_decrypt, rsa_long_encrypt
 from common.utils.tool_code import ToolExecutor
 from knowledge.models import File, FileSourceType
@@ -101,6 +105,18 @@ def encryption(message: str):
                message_len)])
     content = "***************"
     return pre_str + content + end_str
+
+
+def validate_mcp_config(servers: Dict):
+    async def validate():
+        client = MultiServerMCPClient(servers)
+        await client.get_tools()
+
+    try:
+        asyncio.run(validate())
+    except Exception as e:
+        maxkb_logger.error(f"validate mcp config error: {e}, servers: {servers}")
+        raise serializers.ValidationError(_('MCP configuration is invalid'))
 
 
 class ToolModelSerializer(serializers.ModelSerializer):
@@ -201,6 +217,131 @@ class PylintInstance(serializers.Serializer):
 
 
 class ToolSerializer(serializers.Serializer):
+    class Query(serializers.Serializer):
+        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+        folder_id = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_('folder id'))
+        name = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('tool name'))
+        user_id = serializers.UUIDField(required=False, allow_null=True, label=_('user id'))
+        scope = serializers.CharField(required=True, label=_('scope'))
+        tool_type = serializers.CharField(required=False, label=_('tool type'), allow_null=True, allow_blank=True)
+        create_user = serializers.UUIDField(required=False, label=_('create user'), allow_null=True)
+
+        def get_query_set(self, workspace_manage, is_x_pack_ee):
+            tool_query_set = QuerySet(Tool).filter(workspace_id=self.data.get('workspace_id'))
+            folder_query_set = QuerySet(ToolFolder)
+            default_query_set = QuerySet(Tool)
+
+            workspace_id = self.data.get('workspace_id')
+            user_id = self.data.get('user_id')
+            scope = self.data.get('scope')
+            tool_type = self.data.get('tool_type')
+            desc = self.data.get('desc')
+            name = self.data.get('name')
+            folder_id = self.data.get('folder_id')
+            create_user = self.data.get('create_user')
+
+            if workspace_id is not None:
+                folder_query_set = folder_query_set.filter(workspace_id=workspace_id)
+                default_query_set = default_query_set.filter(workspace_id=workspace_id)
+            if folder_id is not None:
+                folder_query_set = folder_query_set.filter(parent=folder_id)
+                default_query_set = default_query_set.filter(folder_id=folder_id)
+            if name is not None:
+                folder_query_set = folder_query_set.filter(name__icontains=name)
+                default_query_set = default_query_set.filter(name__icontains=name)
+            if desc is not None:
+                folder_query_set = folder_query_set.filter(desc__icontains=desc)
+                default_query_set = default_query_set.filter(desc__icontains=desc)
+            if create_user is not None:
+                tool_query_set = tool_query_set.filter(user_id=create_user)
+                folder_query_set = folder_query_set.filter(user_id=create_user)
+
+            default_query_set = default_query_set.order_by("-create_time")
+
+            if scope is not None:
+                tool_query_set = tool_query_set.filter(scope=scope)
+            if tool_type:
+                tool_query_set = tool_query_set.filter(tool_type=tool_type)
+
+            query_set_dict = {
+                'folder_query_set': folder_query_set,
+                'tool_query_set': tool_query_set,
+                'default_query_set': default_query_set,
+            }
+            if not workspace_manage:
+                query_set_dict['workspace_user_resource_permission_query_set'] = QuerySet(
+                    WorkspaceUserResourcePermission).filter(
+                    auth_target_type="TOOL",
+                    workspace_id=workspace_id,
+                    user_id=user_id
+                )
+            return query_set_dict
+
+        def get_authorized_query_set(self):
+            default_query_set = QuerySet(Tool)
+            tool_type = self.data.get('tool_type')
+            desc = self.data.get('desc')
+            name = self.data.get('name')
+            create_user = self.data.get('create_user')
+
+            default_query_set = default_query_set.filter(workspace_id='None')
+            default_query_set = default_query_set.filter(scope=ToolScope.SHARED)
+            if name is not None:
+                default_query_set = default_query_set.filter(name__icontains=name)
+            if desc is not None:
+                default_query_set = default_query_set.filter(desc__icontains=desc)
+            if create_user is not None:
+                default_query_set = default_query_set.filter(user_id=create_user)
+            if tool_type:
+                default_query_set = default_query_set.filter(tool_type=tool_type)
+
+            default_query_set = default_query_set.order_by("-create_time")
+
+            return default_query_set
+
+        @staticmethod
+        def is_x_pack_ee():
+            workspace_user_role_mapping_model = DatabaseModelManage.get_model("workspace_user_role_mapping")
+            role_permission_mapping_model = DatabaseModelManage.get_model("role_permission_mapping_model")
+            return workspace_user_role_mapping_model is not None and role_permission_mapping_model is not None
+
+        def get_tools(self):
+            self.is_valid(raise_exception=True)
+
+            workspace_manage = is_workspace_manage(self.data.get('user_id'), self.data.get('workspace_id'))
+            is_x_pack_ee = self.is_x_pack_ee()
+            results = native_search(
+                self.get_query_set(workspace_manage, is_x_pack_ee),
+                get_file_content(
+                    os.path.join(
+                        PROJECT_DIR,
+                        "apps", "tools", 'sql',
+                        'list_tool.sql' if workspace_manage else (
+                            'list_tool_user_ee.sql' if is_x_pack_ee else 'list_tool_user.sql'
+                        )
+                    )
+                ),
+            )
+
+            get_authorized_tool = DatabaseModelManage.get_model("get_authorized_tool")
+            shared_queryset = QuerySet(Tool).none()
+            if get_authorized_tool is not None:
+                shared_queryset = self.get_authorized_query_set()
+                shared_queryset = get_authorized_tool(shared_queryset, self.data.get('workspace_id'))
+
+            return {
+                'shared_tools': [
+                    ToolModelSerializer(data).data for data in shared_queryset
+                ],
+                'tools': [
+                    {
+                        **tool,
+                        'input_field_list': json.loads(tool.get('input_field_list', '[]')),
+                        'init_field_list': json.loads(tool.get('init_field_list', '[]')),
+                    } for tool in results if tool['resource_type'] == 'tool'
+                ],
+            }
+
     class Create(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, label=_('user id'))
         workspace_id = serializers.CharField(required=True, label=_('workspace id'))
@@ -212,6 +353,10 @@ class ToolSerializer(serializers.Serializer):
                 ToolCreateRequest(data=instance).is_valid(raise_exception=True)
                 # 校验代码是否包括禁止的关键字
                 ToolExecutor().validate_banned_keywords(instance.get('code', ''))
+                # 校验mcp json
+                if instance.get('tool_type') == ToolType.MCP.value:
+                    validate_mcp_config(json.loads(instance.get('code')))
+
             tool_id = uuid.uuid7()
             Tool(
                 id=tool_id,
@@ -223,6 +368,7 @@ class ToolSerializer(serializers.Serializer):
                 input_field_list=instance.get('input_field_list', []),
                 init_field_list=instance.get('init_field_list', []),
                 scope=instance.get('scope', ToolScope.WORKSPACE),
+                tool_type=instance.get('tool_type', ToolType.CUSTOM),
                 folder_id=instance.get('folder_id', self.data.get('workspace_id')),
                 is_active=False
             ).save()
@@ -326,6 +472,10 @@ class ToolSerializer(serializers.Serializer):
                 ToolEditRequest(data=instance).is_valid(raise_exception=True)
                 # 校验代码是否包括禁止的关键字
                 ToolExecutor().validate_banned_keywords(instance.get('code', ''))
+                # 校验mcp json
+                if instance.get('tool_type') == ToolType.MCP.value:
+                    validate_mcp_config(json.loads(instance.get('code')))
+
             if not QuerySet(Tool).filter(id=self.data.get('id')).exists():
                 raise serializers.ValidationError(_('Tool not found'))
 
@@ -574,6 +724,7 @@ class ToolTreeSerializer(serializers.Serializer):
         name = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('tool name'))
         user_id = serializers.UUIDField(required=False, allow_null=True, label=_('user id'))
         scope = serializers.CharField(required=True, label=_('scope'))
+        tool_type = serializers.CharField(required=False, label=_('tool type'), allow_null=True, allow_blank=True)
         create_user = serializers.UUIDField(required=False, label=_('create user'), allow_null=True)
 
         def page_tool(self, current_page: int, page_size: int):
@@ -609,6 +760,7 @@ class ToolTreeSerializer(serializers.Serializer):
             workspace_id = self.data.get('workspace_id')
             user_id = self.data.get('user_id')
             scope = self.data.get('scope')
+            tool_type = self.data.get('tool_type')
             desc = self.data.get('desc')
             name = self.data.get('name')
             folder_id = self.data.get('folder_id')
@@ -634,6 +786,8 @@ class ToolTreeSerializer(serializers.Serializer):
 
             if scope is not None:
                 tool_query_set = tool_query_set.filter(scope=scope)
+            if tool_type:
+                tool_query_set = tool_query_set.filter(tool_type=tool_type)
 
             query_set_dict = {
                 'folder_query_set': folder_query_set,
