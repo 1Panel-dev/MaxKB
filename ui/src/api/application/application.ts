@@ -360,6 +360,74 @@ const putApplicationIcon: (
   return put(`${prefix.value}/${application_id}/icon`, fd, undefined, loading)
 }
 
+/**
+ * 修改应用聊天背景
+ * @param application_id 应用id
+ * @param file 背景图片文件
+ * @param loading 加载器
+ * @returns
+ */
+const putApplicationChatBackground: (
+  application_id: string,
+  file: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (application_id, file, loading) => {
+  const fd = new FormData()
+  fd.append('file', file)
+  return put(`${prefix.value}/${application_id}/chat_background`, fd, undefined, loading)
+}
+
+/**
+ * 修改应用AI头像
+ * @param application_id 应用id
+ * @param file 头像文件
+ * @param loading 加载器
+ * @returns
+ */
+const putApplicationAvatar: (
+  application_id: string,
+  file: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (application_id, file, loading) => {
+  const fd = new FormData()
+  fd.append('file', file)
+  return put(`${prefix.value}/${application_id}/avatar`, fd, undefined, loading)
+}
+
+/**
+ * 修改应用用户头像
+ * @param application_id 应用id
+ * @param file 头像文件
+ * @param loading 加载器
+ * @returns
+ */
+const putApplicationUserAvatar: (
+  application_id: string,
+  file: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (application_id, file, loading) => {
+  const fd = new FormData()
+  fd.append('file', file)
+  return put(`${prefix.value}/${application_id}/user_avatar`, fd, undefined, loading)
+}
+
+/**
+ * 修改应用浮窗图标
+ * @param application_id 应用id
+ * @param file 图标文件
+ * @param loading 加载器
+ * @returns
+ */
+const putApplicationFloatIcon: (
+  application_id: string,
+  file: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (application_id, file, loading) => {
+  const fd = new FormData()
+  fd.append('file', file)
+  return put(`${prefix.value}/${application_id}/float_icon`, fd, undefined, loading)
+}
+
 export default {
   getAllApplication,
   getApplication,
@@ -388,4 +456,8 @@ export default {
   getMcpTools,
   postUploadFile,
   putApplicationIcon,
+  putApplicationChatBackground,
+  putApplicationAvatar,
+  putApplicationUserAvatar,
+  putApplicationFloatIcon,
 }

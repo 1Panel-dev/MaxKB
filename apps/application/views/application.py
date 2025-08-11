@@ -16,10 +16,12 @@ from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser
 
 from application.api.application_api import ApplicationCreateAPI, ApplicationQueryAPI, ApplicationImportAPI, \
-    ApplicationExportAPI, ApplicationOperateAPI, ApplicationEditAPI, TextToSpeechAPI, SpeechToTextAPI, PlayDemoTextAPI, ApplicationIconAPI
+    ApplicationExportAPI, ApplicationOperateAPI, ApplicationEditAPI, TextToSpeechAPI, SpeechToTextAPI, PlayDemoTextAPI, ApplicationIconAPI, \
+    ApplicationChatBackgroundAPI, ApplicationAvatarAPI, ApplicationUserAvatarAPI, ApplicationFloatIconAPI
 from application.flow.step_node.condition_node.compare import Compare
 from application.models import Application
-from application.serializers.application import ApplicationSerializer, Query, ApplicationOperateSerializer, ApplicationIconSerializer
+from application.serializers.application import ApplicationSerializer, Query, ApplicationOperateSerializer, ApplicationIconSerializer, \
+    ApplicationChatBackgroundSerializer, ApplicationAvatarSerializer, ApplicationUserAvatarSerializer, ApplicationFloatIconSerializer
 from common import result
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions, get_is_permissions
@@ -386,6 +388,130 @@ class ApplicationIcon(APIView):
          get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')))
     def put(self, request: Request, workspace_id: str, application_id: str):
         return result.success(ApplicationIconSerializer(data={
+            'application_id': application_id,
+            'workspace_id': workspace_id,
+            'user_id': request.user.id,
+            'image': request.FILES.get('file')
+        }).edit())
+
+
+class ApplicationChatBackground(APIView):
+    authentication_classes = [TokenAuth]
+    parser_classes = [MultiPartParser]
+
+    @extend_schema(
+        methods=['PUT'],
+        summary=_('Edit application chat background'),
+        operation_id=_('Edit application chat background'),
+        description=_('Edit application chat background'),
+        request=ApplicationChatBackgroundAPI.get_request(),
+        responses=ApplicationChatBackgroundAPI.get_response(),
+        parameters=ApplicationChatBackgroundAPI.get_parameters(),
+        tags=[_('Application')]
+    )
+    @has_permissions(PermissionConstants.APPLICATION_EDIT.get_workspace_application_permission(),
+                     PermissionConstants.APPLICATION_EDIT.get_workspace_permission_workspace_manage_role(),
+                     ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                    [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                                    CompareConstants.AND),
+                     RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
+    @log(menu='Application', operate="Edit application chat background",
+         get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')))
+    def put(self, request: Request, workspace_id: str, application_id: str):
+        return result.success(ApplicationChatBackgroundSerializer(data={
+            'application_id': application_id,
+            'workspace_id': workspace_id,
+            'user_id': request.user.id,
+            'image': request.FILES.get('file')
+        }).edit())
+
+
+class ApplicationAvatar(APIView):
+    authentication_classes = [TokenAuth]
+    parser_classes = [MultiPartParser]
+
+    @extend_schema(
+        methods=['PUT'],
+        summary=_('Edit application AI avatar'),
+        operation_id=_('Edit application AI avatar'),
+        description=_('Edit application AI avatar'),
+        request=ApplicationAvatarAPI.get_request(),
+        responses=ApplicationAvatarAPI.get_response(),
+        parameters=ApplicationAvatarAPI.get_parameters(),
+        tags=[_('Application')]
+    )
+    @has_permissions(PermissionConstants.APPLICATION_EDIT.get_workspace_application_permission(),
+                     PermissionConstants.APPLICATION_EDIT.get_workspace_permission_workspace_manage_role(),
+                     ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                    [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                                    CompareConstants.AND),
+                     RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
+    @log(menu='Application', operate="Edit application AI avatar",
+         get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')))
+    def put(self, request: Request, workspace_id: str, application_id: str):
+        return result.success(ApplicationAvatarSerializer(data={
+            'application_id': application_id,
+            'workspace_id': workspace_id,
+            'user_id': request.user.id,
+            'image': request.FILES.get('file')
+        }).edit())
+
+
+class ApplicationUserAvatar(APIView):
+    authentication_classes = [TokenAuth]
+    parser_classes = [MultiPartParser]
+
+    @extend_schema(
+        methods=['PUT'],
+        summary=_('Edit application user avatar'),
+        operation_id=_('Edit application user avatar'),
+        description=_('Edit application user avatar'),
+        request=ApplicationUserAvatarAPI.get_request(),
+        responses=ApplicationUserAvatarAPI.get_response(),
+        parameters=ApplicationUserAvatarAPI.get_parameters(),
+        tags=[_('Application')]
+    )
+    @has_permissions(PermissionConstants.APPLICATION_EDIT.get_workspace_application_permission(),
+                     PermissionConstants.APPLICATION_EDIT.get_workspace_permission_workspace_manage_role(),
+                     ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                    [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                                    CompareConstants.AND),
+                     RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
+    @log(menu='Application', operate="Edit application user avatar",
+         get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')))
+    def put(self, request: Request, workspace_id: str, application_id: str):
+        return result.success(ApplicationUserAvatarSerializer(data={
+            'application_id': application_id,
+            'workspace_id': workspace_id,
+            'user_id': request.user.id,
+            'image': request.FILES.get('file')
+        }).edit())
+
+
+class ApplicationFloatIcon(APIView):
+    authentication_classes = [TokenAuth]
+    parser_classes = [MultiPartParser]
+
+    @extend_schema(
+        methods=['PUT'],
+        summary=_('Edit application float icon'),
+        operation_id=_('Edit application float icon'),
+        description=_('Edit application float icon'),
+        request=ApplicationFloatIconAPI.get_request(),
+        responses=ApplicationFloatIconAPI.get_response(),
+        parameters=ApplicationFloatIconAPI.get_parameters(),
+        tags=[_('Application')]
+    )
+    @has_permissions(PermissionConstants.APPLICATION_EDIT.get_workspace_application_permission(),
+                     PermissionConstants.APPLICATION_EDIT.get_workspace_permission_workspace_manage_role(),
+                     ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                    [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                                    CompareConstants.AND),
+                     RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
+    @log(menu='Application', operate="Edit application float icon",
+         get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')))
+    def put(self, request: Request, workspace_id: str, application_id: str):
+        return result.success(ApplicationFloatIconSerializer(data={
             'application_id': application_id,
             'workspace_id': workspace_id,
             'user_id': request.user.id,

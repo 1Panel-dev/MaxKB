@@ -74,6 +74,14 @@ class Application(AppModelMixin):
     tts_model_params_setting = models.JSONField(verbose_name="模型参数相关设置", default=dict)
     problem_optimization = models.BooleanField(verbose_name="问题优化", default=False)
     icon = models.CharField(max_length=256, verbose_name="应用icon", default="./favicon.ico")
+    # 聊天背景
+    chat_background = models.CharField(verbose_name="聊天背景", max_length=256, default='')
+    # AI头像
+    avatar = models.CharField(verbose_name="AI头像", max_length=256, default='')
+    # 用户头像
+    user_avatar = models.CharField(verbose_name="用户头像", max_length=256, default='')
+    # 浮窗图标
+    float_icon = models.CharField(verbose_name="浮窗图标", max_length=256, default='')
     work_flow = models.JSONField(verbose_name="工作流数据", default=dict)
     type = models.CharField(verbose_name="应用类型", choices=ApplicationTypeChoices.choices,
                             default=ApplicationTypeChoices.SIMPLE, max_length=256)
@@ -140,6 +148,14 @@ class ApplicationVersion(AppModelMixin):
     tts_model_params_setting = models.JSONField(verbose_name="模型参数相关设置", default=dict)
     problem_optimization = models.BooleanField(verbose_name="问题优化", default=False)
     icon = models.CharField(max_length=256, verbose_name="应用icon", default="./favicon.ico")
+    # 聊天背景
+    chat_background = models.CharField(verbose_name="聊天背景", max_length=256, default='')
+    # AI头像
+    avatar = models.CharField(verbose_name="AI头像", max_length=256, default='')
+    # 用户头像
+    user_avatar = models.CharField(verbose_name="用户头像", max_length=256, default='')
+    # 浮窗图标
+    float_icon = models.CharField(verbose_name="浮窗图标", max_length=256, default='')
     work_flow = models.JSONField(verbose_name="工作流数据", default=dict)
     type = models.CharField(verbose_name="应用类型", choices=ApplicationTypeChoices.choices,
                             default=ApplicationTypeChoices.SIMPLE, max_length=256)

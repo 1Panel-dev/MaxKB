@@ -90,6 +90,16 @@
                     </el-icon>
                     {{ $t('views.applicationOverview.appInfo.accessControl') }}
                   </el-button>
+                  <!-- 对话页面配置 -->
+                  <el-button
+                    @click="openApplicationDisplaySettingDialog"
+                    v-if="permissionPrecise.overview_display(id)"
+                  >
+                    <el-icon class="mr-4">
+                      <Setting />
+                    </el-icon>
+                    {{ $t('views.application.chatPageConfig') }}
+                  </el-button>
                   <!-- 显示设置 -->
                   <el-button
                     @click="openDisplaySettingDialog"
@@ -199,12 +209,14 @@
     <component :is="currentDisplaySettingDialog" ref="DisplaySettingDialogRef" @refresh="refresh" />
     <!-- 图标编辑 -->
     <EditApplicationIconDialog ref="EditApplicationIconDialogRef" @refresh="refreshIcon" />
+    <!-- 显示设置 -->
+    <ApplicationDisplaySettingDialog ref="ApplicationDisplaySettingDialogRef" @refresh="refresh" />
   </div>
 </template>
 <script setup lang="ts">
 import { ref, computed, onMounted, shallowRef, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
-import { Edit } from '@element-plus/icons-vue'
+import { Edit, Setting } from '@element-plus/icons-vue'
 import EmbedDialog from './component/EmbedDialog.vue'
 import APIKeyDialog from './component/APIKeyDialog.vue'
 import LimitDialog from './component/LimitDialog.vue'
@@ -213,6 +225,7 @@ import DisplaySettingDialog from './component/DisplaySettingDialog.vue'
 import XPackDisplaySettingDialog from './xpack-component/XPackDisplaySettingDialog.vue'
 import StatisticsCharts from './component/StatisticsCharts.vue'
 import EditApplicationIconDialog from './component/EditApplicationIconDialog.vue'
+import ApplicationDisplaySettingDialog from './component/ApplicationDisplaySettingDialog.vue'
 import { nowDate, beforeDay } from '@/utils/time'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { copyClick } from '@/utils/clipboard'
@@ -248,6 +261,7 @@ const baseUrl = window.location.origin + `${window.MaxKB.chatPrefix}/api/`
 const APIKeyDialogRef = ref()
 const EmbedDialogRef = ref()
 const EditApplicationIconDialogRef = ref()
+const ApplicationDisplaySettingDialogRef = ref()
 
 const accessToken = ref<any>({})
 const detail = ref<any>(null)
@@ -472,6 +486,10 @@ function refreshIcon(newIcon: string) {
   if (detail.value) {
     detail.value.icon = newIcon
   }
+}
+
+function openApplicationDisplaySettingDialog() {
+  ApplicationDisplaySettingDialogRef.value?.open(detail.value)
 }
 
 onMounted(() => {

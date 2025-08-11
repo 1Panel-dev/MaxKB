@@ -1004,3 +1004,207 @@ class ApplicationIconSerializer(serializers.Serializer):
 
         application.save()
         return application.icon
+
+
+class ApplicationChatBackgroundSerializer(serializers.Serializer):
+    application_id = serializers.UUIDField(required=True, label=_("Application ID"))
+    workspace_id = serializers.CharField(required=True, label=_("Workspace ID"))
+    user_id = serializers.UUIDField(required=True, label=_("User ID"))
+    image = UploadedImageField(required=False, allow_null=True, label=_("Chat Background"))
+
+    def is_valid(self, *, raise_exception=False):
+        super().is_valid(raise_exception=True)
+        workspace_id = self.data.get('workspace_id')
+        query_set = QuerySet(Application).filter(id=self.data.get('application_id'))
+        if workspace_id:
+            query_set = query_set.filter(workspace_id=workspace_id)
+        if not query_set.exists():
+            raise AppApiException(500, _('Application id does not exist'))
+
+    def edit(self, with_valid=True):
+        if with_valid:
+            self.is_valid(raise_exception=True)
+        application = QuerySet(Application).filter(id=self.data.get('application_id')).first()
+        if application is None:
+            raise AppApiException(500, _('Application does not exist'))
+
+        # 删除旧的图片
+        if application.chat_background and application.chat_background.startswith('./oss/file/'):
+            old_file_id = application.chat_background.split('/')[-1]
+            QuerySet(File).filter(id=old_file_id).delete()
+
+        # 处理新图片
+        if self.data.get('image') is None:
+            # 重置为默认
+            application.chat_background = ''
+        else:
+            # 上传新图片
+            meta = {
+                'debug': False
+            }
+            file_id = uuid.uuid7()
+            file = File(
+                id=file_id,
+                file_name=self.data.get('image').name,
+                source_type=FileSourceType.APPLICATION,
+                source_id=application.id,
+                meta=meta
+            )
+            file.save(self.data.get('image').read())
+            application.chat_background = f'./oss/file/{file_id}'
+
+        application.save()
+        return application.chat_background
+
+
+class ApplicationAvatarSerializer(serializers.Serializer):
+    application_id = serializers.UUIDField(required=True, label=_("Application ID"))
+    workspace_id = serializers.CharField(required=True, label=_("Workspace ID"))
+    user_id = serializers.UUIDField(required=True, label=_("User ID"))
+    image = UploadedImageField(required=False, allow_null=True, label=_("AI Avatar"))
+
+    def is_valid(self, *, raise_exception=False):
+        super().is_valid(raise_exception=True)
+        workspace_id = self.data.get('workspace_id')
+        query_set = QuerySet(Application).filter(id=self.data.get('application_id'))
+        if workspace_id:
+            query_set = query_set.filter(workspace_id=workspace_id)
+        if not query_set.exists():
+            raise AppApiException(500, _('Application id does not exist'))
+
+    def edit(self, with_valid=True):
+        if with_valid:
+            self.is_valid(raise_exception=True)
+        application = QuerySet(Application).filter(id=self.data.get('application_id')).first()
+        if application is None:
+            raise AppApiException(500, _('Application does not exist'))
+
+        # 删除旧的图片
+        if application.avatar and application.avatar.startswith('./oss/file/'):
+            old_file_id = application.avatar.split('/')[-1]
+            QuerySet(File).filter(id=old_file_id).delete()
+
+        # 处理新图片
+        if self.data.get('image') is None:
+            # 重置为默认
+            application.avatar = ''
+        else:
+            # 上传新图片
+            meta = {
+                'debug': False
+            }
+            file_id = uuid.uuid7()
+            file = File(
+                id=file_id,
+                file_name=self.data.get('image').name,
+                source_type=FileSourceType.APPLICATION,
+                source_id=application.id,
+                meta=meta
+            )
+            file.save(self.data.get('image').read())
+            application.avatar = f'./oss/file/{file_id}'
+
+        application.save()
+        return application.avatar
+
+
+class ApplicationUserAvatarSerializer(serializers.Serializer):
+    application_id = serializers.UUIDField(required=True, label=_("Application ID"))
+    workspace_id = serializers.CharField(required=True, label=_("Workspace ID"))
+    user_id = serializers.UUIDField(required=True, label=_("User ID"))
+    image = UploadedImageField(required=False, allow_null=True, label=_("User Avatar"))
+
+    def is_valid(self, *, raise_exception=False):
+        super().is_valid(raise_exception=True)
+        workspace_id = self.data.get('workspace_id')
+        query_set = QuerySet(Application).filter(id=self.data.get('application_id'))
+        if workspace_id:
+            query_set = query_set.filter(workspace_id=workspace_id)
+        if not query_set.exists():
+            raise AppApiException(500, _('Application id does not exist'))
+
+    def edit(self, with_valid=True):
+        if with_valid:
+            self.is_valid(raise_exception=True)
+        application = QuerySet(Application).filter(id=self.data.get('application_id')).first()
+        if application is None:
+            raise AppApiException(500, _('Application does not exist'))
+
+        # 删除旧的图片
+        if application.user_avatar and application.user_avatar.startswith('./oss/file/'):
+            old_file_id = application.user_avatar.split('/')[-1]
+            QuerySet(File).filter(id=old_file_id).delete()
+
+        # 处理新图片
+        if self.data.get('image') is None:
+            # 重置为默认
+            application.user_avatar = ''
+        else:
+            # 上传新图片
+            meta = {
+                'debug': False
+            }
+            file_id = uuid.uuid7()
+            file = File(
+                id=file_id,
+                file_name=self.data.get('image').name,
+                source_type=FileSourceType.APPLICATION,
+                source_id=application.id,
+                meta=meta
+            )
+            file.save(self.data.get('image').read())
+            application.user_avatar = f'./oss/file/{file_id}'
+
+        application.save()
+        return application.user_avatar
+
+
+class ApplicationFloatIconSerializer(serializers.Serializer):
+    application_id = serializers.UUIDField(required=True, label=_("Application ID"))
+    workspace_id = serializers.CharField(required=True, label=_("Workspace ID"))
+    user_id = serializers.UUIDField(required=True, label=_("User ID"))
+    image = UploadedImageField(required=False, allow_null=True, label=_("Float Icon"))
+
+    def is_valid(self, *, raise_exception=False):
+        super().is_valid(raise_exception=True)
+        workspace_id = self.data.get('workspace_id')
+        query_set = QuerySet(Application).filter(id=self.data.get('application_id'))
+        if workspace_id:
+            query_set = query_set.filter(workspace_id=workspace_id)
+        if not query_set.exists():
+            raise AppApiException(500, _('Application id does not exist'))
+
+    def edit(self, with_valid=True):
+        if with_valid:
+            self.is_valid(raise_exception=True)
+        application = QuerySet(Application).filter(id=self.data.get('application_id')).first()
+        if application is None:
+            raise AppApiException(500, _('Application does not exist'))
+
+        # 删除旧的图片
+        if application.float_icon and application.float_icon.startswith('./oss/file/'):
+            old_file_id = application.float_icon.split('/')[-1]
+            QuerySet(File).filter(id=old_file_id).delete()
+
+        # 处理新图片
+        if self.data.get('image') is None:
+            # 重置为默认
+            application.float_icon = ''
+        else:
+            # 上传新图片
+            meta = {
+                'debug': False
+            }
+            file_id = uuid.uuid7()
+            file = File(
+                id=file_id,
+                file_name=self.data.get('image').name,
+                source_type=FileSourceType.APPLICATION,
+                source_id=application.id,
+                meta=meta
+            )
+            file.save(self.data.get('image').read())
+            application.float_icon = f'./oss/file/{file_id}'
+
+        application.save()
+        return application.float_icon
