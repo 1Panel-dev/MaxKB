@@ -1,5 +1,5 @@
 <template>
-  <el-drawer v-model="debugVisible" size="60%" :append-to-body="true">
+  <el-drawer v-model="debugVisible" size="60%" :append-to-body="true" :modal="false">
     <template #header>
       <div class="flex align-center" style="margin-left: -8px">
         <el-button class="cursor mr-4" link @click.prevent="debugVisible = false">
