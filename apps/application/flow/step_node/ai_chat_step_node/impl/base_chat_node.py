@@ -340,8 +340,8 @@ class BaseChatNode(IChatNode):
             # 清理工具代码文件，延时删除，避免文件被占用
             for tool_id in self.context.get('tool_ids'):
                 code_path = f'{executor.sandbox_path}/execute/{tool_id}.py'
-                # if os.path.exists(code_path):
-                #     os.remove(code_path)
+                if os.path.exists(code_path):
+                    os.remove(code_path)
         return {
             'name': self.node.properties.get('stepName'),
             "index": index,
