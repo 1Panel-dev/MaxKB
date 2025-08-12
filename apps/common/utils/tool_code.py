@@ -120,19 +120,16 @@ except Exception as e:
         python_paths = CONFIG.get_sandbox_python_package_paths().split(',')
         code = self._generate_mcp_server_code(code_str)
         return f"""
-try:
-    import os
-    import sys
-    path_to_exclude = ['/opt/py3/lib/python3.11/site-packages', '/opt/maxkb-app/apps']
-    sys.path = [p for p in sys.path if p not in path_to_exclude]
-    sys.path += {python_paths}
-    env = dict(os.environ)
-    for key in list(env.keys()):
-        if key in os.environ and (key.startswith('MAXKB') or key.startswith('POSTGRES') or key.startswith('PG') or key.startswith('REDIS') or key == 'PATH'):
-            del os.environ[key]
-    exec({dedent(code)!a})
-except Exception as e:
-    pass
+import os
+import sys
+path_to_exclude = ['/opt/py3/lib/python3.11/site-packages', '/opt/maxkb-app/apps']
+sys.path = [p for p in sys.path if p not in path_to_exclude]
+sys.path += {python_paths}
+env = dict(os.environ)
+for key in list(env.keys()):
+    if key in os.environ and (key.startswith('MAXKB') or key.startswith('POSTGRES') or key.startswith('PG') or key.startswith('REDIS') or key == 'PATH'):
+        del os.environ[key]
+exec({dedent(code)!a})
 """
 
     def _exec_sandbox(self, _code, _id):

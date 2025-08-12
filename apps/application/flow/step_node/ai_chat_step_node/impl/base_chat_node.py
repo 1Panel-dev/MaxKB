@@ -10,7 +10,9 @@ import asyncio
 import json
 import os
 import re
+import sys
 import time
+import traceback
 from functools import reduce
 from typing import List, Dict
 
@@ -143,7 +145,7 @@ def mcp_response_generator(chat_model, message_list, mcp_servers):
             except StopAsyncIteration:
                 break
     except Exception as e:
-        maxkb_logger.error(f'Exception: {e}')
+        maxkb_logger.error(f'Exception: {e}', traceback.format_exc())
     finally:
         loop.close()
 
@@ -285,9 +287,10 @@ class BaseChatNode(IChatNode):
                     code_path = f'{executor.sandbox_path}/execute/{tool_id}.py'
                     with open(code_path, 'w') as f:
                         f.write(code)
+                        os.system(f"chown sandbox:root {code_path}")
 
                     tool_config = {
-                        'command': 'python',
+                        'command': sys.executable,
                         'args': [code_path],
                         'transport': 'stdio',
                     }
