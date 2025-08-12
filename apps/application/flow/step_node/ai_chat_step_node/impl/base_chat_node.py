@@ -25,6 +25,7 @@ from application.flow.step_node.ai_chat_step_node.i_chat_node import IChatNode
 from application.flow.tools import Reasoning
 from common.utils.logger import maxkb_logger
 from common.utils.tool_code import ToolExecutor
+from maxkb.conf import PROJECT_DIR
 from models_provider.models import Model
 from models_provider.tools import get_model_credential, get_model_instance_by_model_workspace_id
 from tools.models import Tool
@@ -280,7 +281,7 @@ class BaseChatNode(IChatNode):
                 for tool_id in tool_ids:
                     tool = QuerySet(Tool).filter(id=tool_id).first()
                     executor = ToolExecutor()
-                    code = executor.generate_mcp_server_code(tool.code)
+                    code = executor.get_exec_code(tool.code)
                     code_path = f'{executor.sandbox_path}/execute/{tool_id}.py'
                     with open(code_path, 'w') as f:
                         f.write(code)

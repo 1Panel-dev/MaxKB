@@ -83,7 +83,7 @@ except Exception as e:
             return result.get('data')
         raise Exception(result.get('msg'))
 
-    def generate_mcp_server_code(self, _code):
+    def _generate_mcp_server_code(self, _code):
         self.validate_banned_keywords(_code)
 
         # 解析代码，提取导入语句和函数定义
@@ -115,6 +115,31 @@ except Exception as e:
         code_parts.append("\nmcp.run(transport=\"stdio\")\n")
 
         return "\n".join(code_parts)
+
+    def get_exec_code(self, code_str):
+        python_paths = CONFIG.get_sandbox_python_package_paths().split(',')
+        code = self._generate_mcp_server_code(code_str)
+        return f"""
+try:
+    import os
+    import sys
+    import pickle
+    path_to_exclude = ['/opt/py3/lib/python3.11/site-packages', '/opt/maxkb-app/apps']
+    sys.path = [p for p in sys.path if p not in path_to_exclude]
+    sys.path += {python_paths}
+    env = dict(os.environ)
+    for key in list(env.keys()):
+        if key in os.environ and (key.startswith('MAXKB') or key.startswith('POSTGRES') or key.startswith('PG') or key.startswith('REDIS') or key == 'PATH'):
+            del os.environ[key]
+    locals_v={'{}'}
+    globals_v=globals()
+    exec({dedent(code)!a}, globals_v, locals_v)
+    f_name, f = locals_v.popitem()
+    for local in locals_v:
+        globals_v[local] = locals_v[local]
+except Exception as e:
+    pass
+"""
 
     def _exec_sandbox(self, _code, _id):
         exec_python_file = f'{self.sandbox_path}/execute/{_id}.py'
