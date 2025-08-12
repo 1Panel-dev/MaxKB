@@ -25,5 +25,5 @@ class DailyTimedRotatingFileHandler(TimedRotatingFileHandler):
             os.path.basename(source)
         ]
         filename = os.path.join(*path)
-        os.makedirs(os.path.dirname(filename), exist_ok=True)
+        os.makedirs(os.path.dirname(filename), 0o700, exist_ok=True)
         return filename
