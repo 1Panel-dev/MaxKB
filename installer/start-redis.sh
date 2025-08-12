@@ -4,8 +4,10 @@ if [ ! -d /opt/maxkb/data/redis ]; then
     mkdir -p /opt/maxkb/data/redis
     chmod 700 /opt/maxkb/data/redis
 fi
-mkdir -p /opt/maxkb/logs
-
+if [ ! -d /opt/maxkb/logs ]; then
+    mkdir -p /opt/maxkb/logs
+    chmod 700 /opt/maxkb/logs
+fi
 if [ ! -f /opt/maxkb/conf/redis.conf ]; then
   mkdir -p /opt/maxkb/conf
   touch /opt/maxkb/conf/redis.conf
