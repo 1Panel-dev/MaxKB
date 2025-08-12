@@ -1,5 +1,6 @@
 export default {
   title: '工具',
+  all: '全部',
   createTool: '建立工具',
   editTool: '編輯工具',
   copyTool: '複製工具',
@@ -62,6 +63,11 @@ export default {
       code: '工具内容（Python）',
       selectPlaceholder: '請选择參數',
       inputPlaceholder: '請輸入參數值',
+    },
+    mcp: {
+      label: 'MCP Server Config',
+      placeholder: '請輸入MCP Server配置',
+      tip: '僅支援SSE、Streamable HTTP呼叫方式',
     },
     debug: {
       run: '運行',

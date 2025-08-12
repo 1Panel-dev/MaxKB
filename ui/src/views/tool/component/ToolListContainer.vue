@@ -54,6 +54,16 @@
                   </div>
                 </div>
               </el-dropdown-item>
+              <el-dropdown-item @click="openCreateMcpDialog()">
+                <div class="flex align-center">
+                  <el-avatar class="avatar-green" shape="square" :size="32">
+                    <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt="" />
+                  </el-avatar>
+                  <div class="pre-wrap ml-8">
+                    <div class="lighter">创建MCP</div>
+                  </div>
+                </div>
+              </el-dropdown-item>
               <el-upload
                 ref="elUploadRef"
                 :file-list="[]"
@@ -284,6 +294,7 @@
   </ContentContainer>
   <InitParamDrawer ref="InitParamDrawerRef" @refresh="refresh" />
   <ToolFormDrawer ref="ToolFormDrawerRef" @refresh="refresh" :title="ToolDrawertitle" />
+  <McpToolFormDrawer ref="McpToolFormDrawerRef" @refresh="refresh" :title="McpToolDrawertitle" />
   <CreateFolderDialog ref="CreateFolderDialogRef" v-if="!isShared" @refresh="refreshFolder" />
   <ToolStoreDialog ref="toolStoreDialogRef" :api-type="apiType" @refresh="refresh" />
   <AddInternalToolDialog ref="AddInternalToolDialogRef" @refresh="confirmAddInternalTool" />
@@ -305,6 +316,7 @@ import { cloneDeep } from 'lodash'
 import { useRoute, onBeforeRouteLeave } from 'vue-router'
 import InitParamDrawer from '@/views/tool/component/InitParamDrawer.vue'
 import ToolFormDrawer from '@/views/tool/ToolFormDrawer.vue'
+import McpToolFormDrawer from '@/views/tool/McpToolFormDrawer.vue'
 import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
 import AuthorizedWorkspace from '@/views/system-shared/AuthorizedWorkspaceDialog.vue'
 import ToolStoreDialog from '@/views/tool/toolStore/ToolStoreDialog.vue'
@@ -374,7 +386,9 @@ const search_type_change = () => {
   search_form.value = { name: '', create_user: '' }
 }
 const ToolFormDrawerRef = ref()
+const McpToolFormDrawerRef = ref()
 const ToolDrawertitle = ref('')
+const McpToolDrawertitle = ref('')
 
 const MoveToDialogRef = ref()
 function openMoveToDialog(data: any) {
@@ -400,6 +414,11 @@ function openAuthorizedWorkspaceDialog(row: any) {
 }
 
 function openCreateDialog(data?: any) {
+  // mcp工具
+  if (data?.tool_type === 'MCP') {
+    openCreateMcpDialog(data)
+    return
+  }
   // 有template_id的不允许编辑，是模板转换来的
   if (data?.template_id) {
     return
@@ -417,6 +436,27 @@ function openCreateDialog(data?: any) {
       })
   } else {
     ToolFormDrawerRef.value.open(data)
+  }
+}
+
+function openCreateMcpDialog(data?: any) {
+  // 有template_id的不允许编辑，是模板转换来的
+  if (data?.template_id) {
+    return
+  }
+  // 共享过来的工具不让编辑
+  if (isShared.value) {
+    return
+  }
+  McpToolDrawertitle.value = data ? t('views.tool.editMcpTool') : t('views.tool.createMcpTool')
+  if (data) {
+    loadSharedApi({ type: 'tool', systemType: apiType.value })
+      .getToolById(data?.id, loading)
+      .then((res: any) => {
+        McpToolFormDrawerRef.value.open(res.data)
+      })
+  } else {
+    McpToolFormDrawerRef.value.open(data)
   }
 }
 
@@ -616,10 +656,21 @@ watch(
   },
   { deep: true, immediate: true },
 )
+
+watch(
+  () => tool.tool_type,
+  () => {
+    paginationConfig.current_page = 1
+    tool.setToolList([])
+    getList()
+  },
+)
+
 function getList() {
   const params: any = {
     folder_id: folder.currentFolder?.id || user.getWorkspaceId(),
     scope: apiType.value === 'systemShare' ? 'SHARED' : 'WORKSPACE',
+    tool_type: tool.tool_type || '',
   }
   if (search_form.value[search_type.value]) {
     params[search_type.value] = search_form.value[search_type.value]

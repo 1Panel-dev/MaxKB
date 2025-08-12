@@ -1,5 +1,5 @@
 # coding=utf-8
-
+import ast
 import os
 import pickle
 import subprocess
@@ -82,6 +82,39 @@ except Exception as e:
         if result.get('code') == 200:
             return result.get('data')
         raise Exception(result.get('msg'))
+
+    def generate_mcp_server_code(self, _code):
+        self.validate_banned_keywords(_code)
+
+        # 解析代码，提取导入语句和函数定义
+        try:
+            tree = ast.parse(_code)
+        except SyntaxError:
+            return _code
+
+        imports = []
+        functions = []
+        other_code = []
+
+        for node in tree.body:
+            if isinstance(node, ast.Import) or isinstance(node, ast.ImportFrom):
+                imports.append(ast.unparse(node))
+            elif isinstance(node, ast.FunctionDef):
+                # 为函数添加 @mcp.tool() 装饰器
+                func_code = ast.unparse(node)
+                functions.append(f"@mcp.tool()\n{func_code}\n")
+            else:
+                other_code.append(ast.unparse(node))
+
+        # 构建完整的 MCP 服务器代码
+        code_parts = ["from mcp.server.fastmcp import FastMCP"]
+        code_parts.extend(imports)
+        code_parts.append(f"\nmcp = FastMCP(\"{uuid.uuid7()}\")\n")
+        code_parts.extend(other_code)
+        code_parts.extend(functions)
+        code_parts.append("\nmcp.run(transport=\"stdio\")\n")
+
+        return "\n".join(code_parts)
 
     def _exec_sandbox(self, _code, _id):
         exec_python_file = f'{self.sandbox_path}/execute/{_id}.py'
