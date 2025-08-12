@@ -115,10 +115,22 @@
         </el-form-item>
 
         <div class="flex-between mb-16">
+          <div class="lighter">MCP</div>
+          <div>
+            <el-button type="primary" link @click="openMcpServersDialog" @refreshForm="refreshParam">
+              <AppIcon iconName="app-setting"></AppIcon>
+            </el-button>
+            <el-switch size="small" v-model="chat_data.mcp_enable" />
+          </div>
+        </div>
+        <div class="flex-between mb-16">
           <div class="lighter">{{ $t('views.applicationWorkflow.nodes.mcpNode.tool') }}</div>
-          <el-button type="primary" link @click="openMcpServersDialog" @refreshForm="refreshParam">
-            <AppIcon iconName="app-setting"></AppIcon>
-          </el-button>
+          <div>
+            <el-button type="primary" link @click="openToolDialog" @refreshForm="refreshParam">
+              <AppIcon iconName="app-setting"></AppIcon>
+            </el-button>
+            <el-switch size="small" v-model="chat_data.tool_enable" />
+          </div>
         </div>
 
         <el-form-item @click.prevent>
@@ -166,6 +178,7 @@
       @refresh="submitReasoningDialog"
     />
     <McpServersDialog ref="mcpServersDialogRef" @refresh="submitMcpServersDialog" />
+    <ToolDialog ref="toolDialogRef" @refresh="submitToolDialog"/>
   </NodeContainer>
 </template>
 <script setup lang="ts">
@@ -180,6 +193,7 @@ import ReasoningParamSettingDialog from '@/views/application/component/Reasoning
 import McpServersDialog from '@/views/application/component/McpServersDialog.vue'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { useRoute } from 'vue-router'
+import ToolDialog from "@/views/application/component/ToolDialog.vue";
 const getApplicationDetail = inject('getApplicationDetail') as any
 const route = useRoute()
 
@@ -324,15 +338,52 @@ const mcpServersDialogRef = ref()
 function openMcpServersDialog() {
   const config = {
     mcp_servers: chat_data.value.mcp_servers,
-    mcp_enable: chat_data.value.mcp_enable,
+    mcp_tool_id: chat_data.value.mcp_tool_id,
+    mcp_source: chat_data.value.mcp_source,
   }
   mcpServersDialogRef.value.open(config)
 }
 
 function submitMcpServersDialog(config: any) {
   set(props.nodeModel.properties.node_data, 'mcp_servers', config.mcp_servers)
-  set(props.nodeModel.properties.node_data, 'mcp_enable', config.mcp_enable)
+  set(props.nodeModel.properties.node_data, 'mcp_tool_id', config.mcp_tool_id)
+  set(props.nodeModel.properties.node_data, 'mcp_source', config.mcp_source)
 }
+
+const toolDialogRef = ref()
+function openToolDialog() {
+  const config = {
+    tool_ids: chat_data.value.tool_ids,
+  }
+  toolDialogRef.value.open(config, toolSelectOptions.value)
+}
+function submitToolDialog(config: any) {
+  set(props.nodeModel.properties.node_data, 'tool_ids', config.tool_ids)
+}
+
+const toolSelectOptions = ref<any[]>([])
+function getToolSelectOptions() {
+  const obj =
+    apiType.value === 'systemManage'
+      ? {
+        scope: 'WORKSPACE',
+        tool_type: 'CUSTOM',
+        workspace_id: application.value?.workspace_id,
+      }
+      : {
+        scope: 'WORKSPACE',
+        tool_type: 'CUSTOM',
+      }
+
+  loadSharedApi({type: 'tool', systemType: apiType.value})
+    .getAllToolList(obj)
+    .then((res: any) => {
+      toolSelectOptions.value = [...res.data.shared_tools, ...res.data.tools]
+        .filter((item: any) => item.is_active)
+    })
+}
+
+
 
 onMounted(() => {
   getSelectModel()
@@ -345,6 +396,8 @@ onMounted(() => {
   if (!chat_data.value.dialogue_type) {
     chat_data.value.dialogue_type = 'WORKFLOW'
   }
+
+  getToolSelectOptions()
 })
 </script>
 <style lang="scss" scoped></style>
