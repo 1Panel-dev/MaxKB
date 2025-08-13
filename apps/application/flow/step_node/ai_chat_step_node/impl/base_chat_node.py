@@ -27,7 +27,9 @@ from application.flow.i_step_node import NodeResult, INode
 from application.flow.step_node.ai_chat_step_node.i_chat_node import IChatNode
 from application.flow.tools import Reasoning
 from common.utils.logger import maxkb_logger
+from common.utils.rsa_util import rsa_long_decrypt
 from common.utils.tool_code import ToolExecutor
+from maxkb.const import CONFIG
 from models_provider.models import Model
 from models_provider.tools import get_model_credential, get_model_instance_by_model_workspace_id
 from tools.models import Tool
@@ -283,25 +285,14 @@ class BaseChatNode(IChatNode):
                 self.context['execute_ids'] = []
                 for tool_id in tool_ids:
                     tool = QuerySet(Tool).filter(id=tool_id).first()
-                    executor = ToolExecutor(sandbox=True)
-                    code = executor.generate_mcp_server_code(tool.code)
-                    _id = uuid.uuid7()
-                    self.context['execute_ids'].append(_id)
-                    code_path = f'{executor.sandbox_path}/execute/{_id}.py'
-                    with open(code_path, 'w') as f:
-                        f.write(code)
-                        os.system(f"chown {executor.user}:root {code_path}")
+                    executor = ToolExecutor(CONFIG.get('SANDBOX'))
+                    if tool.init_params is not None:
+                        params = json.loads(rsa_long_decrypt(tool.init_params))
+                    else:
+                        params = {}
+                    _id, tool_config = executor.get_tool_mcp_config(tool.code, params)
 
-                    tool_config = {
-                        'command': 'su',
-                        'args': [
-                            '-s', sys.executable,
-                            '-c', f"exec(open('{code_path}', 'r').read())",
-                            executor.user,
-                        ],
-                        'cwd': executor.sandbox_path,
-                        'transport': 'stdio',
-                    }
+                    self.context['execute_ids'].append(_id)
                     mcp_servers_config[str(tool.id)] = tool_config
 
         if len(mcp_servers_config) > 0:
@@ -347,7 +338,7 @@ class BaseChatNode(IChatNode):
     def get_details(self, index: int, **kwargs):
         # 删除临时生成的MCP代码文件
         if self.context.get('execute_ids'):
-            executor = ToolExecutor(sandbox=True)
+            executor = ToolExecutor(CONFIG.get('SANDBOX'))
             # 清理工具代码文件，延时删除，避免文件被占用
             for tool_id in self.context.get('execute_ids'):
                 code_path = f'{executor.sandbox_path}/execute/{tool_id}.py'

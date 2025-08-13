@@ -83,7 +83,7 @@ except Exception as e:
             return result.get('data')
         raise Exception(result.get('msg'))
 
-    def _generate_mcp_server_code(self, _code):
+    def _generate_mcp_server_code(self, _code, params):
         self.validate_banned_keywords(_code)
 
         # 解析代码，提取导入语句和函数定义
@@ -100,7 +100,31 @@ except Exception as e:
             if isinstance(node, ast.Import) or isinstance(node, ast.ImportFrom):
                 imports.append(ast.unparse(node))
             elif isinstance(node, ast.FunctionDef):
-                # 为函数添加 @mcp.tool() 装饰器
+                # 修改函数参数以包含 params 中的默认值
+                func_name = node.name
+                if func_name in params:
+                    func_params = params[func_name]
+                    # 为函数参数设置默认值
+                    for i, arg in enumerate(node.args.args):
+                        arg_name = arg.arg
+                        if arg_name in func_params:
+                            # 创建默认值节点
+                            default_value = func_params[arg_name]
+                            if isinstance(default_value, str):
+                                default_node = ast.Constant(value=default_value)
+                            elif isinstance(default_value, (int, float, bool)):
+                                default_node = ast.Constant(value=default_value)
+                            else:
+                                default_node = ast.Constant(value=str(default_value))
+
+                            # 添加到defaults列表
+                            if not hasattr(node.args, 'defaults') or node.args.defaults is None:
+                                node.args.defaults = []
+                            # 确保defaults列表长度正确
+                            while len(node.args.defaults) < len(node.args.args):
+                                node.args.defaults.insert(0, None)
+                            node.args.defaults[i] = default_node
+
                 func_code = ast.unparse(node)
                 functions.append(f"@mcp.tool()\n{func_code}\n")
             else:
@@ -116,9 +140,9 @@ except Exception as e:
 
         return "\n".join(code_parts)
 
-    def generate_mcp_server_code(self, code_str):
+    def generate_mcp_server_code(self, code_str, params):
         python_paths = CONFIG.get_sandbox_python_package_paths().split(',')
-        code = self._generate_mcp_server_code(code_str)
+        code = self._generate_mcp_server_code(code_str, params)
         return f"""
 import os
 import sys
@@ -131,6 +155,34 @@ for key in list(env.keys()):
         del os.environ[key]
 exec({dedent(code)!a})
 """
+
+    def get_tool_mcp_config(self, code, params):
+        code = self.generate_mcp_server_code(code, params)
+
+        _id = uuid.uuid7()
+        code_path = f'{self.sandbox_path}/execute/{_id}.py'
+        with open(code_path, 'w') as f:
+            f.write(code)
+        if self.sandbox:
+            os.system(f"chown {self.user}:root {code_path}")
+
+            tool_config = {
+                'command': 'su',
+                'args': [
+                    '-s', sys.executable,
+                    '-c', f"exec(open('{code_path}', 'r').read())",
+                    self.user,
+                ],
+                'cwd': self.sandbox_path,
+                'transport': 'stdio',
+            }
+        else:
+            tool_config = {
+                'command': sys.executable,
+                'args': [code_path],
+                'transport': 'stdio',
+            }
+        return _id, tool_config
 
     def _exec_sandbox(self, _code, _id):
         exec_python_file = f'{self.sandbox_path}/execute/{_id}.py'
