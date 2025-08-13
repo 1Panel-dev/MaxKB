@@ -37,7 +37,7 @@ langchain-mcp-adapters = "0.1.9"
 langchain-huggingface = "0.3.0"
 langchain-ollama = "0.3.4"
 langgraph = "0.5.3"
-torch = "2.7.1"
+torch = {version = "2.8.0+cpu", source = "pytorch"}
 sentence-transformers = "5.0.0"
 
 # 云服务SDK
