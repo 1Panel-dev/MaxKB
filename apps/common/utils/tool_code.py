@@ -101,29 +101,33 @@ except Exception as e:
                 imports.append(ast.unparse(node))
             elif isinstance(node, ast.FunctionDef):
                 # 修改函数参数以包含 params 中的默认值
-                func_name = node.name
-                if func_name in params:
-                    func_params = params[func_name]
-                    # 为函数参数设置默认值
-                    for i, arg in enumerate(node.args.args):
-                        arg_name = arg.arg
-                        if arg_name in func_params:
-                            # 创建默认值节点
-                            default_value = func_params[arg_name]
-                            if isinstance(default_value, str):
-                                default_node = ast.Constant(value=default_value)
-                            elif isinstance(default_value, (int, float, bool)):
-                                default_node = ast.Constant(value=default_value)
-                            else:
-                                default_node = ast.Constant(value=str(default_value))
+                arg_names = [arg.arg for arg in node.args.args]
 
-                            # 添加到defaults列表
-                            if not hasattr(node.args, 'defaults') or node.args.defaults is None:
-                                node.args.defaults = []
-                            # 确保defaults列表长度正确
-                            while len(node.args.defaults) < len(node.args.args):
-                                node.args.defaults.insert(0, None)
-                            node.args.defaults[i] = default_node
+                # 为有默认值的参数添加默认值
+                defaults = []
+                for arg_name in arg_names:
+                    if arg_name in params:
+                        # 将参数值转换为 AST 节点
+                        default_value = params[arg_name]
+                        if isinstance(default_value, str):
+                            defaults.append(ast.Constant(value=default_value))
+                        elif isinstance(default_value, (int, float, bool)):
+                            defaults.append(ast.Constant(value=default_value))
+                        elif default_value is None:
+                            defaults.append(ast.Constant(value=None))
+                        else:
+                            # 对于复杂类型，使用字符串表示
+                            defaults.append(ast.Constant(value=str(default_value)))
+                    else:
+                        defaults.append(None)
+
+                # 只保留非 None 的默认值（从右到左）
+                while defaults and defaults[-1] is None:
+                    defaults.pop()
+
+                # 更新函数的默认参数
+                if defaults:
+                    node.args.defaults = [d for d in defaults if d is not None]
 
                 func_code = ast.unparse(node)
                 functions.append(f"@mcp.tool()\n{func_code}\n")
