@@ -39,7 +39,6 @@ ARG DOCKER_IMAGE_TAG=dev \
     GITHUB_COMMIT
 
 ENV MAXKB_VERSION="${DOCKER_IMAGE_TAG} (build at ${BUILD_AT}, commit: ${GITHUB_COMMIT})" \
-    MAXKB_CONFIG_TYPE=ENV \
     MAXKB_DB_NAME=maxkb \
     MAXKB_DB_HOST=127.0.0.1 \
     MAXKB_DB_PORT=5432  \
@@ -55,10 +54,9 @@ ENV MAXKB_VERSION="${DOCKER_IMAGE_TAG} (build at ${BUILD_AT}, commit: ${GITHUB_C
     MAXKB_LOCAL_MODEL_HOST=127.0.0.1 \
     MAXKB_LOCAL_MODEL_PORT=11636 \
     MAXKB_LOCAL_MODEL_PROTOCOL=http \
-    MAXKB_SANDBOX=1 \
     PATH=/opt/py3/bin:$PATH \
-    PIP_TARGET=/opt/maxkb/python-packages \
-    PYTHONUNBUFFERED=1
+    PIP_TARGET=/opt/maxkb/python-packages
+
 
 WORKDIR /opt/maxkb-app
 COPY --from=stage-build /opt/maxkb-app /opt/maxkb-app
