@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "maxkb"
 version = "2.0.0"
-description = "企业级 AI 助手"
+description = "强大易用的开源企业级智能体平台"
 authors = ["shaohuzhang1 <shaohu.zhang@fit2cloud.com>"]
 readme = "README.md"
 package-mode = false
