@@ -17,9 +17,9 @@ from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
 from common.constants.permission_constants import PermissionConstants, RoleConstants, Permission, Group, Operate
 from common.log.log import log
-from common.result import DefaultResultSerializer
 from system_manage.api.user_resource_permission import UserResourcePermissionAPI, EditUserResourcePermissionAPI, \
-    ResourceUserPermissionAPI, ResourceUserPermissionPageAPI, ResourceUserPermissionEditAPI
+    ResourceUserPermissionAPI, ResourceUserPermissionPageAPI, ResourceUserPermissionEditAPI, \
+    UserResourcePermissionPageAPI
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer, \
     ResourceUserPermissionSerializer
 from users.models import User
@@ -52,15 +52,16 @@ class WorkSpaceUserResourcePermissionView(APIView):
     def get(self, request: Request, workspace_id: str, user_id: str, resource: str):
         return result.success(UserResourcePermissionSerializer(
             data={'workspace_id': workspace_id, 'user_id': user_id, 'auth_target_type': resource}
-        ).list(request.user))
+        ).list({'name': request.query_params.get('name'),
+                'permission': request.query_params.get('permission')}, request.user))
 
     @extend_schema(
         methods=['PUT'],
         description=_('Modify the resource authorization list'),
         operation_id=_('Modify the resource authorization list'),  # type: ignore
-        parameters=UserResourcePermissionAPI.get_parameters(),
+        parameters=EditUserResourcePermissionAPI.get_parameters(),
         request=EditUserResourcePermissionAPI.get_request(),
-        responses=DefaultResultSerializer(),
+        responses=EditUserResourcePermissionAPI.get_response(),
         tags=[_('Resources authorization')]  # type: ignore
     )
     @log(menu='System', operate='Modify the resource authorization list',
@@ -74,6 +75,26 @@ class WorkSpaceUserResourcePermissionView(APIView):
         return result.success(UserResourcePermissionSerializer(
             data={'workspace_id': workspace_id, 'user_id': user_id, 'auth_target_type': resource}
         ).edit(request.data, request.user))
+
+    class Page(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['GET'],
+            description=_('Obtain resource authorization list by page'),
+            summary=_('Obtain resource authorization list by page'),
+            operation_id=_('Obtain resource authorization list by page'),  # type: ignore
+            request=None,
+            parameters=UserResourcePermissionPageAPI.get_parameters(),
+            responses=UserResourcePermissionPageAPI.get_response(),
+            tags=[_('Resources authorization')]  # type: ignore
+        )
+        def get(self, request: Request, workspace_id: str, user_id: str, resource: str, current_page: str,
+                page_size: str):
+            return result.success(UserResourcePermissionSerializer(
+                data={'workspace_id': workspace_id, 'user_id': user_id, 'auth_target_type': resource}
+                ).page({'name': request.query_params.get('name'),
+                        'permission': request.query_params.get('permission')}, current_page, page_size, request.user))
 
 
 class WorkspaceResourceUserPermissionView(APIView):
@@ -107,7 +128,6 @@ class WorkspaceResourceUserPermissionView(APIView):
         tags=[_('Resources authorization')]  # type: ignore
     )
     def put(self, request: Request, workspace_id: str, target: str, resource: str):
-
         return result.success(ResourceUserPermissionSerializer(
             data={'workspace_id': workspace_id, "target": target, 'auth_target_type': resource, })
                               .edit(instance=request.data))
@@ -129,5 +149,6 @@ class WorkspaceResourceUserPermissionView(APIView):
             return result.success(ResourceUserPermissionSerializer(
                 data={'workspace_id': workspace_id, "target": target, 'auth_target_type': resource, }
             ).page({'username': request.query_params.get("username"),
-                    'nick_name': request.query_params.get("nick_name"), 'permission': request.query_params.get("permission")}, current_page, page_size,
+                    'nick_name': request.query_params.get("nick_name"),
+                    'permission': request.query_params.get("permission")}, current_page, page_size,
                    ))

@@ -1,17 +1,38 @@
-SELECT app_or_knowledge.*,
-      COALESCE(workspace_user_resource_permission.permission_list,'{}')::varchar[] as permission_list,
-      COALESCE(workspace_user_resource_permission.auth_type,'ROLE') as auth_type
-FROM (SELECT "id",
-             "name",
-             'KNOWLEDGE' AS "auth_target_type",
-             user_id,
-             workspace_id,
-             "type"::varchar    AS "icon",
-             folder_id
-      FROM knowledge
-      ${query_set}
-   ) app_or_knowledge
-         LEFT JOIN (SELECT *
-                    FROM workspace_user_resource_permission
-                     ${workspace_user_resource_permission_query_set}) workspace_user_resource_permission
-                   ON workspace_user_resource_permission.target = app_or_knowledge."id";
+SELECT
+    app_or_knowledge.*,
+    CASE
+		WHEN
+	      wurp."permission" is null then 'NOT_AUTH'
+		ELSE wurp."permission"
+	END
+FROM (
+    SELECT
+        "id",
+        "name",
+        'KNOWLEDGE' AS "auth_target_type",
+        user_id,
+        workspace_id,
+        "type"::varchar     AS "icon",
+        folder_id
+    FROM
+        knowledge
+        ${query_set}
+) app_or_knowledge
+LEFT JOIN (
+    SELECT
+        target,
+        CASE
+            WHEN auth_type = 'ROLE'
+                AND 'ROLE' = ANY(permission_list) THEN 'ROLE'
+            WHEN auth_type = 'RESOURCE_PERMISSION_GROUP'
+                AND 'MANAGE' = ANY(permission_list) THEN 'MANAGE'
+            WHEN auth_type = 'RESOURCE_PERMISSION_GROUP'
+                AND 'VIEW' = ANY(permission_list) THEN 'VIEW'
+            ELSE 'NOT_AUTH'
+        END AS permission
+    FROM
+        workspace_user_resource_permission
+        ${workspace_user_resource_permission_query_set}
+) wurp
+ON wurp.target = app_or_knowledge."id"
+${resource_query_set}
