@@ -109,6 +109,14 @@ const platforms = reactive([
     isActive: false,
     exists: false,
   },
+    {
+    key: 'wecomBot',
+    logoSrc: new URL(`../../assets/logo/logo_wechat-work.svg`, import.meta.url).href,
+    name: t('views.application.applicationAccess.wecomBot'),
+    description: t('views.application.applicationAccess.wecomBotTip'),
+    isActive: false,
+    exists: false,
+  },
 ])
 
 const AccessSettingDrawerRef = ref()

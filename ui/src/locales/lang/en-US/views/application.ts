@@ -161,6 +161,8 @@ export default {
     title: 'APP Access',
     wecom: 'WeCom',
     wecomTip: 'Create WeCom intelligent APP',
+    wecomBot: 'WeCom Bot',
+    wecomBotTip: 'Create WeCom intelligent Bot',
     dingtalk: 'DingTalk',
     dingtalkTip: 'Create DingTalk intelligent APP',
     wechat: 'WeChat',
@@ -207,6 +209,10 @@ export default {
       aesKeyPlaceholder: 'Please enter the message encryption key',
       urlInfo:
         '-Settings and Development-Basic Configuration-"Server Address URL" in server configuration',
+    },
+    wecomBotSetting: {
+      title: 'WeCom Bot Configuration',
+      urlInfo: '-Security and Management-Management Tools-Intelligent Bots-API Mode',
     },
     larkSetting: {
       title: 'Lark Configuration',

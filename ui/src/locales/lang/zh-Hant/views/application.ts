@@ -153,6 +153,8 @@ export default {
     wecomTip: '打造企業微信智慧應用',
     dingtalk: '釘釘應用',
     dingtalkTip: '打造釘釘智慧應用',
+    wecomBot: '企業微信智能機器人',
+    wecomBotTip: '打造企業微信智能機器人',
     wechat: '公眾號',
     wechatTip: '打造公眾號智慧應用',
     lark: '飛書應用',
@@ -201,6 +203,10 @@ export default {
       appSecretPlaceholder: '請輸入App Secret',
       verificationTokenPlaceholder: '請輸入Verification Token',
       urlInfo: '-事件與回呼-事件配置-配置訂閱方式的 "請求位址" 中',
+    },
+      wecomBotSetting: {
+      title: '企業微信機器人配置',
+      urlInfo: '-安全與管理-管理工具-智能機器人- API 模式建立的 "URL" 中',
     },
     slackSetting: {
       title: 'Slack 應用配置',

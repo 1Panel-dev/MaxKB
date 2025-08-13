@@ -150,6 +150,8 @@ export default {
     title: '应用接入',
     wecom: '企业微信应用',
     wecomTip: '打造企业微信智能应用',
+    wecomBot: '企业微信智能机器人',
+    wecomBotTip: '打造企业微信智能机器人应用',
     dingtalk: '钉钉应用',
     dingtalkTip: '打造钉钉智能应用',
     wechat: '公众号',
@@ -175,6 +177,10 @@ export default {
       encodingAesKeyPlaceholder: '请输入EncodingAESKey',
       authenticationSuccessful: '认证成功',
       urlInfo: '-应用管理-自建-创建的应用-接收消息-设置 API 接收的 "URL" 中',
+    },
+    wecomBotSetting: {
+      title: '企业微信应用配置',
+      urlInfo: '-安全与管理-管理工具-智能机器人- API 模式创建的 "URL" 中',
     },
     dingtalkSetting: {
       title: '钉钉应用配置',
