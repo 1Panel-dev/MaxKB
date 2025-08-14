@@ -28,7 +28,7 @@ LEFT JOIN (
                 AND 'MANAGE' = ANY(permission_list) THEN 'MANAGE'
             WHEN auth_type = 'RESOURCE_PERMISSION_GROUP'
                 AND 'VIEW' = ANY(permission_list) THEN 'VIEW'
-            ELSE 'NOT_AUTH'
+            ELSE null
         END AS permission
     FROM
         workspace_user_resource_permission
