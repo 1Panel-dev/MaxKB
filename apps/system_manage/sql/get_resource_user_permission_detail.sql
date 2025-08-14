@@ -19,7 +19,7 @@ LEFT JOIN (
 			and 'MANAGE'= any(permission_list)   then 'MANAGE'
 			  when  auth_type = 'RESOURCE_PERMISSION_GROUP'
 			and 'VIEW' = any( permission_list) then 'VIEW'
-			else 'NOT_AUTH'
+			else null
 		end) as "permission"
     FROM
         workspace_user_resource_permission

@@ -66,6 +66,7 @@ class UserResourcePermissionAPI(APIMixin):
                 description="权限",
                 type=OpenApiTypes.STR,
                 location='query',
+                many=True,
                 required=False
             ),
         ]
@@ -167,6 +168,7 @@ class ResourceUserPermissionAPI(APIMixin):
                 description="权限",
                 type=OpenApiTypes.STR,
                 location='query',
+                many=True,
                 required=False
             ),
         ]
@@ -226,6 +228,7 @@ class UserResourcePermissionPageAPI(APIMixin):
                 description="权限",
                 type=OpenApiTypes.STR,
                 location='query',
+                many=True,
                 required=False
             ),
         ]
@@ -298,6 +301,7 @@ class ResourceUserPermissionPageAPI(APIMixin):
                 description="权限",
                 type=OpenApiTypes.STR,
                 location='query',
+                many=True,
                 required=False
             ),
         ]
