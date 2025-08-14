@@ -76,7 +76,6 @@ websockets = "15.0.1"
 
 # 开发工具
 pylint = "3.3.7"
-tencentcloud-sdk-python-asr = "^3.0.1416"
 
 
 [build-system]
