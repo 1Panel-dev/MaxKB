@@ -107,7 +107,7 @@ def is_valid_credential(provider, model_type, model_name, model_credential: Dict
 def get_model_by_id(_id, workspace_id):
     model = QuerySet(Model).filter(id=_id).first()
     get_authorized_model = DatabaseModelManage.get_model("get_authorized_model")
-    if model and model.workspace_id!=workspace_id and get_authorized_model is not None:
+    if model and model.workspace_id != workspace_id and get_authorized_model is not None:
         model = get_authorized_model(QuerySet(Model).filter(id=_id), workspace_id).first()
     if model is None:
         raise Exception(_("Model does not exist"))
@@ -122,4 +122,5 @@ def get_model_instance_by_model_workspace_id(model_id, workspace_id, **kwargs):
     @return:                模型实例
     """
     model = get_model_by_id(model_id, workspace_id)
-    return ModelManage.get_model(model_id, lambda _id: get_model(model, **kwargs))
+    s = {p.get('field'): p.get('default_value') for p in model.model_params_form if p.get('default_value') is not None}
+    return ModelManage.get_model(model_id, lambda _id: get_model(model, **{**s, **kwargs}))
