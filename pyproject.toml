@@ -39,7 +39,8 @@ langchain-ollama = "0.3.4"
 langgraph = "0.5.3"
 torch = [
     { version = "2.8.0+cpu", markers = "sys_platform == 'linux'", source = "pytorch" },
-    { url = "https://download.pytorch.org/whl/cpu/torch-2.8.0-cp311-none-macosx_11_0_arm64.whl", markers = "sys_platform == 'darwin'" }
+    { version = "2.8.0+cpu", markers = "sys_platform == 'win'", source = "pytorch" },
+    { url = "https://download.pytorch.org/whl/cpu/torch-2.8.0-cp311-none-macosx_11_0_arm64.whl", markers = "sys_platform == 'darwin'" },
 ]
 sentence-transformers = "5.0.0"
 
