@@ -53,7 +53,7 @@ class WorkSpaceUserResourcePermissionView(APIView):
         return result.success(UserResourcePermissionSerializer(
             data={'workspace_id': workspace_id, 'user_id': user_id, 'auth_target_type': resource}
         ).list({'name': request.query_params.get('name'),
-                'permission': request.query_params.get('permission')}, request.user))
+                'permission': request.query_params.getlist('permission')}, request.user))
 
     @extend_schema(
         methods=['PUT'],
@@ -94,7 +94,7 @@ class WorkSpaceUserResourcePermissionView(APIView):
             return result.success(UserResourcePermissionSerializer(
                 data={'workspace_id': workspace_id, 'user_id': user_id, 'auth_target_type': resource}
                 ).page({'name': request.query_params.get('name'),
-                        'permission': request.query_params.get('permission')}, current_page, page_size, request.user))
+                        'permission': request.query_params.getlist('permission')}, current_page, page_size, request.user))
 
 
 class WorkspaceResourceUserPermissionView(APIView):
@@ -114,7 +114,7 @@ class WorkspaceResourceUserPermissionView(APIView):
             data={'workspace_id': workspace_id, "target": target, 'auth_target_type': resource,
                   }).list(
             {'username': request.query_params.get("username"), 'nick_name': request.query_params.get("nick_name"),
-             'permission': request.query_params.get("permission")
+             'permission': request.query_params.getlist("permission")
              }))
 
     @extend_schema(
@@ -150,5 +150,5 @@ class WorkspaceResourceUserPermissionView(APIView):
                 data={'workspace_id': workspace_id, "target": target, 'auth_target_type': resource, }
             ).page({'username': request.query_params.get("username"),
                     'nick_name': request.query_params.get("nick_name"),
-                    'permission': request.query_params.get("permission")}, current_page, page_size,
+                    'permission': request.query_params.getlist("permission")}, current_page, page_size,
                    ))

@@ -11,7 +11,7 @@ import os
 
 from django.core.cache import cache
 from django.db import models
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Q
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -24,14 +24,12 @@ from common.db.search import native_search, native_page_search, get_dynamics_mod
 from common.db.sql_execute import select_list
 from common.exception.app_exception import AppApiException
 from common.utils.common import get_file_content
-from common.utils.split_model import group_by
 from knowledge.models import Knowledge
 from maxkb.conf import PROJECT_DIR
 from maxkb.settings import edition
 from models_provider.models import Model
-from system_manage.models import WorkspaceUserResourcePermission, AuthTargetType
+from system_manage.models import WorkspaceUserResourcePermission
 from tools.models import Tool
-from users.models import User
 from users.serializers.user import is_workspace_manage
 
 
@@ -94,10 +92,13 @@ sql_map = {
     'APPLICATION': 'get_application_user_resource_permission.sql'
 }
 
+
 class UserResourcePermissionUserListRequest(serializers.Serializer):
     name = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('resource name'))
-    permission = serializers.ChoiceField(required=False, allow_null=True, allow_blank=True,choices=['NOT_AUTH', 'MANAGE', 'VIEW', 'ROLE'],
+    permission = serializers.MultipleChoiceField(required=False, allow_null=True, allow_blank=True,
+                                         choices=['NOT_AUTH', 'MANAGE', 'VIEW', 'ROLE'],
                                          label=_('permission'))
+
 
 class UserResourcePermissionSerializer(serializers.Serializer):
     workspace_id = serializers.CharField(required=True, label=_('workspace id'))
@@ -112,13 +113,20 @@ class UserResourcePermissionSerializer(serializers.Serializer):
             }))
         name = instance.get('name')
         permission = instance.get('permission')
+        query_p_list = [None if p == "NOT_AUTH" else p for p in permission]
 
         if name:
             resource_query_set = resource_query_set.filter(name__contains=name)
         if permission:
-            resource_query_set = resource_query_set.filter(
-                permission=None if instance.get('permission') == 'NOT_AUTH' else instance.get('permission'))
-
+            if all([p is None for p in query_p_list]):
+                resource_query_set = resource_query_set.filter(permission=None)
+            else:
+                if any([p is None for p in query_p_list]):
+                    resource_query_set = resource_query_set.filter(
+                        Q(permission__in=query_p_list) | Q(permission=None))
+                else:
+                    resource_query_set = resource_query_set.filter(
+                        permission__in=query_p_list)
         return {
             'query_set': QuerySet(m_map.get(self.data.get('auth_target_type'))).filter(
                 workspace_id=self.data.get('workspace_id')),
@@ -218,35 +226,37 @@ class UserResourcePermissionSerializer(serializers.Serializer):
             os.path.join(PROJECT_DIR, "apps", "system_manage", 'sql', sql_map.get(self.data.get('auth_target_type')))))
 
         return [{**user_resource_permission}
-            for user_resource_permission in user_resource_permission_list]
+                for user_resource_permission in user_resource_permission_list]
 
-
-    def page(self, instance, current_page: int, page_size: int,user, with_valid=True):
+    def page(self, instance, current_page: int, page_size: int, user, with_valid=True):
         if with_valid:
             self.is_valid(raise_exception=True)
             UserResourcePermissionUserListRequest(data=instance).is_valid(raise_exception=True)
         workspace_id = self.data.get("workspace_id")
         user_id = self.data.get("user_id")
         # 用户对应的资源权限分页列表
-        user_resource_permission_page_list = native_page_search(current_page,page_size,self.get_queryset(instance),get_file_content(
-            os.path.join(PROJECT_DIR, "apps", "system_manage", 'sql', sql_map.get(self.data.get('auth_target_type')))
-        ))
+        user_resource_permission_page_list = native_page_search(current_page, page_size, self.get_queryset(instance),
+                                                                get_file_content(
+                                                                    os.path.join(PROJECT_DIR, "apps", "system_manage",
+                                                                                 'sql', sql_map.get(
+                                                                            self.data.get('auth_target_type')))
+                                                                ))
 
         return user_resource_permission_page_list
-
 
     def edit(self, instance, user, with_valid=True):
         if with_valid:
             self.is_valid(raise_exception=True)
-            UpdateUserResourcePermissionRequest(data={'user_resource_permission_list':instance}).is_valid(raise_exception=True,
-                                                                        auth_target_type=self.data.get(
-                                                                            'auth_target_type'),
-                                                                        workspace_id=self.data.get('workspace_id'))
+            UpdateUserResourcePermissionRequest(data={'user_resource_permission_list': instance}).is_valid(
+                raise_exception=True,
+                auth_target_type=self.data.get(
+                    'auth_target_type'),
+                workspace_id=self.data.get('workspace_id'))
         workspace_id = self.data.get("workspace_id")
         user_id = self.data.get("user_id")
         update_list = []
         save_list = []
-        targets = [ item['target_id'] for item in instance ]
+        targets = [item['target_id'] for item in instance]
         QuerySet(WorkspaceUserResourcePermission).filter(
             workspace_id=workspace_id,
             user_id=user_id,
@@ -286,14 +296,15 @@ class UserResourcePermissionSerializer(serializers.Serializer):
 class ResourceUserPermissionUserListRequest(serializers.Serializer):
     nick_name = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('workspace id'))
     username = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('workspace id'))
-    permission = serializers.ChoiceField(required=False, allow_null=True, allow_blank=True, choices=['NOT_AUTH', 'MANAGE', 'VIEW', 'ROLE'],
-                                         label=_('permission'))
+    permission = serializers.MultipleChoiceField(required=False, allow_null=True, allow_blank=True,
+                                                 choices=['NOT_AUTH', 'MANAGE', 'VIEW', 'ROLE'],
+                                                 label=_('permission'))
 
 
 class ResourceUserPermissionEditRequest(serializers.Serializer):
     user_id = serializers.CharField(required=True, label=_('workspace id'))
     permission = serializers.ChoiceField(required=True, choices=['NOT_AUTH', 'MANAGE', 'VIEW', 'ROLE'],
-                                         label=_('permission'))
+                                                 label=_('permission'))
 
 
 permission_map = {
@@ -315,11 +326,13 @@ class ResourceUserPermissionSerializer(serializers.Serializer):
         user_query_set = QuerySet(model=get_dynamics_model({
             'nick_name': models.CharField(),
             'username': models.CharField(),
-            "permission": models.CharField(),
+            "permission": models.CharField()
         }))
         nick_name = instance.get('nick_name')
         username = instance.get('username')
         permission = instance.get('permission')
+        query_p_list = [None if p == "NOT_AUTH" else p for p in permission]
+
         workspace_user_resource_permission_query_set = QuerySet(WorkspaceUserResourcePermission).filter(
             workspace_id=self.data.get('workspace_id'),
             auth_target_type=self.data.get('auth_target_type'),
@@ -329,8 +342,16 @@ class ResourceUserPermissionSerializer(serializers.Serializer):
         if username:
             user_query_set = user_query_set.filter(username__contains=username)
         if permission:
-            user_query_set = user_query_set.filter(
-                permission=None if instance.get('permission') == 'NOT_AUTH' else instance.get('permission'))
+            if all([p is None for p in query_p_list]):
+                user_query_set = user_query_set.filter(
+                    permission=None)
+            else:
+                if any([p is None for p in query_p_list]):
+                    user_query_set = user_query_set.filter(
+                        Q(permission__in=query_p_list) | Q(permission=None))
+                else:
+                    user_query_set = user_query_set.filter(
+                        permission__in=query_p_list)
 
         return {
             'workspace_user_resource_permission_query_set': workspace_user_resource_permission_query_set,
