@@ -8697,3 +8697,81 @@ msgstr "修改資源對用戶的授權狀態"
 
 msgid "Get user authorization status of resource by page"
 msgstr "分頁獲取資源對用戶的授權狀態"
+
+msgid "Obtain resource authorization list by page"
+msgstr "分頁獲取資源授權清單"
+
+msgid "Engine model type"
+msgstr "引擎模型類型"
+
+msgid "If not passed, the default value is 16k_zh (Chinese universal)"
+msgstr "如果未傳遞，默認值為 16k_zh（中文通用）"
+
+msgid "Chinese telephone universal"
+msgstr "中文電話通用"
+
+msgid "English telephone universal"
+msgstr "英文電話通用"
+
+msgid "Commonly used in Chinese"
+msgstr "中文常用"
+
+msgid "Chinese, English, and Guangdong"
+msgstr "中文、英文和廣東話"
+
+msgid "Chinese medical"
+msgstr "中文醫療"
+
+msgid "English"
+msgstr "英文"
+
+msgid "Cantonese"
+msgstr "粵語"
+
+msgid "Japanese"
+msgstr "日語"
+
+msgid "Korean"
+msgstr "韓語"
+
+msgid "Vietnamese"
+msgstr "越南語"
+
+msgid "Malay language"
+msgstr "馬來語"
+
+msgid "Indonesian language"
+msgstr "印尼語"
+
+msgid "Filipino language"
+msgstr "菲律賓語"
+
+msgid "Thai"
+msgstr "泰語"
+
+msgid "Portuguese"
+msgstr "葡萄牙語"
+
+msgid "Turkish"
+msgstr "土耳其語"
+
+msgid "Arabic"
+msgstr "阿拉伯語"
+
+msgid "Spanish"
+msgstr "西班牙語"
+
+msgid "Hindi"
+msgstr "印地語"
+
+msgid "French"
+msgstr "法語"
+
+msgid "German"
+msgstr "德語"
+
+msgid "Multiple dialects, supporting 23 dialects"
+msgstr "多種方言，支持 23 種方言"
+
+msgid "This interface is used to recognize short audio files within 60 seconds. Supports Mandarin Chinese, English, Cantonese, Japanese, Vietnamese, Malay, Indonesian, Filipino, Thai, Portuguese, Turkish, Arabic, Hindi, French, German, and 23 Chinese dialects."
+msgstr "本介面用於識別 60 秒之內的短音頻文件。支援中文普通話、英語、粵語、日語、越南語、馬來語、印度尼西亞語、菲律賓語、泰語、葡萄牙語、土耳其語、阿拉伯語、印地語、法語、德語及 23 種漢語方言。"

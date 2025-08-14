@@ -9,10 +9,12 @@ from models_provider.base_model_provider import (
 from models_provider.impl.tencent_model_provider.credential.embedding import TencentEmbeddingCredential
 from models_provider.impl.tencent_model_provider.credential.image import TencentVisionModelCredential
 from models_provider.impl.tencent_model_provider.credential.llm import TencentLLMModelCredential
+from models_provider.impl.tencent_model_provider.credential.stt import TencentSTTModelCredential
 from models_provider.impl.tencent_model_provider.credential.tti import TencentTTIModelCredential
 from models_provider.impl.tencent_model_provider.model.embedding import TencentEmbeddingModel
 from models_provider.impl.tencent_model_provider.model.image import TencentVision
 from models_provider.impl.tencent_model_provider.model.llm import TencentModel
+from models_provider.impl.tencent_model_provider.model.stt import TencentSpeechToText
 from models_provider.impl.tencent_model_provider.model.tti import TencentTextToImageModel
 from maxkb.conf import PROJECT_DIR
 from django.utils.translation import gettext as _
@@ -70,6 +72,12 @@ def _initialize_model_info():
             ModelTypeConst.LLM,
             TencentLLMModelCredential,
             TencentModel),
+        _create_model_info(
+            'asr-sentence',
+            _("This interface is used to recognize short audio files within 60 seconds. Supports Mandarin Chinese, English, Cantonese, Japanese, Vietnamese, Malay, Indonesian, Filipino, Thai, Portuguese, Turkish, Arabic, Hindi, French, German, and 23 Chinese dialects."),
+            ModelTypeConst.STT,
+            TencentSTTModelCredential,
+            TencentSpeechToText),
     ]
 
     tencent_embedding_model_info = _create_model_info(

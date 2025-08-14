@@ -8571,3 +8571,81 @@ msgstr ""
 
 msgid "Get user authorization status of resource by page"
 msgstr ""
+
+msgid "Obtain resource authorization list by page"
+msgstr ""
+
+msgid "Engine model type"
+msgstr ""
+
+msgid "If not passed, the default value is 16k_zh (Chinese universal)"
+msgstr ""
+
+msgid "Chinese telephone universal"
+msgstr ""
+
+msgid "English telephone universal"
+msgstr ""
+
+msgid "Commonly used in Chinese"
+msgstr ""
+
+msgid "Chinese, English, and Guangdong"
+msgstr ""
+
+msgid "Chinese medical"
+msgstr ""
+
+msgid "English"
+msgstr ""
+
+msgid "Cantonese"
+msgstr ""
+
+msgid "Japanese"
+msgstr ""
+
+msgid "Korean"
+msgstr ""
+
+msgid "Vietnamese"
+msgstr ""
+
+msgid "Malay language"
+msgstr ""
+
+msgid "Indonesian language"
+msgstr ""
+
+msgid "Filipino language"
+msgstr ""
+
+msgid "Thai"
+msgstr ""
+
+msgid "Portuguese"
+msgstr ""
+
+msgid "Turkish"
+msgstr ""
+
+msgid "Arabic"
+msgstr ""
+
+msgid "Spanish"
+msgstr ""
+
+msgid "Hindi"
+msgstr ""
+
+msgid "French"
+msgstr ""
+
+msgid "German"
+msgstr ""
+
+msgid "Multiple dialects, supporting 23 dialects"
+msgstr ""
+
+msgid "This interface is used to recognize short audio files within 60 seconds. Supports Mandarin Chinese, English, Cantonese, Japanese, Vietnamese, Malay, Indonesian, Filipino, Thai, Portuguese, Turkish, Arabic, Hindi, French, German, and 23 Chinese dialects."
+msgstr ""
