@@ -77,4 +77,4 @@ class TencentSpeechToText(MaxKBBaseModel, BaseSpeechToText):
 
 
         except TencentCloudSDKException as err:
-            print(err)
+            maxkb_logger.error(f":Error: {str(err)}: {traceback.format_exc()}")
