@@ -9,46 +9,46 @@ export default {
     DatePicker: 'Date Picker',
     JsonInput: 'JSON',
     RadioCard: 'Radio Card',
-    RadioRow: 'Radio Row'
+    RadioRow: 'Radio Row',
   },
   default: {
     label: 'Default',
     placeholder: 'Please enter a default',
     requiredMessage: ' is a required property',
-    show: 'Show Default'
+    show: 'Show Default',
   },
   tip: {
     requiredMessage: 'cannot be empty',
-    jsonMessage: 'Incorrect JSON format'
+    jsonMessage: 'Incorrect JSON format',
   },
   searchBar: {
-    placeholder: 'Please enter keywords to search'
+    placeholder: 'Please enter keywords to search',
   },
   paramForm: {
     field: {
       label: 'Parameter',
       placeholder: 'Please enter a parameter',
       requiredMessage: 'Parameter is a required property',
-      requiredMessage2: 'Only letters, numbers, and underscores are allowed'
+      requiredMessage2: 'Only letters, numbers, and underscores are allowed',
     },
     name: {
       label: 'Name',
       placeholder: 'Please enter a name',
-      requiredMessage: 'Name is a required property'
+      requiredMessage: 'Name is a required property',
     },
     tooltip: {
       label: 'Tooltip',
-      placeholder: 'Please enter a tooltip'
+      placeholder: 'Please enter a tooltip',
     },
     required: {
       label: 'Required',
-      requiredMessage: 'Required is a required property'
+      requiredMessage: 'Required is a required property',
     },
     input_type: {
       label: 'Type',
       placeholder: 'Please select a type',
-      requiredMessage: 'Type is a required property'
-    }
+      requiredMessage: 'Type is a required property',
+    },
   },
   DatePicker: {
     placeholder: 'Select Date',
@@ -58,35 +58,35 @@ export default {
     datetime: 'Date Time',
     dataType: {
       label: 'Date Type',
-      placeholder: 'Please select a date type'
+      placeholder: 'Please select a date type',
     },
     format: {
       label: 'Format',
-      placeholder: 'Please select a format'
-    }
+      placeholder: 'Please select a format',
+    },
   },
   Select: {
     label: 'Option Value',
-    placeholder: 'Please enter an option value'
+    placeholder: 'Please enter an option value',
   },
   tag: {
     label: 'Tag',
-    placeholder: 'Please enter an option label'
+    placeholder: 'Please enter an option label',
   },
   Slider: {
     showInput: {
-      label: 'Show Input Box'
+      label: 'Show Input Box',
     },
     valueRange: {
       label: 'Value Range',
       minRequired: 'Minimum value is required',
-      maxRequired: 'Maximum value is required'
+      maxRequired: 'Maximum value is required',
     },
     step: {
       label: 'Step Value',
       requiredMessage1: 'Step value is required',
-      requiredMessage2: 'Step value cannot be 0'
-    }
+      requiredMessage2: 'Step value cannot be 0',
+    },
   },
   TextInput: {
     length: {
@@ -96,7 +96,16 @@ export default {
       requiredMessage1: 'Length must be between',
       requiredMessage2: 'and',
       requiredMessage3: 'characters',
-      requiredMessage4: 'Text length is a required parameter'
-    }
-  }
+      requiredMessage4: 'Text length is a required parameter',
+    },
+  },
+  AssignmentMethod: {
+    label: 'Assignment Method',
+    custom: {
+      label: 'Custom',
+    },
+    ref_variables: {
+      label: 'Reference Variables',
+    },
+  },
 }
