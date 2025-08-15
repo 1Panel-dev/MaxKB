@@ -9,46 +9,46 @@ export default {
     DatePicker: '日期',
     JsonInput: 'JSON文本框',
     RadioCard: '选项卡',
-    RadioRow: '单行选项卡'
+    RadioRow: '单行选项卡',
   },
   default: {
     label: '默认值',
     placeholder: '请输入默认值',
     requiredMessage: '为必填属性',
-    show: '显示默认值'
+    show: '显示默认值',
   },
   tip: {
     requiredMessage: '不能为空',
-    jsonMessage: 'JSON格式不正确'
+    jsonMessage: 'JSON格式不正确',
   },
   searchBar: {
-    placeholder: '请输入关键字搜索'
+    placeholder: '请输入关键字搜索',
   },
   paramForm: {
     field: {
       label: '参数',
       placeholder: '请输入参数',
       requiredMessage: '参数 为必填属性',
-      requiredMessage2: '只能输入字母数字和下划线'
+      requiredMessage2: '只能输入字母数字和下划线',
     },
     name: {
       label: '显示名称',
       placeholder: '请输入显示名称',
-      requiredMessage: '显示名称 为必填属性'
+      requiredMessage: '显示名称 为必填属性',
     },
     tooltip: {
       label: '参数提示说明',
-      placeholder: '请输入参数提示说明'
+      placeholder: '请输入参数提示说明',
     },
     required: {
       label: '是否必填',
-      requiredMessage: '是否必填 为必填属性'
+      requiredMessage: '是否必填 为必填属性',
     },
     input_type: {
       label: '组件类型',
       placeholder: '请选择组件类型',
-      requiredMessage: '组建类型 为必填属性'
-    }
+      requiredMessage: '组建类型 为必填属性',
+    },
   },
   DatePicker: {
     placeholder: '选择日期',
@@ -58,35 +58,35 @@ export default {
     datetime: '日期时间',
     dataType: {
       label: '时间类型',
-      placeholder: '请选择时间类型'
+      placeholder: '请选择时间类型',
     },
     format: {
       label: '格式',
-      placeholder: '请选择格式'
-    }
+      placeholder: '请选择格式',
+    },
   },
   Select: {
     label: '选项值',
-    placeholder: '请输入选项值'
+    placeholder: '请输入选项值',
   },
   tag: {
     label: '标签',
-    placeholder: '请输入选项标签'
+    placeholder: '请输入选项标签',
   },
   Slider: {
     showInput: {
-      label: '是否带输入框'
+      label: '是否带输入框',
     },
     valueRange: {
       label: '取值范围',
       minRequired: '最小值必填',
-      maxRequired: '最大值必填'
+      maxRequired: '最大值必填',
     },
     step: {
       label: '步长值',
       requiredMessage1: '步长值必填',
-      requiredMessage2: '步长不能为0'
-    }
+      requiredMessage2: '步长不能为0',
+    },
   },
   TextInput: {
     length: {
@@ -96,7 +96,16 @@ export default {
       requiredMessage1: '长度在',
       requiredMessage2: '到',
       requiredMessage3: '个字符',
-      requiredMessage4: '文本长度为必填参数'
-    }
-  }
+      requiredMessage4: '文本长度为必填参数',
+    },
+  },
+  AssignmentMethod: {
+    label: '赋值方式',
+    custom: {
+      label: '自定义',
+    },
+    ref_variables: {
+      label: '引用变量 ',
+    },
+  },
 }

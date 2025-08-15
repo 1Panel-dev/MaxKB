@@ -17,6 +17,19 @@ from application.flow.i_step_node import NodeResult
 from application.flow.step_node.form_node.i_form_node import IFormNode
 
 
+def get_default_option(option_list, _type, value_field):
+    if option_list is not None and len(option_list) > 0:
+        default_value_list = [o.get(value_field) for o in option_list if o.get('default')]
+        if len(default_value_list) == 0:
+            return option_list[0].get(value_field)
+        else:
+            if _type == 'MultiSelect':
+                return default_value_list
+            else:
+                return default_value_list[0]
+    return []
+
+
 def write_context(step_variable: Dict, global_variable: Dict, node, workflow):
     if step_variable is not None:
         for key in step_variable:
@@ -44,6 +57,28 @@ class BaseFormNode(IFormNode):
             for key in form_data:
                 self.context[key] = form_data[key]
 
+    def reset_field(self, field):
+        if ['SingleSelect', 'MultiSelect', 'RadioCard'].__contains__(field.get('input_type')):
+            if field.get('assignment_method') == 'ref_variables':
+                option_list = self.workflow_manage.get_reference_field(field.get('option_list')[0],
+                                                                       field.get('option_list')[1:])
+                field['option_list'] = option_list
+                field['default_value'] = get_default_option(option_list, field.get('input_type'),
+                                                            field.get('value_field'))
+
+        reset_field = ['field', 'label', 'default_value']
+        for f in reset_field:
+            _value = field[f]
+            if isinstance(_value, str):
+                field[f] = self.workflow_manage.generate_prompt(_value)
+            else:
+                _label_value = _value.get('label')
+                _value['label'] = self.workflow_manage.generate_prompt(_label_value)
+                tooltip = _value.get('attrs').get('tooltip')
+                if tooltip is not None:
+                    _value.get('attrs')['tooltip'] = self.workflow_manage.generate_prompt(tooltip)
+        return field
+
     def execute(self, form_field_list, form_content_format, form_data, **kwargs) -> NodeResult:
         if form_data is not None:
             self.context['is_submit'] = True
@@ -52,6 +87,7 @@ class BaseFormNode(IFormNode):
                 self.context[key] = form_data.get(key)
         else:
             self.context['is_submit'] = False
+        form_field_list = [self.reset_field(field) for field in form_field_list]
         form_setting = {"form_field_list": form_field_list, "runtime_node_id": self.runtime_node_id,
                         "chat_record_id": self.flow_params_serializer.data.get("chat_record_id"),
                         "is_submit": self.context.get("is_submit", False)}
@@ -60,6 +96,7 @@ class BaseFormNode(IFormNode):
         form_content_format = self.workflow_manage.reset_prompt(form_content_format)
         prompt_template = PromptTemplate.from_template(form_content_format, template_format='jinja2')
         value = prompt_template.format(form=form, context=context)
+
         return NodeResult(
             {'result': value, 'form_field_list': form_field_list, 'form_content_format': form_content_format}, {},
             _write_context=write_context)

@@ -10,11 +10,11 @@
             style="--el-card-padding: 12px 16px"
             :class="[
               inputDisabled ? 'is-disabled' : '',
-              modelValue == item[valueField] ? 'active' : ''
+              modelValue == item[valueField] ? 'active' : '',
             ]"
             @click="inputDisabled ? () => {} : selected(item[valueField])"
+            :innerHTML="item[textField]"
           >
-            {{ item[textField] }}
           </el-card>
         </el-col>
       </template>

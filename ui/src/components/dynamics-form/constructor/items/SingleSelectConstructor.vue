@@ -1,5 +1,28 @@
 <template>
-  <el-form-item>
+  <el-form-item v-if="getModel">
+    <template #label>
+      <div class="flex-between">
+        {{ $t('dynamicsForm.AssignmentMethod.label', '赋值方式') }}
+      </div>
+    </template>
+
+    <el-row style="width: 100%" :gutter="10">
+      <el-radio-group v-model="formValue.assignment_method">
+        <el-radio :value="item.value" size="large" v-for="item in assignment_method_option_list">{{
+          item.label
+        }}</el-radio>
+      </el-radio-group>
+    </el-row>
+  </el-form-item>
+  <NodeCascader
+    v-if="formValue.assignment_method == 'ref_variables'"
+    ref="nodeCascaderRef"
+    :nodeModel="model"
+    class="w-full"
+    :placeholder="$t('views.applicationWorkflow.variable.placeholder')"
+    v-model="formValue.option_list"
+  />
+  <el-form-item v-if="formValue.assignment_method == 'custom'">
     <template #label>
       <div class="flex-between">
         {{ $t('dynamicsForm.Select.label') }}
@@ -52,6 +75,7 @@
     </el-row>
   </el-form-item>
   <el-form-item
+    v-if="formValue.assignment_method == 'custom'"
     class="defaultValueItem"
     :required="formValue.required"
     prop="default_value"
@@ -85,8 +109,34 @@
   </el-form-item>
 </template>
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, inject } from 'vue'
+import NodeCascader from '@/workflow/common/NodeCascader.vue'
+import { t } from '@/locales'
+const getModel = inject('getModel') as any
 
+const assignment_method_option_list = computed(() => {
+  const option_list = [
+    {
+      label: t('dynamicsForm.AssignmentMethod.custom.label', '自定义'),
+      value: 'custom',
+    },
+  ]
+  if (getModel) {
+    option_list.push({
+      label: t('dynamicsForm.AssignmentMethod.ref_variables.label', '引用变量'),
+      value: 'ref_variables',
+    })
+  }
+  return option_list
+})
+
+const model = computed(() => {
+  if (getModel) {
+    return getModel()
+  } else {
+    return null
+  }
+})
 const props = defineProps<{
   modelValue: any
 }>()
@@ -121,18 +171,21 @@ const getData = () => {
     text_field: 'label',
     value_field: 'value',
     option_list: formValue.value.option_list,
+    assignment_method: formValue.value.assignment_method || 'custom',
   }
 }
 const rander = (form_data: any) => {
   formValue.value.option_list = form_data.option_list || []
   formValue.value.default_value = form_data.default_value
   formValue.value.show_default_value = form_data.show_default_value
+  formValue.value.assignment_method = form_data.assignment_method || 'custom'
 }
 
 defineExpose({ getData, rander })
 onMounted(() => {
   formValue.value.option_list = []
   formValue.value.default_value = ''
+  formValue.value.assignment_method = 'custom'
   if (formValue.value.show_default_value === undefined) {
     formValue.value.show_default_value = true
   }
