@@ -84,6 +84,16 @@
             }}</a
           >{{ $t('views.application.applicationAccess.larkSetting.urlInfo') }}
         </el-text>
+        <el-text type="info" v-if="configType === 'wecomBot'">
+          {{ $t('views.application.applicationAccess.copyUrl') }}
+          <a
+            class="color-primary"
+            href="https://work.weixin.qq.com/wework_admin/frame#/manageTools"
+            target="_blank"
+          >{{ $t('views.application.applicationAccess.wecomPlatform') }}</a
+          >{{ $t('views.application.applicationAccess.wecomBotSetting.urlInfo') }}
+        </el-text>
+
       </el-form-item>
     </el-form>
 
