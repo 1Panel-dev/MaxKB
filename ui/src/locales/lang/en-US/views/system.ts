@@ -109,18 +109,20 @@ export default {
     enableSSL: 'Enable SSL (if the SMTP port is 465, you usually need to enable SSL)',
     enableTLS: 'Enable TLS (if the SMTP port is 587, you usually need to enable TLS)',
   },
+
   resourceAuthorization: {
     title: 'Resource Authorization',
     member: 'Member',
     permissionSetting: 'Permission Setting',
     setting: {
       management: 'management',
+      managementDesc: 'Can delete or modify this resource',
       check: 'check',
-      authorization: 'authorization',
-    },
-    priority: {
-      label: 'Resource permission priority',
-      role: 'Role',
+      checkDesc: 'Can only view the resource',
+      role: 'User Role',
+      roleDesc: 'Authorize users based on their roles to access this resource',
+      notAuthorized: 'Not Authorized',
+      configure: 'Configure Permission',
     },
   },
   resource_management: {

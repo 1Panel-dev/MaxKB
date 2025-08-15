@@ -22,7 +22,8 @@
               :type="type" :send-message="sendMessage" :chat-management="ChatManagement"
               :executionIsRightPanel="props.executionIsRightPanel"
               @open-execution-detail="emit('openExecutionDetail', chatList[index])"
-              @openParagraph="emit('openParagraph', chatList[index])" @openParagraphDocument="
+              @openParagraph="emit('openParagraph', chatList[index])"
+              @openParagraphDocument="
                 (val: any) => emit('openParagraphDocument', chatList[index], val)
               "></AnswerContent>
           </template>

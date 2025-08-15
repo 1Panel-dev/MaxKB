@@ -1,8 +1,7 @@
-import { Permission } from '@/utils/permission/type'
 import { Result } from '@/request/Result'
 import { get, put, post, del } from '@/request/index'
-import type { pageRequest } from '@/api/type/common'
 import type { Ref } from 'vue'
+import type { pageRequest } from '@/api/type/common'
 const prefix = '/workspace'
 
 /**
@@ -13,11 +12,13 @@ const getResourceAuthorization: (
   workspace_id: string,
   user_id: string,
   resource: string,
+  page: pageRequest,
+  params?: any,
   loading?: Ref<boolean>,
-) => Promise<Result<any>> = (workspace_id, user_id, resource, loading) => {
+) => Promise<Result<any>> = (workspace_id, user_id, resource, page, params, loading) => {
   return get(
-    `${prefix}/${workspace_id}/user_resource_permission/user/${user_id}/resource/${resource}`,
-    undefined,
+    `${prefix}/${workspace_id}/user_resource_permission/user/${user_id}/resource/${resource}/${page.current_page}/${page.page_size}`,
+    params,
     loading,
   )
 }
@@ -26,18 +27,12 @@ const getResourceAuthorization: (
  * 修改成员权限
  * @param 参数 member_id
  * @param 参数 {
-          "team_resource_permission_list": [
-            {
-              "auth_target_type": "KNOWLEDGE",
-              "target_id": "string",
-              "auth_type": "ROLE",
-              "permission": {
-                "VIEW": true,
-                "MANAGE": true,
-                "ROLE": true
-              }
-            }
-          ]
+     [
+      {
+        "target_id": "string",
+        "permission": "NOT_AUTH"
+      }
+    ]
         }
  */
 const putResourceAuthorization: (
