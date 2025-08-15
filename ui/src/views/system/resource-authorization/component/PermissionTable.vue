@@ -23,7 +23,7 @@
             <el-option :label="$t('common.name')" value="name" />
             <el-option
               :label="$t('views.model.modelForm.permissionType.label')"
-              value="publish_status"
+              value="permission"
             />
           </el-select>
           <el-input
@@ -35,8 +35,8 @@
             clearable
           />
           <el-select
-            v-else-if="searchType === 'publish_status'"
-            v-model="searchForm.publish_status"
+            v-else-if="searchType === 'permission'"
+            v-model="searchForm.permission"
             @change="searchHandle"
             filterable
             clearable
@@ -139,7 +139,7 @@
 import { ref, onMounted, watch, computed, reactive } from 'vue'
 import { useRoute } from 'vue-router'
 import type { Provider } from '@/api/type/model'
-import { AuthorizationEnum } from '@/enums/system'
+import { SourceTypeEnum } from '@/enums/common'
 import { isAppIcon, resetUrl } from '@/utils/common'
 import { RoleConst, PermissionConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
@@ -196,20 +196,20 @@ const permissionObj = ref<any>({
     'OR',
   ),
 })
-const isKnowledge = computed(() => props.type === AuthorizationEnum.KNOWLEDGE)
-const isApplication = computed(() => props.type === AuthorizationEnum.APPLICATION)
-const isTool = computed(() => props.type === AuthorizationEnum.TOOL)
-const isModel = computed(() => props.type === AuthorizationEnum.MODEL)
+const isKnowledge = computed(() => props.type === SourceTypeEnum.KNOWLEDGE)
+const isApplication = computed(() => props.type === SourceTypeEnum.APPLICATION)
+const isTool = computed(() => props.type === SourceTypeEnum.TOOL)
+const isModel = computed(() => props.type === SourceTypeEnum.MODEL)
 
 const multipleTableRef = ref()
 const searchType = ref('name')
 const searchForm = ref<any>({
   name: '',
-  publish_status: undefined,
+  permission: undefined,
 })
 
 const search_type_change = () => {
-  searchForm.value = { name: '', create_user: '' }
+  searchForm.value = { name: '', permission: undefined }
 }
 
 const paginationConfig = reactive({

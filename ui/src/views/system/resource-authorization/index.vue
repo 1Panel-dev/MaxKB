@@ -77,11 +77,11 @@
 <script lang="ts" setup>
 import { onMounted, ref, reactive, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import AuthorizationApi from '@/api/system/resource-authorization'
 import PermissionTable from '@/views/system/resource-authorization/component/PermissionTable.vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
-import { AuthorizationEnum } from '@/enums/system'
+import { SourceTypeEnum } from '@/enums/common'
 import { t } from '@/locales'
+import AuthorizationApi from '@/api/system/resource-authorization'
 import { EditionConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
 import type { WorkspaceItem } from '@/api/type/workspace'
@@ -103,19 +103,19 @@ const permissionData = ref<any[]>([])
 const settingTags = reactive([
   {
     label: t('views.knowledge.title'),
-    type: AuthorizationEnum.KNOWLEDGE,
+    type: SourceTypeEnum.KNOWLEDGE,
   },
   {
     label: t('views.application.title'),
-    type: AuthorizationEnum.APPLICATION,
+    type: SourceTypeEnum.APPLICATION,
   },
   {
     label: t('views.tool.title'),
-    type: AuthorizationEnum.TOOL,
+    type: SourceTypeEnum.TOOL,
   },
   {
     label: t('views.model.title'),
-    type: AuthorizationEnum.MODEL,
+    type: SourceTypeEnum.MODEL,
   },
 ])
 // 当前激活的数据类型（应用/知识库/模型/工具）

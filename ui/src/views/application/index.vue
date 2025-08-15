@@ -249,6 +249,14 @@
                               <AppIcon iconName="app-setting" class="color-secondary"></AppIcon>
                               {{ $t('common.setting') }}
                             </el-dropdown-item>
+
+                            <el-dropdown-item @click.stop="openAuthorization(item)">
+                              <AppIcon
+                                iconName="app-resource-authorization"
+                                class="color-secondary"
+                              ></AppIcon>
+                              {{ $t('views.system.resourceAuthorization.title') }}
+                            </el-dropdown-item>
                             <el-dropdown-item
                               @click.stop="openMoveToDialog(item)"
                               v-if="permissionPrecise.edit(item.id) && apiType === 'workspace'"
@@ -301,6 +309,10 @@
       @refresh="refreshApplicationList"
       v-if="apiType === 'workspace'"
     />
+    <ResourceAuthorizationDrawer
+      :type="SourceTypeEnum.APPLICATION"
+      ref="ResourceAuthorizationDrawerRef"
+    />
   </LayoutContainer>
 </template>
 
@@ -310,6 +322,7 @@ import CreateApplicationDialog from '@/views/application/component/CreateApplica
 import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
 import CopyApplicationDialog from '@/views/application/component/CopyApplicationDialog.vue'
 import MoveToDialog from '@/components/folder-tree/MoveToDialog.vue'
+import ResourceAuthorizationDrawer from '@/components/resource-authorization-drawer/index.vue'
 import ApplicationApi from '@/api/application/application'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import useStore from '@/stores'
@@ -318,7 +331,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { isWorkFlow } from '@/utils/application'
 import { resetUrl } from '@/utils/common'
 import { dateFormat } from '@/utils/time'
-import { SourceTypeEnum, ValidType, ValidCount } from '@/enums/common'
+import { SourceTypeEnum } from '@/enums/common'
 import permissionMap from '@/permission'
 import WorkspaceApi from '@/api/workspace/workspace'
 import { hasPermission } from '@/utils/permission'
@@ -357,6 +370,11 @@ const paginationConfig = reactive({
 const folderList = ref<any[]>([])
 const applicationList = ref<any[]>([])
 const CopyApplicationDialogRef = ref()
+
+const ResourceAuthorizationDrawerRef = ref()
+function openAuthorization(item: any) {
+  ResourceAuthorizationDrawerRef.value.open(item.id)
+}
 
 const MoveToDialogRef = ref()
 
