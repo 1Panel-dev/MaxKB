@@ -8649,3 +8649,12 @@ msgstr ""
 
 msgid "This interface is used to recognize short audio files within 60 seconds. Supports Mandarin Chinese, English, Cantonese, Japanese, Vietnamese, Malay, Indonesian, Filipino, Thai, Portuguese, Turkish, Arabic, Hindi, French, German, and 23 Chinese dialects."
 msgstr ""
+
+msgid "CueWord"
+msgstr ""
+
+msgid "If not passed, the default value is What is this audio saying? Only answer the audio content"
+msgstr ""
+
+msgid "The Qwen Omni series model supports inputting multiple modalities of data, including video, audio, images, and text, and outputting audio and text."
+msgstr ""
