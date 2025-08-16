@@ -120,14 +120,12 @@ select_components() {
     echo "  1) Redis 缓存服务"
     echo "  2) PostgreSQL+pgvector 数据库"
     echo "  3) GS_KH 后台应用"
-    echo "  4) 前端页面"
-    echo "  5) 全部组件"
     echo ""
-    
+
     while true; do
         echo -e "${YELLOW}请选择要部署的组件 (用空格分隔多个选项，如: 1 2 3)${NC}: "
         read -r selection
-        
+
         SELECTED_COMPONENTS=()
         for choice in $selection; do
             case $choice in
@@ -140,27 +138,20 @@ select_components() {
                 3)
                     SELECTED_COMPONENTS+=("backend")
                     ;;
-                4)
-                    SELECTED_COMPONENTS+=("frontend")
-                    ;;
-                5)
-                    SELECTED_COMPONENTS=("redis" "postgres" "backend" "frontend")
-                    break
-                    ;;
                 *)
                     log_error "无效选择: $choice"
                     continue 2
                     ;;
             esac
         done
-        
+
         if [ ${#SELECTED_COMPONENTS[@]} -gt 0 ]; then
             break
         else
             log_error "请至少选择一个组件"
         fi
     done
-    
+
     echo ""
     log_info "已选择组件: ${SELECTED_COMPONENTS[*]}"
     echo ""
@@ -252,53 +243,20 @@ configure_postgres() {
 # 配置后台应用的镜像
 configure_backend_image() {
     echo -e "${CYAN}=== 配置后台应用镜像 ===${NC}"
-    
-    # 设置默认镜像
-    local default_image="maxkb/backend:v2.0"
-    if [ -n "$REGISTRY" ]; then
-        default_image="$REGISTRY/gs_kh/maxkb/backend:v2.0"
+
+    # 设置默认镜像仓库地址
+    local default_registry="docker.zhouke.tech/gs_kh"
+
+    echo -e "${YELLOW}请输入镜像标签${NC} [默认: ${BLUE}dev${NC}]: "
+    read -r tag_input
+    if [ -z "$tag_input" ]; then
+        tag_input="dev"
     fi
-    
-    echo -e "${YELLOW}请选择后台镜像配置方式:${NC}"
-    echo "  1) 使用默认镜像: $default_image"
-    echo "  2) 自定义镜像名称"
-    echo -e "请选择 [1-2，默认1]: "
-    
-    read -r image_choice
-    case $image_choice in
-        2)
-            echo -e "${YELLOW}请输入自定义的后台镜像名称:${NC}"
-            if [ -n "$REGISTRY" ]; then
-                echo -e "${CYAN}💡 当前私有仓库: $REGISTRY${NC}"
-                echo -e "${CYAN}💡 示例: gs_kh/gsbackend:v2.2 (将自动添加仓库前缀)${NC}"
-                echo -e "${CYAN}💡 示例: custom-project/backend:latest${NC}"
-            else
-                echo -e "${CYAN}💡 示例: maxkb/maxkb/backend:2.2${NC}"
-                echo -e "${CYAN}💡 示例: your-registry.com/your-project/backend:latest${NC}"
-            fi
-            
-            read_input "后台镜像名称" "" "CUSTOM_IMAGE_NAME"
-            
-            # 验证镜像名称不为空
-            while [ -z "$CUSTOM_IMAGE_NAME" ]; do
-                echo -e "${RED}镜像名称不能为空，请重新输入${NC}"
-                read_input "后台镜像名称" "" "CUSTOM_IMAGE_NAME"
-            done
-            
-            # 如果有私有仓库且镜像名不包含仓库地址，自动添加前缀
-            if [ -n "$REGISTRY" ] && [[ "$CUSTOM_IMAGE_NAME" != *"://"* ]] && [[ "$CUSTOM_IMAGE_NAME" != "$REGISTRY"* ]]; then
-                BACKEND_IMAGE="$REGISTRY/$CUSTOM_IMAGE_NAME"
-                log_info "使用自定义镜像: $BACKEND_IMAGE (已添加仓库前缀)"
-            else
-                BACKEND_IMAGE="$CUSTOM_IMAGE_NAME"
-                log_info "使用自定义镜像: $BACKEND_IMAGE"
-            fi
-            ;;
-        *)
-            BACKEND_IMAGE="$default_image"
-            log_info "使用默认镜像: $BACKEND_IMAGE"
-            ;;
-    esac
+
+    # 构建完整的镜像地址
+    BACKEND_IMAGE="$default_registry/backend:$tag_input"
+
+    log_info "使用后台镜像: $BACKEND_IMAGE"
     echo ""
 }
 
@@ -416,29 +374,7 @@ configure_backend_redis() {
     echo ""
 }
 
-# 配置前端参数
-configure_frontend() {
-    log_step "配置前端页面参数"
-    echo ""
-    
-    # 如果没有配置后台，询问后台地址
-    if [[ ! " ${SELECTED_COMPONENTS[*]} " =~ " backend " ]]; then
-        echo -e "${YELLOW}检测到未选择部署后台应用，请配置后台服务地址:${NC}"
-        read_input "后台服务主机" "localhost" "BACKEND_HOST"
-        read_input "后台服务端口" "8080" "BACKEND_PORT"
-        echo ""
-    else
-        BACKEND_HOST="maxkb-backend"
-    fi
-    
-    read_input "前端页面端口" "80" "FRONTEND_PORT"
-    
-    echo ""
-    log_info "前端页面配置完成"
-    echo "  - 端口: $FRONTEND_PORT"
-    echo "  - 后台代理: $BACKEND_HOST:$BACKEND_PORT"
-    echo ""
-}
+
 
 # 检查 Docker 环境
 check_docker() {
@@ -487,7 +423,7 @@ check_image_exists() {
 # 获取组件需要的镜像列表（基于选中的组件，不考虑外部服务）
 get_component_images() {
     local images=()
-    
+
     # 根据选中的组件获取对应镜像，暂时不考虑是否使用外部服务
     for component in "${SELECTED_COMPONENTS[@]}"; do
         case $component in
@@ -506,27 +442,20 @@ get_component_images() {
                 images+=("$postgres_image")
                 ;;
             backend)
-                # 直接使用配置的后台镜像（已在 configure_backend_image 中处理了仓库前缀）
-                local backend_image="${BACKEND_IMAGE:-maxkb/backend:v2.0}"
+                # 直接使用配置的后台镜像
+                local backend_image="${BACKEND_IMAGE:-docker.zhouke.tech/gs_kh/backend:dev}"
                 images+=("$backend_image")
-                ;;
-            frontend)
-                local frontend_image="maxkb/frontend:v2.0"
-                if [ -n "$REGISTRY" ]; then
-                    frontend_image="$REGISTRY/gs_kh/maxkb/frontend:v2.0"
-                fi
-                images+=("$frontend_image")
                 ;;
         esac
     done
-    
+
     echo "${images[@]}"
 }
 
 # 获取部署阶段实际需要的镜像（考虑外部服务选择）
 get_deployment_images() {
     local images=()
-    
+
     # 根据外部服务配置决定实际需要的镜像
     for component in "${SELECTED_COMPONENTS[@]}"; do
         case $component in
@@ -551,21 +480,13 @@ get_deployment_images() {
                 fi
                 ;;
             backend)
-                # 后台应用总是需要镜像（已在 configure_backend_image 中处理了仓库前缀）
-                local backend_image="${BACKEND_IMAGE:-maxkb/backend:v2.0}"
+                # 后台应用总是需要镜像
+                local backend_image="${BACKEND_IMAGE:-docker.zhouke.tech/gs_kh/backend:dev}"
                 images+=("$backend_image")
-                ;;
-            frontend)
-                # 前端总是需要镜像
-                local frontend_image="maxkb/frontend:v2.0"
-                if [ -n "$REGISTRY" ]; then
-                    frontend_image="$REGISTRY/gs_kh/maxkb/frontend:v2.0"
-                fi
-                images+=("$frontend_image")
                 ;;
         esac
     done
-    
+
     echo "${images[@]}"
 }
 
@@ -708,8 +629,8 @@ create_network() {
 # 创建数据目录
 create_data_dirs() {
     log_info "创建数据持久化目录"
-    mkdir -p "$DATA_DIR"/{redis,postgres-data,postgres-init,maxkb-logs,maxkb-local,maxkb-models,nginx}
-    
+    mkdir -p "$DATA_DIR"/{redis,postgres-data,postgres-init,maxkb-logs,maxkb-local,maxkb-models}
+
     # 设置合适的目录权限，确保容器内应用可以写入
     chmod 755 "$DATA_DIR"
     chmod 777 "$DATA_DIR"/maxkb-logs    # 日志目录需要写权限
@@ -718,7 +639,6 @@ create_data_dirs() {
     chmod 755 "$DATA_DIR"/redis
     chmod 755 "$DATA_DIR"/postgres-data
     chmod 755 "$DATA_DIR"/postgres-init
-    chmod 755 "$DATA_DIR"/nginx
     
     # 预创建关键日志文件，避免权限问题
     touch "$DATA_DIR"/maxkb-logs/drf_exception.log
@@ -837,77 +757,7 @@ deploy_backend() {
     log_info "MaxKB 后台应用部署完成"
 }
 
-# 部署前端页面
-deploy_frontend() {
-    log_info "部署前端页面..."
-    
-    local image="maxkb/frontend:v2.0"
-    if [ -n "$REGISTRY" ]; then
-        image="$REGISTRY/gs_kh/maxkb/frontend:v2.0"
-    fi
-    
-    # 停止并删除现有容器
-    docker stop gs-frontend 2>/dev/null || true
-    docker rm gs-frontend 2>/dev/null || true
-    
-    # 创建 Nginx 配置
-    cat > "$DATA_DIR/nginx/nginx.conf" << EOF
-server {
-    listen 80;
-    server_name localhost;
-    
-    # 前端静态文件
-    location / {
-        root /usr/share/nginx/html;
-        index index.html;
-        try_files \$uri \$uri/ /index.html;
-    }
-    
-    # API 代理到后台
-    location /api/ {
-        proxy_pass http://${BACKEND_HOST}:${BACKEND_PORT}/api/;
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto \$scheme;
-    }
-    
-    # 管理后台代理
-    location /admin/ {
-        proxy_pass http://${BACKEND_HOST}:${BACKEND_PORT}/admin/;
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto \$scheme;
-    }
-    
-    # 聊天接口代理
-    location /chat/ {
-        proxy_pass http://${BACKEND_HOST}:${BACKEND_PORT}/chat/;
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto \$scheme;
-        
-        # WebSocket 支持
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade \$http_upgrade;
-        proxy_set_header Connection "upgrade";
-    }
-}
-EOF
-    
-    # 启动前端容器
-    docker run -d \
-        --name gs-frontend \
-        --network "$NETWORK" \
-        -p "$FRONTEND_PORT:80" \
-        -v "$DATA_DIR/nginx/nginx.conf:/etc/nginx/conf.d/default.conf" \
-        --restart unless-stopped \
-        "$image"
-    
-    log_info "前端页面部署完成"
-}
+
 
 # 保存配置信息
 save_config() {
@@ -947,9 +797,6 @@ BACKEND_IMAGE=${BACKEND_IMAGE:-}
 BACKEND_HOST=${BACKEND_HOST:-}
 BACKEND_PORT=${BACKEND_PORT:-}
 LOG_LEVEL=${LOG_LEVEL:-}
-
-# 前端配置 (如果部署)
-FRONTEND_PORT=${FRONTEND_PORT:-}
 
 # 部署时间
 DEPLOY_TIME=$(date '+%Y-%m-%d %H:%M:%S')
@@ -995,19 +842,8 @@ show_summary() {
         echo "  - Redis 连接: $REDIS_HOST:$REDIS_PORT"
         echo ""
     fi
-    
-    if [[ " ${SELECTED_COMPONENTS[*]} " =~ " frontend " ]]; then
-        echo -e "${GREEN}✓ 前端页面${NC}"
-        echo "  - 端口: $FRONTEND_PORT"
-        echo "  - 后台代理: $BACKEND_HOST:$BACKEND_PORT"
-        echo ""
-    fi
-    
+
     echo -e "${CYAN}访问地址:${NC}"
-    if [[ " ${SELECTED_COMPONENTS[*]} " =~ " frontend " ]]; then
-        echo "  前端页面: http://localhost:${FRONTEND_PORT:-80}"
-        echo "  管理后台: http://localhost:${FRONTEND_PORT:-80}/admin"
-    fi
     if [[ " ${SELECTED_COMPONENTS[*]} " =~ " backend " ]]; then
         echo "  API 文档: http://localhost:${BACKEND_PORT:-8080}/api/docs"
     fi
@@ -1043,9 +879,6 @@ main() {
                 ;;
             backend)
                 configure_backend
-                ;;
-            frontend)
-                configure_frontend
                 ;;
         esac
     done
@@ -1099,9 +932,6 @@ main() {
             backend)
                 deploy_backend
                 ;;
-            frontend)
-                deploy_frontend
-                ;;
         esac
     done
     
@@ -1121,7 +951,7 @@ if [[ "$1" == "--help" || "$1" == "-h" ]]; then
     echo "用法: $0"
     echo ""
     echo "这个脚本会引导你完成交互式部署配置"
-    echo "支持选择性部署 Redis、PostgreSQL、后台应用、前端页面"
+    echo "支持选择性部署 Redis、PostgreSQL、后台应用"
     exit 0
 fi
 

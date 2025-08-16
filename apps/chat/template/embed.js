@@ -1,5 +1,42 @@
 (function() {
-const guideHtml=`
+// 获取浏览器语言
+function getBrowserLanguage() {
+  const lang = navigator.language || navigator.userLanguage;
+  if (lang.startsWith('zh')) {
+    return lang.includes('TW') || lang.includes('HK') || lang.includes('Hant') ? 'zh-Hant' : 'zh-CN';
+  }
+  return 'en-US';
+}
+
+// 多语言文本配置
+const i18nTexts = {
+  'zh-CN': {
+    title: '🌟 遇见问题，不再有障碍！',
+    content: '你好，我是你的智能小助手。<br/>点我，开启高效解答模式，让问题变成过去式。',
+    button: '我知道了'
+  },
+  'zh-Hant': {
+    title: '🌟 遇見問題，不再有障礙！',
+    content: '你好，我是你的智能小助手。<br/>點我，開啟高效解答模式，讓問題變成過去式。',
+    button: '我知道了'
+  },
+  'en-US': {
+    title: '🌟 No More Obstacles When You Encounter Problems!',
+    content: 'Hello, I am your intelligent assistant.<br/>Click me to start efficient Q&A mode and make problems a thing of the past.',
+    button: 'Got it'
+  }
+};
+
+// 获取当前语言的文本
+function getLocalizedTexts() {
+  const currentLang = getBrowserLanguage();
+  return i18nTexts[currentLang] || i18nTexts['en-US'];
+}
+
+// 生成本地化的引导HTML
+function getGuideHtml() {
+  const texts = getLocalizedTexts();
+  return `
 <div class="maxkb-mask">
   <div class="maxkb-content"></div>
 </div>
@@ -10,15 +47,15 @@ const guideHtml=`
           </svg>
   </div>
 
-  <div class="maxkb-title"> 🌟 遇见问题，不再有障碍！</div>
-  <p>你好，我是你的智能小助手。<br/>
-      点我，开启高效解答模式，让问题变成过去式。</p>
+  <div class="maxkb-title">${texts.title}</div>
+  <p>${texts.content}</p>
   <div class="maxkb-button">
-      <button>我知道了</button>
+      <button>${texts.button}</button>
   </div>
   <span class="maxkb-arrow" ></span>
 </div>
-`
+`;
+}
 const chatButtonHtml=
 `<div class="maxkb-chat-button" >
 <img style="height:100%;width:100%;" src="{{float_icon}}">
@@ -47,7 +84,7 @@ const getChatContainerHtml=(protocol,host,token,query)=>{
  * @param {*} root
  */
 const initGuide=(root)=>{
-   root.insertAdjacentHTML("beforeend",guideHtml)
+   root.insertAdjacentHTML("beforeend",getGuideHtml())
    const button=root.querySelector(".maxkb-button")
    const close_icon=root.querySelector('.maxkb-close')
    const close_func=()=>{
