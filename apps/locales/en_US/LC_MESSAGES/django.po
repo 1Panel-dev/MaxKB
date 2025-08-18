@@ -8659,5 +8659,5 @@ msgstr ""
 msgid "The Qwen Omni series model supports inputting multiple modalities of data, including video, audio, images, and text, and outputting audio and text."
 msgstr ""
 
-msgid "Resource authorization"
+msgid "resource authorization"
 msgstr ""
