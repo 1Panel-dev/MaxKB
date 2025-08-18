@@ -8784,3 +8784,6 @@ msgstr "如果未传递，默认值为 这段音频在说什么，只回答音�
 
 msgid "The Qwen Omni series model supports inputting multiple modalities of data, including video, audio, images, and text, and outputting audio and text."
 msgstr "Qwen-Omni 系列模型支持输入多种模态的数据，包括视频、音频、图片、文本，并输出音频与文本"
+
+msgid "Resource authorization"
+msgstr "资源授权"

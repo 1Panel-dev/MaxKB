@@ -89,6 +89,10 @@ class WorkSpaceUserResourcePermissionView(APIView):
             responses=UserResourcePermissionPageAPI.get_response(),
             tags=[_('Resources authorization')]  # type: ignore
         )
+        @has_permissions(
+            lambda r, kwargs: Permission(group=Group(kwargs.get('resource') + '_WORKSPACE_USER_RESOURCE_PERMISSION'),
+                                         operate=Operate.READ),
+            RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str, user_id: str, resource: str, current_page: str,
                 page_size: str):
             return result.success(UserResourcePermissionSerializer(
@@ -109,6 +113,10 @@ class WorkspaceResourceUserPermissionView(APIView):
         responses=ResourceUserPermissionAPI.get_response(),
         tags=[_('Resources authorization')]  # type: ignore
     )
+    @has_permissions(
+        lambda r, kwargs: Permission(group=Group(kwargs.get('resource') + '_RESOURCE_AUTHORIZATION'),
+                                     operate=Operate.AUTH),
+        RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def get(self, request: Request, workspace_id: str, target: str, resource: str):
         return result.success(ResourceUserPermissionSerializer(
             data={'workspace_id': workspace_id, "target": target, 'auth_target_type': resource,
@@ -127,6 +135,13 @@ class WorkspaceResourceUserPermissionView(APIView):
         responses=ResourceUserPermissionEditAPI.get_response(),
         tags=[_('Resources authorization')]  # type: ignore
     )
+    @log(menu='System', operate='Edit user authorization status of resource',
+         get_operation_object=lambda r, k: get_user_operation_object(k.get('user_id'))
+         )
+    @has_permissions(
+        lambda r, kwargs: Permission(group=Group(kwargs.get('resource') + '_RESOURCE_AUTHORIZATION'),
+                                     operate=Operate.AUTH),
+        RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def put(self, request: Request, workspace_id: str, target: str, resource: str):
         return result.success(ResourceUserPermissionSerializer(
             data={'workspace_id': workspace_id, "target": target, 'auth_target_type': resource, })
@@ -144,6 +159,10 @@ class WorkspaceResourceUserPermissionView(APIView):
             responses=ResourceUserPermissionPageAPI.get_response(),
             tags=[_('Resources authorization')]  # type: ignore
         )
+        @has_permissions(
+            lambda r, kwargs: Permission(group=Group(kwargs.get('resource') + '_RESOURCE_AUTHORIZATION'),
+                                         operate=Operate.AUTH),
+            RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str, target: str, resource: str, current_page: int,
                 page_size: int):
             return result.success(ResourceUserPermissionSerializer(
