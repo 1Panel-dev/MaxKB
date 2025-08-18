@@ -72,7 +72,7 @@
     <SelectProviderDialog
       v-if="showFooter"
       ref="selectProviderRef"
-      @change="(provider, modelType) => openCreateModel(provider, modelType)"
+      @change="(provider: any, modelType: any) => openCreateModel(provider, modelType)"
     />
   </div>
 </template>
@@ -82,8 +82,6 @@ import type { Provider } from '@/api/type/model'
 import { relatedObject } from '@/utils/utils'
 import CreateModelDialog from '@/views/template/component/CreateModelDialog.vue'
 import SelectProviderDialog from '@/views/template/component/SelectProviderDialog.vue'
-
-import { t } from '@/locales'
 import useStore from '@/stores'
 
 defineOptions({ name: 'ModelSelect' })

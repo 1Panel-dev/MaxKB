@@ -130,7 +130,6 @@ import useStore from '@/stores'
 import authApi from '@/api/auth-setting'
 import useApi from '@/api/user'
 import { MsgConfirm, MsgError, MsgSuccess } from '@/utils/message'
-
 import { t, getBrowserLang } from '@/locales'
 import QrCodeTab from '@/views/login/components/QrCodeTab.vue'
 import { useI18n } from 'vue-i18n'
