@@ -44,7 +44,12 @@
           clearable
         >
           <template #prepend>
-            <el-select v-model="searchType" placeholder="Select" style="width: 80px">
+            <el-select
+              v-model="searchType"
+              placeholder="Select"
+              style="width: 80px"
+              @change="searchTypeChange"
+            >
               <el-option :label="$t('common.title')" value="title" />
               <el-option :label="$t('common.content')" value="content" />
             </el-select>
@@ -133,9 +138,7 @@
                             <el-dropdown-menu>
                               <el-dropdown-item @click="openGenerateDialog(item)">
                                 <el-icon><Connection /></el-icon>
-                                {{
-                                  $t('views.document.generateQuestion.title')
-                                }}</el-dropdown-item
+                                {{ $t('views.document.generateQuestion.title') }}</el-dropdown-item
                               >
                               <el-dropdown-item @click="openSelectDocumentDialog(item)">
                                 <AppIcon iconName="app-migrate"></AppIcon>
@@ -206,6 +209,10 @@ const paragraphDetail = ref<any[]>([])
 const title = ref('')
 const search = ref('')
 const searchType = ref('title')
+
+const searchTypeChange = () => {
+  search.value = ''
+}
 
 // 批量操作
 const isBatch = ref(false)
@@ -313,7 +320,7 @@ function addParagraph() {
   ParagraphDialogRef.value.open()
 }
 function editParagraph(row: any) {
-  title.value = t('views.paragraph.paragraphDetail') 
+  title.value = t('views.paragraph.paragraphDetail')
   ParagraphDialogRef.value.open(row)
 }
 
