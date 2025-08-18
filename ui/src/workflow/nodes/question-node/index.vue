@@ -83,7 +83,6 @@
                   $t('views.application.applicationForm.form.prompt.tooltip')
                 }}</template>
                 <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
-                <el-icon><EditPen /></el-icon>
               </el-tooltip>
             </div>
           </template>
