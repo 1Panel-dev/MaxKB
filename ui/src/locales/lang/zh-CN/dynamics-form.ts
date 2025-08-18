@@ -10,6 +10,8 @@ export default {
     JsonInput: 'JSON文本框',
     RadioCard: '选项卡',
     RadioRow: '单行选项卡',
+    UploadInput: '文件上传',
+    TextareaInput: '多行文本框',
   },
   default: {
     label: '默认值',
@@ -99,13 +101,32 @@ export default {
       requiredMessage4: '文本长度为必填参数',
     },
   },
+  UploadInput: {
+    limit: {
+      label: '单次上传最多文件数',
+      required: '单次上传最多文件数必填',
+    },
+    max_file_size: {
+      label: '每个文件最大(MB)',
+      required: '每个文件最大(MB)必填',
+    },
+    accept: {
+      label: '文件类型',
+      required: '文件类型必填',
+    },
+  },
   AssignmentMethod: {
     label: '赋值方式',
+
     custom: {
       label: '自定义',
     },
     ref_variables: {
       label: '引用变量 ',
+      popover: '变量的值必须符合',
+      popover_label: '标签',
+      popover_value: '值',
+      popover_default: '是否为默认值',
     },
   },
 }
