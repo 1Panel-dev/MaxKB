@@ -1,6 +1,6 @@
 FROM python:3.11-slim-bullseye AS python-stage
 FROM ghcr.io/1panel-dev/maxkb-vector-model:v2.0.2 AS vector-model
-FROM postgres:17.5-bullseye
+FROM postgres:17.6-bullseye
 COPY --from=python-stage /usr/local /usr/local
 COPY installer/*.sh /usr/bin/
 COPY installer/init.sql /docker-entrypoint-initdb.d/
