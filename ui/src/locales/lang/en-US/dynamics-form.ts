@@ -10,6 +10,8 @@ export default {
     JsonInput: 'JSON',
     RadioCard: 'Radio Card',
     RadioRow: 'Radio Row',
+    UploadInput: 'File upload',
+    TextareaInput: 'Multiline Input',
   },
   default: {
     label: 'Default',
@@ -99,6 +101,20 @@ export default {
       requiredMessage4: 'Text length is a required parameter',
     },
   },
+  UploadInput: {
+    limit: {
+      label: 'Maximum number of files per upload',
+      required: 'Maximum number of files is required',
+    },
+    max_file_size: {
+      label: 'Maximum file size (MB)',
+      required: 'Maximum file size is required',
+    },
+    accept: {
+      label: 'File type',
+      required: 'File type is required',
+    },
+  },
   AssignmentMethod: {
     label: 'Assignment Method',
     custom: {
@@ -106,6 +122,10 @@ export default {
     },
     ref_variables: {
       label: 'Reference Variables',
+      popover: 'Variable values must comply with',
+      popover_label: 'Label',
+      popover_value: 'Value',
+      popover_default: 'Is Default',
     },
   },
 }

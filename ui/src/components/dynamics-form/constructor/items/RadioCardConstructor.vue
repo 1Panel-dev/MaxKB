@@ -8,9 +8,32 @@
 
     <el-row style="width: 100%" :gutter="10">
       <el-radio-group v-model="formValue.assignment_method">
-        <el-radio :value="item.value" size="large" v-for="item in assignment_method_option_list">{{
-          item.label
-        }}</el-radio>
+        <el-radio :value="item.value" size="large" v-for="item in assignment_method_option_list"
+          >{{ item.label }}
+          <el-popover
+            width="300px"
+            v-if="item.value == 'ref_variables'"
+            class="box-item"
+            placement="top-start"
+          >
+            {{ $t('dynamicsForm.AssignmentMethod.ref_variables.popover') }}:<br />
+            [<br />
+            {<br />
+            "label": "xx",<br />
+            "value": "xx",<br />
+            "default": false<br />
+            }<br />
+            ]<br />
+            label: {{ $t('dynamicsForm.AssignmentMethod.ref_variables.popover_label') }}
+            {{ $t('common.required') }}<br />
+            value: {{ $t('dynamicsForm.AssignmentMethod.ref_variables.popover_value') }}
+            {{ $t('common.required') }}<br />
+            default:{{ $t('dynamicsForm.AssignmentMethod.ref_variables.popover_default') }}
+            <template #reference>
+              <el-icon><InfoFilled /></el-icon>
+            </template>
+          </el-popover>
+        </el-radio>
       </el-radio-group>
     </el-row>
   </el-form-item>

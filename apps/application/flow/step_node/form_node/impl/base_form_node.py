@@ -69,9 +69,11 @@ class BaseFormNode(IFormNode):
         reset_field = ['field', 'label', 'default_value']
         for f in reset_field:
             _value = field[f]
+            if _value is None:
+                continue
             if isinstance(_value, str):
                 field[f] = self.workflow_manage.generate_prompt(_value)
-            else:
+            elif f == 'label':
                 _label_value = _value.get('label')
                 _value['label'] = self.workflow_manage.generate_prompt(_label_value)
                 tooltip = _value.get('attrs').get('tooltip')
