@@ -40,6 +40,16 @@ const workspace = {
       ],
       'OR'
     ),
+  auth: (source_id:string) =>
+    hasPermission(
+      [
+        new ComplexPermission([RoleConst.USER],[PermissionConst.MODEL.getModelWorkspaceResourcePermission(source_id)],[],'AND'),
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.MODEL_RESOURCE_AUTHORIZATION.getModelWorkspaceResourcePermission(source_id),
+        PermissionConst.MODEL_RESOURCE_AUTHORIZATION.getWorkspacePermissionWorkspaceManageRole
+      ],
+      'OR'
+    ),
   folderEdit: () =>
     hasPermission(
       [

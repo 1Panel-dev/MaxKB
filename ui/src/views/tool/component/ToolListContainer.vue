@@ -252,7 +252,7 @@
                           </el-dropdown-item>
                           <el-dropdown-item
                             @click.stop="openAuthorization(item)"
-                            v-if="apiType === 'workspace'"
+                            v-if="apiType === 'workspace' && permissionPrecise.auth(item.id)"
                           >
                             <AppIcon
                               iconName="app-resource-authorization"
