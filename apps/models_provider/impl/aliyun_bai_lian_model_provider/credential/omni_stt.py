@@ -17,7 +17,8 @@ class AliyunBaiLianOmiSTTModelParams(BaseForm):
 
 
 class AliyunBaiLianOmiSTTModelCredential(BaseForm, BaseModelCredential):
-    api_key = PasswordInputField("API key", required=True)
+    api_url = forms.TextInputField(_('API URL'), required=True)
+    api_key = forms.PasswordInputField(_('API Key'), required=True)
 
     def is_valid(self,
                  model_type: str,
