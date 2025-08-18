@@ -15,7 +15,7 @@ from models_provider.impl.aliyun_bai_lian_model_provider.credential.embedding im
     AliyunBaiLianEmbeddingCredential
 from models_provider.impl.aliyun_bai_lian_model_provider.credential.image import QwenVLModelCredential
 from models_provider.impl.aliyun_bai_lian_model_provider.credential.llm import BaiLianLLMModelCredential
-from models_provider.impl.aliyun_bai_lian_model_provider.credential.omi_stt import AliyunBaiLianOmiSTTModelCredential
+from models_provider.impl.aliyun_bai_lian_model_provider.credential.omni_stt import AliyunBaiLianOmiSTTModelCredential
 from models_provider.impl.aliyun_bai_lian_model_provider.credential.reranker import \
     AliyunBaiLianRerankerCredential
 from models_provider.impl.aliyun_bai_lian_model_provider.credential.stt import AliyunBaiLianSTTModelCredential
@@ -24,7 +24,7 @@ from models_provider.impl.aliyun_bai_lian_model_provider.credential.tts import A
 from models_provider.impl.aliyun_bai_lian_model_provider.model.embedding import AliyunBaiLianEmbedding
 from models_provider.impl.aliyun_bai_lian_model_provider.model.image import QwenVLChatModel
 from models_provider.impl.aliyun_bai_lian_model_provider.model.llm import BaiLianChatModel
-from models_provider.impl.aliyun_bai_lian_model_provider.model.omi_stt import AliyunBaiLianOmiSpeechToText
+from models_provider.impl.aliyun_bai_lian_model_provider.model.omni_stt import AliyunBaiLianOmiSpeechToText
 from models_provider.impl.aliyun_bai_lian_model_provider.model.reranker import AliyunBaiLianReranker
 from models_provider.impl.aliyun_bai_lian_model_provider.model.stt import AliyunBaiLianSpeechToText
 from models_provider.impl.aliyun_bai_lian_model_provider.model.tti import QwenTextToImageModel
@@ -78,6 +78,9 @@ model_info_list = [ModelInfo('gte-rerank',
                    ModelInfo('qwen-max', '', ModelTypeConst.LLM, aliyun_bai_lian_llm_model_credential,
                              BaiLianChatModel),
                    ModelInfo('qwen-omni-turbo',
+                             _('The Qwen Omni series model supports inputting multiple modalities of data, including video, audio, images, and text, and outputting audio and text.'),
+                             ModelTypeConst.STT, aliyun_bai_lian_omi_stt_model_credential, AliyunBaiLianOmiSpeechToText),
+                   ModelInfo('qwen2.5-omni-7b',
                              _('The Qwen Omni series model supports inputting multiple modalities of data, including video, audio, images, and text, and outputting audio and text.'),
                              ModelTypeConst.STT, aliyun_bai_lian_omi_stt_model_credential, AliyunBaiLianOmiSpeechToText),
                    ]

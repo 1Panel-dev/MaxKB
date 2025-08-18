@@ -12,6 +12,7 @@ from models_provider.impl.base_stt import BaseSpeechToText
 
 class AliyunBaiLianOmiSpeechToText(MaxKBBaseModel, BaseSpeechToText):
     api_key: str
+    api_url: str
     model: str
     params: dict
 
@@ -20,6 +21,7 @@ class AliyunBaiLianOmiSpeechToText(MaxKBBaseModel, BaseSpeechToText):
         self.api_key = kwargs.get('api_key')
         self.model = kwargs.get('model')
         self.params = kwargs.get('params')
+        self.api_url = kwargs.get('api_url')
 
     @staticmethod
     def is_cache_model():
@@ -30,6 +32,7 @@ class AliyunBaiLianOmiSpeechToText(MaxKBBaseModel, BaseSpeechToText):
         return AliyunBaiLianOmiSpeechToText(
             model=model_name,
             api_key=model_credential.get('api_key'),
+            api_url=model_credential.get('api_url') ,
             params= model_kwargs,
             **model_kwargs
         )
@@ -47,13 +50,13 @@ class AliyunBaiLianOmiSpeechToText(MaxKBBaseModel, BaseSpeechToText):
             client = OpenAI(
                 # 若没有配置环境变量，请用阿里云百炼API Key将下行替换为：api_key="sk-xxx",
                 api_key=self.api_key,
-                base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
+                base_url=self.api_url,
             )
 
             base64_audio = base64.b64encode(audio_file.read()).decode("utf-8")
 
             completion = client.chat.completions.create(
-                model="qwen-omni-turbo-0119",
+                model=self.model,
                 messages=[
                     {
                         "role": "user",
@@ -71,16 +74,15 @@ class AliyunBaiLianOmiSpeechToText(MaxKBBaseModel, BaseSpeechToText):
                 ],
                 # 设置输出数据的模态，当前支持两种：["text","audio"]、["text"]
                 modalities=["text"],
-                audio={"voice": "Cherry", "format": "mp3"},
                 # stream 必须设置为 True，否则会报错
                 stream=True,
                 stream_options={"include_usage": True},
             )
             result = []
             for chunk in completion:
-                if chunk.choices and hasattr(chunk.choices[0].delta, 'audio'):
-                    transcript = chunk.choices[0].delta.audio.get('transcript')
-                    result.append(transcript)
+                if chunk.choices and hasattr(chunk.choices[0].delta, 'content'):
+                    content = chunk.choices[0].delta.content
+                    result.append(content)
             return "".join(result)
 
         except Exception as err:
