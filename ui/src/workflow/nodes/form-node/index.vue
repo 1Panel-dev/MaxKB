@@ -189,7 +189,6 @@ const sync_form_field_list = () => {
   ]
   set(props.nodeModel.properties.config, 'fields', fields)
   props.nodeModel.clear_next_node_field(false)
-  onDragHandle()
 }
 const addFormCollectRef = ref<InstanceType<typeof AddFormCollect>>()
 const editFormCollectRef = ref<InstanceType<typeof EditFormCollect>>()
@@ -264,7 +263,7 @@ function onDragHandle() {
     onEnd: (evt) => {
       if (evt.oldIndex === undefined || evt.newIndex === undefined) return
       // 更新数据顺序
-      const items = [...form_data.value.form_field_list]
+      const items = cloneDeep([...form_data.value.form_field_list])
       const [movedItem] = items.splice(evt.oldIndex, 1)
       items.splice(evt.newIndex, 0, movedItem)
       form_data.value.form_field_list = items
@@ -276,6 +275,7 @@ onMounted(() => {
   set(props.nodeModel, 'validate', validate)
   sync_form_field_list()
   props.nodeModel.graphModel.eventCenter.emit('refresh_incoming_node_field')
+  onDragHandle()
 })
 </script>
 <style lang="scss" scoped></style>
