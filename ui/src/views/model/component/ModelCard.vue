@@ -100,7 +100,7 @@
               <AppIcon iconName="app-setting" class="color-secondary"></AppIcon>
               {{ $t('views.model.modelForm.title.paramSetting') }}
             </el-dropdown-item>
-            <el-dropdown-item @click.stop="openAuthorization(model)" v-if="apiType === 'workspace'">
+            <el-dropdown-item @click.stop="openAuthorization(model)" v-if="apiType === 'workspace' && permissionPrecise.auth(model.id)">
               <AppIcon iconName="app-resource-authorization" class="color-secondary"></AppIcon>
               {{ $t('views.system.resourceAuthorization.title') }}
             </el-dropdown-item>

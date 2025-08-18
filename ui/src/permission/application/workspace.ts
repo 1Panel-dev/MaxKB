@@ -43,6 +43,16 @@ const workspace = {
             ],
             'OR'
     ),
+    auth: (source_id:string) => 
+        hasPermission(
+            [
+              new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(source_id)],[],'AND'),
+              RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+              PermissionConst.APPLICATION_RESOURCE_AUTHORIZATION.getWorkspacePermissionWorkspaceManageRole,
+              PermissionConst.APPLICATION_RESOURCE_AUTHORIZATION.getApplicationWorkspaceResourcePermission(source_id)  
+            ],
+            'OR'
+    ),
     folderEdit: () => 
         hasPermission(
             [
