@@ -1,5 +1,5 @@
-FROM python:3.11-slim-bullseye AS python-stage
-FROM postgres:15.14-bullseye
+FROM python:3.11-slim-bookworm AS python-stage
+FROM postgres:15.14-bookworm
 
 ARG DEPENDENCIES="                    \
         libexpat1-dev                 \
