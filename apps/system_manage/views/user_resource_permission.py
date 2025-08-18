@@ -15,7 +15,8 @@ from rest_framework.views import APIView
 from common import result
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
-from common.constants.permission_constants import PermissionConstants, RoleConstants, Permission, Group, Operate
+from common.constants.permission_constants import RoleConstants, Permission, Group, Operate, ViewPermission, \
+    CompareConstants
 from common.log.log import log
 from system_manage.api.user_resource_permission import UserResourcePermissionAPI, EditUserResourcePermissionAPI, \
     ResourceUserPermissionAPI, ResourceUserPermissionPageAPI, ResourceUserPermissionEditAPI, \
@@ -114,9 +115,18 @@ class WorkspaceResourceUserPermissionView(APIView):
         tags=[_('Resources authorization')]  # type: ignore
     )
     @has_permissions(
-        lambda r, kwargs: Permission(group=Group(kwargs.get('resource') + '_RESOURCE_AUTHORIZATION'),
-                                     operate=Operate.AUTH),
-        RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
+        lambda r, kwargs: Permission(group=Group(kwargs.get('resource')),
+                                     operate=Operate.AUTH,
+                                     resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/ROLE/WORKSPACE_MANAGE"),
+        lambda r, kwargs: Permission(group=Group(kwargs.get('resource')),
+                                     operate=Operate.AUTH,
+                                     resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('resource')}/{kwargs.get('target')}"),
+        ViewPermission([RoleConstants.USER.get_workspace_role()],
+                       [lambda r, kwargs: Permission(group=Group(kwargs.get('resource')),
+                                                     operate=Operate.SELF,
+                                                     resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('resource')}/{kwargs.get('target')}")],
+                       CompareConstants.AND),
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def get(self, request: Request, workspace_id: str, target: str, resource: str):
         return result.success(ResourceUserPermissionSerializer(
             data={'workspace_id': workspace_id, "target": target, 'auth_target_type': resource,
@@ -139,9 +149,18 @@ class WorkspaceResourceUserPermissionView(APIView):
          get_operation_object=lambda r, k: get_user_operation_object(k.get('user_id'))
          )
     @has_permissions(
-        lambda r, kwargs: Permission(group=Group(kwargs.get('resource') + '_RESOURCE_AUTHORIZATION'),
-                                     operate=Operate.AUTH),
-        RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
+        lambda r, kwargs: Permission(group=Group(kwargs.get('resource')),
+                                     operate=Operate.AUTH,
+                                     resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/ROLE/WORKSPACE_MANAGE"),
+        lambda r, kwargs: Permission(group=Group(kwargs.get('resource')),
+                                     operate=Operate.AUTH,
+                                     resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('resource')}/{kwargs.get('target')}"),
+        ViewPermission([RoleConstants.USER.get_workspace_role()],
+                       [lambda r, kwargs: Permission(group=Group(kwargs.get('resource')),
+                                                     operate=Operate.SELF,
+                                                     resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('resource')}/{kwargs.get('target')}")],
+                       CompareConstants.AND),
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def put(self, request: Request, workspace_id: str, target: str, resource: str):
         return result.success(ResourceUserPermissionSerializer(
             data={'workspace_id': workspace_id, "target": target, 'auth_target_type': resource, })
@@ -160,9 +179,18 @@ class WorkspaceResourceUserPermissionView(APIView):
             tags=[_('Resources authorization')]  # type: ignore
         )
         @has_permissions(
-            lambda r, kwargs: Permission(group=Group(kwargs.get('resource') + '_RESOURCE_AUTHORIZATION'),
-                                         operate=Operate.AUTH),
-            RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
+            lambda r, kwargs: Permission(group=Group(kwargs.get('resource')),
+                                         operate=Operate.AUTH,
+                                         resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/ROLE/WORKSPACE_MANAGE"),
+        lambda r, kwargs: Permission(group=Group(kwargs.get('resource')),
+                                     operate=Operate.AUTH,
+                                     resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('resource')}/{kwargs.get('target')}"),
+             ViewPermission([RoleConstants.USER.get_workspace_role()],
+                           [lambda r, kwargs: Permission(group=Group(kwargs.get('resource')),
+                                     operate=Operate.SELF,
+                                     resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('resource')}/{kwargs.get('target')}")],
+                           CompareConstants.AND),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str, target: str, resource: str, current_page: int,
                 page_size: int):
             return result.success(ResourceUserPermissionSerializer(
