@@ -23,7 +23,7 @@ langchain-huggingface = "0.1.2"
 langchain-ollama = "0.3.2"
 langgraph = "0.3.27"
 mcp = "1.8.0"
-psycopg2-binary = "2.9.10"
+psycopg = { extras = ["binary"], version = "3.2.9" }
 jieba = "0.42.1"
 diskcache = "5.6.3"
 pillow = "10.4.0"
