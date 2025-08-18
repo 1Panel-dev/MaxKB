@@ -45,7 +45,13 @@
                 >
                 </el-input>
 
-                <img :src="identifyCode" alt="" height="38" class="ml-8 cursor border border-r-4" @click="makeCode" />
+                <img
+                  :src="identifyCode"
+                  alt=""
+                  height="38"
+                  class="ml-8 cursor border border-r-4"
+                  @click="makeCode"
+                />
               </div>
             </el-form-item>
           </div>
@@ -259,20 +265,25 @@ function changeMode(val: string) {
 }
 
 const login = () => {
-  loginFormRef.value?.validate().then(() => {
-    loading.value = true
-    user
-      .login(
-        loginMode.value,
-        loginForm.value.username,
-        loginForm.value.password,
-        loginForm.value.captcha
-      )
-      .then(() => {
-        locale.value = localStorage.getItem('MaxKB-locale') || getBrowserLang() || 'en-US'
-        router.push({ name: 'home' })
-      })
-      .finally(() => (loading.value = false))
+  if (!loginFormRef.value) {
+    return
+  }
+  loginFormRef.value?.validate((valid) => {
+    if (valid) {
+      loading.value = true
+      user
+        .login(
+          loginMode.value,
+          loginForm.value.username,
+          loginForm.value.password,
+          loginForm.value.captcha
+        )
+        .then(() => {
+          locale.value = localStorage.getItem('MaxKB-locale') || getBrowserLang() || 'en-US'
+          router.push({ name: 'home' })
+        })
+        .finally(() => (loading.value = false))
+    }
   })
 }
 
