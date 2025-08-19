@@ -1,6 +1,6 @@
-FROM python:3.11-slim-bookworm AS python-stage
+FROM python:3.11-slim-trixie AS python-stage
 FROM ghcr.io/1panel-dev/maxkb-vector-model:v2.0.2 AS vector-model
-FROM postgres:17.6-bookworm
+FROM postgres:17.6-trixie
 COPY --from=python-stage /usr/local /usr/local
 COPY installer/*.sh /usr/bin/
 COPY installer/init.sql /docker-entrypoint-initdb.d/
