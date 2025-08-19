@@ -23,7 +23,7 @@ RUN rm -rf /opt/maxkb-app/ui && \
     python3 -m venv /opt/py3 && \
     pip install uv --break-system-packages && \
     . /opt/py3/bin/activate && \
-    uv sync && \
+    uv pip install -r pyproject.toml && \
     find /opt/maxkb-app  -depth \( -name ".git*" -o -name ".docker*" -o -name ".idea*" -o -name ".editorconfig*" -o -name ".prettierrc*" -o -name "README.md" -o -name "poetry.lock" -o -name "pyproject.toml"  \) -exec rm -rf {} + && \
     export MAXKB_CONFIG_TYPE=ENV && python3 /opt/maxkb-app/apps/manage.py compilemessages && \
     export PIP_TARGET=/opt/maxkb-app/sandbox/python-packages && \
