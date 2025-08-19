@@ -20,7 +20,7 @@ dependencies = [
     "cffi==1.17.1",
     "beautifulsoup4==4.13.4",
     "jieba==0.42.1",
-    "langchain-openai==0.3.27",
+    "langchain-openai==0.3.30",
     "langchain-anthropic==0.3.17",
     "langchain-community==0.3.27",
     "langchain-deepseek==0.1.3",
