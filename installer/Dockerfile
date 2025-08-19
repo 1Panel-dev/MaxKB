@@ -1,10 +1,9 @@
-FROM node:18-alpine3.18 AS web-build
+FROM node:24-alpine AS web-build
 COPY ui ui
 RUN cd ui && \
-    npm install -g pnpm && \
-    pnpm install && \
-    NODE_OPTIONS="--max-old-space-size=4096" pnpm run build && \
-    NODE_OPTIONS="--max-old-space-size=4096" pnpm run build-chat && \
+    npm install && \
+    NODE_OPTIONS="--max-old-space-size=4096" npm run build && \
+    NODE_OPTIONS="--max-old-space-size=4096" npm run build-chat && \
     find . -maxdepth 1 ! -name '.' ! -name 'dist' ! -name 'public' -exec rm -rf {} +
 
 FROM ghcr.io/1panel-dev/maxkb-base:python3.11-pg17.6 AS stage-build
