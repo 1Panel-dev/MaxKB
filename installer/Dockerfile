@@ -1,7 +1,7 @@
 FROM node:24-alpine AS web-build
 COPY ui ui
 RUN cd ui && \
-    npm install && \
+    npm install --prefer-offline --no-audit && \
     NODE_OPTIONS="--max-old-space-size=4096" npm run build && \
     NODE_OPTIONS="--max-old-space-size=4096" npm run build-chat && \
     find . -maxdepth 1 ! -name '.' ! -name 'dist' ! -name 'public' -exec rm -rf {} +
