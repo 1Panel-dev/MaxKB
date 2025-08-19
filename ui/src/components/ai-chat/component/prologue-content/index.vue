@@ -17,6 +17,7 @@
           :source="prologue"
           :send-message="sendMessage"
           reasoning_content=""
+          :type="type"
         ></MdRenderer>
       </el-card>
     </div>
