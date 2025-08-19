@@ -1,4 +1,4 @@
-FROM node:24-alpine AS web-build
+FROM node:18-alpine3.18 AS web-build
 COPY ui ui
 RUN cd ui && \
     npm install -g pnpm && \
