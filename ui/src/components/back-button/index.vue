@@ -19,7 +19,11 @@ const emit = defineEmits(['click'])
 const back: any = router.options.history.state.back
 function jump() {
   if (props.to === '-1') {
-    back ? router.push(back) : router.go(-1)
+    if (back) {
+      router.push(back)
+    } else {
+      router.go(-1)
+    }
   } else if (props.to) {
     router.push(props.to as RouteLocationRaw)
   } else {

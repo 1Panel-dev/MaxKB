@@ -109,7 +109,6 @@ const { user } = useStore()
 const router = useRouter()
 const emit = defineEmits(['refresh'])
 
-// @ts-ignore
 const defaultPrompt = t('views.application.form.prompt.defaultPrompt', {
   data: '{data}',
   question: '{question}',

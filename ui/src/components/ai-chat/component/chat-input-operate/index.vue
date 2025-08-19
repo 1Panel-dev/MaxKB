@@ -372,7 +372,7 @@ const imageExtensions = ['JPG', 'JPEG', 'PNG', 'GIF', 'BMP']
 const documentExtensions = ['PDF', 'DOCX', 'TXT', 'XLS', 'XLSX', 'MD', 'HTML', 'CSV']
 const videoExtensions: any = []
 const audioExtensions = ['MP3', 'WAV', 'OGG', 'AAC', 'M4A']
-let otherExtensions = ref(['PPT', 'DOC'])
+const otherExtensions = ref(['PPT', 'DOC'])
 
 const getAcceptList = () => {
   const { image, document, audio, video, other } = props.applicationDetails.file_upload_setting
@@ -554,7 +554,7 @@ const switchMicrophone = (status: boolean) => {
   }
 }
 
-const TouchEnd = (bool?: Boolean) => {
+const TouchEnd = (bool?: boolean) => {
   if (bool) {
     stopRecording()
     recorderStatus.value = 'STOP'

@@ -66,7 +66,7 @@ import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import permissionMap from '@/permission'
 
 const props = defineProps<{
-  title: String
+  title: string
   apiType: 'systemShare' | 'workspace' | 'systemManage'
 }>()
 

@@ -367,7 +367,7 @@ const search_type_change = () => {
 }
 
 function getRequestParams() {
-  let obj: any = {
+  const obj: any = {
     name: model_search_form.value.name,
     create_user: model_search_form.value.create_user,
     model_type: model_search_form.value.model_type,

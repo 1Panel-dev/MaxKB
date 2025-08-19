@@ -3,7 +3,7 @@
     <ContentContainer>
       <template #header>
         <el-breadcrumb separator-icon="ArrowRight">
-          <el-breadcrumb-item>{{ t('views.shared.shared_resources') }}</el-breadcrumb-item>
+          <el-breadcrumb-item>{{ $t('views.shared.shared_resources') }}</el-breadcrumb-item>
           <el-breadcrumb-item>
             <h5 class="ml-4 color-text-primary">{{ t('views.model.title') }}</h5>
           </el-breadcrumb-item>
@@ -18,7 +18,6 @@
 
 <script lang="ts" setup>
 import { onMounted, ref, computed } from 'vue'
-import { t } from '@/locales'
 import modelListContainer from '@/views/model/index.vue'
 
 onMounted(() => {})

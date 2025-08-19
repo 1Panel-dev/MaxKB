@@ -64,9 +64,9 @@ import permissionMap from '@/permission'
 
 
 const props = defineProps<{
-  paragraphId: String
-  docId: String
-  knowledgeId: String
+  paragraphId: string
+  docId: string
+  knowledgeId: string
   apiType: 'systemShare' | 'workspace' | 'systemManage'
 }>()
 

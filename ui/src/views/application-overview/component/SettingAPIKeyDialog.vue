@@ -113,7 +113,7 @@ const submit = async (formEl: FormInstance | undefined) => {
 
       apiCall.then(() => {
         emit('refresh')
-        //@ts-ignore
+
         MsgSuccess(t('common.settingSuccess'))
         dialogVisible.value = false
       })

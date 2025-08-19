@@ -255,7 +255,6 @@ const shareUrl = computed(
 const dayOptions = [
   {
     value: 7,
-    // @ts-ignore
     label: t('views.applicationOverview.monitor.pastDayOptions.past7Days'),
   },
   {
@@ -373,7 +372,6 @@ function refreshAccessToken() {
       const obj = {
         access_token_reset: true,
       }
-      // @ts-ignore
       const str = t('views.applicationOverview.appInfo.refreshToken.refreshSuccess')
       updateAccessToken(obj, str)
     })

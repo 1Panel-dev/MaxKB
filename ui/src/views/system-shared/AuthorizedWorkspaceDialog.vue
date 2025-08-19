@@ -1,6 +1,6 @@
 <template>
   <el-dialog modal-class="authorized-workspace" v-model="centerDialogVisible" width="840">
-    <template #header="{ titleId, titleClass }">
+    <template #header>
       <h4 class="mb-8">{{ $t('views.shared.authorized_workspace') }}</h4>
       <el-text class="color-secondary lighter">{{ $t('views.shared.authorized_tip') }}</el-text>
     </template>
@@ -11,7 +11,7 @@
       <el-radio value="BLACK_LIST">{{ $t('views.shared.BLACK_LIST') }}</el-radio>
     </el-radio-group>
     <p class="mb-8 lighter mt-16">{{ $t('views.shared.select_workspace') }}</p>
-    <div class="flex border" v-loading="loading" style="overflow: hidden;">
+    <div class="flex border" v-loading="loading" style="overflow: hidden">
       <div class="border-r">
         <el-input
           v-model="search"
@@ -69,7 +69,7 @@
           </el-button>
         </div>
         <el-scrollbar max-height="250" wrap-class="p-16 pt-0">
-          <template v-for="ele in checkedWorkspace">
+          <template v-for="(ele, index) in checkedWorkspace" :key="index">
             <div class="flex-between">
               <div class="flex align-center">
                 <AppIcon iconName="app-workspace"></AppIcon>
@@ -97,7 +97,6 @@
 import { ref, computed } from 'vue'
 import type { CheckboxValueType } from 'element-plus'
 import authorizationApi from '@/api/system-shared/authorization'
-import workspaceApi from '@/api/workspace/workspace'
 import { loadPermissionApi } from '@/utils/dynamics-api/permission-api.ts'
 
 const checkAll = ref(false)
@@ -137,7 +136,7 @@ const open = async ({ id }: any, type = 'Knowledge') => {
   ])
   workspace.value = systemWorkspaceList.data as any
   listType.value = (authList.data || {}).authentication_type || 'WHITE_LIST'
-  let workspace_id_list = (authList.data || {}).workspace_id_list || []
+  const workspace_id_list = (authList.data || {}).workspace_id_list || []
   checkedWorkspace.value = workspace.value.filter((ele) => workspace_id_list.includes(ele.id))
   handleCheckedWorkspaceChange(checkedWorkspace.value)
   loading.value = false

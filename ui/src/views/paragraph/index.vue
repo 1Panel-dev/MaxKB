@@ -62,7 +62,7 @@
                 container=".paragraph-scollbar"
                 @click="handleClick"
               >
-                <template v-for="(item, index) in paragraphDetail" :key="item.id">
+                <template v-for="(item) in paragraphDetail" :key="item.id">
                   <el-anchor-link :href="`#m${item.id}`" :title="item.title" v-if="item.title">
                     <span :title="item.title">
                       {{ item.title }}

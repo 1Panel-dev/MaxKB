@@ -277,7 +277,7 @@ function sendMessage(val: string, other_params_data?: any, chat?: chatType): Pro
       return userFormRef.value
         ?.validate()
         .then((ok) => {
-          let userFormData = accessToken
+          const userFormData = accessToken
             ? JSON.parse(localStorage.getItem(`${accessToken}userForm`) || '{}')
             : {}
           const newData = Object.keys(form_data.value).reduce((result: any, key: string) => {
@@ -640,7 +640,7 @@ const handleScroll = () => {
 
 onMounted(() => {
   if (isUserInput.value && localStorage.getItem(`${accessToken}userForm`)) {
-    let userFormData = JSON.parse(localStorage.getItem(`${accessToken}userForm`) || '{}')
+    const userFormData = JSON.parse(localStorage.getItem(`${accessToken}userForm`) || '{}')
     form_data.value = userFormData
   }
   if (window.speechSynthesis) {

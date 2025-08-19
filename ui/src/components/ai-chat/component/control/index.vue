@@ -99,7 +99,7 @@ const menus = ref([
  */
 const clearSelectedText = () => {
   if (window.getSelection) {
-    var selection = window.getSelection()
+    const selection = window.getSelection()
     if (selection) {
       selection.removeAllRanges()
     }
