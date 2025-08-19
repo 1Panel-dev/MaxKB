@@ -1,9 +1,10 @@
 FROM node:24-alpine AS web-build
 COPY ui ui
 RUN cd ui && \
-    npm install && \
-    NODE_OPTIONS="--max-old-space-size=4096" npm run build && \
-    NODE_OPTIONS="--max-old-space-size=4096" npm run build-chat && \
+    corepack enable && \
+    pnpm install && \
+    NODE_OPTIONS="--max-old-space-size=4096" pnpm run build && \
+    NODE_OPTIONS="--max-old-space-size=4096" pnpm run build-chat && \
     find . -maxdepth 1 ! -name '.' ! -name 'dist' ! -name 'public' -exec rm -rf {} +
 
 FROM ghcr.io/1panel-dev/maxkb-base:python3.11-pg17.6 AS stage-build
