@@ -5,7 +5,7 @@
         <el-breadcrumb separator-icon="ArrowRight">
           <el-breadcrumb-item>{{ $t('views.shared.shared_resources') }}</el-breadcrumb-item>
           <el-breadcrumb-item>
-            <h5 class="ml-4 color-text-primary">{{ t('views.knowledge.title') }}</h5>
+            <h5 class="ml-4 color-text-primary">{{ $t('views.knowledge.title') }}</h5>
           </el-breadcrumb-item>
         </el-breadcrumb>
       </template>
