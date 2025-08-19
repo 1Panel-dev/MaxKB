@@ -142,7 +142,7 @@ class Dataset(APIView):
 
         @action(methods="PUT", detail=False)
         @swagger_auto_schema(operation_summary=_('Hit test list'), operation_id=_('Hit test list'),
-                             manual_parameters=CommonApi.HitTestApi.get_request_params_api(),
+                             request_body=CommonApi.HitTestApi.get_request_body_api(),
                              responses=result.get_api_array_response(CommonApi.HitTestApi.get_response_body_api()),
                              tags=[_('Knowledge Base')])
         @has_permissions(lambda r, keywords: Permission(group=Group.DATASET, operate=Operate.USE,
