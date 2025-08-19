@@ -7,7 +7,7 @@
     :destroy-on-close="true"
     :before-close="close"
   >
-    <template #header="{ close, titleId, titleClass }">
+    <template #header>
       <el-breadcrumb separator=">">
         <el-breadcrumb-item
           ><span class="active-breadcrumb">{{

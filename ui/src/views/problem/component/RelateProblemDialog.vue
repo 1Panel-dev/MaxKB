@@ -204,7 +204,9 @@ function associationClick(item: any) {
 function searchHandle() {
   paginationConfig.current_page = 1
   paragraphList.value = []
-  currentDocument.value && getParagraphList(currentDocument.value)
+  if (currentDocument.value) {
+    getParagraphList(currentDocument.value)
+  }
 }
 
 function clickDocumentHandle(item: any) {
@@ -222,7 +224,10 @@ function getDocument() {
       documentList.value = res.data
       currentDocument.value =
         cloneDocumentList.value?.length > 0 ? cloneDocumentList.value[0].id : ''
-      currentDocument.value && getParagraphList(currentDocument.value)
+
+      if (currentDocument.value) {
+        getParagraphList(currentDocument.value)
+      }
     })
 }
 

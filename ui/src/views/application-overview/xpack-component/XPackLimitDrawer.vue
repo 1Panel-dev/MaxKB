@@ -227,7 +227,6 @@ const submit = async (formEl: FormInstance | undefined) => {
         .putAccessToken(id as string, obj, loading)
         .then(() => {
           emit('refresh')
-          // @ts-ignore
           MsgSuccess(t('common.settingSuccess'))
           dialogVisible.value = false
         })

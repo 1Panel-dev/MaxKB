@@ -106,7 +106,6 @@ const onChange = (file: any) => {
   //1、判断文件大小是否合法，文件限制不能大于10MB
   const isLimit = file?.size / 1024 / 1024 < 10
   if (!isLimit) {
-    // @ts-ignore
     MsgError(t('common.EditAvatarDialog.fileSizeExceeded'))
     return false
   } else {

@@ -149,6 +149,8 @@ const resourceType = computed(() => {
     return 'model'
   } else if (props.source === 'TOOL') {
     return 'tool'
+  } else {
+    return 'application'
   }
 })
 

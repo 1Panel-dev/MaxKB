@@ -313,7 +313,6 @@ const rules = reactive<FormRules>({
 const onChange = (file: any, fileList: UploadFiles, attr: string) => {
   const isLimit = file?.size / 1024 / 1024 < 10
   if (!isLimit) {
-    // @ts-ignore
     MsgError(t('theme.fileMessageError'))
     return false
   } else {

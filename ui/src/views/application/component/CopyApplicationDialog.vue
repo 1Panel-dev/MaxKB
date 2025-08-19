@@ -60,7 +60,6 @@ import useStore from '@/stores'
 const router = useRouter()
 const { common, user } = useStore()
 
-// @ts-ignore
 const defaultPrompt = t('views.application.form.prompt.defaultPrompt', {
   data: '{data}',
   question: '{question}',
@@ -69,7 +68,7 @@ const applicationFormRef = ref()
 
 const loading = ref(false)
 const dialogVisible = ref<boolean>(false)
-// @ts-ignore
+
 const applicationForm = ref<ApplicationFormType>({
   name: '',
   desc: '',

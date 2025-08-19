@@ -98,13 +98,12 @@ function settingApiKey(row: any) {
 
 function deleteApiKey(row: any) {
   MsgConfirm(
-    // @ts-ignore
     `${t('views.applicationOverview.appInfo.APIKeyDialog.msgConfirm1')}: ${row.secret_key}?`,
     t('views.applicationOverview.appInfo.APIKeyDialog.msgConfirm2'),
     {
       confirmButtonText: t('common.confirm'),
       cancelButtonText: t('common.cancel'),
-      confirmButtonClass: 'color-danger',
+      confirmButtonClass: 'danger',
     },
   )
     .then(() => {

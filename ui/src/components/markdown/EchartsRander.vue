@@ -44,8 +44,7 @@ function evalParseOption(option_json: any) {
   if (option_json.style) {
     style.value = option_json.style
   }
-  let option = {}
-  echarts
+  const option = {}
   tmp.value = echarts
   eval(option_json.option)
   return option

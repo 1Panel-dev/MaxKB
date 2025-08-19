@@ -363,7 +363,6 @@ function mapToUrlParams(map: any[]) {
 
 function deleteApplication(row: any) {
   MsgConfirm(
-    // @ts-ignore
     `${t('views.application.delete.confirmTitle')}${row.name} ?`,
     t('views.application.delete.confirmMessage'),
     {
