@@ -8787,3 +8787,6 @@ msgstr "Qwen-Omni 系列模型支持输入多种模态的数据，包括视频�
 
 msgid "resource authorization"
 msgstr "资源授权"
+
+msgid "The Qwen Audio based end-to-end speech recognition model supports audio recognition within 3 minutes. At present, it mainly supports Chinese and English recognition."
+msgstr "基于Qwen-Audio的端到端语音识别大模型，支持3分钟以内的音频识别，目前主要支持中英文识别。"

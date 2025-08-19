@@ -11,6 +11,7 @@ import os
 from common.utils.common import get_file_content
 from models_provider.base_model_provider import ModelProvideInfo, ModelTypeConst, ModelInfo, IModelProvider, \
     ModelInfoManage
+from models_provider.impl.aliyun_bai_lian_model_provider.credential.asr_stt import AliyunBaiLianAsrSTTModelCredential
 from models_provider.impl.aliyun_bai_lian_model_provider.credential.embedding import \
     AliyunBaiLianEmbeddingCredential
 from models_provider.impl.aliyun_bai_lian_model_provider.credential.image import QwenVLModelCredential
@@ -21,6 +22,7 @@ from models_provider.impl.aliyun_bai_lian_model_provider.credential.reranker imp
 from models_provider.impl.aliyun_bai_lian_model_provider.credential.stt import AliyunBaiLianSTTModelCredential
 from models_provider.impl.aliyun_bai_lian_model_provider.credential.tti import QwenTextToImageModelCredential
 from models_provider.impl.aliyun_bai_lian_model_provider.credential.tts import AliyunBaiLianTTSModelCredential
+from models_provider.impl.aliyun_bai_lian_model_provider.model.asr_stt import AliyunBaiLianAsrSpeechToText
 from models_provider.impl.aliyun_bai_lian_model_provider.model.embedding import AliyunBaiLianEmbedding
 from models_provider.impl.aliyun_bai_lian_model_provider.model.image import QwenVLChatModel
 from models_provider.impl.aliyun_bai_lian_model_provider.model.llm import BaiLianChatModel
@@ -36,6 +38,7 @@ aliyun_bai_lian_model_credential = AliyunBaiLianRerankerCredential()
 aliyun_bai_lian_tts_model_credential = AliyunBaiLianTTSModelCredential()
 aliyun_bai_lian_stt_model_credential = AliyunBaiLianSTTModelCredential()
 aliyun_bai_lian_omi_stt_model_credential = AliyunBaiLianOmiSTTModelCredential()
+aliyun_bai_lian_asr_stt_model_credential = AliyunBaiLianAsrSTTModelCredential()
 aliyun_bai_lian_embedding_model_credential = AliyunBaiLianEmbeddingCredential()
 aliyun_bai_lian_llm_model_credential = BaiLianLLMModelCredential()
 qwenvl_model_credential = QwenVLModelCredential()
@@ -79,10 +82,16 @@ model_info_list = [ModelInfo('gte-rerank',
                              BaiLianChatModel),
                    ModelInfo('qwen-omni-turbo',
                              _('The Qwen Omni series model supports inputting multiple modalities of data, including video, audio, images, and text, and outputting audio and text.'),
-                             ModelTypeConst.STT, aliyun_bai_lian_omi_stt_model_credential, AliyunBaiLianOmiSpeechToText),
+                             ModelTypeConst.STT, aliyun_bai_lian_omi_stt_model_credential,
+                             AliyunBaiLianOmiSpeechToText),
                    ModelInfo('qwen2.5-omni-7b',
                              _('The Qwen Omni series model supports inputting multiple modalities of data, including video, audio, images, and text, and outputting audio and text.'),
-                             ModelTypeConst.STT, aliyun_bai_lian_omi_stt_model_credential, AliyunBaiLianOmiSpeechToText),
+                             ModelTypeConst.STT, aliyun_bai_lian_omi_stt_model_credential,
+                             AliyunBaiLianOmiSpeechToText),
+                   ModelInfo('qwen-audio-asr',
+                             _('The Qwen Audio based end-to-end speech recognition model supports audio recognition within 3 minutes. At present, it mainly supports Chinese and English recognition.'),
+                             ModelTypeConst.STT, aliyun_bai_lian_asr_stt_model_credential,
+                             AliyunBaiLianAsrSpeechToText),
                    ]
 
 module_info_vl_list = [
