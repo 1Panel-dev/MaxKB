@@ -258,7 +258,16 @@
                             <AppIcon iconName="app-lock" class="color-secondary"></AppIcon>
                             {{ $t('views.shared.authorized_workspace') }}</el-dropdown-item
                           >
-
+                          <el-dropdown-item
+                            @click.stop="openAuthorization(item)"
+                            v-if="apiType === 'workspace' && permissionPrecise.auth(item.id)"
+                          >
+                            <AppIcon
+                              iconName="app-resource-authorization"
+                              class="color-secondary"
+                            ></AppIcon>
+                            {{ $t('views.system.resourceAuthorization.title') }}
+                          </el-dropdown-item>
                           <el-dropdown-item
                             @click.stop="openMoveToDialog(item)"
                             v-if="permissionPrecise.edit(item.id) && apiType === 'workspace'"
@@ -328,6 +337,11 @@
     @refresh="refreshKnowledgeList"
     v-if="apiType === 'workspace'"
   />
+  <ResourceAuthorizationDrawer
+    :type="SourceTypeEnum.KNOWLEDGE"
+    ref="ResourceAuthorizationDrawerRef"
+    v-if="apiType === 'workspace'"
+  />
 </template>
 
 <script lang="ts" setup>
@@ -342,6 +356,7 @@ import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
 import MoveToDialog from '@/components/folder-tree/MoveToDialog.vue'
 import GenerateRelatedDialog from '@/components/generate-related-dialog/index.vue'
 import AuthorizedWorkspace from '@/views/system-shared/AuthorizedWorkspaceDialog.vue'
+import ResourceAuthorizationDrawer from '@/components/resource-authorization-drawer/index.vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import useStore from '@/stores'
 import { numberFormat } from '@/utils/common'
@@ -406,6 +421,11 @@ const paginationConfig = reactive({
   page_size: 30,
   total: 0,
 })
+
+const ResourceAuthorizationDrawerRef = ref()
+function openAuthorization(item: any) {
+  ResourceAuthorizationDrawerRef.value.open(item.id)
+}
 
 const MoveToDialogRef = ref()
 function openMoveToDialog(data: any) {

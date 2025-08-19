@@ -8775,3 +8775,15 @@ msgstr "多種方言，支持 23 種方言"
 
 msgid "This interface is used to recognize short audio files within 60 seconds. Supports Mandarin Chinese, English, Cantonese, Japanese, Vietnamese, Malay, Indonesian, Filipino, Thai, Portuguese, Turkish, Arabic, Hindi, French, German, and 23 Chinese dialects."
 msgstr "本介面用於識別 60 秒之內的短音頻文件。支援中文普通話、英語、粵語、日語、越南語、馬來語、印度尼西亞語、菲律賓語、泰語、葡萄牙語、土耳其語、阿拉伯語、印地語、法語、德語及 23 種漢語方言。"
+
+msgid "CueWord"
+msgstr "提示詞"
+
+msgid "If not passed, the default value is What is this audio saying? Only answer the audio content"
+msgstr "如果未傳遞，預設值為這段音訊在說什麼，只回答音訊的內容"
+
+msgid "The Qwen Omni series model supports inputting multiple modalities of data, including video, audio, images, and text, and outputting audio and text."
+msgstr "Qwen-Omni系列模型支持輸入多種模態的數據，包括視頻、音訊、圖片、文字，並輸出音訊與文字"
+
+msgid "resource authorization"
+msgstr "資源授權"

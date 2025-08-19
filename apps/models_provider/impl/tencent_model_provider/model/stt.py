@@ -1,6 +1,7 @@
 import base64
 import json
 import os
+import traceback
 from typing import Dict
 
 from tencentcloud.asr.v20190614 import asr_client, models
@@ -9,6 +10,7 @@ from tencentcloud.common.exception import TencentCloudSDKException
 from tencentcloud.common.profile.client_profile import ClientProfile
 from tencentcloud.common.profile.http_profile import HttpProfile
 
+from common.utils.logger import maxkb_logger
 from models_provider.base_model_provider import MaxKBBaseModel
 from models_provider.impl.base_stt import BaseSpeechToText
 

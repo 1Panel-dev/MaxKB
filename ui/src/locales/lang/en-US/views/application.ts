@@ -212,7 +212,7 @@ export default {
     },
     wecomBotSetting: {
       title: 'WeCom Bot Configuration',
-      urlInfo: '-Security and Management-Management Tools-Intelligent Bots-API Mode',
+      urlInfo: '-Management Tools-Smart Bot-Create Bot-API Mode Create "URL"',
     },
     larkSetting: {
       title: 'Lark Configuration',

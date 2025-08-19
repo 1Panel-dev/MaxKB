@@ -158,6 +158,9 @@ export default {
       placeholder: 'Directly return segment content',
       requiredMessage: 'Please enter similarity value',
     },
+    allow_download: {
+     label: 'Allow download in knowledge base source',
+    }
   },
   hitHandlingMethod: {
     optimization: 'Model optimization',

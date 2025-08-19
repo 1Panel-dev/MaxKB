@@ -1,43 +1,92 @@
 <template>
-  <div ref="aiChatRef" class="ai-chat" :class="type" :style="{
-    height: firsUserInput ? '100%' : undefined,
-    paddingBottom: applicationDetails.disclaimer ? '20px' : 0,
-  }">
-    <div v-show="showUserInputContent" :class="firsUserInput ? 'firstUserInput' : 'popperUserInput'">
-      <UserForm v-model:api_form_data="api_form_data" v-model:form_data="form_data" :application="applicationDetails"
-        :type="type" :first="firsUserInput" @confirm="UserFormConfirm" @cancel="UserFormCancel" ref="userFormRef">
+  <div
+    ref="aiChatRef"
+    class="ai-chat"
+    :class="type"
+    :style="{
+      height: firsUserInput ? '100%' : undefined,
+      paddingBottom: applicationDetails.disclaimer ? '20px' : 0,
+    }"
+  >
+    <div
+      v-show="showUserInputContent"
+      :class="firsUserInput ? 'firstUserInput' : 'popperUserInput'"
+    >
+      <UserForm
+        v-model:api_form_data="api_form_data"
+        v-model:form_data="form_data"
+        :application="applicationDetails"
+        :type="type"
+        :first="firsUserInput"
+        @confirm="UserFormConfirm"
+        @cancel="UserFormCancel"
+        ref="userFormRef"
+      >
       </UserForm>
     </div>
     <template v-if="!(isUserInput || isAPIInput) || !firsUserInput || type === 'log'">
       <el-scrollbar ref="scrollDiv" @scroll="handleScrollTop">
         <div ref="dialogScrollbar" class="ai-chat__content p-16">
-          <PrologueContent :type="type" :application="applicationDetails" :available="available"
-            :send-message="sendMessage"></PrologueContent>
+          <PrologueContent
+            :type="type"
+            :application="applicationDetails"
+            :available="available"
+            :send-message="sendMessage"
+          ></PrologueContent>
 
           <template v-for="(item, index) in chatList" :key="index">
             <!-- 问题 -->
-            <QuestionContent :type="type" :application="applicationDetails" :chat-record="item"></QuestionContent>
+            <QuestionContent
+              :type="type"
+              :application="applicationDetails"
+              :chat-record="item"
+            ></QuestionContent>
             <!-- 回答 -->
-            <AnswerContent :application="applicationDetails" :loading="loading" v-model:chat-record="chatList[index]"
-              :type="type" :send-message="sendMessage" :chat-management="ChatManagement"
+            <AnswerContent
+              :application="applicationDetails"
+              :loading="loading"
+              v-model:chat-record="chatList[index]"
+              :type="type"
+              :send-message="sendMessage"
+              :chat-management="ChatManagement"
               :executionIsRightPanel="props.executionIsRightPanel"
               @open-execution-detail="emit('openExecutionDetail', chatList[index])"
-              @openParagraph="emit('openParagraph', chatList[index])" @openParagraphDocument="
+              @openParagraph="emit('openParagraph', chatList[index])"
+              @openParagraphDocument="
                 (val: any) => emit('openParagraphDocument', chatList[index], val)
-              "></AnswerContent>
+              "
+            ></AnswerContent>
           </template>
-          <TransitionContent v-if="transcribing" :text="t('chat.transcribing')" :type="type"
-            :application="applicationDetails">
+          <TransitionContent
+            v-if="transcribing"
+            :text="t('chat.transcribing')"
+            :type="type"
+            :application="applicationDetails"
+          >
           </TransitionContent>
         </div>
       </el-scrollbar>
 
-      <ChatInputOperate :app-id="appId" :application-details="applicationDetails" :is-mobile="isMobile" :type="type"
-        :send-message="sendMessage" :open-chat-id="openChatId" :validate="validate" :chat-management="ChatManagement"
-        v-model:chat-id="chartOpenId" v-model:loading="loading" v-model:show-user-input="showUserInput"
-        v-if="type !== 'log'">
+      <ChatInputOperate
+        :app-id="appId"
+        :application-details="applicationDetails"
+        :is-mobile="isMobile"
+        :type="type"
+        :send-message="sendMessage"
+        :open-chat-id="openChatId"
+        :validate="validate"
+        :chat-management="ChatManagement"
+        v-model:chat-id="chartOpenId"
+        v-model:loading="loading"
+        v-model:show-user-input="showUserInput"
+        v-if="type !== 'log'"
+      >
         <template #userInput>
-          <el-button v-if="isUserInput || isAPIInput" class="user-input-button mb-8" @click="toggleUserInput">
+          <el-button
+            v-if="isUserInput || isAPIInput"
+            class="user-input-button mb-8"
+            @click="toggleUserInput"
+          >
             <AppIcon iconName="app-edit" :size="16" class="mr-4"></AppIcon>
             <span class="ellipsis">
               {{ userInputTitle || $t('chat.userInput') }}
@@ -51,11 +100,21 @@
   </div>
 </template>
 <script setup lang="ts">
-import { type Ref, ref, nextTick, computed, watch, reactive, onMounted, onBeforeUnmount } from 'vue'
+import {
+  type Ref,
+  ref,
+  nextTick,
+  computed,
+  watch,
+  reactive,
+  onMounted,
+  onBeforeUnmount,
+  provide,
+} from 'vue'
 import { useRoute } from 'vue-router'
 import applicationApi from '@/api/application/application'
 import chatAPI from '@/api/chat/chat'
-import SystemResourceManagementApplicationAPI from "@/api/system-resource-management/application.ts"
+import SystemResourceManagementApplicationAPI from '@/api/system-resource-management/application.ts'
 import syetrmResourceManagementChatLogApi from '@/api/system-resource-management/chat-log'
 import chatLogApi from '@/api/application/chat-log'
 import { ChatManagement, type chatType } from '@/api/type/application'
@@ -71,6 +130,11 @@ import UserForm from '@/components/ai-chat/component/user-form/index.vue'
 import Control from '@/components/ai-chat/component/control/index.vue'
 import { t } from '@/locales'
 import bus from '@/bus'
+provide('upload', (file: any, loading?: Ref<boolean>) => {
+  return props.type === 'debug-ai-chat'
+    ? applicationApi.postUploadFile(file, 'TEMPORARY_120_MINUTE', 'TEMPORARY_120_MINUTE', loading)
+    : chatAPI.postUploadFile(file, chartOpenId.value, 'CHAT', loading)
+})
 const transcribing = ref<boolean>(false)
 defineOptions({ name: 'AiChat' })
 const route = useRoute()
@@ -300,17 +364,25 @@ const getChatRecordDetailsAPI = (row: any) => {
   if (row.record_id) {
     if (props.type === 'debug-ai-chat') {
       if (route.path.includes('resource-management')) {
-        return syetrmResourceManagementChatLogApi
-          .getChatRecordDetails(id || props.appId, row.chat_id, row.record_id, loading)
+        return syetrmResourceManagementChatLogApi.getChatRecordDetails(
+          id || props.appId,
+          row.chat_id,
+          row.record_id,
+          loading,
+        )
       } else {
-        return chatLogApi
-          .getChatRecordDetails(id || props.appId, row.chat_id, row.record_id, loading)
+        return chatLogApi.getChatRecordDetails(
+          id || props.appId,
+          row.chat_id,
+          row.record_id,
+          loading,
+        )
       }
     } else {
       return chatAPI.getChatRecord(row.chat_id, row.record_id, loading)
     }
   }
-  return Promise.reject("404")
+  return Promise.reject('404')
 }
 /**
  * 获取对话详情
@@ -325,7 +397,6 @@ function getSourceDetail(row: any) {
       }
     })
   })
-
 }
 /**
  * 对话

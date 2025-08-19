@@ -204,9 +204,9 @@ export default {
       verificationTokenPlaceholder: '請輸入Verification Token',
       urlInfo: '-事件與回呼-事件配置-配置訂閱方式的 "請求位址" 中',
     },
-      wecomBotSetting: {
-      title: '企業微信機器人配置',
-      urlInfo: '-安全與管理-管理工具-智能機器人- API 模式建立的 "URL" 中',
+    wecomBotSetting: {
+      title: '企業微信智能機器人配置',
+      urlInfo: '-管理工具-智能机器人-创建机器人-API模式创建的 "URL" 中',
     },
     slackSetting: {
       title: 'Slack 應用配置',

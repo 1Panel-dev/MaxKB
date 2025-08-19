@@ -71,6 +71,7 @@ export default {
     imageMessage: '请解析图片内容',
     fileMessage: '请解析文件内容',
     errorMessage: '上传失败',
+    fileRepeat: '文件已存在',
   },
   executionDetails: {
     title: '执行详情',

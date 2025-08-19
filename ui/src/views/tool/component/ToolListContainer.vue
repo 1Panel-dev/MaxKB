@@ -251,6 +251,16 @@
                             {{ $t('common.param.initParam') }}
                           </el-dropdown-item>
                           <el-dropdown-item
+                            @click.stop="openAuthorization(item)"
+                            v-if="apiType === 'workspace' && permissionPrecise.auth(item.id)"
+                          >
+                            <AppIcon
+                              iconName="app-resource-authorization"
+                              class="color-secondary"
+                            ></AppIcon>
+                            {{ $t('views.system.resourceAuthorization.title') }}
+                          </el-dropdown-item>
+                          <el-dropdown-item
                             @click.stop="openMoveToDialog(item)"
                             v-if="permissionPrecise.copy(item.id) && apiType === 'workspace'"
                           >
@@ -308,6 +318,11 @@
     @refresh="refreshToolList"
     v-if="apiType === 'workspace'"
   />
+  <ResourceAuthorizationDrawer
+    :type="SourceTypeEnum.TOOL"
+    ref="ResourceAuthorizationDrawerRef"
+    v-if="apiType === 'workspace'"
+  />
 </template>
 
 <script lang="ts" setup>
@@ -322,6 +337,7 @@ import AuthorizedWorkspace from '@/views/system-shared/AuthorizedWorkspaceDialog
 import ToolStoreDialog from '@/views/tool/toolStore/ToolStoreDialog.vue'
 import AddInternalToolDialog from '@/views/tool/toolStore/AddInternalToolDialog.vue'
 import MoveToDialog from '@/components/folder-tree/MoveToDialog.vue'
+import ResourceAuthorizationDrawer from '@/components/resource-authorization-drawer/index.vue'
 import { resetUrl } from '@/utils/common'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import { SourceTypeEnum } from '@/enums/common'
@@ -364,6 +380,11 @@ const MoreFieldPermission = (id: any) => {
     permissionPrecise.value.delete(id) ||
     isSystemShare.value
   )
+}
+
+const ResourceAuthorizationDrawerRef = ref()
+function openAuthorization(item: any) {
+  ResourceAuthorizationDrawerRef.value.open(item.id)
 }
 
 const InitParamDrawerRef = ref()

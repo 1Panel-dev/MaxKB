@@ -60,7 +60,10 @@ class Reasoning:
                 if not self.reasoning_content_is_end:
                     self.reasoning_content_is_end = True
                     self.content += self.all_content
-                    return {'content': self.all_content, 'reasoning_content': ''}
+                    return {'content': self.all_content,
+                            'reasoning_content': chunk.additional_kwargs.get('reasoning_content',
+                                                                             '') if chunk.additional_kwargs else ''
+                            }
         else:
             if self.reasoning_content_is_start:
                 self.reasoning_content_chunk += chunk.content
@@ -68,7 +71,9 @@ class Reasoning:
             self.reasoning_content_end_tag_prefix)
         if self.reasoning_content_is_end:
             self.content += chunk.content
-            return {'content': chunk.content, 'reasoning_content': ''}
+            return {'content': chunk.content, 'reasoning_content': chunk.additional_kwargs.get('reasoning_content',
+                                                                                               '') if chunk.additional_kwargs else ''
+                    }
         # 是否包含结束
         if reasoning_content_end_tag_prefix_index > -1:
             if len(self.reasoning_content_chunk) - reasoning_content_end_tag_prefix_index >= self.reasoning_content_end_tag_len:
@@ -93,7 +98,9 @@ class Reasoning:
         else:
             if self.reasoning_content_is_end:
                 self.content += chunk.content
-                return {'content': chunk.content, 'reasoning_content': ''}
+                return {'content': chunk.content, 'reasoning_content': chunk.additional_kwargs.get('reasoning_content',
+                                                                                                   '') if chunk.additional_kwargs else ''
+                        }
             else:
                 # aaa
                 result = {'content': '', 'reasoning_content': self.reasoning_content_chunk}

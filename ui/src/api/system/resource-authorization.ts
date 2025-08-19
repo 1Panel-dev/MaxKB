@@ -1,43 +1,84 @@
-import { Permission } from '@/utils/permission/type'
 import { Result } from '@/request/Result'
 import { get, put, post, del } from '@/request/index'
-import type { pageRequest } from '@/api/type/common'
 import type { Ref } from 'vue'
+import type { pageRequest } from '@/api/type/common'
 const prefix = '/workspace'
 
 /**
- * 获取资源权限
+ * 工作空间下各资源获取资源权限
+ * @query 参数
+ */
+const getWorkspaceResourceAuthorization: (
+  workspace_id: string,
+  target: string,
+  resource: string,
+  page: pageRequest,
+  params?: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (workspace_id, target, resource, page, params, loading) => {
+  return get(
+    `${prefix}/${workspace_id}/resource_user_permission/resource/${target}/resource/${resource}/${page.current_page}/${page.page_size}`,
+    params,
+    loading,
+  )
+}
+
+/**
+ * 工作空间下各资源修改成员权限
+ * @param 参数 member_id
+ * @param 参数 {
+     [
+      {
+        "user_id": "string",
+        "permission": "NOT_AUTH"
+      }
+    ]
+  }
+ */
+const putWorkspaceResourceAuthorization: (
+  workspace_id: string,
+  target: string,
+  resource: string,
+  body: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (workspace_id, target, resource, body, loading) => {
+  return put(
+    `${prefix}/${workspace_id}/resource_user_permission/resource/${target}/resource/${resource}`,
+    body,
+    {},
+    loading,
+  )
+}
+
+/**
+ * 系统资源授权获取资源权限
  * @query 参数
  */
 const getResourceAuthorization: (
   workspace_id: string,
   user_id: string,
   resource: string,
+  page: pageRequest,
+  params?: any,
   loading?: Ref<boolean>,
-) => Promise<Result<any>> = (workspace_id, user_id, resource, loading) => {
+) => Promise<Result<any>> = (workspace_id, user_id, resource, page, params, loading) => {
   return get(
-    `${prefix}/${workspace_id}/user_resource_permission/user/${user_id}/resource/${resource}`,
-    undefined,
+    `${prefix}/${workspace_id}/user_resource_permission/user/${user_id}/resource/${resource}/${page.current_page}/${page.page_size}`,
+    params,
     loading,
   )
 }
 
 /**
- * 修改成员权限
+ * 系统资源授权修改成员权限
  * @param 参数 member_id
  * @param 参数 {
-          "team_resource_permission_list": [
-            {
-              "auth_target_type": "KNOWLEDGE",
-              "target_id": "string",
-              "auth_type": "ROLE",
-              "permission": {
-                "VIEW": true,
-                "MANAGE": true,
-                "ROLE": true
-              }
-            }
-          ]
+     [
+      {
+        "target_id": "string",
+        "permission": "NOT_AUTH"
+      }
+    ]
         }
  */
 const putResourceAuthorization: (
@@ -107,4 +148,6 @@ export default {
   getUserList,
   getUserMember,
   getSystemFolder,
+  getWorkspaceResourceAuthorization,
+  putWorkspaceResourceAuthorization
 }

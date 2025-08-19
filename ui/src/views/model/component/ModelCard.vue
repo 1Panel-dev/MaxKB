@@ -100,6 +100,10 @@
               <AppIcon iconName="app-setting" class="color-secondary"></AppIcon>
               {{ $t('views.model.modelForm.title.paramSetting') }}
             </el-dropdown-item>
+            <el-dropdown-item @click.stop="openAuthorization(model)" v-if="apiType === 'workspace' && permissionPrecise.auth(model.id)">
+              <AppIcon iconName="app-resource-authorization" class="color-secondary"></AppIcon>
+              {{ $t('views.system.resourceAuthorization.title') }}
+            </el-dropdown-item>
             <el-dropdown-item
               divided
               text
@@ -119,6 +123,11 @@
       ref="AuthorizedWorkspaceDialogRef"
       v-if="isSystemShare"
     ></AuthorizedWorkspace>
+    <ResourceAuthorizationDrawer
+      :type="SourceTypeEnum.MODEL"
+      ref="ResourceAuthorizationDrawerRef"
+      v-if="apiType === 'workspace'"
+    />
   </card-box>
 </template>
 <script setup lang="ts">
@@ -130,6 +139,8 @@ import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { modelType } from '@/enums/model'
 import ParamSettingDialog from './ParamSettingDialog.vue'
 import AuthorizedWorkspace from '@/views/system-shared/AuthorizedWorkspaceDialog.vue'
+import ResourceAuthorizationDrawer from '@/components/resource-authorization-drawer/index.vue'
+import { SourceTypeEnum } from '@/enums/common'
 import { t } from '@/locales'
 import permissionMap from '@/permission'
 import { useRoute } from 'vue-router'
@@ -146,10 +157,8 @@ const props = defineProps<{
   apiType: 'systemShare' | 'workspace' | 'systemManage'
 }>()
 
-const apiType = props.apiType
-
 const isSystemShare = computed(() => {
-  return apiType === 'systemShare'
+  return props.apiType === 'systemShare'
 })
 
 const permissionPrecise = computed(() => {
@@ -160,6 +169,11 @@ const MoreFilledPermission = (id: any) => {
   return (
     permissionPrecise.value.modify(id) || permissionPrecise.value.delete(id) || isSystemShare.value
   )
+}
+
+const ResourceAuthorizationDrawerRef = ref()
+function openAuthorization(item: any) {
+  ResourceAuthorizationDrawerRef.value.open(item.id)
 }
 
 const downModel = ref<Model>()

@@ -170,6 +170,7 @@ class Operate(Enum):
     TO_CHAT = "READ+TO_CHAT"  # 去对话
     SETTING = "READ+SETTING"  # 管理
     DOWNLOAD = "READ+DOWNLOAD"  # 下载
+    AUTH = "READ+AUTH"
 
 
 class RoleGroup(Enum):
@@ -335,6 +336,7 @@ Permission_Label = {
     Operate.DD.value: _('Dingding'),
     Operate.WEIXIN_PUBLIC_ACCOUNT.value: _('Weixin Public Account'),
     Operate.ADD_KNOWLEDGE.value: _('Add to Knowledge Base'),
+    Operate.AUTH.value:_('resource authorization'),
     Group.APPLICATION_OVERVIEW.value: _('Overview'),
     Group.APPLICATION_ACCESS.value: _('Application Access'),
     Group.APPLICATION_CHAT_USER.value: _('Dialogue users'),
@@ -481,6 +483,11 @@ class PermissionConstants(Enum):
         parent_group=[WorkspaceGroup.MODEL, UserGroup.MODEL],
         resource_permission_group_list=[ResourcePermissionConst.MODEL_MANGE]
     )
+    MODEL_RESOURCE_AUTHORIZATION = Permission(
+        group=Group.MODEL, operate=Operate.AUTH, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.MODEL, UserGroup.MODEL],
+        resource_permission_group_list=[ResourcePermissionConst.MODEL_MANGE]
+    )
     TOOL_READ = Permission(
         group=Group.TOOL, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
         parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL],
@@ -517,6 +524,11 @@ class PermissionConstants(Enum):
     )
     TOOL_EXPORT = Permission(
         group=Group.TOOL, operate=Operate.EXPORT, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL],
+        resource_permission_group_list=[ResourcePermissionConst.TOOL_MANGE]
+    )
+    TOOL_RESOURCE_AUTHORIZATION = Permission(
+        group=Group.TOOL, operate=Operate.AUTH, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
         parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL],
         resource_permission_group_list=[ResourcePermissionConst.TOOL_MANGE]
     )
@@ -557,6 +569,11 @@ class PermissionConstants(Enum):
     )
     KNOWLEDGE_GENERATE = Permission(
         group=Group.KNOWLEDGE, operate=Operate.GENERATE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANGE],
+        parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
+    )
+    KNOWLEDGE_RESOURCE_AUTHORIZATION = Permission(
+        group=Group.KNOWLEDGE, operate=Operate.AUTH, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
         resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANGE],
         parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
@@ -819,7 +836,11 @@ class PermissionConstants(Enum):
                                   parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
                                   resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE],
                                   )
-
+    APPLICATION_RESOURCE_AUTHORIZATION = Permission(group=Group.APPLICATION, operate=Operate.AUTH,
+                                  role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                  parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
+                                  resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE],
+                                  )
     APPLICATION_OVERVIEW_READ = Permission(group=Group.APPLICATION_OVERVIEW, operate=Operate.READ,
                                            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                            parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],

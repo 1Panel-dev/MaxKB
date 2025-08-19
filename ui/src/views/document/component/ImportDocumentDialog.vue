@@ -80,6 +80,11 @@
           /><span>{{ $t('views.document.form.similarity.placeholder') }}</span>
         </div>
       </el-form-item>
+      <el-form-item prop="allow_download">
+        <el-checkbox v-model="form.allow_download">
+          {{ $t('views.document.form.allow_download.label') }}
+        </el-checkbox>
+      </el-form-item>
     </el-form>
     <template #footer>
       <span class="dialog-footer">
@@ -127,6 +132,7 @@ const form = ref<any>({
   selector: '',
   hit_handling_method: 'optimization',
   directly_return_similarity: 0.9,
+  allow_download: false,
 })
 
 // 文档设置
@@ -162,6 +168,7 @@ watch(dialogVisible, (bool) => {
       selector: '',
       hit_handling_method: 'optimization',
       directly_return_similarity: 0.9,
+      allow_download: false,
     }
     isImport.value = false
     documentType.value = ''
@@ -200,6 +207,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         const obj = {
           source_url_list: form.value.source_url.split('\n'),
           selector: form.value.selector,
+          allow_download: form.value.allow_download,
         }
         loadSharedApi({ type: 'document', systemType: apiType.value })
           .postWebDocument(id, obj, loading)
@@ -219,6 +227,7 @@ const submit = async (formEl: FormInstance | undefined) => {
               ...{
                 source_url: form.value.source_url,
                 selector: form.value.selector,
+                allow_download: form.value.allow_download,
               },
             },
           }

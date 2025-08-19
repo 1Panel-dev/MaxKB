@@ -2,10 +2,7 @@ export enum AuthorizationEnum {
   MANAGE = 'MANAGE',
   VIEW = 'VIEW',
   ROLE = 'ROLE',
-  KNOWLEDGE = 'KNOWLEDGE',
-  APPLICATION = 'APPLICATION',
-  MODEL = 'MODEL',
-  TOOL = 'TOOL',
+  NOT_AUTH = 'NOT_AUTH',
 }
 
 export enum RoleTypeEnum {

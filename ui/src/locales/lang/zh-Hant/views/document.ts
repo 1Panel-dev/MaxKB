@@ -154,6 +154,9 @@ export default {
       placeholder: '直接返回分段内容',
       requiredMessage: '请输入相似度',
     },
+    allow_download: {
+     label: '允許在知識庫來源下載',
+    }
   },
   hitHandlingMethod: {
     optimization: '模型優化',
