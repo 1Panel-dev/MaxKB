@@ -6,7 +6,7 @@ RUN cd ui && \
     NODE_OPTIONS="--max-old-space-size=4096" npm run build-chat && \
     find . -maxdepth 1 ! -name '.' ! -name 'dist' ! -name 'public' -exec rm -rf {} +
 
-FROM ghcr.io/1panel-dev/maxkb-base:python3.11-pg17.5 AS stage-build
+FROM ghcr.io/1panel-dev/maxkb-base:python3.11-pg17.6 AS stage-build
 
 ARG DEPENDENCIES="                    \
         python3-pip"
@@ -32,7 +32,7 @@ RUN rm -rf /opt/maxkb-app/ui && \
     rm -rf /opt/maxkb-app/installer
 COPY --from=web-build --chmod=700 ui /opt/maxkb-app/ui
 
-FROM ghcr.io/1panel-dev/maxkb-base:python3.11-pg17.5
+FROM ghcr.io/1panel-dev/maxkb-base:python3.11-pg17.6
 ARG DOCKER_IMAGE_TAG=dev \
     BUILD_AT \
     GITHUB_COMMIT
