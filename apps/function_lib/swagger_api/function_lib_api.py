@@ -195,6 +195,53 @@ class FunctionLibApi(ApiMixin):
                 }
             )
 
+        @staticmethod
+        def get_response_body_api():
+            return openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                required=['id', 'name', 'code', 'input_field_list', 'permission_type'],
+                properties={
+                    'id': openapi.Schema(type=openapi.TYPE_STRING, title="", description=_('ID')),
+
+                    'name': openapi.Schema(type=openapi.TYPE_STRING, title=_('function name'),
+                                           description=_('function name')),
+                    'desc': openapi.Schema(type=openapi.TYPE_STRING, title=_('function description'),
+                                           description=_('function description')),
+                    'code': openapi.Schema(type=openapi.TYPE_STRING, title=_('function content'),
+                                           description=_('function content')),
+                    'permission_type': openapi.Schema(type=openapi.TYPE_STRING, title=_('permission'),
+                                                      description=_('permission')),
+                    'is_active': openapi.Schema(type=openapi.TYPE_BOOLEAN, title=_('Is active'),
+                                                description=_('Is active')),
+                    'input_field_list': openapi.Schema(type=openapi.TYPE_ARRAY,
+                                                       description=_('Input variable list'),
+                                                       items=openapi.Schema(type=openapi.TYPE_OBJECT,
+                                                                            required=['name', 'is_required', 'source'],
+                                                                            properties={
+                                                                                'name': openapi.Schema(
+                                                                                    type=openapi.TYPE_STRING,
+                                                                                    title=_('variable name'),
+                                                                                    description=_('variable name')),
+                                                                                'is_required': openapi.Schema(
+                                                                                    type=openapi.TYPE_BOOLEAN,
+                                                                                    title=_('required'),
+                                                                                    description=_('required')),
+                                                                                'type': openapi.Schema(
+                                                                                    type=openapi.TYPE_STRING,
+                                                                                    title=_('type'),
+                                                                                    description=_(
+                                                                                        'Field type string|int|dict|array|float')
+                                                                                ),
+                                                                                'source': openapi.Schema(
+                                                                                    type=openapi.TYPE_STRING,
+                                                                                    title=_('source'),
+                                                                                    description=_(
+                                                                                        'The source only supports custom|reference')),
+
+                                                                            }))
+                }
+            )
+
     class Export(ApiMixin):
         @staticmethod
         def get_request_params_api():

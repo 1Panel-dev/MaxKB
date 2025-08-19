@@ -26,6 +26,7 @@ class PyLintView(APIView):
     @swagger_auto_schema(operation_summary=_('Check code'),
                          operation_id=_('Check code'),
                          request_body=PyLintApi.get_request_body_api(),
+                         responses=result.get_api_response(PyLintApi.get_request_body_api()),
                          tags=[_('Function')])
     @has_permissions(RoleConstants.ADMIN, RoleConstants.USER)
     def post(self, request: Request):

@@ -94,6 +94,7 @@ class ChatView(APIView):
         @swagger_auto_schema(operation_summary=_("Get the workflow temporary session id"),
                              operation_id=_("Get the workflow temporary session id"),
                              request_body=ChatApi.OpenWorkFlowTemp.get_request_body_api(),
+                             responses=result.get_api_response(ChatApi.OpenTempChat.get_response_body_api()),
                              tags=[_("Application/Chat")])
         def post(self, request: Request):
             return result.success(ChatSerializers.OpenWorkFlowChat(
@@ -106,6 +107,7 @@ class ChatView(APIView):
         @swagger_auto_schema(operation_summary=_("Get a temporary session id"),
                              operation_id=_("Get a temporary session id"),
                              request_body=ChatApi.OpenTempChat.get_request_body_api(),
+                             responses=result.get_api_response(ChatApi.OpenTempChat.get_response_body_api()),
                              tags=[_("Application/Chat")])
         @has_permissions(RoleConstants.ADMIN, RoleConstants.USER)
         def post(self, request: Request):
@@ -239,6 +241,7 @@ class ChatView(APIView):
             @swagger_auto_schema(operation_summary=_("Client modifies dialogue summary"),
                                  operation_id=_("Client modifies dialogue summary"),
                                  request_body=ChatClientHistoryApi.Operate.ReAbstract.get_request_body_api(),
+                                 responses=result.get_default_response(),
                                  tags=[_("Application/Conversation Log")])
             @has_permissions(ViewPermission(
                 [RoleConstants.APPLICATION_ACCESS_TOKEN, RoleConstants.ADMIN, RoleConstants.USER],
@@ -418,6 +421,7 @@ class ChatView(APIView):
                                  operation_id=_("Add to Knowledge Base"),
                                  manual_parameters=ImproveApi.get_request_params_api_post(),
                                  request_body=ImproveApi.get_request_body_api_post(),
+                                 responses=result.get_default_response(),
                                  tags=[_("Application/Conversation Log/Add to Knowledge Base")]
                                  )
             @has_permissions(

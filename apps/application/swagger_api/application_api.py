@@ -38,6 +38,15 @@ class ApplicationApi(ApiMixin):
                 }
             )
 
+        @staticmethod
+        def get_response_body_api():
+            return openapi.Schema(
+                type=openapi.TYPE_STRING,
+                title=_("Application authentication token"),
+                description=_("Application authentication token"),
+                default="token"
+            )
+
     @staticmethod
     def get_response_body_api():
         return openapi.Schema(
@@ -133,6 +142,27 @@ class ApplicationApi(ApiMixin):
                     }
                 )
 
+            @staticmethod
+            def get_response_body_api():
+                return openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'id': openapi.Schema(type=openapi.TYPE_STRING, title=_("Primary key id"),
+                                             description=_("Primary key id")),
+                        'secret_key': openapi.Schema(type=openapi.TYPE_STRING, title=_("Secret key"),
+                                                     description=_("Secret key")),
+                        'is_active': openapi.Schema(type=openapi.TYPE_BOOLEAN, title=_("Is activation"),
+                                                    description=_("Is activation")),
+                        'application_id': openapi.Schema(type=openapi.TYPE_STRING, title=_("Application ID"),
+                                                         description=_("Application ID")),
+                        'allow_cross_domain': openapi.Schema(type=openapi.TYPE_BOOLEAN,
+                                                             title=_("Is cross-domain allowed"),
+                                                             description=_("Is cross-domain allowed")),
+                        'cross_domain_list': openapi.Schema(type=openapi.TYPE_ARRAY, title=_('Cross-domain list'),
+                                                            items=openapi.Schema(type=openapi.TYPE_STRING))
+                    }
+                )
+
     class AccessToken(ApiMixin):
         @staticmethod
         def get_request_params_api():
@@ -150,6 +180,37 @@ class ApplicationApi(ApiMixin):
                 type=openapi.TYPE_OBJECT,
                 required=[],
                 properties={
+                    'access_token_reset': openapi.Schema(type=openapi.TYPE_BOOLEAN, title=_("Reset Token"),
+                                                         description=_("Reset Token")),
+
+                    'is_active': openapi.Schema(type=openapi.TYPE_BOOLEAN, title=_("Is activation"),
+                                                description=_("Is activation")),
+                    'access_num': openapi.Schema(type=openapi.TYPE_NUMBER, title=_("Number of visits"),
+                                                 description=_("Number of visits")),
+                    'white_active': openapi.Schema(type=openapi.TYPE_BOOLEAN, title=_("Whether to enable whitelist"),
+                                                   description=_("Whether to enable whitelist")),
+                    'white_list': openapi.Schema(type=openapi.TYPE_ARRAY,
+                                                 items=openapi.Schema(type=openapi.TYPE_STRING), title=_("Whitelist"),
+                                                 description=_("Whitelist")),
+                    'show_source': openapi.Schema(type=openapi.TYPE_BOOLEAN,
+                                                  title=_("Whether to display knowledge sources"),
+                                                  description=_("Whether to display knowledge sources")),
+                    'language': openapi.Schema(type=openapi.TYPE_STRING,
+                                               title=_("language"),
+                                               description=_("language"))
+                }
+            )
+
+        @staticmethod
+        def get_response_body_api():
+            return openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                required=[],
+                properties={
+                    'id': openapi.Schema(type=openapi.TYPE_STRING, title=_("Primary key id"),
+                                         description=_("Primary key id")),
+                    'access_token': openapi.Schema(type=openapi.TYPE_STRING, title=_("Access Token"),
+                                                   description=_("Access Token")),
                     'access_token_reset': openapi.Schema(type=openapi.TYPE_BOOLEAN, title=_("Reset Token"),
                                                          description=_("Reset Token")),
 
@@ -327,6 +388,56 @@ class ApplicationApi(ApiMixin):
                           'problem_optimization', 'stt_model_enable', 'stt_model_enable', 'tts_type',
                           'work_flow'],
                 properties={
+                    'name': openapi.Schema(type=openapi.TYPE_STRING, title=_("Application Name"),
+                                           description=_("Application Name")),
+                    'desc': openapi.Schema(type=openapi.TYPE_STRING, title=_("Application Description"),
+                                           description=_("Application Description")),
+                    'model_id': openapi.Schema(type=openapi.TYPE_STRING, title=_("Model id"),
+                                               description=_("Model id")),
+                    "dialogue_number": openapi.Schema(type=openapi.TYPE_NUMBER,
+                                                      title=_("Number of multi-round conversations"),
+                                                      description=_("Number of multi-round conversations")),
+                    'prologue': openapi.Schema(type=openapi.TYPE_STRING, title=_("Opening remarks"),
+                                               description=_("Opening remarks")),
+                    'dataset_id_list': openapi.Schema(type=openapi.TYPE_ARRAY,
+                                                      items=openapi.Schema(type=openapi.TYPE_STRING),
+                                                      title=_("List of associated knowledge base IDs"),
+                                                      description=_("List of associated knowledge base IDs")),
+                    'dataset_setting': ApplicationApi.DatasetSetting.get_request_body_api(),
+                    'model_setting': ApplicationApi.ModelSetting.get_request_body_api(),
+                    'problem_optimization': openapi.Schema(type=openapi.TYPE_BOOLEAN, title=_("Problem Optimization"),
+                                                           description=_("Problem Optimization"), default=True),
+                    'type': openapi.Schema(type=openapi.TYPE_STRING, title=_("Application Type"),
+                                           description=_("Application Type   SIMPLE |  WORK_FLOW")),
+                    'problem_optimization_prompt': openapi.Schema(type=openapi.TYPE_STRING,
+                                                                  title=_('Question optimization tips'),
+                                                                  description=_("Question optimization tips"),
+                                                                  default=_(
+                                                                      "() contains the user's question. Answer the guessed user's question based on the context ({question}) Requirement: Output a complete question and put it in the <data></data> tag")),
+                    'tts_model_id': openapi.Schema(type=openapi.TYPE_STRING, title=_("Text-to-speech model ID"),
+                                                   description=_("Text-to-speech model ID")),
+                    'stt_model_id': openapi.Schema(type=openapi.TYPE_STRING, title=_("Speech-to-text model id"),
+                                                   description=_("Speech-to-text model id")),
+                    'stt_model_enable': openapi.Schema(type=openapi.TYPE_STRING, title=_("Is speech-to-text enabled"),
+                                                       description=_("Is speech-to-text enabled")),
+                    'tts_model_enable': openapi.Schema(type=openapi.TYPE_STRING, title=_("Is text-to-speech enabled"),
+                                                       description=_("Is text-to-speech enabled")),
+                    'tts_type': openapi.Schema(type=openapi.TYPE_STRING, title=_("Text-to-speech type"),
+                                               description=_("Text-to-speech type")),
+                    'work_flow': ApplicationApi.WorkFlow.get_request_body_api(),
+                }
+            )
+
+        @staticmethod
+        def get_response_body_api():
+            return openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                required=['id', 'name', 'desc', 'model_id', 'dialogue_number', 'dataset_setting', 'model_setting',
+                          'problem_optimization', 'stt_model_enable', 'stt_model_enable', 'tts_type',
+                          'work_flow'],
+                properties={
+                    'id': openapi.Schema(type=openapi.TYPE_STRING, title=_("Primary key id"),
+                                         description=_("Primary key id")),
                     'name': openapi.Schema(type=openapi.TYPE_STRING, title=_("Application Name"),
                                            description=_("Application Name")),
                     'desc': openapi.Schema(type=openapi.TYPE_STRING, title=_("Application Description"),

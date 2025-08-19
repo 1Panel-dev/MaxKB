@@ -38,6 +38,7 @@ class TeamMember(APIView):
     @swagger_auto_schema(operation_summary=_('Add member'),
                          operation_id=_('Add member'),
                          request_body=TeamMemberSerializer().get_request_body_api(),
+                         responses=result.get_default_response(),
                          tags=[_('Team')])
     @has_permissions(PermissionConstants.TEAM_CREATE)
     @log(menu='Team', operate='Add member',
@@ -53,6 +54,7 @@ class TeamMember(APIView):
         @swagger_auto_schema(operation_summary=_('Add members in batches'),
                              operation_id=_('Add members in batches'),
                              request_body=TeamMemberSerializer.get_bach_request_body_api(),
+                             responses=result.get_api_array_response(TeamMemberSerializer.get_response_body_api()),
                              tags=[_('Team')])
         @has_permissions(PermissionConstants.TEAM_CREATE)
         @log(menu='Team', operate='Add members in batches',
@@ -78,6 +80,7 @@ class TeamMember(APIView):
         @swagger_auto_schema(operation_summary=_('Update team member permissions'),
                              operation_id=_('Update team member permissions'),
                              request_body=UpdateTeamMemberPermissionSerializer().get_request_body_api(),
+                             responses=result.get_default_response(),
                              manual_parameters=TeamMemberSerializer.Operate.get_request_params_api(),
                              tags=[_('Team')]
                              )
@@ -93,6 +96,7 @@ class TeamMember(APIView):
         @swagger_auto_schema(operation_summary=_('Remove member'),
                              operation_id=_('Remove member'),
                              manual_parameters=TeamMemberSerializer.Operate.get_request_params_api(),
+                             responses=result.get_default_response(),
                              tags=[_('Team')]
                              )
         @has_permissions(PermissionConstants.TEAM_DELETE)

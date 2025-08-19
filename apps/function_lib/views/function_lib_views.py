@@ -44,6 +44,7 @@ class FunctionLibView(APIView):
     @swagger_auto_schema(operation_summary=_('Create function'),
                          operation_id=_('Create function'),
                          request_body=FunctionLibApi.Create.get_request_body_api(),
+                         responses=result.get_api_response(FunctionLibApi.Create.get_response_body_api()),
                          tags=[_('Function')])
     @has_permissions(RoleConstants.ADMIN, RoleConstants.USER)
     @log(menu='Function', operate="Create function",
@@ -58,6 +59,7 @@ class FunctionLibView(APIView):
         @swagger_auto_schema(operation_summary=_('Debug function'),
                              operation_id=_('Debug function'),
                              request_body=FunctionLibApi.Debug.get_request_body_api(),
+                             responses=result.get_default_response(),
                              tags=[_('Function')])
         @has_permissions(RoleConstants.ADMIN, RoleConstants.USER)
         def post(self, request: Request):
@@ -72,6 +74,7 @@ class FunctionLibView(APIView):
         @swagger_auto_schema(operation_summary=_('Update function'),
                              operation_id=_('Update function'),
                              request_body=FunctionLibApi.Edit.get_request_body_api(),
+                             responses=result.get_api_response(FunctionLibApi.Edit.get_request_body_api()),
                              tags=[_('Function')])
         @has_permissions(RoleConstants.ADMIN, RoleConstants.USER)
         @log(menu='Function', operate="Update function",
@@ -84,6 +87,7 @@ class FunctionLibView(APIView):
         @action(methods=['DELETE'], detail=False)
         @swagger_auto_schema(operation_summary=_('Delete function'),
                              operation_id=_('Delete function'),
+                             responses=result.get_default_response(),
                              tags=[_('Function')])
         @has_permissions(RoleConstants.ADMIN, RoleConstants.USER)
         @log(menu='Function', operate="Delete function",
