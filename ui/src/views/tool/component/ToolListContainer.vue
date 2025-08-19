@@ -50,17 +50,19 @@
                     <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt="" />
                   </el-avatar>
                   <div class="pre-wrap ml-8">
-                    <div class="lighter">空白创建</div>
+                    <div class="lighter">
+                      {{ $t('views.application.form.appTemplate.blankApp.title') }}
+                    </div>
                   </div>
                 </div>
               </el-dropdown-item>
               <el-dropdown-item @click="openCreateMcpDialog()">
                 <div class="flex align-center">
-                  <el-avatar class="avatar-green" shape="square" :size="32">
-                    <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt="" />
+                  <el-avatar shape="square" :size="32">
+                    <img src="@/assets/workflow/icon_mcp.svg" style="width: 75%" alt="" />
                   </el-avatar>
                   <div class="pre-wrap ml-8">
-                    <div class="lighter">创建MCP</div>
+                    <div class="lighter">{{ $t('common.create') }} MCP</div>
                   </div>
                 </div>
               </el-dropdown-item>
@@ -77,7 +79,7 @@
               >
                 <el-dropdown-item v-if="permissionPrecise.import()">
                   <div class="flex align-center w-full">
-                    <el-avatar shape="square" class="mt-4" :size="36" style="background: none">
+                    <el-avatar shape="square" :size="36" style="background: none">
                       <img src="@/assets/icon_import.svg" alt="" />
                     </el-avatar>
                     <div class="pre-wrap ml-8">
@@ -88,8 +90,8 @@
               </el-upload>
               <el-dropdown-item @click="openToolStoreDialog()">
                 <div class="flex align-center">
-                  <el-avatar class="avatar-green" shape="square" :size="32">
-                    <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt="" />
+                  <el-avatar shape="square" :size="36" style="background: none">
+                    <img src="@/assets/icon_tool_shop.svg" alt="" />
                   </el-avatar>
                   <div class="pre-wrap ml-8">
                     <div class="lighter">
@@ -173,9 +175,7 @@
                   >
                     <img :src="resetUrl(item?.icon)" alt="" />
                   </el-avatar>
-                  <el-avatar v-else class="avatar-green" shape="square" :size="32">
-                    <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt="" />
-                  </el-avatar>
+                  <ToolIcon v-else :size="32" :type="item?.tool_type" />
                 </template>
                 <template #subTitle>
                   <el-text class="color-secondary lighter" size="small">

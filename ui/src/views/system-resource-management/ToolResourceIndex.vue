@@ -61,9 +61,8 @@
                 >
                   <img :src="resetUrl(row?.icon)" alt="" />
                 </el-avatar>
-                <el-avatar v-else class="avatar-green" shape="square" :size="24">
-                  <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt="" />
-                </el-avatar>
+
+                <ToolIcon v-else :size="24" :type="row?.tool_type" />
               </el-icon>
               {{ row.name }}
             </div>
@@ -72,13 +71,15 @@
 
         <el-table-column prop="tool_type" :label="$t('views.system.resource_management.type')">
           <template #default="scope">
-            <span v-if="scope.row.tool_type === 'MCP'">
-              MCP
-            </span>
+            <span v-if="scope.row.tool_type === 'MCP'"> MCP </span>
             <span v-else>
-            {{
-                $t(ToolType[scope.row.template_id ? 'INTERNAL' : ('CUSTOM' as keyof typeof ToolType)])
-            }}
+              {{
+                $t(
+                  ToolType[
+                    scope.row.template_id ? 'INTERNAL' : ('CUSTOM' as keyof typeof ToolType)
+                  ],
+                )
+              }}
             </span>
           </template>
         </el-table-column>

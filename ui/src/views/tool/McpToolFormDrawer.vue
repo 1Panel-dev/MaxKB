@@ -13,6 +13,7 @@
         :rules="rules"
         label-position="top"
         require-asterisk-position="right"
+        hide-required-asterisk
         v-loading="loading"
         @submit.prevent
       >
@@ -31,10 +32,11 @@
                 :size="32"
                 style="background: none"
               >
-                <img :src="String(form.icon)" alt=""/>
+                <img :src="String(form.icon)" alt="" />
               </el-Avatar>
-              <el-avatar v-else class="avatar-green" shape="square" :size="32">
-                <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt=""/>
+
+              <el-avatar v-else shape="square" :size="32">
+                <img src="@/assets/workflow/icon_mcp.svg" style="width: 75%" alt="" />
               </el-avatar>
               <el-Avatar
                 v-if="showEditIcon"
@@ -47,8 +49,9 @@
                 <AppIcon iconName="app-edit"></AppIcon>
               </el-Avatar>
             </div>
-            <el-avatar v-else class="avatar-green mr-12" shape="square" :size="32">
-              <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt=""/>
+
+            <el-avatar v-else shape="square" :size="32" class="mr-12">
+              <img src="@/assets/workflow/icon_mcp.svg" style="width: 75%" alt="" />
             </el-avatar>
             <el-input
               v-model="form.name"
@@ -71,24 +74,26 @@
             @blur="form.desc = form.desc?.trim()"
           />
         </el-form-item>
+        <h4 class="title-decoration-1 mb-16">
+          {{ $t('views.tool.form.mcp.title') }}
+        </h4>
+
+        <el-form-item :label="$t('views.tool.form.toolDescription.label')" prop="code">
+          <template #label>
+            {{ $t('views.tool.form.mcp.label') }}
+            <span class="color-danger">*</span>
+            <el-text type="info" class="color-secondary">
+              （{{ $t('views.tool.form.mcp.tip') }}）
+            </el-text>
+          </template>
+          <el-input
+            v-model="form.code"
+            :placeholder="mcpServerJson"
+            type="textarea"
+            :autosize="{ minRows: 5 }"
+          />
+        </el-form-item>
       </el-form>
-
-      <h4 class="title-decoration-1 mb-16">
-        {{ $t('views.tool.form.mcp.label') }}
-        <span style="color: red; margin-left: -10px">*</span>
-        <el-text type="info" class="color-secondary">
-          {{ $t('views.tool.form.mcp.tip') }}
-        </el-text>
-      </h4>
-
-      <div class="mb-8">
-        <el-input
-          v-model="form.code"
-          :placeholder="mcpServerJson"
-          type="textarea"
-          :autosize="{ minRows: 5 }"
-        />
-      </div>
     </div>
 
     <template #footer>
@@ -104,30 +109,30 @@
         </el-button>
       </div>
     </template>
-    <EditAvatarDialog ref="EditAvatarDialogRef" @refresh="refreshTool"/>
+    <EditAvatarDialog ref="EditAvatarDialogRef" @refresh="refreshTool" />
   </el-drawer>
 </template>
 
 <script setup lang="ts">
-import {computed, reactive, ref, watch} from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 import EditAvatarDialog from '@/views/tool/component/EditAvatarDialog.vue'
-import type {toolData} from '@/api/type/tool'
-import type {FormInstance} from 'element-plus'
-import {MsgConfirm, MsgSuccess} from '@/utils/message'
-import {cloneDeep} from 'lodash'
-import {t} from '@/locales'
-import {isAppIcon} from '@/utils/common'
-import {useRoute} from 'vue-router'
+import type { toolData } from '@/api/type/tool'
+import type { FormInstance } from 'element-plus'
+import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import { cloneDeep } from 'lodash'
+import { t } from '@/locales'
+import { isAppIcon } from '@/utils/common'
+import { useRoute } from 'vue-router'
 import useStore from '@/stores'
 import permissionMap from '@/permission'
-import {loadSharedApi} from '@/utils/dynamics-api/shared-api'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 const route = useRoute()
 
 const props = defineProps({
   title: String,
 })
-const {folder, user} = useStore()
+const { folder, user } = useStore()
 
 const apiType = computed(() => {
   if (route.path.includes('shared')) {
@@ -196,6 +201,13 @@ const rules = reactive({
       trigger: 'blur',
     },
   ],
+  code: [
+    {
+      required: true,
+      message: t('views.tool.form.mcp.requiredMessage'),
+      trigger: 'blur',
+    },
+  ],
 })
 
 function close() {
@@ -209,8 +221,7 @@ function close() {
       .then(() => {
         visible.value = false
       })
-      .catch(() => {
-      })
+      .catch(() => {})
   }
 }
 
@@ -226,7 +237,6 @@ function refreshTool(data: any) {
   form.value.icon = data
 }
 
-
 function openEditAvatar() {
   EditAvatarDialogRef.value.open(form.value)
 }
@@ -236,7 +246,7 @@ const submit = async (formEl: FormInstance | undefined) => {
   await formEl.validate((valid: any) => {
     if (valid) {
       if (isEdit.value) {
-        loadSharedApi({type: 'tool', systemType: apiType.value})
+        loadSharedApi({ type: 'tool', systemType: apiType.value })
           .putTool(form.value?.id as string, form.value, loading)
           .then((res: any) => {
             MsgSuccess(t('common.editSuccess'))
@@ -251,7 +261,7 @@ const submit = async (formEl: FormInstance | undefined) => {
           folder_id: folder.currentFolder?.id,
           ...form.value,
         }
-        loadSharedApi({type: 'tool', systemType: apiType.value})
+        loadSharedApi({ type: 'tool', systemType: apiType.value })
           .postTool(obj, loading)
           .then((res: any) => {
             MsgSuccess(t('common.createSuccess'))

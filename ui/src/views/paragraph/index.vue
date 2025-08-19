@@ -39,7 +39,12 @@
           clearable
         >
           <template #prepend>
-            <el-select v-model="searchType" placeholder="Select" style="width: 80px">
+            <el-select
+              v-model="searchType"
+              placeholder="Select"
+              style="width: 80px"
+              @change="searchTypeChange"
+            >
               <el-option :label="$t('common.title')" value="title" />
               <el-option :label="$t('common.content')" value="content" />
             </el-select>
@@ -226,6 +231,11 @@ const paragraphDetail = ref<any[]>([])
 const title = ref('')
 const search = ref('')
 const searchType = ref('title')
+
+const searchTypeChange = () => {
+  search.value = ''
+}
+
 
 const dialogVisible = ref(false)
 watch(

@@ -13,6 +13,8 @@
       ref="paramFormRef"
       :model="form"
       require-asterisk-position="right"
+      hide-required-asterisk
+      @submit.prevent
     >
       <el-form-item>
         <el-radio-group v-model="form.mcp_source">
@@ -22,7 +24,22 @@
           <el-radio value="custom">{{ $t('common.custom') }}</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item v-if="form.mcp_source === 'referencing'">
+      <el-form-item
+        v-if="form.mcp_source === 'referencing'"
+        :rules="[
+          {
+            required: true,
+            message:
+              $t('common.selectPlaceholder') +
+              ` MCP ${$t('views.applicationWorkflow.nodes.mcpNode.tool')}`,
+          },
+        ]"
+        prop="mcp_tool_id"
+      >
+        <template #label>
+          {{ `MCP ${$t('views.applicationWorkflow.nodes.mcpNode.tool')}` }}
+          <span class="color-danger">*</span>
+        </template>
         <el-select v-model="form.mcp_tool_id" filterable>
           <el-option
             v-for="mcpTool in mcpToolSelectOptions"
@@ -30,19 +47,35 @@
             :label="mcpTool.name"
             :value="mcpTool.id"
           >
-            <span>{{ mcpTool.name }}</span>
-            <el-tag v-if="mcpTool.scope === 'SHARED'" type="info" class="info-tag ml-8 mt-4">
-              {{ $t('views.shared.title') }}
-            </el-tag>
+            <div class="flex align-center">
+              <el-avatar shape="square" :size="20" class="mr-8">
+                <img src="@/assets/workflow/icon_mcp.svg" style="width: 75%" alt="" />
+              </el-avatar>
+              <span>{{ mcpTool.name }}</span>
+              <el-tag v-if="mcpTool.scope === 'SHARED'" type="info" class="info-tag ml-8 mt-4">
+                {{ $t('views.shared.title') }}
+              </el-tag>
+            </div>
           </el-option>
         </el-select>
       </el-form-item>
       <el-form-item
         v-else
-        :label="$t('views.applicationWorkflow.nodes.mcpNode.configLabel')"
         prop="mcp_servers"
-        :rules="[{ required: true, message: $t('common.required') }]"
+        :rules="[
+          {
+            required: true,
+            message: $t('common.inputPlaceholder') + ' ' + $t('views.tool.form.mcp.label'),
+          },
+        ]"
       >
+        <template #label>
+          {{ $t('views.tool.form.mcp.label') }}
+          <span class="color-danger">*</span>
+          <el-text type="info" class="color-secondary">
+            （{{ $t('views.tool.form.mcp.tip') }}）
+          </el-text>
+        </template>
         <el-input
           v-model="form.mcp_servers"
           :rows="6"
@@ -63,9 +96,9 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import {computed, inject, onMounted, ref, watch} from 'vue'
-import {loadSharedApi} from "@/utils/dynamics-api/shared-api.ts";
-import {useRoute} from "vue-router";
+import { computed, inject, onMounted, ref, watch } from 'vue'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api.ts'
+import { useRoute } from 'vue-router'
 
 const getApplicationDetail = inject('getApplicationDetail') as any
 const applicationDetail = getApplicationDetail()
@@ -106,38 +139,40 @@ watch(dialogVisible, (bool) => {
       mcp_tool_id: '',
       mcp_source: 'referencing',
     }
+    paramFormRef.value?.clearValidate()
   }
 })
-
 
 function getMcpToolSelectOptions() {
   const obj =
     apiType.value === 'systemManage'
       ? {
-        scope: 'WORKSPACE',
-        tool_type: 'MCP',
-        workspace_id: applicationDetail.value?.workspace_id,
-      }
+          scope: 'WORKSPACE',
+          tool_type: 'MCP',
+          workspace_id: applicationDetail.value?.workspace_id,
+        }
       : {
-        scope: 'WORKSPACE',
-        tool_type: 'MCP',
-      }
+          scope: 'WORKSPACE',
+          tool_type: 'MCP',
+        }
 
-  loadSharedApi({type: 'tool', systemType: apiType.value})
+  loadSharedApi({ type: 'tool', systemType: apiType.value })
     .getAllToolList(obj, loading)
     .then((res: any) => {
-      mcpToolSelectOptions.value = [...res.data.shared_tools, ...res.data.tools]
-        .filter((item: any) => item.is_active)
+      mcpToolSelectOptions.value = [...res.data.shared_tools, ...res.data.tools].filter(
+        (item: any) => item.is_active,
+      )
     })
 }
 
 const open = (data: any) => {
-  form.value = {...form.value, ...data}
+  form.value = { ...form.value, ...data }
+  form.value.mcp_source = data.mcp_source || 'referencing'
   dialogVisible.value = true
 }
 
 const submit = () => {
-  paramFormRef.value.validate().then((valid: any) => {
+  paramFormRef.value.validate((valid: any) => {
     if (valid) {
       emit('refresh', form.value)
       dialogVisible.value = false
@@ -149,6 +184,6 @@ onMounted(() => {
   getMcpToolSelectOptions()
 })
 
-defineExpose({open})
+defineExpose({ open })
 </script>
 <style lang="scss" scoped></style>
