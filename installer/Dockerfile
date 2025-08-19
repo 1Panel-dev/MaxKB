@@ -2,8 +2,8 @@ FROM node:24-alpine AS web-build
 COPY ui ui
 RUN cd ui && \
     npm install --prefer-offline --no-audit && \
-    NODE_OPTIONS="--max-old-space-size=4096" npm run build && \
-    NODE_OPTIONS="--max-old-space-size=4096" npm run build-chat && \
+    npm install -D concurrently && \
+    NODE_OPTIONS="--max-old-space-size=4096" npx concurrently "npm run build" "npm run build-chat" && \
     find . -maxdepth 1 ! -name '.' ! -name 'dist' ! -name 'public' -exec rm -rf {} +
 
 FROM ghcr.io/1panel-dev/maxkb-base:python3.11-pg17.6 AS stage-build
