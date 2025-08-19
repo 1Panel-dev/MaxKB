@@ -319,6 +319,15 @@ class ChatApi(ApiMixin):
                 }
             )
 
+        @staticmethod
+        def get_response_body_api():
+            return openapi.Schema(
+                type=openapi.TYPE_STRING,
+                title=_("Conversation ID"),
+                description=_("Conversation ID"),
+                default="chat_id"
+            )
+
     @staticmethod
     def get_request_params_api():
         return [openapi.Parameter(name='application_id',

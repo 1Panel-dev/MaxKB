@@ -31,7 +31,8 @@ class Model(APIView):
     @action(methods=['POST'], detail=False)
     @swagger_auto_schema(operation_summary=_('Create model'),
                          operation_id=_('Create model'),
-                         request_body=ModelCreateApi.get_request_body_api()
+                         request_body=ModelCreateApi.get_request_body_api(),
+                         manual_parameters=result.get_api_response(ModelCreateApi.get_request_body_api())
         , tags=[_('model')])
     @has_permissions(PermissionConstants.MODEL_CREATE)
     @log(menu='model', operate='Create model',
@@ -45,7 +46,8 @@ class Model(APIView):
     @action(methods=['PUT'], detail=False)
     @swagger_auto_schema(operation_summary=_('Download model, trial only with Ollama platform'),
                          operation_id=_('Download model, trial only with Ollama platform'),
-                         request_body=ModelCreateApi.get_request_body_api()
+                         request_body=ModelCreateApi.get_request_body_api(),
+                         responses=result.get_api_response(ModelCreateApi.get_request_body_api())
         , tags=[_('model')])
     @has_permissions(PermissionConstants.MODEL_CREATE)
     def put(self, request: Request):
@@ -123,7 +125,8 @@ class Model(APIView):
         @action(methods=['PUT'], detail=False)
         @swagger_auto_schema(operation_summary=_('Update model'),
                              operation_id=_('Update model'),
-                             request_body=ModelEditApi.get_request_body_api()
+                             request_body=ModelEditApi.get_request_body_api(),
+                             responses=result.get_api_response(ModelEditApi.get_request_body_api())
             , tags=[_('model')])
         @has_permissions(PermissionConstants.MODEL_CREATE)
         @log(menu='model', operate='Update model',
@@ -166,7 +169,8 @@ class Provide(APIView):
         @swagger_auto_schema(operation_summary=_('Call the supplier function to obtain form data'),
                              operation_id=_('Call the supplier function to obtain form data'),
                              manual_parameters=ProvideApi.get_request_params_api(),
-                             request_body=ProvideApi.get_request_body_api()
+                             request_body=ProvideApi.get_request_body_api(),
+                             responses=result.get_api_response(ProvideApi.get_request_body_api())
             , tags=[_('model')])
         @has_permissions(PermissionConstants.MODEL_READ)
         @log(menu='model', operate='Call the supplier function to obtain form data')

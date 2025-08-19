@@ -371,7 +371,8 @@ class Application(APIView):
                                  operation_id=_("Modify application API_KEY"),
                                  tags=[_('Application/API_KEY')],
                                  manual_parameters=ApplicationApi.ApiKey.Operate.get_request_params_api(),
-                                 request_body=ApplicationApi.ApiKey.Operate.get_request_body_api())
+                                 request_body=ApplicationApi.ApiKey.Operate.get_request_body_api(),
+                                 responses=result.get_api_response(ApplicationApi.ApiKey.Operate.get_response_body_api()))
             @has_permissions(ViewPermission(
                 [RoleConstants.ADMIN, RoleConstants.USER],
                 [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.MANAGE,
@@ -413,7 +414,8 @@ class Application(APIView):
                              operation_id=_("Modify Application AccessToken"),
                              tags=[_('Application/Public Access')],
                              manual_parameters=ApplicationApi.AccessToken.get_request_params_api(),
-                             request_body=ApplicationApi.AccessToken.get_request_body_api())
+                             request_body=ApplicationApi.AccessToken.get_request_body_api(),
+                             responses=result.get_api_response(ApplicationApi.AccessToken.get_response_body_api()))
         @has_permissions(ViewPermission(
             [RoleConstants.ADMIN, RoleConstants.USER],
             [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.MANAGE,
@@ -453,6 +455,7 @@ class Application(APIView):
         @swagger_auto_schema(operation_summary=_("Application Certification"),
                              operation_id=_("Application Certification"),
                              request_body=ApplicationApi.Authentication.get_request_body_api(),
+                             responses=result.get_api_response(ApplicationApi.Authentication.get_response_body_api()),
                              tags=[_("Application/Certification")],
                              security=[])
         def post(self, request: Request):
@@ -470,6 +473,7 @@ class Application(APIView):
     @swagger_auto_schema(operation_summary=_("Create an application"),
                          operation_id=_("Create an application"),
                          request_body=ApplicationApi.Create.get_request_body_api(),
+                         responses=result.get_api_response(ApplicationApi.Create.get_response_body_api()),
                          tags=[_('Application')])
     @has_permissions(PermissionConstants.APPLICATION_CREATE, compare=CompareConstants.AND)
     @log(menu='Application', operate="Create an application",

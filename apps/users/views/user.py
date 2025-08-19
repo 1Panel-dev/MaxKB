@@ -84,7 +84,7 @@ class SwitchUserLanguageView(APIView):
                                                             description=_("language")),
                              }
                          ),
-                         responses=RePasswordSerializer().get_response_body_api(),
+                         responses=result.get_default_response(),
                          tags=[_("User management")])
     @log(menu='User management', operate='Switch Language',
          get_operation_object=lambda r, k: {'name': r.user.username})
@@ -111,7 +111,7 @@ class ResetCurrentUserPasswordView(APIView):
                                                                description=_("Password"))
                              }
                          ),
-                         responses=RePasswordSerializer().get_response_body_api(),
+                         responses=result.get_default_response(),
                          tags=[_("User management")])
     @log(menu='User management', operate='Modify current user password',
          get_operation_object=lambda r, k: {'name': r.user.username},

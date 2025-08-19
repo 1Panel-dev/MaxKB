@@ -171,6 +171,24 @@ class TeamMemberSerializer(ApiMixin, serializers.Serializer):
             }
         )
 
+    @staticmethod
+    def get_response_body_api():
+        return openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'id': openapi.Schema(type=openapi.TYPE_STRING, title=_('user id'), description=_('user id')),
+                'username': openapi.Schema(type=openapi.TYPE_STRING, title=_('Username'), description=_('Username')),
+                'email': openapi.Schema(type=openapi.TYPE_STRING, title=_('Email'), description=_('Email')),
+                'role': openapi.Schema(type=openapi.TYPE_STRING, title=_('Role'), description=_('Role')),
+                'is_active': openapi.Schema(type=openapi.TYPE_STRING, title=_('Is active'),
+                                            description=_('Is active')),
+                'team_id': openapi.Schema(type=openapi.TYPE_STRING, title=_('team id'), description=_('team id')),
+                'user_id': openapi.Schema(type=openapi.TYPE_STRING, title=_('user id'), description=_('user id')),
+                'type': openapi.Schema(type=openapi.TYPE_STRING, title=_('member type'),
+                                       description=_('member type manage|member')),
+            }
+        )
+
     @transaction.atomic
     def batch_add_member(self, user_id_list: List[str], with_valid=True):
         """

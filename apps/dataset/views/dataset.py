@@ -181,6 +181,7 @@ class Dataset(APIView):
         @swagger_auto_schema(operation_summary=_('Generate related'), operation_id=_('Generate related'),
                              manual_parameters=DataSetSerializers.Operate.get_request_params_api(),
                              request_body=GenerateRelatedSerializer.get_request_body_api(),
+                             responses=result.get_default_response(),
                              tags=[_('Knowledge Base')]
                              )
         @log(menu='document', operate="Generate related documents",
