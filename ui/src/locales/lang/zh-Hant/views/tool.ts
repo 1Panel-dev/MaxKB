@@ -65,9 +65,11 @@ export default {
       inputPlaceholder: '請輸入參數值',
     },
     mcp: {
+      title: 'MCP 服務',
       label: 'MCP Server Config',
       placeholder: '請輸入MCP Server配置',
       tip: '僅支援SSE、Streamable HTTP呼叫方式',
+      requiredMessage: '請輸入 MCP Server Config',
     },
     debug: {
       run: '運行',

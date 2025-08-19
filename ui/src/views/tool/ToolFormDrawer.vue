@@ -196,7 +196,7 @@
       </el-table>
       <h4 class="title-decoration-1 mb-16">
         {{ $t('views.tool.form.param.code') }}
-        <span style="color: red; margin-left: -10px">*</span>
+        <span  class="color-danger" style="margin-left: -10px">*</span>
         <el-text type="info" class="color-secondary">
           {{ $t('views.tool.form.param.paramInfo2') }}
         </el-text>

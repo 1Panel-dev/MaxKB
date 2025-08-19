@@ -1,5 +1,11 @@
 <template>
-  <el-drawer v-model="debugVisible" size="60%" :append-to-body="true" :modal="false">
+  <el-drawer
+    v-model="debugVisible"
+    size="60%"
+    :append-to-body="true"
+    :modal="false"
+    :show-close="false"
+  >
     <template #header>
       <div class="flex align-center" style="margin-left: -8px">
         <el-button class="cursor mr-4" link @click.prevent="debugVisible = false">
@@ -54,7 +60,8 @@
                 <template #label>
                   <div class="flex">
                     <span
-                      >{{ item.name }} <span class="color-danger" v-if="item.is_required">*</span></span
+                      >{{ item.name }}
+                      <span class="color-danger" v-if="item.is_required">*</span></span
                     >
                     <el-tag type="info" class="info-tag ml-4">{{ item.type }}</el-tag>
                   </div>
@@ -95,11 +102,7 @@
 
         <p class="lighter mb-8">{{ $t('views.tool.form.debug.output') }}</p>
 
-        <el-card
-          :class="isSuccess ? '' : 'color-danger'"
-          class="pre-wrap"
-          shadow="never"
-        >
+        <el-card :class="isSuccess ? '' : 'color-danger'" class="pre-wrap" shadow="never">
           {{ String(result) == '0' ? 0 : result || '-' }}
         </el-card>
       </div>

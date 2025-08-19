@@ -68,9 +68,11 @@ export default {
       inputPlaceholder: 'Please enter parameter values',
     },
     mcp: {
+      title: 'MCP Service',
       label: 'MCP Server Config',
       placeholder: 'Please enter MCP Server config',
       tip: 'Only supports SSE and Streamable HTTP calling methods',
+      requiredMessage: 'Please enter MCP Server Config',
     },
     debug: {
       run: 'Run',

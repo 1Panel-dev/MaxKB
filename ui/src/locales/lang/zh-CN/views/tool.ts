@@ -64,9 +64,11 @@ export default {
       inputPlaceholder: '请输入参数值',
     },
     mcp: {
+      title: 'MCP 服务',
       label: 'MCP Server Config',
       placeholder: '请输入MCP Server配置',
       tip: '仅支持SSE、Streamable HTTP调用方式',
+      requiredMessage: '请输入 MCP Server Config',
     },
     debug: {
       run: '运行',

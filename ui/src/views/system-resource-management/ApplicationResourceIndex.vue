@@ -52,17 +52,8 @@
           <template #default="scope">
             <div class="table-name flex align-center">
               <el-icon size="24" class="mr-8">
-                <el-avatar
-                  v-if="isAppIcon(scope.row?.icon)"
-                  shape="square"
-                  :size="24"
-                  style="background: none"
-                  class="mr-8"
-                >
+                <el-avatar shape="square" :size="24" style="background: none" class="mr-8">
                   <img :src="resetUrl(scope.row?.icon)" alt="" />
-                </el-avatar>
-                <el-avatar v-else class="avatar-green" shape="square" :size="24">
-                  <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt="" />
                 </el-avatar>
               </el-icon>
               {{ scope.row.name }}
@@ -447,7 +438,6 @@ watch(
   },
   { immediate: true },
 )
-
 
 function filterWorkspaceChange(val: string) {
   if (val === 'clear') {

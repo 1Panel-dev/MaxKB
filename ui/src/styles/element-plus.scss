@@ -282,3 +282,8 @@
 .el-tag {
   padding: 0 6px;
 }
+
+// el-input
+.el-input {
+  --el-input-text-color: var(--el-text-color-primary);
+}

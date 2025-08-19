@@ -54,7 +54,7 @@
 
         <el-scrollbar>
           <div class="p-16-24 pt-0" style="height: calc(100vh - 200px)">
-            <el-row :gutter="12" v-loading="loading" v-if="filterData.length">
+            <el-row :gutter="12" v-loading="loading || apiLoading" v-if="filterData.length">
               <el-col
                 :span="12"
                 v-for="(item, index) in filterData.filter((v: any) => v.resource_type !== 'folder')"
@@ -132,7 +132,7 @@ const currentEmbedding = ref('')
 const searchValue = ref('')
 const searchData = ref<Array<any>>([])
 const knowledgeList = ref<Array<any>>([])
-const loading = ref(false)
+const apiLoading = ref(false)
 
 const filterData = computed(() => {
   return currentEmbedding.value
@@ -228,7 +228,7 @@ function getList() {
     isShared: folder_id === 'share',
     systemType: apiType.value,
   })
-    .getKnowledgeList({ folder_id }, loading)
+    .getKnowledgeList({ folder_id }, apiLoading)
     .then((res: any) => {
       knowledgeList.value = uniqueArray([...knowledgeList.value, ...res.data], 'id')
       searchData.value = res.data

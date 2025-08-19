@@ -1,9 +1,9 @@
 <template>
-  <el-breadcrumb separator-icon="ArrowRight" style="line-height: 22px">
-    <h2 v-if="breadcrumbData?.length === 1" class="ellipsis" :title="breadcrumbData[0]?.name">
-      {{ breadcrumbData[0]?.name }}
-    </h2>
-    <el-breadcrumb-item v-for="(item, index) in breadcrumbData" :key="index" v-else>
+  <h2 v-if="breadcrumbData?.length === 1" class="ellipsis" :title="breadcrumbData[0]?.name">
+    {{ breadcrumbData[0]?.name }}
+  </h2>
+  <el-breadcrumb separator-icon="ArrowRight" style="line-height: normal" class="mt-4" v-else>
+    <el-breadcrumb-item v-for="(item, index) in breadcrumbData" :key="index">
       <h5 class="ml-4 ellipsis" v-if="index === breadcrumbData.length - 1" :title="item.name">
         {{ item.name }}
       </h5>
