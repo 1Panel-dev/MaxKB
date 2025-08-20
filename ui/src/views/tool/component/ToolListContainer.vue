@@ -235,7 +235,7 @@
                             {{ $t('common.edit') }}
                           </el-dropdown-item>
                           <el-dropdown-item
-                            v-if="!item.template_id && permissionPrecise.copy(item.id)"
+                            v-if="!item.template_id && permissionPrecise.copy(item.id) && item.tool_type!== 'MCP'"
                             @click.stop="copyTool(item)"
                           >
                             <AppIcon iconName="app-copy" class="color-secondary"></AppIcon>
@@ -275,7 +275,7 @@
                             {{ $t('views.shared.authorized_workspace') }}</el-dropdown-item
                           >
                           <el-dropdown-item
-                            v-if="!item.template_id && permissionPrecise.export(item.id)"
+                            v-if="!item.template_id && permissionPrecise.export(item.id) && item.tool_type!== 'MCP'"
                             @click.stop="exportTool(item)"
                           >
                             <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
