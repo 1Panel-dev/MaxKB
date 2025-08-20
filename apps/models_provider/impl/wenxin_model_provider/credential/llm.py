@@ -106,11 +106,11 @@ class WenxinLLMModelCredential(BaseForm, BaseModelCredential):
                               method='', )
 
     # v2版本字段
-    api_base = forms.TextInputField("API Base", required=False, relation_show_field_dict={"api_version": ["v2"]})
+    api_base = forms.TextInputField("API URL", required=True, relation_show_field_dict={"api_version": ["v2"]})
 
     # v1版本字段
-    api_key = forms.PasswordInputField('API Key', required=False)
-    secret_key = forms.PasswordInputField("Secret Key", required=False,
+    api_key = forms.PasswordInputField('API Key', required=True)
+    secret_key = forms.PasswordInputField("Secret Key", required=True,
                                           relation_show_field_dict={"api_version": ["v1"]})
 
     def get_model_params_setting_form(self, model_name):
