@@ -3,6 +3,7 @@ import logging
 import re
 import traceback
 from functools import reduce
+from pathlib import Path
 from typing import List, Set
 from urllib.parse import urljoin, urlparse, ParseResult, urlsplit, urlunparse
 
@@ -70,6 +71,8 @@ class Fork:
 
     def __init__(self, base_fork_url: str, selector_list: List[str]):
         base_fork_url = remove_fragment(base_fork_url)
+        if any([True for end_str in ['index.html', '.htm', '.html'] if base_fork_url.endswith(end_str)]):
+            self.base_fork_url = str(Path(base_fork_url).parent)
         self.base_fork_url = urljoin(base_fork_url if base_fork_url.endswith("/") else base_fork_url + '/', '.')
         parsed = urlsplit(base_fork_url)
         query = parsed.query
