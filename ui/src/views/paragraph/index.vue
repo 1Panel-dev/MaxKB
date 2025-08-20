@@ -160,7 +160,7 @@
         </div>
       </LayoutContainer>
 
-      <div class="mul-operation border-t w-full" v-if="isBatch === true">
+      <div class="mul-operation border-t w-full flex align-center" v-if="isBatch === true">
         <el-button :disabled="multipleSelection.length === 0" @click="openGenerateDialog()">
           {{ $t('views.document.generateQuestion.title') }}
         </el-button>
@@ -171,7 +171,7 @@
         <el-button :disabled="multipleSelection.length === 0" @click="deleteMulParagraph">
           {{ $t('common.delete') }}
         </el-button>
-        <span class="ml-8">
+        <span class="ml-24">
           {{ $t('common.selected') }} {{ multipleSelection.length }}
           {{ $t('views.document.items') }}
         </span>

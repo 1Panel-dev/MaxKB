@@ -287,3 +287,13 @@
 .el-input {
   --el-input-text-color: var(--el-text-color-primary);
 }
+
+.el-input-group__prepend div.el-select .el-select__wrapper {
+  background: #ffffff;
+  &:hover {
+    background: #ffffff;
+  }
+  .el-select__placeholder {
+    color: var(--el-text-color-regular);
+  }
+}

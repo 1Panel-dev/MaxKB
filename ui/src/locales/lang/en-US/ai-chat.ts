@@ -66,6 +66,7 @@ export default {
     limitMessage1: 'You can upload up to',
     limitMessage2: 'files',
     sizeLimit: 'Each file must not exceed',
+    sizeLimit2: 'Empty files are not supported for upload',
     imageMessage: 'Please process the image content',
     fileMessage: 'Please process the file content',
     errorMessage: 'Upload Failed',
