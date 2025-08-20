@@ -406,6 +406,15 @@ class ParagraphSerializers(serializers.Serializer):
         def association(self, with_valid=True, with_embedding=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
+            # 已关联则直接返回
+            if QuerySet(ProblemParagraphMapping).filter(
+                knowledge_id=self.data.get('knowledge_id'),
+                document_id=self.data.get('document_id'),
+                paragraph_id=self.data.get('paragraph_id'),
+                problem_id=self.data.get('problem_id')
+            ).exists():
+                return True
+
             problem = QuerySet(Problem).filter(id=self.data.get("problem_id")).first()
             problem_paragraph_mapping = ProblemParagraphMapping(id=uuid.uuid7(),
                                                                 document_id=self.data.get('document_id'),

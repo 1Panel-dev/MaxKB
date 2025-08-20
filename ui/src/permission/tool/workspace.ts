@@ -110,6 +110,16 @@ const workspace = {
       ],
       'OR'
     ), 
+  auth: (source_id:string) =>
+    hasPermission(
+      [
+        new ComplexPermission([RoleConst.USER],[PermissionConst.TOOL.getToolWorkspaceResourcePermission(source_id)],[],'AND'),
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.TOOL_RESOURCE_AUTHORIZATION.getToolWorkspaceResourcePermission(source_id),
+        PermissionConst.TOOL_RESOURCE_AUTHORIZATION.getWorkspacePermissionWorkspaceManageRole
+      ],
+      'OR'
+    ), 
   debug: () =>
     hasPermission(
       [ 

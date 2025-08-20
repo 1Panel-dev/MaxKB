@@ -603,7 +603,6 @@ const onChange = (file: any, fileList: UploadFiles, attr: string) => {
   //1、判断文件大小是否合法，文件限制不能大于 10 MB
   const isLimit = file?.size / 1024 / 1024 < 10
   if (!isLimit) {
-    // @ts-ignore
     MsgError(t('common.EditAvatarDialog.fileSizeExceeded'))
     return false
   } else {
@@ -675,7 +674,6 @@ const submit = async (formEl: FormInstance | undefined) => {
         .putXpackAccessToken(id as string, fd, loading)
         .then(() => {
           emit('refresh')
-          // @ts-ignore
           MsgSuccess(t('common.settingSuccess'))
           dialogVisible.value = false
         })

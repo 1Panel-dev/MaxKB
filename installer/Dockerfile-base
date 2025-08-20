@@ -1,8 +1,7 @@
-FROM python:3.11-slim-bullseye AS python-stage
+FROM python:3.11-slim-trixie AS python-stage
 FROM ghcr.io/1panel-dev/maxkb-vector-model:v2.0.2 AS vector-model
-FROM postgres:17.5-bullseye
+FROM postgres:17.6-trixie
 COPY --from=python-stage /usr/local /usr/local
-COPY --from=vector-model /opt/maxkb-app/model /opt/maxkb-app/model
 COPY installer/*.sh /usr/bin/
 COPY installer/init.sql /docker-entrypoint-initdb.d/
 
@@ -28,9 +27,11 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     useradd --no-create-home --home /opt/maxkb-app/sandbox sandbox -g root && \
     chown -R sandbox:root /opt/maxkb-app/sandbox && \
     chmod g-xr /usr/local/bin/* /usr/bin/* /bin/* /usr/sbin/* /sbin/* /usr/lib/postgresql/17/bin/* && \
+    chmod g+xr /usr/bin/ld.so && \
     chmod g+x /usr/local/bin/python* && \
     apt-get clean all && \
     rm -rf /var/lib/apt/lists/* /usr/share/doc/* /usr/share/man/* /usr/share/info/* /usr/share/locale/* /usr/share/lintian/* /usr/share/linda/* /var/cache/* /var/log/* /var/tmp/* /tmp/*
+COPY --from=vector-model --chmod=700 /opt/maxkb-app/model /opt/maxkb-app/model
 
 ENV PGDATA=/opt/maxkb/data/postgresql/pgdata \
     POSTGRES_USER=root \
@@ -38,7 +39,10 @@ ENV PGDATA=/opt/maxkb/data/postgresql/pgdata \
     POSTGRES_MAX_CONNECTIONS=1000 \
     REDIS_PASSWORD=Password123@redis \
     LANG=en_US.UTF-8 \
+    PYTHONUNBUFFERED=1 \
+    MAXKB_CONFIG_TYPE=ENV \
     MAXKB_LOG_LEVEL=INFO \
+    MAXKB_SANDBOX=1 \
     MAXKB_SANDBOX_PYTHON_PACKAGE_PATHS="/opt/py3/lib/python3.11/site-packages,/opt/maxkb-app/sandbox/python-packages,/opt/maxkb/python-packages" \
     MAXKB_SANDBOX_PYTHON_BANNED_KEYWORDS="subprocess.,system(,exec(,pty.,eval(,compile(,shutil.,input(,__import__" \
     MAXKB_ADMIN_PATH=/admin

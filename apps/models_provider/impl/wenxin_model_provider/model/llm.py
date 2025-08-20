@@ -17,9 +17,10 @@ from langchain_core.messages import (
 from langchain_core.outputs import ChatGenerationChunk
 
 from models_provider.base_model_provider import MaxKBBaseModel
+from models_provider.impl.base_chat_open_ai import BaseChatOpenAI
 
 
-class QianfanChatModel(MaxKBBaseModel, QianfanChatEndpoint):
+class QianfanChatModelQianfan(MaxKBBaseModel, QianfanChatEndpoint):
     @staticmethod
     def is_cache_model():
         return False
@@ -27,11 +28,11 @@ class QianfanChatModel(MaxKBBaseModel, QianfanChatEndpoint):
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
-        return QianfanChatModel(model=model_name,
-                                qianfan_ak=model_credential.get('api_key'),
-                                qianfan_sk=model_credential.get('secret_key'),
-                                streaming=model_kwargs.get('streaming', False),
-                                init_kwargs=optional_params)
+        return QianfanChatModelQianfan(model=model_name,
+                                       qianfan_ak=model_credential.get('api_key'),
+                                       qianfan_sk=model_credential.get('secret_key'),
+                                       streaming=model_kwargs.get('streaming', False),
+                                       init_kwargs=optional_params)
 
     usage_metadata: dict = {}
 
@@ -74,3 +75,30 @@ class QianfanChatModel(MaxKBBaseModel, QianfanChatEndpoint):
                 if run_manager:
                     run_manager.on_llm_new_token(chunk.text, chunk=chunk)
                 yield chunk
+
+
+class QianfanChatModelOpenai(MaxKBBaseModel, BaseChatOpenAI):
+    @staticmethod
+    def is_cache_model():
+        return False
+
+    @staticmethod
+    def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
+        optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
+        return QianfanChatModelOpenai(
+            model=model_name,
+            openai_api_base=model_credential.get('api_base'),
+            openai_api_key=model_credential.get('api_key'),
+            extra_body=optional_params
+        )
+
+
+class QianfanChatModel(MaxKBBaseModel):
+    @staticmethod
+    def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
+        api_version = model_credential.get('api_version', 'v1')
+
+        if api_version == "v1":
+            return QianfanChatModelQianfan.new_instance(model_type, model_name, model_credential, **model_kwargs)
+        elif api_version == "v2":
+            return QianfanChatModelOpenai.new_instance(model_type, model_name, model_credential, **model_kwargs)

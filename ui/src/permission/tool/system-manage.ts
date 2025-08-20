@@ -57,6 +57,7 @@ const systemManage = {
       'OR',
     ),
 
+  auth: () => false,
   folderCreate: () => false,
   folderEdit: () => false,
   folderDelete: () => false,

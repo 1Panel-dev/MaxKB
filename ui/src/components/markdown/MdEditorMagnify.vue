@@ -28,7 +28,7 @@
 import { ref, computed, watch } from 'vue'
 defineOptions({ name: 'MdEditorMagnify' })
 const props = defineProps<{
-  title: String
+  title: string
   modelValue: any
 }>()
 const emit = defineEmits(['update:modelValue', 'submitDialog'])

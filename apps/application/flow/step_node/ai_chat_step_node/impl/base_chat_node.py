@@ -8,12 +8,15 @@
 """
 import asyncio
 import json
-import logging
+import os
 import re
+import sys
 import time
+import traceback
 from functools import reduce
 from typing import List, Dict
 
+import uuid_utils.compat as uuid
 from django.db.models import QuerySet
 from langchain.schema import HumanMessage, SystemMessage
 from langchain_core.messages import BaseMessage, AIMessage, AIMessageChunk, ToolMessage
@@ -23,9 +26,13 @@ from langgraph.prebuilt import create_react_agent
 from application.flow.i_step_node import NodeResult, INode
 from application.flow.step_node.ai_chat_step_node.i_chat_node import IChatNode
 from application.flow.tools import Reasoning
+from common.utils.logger import maxkb_logger
+from common.utils.rsa_util import rsa_long_decrypt
+from common.utils.tool_code import ToolExecutor
+from maxkb.const import CONFIG
 from models_provider.models import Model
 from models_provider.tools import get_model_credential, get_model_instance_by_model_workspace_id
-from common.utils.logger import maxkb_logger
+from tools.models import Tool
 
 tool_message_template = """
 <details>
@@ -140,7 +147,7 @@ def mcp_response_generator(chat_model, message_list, mcp_servers):
             except StopAsyncIteration:
                 break
     except Exception as e:
-        maxkb_logger.error(f'Exception: {e}')
+        maxkb_logger.error(f'Exception: {e}', traceback.format_exc())
     finally:
         loop.close()
 
@@ -211,6 +218,10 @@ class BaseChatNode(IChatNode):
                 model_setting=None,
                 mcp_enable=False,
                 mcp_servers=None,
+                mcp_tool_id=None,
+                mcp_source=None,
+                tool_enable=False,
+                tool_ids=None,
                 **kwargs) -> NodeResult:
         if dialogue_type is None:
             dialogue_type = 'WORKFLOW'
@@ -234,12 +245,13 @@ class BaseChatNode(IChatNode):
         message_list = self.generate_message_list(system, prompt, history_message)
         self.context['message_list'] = message_list
 
-        if mcp_enable and mcp_servers is not None and '"stdio"' not in mcp_servers:
-            r = mcp_response_generator(chat_model, message_list, mcp_servers)
-            return NodeResult(
-                {'result': r, 'chat_model': chat_model, 'message_list': message_list,
-                 'history_message': history_message, 'question': question.content}, {},
-                _write_context=write_context_stream)
+        # 处理 MCP 请求
+        mcp_result = self._handle_mcp_request(
+            mcp_enable, tool_enable, mcp_source, mcp_servers, mcp_tool_id, tool_ids, chat_model, message_list,
+            history_message, question
+        )
+        if mcp_result:
+            return mcp_result
 
         if stream:
             r = chat_model.stream(message_list)
@@ -251,6 +263,46 @@ class BaseChatNode(IChatNode):
             return NodeResult({'result': r, 'chat_model': chat_model, 'message_list': message_list,
                                'history_message': history_message, 'question': question.content}, {},
                               _write_context=write_context)
+
+    def _handle_mcp_request(self, mcp_enable, tool_enable, mcp_source, mcp_servers, mcp_tool_id, tool_ids,
+                            chat_model, message_list, history_message, question):
+        if not mcp_enable and not tool_enable:
+            return None
+
+        mcp_servers_config = {}
+
+        if mcp_enable:
+            if mcp_source == 'custom' and mcp_servers is not None and '"stdio"' not in mcp_servers:
+                mcp_servers_config = json.loads(mcp_servers)
+            elif mcp_tool_id:
+                mcp_tool = QuerySet(Tool).filter(id=mcp_tool_id).first()
+                if mcp_tool:
+                    mcp_servers_config = json.loads(mcp_tool.code)
+
+        if tool_enable:
+            if tool_ids and len(tool_ids) > 0:  # 如果有工具ID，则将其转换为MCP
+                self.context['tool_ids'] = tool_ids
+                self.context['execute_ids'] = []
+                for tool_id in tool_ids:
+                    tool = QuerySet(Tool).filter(id=tool_id).first()
+                    executor = ToolExecutor(CONFIG.get('SANDBOX'))
+                    if tool.init_params is not None:
+                        params = json.loads(rsa_long_decrypt(tool.init_params))
+                    else:
+                        params = {}
+                    _id, tool_config = executor.get_tool_mcp_config(tool.code, params)
+
+                    self.context['execute_ids'].append(_id)
+                    mcp_servers_config[str(tool.id)] = tool_config
+
+        if len(mcp_servers_config) > 0:
+            r = mcp_response_generator(chat_model, message_list, json.dumps(mcp_servers_config))
+            return NodeResult(
+                {'result': r, 'chat_model': chat_model, 'message_list': message_list,
+                 'history_message': history_message, 'question': question.content}, {},
+                _write_context=write_context_stream)
+
+        return None
 
     @staticmethod
     def get_history_message(history_chat_record, dialogue_number, dialogue_type, runtime_node_id):
@@ -284,6 +336,14 @@ class BaseChatNode(IChatNode):
         return result
 
     def get_details(self, index: int, **kwargs):
+        # 删除临时生成的MCP代码文件
+        if self.context.get('execute_ids'):
+            executor = ToolExecutor(CONFIG.get('SANDBOX'))
+            # 清理工具代码文件，延时删除，避免文件被占用
+            for tool_id in self.context.get('execute_ids'):
+                code_path = f'{executor.sandbox_path}/execute/{tool_id}.py'
+                if os.path.exists(code_path):
+                    os.remove(code_path)
         return {
             'name': self.node.properties.get('stepName'),
             "index": index,

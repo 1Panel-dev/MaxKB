@@ -474,7 +474,6 @@ const permissionPrecise = computed(() => {
   return permissionMap['application'][apiType.value]
 })
 
-// @ts-ignore
 const defaultPrompt = t('views.application.form.prompt.defaultPrompt', {
   data: '{data}',
   question: '{question}',

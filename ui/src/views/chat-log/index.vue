@@ -259,7 +259,6 @@ const formRef = ref()
 const dayOptions = [
   {
     value: 7,
-    // @ts-ignore
     label: t('views.applicationOverview.monitor.pastDayOptions.past7Days'), // 使用 t 方法来国际化显示文本
   },
   {
@@ -359,12 +358,12 @@ const nextChatRecord = () => {
   }
 }
 const pre_disable = computed(() => {
-  let index = tableIndexMap.value[currentChatId.value] - 1
+  const index = tableIndexMap.value[currentChatId.value] - 1
   return index < 0 && paginationConfig.current_page <= 1
 })
 
 const next_disable = computed(() => {
-  let index = tableIndexMap.value[currentChatId.value] + 1
+  const index = tableIndexMap.value[currentChatId.value] + 1
   return (
     index >= tableData.value.length &&
     index + (paginationConfig.current_page - 1) * paginationConfig.page_size >=

@@ -11,12 +11,12 @@
       >
         <img :src="resetUrl(current?.icon, resetUrl('./favicon.ico'))" alt="" />
       </el-avatar>
-      <LogoIcon
+      <!-- <LogoIcon
         v-else-if="isApplication"
         height="28px"
         style="width: 28px; height: 28px; display: block"
         class="mr-8"
-      />
+      /> -->
       <KnowledgeIcon v-else-if="isKnowledge" :type="current?.type" class="mr-8" />
 
       <div class="ellipsis" :title="current?.name">{{ current?.name }}</div>

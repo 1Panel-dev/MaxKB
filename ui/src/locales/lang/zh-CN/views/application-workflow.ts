@@ -238,6 +238,7 @@ export default {
       mcpServerTip: '请输入JSON格式的MCP服务器配置',
       mcpToolTip: '请选择工具',
       configLabel: 'MCP Server Config (仅支持SSE/Streamable HTTP调用方式)',
+      reference: '引用MCP',
     },
     imageGenerateNode: {
       label: '图片生成',

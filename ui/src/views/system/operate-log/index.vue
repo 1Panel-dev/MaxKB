@@ -281,7 +281,6 @@ const daterangeValue = ref('')
 const dayOptions = [
   {
     value: 7,
-    // @ts-ignore
     label: t('views.applicationOverview.monitor.pastDayOptions.past7Days'), // 使用 t 方法来国际化显示文本
   },
   {
@@ -380,7 +379,7 @@ function handleSizeChange() {
 }
 
 function getRequestParams() {
-  let obj: any = {
+  const obj: any = {
     start_time: daterange.value.start_time,
     end_time: daterange.value.end_time,
   }
@@ -408,7 +407,7 @@ function getList() {
 
 function getMenuList() {
   return operateLog.getMenuList().then((res) => {
-    let arr: any[] = res.data
+    const arr: any[] = res.data
     arr
       .filter((item, index, self) => index === self.findIndex((i) => i['menu'] === item['menu']))
       .forEach((ele) => {

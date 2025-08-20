@@ -39,7 +39,12 @@
           clearable
         >
           <template #prepend>
-            <el-select v-model="searchType" placeholder="Select" style="width: 80px">
+            <el-select
+              v-model="searchType"
+              placeholder="Select"
+              style="width: 80px"
+              @change="searchTypeChange"
+            >
               <el-option :label="$t('common.title')" value="title" />
               <el-option :label="$t('common.content')" value="content" />
             </el-select>
@@ -57,7 +62,7 @@
                 container=".paragraph-scollbar"
                 @click="handleClick"
               >
-                <template v-for="(item, index) in paragraphDetail" :key="item.id">
+                <template v-for="(item) in paragraphDetail" :key="item.id">
                   <el-anchor-link :href="`#m${item.id}`" :title="item.title" v-if="item.title">
                     <span :title="item.title">
                       {{ item.title }}
@@ -155,7 +160,7 @@
         </div>
       </LayoutContainer>
 
-      <div class="mul-operation border-t w-full" v-if="isBatch === true">
+      <div class="mul-operation border-t w-full flex align-center" v-if="isBatch === true">
         <el-button :disabled="multipleSelection.length === 0" @click="openGenerateDialog()">
           {{ $t('views.document.generateQuestion.title') }}
         </el-button>
@@ -166,7 +171,7 @@
         <el-button :disabled="multipleSelection.length === 0" @click="deleteMulParagraph">
           {{ $t('common.delete') }}
         </el-button>
-        <span class="ml-8">
+        <span class="ml-24">
           {{ $t('common.selected') }} {{ multipleSelection.length }}
           {{ $t('views.document.items') }}
         </span>
@@ -226,6 +231,11 @@ const paragraphDetail = ref<any[]>([])
 const title = ref('')
 const search = ref('')
 const searchType = ref('title')
+
+const searchTypeChange = () => {
+  search.value = ''
+}
+
 
 const dialogVisible = ref(false)
 watch(

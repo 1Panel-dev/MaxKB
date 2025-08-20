@@ -38,6 +38,7 @@ const systemManage = {
             'OR'
     ),
     folderDelete: () => false,
+    auth: () => false,
     overview_embed: () =>
         hasPermission(
             [

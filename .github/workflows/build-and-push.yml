@@ -7,7 +7,7 @@ on:
     inputs:
       dockerImageTag:
         description: 'Image Tag'
-        default: 'v2.0.1-dev'
+        default: 'v2.0.3-dev'
         required: true
       dockerImageTagWithLatest:
         description: '是否发布latest tag（正式发版时选择，测试版本切勿选择）'
@@ -90,6 +90,12 @@ jobs:
           registry: ${{ secrets.FIT2CLOUD_REGISTRY_HOST }}
           username: ${{ secrets.FIT2CLOUD_REGISTRY_USERNAME }}
           password: ${{ secrets.FIT2CLOUD_REGISTRY_PASSWORD }}
+      - name: Build Web
+        run: |
+          docker buildx build --no-cache --target web-build --output type=local,dest=./web-build-output . -f installer/Dockerfile
+          rm -rf ./ui
+          cp -r ./web-build-output/ui ./
+          rm -rf ./web-build-output
       - name: Docker Buildx (build-and-push)
         run: |
           sudo sync && echo 3 | sudo tee /proc/sys/vm/drop_caches && free -m
@@ -150,6 +156,12 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build Web
+        run: |
+          docker buildx build --no-cache --target web-build --output type=local,dest=./web-build-output . -f installer/Dockerfile
+          rm -rf ./ui
+          cp -r ./web-build-output/ui ./
+          rm -rf ./web-build-output
       - name: Docker Buildx (build-and-push)
         run: |
           sudo sync && echo 3 | sudo tee /proc/sys/vm/drop_caches && free -m

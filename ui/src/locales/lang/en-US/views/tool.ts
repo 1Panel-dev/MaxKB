@@ -1,9 +1,13 @@
 export default {
   title: 'Tool',
+  all: 'All',
   createTool: 'Create Tool',
   editTool: 'Edit Tool',
+  createMcpTool: 'Create MCP',
+  editMcpTool: 'Edit MCP',
   copyTool: 'Copy Tool',
   importTool: 'Import Tool',
+  settingTool: 'Set Tool',
   toolStore: {
     title: 'Tool Store',
     createFromToolStore: 'Create from Tool Store',
@@ -65,6 +69,13 @@ export default {
       code: 'Content (Python)',
       selectPlaceholder: 'Please select parameter',
       inputPlaceholder: 'Please enter parameter values',
+    },
+    mcp: {
+      title: 'MCP Service',
+      label: 'MCP Server Config',
+      placeholder: 'Please enter MCP Server config',
+      tip: 'Only supports SSE and Streamable HTTP calling methods',
+      requiredMessage: 'Please enter MCP Server Config',
     },
     debug: {
       run: 'Run',

@@ -68,7 +68,6 @@ const props = defineProps({
 const statisticsType = computed(() => [
   {
     id: 'customerCharts',
-    // @ts-ignore
     name: t('views.applicationOverview.monitor.charts.customerTotal'),
     icon: 'app-user',
     background: '#EBF1FF',

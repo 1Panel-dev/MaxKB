@@ -313,7 +313,6 @@ const rules = reactive<FormRules>({
 const onChange = (file: any, fileList: UploadFiles, attr: string) => {
   const isLimit = file?.size / 1024 / 1024 < 10
   if (!isLimit) {
-    // @ts-ignore
     MsgError(t('theme.fileMessageError'))
     return false
   } else {
@@ -419,6 +418,11 @@ onMounted(() => {
     .theme-platform-header {
       padding: 10px 20px;
       background: var(--app-header-bg-color);
+    }
+  }
+  .theme-form {
+    :deep(.el-checkbox__input.is-checked + .el-checkbox__label) {
+      color: var(--el-checkbox-text-color);
     }
   }
 }

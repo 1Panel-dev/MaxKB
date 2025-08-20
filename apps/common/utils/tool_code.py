@@ -1,5 +1,5 @@
 # coding=utf-8
-
+import ast
 import os
 import pickle
 import subprocess
@@ -82,6 +82,115 @@ except Exception as e:
         if result.get('code') == 200:
             return result.get('data')
         raise Exception(result.get('msg'))
+
+    def _generate_mcp_server_code(self, _code, params):
+        self.validate_banned_keywords(_code)
+
+        # 解析代码，提取导入语句和函数定义
+        try:
+            tree = ast.parse(_code)
+        except SyntaxError:
+            return _code
+
+        imports = []
+        functions = []
+        other_code = []
+
+        for node in tree.body:
+            if isinstance(node, ast.Import) or isinstance(node, ast.ImportFrom):
+                imports.append(ast.unparse(node))
+            elif isinstance(node, ast.FunctionDef):
+                # 修改函数参数以包含 params 中的默认值
+                arg_names = [arg.arg for arg in node.args.args]
+
+                # 为参数添加默认值，确保参数顺序正确
+                defaults = []
+                num_defaults = 0
+
+                # 从后往前检查哪些参数有默认值
+                for i, arg_name in enumerate(arg_names):
+                    if arg_name in params:
+                        num_defaults = len(arg_names) - i
+                        break
+
+                # 为有默认值的参数创建默认值列表
+                if num_defaults > 0:
+                    for i in range(len(arg_names) - num_defaults, len(arg_names)):
+                        arg_name = arg_names[i]
+                        if arg_name in params:
+                            default_value = params[arg_name]
+                            if isinstance(default_value, str):
+                                defaults.append(ast.Constant(value=default_value))
+                            elif isinstance(default_value, (int, float, bool)):
+                                defaults.append(ast.Constant(value=default_value))
+                            elif default_value is None:
+                                defaults.append(ast.Constant(value=None))
+                            else:
+                                defaults.append(ast.Constant(value=str(default_value)))
+                        else:
+                            # 如果某个参数没有默认值，需要添加 None 占位
+                            defaults.append(ast.Constant(value=None))
+
+                    node.args.defaults = defaults
+
+                func_code = ast.unparse(node)
+                functions.append(f"@mcp.tool()\n{func_code}\n")
+            else:
+                other_code.append(ast.unparse(node))
+
+        # 构建完整的 MCP 服务器代码
+        code_parts = ["from mcp.server.fastmcp import FastMCP"]
+        code_parts.extend(imports)
+        code_parts.append(f"\nmcp = FastMCP(\"{uuid.uuid7()}\")\n")
+        code_parts.extend(other_code)
+        code_parts.extend(functions)
+        code_parts.append("\nmcp.run(transport=\"stdio\")\n")
+
+        return "\n".join(code_parts)
+
+    def generate_mcp_server_code(self, code_str, params):
+        python_paths = CONFIG.get_sandbox_python_package_paths().split(',')
+        code = self._generate_mcp_server_code(code_str, params)
+        return f"""
+import os
+import sys
+path_to_exclude = ['/opt/py3/lib/python3.11/site-packages', '/opt/maxkb-app/apps']
+sys.path = [p for p in sys.path if p not in path_to_exclude]
+sys.path += {python_paths}
+env = dict(os.environ)
+for key in list(env.keys()):
+    if key in os.environ and (key.startswith('MAXKB') or key.startswith('POSTGRES') or key.startswith('PG') or key.startswith('REDIS') or key == 'PATH'):
+        del os.environ[key]
+exec({dedent(code)!a})
+"""
+
+    def get_tool_mcp_config(self, code, params):
+        code = self.generate_mcp_server_code(code, params)
+
+        _id = uuid.uuid7()
+        code_path = f'{self.sandbox_path}/execute/{_id}.py'
+        with open(code_path, 'w') as f:
+            f.write(code)
+        if self.sandbox:
+            os.system(f"chown {self.user}:root {code_path}")
+
+            tool_config = {
+                'command': 'su',
+                'args': [
+                    '-s', sys.executable,
+                    '-c', f"exec(open('{code_path}', 'r').read())",
+                    self.user,
+                ],
+                'cwd': self.sandbox_path,
+                'transport': 'stdio',
+            }
+        else:
+            tool_config = {
+                'command': sys.executable,
+                'args': [code_path],
+                'transport': 'stdio',
+            }
+        return _id, tool_config
 
     def _exec_sandbox(self, _code, _id):
         exec_python_file = f'{self.sandbox_path}/execute/{_id}.py'

@@ -218,7 +218,9 @@ function back() {
         saveApplication(true, true)
       })
       .catch((action: Action) => {
-        action === 'cancel' && go()
+        if (action === 'cancel') {
+          go()
+        }
       })
   } else {
     go()
@@ -275,7 +277,11 @@ function openHistory() {
 }
 
 function changeSave(bool: boolean) {
-  bool ? initInterval() : closeInterval()
+  if (bool) {
+    initInterval()
+  } else {
+    closeInterval()
+  }
   localStorage.setItem('workflowAutoSave', bool.toString())
 }
 

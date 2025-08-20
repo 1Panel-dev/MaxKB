@@ -61,7 +61,14 @@
         <!-- <el-table-column type="selection" width="55" /> -->
         <el-table-column width="220" :label="$t('common.name')" show-overflow-tooltip>
           <template #default="{ row }">
-            {{ row.name }}
+            <el-space :size="8">
+              <span
+                style="width: 24px; height: 24px; display: inline-block"
+                :innerHTML="getRowProvider(row)?.icon"
+              >
+              </span>
+              <span> {{ row.name }}</span>
+            </el-space>
           </template>
         </el-table-column>
         <el-table-column
@@ -360,7 +367,7 @@ const search_type_change = () => {
 }
 
 function getRequestParams() {
-  let obj: any = {
+  const obj: any = {
     name: model_search_form.value.name,
     create_user: model_search_form.value.create_user,
     model_type: model_search_form.value.model_type,

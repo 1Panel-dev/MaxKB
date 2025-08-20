@@ -8,7 +8,7 @@
     :before-close="close"
     append-to-body
   >
-    <template #header="{ close, titleId, titleClass }">
+    <template #header>
       <el-breadcrumb separator=">">
         <el-breadcrumb-item>
           <span @click="toSelectProvider" class="select-provider">

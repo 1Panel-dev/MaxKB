@@ -106,7 +106,7 @@ watch(
 
 function handleInputFieldList() {
   dynamicsFormRefresh.value++
-  let default_value: any = {}
+  const default_value: any = {}
   props.application.work_flow?.nodes
     ?.filter((v: any) => v.id === 'base-node')
     .map((v: any) => {
@@ -312,8 +312,8 @@ const validate = () => {
 }
 const validate_query = () => {
   // 浏览器query参数找到接口传参
-  let msg = []
-  for (let f of apiInputFieldList.value) {
+  const msg = []
+  for (const f of apiInputFieldList.value) {
     if (f.required && !api_form_data_context.value[f.field]) {
       msg.push(f.field)
     }
@@ -328,9 +328,9 @@ const validate_query = () => {
 }
 
 const initRouteQueryValue = () => {
-  for (let f of apiInputFieldList.value) {
+  for (const f of apiInputFieldList.value) {
     if (!api_form_data_context.value[f.field]) {
-      let _value = getRouteQueryValue(f.field)
+      const _value = getRouteQueryValue(f.field)
       if (_value != null) {
         api_form_data_context.value[f.field] = _value
       }

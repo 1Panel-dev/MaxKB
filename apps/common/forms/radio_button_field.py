@@ -11,7 +11,7 @@ from typing import List, Dict
 from common.forms.base_field import BaseExecField, TriggerType
 
 
-class Radio(BaseExecField):
+class RadioButton(BaseExecField):
     """
     下拉单选
     """

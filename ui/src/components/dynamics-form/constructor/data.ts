@@ -2,43 +2,51 @@ import { t } from '@/locales'
 const input_type_list = [
   {
     label: t('dynamicsForm.input_type_list.TextInput'),
-    value: 'TextInput'
+    value: 'TextInput',
   },
   {
     label: t('dynamicsForm.input_type_list.PasswordInput'),
-    value: 'PasswordInput'
+    value: 'PasswordInput',
   },
   {
     label: t('dynamicsForm.input_type_list.Slider'),
-    value: 'Slider'
+    value: 'Slider',
   },
   {
     label: t('dynamicsForm.input_type_list.SwitchInput'),
-    value: 'SwitchInput'
+    value: 'SwitchInput',
   },
   {
     label: t('dynamicsForm.input_type_list.SingleSelect'),
-    value: 'SingleSelect'
+    value: 'SingleSelect',
   },
   {
     label: t('dynamicsForm.input_type_list.MultiSelect'),
-    value: 'MultiSelect'
+    value: 'MultiSelect',
   },
   {
     label: t('dynamicsForm.input_type_list.DatePicker'),
-    value: 'DatePicker'
+    value: 'DatePicker',
   },
   {
     label: t('dynamicsForm.input_type_list.JsonInput'),
-    value: 'JsonInput'
+    value: 'JsonInput',
   },
   {
     label: t('dynamicsForm.input_type_list.RadioCard'),
-    value: 'RadioCard'
+    value: 'RadioCard',
   },
   {
     label: t('dynamicsForm.input_type_list.RadioRow'),
-    value: 'RadioRow'
-  }
+    value: 'RadioRow',
+  },
+  {
+    label: t('dynamicsForm.input_type_list.UploadInput'),
+    value: 'UploadInput',
+  },
+  {
+    label: t('dynamicsForm.input_type_list.TextareaInput'),
+    value: 'TextareaInput',
+  },
 ]
 export { input_type_list }

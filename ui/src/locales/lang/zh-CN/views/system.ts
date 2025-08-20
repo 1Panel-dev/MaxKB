@@ -1,3 +1,5 @@
+import role from './role'
+
 export default {
   title: '系统管理',
   subTitle: '系统设置',
@@ -115,12 +117,13 @@ export default {
     permissionSetting: '资源权限配置',
     setting: {
       management: '管理',
+      managementDesc: '可对该资源进行删改操作',
       check: '查看',
-      authorization: '授权',
-    },
-    priority: {
-      label: '资源权限优先级',
-      role: '按角色',
+      checkDesc: '仅能查看使用该资源',
+      role: '按用户角色',
+      roleDesc: '根据用户角色中的权限授权用户对该资源的操作权限',
+      notAuthorized: '不授权',
+      configure: '配置权限',
     },
   },
   resource_management: {

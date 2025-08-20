@@ -20,7 +20,7 @@ onMounted(() => {
     range.selectNode(htmlRef.value)
     const scripts = htmlRef.value.getElementsByTagName('script')
     if (scripts) {
-      var documentFragment = range.createContextualFragment(
+      const documentFragment = range.createContextualFragment(
         [...scripts]
           .map((item: HTMLElement) => {
             htmlRef.value?.removeChild(item)

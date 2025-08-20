@@ -147,13 +147,14 @@ import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import AddFormCollect from '@/workflow/common/AddFormCollect.vue'
 import EditFormCollect from '@/workflow/common/EditFormCollect.vue'
 import { type FormInstance } from 'element-plus'
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, provide } from 'vue'
 import { input_type_list } from '@/components/dynamics-form/constructor/data'
 import { MsgError } from '@/utils/message'
 import { set, cloneDeep } from 'lodash'
 import Sortable from 'sortablejs'
 import { t } from '@/locales'
 const props = defineProps<{ nodeModel: any }>()
+provide('getModel', () => props.nodeModel)
 const formNodeFormRef = ref<FormInstance>()
 const tableRef = ref()
 const editFormField = (form_field_data: any, field_index: number) => {

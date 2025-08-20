@@ -5,9 +5,11 @@
     <template v-for="(item, index) in md_view_list" :key="index">
       <div
         v-if="item.type === 'question'"
-        @click="sendMessage ? sendMessage(item.content, 'new') : (content: string) => {}"
+        @click="
+          sendMessage && type !== 'log' ? sendMessage(item.content, 'new') : (content: string) => {}
+        "
         class="problem-button mt-4 mb-4 flex"
-        :class="sendMessage ? 'cursor' : 'disabled'"
+        :class="sendMessage && type !== 'log' ? 'cursor' : 'disabled'"
       >
         <AppIcon iconName="app-edit" class="mr-8" style="margin-top: 2px"></AppIcon>
         {{ item.content }}
@@ -61,6 +63,7 @@ config({
       tokens[idx].attrSet('target', '_blank')
       return md.renderer.renderToken(tokens, idx, options)
     }
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     document.appendChild
   },
 })
@@ -74,6 +77,7 @@ const props = withDefaults(
     chat_record_id?: string
     runtime_node_id?: string
     disabled?: boolean
+    type?: 'log' | 'ai-chat' | 'debug-ai-chat'
   }>(),
   {
     source: '',

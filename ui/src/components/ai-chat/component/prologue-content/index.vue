@@ -17,6 +17,7 @@
           :source="prologue"
           :send-message="sendMessage"
           reasoning_content=""
+          :type="type"
         ></MdRenderer>
       </el-card>
     </div>
@@ -34,7 +35,6 @@ const props = defineProps<{
   type: 'log' | 'ai-chat' | 'debug-ai-chat'
   sendMessage: (question: string, other_params_data?: any, chat?: chatType) => void
 }>()
-
 
 const showAvatar = computed(() => {
   return props.application.show_avatar == undefined ? true : props.application.show_avatar

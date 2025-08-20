@@ -114,11 +114,70 @@
           />
         </el-form-item>
 
+        <!-- MCP-->
+        <div class="flex-between mb-16">
+          <div class="lighter">MCP</div>
+          <div>
+            <el-button
+              type="primary"
+              class="mr-4"
+              link
+              @click="openMcpServersDialog"
+              @refreshForm="refreshParam"
+            >
+              <AppIcon iconName="app-setting"></AppIcon>
+            </el-button>
+            <el-switch size="small" v-model="chat_data.mcp_enable" />
+          </div>
+        </div>
+        <div class="w-full" v-if="
+          (chat_data.mcp_tool_id) ||
+          (chat_data.mcp_servers && chat_data.mcp_servers.length > 0)"
+        >
+          <div class="flex-between border border-r-6 white-bg mb-4" style="padding: 5px 8px">
+            <div class="flex align-center" style="line-height: 20px">
+              <ToolIcon type="MCP" class="mr-8" :size="20" />
+
+              <div class="ellipsis" :title="relatedObject(toolSelectOptions, chat_data.mcp_tool_id, 'id')?.name">
+                {{ relatedObject(mcpToolSelectOptions, chat_data.mcp_tool_id, 'id')?.name || $t('common.custom') + ' MCP' }}
+              </div>
+            </div>
+            <el-button text @click="chat_data.mcp_tool_id = ''">
+              <el-icon><Close /></el-icon>
+            </el-button>
+          </div>
+        </div>
+        <!-- 工具       -->
         <div class="flex-between mb-16">
           <div class="lighter">{{ $t('views.applicationWorkflow.nodes.mcpNode.tool') }}</div>
-          <el-button type="primary" link @click="openMcpServersDialog" @refreshForm="refreshParam">
-            <AppIcon iconName="app-setting"></AppIcon>
-          </el-button>
+          <div>
+            <el-button
+              type="primary"
+              class="mr-4"
+              link
+              @click="openToolDialog"
+              @refreshForm="refreshParam"
+            >
+              <AppIcon iconName="app-setting"></AppIcon>
+            </el-button>
+            <el-switch size="small" v-model="chat_data.tool_enable" />
+          </div>
+        </div>
+        <div class="w-full" v-if="chat_data.tool_ids?.length > 0">
+          <template v-for="(item, index) in chat_data.tool_ids" :key="index">
+            <div class="flex-between border border-r-6 white-bg mb-4" style="padding: 5px 8px">
+              <div class="flex align-center" style="line-height: 20px">
+                <ToolIcon type="CUSTOM" class="mr-8" :size="20" />
+
+                <div class="ellipsis" :title="relatedObject(toolSelectOptions, item, 'id')?.name">
+                  {{ relatedObject(toolSelectOptions, item, 'id')?.name }}
+                </div>
+              </div>
+              <el-button text @click="removeTool(item)">
+                <el-icon><Close /></el-icon>
+              </el-button>
+            </div>
+          </template>
         </div>
 
         <el-form-item @click.prevent>
@@ -166,6 +225,7 @@
       @refresh="submitReasoningDialog"
     />
     <McpServersDialog ref="mcpServersDialogRef" @refresh="submitMcpServersDialog" />
+    <ToolDialog ref="toolDialogRef" @refresh="submitToolDialog" />
   </NodeContainer>
 </template>
 <script setup lang="ts">
@@ -180,6 +240,8 @@ import ReasoningParamSettingDialog from '@/views/application/component/Reasoning
 import McpServersDialog from '@/views/application/component/McpServersDialog.vue'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { useRoute } from 'vue-router'
+import ToolDialog from '@/views/application/component/ToolDialog.vue'
+import {relatedObject} from "@/utils/array.ts";
 const getApplicationDetail = inject('getApplicationDetail') as any
 const route = useRoute()
 
@@ -221,7 +283,6 @@ const model_change = (model_id?: string) => {
   }
 }
 
-// @ts-ignore
 const defaultPrompt = `${t('views.applicationWorkflow.nodes.aiChatNode.defaultPrompt')}：
 {{${t('views.applicationWorkflow.nodes.searchKnowledgeNode.label')}.data}}
 ${t('views.problem.title')}：
@@ -324,14 +385,74 @@ const mcpServersDialogRef = ref()
 function openMcpServersDialog() {
   const config = {
     mcp_servers: chat_data.value.mcp_servers,
-    mcp_enable: chat_data.value.mcp_enable,
+    mcp_tool_id: chat_data.value.mcp_tool_id,
+    mcp_source: chat_data.value.mcp_source,
   }
-  mcpServersDialogRef.value.open(config)
+  mcpServersDialogRef.value.open(config, mcpToolSelectOptions.value)
 }
 
 function submitMcpServersDialog(config: any) {
   set(props.nodeModel.properties.node_data, 'mcp_servers', config.mcp_servers)
-  set(props.nodeModel.properties.node_data, 'mcp_enable', config.mcp_enable)
+  set(props.nodeModel.properties.node_data, 'mcp_tool_id', config.mcp_tool_id)
+  set(props.nodeModel.properties.node_data, 'mcp_source', config.mcp_source)
+}
+
+const toolDialogRef = ref()
+function openToolDialog() {
+  toolDialogRef.value.open(chat_data.value.tool_ids)
+}
+function submitToolDialog(config: any) {
+  set(props.nodeModel.properties.node_data, 'tool_ids', config.tool_ids)
+}
+function removeTool(id: any) {
+  const list = props.nodeModel.properties.node_data.tool_ids.filter((v: any) => v !== id)
+  set(props.nodeModel.properties.node_data, 'tool_ids', list)
+}
+
+const toolSelectOptions = ref<any[]>([])
+function getToolSelectOptions() {
+  const obj =
+    apiType.value === 'systemManage'
+      ? {
+          scope: 'WORKSPACE',
+          tool_type: 'CUSTOM',
+          workspace_id: application.value?.workspace_id,
+        }
+      : {
+          scope: 'WORKSPACE',
+          tool_type: 'CUSTOM',
+        }
+
+  loadSharedApi({ type: 'tool', systemType: apiType.value })
+    .getAllToolList(obj)
+    .then((res: any) => {
+      toolSelectOptions.value = [...res.data.shared_tools, ...res.data.tools].filter(
+        (item: any) => item.is_active,
+      )
+    })
+}
+
+const mcpToolSelectOptions = ref<any[]>([])
+function getMcpToolSelectOptions() {
+  const obj =
+    apiType.value === 'systemManage'
+      ? {
+          scope: 'WORKSPACE',
+          tool_type: 'MCP',
+          workspace_id: application.value?.workspace_id,
+        }
+      : {
+          scope: 'WORKSPACE',
+          tool_type: 'MCP',
+        }
+
+  loadSharedApi({ type: 'tool', systemType: apiType.value })
+    .getAllToolList(obj)
+    .then((res: any) => {
+      mcpToolSelectOptions.value = [...res.data.shared_tools, ...res.data.tools].filter(
+        (item: any) => item.is_active,
+      )
+    })
 }
 
 onMounted(() => {
@@ -345,6 +466,9 @@ onMounted(() => {
   if (!chat_data.value.dialogue_type) {
     chat_data.value.dialogue_type = 'WORKFLOW'
   }
+
+  getToolSelectOptions()
+  getMcpToolSelectOptions()
 })
 </script>
 <style lang="scss" scoped></style>

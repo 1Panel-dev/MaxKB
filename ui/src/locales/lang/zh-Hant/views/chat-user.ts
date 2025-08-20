@@ -13,6 +13,7 @@ export default {
   replace: '替換',
   group: {
     title: '用戶組',
+    requiredMessage: '請選擇用戶組',
     name: '用戶組名稱',
     usernameOrName: '用戶名/姓名',
     delete: {
@@ -25,5 +26,5 @@ export default {
     title: '成功同步 {count} 個用戶',
     usernameExist: '以下用戶名已存在：',
     nicknameExist: '以下姓名已存在：',
-  }
+  },
 }

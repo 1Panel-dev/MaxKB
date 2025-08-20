@@ -50,7 +50,19 @@
                     <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt="" />
                   </el-avatar>
                   <div class="pre-wrap ml-8">
-                    <div class="lighter">空白创建</div>
+                    <div class="lighter">
+                      {{ $t('views.application.form.appTemplate.blankApp.title') }}
+                    </div>
+                  </div>
+                </div>
+              </el-dropdown-item>
+              <el-dropdown-item @click="openCreateMcpDialog()">
+                <div class="flex align-center">
+                  <el-avatar shape="square" :size="32">
+                    <img src="@/assets/workflow/icon_mcp.svg" style="width: 75%" alt="" />
+                  </el-avatar>
+                  <div class="pre-wrap ml-8">
+                    <div class="lighter">{{ $t('common.create') }} MCP</div>
                   </div>
                 </div>
               </el-dropdown-item>
@@ -67,7 +79,7 @@
               >
                 <el-dropdown-item v-if="permissionPrecise.import()">
                   <div class="flex align-center w-full">
-                    <el-avatar shape="square" class="mt-4" :size="36" style="background: none">
+                    <el-avatar shape="square" :size="36" style="background: none">
                       <img src="@/assets/icon_import.svg" alt="" />
                     </el-avatar>
                     <div class="pre-wrap ml-8">
@@ -78,8 +90,8 @@
               </el-upload>
               <el-dropdown-item @click="openToolStoreDialog()">
                 <div class="flex align-center">
-                  <el-avatar class="avatar-green" shape="square" :size="32">
-                    <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt="" />
+                  <el-avatar shape="square" :size="36" style="background: none">
+                    <img src="@/assets/icon_tool_shop.svg" alt="" />
                   </el-avatar>
                   <div class="pre-wrap ml-8">
                     <div class="lighter">
@@ -163,9 +175,7 @@
                   >
                     <img :src="resetUrl(item?.icon)" alt="" />
                   </el-avatar>
-                  <el-avatar v-else class="avatar-green" shape="square" :size="32">
-                    <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt="" />
-                  </el-avatar>
+                  <ToolIcon v-else :size="32" :type="item?.tool_type" />
                 </template>
                 <template #subTitle>
                   <el-text class="color-secondary lighter" size="small">
@@ -225,7 +235,7 @@
                             {{ $t('common.edit') }}
                           </el-dropdown-item>
                           <el-dropdown-item
-                            v-if="!item.template_id && permissionPrecise.copy(item.id)"
+                            v-if="!item.template_id && permissionPrecise.copy(item.id) && item.tool_type!== 'MCP'"
                             @click.stop="copyTool(item)"
                           >
                             <AppIcon iconName="app-copy" class="color-secondary"></AppIcon>
@@ -239,6 +249,16 @@
                           >
                             <AppIcon iconName="app-operation" class="color-secondary"></AppIcon>
                             {{ $t('common.param.initParam') }}
+                          </el-dropdown-item>
+                          <el-dropdown-item
+                            @click.stop="openAuthorization(item)"
+                            v-if="apiType === 'workspace' && permissionPrecise.auth(item.id)"
+                          >
+                            <AppIcon
+                              iconName="app-resource-authorization"
+                              class="color-secondary"
+                            ></AppIcon>
+                            {{ $t('views.system.resourceAuthorization.title') }}
                           </el-dropdown-item>
                           <el-dropdown-item
                             @click.stop="openMoveToDialog(item)"
@@ -255,7 +275,7 @@
                             {{ $t('views.shared.authorized_workspace') }}</el-dropdown-item
                           >
                           <el-dropdown-item
-                            v-if="!item.template_id && permissionPrecise.export(item.id)"
+                            v-if="!item.template_id && permissionPrecise.export(item.id) && item.tool_type!== 'MCP'"
                             @click.stop="exportTool(item)"
                           >
                             <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
@@ -284,6 +304,7 @@
   </ContentContainer>
   <InitParamDrawer ref="InitParamDrawerRef" @refresh="refresh" />
   <ToolFormDrawer ref="ToolFormDrawerRef" @refresh="refresh" :title="ToolDrawertitle" />
+  <McpToolFormDrawer ref="McpToolFormDrawerRef" @refresh="refresh" :title="McpToolDrawertitle" />
   <CreateFolderDialog ref="CreateFolderDialogRef" v-if="!isShared" @refresh="refreshFolder" />
   <ToolStoreDialog ref="toolStoreDialogRef" :api-type="apiType" @refresh="refresh" />
   <AddInternalToolDialog ref="AddInternalToolDialogRef" @refresh="confirmAddInternalTool" />
@@ -297,6 +318,11 @@
     @refresh="refreshToolList"
     v-if="apiType === 'workspace'"
   />
+  <ResourceAuthorizationDrawer
+    :type="SourceTypeEnum.TOOL"
+    ref="ResourceAuthorizationDrawerRef"
+    v-if="apiType === 'workspace'"
+  />
 </template>
 
 <script lang="ts" setup>
@@ -305,11 +331,13 @@ import { cloneDeep } from 'lodash'
 import { useRoute, onBeforeRouteLeave } from 'vue-router'
 import InitParamDrawer from '@/views/tool/component/InitParamDrawer.vue'
 import ToolFormDrawer from '@/views/tool/ToolFormDrawer.vue'
+import McpToolFormDrawer from '@/views/tool/McpToolFormDrawer.vue'
 import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
 import AuthorizedWorkspace from '@/views/system-shared/AuthorizedWorkspaceDialog.vue'
 import ToolStoreDialog from '@/views/tool/toolStore/ToolStoreDialog.vue'
 import AddInternalToolDialog from '@/views/tool/toolStore/AddInternalToolDialog.vue'
 import MoveToDialog from '@/components/folder-tree/MoveToDialog.vue'
+import ResourceAuthorizationDrawer from '@/components/resource-authorization-drawer/index.vue'
 import { resetUrl } from '@/utils/common'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import { SourceTypeEnum } from '@/enums/common'
@@ -354,6 +382,11 @@ const MoreFieldPermission = (id: any) => {
   )
 }
 
+const ResourceAuthorizationDrawerRef = ref()
+function openAuthorization(item: any) {
+  ResourceAuthorizationDrawerRef.value.open(item.id)
+}
+
 const InitParamDrawerRef = ref()
 const search_type = ref('name')
 const search_form = ref<any>({
@@ -374,7 +407,9 @@ const search_type_change = () => {
   search_form.value = { name: '', create_user: '' }
 }
 const ToolFormDrawerRef = ref()
+const McpToolFormDrawerRef = ref()
 const ToolDrawertitle = ref('')
+const McpToolDrawertitle = ref('')
 
 const MoveToDialogRef = ref()
 function openMoveToDialog(data: any) {
@@ -400,6 +435,11 @@ function openAuthorizedWorkspaceDialog(row: any) {
 }
 
 function openCreateDialog(data?: any) {
+  // mcp工具
+  if (data?.tool_type === 'MCP') {
+    openCreateMcpDialog(data)
+    return
+  }
   // 有template_id的不允许编辑，是模板转换来的
   if (data?.template_id) {
     return
@@ -417,6 +457,27 @@ function openCreateDialog(data?: any) {
       })
   } else {
     ToolFormDrawerRef.value.open(data)
+  }
+}
+
+function openCreateMcpDialog(data?: any) {
+  // 有template_id的不允许编辑，是模板转换来的
+  if (data?.template_id) {
+    return
+  }
+  // 共享过来的工具不让编辑
+  if (isShared.value) {
+    return
+  }
+  McpToolDrawertitle.value = data ? t('views.tool.editMcpTool') : t('views.tool.createMcpTool')
+  if (data) {
+    loadSharedApi({ type: 'tool', systemType: apiType.value })
+      .getToolById(data?.id, loading)
+      .then((res: any) => {
+        McpToolFormDrawerRef.value.open(res.data)
+      })
+  } else {
+    McpToolFormDrawerRef.value.open(data)
   }
 }
 
@@ -616,10 +677,21 @@ watch(
   },
   { deep: true, immediate: true },
 )
+
+watch(
+  () => tool.tool_type,
+  () => {
+    paginationConfig.current_page = 1
+    tool.setToolList([])
+    getList()
+  },
+)
+
 function getList() {
   const params: any = {
     folder_id: folder.currentFolder?.id || user.getWorkspaceId(),
     scope: apiType.value === 'systemShare' ? 'SHARED' : 'WORKSPACE',
+    tool_type: tool.tool_type || '',
   }
   if (search_form.value[search_type.value]) {
     params[search_type.value] = search_form.value[search_type.value]

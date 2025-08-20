@@ -254,6 +254,7 @@ async function getToolList() {
     systemType: 'workspace',
   }).getToolList({
     folder_id: folder.currentFolder?.id || user.getWorkspaceId(),
+    tool_type: 'CUSTOM'
   })
   toolList.value = res.data?.tools || res.data || []
   toolList.value = toolList.value?.filter((item: any) => item.is_active)

@@ -33,8 +33,8 @@ def get_celery_periodic_task(task_name):
     return task
 
 
-def make_dirs(name, mode=0o755, exist_ok=False):
-    """ 默认权限设置为 0o755 """
+def make_dirs(name, mode=0o700, exist_ok=False):
+    """ 默认权限设置为 0o700 """
     return os.makedirs(name, mode=mode, exist_ok=exist_ok)
 
 

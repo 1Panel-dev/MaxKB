@@ -372,7 +372,7 @@ const imageExtensions = ['JPG', 'JPEG', 'PNG', 'GIF', 'BMP']
 const documentExtensions = ['PDF', 'DOCX', 'TXT', 'XLS', 'XLSX', 'MD', 'HTML', 'CSV']
 const videoExtensions: any = []
 const audioExtensions = ['MP3', 'WAV', 'OGG', 'AAC', 'M4A']
-let otherExtensions = ref(['PPT', 'DOC'])
+const otherExtensions = ref(['PPT', 'DOC'])
 
 const getAcceptList = () => {
   const { image, document, audio, video, other } = props.applicationDetails.file_upload_setting
@@ -421,16 +421,29 @@ const uploadFile = async (file: any, fileList: any) => {
     uploadAudioList.value.length +
     uploadVideoList.value.length +
     uploadOtherList.value.length
+
   if (file_limit_once >= maxFiles) {
     MsgWarning(t('chat.uploadFile.limitMessage1') + maxFiles + t('chat.uploadFile.limitMessage2'))
     fileList.splice(0, fileList.length, ...fileList.slice(0, maxFiles))
+    return
+  }
+  console.log(fileList)
+  if (fileList.filter((f: any) => f.size == 0).length > 0) {
+    // MB
+    MsgWarning(t('chat.uploadFile.sizeLimit2') + fileLimit + 'MB')
+    // 只保留未超出大小限制的文件
+    fileList.splice(0, fileList.length, ...fileList.filter((f: any) => f.size > 0))
     return
   }
   if (fileList.filter((f: any) => f.size > fileLimit * 1024 * 1024).length > 0) {
     // MB
     MsgWarning(t('chat.uploadFile.sizeLimit') + fileLimit + 'MB')
     // 只保留未超出大小限制的文件
-    fileList.splice(0, fileList.length, ...fileList.filter((f: any) => f.size <= fileLimit * 1024 * 1024))
+    fileList.splice(
+      0,
+      fileList.length,
+      ...fileList.filter((f: any) => f.size <= fileLimit * 1024 * 1024),
+    )
     return
   }
   const inner = reactive(file)
@@ -554,7 +567,7 @@ const switchMicrophone = (status: boolean) => {
   }
 }
 
-const TouchEnd = (bool?: Boolean) => {
+const TouchEnd = (bool?: boolean) => {
   if (bool) {
     stopRecording()
     recorderStatus.value = 'STOP'

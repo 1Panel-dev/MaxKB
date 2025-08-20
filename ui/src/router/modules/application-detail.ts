@@ -155,7 +155,7 @@ const ApplicationDetailRouter = {
       name: 'applicationChatUser',
       meta: {
         icon: 'app-user-chat',
-        iconActive: 'app-user-chat',
+        iconActive: 'app-user-chat-active',
         title: 'views.chatUser.title',
         active: 'chat-user',
         parentPath: '/application/:from/:id/:type',

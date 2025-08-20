@@ -68,9 +68,11 @@ export default {
     limitMessage1: '最多上传',
     limitMessage2: '个文件',
     sizeLimit: '单个文件大小不能超过',
+    sizeLimit2: '空文件不支持上传',
     imageMessage: '请解析图片内容',
     fileMessage: '请解析文件内容',
     errorMessage: '上传失败',
+    fileRepeat: '文件已存在',
   },
   executionDetails: {
     title: '执行详情',

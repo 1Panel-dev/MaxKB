@@ -122,4 +122,4 @@ LOGGING = {
 SYSLOG_ENABLE = CONFIG.SYSLOG_ENABLE
 
 if not os.path.isdir(LOG_DIR):
-    os.makedirs(LOG_DIR, mode=0o755)
+    os.makedirs(LOG_DIR, mode=0o700, exist_ok=True)

@@ -51,7 +51,6 @@
 <script setup lang="ts">
 import { ref, reactive, watch } from 'vue'
 import type { FormInstance } from 'element-plus'
-import chatUserApi from '@/api/system/chat-user'
 import userManageApi from '@/api/system/user-manage'
 import { MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
@@ -109,6 +108,14 @@ const rules = reactive({
       pattern: /^1[3-9]\d{9}$/,
       message: t('views.userManage.userForm.phone.invalidMessage'),
       trigger: 'blur',
+    },
+  ],
+  user_group_ids: [
+    {
+      type: 'array',
+      required: true,
+      message: t('views.chatUser.group.requiredMessage'),
+      trigger: 'change',
     },
   ],
 })

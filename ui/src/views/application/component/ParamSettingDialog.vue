@@ -205,7 +205,6 @@ const noReferencesformRef = ref()
 
 const defaultValue = {
   ai_questioning: '{question}',
-  // @ts-ignore
   designated_answer: t('views.application.dialog.designated_answer'),
 }
 

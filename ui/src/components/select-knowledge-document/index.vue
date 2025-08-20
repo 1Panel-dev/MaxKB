@@ -61,8 +61,8 @@ import useStore from '@/stores'
 import { t } from '@/locales'
 const props = defineProps<{
   data?: {
-    type: Object
-    default: () => {}
+    type: object
+    default: () => null
   }
   apiType: 'systemShare' | 'workspace' | 'systemManage'
   isApplication?: boolean,

@@ -10,6 +10,7 @@ const workspaceShare = {
   edit: () => false,
   export: () => false,
   delete: () => false,
+  auth: () => false,
 
   doc_read: () => false,  
   doc_create: () => false,

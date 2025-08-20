@@ -3,13 +3,8 @@
     <template #left>
       <h4 class="p-12-16 pb-0 mt-12">{{ $t('views.application.title') }}</h4>
       <div class="p-8">
-        <folder-tree
-          :source="SourceTypeEnum.APPLICATION"
-          :data="folderList"
-          :currentNodeKey="folder.currentFolder?.id"
-          @handleNodeClick="folderClickHandle"
-          @refreshTree="refreshFolder"
-        />
+        <folder-tree :source="SourceTypeEnum.APPLICATION" :data="folderList" :currentNodeKey="folder.currentFolder?.id"
+          @handleNodeClick="folderClickHandle" @refreshTree="refreshFolder" />
       </div>
     </template>
     <ContentContainer>
@@ -19,44 +14,22 @@
       <template #search>
         <div class="flex">
           <div class="flex-between complex-search">
-            <el-select
-              class="complex-search__left"
-              v-model="search_type"
-              style="width: 120px"
-              @change="search_type_change"
-            >
+            <el-select class="complex-search__left" v-model="search_type" style="width: 120px"
+              @change="search_type_change">
               <el-option :label="$t('common.creator')" value="create_user" />
 
               <el-option :label="$t('common.name')" value="name" />
 
               <el-option :label="$t('common.publishStatus')" value="publish_status" />
             </el-select>
-            <el-input
-              v-if="search_type === 'name'"
-              v-model="search_form.name"
-              @change="searchHandle"
-              :placeholder="$t('common.searchBar.placeholder')"
-              style="width: 220px"
-              clearable
-            />
-            <el-select
-              v-else-if="search_type === 'create_user'"
-              v-model="search_form.create_user"
-              @change="searchHandle"
-              filterable
-              clearable
-              style="width: 220px"
-            >
+            <el-input v-if="search_type === 'name'" v-model="search_form.name" @change="searchHandle"
+              :placeholder="$t('common.searchBar.placeholder')" style="width: 220px" clearable />
+            <el-select v-else-if="search_type === 'create_user'" v-model="search_form.create_user"
+              @change="searchHandle" filterable clearable style="width: 220px">
               <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.nick_name" />
             </el-select>
-            <el-select
-              v-else-if="search_type === 'publish_status'"
-              v-model="search_form.publish_status"
-              @change="searchHandle"
-              filterable
-              clearable
-              style="width: 220px"
-            >
+            <el-select v-else-if="search_type === 'publish_status'" v-model="search_form.publish_status"
+              @change="searchHandle" filterable clearable style="width: 220px">
               <el-option :label="$t('common.published')" value="published" />
               <el-option :label="$t('common.unpublished')" value="unpublished" />
             </el-select>
@@ -73,16 +46,11 @@
                 <el-dropdown-item @click="openCreateDialog('SIMPLE')">
                   <div class="flex">
                     <el-avatar shape="square" class="avatar-blue mt-4" :size="36">
-                      <img
-                        src="@/assets/application/icon_simple_application.svg"
-                        style="width: 65%"
-                        alt=""
-                      />
+                      <img src="@/assets/application/icon_simple_application.svg" style="width: 65%" alt="" />
                     </el-avatar>
                     <div class="pre-wrap ml-8">
                       <div class="lighter">{{ $t('views.application.simple') }}</div>
-                      <el-text type="info" size="small"
-                        >{{ $t('views.application.simplePlaceholder') }}
+                      <el-text type="info" size="small">{{ $t('views.application.simplePlaceholder') }}
                       </el-text>
                     </div>
                   </div>
@@ -90,31 +58,18 @@
                 <el-dropdown-item @click="openCreateDialog('WORK_FLOW')">
                   <div class="flex">
                     <el-avatar shape="square" class="avatar-purple mt-4" :size="36">
-                      <img
-                        src="@/assets/application/icon_workflow_application.svg"
-                        style="width: 65%"
-                        alt=""
-                      />
+                      <img src="@/assets/application/icon_workflow_application.svg" style="width: 65%" alt="" />
                     </el-avatar>
                     <div class="pre-wrap ml-8">
                       <div class="lighter">{{ $t('views.application.workflow') }}</div>
-                      <el-text type="info" size="small"
-                        >{{ $t('views.application.workflowPlaceholder') }}
+                      <el-text type="info" size="small">{{ $t('views.application.workflowPlaceholder') }}
                       </el-text>
                     </div>
                   </div>
                 </el-dropdown-item>
-                <el-upload
-                  class="import-button"
-                  ref="elUploadRef"
-                  :file-list="[]"
-                  action="#"
-                  multiple
-                  :auto-upload="false"
-                  :show-file-list="false"
-                  :limit="1"
-                  :on-change="(file: any, fileList: any) => importApplication(file)"
-                >
+                <el-upload class="import-button" ref="elUploadRef" :file-list="[]" action="#" multiple
+                  :auto-upload="false" :show-file-list="false" :limit="1"
+                  :on-change="(file: any, fileList: any) => importApplication(file)">
                   <el-dropdown-item>
                     <div class="flex align-center w-full">
                       <el-avatar shape="square" class="mt-4" :size="36" style="background: none">
@@ -141,35 +96,16 @@
           </el-dropdown>
         </div>
       </template>
-      <div
-        v-loading.fullscreen.lock="paginationConfig.current_page === 1 && loading"
-        style="max-height: calc(100vh - 120px)"
-      >
-        <InfiniteScroll
-          :size="applicationList.length"
-          :total="paginationConfig.total"
-          :page_size="paginationConfig.page_size"
-          v-model:current_page="paginationConfig.current_page"
-          @load="getList"
-          :loading="loading"
-        >
+      <div v-loading.fullscreen.lock="paginationConfig.current_page === 1 && loading"
+        style="max-height: calc(100vh - 120px)">
+        <InfiniteScroll :size="applicationList.length" :total="paginationConfig.total"
+          :page_size="paginationConfig.page_size" v-model:current_page="paginationConfig.current_page" @load="getList"
+          :loading="loading">
           <el-row v-if="applicationList.length > 0" :gutter="15" class="w-full">
             <template v-for="(item, index) in applicationList" :key="index">
-              <el-col
-                v-if="item.resource_type === 'folder'"
-                :xs="24"
-                :sm="12"
-                :md="12"
-                :lg="8"
-                :xl="6"
-                class="mb-16"
-              >
-                <CardBox
-                  :title="item.name"
-                  :description="item.desc || $t('components.noDesc')"
-                  class="cursor"
-                  @click="clickFolder(item)"
-                >
+              <el-col v-if="item.resource_type === 'folder'" :xs="24" :sm="12" :md="12" :lg="8" :xl="6" class="mb-16">
+                <CardBox :title="item.name" :description="item.desc || $t('components.noDesc')" class="cursor"
+                  @click="clickFolder(item)">
                   <template #icon>
                     <el-avatar shape="square" :size="32" style="background: none">
                       <AppIcon iconName="app-folder" style="font-size: 32px"></AppIcon>
@@ -183,12 +119,7 @@
                 </CardBox>
               </el-col>
               <el-col v-else :xs="24" :sm="12" :md="12" :lg="8" :xl="6" class="mb-16">
-                <CardBox
-                  :title="item.name"
-                  :description="item.desc"
-                  class="cursor"
-                  @click="goApp(item)"
-                >
+                <CardBox :title="item.name" :description="item.desc" class="cursor" @click="goApp(item)">
                   <template #icon>
                     <el-avatar shape="square" :size="32" style="background: none">
                       <img :src="resetUrl(item?.icon, resetUrl('./favicon.ico'))" alt="" />
@@ -242,40 +173,33 @@
                               <AppIcon iconName="app-create-chat" class="color-secondary"></AppIcon>
                               {{ $t('views.application.operation.toChat') }}
                             </el-dropdown-item>
-                            <el-dropdown-item
-                              @click.stop="settingApplication(item)"
-                              v-if="permissionPrecise.edit(item.id)"
-                            >
+                            <el-dropdown-item @click.stop="settingApplication(item)"
+                              v-if="permissionPrecise.edit(item.id)">
                               <AppIcon iconName="app-setting" class="color-secondary"></AppIcon>
                               {{ $t('common.setting') }}
                             </el-dropdown-item>
-                            <el-dropdown-item
-                              @click.stop="openMoveToDialog(item)"
-                              v-if="permissionPrecise.edit(item.id) && apiType === 'workspace'"
-                            >
+
+                            <el-dropdown-item @click.stop="openAuthorization(item)"
+                              v-if="permissionPrecise.auth(item.id)">
+                              <AppIcon iconName="app-resource-authorization" class="color-secondary"></AppIcon>
+                              {{ $t('views.system.resourceAuthorization.title') }}
+                            </el-dropdown-item>
+                            <el-dropdown-item @click.stop="openMoveToDialog(item)"
+                              v-if="permissionPrecise.edit(item.id) && apiType === 'workspace'">
                               <AppIcon iconName="app-migrate" class="color-secondary"></AppIcon>
                               {{ $t('common.moveTo') }}
                             </el-dropdown-item>
-                            <el-dropdown-item
-                              @click="copyApplication(item)"
-                              v-if="permissionPrecise.create()"
-                            >
+                            <el-dropdown-item @click="copyApplication(item)" v-if="permissionPrecise.create()">
                               <AppIcon iconName="app-copy" class="color-secondary"></AppIcon>
                               {{ $t('common.copy') }}
                             </el-dropdown-item>
-                            <el-dropdown-item
-                              divided
-                              @click.stop="exportApplication(item)"
-                              v-if="permissionPrecise.export(item.id)"
-                            >
+                            <el-dropdown-item divided @click.stop="exportApplication(item)"
+                              v-if="permissionPrecise.export(item.id)">
                               <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
                               {{ $t('common.export') }}
                             </el-dropdown-item>
-                            <el-dropdown-item
-                              divided
-                              @click.stop="deleteApplication(item)"
-                              v-if="permissionPrecise.delete(item.id)"
-                            >
+                            <el-dropdown-item divided @click.stop="deleteApplication(item)"
+                              v-if="permissionPrecise.delete(item.id)">
                               <AppIcon iconName="app-delete" class="color-secondary"></AppIcon>
                               {{ $t('common.delete') }}
                             </el-dropdown-item>
@@ -295,12 +219,9 @@
     <CreateApplicationDialog ref="CreateApplicationDialogRef" />
     <CopyApplicationDialog ref="CopyApplicationDialogRef" />
     <CreateFolderDialog ref="CreateFolderDialogRef" @refresh="refreshFolder" />
-    <MoveToDialog
-      ref="MoveToDialogRef"
-      :source="SourceTypeEnum.APPLICATION"
-      @refresh="refreshApplicationList"
-      v-if="apiType === 'workspace'"
-    />
+    <MoveToDialog ref="MoveToDialogRef" :source="SourceTypeEnum.APPLICATION" @refresh="refreshApplicationList"
+      v-if="apiType === 'workspace'" />
+    <ResourceAuthorizationDrawer :type="SourceTypeEnum.APPLICATION" ref="ResourceAuthorizationDrawerRef" />
   </LayoutContainer>
 </template>
 
@@ -310,6 +231,7 @@ import CreateApplicationDialog from '@/views/application/component/CreateApplica
 import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
 import CopyApplicationDialog from '@/views/application/component/CopyApplicationDialog.vue'
 import MoveToDialog from '@/components/folder-tree/MoveToDialog.vue'
+import ResourceAuthorizationDrawer from '@/components/resource-authorization-drawer/index.vue'
 import ApplicationApi from '@/api/application/application'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import useStore from '@/stores'
@@ -318,7 +240,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { isWorkFlow } from '@/utils/application'
 import { resetUrl } from '@/utils/common'
 import { dateFormat } from '@/utils/time'
-import { SourceTypeEnum, ValidType, ValidCount } from '@/enums/common'
+import { SourceTypeEnum } from '@/enums/common'
 import permissionMap from '@/permission'
 import WorkspaceApi from '@/api/workspace/workspace'
 import { hasPermission } from '@/utils/permission'
@@ -357,6 +279,11 @@ const paginationConfig = reactive({
 const folderList = ref<any[]>([])
 const applicationList = ref<any[]>([])
 const CopyApplicationDialogRef = ref()
+
+const ResourceAuthorizationDrawerRef = ref()
+function openAuthorization(item: any) {
+  ResourceAuthorizationDrawerRef.value.open(item.id)
+}
 
 const MoveToDialogRef = ref()
 
@@ -517,20 +444,20 @@ function toChat(row: any) {
     .map((v: any) => {
       apiInputParams.value = v.properties.api_input_field_list
         ? v.properties.api_input_field_list.map((v: any) => {
-            return {
-              name: v.variable,
-              value: v.default_value,
-            }
-          })
+          return {
+            name: v.variable,
+            value: v.default_value,
+          }
+        })
         : v.properties.input_field_list
           ? v.properties.input_field_list
-              .filter((v: any) => v.assignment_method === 'api_input')
-              .map((v: any) => {
-                return {
-                  name: v.variable,
-                  value: v.default_value,
-                }
-              })
+            .filter((v: any) => v.assignment_method === 'api_input')
+            .map((v: any) => {
+              return {
+                name: v.variable,
+                value: v.default_value,
+              }
+            })
           : []
     })
   const apiParams = mapToUrlParams(apiInputParams.value)
@@ -588,7 +515,7 @@ function deleteApplication(row: any) {
         MsgSuccess(t('common.deleteSuccess'))
       })
     })
-    .catch(() => {})
+    .catch(() => { })
 }
 
 const exportApplication = (application: any) => {

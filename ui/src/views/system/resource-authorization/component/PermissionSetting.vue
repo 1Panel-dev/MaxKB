@@ -178,6 +178,7 @@
 import { ref, onMounted, watch, computed } from 'vue'
 import type { Provider } from '@/api/type/model'
 import { AuthorizationEnum } from '@/enums/system'
+import { SourceTypeEnum } from '@/enums/common'
 import { isAppIcon, resetUrl } from '@/utils/common'
 import { EditionConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
@@ -202,10 +203,10 @@ const radioRole = computed({
     emit('update:isRole', v)
   },
 })
-const isKnowledge = computed(() => props.type === AuthorizationEnum.KNOWLEDGE)
-const isApplication = computed(() => props.type === AuthorizationEnum.APPLICATION)
-const isTool = computed(() => props.type === AuthorizationEnum.TOOL)
-const isModel = computed(() => props.type === AuthorizationEnum.MODEL)
+const isKnowledge = computed(() => props.type === SourceTypeEnum.KNOWLEDGE)
+const isApplication = computed(() => props.type === SourceTypeEnum.APPLICATION)
+const isTool = computed(() => props.type === SourceTypeEnum.TOOL)
+const isModel = computed(() => props.type === SourceTypeEnum.MODEL)
 const defaultExpandKeys = computed(() => (props.data?.length > 0 ? [props.data[0]?.id] : []))
 const dfsPermission = (arr: any = [], Name: string | number, e: boolean, idArr: any[]) => {
   arr.map((item: any) => {

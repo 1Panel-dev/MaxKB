@@ -47,11 +47,10 @@ import { groupBy } from 'lodash'
 import type { knowledgeData } from '@/api/type/knowledge'
 import { t } from '@/locales'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
-import modelResourceApi from '@/api/system-resource-management/model'
 const props = defineProps<{
   data?: {
-    type: Object
-    default: () => {}
+    type: object
+    default: () => null
   }
   apiType: 'systemShare' | 'workspace' | 'systemManage'
 }>()

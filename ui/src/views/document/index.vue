@@ -51,10 +51,11 @@
                   >{{ $t('views.document.generateQuestion.title') }}
                 </el-button>
                 <el-button
-                  @click="openknowledgeDialog()"
+                  @click="openBatchEditDocument"
                   :disabled="multipleSelection.length === 0"
-                  v-if="permissionPrecise.doc_migrate(id)"
-                  >{{ $t('views.document.setting.migration') }}
+                  v-if="permissionPrecise.doc_edit(id)"
+                >
+                  {{ $t('common.setting') }}
                 </el-button>
                 <el-dropdown v-if="MoreFilledPermission0(id)">
                   <el-button class="ml-12 mr-12">
@@ -63,11 +64,11 @@
                   <template #dropdown>
                     <el-dropdown-menu>
                       <el-dropdown-item
-                        @click="openBatchEditDocument"
+                        @click="openknowledgeDialog()"
                         :disabled="multipleSelection.length === 0"
-                        v-if="permissionPrecise.doc_edit(id)"
+                        v-if="permissionPrecise.doc_migrate(id)"
                       >
-                        {{ $t('common.setting') }}
+                        {{ $t('views.document.setting.migration') }}
                       </el-dropdown-item>
                       <el-dropdown-item
                         divided
@@ -434,16 +435,12 @@
                             "
                             @click="cancelTask(row, TaskType.GENERATE_PROBLEM)"
                           >
-                            <AppIcon
-                              iconName="app-generate-question"
-                              class="color-secondary"
-                            ></AppIcon>
+                            <el-icon class="color-secondary"><Close /></el-icon>
                             {{ $t('views.document.setting.cancelGenerateQuestion') }}
                           </el-dropdown-item>
                           <el-dropdown-item
-                            v-else
                             @click="openGenerateDialog(row)"
-                            v-if="permissionPrecise.doc_generate(id)"
+                            v-else-if="permissionPrecise.doc_generate(id)"
                           >
                             <AppIcon
                               iconName="app-generate-question"
@@ -496,18 +493,6 @@
                 <template v-if="knowledgeDetail?.type === 1 || knowledgeDetail?.type === 2">
                   <el-tooltip
                     effect="dark"
-                    :content="$t('views.knowledge.setting.sync')"
-                    placement="top"
-                    v-if="permissionPrecise.sync(id)"
-                  >
-                    <span class="mr-4">
-                      <el-button type="primary" text @click.stop="syncDocument(row)">
-                        <AppIcon iconName="app-sync"></AppIcon>
-                      </el-button>
-                    </span>
-                  </el-tooltip>
-                  <el-tooltip
-                    effect="dark"
                     :content="$t('views.document.setting.cancelVectorization')"
                     placement="top"
                     v-if="
@@ -538,6 +523,18 @@
                       </el-button>
                     </span>
                   </el-tooltip>
+                  <el-tooltip
+                    effect="dark"
+                    :content="$t('common.setting')"
+                    placement="top"
+                    v-if="permissionPrecise.doc_edit(id)"
+                  >
+                    <span class="mr-4">
+                      <el-button type="primary" text @click.stop="settingDoc(row)">
+                        <AppIcon iconName="app-setting"></AppIcon>
+                      </el-button>
+                    </span>
+                  </el-tooltip>
                   <span @click.stop>
                     <el-dropdown trigger="click" v-if="MoreFilledPermission2(id)">
                       <el-button text type="primary">
@@ -546,11 +543,11 @@
                       <template #dropdown>
                         <el-dropdown-menu>
                           <el-dropdown-item
-                            @click="settingDoc(row)"
-                            v-if="permissionPrecise.doc_edit(id)"
+                            @click="syncDocument(row)"
+                            v-if="permissionPrecise.sync(id)"
                           >
-                            <AppIcon iconName="app-setting"></AppIcon>
-                            {{ $t('common.setting') }}</el-dropdown-item
+                            <AppIcon iconName="app-sync" class="color-secondary"></AppIcon>
+                            {{ $t('views.knowledge.setting.sync') }}</el-dropdown-item
                           >
                           <el-dropdown-item
                             v-if="
@@ -561,43 +558,45 @@
                             "
                             @click="cancelTask(row, TaskType.GENERATE_PROBLEM)"
                           >
-                            <AppIcon iconName="app-generate-question"></AppIcon>
+                            <el-icon class="color-secondary"><Close /></el-icon>
                             {{ $t('views.document.setting.cancelGenerateQuestion') }}
                           </el-dropdown-item>
                           <el-dropdown-item
-                            v-else
                             @click="openGenerateDialog(row)"
-                            v-if="permissionPrecise.doc_generate(id)"
+                            v-else-if="permissionPrecise.doc_generate(id)"
                           >
-                            <AppIcon iconName="app-generate-question"></AppIcon>
+                            <AppIcon
+                              iconName="app-generate-question"
+                              class="color-secondary"
+                            ></AppIcon>
                             {{ $t('views.document.generateQuestion.title') }}
                           </el-dropdown-item>
                           <el-dropdown-item
                             @click="openknowledgeDialog(row)"
                             v-if="permissionPrecise.doc_migrate(id)"
                           >
-                            <AppIcon iconName="app-migrate"></AppIcon>
+                            <AppIcon iconName="app-migrate" class="color-secondary"></AppIcon>
                             {{ $t('views.document.setting.migration') }}
                           </el-dropdown-item>
                           <el-dropdown-item
                             @click="exportDocument(row)"
                             v-if="permissionPrecise.doc_export(id)"
                           >
-                            <AppIcon iconName="app-export"></AppIcon>
+                            <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
                             {{ $t('views.document.setting.export') }} Excel
                           </el-dropdown-item>
                           <el-dropdown-item
                             @click="exportDocumentZip(row)"
                             v-if="permissionPrecise.doc_export(id)"
                           >
-                            <AppIcon iconName="app-export"></AppIcon>
+                            <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
                             {{ $t('views.document.setting.export') }} Zip
                           </el-dropdown-item>
                           <el-dropdown-item
                             @click.stop="deleteDocument(row)"
                             v-if="permissionPrecise.doc_delete(id)"
                           >
-                            <AppIcon iconName="app-delete"></AppIcon>
+                            <AppIcon iconName="app-delete" class="color-secondary"></AppIcon>
                             {{ $t('common.delete') }}
                           </el-dropdown-item>
                         </el-dropdown-menu>
@@ -712,7 +711,7 @@ const permissionPrecise = computed(() => {
 
 const MoreFilledPermission0 = (id: string) => {
   return (
-    permissionPrecise.value.doc_edit(id) ||
+    permissionPrecise.value.doc_migrate(id) ||
     (knowledgeDetail?.value.type === 1 && permissionPrecise.value.doc_sync(id)) ||
     (knowledgeDetail?.value.type === 2 && permissionPrecise.value.doc_sync(id)) ||
     permissionPrecise.value.doc_delete(id)
@@ -731,7 +730,7 @@ const MoreFilledPermission1 = (id: string) => {
 
 const MoreFilledPermission2 = (id: string) => {
   return (
-    permissionPrecise.value.doc_edit(id) ||
+    permissionPrecise.value.sync(id) ||
     permissionPrecise.value.doc_generate(id) ||
     permissionPrecise.value.doc_migrate(id) ||
     permissionPrecise.value.doc_export(id) ||

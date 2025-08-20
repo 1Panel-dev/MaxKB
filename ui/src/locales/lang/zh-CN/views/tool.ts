@@ -1,9 +1,13 @@
 export default {
   title: '工具',
+  all: '全部',
   createTool: '创建工具',
   editTool: '编辑工具',
+  createMcpTool: '创建MCP',
+  editMcpTool: '编辑MCP',
   copyTool: '复制工具',
   importTool: '导入工具',
+  settingTool: '设置工具',
   toolStore: {
     title: '工具商店',
     createFromToolStore: '从工具商店创建',
@@ -59,6 +63,13 @@ export default {
       code: '工具内容（Python）',
       selectPlaceholder: '请选择参数',
       inputPlaceholder: '请输入参数值',
+    },
+    mcp: {
+      title: 'MCP 服务',
+      label: 'MCP Server Config',
+      placeholder: '请输入MCP Server配置',
+      tip: '仅支持SSE、Streamable HTTP调用方式',
+      requiredMessage: '请输入 MCP Server Config',
     },
     debug: {
       run: '运行',

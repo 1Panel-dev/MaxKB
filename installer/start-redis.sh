@@ -1,11 +1,17 @@
 #!/bin/bash
 
-mkdir -p /opt/maxkb/data/redis
-mkdir -p /opt/maxkb/logs
-
+if [ ! -d /opt/maxkb/data/redis ]; then
+    mkdir -p /opt/maxkb/data/redis
+    chmod 700 /opt/maxkb/data/redis
+fi
+if [ ! -d /opt/maxkb/logs ]; then
+    mkdir -p /opt/maxkb/logs
+    chmod 700 /opt/maxkb/logs
+fi
 if [ ! -f /opt/maxkb/conf/redis.conf ]; then
   mkdir -p /opt/maxkb/conf
   touch /opt/maxkb/conf/redis.conf
+  chmod 700 /opt/maxkb/conf/redis.conf
   cat <<EOF > /opt/maxkb/conf/redis.conf
 bind 0.0.0.0
 port 6379

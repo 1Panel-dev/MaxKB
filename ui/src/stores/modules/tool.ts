@@ -8,10 +8,14 @@ import useFolderStore from './folder'
 const useToolStore = defineStore('tool', {
   state: () => ({
     toolList: [] as any[],
+    tool_type: '' as string,
   }),
   actions: {
     setToolList(list: any[]) {
       this.toolList = list
+    },
+    setToolType(type: string) {
+      this.tool_type = type
     },
   },
 })
