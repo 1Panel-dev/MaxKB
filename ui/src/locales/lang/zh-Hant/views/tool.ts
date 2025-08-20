@@ -3,8 +3,11 @@ export default {
   all: '全部',
   createTool: '建立工具',
   editTool: '編輯工具',
+  createMcpTool: '建立MCP',
+  editMcpTool: '編輯MCP',
   copyTool: '複製工具',
   importTool: '匯入工具',
+  settingTool: '設定工具',
   toolStore: {
     title: '工具商店',
     createFromToolStore: '從工具商店創建',

@@ -21,6 +21,9 @@
     border: 0 !important;
     max-width: 360px !important;
   }
+  ul {
+    list-style: circle;
+  }
 }
 
 @media only screen and (max-width: 768px) {
