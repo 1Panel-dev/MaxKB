@@ -53,6 +53,28 @@ def remove_fragment(url: str) -> str:
     return urlunparse(modified_url)
 
 
+def remove_last_path_robust(url):
+    """健壮地删除URL的最后一个路径部分"""
+    parsed = urlparse(url)
+
+    # 分割路径并过滤空字符串
+    paths = [p for p in parsed.path.split('/') if p]
+
+    if paths:
+        paths.pop()  # 移除最后一个路径
+
+    # 重建路径
+    new_path = '/' + '/'.join(paths) if paths else '/'
+
+    # 重建URL
+    return urlunparse((
+        parsed.scheme,
+        parsed.netloc,
+        new_path,
+        parsed.params,
+        parsed.query,
+        parsed.fragment
+    ))
 class Fork:
     class Response:
         def __init__(self, content: str, child_link_list: List[ChildLink], status, message: str):
@@ -72,7 +94,7 @@ class Fork:
     def __init__(self, base_fork_url: str, selector_list: List[str]):
         base_fork_url = remove_fragment(base_fork_url)
         if any([True for end_str in ['index.html', '.htm', '.html'] if base_fork_url.endswith(end_str)]):
-            self.base_fork_url = str(Path(base_fork_url).parent)
+            base_fork_url =remove_last_path_robust(base_fork_url)
         self.base_fork_url = urljoin(base_fork_url if base_fork_url.endswith("/") else base_fork_url + '/', '.')
         parsed = urlsplit(base_fork_url)
         query = parsed.query
@@ -190,4 +212,4 @@ class Fork:
 def handler(base_url, response: Fork.Response):
     print(base_url.url, base_url.tag.text if base_url.tag else None, response.content)
 
-# ForkManage('https://bbs.fit2cloud.com/c/de/6', ['.md-content']).fork(3, set(), handler)
+# ForkManage('https://hzqcgc.htc.edu.cn/jxky.htm', ['.md-content']).fork(3, set(), handler)
