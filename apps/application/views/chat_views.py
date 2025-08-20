@@ -244,7 +244,7 @@ class ChatView(APIView):
                                  responses=result.get_default_response(),
                                  tags=[_("Application/Conversation Log")])
             @has_permissions(ViewPermission(
-                [RoleConstants.APPLICATION_ACCESS_TOKEN],
+                [RoleConstants.APPLICATION_ACCESS_TOKEN, RoleConstants.ADMIN, RoleConstants.USER],
                 [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
                                                 dynamic_tag=keywords.get('application_id'))],
                 compare=CompareConstants.AND),
