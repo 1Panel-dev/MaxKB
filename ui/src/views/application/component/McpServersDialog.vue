@@ -17,7 +17,7 @@
       @submit.prevent
     >
       <el-form-item>
-        <el-radio-group v-model="form.mcp_source">
+        <el-radio-group v-model="form.mcp_source" @change="mcpSourceChange">
           <el-radio value="referencing">
             {{ $t('views.applicationWorkflow.nodes.mcpNode.reference') }}
           </el-radio>
@@ -100,17 +100,8 @@ import { computed, inject, onMounted, ref, watch } from 'vue'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api.ts'
 import { useRoute } from 'vue-router'
 
-const getApplicationDetail = inject('getApplicationDetail') as any
-const applicationDetail = getApplicationDetail()
 const emit = defineEmits(['refresh'])
-const route = useRoute()
-const apiType = computed(() => {
-  if (route.path.includes('resource-management')) {
-    return 'systemManage'
-  } else {
-    return 'workspace'
-  }
-})
+
 const paramFormRef = ref()
 
 const mcpServerJson = `{
@@ -143,32 +134,20 @@ watch(dialogVisible, (bool) => {
   }
 })
 
-function getMcpToolSelectOptions() {
-  const obj =
-    apiType.value === 'systemManage'
-      ? {
-          scope: 'WORKSPACE',
-          tool_type: 'MCP',
-          workspace_id: applicationDetail.value?.workspace_id,
-        }
-      : {
-          scope: 'WORKSPACE',
-          tool_type: 'MCP',
-        }
-
-  loadSharedApi({ type: 'tool', systemType: apiType.value })
-    .getAllToolList(obj, loading)
-    .then((res: any) => {
-      mcpToolSelectOptions.value = [...res.data.shared_tools, ...res.data.tools].filter(
-        (item: any) => item.is_active,
-      )
-    })
+function mcpSourceChange() {
+  if (form.value.mcp_source === 'referencing') {
+    form.value.mcp_servers = ''
+  } else {
+    form.value.mcp_tool_id = ''
+  }
 }
 
-const open = (data: any) => {
+
+const open = (data: any, selectOptions: any) => {
   form.value = { ...form.value, ...data }
   form.value.mcp_source = data.mcp_source || 'referencing'
   dialogVisible.value = true
+  mcpToolSelectOptions.value = selectOptions || []
 }
 
 const submit = () => {
@@ -179,10 +158,6 @@ const submit = () => {
     }
   })
 }
-
-onMounted(() => {
-  getMcpToolSelectOptions()
-})
 
 defineExpose({ open })
 </script>
