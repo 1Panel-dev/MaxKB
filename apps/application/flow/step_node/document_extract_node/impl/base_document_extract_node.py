@@ -66,7 +66,7 @@ class BaseDocumentExtractNode(IDocumentExtractNode):
 
         for doc in document:
             file = QuerySet(File).filter(id=doc['file_id']).first()
-            buffer = io.BytesIO(file.get_byte().tobytes())
+            buffer = io.BytesIO(file.get_byte())
             buffer.name = doc['name']  # this is the important line
 
             for split_handle in (parse_table_handle_list + split_handles):
