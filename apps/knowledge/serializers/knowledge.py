@@ -123,6 +123,7 @@ class KnowledgeSerializer(serializers.Serializer):
             return workspace_user_role_mapping_model is not None and role_permission_mapping_model is not None
 
         def get_query_set(self, workspace_manage, is_x_pack_ee):
+            self.is_valid(raise_exception=True)
             workspace_id = self.data.get("workspace_id")
             query_set_dict = {}
             query_set = QuerySet(model=get_dynamics_model({
@@ -171,7 +172,6 @@ class KnowledgeSerializer(serializers.Serializer):
 
         def page(self, current_page: int, page_size: int):
             self.is_valid(raise_exception=True)
-
             folder_id = self.data.get('folder_id', self.data.get("workspace_id"))
             root = KnowledgeFolder.objects.filter(id=folder_id).first()
             if not root:

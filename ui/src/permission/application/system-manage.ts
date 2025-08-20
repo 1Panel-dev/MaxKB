@@ -29,6 +29,14 @@ const systemManage = {
             ],
             'OR'
     ),
+    debug: () =>
+        hasPermission(
+            [
+              RoleConst.ADMIN,
+              PermissionConst.RESOURCE_APPLICATION_DEBUG
+            ],
+            'OR'
+    ),
     folderDelete: () => false,
     overview_embed: () =>
         hasPermission(

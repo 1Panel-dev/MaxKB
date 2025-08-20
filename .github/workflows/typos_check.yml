@@ -1,8 +1,7 @@
 name: Typos Check
 on:
+  workflow_dispatch:
   push:
-    branches:
-      - main
   pull_request:
     types: [opened, synchronize, reopened]
 
@@ -12,7 +11,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Actions Repository
-      uses: actions/checkout@v2
-
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.ref_name }}
+    - name: Create config file
+      run: |
+        cat <<EOF > typo-check-config.toml
+        [files]
+        extend-exclude = [
+          "**/*_svg",
+          "**/migrations/**"
+        ]
+        EOF
     - name: Check spelling
       uses: crate-ci/typos@master
+      with:
+        config: ./typo-check-config.toml

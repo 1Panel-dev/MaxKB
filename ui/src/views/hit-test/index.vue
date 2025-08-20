@@ -98,11 +98,12 @@
       <el-popover :visible="popoverVisible" placement="right-end" :width="500" trigger="click">
         <template #reference>
           <el-button
-            icon="Setting"
             class="mb-8"
             @click="settingChange('open')"
             v-if="!route.path.includes('share/')"
-            >{{ $t('common.paramSetting') }}</el-button
+          >
+            <AppIcon iconName="app-setting"></AppIcon>
+            {{ $t('common.paramSetting') }}</el-button
           >
         </template>
         <div class="mb-16">

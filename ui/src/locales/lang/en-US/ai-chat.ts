@@ -67,6 +67,7 @@ export default {
     limitMessage2: 'files',
     sizeLimit: 'Each file must not exceed',
     imageMessage: 'Please process the image content',
+    fileMessage: 'Please process the file content',
     errorMessage: 'Upload Failed',
   },
   executionDetails: {

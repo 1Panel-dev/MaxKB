@@ -28,6 +28,8 @@
               <el-option :label="$t('common.creator')" value="create_user" />
 
               <el-option :label="$t('common.name')" value="name" />
+
+              <el-option :label="$t('common.publishStatus')" value="publish_status" />
             </el-select>
             <el-input
               v-if="search_type === 'name'"
@@ -46,6 +48,17 @@
               style="width: 220px"
             >
               <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.nick_name" />
+            </el-select>
+            <el-select
+              v-else-if="search_type === 'publish_status'"
+              v-model="search_form.publish_status"
+              @change="searchHandle"
+              filterable
+              clearable
+              style="width: 220px"
+            >
+              <el-option :label="$t('common.published')" value="published" />
+              <el-option :label="$t('common.unpublished')" value="unpublished" />
             </el-select>
           </div>
           <el-dropdown trigger="click" v-if="permissionPrecise.create()">
@@ -206,9 +219,8 @@
                         {{ $t('views.application.status.published') }}
                       </span>
                       <el-divider direction="vertical" />
-                      <el-icon class="mr-8">
-                        <Clock />
-                      </el-icon>
+                      <AppIcon iconName="app-clock" class="color-secondary mr-8"></AppIcon>
+
                       <span class="color-secondary">{{ dateFormat(item.update_time) }}</span>
                     </div>
                     <div v-else class="flex align-center">
@@ -227,30 +239,28 @@
                         <template #dropdown>
                           <el-dropdown-menu>
                             <el-dropdown-item @click.stop="toChat(item)">
-                              <AppIcon iconName="app-create-chat"></AppIcon>
+                              <AppIcon iconName="app-create-chat" class="color-secondary"></AppIcon>
                               {{ $t('views.application.operation.toChat') }}
                             </el-dropdown-item>
                             <el-dropdown-item
                               @click.stop="settingApplication(item)"
                               v-if="permissionPrecise.edit(item.id)"
                             >
-                              <el-icon>
-                                <Setting />
-                              </el-icon>
+                              <AppIcon iconName="app-setting" class="color-secondary"></AppIcon>
                               {{ $t('common.setting') }}
                             </el-dropdown-item>
                             <el-dropdown-item
                               @click.stop="openMoveToDialog(item)"
                               v-if="permissionPrecise.edit(item.id) && apiType === 'workspace'"
                             >
-                              <AppIcon iconName="app-migrate"></AppIcon>
+                              <AppIcon iconName="app-migrate" class="color-secondary"></AppIcon>
                               {{ $t('common.moveTo') }}
                             </el-dropdown-item>
                             <el-dropdown-item
                               @click="copyApplication(item)"
                               v-if="permissionPrecise.create()"
                             >
-                              <AppIcon iconName="app-copy"></AppIcon>
+                              <AppIcon iconName="app-copy" class="color-secondary"></AppIcon>
                               {{ $t('common.copy') }}
                             </el-dropdown-item>
                             <el-dropdown-item
@@ -258,7 +268,7 @@
                               @click.stop="exportApplication(item)"
                               v-if="permissionPrecise.export(item.id)"
                             >
-                              <AppIcon iconName="app-export"></AppIcon>
+                              <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
                               {{ $t('common.export') }}
                             </el-dropdown-item>
                             <el-dropdown-item
@@ -266,7 +276,7 @@
                               @click.stop="deleteApplication(item)"
                               v-if="permissionPrecise.delete(item.id)"
                             >
-                              <AppIcon iconName="app-delete"></AppIcon>
+                              <AppIcon iconName="app-delete" class="color-secondary"></AppIcon>
                               {{ $t('common.delete') }}
                             </el-dropdown-item>
                           </el-dropdown-menu>
@@ -333,6 +343,7 @@ const search_type = ref('name')
 const search_form = ref<any>({
   name: '',
   create_user: '',
+  publish_status: undefined,
 })
 
 const user_options = ref<any[]>([])

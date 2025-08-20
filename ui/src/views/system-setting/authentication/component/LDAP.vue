@@ -65,7 +65,7 @@
           </el-form-item>
         </el-form>
 
-        <div class="text-right">
+        <div>
           <el-button @click="submit(authFormRef, 'test')" :disabled="loading">
             {{ $t('views.system.test') }}</el-button
           >

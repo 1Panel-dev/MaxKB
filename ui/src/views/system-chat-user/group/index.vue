@@ -78,7 +78,7 @@
                                 class="p-8"
                                 v-if="editPermission()"
                               >
-                                <AppIcon iconName="app-edit"></AppIcon>
+                                <AppIcon iconName="app-edit" class="color-secondary"></AppIcon>
                                 {{ $t('common.rename') }}
                               </el-dropdown-item>
                               <el-dropdown-item
@@ -86,7 +86,7 @@
                                 class="border-t p-8"
                                 v-if="dlePermission()"
                               >
-                                <AppIcon iconName="app-delete"></AppIcon>
+                                <AppIcon iconName="app-delete" class="color-secondary"></AppIcon>
                                 {{ $t('common.delete') }}
                               </el-dropdown-item>
                             </el-dropdown-menu>
@@ -163,6 +163,7 @@
                   :label="$t('views.userManage.userForm.nick_name.label')"
                   value="nick_name"
                 />
+                <el-option :label="$t('views.userManage.source.label')" value="source" />
               </el-select>
               <el-input
                 v-if="searchType === 'username'"
@@ -180,6 +181,23 @@
                 style="width: 220px"
                 clearable
               />
+              <el-select
+                v-else-if="searchType === 'source'"
+                v-model="searchForm.source"
+                @change="getList"
+                style="width: 220px"
+                clearable
+                :placeholder="$t('common.inputPlaceholder')"
+              >
+                <el-option :label="$t('views.userManage.source.local')" value="LOCAL" />
+                <el-option label="CAS" value="CAS" />
+                <el-option label="LDAP" value="LDAP" />
+                <el-option label="OIDC" value="OIDC" />
+                <el-option label="OAuth2" value="OAuth2" />
+                <el-option :label="$t('views.userManage.source.wecom')" value="wecom" />
+                <el-option :label="$t('views.userManage.source.lark')" value="lark" />
+                <el-option :label="$t('views.userManage.source.dingtalk')" value="dingtalk" />
+              </el-select>
             </div>
           </div>
 
@@ -366,6 +384,7 @@ const searchType = ref('username')
 const searchForm = ref<Record<string, any>>({
   username: '',
   nick_name: '',
+  source: '',
 })
 const paginationConfig = reactive({
   current_page: 1,

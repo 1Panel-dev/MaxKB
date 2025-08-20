@@ -662,6 +662,7 @@ class DocumentSerializers(serializers.Serializer):
 
         @transaction.atomic
         def delete(self):
+            self.is_valid(raise_exception=True)
             document_id = self.data.get("document_id")
             source_file_ids = [
                 doc['meta'].get(

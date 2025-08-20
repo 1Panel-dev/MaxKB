@@ -59,13 +59,19 @@ def valid_reference_value(_type, value, name):
 
 
 def convert_value(name: str, value, _type, is_required, source, node):
-    if not is_required and (value is None or (isinstance(value, str) and len(value) == 0)):
+    if not is_required and (value is None or ((isinstance(value, str) or isinstance(value, list)) and len(value) == 0)):
         return None
     if source == 'reference':
         value = node.workflow_manage.get_reference_field(
             value[0],
             value[1:])
-
+        if value is None:
+            if not is_required:
+                return None
+            else:
+                raise Exception(_(
+                    'Field: {name} Type: {_type} is required'
+                ).format(name=name, _type=_type))
         value = valid_reference_value(_type, value, name)
         if _type == 'int':
             return int(value)
@@ -81,15 +87,17 @@ def convert_value(name: str, value, _type, is_required, source, node):
             v = json.loads(value)
             if isinstance(v, dict):
                 return v
-            raise Exception("类型错误")
+            raise Exception(_('type error'))
         if _type == 'array':
             v = json.loads(value)
             if isinstance(v, list):
                 return v
-            raise Exception("类型错误")
+            raise Exception(_('type error'))
         return value
     except Exception as e:
-        raise Exception(f'字段:{name}类型:{_type}值:{value}类型错误')
+        raise Exception(
+            _('Field: {name} Type: {_type} Value: {value} Type error').format(name=name, _type=_type,
+                                                                              value=value))
 
 
 class BaseToolNodeNode(IToolNode):

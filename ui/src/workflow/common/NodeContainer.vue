@@ -244,9 +244,9 @@ const editName = async (formEl: FormInstance | undefined) => {
   await formEl.validate((valid) => {
     if (valid) {
       if (
-        !props.nodeModel.graphModel.nodes?.some(
-          (node: any) => node.properties.stepName === form.value.title,
-        )
+        !props.nodeModel.graphModel.nodes
+          .filter((node: any) => node.id !== props.nodeModel.id)
+          ?.some((node: any) => node.properties.stepName === form.value.title)
       ) {
         set(props.nodeModel.properties, 'stepName', form.value.title)
         nodeNameDialogVisible.value = false

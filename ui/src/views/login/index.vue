@@ -192,7 +192,6 @@ const loginHandle = () => {
           .asyncLdapLogin(loginForm.value)
           .then(() => {
             locale.value = localStorage.getItem('MaxKB-locale') || getBrowserLang() || 'en-US'
-            loading.value = false
             router.push({ name: 'home' })
           })
           .catch(() => {
@@ -204,7 +203,6 @@ const loginHandle = () => {
           .then(() => {
             locale.value = localStorage.getItem('MaxKB-locale') || getBrowserLang() || 'en-US'
             localStorage.setItem('workspace_id', 'default')
-            loading.value = false
             router.push({ name: 'home' })
           })
           .catch(() => {

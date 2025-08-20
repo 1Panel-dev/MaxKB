@@ -142,14 +142,15 @@ const step_rules = [
   {
     required: true,
     validator: (rule: any, value: any, callback: any) => {
-      if (!value) {
-        callback(new Error(t('dynamicsForm.Slider.step.requiredMessage1')))
-        return false
-      }
       if (value === 0) {
         callback(new Error(t('dynamicsForm.Slider.step.requiredMessage2')))
         return false
       }
+      if (!value) {
+        callback(new Error(t('dynamicsForm.Slider.step.requiredMessage1')))
+        return false
+      }
+
       return true
     },
     trigger: 'blur',

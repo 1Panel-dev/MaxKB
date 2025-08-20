@@ -602,7 +602,10 @@ class WorkflowManage:
         elif node_id == 'chat':
             return INode.get_field(self.chat_context, fields)
         else:
-            return self.get_node_by_id(node_id).get_reference_field(fields)
+            node = self.get_node_by_id(node_id)
+            if node:
+                return node.get_reference_field(fields)
+            return None
 
     def get_workflow_content(self):
         context = {

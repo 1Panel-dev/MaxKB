@@ -35,7 +35,7 @@
                 :disabled="!form_data.tts_model_id"
                 class="mr-4"
               >
-                <el-icon><Setting /></el-icon>
+                <AppIcon iconName="app-setting"></AppIcon>
               </el-button>
             </div>
           </template>

@@ -37,6 +37,7 @@
       <el-col :span="6" class="border-l" style="width: 300px">
         <!-- 关联问题 -->
         <ProblemComponent
+          v-if="permissionPrecise.problem_read(id)"
           :paragraphId="paragraphId"
           :docId="document_id"
           :knowledgeId="id"
@@ -56,12 +57,13 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { ref, watch, nextTick } from 'vue'
+import { ref, watch, nextTick, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { cloneDeep, debounce } from 'lodash'
 import ParagraphForm from '@/views/paragraph/component/ParagraphForm.vue'
 import ProblemComponent from '@/views/paragraph/component/ProblemComponent.vue'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import permissionMap from '@/permission'
 
 const props = defineProps<{
   title: String
@@ -72,6 +74,10 @@ const route = useRoute()
 const {
   params: { id, documentId },
 } = route as any
+
+const permissionPrecise = computed(() => {
+  return permissionMap['knowledge'][props.apiType]
+})
 
 const emit = defineEmits(['refresh'])
 

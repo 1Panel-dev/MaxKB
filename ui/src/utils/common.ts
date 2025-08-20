@@ -1,3 +1,4 @@
+import { nanoid } from 'nanoid'
 /**
  * 数字处理
  */
@@ -41,7 +42,7 @@ export function isFunction(fn: any) {
   随机id
 */
 export const randomId = function () {
-  return Math.floor(Math.random() * 10000) + ''
+  return nanoid()
 }
 
 /*

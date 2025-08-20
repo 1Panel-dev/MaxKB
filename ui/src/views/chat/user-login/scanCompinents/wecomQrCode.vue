@@ -1,5 +1,5 @@
 <template>
-  <div id="wecom-qr" class="wecom-qr" style="margin-left: 50px"></div>
+  <div id="wecom-qr" class="wecom-qr flex"></div>
 </template>
 
 <script lang="ts" setup>
@@ -80,8 +80,10 @@ init()
 </script>
 
 <style scoped lang="scss">
-.wecom-qr {
+#wecom-qr {
   margin-top: -20px;
   height: 331px;
+  justify-content: center;
+
 }
 </style>

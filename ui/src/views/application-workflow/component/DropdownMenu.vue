@@ -157,9 +157,6 @@ const apiType = computed(() => {
 const permissionPrecise = computed(() => {
   return permissionMap['tool'][apiType.value]
 })
-const isShared = computed(() => {
-  return folder.currentFolder.id === 'share'
-})
 
 const loading = ref(false)
 const activeName = ref('base')
@@ -253,6 +250,7 @@ async function getToolFolder() {
 async function getToolList() {
   const res = await loadSharedApi({
     type: 'tool',
+    isShared: folder.currentFolder?.id === 'share',
     systemType: 'workspace',
   }).getToolList({
     folder_id: folder.currentFolder?.id || user.getWorkspaceId(),
@@ -278,7 +276,9 @@ async function getApplicationList() {
   }).getAllApplication({
     folder_id: folder.currentFolder?.id || user.getWorkspaceId(),
   })
-  applicationList.value = res.data.filter((item: any) => item.resource_type === 'application')
+  applicationList.value = res.data.filter(
+    (item: any) => item.resource_type === 'application' && item.id !== props.id && item.is_publish,
+  )
 }
 
 function folderClickHandle(row: any) {

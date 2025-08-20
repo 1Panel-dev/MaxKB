@@ -1,5 +1,5 @@
 <template>
-  <el-tag class="tag-ellipsis flex-between mb-8" effect="plain" v-bind="$attrs">
+  <el-tag class="tag-ellipsis flex-between mb-8 w-full" effect="plain" v-bind="$attrs">
     <slot></slot>
   </el-tag>
 </template>

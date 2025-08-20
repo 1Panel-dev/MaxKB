@@ -72,11 +72,11 @@
                       <template #dropdown>
                         <el-dropdown-menu>
                           <el-dropdown-item @click.stop="editLogTitle(row)">
-                            <AppIcon iconName="app-edit"></AppIcon>
+                            <AppIcon iconName="app-edit" class="color-secondary"></AppIcon>
                             {{ $t('common.edit') }}
                           </el-dropdown-item>
                           <el-dropdown-item @click.stop="deleteChatLog(row)">
-                            <AppIcon iconName="app-delete"></AppIcon>
+                            <AppIcon iconName="app-delete" class="color-secondary"></AppIcon>
                             {{ $t('common.delete') }}
                           </el-dropdown-item>
                         </el-dropdown-menu>
@@ -136,11 +136,11 @@
                   <template #dropdown>
                     <el-dropdown-menu>
                       <el-dropdown-item @click.stop="editLogTitle(row)">
-                        <AppIcon iconName="app-edit"></AppIcon>
+                        <AppIcon iconName="app-edit" class="color-secondary"></AppIcon>
                         {{ $t('common.edit') }}
                       </el-dropdown-item>
                       <el-dropdown-item @click.stop="deleteChatLog(row)">
-                        <AppIcon iconName="app-delete"></AppIcon>
+                        <AppIcon iconName="app-delete" class="color-secondary"></AppIcon>
                         {{ $t('common.delete') }}
                       </el-dropdown-item>
                     </el-dropdown-menu>

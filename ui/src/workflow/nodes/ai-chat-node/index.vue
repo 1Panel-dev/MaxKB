@@ -36,7 +36,7 @@
                 @click="openAIParamSettingDialog(chat_data.model_id)"
                 @refreshForm="refreshParam"
               >
-                <el-icon><Setting /></el-icon>
+                <AppIcon iconName="app-setting"></AppIcon>
               </el-button>
             </div>
           </template>
@@ -117,7 +117,7 @@
         <div class="flex-between mb-16">
           <div class="lighter">{{ $t('views.applicationWorkflow.nodes.mcpNode.tool') }}</div>
           <el-button type="primary" link @click="openMcpServersDialog" @refreshForm="refreshParam">
-            <el-icon><Setting /></el-icon>
+            <AppIcon iconName="app-setting"></AppIcon>
           </el-button>
         </div>
 
@@ -133,7 +133,7 @@
                 @click="openReasoningParamSettingDialog"
                 @refreshForm="refreshParam"
               >
-                <el-icon><Setting /></el-icon>
+                <AppIcon iconName="app-setting"></AppIcon>
               </el-button>
             </div>
           </template>

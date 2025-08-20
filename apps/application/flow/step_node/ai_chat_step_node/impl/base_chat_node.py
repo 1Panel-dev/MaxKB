@@ -33,12 +33,24 @@ tool_message_template = """
         <strong>Called MCP Tool: <em>%s</em></strong>
     </summary>
 
-```json
 %s
-```
+
 </details>
 
 """
+
+tool_message_json_template = """
+```json
+%s
+```
+"""
+
+
+def generate_tool_message_template(name, context):
+    if '```' in context:
+        return tool_message_template % (name, context)
+    else:
+        return tool_message_template % (name, tool_message_json_template % (context))
 
 
 def _write_context(node_variable: Dict, workflow_variable: Dict, node: INode, workflow, answer: str,
@@ -110,7 +122,7 @@ async def _yield_mcp_response(chat_model, message_list, mcp_servers):
     response = agent.astream({"messages": message_list}, stream_mode='messages')
     async for chunk in response:
         if isinstance(chunk[0], ToolMessage):
-            content = tool_message_template % (chunk[0].name, chunk[0].content)
+            content = generate_tool_message_template(chunk[0].name, chunk[0].content)
             chunk[0].content = content
             yield chunk[0]
         if isinstance(chunk[0], AIMessageChunk):

@@ -88,7 +88,7 @@
                                 class="p-8"
                                 v-if="editPermission()"
                               >
-                                <AppIcon iconName="app-edit"></AppIcon>
+                                <AppIcon iconName="app-edit" class="color-secondary"></AppIcon>
                                 {{ $t('common.rename') }}
                               </el-dropdown-item>
                               <el-dropdown-item
@@ -96,7 +96,7 @@
                                 class="border-t p-8"
                                 v-if="delPermission()"
                               >
-                                <AppIcon iconName="app-delete"></AppIcon>
+                                <AppIcon iconName="app-delete" class="color-secondary"></AppIcon>
                                 {{ $t('common.delete') }}
                               </el-dropdown-item>
                             </el-dropdown-menu>

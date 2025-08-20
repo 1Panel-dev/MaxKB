@@ -209,7 +209,7 @@
       :close-on-click-modal="false"
       :close-on-press-escape="false"
     >
-      <SelectKnowledgeDocument ref="SelectKnowledgeDocumentRef" :apiType="apiType" />
+      <SelectKnowledgeDocument ref="SelectKnowledgeDocumentRef" :apiType="apiType" :workspace-id="detail.workspace_id"/>
       <template #footer>
         <span class="dialog-footer">
           <el-button @click.prevent="documentDialogVisible = false">

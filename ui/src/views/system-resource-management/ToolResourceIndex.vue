@@ -72,7 +72,9 @@
 
         <el-table-column prop="tool_type" :label="$t('views.system.resource_management.type')">
           <template #default="scope">
-            {{ $t(ToolType[scope.row.tool_type as keyof typeof ToolType]) }}
+            {{
+              $t(ToolType[scope.row.template_id ? 'INTERNAL' : ('CUSTOM' as keyof typeof ToolType)])
+            }}
           </template>
         </el-table-column>
         <el-table-column :label="$t('common.status.label')" width="120">
@@ -117,21 +119,28 @@
                   </el-button>
                 </template>
                 <div class="filter">
-                  <div class="form-item mb-16">
+                  <div class="form-item mb-16 ml-4">
                     <div @click.stop>
-                      <el-scrollbar height="300" style="margin: 0 0 0 10px">
+                      <el-input
+                        v-model="filterText"
+                        :placeholder="$t('common.search')"
+                        prefix-icon="Search"
+                        clearable
+                      />
+                      <el-scrollbar height="300" v-if="filterData.length">
                         <el-checkbox-group
                           v-model="workspaceArr"
                           style="display: flex; flex-direction: column"
                         >
                           <el-checkbox
-                            v-for="item in workspaceOptions"
+                            v-for="item in filterData"
                             :key="item.value"
                             :label="item.label"
                             :value="item.value"
                           />
                         </el-checkbox-group>
                       </el-scrollbar>
+                      <el-empty v-else :description="$t('common.noData')" />
                     </div>
                   </div>
                 </div>
@@ -233,7 +242,7 @@
                     v-if="row.init_field_list?.length > 0 && permissionPrecise.edit()"
                     @click.stop="configInitParams(row)"
                   >
-                    <AppIcon iconName="app-operation" class="mr-4"></AppIcon>
+                    <AppIcon iconName="app-operation" class="color-secondary"></AppIcon>
                     {{ $t('common.param.initParam') }}
                   </el-dropdown-item>
 
@@ -241,7 +250,7 @@
                     v-if="!row.template_id && permissionPrecise.export()"
                     @click.stop="exportTool(row)"
                   >
-                    <AppIcon iconName="app-export"></AppIcon>
+                    <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
                     {{ $t('common.export') }}
                   </el-dropdown-item>
                   <el-dropdown-item
@@ -249,7 +258,7 @@
                     divided
                     @click.stop="deleteTool(row)"
                   >
-                    <AppIcon iconName="app-delete"></AppIcon>
+                    <AppIcon iconName="app-delete" class="color-secondary"></AppIcon>
                     {{ $t('common.delete') }}
                   </el-dropdown-item>
                 </el-dropdown-menu>
@@ -267,7 +276,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, reactive, computed } from 'vue'
+import { onMounted, ref, reactive, computed, watch } from 'vue'
 import { cloneDeep } from 'lodash'
 import InitParamDrawer from '@/views/tool/component/InitParamDrawer.vue'
 import ToolResourceApi from '@/api/system-resource-management/tool'
@@ -441,6 +450,22 @@ async function changeState(row: any) {
       })
   }
 }
+
+const filterText = ref('')
+const filterData = ref<any[]>([])
+
+watch(
+  [() => workspaceOptions.value, () => filterText.value],
+  () => {
+    if (!filterText.value.length) {
+      filterData.value = workspaceOptions.value
+    }
+    filterData.value = workspaceOptions.value.filter((v: any) =>
+      v.label.toLowerCase().includes(filterText.value.toLowerCase()),
+    )
+  },
+  { immediate: true },
+)
 
 function filterWorkspaceChange(val: string) {
   if (val === 'clear') {

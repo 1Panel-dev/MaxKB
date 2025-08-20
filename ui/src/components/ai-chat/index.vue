@@ -1,90 +1,43 @@
 <template>
-  <div
-    ref="aiChatRef"
-    class="ai-chat"
-    :class="type"
-    :style="{
-      height: firsUserInput ? '100%' : undefined,
-      paddingBottom: applicationDetails.disclaimer ? '20px' : 0,
-    }"
-  >
-    <div
-      v-show="showUserInputContent"
-      :class="firsUserInput ? 'firstUserInput' : 'popperUserInput'"
-    >
-      <UserForm
-        v-model:api_form_data="api_form_data"
-        v-model:form_data="form_data"
-        :application="applicationDetails"
-        :type="type"
-        :first="firsUserInput"
-        @confirm="UserFormConfirm"
-        @cancel="UserFormCancel"
-        ref="userFormRef"
-      ></UserForm>
+  <div ref="aiChatRef" class="ai-chat" :class="type" :style="{
+    height: firsUserInput ? '100%' : undefined,
+    paddingBottom: applicationDetails.disclaimer ? '20px' : 0,
+  }">
+    <div v-show="showUserInputContent" :class="firsUserInput ? 'firstUserInput' : 'popperUserInput'">
+      <UserForm v-model:api_form_data="api_form_data" v-model:form_data="form_data" :application="applicationDetails"
+        :type="type" :first="firsUserInput" @confirm="UserFormConfirm" @cancel="UserFormCancel" ref="userFormRef">
+      </UserForm>
     </div>
     <template v-if="!(isUserInput || isAPIInput) || !firsUserInput || type === 'log'">
       <el-scrollbar ref="scrollDiv" @scroll="handleScrollTop">
         <div ref="dialogScrollbar" class="ai-chat__content p-16">
-          <PrologueContent
-            :type="type"
-            :application="applicationDetails"
-            :available="available"
-            :send-message="sendMessage"
-          ></PrologueContent>
+          <PrologueContent :type="type" :application="applicationDetails" :available="available"
+            :send-message="sendMessage"></PrologueContent>
 
           <template v-for="(item, index) in chatList" :key="index">
             <!-- 问题 -->
-            <QuestionContent
-              :type="type"
-              :application="applicationDetails"
-              :chat-record="item"
-            ></QuestionContent>
+            <QuestionContent :type="type" :application="applicationDetails" :chat-record="item"></QuestionContent>
             <!-- 回答 -->
-            <AnswerContent
-              :application="applicationDetails"
-              :loading="loading"
-              v-model:chat-record="chatList[index]"
-              :type="type"
-              :send-message="sendMessage"
-              :chat-management="ChatManagement"
+            <AnswerContent :application="applicationDetails" :loading="loading" v-model:chat-record="chatList[index]"
+              :type="type" :send-message="sendMessage" :chat-management="ChatManagement"
               :executionIsRightPanel="props.executionIsRightPanel"
               @open-execution-detail="emit('openExecutionDetail', chatList[index])"
-              @openParagraph="emit('openParagraph', chatList[index])"
-              @openParagraphDocument="
+              @openParagraph="emit('openParagraph', chatList[index])" @openParagraphDocument="
                 (val: any) => emit('openParagraphDocument', chatList[index], val)
-              "
-            ></AnswerContent>
+              "></AnswerContent>
           </template>
-          <TransitionContent
-            v-if="transcribing"
-            :text="t('chat.transcribing')"
-            :type="type"
-            :application="applicationDetails"
-          ></TransitionContent>
+          <TransitionContent v-if="transcribing" :text="t('chat.transcribing')" :type="type"
+            :application="applicationDetails">
+          </TransitionContent>
         </div>
       </el-scrollbar>
 
-      <ChatInputOperate
-        :app-id="appId"
-        :application-details="applicationDetails"
-        :is-mobile="isMobile"
-        :type="type"
-        :send-message="sendMessage"
-        :open-chat-id="openChatId"
-        :validate="validate"
-        :chat-management="ChatManagement"
-        v-model:chat-id="chartOpenId"
-        v-model:loading="loading"
-        v-model:show-user-input="showUserInput"
-        v-if="type !== 'log'"
-      >
+      <ChatInputOperate :app-id="appId" :application-details="applicationDetails" :is-mobile="isMobile" :type="type"
+        :send-message="sendMessage" :open-chat-id="openChatId" :validate="validate" :chat-management="ChatManagement"
+        v-model:chat-id="chartOpenId" v-model:loading="loading" v-model:show-user-input="showUserInput"
+        v-if="type !== 'log'">
         <template #userInput>
-          <el-button
-            v-if="isUserInput || isAPIInput"
-            class="user-input-button mb-8"
-            @click="toggleUserInput"
-          >
+          <el-button v-if="isUserInput || isAPIInput" class="user-input-button mb-8" @click="toggleUserInput">
             <AppIcon iconName="app-edit" :size="16" class="mr-4"></AppIcon>
             <span class="ellipsis">
               {{ userInputTitle || $t('chat.userInput') }}
@@ -102,6 +55,8 @@ import { type Ref, ref, nextTick, computed, watch, reactive, onMounted, onBefore
 import { useRoute } from 'vue-router'
 import applicationApi from '@/api/application/application'
 import chatAPI from '@/api/chat/chat'
+import SystemResourceManagementApplicationAPI from "@/api/system-resource-management/application.ts"
+import syetrmResourceManagementChatLogApi from '@/api/system-resource-management/chat-log'
 import chatLogApi from '@/api/application/chat-log'
 import { ChatManagement, type chatType } from '@/api/type/application'
 import { randomId } from '@/utils/common'
@@ -329,7 +284,11 @@ const getChatMessageAPI = () => {
 }
 const getOpenChatAPI = () => {
   if (props.type === 'debug-ai-chat') {
-    return applicationApi.open
+    if (route.path.includes('resource-management')) {
+      return SystemResourceManagementApplicationAPI.open
+    } else {
+      return applicationApi.open
+    }
   } else {
     return (a?: string, loading?: Ref<boolean>) => {
       return chatAPI.open(loading)
@@ -337,35 +296,36 @@ const getOpenChatAPI = () => {
   }
 }
 
+const getChatRecordDetailsAPI = (row: any) => {
+  if (row.record_id) {
+    if (props.type === 'debug-ai-chat') {
+      if (route.path.includes('resource-management')) {
+        return syetrmResourceManagementChatLogApi
+          .getChatRecordDetails(id || props.appId, row.chat_id, row.record_id, loading)
+      } else {
+        return chatLogApi
+          .getChatRecordDetails(id || props.appId, row.chat_id, row.record_id, loading)
+      }
+    } else {
+      return chatAPI.getChatRecord(row.chat_id, row.record_id, loading)
+    }
+  }
+  return Promise.reject("404")
+}
 /**
  * 获取对话详情
  * @param row
  */
 function getSourceDetail(row: any) {
-  if (row.record_id) {
-    if (props.type === 'debug-ai-chat') {
-      chatLogApi
-        .getChatRecordDetails(id || props.appId, row.chat_id, row.record_id, loading)
-        .then((res) => {
-          const exclude_keys = ['answer_text', 'id', 'answer_text_list']
-          Object.keys(res.data).forEach((key) => {
-            if (!exclude_keys.includes(key)) {
-              row[key] = res.data[key]
-            }
-          })
-        })
-    } else {
-      chatAPI.getChatRecord(row.chat_id, row.record_id, loading).then((res) => {
-        const exclude_keys = ['answer_text', 'id', 'answer_text_list']
-        Object.keys(res.data).forEach((key) => {
-          if (!exclude_keys.includes(key)) {
-            row[key] = res.data[key]
-          }
-        })
-      })
-    }
-  }
-  return true
+  return getChatRecordDetailsAPI(row).then((res) => {
+    const exclude_keys = ['answer_text', 'id', 'answer_text_list']
+    Object.keys(res.data).forEach((key) => {
+      if (!exclude_keys.includes(key)) {
+        row[key] = res.data[key]
+      }
+    })
+  })
+
 }
 /**
  * 对话
@@ -650,20 +610,24 @@ defineExpose({
 </script>
 <style lang="scss">
 @use './index.scss';
+
 .firstUserInput {
   height: 100%;
   display: flex;
   justify-content: center;
   overflow: auto;
+
   .user-form-container {
     max-width: 70%;
   }
 }
+
 .debug-ai-chat {
   .user-form-container {
     max-width: 100%;
   }
 }
+
 .popperUserInput {
   position: absolute;
   z-index: 999;
@@ -675,10 +639,12 @@ defineExpose({
 
 .video-stop-button {
   box-shadow: 0px 6px 24px 0px rgba(31, 35, 41, 0.08);
+
   &:hover {
     background: #ffffff;
   }
 }
+
 @media only screen and (max-width: 768px) {
   .firstUserInput {
     .user-form-container {

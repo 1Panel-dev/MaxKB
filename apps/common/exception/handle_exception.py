@@ -68,7 +68,10 @@ def find_err_detail(exc_detail):
             _label = get_label(key, exc_detail)
             _value = exc_detail[key]
             if isinstance(_value, list):
-                return f"{_label}:{find_err_detail(_value)}"
+                for v in _value:
+                    r = find_err_detail(ReturnDict({key: v}, serializer=exc_detail.serializer))
+                    if r is not None:
+                        return r
             if isinstance(_value, ErrorDetail):
                 return f"{_label}:{find_err_detail(_value)}"
             if isinstance(_value, dict) and len(_value.keys()) > 0:
@@ -78,7 +81,7 @@ def find_err_detail(exc_detail):
                     return _value
     if isinstance(exc_detail, list):
         for v in exc_detail:
-            r = find_err_detail(v)
+            r = find_err_detail(ReturnDict(v, serializer=exc_detail.serializer.child))
             if r is not None:
                 return r
 

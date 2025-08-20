@@ -230,12 +230,14 @@
               {{ datetimeFormat(row.create_time) }}
             </template>
           </el-table-column>
-          <el-table-column :label="$t('common.operation')" width="110" align="left" fixed="right">
+          <el-table-column :label="$t('common.operation')" width="60" align="left" fixed="right">
             <template #default="{ row }">
               <span class="mr-4">
-                <el-button type="primary" text @click.stop="showDetails(row)" class="text-button">
-                  {{ $t('views.operateLog.table.opt.label') }}
-                </el-button>
+                <el-tooltip effect="dark" :content="$t('views.operateLog.table.opt.label')" placement="top">
+                  <el-button type="primary" text @click.stop="showDetails(row)" class="text-button">
+                    <AppIcon iconName="app-operate-log"></AppIcon>
+                  </el-button>
+                </el-tooltip>
               </span>
             </template>
           </el-table-column>

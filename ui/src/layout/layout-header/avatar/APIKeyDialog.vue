@@ -49,7 +49,7 @@
           <span class="mr-4">
             <el-tooltip effect="dark" :content="$t('common.setting')" placement="top">
               <el-button type="primary" text @click.stop="settingApiKey(row)">
-                <el-icon><Setting /></el-icon>
+                 <AppIcon iconName="app-setting"></AppIcon>
               </el-button>
             </el-tooltip>
           </span>

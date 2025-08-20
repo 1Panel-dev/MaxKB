@@ -4,6 +4,9 @@ export default {
   createSuccess: '创建成功',
   copy: '复制',
   copySuccess: '复制成功',
+  publishStatus: '发布状态',
+  published: '已发布',
+  unpublished: '未发布',
   copyError: '复制失败',
   save: '保存',
   saveSuccess: '保存成功',
@@ -97,7 +100,7 @@ export default {
   notFound: {
     title: '404',
     NoService: '暂时无法访问服务',
-    NoPermission:'当前用户暂无权限访问，请联系管理员',
+    NoPermission: '当前用户暂无权限访问，请联系管理员',
     operate: '返回首页',
   },
   custom: '自定义',

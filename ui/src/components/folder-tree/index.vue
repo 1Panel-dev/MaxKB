@@ -39,7 +39,7 @@
           <template #default="{ node, data }">
             <div class="flex-between w-full" @mouseenter.stop="handleMouseEnter(data)">
               <div class="flex align-center">
-                <AppIcon iconName="app-folder" style="font-size: 16px"></AppIcon>
+                <AppIcon iconName="app-folder" style="font-size: 20px"></AppIcon>
                 <span class="ml-8 ellipsis" style="max-width: 110px" :title="node.label">{{
                   node.label
                 }}</span>
@@ -63,14 +63,14 @@
                         @click.stop="openCreateFolder(data)"
                         v-if="node.level !== 3 && permissionPrecise.folderCreate()"
                       >
-                        <AppIcon iconName="app-add-folder"></AppIcon>
+                        <AppIcon iconName="app-add-folder" class="color-secondary"></AppIcon>
                         {{ $t('components.folder.addChildFolder') }}
                       </el-dropdown-item>
                       <el-dropdown-item
                         @click.stop="openEditFolder(data)"
                         v-if="permissionPrecise.folderEdit()"
                       >
-                        <AppIcon iconName="app-edit"></AppIcon>
+                        <AppIcon iconName="app-edit" class="color-secondary"></AppIcon>
                         {{ $t('common.edit') }}
                       </el-dropdown-item>
                       <el-dropdown-item
@@ -79,7 +79,7 @@
                         :disabled="!data.parent_id"
                         v-if="permissionPrecise.folderDelete()"
                       >
-                        <AppIcon iconName="app-delete"></AppIcon>
+                        <AppIcon iconName="app-delete" class="color-secondary"></AppIcon>
                         {{ $t('common.delete') }}
                       </el-dropdown-item>
                     </el-dropdown-menu>

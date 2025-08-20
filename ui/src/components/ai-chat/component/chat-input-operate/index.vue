@@ -423,13 +423,14 @@ const uploadFile = async (file: any, fileList: any) => {
     uploadOtherList.value.length
   if (file_limit_once >= maxFiles) {
     MsgWarning(t('chat.uploadFile.limitMessage1') + maxFiles + t('chat.uploadFile.limitMessage2'))
-    fileList.splice(0, fileList.length)
+    fileList.splice(0, fileList.length, ...fileList.slice(0, maxFiles))
     return
   }
   if (fileList.filter((f: any) => f.size > fileLimit * 1024 * 1024).length > 0) {
     // MB
     MsgWarning(t('chat.uploadFile.sizeLimit') + fileLimit + 'MB')
-    fileList.splice(0, fileList.length)
+    // 只保留未超出大小限制的文件
+    fileList.splice(0, fileList.length, ...fileList.filter((f: any) => f.size <= fileLimit * 1024 * 1024))
     return
   }
   const inner = reactive(file)
@@ -454,6 +455,8 @@ const uploadFile = async (file: any, fileList: any) => {
   })
   if (!inputValue.value && uploadImageList.value.length > 0) {
     inputValue.value = t('chat.uploadFile.imageMessage')
+  } else {
+    inputValue.value = t('chat.uploadFile.fileMessage')
   }
 }
 // 粘贴处理

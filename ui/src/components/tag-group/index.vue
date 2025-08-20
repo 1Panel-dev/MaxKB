@@ -21,7 +21,6 @@
   </div>
 </template>
 <script setup lang="ts">
-
 const props = defineProps<{
   tags: string[]
   size?: 'large' | 'default' | 'small'
@@ -33,6 +32,16 @@ const props = defineProps<{
 .tag-group {
   :deep(.el-tag__content) {
     width: 100%;
+  }
+  /* tag超出省略号 */
+  .tag-ellipsis {
+    box-sizing: border-box;
+    max-width: 130px;
+    .el-tag__content {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
   }
 }
 </style>

@@ -182,6 +182,7 @@
       ref="SelectDocumentDialogRef"
       @refresh="refreshMigrateParagraph"
       :apiType="apiType"
+      :workspaceId="knowledgeDetail.workspace_id"
     />
     <GenerateRelatedDialog ref="GenerateRelatedDialogRef" @refresh="refresh" :apiType="apiType" />
   </div>
@@ -220,6 +221,7 @@ const ParagraphDialogRef = ref()
 const loading = ref(false)
 const changeStateloading = ref(false)
 const documentDetail = ref<any>({})
+const knowledgeDetail = ref<any>({})
 const paragraphDetail = ref<any[]>([])
 const title = ref('')
 const search = ref('')
@@ -331,6 +333,12 @@ function getDetail() {
     .getDocumentDetail(id, documentId, loading)
     .then((res: any) => {
       documentDetail.value = res.data
+    })
+
+  loadSharedApi({ type: 'knowledge', isShared: isShared.value, systemType: apiType.value })
+    .getKnowledgeDetail(id, loading)
+    .then((res: any) => {
+      knowledgeDetail.value = res.data
     })
 }
 

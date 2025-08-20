@@ -5,12 +5,20 @@
         {{ $t('common.setting') }}
       </h3>
       <div>
-        <el-button type="primary" @click="submit(applicationFormRef)" :disabled="loading"
-          v-if="permissionPrecise.edit(id)">
+        <el-button
+          type="primary"
+          @click="submit(applicationFormRef)"
+          :disabled="loading"
+          v-if="permissionPrecise.edit(id)"
+        >
           {{ $t('common.save') }}
         </el-button>
-        <el-button type="primary" @click="publish(applicationFormRef)" :disabled="loading"
-          v-if="permissionPrecise.edit(id)">
+        <el-button
+          type="primary"
+          @click="publish(applicationFormRef)"
+          :disabled="loading"
+          v-if="permissionPrecise.edit(id)"
+        >
           {{ $t('views.application.operation.publish') }}
         </el-button>
       </div>
@@ -26,23 +34,42 @@
           </div>
           <div class="scrollbar-height-left">
             <el-scrollbar>
-              <el-form hide-required-asterisk ref="applicationFormRef" :model="applicationForm" :rules="rules"
-                label-position="top" require-asterisk-position="right" class="p-24" style="padding-top: 0">
+              <el-form
+                hide-required-asterisk
+                ref="applicationFormRef"
+                :model="applicationForm"
+                :rules="rules"
+                label-position="top"
+                require-asterisk-position="right"
+                class="p-24"
+                style="padding-top: 0"
+              >
                 <el-form-item prop="name">
                   <template #label>
                     <div class="flex-between">
-                      <span>{{ $t('views.application.form.appName.label') }}
-                        <span class="color-danger">*</span></span>
+                      <span
+                        >{{ $t('views.application.form.appName.label') }}
+                        <span class="color-danger">*</span></span
+                      >
                     </div>
                   </template>
-                  <el-input v-model="applicationForm.name" maxlength="64"
-                    :placeholder="$t('views.application.form.appName.placeholder')" show-word-limit
-                    @blur="applicationForm.name = applicationForm.name?.trim()" />
+                  <el-input
+                    v-model="applicationForm.name"
+                    maxlength="64"
+                    :placeholder="$t('views.application.form.appName.placeholder')"
+                    show-word-limit
+                    @blur="applicationForm.name = applicationForm.name?.trim()"
+                  />
                 </el-form-item>
                 <el-form-item :label="$t('views.application.form.appDescription.label')">
-                  <el-input v-model="applicationForm.desc" type="textarea"
-                    :placeholder="$t('views.application.form.appDescription.placeholder')" :rows="3" maxlength="256"
-                    show-word-limit />
+                  <el-input
+                    v-model="applicationForm.desc"
+                    type="textarea"
+                    :placeholder="$t('views.application.form.appDescription.placeholder')"
+                    :rows="3"
+                    maxlength="256"
+                    show-word-limit
+                  />
                 </el-form-item>
 
                 <el-form-item :label="$t('views.application.form.aiModel.label')">
@@ -50,53 +77,92 @@
                     <div class="flex-between">
                       <span>{{ $t('views.application.form.aiModel.label') }}</span>
 
-                      <el-button type="primary" link @click="openAIParamSettingDialog"
-                        :disabled="!applicationForm.model_id">
+                      <el-button
+                        type="primary"
+                        link
+                        @click="openAIParamSettingDialog"
+                        :disabled="!applicationForm.model_id"
+                      >
                         {{ $t('common.paramSetting') }}
                       </el-button>
                     </div>
                   </template>
-                  <ModelSelect v-model="applicationForm.model_id"
-                    :placeholder="$t('views.application.form.aiModel.placeholder')" :options="modelOptions"
-                    @change="model_change" @submitModel="getSelectModel" showFooter :model-type="'LLM'">
+                  <ModelSelect
+                    v-model="applicationForm.model_id"
+                    :placeholder="$t('views.application.form.aiModel.placeholder')"
+                    :options="modelOptions"
+                    @change="model_change"
+                    @submitModel="getSelectModel"
+                    showFooter
+                    :model-type="'LLM'"
+                  >
                   </ModelSelect>
                 </el-form-item>
                 <el-form-item :label="$t('views.application.form.roleSettings.label')">
-                  <MdEditorMagnify :title="$t('views.application.form.roleSettings.label')"
-                    v-model="applicationForm.model_setting.system" style="height: 120px"
+                  <MdEditorMagnify
+                    :title="$t('views.application.form.roleSettings.label')"
+                    v-model="applicationForm.model_setting.system"
+                    style="height: 120px"
                     @submitDialog="submitSystemDialog"
-                    :placeholder="$t('views.application.form.roleSettings.placeholder')" />
+                    :placeholder="$t('views.application.form.roleSettings.placeholder')"
+                  />
                 </el-form-item>
-                <el-form-item prop="model_setting.no_references_prompt" :rules="{
-                  required: applicationForm.model_id,
-                  message: $t('views.application.form.prompt.requiredMessage'),
-                  trigger: 'blur',
-                }">
+                <el-form-item
+                  prop="model_setting.no_references_prompt"
+                  :rules="{
+                    required: applicationForm.model_id,
+                    message: $t('views.application.form.prompt.requiredMessage'),
+                    trigger: 'blur',
+                  }"
+                >
                   <template #label>
                     <div class="flex align-center">
-                      <span class="mr-4">{{
-                        $t('views.application.form.prompt.label') +
-                        $t('views.application.form.prompt.noReferences')
-                      }}
+                      <span class="mr-4"
+                        >{{
+                          $t('views.application.form.prompt.label') +
+                          $t('views.application.form.prompt.noReferences')
+                        }}
                       </span>
-                      <el-tooltip effect="dark" :content="$t('views.application.form.prompt.noReferencesTooltip', {
-                        question: '{question}',
-                      })
-                        " placement="right" popper-class="max-w-350">
+                      <el-tooltip
+                        effect="dark"
+                        :content="
+                          $t('views.application.form.prompt.noReferencesTooltip', {
+                            question: '{question}',
+                          })
+                        "
+                        placement="right"
+                        popper-class="max-w-350"
+                      >
                         <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
                       </el-tooltip>
                       <span class="color-danger ml-4" v-if="applicationForm.model_id">*</span>
                     </div>
                   </template>
 
-                  <MdEditorMagnify :title="$t('views.application.form.prompt.label') +
-                    $t('views.application.form.prompt.noReferences')
-                    " v-model="applicationForm.model_setting.no_references_prompt" style="height: 120px"
-                    @submitDialog="submitNoReferencesPromptDialog" placeholder="{question}" />
+                  <MdEditorMagnify
+                    :title="
+                      $t('views.application.form.prompt.label') +
+                      $t('views.application.form.prompt.noReferences')
+                    "
+                    v-model="applicationForm.model_setting.no_references_prompt"
+                    style="height: 120px"
+                    @submitDialog="submitNoReferencesPromptDialog"
+                    placeholder="{question}"
+                  />
                 </el-form-item>
-                <el-form-item :label="$t('views.application.form.historyRecord.label')" @click.prevent>
-                  <el-input-number v-model="applicationForm.dialogue_number" :min="0" :value-on-clear="0"
-                    controls-position="right" class="w-full" :step="1" :step-strictly="true" />
+                <el-form-item
+                  :label="$t('views.application.form.historyRecord.label')"
+                  @click.prevent
+                >
+                  <el-input-number
+                    v-model="applicationForm.dialogue_number"
+                    :min="0"
+                    :value-on-clear="0"
+                    controls-position="right"
+                    class="w-full"
+                    :step="1"
+                    :step-strictly="true"
+                  />
                 </el-form-item>
                 <el-form-item label="$t('views.application.form.relatedKnowledgeBase')">
                   <template #label>
@@ -117,19 +183,34 @@
                     </div>
                   </template>
                   <div class="w-full">
-                    <el-text type="info" v-if="applicationForm.knowledge_id_list?.length === 0">{{
-                      $t('views.application.form.relatedKnowledge.placeholder') }}
+                    <el-text type="info" v-if="applicationForm.knowledge_id_list?.length === 0"
+                      >{{ $t('views.application.form.relatedKnowledge.placeholder') }}
                     </el-text>
                     <el-row :gutter="12" v-else>
-                      <el-col :xs="24" :sm="24" :md="24" :lg="12" :xl="12" class="mb-8"
-                        v-for="(item, index) in applicationForm.knowledge_id_list" :key="index">
+                      <el-col
+                        :xs="24"
+                        :sm="24"
+                        :md="24"
+                        :lg="12"
+                        :xl="12"
+                        class="mb-8"
+                        v-for="(item, index) in applicationForm.knowledge_id_list"
+                        :key="index"
+                      >
                         <el-card class="relate-knowledge-card border-r-6" shadow="never">
                           <div class="flex-between">
                             <div class="flex align-center" style="width: 80%">
-                              <KnowledgeIcon :type="relatedObject(knowledgeList, item, 'id')?.type" class="mr-12" />
+                              <KnowledgeIcon
+                                :type="relatedObject(knowledgeList, item, 'id')?.type"
+                                class="mr-12"
+                              />
 
-                              <span class="ellipsis cursor" :title="relatedObject(knowledgeList, item, 'id')?.name">
-                                {{ relatedObject(knowledgeList, item, 'id')?.name }}</span>
+                              <span
+                                class="ellipsis cursor"
+                                :title="relatedObject(knowledgeList, item, 'id')?.name"
+                              >
+                                {{ relatedObject(knowledgeList, item, 'id')?.name }}</span
+                              >
                             </div>
                             <el-button text @click="removeKnowledge(item)">
                               <el-icon>
@@ -142,36 +223,56 @@
                     </el-row>
                   </div>
                 </el-form-item>
-                <el-form-item :label="$t('views.application.form.prompt.label')" prop="model_setting.prompt" :rules="{
-                  required: applicationForm.model_id,
-                  message: $t('views.application.form.prompt.requiredMessage'),
-                  trigger: 'blur',
-                }">
+                <el-form-item
+                  :label="$t('views.application.form.prompt.label')"
+                  prop="model_setting.prompt"
+                  :rules="{
+                    required: applicationForm.model_id,
+                    message: $t('views.application.form.prompt.requiredMessage'),
+                    trigger: 'blur',
+                  }"
+                >
                   <template #label>
                     <div class="flex align-center">
                       <span class="mr-4">
                         {{ $t('views.application.form.prompt.label') }}
                         {{ $t('views.application.form.prompt.references') }}
                       </span>
-                      <el-tooltip effect="dark" :content="$t('views.application.form.prompt.referencesTooltip', {
-                        data: '{data}',
-                        question: '{question}',
-                      })
-                        " popper-class="max-w-350" placement="right">
+                      <el-tooltip
+                        effect="dark"
+                        :content="
+                          $t('views.application.form.prompt.referencesTooltip', {
+                            data: '{data}',
+                            question: '{question}',
+                          })
+                        "
+                        popper-class="max-w-350"
+                        placement="right"
+                      >
                         <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
                       </el-tooltip>
                       <span class="color-danger ml-4" v-if="applicationForm.model_id">*</span>
                     </div>
                   </template>
 
-                  <MdEditorMagnify :title="$t('views.application.form.prompt.label') +
-                    $t('views.application.form.prompt.references')
-                    " v-model="applicationForm.model_setting.prompt" style="height: 150px"
-                    @submitDialog="submitPromptDialog" :placeholder="defaultPrompt" />
+                  <MdEditorMagnify
+                    :title="
+                      $t('views.application.form.prompt.label') +
+                      $t('views.application.form.prompt.references')
+                    "
+                    v-model="applicationForm.model_setting.prompt"
+                    style="height: 150px"
+                    @submitDialog="submitPromptDialog"
+                    :placeholder="defaultPrompt"
+                  />
                 </el-form-item>
                 <el-form-item :label="$t('views.application.form.prologue')">
-                  <MdEditorMagnify :title="$t('views.application.form.prologue')" v-model="applicationForm.prologue"
-                    style="height: 150px" @submitDialog="submitPrologueDialog" />
+                  <MdEditorMagnify
+                    :title="$t('views.application.form.prologue')"
+                    v-model="applicationForm.prologue"
+                    style="height: 150px"
+                    @submitDialog="submitPrologueDialog"
+                  />
                 </el-form-item>
                 <el-form-item @click.prevent>
                   <template #label>
@@ -182,23 +283,27 @@
 
                       <div class="flex">
                         <el-button type="primary" link @click="openReasoningParamSettingDialog">
-                          <el-icon>
-                            <Setting />
-                          </el-icon>
+                          <AppIcon iconName="app-setting"></AppIcon>
                         </el-button>
-                        <el-switch class="ml-8" size="small"
+                        <el-switch
+                          class="ml-8"
+                          size="small"
                           v-model="applicationForm.model_setting.reasoning_content_enable"
-                          @change="sttModelEnableChange" />
+                          @change="sttModelEnableChange"
+                        />
                       </div>
                     </div>
                   </template>
                 </el-form-item>
 
-                <el-form-item prop="stt_model_id" :rules="{
-                  required: applicationForm.stt_model_enable,
-                  message: $t('views.application.form.voiceInput.requiredMessage'),
-                  trigger: 'change',
-                }">
+                <el-form-item
+                  prop="stt_model_id"
+                  :rules="{
+                    required: applicationForm.stt_model_enable,
+                    message: $t('views.application.form.voiceInput.requiredMessage'),
+                    trigger: 'change',
+                  }"
+                >
                   <template #label>
                     <div class="flex-between">
                       <span class="mr-4">
@@ -207,58 +312,95 @@
                       </span>
 
                       <div class="flex">
-                        <el-checkbox v-if="applicationForm.stt_model_enable" v-model="applicationForm.stt_autosend">{{
-                          $t('views.application.form.voiceInput.autoSend') }}</el-checkbox>
-                        <el-switch class="ml-8" size="small" v-model="applicationForm.stt_model_enable"
-                          @change="sttModelEnableChange" />
+                        <el-checkbox
+                          v-if="applicationForm.stt_model_enable"
+                          v-model="applicationForm.stt_autosend"
+                          >{{ $t('views.application.form.voiceInput.autoSend') }}</el-checkbox
+                        >
+                        <el-switch
+                          class="ml-8"
+                          size="small"
+                          v-model="applicationForm.stt_model_enable"
+                          @change="sttModelEnableChange"
+                        />
                       </div>
                     </div>
                   </template>
-                  <ModelSelect v-show="applicationForm.stt_model_enable" v-model="applicationForm.stt_model_id"
-                    :placeholder="$t('views.application.form.voiceInput.placeholder')" :options="sttModelOptions"
-                    :model-type="'STT'">
+                  <ModelSelect
+                    v-show="applicationForm.stt_model_enable"
+                    v-model="applicationForm.stt_model_id"
+                    :placeholder="$t('views.application.form.voiceInput.placeholder')"
+                    :options="sttModelOptions"
+                    :model-type="'STT'"
+                  >
                   </ModelSelect>
                 </el-form-item>
-                <el-form-item prop="tts_model_id" :rules="{
-                  required:
-                    applicationForm.tts_type === 'TTS' && applicationForm.tts_model_enable,
-                  message: $t('views.application.form.voicePlay.requiredMessage'),
-                  trigger: 'change',
-                }">
+                <el-form-item
+                  prop="tts_model_id"
+                  :rules="{
+                    required:
+                      applicationForm.tts_type === 'TTS' && applicationForm.tts_model_enable,
+                    message: $t('views.application.form.voicePlay.requiredMessage'),
+                    trigger: 'change',
+                  }"
+                >
                   <template #label>
                     <div class="flex-between">
-                      <span class="mr-4">{{ $t('views.application.form.voicePlay.label') }}
-                        <span class="color-danger" v-if="
-                          applicationForm.tts_type === 'TTS' && applicationForm.tts_model_enable
-                        ">*</span>
+                      <span class="mr-4"
+                        >{{ $t('views.application.form.voicePlay.label') }}
+                        <span
+                          class="color-danger"
+                          v-if="
+                            applicationForm.tts_type === 'TTS' && applicationForm.tts_model_enable
+                          "
+                          >*</span
+                        >
                       </span>
                       <div class="flex">
-                        <el-checkbox v-if="applicationForm.tts_model_enable" v-model="applicationForm.tts_autoplay">{{
-                          $t('views.application.form.voicePlay.autoPlay') }}</el-checkbox>
-                        <el-switch class="ml-8" size="small" v-model="applicationForm.tts_model_enable"
-                          @change="ttsModelEnableChange" />
+                        <el-checkbox
+                          v-if="applicationForm.tts_model_enable"
+                          v-model="applicationForm.tts_autoplay"
+                          >{{ $t('views.application.form.voicePlay.autoPlay') }}</el-checkbox
+                        >
+                        <el-switch
+                          class="ml-8"
+                          size="small"
+                          v-model="applicationForm.tts_model_enable"
+                          @change="ttsModelEnableChange"
+                        />
                       </div>
                     </div>
                   </template>
                   <div class="w-full">
-                    <el-radio-group v-model="applicationForm.tts_type" v-show="applicationForm.tts_model_enable"
-                      class="mb-8">
+                    <el-radio-group
+                      v-model="applicationForm.tts_type"
+                      v-show="applicationForm.tts_model_enable"
+                      class="mb-8"
+                    >
                       <el-radio value="BROWSER">{{
                         $t('views.application.form.voicePlay.browser')
-                        }}</el-radio>
+                      }}</el-radio>
                       <el-radio value="TTS">{{
                         $t('views.application.form.voicePlay.tts')
-                        }}</el-radio>
+                      }}</el-radio>
                     </el-radio-group>
                   </div>
                   <div class="flex-between w-full">
-                    <ModelSelect v-if="applicationForm.tts_type === 'TTS' && applicationForm.tts_model_enable"
+                    <ModelSelect
+                      v-if="applicationForm.tts_type === 'TTS' && applicationForm.tts_model_enable"
                       v-model="applicationForm.tts_model_id"
-                      :placeholder="$t('views.application.form.voicePlay.placeholder')" :options="ttsModelOptions"
-                      @change="ttsModelChange()" :model-type="'TTS'"></ModelSelect>
+                      :placeholder="$t('views.application.form.voicePlay.placeholder')"
+                      :options="ttsModelOptions"
+                      @change="ttsModelChange()"
+                      :model-type="'TTS'"
+                    ></ModelSelect>
 
-                    <el-button v-if="applicationForm.tts_type === 'TTS'" @click="openTTSParamSettingDialog"
-                      :disabled="!applicationForm.tts_model_id" class="ml-8">
+                    <el-button
+                      v-if="applicationForm.tts_type === 'TTS'"
+                      @click="openTTSParamSettingDialog"
+                      :disabled="!applicationForm.tts_model_id"
+                      class="ml-8"
+                    >
                       <el-icon>
                         <Operation />
                       </el-icon>
@@ -285,9 +427,16 @@
     <AIModeParamSettingDialog ref="AIModeParamSettingDialogRef" @refresh="refreshForm" />
     <TTSModeParamSettingDialog ref="TTSModeParamSettingDialogRef" @refresh="refreshTTSForm" />
     <ParamSettingDialog ref="ParamSettingDialogRef" @refresh="refreshParam" />
-    <AddKnowledgeDialog ref="AddKnowledgeDialogRef" @addData="addKnowledge" :data="knowledgeList"
-      :loading="knowledgeLoading" />
-    <ReasoningParamSettingDialog ref="ReasoningParamSettingDialogRef" @refresh="submitReasoningDialog" />
+    <AddKnowledgeDialog
+      ref="AddKnowledgeDialogRef"
+      @addData="addKnowledge"
+      :data="knowledgeList"
+      :loading="knowledgeLoading"
+    />
+    <ReasoningParamSettingDialog
+      ref="ReasoningParamSettingDialogRef"
+      @refresh="submitReasoningDialog"
+    />
   </div>
 </template>
 <script setup lang="ts">
@@ -324,7 +473,6 @@ const apiType = computed(() => {
 const permissionPrecise = computed(() => {
   return permissionMap['application'][apiType.value]
 })
-
 
 // @ts-ignore
 const defaultPrompt = t('views.application.form.prompt.defaultPrompt', {
@@ -542,12 +690,12 @@ function getSelectModel() {
   const obj =
     apiType.value === 'systemManage'
       ? {
-        model_type: 'LLM',
-        workspace_id: applicationForm.value?.workspace_id,
-      }
+          model_type: 'LLM',
+          workspace_id: applicationForm.value?.workspace_id,
+        }
       : {
-        model_type: 'LLM',
-      }
+          model_type: 'LLM',
+        }
   loadSharedApi({ type: 'model', systemType: apiType.value })
     .getSelectModelList(obj)
     .then((res: any) => {
@@ -564,12 +712,12 @@ function getSTTModel() {
   const obj =
     apiType.value === 'systemManage'
       ? {
-        model_type: 'STT',
-        workspace_id: applicationForm.value?.workspace_id,
-      }
+          model_type: 'STT',
+          workspace_id: applicationForm.value?.workspace_id,
+        }
       : {
-        model_type: 'STT',
-      }
+          model_type: 'STT',
+        }
   loadSharedApi({ type: 'model', systemType: apiType.value })
     .getSelectModelList(obj)
     .then((res: any) => {
@@ -586,12 +734,12 @@ function getTTSModel() {
   const obj =
     apiType.value === 'systemManage'
       ? {
-        model_type: 'TTS',
-        workspace_id: applicationForm.value?.workspace_id,
-      }
+          model_type: 'TTS',
+          workspace_id: applicationForm.value?.workspace_id,
+        }
       : {
-        model_type: 'TTS',
-      }
+          model_type: 'TTS',
+        }
   loadSharedApi({ type: 'model', systemType: apiType.value })
     .getSelectModelList(obj)
     .then((res: any) => {
@@ -630,7 +778,6 @@ onBeforeMount(() => {
     } else {
       router.push(`/application/resource-management/${route.params.id}/workflow`)
     }
-
   }
 })
 onMounted(() => {

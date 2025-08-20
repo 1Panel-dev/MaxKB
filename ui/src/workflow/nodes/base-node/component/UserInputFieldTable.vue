@@ -5,9 +5,7 @@
     </h5>
     <div>
       <el-button type="primary" link @click="openChangeTitleDialog">
-        <el-icon>
-          <Setting />
-        </el-icon>
+        <AppIcon iconName="app-setting"></AppIcon>
       </el-button>
       <span class="ml-4">
         <el-button link type="primary" @click="openAddDialog()">

@@ -48,7 +48,7 @@
         <PasswordAuth></PasswordAuth>
       </el-card>
 
-      <el-card class="login-card" v-else>
+      <el-card class="login-card" v-else style="--el-card-padding: 0">
         <h2 class="mb-24" v-if="!showQrCodeTab && (loginMode === 'LDAP' || loginMode === 'LOCAL')">
           {{ loginMode == 'LOCAL' ? $t('views.login.title') : loginMode }}
         </h2>
@@ -299,7 +299,12 @@ function redirectAuth(authType: string, needMessage: boolean = false) {
     }
 
     const config = res.data.config
-    const redirectUrl = eval(`\`${config.redirectUrl}/${accessToken}\``)
+    const queryParams = new URLSearchParams(route.query as any).toString()
+    // 构造带查询参数的redirectUrl
+    let redirectUrl = `${config.redirectUrl}/${accessToken}`
+    if (queryParams) {
+      redirectUrl += `?${queryParams}`
+    }
     let url
     if (authType === 'CAS') {
       url = config.ldpUri
@@ -342,6 +347,9 @@ function redirectAuth(authType: string, needMessage: boolean = false) {
 
 function changeMode(val: string) {
   loginMode.value = val === 'LDAP' ? val : 'LOCAL'
+  if (val !== 'LOCAL') {
+    loginMode.value = val
+  }
   if (val === 'QR_CODE') {
     loginMode.value = val
     showQrCodeTab.value = true
@@ -380,7 +388,6 @@ onBeforeMount(() => {
     // modeList需要去掉lark wecom dingtalk
     modeList.value = modeList.value.filter((item) => !['lark', 'wecom', 'dingtalk'].includes(item))
     if (QrList.value.length > 0) {
-      modeList.value = ['QR_CODE', ...modeList.value]
       QrList.value.forEach((item) => {
         orgOptions.value.push({
           key: item,
@@ -392,6 +399,10 @@ onBeforeMount(() => {
                 : t('views.system.authentication.scanTheQRCode.lark'),
         })
       })
+      if (!modeList.value.includes('LOCAL') && !modeList.value.includes('LDAP')) {
+        showQrCodeTab.value = true
+      }
+      modeList.value = ['QR_CODE', ...modeList.value]
     }
   }
 })
