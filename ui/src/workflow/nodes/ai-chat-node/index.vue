@@ -247,7 +247,6 @@ const model_change = (model_id?: string) => {
   }
 }
 
-// @ts-ignore
 const defaultPrompt = `${t('views.applicationWorkflow.nodes.aiChatNode.defaultPrompt')}：
 {{${t('views.applicationWorkflow.nodes.searchKnowledgeNode.label')}.data}}
 ${t('views.problem.title')}：
@@ -364,10 +363,7 @@ function submitMcpServersDialog(config: any) {
 
 const toolDialogRef = ref()
 function openToolDialog() {
-  const config = {
-    tool_ids: chat_data.value.tool_ids,
-  }
-  toolDialogRef.value.open(config, toolSelectOptions.value)
+  toolDialogRef.value.open(chat_data.value.tool_ids)
 }
 function submitToolDialog(config: any) {
   set(props.nodeModel.properties.node_data, 'tool_ids', config.tool_ids)

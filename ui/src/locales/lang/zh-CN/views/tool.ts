@@ -7,6 +7,7 @@ export default {
   editMcpTool: '编辑MCP',
   copyTool: '复制工具',
   importTool: '导入工具',
+  settingTool: '设置工具',
   toolStore: {
     title: '工具商店',
     createFromToolStore: '从工具商店创建',

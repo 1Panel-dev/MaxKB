@@ -3,8 +3,11 @@ export default {
   all: 'All',
   createTool: 'Create Tool',
   editTool: 'Edit Tool',
+  createMcpTool: 'Create MCP',
+  editMcpTool: 'Edit MCP',
   copyTool: 'Copy Tool',
   importTool: 'Import Tool',
+  settingTool: 'Set Tool',
   toolStore: {
     title: 'Tool Store',
     createFromToolStore: 'Create from Tool Store',
