@@ -788,7 +788,7 @@ class DataSetSerializers(serializers.ModelSerializer):
             QuerySet(ProblemParagraphMapping).filter(dataset=dataset).delete()
             QuerySet(Paragraph).filter(dataset=dataset).delete()
             QuerySet(Problem).filter(dataset=dataset).delete()
-            drop_dataset_index(knowledge_id=dataset.id)
+            drop_dataset_index(dataset_id=dataset.id)
             dataset.delete()
             delete_embedding_by_dataset(self.data.get('id'))
             return True
