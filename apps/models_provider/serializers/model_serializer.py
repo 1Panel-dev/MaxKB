@@ -381,7 +381,7 @@ class ModelSerializer(serializers.Serializer):
             return [
                 self._build_model_data(
                     model
-                ) for model in query_params.get('model_query_set').order_by("-create_time")
+                ) for model in query_params.get('model_query_set')
             ]
 
         def model_list(self, workspace_id, with_valid=True):
@@ -398,7 +398,7 @@ class ModelSerializer(serializers.Serializer):
                 shared_queryset = get_authorized_model(shared_queryset, workspace_id)
 
             # 构建共享模型和普通模型列表
-            shared_model = [self._build_model_data(model) for model in shared_queryset.order_by("-create_time")]
+            shared_model = [self._build_model_data(model) for model in shared_queryset]
 
             is_x_pack_ee = self.is_x_pack_ee()
             normal_model = native_search(
@@ -429,6 +429,7 @@ class ModelSerializer(serializers.Serializer):
                         queryset = queryset.filter(user_id=value)
                     else:
                         queryset = queryset.filter(**{field: value})
+            queryset = queryset.order_by("-create_time")
             return {
                 'model_query_set': queryset,
                 'workspace_user_resource_permission_query_set': QuerySet(WorkspaceUserResourcePermission).filter(
