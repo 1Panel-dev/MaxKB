@@ -1,6 +1,6 @@
 <template>
   <el-upload
-    style="width: 80%"
+    style="width: 100%"
     v-loading="loading"
     action="#"
     v-bind="$attrs"
@@ -10,26 +10,26 @@
     multiple
   >
     <el-button type="primary">{{ $t('chat.uploadFile.label') }}</el-button>
-    <template #file="{ file, index }"
-      ><el-card style="--el-card-padding: 0" shadow="never">
+    <template #file="{ file }">
+      <el-card style="--el-card-padding: 0" shadow="never">
         <div
+          class="flex-between"
           :class="[inputDisabled ? 'is-disabled' : '']"
-          style="
-            padding: 0 8px 0 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            align-content: center;
-          "
+          style="padding: 0 8px 0 8px"
         >
-          <el-tooltip class="box-item" effect="dark" :content="file.name" placement="top-start">
-            <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 40%">
+          <div class="flex align-center" style="width: 70%">
+            <img :src="getImgUrl(file && file?.name)" alt="" width="24" class="mr-4" />
+            <span class="ellipsis-1" :title="file.name">
               {{ file.name }}
-            </div></el-tooltip
-          >
+            </span>
+          </div>
+          <div class="flex align-center">
+            <div>{{ formatSize(file.size) }}</div>
 
-          <div>{{ formatSize(file.size) }}</div>
-          <el-icon @click="deleteFile(file)" style="cursor: pointer"><DeleteFilled /></el-icon>
+            <el-button link class="ml-8" @click="deleteFile(file)">
+              <AppIcon iconName="app-delete"></AppIcon>
+            </el-button>
+          </div>
         </div>
       </el-card>
     </template>
@@ -39,6 +39,7 @@
 import { computed, inject, ref, useAttrs } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { FormField } from '@/components/dynamics-form/type'
+import { getImgUrl } from '@/utils/common'
 import { t } from '@/locales'
 import { useFormDisabled } from 'element-plus'
 const inputDisabled = useFormDisabled()
@@ -71,7 +72,7 @@ const deleteFile = (file: any) => {
 
 const model_value = computed({
   get: () => {
-    if (!model_value) {
+    if (!model_value.value) {
       emit('update:modelValue', [])
     }
     return props.modelValue
