@@ -92,7 +92,7 @@ jobs:
           password: ${{ secrets.FIT2CLOUD_REGISTRY_PASSWORD }}
       - name: Build Web
         run: |
-          docker buildx build --target web-build --output type=local,dest=./web-build-output . -f installer/Dockerfile
+          docker buildx build --no-cache --target web-build --output type=local,dest=./web-build-output . -f installer/Dockerfile
           rm -rf ./ui
           cp -r ./web-build-output/ui ./
           rm -rf ./web-build-output
@@ -158,7 +158,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build Web
         run: |
-          docker buildx build --target web-build --output type=local,dest=./web-build-output . -f installer/Dockerfile
+          docker buildx build --no-cache --target web-build --output type=local,dest=./web-build-output . -f installer/Dockerfile
           rm -rf ./ui
           cp -r ./web-build-output/ui ./
           rm -rf ./web-build-output
