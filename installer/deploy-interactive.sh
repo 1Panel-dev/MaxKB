@@ -103,6 +103,8 @@ read_external_password() {
     eval "$var_name='$password'"
 }
 
+
+
 # 显示欢迎信息
 show_welcome() {
     clear
@@ -116,6 +118,31 @@ show_welcome() {
 select_components() {
     log_step "选择要部署的组件"
     echo ""
+
+    # 如果使用现有配置，显示当前组件并询问是否修改
+    if [ "$USE_EXISTING_CONFIG" = "true" ] && [ -n "$DEPLOYED_COMPONENTS" ]; then
+        echo "当前已部署组件: $DEPLOYED_COMPONENTS"
+        echo ""
+        echo -e "${YELLOW}是否修改组件选择？${NC}"
+        echo "  1) 保持当前组件选择"
+        echo "  2) 重新选择组件"
+        echo -e "请选择 [1-2，默认1]: "
+
+        read -r modify_components
+        case $modify_components in
+            2)
+                # 重新选择组件
+                ;;
+            *)
+                # 使用现有组件配置
+                IFS=' ' read -ra SELECTED_COMPONENTS <<< "$DEPLOYED_COMPONENTS"
+                log_info "使用现有组件配置: ${SELECTED_COMPONENTS[*]}"
+                echo ""
+                return
+                ;;
+        esac
+    fi
+
     echo "可选组件："
     echo "  1) Redis 缓存服务"
     echo "  2) PostgreSQL+pgvector 数据库"
@@ -161,37 +188,72 @@ select_components() {
 configure_general() {
     log_step "配置通用参数"
     echo ""
+
+    # 使用现有配置作为默认值
+    local default_registry="${REGISTRY:-$DEFAULT_REGISTRY}"
+    local default_network="${NETWORK:-$DEFAULT_NETWORK}"
+    local default_data_dir="${DATA_DIR:-$DEFAULT_DATA_DIR}"
+
+    read_input "私有镜像仓库地址" "$default_registry" "REGISTRY"
     
-    read_input "私有镜像仓库地址" "$DEFAULT_REGISTRY" "REGISTRY"
-    
-    # 如果配置了私有仓库，询问是否需要登录
+    # 如果配置了私有仓库，询问是否需要登录认证
     if [ -n "$REGISTRY" ] && [ "$REGISTRY" != "docker.io" ]; then
         echo ""
-        echo -e "${YELLOW}检测到私有镜像仓库，是否需要登录认证？${NC}"
-        echo "  1) 需要登录认证"
-        echo "  2) 无需认证（公开仓库或已登录）"
-        echo -e "请选择 [1-2，默认2]: "
-        
-        read -r auth_choice
-        case $auth_choice in
-            1)
-                echo ""
-                echo -e "${YELLOW}请输入 Docker 仓库认证信息:${NC}"
-                read_input "用户名" "" "DOCKER_USERNAME"
-                read_external_password "密码" "DOCKER_PASSWORD"
-                NEED_DOCKER_LOGIN="true"
-                ;;
-            *)
-                NEED_DOCKER_LOGIN="false"
-                ;;
-        esac
+
+        # 检查是否有现有的认证配置
+        if [ "$USE_EXISTING_CONFIG" = "true" ] && [ "$NEED_DOCKER_LOGIN" = "true" ] && [ -n "$DOCKER_USERNAME" ]; then
+            echo -e "${YELLOW}检测到现有Docker认证配置 (用户名: $DOCKER_USERNAME)${NC}"
+            echo "  1) 使用现有认证配置"
+            echo "  2) 重新配置认证信息"
+            echo "  3) 无需认证（公开仓库或已登录）"
+            echo -e "请选择 [1-3，默认1]: "
+
+            read -r auth_choice
+            case $auth_choice in
+                2)
+                    echo ""
+                    echo -e "${YELLOW}请输入新的 Docker 仓库认证信息:${NC}"
+                    read_input "用户名" "$DOCKER_USERNAME" "DOCKER_USERNAME"
+                    read_external_password "密码" "DOCKER_PASSWORD"
+                    NEED_DOCKER_LOGIN="true"
+                    ;;
+                3)
+                    NEED_DOCKER_LOGIN="false"
+                    ;;
+                *)
+                    log_info "使用现有认证配置"
+                    # 需要重新输入密码（安全考虑）
+                    read_external_password "请重新输入密码" "DOCKER_PASSWORD"
+                    NEED_DOCKER_LOGIN="true"
+                    ;;
+            esac
+        else
+            echo -e "${YELLOW}检测到私有镜像仓库，是否需要登录认证？${NC}"
+            echo "  1) 需要登录认证"
+            echo "  2) 无需认证（公开仓库或已登录）"
+            echo -e "请选择 [1-2，默认2]: "
+
+            read -r auth_choice
+            case $auth_choice in
+                1)
+                    echo ""
+                    echo -e "${YELLOW}请输入 Docker 仓库认证信息:${NC}"
+                    read_input "用户名" "${DOCKER_USERNAME:-}" "DOCKER_USERNAME"
+                    read_external_password "密码" "DOCKER_PASSWORD"
+                    NEED_DOCKER_LOGIN="true"
+                    ;;
+                *)
+                    NEED_DOCKER_LOGIN="false"
+                    ;;
+            esac
+        fi
     else
         NEED_DOCKER_LOGIN="false"
     fi
-    
+
     echo ""
-    read_input "Docker 网络名称" "$DEFAULT_NETWORK" "NETWORK"
-    read_input "数据持久化目录" "$DEFAULT_DATA_DIR" "DATA_DIR"
+    read_input "Docker 网络名称" "$default_network" "NETWORK"
+    read_input "数据持久化目录" "$default_data_dir" "DATA_DIR"
     
     echo ""
 }
@@ -200,10 +262,33 @@ configure_general() {
 configure_redis() {
     log_step "配置 Redis 参数"
     echo ""
-    
-    read_input "Redis 容器名称" "gs-redis" "REDIS_CONTAINER"
-    read_input "Redis 端口" "6379" "REDIS_PORT"
-    read_password "Redis 密码" "REDIS_PASSWORD"
+
+    # 使用现有配置作为默认值
+    local default_redis_container="${REDIS_CONTAINER:-gs-redis}"
+    local default_redis_port="${REDIS_PORT:-6379}"
+
+    read_input "Redis 容器名称" "$default_redis_container" "REDIS_CONTAINER"
+    read_input "Redis 端口" "$default_redis_port" "REDIS_PORT"
+
+    # 如果有现有密码，询问是否使用
+    if [ "$USE_EXISTING_CONFIG" = "true" ] && [ -n "$REDIS_PASSWORD" ]; then
+        echo -e "${YELLOW}检测到现有Redis密码，是否使用现有密码？${NC}"
+        echo "  1) 使用现有密码"
+        echo "  2) 重新设置密码"
+        echo -e "请选择 [1-2，默认1]: "
+
+        read -r password_choice
+        case $password_choice in
+            2)
+                read_password "Redis 密码" "REDIS_PASSWORD"
+                ;;
+            *)
+                log_info "使用现有Redis密码"
+                ;;
+        esac
+    else
+        read_password "Redis 密码" "REDIS_PASSWORD"
+    fi
     
     # Redis 在网络内的主机名就是容器名
     REDIS_HOST="$REDIS_CONTAINER"
@@ -220,12 +305,37 @@ configure_redis() {
 configure_postgres() {
     log_step "配置 PostgreSQL 参数"
     echo ""
-    
-    read_input "PostgreSQL 容器名称" "gs-postgres" "DB_CONTAINER"
-    read_input "PostgreSQL 端口" "5432" "DB_PORT"
-    read_input "数据库名称" "gskh" "DB_NAME"
-    read_input "数据库用户名" "maxkb" "DB_USER"
-    read_password "数据库密码" "DB_PASSWORD"
+
+    # 使用现有配置作为默认值
+    local default_db_container="${DB_CONTAINER:-gs-postgres}"
+    local default_db_port="${DB_PORT:-5432}"
+    local default_db_name="${DB_NAME:-gskh}"
+    local default_db_user="${DB_USER:-maxkb}"
+
+    read_input "PostgreSQL 容器名称" "$default_db_container" "DB_CONTAINER"
+    read_input "PostgreSQL 端口" "$default_db_port" "DB_PORT"
+    read_input "数据库名称" "$default_db_name" "DB_NAME"
+    read_input "数据库用户名" "$default_db_user" "DB_USER"
+
+    # 如果有现有密码，询问是否使用
+    if [ "$USE_EXISTING_CONFIG" = "true" ] && [ -n "$DB_PASSWORD" ]; then
+        echo -e "${YELLOW}检测到现有数据库密码，是否使用现有密码？${NC}"
+        echo "  1) 使用现有密码"
+        echo "  2) 重新设置密码"
+        echo -e "请选择 [1-2，默认1]: "
+
+        read -r password_choice
+        case $password_choice in
+            2)
+                read_password "数据库密码" "DB_PASSWORD"
+                ;;
+            *)
+                log_info "使用现有数据库密码"
+                ;;
+        esac
+    else
+        read_password "数据库密码" "DB_PASSWORD"
+    fi
     
     # PostgreSQL 在网络内的主机名就是容器名
     DB_HOST="$DB_CONTAINER"
@@ -247,14 +357,59 @@ configure_backend_image() {
     # 设置默认镜像仓库地址
     local default_registry="docker.zhouke.tech/gs_kh"
 
-    echo -e "${YELLOW}请输入镜像标签${NC} [默认: ${BLUE}dev${NC}]: "
-    read -r tag_input
-    if [ -z "$tag_input" ]; then
-        tag_input="dev"
-    fi
+    # 如果有现有配置，解析当前镜像信息
+    if [ "$USE_EXISTING_CONFIG" = "true" ] && [ -n "$BACKEND_IMAGE" ]; then
+        echo "当前后台镜像: $BACKEND_IMAGE"
+        echo ""
 
-    # 构建完整的镜像地址
-    BACKEND_IMAGE="$default_registry/backend:$tag_input"
+        # 解析当前镜像的tag
+        local current_tag=$(echo "$BACKEND_IMAGE" | sed 's/.*://')
+        local current_registry_and_repo=$(echo "$BACKEND_IMAGE" | sed 's/:.*$//')
+
+        echo -e "${YELLOW}镜像配置选项:${NC}"
+        echo "  1) 仅更新镜像标签 (推荐用于版本更新)"
+        echo "  2) 使用当前镜像配置"
+        echo "  3) 重新配置完整镜像地址"
+        echo -e "请选择 [1-3，默认1]: "
+
+        read -r image_choice
+        case $image_choice in
+            2)
+                log_info "使用当前镜像: $BACKEND_IMAGE"
+                echo ""
+                return
+                ;;
+            3)
+                # 重新配置完整镜像
+                echo -e "${YELLOW}请输入完整的镜像地址${NC} [默认: ${BLUE}$default_registry/backend:dev${NC}]: "
+                read -r full_image_input
+                if [ -z "$full_image_input" ]; then
+                    BACKEND_IMAGE="$default_registry/backend:dev"
+                else
+                    BACKEND_IMAGE="$full_image_input"
+                fi
+                ;;
+            *)
+                # 仅更新标签
+                echo -e "${YELLOW}请输入新的镜像标签${NC} [当前: ${BLUE}$current_tag${NC}]: "
+                read -r tag_input
+                if [ -z "$tag_input" ]; then
+                    tag_input="$current_tag"
+                fi
+                BACKEND_IMAGE="$current_registry_and_repo:$tag_input"
+                ;;
+        esac
+    else
+        # 全新配置
+        echo -e "${YELLOW}请输入镜像标签${NC} [默认: ${BLUE}dev${NC}]: "
+        read -r tag_input
+        if [ -z "$tag_input" ]; then
+            tag_input="dev"
+        fi
+
+        # 构建完整的镜像地址
+        BACKEND_IMAGE="$default_registry/backend:$tag_input"
+    fi
 
     log_info "使用后台镜像: $BACKEND_IMAGE"
     echo ""
@@ -274,8 +429,12 @@ configure_backend() {
     # 配置Redis连接
     configure_backend_redis
     
-    read_input "后台应用端口" "8080" "BACKEND_PORT"
-    read_input "日志级别" "INFO" "LOG_LEVEL"
+    # 使用现有配置作为默认值
+    local default_backend_port="${BACKEND_PORT:-8080}"
+    local default_log_level="${LOG_LEVEL:-INFO}"
+
+    read_input "后台应用端口" "$default_backend_port" "BACKEND_PORT"
+    read_input "日志级别" "$default_log_level" "LOG_LEVEL"
     
     echo ""
     log_info "后台应用配置完成"
@@ -289,25 +448,77 @@ configure_backend() {
 # 配置后台应用的数据库连接
 configure_backend_database() {
     echo -e "${CYAN}=== 配置数据库连接 ===${NC}"
-    
+
+    # 如果有现有配置，显示当前设置
+    if [ "$USE_EXISTING_CONFIG" = "true" ] && [ -n "$USE_EXTERNAL_DB" ]; then
+        if [ "$USE_EXTERNAL_DB" = "true" ]; then
+            echo "当前配置: 使用外部数据库 ($DB_HOST:$DB_PORT/$DB_NAME)"
+        else
+            echo "当前配置: 使用内部数据库"
+        fi
+        echo ""
+        echo -e "${YELLOW}是否修改数据库连接配置？${NC}"
+        echo "  1) 保持当前配置"
+        echo "  2) 重新配置数据库连接"
+        echo -e "请选择 [1-2，默认1]: "
+
+        read -r modify_db
+        case $modify_db in
+            2)
+                # 重新配置
+                ;;
+            *)
+                log_info "保持当前数据库连接配置"
+                echo ""
+                return
+                ;;
+        esac
+    fi
+
     if [[ " ${SELECTED_COMPONENTS[*]} " =~ " postgres " ]]; then
         echo "检测到已选择部署 PostgreSQL 组件"
         echo -e "${YELLOW}请选择数据库连接方式:${NC}"
         echo "  1) 使用内部 PostgreSQL (推荐)"
         echo "  2) 使用外部数据库"
         echo -e "请选择 [1-2，默认1]: "
-        
+
         read -r db_choice
         case $db_choice in
             2)
                 echo -e "${YELLOW}请配置外部数据库连接:${NC}"
                 echo -e "${CYAN}💡 提示: 后台应用使用host网络，建议使用 127.0.0.1${NC}"
-                read_input "数据库主机地址" "127.0.0.1" "DB_HOST"
-                read_input "数据库端口" "5433" "DB_PORT"
-                read_input "数据库名称" "gskh" "DB_NAME"
-                read_input "数据库用户名" "gskh" "DB_USER"
-                read_external_password "数据库密码" "DB_PASSWORD"
-                
+
+                # 使用现有配置作为默认值
+                local default_db_host="${DB_HOST:-127.0.0.1}"
+                local default_db_port="${DB_PORT:-5433}"
+                local default_db_name="${DB_NAME:-gskh}"
+                local default_db_user="${DB_USER:-gskh}"
+
+                read_input "数据库主机地址" "$default_db_host" "DB_HOST"
+                read_input "数据库端口" "$default_db_port" "DB_PORT"
+                read_input "数据库名称" "$default_db_name" "DB_NAME"
+                read_input "数据库用户名" "$default_db_user" "DB_USER"
+
+                # 处理密码
+                if [ "$USE_EXISTING_CONFIG" = "true" ] && [ -n "$DB_PASSWORD" ]; then
+                    echo -e "${YELLOW}是否使用现有数据库密码？${NC}"
+                    echo "  1) 使用现有密码"
+                    echo "  2) 重新输入密码"
+                    echo -e "请选择 [1-2，默认1]: "
+
+                    read -r password_choice
+                    case $password_choice in
+                        2)
+                            read_external_password "数据库密码" "DB_PASSWORD"
+                            ;;
+                        *)
+                            log_info "使用现有数据库密码"
+                            ;;
+                    esac
+                else
+                    read_external_password "数据库密码" "DB_PASSWORD"
+                fi
+
                 # 标记不部署内部PostgreSQL
                 USE_EXTERNAL_DB="true"
                 ;;
@@ -320,12 +531,38 @@ configure_backend_database() {
     else
         echo -e "${YELLOW}未部署 PostgreSQL，请配置外部数据库连接:${NC}"
         echo -e "${CYAN}💡 提示: 后台应用使用host网络，建议使用 127.0.0.1${NC}"
-        read_input "数据库主机地址" "127.0.0.1" "DB_HOST"
-        read_input "数据库端口" "5432" "DB_PORT"
-        read_input "数据库名称" "gskh" "DB_NAME"
-        read_input "数据库用户名" "gskh" "DB_USER"
-        read_external_password "数据库密码" "DB_PASSWORD"
-        
+
+        # 使用现有配置作为默认值
+        local default_db_host="${DB_HOST:-127.0.0.1}"
+        local default_db_port="${DB_PORT:-5432}"
+        local default_db_name="${DB_NAME:-gskh}"
+        local default_db_user="${DB_USER:-gskh}"
+
+        read_input "数据库主机地址" "$default_db_host" "DB_HOST"
+        read_input "数据库端口" "$default_db_port" "DB_PORT"
+        read_input "数据库名称" "$default_db_name" "DB_NAME"
+        read_input "数据库用户名" "$default_db_user" "DB_USER"
+
+        # 处理密码
+        if [ "$USE_EXISTING_CONFIG" = "true" ] && [ -n "$DB_PASSWORD" ]; then
+            echo -e "${YELLOW}是否使用现有数据库密码？${NC}"
+            echo "  1) 使用现有密码"
+            echo "  2) 重新输入密码"
+            echo -e "请选择 [1-2，默认1]: "
+
+            read -r password_choice
+            case $password_choice in
+                2)
+                    read_external_password "数据库密码" "DB_PASSWORD"
+                    ;;
+                *)
+                    log_info "使用现有数据库密码"
+                    ;;
+            esac
+        else
+            read_external_password "数据库密码" "DB_PASSWORD"
+        fi
+
         # 标记不部署内部PostgreSQL
         USE_EXTERNAL_DB="true"
     fi
@@ -335,23 +572,73 @@ configure_backend_database() {
 # 配置后台应用的Redis连接
 configure_backend_redis() {
     echo -e "${CYAN}=== 配置 Redis 连接 ===${NC}"
-    
+
+    # 如果有现有配置，显示当前设置
+    if [ "$USE_EXISTING_CONFIG" = "true" ] && [ -n "$USE_EXTERNAL_REDIS" ]; then
+        if [ "$USE_EXTERNAL_REDIS" = "true" ]; then
+            echo "当前配置: 使用外部Redis ($REDIS_HOST:$REDIS_PORT)"
+        else
+            echo "当前配置: 使用内部Redis"
+        fi
+        echo ""
+        echo -e "${YELLOW}是否修改Redis连接配置？${NC}"
+        echo "  1) 保持当前配置"
+        echo "  2) 重新配置Redis连接"
+        echo -e "请选择 [1-2，默认1]: "
+
+        read -r modify_redis
+        case $modify_redis in
+            2)
+                # 重新配置
+                ;;
+            *)
+                log_info "保持当前Redis连接配置"
+                echo ""
+                return
+                ;;
+        esac
+    fi
+
     if [[ " ${SELECTED_COMPONENTS[*]} " =~ " redis " ]]; then
         echo "检测到已选择部署 Redis 组件"
         echo -e "${YELLOW}请选择 Redis 连接方式:${NC}"
         echo "  1) 使用内部 Redis (推荐)"
         echo "  2) 使用外部 Redis"
         echo -e "请选择 [1-2，默认1]: "
-        
+
         read -r redis_choice
         case $redis_choice in
             2)
                 echo -e "${YELLOW}请配置外部 Redis 连接:${NC}"
                 echo -e "${CYAN}💡 提示: 后台应用使用host网络，建议使用 127.0.0.1${NC}"
-                read_input "Redis 主机地址" "127.0.0.1" "REDIS_HOST"
-                read_input "Redis 端口" "6379" "REDIS_PORT"
-                read_external_password "Redis 密码" "REDIS_PASSWORD"
-                
+
+                # 使用现有配置作为默认值
+                local default_redis_host="${REDIS_HOST:-127.0.0.1}"
+                local default_redis_port="${REDIS_PORT:-6379}"
+
+                read_input "Redis 主机地址" "$default_redis_host" "REDIS_HOST"
+                read_input "Redis 端口" "$default_redis_port" "REDIS_PORT"
+
+                # 处理密码
+                if [ "$USE_EXISTING_CONFIG" = "true" ] && [ -n "$REDIS_PASSWORD" ]; then
+                    echo -e "${YELLOW}是否使用现有Redis密码？${NC}"
+                    echo "  1) 使用现有密码"
+                    echo "  2) 重新输入密码"
+                    echo -e "请选择 [1-2，默认1]: "
+
+                    read -r password_choice
+                    case $password_choice in
+                        2)
+                            read_external_password "Redis 密码" "REDIS_PASSWORD"
+                            ;;
+                        *)
+                            log_info "使用现有Redis密码"
+                            ;;
+                    esac
+                else
+                    read_external_password "Redis 密码" "REDIS_PASSWORD"
+                fi
+
                 # 标记不部署内部Redis
                 USE_EXTERNAL_REDIS="true"
                 ;;
@@ -364,10 +651,34 @@ configure_backend_redis() {
     else
         echo -e "${YELLOW}未部署 Redis，请配置外部 Redis 连接:${NC}"
         echo -e "${CYAN}💡 提示: 后台应用使用host网络，建议使用 127.0.0.1${NC}"
-        read_input "Redis 主机地址" "127.0.0.1" "REDIS_HOST"
-        read_input "Redis 端口" "6379" "REDIS_PORT"
-        read_external_password "Redis 密码" "REDIS_PASSWORD"
-        
+
+        # 使用现有配置作为默认值
+        local default_redis_host="${REDIS_HOST:-127.0.0.1}"
+        local default_redis_port="${REDIS_PORT:-6379}"
+
+        read_input "Redis 主机地址" "$default_redis_host" "REDIS_HOST"
+        read_input "Redis 端口" "$default_redis_port" "REDIS_PORT"
+
+        # 处理密码
+        if [ "$USE_EXISTING_CONFIG" = "true" ] && [ -n "$REDIS_PASSWORD" ]; then
+            echo -e "${YELLOW}是否使用现有Redis密码？${NC}"
+            echo "  1) 使用现有密码"
+            echo "  2) 重新输入密码"
+            echo -e "请选择 [1-2，默认1]: "
+
+            read -r password_choice
+            case $password_choice in
+                2)
+                    read_external_password "Redis 密码" "REDIS_PASSWORD"
+                    ;;
+                *)
+                    log_info "使用现有Redis密码"
+                    ;;
+            esac
+        else
+            read_external_password "Redis 密码" "REDIS_PASSWORD"
+        fi
+
         # 标记不部署内部Redis
         USE_EXTERNAL_REDIS="true"
     fi
@@ -629,7 +940,7 @@ create_network() {
 # 创建数据目录
 create_data_dirs() {
     log_info "创建数据持久化目录"
-    mkdir -p "$DATA_DIR"/{redis,postgres-data,postgres-init,maxkb-logs,maxkb-local,maxkb-models,maxkb-python-packages}
+    mkdir -p "$DATA_DIR"/{redis,postgres-data,postgres-init,maxkb-logs,maxkb-local,maxkb-models,maxkb-python-packages,maxkb-sandbox,maxkb-cache}
 
     # 设置合适的目录权限，确保容器内应用可以写入
     chmod 755 "$DATA_DIR"
@@ -637,6 +948,8 @@ create_data_dirs() {
     chmod 777 "$DATA_DIR"/maxkb-local   # 本地存储需要写权限
     chmod 777 "$DATA_DIR"/maxkb-models  # 模型目录需要写权限
     chmod 777 "$DATA_DIR"/maxkb-python-packages  # Python包目录需要写权限
+    chmod 777 "$DATA_DIR"/maxkb-sandbox # Sandbox目录需要写权限
+    chmod 777 "$DATA_DIR"/maxkb-cache   # 缓存目录需要写权限
     chmod 755 "$DATA_DIR"/redis
     chmod 755 "$DATA_DIR"/postgres-data
     chmod 755 "$DATA_DIR"/postgres-init
@@ -648,7 +961,7 @@ create_data_dirs() {
     
     # 设置目录所有者（如果是root运行）
     if [ "$(id -u)" = "0" ]; then
-        chown -R 1000:1000 "$DATA_DIR"/maxkb-logs "$DATA_DIR"/maxkb-local "$DATA_DIR"/maxkb-models "$DATA_DIR"/maxkb-python-packages 2>/dev/null || true
+        chown -R 1000:1000 "$DATA_DIR"/maxkb-logs "$DATA_DIR"/maxkb-local "$DATA_DIR"/maxkb-models "$DATA_DIR"/maxkb-python-packages "$DATA_DIR"/maxkb-sandbox "$DATA_DIR"/maxkb-cache 2>/dev/null || true
     fi
     
     log_info "数据目录创建完成: $DATA_DIR"
@@ -742,6 +1055,8 @@ deploy_backend() {
         -v "$DATA_DIR/maxkb-local:/opt/maxkb/local" \
         -v "$DATA_DIR/maxkb-models:/opt/maxkb-app/model" \
         -v "$DATA_DIR/maxkb-python-packages:/opt/maxkb/python-packages" \
+        -v "$DATA_DIR/maxkb-sandbox:/opt/maxkb-app/sandbox" \
+        -v "$DATA_DIR/maxkb-cache:/opt/maxkb/cache" \
         -e MAXKB_CONFIG_TYPE=ENV \
         -e MAXKB_DB_NAME="$DB_NAME" \
         -e MAXKB_DB_HOST="$DB_HOST" \
@@ -882,6 +1197,8 @@ show_summary() {
     echo "  - 本地存储: $DATA_DIR/maxkb-local"
     echo "  - 模型目录: $DATA_DIR/maxkb-models"
     echo "  - Python包: $DATA_DIR/maxkb-python-packages"
+    echo "  - Sandbox: $DATA_DIR/maxkb-sandbox"
+    echo "  - 缓存目录: $DATA_DIR/maxkb-cache"
     echo ""
     echo -e "${CYAN}配置文件: $DATA_DIR/maxkb-config.env${NC}"
     echo ""
@@ -896,11 +1213,57 @@ show_summary() {
 main() {
     # 显示欢迎信息
     show_welcome
-    
+
     # 检查 Docker 环境
     check_docker
     echo ""
-    
+
+    # 加载现有配置
+    log_info "正在检查现有配置..."
+
+    # 直接在这里实现配置加载逻辑
+    local config_file="$DEFAULT_DATA_DIR/maxkb-config.env"
+    log_info "检查配置文件: $config_file"
+
+    if [ -f "$config_file" ]; then
+        log_info "检测到现有配置文件: $config_file"
+        echo ""
+        echo -e "${YELLOW}是否使用现有配置作为默认值？${NC}"
+        echo "  1) 是，使用现有配置（推荐，可修改tag等参数）"
+        echo "  2) 否，重新配置所有参数"
+        echo -e "请选择 [1-2，默认1]: "
+
+        read -r use_existing
+        case $use_existing in
+            2)
+                log_info "将重新配置所有参数"
+                USE_EXISTING_CONFIG="false"
+                ;;
+            *)
+                log_info "加载现有配置作为默认值"
+                USE_EXISTING_CONFIG="true"
+
+                # 加载配置文件
+                source "$config_file"
+
+                # 显示当前配置摘要
+                echo ""
+                log_info "当前配置摘要:"
+                echo "  - 镜像仓库: ${REGISTRY:-未设置}"
+                echo "  - 数据目录: ${DATA_DIR:-$DEFAULT_DATA_DIR}"
+                echo "  - 已部署组件: ${DEPLOYED_COMPONENTS:-无}"
+                echo "  - 后台镜像: ${BACKEND_IMAGE:-未设置}"
+                echo "  - 外部数据库: $([ "$USE_EXTERNAL_DB" = "true" ] && echo "是" || echo "否")"
+                echo "  - 外部Redis: $([ "$USE_EXTERNAL_REDIS" = "true" ] && echo "是" || echo "否")"
+                echo ""
+                ;;
+        esac
+    else
+        log_info "未检测到现有配置文件，将进行全新配置"
+        USE_EXISTING_CONFIG="false"
+    fi
+    echo ""
+
     # 选择组件
     select_components
     

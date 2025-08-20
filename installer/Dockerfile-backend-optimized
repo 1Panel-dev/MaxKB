@@ -122,9 +122,11 @@ COPY --from=backend-builder /opt/py3 /opt/py3
 ENV PYTHONPATH=/opt/maxkb-app/apps
 
 # 创建目录并修复权限
-RUN mkdir -p /opt/maxkb-app/sandbox \
+RUN mkdir -p /opt/maxkb-app/sandbox/execute \
+             /opt/maxkb-app/sandbox/result \
              /opt/maxkb/logs \
              /opt/maxkb/local \
+             /opt/maxkb/cache \
              /opt/maxkb/python-packages && \
     chown -R maxkb:root /opt/maxkb-app /opt/maxkb && \
     chmod -R 755 /opt/maxkb-app /opt/maxkb && \
@@ -144,7 +146,8 @@ echo "等待 Redis 连接..."
 wait-for-it ${MAXKB_REDIS_HOST}:${MAXKB_REDIS_PORT} --timeout=60 --strict
 
 echo "创建必要目录..."
-mkdir -p /opt/maxkb/logs /opt/maxkb/local /opt/maxkb/python-packages
+mkdir -p /opt/maxkb/logs /opt/maxkb/local /opt/maxkb/cache /opt/maxkb/python-packages
+mkdir -p /opt/maxkb-app/sandbox/execute /opt/maxkb-app/sandbox/result
 
 echo "清理临时文件..."
 rm -f /opt/maxkb-app/tmp/*.pid 2>/dev/null || true
@@ -160,7 +163,7 @@ WORKDIR /opt/maxkb-app
 
 EXPOSE 8080
 
-VOLUME ["/opt/maxkb/logs", "/opt/maxkb/local", "/opt/maxkb-app/model"]
+VOLUME ["/opt/maxkb/logs", "/opt/maxkb/local", "/opt/maxkb/cache", "/opt/maxkb-app/model", "/opt/maxkb-app/sandbox"]
 
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8080/api/health || exit 1
