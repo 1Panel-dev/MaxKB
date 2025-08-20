@@ -629,13 +629,14 @@ create_network() {
 # 创建数据目录
 create_data_dirs() {
     log_info "创建数据持久化目录"
-    mkdir -p "$DATA_DIR"/{redis,postgres-data,postgres-init,maxkb-logs,maxkb-local,maxkb-models}
+    mkdir -p "$DATA_DIR"/{redis,postgres-data,postgres-init,maxkb-logs,maxkb-local,maxkb-models,maxkb-python-packages}
 
     # 设置合适的目录权限，确保容器内应用可以写入
     chmod 755 "$DATA_DIR"
     chmod 777 "$DATA_DIR"/maxkb-logs    # 日志目录需要写权限
     chmod 777 "$DATA_DIR"/maxkb-local   # 本地存储需要写权限
     chmod 777 "$DATA_DIR"/maxkb-models  # 模型目录需要写权限
+    chmod 777 "$DATA_DIR"/maxkb-python-packages  # Python包目录需要写权限
     chmod 755 "$DATA_DIR"/redis
     chmod 755 "$DATA_DIR"/postgres-data
     chmod 755 "$DATA_DIR"/postgres-init
@@ -647,7 +648,7 @@ create_data_dirs() {
     
     # 设置目录所有者（如果是root运行）
     if [ "$(id -u)" = "0" ]; then
-        chown -R 1000:1000 "$DATA_DIR"/maxkb-logs "$DATA_DIR"/maxkb-local "$DATA_DIR"/maxkb-models 2>/dev/null || true
+        chown -R 1000:1000 "$DATA_DIR"/maxkb-logs "$DATA_DIR"/maxkb-local "$DATA_DIR"/maxkb-models "$DATA_DIR"/maxkb-python-packages 2>/dev/null || true
     fi
     
     log_info "数据目录创建完成: $DATA_DIR"
@@ -740,6 +741,7 @@ deploy_backend() {
         -v "$DATA_DIR/maxkb-logs:/opt/maxkb/logs" \
         -v "$DATA_DIR/maxkb-local:/opt/maxkb/local" \
         -v "$DATA_DIR/maxkb-models:/opt/maxkb-app/model" \
+        -v "$DATA_DIR/maxkb-python-packages:/opt/maxkb/python-packages" \
         -e MAXKB_CONFIG_TYPE=ENV \
         -e MAXKB_DB_NAME="$DB_NAME" \
         -e MAXKB_DB_HOST="$DB_HOST" \
@@ -805,6 +807,32 @@ EOF
     log_info "配置信息已保存到: $DATA_DIR/maxkb-config.env"
 }
 
+# Python依赖管理辅助函数
+manage_python_dependencies() {
+    log_info "Python依赖管理"
+    echo ""
+    echo "Python依赖包目录: $DATA_DIR/maxkb-python-packages"
+    echo ""
+    echo "管理方式："
+    echo "  方法1 - 宿主机直接安装（推荐）："
+    echo "    pip install --target $DATA_DIR/maxkb-python-packages <包名>"
+    echo ""
+    echo "  方法2 - 容器内安装："
+    echo "    docker exec -it gs-backend bash"
+    echo "    source /opt/py3/bin/activate"
+    echo "    pip install --target /opt/maxkb/python-packages <包名>"
+    echo ""
+    echo "  方法3 - 批量安装："
+    echo "    # 创建requirements.txt到 $DATA_DIR/maxkb-local/requirements.txt"
+    echo "    # 然后执行："
+    echo "    docker exec gs-backend bash -c \\"
+    echo "      source /opt/py3/bin/activate && \\"
+    echo "      pip install --target /opt/maxkb/python-packages -r /opt/maxkb/local/requirements.txt\""
+    echo ""
+    log_info "💡 提示: 使用Volume挂载，容器更新后依赖包会自动保留！"
+    echo ""
+}
+
 # 显示部署摘要
 show_summary() {
     echo ""
@@ -849,8 +877,19 @@ show_summary() {
     fi
     
     echo ""
+    echo -e "${CYAN}数据目录:${NC}"
+    echo "  - 日志目录: $DATA_DIR/maxkb-logs"
+    echo "  - 本地存储: $DATA_DIR/maxkb-local"
+    echo "  - 模型目录: $DATA_DIR/maxkb-models"
+    echo "  - Python包: $DATA_DIR/maxkb-python-packages"
+    echo ""
     echo -e "${CYAN}配置文件: $DATA_DIR/maxkb-config.env${NC}"
     echo ""
+
+    # 显示Python依赖管理信息
+    if [[ " ${SELECTED_COMPONENTS[*]} " =~ " backend " ]]; then
+        manage_python_dependencies
+    fi
 }
 
 # 主函数
