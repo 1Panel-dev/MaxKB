@@ -297,7 +297,6 @@ function clickNodes(item: any) {
     x: anchorData.value?.x + width / 2 + 200,
     y: anchorData.value?.y - item.height
   })
-  console.log(nodeModel)
   props.nodeModel.graphModel.addEdge({
     type: 'app-edge',
     sourceNodeId: props.nodeModel.id,
