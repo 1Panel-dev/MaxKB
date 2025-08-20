@@ -22,7 +22,7 @@
         </div>
       </div>
       <el-scrollbar>
-        <div class="hit-test-height">
+        <div :style="{ height: user.isExpire() ? 'calc(100vh - 340px)' : 'calc(100vh - 300px)' }">
           <el-empty
             v-if="first"
             :image="emptyImg"
@@ -231,6 +231,7 @@
 <script setup lang="ts">
 import { nextTick, ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
+import useStore from '@/stores'
 import { cloneDeep } from 'lodash'
 import ParagraphDialog from '@/views/paragraph/component/ParagraphDialog.vue'
 import { arraySort } from '@/utils/array'
@@ -241,6 +242,7 @@ const route = useRoute()
 const {
   params: { id },
 } = route as any
+const { user } = useStore()
 const apiType = computed(() => {
   if (route.path.includes('shared')) {
     return 'systemShare'
@@ -407,10 +409,6 @@ onMounted(() => {})
   &__header {
     position: absolute;
     right: calc(var(--app-base-px) * 3);
-  }
-
-  .hit-test-height {
-    height: calc(100vh - 300px);
   }
   .document-card {
     height: 210px;
