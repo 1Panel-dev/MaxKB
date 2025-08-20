@@ -64,6 +64,7 @@ export default {
     limitMessage1: '最多上傳',
     limitMessage2: '個文件',
     sizeLimit: '單個文件大小不能超過',
+    sizeLimit2: '空文件不支持上傳',
     imageMessage: '請解析圖片內容',
     fileMessage: '請解析文件內容',
     errorMessage: '上傳失敗',

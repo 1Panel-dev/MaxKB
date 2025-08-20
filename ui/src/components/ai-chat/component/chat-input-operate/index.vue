@@ -421,16 +421,29 @@ const uploadFile = async (file: any, fileList: any) => {
     uploadAudioList.value.length +
     uploadVideoList.value.length +
     uploadOtherList.value.length
+
   if (file_limit_once >= maxFiles) {
     MsgWarning(t('chat.uploadFile.limitMessage1') + maxFiles + t('chat.uploadFile.limitMessage2'))
     fileList.splice(0, fileList.length, ...fileList.slice(0, maxFiles))
+    return
+  }
+  console.log(fileList)
+  if (fileList.filter((f: any) => f.size == 0).length > 0) {
+    // MB
+    MsgWarning(t('chat.uploadFile.sizeLimit2') + fileLimit + 'MB')
+    // 只保留未超出大小限制的文件
+    fileList.splice(0, fileList.length, ...fileList.filter((f: any) => f.size > 0))
     return
   }
   if (fileList.filter((f: any) => f.size > fileLimit * 1024 * 1024).length > 0) {
     // MB
     MsgWarning(t('chat.uploadFile.sizeLimit') + fileLimit + 'MB')
     // 只保留未超出大小限制的文件
-    fileList.splice(0, fileList.length, ...fileList.filter((f: any) => f.size <= fileLimit * 1024 * 1024))
+    fileList.splice(
+      0,
+      fileList.length,
+      ...fileList.filter((f: any) => f.size <= fileLimit * 1024 * 1024),
+    )
     return
   }
   const inner = reactive(file)
