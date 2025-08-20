@@ -90,6 +90,12 @@ jobs:
           registry: ${{ secrets.FIT2CLOUD_REGISTRY_HOST }}
           username: ${{ secrets.FIT2CLOUD_REGISTRY_USERNAME }}
           password: ${{ secrets.FIT2CLOUD_REGISTRY_PASSWORD }}
+      - name: Build Web
+        run: |
+          docker buildx build --target web-build --output type=local,dest=./web-build-output . -f installer/Dockerfile
+          rm -rf ./ui
+          cp -r ./web-build-output/ui ./
+          rm -rf ./web-build-output
       - name: Docker Buildx (build-and-push)
         run: |
           sudo sync && echo 3 | sudo tee /proc/sys/vm/drop_caches && free -m
@@ -150,6 +156,12 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build Web
+        run: |
+          docker buildx build --target web-build --output type=local,dest=./web-build-output . -f installer/Dockerfile
+          rm -rf ./ui
+          cp -r ./web-build-output/ui ./
+          rm -rf ./web-build-output
       - name: Docker Buildx (build-and-push)
         run: |
           sudo sync && echo 3 | sudo tee /proc/sys/vm/drop_caches && free -m

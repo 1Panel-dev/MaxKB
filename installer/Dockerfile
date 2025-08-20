@@ -1,6 +1,6 @@
 FROM node:24-alpine AS web-build
 COPY ui ui
-RUN cd ui && \
+RUN cd ui && ls -la && if [ -d "dist" ]; then exit 0; fi && \
     npm install --prefer-offline --no-audit && \
     npm install -D concurrently && \
     NODE_OPTIONS="--max-old-space-size=4096" npx concurrently "npm run build" "npm run build-chat" && \
