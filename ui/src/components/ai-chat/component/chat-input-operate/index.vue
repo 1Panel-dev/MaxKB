@@ -454,10 +454,6 @@ const uploadFile = async (file: any, fileList: any) => {
       fileList.splice(0, fileList.length)
       file.url = response.data[0].url
       file.file_id = response.data[0].file_id
-
-      if (!inputValue.value && uploadImageList.value.length > 0) {
-        inputValue.value = t('chat.uploadFile.imageMessage')
-      }
     })
 }
 // 粘贴处理
@@ -532,7 +528,16 @@ const uploadOtherList = ref<Array<any>>([])
 const showDelete = ref('')
 
 const isDisabledChat = computed(
-  () => !(inputValue.value.trim() && (props.appId || props.applicationDetails?.name))
+  () =>
+    !(
+      (inputValue.value.trim() ||
+        uploadImageList.value.length > 0 ||
+        uploadDocumentList.value.length > 0 ||
+        uploadVideoList.value.length > 0 ||
+        uploadAudioList.value.length > 0 ||
+        uploadOtherList.value.length > 0) &&
+      (props.appId || props.applicationDetails?.name)
+    )
 )
 // 是否显示移动端语音按钮
 const isMicrophone = ref(false)
@@ -732,11 +737,34 @@ const stopTimer = () => {
   }
 }
 
+const getQuestion = () => {
+  if (!inputValue.value.trim()) {
+    const fileLenth = [
+      uploadImageList.value.length > 0,
+      uploadDocumentList.value.length > 0,
+      uploadAudioList.value.length > 0,
+      uploadOtherList.value.length > 0
+    ]
+    if (fileLenth.filter((f) => f).length > 1) {
+      return t('chat.uploadFile.otherMessage')
+    } else if (fileLenth[0]) {
+      return t('chat.uploadFile.imageMessage')
+    } else if (fileLenth[1]) {
+      return t('chat.uploadFile.documentMessage')
+    } else if (fileLenth[2]) {
+      return t('chat.uploadFile.audioMessage')
+    } else if (fileLenth[3]) {
+      return t('chat.uploadFile.otherMessage')
+    }
+  }
+
+  return inputValue.value.trim()
+}
 function autoSendMessage() {
   props
     .validate()
     .then(() => {
-      props.sendMessage(inputValue.value, {
+      props.sendMessage(getQuestion(), {
         image_list: uploadImageList.value,
         document_list: uploadDocumentList.value,
         audio_list: uploadAudioList.value,
@@ -771,7 +799,14 @@ function sendChatHandle(event?: any) {
     // 如果没有按下组合键，则会阻止默认事件
     event?.preventDefault()
     if (!isDisabledChat.value && !props.loading && !event?.isComposing) {
-      if (inputValue.value.trim()) {
+      if (
+        inputValue.value.trim() ||
+        uploadImageList.value.length > 0 ||
+        uploadDocumentList.value.length > 0 ||
+        uploadAudioList.value.length > 0 ||
+        uploadVideoList.value.length > 0 ||
+        uploadOtherList.value.length > 0
+      ) {
         autoSendMessage()
       }
     }
