@@ -64,7 +64,7 @@ export default {
     sizeLimit: 'Each file must not exceed',
     imageMessage: 'Please process the image content',
     documentMessage: 'Please understand the content of the document',
-    audioMessage: 'Please understand the aideo content',
+    audioMessage: 'Please understand the audio content',
     otherMessage: 'Please understand the file content',
     errorMessage: 'Upload Failed'
   },
