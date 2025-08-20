@@ -8664,3 +8664,6 @@ msgstr ""
 
 msgid "The Qwen Audio based end-to-end speech recognition model supports audio recognition within 3 minutes. At present, it mainly supports Chinese and English recognition."
 msgstr ""
+
+msgid "If not passed, the default value is 'zh'"
+msgstr ""
