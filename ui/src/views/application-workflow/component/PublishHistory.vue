@@ -15,7 +15,7 @@
             <template #default="{ row, index }">
               <div class="flex-between">
                 <div style="max-width: 80%">
-                  <h5 :class="index === 0 ? 'primary' : ''" class="flex">
+                  <h5 :class="index === 0 ? 'primary' : ''" class="flex align-center">
                     <ReadWrite
                       @change="editName($event, row)"
                       :data="row.name || datetimeFormat(row.update_time)"
@@ -27,7 +27,7 @@
                       $t('views.applicationWorkflow.setting.latestRelease')
                     }}</el-tag>
                   </h5>
-                  <el-text type="info" class="color-secondary flex mt-8">
+                  <el-text type="info" class="color-secondary flex align-center mt-8">
                     <el-avatar :size="20" class="avatar-grey mr-4">
                       <el-icon><UserFilled /></el-icon>
                     </el-avatar>

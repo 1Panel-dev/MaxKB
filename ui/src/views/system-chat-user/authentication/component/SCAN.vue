@@ -34,7 +34,7 @@
             <div v-if="item.isValid" class="border-t mt-16">
               <el-row :gutter="12" class="mt-16">
                 <el-col v-for="(value, key) in item.config" :key="key" :span="12">
-                  <el-text type="info" class="lighter">{{ formatFieldName(key, item) }}</el-text>
+                  <el-text class="color-secondary lighter">{{ formatFieldName(key, item) }}</el-text>
                   <div class="mt-4 mb-16 flex align-center">
                     <span
                       v-if="key !== 'app_secret'"

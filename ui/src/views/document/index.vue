@@ -108,7 +108,7 @@
           </div>
           <app-table
             ref="multipleTableRef"
-            class="mt-16"
+            class="mt-16 document-table"
             :data="documentData"
             :pagination-config="paginationConfig"
             :quick-create="
@@ -1205,6 +1205,11 @@ onBeforeUnmount(() => {
     background: #ffffff;
     z-index: 22;
     box-shadow: 0px -2px 4px 0px rgba(31, 35, 41, 0.08);
+  }
+  .document-table {
+    :deep(.el-table__row) {
+      cursor: pointer;
+    }
   }
 }
 </style>

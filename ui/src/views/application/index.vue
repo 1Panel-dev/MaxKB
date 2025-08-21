@@ -133,10 +133,10 @@
                     </el-text>
                   </template>
                   <template #tag>
-                    <el-tag type="warning" v-if="isWorkFlow(item.type)" style="height: 22px">
+                    <el-tag v-if="isWorkFlow(item.type)" class="warning-tag">
                       {{ $t('views.application.workflow') }}
                     </el-tag>
-                    <el-tag class="blue-tag" v-else style="height: 22px">
+                    <el-tag class="blue-tag" v-else>
                       {{ $t('views.application.simple') }}
                     </el-tag>
                   </template>
