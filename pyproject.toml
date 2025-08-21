@@ -57,7 +57,7 @@ dependencies = [
     "python-daemon==3.1.2",
     "websockets==15.0.1",
     "pylint==3.3.7",
-    "cohere>=5.17.0",
+    "cohere==5.17.0",
 ]
 
 [tool.uv]
