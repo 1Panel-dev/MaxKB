@@ -40,9 +40,19 @@ export default {
       placeholder: '请输入工具名称',
       requiredMessage: '请输入工具名称',
     },
+    mcpName: {
+      label: '名称',
+      name: 'MCP名称',
+      placeholder: '请输入MCP名称',
+      requiredMessage: '请输入MCP名称',
+    },
     toolDescription: {
       label: '描述',
       placeholder: '请输入工具的描述',
+    },
+    mcpDescription: {
+      label: '描述',
+      placeholder: '请输入MCP的描述',
     },
     paramName: {
       label: '参数名',

@@ -46,9 +46,19 @@ export default {
       placeholder: 'Please enter the tool name',
       requiredMessage: 'Please enter the tool name',
     },
+    mcpName: {
+      label: 'Name',
+      name: 'MCP Name',
+      placeholder: 'Please enter the MCP name',
+      requiredMessage: 'Please enter the MCP name',
+    },
     toolDescription: {
       label: 'Description',
       placeholder: 'Please enter a description of the tool',
+    },
+    mcpDescription: {
+      label: 'Description',
+      placeholder: 'Please enter a description of the MCP',
     },
     paramName: {
       label: 'Parameter Name',

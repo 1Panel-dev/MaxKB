@@ -43,9 +43,19 @@ export default {
       placeholder: '請輸入工具名稱',
       requiredMessage: '請輸入工具名稱',
     },
+    mcpName: {
+      label: '名稱',
+      name: 'MCP名稱',
+      placeholder: '請輸入MCP名稱',
+      requiredMessage: '請輸入MCP名稱',
+    },
     toolDescription: {
       label: '描述',
       placeholder: '請輸入工具的描述',
+    },
+    mcpDescription: {
+      label: '描述',
+      placeholder: '請輸入MCP的描述',
     },
     paramName: {
       label: '參數名',

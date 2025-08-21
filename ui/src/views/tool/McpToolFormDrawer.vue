@@ -17,7 +17,7 @@
         v-loading="loading"
         @submit.prevent
       >
-        <el-form-item :label="$t('views.tool.form.toolName.label')" prop="name">
+        <el-form-item :label="$t('views.tool.form.mcpName.label')" prop="name">
           <div class="flex w-full">
             <div
               v-if="form.id"
@@ -55,7 +55,7 @@
             </el-avatar>
             <el-input
               v-model="form.name"
-              :placeholder="$t('views.tool.form.toolName.placeholder')"
+              :placeholder="$t('views.tool.form.mcpName.placeholder')"
               maxlength="64"
               show-word-limit
               @blur="form.name = form.name?.trim()"
@@ -63,11 +63,11 @@
           </div>
         </el-form-item>
 
-        <el-form-item :label="$t('views.tool.form.toolDescription.label')">
+        <el-form-item :label="$t('views.tool.form.mcpDescription.label')">
           <el-input
             v-model="form.desc"
             type="textarea"
-            :placeholder="$t('views.tool.form.toolDescription.placeholder')"
+            :placeholder="$t('views.tool.form.mcpDescription.placeholder')"
             maxlength="128"
             show-word-limit
             :autosize="{ minRows: 3 }"
@@ -78,7 +78,7 @@
           {{ $t('views.tool.form.mcp.title') }}
         </h4>
 
-        <el-form-item :label="$t('views.tool.form.toolDescription.label')" prop="code">
+        <el-form-item :label="$t('views.tool.form.mcpDescription.label')" prop="code">
           <template #label>
             {{ $t('views.tool.form.mcp.label') }}
             <span class="color-danger">*</span>
@@ -197,7 +197,7 @@ const rules = reactive({
   name: [
     {
       required: true,
-      message: t('views.tool.form.toolName.requiredMessage'),
+      message: t('views.tool.form.mcpName.requiredMessage'),
       trigger: 'blur',
     },
   ],
