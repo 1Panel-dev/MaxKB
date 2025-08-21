@@ -9,7 +9,6 @@
 import uuid
 from django.core.cache import cache
 from django.db.models import QuerySet
-from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import action
 from rest_framework.request import Request
 from rest_framework.views import APIView
@@ -26,11 +25,6 @@ class RuoyiLoginApi(APIView):
     authentication_classes = []
 
     @action(methods=['POST'], detail=False)
-    @swagger_auto_schema(operation_summary="Ruoyi Token登录",
-                         operation_id="Ruoyi Token登录",
-                         request_body=LoginSerializer,
-                         responses=result.get_api_response(UserSerializer),
-                         tags=["用户管理"])
     def ruoyi_login(self, request: Request):
         """
         Ruoyi Token登录接口
@@ -92,10 +86,6 @@ class RuoyiLoginApi(APIView):
         return token
 
     @action(methods=['GET'], detail=False)
-    @swagger_auto_schema(operation_summary="检查Ruoyi Token状态",
-                         operation_id="检查Ruoyi Token状态",
-                         responses=result.get_api_response(UserSerializer),
-                         tags=["用户管理"])
     def check_ruoyi_status(self, request: Request):
         """
         检查Ruoyi Token状态
