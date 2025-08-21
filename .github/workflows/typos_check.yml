@@ -20,7 +20,8 @@ jobs:
         [files]
         extend-exclude = [
           "**/*_svg",
-          "**/migrations/**"
+          "**/migrations/**",
+          "**/tencent_model_provider/**"
         ]
         EOF
     - name: Check spelling

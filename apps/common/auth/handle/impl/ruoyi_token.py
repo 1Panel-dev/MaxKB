@@ -31,7 +31,7 @@ class RuoyiToken(AuthBaseHandle):
             return True
             
         # 方式2: 通过请求头判断
-        if request.META.get('HTTP_X_AUTH_TYPE') == 'ruoyi':
+        if request.META.get('HTTP_X_AUTH_TYPE') == 'sparkone':
             return True
             
         # 方式3: 通过token前缀判断（如果Ruoyi有特定前缀）

@@ -144,6 +144,7 @@ import { loadScript } from '@/utils/common'
 import { RuoyiIntegration } from '@/utils/ruoyi-integration'
 
 const router = useRouter()
+const route = useRoute()
 const { login, user, theme } = useStore()
 const { locale } = useI18n({ useScope: 'global' })
 const loading = ref<boolean>(false)
@@ -380,7 +381,6 @@ onMounted(async () => {
     console.error('Ruoyi自动登录失败:', error)
   }
 
-  const route = useRoute()
   const currentUrl = ref(route.fullPath)
   const params = new URLSearchParams(currentUrl.value.split('?')[1])
   const client = params.get('client')
