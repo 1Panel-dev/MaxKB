@@ -39,7 +39,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clear Work Dir
-        run: rm -rf -- ./* ./.??*
+        run: |
+          ls -la
+          rm -rf -- ./* ./.??*
       - name: Check Disk Space
         run: df -h
       - name: Free Disk Space (Ubuntu)
@@ -108,7 +110,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clear Work Dir
-        run: rm -rf -- ./* ./.??*
+        run: |
+          ls -la
+          rm -rf -- ./* ./.??*
       - name: Check Disk Space
         run: df -h
       - name: Free Disk Space (Ubuntu)
