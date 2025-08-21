@@ -8,6 +8,7 @@ export default {
   copyTool: '複製工具',
   importTool: '匯入工具',
   settingTool: '設定工具',
+  mcpConfig: 'MCP服務配置',
   toolStore: {
     title: '工具商店',
     createFromToolStore: '從工具商店創建',
@@ -35,9 +36,6 @@ export default {
     confirmMessage: '停用後，引用該工具的應用在查詢時會報錯，請謹慎操作。',
   },
   form: {
-    create: '建立工具',
-    createMcp: '建立MCP',
-    mcpConfig: 'MCP服務配置',
     toolName: {
       label: '名稱',
       name: '工具名稱',
