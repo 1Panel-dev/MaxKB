@@ -1,7 +1,7 @@
 <template>
   <div class="upload-document p-12-24">
     <div class="flex align-center mb-16">
-      <back-button to="-1" style="margin-left: -4px"></back-button>
+      <back-button @click="back" style="margin-left: -4px"></back-button>
       <h3 style="display: inline-block">{{ $t('views.document.uploadDocument') }}</h3>
     </div>
     <el-card style="--el-card-padding: 0">

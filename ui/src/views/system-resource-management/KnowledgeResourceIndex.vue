@@ -186,7 +186,7 @@
               </span>
             </el-tooltip>
             <el-dropdown trigger="click" v-if="MoreFilledPermission()">
-              <el-button text @click.stop>
+              <el-button text @click.stop type="primary">
                 <AppIcon iconName="app-more"></AppIcon>
               </el-button>
               <template #dropdown>

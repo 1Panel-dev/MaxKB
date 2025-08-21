@@ -57,10 +57,7 @@
                 >{{ $t('views.system.email.enableTLS') }}
               </el-checkbox>
             </el-form-item>
-            <el-button
-              @click="submit(emailFormRef)"
-              type="primary"
-              :disabled="loading"
+            <span
               v-hasPermission="
                 new ComplexPermission(
                   [RoleConst.ADMIN],
@@ -69,12 +66,17 @@
                   'OR',
                 )
               "
+              class="mr-12"
             >
-              {{ $t('common.save') }}
-            </el-button>
-            <el-button @click="submit(emailFormRef, 'test')" :disabled="loading">
-              {{ $t('views.system.test') }}
-            </el-button>
+              <el-button @click="submit(emailFormRef)" type="primary" :disabled="loading">
+                {{ $t('common.save') }}
+              </el-button>
+            </span>
+            <span>
+              <el-button @click="submit(emailFormRef, 'test')" :disabled="loading">
+                {{ $t('views.system.test') }}
+              </el-button>
+            </span>
           </el-form>
         </div>
       </el-scrollbar>

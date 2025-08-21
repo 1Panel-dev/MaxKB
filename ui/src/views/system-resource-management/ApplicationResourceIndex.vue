@@ -67,10 +67,10 @@
           width="160"
         >
           <template #default="scope">
-            <el-tag type="warning" v-if="isWorkFlow(scope.row.type)" style="height: 22px">
+            <el-tag class="warning-tag" v-if="isWorkFlow(scope.row.type)">
               {{ $t('views.application.workflow') }}
             </el-tag>
-            <el-tag class="blue-tag" v-else style="height: 22px">
+            <el-tag class="blue-tag" v-else>
               {{ $t('views.application.simple') }}
             </el-tag>
           </template>
@@ -255,7 +255,7 @@
               </span>
             </el-tooltip>
             <el-dropdown trigger="click" v-if="MoreFilledPermission()">
-              <el-button text @click.stop>
+              <el-button text @click.stop type="primary">
                 <AppIcon iconName="app-more"></AppIcon>
               </el-button>
               <template #dropdown>

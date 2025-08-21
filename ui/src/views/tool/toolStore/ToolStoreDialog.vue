@@ -7,7 +7,7 @@
           {{ $t('views.tool.toolStore.title') }}
         </h4>
 
-        <el-tag class="store-type default-tag">{{t('views.tool.toolStore.internal')}}</el-tag>
+        <!-- <el-tag class="store-type default-tag">{{t('views.tool.toolStore.internal')}}</el-tag> -->
 
         <div class="flex align-center" style="margin-right: 28px;">
           <el-input v-model="searchValue" :placeholder="$t('common.search')" prefix-icon="Search" class="w-240 mr-8"
@@ -33,7 +33,7 @@
               {{ category.title }}
             </h4>
             <el-row :gutter="16">
-              <el-col v-for="tool in category.tools" :key="tool.id" :span="8" class="mb-16">
+              <el-col v-for="tool in category.tools" :key="tool.id" :span="12" class="mb-16">
                 <ToolCard :tool="tool" :addLoading="addLoading" :get-sub-title="getSubTitle"
                   @handleAdd="handleOpenAdd(tool)" @handleDetail="handleDetail(tool)" />
               </el-col>
@@ -46,7 +46,7 @@
             {{ t('views.tool.toolStore.searchResult', { count: filterList.length }) }}
           </h4>
           <el-row :gutter="16" v-if="filterList.length">
-            <el-col v-for="tool in filterList" :key="tool.id" :span="8" class="mb-16">
+            <el-col v-for="tool in filterList" :key="tool.id" :span="12" class="mb-16">
               <ToolCard :tool="tool" :addLoading="addLoading" :get-sub-title="getSubTitle"
                 @handleAdd="handleOpenAdd(tool)" @handleDetail="handleDetail(tool)" />
             </el-col>

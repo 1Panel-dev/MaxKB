@@ -8,19 +8,21 @@
       class="p-8"
     />
     <div class="tree-height" :style="treeStyle">
-      <div
-        @click="handleSharedNodeClick"
-        v-if="showShared && hasPermission(EditionConst.IS_EE, 'OR')"
-        class="shared-button flex cursor border-b"
-        :class="currentNodeKey === 'share' && 'active'"
-      >
-        <AppIcon
-          iconName="app-shared-active"
-          style="font-size: 18px"
-          class="color-primary"
-        ></AppIcon>
-        <span class="ml-8 lighter">{{ shareTitle }}</span>
+      <div v-if="showShared && hasPermission(EditionConst.IS_EE, 'OR')" class="border-b mb-4">
+        <div
+          @click="handleSharedNodeClick"
+          class="shared-button flex cursor"
+          :class="currentNodeKey === 'share' && 'active'"
+        >
+          <AppIcon
+            iconName="app-shared-active"
+            style="font-size: 18px"
+            class="color-primary"
+          ></AppIcon>
+          <span class="ml-8 lighter">{{ shareTitle }}</span>
+        </div>
       </div>
+
       <el-scrollbar>
         <el-tree
           ref="treeRef"
