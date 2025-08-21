@@ -40,6 +40,7 @@ export default {
   form: {
     create: 'Create Tool',
     createMcp: 'Create MCP',
+    mcpConfig: 'MCP Service Config',
     toolName: {
       label: 'Name',
       name: 'Tool Name',

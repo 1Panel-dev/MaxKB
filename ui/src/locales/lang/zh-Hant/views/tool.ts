@@ -37,6 +37,7 @@ export default {
   form: {
     create: '建立工具',
     createMcp: '建立MCP',
+    mcpConfig: 'MCP服務配置',
     toolName: {
       label: '名稱',
       name: '工具名稱',

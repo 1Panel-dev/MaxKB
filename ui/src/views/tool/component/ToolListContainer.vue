@@ -219,6 +219,13 @@
                       <template #dropdown>
                         <el-dropdown-menu>
                           <el-dropdown-item
+                            v-if="item.tool_type === 'MCP'"
+                            @click.stop="showMcpConfig(item)"
+                          >
+                            <AppIcon iconName="app-edit" class="color-secondary"></AppIcon>
+                            {{ $t('views.tool.form.mcpConfig') }}
+                          </el-dropdown-item>
+                          <el-dropdown-item
                             v-if="item.template_id && permissionPrecise.edit(item.id)"
                             @click.stop="addInternalTool(item, true)"
                           >
@@ -306,6 +313,7 @@
   <CreateFolderDialog ref="CreateFolderDialogRef" v-if="!isShared" @refresh="refreshFolder" />
   <ToolStoreDialog ref="toolStoreDialogRef" :api-type="apiType" @refresh="refresh" />
   <AddInternalToolDialog ref="AddInternalToolDialogRef" @refresh="confirmAddInternalTool" />
+  <McpToolConfigDialog ref="McpToolConfigDialogRef" @refresh="refresh" />
   <AuthorizedWorkspace
     ref="AuthorizedWorkspaceDialogRef"
     v-if="isSystemShare"
@@ -336,6 +344,7 @@ import ToolStoreDialog from '@/views/tool/toolStore/ToolStoreDialog.vue'
 import AddInternalToolDialog from '@/views/tool/toolStore/AddInternalToolDialog.vue'
 import MoveToDialog from '@/components/folder-tree/MoveToDialog.vue'
 import ResourceAuthorizationDrawer from '@/components/resource-authorization-drawer/index.vue'
+import McpToolConfigDialog from "@/views/tool/component/McpToolConfigDialog.vue";
 import { resetUrl } from '@/utils/common'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import { SourceTypeEnum } from '@/enums/common'
@@ -641,6 +650,15 @@ function importTool(file: any) {
           window.open('https://maxkb.cn/pricing.html', '_blank')
         })
       }
+    })
+}
+
+const McpToolConfigDialogRef = ref()
+function showMcpConfig(item: any) {
+  loadSharedApi({ type: 'tool', systemType: apiType.value })
+    .getToolById(item?.id, loading)
+    .then((res: any) => {
+      McpToolConfigDialogRef.value.open(res.data)
     })
 }
 
