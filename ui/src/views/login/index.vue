@@ -141,6 +141,7 @@ import QrCodeTab from '@/views/login/scanCompinents/QrCodeTab.vue'
 import { MsgConfirm, MsgError } from '@/utils/message.ts'
 import * as dd from 'dingtalk-jsapi'
 import { loadScript } from '@/utils/common'
+import { RuoyiIntegration } from '@/utils/ruoyi-integration'
 
 const router = useRouter()
 const { login, user, theme } = useStore()
@@ -362,8 +363,23 @@ onBeforeMount(() => {
 })
 declare const window: any
 
-onMounted(() => {
+onMounted(async () => {
   makeCode()
+
+  // Ruoyi自动登录检测
+  try {
+    const ruoyiLoginSuccess = await RuoyiIntegration.autoLogin()
+    if (ruoyiLoginSuccess) {
+      // 登录成功，跳转到首页
+      locale.value = localStorage.getItem('MaxKB-locale') || getBrowserLang() || 'en-US'
+      localStorage.setItem('workspace_id', 'default')
+      router.push({ name: 'home' })
+      return
+    }
+  } catch (error) {
+    console.error('Ruoyi自动登录失败:', error)
+  }
+
   const route = useRoute()
   const currentUrl = ref(route.fullPath)
   const params = new URLSearchParams(currentUrl.value.split('?')[1])

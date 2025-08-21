@@ -8,3 +8,4 @@
 """
 from .login import *
 from .user import *
+from .ruoyi_login import *

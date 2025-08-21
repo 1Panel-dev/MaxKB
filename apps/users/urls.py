@@ -6,6 +6,8 @@ app_name = "user"
 # @formatter:off
 urlpatterns = [
     path('user/login', views.LoginView.as_view(), name='login'),
+    path('user/ruoyi_login', views.RuoyiLoginApi.as_view({'post': 'ruoyi_login'}), name='ruoyi_login'),
+    path('user/ruoyi_status', views.RuoyiLoginApi.as_view({'get': 'check_ruoyi_status'}), name='ruoyi_status'),
     path('user/profile', views.UserProfileView.as_view(), name="user_profile"),
     path('user/captcha', views.CaptchaView.as_view(), name='captcha'),
     path('user/test', views.TestPermissionsUserView.as_view(), name="test"),

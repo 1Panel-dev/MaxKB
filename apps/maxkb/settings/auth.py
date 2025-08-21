@@ -9,8 +9,11 @@
 USER_TOKEN_AUTH = 'common.auth.handle.impl.user_token.UserToken'
 CHAT_ANONYMOUS_USER_AURH = 'common.auth.handle.impl.chat_anonymous_user_token.ChatAnonymousUserToken'
 APPLICATION_KEY_AUTH = 'common.auth.handle.impl.application_key.ApplicationKey'
+RUOYI_TOKEN_AUTH = 'common.auth.handle.impl.ruoyi_token.RuoyiToken'
+
 AUTH_HANDLES = [
     USER_TOKEN_AUTH,
     CHAT_ANONYMOUS_USER_AURH,
-    APPLICATION_KEY_AUTH
+    APPLICATION_KEY_AUTH,
+    RUOYI_TOKEN_AUTH
 ]
