@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="$t('views.tool.form.mcpConfig')"
+    :title="$t('views.tool.mcpConfig')"
     width="600"
     v-model="dialogVisible"
     :close-on-click-modal="false"
@@ -8,6 +8,7 @@
     :destroy-on-close="true"
     :before-close="close"
     append-to-body
+    class="mcp-config-dialog"
   >
     <el-form label-width="auto" label-position="top">
       <el-form-item>
@@ -16,24 +17,25 @@
           v-model="mcp_servers"
           rows="8"
           disabled
+          class="config-textarea"
+          @mouseenter.stop="showIcon = true"
+          @mouseleave.stop="showIcon = false"
         ></el-input>
-        <AppIcon
-          iconName="app-copy"
-          class="copy-icon color-secondary"
-          @click="copyClick(mcp_servers)"
-        />
+        <el-button circle class="copy-icon" v-if="showIcon" @click="copyClick(mcp_servers)">
+          <AppIcon iconName="app-copy" class="color-secondary"/>
+        </el-button>
       </el-form-item>
     </el-form>
   </el-dialog>
 </template>
 
 <script setup lang="ts">
-import {ref} from 'vue'
-import {copyClick} from '@/utils/clipboard'
-
+import { ref } from 'vue'
+import { copyClick } from '@/utils/clipboard'
 
 const mcp_servers = ref<string>('')
 const dialogVisible = ref<boolean>(false)
+const showIcon = ref<boolean>(false)
 
 const close = () => {
   dialogVisible.value = false
@@ -43,25 +45,23 @@ const open = (item: any) => {
   dialogVisible.value = true
 }
 
-defineExpose({open,})
+defineExpose({ open })
 </script>
 
 <style scoped lang="scss">
-
-.copy-icon {
-  position: absolute;
-  top: 6px;
-  right: 8px;
-  font-size: 16px;
-  cursor: pointer;
-  z-index: 2;
-}
-
-.copy-icon:hover {
-  opacity: 0.85;
-}
-
-:deep(.el-textarea__inner) {
-  padding-right: 34px; // 给右上角图标留空间
+.mcp-config-dialog {
+  .copy-icon {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    box-shadow: 0px 4px 8px 0px rgba(31, 35, 41, 0.1);
+    z-index: 2;
+  }
+  .config-textarea {
+    :deep(.el-textarea__inner) {
+      color: var(--el-text-color-primary);
+      cursor: pointer;
+    }
+  }
 }
 </style>

@@ -20,12 +20,10 @@
         </el-button>
       </el-tooltip>
     </div>
-    <template v-if="nodeModel.properties.config.chatFields">
+    <template v-if="nodeModel.properties.config.chatFields?.length">
       <h5 class="title-decoration-1 mb-8">{{ $t('views.applicationWorkflow.variable.chat') }}</h5>
       <div
-        v-for="(item, index) in nodeModel.properties.config.chatFields
-          ? nodeModel.properties.config.chatFields
-          : []"
+        v-for="(item, index) in nodeModel.properties.config.chatFields || []"
         :key="index"
         class="flex-between border-r-6 p-8-12 mb-8 layout-bg lighter"
         @mouseenter="showicon = true"

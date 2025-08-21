@@ -8,6 +8,7 @@ export default {
   copyTool: 'Copy Tool',
   importTool: 'Import Tool',
   settingTool: 'Set Tool',
+  mcpConfig: 'MCP Service Config',
   toolStore: {
     title: 'Tool Store',
     createFromToolStore: 'Create from Tool Store',
@@ -38,9 +39,6 @@ export default {
   },
 
   form: {
-    create: 'Create Tool',
-    createMcp: 'Create MCP',
-    mcpConfig: 'MCP Service Config',
     toolName: {
       label: 'Name',
       name: 'Tool Name',

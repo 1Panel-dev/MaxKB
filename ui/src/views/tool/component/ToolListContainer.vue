@@ -50,7 +50,7 @@
                     <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt="" />
                   </el-avatar>
                   <div class="pre-wrap ml-8">
-                    <div class="lighter">{{ $t('views.tool.form.create') }}</div>
+                    <div class="lighter">{{ $t('views.tool.createTool') }}</div>
                   </div>
                 </div>
               </el-dropdown-item>
@@ -60,7 +60,7 @@
                     <img src="@/assets/workflow/icon_mcp.svg" style="width: 75%" alt="" />
                   </el-avatar>
                   <div class="pre-wrap ml-8">
-                    <div class="lighter">{{ $t('views.tool.form.createMcp') }}</div>
+                    <div class="lighter">{{ $t('views.tool.createMcpTool') }}</div>
                   </div>
                 </div>
               </el-dropdown-item>
@@ -222,8 +222,8 @@
                             v-if="item.tool_type === 'MCP'"
                             @click.stop="showMcpConfig(item)"
                           >
-                            <AppIcon iconName="app-edit" class="color-secondary"></AppIcon>
-                            {{ $t('views.tool.form.mcpConfig') }}
+                            <AppIcon iconName="app-operate-log" class="color-secondary"></AppIcon>
+                            {{ $t('views.tool.mcpConfig') }}
                           </el-dropdown-item>
                           <el-dropdown-item
                             v-if="item.template_id && permissionPrecise.edit(item.id)"
