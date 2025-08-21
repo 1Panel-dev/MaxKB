@@ -18,6 +18,7 @@ COPY --chmod=700 . /opt/maxkb-app
 WORKDIR /opt/maxkb-app
 RUN rm -rf /opt/maxkb-app/ui && \
     pip install uv --break-system-packages && \
+    . /opt/py3/bin/activate && \
     uv pip install -r pyproject.toml && \
     find /opt/maxkb-app  -depth \( -name ".git*" -o -name ".docker*" -o -name ".idea*" -o -name ".editorconfig*" -o -name ".prettierrc*" -o -name "README.md" -o -name "poetry.lock" -o -name "pyproject.toml"  \) -exec rm -rf {} + && \
     export MAXKB_CONFIG_TYPE=ENV && python3 /opt/maxkb-app/apps/manage.py compilemessages && \

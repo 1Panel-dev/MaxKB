@@ -1,8 +1,6 @@
 FROM python:3.11-slim-trixie AS python-stage
-RUN mkdir -p /opt/maxkb-app && \
-    cd /opt/maxkb-app && \
-    python3 -m venv /opt/py3 && \
-    . /opt/py3/bin/activate
+RUN python3 -m venv /opt/py3
+
 
 FROM ghcr.io/1panel-dev/maxkb-vector-model:v2.0.2 AS vector-model
 
