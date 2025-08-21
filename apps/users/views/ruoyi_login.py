@@ -38,7 +38,7 @@ class RuoyiLoginApi(APIView):
         """
         try:
             # 获取token
-            token = request.data.get('token') or request.GET.get('ruoyi_token')
+            token = request.data.get('token') or request.GET.get('sparkone_token')
             if not token:
                 return result.error(message="Token不能为空")
 
@@ -102,7 +102,7 @@ class RuoyiLoginApi(APIView):
         检查Ruoyi Token状态
         """
         try:
-            token = request.GET.get('ruoyi_token')
+            token = request.GET.get('sparkone_token')
             if not token:
                 return result.error(message="Token不能为空")
 

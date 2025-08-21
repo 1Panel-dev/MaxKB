@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ruoyi集成测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 3px;
+            white-space: pre-wrap;
+        }
+        .success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        iframe {
+            width: 100%;
+            height: 400px;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h1>Ruoyi集成测试页面</h1>
+    
+    <div class="test-section">
+        <h3>1. 直接URL跳转测试</h3>
+        <p>测试通过URL参数传递token的方式</p>
+        <input type="text" id="tokenInput" placeholder="请输入sparkone_token" value="test_token_123456">
+        <button onclick="testDirectUrl()">测试直接跳转</button>
+        <div id="directResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>2. iframe嵌入测试</h3>
+        <p>测试在iframe中嵌入MaxKB并传递token</p>
+        <input type="text" id="iframeTokenInput" placeholder="请输入sparkone_token" value="test_token_123456">
+        <button onclick="testIframe()">测试iframe嵌入</button>
+        <button onclick="sendTokenToIframe()">向iframe发送token</button>
+        <div id="iframeContainer"></div>
+        <div id="iframeResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>3. API测试</h3>
+        <p>直接测试MaxKB的Ruoyi登录API</p>
+        <input type="text" id="apiTokenInput" placeholder="请输入sparkone_token" value="test_token_123456">
+        <button onclick="testLoginApi()">测试登录API</button>
+        <button onclick="testStatusApi()">测试状态API</button>
+        <div id="apiResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>4. 日志监控</h3>
+        <p>查看浏览器控制台日志以监控整个流程</p>
+        <button onclick="clearConsole()">清空控制台</button>
+        <button onclick="showLogs()">显示日志说明</button>
+        <div id="logInfo" class="result" style="display: none;">
+            <strong>日志说明：</strong><br>
+            1. 打开浏览器开发者工具 (F12)<br>
+            2. 切换到 Console 标签<br>
+            3. 执行测试操作<br>
+            4. 查看以下关键日志：<br>
+            - [RuoyiIntegration] 前端集成日志<br>
+            - [RuoyiToken] 后端认证处理器日志<br>
+            - 网络请求日志 (Network 标签)<br>
+        </div>
+    </div>
+
+    <script>
+        // 测试直接URL跳转
+        function testDirectUrl() {
+            const token = document.getElementById('tokenInput').value;
+            if (!token) {
+                showResult('directResult', '请输入token', 'error');
+                return;
+            }
+            
+            const url = `http://localhost:3000/admin/login?sparkone_token=${encodeURIComponent(token)}`;
+            showResult('directResult', `正在跳转到: ${url}`, 'success');
+            
+            // 在新窗口打开
+            window.open(url, '_blank');
+        }
+        
+        // 测试iframe嵌入
+        function testIframe() {
+            const token = document.getElementById('iframeTokenInput').value;
+            if (!token) {
+                showResult('iframeResult', '请输入token', 'error');
+                return;
+            }
+            
+            const url = `http://localhost:3000/admin/login?sparkone_token=${encodeURIComponent(token)}`;
+            const iframe = document.createElement('iframe');
+            iframe.src = url;
+            iframe.id = 'maxkbIframe';
+            
+            const container = document.getElementById('iframeContainer');
+            container.innerHTML = '';
+            container.appendChild(iframe);
+            
+            showResult('iframeResult', `iframe已创建，URL: ${url}`, 'success');
+            
+            // 监听iframe消息
+            window.addEventListener('message', function(event) {
+                console.log('收到iframe消息:', event.data);
+                if (event.data.type === 'MAXKB_LOGIN_STATUS') {
+                    showResult('iframeResult', `登录状态: ${event.data.success ? '成功' : '失败'}`, 
+                              event.data.success ? 'success' : 'error');
+                }
+            });
+        }
+        
+        // 向iframe发送token
+        function sendTokenToIframe() {
+            const token = document.getElementById('iframeTokenInput').value;
+            const iframe = document.getElementById('maxkbIframe');
+            
+            if (!iframe) {
+                showResult('iframeResult', '请先创建iframe', 'error');
+                return;
+            }
+            
+            iframe.contentWindow.postMessage({
+                type: 'RUOYI_TOKEN',
+                token: token
+            }, '*');
+            
+            showResult('iframeResult', `已向iframe发送token: ${token.substring(0, 20)}...`, 'success');
+        }
+        
+        // 测试登录API
+        async function testLoginApi() {
+            const token = document.getElementById('apiTokenInput').value;
+            if (!token) {
+                showResult('apiResult', '请输入token', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('http://localhost:8080/api/user/ruoyi_login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ token: token })
+                });
+                
+                const result = await response.json();
+                showResult('apiResult', `登录API响应:\n${JSON.stringify(result, null, 2)}`, 
+                          result.code === 200 ? 'success' : 'error');
+            } catch (error) {
+                showResult('apiResult', `API调用失败: ${error.message}`, 'error');
+            }
+        }
+        
+        // 测试状态API
+        async function testStatusApi() {
+            const token = document.getElementById('apiTokenInput').value;
+            if (!token) {
+                showResult('apiResult', '请输入token', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`http://localhost:8080/api/user/ruoyi_status?sparkone_token=${encodeURIComponent(token)}`);
+                const result = await response.json();
+                showResult('apiResult', `状态API响应:\n${JSON.stringify(result, null, 2)}`, 
+                          result.data?.valid ? 'success' : 'error');
+            } catch (error) {
+                showResult('apiResult', `API调用失败: ${error.message}`, 'error');
+            }
+        }
+        
+        // 显示结果
+        function showResult(elementId, message, type = '') {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `result ${type}`;
+        }
+        
+        // 清空控制台
+        function clearConsole() {
+            console.clear();
+            console.log('控制台已清空，开始监控Ruoyi集成日志...');
+        }
+        
+        // 显示日志说明
+        function showLogs() {
+            const logInfo = document.getElementById('logInfo');
+            logInfo.style.display = logInfo.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        // 页面加载完成后的初始化
+        window.onload = function() {
+            console.log('Ruoyi集成测试页面已加载');
+            console.log('请使用上述测试功能验证集成效果');
+        };
+    </script>
+</body>
+</html>
