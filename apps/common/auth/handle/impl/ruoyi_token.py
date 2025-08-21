@@ -19,7 +19,7 @@ from common.constants.authentication_type import AuthenticationType
 from common.constants.permission_constants import Auth, RoleConstants, PermissionConstants
 from common.exception.app_exception import AppAuthenticationFailed
 from users.models import User
-from common.util.common import password_encrypt
+from common.utils.common import password_encrypt
 
 
 class RuoyiToken(AuthBaseHandle):

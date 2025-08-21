@@ -16,8 +16,7 @@ from rest_framework.views import APIView
 
 from common.auth.handle.impl.ruoyi_token import RuoyiToken
 from common.exception.app_exception import AppApiException
-from common.response import result
-from common.util.common import query_params_to_single_dict
+from common.result import result
 from users.models import User
 from users.serializers.common import UserSerializer
 from users.serializers.login import LoginSerializer
