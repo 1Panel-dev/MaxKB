@@ -111,7 +111,7 @@ const platforms = reactive([
   },
     {
     key: 'wecomBot',
-    logoSrc: new URL(`../../assets/logo/logo_wechat-work.svg`, import.meta.url).href,
+    logoSrc: new URL(`../../assets/logo/logo_wechat-bot.svg`, import.meta.url).href,
     name: t('views.application.applicationAccess.wecomBot'),
     description: t('views.application.applicationAccess.wecomBotTip'),
     isActive: false,
