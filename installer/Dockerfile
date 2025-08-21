@@ -8,11 +8,8 @@ RUN cd ui && ls -la && if [ -d "dist" ]; then exit 0; fi && \
 
 FROM ghcr.io/1panel-dev/maxkb-base:python3.11-pg17.6 AS stage-build
 
-ARG DEPENDENCIES="                    \
-        python3-pip"
-
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends $DEPENDENCIES && \
+    apt-get install -y --no-install-recommends python3-pip && \
     apt-get clean all  && \
     rm -rf /var/lib/apt/lists/*
 
@@ -20,9 +17,7 @@ COPY --chmod=700 . /opt/maxkb-app
 
 WORKDIR /opt/maxkb-app
 RUN rm -rf /opt/maxkb-app/ui && \
-    python3 -m venv /opt/py3 && \
     pip install uv --break-system-packages && \
-    . /opt/py3/bin/activate && \
     uv pip install -r pyproject.toml && \
     find /opt/maxkb-app  -depth \( -name ".git*" -o -name ".docker*" -o -name ".idea*" -o -name ".editorconfig*" -o -name ".prettierrc*" -o -name "README.md" -o -name "poetry.lock" -o -name "pyproject.toml"  \) -exec rm -rf {} + && \
     export MAXKB_CONFIG_TYPE=ENV && python3 /opt/maxkb-app/apps/manage.py compilemessages && \
