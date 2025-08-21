@@ -9,7 +9,6 @@
 import uuid
 from django.core.cache import cache
 from django.db.models import QuerySet
-from rest_framework.decorators import action
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
@@ -24,8 +23,7 @@ from users.serializers.login import LoginSerializer
 class RuoyiLoginApi(APIView):
     authentication_classes = []
 
-    @action(methods=['POST'], detail=False)
-    def ruoyi_login(self, request: Request):
+    def post(self, request: Request):
         """
         Ruoyi Token登录接口
         """
@@ -85,8 +83,11 @@ class RuoyiLoginApi(APIView):
         
         return token
 
-    @action(methods=['GET'], detail=False)
-    def check_ruoyi_status(self, request: Request):
+
+class RuoyiStatusApi(APIView):
+    authentication_classes = []
+
+    def get(self, request: Request):
         """
         检查Ruoyi Token状态
         """
@@ -98,14 +99,14 @@ class RuoyiLoginApi(APIView):
             # 验证token
             ruoyi_handler = RuoyiToken()
             user_info = ruoyi_handler.verify_ruoyi_token(token)
-            
+
             return result.success({
                 'valid': True,
                 'username': user_info.get('username'),
                 'nickname': user_info.get('nickname', user_info.get('nickName')),
                 'roles': user_info.get('rolePermission', [])
             })
-            
+
         except Exception as e:
             return result.success({
                 'valid': False,
