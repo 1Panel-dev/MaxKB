@@ -10,6 +10,7 @@ from models_provider.base_model_provider import IModelProvider, ModelProvideInfo
 from models_provider.impl.vllm_model_provider.credential.embedding import VllmEmbeddingCredential
 from models_provider.impl.vllm_model_provider.credential.image import VllmImageModelCredential
 from models_provider.impl.vllm_model_provider.credential.llm import VLLMModelCredential
+from models_provider.impl.vllm_model_provider.credential.reranker import VllmRerankerCredential
 from models_provider.impl.vllm_model_provider.credential.whisper_stt import VLLMWhisperModelCredential
 from models_provider.impl.vllm_model_provider.model.embedding import VllmEmbeddingModel
 from models_provider.impl.vllm_model_provider.model.image import VllmImage
@@ -17,12 +18,14 @@ from models_provider.impl.vllm_model_provider.model.llm import VllmChatModel
 from maxkb.conf import PROJECT_DIR
 from django.utils.translation import gettext as _
 
+from models_provider.impl.vllm_model_provider.model.reranker import VllmBgeReranker
 from models_provider.impl.vllm_model_provider.model.whisper_sst import VllmWhisperSpeechToText
 
 v_llm_model_credential = VLLMModelCredential()
 image_model_credential = VllmImageModelCredential()
 embedding_model_credential = VllmEmbeddingCredential()
 whisper_model_credential = VLLMWhisperModelCredential()
+rerank_model_credential = VllmRerankerCredential()
 
 model_info_list = [
     ModelInfo('facebook/opt-125m', _('Facebook’s 125M parameter model'), ModelTypeConst.LLM, v_llm_model_credential,
@@ -50,6 +53,10 @@ whisper_model_info_list = [
     ModelInfo('whisper-large-v3', '', ModelTypeConst.STT, whisper_model_credential, VllmWhisperSpeechToText),
 ]
 
+reranker_model_info_list = [
+    ModelInfo('bge-reranker-v2-m3', '', ModelTypeConst.RERANKER, rerank_model_credential, VllmBgeReranker),
+]
+
 model_info_manage = (
     ModelInfoManage.builder()
     .append_model_info_list(model_info_list)
@@ -62,6 +69,8 @@ model_info_manage = (
     .append_default_model_info(embedding_model_info_list[0])
     .append_model_info_list(whisper_model_info_list)
     .append_default_model_info(whisper_model_info_list[0])
+    .append_model_info_list(reranker_model_info_list)
+    .append_default_model_info(reranker_model_info_list[0])
     .build()
 )
 
