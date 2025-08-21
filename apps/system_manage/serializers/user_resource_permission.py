@@ -96,8 +96,8 @@ sql_map = {
 class UserResourcePermissionUserListRequest(serializers.Serializer):
     name = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('resource name'))
     permission = serializers.MultipleChoiceField(required=False, allow_null=True, allow_blank=True,
-                                         choices=['NOT_AUTH', 'MANAGE', 'VIEW', 'ROLE'],
-                                         label=_('permission'))
+                                                 choices=['NOT_AUTH', 'MANAGE', 'VIEW', 'ROLE'],
+                                                 label=_('permission'))
 
 
 class UserResourcePermissionSerializer(serializers.Serializer):
@@ -304,7 +304,7 @@ class ResourceUserPermissionUserListRequest(serializers.Serializer):
 class ResourceUserPermissionEditRequest(serializers.Serializer):
     user_id = serializers.CharField(required=True, label=_('workspace id'))
     permission = serializers.ChoiceField(required=True, choices=['NOT_AUTH', 'MANAGE', 'VIEW', 'ROLE'],
-                                                 label=_('permission'))
+                                         label=_('permission'))
 
 
 permission_map = {
@@ -326,7 +326,8 @@ class ResourceUserPermissionSerializer(serializers.Serializer):
         user_query_set = QuerySet(model=get_dynamics_model({
             'nick_name': models.CharField(),
             'username': models.CharField(),
-            "permission": models.CharField()
+            "permission": models.CharField(),
+            "id": models.UUIDField(),
         }))
         nick_name = instance.get('nick_name')
         username = instance.get('username')
@@ -352,6 +353,11 @@ class ResourceUserPermissionSerializer(serializers.Serializer):
                 else:
                     user_query_set = user_query_set.filter(
                         permission__in=query_p_list)
+        workspace_user_role_mapping_model = DatabaseModelManage.get_model("workspace_user_role_mapping")
+        if workspace_user_role_mapping_model:
+            user_query_set=user_query_set.filter(
+                id__in=QuerySet(workspace_user_role_mapping_model).filter(
+                    workspace_id=self.data.get('workspace_id')).values("user_id"))
 
         return {
             'workspace_user_resource_permission_query_set': workspace_user_resource_permission_query_set,

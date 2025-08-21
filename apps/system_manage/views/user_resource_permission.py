@@ -197,5 +197,5 @@ class WorkspaceResourceUserPermissionView(APIView):
                 data={'workspace_id': workspace_id, "target": target, 'auth_target_type': resource, }
             ).page({'username': request.query_params.get("username"),
                     'nick_name': request.query_params.get("nick_name"),
-                    'permission': request.query_params.getlist("permission")}, current_page, page_size,
+                    'permission': request.query_params.getlist("permission[]")}, current_page, page_size,
                    ))
