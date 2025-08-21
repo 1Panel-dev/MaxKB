@@ -63,7 +63,7 @@ function formatSize(sizeInBytes: number) {
 }
 
 const deleteFile = (file: any) => {
-  if (inputDisabled) {
+  if (inputDisabled.value) {
     return
   }
   fileArray.value = fileArray.value.filter((f: any) => f.uid != file.uid)
