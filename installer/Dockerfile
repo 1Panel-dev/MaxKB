@@ -18,12 +18,11 @@ COPY --chmod=700 . /opt/maxkb-app
 WORKDIR /opt/maxkb-app
 RUN rm -rf /opt/maxkb-app/ui && \
     pip install uv --break-system-packages && \
-    . /opt/py3/bin/activate && \
-    uv pip install -r pyproject.toml && \
+    python -m uv pip install -r pyproject.toml && \
     find /opt/maxkb-app  -depth \( -name ".git*" -o -name ".docker*" -o -name ".idea*" -o -name ".editorconfig*" -o -name ".prettierrc*" -o -name "README.md" -o -name "poetry.lock" -o -name "pyproject.toml"  \) -exec rm -rf {} + && \
     export MAXKB_CONFIG_TYPE=ENV && python3 /opt/maxkb-app/apps/manage.py compilemessages && \
     export PIP_TARGET=/opt/maxkb-app/sandbox/python-packages && \
-    uv pip install --target=$PIP_TARGET requests pymysql psycopg2-binary && \
+    python -m uv pip install --target=$PIP_TARGET requests pymysql psycopg2-binary && \
     rm -rf /opt/maxkb-app/installer
 COPY --from=web-build --chmod=700 ui /opt/maxkb-app/ui
 
@@ -48,7 +47,6 @@ ENV MAXKB_VERSION="${DOCKER_IMAGE_TAG} (build at ${BUILD_AT}, commit: ${GITHUB_C
     MAXKB_LOCAL_MODEL_HOST=127.0.0.1 \
     MAXKB_LOCAL_MODEL_PORT=11636 \
     MAXKB_LOCAL_MODEL_PROTOCOL=http \
-    PATH=/opt/py3/bin:$PATH \
     PIP_TARGET=/opt/maxkb/python-packages
 
 

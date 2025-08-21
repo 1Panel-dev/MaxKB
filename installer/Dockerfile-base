@@ -1,7 +1,6 @@
 FROM python:3.11-slim-trixie AS python-stage
 RUN python3 -m venv /opt/py3
 
-
 FROM ghcr.io/1panel-dev/maxkb-vector-model:v2.0.2 AS vector-model
 
 FROM postgres:17.6-trixie
@@ -38,7 +37,8 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     rm -rf /var/lib/apt/lists/* /usr/share/doc/* /usr/share/man/* /usr/share/info/* /usr/share/locale/* /usr/share/lintian/* /usr/share/linda/* /var/cache/* /var/log/* /var/tmp/* /tmp/*
 COPY --from=vector-model --chmod=700 /opt/maxkb-app/model /opt/maxkb-app/model
 
-ENV PGDATA=/opt/maxkb/data/postgresql/pgdata \
+ENV PATH=/opt/py3/bin:$PATH \
+    PGDATA=/opt/maxkb/data/postgresql/pgdata \
     POSTGRES_USER=root \
     POSTGRES_PASSWORD=Password123@postgres \
     POSTGRES_MAX_CONNECTIONS=1000 \
