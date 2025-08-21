@@ -17,7 +17,7 @@ from common.auth.handle.impl.ruoyi_token import RuoyiToken
 from common.exception.app_exception import AppApiException
 from common.result import result
 from users.models import User
-from users.serializers.common import UserSerializer
+from users.serializers.user import UserInstanceSerializer
 from users.serializers.login import LoginSerializer
 
 
@@ -48,7 +48,7 @@ class RuoyiLoginApi(APIView):
             maxkb_token = self.generate_maxkb_token(user, user_info)
             
             # 返回用户信息和token
-            user_data = UserSerializer(user, many=False).data
+            user_data = UserInstanceSerializer(user, many=False).data
             user_data['token'] = maxkb_token
             
             return result.success(user_data)
