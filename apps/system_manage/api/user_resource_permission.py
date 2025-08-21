@@ -297,7 +297,7 @@ class ResourceUserPermissionPageAPI(APIMixin):
                 required=False
             ),
             OpenApiParameter(
-                name="permission",
+                name="permission[]",
                 description="权限",
                 type=OpenApiTypes.STR,
                 location='query',
