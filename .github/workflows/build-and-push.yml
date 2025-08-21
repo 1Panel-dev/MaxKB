@@ -38,6 +38,8 @@ jobs:
     if: ${{ contains(github.event.inputs.registry, 'fit2cloud') }}
     runs-on: ubuntu-latest
     steps:
+      - name: Clear Work Dir
+        run: rm -rf -- ./* ./.??*
       - name: Check Disk Space
         run: df -h
       - name: Free Disk Space (Ubuntu)
@@ -105,6 +107,8 @@ jobs:
     if: ${{ contains(github.event.inputs.registry, 'dockerhub') }}
     runs-on: ubuntu-latest
     steps:
+      - name: Clear Work Dir
+        run: rm -rf -- ./* ./.??*
       - name: Check Disk Space
         run: df -h
       - name: Free Disk Space (Ubuntu)

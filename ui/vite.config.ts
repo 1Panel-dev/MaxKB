@@ -6,7 +6,6 @@ import vueJsx from '@vitejs/plugin-vue-jsx'
 import DefineOptions from 'unplugin-vue-define-options/vite'
 import path from 'path'
 import { createHtmlPlugin } from 'vite-plugin-html'
-import viteCompression from 'vite-plugin-compression'
 import fs from 'fs'
 // import vueDevTools from 'vite-plugin-vue-devtools'
 const envDir = './env'
@@ -88,14 +87,6 @@ export default defineConfig((conf: any) => {
       DefineOptions(),
       createHtmlPlugin({ template: ENV.VITE_ENTRY }),
       renameHtmlPlugin(`dist${ENV.VITE_BASE_PATH}`, ENV.VITE_ENTRY),
-      viteCompression({
-        // gzip静态资源压缩配置
-        verbose: true, // 是否在控制台输出压缩结果
-        disable: false, // 是否禁用压缩
-        threshold: 10240, // 启用压缩的文件大小限制
-        algorithm: 'gzip', // 采用的压缩算法
-        ext: '.gz', // 生成的压缩包后缀
-      }),
     ],
     server: {
       cors: true,
