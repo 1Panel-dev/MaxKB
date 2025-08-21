@@ -1,6 +1,6 @@
 <template>
   <el-upload
-    style="width: 80%"
+    style="width: 100%"
     v-loading="loading"
     action="#"
     v-bind="$attrs"
@@ -62,7 +62,7 @@ function formatSize(sizeInBytes: number) {
 }
 
 const deleteFile = (file: any) => {
-  if (inputDisabled) {
+  if (inputDisabled.value) {
     return
   }
   fileArray.value = fileArray.value.filter((f: any) => f.uid != file.uid)
