@@ -54,7 +54,7 @@ class TeamMember(APIView):
         @swagger_auto_schema(operation_summary=_('Add members in batches'),
                              operation_id=_('Add members in batches'),
                              request_body=TeamMemberSerializer.get_bach_request_body_api(),
-                             responses=result.get_api_array_response(TeamMemberSerializer.get_response_body_api()),
+                             responses=TeamMemberSerializer.get_response_body_api(),
                              tags=[_('Team')])
         @has_permissions(PermissionConstants.TEAM_CREATE)
         @log(menu='Team', operate='Add members in batches',
