@@ -50,9 +50,7 @@
                     <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt="" />
                   </el-avatar>
                   <div class="pre-wrap ml-8">
-                    <div class="lighter">
-                      {{ $t('views.application.form.appTemplate.blankApp.title') }}
-                    </div>
+                    <div class="lighter">{{ $t('views.tool.form.create') }}</div>
                   </div>
                 </div>
               </el-dropdown-item>
@@ -62,7 +60,7 @@
                     <img src="@/assets/workflow/icon_mcp.svg" style="width: 75%" alt="" />
                   </el-avatar>
                   <div class="pre-wrap ml-8">
-                    <div class="lighter">{{ $t('common.create') }} MCP</div>
+                    <div class="lighter">{{ $t('views.tool.form.createMcp') }}</div>
                   </div>
                 </div>
               </el-dropdown-item>

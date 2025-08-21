@@ -35,6 +35,8 @@ export default {
     confirmMessage: '停用後，引用該工具的應用在查詢時會報錯，請謹慎操作。',
   },
   form: {
+    create: '建立工具',
+    createMcp: '建立MCP',
     toolName: {
       label: '名稱',
       name: '工具名稱',

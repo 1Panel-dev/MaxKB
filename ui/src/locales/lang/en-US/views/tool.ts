@@ -38,6 +38,8 @@ export default {
   },
 
   form: {
+    create: 'Create Tool',
+    createMcp: 'Create MCP',
     toolName: {
       label: 'Name',
       name: 'Tool Name',

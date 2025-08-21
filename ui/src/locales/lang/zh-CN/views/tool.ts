@@ -32,6 +32,8 @@ export default {
     saveMessage: '当前的更改尚未保存，确认退出吗?',
   },
   form: {
+    create: '创建工具',
+    createMcp: '创建MCP',
     toolName: {
       label: '名称',
       name: '工具名称',
