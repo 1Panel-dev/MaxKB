@@ -270,7 +270,7 @@
                   </el-dropdown-item>
 
                   <el-dropdown-item
-                    v-if="!row.template_id && permissionPrecise.export()"
+                    v-if="!row.template_id && row.tool_type === 'CUSTOM' && permissionPrecise.export()"
                     @click.stop="exportTool(row)"
                   >
                     <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
