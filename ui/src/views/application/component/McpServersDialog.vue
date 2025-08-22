@@ -154,7 +154,7 @@ const submit = () => {
   paramFormRef.value.validate((valid: any) => {
     if (valid) {
       try {
-        JSON.parse(form.value.mcp_servers)
+        JSON.parse(form.value.mcp_servers || '{}')
       } catch (e) {
         MsgError(t('views.applicationWorkflow.nodes.mcpNode.mcpServerTip'))
         return
