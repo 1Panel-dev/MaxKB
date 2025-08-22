@@ -324,7 +324,7 @@ function deleteLog(row: any) {
       paginationConfig.value.total = 0
       currentRecordList.value = []
     }
-    getChatLog(applicationDetail.value.id)
+    getChatLog()
   })
 }
 
@@ -335,7 +335,7 @@ function clearChat() {
     paginationConfig.value.current_page = 1
     paginationConfig.value.total = 0
     currentRecordList.value = []
-    getChatLog(applicationDetail.value.id)
+    getChatLog()
   })
 }
 
@@ -372,7 +372,7 @@ function newChat() {
   }
 }
 
-function getChatLog(id: string, refresh?: boolean) {
+function getChatLog(refresh?: boolean) {
   const page = {
     current_page: 1,
     page_size: 20,
@@ -386,11 +386,8 @@ function getChatLog(id: string, refresh?: boolean) {
       paginationConfig.value.current_page = 1
       paginationConfig.value.total = 0
       currentRecordList.value = []
-      currentChatId.value = chatLogData.value?.[0]?.id || 'new'
-      currentChatName.value = chatLogData.value?.[0]?.abstract || t('chat.createChat')
-      if (currentChatId.value !== 'new') {
-        getChatRecord()
-      }
+      currentChatId.value = 'new'
+      currentChatName.value = t('chat.createChat')
     }
   })
 }
@@ -449,7 +446,7 @@ const clickListHandle = (item: any) => {
 
 function refresh(id: string) {
   currentChatId.value = id
-  getChatLog(applicationDetail.value.id, true)
+  getChatLog(true)
 }
 
 async function exportMarkdown(): Promise<void> {
@@ -477,7 +474,7 @@ async function exportHTML(): Promise<void> {
  *初始化历史对话记录
  */
 const init = () => {
-  getChatLog(applicationDetail.value?.id)
+  getChatLog()
 }
 onMounted(() => {
   init()

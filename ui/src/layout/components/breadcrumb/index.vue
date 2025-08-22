@@ -1,6 +1,6 @@
 <template>
   <div class="breadcrumb ml-4 mt-4 mb-12 flex">
-    <back-button :to="toBackPath" class="mt-4"></back-button>
+    <back-button  @click="toBack"></back-button>
     <div class="flex align-center">
       <el-avatar
         v-if="isApplication"
@@ -30,8 +30,9 @@ import { onBeforeRouteLeave, useRouter, useRoute } from 'vue-router'
 import { resetUrl } from '@/utils/common'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import useStore from '@/stores'
-const { common, application } = useStore()
+const { common, folder } = useStore()
 const route = useRoute()
+const router = useRouter()
 
 const {
   meta: { activeMenu },
@@ -102,6 +103,20 @@ function getApplicationDetail() {
     .catch(() => {
       loading.value = false
     })
+}
+
+function toBack() {
+  if (isKnowledge.value) {
+    folder.setCurrentFolder({
+      id: folderId,
+    })
+  } else if (isApplication.value) {
+    folder.setCurrentFolder({
+      id: current.value.folder,
+    })
+  }
+
+  router.push({ path: toBackPath.value })
 }
 
 onMounted(() => {

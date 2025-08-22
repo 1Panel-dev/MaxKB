@@ -11,7 +11,7 @@
   >
     <el-button type="primary">{{ $t('chat.uploadFile.label') }}</el-button>
     <template #file="{ file }">
-      <el-card style="--el-card-padding: 0" shadow="never">
+      <el-card style="--el-card-padding: 0" shadow="never" class="upload_content">
         <div
           class="flex-between"
           :class="[inputDisabled ? 'is-disabled' : '']"
@@ -112,13 +112,15 @@ const uploadFile = async (file: any, fileList: Array<any>) => {
   })
 }
 </script>
-<style lang="scss">
-.is-disabled {
-  background-color: var(--el-fill-color-light);
-  color: var(--el-text-color-placeholder);
-  cursor: not-allowed;
-  &:hover {
+<style lang="scss" scoped>
+.upload_content {
+  .is-disabled {
+    background-color: var(--el-fill-color-light);
+    color: var(--el-text-color-placeholder);
     cursor: not-allowed;
+    &:hover {
+      cursor: not-allowed;
+    }
   }
 }
 </style>

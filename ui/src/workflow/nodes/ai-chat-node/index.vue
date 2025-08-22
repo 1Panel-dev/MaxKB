@@ -130,16 +130,24 @@
             <el-switch size="small" v-model="chat_data.mcp_enable" />
           </div>
         </div>
-        <div class="w-full" v-if="
-          (chat_data.mcp_tool_id) ||
-          (chat_data.mcp_servers && chat_data.mcp_servers.length > 0)"
+        <div
+          class="w-full mb-16"
+          v-if="
+            chat_data.mcp_tool_id || (chat_data.mcp_servers && chat_data.mcp_servers.length > 0)
+          "
         >
           <div class="flex-between border border-r-6 white-bg mb-4" style="padding: 5px 8px">
             <div class="flex align-center" style="line-height: 20px">
               <ToolIcon type="MCP" class="mr-8" :size="20" />
 
-              <div class="ellipsis" :title="relatedObject(toolSelectOptions, chat_data.mcp_tool_id, 'id')?.name">
-                {{ relatedObject(mcpToolSelectOptions, chat_data.mcp_tool_id, 'id')?.name || $t('common.custom') + ' MCP' }}
+              <div
+                class="ellipsis"
+                :title="relatedObject(toolSelectOptions, chat_data.mcp_tool_id, 'id')?.name"
+              >
+                {{
+                  relatedObject(mcpToolSelectOptions, chat_data.mcp_tool_id, 'id')?.name ||
+                  $t('common.custom') + ' MCP'
+                }}
               </div>
             </div>
             <el-button text @click="chat_data.mcp_tool_id = ''">
@@ -163,7 +171,7 @@
             <el-switch size="small" v-model="chat_data.tool_enable" />
           </div>
         </div>
-        <div class="w-full" v-if="chat_data.tool_ids?.length > 0">
+        <div class="w-full mb-16" v-if="chat_data.tool_ids?.length > 0">
           <template v-for="(item, index) in chat_data.tool_ids" :key="index">
             <div class="flex-between border border-r-6 white-bg mb-4" style="padding: 5px 8px">
               <div class="flex align-center" style="line-height: 20px">
@@ -186,17 +194,23 @@
               <div>
                 <span>{{ $t('views.application.form.reasoningContent.label') }}</span>
               </div>
-              <el-button
-                type="primary"
-                link
-                @click="openReasoningParamSettingDialog"
-                @refreshForm="refreshParam"
-              >
-                <AppIcon iconName="app-setting"></AppIcon>
-              </el-button>
+              <div>
+                <el-button
+                  type="primary"
+                  link
+                  @click="openReasoningParamSettingDialog"
+                  @refreshForm="refreshParam"
+                  class="mr-4"
+                >
+                  <AppIcon iconName="app-setting"></AppIcon>
+                </el-button>
+                <el-switch
+                  size="small"
+                  v-model="chat_data.model_setting.reasoning_content_enable"
+                />
+              </div>
             </div>
           </template>
-          <el-switch size="small" v-model="chat_data.model_setting.reasoning_content_enable" />
         </el-form-item>
         <el-form-item @click.prevent>
           <template #label>
@@ -241,7 +255,7 @@ import McpServersDialog from '@/views/application/component/McpServersDialog.vue
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { useRoute } from 'vue-router'
 import ToolDialog from '@/views/application/component/ToolDialog.vue'
-import {relatedObject} from "@/utils/array.ts";
+import { relatedObject } from '@/utils/array.ts'
 const getApplicationDetail = inject('getApplicationDetail') as any
 const route = useRoute()
 

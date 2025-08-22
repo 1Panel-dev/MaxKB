@@ -182,7 +182,7 @@ function newChat() {
   show.value = false
 }
 
-function getChatLog(id: string) {
+function getChatLog(refresh?: boolean) {
   const page = {
     current_page: 1,
     page_size: 20,
@@ -190,12 +190,11 @@ function getChatLog(id: string) {
 
   chatAPI.pageChat(page.current_page, page.page_size, left_loading).then((res: any) => {
     chatLogData.value = res.data.records
-    paginationConfig.current_page = 1
-    paginationConfig.total = 0
-    currentRecordList.value = []
-    currentChatId.value = chatLogData.value?.[0]?.id || 'new'
-    if (currentChatId.value !== 'new') {
-      getChatRecord()
+    if (!refresh) {
+      paginationConfig.current_page = 1
+      paginationConfig.total = 0
+      currentRecordList.value = []
+      currentChatId.value = 'new'
     }
   })
 }
@@ -247,14 +246,14 @@ function refreshFieldTitle(chatId: string, abstract: string) {
 }
 
 function refresh(id: string) {
-  getChatLog(applicationDetail.value.id)
   currentChatId.value = id
+  getChatLog(true)
 }
 /**
  *初始化历史对话记录
  */
 const init = () => {
-  getChatLog(applicationDetail.value.id)
+  getChatLog()
 }
 
 onMounted(() => {
