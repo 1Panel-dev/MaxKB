@@ -49,7 +49,7 @@
           >
             <div class="flex align-center">
               <el-avatar shape="square" :size="20" class="mr-8">
-                <img src="@/assets/workflow/icon_mcp.svg" style="width: 75%" alt="" />
+                <img src="@/assets/workflow/icon_mcp.svg" style="width: 75%" alt=""/>
               </el-avatar>
               <span>{{ mcpTool.name }}</span>
               <el-tag v-if="mcpTool.scope === 'SHARED'" type="info" class="info-tag ml-8 mt-4">
@@ -96,9 +96,9 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { computed, inject, onMounted, ref, watch } from 'vue'
-import { loadSharedApi } from '@/utils/dynamics-api/shared-api.ts'
-import { useRoute } from 'vue-router'
+import {ref, watch} from 'vue'
+import {MsgError} from "@/utils/message.ts";
+import {t} from "@/locales";
 
 const emit = defineEmits(['refresh'])
 
@@ -144,7 +144,7 @@ function mcpSourceChange() {
 
 
 const open = (data: any, selectOptions: any) => {
-  form.value = { ...form.value, ...data }
+  form.value = {...form.value, ...data}
   form.value.mcp_source = data.mcp_source || 'referencing'
   dialogVisible.value = true
   mcpToolSelectOptions.value = selectOptions || []
@@ -153,12 +153,18 @@ const open = (data: any, selectOptions: any) => {
 const submit = () => {
   paramFormRef.value.validate((valid: any) => {
     if (valid) {
+      try {
+        JSON.parse(form.value.mcp_servers)
+      } catch (e) {
+        MsgError(t('views.applicationWorkflow.nodes.mcpNode.mcpServerTip'))
+        return
+      }
       emit('refresh', form.value)
       dialogVisible.value = false
     }
   })
 }
 
-defineExpose({ open })
+defineExpose({open})
 </script>
 <style lang="scss" scoped></style>
