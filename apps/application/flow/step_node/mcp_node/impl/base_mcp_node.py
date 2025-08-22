@@ -3,10 +3,12 @@ import asyncio
 import json
 from typing import List
 
+from django.db.models import QuerySet
 from langchain_mcp_adapters.client import MultiServerMCPClient
 
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.mcp_node.i_mcp_node import IMcpNode
+from tools.models import Tool
 
 
 class BaseMcpNode(IMcpNode):
@@ -15,10 +17,20 @@ class BaseMcpNode(IMcpNode):
         self.context['tool_params'] = details.get('tool_params')
         self.context['mcp_tool'] = details.get('mcp_tool')
 
-    def execute(self, mcp_servers, mcp_server, mcp_tool, tool_params, **kwargs) -> NodeResult:
-        servers = json.loads(mcp_servers)
-        params = json.loads(json.dumps(tool_params))
-        params = self.handle_variables(params)
+    def execute(self, mcp_servers, mcp_server, mcp_tool, mcp_tool_id, mcp_source, tool_params,**kwargs) -> NodeResult:
+        if mcp_source == 'referencing':
+            if not mcp_tool_id:
+                raise ValueError("MCP tool ID is required when mcp_source is 'referencing'.")
+            tool = QuerySet(Tool).filter(id=mcp_tool_id).first()
+            if not tool:
+                raise ValueError(f"Tool with ID {mcp_tool_id} not found.")
+            servers = json.loads(tool.code)
+            params = json.loads(json.dumps(tool_params))
+            params = self.handle_variables(params)
+        else:
+            servers = json.loads(mcp_servers)
+            params = json.loads(json.dumps(tool_params))
+            params = self.handle_variables(params)
 
         async def call_tool(t, a):
             client = MultiServerMCPClient(servers)

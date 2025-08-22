@@ -9,16 +9,12 @@ from application.flow.i_step_node import INode, NodeResult
 
 
 class McpNodeSerializer(serializers.Serializer):
-    mcp_servers = serializers.JSONField(required=True,
-                                        label=_("Mcp servers"))
-
-    mcp_server = serializers.CharField(required=True,
-                                       label=_("Mcp server"))
-
+    mcp_servers = serializers.JSONField(required=True, label=_("Mcp servers"))
+    mcp_server = serializers.CharField(required=True, label=_("Mcp server"))
     mcp_tool = serializers.CharField(required=True, label=_("Mcp tool"))
-
-    tool_params = serializers.DictField(required=True,
-                                        label=_("Tool parameters"))
+    mcp_tool_id = serializers.UUIDField(required=False, label=_("Mcp tool"), allow_null=True)
+    mcp_source = serializers.CharField(required=False, label=_("Mcp source"), allow_blank=True, allow_null=True)
+    tool_params = serializers.DictField(required=True, label=_("Tool parameters"))
 
 
 class IMcpNode(INode):
@@ -30,5 +26,5 @@ class IMcpNode(INode):
     def _run(self):
         return self.execute(**self.node_params_serializer.data, **self.flow_params_serializer.data)
 
-    def execute(self, mcp_servers, mcp_server, mcp_tool, tool_params, **kwargs) -> NodeResult:
+    def execute(self, mcp_servers, mcp_server, mcp_tool, mcp_tool_id, mcp_source, tool_params, **kwargs) -> NodeResult:
         pass
