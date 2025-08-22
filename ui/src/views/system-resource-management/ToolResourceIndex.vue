@@ -207,13 +207,30 @@
               effect="dark"
               :content="$t('common.edit')"
               placement="top"
-              v-if="!row.template_id && permissionPrecise.edit()"
+              v-if="!row.template_id && row.tool_type === 'CUSTOM' && permissionPrecise.edit()"
             >
               <span class="mr-8">
                 <el-button
                   type="primary"
                   text
                   @click.stop="openCreateDialog(row)"
+                  :title="$t('common.edit')"
+                >
+                  <AppIcon iconName="app-edit"></AppIcon>
+                </el-button>
+              </span>
+            </el-tooltip>
+            <el-tooltip
+              effect="dark"
+              :content="$t('common.edit')"
+              placement="top"
+              v-if="!row.template_id && row.tool_type === 'MCP' && permissionPrecise.edit()"
+            >
+              <span class="mr-8">
+                <el-button
+                  type="primary"
+                  text
+                  @click.stop="openCreateMcpDialog(row)"
                   :title="$t('common.edit')"
                 >
                   <AppIcon iconName="app-edit"></AppIcon>
@@ -277,6 +294,7 @@
 
     <InitParamDrawer ref="InitParamDrawerRef" @refresh="refresh" />
     <ToolFormDrawer ref="ToolFormDrawerRef" @refresh="refresh" :title="ToolDrawertitle" />
+    <McpToolFormDrawer ref="McpToolFormDrawerRef" @refresh="refresh" :title="McpToolDrawertitle" />
     <AddInternalToolDialog ref="AddInternalToolDialogRef" @refresh="confirmAddInternalTool" />
   </div>
 </template>
@@ -288,6 +306,7 @@ import InitParamDrawer from '@/views/tool/component/InitParamDrawer.vue'
 import ToolResourceApi from '@/api/system-resource-management/tool'
 import AddInternalToolDialog from '@/views/tool/toolStore/AddInternalToolDialog.vue'
 import ToolFormDrawer from '@/views/tool/ToolFormDrawer.vue'
+import McpToolFormDrawer from "@/views/tool/McpToolFormDrawer.vue";
 import { t } from '@/locales'
 import { resetUrl } from '@/utils/common'
 import { ToolType } from '@/enums/tool'
@@ -376,7 +395,9 @@ async function copyTool(row: any) {
 }
 
 const ToolFormDrawerRef = ref()
+const McpToolFormDrawerRef = ref()
 const ToolDrawertitle = ref('')
+const McpToolDrawertitle = ref('')
 
 function openCreateDialog(data?: any) {
   // 有template_id的不允许编辑，是模板转换来的
@@ -391,6 +412,23 @@ function openCreateDialog(data?: any) {
     })
   } else {
     ToolFormDrawerRef.value.open(data)
+  }
+}
+
+
+function openCreateMcpDialog(data?: any) {
+  // 有template_id的不允许编辑，是模板转换来的
+  if (data?.template_id) {
+    return
+  }
+
+  McpToolDrawertitle.value = data ? t('views.tool.editMcpTool') : t('views.tool.createMcpTool')
+  if (data) {
+    ToolResourceApi.getToolById(data?.id, loading).then((res: any) => {
+      McpToolFormDrawerRef.value.open(res.data)
+    })
+  } else {
+    McpToolFormDrawerRef.value.open(data)
   }
 }
 
