@@ -36,7 +36,6 @@ dependencies = [
     "volcengine-python-sdk[ark]==4.0.5",
     "boto3==1.39.4",
     "tencentcloud-sdk-python==3.0.1420",
-    "tencentcloud-sdk-python-asr==3.0.1416",
     "xinference-client==1.7.1.post1",
     "anthropic==0.57.1",
     "dashscope==1.23.8",
