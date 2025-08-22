@@ -122,31 +122,37 @@ class RuoyiToken(AuthBaseHandle):
         api_url = f"{ruoyi_base_url}/api/integration/token/verify"
 
         self.logger.info(f"[RuoyiToken] 准备调用Ruoyi API验证Token")
-        self.logger.info(f"[RuoyiToken] API地址: {api_url}")
-        self.logger.info(f"[RuoyiToken] Token: {token[:20] + '...' if token and len(token) > 20 else token}")
+        self.logger.info(f"[RuoyiToken] 配置的RUOYI_BASE_URL: {ruoyi_base_url}")
+        self.logger.info(f"[RuoyiToken] 完整API地址: {api_url}")
+        self.logger.info(f"[RuoyiToken] 发送的Token参数: {token}")
 
         try:
             # 调用Ruoyi验证接口
+            self.logger.info(f"[RuoyiToken] 开始发送HTTP GET请求")
             response = requests.get(
                 api_url,
                 params={'token': token},
                 timeout=10
             )
 
-            self.logger.info(f"[RuoyiToken] API响应状态码: {response.status_code}")
-            self.logger.info(f"[RuoyiToken] API响应内容: {response.text[:500] + '...' if len(response.text) > 500 else response.text}")
+            self.logger.info(f"[RuoyiToken] HTTP请求完成")
+            self.logger.info(f"[RuoyiToken] 响应状态码: {response.status_code}")
+            self.logger.info(f"[RuoyiToken] 响应头: {dict(response.headers)}")
+            self.logger.info(f"[RuoyiToken] 响应内容: {response.text}")
 
             if response.status_code == 200:
                 result = response.json()
+                self.logger.info(f"[RuoyiToken] 解析JSON结果: {result}")
                 if result.get('code') == 200:
                     user_data = result.get('data')
-                    self.logger.info(f"[RuoyiToken] ✅ Token验证成功，用户: {user_data.get('username', 'N/A')}")
+                    self.logger.info(f"[RuoyiToken] ✅ Token验证成功，用户数据: {user_data}")
                     return user_data
                 else:
                     self.logger.error(f"[RuoyiToken] ❌ API返回错误: code={result.get('code')}, msg={result.get('msg')}")
                     raise Exception(f'Token验证失败: {result.get("msg", "未知错误")}')
             else:
                 self.logger.error(f"[RuoyiToken] ❌ HTTP请求失败: {response.status_code}")
+                self.logger.error(f"[RuoyiToken] 错误响应内容: {response.text}")
                 raise Exception(f'Token验证失败: HTTP {response.status_code}')
 
         except requests.RequestException as e:
