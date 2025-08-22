@@ -6,7 +6,14 @@ RUN cd ui && ls -la && if [ -d "dist" ]; then exit 0; fi && \
     NODE_OPTIONS="--max-old-space-size=4096" npx concurrently "npm run build" "npm run build-chat" && \
     find . -maxdepth 1 ! -name '.' ! -name 'dist' ! -name 'public' -exec rm -rf {} +
 
-FROM ghcr.io/1panel-dev/maxkb-base:python3.11-pg17.6 AS stage-build
+FROM ghcr.io/1panel-dev/maxkb-base:python3.11-pg17.6 AS deps-build
+COPY --chmod=700 . /opt/maxkb-app
+WORKDIR /opt/maxkb-app
+RUN pip install uv --break-system-packages && \
+    python -m uv pip install -r pyproject.toml && \
+    python -m uv pip install --target=/opt/maxkb-app/sandbox/python-packages requests pymysql psycopg2-binary
+
+FROM ghcr.io/1panel-dev/maxkb-base:python3.11-pg17.6 AS apps-build
 COPY --chmod=700 . /opt/maxkb-app
 RUN apt-get update && \
     apt-get install -y --no-install-recommends gettext libexpat1-dev libffi-dev && \
@@ -14,14 +21,11 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 WORKDIR /opt/maxkb-app
 RUN rm -rf /opt/maxkb-app/ui && \
-    pip install uv --break-system-packages && \
-    python -m uv pip install -r pyproject.toml && \
+    grep -oE '"django==[^"]+"' pyproject.toml | sed 's/"//g' | xargs -n 1 pip install && python /opt/maxkb-app/apps/manage.py compilemessages && \
     find /opt/maxkb-app  -depth \( -name ".git*" -o -name ".docker*" -o -name ".idea*" -o -name ".editorconfig*" -o -name ".prettierrc*" -o -name "README.md" -o -name "poetry.lock" -o -name "pyproject.toml"  \) -exec rm -rf {} + && \
-    python /opt/maxkb-app/apps/manage.py compilemessages && \
-    export PIP_TARGET=/opt/maxkb-app/sandbox/python-packages && \
-    python -m uv pip install --target=$PIP_TARGET requests pymysql psycopg2-binary && \
     rm -rf /opt/maxkb-app/installer
 COPY --from=web-build --chmod=700 ui /opt/maxkb-app/ui
+COPY --from=deps-build /opt/maxkb-app/sandbox/python-packages /opt/maxkb-app/sandbox/python-packages
 
 FROM ghcr.io/1panel-dev/maxkb-base:python3.11-pg17.6
 ARG DOCKER_IMAGE_TAG=dev \
@@ -48,8 +52,8 @@ ENV MAXKB_VERSION="${DOCKER_IMAGE_TAG} (build at ${BUILD_AT}, commit: ${GITHUB_C
 
 
 WORKDIR /opt/maxkb-app
-COPY --from=stage-build /opt/maxkb-app /opt/maxkb-app
-COPY --from=stage-build /opt/py3 /opt/py3
+COPY --from=apps-build /opt/maxkb-app /opt/maxkb-app
+COPY --from=deps-build /opt/py3/lib/python3.11/site-packages /opt/py3/lib/python3.11/site-packages
 
 RUN chmod 755 /tmp
 
