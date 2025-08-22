@@ -56,30 +56,22 @@ class RuoyiLoginApi(APIView):
 
     def generate_maxkb_token(self, user, user_info):
         """生成MaxKB内部token"""
-        # 生成唯一token
-        token = str(uuid.uuid4())
+        from django.core import signing
+        from common.constants.authentication_type import AuthenticationType
         
-        # 构建认证详情
-        auth_details = {
-            'id': user.id,
+        # 使用与标准登录相同的token生成方式
+        token = signing.dumps({
             'username': user.username,
+            'id': str(user.id),
             'email': user.email,
-            'nick_name': user.nick_name,
-            'role': user.role,
-            'source': 'RUOYI',
-            'ruoyi_user_info': user_info  # 保存Ruoyi用户信息
-        }
+            'type': AuthenticationType.SYSTEM_USER.value
+        })
         
-        # 缓存token信息（24小时有效）
-        cache_key = f"user_token_{token}"
-        cache.set(
-            cache_key,
-            {
-                'password': user.password,
-                'auth_details': auth_details
-            },
-            timeout=24 * 60 * 60  # 24小时
-        )
+        # 缓存token信息
+        from common.constants.cache_version import Cache_Version
+        version, get_key = Cache_Version.TOKEN.value
+        timeout = 24 * 60 * 60  # 24小时
+        cache.set(get_key(token), user, timeout=timeout, version=version)
         
         return token
 
