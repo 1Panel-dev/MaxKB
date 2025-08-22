@@ -8,11 +8,6 @@ RUN cd ui && ls -la && if [ -d "dist" ]; then exit 0; fi && \
 
 FROM ghcr.io/1panel-dev/maxkb-base:python3.11-pg17.6 AS stage-build
 
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends python3-pip && \
-    apt-get clean all  && \
-    rm -rf /var/lib/apt/lists/*
-
 COPY --chmod=700 . /opt/maxkb-app
 
 WORKDIR /opt/maxkb-app
