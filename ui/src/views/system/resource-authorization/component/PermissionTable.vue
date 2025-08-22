@@ -81,9 +81,7 @@
               <!--  应用 icon -->
               <LogoIcon v-else-if="isApplication" height="20px" />
               <!-- 工具 icon -->
-              <el-avatar v-else-if="isTool" class="avatar-green" shape="square" :size="20">
-                <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt="" />
-              </el-avatar>
+              <ToolIcon v-else-if="isTool" :size="20" :type="row?.tool_type" />
               <!-- 模型 icon -->
               <span
                 v-else-if="isModel"
