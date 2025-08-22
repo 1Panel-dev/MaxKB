@@ -145,7 +145,15 @@ function mcpSourceChange() {
 
 const open = (data: any, selectOptions: any) => {
   form.value = {...form.value, ...data}
-  form.value.mcp_source = data.mcp_source || 'referencing'
+  if (data.mcp_servers) {
+    form.value.mcp_source = 'custom'
+  } else if (data.mcp_tool_id) {
+    form.value.mcp_source = 'referencing'
+    form.value.mcp_tool_id = data.mcp_tool_id
+    form.value.mcp_servers = ''
+  } else {
+    form.value.mcp_source = data.mcp_source || 'referencing'
+  }
   dialogVisible.value = true
   mcpToolSelectOptions.value = selectOptions || []
 }
