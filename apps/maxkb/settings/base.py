@@ -32,7 +32,9 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'django.contrib.auth',
     'django.contrib.contenttypes',
+    'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
@@ -195,4 +197,4 @@ if os.environ.get('MAXKB_REDIS_SENTINEL_SENTINELS') is not None:
     DJANGO_REDIS_CONNECTION_FACTORY = "django_redis.pool.SentinelConnectionFactory"
 
 # Ruoyi集成配置
-RUOYI_BASE_URL = os.environ.get('RUOYI_BASE_URL', 'http://localhost:8080')
+RUOYI_BASE_URL = os.environ.get('RUOYI_BASE_URL', 'http://192.168.9.88:8084')
