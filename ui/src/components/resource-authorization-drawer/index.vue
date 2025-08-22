@@ -25,7 +25,7 @@
           <el-option :label="$t('views.login.loginForm.username.label')" value="username" />
           <el-option
             :label="$t('views.model.modelForm.permissionType.label')"
-            value="publish_status"
+            value="permission"
           />
         </el-select>
         <el-input
@@ -46,8 +46,8 @@
         />
 
         <el-select
-          v-else-if="searchType === 'publish_status'"
-          v-model="searchForm.publish_status"
+          v-else-if="searchType === 'permission'"
+          v-model="searchForm.permission"
           @change="searchHandle"
           filterable
           clearable
