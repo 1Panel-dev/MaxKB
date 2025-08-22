@@ -32,23 +32,44 @@ export class RuoyiIntegration {
    */
   static async loginWithRuoyiToken(token: string): Promise<boolean> {
     try {
-      const response = await request.post<RuoyiLoginResponse>('/api/user/ruoyi_login', {
+      console.log('[RuoyiIntegration] 开始调用 /user/ruoyi_login 接口')
+      console.log('[RuoyiIntegration] 发送的token:', token.substring(0, 20) + '...')
+
+      const response = await request.post<RuoyiLoginResponse>('/user/ruoyi_login', {
         token: token
       })
 
+      console.log('[RuoyiIntegration] 接口响应:', response)
+      console.log('[RuoyiIntegration] 响应状态码:', response.status)
+      console.log('[RuoyiIntegration] 响应数据:', response.data)
+
       if (response.data.code === 200) {
+        console.log('[RuoyiIntegration] 响应数据结构检查:')
+        console.log('[RuoyiIntegration] - response.data:', response.data)
+        console.log('[RuoyiIntegration] - response.data.data:', response.data.data)
+        console.log('[RuoyiIntegration] - response.data.data.token:', response.data.data?.token)
+
         // 保存MaxKB token到localStorage
-        localStorage.setItem('token', response.data.data.token)
-        localStorage.setItem('user', JSON.stringify(response.data.data))
+        const maxkbToken = response.data.data?.token
+        if (maxkbToken) {
+          localStorage.setItem('token', maxkbToken)
+          localStorage.setItem('user', JSON.stringify(response.data.data))
+          console.log('[RuoyiIntegration] ✅ 成功保存token到localStorage:', maxkbToken.substring(0, 20) + '...')
+          console.log('[RuoyiIntegration] ✅ 成功保存user到localStorage:', response.data.data)
+        } else {
+          console.error('[RuoyiIntegration] ❌ 响应中没有找到token字段')
+        }
 
         ElMessage.success('登录成功')
         return true
       } else {
+        console.error('[RuoyiIntegration] ❌ 接口返回错误:', response.data)
         ElMessage.error(response.data.msg || '登录失败')
         return false
       }
     } catch (error: any) {
-      console.error('Ruoyi登录失败:', error)
+      console.error('[RuoyiIntegration] ❌ 请求异常:', error)
+      console.error('[RuoyiIntegration] ❌ 错误详情:', error.response?.data)
       ElMessage.error(error.response?.data?.message || '登录失败')
       return false
     }
@@ -100,7 +121,7 @@ export class RuoyiIntegration {
    */
   static async checkRuoyiTokenStatus(token: string): Promise<boolean> {
     try {
-      const response = await request.get('/api/user/ruoyi_status', {
+      const response = await request.get('/user/ruoyi_status', {
         params: { sparkone_token: token }
       })
 

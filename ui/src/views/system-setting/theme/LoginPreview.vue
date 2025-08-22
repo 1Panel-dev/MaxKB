@@ -4,7 +4,7 @@
       <div class="tag flex-between">
         <div class="flex align-center">
           <img v-if="props.data.icon" :src="fileURL" alt="" height="20px" class="mr-8" />
-          <img v-else src="@/assets/logo/logo.svg" height="24px" class="mr-8" />
+          <img v-else src="@/assets/logo/GoServiceLogo.png" height="24px" class="mr-8" />
           <span class="ellipsis">{{ data.title }}</span>
         </div>
         <el-icon><Close /></el-icon>
