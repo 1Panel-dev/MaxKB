@@ -75,6 +75,9 @@ torch = [
     { url = "https://download.pytorch.org/whl/cpu/torch-2.8.0-cp311-none-macosx_11_0_arm64.whl", marker = "sys_platform == 'darwin'" },
 ]
 
+[tool.uv.pip]
+args = ["--prefer-binary"]
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
