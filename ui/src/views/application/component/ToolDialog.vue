@@ -196,13 +196,17 @@ function getList() {
   const folder_id = currentFolder.value?.id || user.getWorkspaceId()
   loadSharedApi({
     type: 'tool',
-    systemType: apiType.value,
+    isShared: folder_id === 'share',
+    systemType: 'workspace',
+  }).getToolList({
+    folder_id: folder_id,
+    tool_type: 'CUSTOM'
+  }).then((res: any) => {
+    toolList.value = res.data?.tools || res.data || []
+    toolList.value = toolList.value?.filter((item: any) => item.is_active)
+    searchData.value = res.data.tools || res.data
+    searchData.value = searchData.value?.filter((item: any) => item.is_active)
   })
-    .getToolList({ folder_id }, apiLoading)
-    .then((res: any) => {
-      toolList.value = uniqueArray([...toolList.value, ...res.data.tools], 'id')
-      searchData.value = res.data.tools
-    })
 }
 
 defineExpose({ open })
