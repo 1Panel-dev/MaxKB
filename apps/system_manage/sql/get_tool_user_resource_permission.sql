@@ -13,7 +13,8 @@ FROM (
         user_id,
         workspace_id,
         icon,
-        folder_id
+        folder_id,
+        tool_type
     FROM
         tool
         ${query_set}
