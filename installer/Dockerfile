@@ -7,15 +7,17 @@ RUN cd ui && ls -la && if [ -d "dist" ]; then exit 0; fi && \
     find . -maxdepth 1 ! -name '.' ! -name 'dist' ! -name 'public' -exec rm -rf {} +
 
 FROM ghcr.io/1panel-dev/maxkb-base:python3.11-pg17.6 AS stage-build
-
 COPY --chmod=700 . /opt/maxkb-app
-
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends gettext libexpat1-dev libffi-dev && \
+    apt-get clean all  && \
+    rm -rf /var/lib/apt/lists/*
 WORKDIR /opt/maxkb-app
 RUN rm -rf /opt/maxkb-app/ui && \
     pip install uv --break-system-packages && \
     python -m uv pip install -r pyproject.toml && \
     find /opt/maxkb-app  -depth \( -name ".git*" -o -name ".docker*" -o -name ".idea*" -o -name ".editorconfig*" -o -name ".prettierrc*" -o -name "README.md" -o -name "poetry.lock" -o -name "pyproject.toml"  \) -exec rm -rf {} + && \
-    export MAXKB_CONFIG_TYPE=ENV && python3 /opt/maxkb-app/apps/manage.py compilemessages && \
+    python /opt/maxkb-app/apps/manage.py compilemessages && \
     export PIP_TARGET=/opt/maxkb-app/sandbox/python-packages && \
     python -m uv pip install --target=$PIP_TARGET requests pymysql psycopg2-binary && \
     rm -rf /opt/maxkb-app/installer
