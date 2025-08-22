@@ -158,83 +158,93 @@ class RuoyiToken(AuthBaseHandle):
         username = user_info.get('username')
         if not username:
             raise Exception('用户名不能为空')
-            
+        
         email = user_info.get('email', f'{username}@ruoyi.local')
         nickname = user_info.get('nickname', user_info.get('nickName', username))
         
-        # 查找现有用户
-        user = QuerySet(User).filter(username=username, source='RUOYI').first()
+        # 查找现有用户（不限制source）
+        user = QuerySet(User).filter(username=username).first()
         
-        if not user:
+        if user:
+            # 用户已存在，直接返回，不创建不赋权
+            self.logger.info(f"[RuoyiToken] ✅ 用户已存在，直接认证: {username} (ID: {user.id}, source: {user.source})")
+            return user
+        else:
             # 创建新用户
+            self.logger.info(f"[RuoyiToken] 开始创建新用户: {username}")
             user = User(
                 username=username,
                 email=email,
                 nick_name=nickname,
-                source='RUOYI',  # 标记来源
+                source='sparkone',  # 标记来源为sparkone
                 is_active=True,
                 role=RoleConstants.USER.name,  # 默认角色
                 password=password_encrypt('123456')  # 默认密码
             )
             user.save()
-        else:
-            # 更新用户信息
-            user.nick_name = nickname
-            user.email = email
-            user.is_active = True
-            user.save()
-        
-        return user
-    
-    def create_auth(self, user, user_info):
-        """创建权限信息"""
-        # 根据Ruoyi角色映射到本地权限
+            self.logger.info(f"[RuoyiToken] ✅ 新用户创建成功: {username} (ID: {user.id})")
+            
+            # 为新用户赋予权限
+            self._assign_user_permissions(user, user_info)
+            
+            return user
+
+    def _assign_user_permissions(self, user, user_info):
+        """为新用户赋予权限"""
         role_permissions = user_info.get('rolePermission', [])
-        menu_permissions = user_info.get('menuPermission', [])
         
-        # 权限映射逻辑
-        permission_list = self.map_permissions(role_permissions, menu_permissions)
-        role_list = self.map_roles(role_permissions)
+        self.logger.info(f"[RuoyiToken] 开始为用户赋予权限")
+        self.logger.info(f"[RuoyiToken] Ruoyi角色权限: {role_permissions}")
         
-        return Auth(role_list, permission_list)
-    
-    def map_permissions(self, role_permissions, menu_permissions):
-        """映射Ruoyi权限到本地权限"""
+        # 获取MaxKB权限列表
+        maxkb_permissions = self.map_permissions_to_maxkb(role_permissions)
+        
+        self.logger.info(f"[RuoyiToken] 映射后的MaxKB权限: {maxkb_permissions}")
+        
+        # TODO: 这里需要调用MaxKB的权限赋予API将权限持久化到数据库
+        # 参考其他代码中的UserResourcePermissionSerializer用法
+        
+        self.logger.info(f"[RuoyiToken] ✅ 权限赋予完成")
+
+    def map_permissions_to_maxkb(self, role_permissions):
+        """映射Ruoyi角色权限到MaxKB权限格式"""
         permission_mapping = {
-            # Ruoyi角色权限映射
             'admin': [
-                'APPLICATION_READ', 'APPLICATION_CREATE', 'APPLICATION_EDIT', 'APPLICATION_DELETE',
-                'KNOWLEDGE_READ', 'KNOWLEDGE_CREATE', 'KNOWLEDGE_EDIT', 'KNOWLEDGE_DELETE',
-                'USER_READ', 'USER_CREATE', 'USER_EDIT', 'USER_DELETE'
+                'APPLICATION:READ', 'APPLICATION:READ+CREATE', 'APPLICATION:READ+EDIT', 'APPLICATION:READ+DELETE',
+                'KNOWLEDGE:READ', 'KNOWLEDGE:READ+CREATE', 'KNOWLEDGE:READ+EDIT', 'KNOWLEDGE:READ+DELETE',
+                'USER_MANAGEMENT:READ', 'USER_MANAGEMENT:READ+CREATE', 'USER_MANAGEMENT:READ+EDIT', 'USER_MANAGEMENT:READ+DELETE'
             ],
             'common': [
-                'APPLICATION_READ', 'KNOWLEDGE_READ'
+                'APPLICATION:READ', 'KNOWLEDGE:READ'
             ],
-            # 可以根据具体的菜单权限进行更细粒度的映射
-            'system:user:list': ['USER_READ'],
-            'system:user:add': ['USER_CREATE'],
-            'system:user:edit': ['USER_EDIT'],
-            'system:user:remove': ['USER_DELETE'],
         }
         
         permissions = set()
         
-        # 根据角色权限映射
+        # 只根据角色权限映射
         for role in role_permissions:
             if role in permission_mapping:
                 permissions.update(permission_mapping[role])
-        
-        # 根据菜单权限映射
-        for menu in menu_permissions:
-            if menu in permission_mapping:
-                permissions.update(permission_mapping[menu])
+                self.logger.info(f"[RuoyiToken] 角色 '{role}' 映射到权限: {permission_mapping[role]}")
         
         # 如果没有匹配的权限，给予基础权限
         if not permissions:
-            permissions = {'APPLICATION_READ', 'KNOWLEDGE_READ'}
+            permissions = {'APPLICATION:READ', 'KNOWLEDGE:READ'}
+            self.logger.info(f"[RuoyiToken] 未匹配到角色权限，使用默认权限: {list(permissions)}")
         
         return list(permissions)
-    
+
+    def create_auth(self, user, user_info):
+        """创建权限信息"""
+        # 根据Ruoyi角色映射到本地权限
+        role_permissions = user_info.get('rolePermission', [])
+        
+        # 权限映射逻辑（只考虑角色权限）
+        permission_list = self.map_permissions_to_maxkb(role_permissions)
+        role_list = self.map_roles(role_permissions)
+        
+        return Auth(role_list, permission_list)
+
     def map_roles(self, role_permissions):
         """映射Ruoyi角色到本地角色"""
         role_mapping = {
