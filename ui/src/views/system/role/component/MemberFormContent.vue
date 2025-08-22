@@ -32,7 +32,7 @@
               :key="opt.value"
               :label="opt.label"
               :value="opt.value"
-              :disabled="opt.disabledFunction?.(element)"
+              :disabled="selectedRoles.includes(opt.value)"
             >
               <el-tooltip effect="dark" :content="opt.label" placement="top" :show-after="500">
                 <div class="ellipsis" style="max-width: 190px">{{ opt.label }}</div>
@@ -55,7 +55,6 @@
         </el-button>
       </div>
     </el-scrollbar>
-
     <!-- 添加按钮 -->
     <el-button type="primary" text class="mt-2" @click="handleAdd">
       <el-icon class="mr-4">
@@ -67,7 +66,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import type { FormItemModel } from '@/api/type/role'
 
 const props = defineProps<{
@@ -81,6 +80,10 @@ const formRef = ref()
 const formItem: Record<string, any> = {}
 const form = defineModel<Record<string, any>[]>('form', {
   default: [],
+})
+
+const selectedRoles = computed(() => {
+  return form.value.map((item) => item.role_id)
 })
 
 function handleAdd() {

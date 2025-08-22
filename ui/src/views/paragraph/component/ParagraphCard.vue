@@ -128,7 +128,7 @@
   </el-card>
 </template>
 <script setup lang="ts">
-import {ref, computed, watch, onMounted} from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import GenerateRelatedDialog from '@/components/generate-related-dialog/index.vue'
 import ParagraphDialog from '@/views/paragraph/component/ParagraphDialog.vue'
@@ -208,7 +208,6 @@ function getDetail() {
     })
 }
 
-
 const GenerateRelatedDialogRef = ref<InstanceType<typeof GenerateRelatedDialog>>()
 function openGenerateDialog(row: any) {
   if (GenerateRelatedDialogRef.value) {
@@ -239,8 +238,8 @@ const ParagraphDialogRef = ref()
 const title = ref('')
 function editParagraph(row: any) {
   if (!props.disabled) {
-    title.value = t('views.paragraph.paragraphDetail')
-    ParagraphDialogRef.value.open(row)
+    title.value = t('views.paragraph.editParagraph')
+    ParagraphDialogRef.value.open(row, 'edit')
   }
 }
 
@@ -251,7 +250,8 @@ function handleClickCard(row: any) {
     return
   }
   if (!props.disabled) {
-    editParagraph(row)
+    title.value = t('views.paragraph.paragraphDetail')
+    ParagraphDialogRef.value.open(row)
   } else {
     emit('clickCard')
   }
