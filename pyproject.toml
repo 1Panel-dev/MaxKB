@@ -68,11 +68,16 @@ name = "pytorch"
 url = "https://download.pytorch.org/whl/cpu"
 explicit = true
 
+[[tool.uv.index]]
+name = "macpytorch"
+url = "https://download.pytorch.org/whl"
+explicit = true
+
 [tool.uv.sources]
 torch = [
     { index = "pytorch", marker = "sys_platform == 'linux'" },
     { index = "pytorch", marker = "sys_platform == 'win'" },
-    { url = "https://download.pytorch.org/whl/cpu/torch-2.8.0-cp311-none-macosx_11_0_arm64.whl", marker = "sys_platform == 'darwin'" },
+    { index = "macpytorch", marker = "sys_platform == 'darwin'" },
 ]
 
 [build-system]
