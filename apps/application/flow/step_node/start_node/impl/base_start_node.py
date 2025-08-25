@@ -55,6 +55,7 @@ class BaseStartStepNode(IStarNode):
             workflow_manage.context[key] = value
         for item in details.get('global_fields', []):
             workflow_manage.context[item.get('key')] = item.get('value')
+        self.workflow_manage.chat_context = self.workflow_manage.get_chat_info().get_chat_variable()
 
     def get_node_params_serializer_class(self) -> Type[serializers.Serializer]:
         pass
