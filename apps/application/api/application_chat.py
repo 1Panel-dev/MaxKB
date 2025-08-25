@@ -66,6 +66,12 @@ class ApplicationChatQueryAPI(APIMixin):
                 required=False,
             ),
             OpenApiParameter(
+                name="username",
+                description="username",
+                type=OpenApiTypes.STR,
+                required=False,
+            ),
+            OpenApiParameter(
                 name="min_star",
                 description=_("Minimum number of likes"),
                 type=OpenApiTypes.INT,
