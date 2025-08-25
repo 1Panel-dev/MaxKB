@@ -51,6 +51,7 @@ class ApplicationChatRecordExportRequest(serializers.Serializer):
 class ApplicationChatQuerySerializers(serializers.Serializer):
     workspace_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("Workspace ID"))
     abstract = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_("summary"))
+    username = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_("username"))
     start_time = serializers.DateField(format='%Y-%m-%d', label=_("Start time"))
     end_time = serializers.DateField(format='%Y-%m-%d', label=_("End time"))
     application_id = serializers.UUIDField(required=True, label=_("Application ID"))
@@ -86,6 +87,7 @@ class ApplicationChatQuerySerializers(serializers.Serializer):
         query_set = QuerySet(model=get_dynamics_model(
             {'application_chat.application_id': models.CharField(),
              'application_chat.abstract': models.CharField(),
+             'application_chat.asker': models.JSONField(),
              "star_num": models.IntegerField(),
              'trample_num': models.IntegerField(),
              'comparer': models.CharField(),
@@ -98,6 +100,9 @@ class ApplicationChatQuerySerializers(serializers.Serializer):
                            }
         if 'abstract' in self.data and self.data.get('abstract') is not None:
             base_query_dict['application_chat.abstract__icontains'] = self.data.get('abstract')
+        if 'username' in self.data and self.data.get('username') is not None:
+            base_query_dict['application_chat.asker__username'] = self.data.get('username')
+
 
         if select_ids is not None and len(select_ids) > 0:
             base_query_dict['application_chat.id__in'] = select_ids
