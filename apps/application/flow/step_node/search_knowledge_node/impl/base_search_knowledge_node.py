@@ -46,6 +46,12 @@ def reset_title(title):
         return f"#### {title}\n"
 
 
+def reset_meta(meta):
+    if not meta.get('allow_download', False):
+        return {'allow_download': False}
+    return meta
+
+
 class BaseSearchKnowledgeNode(ISearchKnowledgeStepNode):
     def save_context(self, details, workflow_manage):
         result = details.get('paragraph_list', [])
@@ -122,7 +128,8 @@ class BaseSearchKnowledgeNode(ISearchKnowledgeStepNode):
                 'create_time': paragraph.get('create_time').strftime("%Y-%m-%d %H:%M:%S"),
                 'id': str(paragraph.get('id')),
                 'knowledge_id': str(paragraph.get('knowledge_id')),
-                'document_id': str(paragraph.get('document_id'))
+                'document_id': str(paragraph.get('document_id')),
+                'meta': reset_meta(paragraph.get('meta'))
             }
 
     @staticmethod

@@ -67,6 +67,14 @@ def get_none_result(question):
          'result_list': [], 'result': ''}, {})
 
 
+def reset_metadata(metadata):
+    meta = metadata.get('meta')
+    if isinstance(metadata.get('meta'), dict):
+        if not meta.get('allow_download', False):
+            metadata['meta'] = {'allow_download': False}
+    return metadata
+
+
 class BaseRerankerNode(IRerankerNode):
     def save_context(self, details, workflow_manage):
         self.context['document_list'] = details.get('document_list', [])
@@ -83,8 +91,9 @@ class BaseRerankerNode(IRerankerNode):
         if len(documents) == 0:
             return get_none_result(question)
         top_n = reranker_setting.get('top_n', 3)
-        self.context['document_list'] = [{'page_content': document.page_content, 'metadata': document.metadata} for
-                                         document in documents]
+        self.context['document_list'] = [
+            {'page_content': document.page_content, 'metadata': reset_metadata(document.metadata)} for
+            document in documents]
         self.context['question'] = question
         workspace_id = self.workflow_manage.get_body().get('workspace_id')
         reranker_model = get_model_instance_by_model_workspace_id(reranker_model_id,

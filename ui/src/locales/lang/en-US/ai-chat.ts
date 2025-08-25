@@ -14,6 +14,7 @@ export default {
   quote: 'Quote',
   download: 'Click to Download',
   noDocument: 'Original Document Not Found',
+  noPermissionDownload: 'No permission to download',
   passwordValidator: {
     title: 'Enter Password to Access',
     errorMessage1: 'Password cannot be empty',

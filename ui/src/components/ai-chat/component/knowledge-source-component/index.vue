@@ -45,7 +45,7 @@
                       <span :title="item?.document_name?.trim()">{{ item?.document_name }}</span>
                     </a>
                   </div>
-                  <div v-else @click="infoMessage">
+                  <div v-else @click="infoMessage(item)">
                     <span class="ellipsis-1 break-all" :title="item?.document_name?.trim()">
                       {{ item?.document_name?.trim() }}
                     </span>
@@ -167,8 +167,12 @@ const currentComponent = shallowRef<any>(null)
 const currentChatDetail = ref<any>(null)
 const dialogType = ref('')
 
-function infoMessage() {
-  MsgInfo(t('chat.noDocument'))
+function infoMessage(data: any) {
+  if (data?.meta?.allow_download === false) {
+    MsgInfo(t('chat.noPermissionDownload'))
+  } else {
+    MsgInfo(t('chat.noDocument'))
+  }
 }
 function openParagraph(row: any, id?: string) {
   dialogTitle.value = t('chat.KnowledgeSource.title')
