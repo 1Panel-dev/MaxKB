@@ -26,7 +26,7 @@
     </div>
     <template v-if="!(isUserInput || isAPIInput) || !firsUserInput || type === 'log'">
       <el-scrollbar ref="scrollDiv" @scroll="handleScrollTop">
-        <div ref="dialogScrollbar" class="ai-chat__content p-16">
+        <div ref="dialogScrollbar" class="ai-chat__content p-16" id="chatListId">
           <PrologueContent
             :type="type"
             :application="applicationDetails"
