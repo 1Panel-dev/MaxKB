@@ -28,7 +28,7 @@
                   :label="$t('views.applicationWorkflow.nodes.mcpNode.reference')"
                   value="referencing"
                 />
-                <el-option :label="$t('common.custom')" value="custom" />
+                <el-option :label="$t('common.custom')" value="custom"/>
               </el-select>
             </div>
           </template>
@@ -41,7 +41,8 @@
             @submitDialog="submitDialog"
             :placeholder="mcpServerJson"
           />
-          <el-select v-else v-model="form_data.mcp_tool_id" filterable @change="mcpToolSelectChange">
+          <el-select v-else v-model="form_data.mcp_tool_id" filterable
+                     @change="mcpToolSelectChange">
             <el-option
               v-for="mcpTool in mcpToolSelectOptions"
               :key="mcpTool.id"
@@ -61,7 +62,7 @@
               <span>{{ $t('views.applicationWorkflow.nodes.mcpNode.tool') }}</span>
               <el-button type="primary" link @click="getTools()">
                 <el-icon class="mr-4">
-                  <Plus />
+                  <Plus/>
                 </el-icon>
                 {{ $t('views.applicationWorkflow.nodes.mcpNode.getTool') }}
               </el-button>
@@ -115,7 +116,7 @@
             <template #label>
               <div class="flex-between">
                 <div>
-                  <TooltipLabel :label="item.label.label" :tooltip="item.label.attrs.tooltip" />
+                  <TooltipLabel :label="item.label.label" :tooltip="item.label.attrs.tooltip"/>
                   <span v-if="item.required" class="color-danger">*</span>
                 </div>
                 <el-select
@@ -129,7 +130,7 @@
                     :label="$t('views.applicationWorkflow.nodes.replyNode.replyContent.reference')"
                     value="referencing"
                   />
-                  <el-option :label="$t('common.custom')" value="custom" />
+                  <el-option :label="$t('common.custom')" value="custom"/>
                 </el-select>
               </div>
             </template>
@@ -184,7 +185,7 @@
             <template #label>
               <div class="flex-between">
                 <div>
-                  <TooltipLabel :label="item.label.label" :tooltip="item.label.attrs.tooltip" />
+                  <TooltipLabel :label="item.label.label" :tooltip="item.label.attrs.tooltip"/>
                   <span v-if="item.required" class="color-danger">*</span>
                 </div>
                 <el-select
@@ -197,7 +198,7 @@
                     :label="$t('views.applicationWorkflow.nodes.replyNode.replyContent.reference')"
                     value="referencing"
                   />
-                  <el-option :label="$t('common.custom')" value="custom" />
+                  <el-option :label="$t('common.custom')" value="custom"/>
                 </el-select>
               </div>
             </template>
@@ -235,7 +236,7 @@
 <script setup lang="ts">
 import { cloneDeep, set } from 'lodash'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
-import { computed, onMounted, ref, inject } from 'vue'
+import { computed, inject, onMounted, ref } from 'vue'
 import { isLastNode } from '@/workflow/common/data'
 import { t } from '@/locales'
 import { MsgError, MsgSuccess } from '@/utils/message'
@@ -244,12 +245,13 @@ import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import { useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import useStore from "@/stores";
+
 const props = defineProps<{ nodeModel: any }>()
-const { user } = useStore()
+const {user} = useStore()
 
 const route = useRoute()
 const {
-  params: { id },
+  params: {id},
 } = route as any
 const getApplicationDetail = inject('getApplicationDetail') as any
 const applicationDetail = getApplicationDetail()
@@ -300,7 +302,7 @@ function submitDialog(val: string) {
 }
 
 async function mcpToolSelectChange() {
-  const tool = await loadSharedApi({ type: 'tool', systemType: apiType.value })
+  const tool = await loadSharedApi({type: 'tool', systemType: apiType.value})
     .getToolById(form_data.value.mcp_tool_id, loading)
   form_data.value.mcp_servers = tool.data.code
 }
@@ -320,7 +322,7 @@ function getTools() {
     MsgError(t('views.applicationWorkflow.nodes.mcpNode.mcpServerTip'))
     return
   }
-  loadSharedApi({ type: 'application', systemType: apiType.value })
+  loadSharedApi({type: 'application', systemType: apiType.value})
     .getMcpTools(id, form_data.value.mcp_servers, loading)
     .then((res: any) => {
       form_data.value.mcp_tools = res.data
@@ -363,7 +365,7 @@ function changeTool() {
           label: {
             input_type: 'TooltipLabel',
             label: item2,
-            attrs: { tooltip: params[item2].description },
+            attrs: {tooltip: params[item2].description},
             props_info: {},
           },
           input_type: input_type,
@@ -399,7 +401,7 @@ function changeTool() {
         label: {
           input_type: 'TooltipLabel',
           label: item,
-          attrs: { tooltip: args_schema.properties[item].description },
+          attrs: {tooltip: args_schema.properties[item].description},
           props_info: {},
         },
         input_type: input_type,
@@ -419,7 +421,7 @@ function changeTool() {
   }
   //
   if (form_data.value.params_nested) {
-    form_data.value.tool_params = { [form_data.value.params_nested]: {} }
+    form_data.value.tool_params = {[form_data.value.params_nested]: {}}
   } else {
     form_data.value.tool_params = {}
   }
@@ -512,6 +514,9 @@ onMounted(() => {
     if (isLastNode(props.nodeModel)) {
       set(props.nodeModel.properties.node_data, 'is_result', true)
     }
+  }
+  if (props.nodeModel.properties.node_data.mcp_servers) {
+    set(props.nodeModel.properties.node_data, 'mcp_source', 'custom')
   }
   getMcpToolSelectOptions()
   set(props.nodeModel, 'validate', validate)
