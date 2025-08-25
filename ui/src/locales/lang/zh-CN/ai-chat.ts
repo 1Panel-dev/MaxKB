@@ -18,6 +18,7 @@ export default {
   download: '点击下载文件',
   transcribing: '转文字中',
   noDocument: '原文档不存在',
+  noPermissionDownload: '无权限下载',
   passwordValidator: {
     title: '请输入密码打开链接',
     errorMessage1: '密码不能为空',

@@ -14,6 +14,7 @@ export default {
   quote: '引用',
   download: '點擊下載文件',
   noDocument: '原文檔不存在',
+  noPermissionDownload: '無許可權下載',
   passwordValidator: {
     title: '請輸入密碼打開連結',
     errorMessage1: '密碼不能為空',

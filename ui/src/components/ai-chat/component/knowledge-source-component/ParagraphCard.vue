@@ -37,7 +37,7 @@
                 <span :title="data?.document_name?.trim()">{{ data?.document_name }}</span>
               </a>
             </div>
-            <div v-else @click="infoMessage">
+            <div v-else @click="infoMessage(data)">
               <span class="ellipsis-1 break-all" :title="data?.document_name?.trim()">
                 {{ data?.document_name?.trim() }}
               </span>
@@ -87,8 +87,12 @@ const parsedMeta = computed(() => {
 })
 
 const meta = computed(() => (isMetaObject.value ? props.data.meta : parsedMeta.value))
-function infoMessage() {
-  MsgInfo(t('chat.noDocument'))
+function infoMessage(data: any) {
+  if (data?.meta?.allow_download === false) {
+    MsgInfo(t('chat.noPermissionDownload'))
+  } else {
+    MsgInfo(t('chat.noDocument'))
+  }
 }
 </script>
 <style lang="scss" scoped></style>
