@@ -15,21 +15,12 @@
         <div class="user-left border-r">
           <div class="p-24 pb-0">
             <h4 class="medium mb-12">{{ $t('views.chatUser.group.title') }}</h4>
-            <el-input
-              v-model="filterText"
-              :placeholder="$t('common.search')"
-              prefix-icon="Search"
-              clearable
-            />
+            <el-input v-model="filterText" :placeholder="$t('common.search')" prefix-icon="Search" clearable />
           </div>
           <div class="list-height-left">
             <el-scrollbar v-loading="loading">
               <div class="p-16">
-                <common-list
-                  :data="filterList"
-                  @click="clickUserGroup"
-                  :default-active="current?.id"
-                >
+                <common-list :data="filterList" @click="clickUserGroup" :default-active="current?.id">
                   <template #default="{ row }">
                     <span class="ellipsis-1" :title="row.name">{{ row.name }}</span>
                   </template>
@@ -57,21 +48,14 @@
               </span>
             </div>
 
-            <div
-              class="flex align-center"
-              v-if="
-                route.path.includes('share/')
-                  ? false
-                  : hasPermission(permissionObj[currentPermissionKey], 'OR')
-              "
-            >
+            <div class="flex align-center" v-if="
+              route.path.includes('share/')
+                ? false
+                : permissionObj[currentPermissionKey]
+            ">
               <div class="color-secondary mr-8">{{ $t('views.chatUser.autoAuthorization') }}</div>
-              <el-switch
-                size="small"
-                :model-value="current?.is_auth"
-                @click="changeAuth"
-                :loading="loading"
-              ></el-switch>
+              <el-switch size="small" :model-value="current?.is_auth" @click="changeAuth"
+                :loading="loading"></el-switch>
             </div>
           </div>
 
@@ -79,36 +63,15 @@
             <div class="flex complex-search">
               <el-select class="complex-search__left" v-model="searchType" style="width: 120px">
                 <el-option :label="$t('views.login.loginForm.username.label')" value="username" />
-                <el-option
-                  :label="$t('views.userManage.userForm.nick_name.label')"
-                  value="nick_name"
-                />
+                <el-option :label="$t('views.userManage.userForm.nick_name.label')" value="nick_name" />
                 <el-option :label="$t('views.userManage.source.label')" value="source" />
               </el-select>
-              <el-input
-                v-if="searchType === 'username'"
-                v-model="searchForm.username"
-                @change="getList"
-                :placeholder="$t('common.inputPlaceholder')"
-                style="width: 220px"
-                clearable
-              />
-              <el-input
-                v-else-if="searchType === 'nick_name'"
-                v-model="searchForm.nick_name"
-                @change="getList"
-                :placeholder="$t('common.inputPlaceholder')"
-                style="width: 220px"
-                clearable
-              />
-              <el-select
-                v-else-if="searchType === 'source'"
-                v-model="searchForm.source"
-                @change="getList"
-                :placeholder="$t('common.selectPlaceholder')"
-                style="width: 220px"
-                clearable
-              >
+              <el-input v-if="searchType === 'username'" v-model="searchForm.username" @change="getList"
+                :placeholder="$t('common.inputPlaceholder')" style="width: 220px" clearable />
+              <el-input v-else-if="searchType === 'nick_name'" v-model="searchForm.nick_name" @change="getList"
+                :placeholder="$t('common.inputPlaceholder')" style="width: 220px" clearable />
+              <el-select v-else-if="searchType === 'source'" v-model="searchForm.source" @change="getList"
+                :placeholder="$t('common.selectPlaceholder')" style="width: 220px" clearable>
                 <el-option :label="$t('views.userManage.source.local')" value="LOCAL" />
                 <el-option label="CAS" value="CAS" />
                 <el-option label="LDAP" value="LDAP" />
@@ -119,31 +82,18 @@
                 <el-option :label="$t('views.userManage.source.dingtalk')" value="dingtalk" />
               </el-select>
             </div>
-            <el-button
-              type="primary"
-              :disabled="current?.is_auth"
-              @click="handleSave"
-              v-if="
-                route.path.includes('share/')
-                  ? false
-                  : hasPermission(permissionObj[currentPermissionKey], 'OR')
-              "
-            >
+            <el-button type="primary" :disabled="current?.is_auth" @click="handleSave" v-if="
+              route.path.includes('share/')
+                ? false
+                : permissionObj[currentPermissionKey]
+            ">
               {{ t('common.save') }}
             </el-button>
           </div>
 
-          <app-table
-            :data="tableData"
-            :pagination-config="paginationConfig"
-            @sizeChange="handleSizeChange"
-            @changePage="getList"
-            :maxTableHeight="350"
-          >
-            <el-table-column
-              prop="nick_name"
-              :label="$t('views.userManage.userForm.nick_name.label')"
-            />
+          <app-table :data="tableData" :pagination-config="paginationConfig" @sizeChange="handleSizeChange"
+            @changePage="getList" :maxTableHeight="350">
+            <el-table-column prop="nick_name" :label="$t('views.userManage.userForm.nick_name.label')" />
             <el-table-column prop="username" :label="$t('views.login.loginForm.username.label')" />
             <el-table-column prop="source" :label="$t('views.userManage.source.label')">
               <template #default="{ row }">
@@ -164,21 +114,13 @@
             </el-table-column>
             <el-table-column :width="140" align="center">
               <template #header>
-                <el-checkbox
-                  :model-value="allChecked"
-                  :indeterminate="allIndeterminate"
-                  :disabled="current?.is_auth"
-                  @change="handleCheckAll"
-                  >{{ $t('views.chatUser.authorization') }}
+                <el-checkbox :model-value="allChecked" :indeterminate="allIndeterminate" :disabled="current?.is_auth"
+                  @change="handleCheckAll">{{ $t('views.chatUser.authorization') }}
                 </el-checkbox>
               </template>
               <template #default="{ row }">
-                <el-checkbox
-                  v-model="row.is_auth"
-                  :indeterminate="row.indeterminate"
-                  :disabled="current?.is_auth"
-                  @change="(value: boolean) => handleRowChange(value, row)"
-                />
+                <el-checkbox v-model="row.is_auth" :indeterminate="row.indeterminate" :disabled="current?.is_auth"
+                  @change="(value: boolean) => handleRowChange(value, row)" />
               </template>
             </el-table-column>
           </app-table>
@@ -200,6 +142,7 @@ import { ComplexPermission } from '@/utils/permission/type'
 import { RoleConst, PermissionConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import permissionMap from '@/permission'
 
 const route = useRoute()
 
@@ -208,42 +151,30 @@ const {
 } = route as any
 
 const permissionObj = ref<any>({
-  APPLICATION: new ComplexPermission(
-    [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole, RoleConst.USER.getWorkspaceRole],
-    [
-      PermissionConst.APPLICATION_CHAT_USER_EDIT,
-      PermissionConst.APPLICATION_CHAT_USER_EDIT.getApplicationWorkspaceResourcePermission(id),
-    ],
-    [],
-    'OR',
-  ),
-  KNOWLEDGE: new ComplexPermission(
-    [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole, RoleConst.USER.getWorkspaceRole],
-    [
-      PermissionConst.KNOWLEDGE_CHAT_USER_EDIT,
-      PermissionConst.KNOWLEDGE_CHAT_USER_EDIT.getKnowledgeWorkspaceResourcePermission(id),
-    ],
-    [],
-    'OR',
-  ),
-  RESOURCE_APPLICATION: [RoleConst.ADMIN, PermissionConst.RESOURCE_APPLICATION_CHAT_USER_EDIT],
-  RESOURCE_KNOWLEDGE: [RoleConst.ADMIN, PermissionConst.RESOURCE_KNOWLEDGE_CHAT_USER_EDIT],
-  SHAREDKNOWLEDGE: new ComplexPermission(
+  APPLICATION: permissionMap['application']['workspace'].application_chat_user_edit(id),
+  KNOWLEDGE: permissionMap['knowledge']['workspace'].chat_user_edit(id),
+  RESOURCE_APPLICATION: hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_APPLICATION_CHAT_USER_EDIT], 'OR'),
+  RESOURCE_KNOWLEDGE: hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_KNOWLEDGE_CHAT_USER_EDIT], 'OR'),
+  SHAREDKNOWLEDGE: hasPermission(new ComplexPermission(
     [RoleConst.ADMIN],
     [PermissionConst.SHARED_KNOWLEDGE_CHAT_USER_EDIT],
     [],
     'OR',
-  ),
+  ), 'OR')
 })
 
 const currentPermissionKey = computed(() => {
-  if (route.path.includes('shared')) return 'SHAREDKNOWLEDGE'
   if (route.path.includes('resource-management')) {
     if (route.meta?.resourceType === 'KNOWLEDGE') {
       return 'RESOURCE_KNOWLEDGE'
     } else if (route.meta?.resourceType === 'APPLICATION') {
       return 'RESOURCE_APPLICATION'
     }
+  }
+  else if (route.path.includes('shared')) {return 'SHAREDKNOWLEDGE'}
+  else {
+    if (route.path.includes('knowledge/')) return 'KNOWLEDGE'
+    if (route.path.includes('application/')) return 'APPLICATION'
   }
   return route.meta?.resourceType as string
 })

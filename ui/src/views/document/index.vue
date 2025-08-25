@@ -515,7 +515,7 @@
                     effect="dark"
                     :content="$t('views.knowledge.setting.vectorization')"
                     placement="top"
-                    v-else="permissionPrecise.vector(id)"
+                    v-if="permissionPrecise.vector(id)"
                   >
                     <span class="mr-4">
                       <el-button type="primary" text @click.stop="refreshDocument(row)">
