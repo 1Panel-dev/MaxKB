@@ -70,6 +70,14 @@ const permissionPrecise = computed(() => {
 // 平台数据
 const platforms = reactive([
   {
+    key: 'wecomBot',
+    logoSrc: new URL(`../../assets/logo/logo_wechat-bot.svg`, import.meta.url).href,
+    name: t('views.application.applicationAccess.wecomBot'),
+    description: t('views.application.applicationAccess.wecomBotTip'),
+    isActive: false,
+    exists: false,
+  },
+  {
     key: 'wecom',
     logoSrc: new URL(`../../assets/logo/logo_wechat-work.svg`, import.meta.url).href,
     name: t('views.application.applicationAccess.wecom'),
@@ -106,14 +114,6 @@ const platforms = reactive([
     logoSrc: new URL(`../../assets/logo/logo_slack.svg`, import.meta.url).href,
     name: t('views.application.applicationAccess.slack'),
     description: t('views.application.applicationAccess.slackTip'),
-    isActive: false,
-    exists: false,
-  },
-    {
-    key: 'wecomBot',
-    logoSrc: new URL(`../../assets/logo/logo_wechat-bot.svg`, import.meta.url).href,
-    name: t('views.application.applicationAccess.wecomBot'),
-    description: t('views.application.applicationAccess.wecomBotTip'),
     isActive: false,
     exists: false,
   },
