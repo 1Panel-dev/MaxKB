@@ -133,6 +133,8 @@ const systemManage = {
           PermissionConst.RESOURCE_APPLICATION_CHAT_USER_READ
         ],'OR'
     ),
+    chat_user_edit: () =>false,
+
     chat_log_read: () => 
       hasPermission(
         [

@@ -31,6 +31,7 @@ const workspaceShare = {
   problem_relate: () => false,
   problem_delete: () => false,
   problem_edit: () => false,
+  chat_user_edit: () =>false,
 
   folderCreate: () => false,
   folderEdit: () => false,
