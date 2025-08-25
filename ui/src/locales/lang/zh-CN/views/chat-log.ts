@@ -12,6 +12,7 @@ export default {
   },
   table: {
     abstract: '摘要',
+    username: '用户',
     chat_record_count: '对话提问数',
     user: '用户',
     feedback: {

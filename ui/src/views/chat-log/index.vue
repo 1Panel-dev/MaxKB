@@ -5,6 +5,23 @@
     <el-card style="--el-card-padding: 24px">
       <div class="mb-16">
         <el-select
+          v-model="query_option"
+          class="mr-12"
+          @change="search_type_change"
+          style="width: 75px"
+        >
+          <el-option :label="$t('views.chatLog.table.abstract')" value="abstract" />
+          <el-option :label="$t('views.chatLog.table.username')" value="username" />
+        </el-select>
+        <el-input
+          v-model="search"
+          @change="getList"
+          :placeholder="$t('common.search')"
+          prefix-icon="Search"
+          class="w-240 mr-12"
+          clearable
+        />
+        <el-select
           v-model="history_day"
           class="mr-12"
           @change="changeDayHandle"
@@ -28,14 +45,6 @@
           @change="changeDayRangeHandle"
           style="width: 240px"
           class="mr-12"
-        />
-        <el-input
-          v-model="search"
-          @change="getList"
-          :placeholder="$t('common.search')"
-          prefix-icon="Search"
-          class="w-240"
-          clearable
         />
         <div style="display: flex; align-items: center" class="float-right">
           <el-button @click="dialogVisible = true" v-if="permissionPrecise.chat_log_clear(id)">
@@ -256,6 +265,15 @@ const {
 const emit = defineEmits(['refresh'])
 const formRef = ref()
 
+const search_form = ref<any>({
+  abstract: '',
+    username: '',
+})
+
+const search_type_change = () => {
+  search_form.value = {abstract: '', username: ''}
+}
+
 const dayOptions = [
   {
     value: 7,
@@ -308,6 +326,7 @@ const tableIndexMap = computed<Dict<number>>(() => {
     .reduce((pre, next) => ({ ...pre, ...next }), {})
 })
 const history_day = ref<number | string>(7)
+const query_option = ref<string>('abstract')
 
 const search = ref('')
 const detail = ref<any>(null)
@@ -416,7 +435,8 @@ function getList() {
     ...filter.value,
   }
   if (search.value) {
-    obj = { ...obj, abstract: search.value }
+    if (query_option.value === 'abstract'){obj = { ...obj, abstract: search.value }}
+    else if (query_option.value === 'username'){obj = { ...obj, username: search.value }} 
   }
   return loadSharedApi({ type: 'chatLog', systemType: apiType.value })
     .getChatLog(id as string, paginationConfig, obj, loading)
