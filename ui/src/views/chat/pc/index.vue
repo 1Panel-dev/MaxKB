@@ -139,6 +139,9 @@
                     <el-dropdown-item @click="exportHTML"
                       >{{ $t('common.export') }} HTML</el-dropdown-item
                     >
+                    <el-dropdown-item @click="exportToPDF('chatListId', currentChatName + '.pdf')"
+                      >{{ $t('common.export') }} PDF</el-dropdown-item
+                    >
                   </el-dropdown-menu>
                 </template>
               </el-dropdown>
@@ -222,7 +225,6 @@ import { ref, onMounted, nextTick, computed, watch } from 'vue'
 import { marked } from 'marked'
 import { saveAs } from 'file-saver'
 import chatAPI from '@/api/chat/chat'
-
 import useStore from '@/stores'
 import useResize from '@/layout/hooks/useResize'
 import { hexToRgba } from '@/utils/theme'
@@ -236,6 +238,7 @@ import ParagraphDocumentContent from '@/components/ai-chat/component/knowledge-s
 import HistoryPanel from '@/views/chat/component/HistoryPanel.vue'
 import { cloneDeep } from 'lodash'
 import { getFileUrl } from '@/utils/common'
+import { exportToPDF } from '@/utils/htmlToPdf'
 useResize()
 
 const { common, chatUser } = useStore()

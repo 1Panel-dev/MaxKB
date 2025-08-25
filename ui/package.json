@@ -32,6 +32,8 @@
     "element-plus": "^2.10.2",
     "file-saver": "^2.0.5",
     "highlight.js": "^11.11.1",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^3.0.1",
     "katex": "^0.16.10",
     "marked": "^12.0.2",
     "md-editor-v3": "^5.8.2",
