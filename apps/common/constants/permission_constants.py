@@ -895,7 +895,7 @@ class PermissionConstants(Enum):
     APPLICATION_CHAT_USER_READ = Permission(group=Group.APPLICATION_CHAT_USER, operate=Operate.READ,
                                             role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                             parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                            resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE],
+                                            resource_permission_group_list=[ResourcePermissionConst.APPLICATION_VIEW],
                                             )
     APPLICATION_CHAT_USER_EDIT = Permission(group=Group.APPLICATION_CHAT_USER, operate=Operate.EDIT,
                                             role_list=[RoleConstants.ADMIN, RoleConstants.USER],
@@ -917,7 +917,7 @@ class PermissionConstants(Enum):
     APPLICATION_CHAT_LOG_READ = Permission(group=Group.APPLICATION_CHAT_LOG, operate=Operate.READ,
                                            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                            parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                           resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE],
+                                           resource_permission_group_list=[ResourcePermissionConst.APPLICATION_VIEW],
                                            )
 
     APPLICATION_CHAT_LOG_ANNOTATION = Permission(group=Group.APPLICATION_CHAT_LOG, operate=Operate.ANNOTATION,
