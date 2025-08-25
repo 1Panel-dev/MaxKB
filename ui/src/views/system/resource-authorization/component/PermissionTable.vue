@@ -142,8 +142,9 @@ import { isAppIcon, resetUrl } from '@/utils/common'
 import { RoleConst, PermissionConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
 import { ComplexPermission } from '@/utils/permission/type'
-import { permissionOptions } from '@/views/system/resource-authorization/constant'
+import { getPermissionOptions } from '@/views/system/resource-authorization/constant'
 import useStore from '@/stores'
+
 const { model, user } = useStore()
 const route = useRoute()
 const props = defineProps<{
@@ -152,6 +153,10 @@ const props = defineProps<{
   getData?: () => void
 }>()
 const emit = defineEmits(['submitPermissions'])
+
+const permissionOptions = computed(() => { 
+  return getPermissionOptions()
+})
 const permissionObj = ref<any>({
   APPLICATION: new ComplexPermission(
     [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],
