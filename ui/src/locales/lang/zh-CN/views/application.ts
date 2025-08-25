@@ -151,7 +151,7 @@ export default {
     wecom: '企业微信应用',
     wecomTip: '打造企业微信智能应用',
     wecomBot: '企业微信智能机器人',
-    wecomBotTip: '打造企业微信智能机器人应用',
+    wecomBotTip: '打造企业微信智能机器人',
     dingtalk: '钉钉应用',
     dingtalkTip: '打造钉钉智能应用',
     wechat: '公众号',
