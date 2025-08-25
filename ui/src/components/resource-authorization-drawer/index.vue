@@ -150,7 +150,7 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted, watch, computed, reactive } from 'vue'
-import { permissionOptions } from '@/views/system/resource-authorization/constant'
+import { getPermissionOptions } from '@/views/system/resource-authorization/constant'
 import AuthorizationApi from '@/api/system/resource-authorization'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { t } from '@/locales'
@@ -159,7 +159,9 @@ const { user } = useStore()
 const props = defineProps<{
   type: string
 }>()
-
+const permissionOptions = computed(() => { 
+  return getPermissionOptions()
+})
 const drawerVisible = ref(false)
 const multipleTableRef = ref()
 
