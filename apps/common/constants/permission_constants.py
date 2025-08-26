@@ -1249,6 +1249,10 @@ class PermissionConstants(Enum):
         group=Group.SYSTEM_RES_APPLICATION, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.RESOURCE_APPLICATION]
     )
+    RESOURCE_APPLICATION_AUTH = Permission(
+        group=Group.SYSTEM_RES_APPLICATION, operate=Operate.AUTH, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.RESOURCE_APPLICATION]
+    )
     RESOURCE_APPLICATION_OVERVIEW_READ = Permission(
         group=Group.SYSTEM_RES_APPLICATION_OVERVIEW, operate=Operate.READ, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.RESOURCE_APPLICATION]
@@ -1337,6 +1341,10 @@ class PermissionConstants(Enum):
     )
     RESOURCE_KNOWLEDGE_GENERATE = Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, operate=Operate.GENERATE, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.RESOURCE_KNOWLEDGE]
+    )
+    RESOURCE_KNOWLEDGE_AUTH = Permission(
+        group=Group.SYSTEM_RES_KNOWLEDGE, operate=Operate.AUTH, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.RESOURCE_KNOWLEDGE]
     )
 # 文档
@@ -1432,6 +1440,10 @@ class PermissionConstants(Enum):
         group=Group.SYSTEM_RES_TOOL, operate=Operate.EXPORT, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.RESOURCE_TOOL]
     )
+    RESOURCE_TOOL_AUTH = Permission(
+        group=Group.SYSTEM_RES_TOOL, operate=Operate.AUTH, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.RESOURCE_TOOL]
+    )
     RESOURCE_MODEL_READ = Permission(
         group=Group.SYSTEM_RES_MODEL, operate=Operate.READ, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.RESOURCE_MODEL]
@@ -1442,6 +1454,10 @@ class PermissionConstants(Enum):
     )
     RESOURCE_MODEL_DELETE = Permission(
         group=Group.SYSTEM_RES_MODEL, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.RESOURCE_MODEL]
+    )
+    RESOURCE_MODEL_AUTH = Permission(
+        group=Group.SYSTEM_RES_MODEL, operate=Operate.AUTH, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.RESOURCE_MODEL]
     )
     OPERATION_LOG_READ = Permission(
