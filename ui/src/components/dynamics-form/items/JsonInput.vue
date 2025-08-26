@@ -75,14 +75,14 @@ const model_value = computed({
         emit('update:modelValue', result)
       } catch (e) {}
     }
-  }
+  },
 })
 
 const extensions = [json(), linter(jsonParseLinter()), oneDark]
 
 const codemirrorStyle = {
   height: '210px!important',
-  width: '100%'
+  width: '100%',
 }
 
 // 弹出框相关代码

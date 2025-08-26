@@ -123,6 +123,7 @@ export default {
     ref_variables: {
       label: 'Reference Variables',
       popover: 'Variable values must comply with',
+      json_format: 'JSON format',
       popover_label: 'Label',
       popover_value: 'Value',
       popover_default: 'Is Default',
