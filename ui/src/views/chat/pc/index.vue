@@ -139,7 +139,7 @@
                     <el-dropdown-item @click="exportHTML"
                       >{{ $t('common.export') }} HTML</el-dropdown-item
                     >
-                    <el-dropdown-item @click="exportToPDF('chatListId', currentChatName + '.pdf')"
+                    <el-dropdown-item @click="openPDFExport"
                       >{{ $t('common.export') }} PDF</el-dropdown-item
                     >
                   </el-dropdown-menu>
@@ -169,7 +169,7 @@
         <div class="execution-detail-panel" :resizable="false" collapsible>
           <div class="p-16 flex-between border-b">
             <h4 class="medium ellipsis" :title="rightPanelTitle">{{ rightPanelTitle }}</h4>
-            　
+
             <div class="flex align-center">
               <span v-if="rightPanelType === 'paragraphDocument'" class="mr-4">
                 <a
@@ -217,6 +217,7 @@
       emitConfirm
       @confirm="handleResetPassword"
     ></ResetPassword>
+    <PdfExport ref="pdfExportRef"></PdfExport>
   </div>
 </template>
 
@@ -238,12 +239,14 @@ import ParagraphDocumentContent from '@/components/ai-chat/component/knowledge-s
 import HistoryPanel from '@/views/chat/component/HistoryPanel.vue'
 import { cloneDeep } from 'lodash'
 import { getFileUrl } from '@/utils/common'
-import { exportToPDF } from '@/utils/htmlToPdf'
+import PdfExport from '@/components/pdf-export/index.vue'
 useResize()
-
+const pdfExportRef = ref<InstanceType<typeof PdfExport>>()
 const { common, chatUser } = useStore()
 const router = useRouter()
-
+const openPDFExport = () => {
+  pdfExportRef.value?.open(document.getElementById('chatListId'))
+}
 const isCollapse = ref(false)
 const isPcCollapse = ref(false)
 watch(
