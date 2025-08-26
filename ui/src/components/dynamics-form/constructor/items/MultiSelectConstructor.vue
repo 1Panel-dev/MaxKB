@@ -7,7 +7,7 @@
     </template>
 
     <el-row style="width: 100%" :gutter="10">
-      <el-radio-group v-model="formValue.assignment_method">
+      <el-radio-group @change="formValue.option_list = []" v-model="formValue.assignment_method">
         <el-radio :value="item.value" size="large" v-for="item in assignment_method_option_list"
           >{{ item.label }}
           <el-popover
@@ -37,14 +37,21 @@
       </el-radio-group>
     </el-row>
   </el-form-item>
-  <NodeCascader
+  <el-form-item
     v-if="formValue.assignment_method == 'ref_variables'"
-    ref="nodeCascaderRef"
-    :nodeModel="model"
-    class="w-full"
-    :placeholder="$t('views.applicationWorkflow.variable.placeholder')"
-    v-model="formValue.option_list"
-  />
+    :required="true"
+    prop="option_list"
+    :rules="[default_ref_variables_value_rule]"
+  >
+    <NodeCascader
+      ref="nodeCascaderRef"
+      :nodeModel="model"
+      class="w-full"
+      :placeholder="$t('views.applicationWorkflow.variable.placeholder')"
+      v-model="formValue.option_list"
+    />
+  </el-form-item>
+
   <el-form-item v-if="formValue.assignment_method == 'custom'">
     <template #label>
       <div class="flex-between">
@@ -139,7 +146,7 @@
   </el-form-item>
 </template>
 <script setup lang="ts">
-import { computed, onMounted, inject } from 'vue'
+import { computed, onMounted, inject, watch } from 'vue'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import { t } from '@/locales'
 const getModel = inject('getModel') as any
@@ -180,6 +187,20 @@ const formValue = computed({
   },
 })
 
+const default_ref_variables_value_rule = {
+  required: true,
+  validator: (rule: any, value: any, callback: any) => {
+    console.log(value.length)
+    if (!(Array.isArray(value) && value.length > 1)) {
+      callback(
+        t('dynamicsForm.AssignmentMethod.ref_variables.label', '引用变量') + t('common.required'),
+      )
+    }
+
+    return true
+  },
+  trigger: 'blur',
+}
 const addOption = () => {
   formValue.value.option_list.push({ value: '', label: '' })
 }

@@ -123,6 +123,7 @@ export default {
     ref_variables: {
       label: '參考變量',
       popover: '變量的值必須符合',
+      json_format: 'JSON 格式',
       popover_label: '標籤',
       popover_value: '值',
       popover_default: '是否為預設值',

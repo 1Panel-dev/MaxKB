@@ -124,6 +124,7 @@ export default {
     ref_variables: {
       label: '引用变量 ',
       popover: '变量的值必须符合',
+      json_format: 'JSON 格式',
       popover_label: '标签',
       popover_value: '值',
       popover_default: '是否为默认值',

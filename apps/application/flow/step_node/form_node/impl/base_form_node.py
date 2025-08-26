@@ -18,15 +18,18 @@ from application.flow.step_node.form_node.i_form_node import IFormNode
 
 
 def get_default_option(option_list, _type, value_field):
-    if option_list is not None and len(option_list) > 0:
-        default_value_list = [o.get(value_field) for o in option_list if o.get('default')]
-        if len(default_value_list) == 0:
-            return option_list[0].get(value_field)
-        else:
-            if _type == 'MultiSelect':
-                return default_value_list
+    try:
+        if option_list is not None and isinstance(option_list, list) and len(option_list) > 0:
+            default_value_list = [o.get(value_field) for o in option_list if o.get('default')]
+            if len(default_value_list) == 0:
+                return option_list[0].get(value_field)
             else:
-                return default_value_list[0]
+                if _type == 'MultiSelect':
+                    return default_value_list
+                else:
+                    return default_value_list[0]
+    except Exception as _:
+        pass
     return []
 
 
@@ -39,6 +42,13 @@ def write_context(step_variable: Dict, global_variable: Dict, node, workflow):
             yield result
             node.answer_text = result
     node.context['run_time'] = time.time() - node.context['start_time']
+
+
+def generate_prompt(workflow_manage, _value):
+    try:
+        return workflow_manage.generate_prompt(_value)
+    except Exception as e:
+        return _value
 
 
 class BaseFormNode(IFormNode):
@@ -58,27 +68,34 @@ class BaseFormNode(IFormNode):
                 self.context[key] = form_data[key]
 
     def reset_field(self, field):
-        if ['SingleSelect', 'MultiSelect', 'RadioCard'].__contains__(field.get('input_type')):
-            if field.get('assignment_method') == 'ref_variables':
-                option_list = self.workflow_manage.get_reference_field(field.get('option_list')[0],
-                                                                       field.get('option_list')[1:])
-                field['option_list'] = option_list
-                field['default_value'] = get_default_option(option_list, field.get('input_type'),
-                                                            field.get('value_field'))
-
         reset_field = ['field', 'label', 'default_value']
         for f in reset_field:
             _value = field[f]
             if _value is None:
                 continue
             if isinstance(_value, str):
-                field[f] = self.workflow_manage.generate_prompt(_value)
+                field[f] = generate_prompt(self.workflow_manage, _value)
             elif f == 'label':
                 _label_value = _value.get('label')
-                _value['label'] = self.workflow_manage.generate_prompt(_label_value)
+                _value['label'] = generate_prompt(self.workflow_manage, _label_value)
                 tooltip = _value.get('attrs').get('tooltip')
                 if tooltip is not None:
-                    _value.get('attrs')['tooltip'] = self.workflow_manage.generate_prompt(tooltip)
+                    _value.get('attrs')['tooltip'] = generate_prompt(self.workflow_manage, tooltip)
+
+        if ['SingleSelect', 'MultiSelect', 'RadioCard', 'RadioRow'].__contains__(field.get('input_type')):
+            if field.get('assignment_method') == 'ref_variables':
+                option_list = self.workflow_manage.get_reference_field(field.get('option_list')[0],
+                                                                       field.get('option_list')[1:])
+                option_list = option_list if isinstance(option_list, list) else []
+                field['option_list'] = option_list
+                field['default_value'] = get_default_option(option_list, field.get('input_type'),
+                                                            field.get('value_field'))
+
+        if ['JsonInput'].__contains__(field.get('input_type')):
+            if field.get('default_value_assignment_method') == 'ref_variables':
+                field['default_value'] = self.workflow_manage.get_reference_field(field.get('default_value')[0],
+                                                                                  field.get('default_value')[1:])
+
         return field
 
     def execute(self, form_field_list, form_content_format, form_data, **kwargs) -> NodeResult:
