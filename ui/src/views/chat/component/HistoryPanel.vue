@@ -3,7 +3,7 @@
     <el-menu
       :default-active="currentChatId"
       :collapse="isPcCollapse"
-      collapse-transition
+      :collapse-transition="false"
       popper-class="chat-pc-popper"
       class="h-full"
     >
@@ -37,7 +37,11 @@
           <AppIcon iconName="app-create-chat"></AppIcon>
           <span class="ml-4">{{ $t('chat.createChat') }}</span>
         </el-button>
-        <div v-show="!isPcCollapse" class="flex-between p-8 pb-0 color-secondary mt-8">
+        <div
+          v-show="!isPcCollapse"
+          class="flex-between p-8 pb-0 color-secondary mt-8"
+          v-if="applicationDetail.show_history || hasPermission(EditionConst.IS_CE, 'OR')"
+        >
           <span>{{ $t('chat.history') }}</span>
           <el-tooltip effect="dark" :content="$t('chat.clearChat')" placement="right">
             <el-button text @click.stop="clearChat">
@@ -46,7 +50,11 @@
           </el-tooltip>
         </div>
       </div>
-      <div v-show="!isPcCollapse" class="left-height">
+      <div
+        v-show="!isPcCollapse"
+        class="left-height"
+        v-if="applicationDetail.show_history || hasPermission(EditionConst.IS_CE, 'OR')"
+      >
         <el-scrollbar>
           <div class="p-16 pt-0">
             <common-list
@@ -103,7 +111,7 @@
         <template #title>{{ $t('chat.createChat') }}</template>
       </el-menu-item>
 
-      <el-sub-menu v-show="isPcCollapse" index="2">
+      <el-sub-menu v-show="isPcCollapse" index="2" v-if="applicationDetail.show_history || hasPermission(EditionConst.IS_CE, 'OR')">
         <template #title>
           <AppIcon iconName="app-history-outlined" />
         </template>
@@ -163,6 +171,8 @@
 import { ref } from 'vue'
 import { isAppIcon } from '@/utils/common'
 import EditTitleDialog from './EditTitleDialog.vue'
+import { EditionConst } from '@/utils/permission/data'
+import { hasPermission } from '@/utils/permission/index'
 const props = defineProps<{
   applicationDetail: any
   chatLogData: any[]

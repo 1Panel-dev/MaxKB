@@ -23,7 +23,13 @@
             <el-card shadow="never" style="--el-card-padding: 8px">
               <div class="flex-between">
                 <div class="flex align-center">
-                  <img :src="getImgUrl(item && item?.document_name)" alt="" width="24" />
+                  <img
+                    src="@/assets/fileType/web-link-icon.svg"
+                    alt=""
+                    width="24"
+                    v-if="item?.meta?.source_file_id || item?.meta?.source_url"
+                  />
+                  <img v-else :src="getImgUrl(item && item?.document_name)" alt="" width="24" />
                   <div
                     class="ml-4 ellipsis-1"
                     :title="item?.document_name"

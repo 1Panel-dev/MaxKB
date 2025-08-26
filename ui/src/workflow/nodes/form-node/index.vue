@@ -111,14 +111,14 @@
                 }}</span>
               </template>
             </el-table-column>
-            <el-table-column :label="$t('common.required')" width="85">
+            <el-table-column :label="$t('common.required')" width="55">
               <template #default="{ row }">
                 <div @click.stop>
                   <el-switch disabled size="small" v-model="row.required" />
                 </div>
               </template>
             </el-table-column>
-            <el-table-column :label="$t('common.operation')" align="left" width="90">
+            <el-table-column :label="$t('common.operation')" align="left" width="80">
               <template #default="{ row, $index }">
                 <span class="mr-4">
                   <el-tooltip effect="dark" :content="$t('common.modify')" placement="top">

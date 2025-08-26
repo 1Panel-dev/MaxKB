@@ -4,8 +4,6 @@ import type {ChatProfile, ChatUserProfile} from '@/api/type/chat'
 import type {LoginRequest} from '@/api/type/user'
 import type {Ref} from 'vue'
 import {getBrowserLang} from '@/locales/index'
-import LoginApi from "@/api/user/login.ts";
-import useUserStore from "@/stores/modules/user.ts";
 
 interface ChatUser {
   // 用户id
@@ -46,6 +44,7 @@ const useChatUserStore = defineStore('chat-user', {
     },
     applicationProfile() {
       return ChatAPI.applicationProfile().then((ok) => {
+        console.log('applicationProfile', ok.data)
         this.application = ok.data
         localStorage.setItem(`${this.accessToken}-locale`, ok.data?.language || this.getLanguage())
       })
