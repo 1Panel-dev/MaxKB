@@ -54,7 +54,7 @@ whisper_model_info_list = [
 ]
 
 reranker_model_info_list = [
-    ModelInfo('bge-reranker-v2-m3', '', ModelTypeConst.RERANKER, rerank_model_credential, VllmBgeReranker),
+    ModelInfo('BAAI/bge-reranker-v2-m3', '', ModelTypeConst.RERANKER, rerank_model_credential, VllmBgeReranker),
 ]
 
 model_info_manage = (

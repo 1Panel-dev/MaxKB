@@ -31,7 +31,8 @@ class VllmRerankerCredential(BaseForm, BaseModelCredential):
                     return False
         try:
             model: VllmBgeReranker = provider.get_model(model_type, model_name, model_credential)
-            model.compress_documents([Document(page_content=_('Hello'))], _('Hello'))
+            test_text = str(_('Hello'))
+            model.compress_documents([Document(page_content=test_text)], test_text)
         except Exception as e:
             traceback.print_exc()
             if isinstance(e, AppApiException):
