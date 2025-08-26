@@ -8667,3 +8667,6 @@ msgstr ""
 
 msgid "If not passed, the default value is 'zh'"
 msgstr ""
+
+msgid "System resources authorization"
+msgstr ""

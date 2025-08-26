@@ -8793,3 +8793,6 @@ msgstr "基于Qwen-Audio的端到端语音识别大模型，支持3分钟以内�
 
 msgid "If not passed, the default value is 'zh'"
 msgstr "如果未传递，则默认值为'zh'"
+
+msgid "System resources authorization"
+msgstr "系统资源授权"
