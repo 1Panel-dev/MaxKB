@@ -4,7 +4,6 @@
     :title="$t('views.system.resourceAuthorization.title')"
     size="60%"
     :append-to-body="true"
-    :modal="false"
   >
     <div class="flex-between mb-16">
       <el-button
@@ -159,7 +158,7 @@ const { user } = useStore()
 const props = defineProps<{
   type: string
 }>()
-const permissionOptions = computed(() => { 
+const permissionOptions = computed(() => {
   return getPermissionOptions()
 })
 const drawerVisible = ref(false)

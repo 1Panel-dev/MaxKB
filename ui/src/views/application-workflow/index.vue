@@ -211,7 +211,6 @@ function back() {
     MsgConfirm(t('common.tip'), t('views.applicationWorkflow.tip.saveMessage'), {
       confirmButtonText: t('views.applicationWorkflow.setting.exitSave'),
       cancelButtonText: t('views.applicationWorkflow.setting.exit'),
-      type: 'warning',
       distinguishCancelAndClose: true,
     })
       .then(() => {

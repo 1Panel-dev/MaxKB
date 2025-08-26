@@ -443,6 +443,10 @@
                 "
               />
               <el-checkbox
+                v-model="xpackForm.show_history"
+                :label="$t('views.applicationOverview.appInfo.SettingDisplayDialog.showHistory')"
+              />
+              <el-checkbox
                 v-model="xpackForm.show_guide"
                 :label="$t('views.applicationOverview.appInfo.SettingDisplayDialog.displayGuide')"
               />
@@ -483,11 +487,8 @@ import type { FormInstance, FormRules, UploadFiles } from 'element-plus'
 import { isAppIcon } from '@/utils/common'
 import { MsgSuccess, MsgError } from '@/utils/message'
 import { langList, t } from '@/locales'
-import useStore from '@/stores'
 import { cloneDeep } from 'lodash'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
-
-const { user } = useStore()
 
 const route = useRoute()
 const {

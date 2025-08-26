@@ -11,18 +11,16 @@
     class="mcp-config-dialog"
   >
     <el-form label-width="auto" label-position="top">
-      <el-form-item>
+      <el-form-item @mouseenter.stop="showIcon = true" @mouseleave.stop="showIcon = false">
         <el-input
           type="textarea"
           v-model="mcp_servers"
           rows="8"
           disabled
           class="config-textarea"
-          @mouseenter.stop="showIcon = true"
-          @mouseleave.stop="showIcon = false"
         ></el-input>
-        <el-button circle class="copy-icon" v-if="showIcon" @click="copyClick(mcp_servers)">
-          <AppIcon iconName="app-copy" class="color-secondary"/>
+        <el-button circle class="copy-icon" v-show="showIcon" @click.stop="copyClick(mcp_servers)">
+          <AppIcon iconName="app-copy" class="color-secondary" />
         </el-button>
       </el-form-item>
     </el-form>
