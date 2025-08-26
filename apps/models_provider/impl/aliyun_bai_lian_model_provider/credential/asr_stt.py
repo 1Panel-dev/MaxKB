@@ -8,8 +8,6 @@ from common.forms import BaseForm
 from models_provider.base_model_provider import BaseModelCredential, ValidCode
 from django.utils.translation import gettext as _
 
-from models_provider.impl.aliyun_bai_lian_model_provider.credential.omni_stt import AliyunBaiLianOmiSTTModelParams
-
 
 class AliyunBaiLianAsrSTTModelCredential(BaseForm, BaseModelCredential):
     api_url = forms.TextInputField(_('API URL'), required=True)
@@ -64,4 +62,4 @@ class AliyunBaiLianAsrSTTModelCredential(BaseForm, BaseModelCredential):
 
     def get_model_params_setting_form(self, model_name):
 
-        return AliyunBaiLianOmiSTTModelParams()
+        pass
