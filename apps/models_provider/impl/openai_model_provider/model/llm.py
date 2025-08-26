@@ -9,7 +9,6 @@
 from typing import List, Dict
 
 from langchain_core.messages import BaseMessage, get_buffer_string
-from langchain_openai.chat_models import ChatOpenAI
 
 from common.config.tokenizer_manage_config import TokenizerManage
 from models_provider.base_model_provider import MaxKBBaseModel
