@@ -72,8 +72,11 @@ export default {
     sizeLimit: 'Each file must not exceed',
     sizeLimit2: 'Empty files are not supported for upload',
     imageMessage: 'Please process the image content',
-    fileMessage: 'Please process the file content',
+    documentMessage: 'Please understand the content of the document',
+    audioMessage: 'Please understand the audio content',
+    otherMessage: 'Please understand the file content',
     errorMessage: 'Upload Failed',
+    fileMessage: 'Please process the file content',
   },
   executionDetails: {
     title: 'Execution Details',

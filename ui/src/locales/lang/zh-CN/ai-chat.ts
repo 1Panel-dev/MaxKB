@@ -74,8 +74,11 @@ export default {
     sizeLimit: '单个文件大小不能超过',
     sizeLimit2: '空文件不支持上传',
     imageMessage: '请解析图片内容',
-    fileMessage: '请解析文件内容',
+    documentMessage: '请理解文档内容',
+    audioMessage: '请理解音频内容',
+    otherMessage: '请理解文件内容',
     errorMessage: '上传失败',
+    fileMessage: '请解析文件内容',
     fileRepeat: '文件已存在',
   },
   executionDetails: {
