@@ -1,4 +1,5 @@
 import io
+import json
 import os
 import re
 import traceback
@@ -9,11 +10,13 @@ from typing import Dict, List
 import openpyxl
 import uuid_utils.compat as uuid
 from celery_once import AlreadyQueued
+from django.contrib.postgres.fields import JSONField
 from django.core import validators
 from django.db import transaction, models
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Func, F, Value
 from django.db.models.aggregates import Max
-from django.db.models.functions import Substr, Reverse
+from django.db.models.fields.json import KeyTextTransform
+from django.db.models.functions import Substr, Reverse, Coalesce, Cast
 from django.http import HttpResponse
 from django.utils.translation import gettext_lazy as _, gettext, get_language, to_locale
 from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
@@ -1256,6 +1259,19 @@ class DocumentSerializers(serializers.Serializer):
             if directly_return_similarity is not None:
                 update_dict['directly_return_similarity'] = directly_return_similarity
             QuerySet(Document).filter(id__in=document_id_list).update(**update_dict)
+            allow_download = instance.get('allow_download')
+            if allow_download is not None:
+                # 我需要修改meta meta是存在Document的字段 是一个json字段 但是allow_download可能不存在
+                Document.objects.filter(id__in=document_id_list).update(
+                    meta=Func(
+                        F("meta"),
+                        Value(["allow_download"]),
+                        Value(json.dumps(allow_download)),  # 转成 "true"/"false"
+                        Value(True),  # create_missing = true
+                        function="jsonb_set",
+                        output_field=JSONField(),
+                    )
+                )
 
         def batch_refresh(self, instance: Dict, with_valid=True):
             if with_valid:
