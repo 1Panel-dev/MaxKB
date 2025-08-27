@@ -218,6 +218,16 @@
                     {{ $t('common.setting') }}
                   </el-dropdown-item>
                   <el-dropdown-item
+                    @click.stop="openAuthorization(row)"
+                    v-if="permissionPrecise.auth()"
+                  >
+                    <AppIcon
+                      iconName="app-resource-authorization"
+                      class="color-secondary"
+                    ></AppIcon>
+                    {{ $t('views.system.resourceAuthorization.title') }}
+                  </el-dropdown-item>
+                  <el-dropdown-item
                     @click.stop="exportKnowledge(row)"
                     v-if="permissionPrecise.export()"
                   >
@@ -248,6 +258,10 @@
     </el-card>
     <SyncWebDialog ref="SyncWebDialogRef" />
     <GenerateRelatedDialog ref="GenerateRelatedDialogRef" apiType="systemManage" />
+    <ResourceAuthorizationDrawer
+      :type="SourceTypeEnum.KNOWLEDGE"
+      ref="ResourceAuthorizationDrawerRef"
+    />
   </div>
 </template>
 
@@ -258,10 +272,12 @@ import KnowledgeResourceApi from '@/api/system-resource-management/knowledge'
 import UserApi from '@/api/user/user'
 import SyncWebDialog from '@/views/knowledge/component/SyncWebDialog.vue'
 import GenerateRelatedDialog from '@/components/generate-related-dialog/index.vue'
+import ResourceAuthorizationDrawer from '@/components/resource-authorization-drawer/index.vue'
 import { datetimeFormat } from '@/utils/time'
 import { loadPermissionApi } from '@/utils/dynamics-api/permission-api.ts'
 import permissionMap from '@/permission'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
+import { SourceTypeEnum } from '@/enums/common'
 import { t } from '@/locales'
 import useStore from '@/stores'
 const router = useRouter()
@@ -287,7 +303,8 @@ const MoreFilledPermission = () => {
     permissionPrecise.value.generate() ||
     permissionPrecise.value.edit() ||
     permissionPrecise.value.export() ||
-    permissionPrecise.value.delete()
+    permissionPrecise.value.delete() ||
+    permissionPrecise.value.auth()
   )
 }
 
@@ -305,6 +322,11 @@ const paginationConfig = reactive({
   page_size: 20,
   total: 0,
 })
+
+const ResourceAuthorizationDrawerRef = ref()
+function openAuthorization(item: any) {
+  ResourceAuthorizationDrawerRef.value.open(item.id)
+}
 
 const exportKnowledge = (item: any) => {
   KnowledgeResourceApi.exportKnowledge(item.name, item.id, loading).then(() => {

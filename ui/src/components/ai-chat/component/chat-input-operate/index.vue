@@ -427,11 +427,10 @@ const uploadFile = async (file: any, fileList: any) => {
     fileList.splice(0, fileList.length, ...fileList.slice(0, maxFiles))
     return
   }
-  console.log(fileList)
   if (fileList.filter((f: any) => f.size == 0).length > 0) {
     // MB
-    MsgWarning(t('chat.uploadFile.sizeLimit2') + fileLimit + 'MB')
-    // 只保留未超出大小限制的文件
+    MsgWarning(t('chat.uploadFile.sizeLimit2'))
+    // 空文件上传过滤
     fileList.splice(0, fileList.length, ...fileList.filter((f: any) => f.size > 0))
     return
   }

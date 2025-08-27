@@ -544,7 +544,7 @@ const xpackForm = ref<any>({
   language: '',
   icon: '',
   icon_url: '',
-  show_history: false,
+  show_history: true,
   draggable: false,
   show_guide: false,
   chat_background: '',

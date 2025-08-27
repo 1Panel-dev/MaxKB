@@ -344,7 +344,6 @@ function close() {
   } else {
     MsgConfirm(t('common.tip'), t('views.tool.tip.saveMessage'), {
       confirmButtonText: t('common.confirm'),
-      type: 'warning',
     })
       .then(() => {
         visible.value = false

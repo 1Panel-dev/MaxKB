@@ -9,6 +9,7 @@ import applicationWorkspaceApi from '@/api/application/application'
 import applicationKeyWorkspaceApi from '@/api/application/application-key'
 import workflowVersionWorkspaceApi from '@/api/application/workflow-version'
 import chatLogWorkspaceApi from '@/api/application/chat-log'
+import resourceAuthorizationWorkspaceApi from '@/api/workspace/resource-authorization'
 import sharedWorkspaceApi from '@/api/shared-workspace'
 import toolSystemShareApi from '@/api/system-shared/tool'
 import modelSystemShareApi from '@/api/system-shared/model'
@@ -29,7 +30,8 @@ import chatUserResourceApi from '@/api/system-resource-management/chat-user'
 import applicationResourceApi from '@/api/system-resource-management/application'
 import applicationKeyResourceApi from '@/api/system-resource-management/application-key'
 import workflowVersionResourceApi from '@/api/system-resource-management/workflow-version'
-import chatLogWResourceApi from '@/api/system-resource-management/chat-log'
+import chatLogResourceApi from '@/api/system-resource-management/chat-log'
+import resourceAuthorizationResourceApi from '@/api/system-resource-management/resource-authorization'
 
 // 普通 API
 const workspaceApiMap = {
@@ -45,6 +47,7 @@ const workspaceApiMap = {
   applicationKey: applicationKeyWorkspaceApi,
   workflowVersion: workflowVersionWorkspaceApi,
   chatLog: chatLogWorkspaceApi,
+  resourceAuthorization: resourceAuthorizationWorkspaceApi,
 } as any
 
 // 系统分享 API
@@ -71,7 +74,8 @@ const systemManageApiMap = {
   application: applicationResourceApi,
   applicationKey: applicationKeyResourceApi,
   workflowVersion: workflowVersionResourceApi,
-  chatLog: chatLogWResourceApi,
+  chatLog: chatLogResourceApi,
+  resourceAuthorization: resourceAuthorizationResourceApi,
 } as any
 
 const data = {

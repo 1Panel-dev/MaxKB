@@ -3,49 +3,52 @@
     <h2 class="mb-16">{{ $t('views.chatLog.title') }}</h2>
 
     <el-card style="--el-card-padding: 24px">
-      <div class="mb-16">
-        <el-select
-          v-model="query_option"
-          class="mr-12"
-          @change="search_type_change"
-          style="width: 75px"
-        >
-          <el-option :label="$t('views.chatLog.table.abstract')" value="abstract" />
-          <el-option :label="$t('views.chatLog.table.username')" value="username" />
-        </el-select>
-        <el-input
-          v-model="search"
-          @change="getList"
-          :placeholder="$t('common.search')"
-          prefix-icon="Search"
-          class="w-240 mr-12"
-          clearable
-        />
-        <el-select
-          v-model="history_day"
-          class="mr-12"
-          @change="changeDayHandle"
-          style="width: 180px"
-        >
-          <el-option
-            v-for="item in dayOptions"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
+      <div class="mb-16 flex-between">
+        <div class="flex align-center">
+          <div class="flex-between complex-search">
+            <el-select
+              v-model="search_type"
+              class="complex-search__left"
+              @change="search_type_change"
+              style="width: 75px"
+            >
+              <el-option :label="$t('views.chatLog.table.abstract')" value="abstract" />
+              <el-option :label="$t('views.chatLog.table.username')" value="username" />
+            </el-select>
+            <el-input
+              v-model="search_form[search_type]"
+              @change="getList"
+              :placeholder="$t('common.search')"
+              class="w-240"
+              clearable
+            />
+          </div>
+          <el-select
+            v-model="history_day"
+            class="ml-12"
+            @change="changeDayHandle"
+            style="width: 180px"
+          >
+            <el-option
+              v-for="item in dayOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+          <el-date-picker
+            v-if="history_day === 'other'"
+            v-model="daterangeValue"
+            type="daterange"
+            :start-placeholder="$t('views.applicationOverview.monitor.startDatePlaceholder')"
+            :end-placeholder="$t('views.applicationOverview.monitor.endDatePlaceholder')"
+            format="YYYY-MM-DD"
+            value-format="YYYY-MM-DD"
+            @change="changeDayRangeHandle"
+            style="width: 240px"
+            class="mr-12"
           />
-        </el-select>
-        <el-date-picker
-          v-if="history_day === 'other'"
-          v-model="daterangeValue"
-          type="daterange"
-          :start-placeholder="$t('views.applicationOverview.monitor.startDatePlaceholder')"
-          :end-placeholder="$t('views.applicationOverview.monitor.endDatePlaceholder')"
-          format="YYYY-MM-DD"
-          value-format="YYYY-MM-DD"
-          @change="changeDayRangeHandle"
-          style="width: 240px"
-          class="mr-12"
-        />
+        </div>
         <div style="display: flex; align-items: center" class="float-right">
           <el-button @click="dialogVisible = true" v-if="permissionPrecise.chat_log_clear(id)">
             {{ $t('views.chatLog.buttons.clearStrategy') }}
@@ -218,7 +221,11 @@
       :close-on-click-modal="false"
       :close-on-press-escape="false"
     >
-      <SelectKnowledgeDocument ref="SelectKnowledgeDocumentRef" :apiType="apiType" :workspace-id="detail.workspace_id"/>
+      <SelectKnowledgeDocument
+        ref="SelectKnowledgeDocumentRef"
+        :apiType="apiType"
+        :workspace-id="detail.workspace_id"
+      />
       <template #footer>
         <span class="dialog-footer">
           <el-button @click.prevent="documentDialogVisible = false">
@@ -263,15 +270,15 @@ const {
 } = route as any
 
 const emit = defineEmits(['refresh'])
-const formRef = ref()
 
+const search_type = ref('abstract')
 const search_form = ref<any>({
   abstract: '',
-    username: '',
+  username: '',
 })
 
 const search_type_change = () => {
-  search_form.value = {abstract: '', username: ''}
+  search_form.value = { abstract: '', username: '' }
 }
 
 const dayOptions = [
@@ -326,9 +333,7 @@ const tableIndexMap = computed<Dict<number>>(() => {
     .reduce((pre, next) => ({ ...pre, ...next }), {})
 })
 const history_day = ref<number | string>(7)
-const query_option = ref<string>('abstract')
 
-const search = ref('')
 const detail = ref<any>(null)
 
 const currentChatId = ref<string>('')
@@ -429,14 +434,13 @@ const handleSelectionChange = (val: any[]) => {
 }
 
 function getList() {
-  let obj: any = {
+  const obj: any = {
     start_time: daterange.value.start_time,
     end_time: daterange.value.end_time,
     ...filter.value,
   }
-  if (search.value) {
-    if (query_option.value === 'abstract'){obj = { ...obj, abstract: search.value }}
-    else if (query_option.value === 'username'){obj = { ...obj, username: search.value }} 
+  if (search_form.value[search_type.value]) {
+    obj[search_type.value] = search_form.value[search_type.value]
   }
   return loadSharedApi({ type: 'chatLog', systemType: apiType.value })
     .getChatLog(id as string, paginationConfig, obj, loading)
@@ -466,15 +470,14 @@ const exportLog = () => {
     }
   })
   if (detail.value) {
-    let obj: any = {
+    const obj: any = {
       start_time: daterange.value.start_time,
       end_time: daterange.value.end_time,
       ...filter.value,
     }
-    if (search.value) {
-      obj = { ...obj, abstract: search.value }
+    if (search_form.value[search_type.value]) {
+      obj[search_type.value] = search_form.value[search_type.value]
     }
-
     loadSharedApi({ type: 'chatLog', systemType: apiType.value }).postExportChatLog(
       detail.value.id,
       detail.value.name,

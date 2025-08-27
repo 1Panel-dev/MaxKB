@@ -77,7 +77,6 @@ import { groupBy } from 'lodash'
 import { MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
 import type { FormInstance } from 'element-plus'
-import modelResourceApi from '@/api/system-resource-management/model'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 const props = defineProps<{

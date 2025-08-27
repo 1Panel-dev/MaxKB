@@ -124,6 +124,7 @@
               link
               @click="openMcpServersDialog"
               @refreshForm="refreshParam"
+              v-if="chat_data.mcp_enable"
             >
               <AppIcon iconName="app-setting"></AppIcon>
             </el-button>
@@ -165,6 +166,7 @@
               link
               @click="openToolDialog"
               @refreshForm="refreshParam"
+              v-if="chat_data.tool_enable"
             >
               <AppIcon iconName="app-setting"></AppIcon>
             </el-button>
@@ -201,6 +203,7 @@
                   @click="openReasoningParamSettingDialog"
                   @refreshForm="refreshParam"
                   class="mr-4"
+                  v-if="chat_data.model_setting.reasoning_content_enable"
                 >
                   <AppIcon iconName="app-setting"></AppIcon>
                 </el-button>

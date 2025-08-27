@@ -40,7 +40,7 @@
         <div
           v-show="!isPcCollapse"
           class="flex-between p-8 pb-0 color-secondary mt-8"
-          v-if="applicationDetail.show_history || hasPermission(EditionConst.IS_CE, 'OR')"
+          v-if="applicationDetail.show_history || user.isCE()"
         >
           <span>{{ $t('chat.history') }}</span>
           <el-tooltip effect="dark" :content="$t('chat.clearChat')" placement="right">
@@ -53,7 +53,7 @@
       <div
         v-show="!isPcCollapse"
         class="left-height"
-        v-if="applicationDetail.show_history || hasPermission(EditionConst.IS_CE, 'OR')"
+        v-if="applicationDetail.show_history || user.isCE()"
       >
         <el-scrollbar>
           <div class="p-16 pt-0">
@@ -111,7 +111,7 @@
         <template #title>{{ $t('chat.createChat') }}</template>
       </el-menu-item>
 
-      <el-sub-menu v-show="isPcCollapse" index="2" v-if="applicationDetail.show_history || hasPermission(EditionConst.IS_CE, 'OR')">
+      <el-sub-menu v-show="isPcCollapse" index="2" v-if="applicationDetail.show_history || user.isCE()">
         <template #title>
           <AppIcon iconName="app-history-outlined" />
         </template>
@@ -171,8 +171,9 @@
 import { ref } from 'vue'
 import { isAppIcon } from '@/utils/common'
 import EditTitleDialog from './EditTitleDialog.vue'
-import { EditionConst } from '@/utils/permission/data'
-import { hasPermission } from '@/utils/permission/index'
+import useStore from "@/stores";
+
+const {user} = useStore()
 const props = defineProps<{
   applicationDetail: any
   chatLogData: any[]

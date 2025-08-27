@@ -184,7 +184,6 @@ function back() {
   if (documentsFiles.value?.length > 0) {
     MsgConfirm(t('common.tip'), t('views.document.tip.saveMessage'), {
       confirmButtonText: t('common.confirm'),
-      type: 'warning',
     })
       .then(() => {
         router.go(-1)

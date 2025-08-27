@@ -270,16 +270,26 @@
                   </el-dropdown-item>
 
                   <el-dropdown-item
-                    v-if="!row.template_id && row.tool_type === 'CUSTOM' && permissionPrecise.export()"
+                    @click.stop="openAuthorization(row)"
+                    v-if="permissionPrecise.auth()"
+                  >
+                    <AppIcon
+                      iconName="app-resource-authorization"
+                      class="color-secondary"
+                    ></AppIcon>
+                    {{ $t('views.system.resourceAuthorization.title') }}
+                  </el-dropdown-item>
+
+                  <el-dropdown-item
+                    v-if="
+                      !row.template_id && row.tool_type === 'CUSTOM' && permissionPrecise.export()
+                    "
                     @click.stop="exportTool(row)"
                   >
                     <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
                     {{ $t('common.export') }}
                   </el-dropdown-item>
-                  <el-dropdown-item
-                    v-if="row.tool_type === 'MCP'"
-                    @click.stop="showMcpConfig(row)"
-                  >
+                  <el-dropdown-item v-if="row.tool_type === 'MCP'" @click.stop="showMcpConfig(row)">
                     <AppIcon iconName="app-operate-log" class="color-secondary"></AppIcon>
                     {{ $t('views.tool.mcpConfig') }}
                   </el-dropdown-item>
@@ -304,6 +314,7 @@
     <McpToolFormDrawer ref="McpToolFormDrawerRef" @refresh="refresh" :title="McpToolDrawertitle" />
     <AddInternalToolDialog ref="AddInternalToolDialogRef" @refresh="confirmAddInternalTool" />
     <McpToolConfigDialog ref="McpToolConfigDialogRef" @refresh="refresh" />
+    <ResourceAuthorizationDrawer :type="SourceTypeEnum.TOOL" ref="ResourceAuthorizationDrawerRef" />
   </div>
 </template>
 
@@ -314,8 +325,10 @@ import InitParamDrawer from '@/views/tool/component/InitParamDrawer.vue'
 import ToolResourceApi from '@/api/system-resource-management/tool'
 import AddInternalToolDialog from '@/views/tool/toolStore/AddInternalToolDialog.vue'
 import ToolFormDrawer from '@/views/tool/ToolFormDrawer.vue'
-import McpToolFormDrawer from "@/views/tool/McpToolFormDrawer.vue";
+import McpToolFormDrawer from '@/views/tool/McpToolFormDrawer.vue'
+import ResourceAuthorizationDrawer from '@/components/resource-authorization-drawer/index.vue'
 import { t } from '@/locales'
+import { SourceTypeEnum } from '@/enums/common'
 import { resetUrl } from '@/utils/common'
 import { ToolType } from '@/enums/tool'
 import useStore from '@/stores'
@@ -324,7 +337,7 @@ import { loadPermissionApi } from '@/utils/dynamics-api/permission-api.ts'
 import UserApi from '@/api/user/user.ts'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import permissionMap from '@/permission'
-import McpToolConfigDialog from "@/views/tool/component/McpToolConfigDialog.vue";
+import McpToolConfigDialog from '@/views/tool/component/McpToolConfigDialog.vue'
 
 const { user } = useStore()
 
@@ -355,8 +368,14 @@ const MoreFilledPermission = (row: any) => {
   return (
     permissionPrecise.value.export() ||
     permissionPrecise.value.delete() ||
+    permissionPrecise.value.auth() ||
     (row.init_field_list?.length > 0 && permissionPrecise.value.edit())
   )
+}
+
+const ResourceAuthorizationDrawerRef = ref()
+function openAuthorization(item: any) {
+  ResourceAuthorizationDrawerRef.value.open(item.id)
 }
 
 function exportTool(row: any) {
@@ -371,11 +390,9 @@ function exportTool(row: any) {
 
 const McpToolConfigDialogRef = ref()
 function showMcpConfig(item: any) {
-  ToolResourceApi
-    .getToolById(item?.id, loading)
-    .then((res: any) => {
-      McpToolConfigDialogRef.value.open(res.data)
-    })
+  ToolResourceApi.getToolById(item?.id, loading).then((res: any) => {
+    McpToolConfigDialogRef.value.open(res.data)
+  })
 }
 
 function deleteTool(row: any) {
@@ -432,7 +449,6 @@ function openCreateDialog(data?: any) {
     ToolFormDrawerRef.value.open(data)
   }
 }
-
 
 function openCreateMcpDialog(data?: any) {
   // 有template_id的不允许编辑，是模板转换来的

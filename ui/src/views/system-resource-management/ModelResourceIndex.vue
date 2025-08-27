@@ -196,50 +196,61 @@
             </el-tooltip>
             <el-tooltip
               effect="dark"
-              :content="$t('views.model.modelForm.title.paramSetting')"
+              :content="$t('views.system.resourceAuthorization.title')"
               placement="top"
-              v-if="
-                (row.model_type === 'TTS' ||
-                  row.model_type === 'LLM' ||
-                  row.model_type === 'IMAGE' ||
-                  row.model_type === 'TTI') &&
-                permissionPrecise.paramSetting()
-              "
+              v-if="permissionPrecise.auth()"
             >
               <span class="mr-8">
                 <el-button
                   type="primary"
                   text
-                  :title="$t('views.model.modelForm.title.paramSetting')"
-                  @click.stop="openParamSetting(row)"
+                  :title="$t('views.system.resourceAuthorization.title')"
+                  @click.stop="openAuthorization(row)"
                 >
-                  <AppIcon iconName="app-setting"></AppIcon>
+                  <AppIcon iconName="app-resource-authorization"></AppIcon>
                 </el-button>
               </span>
             </el-tooltip>
-            <el-tooltip
-              effect="dark"
-              :content="$t('common.delete')"
-              placement="top"
-              v-if="permissionPrecise.delete()"
-            >
-              <span class="mr-8">
-                <el-button
-                  type="primary"
-                  text
-                  :title="$t('common.delete')"
-                  @click.stop="deleteModel(row)"
-                >
-                  <AppIcon iconName="app-delete"></AppIcon>
-                </el-button>
-              </span>
-            </el-tooltip>
+
+            <el-dropdown trigger="click" v-if="MoreFilledPermission()">
+              <el-button text @click.stop type="primary">
+                <AppIcon iconName="app-more"></AppIcon>
+              </el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item
+                    @click.stop="openAuthorization(row)"
+                    v-if="
+                      (row.model_type === 'TTS' ||
+                        row.model_type === 'LLM' ||
+                        row.model_type === 'IMAGE' ||
+                        row.model_type === 'TTI') &&
+                      permissionPrecise.paramSetting()
+                    "
+                  >
+                    <AppIcon iconName="app-setting" class="color-secondary"></AppIcon>
+                    {{ $t('views.model.modelForm.title.paramSetting') }}
+                  </el-dropdown-item>
+                  <el-dropdown-item
+                    @click.stop="deleteModel(row)"
+                    v-if="permissionPrecise.delete()"
+                  >
+                    <AppIcon iconName="app-delete" class="color-secondary"></AppIcon>
+                    {{ $t('common.delete') }}
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
           </template>
         </el-table-column>
       </app-table>
     </el-card>
     <EditModel ref="editModelRef" @submit="getList"></EditModel>
     <ParamSettingDialog ref="paramSettingRef" />
+    <ResourceAuthorizationDrawer
+      :type="SourceTypeEnum.MODEL"
+      ref="ResourceAuthorizationDrawerRef"
+    />
   </div>
 </template>
 
@@ -249,6 +260,8 @@ import type { Provider, Model } from '@/api/type/model'
 import EditModel from '@/views/model/component/EditModel.vue'
 import ParamSettingDialog from '@/views/model/component/ParamSettingDialog.vue'
 import ModelResourceApi from '@/api/system-resource-management/model'
+import ResourceAuthorizationDrawer from '@/components/resource-authorization-drawer/index.vue'
+import { SourceTypeEnum } from '@/enums/common'
 import { modelTypeList } from '@/views/model/component/data'
 import { modelType } from '@/enums/model'
 import { t } from '@/locales'
@@ -282,6 +295,16 @@ const paginationConfig = reactive({
   page_size: 20,
   total: 0,
 })
+
+// sync generete edit export delete
+const MoreFilledPermission = () => {
+  return permissionPrecise.value.delete() || permissionPrecise.value.auth()
+}
+
+const ResourceAuthorizationDrawerRef = ref()
+function openAuthorization(item: any) {
+  ResourceAuthorizationDrawerRef.value.open(item.id)
+}
 
 const deleteModel = (row: any) => {
   MsgConfirm(
