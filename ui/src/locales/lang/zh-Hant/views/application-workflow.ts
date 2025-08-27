@@ -5,11 +5,11 @@ export default {
   nodeSetting: '節點設置',
   workflow: '工作流',
   searchBar: {
-    placeholder: '按名稱搜索'
+    placeholder: '按名稱搜索',
   },
   info: {
     previewVersion: '預覽版本：',
-    saveTime: '保存時間：'
+    saveTime: '保存時間：',
   },
   setting: {
     restoreVersion: '恢復版本',
@@ -39,7 +39,7 @@ export default {
   },
   delete: {
     confirmTitle: '確定刪除該節點？',
-    deleteMessage: '節點不允許刪除'
+    deleteMessage: '節點不允許刪除',
   },
   control: {
     zoomOut: '縮小',
@@ -47,7 +47,7 @@ export default {
     fitView: '適應',
     retract: '收起全部節點',
     extend: '展開全部節點',
-    beautify: '一鍵美化'
+    beautify: '一鍵美化',
   },
   variable: {
     label: '變量',
@@ -56,14 +56,14 @@ export default {
     ReferencingRequired: '引用變量必填',
     ReferencingError: '引用變量錯誤',
     NoReferencing: '不存在的引用變量',
-    placeholder: '請選擇變量'
+    placeholder: '請選擇變量',
   },
   condition: {
     title: '執行條件',
     front: '前置',
     AND: '所有',
     OR: '任一',
-    text: '連線節點執行完，執行當前節點'
+    text: '連線節點執行完，執行當前節點',
   },
   validate: {
     startNodeRequired: '開始節點必填',
@@ -75,30 +75,30 @@ export default {
     nodeUnavailable: '節點不可用',
     needConnect1: '節點的',
     needConnect2: '分支需要連接',
-    cannotEndNode: '節點不能當做結束節點'
+    cannotEndNode: '節點不能當做結束節點',
   },
   nodes: {
     classify: {
       aiCapability: 'AI能力',
       businessLogic: '業務邏輯',
-      other: '其他'
+      other: '其他',
     },
     startNode: {
       label: '開始',
       question: '用戶問題',
-      currentTime: '當前時間'
+      currentTime: '當前時間',
     },
     baseNode: {
       label: '基本信息',
       appName: {
-        label: '應用名稱'
+        label: '應用名稱',
       },
       appDescription: {
-        label: '應用描述'
+        label: '應用描述',
       },
       fileUpload: {
         label: '文件上傳',
-        tooltip: '開啟後，問答頁面會顯示上傳文件的按鈕。'
+        tooltip: '開啟後，問答頁面會顯示上傳文件的按鈕。',
       },
       FileUploadSetting: {
         title: '文件上傳設置',
@@ -108,9 +108,9 @@ export default {
           label: '上傳的文件類型',
           documentText: '需要使用「文檔內容提取」節點解析文檔內容',
           imageText: '需要使用「圖片理解」節點解析圖片內容',
-          audioText: '需要使用「語音轉文本」節點解析音頻內容'
-        }
-      }
+          audioText: '需要使用「語音轉文本」節點解析音頻內容',
+        },
+      },
     },
     aiChatNode: {
       label: 'AI 對話',
@@ -119,10 +119,10 @@ export default {
       returnContent: {
         label: '返回內容',
         tooltip: `關閉後該節點的內容則不輸出給用戶。
-                  如果你想讓用戶看到該節點的輸出內容，請打開開關。`
+                  如果你想讓用戶看到該節點的輸出內容，請打開開關。`,
       },
       defaultPrompt: '已知信息',
-      think: '思考過程'
+      think: '思考過程',
     },
     searchKnowledgeNode: {
       label: '知識庫檢索',
@@ -135,8 +135,8 @@ export default {
       searchQuestion: {
         label: '檢索問題',
         placeholder: '請選擇檢索問題',
-        requiredMessage: '請選擇檢索問題'
-      }
+        requiredMessage: '請選擇檢索問題',
+      },
     },
     questionNode: {
       label: '問題優化',
@@ -144,7 +144,7 @@ export default {
       result: '問題優化結果',
       defaultPrompt1: `根據上下文優化和完善用戶問題：`,
       defaultPrompt2: `請輸出一個優化後的問題。`,
-      systemDefault: '你是一個問題優化大師'
+      systemDefault: '你是一個問題優化大師',
     },
     conditionNode: {
       label: '判斷器',
@@ -153,11 +153,11 @@ export default {
       conditions: {
         label: '條件',
         info: '符合以下',
-        requiredMessage: '請選擇條件'
+        requiredMessage: '請選擇條件',
       },
       valueMessage: '請輸入值',
       addCondition: '添加條件',
-      addBranch: '添加分支'
+      addBranch: '添加分支',
     },
     replyNode: {
       label: '指定回覆',
@@ -165,8 +165,8 @@ export default {
       content: '內容',
       replyContent: {
         label: '回覆內容',
-        reference: '引用變量'
-      }
+        reference: '引用變量',
+      },
     },
     rerankerNode: {
       label: '多路召回',
@@ -175,15 +175,15 @@ export default {
       result: '重排結果',
       rerankerContent: {
         label: '重排內容',
-        requiredMessage: '請選擇重排內容'
+        requiredMessage: '請選擇重排內容',
       },
       higher: '高於',
       ScoreTooltip: 'Score越高相關性越強。',
       max_paragraph_char_number: '最大引用字符數',
       reranker_model: {
         label: '重排模型',
-        placeholder: '請選擇重排模型'
-      }
+        placeholder: '請選擇重排模型',
+      },
     },
     formNode: {
       label: '表單收集',
@@ -194,15 +194,15 @@ export default {
       formContent: {
         label: '表單輸出內容',
         requiredMessage: '請表單輸出內容',
-        tooltip: '設置執行該節點輸出的內容，{ form } 為表單的佔位符。'
+        tooltip: '設置執行該節點輸出的內容，{ form } 為表單的佔位符。',
       },
       formAllContent: '表單全部內容',
-      formSetting: '表單配置'
+      formSetting: '表單配置',
     },
     documentExtractNode: {
       label: '文檔內容提取',
       text: '提取文檔中的內容',
-      content: '文檔內容'
+      content: '文檔內容',
     },
     imageUnderstandNode: {
       label: '圖片理解',
@@ -210,17 +210,28 @@ export default {
       answer: 'AI 回答內容',
       model: {
         label: '圖片理解模型',
-        requiredMessage: '請選擇圖片理解模型'
+        requiredMessage: '請選擇圖片理解模型',
       },
       image: {
         label: '選擇圖片',
-        requiredMessage: '請選擇圖片'
-      }
+        requiredMessage: '請選擇圖片',
+      },
     },
     variableAssignNode: {
       label: '變數賦值',
       text: '更新全域變數的值',
-      assign: '賦值'
+      assign: '賦值',
+    },
+    mcpNode: {
+      label: 'MCP 調用',
+      text: '通過SSE/Streamable HTTP方式執行MCP服務中的工具',
+      getToolsSuccess: '獲取工具成功',
+      getTool: '獲取工具',
+      toolParam: '工具參數',
+      mcpServerTip: '請輸入JSON格式的MCP服務器配置',
+      mcpToolTip: '請選擇工具',
+      configLabel: 'MCP Server Config (僅支持SSE/Streamable HTTP調用方式)',
+      reference: '引用MCP',
     },
     imageGenerateNode: {
       label: '圖片生成',
@@ -228,46 +239,46 @@ export default {
       answer: 'AI 回答內容',
       model: {
         label: '圖片生成模型',
-        requiredMessage: '請選擇圖片生成模型'
+        requiredMessage: '請選擇圖片生成模型',
       },
       prompt: {
         label: '提示詞(正向)',
-        tooltip: '正向提示詞，用來描述生成圖像中期望包含的元素和視覺特點'
+        tooltip: '正向提示詞，用來描述生成圖像中期望包含的元素和視覺特點',
       },
       negative_prompt: {
         label: '提示詞(負向)',
         tooltip: '反向提示詞，用來描述不希望在畫面中看到的內容，可以對畫面進行限制。',
-        placeholder: '請描述不想生成的圖片內容，比如：顏色、血腥內容'
-      }
+        placeholder: '請描述不想生成的圖片內容，比如：顏色、血腥內容',
+      },
     },
     speechToTextNode: {
       label: '語音轉文本',
       text: '將音頻通過語音識別模型轉換為文本',
       stt_model: {
-        label: '語音識別模型'
+        label: '語音識別模型',
       },
       audio: {
         label: '選擇語音文件',
-        placeholder: '請選擇語音文件'
-      }
+        placeholder: '請選擇語音文件',
+      },
     },
     textToSpeechNode: {
       label: '文本轉語音',
       text: '將文本通過語音合成模型轉換為音頻',
       tts_model: {
-        label: '語音合成模型'
+        label: '語音合成模型',
       },
       content: {
-        label: '選擇文本內容'
-      }
+        label: '選擇文本內容',
+      },
     },
     toolNode: {
       label: '自定義工具',
-      text: '通過執行自定義腳本，實現數據處理'
+      text: '通過執行自定義腳本，實現數據處理',
     },
     applicationNode: {
-      label: '應用節點'
-    }
+      label: '應用節點',
+    },
   },
   compare: {
     is_null: '為空',
@@ -283,7 +294,7 @@ export default {
     len_ge: '長度大於等於',
     len_gt: '長度大於',
     len_le: '長度小於等於',
-    len_lt: '長度小於'
+    len_lt: '長度小於',
   },
-  FileUploadSetting: {}
+  FileUploadSetting: {},
 }

@@ -31,13 +31,13 @@
             required: true,
             message:
               $t('common.selectPlaceholder') +
-              ` MCP ${$t('views.applicationWorkflow.nodes.mcpNode.tool')}`,
+              ` MCP ${$t('views.tool.title')}`,
           },
         ]"
         prop="mcp_tool_id"
       >
         <template #label>
-          {{ `MCP ${$t('views.applicationWorkflow.nodes.mcpNode.tool')}` }}
+          {{ `MCP ${$t('views.tool.title')}` }}
           <span class="color-danger">*</span>
         </template>
         <el-select v-model="form.mcp_tool_id" filterable>

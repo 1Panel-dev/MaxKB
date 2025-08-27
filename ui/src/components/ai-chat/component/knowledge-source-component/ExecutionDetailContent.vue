@@ -669,12 +669,12 @@
                   <template v-if="item.type === WorkflowType.McpNode">
                     <div class="card-never border-r-6">
                       <h5 class="p-8-12">
-                        {{ $t('views.applicationWorkflow.nodes.mcpNode.tool') }}
+                        {{ $t('views.tool.title') }}
                       </h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         <div class="mb-8">
                           <span class="color-secondary">
-                            {{ $t('views.applicationWorkflow.nodes.mcpNode.tool') }}:
+                            {{ $t('views.tool.title') }}:
                           </span>
                           {{ item.mcp_tool }}
                         </div>

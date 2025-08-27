@@ -59,7 +59,7 @@
         <el-form-item>
           <template v-slot:label>
             <div class="flex-between">
-              <span>{{ $t('views.applicationWorkflow.nodes.mcpNode.tool') }}</span>
+              <span>{{ $t('views.tool.title') }}</span>
               <el-button type="primary" link @click="getTools()">
                 <el-icon class="mr-4">
                   <Plus/>

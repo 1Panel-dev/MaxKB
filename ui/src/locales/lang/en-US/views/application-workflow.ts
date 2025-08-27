@@ -5,11 +5,11 @@ export default {
   nodeSetting: 'Node Settings',
   workflow: 'Workflow',
   searchBar: {
-    placeholder: 'Search by name'
+    placeholder: 'Search by name',
   },
   info: {
     previewVersion: 'Preview Version:',
-    saveTime: 'Last Saved:'
+    saveTime: 'Last Saved:',
   },
   setting: {
     restoreVersion: 'Restore Previous Version"',
@@ -39,7 +39,7 @@ export default {
   },
   delete: {
     confirmTitle: 'Confirm to delete this node?',
-    deleteMessage: 'This node cannot be deleted'
+    deleteMessage: 'This node cannot be deleted',
   },
   control: {
     zoomOut: 'Zoom Out',
@@ -47,7 +47,7 @@ export default {
     fitView: 'Fit to Screen',
     retract: 'Collapse All',
     extend: 'Expand All',
-    beautify: 'Auto-Arrange'
+    beautify: 'Auto-Arrange',
   },
   variable: {
     label: 'Variable',
@@ -56,14 +56,14 @@ export default {
     ReferencingRequired: 'Referenced variable is required',
     ReferencingError: 'Invalid referenced variable',
     NoReferencing: 'Referenced variable does not exist',
-    placeholder: 'Please select a variable'
+    placeholder: 'Please select a variable',
   },
   condition: {
     title: 'Execution Condition',
     front: 'Precondition',
     AND: 'All',
     OR: 'Any',
-    text: 'After the connected node is executed, execute the current node'
+    text: 'After the connected node is executed, execute the current node',
   },
   validate: {
     startNodeRequired: 'Start node is required',
@@ -74,30 +74,30 @@ export default {
     noNextNode: 'Next node does not exist',
     nodeUnavailable: 'Node unavailable',
     needConnect1: 'The branch of the node needs to be connected',
-    cannotEndNode: 'This node cannot be used as an end node'
+    cannotEndNode: 'This node cannot be used as an end node',
   },
   nodes: {
     classify: {
       aiCapability: 'AI capability',
       businessLogic: 'Business logic',
-      other: 'Other'
+      other: 'Other',
     },
     startNode: {
       label: 'Start',
       question: 'User Question',
-      currentTime: 'Current Time'
+      currentTime: 'Current Time',
     },
     baseNode: {
       label: 'Base Information',
       appName: {
-        label: 'App Name'
+        label: 'App Name',
       },
       appDescription: {
-        label: 'App Description'
+        label: 'App Description',
       },
       fileUpload: {
         label: 'File Upload',
-        tooltip: 'When enabled, the Q&A page will display a file upload button.'
+        tooltip: 'When enabled, the Q&A page will display a file upload button.',
       },
       FileUploadSetting: {
         title: 'File Upload Settings',
@@ -107,9 +107,9 @@ export default {
           label: 'File types allowed for upload',
           documentText: 'Requires "Document Content Extraction" node to parse document content',
           imageText: 'Requires "Image Understanding" node to parse image content',
-          audioText: 'Requires "Speech-to-Text" node to parse audio content'
-        }
-      }
+          audioText: 'Requires "Speech-to-Text" node to parse audio content',
+        },
+      },
     },
     aiChatNode: {
       label: 'AI Chat',
@@ -118,10 +118,10 @@ export default {
       returnContent: {
         label: 'Return Content',
         tooltip: `If turned off, the content of this node will not be output to the user.
-                  If you want the user to see the output of this node, please turn on the switch.`
+                  If you want the user to see the output of this node, please turn on the switch.`,
       },
       defaultPrompt: 'Known Information',
-      think: 'Thinking Process'
+      think: 'Thinking Process',
     },
     searchKnowledgeNode: {
       label: 'Knowledge Retrieval',
@@ -134,8 +134,8 @@ export default {
       searchQuestion: {
         label: 'Question',
         placeholder: 'Please select a search question',
-        requiredMessage: 'Please select a search question'
-      }
+        requiredMessage: 'Please select a search question',
+      },
     },
     questionNode: {
       label: 'Question Optimization',
@@ -143,7 +143,7 @@ export default {
       result: 'Optimized Question Result',
       defaultPrompt1: `Optimize and improve the user's question based on context:`,
       defaultPrompt2: `Please output an optimized question.`,
-      systemDefault: 'You are a question optimization expert'
+      systemDefault: 'You are a question optimization expert',
     },
     conditionNode: {
       label: 'Conditional Branch',
@@ -152,11 +152,11 @@ export default {
       conditions: {
         label: 'Conditions',
         info: 'Meets the following',
-        requiredMessage: 'Please select conditions'
+        requiredMessage: 'Please select conditions',
       },
       valueMessage: 'Please enter a value',
       addCondition: 'Add Condition',
-      addBranch: 'Add Branch'
+      addBranch: 'Add Branch',
     },
     replyNode: {
       label: 'Specified Reply',
@@ -164,8 +164,8 @@ export default {
       content: 'Content',
       replyContent: {
         label: 'Reply Content',
-        reference: 'Reference Variable'
-      }
+        reference: 'Reference Variable',
+      },
     },
     rerankerNode: {
       label: 'Multi-path Recall',
@@ -174,15 +174,15 @@ export default {
       result: 'Re-ranking Result',
       rerankerContent: {
         label: 'Re-ranking Content',
-        requiredMessage: 'Please select re-ranking content'
+        requiredMessage: 'Please select re-ranking content',
       },
       higher: 'Higher',
       ScoreTooltip: 'The higher the Score, the stronger the relevance.',
       max_paragraph_char_number: 'Maximum Character',
       reranker_model: {
         label: 'Rerank',
-        placeholder: 'Please select a rerank'
-      }
+        placeholder: 'Please select a rerank',
+      },
     },
     formNode: {
       label: 'Form Input',
@@ -194,15 +194,15 @@ export default {
         label: 'Form Output Content',
         requiredMessage:
           'Please set the output content of this node, { form } is a placeholder for the form.',
-        tooltip: 'Define the output content of this node. { form } is a placeholder for the form'
+        tooltip: 'Define the output content of this node. { form } is a placeholder for the form',
       },
       formAllContent: 'All Form Content',
-      formSetting: 'Form Configuration'
+      formSetting: 'Form Configuration',
     },
     documentExtractNode: {
       label: 'Document Content Extraction',
       text: 'Extract content from documents',
-      content: 'Document Content'
+      content: 'Document Content',
     },
     imageUnderstandNode: {
       label: 'Image Understanding',
@@ -210,17 +210,28 @@ export default {
       answer: 'AI Content',
       model: {
         label: 'Vision Model',
-        requiredMessage: 'Please select a vision model'
+        requiredMessage: 'Please select a vision model',
       },
       image: {
         label: 'Select Image',
-        requiredMessage: 'Please select an image'
-      }
+        requiredMessage: 'Please select an image',
+      },
     },
     variableAssignNode: {
       label: 'Variable Assign',
       text: 'Update the value of the global variable',
-      assign: 'Set Value'
+      assign: 'Set Value',
+    },
+    mcpNode: {
+      label: 'MCP Node',
+      text: 'Call external MCP services to process data',
+      getToolsSuccess: 'Tools fetched successfully',
+      getTool: 'Fetch Tools',
+      toolParam: 'Tool Parameters',
+      mcpServerTip: 'Please enter MCP server configuration in JSON format',
+      mcpToolTip: 'Please select a tool',
+      configLabel: 'MCP Server Config (Only SSE/Streamable HTTP calls are supported)',
+      reference: 'Reference MCP',
     },
     imageGenerateNode: {
       label: 'Image Generation',
@@ -228,47 +239,47 @@ export default {
       answer: 'AI Content',
       model: {
         label: 'Image Generation Model',
-        requiredMessage: 'Please select an image generation model'
+        requiredMessage: 'Please select an image generation model',
       },
       prompt: {
         label: 'Positive Prompt',
-        tooltip: 'Describe elements and visual features you want in the generated image'
+        tooltip: 'Describe elements and visual features you want in the generated image',
       },
       negative_prompt: {
         label: 'Negative Prompt',
         tooltip: 'Describe elements you want to exclude from the generated image',
         placeholder:
-          'Please describe content you do not want to generate, such as color, bloody content'
-      }
+          'Please describe content you do not want to generate, such as color, bloody content',
+      },
     },
     speechToTextNode: {
       label: 'Speech2Text',
       text: 'Convert audio to text through speech recognition model',
       stt_model: {
-        label: 'Speech Recognition Model'
+        label: 'Speech Recognition Model',
       },
       audio: {
         label: 'Select Audio File',
-        placeholder: 'Please select an audio file'
-      }
+        placeholder: 'Please select an audio file',
+      },
     },
     textToSpeechNode: {
       label: 'TTS',
       text: 'Convert text to audio through speech synthesis model',
       tts_model: {
-        label: 'Speech Synthesis Model'
+        label: 'Speech Synthesis Model',
       },
       content: {
-        label: 'Select Text Content'
-      }
+        label: 'Select Text Content',
+      },
     },
     toolNode: {
       label: 'Custom Tool',
-      text: 'Execute custom scripts to achieve data processing'
+      text: 'Execute custom scripts to achieve data processing',
     },
     applicationNode: {
-      label: 'APP Node'
-    }
+      label: 'APP Node',
+    },
   },
   compare: {
     is_null: 'Is null',
@@ -284,7 +295,7 @@ export default {
     len_ge: 'Length greater than or equal to',
     len_gt: 'Length greater than',
     len_le: 'Length less than or equal to',
-    len_lt: 'Length less than'
+    len_lt: 'Length less than',
   },
-  FileUploadSetting: {}
+  FileUploadSetting: {},
 }

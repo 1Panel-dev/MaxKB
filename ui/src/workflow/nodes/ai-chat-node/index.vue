@@ -158,7 +158,7 @@
         </div>
         <!-- 工具       -->
         <div class="flex-between mb-16">
-          <div class="lighter">{{ $t('views.applicationWorkflow.nodes.mcpNode.tool') }}</div>
+          <div class="lighter">{{ $t('views.tool.title') }}</div>
           <div>
             <el-button
               type="primary"
