@@ -733,7 +733,7 @@
         </div>
         <div v-if="system" class="card-never border-r-6 mb-12">
           <h5 class="p-8-12">
-            {{ $t('chat.paragraphSource.system') }}
+            {{ $t('views.application.form.roleSettings.label') }}
           </h5>
           <div class="p-8-12 border-t-dashed lighter">
             <span class="mb-8">{{ system }}</span>
@@ -742,7 +742,7 @@
 
         <div class="card-never border-r-6 mb-12">
           <h5 class="p-8-12">
-            {{ $t('chat.paragraphSource.historyRecord') }}
+            {{ $t('chat.history') }}
           </h5>
           <div class="p-8-12 border-t-dashed lighter">
             <div v-for="(msg, index) in historyRecord" :key="index">
@@ -754,10 +754,10 @@
 
         <div class="card-never border-r-6 mb-12">
           <h5 class="p-8-12">
-            {{ $t('chat.paragraphSource.currentChat') }}
+            {{ $t('chat.executionDetails.currentChat') }}
           </h5>
           <div class="p-8-12 border-t-dashed lighter">
-            <div class="mb-8">{{ $t('chat.paragraphSource.knowedMessage') }}:</div>
+            <div class="mb-8">{{ $t('chat.executionDetails.knowedMessage') }}:</div>
             <div v-for="(msg, index) in currentChat" :key="index">
               <span>{{ msg.content }}</span>
             </div>
@@ -766,7 +766,7 @@
 
         <div class="card-never border-r-6 mb-12">
           <h5 class="p-8-12">
-            {{ $t('chat.paragraphSource.AiResponse') }}
+            {{ $t('chat.executionDetails.answer') }}
           </h5>
           <div class="p-8-12 border-t-dashed lighter">
             <div v-for="(msg, index) in AiResponse" :key="index">

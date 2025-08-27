@@ -3,13 +3,14 @@
     v-model="dialogVisible"
     :title="$t('chat.preview')"
     style="overflow: auto"
-    width="80%"
+    width="60%"
     :before-close="close"
     destroy-on-close
+    align-center
   >
     <div
       v-loading="loading"
-      style="height: calc(70vh - 150px); overflow-y: auto; display: flex; justify-content: center"
+      style="max-height: calc(100vh - 200px); overflow-y: auto; display: flex; justify-content: center"
     >
       <div ref="cloneContainerRef" style="width: 100%"></div>
       <div ref="svgContainerRef"></div>

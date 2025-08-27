@@ -13,6 +13,8 @@ export default {
   exportImg: '匯出圖片',
   preview: '預覽',
   chatId: '對話 ID',
+  chatUserId: '對話用戶 ID',
+  chatUserType: '對話用戶類型',
   userInput: '用戶輸入',
   quote: '引用',
   download: '點擊下載文件',
@@ -75,6 +77,7 @@ export default {
     otherMessage: '請理解檔案內容',
     fileMessage: '請解析文件內容',
     errorMessage: '上傳失敗',
+    fileRepeat: '文件已存在',
   },
   executionDetails: {
     title: '執行詳細',
@@ -94,6 +97,7 @@ export default {
     paragraph: '段落',
     noSubmit: '用戶未提交',
     errMessage: '錯誤日誌',
+    knowedMessage: '已知資訊',
   },
   KnowledgeSource: {
     title: '知識來源',
@@ -107,11 +111,6 @@ export default {
     question: '用戶問題',
     optimizationQuestion: '優化後問題',
     questionPadded: '優化後問題',
-    system: '角色設定',
-    historyRecord: '歷史記錄',
-    currentChat: '本次對話',
-    AiResponse: 'AI 回答',
-    knowedMessage: '已知資訊',
   },
   editTitle: '編輯標題',
 }

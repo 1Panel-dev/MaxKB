@@ -8,11 +8,13 @@
         @click="
           sendMessage && type !== 'log' ? sendMessage(item.content, 'new') : (content: string) => {}
         "
-        class="problem-button mt-4 mb-4 flex"
+        class="problem-button mt-4 mb-4"
         :class="sendMessage && type !== 'log' ? 'cursor' : 'disabled'"
       >
-        <AppIcon iconName="app-edit" class="mr-8" style="margin-top: 2px"></AppIcon>
-        {{ item.content }}
+        <el-space :size="8" alignment="flex-start">
+          <AppIcon iconName="app-edit" class="color-primary" style="margin-top: 3px;"></AppIcon>
+          {{ item.content }}
+        </el-space>
       </div>
       <HtmlRander v-else-if="item.type === 'html_rander'" :source="item.content"></HtmlRander>
       <EchartsRander
@@ -251,8 +253,9 @@ const split_form_rander_ = (source: string, type: string) => {
     }
   }
 
-  :deep(.el-icon) {
-    color: var(--el-color-primary);
-  }
+  // :deep(.el-icon) {
+  //   color: var(--el-color-primary);
+  //   margin-top: 3px;
+  // }
 }
 </style>

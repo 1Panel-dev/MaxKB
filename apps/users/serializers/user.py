@@ -110,7 +110,7 @@ class UserProfileSerializer(serializers.Serializer):
             'email': user.email,
             'role': auth.role_list,
             'permissions': auth.permission_list,
-            'is_edit_password': user.role == RoleConstants.ADMIN.name and user.password == 'd880e722c47a34d8e9fce789fc62389d',
+            'is_edit_password': user.password == 'd880e722c47a34d8e9fce789fc62389d' if user.source == 'LOCAL' else False,
             'language': user.language,
             'workspace_list': workspace_list,
             'role_name': role_name

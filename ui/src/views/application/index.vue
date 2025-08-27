@@ -72,7 +72,7 @@
               <el-dropdown-menu class="create-dropdown">
                 <el-dropdown-item @click="openCreateDialog('SIMPLE')">
                   <div class="flex">
-                    <el-avatar shape="square" class="avatar-blue mt-4" :size="36">
+                    <el-avatar shape="square" class="avatar-blue mt-4" :size="32">
                       <img
                         src="@/assets/application/icon_simple_application.svg"
                         style="width: 65%"
@@ -89,7 +89,7 @@
                 </el-dropdown-item>
                 <el-dropdown-item @click="openCreateDialog('WORK_FLOW')">
                   <div class="flex">
-                    <el-avatar shape="square" class="avatar-purple mt-4" :size="36">
+                    <el-avatar shape="square" class="avatar-purple mt-4" :size="32">
                       <img
                         src="@/assets/application/icon_workflow_application.svg"
                         style="width: 65%"
@@ -117,7 +117,7 @@
                 >
                   <el-dropdown-item>
                     <div class="flex align-center w-full">
-                      <el-avatar shape="square" class="mt-4" :size="36" style="background: none">
+                      <el-avatar shape="square" class="mt-4" :size="32" style="background: none">
                         <img src="@/assets/icon_import.svg" alt="" />
                       </el-avatar>
                       <div class="pre-wrap ml-8">

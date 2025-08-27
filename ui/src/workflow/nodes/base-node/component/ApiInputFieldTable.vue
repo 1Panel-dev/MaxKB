@@ -149,6 +149,7 @@ onMounted(() => {
     inputFieldList.value.push(...props.nodeModel.properties.api_input_field_list)
   }
   set(props.nodeModel.properties, 'api_input_field_list', inputFieldList)
+  onDragHandle()
 })
 </script>
 

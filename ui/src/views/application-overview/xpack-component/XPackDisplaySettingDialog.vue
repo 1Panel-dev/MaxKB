@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="$t('views.applicationOverview.appInfo.SettingDisplayDialog.dialogTitle')"
+    :title="$t('views.applicationOverview.appInfo.displaySetting')"
     width="900"
     v-model="dialogVisible"
     :close-on-click-modal="false"
@@ -12,14 +12,14 @@
     <template #header="{ titleId, titleClass }">
       <div class="flex-between mb-8">
         <h4 :id="titleId" :class="titleClass">
-          {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.dialogTitle') }}
+          {{ $t('views.applicationOverview.appInfo.displaySetting') }}
         </h4>
         <div class="flex align-center">
           <el-button @click.prevent="resetForm" link>
             <el-icon class="mr-4">
               <Refresh />
             </el-icon>
-            {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.restoreDefault') }}
+            {{ $t('views.applicationOverview.SettingDisplayDialog.restoreDefault') }}
           </el-button>
           <el-divider direction="vertical" />
         </div>
@@ -174,14 +174,14 @@
               <el-col :span="12">
                 <h5 class="mb-8">
                   {{
-                    $t('views.applicationOverview.appInfo.SettingDisplayDialog.customThemeColor')
+                    $t('views.applicationOverview.SettingDisplayDialog.customThemeColor')
                   }}
                 </h5>
                 <div>
                   <el-color-picker v-model="xpackForm.custom_theme.theme_color" />
                   {{
                     !xpackForm.custom_theme.theme_color
-                      ? $t('views.applicationOverview.appInfo.SettingDisplayDialog.default')
+                      ? $t('views.applicationOverview.SettingDisplayDialog.default')
                       : ''
                   }}
                 </div>
@@ -190,7 +190,7 @@
                 <h5 class="mb-8">
                   {{
                     $t(
-                      'views.applicationOverview.appInfo.SettingDisplayDialog.headerTitleFontColor',
+                      'views.applicationOverview.SettingDisplayDialog.headerTitleFontColor',
                     )
                   }}
                 </h5>
@@ -199,7 +199,7 @@
             </el-row>
             <el-row class="w-full mb-8">
               <h5 class="mb-8">
-                {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.languageLabel') }}
+                {{ $t('layout.language') }}
               </h5>
               <el-select v-model="xpackForm.language" clearable>
                 <el-option
@@ -225,20 +225,20 @@
                     :on-change="(file: any, fileList: any) => onChange(file, fileList, 'icon')"
                   >
                     <el-button size="small">
-                      {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.replace') }}
+                      {{ $t('views.applicationOverview.SettingDisplayDialog.replace') }}
                     </el-button>
                   </el-upload>
                 </span>
               </div>
               <el-text type="info" size="small">
-                {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.imageMessage') }}
+                {{ $t('views.applicationOverview.SettingDisplayDialog.imageMessage') }}
               </el-text>
             </el-card>
             <!-- 聊天背景 -->
             <el-card shadow="never" class="mb-8">
               <div class="flex-between mb-8">
                 <span class="lighter">{{
-                  $t('views.applicationOverview.appInfo.SettingDisplayDialog.chatBackground')
+                  $t('views.applicationOverview.SettingDisplayDialog.chatBackground')
                 }}</span>
                 <span class="flex align-center">
                   <el-upload
@@ -253,14 +253,14 @@
                     "
                   >
                     <el-button size="small">
-                      {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.replace') }}
+                      {{ $t('views.applicationOverview.SettingDisplayDialog.replace') }}
                     </el-button>
                   </el-upload>
                 </span>
               </div>
               <el-text type="info" size="small">
                 {{
-                  $t('views.applicationOverview.appInfo.SettingDisplayDialog.chatBackgroundMessage')
+                  $t('views.applicationOverview.SettingDisplayDialog.chatBackgroundMessage')
                 }}
               </el-text>
             </el-card>
@@ -268,11 +268,11 @@
             <el-card shadow="never" class="mb-8">
               <div class="flex-between mb-8">
                 <span class="lighter">{{
-                  $t('views.applicationOverview.appInfo.SettingDisplayDialog.AIAvatar')
+                  $t('views.applicationOverview.SettingDisplayDialog.AIAvatar')
                 }}</span>
                 <span class="flex align-center">
                   <el-checkbox v-model="xpackForm.show_avatar">{{
-                    $t('views.applicationOverview.appInfo.SettingDisplayDialog.display')
+                    $t('views.applicationOverview.SettingDisplayDialog.display')
                   }}</el-checkbox>
                   <el-upload
                     class="ml-8"
@@ -284,25 +284,25 @@
                     :on-change="(file: any, fileList: any) => onChange(file, fileList, 'avatar')"
                   >
                     <el-button size="small">
-                      {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.replace') }}
+                      {{ $t('views.applicationOverview.SettingDisplayDialog.replace') }}
                     </el-button>
                   </el-upload>
                 </span>
               </div>
               <el-text type="info" size="small">
-                {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.imageMessage') }}
+                {{ $t('views.applicationOverview.SettingDisplayDialog.imageMessage') }}
               </el-text>
             </el-card>
             <!-- 提问头像 -->
             <el-card shadow="never" class="mb-8">
               <div class="flex-between mb-8">
                 <span class="lighter">{{
-                  $t('views.applicationOverview.appInfo.SettingDisplayDialog.askUserAvatar')
+                  $t('views.applicationOverview.SettingDisplayDialog.askUserAvatar')
                 }}</span>
                 <span class="flex align-center">
                   <el-checkbox v-model="xpackForm.show_user_avatar">
                     {{
-                      $t('views.applicationOverview.appInfo.SettingDisplayDialog.display')
+                      $t('views.applicationOverview.SettingDisplayDialog.display')
                     }}</el-checkbox
                   >
                   <el-upload
@@ -317,20 +317,20 @@
                     "
                   >
                     <el-button size="small">
-                      {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.replace') }}
+                      {{ $t('views.applicationOverview.SettingDisplayDialog.replace') }}
                     </el-button>
                   </el-upload>
                 </span>
               </div>
               <el-text type="info" size="small"
-                >{{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.imageMessage') }}
+                >{{ $t('views.applicationOverview.SettingDisplayDialog.imageMessage') }}
               </el-text>
             </el-card>
             <!-- 浮窗图标 -->
             <el-card shadow="never" class="mb-8">
               <div class="flex-between mb-8">
                 <span class="lighter">{{
-                  $t('views.applicationOverview.appInfo.SettingDisplayDialog.floatIcon')
+                  $t('views.applicationOverview.SettingDisplayDialog.floatIcon')
                 }}</span>
                 <el-upload
                   ref="uploadRef"
@@ -341,22 +341,22 @@
                   :on-change="(file: any, fileList: any) => onChange(file, fileList, 'float_icon')"
                 >
                   <el-button size="small">
-                    {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.replace') }}
+                    {{ $t('views.applicationOverview.SettingDisplayDialog.replace') }}
                   </el-button>
                 </el-upload>
               </div>
               <el-text type="info" size="small">
-                {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.imageMessage') }}
+                {{ $t('views.applicationOverview.SettingDisplayDialog.imageMessage') }}
               </el-text>
               <div class="border-t mt-8">
                 <div class="flex-between mb-8">
                   <span class="lighter">{{
-                    $t('views.applicationOverview.appInfo.SettingDisplayDialog.iconDefaultPosition')
+                    $t('views.applicationOverview.SettingDisplayDialog.iconDefaultPosition')
                   }}</span>
                   <el-checkbox
                     v-model="xpackForm.draggable"
                     :label="
-                      $t('views.applicationOverview.appInfo.SettingDisplayDialog.draggablePosition')
+                      $t('views.applicationOverview.SettingDisplayDialog.draggablePosition')
                     "
                   />
                 </div>
@@ -367,7 +367,7 @@
                         <el-option
                           :label="
                             $t(
-                              'views.applicationOverview.appInfo.SettingDisplayDialog.iconPosition.left',
+                              'views.applicationOverview.SettingDisplayDialog.iconPosition.left',
                             )
                           "
                           value="left"
@@ -375,7 +375,7 @@
                         <el-option
                           :label="
                             $t(
-                              'views.applicationOverview.appInfo.SettingDisplayDialog.iconPosition.right',
+                              'views.applicationOverview.SettingDisplayDialog.iconPosition.right',
                             )
                           "
                           value="right"
@@ -399,7 +399,7 @@
                         <el-option
                           :label="
                             $t(
-                              'views.applicationOverview.appInfo.SettingDisplayDialog.iconPosition.top',
+                              'views.applicationOverview.SettingDisplayDialog.iconPosition.top',
                             )
                           "
                           value="top"
@@ -407,7 +407,7 @@
                         <el-option
                           :label="
                             $t(
-                              'views.applicationOverview.appInfo.SettingDisplayDialog.iconPosition.bottom',
+                              'views.applicationOverview.SettingDisplayDialog.iconPosition.bottom',
                             )
                           "
                           value="bottom"
@@ -433,26 +433,26 @@
               <el-checkbox
                 v-model="xpackForm.show_source"
                 :label="
-                  $t('views.applicationOverview.appInfo.SettingDisplayDialog.showSourceLabel')
+                  $t('views.applicationOverview.SettingDisplayDialog.showSourceLabel')
                 "
               />
               <el-checkbox
                 v-model="xpackForm.show_exec"
                 :label="
-                  $t('views.applicationOverview.appInfo.SettingDisplayDialog.showExecutionDetail')
+                  $t('views.applicationOverview.SettingDisplayDialog.showExecutionDetail')
                 "
               />
               <el-checkbox
                 v-model="xpackForm.show_history"
-                :label="$t('views.applicationOverview.appInfo.SettingDisplayDialog.showHistory')"
+                :label="$t('views.applicationOverview.SettingDisplayDialog.showHistory')"
               />
               <el-checkbox
                 v-model="xpackForm.show_guide"
-                :label="$t('views.applicationOverview.appInfo.SettingDisplayDialog.displayGuide')"
+                :label="$t('views.applicationOverview.SettingDisplayDialog.displayGuide')"
               />
               <el-checkbox
                 v-model="xpackForm.disclaimer"
-                :label="$t('views.applicationOverview.appInfo.SettingDisplayDialog.disclaimer')"
+                :label="$t('views.applicationOverview.SettingDisplayDialog.disclaimer')"
                 @change="changeDisclaimer"
               />
               <span v-if="xpackForm.disclaimer"
@@ -523,7 +523,7 @@ const defaultSetting = {
   user_avatar: '',
   user_avatar_url: '',
   disclaimer: false,
-  disclaimer_value: t('views.applicationOverview.appInfo.SettingDisplayDialog.disclaimerValue'),
+  disclaimer_value: t('views.applicationOverview.SettingDisplayDialog.disclaimerValue'),
   custom_theme: {
     theme_color: '',
     header_font_color: '#1f2329',
@@ -556,7 +556,7 @@ const xpackForm = ref<any>({
   user_avatar: '',
   user_avatar_url: '',
   disclaimer: false,
-  disclaimer_value: t('views.applicationOverview.appInfo.SettingDisplayDialog.disclaimerValue'),
+  disclaimer_value: t('views.applicationOverview.SettingDisplayDialog.disclaimerValue'),
   custom_theme: {
     theme_color: '',
     header_font_color: '#1f2329',
@@ -630,10 +630,10 @@ const open = (data: any, content: any) => {
   xpackForm.value.disclaimer_value = data.disclaimer_value
   if (
     xpackForm.value.disclaimer_value ===
-    t('views.applicationOverview.appInfo.SettingDisplayDialog.disclaimerValue')
+    t('views.applicationOverview.SettingDisplayDialog.disclaimerValue')
   ) {
     xpackForm.value.disclaimer_value = t(
-      'views.applicationOverview.appInfo.SettingDisplayDialog.disclaimerValue',
+      'views.applicationOverview.SettingDisplayDialog.disclaimerValue',
     )
   }
   xpackForm.value.avatar_url = data.avatar

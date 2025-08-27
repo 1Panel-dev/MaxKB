@@ -13,6 +13,8 @@ export default {
   exportImg: 'Exporting images',
   preview: 'Preview',
   chatId: 'Chat ID',
+  chatUserId: 'Chat User ID',
+  chatUserType: 'Chat User Type',
   userInput: 'User Input',
   quote: 'Quote',
   download: 'Click to Download',
@@ -77,6 +79,7 @@ export default {
     otherMessage: 'Please understand the file content',
     errorMessage: 'Upload Failed',
     fileMessage: 'Please process the file content',
+    fileRepeat: 'File already exists',
   },
   executionDetails: {
     title: 'Execution Details',
@@ -96,6 +99,7 @@ export default {
     paragraph: 'Segment',
     noSubmit: 'No submission from user',
     errMessage: 'Error Log',
+    knowedMessage: 'Known Information',
   },
   KnowledgeSource: {
     title: 'Knowledge Source',
@@ -109,11 +113,6 @@ export default {
     question: 'User Question',
     optimizationQuestion: 'Optimized Question',
     questionPadded: 'Padded Question',
-    system: 'Role Setting',
-    historyRecord: 'History Record',
-    currentChat: 'Current Chat',
-    AiResponse: 'AiResponse',
-    knowedMessage: 'Knowed Information',
   },
   editTitle: 'Edit Title',
 }

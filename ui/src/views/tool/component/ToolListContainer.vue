@@ -77,7 +77,7 @@
               >
                 <el-dropdown-item v-if="permissionPrecise.import()">
                   <div class="flex align-center w-full">
-                    <el-avatar shape="square" :size="36" style="background: none">
+                    <el-avatar shape="square" :size="32" style="background: none">
                       <img src="@/assets/icon_import.svg" alt="" />
                     </el-avatar>
                     <div class="pre-wrap ml-8">
@@ -88,7 +88,7 @@
               </el-upload>
               <el-dropdown-item @click="openToolStoreDialog()">
                 <div class="flex align-center">
-                  <el-avatar shape="square" :size="36" style="background: none">
+                  <el-avatar shape="square" :size="32" style="background: none">
                     <img src="@/assets/icon_tool_shop.svg" alt="" />
                   </el-avatar>
                   <div class="pre-wrap ml-8">
@@ -101,6 +101,7 @@
               <el-dropdown-item @click="openCreateFolder" divided v-if="apiType === 'workspace'">
                 <div class="flex align-center">
                   <AppIcon iconName="app-folder" style="font-size: 32px"></AppIcon>
+
                   <div class="pre-wrap ml-4">
                     <div class="lighter">
                       {{ $t('components.folder.addFolder') }}
