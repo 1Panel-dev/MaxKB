@@ -41,16 +41,16 @@
                 chatUser.chat_profile.authentication_type === 'password'
               "
             >
-              <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
+              <img src="@/assets/user-icon.svg" style="width: 54%" alt=""/>
             </el-avatar>
             <el-dropdown v-else trigger="click" type="primary" class="w-full">
               <div class="flex align-center">
                 <el-avatar :size="32">
-                  <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
+                  <img src="@/assets/user-icon.svg" style="width: 54%" alt=""/>
                 </el-avatar>
                 <span v-show="!isPcCollapse" class="ml-8 color-text-primary">{{
-                  chatUser.chatUserProfile?.nick_name
-                }}</span>
+                    chatUser.chatUserProfile?.nick_name
+                  }}</span>
               </div>
 
               <template #dropdown>
@@ -58,7 +58,7 @@
                   <div class="flex align-center p-8">
                     <div class="mr-8 flex align-center">
                       <el-avatar :size="40">
-                        <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
+                        <img src="@/assets/user-icon.svg" style="width: 54%" alt=""/>
                       </el-avatar>
                     </div>
                     <div>
@@ -83,7 +83,7 @@
                     style="padding-top: 8px; padding-bottom: 8px"
                     @click="logout"
                   >
-                    <AppIcon iconName="app-export" class="color-secondary" />
+                    <AppIcon iconName="app-export" class="color-secondary"/>
                     {{ $t('layout.logout') }}
                   </el-dropdown-item>
                 </el-dropdown-menu>
@@ -98,7 +98,7 @@
           @click="isPcCollapse = !isPcCollapse"
         >
           <el-icon>
-            <component :is="isPcCollapse ? 'ArrowRightBold' : 'ArrowLeftBold'" />
+            <component :is="isPcCollapse ? 'ArrowRightBold' : 'ArrowLeftBold'"/>
           </el-icon>
         </el-button>
       </div>
@@ -134,13 +134,13 @@
                 <template #dropdown>
                   <el-dropdown-menu>
                     <el-dropdown-item @click="exportMarkdown"
-                      >{{ $t('common.export') }} Markdown</el-dropdown-item
+                    >{{ $t('common.export') }} Markdown</el-dropdown-item
                     >
                     <el-dropdown-item @click="exportHTML"
-                      >{{ $t('common.export') }} HTML</el-dropdown-item
+                    >{{ $t('common.export') }} HTML</el-dropdown-item
                     >
                     <el-dropdown-item @click="openPDFExport"
-                      >{{ $t('common.export') }} PDF</el-dropdown-item
+                    >{{ $t('common.export') }} PDF</el-dropdown-item
                     >
                   </el-dropdown-menu>
                 </template>
@@ -191,8 +191,8 @@
               </span> -->
               <span>
                 <el-button text @click="closeExecutionDetail">
-                  <el-icon size="20"><Close /></el-icon
-                ></el-button>
+                  <el-icon size="20"><Close/></el-icon
+                  ></el-button>
               </span>
             </div>
           </div>
@@ -206,7 +206,7 @@
               :detail="executionDetail"
               :appType="applicationDetail?.type"
             />
-            <ParagraphDocumentContent :detail="rightPanelDetail" v-else />
+            <ParagraphDocumentContent :detail="rightPanelDetail" v-else/>
           </div>
         </div>
       </div>
@@ -222,31 +222,36 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick, computed, watch } from 'vue'
-import { marked } from 'marked'
-import { saveAs } from 'file-saver'
+import {ref, onMounted, nextTick, computed, watch} from 'vue'
+import {marked} from 'marked'
+import {saveAs} from 'file-saver'
 import chatAPI from '@/api/chat/chat'
 import useStore from '@/stores'
 import useResize from '@/layout/hooks/useResize'
-import { hexToRgba } from '@/utils/theme'
-import { useRouter } from 'vue-router'
+import {hexToRgba} from '@/utils/theme'
+import {useRoute, useRouter} from 'vue-router'
 import ResetPassword from '@/layout/layout-header/avatar/ResetPassword.vue'
-import { t } from '@/locales'
-import type { ResetCurrentUserPasswordRequest } from '@/api/type/user'
-import ExecutionDetailContent from '@/components/ai-chat/component/knowledge-source-component/ExecutionDetailContent.vue'
-import ParagraphSourceContent from '@/components/ai-chat/component/knowledge-source-component/ParagraphSourceContent.vue'
-import ParagraphDocumentContent from '@/components/ai-chat/component/knowledge-source-component/ParagraphDocumentContent.vue'
+import {t} from '@/locales'
+import type {ResetCurrentUserPasswordRequest} from '@/api/type/user'
+import ExecutionDetailContent
+  from '@/components/ai-chat/component/knowledge-source-component/ExecutionDetailContent.vue'
+import ParagraphSourceContent
+  from '@/components/ai-chat/component/knowledge-source-component/ParagraphSourceContent.vue'
+import ParagraphDocumentContent
+  from '@/components/ai-chat/component/knowledge-source-component/ParagraphDocumentContent.vue'
 import HistoryPanel from '@/views/chat/component/HistoryPanel.vue'
-import { cloneDeep } from 'lodash'
-import { getFileUrl } from '@/utils/common'
+import {cloneDeep} from 'lodash'
+import {getFileUrl} from '@/utils/common'
 import PdfExport from '@/components/pdf-export/index.vue'
+
 useResize()
 const pdfExportRef = ref<InstanceType<typeof PdfExport>>()
-const { common, chatUser } = useStore()
+const {common, chatUser} = useStore()
 const router = useRouter()
 const openPDFExport = () => {
   pdfExportRef.value?.open(document.getElementById('chatListId'))
 }
+const route = useRoute()
 const isCollapse = ref(false)
 const isPcCollapse = ref(false)
 watch(
@@ -260,7 +265,10 @@ watch(
 
 const logout = () => {
   chatUser.logout().then(() => {
-    router.push({ name: 'login' })
+    router.push({
+      name: 'login',
+      query: route.query,
+    })
   })
 }
 
@@ -271,7 +279,7 @@ const openResetPassword = () => {
 
 const handleResetPassword = (param: ResetCurrentUserPasswordRequest) => {
   chatAPI.resetCurrentPassword(param).then(() => {
-    router.push({ name: 'login' })
+    router.push({name: 'login'})
   })
 }
 
@@ -299,7 +307,8 @@ const applicationDetail = computed({
   get: () => {
     return props.application_profile
   },
-  set: (v) => {},
+  set: (v) => {
+  },
 })
 
 const chatLogData = ref<any[]>([])
@@ -461,7 +470,7 @@ async function exportMarkdown(): Promise<void> {
     .map((record: any) => `# ${record.problem_text}\n\n${record.answer_text}\n\n`)
     .join('\n')
 
-  const blob: Blob = new Blob([markdownContent], { type: 'text/markdown;charset=utf-8' })
+  const blob: Blob = new Blob([markdownContent], {type: 'text/markdown;charset=utf-8'})
   saveAs(blob, suggestedName)
 }
 
@@ -472,7 +481,7 @@ async function exportHTML(): Promise<void> {
     .join('\n')
   const htmlContent: any = marked(markdownContent)
 
-  const blob: Blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' })
+  const blob: Blob = new Blob([htmlContent], {type: 'text/html;charset=utf-8'})
   saveAs(blob, suggestedName)
 }
 
@@ -578,13 +587,16 @@ function closeExecutionDetail() {
   max-width: 80%;
   margin: 0 auto;
 }
+
 .chat-pc__right {
   width: calc(100vw - 280px);
   --execution-detail-panel-width: 400px;
+
   .execution-detail-panel {
     width: var(--execution-detail-panel-width, 400px);
   }
 }
+
 @media only screen and (max-width: 1000px) {
   .chat-width {
     max-width: 100% !important;
