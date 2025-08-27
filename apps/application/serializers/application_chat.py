@@ -101,7 +101,7 @@ class ApplicationChatQuerySerializers(serializers.Serializer):
         if 'abstract' in self.data and self.data.get('abstract') is not None:
             base_query_dict['application_chat.abstract__icontains'] = self.data.get('abstract')
         if 'username' in self.data and self.data.get('username') is not None:
-            base_query_dict['application_chat.asker__username'] = self.data.get('username')
+            base_query_dict['application_chat.asker__username__icontains'] = self.data.get('username')
 
 
         if select_ids is not None and len(select_ids) > 0:
