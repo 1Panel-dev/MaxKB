@@ -11,6 +11,7 @@
       v-loading="loading"
       style="height: calc(70vh - 150px); overflow-y: auto; display: flex; justify-content: center"
     >
+      <div ref="cloneContainerRef" style="width: 100%"></div>
       <div ref="svgContainerRef"></div>
     </div>
     <template #footer>
@@ -39,6 +40,7 @@ import html2Canvas from 'html2canvas'
 import { jsPDF } from 'jspdf'
 const loading = ref<boolean>(false)
 const svgContainerRef = ref()
+const cloneContainerRef = ref()
 const dialogVisible = ref<boolean>(false)
 const open = (element: HTMLElement | null) => {
   dialogVisible.value = true
@@ -46,28 +48,66 @@ const open = (element: HTMLElement | null) => {
   if (!element) {
     return
   }
-  setTimeout(() => {
-    nextTick(() => {
-      htmlToImage
-        .toSvg(element, { pixelRatio: 1, quality: 1 })
-        .then((dataUrl) => {
-          return fetch(dataUrl)
-            .then((response) => {
-              return response.text()
-            })
-            .then((text) => {
-              const parser = new DOMParser()
-              const svgDoc = parser.parseFromString(text, 'image/svg+xml')
-              const svgElement = svgDoc.documentElement
-              svgContainerRef.value.appendChild(svgElement)
-              svgContainerRef.value.style.height = svgElement.scrollHeight + 'px'
-            })
-        })
-        .finally(() => {
-          loading.value = false
-        })
+  const cElement = element.cloneNode(true) as HTMLElement
+  const images = cElement.querySelectorAll('img')
+  const loadPromises = Array.from(images).map((img) => {
+    if (!img.src.startsWith(window.origin) && img.src.startsWith('http')) {
+      img.src = `${window.MaxKB.prefix}/api/resource_proxy?url=${encodeURIComponent(img.src)}`
+    }
+    img.setAttribute('onerror', '')
+    return new Promise((resolve) => {
+      // 已加载完成的图片直接 resolve
+      if (img.complete) {
+        resolve({ img, success: img.naturalWidth > 0 })
+        return
+      }
+
+      // 未加载完成的图片监听事件
+      img.onload = () => resolve({ img, success: true })
+      img.onerror = () => resolve({ img, success: false })
     })
-  }, 1)
+  })
+  Promise.all(loadPromises).finally(() => {
+    setTimeout(() => {
+      nextTick(() => {
+        cloneContainerRef.value.appendChild(cElement)
+        htmlToImage
+          .toSvg(cElement, {
+            pixelRatio: 1,
+            quality: 1,
+            onImageErrorHandler: (
+              event: Event | string,
+              source?: string,
+              lineno?: number,
+              colno?: number,
+              error?: Error,
+            ) => {
+              console.log(event, source, lineno, colno, error)
+            },
+          })
+          .then((dataUrl) => {
+            return fetch(dataUrl)
+              .then((response) => {
+                return response.text()
+              })
+              .then((text) => {
+                const parser = new DOMParser()
+                const svgDoc = parser.parseFromString(text, 'image/svg+xml')
+                cloneContainerRef.value.style.display = 'none'
+                const svgElement = svgDoc.documentElement
+                svgContainerRef.value.appendChild(svgElement)
+                svgContainerRef.value.style.height = svgElement.scrollHeight + 'px'
+              })
+          })
+          .finally(() => {
+            loading.value = false
+          })
+          .catch((e) => {
+            loading.value = false
+          })
+      })
+    }, 1)
+  })
 }
 
 const exportPDF = () => {
@@ -75,6 +115,7 @@ const exportPDF = () => {
   setTimeout(() => {
     nextTick(() => {
       html2Canvas(svgContainerRef.value, {
+        scale: 2,
         logging: false,
       })
         .then((canvas) => {

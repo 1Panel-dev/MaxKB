@@ -55,7 +55,7 @@ config({
       }
       tokens[idx].attrSet(
         'onerror',
-        'this.src="/${window.MaxKB.prefix}/assets/load_error.png";this.onerror=null;this.height="33px"',
+        `this.src="./assets/load_error.png";this.onerror=null;this.height="33px"`,
       )
       return md.renderer.renderToken(tokens, idx, options)
     }
