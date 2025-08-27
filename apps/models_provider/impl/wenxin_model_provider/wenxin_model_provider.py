@@ -31,19 +31,28 @@ model_info_list = [ModelInfo('ERNIE-Bot-4',
                              ModelTypeConst.LLM, win_xin_llm_model_credential, QianfanChatModel),
                    ModelInfo('qianfan-chinese-llama-2-13b',
                              '',
-                             ModelTypeConst.LLM, win_xin_llm_model_credential, QianfanChatModel)
+                             ModelTypeConst.LLM, win_xin_llm_model_credential, QianfanChatModel),
+                   ModelInfo('ernie-4.5-turbo-32k', '', ModelTypeConst.LLM, win_xin_llm_model_credential,
+                             QianfanChatModel),
+                   ModelInfo('ernie-speed-8k', '', ModelTypeConst.LLM, win_xin_llm_model_credential, QianfanChatModel),
+                   ModelInfo('ernie-4.5-0.3b', '', ModelTypeConst.LLM, win_xin_llm_model_credential, QianfanChatModel)
 
                    ]
-embedding_model_info = ModelInfo('Embedding-V1',
-                                 _('Embedding-V1 is a text representation model based on Baidu Wenxin large model technology. It can convert text into a vector form represented by numerical values and can be used in text retrieval, information recommendation, knowledge mining and other scenarios. Embedding-V1 provides the Embeddings interface, which can generate corresponding vector representations based on input content. You can call this interface to input text into the model and obtain the corresponding vector representation for subsequent text processing and analysis.'),
-                                 ModelTypeConst.EMBEDDING, qianfan_embedding_credential, QianfanEmbeddings)
+embedding_model_info_list = [ModelInfo('Embedding-V1',
+                                       _('Embedding-V1 is a text representation model based on Baidu Wenxin large model technology. It can convert text into a vector form represented by numerical values and can be used in text retrieval, information recommendation, knowledge mining and other scenarios. Embedding-V1 provides the Embeddings interface, which can generate corresponding vector representations based on input content. You can call this interface to input text into the model and obtain the corresponding vector representation for subsequent text processing and analysis.'),
+                                       ModelTypeConst.EMBEDDING, qianfan_embedding_credential, QianfanEmbeddings),
+                             ModelInfo('tao-8k', '', ModelTypeConst.EMBEDDING, qianfan_embedding_credential,
+                                       QianfanEmbeddings),
+                             ModelInfo('bge-large-zh', '', ModelTypeConst.EMBEDDING, qianfan_embedding_credential,
+                                       QianfanEmbeddings)
+                             ]
 model_info_manage = ModelInfoManage.builder().append_model_info_list(model_info_list).append_default_model_info(
     ModelInfo('ERNIE-Bot-4',
               _('ERNIE-Bot-4 is a large language model independently developed by Baidu. It covers massive Chinese data and has stronger capabilities in dialogue Q&A, content creation and generation.'),
               ModelTypeConst.LLM,
               win_xin_llm_model_credential,
-              QianfanChatModel)).append_model_info(embedding_model_info).append_default_model_info(
-    embedding_model_info).build()
+              QianfanChatModel)).append_model_info_list(embedding_model_info_list).append_default_model_info(
+    embedding_model_info_list[0]).build()
 
 
 class WenxinModelProvider(IModelProvider):
