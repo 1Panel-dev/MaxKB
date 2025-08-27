@@ -86,8 +86,7 @@ function refreshFieldList(data: any, index: any) {
       return
     }
   }
-  console.log(index)
-  if (index) {
+  if (index !== undefined) {
     inputFieldList.value.splice(index, 1, data)
   } else {
     inputFieldList.value.push(data)

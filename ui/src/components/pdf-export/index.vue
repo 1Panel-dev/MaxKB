@@ -115,7 +115,6 @@ const exportPDF = () => {
   setTimeout(() => {
     nextTick(() => {
       html2Canvas(svgContainerRef.value, {
-        scale: 2,
         logging: false,
       })
         .then((canvas) => {
