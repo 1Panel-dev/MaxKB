@@ -277,6 +277,13 @@
                     {{ $t('common.export') }}
                   </el-dropdown-item>
                   <el-dropdown-item
+                    v-if="row.tool_type === 'MCP'"
+                    @click.stop="showMcpConfig(row)"
+                  >
+                    <AppIcon iconName="app-operate-log" class="color-secondary"></AppIcon>
+                    {{ $t('views.tool.mcpConfig') }}
+                  </el-dropdown-item>
+                  <el-dropdown-item
                     v-if="permissionPrecise.delete()"
                     divided
                     @click.stop="deleteTool(row)"
@@ -296,6 +303,7 @@
     <ToolFormDrawer ref="ToolFormDrawerRef" @refresh="refresh" :title="ToolDrawertitle" />
     <McpToolFormDrawer ref="McpToolFormDrawerRef" @refresh="refresh" :title="McpToolDrawertitle" />
     <AddInternalToolDialog ref="AddInternalToolDialogRef" @refresh="confirmAddInternalTool" />
+    <McpToolConfigDialog ref="McpToolConfigDialogRef" @refresh="refresh" />
   </div>
 </template>
 
@@ -316,6 +324,7 @@ import { loadPermissionApi } from '@/utils/dynamics-api/permission-api.ts'
 import UserApi from '@/api/user/user.ts'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import permissionMap from '@/permission'
+import McpToolConfigDialog from "@/views/tool/component/McpToolConfigDialog.vue";
 
 const { user } = useStore()
 
@@ -358,6 +367,15 @@ function exportTool(row: any) {
       })
     }
   })
+}
+
+const McpToolConfigDialogRef = ref()
+function showMcpConfig(item: any) {
+  ToolResourceApi
+    .getToolById(item?.id, loading)
+    .then((res: any) => {
+      McpToolConfigDialogRef.value.open(res.data)
+    })
 }
 
 function deleteTool(row: any) {
