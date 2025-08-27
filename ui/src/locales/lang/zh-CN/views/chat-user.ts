@@ -10,7 +10,6 @@ export default {
   batchDeleteUser: '是否删除选中的 {count} 个用户？',
   settingMethod: '设置方式',
   append: '追加',
-  replace: '替换',
   group: {
     title: '用户组',
     requiredMessage: '请选择用户组',

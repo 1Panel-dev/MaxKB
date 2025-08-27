@@ -2,18 +2,19 @@
   <div class="provider-list">
     <el-scrollbar>
       <div class="p-8">
-        <div
-          @click="handleSharedNodeClick"
-          class="shared-button flex cursor border-b"
-          v-if="showShared && hasPermission(EditionConst.IS_EE, 'OR')"
-          :class="active?.provider === 'share' && 'active'"
-        >
-          <AppIcon
-            iconName="app-shared-active"
-            style="font-size: 18px"
-            class="color-primary"
-          ></AppIcon>
-          <span class="ml-8 lighter">{{ $t('views.shared.shared_model') }}</span>
+        <div v-if="showShared && hasPermission(EditionConst.IS_EE, 'OR')" class="border-b mb-4">
+          <div
+            @click="handleSharedNodeClick"
+            class="shared-button flex cursor"
+            :class="active?.provider === 'share' && 'active'"
+          >
+            <AppIcon
+              iconName="app-shared-active"
+              style="font-size: 18px"
+              class="color-primary"
+            ></AppIcon>
+            <span class="ml-8 lighter">{{ $t('views.shared.shared_model') }}</span>
+          </div>
         </div>
         <div
           class="all-mode flex cursor"

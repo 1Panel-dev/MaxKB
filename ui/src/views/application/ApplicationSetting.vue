@@ -83,6 +83,7 @@
                         @click="openAIParamSettingDialog"
                         :disabled="!applicationForm.model_id"
                       >
+                        <AppIcon iconName="app-setting" class="mr-4"></AppIcon>
                         {{ $t('common.paramSetting') }}
                       </el-button>
                     </div>
@@ -170,7 +171,7 @@
                       <span>{{ $t('views.application.form.relatedKnowledge.label') }}</span>
                       <div>
                         <el-button type="primary" link @click="openParamSettingDialog">
-                          <AppIcon iconName="app-operation" class="mr-4"></AppIcon>
+                          <AppIcon iconName="app-setting" class="mr-4"></AppIcon>
                           {{ $t('common.paramSetting') }}
                         </el-button>
                         <el-button type="primary" link @click="openKnowledgeDialog">

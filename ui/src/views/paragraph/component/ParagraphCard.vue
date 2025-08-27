@@ -26,20 +26,40 @@
 
         <el-divider direction="vertical" />
         <span class="mr-8">
-          <el-button link @click.stop="editParagraph(data)" v-if="permissionPrecise.doc_edit(id)">
-            <AppIcon iconName="app-edit" :size="16" :title="$t('common.edit')"></AppIcon>
-          </el-button>
+          <el-tooltip
+            effect="dark"
+            :content="$t('views.paragraph.editParagraph')"
+            placement="top"
+            v-if="permissionPrecise.doc_edit(id)"
+          >
+            <el-button text @click.stop="editParagraph(data)">
+              <AppIcon
+                iconName="app-edit"
+                :size="16"
+                class="color-secondary"
+              ></AppIcon>
+            </el-button>
+          </el-tooltip>
         </span>
         <span class="mr-8">
-          <el-button link @click.stop="addParagraph(data)" v-if="permissionPrecise.doc_edit(id)">
-            <el-icon :size="16" :title="$t('common.add')">
-              <el-icon><CirclePlus /></el-icon>
-            </el-icon>
-          </el-button>
+          <el-tooltip
+            effect="dark"
+            :content="$t('views.paragraph.prevAddParagraph')"
+            placement="top"
+            v-if="permissionPrecise.doc_edit(id)"
+          >
+            <el-button text @click.stop="addParagraph(data)" v-if="permissionPrecise.doc_edit(id)">
+              <AppIcon
+                iconName="app-add-circle-outlined"
+                class="color-secondary"
+                :size="16"
+              ></AppIcon>
+            </el-button>
+          </el-tooltip>
         </span>
         <el-dropdown trigger="click" :teleported="false" v-if="MoreFieldPermission(id)">
           <el-button text>
-            <AppIcon iconName="app-more"></AppIcon>
+            <AppIcon iconName="app-more" class="color-secondary"></AppIcon>
           </el-button>
           <template #dropdown>
             <el-dropdown-menu style="min-width: 140px">
@@ -47,14 +67,14 @@
                 @click.stop="openGenerateDialog(data)"
                 v-if="permissionPrecise.doc_generate(id)"
               >
-                <AppIcon iconName="app-generate-question"></AppIcon>
+                <AppIcon iconName="app-generate-question" class="color-secondary"></AppIcon>
                 {{ $t('views.document.generateQuestion.title') }}</el-dropdown-item
               >
               <el-dropdown-item
                 @click.stop="openSelectDocumentDialog(data)"
                 v-if="permissionPrecise.doc_edit(id)"
               >
-                <AppIcon iconName="app-migrate"></AppIcon>
+                <AppIcon iconName="app-migrate" class="color-secondary"></AppIcon>
                 {{ $t('views.document.setting.migration') }}</el-dropdown-item
               >
               <el-dropdown-item v-if="permissionPrecise.doc_edit(id)">
@@ -67,8 +87,7 @@
                 >
                   <div class="w-full flex-between" style="line-height: 22px">
                     <div class="flex align-center">
-                      <!-- TODO 更换icon -->
-                      <AppIcon iconName="app-migrate"></AppIcon>
+                      <AppIcon iconName="app-drag-outlined" class="color-secondary"></AppIcon>
                       {{ $t('views.document.movePosition.title') }}
                     </div>
                     <el-icon class="color-input-placeholder" :size="16" style="margin-right: 0"
@@ -77,11 +96,14 @@
                   </div>
                   <template #dropdown>
                     <el-dropdown-menu>
-                      <el-dropdown-item v-if="props.showMoveUp" @click.stop="emit('move', 'up')">
+                      <el-dropdown-item
+                        :disabled="props.showMoveUp"
+                        @click.stop="emit('move', 'up')"
+                      >
                         {{ $t('views.document.movePosition.moveUp') }}
                       </el-dropdown-item>
                       <el-dropdown-item
-                        v-if="props.showMoveDown"
+                        :disabled="props.showMoveDown"
                         @click.stop="emit('move', 'down')"
                       >
                         {{ $t('views.document.movePosition.moveDown') }}
@@ -94,7 +116,7 @@
                 @click.stop="deleteParagraph(data)"
                 v-if="permissionPrecise.doc_edit(id)"
               >
-                <AppIcon iconName="app-delete"></AppIcon>
+                <AppIcon iconName="app-delete" class="color-secondary"></AppIcon>
                 {{ $t('common.delete') }}</el-dropdown-item
               >
             </el-dropdown-menu>

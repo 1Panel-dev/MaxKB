@@ -15,11 +15,9 @@ export default {
   chatId: '对话 ID',
   chatUserId: '对话用户 ID',
   chatUserType: '对话用户类型',
-  chatUser: '对话用户',
   userInput: '用户输入',
   quote: '引用',
   download: '点击下载文件',
-  transcribing: '转文字中',
   noDocument: '原文档不存在',
   noPermissionDownload: '无权限下载',
   passwordValidator: {
@@ -96,6 +94,7 @@ export default {
     paragraph: '分段',
     noSubmit: '用户未提交',
     errMessage: '错误日志',
+    knowedMessage: '已知信息',
   },
   KnowledgeSource: {
     title: '知识来源',
@@ -109,11 +108,6 @@ export default {
     question: '用户问题',
     optimizationQuestion: '优化后问题',
     questionPadded: '优化后问题',
-    system: '角色设定',
-    historyRecord: '历史记录',
-    currentChat: '本次对话',
-    AiResponse: 'AI 回答',
-    knowedMessage: '已知信息',
   },
   editTitle: '编辑标题',
 }

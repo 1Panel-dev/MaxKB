@@ -105,13 +105,12 @@ function settingApiKey(row: any) {
 
 function deleteApiKey(row: any) {
   MsgConfirm(
-    // @ts-ignore
     `${t('views.applicationOverview.appInfo.APIKeyDialog.msgConfirm1')}: ${row.secret_key}?`,
     t(t('views.applicationOverview.appInfo.APIKeyDialog.msgConfirm2')),
     {
       confirmButtonText: t('common.confirm'),
       cancelButtonText: t('common.cancel'),
-      confirmButtonClass: 'color-danger',
+      confirmButtonClass: 'danger',
     },
   )
     .then(() => {
@@ -128,8 +127,8 @@ function changeState(bool: boolean, row: any) {
     is_active: bool,
   }
   const str = bool
-    ? t('views.applicationOverview.appInfo.APIKeyDialog.enabledSuccess')
-    : t('views.applicationOverview.appInfo.APIKeyDialog.disabledSuccess')
+    ? t('common.enabled')
+    : t('common.disabled')
   systemKeyApi.putAPIKey(row.id, obj, loading).then((res) => {
     MsgSuccess(str)
     getApiKeyList()
