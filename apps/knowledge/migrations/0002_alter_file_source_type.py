@@ -2,6 +2,23 @@
 
 from django.db import migrations, models
 
+from django.db.models import Q
+
+
+def add_allow_download_to_existing_documents(apps, schema_editor):
+    Document = apps.get_model('knowledge', 'Document')
+
+    # 为所有现有的Document记录添加allow_download=True
+    documents = Document.objects.filter(
+        Q(meta__isnull=True) |
+        ~Q(meta__has_key='allow_download')
+    )
+
+    for doc in documents:
+        if doc.meta is None:
+            doc.meta = {}
+        doc.meta['allow_download'] = True
+        doc.save(update_fields=['meta'])
 
 class Migration(migrations.Migration):
 
@@ -15,4 +32,5 @@ class Migration(migrations.Migration):
             name='source_type',
             field=models.CharField(choices=[('KNOWLEDGE', 'Knowledge'), ('APPLICATION', 'Application'), ('TOOL', 'Tool'), ('DOCUMENT', 'Document'), ('CHAT', 'Chat'), ('SYSTEM', 'System'), ('TEMPORARY_30_MINUTE', 'Temporary 30 Minute'), ('TEMPORARY_120_MINUTE', 'Temporary 120 Minute'), ('TEMPORARY_1_DAY', 'Temporary 1 Day')], db_index=True, default='TEMPORARY_120_MINUTE', verbose_name='资源类型'),
         ),
+        migrations.RunPython(add_allow_download_to_existing_documents)
     ]
