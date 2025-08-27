@@ -6,7 +6,8 @@
     @date：2025/6/6 11:18
     @desc:
 """
-from django.http import HttpResponse
+import requests
+from django.http import HttpResponse, StreamingHttpResponse
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
 from rest_framework.parsers import MultiPartParser
@@ -28,6 +29,39 @@ from knowledge.models import FileSourceType
 from oss.serializers.file import FileSerializer
 from users.api import CaptchaAPI
 from users.serializers.login import CaptchaSerializer
+
+
+def stream_image(response):
+    """生成器函数，用于流式传输图片数据"""
+    for chunk in response.iter_content(chunk_size=4096):
+        if chunk:  # 过滤掉保持连接的空块
+            yield chunk
+
+
+class ResourceProxy(APIView):
+    def get(self, request: Request):
+        image_url = request.query_params.get("url")
+        if not image_url:
+            return result.error("Missing 'url' parameter")
+        try:
+
+            # 发送GET请求，流式获取图片内容
+            response = requests.get(
+                image_url,
+                stream=True,  # 启用流式响应
+                allow_redirects=True,
+                timeout=10
+            )
+            content_type = response.headers.get('Content-Type', '').split(';')[0]
+            # 创建Django流式响应
+            django_response = StreamingHttpResponse(
+                stream_image(response),  # 使用生成器
+                content_type=content_type
+            )
+
+            return django_response
+        except Exception as e:
+            return result.error(f"Image request failed: {str(e)}")
 
 
 class OpenAIView(APIView):

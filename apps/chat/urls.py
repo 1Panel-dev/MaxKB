@@ -8,6 +8,7 @@ urlpatterns = [
     path('embed', views.ChatEmbedView.as_view()),
     path('auth/anonymous', views.AnonymousAuthentication.as_view()),
     path('profile', views.AuthProfile.as_view()),
+    path('resource_proxy',views.ResourceProxy.as_view()),
     path('application/profile', views.ApplicationProfile.as_view(), name='profile'),
     path('chat_message/<str:chat_id>', views.ChatView.as_view(), name='chat'),
     path('open', views.OpenView.as_view(), name='open'),
