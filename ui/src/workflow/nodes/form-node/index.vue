@@ -189,6 +189,7 @@ const sync_form_field_list = () => {
   ]
   set(props.nodeModel.properties.config, 'fields', fields)
   props.nodeModel.clear_next_node_field(false)
+  onDragHandle()
 }
 const addFormCollectRef = ref<InstanceType<typeof AddFormCollect>>()
 const editFormCollectRef = ref<InstanceType<typeof EditFormCollect>>()
@@ -275,7 +276,6 @@ onMounted(() => {
   set(props.nodeModel, 'validate', validate)
   sync_form_field_list()
   props.nodeModel.graphModel.eventCenter.emit('refresh_incoming_node_field')
-  onDragHandle()
 })
 </script>
 <style lang="scss" scoped></style>

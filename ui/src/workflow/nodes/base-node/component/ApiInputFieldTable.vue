@@ -13,7 +13,7 @@
     :data="props.nodeModel.properties.api_input_field_list"
     class="mb-16"
     ref="tableRef"
-    row-key="field"
+    row-key="variable"
   >
     <el-table-column prop="variable" :label="$t('dynamicsForm.paramForm.field.label')">
       <template #default="{ row }">
