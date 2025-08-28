@@ -16,6 +16,7 @@ import django.db.models
 from django.db.models import QuerySet
 from django.db.models.functions import Substr, Reverse
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 from langchain_core.embeddings import Embeddings
 
 from common.config.embedding_config import VectorStore
@@ -236,7 +237,7 @@ class ListenerManagement:
         next_index = taskType.value + 1
         current_index = taskType.value
         status_number = state.value
-        current_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') + '+00'
+        current_time = timezone.now().strftime('%Y-%m-%d %H:%M:%S.%f') + '+00'
         params_dict = {'${bit_number}': bit_number, '${up_index}': up_index,
                        '${status_number}': status_number, '${next_index}': next_index,
                        '${table_name}': query_set.model._meta.db_table, '${current_index}': current_index,
