@@ -866,7 +866,7 @@ class DocumentSerializers(serializers.Serializer):
         def get_document_paragraph_model(knowledge_id, instance: Dict):
             source_meta = {'source_file_id': instance.get('source_file_id')} if instance.get('source_file_id') else {}
             meta = {**instance.get('meta'), **source_meta} if instance.get('meta') is not None else source_meta
-            meta = convert_uuid_to_str(meta)
+            meta = {**convert_uuid_to_str(meta), 'allow_download': True}
 
             document_model = Document(
                 **{
