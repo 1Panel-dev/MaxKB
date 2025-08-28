@@ -8,6 +8,7 @@
 """
 from typing import Type
 
+from django.db import connection
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
@@ -31,6 +32,8 @@ class FunctionLibNodeParamsSerializer(serializers.Serializer):
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)
         f_lib = QuerySet(Tool).filter(id=self.data.get('tool_lib_id')).first()
+        # 归还链接到连接池
+        connection.close()
         if f_lib is None:
             raise Exception(_('The function has been deleted'))
 
