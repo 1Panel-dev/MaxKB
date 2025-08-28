@@ -22,6 +22,7 @@ from django.db import models, transaction
 from django.db.models import QuerySet, Q
 from django.http import HttpResponse
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from rest_framework import serializers, status
 from rest_framework.utils.formatting import lazy_format
@@ -734,11 +735,11 @@ class ApplicationOperateSerializer(serializers.Serializer):
                     application.desc = node_data.get('desc')
                     application.prologue = node_data.get('prologue')
             application.work_flow = work_flow
-        application.publish_time = datetime.datetime.now()
+        application.publish_time = timezone.now()
         application.is_publish = True
         application.save()
         work_flow_version = ApplicationVersion(work_flow=application.work_flow, application=application,
-                                               name=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                                               name=timezone.now().strftime('%Y-%m-%d %H:%M:%S'),
                                                publish_user_id=user_id,
                                                publish_user_name=user.username,
                                                workspace_id=workspace_id)
