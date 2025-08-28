@@ -289,7 +289,7 @@
                     <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
                     {{ $t('common.export') }}
                   </el-dropdown-item>
-                  <el-dropdown-item v-if="row.tool_type === 'MCP'" @click.stop="showMcpConfig(row)">
+                  <el-dropdown-item v-if="row.tool_type === 'MCP' && permissionPrecise.edit()" @click.stop="showMcpConfig(row)">
                     <AppIcon iconName="app-operate-log" class="color-secondary"></AppIcon>
                     {{ $t('views.tool.mcpConfig') }}
                   </el-dropdown-item>

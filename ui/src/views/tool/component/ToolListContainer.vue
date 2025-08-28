@@ -386,6 +386,7 @@ const MoreFieldPermission = (id: any) => {
     permissionPrecise.value.edit(id) ||
     permissionPrecise.value.export(id) ||
     permissionPrecise.value.delete(id) ||
+    permissionPrecise.value.auth(id) ||
     isSystemShare.value
   )
 }
