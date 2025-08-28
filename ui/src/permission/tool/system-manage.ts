@@ -57,7 +57,14 @@ const systemManage = {
       'OR',
     ),
 
-  auth: () => false,
+  auth: () => 
+    hasPermission(
+      [
+        RoleConst.ADMIN,
+        PermissionConst.RESOURCE_TOOL_AUTH,
+      ],
+      'OR',
+    ),
   folderCreate: () => false,
   folderEdit: () => false,
   folderDelete: () => false,

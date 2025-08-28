@@ -38,7 +38,14 @@ const systemManage = {
             'OR'
     ),
     folderDelete: () => false,
-    auth: () => false,
+    auth: () => 
+        hasPermission(
+            [
+              RoleConst.ADMIN,
+              PermissionConst.RESOURCE_APPLICATION_AUTH
+            ],
+            'OR'
+    ),
     overview_embed: () =>
         hasPermission(
             [

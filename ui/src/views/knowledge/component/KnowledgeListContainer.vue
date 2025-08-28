@@ -401,6 +401,7 @@ const MoreFilledPermission = (item: any) => {
     permissionPrecise.value.generate(item.id) ||
     (permissionPrecise.value.edit(item.id) && apiType.value) === 'workspace' ||
     permissionPrecise.value.export(item.id) ||
+    permissionPrecise.value.auth(item.id) ||
     permissionPrecise.value.delete(item.id) ||
     isSystemShare.value
   )
