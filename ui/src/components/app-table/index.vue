@@ -24,7 +24,7 @@
         </div>
         <div v-else @click="quickCreateHandle" class="w-full">
           <el-button type="primary" link class="quich-button">
-            <el-icon><Plus /></el-icon>
+            <AppIcon iconName="app-add-outlined"></AppIcon>
             <span class="ml-4">{{ quickCreatePlaceholder }}</span>
           </el-button>
         </div>

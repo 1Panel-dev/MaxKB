@@ -304,3 +304,20 @@
 .el-pagination .el-select {
   width: 105px;
 }
+
+// el-checkbox
+.el-checkbox {
+  --el-checkbox-font-weight: 400;
+  --el-checkbox-text-color: var(--el-text-color-primary);
+}
+.el-checkbox__input.is-checked + .el-checkbox__label {
+  color: var(--el-text-color-primary);
+}
+
+// el-radio
+.el-radio {
+  --el-radio-font-weight: 400;
+}
+.el-radio__input.is-checked + .el-radio__label {
+  color: var(--el-text-color-primary);
+}

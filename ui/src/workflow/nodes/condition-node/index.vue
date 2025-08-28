@@ -144,14 +144,14 @@
               @click="addCondition(index)"
               v-if="index !== form_data.branch.length - 1"
             >
-              <el-icon class="mr-4"><Plus /></el-icon>
+              <AppIcon iconName="app-add-outlined" class="mr-4"></AppIcon>
               {{ $t('views.applicationWorkflow.nodes.conditionNode.addCondition') }}
             </el-button>
           </el-card>
         </template>
       </VueDraggable>
       <el-button link type="primary" @click="addBranch">
-        <el-icon class="mr-4"><Plus /></el-icon>
+        <AppIcon iconName="app-add-outlined" class="mr-4"></AppIcon>
         {{ $t('views.applicationWorkflow.nodes.conditionNode.addBranch') }}
       </el-button>
     </el-form>

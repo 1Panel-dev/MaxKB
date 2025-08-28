@@ -15,7 +15,7 @@
             <div class="flex-between">
               <span>{{ $t('views.chatLog.selectKnowledge') }}</span>
               <el-button type="primary" link @click="openknowledgeDialog">
-                <el-icon><Plus /></el-icon>
+                <AppIcon iconName="app-add-outlined"></AppIcon>
               </el-button>
             </div>
           </template>

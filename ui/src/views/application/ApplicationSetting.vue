@@ -175,9 +175,7 @@
                           {{ $t('common.paramSetting') }}
                         </el-button>
                         <el-button type="primary" link @click="openKnowledgeDialog">
-                          <el-icon class="mr-4">
-                            <Plus />
-                          </el-icon>
+                          <AppIcon iconName="app-add-outlined" class="mr-4"></AppIcon>
                           {{ $t('common.add') }}
                         </el-button>
                       </div>

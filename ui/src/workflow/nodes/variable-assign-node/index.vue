@@ -136,9 +136,7 @@
       </template>
 
       <el-button link type="primary" @click="addVariable">
-        <el-icon class="mr-4">
-          <Plus />
-        </el-icon>
+        <AppIcon iconName="app-add-outlined" class="mr-4"></AppIcon>
         {{ $t('common.add') }}
       </el-button>
     </el-form>

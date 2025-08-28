@@ -53,7 +53,7 @@
                 :class="appTemplate === 'blank' ? 'active' : ''"
               >
                 <div class="flex-center p-24">
-                  <el-icon class="mr-12"><Plus /></el-icon>
+                  <AppIcon iconName="app-add-outlined" class="mr-12"></AppIcon>
                   {{ $t('views.application.form.appTemplate.blankApp.title') }}
                 </div>
               </el-card>

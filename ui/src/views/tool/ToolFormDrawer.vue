@@ -77,9 +77,7 @@
           {{ $t('common.param.initParam') }}
         </h4>
         <el-button link type="primary" @click="openAddInitDialog()">
-          <el-icon class="mr-4">
-            <Plus />
-          </el-icon>
+          <AppIcon iconName="app-add-outlined" class="mr-4"></AppIcon>
           {{ $t('common.add') }}
         </el-button>
       </div>
@@ -149,9 +147,7 @@
           </el-text>
         </h4>
         <el-button link type="primary" @click="openAddDialog()">
-          <el-icon class="mr-4">
-            <Plus />
-          </el-icon>
+          <AppIcon iconName="app-add-outlined" class="mr-4"></AppIcon>
           {{ $t('common.add') }}
         </el-button>
       </div>
@@ -196,7 +192,7 @@
       </el-table>
       <h4 class="title-decoration-1 mb-16">
         {{ $t('views.tool.form.param.code') }}
-        <span  class="color-danger" style="margin-left: -10px">*</span>
+        <span class="color-danger" style="margin-left: -10px">*</span>
         <el-text type="info" class="color-secondary">
           {{ $t('views.tool.form.param.paramInfo2') }}
         </el-text>

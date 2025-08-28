@@ -53,12 +53,8 @@
       <template #footer v-if="showFooter">
         <slot name="footer">
           <div class="w-full text-left cursor" @click="openCreateModel(undefined, props.modelType)">
-            <el-button type="primary" link
-              v-if="permissionPrecise.create()"
-            >
-              <el-icon class="mr-4">
-                <Plus />
-              </el-icon>
+            <el-button type="primary" link v-if="permissionPrecise.create()">
+              <AppIcon iconName="app-add-outlined" class="mr-4"></AppIcon>
               {{ $t('views.application.operation.addModel') }}
             </el-button>
           </div>

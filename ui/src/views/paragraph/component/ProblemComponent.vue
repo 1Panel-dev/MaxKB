@@ -3,10 +3,8 @@
     <span class="flex align-center">
       <span>{{ $t('views.paragraph.relatedProblem.title') }}</span>
       <el-divider direction="vertical" class="mr-4" />
-      <el-button text @click="addProblem"
-        v-if="permissionPrecise.problem_relate(id)"
-      >
-        <el-icon><Plus /></el-icon>
+      <el-button text @click="addProblem" v-if="permissionPrecise.problem_relate(id)">
+        <AppIcon iconName="app-add-outlined"></AppIcon>
       </el-button>
     </span>
   </p>
@@ -45,7 +43,7 @@
             class="question-tag"
             type="info"
             effect="plain"
-            v-bind="permissionPrecise.problem_relate(id) ? {closable:true} : {} "
+            v-bind="permissionPrecise.problem_relate(id) ? { closable: true } : {}"
           >
             <auto-tooltip :content="item.content">
               {{ item.content }}
@@ -61,7 +59,6 @@ import { ref, nextTick, onMounted, onUnmounted, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import permissionMap from '@/permission'
-
 
 const props = defineProps<{
   paragraphId: string

@@ -90,7 +90,6 @@ const getRefreshFieldList = () => {
     .map((v: any) => cloneDeep(v.properties.api_input_field_list))
     .reduce((x: any, y: any) => [...x, ...y], [])
     .map((i: any) => ({ label: i.name || i.variable, value: i.variable }))
-
   return [...user_input_fields, ...api_input_fields]
 }
 const refreshFieldList = () => {

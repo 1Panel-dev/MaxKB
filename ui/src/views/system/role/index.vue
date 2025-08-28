@@ -53,7 +53,7 @@
                         )
                       "
                     >
-                      <el-icon :size="18"><Plus /></el-icon>
+                      <AppIcon iconName="app-add-outlined"></AppIcon>
                     </el-button>
                   </el-tooltip>
                 </div>

@@ -57,9 +57,7 @@
     </el-scrollbar>
     <!-- 添加按钮 -->
     <el-button type="primary" text class="mt-2" @click="handleAdd">
-      <el-icon class="mr-4">
-        <Plus />
-      </el-icon>
+      <AppIcon iconName="app-add-outlined" class="mr-4"></AppIcon>
       {{ props.addText ?? $t('views.role.member.add') }}
     </el-button>
   </el-form>

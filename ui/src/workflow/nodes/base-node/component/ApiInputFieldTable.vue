@@ -2,18 +2,16 @@
   <div class="flex-between mb-16">
     <h5 class="lighter">{{ $t('views.model.modelForm.title.apiParamPassing') }}</h5>
     <el-button link type="primary" @click="openAddDialog()">
-      <el-icon class="mr-4">
-        <Plus />
-      </el-icon>
+      <AppIcon iconName="app-add-outlined" class="mr-4"></AppIcon>
       {{ $t('common.add') }}
     </el-button>
   </div>
   <el-table
     v-if="props.nodeModel.properties.api_input_field_list?.length > 0"
     :data="props.nodeModel.properties.api_input_field_list"
-    class="mb-16"
+    class="mb-16 api-input-field-table"
     ref="tableRef"
-    row-key="field"
+    row-key="variable"
   >
     <el-table-column prop="variable" :label="$t('dynamicsForm.paramForm.field.label')">
       <template #default="{ row }">
@@ -59,7 +57,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { set } from 'lodash'
+import { set, cloneDeep } from 'lodash'
 import Sortable from 'sortablejs'
 import ApiFieldFormDialog from './ApiFieldFormDialog.vue'
 import { MsgError } from '@/utils/message'
@@ -116,7 +114,7 @@ function onDragHandle() {
 
   // 获取表格的 tbody DOM 元素
   const wrapper = tableRef.value.$el as HTMLElement
-  const tbody = wrapper.querySelector('.el-table__body-wrapper tbody')
+  const tbody = wrapper.querySelector('.api-input-field-table .el-table__body-wrapper tbody')
   if (!tbody) return
   // 初始化 Sortable
   Sortable.create(tbody as HTMLElement, {
@@ -125,7 +123,7 @@ function onDragHandle() {
     onEnd: (evt) => {
       if (evt.oldIndex === undefined || evt.newIndex === undefined) return
       // 更新数据顺序
-      const items = [...inputFieldList.value]
+      const items = cloneDeep([...inputFieldList.value])
       const [movedItem] = items.splice(evt.oldIndex, 1)
       items.splice(evt.newIndex, 0, movedItem)
       inputFieldList.value = items
