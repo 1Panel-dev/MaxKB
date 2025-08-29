@@ -154,8 +154,8 @@ const getModelList: (param: any, loading?: Ref<boolean>) => Promise<Result<Array
   return get(`${prefix}/${prefix_workspace.value}/model`, param, loading)
 }
 
-const getToolList: (loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (loading) => {
-  return get(`${prefix}/${prefix_workspace.value}/tool`, {}, loading)
+const getToolList: (param: any, loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (param, loading) => {
+  return get(`${prefix}/${prefix_workspace.value}/tool`, param, loading)
 }
 
 const getToolListPage: (
