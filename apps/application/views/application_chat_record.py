@@ -129,7 +129,7 @@ class ApplicationChatRecordAddKnowledge(APIView):
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def post(self, request: Request, workspace_id: str, application_id: str):
         return result.success(ApplicationChatRecordAddKnowledgeSerializer().post_improve(
-            {'workspace_id': workspace_id, 'application_id': application_id, **request.data}))
+            {'workspace_id': workspace_id, 'application_id': application_id, **request.data}, request=request))
 
 
 class ApplicationChatRecordImprove(APIView):
@@ -186,7 +186,7 @@ class ApplicationChatRecordImproveParagraph(APIView):
         return result.success(ApplicationChatRecordImproveSerializer(
             data={'workspace_id': workspace_id, 'application_id': application_id, 'chat_id': chat_id,
                   'chat_record_id': chat_record_id,
-                  'knowledge_id': knowledge_id, 'document_id': document_id}).improve(request.data))
+                  'knowledge_id': knowledge_id, 'document_id': document_id}).improve(request.data, request=request))
 
     class Operate(APIView):
         authentication_classes = [TokenAuth]
@@ -214,4 +214,4 @@ class ApplicationChatRecordImproveParagraph(APIView):
                 data={'chat_id': chat_id, 'chat_record_id': chat_record_id, 'workspace_id': workspace_id,
                       'application_id': application_id,
                       'knowledge_id': knowledge_id, 'document_id': document_id,
-                      'paragraph_id': paragraph_id}).delete())
+                      'paragraph_id': paragraph_id}).delete(request=request))

@@ -20,8 +20,10 @@ from rest_framework.utils.formatting import lazy_format
 from application.models import ChatRecord, ApplicationAccessToken, Application
 from application.serializers.application_chat import ChatCountSerializer
 from application.serializers.common import ChatInfo
+from common.auth.authentication import get_is_permissions
+from common.constants.permission_constants import PermissionConstants, RoleConstants, ViewPermission, CompareConstants
 from common.db.search import page_search
-from common.exception.app_exception import AppApiException
+from common.exception.app_exception import AppApiException, AppUnauthorizedFailed
 from common.utils.common import post
 from knowledge.models import Paragraph, Document, Problem, ProblemParagraphMapping, Knowledge
 from knowledge.serializers.common import get_embedding_model_id_by_knowledge_id, update_document_char_length
@@ -254,8 +256,27 @@ class ApplicationChatRecordAddKnowledgeSerializer(serializers.Serializer):
 
     @post(post_function=post_embedding_paragraph)
     @transaction.atomic
-    def post_improve(self, instance: Dict):
-        ApplicationChatRecordAddKnowledgeSerializer(data=instance).is_valid(raise_exception=True)
+    def post_improve(self, instance: Dict, request=None, scope='WORKSPACE', with_valid=True):
+        if with_valid:
+            ApplicationChatRecordAddKnowledgeSerializer(data=instance).is_valid(raise_exception=True)
+        self.is_valid(raise_exception=True)
+        if scope == 'WORKSPACE':
+            is_permission = get_is_permissions(request=request, workspace_id=self.data.get('workspace_id'),
+                                               knowledge_id=self.data.get("knowledge_id"))(
+                PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission(),
+                PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_permission_workspace_manage_role(),
+                RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+                ViewPermission([RoleConstants.USER.get_workspace_role()],
+                               [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
+                               CompareConstants.AND),
+            )
+        else:
+            is_permission = get_is_permissions(request=request, workspace_id=self.data.get('workspace_id'),
+                                               knowledge_id=self.data.get("knowledge_id"))(
+                PermissionConstants.RESOURCE_KNOWLEDGE_DOCUMENT_EDIT, RoleConstants.ADMIN
+            )
+        if not is_permission:
+            raise AppUnauthorizedFailed(403, gettext('No permission to access'))
 
         chat_ids = instance['chat_ids']
         document_id = instance['document_id']
@@ -372,9 +393,26 @@ class ApplicationChatRecordImproveSerializer(serializers.Serializer):
 
     @post(post_function=post_embedding_paragraph)
     @transaction.atomic
-    def improve(self, instance: Dict, with_valid=True):
+    def improve(self, instance: Dict, request=None, scope='WORKSPACE', with_valid=True):
         if with_valid:
             self.is_valid(raise_exception=True)
+        if scope == 'WORKSPACE':
+            is_permission = get_is_permissions(request, workspace_id=self.data.get('workspace_id'),
+                                               knowledge_id=self.data.get("knowledge_id"))(
+                PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission(),
+                PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_permission_workspace_manage_role(),
+                RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+                ViewPermission([RoleConstants.USER.get_workspace_role()],
+                               [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
+                               CompareConstants.AND),
+            )
+        else:
+            is_permission = get_is_permissions(request, workspace_id=self.data.get('workspace_id'),
+                                               knowledge_id=self.data.get("knowledge_id"))(
+                PermissionConstants.RESOURCE_KNOWLEDGE_DOCUMENT_EDIT, RoleConstants.ADMIN
+            )
+        if not is_permission:
+            raise AppUnauthorizedFailed(403, gettext('No permission to access'))
         ApplicationChatRecordImproveInstanceSerializer(data=instance).is_valid(raise_exception=True)
         chat_record_id = self.data.get('chat_record_id')
         chat_id = self.data.get('chat_id')
@@ -427,9 +465,28 @@ class ApplicationChatRecordImproveSerializer(serializers.Serializer):
 
         workspace_id = serializers.CharField(required=True, label=_("Workspace ID"))
 
-        def delete(self, with_valid=True):
+        def delete(self, request=None, scope='WORKSPACE', with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
+                if scope == 'WORKSPACE':
+                    is_permission = get_is_permissions(request=request, workspace_id=self.data.get('workspace_id'),
+                                                       knowledge_id=self.data.get("knowledge_id"))(
+                        PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission(),
+                        PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_permission_workspace_manage_role(),
+                        RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+                        ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                       [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
+                                       CompareConstants.AND),
+                    )
+                else:
+                    is_permission = get_is_permissions(request=request, workspace_id=self.data.get('workspace_id'),
+                                                       knowledge_id=self.data.get("knowledge_id"))(
+                        PermissionConstants.RESOURCE_KNOWLEDGE_DOCUMENT_EDIT, RoleConstants.ADMIN
+                    )
+
+                if not is_permission:
+                    raise AppUnauthorizedFailed(403, gettext('No permission to access'))
+
             workspace_id = self.data.get('workspace_id')
             chat_record_id = self.data.get('chat_record_id')
             chat_id = self.data.get('chat_id')
