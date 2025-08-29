@@ -6,27 +6,52 @@
     @date：2025/6/6 19:55
     @desc:
 """
+import hashlib
 import json
+import threading
 
-from django.core import signing
+from django.core import signing, cache
 
+from common.constants.cache_version import Cache_Version
 from common.utils.rsa_util import encrypt, decrypt
+
+authentication_cache = cache.cache
+lock = threading.Lock()
+
+
+def _decrypt(authentication: str):
+    cache_key = hashlib.sha256(authentication.encode()).hexdigest()
+    result = authentication_cache.get(key=cache_key, version=Cache_Version.CHAT.value)
+    if result is None:
+        with lock:
+            result = authentication_cache.get(cache_key, version=Cache_Version.CHAT.value)
+            if result is None:
+                result = decrypt(authentication)
+                authentication_cache.set(cache_key, result, version=Cache_Version.CHAT.value, timeout=60 * 60 * 2)
+
+    return result
 
 
 class ChatAuthentication:
-    def __init__(self, auth_type: str | None):
+    def __init__(self, auth_type: str | None, **kwargs):
         self.auth_type = auth_type
+        for k, v in kwargs.items():
+            self.__setattr__(k, v)
 
     def to_dict(self):
-        return {'auth_type': self.auth_type}
+        return self.__dict__
 
     def to_string(self):
-        return encrypt(json.dumps(self.to_dict()))
+        value = json.dumps(self.to_dict())
+        authentication = encrypt(value)
+        cache_key = hashlib.sha256(authentication.encode()).hexdigest()
+        authentication_cache.set(cache_key, value, version=Cache_Version.CHAT.value, timeout=60 * 60 * 2)
+        return authentication
 
     @staticmethod
     def new_instance(authentication: str):
-        auth = json.loads(decrypt(authentication))
-        return ChatAuthentication(auth.get('auth_type'))
+        auth = json.loads(_decrypt(authentication))
+        return ChatAuthentication(**auth)
 
 
 class ChatUserToken:
