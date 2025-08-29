@@ -211,7 +211,7 @@ const rules = reactive({
 })
 
 function close() {
-  if (isEdit.value || !areAllValuesNonEmpty(form.value)) {
+  if (!areAllValuesNonEmpty(form.value)) {
     visible.value = false
   } else {
     MsgConfirm(t('common.tip'), t('views.tool.tip.saveMessage'), {

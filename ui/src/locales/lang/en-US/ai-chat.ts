@@ -59,8 +59,8 @@ export default {
     prologueMessage: 'Sorry, the service is currently under maintenance. Please try again later!',
   },
   inputPlaceholder: {
-    speaking: 'Speaking...',
-    recorderLoading: 'Transcribing...',
+    speaking: 'Speaking',
+    recorderLoading: 'Transcribing',
     default: 'Type your question',
   },
   uploadFile: {

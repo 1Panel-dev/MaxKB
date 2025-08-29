@@ -59,7 +59,7 @@
           </template>
           <TransitionContent
             v-if="transcribing"
-            :text="t('chat.transcribing')"
+            :text="t('chat.inputPlaceholder.recorderLoading')"
             :type="type"
             :application="applicationDetails"
           >

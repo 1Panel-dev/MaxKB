@@ -139,19 +139,19 @@ function clearChat() {
     paginationConfig.current_page = 1
     paginationConfig.total = 0
     currentRecordList.value = []
-    getChatLog(applicationDetail.value.id)
+    getChatLog()
   })
 }
 
 function deleteLog(row: any) {
-  chatAPI.deleteChat(row.id, left_loading).then(() => {
+  chatAPI.deleteChat(row.id).then(() => {
     if (currentChatId.value === row.id) {
       currentChatId.value = 'new'
       paginationConfig.current_page = 1
       paginationConfig.total = 0
       currentRecordList.value = []
     }
-    getChatLog(applicationDetail.value.id)
+    chatLogData.value = chatLogData.value.filter((item) => item.id !== row.id)
   })
 }
 function handleScroll(event: any) {
