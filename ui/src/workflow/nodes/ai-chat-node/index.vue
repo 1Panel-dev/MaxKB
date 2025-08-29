@@ -139,11 +139,20 @@
         >
           <div class="flex-between border border-r-6 white-bg mb-4" style="padding: 5px 8px">
             <div class="flex align-center" style="line-height: 20px">
-              <ToolIcon type="MCP" class="mr-8" :size="20" />
+              <el-avatar
+                v-if="relatedObject(mcpToolSelectOptions, chat_data.mcp_tool_id, 'id')?.icon"
+                shape="square"
+                :size="20"
+                style="background: none"
+                class="mr-8"
+              >
+                <img :src="resetUrl(relatedObject(mcpToolSelectOptions, chat_data.mcp_tool_id, 'id')?.icon)" alt="" />
+              </el-avatar>
+              <ToolIcon v-else type="MCP" class="mr-8" :size="20" />
 
               <div
                 class="ellipsis"
-                :title="relatedObject(toolSelectOptions, chat_data.mcp_tool_id, 'id')?.name"
+                :title="relatedObject(mcpToolSelectOptions, chat_data.mcp_tool_id, 'id')?.name"
               >
                 {{
                   relatedObject(mcpToolSelectOptions, chat_data.mcp_tool_id, 'id')?.name ||
