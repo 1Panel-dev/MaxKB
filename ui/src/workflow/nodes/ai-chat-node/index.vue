@@ -177,7 +177,16 @@
           <template v-for="(item, index) in chat_data.tool_ids" :key="index">
             <div class="flex-between border border-r-6 white-bg mb-4" style="padding: 5px 8px">
               <div class="flex align-center" style="line-height: 20px">
-                <ToolIcon type="CUSTOM" class="mr-8" :size="20" />
+                <el-avatar
+                  v-if="relatedObject(toolSelectOptions, item, 'id')?.icon"
+                  shape="square"
+                  :size="20"
+                  style="background: none"
+                  class="mr-8"
+                >
+                  <img :src="resetUrl(relatedObject(toolSelectOptions, item, 'id')?.icon)" alt="" />
+                </el-avatar>
+                <ToolIcon v-else class="mr-8" :size="20" />
 
                 <div class="ellipsis" :title="relatedObject(toolSelectOptions, item, 'id')?.name">
                   {{ relatedObject(toolSelectOptions, item, 'id')?.name }}
@@ -254,10 +263,12 @@ import { isLastNode } from '@/workflow/common/data'
 import AIModeParamSettingDialog from '@/views/application/component/AIModeParamSettingDialog.vue'
 import { t } from '@/locales'
 import ReasoningParamSettingDialog from '@/views/application/component/ReasoningParamSettingDialog.vue'
+import ToolDialog from '@/views/application/component/ToolDialog.vue'
 import McpServersDialog from '@/views/application/component/McpServersDialog.vue'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { useRoute } from 'vue-router'
-import ToolDialog from '@/views/application/component/ToolDialog.vue'
+
+import { resetUrl } from '@/utils/common'
 import { relatedObject } from '@/utils/array.ts'
 const getApplicationDetail = inject('getApplicationDetail') as any
 const route = useRoute()

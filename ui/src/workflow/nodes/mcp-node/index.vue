@@ -53,10 +53,22 @@
               :label="mcpTool.name"
               :value="mcpTool.id"
             >
-              <span>{{ mcpTool.name }}</span>
-              <el-tag v-if="mcpTool.scope === 'SHARED'" type="info" class="info-tag ml-8 mt-4">
-                {{ t('views.shared.title') }}
-              </el-tag>
+              <div class="flex align-center">
+                <el-avatar
+                  v-if="mcpTool?.icon"
+                  shape="square"
+                  :size="20"
+                  style="background: none"
+                  class="mr-8"
+                >
+                  <img :src="resetUrl(mcpTool?.icon)" alt="" />
+                </el-avatar>
+                <ToolIcon v-else :size="20" :type="mcpTool?.tool_type" class="mr-8" />
+                <span>{{ mcpTool.name }}</span>
+                <el-tag v-if="mcpTool.scope === 'SHARED'" type="info" class="info-tag ml-8">
+                  {{ t('views.shared.title') }}
+                </el-tag>
+              </div>
             </el-option>
           </el-select>
         </el-form-item>
@@ -246,10 +258,9 @@ import TooltipLabel from '@/components/dynamics-form/items/label/TooltipLabel.vu
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import { useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
-import useStore from '@/stores'
+import { resetUrl } from '@/utils/common'
 
 const props = defineProps<{ nodeModel: any }>()
-const { user } = useStore()
 
 const route = useRoute()
 const {

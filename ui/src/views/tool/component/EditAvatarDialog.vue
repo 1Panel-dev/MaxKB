@@ -9,9 +9,7 @@
     <el-radio-group v-model="radioType" class="radio-block mb-16">
       <el-radio value="default">
         <p>{{ $t('common.EditAvatarDialog.default') }}</p>
-        <el-avatar class="avatar-green" shape="square" :size="32">
-          <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt="" />
-        </el-avatar>
+        <ToolIcon :size="32" :type="iconType" />
       </el-radio>
 
       <el-radio value="custom">
@@ -55,15 +53,17 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import {computed, ref, watch} from 'vue'
-import ToolApi from '@/api/tool/tool'
+import { computed, ref, watch } from 'vue'
 import { cloneDeep } from 'lodash'
 import { MsgError, MsgSuccess } from '@/utils/message'
-import { defaultIcon, isAppIcon } from '@/utils/common'
+import { isAppIcon } from '@/utils/common'
 import { t } from '@/locales'
-import {loadSharedApi} from "@/utils/dynamics-api/shared-api.ts";
-import {useRoute} from "vue-router";
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api.ts'
+import { useRoute } from 'vue-router'
 
+const props = defineProps<{
+  iconType?: string
+}>()
 const emit = defineEmits(['refresh'])
 const route = useRoute()
 
@@ -122,7 +122,8 @@ function submit() {
     const fd = new FormData()
     fd.append('file', iconFile.value.raw)
     loadSharedApi({ type: 'tool', systemType: apiType.value })
-      .putToolIcon(detail.value.id, fd, loading).then((res: any) => {
+      .putToolIcon(detail.value.id, fd, loading)
+      .then((res: any) => {
         emit('refresh', res.data)
         dialogVisible.value = false
       })

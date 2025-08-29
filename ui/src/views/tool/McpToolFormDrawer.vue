@@ -109,7 +109,7 @@
         </el-button>
       </div>
     </template>
-    <EditAvatarDialog ref="EditAvatarDialogRef" @refresh="refreshTool" />
+    <EditAvatarDialog ref="EditAvatarDialogRef" @refresh="refreshTool" iconType="MCP" />
   </el-drawer>
 </template>
 

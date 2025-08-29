@@ -29,9 +29,7 @@
         :rules="[
           {
             required: true,
-            message:
-              $t('common.selectPlaceholder') +
-              ` MCP ${$t('views.tool.title')}`,
+            message: $t('common.selectPlaceholder') + ` MCP ${$t('views.tool.title')}`,
           },
         ]"
         prop="mcp_tool_id"
@@ -48,8 +46,17 @@
             :value="mcpTool.id"
           >
             <div class="flex align-center">
-              <el-avatar shape="square" :size="20" class="mr-8">
-                <img src="@/assets/workflow/icon_mcp.svg" style="width: 75%" alt=""/>
+              <el-avatar
+                v-if="mcpTool?.icon"
+                shape="square"
+                :size="20"
+                style="background: none"
+                class="mr-8"
+              >
+                <img :src="resetUrl(mcpTool?.icon)" alt="" />
+              </el-avatar>
+              <el-avatar v-else shape="square" :size="20" class="mr-8">
+                <img src="@/assets/workflow/icon_mcp.svg" style="width: 75%" alt="" />
               </el-avatar>
               <span>{{ mcpTool.name }}</span>
               <el-tag v-if="mcpTool.scope === 'SHARED'" type="info" class="info-tag ml-8 mt-4">
@@ -96,9 +103,10 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import {ref, watch} from 'vue'
-import {MsgError} from "@/utils/message.ts";
-import {t} from "@/locales";
+import { ref, watch } from 'vue'
+import { MsgError } from '@/utils/message.ts'
+import { t } from '@/locales'
+import { resetUrl } from '@/utils/common'
 
 const emit = defineEmits(['refresh'])
 
@@ -142,9 +150,8 @@ function mcpSourceChange() {
   }
 }
 
-
 const open = (data: any, selectOptions: any) => {
-  form.value = {...form.value, ...data}
+  form.value = { ...form.value, ...data }
   if (data.mcp_servers) {
     form.value.mcp_source = 'custom'
   } else if (data.mcp_tool_id) {
@@ -173,6 +180,6 @@ const submit = () => {
   })
 }
 
-defineExpose({open})
+defineExpose({ open })
 </script>
 <style lang="scss" scoped></style>

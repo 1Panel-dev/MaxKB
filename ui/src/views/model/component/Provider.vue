@@ -13,7 +13,7 @@
               style="font-size: 18px"
               class="color-primary"
             ></AppIcon>
-            <span class="ml-8 lighter">{{ $t('views.shared.shared_model') }}</span>
+            <span class="ml-8">{{ $t('views.shared.shared_model') }}</span>
           </div>
         </div>
         <div

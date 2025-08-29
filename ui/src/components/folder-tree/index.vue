@@ -19,7 +19,7 @@
             style="font-size: 18px"
             class="color-primary"
           ></AppIcon>
-          <span class="ml-8 lighter">{{ shareTitle }}</span>
+          <span class="ml-8">{{ shareTitle }}</span>
         </div>
       </div>
 
