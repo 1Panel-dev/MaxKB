@@ -765,21 +765,21 @@ const stopTimer = () => {
 
 const getQuestion = () => {
   if (!inputValue.value.trim()) {
-    const fileLenth = [
+    const fileLength = [
       uploadImageList.value.length > 0,
       uploadDocumentList.value.length > 0,
       uploadAudioList.value.length > 0,
       uploadOtherList.value.length > 0,
     ]
-    if (fileLenth.filter((f) => f).length > 1) {
+    if (fileLength.filter((f) => f).length > 1) {
       return t('chat.uploadFile.otherMessage')
-    } else if (fileLenth[0]) {
+    } else if (fileLength[0]) {
       return t('chat.uploadFile.imageMessage')
-    } else if (fileLenth[1]) {
+    } else if (fileLength[1]) {
       return t('chat.uploadFile.documentMessage')
-    } else if (fileLenth[2]) {
+    } else if (fileLength[2]) {
       return t('chat.uploadFile.audioMessage')
-    } else if (fileLenth[3]) {
+    } else if (fileLength[3]) {
       return t('chat.uploadFile.otherMessage')
     }
   }
