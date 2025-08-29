@@ -1,5 +1,5 @@
 <template>
-  <div class="breadcrumb ml-4 mt-4 mb-12 flex">
+  <div class="breadcrumb ml-4 mt-4 mb-12 flex align-center">
     <back-button  @click="toBack"></back-button>
     <div class="flex align-center">
       <el-avatar

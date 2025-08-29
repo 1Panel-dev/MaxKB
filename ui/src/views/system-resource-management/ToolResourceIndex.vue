@@ -89,13 +89,13 @@
               <el-icon class="color-success mr-8" style="font-size: 16px">
                 <SuccessFilled />
               </el-icon>
-              <span class="color-secondary">
+              <span class="color-text-primary">
                 {{ $t('common.status.enabled') }}
               </span>
             </div>
             <div v-else class="flex align-center">
               <AppIcon iconName="app-disabled" class="color-secondary mr-8"></AppIcon>
-              <span class="color-secondary">
+              <span class="color-text-primary">
                 {{ $t('common.status.disabled') }}
               </span>
             </div>

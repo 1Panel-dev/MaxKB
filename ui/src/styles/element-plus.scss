@@ -248,6 +248,11 @@
   color: var(--el-text-color-primary);
 }
 
+.el-form-item__content {
+  font-weight: 400 !important;
+  color: var(--el-text-color-primary);
+}
+
 .el-form-item__error {
   position: unset;
   font-size: 14px;
@@ -285,6 +290,20 @@
   font-weight: 400;
 }
 
+// el-select
+.el-select__selected-item {
+  color: var(--el-text-color-primary);
+  font-weight: 400;
+}
+.el-select__caret {
+  color: var(--app-text-color-secondary);
+}
+
+// el-textarea
+.el-textarea {
+  --el-input-text-color: var(--el-text-color-primary);
+}
+
 // el-input
 .el-input {
   --el-input-text-color: var(--el-text-color-primary);
@@ -304,6 +323,9 @@
 .el-pagination .el-select {
   width: 105px;
 }
+.el-pagination__total {
+  color: var(--el-text-color-primary);
+}
 
 // el-checkbox
 .el-checkbox {
@@ -317,6 +339,7 @@
 // el-radio
 .el-radio {
   --el-radio-font-weight: 400;
+  color: var(--el-text-color-primary);
 }
 .el-radio__input.is-checked + .el-radio__label {
   color: var(--el-text-color-primary);

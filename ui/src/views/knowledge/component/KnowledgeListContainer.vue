@@ -189,7 +189,7 @@
                   <KnowledgeIcon :type="item.type" />
                 </template>
                 <template #subTitle>
-                  <el-text class="color-secondary" size="small">
+                  <el-text class="color-secondary lighter" size="small">
                     {{ $t('common.creator') }}: {{ item.nick_name }}
                   </el-text>
                 </template>

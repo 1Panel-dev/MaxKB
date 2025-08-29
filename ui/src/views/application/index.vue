@@ -195,7 +195,7 @@
                     </el-avatar>
                   </template>
                   <template #subTitle>
-                    <el-text class="color-secondary" size="small">
+                    <el-text class="color-secondary lighter" size="small">
                       <auto-tooltip :content="item.username">
                         {{ $t('common.creator') }}: {{ item.nick_name }}
                       </auto-tooltip>

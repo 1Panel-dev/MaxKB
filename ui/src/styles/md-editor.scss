@@ -1,5 +1,10 @@
 .md-editor {
   font-weight: 400;
+  --md-color: var(--el-text-color-primary);
+  .cm-content {
+    font-weight: 400;
+    color: var(--el-text-color-primary);
+  }
 }
 
 .md-editor-preview {
@@ -7,6 +12,7 @@
   margin: 0;
   font-size: inherit;
   word-break: break-word;
+  color: var(--el-text-color-primary);
   table {
     display: block;
   }
