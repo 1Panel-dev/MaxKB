@@ -37,12 +37,17 @@ const selected = (activeValue: string | number) => {
       props.modelValue.filter((i: any) => i != activeValue),
     )
   } else {
-    emit('update:modelValue', props.modelValue ? [...props.modelValue, activeValue] : [activeValue])
+    emit('update:modelValue', reset(activeValue))
   }
   if (elFormItem?.validate) {
     elFormItem.validate('change')
   }
 }
+const reset = (activeValue: string) => {
+  const _result = props.modelValue ? [...props.modelValue, activeValue] : [activeValue]
+  return _result.filter((r) => option_value_list.value.includes(r))
+}
+
 const _value = computed(() => {
   return props.modelValue ? props.modelValue : []
 })
@@ -55,7 +60,9 @@ const textField = computed(() => {
 const valueField = computed(() => {
   return props.formField.value_field ? props.formField.value_field : 'value'
 })
-
+const option_value_list = computed(() => {
+  return option_list.value.map((item) => item[valueField.value])
+})
 const option_list = computed(() => {
   return props.formField.option_list ? props.formField.option_list : []
 })
