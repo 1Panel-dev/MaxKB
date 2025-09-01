@@ -12,6 +12,7 @@ export default {
     RadioRow: '单行选项卡',
     UploadInput: '文件上传',
     TextareaInput: '多行文本框',
+    MultiRow: '单行多选卡',
   },
   default: {
     label: '默认值',

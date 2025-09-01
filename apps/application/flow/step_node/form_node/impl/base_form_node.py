@@ -16,6 +16,11 @@ from application.flow.common import Answer
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.form_node.i_form_node import IFormNode
 
+multi_select_list = [
+    'MultiSelect',
+    'MultiRow'
+]
+
 
 def get_default_option(option_list, _type, value_field):
     try:
@@ -23,10 +28,10 @@ def get_default_option(option_list, _type, value_field):
             default_value_list = [o.get(value_field) for o in option_list if o.get('default')]
             if len(default_value_list) == 0:
                 return [option_list[0].get(
-                    value_field)] if _type == 'MultiSelect' else option_list[0].get(
+                    value_field)] if multi_select_list.__contains__(_type) else option_list[0].get(
                     value_field)
             else:
-                if _type == 'MultiSelect':
+                if multi_select_list.__contains__(_type):
                     return default_value_list
                 else:
                     return default_value_list[0]
@@ -84,7 +89,7 @@ class BaseFormNode(IFormNode):
                 if tooltip is not None:
                     _value.get('attrs')['tooltip'] = generate_prompt(self.workflow_manage, tooltip)
 
-        if ['SingleSelect', 'MultiSelect', 'RadioCard', 'RadioRow'].__contains__(field.get('input_type')):
+        if ['SingleSelect', 'MultiSelect', 'RadioCard', 'RadioRow', 'MultiRow'].__contains__(field.get('input_type')):
             if field.get('assignment_method') == 'ref_variables':
                 option_list = self.workflow_manage.get_reference_field(field.get('option_list')[0],
                                                                        field.get('option_list')[1:])
