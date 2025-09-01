@@ -150,7 +150,9 @@ class ApplicationChatRecordQuerySerializers(serializers.Serializer):
                 chat_record.save()
         show_source_dict = {'knowledge_list': knowledge_list,
                             'paragraph_list': paragraph_list, }
-        show_exec_dict = {'execution_details': [chat_record.details[key] for key in chat_record.details]}
+        show_exec_dict = {'execution_details': [chat_record.details[key] for key in chat_record.details if
+                                                (True if show_exec else chat_record.details[key].get(
+                                                    'type') == 'start-node')]}
         return {
             **ChatRecordSerializerModel(chat_record).data,
             'padding_problem_text': chat_record.details.get('problem_padding').get(
