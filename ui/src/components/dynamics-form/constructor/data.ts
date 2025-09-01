@@ -33,6 +33,10 @@ const input_type_list = [
     value: 'RadioRow',
   },
   {
+    label: t('dynamicsForm.input_type_list.MultiRow'),
+    value: 'MultiRow',
+  },
+  {
     label: t('dynamicsForm.input_type_list.Slider'),
     value: 'Slider',
   },
