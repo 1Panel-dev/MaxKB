@@ -86,7 +86,7 @@ const useUserStore = defineStore('user', {
       return this.edition != 'CE' && !this.license_is_valid
     },
     isCE() {
-      return this.edition == 'CE' && this.license_is_valid
+      return this.edition == 'CE'
     },
     isPE() {
       return this.edition == 'PE' && this.license_is_valid

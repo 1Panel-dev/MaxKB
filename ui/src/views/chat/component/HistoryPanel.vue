@@ -111,7 +111,11 @@
         <template #title>{{ $t('chat.createChat') }}</template>
       </el-menu-item>
 
-      <el-sub-menu v-show="isPcCollapse" index="2" v-if="applicationDetail.show_history || user.isCE()">
+      <el-sub-menu
+        v-show="isPcCollapse"
+        index="2"
+        v-if="applicationDetail.show_history || user.isCE()"
+      >
         <template #title>
           <AppIcon iconName="app-history-outlined" />
         </template>
@@ -171,9 +175,9 @@
 import { ref } from 'vue'
 import { isAppIcon } from '@/utils/common'
 import EditTitleDialog from './EditTitleDialog.vue'
-import useStore from "@/stores";
+import useStore from '@/stores'
 
-const {user} = useStore()
+const { user } = useStore()
 const props = defineProps<{
   applicationDetail: any
   chatLogData: any[]
