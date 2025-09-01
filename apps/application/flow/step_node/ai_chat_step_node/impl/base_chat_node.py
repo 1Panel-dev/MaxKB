@@ -271,6 +271,9 @@ class BaseChatNode(IChatNode):
 
         mcp_servers_config = {}
 
+        # 迁移过来mcp_source是None
+        if mcp_source is None:
+            mcp_source = 'custom'
         if mcp_enable:
             if mcp_source == 'custom' and mcp_servers is not None and '"stdio"' not in mcp_servers:
                 mcp_servers_config = json.loads(mcp_servers)
