@@ -27,9 +27,9 @@
             </span>
           </div>
           <div class="flex align-center">
-            <div>{{ formatSize(file.size) }}</div>
+            <div class="ellipsis-1" :title="formatSize(file.size)">{{ formatSize(file.size) }}</div>
 
-            <el-button link class="ml-8" @click="deleteFile(file)">
+            <el-button link class="ml-8" @click="deleteFile(file)" v-if="!inputDisabled">
               <AppIcon iconName="app-delete"></AppIcon>
             </el-button>
           </div>
@@ -141,6 +141,15 @@ const uploadFile = async (file: any, fileList: Array<any>) => {
   }
 }
 .debug-ai-chat {
+  .upload_content {
+    &.media-file-width {
+      :deep(.el-space__item) {
+        min-width: 100% !important;
+      }
+    }
+  }
+}
+.execution-details {
   .upload_content {
     &.media-file-width {
       :deep(.el-space__item) {
