@@ -288,6 +288,9 @@ const validate = () => {
 
 onMounted(() => {
   getSelectModel()
+  form_data.value.show_knowledge = form_data.value.show_knowledge
+    ? form_data.value.show_knowledge
+    : false
   set(props.nodeModel, 'validate', validate)
 })
 </script>
