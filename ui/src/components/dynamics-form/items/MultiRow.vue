@@ -43,7 +43,7 @@ const selected = (activeValue: string | number) => {
     elFormItem.validate('change')
   }
 }
-const reset = (activeValue: string) => {
+const reset = (activeValue: string | number) => {
   const _result = props.modelValue ? [...props.modelValue, activeValue] : [activeValue]
   return _result.filter((r) => option_value_list.value.includes(r))
 }

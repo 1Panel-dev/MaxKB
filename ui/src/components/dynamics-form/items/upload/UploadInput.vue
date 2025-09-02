@@ -72,7 +72,7 @@ const deleteFile = (file: any) => {
 
 const model_value = computed({
   get: () => {
-    if (!model_value.value) {
+    if (!props.modelValue) {
       emit('update:modelValue', [])
     }
     return props.modelValue
