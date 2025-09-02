@@ -12,6 +12,7 @@ export default {
     RadioRow: 'Radio Row',
     UploadInput: 'File upload',
     TextareaInput: 'Multiline Input',
+    MultiRow: 'Multi Row',
   },
   default: {
     label: 'Default',
