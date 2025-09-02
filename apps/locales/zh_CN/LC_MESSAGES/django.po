@@ -8796,3 +8796,6 @@ msgstr "如果未传递，则默认值为'zh'"
 
 msgid "System resources authorization"
 msgstr "系统资源授权"
+
+msgid "This folder contains resources that you dont have permission"
+msgstr "此文件夹包含您没有权限的资源"

@@ -8670,3 +8670,6 @@ msgstr ""
 
 msgid "System resources authorization"
 msgstr ""
+
+msgid "This folder contains resources that you dont have permission"
+msgstr ""
