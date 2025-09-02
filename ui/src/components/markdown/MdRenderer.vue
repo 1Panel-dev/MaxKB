@@ -12,7 +12,7 @@
         :class="sendMessage && type !== 'log' ? 'cursor' : 'disabled'"
       >
         <el-space :size="8" alignment="flex-start">
-          <AppIcon iconName="app-edit" class="color-primary" style="margin-top: 3px;"></AppIcon>
+          <AppIcon iconName="app-edit" class="color-primary" style="margin-top: 3px"></AppIcon>
           {{ item.content }}
         </el-space>
       </div>
@@ -48,6 +48,7 @@ import HtmlRander from './HtmlRander.vue'
 import EchartsRander from './EchartsRander.vue'
 import FormRander from './FormRander.vue'
 import ReasoningRander from './ReasoningRander.vue'
+import { nanoid } from 'nanoid'
 config({
   markdownItConfig(md) {
     md.renderer.rules.image = (tokens, idx, options, env, self) => {
@@ -204,16 +205,68 @@ const split_form_rander = (result: Array<any>) => {
       return [...x, ...y]
     }, [])
 }
+function extractFormRanderContent(html: string) {
+  const results = []
+  const startTag = '<form_rander>'
+  const endTag = '</form_rander>'
 
+  let startIndex = html.indexOf(startTag)
+
+  while (startIndex !== -1) {
+    let endIndex = html.indexOf(endTag, startIndex)
+    let depth = 1
+    let tempIndex = startIndex + startTag.length
+
+    // 查找匹配的结束标签
+    while (depth > 0 && tempIndex < html.length) {
+      const nextStart = html.indexOf(startTag, tempIndex)
+      const nextEnd = html.indexOf(endTag, tempIndex)
+
+      if (nextStart !== -1 && nextStart < nextEnd) {
+        depth++
+        tempIndex = nextStart + startTag.length
+      } else if (nextEnd !== -1) {
+        depth--
+        tempIndex = nextEnd + endTag.length
+        if (depth === 0) {
+          endIndex = nextEnd
+        }
+      } else {
+        break
+      }
+    }
+
+    if (endIndex !== -1) {
+      // 提取内容（去掉开始和结束标签）
+      const contentStart = startIndex + startTag.length
+      const content = html.substring(contentStart, endIndex)
+      results.push(content)
+      startIndex = html.indexOf(startTag, endIndex + endTag.length)
+    } else {
+      break
+    }
+  }
+
+  return results
+}
+const _split_form_rander = (source: string, form_rander_list: Array<string>) => {
+  const uuid = nanoid()
+  if (form_rander_list.length > 0) {
+    form_rander_list.forEach((item) => {
+      source = source.replace(`<form_rander>${item}</form_rander>`, uuid)
+    })
+  }
+  return source
+    .split(uuid)
+    .filter((item) => item !== undefined)
+    .filter((item) => !form_rander_list?.includes(item))
+}
 const split_form_rander_ = (source: string, type: string) => {
-  const temp_md_quick_question_list = source.match(/<form_rander>[\d\D]*?<\/form_rander>/g)
+  const temp_md_quick_question_list = extractFormRanderContent(source)
   const md_quick_question_list = temp_md_quick_question_list
     ? temp_md_quick_question_list.filter((i) => i)
     : []
-  const split_quick_question_value = source
-    .split(/<form_rander>[\d\D]*?<\/form_rander>/g)
-    .filter((item) => item !== undefined)
-    .filter((item) => !md_quick_question_list?.includes(item))
+  const split_quick_question_value = _split_form_rander(source, md_quick_question_list)
   const result = Array.from(
     { length: md_quick_question_list.length + split_quick_question_value.length },
     (v, i) => i,
@@ -223,12 +276,11 @@ const split_form_rander_ = (source: string, type: string) => {
     } else {
       return {
         type: 'form_rander',
-        content: md_quick_question_list[Math.floor(index / 2)]
-          .replace('<form_rander>', '')
-          .replace('</form_rander>', ''),
+        content: md_quick_question_list[Math.floor(index / 2)],
       }
     }
   })
+
   return result
 }
 </script>
