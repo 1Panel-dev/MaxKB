@@ -56,8 +56,8 @@ class ProblemView(APIView):
         tags=[_('Knowledge Base/Documentation/Paragraph/Question')]  # type: ignore
     )
     @has_permissions(
-        PermissionConstants.KNOWLEDGE_PROBLEM_EDIT.get_workspace_knowledge_permission(),
-        PermissionConstants.KNOWLEDGE_PROBLEM_EDIT.get_workspace_permission_workspace_manage_role(),
+        PermissionConstants.KNOWLEDGE_PROBLEM_CREATE.get_workspace_knowledge_permission(),
+        PermissionConstants.KNOWLEDGE_PROBLEM_CREATE.get_workspace_permission_workspace_manage_role(),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         ViewPermission([RoleConstants.USER.get_workspace_role()],
                        [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], CompareConstants.AND),
