@@ -12,6 +12,7 @@ from typing import List
 from django.core.cache import cache
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 
 from application.chat_pipeline.step.chat_step.i_chat_step import PostResponseHandler
 from application.models import Application, ChatRecord, Chat, ApplicationVersion, ChatUserType, ApplicationTypeChoices, \
@@ -213,7 +214,7 @@ class ChatInfo:
                      chat_user_id=self.chat_user_id, chat_user_type=self.chat_user_type,
                      asker=self.get_chat_user()).save()
             else:
-                QuerySet(Chat).filter(id=self.chat_id).update(update_time=datetime.now())
+                QuerySet(Chat).filter(id=self.chat_id).update(update_time=timezone.now())
             # 插入会话记录
             chat_record.save()
             ChatCountSerializer(data={'chat_id': self.chat_id}).update_chat()
