@@ -24,6 +24,8 @@ class BaseMcpNode(IMcpNode):
             tool = QuerySet(Tool).filter(id=mcp_tool_id).first()
             if not tool:
                 raise ValueError(f"Tool with ID {mcp_tool_id} not found.")
+            if not tool.is_active:
+                raise ValueError(f"Tool with ID {mcp_tool_id} is inactive.")
             servers = json.loads(tool.code)
             params = json.loads(json.dumps(tool_params))
             params = self.handle_variables(params)
