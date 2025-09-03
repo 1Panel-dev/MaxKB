@@ -515,7 +515,8 @@ class ToolSerializer(serializers.Serializer):
 
         def one(self):
             self.is_one_valid(raise_exception=True)
-            tool = QuerySet(Tool).filter(id=self.data.get('id')).first()
+            tool = QuerySet(Tool).filter(id=self.data.get('id')).select_related('user').first()
+            nick_name = tool.user.nick_name if tool and tool.user else None
             if tool.init_params:
                 tool.init_params = json.loads(rsa_long_decrypt(tool.init_params))
             if tool.init_field_list:
@@ -528,6 +529,7 @@ class ToolSerializer(serializers.Serializer):
             return {
                 **ToolModelSerializer(tool).data,
                 'init_params': tool.init_params if tool.init_params else {},
+                'nick_name': nick_name
             }
 
         def export(self):
