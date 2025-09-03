@@ -137,7 +137,9 @@
             chat_data.mcp_tool_id || (chat_data.mcp_servers && chat_data.mcp_servers.length > 0)
           "
         >
-          <div class="flex-between border border-r-6 white-bg mb-4" style="padding: 5px 8px">
+          <div class="flex-between border border-r-6 white-bg mb-4" style="padding: 5px 8px"
+            v-if="relatedObject(mcpToolSelectOptions, chat_data.mcp_tool_id, 'id')"
+          >
             <div class="flex align-center" style="line-height: 20px">
               <el-avatar
                 v-if="relatedObject(mcpToolSelectOptions, chat_data.mcp_tool_id, 'id')?.icon"

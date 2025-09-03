@@ -531,7 +531,7 @@ onMounted(() => {
       set(props.nodeModel.properties.node_data, 'is_result', true)
     }
   }
-  if (props.nodeModel.properties.node_data.mcp_servers) {
+  if (props.nodeModel.properties.node_data.mcp_servers && !props.nodeModel.properties.node_data.mcp_source) {
     set(props.nodeModel.properties.node_data, 'mcp_source', 'custom')
   }
   getMcpToolSelectOptions()
