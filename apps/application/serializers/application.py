@@ -739,7 +739,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
         application.is_publish = True
         application.save()
         work_flow_version = ApplicationVersion(work_flow=application.work_flow, application=application,
-                                               name=timezone.now().strftime('%Y-%m-%d %H:%M:%S'),
+                                               name=timezone.localtime(timezone.now()).strftime('%Y-%m-%d %H:%M:%S'),
                                                publish_user_id=user_id,
                                                publish_user_name=user.username,
                                                workspace_id=workspace_id)
