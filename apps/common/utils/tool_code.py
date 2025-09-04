@@ -40,7 +40,7 @@ class ToolExecutor:
     def exec_code(self, code_str, keywords):
         self.validate_banned_keywords(code_str)
         _id = str(uuid.uuid7())
-        success = '{"code":200,"msg":"成功","data":json.dumps(exec_result, default=str)}'
+        success = '{"code":200,"msg":"成功","data":exec_result}'
         err = '{"code":500,"msg":str(e),"data":None}'
         result_path = f'{self.sandbox_path}/result/{_id}.result'
         python_paths = CONFIG.get_sandbox_python_package_paths().split(',')
@@ -65,7 +65,7 @@ try:
         globals_v[local] = locals_v[local]
     exec_result=f(**keywords)
     with open({result_path!a}, 'w') as file:
-        file.write(json.dumps({success}))
+        file.write(json.dumps({success}, default=str))
 except Exception as e:
     with open({result_path!a}, 'w') as file:
         file.write(json.dumps({err}))
