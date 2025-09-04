@@ -1,7 +1,7 @@
 # coding=utf-8
 import ast
 import os
-import pickle
+import json
 import subprocess
 import sys
 from textwrap import dedent
@@ -40,7 +40,7 @@ class ToolExecutor:
     def exec_code(self, code_str, keywords):
         self.validate_banned_keywords(code_str)
         _id = str(uuid.uuid7())
-        success = '{"code":200,"msg":"成功","data":exec_result}'
+        success = '{"code":200,"msg":"成功","data":json.dumps(exec_result, default=str)}'
         err = '{"code":500,"msg":str(e),"data":None}'
         result_path = f'{self.sandbox_path}/result/{_id}.result'
         python_paths = CONFIG.get_sandbox_python_package_paths().split(',')
@@ -48,7 +48,7 @@ class ToolExecutor:
 try:
     import os
     import sys
-    import pickle
+    import json
     path_to_exclude = ['/opt/py3/lib/python3.11/site-packages', '/opt/maxkb-app/apps']
     sys.path = [p for p in sys.path if p not in path_to_exclude]
     sys.path += {python_paths}
@@ -64,11 +64,11 @@ try:
     for local in locals_v:
         globals_v[local] = locals_v[local]
     exec_result=f(**keywords)
-    with open({result_path!a}, 'wb') as file:
-        file.write(pickle.dumps({success}))
+    with open({result_path!a}, 'w') as file:
+        file.write(json.dumps({success}))
 except Exception as e:
-    with open({result_path!a}, 'wb') as file:
-        file.write(pickle.dumps({err}))
+    with open({result_path!a}, 'w') as file:
+        file.write(json.dumps({err}))
 """
         if self.sandbox:
             subprocess_result = self._exec_sandbox(_exec_code, _id)
@@ -76,8 +76,8 @@ except Exception as e:
             subprocess_result = self._exec(_exec_code)
         if subprocess_result.returncode == 1:
             raise Exception(subprocess_result.stderr)
-        with open(result_path, 'rb') as file:
-            result = pickle.loads(file.read())
+        with open(result_path, 'r') as file:
+            result = json.loads(file.read())
         os.remove(result_path)
         if result.get('code') == 200:
             return result.get('data')
