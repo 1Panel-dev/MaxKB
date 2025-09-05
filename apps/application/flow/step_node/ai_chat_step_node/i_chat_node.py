@@ -58,6 +58,7 @@ class IChatNode(INode):
                 model_setting=None,
                 mcp_enable=False,
                 mcp_servers=None,
+                mcp_tool_id=None,
                 mcp_tool_ids=None,
                 mcp_source=None,
                 tool_enable=False,
