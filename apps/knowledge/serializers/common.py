@@ -177,7 +177,7 @@ def write_image(zip_path: str, image_list: List[str]):
                 file = QuerySet(File).filter(id=r).first()
                 if file is None:
                     break
-                zip_inner_path = os.path.join('api', 'file', r)
+                zip_inner_path = os.path.join('oss', 'file', r)
                 file_path = os.path.join(zip_path, zip_inner_path)
                 if not os.path.exists(os.path.dirname(file_path)):
                     os.makedirs(os.path.dirname(file_path))
