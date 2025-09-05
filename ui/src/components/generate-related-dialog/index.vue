@@ -28,7 +28,21 @@
             <p>{{ $t('views.document.generateQuestion.tip4') }}</p>
           </div>
         </div>
-        <el-form-item :label="$t('views.application.form.aiModel.label')" prop="model_id">
+        <el-form-item prop="model_id">
+          <template #label>
+            <div class="flex-between">
+              <span>{{ $t('views.application.form.aiModel.label') }}</span>
+              <el-button
+                type="primary"
+                link
+                @click="openAIParamSettingDialog"
+                :disabled="!form.model_id"
+              >
+                <AppIcon iconName="app-setting" class="mr-4"></AppIcon>
+                {{ $t('common.paramSetting') }}
+              </el-button>
+            </div>
+          </template>
           <ModelSelect
             v-model="form.model_id"
             :placeholder="$t('views.application.form.aiModel.placeholder')"
@@ -68,6 +82,8 @@
       </span>
     </template>
   </el-dialog>
+  <AIModeParamSettingDialog ref="AIModeParamSettingDialogRef" @refresh="refreshForm" />
+
 </template>
 <script setup lang="ts">
 import { reactive, ref, watch, computed } from 'vue'
@@ -78,6 +94,7 @@ import { MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
 import type { FormInstance } from 'element-plus'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import AIModeParamSettingDialog from "@/views/application/component/AIModeParamSettingDialog.vue";
 
 const props = defineProps<{
   apiType: 'systemShare' | 'workspace' | 'systemManage' | 'workspaceShare'
@@ -130,6 +147,21 @@ watch(dialogVisible, (bool) => {
     FormRef.value?.clearValidate()
   }
 })
+const AIModeParamSettingDialogRef = ref()
+const openAIParamSettingDialog = () => {
+  if (form.value.model_id) {
+    AIModeParamSettingDialogRef.value?.open(
+      form.value.model_id,
+      id,
+      form.value.model_params_setting,
+    )
+  }
+}
+
+function refreshForm(data: any) {
+  form.value.model_params_setting = data
+}
+
 
 const open = (ids: string[], type: string, _knowledge?: any) => {
   currentKnowledge.value = _knowledge

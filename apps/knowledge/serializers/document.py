@@ -1305,6 +1305,7 @@ class DocumentSerializers(serializers.Serializer):
             document_id_list = instance.get("document_id_list")
             model_id = instance.get("model_id")
             prompt = instance.get("prompt")
+            model_params_setting = instance.get("model_params_setting")
             state_list = instance.get('state_list')
             ListenerManagement.update_status(
                 QuerySet(Document).filter(id__in=document_id_list),
@@ -1327,7 +1328,7 @@ class DocumentSerializers(serializers.Serializer):
                 QuerySet(Document).filter(id__in=document_id_list))()
             try:
                 for document_id in document_id_list:
-                    generate_related_by_document_id.delay(document_id, model_id, prompt, state_list)
+                    generate_related_by_document_id.delay(document_id, model_id, model_params_setting, prompt, state_list)
             except AlreadyQueued as e:
                 pass
 

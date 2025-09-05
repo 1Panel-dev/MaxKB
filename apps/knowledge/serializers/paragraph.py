@@ -480,6 +480,7 @@ class ParagraphSerializers(serializers.Serializer):
             paragraph_id_list = instance.get("paragraph_id_list")
             model_id = instance.get("model_id")
             prompt = instance.get("prompt")
+            model_params_setting = instance.get("model_params_setting")
             document_id = self.data.get('document_id')
             ListenerManagement.update_status(
                 QuerySet(Document).filter(id=document_id),
@@ -493,7 +494,7 @@ class ParagraphSerializers(serializers.Serializer):
             )
             ListenerManagement.get_aggregation_document_status(document_id)()
             try:
-                generate_related_by_paragraph_id_list.delay(document_id, paragraph_id_list, model_id, prompt)
+                generate_related_by_paragraph_id_list.delay(document_id, paragraph_id_list, model_id, model_params_setting, prompt)
             except AlreadyQueued as e:
                 raise AppApiException(500, _('The task is being executed, please do not send it again.'))
 

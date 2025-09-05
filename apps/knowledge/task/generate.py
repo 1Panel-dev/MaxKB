@@ -18,9 +18,9 @@ from models_provider.tools import get_model
 from ops import celery_app
 
 
-def get_llm_model(model_id):
+def get_llm_model(model_id, model_params_setting=None):
     model = QuerySet(Model).filter(id=model_id).first()
-    return ModelManage.get_model(model_id, lambda _id: get_model(model))
+    return ModelManage.get_model(model_id, lambda _id: get_model(model, **(model_params_setting or {})))
 
 
 def generate_problem_by_paragraph(paragraph, llm_model, prompt):
@@ -64,18 +64,18 @@ def get_is_the_task_interrupted(document_id):
 
 @celery_app.task(base=QueueOnce, once={'keys': ['knowledge_id']},
                  name='celery:generate_related_by_knowledge')
-def generate_related_by_knowledge_id(knowledge_id, model_id, prompt, state_list=None):
+def generate_related_by_knowledge_id(knowledge_id, model_id, model_params_setting, prompt, state_list=None):
     document_list = QuerySet(Document).filter(knowledge_id=knowledge_id)
     for document in document_list:
         try:
-            generate_related_by_document_id.delay(document.id, model_id, prompt, state_list)
+            generate_related_by_document_id.delay(document.id, model_id, model_params_setting, prompt, state_list)
         except Exception as e:
             pass
 
 
 @celery_app.task(base=QueueOnce, once={'keys': ['document_id']},
                  name='celery:generate_related_by_document')
-def generate_related_by_document_id(document_id, model_id, prompt, state_list=None):
+def generate_related_by_document_id(document_id, model_id, model_params_setting, prompt, state_list=None):
     if state_list is None:
         state_list = [State.PENDING.value, State.STARTED.value, State.SUCCESS.value, State.FAILURE.value,
                       State.REVOKE.value,
@@ -87,7 +87,7 @@ def generate_related_by_document_id(document_id, model_id, prompt, state_list=No
         ListenerManagement.update_status(QuerySet(Document).filter(id=document_id),
                                          TaskType.GENERATE_PROBLEM,
                                          State.STARTED)
-        llm_model = get_llm_model(model_id)
+        llm_model = get_llm_model(model_id, model_params_setting)
 
         # 生成问题函数
         generate_problem = get_generate_problem(llm_model, prompt,
@@ -110,7 +110,7 @@ def generate_related_by_document_id(document_id, model_id, prompt, state_list=No
 
 @celery_app.task(base=QueueOnce, once={'keys': ['paragraph_id_list']},
                  name='celery:generate_related_by_paragraph_list')
-def generate_related_by_paragraph_id_list(document_id, paragraph_id_list, model_id, prompt):
+def generate_related_by_paragraph_id_list(document_id, paragraph_id_list, model_id, model_params_setting, prompt):
     try:
         is_the_task_interrupted = get_is_the_task_interrupted(document_id)
         if is_the_task_interrupted():
@@ -121,7 +121,7 @@ def generate_related_by_paragraph_id_list(document_id, paragraph_id_list, model_
         ListenerManagement.update_status(QuerySet(Document).filter(id=document_id),
                                          TaskType.GENERATE_PROBLEM,
                                          State.STARTED)
-        llm_model = get_llm_model(model_id)
+        llm_model = get_llm_model(model_id, model_params_setting)
         # 生成问题函数
         generate_problem = get_generate_problem(llm_model, prompt, ListenerManagement.get_aggregation_document_status(
             document_id))

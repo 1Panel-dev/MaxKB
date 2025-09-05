@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { t } from '@/locales'
 export interface promptTypes {
   user: string
-  formValue: { model_id: string; prompt: string }
+  formValue: { model_id: string; prompt: string; model_params_setting: any }
 }
 
 const usePromptStore = defineStore('prompt', {
@@ -25,6 +25,7 @@ const usePromptStore = defineStore('prompt', {
       }
       return {
         model_id: '',
+        model_params_setting: {},
         prompt:
           t('views.document.generateQuestion.prompt1', { data: '{data}' }) +
           '<question></question>' +

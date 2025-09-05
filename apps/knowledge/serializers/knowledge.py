@@ -267,6 +267,7 @@ class KnowledgeSerializer(serializers.Serializer):
             knowledge_id = self.data.get('knowledge_id')
             model_id = instance.get("model_id")
             prompt = instance.get("prompt")
+            model_params_setting = instance.get("model_params_setting")
             state_list = instance.get('state_list')
             ListenerManagement.update_status(
                 QuerySet(Document).filter(knowledge_id=knowledge_id),
@@ -285,7 +286,7 @@ class KnowledgeSerializer(serializers.Serializer):
             )
             ListenerManagement.get_aggregation_document_status_by_knowledge_id(knowledge_id)()
             try:
-                generate_related_by_knowledge_id.delay(knowledge_id, model_id, prompt, state_list)
+                generate_related_by_knowledge_id.delay(knowledge_id, model_id, model_params_setting, prompt, state_list)
             except AlreadyQueued as e:
                 raise AppApiException(500, _('Failed to send the vectorization task, please try again later!'))
 
