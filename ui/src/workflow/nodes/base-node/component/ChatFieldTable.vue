@@ -84,12 +84,11 @@ function refreshFieldList(data: any, index: any) {
       return
     }
   }
-  if (index !== undefined) {
-    inputFieldList.value.splice(index, 1, data)
-  } else {
+  if ([undefined, null].includes(index)) {
     inputFieldList.value.push(data)
+  } else {
+    inputFieldList.value.splice(index, 1, data)
   }
-
   ChatFieldDialogRef.value.close()
   props.nodeModel.graphModel.eventCenter.emit('chatFieldList')
 }
