@@ -32,13 +32,13 @@
             message: $t('common.selectPlaceholder') + ` MCP ${$t('views.tool.title')}`,
           },
         ]"
-        prop="mcp_tool_id"
+        prop="mcp_tool_ids"
       >
         <template #label>
           {{ `MCP ${$t('views.tool.title')}` }}
           <span class="color-danger">*</span>
         </template>
-        <el-select v-model="form.mcp_tool_id" filterable>
+        <el-select v-model="form.mcp_tool_ids" filterable multiple>
           <el-option
             v-for="mcpTool in mcpToolSelectOptions"
             :key="mcpTool.id"
@@ -121,7 +121,7 @@ const mcpServerJson = `{
 
 const form = ref<any>({
   mcp_servers: '',
-  mcp_tool_id: '',
+  mcp_tool_ids: [],
   mcp_source: 'referencing',
 })
 
@@ -135,7 +135,7 @@ watch(dialogVisible, (bool) => {
   if (!bool) {
     form.value = {
       mcp_servers: '',
-      mcp_tool_id: '',
+      mcp_tool_ids: '',
       mcp_source: 'referencing',
     }
     paramFormRef.value?.clearValidate()
@@ -146,7 +146,7 @@ function mcpSourceChange() {
   if (form.value.mcp_source === 'referencing') {
     form.value.mcp_servers = ''
   } else {
-    form.value.mcp_tool_id = ''
+    form.value.mcp_tool_ids = ''
   }
 }
 
@@ -154,9 +154,9 @@ const open = (data: any, selectOptions: any) => {
   form.value = { ...form.value, ...data }
   if (data.mcp_servers) {
     form.value.mcp_source = 'custom'
-  } else if (data.mcp_tool_id) {
+  } else if (data.mcp_tool_ids) {
     form.value.mcp_source = 'referencing'
-    form.value.mcp_tool_id = data.mcp_tool_id
+    form.value.mcp_tool_ids = data.mcp_tool_ids
     form.value.mcp_servers = ''
   } else {
     form.value.mcp_source = data.mcp_source || 'referencing'
