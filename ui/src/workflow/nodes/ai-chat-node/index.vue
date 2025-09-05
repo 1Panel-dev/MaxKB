@@ -134,38 +134,40 @@
         <div
           class="w-full mb-16"
           v-if="
-            chat_data.mcp_tool_id || (chat_data.mcp_servers && chat_data.mcp_servers.length > 0)
+            chat_data.mcp_tool_ids?.length > 0 || (chat_data.mcp_servers && chat_data.mcp_servers.length > 0)
           "
         >
-          <div class="flex-between border border-r-6 white-bg mb-4" style="padding: 5px 8px"
-            v-if="relatedObject(mcpToolSelectOptions, chat_data.mcp_tool_id, 'id')"
-          >
-            <div class="flex align-center" style="line-height: 20px">
-              <el-avatar
-                v-if="relatedObject(mcpToolSelectOptions, chat_data.mcp_tool_id, 'id')?.icon"
-                shape="square"
-                :size="20"
-                style="background: none"
-                class="mr-8"
-              >
-                <img :src="resetUrl(relatedObject(mcpToolSelectOptions, chat_data.mcp_tool_id, 'id')?.icon)" alt="" />
-              </el-avatar>
-              <ToolIcon v-else type="MCP" class="mr-8" :size="20" />
+          <template v-for="(item, index) in chat_data.mcp_tool_ids" :key="index">
+            <div class="flex-between border border-r-6 white-bg mb-4" style="padding: 5px 8px"
+              v-if="relatedObject(mcpToolSelectOptions, item, 'id')"
+            >
+              <div class="flex align-center" style="line-height: 20px">
+                <el-avatar
+                  v-if="relatedObject(mcpToolSelectOptions, item, 'id')?.icon"
+                  shape="square"
+                  :size="20"
+                  style="background: none"
+                  class="mr-8"
+                >
+                  <img :src="resetUrl(relatedObject(mcpToolSelectOptions, item, 'id')?.icon)" alt="" />
+                </el-avatar>
+                <ToolIcon v-else type="MCP" class="mr-8" :size="20" />
 
-              <div
-                class="ellipsis"
-                :title="relatedObject(mcpToolSelectOptions, chat_data.mcp_tool_id, 'id')?.name"
-              >
-                {{
-                  relatedObject(mcpToolSelectOptions, chat_data.mcp_tool_id, 'id')?.name ||
-                  $t('common.custom') + ' MCP'
-                }}
+                <div
+                  class="ellipsis"
+                  :title="relatedObject(mcpToolSelectOptions, item, 'id')?.name"
+                >
+                  {{
+                    relatedObject(mcpToolSelectOptions, item, 'id')?.name ||
+                    $t('common.custom') + ' MCP'
+                  }}
+                </div>
               </div>
+              <el-button text @click="removeMcpTool(item)">
+                <el-icon><Close /></el-icon>
+              </el-button>
             </div>
-            <el-button text @click="chat_data.mcp_tool_id = ''">
-              <el-icon><Close /></el-icon>
-            </el-button>
-          </div>
+          </template>
         </div>
         <!-- 工具       -->
         <div class="flex-between mb-16">
@@ -424,7 +426,7 @@ const mcpServersDialogRef = ref()
 function openMcpServersDialog() {
   const config = {
     mcp_servers: chat_data.value.mcp_servers,
-    mcp_tool_id: chat_data.value.mcp_tool_id,
+    mcp_tool_ids: chat_data.value.mcp_tool_ids,
     mcp_source: chat_data.value.mcp_source,
   }
   mcpServersDialogRef.value.open(config, mcpToolSelectOptions.value)
@@ -432,7 +434,7 @@ function openMcpServersDialog() {
 
 function submitMcpServersDialog(config: any) {
   set(props.nodeModel.properties.node_data, 'mcp_servers', config.mcp_servers)
-  set(props.nodeModel.properties.node_data, 'mcp_tool_id', config.mcp_tool_id)
+  set(props.nodeModel.properties.node_data, 'mcp_tool_ids', config.mcp_tool_ids)
   set(props.nodeModel.properties.node_data, 'mcp_source', config.mcp_source)
 }
 
@@ -446,6 +448,10 @@ function submitToolDialog(config: any) {
 function removeTool(id: any) {
   const list = props.nodeModel.properties.node_data.tool_ids.filter((v: any) => v !== id)
   set(props.nodeModel.properties.node_data, 'tool_ids', list)
+}
+function removeMcpTool(id: any) {
+  const list = props.nodeModel.properties.node_data.mcp_tool_ids.filter((v: any) => v !== id)
+  set(props.nodeModel.properties.node_data, 'mcp_tool_ids', list)
 }
 
 const toolSelectOptions = ref<any[]>([])
@@ -504,6 +510,11 @@ onMounted(() => {
   set(props.nodeModel, 'validate', validate)
   if (!chat_data.value.dialogue_type) {
     chat_data.value.dialogue_type = 'WORKFLOW'
+  }
+
+  if (props.nodeModel.properties.node_data?.mcp_tool_id) {
+   set(props.nodeModel.properties.node_data, 'mcp_tool_ids', [props.nodeModel.properties.node_data?.mcp_tool_id])
+   set(props.nodeModel.properties.node_data, 'mcp_tool_id', undefined)
   }
 
   getToolSelectOptions()
