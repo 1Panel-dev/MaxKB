@@ -453,6 +453,7 @@ class KnowledgeSerializer(serializers.Serializer):
         def export_zip(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
+            knowledge = QuerySet(Knowledge).filter(id=self.data.get("knowledge_id")).first()
             document_list = QuerySet(Document).filter(knowledge_id=self.data.get('knowledge_id'))
             paragraph_list = native_search(
                 QuerySet(Paragraph).filter(knowledge_id=self.data.get("knowledge_id")),
@@ -472,7 +473,7 @@ class KnowledgeSerializer(serializers.Serializer):
 
             workbook = DocumentSerializers.Operate.get_workbook(data_dict, document_dict)
             response = HttpResponse(content_type='application/zip')
-            response['Content-Disposition'] = 'attachment; filename="archive.zip"'
+            response['Content-Disposition'] = f'attachment; filename="{knowledge.name}.zip"'
             zip_buffer = io.BytesIO()
             with TemporaryDirectory() as tempdir:
                 knowledge_file = os.path.join(tempdir, 'knowledge.xlsx')
