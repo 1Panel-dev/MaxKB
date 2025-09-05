@@ -219,6 +219,7 @@ class BaseChatNode(IChatNode):
                 mcp_enable=False,
                 mcp_servers=None,
                 mcp_tool_id=None,
+                mcp_tool_ids=None,
                 mcp_source=None,
                 tool_enable=False,
                 tool_ids=None,
@@ -247,7 +248,7 @@ class BaseChatNode(IChatNode):
 
         # 处理 MCP 请求
         mcp_result = self._handle_mcp_request(
-            mcp_enable, tool_enable, mcp_source, mcp_servers, mcp_tool_id, tool_ids, chat_model, message_list,
+            mcp_enable, tool_enable, mcp_source, mcp_servers, mcp_tool_id, mcp_tool_ids, tool_ids, chat_model, message_list,
             history_message, question
         )
         if mcp_result:
@@ -264,7 +265,7 @@ class BaseChatNode(IChatNode):
                                'history_message': history_message, 'question': question.content}, {},
                               _write_context=write_context)
 
-    def _handle_mcp_request(self, mcp_enable, tool_enable, mcp_source, mcp_servers, mcp_tool_id, tool_ids,
+    def _handle_mcp_request(self, mcp_enable, tool_enable, mcp_source, mcp_servers, mcp_tool_id, mcp_tool_ids, tool_ids,
                             chat_model, message_list, history_message, question):
         if not mcp_enable and not tool_enable:
             return None
@@ -275,12 +276,18 @@ class BaseChatNode(IChatNode):
         if mcp_source is None:
             mcp_source = 'custom'
         if mcp_enable:
+            # 兼容老数据
+            if not mcp_tool_ids:
+                mcp_tool_ids = []
+            if mcp_tool_id:
+                mcp_tool_ids = list(set(mcp_tool_ids + [mcp_tool_id]))
             if mcp_source == 'custom' and mcp_servers is not None and '"stdio"' not in mcp_servers:
                 mcp_servers_config = json.loads(mcp_servers)
-            elif mcp_tool_id:
-                mcp_tool = QuerySet(Tool).filter(id=mcp_tool_id).first()
-                if mcp_tool and mcp_tool.is_active:
-                    mcp_servers_config = json.loads(mcp_tool.code)
+            elif mcp_tool_ids:
+                mcp_tools = QuerySet(Tool).filter(id__in=mcp_tool_ids).values()
+                for mcp_tool in mcp_tools:
+                    if mcp_tool and mcp_tool['is_active']:
+                        mcp_servers_config = {**mcp_servers_config, **json.loads(mcp_tool['code'])}
 
         if tool_enable:
             if tool_ids and len(tool_ids) > 0:  # 如果有工具ID，则将其转换为MCP
