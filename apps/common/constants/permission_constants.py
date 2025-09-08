@@ -10,7 +10,7 @@ from functools import reduce
 from typing import List
 
 from django.db import models
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy as _
 
 from maxkb import settings
 
