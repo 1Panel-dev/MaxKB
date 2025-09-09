@@ -12,7 +12,7 @@ const chartsRef = ref()
 
 const style = ref({
   height: '220px',
-  width: '100%'
+  width: '100%',
 })
 
 function initChart() {
@@ -44,7 +44,7 @@ function evalParseOption(option_json: any) {
   if (option_json.style) {
     style.value = option_json.style
   }
-  const option = {}
+  let option = {}
   tmp.value = echarts
   eval(option_json.option)
   return option
@@ -62,7 +62,7 @@ watch(
         initChart()
       })
     }
-  }
+  },
 )
 
 onMounted(() => {
