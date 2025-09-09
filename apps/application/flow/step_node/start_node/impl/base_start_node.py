@@ -30,7 +30,7 @@ def get_global_variable(node):
     history_context = [{'question': chat_record.problem_text, 'answer': chat_record.answer_text} for chat_record in
                        history_chat_record]
     chat_id = node.flow_params_serializer.data.get('chat_id')
-    return {'time': timezone.now().strftime('%Y-%m-%d %H:%M:%S'), 'start_time': time.time(),
+    return {'time': timezone.localtime(timezone.now()).strftime('%Y-%m-%d %H:%M:%S'), 'start_time': time.time(),
             'history_context': history_context, 'chat_id': str(chat_id), **node.workflow_manage.form_data,
             'chat_user_id': body.get('chat_user_id'),
             'chat_user_type': body.get('chat_user_type'),
