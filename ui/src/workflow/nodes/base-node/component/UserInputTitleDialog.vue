@@ -14,6 +14,7 @@
       :rules="rules"
       :model="form"
       require-asterisk-position="right"
+      @submit.prevent
     >
       <el-form-item :label="$t('common.title')" prop="title">
         <el-input
@@ -45,13 +46,13 @@ const fieldFormRef = ref()
 const loading = ref<boolean>(false)
 
 const form = ref<any>({
-  title: t('chat.userInput')
+  title: t('chat.userInput'),
 })
 
 const rules = reactive({
   title: [
-    { required: true, message: t('dynamicsForm.paramForm.name.requiredMessage'), trigger: 'blur' }
-  ]
+    { required: true, message: t('dynamicsForm.paramForm.name.requiredMessage'), trigger: 'blur' },
+  ],
 })
 
 const dialogVisible = ref<boolean>(false)
