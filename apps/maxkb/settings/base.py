@@ -168,6 +168,10 @@ TIME_ZONE = CONFIG.get_time_zone()
 USE_I18N = True
 
 USE_TZ = True
+
+# 文件上传配置
+DATA_UPLOAD_MAX_NUMBER_FILES = 1000
+
 # 支持的语言
 LANGUAGES = [
     ('en', 'English'),
