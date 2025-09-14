@@ -407,3 +407,84 @@ class ToolView(APIView):
                 'user_id': request.user.id,
                 'workspace_id': workspace_id
             }).add(request.data))
+
+    class StoreTool(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['GET'],
+            description=_("Get Appstore tools"),
+            summary=_("Get Appstore tools"),
+            operation_id=_("Get Appstore tools"),  # type: ignore
+            responses=GetInternalToolAPI.get_response(),
+            tags=[_("Tool")]  # type: ignore
+        )
+        def get(self, request: Request):
+            return result.success(ToolSerializer.StoreTool(data={
+                'user_id': request.user.id,
+                'name': request.query_params.get('name', ''),
+            }).get_appstore_tools())
+
+    class AddStoreTool(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['POST'],
+            description=_("Add Appstore tool"),
+            summary=_("Add Appstore tool"),
+            operation_id=_("Add Appstore tool"),  # type: ignore
+            parameters=AddInternalToolAPI.get_parameters(),
+            request=AddInternalToolAPI.get_request(),
+            responses=AddInternalToolAPI.get_response(),
+            tags=[_("Tool")]  # type: ignore
+        )
+        @has_permissions(
+            PermissionConstants.TOOL_CREATE.get_workspace_permission(),
+            PermissionConstants.TOOL_CREATE.get_workspace_permission_workspace_manage_role(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            RoleConstants.USER.get_workspace_role(),
+        )
+        @log(
+            menu='Tool', operate="Add Appstore tool",
+            get_operation_object=lambda r, k: get_tool_operation_object(k.get('tool_id')),
+        )
+        def post(self, request: Request, tool_id: str, workspace_id: str):
+            return result.success(ToolSerializer.AddStoreTool(data={
+                'tool_id': tool_id,
+                'user_id': request.user.id,
+                'workspace_id': workspace_id,
+            }).add(request.data))
+
+    class UpdateStoreTool(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['POST'],
+            description=_("Update Appstore tool"),
+            summary=_("Update Appstore tool"),
+            operation_id=_("Update Appstore tool"),  # type: ignore
+            parameters=AddInternalToolAPI.get_parameters(),
+            request=AddInternalToolAPI.get_request(),
+            responses=AddInternalToolAPI.get_response(),
+            tags=[_("Tool")]  # type: ignore
+        )
+        @has_permissions(
+            PermissionConstants.TOOL_CREATE.get_workspace_permission(),
+            PermissionConstants.TOOL_CREATE.get_workspace_permission_workspace_manage_role(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            RoleConstants.USER.get_workspace_role(),
+        )
+        @log(
+            menu='Tool', operate="Update Appstore tool",
+            get_operation_object=lambda r, k: get_tool_operation_object(k.get('tool_id')),
+        )
+        def post(self, request: Request, tool_id: str, workspace_id: str):
+            return result.success(ToolSerializer.UpdateStoreTool(data={
+                'tool_id': tool_id,
+                'user_id': request.user.id,
+                'workspace_id': workspace_id,
+                'download_url': request.data.get('download_url'),
+                'download_callback_url': request.data.get('download_callback_url'),
+                'icon': request.data.get('icon'),
+                'versions': request.data.get('versions'),
+            }).update_tool(request.data))

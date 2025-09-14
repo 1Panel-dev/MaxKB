@@ -12,6 +12,7 @@ export default {
     RadioRow: 'Radio Row',
     UploadInput: 'File upload',
     TextareaInput: 'Multiline Input',
+    MultiRow: 'Multi Row',
   },
   default: {
     label: 'Default',
@@ -123,6 +124,7 @@ export default {
     ref_variables: {
       label: 'Reference Variables',
       popover: 'Variable values must comply with',
+      json_format: 'JSON format',
       popover_label: 'Label',
       popover_value: 'Value',
       popover_default: 'Is Default',

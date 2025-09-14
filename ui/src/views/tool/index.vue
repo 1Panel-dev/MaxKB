@@ -89,7 +89,7 @@ function refreshFolder() {
 }
 
 onMounted(() => {
-  getFolder(true)
+  getFolder(folder.currentFolder?.id ? false : true)
 })
 </script>
 

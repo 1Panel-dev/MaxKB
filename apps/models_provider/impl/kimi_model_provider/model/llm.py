@@ -25,7 +25,7 @@ class KimiChatModel(MaxKBBaseModel, BaseChatOpenAI):
         kimi_chat_open_ai = KimiChatModel(
             openai_api_base=model_credential['api_base'],
             openai_api_key=model_credential['api_key'],
-            model_name=model_name,
+            model=model_name,
             extra_body=optional_params,
         )
         return kimi_chat_open_ai

@@ -24,12 +24,7 @@
         <el-button @click.prevent="dialogVisible = false">
           {{ $t('common.cancel') }}
         </el-button>
-        <el-button
-          type="primary"
-          @click="submit"
-          :loading="loading"
-          v-if="permissionPrecise.paramSetting(modelID)"
-        >
+        <el-button type="primary" @click="submit" :loading="loading">
           {{ $t('common.confirm') }}
         </el-button>
       </span>

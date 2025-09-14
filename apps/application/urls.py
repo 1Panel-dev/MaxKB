@@ -39,6 +39,7 @@ urlpatterns = [
     path('workspace/<str:workspace_id>/application/<str:application_id>/avatar', views.ApplicationAvatar.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/user_avatar', views.ApplicationUserAvatar.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/float_icon', views.ApplicationFloatIcon.as_view()),
+    path('workspace/<str:workspace_id>/application/<str:application_id>/model/<str:model_id>/prompt_generate', views.PromptGenerateView.as_view()),
     path('chat_message/<str:chat_id>', views.ChatView.as_view()),
 
 ]

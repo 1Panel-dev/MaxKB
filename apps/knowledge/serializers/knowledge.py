@@ -267,6 +267,7 @@ class KnowledgeSerializer(serializers.Serializer):
             knowledge_id = self.data.get('knowledge_id')
             model_id = instance.get("model_id")
             prompt = instance.get("prompt")
+            model_params_setting = instance.get("model_params_setting")
             state_list = instance.get('state_list')
             ListenerManagement.update_status(
                 QuerySet(Document).filter(knowledge_id=knowledge_id),
@@ -285,7 +286,7 @@ class KnowledgeSerializer(serializers.Serializer):
             )
             ListenerManagement.get_aggregation_document_status_by_knowledge_id(knowledge_id)()
             try:
-                generate_related_by_knowledge_id.delay(knowledge_id, model_id, prompt, state_list)
+                generate_related_by_knowledge_id.delay(knowledge_id, model_id, model_params_setting, prompt, state_list)
             except AlreadyQueued as e:
                 raise AppApiException(500, _('Failed to send the vectorization task, please try again later!'))
 
@@ -453,6 +454,7 @@ class KnowledgeSerializer(serializers.Serializer):
         def export_zip(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
+            knowledge = QuerySet(Knowledge).filter(id=self.data.get("knowledge_id")).first()
             document_list = QuerySet(Document).filter(knowledge_id=self.data.get('knowledge_id'))
             paragraph_list = native_search(
                 QuerySet(Paragraph).filter(knowledge_id=self.data.get("knowledge_id")),
@@ -472,7 +474,7 @@ class KnowledgeSerializer(serializers.Serializer):
 
             workbook = DocumentSerializers.Operate.get_workbook(data_dict, document_dict)
             response = HttpResponse(content_type='application/zip')
-            response['Content-Disposition'] = 'attachment; filename="archive.zip"'
+            response['Content-Disposition'] = f'attachment; filename="{knowledge.name}.zip"'
             zip_buffer = io.BytesIO()
             with TemporaryDirectory() as tempdir:
                 knowledge_file = os.path.join(tempdir, 'knowledge.xlsx')

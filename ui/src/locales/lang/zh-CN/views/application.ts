@@ -91,6 +91,7 @@ export default {
       label: '系统角色',
       placeholder: '你是 xxx 小助手',
     },
+
     prompt: {
       label: '提示词',
       noReferences: ' (无引用知识库)',
@@ -146,8 +147,13 @@ export default {
       start: '开始',
       end: '结束',
     },
+    mcp_output_enable: '输出MCP/工具执行过程',
   },
-
+  generateDialog: {
+    label: '生成',
+    generatePrompt: '生成提示词',
+    placeholder: '请输入提示词主题',
+  },
   dialog: {
     addKnowledge: '添加关联知识库',
     addKnowledgePlaceholder: '所选知识库必须使用相同的 Embedding 模型',
@@ -177,7 +183,7 @@ export default {
     wecom: '企业微信应用',
     wecomTip: '打造企业微信智能应用',
     wecomBot: '企业微信智能机器人',
-    wecomBotTip: '打造企业微信智能机器人应用',
+    wecomBotTip: '打造企业微信智能机器人',
     dingtalk: '钉钉应用',
     dingtalkTip: '打造钉钉智能应用',
     wechat: '公众号',

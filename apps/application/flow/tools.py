@@ -6,14 +6,18 @@
     @date：2024/6/6 15:15
     @desc:
 """
+import asyncio
 import json
+import traceback
 from typing import Iterator
 
 from django.http import StreamingHttpResponse
-from langchain_core.messages import BaseMessageChunk, BaseMessage
-
+from langchain_core.messages import BaseMessageChunk, BaseMessage, ToolMessage, AIMessageChunk
+from langchain_mcp_adapters.client import MultiServerMCPClient
+from langgraph.prebuilt import create_react_agent
 from application.flow.i_step_node import WorkFlowPostHandler
 from common.result import result
+from common.utils.logger import maxkb_logger
 
 
 class Reasoning:
@@ -196,3 +200,62 @@ def to_stream_response_simple(stream_event):
 
     r['Cache-Control'] = 'no-cache'
     return r
+
+tool_message_template = """
+<details>
+    <summary>
+        <strong>Called MCP Tool: <em>%s</em></strong>
+    </summary>
+
+%s
+
+</details>
+
+"""
+
+tool_message_json_template = """
+```json
+%s
+```
+"""
+
+
+def generate_tool_message_template(name, context):
+    if '```' in context:
+        return tool_message_template % (name, context)
+    else:
+        return tool_message_template % (name, tool_message_json_template % (context))
+
+
+async def _yield_mcp_response(chat_model, message_list, mcp_servers, mcp_output_enable=True):
+    client = MultiServerMCPClient(json.loads(mcp_servers))
+    tools = await client.get_tools()
+    agent = create_react_agent(chat_model, tools)
+    response = agent.astream({"messages": message_list}, stream_mode='messages')
+    async for chunk in response:
+        if mcp_output_enable and isinstance(chunk[0], ToolMessage):
+            content = generate_tool_message_template(chunk[0].name, chunk[0].content)
+            chunk[0].content = content
+            yield chunk[0]
+        if isinstance(chunk[0], AIMessageChunk):
+            yield chunk[0]
+
+
+def mcp_response_generator(chat_model, message_list, mcp_servers, mcp_output_enable=True):
+    loop = asyncio.new_event_loop()
+    try:
+        async_gen = _yield_mcp_response(chat_model, message_list, mcp_servers, mcp_output_enable)
+        while True:
+            try:
+                chunk = loop.run_until_complete(anext_async(async_gen))
+                yield chunk
+            except StopAsyncIteration:
+                break
+    except Exception as e:
+        maxkb_logger.error(f'Exception: {e}', traceback.format_exc())
+    finally:
+        loop.close()
+
+
+async def anext_async(agen):
+    return await agen.__anext__()

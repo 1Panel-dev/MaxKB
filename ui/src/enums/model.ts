@@ -14,5 +14,7 @@ export enum modelType {
   TTS = 'views.model.modelType.TTS',
   IMAGE = 'views.model.modelType.IMAGE',
   TTI = 'views.model.modelType.TTI',
-  RERANKER = 'views.model.modelType.RERANKER'
+  RERANKER = 'views.model.modelType.RERANKER',
+  TTV = 'views.model.modelType.TTV',
+  ITV = 'views.model.modelType.ITV',
 }

@@ -204,6 +204,26 @@ const open: (application_id: string, loading?: Ref<boolean>) => Promise<Result<s
 ) => {
   return get(`${prefix.value}/${application_id}/open`, {}, loading)
 }
+
+/**
+ * 生成提示词
+ * @param workspace_id 
+ * @param model_id 
+ * @param application_id 
+ * @param data 
+ * @returns 
+ */
+const generate_prompt: (workspace_id:string ,model_id:string, application_id:string,data: any) => Promise<any> = (
+  workspace_id,
+  model_id,
+  application_id,
+  data
+) => {
+  const prefix = (window.MaxKB?.prefix ? window.MaxKB?.prefix : '/admin') + '/api'
+  return postStream(`${prefix}/workspace/${workspace_id}/application/${application_id}/model/${model_id}/prompt_generate`, data)
+}
+
+
 /**
  * 对话
  * chat_id: string
@@ -473,6 +493,7 @@ export default {
   speechToText,
   getMcpTools,
   postUploadFile,
+  generate_prompt
   putApplicationIcon,
   putApplicationChatBackground,
   putApplicationAvatar,

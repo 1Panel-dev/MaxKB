@@ -14,7 +14,7 @@ export enum WorkflowType {
   Reply = 'reply-node',
   ToolLib = 'tool-lib-node',
   ToolLibCustom = 'tool-node',
-  RrerankerNode = 'reranker-node',
+  RerankerNode = 'reranker-node',
   Application = 'application-node',
   DocumentExtractNode = 'document-extract-node',
   ImageUnderstandNode = 'image-understand-node',
@@ -24,4 +24,8 @@ export enum WorkflowType {
   SpeechToTextNode = 'speech-to-text-node',
   ImageGenerateNode = 'image-generate-node',
   McpNode = 'mcp-node',
+  IntentNode = 'intent-node',
+  TextToVideoGenerateNode = 'text-to-video-node',
+  ImageToVideoGenerateNode = 'image-to-video-node'
+
 }

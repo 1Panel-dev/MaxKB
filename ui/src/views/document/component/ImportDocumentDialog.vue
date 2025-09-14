@@ -132,7 +132,7 @@ const form = ref<any>({
   selector: '',
   hit_handling_method: 'optimization',
   directly_return_similarity: 0.9,
-  allow_download: false,
+  allow_download: true,
 })
 
 // 文档设置
@@ -168,7 +168,7 @@ watch(dialogVisible, (bool) => {
       selector: '',
       hit_handling_method: 'optimization',
       directly_return_similarity: 0.9,
-      allow_download: false,
+      allow_download: true,
     }
     isImport.value = false
     documentType.value = ''
@@ -244,6 +244,7 @@ const submit = async (formEl: FormInstance | undefined) => {
             hit_handling_method: form.value.hit_handling_method,
             directly_return_similarity: form.value.directly_return_similarity,
             id_list: documentList.value,
+            allow_download: form.value.allow_download,
           }
           loadSharedApi({ type: 'document', systemType: apiType.value })
             .putBatchEditHitHandling(id, obj, loading)

@@ -50,7 +50,9 @@
       </el-form-item>
     </el-form>
     <SelectKnowledgeDocument
+      v-if="detail.workspace_id"
       ref="SelectKnowledgeDocumentRef"
+      :post-knowledge-handler="postKnowledgeHandler"
       :apiType="apiType"
       @changeKnowledge="changeKnowledge"
       @changeDocument="changeDocument"
@@ -75,6 +77,10 @@ import type { FormInstance, FormRules } from 'element-plus'
 import imageApi from '@/api/image'
 import { t } from '@/locales'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import { Permission } from '@/utils/permission/type'
+import { hasPermission } from '@/utils/permission'
+import { PermissionConst, RoleConst } from '@/utils/permission/data'
+
 const route = useRoute()
 const {
   params: { id },
@@ -86,6 +92,18 @@ const apiType = computed(() => {
     return 'workspace'
   }
 })
+
+const postKnowledgeHandler = (knowledgeList: Array<any>) => { 
+  return knowledgeList.filter(item => {
+    if (apiType.value === 'workspace') {
+      return hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole(),
+      new Permission("KNOWLEDGE_DOCUMENT:READ+EDIT").getWorkspacePermissionWorkspaceManageRole,
+      new Permission("KNOWLEDGE_DOCUMENT:READ+EDIT").getWorkspaceResourcePermission('KNOWLEDGE', item.id)], 'OR')
+    } else if (apiType.value === 'systemManage') {
+      return hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_KNOWLEDGE_DOCUMENT_EDIT],'OR')
+    }
+  }) 
+}
 
 const emit = defineEmits(['refresh'])
 
@@ -127,7 +145,6 @@ const SelectKnowledgeDocumentRef = ref()
 const dialogVisible = ref<boolean>(false)
 const loading = ref(false)
 const detail = ref<any>({})
-
 const form = ref<any>({
   chat_id: '',
   record_id: '',

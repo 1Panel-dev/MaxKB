@@ -13,6 +13,7 @@ from typing import Dict, List
 from django.db import models
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 from rest_framework import serializers
 
 from application.models import ApplicationChatUserStats, Application
@@ -48,12 +49,14 @@ class ApplicationStatisticsSerializer(serializers.Serializer):
             raise AppApiException(500, _('Application id does not exist'))
 
     def get_end_time(self):
-        return datetime.datetime.combine(
-            datetime.datetime.strptime(self.data.get('end_time'), '%Y-%m-%d'),
-            datetime.datetime.max.time())
+        d = datetime.datetime.strptime(self.data.get('end_time'), '%Y-%m-%d').date()
+        naive = datetime.datetime.combine(d, datetime.time.max)
+        return timezone.make_aware(naive, timezone.get_default_timezone())
 
     def get_start_time(self):
-        return self.data.get('start_time')
+        d = datetime.datetime.strptime(self.data.get('start_time'), '%Y-%m-%d').date()
+        naive = datetime.datetime.combine(d, datetime.time.min)
+        return timezone.make_aware(naive, timezone.get_default_timezone())
 
     def get_customer_count_trend(self, with_valid=True):
         if with_valid:

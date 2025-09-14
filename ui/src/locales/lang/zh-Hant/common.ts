@@ -47,6 +47,8 @@ export default {
   noData: '暂无数据',
   result: '結果',
   remove: '移除',
+  classify: '分類',
+  reason: '理由',
   removeSuccess: '移除成功',
   searchBar: {
     placeholder: '按名稱搜尋',

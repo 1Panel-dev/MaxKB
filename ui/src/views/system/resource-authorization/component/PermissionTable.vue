@@ -81,9 +81,7 @@
               <!--  应用 icon -->
               <LogoIcon v-else-if="isApplication" height="20px" />
               <!-- 工具 icon -->
-              <el-avatar v-else-if="isTool" class="avatar-green" shape="square" :size="20">
-                <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt="" />
-              </el-avatar>
+              <ToolIcon v-else-if="isTool" :size="20" :type="row?.tool_type" />
               <!-- 模型 icon -->
               <span
                 v-else-if="isModel"
@@ -96,7 +94,7 @@
             </el-space>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('common.operation')" align="left">
+        <el-table-column :label="$t('views.model.modelForm.permissionType.label')" align="left">
           <template #default="{ row }">
             <el-radio-group
               v-model="row.permission"
@@ -144,8 +142,9 @@ import { isAppIcon, resetUrl } from '@/utils/common'
 import { RoleConst, PermissionConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
 import { ComplexPermission } from '@/utils/permission/type'
-import { permissionOptions } from '@/views/system/resource-authorization/constant'
+import { getPermissionOptions } from '@/views/system/resource-authorization/constant'
 import useStore from '@/stores'
+
 const { model, user } = useStore()
 const route = useRoute()
 const props = defineProps<{
@@ -154,6 +153,10 @@ const props = defineProps<{
   getData?: () => void
 }>()
 const emit = defineEmits(['submitPermissions'])
+
+const permissionOptions = computed(() => {
+  return getPermissionOptions()
+})
 const permissionObj = ref<any>({
   APPLICATION: new ComplexPermission(
     [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE],

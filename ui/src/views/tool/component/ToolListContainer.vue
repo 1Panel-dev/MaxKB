@@ -50,9 +50,7 @@
                     <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt="" />
                   </el-avatar>
                   <div class="pre-wrap ml-8">
-                    <div class="lighter">
-                      {{ $t('views.application.form.appTemplate.blankApp.title') }}
-                    </div>
+                    <div class="lighter">{{ $t('views.tool.createTool') }}</div>
                   </div>
                 </div>
               </el-dropdown-item>
@@ -62,7 +60,7 @@
                     <img src="@/assets/workflow/icon_mcp.svg" style="width: 75%" alt="" />
                   </el-avatar>
                   <div class="pre-wrap ml-8">
-                    <div class="lighter">{{ $t('common.create') }} MCP</div>
+                    <div class="lighter">{{ $t('views.tool.createMcpTool') }}</div>
                   </div>
                 </div>
               </el-dropdown-item>
@@ -79,7 +77,7 @@
               >
                 <el-dropdown-item v-if="permissionPrecise.import()">
                   <div class="flex align-center w-full">
-                    <el-avatar shape="square" :size="36" style="background: none">
+                    <el-avatar shape="square" :size="32" style="background: none">
                       <img src="@/assets/icon_import.svg" alt="" />
                     </el-avatar>
                     <div class="pre-wrap ml-8">
@@ -90,7 +88,7 @@
               </el-upload>
               <el-dropdown-item @click="openToolStoreDialog()">
                 <div class="flex align-center">
-                  <el-avatar shape="square" :size="36" style="background: none">
+                  <el-avatar shape="square" :size="32" style="background: none">
                     <img src="@/assets/icon_tool_shop.svg" alt="" />
                   </el-avatar>
                   <div class="pre-wrap ml-8">
@@ -103,6 +101,7 @@
               <el-dropdown-item @click="openCreateFolder" divided v-if="apiType === 'workspace'">
                 <div class="flex align-center">
                   <AppIcon iconName="app-folder" style="font-size: 32px"></AppIcon>
+
                   <div class="pre-wrap ml-4">
                     <div class="lighter">
                       {{ $t('components.folder.addFolder') }}
@@ -177,15 +176,36 @@
                   </el-avatar>
                   <ToolIcon v-else :size="32" :type="item?.tool_type" />
                 </template>
+                <template #title>
+                  <div>
+                    {{ item.name }}
+                    <el-tag v-if="item.version" class="ml-4" type="info" effect="plain">
+                      {{ item.version }}
+                    </el-tag>
+                  </div>
+                </template>
                 <template #subTitle>
                   <el-text class="color-secondary lighter" size="small">
                     {{ $t('common.creator') }}: {{ item.nick_name }}
                   </el-text>
                 </template>
-                <template #tag>
+                <template #tag="{ hoverShow }">
                   <el-tag v-if="isShared" type="info" class="info-tag">
                     {{ t('views.shared.title') }}
                   </el-tag>
+                  <el-tooltip effect="dark" content="更新版本">
+                    <el-button
+                      text
+                      @click.stop
+                      v-if="
+                        showUpdateStoreTool(item) && !isShared && permissionPrecise.edit(item.id)
+                      "
+                      @click="updateStoreTool(item)"
+                    >
+                      <el-icon v-if="hoverShow"><Refresh /></el-icon>
+                      <div v-else class="dot-success"></div>
+                    </el-button>
+                  </el-tooltip>
                 </template>
 
                 <template #footer>
@@ -221,6 +241,13 @@
                       <template #dropdown>
                         <el-dropdown-menu>
                           <el-dropdown-item
+                            v-if="item.tool_type === 'MCP'"
+                            @click.stop="showMcpConfig(item)"
+                          >
+                            <AppIcon iconName="app-operate-log" class="color-secondary"></AppIcon>
+                            {{ $t('views.tool.mcpConfig') }}
+                          </el-dropdown-item>
+                          <el-dropdown-item
                             v-if="item.template_id && permissionPrecise.edit(item.id)"
                             @click.stop="addInternalTool(item, true)"
                           >
@@ -235,7 +262,11 @@
                             {{ $t('common.edit') }}
                           </el-dropdown-item>
                           <el-dropdown-item
-                            v-if="!item.template_id && permissionPrecise.copy(item.id) && item.tool_type!== 'MCP'"
+                            v-if="
+                              !item.template_id &&
+                              permissionPrecise.copy(item.id) &&
+                              item.tool_type !== 'MCP'
+                            "
                             @click.stop="copyTool(item)"
                           >
                             <AppIcon iconName="app-copy" class="color-secondary"></AppIcon>
@@ -275,7 +306,11 @@
                             {{ $t('views.shared.authorized_workspace') }}</el-dropdown-item
                           >
                           <el-dropdown-item
-                            v-if="!item.template_id && permissionPrecise.export(item.id) && item.tool_type!== 'MCP'"
+                            v-if="
+                              !item.template_id &&
+                              permissionPrecise.export(item.id) &&
+                              item.tool_type !== 'MCP'
+                            "
                             @click.stop="exportTool(item)"
                           >
                             <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
@@ -308,6 +343,7 @@
   <CreateFolderDialog ref="CreateFolderDialogRef" v-if="!isShared" @refresh="refreshFolder" />
   <ToolStoreDialog ref="toolStoreDialogRef" :api-type="apiType" @refresh="refresh" />
   <AddInternalToolDialog ref="AddInternalToolDialogRef" @refresh="confirmAddInternalTool" />
+  <McpToolConfigDialog ref="McpToolConfigDialogRef" @refresh="refresh" />
   <AuthorizedWorkspace
     ref="AuthorizedWorkspaceDialogRef"
     v-if="isSystemShare"
@@ -338,6 +374,7 @@ import ToolStoreDialog from '@/views/tool/toolStore/ToolStoreDialog.vue'
 import AddInternalToolDialog from '@/views/tool/toolStore/AddInternalToolDialog.vue'
 import MoveToDialog from '@/components/folder-tree/MoveToDialog.vue'
 import ResourceAuthorizationDrawer from '@/components/resource-authorization-drawer/index.vue'
+import McpToolConfigDialog from '@/views/tool/component/McpToolConfigDialog.vue'
 import { resetUrl } from '@/utils/common'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import { SourceTypeEnum } from '@/enums/common'
@@ -345,6 +382,7 @@ import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import permissionMap from '@/permission'
 import useStore from '@/stores'
 import { t } from '@/locales'
+import ToolStoreApi from '@/api/tool/store.ts'
 const route = useRoute()
 const { folder, user, tool } = useStore()
 onBeforeRouteLeave((to, from) => {
@@ -378,6 +416,7 @@ const MoreFieldPermission = (id: any) => {
     permissionPrecise.value.edit(id) ||
     permissionPrecise.value.export(id) ||
     permissionPrecise.value.delete(id) ||
+    permissionPrecise.value.auth(id) ||
     isSystemShare.value
   )
 }
@@ -617,6 +656,58 @@ function confirmAddInternalTool(data?: any, isEdit?: boolean) {
   }
 }
 
+const storeTools = ref<any[]>([])
+function getStoreToolList() {
+  ToolStoreApi.getStoreToolList({ name: '' }, loading).then((res: any) => {
+    storeTools.value = res.data.apps
+  })
+}
+
+function showUpdateStoreTool(item: any) {
+  for (const tool of storeTools.value) {
+    if (tool.id === item.template_id && tool.version !== item.version) {
+      item.downloadUrl = tool.downloadUrl
+      item.downloadCallbackUrl = tool.downloadCallbackUrl
+      item.icon = tool.icon
+      item.versions = tool.versions
+      item.label = tool.label
+      return true
+    }
+  }
+}
+
+function updateStoreTool(item: any) {
+  MsgConfirm(
+    t('views.tool.toolStore.confirmTip') + item.name,
+    t('views.tool.toolStore.updateStoreToolMessage'),
+    {
+      cancelButtonText: t('common.cancel'),
+      confirmButtonText: t('common.confirm'),
+    },
+  )
+    .then(() => {
+      const obj = {
+        download_url: item.downloadUrl,
+        download_callback_url: item.downloadCallbackUrl,
+        icon: item.icon,
+        versions: item.versions,
+        label: item.label,
+      }
+      loadSharedApi({ type: 'tool', systemType: apiType.value })
+        .updateStoreTool(item.id, obj, loading)
+        .then(async (res: any) => {
+          if (res?.data) {
+            tool.setToolList([])
+            return user.profile()
+          }
+        })
+        .then(() => {
+          getList()
+        })
+    })
+    .catch(() => {})
+}
+
 const elUploadRef = ref()
 function importTool(file: any) {
   const formData = new FormData()
@@ -643,6 +734,15 @@ function importTool(file: any) {
           window.open('https://maxkb.cn/pricing.html', '_blank')
         })
       }
+    })
+}
+
+const McpToolConfigDialogRef = ref()
+function showMcpConfig(item: any) {
+  loadSharedApi({ type: 'tool', systemType: apiType.value })
+    .getToolById(item?.id, loading)
+    .then((res: any) => {
+      McpToolConfigDialogRef.value.open(res.data)
     })
 }
 
@@ -727,6 +827,7 @@ onMounted(() => {
     .then((res: any) => {
       user_options.value = res.data
     })
+  getStoreToolList()
 })
 </script>
 

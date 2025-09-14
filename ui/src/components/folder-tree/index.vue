@@ -8,19 +8,21 @@
       class="p-8"
     />
     <div class="tree-height" :style="treeStyle">
-      <div
-        @click="handleSharedNodeClick"
-        v-if="showShared && hasPermission(EditionConst.IS_EE, 'OR')"
-        class="shared-button flex cursor border-b"
-        :class="currentNodeKey === 'share' && 'active'"
-      >
-        <AppIcon
-          iconName="app-shared-active"
-          style="font-size: 18px"
-          class="color-primary"
-        ></AppIcon>
-        <span class="ml-8 lighter">{{ shareTitle }}</span>
+      <div v-if="showShared && hasPermission(EditionConst.IS_EE, 'OR')" class="border-b mb-4">
+        <div
+          @click="handleSharedNodeClick"
+          class="shared-button flex cursor"
+          :class="currentNodeKey === 'share' && 'active'"
+        >
+          <AppIcon
+            iconName="app-shared-active"
+            style="font-size: 18px"
+            class="color-primary"
+          ></AppIcon>
+          <span class="ml-8">{{ shareTitle }}</span>
+        </div>
       </div>
+
       <el-scrollbar>
         <el-tree
           ref="treeRef"
@@ -275,7 +277,7 @@ onUnmounted(() => {
     margin-bottom: 4px;
     &.active {
       background: var(--el-color-primary-light-9);
-      border-radius: var(--app-border-radius-base);
+      border-radius: var();
       color: var(--el-color-primary);
       font-weight: 500;
       &:hover {
@@ -283,7 +285,7 @@ onUnmounted(() => {
       }
     }
     &:hover {
-      border-radius: var(--app-border-radius-base);
+      border-radius: var();
       background: var(--app-text-color-light-1);
     }
     &.is-active {

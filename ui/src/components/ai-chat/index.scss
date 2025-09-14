@@ -7,6 +7,12 @@
   position: relative;
   color: var(--app-text-color);
   box-sizing: border-box;
+
+  .back-bottom-button {
+    position: absolute;
+    right: 14px;
+    top: -30px;
+  }
   &__content {
     padding-top: 0;
     box-sizing: border-box;
@@ -16,7 +22,6 @@
     }
 
     .content {
-
       :deep(ol) {
         margin-left: 16px !important;
       }

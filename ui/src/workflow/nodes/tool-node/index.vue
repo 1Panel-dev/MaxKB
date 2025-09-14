@@ -4,7 +4,7 @@
     <div class="flex-between">
       <h5 class="lighter mb-8">{{ $t('common.param.inputParam') }}</h5>
       <el-button link type="primary" @click="openAddDialog()">
-        <el-icon class="mr-4"><Plus /></el-icon> {{ $t('common.add') }}
+        <AppIcon iconName="app-add-outlined" class="mr-4"></AppIcon> {{ $t('common.add') }}
       </el-button>
     </div>
     <el-form

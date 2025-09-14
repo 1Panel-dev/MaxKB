@@ -233,7 +233,6 @@ export default {
       text: '通过SSE/Streamable HTTP方式执行MCP服务中的工具',
       getToolsSuccess: '获取工具成功',
       getTool: '获取工具',
-      tool: '工具',
       toolParam: '工具参数',
       mcpServerTip: '请输入JSON格式的MCP服务器配置',
       mcpToolTip: '请选择工具',
@@ -256,6 +255,50 @@ export default {
         label: '提示词(负向)',
         tooltip: '反向提示词，用来描述不希望在画面中看到的内容，可以对画面进行限制。',
         placeholder: '请描述不想生成的图片内容，比如：颜色、血腥内容',
+      },
+    },
+    textToVideoGenerate: {
+      label: '文生视频',
+      text: '根据提供的文本内容生成视频',
+      answer: 'AI 回答内容',
+      model: {
+        label: '文生视频模型',
+        requiredMessage: '请选择文生视频模型',
+      },
+      prompt: {
+        label: '提示词(正向)',
+        tooltip: '正向提示词，用来描述生成视频中期望包含的元素和视觉特点',
+      },
+      negative_prompt: {
+        label: '提示词(负向)',
+        tooltip: '反向提示词，用来描述不希望在视频中看到的内容，可以对视频进行限制。',
+        placeholder: '请描述不想生成的视频内容，比如：颜色、血腥内容',
+      },
+    },
+    imageToVideoGenerate: {
+      label: '图生视频',
+      text: '根据提供的图片生成视频',
+      answer: 'AI 回答内容',
+      model: {
+        label: '图生视频模型',
+        requiredMessage: '请选择图生视频模型',
+      },
+      prompt: {
+        label: '提示词(正向)',
+        tooltip: '正向提示词，用来描述生成视频中期望包含的元素和视觉特点',
+      },
+      negative_prompt: {
+        label: '提示词(负向)',
+        tooltip: '反向提示词，用来描述不希望在视频中看到的内容，可以对视频进行限制。',
+        placeholder: '请描述不想生成的视频内容，比如：颜色、血腥内容',
+      },
+      first_frame: {
+        label: '首帧图片',
+        requiredMessage: '请选择首帧图片',
+      },
+      last_frame: {
+        label: '尾帧图片',
+        requiredMessage: '请选择尾帧图片',
       },
     },
     speechToTextNode: {
@@ -282,6 +325,18 @@ export default {
     toolNode: {
       label: '自定义工具',
       text: '通过执行自定义脚本，实现数据处理',
+    },
+    intentNode: {
+      label: '意图识别',
+      other: '其他',
+      placeholder: '请选择分类项',
+      classify: {
+        label: '意图分类',
+        placeholder: '请输入',
+      },
+      input: {
+        label: '输入',
+      },
     },
     applicationNode: {
       label: '应用节点',

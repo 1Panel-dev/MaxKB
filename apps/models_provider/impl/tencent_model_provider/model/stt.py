@@ -65,7 +65,7 @@ class TencentSpeechToText(MaxKBBaseModel, BaseSpeechToText):
             # 实例化一个请求对象,每个接口都会对应一个request对象
             req = models.SentenceRecognitionRequest()
             params = {
-                "EngSerViceType": self.params.get('EngSerViceType'),
+                "EngSerViceType": '16k_zh',
                 "SourceType": 1,
                 "VoiceFormat": "mp3",
                 "Data": _v.decode(),

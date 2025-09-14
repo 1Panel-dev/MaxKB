@@ -15,7 +15,7 @@
             <div class="flex-between">
               <span>{{ $t('views.chatLog.selectKnowledge') }}</span>
               <el-button type="primary" link @click="openknowledgeDialog">
-                <el-icon><Plus /></el-icon>
+                <AppIcon iconName="app-add-outlined"></AppIcon>
               </el-button>
             </div>
           </template>
@@ -217,6 +217,9 @@ const validate = () => {
 onMounted(() => {
   // console.log(props.nodeModel.properties.node_data)
   knowledgeList.value = props.nodeModel.properties.node_data.knowledge_list
+  form_data.value.show_knowledge = form_data.value.show_knowledge
+    ? form_data.value.show_knowledge
+    : false
   set(props.nodeModel, 'validate', validate)
 })
 </script>

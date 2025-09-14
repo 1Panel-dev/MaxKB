@@ -16,6 +16,7 @@ from (select tool."id"::text,
              tool."update_time",
              tool.init_field_list,
              tool.input_field_list,
+             tool.version,
              tool."is_active"
       from tool
                left join "user" on "user".id = user_id ${tool_query_set}
@@ -37,6 +38,7 @@ from (select tool."id"::text,
              tool_folder."update_time",
              '[]'::jsonb             as init_field_list,
              '[]'::jsonb             as input_field_list,
+             ''                      as version,
              'true'                  as "is_active"
       from tool_folder
                left join "user" on "user".id = user_id ${folder_query_set}) temp

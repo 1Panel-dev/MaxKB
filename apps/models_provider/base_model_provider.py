@@ -147,6 +147,11 @@ class ModelTypeConst(Enum):
     IMAGE = {'code': 'IMAGE', 'message': _('Vision Model')}
     TTI = {'code': 'TTI', 'message': _('Image Generation')}
     RERANKER = {'code': 'RERANKER', 'message': _('Rerank')}
+    #文生视频 图生视频
+    TTV = {'code': 'TTV', 'message': _('Text to Video')}
+    ITV = {'code': 'ITV', 'message': _('Image to Video')}
+
+
 
 
 class ModelInfo:

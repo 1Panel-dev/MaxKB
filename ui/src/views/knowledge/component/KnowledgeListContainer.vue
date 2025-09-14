@@ -189,7 +189,7 @@
                   <KnowledgeIcon :type="item.type" />
                 </template>
                 <template #subTitle>
-                  <el-text class="color-secondary" size="small">
+                  <el-text class="color-secondary lighter" size="small">
                     {{ $t('common.creator') }}: {{ item.nick_name }}
                   </el-text>
                 </template>
@@ -401,6 +401,7 @@ const MoreFilledPermission = (item: any) => {
     permissionPrecise.value.generate(item.id) ||
     (permissionPrecise.value.edit(item.id) && apiType.value) === 'workspace' ||
     permissionPrecise.value.export(item.id) ||
+    permissionPrecise.value.auth(item.id) ||
     permissionPrecise.value.delete(item.id) ||
     isSystemShare.value
   )

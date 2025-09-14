@@ -12,7 +12,6 @@ export default {
   batchDeleteUser: 'Delete selected {count} users?',
   settingMethod: 'Configuration Method',
   append: 'Append',
-  replace: 'Replace',
   group: {
     title: 'User Groups',
     name: 'User Group Name',

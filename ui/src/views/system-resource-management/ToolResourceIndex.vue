@@ -72,6 +72,7 @@
         <el-table-column prop="tool_type" :label="$t('views.system.resource_management.type')">
           <template #default="scope">
             <span v-if="scope.row.tool_type === 'MCP'"> MCP </span>
+            <span v-else-if="scope.row.version">{{ $t('views.tool.toolStore.title') }}</span>
             <span v-else>
               {{
                 $t(
@@ -89,13 +90,13 @@
               <el-icon class="color-success mr-8" style="font-size: 16px">
                 <SuccessFilled />
               </el-icon>
-              <span class="color-secondary">
+              <span class="color-text-primary">
                 {{ $t('common.status.enabled') }}
               </span>
             </div>
             <div v-else class="flex align-center">
               <AppIcon iconName="app-disabled" class="color-secondary mr-8"></AppIcon>
-              <span class="color-secondary">
+              <span class="color-text-primary">
                 {{ $t('common.status.disabled') }}
               </span>
             </div>
@@ -207,13 +208,30 @@
               effect="dark"
               :content="$t('common.edit')"
               placement="top"
-              v-if="!row.template_id && permissionPrecise.edit()"
+              v-if="!row.template_id && row.tool_type === 'CUSTOM' && permissionPrecise.edit()"
             >
               <span class="mr-8">
                 <el-button
                   type="primary"
                   text
                   @click.stop="openCreateDialog(row)"
+                  :title="$t('common.edit')"
+                >
+                  <AppIcon iconName="app-edit"></AppIcon>
+                </el-button>
+              </span>
+            </el-tooltip>
+            <el-tooltip
+              effect="dark"
+              :content="$t('common.edit')"
+              placement="top"
+              v-if="!row.template_id && row.tool_type === 'MCP' && permissionPrecise.edit()"
+            >
+              <span class="mr-8">
+                <el-button
+                  type="primary"
+                  text
+                  @click.stop="openCreateMcpDialog(row)"
                   :title="$t('common.edit')"
                 >
                   <AppIcon iconName="app-edit"></AppIcon>
@@ -239,7 +257,7 @@
               </span>
             </el-tooltip>
             <el-dropdown trigger="click" v-if="MoreFilledPermission(row)">
-              <el-button text @click.stop>
+              <el-button text @click.stop type="primary">
                 <AppIcon iconName="app-more"></AppIcon>
               </el-button>
               <template #dropdown>
@@ -253,11 +271,28 @@
                   </el-dropdown-item>
 
                   <el-dropdown-item
-                    v-if="!row.template_id && permissionPrecise.export()"
+                    @click.stop="openAuthorization(row)"
+                    v-if="permissionPrecise.auth()"
+                  >
+                    <AppIcon
+                      iconName="app-resource-authorization"
+                      class="color-secondary"
+                    ></AppIcon>
+                    {{ $t('views.system.resourceAuthorization.title') }}
+                  </el-dropdown-item>
+
+                  <el-dropdown-item
+                    v-if="
+                      !row.template_id && row.tool_type === 'CUSTOM' && permissionPrecise.export()
+                    "
                     @click.stop="exportTool(row)"
                   >
                     <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
                     {{ $t('common.export') }}
+                  </el-dropdown-item>
+                  <el-dropdown-item v-if="row.tool_type === 'MCP' && permissionPrecise.edit()" @click.stop="showMcpConfig(row)">
+                    <AppIcon iconName="app-operate-log" class="color-secondary"></AppIcon>
+                    {{ $t('views.tool.mcpConfig') }}
                   </el-dropdown-item>
                   <el-dropdown-item
                     v-if="permissionPrecise.delete()"
@@ -277,7 +312,10 @@
 
     <InitParamDrawer ref="InitParamDrawerRef" @refresh="refresh" />
     <ToolFormDrawer ref="ToolFormDrawerRef" @refresh="refresh" :title="ToolDrawertitle" />
+    <McpToolFormDrawer ref="McpToolFormDrawerRef" @refresh="refresh" :title="McpToolDrawertitle" />
     <AddInternalToolDialog ref="AddInternalToolDialogRef" @refresh="confirmAddInternalTool" />
+    <McpToolConfigDialog ref="McpToolConfigDialogRef" @refresh="refresh" />
+    <ResourceAuthorizationDrawer :type="SourceTypeEnum.TOOL" ref="ResourceAuthorizationDrawerRef" />
   </div>
 </template>
 
@@ -288,7 +326,10 @@ import InitParamDrawer from '@/views/tool/component/InitParamDrawer.vue'
 import ToolResourceApi from '@/api/system-resource-management/tool'
 import AddInternalToolDialog from '@/views/tool/toolStore/AddInternalToolDialog.vue'
 import ToolFormDrawer from '@/views/tool/ToolFormDrawer.vue'
+import McpToolFormDrawer from '@/views/tool/McpToolFormDrawer.vue'
+import ResourceAuthorizationDrawer from '@/components/resource-authorization-drawer/index.vue'
 import { t } from '@/locales'
+import { SourceTypeEnum } from '@/enums/common'
 import { resetUrl } from '@/utils/common'
 import { ToolType } from '@/enums/tool'
 import useStore from '@/stores'
@@ -297,6 +338,7 @@ import { loadPermissionApi } from '@/utils/dynamics-api/permission-api.ts'
 import UserApi from '@/api/user/user.ts'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import permissionMap from '@/permission'
+import McpToolConfigDialog from '@/views/tool/component/McpToolConfigDialog.vue'
 
 const { user } = useStore()
 
@@ -327,8 +369,14 @@ const MoreFilledPermission = (row: any) => {
   return (
     permissionPrecise.value.export() ||
     permissionPrecise.value.delete() ||
+    permissionPrecise.value.auth() ||
     (row.init_field_list?.length > 0 && permissionPrecise.value.edit())
   )
+}
+
+const ResourceAuthorizationDrawerRef = ref()
+function openAuthorization(item: any) {
+  ResourceAuthorizationDrawerRef.value.open(item.id)
 }
 
 function exportTool(row: any) {
@@ -338,6 +386,13 @@ function exportTool(row: any) {
         MsgError(`${t('views.application.tip.ExportError')}:${JSON.parse(res).message}`)
       })
     }
+  })
+}
+
+const McpToolConfigDialogRef = ref()
+function showMcpConfig(item: any) {
+  ToolResourceApi.getToolById(item?.id, loading).then((res: any) => {
+    McpToolConfigDialogRef.value.open(res.data)
   })
 }
 
@@ -376,7 +431,9 @@ async function copyTool(row: any) {
 }
 
 const ToolFormDrawerRef = ref()
+const McpToolFormDrawerRef = ref()
 const ToolDrawertitle = ref('')
+const McpToolDrawertitle = ref('')
 
 function openCreateDialog(data?: any) {
   // 有template_id的不允许编辑，是模板转换来的
@@ -391,6 +448,22 @@ function openCreateDialog(data?: any) {
     })
   } else {
     ToolFormDrawerRef.value.open(data)
+  }
+}
+
+function openCreateMcpDialog(data?: any) {
+  // 有template_id的不允许编辑，是模板转换来的
+  if (data?.template_id) {
+    return
+  }
+
+  McpToolDrawertitle.value = data ? t('views.tool.editMcpTool') : t('views.tool.createMcpTool')
+  if (data) {
+    ToolResourceApi.getToolById(data?.id, loading).then((res: any) => {
+      McpToolFormDrawerRef.value.open(res.data)
+    })
+  } else {
+    McpToolFormDrawerRef.value.open(data)
   }
 }
 

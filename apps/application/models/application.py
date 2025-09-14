@@ -101,6 +101,13 @@ class Application(AppModelMixin):
     publish_time = models.DateTimeField(verbose_name="发布时间", default=None, null=True, blank=True)
     file_upload_enable = models.BooleanField(verbose_name="文件上传是否启用", default=False)
     file_upload_setting = models.JSONField(verbose_name="文件上传相关设置", default=dict)
+    mcp_enable = models.BooleanField(verbose_name="MCP否启用", default=False)
+    mcp_tool_ids = models.JSONField(verbose_name="MCP工具ID列表", default=list)
+    mcp_servers = models.JSONField(verbose_name="MCP服务列表", default=dict)
+    mcp_source = models.CharField(verbose_name="MCP Source", max_length=20, default="referencing")
+    tool_enable = models.BooleanField(verbose_name="工具是否启用", default=False)
+    tool_ids = models.JSONField(verbose_name="工具ID列表", default=list)
+    mcp_output_enable = models.BooleanField(verbose_name="MCP输出是否启用", default=True)
 
     @staticmethod
     def get_default_model_prompt():
@@ -174,6 +181,13 @@ class ApplicationVersion(AppModelMixin):
     clean_time = models.IntegerField(verbose_name="清理时间", default=180)
     file_upload_enable = models.BooleanField(verbose_name="文件上传是否启用", default=False)
     file_upload_setting = models.JSONField(verbose_name="文件上传相关设置", default=dict)
+    mcp_enable = models.BooleanField(verbose_name="MCP否启用", default=False)
+    mcp_tool_ids = models.JSONField(verbose_name="MCP工具ID列表", default=list)
+    mcp_servers = models.JSONField(verbose_name="MCP服务列表", default=dict)
+    mcp_source = models.CharField(verbose_name="MCP Source", max_length=20, default="referencing")
+    tool_enable = models.BooleanField(verbose_name="工具是否启用", default=False)
+    tool_ids = models.JSONField(verbose_name="工具ID列表", default=list)
+    mcp_output_enable = models.BooleanField(verbose_name="MCP输出是否启用", default=True)
 
     class Meta:
         db_table = "application_version"

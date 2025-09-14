@@ -86,7 +86,7 @@ def get_sync_web_document_handler(knowledge_id):
         else:
             Document(name=source_url[0:128],
                      knowledge_id=knowledge_id,
-                     meta={'source_url': source_url, 'selector': selector},
+                     meta={'source_url': source_url, 'selector': selector, 'allow_download': True},
                      type=KnowledgeType.WEB,
                      char_length=0,
                      status=State.FAILURE).save()

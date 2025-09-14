@@ -14,7 +14,7 @@ from concurrent.futures import ThreadPoolExecutor
 from functools import reduce
 from typing import List, Dict
 
-from django.db import close_old_connections
+from django.db import close_old_connections, connection
 from django.utils import translation
 from django.utils.translation import get_language
 from langchain_core.prompts import PromptTemplate
@@ -433,6 +433,8 @@ class WorkflowManage:
             return None
         finally:
             current_node.node_chunk.end()
+            # 归还链接到连接池
+            connection.close()
 
     def run_node_async(self, node):
         future = executor.submit(self.run_node, node)

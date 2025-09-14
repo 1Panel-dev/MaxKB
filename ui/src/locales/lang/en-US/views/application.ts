@@ -155,8 +155,13 @@ export default {
       start: 'Start',
       end: 'End',
     },
+    mcp_output_enable: 'Output MCP/Tool Execution Process',
   },
-  buttons: {},
+  generateDialog: {
+    label: 'Generate',
+    generatePrompt: 'Generate Prompt',
+    placeholder: 'Please enter the prompt topic',
+  },
   dialog: {
     addKnowledge: 'Add Related Knowledge',
     addKnowledgePlaceholder: 'The selected knowledge must use the same embedding model',

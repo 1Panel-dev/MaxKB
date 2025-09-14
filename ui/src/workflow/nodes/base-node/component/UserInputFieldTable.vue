@@ -9,9 +9,7 @@
       </el-button>
       <span class="ml-4">
         <el-button link type="primary" @click="openAddDialog()">
-          <el-icon class="mr-4">
-            <Plus />
-          </el-icon>
+          <AppIcon iconName="app-add-outlined" class="mr-4"></AppIcon>
           {{ $t('common.add') }}
         </el-button>
       </span>
@@ -109,7 +107,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { set } from 'lodash'
+import { set,cloneDeep } from 'lodash'
 import Sortable from 'sortablejs'
 import UserFieldFormDialog from './UserFieldFormDialog.vue'
 import { MsgError } from '@/utils/message'
@@ -200,7 +198,7 @@ function onDragHandle() {
     onEnd: (evt) => {
       if (evt.oldIndex === undefined || evt.newIndex === undefined) return
       // 更新数据顺序
-      const items = [...inputFieldList.value]
+      const items = cloneDeep([...inputFieldList.value])
       const [movedItem] = items.splice(evt.oldIndex, 1)
       items.splice(evt.newIndex, 0, movedItem)
       inputFieldList.value = items

@@ -12,6 +12,7 @@ from typing import List
 from django.core.cache import cache
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 
 from application.chat_pipeline.step.chat_step.i_chat_step import PostResponseHandler
 from application.models import Application, ChatRecord, Chat, ApplicationVersion, ChatUserType, ApplicationTypeChoices, \
@@ -153,7 +154,14 @@ class ChatInfo:
             'search_mode': self.application.knowledge_setting.get('search_mode') or 'embedding',
             'no_references_setting': self.get_no_references_setting(self.application.knowledge_setting, model_setting),
             'workspace_id': self.application.workspace_id,
-            'application_id': self.application.id
+            'application_id': self.application.id,
+            'mcp_enable': self.application.mcp_enable,
+            'mcp_tool_ids': self.application.mcp_tool_ids,
+            'mcp_servers': self.application.mcp_servers,
+            'mcp_source': self.application.mcp_source,
+            'tool_enable': self.application.tool_enable,
+            'tool_ids': self.application.tool_ids,
+            'mcp_output_enable': self.application.mcp_output_enable,
         }
 
     def to_pipeline_manage_params(self, problem_text: str, post_response_handler: PostResponseHandler,
@@ -213,7 +221,7 @@ class ChatInfo:
                      chat_user_id=self.chat_user_id, chat_user_type=self.chat_user_type,
                      asker=self.get_chat_user()).save()
             else:
-                QuerySet(Chat).filter(id=self.chat_id).update(update_time=datetime.now())
+                QuerySet(Chat).filter(id=self.chat_id).update(update_time=timezone.now())
             # 插入会话记录
             chat_record.save()
             ChatCountSerializer(data={'chat_id': self.chat_id}).update_chat()

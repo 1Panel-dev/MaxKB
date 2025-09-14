@@ -4,7 +4,6 @@
     :title="$t('views.system.resourceAuthorization.title')"
     size="60%"
     :append-to-body="true"
-    :modal="false"
   >
     <div class="flex-between mb-16">
       <el-button
@@ -23,10 +22,7 @@
         >
           <el-option :label="$t('views.userManage.userForm.nick_name.label')" value="nick_name" />
           <el-option :label="$t('views.login.loginForm.username.label')" value="username" />
-          <el-option
-            :label="$t('views.model.modelForm.permissionType.label')"
-            value="publish_status"
-          />
+          <el-option :label="$t('views.model.modelForm.permissionType.label')" value="permission" />
         </el-select>
         <el-input
           v-if="searchType === 'nick_name'"
@@ -46,8 +42,8 @@
         />
 
         <el-select
-          v-else-if="searchType === 'publish_status'"
-          v-model="searchForm.publish_status"
+          v-else-if="searchType === 'permission'"
+          v-model="searchForm.permission"
           @change="searchHandle"
           filterable
           clearable
@@ -150,16 +146,29 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted, watch, computed, reactive } from 'vue'
-import { permissionOptions } from '@/views/system/resource-authorization/constant'
+import { useRoute } from 'vue-router'
+import { getPermissionOptions } from '@/views/system/resource-authorization/constant'
 import AuthorizationApi from '@/api/system/resource-authorization'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { t } from '@/locales'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+const route = useRoute()
 import useStore from '@/stores'
 const { user } = useStore()
 const props = defineProps<{
   type: string
 }>()
 
+const apiType = computed(() => {
+  if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
+const permissionOptions = computed(() => {
+  return getPermissionOptions()
+})
 const drawerVisible = ref(false)
 const multipleTableRef = ref()
 
@@ -249,16 +258,12 @@ function permissionsHandle(val: any, row: any) {
 
 function submitPermissions(obj: any) {
   const workspaceId = user.getWorkspaceId() || 'default'
-  AuthorizationApi.putWorkspaceResourceAuthorization(
-    workspaceId,
-    targetId.value,
-    props.type,
-    obj,
-    loading,
-  ).then(() => {
-    MsgSuccess(t('common.submitSuccess'))
-    getPermissionList()
-  })
+  loadSharedApi({ type: 'resourceAuthorization', systemType: apiType.value })
+    .putResourceAuthorization(workspaceId, targetId.value, props.type, obj, loading)
+    .then(() => {
+      MsgSuccess(t('common.submitSuccess'))
+      getPermissionList()
+    })
 }
 const getPermissionList = () => {
   const workspaceId = user.getWorkspaceId() || 'default'
@@ -266,17 +271,19 @@ const getPermissionList = () => {
   if (searchForm.value[searchType.value]) {
     params[searchType.value] = searchForm.value[searchType.value]
   }
-  AuthorizationApi.getWorkspaceResourceAuthorization(
-    workspaceId,
-    targetId.value,
-    props.type,
-    paginationConfig,
-    params,
-    loading,
-  ).then((res) => {
-    permissionData.value = res.data.records || []
-    paginationConfig.total = res.data.total || 0
-  })
+  loadSharedApi({ type: 'resourceAuthorization', systemType: apiType.value })
+    .getResourceAuthorization(
+      workspaceId,
+      targetId.value,
+      props.type,
+      paginationConfig,
+      params,
+      loading,
+    )
+    .then((res: any) => {
+      permissionData.value = res.data.records || []
+      paginationConfig.total = res.data.total || 0
+    })
 }
 
 const open = (id: string) => {

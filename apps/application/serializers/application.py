@@ -22,6 +22,7 @@ from django.db import models, transaction
 from django.db.models import QuerySet, Q
 from django.http import HttpResponse
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from rest_framework import serializers, status
 from rest_framework.utils.formatting import lazy_format
@@ -705,6 +706,8 @@ class ApplicationOperateSerializer(serializers.Serializer):
             'stt_model_enable': 'stt_model_enable', 'tts_type': 'tts_type',
             'tts_autoplay': 'tts_autoplay', 'stt_autosend': 'stt_autosend', 'file_upload_enable': 'file_upload_enable',
             'file_upload_setting': 'file_upload_setting',
+            'mcp_enable': 'mcp_enable', 'mcp_tool_ids': 'mcp_tool_ids', 'mcp_servers': 'mcp_servers',
+            'mcp_source': 'mcp_source', 'tool_enable': 'tool_enable', 'tool_ids': 'tool_ids', 'mcp_output_enable': 'mcp_output_enable',
             'type': 'type', 'chat_background': 'chat_background', 'avatar': 'avatar',
             'user_avatar': 'user_avatar', 'float_icon': 'float_icon'
         }
@@ -735,11 +738,11 @@ class ApplicationOperateSerializer(serializers.Serializer):
                     application.desc = node_data.get('desc')
                     application.prologue = node_data.get('prologue')
             application.work_flow = work_flow
-        application.publish_time = datetime.datetime.now()
+        application.publish_time = timezone.now()
         application.is_publish = True
         application.save()
         work_flow_version = ApplicationVersion(work_flow=application.work_flow, application=application,
-                                               name=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                                               name=timezone.localtime(timezone.now()).strftime('%Y-%m-%d %H:%M:%S'),
                                                publish_user_id=user_id,
                                                publish_user_name=user.username,
                                                workspace_id=workspace_id)
@@ -829,6 +832,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
                        'stt_model_id', 'tts_model_id', 'tts_model_enable', 'stt_model_enable', 'tts_type',
                        'tts_autoplay', 'stt_autosend', 'file_upload_enable', 'file_upload_setting',
                        'api_key_is_active', 'icon', 'work_flow', 'model_params_setting', 'tts_model_params_setting',
+                       'mcp_enable', 'mcp_tool_ids', 'mcp_servers', 'mcp_source', 'tool_enable', 'tool_ids', 'mcp_output_enable',
                        'problem_optimization_prompt', 'clean_time', 'folder_id']
         for update_key in update_keys:
             if update_key in instance and instance.get(update_key) is not None:

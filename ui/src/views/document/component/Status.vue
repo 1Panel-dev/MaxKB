@@ -15,23 +15,23 @@
       ></StatusTable>
     </template>
     <template #reference>
-      <el-text v-if="aggStatus?.value === State.SUCCESS || aggStatus?.value === State.REVOKED">
+      <el-text class="color-text-primary" v-if="aggStatus?.value === State.SUCCESS || aggStatus?.value === State.REVOKED">
         <el-icon class="color-success"><SuccessFilled /></el-icon>
         {{ stateMap[aggStatus.value](aggStatus.key) }}
       </el-text>
-      <el-text v-else-if="aggStatus?.value === State.FAILURE">
+      <el-text class="color-text-primary" v-else-if="aggStatus?.value === State.FAILURE">
         <el-icon class="color-danger"><CircleCloseFilled /></el-icon>
         {{ stateMap[aggStatus.value](aggStatus.key) }}
       </el-text>
-      <el-text v-else-if="aggStatus?.value === State.STARTED">
+      <el-text class="color-text-primary" v-else-if="aggStatus?.value === State.STARTED">
         <el-icon class="is-loading color-primary"><Loading /></el-icon>
         {{ stateMap[aggStatus.value](aggStatus.key) }}
       </el-text>
-      <el-text v-else-if="aggStatus?.value === State.PENDING">
+      <el-text class="color-text-primary" v-else-if="aggStatus?.value === State.PENDING">
         <el-icon class="is-loading color-primary"><Loading /></el-icon>
         {{ stateMap[aggStatus.value](aggStatus.key) }}
       </el-text>
-      <el-text v-else-if="aggStatus?.value === State.REVOKE">
+      <el-text class="color-text-primary" v-else-if="aggStatus?.value === State.REVOKE">
         <el-icon class="is-loading color-primary"><Loading /></el-icon>
         {{ stateMap[aggStatus.value](aggStatus.key) }}
       </el-text>

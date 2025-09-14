@@ -8,6 +8,7 @@ export default {
   copyTool: 'Copy Tool',
   importTool: 'Import Tool',
   settingTool: 'Set Tool',
+  mcpConfig: 'MCP Service Config',
   toolStore: {
     title: 'Tool Store',
     createFromToolStore: 'Create from Tool Store',
@@ -19,6 +20,8 @@ export default {
     developer: 'Developer',
     communication: 'Communication',
     searchResult: '{count} search results for',
+    confirmTip: 'Are you sure to update tool: ',
+    updateStoreToolMessage: 'Updating tools may affect resources in use, so proceed with caution.',
   },
   searchBar: {
     placeholder: 'Search by tool name',
@@ -44,9 +47,19 @@ export default {
       placeholder: 'Please enter the tool name',
       requiredMessage: 'Please enter the tool name',
     },
+    mcpName: {
+      label: 'Name',
+      name: 'MCP Name',
+      placeholder: 'Please enter the MCP name',
+      requiredMessage: 'Please enter the MCP name',
+    },
     toolDescription: {
       label: 'Description',
       placeholder: 'Please enter a description of the tool',
+    },
+    mcpDescription: {
+      label: 'Description',
+      placeholder: 'Please enter a description of the MCP',
     },
     paramName: {
       label: 'Parameter Name',

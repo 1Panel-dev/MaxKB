@@ -150,8 +150,15 @@ const systemManage = {
       PermissionConst.RESOURCE_KNOWLEDGE_PROBLEM_EDIT
     ],'OR'
     ),
+    chat_user_edit: () =>false,
+
   
-  auth: () => false,
+  auth: () => 
+    hasPermission([
+      RoleConst.ADMIN,
+      PermissionConst.RESOURCE_KNOWLEDGE_AUTH
+    ],'OR'
+    ),
   folderCreate: () => false,
   folderEdit: () => false,
   folderDelete: () => false,

@@ -57,9 +57,7 @@
                 {{ $t('views.applicationWorkflow.nodes.formNode.formSetting') }}
               </h5>
               <el-button link type="primary" @click="openAddFormCollect()">
-                <el-icon class="mr-4">
-                  <Plus />
-                </el-icon>
+                <AppIcon iconName="app-add-outlined" class="mr-4"></AppIcon>
                 {{ $t('common.add') }}
               </el-button>
             </div></template
@@ -111,14 +109,14 @@
                 }}</span>
               </template>
             </el-table-column>
-            <el-table-column :label="$t('common.required')" width="85">
+            <el-table-column :label="$t('common.required')" width="55">
               <template #default="{ row }">
                 <div @click.stop>
                   <el-switch disabled size="small" v-model="row.required" />
                 </div>
               </template>
             </el-table-column>
-            <el-table-column :label="$t('common.operation')" align="left" width="90">
+            <el-table-column :label="$t('common.operation')" align="left" width="80">
               <template #default="{ row, $index }">
                 <span class="mr-4">
                   <el-tooltip effect="dark" :content="$t('common.modify')" placement="top">
@@ -263,7 +261,7 @@ function onDragHandle() {
     onEnd: (evt) => {
       if (evt.oldIndex === undefined || evt.newIndex === undefined) return
       // 更新数据顺序
-      const items = [...form_data.value.form_field_list]
+      const items = cloneDeep([...form_data.value.form_field_list])
       const [movedItem] = items.splice(evt.oldIndex, 1)
       items.splice(evt.newIndex, 0, movedItem)
       form_data.value.form_field_list = items

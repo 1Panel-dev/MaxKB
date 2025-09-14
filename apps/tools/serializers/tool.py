@@ -5,6 +5,9 @@ import json
 import os
 import pickle
 import re
+import requests
+import tempfile
+import zipfile
 from typing import Dict
 
 import uuid_utils.compat as uuid
@@ -124,7 +127,7 @@ class ToolModelSerializer(serializers.ModelSerializer):
         model = Tool
         fields = ['id', 'name', 'icon', 'desc', 'code', 'input_field_list', 'init_field_list', 'init_params',
                   'scope', 'is_active', 'user_id', 'template_id', 'workspace_id', 'folder_id', 'tool_type', 'label',
-                  'create_time', 'update_time']
+                  'version', 'create_time', 'update_time']
 
 
 class ToolExportModelSerializer(serializers.ModelSerializer):
@@ -515,7 +518,8 @@ class ToolSerializer(serializers.Serializer):
 
         def one(self):
             self.is_one_valid(raise_exception=True)
-            tool = QuerySet(Tool).filter(id=self.data.get('id')).first()
+            tool = QuerySet(Tool).filter(id=self.data.get('id')).select_related('user').first()
+            nick_name = tool.user.nick_name if tool and tool.user else None
             if tool.init_params:
                 tool.init_params = json.loads(rsa_long_decrypt(tool.init_params))
             if tool.init_field_list:
@@ -528,6 +532,7 @@ class ToolSerializer(serializers.Serializer):
             return {
                 **ToolModelSerializer(tool).data,
                 'init_params': tool.init_params if tool.init_params else {},
+                'nick_name': nick_name
             }
 
         def export(self):
@@ -703,6 +708,7 @@ class ToolSerializer(serializers.Serializer):
                 tool_type=ToolType.CUSTOM,
                 folder_id=instance.get('folder_id', self.data.get('workspace_id')),
                 template_id=internal_tool.id,
+                label=internal_tool.label,
                 is_active=False
             )
             tool.save()
@@ -715,6 +721,140 @@ class ToolSerializer(serializers.Serializer):
             }).auth_resource(str(tool_id))
 
             return ToolModelSerializer(tool).data
+
+    class StoreTool(serializers.Serializer):
+        user_id = serializers.UUIDField(required=True, label=_("User ID"))
+        name = serializers.CharField(required=False, label=_("tool name"), allow_null=True, allow_blank=True)
+
+        def get_appstore_tools(self):
+            self.is_valid(raise_exception=True)
+            # 下载zip文件
+            try:
+                res = requests.get('https://apps-assets.fit2cloud.com/stable/maxkb.json.zip', timeout=5)
+                res.raise_for_status()
+                # 创建临时文件保存zip
+                with tempfile.NamedTemporaryFile(delete=False, suffix='.zip') as temp_zip:
+                    temp_zip.write(res.content)
+                    temp_zip_path = temp_zip.name
+
+                try:
+                    # 解压zip文件
+                    with zipfile.ZipFile(temp_zip_path, 'r') as zip_ref:
+                        # 获取zip中的第一个文件（假设只有一个json文件）
+                        json_filename = zip_ref.namelist()[0]
+                        json_content = zip_ref.read(json_filename)
+
+                    # 将json转换为字典
+                    tool_store = json.loads(json_content.decode('utf-8'))
+                    tag_dict = {tag['name']: tag['key'] for tag in tool_store['additionalProperties']['tags']}
+                    filter_apps = []
+                    for tool in tool_store['apps']:
+                        if self.data.get('name', '') != '':
+                            if self.data.get('name').lower() not in tool.get('name', '').lower():
+                                continue
+                        versions = tool.get('versions', [])
+                        tool['label'] = tag_dict[tool.get('tags')[0]] if tool.get('tags') else ''
+                        tool['version'] = next(
+                            (version.get('name') for version in versions if version.get('downloadUrl') == tool['downloadUrl']),
+                        )
+                        filter_apps.append(tool)
+
+                    tool_store['apps'] = filter_apps
+                    return tool_store
+                finally:
+                    # 清理临时文件
+                    os.unlink(temp_zip_path)
+            except requests.RequestException as e:
+                maxkb_logger.error(f"fetch appstore tools error: {e}")
+                return {'apps': [], 'additionalProperties': {'tags': []}}
+
+    class AddStoreTool(serializers.Serializer):
+        user_id = serializers.UUIDField(required=True, label=_("User ID"))
+        workspace_id = serializers.CharField(required=True, label=_("workspace id"))
+        tool_id = serializers.CharField(required=True, label=_("tool id"))
+
+        def add(self, instance: Dict, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+                AddInternalToolRequest(data=instance).is_valid(raise_exception=True)
+
+            versions = instance.get('versions', [])
+            download_url = instance.get('download_url')
+            # 查找匹配的版本名称
+            version_name = next(
+                (version.get('name') for version in versions if version.get('downloadUrl') == download_url),
+            )
+            res = requests.get(download_url, timeout=5)
+            tool_data = RestrictedUnpickler(io.BytesIO(res.content)).load().tool
+            tool_id = uuid.uuid7()
+            tool = Tool(
+                id=tool_id,
+                name=tool_data.get('name'),
+                desc=tool_data.get('desc'),
+                code=tool_data.get('code'),
+                user_id=self.data.get('user_id'),
+                icon=instance.get('icon', ''),
+                workspace_id=self.data.get('workspace_id'),
+                input_field_list=tool_data.get('input_field_list', []),
+                init_field_list=tool_data.get('init_field_list', []),
+                scope=ToolScope.WORKSPACE,
+                tool_type=ToolType.CUSTOM,
+                folder_id=instance.get('folder_id', self.data.get('workspace_id')),
+                template_id=self.data.get('tool_id'),
+                label=instance.get('label'),
+                version=version_name,
+                is_active=False
+            )
+            tool.save()
+
+            # 自动授权给创建者
+            UserResourcePermissionSerializer(data={
+                'workspace_id': self.data.get('workspace_id'),
+                'user_id': self.data.get('user_id'),
+                'auth_target_type': AuthTargetType.TOOL.value
+            }).auth_resource(str(tool_id))
+            try:
+                requests.get(instance.get('download_callback_url'), timeout=5)
+            except Exception as e:
+                maxkb_logger.error(f"callback appstore tool download error: {e}")
+            return ToolModelSerializer(tool).data
+
+    class UpdateStoreTool(serializers.Serializer):
+        user_id = serializers.UUIDField(required=True, label=_("User ID"))
+        workspace_id = serializers.CharField(required=True, label=_("workspace id"))
+        tool_id = serializers.UUIDField(required=True, label=_("tool id"))
+        download_url = serializers.CharField(required=True, label=_("download url"))
+        download_callback_url = serializers.CharField(required=True, label=_("download callback url"))
+        icon = serializers.CharField(required=True, label=_("icon"), allow_null=True, allow_blank=True)
+        versions = serializers.ListField(required=True, label=_("versions"), child=serializers.DictField())
+
+        def update_tool(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            tool = QuerySet(Tool).filter(id=self.data.get('tool_id')).first()
+            if tool is None:
+                raise AppApiException(500, _('Tool does not exist'))
+            # 查找匹配的版本名称
+            version_name = next(
+                (version.get('name') for version in self.data.get('versions') if version.get('downloadUrl') == self.data.get('download_url')),
+            )
+            res = requests.get(self.data.get('download_url'), timeout=5)
+            tool_data = RestrictedUnpickler(io.BytesIO(res.content)).load().tool
+            tool.name = tool_data.get('name')
+            tool.desc = tool_data.get('desc')
+            tool.code = tool_data.get('code')
+            tool.input_field_list = tool_data.get('input_field_list', [])
+            tool.init_field_list = tool_data.get('init_field_list', [])
+            tool.icon = self.data.get('icon', tool.icon)
+            tool.version = version_name
+            # tool.is_active = False
+            tool.save()
+            try:
+                requests.get(self.data.get('download_callback_url'), timeout=5)
+            except Exception as e:
+                maxkb_logger.error(f"callback appstore tool download error: {e}")
+            return ToolModelSerializer(tool).data
+
 
 
 class ToolTreeSerializer(serializers.Serializer):

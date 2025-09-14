@@ -68,7 +68,7 @@ class AliyunBaiLianOmiSpeechToText(MaxKBBaseModel, BaseSpeechToText):
                                     "format": "mp3",
                                 },
                             },
-                            {"type": "text", "text": self.params.get('CueWord')},
+                            {"type": "text", "text": '这段音频在说什么，只回答音频的内容'},
                         ],
                     },
                 ],

@@ -8793,3 +8793,37 @@ msgstr "基于Qwen-Audio的端到端语音识别大模型，支持3分钟以内�
 
 msgid "If not passed, the default value is 'zh'"
 msgstr "如果未传递，则默认值为'zh'"
+
+msgid "System resources authorization"
+msgstr "系统资源授权"
+
+msgid "This folder contains resources that you dont have permission"
+msgstr "此文件夹包含您没有权限的资源"
+
+
+msgid "Text to Video"
+msgstr "文生视频"
+
+msgid "Image to Video"
+msgstr "图生视频"
+
+msgid "Authentication failed. Please verify that the parameters are correct"
+msgstr "认证失败，请检查参数是否正确"
+
+msgid "Chat context"
+msgstr "聊天上下文"
+
+msgid "Prompt template"
+msgstr "提示词模板"
+
+msgid "generate prompt"
+msgstr "生成提示词"
+
+msgid "Watermark"
+msgstr "水印"
+
+msgid "Whether to add watermark"
+msgstr "是否添加水印"
+
+msgid "Resolution"
+msgstr "分辨率"

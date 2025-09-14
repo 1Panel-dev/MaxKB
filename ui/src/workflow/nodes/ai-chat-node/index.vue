@@ -54,6 +54,19 @@
         </el-form-item>
 
         <el-form-item :label="$t('views.application.form.roleSettings.label')">
+          <template #label>
+            <div class="flex-between">
+              <span>{{ $t('views.application.form.roleSettings.label') }}</span>
+              <el-button
+                type="primary"
+                link
+                @click="openGeneratePromptDialog(chat_data.model_id)"
+                :disabled="!chat_data.model_id"
+              >
+                <AppIcon iconName="app-generate-star"></AppIcon>
+              </el-button>
+            </div>
+          </template>
           <MdEditorMagnify
             :title="$t('views.application.form.roleSettings.label')"
             v-model="chat_data.system"
@@ -124,32 +137,60 @@
               link
               @click="openMcpServersDialog"
               @refreshForm="refreshParam"
+              v-if="chat_data.mcp_enable"
             >
               <AppIcon iconName="app-setting"></AppIcon>
             </el-button>
             <el-switch size="small" v-model="chat_data.mcp_enable" />
           </div>
         </div>
-        <div class="w-full" v-if="
-          (chat_data.mcp_tool_id) ||
-          (chat_data.mcp_servers && chat_data.mcp_servers.length > 0)"
+        <div
+          class="w-full mb-16"
+          v-if="
+            chat_data.mcp_tool_ids?.length > 0 ||
+            (chat_data.mcp_servers && chat_data.mcp_servers.length > 0)
+          "
         >
-          <div class="flex-between border border-r-6 white-bg mb-4" style="padding: 5px 8px">
-            <div class="flex align-center" style="line-height: 20px">
-              <ToolIcon type="MCP" class="mr-8" :size="20" />
+          <template v-for="(item, index) in chat_data.mcp_tool_ids" :key="index">
+            <div
+              class="flex-between border border-r-6 white-bg mb-4"
+              style="padding: 5px 8px"
+              v-if="relatedObject(mcpToolSelectOptions, item, 'id')"
+            >
+              <div class="flex align-center" style="line-height: 20px">
+                <el-avatar
+                  v-if="relatedObject(mcpToolSelectOptions, item, 'id')?.icon"
+                  shape="square"
+                  :size="20"
+                  style="background: none"
+                  class="mr-8"
+                >
+                  <img
+                    :src="resetUrl(relatedObject(mcpToolSelectOptions, item, 'id')?.icon)"
+                    alt=""
+                  />
+                </el-avatar>
+                <ToolIcon v-else type="MCP" class="mr-8" :size="20" />
 
-              <div class="ellipsis" :title="relatedObject(toolSelectOptions, chat_data.mcp_tool_id, 'id')?.name">
-                {{ relatedObject(mcpToolSelectOptions, chat_data.mcp_tool_id, 'id')?.name || $t('common.custom') + ' MCP' }}
+                <div
+                  class="ellipsis"
+                  :title="relatedObject(mcpToolSelectOptions, item, 'id')?.name"
+                >
+                  {{
+                    relatedObject(mcpToolSelectOptions, item, 'id')?.name ||
+                    $t('common.custom') + ' MCP'
+                  }}
+                </div>
               </div>
+              <el-button text @click="removeMcpTool(item)">
+                <el-icon><Close /></el-icon>
+              </el-button>
             </div>
-            <el-button text @click="chat_data.mcp_tool_id = ''">
-              <el-icon><Close /></el-icon>
-            </el-button>
-          </div>
+          </template>
         </div>
         <!-- 工具       -->
         <div class="flex-between mb-16">
-          <div class="lighter">{{ $t('views.applicationWorkflow.nodes.mcpNode.tool') }}</div>
+          <div class="lighter">{{ $t('views.tool.title') }}</div>
           <div>
             <el-button
               type="primary"
@@ -157,17 +198,27 @@
               link
               @click="openToolDialog"
               @refreshForm="refreshParam"
+              v-if="chat_data.tool_enable"
             >
               <AppIcon iconName="app-setting"></AppIcon>
             </el-button>
             <el-switch size="small" v-model="chat_data.tool_enable" />
           </div>
         </div>
-        <div class="w-full" v-if="chat_data.tool_ids?.length > 0">
+        <div class="w-full mb-16" v-if="chat_data.tool_ids?.length > 0">
           <template v-for="(item, index) in chat_data.tool_ids" :key="index">
             <div class="flex-between border border-r-6 white-bg mb-4" style="padding: 5px 8px">
               <div class="flex align-center" style="line-height: 20px">
-                <ToolIcon type="CUSTOM" class="mr-8" :size="20" />
+                <el-avatar
+                  v-if="relatedObject(toolSelectOptions, item, 'id')?.icon"
+                  shape="square"
+                  :size="20"
+                  style="background: none"
+                  class="mr-8"
+                >
+                  <img :src="resetUrl(relatedObject(toolSelectOptions, item, 'id')?.icon)" alt="" />
+                </el-avatar>
+                <ToolIcon v-else class="mr-8" :size="20" />
 
                 <div class="ellipsis" :title="relatedObject(toolSelectOptions, item, 'id')?.name">
                   {{ relatedObject(toolSelectOptions, item, 'id')?.name }}
@@ -179,24 +230,42 @@
             </div>
           </template>
         </div>
-
+        <el-form-item @click.prevent>
+          <template #label>
+            <div class="flex-between">
+              <span class="mr-4">
+                {{ $t('views.application.form.mcp_output_enable') }}
+              </span>
+              <div class="flex">
+                <el-switch class="ml-8" size="small" v-model="chat_data.mcp_output_enable" />
+              </div>
+            </div>
+          </template>
+        </el-form-item>
         <el-form-item @click.prevent>
           <template #label>
             <div class="flex-between w-full">
               <div>
                 <span>{{ $t('views.application.form.reasoningContent.label') }}</span>
               </div>
-              <el-button
-                type="primary"
-                link
-                @click="openReasoningParamSettingDialog"
-                @refreshForm="refreshParam"
-              >
-                <AppIcon iconName="app-setting"></AppIcon>
-              </el-button>
+              <div>
+                <el-button
+                  type="primary"
+                  link
+                  @click="openReasoningParamSettingDialog"
+                  @refreshForm="refreshParam"
+                  class="mr-4"
+                  v-if="chat_data.model_setting.reasoning_content_enable"
+                >
+                  <AppIcon iconName="app-setting"></AppIcon>
+                </el-button>
+                <el-switch
+                  size="small"
+                  v-model="chat_data.model_setting.reasoning_content_enable"
+                />
+              </div>
             </div>
           </template>
-          <el-switch size="small" v-model="chat_data.model_setting.reasoning_content_enable" />
         </el-form-item>
         <el-form-item @click.prevent>
           <template #label>
@@ -220,6 +289,7 @@
     </el-card>
 
     <AIModeParamSettingDialog ref="AIModeParamSettingDialogRef" @refresh="refreshParam" />
+    <GeneratePromptDialog @replace="replace" ref="GeneratePromptDialogRef" />
     <ReasoningParamSettingDialog
       ref="ReasoningParamSettingDialogRef"
       @refresh="submitReasoningDialog"
@@ -235,13 +305,16 @@ import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted, inject } from 'vue'
 import { isLastNode } from '@/workflow/common/data'
 import AIModeParamSettingDialog from '@/views/application/component/AIModeParamSettingDialog.vue'
+import GeneratePromptDialog from '@/views/application/component/GeneratePromptDialog.vue'
 import { t } from '@/locales'
 import ReasoningParamSettingDialog from '@/views/application/component/ReasoningParamSettingDialog.vue'
+import ToolDialog from '@/views/application/component/ToolDialog.vue'
 import McpServersDialog from '@/views/application/component/McpServersDialog.vue'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { useRoute } from 'vue-router'
-import ToolDialog from '@/views/application/component/ToolDialog.vue'
-import {relatedObject} from "@/utils/array.ts";
+
+import { resetUrl } from '@/utils/common'
+import { relatedObject } from '@/utils/array.ts'
 const getApplicationDetail = inject('getApplicationDetail') as any
 const route = useRoute()
 
@@ -363,6 +436,15 @@ const openAIParamSettingDialog = (modelId: string) => {
   }
 }
 
+const GeneratePromptDialogRef = ref<InstanceType<typeof GeneratePromptDialog>>()
+const openGeneratePromptDialog = (modelId: string) => {
+  if (modelId) {
+    GeneratePromptDialogRef.value?.open(modelId, id)
+  }
+}
+const replace = (v: any) => {
+  set(props.nodeModel.properties.node_data.model_setting, 'system', v)
+}
 const openReasoningParamSettingDialog = () => {
   ReasoningParamSettingDialogRef.value?.open(chat_data.value.model_setting)
 }
@@ -385,7 +467,7 @@ const mcpServersDialogRef = ref()
 function openMcpServersDialog() {
   const config = {
     mcp_servers: chat_data.value.mcp_servers,
-    mcp_tool_id: chat_data.value.mcp_tool_id,
+    mcp_tool_ids: chat_data.value.mcp_tool_ids,
     mcp_source: chat_data.value.mcp_source,
   }
   mcpServersDialogRef.value.open(config, mcpToolSelectOptions.value)
@@ -393,7 +475,7 @@ function openMcpServersDialog() {
 
 function submitMcpServersDialog(config: any) {
   set(props.nodeModel.properties.node_data, 'mcp_servers', config.mcp_servers)
-  set(props.nodeModel.properties.node_data, 'mcp_tool_id', config.mcp_tool_id)
+  set(props.nodeModel.properties.node_data, 'mcp_tool_ids', config.mcp_tool_ids)
   set(props.nodeModel.properties.node_data, 'mcp_source', config.mcp_source)
 }
 
@@ -407,6 +489,10 @@ function submitToolDialog(config: any) {
 function removeTool(id: any) {
   const list = props.nodeModel.properties.node_data.tool_ids.filter((v: any) => v !== id)
   set(props.nodeModel.properties.node_data, 'tool_ids', list)
+}
+function removeMcpTool(id: any) {
+  const list = props.nodeModel.properties.node_data.mcp_tool_ids.filter((v: any) => v !== id)
+  set(props.nodeModel.properties.node_data, 'mcp_tool_ids', list)
 }
 
 const toolSelectOptions = ref<any[]>([])
@@ -465,6 +551,16 @@ onMounted(() => {
   set(props.nodeModel, 'validate', validate)
   if (!chat_data.value.dialogue_type) {
     chat_data.value.dialogue_type = 'WORKFLOW'
+  }
+
+  if (props.nodeModel.properties.node_data?.mcp_tool_id) {
+    set(props.nodeModel.properties.node_data, 'mcp_tool_ids', [
+      props.nodeModel.properties.node_data?.mcp_tool_id,
+    ])
+    set(props.nodeModel.properties.node_data, 'mcp_tool_id', undefined)
+  }
+  if (props.nodeModel.properties.node_data?.mcp_output_enable === undefined) {
+    set(props.nodeModel.properties.node_data, 'mcp_output_enable', true)
   }
 
   getToolSelectOptions()

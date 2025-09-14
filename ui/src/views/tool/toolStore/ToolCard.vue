@@ -1,10 +1,29 @@
 <template>
   <CardBox :title="props.tool.name" :description="props.tool.desc" class="cursor">
     <template #icon>
-      <el-avatar v-if="isAppIcon(props.tool?.icon)" shape="square" :size="32" style="background: none">
+      <el-avatar
+        v-if="isAppIcon(props.tool?.icon)"
+        shape="square"
+        :size="32"
+        style="background: none"
+      >
         <img :src="resetUrl(props.tool?.icon)" alt="" />
       </el-avatar>
-      <el-avatar v-else-if="props.tool?.name" :name="props.tool?.name" pinyinColor shape="square" :size="32" />
+      <el-avatar
+        v-else-if="props.tool?.name"
+        :name="props.tool?.name"
+        pinyinColor
+        shape="square"
+        :size="32"
+      />
+    </template>
+    <template #title>
+      <div>
+        {{ props.tool?.name }}
+        <el-tag v-if="props.tool?.version" class="ml-4" type="info" effect="plain">
+          {{ props.tool?.version }}
+        </el-tag>
+      </div>
     </template>
     <template #subTitle>
       <el-text class="color-secondary" size="small">
@@ -29,24 +48,24 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import {isAppIcon, resetUrl} from '@/utils/common'
+import { isAppIcon, resetUrl } from '@/utils/common'
 
 const props = defineProps<{
-  tool: any,
+  tool: any
   getSubTitle: (v: any) => string
   addLoading: boolean
 }>()
 
 const emit = defineEmits<{
-  (e: 'handleAdd'): void;
-  (e: 'handleDetail'): void;
-}>();
+  (e: 'handleAdd'): void
+  (e: 'handleDetail'): void
+}>()
 </script>
 
 <style lang="scss" scoped>
 .el-card {
   :deep(.card-footer) {
-    &>div:first-of-type {
+    & > div:first-of-type {
       flex: 1;
     }
 

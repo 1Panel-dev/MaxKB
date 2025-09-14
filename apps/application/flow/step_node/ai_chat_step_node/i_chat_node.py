@@ -34,12 +34,13 @@ class ChatNodeSerializer(serializers.Serializer):
     mcp_enable = serializers.BooleanField(required=False, label=_("Whether to enable MCP"))
     mcp_servers = serializers.JSONField(required=False, label=_("MCP Server"))
     mcp_tool_id = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_("MCP Tool ID"))
+    mcp_tool_ids = serializers.ListField(child=serializers.UUIDField(), required=False, allow_empty=True, label=_("MCP Tool IDs"), )
     mcp_source = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_("MCP Source"))
 
     tool_enable = serializers.BooleanField(required=False, default=False, label=_("Whether to enable tools"))
     tool_ids = serializers.ListField(child=serializers.UUIDField(), required=False, allow_empty=True,
                                      label=_("Tool IDs"), )
-
+    mcp_output_enable = serializers.BooleanField(required=False, default=True, label=_("Whether to enable MCP output"))
 
 class IChatNode(INode):
     type = 'ai-chat-node'
@@ -58,8 +59,10 @@ class IChatNode(INode):
                 mcp_enable=False,
                 mcp_servers=None,
                 mcp_tool_id=None,
+                mcp_tool_ids=None,
                 mcp_source=None,
                 tool_enable=False,
                 tool_ids=None,
+                mcp_output_enable=True,
                 **kwargs) -> NodeResult:
         pass

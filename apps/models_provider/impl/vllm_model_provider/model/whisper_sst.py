@@ -44,7 +44,9 @@ class VllmWhisperSpeechToText(MaxKBBaseModel, BaseSpeechToText):
             self.speech_to_text(audio_file)
 
     def speech_to_text(self, audio_file):
-        base_url = f"{self.api_url}/v1"
+
+        base_url = self.api_url if self.api_url.endswith('v1') else f"{self.api_url}/v1"
+
         try:
             client = OpenAI(
                 api_key=self.api_key,

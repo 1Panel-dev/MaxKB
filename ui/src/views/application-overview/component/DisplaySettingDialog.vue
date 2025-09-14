@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="$t('views.applicationOverview.appInfo.SettingDisplayDialog.dialogTitle')"
+    :title="$t('views.applicationOverview.appInfo.displaySetting')"
     v-model="dialogVisible"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
@@ -9,7 +9,7 @@
     <el-form label-position="top" ref="displayFormRef" :model="form">
       <el-form-item>
         <span>{{
-          $t('views.applicationOverview.appInfo.SettingDisplayDialog.languageLabel')
+          $t('layout.language')
         }}</span>
         <el-select v-model="form.language" clearable>
           <el-option
@@ -24,13 +24,13 @@
         <el-space direction="vertical" alignment="start" :size="2">
           <el-checkbox
             v-model="form.show_source"
-            :label="$t('views.applicationOverview.appInfo.SettingDisplayDialog.showSourceLabel')"
+            :label="$t('views.applicationOverview.SettingDisplayDialog.showSourceLabel')"
           />
 
           <el-checkbox
             v-model="form.show_exec"
             :label="
-              $t('views.applicationOverview.appInfo.SettingDisplayDialog.showExecutionDetail')
+              $t('views.applicationOverview.SettingDisplayDialog.showExecutionDetail')
             "
           />
         </el-space>

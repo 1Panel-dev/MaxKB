@@ -31,6 +31,8 @@ export default {
     TTS: 'TTS',
     IMAGE: 'Vision Model',
     TTI: 'Image Generation',
+    TTV: 'Text-to-Video',
+    ITV: 'Image-to-Video',
   },
   modelForm: {
     title: {

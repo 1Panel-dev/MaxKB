@@ -10,7 +10,12 @@
   >
     <el-row v-if="isConnect">
       <el-col :span="18" class="p-24">
-        <ParagraphForm ref="paragraphFormRef" :data="detail" :isEdit="true" :knowledge-id="knowledgeId"/>
+        <ParagraphForm
+          ref="paragraphFormRef"
+          :data="detail"
+          :isEdit="true"
+          :knowledge-id="knowledgeId"
+        />
       </el-col>
       <el-col :span="6" class="border-l" style="width: 300px">
         <p class="bold title p-24" style="padding-bottom: 0">
@@ -18,7 +23,7 @@
             <span>{{ $t('views.paragraph.relatedProblem.title') }}</span>
             <el-divider direction="vertical" class="mr-4" />
             <el-button text @click="addProblem">
-              <el-icon><Plus /></el-icon>
+              <AppIcon iconName="app-add-outlined"></AppIcon>
             </el-button>
           </span>
         </p>
@@ -52,7 +57,12 @@
       </el-col>
     </el-row>
     <div v-else class="p-24">
-      <ParagraphForm ref="paragraphFormRef" :data="detail" :isEdit="true" :knowledge-id="knowledgeId"/>
+      <ParagraphForm
+        ref="paragraphFormRef"
+        :data="detail"
+        :isEdit="true"
+        :knowledge-id="knowledgeId"
+      />
     </div>
 
     <template #footer>
@@ -70,7 +80,7 @@ import ParagraphForm from '@/views/paragraph/component/ParagraphForm.vue'
 
 const props = defineProps({
   isConnect: Boolean,
-  knowledgeId: String
+  knowledgeId: String,
 })
 
 const emit = defineEmits(['updateContent'])
@@ -106,7 +116,7 @@ function addProblemHandle() {
       !detail.value?.problem_list.some((item: any) => item.content === problemValue.value.trim())
     ) {
       detail.value?.problem_list?.push({
-        content: problemValue.value.trim()
+        content: problemValue.value.trim(),
       })
     }
 
@@ -125,7 +135,7 @@ const submitHandle = async () => {
   if (await paragraphFormRef.value?.validate()) {
     emit('updateContent', {
       problem_list: detail.value.problem_list,
-      ...paragraphFormRef.value?.form
+      ...paragraphFormRef.value?.form,
     })
     dialogVisible.value = false
   }

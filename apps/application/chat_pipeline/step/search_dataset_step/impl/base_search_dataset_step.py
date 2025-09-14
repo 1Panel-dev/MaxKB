@@ -27,6 +27,12 @@ from models_provider.models import Model
 from models_provider.tools import get_model, get_model_by_id
 
 
+def reset_meta(meta):
+    if not meta.get('allow_download', False):
+        return {'allow_download': False}
+    return meta
+
+
 def get_embedding_id(knowledge_id_list):
     knowledge_list = QuerySet(Knowledge).filter(id__in=knowledge_id_list)
     if len(set([knowledge.embedding_model_id for knowledge in knowledge_list])) > 1:
@@ -84,7 +90,7 @@ class BaseSearchDatasetStep(ISearchDatasetStep):
                     .add_document_name(paragraph.get('document_name'))
                     .add_hit_handling_method(paragraph.get('hit_handling_method'))
                     .add_directly_return_similarity(paragraph.get('directly_return_similarity'))
-                    .add_meta(paragraph.get('meta'))
+                    .add_meta(reset_meta(paragraph.get('meta')))
                     .build())
 
     @staticmethod

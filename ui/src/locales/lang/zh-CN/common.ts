@@ -48,6 +48,8 @@ export default {
   noData: '暂无数据',
   result: '结果',
   remove: '移除',
+  classify: '分类',
+  reason: '理由',
   removeSuccess: '移除成功',
   searchBar: {
     placeholder: '按名称搜索',

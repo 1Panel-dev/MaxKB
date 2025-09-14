@@ -8,6 +8,7 @@ export default {
   copyTool: '複製工具',
   importTool: '匯入工具',
   settingTool: '設定工具',
+  mcpConfig: 'MCP服務配置',
   toolStore: {
     title: '工具商店',
     createFromToolStore: '從工具商店創建',
@@ -19,6 +20,8 @@ export default {
     developer: '開發者',
     communication: '通信',
     searchResult: '的搜索結果 {count} 個',
+    confirmTip: '是否更新工具：',
+    updateStoreToolMessage: '更新工具可能會影響正在使用的資源，請謹慎操作。',
   },
   searchBar: {
     placeholder: '按工具名稱搜尋',
@@ -41,9 +44,19 @@ export default {
       placeholder: '請輸入工具名稱',
       requiredMessage: '請輸入工具名稱',
     },
+    mcpName: {
+      label: '名稱',
+      name: 'MCP名稱',
+      placeholder: '請輸入MCP名稱',
+      requiredMessage: '請輸入MCP名稱',
+    },
     toolDescription: {
       label: '描述',
       placeholder: '請輸入工具的描述',
+    },
+    mcpDescription: {
+      label: '描述',
+      placeholder: '請輸入MCP的描述',
     },
     paramName: {
       label: '參數名',

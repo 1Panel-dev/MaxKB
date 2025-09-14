@@ -61,10 +61,11 @@ class AliyunBaiLianAsrSpeechToText(MaxKBBaseModel, BaseSpeechToText):
                 messages=messages,
                 result_format="message",
             )
-
-            text = response["output"]["choices"][0]["message"].content[0]["text"]
-
-            return text
+            if response.status_code == 200:
+                text = response["output"]["choices"][0]["message"].content[0]["text"]
+                return text
+            else:
+                raise Exception('Error: ', response.message)
 
         except Exception as err:
             maxkb_logger.error(f":Error: {str(err)}: {traceback.format_exc()}")

@@ -142,6 +142,24 @@ const addInternalTool: (
   return post(`${prefix}/${tool_id}/add_internal_tool`, param, undefined, loading)
 }
 
+/**
+ * 工具商店
+ */
+const addStoreTool: (
+  tool_id: string,
+  param: AddInternalToolParam,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (tool_id, param, loading) => {
+  return post(`${prefix}/${tool_id}/add_store_tool`, param, undefined, loading)
+}
+
+const updateStoreTool: (
+  tool_id: string,
+  param: AddInternalToolParam,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (tool_id, param, loading) => {
+  return post(`${prefix}/${tool_id}/update_store_tool`, param, undefined, loading)
+}
 
 export default {
   getToolList,
@@ -156,5 +174,7 @@ export default {
   exportTool,
   putToolIcon,
   delTool,
-  addInternalTool
+  addInternalTool,
+  addStoreTool,
+  updateStoreTool
 }

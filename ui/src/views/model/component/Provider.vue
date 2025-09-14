@@ -2,18 +2,19 @@
   <div class="provider-list">
     <el-scrollbar>
       <div class="p-8">
-        <div
-          @click="handleSharedNodeClick"
-          class="shared-button flex cursor border-b"
-          v-if="showShared && hasPermission(EditionConst.IS_EE, 'OR')"
-          :class="active?.provider === 'share' && 'active'"
-        >
-          <AppIcon
-            iconName="app-shared-active"
-            style="font-size: 18px"
-            class="color-primary"
-          ></AppIcon>
-          <span class="ml-8 lighter">{{ $t('views.shared.shared_model') }}</span>
+        <div v-if="showShared && hasPermission(EditionConst.IS_EE, 'OR')" class="border-b mb-4">
+          <div
+            @click="handleSharedNodeClick"
+            class="shared-button flex cursor"
+            :class="active?.provider === 'share' && 'active'"
+          >
+            <AppIcon
+              iconName="app-shared-active"
+              style="font-size: 18px"
+              class="color-primary"
+            ></AppIcon>
+            <span class="ml-8">{{ $t('views.shared.shared_model') }}</span>
+          </div>
         </div>
         <div
           class="all-mode flex cursor"
@@ -159,12 +160,12 @@ const handleSharedNodeClick = () => {
     padding: 10px 8px;
     font-weight: 400;
     &:hover {
-      border-radius: var(--app-border-radius-base);
+      border-radius: var();
       background: var(--app-text-color-light-1);
     }
   }
   .all-mode-active {
-    border-radius: var(--app-border-radius-base);
+    border-radius: var();
     color: var(--el-color-primary);
     font-weight: 500 !important;
     background: var(--el-color-primary-light-9);
@@ -184,7 +185,7 @@ const handleSharedNodeClick = () => {
       background: none;
       &:hover {
         background: var(--app-text-color-light-1);
-        border-radius: var(--app-border-radius-base);
+        border-radius: var();
       }
     }
     :deep(.el-collapse-item) {
@@ -210,7 +211,7 @@ const handleSharedNodeClick = () => {
     margin-bottom: 4px;
     &.active {
       background: var(--el-color-primary-light-9);
-      border-radius: var(--app-border-radius-base);
+      border-radius: var();
       color: var(--el-color-primary);
       font-weight: 500;
       &:hover {
@@ -218,7 +219,7 @@ const handleSharedNodeClick = () => {
       }
     }
     &:hover {
-      border-radius: var(--app-border-radius-base);
+      border-radius: var();
       background: var(--app-text-color-light-1);
     }
     &.is-active {

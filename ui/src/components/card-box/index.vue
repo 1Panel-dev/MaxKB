@@ -20,7 +20,7 @@
           </div>
 
           <div class="status-tag">
-            <slot name="tag"> <!-- 放标签 --> </slot>
+            <slot name="tag" :hoverShow="show"> <!-- 放标签 --> </slot>
           </div>
         </div>
       </slot>
@@ -80,6 +80,7 @@ function cardLeave() {
 function subHoveredEnter() {
   subHovered.value = true
 }
+
 </script>
 <style lang="scss" scoped>
 .card-box {

@@ -9,7 +9,7 @@
 import time
 from datetime import datetime
 from typing import List, Type
-
+from django.utils import timezone
 from rest_framework import serializers
 
 from application.flow.i_step_node import NodeResult
@@ -30,7 +30,7 @@ def get_global_variable(node):
     history_context = [{'question': chat_record.problem_text, 'answer': chat_record.answer_text} for chat_record in
                        history_chat_record]
     chat_id = node.flow_params_serializer.data.get('chat_id')
-    return {'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'start_time': time.time(),
+    return {'time': timezone.localtime(timezone.now()).strftime('%Y-%m-%d %H:%M:%S'), 'start_time': time.time(),
             'history_context': history_context, 'chat_id': str(chat_id), **node.workflow_manage.form_data,
             'chat_user_id': body.get('chat_user_id'),
             'chat_user_type': body.get('chat_user_type'),
@@ -55,6 +55,7 @@ class BaseStartStepNode(IStarNode):
             workflow_manage.context[key] = value
         for item in details.get('global_fields', []):
             workflow_manage.context[item.get('key')] = item.get('value')
+        self.workflow_manage.chat_context = self.workflow_manage.get_chat_info().get_chat_variable()
 
     def get_node_params_serializer_class(self) -> Type[serializers.Serializer]:
         pass

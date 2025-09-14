@@ -7,7 +7,7 @@
             <div class="flex-between cursor" @click="item['show'] = !item['show']">
               <div class="flex align-center">
                 <el-icon class="mr-8 arrow-icon" :class="item['show'] ? 'rotate-90' : ''">
-                  <CaretRight />
+                  <CaretRight/>
                 </el-icon>
                 <component
                   :is="iconComponent(`${item.type}-icon`)"
@@ -27,14 +27,14 @@
                     item.type === WorkflowType.ImageGenerateNode ||
                     item.type === WorkflowType.Application
                   "
-                  >{{ item?.message_tokens + item?.answer_tokens }} tokens</span
+                >{{ item?.message_tokens + item?.answer_tokens }} tokens</span
                 >
                 <span class="mr-16 color-secondary">{{ item?.run_time?.toFixed(2) || 0.0 }} s</span>
                 <el-icon class="color-success" :size="16" v-if="item.status === 200">
-                  <CircleCheck />
+                  <CircleCheck/>
                 </el-icon>
                 <el-icon class="color-danger" :size="16" v-else>
-                  <CircleClose />
+                  <CircleClose/>
                 </el-icon>
               </div>
             </div>
@@ -77,7 +77,7 @@
                                 class="file cursor"
                               >
                                 <div class="flex align-center">
-                                  <img :src="getImgUrl(f && f?.name)" alt="" width="24" />
+                                  <img :src="getImgUrl(f && f?.name)" alt="" width="24"/>
                                   <div class="ml-4 ellipsis" :title="f && f?.name">
                                     {{ f && f?.name }}
                                   </div>
@@ -130,7 +130,7 @@
                                 class="file cursor"
                               >
                                 <div class="flex align-center">
-                                  <img :src="getImgUrl(f && f?.name)" alt="" width="24" />
+                                  <img :src="getImgUrl(f && f?.name)" alt="" width="24"/>
                                   <div class="ml-4 ellipsis" :title="f && f?.name">
                                     {{ f && f?.name }}
                                   </div>
@@ -431,7 +431,7 @@
                     </div>
                   </template>
                   <!-- 多路召回 -->
-                  <template v-if="item.type == WorkflowType.RrerankerNode">
+                  <template v-if="item.type == WorkflowType.RerankerNode">
                     <div class="card-never border-r-6">
                       <h5 class="p-8-12">
                         {{ $t('chat.executionDetails.searchContent') }}
@@ -485,7 +485,8 @@
                   <template v-if="item.type === WorkflowType.FormNode">
                     <div class="card-never border-r-6">
                       <h5 class="p-8-12">
-                        {{ $t('common.param.outputParam')
+                        {{
+                          $t('common.param.outputParam')
                         }}<span style="color: #f54a45">{{
                           item.is_submit ? '' : `(${$t('chat.executionDetails.noSubmit')})`
                         }}</span>
@@ -543,7 +544,7 @@
                                   class="border-r-6 mr-8"
                                 />
 
-                                <span v-else>{{ h.text }}<br /></span>
+                                <span v-else>{{ h.text }}<br/></span>
                               </template>
                             </span>
 
@@ -640,7 +641,155 @@
                       </div>
                     </div>
                   </template>
+                  <template v-if="item.type == WorkflowType.TextToVideoGenerateNode">
+                    <div class="card-never border-r-6 mt-8">
+                      <h5 class="p-8-12">
+                        {{ $t('chat.executionDetails.currentChat') }}
+                      </h5>
+                      <div class="p-8-12 border-t-dashed lighter pre-wrap">
+                        {{ item.question || '-' }}
+                      </div>
+                    </div>
+                    <div class="card-never border-r-6 mt-8">
+                      <h5 class="p-8-12">
+                        {{
+                          $t(
+                            'views.applicationWorkflow.nodes.imageGenerateNode.negative_prompt.label',
+                          )
+                        }}
+                      </h5>
+                      <div class="p-8-12 border-t-dashed lighter pre-wrap">
+                        {{ item.negative_prompt || '-' }}
+                      </div>
+                    </div>
+                    <div class="card-never border-r-6 mt-8">
+                      <h5 class="p-8-12">
+                        {{
+                          item.type == WorkflowType.Application
+                            ? $t('common.param.outputParam')
+                            : $t('chat.executionDetails.answer')
+                        }}
+                      </h5>
+                      <div class="p-8-12 border-t-dashed lighter">
+                        <MdPreview
+                          v-if="item.answer"
+                          ref="editorRef"
+                          editorId="preview-only"
+                          :modelValue="item.answer"
+                          style="background: none"
+                          noImgZoomIn
+                        />
+                        <template v-else> -</template>
+                      </div>
+                    </div>
+                  </template>
 
+                  <template v-if="item.type == WorkflowType.ImageToVideoGenerateNode">
+                    <div class="card-never border-r-6 mt-8">
+                      <h5 class="p-8-12">
+                        {{ $t('chat.executionDetails.currentChat') }}
+                      </h5>
+                      <div class="p-8-12 border-t-dashed lighter pre-wrap">
+                        {{ item.question || '-' }}
+                      </div>
+                    </div>
+                    <div class="card-never border-r-6 mt-8">
+                      <h5 class="p-8-12">
+                        {{
+                          $t(
+                            'views.applicationWorkflow.nodes.imageGenerateNode.negative_prompt.label',
+                          )
+                        }}
+                      </h5>
+                      <div class="p-8-12 border-t-dashed lighter pre-wrap">
+                        {{ item.negative_prompt || '-' }}
+                      </div>
+                    </div>
+                    <div class="card-never border-r-6 mt-8">
+                      <h5 class="p-8-12">
+                        {{
+                          $t('views.applicationWorkflow.nodes.imageToVideoGenerate.first_frame.label')
+                        }}
+                      </h5>
+                      <div class="p-8-12 border-t-dashed lighter pre-wrap">
+
+                        <div v-if="typeof item.first_frame_url === 'string'">
+                          <el-image
+                            :src="item.first_frame_url"
+                            alt=""
+                            fit="cover" style="width: 40px; height: 40px; display: block"
+                            class="border-r-6"
+                          />
+                        </div>
+                        <div v-else-if="Array.isArray(item.first_frame_url)">
+                          <el-space wrap>
+                            <template v-for="(f, i) in item.first_frame_url" :key="i">
+                              <el-image
+                                :src="f.url"
+                                alt=""
+                                fit="cover" style="width: 40px; height: 40px; display: block"
+                                class="border-r-6"
+                              />
+                            </template>
+                          </el-space>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-never border-r-6 mt-8">
+                      <h5 class="p-8-12">
+                        {{
+                          $t('views.applicationWorkflow.nodes.imageToVideoGenerate.last_frame.label')
+                        }}
+                      </h5>
+                      <div class="p-8-12 border-t-dashed lighter pre-wrap">
+
+                        <div v-if="typeof item.last_frame_url === 'string'">
+                          <el-image
+                            :src="item.last_frame_url"
+                            alt=""
+                            fit="cover" style="width: 40px; height: 40px; display: block"
+                            class="border-r-6"
+                          />
+                        </div>
+                        <div v-else-if="Array.isArray(item.last_frame_url)">
+                          <el-space wrap>
+                            <template v-for="(f, i) in item.last_frame_url" :key="i">
+                              <el-image
+                                :src="f.url"
+                                alt=""
+                                fit="cover" style="width: 40px; height: 40px; display: block"
+                                class="border-r-6"
+                              />
+                            </template>
+                          </el-space>
+                        </div>
+                        <div v-else>
+                          -
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="card-never border-r-6 mt-8">
+                      <h5 class="p-8-12">
+                        {{
+                          item.type == WorkflowType.Application
+                            ? $t('common.param.outputParam')
+                            : $t('chat.executionDetails.answer')
+                        }}
+                      </h5>
+                      <div class="p-8-12 border-t-dashed lighter">
+                        <MdPreview
+                          v-if="item.answer"
+                          ref="editorRef"
+                          editorId="preview-only"
+                          :modelValue="item.answer"
+                          style="background: none"
+                          noImgZoomIn
+                        />
+                        <template v-else> -</template>
+                      </div>
+                    </div>
+                  </template>
                   <!-- 变量赋值 -->
                   <template v-if="item.type === WorkflowType.VariableAssignNode">
                     <div class="card-never border-r-6">
@@ -669,12 +818,12 @@
                   <template v-if="item.type === WorkflowType.McpNode">
                     <div class="card-never border-r-6">
                       <h5 class="p-8-12">
-                        {{ $t('views.applicationWorkflow.nodes.mcpNode.tool') }}
+                        {{ $t('views.tool.title') }}
                       </h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         <div class="mb-8">
                           <span class="color-secondary">
-                            {{ $t('views.applicationWorkflow.nodes.mcpNode.tool') }}:
+                            {{ $t('views.tool.title') }}:
                           </span>
                           {{ item.mcp_tool }}
                         </div>
@@ -733,7 +882,7 @@
         </div>
         <div v-if="system" class="card-never border-r-6 mb-12">
           <h5 class="p-8-12">
-            {{ $t('chat.paragraphSource.system') }}
+            {{ $t('views.application.form.roleSettings.label') }}
           </h5>
           <div class="p-8-12 border-t-dashed lighter">
             <span class="mb-8">{{ system }}</span>
@@ -742,7 +891,7 @@
 
         <div class="card-never border-r-6 mb-12">
           <h5 class="p-8-12">
-            {{ $t('chat.paragraphSource.historyRecord') }}
+            {{ $t('chat.history') }}
           </h5>
           <div class="p-8-12 border-t-dashed lighter">
             <div v-for="(msg, index) in historyRecord" :key="index">
@@ -754,10 +903,10 @@
 
         <div class="card-never border-r-6 mb-12">
           <h5 class="p-8-12">
-            {{ $t('chat.paragraphSource.currentChat') }}
+            {{ $t('chat.executionDetails.currentChat') }}
           </h5>
           <div class="p-8-12 border-t-dashed lighter">
-            <div class="mb-8">{{ $t('chat.paragraphSource.knowedMessage') }}:</div>
+            <div class="mb-8">{{ $t('chat.executionDetails.knowedMessage') }}:</div>
             <div v-for="(msg, index) in currentChat" :key="index">
               <span>{{ msg.content }}</span>
             </div>
@@ -766,7 +915,7 @@
 
         <div class="card-never border-r-6 mb-12">
           <h5 class="p-8-12">
-            {{ $t('chat.paragraphSource.AiResponse') }}
+            {{ $t('chat.executionDetails.answer') }}
           </h5>
           <div class="p-8-12 border-t-dashed lighter">
             <div v-for="(msg, index) in AiResponse" :key="index">
@@ -779,14 +928,15 @@
   </el-scrollbar>
 </template>
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import ParagraphCard from '@/components/ai-chat/component/knowledge-source-component/ParagraphCard.vue'
-import { arraySort } from '@/utils/array'
-import { iconComponent } from '@/workflow/icons/utils'
-import { WorkflowType } from '@/enums/application'
-import { getImgUrl } from '@/utils/common'
+import {ref, computed} from 'vue'
+import ParagraphCard
+  from '@/components/ai-chat/component/knowledge-source-component/ParagraphCard.vue'
+import {arraySort} from '@/utils/array'
+import {iconComponent} from '@/workflow/icons/utils'
+import {WorkflowType} from '@/enums/application'
+import {getImgUrl} from '@/utils/common'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
-import { isWorkFlow } from '@/utils/application'
+import {isWorkFlow} from '@/utils/application'
 
 const props = defineProps<{
   detail?: any[]
@@ -860,6 +1010,7 @@ const AiResponse = computed(() => {
 <style lang="scss" scoped>
 .execution-details {
   max-height: calc(100vh - 260px);
+
   .arrow-icon {
     transition: 0.2s;
   }

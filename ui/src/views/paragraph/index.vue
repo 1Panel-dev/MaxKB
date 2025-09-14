@@ -62,7 +62,7 @@
                 container=".paragraph-scollbar"
                 @click="handleClick"
               >
-                <template v-for="(item) in paragraphDetail" :key="item.id">
+                <template v-for="item in paragraphDetail" :key="item.id">
                   <el-anchor-link :href="`#m${item.id}`" :title="item.title" v-if="item.title">
                     <span :title="item.title">
                       {{ item.title }}
@@ -171,10 +171,13 @@
         <el-button :disabled="multipleSelection.length === 0" @click="deleteMulParagraph">
           {{ $t('common.delete') }}
         </el-button>
-        <span class="ml-24">
+        <span class="color-secondary ml-24 mr-16">
           {{ $t('common.selected') }} {{ multipleSelection.length }}
           {{ $t('views.document.items') }}
         </span>
+        <el-button link type="primary" v-if="multipleSelection.length > 0" @click="multipleSelection = []">
+          {{ $t('common.clear') }}
+        </el-button>
       </div>
     </el-card>
     <ParagraphDialog
@@ -235,7 +238,6 @@ const searchType = ref('title')
 const searchTypeChange = () => {
   search.value = ''
 }
-
 
 const dialogVisible = ref(false)
 watch(

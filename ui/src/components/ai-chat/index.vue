@@ -26,7 +26,7 @@
     </div>
     <template v-if="!(isUserInput || isAPIInput) || !firsUserInput || type === 'log'">
       <el-scrollbar ref="scrollDiv" @scroll="handleScrollTop">
-        <div ref="dialogScrollbar" class="ai-chat__content p-16">
+        <div ref="dialogScrollbar" class="ai-chat__content p-16" id="chatListId">
           <PrologueContent
             :type="type"
             :application="applicationDetails"
@@ -59,42 +59,46 @@
           </template>
           <TransitionContent
             v-if="transcribing"
-            :text="t('chat.transcribing')"
+            :text="t('chat.inputPlaceholder.recorderLoading')"
             :type="type"
             :application="applicationDetails"
           >
           </TransitionContent>
         </div>
       </el-scrollbar>
-
-      <ChatInputOperate
-        :app-id="appId"
-        :application-details="applicationDetails"
-        :is-mobile="isMobile"
-        :type="type"
-        :send-message="sendMessage"
-        :open-chat-id="openChatId"
-        :validate="validate"
-        :chat-management="ChatManagement"
-        v-model:chat-id="chartOpenId"
-        v-model:loading="loading"
-        v-model:show-user-input="showUserInput"
-        v-if="type !== 'log'"
-      >
-        <template #userInput>
-          <el-button
-            v-if="isUserInput || isAPIInput"
-            class="user-input-button mb-8"
-            @click="toggleUserInput"
-          >
-            <AppIcon iconName="app-edit" :size="16" class="mr-4"></AppIcon>
-            <span class="ellipsis">
-              {{ userInputTitle || $t('chat.userInput') }}
-            </span>
-          </el-button>
-        </template>
-      </ChatInputOperate>
-
+      <div style="position: relative">
+        <!-- 置底按钮 -->
+        <el-button v-if="isBottom" circle class="back-bottom-button" @click="setScrollBottom">
+          <el-icon><ArrowDownBold /></el-icon>
+        </el-button>
+        <ChatInputOperate
+          :app-id="appId"
+          :application-details="applicationDetails"
+          :is-mobile="isMobile"
+          :type="type"
+          :send-message="sendMessage"
+          :open-chat-id="openChatId"
+          :validate="validate"
+          :chat-management="ChatManagement"
+          v-model:chat-id="chartOpenId"
+          v-model:loading="loading"
+          v-model:show-user-input="showUserInput"
+          v-if="type !== 'log'"
+        >
+          <template #userInput>
+            <el-button
+              v-if="isUserInput || isAPIInput"
+              class="user-input-button mb-8"
+              @click="toggleUserInput"
+            >
+              <AppIcon iconName="app-edit" :size="16" class="mr-4"></AppIcon>
+              <span class="ellipsis">
+                {{ userInputTitle || $t('chat.userInput') }}
+              </span>
+            </el-button>
+          </template>
+        </ChatInputOperate>
+      </div>
       <Control></Control>
     </template>
   </div>
@@ -603,10 +607,12 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean, other_para
 const scrollTop = ref(0)
 
 const scorll = ref(true)
+const isBottom = ref(false)
 
 const getMaxHeight = () => {
   return dialogScrollbar.value!.scrollHeight
 }
+
 /**
  * 滚动滚动条到最上面
  * @param $event
@@ -621,6 +627,8 @@ const handleScrollTop = ($event: any) => {
   } else {
     scorll.value = false
   }
+  isBottom.value =
+    scrollTop.value + scrollDiv.value.wrapRef.offsetHeight < dialogScrollbar.value!.scrollHeight
   emit('scroll', { ...$event, dialogScrollbar: dialogScrollbar.value, scrollDiv: scrollDiv.value })
 }
 /**

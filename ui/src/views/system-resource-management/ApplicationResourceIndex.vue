@@ -67,10 +67,10 @@
           width="160"
         >
           <template #default="scope">
-            <el-tag type="warning" v-if="isWorkFlow(scope.row.type)" style="height: 22px">
+            <el-tag class="warning-tag" v-if="isWorkFlow(scope.row.type)">
               {{ $t('views.application.workflow') }}
             </el-tag>
-            <el-tag class="blue-tag" v-else style="height: 22px">
+            <el-tag class="blue-tag" v-else>
               {{ $t('views.application.simple') }}
             </el-tag>
           </template>
@@ -130,13 +130,13 @@
               <el-icon class="color-success mr-8" style="font-size: 16px">
                 <SuccessFilled />
               </el-icon>
-              <span class="color-secondary">
+              <span class="color-text-primary">
                 {{ $t('views.application.status.published') }}
               </span>
             </div>
             <div v-else class="flex align-center">
               <AppIcon iconName="app-disabled" class="color-secondary mr-8"></AppIcon>
-              <span class="color-secondary">
+              <span class="color-text-primary">
                 {{ $t('views.application.status.unpublished') }}
               </span>
             </div>
@@ -255,11 +255,21 @@
               </span>
             </el-tooltip>
             <el-dropdown trigger="click" v-if="MoreFilledPermission()">
-              <el-button text @click.stop>
+              <el-button text @click.stop type="primary">
                 <AppIcon iconName="app-more"></AppIcon>
               </el-button>
               <template #dropdown>
                 <el-dropdown-menu>
+                  <el-dropdown-item
+                    @click.stop="openAuthorization(row)"
+                    v-if="permissionPrecise.auth()"
+                  >
+                    <AppIcon
+                      iconName="app-resource-authorization"
+                      class="color-secondary"
+                    ></AppIcon>
+                    {{ $t('views.system.resourceAuthorization.title') }}
+                  </el-dropdown-item>
                   <el-dropdown-item
                     @click.stop="exportApplication(row)"
                     v-if="permissionPrecise.export()"
@@ -281,6 +291,10 @@
         </el-table-column>
       </app-table>
     </el-card>
+    <ResourceAuthorizationDrawer
+      :type="SourceTypeEnum.APPLICATION"
+      ref="ResourceAuthorizationDrawerRef"
+    />
   </div>
 </template>
 
@@ -288,6 +302,7 @@
 import { onMounted, ref, reactive, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import ApplicationResourceApi from '@/api/system-resource-management/application'
+import ResourceAuthorizationDrawer from '@/components/resource-authorization-drawer/index.vue'
 import { t } from '@/locales'
 import { isAppIcon, resetUrl } from '@/utils/common'
 import useStore from '@/stores'
@@ -297,7 +312,7 @@ import { isWorkFlow } from '@/utils/application.ts'
 import UserApi from '@/api/user/user.ts'
 import permissionMap from '@/permission'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
-
+import { SourceTypeEnum } from '@/enums/common'
 const router = useRouter()
 const route = useRoute()
 const { user, application } = useStore()
@@ -317,7 +332,16 @@ const managePermission = () => {
 }
 
 const MoreFilledPermission = () => {
-  return permissionPrecise.value.export() || permissionPrecise.value.delete()
+  return (
+    permissionPrecise.value.export() ||
+    permissionPrecise.value.delete() ||
+    permissionPrecise.value.auth()
+  )
+}
+
+const ResourceAuthorizationDrawerRef = ref()
+function openAuthorization(item: any) {
+  ResourceAuthorizationDrawerRef.value.open(item.id)
 }
 
 const apiInputParams = ref([])

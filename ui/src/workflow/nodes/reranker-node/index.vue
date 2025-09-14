@@ -29,7 +29,7 @@
                 }}<span class="color-danger">*</span></span
               >
               <el-button @click="add_reranker_reference" link type="primary">
-                <el-icon class="mr-4"><Plus /></el-icon>
+                <AppIcon iconName="app-add-outlined"></AppIcon>
               </el-button>
             </div>
           </template>
@@ -288,6 +288,9 @@ const validate = () => {
 
 onMounted(() => {
   getSelectModel()
+  form_data.value.show_knowledge = form_data.value.show_knowledge
+    ? form_data.value.show_knowledge
+    : false
   set(props.nodeModel, 'validate', validate)
 })
 </script>

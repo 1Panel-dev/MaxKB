@@ -80,7 +80,7 @@
     <template #footer>
       <div class="flex-between">
         <div class="flex">
-          <el-text type="info" class="color-secondary mr-8" v-if="checkList.length > 0">
+          <el-text class="color-secondary mr-8" v-if="checkList.length > 0">
             {{ $t('common.selected') }} {{ checkList.length }}
           </el-text>
           <el-button link type="primary" v-if="checkList.length > 0" @click="clearCheck">

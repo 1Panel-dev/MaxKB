@@ -47,6 +47,8 @@ export default {
   noData: 'No data',
   result: 'Result',
   remove: 'Remove',
+  classify: 'Classify',
+  reason: 'Reason',
   removeSuccess: 'Successful',
   searchBar: {
     placeholder: 'Search by name',

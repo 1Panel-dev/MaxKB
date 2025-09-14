@@ -56,7 +56,13 @@
               v-model="item.type"
               style="max-width: 85px"
               class="mr-8"
-              @change="form_data.variable_list[index].value = null"
+              @change="(val: string) => {
+                if (val === 'bool') {
+                  form_data.variable_list[index].value = true;
+                } else {
+                  form_data.variable_list[index].value = null;
+                }
+              }"
             >
               <el-option v-for="item in typeOptions" :key="item" :label="item" :value="item" />
             </el-select>
@@ -122,6 +128,20 @@
                 @submitDialog="(val: string) => (form_data.variable_list[index].value = val)"
               />
             </el-form-item>
+            <el-form-item
+              v-else-if="item.type === 'bool'"
+              :prop="'variable_list.' + index + '.value'"
+              :rules="{
+                message: $t('common.inputPlaceholder'),
+                trigger: 'blur',
+                required: true,
+              }"
+            >
+              <el-select v-model="item.value" style="width: 155px">
+                <el-option label="true" :value="true" />
+                <el-option label="false" :value="false" />
+              </el-select>
+            </el-form-item>
           </div>
           <el-form-item v-else>
             <NodeCascader
@@ -136,9 +156,7 @@
       </template>
 
       <el-button link type="primary" @click="addVariable">
-        <el-icon class="mr-4">
-          <Plus />
-        </el-icon>
+        <AppIcon iconName="app-add-outlined" class="mr-4"></AppIcon>
         {{ $t('common.add') }}
       </el-button>
     </el-form>
@@ -148,14 +166,14 @@
 import { cloneDeep, set } from 'lodash'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
-import { computed, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import { isLastNode } from '@/workflow/common/data'
 import { randomId } from '@/utils/common'
 import { t } from '@/locales'
 
 const props = defineProps<{ nodeModel: any }>()
 
-const typeOptions = ['string', 'num', 'json']
+const typeOptions = ['string', 'num', 'json', 'bool']
 
 const wheel = (e: any) => {
   if (e.ctrlKey === true) {
@@ -179,6 +197,7 @@ const form = {
     },
   ],
 }
+const boolValue = ref(1)
 
 const form_data = computed({
   get: () => {

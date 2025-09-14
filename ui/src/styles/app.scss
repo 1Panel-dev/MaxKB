@@ -315,14 +315,12 @@ h5 {
 .border-b-light {
   border-bottom: 1px solid var(--el-border-color-lighter);
 }
-.border-r-4 {
-  border-radius: var(--app-border-radius-small);
-}
+
 .border-r-6 {
-  border-radius: var(--app-border-radius-base);
+  border-radius: var();
 }
 .border-r-8 {
-  border-radius: var(--app-border-radius-large);
+  border-radius: var(--app-border-radius-base);
 }
 
 .border-t-dashed {
@@ -468,12 +466,12 @@ h5 {
 }
 .success-tag {
   background: var(--tag-success-bg);
-  color: var(--el-color-success);
+  color: var(--tag-success-color);
   border: none;
 }
 .warning-tag {
   background: var(--tag-warning-bg);
-  color: var(--el-color-warning);
+  color: var(--tag-warning-color);
   border: none;
 }
 
@@ -483,16 +481,10 @@ h5 {
   border: none;
 }
 
-.purple-tag {
-  background: #f2ebfe;
-  color: #7f3bf5;
-  border-color: #e0d7f0;
-}
-
 .blue-tag {
-  background: #ebf1ff;
-  color: #3370ff;
-  border-color: #d6e2ff;
+  background: var(--tag-default-bg);
+  color: var(--tag-default-color);
+  border: none;
 }
 
 // 蓝色提示框

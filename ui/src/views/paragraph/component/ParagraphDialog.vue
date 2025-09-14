@@ -112,18 +112,23 @@ const cancelEdit = () => {
 }
 
 const open = (data: any, str: any) => {
-  if (data && !str) {
+  if (data && str === 'add') {
+    isEdit.value = true
+    position.value = data.position
+  } else if (data) {
     detail.value.title = data.title
     detail.value.content = data.content
     cloneData.value = cloneDeep(detail.value)
     paragraphId.value = data.id
     document_id.value = data.document_id
     dataset_id.value = data.dataset_id || id
+    if (str === 'edit') {
+      isEdit.value = true
+    } else {
+      isEdit.value = false
+    }
   } else {
     isEdit.value = true
-    if (str === 'add') {
-      position.value = data.position
-    }
   }
   dialogVisible.value = true
 }

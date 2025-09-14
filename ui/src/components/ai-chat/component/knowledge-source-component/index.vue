@@ -23,7 +23,13 @@
             <el-card shadow="never" style="--el-card-padding: 8px">
               <div class="flex-between">
                 <div class="flex align-center">
-                  <img :src="getImgUrl(item && item?.document_name)" alt="" width="24" />
+                  <img
+                    src="@/assets/fileType/web-link-icon.svg"
+                    alt=""
+                    width="24"
+                    v-if="item?.meta?.source_file_id || item?.meta?.source_url"
+                  />
+                  <img v-else :src="getImgUrl(item && item?.document_name)" alt="" width="24" />
                   <div
                     class="ml-4 ellipsis-1"
                     :title="item?.document_name"
@@ -45,7 +51,7 @@
                       <span :title="item?.document_name?.trim()">{{ item?.document_name }}</span>
                     </a>
                   </div>
-                  <div v-else @click="infoMessage">
+                  <div v-else @click="infoMessage(item)">
                     <span class="ellipsis-1 break-all" :title="item?.document_name?.trim()">
                       {{ item?.document_name?.trim() }}
                     </span>
@@ -167,8 +173,12 @@ const currentComponent = shallowRef<any>(null)
 const currentChatDetail = ref<any>(null)
 const dialogType = ref('')
 
-function infoMessage() {
-  MsgInfo(t('chat.noDocument'))
+function infoMessage(data: any) {
+  if (data?.meta?.allow_download === false) {
+    MsgInfo(t('chat.noPermissionDownload'))
+  } else {
+    MsgInfo(t('chat.noDocument'))
+  }
 }
 function openParagraph(row: any, id?: string) {
   dialogTitle.value = t('chat.KnowledgeSource.title')

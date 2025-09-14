@@ -6,6 +6,7 @@
     @date：2023/10/7 18:20
     @desc:
 """
+import hashlib
 from typing import Dict, Any
 
 from django.db import DEFAULT_DB_ALIAS, models, connections
@@ -16,6 +17,8 @@ from common.db.sql_execute import select_one, select_list, update_execute
 from common.result import Page
 
 
+# 添加模型缓存
+_model_cache = {}
 def get_dynamics_model(attr: dict, table_name='dynamics'):
     """
     获取一个动态的django模型
@@ -23,12 +26,28 @@ def get_dynamics_model(attr: dict, table_name='dynamics'):
     :param table_name: 表名
     :return: django 模型
     """
+    # 创建缓存键，基于属性和表名
+    cache_key = hashlib.md5(f"{table_name}_{str(sorted(attr.items()))}".encode()).hexdigest()
+    # print(f'cache_key: {cache_key}')
+    
+    # 如果模型已存在，直接返回缓存的模型
+    if cache_key in _model_cache:
+        return _model_cache[cache_key]
+    
     attributes = {
         "__module__": "knowledge.models",
         "Meta": type("Meta", (), {'db_table': table_name}),
         **attr
     }
-    return type('Dynamics', (models.Model,), attributes)
+    
+    # 使用唯一的类名避免冲突
+    class_name = f'Dynamics_{cache_key[:8]}'
+    model_class = type(class_name, (models.Model,), attributes)
+    
+    # 缓存模型
+    _model_cache[cache_key] = model_class
+    
+    return model_class
 
 
 def generate_sql_by_query_dict(queryset_dict: Dict[str, QuerySet], select_string: str,

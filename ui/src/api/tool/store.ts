@@ -23,6 +23,16 @@ const getInternalToolList: (param?: any, loading?: Ref<boolean>) => Promise<Resu
 }
 
 /**
+ * 工具商店列表
+ */
+const getStoreToolList: (param?: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  param,
+  loading,
+) => {
+  return get('/workspace/store/tool', param, loading)
+}
+
+/**
  * 工具商店-添加系统内置
  */
 const addInternalTool: (
@@ -33,7 +43,20 @@ const addInternalTool: (
   return post(`${prefix.value}/${tool_id}/add_internal_tool`, param, undefined, loading)
 }
 
+/**
+ * 工具商店-添加
+ */
+const addStoreTool: (
+  tool_id: string,
+  param: AddInternalToolParam,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (tool_id, param, loading) => {
+  return post(`${prefix.value}/${tool_id}/add_store_tool`, param, undefined, loading)
+}
+
 export default {
   getInternalToolList,
+  getStoreToolList,
   addInternalTool,
+  addStoreTool
 }

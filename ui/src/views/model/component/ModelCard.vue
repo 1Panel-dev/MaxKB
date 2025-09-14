@@ -167,7 +167,10 @@ const permissionPrecise = computed(() => {
 
 const MoreFilledPermission = (id: any) => {
   return (
-    permissionPrecise.value.modify(id) || permissionPrecise.value.delete(id) || isSystemShare.value
+    permissionPrecise.value.modify(id) ||
+    permissionPrecise.value.delete(id) ||
+    permissionPrecise.value.auth(id) ||
+    isSystemShare.value
   )
 }
 

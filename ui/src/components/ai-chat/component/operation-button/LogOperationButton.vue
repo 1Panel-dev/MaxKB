@@ -8,12 +8,7 @@
     <div>
       <!-- 语音播放 -->
       <span v-if="tts">
-        <el-tooltip
-          effect="dark"
-          :content="$t('chat.operation.play')"
-          placement="top"
-          v-if="!audioPlayerStatus"
-        >
+        <el-tooltip effect="dark" :content="$t('chat.operation.play')" placement="top" v-if="!audioPlayerStatus">
           <el-button text @click="playAnswerText(data?.answer_text)">
             <AppIcon iconName="app-video-play"></AppIcon>
           </el-button>
@@ -31,22 +26,20 @@
         </el-button>
       </el-tooltip>
       <el-divider direction="vertical" />
-      <el-tooltip
-        v-if="buttonData.improve_paragraph_id_list.length === 0"
-        effect="dark"
-        :content="$t('views.chatLog.editContent')"
-        placement="top"
-      >
-        <el-button text @click="editContent(data)">
-          <AppIcon iconName="app-edit"></AppIcon>
-        </el-button>
-      </el-tooltip>
+      <template v-if="permissionPrecise.chat_log_add_knowledge(id)">
+        <el-tooltip v-if="buttonData.improve_paragraph_id_list.length === 0" effect="dark"
+          :content="$t('views.chatLog.editContent')" placement="top">
+          <el-button text @click="editContent(data)">
+            <AppIcon iconName="app-edit"></AppIcon>
+          </el-button>
+        </el-tooltip>
 
-      <el-tooltip v-else effect="dark" :content="$t('views.chatLog.editMark')" placement="top">
-        <el-button text @click="editMark(data)">
-          <AppIcon iconName="app-document-active" class="primary"></AppIcon>
-        </el-button>
-      </el-tooltip>
+        <el-tooltip v-else effect="dark" :content="$t('views.chatLog.editMark')" placement="top">
+          <el-button text @click="editMark(data)">
+            <AppIcon iconName="app-document-active" class="primary"></AppIcon>
+          </el-button>
+        </el-tooltip>
+      </template>
 
       <el-divider direction="vertical" v-if="buttonData?.vote_status !== '-1'" />
       <el-button text disabled v-if="buttonData?.vote_status === '0'">
@@ -59,24 +52,19 @@
       <EditContentDialog ref="EditContentDialogRef" @refresh="refreshContent" />
       <EditMarkDialog ref="EditMarkDialogRef" @refresh="refreshMark" />
       <!-- 先渲染，不然不能播放   -->
-      <audio
-        ref="audioPlayer"
-        v-for="item in audioList"
-        :key="item"
-        controls
-        hidden="hidden"
-      ></audio>
+      <audio ref="audioPlayer" v-for="item in audioList" :key="item" controls hidden="hidden"></audio>
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { copyClick } from '@/utils/clipboard'
 import EditContentDialog from '@/views/chat-log/component/EditContentDialog.vue'
 import EditMarkDialog from '@/views/chat-log/component/EditMarkDialog.vue'
 import { datetimeFormat } from '@/utils/time'
 import applicationApi from '@/api/application/application'
 import { useRoute } from 'vue-router'
+import permissionMap from '@/permission'
 import { MsgError } from '@/utils/message'
 import { t } from '@/locales'
 const route = useRoute()
@@ -84,10 +72,11 @@ const {
   params: { id },
 } = route as any
 
+
 const props = defineProps({
   data: {
     type: Object,
-    default: () => {},
+    default: () => { },
   },
   applicationId: {
     type: String,
@@ -95,6 +84,17 @@ const props = defineProps({
   },
   tts: Boolean,
   tts_type: String,
+})
+
+const apiType = computed(() => {
+  if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
+const permissionPrecise = computed(() => {
+  return permissionMap['application'][apiType.value]
 })
 
 const emit = defineEmits(['update:data'])

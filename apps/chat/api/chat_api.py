@@ -10,10 +10,41 @@ from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter
 
 from application.serializers.application_chat_record import ChatRecordSerializerModel
-from chat.serializers.chat import ChatMessageSerializers
+from chat.serializers.chat import ChatMessageSerializers, GeneratePromptSerializers
 from chat.serializers.chat_record import HistoryChatModel, EditAbstractSerializer
 from common.mixins.api_mixin import APIMixin
 from common.result import ResultSerializer, ResultPageSerializer, DefaultResultSerializer
+
+
+class PromptGenerateAPI(APIMixin):
+    @staticmethod
+    def get_parameters():
+        return [OpenApiParameter(
+            name="workspace_id",
+            description="工作空间id",
+            type=OpenApiTypes.STR,
+            location='path',
+            required=True,
+        ),
+            OpenApiParameter(
+                name="model_id",
+                description="模型id",
+                type=OpenApiTypes.STR,
+                location='path',
+                required=True,
+        ),
+            OpenApiParameter(
+                name="application_id",
+                description="应用id",
+                type=OpenApiTypes.STR,
+                location='path',
+                required=True,
+            ),
+        ]
+
+    @staticmethod
+    def get_request():
+        return GeneratePromptSerializers
 
 
 class ChatAPI(APIMixin):

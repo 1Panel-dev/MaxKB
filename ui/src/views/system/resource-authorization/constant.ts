@@ -2,9 +2,8 @@ import { AuthorizationEnum } from '@/enums/system'
 import { t } from '@/locales'
 import { hasPermission } from '@/utils/permission'
 import { EditionConst } from '@/utils/permission/data'
-
-const notCommunity = hasPermission([EditionConst.IS_EE,EditionConst.IS_PE],'OR')
-
+ 
+ 
 const permissionOptions = [
   {
     label: t('views.system.resourceAuthorization.setting.notAuthorized'),
@@ -23,14 +22,16 @@ const permissionOptions = [
   },
 ]
 
-if (notCommunity) {
-  permissionOptions.push(
-    {
+ 
+const getPermissionOptions=()=>{ 
+  if (hasPermission([EditionConst.IS_EE, EditionConst.IS_PE], 'OR')) { 
+    return [...permissionOptions,{
     label: t('views.system.resourceAuthorization.setting.role'),
     value: AuthorizationEnum.ROLE,
     desc: t('views.system.resourceAuthorization.setting.roleDesc'),
-  },
-  )
+  },]
+  }
+  return permissionOptions;
 }
 
-export {permissionOptions}
+export {getPermissionOptions}

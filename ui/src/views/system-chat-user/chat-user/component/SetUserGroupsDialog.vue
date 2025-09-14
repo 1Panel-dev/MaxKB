@@ -5,7 +5,7 @@
       <el-form-item :label="$t('views.chatUser.settingMethod')" prop="user_group_ids">
         <el-radio-group v-model="form.is_append">
           <el-radio :value="true">{{ $t('views.chatUser.append') }}</el-radio>
-          <el-radio :value="false">{{ $t('views.chatUser.replace') }}</el-radio>
+          <el-radio :value="false">{{ $t('views.applicationOverview.SettingDisplayDialog.replace') }}</el-radio>
         </el-radio-group>
       </el-form-item>
       <el-form-item :label="$t('views.chatUser.group.title')" prop="user_group_ids">

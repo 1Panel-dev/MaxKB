@@ -146,8 +146,13 @@ export default {
       start: '開始',
       end: '結束',
     },
+    mcp_output_enable: '輸出MCP/工具執行過程',
   },
-
+  generateDialog: {
+    label: '生成',
+    generatePrompt: '生成提示詞',
+    placeholder: '請輸入提示詞主題',
+  },
   dialog: {
     addKnowledge: '新增關聯知識庫',
     addKnowledgePlaceholder: '所選知識庫必須使用相同的 Embedding 模型',

@@ -139,6 +139,9 @@
                     <el-dropdown-item @click="exportHTML"
                       >{{ $t('common.export') }} HTML</el-dropdown-item
                     >
+                    <el-dropdown-item @click="openPDFExport"
+                      >{{ $t('common.export') }} PDF</el-dropdown-item
+                    >
                   </el-dropdown-menu>
                 </template>
               </el-dropdown>
@@ -166,7 +169,7 @@
         <div class="execution-detail-panel" :resizable="false" collapsible>
           <div class="p-16 flex-between border-b">
             <h4 class="medium ellipsis" :title="rightPanelTitle">{{ rightPanelTitle }}</h4>
-            　
+
             <div class="flex align-center">
               <span v-if="rightPanelType === 'paragraphDocument'" class="mr-4">
                 <a
@@ -214,6 +217,7 @@
       emitConfirm
       @confirm="handleResetPassword"
     ></ResetPassword>
+    <PdfExport ref="pdfExportRef"></PdfExport>
   </div>
 </template>
 
@@ -222,11 +226,10 @@ import { ref, onMounted, nextTick, computed, watch } from 'vue'
 import { marked } from 'marked'
 import { saveAs } from 'file-saver'
 import chatAPI from '@/api/chat/chat'
-
 import useStore from '@/stores'
 import useResize from '@/layout/hooks/useResize'
 import { hexToRgba } from '@/utils/theme'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import ResetPassword from '@/layout/layout-header/avatar/ResetPassword.vue'
 import { t } from '@/locales'
 import type { ResetCurrentUserPasswordRequest } from '@/api/type/user'
@@ -236,11 +239,16 @@ import ParagraphDocumentContent from '@/components/ai-chat/component/knowledge-s
 import HistoryPanel from '@/views/chat/component/HistoryPanel.vue'
 import { cloneDeep } from 'lodash'
 import { getFileUrl } from '@/utils/common'
-useResize()
+import PdfExport from '@/components/pdf-export/index.vue'
 
+useResize()
+const pdfExportRef = ref<InstanceType<typeof PdfExport>>()
 const { common, chatUser } = useStore()
 const router = useRouter()
-
+const openPDFExport = () => {
+  pdfExportRef.value?.open(document.getElementById('chatListId'))
+}
+const route = useRoute()
 const isCollapse = ref(false)
 const isPcCollapse = ref(false)
 watch(
@@ -254,7 +262,10 @@ watch(
 
 const logout = () => {
   chatUser.logout().then(() => {
-    router.push({ name: 'login' })
+    router.push({
+      name: 'login',
+      query: route.query,
+    })
   })
 }
 
@@ -316,7 +327,7 @@ function refreshFieldTitle(chatId: string, abstract: string) {
 }
 
 function deleteLog(row: any) {
-  chatAPI.deleteChat(row.id, left_loading).then(() => {
+  chatAPI.deleteChat(row.id).then(() => {
     if (currentChatId.value === row.id) {
       currentChatId.value = 'new'
       currentChatName.value = t('chat.createChat')
@@ -324,7 +335,7 @@ function deleteLog(row: any) {
       paginationConfig.value.total = 0
       currentRecordList.value = []
     }
-    getChatLog(applicationDetail.value.id)
+    chatLogData.value = chatLogData.value.filter((item) => item.id !== row.id)
   })
 }
 
@@ -335,7 +346,7 @@ function clearChat() {
     paginationConfig.value.current_page = 1
     paginationConfig.value.total = 0
     currentRecordList.value = []
-    getChatLog(applicationDetail.value.id)
+    getChatLog()
   })
 }
 
@@ -372,7 +383,7 @@ function newChat() {
   }
 }
 
-function getChatLog(id: string, refresh?: boolean) {
+function getChatLog(refresh?: boolean) {
   const page = {
     current_page: 1,
     page_size: 20,
@@ -386,11 +397,8 @@ function getChatLog(id: string, refresh?: boolean) {
       paginationConfig.value.current_page = 1
       paginationConfig.value.total = 0
       currentRecordList.value = []
-      currentChatId.value = chatLogData.value?.[0]?.id || 'new'
-      currentChatName.value = chatLogData.value?.[0]?.abstract || t('chat.createChat')
-      if (currentChatId.value !== 'new') {
-        getChatRecord()
-      }
+      currentChatId.value = 'new'
+      currentChatName.value = t('chat.createChat')
     }
   })
 }
@@ -449,7 +457,7 @@ const clickListHandle = (item: any) => {
 
 function refresh(id: string) {
   currentChatId.value = id
-  getChatLog(applicationDetail.value.id, true)
+  getChatLog(true)
 }
 
 async function exportMarkdown(): Promise<void> {
@@ -477,7 +485,7 @@ async function exportHTML(): Promise<void> {
  *初始化历史对话记录
  */
 const init = () => {
-  getChatLog(applicationDetail.value?.id)
+  getChatLog()
 }
 onMounted(() => {
   init()
@@ -575,13 +583,16 @@ function closeExecutionDetail() {
   max-width: 80%;
   margin: 0 auto;
 }
+
 .chat-pc__right {
   width: calc(100vw - 280px);
   --execution-detail-panel-width: 400px;
+
   .execution-detail-panel {
     width: var(--execution-detail-panel-width, 400px);
   }
 }
+
 @media only screen and (max-width: 1000px) {
   .chat-width {
     max-width: 100% !important;

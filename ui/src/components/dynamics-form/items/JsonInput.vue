@@ -75,14 +75,14 @@ const model_value = computed({
         emit('update:modelValue', result)
       } catch (e) {}
     }
-  }
+  },
 })
 
 const extensions = [json(), linter(jsonParseLinter()), oneDark]
 
 const codemirrorStyle = {
   height: '210px!important',
-  width: '100%'
+  width: '100%',
 }
 
 // 弹出框相关代码
@@ -117,7 +117,7 @@ const validate_rules = (rule: any, value: any, callback: any) => {
     try {
       JSON.parse(model_value.value)
     } catch (e) {
-      callback(new Error(t('dynamicsForm.tip.requiredMessage')))
+      callback(new Error(t('dynamicsForm.tip.jsonMessage')))
       return false
     }
   }

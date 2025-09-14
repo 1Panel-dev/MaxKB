@@ -24,7 +24,7 @@
         </div>
         <div v-else @click="quickCreateHandle" class="w-full">
           <el-button type="primary" link class="quich-button">
-            <el-icon><Plus /></el-icon>
+            <AppIcon iconName="app-add-outlined"></AppIcon>
             <span class="ml-4">{{ quickCreatePlaceholder }}</span>
           </el-button>
         </div>
@@ -36,7 +36,7 @@
         <el-pagination
           v-model:current-page="paginationConfig.current_page"
           v-model:page-size="paginationConfig.page_size"
-          :page-sizes="pageSizes"
+          :page-sizes="paginationConfig.page_sizes|| pageSizes"
           :total="paginationConfig.total"
           layout="total, prev, pager, next, sizes"
           @size-change="handleSizeChange"

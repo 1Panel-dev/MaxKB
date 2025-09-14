@@ -20,7 +20,8 @@ const systemManage = {
   delete: () =>
     hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_MODEL_DELETE], 'OR'),
 
-  auth: () => false,  
+  auth: () => 
+    hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_MODEL_AUTH], 'OR'),  
   folderCreate: () => false,
   folderEdit: () => false,
   folderDelete: () => false,

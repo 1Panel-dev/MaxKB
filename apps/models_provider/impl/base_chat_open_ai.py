@@ -1,4 +1,6 @@
 # coding=utf-8
+from concurrent.futures import ThreadPoolExecutor
+from requests.exceptions import ConnectTimeout, ReadTimeout
 from typing import Dict, Optional, Any, Iterator, cast, Union, Sequence, Callable, Mapping
 
 from langchain_core.language_models import LanguageModelInput
@@ -92,13 +94,24 @@ class BaseChatOpenAI(ChatOpenAI):
             tools: Optional[
                 Sequence[Union[dict[str, Any], type, Callable, BaseTool]]
             ] = None,
+            timeout: Optional[float] = 0.5,
     ) -> int:
         if self.usage_metadata is None or self.usage_metadata == {}:
-            try:
-                return super().get_num_tokens_from_messages(messages)
-            except Exception as e:
-                tokenizer = TokenizerManage.get_tokenizer()
-                return sum([len(tokenizer.encode(get_buffer_string([m]))) for m in messages])
+
+            with ThreadPoolExecutor(max_workers=1) as executor:
+                future = executor.submit(super().get_num_tokens_from_messages, messages, tools)
+                try:
+                    response = future.result()
+                    print("请求成功（未超时）")
+                    return response
+                except Exception as e:
+                    if isinstance(e, ReadTimeout):
+                        raise  # 继续抛出
+                    else:
+                        print("except:", e)
+                        tokenizer = TokenizerManage.get_tokenizer()
+                        return sum([len(tokenizer.encode(get_buffer_string([m]))) for m in messages])
+
         return self.usage_metadata.get('input_tokens', self.usage_metadata.get('prompt_tokens', 0))
 
     def get_num_tokens(self, text: str) -> int:

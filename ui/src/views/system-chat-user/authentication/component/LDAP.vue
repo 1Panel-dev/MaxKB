@@ -66,18 +66,26 @@
         </el-form>
 
         <div>
-          <el-button @click="submit(authFormRef, 'test')" :disabled="loading">
-            {{ $t('views.system.test') }}</el-button
-          >
-          <el-button @click="submit(authFormRef)" type="primary" :disabled="loading"
+          <span
             v-hasPermission="
-                      new ComplexPermission(
-                        [RoleConst.ADMIN],
-                        [PermissionConst.CHAT_USER_AUTH_EDIT],
-                        [],'OR',)"
+              new ComplexPermission(
+                [RoleConst.ADMIN],
+                [PermissionConst.CHAT_USER_AUTH_EDIT],
+                [],
+                'OR',
+              )
+            "
+            class="mr-12"
           >
-            {{ $t('common.save') }}
-          </el-button>
+            <el-button @click="submit(authFormRef)" type="primary" :disabled="loading">
+              {{ $t('common.save') }}
+            </el-button>
+          </span>
+          <span>
+            <el-button @click="submit(authFormRef, 'test')" :disabled="loading">
+              {{ $t('views.system.test') }}
+            </el-button>
+          </span>
         </div>
       </div>
     </el-scrollbar>
@@ -101,9 +109,9 @@ const form = ref<any>({
     password: '',
     ou: '',
     ldap_filter: '',
-    ldap_mapping: ''
+    ldap_mapping: '',
   },
-  is_active: true
+  is_active: true,
 })
 
 const authFormRef = ref()
@@ -115,44 +123,44 @@ const rules = reactive<FormRules<any>>({
     {
       required: true,
       message: t('views.system.authentication.ldap.serverPlaceholder'),
-      trigger: 'blur'
-    }
+      trigger: 'blur',
+    },
   ],
   'config.base_dn': [
     {
       required: true,
       message: t('views.system.authentication.ldap.bindDNPlaceholder'),
-      trigger: 'blur'
-    }
+      trigger: 'blur',
+    },
   ],
   'config.password': [
     {
       required: true,
       message: t('views.login.loginForm.password.placeholder'),
-      trigger: 'blur'
-    }
+      trigger: 'blur',
+    },
   ],
   'config.ou': [
     {
       required: true,
       message: t('views.system.authentication.ldap.ouPlaceholder'),
-      trigger: 'blur'
-    }
+      trigger: 'blur',
+    },
   ],
   'config.ldap_filter': [
     {
       required: true,
       message: t('views.system.authentication.ldap.ldap_filterPlaceholder'),
-      trigger: 'blur'
-    }
+      trigger: 'blur',
+    },
   ],
   'config.ldap_mapping': [
     {
       required: true,
       message: t('views.system.authentication.ldap.ldap_mappingPlaceholder'),
-      trigger: 'blur'
-    }
-  ]
+      trigger: 'blur',
+    },
+  ],
 })
 
 const submit = async (formEl: FormInstance | undefined, test?: string) => {
@@ -177,9 +185,7 @@ function getDetail() {
     if (res.data && JSON.stringify(res.data) !== '{}') {
       form.value = res.data
       if (res.data.config.ldap_mapping) {
-        form.value.config.ldap_mapping = JSON.stringify(
-          JSON.parse(res.data.config.ldap_mapping)
-        )
+        form.value.config.ldap_mapping = JSON.stringify(JSON.parse(res.data.config.ldap_mapping))
       }
     }
   })

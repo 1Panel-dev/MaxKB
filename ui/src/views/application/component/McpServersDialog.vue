@@ -29,18 +29,16 @@
         :rules="[
           {
             required: true,
-            message:
-              $t('common.selectPlaceholder') +
-              ` MCP ${$t('views.applicationWorkflow.nodes.mcpNode.tool')}`,
+            message: $t('common.selectPlaceholder') + ` MCP ${$t('views.tool.title')}`,
           },
         ]"
-        prop="mcp_tool_id"
+        prop="mcp_tool_ids"
       >
         <template #label>
-          {{ `MCP ${$t('views.applicationWorkflow.nodes.mcpNode.tool')}` }}
+          {{ `MCP ${$t('views.tool.title')}` }}
           <span class="color-danger">*</span>
         </template>
-        <el-select v-model="form.mcp_tool_id" filterable>
+        <el-select v-model="form.mcp_tool_ids" filterable multiple>
           <el-option
             v-for="mcpTool in mcpToolSelectOptions"
             :key="mcpTool.id"
@@ -48,7 +46,16 @@
             :value="mcpTool.id"
           >
             <div class="flex align-center">
-              <el-avatar shape="square" :size="20" class="mr-8">
+              <el-avatar
+                v-if="mcpTool?.icon"
+                shape="square"
+                :size="20"
+                style="background: none"
+                class="mr-8"
+              >
+                <img :src="resetUrl(mcpTool?.icon)" alt="" />
+              </el-avatar>
+              <el-avatar v-else shape="square" :size="20" class="mr-8">
                 <img src="@/assets/workflow/icon_mcp.svg" style="width: 75%" alt="" />
               </el-avatar>
               <span>{{ mcpTool.name }}</span>
@@ -96,9 +103,10 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { computed, inject, onMounted, ref, watch } from 'vue'
-import { loadSharedApi } from '@/utils/dynamics-api/shared-api.ts'
-import { useRoute } from 'vue-router'
+import { ref, watch } from 'vue'
+import { MsgError } from '@/utils/message.ts'
+import { t } from '@/locales'
+import { resetUrl } from '@/utils/common'
 
 const emit = defineEmits(['refresh'])
 
@@ -113,7 +121,7 @@ const mcpServerJson = `{
 
 const form = ref<any>({
   mcp_servers: '',
-  mcp_tool_id: '',
+  mcp_tool_ids: [],
   mcp_source: 'referencing',
 })
 
@@ -127,7 +135,7 @@ watch(dialogVisible, (bool) => {
   if (!bool) {
     form.value = {
       mcp_servers: '',
-      mcp_tool_id: '',
+      mcp_tool_ids: '',
       mcp_source: 'referencing',
     }
     paramFormRef.value?.clearValidate()
@@ -138,14 +146,21 @@ function mcpSourceChange() {
   if (form.value.mcp_source === 'referencing') {
     form.value.mcp_servers = ''
   } else {
-    form.value.mcp_tool_id = ''
+    form.value.mcp_tool_ids = ''
   }
 }
 
-
 const open = (data: any, selectOptions: any) => {
   form.value = { ...form.value, ...data }
-  form.value.mcp_source = data.mcp_source || 'referencing'
+  if (data.mcp_servers) {
+    form.value.mcp_source = 'custom'
+  } else if (data.mcp_tool_ids) {
+    form.value.mcp_source = 'referencing'
+    form.value.mcp_tool_ids = data.mcp_tool_ids
+    form.value.mcp_servers = ''
+  } else {
+    form.value.mcp_source = data.mcp_source || 'referencing'
+  }
   dialogVisible.value = true
   mcpToolSelectOptions.value = selectOptions || []
 }
@@ -153,6 +168,12 @@ const open = (data: any, selectOptions: any) => {
 const submit = () => {
   paramFormRef.value.validate((valid: any) => {
     if (valid) {
+      try {
+        JSON.parse(form.value.mcp_servers || '{}')
+      } catch (e) {
+        MsgError(t('views.applicationWorkflow.nodes.mcpNode.mcpServerTip'))
+        return
+      }
       emit('refresh', form.value)
       dialogVisible.value = false
     }

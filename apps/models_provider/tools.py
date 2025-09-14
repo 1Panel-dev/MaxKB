@@ -106,6 +106,8 @@ def is_valid_credential(provider, model_type, model_name, model_credential: Dict
 
 def get_model_by_id(_id, workspace_id):
     model = QuerySet(Model).filter(id=_id).first()
+    # 归还链接到连接池
+    connection.close()
     get_authorized_model = DatabaseModelManage.get_model("get_authorized_model")
     if model and model.workspace_id != workspace_id and get_authorized_model is not None:
         model = get_authorized_model(QuerySet(Model).filter(id=_id), workspace_id).first()

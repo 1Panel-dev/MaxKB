@@ -111,6 +111,9 @@
   }
   .el-dialog__header {
     padding: 16px 24px;
+    .el-dialog__headerbtn {
+      top: 8px;
+    }
   }
   .el-dialog__body {
     border-top: 1px solid var(--el-border-color);
@@ -156,7 +159,7 @@
 // radio-button-group
 .app-radio-button-group {
   background: #ffffff;
-  border: 1px solid var(--app-border-color-dark);
+  border: 1px solid var(--el-border-color);
   border-radius: var(--el-border-radius-base);
   .el-radio-button {
     padding: 3px;
@@ -231,6 +234,13 @@
   75% {
     border-right-color: transparent;
   }
+}
+
+.dot-success {
+  height: 8px;
+  width: 8px;
+  background-color: var(--el-color-success);
+  border-radius: 50%;
 }
 
 // checkbox 一行一个样式

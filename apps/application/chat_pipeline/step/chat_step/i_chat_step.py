@@ -82,6 +82,13 @@ class IChatStep(IBaseChatPipelineStep):
 
         model_params_setting = serializers.DictField(required=False, allow_null=True,
                                                      label=_("Model parameter settings"))
+        mcp_enable = serializers.BooleanField(label="MCP否启用", required=False, default=False)
+        mcp_tool_ids = serializers.JSONField(label="MCP工具ID列表", required=False, default=list)
+        mcp_servers = serializers.JSONField(label="MCP服务列表", required=False, default=dict)
+        mcp_source = serializers.CharField(label="MCP Source", required=False, default="referencing")
+        tool_enable = serializers.BooleanField(label="工具是否启用", required=False, default=False)
+        tool_ids = serializers.JSONField(label="工具ID列表", required=False, default=list)
+        mcp_output_enable = serializers.BooleanField(label="MCP输出是否启用", required=False, default=True)
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
@@ -106,5 +113,8 @@ class IChatStep(IBaseChatPipelineStep):
                 paragraph_list=None,
                 manage: PipelineManage = None,
                 padding_problem_text: str = None, stream: bool = True, chat_user_id=None, chat_user_type=None,
-                no_references_setting=None, model_params_setting=None, model_setting=None, **kwargs):
+                no_references_setting=None, model_params_setting=None, model_setting=None,
+                mcp_enable=False, mcp_tool_ids=None, mcp_servers='', mcp_source="referencing",
+                tool_enable=False, tool_ids=None, mcp_output_enable=True,
+                **kwargs):
         pass

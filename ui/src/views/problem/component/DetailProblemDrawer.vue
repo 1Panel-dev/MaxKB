@@ -160,7 +160,7 @@ function relateProblem() {
 }
 
 function editParagraph(row: any) {
-  ParagraphDialogRef.value.open(row)
+  ParagraphDialogRef.value.open(row, 'edit')
 }
 
 function editName(val: string) {

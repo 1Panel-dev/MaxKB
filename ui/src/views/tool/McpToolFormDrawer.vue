@@ -17,7 +17,7 @@
         v-loading="loading"
         @submit.prevent
       >
-        <el-form-item :label="$t('views.tool.form.toolName.label')" prop="name">
+        <el-form-item :label="$t('views.tool.form.mcpName.label')" prop="name">
           <div class="flex w-full">
             <div
               v-if="form.id"
@@ -55,7 +55,7 @@
             </el-avatar>
             <el-input
               v-model="form.name"
-              :placeholder="$t('views.tool.form.toolName.placeholder')"
+              :placeholder="$t('views.tool.form.mcpName.placeholder')"
               maxlength="64"
               show-word-limit
               @blur="form.name = form.name?.trim()"
@@ -63,11 +63,11 @@
           </div>
         </el-form-item>
 
-        <el-form-item :label="$t('views.tool.form.toolDescription.label')">
+        <el-form-item :label="$t('views.tool.form.mcpDescription.label')">
           <el-input
             v-model="form.desc"
             type="textarea"
-            :placeholder="$t('views.tool.form.toolDescription.placeholder')"
+            :placeholder="$t('views.tool.form.mcpDescription.placeholder')"
             maxlength="128"
             show-word-limit
             :autosize="{ minRows: 3 }"
@@ -78,7 +78,7 @@
           {{ $t('views.tool.form.mcp.title') }}
         </h4>
 
-        <el-form-item :label="$t('views.tool.form.toolDescription.label')" prop="code">
+        <el-form-item :label="$t('views.tool.form.mcpDescription.label')" prop="code">
           <template #label>
             {{ $t('views.tool.form.mcp.label') }}
             <span class="color-danger">*</span>
@@ -109,7 +109,7 @@
         </el-button>
       </div>
     </template>
-    <EditAvatarDialog ref="EditAvatarDialogRef" @refresh="refreshTool" />
+    <EditAvatarDialog ref="EditAvatarDialogRef" @refresh="refreshTool" iconType="MCP" />
   </el-drawer>
 </template>
 
@@ -197,7 +197,7 @@ const rules = reactive({
   name: [
     {
       required: true,
-      message: t('views.tool.form.toolName.requiredMessage'),
+      message: t('views.tool.form.mcpName.requiredMessage'),
       trigger: 'blur',
     },
   ],
@@ -211,12 +211,11 @@ const rules = reactive({
 })
 
 function close() {
-  if (isEdit.value || !areAllValuesNonEmpty(form.value)) {
+  if (!areAllValuesNonEmpty(form.value)) {
     visible.value = false
   } else {
     MsgConfirm(t('common.tip'), t('views.tool.tip.saveMessage'), {
       confirmButtonText: t('common.confirm'),
-      type: 'warning',
     })
       .then(() => {
         visible.value = false

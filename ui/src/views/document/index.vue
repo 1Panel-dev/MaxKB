@@ -108,7 +108,7 @@
           </div>
           <app-table
             ref="multipleTableRef"
-            class="mt-16"
+            class="mt-16 document-table"
             :data="documentData"
             :pagination-config="paginationConfig"
             :quick-create="
@@ -283,13 +283,13 @@
                   <el-icon class="color-success mr-8" style="font-size: 16px">
                     <SuccessFilled />
                   </el-icon>
-                  <span class="color-secondary">
+                  <span class="color-text-primary">
                     {{ $t('common.status.enabled') }}
                   </span>
                 </div>
                 <div v-else class="flex align-center">
                   <AppIcon iconName="app-disabled" class="color-secondary mr-8"></AppIcon>
-                  <span class="color-secondary">
+                  <span class="color-text-primary">
                     {{ $t('common.status.disabled') }}
                   </span>
                 </div>
@@ -515,7 +515,7 @@
                     effect="dark"
                     :content="$t('views.knowledge.setting.vectorization')"
                     placement="top"
-                    v-else="permissionPrecise.vector(id)"
+                    v-if="permissionPrecise.vector(id)"
                   >
                     <span class="mr-4">
                       <el-button type="primary" text @click.stop="refreshDocument(row)">
@@ -1205,6 +1205,11 @@ onBeforeUnmount(() => {
     background: #ffffff;
     z-index: 22;
     box-shadow: 0px -2px 4px 0px rgba(31, 35, 41, 0.08);
+  }
+  .document-table {
+    :deep(.el-table__row) {
+      cursor: pointer;
+    }
   }
 }
 </style>

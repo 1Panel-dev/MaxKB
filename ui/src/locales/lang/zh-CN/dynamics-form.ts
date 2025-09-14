@@ -12,6 +12,7 @@ export default {
     RadioRow: '单行选项卡',
     UploadInput: '文件上传',
     TextareaInput: '多行文本框',
+    MultiRow: '单行多选卡',
   },
   default: {
     label: '默认值',
@@ -124,6 +125,7 @@ export default {
     ref_variables: {
       label: '引用变量 ',
       popover: '变量的值必须符合',
+      json_format: 'JSON 格式',
       popover_label: '标签',
       popover_value: '值',
       popover_default: '是否为默认值',

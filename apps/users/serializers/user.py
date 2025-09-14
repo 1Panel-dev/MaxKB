@@ -61,6 +61,7 @@ class CreateUserSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True, label=_('Email'))
     nick_name = serializers.CharField(required=False, label=_('Nick name'))
     phone = serializers.CharField(required=False, label=_('Phone'))
+    source = serializers.CharField(required=False, label=_('Source'), default='LOCAL')
 
 
 def is_workspace_manage(user_id: str, workspace_id: str):
@@ -110,7 +111,7 @@ class UserProfileSerializer(serializers.Serializer):
             'email': user.email,
             'role': auth.role_list,
             'permissions': auth.permission_list,
-            'is_edit_password': user.role == RoleConstants.ADMIN.name and user.password == 'd880e722c47a34d8e9fce789fc62389d',
+            'is_edit_password': user.password == 'd880e722c47a34d8e9fce789fc62389d' if user.source == 'LOCAL' else False,
             'language': user.language,
             'workspace_list': workspace_list,
             'role_name': role_name
@@ -172,6 +173,13 @@ class UserManageSerializer(serializers.Serializer):
             allow_null=True,
             allow_blank=True
         )
+        source = serializers.CharField(
+            required=False,
+            label=_("Source"),
+            max_length=20,
+            default="LOCAL"
+        )
+
 
         def is_valid(self, *, raise_exception=True):
             super().is_valid(raise_exception=True)
@@ -332,7 +340,7 @@ class UserManageSerializer(serializers.Serializer):
             username=instance.get('username'),
             password=password_encrypt(instance.get('password')),
             role=RoleConstants.USER.name,
-            source="LOCAL",
+            source=instance.get('source', 'LOCAL'),
             is_active=True
         )
         update_user_role(instance, user, user_id)

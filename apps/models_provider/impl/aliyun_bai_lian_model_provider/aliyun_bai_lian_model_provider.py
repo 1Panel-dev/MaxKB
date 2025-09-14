@@ -15,6 +15,7 @@ from models_provider.impl.aliyun_bai_lian_model_provider.credential.asr_stt impo
 from models_provider.impl.aliyun_bai_lian_model_provider.credential.embedding import \
     AliyunBaiLianEmbeddingCredential
 from models_provider.impl.aliyun_bai_lian_model_provider.credential.image import QwenVLModelCredential
+from models_provider.impl.aliyun_bai_lian_model_provider.credential.itv import ImageToVideoModelCredential
 from models_provider.impl.aliyun_bai_lian_model_provider.credential.llm import BaiLianLLMModelCredential
 from models_provider.impl.aliyun_bai_lian_model_provider.credential.omni_stt import AliyunBaiLianOmiSTTModelCredential
 from models_provider.impl.aliyun_bai_lian_model_provider.credential.reranker import \
@@ -22,6 +23,7 @@ from models_provider.impl.aliyun_bai_lian_model_provider.credential.reranker imp
 from models_provider.impl.aliyun_bai_lian_model_provider.credential.stt import AliyunBaiLianSTTModelCredential
 from models_provider.impl.aliyun_bai_lian_model_provider.credential.tti import QwenTextToImageModelCredential
 from models_provider.impl.aliyun_bai_lian_model_provider.credential.tts import AliyunBaiLianTTSModelCredential
+from models_provider.impl.aliyun_bai_lian_model_provider.credential.ttv import TextToVideoModelCredential
 from models_provider.impl.aliyun_bai_lian_model_provider.model.asr_stt import AliyunBaiLianAsrSpeechToText
 from models_provider.impl.aliyun_bai_lian_model_provider.model.embedding import AliyunBaiLianEmbedding
 from models_provider.impl.aliyun_bai_lian_model_provider.model.image import QwenVLChatModel
@@ -34,6 +36,8 @@ from models_provider.impl.aliyun_bai_lian_model_provider.model.tts import Aliyun
 from maxkb.conf import PROJECT_DIR
 from django.utils.translation import gettext as _, gettext
 
+from models_provider.impl.aliyun_bai_lian_model_provider.model.ttv import GenerationVideoModel
+
 aliyun_bai_lian_model_credential = AliyunBaiLianRerankerCredential()
 aliyun_bai_lian_tts_model_credential = AliyunBaiLianTTSModelCredential()
 aliyun_bai_lian_stt_model_credential = AliyunBaiLianSTTModelCredential()
@@ -43,6 +47,8 @@ aliyun_bai_lian_embedding_model_credential = AliyunBaiLianEmbeddingCredential()
 aliyun_bai_lian_llm_model_credential = BaiLianLLMModelCredential()
 qwenvl_model_credential = QwenVLModelCredential()
 qwentti_model_credential = QwenTextToImageModelCredential()
+aliyun_bai_lian_ttv_model_credential = TextToVideoModelCredential()
+aliyun_bai_lian_itv_model_credential = ImageToVideoModelCredential()
 
 model_info_list = [ModelInfo('gte-rerank',
                              _('With the GTE-Rerank text sorting series model developed by Alibaba Tongyi Lab, developers can integrate high-quality text retrieval and sorting through the LlamaIndex framework.'),
@@ -104,6 +110,24 @@ module_info_tti_list = [
               _('Tongyi Wanxiang - a large image model for text generation, supports bilingual input in Chinese and English, and supports the input of reference pictures for reference content or reference style migration. Key styles include but are not limited to watercolor, oil painting, Chinese painting, sketch, flat illustration, two-dimensional, and 3D. Cartoon.'),
               ModelTypeConst.TTI, qwentti_model_credential, QwenTextToImageModel),
 ]
+model_info_ttv_list = [
+    ModelInfo('wan2.2-t2v-plus', '', ModelTypeConst.TTV, aliyun_bai_lian_ttv_model_credential,
+              GenerationVideoModel),
+    ModelInfo('wanx2.1-t2v-turbo', '', ModelTypeConst.TTV, aliyun_bai_lian_ttv_model_credential,
+              GenerationVideoModel),
+    ModelInfo('wanx2.1-t2v-plus', '', ModelTypeConst.TTV, aliyun_bai_lian_ttv_model_credential,
+              GenerationVideoModel),
+]
+module_info_itv_list = [
+    ModelInfo('wan2.2-i2v-flash', '', ModelTypeConst.ITV, aliyun_bai_lian_itv_model_credential,
+              GenerationVideoModel),
+    ModelInfo('wan2.2-i2v-plus', '', ModelTypeConst.ITV, aliyun_bai_lian_itv_model_credential,
+              GenerationVideoModel),
+    ModelInfo('wanx2.1-i2v-plus', '', ModelTypeConst.ITV, aliyun_bai_lian_itv_model_credential,
+              GenerationVideoModel),
+    ModelInfo('wanx2.1-i2v-turbo', '', ModelTypeConst.ITV, aliyun_bai_lian_itv_model_credential,
+              GenerationVideoModel),
+]
 
 model_info_manage = (
     ModelInfoManage.builder()
@@ -117,6 +141,10 @@ model_info_manage = (
     .append_default_model_info(model_info_list[3])
     .append_default_model_info(model_info_list[4])
     .append_default_model_info(model_info_list[0])
+    .append_model_info_list(model_info_ttv_list)
+    .append_default_model_info(model_info_ttv_list[0])
+    .append_model_info_list(module_info_itv_list)
+    .append_default_model_info(module_info_itv_list[0])
     .build()
 )
 

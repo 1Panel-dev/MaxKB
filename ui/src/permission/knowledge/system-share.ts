@@ -182,6 +182,8 @@ const share = {
       ],
       'OR'
     ),
+  chat_user_edit: () =>false,
+
   auth: () => false,
   folderCreate: () => false,
   folderEdit: () => false,

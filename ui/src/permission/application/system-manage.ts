@@ -38,7 +38,14 @@ const systemManage = {
             'OR'
     ),
     folderDelete: () => false,
-    auth: () => false,
+    auth: () => 
+        hasPermission(
+            [
+              RoleConst.ADMIN,
+              PermissionConst.RESOURCE_APPLICATION_AUTH
+            ],
+            'OR'
+    ),
     overview_embed: () =>
         hasPermission(
             [
@@ -133,6 +140,8 @@ const systemManage = {
           PermissionConst.RESOURCE_APPLICATION_CHAT_USER_READ
         ],'OR'
     ),
+    chat_user_edit: () =>false,
+
     chat_log_read: () => 
       hasPermission(
         [

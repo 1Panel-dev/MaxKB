@@ -17,6 +17,7 @@ from models_provider.impl.xf_model_provider.credential.image import XunFeiImageM
 from models_provider.impl.xf_model_provider.credential.llm import XunFeiLLMModelCredential
 from models_provider.impl.xf_model_provider.credential.stt import XunFeiSTTModelCredential
 from models_provider.impl.xf_model_provider.credential.tts import XunFeiTTSModelCredential
+from models_provider.impl.xf_model_provider.credential.zh_en_stt import ZhEnXunFeiSTTModelCredential
 from models_provider.impl.xf_model_provider.model.embedding import XFEmbedding
 from models_provider.impl.xf_model_provider.model.image import XFSparkImage
 from models_provider.impl.xf_model_provider.model.llm import XFChatSparkLLM
@@ -25,10 +26,13 @@ from models_provider.impl.xf_model_provider.model.tts import XFSparkTextToSpeech
 from maxkb.conf import PROJECT_DIR
 from django.utils.translation import gettext as _
 
+from models_provider.impl.xf_model_provider.model.zh_en_stt import XFZhEnSparkSpeechToText
+
 ssl._create_default_https_context = ssl.create_default_context()
 
 xunfei_model_credential = XunFeiLLMModelCredential()
 stt_model_credential = XunFeiSTTModelCredential()
+zh_en_stt_credential = ZhEnXunFeiSTTModelCredential()
 image_model_credential = XunFeiImageModelCredential()
 tts_model_credential = XunFeiTTSModelCredential()
 embedding_model_credential = XFEmbeddingCredential()
@@ -36,7 +40,10 @@ model_info_list = [
     ModelInfo('generalv3.5', '', ModelTypeConst.LLM, xunfei_model_credential, XFChatSparkLLM),
     ModelInfo('generalv3', '', ModelTypeConst.LLM, xunfei_model_credential, XFChatSparkLLM),
     ModelInfo('generalv2', '', ModelTypeConst.LLM, xunfei_model_credential, XFChatSparkLLM),
-    ModelInfo('iat', _('Chinese and English recognition'), ModelTypeConst.STT, stt_model_credential, XFSparkSpeechToText),
+    ModelInfo('iat', _('Chinese and English recognition'), ModelTypeConst.STT, stt_model_credential,
+              XFSparkSpeechToText),
+    ModelInfo('slm', _('Chinese and English recognition'), ModelTypeConst.STT, zh_en_stt_credential,
+              XFZhEnSparkSpeechToText),
     ModelInfo('tts', '', ModelTypeConst.TTS, tts_model_credential, XFSparkTextToSpeech),
     ModelInfo('embedding', '', ModelTypeConst.EMBEDDING, embedding_model_credential, XFEmbedding)
 ]
@@ -47,7 +54,8 @@ model_info_manage = (
     .append_default_model_info(
         ModelInfo('generalv3.5', '', ModelTypeConst.LLM, xunfei_model_credential, XFChatSparkLLM))
     .append_default_model_info(
-        ModelInfo('iat', _('Chinese and English recognition'), ModelTypeConst.STT, stt_model_credential, XFSparkSpeechToText),
+        ModelInfo('iat', _('Chinese and English recognition'), ModelTypeConst.STT, stt_model_credential,
+                  XFSparkSpeechToText),
     )
     .append_default_model_info(
         ModelInfo('tts', '', ModelTypeConst.TTS, tts_model_credential, XFSparkTextToSpeech))

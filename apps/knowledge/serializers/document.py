@@ -1,4 +1,5 @@
 import io
+import json
 import os
 import re
 import traceback
@@ -9,11 +10,13 @@ from typing import Dict, List
 import openpyxl
 import uuid_utils.compat as uuid
 from celery_once import AlreadyQueued
+from django.contrib.postgres.fields import JSONField
 from django.core import validators
 from django.db import transaction, models
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Func, F, Value
 from django.db.models.aggregates import Max
-from django.db.models.functions import Substr, Reverse
+from django.db.models.fields.json import KeyTextTransform
+from django.db.models.functions import Substr, Reverse, Coalesce, Cast
 from django.http import HttpResponse
 from django.utils.translation import gettext_lazy as _, gettext, get_language, to_locale
 from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
@@ -587,10 +590,10 @@ class DocumentSerializers(serializers.Serializer):
 
             workbook = DocumentSerializers.Operate.get_workbook(data_dict, document_dict)
             response = HttpResponse(content_type='application/zip')
-            response['Content-Disposition'] = 'attachment; filename="archive.zip"'
+            response['Content-Disposition'] = f'attachment; filename="{document.name}.zip"'
             zip_buffer = io.BytesIO()
             with TemporaryDirectory() as tempdir:
-                knowledge_file = os.path.join(tempdir, 'knowledge.xlsx')
+                knowledge_file = os.path.join(tempdir, 'document.xlsx')
                 workbook.save(knowledge_file)
                 for r in res:
                     write_image(tempdir, r)
@@ -863,7 +866,7 @@ class DocumentSerializers(serializers.Serializer):
         def get_document_paragraph_model(knowledge_id, instance: Dict):
             source_meta = {'source_file_id': instance.get('source_file_id')} if instance.get('source_file_id') else {}
             meta = {**instance.get('meta'), **source_meta} if instance.get('meta') is not None else source_meta
-            meta = convert_uuid_to_str(meta)
+            meta = {**convert_uuid_to_str(meta), 'allow_download': True}
 
             document_model = Document(
                 **{
@@ -1256,6 +1259,19 @@ class DocumentSerializers(serializers.Serializer):
             if directly_return_similarity is not None:
                 update_dict['directly_return_similarity'] = directly_return_similarity
             QuerySet(Document).filter(id__in=document_id_list).update(**update_dict)
+            allow_download = instance.get('allow_download')
+            if allow_download is not None:
+                # 我需要修改meta meta是存在Document的字段 是一个json字段 但是allow_download可能不存在
+                Document.objects.filter(id__in=document_id_list).update(
+                    meta=Func(
+                        F("meta"),
+                        Value(["allow_download"]),
+                        Value(json.dumps(allow_download)),  # 转成 "true"/"false"
+                        Value(True),  # create_missing = true
+                        function="jsonb_set",
+                        output_field=JSONField(),
+                    )
+                )
 
         def batch_refresh(self, instance: Dict, with_valid=True):
             if with_valid:
@@ -1289,6 +1305,7 @@ class DocumentSerializers(serializers.Serializer):
             document_id_list = instance.get("document_id_list")
             model_id = instance.get("model_id")
             prompt = instance.get("prompt")
+            model_params_setting = instance.get("model_params_setting")
             state_list = instance.get('state_list')
             ListenerManagement.update_status(
                 QuerySet(Document).filter(id__in=document_id_list),
@@ -1311,7 +1328,7 @@ class DocumentSerializers(serializers.Serializer):
                 QuerySet(Document).filter(id__in=document_id_list))()
             try:
                 for document_id in document_id_list:
-                    generate_related_by_document_id.delay(document_id, model_id, prompt, state_list)
+                    generate_related_by_document_id.delay(document_id, model_id, model_params_setting, prompt, state_list)
             except AlreadyQueued as e:
                 pass
 

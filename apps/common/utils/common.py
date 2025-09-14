@@ -327,7 +327,7 @@ def flat_map(array: List[List]):
 
 
 def parse_image(content: str):
-    matches = re.finditer("!\[.*?\]\(\/oss\/(image|file)\/.*?\)", content)
+    matches = re.finditer("!\[.*?\]\(\.\/oss\/(image|file)\/.*?\)", content)
     image_list = [match.group() for match in matches]
     return image_list
 

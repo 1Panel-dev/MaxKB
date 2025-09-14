@@ -6,6 +6,7 @@
         {{ $t('chat.operation.stopChat') }}</el-button
       >
     </div>
+
     <div class="operate-textarea">
       <el-scrollbar max-height="136">
         <div
@@ -333,7 +334,7 @@ const props = withDefaults(
     available: true,
   },
 )
-const emit = defineEmits(['update:chatId', 'update:loading', 'update:showUserInput'])
+const emit = defineEmits(['update:chatId', 'update:loading', 'update:showUserInput', 'backBottom'])
 const chartOpenId = ref<string>()
 const chatId_context = computed({
   get: () => {
@@ -356,7 +357,9 @@ const localLoading = computed({
   },
 })
 
-const uploadLoading = ref(false)
+const uploadLoading = computed(() => {
+  return Object.values(filePromisionDict.value).length > 0
+})
 
 const inputPlaceholder = computed(() => {
   return recorderStatus.value === 'START'
@@ -411,7 +414,7 @@ const checkMaxFilesLimit = () => {
       uploadOtherList.value.length
   )
 }
-
+const filePromisionDict: any = ref<any>({})
 const uploadFile = async (file: any, fileList: any) => {
   const { maxFiles, fileLimit } = props.applicationDetails.file_upload_setting
   // 单次上传文件数量限制
@@ -427,11 +430,10 @@ const uploadFile = async (file: any, fileList: any) => {
     fileList.splice(0, fileList.length, ...fileList.slice(0, maxFiles))
     return
   }
-  console.log(fileList)
   if (fileList.filter((f: any) => f.size == 0).length > 0) {
     // MB
-    MsgWarning(t('chat.uploadFile.sizeLimit2') + fileLimit + 'MB')
-    // 只保留未超出大小限制的文件
+    MsgWarning(t('chat.uploadFile.sizeLimit2'))
+    // 空文件上传过滤
     fileList.splice(0, fileList.length, ...fileList.filter((f: any) => f.size > 0))
     return
   }
@@ -446,6 +448,7 @@ const uploadFile = async (file: any, fileList: any) => {
     )
     return
   }
+  filePromisionDict.value[file.uid] = false
   const inner = reactive(file)
   fileAllList.value.push(inner)
   if (!chatId_context.value) {
@@ -454,23 +457,15 @@ const uploadFile = async (file: any, fileList: any) => {
   }
   const api =
     props.type === 'debug-ai-chat'
-      ? applicationApi.postUploadFile(
-          file.raw,
-          'TEMPORARY_120_MINUTE',
-          'TEMPORARY_120_MINUTE',
-          uploadLoading,
-        )
-      : chatAPI.postUploadFile(file.raw, chatId_context.value, 'CHAT', uploadLoading)
+      ? applicationApi.postUploadFile(file.raw, 'TEMPORARY_120_MINUTE', 'TEMPORARY_120_MINUTE')
+      : chatAPI.postUploadFile(file.raw, chatId_context.value, 'CHAT')
+
   api.then((ok) => {
     inner.url = ok.data
     const split_path = ok.data.split('/')
     inner.file_id = split_path[split_path.length - 1]
+    delete filePromisionDict.value[file.uid]
   })
-  if (!inputValue.value && uploadImageList.value.length > 0) {
-    inputValue.value = t('chat.uploadFile.imageMessage')
-  } else {
-    inputValue.value = t('chat.uploadFile.fileMessage')
-  }
 }
 // 粘贴处理
 const handlePaste = (event: ClipboardEvent) => {
@@ -550,8 +545,18 @@ const uploadOtherList = computed(() =>
 const showDelete = ref('')
 
 const isDisabledChat = computed(
-  () => !(inputValue.value.trim() && (props.appId || props.applicationDetails?.name)),
+  () =>
+    !(
+      (inputValue.value.trim() ||
+        uploadImageList.value.length > 0 ||
+        uploadDocumentList.value.length > 0 ||
+        uploadVideoList.value.length > 0 ||
+        uploadAudioList.value.length > 0 ||
+        uploadOtherList.value.length > 0) &&
+      (props.appId || props.applicationDetails?.name)
+    ),
 )
+
 // 是否显示移动端语音按钮
 const isMicrophone = ref(false)
 const switchMicrophone = (status: boolean) => {
@@ -759,11 +764,34 @@ const stopTimer = () => {
   }
 }
 
+const getQuestion = () => {
+  if (!inputValue.value.trim()) {
+    const fileLength = [
+      uploadImageList.value.length > 0,
+      uploadDocumentList.value.length > 0,
+      uploadAudioList.value.length > 0,
+      uploadOtherList.value.length > 0,
+    ]
+    if (fileLength.filter((f) => f).length > 1) {
+      return t('chat.uploadFile.otherMessage')
+    } else if (fileLength[0]) {
+      return t('chat.uploadFile.imageMessage')
+    } else if (fileLength[1]) {
+      return t('chat.uploadFile.documentMessage')
+    } else if (fileLength[2]) {
+      return t('chat.uploadFile.audioMessage')
+    } else if (fileLength[3]) {
+      return t('chat.uploadFile.otherMessage')
+    }
+  }
+
+  return inputValue.value.trim()
+}
 function autoSendMessage() {
   props
     .validate()
     .then(() => {
-      props.sendMessage(inputValue.value, {
+      props.sendMessage(getQuestion(), {
         image_list: uploadImageList.value,
         document_list: uploadDocumentList.value,
         audio_list: uploadAudioList.value,
@@ -798,7 +826,7 @@ function sendChatHandle(event?: any) {
     // 如果没有按下组合键，则会阻止默认事件
     event?.preventDefault()
     if (!isDisabledChat.value && !props.loading && !event?.isComposing && !uploadLoading.value) {
-      if (inputValue.value.trim()) {
+      if (inputValue.value.trim() || fileAllList.value.length > 0) {
         autoSendMessage()
       }
     }

@@ -41,28 +41,43 @@
             @submitDialog="submitDialog"
             :placeholder="mcpServerJson"
           />
-          <el-select v-else v-model="form_data.mcp_tool_id" filterable @change="mcpToolSelectChange">
+          <el-select
+            v-else
+            v-model="form_data.mcp_tool_id"
+            filterable
+            @change="mcpToolSelectChange"
+          >
             <el-option
               v-for="mcpTool in mcpToolSelectOptions"
               :key="mcpTool.id"
               :label="mcpTool.name"
               :value="mcpTool.id"
             >
-              <span>{{ mcpTool.name }}</span>
-              <el-tag v-if="mcpTool.scope === 'SHARED'" type="info" class="info-tag ml-8 mt-4">
-                {{ t('views.shared.title') }}
-              </el-tag>
+              <div class="flex align-center">
+                <el-avatar
+                  v-if="mcpTool?.icon"
+                  shape="square"
+                  :size="20"
+                  style="background: none"
+                  class="mr-8"
+                >
+                  <img :src="resetUrl(mcpTool?.icon)" alt="" />
+                </el-avatar>
+                <ToolIcon v-else :size="20" :type="mcpTool?.tool_type" class="mr-8" />
+                <span>{{ mcpTool.name }}</span>
+                <el-tag v-if="mcpTool.scope === 'SHARED'" type="info" class="info-tag ml-8">
+                  {{ t('views.shared.title') }}
+                </el-tag>
+              </div>
             </el-option>
           </el-select>
         </el-form-item>
         <el-form-item>
           <template v-slot:label>
             <div class="flex-between">
-              <span>{{ $t('views.applicationWorkflow.nodes.mcpNode.tool') }}</span>
+              <span>{{ $t('views.tool.title') }}</span>
               <el-button type="primary" link @click="getTools()">
-                <el-icon class="mr-4">
-                  <Plus />
-                </el-icon>
+                <AppIcon iconName="app-add-outlined" class="mr-4"></AppIcon>
                 {{ $t('views.applicationWorkflow.nodes.mcpNode.getTool') }}
               </el-button>
             </div>
@@ -235,7 +250,7 @@
 <script setup lang="ts">
 import { cloneDeep, set } from 'lodash'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
-import { computed, onMounted, ref, inject } from 'vue'
+import { computed, inject, onMounted, ref } from 'vue'
 import { isLastNode } from '@/workflow/common/data'
 import { t } from '@/locales'
 import { MsgError, MsgSuccess } from '@/utils/message'
@@ -243,9 +258,9 @@ import TooltipLabel from '@/components/dynamics-form/items/label/TooltipLabel.vu
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import { useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
-import useStore from "@/stores";
+import { resetUrl } from '@/utils/common'
+
 const props = defineProps<{ nodeModel: any }>()
-const { user } = useStore()
 
 const route = useRoute()
 const {
@@ -300,8 +315,10 @@ function submitDialog(val: string) {
 }
 
 async function mcpToolSelectChange() {
-  const tool = await loadSharedApi({ type: 'tool', systemType: apiType.value })
-    .getToolById(form_data.value.mcp_tool_id, loading)
+  const tool = await loadSharedApi({ type: 'tool', systemType: apiType.value }).getToolById(
+    form_data.value.mcp_tool_id,
+    loading,
+  )
   form_data.value.mcp_servers = tool.data.code
 }
 
@@ -309,6 +326,12 @@ function getTools() {
   if (form_data.value.mcp_source === 'referencing' && !form_data.value.mcp_tool_id) {
     MsgError(t('views.applicationWorkflow.nodes.mcpNode.mcpToolTip'))
     return
+  }
+  if (form_data.value.mcp_source === 'referencing' && form_data.value.mcp_tool_id) {
+    if (!mcpToolSelectOptions.value.find((item) => item.id === form_data.value.mcp_tool_id)) {
+      MsgError(t('views.applicationWorkflow.nodes.mcpNode.mcpToolTip'))
+      return
+    }
   }
   if (form_data.value.mcp_source === 'custom' && !form_data.value.mcp_servers) {
     MsgError(t('views.applicationWorkflow.nodes.mcpNode.mcpServerTip'))
@@ -490,20 +513,21 @@ function getMcpToolSelectOptions() {
   const obj =
     apiType.value === 'systemManage'
       ? {
-        scope: 'WORKSPACE',
-        tool_type: 'MCP',
-        workspace_id: applicationDetail.value?.workspace_id,
-      }
+          scope: 'WORKSPACE',
+          tool_type: 'MCP',
+          workspace_id: applicationDetail.value?.workspace_id,
+        }
       : {
-        scope: 'WORKSPACE',
-        tool_type: 'MCP',
-      }
+          scope: 'WORKSPACE',
+          tool_type: 'MCP',
+        }
 
-  loadSharedApi({type: 'tool', systemType: apiType.value})
+  loadSharedApi({ type: 'tool', systemType: apiType.value })
     .getAllToolList(obj, loading)
     .then((res: any) => {
-      mcpToolSelectOptions.value = [...res.data.shared_tools, ...res.data.tools]
-        .filter((item: any) => item.is_active)
+      mcpToolSelectOptions.value = [...res.data.shared_tools, ...res.data.tools].filter(
+        (item: any) => item.is_active,
+      )
     })
 }
 
@@ -512,6 +536,9 @@ onMounted(() => {
     if (isLastNode(props.nodeModel)) {
       set(props.nodeModel.properties.node_data, 'is_result', true)
     }
+  }
+  if (props.nodeModel.properties.node_data.mcp_servers && !props.nodeModel.properties.node_data.mcp_source) {
+    set(props.nodeModel.properties.node_data, 'mcp_source', 'custom')
   }
   getMcpToolSelectOptions()
   set(props.nodeModel, 'validate', validate)

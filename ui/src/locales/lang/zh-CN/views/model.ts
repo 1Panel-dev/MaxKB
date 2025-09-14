@@ -29,6 +29,8 @@ export default {
     TTS: '语音合成',
     IMAGE: '视觉模型',
     TTI: '图片生成',
+    TTV: '文生视频',
+    ITV: '图生视频',
   },
   modelForm: {
     title: {

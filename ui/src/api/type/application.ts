@@ -26,6 +26,13 @@ interface ApplicationFormType {
   stt_autosend?: boolean
   folder_id?: string
   workspace_id?: string
+  mcp_enable?: boolean
+  mcp_servers?: string
+  mcp_tool_ids?: string[]
+  mcp_source?: string
+  tool_enable?: boolean
+  tool_ids?: string[]
+  mcp_output_enable?: boolean
 }
 interface Chunk {
   real_node_id: string

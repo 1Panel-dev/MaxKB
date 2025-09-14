@@ -23,7 +23,7 @@
                 <AppIcon iconName="app-copy"></AppIcon>
               </el-button>
             </div>
-            <el-scrollbar height="150" always>
+            <el-scrollbar height="180" always>
               <div class="pre-wrap p-8 pt-0">
                 {{ source1 }}
               </div>
@@ -46,7 +46,7 @@
                 <AppIcon iconName="app-copy"></AppIcon>
               </el-button>
             </div>
-            <el-scrollbar height="150" always>
+            <el-scrollbar height="180" always>
               <div class="pre-wrap p-8 pt-0">
                 {{ source3 }}
               </div>
@@ -69,7 +69,7 @@
                 <AppIcon iconName="app-copy"></AppIcon>
               </el-button>
             </div>
-            <el-scrollbar height="150" always>
+            <el-scrollbar height="180" always>
               <div class="pre-wrap p-8 pt-0">
                 {{ source2 }}
               </div>
@@ -157,7 +157,7 @@ defineExpose({ open })
     font-weight: 400;
     font-size: 13px;
     white-space: pre;
-    height: 188px;
+    height: 210px;
   }
 }
 </style>

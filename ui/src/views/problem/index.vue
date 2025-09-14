@@ -207,6 +207,7 @@ const paginationConfig = reactive({
   current_page: 1,
   page_size: 10,
   total: 0,
+  page_sizes: [10, 20, 50, 100, 1000],
 })
 
 const filterText = ref('')

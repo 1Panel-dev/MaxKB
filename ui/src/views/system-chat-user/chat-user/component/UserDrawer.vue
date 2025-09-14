@@ -180,7 +180,5 @@ const submit = async (formEl: FormInstance | undefined) => {
 defineExpose({ open })
 </script>
 <style lang="scss" scoped>
-:deep(.el-form-item__content) {
-  font-weight: 400
-}
+
 </style>

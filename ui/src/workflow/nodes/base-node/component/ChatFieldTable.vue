@@ -6,9 +6,7 @@
     <div>
       <span class="ml-4">
         <el-button link type="primary" @click="openAddDialog()">
-          <el-icon class="mr-4">
-            <Plus />
-          </el-icon>
+          <AppIcon iconName="app-add-outlined" class="mr-4"></AppIcon>
           {{ $t('common.add') }}
         </el-button>
       </span>
@@ -86,13 +84,11 @@ function refreshFieldList(data: any, index: any) {
       return
     }
   }
-  console.log(index)
-  if (index) {
-    inputFieldList.value.splice(index, 1, data)
-  } else {
+  if ([undefined, null].includes(index)) {
     inputFieldList.value.push(data)
+  } else {
+    inputFieldList.value.splice(index, 1, data)
   }
-
   ChatFieldDialogRef.value.close()
   props.nodeModel.graphModel.eventCenter.emit('chatFieldList')
 }
