@@ -152,7 +152,7 @@ function mcpSourceChange() {
 
 const open = (data: any, selectOptions: any) => {
   form.value = { ...form.value, ...data }
-  if (data.mcp_servers) {
+  if (data.mcp_servers && Object.keys(data.mcp_servers).length > 0) {
     form.value.mcp_source = 'custom'
   } else if (data.mcp_tool_ids) {
     form.value.mcp_source = 'referencing'
