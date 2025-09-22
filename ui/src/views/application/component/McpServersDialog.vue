@@ -135,7 +135,7 @@ watch(dialogVisible, (bool) => {
   if (!bool) {
     form.value = {
       mcp_servers: '',
-      mcp_tool_ids: '',
+      mcp_tool_ids: [],
       mcp_source: 'referencing',
     }
     paramFormRef.value?.clearValidate()
@@ -146,7 +146,7 @@ function mcpSourceChange() {
   if (form.value.mcp_source === 'referencing') {
     form.value.mcp_servers = ''
   } else {
-    form.value.mcp_tool_ids = ''
+    form.value.mcp_tool_ids = []
   }
 }
 

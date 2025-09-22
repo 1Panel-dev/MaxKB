@@ -133,9 +133,7 @@
         </div>
         <div
           class="w-full mb-16"
-          v-if="
-            chat_data.mcp_tool_ids?.length > 0 || (chat_data.mcp_servers && chat_data.mcp_servers.length > 0)
-          "
+          v-if=" chat_data.mcp_tool_ids?.length > 0"
         >
           <template v-for="(item, index) in chat_data.mcp_tool_ids" :key="index">
             <div class="flex-between border border-r-6 white-bg mb-4" style="padding: 5px 8px"
@@ -168,7 +166,23 @@
               </el-button>
             </div>
           </template>
-        </div>
+          </div>
+          <div v-if="chat_data.mcp_servers && chat_data.mcp_servers.length > 0"
+               class="flex-between border border-r-6 white-bg mb-4"
+               style="padding: 5px 8px"
+          >
+            <div class="flex align-center" style="line-height: 20px">
+              <ToolIcon type="MCP" class="mr-8" :size="20"/>
+              <div class="ellipsis">
+                {{
+                  $t('common.custom') + ' MCP'
+                }}
+              </div>
+            </div>
+            <el-button text @click="chat_data.mcp_servers = ''">
+              <el-icon><Close/></el-icon>
+            </el-button>
+          </div>
         <!-- 工具       -->
         <div class="flex-between mb-16">
           <div class="lighter">{{ $t('views.tool.title') }}</div>
