@@ -48,7 +48,11 @@ class ApplicationVersionView(APIView):
                                  ApplicationVersionApi.Query.get_request_params_api()),
                              responses=result.get_page_api_response(ApplicationVersionApi.get_response_body_api()),
                              tags=[_('Application/Version')])
-        @has_permissions(PermissionConstants.APPLICATION_READ, compare=CompareConstants.AND)
+        @has_permissions(PermissionConstants.APPLICATION_READ,
+                         ViewPermission([RoleConstants.ADMIN, RoleConstants.USER],
+                                        [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
+                                                                        dynamic_tag=keywords.get('application_id'))],
+                                        compare=CompareConstants.AND), compare=CompareConstants.AND)
         def get(self, request: Request, application_id: str, current_page: int, page_size: int):
             return result.success(
                 ApplicationVersionSerializer.Query(
@@ -65,7 +69,14 @@ class ApplicationVersionView(APIView):
                              manual_parameters=ApplicationVersionApi.Operate.get_request_params_api(),
                              responses=result.get_api_response(ApplicationVersionApi.get_response_body_api()),
                              tags=[_('Application/Version')])
-        @has_permissions(PermissionConstants.APPLICATION_READ, compare=CompareConstants.AND)
+        @has_permissions(PermissionConstants.APPLICATION_READ, ViewPermission([RoleConstants.ADMIN, RoleConstants.USER],
+                                                                              [lambda r, keywords: Permission(
+                                                                                  group=Group.APPLICATION,
+                                                                                  operate=Operate.USE,
+                                                                                  dynamic_tag=keywords.get(
+                                                                                      'application_id'))],
+                                                                              compare=CompareConstants.AND),
+                         compare=CompareConstants.AND)
         def get(self, request: Request, application_id: str, work_flow_version_id: str):
             return result.success(
                 ApplicationVersionSerializer.Operate(

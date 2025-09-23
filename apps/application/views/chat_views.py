@@ -59,7 +59,8 @@ class ChatView(APIView):
         @has_permissions(
             ViewPermission([RoleConstants.ADMIN, RoleConstants.USER, RoleConstants.APPLICATION_KEY],
                            [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
-                                                           dynamic_tag=keywords.get('application_id'))])
+                                                           dynamic_tag=keywords.get('application_id'))],
+                           compare=CompareConstants.AND)
         )
         @log(menu='Conversation Log', operate="Export conversation",
              get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')))
@@ -164,7 +165,9 @@ class ChatView(APIView):
     @has_permissions(
         ViewPermission([RoleConstants.ADMIN, RoleConstants.USER, RoleConstants.APPLICATION_KEY],
                        [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
-                                                       dynamic_tag=keywords.get('application_id'))])
+                                                       dynamic_tag=keywords.get('application_id'))],
+                       compare=CompareConstants.AND
+                       )
     )
     def get(self, request: Request, application_id: str):
         return result.success(ChatSerializers.Query(
@@ -182,8 +185,7 @@ class ChatView(APIView):
             [RoleConstants.ADMIN, RoleConstants.USER],
             [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.MANAGE,
                                             dynamic_tag=keywords.get('application_id'))],
-            compare=CompareConstants.AND),
-            compare=CompareConstants.AND)
+            compare=CompareConstants.AND))
         @log(menu='Conversation Log', operate="Delete a conversation",
              get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')))
         def delete(self, request: Request, application_id: str, chat_id: str):
@@ -206,7 +208,8 @@ class ChatView(APIView):
         @has_permissions(
             ViewPermission([RoleConstants.APPLICATION_ACCESS_TOKEN],
                            [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
-                                                           dynamic_tag=keywords.get('application_id'))])
+                                                           dynamic_tag=keywords.get('application_id'))],
+                           compare=CompareConstants.AND)
         )
         def get(self, request: Request, application_id: str, current_page: int, page_size: int):
             return result.success(ChatSerializers.ClientChatHistory(
@@ -267,7 +270,8 @@ class ChatView(APIView):
         @has_permissions(
             ViewPermission([RoleConstants.ADMIN, RoleConstants.USER, RoleConstants.APPLICATION_KEY],
                            [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
-                                                           dynamic_tag=keywords.get('application_id'))])
+                                                           dynamic_tag=keywords.get('application_id'))],
+                           compare=CompareConstants.AND)
         )
         def get(self, request: Request, application_id: str, current_page: int, page_size: int):
             return result.success(ChatSerializers.Query(
@@ -292,7 +296,8 @@ class ChatView(APIView):
                 ViewPermission([RoleConstants.ADMIN, RoleConstants.USER, RoleConstants.APPLICATION_KEY,
                                 RoleConstants.APPLICATION_ACCESS_TOKEN],
                                [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
-                                                               dynamic_tag=keywords.get('application_id'))])
+                                                               dynamic_tag=keywords.get('application_id'))],
+                               compare=CompareConstants.AND)
             )
             def get(self, request: Request, application_id: str, chat_id: str, chat_record_id: str):
                 return result.success(ChatRecordSerializer.Operate(
@@ -310,7 +315,8 @@ class ChatView(APIView):
         @has_permissions(
             ViewPermission([RoleConstants.ADMIN, RoleConstants.USER, RoleConstants.APPLICATION_KEY],
                            [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
-                                                           dynamic_tag=keywords.get('application_id'))])
+                                                           dynamic_tag=keywords.get('application_id'))],
+                           compare=CompareConstants.AND)
         )
         def get(self, request: Request, application_id: str, chat_id: str):
             return result.success(ChatRecordSerializer.Query(
@@ -329,9 +335,11 @@ class ChatView(APIView):
                                  tags=[_("Application/Conversation Log")]
                                  )
             @has_permissions(
-                ViewPermission([RoleConstants.ADMIN, RoleConstants.USER, RoleConstants.APPLICATION_KEY],
+                ViewPermission([RoleConstants.ADMIN, RoleConstants.USER, RoleConstants.APPLICATION_KEY,
+                                RoleConstants.APPLICATION_ACCESS_TOKEN],
                                [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
-                                                               dynamic_tag=keywords.get('application_id'))])
+                                                               dynamic_tag=keywords.get('application_id'))],
+                               compare=CompareConstants.AND)
             )
             def get(self, request: Request, application_id: str, chat_id: str, current_page: int, page_size: int):
                 return result.success(ChatRecordSerializer.Query(
@@ -354,7 +362,8 @@ class ChatView(APIView):
                 ViewPermission([RoleConstants.ADMIN, RoleConstants.USER, RoleConstants.APPLICATION_KEY,
                                 RoleConstants.APPLICATION_ACCESS_TOKEN],
                                [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
-                                                               dynamic_tag=keywords.get('application_id'))])
+                                                               dynamic_tag=keywords.get('application_id'))],
+                               compare=CompareConstants.AND)
             )
             @log(menu='Conversation Log', operate="Like, Dislike",
                  get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')))
@@ -377,7 +386,7 @@ class ChatView(APIView):
                 ViewPermission([RoleConstants.ADMIN, RoleConstants.USER],
                                [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
                                                                dynamic_tag=keywords.get('application_id'))]
-                               ))
+                    , compare=CompareConstants.AND))
             def get(self, request: Request, application_id: str, chat_id: str, chat_record_id: str):
                 return result.success(ChatRecordSerializer.ChatRecordImprove(
                     data={'chat_id': chat_id, 'chat_record_id': chat_record_id}).get())
@@ -397,7 +406,7 @@ class ChatView(APIView):
                 ViewPermission([RoleConstants.ADMIN, RoleConstants.USER],
                                [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
                                                                dynamic_tag=keywords.get('application_id'))],
-
+                               compare=CompareConstants.AND
                                ), ViewPermission([RoleConstants.ADMIN, RoleConstants.USER],
                                                  [lambda r, keywords: Permission(group=Group.DATASET,
                                                                                  operate=Operate.MANAGE,
@@ -424,6 +433,7 @@ class ChatView(APIView):
                 ViewPermission([RoleConstants.ADMIN, RoleConstants.USER],
                                [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
                                                                dynamic_tag=keywords.get('application_id'))],
+                               compare=CompareConstants.AND
 
                                ), ViewPermission([RoleConstants.ADMIN, RoleConstants.USER],
                                                  [lambda r, keywords: Permission(group=Group.DATASET,
@@ -451,6 +461,7 @@ class ChatView(APIView):
                     ViewPermission([RoleConstants.ADMIN, RoleConstants.USER],
                                    [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
                                                                    dynamic_tag=keywords.get('application_id'))],
+                                   compare=CompareConstants.AND
 
                                    ), ViewPermission([RoleConstants.ADMIN, RoleConstants.USER],
                                                      [lambda r, keywords: Permission(group=Group.DATASET,
@@ -499,7 +510,8 @@ class ChatView(APIView):
             ViewPermission([RoleConstants.ADMIN, RoleConstants.USER, RoleConstants.APPLICATION_KEY,
                             RoleConstants.APPLICATION_ACCESS_TOKEN],
                            [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
-                                                           dynamic_tag=keywords.get('application_id'))])
+                                                           dynamic_tag=keywords.get('application_id'))]
+                , compare=CompareConstants.AND)
         )
         def post(self, request: Request, application_id: str, chat_id: str):
             files = request.FILES.getlist('file')
