@@ -22,11 +22,25 @@ ssl_context.check_hostname = False
 ssl_context.verify_mode = ssl.CERT_NONE
 
 
+def deep_merge_dict(target_dict, source_dict):
+
+    if not isinstance(source_dict, dict):
+        return source_dict
+    result = target_dict.copy() if isinstance(target_dict, dict) else {}
+    for key, value in source_dict.items():
+        if key in result and isinstance(result[key], dict) and isinstance(value, dict):
+            result[key] = deep_merge_dict(result[key], value)
+        else:
+            result[key] = value
+    return result
+
+
 class XFZhEnSparkSpeechToText(MaxKBBaseModel, BaseSpeechToText):
     spark_app_id: str
     spark_api_key: str
     spark_api_secret: str
     spark_api_url: str
+    params: dict
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -34,6 +48,7 @@ class XFZhEnSparkSpeechToText(MaxKBBaseModel, BaseSpeechToText):
         self.spark_app_id = kwargs.get('spark_app_id')
         self.spark_api_key = kwargs.get('spark_api_key')
         self.spark_api_secret = kwargs.get('spark_api_secret')
+        self.params = kwargs.get('params')
 
     @staticmethod
     def is_cache_model():
@@ -41,17 +56,14 @@ class XFZhEnSparkSpeechToText(MaxKBBaseModel, BaseSpeechToText):
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
-        optional_params = {}
-        if 'max_tokens' in model_kwargs and model_kwargs['max_tokens'] is not None:
-            optional_params['max_tokens'] = model_kwargs['max_tokens']
-        if 'temperature' in model_kwargs and model_kwargs['temperature'] is not None:
-            optional_params['temperature'] = model_kwargs['temperature']
+
         return XFZhEnSparkSpeechToText(
             spark_app_id=model_credential.get('spark_app_id'),
             spark_api_key=model_credential.get('spark_api_key'),
             spark_api_secret=model_credential.get('spark_api_secret'),
             spark_api_url=model_credential.get('spark_api_url'),
-            **optional_params
+            params=model_kwargs,
+            **model_kwargs
         )
 
     # 生成url
@@ -106,6 +118,10 @@ class XFZhEnSparkSpeechToText(MaxKBBaseModel, BaseSpeechToText):
             maxkb_logger.error(f"语音识别错误: {str(err)}: {traceback.format_exc()}")
             return ""
 
+    def merge_params_to_frame(self, frame,params):
+
+        return deep_merge_dict(frame, params)
+
     async def send_audio(self, ws, audio_file):
         """发送音频数据"""
         chunk_size = 4000
@@ -123,8 +139,11 @@ class XFZhEnSparkSpeechToText(MaxKBBaseModel, BaseSpeechToText):
                     "header": {"app_id": self.spark_app_id, "status": 0},
                     "parameter": {
                         "iat": {
-                            "domain": "slm", "language": "zh_cn", "accent": "mandarin",
-                            "eos": 10000, "vinfo": 1,
+                            "domain": "slm",
+                            "language": "zh_cn",
+                            "accent": "mandarin",
+                            "eos": 10000,
+                            "vinfo": 1,
                             "result": {"encoding": "utf8", "compress": "raw", "format": "json"}
                         }
                     },
@@ -135,6 +154,9 @@ class XFZhEnSparkSpeechToText(MaxKBBaseModel, BaseSpeechToText):
                         }
                     }
                 }
+                frame = self.merge_params_to_frame(frame,{key: value for key, value in self.params.items() if
+                                            not ['model_id', 'use_local', 'streaming'].__contains__(key)})
+
             # 中间帧
             else:
                 frame = {
@@ -146,6 +168,9 @@ class XFZhEnSparkSpeechToText(MaxKBBaseModel, BaseSpeechToText):
                         }
                     }
                 }
+
+                frame = self.merge_params_to_frame(frame,{key: value for key, value in self.params.items() if
+                                            not ['model_id', 'use_local', 'streaming','parameter'].__contains__(key)})
 
             await ws.send(json.dumps(frame))
             seq += 1
@@ -160,17 +185,19 @@ class XFZhEnSparkSpeechToText(MaxKBBaseModel, BaseSpeechToText):
                 }
             }
         }
+
+        end_frame = self.merge_params_to_frame(end_frame,{key: value for key, value in self.params.items() if
+                                            not ['model_id', 'use_local', 'streaming','parameter'].__contains__(key)})
+
         await ws.send(json.dumps(end_frame))
 
-
-# 接受信息处理器
+    # 接受信息处理器
     async def handle_message(self, ws):
         result_text = ""
         while True:
             try:
                 message = await asyncio.wait_for(ws.recv(), timeout=30.0)
                 data = json.loads(message)
-
                 if data['header']['code'] != 0:
                     raise Exception("")
 

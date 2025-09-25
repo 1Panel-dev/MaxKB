@@ -105,6 +105,23 @@ const open: (application_id: string, loading?: Ref<boolean>) => Promise<Result<s
 }
 
 /**
+ * 生成提示词
+ * @param application_id 
+ * @param model_id 
+ * @param data 
+ * @returns 
+ */
+const generate_prompt: (application_id:string, model_id:string, data: any) => Promise<any> = (
+  application_id,
+  model_id,
+  data
+) => {
+  const prefix = (window.MaxKB?.prefix ? window.MaxKB?.prefix : '/admin') + '/api'
+  return postStream(`${prefix}/system/resource/application/${application_id}/model/${model_id}/prompt_generate`, data)
+}
+
+
+/**
  * 应用发布
  * @param application_id
  * @param loading

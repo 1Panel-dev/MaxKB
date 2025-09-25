@@ -130,4 +130,11 @@ export default {
     type: '類型',
     management: '管理',
   },
+    default_login: '預設登入方式',
+  display_code: '帳號登入驗證碼設定',
+  loginFailed: '登入失敗',
+  loginFailedMessage: '次顯示驗證碼',
+  display_codeTip: '值為-1時，不顯示驗證碼',
+  time: '次',
+  setting: '登录設置',
 }

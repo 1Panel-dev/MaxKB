@@ -12,7 +12,7 @@ class McpNodeSerializer(serializers.Serializer):
     mcp_servers = serializers.JSONField(required=True, label=_("Mcp servers"))
     mcp_server = serializers.CharField(required=True, label=_("Mcp server"))
     mcp_tool = serializers.CharField(required=True, label=_("Mcp tool"))
-    mcp_tool_id = serializers.UUIDField(required=False, label=_("Mcp tool"), allow_null=True)
+    mcp_tool_id = serializers.CharField(required=False, label=_("Mcp tool"), allow_null=True, allow_blank=True)
     mcp_source = serializers.CharField(required=False, label=_("Mcp source"), allow_blank=True, allow_null=True)
     tool_params = serializers.DictField(required=True, label=_("Tool parameters"))
 

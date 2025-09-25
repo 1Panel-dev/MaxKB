@@ -1,5 +1,5 @@
 <template>
-  <div v-show="show" class="workflow-dropdown-menu border border-r-6 white-bg">
+  <div v-show="show" class="workflow-dropdown-menu border border-r-6 white-bg" :style="{ width: activeName === 'base' ? '400px':'640px' }">
     <el-tabs v-model="activeName" class="workflow-dropdown-tabs" @tab-change="handleClick">
       <div
         v-show="activeName === 'base'"
@@ -39,7 +39,7 @@
                         <component
                           :is="iconComponent(`${item.type}-icon`)"
                           class="mr-8"
-                          :size="32"
+                          :size="20"
                         />
                         <div class="lighter">{{ item.label }}</div>
                       </div>
@@ -119,8 +119,8 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import { menuNodes, toolLibNode, applicationNode } from '@/workflow/common/data'
+import { ref, onMounted, computed, inject } from 'vue'
+import { getMenuNodes, toolLibNode, applicationNode } from '@/workflow/common/data'
 import { iconComponent } from '@/workflow/icons/utils'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { isWorkFlow } from '@/utils/application'
@@ -129,9 +129,12 @@ import NodeContent from './NodeContent.vue'
 import { SourceTypeEnum } from '@/enums/common'
 import permissionMap from '@/permission'
 import { useRoute } from 'vue-router'
+import { WorkflowMode } from '@/enums/application'
+const workflowModel = inject('workflowMode') as WorkflowMode
 const route = useRoute()
 const { user, folder } = useStore()
 
+const menuNodes = getMenuNodes(workflowModel || WorkflowMode.Application)
 const search_text = ref<string>('')
 const props = defineProps({
   show: {
@@ -162,10 +165,10 @@ const loading = ref(false)
 const activeName = ref('base')
 
 const filter_menu_nodes = computed(() => {
-  if (!search_text.value) return menuNodes
+  if (!search_text.value) return menuNodes || []
   const searchTerm = search_text.value.toLowerCase()
 
-  return menuNodes.reduce((result: any[], item) => {
+  return (menuNodes || []).reduce((result: any[], item) => {
     const filteredList = item.list.filter((listItem) =>
       listItem.label.toLowerCase().includes(searchTerm),
     )
@@ -254,7 +257,7 @@ async function getToolList() {
     systemType: 'workspace',
   }).getToolList({
     folder_id: folder.currentFolder?.id || user.getWorkspaceId(),
-    tool_type: 'CUSTOM'
+    tool_type: 'CUSTOM',
   })
   toolList.value = res.data?.tools || res.data || []
   toolList.value = toolList.value?.filter((item: any) => item.is_active)

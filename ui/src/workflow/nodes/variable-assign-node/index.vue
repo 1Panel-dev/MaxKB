@@ -56,13 +56,15 @@
               v-model="item.type"
               style="max-width: 85px"
               class="mr-8"
-              @change="(val: string) => {
-                if (val === 'bool') {
-                  form_data.variable_list[index].value = true;
-                } else {
-                  form_data.variable_list[index].value = null;
+              @change="
+                (val: string) => {
+                  if (val === 'bool') {
+                    form_data.variable_list[index].value = true
+                  } else {
+                    form_data.variable_list[index].value = null
+                  }
                 }
-              }"
+              "
             >
               <el-option v-for="item in typeOptions" :key="item" :label="item" :value="item" />
             </el-select>
@@ -166,11 +168,12 @@
 import { cloneDeep, set } from 'lodash'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
-import { computed, nextTick, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref, inject } from 'vue'
 import { isLastNode } from '@/workflow/common/data'
 import { randomId } from '@/utils/common'
 import { t } from '@/locales'
-
+import { WorkflowMode } from '@/enums/application'
+const workflowMode = inject('workflowMode') as WorkflowMode
 const props = defineProps<{ nodeModel: any }>()
 
 const typeOptions = ['string', 'num', 'json', 'bool']
@@ -257,7 +260,10 @@ function deleteVariable(index: number) {
 }
 
 function variableChange(item: any) {
-  props.nodeModel.graphModel.nodes.map((node: any) => {
+  ;(workflowMode == WorkflowMode.ApplicationLoop
+    ? [...props.nodeModel.graphModel.nodes, ...props.nodeModel.graphModel.get_parent_nodes()]
+    : props.nodeModel.graphModel.nodes
+  ).map((node: any) => {
     if (node.id === 'start-node') {
       node.properties.config.globalFields.forEach((field: any) => {
         if (field.value === item.fields[1]) {
@@ -266,6 +272,13 @@ function variableChange(item: any) {
       })
       node.properties.config.chatFields.forEach((field: any) => {
         if (field.value === item.fields[1]) {
+          item.name = field.label
+        }
+      })
+    }
+    if (node.id === 'loop-start-node') {
+      node.properties.loop_input_field_list.forEach((field: any) => {
+        if (field.field === item.fields[1]) {
           item.name = field.label
         }
       })

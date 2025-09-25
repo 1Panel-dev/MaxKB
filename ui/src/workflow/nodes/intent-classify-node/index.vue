@@ -53,10 +53,11 @@
         </el-form-item>
         <el-form-item
           prop="content_list"
-         :label="$t('views.applicationWorkflow.nodes.intentNode.input.label')"
-         :rules="{
-            required: true,
+          :label="$t('views.applicationWorkflow.nodes.intentNode.input.label')"
+          :rules="{
+            message: $t('views.applicationWorkflow.nodes.textToSpeechNode.content.label'),
             trigger: 'change',
+            required: true,
           }"
         >
           <template #label>
@@ -76,7 +77,6 @@
             :placeholder="$t('views.applicationWorkflow.nodes.textToSpeechNode.content.label')"
             v-model="form_data.content_list"
           />
-      
         </el-form-item>
         <el-form-item :label="$t('views.application.form.historyRecord.label')">
           <el-input-number
@@ -89,53 +89,60 @@
             :step-strictly="true"
           />
         </el-form-item>
-        <el-form-item          
-          :label="$t('views.applicationWorkflow.nodes.intentNode.classify.label')"           
-          :rules="{             
-            required: true,             
-            trigger: 'change',           
-          }"         
-        >           
-          <template #label>             
-            <div class="flex-between">               
-              <div>                 
-                <span>{{ $t('views.applicationWorkflow.nodes.intentNode.input.label') }}<span class="color-danger">*</span></span>               
-              </div>               
-              <el-button                 
-                @click="addClassfiyBranch"                 
-                type="primary"                 
-                size="large"                 
-                link>                   
-                <el-icon><Plus /></el-icon>               
-              </el-button>             
-            </div>           
-          </template>           
-          <div>             
-            <div v-for="(item,index) in form_data.branch" 
-            v-resize="(wh: any) => resizeBranch(wh, item, index)"
-            :key="item.id">               
+        <el-form-item
+        >
+          <template #label>
+            <div class="flex-between">
+              <div>
+                <span
+                  >{{ $t('views.applicationWorkflow.nodes.intentNode.classify.label')
+                  }}<span class="color-danger">*</span></span
+                >
+              </div>
+              <el-button @click="addClassfiyBranch" type="primary" size="large" link>
+                <el-icon><Plus /></el-icon>
+              </el-button>
+            </div>
+          </template>
+          <div>
+            <div
+              v-for="(item, index) in form_data.branch"
+              :key="item.id"
+            >
+            <el-form-item
+            :prop="`branch.${index}.content`"
+            :rules="{
+            message: $t('views.applicationWorkflow.nodes.intentNode.classify.placeholder'),
+            trigger: 'change',
+            required: true,
+          }"
+            >
               <el-row class="mb-8" :gutter="12" align="middle">
                 <el-col :span="21">
-                  <el-input 
-                    v-model="item.content" 
-                    style="width: 210px"                 
-                    :disabled="item.isOther"                  
-                    :placeholder="$t('views.applicationWorkflow.nodes.intentNode.classify.placeholder')" />
+                  <el-input
+                    v-model="item.content"
+                    style="width: 210px"
+                    :disabled="item.isOther"
+                    :placeholder="
+                      $t('views.applicationWorkflow.nodes.intentNode.classify.placeholder')
+                    "
+                  />
                 </el-col>
                 <el-col :span="3">
-                  <el-button 
-                    link 
+                  <el-button
+                    link
                     size="large"
-                    class="mt-4"                  
-                    v-if="!item.isOther"                 
-                    :disabled="form_data.branch.filter((b:any) => !b.isOther).length <= 1"                 
-                    @click="deleteClassifyBranch(item.id)">                   
-                    <el-icon><Delete /></el-icon>                 
+                    v-if="!item.isOther"
+                    :disabled="form_data.branch.filter((b: any) => !b.isOther).length <= 1"
+                    @click="deleteClassifyBranch(item.id)"
+                  >
+                    <el-icon><Delete /></el-icon>
                   </el-button>
                 </el-col>
-              </el-row>             
-            </div>           
-          </div>         
+              </el-row>
+            </el-form-item>
+            </div>
+          </div>
         </el-form-item>
       </el-form>
     </el-card>
@@ -176,15 +183,15 @@ const AIModeParamSettingDialogRef = ref<InstanceType<typeof AIModeParamSettingDi
 function addClassfiyBranch() {
   const list = cloneDeep(props.nodeModel.properties.node_data.branch)
   const obj = {
-      id: randomId(),
-      content: '',
-      isOther: false ,
+    id: randomId(),
+    content: '',
+    isOther: false,
   }
-  list.splice(list.length - 1, 0 , obj)
+  list.splice(list.length - 1, 0, obj)
   refreshBranchAnchor(list, true)
   set(props.nodeModel.properties.node_data, 'branch', list)
+  props.nodeModel.refreshBranch()
 }
-
 
 function deleteClassifyBranch(id: string) {
   const list = cloneDeep(props.nodeModel.properties.node_data.branch)
@@ -194,19 +201,19 @@ function deleteClassifyBranch(id: string) {
     return
   }
 
-  const commonItems = list.filter((item:any) => !item.isOther)
+  const commonItems = list.filter((item: any) => !item.isOther)
   if (commonItems.length <= 1) {
-      return
+    return
   }
   // 删除连接线
   const delete_anchor_id = `${props.nodeModel.id}_${id}_right`
   const edgetToDelete = (props.nodeModel.outgoing?.edges || [])
     .filter((edge: any) => edge.sourceAnchorId === delete_anchor_id)
     .map((edge: any) => edge.id)
-  
+
   if (edgetToDelete.length > 0) {
     props.nodeModel.graphModel.eventCenter.emit('delete_edge', edgetToDelete)
-  } 
+  }
 
   const newList = list.filter((item: any) => item.id !== id) // 删除分支
 
@@ -225,19 +232,19 @@ function refreshBranchAnchor(list: Array<any>, is_add: boolean) {
     .map((item, index) => {
       const exist = branch_condition_list.find((b: any) => b.id === item.id)
       if (exist) {
-        return {index: index, height: exist.height, id: item.id}
+        return { index: index, height: exist.height, id: item.id }
       } else {
         if (is_add) {
-          return {index: index, height: 12, id: item.id}
+          return { index: index, height: 12, id: item.id }
         }
       }
-    }) 
+    })
     .filter((item) => item)
 
   set(props.nodeModel.properties, 'branch_condition_list', new_branch_condition_list)
   props.nodeModel.refreshBranch()
 }
- 
+
 const resizeBranch = (wh: any, row: any, index: number) => {
   const branch_condition_list = cloneDeep(
     props.nodeModel.properties.branch_condition_list
@@ -249,15 +256,14 @@ const resizeBranch = (wh: any, row: any, index: number) => {
       return {
         ...item,
         height: wh.height, //该分支高度
-        index: index
+        index: index,
       }
     }
     return item
   })
   set(props.nodeModel.properties, 'branch_condition_list', new_branch_condition_list)
-  refreshBranchAnchor(props.nodeModel.properties.node_data.branch, true) 
+  refreshBranchAnchor(props.nodeModel.properties.node_data.branch, true)
 }
-
 
 const wheel = (e: any) => {
   if (e.ctrlKey === true) {
@@ -283,18 +289,17 @@ const form = {
     {
       id: randomId(),
       content: '',
-      isOther: false
+      isOther: false,
     },
     {
       id: randomId(),
       content: t('views.applicationWorkflow.nodes.intentNode.other'),
-      isOther: true
-    }
+      isOther: true,
+    },
   ],
   dialogue_number: 1,
   content_list: [],
 }
-
 
 function refreshParam(data: any) {
   set(props.nodeModel.properties.node_data, 'model_params_setting', data)
@@ -325,10 +330,15 @@ const IntentClassifyNodeFormRef = ref<FormInstance>()
 const modelOptions = ref<any>(null)
 
 const validate = () => {
+
   return Promise.all([
     nodeCascaderRef.value ? nodeCascaderRef.value.validate() : Promise.resolve(''),
     IntentClassifyNodeFormRef.value?.validate(),
-  ]).catch((err: any) => {
+  ]).then(() => {
+    if (form_data.value.branch.length != new Set(form_data.value.branch.map((item: any) => item.content)).size) {
+      throw t('views.applicationWorkflow.nodes.intentNode.error2')
+    }
+  }).catch((err: any) => {
     return Promise.reject({ node: props.nodeModel, errMessage: err })
   })
 }

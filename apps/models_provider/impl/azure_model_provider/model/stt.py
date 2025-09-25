@@ -18,12 +18,14 @@ class AzureOpenAISpeechToText(MaxKBBaseModel, BaseSpeechToText):
     api_key: str
     api_version: str
     model: str
+    params: dict
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.api_key = kwargs.get('api_key')
         self.api_base = kwargs.get('api_base')
         self.api_version = kwargs.get('api_version')
+        self.params = kwargs.get('params')
 
     @staticmethod
     def is_cache_model():
@@ -41,6 +43,7 @@ class AzureOpenAISpeechToText(MaxKBBaseModel, BaseSpeechToText):
             api_base=model_credential.get('api_base'),
             api_key=model_credential.get('api_key'),
             api_version=model_credential.get('api_version'),
+            params=model_kwargs,
             **optional_params,
         )
 
@@ -62,5 +65,13 @@ class AzureOpenAISpeechToText(MaxKBBaseModel, BaseSpeechToText):
         audio_data = audio_file.read()
         buffer = io.BytesIO(audio_data)
         buffer.name = "file.mp3"  # this is the important line
-        res = client.audio.transcriptions.create(model=self.model, language="zh", file=buffer)
+
+        filter_params = {k: v for k, v in self.params.items() if k not in {'model_id', 'use_local', 'streaming'}}
+        transcription_params = {
+            'model': self.model,
+            'file': buffer,
+            'language': 'zh'
+        }
+
+        res = client.audio.transcriptions.create(**transcription_params, extra_body=filter_params)
         return res.text

@@ -6,8 +6,16 @@ from django.utils.translation import gettext as _
 
 from common import forms
 from common.exception.app_exception import AppApiException
-from common.forms import BaseForm
+from common.forms import BaseForm, TooltipLabel
 from models_provider.base_model_provider import BaseModelCredential, ValidCode
+
+class VolcanicEngineSTTModelParams(BaseForm):
+    uid = forms.TextInputField(
+        TooltipLabel(_('User ID'),_('If not passed, the default value is streaming_asr_demo')),
+        required=True,
+        default_value='streaming_asr_demo'
+    )
+
 
 
 class VolcanicEngineSTTModelCredential(BaseForm, BaseModelCredential):
@@ -31,7 +39,7 @@ class VolcanicEngineSTTModelCredential(BaseForm, BaseModelCredential):
                 else:
                     return False
         try:
-            model = provider.get_model(model_type, model_name, model_credential)
+            model = provider.get_model(model_type, model_name, model_credential, **model_params)
             model.check_auth()
         except Exception as e:
             traceback.print_exc()
@@ -49,4 +57,4 @@ class VolcanicEngineSTTModelCredential(BaseForm, BaseModelCredential):
         return {**model, 'volcanic_token': super().encryption(model.get('volcanic_token', ''))}
 
     def get_model_params_setting_form(self, model_name):
-        pass
+        return VolcanicEngineSTTModelParams()

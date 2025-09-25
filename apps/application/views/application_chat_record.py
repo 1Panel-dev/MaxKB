@@ -93,8 +93,8 @@ class ApplicationChatRecordOperateAPI(APIView):
     )
     @has_permissions(PermissionConstants.APPLICATION_CHAT_LOG_READ.get_workspace_application_permission(),
                      PermissionConstants.APPLICATION_CHAT_LOG_READ.get_workspace_permission_workspace_manage_role(),
-                     PermissionConstants.APPLICATION_DEBUG.get_workspace_application_permission(),
-                     PermissionConstants.APPLICATION_DEBUG.get_workspace_permission_workspace_manage_role(),
+                     PermissionConstants.APPLICATION_EDIT.get_workspace_application_permission(),
+                     PermissionConstants.APPLICATION_EDIT.get_workspace_permission_workspace_manage_role(),
                      ViewPermission([RoleConstants.USER.get_workspace_role()],
                                     [PermissionConstants.APPLICATION.get_workspace_application_permission()],
                                     CompareConstants.AND),

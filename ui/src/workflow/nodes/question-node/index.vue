@@ -51,13 +51,27 @@
             :model-type="'LLM'"
           ></ModelSelect>
         </el-form-item>
-        <el-form-item :label="$t('views.application.form.roleSettings.label')">
+        <el-form-item>
+          <template #label>
+            <div class="flex-between">
+              <div class="flex align-center">
+                <span>{{ $t('views.application.form.roleSettings.label') }}</span>
+                <el-tooltip
+                  effect="dark"
+                  :content="$t('views.application.form.roleSettings.tooltip')"
+                  placement="right"
+                >
+                  <AppIcon iconName="app-warning" class="app-warning-icon ml-4"></AppIcon>
+                </el-tooltip>
+              </div>
+            </div>
+          </template>
           <MdEditorMagnify
             :title="$t('views.application.form.roleSettings.label')"
             v-model="form_data.system"
             style="height: 100px"
             @submitDialog="submitSystemDialog"
-            :placeholder="$t('views.application.form.roleSettings.label')"
+            :placeholder="`${t('views.applicationWorkflow.SystemPromptPlaceholder')}{{${t('views.applicationWorkflow.nodes.startNode.label')}.question}}`"
           />
         </el-form-item>
         <el-form-item
@@ -89,6 +103,7 @@
             v-model="form_data.prompt"
             style="height: 150px"
             @submitDialog="submitDialog"
+            :placeholder="`${t('views.applicationWorkflow.UserPromptPlaceholder')}{{${t('views.applicationWorkflow.nodes.startNode.label')}.question}}`"
           />
         </el-form-item>
         <el-form-item :label="$t('views.application.form.historyRecord.label')">
@@ -182,14 +197,12 @@ function submitSystemDialog(val: string) {
   set(props.nodeModel.properties.node_data, 'system', val)
 }
 
-// @ts-ignore
-const defaultPrompt = `${t('views.applicationWorkflow.nodes.questionNode.defaultPrompt1')}{{${t('views.applicationWorkflow.nodes.startNode.label')}.question}}
-${t('views.applicationWorkflow.nodes.questionNode.defaultPrompt2')}`
+const defaultPrompt = `{{${t('views.applicationWorkflow.nodes.startNode.label')}.question}}`
 
 const form = {
   model_id: '',
-  system: t('views.applicationWorkflow.nodes.questionNode.systemDefault'),
-  prompt: defaultPrompt,
+  system: defaultPrompt,
+  prompt: t('views.applicationWorkflow.nodes.questionNode.systemDefault'),
   dialogue_number: 1,
   is_result: false,
 }

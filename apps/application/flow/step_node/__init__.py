@@ -15,6 +15,11 @@ from .form_node import *
 from .image_generate_step_node import *
 from .image_to_video_step_node import BaseImageToVideoNode
 from .image_understand_step_node import *
+from .intent_node import *
+from .loop_break_node import BaseLoopBreakNode
+from .loop_continue_node import BaseLoopContinueNode
+from .loop_node import *
+from .loop_start_node import *
 from .mcp_node import BaseMcpNode
 from .question_node import *
 from .reranker_node import *
@@ -26,7 +31,6 @@ from .text_to_video_step_node.impl.base_text_to_video_node import BaseTextToVide
 from .tool_lib_node import *
 from .tool_node import *
 from .variable_assign_node import BaseVariableAssignNode
-from .intent_node import *
 
 node_list = [BaseStartStepNode, BaseChatNode, BaseSearchKnowledgeNode, BaseQuestionNode,
              BaseConditionNode, BaseReplyNode,
@@ -34,7 +38,9 @@ node_list = [BaseStartStepNode, BaseChatNode, BaseSearchKnowledgeNode, BaseQuest
              BaseDocumentExtractNode,
              BaseImageUnderstandNode, BaseFormNode, BaseSpeechToTextNode, BaseTextToSpeechNode,
              BaseImageGenerateNode, BaseVariableAssignNode, BaseMcpNode, BaseTextToVideoNode, BaseImageToVideoNode,
-             BaseIntentNode]
+             BaseIntentNode, BaseLoopNode, BaseLoopStartStepNode,
+             BaseLoopContinueNode,
+             BaseLoopBreakNode]
 
 
 def get_node(node_type):

@@ -9,7 +9,7 @@
 from typing import List
 
 from application.flow.i_step_node import NodeResult
-from application.flow.step_node.condition_node.compare import compare_handle_list
+from application.flow.compare import compare_handle_list
 from application.flow.step_node.condition_node.i_condition_node import IConditionNode
 
 

@@ -76,6 +76,7 @@ export default {
     needConnect1: '節點的',
     needConnect2: '分支需要連接',
     cannotEndNode: '節點不能當做結束節點',
+    loopNodeBreakNodeRequired: '無線迴圈必須存在Break節點',
   },
   nodes: {
     classify: {
@@ -142,9 +143,18 @@ export default {
       label: '問題優化',
       text: '根據歷史聊天記錄優化完善當前問題，更利於匹配知識庫分段',
       result: '問題優化結果',
-      defaultPrompt1: `根據上下文優化和完善用戶問題：`,
-      defaultPrompt2: `請輸出一個優化後的問題。`,
-      systemDefault: '你是一個問題優化大師',
+      systemDefault: `# 角色
+妳是壹位問題優化大師，擅長根據上下文精準揣測用戶意圖，並對用戶提出的問題進行優化。
+
+## 技能
+### 技能 1: 優化問題
+2. 接收用戶輸入的問題。
+3. 依據上下文仔細分析問題含義。
+4. 輸出優化後的問題。
+
+## 限制:
+- 僅返回優化後的問題，不進行額外解釋或說明。
+- 確保優化後的問題準確反映原始問題意圖，不得改變原意。`,
     },
     conditionNode: {
       label: '判斷器',
@@ -322,7 +332,9 @@ export default {
     },
     intentNode: {
       label: '意圖識別',
+      text: '將用戶問題與用戶預設的意圖分類進行匹配',
       other: '其他',
+      error2: '意圖重複',
       placeholder: '請選擇分類項',
       classify: {
         label: '意圖分類',
@@ -335,6 +347,41 @@ export default {
     applicationNode: {
       label: '應用節點',
     },
+    loopNode: {
+      label: '循環節點',
+      text: '通過設置循環次數和邏輯，重複執行一系列任務',
+      loopType: {
+        label: '循環類型',
+        requiredMessage: '請選擇循環類型',
+        arrayLoop: '數組循環',
+        numberLoop: '指定次數循環',
+        infiniteLoop: '無限循環',
+      },
+      loopNumber: {
+        label: '循環次數',
+        requiredMessage: '請填寫循環次數',
+      },
+      loopArray: {
+        label: '循環數組',
+        requiredMessage: '循環數組必填',
+        placeholder: '請選擇循環數組',
+      },
+      loopSetting: '循環設置',
+      loopDetail: '循環詳情',
+    },
+    loopStartNode: {
+      label: '循環開始',
+      loopIndex: '下標',
+      loopItem: '循環元素',
+      loopVariable: '循環變量',
+    },
+    loopBodyNode: { label: '循環體', text: '循環體' },
+    loopContinueNode: {
+      label: 'Continue',
+      text: '用於終止當前循環，執行下次循環',
+      isContinue: 'Continue',
+    },
+    loopBreakNode: { label: 'Break', text: '終止當前循環，跳出循環體', isBreak: 'Break' },
   },
   compare: {
     is_null: '為空',
@@ -352,5 +399,6 @@ export default {
     len_le: '長度小於等於',
     len_lt: '長度小於',
   },
-  FileUploadSetting: {},
+  SystemPromptPlaceholder: '系統提示詞，可以引用系統中的變量：如',
+  UserPromptPlaceholder: '用戶提示詞，可以引用系統中的變量：如',
 }

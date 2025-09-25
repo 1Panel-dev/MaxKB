@@ -54,22 +54,20 @@
             :options="modelOptions"
             showFooter
             :model-type="'LLM'"
+            @change="modelChange"
           ></ModelSelect>
         </el-form-item>
-        <el-form-item :label="$t('views.application.form.prompt.label')" prop="prompt">
+        <el-form-item prop="prompt">
           <template #label>
             <div class="flex-between">
               <div>
-                <span
-                  >{{ $t('views.application.form.prompt.label') }}
-                  <span class="color-danger">*</span></span
-                >
+                <span>{{ $t('common.prompt.label') }} <span class="color-danger">*</span></span>
               </div>
             </div>
           </template>
           <el-input
             v-model="form.prompt"
-            :placeholder="$t('views.application.form.prompt.placeholder')"
+            :placeholder="$t('common.prompt.placeholder')"
             :rows="7"
             type="textarea"
           />
@@ -149,7 +147,7 @@ const rules = reactive({
   prompt: [
     {
       required: true,
-      message: t('views.application.form.prompt.placeholder'),
+      message: t('common.prompt.placeholder'),
       trigger: 'blur',
     },
   ],
@@ -169,6 +167,14 @@ const openAIParamSettingDialog = () => {
       id,
       form.value.model_params_setting,
     )
+  }
+}
+
+function modelChange() {
+  if (form.value.model_id) {
+    AIModeParamSettingDialogRef.value?.reset_default(form.value.model_id, id)
+  } else {
+    refreshForm({})
   }
 }
 

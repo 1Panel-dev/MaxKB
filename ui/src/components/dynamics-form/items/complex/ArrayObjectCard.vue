@@ -22,7 +22,7 @@
     </el-card>
     <el-card shadow="never" class="card-add box-card" @click="add_card">
       <div class="flex-center">
-        <AppIcon iconName="Plus" class="add-icon layout-bg p-8 border-r-6" />
+        <AppIcon iconName="app-add-outlined" class="add-icon layout-bg p-8 border-r-6" />
         <span>{{ add_msg }}</span>
       </div>
     </el-card>

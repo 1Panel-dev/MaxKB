@@ -24,6 +24,8 @@
                 v-for="item in modelTypeOptions"
                 :key="item.value"
                 @click="checkModelType(item.value)"
+                class="flex-between w-120"
+                :class="currentModelType === item.text ? 'active' : ''"
               >
                 <span>{{ item.text }}</span>
                 <el-icon v-if="currentModelType === item.text"><Check /></el-icon>
@@ -57,7 +59,10 @@ const dialogVisible = ref<boolean>(false)
 const list_provider = ref<Array<Provider>>([])
 const currentModelType = ref('')
 const selectModelType = ref('')
-const modelTypeOptions = [{ text: t('views.model.modelType.allModel'), value: '' }, ...modelTypeList]
+const modelTypeOptions = [
+  { text: t('views.model.modelType.allModel'), value: '' },
+  ...modelTypeList,
+]
 
 const open = (model_type?: string) => {
   dialogVisible.value = true

@@ -19,15 +19,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, inject } from 'vue'
 import { iconComponent } from '../icons/utils'
 import { t } from '@/locales'
+import { WorkflowMode } from '@/enums/application'
 const props = defineProps<{
   nodeModel: any
   modelValue: Array<any>
   global?: boolean
 }>()
 const emit = defineEmits(['update:modelValue'])
+const workflowMode = inject('workflowMode') as WorkflowMode
 const data = computed({
   set: (value) => {
     emit('update:modelValue', value)
@@ -50,20 +52,12 @@ const wheel = (e: any) => {
 
 function visibleChange(bool: boolean) {
   if (bool) {
-    options.value = props.global
-      ? props.nodeModel
-          .get_up_node_field_list(false, true)
-          .filter(
-            (v: any) => ['global', 'chat'].includes(v.value) && v.children && v.children.length > 0,
-          )
-      : props.nodeModel
-          .get_up_node_field_list(false, true)
-          .filter((v: any) => v.children && v.children.length > 0)
+    initOptions()
   }
 }
 
 const validate = () => {
-  const incomingNodeValue = props.nodeModel.get_up_node_field_list(false, true)
+  const incomingNodeValue = getOptionsValue()
   if (!data.value || data.value.length === 0) {
     return Promise.reject(t('views.applicationWorkflow.variable.ReferencingRequired'))
   }
@@ -83,15 +77,44 @@ const validate = () => {
   }
   return Promise.resolve('')
 }
+
+const get_up_node_field_list = (contain_self: boolean, use_cache: boolean) => {
+  const result = props.nodeModel.get_up_node_field_list(contain_self, use_cache)
+  if (props.nodeModel.graphModel.get_up_node_field_list) {
+    const _u = props.nodeModel.graphModel.get_up_node_field_list(contain_self, use_cache)
+
+    _u.forEach((item: any) => {
+      result.push(item)
+    })
+  }
+  return result.filter((v: any) => v.children && v.children.length > 0)
+}
+const getOptionsValue = () => {
+  if (workflowMode == WorkflowMode.ApplicationLoop) {
+    return props.global
+      ? get_up_node_field_list(false, true).filter(
+          (v: any) =>
+            ['global', 'chat', 'loop'].includes(v.value) && v.children && v.children.length > 0,
+        )
+      : get_up_node_field_list(false, true).filter((v: any) => v.children && v.children.length > 0)
+  } else {
+    return props.global
+      ? props.nodeModel
+          .get_up_node_field_list(false, true)
+          .filter(
+            (v: any) => ['global', 'chat'].includes(v.value) && v.children && v.children.length > 0,
+          )
+      : props.nodeModel
+          .get_up_node_field_list(false, true)
+          .filter((v: any) => v.children && v.children.length > 0)
+  }
+}
+const initOptions = () => {
+  options.value = getOptionsValue()
+}
 defineExpose({ validate })
 onMounted(() => {
-  options.value = props.global
-    ? props.nodeModel
-        .get_up_node_field_list(false, true)
-        .filter(
-          (v: any) => ['global', 'chat'].includes(v.value) && v.children && v.children.length > 0,
-        )
-    : props.nodeModel.get_up_node_field_list(false, true)
+  initOptions()
 })
 </script>
 <style scoped></style>

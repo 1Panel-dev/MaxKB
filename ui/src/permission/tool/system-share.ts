@@ -63,7 +63,7 @@ const share = {
     hasPermission(
       [
         RoleConst.ADMIN,
-        PermissionConst.SHARED_TOOL_DEBUG,
+        PermissionConst.SHARED_TOOL_EDIT,
       ],
       'OR',
     ),

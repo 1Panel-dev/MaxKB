@@ -257,7 +257,7 @@ class BaseChatStep(IChatStep):
                 self.context['execute_ids'] = []
                 for tool_id in tool_ids:
                     tool = QuerySet(Tool).filter(id=tool_id).first()
-                    if not tool.is_active:
+                    if tool is None or tool.is_active is False:
                         continue
                     executor = ToolExecutor(CONFIG.get('SANDBOX'))
                     if tool.init_params is not None:

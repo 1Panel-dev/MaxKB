@@ -49,7 +49,7 @@
           <span class="mr-4">
             <el-tooltip effect="dark" :content="$t('common.setting')" placement="top">
               <el-button type="primary" text @click.stop="settingApiKey(row)">
-                 <AppIcon iconName="app-setting"></AppIcon>
+                <AppIcon iconName="app-setting"></AppIcon>
               </el-button>
             </el-tooltip>
           </span>
@@ -87,7 +87,7 @@ const props = defineProps({
 })
 const emit = defineEmits(['addData'])
 
-const apiUrl = window.location.origin + '/doc/'
+const apiUrl = window.location.origin + `${window.MaxKB.prefix}/api-doc/`
 const SettingAPIKeyDialogRef = ref()
 const dialogVisible = ref<boolean>(false)
 const loading = ref(false)
@@ -126,9 +126,7 @@ function changeState(bool: boolean, row: any) {
   const obj = {
     is_active: bool,
   }
-  const str = bool
-    ? t('common.enabled')
-    : t('common.disabled')
+  const str = bool ? t('common.enabled') : t('common.disabled')
   systemKeyApi.putAPIKey(row.id, obj, loading).then((res) => {
     MsgSuccess(str)
     getApiKeyList()

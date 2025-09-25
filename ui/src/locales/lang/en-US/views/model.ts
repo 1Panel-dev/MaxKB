@@ -67,6 +67,10 @@ export default {
         'Vision Model: A visual model used for image understanding in advanced orchestration APP.',
       tooltip7:
         'Image Generation: A visual model used for image generation in advanced orchestration APP.',
+      tooltip8:
+        'Text-to-Video: A visual model used for text-to-video in the APP.',
+      tooltip9:
+        'Image-to-Video: A visual model used for image-to-video in the APP.',
       requiredMessage: 'Model type cannot be empty',
     },
     base_model: {

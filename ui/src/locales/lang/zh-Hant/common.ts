@@ -109,4 +109,8 @@ export default {
   copyTitle: '副本',
   professional: '購買專業版',
   sync: '同步',
+  prompt: {
+    label: '提示詞',
+    placeholder: '請輸入提示詞',
+  },
 }

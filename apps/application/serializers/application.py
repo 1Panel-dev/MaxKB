@@ -7,7 +7,6 @@
     @desc:
 """
 import asyncio
-import datetime
 import hashlib
 import json
 import os
@@ -21,8 +20,8 @@ from django.core import validators
 from django.db import models, transaction
 from django.db.models import QuerySet, Q
 from django.http import HttpResponse
-from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from rest_framework import serializers, status
 from rest_framework.utils.formatting import lazy_format
@@ -256,29 +255,39 @@ class ApplicationCreateSerializer(serializers.Serializer):
 
         @staticmethod
         def to_application_model(user_id: str, workspace_id: str, application: Dict):
-            return Application(id=uuid.uuid7(), name=application.get('name'), desc=application.get('desc'),
-                               workspace_id=workspace_id,
-                               prologue=application.get('prologue'),
-                               dialogue_number=application.get('dialogue_number', 0),
-                               user_id=user_id, model_id=application.get('model_id'),
-                               folder_id=application.get('folder_id', application.get('workspace_id')),
-                               knowledge_setting=application.get('knowledge_setting'),
-                               model_setting=application.get('model_setting'),
-                               problem_optimization=application.get('problem_optimization'),
-                               type=ApplicationTypeChoices.SIMPLE,
-                               model_params_setting=application.get('model_params_setting', {}),
-                               problem_optimization_prompt=application.get('problem_optimization_prompt', None),
-                               stt_model_enable=application.get('stt_model_enable', False),
-                               stt_model_id=application.get('stt_model', None),
-                               stt_autosend=application.get('stt_autosend', False),
-                               tts_model_id=application.get('tts_model', None),
-                               tts_model_enable=application.get('tts_model_enable', False),
-                               tts_model_params_setting=application.get('tts_model_params_setting', {}),
-                               tts_type=application.get('tts_type', 'BROWSER'),
-                               file_upload_enable=application.get('file_upload_enable', False),
-                               file_upload_setting=application.get('file_upload_setting', {}),
-                               work_flow={}
-                               )
+            return Application(
+                id=uuid.uuid7(),
+                name=application.get('name'),
+                desc=application.get('desc'),
+                workspace_id=workspace_id,
+                prologue=application.get('prologue'),
+                dialogue_number=application.get('dialogue_number', 0),
+                user_id=user_id, model_id=application.get('model_id'),
+                folder_id=application.get('folder_id', application.get('workspace_id')),
+                knowledge_setting=application.get('knowledge_setting'),
+                model_setting=application.get('model_setting'),
+                problem_optimization=application.get('problem_optimization'),
+                type=ApplicationTypeChoices.SIMPLE,
+                model_params_setting=application.get('model_params_setting', {}),
+                problem_optimization_prompt=application.get('problem_optimization_prompt', None),
+                stt_model_enable=application.get('stt_model_enable', False),
+                stt_model_id=application.get('stt_model', None),
+                stt_autosend=application.get('stt_autosend', False),
+                tts_model_id=application.get('tts_model', None),
+                tts_model_enable=application.get('tts_model_enable', False),
+                tts_model_params_setting=application.get('tts_model_params_setting', {}),
+                tts_type=application.get('tts_type', 'BROWSER'),
+                file_upload_enable=application.get('file_upload_enable', False),
+                file_upload_setting=application.get('file_upload_setting', {}),
+                work_flow={},
+                mcp_enable=application.get('mcp_enable', False),
+                mcp_tool_ids=application.get('mcp_tool_ids', []),
+                mcp_servers=application.get('mcp_servers', {}),
+                mcp_source=application.get('mcp_source', 'referencing'),
+                tool_enable=application.get('tool_enable', False),
+                tool_ids=application.get('tool_ids', []),
+                mcp_output_enable=application.get('mcp_output_enable', False),
+            )
 
 
 class ApplicationQueryRequest(serializers.Serializer):
@@ -700,6 +709,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
             'user_id': 'user_id', 'model_id': 'model_id', 'knowledge_setting': 'knowledge_setting',
             'model_setting': 'model_setting', 'model_params_setting': 'model_params_setting',
             'tts_model_params_setting': 'tts_model_params_setting',
+            'stt_model_params_setting': 'stt_model_params_setting',
             'problem_optimization': 'problem_optimization', 'icon': 'icon', 'work_flow': 'work_flow',
             'problem_optimization_prompt': 'problem_optimization_prompt', 'tts_model_id': 'tts_model_id',
             'stt_model_id': 'stt_model_id', 'tts_model_enable': 'tts_model_enable',
@@ -707,7 +717,8 @@ class ApplicationOperateSerializer(serializers.Serializer):
             'tts_autoplay': 'tts_autoplay', 'stt_autosend': 'stt_autosend', 'file_upload_enable': 'file_upload_enable',
             'file_upload_setting': 'file_upload_setting',
             'mcp_enable': 'mcp_enable', 'mcp_tool_ids': 'mcp_tool_ids', 'mcp_servers': 'mcp_servers',
-            'mcp_source': 'mcp_source', 'tool_enable': 'tool_enable', 'tool_ids': 'tool_ids', 'mcp_output_enable': 'mcp_output_enable',
+            'mcp_source': 'mcp_source', 'tool_enable': 'tool_enable', 'tool_ids': 'tool_ids',
+            'mcp_output_enable': 'mcp_output_enable',
             'type': 'type', 'chat_background': 'chat_background', 'avatar': 'avatar',
             'user_avatar': 'user_avatar', 'float_icon': 'float_icon'
         }
@@ -750,7 +761,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
         work_flow_version.save()
         access_token = hashlib.md5(
             str(uuid.uuid7()).encode()).hexdigest()[
-                       8:24]
+            8:24]
         application_access_token = QuerySet(ApplicationAccessToken).filter(
             application_id=application.id).first()
         if application_access_token is None:
@@ -786,6 +797,8 @@ class ApplicationOperateSerializer(serializers.Serializer):
                     instance['stt_autosend'] = node_data['stt_autosend']
                 if 'tts_model_params_setting' in node_data:
                     instance['tts_model_params_setting'] = node_data['tts_model_params_setting']
+                if 'stt_model_params_setting' in node_data:
+                    instance['stt_model_params_setting'] = node_data['stt_model_params_setting']
                 if 'file_upload_enable' in node_data:
                     instance['file_upload_enable'] = node_data['file_upload_enable']
                 if 'file_upload_setting' in node_data:
@@ -832,7 +845,9 @@ class ApplicationOperateSerializer(serializers.Serializer):
                        'stt_model_id', 'tts_model_id', 'tts_model_enable', 'stt_model_enable', 'tts_type',
                        'tts_autoplay', 'stt_autosend', 'file_upload_enable', 'file_upload_setting',
                        'api_key_is_active', 'icon', 'work_flow', 'model_params_setting', 'tts_model_params_setting',
-                       'mcp_enable', 'mcp_tool_ids', 'mcp_servers', 'mcp_source', 'tool_enable', 'tool_ids', 'mcp_output_enable',
+                       'stt_model_params_setting',
+                       'mcp_enable', 'mcp_tool_ids', 'mcp_servers', 'mcp_source', 'tool_enable', 'tool_ids',
+                       'mcp_output_enable',
                        'problem_optimization_prompt', 'clean_time', 'folder_id']
         for update_key in update_keys:
             if update_key in instance and instance.get(update_key) is not None:
@@ -951,7 +966,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
             application = QuerySet(ApplicationVersion).filter(application_id=application_id).order_by(
                 '-create_time').first()
         if application.stt_model_enable:
-            model = get_model_instance_by_model_workspace_id(application.stt_model_id, application.workspace_id)
+            model = get_model_instance_by_model_workspace_id(application.stt_model_id, application.workspace_id, **application.stt_model_params_setting)
             text = model.speech_to_text(instance.get('file'))
             return text
 

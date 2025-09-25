@@ -249,7 +249,7 @@ const permissionPrecise = computed(() => {
   return permissionMap['application'][apiType.value]
 })
 
-const apiUrl = window.location.origin + '/doc_chat/'
+const apiUrl = window.location.origin + `${window.MaxKB.chatPrefix}/api-doc/`
 
 const baseUrl = window.location.origin + `${window.MaxKB.chatPrefix}/api/`
 

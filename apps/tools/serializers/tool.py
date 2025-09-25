@@ -5,11 +5,11 @@ import json
 import os
 import pickle
 import re
-import requests
 import tempfile
 import zipfile
 from typing import Dict
 
+import requests
 import uuid_utils.compat as uuid
 from django.core import validators
 from django.db import transaction
@@ -356,9 +356,6 @@ class ToolSerializer(serializers.Serializer):
                 ToolCreateRequest(data=instance).is_valid(raise_exception=True)
                 # 校验代码是否包括禁止的关键字
                 ToolExecutor().validate_banned_keywords(instance.get('code', ''))
-                # 校验mcp json
-                if instance.get('tool_type') == ToolType.MCP.value:
-                    validate_mcp_config(json.loads(instance.get('code')))
 
             tool_id = uuid.uuid7()
             Tool(
@@ -385,6 +382,18 @@ class ToolSerializer(serializers.Serializer):
             return ToolSerializer.Operate(data={
                 'id': tool_id, 'workspace_id': self.data.get('workspace_id')
             }).one()
+
+    class TestConnection(serializers.Serializer):
+        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+        code = serializers.CharField(required=True, label=_('tool content'))
+
+        def test_connection(self):
+            self.is_valid(raise_exception=True)
+            # 校验代码是否包括禁止的关键字
+            ToolExecutor().validate_banned_keywords(self.data.get('code', ''))
+            # 校验mcp json
+            validate_mcp_config(json.loads(self.data.get('code')))
+            return True
 
     class Debug(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, label=_('user id'))
@@ -475,9 +484,7 @@ class ToolSerializer(serializers.Serializer):
                 ToolEditRequest(data=instance).is_valid(raise_exception=True)
                 # 校验代码是否包括禁止的关键字
                 ToolExecutor().validate_banned_keywords(instance.get('code', ''))
-                # 校验mcp json
-                if instance.get('tool_type') == ToolType.MCP.value:
-                    validate_mcp_config(json.loads(instance.get('code')))
+
 
             if not QuerySet(Tool).filter(id=self.data.get('id')).exists():
                 raise serializers.ValidationError(_('Tool not found'))
@@ -755,7 +762,8 @@ class ToolSerializer(serializers.Serializer):
                         versions = tool.get('versions', [])
                         tool['label'] = tag_dict[tool.get('tags')[0]] if tool.get('tags') else ''
                         tool['version'] = next(
-                            (version.get('name') for version in versions if version.get('downloadUrl') == tool['downloadUrl']),
+                            (version.get('name') for version in versions if
+                             version.get('downloadUrl') == tool['downloadUrl']),
                         )
                         filter_apps.append(tool)
 
@@ -789,7 +797,7 @@ class ToolSerializer(serializers.Serializer):
             tool_id = uuid.uuid7()
             tool = Tool(
                 id=tool_id,
-                name=tool_data.get('name'),
+                name=instance.get('name'),
                 desc=tool_data.get('desc'),
                 code=tool_data.get('code'),
                 user_id=self.data.get('user_id'),
@@ -836,11 +844,11 @@ class ToolSerializer(serializers.Serializer):
                 raise AppApiException(500, _('Tool does not exist'))
             # 查找匹配的版本名称
             version_name = next(
-                (version.get('name') for version in self.data.get('versions') if version.get('downloadUrl') == self.data.get('download_url')),
+                (version.get('name') for version in self.data.get('versions') if
+                 version.get('downloadUrl') == self.data.get('download_url')),
             )
             res = requests.get(self.data.get('download_url'), timeout=5)
             tool_data = RestrictedUnpickler(io.BytesIO(res.content)).load().tool
-            tool.name = tool_data.get('name')
             tool.desc = tool_data.get('desc')
             tool.code = tool_data.get('code')
             tool.input_field_list = tool_data.get('input_field_list', [])
@@ -854,7 +862,6 @@ class ToolSerializer(serializers.Serializer):
             except Exception as e:
                 maxkb_logger.error(f"callback appstore tool download error: {e}")
             return ToolModelSerializer(tool).data
-
 
 
 class ToolTreeSerializer(serializers.Serializer):

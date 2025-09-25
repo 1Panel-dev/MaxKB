@@ -11,7 +11,7 @@ import { ref, type WritableComputedRef } from 'vue'
 const axiosConfig = {
   baseURL: (window.MaxKB?.prefix ? window.MaxKB?.prefix : '/admin') + '/api',
   withCredentials: false,
-  timeout: 600000,
+  timeout: 1800000, // 30分钟 timeout
   headers: {},
 }
 

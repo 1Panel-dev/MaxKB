@@ -68,7 +68,7 @@ class AliyunBaiLianOmiSpeechToText(MaxKBBaseModel, BaseSpeechToText):
                                     "format": "mp3",
                                 },
                             },
-                            {"type": "text", "text": '这段音频在说什么，只回答音频的内容'},
+                            {"type": "text", "text": self.params.get('CueWord')},
                         ],
                     },
                 ],
@@ -77,6 +77,7 @@ class AliyunBaiLianOmiSpeechToText(MaxKBBaseModel, BaseSpeechToText):
                 # stream 必须设置为 True，否则会报错
                 stream=True,
                 stream_options={"include_usage": True},
+                extra_body=self.params
             )
             result = []
             for chunk in completion:

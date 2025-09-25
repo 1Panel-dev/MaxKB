@@ -72,6 +72,7 @@ class Application(AppModelMixin):
     model_setting = models.JSONField(verbose_name="模型参数相关设置", default=get_model_setting_dict)
     model_params_setting = models.JSONField(verbose_name="模型参数相关设置", default=dict)
     tts_model_params_setting = models.JSONField(verbose_name="模型参数相关设置", default=dict)
+    stt_model_params_setting = models.JSONField(verbose_name="STT模型参数相关设置", default=dict)
     problem_optimization = models.BooleanField(verbose_name="问题优化", default=False)
     icon = models.CharField(max_length=256, verbose_name="应用icon", default="./favicon.ico")
     # 聊天背景
@@ -153,6 +154,7 @@ class ApplicationVersion(AppModelMixin):
     model_setting = models.JSONField(verbose_name="模型参数相关设置", default=get_model_setting_dict)
     model_params_setting = models.JSONField(verbose_name="模型参数相关设置", default=dict)
     tts_model_params_setting = models.JSONField(verbose_name="模型参数相关设置", default=dict)
+    stt_model_params_setting = models.JSONField(verbose_name="STT模型参数相关设置", default=dict)
     problem_optimization = models.BooleanField(verbose_name="问题优化", default=False)
     icon = models.CharField(max_length=256, verbose_name="应用icon", default="./favicon.ico")
     # 聊天背景

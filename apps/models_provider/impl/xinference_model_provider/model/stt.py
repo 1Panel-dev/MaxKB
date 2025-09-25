@@ -22,6 +22,8 @@ class XInferenceSpeechToText(MaxKBBaseModel, BaseSpeechToText):
         super().__init__(**kwargs)
         self.api_key = kwargs.get('api_key')
         self.api_base = kwargs.get('api_base')
+        self.model = kwargs.get('model')
+        self.params = kwargs.get('params')
 
     @staticmethod
     def is_cache_model():
@@ -57,5 +59,14 @@ class XInferenceSpeechToText(MaxKBBaseModel, BaseSpeechToText):
         audio_data = audio_file.read()
         buffer = io.BytesIO(audio_data)
         buffer.name = "file.mp3"  # this is the important line
-        res = client.audio.transcriptions.create(model=self.model, language="zh", file=buffer)
+
+        filter_params = {k: v for k, v in self.params.items() if k not in {'model_id', 'use_local', 'streaming'}}
+        transcription_params = {
+            'model': self.model,
+            'file': buffer,
+            'language': 'zh',
+            **filter_params
+        }
+
+        res = client.audio.transcriptions.create(**transcription_params)
         return res.text

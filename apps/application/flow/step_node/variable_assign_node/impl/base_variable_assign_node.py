@@ -2,11 +2,8 @@
 import json
 from typing import List
 
-from django.db.models import QuerySet
-
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.variable_assign_node.i_variable_assign_node import IVariableAssignNode
-from application.models import Chat
 
 
 class BaseVariableAssignNode(IVariableAssignNode):
@@ -15,10 +12,23 @@ class BaseVariableAssignNode(IVariableAssignNode):
         self.context['result_list'] = details.get('result_list')
 
     def global_evaluation(self, variable, value):
-        self.workflow_manage.context[variable['fields'][1]] = value
+        from application.flow.loop_workflow_manage import LoopWorkflowManage
+        if isinstance(self.workflow_manage, LoopWorkflowManage):
+            self.workflow_manage.parentWorkflowManage.context[variable['fields'][1]] = value
+        else:
+            self.workflow_manage.context[variable['fields'][1]] = value
+
+    def loop_evaluation(self, variable, value):
+        from application.flow.loop_workflow_manage import LoopWorkflowManage
+        if isinstance(self.workflow_manage, LoopWorkflowManage):
+            self.workflow_manage.get_loop_context()[variable['fields'][1]] = value
 
     def chat_evaluation(self, variable, value):
-        self.workflow_manage.chat_context[variable['fields'][1]] = value
+        from application.flow.loop_workflow_manage import LoopWorkflowManage
+        if isinstance(self.workflow_manage, LoopWorkflowManage):
+            self.workflow_manage.parentWorkflowManage.chat_context[variable['fields'][1]] = value
+        else:
+            self.workflow_manage.chat_context[variable['fields'][1]] = value
 
     def handle(self, variable, evaluation):
         result = {
@@ -62,8 +72,17 @@ class BaseVariableAssignNode(IVariableAssignNode):
                 result = self.handle(variable, self.chat_evaluation)
                 result_list.append(result)
                 is_chat = True
+            if 'loop' == variable['fields'][0]:
+                result = self.handle(variable, self.loop_evaluation)
+                result_list.append(result)
+
         if is_chat:
-            self.workflow_manage.get_chat_info().set_chat_variable(self.workflow_manage.chat_context)
+            from application.flow.loop_workflow_manage import LoopWorkflowManage
+            if isinstance(self.workflow_manage, LoopWorkflowManage):
+                self.workflow_manage.parentWorkflowManage.get_chat_info().set_chat_variable(
+                    self.workflow_manage.parentWorkflowManage.chat_context)
+            else:
+                self.workflow_manage.get_chat_info().set_chat_variable(self.workflow_manage.chat_context)
         return NodeResult({'variable_list': variable_list, 'result_list': result_list}, {})
 
     def get_reference_content(self, fields: List[str]):

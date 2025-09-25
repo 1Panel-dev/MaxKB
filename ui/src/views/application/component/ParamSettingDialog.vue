@@ -168,7 +168,7 @@
           </el-form-item>
           <el-form-item
             v-if="form.problem_optimization"
-            :label="$t('views.application.form.prompt.label')"
+            :label="$t('common.prompt.label')"
           >
             <el-input
               v-model="form.problem_optimization_prompt"
@@ -246,7 +246,7 @@ const noReferencesRules = reactive<FormRules<any>>({
   designated_answer: [
     {
       required: true,
-      message: t('views.application.form.prompt.requiredMessage'),
+      message: t('common.prompt.placeholder'),
       trigger: 'blur',
     },
   ],

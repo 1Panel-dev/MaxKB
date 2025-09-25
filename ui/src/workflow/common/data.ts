@@ -1,4 +1,4 @@
-import { WorkflowType } from '@/enums/application'
+import { WorkflowType, WorkflowMode } from '@/enums/application'
 import { t } from '@/locales'
 
 export const startNode = {
@@ -48,7 +48,6 @@ export const baseNode = {
     node_data: {
       name: '',
       desc: '',
-      // @ts-ignore
       prologue: t('views.application.form.defaultPrologue'),
       tts_type: 'BROWSER',
     },
@@ -360,9 +359,10 @@ export const toolNode = {
     },
   },
 }
+
 export const intentNode = {
   type: WorkflowType.IntentNode,
-  text: t('views.applicationWorkflow.nodes.intentNode.label'),
+  text: t('views.applicationWorkflow.nodes.intentNode.text'),
   label: t('views.applicationWorkflow.nodes.intentNode.label'),
   height: 260,
   properties: {
@@ -373,11 +373,72 @@ export const intentNode = {
           label: t('common.classify'),
           value: 'category',
         },
-         {
+        {
           label: t('common.reason'),
           value: 'reason',
         },
       ],
+    },
+  },
+}
+
+export const loopStartNode = {
+  id: WorkflowType.LoopStartNode,
+  type: WorkflowType.LoopStartNode,
+  x: 480,
+  y: 3340,
+  properties: {
+    height: 364,
+    stepName: t('views.applicationWorkflow.nodes.loopStartNode.label'),
+    config: {
+      fields: [
+        {
+          label: t('views.applicationWorkflow.nodes.loopStartNode.loopIndex'),
+          value: 'index',
+        },
+        {
+          label: t('views.applicationWorkflow.nodes.loopStartNode.loopItem'),
+          value: 'item',
+        },
+      ],
+      globalFields: [],
+    },
+    showNode: true,
+  },
+}
+
+export const loopNode = {
+  type: WorkflowType.LoopNode,
+  visible: false,
+  text: t('views.applicationWorkflow.nodes.loopNode.text'),
+  label: t('views.applicationWorkflow.nodes.loopNode.label'),
+  height: 252,
+  properties: {
+    stepName: t('views.applicationWorkflow.nodes.loopNode.label'),
+    workflow: {
+      edges: [],
+      nodes: [
+        {
+          x: 480,
+          y: 3340,
+          id: 'loop-start-node',
+          type: 'loop-start-node',
+          properties: {
+            config: {
+              fields: [],
+              globalFields: [],
+            },
+            fields: [],
+            height: 361.333,
+            showNode: true,
+            stepName: '开始',
+            globalFields: [],
+          },
+        },
+      ],
+    },
+    config: {
+      fields: [],
     },
   },
 }
@@ -400,6 +461,33 @@ export const imageToVideoNode = {
   },
 }
 
+export const loopBodyNode = {
+  type: WorkflowType.LoopBodyNode,
+  text: t('views.applicationWorkflow.nodes.loopBodyNode.text'),
+  label: t('views.applicationWorkflow.nodes.loopBodyNode.label'),
+  height: 1080,
+  properties: {
+    width: 1920,
+    stepName: t('views.applicationWorkflow.nodes.loopBodyNode.label'),
+    config: {
+      fields: [],
+    },
+  },
+}
+export const loopContinueNode = {
+  type: WorkflowType.LoopContinueNode,
+  text: t('views.applicationWorkflow.nodes.loopContinueNode.text'),
+  label: t('views.applicationWorkflow.nodes.loopContinueNode.label'),
+  height: 100,
+  properties: {
+    width: 600,
+    stepName: t('views.applicationWorkflow.nodes.loopContinueNode.label'),
+    config: {
+      fields: [],
+    },
+  },
+}
+
 export const textToVideoNode = {
   type: WorkflowType.TextToVideoGenerateNode,
   text: t('views.applicationWorkflow.nodes.textToVideoGenerate.text'),
@@ -417,7 +505,47 @@ export const textToVideoNode = {
     },
   },
 }
+
+export const loopBreakNode = {
+  type: WorkflowType.LoopBreakNode,
+  text: t('views.applicationWorkflow.nodes.loopBreakNode.text'),
+  label: t('views.applicationWorkflow.nodes.loopBreakNode.label'),
+  height: 100,
+  properties: {
+    width: 600,
+    stepName: t('views.applicationWorkflow.nodes.loopBreakNode.label'),
+    config: {
+      fields: [],
+    },
+  },
+}
+
 export const menuNodes = [
+  {
+    label: t('views.applicationWorkflow.nodes.classify.aiCapability'),
+    list: [
+      aiChatNode,
+      intentNode,
+      imageGenerateNode,
+      imageUnderstandNode,
+      textToSpeechNode,
+      speechToTextNode,
+      textToVideoNode,
+      imageToVideoNode,
+      questionNode,
+    ],
+  },
+  { label: t('views.knowledge.title'), list: [searchKnowledgeNode, rerankerNode] },
+  {
+    label: t('views.applicationWorkflow.nodes.classify.businessLogic'),
+    list: [conditionNode, formNode, variableAssignNode, replyNode, loopNode],
+  },
+  {
+    label: t('views.applicationWorkflow.nodes.classify.other'),
+    list: [mcpNode, documentExtractNode, toolNode],
+  },
+]
+export const applicationLoopMenuNodes = [
   {
     label: t('views.applicationWorkflow.nodes.classify.aiCapability'),
     list: [
@@ -429,13 +557,13 @@ export const menuNodes = [
       textToSpeechNode,
       speechToTextNode,
       textToVideoNode,
-      imageToVideoNode
+      imageToVideoNode,
     ],
   },
   { label: t('views.knowledge.title'), list: [searchKnowledgeNode, rerankerNode] },
   {
     label: t('views.applicationWorkflow.nodes.classify.businessLogic'),
-    list: [conditionNode, formNode, variableAssignNode, replyNode],
+    list: [conditionNode, formNode, variableAssignNode, replyNode, loopContinueNode, loopBreakNode],
   },
   {
     label: t('views.applicationWorkflow.nodes.classify.other'),
@@ -443,6 +571,14 @@ export const menuNodes = [
   },
 ]
 
+export const getMenuNodes = (workflowMode: WorkflowMode) => {
+  if (workflowMode == WorkflowMode.Application) {
+    return menuNodes
+  }
+  if (workflowMode == WorkflowMode.ApplicationLoop) {
+    return applicationLoopMenuNodes
+  }
+}
 
 /**
  * 工具配置数据
@@ -525,6 +661,11 @@ export const nodeDict: any = {
   [WorkflowType.TextToVideoGenerateNode]: textToVideoNode,
   [WorkflowType.ImageToVideoGenerateNode]: imageToVideoNode,
   [WorkflowType.IntentNode]: intentNode,
+  [WorkflowType.LoopNode]: loopNode,
+  [WorkflowType.LoopBodyNode]: loopBodyNode,
+  [WorkflowType.LoopStartNode]: loopStartNode,
+  [WorkflowType.LoopBreakNode]: loopBodyNode,
+  [WorkflowType.LoopContinueNode]: loopContinueNode,
 }
 export function isWorkFlow(type: string | undefined) {
   return type === 'WORK_FLOW'

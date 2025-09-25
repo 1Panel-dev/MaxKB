@@ -10,22 +10,26 @@ export function connect(
   container: HTMLDivElement,
   node: BaseNodeModel | BaseEdgeModel,
   graph: GraphModel,
-  get_props?: any
+  get_props?: any,
+  get_provide?: any,
 ) {
   if (!get_props) {
     get_props = (node: BaseNodeModel | BaseEdgeModel, graph: GraphModel) => {
       return { nodeModel: node, graph }
     }
   }
+  if (!get_provide) {
+    get_provide = (node: BaseNodeModel | BaseEdgeModel, graph: GraphModel) => ({
+      getNode: () => node,
+      getGraph: () => graph,
+    })
+  }
   if (active) {
     items[id] = markRaw(
       defineComponent({
         render: () => h(Teleport, { to: container } as any, [h(component, get_props(node, graph))]),
-        provide: () => ({
-          getNode: () => node,
-          getGraph: () => graph
-        })
-      })
+        provide: () => get_provide(node, graph),
+      }),
     )
   }
 }
@@ -50,8 +54,8 @@ export function getTeleport(): any {
     props: {
       flowId: {
         type: String,
-        required: true
-      }
+        required: true,
+      },
     },
     setup(props) {
       return () => {
@@ -65,16 +69,15 @@ export function getTeleport(): any {
 
           // 比对当前界面显示的flowId，只更新items[当前页面flowId:nodeId]的数据
           // 比如items[0]属于Page1的数据，那么Page2无论active=true/false，都无法执行items[0]
-          if (id.startsWith(props.flowId)) {
-            children.push(items[id])
-          }
+
+          children.push(items[id])
         })
         return h(
           Fragment,
           {},
-          children.map((item) => h(item))
+          children.map((item) => h(item)),
         )
       }
-    }
+    },
   })
 }

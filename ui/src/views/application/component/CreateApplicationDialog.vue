@@ -151,7 +151,7 @@ const applicationForm = ref<ApplicationFormType>({
   },
   model_setting: {
     prompt: defaultPrompt,
-    system: t('views.application.form.roleSettings.placeholder'),
+    system: '',
     no_references_prompt: '{question}',
   },
   model_params_setting: {},
@@ -205,7 +205,7 @@ watch(dialogVisible, (bool) => {
       },
       model_setting: {
         prompt: defaultPrompt,
-        system: t('views.application.form.roleSettings.placeholder'),
+        system: '',
         no_references_prompt: '{question}',
       },
       model_params_setting: {},

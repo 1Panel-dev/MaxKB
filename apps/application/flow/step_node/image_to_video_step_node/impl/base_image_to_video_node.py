@@ -13,6 +13,7 @@ from common.utils.common import bytes_to_uploaded_file
 from knowledge.models import FileSourceType, File
 from oss.serializers.file import FileSerializer, mime_types
 from models_provider.tools import get_model_instance_by_model_workspace_id
+from django.utils.translation import gettext
 
 
 class BaseImageToVideoNode(IImageToVideoNode):
@@ -38,7 +39,7 @@ class BaseImageToVideoNode(IImageToVideoNode):
         message_list = self.generate_message_list(question, history_message)
         self.context['message_list'] = message_list
         self.context['dialogue_type'] = dialogue_type
-        self.context['negative_prompt'] = negative_prompt
+        self.context['negative_prompt'] = self.generate_prompt_question(negative_prompt)
         self.context['first_frame_url'] = first_frame_url
         self.context['last_frame_url'] = last_frame_url
         # 处理首尾帧图片 这块可以是url 也可以是file_id 如果是url 可以直接传递给模型  如果是file_id 需要传base64
@@ -47,8 +48,8 @@ class BaseImageToVideoNode(IImageToVideoNode):
         last_frame_url = self.get_file_base64(last_frame_url)
         video_urls = ttv_model.generate_video(question, negative_prompt, first_frame_url, last_frame_url)
         # 保存图片
-        if video_urls is None:
-            return NodeResult({'answer': '生成视频失败'}, {})
+        if video_urls is None or video_urls == '':
+            return NodeResult({'answer': gettext('Failed to generate video')}, {})
         file_name = 'generated_video.mp4'
         if isinstance(video_urls, str) and video_urls.startswith('http'):
             video_urls = requests.get(video_urls).content
@@ -71,17 +72,21 @@ class BaseImageToVideoNode(IImageToVideoNode):
                            'history_message': history_message, 'question': question}, {})
 
     def get_file_base64(self, image_url):
-        if isinstance(image_url, list):
-            image_url = image_url[0].get('file_id')
-        if isinstance(image_url, str) and not image_url.startswith('http'):
-            file = QuerySet(File).filter(id=image_url).first()
-            file_bytes = file.get_bytes()
-            # 如果我不知道content_type 可以用 magic 库去检测
-            file_type = file.file_name.split(".")[-1].lower()
-            content_type = mime_types.get(file_type, 'application/octet-stream')
-            encoded_bytes = base64.b64encode(file_bytes)
-            return f'data:{content_type};base64,{encoded_bytes.decode()}'
-        return image_url
+        try:
+            if isinstance(image_url, list):
+                image_url = image_url[0].get('file_id')
+            if isinstance(image_url, str) and not image_url.startswith('http'):
+                file = QuerySet(File).filter(id=image_url).first()
+                file_bytes = file.get_bytes()
+                # 如果我不知道content_type 可以用 magic 库去检测
+                file_type = file.file_name.split(".")[-1].lower()
+                content_type = mime_types.get(file_type, 'application/octet-stream')
+                encoded_bytes = base64.b64encode(file_bytes)
+                return f'data:{content_type};base64,{encoded_bytes.decode()}'
+            return image_url
+        except Exception as e:
+            raise ValueError(
+                gettext("Failed to obtain the image"))
 
     def generate_history_ai_message(self, chat_record):
         for val in chat_record.details.values():

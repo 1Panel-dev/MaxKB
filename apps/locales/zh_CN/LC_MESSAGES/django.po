@@ -8062,7 +8062,7 @@ msgstr "登录 logo"
 
 #: apps/xpack/serializers/system_params.py:23
 msgid "login image"
-msgstr "登陆图片"
+msgstr "登录图片"
 
 #: apps/xpack/serializers/system_params.py:24
 msgid "title"
@@ -8827,3 +8827,30 @@ msgstr "是否添加水印"
 
 msgid "Resolution"
 msgstr "分辨率"
+
+msgid "Ratio"
+msgstr "比例"
+
+msgid "Duration"
+msgstr "时长"
+
+msgid "Failed to generate video"
+msgstr "生成视频失败"
+
+msgid "password"
+msgstr "密码登录"
+
+msgid "Failed to obtain the image"
+msgstr "获取图片失败"
+
+msgid "Update auth setting"
+msgstr "更新认证设置"
+
+msgid "If not passed, the default value is streaming_asr_demo"
+msgstr "如果未传入，则默认值为 streaming_asr_demo"
+
+msgid "If not passed, the default value is 16000"
+msgstr "如果未传入，则默认值为 16000"
+
+msgid "Sample Rate"
+msgstr "采样率"

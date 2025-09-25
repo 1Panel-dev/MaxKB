@@ -92,8 +92,8 @@ class ToolView(APIView):
             tags=[_('Tool')]  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.TOOL_DEBUG.get_workspace_permission(),
-            PermissionConstants.TOOL_DEBUG.get_workspace_permission_workspace_manage_role(),
+            PermissionConstants.TOOL_EDIT.get_workspace_permission(),
+            PermissionConstants.TOOL_EDIT.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
         )
         def post(self, request: Request, workspace_id: str):
@@ -359,6 +359,31 @@ class ToolView(APIView):
                 'user_id': request.user.id,
                 'image': request.FILES.get('file')
             }).edit(request.data))
+
+    class TestConnection(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['POST'],
+            description=_("Test tool connection"),
+            summary=_("Test tool connection"),
+            operation_id=_("Test tool connection"),  # type: ignore
+            request=ToolReadAPI.get_request(),
+            responses=ToolReadAPI.get_response(),
+            tags=[_("Tool")]  # type: ignore
+        )
+        @has_permissions(
+            PermissionConstants.TOOL_CREATE.get_workspace_permission(),
+            PermissionConstants.TOOL_CREATE.get_workspace_permission_workspace_manage_role(),
+            PermissionConstants.TOOL_EDIT.get_workspace_permission(),
+            PermissionConstants.TOOL_EDIT.get_workspace_permission_workspace_manage_role(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
+        )
+        def post(self, request: Request, workspace_id: str):
+            return result.success(ToolSerializer.TestConnection(data={
+                'workspace_id': workspace_id,
+                'code': request.data.get('code'),
+            }).test_connection())
 
     class InternalTool(APIView):
         authentication_classes = [TokenAuth]

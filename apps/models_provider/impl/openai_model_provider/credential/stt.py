@@ -6,9 +6,16 @@ from django.utils.translation import gettext as _
 
 from common import forms
 from common.exception.app_exception import AppApiException
-from common.forms import BaseForm
+from common.forms import BaseForm, TooltipLabel
 from models_provider.base_model_provider import BaseModelCredential, ValidCode
 
+
+class OpenAISTTModelParams(BaseForm):
+    language = forms.TextInputField(
+        TooltipLabel(_('language'), _('If not passed, the default value is zh')),
+        required=True,
+        default_value='zh',
+    )
 
 class OpenAISTTModelCredential(BaseForm, BaseModelCredential):
     api_base = forms.TextInputField('API URL', required=True)
@@ -28,7 +35,7 @@ class OpenAISTTModelCredential(BaseForm, BaseModelCredential):
                 else:
                     return False
         try:
-            model = provider.get_model(model_type, model_name, model_credential)
+            model = provider.get_model(model_type, model_name, model_credential, **model_params)
             model.check_auth()
         except Exception as e:
             traceback.print_exc()
@@ -46,4 +53,5 @@ class OpenAISTTModelCredential(BaseForm, BaseModelCredential):
         return {**model, 'api_key': super().encryption(model.get('api_key', ''))}
 
     def get_model_params_setting_form(self, model_name):
-        pass
+
+        return OpenAISTTModelParams()

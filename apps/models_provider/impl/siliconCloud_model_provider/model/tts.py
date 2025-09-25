@@ -60,26 +60,5 @@ class SiliconCloudTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
         ) as response:
             return response.read()
 
-        import requests
-
-        url = "https://api.siliconflow.cn/v1/audio/speech"
-
-        payload = {
-            "model": "FunAudioLLM/CosyVoice2-0.5B",
-            "input": "Can you say it with a happy emotion? <|endofprompt|>I'm so happy, Spring Festival is coming!",
-            "voice": "FunAudioLLM/CosyVoice2-0.5B:alex",
-            "response_format": "mp3",
-            "sample_rate": 123,
-            "stream": True,
-            "speed": 1,
-            "gain": 0
-        }
-        headers = {
-            "Authorization": "Bearer <token>",
-            "Content-Type": "application/json"
-        }
-
-        response = requests.request("POST", url, json=payload, headers=headers)
-
     def is_cache_model(self):
         return False

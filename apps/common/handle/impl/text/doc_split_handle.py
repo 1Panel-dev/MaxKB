@@ -44,7 +44,7 @@ def image_to_mode(image, doc: Document, images_list, get_image_id):
             if len([i for i in images_list if i.id == image_uuid]) == 0:
                 image = File(id=image_uuid, file_name=part.filename, meta={'debug': False, 'content': part.blob})
                 images_list.append(image)
-            return f'![](./oss/file/{image_uuid})'
+            return f'![{part.filename.replace("[", "").replace("]", "")}](./oss/file/{image_uuid})'
         return None
     return None
 

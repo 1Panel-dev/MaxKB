@@ -73,4 +73,5 @@ class CaptchaView(APIView):
                    tags=[_("User Management")],  # type: ignore
                    responses=CaptchaAPI.get_response())
     def get(self, request: Request):
-        return result.success(CaptchaSerializer().generate())
+        username = request.query_params.get('username', None)
+        return result.success(CaptchaSerializer().generate(username))

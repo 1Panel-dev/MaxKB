@@ -16,6 +16,8 @@ class SpeechToTextNodeSerializer(serializers.Serializer):
 
     audio_list = serializers.ListField(required=True,
                                        label=_("The audio file cannot be empty"))
+    model_params_setting = serializers.DictField(required=False,
+                                                 label=_("Model parameter settings"))
 
 
 class ISpeechToTextNode(INode):
@@ -35,6 +37,6 @@ class ISpeechToTextNode(INode):
         return self.execute(audio=res, **self.node_params_serializer.data, **self.flow_params_serializer.data)
 
     def execute(self, stt_model_id, chat_id,
-                audio,
+                audio, model_params_setting=None,
                 **kwargs) -> NodeResult:
         pass

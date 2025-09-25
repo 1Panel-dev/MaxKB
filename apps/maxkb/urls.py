@@ -52,8 +52,13 @@ init_doc(urlpatterns, chat_urlpatterns)
 
 def pro():
     urlpatterns.append(
-        re_path(r'^doc/(?P<path>.*)$', static.serve,
+        re_path(rf'^{CONFIG.get_admin_path()[1:]}/api-doc/(?P<path>.*)$', static.serve,
                 {'document_root': os.path.join(settings.STATIC_ROOT, "drf_spectacular_sidecar")}, name='doc'),
+    )
+
+    urlpatterns.append(
+        re_path(rf'^{CONFIG.get_chat_path()[1:]}/api-doc/(?P<path>.*)$', static.serve,
+                {'document_root': os.path.join(settings.STATIC_ROOT, "drf_spectacular_sidecar")}, name='doc_chat'),
     )
     # 暴露ui静态资源
     urlpatterns.append(

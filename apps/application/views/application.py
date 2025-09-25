@@ -18,7 +18,6 @@ from rest_framework.parsers import MultiPartParser
 from application.api.application_api import ApplicationCreateAPI, ApplicationQueryAPI, ApplicationImportAPI, \
     ApplicationExportAPI, ApplicationOperateAPI, ApplicationEditAPI, TextToSpeechAPI, SpeechToTextAPI, PlayDemoTextAPI, ApplicationIconAPI, \
     ApplicationChatBackgroundAPI, ApplicationAvatarAPI, ApplicationUserAvatarAPI, ApplicationFloatIconAPI
-from application.flow.step_node.condition_node.compare import Compare
 from application.models import Application
 from application.serializers.application import ApplicationSerializer, Query, ApplicationOperateSerializer, ApplicationIconSerializer, \
     ApplicationChatBackgroundSerializer, ApplicationAvatarSerializer, ApplicationUserAvatarSerializer, ApplicationFloatIconSerializer

@@ -98,6 +98,7 @@
 
     <template #footer>
       <div>
+        <el-button :loading="loading" @click="testConnection">{{ $t('views.system.test') }}</el-button>
         <el-button :loading="loading" @click="visible = false">{{ $t('common.cancel') }}</el-button>
         <el-button
           type="primary"
@@ -273,6 +274,21 @@ const submit = async (formEl: FormInstance | undefined) => {
       }
     }
   })
+}
+
+function testConnection() {
+  if (!form.value.code) {
+    return
+  }
+  loading.value = true
+  loadSharedApi({ type: 'tool', systemType: apiType.value })
+    .postToolTestConnection({ code: form.value.code }, loading)
+    .then(() => {
+      MsgSuccess(t('views.system.testSuccess'))
+    })
+    .finally(() => {
+      loading.value = false
+    })
 }
 
 const open = (data: any) => {

@@ -22,16 +22,15 @@
             @click.stop="emit('clickNodes', item)"
             @mousedown.stop="emit('onmousedown', item)"
           >
-            <!--            <LogoIcon v-if="item.resource_type === 'application'" height="32px" />-->
             <el-avatar
               v-if="isAppIcon(item?.icon)"
               shape="square"
-              :size="32"
+              :size="20"
               style="background: none"
             >
               <img :src="resetUrl(item?.icon, resetUrl('./favicon.ico'))" alt="" />
             </el-avatar>
-            <el-avatar v-else class="avatar-green" shape="square" :size="32">
+            <el-avatar v-else class="avatar-green" shape="square" :size="20">
               <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt="" />
             </el-avatar>
             <span class="ml-8 ellipsis" :title="item.name">{{ item.name }}</span>
@@ -41,16 +40,15 @@
         <template #default>
           <div class="flex-between">
             <div class="flex align-center">
-              <!--              <LogoIcon v-if="item.resource_type === 'application'" height="32px"/>-->
               <el-avatar
                 v-if="isAppIcon(item?.icon)"
                 shape="square"
-                :size="32"
+                :size="20"
                 style="background: none"
               >
                 <img :src="resetUrl(item?.icon, resetUrl('./favicon.ico'))" alt="" />
               </el-avatar>
-              <el-avatar v-else class="avatar-green" shape="square" :size="32">
+              <el-avatar v-else class="avatar-green" shape="square" :size="20">
                 <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt="" />
               </el-avatar>
               <span class="font-medium ml-8 break-all" :title="item.name">{{ item.name }}</span>

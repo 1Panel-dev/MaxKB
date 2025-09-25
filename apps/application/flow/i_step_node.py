@@ -168,7 +168,7 @@ class INode:
                    self.runtime_node_id, self.context.get('reasoning_content', '') if reasoning_content_enable else '')]
 
     def __init__(self, node, workflow_params, workflow_manage, up_node_id_list=None,
-                 get_node_params=lambda node: node.properties.get('node_data')):
+                 get_node_params=lambda node: node.properties.get('node_data'), salt=None):
         # 当前步骤上下文,用于存储当前步骤信息
         self.status = 200
         self.err_message = ''
@@ -188,7 +188,8 @@ class INode:
         self.runtime_node_id = sha1(uuid.NAMESPACE_DNS.bytes + bytes(str(uuid.uuid5(uuid.NAMESPACE_DNS,
                                                                                     "".join([*sorted(up_node_id_list),
                                                                                              node.id]))),
-                                                                     "utf-8")).hexdigest()
+                                                                     "utf-8")).hexdigest() + (
+                                   "__" + str(salt) if salt is not None else '')
 
     def valid_args(self, node_params, flow_params):
         flow_params_serializer_class = self.get_flow_params_serializer_class()

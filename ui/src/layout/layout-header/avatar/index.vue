@@ -188,7 +188,7 @@ const openResetPassword = () => {
 
 const logout = () => {
   login.logout().then(() => {
-    router.push({name: 'login'})
+    router.push({name: 'login', query: {login_mode: 'manual'}})
   })
 }
 

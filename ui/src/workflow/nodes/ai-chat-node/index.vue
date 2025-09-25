@@ -53,10 +53,20 @@
           ></ModelSelect>
         </el-form-item>
 
-        <el-form-item :label="$t('views.application.form.roleSettings.label')">
+        <el-form-item>
           <template #label>
             <div class="flex-between">
-              <span>{{ $t('views.application.form.roleSettings.label') }}</span>
+              <div class="flex align-center">
+                <span>{{ $t('views.application.form.roleSettings.label') }}</span>
+                <el-tooltip
+                  effect="dark"
+                  :content="$t('views.application.form.roleSettings.tooltip')"
+                  placement="right"
+                >
+                  <AppIcon iconName="app-warning" class="app-warning-icon ml-4"></AppIcon>
+                </el-tooltip>
+              </div>
+
               <el-button
                 type="primary"
                 link
@@ -72,7 +82,7 @@
             v-model="chat_data.system"
             style="height: 100px"
             @submitDialog="submitSystemDialog"
-            :placeholder="$t('views.application.form.roleSettings.label')"
+            :placeholder="`${t('views.applicationWorkflow.SystemPromptPlaceholder')}{{${t('views.applicationWorkflow.nodes.startNode.label')}.question}}`"
           />
         </el-form-item>
         <el-form-item
@@ -104,6 +114,7 @@
             v-model="chat_data.prompt"
             style="height: 150px"
             @submitDialog="submitDialog"
+            :placeholder="`${t('views.applicationWorkflow.UserPromptPlaceholder')}{{${t('views.applicationWorkflow.nodes.startNode.label')}.question}}`"
           />
         </el-form-item>
         <el-form-item :label="$t('views.application.form.historyRecord.label')">
@@ -144,13 +155,7 @@
             <el-switch size="small" v-model="chat_data.mcp_enable" />
           </div>
         </div>
-        <div
-          class="w-full mb-16"
-          v-if="
-            chat_data.mcp_tool_ids?.length > 0 ||
-            (chat_data.mcp_servers && chat_data.mcp_servers.length > 0)
-          "
-        >
+        <div class="w-full mb-16" v-if="chat_data.mcp_tool_ids?.length > 0">
           <template v-for="(item, index) in chat_data.mcp_tool_ids" :key="index">
             <div
               class="flex-between border border-r-6 white-bg mb-4"
@@ -187,6 +192,21 @@
               </el-button>
             </div>
           </template>
+        </div>
+        <div
+          v-if="chat_data.mcp_servers && chat_data.mcp_servers.length > 0"
+          class="flex-between border border-r-6 white-bg mb-4"
+          style="padding: 5px 8px"
+        >
+          <div class="flex align-center" style="line-height: 20px">
+            <ToolIcon type="MCP" class="mr-8" :size="20" />
+            <div class="ellipsis">
+              {{ $t('common.custom') + ' MCP' }}
+            </div>
+          </div>
+          <el-button text @click="chat_data.mcp_servers = ''">
+            <el-icon><Close /></el-icon>
+          </el-button>
         </div>
         <!-- 工具       -->
         <div class="flex-between mb-16">
@@ -230,7 +250,7 @@
             </div>
           </template>
         </div>
-        <el-form-item @click.prevent>
+        <el-form-item @click.prevent v-if="chat_data.mcp_enable || chat_data.tool_enable">
           <template #label>
             <div class="flex-between">
               <span class="mr-4">
@@ -443,7 +463,8 @@ const openGeneratePromptDialog = (modelId: string) => {
   }
 }
 const replace = (v: any) => {
-  set(props.nodeModel.properties.node_data.model_setting, 'system', v)
+  console.log(props.nodeModel.properties.node_data.model_setting)
+  set(props.nodeModel.properties.node_data, 'system', v)
 }
 const openReasoningParamSettingDialog = () => {
   ReasoningParamSettingDialogRef.value?.open(chat_data.value.model_setting)

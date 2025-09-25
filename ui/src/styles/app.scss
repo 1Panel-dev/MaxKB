@@ -317,7 +317,7 @@ h5 {
 }
 
 .border-r-6 {
-  border-radius: var();
+  border-radius: var(--app-border-radius-small);
 }
 .border-r-8 {
   border-radius: var(--app-border-radius-base);

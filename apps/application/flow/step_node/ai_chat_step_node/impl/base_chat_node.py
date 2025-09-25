@@ -220,11 +220,13 @@ class BaseChatNode(IChatNode):
                 mcp_tool_ids = list(set(mcp_tool_ids + [mcp_tool_id]))
             if mcp_source == 'custom' and mcp_servers is not None and '"stdio"' not in mcp_servers:
                 mcp_servers_config = json.loads(mcp_servers)
+                mcp_servers_config = self.handle_variables(mcp_servers_config)
             elif mcp_tool_ids:
                 mcp_tools = QuerySet(Tool).filter(id__in=mcp_tool_ids).values()
                 for mcp_tool in mcp_tools:
                     if mcp_tool and mcp_tool['is_active']:
                         mcp_servers_config = {**mcp_servers_config, **json.loads(mcp_tool['code'])}
+                        mcp_servers_config = self.handle_variables(mcp_servers_config)
 
         if tool_enable:
             if tool_ids and len(tool_ids) > 0:  # 如果有工具ID，则将其转换为MCP
@@ -252,6 +254,22 @@ class BaseChatNode(IChatNode):
                 _write_context=write_context_stream)
 
         return None
+
+    def handle_variables(self, tool_params):
+        # 处理参数中的变量
+        for k, v in tool_params.items():
+            if type(v) == str:
+                tool_params[k] = self.workflow_manage.generate_prompt(tool_params[k])
+            if type(v) == dict:
+                self.handle_variables(v)
+            if (type(v) == list) and (type(v[0]) == str):
+                tool_params[k] = self.get_reference_content(v)
+        return tool_params
+
+    def get_reference_content(self, fields: List[str]):
+        return str(self.workflow_manage.get_reference_field(
+            fields[0],
+            fields[1:]))
 
     @staticmethod
     def get_history_message(history_chat_record, dialogue_number, dialogue_type, runtime_node_id):

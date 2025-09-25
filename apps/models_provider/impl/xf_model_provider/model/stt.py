@@ -34,6 +34,7 @@ class XFSparkSpeechToText(MaxKBBaseModel, BaseSpeechToText):
     spark_api_key: str
     spark_api_secret: str
     spark_api_url: str
+    params: dict
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -41,6 +42,7 @@ class XFSparkSpeechToText(MaxKBBaseModel, BaseSpeechToText):
         self.spark_app_id = kwargs.get('spark_app_id')
         self.spark_api_key = kwargs.get('spark_api_key')
         self.spark_api_secret = kwargs.get('spark_api_secret')
+        self.params = kwargs.get('params')
 
     @staticmethod
     def is_cache_model():
@@ -58,6 +60,7 @@ class XFSparkSpeechToText(MaxKBBaseModel, BaseSpeechToText):
             spark_api_key=model_credential.get('spark_api_key'),
             spark_api_secret=model_credential.get('spark_api_secret'),
             spark_api_url=model_credential.get('spark_api_url'),
+            params=model_kwargs,
             **optional_params
         )
 
@@ -132,6 +135,11 @@ class XFSparkSpeechToText(MaxKBBaseModel, BaseSpeechToText):
         frameSize = 8000  # 每一帧的音频大小
         status = STATUS_FIRST_FRAME  # 音频的状态信息，标识音频是第一帧，还是中间帧、最后一帧
 
+        allowed_params = {'language','domain','accent','vad_eos','dwa','pd','ptt',
+                          'pcm','ltc','rlang','vinfo','nunum','speex_size','nbest','wbest'}
+
+        business_params = {k: v for k,v in self.params.items() if k in allowed_params}
+
         while True:
             buf = file.read(frameSize)
             # 文件结束
@@ -144,17 +152,14 @@ class XFSparkSpeechToText(MaxKBBaseModel, BaseSpeechToText):
                 d = {
                     "common": {"app_id": self.spark_app_id},
                     "business": {
-                        "domain": "iat",
-                        "language": "zh_cn",
-                        "accent": "mandarin",
-                        "vinfo": 1,
-                        "vad_eos": 10000
+                        **business_params
                     },
                     "data": {
                         "status": 0, "format": "audio/L16;rate=16000",
                         "audio": str(base64.b64encode(buf), 'utf-8'),
                         "encoding": "lame"}
                 }
+                print(d)
                 d = json.dumps(d)
                 await ws.send(d)
                 status = STATUS_CONTINUE_FRAME

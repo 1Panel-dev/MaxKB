@@ -66,6 +66,7 @@
                   size="large"
                   class="input-item"
                   v-model="loginForm.username"
+                  @blur="handleUsernameBlur(loginForm.username)"
                   :placeholder="$t('views.login.loginForm.username.placeholder')"
                 >
                 </el-input>
@@ -84,7 +85,7 @@
                 </el-input>
               </el-form-item>
             </div>
-            <div class="mb-24" v-if="loginMode !== 'LDAP'">
+            <div class="mb-24" v-if="loginMode !== 'LDAP'&& identifyCode">
               <el-form-item prop="captcha">
                 <div class="flex-between w-full">
                   <el-input
@@ -100,7 +101,7 @@
                     alt=""
                     height="38"
                     class="ml-8 cursor border border-r-6"
-                    @click="makeCode"
+                    @click="makeCode(loginForm.username)"
                   />
                 </div>
               </el-form-item>
@@ -179,6 +180,7 @@ import QrCodeTab from '@/views/chat/user-login/scanCompinents/QrCodeTab.vue'
 import {MsgConfirm, MsgError} from '@/utils/message.ts'
 import PasswordAuth from '@/views/chat/auth/component/password.vue'
 import {isAppIcon} from '@/utils/common'
+import forge from "node-forge";
 
 useResize()
 const router = useRouter()
@@ -212,6 +214,7 @@ const loginForm = ref<LoginRequest>({
   captcha: '',
 })
 
+const max_attempts = ref<number>(1)  // 声明为 ref
 const rules = ref<FormRules<LoginRequest>>({
   username: [
     {
@@ -229,7 +232,7 @@ const rules = ref<FormRules<LoginRequest>>({
   ],
   captcha: [
     {
-      required: true,
+      required: false,
       message: t('views.login.loginForm.captcha.requiredMessage'),
       trigger: 'blur',
     },
@@ -247,26 +250,33 @@ const loginHandle = () => {
         })
       })
     } else {
-      chatUser.login(loginForm.value).then((ok) => {
+      const publicKey = forge.pki.publicKeyFromPem(chatUser?.chat_profile?.rasKey as any);
+      const encrypted = publicKey.encrypt(JSON.stringify(loginForm.value), 'RSAES-PKCS1-V1_5');
+      const encryptedBase64 = forge.util.encode64(encrypted);
+      chatUser.login({
+        encryptedData: encryptedBase64,
+        username: loginForm.value.username
+      }).then((ok) => {
         router.push({
           name: 'chat',
           params: {accessToken: chatUser.accessToken},
           query: route.query,
         })
+      }).catch(() => {
+        makeCode(loginForm.value.username)
       })
     }
   })
 }
 
-function makeCode() {
-  loginApi.getCaptcha().then((res: any) => {
+function makeCode(username?: string) {
+  loginApi.getCaptcha(username, accessToken).then((res: any) => {
     identifyCode.value = res.data.captcha
   })
 }
 
 onBeforeMount(() => {
   locale.value = chatUser.getLanguage()
-  makeCode()
 })
 
 const modeList = ref<string[]>([])
@@ -290,7 +300,7 @@ function uuidv4() {
 }
 
 function redirectAuth(authType: string, needMessage: boolean = false) {
-  if (authType === 'LDAP' || authType === '') {
+  if (authType === 'LDAP' || authType === '' || authType === 'password') {
     return
   }
   loginApi.getAuthSetting(authType, loading).then((res: any) => {
@@ -365,7 +375,14 @@ function changeMode(val: string) {
   loginFormRef.value?.clearValidate()
 }
 
+function handleUsernameBlur(username: string) {
+  makeCode(username)
+}
+
 onBeforeMount(() => {
+  if (chatUser.chat_profile?.max_attempts) {
+    max_attempts.value = chatUser.chat_profile.max_attempts
+  }
   if (chatUser.chat_profile?.login_value) {
     modeList.value = chatUser.chat_profile.login_value
     if (modeList.value.includes('LOCAL')) {

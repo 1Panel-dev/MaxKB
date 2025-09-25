@@ -4,10 +4,20 @@ import traceback
 from typing import Dict, Any
 
 from django.utils.translation import gettext as _
+
+from common import forms
 from common.exception.app_exception import AppApiException
-from common.forms import BaseForm, PasswordInputField
+from common.forms import BaseForm, PasswordInputField, TooltipLabel
 from models_provider.base_model_provider import BaseModelCredential, ValidCode
 
+
+class AliyunBaiLianSTTModelParams(BaseForm):
+    sample_rate = forms.SliderField(
+        TooltipLabel(_('Sample Rate'), _('If not passed, the default value is 16000')),
+        required=True,
+        default_value=16000,
+        _step=4000, _min=0, _max=20000,precision=0
+    )
 
 class AliyunBaiLianSTTModelCredential(BaseForm, BaseModelCredential):
     """
@@ -55,7 +65,7 @@ class AliyunBaiLianSTTModelCredential(BaseForm, BaseModelCredential):
                 return False
 
         try:
-            model = provider.get_model(model_type, model_name, model_credential)
+            model = provider.get_model(model_type, model_name, model_credential,**model_params)
             model.check_auth()
         except Exception as e:
             traceback.print_exc()
@@ -89,4 +99,4 @@ class AliyunBaiLianSTTModelCredential(BaseForm, BaseModelCredential):
         :param model_name: Name of the model.
         :return: Parameter setting form (not implemented).
         """
-        pass
+        return AliyunBaiLianSTTModelParams()

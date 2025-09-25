@@ -8701,3 +8701,30 @@ msgstr ""
 
 msgid "Resolution"
 msgstr ""
+
+msgid "Ratio"
+msgstr ""
+
+msgid "Duration"
+msgstr ""
+
+msgid "Failed to generate video"
+msgstr ""
+
+msgid "password"
+msgstr "Password login"
+
+msgid "Failed to obtain the image"
+msgstr ""
+
+msgid "Update auth setting"
+msgstr ""
+
+msgid "If not passed, the default value is streaming_asr_demo"
+msgstr ""
+
+msgid "If not passed, the default value is 16000"
+msgstr ""
+
+msgid "Sample Rate"
+msgstr ""

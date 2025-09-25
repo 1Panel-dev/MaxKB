@@ -7,7 +7,9 @@ export const modelTypeList = [
   { text: t(modelType['STT']), value: 'STT' },
   { text: t(modelType['TTS']), value: 'TTS' },
   { text: t(modelType['IMAGE']), value: 'IMAGE' },
-  { text: t(modelType['TTI']), value: 'TTI' }
+  { text: t(modelType['TTI']), value: 'TTI' },
+  { text: t(modelType['ITV']), value: 'ITV' },
+  { text: t(modelType['TTV']), value: 'TTV' },
 ]
 
 

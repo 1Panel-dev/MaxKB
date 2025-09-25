@@ -29,7 +29,7 @@ const showThink = ref<boolean>(true)
   }
   .reasoning-md {
     padding-left: 8px;
-    --md-color: var(--app-text-color-secondary) !important;
+    --md-color: var(--app-input-color-placeholder) !important;
   }
 }
 </style>

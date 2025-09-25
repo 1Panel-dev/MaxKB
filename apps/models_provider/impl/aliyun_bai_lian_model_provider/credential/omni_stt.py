@@ -8,12 +8,12 @@ from common.forms import BaseForm, PasswordInputField, TooltipLabel
 from models_provider.base_model_provider import BaseModelCredential, ValidCode
 from django.utils.translation import gettext as _
 
-# class AliyunBaiLianOmiSTTModelParams(BaseForm):
-#     CueWord = forms.TextInputField(
-#         TooltipLabel(_('CueWord'), _('If not passed, the default value is What is this audio saying? Only answer the audio content')),
-#         required=True,
-#         default_value='这段音频在说什么，只回答音频的内容',
-#     )
+class AliyunBaiLianOmiSTTModelParams(BaseForm):
+    CueWord = forms.TextInputField(
+        TooltipLabel(_('CueWord'), _('If not passed, the default value is What is this audio saying? Only answer the audio content')),
+        required=True,
+        default_value='这段音频在说什么，只回答音频的内容',
+    )
 
 
 class AliyunBaiLianOmiSTTModelCredential(BaseForm, BaseModelCredential):
@@ -70,4 +70,4 @@ class AliyunBaiLianOmiSTTModelCredential(BaseForm, BaseModelCredential):
 
     def get_model_params_setting_form(self, model_name):
 
-        pass
+        return AliyunBaiLianOmiSTTModelParams()

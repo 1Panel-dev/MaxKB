@@ -304,6 +304,9 @@
 .el-select__caret {
   color: var(--app-text-color-secondary);
 }
+.el-select__wrapper.is-disabled .el-select__caret {
+  color: var(--app-text-color-disable);
+}
 
 // el-textarea
 .el-textarea {
@@ -313,6 +316,9 @@
 // el-input
 .el-input {
   --el-input-text-color: var(--el-text-color-primary);
+}
+.el-input .el-input__password {
+  color: var(--app-text-color-secondary) !important;
 }
 
 .el-input-group__prepend div.el-select .el-select__wrapper {

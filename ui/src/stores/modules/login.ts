@@ -16,7 +16,7 @@ const useLoginStore = defineStore('login', {
       return localStorage.getItem('token')
     },
 
-    async asyncLogin(data: LoginRequest, loading?: Ref<boolean>) {
+    async asyncLogin(data: any, loading?: Ref<boolean>) {
       return LoginApi.login(data).then((ok) => {
         this.token = ok?.data?.token
         localStorage.setItem('token', ok?.data?.token)

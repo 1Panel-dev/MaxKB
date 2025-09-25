@@ -24,7 +24,8 @@
             <div class="flex-between w-full">
               <div>
                 <span
-                  >{{ $t('views.applicationWorkflow.nodes.imageToVideoGenerate.model.label')
+                >{{
+                    $t('views.applicationWorkflow.nodes.imageToVideoGenerate.model.label')
                   }}<span class="color-danger">*</span></span
                 >
               </div>
@@ -45,12 +46,13 @@
             @wheel="wheel"
             :teleported="false"
             v-model="form_data.model_id"
+            @focus="getSelectModel"
             :placeholder="
               $t('views.applicationWorkflow.nodes.imageToVideoGenerate.model.requiredMessage')
             "
             :options="modelOptions"
             showFooter
-            :model-type="'TTI'"
+            :model-type="'ITV'"
           ></ModelSelect>
         </el-form-item>
 
@@ -59,7 +61,7 @@
           prop="prompt"
           :rules="{
             required: true,
-            message: $t('views.application.form.prompt.requiredMessage'),
+            message: $t('common.prompt.placeholder'),
             trigger: 'blur',
           }"
         >
@@ -67,13 +69,14 @@
             <div class="flex align-center">
               <div class="mr-4">
                 <span
-                  >{{ $t('views.applicationWorkflow.nodes.imageToVideoGenerate.prompt.label')
+                >{{
+                    $t('views.applicationWorkflow.nodes.imageToVideoGenerate.prompt.label')
                   }}<span class="color-danger">*</span></span
                 >
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content
-                  >{{ $t('views.applicationWorkflow.nodes.imageToVideoGenerate.prompt.tooltip') }}
+                >{{ $t('views.applicationWorkflow.nodes.imageToVideoGenerate.prompt.tooltip') }}
                 </template>
                 <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
               </el-tooltip>
@@ -92,7 +95,7 @@
           prop="prompt"
           :rules="{
             required: false,
-            message: $t('views.application.form.prompt.requiredMessage'),
+            message: $t('common.prompt.placeholder'),
             trigger: 'blur',
           }"
         >
@@ -100,12 +103,12 @@
             <div class="flex align-center">
               <div class="mr-4">
                 <span>{{
-                  $t('views.applicationWorkflow.nodes.imageToVideoGenerate.negative_prompt.label')
-                }}</span>
+                    $t('views.applicationWorkflow.nodes.imageToVideoGenerate.negative_prompt.label')
+                  }}</span>
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content
-                  >{{
+                >{{
                     $t('views.applicationWorkflow.nodes.imageToVideoGenerate.negative_prompt.tooltip')
                   }}
                 </template>
@@ -136,7 +139,8 @@
           }"
         >
           <template #label
-            >{{ $t('views.applicationWorkflow.nodes.imageToVideoGenerate.first_frame.label')
+          >{{
+              $t('views.applicationWorkflow.nodes.imageToVideoGenerate.first_frame.label')
             }}<span class="color-danger">*</span></template
           >
           <NodeCascader
@@ -161,8 +165,10 @@
           }"
         >
           <template #label
-            >{{ $t('views.applicationWorkflow.nodes.imageToVideoGenerate.last_frame.label')
-            }}</template
+          >{{
+              $t('views.applicationWorkflow.nodes.imageToVideoGenerate.last_frame.label')
+            }}
+          </template
           >
           <NodeCascader
             ref="nodeCascaderRef"
@@ -171,6 +177,7 @@
             :placeholder="
               $t('views.applicationWorkflow.nodes.imageToVideoGenerate.last_frame.requiredMessage')
             "
+            clearable
             v-model="form_data.last_frame_url"
           />
         </el-form-item>
@@ -182,8 +189,8 @@
             <div class="flex align-center">
               <div class="mr-4">
                 <span>{{
-                  $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')
-                }}</span>
+                    $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')
+                  }}</span>
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content>
@@ -193,29 +200,30 @@
               </el-tooltip>
             </div>
           </template>
-          <el-switch size="small" v-model="form_data.is_result" />
+          <el-switch size="small" v-model="form_data.is_result"/>
         </el-form-item>
       </el-form>
     </el-card>
-    <AIModeParamSettingDialog ref="AIModeParamSettingDialogRef" @refresh="refreshParam" />
+    <AIModeParamSettingDialog ref="AIModeParamSettingDialogRef" @refresh="refreshParam"/>
   </NodeContainer>
 </template>
 
 <script setup lang="ts">
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
-import { computed, nextTick, onMounted, ref, inject } from 'vue'
-import { groupBy, set } from 'lodash'
-import type { FormInstance } from 'element-plus'
+import {computed, nextTick, onMounted, ref, inject} from 'vue'
+import {groupBy, set} from 'lodash'
+import type {FormInstance} from 'element-plus'
 import AIModeParamSettingDialog from '@/views/application/component/AIModeParamSettingDialog.vue'
-import { t } from '@/locales'
-import { useRoute } from 'vue-router'
-import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import {t} from '@/locales'
+import {useRoute} from 'vue-router'
+import {loadSharedApi} from '@/utils/dynamics-api/shared-api'
 import NodeCascader from "@/workflow/common/NodeCascader.vue";
+
 const getApplicationDetail = inject('getApplicationDetail') as any
 const route = useRoute()
 
 const {
-  params: { id },
+  params: {id},
 } = route as any
 
 const apiType = computed(() => {
@@ -233,7 +241,7 @@ const AIModeParamSettingDialogRef = ref<InstanceType<typeof AIModeParamSettingDi
 const aiChatNodeFormRef = ref<FormInstance>()
 const validate = () => {
   return aiChatNodeFormRef.value?.validate().catch((err) => {
-    return Promise.reject({ node: props.nodeModel, errMessage: err })
+    return Promise.reject({node: props.nodeModel, errMessage: err})
   })
 }
 
@@ -278,17 +286,18 @@ const form_data = computed({
 })
 
 const application = getApplicationDetail()
+
 function getSelectModel() {
   const obj =
     apiType.value === 'systemManage'
       ? {
-          model_type: 'ITV',
-          workspace_id: application.value?.workspace_id,
-        }
+        model_type: 'ITV',
+        workspace_id: application.value?.workspace_id,
+      }
       : {
-          model_type: 'ITV',
-        }
-  loadSharedApi({ type: 'model', systemType: apiType.value })
+        model_type: 'ITV',
+      }
+  loadSharedApi({type: 'model', systemType: apiType.value})
     .getSelectModelList(obj)
     .then((res: any) => {
       modelOptions.value = groupBy(res?.data, 'provider')

@@ -18,11 +18,13 @@ class SiliconCloudSpeechToText(MaxKBBaseModel, BaseSpeechToText):
     api_base: str
     api_key: str
     model: str
+    params: dict
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.api_key = kwargs.get('api_key')
         self.api_base = kwargs.get('api_base')
+        self.params = kwargs.get('params')
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
@@ -35,6 +37,7 @@ class SiliconCloudSpeechToText(MaxKBBaseModel, BaseSpeechToText):
             model=model_name,
             api_base=model_credential.get('api_base'),
             api_key=model_credential.get('api_key'),
+            params=model_kwargs,
             **optional_params,
         )
 
@@ -58,5 +61,13 @@ class SiliconCloudSpeechToText(MaxKBBaseModel, BaseSpeechToText):
         audio_data = audio_file.read()
         buffer = io.BytesIO(audio_data)
         buffer.name = "file.mp3"  # this is the important line
-        res = client.audio.transcriptions.create(model=self.model, language="zh", file=buffer)
+
+        filter_params = {k: v for k, v in self.params.items() if k not in {'model_id', 'use_local', 'streaming'}}
+        transcription_params = {
+            'model': self.model,
+            'file': buffer,
+            'language': 'zh'
+        }
+
+        res = client.audio.transcriptions.create(**transcription_params,extra_body=filter_params)
         return res.text

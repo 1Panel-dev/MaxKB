@@ -13,7 +13,7 @@
             @drag.prevent
             @dragover.prevent
             @dragend.prevent
-            style="width: 70%"
+            style="width: 69%"
           >
             <component
               :is="iconComponent(`${nodeModel.type}-icon`)"
@@ -284,6 +284,14 @@ const deleteNode = () => {
     confirmButtonText: t('common.confirm'),
     confirmButtonClass: 'danger',
   }).then(() => {
+    if (props.nodeModel.type === WorkflowType.LoopNode) {
+      const next = props.nodeModel.graphModel.getNodeOutgoingNode(props.nodeModel.id)
+      next.forEach((n: any) => {
+        if (n.type === 'loop-body-node') {
+          props.nodeModel.graphModel.deleteNode(n.id)
+        }
+      })
+    }
     props.nodeModel.graphModel.deleteNode(props.nodeModel.id)
   })
   props.nodeModel.graphModel.eventCenter.emit('delete_node')
@@ -334,7 +342,9 @@ const nodeFields = computed(() => {
 })
 
 function showOperate(type: string) {
-  return type !== WorkflowType.Base && type !== WorkflowType.Start
+  return ![WorkflowType.Start, WorkflowType.Base, WorkflowType.LoopStartNode.toString()].includes(
+    type,
+  )
 }
 const openNodeMenu = (anchorValue: any) => {
   showAnchor.value = true

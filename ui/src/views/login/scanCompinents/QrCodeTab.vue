@@ -14,9 +14,11 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, defineAsyncComponent } from 'vue'
+import {onMounted, ref, defineAsyncComponent} from 'vue'
 import useStore from '@/stores'
-const { login } = useStore()
+
+const {login} = useStore()
+
 interface Tab {
   key: string
   value: string
@@ -36,11 +38,11 @@ interface Config {
   agentId?: string
 }
 
-const props = defineProps<{ tabs: Tab[] }>()
+const props = defineProps<{ tabs: Tab[], defaultTab?: string }>()
 const activeKey = ref('')
 const allConfigs = ref<PlatformConfig[]>([])
-const config = ref<Config>({ app_key: '', app_secret: '' })
-// const logoUrl = ref('')
+const config = ref<Config>({app_key: '', app_secret: ''})
+
 
 async function getPlatformInfo() {
   try {
@@ -56,6 +58,10 @@ onMounted(async () => {
   }
   allConfigs.value = await getPlatformInfo()
   updateConfig(activeKey.value)
+  console.log(props.defaultTab)
+  if (props.defaultTab) {
+    selectTab(props.defaultTab)
+  }
 })
 
 const updateConfig = (key: string) => {

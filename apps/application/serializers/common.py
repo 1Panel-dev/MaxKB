@@ -154,7 +154,7 @@ class ChatInfo:
             'search_mode': self.application.knowledge_setting.get('search_mode') or 'embedding',
             'no_references_setting': self.get_no_references_setting(self.application.knowledge_setting, model_setting),
             'workspace_id': self.application.workspace_id,
-            'application_id': self.application.id,
+            'application_id': self.application_id,
             'mcp_enable': self.application.mcp_enable,
             'mcp_tool_ids': self.application.mcp_tool_ids,
             'mcp_servers': self.application.mcp_servers,

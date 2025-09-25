@@ -23,8 +23,8 @@
           step-strictly
         />
         <span class="ml-4">{{
-          $t('views.applicationOverview.appInfo.LimitDialog.timesDays')
-        }}</span>
+            $t('views.applicationOverview.appInfo.LimitDialog.timesDays')
+          }}</span>
       </el-form-item>
       <!--     身份验证 -->
       <el-form-item
@@ -74,7 +74,7 @@
                     style="margin: 0 4px 0 0 !important"
                   >
                     <el-icon>
-                      <RefreshRight />
+                      <RefreshRight/>
                     </el-icon>
                   </el-button>
                 </el-tooltip>
@@ -111,9 +111,39 @@
           >
             <el-checkbox-group v-model="form.authentication_value.login_value">
               <template v-for="t in auth_list" :key="t.value">
-                <el-checkbox :label="t.label" :value="t.value" />
+                <el-checkbox :label="t.label" :value="t.value"/>
               </template>
             </el-checkbox-group>
+          </el-form-item>
+          <el-form-item
+            v-if="form.authentication_value.type === 'login' && form.authentication_value?.login_value?.includes('LOCAL')"
+            :label="$t('views.system.display_code')"
+            :rules="[
+              {
+                required: true,
+                message: $t('views.applicationOverview.appInfo.LimitDialog.displayCodeRequired'),
+                trigger: 'change',
+              },
+            ]"
+            prop="authentication_value.max_attempts"
+          >
+             <span style="font-size: 13px;">
+      {{ $t('views.system.loginFailed') }}
+    </span>
+            <el-input-number
+              style="margin-left: 8px;"
+              v-model="form.authentication_value.max_attempts"
+              :min="-1"
+              :max="10"
+              :step="1"
+              controls-position="right"
+            />
+            <span style="margin-left: 8px; font-size: 13px;">
+      {{ $t('views.system.loginFailedMessage') }}
+    </span>
+            <span style="margin-left: 8px; color: #909399; font-size: 12px;">
+      ({{ $t('views.system.display_codeTip') }})
+    </span>
           </el-form-item>
         </el-card>
       </el-radio-group>
@@ -144,18 +174,18 @@
   </el-drawer>
 </template>
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import type { FormInstance, FormRules } from 'element-plus'
-import { MsgSuccess } from '@/utils/message'
-import { t } from '@/locales'
-import { copyClick } from '@/utils/clipboard'
-import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import {ref, watch, computed} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
+import type {FormInstance, FormRules} from 'element-plus'
+import {MsgSuccess} from '@/utils/message'
+import {t} from '@/locales'
+import {copyClick} from '@/utils/clipboard'
+import {loadSharedApi} from '@/utils/dynamics-api/shared-api'
 
 const router = useRouter()
 const route = useRoute()
 const {
-  params: { id },
+  params: {id},
 } = route
 
 const apiType = computed(() => {
@@ -174,6 +204,7 @@ const form = ref<any>({
   white_list: '',
   authentication_value: {
     type: 'password',
+    max_attempts: 1,
   },
   authentication: false,
 })
@@ -205,7 +236,7 @@ const open = (data: any) => {
   }
   form.value.authentication = data.authentication
   dialogVisible.value = true
-  loadSharedApi({ type: 'application', systemType: apiType.value })
+  loadSharedApi({type: 'application', systemType: apiType.value})
     .getChatUserAuthType()
     .then((ok: any) => {
       auth_list.value = ok.data
@@ -223,7 +254,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         authentication: form.value.authentication,
         authentication_value: form.value.authentication_value,
       }
-      loadSharedApi({ type: 'application', systemType: apiType.value })
+      loadSharedApi({type: 'application', systemType: apiType.value})
         .putAccessToken(id as string, obj, loading)
         .then(() => {
           emit('refresh')
@@ -253,10 +284,13 @@ function firstGeneration() {
       type: 'password',
       password_value: generateAuthenticationValue(),
     }
+    if (!form.value.authentication_value.max_attempts) {
+      form.value.authentication_value.max_attempts = 1
+    }
   }
 }
 
-defineExpose({ open })
+defineExpose({open})
 </script>
 <style lang="scss" scoped>
 .authentication-append-input {

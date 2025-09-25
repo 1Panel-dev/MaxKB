@@ -192,6 +192,7 @@ class VolcanicEngineSpeechToText(MaxKBBaseModel, BaseSpeechToText):
     volcanic_cluster: str
     volcanic_api_url: str
     volcanic_token: str
+    params: dict
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -199,6 +200,7 @@ class VolcanicEngineSpeechToText(MaxKBBaseModel, BaseSpeechToText):
         self.volcanic_token = kwargs.get('volcanic_token')
         self.volcanic_app_id = kwargs.get('volcanic_app_id')
         self.volcanic_cluster = kwargs.get('volcanic_cluster')
+        self.params = kwargs.get('params')
 
     @staticmethod
     def is_cache_model():
@@ -216,10 +218,14 @@ class VolcanicEngineSpeechToText(MaxKBBaseModel, BaseSpeechToText):
             volcanic_token=model_credential.get('volcanic_token'),
             volcanic_app_id=model_credential.get('volcanic_app_id'),
             volcanic_cluster=model_credential.get('volcanic_cluster'),
+            params=model_kwargs,
+            **model_kwargs,
             **optional_params
         )
 
     def construct_request(self, reqid):
+
+        params = self.params or {}
         req = {
             'app': {
                 'appid': self.volcanic_app_id,
@@ -227,24 +233,24 @@ class VolcanicEngineSpeechToText(MaxKBBaseModel, BaseSpeechToText):
                 'token': self.volcanic_token,
             },
             'user': {
-                'uid': 'uid'
+                'uid': params.get("uid", "streaming_asr_demo")
             },
             'request': {
                 'reqid': reqid,
-                'nbest': self.nbest,
-                'workflow': self.workflow,
-                'show_language': self.show_language,
-                'show_utterances': self.show_utterances,
-                'result_type': self.result_type,
-                "sequence": 1
+                'nbest': params.get('nbest', self.nbest),
+                'workflow': params.get('workflow', self.workflow),
+                'show_language': params.get('show_language', self.show_language),
+                'show_utterances': params.get('show_utterances', self.show_utterances),
+                'result_type': params.get('result_type', self.result_type),
+                'sequence': params.get('sequence', 1)
             },
             'audio': {
-                'format': self.format,
-                'rate': self.rate,
-                'language': self.language,
-                'bits': self.bits,
-                'channel': self.channel,
-                'codec': self.codec
+                'format': params.get('format', self.format),
+                'rate': params.get('rate', self.rate),
+                'language': params.get('language', self.language),
+                'bits': params.get('bits', self.bits),
+                'channel': params.get('channel', self.channel),
+                'codec': params.get('codec', self.codec)
             }
         }
         return req

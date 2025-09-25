@@ -122,9 +122,9 @@ SPECTACULAR_SETTINGS = {
     'VERSION': 'v2',
     'SERVE_INCLUDE_SCHEMA': False,
     # OTHER SETTINGS
-    'SWAGGER_UI_DIST': '/doc/swagger-ui-dist',  # shorthand to use the sidecar instead
-    'SWAGGER_UI_FAVICON_HREF': '/doc/swagger-ui-dist/favicon-32x32.png',
-    'REDOC_DIST': '/doc/redoc',
+    'SWAGGER_UI_DIST': f'{CONFIG.get_admin_path()}/api-doc/swagger-ui-dist',  # shorthand to use the sidecar instead
+    'SWAGGER_UI_FAVICON_HREF': f'{CONFIG.get_admin_path()}/api-doc/swagger-ui-dist/favicon-32x32.png',
+    'REDOC_DIST': f'{CONFIG.get_admin_path()}/api-doc/redoc',
     'SECURITY_DEFINITIONS': {
         'Bearer': {
             'type': 'apiKey',

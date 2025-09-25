@@ -69,6 +69,8 @@
                       <p>{{ $t('views.model.modelForm.model_type.tooltip5') }}</p>
                       <p>{{ $t('views.model.modelForm.model_type.tooltip6') }}</p>
                       <p>{{ $t('views.model.modelForm.model_type.tooltip7') }}</p>
+                      <p>{{ $t('views.model.modelForm.model_type.tooltip8') }}</p>
+                      <p>{{ $t('views.model.modelForm.model_type.tooltip9') }}</p>
                     </template>
                     <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
                   </el-tooltip>
@@ -139,8 +141,7 @@
         <el-empty
           v-else-if="
             base_form_data.model_type === 'RERANKER' ||
-            base_form_data.model_type === 'EMBEDDING' ||
-            base_form_data.model_type === 'STT'
+            base_form_data.model_type === 'EMBEDDING'
           "
           :description="$t('views.model.tip.emptyMessage2')"
         />
@@ -149,14 +150,9 @@
           <el-button
             type="text"
             @click.stop="openAddDrawer()"
-            :disabled="
-              base_form_data.model_type !== 'TTS' &&
-              base_form_data.model_type !== 'LLM' &&
-              base_form_data.model_type !== 'IMAGE' &&
-              base_form_data.model_type !== 'TTI'
-            "
+            :disabled="!['TTS', 'LLM', 'IMAGE', 'TTI', 'TTV', 'ITV','STT'].includes(base_form_data.model_type)"
           >
-            <AppIcon iconName="Plus" class="add-icon" />{{ $t('common.add') }}
+            <AppIcon iconName="app-add-outlined" class="mr-4"/> {{ $t('common.add') }}
           </el-button>
         </div>
         <el-table

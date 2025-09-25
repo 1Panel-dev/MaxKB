@@ -10,9 +10,13 @@ const end_nodes: Array<string> = [
   WorkflowType.Application,
   WorkflowType.SpeechToTextNode,
   WorkflowType.TextToSpeechNode,
-    WorkflowType.ImageGenerateNode,
+  WorkflowType.ImageGenerateNode,
   WorkflowType.ImageToVideoGenerateNode,
   WorkflowType.TextToVideoGenerateNode,
+  WorkflowType.ImageGenerateNode,
+  WorkflowType.LoopBodyNode,
+  WorkflowType.LoopNode,
+  WorkflowType.LoopBreakNode,
 ]
 export class WorkFlowInstance {
   nodes
@@ -27,7 +31,9 @@ export class WorkFlowInstance {
    * 校验开始节点
    */
   private is_valid_start_node() {
-    const start_node_list = this.nodes.filter((item) => item.id === WorkflowType.Start)
+    const start_node_list = this.nodes.filter((item) =>
+      [WorkflowType.Start, WorkflowType.LoopStartNode].includes(item.id),
+    )
     if (start_node_list.length == 0) {
       throw t('views.applicationWorkflow.validate.startNodeRequired')
     } else if (start_node_list.length > 1) {
@@ -55,12 +61,20 @@ export class WorkFlowInstance {
     this.is_valid_nodes()
   }
 
+  is_loop_valid() {
+    this.is_valid_start_node()
+    this.is_valid_work_flow()
+    this.is_valid_nodes()
+  }
+
   /**
    * 获取开始节点
    * @returns
    */
   get_start_node() {
-    const start_node_list = this.nodes.filter((item) => item.id === WorkflowType.Start)
+    const start_node_list = this.nodes.filter((item) =>
+      [WorkflowType.Start, WorkflowType.LoopStartNode].includes(item.id),
+    )
     return start_node_list[0]
   }
   /**
@@ -71,7 +85,9 @@ export class WorkFlowInstance {
     const base_node_list = this.nodes.filter((item) => item.id === WorkflowType.Base)
     return base_node_list[0]
   }
-
+  exist_break_node() {
+    return this.nodes.some((item) => item.type === WorkflowType.LoopBreakNode)
+  }
   /**
    * 校验工作流
    * @param up_node 上一个节点
@@ -115,7 +131,11 @@ export class WorkFlowInstance {
   }
   private is_valid_nodes() {
     for (const node of this.nodes) {
-      if (node.type !== WorkflowType.Base && node.type !== WorkflowType.Start) {
+      if (
+        node.type !== WorkflowType.Base &&
+        node.type !== WorkflowType.Start &&
+        node.type !== WorkflowType.LoopStartNode
+      ) {
         if (!this.edges.some((edge) => edge.targetNodeId === node.id)) {
           throw `${t('views.applicationWorkflow.validate.notInWorkFlowNode')}:${node.properties.stepName}`
         }

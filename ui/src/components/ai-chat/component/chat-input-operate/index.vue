@@ -888,7 +888,7 @@ onMounted(() => {
               .join('&')
           : route.path
 
-      history.pushState(null, '', '/ui' + newRoute)
+      history.pushState(null, '', '/chat' + newRoute)
     }, 100)
   }
   setTimeout(() => {

@@ -8,6 +8,7 @@
 import LogicFlow from '@logicflow/core'
 import { ref, onMounted, computed } from 'vue'
 import AppEdge from './common/edge'
+import loopEdge from './common/loopEdge'
 import Control from './common/NodeControl.vue'
 import { baseNodes } from '@/workflow/common/data'
 import '@logicflow/extension/lib/style/index.css'
@@ -33,22 +34,6 @@ type ShapeItem = {
 
 const props = defineProps({
   data: Object || null,
-})
-
-const defaultData = {
-  nodes: [...baseNodes],
-}
-const graphData = computed({
-  get: () => {
-    if (props.data) {
-      return props.data
-    } else {
-      return defaultData
-    }
-  },
-  set: (value) => {
-    return value
-  },
 })
 
 const lf = ref()
@@ -82,6 +67,7 @@ const renderGraphData = (data?: any) => {
       },
       isSilentMode: false,
       container: container,
+      saa: 'sssssss',
     })
     lf.value.setTheme({
       bezier: {
@@ -89,11 +75,17 @@ const renderGraphData = (data?: any) => {
         strokeWidth: 1,
       },
     })
+    lf.value.graphModel.get = 'sdasdaad'
     lf.value.on('graph:rendered', () => {
       flowId.value = lf.value.graphModel.flowId
     })
     initDefaultShortcut(lf.value, lf.value.graphModel)
-    lf.value.batchRegister([...Object.keys(nodes).map((key) => nodes[key].default), AppEdge])
+    lf.value.batchRegister([
+      ...Object.keys(nodes).map((key) => nodes[key].default),
+      AppEdge,
+      loopEdge,
+    ])
+
     lf.value.setDefaultEdgeType('app-edge')
 
     lf.value.render(data ? data : {})
@@ -117,7 +109,17 @@ const validate = () => {
   return Promise.all(lf.value.graphModel.nodes.map((element: any) => element?.validate?.()))
 }
 const getGraphData = () => {
-  return lf.value.getGraphData()
+  const graph_data = lf.value.getGraphData()
+  graph_data.nodes.forEach((node: any) => {
+    if (node.type === 'loop-body-node') {
+      const node_model = lf.value.getNodeModelById(node.id)
+      node_model.set_loop_body()
+    }
+  })
+  const _graph_data = lf.value.getGraphData()
+  _graph_data.nodes = _graph_data.nodes.filter((node: any) => node.type !== 'loop-body-node')
+  _graph_data.edges = graph_data.edges.filter((node: any) => node.type !== 'loop-edge')
+  return _graph_data
 }
 
 const onmousedown = (shapeItem: ShapeItem) => {

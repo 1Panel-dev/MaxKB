@@ -16,8 +16,8 @@
             @change="search_type_change"
           >
             <el-option :label="$t('common.creator')" value="create_user" />
-
             <el-option :label="$t('views.tool.form.toolName.label')" value="name" />
+            <el-option :label="$t('views.system.resource_management.type')" value="tool_type"/>
           </el-select>
           <el-input
             v-if="search_type === 'name'"
@@ -36,6 +36,16 @@
             style="width: 220px"
           >
             <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.nick_name" />
+          </el-select>
+          <el-select
+            v-else-if="search_type === 'tool_type'"
+            v-model="search_form.tool_type"
+            @change="getList"
+            clearable
+            filterable
+            style="width: 220px"
+          >
+            <el-option v-for="u in type_options" :value="u.value" :label="u.label"/>
           </el-select>
         </div>
       </div>
@@ -346,9 +356,27 @@ const search_type = ref('name')
 const search_form = ref<any>({
   name: '',
   create_user: '',
+  tool_type: '',
 })
 const user_options = ref<any[]>([])
-
+const type_options = ref<any[]>([
+  {
+    label: 'MCP',
+    value: 'MCP',
+  },
+  {
+    label: t('views.tool.toolStore.title'),
+    value: 'TOOL_STORE',
+  },
+  {
+    label: t('views.tool.toolStore.internal'),
+    value: 'INTERNAL',
+  },
+  {
+    label: t('common.custom'),
+    value: 'CUSTOM',
+  },
+])
 const loading = ref(false)
 const changeStateloading = ref(false)
 const toolList = ref<any[]>([])

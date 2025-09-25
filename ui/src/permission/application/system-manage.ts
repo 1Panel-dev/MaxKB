@@ -33,7 +33,7 @@ const systemManage = {
         hasPermission(
             [
               RoleConst.ADMIN,
-              PermissionConst.RESOURCE_APPLICATION_DEBUG
+              PermissionConst.RESOURCE_APPLICATION_EDIT
             ],
             'OR'
     ),

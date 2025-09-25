@@ -28,7 +28,7 @@ class SiliconCloudSTTModelCredential(BaseForm, BaseModelCredential):
                 else:
                     return False
         try:
-            model = provider.get_model(model_type, model_name, model_credential)
+            model = provider.get_model(model_type, model_name, model_credential,**model_params)
             model.check_auth()
         except Exception as e:
             traceback.print_exc()

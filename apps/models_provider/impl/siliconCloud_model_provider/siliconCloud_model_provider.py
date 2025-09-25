@@ -11,7 +11,6 @@ import os
 from common.utils.common import get_file_content
 from models_provider.base_model_provider import IModelProvider, ModelProvideInfo, ModelInfo, \
     ModelTypeConst, ModelInfoManage
-from models_provider.impl.openai_model_provider.openai_model_provider import openai_tts_model_credential
 from models_provider.impl.siliconCloud_model_provider.credential.embedding import \
     SiliconCloudEmbeddingCredential
 from models_provider.impl.siliconCloud_model_provider.credential.llm import SiliconCloudLLMModelCredential
@@ -19,6 +18,7 @@ from models_provider.impl.siliconCloud_model_provider.credential.reranker import
 from models_provider.impl.siliconCloud_model_provider.credential.stt import SiliconCloudSTTModelCredential
 from models_provider.impl.siliconCloud_model_provider.credential.tti import \
     SiliconCloudTextToImageModelCredential
+from models_provider.impl.siliconCloud_model_provider.credential.tts import SiliconCloudTTSModelCredential
 from models_provider.impl.siliconCloud_model_provider.model.embedding import SiliconCloudEmbeddingModel
 from models_provider.impl.siliconCloud_model_provider.model.llm import SiliconCloudChatModel
 from models_provider.impl.siliconCloud_model_provider.model.reranker import SiliconCloudReranker
@@ -32,6 +32,7 @@ openai_llm_model_credential = SiliconCloudLLMModelCredential()
 openai_stt_model_credential = SiliconCloudSTTModelCredential()
 openai_reranker_model_credential = SiliconCloudRerankerCredential()
 openai_tti_model_credential = SiliconCloudTextToImageModelCredential()
+openai_tts_model_credential = SiliconCloudTTSModelCredential()
 model_info_list = [
     ModelInfo('deepseek-ai/DeepSeek-R1-Distill-Llama-8B', '', ModelTypeConst.LLM,
               openai_llm_model_credential, SiliconCloudChatModel

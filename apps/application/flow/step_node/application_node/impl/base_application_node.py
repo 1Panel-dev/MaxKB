@@ -55,7 +55,7 @@ def write_context_stream(node_variable: Dict, workflow_variable: Dict, node: INo
         # 先把流转成字符串
         response_content = chunk.decode('utf-8')[6:]
         response_content = json.loads(response_content)
-        content = response_content.get('content', '')
+        content = (response_content.get('content', '') or '')
         runtime_node_id = response_content.get('runtime_node_id', '')
         chat_record_id = response_content.get('chat_record_id', '')
         child_node = response_content.get('child_node')
@@ -63,7 +63,7 @@ def write_context_stream(node_variable: Dict, workflow_variable: Dict, node: INo
         node_type = response_content.get('node_type')
         real_node_id = response_content.get('real_node_id')
         node_is_end = response_content.get('node_is_end', False)
-        _reasoning_content = response_content.get('reasoning_content', '')
+        _reasoning_content = (response_content.get('reasoning_content', '') or '')
         if node_type == 'form-node':
             is_interrupt_exec = True
         answer += content

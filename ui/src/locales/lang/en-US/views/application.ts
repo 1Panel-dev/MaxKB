@@ -92,18 +92,21 @@ export default {
       placeholder: 'Please select an AI model',
     },
     roleSettings: {
-      label: 'System Role',
-      placeholder: 'You are xxx assistant',
+      label: 'System Prompt',
+      placeholder:
+        'System prompt, you can reference variables in the system: {data} is the segment hit in the knowledge base; {question} is the question asked by the user.',
+      tooltip: 'Set the role or instructions for the model to follow',
     },
 
     prompt: {
-      label: 'Prompt',
+      label: 'User Prompt',
       noReferences: '（No references Knowledge）',
       references: ' (References Knowledge)',
-      placeholder: 'Please enter prompt',
-      requiredMessage: 'Please enter prompt',
+      placeholder:
+        'User prompt, you can reference variables in the system: {data} is the segment hit in the knowledge base; {question} is the question asked by the user',
+      requiredMessage: 'Please enter User prompt',
       tooltip:
-        'By adjusting the content of the prompt, you can guide the direction of the large model chat.',
+        'The question or command that the user poses to the model',
 
       noReferencesTooltip:
         'By adjusting the content of the prompt, you can guide the direction of the large model chat. This prompt will be fixed at the beginning of the context. Variables used: {question} is the question posed by the user.',
@@ -161,6 +164,13 @@ export default {
     label: 'Generate',
     generatePrompt: 'Generate Prompt',
     placeholder: 'Please enter the prompt topic',
+    title: 'The prompt is displayed here',
+    remake: 'Regenerate',
+    stop: 'Stop Generating',
+    continue: 'Continue Generating',
+    replace: 'Replace',
+    exit: 'Are you sure you want to exit and discard the AI-generated content?',
+    loading: 'Generating...',
   },
   dialog: {
     addKnowledge: 'Add Related Knowledge',

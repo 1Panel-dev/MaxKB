@@ -85,9 +85,8 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
         # --- 异步提交任务 ---
         rsp = self._safe_call(VideoSynthesis.async_call, **params)
         if rsp.status_code != HTTPStatus.OK:
-            maxkb_logger.info('提交任务失败，status_code: %s, code: %s, message: %s' %
-                              (rsp.status_code, rsp.code, rsp.message))
-            return None
+            maxkb_logger.info(f'提交任务失败，status_code: {rsp.status_code}, code: {rsp.code}, message: {rsp.message}')
+            raise RuntimeError(f'提交任务失败，status_code: {rsp.status_code}, code: {rsp.code}, message: {rsp.message}')
 
         maxkb_logger.info("task_id:", rsp.output.task_id)
 
@@ -96,15 +95,21 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
         if status.status_code == HTTPStatus.OK:
             maxkb_logger.info("当前任务状态:", status.output.task_status)
         else:
-            maxkb_logger.error('获取任务状态失败，status_code: %s, code: %s, message: %s' %
-                               (status.status_code, status.code, status.message))
+            maxkb_logger.error(
+                f'获取任务状态失败，status_code: {status.status_code}, code: {status.code}, message: {status.message}')
+            raise RuntimeError(
+                f'获取任务状态失败，status_code: {status.status_code}, code: {status.code}, message: {status.message}')
 
         # --- 等待任务完成 ---
         rsp = self._safe_call(VideoSynthesis.wait, task=rsp, api_key=self.api_key)
         if rsp.status_code == HTTPStatus.OK:
             maxkb_logger.info("视频生成完成！视频 URL:", rsp.output.video_url)
-            return rsp.output.video_url
+            if rsp.output.task_status == "SUCCEEDED":
+                maxkb_logger.info("视频生成完成！视频 URL:", rsp.output.video_url)
+                return rsp.output.video_url
+            else:
+                maxkb_logger.error("视频生成失败！")
+                raise RuntimeError(f'生成失败, message: {rsp.output.message}')
         else:
-            maxkb_logger.error('生成失败，status_code: %s, code: %s, message: %s' %
-                               (rsp.status_code, rsp.code, rsp.message))
-            return None
+            maxkb_logger.error(f'生成失败，status_code: {rsp.status_code}, code: {rsp.code}, message: {rsp.message}')
+            raise RuntimeError(f'生成失败，status_code: {rsp.status_code}, code: {rsp.code}, message: {rsp.message}')

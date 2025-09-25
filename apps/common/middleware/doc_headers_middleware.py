@@ -115,7 +115,8 @@ content = """
 
 class DocHeadersMiddleware(MiddlewareMixin):
     def process_response(self, request, response):
-        if request.path.startswith('/doc/') or request.path.startswith('/doc_chat/'):
+        if request.path.startswith(CONFIG.get_admin_path() + '/api-doc/') or request.path.startswith(
+                CONFIG.get_chat_path() + '/api-doc/'):
             auth = request.COOKIES.get('Authorization')
             if auth is None:
                 return HttpResponse(content)

@@ -89,7 +89,6 @@ class BaseIntentNode(IIntentNode):
         try:
             r = chat_model.invoke(message_list)
             classification_result = r.content.strip()
-
             # 解析分类结果获取分支信息
             matched_branch = self.parse_classification_result(classification_result, branch)
 
@@ -101,7 +100,7 @@ class BaseIntentNode(IIntentNode):
                 'history_message': history_message,
                 'user_input': user_input,
                 'branch_id': matched_branch['id'],
-                'reason': json.loads(r.content).get('reason'),
+                'reason': self.parse_result_reason(r.content),
                 'category': matched_branch.get('content', matched_branch['id'])
             }, {}, _write_context=write_context)
 
@@ -191,7 +190,7 @@ class BaseIntentNode(IIntentNode):
 
         try:
             result_json = json.loads(result)
-            classification_id = result_json.get('classificationId', 0) # 0 兜底
+            classification_id = result_json.get('classificationId')
             # 如果是 0 ，返回其他分支
             matched_branch = get_branch_by_id(classification_id)
             if matched_branch:
@@ -210,6 +209,26 @@ class BaseIntentNode(IIntentNode):
         # 如果都解析失败，返回“other”
         return other_branch or (normal_intents[0] if normal_intents else {'id': 'unknown', 'content': 'unknown'})
 
+    def parse_result_reason(self, result: str):
+        """解析分类的原因"""
+        try:
+            result_json = json.loads(result)
+            return result_json.get('reason', '')
+        except Exception as e:
+            reason_patterns = [
+                r'"reason":\s*"([^"]*)"',  # 标准格式
+                r'"reason":\s*"([^"]*)',  # 缺少结束引号
+                r'"reason":\s*([^,}\n]*)',  # 没有引号包围的内容
+            ]
+            for pattern in reason_patterns:
+                match = re.search(pattern, result, re.DOTALL)
+                if match:
+                    reason = match.group(1).strip()
+                    # 清理可能的尾部字符
+                    reason = re.sub(r'["\s]*$', '', reason)
+                    return reason
+
+            return ''
 
     def find_other_branch(self, branch: List[Dict]) -> Dict[str, Any] | None:
         """查找其他分支"""

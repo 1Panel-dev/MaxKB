@@ -43,6 +43,7 @@
           <ModelSelect
             @change="model_change"
             @wheel="wheel"
+             @focus="getSelectModel"
             :teleported="false"
             v-model="form_data.model_id"
             :placeholder="
@@ -50,7 +51,7 @@
             "
             :options="modelOptions"
             showFooter
-            :model-type="'TTI'"
+            :model-type="'TTV'"
           ></ModelSelect>
         </el-form-item>
 
@@ -59,7 +60,7 @@
           prop="prompt"
           :rules="{
             required: true,
-            message: $t('views.application.form.prompt.requiredMessage'),
+            message: $t('common.prompt.placeholder'),
             trigger: 'blur',
           }"
         >
@@ -92,7 +93,7 @@
           prop="prompt"
           :rules="{
             required: false,
-            message: $t('views.application.form.prompt.requiredMessage'),
+            message: $t('common.prompt.placeholder'),
             trigger: 'blur',
           }"
         >

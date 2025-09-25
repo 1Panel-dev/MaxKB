@@ -13,11 +13,14 @@ from models_provider.impl.base_stt import BaseSpeechToText
 class AliyunBaiLianSpeechToText(MaxKBBaseModel, BaseSpeechToText):
     api_key: str
     model: str
+    params: dict
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.api_key = kwargs.get('api_key')
         self.model = kwargs.get('model')
+        self.params = kwargs.get('params')
+
 
     @staticmethod
     def is_cache_model():
@@ -33,6 +36,7 @@ class AliyunBaiLianSpeechToText(MaxKBBaseModel, BaseSpeechToText):
         return AliyunBaiLianSpeechToText(
             model=model_name,
             api_key=model_credential.get('api_key'),
+            params=model_kwargs,
             **optional_params,
         )
 
@@ -43,10 +47,17 @@ class AliyunBaiLianSpeechToText(MaxKBBaseModel, BaseSpeechToText):
 
     def speech_to_text(self, audio_file):
         dashscope.api_key = self.api_key
-        recognition = Recognition(model=self.model,
-                                  format='mp3',
-                                  sample_rate=16000,
-                                  callback=None)
+        recognition_params = {
+            'model': self.model,
+            'format': 'mp3',
+            'sample_rate': 16000,
+            'callback': None,
+            **self.params
+        }
+        print(recognition_params)
+        recognition = Recognition(**recognition_params)
+
+
         with tempfile.NamedTemporaryFile(delete=False) as temp_file:
             # 将上传的文件保存到临时文件中
             temp_file.write(audio_file.read())

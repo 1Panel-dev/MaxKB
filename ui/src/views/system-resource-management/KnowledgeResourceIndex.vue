@@ -16,8 +16,8 @@
             @change="search_type_change"
           >
             <el-option :label="$t('common.creator')" value="create_user" />
-
             <el-option :label="$t('common.name')" value="name" />
+            <el-option :label="$t('views.system.resource_management.type')" value="type"/>
           </el-select>
           <el-input
             v-if="search_type === 'name'"
@@ -36,6 +36,16 @@
             style="width: 220px"
           >
             <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.nick_name" />
+          </el-select>
+          <el-select
+            v-else-if="search_type === 'type'"
+            v-model="search_form.type"
+            @change="getList"
+            clearable
+            filterable
+            style="width: 220px"
+          >
+            <el-option v-for="u in type_options" :value="u.value" :label="u.label"/>
           </el-select>
         </div>
       </div>
@@ -312,9 +322,23 @@ const search_type = ref('name')
 const search_form = ref<any>({
   name: '',
   create_user: '',
+  type: '',
 })
 const user_options = ref<any[]>([])
-
+const type_options = ref<any[]>([
+  {
+    label: t('views.knowledge.knowledgeType.generalKnowledge'),
+    value: '0',
+  },
+  {
+    label: t('views.knowledge.knowledgeType.webKnowledge'),
+    value: '1',
+  },
+  {
+    label: t('views.knowledge.knowledgeType.larkKnowledge'),
+    value: '2',
+  },
+])
 const loading = ref(false)
 const knowledgeList = ref<any[]>([])
 const paginationConfig = reactive({

@@ -52,7 +52,7 @@ const systemManage = {
     hasPermission(
       [
         RoleConst.ADMIN,
-        PermissionConst.RESOURCE_TOOL_DEBUG,
+        PermissionConst.RESOURCE_TOOL_EDIT,
       ],
       'OR',
     ),

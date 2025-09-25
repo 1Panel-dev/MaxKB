@@ -65,21 +65,21 @@
             />
           </el-form-item>
           <el-form-item
-            :label="$t('views.system.authentication.oauth2.redirectUrl')"
-            prop="config.redirectUrl"
-          >
-            <el-input
-              v-model="form.config.redirectUrl"
-              :placeholder="$t('views.system.authentication.oauth2.redirectUrlPlaceholder')"
-            />
-          </el-form-item>
-          <el-form-item
             :label="$t('views.system.authentication.oauth2.filedMapping')"
             prop="config.fieldMapping"
           >
             <el-input
               v-model="form.config.fieldMapping"
               :placeholder="$t('views.system.authentication.oauth2.filedMappingPlaceholder')"
+            />
+          </el-form-item>
+          <el-form-item
+            :label="$t('views.system.authentication.oauth2.redirectUrl')"
+            prop="config.redirectUrl"
+          >
+            <el-input
+              v-model="form.config.redirectUrl"
+              :placeholder="$t('views.system.authentication.oauth2.redirectUrlPlaceholder')"
             />
           </el-form-item>
           <el-form-item>

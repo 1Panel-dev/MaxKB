@@ -11,5 +11,9 @@ interface LoginRequest {
    * 验证码
    */
   captcha: string
+  /**
+   * 加密数据
+   */
+  encryptedData?: string
 }
 export type { LoginRequest }

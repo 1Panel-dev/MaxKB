@@ -11,7 +11,7 @@ from common.utils.common import bytes_to_uploaded_file
 from knowledge.models import FileSourceType
 from oss.serializers.file import FileSerializer
 from models_provider.tools import get_model_instance_by_model_workspace_id
-
+from django.utils.translation import gettext
 
 class BaseTextToVideoNode(ITextToVideoNode):
     def save_context(self, details, workflow_manage):
@@ -35,12 +35,12 @@ class BaseTextToVideoNode(ITextToVideoNode):
         message_list = self.generate_message_list(question, history_message)
         self.context['message_list'] = message_list
         self.context['dialogue_type'] = dialogue_type
-        self.context['negative_prompt'] = negative_prompt
+        self.context['negative_prompt'] = self.generate_prompt_question(negative_prompt)
         video_urls = ttv_model.generate_video(question, negative_prompt)
         print('video_urls', video_urls)
         # 保存图片
         if video_urls is None:
-            return NodeResult({'answer': '生成视频失败'}, {})
+            return NodeResult({'answer': gettext('Failed to generate video')}, {})
         file_name = 'generated_video.mp4'
         if isinstance(video_urls, str) and video_urls.startswith('http'):
             video_urls = requests.get(video_urls).content
@@ -56,7 +56,6 @@ class BaseTextToVideoNode(ITextToVideoNode):
             'source_id': meta['application_id'],
             'source_type': FileSourceType.APPLICATION.value
         }).upload()
-        print('file_url', file_url)
         video_label = f'<video src="{file_url}" controls style="max-width: 100%; width: 100%; height: auto;"></video>'
         video_list = [{'file_id': file_url.split('/')[-1], 'file_name': file_name, 'url': file_url}]
         return NodeResult({'answer': video_label, 'chat_model': ttv_model, 'message_list': message_list,

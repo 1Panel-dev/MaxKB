@@ -48,19 +48,20 @@ class IntentModel extends AppNodeModel {
 
         if (branch_condition_list) {
 
-            const FORM_ITEMS_HEIGHT = 382  // 上方表单占用高度
+            const FORM_ITEMS_HEIGHT = 397  // 上方表单占用高度
             
             for (let index = 0; index < branch_condition_list.length; index++) {
                 const element = branch_condition_list[index]
-                const h = get_up_index_height(branch_condition_list, index)
+               
                 anchors.push({
                 x: x + width / 2 - 10,
                 y: showNode
-                        ? y - height / 2 + FORM_ITEMS_HEIGHT + h + element.height / 2
+                        ? y - height / 2 + FORM_ITEMS_HEIGHT  + index *41.3
                         : y - 15,
                 id: `${id}_${element.id}_right`,
                 type: 'right'
                 })
+                console.log(y - height / 2 + FORM_ITEMS_HEIGHT   + 100/ 2)
             }
         }
         return anchors

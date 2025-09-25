@@ -9,6 +9,25 @@ from common.exception.app_exception import AppApiException
 from common.forms import BaseForm, TooltipLabel
 from models_provider.base_model_provider import BaseModelCredential, ValidCode
 
+class SiliconCloudTTSModelGeneralParams(BaseForm):
+    # alloy, echo, fable, onyx, nova, shimmer
+    voice = forms.SingleSelect(
+        TooltipLabel('Voice',
+                     _('Try out the different sounds (Alloy, Echo, Fable, Onyx, Nova, and Sparkle) to find one that suits your desired tone and audience. The current voiceover is optimized for English.')),
+        required=True, default_value='fnlp/MOSS-TTSD-v0.5:alex',
+        text_field='label',
+        value_field='value',
+        option_list=[
+            {'label': 'alex', 'value': 'fnlp/MOSS-TTSD-v0.5:alex'},
+            {'label': 'anna', 'value': 'fnlp/MOSS-TTSD-v0.5:anna'},
+            {'label': 'bella', 'value': 'fnlp/MOSS-TTSD-v0.5:bella'},
+            {'label': 'charles', 'value': 'fnlp/MOSS-TTSD-v0.5:charles'},
+            {'label': 'benjamin', 'value': 'fnlp/MOSS-TTSD-v0.5:benjamin'},
+            {'label': 'claire', 'value': 'fnlp/MOSS-TTSD-v0.5:claire'},
+            {'label': 'david', 'value': 'fnlp/MOSS-TTSD-v0.5:david'},
+            {'label': 'diana', 'value': 'fnlp/MOSS-TTSD-v0.5:diana'},
+        ])
+
 
 class SiliconCloudTTSModelCredential(BaseForm, BaseModelCredential):
     api_base = forms.TextInputField('API URL', required=True)
@@ -46,3 +65,6 @@ class SiliconCloudTTSModelCredential(BaseForm, BaseModelCredential):
     def encryption_dict(self, model: Dict[str, object]):
         return {**model, 'api_key': super().encryption(model.get('api_key', ''))}
 
+
+    def get_model_params_setting_form(self, model_name):
+        return SiliconCloudTTSModelGeneralParams()

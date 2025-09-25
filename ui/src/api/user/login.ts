@@ -38,8 +38,8 @@ const logout: (loading?: Ref<boolean>) => Promise<Result<boolean>> = (loading) =
  * 获取验证码
  * @param loading 接口加载器
  */
-const getCaptcha: (loading?: Ref<boolean>) => Promise<Result<any>> = (loading) => {
-  return get('/user/captcha', undefined, loading)
+const getCaptcha: (username?: string, loading?: Ref<boolean>) => Promise<Result<any>> = (username, loading) => {
+  return get('/user/captcha', {username}, loading)
 }
 
 /**

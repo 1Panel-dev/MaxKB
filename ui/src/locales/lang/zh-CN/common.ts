@@ -113,4 +113,8 @@ export default {
   copyTitle: '副本',
   professional: '购买专业版',
   sync: '同步',
+  prompt: {
+    label: '提示词',
+    placeholder: '请输入提示词',
+  },
 }

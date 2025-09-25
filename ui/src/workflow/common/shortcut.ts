@@ -43,7 +43,7 @@ let CHILDREN_TRANSLATION_DISTANCE = 40
 export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
   const { keyboard } = lf
   const {
-    options: { keyboard: keyboardOptions }
+    options: { keyboard: keyboardOptions },
   } = keyboard
   const copy_node = () => {
     CHILDREN_TRANSLATION_DISTANCE = TRANSLATION_DISTANCE
@@ -57,7 +57,7 @@ export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
       return true
     }
     const base_nodes = elements.nodes.filter(
-      (node: any) => node.type === WorkflowType.Start || node.type === WorkflowType.Base
+      (node: any) => node.type === WorkflowType.Start || node.type === WorkflowType.Base,
     )
     if (base_nodes.length > 0) {
       MsgError(base_nodes[0]?.properties?.stepName + t('views.applicationWorkflow.tip.cannotCopy'))
@@ -91,23 +91,39 @@ export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
       return
     }
     if (elements.edges.length > 0 && elements.nodes.length == 0) {
-      elements.edges.forEach((edge: any) => lf.deleteEdge(edge.id))
+      elements.edges
+        .filter((edge) => !['loop-edge'].includes(edge.type || ''))
+        .forEach((edge: any) => lf.deleteEdge(edge.id))
       return
     }
-    const nodes = elements.nodes.filter((node) => ['start-node', 'base-node'].includes(node.type))
+    const nodes = elements.nodes.filter((node) =>
+      ['start-node', 'base-node', 'loop-body-node'].includes(node.type),
+    )
     if (nodes.length > 0) {
-      MsgError(`${nodes[0].properties?.stepName}${t('views.applicationWorkflow.delete.deleteMessage')}`)
+      MsgError(
+        `${nodes[0].properties?.stepName}${t('views.applicationWorkflow.delete.deleteMessage')}`,
+      )
       return
     }
     MsgConfirm(t('common.tip'), t('views.applicationWorkflow.delete.confirmTitle'), {
       confirmButtonText: t('common.confirm'),
-      confirmButtonClass: 'danger'
+      confirmButtonClass: 'danger',
     }).then(() => {
       if (!keyboardOptions?.enabled) return true
       if (graph.textEditElement) return true
 
       elements.edges.forEach((edge: any) => lf.deleteEdge(edge.id))
-      elements.nodes.forEach((node: any) => lf.deleteNode(node.id))
+      elements.nodes.forEach((node: any) => {
+        if (node.type === 'loop-node') {
+          const next = lf.getNodeOutgoingNode(node.id)
+          next.forEach((n: any) => {
+            if (n.type === 'loop-body-node') {
+              lf.deleteNode(n.id)
+            }
+          })
+        }
+        lf.deleteNode(node.id)
+      })
     })
 
     return false

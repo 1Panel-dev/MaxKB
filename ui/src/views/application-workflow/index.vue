@@ -27,7 +27,8 @@
         </el-button>
       </div>
       <div v-else>
-        <el-button icon="Plus" @click="showPopover = !showPopover">
+        <el-button @click="showPopover = !showPopover">
+          <AppIcon iconName="app-add-outlined" class="mr-4"/>
           {{ $t('views.applicationWorkflow.setting.addComponent') }}
         </el-button>
         <el-button @click="clickShowDebug" :disabled="showDebug" v-if="permissionPrecise.debug(id)">

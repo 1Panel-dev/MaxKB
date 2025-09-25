@@ -1,4 +1,5 @@
-import { nanoid } from 'nanoid'
+import {nanoid} from 'nanoid'
+
 /**
  * 数字处理
  */
@@ -7,6 +8,7 @@ export function toThousands(num: any) {
     return n.replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
   })
 }
+
 export function numberFormat(num: number) {
   return num < 1000 ? toThousands(num) : toThousands((num / 1000).toFixed(1)) + 'k'
 }
@@ -25,6 +27,7 @@ export function filesize(size: number) {
 
 // 头像
 export const defaultIcon = '/${window.MaxKB.prefix}/favicon.ico'
+
 export function isAppIcon(url: string | undefined) {
   // 如果没有URL或者是默认图标，返回false
   if (!url || url === './favicon.ico' || url === defaultIcon) {
@@ -70,6 +73,7 @@ export function getImgUrl(name: string) {
     : 'unknown'
   return new URL(`../assets/fileType/${type}-icon.svg`, import.meta.url).href
 }
+
 // 是否是白名单后缀
 export function isRightType(name: string, type: string) {
   return typeList[type].includes(fileType(name).toLowerCase())
@@ -99,7 +103,7 @@ interface LoadScriptOptions {
 }
 
 export const loadScript = (url: string, options: LoadScriptOptions = {}): Promise<void> => {
-  const { jsId, forceReload = false } = options
+  const {jsId, forceReload = false} = options
   const scriptId = jsId || `script-${btoa(url).slice(0, 12)}` // 生成唯一 ID
 
   return new Promise((resolve, reject) => {
@@ -149,12 +153,14 @@ export function getNormalizedUrl(url: string) {
   }
   return url
 }
+
 export function getFileUrl(fileId?: string) {
   if (fileId) {
     return `${window.MaxKB.prefix}/oss/file/${fileId}`
   }
   return ''
 }
+
 export const resetUrl = (url: string, defaultUrl?: string) => {
   if (url && url.startsWith('./')) {
     return `${window.MaxKB.prefix}/${url.substring(2)}`

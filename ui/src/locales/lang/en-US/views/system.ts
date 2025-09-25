@@ -130,4 +130,11 @@ export default {
     type: 'Type',
     management: 'management',
   },
+    default_login: 'Default Login Method',
+  display_code: 'Account login verification code setting',
+    loginFailed: 'Login failed',
+  loginFailedMessage: 'Display verification code twice',
+  display_codeTip: 'When the value is -1, the verification code is not displayed',
+  time: 'Times',
+  setting: 'Login Setting',
 }

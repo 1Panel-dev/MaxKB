@@ -60,6 +60,7 @@ class AliyunBaiLianAsrSpeechToText(MaxKBBaseModel, BaseSpeechToText):
                 model=self.model,
                 messages=messages,
                 result_format="message",
+                **self.params
             )
             if response.status_code == 200:
                 text = response["output"]["choices"][0]["message"].content[0]["text"]

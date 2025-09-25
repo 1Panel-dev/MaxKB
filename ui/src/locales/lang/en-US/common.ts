@@ -110,4 +110,8 @@ export default {
   copyTitle: 'Copy',
   professional: 'Purchase the Professional Edition',
   sync: 'Sync',
+  prompt: {
+    label: 'Prompt',
+    placeholder: 'Please enter prompt',
+  },
 }

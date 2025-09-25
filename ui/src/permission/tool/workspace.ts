@@ -125,8 +125,8 @@ const workspace = {
       [ 
         RoleConst.USER.getWorkspaceRole,  
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-        PermissionConst.TOOL_DEBUG.getWorkspacePermission,
-        PermissionConst.TOOL_DEBUG.getWorkspacePermissionWorkspaceManageRole
+        PermissionConst.TOOL_EDIT.getWorkspacePermission,
+        PermissionConst.TOOL_EDIT.getWorkspacePermissionWorkspaceManageRole
       ],
       'OR'
     ), 

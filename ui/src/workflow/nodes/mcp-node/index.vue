@@ -246,6 +246,7 @@
       </div>
     </template>
   </NodeContainer>
+  <McpServerInputDialog ref="mcpServerInputDialogRef" @refresh="handleMcpVariables" />
 </template>
 <script setup lang="ts">
 import { cloneDeep, set } from 'lodash'
@@ -256,6 +257,7 @@ import { t } from '@/locales'
 import { MsgError, MsgSuccess } from '@/utils/message'
 import TooltipLabel from '@/components/dynamics-form/items/label/TooltipLabel.vue'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
+import McpServerInputDialog from "./component/McpServerInputDialog.vue";
 import { useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { resetUrl } from '@/utils/common'
@@ -339,12 +341,22 @@ function getTools() {
   }
   try {
     JSON.parse(form_data.value.mcp_servers)
+    const vars = extractPlaceholders(form_data.value.mcp_servers)
+    if (vars.length > 0) {
+      mcpServerInputDialogRef.value.open(vars)
+      return
+    }
   } catch (e) {
     MsgError(t('views.applicationWorkflow.nodes.mcpNode.mcpServerTip'))
     return
   }
-  loadSharedApi({ type: 'application', systemType: apiType.value })
-    .getMcpTools(id, form_data.value.mcp_servers, loading)
+  // 一切正常，获取tool
+  _getTools(form_data.value.mcp_servers)
+}
+
+function _getTools(mcp_servers: any) {
+   loadSharedApi({ type: 'application', systemType: apiType.value })
+    .getMcpTools(id, mcp_servers, loading)
     .then((res: any) => {
       form_data.value.mcp_tools = res.data
       MsgSuccess(t('views.applicationWorkflow.nodes.mcpNode.getToolsSuccess'))
@@ -353,6 +365,47 @@ function getTools() {
         (item: any) => item.name === form_data.value.mcp_tool,
       )?.server
     })
+}
+
+const mcpServerInputDialogRef = ref()
+// 提取 JSON 中所有占位符（{{...}}）的变量路径
+function extractPlaceholders(input: unknown): string[] {
+  const re = /\{\{\s*([a-zA-Z_][\w.]*)\s*\}\}/g; // 捕获 {{ path.like.this }}
+  const found = new Set<string>();
+
+  const visit = (v: unknown) => {
+    if (typeof v === 'string') {
+      let m: RegExpExecArray | null;
+      while ((m = re.exec(v)) !== null) found.add(m[1]);
+    } else if (Array.isArray(v)) {
+      v.forEach(visit);
+    } else if (v && typeof v === 'object') {
+      Object.values(v as Record<string, unknown>).forEach(visit);
+    }
+  };
+
+  // 如果传入的是 JSON 字符串，尝试解析，否则按字符串/对象处理
+  if (typeof input === 'string') {
+    try {
+      visit(JSON.parse(input));
+    } catch {
+      visit(input);
+    }
+  } else {
+    visit(input);
+  }
+
+  return [...found];
+}
+
+function handleMcpVariables(vars: any) {
+  let mcp_servers = form_data.value.mcp_servers
+  for (const item in vars) {
+    mcp_servers = mcp_servers.replace(`{{${item}}}`, vars[item])
+  }
+
+  // 一切正常，获取tool
+  _getTools(mcp_servers)
 }
 
 function changeTool() {

@@ -28,6 +28,15 @@
                   }}<span class="color-danger">*</span></span
                 >
               </div>
+              <el-button
+                type="primary"
+                link
+                @click="openSTTParamSettingDialog"
+                :disabled="!form_data.stt_model_id"
+                class="mr-4"
+              >
+                <AppIcon iconName="app-setting"></AppIcon>
+              </el-button>
             </div>
           </template>
           <ModelSelect
@@ -91,6 +100,7 @@
         </el-form-item>
       </el-form>
     </el-card>
+    <STTModeParamSettingDialog ref="STTModeParamSettingDialogRef" @refresh="refreshSTTForm" />
   </NodeContainer>
 </template>
 
@@ -100,12 +110,17 @@ import { computed, onMounted, ref, inject } from 'vue'
 import { groupBy, set } from 'lodash'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import type { FormInstance } from 'element-plus'
+import { MsgSuccess } from '@/utils/message'
+import { t } from '@/locales'
 import { useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import STTModeParamSettingDialog from '@/views/application/component/STTModelParamSettingDialog.vue'
 const getApplicationDetail = inject('getApplicationDetail') as any
 const route = useRoute()
 
-const {} = route as any
+const {
+  params: { id },
+} = route as any
 
 const apiType = computed(() => {
   if (route.path.includes('resource-management')) {
@@ -117,6 +132,8 @@ const apiType = computed(() => {
 
 const props = defineProps<{ nodeModel: any }>()
 const modelOptions = ref<any>(null)
+const STTModeParamSettingDialogRef = ref<InstanceType<typeof STTModeParamSettingDialog>>()
+
 
 const aiChatNodeFormRef = ref<FormInstance>()
 const nodeCascaderRef = ref()
@@ -143,6 +160,7 @@ const form = {
   stt_model_id: '',
   is_result: true,
   audio_list: [],
+  model_params_setting: {},
 }
 
 const form_data = computed({
@@ -158,6 +176,25 @@ const form_data = computed({
     set(props.nodeModel.properties, 'node_data', value)
   },
 })
+
+
+const openSTTParamSettingDialog = () => {
+  const model_id = form_data.value.stt_model_id
+  if (!model_id) {
+    MsgSuccess(t('views.application.form.voiceInput.requiredMessage'))
+    return
+  }
+  STTModeParamSettingDialogRef.value?.open(
+      model_id,
+      id,
+      form_data.value.model_params_setting,
+    )
+}
+
+const refreshSTTForm = (data: any) => {
+  form_data.value.model_params_setting = data
+}
+
 
 const application = getApplicationDetail()
 function getSelectModel() {

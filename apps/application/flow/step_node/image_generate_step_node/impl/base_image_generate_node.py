@@ -35,7 +35,7 @@ class BaseImageGenerateNode(IImageGenerateNode):
         message_list = self.generate_message_list(question, history_message)
         self.context['message_list'] = message_list
         self.context['dialogue_type'] = dialogue_type
-        self.context['negative_prompt'] = negative_prompt
+        self.context['negative_prompt'] = self.generate_prompt_question(negative_prompt)
         image_urls = tti_model.generate_image(question, negative_prompt)
         # 保存图片
         file_urls = []

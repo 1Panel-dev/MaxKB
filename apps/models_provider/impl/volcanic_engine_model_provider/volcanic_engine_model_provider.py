@@ -17,6 +17,7 @@ from models_provider.impl.volcanic_engine_model_provider.credential.image import
     VolcanicEngineImageModelCredential
 from models_provider.impl.volcanic_engine_model_provider.credential.tti import VolcanicEngineTTIModelCredential
 from models_provider.impl.volcanic_engine_model_provider.credential.tts import VolcanicEngineTTSModelCredential
+from models_provider.impl.volcanic_engine_model_provider.credential.ttv import VolcanicEngineTTVModelCredential
 from models_provider.impl.volcanic_engine_model_provider.model.embedding import VolcanicEngineEmbeddingModel
 from models_provider.impl.volcanic_engine_model_provider.model.image import VolcanicEngineImage
 from models_provider.impl.volcanic_engine_model_provider.model.llm import VolcanicEngineChatModel
@@ -27,6 +28,8 @@ from models_provider.impl.volcanic_engine_model_provider.model.tts import Volcan
 
 from maxkb.conf import PROJECT_DIR
 from django.utils.translation import gettext as _
+
+from models_provider.impl.volcanic_engine_model_provider.model.ttv import GenerationVideoModel
 
 volcanic_engine_llm_model_credential = OpenAILLMModelCredential()
 volcanic_engine_stt_model_credential = VolcanicEngineSTTModelCredential()
@@ -69,6 +72,45 @@ model_info_embedding_list = [
               ModelTypeConst.EMBEDDING, open_ai_embedding_credential,
               VolcanicEngineEmbeddingModel)
 ]
+ttv_credential = VolcanicEngineTTVModelCredential()
+model_info_ttv_list = [
+    ModelInfo('doubao-seedance-1-0-pro-250528',
+              _(''),
+              ModelTypeConst.TTV,
+              ttv_credential, GenerationVideoModel)
+    ,
+    ModelInfo('doubao-seedance-1-0-lite-t2v-250428',
+              _(''),
+              ModelTypeConst.TTV,
+              ttv_credential, GenerationVideoModel)
+    ,
+    ModelInfo('wan2-1-14b-t2v-250225',
+              _(''),
+              ModelTypeConst.TTV,
+              ttv_credential, GenerationVideoModel)
+]
+model_info_itv_list = [
+    ModelInfo('doubao-seedance-1-0-pro-250528',
+              _(''),
+              ModelTypeConst.ITV,
+              ttv_credential,
+              GenerationVideoModel),
+    ModelInfo('doubao-seedance-1-0-lite-i2v-250428',
+              _(''),
+              ModelTypeConst.ITV,
+              ttv_credential,
+              GenerationVideoModel),
+    ModelInfo('wan2-1-14b-i2v-250225',
+              _(''),
+              ModelTypeConst.ITV,
+              ttv_credential,
+              GenerationVideoModel),
+    ModelInfo('wan2-1-14b-flf2v-250417',
+              _(''),
+              ModelTypeConst.ITV,
+              ttv_credential,
+              GenerationVideoModel),
+]
 
 model_info_manage = (
     ModelInfoManage.builder()
@@ -80,6 +122,10 @@ model_info_manage = (
     .append_default_model_info(model_info_list[4])
     .append_model_info_list(model_info_embedding_list)
     .append_default_model_info(model_info_embedding_list[0])
+    .append_model_info_list(model_info_ttv_list)
+    .append_default_model_info(model_info_ttv_list[0])
+    .append_model_info_list(model_info_itv_list)
+    .append_default_model_info(model_info_itv_list[0])
     .build()
 )
 

@@ -1,3 +1,5 @@
+import tool from '@/api/tool/tool'
+
 export default {
   title: '应用',
   createApplication: '创建简易应用',
@@ -88,18 +90,21 @@ export default {
       placeholder: '请选择 AI 模型',
     },
     roleSettings: {
-      label: '系统角色',
-      placeholder: '你是 xxx 小助手',
+      label: '系统提示词',
+      placeholder:
+        '系统提示词，可以引用系统中的变量：{data} 是命中知识库中的分段；{question} 是用户提出的问题。',
+      tooltip: '设定模型扮演的角色或遵循的指令',
     },
 
     prompt: {
-      label: '提示词',
+      label: '用户提示词',
       noReferences: ' (无引用知识库)',
       references: ' (引用知识库)',
-      placeholder: '请输入提示词',
-      requiredMessage: '请输入提示词',
+      placeholder:
+        '用户提示词，可以引用系统中的变量：{data} 是命中知识库中的分段；{question} 是用户提出的问题。',
+      requiredMessage: '请输入用户提示词',
       tooltip:
-        '通过调整提示词内容，可以引导大模型聊天方向，该提示词会被固定在上下文的开头，可以使用变量。',
+        '用户向模型提出的问题或输入的指令',
       noReferencesTooltip:
         '通过调整提示词内容，可以引导大模型聊天方向，该提示词会被固定在上下文的开头。可以使用变量：{question} 是用户提出问题的占位符。',
       referencesTooltip:
@@ -153,6 +158,13 @@ export default {
     label: '生成',
     generatePrompt: '生成提示词',
     placeholder: '请输入提示词主题',
+    title: '提示词显示在这里',
+    remake: '重新生成',
+    stop: '停止生成',
+    continue: '继续生成',
+    replace: '替换',
+    exit: '确认退出并舍弃 AI 生成的内容吗？',
+    loading: '生成中...',
   },
   dialog: {
     addKnowledge: '添加关联知识库',

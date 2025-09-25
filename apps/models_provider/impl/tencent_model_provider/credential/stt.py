@@ -8,38 +8,38 @@ from django.utils.translation import gettext_lazy as _, gettext
 from models_provider.base_model_provider import BaseModelCredential, ValidCode
 
 
-# class TencentSSTModelParams(BaseForm):
-#     EngSerViceType = forms.SingleSelect(
-#         TooltipLabel(_('Engine model type'), _('If not passed, the default value is 16k_zh (Chinese universal)')),
-#         required=True,
-#         default_value='16k_zh',
-#         option_list=[
-#             {"value": "8k_zh", "label": _("Chinese telephone universal")},
-#             {"value": "8k_en", "label": _("English telephone universal")},
-#             {"value": "16k_zh", "label": _("Commonly used in Chinese")},
-#             {"value": "16k_zh-PY", "label": _("Chinese, English, and Guangdong")},
-#             {"value": "16k_zh_medical", "label": _("Chinese medical")},
-#             {"value": "16k_en", "label": _("English")},
-#             {"value": "16k_yue", "label": _("Cantonese")},
-#             {"value": "16k_ja", "label": _("Japanese")},
-#             {"value": "16k_ko", "label": _("Korean")},
-#             {"value": "16k_vi", "label": _("Vietnamese")},
-#             {"value": "16k_ms", "label": _("Malay language")},
-#             {"value": "16k_id", "label": _("Indonesian language")},
-#             {"value": "16k_fil", "label": _("Filipino language")},
-#             {"value": "16k_th", "label": _("Thai")},
-#             {"value": "16k_pt", "label": _("Portuguese")},
-#             {"value": "16k_tr", "label": _("Turkish")},
-#             {"value": "16k_ar", "label": _("Arabic")},
-#             {"value": "16k_es", "label": _("Spanish")},
-#             {"value": "16k_hi", "label": _("Hindi")},
-#             {"value": "16k_fr", "label": _("French")},
-#             {"value": "16k_de", "label": _("German")},
-#             {"value": "16k_zh_dialect", "label": _("Multiple dialects, supporting 23 dialects")}
-#         ],
-#         value_field='value',
-#         text_field='label'
-#     )
+class TencentSSTModelParams(BaseForm):
+    EngSerViceType = forms.SingleSelect(
+        TooltipLabel(_('Engine model type'), _('If not passed, the default value is 16k_zh (Chinese universal)')),
+        required=True,
+        default_value='16k_zh',
+        option_list=[
+            {"value": "8k_zh", "label": _("Chinese telephone universal")},
+            {"value": "8k_en", "label": _("English telephone universal")},
+            {"value": "16k_zh", "label": _("Commonly used in Chinese")},
+            {"value": "16k_zh-PY", "label": _("Chinese, English, and Guangdong")},
+            {"value": "16k_zh_medical", "label": _("Chinese medical")},
+            {"value": "16k_en", "label": _("English")},
+            {"value": "16k_yue", "label": _("Cantonese")},
+            {"value": "16k_ja", "label": _("Japanese")},
+            {"value": "16k_ko", "label": _("Korean")},
+            {"value": "16k_vi", "label": _("Vietnamese")},
+            {"value": "16k_ms", "label": _("Malay language")},
+            {"value": "16k_id", "label": _("Indonesian language")},
+            {"value": "16k_fil", "label": _("Filipino language")},
+            {"value": "16k_th", "label": _("Thai")},
+            {"value": "16k_pt", "label": _("Portuguese")},
+            {"value": "16k_tr", "label": _("Turkish")},
+            {"value": "16k_ar", "label": _("Arabic")},
+            {"value": "16k_es", "label": _("Spanish")},
+            {"value": "16k_hi", "label": _("Hindi")},
+            {"value": "16k_fr", "label": _("French")},
+            {"value": "16k_de", "label": _("German")},
+            {"value": "16k_zh_dialect", "label": _("Multiple dialects, supporting 23 dialects")}
+        ],
+        value_field='value',
+        text_field='label'
+    )
 
 class TencentSTTModelCredential(BaseForm, BaseModelCredential):
     REQUIRED_FIELDS = ["SecretId", "SecretKey"]
@@ -87,4 +87,4 @@ class TencentSTTModelCredential(BaseForm, BaseModelCredential):
     SecretKey = forms.PasswordInputField('SecretKey', required=True)
 
     def get_model_params_setting_form(self, model_name):
-        pass
+        return TencentSSTModelParams()

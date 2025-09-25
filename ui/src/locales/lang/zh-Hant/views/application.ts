@@ -88,16 +88,19 @@ export default {
       placeholder: '請選擇 AI 模型',
     },
     roleSettings: {
-      label: '角色設定',
-      placeholder: '你是 xxx 小助手',
+      label: '系統提示詞',
+      placeholder:
+        '系統提示詞，可以引用系統中的變數：{data} 是命中知識庫中的分段；{question} 是用戶提出的問題。',
+      tooltip: '設定模型扮演的角色或遵循的指令',
     },
     prompt: {
-      label: '提示詞',
+      label: '用戶提示詞',
       noReferences: ' (無引用知識庫)',
       references: ' (引用知識庫)',
-      placeholder: '請輸入提示詞',
-      requiredMessage: '請輸入提示詞',
-      tooltip: '透過調整提示詞內容，可以引導大模型對話方向，該提示詞會被固定在上下文的開頭。',
+      placeholder:
+        '用戶提示詞，可以引用系統中的變數：{data} 是命中知識庫中的分段；{question} 是用戶提出的問題。',
+      requiredMessage: '請輸入用戶提示詞',
+      tooltip: '用戶向模型提出的問題或輸入的指令',
 
       noReferencesTooltip:
         '透過調整提示詞內容，可以引導大模型對話方向，該提示詞會被固定在上下文的開頭。可以使用變數：{question} 是用戶提出問題的佔位符。',
@@ -152,6 +155,13 @@ export default {
     label: '生成',
     generatePrompt: '生成提示詞',
     placeholder: '請輸入提示詞主題',
+    title: '提示詞顯示在這裡',
+    remake: '重新生成',
+    stop: '停止生成',
+    continue: '繼續生成',
+    replace: '替換',
+    exit: '確認退出並捨棄 AI 生成的內容嗎？',
+    loading: '生成中...',
   },
   dialog: {
     addKnowledge: '新增關聯知識庫',
