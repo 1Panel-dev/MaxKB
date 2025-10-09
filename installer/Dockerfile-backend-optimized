@@ -37,10 +37,10 @@ RUN python3 -m venv /opt/py3 && \
 
 COPY pyproject.toml /build/
 
-# 优化 PyTorch 构建
-RUN if [ "$(uname -m)" = "x86_64" ]; then \
-        sed -i 's/^torch.*/torch = {version = "2.7.1+cpu", source = "pytorch"}/g' pyproject.toml; \
-    fi
+# 优化 PyTorch 构建 - 已注释，pyproject.toml 使用 uv 格式与 poetry 不兼容
+# RUN if [ "$(uname -m)" = "x86_64" ]; then \
+#         sed -i 's/^torch.*/torch = {version = "2.7.1+cpu", source = "pytorch"}/g' pyproject.toml; \
+#     fi
 
 RUN . /opt/py3/bin/activate && \
     rm -f poetry.lock && \
