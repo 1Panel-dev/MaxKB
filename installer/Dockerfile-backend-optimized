@@ -28,12 +28,10 @@ RUN mkdir -p /root/.pip && \
     echo 'timeout = 300' >> /root/.pip/pip.conf && \
     echo 'retries = 5' >> /root/.pip/pip.conf
 
-# 安装 uv 包管理器
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
-    mv /root/.cargo/bin/uv /usr/local/bin/ || true
-
-# 创建虚拟环境
-RUN python3 -m venv /opt/py3
+# 创建虚拟环境并安装 uv
+RUN python3 -m venv /opt/py3 && \
+    /opt/py3/bin/pip install --upgrade pip && \
+    /opt/py3/bin/pip install uv
 
 # 强制重新构建（避免缓存问题）
 RUN echo "Build timestamp: $(date +%s)" > /tmp/build-marker
@@ -43,7 +41,7 @@ COPY pyproject.toml /build/
 # 使用 uv 安装依赖（支持阿里云镜像）
 RUN export UV_INDEX_URL=https://mirrors.aliyun.com/pypi/simple/ && \
     python3 -c "import tomllib; deps = tomllib.load(open('pyproject.toml', 'rb'))['tool']['poetry']['dependencies']; open('requirements.txt', 'w').write('\n'.join(deps))" && \
-    uv pip install --python /opt/py3/bin/python --no-cache -r requirements.txt && \
+    /opt/py3/bin/uv pip install --python /opt/py3/bin/python --no-cache -r requirements.txt && \
     /opt/py3/bin/pip install --no-cache-dir --timeout 300 --retries 5 \
         -i https://mirrors.aliyun.com/pypi/simple/ \
         --trusted-host mirrors.aliyun.com \
