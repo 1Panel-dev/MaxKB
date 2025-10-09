@@ -40,8 +40,12 @@ COPY pyproject.toml /build/
 
 # 使用 uv 安装依赖（支持阿里云镜像）
 RUN export UV_INDEX_URL=https://mirrors.aliyun.com/pypi/simple/ && \
-    python3 -c "import tomllib; deps = tomllib.load(open('pyproject.toml', 'rb'))['tool']['poetry']['dependencies']; open('requirements.txt', 'w').write('\n'.join(deps))" && \
+    export UV_HTTP_TIMEOUT=600 && \
+    python3 -c "import tomllib; deps = tomllib.load(open('pyproject.toml', 'rb'))['tool']['poetry']['dependencies']; deps_no_torch = [d for d in deps if not d.startswith('torch==')]; open('requirements.txt', 'w').write('\n'.join(deps_no_torch))" && \
     /opt/py3/bin/uv pip install --python /opt/py3/bin/python --no-cache -r requirements.txt && \
+    /opt/py3/bin/pip install --no-cache-dir --timeout 600 --retries 5 \
+        --index-url https://download.pytorch.org/whl/cpu \
+        torch==2.8.0+cpu && \
     /opt/py3/bin/pip install --no-cache-dir --timeout 300 --retries 5 \
         -i https://mirrors.aliyun.com/pypi/simple/ \
         --trusted-host mirrors.aliyun.com \
