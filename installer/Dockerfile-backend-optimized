@@ -35,6 +35,9 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
 # 创建虚拟环境
 RUN python3 -m venv /opt/py3
 
+# 强制重新构建（避免缓存问题）
+RUN echo "Build timestamp: $(date +%s)" > /tmp/build-marker
+
 COPY pyproject.toml /build/
 
 # 使用 uv 安装依赖（支持阿里云镜像）
