@@ -283,9 +283,7 @@ const login = () => {
             locale.value = localStorage.getItem('MaxKB-locale') || getBrowserLang() || 'en-US'
             router.push({ name: 'home' })
           })
-          .catch(() => {
-            loading.value = false
-          })
+          .finally(() => (loading.value = false))
       } else {
         const publicKey = forge.pki.publicKeyFromPem(user.rasKey)
         const encrypted = publicKey.encrypt(JSON.stringify(loginForm.value), 'RSAES-PKCS1-V1_5')

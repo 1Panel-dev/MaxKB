@@ -22,7 +22,7 @@ const ldapLogin: (request: LoginRequest, loading?: Ref<boolean>) => Promise<Resu
   request,
   loading
 ) => {
-  return post('/ldap/login', request, undefined, loading)
+  return post('/LDAP/login', request, undefined, loading)
 }
 /**
  * 获取图形验证码
