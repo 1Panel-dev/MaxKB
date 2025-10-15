@@ -208,8 +208,8 @@ export default {
       text: '識別出圖片中的物件、場景等信息回答用戶問題',
       answer: 'AI 回答內容',
       model: {
-        label: '圖片理解模型',
-        requiredMessage: '請選擇圖片理解模型'
+        label: '視覺模型',
+        requiredMessage: '請選擇視覺模型'
       },
       image: {
         label: '選擇圖片',
