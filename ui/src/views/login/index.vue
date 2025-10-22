@@ -286,7 +286,9 @@ const login = () => {
           .finally(() => (loading.value = false))
       } else {
         const publicKey = forge.pki.publicKeyFromPem(user.rasKey)
-        const encrypted = publicKey.encrypt(JSON.stringify(loginForm.value), 'RSAES-PKCS1-V1_5')
+        const jsonData = JSON.stringify(loginForm.value)
+        const utf8Bytes = forge.util.encodeUtf8(jsonData)
+        const encrypted = publicKey.encrypt(utf8Bytes, 'RSAES-PKCS1-V1_5')
         const encryptedBase64 = forge.util.encode64(encrypted)
         user
           .login({ encryptedData: encryptedBase64, username: loginForm.value.username })
