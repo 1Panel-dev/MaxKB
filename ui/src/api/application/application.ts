@@ -207,11 +207,11 @@ const open: (application_id: string, loading?: Ref<boolean>) => Promise<Result<s
 
 /**
  * 生成提示词
- * @param workspace_id 
- * @param model_id 
- * @param application_id 
- * @param data 
- * @returns 
+ * @param workspace_id
+ * @param model_id
+ * @param application_id
+ * @param data
+ * @returns
  */
 const generate_prompt: (workspace_id:string ,model_id:string, application_id:string,data: any) => Promise<any> = (
   workspace_id,
@@ -493,7 +493,7 @@ export default {
   speechToText,
   getMcpTools,
   postUploadFile,
-  generate_prompt
+  generate_prompt,
   putApplicationIcon,
   putApplicationChatBackground,
   putApplicationAvatar,

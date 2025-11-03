@@ -384,6 +384,7 @@ export default {
   postTextToSpeech,
   speechToText,
   getMcpTools,
+  generate_prompt,
   putApplicationIcon,
   putApplicationChatBackground,
   putApplicationAvatar,
