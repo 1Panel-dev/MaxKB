@@ -39,8 +39,9 @@ const init = async () => {
   }
   const redirectUri = encodeURIComponent(data.redirectUri)
   console.log('redirectUri', data.redirectUri)
+  console.log(accessToken)
   // 手动构建生成二维码的url
-  iframeUrl.value = `https://login.work.weixin.qq.com/wwlogin/sso/login?login_type=CorpApp&appid=${data.corpId}&agentid=${data.agentId}&redirect_uri=${redirectUri}&accessToken=${accessToken}&state=fit2cloud-wecom-qr&lang=${lang}&lang=${lang}&panel_size=small`
+  iframeUrl.value = `https://login.work.weixin.qq.com/wwlogin/sso/login?login_type=CorpApp&appid=${data.corpId}&agentid=${data.agentId}&redirect_uri=${redirectUri}&state=${accessToken}&lang=${lang}&lang=${lang}&panel_size=small`
 }
 
 init()
