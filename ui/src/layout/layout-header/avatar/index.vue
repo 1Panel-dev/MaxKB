@@ -19,7 +19,7 @@
             </el-avatar>
           </div>
           <div style="width: 90%">
-            <p class="bold mb-4" style="font-size: 14px">{{ user.userInfo?.nick_name }}({{ user.userInfo?.username }})</p>
+            <p class="bold mb-4" style="font-size: 14px">{{ user.userInfo?.nick_name }} <span class="color-secondary lighter">({{ user.userInfo?.username }})</span></p>
             <template v-if="user.userInfo?.role_name && user.userInfo.role_name.length > 0">
               <TagGroup
                 size="small"
@@ -222,6 +222,7 @@ onMounted(() => {
 <style lang="scss" scoped>
 .avatar-dropdown {
   min-width: 210px;
+  max-width: 400px;
 
   .userInfo {
     padding: 12px 11px;
