@@ -8,12 +8,12 @@
       @submit.prevent :close-on-click-modal="false" :close-on-press-escape="false">
       <el-form-item :prop="isEdit ? '' : 'username'" :label="$t('views.login.loginForm.username.label')">
         <el-input v-model="userForm.username" :placeholder="$t('views.login.loginForm.username.placeholder')"
-          maxlength="20" show-word-limit :disabled="isEdit">
+          maxlength="64" show-word-limit :disabled="isEdit">
         </el-input>
       </el-form-item>
       <el-form-item prop="nick_name" :label="$t('views.userManage.userForm.nick_name.label')">
         <el-input v-model="userForm.nick_name" :placeholder="$t('views.userManage.userForm.nick_name.placeholder')"
-          maxlength="20" show-word-limit>
+          maxlength="64" show-word-limit>
         </el-input>
       </el-form-item>
       <el-form-item :label="$t('views.login.loginForm.email.label')" prop="email">
@@ -85,7 +85,7 @@ const rules = reactive({
     },
     {
       min: 4,
-      max: 20,
+      max: 64,
       message: t('views.login.loginForm.username.lengthMessage'),
       trigger: 'blur',
     },
@@ -98,7 +98,7 @@ const rules = reactive({
     },
     {
       min: 1,
-      max: 20,
+      max: 64,
       message: t('views.userManage.userForm.nick_name.lengthMessage'),
       trigger: 'blur',
     },

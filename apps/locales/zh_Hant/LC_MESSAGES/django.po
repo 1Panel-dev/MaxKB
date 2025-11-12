@@ -6796,8 +6796,8 @@ msgid "Phone"
 msgstr "手機"
 
 #: apps/users/serializers/user.py:120 apps/xpack/serializers/chat_user.py:68
-msgid "Username must be 4-20 characters long"
-msgstr "用戶名必須為4-20個字符"
+msgid "Username must be 4-64 characters long"
+msgstr "用戶名必須為4-64個字符"
 
 #: apps/users/serializers/user.py:133 apps/users/serializers/user.py:298
 #: apps/xpack/serializers/chat_user.py:81

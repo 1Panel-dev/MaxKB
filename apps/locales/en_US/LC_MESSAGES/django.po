@@ -6671,7 +6671,7 @@ msgid "Phone"
 msgstr ""
 
 #: apps/users/serializers/user.py:120 apps/xpack/serializers/chat_user.py:68
-msgid "Username must be 4-20 characters long"
+msgid "Username must be 4-64 characters long"
 msgstr ""
 
 #: apps/users/serializers/user.py:133 apps/users/serializers/user.py:298
