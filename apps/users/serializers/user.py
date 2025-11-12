@@ -139,12 +139,12 @@ class UserManageSerializer(serializers.Serializer):
         username = serializers.CharField(
             required=True,
             label=_("Username"),
-            max_length=20,
+            max_length=64,
             min_length=4,
             validators=[
                 validators.RegexValidator(
-                    regex=re.compile("^.{4,20}$"),
-                    message=_('Username must be 4-20 characters long')
+                    regex=re.compile("^.{4,64}$"),
+                    message=_('Username must be 4-64 characters long')
                 )
             ]
         )
@@ -165,7 +165,7 @@ class UserManageSerializer(serializers.Serializer):
         nick_name = serializers.CharField(
             required=True,
             label=_("Nick name"),
-            max_length=20,
+            max_length=64,
         )
         phone = serializers.CharField(
             required=False,
@@ -203,13 +203,13 @@ class UserManageSerializer(serializers.Serializer):
         username = serializers.CharField(
             required=False,
             label=_("Username"),
-            max_length=20,
+            max_length=64,
             allow_blank=True
         )
         nick_name = serializers.CharField(
             required=False,
             label=_("Nick Name"),
-            max_length=20,
+            max_length=64,
             allow_blank=True
         )
         email = serializers.CharField(
@@ -360,7 +360,7 @@ class UserManageSerializer(serializers.Serializer):
         nick_name = serializers.CharField(
             required=False,
             label=_("Name"),
-            max_length=20,
+            max_length=64,
         )
         phone = serializers.CharField(
             required=False,
