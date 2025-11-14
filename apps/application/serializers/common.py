@@ -258,23 +258,24 @@ class ChatInfo:
     @staticmethod
     def map_to_chat_record(chat_record_dict):
         return ChatRecord(id=chat_record_dict.get('id'),
-                   chat_id=chat_record_dict.get('chat_id'),
-                   vote_status=chat_record_dict.get('vote_status'),
-                   problem_text=chat_record_dict.get('problem_text'),
-                   answer_text=chat_record_dict.get('answer_text'),
-                   answer_text_list=chat_record_dict.get('answer_text_list'),
-                   message_tokens=chat_record_dict.get('message_tokens'),
-                   answer_tokens=chat_record_dict.get('answer_tokens'),
-                   const=chat_record_dict.get('const'),
-                   details=chat_record_dict.get('details'),
-                   improve_paragraph_id_list=chat_record_dict.get('improve_paragraph_id_list'),
-                   run_time=chat_record_dict.get('run_time'),
-                   index=chat_record_dict.get('index'), )
+                          chat_id=chat_record_dict.get('chat_id'),
+                          vote_status=chat_record_dict.get('vote_status'),
+                          problem_text=chat_record_dict.get('problem_text'),
+                          answer_text=chat_record_dict.get('answer_text'),
+                          answer_text_list=chat_record_dict.get('answer_text_list'),
+                          message_tokens=chat_record_dict.get('message_tokens'),
+                          answer_tokens=chat_record_dict.get('answer_tokens'),
+                          const=chat_record_dict.get('const'),
+                          details=chat_record_dict.get('details'),
+                          improve_paragraph_id_list=chat_record_dict.get('improve_paragraph_id_list'),
+                          run_time=chat_record_dict.get('run_time'),
+                          index=chat_record_dict.get('index'), )
 
     def set_cache(self):
-        cache.set(Cache_Version.CHAT.get_key(key=self.chat_id),json.dumps( self.to_dict(),cls=SystemEncoder),
-                  version=Cache_Version.CHAT_INFO.get_version(),
-                  timeout=60 * 30)
+        if self.debug:
+            cache.set(Cache_Version.CHAT.get_key(key=self.chat_id), json.dumps(self.to_dict(), cls=SystemEncoder),
+                      version=Cache_Version.CHAT_INFO.get_version(),
+                      timeout=60 * 30)
 
     @staticmethod
     def map_to_chat_info(chat_info_dict):

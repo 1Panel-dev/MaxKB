@@ -446,7 +446,10 @@ class ChatSerializers(serializers.Serializer):
     def get_chat_info(self):
         self.is_valid(raise_exception=True)
         chat_id = self.data.get('chat_id')
-        chat_info: ChatInfo = self.re_open_chat(chat_id)
+        chat_info: ChatInfo = ChatInfo.get_cache(chat_id)
+        if chat_info is None:
+            chat_info: ChatInfo = self.re_open_chat(chat_id)
+            chat_info.set_cache()
         return chat_info
 
     def re_open_chat(self, chat_id: str):
