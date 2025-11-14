@@ -272,10 +272,9 @@ class ChatInfo:
                           index=chat_record_dict.get('index'), )
 
     def set_cache(self):
-        if self.debug:
-            cache.set(Cache_Version.CHAT.get_key(key=self.chat_id), json.dumps(self.to_dict(), cls=SystemEncoder),
-                      version=Cache_Version.CHAT_INFO.get_version(),
-                      timeout=60 * 30)
+        cache.set(Cache_Version.CHAT.get_key(key=self.chat_id), json.dumps(self.to_dict(), cls=SystemEncoder),
+                  version=Cache_Version.CHAT_INFO.get_version(),
+                  timeout=60 * 30)
 
     @staticmethod
     def map_to_chat_info(chat_info_dict):

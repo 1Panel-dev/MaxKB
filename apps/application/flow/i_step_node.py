@@ -94,6 +94,7 @@ class WorkFlowPostHandler:
                 application_public_access_client.access_num = application_public_access_client.access_num + 1
                 application_public_access_client.intraday_access_num = application_public_access_client.intraday_access_num + 1
                 application_public_access_client.save()
+        self.chat_info = None
 
 
 class NodeResult:
