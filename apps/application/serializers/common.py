@@ -6,7 +6,6 @@
     @date：2025/6/9 13:42
     @desc:
 """
-from datetime import datetime
 from typing import List
 
 from django.core.cache import cache
@@ -226,41 +225,66 @@ class ChatInfo:
             chat_record.save()
             ChatCountSerializer(data={'chat_id': self.chat_id}).update_chat()
 
+    def to_dict(self):
+
+        return {
+            'chat_id': self.chat_id,
+            'chat_user_id': self.chat_user_id,
+            'chat_user_type': self.chat_user_type,
+            'knowledge_id_list': self.knowledge_id_list,
+            'exclude_document_id_list': self.exclude_document_id_list,
+            'application_id': self.application_id,
+            'chat_record_list': [self.chat_record_to_map(c) for c in self.chat_record_list],
+            'debug': self.debug
+        }
+
+    def chat_record_to_map(self, chat_record):
+        return {'id': chat_record.id,
+                'chat_id': chat_record.chat_id,
+                'vote_status': chat_record.vote_status,
+                'problem_text': chat_record.problem_text,
+                'answer_text': chat_record.answer_text,
+                'answer_text_list': chat_record.answer_text_list,
+                'message_tokens': chat_record.message_tokens,
+                'answer_tokens': chat_record.answer_tokens,
+                'const': chat_record.const,
+                'details': chat_record.details,
+                'improve_paragraph_id_list': chat_record.improve_paragraph_id_list,
+                'run_time': chat_record.run_time,
+                'index': chat_record.index}
+
+    @staticmethod
+    def map_to_chat_record(chat_record_dict):
+        ChatRecord(id=chat_record_dict.get('id'),
+                   chat_id=chat_record_dict.get('chat_id'),
+                   vote_status=chat_record_dict.get('vote_status'),
+                   problem_text=chat_record_dict.get('problem_text'),
+                   answer_text=chat_record_dict.get('answer_text'),
+                   answer_text_list=chat_record_dict.get('answer_text_list'),
+                   message_tokens=chat_record_dict.get('message_tokens'),
+                   answer_tokens=chat_record_dict.get('answer_tokens'),
+                   const=chat_record_dict.get('const'),
+                   details=chat_record_dict.get('details'),
+                   improve_paragraph_id_list=chat_record_dict.get('improve_paragraph_id_list'),
+                   run_time=chat_record_dict.get('run_time'),
+                   index=chat_record_dict.get('index'), )
+
     def set_cache(self):
-        cache.set(Cache_Version.CHAT.get_key(key=self.chat_id), self, version=Cache_Version.CHAT.get_version(),
+        cache.set(Cache_Version.CHAT.get_key(key=self.chat_id), self.to_dict(),
+                  version=Cache_Version.CHAT_INFO.get_version(),
                   timeout=60 * 30)
 
     @staticmethod
+    def map_to_chat_info(chat_info_dict):
+        return ChatInfo(chat_info_dict.get('chat_id'), chat_info_dict.get('chat_user_id'),
+                        chat_info_dict.get('chat_user_type'), chat_info_dict.get('knowledge_id_list'),
+                        chat_info_dict.get('exclude_document_id_list'),
+                        chat_info_dict.get('application_id'),
+                        [ChatInfo.map_to_chat_record(c_r) for c_r in chat_info_dict.get('chat_record_list')])
+
+    @staticmethod
     def get_cache(chat_id):
-        return cache.get(Cache_Version.CHAT.get_key(key=chat_id), version=Cache_Version.CHAT.get_version())
-
-    def __getstate__(self):
-        state = self.__dict__.copy()
-        state['application'] = None
-        state['chat_user'] = None
-
-        # 将 ChatRecord ORM 对象转为轻量字典
-        if not self.debug and len(self.chat_record_list) > 0:
-            state['chat_record_list'] = [
-                {
-                    'id': str(record.id),
-                }
-                for record in self.chat_record_list
-            ]
-        return state
-
-    def __setstate__(self, state):
-        self.__dict__.update(state)
-
-        # 恢复 application
-        if self.application is None and self.application_id:
-            self.get_application()
-
-        # 如果需要完整的 ChatRecord 对象,从数据库重新加载
-        if not self.debug and len(self.chat_record_list) > 0:
-            record_ids = [record['id'] for record in self.chat_record_list if isinstance(record, dict)]
-            if record_ids:
-                self.chat_record_list = list(
-                    QuerySet(ChatRecord).filter(id__in=record_ids).order_by('create_time')
-                )
-
+        chat_info_dict = cache.get(Cache_Version.CHAT.get_key(key=chat_id), version=Cache_Version.CHAT_INFO.get_version())
+        if chat_info_dict:
+            return ChatInfo.map_to_chat_info(chat_info_dict)
+        return None

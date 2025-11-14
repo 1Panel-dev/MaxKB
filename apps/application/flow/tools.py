@@ -8,7 +8,8 @@
 """
 import asyncio
 import json
-import traceback
+import queue
+import threading
 from typing import Iterator
 
 from django.http import StreamingHttpResponse
@@ -227,6 +228,30 @@ def generate_tool_message_template(name, context):
         return tool_message_template % (name, tool_message_json_template % (context))
 
 
+# 全局单例事件循环
+_global_loop = None
+_loop_thread = None
+_loop_lock = threading.Lock()
+
+
+def get_global_loop():
+    """获取全局共享的事件循环"""
+    global _global_loop, _loop_thread
+
+    with _loop_lock:
+        if _global_loop is None:
+            _global_loop = asyncio.new_event_loop()
+
+            def run_forever():
+                asyncio.set_event_loop(_global_loop)
+                _global_loop.run_forever()
+
+            _loop_thread = threading.Thread(target=run_forever, daemon=True, name="GlobalAsyncLoop")
+            _loop_thread.start()
+
+    return _global_loop
+
+
 async def _yield_mcp_response(chat_model, message_list, mcp_servers, mcp_output_enable=True):
     client = MultiServerMCPClient(json.loads(mcp_servers))
     tools = await client.get_tools()
@@ -242,19 +267,31 @@ async def _yield_mcp_response(chat_model, message_list, mcp_servers, mcp_output_
 
 
 def mcp_response_generator(chat_model, message_list, mcp_servers, mcp_output_enable=True):
-    loop = asyncio.new_event_loop()
-    try:
-        async_gen = _yield_mcp_response(chat_model, message_list, mcp_servers, mcp_output_enable)
-        while True:
-            try:
-                chunk = loop.run_until_complete(anext_async(async_gen))
-                yield chunk
-            except StopAsyncIteration:
-                break
-    except Exception as e:
-        maxkb_logger.error(f'Exception: {e}', exc_info=True)
-    finally:
-        loop.close()
+    """使用全局事件循环，不创建新实例"""
+    result_queue = queue.Queue()
+    loop = get_global_loop()  # 使用共享循环
+
+    async def _run():
+        try:
+            async_gen = _yield_mcp_response(chat_model, message_list, mcp_servers, mcp_output_enable)
+            async for chunk in async_gen:
+                result_queue.put(('data', chunk))
+        except Exception as e:
+            maxkb_logger.error(f'Exception: {e}', exc_info=True)
+            result_queue.put(('error', e))
+        finally:
+            result_queue.put(('done', None))
+
+    # 在全局循环中调度任务
+    asyncio.run_coroutine_threadsafe(_run(), loop)
+
+    while True:
+        msg_type, data = result_queue.get()
+        if msg_type == 'done':
+            break
+        if msg_type == 'error':
+            raise data
+        yield data
 
 
 async def anext_async(agen):
