@@ -233,3 +233,34 @@ class ChatInfo:
     @staticmethod
     def get_cache(chat_id):
         return cache.get(Cache_Version.CHAT.get_key(key=chat_id), version=Cache_Version.CHAT.get_version())
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        state['application'] = None
+        state['chat_user'] = None
+
+        # 将 ChatRecord ORM 对象转为轻量字典
+        if not self.debug and len(self.chat_record_list) > 0:
+            state['chat_record_list'] = [
+                {
+                    'id': str(record.id),
+                }
+                for record in self.chat_record_list
+            ]
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+
+        # 恢复 application
+        if self.application is None and self.application_id:
+            self.get_application()
+
+        # 如果需要完整的 ChatRecord 对象,从数据库重新加载
+        if not self.debug and len(self.chat_record_list) > 0:
+            record_ids = [record['id'] for record in self.chat_record_list if isinstance(record, dict)]
+            if record_ids:
+                self.chat_record_list = list(
+                    QuerySet(ChatRecord).filter(id__in=record_ids).order_by('create_time')
+                )
+
