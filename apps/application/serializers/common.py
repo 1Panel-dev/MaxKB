@@ -272,7 +272,7 @@ class ChatInfo:
                           index=chat_record_dict.get('index'), )
 
     def set_cache(self):
-        cache.set(Cache_Version.CHAT.get_key(key=self.chat_id), json.dumps(self.to_dict(), cls=SystemEncoder),
+        cache.set(Cache_Version.CHAT.get_key(key=self.chat_id), self.to_dict(),
                   version=Cache_Version.CHAT_INFO.get_version(),
                   timeout=60 * 30)
 
@@ -291,5 +291,5 @@ class ChatInfo:
         chat_info_dict = cache.get(Cache_Version.CHAT.get_key(key=chat_id),
                                    version=Cache_Version.CHAT_INFO.get_version())
         if chat_info_dict:
-            return ChatInfo.map_to_chat_info(json.loads(chat_info_dict))
+            return ChatInfo.map_to_chat_info(chat_info_dict)
         return None
