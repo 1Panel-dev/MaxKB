@@ -50,11 +50,14 @@ node_list = [BaseStartStepNode, BaseChatNode, BaseSearchKnowledgeNode, BaseSearc
              BaseIntentNode, BaseLoopNode, BaseLoopStartStepNode,
              BaseLoopContinueNode,
              BaseLoopBreakNode, BaseVariableSplittingNode, BaseParameterExtractionNode, BaseVariableAggregationNode,
+<<<<<<< Updated upstream
              BaseDataSourceLocalNode,BaseDataSourceWebNode,BaseKnowledgeWriteNode]
+=======
+             BaseDataSourceLocalNode, BaseDataSourceWebNode]
+
+node_map = {n.type: {w: n for w in n.support} for n in node_list}
+>>>>>>> Stashed changes
 
 
-def get_node(node_type):
-    find_list = [node for node in node_list if node.type == node_type]
-    if len(find_list) > 0:
-        return find_list[0]
-    return None
+def get_node(node_type, workflow_model):
+    return node_map.get(node_type).get(workflow_model)

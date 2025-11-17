@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-loading="loading">
     <div class="update-info flex p-8-12 border-r-6 mb-16 w-full">
       <div class="mt-4">
         <AppIcon iconName="app-warning-colorful" style="font-size: 16px"></AppIcon>
@@ -69,12 +69,13 @@
   </div>
 </template>
 <script setup lang="ts">
-import { computed, useAttrs, nextTick } from 'vue'
+import { computed, useAttrs, nextTick, inject, ref } from 'vue'
 import type { FormField } from '@/components/dynamics-form/type'
 import { MsgError } from '@/utils/message'
 import type { UploadFiles } from 'element-plus'
-import { filesize, getImgUrl, isRightType } from '@/utils/common'
+import { filesize, getImgUrl } from '@/utils/common'
 import { t } from '@/locales'
+const upload = inject('upload') as any
 const attrs = useAttrs() as any
 const props = withDefaults(defineProps<{ modelValue?: any; formField: FormField }>(), {
   modelValue: () => [],
@@ -87,6 +88,8 @@ const onExceed = () => {
   )
 }
 const emit = defineEmits(['update:modelValue'])
+const fileArray = ref<any>([])
+const loading = ref<boolean>(false)
 // 上传on-change事件
 const fileHandleChange = (file: any, fileList: UploadFiles) => {
   //1、判断文件大小是否合法，文件限制不能大于100M
@@ -102,8 +105,12 @@ const fileHandleChange = (file: any, fileList: UploadFiles) => {
     fileList.splice(-1, 1)
     return false
   }
-
-  emit('update:modelValue', fileList)
+  upload(file.raw, loading).then((ok: any) => {
+    const split_path = ok.data.split('/')
+    const file_id = split_path[split_path.length - 1]
+    fileArray.value?.push({ name: file.name, file_id, size: file.size })
+    emit('update:modelValue', fileArray.value)
+  })
 }
 function deleteFile(index: number) {
   emit(

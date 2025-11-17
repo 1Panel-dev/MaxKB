@@ -34,5 +34,6 @@ class BaseDataSourceLocalNode(IDataSourceLocalNode):
             'label': '',
         }]
 
-    def execute(self, file_format, max_file_number, file_max_size, **kwargs) -> NodeResult:
-        pass
+    def execute(self, file_type_list, file_size_limit, file_count_limit, **kwargs) -> NodeResult:
+        return NodeResult({'file_list': self.workflow_manage.params.get('data_source', {}).get('file_list')},
+                          self.workflow_manage.params.get('knowledge_base') or {})

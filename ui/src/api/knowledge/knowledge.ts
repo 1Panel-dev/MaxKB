@@ -1,7 +1,7 @@
 import { Result } from '@/request/Result'
 import { get, post, del, put, exportFile, exportExcel } from '@/request/index'
 import { type Ref } from 'vue'
-import type { pageRequest } from '@/api/type/common'
+import type { Dict, pageRequest } from '@/api/type/common'
 import type { knowledgeData } from '@/api/type/knowledge'
 
 import useStore from '@/stores'
@@ -330,6 +330,13 @@ const getKnowledgeWorkflowFormList: (
 ) => {
   return post(`${prefix.value}/${knowledge_id}/form_list/${type}/${id}`, { node }, {}, loading)
 }
+const workflowAction: (
+  knowledge_id: string,
+  instance: Dict<any>,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (knowledge_id: string, instance, loading) => {
+  return post(`${prefix.value}/${knowledge_id}/action`, instance, {}, loading)
+}
 
 export default {
   getKnowledgeList,
@@ -356,4 +363,5 @@ export default {
   delMulTag,
   createWorkflowKnowledge,
   getKnowledgeWorkflowFormList,
+  workflowAction,
 }

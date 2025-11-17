@@ -105,10 +105,10 @@ class LoopWorkflowManage(WorkflowManage):
                            get_node_params=lambda node: node.properties.get('node_data')):
         for node in self.flow.nodes:
             if node.id == node_id:
-                node_instance = get_node(node.type)(node,
-                                                    self.params, self, up_node_id_list,
-                                                    get_node_params,
-                                                    salt=self.get_index())
+                node_instance = get_node(node.type, self.flow.workflow_mode)(node,
+                                                                             self.params, self, up_node_id_list,
+                                                                             get_node_params,
+                                                                             salt=self.get_index())
                 return node_instance
         return None
 

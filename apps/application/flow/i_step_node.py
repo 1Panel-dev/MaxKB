@@ -96,6 +96,14 @@ class WorkFlowPostHandler:
                 application_public_access_client.save()
 
 
+class KnowledgeWorkflowPostHandler(WorkFlowPostHandler):
+    def __init__(self, chat_info):
+        super().__init__(chat_info)
+
+    def handler(self, workflow):
+        pass
+
+
 class NodeResult:
     def __init__(self, node_variable: Dict, workflow_variable: Dict,
                  _write_context=write_context, _is_interrupt=is_interrupt):
@@ -150,6 +158,12 @@ class FlowParamsSerializer(serializers.Serializer):
     re_chat = serializers.BooleanField(required=True, label="换个答案")
 
     debug = serializers.BooleanField(required=True, label="是否debug")
+
+
+class KnowledgeFlowParamsSerializer(serializers.Serializer):
+    knowledge_id = serializers.CharField(required=True, label="知识库id")
+    data_source = serializers.DictField(required=True, label="数据源")
+    knowledge_base = serializers.DictField(required=False, label="知识库设置")
 
 
 class INode:
@@ -221,7 +235,7 @@ class INode:
         pass
 
     def get_flow_params_serializer_class(self) -> Type[serializers.Serializer]:
-        return FlowParamsSerializer
+        return self.workflow_manage.get_params_serializer_class()
 
     def get_write_error_context(self, e):
         self.status = 500

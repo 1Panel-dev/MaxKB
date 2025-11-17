@@ -13,6 +13,7 @@ from django.core import validators
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from application.flow.common import WorkflowMode
 from application.flow.i_step_node import INode, NodeResult
 from common.utils.common import flat_map
 
@@ -67,6 +68,7 @@ def get_paragraph_list(chat_record, node_id):
 
 class ISearchKnowledgeStepNode(INode):
     type = 'search-knowledge-node'
+    support = [WorkflowMode.APPLICATION, WorkflowMode.APPLICATION_LOOP]
 
     def get_node_params_serializer_class(self) -> Type[serializers.Serializer]:
         return SearchDatasetStepNodeSerializer

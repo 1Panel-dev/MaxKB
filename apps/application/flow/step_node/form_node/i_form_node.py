@@ -10,6 +10,7 @@ from typing import Type
 
 from rest_framework import serializers
 
+from application.flow.common import WorkflowMode
 from application.flow.i_step_node import INode, NodeResult
 
 from django.utils.translation import gettext_lazy as _
@@ -24,6 +25,7 @@ class FormNodeParamsSerializer(serializers.Serializer):
 class IFormNode(INode):
     type = 'form-node'
     view_type = 'single_view'
+    support = [WorkflowMode.APPLICATION, WorkflowMode.APPLICATION_LOOP]
 
     def get_node_params_serializer_class(self) -> Type[serializers.Serializer]:
         return FormNodeParamsSerializer

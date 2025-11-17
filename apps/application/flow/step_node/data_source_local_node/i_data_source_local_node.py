@@ -12,6 +12,7 @@ from typing import Type
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from application.flow.common import WorkflowMode
 from application.flow.i_step_node import INode, NodeResult
 
 
@@ -35,5 +36,7 @@ class IDataSourceLocalNode(INode):
     def _run(self):
         return self.execute(**self.node_params_serializer.data, **self.flow_params_serializer.data)
 
-    def execute(self, file_format, max_file_number, file_max_size, **kwargs) -> NodeResult:
+    def execute(self, file_type_list, file_size_limit, file_count_limit, **kwargs) -> NodeResult:
         pass
+
+    support = [WorkflowMode.KNOWLEDGE]

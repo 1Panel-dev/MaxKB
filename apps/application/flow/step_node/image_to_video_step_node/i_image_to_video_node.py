@@ -5,6 +5,7 @@ from typing import Type
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from application.flow.common import WorkflowMode
 from application.flow.i_step_node import INode, NodeResult
 
 
@@ -34,6 +35,7 @@ class ImageToVideoNodeSerializer(serializers.Serializer):
 
 class IImageToVideoNode(INode):
     type = 'image-to-video-node'
+    support = [WorkflowMode.APPLICATION, WorkflowMode.APPLICATION_LOOP]
 
     def get_node_params_serializer_class(self) -> Type[serializers.Serializer]:
         return ImageToVideoNodeSerializer

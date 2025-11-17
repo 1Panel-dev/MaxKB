@@ -22,7 +22,7 @@ from rest_framework import status
 
 from application.flow import tools
 from application.flow.common import Workflow
-from application.flow.i_step_node import INode, WorkFlowPostHandler, NodeResult
+from application.flow.i_step_node import INode, WorkFlowPostHandler, NodeResult, FlowParamsSerializer
 from application.flow.step_node import get_node
 from common.handle.base_to_response import BaseToResponse
 from common.handle.impl.response.system_to_response import SystemToResponse
@@ -302,8 +302,8 @@ class WorkflowManage:
             answer_tokens = sum([row.get('answer_tokens') for row in details.values() if
                                  'answer_tokens' in row and row.get('answer_tokens') is not None])
             self.work_flow_post_handler.handler(self)
-            yield self.base_to_response.to_stream_chunk_response(self.params['chat_id'],
-                                                                 self.params['chat_record_id'],
+            yield self.base_to_response.to_stream_chunk_response(self.params.get('chat_id'),
+                                                                 self.params.get('chat_record_id'),
                                                                  '',
                                                                  [],
                                                                  '', True, message_tokens, answer_tokens, {})
@@ -316,7 +316,7 @@ class WorkflowManage:
         translation.activate(language)
         if current_node is None:
             start_node = self.get_start_node()
-            current_node = get_node(start_node.type)(start_node, self.params, self)
+            current_node = get_node(start_node.type, self.flow.workflow_mode)(start_node, self.params, self)
         self.node_chunk_manage.add_node_chunk(current_node.node_chunk)
         # 添加节点
         self.append_node(current_node)
@@ -402,8 +402,8 @@ class WorkflowManage:
                                 node_type = r.get("node_type")
                             view_type = r.get('view_type')
                             reasoning_content = r.get('reasoning_content')
-                        chunk = self.base_to_response.to_stream_chunk_response(self.params['chat_id'],
-                                                                               self.params['chat_record_id'],
+                        chunk = self.base_to_response.to_stream_chunk_response(self.params.get('chat_id'),
+                                                                               self.params.get('chat_record_id'),
                                                                                current_node.id,
                                                                                current_node.up_node_id_list,
                                                                                content, False, 0, 0,
@@ -417,8 +417,8 @@ class WorkflowManage:
                                                                                 'node_status': "SUCCESS"})
                         current_node.node_chunk.add_chunk(chunk)
                     chunk = (self.base_to_response
-                             .to_stream_chunk_response(self.params['chat_id'],
-                                                       self.params['chat_record_id'],
+                             .to_stream_chunk_response(self.params.get('chat_id'),
+                                                       self.params.get('chat_record_id'),
                                                        current_node.id,
                                                        current_node.up_node_id_list,
                                                        '', False, 0, 0, {'node_is_end': True,
@@ -436,8 +436,8 @@ class WorkflowManage:
         except Exception as e:
             # 添加节点
             traceback.print_exc()
-            chunk = self.base_to_response.to_stream_chunk_response(self.params['chat_id'],
-                                                                   self.params['chat_record_id'],
+            chunk = self.base_to_response.to_stream_chunk_response(self.params.get('chat_id'),
+                                                                   self.params.get('chat_record_id'),
                                                                    current_node.id,
                                                                    current_node.up_node_id_list,
                                                                    'Exception:' + str(e), False, 0, 0,
@@ -698,8 +698,9 @@ class WorkflowManage:
                            get_node_params=lambda node: node.properties.get('node_data')):
         for node in self.flow.nodes:
             if node.id == node_id:
-                node_instance = get_node(node.type)(node,
-                                                    self.params, self, up_node_id_list, get_node_params)
+                node_instance = get_node(node.type, self.flow.workflow_mode)(node,
+                                                                             self.params, self, up_node_id_list,
+                                                                             get_node_params)
                 return node_instance
         return None
 
@@ -712,3 +713,6 @@ class WorkflowManage:
     def get_node_reference(self, reference_address: Dict):
         node = self.get_node_by_id(reference_address.get('node_id'))
         return node.context[reference_address.get('node_field')]
+
+    def get_params_serializer_class(self):
+        return FlowParamsSerializer

@@ -9,8 +9,8 @@
     require-asterisk-position="right"
   >
     <template #default>
-      <el-form-item prop="data_source" :rules="base_form_data_rule.data_source">
-        <el-radio-group @change="sourceChange" v-model="base_form_data.data_source">
+      <el-form-item prop="node_id" :rules="base_form_data_rule.node_id">
+        <el-radio-group @change="sourceChange" v-model="base_form_data.node_id">
           <el-radio :value="node.id" border size="large" v-for="node in source_node_list">
             <div style="display: flex; align-items: center">
               <component
@@ -52,7 +52,7 @@ const props = defineProps<{
 }>()
 const loading = ref<boolean>(false)
 const dynamicsFormRef = ref<InstanceType<typeof DynamicsForm>>()
-const base_form_data = ref<{ data_source: string }>({ data_source: '' })
+const base_form_data = ref<{ node_id: string }>({ node_id: '' })
 const dynamics_form_data = ref<Dict<any>>({})
 const form_data = computed({
   get: () => {
@@ -82,7 +82,7 @@ const sourceChange = (node_id: string) => {
     })
 }
 const base_form_data_rule = ref<FormRules>({
-  data_source: {
+  node_id: {
     required: true,
     trigger: 'blur',
     message: '数据源必选',

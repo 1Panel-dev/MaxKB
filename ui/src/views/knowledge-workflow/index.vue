@@ -393,8 +393,7 @@ const clickShowDebug = () => {
           ...workflow.get_base_node()?.properties.node_data,
           work_flow: getGraphData(),
         }
-        console.log('sss', DebugRef.value)
-        DebugRef.value?.open(graphData)
+        DebugRef.value?.open(graphData, id)
       } catch (e: any) {
         console.log(e)
         MsgError(e.toString())

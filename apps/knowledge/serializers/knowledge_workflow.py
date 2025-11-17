@@ -8,6 +8,9 @@ from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from application.flow.common import Workflow, WorkflowMode
+from application.flow.i_step_node import KnowledgeWorkflowPostHandler
+from application.flow.knowledge_workflow_manage import KnowledgeWorkflowManage
 from application.flow.step_node import get_node
 from common.exception.app_exception import AppApiException
 from knowledge.models import KnowledgeScope, Knowledge, KnowledgeType, KnowledgeWorkflow
@@ -23,6 +26,23 @@ class KnowledgeWorkflowModelSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class KnowledgeWorkflowActionSerializer(serializers.Serializer):
+    workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+    knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
+
+    def action(self, instance: Dict, with_valid=True):
+        if with_valid:
+            self.is_valid(raise_exception=True)
+        knowledge_workflow = QuerySet(KnowledgeWorkflow).filter(knowledge_id=self.data.get("knowledge_id")).first()
+        work_flow_manage = KnowledgeWorkflowManage(
+            Workflow.new_instance(knowledge_workflow.work_flow, WorkflowMode.KNOWLEDGE),
+            {'knowledge_id': self.data.get("knowledge_id"), 'stream': True,
+             **instance},
+            KnowledgeWorkflowPostHandler(None))
+        r = work_flow_manage.run()
+        return r
+
+
 class KnowledgeWorkflowSerializer(serializers.Serializer):
     class Form(serializers.Serializer):
         type = serializers.CharField(required=True, label=_('type'))
@@ -32,7 +52,7 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
         def get_form_list(self):
             self.is_valid(raise_exception=True)
             if self.data.get('type') == 'local':
-                node = get_node(self.data.get('id'))
+                node = get_node(self.data.get('id'), WorkflowMode.KNOWLEDGE)
                 return node.get_form_list(self.data.get("node"))
             elif self.data.get('type') == 'tool':
                 tool = QuerySet(Tool).filter(id=self.data.get("id")).first()
