@@ -82,6 +82,7 @@
         <el-table-column prop="tool_type" :label="$t('views.system.resource_management.type')">
           <template #default="scope">
             <span v-if="scope.row.tool_type === 'MCP'"> MCP </span>
+            <span v-else-if="scope.row.tool_type === 'DATA_SOURCE'"> {{ $t('views.tool.dataSource') }} </span>
             <span v-else-if="scope.row.version">{{ $t('views.tool.toolStore.title') }}</span>
             <span v-else>
               {{
@@ -248,6 +249,23 @@
                 </el-button>
               </span>
             </el-tooltip>
+            <el-tooltip
+              effect="dark"
+              :content="$t('common.edit')"
+              placement="top"
+              v-if="!row.template_id && row.tool_type === 'DATA_SOURCE' && permissionPrecise.edit()"
+            >
+              <span class="mr-8">
+                <el-button
+                  type="primary"
+                  text
+                  @click.stop="openCreateDataSourceDialog(row)"
+                  :title="$t('common.edit')"
+                >
+                  <AppIcon iconName="app-edit"></AppIcon>
+                </el-button>
+              </span>
+            </el-tooltip>
 
             <el-tooltip
               effect="dark"
@@ -323,6 +341,7 @@
     <InitParamDrawer ref="InitParamDrawerRef" @refresh="refresh" />
     <ToolFormDrawer ref="ToolFormDrawerRef" @refresh="refresh" :title="ToolDrawertitle" />
     <McpToolFormDrawer ref="McpToolFormDrawerRef" @refresh="refresh" :title="McpToolDrawertitle" />
+    <DataSourceToolFormDrawer ref="DataSourceToolFormDrawerRef" @refresh="refresh" :title="DataSourceToolDrawertitle" />
     <AddInternalToolDialog ref="AddInternalToolDialogRef" @refresh="confirmAddInternalTool" />
     <McpToolConfigDialog ref="McpToolConfigDialogRef" @refresh="refresh" />
     <ResourceAuthorizationDrawer :type="SourceTypeEnum.TOOL" ref="ResourceAuthorizationDrawerRef" />
@@ -337,6 +356,7 @@ import ToolResourceApi from '@/api/system-resource-management/tool'
 import AddInternalToolDialog from '@/views/tool/toolStore/AddInternalToolDialog.vue'
 import ToolFormDrawer from '@/views/tool/ToolFormDrawer.vue'
 import McpToolFormDrawer from '@/views/tool/McpToolFormDrawer.vue'
+import DataSourceToolFormDrawer from '@/views/tool/DataSourceToolFormDrawer.vue'
 import ResourceAuthorizationDrawer from '@/components/resource-authorization-drawer/index.vue'
 import { t } from '@/locales'
 import { SourceTypeEnum } from '@/enums/common'
@@ -460,8 +480,10 @@ async function copyTool(row: any) {
 
 const ToolFormDrawerRef = ref()
 const McpToolFormDrawerRef = ref()
+const DataSourceToolFormDrawerRef = ref()
 const ToolDrawertitle = ref('')
 const McpToolDrawertitle = ref('')
+const DataSourceToolDrawertitle = ref('')
 
 function openCreateDialog(data?: any) {
   // 有template_id的不允许编辑，是模板转换来的
@@ -492,6 +514,22 @@ function openCreateMcpDialog(data?: any) {
     })
   } else {
     McpToolFormDrawerRef.value.open(data)
+  }
+}
+
+function openCreateDataSourceDialog(data?: any) {
+  // 有template_id的不允许编辑，是模板转换来的
+  if (data?.template_id) {
+    return
+  }
+
+  DataSourceToolDrawertitle.value = data ? t('views.tool.editDataSourceTool') : t('views.tool.createDataSourceTool')
+  if (data) {
+    ToolResourceApi.getToolById(data?.id, loading).then((res: any) => {
+      DataSourceToolFormDrawerRef.value.open(res.data)
+    })
+  } else {
+    DataSourceToolFormDrawerRef.value.open(data)
   }
 }
 

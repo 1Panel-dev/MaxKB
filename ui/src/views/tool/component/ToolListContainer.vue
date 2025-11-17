@@ -48,6 +48,16 @@
                   </div>
                 </div>
               </el-dropdown-item>
+              <el-dropdown-item @click="openCreateDataSourceDialog()">
+                <div class="flex align-center">
+                  <el-avatar shape="square" :size="32">
+                    <img src="@/assets/workflow/icon_mcp.svg" style="width: 75%" alt="" />
+                  </el-avatar>
+                  <div class="pre-wrap ml-8">
+                    <div class="lighter">{{ $t('views.tool.createDataSourceTool') }}</div>
+                  </div>
+                </div>
+              </el-dropdown-item>
               <el-upload ref="elUploadRef" :file-list="[]" action="#" multiple :auto-upload="false"
                 :show-file-list="false" :limit="1" :on-change="(file: any, fileList: any) => importTool(file)"
                 class="import-button">
@@ -249,6 +259,7 @@
   <InitParamDrawer ref="InitParamDrawerRef" @refresh="refresh" />
   <ToolFormDrawer ref="ToolFormDrawerRef" @refresh="refresh" :title="ToolDrawertitle" />
   <McpToolFormDrawer ref="McpToolFormDrawerRef" @refresh="refresh" :title="McpToolDrawertitle" />
+  <DataSourceToolFormDrawer ref="DataSourceToolFormDrawerRef" @refresh="refresh" :title="DataSourceToolDrawertitle" />
   <CreateFolderDialog ref="CreateFolderDialogRef" v-if="!isShared" @refresh="refreshFolder" />
   <ToolStoreDialog ref="toolStoreDialogRef" :api-type="apiType" @refresh="refresh" />
   <AddInternalToolDialog ref="AddInternalToolDialogRef" @refresh="confirmAddInternalTool" />
@@ -268,6 +279,7 @@ import { useRoute, onBeforeRouteLeave } from 'vue-router'
 import InitParamDrawer from '@/views/tool/component/InitParamDrawer.vue'
 import ToolFormDrawer from '@/views/tool/ToolFormDrawer.vue'
 import McpToolFormDrawer from '@/views/tool/McpToolFormDrawer.vue'
+import DataSourceToolFormDrawer from '@/views/tool/DataSourceToolFormDrawer.vue'
 import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
 import AuthorizedWorkspace from '@/views/system-shared/AuthorizedWorkspaceDialog.vue'
 import ToolStoreDialog from '@/views/tool/toolStore/ToolStoreDialog.vue'
@@ -350,8 +362,10 @@ const search_type_change = () => {
 }
 const ToolFormDrawerRef = ref()
 const McpToolFormDrawerRef = ref()
+const DataSourceToolFormDrawerRef = ref()
 const ToolDrawertitle = ref('')
 const McpToolDrawertitle = ref('')
+const DataSourceToolDrawertitle = ref('')
 
 const MoveToDialogRef = ref()
 function openMoveToDialog(data: any) {
@@ -382,6 +396,12 @@ function openCreateDialog(data?: any) {
   if (data?.tool_type === 'MCP') {
     bus.emit('select_node', data.folder_id)
     openCreateMcpDialog(data)
+    return
+  }
+  // 数据源工具
+  if (data?.tool_type === 'DATA_SOURCE') {
+    bus.emit('select_node', data.folder_id)
+    openCreateDataSourceDialog(data)
     return
   }
   // 有版本号的展示readme，是商店更新过来的
@@ -437,6 +457,27 @@ function openCreateMcpDialog(data?: any) {
       })
   } else {
     McpToolFormDrawerRef.value.open(data)
+  }
+}
+
+function openCreateDataSourceDialog(data?: any) {
+  // 有template_id的不允许编辑，是模板转换来的
+  if (data?.template_id) {
+    return
+  }
+  // 共享过来的工具不让编辑
+  if (isShared.value) {
+    return
+  }
+  DataSourceToolDrawertitle.value = data ? t('views.tool.editDataSourceTool') : t('views.tool.createDataSourceTool')
+  if (data) {
+    loadSharedApi({ type: 'tool', systemType: apiType.value })
+      .getToolById(data?.id, loading)
+      .then((res: any) => {
+        DataSourceToolFormDrawerRef.value.open(res.data)
+      })
+  } else {
+    DataSourceToolFormDrawerRef.value.open(data)
   }
 }
 
