@@ -610,6 +610,7 @@ class ToolSerializer(serializers.Serializer):
                 workspace_id=self.data.get('workspace_id'),
                 input_field_list=tool.get('input_field_list'),
                 init_field_list=tool.get('init_field_list', []),
+                tool_type=tool.get('tool_type'),
                 folder_id=folder_id,
                 scope=scope,
                 is_active=False
