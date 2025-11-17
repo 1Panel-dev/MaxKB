@@ -249,7 +249,6 @@ const handleDrop = (draggingNode: any, dropNode: any, dropType: string, ev: Drag
     .putFolder(dragData.id, props.source, obj, loading)
     .then(() => {
       MsgSuccess(t('common.saveSuccess'))
-      emit('refreshTree')
     })
     .catch(() => {
       emit('refreshTree')

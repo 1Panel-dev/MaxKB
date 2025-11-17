@@ -225,7 +225,6 @@ tool_message_complete_template = """
 """
 
 
-
 def generate_tool_message_complete(name, input_content, output_content):
     """生成包含输入和输出的工具消息模版"""
     # 格式化输入
@@ -268,39 +267,55 @@ def get_global_loop():
 
 
 async def _yield_mcp_response(chat_model, message_list, mcp_servers, mcp_output_enable=True):
-    client = MultiServerMCPClient(json.loads(mcp_servers))
-    tools = await client.get_tools()
-    agent = create_react_agent(chat_model, tools)
-    response = agent.astream({"messages": message_list}, stream_mode='messages')
+    try:
+        client = MultiServerMCPClient(json.loads(mcp_servers))
+        tools = await client.get_tools()
+        agent = create_react_agent(chat_model, tools)
+        response = agent.astream({"messages": message_list}, stream_mode='messages')
 
-    # 用于存储工具调用信息
-    tool_calls_info = {}
+        # 用于存储工具调用信息
+        tool_calls_info = {}
 
-    async for chunk in response:
-        if isinstance(chunk[0], AIMessageChunk):
-            tool_calls = chunk[0].additional_kwargs.get('tool_calls', [])
-            for tool_call in tool_calls:
-                tool_id = tool_call.get('id', '')
-                if tool_id:
-                    # 保存工具调用的输入
-                    tool_calls_info[tool_id] = {
-                        'name': tool_call.get('function', {}).get('name', ''),
-                        'input': tool_call.get('function', {}).get('arguments', '')
-                    }
-            yield chunk[0]
+        async for chunk in response:
+            if isinstance(chunk[0], AIMessageChunk):
+                tool_calls = chunk[0].additional_kwargs.get('tool_calls', [])
+                for tool_call in tool_calls:
+                    tool_id = tool_call.get('id', '')
+                    if tool_id:
+                        # 保存工具调用的输入
+                        tool_calls_info[tool_id] = {
+                            'name': tool_call.get('function', {}).get('name', ''),
+                            'input': tool_call.get('function', {}).get('arguments', '')
+                        }
+                yield chunk[0]
 
-        if mcp_output_enable and isinstance(chunk[0], ToolMessage):
-            tool_id = chunk[0].tool_call_id
-            if tool_id in tool_calls_info:
-                # 合并输入和输出
-                tool_info = tool_calls_info[tool_id]
-                content = generate_tool_message_complete(
-                    tool_info['name'],
-                    tool_info['input'],
-                    chunk[0].content
-                )
-                chunk[0].content = content
-            yield chunk[0]
+            if mcp_output_enable and isinstance(chunk[0], ToolMessage):
+                tool_id = chunk[0].tool_call_id
+                if tool_id in tool_calls_info:
+                    # 合并输入和输出
+                    tool_info = tool_calls_info[tool_id]
+                    content = generate_tool_message_complete(
+                        tool_info['name'],
+                        tool_info['input'],
+                        chunk[0].content
+                    )
+                    chunk[0].content = content
+                yield chunk[0]
+
+    except ExceptionGroup as eg:
+
+        def get_real_error(exc):
+            if isinstance(exc, ExceptionGroup):
+                return get_real_error(exc.exceptions[0])
+            return exc
+
+        real_error = get_real_error(eg)
+        error_msg = f"{type(real_error).__name__}: {str(real_error)}"
+        raise RuntimeError(error_msg) from None
+
+    except Exception as e:
+        error_msg = f"{type(e).__name__}: {str(e)}"
+        raise RuntimeError(error_msg) from None
 
 
 def mcp_response_generator(chat_model, message_list, mcp_servers, mcp_output_enable=True):
