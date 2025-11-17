@@ -18,6 +18,7 @@ from .image_generate_step_node import *
 from .image_to_video_step_node import BaseImageToVideoNode
 from .image_understand_step_node import *
 from .intent_node import *
+from .knowledge_write_node.impl.base_knowledge_write_node import BaseKnowledgeWriteNode
 from .loop_break_node import BaseLoopBreakNode
 from .loop_continue_node import BaseLoopContinueNode
 from .loop_node import *
@@ -49,7 +50,7 @@ node_list = [BaseStartStepNode, BaseChatNode, BaseSearchKnowledgeNode, BaseSearc
              BaseIntentNode, BaseLoopNode, BaseLoopStartStepNode,
              BaseLoopContinueNode,
              BaseLoopBreakNode, BaseVariableSplittingNode, BaseParameterExtractionNode, BaseVariableAggregationNode,
-             BaseDataSourceLocalNode,BaseDataSourceWebNode]
+             BaseDataSourceLocalNode,BaseDataSourceWebNode,BaseKnowledgeWriteNode]
 
 
 def get_node(node_type):

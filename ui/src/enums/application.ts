@@ -40,6 +40,7 @@ export enum WorkflowType {
   ParameterExtractionNode = 'parameter-extraction-node',
   DataSourceLocalNode = 'data-source-local-node',
   DataSourceWebNode = 'data-source-web-node',
+  KnowledgeWriteNode = 'knowledge-write-node',
 }
 export enum WorkflowKind {
   DataSource = 'data-source',

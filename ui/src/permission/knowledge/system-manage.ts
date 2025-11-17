@@ -185,7 +185,7 @@ const systemManage = {
       PermissionConst.RESOURCE_KNOWLEDGE_TAG_DELETE
     ],'OR'
     ),  
-  bug: () => 
+  debug: () => 
     hasPermission([
       RoleConst.ADMIN,
       PermissionConst.RESOURCE_KNOWLEDGE_WORKFLOW_READ

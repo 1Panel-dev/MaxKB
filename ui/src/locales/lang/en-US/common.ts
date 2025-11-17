@@ -76,6 +76,7 @@ export default {
   },
   aggregationStrategy: 'Aggregation Strategy',
   inputPlaceholder: 'Please input',
+  inputContent: 'Input content',
   selectPlaceholder: 'Please select',
   title: 'Title',
   content: 'Content',

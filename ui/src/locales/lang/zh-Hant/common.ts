@@ -76,6 +76,7 @@ export default {
   },
   aggregationStrategy: '聚合策略',
   inputPlaceholder: '請輸入',
+  inputContent: '輸入內容',
   selectPlaceholder: '請選擇',
   title: '標題',
   content: '内容',
