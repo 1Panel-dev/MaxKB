@@ -132,7 +132,17 @@
         </el-dropdown-item>
         <el-dropdown-item
           @click="openAbout"
-          v-if="hasPermission([RoleConst.ADMIN, PermissionConst.ABOUT_READ], 'OR')"
+          v-if="
+              hasPermission(
+                new ComplexPermission(
+                  [RoleConst.ADMIN, RoleConst.USER, RoleConst.WORKSPACE_MANAGE],
+                  [PermissionConst.ABOUT_READ],
+                  [],
+                  'OR',
+                ),
+                'OR',
+              )
+            "
         >
           {{ $t('layout.about.title') }}
         </el-dropdown-item>
