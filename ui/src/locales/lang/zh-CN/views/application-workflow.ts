@@ -81,6 +81,11 @@ export default {
     loopNodeBreakNodeRequired: '无限循环 必须存在 Break 节点',
   },
   nodes: {
+    knowledgeWriteNode: {
+      chunk_length: '子分块长度',
+      text: '知识库写入',
+      label: '知识库写入',
+    },        
     dataSourceWebNode: {
       label: 'Web站点',
       text: 'Web站点',

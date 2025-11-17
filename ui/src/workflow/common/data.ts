@@ -119,7 +119,19 @@ export const dataSourceWebNode = {
       ],
     },
   },
+}
 
+export const knowledgeWriteNode = {
+  type: WorkflowType.KnowledgeWriteNode,
+  text: t('views.applicationWorkflow.nodes.knowledgeWriteNode.text'),
+  label: t('views.applicationWorkflow.nodes.knowledgeWriteNode.label'),
+  properties: {
+    height: 252,
+    stepName: t('views.applicationWorkflow.nodes.knowledgeWriteNode.label'),
+    config: {
+      fields:[]
+    },
+  },
 }
 
 
@@ -706,7 +718,7 @@ export const knowledgeMenuNodes = [
   },
   {
     label: t('views.knowledge.title'),
-    list: [documentExtractNode],
+    list: [documentExtractNode, knowledgeWriteNode],
   },
   {
     label: t('views.applicationWorkflow.nodes.classify.businessLogic'),
@@ -952,6 +964,7 @@ export const nodeDict: any = {
   [WorkflowType.KnowledgeBase]: knowledgeBaseNode,
   [WorkflowType.DataSourceLocalNode]: dataSourceLocalNode,
   [WorkflowType.DataSourceWebNode]: dataSourceWebNode,
+  [WorkflowType.KnowledgeWriteNode]: knowledgeWriteNode,
 }
 
 export function isWorkFlow(type: string | undefined) {

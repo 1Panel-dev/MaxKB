@@ -79,6 +79,11 @@ export default {
     loopNodeBreakNodeRequired: 'Wireless loop must have a Break node',
   },
   nodes: {
+    knowledgeWriteNode: {
+      chunk_length: 'Chunk length',
+      text: 'Knowledge write',
+      label: 'Knowledge write',
+    },    
     dataSourceWebNode: {
       label: 'Web Site',
       text: 'Web Site',

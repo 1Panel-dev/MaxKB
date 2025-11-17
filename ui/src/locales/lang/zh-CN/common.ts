@@ -80,6 +80,7 @@ export default {
   },
   aggregationStrategy: '聚合策略',
   inputPlaceholder: '请输入',
+  inputContent: '输入内容',
   selectPlaceholder: '请选择',
   title: '标题',
   content: '内容',

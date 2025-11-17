@@ -30,7 +30,7 @@
           <AppIcon iconName="app-add-outlined" class="mr-4" />
           {{ $t('views.knowledgeWorkflow.setting.addComponent') }}
         </el-button>
-        <el-button @click="clickShowDebug" :disabled="showDebug">
+        <el-button @click="clickShowDebug" :disabled="showDebug" v-if="permissionPrecise.debug(id)">
           <AppIcon iconName="app-debug-outlined" class="mr-4"></AppIcon>
           {{ $t('views.knowledgeWorkflow.setting.debug') }}
         </el-button>

@@ -80,6 +80,11 @@ export default {
     loopNodeBreakNodeRequired: '無限循環必須存在Break節點',
   },
   nodes: {
+    knowledgeWriteNode: {
+      chunk_length: '子分塊長度',
+      text: '知識庫寫入',
+      label: '知識庫寫入',
+    },  
     dataSourceWebNode: {
       label: 'Web網站',
       text: 'Web網站',
