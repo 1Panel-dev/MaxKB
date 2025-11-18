@@ -232,8 +232,7 @@
                           </el-dropdown-item>
                           <el-dropdown-item v-if="
                             !item.template_id &&
-                            permissionPrecise.export(item.id) &&
-                            item.tool_type !== 'MCP'
+                            permissionPrecise.export(item.id)
                           " @click.stop="exportTool(item)">
                             <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
                             {{ $t('common.export') }}
