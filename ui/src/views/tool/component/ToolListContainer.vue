@@ -204,8 +204,7 @@
                           </el-dropdown-item>
                           <el-dropdown-item v-if="
                             !item.template_id &&
-                            permissionPrecise.copy(item.id) &&
-                            item.tool_type !== 'MCP'
+                            permissionPrecise.copy(item.id)
                           " @click.stop="copyTool(item)">
                             <AppIcon iconName="app-copy" class="color-secondary"></AppIcon>
                             {{ $t('common.copy') }}
@@ -540,6 +539,18 @@ async function changeState(row: any) {
 }
 
 async function copyTool(row: any) {
+  // mcp工具
+  if (row?.tool_type === 'MCP') {
+    bus.emit('select_node', row.folder_id)
+    await copyMcpTool(row)
+    return
+  }
+  // 数据源工具
+  if (row?.tool_type === 'DATA_SOURCE') {
+    bus.emit('select_node', row.folder_id)
+    await copyDataSource(row)
+    return
+  }
   ToolDrawertitle.value = t('views.tool.copyTool')
   const res = await loadSharedApi({ type: 'tool', systemType: apiType.value }).getToolById(
     row.id,
@@ -549,6 +560,30 @@ async function copyTool(row: any) {
   delete obj['id']
   obj['name'] = obj['name'] + `  ${t('common.copyTitle')}`
   ToolFormDrawerRef.value.open(obj)
+}
+
+async function copyMcpTool(row: any) {
+  McpToolDrawertitle.value = t('views.tool.copyMcpTool')
+  const res = await loadSharedApi({ type: 'tool', systemType: apiType.value }).getToolById(
+    row.id,
+    changeStateloading,
+  )
+  const obj = cloneDeep(res.data)
+  delete obj['id']
+  obj['name'] = obj['name'] + `  ${t('common.copyTitle')}`
+  McpToolFormDrawerRef.value.open(obj)
+}
+
+async function copyDataSource(row: any) {
+  DataSourceToolDrawertitle.value = t('views.tool.copyDataSource')
+  const res = await loadSharedApi({ type: 'tool', systemType: apiType.value }).getToolById(
+    row.id,
+    changeStateloading,
+  )
+  const obj = cloneDeep(res.data)
+  delete obj['id']
+  obj['name'] = obj['name'] + `  ${t('common.copyTitle')}`
+  DataSourceToolFormDrawerRef.value.open(obj)
 }
 
 function exportTool(row: any) {

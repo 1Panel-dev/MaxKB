@@ -9,6 +9,8 @@ export default {
   editDataSourceTool: 'Edit Data Source',
   editMcpTool: 'Edit MCP',
   copyTool: 'Copy Tool',
+  copyMcpTool: 'Copy MCP',
+  copyDataSource: 'Copy Data Source',
   importTool: 'Import Tool',
   settingTool: 'Set Tool',
   mcpConfig: 'MCP Service Config',

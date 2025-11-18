@@ -9,6 +9,8 @@ export default {
   editDataSourceTool: '編輯資料來源',
   editMcpTool: '編輯MCP',
   copyTool: '複製工具',
+  copyMcpTool: '複製MCP',
+  copyDataSource: '複製資料來源',
   importTool: '匯入工具',
   settingTool: '設定工具',
   mcpConfig: 'MCP服務配置',
