@@ -108,9 +108,9 @@ def write_context(node_variable: Dict, workflow_variable: Dict, node: INode, wor
     content = reasoning_result.get('content') + reasoning_result_end.get('content')
     meta = {**response.response_metadata, **response.additional_kwargs}
     if 'reasoning_content' in meta:
-        reasoning_content = meta.get('reasoning_content', '')
+        reasoning_content = (meta.get('reasoning_content', '') or '')
     else:
-        reasoning_content = reasoning_result.get('reasoning_content') + reasoning_result_end.get('reasoning_content')
+        reasoning_content = (reasoning_result.get('reasoning_content') or '') + (reasoning_result_end.get('reasoning_content') or '')
     _write_context(node_variable, workflow_variable, node, workflow, content, reasoning_content)
 
 

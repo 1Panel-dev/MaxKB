@@ -416,10 +416,10 @@ class BaseChatStep(IChatStep):
             reasoning_result_end = reasoning.get_end_reasoning_content()
             content = reasoning_result.get('content') + reasoning_result_end.get('content')
             if 'reasoning_content' in chat_result.response_metadata:
-                reasoning_content = chat_result.response_metadata.get('reasoning_content', '')
+                reasoning_content = (chat_result.response_metadata.get('reasoning_content', '') or '')
             else:
-                reasoning_content = reasoning_result.get('reasoning_content') + reasoning_result_end.get(
-                    'reasoning_content')
+                reasoning_content = (reasoning_result.get('reasoning_content') or "") + (reasoning_result_end.get(
+                    'reasoning_content') or "")
             post_response_handler.handler(chat_id, chat_record_id, paragraph_list, problem_text,
                                           content, manage, self, padding_problem_text,
                                           reasoning_content=reasoning_content)
