@@ -311,7 +311,7 @@
 
                   <el-dropdown-item
                     v-if="
-                      !row.template_id && row.tool_type === 'CUSTOM' && permissionPrecise.export()
+                      !row.template_id && permissionPrecise.export()
                     "
                     @click.stop="exportTool(row)"
                   >
