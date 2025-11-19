@@ -159,6 +159,7 @@ function refreshFieldList(data: any, index: any) {
     value: item.field,
   }))
 
+  set(props.nodeModel.properties, 'user_input_field_list', cloneDeep(inputFieldList.value))
   set(props.nodeModel.properties.config, 'fields', fields)
   onDragHandle()
 }
@@ -210,6 +211,7 @@ function onDragHandle() {
 }
 
 onMounted(() => {
+  inputFieldList.value = []
   if (props.nodeModel.properties.user_input_field_list) {
     inputFieldList.value = cloneDeep(props.nodeModel.properties.user_input_field_list)
   }

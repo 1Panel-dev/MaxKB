@@ -27,8 +27,16 @@ class KnowledgeWorkflowActionView(APIView):
     authentication_classes = [TokenAuth]
 
     def post(self, request: Request, workspace_id: str, knowledge_id: str):
-        return KnowledgeWorkflowActionSerializer(
-            data={'workspace_id': workspace_id, 'knowledge_id': knowledge_id}).action(request.data, True)
+        return result.success(KnowledgeWorkflowActionSerializer(
+            data={'workspace_id': workspace_id, 'knowledge_id': knowledge_id}).action(request.data, True))
+
+    class Operate(APIView):
+        authentication_classes = [TokenAuth]
+
+        def get(self, request, workspace_id: str, knowledge_id: str, knowledge_action_id: str):
+            return result.success(KnowledgeWorkflowActionSerializer.Operate(
+                data={'workspace_id': workspace_id, 'knowledge_id': knowledge_id, 'id': knowledge_action_id})
+                                  .one())
 
 
 class KnowledgeWorkflowView(APIView):

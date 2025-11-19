@@ -14,6 +14,7 @@ from application.flow.knowledge_workflow_manage import KnowledgeWorkflowManage
 from application.flow.step_node import get_node
 from common.exception.app_exception import AppApiException
 from knowledge.models import KnowledgeScope, Knowledge, KnowledgeType, KnowledgeWorkflow
+from knowledge.models.knowledge_action import KnowledgeAction, State
 from knowledge.serializers.knowledge import KnowledgeModelSerializer
 from system_manage.models import AuthTargetType
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
@@ -34,13 +35,30 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
         if with_valid:
             self.is_valid(raise_exception=True)
         knowledge_workflow = QuerySet(KnowledgeWorkflow).filter(knowledge_id=self.data.get("knowledge_id")).first()
+        knowledge_action_id = uuid.uuid7()
+        KnowledgeAction(id=knowledge_action_id, knowledge_id=self.data.get("knowledge_id"), state=State.STARTED).save()
         work_flow_manage = KnowledgeWorkflowManage(
             Workflow.new_instance(knowledge_workflow.work_flow, WorkflowMode.KNOWLEDGE),
-            {'knowledge_id': self.data.get("knowledge_id"), 'stream': True,
+            {'knowledge_id': self.data.get("knowledge_id"), 'knowledge_action_id': knowledge_action_id, 'stream': True,
              **instance},
-            KnowledgeWorkflowPostHandler(None))
-        r = work_flow_manage.run()
-        return r
+            KnowledgeWorkflowPostHandler(None, knowledge_action_id))
+        work_flow_manage.run()
+        return {'id': knowledge_action_id, 'knowledge_id': self.data.get("knowledge_id"), 'state': State.STARTED,
+                'details': {}}
+
+    class Operate(serializers.Serializer):
+        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+        knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
+        id = serializers.UUIDField(required=True, label=_('knowledge action id'))
+
+        def one(self, is_valid=True):
+            if is_valid:
+                self.is_valid(raise_exception=True)
+            knowledge_action_id = self.data.get("id")
+            knowledge_action = QuerySet(KnowledgeAction).filter(id=knowledge_action_id).first()
+            return {'id': knowledge_action_id, 'knowledge_id': knowledge_action.knowledge_id,
+                    'state': knowledge_action.state,
+                    'details': knowledge_action.details}
 
 
 class KnowledgeWorkflowSerializer(serializers.Serializer):

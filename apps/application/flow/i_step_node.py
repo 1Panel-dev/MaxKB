@@ -21,6 +21,7 @@ from application.flow.common import Answer, NodeChunk
 from application.models import ApplicationChatUserStats
 from application.models import ChatRecord, ChatUserType
 from common.field.common import InstanceField
+from knowledge.models.knowledge_action import KnowledgeAction, State
 
 chat_cache = cache
 
@@ -97,11 +98,13 @@ class WorkFlowPostHandler:
 
 
 class KnowledgeWorkflowPostHandler(WorkFlowPostHandler):
-    def __init__(self, chat_info):
+    def __init__(self, chat_info, knowledge_action_id):
         super().__init__(chat_info)
+        self.knowledge_action_id = knowledge_action_id
 
     def handler(self, workflow):
-        pass
+        QuerySet(KnowledgeAction).filter(id=self.knowledge_action_id).update(
+            state=State.SUCCESS)
 
 
 class NodeResult:
@@ -161,7 +164,8 @@ class FlowParamsSerializer(serializers.Serializer):
 
 
 class KnowledgeFlowParamsSerializer(serializers.Serializer):
-    knowledge_id = serializers.CharField(required=True, label="知识库id")
+    knowledge_id = serializers.UUIDField(required=True, label="知识库id")
+    knowledge_action_id = serializers.UUIDField(required=True, label="知识库任务执行器id")
     data_source = serializers.DictField(required=True, label="数据源")
     knowledge_base = serializers.DictField(required=False, label="知识库设置")
 
@@ -241,7 +245,8 @@ class INode:
         self.status = 500
         self.answer_text = str(e)
         self.err_message = str(e)
-        self.context['run_time'] = time.time() - self.context['start_time']
+        current_time = time.time()
+        self.context['run_time'] = current_time - (self.context.get('start_time') or current_time)
 
         def write_error_context(answer, status=200):
             pass

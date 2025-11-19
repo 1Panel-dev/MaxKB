@@ -1,7 +1,13 @@
 <template>
   <div style="height: 100%; width: 100%">
     <div style="height: calc(100% - 57px); overflow-y: auto; width: 100%">
-      <component ref="ActionRef" :is="ak[active]" :workflow="workflow"></component>
+      <component
+        ref="ActionRef"
+        :is="ak[active]"
+        :workflow="workflow"
+        :knowledge_id="knowledge_id"
+        :id="action_id"
+      ></component>
     </div>
     <div class="el-drawer__footer">
       <el-button>Cancel</el-button>
@@ -23,6 +29,7 @@
 <script setup lang="ts">
 import { computed, ref, provide, type Ref } from 'vue'
 import DataSource from '@/views/knowledge-workflow/component/action/DataSource.vue'
+import Result from '@/views/knowledge-workflow/component/action/Result.vue'
 import applicationApi from '@/api/application/application'
 import KnowledgeBase from '@/views/knowledge-workflow/component/action/KnowledgeBase.vue'
 import { WorkflowType } from '@/enums/application'
@@ -33,10 +40,12 @@ provide('upload', (file: any, loading?: Ref<boolean>) => {
 const ak = {
   data_source: DataSource,
   knowledge_base: KnowledgeBase,
+  result: Result,
 }
+const action_id = ref<string>()
 const ActionRef = ref()
 const form_data = ref<any>({})
-const active = ref<'data_source' | 'knowledge_base'>('data_source')
+const active = ref<'data_source' | 'knowledge_base' | 'result'>('data_source')
 const props = defineProps<{
   workflow: any
   knowledge_id: string
@@ -62,7 +71,10 @@ const up = () => {
 const upload = () => {
   ActionRef.value.validate().then(() => {
     form_data.value[active.value] = ActionRef.value.get_data()
-    KnowledgeApi.workflowAction(props.knowledge_id, form_data.value)
+    KnowledgeApi.workflowAction(props.knowledge_id, form_data.value).then((ok) => {
+      action_id.value = ok.data.id
+      active.value = 'result'
+    })
   })
 }
 </script>
