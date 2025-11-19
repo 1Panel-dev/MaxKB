@@ -16,13 +16,14 @@ class GunicornService(BaseService):
 
         log_format = '%(h)s %(t)s %(L)ss "%(r)s" %(s)s %(b)s '
         bind = f'{HTTP_HOST}:{HTTP_PORT}'
+        max_requests = 10240 if int(self.worker) > 1 else 0
         cmd = [
             'gunicorn', 'smartdoc.wsgi:application',
             '-b', bind,
             '-k', 'gthread',
             '--threads', '200',
             '-w', str(self.worker),
-            '--max-requests', '10240',
+            '--max-requests', str(max_requests),
             '--max-requests-jitter', '2048',
             '--access-logformat', log_format,
             '--access-logfile', '-'

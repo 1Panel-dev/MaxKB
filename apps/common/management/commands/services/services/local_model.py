@@ -25,13 +25,14 @@ class GunicornLocalModelService(BaseService):
         log_format = '%(h)s %(t)s %(L)ss "%(r)s" %(s)s %(b)s '
         bind = f'{CONFIG.get("LOCAL_MODEL_HOST")}:{CONFIG.get("LOCAL_MODEL_PORT")}'
         worker = CONFIG.get("LOCAL_MODEL_HOST_WORKER", 1)
+        max_requests = 10240 if int(worker) > 1 else 0
         cmd = [
             'gunicorn', 'smartdoc.wsgi:application',
             '-b', bind,
             '-k', 'gthread',
             '--threads', '200',
             '-w', str(worker),
-            '--max-requests', '10240',
+            '--max-requests', str(max_requests),
             '--max-requests-jitter', '2048',
             '--access-logformat', log_format,
             '--access-logfile', '-'
