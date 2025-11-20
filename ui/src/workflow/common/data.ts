@@ -92,7 +92,14 @@ export const dataSourceLocalNode = {
     stepName: t('views.applicationWorkflow.nodes.dataSourceLocalNode.label', '本地文件'),
     input_field_list: [],
     node_data: {},
-    config: {},
+    config: {
+      fields: [
+        {
+          label: t('views.applicationWorkflow.nodes.dataSourceLocalNode.field_label', '文件列表'),
+          value: 'file_list',
+        },
+      ],
+    },
     showNode: true,
     user_input_config: {},
     user_input_field_list: [],
@@ -129,11 +136,10 @@ export const knowledgeWriteNode = {
     height: 252,
     stepName: t('views.applicationWorkflow.nodes.knowledgeWriteNode.label'),
     config: {
-      fields:[]
+      fields: [],
     },
   },
 }
-
 
 /**
  * 说明
