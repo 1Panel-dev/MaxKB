@@ -83,7 +83,7 @@ export default {
       chunk_length: 'Chunk length',
       text: 'Knowledge write',
       label: 'Knowledge write',
-    },    
+    },
     dataSourceWebNode: {
       label: 'Web Site',
       text: 'Web Site',
@@ -249,6 +249,16 @@ You are a master of problem optimization, adept at accurately inferring user int
       label: 'Document Content Extraction',
       text: 'Extract content from documents',
       content: 'Document Content',
+    },
+    documentSplitNode: {
+      label: 'Document Splitting',
+      text: 'Split document content into smaller segments',
+      paragraph_list: 'List of split segments',
+      splitStrategy: {
+        label: 'Splitting Strategy',
+        placeholder: 'Please select a splitting strategy',
+        requiredMessage: 'Please select a splitting strategy',
+      },
     },
     imageUnderstandNode: {
       label: 'Image Understanding',

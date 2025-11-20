@@ -84,7 +84,7 @@ export default {
       chunk_length: '子分塊長度',
       text: '知識庫寫入',
       label: '知識庫寫入',
-    },  
+    },
     dataSourceWebNode: {
       label: 'Web網站',
       text: 'Web網站',
@@ -249,6 +249,16 @@ export default {
       label: '文檔內容提取',
       text: '提取文檔中的內容',
       content: '文檔內容',
+    },
+    documentSplitNode: {
+      label: '文檔拆分',
+      text: '將文檔內容拆分為多個分段',
+      paragraph_list: '分段列表',
+      splitStrategy: {
+        label: '分段策略',
+        placeholder: '請選擇分段策略',
+        requiredMessage: '請選擇分段策略',
+      },
     },
     imageUnderstandNode: {
       label: '圖片理解',

@@ -15,12 +15,12 @@ const end_nodes: Array<string> = [
   WorkflowType.ImageGenerateNode,
   WorkflowType.ImageToVideoGenerateNode,
   WorkflowType.TextToVideoGenerateNode,
-  WorkflowType.ImageGenerateNode,
   WorkflowType.LoopBodyNode,
   WorkflowType.LoopNode,
   WorkflowType.LoopBreakNode,
   WorkflowType.VideoUnderstandNode,
   WorkflowType.VariableAssignNode,
+  WorkflowType.KnowledgeWriteNode,
 ]
 
 const loop_end_nodes: Array<string> = [
@@ -36,7 +36,6 @@ const loop_end_nodes: Array<string> = [
   WorkflowType.ImageGenerateNode,
   WorkflowType.ImageToVideoGenerateNode,
   WorkflowType.TextToVideoGenerateNode,
-  WorkflowType.ImageGenerateNode,
   WorkflowType.LoopBodyNode,
   WorkflowType.LoopNode,
   WorkflowType.LoopBreakNode,

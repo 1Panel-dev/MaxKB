@@ -39,6 +39,7 @@ from .variable_aggregation_node.impl.base_variable_aggregation_node import BaseV
 from .variable_assign_node import BaseVariableAssignNode
 from .variable_splitting_node import BaseVariableSplittingNode
 from .video_understand_step_node import BaseVideoUnderstandNode
+from .document_split_node import BaseDocumentSplitNode
 
 node_list = [BaseStartStepNode, BaseChatNode, BaseSearchKnowledgeNode, BaseSearchDocumentNode, BaseQuestionNode,
              BaseConditionNode, BaseReplyNode,
@@ -50,7 +51,7 @@ node_list = [BaseStartStepNode, BaseChatNode, BaseSearchKnowledgeNode, BaseSearc
              BaseIntentNode, BaseLoopNode, BaseLoopStartStepNode,
              BaseLoopContinueNode,
              BaseLoopBreakNode, BaseVariableSplittingNode, BaseParameterExtractionNode, BaseVariableAggregationNode,
-             BaseDataSourceLocalNode, BaseDataSourceWebNode, BaseKnowledgeWriteNode]
+             BaseDataSourceLocalNode, BaseDataSourceWebNode, BaseKnowledgeWriteNode, BaseDocumentSplitNode]
 
 node_map = {n.type: {w: n for w in n.support} for n in node_list}
 

@@ -387,6 +387,24 @@ export const documentExtractNode = {
     },
   },
 }
+export const documentSplitNode = {
+  type: WorkflowType.DocumentSplitNode,
+  text: t('views.applicationWorkflow.nodes.documentSplitNode.text'),
+  label: t('views.applicationWorkflow.nodes.documentSplitNode.label'),
+  height: 252,
+  properties: {
+    width: 500,
+    stepName: t('views.applicationWorkflow.nodes.documentSplitNode.label'),
+    config: {
+      fields: [
+        {
+          label: t('views.applicationWorkflow.nodes.documentSplitNode.paragraph_list'),
+          value: 'paragraph_list',
+        },
+      ],
+    },
+  },
+}
 export const imageUnderstandNode = {
   type: WorkflowType.ImageUnderstandNode,
   text: t('views.applicationWorkflow.nodes.imageUnderstandNode.text'),
@@ -724,7 +742,7 @@ export const knowledgeMenuNodes = [
   },
   {
     label: t('views.knowledge.title'),
-    list: [documentExtractNode, knowledgeWriteNode],
+    list: [documentExtractNode, documentSplitNode, knowledgeWriteNode],
   },
   {
     label: t('views.applicationWorkflow.nodes.classify.businessLogic'),
@@ -763,7 +781,7 @@ export const menuNodes = [
   },
   {
     label: t('views.knowledge.title'),
-    list: [searchKnowledgeNode, searchDocumentNode, rerankerNode, documentExtractNode],
+    list: [searchKnowledgeNode, searchDocumentNode, rerankerNode, documentExtractNode, documentSplitNode, knowledgeWriteNode],
   },
   {
     label: t('views.applicationWorkflow.nodes.classify.businessLogic'),
@@ -949,6 +967,7 @@ export const nodeDict: any = {
   [WorkflowType.FormNode]: formNode,
   [WorkflowType.Application]: applicationNode,
   [WorkflowType.DocumentExtractNode]: documentExtractNode,
+  [WorkflowType.DocumentSplitNode]: documentSplitNode,
   [WorkflowType.ImageUnderstandNode]: imageUnderstandNode,
   [WorkflowType.TextToSpeechNode]: textToSpeechNode,
   [WorkflowType.SpeechToTextNode]: speechToTextNode,

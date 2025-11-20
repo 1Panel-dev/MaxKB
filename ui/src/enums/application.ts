@@ -19,6 +19,7 @@ export enum WorkflowType {
   RerankerNode = 'reranker-node',
   Application = 'application-node',
   DocumentExtractNode = 'document-extract-node',
+  DocumentSplitNode = 'document-split-node',
   ImageUnderstandNode = 'image-understand-node',
   VariableAssignNode = 'variable-assign-node',
   FormNode = 'form-node',
