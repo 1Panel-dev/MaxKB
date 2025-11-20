@@ -12,7 +12,7 @@
         hide-required-asterisk
       >
         <el-form-item
-        prop="paragraph_list"
+        prop="document_list"
         :label="$t('common.inputContent')"
         :rules="{
             message: $t('views.applicationWorkflow.nodes.textToSpeechNode.content.label'),
@@ -35,29 +35,8 @@
             :nodeModel="nodeModel"
             class="w-full"
             :placeholder="$t('views.applicationWorkflow.nodes.textToSpeechNode.content.label')"
-            v-model="form_data.paragraph_list"
+            v-model="form_data.document_list"
           />
-      </el-form-item>
-      <el-form-item
-        prop="chunk_length"
-        :label="$t('views.applicationWorkflow.nodes.knowledgeWriteNode.chunk_length')"
-        :rules="{
-            message: $t('views.applicationWorkflow.nodes.knowledgeWriteNode.chunk_length'),
-            trigger: 'change',
-            required: true,
-        }"             
-      >
-        <template #label>
-            <div class="flex-between">
-              <div>
-                <span
-                  >{{ $t('views.applicationWorkflow.nodes.knowledgeWriteNode.chunk_length')
-                  }}<span class="color-danger">*</span></span
-                >
-              </div>
-            </div>
-        </template>
-        <el-slider v-model="form_data.chunk_length" show-input :max="8192"></el-slider>
       </el-form-item>
       </el-form>
     </el-card>
@@ -73,8 +52,7 @@ import NodeCascader from '@/workflow/common/NodeCascader.vue'
 const props = defineProps<{ nodeModel: any }>()
 
 const form = {
-    paragraph_list: [],
-    chunk_length: 4096
+  document_list: [],
 }
 
 const form_data = computed({
