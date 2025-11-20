@@ -54,7 +54,7 @@ class IChatNode(INode):
         return ChatNodeSerializer
 
     def _run(self):
-        if [WorkflowMode.KNOWLEDGE, WorkflowMode.APPLICATION_LOOP].__contains__(
+        if [WorkflowMode.KNOWLEDGE, WorkflowMode.KNOWLEDGE_LOOP].__contains__(
                 self.workflow_manage.flow.workflow_mode):
             return self.execute(**self.node_params_serializer.data, **self.flow_params_serializer.data,
                                 **{'history_chat_record': [], 'stream': True, 'chat_id': None, 'chat_record_id': None})
