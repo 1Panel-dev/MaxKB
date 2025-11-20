@@ -22,7 +22,7 @@ class DocumentSplitNodeSerializer(serializers.Serializer):
         required=False, label=_("paragraph title relate problem"), default=False
     )
     paragraph_title_relate_problem_reference = serializers.ListField(
-        required=False, label=_("paragraph title relate problem reference"), child=serializers.CharField()
+        required=False, label=_("paragraph title relate problem reference"), child=serializers.CharField(), default=[]
     )
     document_name_relate_problem_type = serializers.ChoiceField(
         choices=['custom', 'referencing'], required=False, label=_("document name relate problem type"),
@@ -32,7 +32,7 @@ class DocumentSplitNodeSerializer(serializers.Serializer):
         required=False, label=_("document name relate problem"), default=False
     )
     document_name_relate_problem_reference = serializers.ListField(
-        required=False, label=_("document name relate problem reference"), child=serializers.CharField()
+        required=False, label=_("document name relate problem reference"), child=serializers.CharField(), default=[]
     )
     limit = serializers.IntegerField(required=False, label=_("limit"), default=4096)
     patterns = serializers.ListField(
@@ -55,9 +55,9 @@ class IDocumentSplitNode(INode):
     def _run(self):
         res = self.workflow_manage.get_reference_field(self.node_params_serializer.data.get('file_list')[0],
                                                        self.node_params_serializer.data.get('file_list')[1:])
-        return self.execute(file_list=res, **self.flow_params_serializer.data)
+        return self.execute(files=res, **self.node_params_serializer.data, **self.flow_params_serializer.data)
 
-    def execute(self, file_list, knowledge_id, split_strategy, paragraph_title_relate_problem_type,
+    def execute(self, files, knowledge_id, split_strategy, paragraph_title_relate_problem_type,
                 paragraph_title_relate_problem, paragraph_title_relate_problem_reference,
                 document_name_relate_problem_type, document_name_relate_problem,
                 document_name_relate_problem_reference, limit, patterns, with_filter, **kwargs) -> NodeResult:
