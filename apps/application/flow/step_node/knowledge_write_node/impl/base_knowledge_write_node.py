@@ -34,6 +34,7 @@ class ParagraphInstanceSerializer(serializers.Serializer):
 class KnowledgeWriteParamSerializer(serializers.Serializer):
     name = serializers.CharField(required=True, label=_('document name'), max_length=128, min_length=1,
                                  source=_('document name'))
+    meta = serializers.DictField(required=False)
     paragraphs = ParagraphInstanceSerializer(required=False, many=True, allow_null=True)
 
 
