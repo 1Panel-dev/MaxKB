@@ -26,7 +26,7 @@ class ParagraphInstanceSerializer(serializers.Serializer):
                                     allow_blank=True)
     title = serializers.CharField(required=False, max_length=256, label=_('section title'), allow_null=True,
                                   allow_blank=True)
-    problem_list = serializers.ListField(required=False, child=serializers.CharField(required=True))
+    problem_list = serializers.ListField(required=False, child=serializers.CharField(required=False, allow_blank=True))
     is_active = serializers.BooleanField(required=False, label=_('Is active'))
     chunks = serializers.ListField(required=False, child=serializers.CharField(required=True))
 
@@ -90,7 +90,7 @@ def get_paragraph_problem_model(knowledge_id: str, document_id: str, instance: D
 def get_paragraph_model(document_model, paragraph_list: List):
     knowledge_id = document_model.knowledge_id
     paragraph_model_dict_list = [
-        get_paragraph_problem_model(knowledge_id,document_model.id,paragraph)
+        get_paragraph_problem_model(knowledge_id, document_model.id, paragraph)
         for paragraph in paragraph_list
     ]
 
@@ -186,8 +186,6 @@ class BaseKnowledgeWriteNode(IKnowledgeWriteNode):
 
         return document_model_list, knowledge_id, workspace_id
 
-
-
     def execute(self, documents, **kwargs) -> NodeResult:
 
         document_model_list, knowledge_id, workspace_id = self.save(documents)
@@ -200,8 +198,7 @@ class BaseKnowledgeWriteNode(IKnowledgeWriteNode):
             } for p in document.get("paragraphs")[0:4]]
         } for document in documents]
 
-        return NodeResult({'write_content':write_content_list},{})
-
+        return NodeResult({'write_content': write_content_list}, {})
 
     def get_details(self, index: int, **kwargs):
         return {
