@@ -41,7 +41,8 @@ class FunctionLibNodeParamsSerializer(serializers.Serializer):
 
 class IToolLibNode(INode):
     type = 'tool-lib-node'
-    support = [WorkflowMode.APPLICATION, WorkflowMode.APPLICATION_LOOP]
+    support = [WorkflowMode.APPLICATION, WorkflowMode.APPLICATION_LOOP, WorkflowMode.KNOWLEDGE,
+               WorkflowMode.KNOWLEDGE_LOOP]
 
     def get_node_params_serializer_class(self) -> Type[serializers.Serializer]:
         return FunctionLibNodeParamsSerializer

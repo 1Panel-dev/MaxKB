@@ -138,7 +138,7 @@ class BaseToolLibNodeNode(IToolLibNode):
         tool_lib = QuerySet(Tool).filter(id=tool_lib_id).first()
         valid_function(tool_lib, workspace_id)
         params = {
-            field.get('name'):  convert_value(
+            field.get('name'): convert_value(
                 field.get('name'), field.get('value'), field.get('type'),
                 field.get('is_required'),
                 field.get('source'), self
@@ -157,8 +157,12 @@ class BaseToolLibNodeNode(IToolLibNode):
             all_params = init_params_default_value | json.loads(rsa_long_decrypt(tool_lib.init_params)) | params
         else:
             all_params = init_params_default_value | params
+        if self.node.properties.get('kind') == 'data-source':
+            all_params = {**all_params, **self.workflow_params.get('data_source')}
         result = function_executor.exec_code(tool_lib.code, all_params)
-        return NodeResult({'result': result}, {}, _write_context=write_context)
+        return NodeResult({'result': result},
+                          (self.workflow_manage.params.get('knowledge_base') or {}) if self.node.properties.get(
+                              'kind') == 'data-source' else {}, _write_context=write_context)
 
     def get_details(self, index: int, **kwargs):
         return {

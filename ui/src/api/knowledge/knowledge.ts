@@ -328,7 +328,34 @@ const getKnowledgeWorkflowFormList: (
   node,
   loading,
 ) => {
-  return post(`${prefix.value}/${knowledge_id}/form_list/${type}/${id}`, { node }, {}, loading)
+  return post(
+    `${prefix.value}/${knowledge_id}/datasource/${type}/${id}/form_list`,
+    { node },
+    {},
+    loading,
+  )
+}
+const getKnowledgeWorkflowDatasourceDetails: (
+  knowledge_id: string,
+  type: 'loacl' | 'tool',
+  id: string,
+  params: any,
+  function_name: string,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (
+  knowledge_id: string,
+  type: 'loacl' | 'tool',
+  id: string,
+  params,
+  function_name,
+  loading,
+) => {
+  return post(
+    `${prefix.value}/${knowledge_id}/datasource/${type}/${id}/${function_name}`,
+    params,
+    {},
+    loading,
+  )
 }
 const workflowAction: (
   knowledge_id: string,
@@ -371,4 +398,5 @@ export default {
   getKnowledgeWorkflowFormList,
   workflowAction,
   getWorkflowAction,
+  getKnowledgeWorkflowDatasourceDetails,
 }

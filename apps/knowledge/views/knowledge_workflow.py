@@ -15,12 +15,18 @@ from knowledge.serializers.common import get_knowledge_operation_object
 from knowledge.serializers.knowledge_workflow import KnowledgeWorkflowSerializer, KnowledgeWorkflowActionSerializer
 
 
-class KnowledgeWorkflowFormView(APIView):
+class KnowledgeDatasourceFormListView(APIView):
     authentication_classes = [TokenAuth]
 
     def post(self, request: Request, workspace_id: str, knowledge_id: str, type: str, id: str):
-        return result.success(KnowledgeWorkflowSerializer.Form(
-            data={'type': type, 'id': id, 'node': request.data.get('node')}).get_form_list())
+        return result.success(KnowledgeWorkflowSerializer.Datasource(
+            data={'type': type, 'id': id, 'params': request.data, 'function_name': 'get_form_list'}).action())
+
+
+class KnowledgeDatasourceView(APIView):
+    def post(self, request: Request, workspace_id: str, knowledge_id: str, type: str, id: str, function_name: str):
+        return result.success(KnowledgeWorkflowSerializer.Datasource(
+            data={'type': type, 'id': id, 'params': request.data, 'function_name': function_name}).action())
 
 
 class KnowledgeWorkflowActionView(APIView):

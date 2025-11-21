@@ -23,6 +23,15 @@ import type { Dict } from '@/api/type/common'
 
 const damo_data: Array<FormField> = [
   {
+    field: 'aaa',
+    input_type: 'Tree',
+    attrs: {
+      lazy: true,
+      url: '/workspace/${current_workspace_id}/knowledge/${current_knowledge_id}/datasource/tool/019aa0bb-552d-73a3-b0c6-1809eaedb139/get_file_list',
+    },
+    label: '',
+  },
+  {
     field: 'aa',
     input_type: 'LocalFileUpload',
     attrs: {

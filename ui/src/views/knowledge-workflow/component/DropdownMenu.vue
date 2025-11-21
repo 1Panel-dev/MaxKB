@@ -72,7 +72,7 @@
         </el-scrollbar>
       </el-tab-pane>
       <!-- 工具 -->
-      <el-tab-pane :label="$t('views.tool.title')" name="tool">
+      <el-tab-pane :label="$t('views.tool.datasource.title', '数据源')" name="DATA_SOURCE_TOOL">
         <LayoutContainer>
           <template #left>
             <div class="p-8">
@@ -96,25 +96,27 @@
           </el-scrollbar>
         </LayoutContainer>
       </el-tab-pane>
-      <!-- 应用 -->
-      <el-tab-pane :label="$t('views.application.title')" name="application">
+      <!-- 工具 -->
+      <el-tab-pane :label="$t('views.tool.title')" name="CUSTOM_TOOL">
         <LayoutContainer>
           <template #left>
             <div class="p-8">
               <folder-tree
-                :source="SourceTypeEnum.APPLICATION"
-                :data="applicationTreeData"
+                :source="SourceTypeEnum.TOOL"
+                :data="toolTreeData"
                 :currentNodeKey="folder.currentFolder?.id"
                 @handleNodeClick="folderClickHandle"
+                :shareTitle="$t('views.shared.shared_tool')"
+                :showShared="permissionPrecise['is_share']()"
                 :canOperation="false"
               />
             </div>
           </template>
           <el-scrollbar height="450">
             <NodeContent
-              :list="applicationList"
-              @clickNodes="(val: any) => clickNodes(applicationNode, val, 'application')"
-              @onmousedown="(val: any) => onmousedown(applicationNode, val, 'application')"
+              :list="toolList"
+              @clickNodes="(val: any) => clickNodes(toolLibNode, val, 'tool')"
+              @onmousedown="(val: any) => onmousedown(toolLibNode, val, 'tool')"
             />
           </el-scrollbar>
         </LayoutContainer>
@@ -133,7 +135,7 @@ import NodeContent from './NodeContent.vue'
 import { SourceTypeEnum } from '@/enums/common'
 import permissionMap from '@/permission'
 import { useRoute } from 'vue-router'
-import { WorkflowMode } from '@/enums/application'
+import { WorkflowKind, WorkflowMode } from '@/enums/application'
 const workflowModel = inject('workflowMode') as WorkflowMode
 const route = useRoute()
 const { user, folder } = useStore()
@@ -188,6 +190,9 @@ function clickNodes(item: any, data?: any, type?: string) {
   if (data) {
     item['properties']['stepName'] = data.name
     if (type == 'tool') {
+      if (data.tool_type == 'DATA_SOURCE') {
+        item['properties'].kind = WorkflowKind.DataSource
+      }
       item['properties']['node_data'] = {
         ...data,
         tool_lib_id: data.id,
@@ -214,6 +219,9 @@ function onmousedown(item: any, data?: any, type?: string) {
   if (data) {
     item['properties']['stepName'] = data.name
     if (type == 'tool') {
+      if (data.tool_type == 'DATA_SOURCE') {
+        item['properties'].kind = WorkflowKind.DataSource
+      }
       item['properties']['node_data'] = {
         ...data,
         tool_lib_id: data.id,
@@ -261,7 +269,7 @@ async function getToolList() {
     systemType: 'workspace',
   }).getToolList({
     folder_id: folder.currentFolder?.id || user.getWorkspaceId(),
-    tool_type: 'CUSTOM',
+    tool_type: activeName.value == 'DATA_SOURCE_TOOL' ? 'DATA_SOURCE' : 'CUSTOM',
   })
   toolList.value = res.data?.tools || res.data || []
   toolList.value = toolList.value?.filter((item: any) => item.is_active)
@@ -300,7 +308,7 @@ function folderClickHandle(row: any) {
 
 async function handleClick(val: string) {
   console.log(val)
-  if (val === 'tool') {
+  if (['DATA_SOURCE_TOOL', 'CUSTOM_TOOL'].includes(val)) {
     await getToolFolder()
     getToolList()
   } else if (val === 'application') {

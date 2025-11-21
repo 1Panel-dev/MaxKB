@@ -1,5 +1,5 @@
 # coding=utf-8
-
+import json
 from typing import Dict
 
 import uuid_utils.compat as uuid
@@ -13,12 +13,17 @@ from application.flow.i_step_node import KnowledgeWorkflowPostHandler
 from application.flow.knowledge_workflow_manage import KnowledgeWorkflowManage
 from application.flow.step_node import get_node
 from common.exception.app_exception import AppApiException
+from common.utils.rsa_util import rsa_long_decrypt
+from common.utils.tool_code import ToolExecutor
 from knowledge.models import KnowledgeScope, Knowledge, KnowledgeType, KnowledgeWorkflow
 from knowledge.models.knowledge_action import KnowledgeAction, State
 from knowledge.serializers.knowledge import KnowledgeModelSerializer
+from maxkb.const import CONFIG
 from system_manage.models import AuthTargetType
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
 from tools.models import Tool
+
+tool_executor = ToolExecutor(CONFIG.get('SANDBOX'))
 
 
 class KnowledgeWorkflowModelSerializer(serializers.ModelSerializer):
@@ -62,20 +67,22 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
 
 
 class KnowledgeWorkflowSerializer(serializers.Serializer):
-    class Form(serializers.Serializer):
+    class Datasource(serializers.Serializer):
         type = serializers.CharField(required=True, label=_('type'))
         id = serializers.CharField(required=True, label=_('type'))
-        node = serializers.DictField(required=True, label="")
+        params = serializers.DictField(required=True, label="")
+        function_name = serializers.CharField(required=True, label=_('function_name'))
 
-        def get_form_list(self):
+        def action(self):
             self.is_valid(raise_exception=True)
             if self.data.get('type') == 'local':
                 node = get_node(self.data.get('id'), WorkflowMode.KNOWLEDGE)
-                return node.get_form_list(self.data.get("node"))
+                return node.__getattribute__(node, self.data.get("function_name"))(**self.data.get("params"))
             elif self.data.get('type') == 'tool':
                 tool = QuerySet(Tool).filter(id=self.data.get("id")).first()
-                # todo 调用工具数据源的函数获取表单列表
-            return None
+                init_params = json.loads(rsa_long_decrypt(tool.init_params))
+                return tool_executor.exec_code(tool.code, {**init_params, **self.data.get('params')},
+                                               self.data.get('function_name'))
 
     class Create(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, label=_('user id'))

@@ -7,6 +7,7 @@
     ref="dynamicsFormRef"
     label-position="top"
     require-asterisk-position="right"
+    :other-params="{ current_workspace_id: workspace_id, current_knowledge_id: knowledge_id }"
   >
     <template #default>
       <el-form-item prop="node_id" :rules="base_form_data_rule.node_id">
@@ -37,6 +38,8 @@ import type { Dict } from '@/api/type/common'
 import type { FormRules } from 'element-plus'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { useRoute } from 'vue-router'
+import useStore from '@/stores'
+const { user } = useStore()
 const route = useRoute()
 
 const apiType = computed(() => {
@@ -49,7 +52,11 @@ const apiType = computed(() => {
 const model_form_field = ref<Array<FormField>>([])
 const props = defineProps<{
   workflow: any
+  knowledge_id: string
 }>()
+const workspace_id = computed(() => {
+  return user.getWorkspaceId()
+})
 const loading = ref<boolean>(false)
 const dynamicsFormRef = ref<InstanceType<typeof DynamicsForm>>()
 const base_form_data = ref<{ node_id: string }>({ node_id: '' })
@@ -73,10 +80,17 @@ const sourceChange = (node_id: string) => {
   node_id = n
     ? [WorkflowType.DataSourceLocalNode, WorkflowType.DataSourceWebNode].includes(n.type)
       ? n.type
-      : node_id
+      : n.properties.node_data.tool_lib_id
     : node_id
   loadSharedApi({ type: 'knowledge', systemType: apiType.value })
-    .getKnowledgeWorkflowFormList(id, 'local', node_id, n)
+    .getKnowledgeWorkflowFormList(
+      id,
+      [WorkflowType.DataSourceLocalNode, WorkflowType.DataSourceWebNode].includes(n.type)
+        ? 'local'
+        : 'tool',
+      node_id,
+      n,
+    )
     .then((ok: any) => {
       dynamicsFormRef.value?.render(ok.data)
     })
