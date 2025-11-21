@@ -1,51 +1,77 @@
 # coding=utf-8
 import ast
+import base64
+import gzip
 import json
 import os
+import socket
 import subprocess
 import sys
-from textwrap import dedent
-import socket
 import uuid_utils.compat as uuid
+from common.utils.logger import maxkb_logger
 from django.utils.translation import gettext_lazy as _
-
 from maxkb.const import BASE_DIR, CONFIG
 from maxkb.const import PROJECT_DIR
+from textwrap import dedent
 
 python_directory = sys.executable
 
 
 class ToolExecutor:
+
     def __init__(self, sandbox=False):
         self.sandbox = sandbox
         if sandbox:
-            self.sandbox_path = '/opt/maxkb-app/sandbox'
+            self.sandbox_path = CONFIG.get("SANDBOX_HOME", '/opt/maxkb-app/sandbox')
             self.user = 'sandbox'
         else:
             self.sandbox_path = os.path.join(PROJECT_DIR, 'data', 'sandbox')
             self.user = None
-        self._createdir()
-        if self.sandbox:
-            os.system(f"chown -R {self.user}:root {self.sandbox_path}")
         self.banned_keywords = CONFIG.get("SANDBOX_PYTHON_BANNED_KEYWORDS", 'nothing_is_banned').split(',');
-        banned_hosts = CONFIG.get("SANDBOX_PYTHON_BANNED_HOSTS", '').strip()
+        self.sandbox_so_path = f'{self.sandbox_path}/sandbox.so'
         try:
-            if banned_hosts:
-                hostname = socket.gethostname()
-                local_ip = socket.gethostbyname(hostname)
-                banned_hosts = f"{banned_hosts},{hostname},{local_ip}"
-        except Exception:
-            pass
-        self.banned_hosts = banned_hosts
+            self._init_dir()
+        except Exception as e:
+            # 本机忽略异常，容器内不忽略
+            maxkb_logger.error(f'Exception: {e}', exc_info=True)
+            if self.sandbox:
+                raise e
 
-    def _createdir(self):
-        old_mask = os.umask(0o077)
+    def _init_dir(self):
         try:
-            os.makedirs(self.sandbox_path, 0o700, exist_ok=True)
-            os.makedirs(os.path.join(self.sandbox_path, 'execute'), 0o700, exist_ok=True)
-            os.makedirs(os.path.join(self.sandbox_path, 'result'), 0o700, exist_ok=True)
-        finally:
-            os.umask(old_mask)
+            # 只初始化一次
+            fd = os.open(os.path.join(PROJECT_DIR, 'tmp', 'tool_executor_init_dir.lock'),
+                         os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+            os.close(fd)
+        except FileExistsError:
+            # 文件已存在 → 已初始化过
+            return
+        maxkb_logger.debug("init dir")
+        if self.sandbox:
+            try:
+                os.system("chmod -R g-rwx /dev/shm /dev/mqueue")
+                os.system("chmod o-rwx /run/postgresql")
+            except Exception as e:
+                maxkb_logger.warning(f'Exception: {e}', exc_info=True)
+                pass
+        if CONFIG.get("SANDBOX_TMP_DIR_ENABLED", '0') == "1":
+            tmp_dir_path = os.path.join(self.sandbox_path, 'tmp')
+            os.makedirs(tmp_dir_path, 0o700, exist_ok=True)
+            os.system(f"chown -R {self.user}:root {tmp_dir_path}")
+        if os.path.exists(self.sandbox_so_path):
+            os.chmod(self.sandbox_so_path, 0o440)
+        # 初始化host黑名单
+        banned_hosts_file_path = f'{self.sandbox_path}/.SANDBOX_BANNED_HOSTS'
+        if os.path.exists(banned_hosts_file_path):
+            os.remove(banned_hosts_file_path)
+        banned_hosts = CONFIG.get("SANDBOX_PYTHON_BANNED_HOSTS", '').strip()
+        if banned_hosts:
+            hostname = socket.gethostname()
+            local_ip = socket.gethostbyname(hostname)
+            banned_hosts = f"{banned_hosts},{hostname},{local_ip}"
+            with open(banned_hosts_file_path, "w") as f:
+                f.write(banned_hosts)
+            os.chmod(banned_hosts_file_path, 0o440)
 
     def exec_code(self, code_str, keywords, function_name=None):
         self.validate_banned_keywords(code_str)
@@ -57,9 +83,7 @@ class ToolExecutor:
         python_paths = CONFIG.get_sandbox_python_package_paths().split(',')
         _exec_code = f"""
 try:
-    import os
-    import sys
-    import json
+    import sys, json, base64, builtins
     path_to_exclude = ['/opt/py3/lib/python3.11/site-packages', '/opt/maxkb-app/apps']
     sys.path = [p for p in sys.path if p not in path_to_exclude]
     sys.path += {python_paths}
@@ -71,21 +95,21 @@ try:
     for local in locals_v:
         globals_v[local] = locals_v[local]
     exec_result=f(**keywords)
-    with open({result_path!a}, 'w') as file:
-        file.write(json.dumps({success}, default=str))
+    builtins.print("\\n{_id}:"+base64.b64encode(json.dumps({success}, default=str).encode()).decode())
 except Exception as e:
-    with open({result_path!a}, 'w') as file:
-        file.write(json.dumps({err}))
+    builtins.print("\\n{_id}:"+base64.b64encode(json.dumps({err}, default=str).encode()).decode())
 """
         if self.sandbox:
-            subprocess_result = self._exec_sandbox(_exec_code, _id)
+            subprocess_result = self._exec_sandbox(_exec_code)
         else:
             subprocess_result = self._exec(_exec_code)
         if subprocess_result.returncode == 1:
             raise Exception(subprocess_result.stderr)
-        with open(result_path, 'r') as file:
-            result = json.loads(file.read())
-        os.remove(result_path)
+        lines = subprocess_result.stdout.splitlines()
+        result_line = [line for line in lines if line.startswith(_id)]
+        if not result_line:
+            raise Exception("No result found.")
+        result = json.loads(base64.b64decode(result_line[-1].split(":", 1)[1]).decode())
         if result.get('code') == 200:
             return result.get('data')
         raise Exception(result.get('msg'))
@@ -173,52 +197,45 @@ exec({dedent(code)!a})
 """
 
     def get_tool_mcp_config(self, code, params):
-        code = self.generate_mcp_server_code(code, params)
-
-        _id = uuid.uuid7()
-        code_path = f'{self.sandbox_path}/execute/{_id}.py'
-        with open(code_path, 'w') as f:
-            f.write(code)
+        _code = self.generate_mcp_server_code(code, params)
+        maxkb_logger.debug(f"Python code of mcp tool: {_code}")
+        compressed_and_base64_encoded_code_str = base64.b64encode(gzip.compress(_code.encode())).decode()
         if self.sandbox:
-            os.system(f"chown {self.user}:root {code_path}")
-
             tool_config = {
                 'command': 'su',
                 'args': [
                     '-s', sys.executable,
-                    '-c', f"exec(open('{code_path}', 'r').read())",
+                    '-c',
+                    f'import base64,gzip; exec(gzip.decompress(base64.b64decode(\'{compressed_and_base64_encoded_code_str}\')).decode())',
                     self.user,
                 ],
                 'cwd': self.sandbox_path,
                 'env': {
-                    'LD_PRELOAD': '/opt/maxkb-app/sandbox/sandbox.so',
-                    'SANDBOX_BANNED_HOSTS': self.banned_hosts,
+                    'LD_PRELOAD': self.sandbox_so_path,
                 },
                 'transport': 'stdio',
             }
         else:
             tool_config = {
                 'command': sys.executable,
-                'args': [code_path],
+                'args': f'import base64,gzip; exec(gzip.decompress(base64.b64decode(\'{compressed_and_base64_encoded_code_str}\')).decode())',
                 'transport': 'stdio',
             }
-        return _id, tool_config
+        return tool_config
 
-    def _exec_sandbox(self, _code, _id):
-        exec_python_file = f'{self.sandbox_path}/execute/{_id}.py'
-        with open(exec_python_file, 'w') as file:
-            file.write(_code)
-            os.system(f"chown {self.user}:root {exec_python_file}")
+    def _exec_sandbox(self, _code):
         kwargs = {'cwd': BASE_DIR}
         kwargs['env'] = {
-            'LD_PRELOAD': '/opt/maxkb-app/sandbox/sandbox.so',
-            'SANDBOX_BANNED_HOSTS': self.banned_hosts,
+            'LD_PRELOAD': self.sandbox_so_path,
         }
+        maxkb_logger.debug(f"Sandbox execute code: {_code}")
+        compressed_and_base64_encoded_code_str = base64.b64encode(gzip.compress(_code.encode())).decode()
         subprocess_result = subprocess.run(
-            ['su', '-s', python_directory, '-c', "exec(open('" + exec_python_file + "').read())", self.user],
+            ['su', '-s', python_directory, '-c',
+             f'import base64,gzip; exec(gzip.decompress(base64.b64decode(\'{compressed_and_base64_encoded_code_str}\')).decode())',
+             self.user],
             text=True,
             capture_output=True, **kwargs)
-        os.remove(exec_python_file)
         return subprocess_result
 
     def validate_banned_keywords(self, code_str):

@@ -52,7 +52,7 @@ def start_services():
     if args.worker:
         start_args.extend(['--worker', str(args.worker)])
     else:
-        worker = os.environ.get('CORE_WORKER')
+        worker = os.environ.get('MAXKB_CORE_WORKER')
         if isinstance(worker, str) and worker.isdigit():
             start_args.extend(['--worker', worker])
 

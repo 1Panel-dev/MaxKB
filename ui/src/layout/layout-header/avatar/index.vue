@@ -19,7 +19,7 @@
             </el-avatar>
           </div>
           <div style="width: 90%">
-            <p class="bold mb-4" style="font-size: 14px">{{ user.userInfo?.nick_name }}({{ user.userInfo?.username }})</p>
+            <p class="bold mb-4" style="font-size: 14px">{{ user.userInfo?.nick_name }} <span class="color-secondary lighter">({{ user.userInfo?.username }})</span></p>
             <template v-if="user.userInfo?.role_name && user.userInfo.role_name.length > 0">
               <TagGroup
                 size="small"
@@ -132,7 +132,17 @@
         </el-dropdown-item>
         <el-dropdown-item
           @click="openAbout"
-          v-if="hasPermission([RoleConst.ADMIN, PermissionConst.ABOUT_READ], 'OR')"
+          v-if="
+              hasPermission(
+                new ComplexPermission(
+                  [RoleConst.ADMIN, RoleConst.USER, RoleConst.WORKSPACE_MANAGE],
+                  [PermissionConst.ABOUT_READ],
+                  [],
+                  'OR',
+                ),
+                'OR',
+              )
+            "
         >
           {{ $t('layout.about.title') }}
         </el-dropdown-item>
@@ -222,6 +232,7 @@ onMounted(() => {
 <style lang="scss" scoped>
 .avatar-dropdown {
   min-width: 210px;
+  max-width: 400px;
 
   .userInfo {
     padding: 12px 11px;

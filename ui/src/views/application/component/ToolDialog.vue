@@ -23,18 +23,16 @@
     </template>
     <LayoutContainer class="application-manage">
       <template #left>
-        <div class="p-8">
-          <folder-tree
-            :data="folderList"
-            :currentNodeKey="currentFolder?.id"
-            @handleNodeClick="folderClickHandle"
-            v-loading="folderLoading"
-            :canOperation="false"
-            showShared
-            :shareTitle="$t('views.shared.shared_tool')"
-            :treeStyle="{ height: 'calc(100vh - 240px)' }"
-          />
-        </div>
+        <folder-tree
+          :data="folderList"
+          :currentNodeKey="currentFolder?.id"
+          @handleNodeClick="folderClickHandle"
+          v-loading="folderLoading"
+          :canOperation="false"
+          showShared
+          :shareTitle="$t('views.shared.shared_tool')"
+          :treeStyle="{ height: 'calc(100vh - 240px)' }"
+        />
       </template>
       <div class="layout-bg">
         <div class="flex-between p-16 ml-8">
@@ -198,15 +196,17 @@ function getList() {
     type: 'tool',
     isShared: folder_id === 'share',
     systemType: 'workspace',
-  }).getToolList({
-    folder_id: folder_id,
-    tool_type: 'CUSTOM'
-  }).then((res: any) => {
-    toolList.value = res.data?.tools || res.data || []
-    toolList.value = toolList.value?.filter((item: any) => item.is_active)
-    searchData.value = res.data.tools || res.data
-    searchData.value = searchData.value?.filter((item: any) => item.is_active)
   })
+    .getToolList({
+      folder_id: folder_id,
+      tool_type: 'CUSTOM',
+    })
+    .then((res: any) => {
+      toolList.value = res.data?.tools || res.data || []
+      toolList.value = toolList.value?.filter((item: any) => item.is_active)
+      searchData.value = res.data.tools || res.data
+      searchData.value = searchData.value?.filter((item: any) => item.is_active)
+    })
 }
 
 defineExpose({ open })

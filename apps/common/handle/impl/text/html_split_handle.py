@@ -77,5 +77,5 @@ class HTMLSplitHandle(BaseSplitHandle):
             content = buffer.decode(encoding)
             return html2text(content)
         except BaseException as e:
-            traceback.print_exception(e)
+            maxkb_logger.error(f'Exception: {e}', exc_info=True)
             return f'{e}'

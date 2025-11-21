@@ -45,7 +45,7 @@ class ChatAuthentication:
         value = json.dumps(self.to_dict())
         authentication = encrypt(value)
         cache_key = hashlib.sha256(authentication.encode()).hexdigest()
-        authentication_cache.set(cache_key, value, version=Cache_Version.CHAT.value, timeout=60 * 60 * 2)
+        authentication_cache.set(cache_key, value, version=Cache_Version.CHAT.get_version(), timeout=60 * 60 * 2)
         return authentication
 
     @staticmethod

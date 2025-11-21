@@ -462,7 +462,7 @@ const postTableDocument: (
 }
 
 /**
- * 获得QA模版
+ * 获得QA模板
  * @param 参数 fileName,type,
  */
 const exportQATemplate: (fileName: string, type: string, loading?: Ref<boolean>) => void = (
@@ -474,7 +474,7 @@ const exportQATemplate: (fileName: string, type: string, loading?: Ref<boolean>)
 }
 
 /**
- * 获得table模版
+ * 获得table模板
  * @param 参数 fileName,type,
  */
 const exportTableTemplate: (fileName: string, type: string, loading?: Ref<boolean>) => void = (

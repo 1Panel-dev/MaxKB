@@ -33,8 +33,6 @@
         </div>
       </el-card>
     </el-col>
-  </el-row>
-  <el-row :gutter="16">
     <el-col
       :xs="24"
       :sm="24"
@@ -51,6 +49,42 @@
         </div>
       </el-card>
     </el-col>
+
+    <el-col :xs="24" :sm="24" :md="24" :lg="12" :xl="12" class="mb-16">
+      <el-card shadow="never" class="StatisticsCharts-card">
+        <el-select v-model="tokenUsageCount" class="top-select">
+          <el-option
+            v-for="item in topOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
+        <div class="p-8">
+          <AppCharts height="316px" id="tokenUsageCharts" type="bar" :option="tokenUsageOption" />
+        </div>
+      </el-card>
+    </el-col>
+    <el-col :xs="24" :sm="24" :md="24" :lg="12" :xl="12" class="mb-16">
+      <el-card shadow="never" class="StatisticsCharts-card">
+        <el-select v-model="topQuestionsCount" class="top-select">
+          <el-option
+            v-for="item in topOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
+        <div class="p-8">
+          <AppCharts
+            height="316px"
+            id="topQuestionsCharts"
+            type="bar"
+            :option="topQuestionsOption"
+          />
+        </div>
+      </el-card>
+    </el-col>
   </el-row>
 </template>
 <script setup lang="ts">
@@ -59,12 +93,23 @@ import AppCharts from '@/components/app-charts/index.vue'
 import { getAttrsArray, getSum } from '@/utils/array'
 import { numberFormat } from '@/utils/common'
 import { t } from '@/locales'
+
 const props = defineProps({
   data: {
     type: Array,
     default: () => [],
   },
+  tokenUsage: {
+    type: Array,
+    default: () => [],
+  },
+  topQuestions: {
+    type: Array,
+    default: () => [],
+  },
 })
+
+
 const statisticsType = computed(() => [
   {
     id: 'customerCharts',
@@ -82,13 +127,11 @@ const statisticsType = computed(() => [
       yData: [
         {
           name: t('views.applicationOverview.monitor.charts.customerTotal'),
-          type: 'line',
           area: true,
           data: getAttrsArray(props.data, 'customer_num'),
         },
         {
           name: t('views.applicationOverview.monitor.charts.customerNew'),
-          type: 'line',
           area: true,
           data: getAttrsArray(props.data, 'customer_added_count'),
         },
@@ -107,7 +150,6 @@ const statisticsType = computed(() => [
       xData: getAttrsArray(props.data, 'day'),
       yData: [
         {
-          type: 'line',
           data: getAttrsArray(props.data, 'chat_record_count'),
         },
       ],
@@ -125,7 +167,6 @@ const statisticsType = computed(() => [
       xData: getAttrsArray(props.data, 'day'),
       yData: [
         {
-          type: 'line',
           data: getAttrsArray(props.data, 'tokens_num'),
         },
       ],
@@ -147,17 +188,52 @@ const statisticsType = computed(() => [
       yData: [
         {
           name: t('views.applicationOverview.monitor.charts.approval'),
-          type: 'line',
           data: getAttrsArray(props.data, 'star_num'),
         },
         {
           name: t('views.applicationOverview.monitor.charts.disapproval'),
-          type: 'line',
           data: getAttrsArray(props.data, 'trample_num'),
         },
       ],
     },
   },
 ])
+
+const topOptions = [{ label: 'TOP 10', value: 10 }, { label: 'TOP 20', value: 20}, { label: 'TOP 50', value: 50}, { label: 'TOP 100', value: 100}]
+const tokenUsageCount = ref(10)
+const topQuestionsCount = ref(10)
+const tokenUsageOption = computed(() => {
+  return {
+    title: t('views.applicationOverview.monitor.charts.tokenUsage'),
+    xData: getAttrsArray(props.tokenUsage?.slice(0, tokenUsageCount.value), 'username'),
+    yData: [
+      {
+        data: getAttrsArray(props.tokenUsage?.slice(0, tokenUsageCount.value), 'token_usage'),
+      },
+    ],
+  }
+})
+const topQuestionsOption = computed(() => {
+  return {
+    title: t('views.applicationOverview.monitor.charts.topQuestions'),
+    xData: getAttrsArray(props.topQuestions?.slice(0, topQuestionsCount.value), 'username'),
+    yData: [
+      {
+        data: getAttrsArray(props.topQuestions?.slice(0, topQuestionsCount.value), 'chat_record_count'),
+      },
+    ],
+  }
+})
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.StatisticsCharts-card {
+  position: relative;
+  .top-select {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 10;
+    width: 100px;
+  }
+}
+</style>

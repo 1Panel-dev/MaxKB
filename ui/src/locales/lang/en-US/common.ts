@@ -58,6 +58,11 @@ export default {
     image: 'Image',
     audio: 'Audio',
     video: 'Video',
+    other: 'Other',
+    addExtensions: 'Add Extensions',
+    existingExtensionsTip: 'The following extensions already exist',
+    localUpload: 'Local Files',
+    urlUpload: 'URL',
   },
   status: {
     label: 'Status',

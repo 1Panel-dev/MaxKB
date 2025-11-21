@@ -79,6 +79,11 @@ export default {
     errorMessage: '上传失败',
     fileMessage: '请解析文件内容',
     fileRepeat: '文件已存在',
+    invalidUrl: '无效的URL',
+    localUpload: '本地上传',
+    urlPlaceholder: '请输入 URL 地址，每行一个地址',
+    urlTitle: 'URL 地址',
+    urlErrorMessage: '文件类型不符合要求'
   },
   executionDetails: {
     title: '执行详情',

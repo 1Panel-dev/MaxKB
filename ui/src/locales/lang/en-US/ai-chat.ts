@@ -81,6 +81,11 @@ export default {
     errorMessage: 'Upload Failed',
     fileMessage: 'Please process the file content',
     fileRepeat: 'File already exists',
+    invalidUrl: 'Invalid URL',
+    localUpload: 'Local Upload',
+    urlPlaceholder: 'Please enter URL addresses, one per line',
+    urlTitle: 'URL Address',
+    urlErrorMessage: 'File type does not meet requirements'
   },
   executionDetails: {
     title: 'Execution Details',

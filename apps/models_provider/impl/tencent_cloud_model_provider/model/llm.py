@@ -6,9 +6,7 @@
     @date：2024/4/18 15:28
     @desc:
 """
-from typing import List, Dict
-
-from langchain_core.messages import BaseMessage, get_buffer_string
+from typing import Dict
 
 from common.config.tokenizer_manage_config import TokenizerManage
 from models_provider.base_model_provider import MaxKBBaseModel

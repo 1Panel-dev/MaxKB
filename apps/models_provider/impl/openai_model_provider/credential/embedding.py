@@ -6,7 +6,6 @@
     @date：2024/7/12 16:45
     @desc:
 """
-import traceback
 from typing import Dict
 
 from django.utils.translation import gettext as _
@@ -15,6 +14,7 @@ from common import forms
 from common.exception.app_exception import AppApiException
 from common.forms import BaseForm, TooltipLabel
 from models_provider.base_model_provider import BaseModelCredential, ValidCode
+from common.utils.logger import maxkb_logger
 
 class OpenAIEmbeddingModelParams(BaseForm):
     dimensions = forms.SingleSelect(
@@ -53,7 +53,7 @@ class OpenAIEmbeddingCredential(BaseForm, BaseModelCredential):
             model = provider.get_model(model_type, model_name, model_credential)
             model.embed_query(_('Hello'))
         except Exception as e:
-            traceback.print_exc()
+            maxkb_logger.error(f'Exception: {e}', exc_info=True)
             if isinstance(e, AppApiException):
                 raise e
             if raise_exception:

@@ -74,7 +74,6 @@ class ModelManage:
 
 
 def get_local_model(model, **kwargs):
-    # system_setting = QuerySet(SystemSetting).filter(type=1).first()
     return LocalModelProvider().get_model(model.model_type, model.model_name,
                                           json.loads(
                                               rsa_long_decrypt(model.credential)),
@@ -111,6 +110,21 @@ class CompressDocuments(serializers.Serializer):
     query = serializers.CharField(required=True, label=_('query'))
 
 
+class ValidateModelSerializers(serializers.Serializer):
+    model_name = serializers.CharField(required=True, label=_('model_name'))
+
+    model_type = serializers.CharField(required=True, label=_('model_type'))
+
+    model_credential = serializers.DictField(required=True, label="credential")
+
+    def validate_model(self, with_valid=True):
+        if with_valid:
+            self.is_valid(raise_exception=True)
+        LocalModelProvider().is_valid_credential(self.data.get('model_type'), self.data.get('model_name'),
+                                                 self.data.get('model_credential'), model_params={},
+                                                 raise_exception=True)
+
+
 class ModelApplySerializers(serializers.Serializer):
     model_id = serializers.UUIDField(required=True, label=_('model id'))
 
@@ -138,3 +152,9 @@ class ModelApplySerializers(serializers.Serializer):
         return [{'page_content': d.page_content, 'metadata': d.metadata} for d in model.compress_documents(
             [Document(page_content=document.get('page_content'), metadata=document.get('metadata')) for document in
              instance.get('documents')], instance.get('query'))]
+
+    def unload(self, with_valid=True):
+        if with_valid:
+            self.is_valid(raise_exception=True)
+        ModelManage.delete_key(self.data.get('model_id'))
+        return True

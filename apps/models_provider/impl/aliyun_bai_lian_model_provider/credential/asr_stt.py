@@ -1,5 +1,4 @@
 # coding=utf-8
-import traceback
 from typing import Dict, Any
 
 from common import forms
@@ -7,7 +6,7 @@ from common.exception.app_exception import AppApiException
 from common.forms import BaseForm
 from models_provider.base_model_provider import BaseModelCredential, ValidCode
 from django.utils.translation import gettext as _
-
+from common.utils.logger import maxkb_logger
 
 class AliyunBaiLianAsrSTTModelCredential(BaseForm, BaseModelCredential):
     api_url = forms.TextInputField(_('API URL'), required=True)
@@ -41,7 +40,7 @@ class AliyunBaiLianAsrSTTModelCredential(BaseForm, BaseModelCredential):
         try:
             model = provider.get_model(model_type, model_name, model_credential)
         except Exception as e:
-            traceback.print_exc()
+            maxkb_logger.error(f'Exception: {e}', exc_info=True)
             if isinstance(e, AppApiException):
                 raise e
             if raise_exception:

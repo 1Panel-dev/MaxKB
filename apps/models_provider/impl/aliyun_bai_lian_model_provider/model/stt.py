@@ -54,7 +54,6 @@ class AliyunBaiLianSpeechToText(MaxKBBaseModel, BaseSpeechToText):
             'callback': None,
             **self.params
         }
-        print(recognition_params)
         recognition = Recognition(**recognition_params)
 
 

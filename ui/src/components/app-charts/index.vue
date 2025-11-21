@@ -9,22 +9,23 @@
 </template>
 <script lang="ts" setup>
 import line from './components/LineCharts.vue'
+import bar from './components/BarCharts.vue'
 defineOptions({ name: 'AppCharts' })
 defineProps({
   type: {
     type: String,
-    default: 'line'
+    default: 'line',
   },
   height: {
     type: String,
-    default: '200px'
+    default: '200px',
   },
   dataZoom: Boolean,
   option: {
     type: Object,
-    required: true
-  } // { title , xData, yData, formatStr  }
+    required: true,
+  }, // { title , xData, yData, formatStr  }
 })
 
-const typeComponentMap = { line } as any
+const typeComponentMap = { line, bar } as any
 </script>

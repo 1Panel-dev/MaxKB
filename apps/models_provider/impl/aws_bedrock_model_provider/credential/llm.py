@@ -1,4 +1,3 @@
-import traceback
 from typing import Dict
 
 from django.utils.translation import gettext_lazy as _, gettext
@@ -8,7 +7,7 @@ from common import forms
 from common.exception.app_exception import AppApiException
 from common.forms import BaseForm, TooltipLabel
 from models_provider.base_model_provider import ValidCode, BaseModelCredential
-
+from common.utils.logger import maxkb_logger
 
 class BedrockLLMModelParams(BaseForm):
     temperature = forms.SliderField(TooltipLabel(_('Temperature'),
@@ -54,7 +53,7 @@ class BedrockLLMModelCredential(BaseForm, BaseModelCredential):
         except AppApiException:
             raise
         except Exception as e:
-            traceback.print_exc()
+            maxkb_logger.error(f'Exception: {e}', exc_info=True)
             if raise_exception:
                 raise AppApiException(ValidCode.valid_error.value,
                                       gettext(

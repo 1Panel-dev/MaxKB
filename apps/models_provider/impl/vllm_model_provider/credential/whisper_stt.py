@@ -13,7 +13,7 @@ from models_provider.base_model_provider import BaseModelCredential, ValidCode
 
 class VLLMWhisperModelParams(BaseForm):
     Language = forms.TextInputField(
-        TooltipLabel(_('Language'),
+        TooltipLabel(_('language'),
                      _("If not passed, the default value is 'zh'")),
         required=True,
         default_value='zh',

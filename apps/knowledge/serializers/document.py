@@ -816,7 +816,7 @@ class DocumentSerializers(serializers.Serializer):
 
         @post(post_function=post_embedding)
         @transaction.atomic
-        def save(self, instance: Dict, with_valid=False, **kwargs):
+        def save(self, instance: Dict, with_valid=True, **kwargs):
             if with_valid:
                 DocumentInstanceSerializer(data=instance).is_valid(raise_exception=True)
                 self.is_valid(raise_exception=True)

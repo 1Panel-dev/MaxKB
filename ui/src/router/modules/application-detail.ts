@@ -82,13 +82,13 @@ const ApplicationDetailRouter = {
           () => {
             const to: any = get_next_route()
             if (to.params.from == 'resource-management') { } else {
-              return PermissionConst.APPLICATION_EDIT.getWorkspacePermissionWorkspaceManageRole()
+              return PermissionConst.APPLICATION_READ.getWorkspacePermissionWorkspaceManageRole()
             }
           },
           () => {
             const to: any = get_next_route()
             if (to.params.from == 'resource-management') { } else {
-              return PermissionConst.APPLICATION_EDIT.getApplicationWorkspaceResourcePermission(
+              return PermissionConst.APPLICATION_READ.getApplicationWorkspaceResourcePermission(
                 to ? to.params.id : '',
               )
             }
@@ -99,7 +99,7 @@ const ApplicationDetailRouter = {
           },
           () => {
             const to: any = get_next_route()
-            if (to.path.includes('resource-management')) { return PermissionConst.RESOURCE_APPLICATION_EDIT }
+            if (to.path.includes('resource-management')) { return PermissionConst.RESOURCE_APPLICATION_READ }
           },
         ]
       },

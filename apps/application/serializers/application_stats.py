@@ -118,3 +118,37 @@ class ApplicationStatisticsSerializer(serializers.Serializer):
             days.append(current_date.strftime('%Y-%m-%d'))
             current_date += datetime.timedelta(days=1)
         return days
+
+    def get_token_usage_statistics(self, with_valid=True):
+        if with_valid:
+            self.is_valid(raise_exception=True)
+        start_time = self.get_start_time()
+        end_time = self.get_end_time()
+        get_token_usage = native_search(
+            {'default_sql': QuerySet(model=get_dynamics_model(
+                {'application_chat.application_id': models.UUIDField(),
+                 'application_chat_record.create_time': models.DateTimeField()})).filter(
+                **{'application_chat.application_id': self.data.get('application_id'),
+                   'application_chat_record.create_time__gte': start_time,
+                   'application_chat_record.create_time__lte': end_time}
+            )},
+            select_string=get_file_content(
+                os.path.join(PROJECT_DIR, "apps", "application", 'sql', 'get_token_usage.sql')))
+        return get_token_usage
+
+    def get_top_questions_statistics(self, with_valid=True):
+        if with_valid:
+            self.is_valid(raise_exception=True)
+        start_time = self.get_start_time()
+        end_time = self.get_end_time()
+        get_top_questions = native_search(
+            {'default_sql': QuerySet(model=get_dynamics_model(
+                {'application_chat.application_id': models.UUIDField(),
+                 'application_chat_record.create_time': models.DateTimeField()})).filter(
+                **{'application_chat.application_id': self.data.get('application_id'),
+                   'application_chat_record.create_time__gte': start_time,
+                   'application_chat_record.create_time__lte': end_time}
+            )},
+            select_string=get_file_content(
+                os.path.join(PROJECT_DIR, "apps", "application", 'sql', 'top_questions.sql')))
+        return get_top_questions

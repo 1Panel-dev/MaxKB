@@ -4,8 +4,7 @@
       <el-button class="border-primary video-stop-button" @click="stopChat">
         <app-icon iconName="app-video-stop" class="mr-8"></app-icon>
         {{ $t('chat.operation.stopChat') }}
-      </el-button
-      >
+      </el-button>
     </div>
 
     <div class="operate-textarea">
@@ -180,7 +179,8 @@
                 <video
                   v-if="item.url"
                   :src="item.url"
-                  controls style="width: 100px; display: block"
+                  controls
+                  style="width: 100px; display: block"
                   class="border-r-6"
                   autoplay
                 />
@@ -256,40 +256,60 @@
           </template>
 
           <template v-if="recorderStatus === 'STOP' || mode === 'mobile'">
-            <span v-if="props.applicationDetails.file_upload_enable" class="flex align-center ml-4">
-              <el-upload
-                action="#"
-                multiple
-                :auto-upload="false"
-                :show-file-list="false"
-                :accept="getAcceptList()"
-                :on-change="(file: any, fileList: any) => uploadFile(file, fileList)"
-                v-model:file-list="fileAllList"
-                ref="upload"
-              >
-                <el-tooltip
-                  :disabled="mode === 'mobile'"
-                  effect="dark"
-                  placement="top"
-                  popper-class="upload-tooltip-width"
-                >
-                  <template #content>
-                    <div class="break-all pre-wrap">
-                      {{ $t('chat.uploadFile.label') }}：{{
-                        $t('chat.uploadFile.most')
-                      }}{{
-                        props.applicationDetails.file_upload_setting.maxFiles
-                      }}{{ $t('chat.uploadFile.limit') }}
-                      {{ props.applicationDetails.file_upload_setting.fileLimit }}MB<br/>{{
-                        $t('chat.uploadFile.fileType')
-                      }}：{{ getAcceptList().replace(/\./g, '').replace(/,/g, '、').toUpperCase() }}
-                    </div>
-                  </template>
-                  <el-button text :disabled="checkMaxFilesLimit() || loading" class="mt-4">
-                    <el-icon><Paperclip/></el-icon>
-                  </el-button>
-                </el-tooltip>
-              </el-upload>
+            <span
+              v-if="props.applicationDetails.file_upload_enable"
+              class="flex align-center ml-4">
+              <!-- 如果URL地址 -->
+          <el-button
+            v-if="props.applicationDetails.file_upload_setting.url_upload"
+            text
+            :disabled="checkMaxFilesLimit() || loading"
+            class="mt-4"
+            @click="openUrlSetting"
+          >
+                <el-icon><Paperclip/></el-icon>
+              </el-button>
+              <!-- 没有URL地址 -->
+                            <el-upload
+                              v-else
+                              action="#"
+                              multiple
+                              :auto-upload="false"
+                              :show-file-list="false"
+                              :accept="getAcceptList()"
+                              :on-change="(file: any, fileList: any) => uploadFile(file, fileList)"
+                              v-model:file-list="fileAllList"
+                              ref="upload"
+                            >
+                              <el-tooltip
+                                :disabled="mode === 'mobile'"
+                                effect="dark"
+                                placement="top"
+                                popper-class="upload-tooltip-width"
+                              >
+                                <template #content>
+                                  <div class="break-all pre-wrap">
+                                    {{ $t('chat.uploadFile.label') }}：{{
+                                      $t('chat.uploadFile.most')
+                                    }}{{
+                                      props.applicationDetails.file_upload_setting.maxFiles
+                                    }}{{ $t('chat.uploadFile.limit') }}
+                                    {{
+                                      props.applicationDetails.file_upload_setting.fileLimit
+                                    }}MB<br/>{{
+                                      $t('chat.uploadFile.fileType')
+                                    }}：{{
+                                      getAcceptList().replace(/\./g, '').replace(/,/g, '、').toUpperCase()
+                                    }}
+                                  </div>
+                                </template>
+                                                                <el-button text
+                                                                           :disabled="checkMaxFilesLimit() || loading"
+                                                                           class="mt-4">
+                                                                  <el-icon><Paperclip/></el-icon>
+                                                                </el-button>
+                              </el-tooltip>
+                            </el-upload>
             </span>
             <el-divider
               direction="vertical"
@@ -323,23 +343,84 @@
         </auto-tooltip>
       </el-text>
     </div>
+
+    <!-- 弹出URL设置框 -->
+    <div class="popperURLSetting" v-if="showURLSetting">
+      <el-card shadow="always" class="border-r-8" style="--el-card-padding: 16px"
+               v-if="props.applicationDetails.file_upload_setting.url_upload">
+        <el-form label-position="top" ref="urlFormRef" :model="urlForm">
+          <el-form-item>
+            <template #label>
+              <div class="flex-between">
+                <span>{{ $t('chat.uploadFile.urlTitle') }}</span>
+                <el-select
+                  :teleported="false"
+                  v-model="urlForm.type"
+                  size="small"
+                  style="width: 85px"
+                >
+                  <el-option
+                    v-for="option in fileUploadOptions"
+                    :key="option.value"
+                    :label="option.label"
+                    :value="option.value"
+                    v-show="option.visible"
+                  />
+                </el-select>
+              </div>
+            </template>
+            <el-input
+              v-model="urlForm.source_url"
+              :placeholder="$t('chat.uploadFile.urlPlaceholder')"
+              :rows="5"
+              type="textarea"
+            />
+          </el-form-item>
+        </el-form>
+        <div class="text-right">
+          <el-button @click="showURLSetting = false">{{ $t('common.cancel') }}</el-button>
+          <el-button type="primary" @click="saveUrl">{{
+              $t('common.confirm')
+            }}
+          </el-button>
+        </div>
+        <el-divider style="margin: 16px 0"/>
+        <el-upload
+          v-if="props.applicationDetails.file_upload_setting.local_upload"
+          action="#"
+          multiple
+          :auto-upload="false"
+          :show-file-list="false"
+          :accept="getAcceptList()"
+          :on-change="(file: any, fileList: any) => uploadFile(file, fileList)"
+          v-model:file-list="fileAllList"
+          ref="upload"
+          class="import-button"
+        >
+          <el-button class="w-full url-upload-button">{{
+              $t('chat.uploadFile.localUpload')
+            }}
+          </el-button>
+        </el-upload>
+      </el-card>
+    </div>
   </div>
 </template>
 <script setup lang="ts">
-import {ref, computed, onMounted, nextTick, reactive, type Ref} from 'vue'
+import {computed, nextTick, onMounted, reactive, ref, type Ref} from 'vue'
 import {t} from '@/locales'
 import Recorder from 'recorder-core'
 import TouchChat from './TouchChat.vue'
 import applicationApi from '@/api/application/application'
-import {MsgAlert} from '@/utils/message'
+import {MsgAlert, MsgWarning} from '@/utils/message'
 import {type chatType} from '@/api/type/application'
 import {useRoute, useRouter} from 'vue-router'
 import {getImgUrl} from '@/utils/common'
 import bus from '@/bus'
 import 'recorder-core/src/engine/mp3'
 import 'recorder-core/src/engine/mp3-engine'
-import {MsgWarning} from '@/utils/message'
 import chatAPI from '@/api/chat/chat'
+import imageApi from '@/api/image'
 
 const router = useRouter()
 const route = useRoute()
@@ -387,6 +468,13 @@ const localLoading = computed({
   },
 })
 
+const showURLSetting = ref(false)
+const urlForm = reactive({
+  source_url: '',
+  type: '',
+})
+
+
 const uploadLoading = computed(() => {
   return Object.values(filePromisionDict.value).length > 0
 })
@@ -403,7 +491,7 @@ const upload = ref()
 
 const imageExtensions = ['JPG', 'JPEG', 'PNG', 'GIF', 'BMP']
 const documentExtensions = ['PDF', 'DOCX', 'TXT', 'XLS', 'XLSX', 'MD', 'HTML', 'CSV']
-const videoExtensions: any = ['MP4', 'AVI', 'MKV', 'MOV', 'FLV', 'WMV']
+const videoExtensions = ['MP4', 'AVI', 'MKV', 'MOV', 'FLV', 'WMV']
 const audioExtensions = ['MP3', 'WAV', 'OGG', 'AAC', 'M4A']
 const otherExtensions = ref(['PPT', 'DOC'])
 
@@ -454,7 +542,6 @@ const uploadFile = async (file: any, fileList: any) => {
     uploadAudioList.value.length +
     uploadVideoList.value.length +
     uploadOtherList.value.length
-
   if (file_limit_once >= maxFiles) {
     MsgWarning(t('chat.uploadFile.limitMessage1') + maxFiles + t('chat.uploadFile.limitMessage2'))
     fileList.splice(0, fileList.length, ...fileList.slice(0, maxFiles))
@@ -482,8 +569,7 @@ const uploadFile = async (file: any, fileList: any) => {
   const inner = reactive(file)
   fileAllList.value.push(inner)
   if (!chatId_context.value) {
-    const res = await props.openChatId()
-    chatId_context.value = res
+    chatId_context.value = await props.openChatId()
   }
   const api =
     props.type === 'debug-ai-chat'
@@ -940,6 +1026,300 @@ onMounted(() => {
     })
   }, 800)
 })
+
+const mime_types = {
+  "html": "text/html",
+  "htm": "text/html",
+  "shtml": "text/html",
+  "css": "text/css",
+  "xml": "text/xml",
+  "gif": "image/gif",
+  "jpeg": "image/jpeg",
+  "jpg": "image/jpeg",
+  "js": "application/javascript",
+  "atom": "application/atom+xml",
+  "rss": "application/rss+xml",
+  "mml": "text/mathml",
+  "txt": "text/plain",
+  "jad": "text/vnd.sun.j2me.app-descriptor",
+  "wml": "text/vnd.wap.wml",
+  "htc": "text/x-component",
+  "avif": "image/avif",
+  "png": "image/png",
+  "svg": "image/svg+xml",
+  "svgz": "image/svg+xml",
+  "tif": "image/tiff",
+  "tiff": "image/tiff",
+  "wbmp": "image/vnd.wap.wbmp",
+  "webp": "image/webp",
+  "ico": "image/x-icon",
+  "jng": "image/x-jng",
+  "bmp": "image/x-ms-bmp",
+  "woff": "font/woff",
+  "woff2": "font/woff2",
+  "jar": "application/java-archive",
+  "war": "application/java-archive",
+  "ear": "application/java-archive",
+  "json": "application/json",
+  "hqx": "application/mac-binhex40",
+  "doc": "application/msword",
+  "pdf": "application/pdf",
+  "ps": "application/postscript",
+  "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  "eps": "application/postscript",
+  "ai": "application/postscript",
+  "rtf": "application/rtf",
+  "m3u8": "application/vnd.apple.mpegurl",
+  "kml": "application/vnd.google-earth.kml+xml",
+  "kmz": "application/vnd.google-earth.kmz",
+  "xls": "application/vnd.ms-excel",
+  "eot": "application/vnd.ms-fontobject",
+  "ppt": "application/vnd.ms-powerpoint",
+  "odg": "application/vnd.oasis.opendocument.graphics",
+  "odp": "application/vnd.oasis.opendocument.presentation",
+  "ods": "application/vnd.oasis.opendocument.spreadsheet",
+  "odt": "application/vnd.oasis.opendocument.text",
+  "wmlc": "application/vnd.wap.wmlc",
+  "wasm": "application/wasm",
+  "7z": "application/x-7z-compressed",
+  "cco": "application/x-cocoa",
+  "jardiff": "application/x-java-archive-diff",
+  "jnlp": "application/x-java-jnlp-file",
+  "run": "application/x-makeself",
+  "pl": "application/x-perl",
+  "pm": "application/x-perl",
+  "prc": "application/x-pilot",
+  "pdb": "application/x-pilot",
+  "rar": "application/x-rar-compressed",
+  "rpm": "application/x-redhat-package-manager",
+  "sea": "application/x-sea",
+  "swf": "application/x-shockwave-flash",
+  "sit": "application/x-stuffit",
+  "tcl": "application/x-tcl",
+  "tk": "application/x-tcl",
+  "der": "application/x-x509-ca-cert",
+  "pem": "application/x-x509-ca-cert",
+  "crt": "application/x-x509-ca-cert",
+  "xpi": "application/x-xpinstall",
+  "xhtml": "application/xhtml+xml",
+  "xspf": "application/xspf+xml",
+  "zip": "application/zip",
+  "bin": "application/octet-stream",
+  "exe": "application/octet-stream",
+  "dll": "application/octet-stream",
+  "deb": "application/octet-stream",
+  "dmg": "application/octet-stream",
+  "iso": "application/octet-stream",
+  "img": "application/octet-stream",
+  "msi": "application/octet-stream",
+  "msp": "application/octet-stream",
+  "msm": "application/octet-stream",
+  "mid": "audio/midi",
+  "midi": "audio/midi",
+  "kar": "audio/midi",
+  "mp3": "audio/mp3",
+  "ogg": "audio/ogg",
+  "m4a": "audio/x-m4a",
+  "ra": "audio/x-realaudio",
+  "3gpp": "video/3gpp",
+  "3gp": "video/3gpp",
+  "ts": "video/mp2t",
+  "mp4": "video/mp4",
+  "mpeg": "video/mpeg",
+  "mpg": "video/mpeg",
+  "mov": "video/quicktime",
+  "webm": "video/webm",
+  "flv": "video/x-flv",
+  "m4v": "video/x-m4v",
+  "mng": "video/x-mng",
+  "asx": "video/x-ms-asf",
+  "asf": "video/x-ms-asf",
+  "wmv": "video/x-ms-wmv",
+  "avi": "video/x-msvideo",
+  "wav": "audio/wav",
+  "flac": "audio/flac",
+  "aac": "audio/aac",
+  "opus": "audio/opus",
+  "csv": "text/csv",
+  "tsv": "text/tab-separated-values",
+  "ics": "text/calendar",
+}
+
+function getExtensionsByMime(mime: string): string[] {
+  return Object.entries(mime_types)
+    .filter(([key, value]) => value === mime)
+    .map(([key]) => key);
+}
+
+const fileUploadOptions = computed(() => [
+  {
+    label: t('common.fileUpload.image'),
+    value: 'image',
+    visible: props.applicationDetails.file_upload_setting.image
+  },
+  {
+    label: t('common.fileUpload.document'),
+    value: 'document',
+    visible: props.applicationDetails.file_upload_setting.document
+  },
+  {
+    label: t('common.fileUpload.video'),
+    value: 'video',
+    visible: props.applicationDetails.file_upload_setting.video
+  },
+  {
+    label: t('common.fileUpload.audio'),
+    value: 'audio',
+    visible: props.applicationDetails.file_upload_setting.audio
+  },
+  {
+    label: t('common.fileUpload.other'),
+    value: 'other',
+    visible: props.applicationDetails.file_upload_setting.other
+  }
+])
+
+function openUrlSetting() {
+  showURLSetting.value = true
+  const visibleOptions = fileUploadOptions.value.filter(option => option.visible)
+  if (visibleOptions.length > 0) {
+    urlForm.type = visibleOptions[0].value
+  }
+}
+
+
+async function saveUrl() {
+  const urls = urlForm.source_url.split('\n')
+  if (urls.length === 0) {
+    MsgWarning(t('chat.uploadFile.invalidUrl'))
+    return
+  }
+  // 允许的 MIME 类型
+  const allowedTypes: Record<string, string[]> = {
+    image: imageExtensions
+      .map(ext => mime_types[ext.toLowerCase() as keyof typeof mime_types])
+      .filter(Boolean) as string[],
+    document: documentExtensions
+      .map(ext => mime_types[ext.toLowerCase() as keyof typeof mime_types])
+      .filter(Boolean) as string[],
+    audio: audioExtensions
+      .map(ext => mime_types[ext.toLowerCase() as keyof typeof mime_types])
+      .filter(Boolean) as string[],
+    video: videoExtensions
+      .map(ext => mime_types[ext.toLowerCase() as keyof typeof mime_types])
+      .filter(Boolean) as string[],
+    other: otherExtensions.value
+      .map(ext => mime_types[ext.toLowerCase() as keyof typeof mime_types])
+      .filter(Boolean) as string[]
+  };
+
+  // 校验 URL 是否有效
+  const validUrls = urls.map(u => u.trim()).filter(u => {
+    try {
+      new URL(u);
+      return u !== '';
+    } catch {
+      return false;
+    }
+  });
+
+  if (validUrls.length === 0) {
+    MsgWarning(t('chat.uploadFile.invalidUrl'));
+    return;
+  }
+
+  const type = urlForm.type
+  const expectedTypes = allowedTypes[type] || [];
+  const validFiles: any[] = [];
+
+  // 异步校验单个 URL
+  async function processUrl(url: string) {
+    try {
+      const res = await imageApi.getFile({url});
+      if (!res.data) {
+        MsgWarning(url + ' ' + t('chat.uploadFile.invalidUrl'));
+        return;
+      }
+
+      const contentType = res.data['Content-Type'] || '';
+      const contentLength = res.data['Content-Length'];
+      const fileSize = contentLength ? parseInt(contentLength, 10) : 0;
+
+      // 类型校验
+      if (expectedTypes.length > 0 && !expectedTypes.some(type => contentType.includes(type))) {
+        MsgWarning(url + ' ' + t('chat.uploadFile.urlErrorMessage'));
+        return;
+      }
+
+      // 大小校验
+      const {fileLimit} = props.applicationDetails.file_upload_setting;
+      if (fileSize > fileLimit * 1024 * 1024) {
+        MsgWarning(url + ' ' + t('chat.uploadFile.sizeLimit') + fileLimit + 'MB')
+        return;
+      }
+
+      // 文件名处理
+      let fileName = url.substring(url.lastIndexOf('/') + 1);
+      if (!fileName) fileName = `file_${Date.now()}`;
+      if (!fileName.includes('.') && getExtensionsByMime(contentType)) {
+        fileName += '.' + getExtensionsByMime(contentType)[0];
+      }
+
+      const fileItem = {
+        uid: `${Date.now()}_${Math.random()}`,
+        name: fileName,
+        url: url,
+        type: contentType,
+        size: fileSize,
+        status: 'success'
+      };
+
+      // 文档/音频类型需要下载后上传
+      if (type === 'document' || type === 'audio' || type === 'other') {
+        const base64Data = res.data.content;
+        const byteString = atob(base64Data.split(',')[1] || base64Data);
+        const mimeString = base64Data.split(',')[0]?.split(':')[1]?.split(';')[0] || contentType;
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
+
+        const fileBlob = new Blob([ab], {type: mimeString});
+        const fileObj = new File([fileBlob], fileName, {type: mimeString});
+
+        const uploadFileItem = {
+          uid: fileItem.uid,
+          name: fileName,
+          size: fileSize,
+          raw: fileObj,
+          status: 'ready',
+          percentage: 0
+        };
+
+        await uploadFile(uploadFileItem, [uploadFileItem]);
+      } else {
+        validFiles.push(reactive(fileItem));
+      }
+    } catch (e) {
+      console.error(e);
+      MsgWarning(`${url} 无法访问`);
+    }
+  }
+
+  // 并行处理所有 URL
+  await Promise.all(validUrls.map(url => processUrl(url)));
+
+  if (validFiles.length > 0) {
+    fileAllList.value.push(...validFiles);
+  }
+
+  showURLSetting.value = false;
+  urlForm.source_url = '';
+  urlForm.type = ''
+}
+
+
 </script>
 <style lang="scss" scoped>
 .ai-chat {
@@ -1026,14 +1406,22 @@ onMounted(() => {
       }
     }
   }
+  .popperURLSetting {
+    right: 30px;
+  }
 }
 
-.popperUserInput {
+.popperURLSetting {
   position: absolute;
   z-index: 999;
-  left: 0;
-  bottom: 50px;
+  right: 60px;
+  bottom: 65px;
   width: calc(100% - 50px);
-  max-width: 400px;
+  max-width: 320px;
+
+  .url-upload-button {
+    border-color: var(--el-color-primary);
+    color: var(--el-color-primary);
+  }
 }
 </style>

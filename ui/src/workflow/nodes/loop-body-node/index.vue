@@ -156,14 +156,27 @@ const renderGraphData = (data?: any) => {
     }, 500)
   }
 }
+
+const loopLayout = () => {
+  lf.value?.extension?.dagre.layout()
+}
 onMounted(() => {
   renderGraphData(cloneDeep(props.nodeModel.properties.workflow))
   set(props.nodeModel, 'validate', validate)
   set(props.nodeModel, 'set_loop_body', set_loop_body)
+  set(props.nodeModel, 'loopLayout', loopLayout)
 })
 onUnmounted(() => {
   disconnectByFlow(lf.value.graphModel.flowId)
   lf.value = null
 })
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.loop-beautify-button {
+  position: absolute;
+  top: 35px;
+  right: 70px;
+  border: none;
+  z-index: 10;
+}
+</style>

@@ -6,11 +6,9 @@
     @date：2024/7/11 18:41
     @desc:
 """
-import traceback
 from typing import Dict
 
 from django.utils.translation import gettext_lazy as _, gettext
-from langchain_core.messages import HumanMessage
 
 from common import forms
 from common.exception.app_exception import AppApiException
@@ -69,7 +67,7 @@ class QwenVLModelCredential(BaseForm, BaseModelCredential):
             model = provider.get_model(model_type, model_name, model_credential, **model_params)
             model.check_auth(model_credential.get('api_key'))
         except Exception as e:
-            traceback.print_exc()
+            maxkb_logger.error(f'Exception: {e}', exc_info=True)
             if isinstance(e, AppApiException):
                 raise e
             if raise_exception:

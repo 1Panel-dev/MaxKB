@@ -5,27 +5,28 @@
       :placeholder="$t('common.search')"
       prefix-icon="Search"
       clearable
-      class="p-8"
+      class="p-16 pb-0"
     />
-
-    <div v-if="showShared && hasPermission(EditionConst.IS_EE, 'OR')" class="border-b mb-4">
-      <div
-        @click="handleSharedNodeClick"
-        class="shared-button flex cursor"
-        :class="currentNodeKey === 'share' && 'active'"
-      >
-        <AppIcon
-          iconName="app-shared-active"
-          style="font-size: 18px"
-          class="color-primary"
-        ></AppIcon>
-        <span class="ml-8">{{ shareTitle }}</span>
+    <div class="p-8 pb-0" v-if="showShared && hasPermission(EditionConst.IS_EE, 'OR')">
+      <div class="border-b">
+        <div
+          @click="handleSharedNodeClick"
+          class="shared-button flex cursor border-r-6"
+          :class="currentNodeKey === 'share' && 'active'"
+        >
+          <AppIcon
+            iconName="app-shared-active"
+            style="font-size: 18px"
+            class="color-primary"
+          ></AppIcon>
+          <span class="ml-8">{{ shareTitle }}</span>
+        </div>
       </div>
     </div>
 
     <el-scrollbar>
       <el-tree
-        class="overflow-inherit_node__children"
+        class="folder-tree__main p-8"
         :class="
           showShared && hasPermission(EditionConst.IS_EE, 'OR')
             ? 'tree-height-shared'
@@ -40,7 +41,7 @@
         :default-expanded-keys="[currentNodeKey]"
         :current-node-key="currentNodeKey"
         highlight-current
-        draggable
+        :draggable="draggable"
         :allow-drop="allowDrop"
         :allow-drag="allowDrag"
         @node-drop="handleDrop"
@@ -49,13 +50,12 @@
         v-bind="$attrs"
       >
         <template #default="{ node, data }">
-          <div class="flex-between w-full" @mouseenter.stop="handleMouseEnter(data)">
-            <div class="flex align-center">
-              <AppIcon iconName="app-folder" style="font-size: 20px"></AppIcon>
-              <span class="ml-8 ellipsis tree-label" style="max-width: 110px" :title="node.label">{{
-                i18n_name(node.label)
-              }}</span>
-            </div>
+          <div
+            @mouseenter.stop="handleMouseEnter(data)"
+            class="flex align-center w-full custom-tree-node"
+          >
+            <AppIcon iconName="app-folder" style="font-size: 20px"></AppIcon>
+            <span class="tree-label ml-8" :title="node.label">{{ i18n_name(node.label) }}</span>
 
             <div
               v-if="canOperation && MoreFilledPermission(node, data)"
@@ -63,7 +63,7 @@
               v-show="hoverNodeId === data.id"
               @mouseenter.stop="handleMouseEnter(data)"
               @mouseleave.stop="handleMouseleave"
-              class="mr-16"
+              class="mr-8 tree-operation-button"
             >
               <el-dropdown trigger="click" :teleported="false">
                 <el-button text class="w-full" v-if="MoreFilledPermission(node, data)">
@@ -178,6 +178,10 @@ const props = defineProps({
     type: Object,
     default: () => ({}),
   },
+  draggable: {
+    type: Boolean,
+    default: false,
+  },
 })
 const resourceType = computed(() => {
   if (props.source === 'APPLICATION') {
@@ -245,7 +249,6 @@ const handleDrop = (draggingNode: any, dropNode: any, dropType: string, ev: Drag
     .putFolder(dragData.id, props.source, obj, loading)
     .then(() => {
       MsgSuccess(t('common.saveSuccess'))
-      emit('refreshTree')
     })
     .catch(() => {
       emit('refreshTree')
@@ -373,7 +376,7 @@ onUnmounted(() => {
     margin-bottom: 4px;
     &.active {
       background: var(--el-color-primary-light-9);
-      border-radius: var();
+      border-radius: var(--app-border-radius-small);
       color: var(--el-color-primary);
       font-weight: 500;
       &:hover {
@@ -381,7 +384,7 @@ onUnmounted(() => {
       }
     }
     &:hover {
-      border-radius: var();
+      border-radius: var(--app-border-radius-small);
       background: var(--app-text-color-light-1);
     }
     &.is-active {
@@ -399,7 +402,7 @@ onUnmounted(() => {
     padding-top: 4px;
     height: calc(100vh - 180px);
   }
-  :deep(.el-tree) {
+  :deep(.folder-tree__main) {
     .el-tree-node.is-dragging {
       opacity: 0.5;
     }
@@ -408,11 +411,19 @@ onUnmounted(() => {
       border: 2px dashed var(--el-color-primary);
       border-radius: 4px;
     }
+    .custom-tree-node {
+      box-sizing: content-box;
+      width: calc(100% - 27px);
+    }
+    .tree-label {
+      width: 100%;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
     .el-tree-node__content {
       position: relative;
     }
-  }
-  :deep(.overflow-inherit_node__children) {
     .el-tree-node__children {
       overflow: inherit !important;
     }

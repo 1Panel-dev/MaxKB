@@ -35,11 +35,11 @@
           <AppIcon iconName="app-debug-outlined" class="mr-4"></AppIcon>
           {{ $t('views.applicationWorkflow.setting.debug') }}
         </el-button>
-        <el-button @click="saveApplication(true)">
+        <el-button @click="saveApplication(true)" v-if="permissionPrecise.edit(id)">
           <AppIcon iconName="app-save-outlined" class="mr-4"></AppIcon>
           {{ $t('common.save') }}
         </el-button>
-        <el-button type="primary" @click="publish">
+        <el-button type="primary" @click="publish" v-if="permissionPrecise.edit(id)">
           {{ $t('views.application.operation.publish') }}
         </el-button>
 

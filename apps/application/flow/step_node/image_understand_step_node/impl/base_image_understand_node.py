@@ -131,11 +131,18 @@ class BaseImageUnderstandNode(IImageUnderstandNode):
                 image_list = data['image_list']
                 if len(image_list) == 0 or data['dialogue_type'] == 'WORKFLOW':
                     return HumanMessage(content=chat_record.problem_text)
-                file_id_list = [image.get('file_id') for image in image_list]
+
+                file_id_list = []
+                url_list = []
+                for image in image_list:
+                    if 'file_id' in image:
+                        file_id_list.append(image.get('file_id'))
+                    elif 'url' in image:
+                        url_list.append(image.get('url'))
                 return HumanMessage(content=[
                     {'type': 'text', 'text': data['question']},
-                    *[{'type': 'image_url', 'image_url': {'url': f'./oss/file/{file_id}'}} for file_id in file_id_list]
-
+                    *[{'type': 'image_url', 'image_url': {'url': f'./oss/file/{file_id}'}} for file_id in file_id_list],
+                    *[{'type': 'image_url', 'image_url': {'url': url}} for url in url_list]
                 ])
         return HumanMessage(content=chat_record.problem_text)
 
@@ -155,13 +162,22 @@ class BaseImageUnderstandNode(IImageUnderstandNode):
                 image_list = data['image_list']
                 if len(image_list) == 0 or data['dialogue_type'] == 'WORKFLOW':
                     return HumanMessage(content=chat_record.problem_text)
-                image_base64_list = [file_id_to_base64(image.get('file_id')) for image in image_list]
+                file_id_list = []
+                url_list = []
+                for image in image_list:
+                    if 'file_id' in image:
+                        file_id_list.append(image.get('file_id'))
+                    elif 'url' in image:
+                        url_list.append(image.get('url'))
+                image_base64_list = [file_id_to_base64(file_id) for file_id in file_id_list]
+
                 return HumanMessage(
                     content=[
                         {'type': 'text', 'text': data['question']},
                         *[{'type': 'image_url',
                            'image_url': {'url': f'data:image/{base64_image[1]};base64,{base64_image[0]}'}} for
-                          base64_image in image_base64_list]
+                          base64_image in image_base64_list],
+                        *[{'type': 'image_url', 'image_url': url} for url in url_list]
                     ])
         return HumanMessage(content=chat_record.problem_text)
 
@@ -177,13 +193,17 @@ class BaseImageUnderstandNode(IImageUnderstandNode):
             images.append({'type': 'image_url', 'image_url': {'url': image}})
         elif image is not None and len(image) > 0:
             for img in image:
-                file_id = img['file_id']
-                file = QuerySet(File).filter(id=file_id).first()
-                image_bytes = file.get_bytes()
-                base64_image = base64.b64encode(image_bytes).decode("utf-8")
-                image_format = what(None, image_bytes)
-                images.append(
-                    {'type': 'image_url', 'image_url': {'url': f'data:image/{image_format};base64,{base64_image}'}})
+                if 'file_id' in img:
+                    file_id = img['file_id']
+                    file = QuerySet(File).filter(id=file_id).first()
+                    image_bytes = file.get_bytes()
+                    base64_image = base64.b64encode(image_bytes).decode("utf-8")
+                    image_format = what(None, image_bytes)
+                    images.append(
+                        {'type': 'image_url', 'image_url': {'url': f'data:image/{image_format};base64,{base64_image}'}})
+                elif 'url' in img and img['url'].startswith('http'):
+                    images.append(
+                        {'type': 'image_url', 'image_url': {'url': img["url"]}})
         return images
 
     def generate_message_list(self, image_model, system: str, prompt: str, history_message, image):

@@ -23,6 +23,5 @@ class GeminiImage(MaxKBBaseModel, ChatGoogleGenerativeAI):
         return GeminiImage(
             model=model_name,
             google_api_key=model_credential.get('api_key'),
-            streaming=True,
             **optional_params,
         )

@@ -11,12 +11,6 @@
       ref="treeRef"
       :source="source"
       :data="folderList"
-      :treeStyle="{
-        height: 'calc(100vh - 320px)',
-        border: '1px solid #ebeef5',
-        borderRadius: '6px',
-        padding: '8px',
-      }"
       :default-expanded-keys="[currentNodeKey]"
       :canOperation="false"
       class="move-to-dialog-tree"
@@ -74,7 +68,7 @@ watch(dialogVisible, (bool) => {
 
 const isFolder = ref<boolean>(false)
 
-const open = (data: any, is_folder?:any) => {
+const open = (data: any, is_folder?: any) => {
   detail.value = data
   isFolder.value = is_folder
   getFolder()
@@ -105,17 +99,17 @@ const submitHandle = async () => {
     }
     if (isFolder.value) {
       const folder_obj = {
-      ...detail.value,
-      parent_id: selectForderId.value,
-    }
-      folderApi.putFolder(detail.value.id, detail.value.folder_type, folder_obj, loading)
+        ...detail.value,
+        parent_id: selectForderId.value,
+      }
+      folderApi
+        .putFolder(detail.value.id, detail.value.folder_type, folder_obj, loading)
         .then(() => {
           MsgSuccess(t('common.saveSuccess'))
-        emit('refresh')
-        dialogVisible.value = false
-      })
-    }
-    else if (props.source === SourceTypeEnum.KNOWLEDGE) {
+          emit('refresh')
+          dialogVisible.value = false
+        })
+    } else if (props.source === SourceTypeEnum.KNOWLEDGE) {
       if (detail.value.type === 2) {
         KnowledgeApi.putLarkKnowledge(detail.value.id, obj, loading).then(() => {
           MsgSuccess(t('common.saveSuccess'))
@@ -155,8 +149,12 @@ defineExpose({ open })
     padding: 0 !important;
     margin-bottom: 8px;
   }
-  :deep(.tree-label) {
-    max-width: 100% !important;
+  :deep(.el-scrollbar) {
+    border: 1px solid var(--el-border-color-light);
+    border-radius: 6px;
+  }
+  :deep(.el-tree) {
+    height: calc(100vh - 320px)!important;
   }
 }
 </style>

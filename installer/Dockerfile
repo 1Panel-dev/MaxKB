@@ -13,7 +13,7 @@ RUN apt-get update && \
     apt-get clean all  && \
     rm -rf /var/lib/apt/lists/*
 WORKDIR /opt/maxkb-app
-RUN gcc -shared -fPIC -o /opt/maxkb-app/sandbox/sandbox.so /opt/maxkb-app/installer/sandbox.c -ldl && \
+RUN gcc -shared -fPIC -o ${MAXKB_SANDBOX_HOME}/sandbox.so /opt/maxkb-app/installer/sandbox.c -ldl && \
     rm -rf /opt/maxkb-app/ui && \
     pip install uv --break-system-packages && \
     python -m uv pip install -r pyproject.toml && \
@@ -47,12 +47,9 @@ ENV MAXKB_VERSION="${DOCKER_IMAGE_TAG} (build at ${BUILD_AT}, commit: ${GITHUB_C
     MAXKB_LOCAL_MODEL_PROTOCOL=http \
     PIP_TARGET=/opt/maxkb/python-packages
 
-
 WORKDIR /opt/maxkb-app
 COPY --from=stage-build /opt/maxkb-app /opt/maxkb-app
 COPY --from=stage-build /opt/py3 /opt/py3
-
-RUN chmod 755 /tmp
 
 EXPOSE 8080
 VOLUME /opt/maxkb

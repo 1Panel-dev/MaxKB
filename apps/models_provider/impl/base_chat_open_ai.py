@@ -1,4 +1,5 @@
 # coding=utf-8
+import base64
 from concurrent.futures import ThreadPoolExecutor
 from requests.exceptions import ConnectTimeout, ReadTimeout
 from typing import Dict, Optional, Any, Iterator, cast, Union, Sequence, Callable, Mapping
@@ -15,7 +16,7 @@ from langchain_openai import ChatOpenAI
 from langchain_openai.chat_models.base import _create_usage_metadata
 
 from common.config.tokenizer_manage_config import TokenizerManage
-
+from common.utils.logger import maxkb_logger
 
 def custom_get_token_ids(text: str):
     tokenizer = TokenizerManage.get_tokenizer()
@@ -102,13 +103,13 @@ class BaseChatOpenAI(ChatOpenAI):
                 future = executor.submit(super().get_num_tokens_from_messages, messages, tools)
                 try:
                     response = future.result()
-                    print("请求成功（未超时）")
+                    maxkb_logger.info("请求成功（未超时）")
                     return response
                 except Exception as e:
                     if isinstance(e, ReadTimeout):
                         raise  # 继续抛出
                     else:
-                        print("except:", e)
+                        maxkb_logger.error("except:", e)
                         tokenizer = TokenizerManage.get_tokenizer()
                         return sum([len(tokenizer.encode(get_buffer_string([m]))) for m in messages])
 
@@ -211,3 +212,20 @@ class BaseChatOpenAI(ChatOpenAI):
         self.usage_metadata = chat_result.response_metadata[
             'token_usage'] if 'token_usage' in chat_result.response_metadata else chat_result.usage_metadata
         return chat_result
+
+
+    def upload_file_and_get_url(self, file_stream, file_name):
+        """上传文件并获取文件URL"""
+        base64_video = base64.b64encode(file_stream).decode("utf-8")
+        video_format = get_video_format(file_name)
+        return f'data:{video_format};base64,{base64_video}'
+
+def get_video_format(file_name):
+    extension = file_name.split('.')[-1].lower()
+    format_map = {
+        'mp4': 'video/mp4',
+        'avi': 'video/avi',
+        'mov': 'video/mov',
+        'wmv': 'video/x-ms-wmv'
+    }
+    return format_map.get(extension, 'video/mp4')

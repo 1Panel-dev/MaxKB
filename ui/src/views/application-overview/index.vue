@@ -11,7 +11,7 @@
             <div class="title flex align-center">
               <div class="edit-avatar mr-12">
                 <el-avatar shape="square" :size="32" style="background: none">
-                  <img :src="resetUrl(detail?.icon, resetUrl('./favicon.ico'))" alt="" />
+                  <img :src="resetUrl(detail?.icon, resetUrl('./favicon.ico'))" alt=""/>
                 </el-avatar>
               </div>
 
@@ -22,7 +22,7 @@
               <el-col :span="12" class="mt-16">
                 <div class="flex">
                   <el-text type="info"
-                    >{{ $t('views.applicationOverview.appInfo.publicAccessLink') }}
+                  >{{ $t('views.applicationOverview.appInfo.publicAccessLink') }}
                   </el-text>
                   <el-switch
                     v-model="accessToken.is_active"
@@ -52,7 +52,7 @@
                       style="margin-left: 1px"
                     >
                       <el-icon>
-                        <RefreshRight />
+                        <RefreshRight/>
                       </el-icon>
                     </el-button>
                   </el-tooltip>
@@ -98,12 +98,12 @@
               <el-col :span="12" class="mt-16">
                 <div class="flex">
                   <el-text type="info"
-                    >{{ $t('views.applicationOverview.appInfo.apiAccessCredentials') }}
+                  >{{ $t('views.applicationOverview.appInfo.apiAccessCredentials') }}
                   </el-text>
                 </div>
                 <div class="mt-4 mb-16 url-height">
                   <div>
-                    <el-text>API {{ $t('common.fileUpload.document') }}： </el-text>
+                    <el-text>API {{ $t('common.fileUpload.document') }}：</el-text>
                     <el-button
                       type="primary"
                       link
@@ -119,8 +119,8 @@
                     </span>
 
                     <span class="vertical-middle lighter break-all ellipsis-1">{{
-                      baseUrl + id
-                    }}</span>
+                        baseUrl + id
+                      }}</span>
                     <el-tooltip effect="dark" :content="$t('common.copy')" placement="top">
                       <el-button type="primary" text @click="copyClick(baseUrl + id)">
                         <AppIcon iconName="app-copy"></AppIcon>
@@ -134,7 +134,7 @@
                     v-if="permissionPrecise.overview_api_key(id)"
                   >
                     <el-icon class="mr-4">
-                      <Key />
+                      <Key/>
                     </el-icon>
                     {{ $t('views.applicationOverview.appInfo.apiKey') }}
                   </el-button>
@@ -173,7 +173,8 @@
             />
           </div>
           <div v-loading="statisticsLoading">
-            <StatisticsCharts :data="statisticsData" />
+            <StatisticsCharts :data="statisticsData" :token-usage="tokenUsage"
+                              :top-questions="topQuestions"/>
           </div>
         </el-card>
       </div>
@@ -184,17 +185,17 @@
       :data="detail"
       :api-input-params="mapToUrlParams(apiInputParams)"
     />
-    <APIKeyDialog ref="APIKeyDialogRef" />
+    <APIKeyDialog ref="APIKeyDialogRef"/>
 
     <!-- 社区版访问限制 -->
-    <component :is="currentLimitDialog" ref="LimitDialogRef" @refresh="refresh" />
+    <component :is="currentLimitDialog" ref="LimitDialogRef" @refresh="refresh"/>
     <!-- 显示设置 -->
-    <component :is="currentDisplaySettingDialog" ref="DisplaySettingDialogRef" @refresh="refresh" />
+    <component :is="currentDisplaySettingDialog" ref="DisplaySettingDialogRef" @refresh="refresh"/>
   </div>
 </template>
 <script setup lang="ts">
-import { ref, computed, onMounted, shallowRef, nextTick } from 'vue'
-import { useRoute } from 'vue-router'
+import {ref, computed, onMounted, shallowRef, nextTick} from 'vue'
+import {useRoute} from 'vue-router'
 import EmbedDialog from './component/EmbedDialog.vue'
 import APIKeyDialog from './component/APIKeyDialog.vue'
 import LimitDialog from './component/LimitDialog.vue'
@@ -202,20 +203,20 @@ import XPackLimitDrawer from './xpack-component/XPackLimitDrawer.vue'
 import DisplaySettingDialog from './component/DisplaySettingDialog.vue'
 import XPackDisplaySettingDialog from './xpack-component/XPackDisplaySettingDialog.vue'
 import StatisticsCharts from './component/StatisticsCharts.vue'
-import { nowDate, beforeDay } from '@/utils/time'
-import { MsgSuccess, MsgConfirm } from '@/utils/message'
-import { copyClick } from '@/utils/clipboard'
-import { resetUrl } from '@/utils/common'
-import { mapToUrlParams } from '@/utils/application'
-import { t } from '@/locales'
-import { EditionConst } from '@/utils/permission/data'
-import { hasPermission } from '@/utils/permission/index'
+import {nowDate, beforeDay} from '@/utils/time'
+import {MsgSuccess, MsgConfirm} from '@/utils/message'
+import {copyClick} from '@/utils/clipboard'
+import {resetUrl} from '@/utils/common'
+import {mapToUrlParams} from '@/utils/application'
+import {t} from '@/locales'
+import {EditionConst} from '@/utils/permission/data'
+import {hasPermission} from '@/utils/permission/index'
 import permissionMap from '@/permission'
-import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import {loadSharedApi} from '@/utils/dynamics-api/shared-api'
 
 const route = useRoute()
 const {
-  params: { id },
+  params: {id},
 } = route as any
 
 const apiType = computed(() => {
@@ -287,6 +288,8 @@ const daterange = ref({
 
 const statisticsLoading = ref(false)
 const statisticsData = ref([])
+const tokenUsage = ref([])
+const topQuestions = ref([])
 
 const apiInputParams = ref([])
 
@@ -308,7 +311,7 @@ function openDisplaySettingDialog() {
   }
   nextTick(() => {
     if (currentDisplaySettingDialog.value == XPackDisplaySettingDialog) {
-      loadSharedApi({ type: 'application', systemType: apiType.value })
+      loadSharedApi({type: 'application', systemType: apiType.value})
         .getApplicationSetting(id)
         .then((ok: any) => {
           DisplaySettingDialogRef.value?.open(ok.data, detail.value)
@@ -351,10 +354,22 @@ function changeDayRangeHandle(val: string) {
 }
 
 function getAppStatistics() {
-  loadSharedApi({ type: 'application', systemType: apiType.value })
+  loadSharedApi({type: 'application', systemType: apiType.value})
     .getStatistics(id, daterange.value, statisticsLoading)
     .then((res: any) => {
       statisticsData.value = res.data
+    })
+  loadSharedApi({type: 'application', systemType: apiType.value})
+    .getTokenUsage(id, daterange.value, statisticsLoading)
+    .then((res: any) => {
+      // [{'token_usage': 200, 'username': '张三'}, ...]
+      tokenUsage.value = res.data
+    })
+  loadSharedApi({type: 'application', systemType: apiType.value})
+    .topQuestions(id, daterange.value, statisticsLoading)
+    .then((res: any) => {
+      // [{'chat_record_count': 200, 'username': '张三'}, ...]
+      topQuestions.value = res.data
     })
 }
 
@@ -374,7 +389,8 @@ function refreshAccessToken() {
       const str = t('views.applicationOverview.appInfo.refreshToken.refreshSuccess')
       updateAccessToken(obj, str)
     })
-    .catch(() => {})
+    .catch(() => {
+    })
 }
 
 async function changeState(bool: boolean) {
@@ -392,7 +408,7 @@ async function changeState(bool: boolean) {
 }
 
 async function updateAccessToken(obj: any, str: string) {
-  loadSharedApi({ type: 'application', systemType: apiType.value })
+  loadSharedApi({type: 'application', systemType: apiType.value})
     .putAccessToken(id as string, obj, loading)
     .then((res: any) => {
       accessToken.value = res?.data
@@ -409,7 +425,7 @@ function openDialog() {
 }
 
 function getAccessToken() {
-  loadSharedApi({ type: 'application', systemType: apiType.value })
+  loadSharedApi({type: 'application', systemType: apiType.value})
     .getAccessToken(id, loading)
     .then((res: any) => {
       accessToken.value = res?.data
@@ -417,7 +433,7 @@ function getAccessToken() {
 }
 
 function getDetail() {
-  loadSharedApi({ type: 'application', systemType: apiType.value })
+  loadSharedApi({type: 'application', systemType: apiType.value})
     .getApplicationDetail(id, loading)
     .then((res: any) => {
       detail.value = res.data
@@ -426,20 +442,20 @@ function getDetail() {
         .map((v: any) => {
           apiInputParams.value = v.properties.api_input_field_list
             ? v.properties.api_input_field_list.map((v: any) => {
-                return {
-                  name: v.variable,
-                  value: v.default_value,
-                }
-              })
+              return {
+                name: v.variable,
+                value: v.default_value,
+              }
+            })
             : v.properties.input_field_list
               ? v.properties.input_field_list
-                  .filter((v: any) => v.assignment_method === 'api_input')
-                  .map((v: any) => {
-                    return {
-                      name: v.variable,
-                      value: v.default_value,
-                    }
-                  })
+                .filter((v: any) => v.assignment_method === 'api_input')
+                .map((v: any) => {
+                  return {
+                    name: v.variable,
+                    value: v.default_value,
+                  }
+                })
               : []
         })
     })

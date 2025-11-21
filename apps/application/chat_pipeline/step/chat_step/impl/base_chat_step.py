@@ -93,6 +93,7 @@ def event_content(response,
                 reasoning_content_chunk = chunk.additional_kwargs.get('reasoning_content', '')
             else:
                 reasoning_content_chunk = reasoning_chunk.get('reasoning_content')
+            content_chunk = reasoning._normalize_content(content_chunk)
             all_text += content_chunk
             if reasoning_content_chunk is None:
                 reasoning_content_chunk = ''
@@ -191,23 +192,17 @@ class BaseChatStep(IChatStep):
                                        manage, padding_problem_text, chat_user_id, chat_user_type,
                                        no_references_setting,
                                        model_setting,
-                                       mcp_enable, mcp_tool_ids, mcp_servers, mcp_source, tool_enable, tool_ids, mcp_output_enable)
+                                       mcp_enable, mcp_tool_ids, mcp_servers, mcp_source, tool_enable, tool_ids,
+                                       mcp_output_enable)
         else:
             return self.execute_block(message_list, chat_id, problem_text, post_response_handler, chat_model,
                                       paragraph_list,
                                       manage, padding_problem_text, chat_user_id, chat_user_type, no_references_setting,
                                       model_setting,
-                                      mcp_enable, mcp_tool_ids, mcp_servers, mcp_source, tool_enable, tool_ids, mcp_output_enable)
+                                      mcp_enable, mcp_tool_ids, mcp_servers, mcp_source, tool_enable, tool_ids,
+                                      mcp_output_enable)
 
     def get_details(self, manage, **kwargs):
-        # 删除临时生成的MCP代码文件
-        if self.context.get('execute_ids'):
-            executor = ToolExecutor(CONFIG.get('SANDBOX'))
-            # 清理工具代码文件，延时删除，避免文件被占用
-            for tool_id in self.context.get('execute_ids'):
-                code_path = f'{executor.sandbox_path}/execute/{tool_id}.py'
-                if os.path.exists(code_path):
-                    os.remove(code_path)
         return {
             'step_type': 'chat_step',
             'run_time': self.context['run_time'],
@@ -254,7 +249,6 @@ class BaseChatStep(IChatStep):
         if tool_enable:
             if tool_ids and len(tool_ids) > 0:  # 如果有工具ID，则将其转换为MCP
                 self.context['tool_ids'] = tool_ids
-                self.context['execute_ids'] = []
                 for tool_id in tool_ids:
                     tool = QuerySet(Tool).filter(id=tool_id).first()
                     if tool is None or tool.is_active is False:
@@ -264,16 +258,14 @@ class BaseChatStep(IChatStep):
                         params = json.loads(rsa_long_decrypt(tool.init_params))
                     else:
                         params = {}
-                    _id, tool_config = executor.get_tool_mcp_config(tool.code, params)
+                    tool_config = executor.get_tool_mcp_config(tool.code, params)
 
-                    self.context['execute_ids'].append(_id)
                     mcp_servers_config[str(tool.id)] = tool_config
 
         if len(mcp_servers_config) > 0:
             return mcp_response_generator(chat_model, message_list, json.dumps(mcp_servers_config), mcp_output_enable)
 
         return None
-
 
     def get_stream_result(self, message_list: List[BaseMessage],
                           chat_model: BaseChatModel = None,
@@ -304,7 +296,8 @@ class BaseChatStep(IChatStep):
         else:
             # 处理 MCP 请求
             mcp_result = self._handle_mcp_request(
-                mcp_enable, tool_enable, mcp_source, mcp_servers, mcp_tool_ids, tool_ids, mcp_output_enable, chat_model, message_list,
+                mcp_enable, tool_enable, mcp_source, mcp_servers, mcp_tool_ids, tool_ids, mcp_output_enable, chat_model,
+                message_list,
             )
             if mcp_result:
                 return mcp_result, True
@@ -329,7 +322,8 @@ class BaseChatStep(IChatStep):
                        tool_ids=None,
                        mcp_output_enable=True):
         chat_result, is_ai_chat = self.get_stream_result(message_list, chat_model, paragraph_list,
-                                                         no_references_setting, problem_text, mcp_enable, mcp_tool_ids, mcp_servers, mcp_source, tool_enable, tool_ids,
+                                                         no_references_setting, problem_text, mcp_enable, mcp_tool_ids,
+                                                         mcp_servers, mcp_source, tool_enable, tool_ids,
                                                          mcp_output_enable)
         chat_record_id = uuid.uuid7()
         r = StreamingHttpResponse(
@@ -404,7 +398,9 @@ class BaseChatStep(IChatStep):
         # 调用模型
         try:
             chat_result, is_ai_chat = self.get_block_result(message_list, chat_model, paragraph_list,
-                                                            no_references_setting, problem_text, mcp_enable, mcp_tool_ids, mcp_servers, mcp_source, tool_enable, tool_ids, mcp_output_enable)
+                                                            no_references_setting, problem_text, mcp_enable,
+                                                            mcp_tool_ids, mcp_servers, mcp_source, tool_enable,
+                                                            tool_ids, mcp_output_enable)
             if is_ai_chat:
                 request_token = chat_model.get_num_tokens_from_messages(message_list)
                 response_token = chat_model.get_num_tokens(chat_result.content)
@@ -416,10 +412,10 @@ class BaseChatStep(IChatStep):
             reasoning_result_end = reasoning.get_end_reasoning_content()
             content = reasoning_result.get('content') + reasoning_result_end.get('content')
             if 'reasoning_content' in chat_result.response_metadata:
-                reasoning_content = chat_result.response_metadata.get('reasoning_content', '')
+                reasoning_content = (chat_result.response_metadata.get('reasoning_content', '') or '')
             else:
-                reasoning_content = reasoning_result.get('reasoning_content') + reasoning_result_end.get(
-                    'reasoning_content')
+                reasoning_content = (reasoning_result.get('reasoning_content') or "") + (reasoning_result_end.get(
+                    'reasoning_content') or "")
             post_response_handler.handler(chat_id, chat_record_id, paragraph_list, problem_text,
                                           content, manage, self, padding_problem_text,
                                           reasoning_content=reasoning_content)

@@ -583,16 +583,17 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean, other_para
         if (props.chatId === 'new') {
           emit('refresh', chartOpenId.value)
         }
-        if (props.type === 'debug-ai-chat') {
-          getSourceDetail(chat)
-        } else {
-          if (
-            props.applicationDetails &&
-            (props.applicationDetails.show_exec || props.applicationDetails.show_source)
-          ) {
-            getSourceDetail(chat)
-          }
-        }
+        getSourceDetail(chat)
+        // if (props.type === 'debug-ai-chat') {
+        //   getSourceDetail(chat)
+        // } else {
+        //   if (
+        //     props.applicationDetails &&
+        //     (props.applicationDetails.show_exec || props.applicationDetails.show_source)
+        //   ) {
+        //     getSourceDetail(chat)
+        //   }
+        // }
       })
       .finally(() => {
         ChatManagement.close(chat.id)

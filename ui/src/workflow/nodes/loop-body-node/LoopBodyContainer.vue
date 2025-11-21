@@ -16,6 +16,7 @@
             />
             <h4 class="ellipsis-1 break-all">{{ nodeModel.properties.stepName }}</h4>
           </div>
+
           <!-- 放大缩小按钮 -->
           <el-button link @click="enlargeHandle">
             <AppIcon
@@ -119,6 +120,10 @@ import type { FormInstance } from 'element-plus'
 import { t } from '@/locales'
 provide('workflowMode', inject('loopWorkflowMode'))
 
+const props = defineProps<{
+  nodeModel: any
+}>()
+
 const titleFormRef = ref()
 const nodeNameDialogVisible = ref<boolean>(false)
 const form = ref<any>({
@@ -174,9 +179,6 @@ const showicon = ref<number | null>(null)
 
 const height = ref<number>(600)
 
-const props = defineProps<{
-  nodeModel: any
-}>()
 const nodeFields = computed(() => {
   if (props.nodeModel.properties.config.fields) {
     const fields = props.nodeModel.properties.config.fields?.map((field: any) => {

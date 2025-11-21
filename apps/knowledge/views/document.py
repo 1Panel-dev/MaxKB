@@ -542,9 +542,9 @@ class DocumentView(APIView):
 
         @extend_schema(
             methods=['PUT'],
-            summary=_('Batch generate related documents'),
-            description=_('Batch generate related documents'),
-            operation_id=_('Batch generate related documents'),  # type: ignore
+            summary=_('Batch generate related problems'),
+            description=_('Batch generate related problems'),
+            operation_id=_('Batch generate related problems'),  # type: ignore
             request=BatchGenerateRelatedAPI.get_request(),
             parameters=BatchGenerateRelatedAPI.get_parameters(),
             responses=BatchGenerateRelatedAPI.get_response(),
@@ -560,7 +560,7 @@ class DocumentView(APIView):
                            [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], CompareConstants.AND),
         )
         @log(
-            menu='document', operate="Batch generate related documents",
+            menu='document', operate="Batch generate related problems",
             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
                 get_knowledge_operation_object(keywords.get('knowledge_id')),
                 get_document_operation_object_batch(r.data.get('document_id_list'))

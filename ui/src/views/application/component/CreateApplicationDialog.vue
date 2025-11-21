@@ -70,11 +70,6 @@
                 <template #icon>
                   <LogoIcon height="32px" />
                 </template>
-                <template #subTitle>
-                  <el-text class="color-secondary" size="small">
-                    {{ $t('views.application.workflow') }}
-                  </el-text>
-                </template>
               </CardBox>
             </el-col>
           </el-row>

@@ -55,12 +55,12 @@
             >
               <div class="flex-between">
                 <div class="flex align-center">
-                  <img class="mr-12" src="@/assets/workflow/icon_file-doc.svg" alt="" />
+                  <img class="mr-12" src="@/assets/workflow/icon_file-doc.svg" alt=""/>
                   <div>
                     <p class="line-height-22 mt-4">
                       {{ $t('common.fileUpload.document') }}
                       <el-text class="color-secondary"
-                        >{{
+                      >{{
                           $t(
                             'views.applicationWorkflow.nodes.baseNode.FileUploadSetting.fileUploadType.documentText',
                           )
@@ -85,12 +85,12 @@
             >
               <div class="flex-between">
                 <div class="flex align-center">
-                  <img class="mr-12" src="@/assets/workflow/icon_file-image.svg" alt="" />
+                  <img class="mr-12" src="@/assets/workflow/icon_file-image.svg" alt=""/>
                   <div>
                     <p class="line-height-22 mt-4">
                       {{ $t('common.fileUpload.image') }}
                       <el-text class="color-secondary"
-                        >{{
+                      >{{
                           $t(
                             'views.applicationWorkflow.nodes.baseNode.FileUploadSetting.fileUploadType.imageText',
                           )
@@ -116,12 +116,12 @@
             >
               <div class="flex-between">
                 <div class="flex align-center">
-                  <img class="mr-12" src="@/assets/workflow/icon_file-audio.svg" alt="" />
+                  <img class="mr-12" src="@/assets/workflow/icon_file-audio.svg" alt=""/>
                   <div>
                     <p class="line-height-22 mt-4">
                       {{ $t('common.fileUpload.audio') }}
                       <el-text class="color-secondary"
-                        >{{
+                      >{{
                           $t(
                             'views.applicationWorkflow.nodes.baseNode.FileUploadSetting.fileUploadType.audioText',
                           )
@@ -156,7 +156,7 @@
                     <p class="line-height-22 mt-4">
                       {{ $t('common.fileUpload.video') }}
                       <el-text class="color-secondary"
-                        >{{
+                      >{{
                           $t(
                             'views.applicationWorkflow.nodes.baseNode.FileUploadSetting.fileUploadType.videoText',
                           )
@@ -181,12 +181,12 @@
             >
               <div class="flex-between">
                 <div class="flex align-center">
-                  <img class="mr-12" :width="32" src="@/assets/fileType/unknown-icon.svg" alt="" />
+                  <img class="mr-12" :width="32" src="@/assets/fileType/unknown-icon.svg" alt=""/>
                   <div>
                     <p class="line-height-22 mt-4">
                       {{ $t('common.fileUpload.other') }}
                       <el-text class="color-secondary"
-                        >{{
+                      >{{
                           $t(
                             'views.applicationWorkflow.nodes.baseNode.FileUploadSetting.fileUploadType.otherText',
                           )
@@ -230,6 +230,21 @@
                 />
               </div>
             </el-card>
+            <el-form-item>
+              <div class="flex align-center">
+                <el-checkbox
+                  v-model="form_data.local_upload"
+                  class="mr-16"
+                >
+                  {{ $t('common.fileUpload.localUpload') }}
+                </el-checkbox>
+                <el-checkbox
+                  v-model="form_data.url_upload"
+                >
+                  {{ $t('common.fileUpload.urlUpload') }}
+                </el-checkbox>
+              </div>
+            </el-form-item>
           </el-form-item>
         </el-form>
       </div>
@@ -246,11 +261,11 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, ref } from 'vue'
-import type { InputInstance } from 'element-plus'
-import { cloneDeep } from 'lodash'
-import { MsgWarning } from '@/utils/message'
-import { t } from '@/locales'
+import {nextTick, ref} from 'vue'
+import type {InputInstance} from 'element-plus'
+import {cloneDeep} from 'lodash'
+import {MsgWarning} from '@/utils/message'
+import {t} from '@/locales'
 
 const emit = defineEmits(['refresh'])
 const props = defineProps<{ nodeModel: any }>()
@@ -276,12 +291,14 @@ const form_data = ref({
   video: false,
   other: false,
   otherExtensions: ['PPT', 'DOC'],
+  local_upload: true,
+  url_upload: false,
 })
 
 function open(data: any) {
   dialogVisible.value = true
   nextTick(() => {
-    form_data.value = { ...form_data.value, ...data }
+    form_data.value = {...form_data.value, ...data}
   })
 }
 

@@ -46,3 +46,58 @@ class ApplicationStats(APIView):
                                                   'end_time': request.query_params.get(
                                                       'end_time')
                                                   }).get_chat_record_aggregate_trend())
+
+    class TokenUsageStatistics(APIView):
+        authentication_classes = [TokenAuth]
+
+        # 应用的token使用统计 根据人的使用数排序
+        @extend_schema(
+            methods=['GET'],
+            description=_('Application token usage statistics'),
+            summary=_('Application token usage statistics'),
+            operation_id=_('Application token usage statistics'),  # type: ignore
+            parameters=ApplicationStatsAPI.get_parameters(),
+            responses=ApplicationStatsAPI.get_response(),
+            tags=[_('Application')]  # type: ignore
+        )
+        @has_permissions(PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_application_permission(),
+                         PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_permission_workspace_manage_role(),
+                         ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                        [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                                        CompareConstants.AND),
+                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
+        def get(self, request: Request, workspace_id: str, application_id: str):
+            return result.success(
+                ApplicationStatisticsSerializer(data={'application_id': application_id, 'workspace_id': workspace_id,
+                                                      'start_time': request.query_params.get(
+                                                          'start_time'),
+                                                      'end_time': request.query_params.get(
+                                                          'end_time')
+                                                      }).get_token_usage_statistics())
+
+    class TopQuestionsStatistics(APIView):
+        authentication_classes = [TokenAuth]
+        # 应用的top问题统计
+        @extend_schema(
+            methods=['GET'],
+            description=_('Application top question statistics'),
+            summary=_('Application top question statistics'),
+            operation_id=_('Application top question statistics'),  # type: ignore
+            parameters=ApplicationStatsAPI.get_parameters(),
+            responses=ApplicationStatsAPI.get_response(),
+            tags=[_('Application')]  # type: ignore
+        )
+        @has_permissions(PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_application_permission(),
+                         PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_permission_workspace_manage_role(),
+                         ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                        [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                                        CompareConstants.AND),
+                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
+        def get(self, request: Request, workspace_id: str, application_id: str):
+            return result.success(
+                ApplicationStatisticsSerializer(data={'application_id': application_id, 'workspace_id': workspace_id,
+                                                      'start_time': request.query_params.get(
+                                                          'start_time'),
+                                                      'end_time': request.query_params.get(
+                                                          'end_time')
+                                                      }).get_top_questions_statistics())

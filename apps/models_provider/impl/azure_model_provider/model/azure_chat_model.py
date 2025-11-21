@@ -7,9 +7,11 @@
     @desc:
 """
 
-from typing import List, Dict
+from typing import List, Dict, Optional, Any
 
+from langchain_core.language_models import LanguageModelInput
 from langchain_core.messages import BaseMessage, get_buffer_string
+from langchain_core.runnables import RunnableConfig
 from langchain_openai import AzureChatOpenAI
 
 from common.config.tokenizer_manage_config import TokenizerManage
@@ -36,16 +38,42 @@ class AzureChatModel(MaxKBBaseModel, AzureChatOpenAI):
             streaming=True,
         )
 
+    def get_last_generation_info(self) -> Optional[Dict[str, Any]]:
+        return self.__dict__.get('_last_generation_info')
+
     def get_num_tokens_from_messages(self, messages: List[BaseMessage]) -> int:
         try:
-            return super().get_num_tokens_from_messages(messages)
+            return self.get_last_generation_info().get('input_tokens', 0)
         except Exception as e:
             tokenizer = TokenizerManage.get_tokenizer()
             return sum([len(tokenizer.encode(get_buffer_string([m]))) for m in messages])
 
     def get_num_tokens(self, text: str) -> int:
         try:
-            return super().get_num_tokens(text)
+            return self.get_last_generation_info().get('output_tokens', 0)
         except Exception as e:
             tokenizer = TokenizerManage.get_tokenizer()
             return len(tokenizer.encode(text))
+
+    def invoke(
+            self,
+            input: LanguageModelInput,
+            config: Optional[RunnableConfig] = None,
+            *,
+            stop: Optional[list[str]] = None,
+            **kwargs: Any,
+    ) -> BaseMessage:
+        message = super().invoke(input, config, stop=stop, **kwargs)
+        if isinstance(message.content, str):
+            return message
+        elif isinstance(message.content, list):
+            # 构造新的响应消息返回
+            content = message.content
+            normalized_parts = []
+            for item in content:
+                if isinstance(item, dict):
+                    if item.get('type') == 'text':
+                        normalized_parts.append(item.get('text', ''))
+            message.content = ''.join(normalized_parts)
+            self.__dict__.setdefault('_last_generation_info', {}).update(message.usage_metadata)
+            return message

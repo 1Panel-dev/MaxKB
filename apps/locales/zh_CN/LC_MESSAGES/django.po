@@ -2952,8 +2952,8 @@ msgstr "批量刷新文档向量库"
 
 #: apps/knowledge/views/document.py:466 apps/knowledge/views/document.py:467
 #: apps/knowledge/views/document.py:468
-msgid "Batch generate related documents"
-msgstr "批量生成相关文档"
+msgid "Batch generate related problems"
+msgstr "批量生成相关问题"
 
 #: apps/knowledge/views/document.py:496 apps/knowledge/views/document.py:497
 #: apps/knowledge/views/document.py:498
@@ -5251,8 +5251,8 @@ msgstr "批量刷新文档向量库"
 #: apps/resource_manage/views/document.py:261
 #: apps/resource_manage/views/document.py:262
 #: apps/resource_manage/views/document.py:263
-msgid "Batch generate related system document"
-msgstr "批量生成相关文档"
+msgid "Batch generate related system problems"
+msgstr "批量生成相关问题"
 
 #: apps/resource_manage/views/document.py:290
 #: apps/resource_manage/views/document.py:291
@@ -6071,8 +6071,8 @@ msgstr "批量刷新共享文档向量库"
 #: apps/shared/views/shared_document.py:262
 #: apps/shared/views/shared_document.py:263
 #: apps/shared/views/shared_document.py:264
-msgid "Batch generate related shared documents"
-msgstr "批量生成相关共享文档"
+msgid "Batch generate related shared problems"
+msgstr "批量生成相关问题"
 
 #: apps/shared/views/shared_document.py:291
 #: apps/shared/views/shared_document.py:292
@@ -6796,8 +6796,8 @@ msgid "Phone"
 msgstr "手机"
 
 #: apps/users/serializers/user.py:120 apps/xpack/serializers/chat_user.py:68
-msgid "Username must be 4-20 characters long"
-msgstr "用户名必须为4-20个字符"
+msgid "Username must be 4-64 characters long"
+msgstr "用户名必须为4-64个字符"
 
 #: apps/users/serializers/user.py:133 apps/users/serializers/user.py:298
 #: apps/xpack/serializers/chat_user.py:81
@@ -8894,3 +8894,8 @@ msgstr "不存在的ID"
 msgid "No permission for the target folder"
 msgstr "没有目标文件夹的权限"
 
+msgid "Application token usage statistics"
+msgstr "应用令牌使用统计"
+
+msgid "Application top question statistics"
+msgstr "应用提问次数统计"

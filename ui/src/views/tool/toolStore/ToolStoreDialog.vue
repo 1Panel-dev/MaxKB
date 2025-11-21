@@ -34,7 +34,7 @@
       </div>
     </template>
 
-    <LayoutContainer v-loading="loading">
+    <LayoutContainer v-loading="loading"  :minLeftWidth="204">
       <template #left>
         <el-anchor
           direction="vertical"
@@ -62,7 +62,7 @@
               {{ category.title }}
             </h4>
             <el-row :gutter="16">
-              <el-col v-for="tool in category.tools" :key="tool.id" :span="12" class="mb-16">
+              <el-col v-for="tool in category.tools" :key="tool.id" :span="8" class="mb-16">
                 <ToolCard
                   :tool="tool"
                   :addLoading="addLoading"

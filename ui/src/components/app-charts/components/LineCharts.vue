@@ -1,5 +1,5 @@
 <template>
-  <div :id="id" ref="PieChartRef" :style="{ height: height, width: width }" />
+  <div :id="id" ref="LineChartRef" :style="{ height: height, width: width }" />
 </template>
 <script lang="ts" setup>
 import { onMounted, nextTick, watch, onBeforeUnmount } from 'vue'
@@ -21,7 +21,7 @@ const props = defineProps({
   option: {
     type: Object,
     required: true,
-  }, // option: { title , data }
+  }, // option: { title , xData, yData, formatStr  }
 })
 
 const color = ['rgba(82, 133, 255, 1)', 'rgba(255, 207, 47, 1)']
@@ -37,6 +37,7 @@ function initChart() {
   if (props.option?.yData?.length) {
     props.option?.yData.forEach((item: any, index: number) => {
       series.push({
+        type: 'line',
         itemStyle: {
           color: color[index],
         },

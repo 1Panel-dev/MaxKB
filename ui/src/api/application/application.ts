@@ -193,6 +193,26 @@ const getStatistics: (
   return get(`${prefix.value}/${application_id}/application_stats`, data, loading)
 }
 /**
+ * 统计token消耗
+ */
+const getTokenUsage: (
+  application_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (application_id, data, loading) => {
+  return get(`${prefix.value}/${application_id}/application_token_usage`, data, loading)
+}
+/**
+ * 统计提问次数
+ */
+const topQuestions: (
+  application_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (application_id, data, loading) => {
+  return get(`${prefix.value}/${application_id}/top_questions`, data, loading)
+}
+/**
  * 打开调试对话id
  * @param application_id 应用id
  * @param loading 加载器
@@ -207,11 +227,11 @@ const open: (application_id: string, loading?: Ref<boolean>) => Promise<Result<s
 
 /**
  * 生成提示词
- * @param workspace_id 
- * @param model_id 
- * @param application_id 
- * @param data 
- * @returns 
+ * @param workspace_id
+ * @param model_id
+ * @param application_id
+ * @param data
+ * @returns
  */
 const generate_prompt: (workspace_id:string ,model_id:string, application_id:string,data: any) => Promise<any> = (
   workspace_id,
@@ -408,5 +428,7 @@ export default {
   speechToText,
   getMcpTools,
   postUploadFile,
-  generate_prompt
+  generate_prompt,
+  getTokenUsage,
+  topQuestions
 }

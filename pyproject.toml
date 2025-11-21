@@ -29,6 +29,7 @@ dependencies = [
     "langchain-huggingface==0.3.0",
     "langchain-ollama==0.3.4",
     "langgraph==0.5.3",
+    "langchain_core==0.3.74",
     "torch==2.8.0",
     "sentence-transformers==5.0.0",
     "qianfan==0.4.12.3",

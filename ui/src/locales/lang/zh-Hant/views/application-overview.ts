@@ -42,6 +42,8 @@ export default {
       loginMethodRequired: '請選擇登陸方式',
       displayCodeRequired: '請輸入失敗次數',
       toSettingChatUser: '去配置對話用戶',
+      authenticationTooltip:
+        '開啟登陸認證後，應用和關聯的知識庫均需要對話用戶授權配置，否則用戶無權限登陸和知識庫檢索',
     },
     SettingAPIKeyDialog: {
       dialogTitle: '設定',
@@ -97,6 +99,8 @@ export default {
       userSatisfaction: '用戶滿意度',
       approval: '贊同',
       disapproval: '反對',
+      tokenUsage: '用戶消耗 Tokens',
+      topQuestions: '用戶提問次數',
     },
   },
 }

@@ -62,6 +62,8 @@ export default {
     other: '其他文件',
     addExtensions: '添加后缀名',
     existingExtensionsTip: '文件后缀已存在',
+    localUpload: '本地文件',
+    urlUpload: 'URL 地址',
   },
   status: {
     label: '状态',

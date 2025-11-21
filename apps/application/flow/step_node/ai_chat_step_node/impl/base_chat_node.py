@@ -108,9 +108,9 @@ def write_context(node_variable: Dict, workflow_variable: Dict, node: INode, wor
     content = reasoning_result.get('content') + reasoning_result_end.get('content')
     meta = {**response.response_metadata, **response.additional_kwargs}
     if 'reasoning_content' in meta:
-        reasoning_content = meta.get('reasoning_content', '')
+        reasoning_content = (meta.get('reasoning_content', '') or '')
     else:
-        reasoning_content = reasoning_result.get('reasoning_content') + reasoning_result_end.get('reasoning_content')
+        reasoning_content = (reasoning_result.get('reasoning_content') or '') + (reasoning_result_end.get('reasoning_content') or '')
     _write_context(node_variable, workflow_variable, node, workflow, content, reasoning_content)
 
 
@@ -233,7 +233,6 @@ class BaseChatNode(IChatNode):
         if tool_enable:
             if tool_ids and len(tool_ids) > 0:  # 如果有工具ID，则将其转换为MCP
                 self.context['tool_ids'] = tool_ids
-                self.context['execute_ids'] = []
                 for tool_id in tool_ids:
                     tool = QuerySet(Tool).filter(id=tool_id).first()
                     if not tool.is_active:
@@ -243,9 +242,8 @@ class BaseChatNode(IChatNode):
                         params = json.loads(rsa_long_decrypt(tool.init_params))
                     else:
                         params = {}
-                    _id, tool_config = executor.get_tool_mcp_config(tool.code, params)
+                    tool_config = executor.get_tool_mcp_config(tool.code, params)
 
-                    self.context['execute_ids'].append(_id)
                     mcp_servers_config[str(tool.id)] = tool_config
 
         if len(mcp_servers_config) > 0:
@@ -307,14 +305,6 @@ class BaseChatNode(IChatNode):
         return result
 
     def get_details(self, index: int, **kwargs):
-        # 删除临时生成的MCP代码文件
-        if self.context.get('execute_ids'):
-            executor = ToolExecutor(CONFIG.get('SANDBOX'))
-            # 清理工具代码文件，延时删除，避免文件被占用
-            for tool_id in self.context.get('execute_ids'):
-                code_path = f'{executor.sandbox_path}/execute/{tool_id}.py'
-                if os.path.exists(code_path):
-                    os.remove(code_path)
         return {
             'name': self.node.properties.get('stepName'),
             "index": index,

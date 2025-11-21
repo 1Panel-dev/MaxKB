@@ -9,7 +9,7 @@
     </el-button>
     <el-button
       @click="changeCursor(false)"
-      style="border: none; padding: 4px; height: 24px;margin-left: 8px;"
+      style="border: none; padding: 4px; height: 24px; margin-left: 8px"
       :class="{ 'is-drag-active': !isDrag }"
     >
       <AppIcon iconName="app-raisehand" :size="16"></AppIcon>
@@ -113,6 +113,12 @@ function fitView() {
 }
 const layout = () => {
   props.lf?.extension.dagre.layout()
+  console.log(props.lf)
+  props.lf?.graphModel.nodes.forEach((node: any) => {
+    if (node.type === 'loop-body-node') {
+      node?.loopLayout?.()
+    }
+  })
 }
 const retract = () => {
   props.lf?.graphModel.nodes.forEach((element: any) => {

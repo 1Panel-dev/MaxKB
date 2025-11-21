@@ -61,7 +61,7 @@
         </slot>
       </template>
     </el-select>
-    <!-- 添加模版 -->
+    <!-- 添加模板 -->
     <CreateModelDialog
       v-if="showFooter"
       ref="createModelRef"

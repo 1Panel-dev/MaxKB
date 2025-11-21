@@ -74,7 +74,7 @@ class BaseImageToVideoNode(IImageToVideoNode):
     def get_file_base64(self, image_url):
         try:
             if isinstance(image_url, list):
-                image_url = image_url[0].get('file_id')
+                image_url = image_url[0].get('file_id') if 'file_id' in image_url[0] else image_url[0].get('url')
             if isinstance(image_url, str) and not image_url.startswith('http'):
                 file = QuerySet(File).filter(id=image_url).first()
                 file_bytes = file.get_bytes()
