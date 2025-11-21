@@ -10,7 +10,7 @@ from application.flow.i_step_node import INode, NodeResult
 
 
 class DocumentSplitNodeSerializer(serializers.Serializer):
-    file_list = serializers.ListField(required=False, label=_("file list"))
+    document_list = serializers.ListField(required=False, label=_("document list"))
     split_strategy = serializers.ChoiceField(
         choices=['auto', 'custom', 'qa'], required=False, label=_("split strategy"), default='auto'
     )
@@ -53,11 +53,11 @@ class IDocumentSplitNode(INode):
         return DocumentSplitNodeSerializer
 
     def _run(self):
-        res = self.workflow_manage.get_reference_field(self.node_params_serializer.data.get('file_list')[0],
-                                                       self.node_params_serializer.data.get('file_list')[1:])
-        return self.execute(files=res, **self.node_params_serializer.data, **self.flow_params_serializer.data)
+        # res = self.workflow_manage.get_reference_field(self.node_params_serializer.data.get('file_list')[0],
+        #                                                self.node_params_serializer.data.get('file_list')[1:])
+        return self.execute(**self.node_params_serializer.data, **self.flow_params_serializer.data)
 
-    def execute(self, files, knowledge_id, split_strategy, paragraph_title_relate_problem_type,
+    def execute(self, document_list, knowledge_id, split_strategy, paragraph_title_relate_problem_type,
                 paragraph_title_relate_problem, paragraph_title_relate_problem_reference,
                 document_name_relate_problem_type, document_name_relate_problem,
                 document_name_relate_problem_reference, limit, patterns, with_filter, **kwargs) -> NodeResult:

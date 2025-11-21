@@ -22,7 +22,7 @@
             :nodeModel="nodeModel"
             class="w-full"
             :placeholder="$t('views.chatLog.documentPlaceholder')"
-            v-model="form_data.file_list"
+            v-model="form_data.document_list"
           />
         </el-form-item>
         <el-form-item
@@ -207,7 +207,7 @@ const props = defineProps<{ nodeModel: any }>()
 const splitPatternList = ref<Array<KeyValue<string, string>>>([])
 
 const form = {
-  file_list: [],
+  document_list: [],
   split_strategy: 'auto',
   paragraph_title_relate_problem_type: 'custom',
   paragraph_title_relate_problem: false,

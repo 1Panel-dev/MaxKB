@@ -42,23 +42,28 @@ class BaseDocumentExtractNode(IDocumentExtractNode):
     def save_context(self, details, workflow_manage):
         self.context['content'] = details.get('content')
 
-    def execute(self, document, chat_id, **kwargs):
+    def execute(self, document, chat_id=None, **kwargs):
         get_buffer = FileBufferHandle().get_buffer
 
         self.context['document_list'] = document
         content = []
         if document is None or not isinstance(document, list):
-            return NodeResult({'content': ''}, {})
+            return NodeResult({'content': '', 'document_list': []}, {})
 
-        application = self.workflow_manage.work_flow_post_handler.chat_info.application
+        # 安全获取 application
+        application = None
+        if (self.workflow_manage and
+                self.workflow_manage.work_flow_post_handler and
+                self.workflow_manage.work_flow_post_handler.chat_info):
+            application = self.workflow_manage.work_flow_post_handler.chat_info.application
 
         # doc文件中的图片保存
         def save_image(image_list):
             for image in image_list:
                 meta = {
-                    'debug': False if application.id else True,
+                    'debug': False if (application and application.id) else True,
                     'chat_id': chat_id,
-                    'application_id': str(application.id) if application.id else None,
+                    'application_id': str(application.id) if (application and application.id) else None,
                     'file_id': str(image.id)
                 }
                 file_bytes = image.meta.pop('content')
@@ -70,6 +75,7 @@ class BaseDocumentExtractNode(IDocumentExtractNode):
                     'source_type': FileSourceType.APPLICATION.value
                 }).upload()
 
+        document_list = []
         for doc in document:
             file = QuerySet(File).filter(id=doc['file_id']).first()
             buffer = io.BytesIO(file.get_bytes())
@@ -81,9 +87,10 @@ class BaseDocumentExtractNode(IDocumentExtractNode):
                     buffer.seek(0)
                     file_content = split_handle.get_content(buffer, save_image)
                     content.append('### ' + doc['name'] + '\n' + file_content)
+                    document_list.append({'id': file.id, 'name': doc['name'], 'content': file_content})
                     break
 
-        return NodeResult({'content': splitter.join(content)}, {})
+        return NodeResult({'content': splitter.join(content), 'document_list': document_list}, {})
 
     def get_details(self, index: int, **kwargs):
         content = self.context.get('content', '').split(splitter)

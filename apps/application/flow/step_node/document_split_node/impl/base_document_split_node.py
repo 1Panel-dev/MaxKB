@@ -9,7 +9,7 @@ from django.db.models import QuerySet
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.document_split_node.i_document_split_node import IDocumentSplitNode
 from knowledge.models import File, FileSourceType
-from knowledge.serializers.document import split_handles, FileBufferHandle
+from knowledge.serializers.document import default_split_handle, FileBufferHandle
 
 
 def bytes_to_uploaded_file(file_bytes, file_name="file.txt"):
@@ -42,36 +42,31 @@ class BaseDocumentSplitNode(IDocumentSplitNode):
     def get_reference_content(self, fields: List[str]):
         return self.workflow_manage.get_reference_field(fields[0], fields[1:])
 
-    def execute(self, files, knowledge_id, split_strategy, paragraph_title_relate_problem_type,
+    def execute(self, document_list, knowledge_id, split_strategy, paragraph_title_relate_problem_type,
                 paragraph_title_relate_problem, paragraph_title_relate_problem_reference,
                 document_name_relate_problem_type, document_name_relate_problem,
                 document_name_relate_problem_reference, limit, patterns, with_filter, **kwargs) -> NodeResult:
-        get_buffer = FileBufferHandle().get_buffer
-        self.context['file_list'] = files
         self.context['knowledge_id'] = knowledge_id
-
+        file_list = self.workflow_manage.get_reference_field(document_list[0], document_list[1:])
         paragraph_list = []
-        for doc in files:
-            file = QuerySet(File).filter(id=doc['file_id']).first()
-            file_mem = bytes_to_uploaded_file(file.get_bytes(), file_name=file.file_name)
+        get_buffer = FileBufferHandle().get_buffer
 
-            for split_handle in split_handles:
-                if split_handle.support(file_mem, get_buffer):
-                    result = split_handle.handle(file_mem, patterns, with_filter, limit, get_buffer, self._save_image)
-                    # 统一处理结果为列表
-                    results = result if isinstance(result, list) else [result]
+        for doc in file_list:
+            file_mem = bytes_to_uploaded_file(doc['content'].encode('utf-8'), doc['name'])
+            result = default_split_handle.handle(file_mem, patterns, with_filter, limit, get_buffer, self._save_image)
+            # 统一处理结果为列表
+            results = result if isinstance(result, list) else [result]
 
-                    for item in results:
-                        self._process_split_result(
-                            item, knowledge_id, file.id, file.file_name,
-                            split_strategy, paragraph_title_relate_problem_type,
-                            paragraph_title_relate_problem, paragraph_title_relate_problem_reference,
-                            document_name_relate_problem_type, document_name_relate_problem,
-                            document_name_relate_problem_reference
-                        )
+            for item in results:
+                self._process_split_result(
+                    item, knowledge_id, doc['id'], doc['name'],
+                    split_strategy, paragraph_title_relate_problem_type,
+                    paragraph_title_relate_problem, paragraph_title_relate_problem_reference,
+                    document_name_relate_problem_type, document_name_relate_problem,
+                    document_name_relate_problem_reference
+                )
 
-                    paragraph_list = results
-                    break
+            paragraph_list = results
 
         self.context['paragraph_list'] = paragraph_list
 

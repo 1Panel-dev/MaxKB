@@ -383,6 +383,10 @@ export const documentExtractNode = {
           label: t('views.applicationWorkflow.nodes.documentExtractNode.content'),
           value: 'content',
         },
+        {
+          label: t('views.applicationWorkflow.nodes.dataSourceWebNode.field_label'),
+          value: 'document_list',
+        },
       ],
     },
   },
