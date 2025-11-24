@@ -4,11 +4,9 @@ import mimetypes
 from typing import List
 
 from django.core.files.uploadedfile import InMemoryUploadedFile
-from django.db.models import QuerySet
 
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.document_split_node.i_document_split_node import IDocumentSplitNode
-from knowledge.models import File, FileSourceType
 from knowledge.serializers.document import default_split_handle, FileBufferHandle
 
 
@@ -73,18 +71,7 @@ class BaseDocumentSplitNode(IDocumentSplitNode):
         return NodeResult({'paragraph_list': paragraph_list}, {})
 
     def _save_image(self, image_list):
-        if image_list is not None and len(image_list) > 0:
-            exist_image_list = [str(i.get('id')) for i in
-                                QuerySet(File).filter(id__in=[i.id for i in image_list]).values('id')]
-            save_image_list = [image for image in image_list if not exist_image_list.__contains__(str(image.id))]
-            save_image_list = list({img.id: img for img in save_image_list}.values())
-            # save image
-            for file in save_image_list:
-                file_bytes = file.meta.pop('content')
-                file.meta['knowledge_id'] = self.context.get('knowledge_id')
-                file.source_type = FileSourceType.KNOWLEDGE
-                file.source_id = self.context.get('knowledge_id')
-                file.save(file_bytes)
+        pass
 
     def _process_split_result(
             self, item, knowledge_id, source_file_id, file_name,

@@ -51,19 +51,21 @@ class BaseDocumentExtractNode(IDocumentExtractNode):
             return NodeResult({'content': '', 'document_list': []}, {})
 
         # 安全获取 application
-        application = None
+        application_id = None
         if (self.workflow_manage and
                 self.workflow_manage.work_flow_post_handler and
                 self.workflow_manage.work_flow_post_handler.chat_info):
-            application = self.workflow_manage.work_flow_post_handler.chat_info.application
+            application_id = self.workflow_manage.work_flow_post_handler.chat_info.application.id
+        knowledge_id = self.workflow_params.get('knowledge_id')
 
         # doc文件中的图片保存
         def save_image(image_list):
             for image in image_list:
                 meta = {
-                    'debug': False if (application and application.id) else True,
+                    'debug': False if (application_id or knowledge_id) else True,
                     'chat_id': chat_id,
-                    'application_id': str(application.id) if (application and application.id) else None,
+                    'application_id': str(application_id) if application_id else None,
+                    'knowledge_id': str(knowledge_id) if knowledge_id else None,
                     'file_id': str(image.id)
                 }
                 file_bytes = image.meta.pop('content')
@@ -71,8 +73,9 @@ class BaseDocumentExtractNode(IDocumentExtractNode):
                 FileSerializer(data={
                     'file': f,
                     'meta': meta,
-                    'source_id': meta['application_id'],
-                    'source_type': FileSourceType.APPLICATION.value
+                    'source_id': meta['application_id'] if meta['application_id'] else meta['knowledge_id'],
+                    'source_type': FileSourceType.APPLICATION.value if meta[
+                        'application_id'] else FileSourceType.KNOWLEDGE.value
                 }).upload()
 
         document_list = []
