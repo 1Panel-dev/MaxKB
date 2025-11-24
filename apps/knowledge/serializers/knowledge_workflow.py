@@ -45,6 +45,7 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
         work_flow_manage = KnowledgeWorkflowManage(
             Workflow.new_instance(knowledge_workflow.work_flow, WorkflowMode.KNOWLEDGE),
             {'knowledge_id': self.data.get("knowledge_id"), 'knowledge_action_id': knowledge_action_id, 'stream': True,
+             'workspace_id': self.data.get("workspace_id"),
              **instance},
             KnowledgeWorkflowPostHandler(None, knowledge_action_id))
         work_flow_manage.run()

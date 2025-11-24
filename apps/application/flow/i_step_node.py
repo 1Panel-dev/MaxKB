@@ -79,7 +79,8 @@ class WorkFlowPostHandler:
                                      message_tokens=message_tokens,
                                      answer_tokens=answer_tokens,
                                      answer_text_list=answer_text_list,
-                                     run_time=time.time() - workflow.context.get('start_time') if  workflow.context.get('start_time') is not None else 0,
+                                     run_time=time.time() - workflow.context.get('start_time') if workflow.context.get(
+                                         'start_time') is not None else 0,
                                      index=0)
 
         self.chat_info.append_chat_record(chat_record)
@@ -166,6 +167,7 @@ class FlowParamsSerializer(serializers.Serializer):
 
 class KnowledgeFlowParamsSerializer(serializers.Serializer):
     knowledge_id = serializers.UUIDField(required=True, label="知识库id")
+    workspace_id = serializers.CharField(required=True, label="工作空间id")
     knowledge_action_id = serializers.UUIDField(required=True, label="知识库任务执行器id")
     data_source = serializers.DictField(required=True, label="数据源")
     knowledge_base = serializers.DictField(required=False, label="知识库设置")
