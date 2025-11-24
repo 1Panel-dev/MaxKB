@@ -45,7 +45,7 @@ class BaseDocumentExtractNode(IDocumentExtractNode):
                 }
                 file_bytes = image.meta.pop('content')
                 new_file = File(
-                    id=uuid.uuid7(),
+                    id=meta['file_id'],
                     file_name=image.file_name,
                     file_size=len(file_bytes),
                     source_type=FileSourceType.APPLICATION.value if meta[
