@@ -50,14 +50,14 @@ class BaseDocumentSplitNode(IDocumentSplitNode):
         get_buffer = FileBufferHandle().get_buffer
 
         for doc in file_list:
-            file_mem = bytes_to_uploaded_file(doc['content'].encode('utf-8'), doc['name'])
+            file_mem = bytes_to_uploaded_file(doc['content'].encode('utf-8'))
             result = default_split_handle.handle(file_mem, patterns, with_filter, limit, get_buffer, self._save_image)
             # 统一处理结果为列表
             results = result if isinstance(result, list) else [result]
 
             for item in results:
                 self._process_split_result(
-                    item, knowledge_id, doc['id'], doc['name'],
+                    item, knowledge_id, doc.get('id'), doc.get('name'),
                     split_strategy, paragraph_title_relate_problem_type,
                     paragraph_title_relate_problem, paragraph_title_relate_problem_reference,
                     document_name_relate_problem_type, document_name_relate_problem,
@@ -83,8 +83,10 @@ class BaseDocumentSplitNode(IDocumentSplitNode):
         """处理文档分割结果"""
         item['meta'] = {
             'knowledge_id': knowledge_id,
-            'source_file_id': source_file_id
+            'source_file_id': source_file_id,
+            'source_url': file_name,
         }
+        item['name'] = file_name
         item['paragraphs'] = item.pop('content', [])
 
         for paragraph in item['paragraphs']:
