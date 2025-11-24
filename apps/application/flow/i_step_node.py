@@ -79,7 +79,7 @@ class WorkFlowPostHandler:
                                      message_tokens=message_tokens,
                                      answer_tokens=answer_tokens,
                                      answer_text_list=answer_text_list,
-                                     run_time=time.time() - workflow.context['start_time'],
+                                     run_time=time.time() - workflow.context.get('start_time') if  workflow.context.get('start_time') is not None else 0,
                                      index=0)
 
         self.chat_info.append_chat_record(chat_record)

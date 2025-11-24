@@ -43,7 +43,7 @@ const loop_end_nodes: Array<string> = [
 ]
 const end_nodes_dict = {
   [WorkflowMode.Application]: end_nodes,
-  [WorkflowMode.Knowledge]: end_nodes,
+  [WorkflowMode.Knowledge]: [WorkflowType.KnowledgeWriteNode],
   [WorkflowMode.ApplicationLoop]: loop_end_nodes,
   [WorkflowMode.KnowledgeLoop]: loop_end_nodes,
 }

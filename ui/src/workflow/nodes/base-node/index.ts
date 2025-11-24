@@ -17,7 +17,7 @@ class BaseModel extends AppNodeModel {
 }
 
 export default {
-  type: 'knowledge-base-node',
+  type: 'base-node',
   model: BaseModel,
   view: BaseNode,
 }

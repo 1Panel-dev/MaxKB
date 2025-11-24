@@ -172,8 +172,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import DropdownMenu from '@/views/application-workflow/component/DropdownMenu.vue'
+import { ref, computed, onMounted, inject } from 'vue'
 import { set } from 'lodash'
 import { iconComponent } from '../icons/utils'
 import { copyClick } from '@/utils/clipboard'
@@ -182,6 +181,9 @@ import { MsgError, MsgConfirm } from '@/utils/message'
 import type { FormInstance } from 'element-plus'
 import { t } from '@/locales'
 import { useRoute } from 'vue-router'
+import DropdownMenu from '@/components/dropdown_menu/index.vue'
+const w = inject('workflowMode')
+console.log(w)
 const route = useRoute()
 const {
   params: { id },

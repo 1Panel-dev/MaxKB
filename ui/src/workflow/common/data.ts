@@ -750,7 +750,7 @@ export const knowledgeMenuNodes = [
   },
   {
     label: t('views.applicationWorkflow.nodes.classify.businessLogic'),
-    list: [conditionNode, formNode, replyNode, loopNode],
+    list: [conditionNode, replyNode, loopNode],
   },
   {
     label: t('views.applicationWorkflow.nodes.classify.dataProcessing'),
@@ -785,7 +785,14 @@ export const menuNodes = [
   },
   {
     label: t('views.knowledge.title'),
-    list: [searchKnowledgeNode, searchDocumentNode, rerankerNode, documentExtractNode, documentSplitNode, knowledgeWriteNode],
+    list: [
+      searchKnowledgeNode,
+      searchDocumentNode,
+      rerankerNode,
+      documentExtractNode,
+      documentSplitNode,
+      knowledgeWriteNode,
+    ],
   },
   {
     label: t('views.applicationWorkflow.nodes.classify.businessLogic'),
@@ -865,7 +872,7 @@ export const knowledgeLoopMenuNodes = [
   },
   {
     label: t('views.applicationWorkflow.nodes.classify.businessLogic'),
-    list: [conditionNode, formNode, replyNode, loopContinueNode, loopBreakNode],
+    list: [conditionNode, replyNode, loopContinueNode, loopBreakNode],
   },
   {
     label: t('views.applicationWorkflow.nodes.classify.dataProcessing', '数据处理'),

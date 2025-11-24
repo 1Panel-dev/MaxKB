@@ -181,7 +181,7 @@ class Workflow:
         return [en.node for en in self.next_node_map.get(node_id, [])]
 
     @staticmethod
-    def new_instance(flow_obj: Dict, workflow_mode: WorkflowMode = WorkflowMode.APPLICATION.value):
+    def new_instance(flow_obj: Dict, workflow_mode: WorkflowMode = WorkflowMode.APPLICATION):
         nodes = flow_obj.get('nodes')
         edges = flow_obj.get('edges')
         nodes = [Node(node.get('id'), node.get('type'), **node)
