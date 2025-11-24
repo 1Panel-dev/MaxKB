@@ -1,39 +1,14 @@
 # coding=utf-8
+import ast
 import io
-import mimetypes
 
-from django.core.files.uploadedfile import InMemoryUploadedFile
+import uuid_utils.compat as uuid
 from django.db.models import QuerySet
 
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.document_extract_node.i_document_extract_node import IDocumentExtractNode
 from knowledge.models import File, FileSourceType
 from knowledge.serializers.document import split_handles, parse_table_handle_list, FileBufferHandle
-from oss.serializers.file import FileSerializer
-
-
-def bytes_to_uploaded_file(file_bytes, file_name="file.txt"):
-    content_type, _ = mimetypes.guess_type(file_name)
-    if content_type is None:
-        # 如果未能识别，设置为默认的二进制文件类型
-        content_type = "application/octet-stream"
-    # 创建一个内存中的字节流对象
-    file_stream = io.BytesIO(file_bytes)
-
-    # 获取文件大小
-    file_size = len(file_bytes)
-
-    # 创建 InMemoryUploadedFile 对象
-    uploaded_file = InMemoryUploadedFile(
-        file=file_stream,
-        field_name=None,
-        name=file_name,
-        content_type=content_type,
-        size=file_size,
-        charset=None,
-    )
-    return uploaded_file
-
 
 splitter = '\n`-----------------------------------`\n'
 
@@ -69,17 +44,42 @@ class BaseDocumentExtractNode(IDocumentExtractNode):
                     'file_id': str(image.id)
                 }
                 file_bytes = image.meta.pop('content')
-                f = bytes_to_uploaded_file(file_bytes, image.file_name)
-                FileSerializer(data={
-                    'file': f,
-                    'meta': meta,
-                    'source_id': meta['application_id'] if meta['application_id'] else meta['knowledge_id'],
-                    'source_type': FileSourceType.APPLICATION.value if meta[
-                        'application_id'] else FileSourceType.KNOWLEDGE.value
-                }).upload()
+                new_file = File(
+                    id=uuid.uuid7(),
+                    file_name=image.file_name,
+                    file_size=len(file_bytes),
+                    source_type=FileSourceType.APPLICATION.value if meta[
+                        'application_id'] else FileSourceType.KNOWLEDGE.value,
+                    source_id=meta['application_id'] if meta['application_id'] else meta['knowledge_id'],
+                    meta=meta
+                )
+                new_file.save(file_bytes)
 
         document_list = []
         for doc in document:
+            if 'file_bytes' in doc:
+                file_bytes = doc['file_bytes']
+                # 如果是字符串，转换为字节
+                if isinstance(file_bytes, str):
+                    file_bytes = ast.literal_eval(file_bytes)
+                doc['file_id'] = doc.get('file_id') or uuid.uuid7()
+                meta = {
+                    'debug': False if (application_id or knowledge_id) else True,
+                    'chat_id': chat_id,
+                    'application_id': str(application_id) if application_id else None,
+                    'knowledge_id': str(knowledge_id) if knowledge_id else None,
+                    'file_id': str(doc['file_id'])
+                }
+                new_file = File(
+                    id=doc['file_id'],
+                    file_name=doc['name'],
+                    file_size=len(file_bytes),
+                    source_type=FileSourceType.APPLICATION.value if meta[
+                        'application_id'] else FileSourceType.KNOWLEDGE.value,
+                    source_id=meta['application_id'] if meta['application_id'] else meta['knowledge_id'],
+                    meta={}
+                )
+                new_file.save(file_bytes)
             file = QuerySet(File).filter(id=doc['file_id']).first()
             buffer = io.BytesIO(file.get_bytes())
             buffer.name = doc['name']  # this is the important line
