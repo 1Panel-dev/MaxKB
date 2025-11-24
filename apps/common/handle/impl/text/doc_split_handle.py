@@ -114,7 +114,11 @@ def get_image_id_func():
 
 title_font_list = [
     [36, 100],
-    [30, 36]
+    [26, 36],
+    [24, 26],
+    [22, 24],
+    [18, 22],
+    [16, 18]
 ]
 
 
@@ -125,12 +129,12 @@ def get_title_level(paragraph: Paragraph):
             if psn.startswith('Heading') or psn.startswith('TOC 标题') or psn.startswith('标题'):
                 return int(psn.replace("Heading ", '').replace('TOC 标题', '').replace('标题',
                                                                                        ''))
-        if len(paragraph.runs) == 1:
+        if len(paragraph.runs) >= 1:
             font_size = paragraph.runs[0].font.size
             pt = font_size.pt
-            if pt >= 30:
+            if pt >= 16:
                 for _value, index in zip(title_font_list, range(len(title_font_list))):
-                    if pt >= _value[0] and pt < _value[1]:
+                    if pt >= _value[0] and pt < _value[1] and any([run.font.bold for run in paragraph.runs]):
                         return index + 1
     except Exception as e:
         pass
