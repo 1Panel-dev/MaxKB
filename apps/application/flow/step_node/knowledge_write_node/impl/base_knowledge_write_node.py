@@ -16,6 +16,7 @@ from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.knowledge_write_node.i_knowledge_write_node import IKnowledgeWriteNode
+from common.chunk import text_to_chunk
 from common.utils.common import bulk_create_in_batches
 from knowledge.models import Document, KnowledgeType, Paragraph, File, FileSourceType, Problem, ProblemParagraphMapping
 from knowledge.serializers.common import ProblemParagraphObject, ProblemParagraphManage
@@ -67,14 +68,14 @@ def link_file(source_file_id, document_id):
         # 保存文件内容和元数据
         new_file.save(file_content)
 
-
 def get_paragraph_problem_model(knowledge_id: str, document_id: str, instance: Dict):
     paragraph = Paragraph(
         id=uuid.uuid7(),
         document_id=document_id,
         content=instance.get("content"),
         knowledge_id=knowledge_id,
-        title=instance.get("title") if 'title' in instance else ''
+        title=instance.get("title") if 'title' in instance else '',
+        chunks = instance.get('chunks') if 'chunks' in instance else text_to_chunk(instance.get("content")),
     )
 
     problem_paragraph_object_list = [ProblemParagraphObject(

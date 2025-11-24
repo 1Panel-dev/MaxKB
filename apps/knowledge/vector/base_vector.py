@@ -23,7 +23,7 @@ lock = threading.Lock()
 def chunk_data(data: Dict):
     if str(data.get('source_type')) == str(SourceType.PARAGRAPH.value):
         text = data.get('text')
-        chunk_list = text_to_chunk(text)
+        chunk_list = data.get('chunks') if data.get('chunks') else text_to_chunk(text)
         return [{**data, 'text': chunk} for chunk in chunk_list]
     return [data]
 
@@ -63,7 +63,8 @@ class BaseVectorStore(ABC):
                 BaseVectorStore.vector_exists = True
         return True
 
-    def save(self, text, source_type: SourceType, knowledge_id: str, document_id: str, paragraph_id: str, source_id: str,
+    def save(self, text, source_type: SourceType, knowledge_id: str, document_id: str, paragraph_id: str,
+             source_id: str,
              is_active: bool,
              embedding: Embeddings):
         """
@@ -104,7 +105,8 @@ class BaseVectorStore(ABC):
                 break
 
     @abstractmethod
-    def _save(self, text, source_type: SourceType, knowledge_id: str, document_id: str, paragraph_id: str, source_id: str,
+    def _save(self, text, source_type: SourceType, knowledge_id: str, document_id: str, paragraph_id: str,
+              source_id: str,
               is_active: bool,
               embedding: Embeddings):
         pass
