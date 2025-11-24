@@ -279,11 +279,97 @@ const visible = ref(false)
 const showEditor = ref(false)
 const currentIndex = ref<any>(null)
 const showEditIcon = ref(false)
+const codeTemplate = `
+from typing import Dict, List
+
+
+def get_call_url(node, function_name):
+    return '/workspace/\${current_workspace_id}/knowledge/\${current_knowledge_id}/datasource/tool/' + node.get(
+        'properties').get('node_data').get('tool_lib_id') + f'/{function_name}'
+
+
+def get_form_list(node, **kwargs) -> List[Dict[str, object]]:
+    """获取文件列表表单配置
+
+    生成一个树形选择器的表单配置，用于展示和选择文件列表。
+
+    Args:
+        node: 节点对象，用于构造API调用URL
+        **kwargs: 其他可选参数
+
+    Returns:
+        list: 表单配置列表，包含树形选择器的配置项
+    """
+    return [{
+        "field": 'file_list',
+        "text_field": 'name',
+        "value_field": 'token',
+        "input_type": 'Tree',
+        "attrs": {
+            "lazy": True,
+            "url": get_call_url(node, 'get_file_list'),
+        },
+        "label": '',
+    }]
+
+
+def get_file_list(app_id=None, app_secret=None, folder_token=None, **kwargs) -> List[Dict[str, str]]:
+    """获取指定文件夹下的文件列表
+
+    Args:
+        app_id: 应用ID，用于身份验证
+        app_secret: 应用密钥，用于身份验证
+        folder_token: 文件夹标识符，不传则获取根目录文件
+        **kwargs: 其他可选参数
+
+    Returns:
+        list: 文件列表，每个文件对象包含以下字段：
+            - name (str): 文件名称
+            - token (str): 文件唯一标识符
+            - type (str): 文件类型，如 "docx"、"xlsx" 或 "folder"
+            - 其他元数据字段
+
+    Example:
+        [
+            {
+                "name": "示例文档.docx",
+                "token": "abc123",
+                "type": "docx"
+            },
+            {
+                "name": "子文件夹",
+                "token": "def456",
+                "type": "folder"
+            }
+        ]
+    """
+    pass
+
+
+def get_raw_file(app_id=None, app_secret=None, **kwargs) -> Dict[str, object]:
+    """下载文件的原始内容
+
+    Args:
+        app_id: 应用ID，用于身份验证
+        app_secret: 应用密钥，用于身份验证
+        **kwargs: 其他可选参数
+
+    Returns:
+        [
+            {
+                "name": "示例文档.docx",
+                "file_bytes": b"文件的二进制内容"
+            }
+        ]
+    """
+
+    pass
+`
 
 const form = ref<toolData>({
   name: '',
   desc: '',
-  code: '',
+  code: codeTemplate,
   icon: '',
   input_field_list: [],
   init_field_list: [],
@@ -298,7 +384,7 @@ watch(visible, (bool) => {
     form.value = {
       name: '',
       desc: '',
-      code: '',
+      code: codeTemplate,
       icon: '',
       input_field_list: [],
       init_field_list: [],
