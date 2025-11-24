@@ -1,6 +1,5 @@
 <template>
   <DynamicsForm
-    v-loading="loading"
     v-model="form_data"
     :render_data="model_form_field"
     :model="form_data"
@@ -53,11 +52,20 @@ const model_form_field = ref<Array<FormField>>([])
 const props = defineProps<{
   workflow: any
   knowledge_id: string
+  loading: boolean
 }>()
 const workspace_id = computed(() => {
   return user.getWorkspaceId()
 })
-const loading = ref<boolean>(false)
+const emit = defineEmits(['update:loading'])
+const _loading = computed({
+  get: () => {
+    return props.loading
+  },
+  set: (v: boolean) => {
+    emit('update:loading', v)
+  },
+})
 const dynamicsFormRef = ref<InstanceType<typeof DynamicsForm>>()
 const base_form_data = ref<{ node_id: string }>({ node_id: '' })
 const dynamics_form_data = ref<Dict<any>>({})
@@ -90,6 +98,7 @@ const sourceChange = (node_id: string) => {
         : 'tool',
       node_id,
       n,
+      _loading,
     )
     .then((ok: any) => {
       dynamicsFormRef.value?.render(ok.data)

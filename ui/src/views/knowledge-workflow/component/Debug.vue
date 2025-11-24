@@ -17,7 +17,7 @@ import ActionVue from '@/views/knowledge-workflow/component/action/index.vue'
 import { ref } from 'vue'
 const drawer = ref<boolean>(false)
 const _workflow = ref<any>(null)
-const _knowledge_id = ref<string>()
+const _knowledge_id = ref<string>('')
 const close = () => {
   drawer.value = false
 }

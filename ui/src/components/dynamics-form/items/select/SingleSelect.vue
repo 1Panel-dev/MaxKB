@@ -19,9 +19,9 @@
 </template>
 <script setup lang="ts">
 import type { FormField } from '@/components/dynamics-form/type'
-import { computed, ref } from 'vue'
+import { computed, ref, useAttrs } from 'vue'
 import _ from 'lodash'
-const rowTemp = ref<any>()
+const attrs = useAttrs() as any
 
 const props = defineProps<{
   modelValue?: string
@@ -58,7 +58,7 @@ const option_list = computed(() => {
 
 const label = (option: any) => {
   //置空
-  if (props.modelValue && option_list.value) {
+  if (props.modelValue && option_list.value && !attrs['allow-create']) {
     const oldItem = option_list.value.find((item) => item[valueField.value] === props.modelValue)
     if (!oldItem) {
       emit('update:modelValue', undefined)

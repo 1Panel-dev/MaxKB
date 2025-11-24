@@ -180,9 +180,9 @@ const loadNode = (node: Node, resolve: (nodeData: Tree[]) => void) => {
   request_call(request, {
     url: renderTemplate(attrs.url, props.otherParams),
     body: { current_node: node.level == 0 ? undefined : node.data },
-    then: (res) => {
+    then: (res: any) => {
       resolve(res.data)
-      res.data.forEach((childNode) => {
+      res.data.forEach((childNode: any) => {
         if (childNode.is_exist) {
           treeRef.value?.setChecked(childNode.token, true, false)
         }
@@ -191,9 +191,12 @@ const loadNode = (node: Node, resolve: (nodeData: Tree[]) => void) => {
     loading: loading,
   })
 }
-const props = withDefaults(defineProps<{ modelValue?: any; formField: FormField; otherParams }>(), {
-  modelValue: () => [],
-})
+const props = withDefaults(
+  defineProps<{ modelValue?: any; formField: FormField; otherParams: any }>(),
+  {
+    modelValue: () => [],
+  },
+)
 
 const emit = defineEmits(['update:modelValue', 'change'])
 

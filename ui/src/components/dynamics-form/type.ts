@@ -173,5 +173,6 @@ interface FormField {
 
   children?: Array<FormField>
   required_asterisk?: boolean
+  [propName: string]: any
 }
 export type { FormField }
