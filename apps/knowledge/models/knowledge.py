@@ -3,6 +3,7 @@ import zipfile
 from enum import Enum
 
 import uuid_utils.compat as uuid
+from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.search import SearchVectorField
 from django.db import models
 from django.db.models import QuerySet
@@ -242,6 +243,7 @@ class Paragraph(AppModelMixin):
     hit_num = models.IntegerField(verbose_name="命中次数", default=0)
     is_active = models.BooleanField(default=True, db_index=True)
     position = models.IntegerField(verbose_name="段落顺序", default=0, db_index=True)
+    chunks = ArrayField(verbose_name="块", base_field=models.CharField(), default=list)
 
     class Meta:
         db_table = "paragraph"
