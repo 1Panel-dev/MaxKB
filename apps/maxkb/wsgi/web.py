@@ -22,8 +22,8 @@ class TorchBlocker:
                 ['torch']
                 if
                 i in name.lower()]) > 0:
-            print(f"Disable package is being imported: 【{name}】", file=sys.stderr)
-            pass
+            import types
+            return types.ModuleType(name)
         else:
             return self.original_import(name, *args, **kwargs)
 
