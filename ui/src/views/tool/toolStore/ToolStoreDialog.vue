@@ -13,10 +13,6 @@
         <h4 :id="titleId" class="medium w-240 mr-8">
           {{ $t('views.tool.toolStore.title') }}
         </h4>
-        <el-radio-group v-model="toolType" @change="radioChange" class="app-radio-button-group">
-          <el-radio-button value="TOOL">{{$t('views.tool.title')}}</el-radio-button>
-          <el-radio-button value="DATA_SOURCE">{{$t('views.tool.dataSource')}}</el-radio-button>
-        </el-radio-group>
 
         <div class="flex align-center" style="margin-right: 28px">
           <el-input
@@ -125,7 +121,6 @@ const dialogVisible = ref(false)
 const loading = ref(false)
 const searchValue = ref('')
 const folderId = ref('')
-const toolType = ref('TOOL')
 const defaultCategories = ref<ToolCategory[]>([
   {
     id: 'web_search',
@@ -142,12 +137,6 @@ const categories = ref<ToolCategory[]>([...defaultCategories.value])
 
 const filterList = ref<any>(null)
 
-watch(dialogVisible, (bool) => {
-  if (!bool) {
-    toolType.value = 'TOOL'
-  }
-})
-
 function getSubTitle(tool: any) {
   return categories.value.find((i) => i.id === tool.label)?.title ?? ''
 }
@@ -162,32 +151,22 @@ function open(id: string) {
 
 async function getList() {
   filterList.value = null
-  if (toolType.value === 'DATA_SOURCE') {
-    categories.value = [
-      {
-        id: 'data_source',
-        title: t('views.tool.dataSource'),
-        tools: [],
-      },
-    ]
-  } else {
-    const [v1, v2] = await Promise.all([
-      getInternalToolList(),
-      getStoreToolList()
-    ])
+  const [v1, v2] = await Promise.all([
+    getInternalToolList(),
+    getStoreToolList()
+  ])
 
-    const merged = [...v1, ...v2].reduce((acc, category) => {
-      const existing = acc.find((item: any) => item.id === category.id)
-      if (existing) {
-        existing.tools = [...existing.tools, ...category.tools]
-      } else {
-        acc.push({...category})
-      }
-      return acc
-    }, [] as ToolCategory[])
+  const merged = [...v1, ...v2].reduce((acc, category) => {
+    const existing = acc.find((item: any) => item.id === category.id)
+    if (existing) {
+      existing.tools = [...existing.tools, ...category.tools]
+    } else {
+      acc.push({...category})
+    }
+    return acc
+  }, [] as ToolCategory[])
 
-    categories.value = merged
-  }
+  categories.value = merged
 }
 
 async function getInternalToolList() {
