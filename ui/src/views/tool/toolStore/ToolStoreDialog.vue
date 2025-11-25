@@ -161,6 +161,7 @@ function open(id: string) {
 }
 
 async function getList() {
+  filterList.value = null
   if (toolType.value === 'DATA_SOURCE') {
     categories.value = [
       {
@@ -194,7 +195,7 @@ async function getInternalToolList() {
     const categories = defaultCategories.value
     const res = await ToolStoreApi.getInternalToolList({ name: searchValue.value }, loading)
     if (searchValue.value.length) {
-      filterList.value = res.data
+      filterList.value = [...res.data, ...filterList.value || []]
     } else {
       filterList.value = null
       categories.forEach((category) => {
@@ -223,7 +224,7 @@ async function getStoreToolList() {
       tool.desc = tool.description
     })
     if (searchValue.value.length) {
-      filterList.value = res.data.apps
+      filterList.value = [...res.data.apps, ...filterList.value || []]
     } else {
       filterList.value = null
       categories = tags.map((tag: any) => ({
