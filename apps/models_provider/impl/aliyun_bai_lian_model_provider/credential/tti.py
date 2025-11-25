@@ -9,6 +9,7 @@ from common.forms import BaseForm, PasswordInputField, SingleSelect, SliderField
 from models_provider.base_model_provider import BaseModelCredential, ValidCode
 from common.utils.logger import maxkb_logger
 
+
 class QwenModelParams(BaseForm):
     """
     Parameters class for the Qwen Text-to-Image model.
@@ -26,7 +27,8 @@ class QwenModelParams(BaseForm):
             {'value': '1280*720', 'label': '1280*720'},
         ],
         text_field='label',
-        value_field='value'
+        value_field='value',
+        attrs={'allow-create': True, 'filterable': True}
     )
 
     n = SliderField(

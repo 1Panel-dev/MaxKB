@@ -354,7 +354,6 @@ class ToolSerializer(serializers.Serializer):
                 self.is_valid(raise_exception=True)
                 ToolCreateRequest(data=instance).is_valid(raise_exception=True)
                 # 校验代码是否包括禁止的关键字
-                ToolExecutor().validate_banned_keywords(instance.get('code', ''))
                 if instance.get('tool_type') == ToolType.MCP:
                     ToolExecutor().validate_mcp_transport(instance.get('code', ''))
 
@@ -391,7 +390,6 @@ class ToolSerializer(serializers.Serializer):
         def test_connection(self):
             self.is_valid(raise_exception=True)
             # 校验代码是否包括禁止的关键字
-            ToolExecutor().validate_banned_keywords(self.data.get('code', ''))
             ToolExecutor().validate_mcp_transport(self.data.get('code', ''))
 
             # 校验mcp json
@@ -486,7 +484,6 @@ class ToolSerializer(serializers.Serializer):
                 self.is_valid(raise_exception=True)
                 ToolEditRequest(data=instance).is_valid(raise_exception=True)
                 # 校验代码是否包括禁止的关键字
-                ToolExecutor().validate_banned_keywords(instance.get('code', ''))
                 if instance.get('tool_type') == ToolType.MCP:
                     ToolExecutor().validate_mcp_transport(instance.get('code', ''))
 

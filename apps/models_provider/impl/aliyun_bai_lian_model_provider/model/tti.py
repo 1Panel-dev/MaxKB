@@ -2,7 +2,7 @@
 from http import HTTPStatus
 from typing import Dict
 
-from dashscope import ImageSynthesis
+from dashscope import ImageSynthesis, MultiModalConversation
 from django.utils.translation import gettext
 from langchain_community.chat_models import ChatTongyi
 from langchain_core.messages import HumanMessage
@@ -46,17 +46,48 @@ class QwenTextToImageModel(MaxKBBaseModel, BaseTextToImage):
         chat.invoke([HumanMessage([{"type": "text", "text": gettext('Hello')}])])
 
     def generate_image(self, prompt: str, negative_prompt: str = None):
-        rsp = ImageSynthesis.call(api_key=self.api_key,
-                                  model=self.model_name,
-                                  base_url='https://dashscope.aliyuncs.com/compatible-mode/v1',
-                                  prompt=prompt,
-                                  negative_prompt=negative_prompt,
-                                  **self.params)
-        file_urls = []
-        if rsp.status_code == HTTPStatus.OK:
-            for result in rsp.output.results:
-                file_urls.append(result.url)
-        else:
-            maxkb_logger.error('sync_call Failed, status_code: %s, code: %s, message: %s' %
-                               (rsp.status_code, rsp.code, rsp.message))
-        return file_urls
+        if self.model_name.startswith("wan"):
+            rsp = ImageSynthesis.call(api_key=self.api_key,
+                                      model=self.model_name,
+                                      base_url='https://dashscope.aliyuncs.com/compatible-mode/v1',
+                                      prompt=prompt,
+                                      negative_prompt=negative_prompt,
+                                      **self.params)
+            file_urls = []
+            if rsp.status_code == HTTPStatus.OK:
+                for result in rsp.output.results:
+                    file_urls.append(result.url)
+            else:
+                maxkb_logger.error('sync_call Failed, status_code: %s, code: %s, message: %s' %
+                                   (rsp.status_code, rsp.code, rsp.message))
+            return file_urls
+        elif self.model_name.startswith("qwen"):
+            messages = [
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": prompt
+                        }
+                    ]
+                }
+            ]
+            rsp = MultiModalConversation.call(
+                api_key=self.api_key,
+                model=self.model_name,
+                messages=messages,
+                result_format='message',
+                base_url='https://dashscope.aliyuncs.com/v1',
+                stream=False,
+                negative_prompt=negative_prompt,
+                **self.params
+            )
+            file_urls = []
+            if rsp.status_code == HTTPStatus.OK:
+                for result in rsp.output.choices:
+                    file_urls.append(result.message.content[0].get('image'))
+            else:
+                maxkb_logger.error('sync_call Failed, status_code: %s, code: %s, message: %s' %
+                                   (rsp.status_code, rsp.code, rsp.message))
+            return file_urls

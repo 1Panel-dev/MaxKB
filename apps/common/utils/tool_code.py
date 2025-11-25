@@ -27,8 +27,8 @@ class ToolExecutor:
         else:
             self.sandbox_path = os.path.join(PROJECT_DIR, 'data', 'sandbox')
             self.user = None
-        self.banned_keywords = CONFIG.get("SANDBOX_PYTHON_BANNED_KEYWORDS", 'nothing_is_banned').split(',');
         self.sandbox_so_path = f'{self.sandbox_path}/sandbox.so'
+        self.process_timeout_seconds = int(CONFIG.get("SANDBOX_PYTHON_PROCESS_TIMEOUT_SECONDS", '3600'))
         try:
             self._init_dir()
         except Exception as e:
@@ -60,21 +60,22 @@ class ToolExecutor:
             os.system(f"chown -R {self.user}:root {tmp_dir_path}")
         if os.path.exists(self.sandbox_so_path):
             os.chmod(self.sandbox_so_path, 0o440)
-        # 初始化host黑名单
-        banned_hosts_file_path = f'{self.sandbox_path}/.SANDBOX_BANNED_HOSTS'
-        if os.path.exists(banned_hosts_file_path):
-            os.remove(banned_hosts_file_path)
+        # 初始化sandbox配置文件
+        sandbox_conf_file_path = f'{self.sandbox_path}/.sandbox.conf'
+        if os.path.exists(sandbox_conf_file_path):
+            os.remove(sandbox_conf_file_path)
+        allow_subprocess = CONFIG.get("SANDBOX_PYTHON_ALLOW_SUBPROCESS", '0')
         banned_hosts = CONFIG.get("SANDBOX_PYTHON_BANNED_HOSTS", '').strip()
         if banned_hosts:
             hostname = socket.gethostname()
             local_ip = socket.gethostbyname(hostname)
             banned_hosts = f"{banned_hosts},{hostname},{local_ip}"
-            with open(banned_hosts_file_path, "w") as f:
-                f.write(banned_hosts)
-            os.chmod(banned_hosts_file_path, 0o440)
+        with open(sandbox_conf_file_path, "w") as f:
+            f.write(f"SANDBOX_PYTHON_BANNED_HOSTS={banned_hosts}\n")
+            f.write(f"SANDBOX_PYTHON_ALLOW_SUBPROCESS={allow_subprocess}\n")
+        os.chmod(sandbox_conf_file_path, 0o440)
 
     def exec_code(self, code_str, keywords, function_name=None):
-        self.validate_banned_keywords(code_str)
         _id = str(uuid.uuid7())
         success = '{"code":200,"msg":"成功","data":exec_result}'
         err = '{"code":500,"msg":str(e),"data":None}'
@@ -115,8 +116,6 @@ except Exception as e:
         raise Exception(result.get('msg'))
 
     def _generate_mcp_server_code(self, _code, params):
-        self.validate_banned_keywords(_code)
-
         # 解析代码，提取导入语句和函数定义
         try:
             tree = ast.parse(_code)
@@ -230,18 +229,18 @@ exec({dedent(code)!a})
         }
         maxkb_logger.debug(f"Sandbox execute code: {_code}")
         compressed_and_base64_encoded_code_str = base64.b64encode(gzip.compress(_code.encode())).decode()
-        subprocess_result = subprocess.run(
-            ['su', '-s', python_directory, '-c',
-             f'import base64,gzip; exec(gzip.decompress(base64.b64decode(\'{compressed_and_base64_encoded_code_str}\')).decode())',
-             self.user],
-            text=True,
-            capture_output=True, **kwargs)
+        try:
+            subprocess_result = subprocess.run(
+                ['su', '-s', python_directory, '-c',
+                 f'import base64,gzip; exec(gzip.decompress(base64.b64decode(\'{compressed_and_base64_encoded_code_str}\')).decode())',
+                 self.user],
+                text=True,
+                capture_output=True,
+                timeout=self.process_timeout_seconds,
+                **kwargs)
+        except subprocess.TimeoutExpired:
+            raise Exception(_("Sandbox process execution timeout, consider increasing MAXKB_SANDBOX_PYTHON_PROCESS_TIMEOUT_SECONDS."))
         return subprocess_result
-
-    def validate_banned_keywords(self, code_str):
-        matched = next((bad for bad in self.banned_keywords if bad in code_str), None)
-        if matched:
-            raise Exception(f"keyword '{matched}' is banned in the tool.")
 
     def validate_mcp_transport(self, code_str):
         servers = json.loads(code_str)
