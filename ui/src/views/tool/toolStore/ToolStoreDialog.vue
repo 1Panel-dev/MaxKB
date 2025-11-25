@@ -14,10 +14,8 @@
           {{ $t('views.tool.toolStore.title') }}
         </h4>
         <el-radio-group v-model="toolType" @change="radioChange" class="app-radio-button-group">
-          <el-radio-button value="INTERNAL">{{
-            $t('views.tool.toolStore.internal')
-          }}</el-radio-button>
-          <el-radio-button value="APPSTORE">{{ $t('views.tool.toolStore.title') }}</el-radio-button>
+          <el-radio-button value="TOOL">{{$t('views.tool.title')}}</el-radio-button>
+          <el-radio-button value="DATA_SOURCE">{{$t('views.tool.dataSource')}}</el-radio-button>
         </el-radio-group>
 
         <div class="flex align-center" style="margin-right: 28px">
@@ -127,14 +125,8 @@ const dialogVisible = ref(false)
 const loading = ref(false)
 const searchValue = ref('')
 const folderId = ref('')
-const toolType = ref('APPSTORE')
+const toolType = ref('TOOL')
 const defaultCategories = ref<ToolCategory[]>([
-  // 第一版不上
-  // {
-  //   id: 'recommend',
-  //   title: t('views.tool.toolStore.recommend'),
-  //   tools: []
-  // },
   {
     id: 'web_search',
     title: t('views.tool.toolStore.webSearch'),
@@ -145,21 +137,6 @@ const defaultCategories = ref<ToolCategory[]>([
     title: t('views.tool.toolStore.databaseQuery'),
     tools: [],
   },
-  // {
-  //   id: 'image',
-  //   title: t('views.tool.toolStore.image'),
-  //   tools: []
-  // },
-  // {
-  //   id: 'developer',
-  //   title: t('views.tool.toolStore.developer'),
-  //   tools: []
-  // },
-  // {
-  //   id: 'communication',
-  //   title: t('views.tool.toolStore.communication'),
-  //   tools: []
-  // }
 ])
 const categories = ref<ToolCategory[]>([...defaultCategories.value])
 
@@ -167,7 +144,7 @@ const filterList = ref<any>(null)
 
 watch(dialogVisible, (bool) => {
   if (!bool) {
-    toolType.value = 'APPSTORE'
+    toolType.value = 'TOOL'
   }
 })
 
@@ -184,22 +161,43 @@ function open(id: string) {
 }
 
 async function getList() {
-  if (toolType.value === 'INTERNAL') {
-    await getInternalToolList()
+  if (toolType.value === 'DATA_SOURCE') {
+    categories.value = [
+      {
+        id: 'data_source',
+        title: t('views.tool.dataSource'),
+        tools: [],
+      },
+    ]
   } else {
-    await getStoreToolList()
+    const [v1, v2] = await Promise.all([
+      getInternalToolList(),
+      getStoreToolList()
+    ])
+
+    const merged = [...v1, ...v2].reduce((acc, category) => {
+      const existing = acc.find((item: any) => item.id === category.id)
+      if (existing) {
+        existing.tools = [...existing.tools, ...category.tools]
+      } else {
+        acc.push({...category})
+      }
+      return acc
+    }, [] as ToolCategory[])
+
+    categories.value = merged
   }
 }
 
 async function getInternalToolList() {
   try {
-    categories.value = defaultCategories.value
+    const categories = defaultCategories.value
     const res = await ToolStoreApi.getInternalToolList({ name: searchValue.value }, loading)
     if (searchValue.value.length) {
       filterList.value = res.data
     } else {
       filterList.value = null
-      categories.value.forEach((category) => {
+      categories.forEach((category) => {
         // if (category.id === 'recommend') {
         //   category.tools = res.data
         // } else {
@@ -207,8 +205,10 @@ async function getInternalToolList() {
         // }
       })
     }
+    return categories
   } catch (error) {
     console.error(error)
+    return []
   }
 }
 
@@ -217,6 +217,7 @@ async function getStoreToolList() {
     const res = await ToolStoreApi.getStoreToolList({ name: searchValue.value }, loading)
     const tags = res.data.additionalProperties.tags
     const storeTools = res.data.apps
+    let categories = []
     //
     storeTools.forEach((tool: any) => {
       tool.desc = tool.description
@@ -225,14 +226,16 @@ async function getStoreToolList() {
       filterList.value = res.data.apps
     } else {
       filterList.value = null
-      categories.value = tags.map((tag: any) => ({
+      categories = tags.map((tag: any) => ({
         id: tag.key,
         title: tag.name, // 国际化
         tools: storeTools.filter((tool: any) => tool.label === tag.key),
       }))
     }
+    return categories
   } catch (error) {
     console.error(error)
+    return []
   }
 }
 
@@ -242,7 +245,8 @@ const handleClick = (e: MouseEvent) => {
 
 const internalDescDrawerRef = ref<InstanceType<typeof InternalDescDrawer>>()
 async function handleDetail(tool: any) {
-  if (toolType.value === 'INTERNAL') {
+  console.log(tool)
+  if (tool.tool_type === 'INTERNAL') {
     const index = tool.icon.replace('icon.png', 'detail.md')
     const response = await fetch(index)
     const content = await response.text()
@@ -259,7 +263,7 @@ function handleOpenAdd(data?: any, isEdit?: boolean) {
 
 const addLoading = ref(false)
 async function handleAdd(tool: any) {
-  if (toolType.value === 'INTERNAL') {
+  if (tool.tool_type === 'INTERNAL') {
     await handleInternalAdd(tool)
   } else {
     await handleStoreAdd(tool)
