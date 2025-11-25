@@ -61,7 +61,7 @@ class BaseDataSourceWebNode(IDataSourceWebNode):
         collect_handler, document_list = get_collect_handler()
 
         try:
-            ForkManage(source_url,selector.split(" ") if selector is not None else []).fork(1,set(),collect_handler)
+            ForkManage(source_url,selector.split(" ") if selector is not None else []).fork(3,set(),collect_handler)
 
             return  NodeResult({'document_list': document_list},
                                self.workflow_manage.params.get('knowledge_base') or {})
