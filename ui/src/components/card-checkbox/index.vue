@@ -49,41 +49,4 @@ function checkboxChange() {
   emit('change')
 }
 </script>
-<style lang="scss">
-.card-checkbox {
-  &.active {
-    border: 1px solid var(--el-color-primary);
-  }
-  input.checkbox[type='checkbox'] {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    height: 14px;
-    width: 14px;
-    position: relative;
-
-    &::after {
-      position: absolute;
-      top: 0;
-      background-color: white;
-      color: #000;
-      height: 13px;
-      width: 13px;
-      visibility: visible;
-      text-align: center;
-      box-sizing: border-box;
-      border: var(--el-border);
-      border-radius: var(--el-border-radius-small);
-      box-sizing: content-box;
-      content: '';
-    }
-
-    &:checked::after {
-      content: '✓';
-      color: #ffffff;
-      border-color: var(--el-color-primary);
-      background: var(--el-color-primary);
-    }
-  }
-}
-</style>
+<style lang="scss"></style>

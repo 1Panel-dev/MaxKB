@@ -54,7 +54,7 @@
               <el-dropdown-item @click="openCreateDialog()">
                 <div class="flex align-center">
                   <el-avatar class="avatar-green" shape="square" :size="32">
-                    <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt="" />
+                    <img src="@/assets/tool/icon_tool.svg" style="width: 58%" alt="" />
                   </el-avatar>
                   <div class="pre-wrap ml-8">
                     <div class="lighter">{{ $t('views.tool.createTool') }}</div>
@@ -64,7 +64,7 @@
               <el-dropdown-item @click="openCreateMcpDialog()">
                 <div class="flex align-center">
                   <el-avatar shape="square" :size="32">
-                    <img src="@/assets/workflow/icon_mcp.svg" style="width: 75%" alt="" />
+                    <img src="@/assets/tool/icon_mcp.svg" style="width: 75%" alt="" />
                   </el-avatar>
                   <div class="pre-wrap ml-8">
                     <div class="lighter">{{ $t('views.tool.createMcpTool') }}</div>
@@ -74,8 +74,8 @@
 
               <el-dropdown-item @click="openCreateDataSourceDialog()">
                 <div class="flex align-center">
-                  <el-avatar shape="square" :size="32">
-                    <img src="@/assets/workflow/icon_mcp.svg" style="width: 75%" alt="" />
+                  <el-avatar class="avatar-purple" shape="square" :size="32">
+                    <img src="@/assets/tool/icon_datasource.svg" style="width: 58%" alt="" />
                   </el-avatar>
                   <div class="pre-wrap ml-8">
                     <div class="lighter">{{ $t('views.tool.createDataSourceTool') }}</div>
@@ -104,18 +104,6 @@
                   </div>
                 </el-dropdown-item>
               </el-upload>
-              <!-- <el-dropdown-item @click="openToolStoreDialog()">
-                <div class="flex align-center">
-                  <el-avatar shape="square" :size="32" style="background: none">
-                    <img src="@/assets/icon_tool_shop.svg" alt="" />
-                  </el-avatar>
-                  <div class="pre-wrap ml-8">
-                    <div class="lighter">
-                      {{ $t('views.tool.toolStore.createFromToolStore') }}
-                    </div>
-                  </div>
-                </div>
-              </el-dropdown-item> -->
               <el-dropdown-item @click="openCreateFolder" divided v-if="apiType === 'workspace'">
                 <div class="flex align-center">
                   <AppIcon iconName="app-folder" style="font-size: 32px"></AppIcon>
@@ -211,7 +199,7 @@
                   <el-tag v-if="isShared" type="info" class="info-tag">
                     {{ t('views.shared.title') }}
                   </el-tag>
-                  <el-tooltip effect="dark" content="更新版本">
+                  <el-tooltip effect="dark" :content="$t('views.tool.updatedVersion')">
                     <el-button
                       text
                       @click.stop

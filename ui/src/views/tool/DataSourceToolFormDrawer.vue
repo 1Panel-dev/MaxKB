@@ -33,8 +33,8 @@
               >
                 <img :src="String(form.icon)" alt="" />
               </el-Avatar>
-              <el-avatar v-else class="avatar-green" shape="square" :size="32">
-                <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt="" />
+              <el-avatar v-else class="avatar-purple" shape="square" :size="32">
+                <img src="@/assets/tool/icon_datasource.svg" style="width: 58%" alt="" />
               </el-avatar>
               <el-Avatar
                 v-if="showEditIcon"
@@ -47,8 +47,8 @@
                 <AppIcon iconName="app-edit"></AppIcon>
               </el-Avatar>
             </div>
-            <el-avatar v-else class="avatar-green mr-12" shape="square" :size="32">
-              <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt="" />
+            <el-avatar v-else class="avatar-purple mr-12" shape="square" :size="32">
+                <img src="@/assets/tool/icon_datasource.svg" style="width: 58%" alt="" />
             </el-avatar>
             <el-input
               v-model="form.name"

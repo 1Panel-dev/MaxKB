@@ -32,14 +32,14 @@
         </el-button>
         <el-button @click="clickShowDebug" :disabled="showDebug" v-if="permissionPrecise.debug(id)">
           <AppIcon iconName="app-debug-outlined" class="mr-4"></AppIcon>
-          {{ $t('views.knowledgeWorkflow.setting.debug') }}
+          {{ $t('common.debug') }}
         </el-button>
         <el-button @click="saveknowledge(true)">
           <AppIcon iconName="app-save-outlined" class="mr-4"></AppIcon>
           {{ $t('common.save') }}
         </el-button>
         <el-button type="primary" @click="publish">
-          {{ $t('views.knowledge.operation.publish') }}
+          {{ $t('views.knowledgeWorkflow.operation.publish') }}
         </el-button>
 
         <el-dropdown trigger="click">
@@ -51,7 +51,7 @@
               <a :href="shareUrl" target="_blank">
                 <el-dropdown-item>
                   <AppIcon iconName="app-create-chat" class="color-secondary"></AppIcon>
-                  {{ $t('views.knowledge.operation.toChat') }}
+                  {{ $t('views.knowledgeWorkflow.operation.toImportDoc') }}
                 </el-dropdown-item>
               </a>
 
@@ -151,7 +151,7 @@ import { mapToUrlParams } from '@/utils/application'
 import useStore from '@/stores'
 import { KnowledgeWorkFlowInstance } from '@/workflow/common/validate'
 import { hasPermission } from '@/utils/permission'
-import DebugVue from './component/Debug.vue'
+import DebugVue from './component/DebugDrawer.vue'
 import { t } from '@/locales'
 import { ComplexPermission } from '@/utils/permission/type'
 import { EditionConst, PermissionConst, RoleConst } from '@/utils/permission/data'

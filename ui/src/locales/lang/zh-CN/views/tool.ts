@@ -14,6 +14,7 @@ export default {
   importTool: '导入工具',
   settingTool: '设置工具',
   mcpConfig: 'MCP服务配置',
+  updatedVersion: '更新版本',
   toolStore: {
     title: '工具商店',
     createFromToolStore: '从工具商店创建',

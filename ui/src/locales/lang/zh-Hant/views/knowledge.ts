@@ -71,6 +71,15 @@ export default {
       label: '上傳的每個文件最大(MB)',
       placeholder: '建议根据服务器配置调整，否則會造成服務宕机',
     },
+    appTemplate: {
+      blank: {
+        title: '空白創建',
+      },
+      basic: {
+        title: '基礎模板',
+        description: '支持本地文件、飛書文檔、Web站點數據源的基礎工作流模板',
+      },
+    },
   },
 
   ResultSuccess: {

@@ -77,6 +77,15 @@ export default {
       label: 'Maximum size of each document(MB)',
       placeholder: 'Suggest based on server configuration, otherwise may cause service shutdown',
     },
+    appTemplate: {
+      blank: {
+        title: 'Blank Creation',
+      },
+      basic: {
+        title: 'Basic Template',
+        description: 'Supports basic workflow templates for local files, Lark documents, and web site data sources',
+      },
+    },
   },
 
   ResultSuccess: {

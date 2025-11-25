@@ -19,7 +19,6 @@ export default {
     autoSave: '自動保存',
     latestRelease: '最近發布',
     copyParam: '複製參數',
-    debug: '調試',
     exit: '直接退出',
     exitSave: '保存並退出',
   },

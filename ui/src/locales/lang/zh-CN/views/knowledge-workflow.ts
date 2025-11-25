@@ -11,6 +11,10 @@ export default {
     previewVersion: '预览版本：',
     saveTime: '保存时间：',
   },
+  operation: {
+    publish: '发布',
+    toImportDoc: '去导入文档',
+  },
   setting: {
     restoreVersion: '恢复版本',
     restoreCurrentVersion: '恢复此版本',
@@ -19,7 +23,6 @@ export default {
     autoSave: '自动保存',
     latestRelease: '最近发布',
     copyParam: '复制参数',
-    debug: '调试',
     exit: '直接退出',
     exitSave: '保存并退出',
   },

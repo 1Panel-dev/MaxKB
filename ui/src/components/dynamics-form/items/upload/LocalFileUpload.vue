@@ -1,6 +1,6 @@
 <template>
-  <div v-loading="loading">
-    <div class="update-info flex p-8-12 border-r-6 mb-16 w-full">
+  <div v-loading="loading" class="w-full">
+    <div class="update-info flex p-8-12 border-r-6 mb-16">
       <div class="mt-4">
         <AppIcon iconName="app-warning-colorful" style="font-size: 16px"></AppIcon>
       </div>

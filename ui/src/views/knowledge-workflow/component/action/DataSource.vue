@@ -7,12 +7,13 @@
     label-position="top"
     require-asterisk-position="right"
     :other-params="{ current_workspace_id: workspace_id, current_knowledge_id: knowledge_id }"
+
   >
     <template #default>
       <el-form-item prop="node_id" :rules="base_form_data_rule.node_id">
         <el-radio-group @change="sourceChange" v-model="base_form_data.node_id">
-          <el-radio :value="node.id" border size="large" v-for="node in source_node_list">
-            <div style="display: flex; align-items: center">
+          <el-radio :value="node.id" border size="large" v-for="node in source_node_list" :key="node.id">
+            <div class="flex align-center">
               <component
                 :is="iconComponent(`${node.type}-icon`)"
                 class="mr-8"

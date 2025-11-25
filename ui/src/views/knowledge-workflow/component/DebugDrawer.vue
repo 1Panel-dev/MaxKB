@@ -1,18 +1,25 @@
 <template>
-  <div style="height: 100%; width: 100%" v-loading="loading">
-    <div style="height: calc(100% - 57px); overflow-y: auto; width: 100%">
+  <el-drawer
+    v-model="drawerVisible"
+    :title="$t('common.debug')"
+    size="60%"
+    direction="rtl"
+    destroy-on-close
+    :before-close="close"
+  >
+    <div style="height: calc(100% - 57px)" v-loading="loading">
       <keep-alive>
         <component
           ref="ActionRef"
           :is="ak[active]"
           v-model:loading="loading"
-          :workflow="workflow"
-          :knowledge_id="knowledge_id"
+          :workflow="_workflow"
+          :knowledge_id="_knowledge_id"
           :id="action_id"
         ></component>
       </keep-alive>
     </div>
-    <div class="el-drawer__footer">
+    <template #footer>
       <el-button
         v-if="base_form_list.length > 0 && active == 'knowledge_base'"
         :loading="loading"
@@ -32,8 +39,8 @@
         :loading="loading"
         >Upload
       </el-button>
-    </div>
-  </div>
+    </template>
+  </el-drawer>
 </template>
 <script setup lang="ts">
 import { computed, ref, provide, type Ref } from 'vue'
@@ -44,7 +51,7 @@ import KnowledgeBase from '@/views/knowledge-workflow/component/action/Knowledge
 import { WorkflowType } from '@/enums/application'
 import KnowledgeApi from '@/api/knowledge/knowledge'
 provide('upload', (file: any, loading?: Ref<boolean>) => {
-  return applicationApi.postUploadFile(file, props.knowledge_id, 'KNOWLEDGE', loading)
+  return applicationApi.postUploadFile(file, _knowledge_id.value, 'KNOWLEDGE', loading)
 })
 const ak = {
   data_source: DataSource,
@@ -56,12 +63,20 @@ const action_id = ref<string>()
 const ActionRef = ref()
 const form_data = ref<any>({})
 const active = ref<'data_source' | 'knowledge_base' | 'result'>('data_source')
-const props = defineProps<{
-  workflow: any
-  knowledge_id: string
-}>()
+const drawerVisible = ref<boolean>(false)
+const _workflow = ref<any>(null)
+const _knowledge_id = ref<string>('')
+const close = () => {
+  drawerVisible.value = false
+}
+const open = (workflow: any, knowledge_id: string) => {
+  drawerVisible.value = true
+  _workflow.value = workflow
+  _knowledge_id.value = knowledge_id
+}
+
 const base_form_list = computed(() => {
-  const kBase = props.workflow?.nodes?.find((n: any) => n.type === WorkflowType.KnowledgeBase)
+  const kBase = _workflow.value?.nodes?.find((n: any) => n.type === WorkflowType.KnowledgeBase)
   if (kBase) {
     return kBase.properties.user_input_field_list
   }
@@ -81,11 +96,12 @@ const up = () => {
 const upload = () => {
   ActionRef.value.validate().then(() => {
     form_data.value[active.value] = ActionRef.value.get_data()
-    KnowledgeApi.workflowAction(props.knowledge_id, form_data.value, loading).then((ok) => {
+    KnowledgeApi.workflowAction(_knowledge_id.value, form_data.value, loading).then((ok) => {
       action_id.value = ok.data.id
       active.value = 'result'
     })
   })
 }
+defineExpose({ close, open })
 </script>
 <style lang="scss" scoped></style>

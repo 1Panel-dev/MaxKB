@@ -9,7 +9,7 @@
     <img :src="item?.icon" alt="" />
   </el-avatar>
   <el-avatar v-else shape="square" style="background: #34c724">
-    <img src="@/assets/workflow/icon_tool.svg" style="width: 75%" alt="" />
+    <img src="@/assets/tool/icon_tool.svg" style="width: 75%" alt="" />
   </el-avatar>
 </template>
 <script setup lang="ts">

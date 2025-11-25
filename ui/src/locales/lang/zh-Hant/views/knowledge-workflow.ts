@@ -11,6 +11,10 @@ export default {
     previewVersion: '預覽版本：',
     saveTime: '保存時間：',
   },
+  operation: {
+    publish: '發布',
+    toImportDoc: '去導入文檔',
+  },
   setting: {
     restoreVersion: '恢復版本',
     restoreCurrentVersion: '恢復此版本',
@@ -19,7 +23,6 @@ export default {
     autoSave: '自動保存',
     latestRelease: '最近發布',
     copyParam: '複製參數',
-    debug: '調試',
     exit: '直接退出',
     exitSave: '保存並退出',
   },

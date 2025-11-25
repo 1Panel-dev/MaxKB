@@ -56,7 +56,7 @@
                 <img :src="resetUrl(mcpTool?.icon)" alt="" />
               </el-avatar>
               <el-avatar v-else shape="square" :size="20" class="mr-8">
-                <img src="@/assets/workflow/icon_mcp.svg" style="width: 75%" alt="" />
+                <img src="@/assets/tool/icon_mcp.svg" style="width: 75%" alt="" />
               </el-avatar>
               <span>{{ mcpTool.name }}</span>
               <el-tag v-if="mcpTool.scope === 'SHARED'" type="info" class="info-tag ml-8 mt-4">

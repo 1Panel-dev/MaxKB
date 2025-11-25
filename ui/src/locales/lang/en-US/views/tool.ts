@@ -14,6 +14,7 @@ export default {
   importTool: 'Import Tool',
   settingTool: 'Set Tool',
   mcpConfig: 'MCP Service Config',
+  updatedVersion: 'Updated Version',
   toolStore: {
     title: 'Tool Store',
     createFromToolStore: 'Create from Tool Store',

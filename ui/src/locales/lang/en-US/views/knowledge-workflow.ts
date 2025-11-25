@@ -11,6 +11,10 @@ export default {
     previewVersion: 'Preview Version:',
     saveTime: 'Last Saved:',
   },
+  operation: {
+    publish: 'Publish',
+    toImportDoc: 'Go to Import Documents',
+  },
   setting: {
     restoreVersion: 'Restore Previous Version"',
     restoreCurrentVersion: 'Restore to This Version',

@@ -10,6 +10,38 @@
     <!-- 基本信息 -->
     <BaseForm ref="BaseFormRef" v-if="dialogVisible" :apiType="apiType" />
 
+    <div class="w-full" v-if="dialogVisible">
+      <el-row :gutter="16">
+        <el-col :span="12">
+          <el-card
+            class="template-radio-card cursor text-center flex-center"
+            shadow="never"
+            @click="selectedType('blank')"
+            :class="appTemplate === 'blank' ? 'active' : ''"
+          >
+            <div class="flex-center p-24">
+              <AppIcon iconName="app-add-outlined" class="mr-12"></AppIcon>
+              {{ $t('views.knowledge.form.appTemplate.blank.title') }}
+            </div>
+          </el-card>
+        </el-col>
+        <el-col :span="12">
+          <CardBox
+            :title="$t('views.knowledge.form.appTemplate.basic.title')"
+            :description="$t('views.knowledge.form.appTemplate.basic.description')"
+            shadow="never"
+            class="template-radio-card cursor"
+            :class="appTemplate === 'basic' ? 'active' : ''"
+            @click="selectedType('basic')"
+          >
+            <template #icon>
+              <img src="@/assets/knowledge/icon_basic_template.svg" alt="" />
+            </template>
+          </CardBox>
+        </el-col>
+      </el-row>
+    </div>
+
     <template #footer>
       <span class="dialog-footer">
         <el-button @click.prevent="dialogVisible = false" :loading="loading">
@@ -83,6 +115,16 @@ const submitHandle = async () => {
   } else {
     return false
   }
+}
+
+const appTemplate = ref('blank')
+const workflowDefault = ref<any>({
+  // edges: [],
+  // nodes: baseNodes,
+})
+function selectedType(type: string) {
+  appTemplate.value = type
+  // workflowDefault.value = applicationTemplate[type]
 }
 
 defineExpose({ open })

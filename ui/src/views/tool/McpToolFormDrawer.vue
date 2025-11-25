@@ -36,7 +36,7 @@
               </el-Avatar>
 
               <el-avatar v-else shape="square" :size="32">
-                <img src="@/assets/workflow/icon_mcp.svg" style="width: 75%" alt="" />
+                <img src="@/assets/tool/icon_mcp.svg" style="width: 75%" alt="" />
               </el-avatar>
               <el-Avatar
                 v-if="showEditIcon"
@@ -51,7 +51,7 @@
             </div>
 
             <el-avatar v-else shape="square" :size="32" class="mr-12">
-              <img src="@/assets/workflow/icon_mcp.svg" style="width: 75%" alt="" />
+              <img src="@/assets/tool/icon_mcp.svg" style="width: 75%" alt="" />
             </el-avatar>
             <el-input
               v-model="form.name"

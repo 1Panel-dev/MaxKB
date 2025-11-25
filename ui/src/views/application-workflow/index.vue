@@ -33,7 +33,7 @@
         </el-button>
         <el-button @click="clickShowDebug" :disabled="showDebug" v-if="permissionPrecise.debug(id)">
           <AppIcon iconName="app-debug-outlined" class="mr-4"></AppIcon>
-          {{ $t('views.applicationWorkflow.setting.debug') }}
+          {{ $t('common.debug') }}
         </el-button>
         <el-button @click="saveApplication(true)" v-if="permissionPrecise.edit(id)">
           <AppIcon iconName="app-save-outlined" class="mr-4"></AppIcon>
