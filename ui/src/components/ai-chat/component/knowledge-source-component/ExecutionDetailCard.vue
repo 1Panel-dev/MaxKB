@@ -27,9 +27,14 @@
           "
           >{{ data?.message_tokens + data?.answer_tokens }} tokens</span
         >
-        <span class="mr-16 color-secondary">{{ data?.run_time?.toFixed(2) || 0.0 }} s</span>
+        <span class="mr-16 color-secondary" v-if="data.status != 202"
+          >{{ data?.run_time?.toFixed(2) || 0.0 }} s</span
+        >
         <el-icon class="color-success" :size="16" v-if="data.status === 200">
           <CircleCheck />
+        </el-icon>
+        <el-icon class="is-loading" :size="16" v-else-if="data.status === 202">
+          <Loading />
         </el-icon>
         <el-icon class="color-danger" :size="16" v-else>
           <CircleClose />
@@ -896,11 +901,12 @@
               :key="groupI"
             >
               <h5 class="p-8-12">
-                {{ group.label+ ' '+ $t('common.param.inputParam') }}
+                {{ group.label + ' ' + $t('common.param.inputParam') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter">
                 <div v-for="(f, i) in group.variable_list" :key="i" class="mb-8">
-                  <span class="color-secondary">{{ `${f.node_name}.${f.field}` }}:</span> {{ f.value }}
+                  <span class="color-secondary">{{ `${f.node_name}.${f.field}` }}:</span>
+                  {{ f.value }}
                 </div>
               </div>
             </div>

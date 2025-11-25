@@ -544,7 +544,7 @@ class WorkflowManage:
         return self._has_next_node(self.get_start_node() if self.current_node is None else self.current_node,
                                    node_result)
 
-    def get_runtime_details(self):
+    def get_runtime_details(self, get_details=lambda n, index: n.get_details(index)):
         details_result = {}
         for index in range(len(self.node_context)):
             node = self.node_context[index]
@@ -553,7 +553,7 @@ class WorkflowManage:
                 if details is not None and self.start_node.runtime_node_id != node.runtime_node_id:
                     details_result[node.runtime_node_id] = details
                     continue
-            details = node.get_details(index)
+            details = get_details(node, index)
             details['node_id'] = node.id
             details['up_node_id_list'] = node.up_node_id_list
             details['runtime_node_id'] = node.runtime_node_id

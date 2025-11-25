@@ -54,7 +54,23 @@ class KnowledgeWorkflowManage(WorkflowManage):
             pass
         self.work_flow_post_handler.handler(self)
 
+    @staticmethod
+    def get_node_details(current_node, node, index):
+        if current_node == node:
+            return {
+                'name': node.node.properties.get('stepName'),
+                "index": index,
+                'run_time': 0,
+                'type': node.type,
+                'status': 202,
+                'err_message': ""
+            }
+
+        return node.get_details(index)
+
     def run_chain(self, current_node, node_result_future=None):
+        QuerySet(KnowledgeAction).filter(id=self.params.get('knowledge_action_id')).update(
+            details=self.get_runtime_details(lambda node, index: self.get_node_details(current_node, node, index)))
         if node_result_future is None:
             node_result_future = self.run_node_future(current_node)
         try:
