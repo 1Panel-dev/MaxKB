@@ -9,6 +9,7 @@
 import json
 import os
 
+from django.contrib.postgres.fields import ArrayField
 from django.core.cache import cache
 from django.db import models
 from django.db.models import QuerySet, Q, TextField
@@ -343,10 +344,13 @@ class ResourceUserPermissionSerializer(serializers.Serializer):
             "role": models.CharField(),
             "role_setting.type": models.CharField(),
             "user_role_relation.workspace_id": models.CharField(),
+            'tmp.type_list': ArrayField(models.CharField()),
+            'tmp.role_name_list_str': models.CharField()
 
         }))
         nick_name = instance.get('nick_name')
         username = instance.get('username')
+        role_name = instance.get('role')
         permission = instance.get('permission')
         query_p_list = [None if p == "NOT_AUTH" else p for p in permission]
 
@@ -375,15 +379,31 @@ class ResourceUserPermissionSerializer(serializers.Serializer):
                 **{"u.id__in": QuerySet(workspace_user_role_mapping_model).filter(
                     workspace_id=self.data.get('workspace_id')).values("user_id")})
         if is_x_pack_ee:
-            user_query_set = user_query_set.filter(
-                **{'role_setting.type': "USER", 'user_role_relation.workspace_id': self.data.get('workspace_id')})
+            user_query_set = user_query_set.filter(**{
+                "tmp.type_list__contains": ["USER"]
+            })
+            role_name_and_type_query_set = QuerySet(model=get_dynamics_model({
+            'user_role_relation.workspace_id': models.CharField(),
+        })).filter(**{
+                "user_role_relation.workspace_id": self.data.get('workspace_id'),
+            })
+            if role_name:
+                user_query_set = user_query_set.filter(
+                    **{'tmp.role_name_list_str__icontains': str(role_name)}
+                )
+
+            return {
+                'workspace_user_resource_permission_query_set': workspace_user_resource_permission_query_set,
+                'user_query_set': user_query_set,
+                'role_name_and_type_query_set': role_name_and_type_query_set
+            }
         else:
             user_query_set = user_query_set.filter(
                 **{'role': "USER"})
-        return {
-            'workspace_user_resource_permission_query_set': workspace_user_resource_permission_query_set,
-            'user_query_set': user_query_set
-        }
+            return {
+                'workspace_user_resource_permission_query_set': workspace_user_resource_permission_query_set,
+                'user_query_set': user_query_set
+            }
 
     def list(self, instance, with_valid=True):
         if with_valid:
