@@ -87,8 +87,12 @@ export default {
     dataSourceWebNode: {
       label: 'Web網站',
       text: 'Web網站',
-      display: '暫無資料',
       field_label: '文件列表',
+    },
+    dataSourceLocalNode: {
+      label: '本地文件',
+      text: '本地文件',
+      fileList: '文件列表',
     },
     classify: {
       aiCapability: 'AI能力',
@@ -162,8 +166,8 @@ export default {
       customTooltip: '手動設置標籤過濾條件',
       auto: '自動',
       autoTooltip: '根據檢索問題自動匹配文檔標簽',
-      document_list: '文件清單',
-      knowledge_list: '知識庫列表',
+      documentList: '文檔列表',
+      knowledgeList: '知識庫列表',
       result: '檢索結果',
       searchParam: '檢索參數',
       select_variable: '選擇變數',
@@ -252,7 +256,7 @@ export default {
     documentSplitNode: {
       label: '文檔拆分',
       text: '將文檔內容拆分為多個分段',
-      paragraph_list: '分段列表',
+      paragraphList: '分段列表',
       splitStrategy: {
         label: '分段策略',
         placeholder: '請選擇分段策略',

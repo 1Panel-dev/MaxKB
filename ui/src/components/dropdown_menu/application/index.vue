@@ -310,39 +310,5 @@ async function handleClick(val: string) {
 onMounted(() => {})
 </script>
 <style lang="scss" scoped>
-.workflow-dropdown-menu {
-  -moz-user-select: none; /* Firefox */
-  -webkit-user-select: none; /* WebKit内核 */
-  -ms-user-select: none; /* IE10及以后 */
-  -khtml-user-select: none; /* 早期浏览器 */
-  -o-user-select: none; /* Opera */
-  user-select: none; /* CSS3属性 */
-  position: absolute;
-  top: 49px;
-  right: 16px;
-  z-index: 99;
-  width: 600px;
-  box-shadow: 0px 4px 8px 0px var(--app-text-color-light-1);
-  padding-bottom: 8px;
 
-  .title {
-    padding: 12px 12px 4px;
-  }
-  .workflow-dropdown-item {
-    &:hover {
-      background: var(--app-text-color-light-1);
-    }
-  }
-
-  .list-item {
-    box-sizing: border-box;
-    &:hover {
-      border-color: var(--el-color-primary);
-    }
-  }
-
-  :deep(.el-tabs__header) {
-    margin-bottom: 0;
-  }
-}
 </style>

@@ -14,7 +14,7 @@
             <el-radio-button value="">{{ $t('views.tool.all') }}</el-radio-button>
             <el-radio-button value="CUSTOM">{{ $t('views.tool.title') }}</el-radio-button>
             <el-radio-button value="MCP">MCP</el-radio-button>
-            <el-radio-button value="DATA_SOURCE">{{ $t('views.tool.dataSource') }}</el-radio-button>
+            <el-radio-button value="DATA_SOURCE">{{ $t('views.tool.dataSource.title') }}</el-radio-button>
           </el-radio-group>
         </el-space>
       </template>

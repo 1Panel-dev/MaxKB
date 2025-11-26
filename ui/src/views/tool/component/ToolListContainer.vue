@@ -78,7 +78,7 @@
                     <img src="@/assets/tool/icon_datasource.svg" style="width: 58%" alt="" />
                   </el-avatar>
                   <div class="pre-wrap ml-8">
-                    <div class="lighter">{{ $t('views.tool.createDataSourceTool') }}</div>
+                    <div class="lighter">{{ $t('views.tool.dataSource.createDataSource') }}</div>
                   </div>
                 </div>
               </el-dropdown-item>
@@ -574,8 +574,8 @@ function openCreateDataSourceDialog(data?: any) {
     return
   }
   DataSourceToolDrawertitle.value = data
-    ? t('views.tool.editDataSourceTool')
-    : t('views.tool.createDataSourceTool')
+    ? t('views.tool.dataSource.editDataSource')
+    : t('views.tool.dataSource.createDataSource')
   if (data) {
     loadSharedApi({ type: 'tool', systemType: apiType.value })
       .getToolById(data?.id, loading)
@@ -683,7 +683,7 @@ async function copyMcpTool(row: any) {
 }
 
 async function copyDataSource(row: any) {
-  DataSourceToolDrawertitle.value = t('views.tool.copyDataSource')
+  DataSourceToolDrawertitle.value = t('views.tool.dataSource.copyDataSource')
   const res = await loadSharedApi({ type: 'tool', systemType: apiType.value }).getToolById(
     row.id,
     changeStateloading,

@@ -88,8 +88,12 @@ export default {
     dataSourceWebNode: {
       label: 'Web站点',
       text: 'Web站点',
-      display: '暂无数据',
       field_label: '文档列表',
+    },
+    dataSourceLocalNode: {
+      label: '本地文件',
+      text: '本地文件',
+      fileList: '文件列表',
     },
     classify: {
       aiCapability: 'AI能力',
@@ -168,8 +172,8 @@ export default {
       customTooltip: '手动设置标签过滤条件',
       auto: '自动',
       autoTooltip: '根据检索问题自动匹配文档标签',
-      document_list: '文档列表',
-      knowledge_list: '知识库列表',
+      documentList: '文档列表',
+      knowledgeList: '知识库列表',
       result: '检索结果',
       searchParam: '检索参数',
       select_variable: '选择变量',
@@ -258,7 +262,7 @@ export default {
     documentSplitNode: {
       label: '文档分段',
       text: '将文档内容拆分为多个分段',
-      paragraph_list: '分段列表',
+      paragraphList: '分段列表',
       splitStrategy: {
         label: '分段策略',
         placeholder: '请选择分段策略',

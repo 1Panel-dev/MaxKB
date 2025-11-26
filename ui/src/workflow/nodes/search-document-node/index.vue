@@ -93,13 +93,13 @@
                     >
                       <el-option
                         :label="
-                          $t('views.workflow.nodes.searchDocumentNode.knowledge_list')
+                          $t('views.workflow.nodes.searchDocumentNode.knowledgeList')
                         "
                         value="knowledge"
                       />
                       <el-option
                         :label="
-                          $t('views.workflow.nodes.searchDocumentNode.document_list')
+                          $t('views.workflow.nodes.searchDocumentNode.documentList')
                         "
                         value="document"
                       />

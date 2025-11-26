@@ -87,8 +87,12 @@ export default {
     dataSourceWebNode: {
       label: 'Web Site',
       text: 'Web Site',
-      display: 'No data available',
       field_label: 'Document list',
+    },
+    dataSourceLocalNode: {
+      label: 'Local File',
+      text: 'Local File',
+      fileList: 'File List',
     },
     classify: {
       aiCapability: 'AI capability',
@@ -162,8 +166,8 @@ export default {
       customTooltip: 'Manually set tag filtering conditions',
       auto: 'Automatic',
       autoTooltip: 'Automatically filter setting tag conditions based on the search question',
-      document_list: 'Document List',
-      knowledge_list: 'Knowledge Base List',
+      documentList: 'Document List',
+      knowledgeList: 'Knowledge Base List',
       result: 'Search Results',
       searchParam: 'Search Parameters',
       select_variable: 'Select Variable',
@@ -253,7 +257,7 @@ You are a master of problem optimization, adept at accurately inferring user int
     documentSplitNode: {
       label: 'Document Splitting',
       text: 'Split document content into smaller segments',
-      paragraph_list: 'List of split segments',
+      paragraphList: 'List of split segments',
       splitStrategy: {
         label: 'Splitting Strategy',
         placeholder: 'Please select a splitting strategy',

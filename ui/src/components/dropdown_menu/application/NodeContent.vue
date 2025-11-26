@@ -100,23 +100,5 @@ watch([() => filterText.value, () => props.list], () => {
 </script>
 
 <style lang="scss" scoped>
-.list {
-  cursor: default;
-  padding: 12px;
-  gap: 12px;
-  box-sizing: border-box;
 
-  .list-item {
-    background-color: #ffffff;
-    box-sizing: border-box;
-
-    &:hover {
-      border-color: var(--el-color-primary);
-    }
-  }
-
-  .el-empty {
-    margin: 0 auto;
-  }
-}
 </style>

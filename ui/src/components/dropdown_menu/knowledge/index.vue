@@ -71,27 +71,26 @@
           </div>
         </el-scrollbar>
       </el-tab-pane>
-      <!-- 工具 -->
-      <el-tab-pane :label="$t('views.tool.datasource.title', '数据源')" name="DATA_SOURCE_TOOL">
+      <!-- 数据源 -->
+      <el-tab-pane :label="$t('views.tool.dataSource.title')" name="DATA_SOURCE_TOOL">
         <LayoutContainer>
           <template #left>
-            <div class="p-8">
-              <folder-tree
-                :source="SourceTypeEnum.TOOL"
-                :data="toolTreeData"
-                :currentNodeKey="folder.currentFolder?.id"
-                @handleNodeClick="folderClickHandle"
-                :shareTitle="$t('views.shared.shared_tool')"
-                :showShared="permissionPrecise['is_share']()"
-                :canOperation="false"
-              />
-            </div>
+            <folder-tree
+              :source="SourceTypeEnum.TOOL"
+              :data="toolTreeData"
+              :currentNodeKey="folder.currentFolder?.id"
+              @handleNodeClick="folderClickHandle"
+              :shareTitle="$t('views.shared.shared_tool')"
+              :showShared="permissionPrecise['is_share']()"
+              :canOperation="false"
+              :treeStyle="{ height: '400px' }"
+            />
           </template>
           <el-scrollbar height="450">
             <NodeContent
               :list="toolList"
-              @clickNodes="(val: any) => clickNodes(toolLibNode, val, 'tool')"
-              @onmousedown="(val: any) => onmousedown(toolLibNode, val, 'tool')"
+              @clickNodes="(val: any) => clickNodes(toolLibNode, val)"
+              @onmousedown="(val: any) => onmousedown(toolLibNode, val)"
             />
           </el-scrollbar>
         </LayoutContainer>
@@ -100,23 +99,22 @@
       <el-tab-pane :label="$t('views.tool.title')" name="CUSTOM_TOOL">
         <LayoutContainer>
           <template #left>
-            <div class="p-8">
-              <folder-tree
-                :source="SourceTypeEnum.TOOL"
-                :data="toolTreeData"
-                :currentNodeKey="folder.currentFolder?.id"
-                @handleNodeClick="folderClickHandle"
-                :shareTitle="$t('views.shared.shared_tool')"
-                :showShared="permissionPrecise['is_share']()"
-                :canOperation="false"
-              />
-            </div>
+            <folder-tree
+              :source="SourceTypeEnum.TOOL"
+              :data="toolTreeData"
+              :currentNodeKey="folder.currentFolder?.id"
+              @handleNodeClick="folderClickHandle"
+              :shareTitle="$t('views.shared.shared_tool')"
+              :showShared="permissionPrecise['is_share']()"
+              :canOperation="false"
+              :treeStyle="{ height: '400px' }"
+            />
           </template>
           <el-scrollbar height="450">
             <NodeContent
               :list="toolList"
-              @clickNodes="(val: any) => clickNodes(toolLibNode, val, 'tool')"
-              @onmousedown="(val: any) => onmousedown(toolLibNode, val, 'tool')"
+              @clickNodes="(val: any) => clickNodes(toolLibNode, val)"
+              @onmousedown="(val: any) => onmousedown(toolLibNode, val)"
             />
           </el-scrollbar>
         </LayoutContainer>
@@ -129,7 +127,6 @@ import { ref, onMounted, computed, inject } from 'vue'
 import { getMenuNodes, toolLibNode, applicationNode } from '@/workflow/common/data'
 import { iconComponent } from '@/workflow/icons/utils'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
-import { isWorkFlow } from '@/utils/application'
 import useStore from '@/stores'
 import NodeContent from './NodeContent.vue'
 import { SourceTypeEnum } from '@/enums/common'
@@ -186,28 +183,20 @@ const filter_menu_nodes = computed(() => {
     return result
   }, [])
 })
-function clickNodes(item: any, data?: any, type?: string) {
+function clickNodes(item: any, data?: any) {
   if (data) {
     item['properties']['stepName'] = data.name
-    if (type == 'tool') {
-      if (data.tool_type == 'DATA_SOURCE') {
-        item['properties'].kind = WorkflowKind.DataSource
-      }
-      item['properties']['node_data'] = {
-        ...data,
-        tool_lib_id: data.id,
-        input_field_list: data.input_field_list.map((field: any) => ({
-          ...field,
-          value: field.source == 'reference' ? [] : '',
-        })),
-      }
+
+    if (data.tool_type == 'DATA_SOURCE') {
+      item['properties'].kind = WorkflowKind.DataSource
     }
-    if (type == 'application') {
-      item['properties']['node_data'] = {
-        name: data.name,
-        icon: data.icon,
-        application_id: data.id,
-      }
+    item['properties']['node_data'] = {
+      ...data,
+      tool_lib_id: data.id,
+      input_field_list: data.input_field_list.map((field: any) => ({
+        ...field,
+        value: field.source == 'reference' ? [] : '',
+      })),
     }
   }
   props.workflowRef?.addNode(item)
@@ -215,38 +204,19 @@ function clickNodes(item: any, data?: any, type?: string) {
   emit('clickNodes', item)
 }
 
-function onmousedown(item: any, data?: any, type?: string) {
+function onmousedown(item: any, data?: any) {
   if (data) {
     item['properties']['stepName'] = data.name
-    if (type == 'tool') {
-      if (data.tool_type == 'DATA_SOURCE') {
-        item['properties'].kind = WorkflowKind.DataSource
-      }
-      item['properties']['node_data'] = {
-        ...data,
-        tool_lib_id: data.id,
-        input_field_list: data.input_field_list.map((field: any) => ({
-          ...field,
-          value: field.source == 'reference' ? [] : '',
-        })),
-      }
+    if (data.tool_type == 'DATA_SOURCE') {
+      item['properties'].kind = WorkflowKind.DataSource
     }
-    if (type == 'application') {
-      if (isWorkFlow(data.type)) {
-        const nodeData = data.work_flow.nodes[0].properties.node_data
-        const fileUploadSetting = nodeData.file_upload_setting
-        item['properties']['node_data'] = {
-          name: data.name,
-          icon: data.icon,
-          application_id: data.id,
-        }
-      } else {
-        item['properties']['node_data'] = {
-          name: data.name,
-          icon: data.icon,
-          application_id: data.id,
-        }
-      }
+    item['properties']['node_data'] = {
+      ...data,
+      tool_lib_id: data.id,
+      input_field_list: data.input_field_list.map((field: any) => ({
+        ...field,
+        value: field.source == 'reference' ? [] : '',
+      })),
     }
   }
   props.workflowRef?.onmousedown(item)
@@ -275,88 +245,20 @@ async function getToolList() {
   toolList.value = toolList.value?.filter((item: any) => item.is_active)
 }
 
-const applicationTreeData = ref<any[]>([])
-const applicationList = ref<any[]>([])
-
-function getApplicationFolder() {
-  folder.asyncGetFolder(SourceTypeEnum.APPLICATION, {}, loading).then((res: any) => {
-    applicationTreeData.value = res.data
-    folder.setCurrentFolder(res.data?.[0] || {})
-  })
-}
-
-async function getApplicationList() {
-  const res = await loadSharedApi({
-    type: 'application',
-    systemType: 'workspace',
-  }).getAllApplication({
-    folder_id: folder.currentFolder?.id || user.getWorkspaceId(),
-  })
-  applicationList.value = res.data.filter(
-    (item: any) => item.resource_type === 'application' && item.id !== props.id && item.is_publish,
-  )
-}
-
 function folderClickHandle(row: any) {
   folder.setCurrentFolder(row)
-  if (activeName.value === 'tool') {
+  if (['DATA_SOURCE_TOOL', 'CUSTOM_TOOL'].includes(activeName.value)) {
     getToolList()
-  } else {
-    getApplicationList()
   }
 }
 
 async function handleClick(val: string) {
-  console.log(val)
   if (['DATA_SOURCE_TOOL', 'CUSTOM_TOOL'].includes(val)) {
     await getToolFolder()
     getToolList()
-  } else if (val === 'application') {
-    getApplicationFolder()
-    getApplicationList()
   }
 }
 
 onMounted(() => {})
 </script>
-<style lang="scss" scoped>
-.workflow-dropdown-menu {
-  -moz-user-select: none; /* Firefox */
-  -webkit-user-select: none; /* WebKit内核 */
-  -ms-user-select: none; /* IE10及以后 */
-  -khtml-user-select: none; /* 早期浏览器 */
-  -o-user-select: none; /* Opera */
-  user-select: none; /* CSS3属性 */
-  position: absolute;
-  top: 49px;
-  right: 16px;
-  z-index: 99;
-  width: 600px;
-  box-shadow: 0px 4px 8px 0px var(--app-text-color-light-1);
-  padding-bottom: 8px;
-
-  .title {
-    padding: 12px 12px 4px;
-  }
-  .workflow-dropdown-item {
-    &:hover {
-      background: var(--app-text-color-light-1);
-    }
-  }
-
-  .list-item {
-    box-sizing: border-box;
-    &:hover {
-      border-color: var(--el-color-primary);
-    }
-  }
-
-  :deep(.el-tabs__header) {
-    margin-bottom: 0;
-  }
-
-  :deep(.tree-height) {
-    height: 400px;
-  }
-}
-</style>
+<style lang="scss" scoped></style>

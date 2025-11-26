@@ -2,7 +2,7 @@
   <NodeContainer :nodeModel="nodeModel">
     <h5 class="title-decoration-1 mb-8">{{ $t('views.workflow.nodeSetting') }}</h5>
     <el-card shadow="never" class="card-never">
-      <h4>{{ $t('views.workflow.nodes.dataSourceWebNode.display') }}</h4>
+      <h4>{{ $t('common.noData') }}</h4>
     </el-card>
   </NodeContainer>
 </template>
@@ -11,7 +11,6 @@
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import { computed } from 'vue'
 import { set } from 'lodash'
-import NodeCascader from '@/workflow/common/NodeCascader.vue'
 
 const props = defineProps<{ nodeModel: any }>()
 

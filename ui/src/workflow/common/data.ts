@@ -30,9 +30,7 @@ export const startNode = {
       ],
     },
     fields: [{ label: t('views.workflow.nodes.startNode.question'), value: 'question' }],
-    globalFields: [
-      { label: t('views.workflow.nodes.startNode.currentTime'), value: 'time' },
-    ],
+    globalFields: [{ label: t('views.workflow.nodes.startNode.currentTime'), value: 'time' }],
     showNode: true,
   },
 }
@@ -84,18 +82,18 @@ export const dataSourceLocalNode = {
   type: WorkflowType.DataSourceLocalNode,
   x: 360,
   y: 2761.3875,
-  text: t('views.workflow.nodes.dataSourceLocalNode.text', '本地文件'),
-  label: t('views.workflow.nodes.dataSourceLocalNode.label', '本地文件'),
+  text: t('views.workflow.nodes.dataSourceLocalNode.text'),
+  label: t('views.workflow.nodes.dataSourceLocalNode.label'),
   properties: {
     kind: WorkflowKind.DataSource,
     height: 728.375,
-    stepName: t('views.workflow.nodes.dataSourceLocalNode.label', '本地文件'),
+    stepName: t('views.workflow.nodes.dataSourceLocalNode.label'),
     input_field_list: [],
     node_data: {},
     config: {
       fields: [
         {
-          label: t('views.workflow.nodes.dataSourceLocalNode.field_label', '文件列表'),
+          label: t('views.workflow.nodes.dataSourceLocalNode.fileList'),
           value: 'file_list',
         },
       ],
@@ -111,12 +109,12 @@ export const dataSourceWebNode = {
   type: WorkflowType.DataSourceWebNode,
   x: 360,
   y: 2761.3875,
-  text: t('views.workflow.nodes.dataSourceWebNode.text', 'Web站点'),
-  label: t('views.workflow.nodes.dataSourceWebNode.label', 'Web站点'),
+  text: t('views.workflow.nodes.dataSourceWebNode.text'),
+  label: t('views.workflow.nodes.dataSourceWebNode.label'),
   properties: {
     kind: WorkflowKind.DataSource,
     height: 180,
-    stepName: t('views.workflow.nodes.dataSourceWebNode.label', 'Web站点'),
+    stepName: t('views.workflow.nodes.dataSourceWebNode.label'),
     config: {
       fields: [
         {
@@ -191,9 +189,7 @@ export const searchKnowledgeNode = {
           value: 'paragraph_list',
         },
         {
-          label: t(
-            'views.workflow.nodes.searchKnowledgeNode.is_hit_handling_method_list',
-          ),
+          label: t('views.workflow.nodes.searchKnowledgeNode.is_hit_handling_method_list'),
           value: 'is_hit_handling_method_list',
         },
         {
@@ -223,11 +219,11 @@ export const searchDocumentNode = {
     config: {
       fields: [
         {
-          label: t('views.workflow.nodes.searchDocumentNode.knowledge_list'),
+          label: t('views.workflow.nodes.searchDocumentNode.knowledgeList'),
           value: 'knowledge_list',
         },
         {
-          label: t('views.workflow.nodes.searchDocumentNode.document_list'),
+          label: t('views.workflow.nodes.searchDocumentNode.documentList'),
           value: 'document_list',
         },
       ],
@@ -402,7 +398,7 @@ export const documentSplitNode = {
     config: {
       fields: [
         {
-          label: t('views.workflow.nodes.documentSplitNode.paragraph_list'),
+          label: t('views.workflow.nodes.documentSplitNode.paragraphList'),
           value: 'paragraph_list',
         },
       ],
@@ -726,8 +722,12 @@ export const loopBreakNode = {
 
 export const knowledgeMenuNodes = [
   {
-    label: t('views.workflow.nodes.classify.dataSource', '数据源'),
+    label: t('views.tool.dataSource.title'),
     list: [dataSourceLocalNode, dataSourceWebNode],
+  },
+  {
+    label: t('views.knowledge.title'),
+    list: [documentSplitNode, knowledgeWriteNode, documentExtractNode],
   },
   {
     label: t('views.workflow.nodes.classify.aiCapability'),
@@ -744,10 +744,7 @@ export const knowledgeMenuNodes = [
       questionNode,
     ],
   },
-  {
-    label: t('views.knowledge.title'),
-    list: [documentExtractNode, documentSplitNode, knowledgeWriteNode],
-  },
+
   {
     label: t('views.workflow.nodes.classify.businessLogic'),
     list: [conditionNode, replyNode, loopNode],
@@ -837,7 +834,7 @@ export const applicationLoopMenuNodes = [
     list: [conditionNode, formNode, replyNode, loopContinueNode, loopBreakNode],
   },
   {
-    label: t('views.workflow.nodes.classify.dataProcessing', '数据处理'),
+    label: t('views.workflow.nodes.classify.dataProcessing'),
     list: [
       variableAssignNode,
       variableSplittingNode,
@@ -875,7 +872,7 @@ export const knowledgeLoopMenuNodes = [
     list: [conditionNode, replyNode, loopContinueNode, loopBreakNode],
   },
   {
-    label: t('views.workflow.nodes.classify.dataProcessing', '数据处理'),
+    label: t('views.workflow.nodes.classify.dataProcessing'),
     list: [
       variableAssignNode,
       variableSplittingNode,

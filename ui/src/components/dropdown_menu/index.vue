@@ -23,4 +23,6 @@ const kw: any = {
   [WorkflowMode.Knowledge]: KnowledgeDropdownMenu,
 }
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss">
+@use './index.scss';
+</style>

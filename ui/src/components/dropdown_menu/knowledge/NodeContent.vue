@@ -30,9 +30,7 @@
             >
               <img :src="resetUrl(item?.icon, resetUrl('./favicon.ico'))" alt="" />
             </el-avatar>
-            <el-avatar v-else class="avatar-green" shape="square" :size="20">
-              <img src="@/assets/tool/icon_tool.svg" style="width: 58%" alt="" />
-            </el-avatar>
+            <ToolIcon v-else :size="20" :type="item?.tool_type" />
             <span class="ml-8 ellipsis" :title="item.name">{{ item.name }}</span>
           </div>
         </template>
@@ -48,18 +46,8 @@
               >
                 <img :src="resetUrl(item?.icon, resetUrl('./favicon.ico'))" alt="" />
               </el-avatar>
-              <el-avatar v-else class="avatar-green" shape="square" :size="20">
-                <img src="@/assets/tool/icon_tool.svg" style="width: 58%" alt="" />
-              </el-avatar>
+              <ToolIcon v-else :size="20" :type="item?.tool_type" />
               <span class="font-medium ml-8 break-all" :title="item.name">{{ item.name }}</span>
-            </div>
-            <div v-if="item.type" class="status-tag" style="margin-left: auto">
-              <el-tag class="warning-tag" v-if="isWorkFlow(item.type)">
-                {{ $t('views.application.workflow') }}
-              </el-tag>
-              <el-tag class="blue-tag" v-else>
-                {{ $t('views.application.simple') }}
-              </el-tag>
             </div>
           </div>
           <el-text type="info" size="small" class="mt-4">{{ item.desc }}</el-text>
@@ -73,7 +61,6 @@
 <script setup lang="ts">
 import { watch, ref } from 'vue'
 import { isAppIcon, resetUrl } from '@/utils/common'
-import { isWorkFlow } from '@/utils/application'
 
 const props = defineProps<{
   list: any[]
@@ -99,24 +86,4 @@ watch([() => filterText.value, () => props.list], () => {
 })
 </script>
 
-<style lang="scss" scoped>
-.list {
-  cursor: default;
-  padding: 12px;
-  gap: 12px;
-  box-sizing: border-box;
-
-  .list-item {
-    background-color: #ffffff;
-    box-sizing: border-box;
-
-    &:hover {
-      border-color: var(--el-color-primary);
-    }
-  }
-
-  .el-empty {
-    margin: 0 auto;
-  }
-}
-</style>
+<style lang="scss" scoped></style>

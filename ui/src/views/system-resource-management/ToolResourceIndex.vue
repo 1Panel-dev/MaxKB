@@ -82,7 +82,7 @@
         <el-table-column prop="tool_type" :label="$t('views.system.resource_management.type')">
           <template #default="scope">
             <span v-if="scope.row.tool_type === 'MCP'"> MCP </span>
-            <span v-else-if="scope.row.tool_type === 'DATA_SOURCE'"> {{ $t('views.tool.dataSource') }} </span>
+            <span v-else-if="scope.row.tool_type === 'DATA_SOURCE'"> {{ $t('views.tool.dataSource.title') }} </span>
             <span v-else-if="scope.row.version">{{ $t('views.tool.toolStore.title') }}</span>
             <span v-else>
               {{
@@ -523,7 +523,7 @@ function openCreateDataSourceDialog(data?: any) {
     return
   }
 
-  DataSourceToolDrawertitle.value = data ? t('views.tool.editDataSourceTool') : t('views.tool.createDataSourceTool')
+  DataSourceToolDrawertitle.value = data ? t('views.tool.dataSource.editDataSource') : t('views.tool.dataSource.createDataSource')
   if (data) {
     ToolResourceApi.getToolById(data?.id, loading).then((res: any) => {
       DataSourceToolFormDrawerRef.value.open(res.data)
