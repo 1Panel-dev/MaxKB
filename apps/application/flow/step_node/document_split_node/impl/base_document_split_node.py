@@ -64,7 +64,7 @@ class BaseDocumentSplitNode(IDocumentSplitNode):
                     document_name_relate_problem_reference
                 )
 
-            paragraph_list = results
+            paragraph_list += results
 
         self.context['paragraph_list'] = paragraph_list
 
@@ -135,6 +135,5 @@ class BaseDocumentSplitNode(IDocumentSplitNode):
             'type': self.node.type,
             'status': self.status,
             'err_message': self.err_message,
-            'file_list': self.context.get('file_list'),
             'paragraph_list': self.context.get('paragraph_list', []),
         }
