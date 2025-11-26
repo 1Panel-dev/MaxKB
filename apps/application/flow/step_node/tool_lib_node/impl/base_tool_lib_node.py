@@ -126,6 +126,16 @@ def valid_function(tool_lib, workspace_id):
     if not tool_lib.is_active:
         raise Exception(_("Tool is not active"))
 
+def _filter_file_bytes(data):
+    """递归过滤掉所有层级的 file_bytes"""
+    if isinstance(data, dict):
+        return {k: _filter_file_bytes(v) for k, v in data.items() if k != 'file_bytes'}
+    elif isinstance(data, list):
+        return [_filter_file_bytes(item) for item in data]
+    else:
+        return data
+
+
 
 class BaseToolLibNodeNode(IToolLibNode):
     def save_context(self, details, workflow_manage):
@@ -165,15 +175,8 @@ class BaseToolLibNodeNode(IToolLibNode):
                               'kind') == 'data-source' else {}, _write_context=write_context)
 
     def get_details(self, index: int, **kwargs):
-        result = self.context.get('result')
-        # 过滤掉 file_bytes
-        if isinstance(result, dict) and 'file_bytes' in result:
-            result = {k: v for k, v in result.items() if k != 'file_bytes'}
-        elif isinstance(result, list):
-            result = [
-                {k: v for k, v in item.items() if k != 'file_bytes'} if isinstance(item, dict) else item
-                for item in result
-            ]
+        result = _filter_file_bytes(self.context.get('result'))
+
         return {
             'name': self.node.properties.get('stepName'),
             "index": index,
