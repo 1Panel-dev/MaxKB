@@ -21,18 +21,38 @@ const state = computed(() => {
   return 'PADDING'
 })
 const knowledge_action = ref<any>()
+let pollingTimer: any = null
+
 const getKnowledgeWorkflowAction = () => {
-  knowledgeApi.getWorkflowAction(props.knowledge_id, props.id).then((ok) => {
-    knowledge_action.value = ok.data
-    if (['SUCCESS', 'FAILURE', 'REVOKED'].includes(state.value)) {
-      clearInterval(polling)
-    }
-  })
+  knowledgeApi.getWorkflowAction(props.knowledge_id, props.id)
+    .then((ok) => {
+      knowledge_action.value = ok.data
+      if (['SUCCESS', 'FAILURE', 'REVOKED'].includes(state.value)) {
+        stopPolling()
+      } else {
+        // 请求完成后再设置下次轮询
+        pollingTimer = setTimeout(getKnowledgeWorkflowAction, 2000)
+      }
+    })
+    .catch(() => {
+      // 错误时也继续轮询
+      pollingTimer = setTimeout(getKnowledgeWorkflowAction, 2000)
+    })
 }
-const polling = setInterval(getKnowledgeWorkflowAction, 2000)
+
+const stopPolling = () => {
+  if (pollingTimer) {
+    clearTimeout(pollingTimer)
+    pollingTimer = null
+  }
+}
+
+// 启动轮询
+getKnowledgeWorkflowAction()
 
 onUnmounted(() => {
-  clearInterval(polling)
+  stopPolling()
 })
+
 </script>
 <style lang="scss"></style>
