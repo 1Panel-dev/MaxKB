@@ -165,10 +165,19 @@ class BaseToolLibNodeNode(IToolLibNode):
                               'kind') == 'data-source' else {}, _write_context=write_context)
 
     def get_details(self, index: int, **kwargs):
+        result = self.context.get('result')
+        # 过滤掉 file_bytes
+        if isinstance(result, dict) and 'file_bytes' in result:
+            result = {k: v for k, v in result.items() if k != 'file_bytes'}
+        elif isinstance(result, list):
+            result = [
+                {k: v for k, v in item.items() if k != 'file_bytes'} if isinstance(item, dict) else item
+                for item in result
+            ]
         return {
             'name': self.node.properties.get('stepName'),
             "index": index,
-            "result": self.context.get('result'),
+            "result": result,
             "params": self.context.get('params'),
             'run_time': self.context.get('run_time'),
             'type': self.node.type,
