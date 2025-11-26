@@ -47,9 +47,10 @@ class BaseDocumentSplitNode(IDocumentSplitNode):
         self.context['knowledge_id'] = knowledge_id
         file_list = self.workflow_manage.get_reference_field(document_list[0], document_list[1:])
         paragraph_list = []
-        get_buffer = FileBufferHandle().get_buffer
 
         for doc in file_list:
+            get_buffer = FileBufferHandle().get_buffer
+
             file_mem = bytes_to_uploaded_file(doc['content'].encode('utf-8'), doc['name'])
             result = default_split_handle.handle(file_mem, patterns, with_filter, limit, get_buffer, self._save_image)
             # 统一处理结果为列表
