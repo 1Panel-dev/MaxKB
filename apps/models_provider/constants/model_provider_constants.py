@@ -7,6 +7,7 @@ from models_provider.impl.anthropic_model_provider.anthropic_model_provider impo
 from models_provider.impl.aws_bedrock_model_provider.aws_bedrock_model_provider import BedrockModelProvider
 from models_provider.impl.azure_model_provider.azure_model_provider import AzureModelProvider
 from models_provider.impl.deepseek_model_provider.deepseek_model_provider import DeepSeekModelProvider
+from models_provider.impl.bailing_model_provider.bailing_model_provider import BailingModelProvider
 from models_provider.impl.gemini_model_provider.gemini_model_provider import GeminiModelProvider
 from models_provider.impl.kimi_model_provider.kimi_model_provider import KimiModelProvider
 from models_provider.impl.local_model_provider.local_model_provider import LocalModelProvider
@@ -46,3 +47,4 @@ class ModelProvideConstants(Enum):
     model_anthropic_provider = AnthropicModelProvider()
     model_siliconCloud_provider = SiliconCloudModelProvider()
     model_regolo_provider = RegoloModelProvider()
+    model_bailing_provider = BailingModelProvider()
