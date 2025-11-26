@@ -23,6 +23,7 @@
           <el-option :label="$t('views.userManage.userForm.nick_name.label')" value="nick_name" />
           <el-option :label="$t('views.login.loginForm.username.label')" value="username" />
           <el-option :label="$t('views.model.modelForm.permissionType.label')" value="permission" />
+          <el-option v-if="hasPermission([EditionConst.IS_EE,EditionConst.IS_PE],'OR')" :label="$t('views.role.member.role')" value="role" />
         </el-select>
         <el-input
           v-if="searchType === 'nick_name'"
@@ -40,7 +41,14 @@
           style="width: 220px"
           clearable
         />
-
+        <el-input
+          v-if="searchType === 'role'"
+          v-model="searchForm.role"
+          @change="searchHandle"
+          :placeholder="$t('common.search')"
+          style="width: 220px"
+          clearable
+        />
         <el-select
           v-else-if="searchType === 'permission'"
           v-model="searchForm.permission"
@@ -85,28 +93,15 @@
         show-overflow-tooltip
         :label="$t('views.login.loginForm.username.label')"
       />
-      <!-- <el-table-column prop="role_name" :label="$t('views.role.member.role')" width="210">
+      <el-table-column v-if="hasPermission([EditionConst.IS_EE,EditionConst.IS_PE],'OR')" prop="role_name" :label="$t('views.role.member.role')" width="210">
         <template #default="{ row }">
-          <el-popover :width="400">
-            <template #reference>
               <TagGroup
                 class="cursor"
                 style="width: fit-content"
                 :tags="row.role_name"
-                tooltipDisabled
               />
             </template>
-            <template #default>
-              <el-table :data="row.role_workspace">
-                <el-table-column prop="role" :label="$t('views.role.member.role')">
-                </el-table-column>
-                <el-table-column prop="workspace" :label="$t('views.workspace.title')">
-                </el-table-column>
-              </el-table>
-            </template>
-          </el-popover>
-        </template>
-      </el-table-column> -->
+      </el-table-column>
       <el-table-column :label="$t('common.operation')" align="left" width="340">
         <template #default="{ row }">
           <el-radio-group
@@ -206,7 +201,7 @@ import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 const route = useRoute()
 import useStore from '@/stores'
 import { hasPermission } from '@/utils/permission/index'
-import { PermissionConst, RoleConst } from '@/utils/permission/data'
+import { EditionConst, PermissionConst, RoleConst } from '@/utils/permission/data'
 
 const { user } = useStore()
 const props = defineProps<{
@@ -338,11 +333,12 @@ const searchType = ref('nick_name')
 const searchForm = ref<any>({
   nick_name: '',
   username: '',
+  role: '',
   permission: undefined,
 })
 
 const search_type_change = () => {
-  searchForm.value = { nick_name: '', username: '', permission: undefined }
+  searchForm.value = { nick_name: '', username: '', role: '', permission: undefined }
 }
 
 const paginationConfig = reactive({

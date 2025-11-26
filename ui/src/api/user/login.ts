@@ -99,7 +99,11 @@ const postLanguage: (data: any, loading?: Ref<boolean>) => Promise<Result<User>>
 ) => {
   return post('/user/language', data, undefined, loading)
 }
-
+const samlLogin: (loading?: Ref<boolean>) => Promise<Result<any>> = (
+  loading,
+) => {
+  return get('/saml2', '', loading)
+}
 export default {
   login,
   logout,
@@ -112,5 +116,6 @@ export default {
   getDingOauth2Callback,
   getLarkCallback,
   getQrSource,
-  ldapLogin
+  ldapLogin,
+  samlLogin
 }

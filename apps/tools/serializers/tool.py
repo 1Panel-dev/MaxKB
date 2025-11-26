@@ -431,7 +431,7 @@ class ToolSerializer(serializers.Serializer):
 
         @staticmethod
         def convert_value(name: str, value: str, _type: str, is_required: bool):
-            if not is_required and value is None:
+            if not is_required and (value is None or (isinstance(value, str) and len(value.strip()) == 0)):
                 return None
             try:
                 if _type == 'int':

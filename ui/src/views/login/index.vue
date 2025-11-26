@@ -329,6 +329,10 @@ function redirectAuth(authType: string, needMessage: boolean = true) {
       if (config.scope) {
         url += `&scope=${config.scope}`
       }
+    } else if (authType === 'SAML2') {
+      loginApi.samlLogin().then((res: any) => {
+        window.location.href = res.data
+      })
     }
     if (!url) {
       return

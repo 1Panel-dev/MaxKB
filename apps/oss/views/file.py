@@ -1,5 +1,8 @@
 # coding=utf-8
 import base64
+import ipaddress
+import socket
+from urllib.parse import urlparse
 
 import requests
 from django.utils.translation import gettext_lazy as _
@@ -83,7 +86,17 @@ class GetUrlView(APIView):
     )
     def get(self, request: Request):
         url = request.query_params.get('url')
-        response = requests.get(url)
+        parsed = validate_url(url)
+
+        response = requests.get(
+            url,
+            timeout=3,
+            allow_redirects=False
+        )
+        final_host = urlparse(response.url).hostname
+        if is_private_ip(final_host):
+            raise ValueError("Blocked unsafe redirect to internal host")
+
         # 返回状态码 响应内容大小  响应的contenttype 还有字节流
         content_type = response.headers.get('Content-Type', '')
         # 根据内容类型决定如何处理
@@ -99,3 +112,43 @@ class GetUrlView(APIView):
             'Content-Type': content_type,
             'content': content,
         })
+
+
+def is_private_ip(host: str) -> bool:
+    """检测 IP 是否属于内网、环回、云 metadata 的危险地址"""
+    try:
+        ip = ipaddress.ip_address(socket.gethostbyname(host))
+        return (
+                ip.is_private or
+                ip.is_loopback or
+                ip.is_reserved or
+                ip.is_link_local or
+                ip.is_multicast
+        )
+    except Exception:
+        return True
+
+
+def validate_url(url: str):
+    """验证 URL 是否安全"""
+    if not url:
+        raise ValueError("URL is required")
+
+    parsed = urlparse(url)
+
+    # 仅允许 http / https
+    if parsed.scheme not in ("http", "https"):
+        raise ValueError("Only http and https are allowed")
+
+    host = parsed.hostname
+    path = parsed.path
+
+    # 域名不能为空
+    if not host:
+        raise ValueError("Invalid URL")
+
+    # 禁止访问内部、保留、环回、云 metadata
+    if is_private_ip(host):
+        raise ValueError("Access to internal IP addresses is blocked")
+
+    return parsed

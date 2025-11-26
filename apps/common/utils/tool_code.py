@@ -7,6 +7,8 @@ import os
 import socket
 import subprocess
 import sys
+import signal
+import time
 import uuid_utils.compat as uuid
 from common.utils.logger import maxkb_logger
 from django.utils.translation import gettext_lazy as _
@@ -84,13 +86,14 @@ class ToolExecutor:
         python_paths = CONFIG.get_sandbox_python_package_paths().split(',')
         _exec_code = f"""
 try:
-    import sys, json, base64, builtins
+    import os, sys, json, base64, builtins
     path_to_exclude = ['/opt/py3/lib/python3.11/site-packages', '/opt/maxkb-app/apps']
     sys.path = [p for p in sys.path if p not in path_to_exclude]
     sys.path += {python_paths}
     locals_v={'{}'}
     keywords={keywords}
     globals_v={'{}'}
+    os.environ.clear()
     exec({dedent(code_str)!a}, globals_v, locals_v)
     f_name, f = {action_function}
     for local in locals_v:
@@ -182,16 +185,14 @@ except Exception as e:
         python_paths = CONFIG.get_sandbox_python_package_paths().split(',')
         code = self._generate_mcp_server_code(code_str, params)
         return f"""
-import os
-import sys
-import logging
+import os, sys, logging
 logging.basicConfig(level=logging.WARNING)
 logging.getLogger("mcp").setLevel(logging.ERROR)
 logging.getLogger("mcp.server").setLevel(logging.ERROR)
-
 path_to_exclude = ['/opt/py3/lib/python3.11/site-packages', '/opt/maxkb-app/apps']
 sys.path = [p for p in sys.path if p not in path_to_exclude]
 sys.path += {python_paths}
+os.environ.clear()
 exec({dedent(code)!a})
 """
 
@@ -223,24 +224,40 @@ exec({dedent(code)!a})
         return tool_config
 
     def _exec_sandbox(self, _code):
-        kwargs = {'cwd': BASE_DIR}
-        kwargs['env'] = {
+        kwargs = {'cwd': BASE_DIR, 'env': {
             'LD_PRELOAD': self.sandbox_so_path,
-        }
+        }}
         maxkb_logger.debug(f"Sandbox execute code: {_code}")
         compressed_and_base64_encoded_code_str = base64.b64encode(gzip.compress(_code.encode())).decode()
+        cmd = [
+            'su', '-s', python_directory, '-c',
+            f'import base64,gzip; exec(gzip.decompress(base64.b64decode(\'{compressed_and_base64_encoded_code_str}\')).decode())',
+            self.user
+        ]
         try:
-            subprocess_result = subprocess.run(
-                ['su', '-s', python_directory, '-c',
-                 f'import base64,gzip; exec(gzip.decompress(base64.b64decode(\'{compressed_and_base64_encoded_code_str}\')).decode())',
-                 self.user],
+            proc = subprocess.Popen(
+                cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
                 text=True,
-                capture_output=True,
-                timeout=self.process_timeout_seconds,
-                **kwargs)
+                **kwargs,
+                start_new_session=True
+            )
+            proc.wait(timeout=self.process_timeout_seconds)
+            return subprocess.CompletedProcess(
+                proc.args,
+                proc.returncode,
+                proc.stdout.read(),
+                proc.stderr.read()
+            )
         except subprocess.TimeoutExpired:
+            pgid = os.getpgid(proc.pid)
+            os.killpg(pgid, signal.SIGTERM) #温和终止
+            time.sleep(1) #留出短暂时间让进程清理
+            if proc.poll() is None: #如果仍未终止，强制终止
+                os.killpg(pgid, signal.SIGKILL)
+            proc.wait()
             raise Exception(_("Sandbox process execution timeout, consider increasing MAXKB_SANDBOX_PYTHON_PROCESS_TIMEOUT_SECONDS."))
-        return subprocess_result
 
     def validate_mcp_transport(self, code_str):
         servers = json.loads(code_str)

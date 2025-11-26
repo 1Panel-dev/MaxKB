@@ -19,8 +19,12 @@
 #include <time.h>
 #include <execinfo.h>
 #include <dlfcn.h>
+#include <linux/sched.h>
+#include <pty.h>
 
 #define CONFIG_FILE ".sandbox.conf"
+#define KEY_BANNED_HOSTS "SANDBOX_PYTHON_BANNED_HOSTS"
+#define KEY_ALLOW_SUBPROCESS "SANDBOX_PYTHON_ALLOW_SUBPROCESS"
 
 static char *banned_hosts = NULL;
 static int allow_subprocess = 0; // 默认禁止
@@ -57,10 +61,10 @@ static void load_sandbox_config() {
         while (*value == ' ' || *value == '\t') value++;
         char *vend = value + strlen(value) - 1;
         while (vend > value && (*vend == ' ' || *vend == '\t')) *vend-- = '\0';
-        if (strcmp(key, "SANDBOX_PYTHON_BANNED_HOSTS") == 0) {
+        if (strcmp(key, KEY_BANNED_HOSTS) == 0) {
             free(banned_hosts);
             banned_hosts = strdup(value);
-        } else if (strcmp(key, "SANDBOX_PYTHON_ALLOW_SUBPROCESS") == 0) {
+        } else if (strcmp(key, KEY_ALLOW_SUBPROCESS) == 0) {
             allow_subprocess = atoi(value);
         }
     }
@@ -158,7 +162,7 @@ static int allow_create_subprocess() {
     return allow_subprocess || !is_sandbox_user();
 }
 static int deny() {
-    fprintf(stderr, "[sandbox] Permission denied to create subprocess in sandbox.\n");
+    fprintf(stderr, "Permission denied to create subprocess.\n");
     _exit(1);
     return -1;
 }
@@ -167,7 +171,6 @@ static int deny() {
     if (!real_##func) {                         \
         real_##func = dlsym(RTLD_NEXT, #func);  \
     }
-
 int execve(const char *filename, char *const argv[], char *const envp[]) {
     RESOLVE_REAL(execve);
     if (!allow_create_subprocess()) return deny();
@@ -180,7 +183,21 @@ int execveat(int dirfd, const char *pathname,
     if (!allow_create_subprocess())  return deny();
     return real_execveat(dirfd, pathname, argv, envp, flags);
 }
-
+int __execve(const char *filename, char *const argv[], char *const envp[]) {
+    RESOLVE_REAL(__execve);
+    if (!allow_create_subprocess()) return deny();
+    return real___execve(filename, argv, envp);
+}
+int execvpe(const char *file, char *const argv[], char *const envp[]) {
+    RESOLVE_REAL(execvpe);
+    if (!allow_create_subprocess()) return deny();
+    return real_execvpe(file, argv, envp);
+}
+int __execvpe(const char *file, char *const argv[], char *const envp[]) {
+    RESOLVE_REAL(__execvpe);
+    if (!allow_create_subprocess()) return deny();
+    return real___execvpe(file, argv, envp);
+}
 pid_t fork(void) {
     RESOLVE_REAL(fork);
     if (!allow_create_subprocess()) return deny();
@@ -203,7 +220,11 @@ int clone(int (*fn)(void *), void *child_stack, int flags, void *arg, ...) {
     va_end(ap);
     return real_clone(fn, child_stack, flags, arg, (void *)a4, (void *)a5);
 }
-
+int clone3(struct clone_args *cl_args, size_t size) {
+    RESOLVE_REAL(clone3);
+    if (!allow_create_subprocess()) return deny();
+    return real_clone3(cl_args, size);
+}
 int posix_spawn(pid_t *pid, const char *path,
                 const posix_spawn_file_actions_t *file_actions,
                 const posix_spawnattr_t *attrp,
@@ -249,9 +270,19 @@ int __libc_system(const char *command) {
     if (!allow_create_subprocess()) return deny();
     return real___libc_system(command);
 }
+pid_t forkpty(int *amaster, char *name, const struct termios *termp, const struct winsize *winp) {
+    RESOLVE_REAL(forkpty);
+    if (!allow_create_subprocess()) return deny();
+    return real_forkpty(amaster, name, termp, winp);
+}
+pid_t __forkpty(int *amaster, char *name, const struct termios *termp, const struct winsize *winp) {
+    RESOLVE_REAL(__forkpty);
+    if (!allow_create_subprocess()) return deny();
+    return real___forkpty(amaster, name, termp, winp);
+}
 long (*real_syscall)(long, ...) = NULL;
 long syscall(long number, ...) {
-    if (!real_syscall) real_syscall = dlsym(RTLD_NEXT, "syscall");
+    RESOLVE_REAL(syscall);
     va_list ap;
     va_start(ap, number);
     long a1 = va_arg(ap, long);
@@ -261,9 +292,20 @@ long syscall(long number, ...) {
     long a5 = va_arg(ap, long);
     long a6 = va_arg(ap, long);
     va_end(ap);
-    if (number == SYS_execve || number == SYS_execveat ||
-        number == SYS_fork || number == SYS_vfork || number == SYS_clone) {
-        if (!allow_create_subprocess()) return deny();
+    switch (number) {
+        case SYS_execve:
+        case SYS_execveat:
+        case SYS_fork:
+        case SYS_vfork:
+        case SYS_clone:
+        case SYS_clone3:
+#ifdef SYS_posix_spawn
+        case SYS_posix_spawn:
+#endif
+#ifdef SYS_posix_spawnp
+        case SYS_posix_spawnp:
+#endif
+            if (!allow_create_subprocess()) return deny();
     }
     return real_syscall(number, a1, a2, a3, a4, a5, a6);
 }
