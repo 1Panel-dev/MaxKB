@@ -24,9 +24,6 @@ export default {
     requiredMessage: '不能为空',
     jsonMessage: 'JSON格式不正确',
   },
-  searchBar: {
-    placeholder: '请输入关键字搜索',
-  },
   paramForm: {
     field: {
       label: '参数',

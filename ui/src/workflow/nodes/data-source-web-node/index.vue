@@ -1,8 +1,8 @@
 <template>
   <NodeContainer :nodeModel="nodeModel">
-    <h5 class="title-decoration-1 mb-8">{{ $t('views.applicationWorkflow.nodeSetting') }}</h5>
+    <h5 class="title-decoration-1 mb-8">{{ $t('views.workflow.nodeSetting') }}</h5>
     <el-card shadow="never" class="card-never">
-      <h4>{{ $t('views.applicationWorkflow.nodes.dataSourceWebNode.display') }}</h4>
+      <h4>{{ $t('views.workflow.nodes.dataSourceWebNode.display') }}</h4>
     </el-card>
   </NodeContainer>
 </template>

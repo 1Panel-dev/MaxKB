@@ -31,7 +31,7 @@ const validate = () => {
         if (loop_node.properties.node_data.loop_type == 'LOOP' && !workflow.exist_break_node()) {
           return Promise.reject({
             node: loop_node,
-            errMessage: t('views.applicationWorkflow.validate.loopNodeBreakNodeRequired'),
+            errMessage: t('views.workflow.validate.loopNodeBreakNodeRequired'),
           })
         }
 

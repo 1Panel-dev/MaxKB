@@ -10,37 +10,37 @@
         ref="replyNodeFormRef"
       >
         <el-form-item
-          :label="$t('views.applicationWorkflow.nodes.loopNode.loopType.label')"
+          :label="$t('views.workflow.nodes.loopNode.loopType.label')"
           @click.prevent
           prop="loop_type"
           :rules="{
-            message: $t('views.applicationWorkflow.nodes.loopNode.loopType.requiredMessage'),
+            message: $t('views.workflow.nodes.loopNode.loopType.requiredMessage'),
             trigger: 'change',
             required: true,
           }"
         >
           <el-select v-model="form_data.loop_type" type="small">
             <el-option
-              :label="$t('views.applicationWorkflow.nodes.loopNode.loopType.arrayLoop')"
+              :label="$t('views.workflow.nodes.loopNode.loopType.arrayLoop')"
               value="ARRAY"
             />
             <el-option
-              :label="$t('views.applicationWorkflow.nodes.loopNode.loopType.numberLoop')"
+              :label="$t('views.workflow.nodes.loopNode.loopType.numberLoop')"
               value="NUMBER"
             />
             <el-option
-              :label="$t('views.applicationWorkflow.nodes.loopNode.loopType.infiniteLoop')"
+              :label="$t('views.workflow.nodes.loopNode.loopType.infiniteLoop')"
               value="LOOP"
             />
           </el-select>
         </el-form-item>
         <el-form-item
           v-if="form_data.loop_type == 'ARRAY'"
-          :label="$t('views.applicationWorkflow.nodes.loopNode.loopArray.label')"
+          :label="$t('views.workflow.nodes.loopNode.loopArray.label')"
           @click.prevent
           prop="array"
           :rules="{
-            message: $t('views.applicationWorkflow.nodes.loopNode.loopArray.requiredMessage'),
+            message: $t('views.workflow.nodes.loopNode.loopArray.requiredMessage'),
             trigger: 'blur',
             required: true,
           }"
@@ -49,17 +49,17 @@
             ref="nodeCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
-            :placeholder="$t('views.applicationWorkflow.nodes.loopNode.loopArray.placeholder')"
+            :placeholder="$t('views.workflow.nodes.loopNode.loopArray.placeholder')"
             v-model="form_data.array"
           />
         </el-form-item>
         <el-form-item
           v-else-if="form_data.loop_type == 'NUMBER'"
-          :label="$t('views.applicationWorkflow.nodes.loopNode.loopNumber.label')"
+          :label="$t('views.workflow.nodes.loopNode.loopNumber.label')"
           @click.prevent
           prop="number"
           :rules="{
-            message: $t('views.applicationWorkflow.nodes.loopNode.loopNumber.requiredMessage'),
+            message: $t('views.workflow.nodes.loopNode.loopNumber.requiredMessage'),
             trigger: 'blur',
             required: true,
           }"

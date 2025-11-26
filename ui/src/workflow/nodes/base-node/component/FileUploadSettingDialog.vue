@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="$t('views.applicationWorkflow.nodes.baseNode.FileUploadSetting.title')"
+    :title="$t('views.workflow.nodes.baseNode.FileUploadSetting.title')"
     v-model="dialogVisible"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
@@ -20,7 +20,7 @@
           require-asterisk-position="right"
         >
           <el-form-item
-            :label="$t('views.applicationWorkflow.nodes.baseNode.FileUploadSetting.maxFiles')"
+            :label="$t('views.workflow.nodes.baseNode.FileUploadSetting.maxFiles')"
           >
             <el-slider
               v-model="form_data.maxFiles"
@@ -31,7 +31,7 @@
             />
           </el-form-item>
           <el-form-item
-            :label="$t('views.applicationWorkflow.nodes.baseNode.FileUploadSetting.fileLimit')"
+            :label="$t('views.workflow.nodes.baseNode.FileUploadSetting.fileLimit')"
           >
             <el-slider
               v-model="form_data.fileLimit"
@@ -43,7 +43,7 @@
           </el-form-item>
           <el-form-item
             :label="
-              $t('views.applicationWorkflow.nodes.baseNode.FileUploadSetting.fileUploadType.label')
+              $t('views.workflow.nodes.baseNode.FileUploadSetting.fileUploadType.label')
             "
           >
             <el-card
@@ -62,7 +62,7 @@
                       <el-text class="color-secondary"
                       >{{
                           $t(
-                            'views.applicationWorkflow.nodes.baseNode.FileUploadSetting.fileUploadType.documentText',
+                            'views.workflow.nodes.baseNode.FileUploadSetting.fileUploadType.documentText',
                           )
                         }}
                       </el-text>
@@ -92,7 +92,7 @@
                       <el-text class="color-secondary"
                       >{{
                           $t(
-                            'views.applicationWorkflow.nodes.baseNode.FileUploadSetting.fileUploadType.imageText',
+                            'views.workflow.nodes.baseNode.FileUploadSetting.fileUploadType.imageText',
                           )
                         }}
                       </el-text>
@@ -123,7 +123,7 @@
                       <el-text class="color-secondary"
                       >{{
                           $t(
-                            'views.applicationWorkflow.nodes.baseNode.FileUploadSetting.fileUploadType.audioText',
+                            'views.workflow.nodes.baseNode.FileUploadSetting.fileUploadType.audioText',
                           )
                         }}
                       </el-text>
@@ -158,7 +158,7 @@
                       <el-text class="color-secondary"
                       >{{
                           $t(
-                            'views.applicationWorkflow.nodes.baseNode.FileUploadSetting.fileUploadType.videoText',
+                            'views.workflow.nodes.baseNode.FileUploadSetting.fileUploadType.videoText',
                           )
                         }}
                       </el-text>
@@ -188,7 +188,7 @@
                       <el-text class="color-secondary"
                       >{{
                           $t(
-                            'views.applicationWorkflow.nodes.baseNode.FileUploadSetting.fileUploadType.otherText',
+                            'views.workflow.nodes.baseNode.FileUploadSetting.fileUploadType.otherText',
                           )
                         }}
                       </el-text>

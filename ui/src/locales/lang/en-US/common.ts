@@ -4,9 +4,6 @@ export default {
   createSuccess: 'Successful',
   copy: 'Copy',
   copySuccess: 'Successful',
-  publishStatus: 'Publish Status',
-  published: 'Published',
-  unpublished: 'Unpublished',
   copyError: 'Copy Failed',
   save: 'Save',
   saveSuccess: 'Successful',
@@ -71,6 +68,8 @@ export default {
     disabled: 'Disabled',
     enableSuccess: 'Successful',
     disableSuccess: 'Successful',
+    published: 'Published',
+    unpublished: 'Unpublished',
   },
   param: {
     outputParam: 'Output Parameters',

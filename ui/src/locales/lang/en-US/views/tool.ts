@@ -29,9 +29,6 @@ export default {
     confirmTip: 'Are you sure to update tool: ',
     updateStoreToolMessage: 'Updating tools may affect resources in use, so proceed with caution.',
   },
-  searchBar: {
-    placeholder: 'Search by tool name',
-  },
   tip: {
     saveMessage: 'Unsaved changes will be lost. Are you sure you want to exit?',
   },

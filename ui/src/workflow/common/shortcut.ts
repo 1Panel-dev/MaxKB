@@ -61,13 +61,13 @@ export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
       (node: any) => node.type === WorkflowType.Start || node.type === WorkflowType.Base,
     )
     if (base_nodes.length > 0) {
-      MsgError(base_nodes[0]?.properties?.stepName + t('views.applicationWorkflow.tip.cannotCopy'))
+      MsgError(base_nodes[0]?.properties?.stepName + t('views.workflow.tip.cannotCopy'))
       return
     }
     selected = cloneDeep(elements)
     selected.nodes.forEach((node: any) => translationNodeData(node, TRANSLATION_DISTANCE))
     selected.edges.forEach((edge: any) => translationEdgeData(edge, TRANSLATION_DISTANCE))
-    MsgSuccess(t('views.applicationWorkflow.tip.copyError'))
+    MsgSuccess(t('views.workflow.tip.copyError'))
     return false
   }
   const paste_node = () => {
@@ -102,11 +102,11 @@ export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
     )
     if (nodes.length > 0) {
       MsgError(
-        `${nodes[0].properties?.stepName}${t('views.applicationWorkflow.delete.deleteMessage')}`,
+        `${nodes[0].properties?.stepName}${t('views.workflow.delete.deleteMessage')}`,
       )
       return
     }
-    MsgConfirm(t('common.tip'), t('views.applicationWorkflow.delete.confirmTitle'), {
+    MsgConfirm(t('common.tip'), t('views.workflow.delete.confirmTitle'), {
       confirmButtonText: t('common.confirm'),
       confirmButtonClass: 'danger',
     }).then(() => {

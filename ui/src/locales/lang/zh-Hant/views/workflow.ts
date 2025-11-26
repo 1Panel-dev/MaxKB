@@ -4,12 +4,12 @@ export default {
   baseComponent: '基礎組件',
   nodeSetting: '節點設置',
   workflow: '工作流',
-  searchBar: {
-    placeholder: '按名稱搜索',
-  },
   info: {
     previewVersion: '預覽版本：',
     saveTime: '保存時間：',
+  },
+  operation: {
+    toImportDoc: '去導入文檔',
   },
   setting: {
     restoreVersion: '恢復版本',

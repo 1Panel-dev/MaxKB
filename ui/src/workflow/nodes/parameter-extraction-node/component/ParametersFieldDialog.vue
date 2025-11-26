@@ -44,7 +44,7 @@
       <el-form-item
         :label="
           $t(
-            'views.applicationWorkflow.nodes.parameterExtractionNode.extractParameters.parameterType',
+            'views.workflow.nodes.parameterExtractionNode.extractParameters.parameterType',
           )
         "
         :required="true"
@@ -56,7 +56,7 @@
           :placeholder="
             $t('common.selectPlaceholder') +
             $t(
-              'views.applicationWorkflow.nodes.parameterExtractionNode.extractParameters.parameterType',
+              'views.workflow.nodes.parameterExtractionNode.extractParameters.parameterType',
             )
           "
           style="width: 100%"

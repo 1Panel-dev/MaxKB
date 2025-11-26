@@ -6,7 +6,7 @@ class LoopBodyNodeView extends AppNode {
     super(props, LoopNode)
   }
   getNodeName() {
-    return t('views.applicationWorkflow.nodes.loopBodyNode.label')
+    return t('views.workflow.nodes.loopBodyNode.label')
   }
   get_up_node_field_list(contain_self: boolean, use_cache: boolean) {
     const loop_node_id = this.props.model.properties.loop_node_id

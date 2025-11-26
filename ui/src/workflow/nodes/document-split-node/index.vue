@@ -1,6 +1,6 @@
 <template>
   <NodeContainer :nodeModel="nodeModel">
-    <h5 class="title-decoration-1 mb-8">{{ $t('views.applicationWorkflow.nodeSetting') }}</h5>
+    <h5 class="title-decoration-1 mb-8">{{ $t('views.workflow.nodeSetting') }}</h5>
     <el-card shadow="never" class="card-never">
       <el-form
         ref="aiChatNodeFormRef"
@@ -26,16 +26,16 @@
           />
         </el-form-item>
         <el-form-item
-          :label="$t('views.applicationWorkflow.nodes.documentSplitNode.splitStrategy.label')"
+          :label="$t('views.workflow.nodes.documentSplitNode.splitStrategy.label')"
           :rules="{
             required: true,
-            message: $t('views.applicationWorkflow.nodes.documentSplitNode.splitStrategy.required'),
+            message: $t('views.workflow.nodes.documentSplitNode.splitStrategy.required'),
             trigger: 'change'
           }"
         >
           <el-select
             v-model="form_data.split_strategy"
-            :placeholder="$t('views.applicationWorkflow.nodes.documentSplitNode.splitStrategy.placeholder')">
+            :placeholder="$t('views.workflow.nodes.documentSplitNode.splitStrategy.placeholder')">
             <el-option
               :label="$t('views.document.setRules.intelligent.label')"
               value="auto"
@@ -118,11 +118,11 @@
               <el-select v-model="form_data.paragraph_title_relate_problem_type" size="small"
                          style="width: 100px">
                 <el-option
-                  :label="$t('views.applicationWorkflow.nodes.searchDocumentNode.custom')"
+                  :label="$t('views.workflow.nodes.searchDocumentNode.custom')"
                   value="custom"
                 />
                 <el-option
-                  :label="$t('views.applicationWorkflow.variable.Referencing')"
+                  :label="$t('views.workflow.variable.Referencing')"
                   value="referencing"
                 />
               </el-select>
@@ -149,11 +149,11 @@
               <el-select v-model="form_data.document_name_relate_problem_type" size="small"
                          style="width: 100px">
                 <el-option
-                  :label="$t('views.applicationWorkflow.nodes.searchDocumentNode.custom')"
+                  :label="$t('views.workflow.nodes.searchDocumentNode.custom')"
                   value="custom"
                 />
                 <el-option
-                  :label="$t('views.applicationWorkflow.variable.Referencing')"
+                  :label="$t('views.workflow.variable.Referencing')"
                   value="referencing"
                 />
               </el-select>

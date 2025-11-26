@@ -1,10 +1,10 @@
 <template>
   <NodeContainer :nodeModel="nodeModel">
-    <h5 class="title-decoration-1 mb-8">{{ $t('views.applicationWorkflow.nodeSetting') }}</h5>
+    <h5 class="title-decoration-1 mb-8">{{ $t('views.workflow.nodeSetting') }}</h5>
     <LoopFieldTable :nodeModel="nodeModel"></LoopFieldTable>
     <template v-if="loop_input_fields?.length">
       <h5 class="title-decoration-1 mb-8">
-        {{ $t('views.applicationWorkflow.variable.loop') }}
+        {{ $t('views.workflow.variable.loop') }}
       </h5>
       <div
         v-for="(item, index) in loop_input_fields || []"
@@ -16,7 +16,7 @@
         <span class="break-all">{{ item.label }} {{ '{' + item.value + '}' }}</span>
         <el-tooltip
           effect="dark"
-          :content="$t('views.applicationWorkflow.setting.copyParam')"
+          :content="$t('views.workflow.setting.copyParam')"
           placement="top"
           v-if="showicon === true"
         >

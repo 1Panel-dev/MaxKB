@@ -1,7 +1,7 @@
 <template>
   <div class="flex-between mb-16">
     <h5 class="break-all ellipsis lighter" style="max-width: 80%">
-      {{ $t('views.applicationWorkflow.variable.chat') }}
+      {{ $t('views.workflow.variable.chat') }}
     </h5>
     <div>
       <span class="ml-4">
@@ -80,7 +80,7 @@ function deleteField(index: any) {
 function refreshFieldList(data: any, index: any) {
   for (let i = 0; i < inputFieldList.value.length; i++) {
     if (inputFieldList.value[i].field === data.field && index !== i) {
-      MsgError(t('views.applicationWorkflow.tip.paramErrorMessage') + data.field)
+      MsgError(t('views.workflow.tip.paramErrorMessage') + data.field)
       return
     }
   }

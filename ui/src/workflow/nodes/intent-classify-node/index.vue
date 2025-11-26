@@ -1,6 +1,6 @@
 <template>
   <NodeContainer :nodeModel="nodeModel">
-    <h5 class="title-decoration-1 mb-8">{{ $t('views.applicationWorkflow.nodeSetting') }}</h5>
+    <h5 class="title-decoration-1 mb-8">{{ $t('views.workflow.nodeSetting') }}</h5>
     <el-card shadow="never" class="card-never" style="--el-card-padding: 12px">
       <el-form
         @submit.prevent
@@ -53,9 +53,9 @@
         </el-form-item>
         <el-form-item
           prop="content_list"
-          :label="$t('views.applicationWorkflow.nodes.intentNode.input.label')"
+          :label="$t('views.workflow.nodes.intentNode.input.label')"
           :rules="{
-            message: $t('views.applicationWorkflow.nodes.textToSpeechNode.content.label'),
+            message: $t('views.workflow.nodes.textToSpeechNode.content.label'),
             trigger: 'change',
             required: true,
           }"
@@ -64,7 +64,7 @@
             <div class="flex-between">
               <div>
                 <span
-                  >{{ $t('views.applicationWorkflow.nodes.intentNode.input.label')
+                  >{{ $t('views.workflow.nodes.intentNode.input.label')
                   }}<span class="color-danger">*</span></span
                 >
               </div>
@@ -74,7 +74,7 @@
             ref="nodeCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
-            :placeholder="$t('views.applicationWorkflow.nodes.textToSpeechNode.content.label')"
+            :placeholder="$t('views.workflow.nodes.textToSpeechNode.content.label')"
             v-model="form_data.content_list"
           />
         </el-form-item>
@@ -94,7 +94,7 @@
             <div class="flex-between">
               <div>
                 <span
-                  >{{ $t('views.applicationWorkflow.nodes.intentNode.classify.label')
+                  >{{ $t('views.workflow.nodes.intentNode.classify.label')
                   }}<span class="color-danger">*</span></span
                 >
               </div>
@@ -108,7 +108,7 @@
               <el-form-item
                 :prop="`branch.${index}.content`"
                 :rules="{
-                  message: $t('views.applicationWorkflow.nodes.intentNode.classify.placeholder'),
+                  message: $t('views.workflow.nodes.intentNode.classify.placeholder'),
                   trigger: 'change',
                   required: true,
                 }"
@@ -120,7 +120,7 @@
                       style="width: 210px"
                       :disabled="item.isOther"
                       :placeholder="
-                        $t('views.applicationWorkflow.nodes.intentNode.classify.placeholder')
+                        $t('views.workflow.nodes.intentNode.classify.placeholder')
                       "
                     />
                   </el-col>
@@ -289,7 +289,7 @@ const form = {
     },
     {
       id: randomId(),
-      content: t('views.applicationWorkflow.nodes.intentNode.other'),
+      content: t('views.workflow.nodes.intentNode.other'),
       isOther: true,
     },
   ],
@@ -335,7 +335,7 @@ const validate = () => {
         form_data.value.branch.length !=
         new Set(form_data.value.branch.map((item: any) => item.content)).size
       ) {
-        throw t('views.applicationWorkflow.nodes.intentNode.error2')
+        throw t('views.workflow.nodes.intentNode.error2')
       }
     })
     .catch((err: any) => {

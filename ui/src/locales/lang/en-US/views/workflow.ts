@@ -4,12 +4,12 @@ export default {
   baseComponent: 'Basic',
   nodeSetting: 'Node Settings',
   workflow: 'Workflow',
-  searchBar: {
-    placeholder: 'Search by name',
-  },
   info: {
     previewVersion: 'Preview Version:',
     saveTime: 'Last Saved:',
+  },
+  operation: {
+    toImportDoc: 'Go to Import Documents',
   },
   setting: {
     restoreVersion: 'Restore Previous Version"',

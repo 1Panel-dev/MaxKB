@@ -1,6 +1,6 @@
 <template>
   <NodeContainer :nodeModel="nodeModel">
-    <h5 class="title-decoration-1 mb-8">{{ $t('views.applicationWorkflow.nodeSetting') }}</h5>
+    <h5 class="title-decoration-1 mb-8">{{ $t('views.workflow.nodeSetting') }}</h5>
     <el-card shadow="never" class="card-never" style="--el-card-padding: 12px">
       <el-form
         @submit.prevent
@@ -14,7 +14,7 @@
         <el-form-item
           prop="input_variable"
           :rules="{
-            message: $t('views.applicationWorkflow.variable.placeholder'),
+            message: $t('views.workflow.variable.placeholder'),
             trigger: 'blur',
             required: true,
           }"
@@ -22,7 +22,7 @@
           <template #label>
             <div class="flex-between">
               <div>
-                {{ $t('views.applicationWorkflow.nodes.variableSplittingNode.inputVariables') }}
+                {{ $t('views.workflow.nodes.variableSplittingNode.inputVariables') }}
                 <span class="color-danger">*</span>
               </div>
             </div>
@@ -31,7 +31,7 @@
             ref="nodeCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
-            :placeholder="$t('views.applicationWorkflow.variable.placeholder')"
+            :placeholder="$t('views.workflow.variable.placeholder')"
             v-model="form_data.input_variable"
           />
         </el-form-item>
@@ -40,7 +40,7 @@
           prop="variable_list"
           :rules="{
             message: $t(
-              'views.applicationWorkflow.nodes.variableSplittingNode.variableListPlaceholder',
+              'views.workflow.nodes.variableSplittingNode.variableListPlaceholder',
             ),
             trigger: 'blur',
             required: true,

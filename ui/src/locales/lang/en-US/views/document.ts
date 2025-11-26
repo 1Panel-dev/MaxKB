@@ -4,9 +4,6 @@ export default {
   syncDocument: 'Sync Document',
   items: 'Items',
   migrateDocument: 'Migrate to',
-  searchBar: {
-    placeholder: 'Search by document name',
-  },
   setting: {
     migration: 'Move',
     cancelGenerateQuestion: 'Cancel Generating Questions',

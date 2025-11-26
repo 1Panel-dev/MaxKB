@@ -1,6 +1,6 @@
 <template>
   <NodeContainer :nodeModel="nodeModel">
-    <h5 class="title-decoration-1 mb-8">{{ $t('views.applicationWorkflow.nodeSetting') }}</h5>
+    <h5 class="title-decoration-1 mb-8">{{ $t('views.workflow.nodeSetting') }}</h5>
     <el-card shadow="never" class="card-never">
       <el-form
         @submit.prevent
@@ -11,11 +11,11 @@
         ref="applicationNodeFormRef"
       >
         <el-form-item
-          :label="$t('views.applicationWorkflow.nodes.startNode.question')"
+          :label="$t('views.workflow.nodes.startNode.question')"
           prop="question_reference_address"
           :rules="{
             message: $t(
-              'views.applicationWorkflow.nodes.searchKnowledgeNode.searchQuestion.requiredMessage',
+              'views.workflow.nodes.searchKnowledgeNode.searchQuestion.requiredMessage',
             ),
             trigger: 'blur',
             required: true,
@@ -26,7 +26,7 @@
             :nodeModel="nodeModel"
             class="w-full"
             :placeholder="
-              $t('views.applicationWorkflow.nodes.searchKnowledgeNode.searchQuestion.placeholder')
+              $t('views.workflow.nodes.searchKnowledgeNode.searchQuestion.placeholder')
             "
             v-model="form_data.question_reference_address"
           />
@@ -53,11 +53,11 @@
 
         <el-form-item
           v-if="form_data.hasOwnProperty('image_list') || 'image_list' in form_data"
-          :label="$t('views.applicationWorkflow.nodes.imageUnderstandNode.image.label')"
+          :label="$t('views.workflow.nodes.imageUnderstandNode.image.label')"
           prop="image_list"
           :rules="{
             message: $t(
-              'views.applicationWorkflow.nodes.imageUnderstandNode.image.requiredMessage',
+              'views.workflow.nodes.imageUnderstandNode.image.requiredMessage',
             ),
             trigger: 'blur',
             required: false,
@@ -68,7 +68,7 @@
             :nodeModel="nodeModel"
             class="w-full"
             :placeholder="
-              $t('views.applicationWorkflow.nodes.imageUnderstandNode.image.requiredMessage')
+              $t('views.workflow.nodes.imageUnderstandNode.image.requiredMessage')
             "
             v-model="form_data.image_list"
           />
@@ -76,10 +76,10 @@
 
         <el-form-item
           v-if="form_data.hasOwnProperty('audio_list') || 'audio_list' in form_data"
-          :label="$t('views.applicationWorkflow.nodes.speechToTextNode.audio.label')"
+          :label="$t('views.workflow.nodes.speechToTextNode.audio.label')"
           prop="audio_list"
           :rules="{
-            message: $t('views.applicationWorkflow.nodes.speechToTextNode.audio.placeholder'),
+            message: $t('views.workflow.nodes.speechToTextNode.audio.placeholder'),
             trigger: 'blur',
             required: false,
           }"
@@ -88,17 +88,17 @@
             ref="nodeCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
-            :placeholder="$t('views.applicationWorkflow.nodes.speechToTextNode.audio.placeholder')"
+            :placeholder="$t('views.workflow.nodes.speechToTextNode.audio.placeholder')"
             v-model="form_data.audio_list"
           />
         </el-form-item>
         <el-form-item
           v-if="form_data.hasOwnProperty('video_list') || 'video_list' in form_data"
-          :label="$t('views.applicationWorkflow.nodes.videoUnderstandNode.video.label')"
+          :label="$t('views.workflow.nodes.videoUnderstandNode.video.label')"
           prop="video_list"
           :rules="{
             message: $t(
-              'views.applicationWorkflow.nodes.videoUnderstandNode.video.requiredMessage',
+              'views.workflow.nodes.videoUnderstandNode.video.requiredMessage',
             ),
             trigger: 'blur',
             required: false,
@@ -109,7 +109,7 @@
             :nodeModel="nodeModel"
             class="w-full"
             :placeholder="
-              $t('views.applicationWorkflow.nodes.videoUnderstandNode.video.requiredMessage')
+              $t('views.workflow.nodes.videoUnderstandNode.video.requiredMessage')
             "
             v-model="form_data.video_list"
           />
@@ -131,7 +131,7 @@
               :nodeModel="nodeModel"
               class="w-full"
               :placeholder="
-                $t('views.applicationWorkflow.nodes.searchKnowledgeNode.searchQuestion.placeholder')
+                $t('views.workflow.nodes.searchKnowledgeNode.searchQuestion.placeholder')
               "
               v-model="form_data.api_input_field_list[index].value"
             />
@@ -155,26 +155,26 @@
               :nodeModel="nodeModel"
               class="w-full"
               :placeholder="
-                $t('views.applicationWorkflow.nodes.searchKnowledgeNode.searchQuestion.placeholder')
+                $t('views.workflow.nodes.searchKnowledgeNode.searchQuestion.placeholder')
               "
               v-model="form_data.user_input_field_list[index].value"
             />
           </el-form-item>
         </div>
         <el-form-item
-          :label="$t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')"
+          :label="$t('views.workflow.nodes.aiChatNode.returnContent.label')"
           @click.prevent
         >
           <template #label>
             <div class="flex align-center">
               <div class="mr-4">
                 <span>{{
-                  $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')
+                  $t('views.workflow.nodes.aiChatNode.returnContent.label')
                 }}</span>
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content>
-                  {{ $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.tooltip') }}
+                  {{ $t('views.workflow.nodes.aiChatNode.returnContent.tooltip') }}
                 </template>
                 <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
               </el-tooltip>

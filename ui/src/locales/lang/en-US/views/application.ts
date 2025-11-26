@@ -10,17 +10,9 @@ export default {
   workflowPlaceholder:
     'Suitable for advanced users to build complex logic AI assistants using low-code drag-and-drop',
   appTest: 'Debug Preview',
-  searchBar: {
-    placeholder: 'Search by name',
-  },
-  status: {
-    published: 'Published',
-    unpublished: 'Unpublished',
-  },
   operation: {
     addModel: 'Add Model',
     toChat: 'Chat',
-    publish: 'Publish',
   },
   delete: {
     confirmTitle: 'Are you sure you want to delete this APP: ',
@@ -78,8 +70,7 @@ export default {
       placeholder:
         'User prompt, you can reference variables in the system: {data} is the segment hit in the knowledge base; {question} is the question asked by the user',
       requiredMessage: 'Please enter User prompt',
-      tooltip:
-        'The question or command that the user poses to the model',
+      tooltip: 'The question or command that the user poses to the model',
 
       noReferencesTooltip:
         'By adjusting the content of the prompt, you can guide the direction of the large model chat. This prompt will be fixed at the beginning of the context. Variables used: {question} is the question posed by the user.',
@@ -250,4 +241,5 @@ export default {
     emptyMessage2: 'No matching sections found',
   },
   publishTime: 'Publish Time',
+  publishStatus: 'Publish Status',
 }

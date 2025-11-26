@@ -3,12 +3,6 @@ export default {
   relatedApplications: 'Linked App',
   document_count: 'docs',
   relatedApp_count: 'linked apps',
-  searchBar: {
-    placeholder: 'Search by name',
-  },
-  operation: {
-    publish: 'Publish',
-  },
   setting: {
     vectorization: 'Vectorization',
     sync: 'Sync',

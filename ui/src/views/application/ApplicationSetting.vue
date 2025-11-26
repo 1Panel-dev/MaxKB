@@ -19,7 +19,7 @@
           :disabled="loading"
           v-if="permissionPrecise.edit(id)"
         >
-          {{ $t('views.application.operation.publish') }}
+          {{ $t('common.publish') }}
         </el-button>
       </div>
     </div>

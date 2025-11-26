@@ -62,21 +62,21 @@ function visibleChange(bool: boolean) {
 const validate = () => {
   const incomingNodeValue = getOptionsValue()
   if (!data.value || data.value.length === 0) {
-    return Promise.reject(t('views.applicationWorkflow.variable.ReferencingRequired'))
+    return Promise.reject(t('views.workflow.variable.ReferencingRequired'))
   }
   if (data.value.length < 2) {
-    return Promise.reject(t('views.applicationWorkflow.variable.ReferencingError'))
+    return Promise.reject(t('views.workflow.variable.ReferencingError'))
   }
   const node_id = data.value[0]
   const node_field = data.value[1]
   const nodeParent = incomingNodeValue.find((item: any) => item.value === node_id)
   if (!nodeParent) {
     data.value = []
-    return Promise.reject(t('views.applicationWorkflow.variable.NoReferencing'))
+    return Promise.reject(t('views.workflow.variable.NoReferencing'))
   }
   if (!nodeParent.children.some((item: any) => item.value === node_field)) {
     data.value = []
-    return Promise.reject(t('views.applicationWorkflow.variable.NoReferencing'))
+    return Promise.reject(t('views.workflow.variable.NoReferencing'))
   }
   return Promise.resolve('')
 }

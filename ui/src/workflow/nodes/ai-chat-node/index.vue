@@ -1,6 +1,6 @@
 <template>
   <NodeContainer :nodeModel="nodeModel">
-    <h5 class="title-decoration-1 mb-8">{{ $t('views.applicationWorkflow.nodeSetting') }}</h5>
+    <h5 class="title-decoration-1 mb-8">{{ $t('views.workflow.nodeSetting') }}</h5>
     <el-card shadow="never" class="card-never" style="--el-card-padding: 12px">
       <el-form
         @submit.prevent
@@ -82,7 +82,7 @@
             v-model="chat_data.system"
             style="height: 100px"
             @submitDialog="submitSystemDialog"
-            :placeholder="`${t('views.applicationWorkflow.SystemPromptPlaceholder')}{{${t('views.applicationWorkflow.nodes.startNode.label')}.question}}`"
+            :placeholder="`${t('views.workflow.SystemPromptPlaceholder')}{{${t('views.workflow.nodes.startNode.label')}.question}}`"
           />
         </el-form-item>
         <el-form-item
@@ -114,7 +114,7 @@
             v-model="chat_data.prompt"
             style="height: 150px"
             @submitDialog="submitDialog"
-            :placeholder="`${t('views.applicationWorkflow.UserPromptPlaceholder')}{{${t('views.applicationWorkflow.nodes.startNode.label')}.question}}`"
+            :placeholder="`${t('views.workflow.UserPromptPlaceholder')}{{${t('views.workflow.nodes.startNode.label')}.question}}`"
           />
         </el-form-item>
         <el-form-item :label="$t('views.application.form.historyRecord.label')">
@@ -122,8 +122,8 @@
             <div class="flex-between">
               <div>{{ $t('views.application.form.historyRecord.label') }}</div>
               <el-select v-model="chat_data.dialogue_type" type="small" style="width: 100px">
-                <el-option :label="$t('views.applicationWorkflow.node')" value="NODE" />
-                <el-option :label="$t('views.applicationWorkflow.workflow')" value="WORKFLOW" />
+                <el-option :label="$t('views.workflow.node')" value="NODE" />
+                <el-option :label="$t('views.workflow.workflow')" value="WORKFLOW" />
               </el-select>
             </div>
           </template>
@@ -292,12 +292,12 @@
             <div class="flex align-center">
               <div class="mr-4">
                 <span>{{
-                  $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')
+                  $t('views.workflow.nodes.aiChatNode.returnContent.label')
                 }}</span>
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content>
-                  {{ $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.tooltip') }}
+                  {{ $t('views.workflow.nodes.aiChatNode.returnContent.tooltip') }}
                 </template>
                 <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
               </el-tooltip>
@@ -376,10 +376,10 @@ const model_change = (model_id?: string) => {
   }
 }
 
-const defaultPrompt = `${t('views.applicationWorkflow.nodes.aiChatNode.defaultPrompt')}：
-{{${t('views.applicationWorkflow.nodes.searchKnowledgeNode.label')}.data}}
+const defaultPrompt = `${t('views.workflow.nodes.aiChatNode.defaultPrompt')}：
+{{${t('views.workflow.nodes.searchKnowledgeNode.label')}.data}}
 ${t('views.problem.title')}：
-{{${t('views.applicationWorkflow.nodes.startNode.label')}.question}}`
+{{${t('views.workflow.nodes.startNode.label')}.question}}`
 
 const form = {
   model_id: '',

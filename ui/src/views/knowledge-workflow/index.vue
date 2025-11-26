@@ -6,17 +6,17 @@
         <h4 class="ellipsis" style="max-width: 300px" :title="detail?.name">{{ detail?.name }}</h4>
         <div v-if="showHistory && disablePublic">
           <el-text type="info" class="ml-16 color-secondary"
-            >{{ $t('views.knowledgeWorkflow.info.previewVersion') }}
+            >{{ $t('views.workflow.info.previewVersion') }}
             {{ currentVersion.name || datetimeFormat(currentVersion.update_time) }}</el-text
           >
         </div>
         <el-text type="info" class="ml-16 color-secondary" v-else-if="saveTime"
-          >{{ $t('views.knowledgeWorkflow.info.saveTime') }}{{ datetimeFormat(saveTime) }}</el-text
+          >{{ $t('views.workflow.info.saveTime') }}{{ datetimeFormat(saveTime) }}</el-text
         >
       </div>
       <div v-if="showHistory && disablePublic">
         <el-button type="primary" class="mr-8" @click="refreshVersion()">
-          {{ $t('views.knowledgeWorkflow.setting.restoreVersion') }}
+          {{ $t('views.workflow.setting.restoreVersion') }}
         </el-button>
         <el-divider direction="vertical" />
         <el-button text @click="closeHistory">
@@ -28,7 +28,7 @@
       <div v-else>
         <el-button @click="showPopover = !showPopover">
           <AppIcon iconName="app-add-outlined" class="mr-4" />
-          {{ $t('views.knowledgeWorkflow.setting.addComponent') }}
+          {{ $t('views.workflow.setting.addComponent') }}
         </el-button>
         <el-button @click="clickShowDebug" :disabled="showDebug" v-if="permissionPrecise.debug(id)">
           <AppIcon iconName="app-debug-outlined" class="mr-4"></AppIcon>
@@ -39,7 +39,7 @@
           {{ $t('common.save') }}
         </el-button>
         <el-button type="primary" @click="publish">
-          {{ $t('views.knowledgeWorkflow.operation.publish') }}
+          {{ $t('common.publish') }}
         </el-button>
 
         <el-dropdown trigger="click">
@@ -51,17 +51,17 @@
               <a :href="shareUrl" target="_blank">
                 <el-dropdown-item>
                   <AppIcon iconName="app-create-chat" class="color-secondary"></AppIcon>
-                  {{ $t('views.knowledgeWorkflow.operation.toImportDoc') }}
+                  {{ $t('views.workflow.operation.toImportDoc') }}
                 </el-dropdown-item>
               </a>
 
               <el-dropdown-item @click="openHistory">
                 <AppIcon iconName="app-history-outlined" class="color-secondary"></AppIcon>
-                {{ $t('views.knowledgeWorkflow.setting.releaseHistory') }}
+                {{ $t('views.workflow.setting.releaseHistory') }}
               </el-dropdown-item>
               <el-dropdown-item>
                 <AppIcon iconName="app-save-outlined" class="color-secondary"></AppIcon>
-                {{ $t('views.knowledgeWorkflow.setting.autoSave') }}
+                {{ $t('views.workflow.setting.autoSave') }}
                 <div class="ml-4">
                   <el-switch size="small" v-model="isSave" @change="changeSave" />
                 </div>
@@ -212,9 +212,9 @@ const shareUrl = computed(
 
 function back() {
   if (JSON.stringify(cloneWorkFlow.value) !== JSON.stringify(getGraphData())) {
-    MsgConfirm(t('common.tip'), t('views.knowledgeWorkflow.tip.saveMessage'), {
-      confirmButtonText: t('views.knowledgeWorkflow.setting.exitSave'),
-      cancelButtonText: t('views.knowledgeWorkflow.setting.exit'),
+    MsgConfirm(t('common.tip'), t('views.workflow.tip.saveMessage'), {
+      confirmButtonText: t('views.workflow.setting.exitSave'),
+      cancelButtonText: t('views.workflow.setting.exit'),
       distinguishCancelAndClose: true,
     })
       .then(() => {
@@ -348,14 +348,14 @@ const publish = () => {
           if (typeof err_message == 'string') {
             MsgError(
               res.node.properties?.stepName +
-                ` ${t('views.knowledgeWorkflow.node').toLowerCase()} ` +
+                ` ${t('views.workflow.node').toLowerCase()} ` +
                 err_message.toLowerCase(),
             )
           } else {
             const keys = Object.keys(err_message)
             MsgError(
               node.properties?.stepName +
-                ` ${t('views.knowledgeWorkflow.node').toLowerCase()} ` +
+                ` ${t('views.workflow.node').toLowerCase()} ` +
                 err_message[keys[0]]?.[0]?.message.toLowerCase(),
             )
           }
@@ -366,13 +366,13 @@ const publish = () => {
       const err_message = res.errMessage
       if (typeof err_message == 'string') {
         MsgError(
-          res.node.properties?.stepName + ` ${t('views.knowledgeWorkflow.node')}，` + err_message,
+          res.node.properties?.stepName + ` ${t('views.workflow.node')}，` + err_message,
         )
       } else {
         const keys = Object.keys(err_message)
         MsgError(
           node.properties?.stepName +
-            ` ${t('views.knowledgeWorkflow.node')}，` +
+            ` ${t('views.workflow.node')}，` +
             err_message[keys[0]]?.[0]?.message,
         )
       }
@@ -403,13 +403,13 @@ const clickShowDebug = () => {
       const err_message = res.errMessage
       if (typeof err_message == 'string') {
         MsgError(
-          res.node.properties?.stepName + ` ${t('views.knowledgeWorkflow.node')}，` + err_message,
+          res.node.properties?.stepName + ` ${t('views.workflow.node')}，` + err_message,
         )
       } else {
         const keys = Object.keys(err_message)
         MsgError(
           node.properties?.stepName +
-            ` ${t('views.knowledgeWorkflow.node')}，` +
+            ` ${t('views.workflow.node')}，` +
             err_message[keys[0]]?.[0]?.message,
         )
       }

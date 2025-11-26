@@ -4,9 +4,7 @@ export default {
   syncDocument: '同步文档',
   items: '项',
   migrateDocument: '文档迁移到',
-  searchBar: {
-    placeholder: '按 文档名称 搜索',
-  },
+
   setting: {
     migration: '迁移',
     cancelGenerateQuestion: '取消生成问题',

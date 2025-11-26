@@ -11,18 +11,10 @@ export default {
   simplePlaceholder: '适用于初级用户使用表单设置构建AI对话助手',
   workflowPlaceholder: '适用于高级用户使用低代码拖拉拽方式构建复杂逻辑的AI对话助手',
   appTest: '调试预览',
-  searchBar: {
-    placeholder: '按名称搜索',
-  },
-  status: {
-    published: '已发布',
-    unpublished: '未发布',
-  },
 
   operation: {
     addModel: '添加模型',
     toChat: '去对话',
-    publish: '发布',
   },
   delete: {
     confirmTitle: '是否删除应用：',
@@ -239,4 +231,5 @@ export default {
     emptyMessage2: '没有命中的分段',
   },
   publishTime: '发布时间',
+  publishStatus: '发布状态',
 }

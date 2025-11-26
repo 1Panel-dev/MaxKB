@@ -10,7 +10,7 @@ class LoopStartNode extends AppNode {
     if (this.props.model.type === 'loop-start-node') {
       result.push({
         value: 'loop',
-        label: t('views.applicationWorkflow.variable.loop'),
+        label: t('views.workflow.variable.loop'),
         type: 'loop',
         children:
           (this.props.model.properties.loop_input_field_list

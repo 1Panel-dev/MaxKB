@@ -6,7 +6,7 @@
       <el-input
         v-model="filterText"
         :validate-event="false"
-        :placeholder="$t('dynamicsForm.searchBar.placeholder')"
+        :placeholder="$t('common.searchBar.placeholder')"
         class="input-with-select"
         style="--el-color-danger: #c0c4cc"
         clearable

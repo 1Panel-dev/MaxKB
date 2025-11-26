@@ -29,9 +29,6 @@ export default {
     confirmTip: '是否更新工具：',
     updateStoreToolMessage: '更新工具可能會影響正在使用的資源，請謹慎操作。',
   },
-  searchBar: {
-    placeholder: '按工具名稱搜尋',
-  },
   tip: {
     saveMessage: '當前的更改尚未保存，確認退出嗎？',
   },

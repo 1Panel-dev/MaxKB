@@ -11,17 +11,17 @@
       >
         <div class="handle flex-between lighter mb-8">
           <div class="info" v-if="form_data.condition_list.length > 1">
-            <span>{{ $t('views.applicationWorkflow.nodes.conditionNode.conditions.info') }}</span>
+            <span>{{ $t('views.workflow.nodes.conditionNode.conditions.info') }}</span>
             <el-select
               :teleported="false"
               v-model="form_data.condition"
               size="small"
               style="width: 60px; margin: 0 8px"
             >
-              <el-option :label="$t('views.applicationWorkflow.condition.AND')" value="and" />
-              <el-option :label="$t('views.applicationWorkflow.condition.OR')" value="or" />
+              <el-option :label="$t('views.workflow.condition.AND')" value="and" />
+              <el-option :label="$t('views.workflow.condition.OR')" value="or" />
             </el-select>
-            <span>{{ $t('views.applicationWorkflow.nodes.conditionNode.conditions.label') }}</span>
+            <span>{{ $t('views.workflow.nodes.conditionNode.conditions.label') }}</span>
           </div>
         </div>
         <template v-for="(condition, index) in form_data.condition_list" :key="index">
@@ -32,7 +32,7 @@
                 :rules="{
                   type: 'array',
                   required: true,
-                  message: $t('views.applicationWorkflow.variable.placeholder'),
+                  message: $t('views.workflow.variable.placeholder'),
                   trigger: 'change',
                 }"
               >
@@ -40,7 +40,7 @@
                   ref="nodeCascaderRef"
                   :nodeModel="nodeModel"
                   class="w-full"
-                  :placeholder="$t('views.applicationWorkflow.variable.placeholder')"
+                  :placeholder="$t('views.workflow.variable.placeholder')"
                   v-model="condition.field"
                 />
               </el-form-item>
@@ -51,7 +51,7 @@
                 :rules="{
                   required: true,
                   message: $t(
-                    'views.applicationWorkflow.nodes.conditionNode.conditions.requiredMessage',
+                    'views.workflow.nodes.conditionNode.conditions.requiredMessage',
                   ),
                   trigger: 'change',
                 }"
@@ -61,7 +61,7 @@
                   :teleported="false"
                   v-model="condition.compare"
                   :placeholder="
-                    $t('views.applicationWorkflow.nodes.conditionNode.conditions.requiredMessage')
+                    $t('views.workflow.nodes.conditionNode.conditions.requiredMessage')
                   "
                   clearable
                 >
@@ -79,13 +79,13 @@
                 :prop="'condition_list.' + index + '.value'"
                 :rules="{
                   required: true,
-                  message: $t('views.applicationWorkflow.nodes.conditionNode.valueMessage'),
+                  message: $t('views.workflow.nodes.conditionNode.valueMessage'),
                   trigger: 'blur',
                 }"
               >
                 <el-input
                   v-model="condition.value"
-                  :placeholder="$t('views.applicationWorkflow.nodes.conditionNode.valueMessage')"
+                  :placeholder="$t('views.workflow.nodes.conditionNode.valueMessage')"
                 />
               </el-form-item>
             </el-col>
@@ -100,7 +100,7 @@
 
       <el-button link type="primary" @click="addCondition()">
         <AppIcon iconName="app-add-outlined" class="mr-4"></AppIcon>
-        {{ $t('views.applicationWorkflow.nodes.conditionNode.addCondition') }}
+        {{ $t('views.workflow.nodes.conditionNode.addCondition') }}
       </el-button>
     </el-card>
   </NodeContainer>

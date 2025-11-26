@@ -2,8 +2,8 @@
   <el-dialog
     :title="
       isEdit
-        ? $t('views.applicationWorkflow.nodes.variableSplittingNode.editVariables')
-        : $t('views.applicationWorkflow.nodes.variableSplittingNode.addVariables')
+        ? $t('views.workflow.nodes.variableSplittingNode.editVariables')
+        : $t('views.workflow.nodes.variableSplittingNode.addVariables')
     "
     v-model="dialogVisible"
     :close-on-click-modal="false"
@@ -30,7 +30,7 @@
         <el-input
           v-model="form.field"
           :maxlength="64"
-          :placeholder="$t('views.applicationWorkflow.variable.inputPlaceholder')"
+          :placeholder="$t('views.workflow.variable.inputPlaceholder')"
           show-word-limit
         />
       </el-form-item>
@@ -52,13 +52,13 @@
         <template #label>
           <div class="flex align-center">
             <span class="mr-4"
-              >{{ $t('views.applicationWorkflow.nodes.variableSplittingNode.expression.label') }}
+              >{{ $t('views.workflow.nodes.variableSplittingNode.expression.label') }}
               <span class="color-danger">*</span></span
             >
             <el-tooltip
               effect="dark"
               :content="
-                $t('views.applicationWorkflow.nodes.variableSplittingNode.expression.tooltip')
+                $t('views.workflow.nodes.variableSplittingNode.expression.tooltip')
               "
               placement="right"
             >
@@ -71,7 +71,7 @@
           :maxlength="64"
           show-word-limit
           :placeholder="
-            $t('views.applicationWorkflow.nodes.variableSplittingNode.expression.placeholder')
+            $t('views.workflow.nodes.variableSplittingNode.expression.placeholder')
           "
         />
       </el-form-item>
@@ -110,7 +110,7 @@ const rules = reactive({
   field: [
     {
       required: true,
-      message: t('views.applicationWorkflow.variable.inputPlaceholder'),
+      message: t('views.workflow.variable.inputPlaceholder'),
       trigger: 'blur',
     },
     {
@@ -122,7 +122,7 @@ const rules = reactive({
   expression: [
     {
       required: true,
-      message: t('views.applicationWorkflow.nodes.variableSplittingNode.expression.placeholder'),
+      message: t('views.workflow.nodes.variableSplittingNode.expression.placeholder'),
       trigger: 'blur',
     },
   ],

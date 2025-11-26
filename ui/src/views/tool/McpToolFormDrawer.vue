@@ -253,7 +253,7 @@ const submit = async (formEl: FormInstance | undefined) => {
           throw new Error('Code must be a valid JSON object')
         }
       } catch (e) {
-        MsgError(t('views.applicationWorkflow.nodes.mcpNode.mcpServerTip'))
+        MsgError(t('views.workflow.nodes.mcpNode.mcpServerTip'))
         return
       }
       loading.value = true

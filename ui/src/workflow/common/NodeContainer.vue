@@ -42,17 +42,17 @@
               </el-button>
               <template #dropdown>
                 <div style="width: 280px" class="p-12-16">
-                  <h5>{{ $t('views.applicationWorkflow.condition.title') }}</h5>
+                  <h5>{{ $t('views.workflow.condition.title') }}</h5>
                   <p class="mt-8 lighter">
-                    <span>{{ $t('views.applicationWorkflow.condition.front') }}</span>
+                    <span>{{ $t('views.workflow.condition.front') }}</span>
                     <el-select v-model="condition" size="small" style="width: 60px; margin: 0 8px">
                       <el-option
-                        :label="$t('views.applicationWorkflow.condition.AND')"
+                        :label="$t('views.workflow.condition.AND')"
                         value="AND"
                       />
-                      <el-option :label="$t('views.applicationWorkflow.condition.OR')" value="OR" />
+                      <el-option :label="$t('views.workflow.condition.OR')" value="OR" />
                     </el-select>
-                    <span>{{ $t('views.applicationWorkflow.condition.text') }}</span>
+                    <span>{{ $t('views.workflow.condition.text') }}</span>
                   </p>
                 </div>
               </template>
@@ -84,8 +84,8 @@
               class="mb-16"
               :title="
                 props.nodeModel.type === 'application-node'
-                  ? $t('views.applicationWorkflow.tip.applicationNodeError')
-                  : $t('views.applicationWorkflow.tip.toolNodeError')
+                  ? $t('views.workflow.tip.applicationNodeError')
+                  : $t('views.workflow.tip.toolNodeError')
               "
               type="error"
               show-icon
@@ -105,7 +105,7 @@
                   <span class="break-all">{{ item.label }} {{ '{' + item.value + '}' }}</span>
                   <el-tooltip
                     effect="dark"
-                    :content="$t('views.applicationWorkflow.setting.copyParam')"
+                    :content="$t('views.workflow.setting.copyParam')"
                     placement="top"
                     v-if="showicon === index"
                   >
@@ -136,7 +136,7 @@
     </el-collapse-transition>
 
     <el-dialog
-      :title="$t('views.applicationWorkflow.nodeName')"
+      :title="$t('views.workflow.nodeName')"
       v-model="nodeNameDialogVisible"
       :close-on-click-modal="false"
       :close-on-press-escape="false"
@@ -261,7 +261,7 @@ const editName = async (formEl: FormInstance | undefined) => {
         nodeNameDialogVisible.value = false
         formEl.resetFields()
       } else {
-        MsgError(t('views.applicationWorkflow.tip.repeatedNodeError'))
+        MsgError(t('views.workflow.tip.repeatedNodeError'))
       }
     }
   })
@@ -284,7 +284,7 @@ const copyNode = () => {
   props.nodeModel.graphModel.toFront(cloneNode.id)
 }
 const deleteNode = () => {
-  MsgConfirm(t('common.tip'), t('views.applicationWorkflow.delete.confirmTitle'), {
+  MsgConfirm(t('common.tip'), t('views.workflow.delete.confirmTitle'), {
     confirmButtonText: t('common.confirm'),
     confirmButtonClass: 'danger',
   }).then(() => {

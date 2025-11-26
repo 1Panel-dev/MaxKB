@@ -31,7 +31,7 @@
               ref="nodeCascaderRef"
               :nodeModel="nodeModel"
               class="w-full"
-              :placeholder="$t('views.applicationWorkflow.variable.placeholder')"
+              :placeholder="$t('views.workflow.variable.placeholder')"
               v-model="item.fields"
               :global="true"
               @change="variableChange(item)"
@@ -39,12 +39,12 @@
           </el-form-item>
           <div class="flex-between mb-8">
             <span class="lighter"
-              >{{ $t('views.applicationWorkflow.nodes.variableAssignNode.assign')
+              >{{ $t('views.workflow.nodes.variableAssignNode.assign')
               }}<span class="color-danger">*</span></span
             >
             <el-select :teleported="false" v-model="item.source" size="small" style="width: 85px">
               <el-option
-                :label="$t('views.applicationWorkflow.variable.Referencing')"
+                :label="$t('views.workflow.variable.Referencing')"
                 value="referencing"
               />
               <el-option :label="$t('common.custom')" value="custom" />
@@ -150,7 +150,7 @@
               ref="nodeCascaderRef2"
               :nodeModel="nodeModel"
               class="w-full"
-              :placeholder="$t('views.applicationWorkflow.variable.placeholder')"
+              :placeholder="$t('views.workflow.variable.placeholder')"
               v-model="item.reference"
             />
           </el-form-item>

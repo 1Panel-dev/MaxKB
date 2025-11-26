@@ -1,7 +1,7 @@
 <template>
   <div class="flex-between w-full">
     <h5 class="break-all lighter">
-      {{ $t('views.applicationWorkflow.nodes.variableSplittingNode.splitVariables') }}
+      {{ $t('views.workflow.nodes.variableSplittingNode.splitVariables') }}
       <span class="color-danger">*</span>
     </h5>
     <span class="ml-4" style="margin-top: -4px">
@@ -86,7 +86,7 @@ function deleteField(index: any) {
 function refreshFieldList(data: any, index: any) {
   for (let i = 0; i < inputFieldList.value.length; i++) {
     if (inputFieldList.value[i].field === data.field && index !== i) {
-      MsgError(t('views.applicationWorkflow.tip.paramErrorMessage') + data.field)
+      MsgError(t('views.workflow.tip.paramErrorMessage') + data.field)
       return
     }
   }

@@ -1,6 +1,6 @@
 <template>
   <NodeContainer :nodeModel="nodeModel">
-    <h5 class="title-decoration-1 mb-8">{{ $t('views.applicationWorkflow.variable.global') }}</h5>
+    <h5 class="title-decoration-1 mb-8">{{ $t('views.workflow.variable.global') }}</h5>
     <div
       v-for="(item, index) in nodeModel.properties.config.globalFields"
       :key="index"
@@ -11,7 +11,7 @@
       <span class="break-all">{{ item.label }} {{ '{' + item.value + '}' }}</span>
       <el-tooltip
         effect="dark"
-        :content="$t('views.applicationWorkflow.setting.copyParam')"
+        :content="$t('views.workflow.setting.copyParam')"
         placement="top"
         v-if="showicon === true"
       >
@@ -21,7 +21,7 @@
       </el-tooltip>
     </div>
     <template v-if="nodeModel.properties.config.chatFields?.length">
-      <h5 class="title-decoration-1 mb-8">{{ $t('views.applicationWorkflow.variable.chat') }}</h5>
+      <h5 class="title-decoration-1 mb-8">{{ $t('views.workflow.variable.chat') }}</h5>
       <div
         v-for="(item, index) in nodeModel.properties.config.chatFields || []"
         :key="index"
@@ -32,7 +32,7 @@
         <span class="break-all">{{ item.label }} {{ '{' + item.value + '}' }}</span>
         <el-tooltip
           effect="dark"
-          :content="$t('views.applicationWorkflow.setting.copyParam')"
+          :content="$t('views.workflow.setting.copyParam')"
           placement="top"
           v-if="showicon === true"
         >
@@ -54,7 +54,7 @@ const props = defineProps<{ nodeModel: any }>()
 
 const showicon = ref(false)
 const globalFields = [
-  { label: t('views.applicationWorkflow.nodes.startNode.currentTime'), value: 'time' },
+  { label: t('views.workflow.nodes.startNode.currentTime'), value: 'time' },
   {
     label: t('views.application.form.historyRecord.label'),
     value: 'history_context',

@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="isEdit ? $t('views.applicationWorkflow.nodes.variableAggregationNode.editGroup') : $t('views.applicationWorkflow.nodes.variableAggregationNode.addGroup')"
+    :title="isEdit ? $t('views.workflow.nodes.variableAggregationNode.editGroup') : $t('views.workflow.nodes.variableAggregationNode.addGroup')"
     v-model="dialogVisible"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
@@ -22,7 +22,7 @@
         <el-input
           v-model="form.field"
           :maxlength="64"
-          :placeholder="$t('views.applicationWorkflow.variable.inputPlaceholder')"
+          :placeholder="$t('views.workflow.variable.inputPlaceholder')"
           show-word-limit
         />
       </el-form-item>
@@ -69,7 +69,7 @@ const rules = reactive({
     { required: true, message: t('dynamicsForm.paramForm.name.placeholder'), trigger: 'blur' },
   ],
   field: [
-    { required: true, message: t('views.applicationWorkflow.variable.inputPlaceholder'), trigger: 'blur' },
+    { required: true, message: t('views.workflow.variable.inputPlaceholder'), trigger: 'blur' },
     {
       pattern: /^[a-zA-Z0-9_]+$/,
       message: t('dynamicsForm.paramForm.field.requiredMessage2'),

@@ -1,6 +1,6 @@
 <template>
   <NodeContainer :node-model="nodeModel">
-    <h5 class="title-decoration-1 mb-8">{{ $t('views.applicationWorkflow.nodeSetting') }}</h5>
+    <h5 class="title-decoration-1 mb-8">{{ $t('views.workflow.nodeSetting') }}</h5>
     <el-card shadow="never" class="card-never">
       <el-form
         @submit.prevent
@@ -12,7 +12,7 @@
         hide-required-asterisk
       >
         <el-form-item
-          :label="$t('views.applicationWorkflow.nodes.textToSpeechNode.tts_model.label')"
+          :label="$t('views.workflow.nodes.textToSpeechNode.tts_model.label')"
           prop="tts_model_id"
           :rules="{
             required: true,
@@ -24,7 +24,7 @@
             <div class="flex-between w-full">
               <div>
                 <span
-                  >{{ $t('views.applicationWorkflow.nodes.textToSpeechNode.tts_model.label')
+                  >{{ $t('views.workflow.nodes.textToSpeechNode.tts_model.label')
                   }}<span class="color-danger">*</span></span
                 >
               </div>
@@ -51,9 +51,9 @@
         </el-form-item>
         <el-form-item
           prop="content_list"
-          :label="$t('views.applicationWorkflow.nodes.textToSpeechNode.content.label')"
+          :label="$t('views.workflow.nodes.textToSpeechNode.content.label')"
           :rules="{
-            message: $t('views.applicationWorkflow.nodes.textToSpeechNode.content.label'),
+            message: $t('views.workflow.nodes.textToSpeechNode.content.label'),
             trigger: 'blur',
             required: true,
           }"
@@ -62,7 +62,7 @@
             <div class="flex-between w-full">
               <div>
                 <span
-                  >{{ $t('views.applicationWorkflow.nodes.textToSpeechNode.content.label')
+                  >{{ $t('views.workflow.nodes.textToSpeechNode.content.label')
                   }}<span class="color-danger">*</span></span
                 >
               </div>
@@ -72,25 +72,25 @@
             ref="nodeCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
-            :placeholder="$t('views.applicationWorkflow.nodes.textToSpeechNode.content.label')"
+            :placeholder="$t('views.workflow.nodes.textToSpeechNode.content.label')"
             v-model="form_data.content_list"
           />
         </el-form-item>
 
         <el-form-item
-          :label="$t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')"
+          :label="$t('views.workflow.nodes.aiChatNode.returnContent.label')"
           @click.prevent
         >
           <template #label>
             <div class="flex align-center">
               <div class="mr-4">
                 <span>{{
-                  $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')
+                  $t('views.workflow.nodes.aiChatNode.returnContent.label')
                 }}</span>
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content>
-                  {{ $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.tooltip') }}
+                  {{ $t('views.workflow.nodes.aiChatNode.returnContent.tooltip') }}
                 </template>
                 <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
               </el-tooltip>

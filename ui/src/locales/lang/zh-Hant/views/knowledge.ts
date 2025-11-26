@@ -3,12 +3,6 @@ export default {
   relatedApplications: '關聯應用',
   document_count: '文檔數',
   relatedApp_count: '關聯應用',
-  searchBar: {
-    placeholder: '按名稱搜尋',
-  },
-  operation: {
-    publish: '發佈',
-  },
   setting: {
     vectorization: '向量化',
     sync: '同步',

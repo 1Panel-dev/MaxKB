@@ -4,9 +4,6 @@ export default {
   createSuccess: '創建成功',
   copy: '複製',
   copySuccess: '複製成功',
-  publishStatus: '發佈狀態',
-  published: '已發佈',
-  unpublished: '未發佈',
   copyError: '複製失敗',
   save: '儲存',
   saveSuccess: '儲存成功',
@@ -71,6 +68,8 @@ export default {
     disabled: '已停用',
     enableSuccess: '啟用成功',
     disableSuccess: '停用成功',
+    published: '已發佈',
+    unpublished: '未發佈',
   },
   param: {
     outputParam: '輸出參數',

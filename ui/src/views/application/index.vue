@@ -29,7 +29,7 @@
 
               <el-option :label="$t('common.name')" value="name" />
 
-              <el-option :label="$t('common.publishStatus')" value="publish_status" />
+              <el-option :label="$t('views.application.publishStatus')" value="publish_status" />
             </el-select>
             <el-input
               v-if="search_type === 'name'"
@@ -57,8 +57,8 @@
               clearable
               style="width: 220px"
             >
-              <el-option :label="$t('common.published')" value="published" />
-              <el-option :label="$t('common.unpublished')" value="unpublished" />
+              <el-option :label="$t('common.status.published')" value="published" />
+              <el-option :label="$t('common.status.unpublished')" value="unpublished" />
             </el-select>
           </div>
           <el-dropdown trigger="click" v-if="permissionPrecise.create()">
@@ -216,7 +216,7 @@
                         <SuccessFilled />
                       </el-icon>
                       <span class="color-secondary">
-                        {{ $t('views.application.status.published') }}
+                        {{ $t('common.status.published') }}
                       </span>
                       <el-divider direction="vertical" />
                       <AppIcon iconName="app-clock" class="color-secondary mr-8"></AppIcon>
@@ -226,7 +226,7 @@
                     <div v-else class="flex align-center">
                       <AppIcon iconName="app-disabled" class="color-secondary mr-8"></AppIcon>
                       <span class="color-secondary">
-                        {{ $t('views.application.status.unpublished') }}
+                        {{ $t('common.status.unpublished') }}
                       </span>
                     </div>
                   </template>

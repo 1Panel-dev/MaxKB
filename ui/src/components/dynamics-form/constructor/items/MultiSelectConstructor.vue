@@ -47,7 +47,7 @@
       ref="nodeCascaderRef"
       :nodeModel="model"
       class="w-full"
-      :placeholder="$t('views.applicationWorkflow.variable.placeholder')"
+      :placeholder="$t('views.workflow.variable.placeholder')"
       v-model="formValue.option_list"
     />
   </el-form-item>
@@ -159,7 +159,7 @@ const assignment_method_option_list = computed(() => {
   ]
   if (getModel) {
     option_list.push({
-      label: t('views.applicationWorkflow.variable.Referencing'),
+      label: t('views.workflow.variable.Referencing'),
       value: 'ref_variables',
     })
   }
@@ -192,7 +192,7 @@ const default_ref_variables_value_rule = {
     console.log(value.length)
     if (!(Array.isArray(value) && value.length > 1)) {
       callback(
-        t('views.applicationWorkflow.variable.Referencing') + t('common.required'),
+        t('views.workflow.variable.Referencing') + t('common.required'),
       )
     }
 

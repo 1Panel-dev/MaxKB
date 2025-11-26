@@ -229,7 +229,7 @@
             </div>
             <div class="card-never border-r-6 mt-8" v-if="data.type == WorkflowType.AiChat">
               <h5 class="p-8-12">
-                {{ $t('views.applicationWorkflow.nodes.aiChatNode.think') }}
+                {{ $t('views.workflow.nodes.aiChatNode.think') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter pre-wrap">
                 {{ data.reasoning_content || '-' }}
@@ -671,7 +671,7 @@
             </div>
             <div class="card-never border-r-6 mt-8">
               <h5 class="p-8-12">
-                {{ $t('views.applicationWorkflow.nodes.imageGenerateNode.negative_prompt.label') }}
+                {{ $t('views.workflow.nodes.imageGenerateNode.negative_prompt.label') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter pre-wrap">
                 {{ data.negative_prompt || '-' }}
@@ -709,7 +709,7 @@
             </div>
             <div class="card-never border-r-6 mt-8">
               <h5 class="p-8-12">
-                {{ $t('views.applicationWorkflow.nodes.imageGenerateNode.negative_prompt.label') }}
+                {{ $t('views.workflow.nodes.imageGenerateNode.negative_prompt.label') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter pre-wrap">
                 {{ data.negative_prompt || '-' }}
@@ -748,7 +748,7 @@
             </div>
             <div class="card-never border-r-6 mt-8">
               <h5 class="p-8-12">
-                {{ $t('views.applicationWorkflow.nodes.imageGenerateNode.negative_prompt.label') }}
+                {{ $t('views.workflow.nodes.imageGenerateNode.negative_prompt.label') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter pre-wrap">
                 {{ data.negative_prompt || '-' }}
@@ -756,7 +756,7 @@
             </div>
             <div class="card-never border-r-6 mt-8">
               <h5 class="p-8-12">
-                {{ $t('views.applicationWorkflow.nodes.imageToVideoGenerate.first_frame.label') }}
+                {{ $t('views.workflow.nodes.imageToVideoGenerate.first_frame.label') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter pre-wrap">
                 <div v-if="typeof data.first_frame_url === 'string'">
@@ -785,7 +785,7 @@
             </div>
             <div class="card-never border-r-6 mt-8">
               <h5 class="p-8-12">
-                {{ $t('views.applicationWorkflow.nodes.imageToVideoGenerate.last_frame.label') }}
+                {{ $t('views.workflow.nodes.imageToVideoGenerate.last_frame.label') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter pre-wrap">
                 <div v-if="typeof data.last_frame_url === 'string'">
@@ -889,7 +889,7 @@
           <template v-if="data.type === WorkflowType.VariableAggregationNode">
             <div class="card-never border-r-6">
               <h5 class="p-8-12">
-                {{ $t('views.applicationWorkflow.nodes.variableAggregationNode.Strategy') }}
+                {{ $t('views.workflow.nodes.variableAggregationNode.Strategy') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter pre-wrap">
                 {{ data.strategy }}
@@ -936,7 +936,7 @@
             </div>
             <div class="card-never border-r-6">
               <h5 class="p-8-12">
-                {{ $t('views.applicationWorkflow.nodes.mcpNode.toolParam') }}
+                {{ $t('views.workflow.nodes.mcpNode.toolParam') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter">
                 <div v-for="(value, name) in data.tool_params" :key="name" class="mb-8">
@@ -958,19 +958,19 @@
           <!-- 循环 节点 -->
           <div class="card-never border-r-6" v-if="data.type === WorkflowType.LoopNode">
             <h5 class="p-8-12">
-              {{ $t('views.applicationWorkflow.nodes.loopNode.loopSetting') }}
+              {{ $t('views.workflow.nodes.loopNode.loopSetting') }}
             </h5>
 
             <div class="p-8-12 border-t-dashed lighter">
               <div class="mb-8">
                 <span class="color-secondary">
-                  {{ $t('views.applicationWorkflow.nodes.loopNode.loopType.label') }}:</span
+                  {{ $t('views.workflow.nodes.loopNode.loopType.label') }}:</span
                 >
                 {{ data.loop_type || '-' }}
               </div>
               <div>
                 <span class="color-secondary">
-                  {{ $t('views.applicationWorkflow.nodes.loopNode.loopArray.label') }}:</span
+                  {{ $t('views.workflow.nodes.loopNode.loopArray.label') }}:</span
                 >
                 {{
                   data.loop_type === 'NUMBER'
@@ -980,7 +980,7 @@
               </div>
             </div>
             <h5 class="p-8-12">
-              {{ $t('views.applicationWorkflow.nodes.loopNode.loopDetail') }}
+              {{ $t('views.workflow.nodes.loopNode.loopDetail') }}
             </h5>
             <div class="p-8-12 border-t-dashed lighter">
               <template v-if="data.type === WorkflowType.LoopNode">
@@ -1010,14 +1010,14 @@
               <div class="p-8-12 border-t-dashed lighter">
                 <div class="mb-8">
                   <span class="color-secondary">
-                    {{ $t('views.applicationWorkflow.nodes.loopStartNode.loopItem') }}:</span
+                    {{ $t('views.workflow.nodes.loopStartNode.loopItem') }}:</span
                   >
 
                   {{ data.current_item }}
                 </div>
                 <div class="mb-8">
                   <span class="color-secondary">
-                    {{ $t('views.applicationWorkflow.nodes.loopStartNode.loopIndex') }}:</span
+                    {{ $t('views.workflow.nodes.loopStartNode.loopIndex') }}:</span
                   >
 
                   {{ data.current_index }}
@@ -1035,7 +1035,7 @@
               <div class="p-8-12 border-t-dashed lighter">
                 <div class="mb-8">
                   <span class="color-secondary">
-                    {{ $t('views.applicationWorkflow.nodes.loopContinueNode.isContinue') }}:</span
+                    {{ $t('views.workflow.nodes.loopContinueNode.isContinue') }}:</span
                   >
 
                   {{ data.is_continue }}
@@ -1053,7 +1053,7 @@
               <div class="p-8-12 border-t-dashed lighter">
                 <div class="mb-8">
                   <span class="color-secondary">
-                    {{ $t('views.applicationWorkflow.nodes.loopBreakNode.isBreak') }}:</span
+                    {{ $t('views.workflow.nodes.loopBreakNode.isBreak') }}:</span
                   >
 
                   {{ data.is_break }}

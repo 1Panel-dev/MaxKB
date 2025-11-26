@@ -10,13 +10,12 @@ import workspace from './workspace'
 import application from './application'
 import problem from './problem'
 import applicationOverview from './application-overview'
-import applicationWorkflow from './application-workflow'
+import workflow from './workflow'
 import paragraph from './paragraph'
 import chatLog from './chat-log'
 import chatUser from './chat-user'
 import operateLog from './operate-log'
 import shared from './shared'
-import knowledgeWorkflow from './knowledge-workflow'
 export default {
   login,
   model,
@@ -30,11 +29,10 @@ export default {
   application,
   problem,
   applicationOverview,
-  applicationWorkflow,
+  workflow,
   paragraph,
   chatLog,
   chatUser,
   operateLog,
   shared,
-  knowledgeWorkflow,
 }

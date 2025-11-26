@@ -1,7 +1,7 @@
 <template>
   <div class="reasoning">
     <el-button text @click="showThink = !showThink" class="reasoning-button">
-      {{ $t('views.applicationWorkflow.nodes.aiChatNode.think') }}
+      {{ $t('views.workflow.nodes.aiChatNode.think') }}
       <el-icon class="ml-4" :class="showThink ? 'rotate-180' : ''"><ArrowDownBold /> </el-icon>
     </el-button>
     <el-collapse-transition>

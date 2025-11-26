@@ -1,6 +1,6 @@
 <template>
   <NodeContainer :node-model="nodeModel">
-    <h5 class="title-decoration-1 mb-8">{{ $t('views.applicationWorkflow.nodeSetting') }}</h5>
+    <h5 class="title-decoration-1 mb-8">{{ $t('views.workflow.nodeSetting') }}</h5>
     <el-card shadow="never" class="card-never">
       <el-form
         @submit.prevent
@@ -12,12 +12,12 @@
         hide-required-asterisk
       >
         <el-form-item
-          :label="$t('views.applicationWorkflow.nodes.videoUnderstandNode.model.label')"
+          :label="$t('views.workflow.nodes.videoUnderstandNode.model.label')"
           prop="model_id"
           :rules="{
             required: true,
             message: $t(
-              'views.applicationWorkflow.nodes.videoUnderstandNode.model.requiredMessage',
+              'views.workflow.nodes.videoUnderstandNode.model.requiredMessage',
             ),
             trigger: 'change',
           }"
@@ -26,7 +26,7 @@
             <div class="flex-between w-full">
               <div>
                 <span
-                  >{{ t('views.applicationWorkflow.nodes.videoUnderstandNode.model.label')
+                  >{{ t('views.workflow.nodes.videoUnderstandNode.model.label')
                   }}<span class="color-danger">*</span></span
                 >
               </div>
@@ -47,7 +47,7 @@
             :teleported="false"
             v-model="form_data.model_id"
             :placeholder="
-              $t('views.applicationWorkflow.nodes.videoUnderstandNode.model.requiredMessage')
+              $t('views.workflow.nodes.videoUnderstandNode.model.requiredMessage')
             "
             :options="modelOptions"
             showFooter
@@ -83,7 +83,7 @@
             v-model="form_data.system"
             style="height: 100px"
             @submitDialog="submitSystemDialog"
-            :placeholder="`${t('views.applicationWorkflow.SystemPromptPlaceholder')}{{${t('views.applicationWorkflow.nodes.startNode.label')}.question}}`"
+            :placeholder="`${t('views.workflow.SystemPromptPlaceholder')}{{${t('views.workflow.nodes.startNode.label')}.question}}`"
           />
         </el-form-item>
         <el-form-item
@@ -115,7 +115,7 @@
             v-model="form_data.prompt"
             style="height: 150px"
             @submitDialog="submitDialog"
-            :placeholder="`${t('views.applicationWorkflow.UserPromptPlaceholder')}{{${t('views.applicationWorkflow.nodes.startNode.label')}.question}}`"
+            :placeholder="`${t('views.workflow.UserPromptPlaceholder')}{{${t('views.workflow.nodes.startNode.label')}.question}}`"
           />
         </el-form-item>
         <el-form-item>
@@ -123,8 +123,8 @@
             <div class="flex-between">
               <div>{{ $t('views.application.form.historyRecord.label') }}</div>
               <el-select v-model="form_data.dialogue_type" type="small" style="width: 100px">
-                <el-option :label="$t('views.applicationWorkflow.node')" value="NODE" />
-                <el-option :label="$t('views.applicationWorkflow.workflow')" value="WORKFLOW" />
+                <el-option :label="$t('views.workflow.node')" value="NODE" />
+                <el-option :label="$t('views.workflow.workflow')" value="WORKFLOW" />
               </el-select>
             </div>
           </template>
@@ -139,18 +139,18 @@
           />
         </el-form-item>
         <el-form-item
-          :label="$t('views.applicationWorkflow.nodes.videoUnderstandNode.image.label')"
+          :label="$t('views.workflow.nodes.videoUnderstandNode.image.label')"
           :rules="{
             type: 'array',
             required: true,
             message: $t(
-              'views.applicationWorkflow.nodes.videoUnderstandNode.image.requiredMessage',
+              'views.workflow.nodes.videoUnderstandNode.image.requiredMessage',
             ),
             trigger: 'change',
           }"
         >
           <template #label
-            >{{ $t('views.applicationWorkflow.nodes.videoUnderstandNode.image.label')
+            >{{ $t('views.workflow.nodes.videoUnderstandNode.image.label')
             }}<span class="color-danger">*</span></template
           >
           <NodeCascader
@@ -158,25 +158,25 @@
             :nodeModel="nodeModel"
             class="w-full"
             :placeholder="
-              $t('views.applicationWorkflow.nodes.videoUnderstandNode.image.requiredMessage')
+              $t('views.workflow.nodes.videoUnderstandNode.image.requiredMessage')
             "
             v-model="form_data.video_list"
           />
         </el-form-item>
         <el-form-item
-          :label="$t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')"
+          :label="$t('views.workflow.nodes.aiChatNode.returnContent.label')"
           @click.prevent
         >
           <template #label>
             <div class="flex align-center">
               <div class="mr-4">
                 <span>{{
-                  $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')
+                  $t('views.workflow.nodes.aiChatNode.returnContent.label')
                 }}</span>
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content>
-                  {{ $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.tooltip') }}
+                  {{ $t('views.workflow.nodes.aiChatNode.returnContent.tooltip') }}
                 </template>
                 <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
               </el-tooltip>
@@ -243,7 +243,7 @@ const wheel = (e: any) => {
   }
 }
 
-const defaultPrompt = `{{${t('views.applicationWorkflow.nodes.startNode.label')}.question}}`
+const defaultPrompt = `{{${t('views.workflow.nodes.startNode.label')}.question}}`
 
 const form = {
   model_id: '',

@@ -1,6 +1,6 @@
 <template>
   <NodeContainer :nodeModel="nodeModel">
-    <h5 class="title-decoration-1 mb-8">{{ $t('views.applicationWorkflow.nodeSetting') }}</h5>
+    <h5 class="title-decoration-1 mb-8">{{ $t('views.workflow.nodeSetting') }}</h5>
     <el-form
       @submit.prevent
       :model="form_data"
@@ -11,7 +11,7 @@
       hide-required-asterisk
     >
       <el-form-item
-        :label="$t('views.applicationWorkflow.nodes.variableAggregationNode.Strategy')"
+        :label="$t('views.workflow.nodes.variableAggregationNode.Strategy')"
         :rules="{
           required: true,
           trigger: 'change',
@@ -21,7 +21,7 @@
           <div class="flex-between">
             <div>
               <span
-                >{{ $t('views.applicationWorkflow.nodes.variableAggregationNode.Strategy') }}
+                >{{ $t('views.workflow.nodes.variableAggregationNode.Strategy') }}
                 <span class="color-danger">*</span>
               </span>
             </div>
@@ -29,11 +29,11 @@
         </template>
         <el-select v-model="form_data.strategy">
           <el-option
-            :label="t('views.applicationWorkflow.nodes.variableAggregationNode.placeholder')"
+            :label="t('views.workflow.nodes.variableAggregationNode.placeholder')"
             value="first_non_null"
           />
           <el-option
-            :label="t('views.applicationWorkflow.nodes.variableAggregationNode.placeholder1')"
+            :label="t('views.workflow.nodes.variableAggregationNode.placeholder1')"
             value="variable_to_json"
           />
         </el-select>
@@ -73,7 +73,7 @@
                     :rules="{
                       type: 'array',
                       required: true,
-                      message: $t('views.applicationWorkflow.variable.placeholder'),
+                      message: $t('views.workflow.variable.placeholder'),
                       trigger: 'change',
                     }"
                   >
@@ -81,7 +81,7 @@
                       ref="nodeCascaderRef"
                       :nodeModel="nodeModel"
                       style="width: 200px"
-                      :placeholder="$t('views.applicationWorkflow.variable.placeholder')"
+                      :placeholder="$t('views.workflow.variable.placeholder')"
                       v-model="item.variable"
                     />
                   </el-form-item>
@@ -107,7 +107,7 @@
       </div>
       <el-button @click="openAddOrEditDialog()" type="primary" size="large" link>
         <AppIcon iconName="app-add-outlined" class="mr-4" />
-        {{ $t('views.applicationWorkflow.nodes.variableAggregationNode.addGroup') }}
+        {{ $t('views.workflow.nodes.variableAggregationNode.addGroup') }}
       </el-button>
     </el-form>
     <GroupFieldDialog ref="GroupFieldDialogRef" @refresh="refreshFieldList"></GroupFieldDialog>
@@ -176,7 +176,7 @@ function openAddOrEditDialog(group?: any, index?: any) {
 function refreshFieldList(data: any, index: any) {
   for (let i = 0; i < inputFieldList.value.length; i++) {
     if (inputFieldList.value[i].field === data.field && index !== i) {
-      MsgError(t('views.applicationWorkflow.tip.paramErrorMessage') + data.field)
+      MsgError(t('views.workflow.tip.paramErrorMessage') + data.field)
       return
     }
   }

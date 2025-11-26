@@ -1,6 +1,6 @@
 <template>
   <NodeContainer :nodeModel="nodeModel">
-    <h5 class="title-decoration-1 mb-8">{{ $t('views.applicationWorkflow.nodeSetting') }}</h5>
+    <h5 class="title-decoration-1 mb-8">{{ $t('views.workflow.nodeSetting') }}</h5>
     <el-card shadow="never" class="card-never" style="--el-card-padding: 12px">
       <el-form
         @submit.prevent
@@ -12,11 +12,11 @@
         hide-required-asterisk
       >
         <el-form-item
-          :label="$t('views.applicationWorkflow.nodes.formNode.formContent.label')"
+          :label="$t('views.workflow.nodes.formNode.formContent.label')"
           prop="form_content_format"
           :rules="{
             required: true,
-            message: $t('views.applicationWorkflow.nodes.formNode.formContent.requiredMessage'),
+            message: $t('views.workflow.nodes.formNode.formContent.requiredMessage'),
             trigger: 'blur',
           }"
         >
@@ -24,14 +24,14 @@
             <div class="flex align-center">
               <div class="mr-4">
                 <span
-                  >{{ $t('views.applicationWorkflow.nodes.formNode.formContent.label')
+                  >{{ $t('views.workflow.nodes.formNode.formContent.label')
                   }}<span class="color-danger">*</span></span
                 >
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content>
                   {{
-                    $t('views.applicationWorkflow.nodes.formNode.formContent.tooltip', {
+                    $t('views.workflow.nodes.formNode.formContent.tooltip', {
                       form: '{ form }',
                     })
                   }}
@@ -41,20 +41,20 @@
             </div>
           </template>
           <MdEditorMagnify
-            :title="$t('views.applicationWorkflow.nodes.formNode.formContent.label')"
+            :title="$t('views.workflow.nodes.formNode.formContent.label')"
             v-model="form_data.form_content_format"
             style="height: 150px"
             @submitDialog="submitDialog"
           />
         </el-form-item>
         <el-form-item
-          :label="$t('views.applicationWorkflow.nodes.formNode.formSetting')"
+          :label="$t('views.workflow.nodes.formNode.formSetting')"
           @click.prevent
         >
           <template #label>
             <div class="flex-between">
               <h5 class="lighter">
-                {{ $t('views.applicationWorkflow.nodes.formNode.formSetting') }}
+                {{ $t('views.workflow.nodes.formNode.formSetting') }}
               </h5>
               <el-button link type="primary" @click="openAddFormCollect()">
                 <AppIcon iconName="app-add-outlined" class="mr-4"></AppIcon>
@@ -167,7 +167,7 @@ const editFormField = (form_field_data: any, field_index: number) => {
 }
 const addFormField = (form_field_data: any) => {
   if (form_data.value.form_field_list.some((field: any) => field.field === form_field_data.field)) {
-    MsgError(t('views.applicationWorkflow.tip.paramErrorMessage') + form_field_data.field)
+    MsgError(t('views.workflow.tip.paramErrorMessage') + form_field_data.field)
     return
   }
   form_data.value.form_field_list = cloneDeep([...form_data.value.form_field_list, form_field_data])
@@ -176,7 +176,7 @@ const addFormField = (form_field_data: any) => {
 const sync_form_field_list = () => {
   const fields = [
     {
-      label: t('views.applicationWorkflow.nodes.formNode.formAllContent'),
+      label: t('views.workflow.nodes.formNode.formAllContent'),
       value: 'form_data',
     },
     ...form_data.value.form_field_list.map((item: any) => ({
@@ -204,9 +204,9 @@ const deleteField = (form_field_data: any) => {
 }
 const form = ref<any>({
   is_result: true,
-  form_content_format: `${t('views.applicationWorkflow.nodes.formNode.form_content_format1')}
+  form_content_format: `${t('views.workflow.nodes.formNode.form_content_format1')}
 {{form}}
-${t('views.applicationWorkflow.nodes.formNode.form_content_format2')}`,
+${t('views.workflow.nodes.formNode.form_content_format2')}`,
   form_field_list: [],
 })
 const form_data = computed({

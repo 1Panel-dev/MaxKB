@@ -4,9 +4,6 @@ export default {
   createSuccess: '创建成功',
   copy: '复制',
   copySuccess: '复制成功',
-  publishStatus: '发布状态',
-  published: '已发布',
-  unpublished: '未发布',
   copyError: '复制失败',
   save: '保存',
   saveSuccess: '保存成功',
@@ -51,6 +48,7 @@ export default {
   classify: '分类',
   reason: '理由',
   removeSuccess: '移除成功',
+  publish: '发布',
   searchBar: {
     placeholder: '按名称搜索',
   },
@@ -72,6 +70,8 @@ export default {
     disabled: '已禁用',
     enableSuccess: '启用成功',
     disableSuccess: '禁用成功',
+    published: '已发布',
+    unpublished: '未发布',
   },
   param: {
     outputParam: '输出参数',

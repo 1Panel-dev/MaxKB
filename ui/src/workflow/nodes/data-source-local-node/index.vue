@@ -1,6 +1,6 @@
 <template>
   <NodeContainer :nodeModel="nodeModel">
-    <h5 class="title-decoration-1 mb-8">{{ $t('views.applicationWorkflow.nodeSetting') }}</h5>
+    <h5 class="title-decoration-1 mb-8">{{ $t('views.workflow.nodeSetting') }}</h5>
     <el-card shadow="never" class="card-never">
       <el-form
         @submit.prevent
@@ -12,7 +12,7 @@
         <el-form-item
           :label="
             $t(
-              'views.applicationWorkflow.nodes.dataSourceLocalNode.fileFormat.label',
+              'views.workflow.nodes.dataSourceLocalNode.fileFormat.label',
               '支持的文件格式',
             )
           "
@@ -20,7 +20,7 @@
             type: 'array',
             required: true,
             message: $t(
-              'views.applicationWorkflow.nodes.dataSourceLocalNode.fileFormat.message',
+              'views.workflow.nodes.dataSourceLocalNode.fileFormat.message',
               '请选择文件格式',
             ),
             trigger: 'change',
@@ -30,7 +30,7 @@
             v-model="form_data.file_type_list"
             :placeholder="
               $t(
-                'views.applicationWorkflow.nodes.dataSourceLocalNode.fileFormat.placeholder',
+                'views.workflow.nodes.dataSourceLocalNode.fileFormat.placeholder',
                 '请选择文件格式',
               )
             "
@@ -52,7 +52,7 @@
         <el-form-item
           :label="
             $t(
-              'views.applicationWorkflow.nodes.dataSourceLocalNode.maxFileNumber.label',
+              'views.workflow.nodes.dataSourceLocalNode.maxFileNumber.label',
               '每次上传最大文件数',
             )
           "
@@ -60,7 +60,7 @@
             type: 'array',
             required: true,
             message: $t(
-              'views.applicationWorkflow.nodes.dataSourceLocalNode.maxFileNumber.placeholder',
+              'views.workflow.nodes.dataSourceLocalNode.maxFileNumber.placeholder',
               '请输入最大文件数',
             ),
             trigger: 'change',
@@ -71,7 +71,7 @@
         <el-form-item
           :label="
             $t(
-              'views.applicationWorkflow.nodes.dataSourceLocalNode.maxFileNumber.label',
+              'views.workflow.nodes.dataSourceLocalNode.maxFileNumber.label',
               '上传的每个文档最大(MB)',
             )
           "
@@ -79,7 +79,7 @@
             type: 'array',
             required: true,
             message: $t(
-              'views.applicationWorkflow.nodes.dataSourceLocalNode.maxFileNumber.placeholder',
+              'views.workflow.nodes.dataSourceLocalNode.maxFileNumber.placeholder',
               '上传的每个文档最大(MB) 必填',
             ),
             trigger: 'change',

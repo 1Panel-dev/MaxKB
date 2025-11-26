@@ -16,11 +16,11 @@
             <template #label>
               <div class="flex align-center">
                 <span class="mr-4"
-                  >Score {{ $t('views.applicationWorkflow.nodes.rerankerNode.higher') }}</span
+                  >Score {{ $t('views.workflow.nodes.rerankerNode.higher') }}</span
                 >
                 <el-tooltip
                   effect="dark"
-                  :content="$t('views.applicationWorkflow.nodes.rerankerNode.ScoreTooltip')"
+                  :content="$t('views.workflow.nodes.rerankerNode.ScoreTooltip')"
                   placement="right"
                 >
                   <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>

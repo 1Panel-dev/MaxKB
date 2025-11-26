@@ -34,7 +34,7 @@
               </span>
               <div class="info" v-if="item.conditions.length > 1">
                 <span>{{
-                  $t('views.applicationWorkflow.nodes.conditionNode.conditions.info')
+                  $t('views.workflow.nodes.conditionNode.conditions.info')
                 }}</span>
                 <el-select
                   :teleported="false"
@@ -42,11 +42,11 @@
                   size="small"
                   style="width: 60px; margin: 0 8px"
                 >
-                  <el-option :label="$t('views.applicationWorkflow.condition.AND')" value="and" />
-                  <el-option :label="$t('views.applicationWorkflow.condition.OR')" value="or" />
+                  <el-option :label="$t('views.workflow.condition.AND')" value="and" />
+                  <el-option :label="$t('views.workflow.condition.OR')" value="or" />
                 </el-select>
                 <span>{{
-                  $t('views.applicationWorkflow.nodes.conditionNode.conditions.label')
+                  $t('views.workflow.nodes.conditionNode.conditions.label')
                 }}</span>
               </div>
             </div>
@@ -59,7 +59,7 @@
                       :rules="{
                         type: 'array',
                         required: true,
-                        message: $t('views.applicationWorkflow.variable.placeholder'),
+                        message: $t('views.workflow.variable.placeholder'),
                         trigger: 'change',
                       }"
                     >
@@ -67,7 +67,7 @@
                         ref="nodeCascaderRef"
                         :nodeModel="nodeModel"
                         class="w-full"
-                        :placeholder="$t('views.applicationWorkflow.variable.placeholder')"
+                        :placeholder="$t('views.workflow.variable.placeholder')"
                         v-model="condition.field"
                       />
                     </el-form-item>
@@ -78,7 +78,7 @@
                       :rules="{
                         required: true,
                         message: $t(
-                          'views.applicationWorkflow.nodes.conditionNode.conditions.requiredMessage',
+                          'views.workflow.nodes.conditionNode.conditions.requiredMessage',
                         ),
                         trigger: 'change',
                       }"
@@ -89,7 +89,7 @@
                         v-model="condition.compare"
                         :placeholder="
                           $t(
-                            'views.applicationWorkflow.nodes.conditionNode.conditions.requiredMessage',
+                            'views.workflow.nodes.conditionNode.conditions.requiredMessage',
                           )
                         "
                         clearable
@@ -111,14 +111,14 @@
                       :prop="'branch.' + index + '.conditions.' + cIndex + '.value'"
                       :rules="{
                         required: true,
-                        message: $t('views.applicationWorkflow.nodes.conditionNode.valueMessage'),
+                        message: $t('views.workflow.nodes.conditionNode.valueMessage'),
                         trigger: 'blur',
                       }"
                     >
                       <el-input
                         v-model="condition.value"
                         :placeholder="
-                          $t('views.applicationWorkflow.nodes.conditionNode.valueMessage')
+                          $t('views.workflow.nodes.conditionNode.valueMessage')
                         "
                       />
                     </el-form-item>
@@ -145,14 +145,14 @@
               v-if="index !== form_data.branch.length - 1"
             >
               <AppIcon iconName="app-add-outlined" class="mr-4"></AppIcon>
-              {{ $t('views.applicationWorkflow.nodes.conditionNode.addCondition') }}
+              {{ $t('views.workflow.nodes.conditionNode.addCondition') }}
             </el-button>
           </el-card>
         </template>
       </VueDraggable>
       <el-button link type="primary" @click="addBranch">
         <AppIcon iconName="app-add-outlined" class="mr-4"></AppIcon>
-        {{ $t('views.applicationWorkflow.nodes.conditionNode.addBranch') }}
+        {{ $t('views.workflow.nodes.conditionNode.addBranch') }}
       </el-button>
     </el-form>
   </NodeContainer>

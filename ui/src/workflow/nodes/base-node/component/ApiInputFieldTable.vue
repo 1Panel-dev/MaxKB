@@ -92,7 +92,7 @@ function deleteField(index: any) {
 function refreshFieldList(data: any) {
   for (let i = 0; i < inputFieldList.value.length; i++) {
     if (inputFieldList.value[i].variable === data.variable && currentIndex.value !== i) {
-      MsgError(t('views.applicationWorkflow.tip.paramErrorMessage') + data.variable)
+      MsgError(t('views.workflow.tip.paramErrorMessage') + data.variable)
       return
     }
   }
@@ -100,7 +100,7 @@ function refreshFieldList(data: any) {
   const arr = props.nodeModel.properties.user_input_field_list
   for (let i = 0; i < arr.length; i++) {
     if (arr[i].field === data.variable) {
-      MsgError(t('views.applicationWorkflow.tip.paramErrorMessage') + data.variable)
+      MsgError(t('views.workflow.tip.paramErrorMessage') + data.variable)
       return
     }
   }
