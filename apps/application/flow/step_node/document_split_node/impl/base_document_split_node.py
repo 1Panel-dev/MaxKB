@@ -51,7 +51,7 @@ class BaseDocumentSplitNode(IDocumentSplitNode):
         for doc in file_list:
             get_buffer = FileBufferHandle().get_buffer
 
-            file_mem = bytes_to_uploaded_file(doc['content'].encode('utf-8'), doc['name'])
+            file_mem = bytes_to_uploaded_file(doc['content'].encode('utf-8'))
             result = default_split_handle.handle(file_mem, patterns, with_filter, limit, get_buffer, self._save_image)
             # 统一处理结果为列表
             results = result if isinstance(result, list) else [result]
