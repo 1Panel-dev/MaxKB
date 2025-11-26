@@ -146,7 +146,7 @@ class BaseKnowledgeWriteNode(IKnowledgeWriteNode):
         document_list = serializer.data
 
         knowledge_id = self.workflow_params.get("knowledge_id")
-        workspace_id = "default"
+        workspace_id = self.workflow_params.get("workspace_id")
 
         document_model_list = []
         paragraph_model_list = []
