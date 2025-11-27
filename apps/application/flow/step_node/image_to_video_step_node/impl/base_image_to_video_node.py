@@ -7,6 +7,7 @@ import requests
 from django.db.models import QuerySet
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
 
+from application.flow.common import WorkflowMode
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.image_to_video_step_node.i_image_to_video_node import IImageToVideoNode
 from common.utils.common import bytes_to_uploaded_file
@@ -23,12 +24,11 @@ class BaseImageToVideoNode(IImageToVideoNode):
         if self.node_params.get('is_result', False):
             self.answer_text = details.get('answer')
 
-    def execute(self, model_id, prompt, negative_prompt, dialogue_number, dialogue_type, history_chat_record, chat_id,
+    def execute(self, model_id, prompt, negative_prompt, dialogue_number, dialogue_type, history_chat_record,
                 model_params_setting,
                 chat_record_id,
                 first_frame_url, last_frame_url=None,
                 **kwargs) -> NodeResult:
-        application = self.workflow_manage.work_flow_post_handler.chat_info.application
         workspace_id = self.workflow_manage.get_body().get('workspace_id')
         ttv_model = get_model_instance_by_model_workspace_id(model_id, workspace_id,
                                                              **model_params_setting)
@@ -54,17 +54,7 @@ class BaseImageToVideoNode(IImageToVideoNode):
         if isinstance(video_urls, str) and video_urls.startswith('http'):
             video_urls = requests.get(video_urls).content
         file = bytes_to_uploaded_file(video_urls, file_name)
-        meta = {
-            'debug': False if application.id else True,
-            'chat_id': chat_id,
-            'application_id': str(application.id) if application.id else None,
-        }
-        file_url = FileSerializer(data={
-            'file': file,
-            'meta': meta,
-            'source_id': meta['application_id'],
-            'source_type': FileSourceType.APPLICATION.value
-        }).upload()
+        file_url = self.upload_file(file)
         video_label = f'<video src="{file_url}" controls style="max-width: 100%; width: 100%; height: auto; max-height: 60vh;"></video>'
         video_list = [{'file_id': file_url.split('/')[-1], 'file_name': file_name, 'url': file_url}]
         return NodeResult({'answer': video_label, 'chat_model': ttv_model, 'message_list': message_list,
@@ -87,6 +77,42 @@ class BaseImageToVideoNode(IImageToVideoNode):
         except Exception as e:
             raise ValueError(
                 gettext("Failed to obtain the image"))
+
+    def upload_file(self, file):
+        if [WorkflowMode.KNOWLEDGE, WorkflowMode.KNOWLEDGE_LOOP].__contains__(
+                self.workflow_manage.flow.workflow_mode):
+            return self.upload_knowledge_file(file)
+        return self.upload_application_file(file)
+
+    def upload_knowledge_file(self, file):
+        knowledge_id = self.workflow_params.get('knowledge_id')
+        meta = {
+            'debug': False,
+            'knowledge_id': knowledge_id
+        }
+        file_url = FileSerializer(data={
+            'file': file,
+            'meta': meta,
+            'source_id': knowledge_id,
+            'source_type': FileSourceType.KNOWLEDGE.value
+        }).upload()
+        return file_url
+
+    def upload_application_file(self, file):
+        application = self.workflow_manage.work_flow_post_handler.chat_info.application
+        chat_id = self.workflow_params.get('chat_id')
+        meta = {
+            'debug': False if application.id else True,
+            'chat_id': chat_id,
+            'application_id': str(application.id) if application.id else None,
+        }
+        file_url = FileSerializer(data={
+            'file': file,
+            'meta': meta,
+            'source_id': meta['application_id'],
+            'source_type': FileSourceType.APPLICATION.value
+        }).upload()
+        return file_url
 
     def generate_history_ai_message(self, chat_record):
         for val in chat_record.details.values():

@@ -38,4 +38,4 @@ class IConditionNode(INode):
 
     type = 'condition-node'
 
-    support = [WorkflowMode.APPLICATION_LOOP]
+    support = [WorkflowMode.APPLICATION, WorkflowMode.APPLICATION_LOOP, WorkflowMode.KNOWLEDGE, WorkflowMode.KNOWLEDGE_LOOP]

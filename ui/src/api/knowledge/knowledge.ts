@@ -371,6 +371,19 @@ const getWorkflowAction: (
 ) => Promise<Result<any>> = (knowledge_id: string, knowledge_action_id, loading) => {
   return get(`${prefix.value}/${knowledge_id}/action/${knowledge_action_id}`, {}, loading)
 }
+
+/**
+ * mcp 节点
+ */
+const getMcpTools: (
+  knowledge_id: string,
+  mcp_servers: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (knowledge_id, mcp_servers, loading) => {
+  return post(`${prefix.value}/${knowledge_id}/mcp_tools`, { mcp_servers }, {}, loading)
+}
+
+
 export default {
   getKnowledgeList,
   getKnowledgeListPage,
@@ -399,4 +412,5 @@ export default {
   workflowAction,
   getWorkflowAction,
   getKnowledgeWorkflowDatasourceDetails,
+  getMcpTools,
 }

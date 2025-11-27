@@ -1,4 +1,5 @@
 # coding=utf-8
+import asyncio
 import json
 from typing import Dict
 
@@ -12,6 +13,7 @@ from application.flow.common import Workflow, WorkflowMode
 from application.flow.i_step_node import KnowledgeWorkflowPostHandler
 from application.flow.knowledge_workflow_manage import KnowledgeWorkflowManage
 from application.flow.step_node import get_node
+from application.serializers.application import get_mcp_tools
 from common.exception.app_exception import AppApiException
 from common.utils.rsa_util import rsa_long_decrypt
 from common.utils.tool_code import ToolExecutor
@@ -146,3 +148,40 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
             self.is_valid(raise_exception=True)
             workflow = QuerySet(KnowledgeWorkflow).filter(knowledge_id=self.data.get('knowledge_id')).first()
             return {**KnowledgeWorkflowModelSerializer(workflow).data}
+
+class McpServersSerializer(serializers.Serializer):
+    mcp_servers = serializers.JSONField(required=True)
+
+class KnowledgeWorkflowMcpSerializer(serializers.Serializer):
+    knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
+    user_id = serializers.UUIDField(required=True, label=_("User ID"))
+    workspace_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("Workspace ID"))
+
+    def is_valid(self, *, raise_exception=False):
+        super().is_valid(raise_exception=True)
+        workspace_id = self.data.get('workspace_id')
+        query_set = QuerySet(Knowledge).filter(id=self.data.get('knowledge_id'))
+        if workspace_id:
+            query_set = query_set.filter(workspace_id=workspace_id)
+        if not query_set.exists():
+            raise AppApiException(500, _('Knowledge id does not exist'))
+
+    def get_mcp_servers(self, instance, with_valid=True):
+        if with_valid:
+            self.is_valid(raise_exception=True)
+            McpServersSerializer(data=instance).is_valid(raise_exception=True)
+        servers = json.loads(instance.get('mcp_servers'))
+        for server, config in servers.items():
+            if config.get('transport') not in ['sse', 'streamable_http']:
+                raise AppApiException(500, _('Only support transport=sse or transport=streamable_http'))
+        tools = []
+        for server in servers:
+            tools += [
+                {
+                    'server': server,
+                    'name': tool.name,
+                    'description': tool.description,
+                    'args_schema': tool.args_schema,
+                }
+                for tool in asyncio.run(get_mcp_tools({server: servers[server]}))]
+        return tools
