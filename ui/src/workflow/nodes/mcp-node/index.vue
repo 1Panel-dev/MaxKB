@@ -272,6 +272,7 @@ import McpServerInputDialog from './component/McpServerInputDialog.vue'
 import { useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { resetUrl } from '@/utils/common'
+import { WorkflowMode } from '@/enums/application'
 
 const props = defineProps<{ nodeModel: any }>()
 
@@ -280,6 +281,7 @@ const {
   params: { id },
 } = route as any
 const getResourceDetail = inject('getResourceDetail') as any
+const workflow_mode:WorkflowMode = inject('workflowMode') || WorkflowMode.Application
 const resource = getResourceDetail()
 
 const apiType = computed(() => {
@@ -366,7 +368,7 @@ function getTools() {
 }
 
 function _getTools(mcp_servers: any) {
-  loadSharedApi({ type: 'application', systemType: apiType.value })
+  loadSharedApi({ type: [WorkflowMode.Application,WorkflowMode.ApplicationLoop].includes(workflow_mode)?'application':'knowledge', systemType: apiType.value })
     .getMcpTools(id, mcp_servers, loading)
     .then((res: any) => {
       form_data.value.mcp_tools = res.data
