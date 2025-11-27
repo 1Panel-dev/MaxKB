@@ -1,14 +1,5 @@
 <template>
-  <div style="width: 100%">
-    <div class="update-info flex p-8-12 border-r-6 mb-16">
-      <div class="mt-4">
-        <AppIcon iconName="app-warning-colorful" style="font-size: 16px"></AppIcon>
-      </div>
-      <div class="ml-16 lighter">
-        <p>{{ $t('views.document.feishu.tip1') }}</p>
-        <p>{{ $t('views.document.feishu.tip2') }}</p>
-      </div>
-    </div>
+  <div v-loading="loading" class="w-full">
     <div class="card-never border-r-6 mb-16">
       <el-checkbox
         v-model="allCheck"

@@ -1,5 +1,26 @@
 <template>
   <div>
+    <h4 class="title-decoration-1 mb-16 mt-4">
+      {{ $t('views.workflow.debug.executionResult') }}
+    </h4>
+    <div class="mb-16">
+      <!-- 执行结果 -->
+      <!-- <el-alert
+            v-if="isSuccess"
+            :title="$t('views.workflow.debug.executionSuccess')"
+            type="success"
+            show-icon
+            :closable="false"
+          />
+          <el-alert
+            v-else
+            :title="$t('views.workflow.debug.executionFailed')"
+            type="error"
+            show-icon
+            :closable="false"
+          /> -->
+    </div>
+    <p class="lighter mb-8">{{ $t('chat.executionDetails.title') }}</p>
     <ExecutionDetailContent :detail="detail" app-type="WORK_FLOW"></ExecutionDetailContent>
   </div>
 </template>
@@ -24,7 +45,8 @@ const knowledge_action = ref<any>()
 let pollingTimer: any = null
 
 const getKnowledgeWorkflowAction = () => {
-  knowledgeApi.getWorkflowAction(props.knowledge_id, props.id)
+  knowledgeApi
+    .getWorkflowAction(props.knowledge_id, props.id)
     .then((ok) => {
       knowledge_action.value = ok.data
       if (['SUCCESS', 'FAILURE', 'REVOKED'].includes(state.value)) {
@@ -53,6 +75,5 @@ getKnowledgeWorkflowAction()
 onUnmounted(() => {
   stopPolling()
 })
-
 </script>
 <style lang="scss"></style>

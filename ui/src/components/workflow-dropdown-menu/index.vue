@@ -4,8 +4,8 @@
 <script setup lang="ts">
 import { inject } from 'vue'
 import { WorkflowMode } from '@/enums/application'
-import ApplicationDropdownMenu from '@/components/dropdown_menu/application/index.vue'
-import KnowledgeDropdownMenu from '@/components/dropdown_menu/knowledge/index.vue'
+import ApplicationDropdownMenu from '@/components/workflow-dropdown-menu/application/index.vue'
+import KnowledgeDropdownMenu from '@/components/workflow-dropdown-menu/knowledge/index.vue'
 const workflow_mode = inject('workflowMode') || WorkflowMode.Application
 defineProps({
   show: {

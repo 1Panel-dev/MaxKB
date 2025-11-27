@@ -17,6 +17,7 @@ export default {
     editDataSource: 'Edit Data Source',
     copyDataSource: 'Copy Data Source',
     selectDataSource: 'Select Data Source',
+    requiredMessage: 'Please select data source',
   },
   toolStore: {
     title: 'Tool Store',

@@ -1,14 +1,12 @@
 <template>
-  <el-scrollbar>
-    <div class="paragraph-source-height p-8">
-      <div v-if="props.detail?.paragraph_list.length > 0" class="w-full">
-        <template v-for="(item, index) in props.detail.paragraph_list" :key="index">
-          <ParagraphCard :data="item" :content="item.content" :index="index" />
-        </template>
-      </div>
-      <span v-else> {{ $t('chat.KnowledgeSource.noSource') }}</span>
+  <div class="paragraph-source-height">
+    <div v-if="props.detail?.paragraph_list.length > 0" class="w-full">
+      <template v-for="(item, index) in props.detail.paragraph_list" :key="index">
+        <ParagraphCard :data="item" :content="item.content" :index="index" />
+      </template>
     </div>
-  </el-scrollbar>
+    <span v-else> {{ $t('chat.KnowledgeSource.noSource') }}</span>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -18,8 +16,4 @@ const props = defineProps<{
   detail?: any
 }>()
 </script>
-<style lang="scss" scoped>
-.paragraph-source-height {
-  max-height: calc(100vh - 260px);
-}
-</style>
+<style lang="scss" scoped></style>

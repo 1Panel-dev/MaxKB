@@ -2,7 +2,7 @@
   <el-drawer
     v-model="drawerVisible"
     :title="$t('common.debug')"
-    size="60%"
+    size="800px"
     direction="rtl"
     destroy-on-close
     :before-close="close"

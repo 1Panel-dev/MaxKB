@@ -142,7 +142,7 @@ import { ref, onBeforeMount, onBeforeUnmount, computed, nextTick, provide } from
 import { useRouter, useRoute } from 'vue-router'
 import type { Action } from 'element-plus'
 import Workflow from '@/workflow/index.vue'
-import DropdownMenu from '@/components/dropdown_menu/index.vue'
+import DropdownMenu from '@/components/workflow-dropdown-menu/index.vue'
 import PublishHistory from '@/views/knowledge-workflow/component/PublishHistory.vue'
 import { isAppIcon, resetUrl } from '@/utils/common'
 import { MsgSuccess, MsgError, MsgConfirm } from '@/utils/message'

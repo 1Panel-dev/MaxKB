@@ -13,10 +13,11 @@ export default {
   updatedVersion: '更新版本',
   dataSource: {
     title: '數據源',
-    createDataSource: '创建数据源',
-    editDataSource: '编辑数据源',
+    createDataSource: '創建數據源',
+    editDataSource: '編輯數據源',
     copyDataSource: '複製數據源',
-    selectDataSource: '选择数据源',
+    selectDataSource: '選擇數據源',
+    requiredMessage: '請選擇數據源',
   },
   toolStore: {
     title: '工具商店',

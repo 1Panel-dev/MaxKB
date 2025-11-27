@@ -1,18 +1,5 @@
 <template>
   <div v-loading="loading" class="w-full">
-    <div class="update-info flex p-8-12 border-r-6 mb-16">
-      <div class="mt-4">
-        <AppIcon iconName="app-warning-colorful" style="font-size: 16px"></AppIcon>
-      </div>
-      <div class="ml-16 lighter">
-        <p>{{ $t('views.document.fileType.txt.tip1') }}</p>
-        <p>
-          2. {{ $t('views.document.tip.fileLimitCountTip1') }} {{ file_count_limit }}
-          {{ $t('views.document.tip.fileLimitCountTip2') }},
-          {{ $t('views.document.tip.fileLimitSizeTip1') }} {{ file_size_limit }} MB
-        </p>
-      </div>
-    </div>
     <el-upload
       :webkitdirectory="false"
       class="w-full"
@@ -40,14 +27,23 @@
           </em>
         </p>
         <div class="upload__decoration">
+          <p>
+            {{ $t('views.document.tip.fileLimitCountTip1') }} {{ file_count_limit }}
+            {{ $t('views.document.tip.fileLimitCountTip2') }},
+            {{ $t('views.document.tip.fileLimitSizeTip1') }} {{ file_size_limit }} MB
+          </p>
           <p>{{ $t('views.document.upload.formats') }}{{ formats }}</p>
         </div>
       </div>
     </el-upload>
-    <el-row :gutter="8" v-if="modelValue?.length">
+    <el-row :gutter="8" v-if="modelValue?.length" class="mt-16">
       <template v-for="(item, index) in modelValue" :key="index">
         <el-col :span="12" class="mb-8">
-          <el-card shadow="never" class="file-List-card">
+          <el-card
+            shadow="never"
+            class="file-List-card"
+            style="--el-card-padding: 8px 12px; line-height: normal"
+          >
             <div class="flex-between">
               <div class="flex">
                 <img :src="getImgUrl(item && item?.name)" alt="" width="40" />

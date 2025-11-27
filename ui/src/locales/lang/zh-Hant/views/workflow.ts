@@ -486,4 +486,9 @@ export default {
   },
   SystemPromptPlaceholder: '系統提示詞，可以引用系統中的變量：如',
   UserPromptPlaceholder: '用戶提示詞，可以引用系統中的變量：如',
+  debug: {
+    executionResult: '執行結果',
+    executionSuccess: '執行成功',
+    executionFailed: '執行失敗',
+  },
 }

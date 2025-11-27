@@ -17,6 +17,7 @@ export default {
     editDataSource: '编辑数据源',
     copyDataSource: '复制数据源',
     selectDataSource: '选择数据源',
+    requiredMessage: '请选择数据源',
   },
   toolStore: {
     title: '工具商店',

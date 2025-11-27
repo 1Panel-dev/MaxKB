@@ -7,23 +7,35 @@
     label-position="top"
     require-asterisk-position="right"
     :other-params="{ current_workspace_id: workspace_id, current_knowledge_id: knowledge_id }"
-
   >
     <template #default>
-      <el-form-item prop="node_id" :rules="base_form_data_rule.node_id">
-        <el-radio-group @change="sourceChange" v-model="base_form_data.node_id">
-          <el-radio :value="node.id" border size="large" v-for="node in source_node_list" :key="node.id">
-            <div class="flex align-center">
-              <component
-                :is="iconComponent(`${node.type}-icon`)"
-                class="mr-8"
-                :size="24"
-                :item="node?.properties.node_data"
-              />
-              {{ node.properties.stepName }}
-            </div>
-          </el-radio>
-        </el-radio-group>
+      <h4 class="title-decoration-1 mb-16 mt-4">{{ $t('views.tool.dataSource.selectDataSource') }}</h4>
+      <el-form-item
+        :label="$t('views.tool.dataSource.title')"
+        prop="node_id"
+        :rules="base_form_data_rule.node_id"
+      >
+        <el-row class="w-full" gutter="8">
+          <el-col :span="8" v-for="node in source_node_list" :key="node.id">
+            <el-card
+              shadow="never"
+              class="card-checkbox cursor w-full mb-8"
+              :class="base_form_data.node_id === node.id ? 'active' : ''"
+              style="--el-card-padding: 4px 12px"
+              @click="sourceChange(node.id)"
+            >
+              <div class="flex align-center">
+                <component
+                  :is="iconComponent(`${node.type}-icon`)"
+                  class="mr-8"
+                  :size="20"
+                  :item="node?.properties.node_data"
+                />
+                {{ node.properties.stepName }}
+              </div>
+            </el-card>
+          </el-col>
+        </el-row>
       </el-form-item>
     </template>
   </DynamicsForm>
@@ -38,6 +50,7 @@ import type { Dict } from '@/api/type/common'
 import type { FormRules } from 'element-plus'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { useRoute } from 'vue-router'
+import { t } from '@/locales'
 import useStore from '@/stores'
 const { user } = useStore()
 const route = useRoute()
@@ -85,6 +98,7 @@ const {
   params: { id, from },
 } = route as any
 const sourceChange = (node_id: string) => {
+  base_form_data.value.node_id = node_id
   const n = source_node_list.value.find((n: any) => n.id == node_id)
   node_id = n
     ? [WorkflowType.DataSourceLocalNode, WorkflowType.DataSourceWebNode].includes(n.type)
@@ -109,7 +123,7 @@ const base_form_data_rule = ref<FormRules>({
   node_id: {
     required: true,
     trigger: 'blur',
-    message: '数据源必选',
+    message: t('views.tool.dataSource.requiredMessage'),
   },
 })
 const validate = () => {

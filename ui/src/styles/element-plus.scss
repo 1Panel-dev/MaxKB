@@ -383,3 +383,8 @@
 .el-tabs__active-bar {
   height: 3px;
 }
+
+// el-upload
+.el-upload {
+    --el-upload-dragger-padding-horizontal: 32px;
+}
