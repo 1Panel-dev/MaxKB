@@ -2,6 +2,7 @@
 import ast
 import base64
 import gzip
+import io
 import json
 import os
 import socket
@@ -217,7 +218,10 @@ exec({dedent(code)!a})
         else:
             tool_config = {
                 'command': sys.executable,
-                'args': f'import base64,gzip; exec(gzip.decompress(base64.b64decode(\'{compressed_and_base64_encoded_code_str}\')).decode())',
+                'args': [
+                    '-c',
+                    f'import base64,gzip; exec(gzip.decompress(base64.b64decode(\'{compressed_and_base64_encoded_code_str}\')).decode())',
+                ],
                 'transport': 'stdio',
             }
         return tool_config
