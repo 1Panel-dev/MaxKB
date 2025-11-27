@@ -16,7 +16,8 @@ from application.flow.i_step_node import INode, NodeResult
 
 
 class KnowledgeWriteNodeParamSerializer(serializers.Serializer):
-    document_list = serializers.ListField(required=True, child=serializers.CharField(required=True), allow_null=True,label=_('document list'))
+    document_list = serializers.ListField(required=True, child=serializers.CharField(required=True), allow_null=True,
+                                          label=_('document list'))
 
 
 class IKnowledgeWriteNode(INode):
@@ -33,11 +34,10 @@ class IKnowledgeWriteNode(INode):
             self.node_params_serializer.data.get('document_list')[1:],
         )
 
-
         return self.execute(**self.node_params_serializer.data, **self.flow_params_serializer.data, documents=documents)
 
     def execute(self, documents, **kwargs) -> NodeResult:
         pass
 
     type = 'knowledge-write-node'
-    support = [WorkflowMode.KNOWLEDGE]
+    support = [WorkflowMode.KNOWLEDGE, WorkflowMode.KNOWLEDGE_LOOP]

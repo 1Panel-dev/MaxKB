@@ -23,7 +23,8 @@ class TextToSpeechNodeSerializer(serializers.Serializer):
 
 class ITextToSpeechNode(INode):
     type = 'text-to-speech-node'
-    support = [WorkflowMode.APPLICATION, WorkflowMode.APPLICATION_LOOP]
+    support = [WorkflowMode.APPLICATION, WorkflowMode.APPLICATION_LOOP, WorkflowMode.KNOWLEDGE,
+               WorkflowMode.KNOWLEDGE_LOOP]
 
     def get_node_params_serializer_class(self) -> Type[serializers.Serializer]:
         return TextToSpeechNodeSerializer
@@ -33,7 +34,7 @@ class ITextToSpeechNode(INode):
                                                            self.node_params_serializer.data.get('content_list')[1:])
         return self.execute(content=content, **self.node_params_serializer.data, **self.flow_params_serializer.data)
 
-    def execute(self, tts_model_id, chat_id,
+    def execute(self, tts_model_id,
                 content, model_params_setting=None,
                 **kwargs) -> NodeResult:
         pass

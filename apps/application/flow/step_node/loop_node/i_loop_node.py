@@ -41,7 +41,7 @@ class ILoopNodeSerializer(serializers.Serializer):
 
 class ILoopNode(INode):
     type = 'loop-node'
-    support = [WorkflowMode.APPLICATION]
+    support = [WorkflowMode.APPLICATION, WorkflowMode.KNOWLEDGE]
 
     def get_node_params_serializer_class(self) -> Type[serializers.Serializer]:
         return ILoopNodeSerializer

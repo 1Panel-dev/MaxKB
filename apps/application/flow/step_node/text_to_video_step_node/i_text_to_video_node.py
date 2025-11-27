@@ -32,7 +32,8 @@ class TextToVideoNodeSerializer(serializers.Serializer):
 
 class ITextToVideoNode(INode):
     type = 'text-to-video-node'
-    support = [WorkflowMode.APPLICATION, WorkflowMode.APPLICATION_LOOP]
+    support = [WorkflowMode.APPLICATION, WorkflowMode.APPLICATION_LOOP, WorkflowMode.KNOWLEDGE,
+               WorkflowMode.KNOWLEDGE_LOOP]
 
     def get_node_params_serializer_class(self) -> Type[serializers.Serializer]:
         return TextToVideoNodeSerializer

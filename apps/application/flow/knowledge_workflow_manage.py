@@ -8,12 +8,13 @@
 """
 import traceback
 from concurrent.futures import ThreadPoolExecutor
+from typing import List
 
 from django.db.models import QuerySet
 from django.utils.translation import get_language
 
 from application.flow.common import Workflow
-from application.flow.i_step_node import WorkFlowPostHandler, KnowledgeFlowParamsSerializer
+from application.flow.i_step_node import WorkFlowPostHandler, KnowledgeFlowParamsSerializer, INode
 from application.flow.workflow_manage import WorkflowManage
 from common.handle.base_to_response import BaseToResponse
 from common.handle.impl.response.system_to_response import SystemToResponse
@@ -100,3 +101,19 @@ class KnowledgeWorkflowManage(WorkflowManage):
             current_node.node_chunk.end()
             QuerySet(KnowledgeAction).filter(id=self.params.get('knowledge_action_id')).update(
                 details=self.get_runtime_details())
+
+    def get_reference_field(self, node_id: str, fields: List[str]):
+        """
+        @param node_id: 节点id
+        @param fields:  字段
+        @return:
+        """
+        if node_id == 'knowledge-base-node':
+            return INode.get_field(self.context, fields)
+        elif node_id == 'chat':
+            return INode.get_field(self.chat_context, fields)
+        else:
+            node = self.get_node_by_id(node_id)
+            if node:
+                return node.get_reference_field(fields)
+            return None
