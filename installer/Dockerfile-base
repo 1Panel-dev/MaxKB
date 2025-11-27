@@ -24,9 +24,9 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     chmod 755 /usr/bin/start-*.sh && \
     find /etc/ -type f ! -path '/etc/resolv.conf' ! -path '/etc/hosts' | xargs chmod g-rx && \
     curl -L --connect-timeout 120 -m 1800 https://resource.fit2cloud.com/maxkb/ffmpeg/get-ffmpeg-linux | sh && \
-    mkdir -p /opt/maxkb-app/sandbox && \
+    mkdir -p /opt/maxkb-app/sandbox/lib && \
     useradd --no-create-home --home /opt/maxkb-app/sandbox sandbox -g root && \
-    chown -R sandbox:root /opt/maxkb-app/sandbox && chmod 550 /opt/maxkb-app/sandbox && \
+    chown sandbox:root /opt/maxkb-app/sandbox && chmod 550 /opt/maxkb-app/sandbox && \
     chmod g-xr /usr/local/bin/* /usr/bin/* /bin/* /usr/sbin/* /sbin/* /usr/lib/postgresql/17/bin/* && \
     chmod g+xr /usr/bin/ld.so && \
     chmod g+x /usr/local/bin/python* && \

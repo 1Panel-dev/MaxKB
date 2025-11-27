@@ -29,7 +29,7 @@ class ToolExecutor:
         else:
             self.sandbox_path = os.path.join(PROJECT_DIR, 'data', 'sandbox')
             self.user = None
-        self.sandbox_so_path = f'{self.sandbox_path}/sandbox.so'
+        self.sandbox_so_path = f'{self.sandbox_path}/lib/sandbox.so'
         self.process_timeout_seconds = int(CONFIG.get("SANDBOX_PYTHON_PROCESS_TIMEOUT_SECONDS", '3600'))
         try:
             self._init_dir()
@@ -60,10 +60,9 @@ class ToolExecutor:
             tmp_dir_path = os.path.join(self.sandbox_path, 'tmp')
             os.makedirs(tmp_dir_path, 0o700, exist_ok=True)
             os.system(f"chown -R {self.user}:root {tmp_dir_path}")
-        if os.path.exists(self.sandbox_so_path):
-            os.chmod(self.sandbox_so_path, 0o440)
         # 初始化sandbox配置文件
-        sandbox_conf_file_path = f'{self.sandbox_path}/.sandbox.conf'
+        sandbox_lib_path = os.path.dirname(self.sandbox_so_path)
+        sandbox_conf_file_path = f'{sandbox_lib_path}/.sandbox.conf'
         if os.path.exists(sandbox_conf_file_path):
             os.remove(sandbox_conf_file_path)
         allow_subprocess = CONFIG.get("SANDBOX_PYTHON_ALLOW_SUBPROCESS", '0')
@@ -75,7 +74,7 @@ class ToolExecutor:
         with open(sandbox_conf_file_path, "w") as f:
             f.write(f"SANDBOX_PYTHON_BANNED_HOSTS={banned_hosts}\n")
             f.write(f"SANDBOX_PYTHON_ALLOW_SUBPROCESS={allow_subprocess}\n")
-        os.chmod(sandbox_conf_file_path, 0o440)
+        os.system(f"chmod -R 550 {sandbox_lib_path}")
 
     def exec_code(self, code_str, keywords, function_name=None):
         _id = str(uuid.uuid7())
