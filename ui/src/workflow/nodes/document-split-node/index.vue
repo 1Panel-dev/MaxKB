@@ -50,6 +50,15 @@
             />
           </el-select>
         </el-form-item>
+        <el-form-item :label="$t('views.document.setRules.limit.label')">
+          <el-slider
+            v-model="form_data.limit"
+            show-input
+            :show-input-controls="false"
+            :min="50"
+            :max="100000"
+          />
+        </el-form-item>
         <div v-if="form_data.split_strategy === 'custom'">
           <div class="set-rules__form">
             <div class="form-item mb-16">
@@ -84,18 +93,6 @@
                   </el-option>
                 </el-select>
               </div>
-            </div>
-            <div class="form-item mb-16">
-              <div class="title mb-8">
-                {{ $t('views.document.setRules.limit.label') }}
-              </div>
-              <el-slider
-                v-model="form_data.limit"
-                show-input
-                :show-input-controls="false"
-                :min="50"
-                :max="100000"
-              />
             </div>
             <div class="form-item mb-16">
               <div class="title mb-8">
