@@ -137,6 +137,7 @@ function deleteField(index: any) {
     value: item.field,
   }))
 
+  set(props.nodeModel.properties, 'user_input_field_list', cloneDeep(inputFieldList.value))
   set(props.nodeModel.properties.config, 'fields', fields)
   onDragHandle()
 }

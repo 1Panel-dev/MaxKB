@@ -66,7 +66,7 @@
             trigger: 'change',
           }"
         >
-          <el-slider v-model="form_data.file_size_limit" show-input />
+          <el-slider v-model="form_data.file_count_limit" show-input />
         </el-form-item>
         <el-form-item
           :label="
@@ -85,7 +85,7 @@
             trigger: 'change',
           }"
         >
-          <el-slider v-model="form_data.file_count_limit" show-input />
+          <el-slider v-model="form_data.file_size_limit" show-input />
         </el-form-item>
       </el-form>
     </el-card>
