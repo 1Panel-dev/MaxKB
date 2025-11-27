@@ -77,6 +77,22 @@ class AppNode extends HtmlResize.view {
         children: this.props.model.properties?.config?.chatFields || [],
       })
     }
+    if (this.props.model.type === 'knowledge-base-node') {
+      let globalFields = []
+      if (this.props.model.properties.user_input_field_list) {
+        globalFields = this.props.model.properties.user_input_field_list.map((item: any) => ({
+          label: item.label.label,
+          value: item.field,
+        }))
+      }
+
+      result.push({
+        value: 'global',
+        label: t('views.workflow.variable.global'),
+        type: 'global',
+        children: globalFields,
+      })
+    }
     result.push({
       value: this.props.model.id,
       icon: this.props.model.properties.node_data?.icon,

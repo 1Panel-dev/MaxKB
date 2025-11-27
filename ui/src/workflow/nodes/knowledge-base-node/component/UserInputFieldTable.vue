@@ -155,13 +155,7 @@ function refreshFieldList(data: any, index: any) {
     inputFieldList.value.push(data)
   }
   UserFieldFormDialogRef.value.close()
-  const fields = inputFieldList.value.map((item) => ({
-    label: item.label.label,
-    value: item.field,
-  }))
-
   set(props.nodeModel.properties, 'user_input_field_list', cloneDeep(inputFieldList.value))
-  set(props.nodeModel.properties.config, 'fields', fields)
   onDragHandle()
 }
 
@@ -216,12 +210,6 @@ onMounted(() => {
   if (props.nodeModel.properties.user_input_field_list) {
     inputFieldList.value = cloneDeep(props.nodeModel.properties.user_input_field_list)
   }
-
-  const fields = inputFieldList.value.map((item) => ({
-    label: item.label.label,
-    value: item.field,
-  }))
-  set(props.nodeModel.properties.config, 'fields', fields)
 
   onDragHandle()
 })
