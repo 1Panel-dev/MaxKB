@@ -190,6 +190,19 @@ const postKnowledge: (data: knowledgeData, loading?: Ref<boolean>) => Promise<Re
 }
 
 /**
+ * 创建工作流知识库
+ * @param data
+ * @param loading
+ * @returns
+ */
+const createWorkflowKnowledge: (data: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  data,
+  loading,
+) => {
+  return post(`${prefix}/workflow`, data, undefined, loading)
+}
+
+/**
  * 获取当前用户可使用的向量化模型列表（没用到）
  * @param application_id
  * @param loading
@@ -313,6 +326,7 @@ export default {
   postKnowledge,
   getKnowledgeModel,
   postWebKnowledge,
+  createWorkflowKnowledge,
   postLarkKnowledge,
   putLarkKnowledge,
   getAllTags,
