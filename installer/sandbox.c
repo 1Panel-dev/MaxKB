@@ -295,8 +295,12 @@ long syscall(long number, ...) {
     switch (number) {
         case SYS_execve:
         case SYS_execveat:
+#ifdef SYS_fork
         case SYS_fork:
+#endif
+#ifdef SYS_vfork
         case SYS_vfork:
+#endif
         case SYS_clone:
         case SYS_clone3:
 #ifdef SYS_posix_spawn

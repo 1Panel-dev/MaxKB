@@ -20,6 +20,8 @@ ARG DEPENDENCIES="                    \
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     echo "Asia/Shanghai" > /etc/timezone && \
+    echo "deb http://deb.debian.org/debian testing main" >> /etc/apt/sources.list && \
+    printf "Package: redis-server\nPin: release a=testing\nPin-Priority: 501\n" > /etc/apt/preferences.d/redis && \
     apt-get update && apt-get install -y --no-install-recommends $DEPENDENCIES && \
     chmod 755 /usr/bin/start-*.sh && \
     find /etc/ -type f ! -path '/etc/resolv.conf' ! -path '/etc/hosts' | xargs chmod g-rx && \
