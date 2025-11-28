@@ -20,6 +20,7 @@ from common.chunk import text_to_chunk
 from common.utils.common import bulk_create_in_batches
 from knowledge.models import Document, KnowledgeType, Paragraph, File, FileSourceType, Problem, ProblemParagraphMapping
 from knowledge.serializers.common import ProblemParagraphObject, ProblemParagraphManage
+from knowledge.serializers.document import DocumentSerializers
 
 
 class ParagraphInstanceSerializer(serializers.Serializer):
@@ -187,9 +188,19 @@ class BaseKnowledgeWriteNode(IKnowledgeWriteNode):
 
         return document_model_list, knowledge_id, workspace_id
 
+    @staticmethod
+    def post_embedding(document_model_list, knowledge_id, workspace_id):
+        for document in document_model_list:
+            DocumentSerializers.Operate(data={
+                'knowledge_id': knowledge_id,
+                'document_id': document.id,
+                'workspace_id': workspace_id
+            }).refresh()
+
     def execute(self, documents, **kwargs) -> NodeResult:
 
         document_model_list, knowledge_id, workspace_id = self.save(documents)
+        self.post_embedding(document_model_list, knowledge_id, workspace_id)
 
         write_content_list = [{
             "name": document.get("name"),

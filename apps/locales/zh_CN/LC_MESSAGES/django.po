@@ -8908,3 +8908,6 @@ msgstr "SAML2 登录"
 
 msgid "SAML2 SSO"
 msgstr "SAML2 单点登录"
+
+msgid "Workflow"
+msgstr "工作流"

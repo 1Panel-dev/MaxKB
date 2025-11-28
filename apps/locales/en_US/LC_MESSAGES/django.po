@@ -8782,3 +8782,6 @@ msgstr ""
 
 msgid "SAML2 SSO"
 msgstr ""
+
+msgid "Workflow"
+msgstr ""
