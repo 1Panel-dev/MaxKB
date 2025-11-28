@@ -185,7 +185,8 @@ class INode:
             return None
         reasoning_content_enable = self.context.get('model_setting', {}).get('reasoning_content_enable', False)
         return [
-            Answer(self.answer_text, self.view_type, self.runtime_node_id, self.workflow_params['chat_record_id'], {},
+            Answer(self.answer_text, self.view_type, self.runtime_node_id, self.workflow_params.get('chat_record_id'),
+                   {},
                    self.runtime_node_id, self.context.get('reasoning_content', '') if reasoning_content_enable else '')]
 
     def __init__(self, node, workflow_params, workflow_manage, up_node_id_list=None,

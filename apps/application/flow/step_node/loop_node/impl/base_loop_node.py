@@ -11,7 +11,7 @@ from typing import Dict, List
 
 from django.utils.translation import gettext as _
 
-from application.flow.common import Answer
+from application.flow.common import Answer, WorkflowMode
 from application.flow.i_step_node import NodeResult, WorkFlowPostHandler, INode
 from application.flow.step_node.loop_node.i_loop_node import ILoopNode
 from application.flow.tools import Reasoning
@@ -197,6 +197,7 @@ def loop(workflow_manage_new_instance, node: INode, generate_loop):
         insert_or_replace(loop_node_data, index, instance.get_runtime_details())
         insert_or_replace(loop_answer_data, index,
                           get_answer_list(instance, child_node_node_dict, node.runtime_node_id))
+        instance._cleanup()
         if break_outer:
             break
     node.context['is_interrupt_exec'] = is_interrupt_exec
@@ -206,7 +207,7 @@ def loop(workflow_manage_new_instance, node: INode, generate_loop):
     node.context["item"] = current_index
 
 
-def get_write_context(loop_type, array, number, loop_body, stream):
+def get_write_context(loop_type, array, number, loop_body):
     def inner_write_context(node_variable: Dict, workflow_variable: Dict, node: INode, workflow):
         if loop_type == 'ARRAY':
             return loop(node_variable['workflow_manage_new_instance'], node, generate_loop_array(array))
@@ -248,27 +249,31 @@ class BaseLoopNode(ILoopNode):
     def get_loop_context(self):
         return self.context
 
-    def execute(self, loop_type, array, number, loop_body, stream, **kwargs) -> NodeResult:
+    def execute(self, loop_type, array, number, loop_body, **kwargs) -> NodeResult:
         from application.flow.loop_workflow_manage import LoopWorkflowManage, Workflow
+        from application.flow.knowledge_loop_workflow_manage import KnowledgeLoopWorkflowManage
         def workflow_manage_new_instance(loop_data, global_data, start_node_id=None,
                                          start_node_data=None, chat_record=None, child_node=None):
-            workflow_manage = LoopWorkflowManage(Workflow.new_instance(loop_body), self.workflow_manage.params,
-                                                 LoopWorkFlowPostHandler(
-                                                     self.workflow_manage.work_flow_post_handler.chat_info),
-                                                 self.workflow_manage,
-                                                 loop_data,
-                                                 self.get_loop_context,
-                                                 base_to_response=LoopToResponse(),
-                                                 start_node_id=start_node_id,
-                                                 start_node_data=start_node_data,
-                                                 chat_record=chat_record,
-                                                 child_node=child_node
-                                                 )
+            workflow_mode = WorkflowMode.KNOWLEDGE_LOOP if WorkflowMode.KNOWLEDGE == self.workflow_manage.flow.workflow_mode else WorkflowMode.APPLICATION_LOOP
+            c = KnowledgeLoopWorkflowManage if workflow_mode == WorkflowMode.KNOWLEDGE_LOOP else LoopWorkflowManage
+            workflow_manage = c(Workflow.new_instance(loop_body, workflow_mode),
+                                self.workflow_manage.params,
+                                LoopWorkFlowPostHandler(
+                                    self.workflow_manage.work_flow_post_handler.chat_info),
+                                self.workflow_manage,
+                                loop_data,
+                                self.get_loop_context,
+                                base_to_response=LoopToResponse(),
+                                start_node_id=start_node_id,
+                                start_node_data=start_node_data,
+                                chat_record=chat_record,
+                                child_node=child_node
+                                )
 
             return workflow_manage
 
         return NodeResult({'workflow_manage_new_instance': workflow_manage_new_instance}, {},
-                          _write_context=get_write_context(loop_type, array, number, loop_body, stream),
+                          _write_context=get_write_context(loop_type, array, number, loop_body),
                           _is_interrupt=_is_interrupt_exec)
 
     def get_loop_context_data(self):

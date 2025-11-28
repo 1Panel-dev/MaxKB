@@ -8,13 +8,12 @@
 """
 import traceback
 from concurrent.futures import ThreadPoolExecutor
-from typing import List
 
 from django.db.models import QuerySet
 from django.utils.translation import get_language
 
 from application.flow.common import Workflow
-from application.flow.i_step_node import WorkFlowPostHandler, KnowledgeFlowParamsSerializer, INode
+from application.flow.i_step_node import WorkFlowPostHandler, KnowledgeFlowParamsSerializer
 from application.flow.workflow_manage import WorkflowManage
 from common.handle.base_to_response import BaseToResponse
 from common.handle.impl.response.system_to_response import SystemToResponse

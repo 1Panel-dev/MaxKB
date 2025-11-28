@@ -10,6 +10,7 @@ from typing import Type
 
 from rest_framework import serializers
 
+from application.flow.common import WorkflowMode
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.loop_start_node.i_loop_start_node import ILoopStarNode
 
@@ -31,7 +32,8 @@ class BaseLoopStartStepNode(ILoopStarNode):
             'index': loop_params.get("index"),
             'item': loop_params.get("item")
         }
-        self.workflow_manage.chat_context = self.workflow_manage.get_chat_info().get_chat_variable()
+        if WorkflowMode.APPLICATION_LOOP == self.workflow_manage.flow.workflow_mode:
+            self.workflow_manage.chat_context = self.workflow_manage.get_chat_info().get_chat_variable()
         return NodeResult(node_variable, {})
 
     def get_details(self, index: int, **kwargs):

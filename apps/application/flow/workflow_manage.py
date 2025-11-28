@@ -316,7 +316,7 @@ class WorkflowManage:
         except Exception as e:
             return True
 
-    def await_result(self):
+    def await_result(self, is_cleanup=True):
         try:
             while self.is_run():
                 while True:
@@ -344,7 +344,8 @@ class WorkflowManage:
                                                                  '',
                                                                  [],
                                                                  '', True, message_tokens, answer_tokens, {})
-            self._cleanup()
+            if is_cleanup:
+                self._cleanup()
 
     def run_chain_async(self, current_node, node_result_future, language='zh'):
         future = executor.submit(self.run_chain_manage, current_node, node_result_future, language)

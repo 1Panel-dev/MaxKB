@@ -116,7 +116,7 @@ class LoopWorkflowManage(WorkflowManage):
         close_old_connections()
         language = get_language()
         self.run_chain_async(self.start_node, None, language)
-        return self.await_result()
+        return self.await_result(is_cleanup=False)
 
     def get_index(self):
         return self.loop_params.get('index')

@@ -46,10 +46,7 @@
                   <p class="mt-8 lighter">
                     <span>{{ $t('views.workflow.condition.front') }}</span>
                     <el-select v-model="condition" size="small" style="width: 60px; margin: 0 8px">
-                      <el-option
-                        :label="$t('views.workflow.condition.AND')"
-                        value="AND"
-                      />
+                      <el-option :label="$t('views.workflow.condition.AND')" value="AND" />
                       <el-option :label="$t('views.workflow.condition.OR')" value="OR" />
                     </el-select>
                     <span>{{ $t('views.workflow.condition.text') }}</span>

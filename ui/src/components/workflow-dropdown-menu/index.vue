@@ -20,7 +20,9 @@ defineProps({
 })
 const kw: any = {
   [WorkflowMode.Application]: ApplicationDropdownMenu,
+  [WorkflowMode.ApplicationLoop]: ApplicationDropdownMenu,
   [WorkflowMode.Knowledge]: KnowledgeDropdownMenu,
+  [WorkflowMode.KnowledgeLoop]: KnowledgeDropdownMenu,
 }
 </script>
 <style lang="scss">
