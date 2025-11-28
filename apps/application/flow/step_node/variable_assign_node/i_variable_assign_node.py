@@ -25,5 +25,5 @@ class IVariableAssignNode(INode):
     def _run(self):
         return self.execute(**self.node_params_serializer.data, **self.flow_params_serializer.data)
 
-    def execute(self, variable_list, stream, **kwargs) -> NodeResult:
+    def execute(self, variable_list, **kwargs) -> NodeResult:
         pass

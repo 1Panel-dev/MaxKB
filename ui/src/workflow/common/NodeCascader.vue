@@ -93,7 +93,7 @@ const get_up_node_field_list = (contain_self: boolean, use_cache: boolean) => {
   return result.filter((v: any) => v.children && v.children.length > 0)
 }
 const getOptionsValue = () => {
-  if (workflowMode == WorkflowMode.ApplicationLoop) {
+  if ([WorkflowMode.ApplicationLoop, WorkflowMode.KnowledgeLoop].includes(workflowMode)) {
     return props.global
       ? get_up_node_field_list(false, true).filter(
           (v: any) =>
@@ -110,13 +110,6 @@ const getOptionsValue = () => {
       : props.nodeModel
           .get_up_node_field_list(false, true)
           .filter((v: any) => v.children && v.children.length > 0)
-    if (workflowMode == WorkflowMode.Knowledge || workflowMode == WorkflowMode.KnowledgeLoop) {
-      const edgeModel = props.nodeModel.graphModel.getElement('knowledge-base-node')
-      const baseNode = edgeModel
-        .get_node_field_list()
-        .filter((v: any) => v.children && v.children.length > 0)
-      return [...baseNode, ...result]
-    }
     return result
   }
 }

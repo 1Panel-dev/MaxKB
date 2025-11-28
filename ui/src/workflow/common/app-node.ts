@@ -81,7 +81,7 @@ class AppNode extends HtmlResize.view {
       let globalFields = []
       if (this.props.model.properties.user_input_field_list) {
         globalFields = this.props.model.properties.user_input_field_list.map((item: any) => ({
-          label: item.label.label,
+          label: typeof item.label == 'string' ? item.label : item.label.label,
           value: item.field,
         }))
       }
@@ -129,6 +129,12 @@ class AppNode extends HtmlResize.view {
         this.props.graphModel.getNodeModelById('start-node') ||
         this.props.graphModel.getNodeModelById('loop-start-node')
       )?.get_node_field_list() || []
+    const kbn = this.props.graphModel.getNodeModelById('knowledge-base-node')
+    if (kbn) {
+      const knowledgeBaseFieldList = kbn.get_node_field_list()
+      return [...knowledgeBaseFieldList, ...start_node_field_list, ...result]
+    }
+
     return [...start_node_field_list, ...result]
   }
 
