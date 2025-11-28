@@ -166,50 +166,89 @@ static int deny() {
     _exit(1);
     return -1;
 }
+static int not_supported(const char *function_name) {
+    fprintf(stderr, "Not supported function: %s\n", function_name);
+    _exit(1);
+    return -1;
+}
 #define RESOLVE_REAL(func)                      \
     static typeof(func) *real_##func = NULL;    \
     if (!real_##func) {                         \
         real_##func = dlsym(RTLD_NEXT, #func);  \
     }
+int execv(const char *path, char *const argv[]) {
+    RESOLVE_REAL(execv);
+    if (!allow_create_subprocess() && strstr(path, "bin/python") == NULL)  return deny();
+    return real_execv(path, argv);
+}
+int __execv(const char *path, char *const argv[]) {
+    RESOLVE_REAL(__execv);
+    if (!allow_create_subprocess() && strstr(path, "bin/python") == NULL)  return deny();
+    return real___execv(path, argv);
+}
 int execve(const char *filename, char *const argv[], char *const envp[]) {
     RESOLVE_REAL(execve);
     if (!allow_create_subprocess()) return deny();
     return real_execve(filename, argv, envp);
-}
-
-int execveat(int dirfd, const char *pathname,
-             char *const argv[], char *const envp[], int flags) {
-    RESOLVE_REAL(execveat);
-    if (!allow_create_subprocess())  return deny();
-    return real_execveat(dirfd, pathname, argv, envp, flags);
 }
 int __execve(const char *filename, char *const argv[], char *const envp[]) {
     RESOLVE_REAL(__execve);
     if (!allow_create_subprocess()) return deny();
     return real___execve(filename, argv, envp);
 }
+int execveat(int dirfd, const char *pathname,
+             char *const argv[], char *const envp[], int flags) {
+    RESOLVE_REAL(execveat);
+    if (!allow_create_subprocess())  return deny();
+    return real_execveat(dirfd, pathname, argv, envp, flags);
+}
 int execvpe(const char *file, char *const argv[], char *const envp[]) {
-    RESOLVE_REAL(execvpe);
-    if (!allow_create_subprocess()) return deny();
-    return real_execvpe(file, argv, envp);
+    return not_supported("execvpe");
 }
 int __execvpe(const char *file, char *const argv[], char *const envp[]) {
-    RESOLVE_REAL(__execvpe);
-    if (!allow_create_subprocess()) return deny();
-    return real___execvpe(file, argv, envp);
+    return not_supported("__execvpe");
+}
+int execvp(const char *file, char *const argv[]) {
+    return not_supported("execvp");
+}
+int __execvp(const char *file, char *const argv[]) {
+    return not_supported("__execvp");
+}
+int execl(const char *path, const char *arg, ...) {
+    return not_supported("execl");
+}
+int __execl(const char *path, const char *arg, ...) {
+    return not_supported("__execl");
+}
+int execlp(const char *file, const char *arg, ...) {
+    return not_supported("execlp");
+}
+int __execlp(const char *file, const char *arg, ...) {
+    return not_supported("__execlp");
+}
+int execle(const char *path, const char *arg, ...) {
+    return not_supported("execle");
 }
 pid_t fork(void) {
     RESOLVE_REAL(fork);
     if (!allow_create_subprocess()) return deny();
     return real_fork();
 }
-
+pid_t __fork(void) {
+    RESOLVE_REAL(__fork);
+    if (!allow_create_subprocess()) return deny();
+    return real___fork();
+}
 pid_t vfork(void) {
     RESOLVE_REAL(vfork);
     if (!allow_create_subprocess()) return deny();
     return real_vfork();
 }
-
+pid_t __vfork(void) {
+    RESOLVE_REAL(__vfork);
+    if (!allow_create_subprocess()) return deny();
+    return real___vfork();
+}
 int clone(int (*fn)(void *), void *child_stack, int flags, void *arg, ...) {
     RESOLVE_REAL(clone);
     if (!allow_create_subprocess()) return deny();
@@ -259,7 +298,24 @@ int __posix_spawnp(pid_t *pid, const char *file,
     if (!allow_create_subprocess()) return deny();
     return real___posix_spawnp(pid, file, file_actions, attrp, argv, envp);
 }
-
+FILE *popen(const char *command, const char *type) {
+    RESOLVE_REAL(popen);
+    if (!allow_create_subprocess()) {
+        fprintf(stderr, "Permission denied to create subprocess.\n");
+        errno = EACCES;
+        return NULL;
+    }
+    return real_popen(command, type);
+}
+FILE *__popen(const char *command, const char *type) {
+    RESOLVE_REAL(__popen);
+    if (!allow_create_subprocess()) {
+        fprintf(stderr, "Permission denied to create subprocess.\n");
+        errno = EACCES;
+        return NULL;
+    }
+    return real___popen(command, type);
+}
 int system(const char *command) {
     RESOLVE_REAL(system);
     if (!allow_create_subprocess()) return deny();
@@ -269,6 +325,16 @@ int __libc_system(const char *command) {
     RESOLVE_REAL(__libc_system);
     if (!allow_create_subprocess()) return deny();
     return real___libc_system(command);
+}
+pid_t __libc_clone(int (*fn)(void *), void *child_stack, int flags, void *arg, ...) {
+    RESOLVE_REAL(__libc_clone);
+    if (!allow_create_subprocess()) return deny();
+    va_list ap;
+    va_start(ap, arg);
+    long a4 = va_arg(ap, long);
+    long a5 = va_arg(ap, long);
+    va_end(ap);
+    return real___libc_clone(fn, child_stack, flags, arg, (void *)a4, (void *)a5);
 }
 pid_t forkpty(int *amaster, char *name, const struct termios *termp, const struct winsize *winp) {
     RESOLVE_REAL(forkpty);

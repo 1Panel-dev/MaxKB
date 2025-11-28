@@ -173,8 +173,6 @@ class PromptGenerateSerializer(serializers.Serializer):
 
         message = messages[-1]['content']
         q = prompt.replace("{userInput}", message)
-        q = q.replace("{application_name}", application.name)
-        q = q.replace("{detail}", application.desc)
 
         messages[-1]['content'] = q
         SUPPORTED_MODEL_TYPES = ["LLM", "IMAGE"]
@@ -185,13 +183,11 @@ class PromptGenerateSerializer(serializers.Serializer):
         if not model_exist:
             raise Exception(_("Model does not exists or is not an LLM model"))
 
-        system_content = SYSTEM_ROLE.format(application_name=application.name, detail=application.desc)
-
         def process():
             model = get_model_instance_by_model_workspace_id(model_id=model_id, workspace_id=workspace_id,
                                                              **application.model_params_setting)
             try:
-                for r in model.stream([SystemMessage(content=system_content),
+                for r in model.stream([SystemMessage(content=SYSTEM_ROLE),
                                        *[HumanMessage(content=m.get('content')) if m.get(
                                            'role') == 'user' else AIMessage(
                                            content=m.get('content')) for m in messages]]):

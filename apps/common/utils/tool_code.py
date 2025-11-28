@@ -112,6 +112,7 @@ except Exception as e:
         lines = subprocess_result.stdout.splitlines()
         result_line = [line for line in lines if line.startswith(_id)]
         if not result_line:
+            maxkb_logger.error("\n".join(lines))
             raise Exception("No result found.")
         result = json.loads(base64.b64decode(result_line[-1].split(":", 1)[1]).decode())
         if result.get('code') == 200:

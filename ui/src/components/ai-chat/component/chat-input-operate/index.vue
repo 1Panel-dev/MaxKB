@@ -1237,7 +1237,8 @@ async function saveUrl() {
   // 异步校验单个 URL
   async function processUrl(url: string) {
     try {
-      const res = await imageApi.getFile({url});
+      const appId = props.appId || props.applicationDetails?.id;
+      const res = await imageApi.getFile(appId, {url});
       if (!res.data) {
         MsgWarning(url + ' ' + t('chat.uploadFile.invalidUrl'));
         return;
