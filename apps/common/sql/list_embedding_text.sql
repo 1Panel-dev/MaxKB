@@ -5,7 +5,8 @@ SELECT
 	problem.knowledge_id AS knowledge_id,
 	0 AS source_type,
 	problem."content" AS "text",
-	paragraph.is_active AS is_active
+	paragraph.is_active AS is_active,
+	paragraph.chunks AS chunks
 FROM
 	problem problem
 	LEFT JOIN problem_paragraph_mapping problem_paragraph_mapping ON problem_paragraph_mapping.problem_id=problem."id"
@@ -20,7 +21,8 @@ SELECT
 	paragraph.knowledge_id AS knowledge_id,
 	1 AS source_type,
 	concat_ws(E'\n',paragraph.title,paragraph."content") AS "text",
-	paragraph.is_active AS is_active
+	paragraph.is_active AS is_active,
+	paragraph.chunks AS chunks
 FROM
 	paragraph paragraph
 

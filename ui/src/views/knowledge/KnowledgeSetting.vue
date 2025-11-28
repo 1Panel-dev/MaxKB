@@ -74,6 +74,26 @@
                     </div>
                   </div>
                 </el-card>
+                <el-card
+                  shadow="never"
+                  class="mb-8 w-full layout-bg"
+                  style="line-height: 22px"
+                  v-if="detail?.type === 4"
+                >
+                  <div class="flex align-center">
+                    <el-avatar shape="square" :size="32" style="background: #753DEF">
+                      <img src="@/assets/knowledge/logo_workflow.svg" style="width: 100%" alt=""/>
+                    </el-avatar>
+                    <div>
+                      <p>
+                        <el-text>{{ $t('views.knowledge.knowledgeType.workflowKnowledge') }}</el-text>
+                      </p>
+                      <el-text type="info"
+                      >{{ $t('views.knowledge.knowledgeType.workflowKnowledge') }}
+                      </el-text>
+                    </div>
+                  </div>
+                </el-card>
               </el-form-item>
               <el-form-item
                 :label="$t('views.knowledge.form.source_url.label')"

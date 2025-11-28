@@ -8899,3 +8899,6 @@ msgstr "应用令牌使用统计"
 
 msgid "Application top question statistics"
 msgstr "应用提问次数统计"
+
+msgid "Workflow"
+msgstr "工作流"
