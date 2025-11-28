@@ -50,9 +50,9 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item :label="$t('views.document.setRules.limit.label')">
+        <el-form-item :label="$t('子分块大小')">
           <el-slider
-            v-model="form_data.limit"
+            v-model="form_data.chunk_size"
             show-input
             :show-input-controls="false"
             :min="50"
@@ -93,6 +93,18 @@
                   </el-option>
                 </el-select>
               </div>
+            </div>
+            <div class="form-item mb-16">
+              <div class="title mb-8">
+                {{ $t('views.document.setRules.limit.label') }}
+              </div>
+              <el-slider
+                v-model="form_data.limit"
+                show-input
+                :show-input-controls="false"
+                :min="50"
+                :max="100000"
+              />
             </div>
             <div class="form-item mb-16">
               <div class="title mb-8">
@@ -213,6 +225,7 @@ const form = {
   document_name_relate_problem: false,
   document_name_relate_problem_reference: [],
   limit: 4096,
+  chunk_size: 256,
   patterns: [],
   with_filter: false
 }
