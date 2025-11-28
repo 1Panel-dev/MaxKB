@@ -6,7 +6,7 @@ import { inject } from 'vue'
 import { WorkflowMode } from '@/enums/application'
 import ApplicationDropdownMenu from '@/components/workflow-dropdown-menu/application/index.vue'
 import KnowledgeDropdownMenu from '@/components/workflow-dropdown-menu/knowledge/index.vue'
-const workflow_mode = inject('workflowMode') || WorkflowMode.Application
+const workflow_mode: WorkflowMode = inject('workflowMode') || WorkflowMode.Application
 defineProps({
   show: {
     type: Boolean,
