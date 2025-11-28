@@ -7,7 +7,13 @@
     ref="dynamicsFormRef"
     label-position="top"
     require-asterisk-position="right"
-  ></DynamicsForm>
+  >
+    <template #default>
+      <h4 class="title-decoration-1 mb-16 mt-4">
+        {{ $t('chat.userInput') }}
+      </h4>
+    </template>
+  </DynamicsForm>
 </template>
 <script setup lang="ts">
 import { ref, computed } from 'vue'

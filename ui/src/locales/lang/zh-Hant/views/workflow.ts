@@ -4,6 +4,7 @@ export default {
   baseComponent: '基礎組件',
   nodeSetting: '節點設置',
   workflow: '工作流',
+  knowledgeWorkflow: '知識庫工作流',
   info: {
     previewVersion: '預覽版本：',
     saveTime: '保存時間：',

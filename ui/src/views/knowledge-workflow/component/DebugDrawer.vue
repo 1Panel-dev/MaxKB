@@ -20,24 +20,28 @@
       </keep-alive>
     </div>
     <template #footer>
+      <el-button :loading="loading" @click="close">{{ $t('common.cancel') }}</el-button>
       <el-button
         v-if="base_form_list.length > 0 && active == 'knowledge_base'"
         :loading="loading"
         @click="up"
-        >上一步</el-button
+      >
+        {{ $t('views.document.buttons.prev') }}</el-button
       >
       <el-button
         v-if="base_form_list.length > 0 && active == 'data_source'"
         :loading="loading"
         @click="next"
-        >下一步</el-button
       >
+        {{ $t('views.document.buttons.next') }}
+      </el-button>
       <el-button
         v-if="base_form_list.length > 0 ? active == 'knowledge_base' : true"
         @click="upload"
         type="primary"
         :loading="loading"
-        >Upload
+      >
+        {{ $t('views.document.buttons.import') }}
       </el-button>
     </template>
   </el-drawer>
@@ -68,6 +72,9 @@ const _workflow = ref<any>(null)
 const _knowledge_id = ref<string>('')
 const close = () => {
   drawerVisible.value = false
+  _workflow.value = null
+  _knowledge_id.value = ''
+  active.value = 'data_source'
 }
 const open = (workflow: any, knowledge_id: string) => {
   drawerVisible.value = true

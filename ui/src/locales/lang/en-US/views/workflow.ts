@@ -4,6 +4,7 @@ export default {
   baseComponent: 'Basic',
   nodeSetting: 'Node Settings',
   workflow: 'Workflow',
+  knowledgeWorkflow: 'Knowledge Workflow',
   info: {
     previewVersion: 'Preview Version:',
     saveTime: 'Last Saved:',
@@ -501,7 +502,7 @@ You are a master of problem optimization, adept at accurately inferring user int
   },
   SystemPromptPlaceholder: 'System Prompt, can reference variables in the system, such as',
   UserPromptPlaceholder: 'User Prompt, can reference variables in the system, such as',
-   debug: {
+  debug: {
     executionResult: 'Execution Result',
     executionSuccess: 'Execution Succeeded',
     executionFailed: 'Execution Failed',
