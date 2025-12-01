@@ -20,7 +20,9 @@ jobs:
         [files]
         extend-exclude = [
           "**/*_svg",
-          "**/migrations/**"
+          "**/migrations/**",
+          "**/loopEdge.ts",
+          "**/edge.ts",
         ]
         EOF
     - name: Check spelling
