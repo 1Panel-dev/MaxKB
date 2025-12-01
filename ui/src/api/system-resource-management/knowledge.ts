@@ -1,7 +1,7 @@
 import { Result } from '@/request/Result'
 import { get, post, del, put, exportFile, exportExcel } from '@/request/index'
 import { type Ref } from 'vue'
-import type { pageRequest } from '@/api/type/common'
+import type { Dict, pageRequest } from '@/api/type/common'
 
 const prefix = '/system/resource/knowledge'
 
@@ -254,6 +254,62 @@ const delMulTag: (knowledge_id: string, tags: any, loading?: Ref<boolean>) => Pr
 ) => {
   return put(`${prefix}/${knowledge_id}/tags/batch_delete`, tags, null, loading)
 }
+const getKnowledgeWorkflowFormList: (
+  knowledge_id: string,
+  type: 'loacl' | 'tool',
+  id: string,
+  node: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (
+  knowledge_id: string,
+  type: 'loacl' | 'tool',
+  id: string,
+  node,
+  loading,
+) => {
+  return post(
+    `${prefix}/${knowledge_id}/datasource/${type}/${id}/form_list`,
+    { node },
+    {},
+    loading,
+  )
+}
+const getKnowledgeWorkflowDatasourceDetails: (
+  knowledge_id: string,
+  type: 'loacl' | 'tool',
+  id: string,
+  params: any,
+  function_name: string,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (
+  knowledge_id: string,
+  type: 'loacl' | 'tool',
+  id: string,
+  params,
+  function_name,
+  loading,
+) => {
+  return post(
+    `${prefix}/${knowledge_id}/datasource/${type}/${id}/${function_name}`,
+    params,
+    {},
+    loading,
+  )
+}
+const workflowAction: (
+  knowledge_id: string,
+  instance: Dict<any>,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (knowledge_id: string, instance, loading) => {
+  return post(`${prefix}/${knowledge_id}/action`, instance, {}, loading)
+}
+const getWorkflowAction: (
+  knowledge_id: string,
+  knowledge_action_id: string,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (knowledge_id: string, knowledge_action_id, loading) => {
+  return get(`${prefix}/${knowledge_id}/action/${knowledge_action_id}`, {}, loading)
+}
 
 
 export default {
@@ -275,7 +331,11 @@ export default {
   postTags,
   putTag,
   delTag,
-  delMulTag
+  delMulTag,
+  getKnowledgeWorkflowFormList,
+  getKnowledgeWorkflowDatasourceDetails,
+  workflowAction,
+  getWorkflowAction,
 } as {
   [key: string]: any
 }

@@ -105,8 +105,8 @@ except Exception as e:
             subprocess_result = self._exec_sandbox(_exec_code)
         else:
             subprocess_result = self._exec(_exec_code)
-        if subprocess_result.returncode == 1:
-            raise Exception(subprocess_result.stderr)
+        if subprocess_result.returncode != 0:
+            raise Exception(subprocess_result.stderr or subprocess_result.stdout or "Unknown exception occurred")
         lines = subprocess_result.stdout.splitlines()
         result_line = [line for line in lines if line.startswith(_id)]
         if not result_line:

@@ -1142,6 +1142,7 @@ function replaceDocument(file: any, row: any) {
   loadSharedApi({ type: 'document', systemType: apiType.value })
     .postReplaceSourceFile(id, row.id, formData, loading)
     .then(() => {
+      MsgSuccess(t('views.document.tip.replaceSuccess'))
       getList()
     })
     .catch((e: any) => {})

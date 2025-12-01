@@ -53,15 +53,26 @@ import Result from '@/views/knowledge-workflow/component/action/Result.vue'
 import applicationApi from '@/api/application/application'
 import KnowledgeBase from '@/views/knowledge-workflow/component/action/KnowledgeBase.vue'
 import { WorkflowType } from '@/enums/application'
-import KnowledgeApi from '@/api/knowledge/knowledge'
+import { loadSharedApi } from "@/utils/dynamics-api/shared-api.ts";
+import { useRoute } from "vue-router";
 provide('upload', (file: any, loading?: Ref<boolean>) => {
   return applicationApi.postUploadFile(file, _knowledge_id.value, 'KNOWLEDGE', loading)
 })
-const ak: any = {
+const route = useRoute()
+const ak = {
   data_source: DataSource,
   knowledge_base: KnowledgeBase,
   result: Result,
 }
+const apiType = computed(() => {
+  if (route.path.includes('shared')) {
+    return 'systemShare'
+  } else if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
 const loading = ref<boolean>(false)
 const action_id = ref<string>()
 const ActionRef = ref()
@@ -103,10 +114,11 @@ const up = () => {
 const upload = () => {
   ActionRef.value.validate().then(() => {
     form_data.value[active.value] = ActionRef.value.get_data()
-    KnowledgeApi.workflowAction(_knowledge_id.value, form_data.value, loading).then((ok) => {
-      action_id.value = ok.data.id
-      active.value = 'result'
-    })
+    loadSharedApi({ type: 'knowledge', systemType: apiType.value })
+      .workflowAction(_knowledge_id.value, form_data.value, loading).then((ok: any) => {
+        action_id.value = ok.data.id
+        active.value = 'result'
+      })
   })
 }
 defineExpose({ close, open })

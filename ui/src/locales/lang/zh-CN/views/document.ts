@@ -22,6 +22,7 @@ export default {
     nameMessage: '文件名称不能为空！',
     importMessage: '导入成功',
     migrationSuccess: '迁移成功',
+    replaceSuccess: '替换成功',
     fileLimitCountTip1: '每次最多上传',
     fileLimitCountTip2: '个文件',
     fileLimitSizeTip1: '每个文件不超过',

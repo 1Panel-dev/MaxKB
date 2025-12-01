@@ -1569,6 +1569,11 @@ class DocumentSerializers(serializers.Serializer):
                 # 读取新文件内容
                 file_content = file.read()
 
+                QuerySet(File).filter(
+                    sha256_hash=original_hash,
+                    source_id__in=[self.data.get('knowledge_id'), self.data.get('document_id')]
+                ).update(file_name=file.name)
+
                 # 查找所有具有相同sha256_hash的文件
                 files_to_update = QuerySet(File).filter(
                     sha256_hash=original_hash,

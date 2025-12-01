@@ -22,6 +22,7 @@ export default {
     nameMessage: 'Document name cannot be empty!',
     importMessage: 'Successful',
     migrationSuccess: 'Successful',
+    replaceSuccess: 'Successful',
     fileLimitCountTip1: 'Maximum upload per time',
     fileLimitCountTip2: 'files',
     fileLimitSizeTip1: 'each file must not exceed',
