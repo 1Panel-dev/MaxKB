@@ -126,6 +126,7 @@
         @click.stop
         @wheel="handleWheel"
         :show="showAnchor"
+        :inner="true"
         :id="id"
         style="left: 100%; top: 50%; transform: translate(0, -50%)"
         @clickNodes="clickNodes"
