@@ -158,7 +158,6 @@ const putKnowledgeHitTest: (
   return put(`${prefix}/${knowledge_id}/hit_test`, data, undefined, loading)
 }
 
-
 /**
  * 同步知识库
  * @param 参数 knowledge_id
@@ -257,7 +256,7 @@ const postLarkKnowledge: (data: any, loading?: Ref<boolean>) => Promise<Result<A
 const putLarkKnowledge: (
   knowledge_id: string,
   data: any,
-  loading?: Ref<boolean>
+  loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (knowledge_id, data, loading) => {
   return put(`${prefix}/lark/${knowledge_id}`, data, undefined, loading)
 }
@@ -269,77 +268,72 @@ const getAllTags: (params: any, loading?: Ref<boolean>) => Promise<Result<any>> 
   return get(`${prefix}/tags`, params, loading)
 }
 
-const getTags: (knowledge_id: string, params: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
-  knowledge_id,
-  params,
-  loading,
-) => {
+const getTags: (
+  knowledge_id: string,
+  params: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (knowledge_id, params, loading) => {
   return get(`${prefix}/${knowledge_id}/tags`, params, loading)
 }
 
-const postTags: (knowledge_id: string, tags: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
-  knowledge_id,
-  tags,
-  loading,
-) => {
+const postTags: (
+  knowledge_id: string,
+  tags: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (knowledge_id, tags, loading) => {
   return post(`${prefix}/${knowledge_id}/tags`, tags, null, loading)
 }
 
-const putTag: (knowledge_id: string, tag_id: string, tag: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
-  knowledge_id,
-  tag_id,
-  tag,
-  loading,
-) => {
+const putTag: (
+  knowledge_id: string,
+  tag_id: string,
+  tag: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (knowledge_id, tag_id, tag, loading) => {
   return put(`${prefix}/${knowledge_id}/tags/${tag_id}`, tag, null, loading)
 }
 
-const delTag: (knowledge_id: string, tag_id: string, type: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
-  knowledge_id,
-  tag_id,
-  type,
-  loading,
-) => {
+const delTag: (
+  knowledge_id: string,
+  tag_id: string,
+  type: string,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (knowledge_id, tag_id, type, loading) => {
   return del(`${prefix}/${knowledge_id}/tags/${tag_id}/${type}`, null, loading)
 }
 
-const delMulTag: (knowledge_id: string, tags: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
-  knowledge_id,
-  tags,
-  loading,
-) => {
+const delMulTag: (
+  knowledge_id: string,
+  tags: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (knowledge_id, tags, loading) => {
   return put(`${prefix}/${knowledge_id}/tags/batch_delete`, tags, null, loading)
 }
 const getKnowledgeWorkflowFormList: (
   knowledge_id: string,
-  type: 'loacl' | 'tool',
+  type: 'local' | 'tool',
   id: string,
   node: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (
   knowledge_id: string,
-  type: 'loacl' | 'tool',
+  type: 'local' | 'tool',
   id: string,
   node,
   loading,
 ) => {
-  return post(
-    `${prefix}/${knowledge_id}/datasource/${type}/${id}/form_list`,
-    { node },
-    {},
-    loading,
-  )
+  return post(`${prefix}/${knowledge_id}/datasource/${type}/${id}/form_list`, { node }, {}, loading)
 }
 const getKnowledgeWorkflowDatasourceDetails: (
   knowledge_id: string,
-  type: 'loacl' | 'tool',
+  type: 'local' | 'tool',
   id: string,
   params: any,
   function_name: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (
   knowledge_id: string,
-  type: 'loacl' | 'tool',
+  type: 'local' | 'tool',
   id: string,
   params,
   function_name,
