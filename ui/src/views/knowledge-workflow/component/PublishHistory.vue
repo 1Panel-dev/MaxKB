@@ -118,8 +118,8 @@ function editName(val: string, item: any) {
     const obj = {
       name: val,
     }
-    loadSharedApi({ type: 'workflowVersion', systemType: apiType.value })
-      .putWorkFlowVersion(id as string, item.id, obj, loading)
+    loadSharedApi({ type: 'knowledge', systemType: apiType.value })
+      .updateKnowledgeVersion(id as string, item.id, obj, loading)
       .then(() => {
         MsgSuccess(t('common.modifySuccess'))
         item['writeStatus'] = false
@@ -131,8 +131,8 @@ function editName(val: string, item: any) {
 }
 
 function getList() {
-  loadSharedApi({ type: 'workflowVersion', systemType: apiType.value })
-    .getWorkFlowVersion(id, loading)
+  loadSharedApi({ type: 'knowledge', systemType: apiType.value })
+    .listKnowledgeVersion(id, loading)
     .then((res: any) => {
       LogData.value = res.data
     })

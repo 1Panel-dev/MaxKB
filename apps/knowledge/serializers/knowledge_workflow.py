@@ -1,13 +1,16 @@
 # coding=utf-8
 import asyncio
+import datetime
 import json
 from typing import Dict
 
 import uuid_utils.compat as uuid
 from django.db import transaction
 from django.db.models import QuerySet
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
+from rest_framework.views import APIView
 
 from application.flow.common import Workflow, WorkflowMode
 from application.flow.i_step_node import KnowledgeWorkflowPostHandler
@@ -17,13 +20,14 @@ from application.serializers.application import get_mcp_tools
 from common.exception.app_exception import AppApiException
 from common.utils.rsa_util import rsa_long_decrypt
 from common.utils.tool_code import ToolExecutor
-from knowledge.models import KnowledgeScope, Knowledge, KnowledgeType, KnowledgeWorkflow
+from knowledge.models import KnowledgeScope, Knowledge, KnowledgeType, KnowledgeWorkflow, KnowledgeWorkflowVersion
 from knowledge.models.knowledge_action import KnowledgeAction, State
 from knowledge.serializers.knowledge import KnowledgeModelSerializer
 from maxkb.const import CONFIG
 from system_manage.models import AuthTargetType
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
 from tools.models import Tool
+from users.models import User
 
 tool_executor = ToolExecutor(CONFIG.get('SANDBOX'))
 
@@ -32,6 +36,11 @@ class KnowledgeWorkflowModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = KnowledgeWorkflow
         fields = '__all__'
+
+
+class KnowledgeWorkflowActionRequestSerializer(serializers.Serializer):
+    data_source = serializers.DictField(required=True, label=_('datasource data'))
+    knowledge_base = serializers.DictField(required=True, label=_('knowledge base data'))
 
 
 class KnowledgeWorkflowActionSerializer(serializers.Serializer):
@@ -46,6 +55,27 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
         KnowledgeAction(id=knowledge_action_id, knowledge_id=self.data.get("knowledge_id"), state=State.STARTED).save()
         work_flow_manage = KnowledgeWorkflowManage(
             Workflow.new_instance(knowledge_workflow.work_flow, WorkflowMode.KNOWLEDGE),
+            {'knowledge_id': self.data.get("knowledge_id"), 'knowledge_action_id': knowledge_action_id, 'stream': True,
+             'workspace_id': self.data.get("workspace_id"),
+             **instance},
+            KnowledgeWorkflowPostHandler(None, knowledge_action_id))
+        work_flow_manage.run()
+        return {'id': knowledge_action_id, 'knowledge_id': self.data.get("knowledge_id"), 'state': State.STARTED,
+                'details': {}}
+
+    def upload_document(self, instance: Dict, with_valid=True):
+        if with_valid:
+            self.is_valid(raise_exception=True)
+        knowledge_workflow = QuerySet(KnowledgeWorkflow).filter(knowledge_id=self.data.get("knowledge_id")).first()
+        if not knowledge_workflow.is_publish:
+            raise AppApiException(500, _("The knowledge base workflow has not been published"))
+        knowledge_workflow_version = QuerySet(KnowledgeWorkflowVersion).filter(
+            knowledge_id=self.data.get("knowledge_id")).order_by(
+            '-create_time')[0:1].first()
+        knowledge_action_id = uuid.uuid7()
+        KnowledgeAction(id=knowledge_action_id, knowledge_id=self.data.get("knowledge_id"), state=State.STARTED).save()
+        work_flow_manage = KnowledgeWorkflowManage(
+            Workflow.new_instance(knowledge_workflow_version.work_flow, WorkflowMode.KNOWLEDGE),
             {'knowledge_id': self.data.get("knowledge_id"), 'knowledge_action_id': knowledge_action_id, 'stream': True,
              'workspace_id': self.data.get("workspace_id"),
              **instance},
@@ -141,6 +171,26 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
         workspace_id = serializers.CharField(required=True, label=_('workspace id'))
         knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
 
+        def publish(self, with_valid=True):
+            if with_valid:
+                self.is_valid()
+            user_id = self.data.get('user_id')
+            workspace_id = self.data.get("workspace_id")
+            user = QuerySet(User).filter(id=user_id).first()
+            knowledge_workflow = QuerySet(KnowledgeWorkflow).filter(knowledge_id=self.data.get("knowledge_id"),
+                                                                    workspace_id=workspace_id).first()
+            work_flow_version = KnowledgeWorkflowVersion(work_flow=knowledge_workflow.work_flow,
+                                                         knowledge_id=self.data.get("knowledge_id"),
+                                                         name=timezone.localtime(timezone.now()).strftime(
+                                                             '%Y-%m-%d %H:%M:%S'),
+                                                         publish_user_id=user_id,
+                                                         publish_user_name=user.username,
+                                                         workspace_id=workspace_id)
+            work_flow_version.save()
+            QuerySet(KnowledgeWorkflow).filter(knowledge_id=self.data.get("knowledge_id")).update(is_publish=True,
+                                                                                                  publish_time=datetime.datetime.now())
+            return True
+
         def edit(self, instance: Dict):
             pass
 
@@ -149,8 +199,10 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
             workflow = QuerySet(KnowledgeWorkflow).filter(knowledge_id=self.data.get('knowledge_id')).first()
             return {**KnowledgeWorkflowModelSerializer(workflow).data}
 
+
 class McpServersSerializer(serializers.Serializer):
     mcp_servers = serializers.JSONField(required=True)
+
 
 class KnowledgeWorkflowMcpSerializer(serializers.Serializer):
     knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))

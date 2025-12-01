@@ -313,7 +313,7 @@ const publish = () => {
         return
       }
       loadSharedApi({ type: 'knowledge', systemType: apiType.value })
-        .putknowledge(id, { work_flow: workflow }, loading)
+        .putKnowledge(id, { work_flow: workflow })
         .then(() => {
           return loadSharedApi({ type: 'knowledge', systemType: apiType.value }).publish(
             id,
@@ -322,28 +322,6 @@ const publish = () => {
           )
         })
         .then((ok: any) => {
-          detail.value.name = ok.data.name
-          ok.data.work_flow?.nodes
-            ?.filter((v: any) => v.id === 'base-node')
-            .map((v: any) => {
-              apiInputParams.value = v.properties.api_input_field_list
-                ? v.properties.api_input_field_list.map((v: any) => {
-                    return {
-                      name: v.variable,
-                      value: v.default_value,
-                    }
-                  })
-                : v.properties.input_field_list
-                  ? v.properties.input_field_list
-                      .filter((v: any) => v.assignment_method === 'api_input')
-                      .map((v: any) => {
-                        return {
-                          name: v.variable,
-                          value: v.default_value,
-                        }
-                      })
-                  : []
-            })
           MsgSuccess(t('views.knowledge.tip.publishSuccess'))
         })
         .catch((res: any) => {
@@ -458,14 +436,6 @@ function getDetail() {
         workflowRef.value?.render(detail.value.work_flow)
         cloneWorkFlow.value = getGraphData()
       })
-      // 企业版和专业版
-      if (hasPermission([EditionConst.IS_EE, EditionConst.IS_PE], 'OR')) {
-        loadSharedApi({ type: 'knowledge', systemType: apiType.value })
-          .getknowledgeSetting(id)
-          .then((ok: any) => {
-            detail.value = { ...detail.value, ...ok.data }
-          })
-      }
     })
 }
 

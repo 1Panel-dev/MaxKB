@@ -159,9 +159,8 @@ class KnowledgeWorkflowVersion(AppModelMixin):
     """
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
     knowledge = models.ForeignKey(Knowledge, on_delete=models.CASCADE, verbose_name="知识库", db_constraint=False)
-    workflow = models.ForeignKey(KnowledgeWorkflow, on_delete=models.CASCADE, verbose_name="工作流",
-                                 db_constraint=False, related_name='versions')
     workspace_id = models.CharField(max_length=64, verbose_name="工作空间id", default="default", db_index=True)
+    name = models.CharField(verbose_name="版本名称", max_length=128, default="")
     work_flow = models.JSONField(verbose_name="工作流数据", default=dict)
     publish_user_id = models.UUIDField(verbose_name="发布者id", max_length=128, default=None, null=True)
     publish_user_name = models.CharField(verbose_name="发布者名称", max_length=128, default="")

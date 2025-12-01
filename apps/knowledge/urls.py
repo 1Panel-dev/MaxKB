@@ -71,7 +71,12 @@ urlpatterns = [
     path('workspace/<str:workspace_id>/knowledge/<int:current_page>/<int:page_size>', views.KnowledgeView.Page.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/datasource/<str:type>/<str:id>/form_list', views.KnowledgeDatasourceFormListView.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/datasource/<str:type>/<str:id>/<str:function_name>', views.KnowledgeDatasourceView.as_view()),
-    path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/action', views.KnowledgeWorkflowActionView.as_view()),
+    path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/publish', views.KnowledgeWorkflowView.Publish.as_view()),
+    path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/debug', views.KnowledgeWorkflowActionView.as_view()),
+    path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/upload_document', views.KnowledgeWorkflowUploadDocumentView.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/action/<str:knowledge_action_id>', views.KnowledgeWorkflowActionView.Operate.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/mcp_tools', views.McpServers.as_view()),
+    path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/knowledge_version', views.KnowledgeWorkflowVersionView.as_view()),
+    path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/knowledge_version/<int:current_page>/<int:page_size>', views.KnowledgeWorkflowVersionView.Page.as_view()),
+    path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/knowledge_version/<str:knowledge_version_id>', views.KnowledgeWorkflowVersionView.Operate.as_view()),
 ]

@@ -43,14 +43,14 @@ const UserInputFieldTableFef = ref()
 
 const nodeFields = computed(() => {
   if (props.nodeModel.properties.user_input_field_list) {
-    const fileds = props.nodeModel.properties.user_input_field_list.map((item: any) => ({
+    const fields = props.nodeModel.properties.user_input_field_list.map((item: any) => ({
       label: typeof item.label == 'string' ? item.label : item.label.label,
       value: item.field,
       globeLabel: `{{global.${typeof item.label == 'string' ? item.label : item.label.label}}}`,
       globeValue: `{{context['global'].${item.field}}}`,
     }))
-    set(props.nodeModel.properties.config, 'globalFields', fileds)
-    return fileds
+    set(props.nodeModel.properties.config, 'globalFields', fields)
+    return fields
   }
   set(props.nodeModel.properties.config, 'globalFields', [])
   return []

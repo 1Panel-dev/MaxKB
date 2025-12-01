@@ -57,7 +57,7 @@ import KnowledgeApi from '@/api/knowledge/knowledge'
 provide('upload', (file: any, loading?: Ref<boolean>) => {
   return applicationApi.postUploadFile(file, _knowledge_id.value, 'KNOWLEDGE', loading)
 })
-const ak = {
+const ak: any = {
   data_source: DataSource,
   knowledge_base: KnowledgeBase,
   result: Result,
