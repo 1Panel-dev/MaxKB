@@ -303,6 +303,21 @@ const getWorkflowAction: (
   return get(`${prefix}/${knowledge_id}/action/${knowledge_action_id}`, {}, loading)
 }
 
+/**
+ * 保存知识库工作流
+ * @param knowledge_id 
+ * @param data 
+ * @param loading 
+ * @returns 
+ */
+const putKnowledgeWorkflow: (
+  knowledge_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (knowledge_id, data, loading) => {
+  return put(`${prefix}/${knowledge_id}/workflow`, data, undefined, loading) 
+}
+
 const publish: (knowledge_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
   knowledge_id: string,
   loading,
@@ -342,6 +357,7 @@ export default {
   workflowAction,
   getWorkflowAction,
   publish,
+  putKnowledgeWorkflow,
   listKnowledgeVersion
 } as {
   [key: string]: any

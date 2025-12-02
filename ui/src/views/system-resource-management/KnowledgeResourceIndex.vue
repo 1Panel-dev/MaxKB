@@ -293,6 +293,8 @@ import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { SourceTypeEnum } from '@/enums/common'
 import { t } from '@/locales'
 import useStore from '@/stores'
+import { hasPermission } from '@/utils/permission'
+import { PermissionConst, RoleConst } from '@/utils/permission/data'
 const router = useRouter()
 const { user } = useStore()
 
@@ -306,7 +308,8 @@ const ManagePermission = () => {
     permissionPrecise.value.problem_read() ||
     permissionPrecise.value.edit() ||
     permissionPrecise.value.knowledge_chat_user_read() ||
-    permissionPrecise.value.hit_test()
+    permissionPrecise.value.hit_test() ||
+    hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_KNOWLEDGE_WORKFLOW_READ],'OR')
   )
 }
 

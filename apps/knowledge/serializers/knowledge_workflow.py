@@ -191,7 +191,20 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
             return True
 
         def edit(self, instance: Dict):
-            pass
+            self.is_valid(raise_exception=True)
+            if instance.get("work_flow"):
+                QuerySet(KnowledgeWorkflow).update_or_create(knowledge_id=self.data.get("knowledge_id"),
+                                                             create_defaults={'id': uuid.uuid7(),
+                                                                              'knowledge_id': self.data.get(
+                                                                                  "knowledge_id"),
+                                                                              "workspace_id": self.data.get(
+                                                                                  'workspace_id'),
+                                                                              'work_flow': instance.get('work_flow',
+                                                                                                        {}), },
+                                                             defaults={
+                                                                 'work_flow': instance.get('work_flow')
+                                                             })
+                return self.one()
 
         def one(self):
             self.is_valid(raise_exception=True)

@@ -16,7 +16,7 @@ urlpatterns = [
     path('workspace/<str:workspace_id>/knowledge/tags', views.KnowledgeView.Tags.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>', views.KnowledgeView.Operate.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/sync', views.KnowledgeView.SyncWeb.as_view()),
-    path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/workfolw', views.KnowledgeWorkflowView.Operate.as_view()),
+    path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/workflow', views.KnowledgeWorkflowView.Operate.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/generate_related', views.KnowledgeView.GenerateRelated.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/embedding', views.KnowledgeView.Embedding.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/hit_test', views.KnowledgeView.HitTest.as_view()),

@@ -416,18 +416,6 @@ class KnowledgeSerializer(serializers.Serializer):
                         application_id=application_id, knowledge_id=self.data.get('knowledge_id')
                     ) for application_id in application_id_list
                 ]) if len(application_id_list) > 0 else None
-            if instance.get("work_flow"):
-                QuerySet(KnowledgeWorkflow).update_or_create(knowledge_id=self.data.get("knowledge_id"),
-                                                             create_defaults={'id': uuid.uuid7(),
-                                                                              'knowledge_id': self.data.get(
-                                                                                  "knowledge_id"),
-                                                                              "workspace_id": self.data.get(
-                                                                                  'workspace_id'),
-                                                                              'work_flow': instance.get('work_flow',
-                                                                                                        {}), },
-                                                             defaults={
-                                                                 'work_flow': instance.get('work_flow')
-                                                             })
             knowledge.save()
             if select_one:
                 return self.one()

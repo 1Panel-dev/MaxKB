@@ -448,7 +448,7 @@ function saveknowledge(bool?: boolean, back?: boolean) {
   }
   loading.value = back || false
   loadSharedApi({ type: 'knowledge', systemType: apiType.value })
-    .putKnowledge(id, obj)
+    .putKnowledgeWorkflow(id, obj)
     .then(() => {
       saveTime.value = new Date()
       if (bool) {
