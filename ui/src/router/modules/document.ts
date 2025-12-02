@@ -115,7 +115,10 @@ const DocumentRouter = {
         title: 'views.workflow.workflow',
         icon: 'app-problems',
         activeMenu: '/knowledge',
-        sameRoute: 'knowledge',
+        parentPath: '/knowledge/:id/:folderId/:type',
+        parentName: 'KnowledgeDetail',
+        resourceType: SourceTypeEnum.KNOWLEDGE,
+        group: 'KnowledgeDetail',
         permission: [
           () => {
             const to: any = get_next_route()
