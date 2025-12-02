@@ -343,14 +343,17 @@ class KnowledgeSerializer(serializers.Serializer):
                 )
             ), with_search_one=True)
             workflow = {}
+
             if knowledge_dict.get('type') == 4:
                 from knowledge.models import KnowledgeWorkflow
                 k = QuerySet(KnowledgeWorkflow).filter(knowledge_id=knowledge_dict.get('id')).first()
                 if k:
-                    workflow = k.work_flow
+                    workflow['work_flow'] = k.work_flow
+                    workflow['is_publish'] = k.is_publish
+                    workflow['publish_time'] = k.publish_time
             return {
                 **knowledge_dict,
-                'work_flow': workflow,
+                **workflow,
                 'meta': json.loads(knowledge_dict.get('meta', '{}')),
                 'application_id_list': list(filter(
                     lambda application_id: all_application_list.__contains__(application_id),
@@ -416,9 +419,12 @@ class KnowledgeSerializer(serializers.Serializer):
             if instance.get("work_flow"):
                 QuerySet(KnowledgeWorkflow).update_or_create(knowledge_id=self.data.get("knowledge_id"),
                                                              create_defaults={'id': uuid.uuid7(),
-                                                                       'knowledge_id': self.data.get("knowledge_id"),
-                                                                       "workspace_id": self.data.get('workspace_id'),
-                                                                       'work_flow': instance.get('work_flow', {}), },
+                                                                              'knowledge_id': self.data.get(
+                                                                                  "knowledge_id"),
+                                                                              "workspace_id": self.data.get(
+                                                                                  'workspace_id'),
+                                                                              'work_flow': instance.get('work_flow',
+                                                                                                        {}), },
                                                              defaults={
                                                                  'work_flow': instance.get('work_flow')
                                                              })

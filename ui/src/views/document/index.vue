@@ -39,7 +39,7 @@
                   >{{ $t('views.document.importDocument') }}
                 </el-button>
                 <el-button
-                  v-if="knowledgeDetail?.type === 4 && permissionPrecise.doc_create(id)"
+                  v-if="knowledgeDetail?.type === 4 && permissionPrecise.doc_create(id)&&knowledgeDetail.is_publish"
                   type="primary"
                   @click="
                     router.push({
