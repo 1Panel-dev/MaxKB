@@ -153,7 +153,7 @@ import { KnowledgeWorkFlowInstance } from '@/workflow/common/validate'
 import { hasPermission } from '@/utils/permission'
 import DebugVue from './component/DebugDrawer.vue'
 import { t } from '@/locales'
-import { ComplexPermission } from '@/utils/permission/type'
+import { ComplexPermission, Permission } from '@/utils/permission/type'
 import { EditionConst, PermissionConst, RoleConst } from '@/utils/permission/data'
 import permissionMap from '@/permission'
 import { WorkflowMode } from '@/enums/application'
@@ -464,21 +464,75 @@ function saveknowledge(bool?: boolean, back?: boolean) {
     })
 }
 const go = () => {
-  if (route.path.includes('workspace')) {
-    return router.push({ path: get_route() })
-  } else {
+  if (route.path.includes('resource-management')) {
     return router.push({ path: get_resource_management_route() })
+  } else if (route.path.includes('shared')) { 
+    return router.push({ path: get_shared_route() })
+  } else {
+    return router.push({ path: get_route() })
+  }
+}
+
+const get_shared_route = () => { 
+  if (hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_DOCUMENT_READ], 'OR')) {
+    return `knowledge/${id}/shared/4/document`
+  } else if (hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_PROBLEM_READ], 'OR')) {
+    return `/knowledge/${id}/shared/4/problem`
+  } else if (hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_HIT_TEST_READ], 'OR')) {
+    return `/knowledge/${id}/shared/4/hit-test`
+  } else if (hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_CHAT_USER_READ], 'OR')) {
+    return `/knowledge/${id}/shared/4/chat-user`
+  } else if (hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_EDIT], 'OR')) {
+    return `/knowledge/${id}/shared/4/setting`
+  } else {
+      return `/system/shared/knowledge`
   }
 }
 
 const get_resource_management_route = () => {
-  return `/knowledge/${id}/${folderId}/4/document`
-
-  // return `/system/resource-management/knowledge`  没有权限的时候返回resource-management的列表
+  if (hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_KNOWLEDGE_DOCUMENT_READ],'OR')) {
+    return `/knowledge/${id}/resource-management/4/document`
+  } else if (hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_KNOWLEDGE_PROBLEM_READ], 'OR')) {
+    return `/knowledge/${id}/resource-management/4/problem`
+  } else if (hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_KNOWLEDGE_HIT_TEST], 'OR')) {
+    return `/knowledge/${id}/resource-management/4/hit-test`
+  } else if (hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_KNOWLEDGE_CHAT_USER_READ], 'OR')) {
+    return `/knowledge/${id}/resource-management/4/chat-user`
+  } else if (hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_KNOWLEDGE_EDIT], 'OR')) {
+    return `/knowledge/${id}/resource-management/4/setting`
+  } else {
+    return `/system/resource-management/knowledge`
+  }
 }
 
 const get_route = () => {
-  return `/knowledge/${id}/${folderId}/4/document`
+  const checkPermission = (permissionConst: Permission) => {
+    return hasPermission([
+      new ComplexPermission(
+        [RoleConst.USER],
+        [PermissionConst.KNOWLEDGE.getKnowledgeWorkspaceResourcePermission(id)],
+        [],
+        'AND'
+      ),
+      RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+      permissionConst.getWorkspacePermissionWorkspaceManageRole,
+      permissionConst.getKnowledgeWorkspaceResourcePermission(id),
+    ],'OR'
+    )
+  }
+   if (checkPermission(PermissionConst.KNOWLEDGE_DOCUMENT_READ)) {
+    return `/knowledge/${id}/${folderId}/4/document`
+  } else if (checkPermission(PermissionConst.KNOWLEDGE_PROBLEM_READ)) {
+    return `/knowledge/${id}/${folderId}/4/problem`
+  } else if (checkPermission(PermissionConst.KNOWLEDGE_HIT_TEST_READ)) {
+    return `/knowledge/${id}/${folderId}/4/hit-test`
+  } else if (checkPermission(PermissionConst.KNOWLEDGE_CHAT_USER_READ)) {
+    return `/knowledge/${id}/${folderId}/4/chat-user`
+  } else if (checkPermission(PermissionConst.KNOWLEDGE_EDIT)) {
+    return `/knowledge/${id}/${folderId}/4/setting`
+  } else {
+    return `/knowledge`
+  }
 }
 
 /**
