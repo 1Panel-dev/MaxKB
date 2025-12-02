@@ -43,7 +43,7 @@
   </DynamicsForm>
 </template>
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { WorkflowKind, WorkflowType } from '@/enums/application'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
 import type { FormField } from '@/components/dynamics-form/type'
@@ -135,6 +135,18 @@ const validate = () => {
 const get_data = () => {
   return form_data.value
 }
+watch(
+  source_node_list,
+  () => {
+    if (!base_form_data.value.node_id) {
+      if (source_node_list.value && source_node_list.value.length > 0) {
+        sourceChange(source_node_list.value[0].id)
+      }
+    }
+  },
+  { immediate: true },
+)
+
 defineExpose({ validate, get_data })
 </script>
 <style lang="scss" scoped></style>
