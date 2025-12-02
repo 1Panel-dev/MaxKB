@@ -26,9 +26,9 @@ const chatButtonHtml=
 
 
 
-const getChatContainerHtml=(protocol,host,token,query)=>{
+const getChatContainerHtml=(protocol,host,token,query,prefix)=>{
  return `<div id="maxkb-chat-container">
-<iframe id="maxkb-chat" allow="microphone" src=${protocol}://${host}/chat/${token}?mode=embed${query}></iframe>
+<iframe id="maxkb-chat" allow="microphone" src=${protocol}://${host}${prefix}/${token}?mode=embed${query}></iframe>
 <div class="maxkb-operate"><div class="maxkb-closeviewport maxkb-viewportnone"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
 <path d="M7.507 11.6645C7.73712 11.6645 7.94545 11.7578 8.09625 11.9086C8.24706 12.0594 8.34033 12.2677 8.34033 12.4978V16.7976C8.34033 17.0277 8.15378 17.2143 7.92366 17.2143H7.09033C6.86021 17.2143 6.67366 17.0277 6.67366 16.7976V14.5812L3.41075 17.843C3.24803 18.0057 2.98421 18.0057 2.82149 17.843L2.23224 17.2537C2.06952 17.091 2.06952 16.8272 2.23224 16.6645L5.56668 13.3311H3.19634C2.96622 13.3311 2.77967 13.1446 2.77967 12.9145V12.0811C2.77967 11.851 2.96622 11.6645 3.19634 11.6645H7.507ZM16.5991 2.1572C16.7619 1.99448 17.0257 1.99448 17.1884 2.1572L17.7777 2.74645C17.9404 2.90917 17.9404 3.17299 17.7777 3.33571L14.4432 6.66904H16.8136C17.0437 6.66904 17.2302 6.85559 17.2302 7.08571V7.91904C17.2302 8.14916 17.0437 8.33571 16.8136 8.33571H12.5029C12.2728 8.33571 12.0644 8.24243 11.9136 8.09163C11.7628 7.94082 11.6696 7.73249 11.6696 7.50237V3.20257C11.6696 2.97245 11.8561 2.7859 12.0862 2.7859H12.9196C13.1497 2.7859 13.3362 2.97245 13.3362 3.20257V5.419L16.5991 2.1572Z" fill="{{header_font_color}}"/>
 </svg></div>
@@ -62,7 +62,7 @@ const initChat=(root)=>{
   // 添加对话icon
   root.insertAdjacentHTML("beforeend",chatButtonHtml)
   // 添加对话框
-  root.insertAdjacentHTML('beforeend',getChatContainerHtml('{{protocol}}','{{host}}','{{token}}','{{query}}'))
+  root.insertAdjacentHTML('beforeend',getChatContainerHtml('{{protocol}}','{{host}}','{{token}}','{{query}}','{{prefix}}'))
   // 按钮元素
   const chat_button=root.querySelector('.maxkb-chat-button')
   const chat_button_img=root.querySelector('.maxkb-chat-button > img')

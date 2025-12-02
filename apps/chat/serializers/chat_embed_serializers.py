@@ -75,6 +75,7 @@ class ChatEmbedSerializer(serializers.Serializer):
                  'white_active': 'true' if application_access_token.white_active else 'false',
                  'is_draggable': is_draggable,
                  'float_icon': float_icon,
+                 'prefix': CONFIG.get_chat_path(),
                  'query': query,
                  'show_guide': show_guide,
                  'x_type': float_location.get('x', {}).get('type', 'right'),
