@@ -23,6 +23,7 @@ export default {
     professionalMessage: '社群版最多支援 5 個應用，如需擁有更多應用，請升級為專業版。',
     saveErrorMessage: '儲存失敗，請檢查輸入或稍後再試',
     loadingErrorMessage: '載入配置失敗，請檢查輸入或稍後再試',
+    noDocPermission: '無文檔創建權限',
   },
   form: {
     appName: {

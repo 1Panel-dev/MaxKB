@@ -34,11 +34,12 @@
           <AppIcon iconName="app-debug-outlined" class="mr-4"></AppIcon>
           {{ $t('common.debug') }}
         </el-button>
-        <el-button @click="saveknowledge(true)">
+        <el-button v-if="permissionPrecise.workflow_edit(id)"
+          @click="saveknowledge(true)">
           <AppIcon iconName="app-save-outlined" class="mr-4"></AppIcon>
           {{ $t('common.save') }}
         </el-button>
-        <el-button type="primary" @click="publish">
+        <el-button type="primary" v-if="permissionPrecise.workflow_edit(id)" @click="publish">
           {{ $t('common.publish') }}
         </el-button>
 
@@ -57,7 +58,7 @@
                 <AppIcon iconName="app-history-outlined" class="color-secondary"></AppIcon>
                 {{ $t('views.workflow.setting.releaseHistory') }}
               </el-dropdown-item>
-              <el-dropdown-item>
+              <el-dropdown-item v-if="permissionPrecise.workflow_edit(id)">
                 <AppIcon iconName="app-save-outlined" class="color-secondary"></AppIcon>
                 {{ $t('views.workflow.setting.autoSave') }}
                 <div class="ml-4">

@@ -73,8 +73,8 @@ class KnowledgeWorkflowActionView(APIView):
         tags=[_('Knowledge Base')]  # type: ignore
     )
     @has_permissions(
-        PermissionConstants.KNOWLEDGE_READ.get_workspace_knowledge_permission(),
-        PermissionConstants.KNOWLEDGE_READ.get_workspace_permission_workspace_manage_role(),
+        PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_knowledge_permission(),
+        PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_permission_workspace_manage_role(),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         ViewPermission(
             [RoleConstants.USER.get_workspace_role()],
@@ -148,8 +148,8 @@ class KnowledgeWorkflowView(APIView):
             responses=DefaultResultSerializer,
             tags=[_('Knowledge')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_EDIT.get_workspace_knowledge_permission(),
-                         PermissionConstants.KNOWLEDGE_EDIT.get_workspace_permission_workspace_manage_role(),
+        @has_permissions(PermissionConstants.KNOWLEDGE_WORKFLOW_EDIT.get_workspace_knowledge_permission(),
+                         PermissionConstants.KNOWLEDGE_WORKFLOW_EDIT.get_workspace_permission_workspace_manage_role(),
                          ViewPermission([RoleConstants.USER.get_workspace_role()],
                                         [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
                                         CompareConstants.AND),

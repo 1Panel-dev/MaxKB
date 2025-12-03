@@ -58,6 +58,9 @@ const share = {
     hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_TAG_DELETE], 'OR'),
   debug: () =>
     hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_WORKFLOW_READ], 'OR'),
+  workflow_edit: () =>
+    hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_WORKFLOW_EDIT], 'OR'),
+  
   chat_user_edit: () => false,
 
   auth: () => false,
