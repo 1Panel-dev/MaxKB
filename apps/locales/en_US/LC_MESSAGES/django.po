@@ -8785,3 +8785,12 @@ msgstr ""
 
 msgid "Workflow"
 msgstr ""
+
+msgid "Web source url"
+msgstr ""
+
+msgid "Web knowledge selector"
+msgstr ""
+
+msgid "The default is body, you can enter .classname/#idname/tagname"
+msgstr ""
