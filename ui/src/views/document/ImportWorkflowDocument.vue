@@ -9,7 +9,7 @@
         <div class="upload-document__component main-calc-height">
           <el-scrollbar>
             <div class="upload-component p-24" style="min-width: 850px">
-              <keep-alive>
+              <keep-alive :key="key" :include="['data_source', 'knowledge_base']">
                 <component
                   ref="ActionRef"
                   :is="ak[active]"
@@ -25,7 +25,9 @@
       </div>
     </el-card>
     <div class="upload-document__footer text-right border-t">
-      <el-button :disabled="loading" @click="router.go(-1)">{{ $t('common.cancel') }}</el-button>
+      <el-button v-if="active == 'result'" @click="continueImporting">
+        {{ $t('views.document.buttons.continueImporting') }}
+      </el-button>
       <el-button
         v-if="base_form_list.length > 0 && active == 'knowledge_base'"
         :loading="loading"
@@ -48,23 +50,27 @@
       >
         {{ $t('views.document.buttons.import') }}
       </el-button>
+      <el-button v-if="active == 'result'" type="primary" @click="goDocument">{{
+        $t('views.knowledge.ResultSuccess.buttons.toDocument')
+      }}</el-button>
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import { computed, ref, provide, type Ref, onMounted } from 'vue'
+import { computed, ref, provide, type Ref, onMounted, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import DataSource from '@/views/knowledge-workflow/component/action/DataSource.vue'
 import Result from '@/views/knowledge-workflow/component/action/Result.vue'
 import applicationApi from '@/api/application/application'
 import KnowledgeBase from '@/views/knowledge-workflow/component/action/KnowledgeBase.vue'
-import { loadSharedApi } from '@/utils/dynamics-api/shared-api.ts'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { WorkflowType } from '@/enums/application'
 provide('upload', (file: any, loading?: Ref<boolean>) => {
   return applicationApi.postUploadFile(file, id as string, 'KNOWLEDGE', loading)
 })
 const router = useRouter()
 const route = useRoute()
+const key = ref<number>(0)
 const {
   params: { folderId },
   query: { id },
@@ -132,7 +138,23 @@ function getDetail() {
       _workflow.value = res.data.work_flow
     })
 }
-
+const continueImporting = () => {
+  active.value = 'data_source'
+  key.value++
+  action_id.value = undefined
+  const c_workflow = _workflow.value
+  _workflow.value = null
+  form_data.value = {}
+  nextTick(() => {
+    _workflow.value = c_workflow
+  })
+}
+const goDocument = () => {
+  const newUrl = router.resolve({
+    path: `/knowledge/${id}/${folderId}/4/document`,
+  }).href
+  window.open(newUrl)
+}
 onMounted(() => {
   getDetail()
 })

@@ -5,20 +5,20 @@
     </h4>
     <div class="mb-16">
       <!-- 执行结果 -->
-      <!-- <el-alert
-            v-if="isSuccess"
-            :title="$t('views.workflow.debug.executionSuccess')"
-            type="success"
-            show-icon
-            :closable="false"
-          />
-          <el-alert
-            v-else
-            :title="$t('views.workflow.debug.executionFailed')"
-            type="error"
-            show-icon
-            :closable="false"
-          /> -->
+      <el-alert
+        v-if="state == 'SUCCESS'"
+        :title="$t('views.workflow.debug.executionSuccess')"
+        type="success"
+        show-icon
+        :closable="false"
+      />
+      <el-alert
+        v-if="state == 'FAILURE'"
+        :title="$t('views.workflow.debug.executionFailed')"
+        type="error"
+        show-icon
+        :closable="false"
+      />
     </div>
     <p class="lighter mb-8">{{ $t('chat.executionDetails.title') }}</p>
     <ExecutionDetailContent :detail="detail" app-type="WORK_FLOW"></ExecutionDetailContent>
@@ -45,20 +45,21 @@ const knowledge_action = ref<any>()
 let pollingTimer: any = null
 
 const getKnowledgeWorkflowAction = () => {
+  if (pollingTimer == null) {
+    return
+  }
   knowledgeApi
     .getWorkflowAction(props.knowledge_id, props.id)
     .then((ok) => {
       knowledge_action.value = ok.data
+    })
+    .finally(() => {
       if (['SUCCESS', 'FAILURE', 'REVOKED'].includes(state.value)) {
         stopPolling()
       } else {
         // 请求完成后再设置下次轮询
         pollingTimer = setTimeout(getKnowledgeWorkflowAction, 2000)
       }
-    })
-    .catch(() => {
-      // 错误时也继续轮询
-      pollingTimer = setTimeout(getKnowledgeWorkflowAction, 2000)
     })
 }
 
@@ -70,8 +71,7 @@ const stopPolling = () => {
 }
 
 // 启动轮询
-getKnowledgeWorkflowAction()
-
+pollingTimer = setTimeout(getKnowledgeWorkflowAction, 0)
 onUnmounted(() => {
   stopPolling()
 })

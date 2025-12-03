@@ -17,7 +17,7 @@
         prop="node_id"
         :rules="base_form_data_rule.node_id"
       >
-        <el-row class="w-full" gutter="8">
+        <el-row class="w-full" :gutter="8">
           <el-col :span="8" v-for="node in source_node_list" :key="node.id">
             <el-card
               shadow="never"

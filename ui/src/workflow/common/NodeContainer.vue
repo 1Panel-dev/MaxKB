@@ -180,8 +180,6 @@ import type { FormInstance } from 'element-plus'
 import { t } from '@/locales'
 import { useRoute } from 'vue-router'
 import DropdownMenu from '@/components/workflow-dropdown-menu/index.vue'
-const w = inject('workflowMode')
-console.log(w)
 const route = useRoute()
 const {
   params: { id },
