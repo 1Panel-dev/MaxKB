@@ -8920,3 +8920,6 @@ msgstr "選擇器"
 
 msgid "The default is body, you can enter .classname/#idname/tagname"
 msgstr "默認為 body，可輸入 .classname/#idname/tagname"
+
+msgid "Please enter the Web root address"
+msgstr "請輸入Web根地址"

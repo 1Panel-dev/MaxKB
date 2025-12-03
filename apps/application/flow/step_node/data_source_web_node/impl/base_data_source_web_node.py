@@ -19,8 +19,10 @@ from common.utils.logger import maxkb_logger
 
 
 class BaseDataSourceWebNodeForm(BaseForm):
-    source_url = forms.TextInputField(_('Web source url'), required=True)
-    selector = forms.TextInputField(_('Web knowledge selector'), required=False,attrs={'placeholder': _('The default is body, you can enter .classname/#idname/tagname')})
+    source_url = forms.TextInputField(_('Web source url'), required=True, attrs={
+        'placeholder': _('Please enter the Web root address')})
+    selector = forms.TextInputField(_('Web knowledge selector'), required=False, attrs={
+        'placeholder': _('The default is body, you can enter .classname/#idname/tagname')})
 
 
 def get_collect_handler():
@@ -38,7 +40,7 @@ def get_collect_handler():
             except Exception as e:
                 maxkb_logger.error(f'{str(e)}:{traceback.format_exc()}')
 
-    return handler,results
+    return handler, results
 
 
 class BaseDataSourceWebNode(IDataSourceWebNode):
@@ -61,16 +63,14 @@ class BaseDataSourceWebNode(IDataSourceWebNode):
         collect_handler, document_list = get_collect_handler()
 
         try:
-            ForkManage(source_url,selector.split(" ") if selector is not None else []).fork(3,set(),collect_handler)
+            ForkManage(source_url, selector.split(" ") if selector is not None else []).fork(3, set(), collect_handler)
 
-            return  NodeResult({'document_list': document_list},
-                               self.workflow_manage.params.get('knowledge_base') or {})
+            return NodeResult({'document_list': document_list},
+                              self.workflow_manage.params.get('knowledge_base') or {})
 
         except Exception as e:
             maxkb_logger.error(_('data source web node:{node_id} error{error}{traceback}').format(
                 knowledge_id=node_id, error=str(e), traceback=traceback.format_exc()))
-
-
 
     def get_details(self, index: int, **kwargs):
         return {
@@ -78,7 +78,7 @@ class BaseDataSourceWebNode(IDataSourceWebNode):
             "index": index,
             'run_time': self.context.get('run_time'),
             'type': self.node.type,
-            'input_params': {"source_url": self.context.get("source_url"),"selector": self.context.get('selector')},
+            'input_params': {"source_url": self.context.get("source_url"), "selector": self.context.get('selector')},
             'output_params': self.context.get('document_list'),
             'knowledge_base': self.workflow_params.get('knowledge_base'),
             'status': self.status,

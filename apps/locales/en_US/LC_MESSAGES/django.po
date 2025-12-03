@@ -8794,3 +8794,6 @@ msgstr ""
 
 msgid "The default is body, you can enter .classname/#idname/tagname"
 msgstr ""
+
+msgid "Please enter the Web root address"
+msgstr ""
