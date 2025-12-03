@@ -210,6 +210,7 @@ exec({dedent(code)!a})
                 '-c',
                 f'import base64,gzip; exec(gzip.decompress(base64.b64decode(\'{compressed_and_base64_encoded_code_str}\')).decode())',
             ],
+            'cwd': self.sandbox_path,
             'env': {
                'LD_PRELOAD': self.sandbox_so_path,
             },

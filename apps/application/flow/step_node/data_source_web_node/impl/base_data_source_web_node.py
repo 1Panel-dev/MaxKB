@@ -19,8 +19,8 @@ from common.utils.logger import maxkb_logger
 
 
 class BaseDataSourceWebNodeForm(BaseForm):
-    source_url = forms.TextInputField('source url', required=True)
-    selector = forms.TextInputField('knowledge selector', required=False,default_value="body")
+    source_url = forms.TextInputField(_('Web source url'), required=True)
+    selector = forms.TextInputField(_('Web knowledge selector'), required=False,attrs={'placeholder': _('The default is body, you can enter .classname/#idname/tagname')})
 
 
 def get_collect_handler():

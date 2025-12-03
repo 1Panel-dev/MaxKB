@@ -26,6 +26,7 @@ export default {
     professionalMessage: '社区版最多支持 5 个应用，如需拥有更多应用，请升级为专业版。',
     saveErrorMessage: '保存失败，请检查输入或稍后再试',
     loadingErrorMessage: '加载配置失败，请检查输入或稍后再试',
+    noDocPermission: '无文档创建权限',
   },
   form: {
     appName: {

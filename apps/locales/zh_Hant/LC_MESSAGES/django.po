@@ -8911,3 +8911,12 @@ msgstr "SAML2 單點登入"
 
 msgid "Workflow"
 msgstr "工作流"
+
+msgid "Web source url"
+msgstr "Web 根地址"
+
+msgid "Web knowledge selector"
+msgstr "選擇器"
+
+msgid "The default is body, you can enter .classname/#idname/tagname"
+msgstr "默認為 body，可輸入 .classname/#idname/tagname"

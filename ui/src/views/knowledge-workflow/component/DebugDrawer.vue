@@ -58,7 +58,11 @@ import Result from '@/views/knowledge-workflow/component/action/Result.vue'
 import applicationApi from '@/api/application/application'
 import KnowledgeBase from '@/views/knowledge-workflow/component/action/KnowledgeBase.vue'
 import { WorkflowType } from '@/enums/application'
+
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import permissionMap from '@/permission'
+import { MsgError } from '@/utils/message'
+import { t } from '@/locales'
 import { useRoute, useRouter } from 'vue-router'
 provide('upload', (file: any, loading?: Ref<boolean>) => {
   return applicationApi.postUploadFile(file, id, 'KNOWLEDGE', loading)
@@ -121,8 +125,14 @@ const up = () => {
     active.value = 'data_source'
   })
 }
+
+const permissionPrecise = computed(() => {
+  return permissionMap['knowledge'][apiType.value]
+})
+
 const upload = () => {
-  ActionRef.value.validate().then(() => {
+  if (permissionPrecise.value.doc_create(id)) {
+    ActionRef.value.validate().then(() => {
     form_data.value[active.value] = ActionRef.value.get_data()
     loadSharedApi({ type: 'knowledge', systemType: apiType.value })
       .workflowAction(id, form_data.value, loading)
@@ -131,6 +141,9 @@ const upload = () => {
         active.value = 'result'
       })
   })
+  } else {
+    MsgError(t('views.application.tip.noDocPermission'))
+  }
 }
 const continueImporting = () => {
   active.value = 'data_source'
