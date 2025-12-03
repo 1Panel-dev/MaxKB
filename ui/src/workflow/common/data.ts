@@ -130,8 +130,8 @@ export const knowledgeWriteNode = {
   type: WorkflowType.KnowledgeWriteNode,
   text: t('views.workflow.nodes.knowledgeWriteNode.text'),
   label: t('views.workflow.nodes.knowledgeWriteNode.label'),
+  height: 252,
   properties: {
-    height: 252,
     stepName: t('views.workflow.nodes.knowledgeWriteNode.label'),
     config: {
       fields: [],
