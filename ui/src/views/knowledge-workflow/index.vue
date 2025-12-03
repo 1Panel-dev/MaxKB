@@ -474,7 +474,7 @@ const go = () => {
 
 const get_shared_route = () => {
   if (hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_DOCUMENT_READ], 'OR')) {
-    return `knowledge/${id}/shared/4/document`
+    return `/knowledge/${id}/shared/4/document`
   } else if (
     hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_PROBLEM_READ], 'OR')
   ) {
