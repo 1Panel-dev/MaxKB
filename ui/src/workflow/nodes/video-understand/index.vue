@@ -16,9 +16,7 @@
           prop="model_id"
           :rules="{
             required: true,
-            message: $t(
-              'views.workflow.nodes.videoUnderstandNode.model.requiredMessage',
-            ),
+            message: $t('views.workflow.nodes.videoUnderstandNode.model.requiredMessage'),
             trigger: 'change',
           }"
         >
@@ -46,9 +44,7 @@
             @wheel="wheel"
             :teleported="false"
             v-model="form_data.model_id"
-            :placeholder="
-              $t('views.workflow.nodes.videoUnderstandNode.model.requiredMessage')
-            "
+            :placeholder="$t('views.workflow.nodes.videoUnderstandNode.model.requiredMessage')"
             :options="modelOptions"
             showFooter
             :model-type="'IMAGE'"
@@ -143,9 +139,7 @@
           :rules="{
             type: 'array',
             required: true,
-            message: $t(
-              'views.workflow.nodes.videoUnderstandNode.image.requiredMessage',
-            ),
+            message: $t('views.workflow.nodes.videoUnderstandNode.image.requiredMessage'),
             trigger: 'change',
           }"
         >
@@ -157,22 +151,19 @@
             ref="nodeCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
-            :placeholder="
-              $t('views.workflow.nodes.videoUnderstandNode.image.requiredMessage')
-            "
+            :placeholder="$t('views.workflow.nodes.videoUnderstandNode.image.requiredMessage')"
             v-model="form_data.video_list"
           />
         </el-form-item>
         <el-form-item
           :label="$t('views.workflow.nodes.aiChatNode.returnContent.label')"
           @click.prevent
+          v-if="[WorkflowMode.Application, WorkflowMode.ApplicationLoop].includes(workflowMode)"
         >
           <template #label>
             <div class="flex align-center">
               <div class="mr-4">
-                <span>{{
-                  $t('views.workflow.nodes.aiChatNode.returnContent.label')
-                }}</span>
+                <span>{{ $t('views.workflow.nodes.aiChatNode.returnContent.label') }}</span>
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content>
@@ -202,7 +193,8 @@ import { t } from '@/locales'
 import { useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import GeneratePromptDialog from '@/views/application/component/GeneratePromptDialog.vue'
-
+import { WorkflowMode } from '@/enums/application'
+const workflowMode = (inject('workflowMode') as WorkflowMode) || WorkflowMode.Application
 const getResourceDetail = inject('getResourceDetail') as any
 const route = useRoute()
 

@@ -16,9 +16,7 @@
           prop="model_id"
           :rules="{
             required: true,
-            message: $t(
-              'views.workflow.nodes.imageToVideoGenerate.model.requiredMessage',
-            ),
+            message: $t('views.workflow.nodes.imageToVideoGenerate.model.requiredMessage'),
             trigger: 'change',
           }"
         >
@@ -48,9 +46,7 @@
             :teleported="false"
             v-model="form_data.model_id"
             @focus="getSelectModel"
-            :placeholder="
-              $t('views.workflow.nodes.imageToVideoGenerate.model.requiredMessage')
-            "
+            :placeholder="$t('views.workflow.nodes.imageToVideoGenerate.model.requiredMessage')"
             :options="modelOptions"
             showFooter
             :model-type="'ITV'"
@@ -108,11 +104,7 @@
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content
-                  >{{
-                    $t(
-                      'views.workflow.nodes.imageToVideoGenerate.negative_prompt.tooltip',
-                    )
-                  }}
+                  >{{ $t('views.workflow.nodes.imageToVideoGenerate.negative_prompt.tooltip') }}
                 </template>
                 <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
               </el-tooltip>
@@ -120,9 +112,7 @@
           </template>
           <MdEditorMagnify
             @wheel="wheel"
-            :title="
-              $t('views.workflow.nodes.imageToVideoGenerate.negative_prompt.label')
-            "
+            :title="$t('views.workflow.nodes.imageToVideoGenerate.negative_prompt.label')"
             v-model="form_data.negative_prompt"
             :placeholder="
               $t('views.workflow.nodes.imageToVideoGenerate.negative_prompt.placeholder')
@@ -136,9 +126,7 @@
           :rules="{
             type: 'array',
             required: true,
-            message: $t(
-              'views.workflow.nodes.imageToVideoGenerate.first_frame.requiredMessage',
-            ),
+            message: $t('views.workflow.nodes.imageToVideoGenerate.first_frame.requiredMessage'),
             trigger: 'change',
           }"
         >
@@ -161,9 +149,7 @@
           :rules="{
             type: 'array',
             required: false,
-            message: $t(
-              'views.workflow.nodes.imageToVideoGenerate.last_frame.requiredMessage',
-            ),
+            message: $t('views.workflow.nodes.imageToVideoGenerate.last_frame.requiredMessage'),
             trigger: 'change',
           }"
         >
@@ -184,13 +170,12 @@
         <el-form-item
           :label="$t('views.workflow.nodes.aiChatNode.returnContent.label')"
           @click.prevent
+          v-if="[WorkflowMode.Application, WorkflowMode.ApplicationLoop].includes(workflowMode)"
         >
           <template #label>
             <div class="flex align-center">
               <div class="mr-4">
-                <span>{{
-                  $t('views.workflow.nodes.aiChatNode.returnContent.label')
-                }}</span>
+                <span>{{ $t('views.workflow.nodes.aiChatNode.returnContent.label') }}</span>
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content>
@@ -218,7 +203,8 @@ import { t } from '@/locales'
 import { useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
-
+import { WorkflowMode } from '@/enums/application'
+const workflowMode = (inject('workflowMode') as WorkflowMode) || WorkflowMode.Application
 const getResourceDetail = inject('getResourceDetail') as any
 const route = useRoute()
 

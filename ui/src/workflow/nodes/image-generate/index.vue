@@ -45,9 +45,7 @@
             @wheel="wheel"
             :teleported="false"
             v-model="form_data.model_id"
-            :placeholder="
-              $t('views.workflow.nodes.imageGenerateNode.model.requiredMessage')
-            "
+            :placeholder="$t('views.workflow.nodes.imageGenerateNode.model.requiredMessage')"
             :options="modelOptions"
             showFooter
             @focus="getSelectModel"
@@ -106,9 +104,7 @@
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content
-                  >{{
-                    $t('views.workflow.nodes.imageGenerateNode.negative_prompt.tooltip')
-                  }}
+                  >{{ $t('views.workflow.nodes.imageGenerateNode.negative_prompt.tooltip') }}
                 </template>
                 <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
               </el-tooltip>
@@ -118,9 +114,7 @@
             @wheel="wheel"
             :title="$t('views.workflow.nodes.imageGenerateNode.negative_prompt.label')"
             v-model="form_data.negative_prompt"
-            :placeholder="
-              $t('views.workflow.nodes.imageGenerateNode.negative_prompt.placeholder')
-            "
+            :placeholder="$t('views.workflow.nodes.imageGenerateNode.negative_prompt.placeholder')"
             style="height: 150px"
             @submitDialog="submitNegativeDialog"
           />
@@ -128,13 +122,12 @@
         <el-form-item
           :label="$t('views.workflow.nodes.aiChatNode.returnContent.label')"
           @click.prevent
+          v-if="[WorkflowMode.Application, WorkflowMode.ApplicationLoop].includes(workflowMode)"
         >
           <template #label>
             <div class="flex align-center">
               <div class="mr-4">
-                <span>{{
-                  $t('views.workflow.nodes.aiChatNode.returnContent.label')
-                }}</span>
+                <span>{{ $t('views.workflow.nodes.aiChatNode.returnContent.label') }}</span>
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content>
@@ -161,6 +154,8 @@ import AIModeParamSettingDialog from '@/views/application/component/AIModeParamS
 import { t } from '@/locales'
 import { useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import { WorkflowMode } from '@/enums/application'
+const workflowMode = (inject('workflowMode') as WorkflowMode) || WorkflowMode.Application
 const getResourceDetail = inject('getResourceDetail') as any
 const route = useRoute()
 

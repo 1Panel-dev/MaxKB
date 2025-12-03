@@ -16,9 +16,7 @@
           prop="model_id"
           :rules="{
             required: true,
-            message: $t(
-              'views.workflow.nodes.textToVideoGenerate.model.requiredMessage',
-            ),
+            message: $t('views.workflow.nodes.textToVideoGenerate.model.requiredMessage'),
             trigger: 'change',
           }"
         >
@@ -48,9 +46,7 @@
             @focus="getSelectModel"
             :teleported="false"
             v-model="form_data.model_id"
-            :placeholder="
-              $t('views.workflow.nodes.textToVideoGenerate.model.requiredMessage')
-            "
+            :placeholder="$t('views.workflow.nodes.textToVideoGenerate.model.requiredMessage')"
             :options="modelOptions"
             showFooter
             :model-type="'TTV'"
@@ -108,11 +104,7 @@
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content
-                  >{{
-                    $t(
-                      'views.workflow.nodes.textToVideoGenerate.negative_prompt.tooltip',
-                    )
-                  }}
+                  >{{ $t('views.workflow.nodes.textToVideoGenerate.negative_prompt.tooltip') }}
                 </template>
                 <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
               </el-tooltip>
@@ -132,13 +124,12 @@
         <el-form-item
           :label="$t('views.workflow.nodes.aiChatNode.returnContent.label')"
           @click.prevent
+          v-if="[WorkflowMode.Application, WorkflowMode.ApplicationLoop].includes(workflowMode)"
         >
           <template #label>
             <div class="flex align-center">
               <div class="mr-4">
-                <span>{{
-                  $t('views.workflow.nodes.aiChatNode.returnContent.label')
-                }}</span>
+                <span>{{ $t('views.workflow.nodes.aiChatNode.returnContent.label') }}</span>
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content>
@@ -165,8 +156,10 @@ import AIModeParamSettingDialog from '@/views/application/component/AIModeParamS
 import { t } from '@/locales'
 import { useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import { WorkflowMode } from '@/enums/application'
 const getResourceDetail = inject('getResourceDetail') as any
 const route = useRoute()
+const workflowMode = (inject('workflowMode') as WorkflowMode) || WorkflowMode.Application
 
 const {
   params: { id },

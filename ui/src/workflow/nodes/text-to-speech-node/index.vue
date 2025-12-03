@@ -80,13 +80,12 @@
         <el-form-item
           :label="$t('views.workflow.nodes.aiChatNode.returnContent.label')"
           @click.prevent
+          v-if="[WorkflowMode.Application, WorkflowMode.ApplicationLoop].includes(workflowMode)"
         >
           <template #label>
             <div class="flex align-center">
               <div class="mr-4">
-                <span>{{
-                  $t('views.workflow.nodes.aiChatNode.returnContent.label')
-                }}</span>
+                <span>{{ $t('views.workflow.nodes.aiChatNode.returnContent.label') }}</span>
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content>
@@ -115,9 +114,10 @@ import { MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
 import { useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import { WorkflowMode } from '@/enums/application'
 const getResourceDetail = inject('getResourceDetail') as any
 const route = useRoute()
-
+const workflowMode = (inject('workflowMode') as WorkflowMode) || WorkflowMode.Application
 const {
   params: { id },
 } = route as any

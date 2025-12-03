@@ -19,14 +19,8 @@
                 size="small"
                 style="width: 85px"
               >
-                <el-option
-                  :label="$t('views.workflow.variable.Referencing')"
-                  value="referencing"
-                />
-                <el-option
-                  :label="$t('common.custom')"
-                  value="content"
-                />
+                <el-option :label="$t('views.workflow.variable.Referencing')" value="referencing" />
+                <el-option :label="$t('common.custom')" value="content" />
               </el-select>
             </div>
           </template>
@@ -44,22 +38,19 @@
             ref="nodeCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
-            :placeholder="
-              $t('views.workflow.nodes.searchKnowledgeNode.searchQuestion.placeholder')
-            "
+            :placeholder="$t('views.workflow.nodes.searchKnowledgeNode.searchQuestion.placeholder')"
             v-model="form_data.fields"
           />
         </el-form-item>
         <el-form-item
+          v-if="[WorkflowMode.Application, WorkflowMode.ApplicationLoop].includes(workflowMode)"
           :label="$t('views.workflow.nodes.aiChatNode.returnContent.label')"
           @click.prevent
         >
           <template #label>
             <div class="flex align-center">
               <div class="mr-4">
-                <span>{{
-                  $t('views.workflow.nodes.aiChatNode.returnContent.label')
-                }}</span>
+                <span>{{ $t('views.workflow.nodes.aiChatNode.returnContent.label') }}</span>
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content>
@@ -79,9 +70,10 @@
 import { set } from 'lodash'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, inject } from 'vue'
 import { isLastNode } from '@/workflow/common/data'
-
+import { WorkflowMode } from '@/enums/application'
+const workflowMode = (inject('workflowMode') as WorkflowMode) || WorkflowMode.Application
 const props = defineProps<{ nodeModel: any }>()
 
 const wheel = (e: any) => {
@@ -111,7 +103,7 @@ const form_data = computed({
   },
   set: (value) => {
     set(props.nodeModel.properties, 'node_data', value)
-  }
+  },
 })
 
 function submitDialog(val: string) {
@@ -123,7 +115,7 @@ const nodeCascaderRef = ref()
 const validate = () => {
   return Promise.all([
     nodeCascaderRef.value ? nodeCascaderRef.value.validate() : Promise.resolve(''),
-    replyNodeFormRef.value?.validate()
+    replyNodeFormRef.value?.validate(),
   ]).catch((err: any) => {
     return Promise.reject({ node: props.nodeModel, errMessage: err })
   })
