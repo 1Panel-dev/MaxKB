@@ -384,8 +384,10 @@ class ResourceUserPermissionSerializer(serializers.Serializer):
             })
             role_name_and_type_query_set = QuerySet(model=get_dynamics_model({
             'user_role_relation.workspace_id': models.CharField(),
+            'role_setting.type': models.CharField(),
         })).filter(**{
                 "user_role_relation.workspace_id": self.data.get('workspace_id'),
+                "role_setting.type": "USER",
             })
             if role_name:
                 user_query_set = user_query_set.filter(
