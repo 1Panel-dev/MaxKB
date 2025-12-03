@@ -43,7 +43,7 @@
         {{ $t('views.document.buttons.next') }}
       </el-button>
       <el-button
-        v-if="base_form_list.length > 0 ? active == 'knowledge_base' : true"
+        v-if="base_form_list.length > 0 ? active == 'knowledge_base' : active == 'data_source'"
         @click="upload"
         type="primary"
         :disabled="loading"

@@ -38,7 +38,7 @@
         {{ $t('views.document.buttons.next') }}
       </el-button>
       <el-button
-        v-if="base_form_list.length > 0 ? active == 'knowledge_base' : true"
+        v-if="base_form_list.length > 0 ? active == 'knowledge_base' : active == 'data_source'"
         @click="upload"
         type="primary"
         :loading="loading"
@@ -133,14 +133,14 @@ const permissionPrecise = computed(() => {
 const upload = () => {
   if (permissionPrecise.value.doc_create(id)) {
     ActionRef.value.validate().then(() => {
-    form_data.value[active.value] = ActionRef.value.get_data()
-    loadSharedApi({ type: 'knowledge', systemType: apiType.value })
-      .workflowAction(id, form_data.value, loading)
-      .then((ok: any) => {
-        action_id.value = ok.data.id
-        active.value = 'result'
-      })
-  })
+      form_data.value[active.value] = ActionRef.value.get_data()
+      loadSharedApi({ type: 'knowledge', systemType: apiType.value })
+        .workflowAction(id, form_data.value, loading)
+        .then((ok: any) => {
+          action_id.value = ok.data.id
+          active.value = 'result'
+        })
+    })
   } else {
     MsgError(t('views.application.tip.noDocPermission'))
   }
