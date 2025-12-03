@@ -315,7 +315,7 @@ const publish = () => {
         return
       }
       loadSharedApi({ type: 'knowledge', systemType: apiType.value })
-        .putKnowledge(id, { work_flow: workflow })
+        .putKnowledgeWorkflow(id, { work_flow: workflow })
         .then(() => {
           return loadSharedApi({ type: 'knowledge', systemType: apiType.value }).publish(
             id,
