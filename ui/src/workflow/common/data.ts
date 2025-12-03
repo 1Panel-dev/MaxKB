@@ -89,7 +89,6 @@ export const dataSourceLocalNode = {
     height: 728.375,
     stepName: t('views.workflow.nodes.dataSourceLocalNode.label'),
     input_field_list: [],
-    node_data: {},
     config: {
       fields: [
         {
