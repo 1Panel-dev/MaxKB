@@ -10,7 +10,7 @@
   >
     <template #default>
       <h4 class="title-decoration-1 mb-16 mt-4">
-        {{ $t('chat.userInput') }}
+        {{ chat_title || $t('chat.userInput') }}
       </h4>
     </template>
   </DynamicsForm>
@@ -26,6 +26,10 @@ const dynamicsFormRef = ref<InstanceType<typeof DynamicsForm>>()
 const validate = () => {
   return dynamicsFormRef.value?.validate()
 }
+const chat_title = computed(() => {
+  const kBase = props.workflow?.nodes?.find((n: any) => n.type === WorkflowType.KnowledgeBase)
+  return kBase.properties.user_input_config.title
+})
 const base_form_list = computed(() => {
   const kBase = props.workflow?.nodes?.find((n: any) => n.type === WorkflowType.KnowledgeBase)
   if (kBase) {

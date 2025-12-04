@@ -209,7 +209,10 @@ onMounted(() => {
   if (props.nodeModel.properties.user_input_field_list) {
     inputFieldList.value = cloneDeep(props.nodeModel.properties.user_input_field_list)
   }
-
+  if (props.nodeModel.properties.user_input_config) {
+    inputFieldConfig.value = props.nodeModel.properties.user_input_config
+  }
+  set(props.nodeModel.properties, 'user_input_config', inputFieldConfig)
   onDragHandle()
 })
 </script>
