@@ -4,6 +4,7 @@ from drf_spectacular.utils import OpenApiParameter
 
 from common.mixins.api_mixin import APIMixin
 from knowledge.serializers.knowledge_workflow import KnowledgeWorkflowActionRequestSerializer
+from knowledge.serializers.knowledge_workflow import KnowledgeWorkflowActionListQuerySerializer
 
 
 class KnowledgeWorkflowApi(APIMixin):
@@ -12,6 +13,12 @@ class KnowledgeWorkflowApi(APIMixin):
 
 class KnowledgeWorkflowVersionApi(APIMixin):
     pass
+
+
+class KnowledgeWorkflowActionPageApi(APIMixin):
+    @staticmethod
+    def get_request():
+        return KnowledgeWorkflowActionListQuerySerializer
 
 
 class KnowledgeWorkflowActionApi(APIMixin):

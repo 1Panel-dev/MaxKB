@@ -11,7 +11,8 @@ from common.auth.authentication import has_permissions
 from common.constants.permission_constants import PermissionConstants, RoleConstants, ViewPermission, CompareConstants
 from common.log.log import log
 from common.result import result, DefaultResultSerializer
-from knowledge.api.knowledge_workflow import KnowledgeWorkflowApi, KnowledgeWorkflowActionApi
+from knowledge.api.knowledge_workflow import KnowledgeWorkflowApi, KnowledgeWorkflowActionApi, \
+    KnowledgeWorkflowActionPageApi
 from knowledge.serializers.common import get_knowledge_operation_object
 from knowledge.serializers.knowledge_workflow import KnowledgeWorkflowSerializer, KnowledgeWorkflowActionSerializer, \
     KnowledgeWorkflowMcpSerializer
@@ -118,7 +119,7 @@ class KnowledgeWorkflowActionView(APIView):
             summary=_('Page Knowledge workflow action'),
             operation_id=_('Page Knowledge workflow action'),  # type: ignore
             parameters=KnowledgeWorkflowActionApi.get_parameters(),
-            request=KnowledgeWorkflowActionApi.get_request(),
+            request=KnowledgeWorkflowActionPageApi.get_request(),
             responses=KnowledgeWorkflowActionApi.get_response(),
             tags=[_('Knowledge Base')]  # type: ignore
         )
