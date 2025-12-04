@@ -382,19 +382,19 @@ const publish: (knowledge_id: string, loading?: Ref<boolean>) => Promise<Result<
 
 /**
  * 保存知识库工作流
- * @param knowledge_id 
- * @param data 
- * @param loading 
- * @returns 
+ * @param knowledge_id
+ * @param data
+ * @param loading
+ * @returns
  */
 const putKnowledgeWorkflow: (
   knowledge_id: string,
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (knowledge_id, data, loading) => {
-  return put(`${prefix.value}/${knowledge_id}/workflow`, data, undefined, loading) 
+  return put(`${prefix.value}/${knowledge_id}/workflow`, data, undefined, loading)
 }
-  
+
 const listKnowledgeVersion: (
   knowledge_id: string,
   loading?: Ref<boolean>,
@@ -414,7 +414,18 @@ const updateKnowledgeVersion: (
     loading,
   )
 }
-
+const pageWorkflowAction: (
+  knowledge_id: string,
+  page: pageRequest,
+  query: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (knowledge_id: string, page, query, loading) => {
+  return get(
+    `${prefix.value}/${knowledge_id}/action/${page.current_page}/${page.page_size}`,
+    query,
+    loading,
+  )
+}
 const getWorkflowAction: (
   knowledge_id: string,
   knowledge_action_id: string,
@@ -468,4 +479,5 @@ export default {
   publish,
   putKnowledgeWorkflow,
   workflowUpload,
+  pageWorkflowAction,
 }

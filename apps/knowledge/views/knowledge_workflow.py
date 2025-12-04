@@ -56,14 +56,15 @@ class KnowledgeWorkflowUploadDocumentView(APIView):
     )
     def post(self, request: Request, workspace_id: str, knowledge_id: str):
         return result.success(KnowledgeWorkflowActionSerializer(
-            data={'workspace_id': workspace_id, 'knowledge_id': knowledge_id}).upload_document(request.data, True))
+            data={'workspace_id': workspace_id, 'knowledge_id': knowledge_id}).upload_document(request.data,
+                                                                                               request.user, True))
 
 
 class KnowledgeWorkflowActionView(APIView):
     authentication_classes = [TokenAuth]
 
     @extend_schema(
-        methods=['GET'],
+        methods=['POST'],
         description=_('Knowledge workflow debug'),
         summary=_('Knowledge workflow debug'),
         operation_id=_('Knowledge workflow debug'),  # type: ignore
@@ -84,7 +85,35 @@ class KnowledgeWorkflowActionView(APIView):
     )
     def post(self, request: Request, workspace_id: str, knowledge_id: str):
         return result.success(KnowledgeWorkflowActionSerializer(
-            data={'workspace_id': workspace_id, 'knowledge_id': knowledge_id}).action(request.data, True))
+            data={'workspace_id': workspace_id, 'knowledge_id': knowledge_id}).action(request.data, request.user, True))
+
+    class Page(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['GET'],
+            description=_('Page Knowledge workflow action'),
+            summary=_('Page Knowledge workflow action'),
+            operation_id=_('Page Knowledge workflow action'),  # type: ignore
+            parameters=KnowledgeWorkflowActionApi.get_parameters(),
+            request=KnowledgeWorkflowActionApi.get_request(),
+            responses=KnowledgeWorkflowActionApi.get_response(),
+            tags=[_('Knowledge Base')]  # type: ignore
+        )
+        @has_permissions(
+            PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_knowledge_permission(),
+            PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_permission_workspace_manage_role(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            ViewPermission(
+                [RoleConstants.USER.get_workspace_role()],
+                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
+                CompareConstants.AND
+            ),
+        )
+        def get(self, request: Request, workspace_id: str, knowledge_id: str, current_page: int, page_size: int):
+            return result.success(
+                KnowledgeWorkflowActionSerializer(data={'workspace_id': workspace_id, 'knowledge_id': knowledge_id})
+                .page(current_page, page_size, request.data))
 
     class Operate(APIView):
         authentication_classes = [TokenAuth]

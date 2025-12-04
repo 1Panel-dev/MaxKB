@@ -15,6 +15,7 @@ from application.flow.i_step_node import KnowledgeWorkflowPostHandler
 from application.flow.knowledge_workflow_manage import KnowledgeWorkflowManage
 from application.flow.step_node import get_node
 from application.serializers.application import get_mcp_tools
+from common.db.search import page_search
 from common.exception.app_exception import AppApiException
 from common.utils.rsa_util import rsa_long_decrypt
 from common.utils.tool_code import ToolExecutor
@@ -41,16 +42,46 @@ class KnowledgeWorkflowActionRequestSerializer(serializers.Serializer):
     knowledge_base = serializers.DictField(required=True, label=_('knowledge base data'))
 
 
+class KnowledgeWorkflowActionListQuerySerializer(serializers.Serializer):
+    user_name = serializers.CharField(required=False, label=_('Name'), allow_blank=True, allow_null=True)
+
+
 class KnowledgeWorkflowActionSerializer(serializers.Serializer):
     workspace_id = serializers.CharField(required=True, label=_('workspace id'))
     knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
 
-    def action(self, instance: Dict, with_valid=True):
+    def get_query_set(self, instance: Dict):
+        query_set = QuerySet(KnowledgeAction).filter(knowledge_id=self.data.get('knowledge_id'))
+        if instance.get("user_name"):
+            query_set = query_set.filter(meta__user_name__icontains=instance.get('user_name'))
+        return query_set.order_by('-create_time')
+
+    def list(self, instance: Dict, is_valid=True):
+        if is_valid:
+            self.is_valid(raise_exception=True)
+            KnowledgeWorkflowActionListQuerySerializer(data=instance).is_valid(raise_exception=True)
+        return [{'id': a.id, 'knowledge_id': a.knowledge_id, 'state': a.state,
+                 'details': a.details, 'meta': a.meta, 'run_time': a.run_time} for a in self.get_query_set(instance)]
+
+    def page(self, current_page, page_size, instance: Dict, is_valid=True):
+        if is_valid:
+            self.is_valid(raise_exception=True)
+            KnowledgeWorkflowActionListQuerySerializer(data=instance).is_valid(raise_exception=True)
+        return page_search(current_page, page_size, self.get_query_set(instance),
+                           lambda a: {'id': a.id, 'knowledge_id': a.knowledge_id, 'state': a.state,
+                                      'details': a.details, 'meta': a.meta, 'run_time': a.run_time})
+
+    def action(self, instance: Dict, user, with_valid=True):
         if with_valid:
             self.is_valid(raise_exception=True)
         knowledge_workflow = QuerySet(KnowledgeWorkflow).filter(knowledge_id=self.data.get("knowledge_id")).first()
         knowledge_action_id = uuid.uuid7()
-        KnowledgeAction(id=knowledge_action_id, knowledge_id=self.data.get("knowledge_id"), state=State.STARTED).save()
+        meta = {'user_id': str(user.id),
+                'user_name': user.username}
+        KnowledgeAction(id=knowledge_action_id,
+                        knowledge_id=self.data.get("knowledge_id"),
+                        state=State.STARTED,
+                        meta=meta).save()
         work_flow_manage = KnowledgeWorkflowManage(
             Workflow.new_instance(knowledge_workflow.work_flow, WorkflowMode.KNOWLEDGE),
             {'knowledge_id': self.data.get("knowledge_id"), 'knowledge_action_id': knowledge_action_id, 'stream': True,
@@ -59,9 +90,9 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
             KnowledgeWorkflowPostHandler(None, knowledge_action_id))
         work_flow_manage.run()
         return {'id': knowledge_action_id, 'knowledge_id': self.data.get("knowledge_id"), 'state': State.STARTED,
-                'details': {}}
+                'details': {}, 'meta': meta}
 
-    def upload_document(self, instance: Dict, with_valid=True):
+    def upload_document(self, instance: Dict, user, with_valid=True):
         if with_valid:
             self.is_valid(raise_exception=True)
         knowledge_workflow = QuerySet(KnowledgeWorkflow).filter(knowledge_id=self.data.get("knowledge_id")).first()
@@ -71,7 +102,10 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
             knowledge_id=self.data.get("knowledge_id")).order_by(
             '-create_time')[0:1].first()
         knowledge_action_id = uuid.uuid7()
-        KnowledgeAction(id=knowledge_action_id, knowledge_id=self.data.get("knowledge_id"), state=State.STARTED).save()
+        meta = {'user_id': str(user.id),
+                'user_name': user.username}
+        KnowledgeAction(id=knowledge_action_id, knowledge_id=self.data.get("knowledge_id"), state=State.STARTED,
+                        meta=meta).save()
         work_flow_manage = KnowledgeWorkflowManage(
             Workflow.new_instance(knowledge_workflow_version.work_flow, WorkflowMode.KNOWLEDGE),
             {'knowledge_id': self.data.get("knowledge_id"), 'knowledge_action_id': knowledge_action_id, 'stream': True,
@@ -80,7 +114,7 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
             KnowledgeWorkflowPostHandler(None, knowledge_action_id))
         work_flow_manage.run()
         return {'id': knowledge_action_id, 'knowledge_id': self.data.get("knowledge_id"), 'state': State.STARTED,
-                'details': {}}
+                'details': {}, 'meta': meta}
 
     class Operate(serializers.Serializer):
         workspace_id = serializers.CharField(required=True, label=_('workspace id'))
@@ -94,7 +128,8 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
             knowledge_action = QuerySet(KnowledgeAction).filter(id=knowledge_action_id).first()
             return {'id': knowledge_action_id, 'knowledge_id': knowledge_action.knowledge_id,
                     'state': knowledge_action.state,
-                    'details': knowledge_action.details}
+                    'details': knowledge_action.details,
+                    'meta': knowledge_action.meta}
 
 
 class KnowledgeWorkflowSerializer(serializers.Serializer):

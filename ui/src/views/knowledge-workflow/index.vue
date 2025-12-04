@@ -34,8 +34,7 @@
           <AppIcon iconName="app-debug-outlined" class="mr-4"></AppIcon>
           {{ $t('common.debug') }}
         </el-button>
-        <el-button v-if="permissionPrecise.workflow_edit(id)"
-          @click="saveknowledge(true)">
+        <el-button v-if="permissionPrecise.workflow_edit(id)" @click="saveknowledge(true)">
           <AppIcon iconName="app-save-outlined" class="mr-4"></AppIcon>
           {{ $t('common.save') }}
         </el-button>
@@ -53,7 +52,10 @@
                 <AppIcon iconName="app-import-doc" class="color-secondary"></AppIcon>
                 {{ $t('views.workflow.operation.toImportDoc') }}
               </el-dropdown-item>
-
+              <el-dropdown-item @click="openListAction">
+                <AppIcon iconName="app-history-outlined" class="color-secondary"></AppIcon>
+                执行记录
+              </el-dropdown-item>
               <el-dropdown-item @click="openHistory">
                 <AppIcon iconName="app-history-outlined" class="color-secondary"></AppIcon>
                 {{ $t('views.workflow.setting.releaseHistory') }}
@@ -127,6 +129,7 @@
       </div>
     </el-collapse-transition>
     <DebugVue ref="DebugRef"></DebugVue>
+    <ListAction ref="ListActionRef"></ListAction>
     <!-- 发布历史 -->
     <PublishHistory
       v-if="showHistory"
@@ -142,6 +145,7 @@ import { useRouter, useRoute } from 'vue-router'
 import type { Action } from 'element-plus'
 import Workflow from '@/workflow/index.vue'
 import DropdownMenu from '@/components/workflow-dropdown-menu/index.vue'
+import ListAction from '@/views/knowledge-workflow/component/list-action/index.vue'
 import PublishHistory from '@/views/knowledge-workflow/component/PublishHistory.vue'
 import { isAppIcon, resetUrl } from '@/utils/common'
 import { MsgSuccess, MsgError, MsgConfirm } from '@/utils/message'
@@ -190,7 +194,7 @@ const isDefaultTheme = computed(() => {
   return theme.isDefaultTheme()
 })
 const DebugRef = ref<InstanceType<typeof DebugVue>>()
-
+const ListActionRef = ref<InstanceType<typeof ListAction>>()
 let interval: any
 const workflowRef = ref()
 const workflowMainRef = ref()
@@ -234,6 +238,9 @@ function back() {
   } else {
     go()
   }
+}
+const openListAction = () => {
+  ListActionRef.value?.open(id)
 }
 function clickoutsideHistory() {
   if (!disablePublic.value) {
