@@ -73,6 +73,7 @@
       <el-form-item
         :label="$t('workflow.nodes.aiChatNode.returnContent.label')"
         @click.prevent
+        v-if="[WorkflowMode.Application, WorkflowMode.ApplicationLoop].includes(workflowMode)"
       >
         <template #label>
           <div class="flex align-center">
@@ -100,9 +101,11 @@ import { useRoute } from 'vue-router'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import type { FormInstance } from 'element-plus'
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, inject } from 'vue'
 import { isLastNode } from '@/workflow/common/data'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import { WorkflowMode } from '@/enums/application'
+const workflowMode = (inject('workflowMode') as WorkflowMode) || WorkflowMode.Application
 
 const props = defineProps<{ nodeModel: any }>()
 
