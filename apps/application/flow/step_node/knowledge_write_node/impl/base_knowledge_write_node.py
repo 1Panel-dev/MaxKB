@@ -208,7 +208,7 @@ class BaseKnowledgeWriteNode(IKnowledgeWriteNode):
             "paragraphs": [{
                 "title": p.get("title"),
                 "content": p.get("content"),
-            } for p in document.get("paragraphs")[0:4]]
+            } for p in document.get("paragraphs")[0:5]]
         } for document in documents]
 
         return NodeResult({'write_content': write_content_list}, {})

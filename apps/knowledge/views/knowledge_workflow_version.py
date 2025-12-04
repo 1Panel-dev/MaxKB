@@ -44,8 +44,8 @@ class KnowledgeWorkflowVersionView(APIView):
         responses=KnowledgeVersionListAPI.get_response(),
         tags=[_('Knowledge/Version')]  # type: ignore
     )
-    @has_permissions(PermissionConstants.KNOWLEDGE_READ.get_workspace_knowledge_permission(),
-                     PermissionConstants.KNOWLEDGE_READ.get_workspace_permission_workspace_manage_role(),
+    @has_permissions(PermissionConstants.KNOWLEDGE_WORKFLOW_READ.get_workspace_knowledge_permission(),
+                     PermissionConstants.KNOWLEDGE_WORKFLOW_READ.get_workspace_permission_workspace_manage_role(),
                      ViewPermission([RoleConstants.USER.get_workspace_role()],
                                     [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
                                     CompareConstants.AND),
@@ -68,8 +68,8 @@ class KnowledgeWorkflowVersionView(APIView):
             responses=KnowledgeVersionPageAPI.get_response(),
             tags=[_('Knowledge/Version')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_READ.get_workspace_knowledge_permission(),
-                         PermissionConstants.KNOWLEDGE_READ.get_workspace_permission_workspace_manage_role(),
+        @has_permissions(PermissionConstants.KNOWLEDGE_WORKFLOW_READ.get_workspace_knowledge_permission(),
+                         PermissionConstants.KNOWLEDGE_WORKFLOW_READ.get_workspace_permission_workspace_manage_role(),
                          ViewPermission([RoleConstants.USER.get_workspace_role()],
                                         [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
                                         CompareConstants.AND),
@@ -93,8 +93,8 @@ class KnowledgeWorkflowVersionView(APIView):
             responses=KnowledgeVersionOperateAPI.get_response(),
             tags=[_('Knowledge/Version')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_EDIT.get_workspace_knowledge_permission(),
-                         PermissionConstants.KNOWLEDGE_EDIT.get_workspace_permission_workspace_manage_role(),
+        @has_permissions(PermissionConstants.KNOWLEDGE_WORKFLOW_READ.get_workspace_knowledge_permission(),
+                         PermissionConstants.KNOWLEDGE_WORKFLOW_READ.get_workspace_permission_workspace_manage_role(),
                          ViewPermission([RoleConstants.USER.get_workspace_role()],
                                         [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
                                         CompareConstants.AND),
@@ -115,8 +115,8 @@ class KnowledgeWorkflowVersionView(APIView):
             responses=KnowledgeVersionOperateAPI.get_response(),
             tags=[_('Knowledge/Version')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.KNOWLEDGE_EDIT.get_workspace_knowledge_permission(),
-                         PermissionConstants.KNOWLEDGE_EDIT.get_workspace_permission_workspace_manage_role(),
+        @has_permissions(PermissionConstants.KNOWLEDGE_WORKFLOW_EDIT.get_workspace_knowledge_permission(),
+                         PermissionConstants.KNOWLEDGE_WORKFLOW_EDIT.get_workspace_permission_workspace_manage_role(),
                          ViewPermission([RoleConstants.USER.get_workspace_role()],
                                         [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
                                         CompareConstants.AND),

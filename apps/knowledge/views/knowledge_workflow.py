@@ -20,12 +20,34 @@ from knowledge.serializers.knowledge_workflow import KnowledgeWorkflowSerializer
 class KnowledgeDatasourceFormListView(APIView):
     authentication_classes = [TokenAuth]
 
+    @has_permissions(
+        PermissionConstants.KNOWLEDGE_WORKFLOW_READ.get_workspace_knowledge_permission(),
+        PermissionConstants.KNOWLEDGE_WORKFLOW_READ.get_workspace_permission_workspace_manage_role(),
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+        ViewPermission(
+            [RoleConstants.USER.get_workspace_role()],
+            [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
+            CompareConstants.AND
+        ),
+    )
     def post(self, request: Request, workspace_id: str, knowledge_id: str, type: str, id: str):
         return result.success(KnowledgeWorkflowSerializer.Datasource(
             data={'type': type, 'id': id, 'params': request.data, 'function_name': 'get_form_list'}).action())
 
 
 class KnowledgeDatasourceView(APIView):
+    authentication_classes = [TokenAuth]
+
+    @has_permissions(
+        PermissionConstants.KNOWLEDGE_WORKFLOW_READ.get_workspace_knowledge_permission(),
+        PermissionConstants.KNOWLEDGE_WORKFLOW_READ.get_workspace_permission_workspace_manage_role(),
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+        ViewPermission(
+            [RoleConstants.USER.get_workspace_role()],
+            [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
+            CompareConstants.AND
+        ),
+    )
     def post(self, request: Request, workspace_id: str, knowledge_id: str, type: str, id: str, function_name: str):
         return result.success(KnowledgeWorkflowSerializer.Datasource(
             data={'type': type, 'id': id, 'params': request.data, 'function_name': function_name}).action())
@@ -45,8 +67,8 @@ class KnowledgeWorkflowUploadDocumentView(APIView):
         tags=[_('Knowledge Base')]  # type: ignore
     )
     @has_permissions(
-        PermissionConstants.KNOWLEDGE_READ.get_workspace_knowledge_permission(),
-        PermissionConstants.KNOWLEDGE_READ.get_workspace_permission_workspace_manage_role(),
+        PermissionConstants.KNOWLEDGE_WORKFLOW_READ.get_workspace_knowledge_permission(),
+        PermissionConstants.KNOWLEDGE_WORKFLOW_READ.get_workspace_permission_workspace_manage_role(),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         ViewPermission(
             [RoleConstants.USER.get_workspace_role()],
@@ -99,8 +121,8 @@ class KnowledgeWorkflowActionView(APIView):
             tags=[_('Knowledge Base')]  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.KNOWLEDGE_READ.get_workspace_knowledge_permission(),
-            PermissionConstants.KNOWLEDGE_READ.get_workspace_permission_workspace_manage_role(),
+            PermissionConstants.KNOWLEDGE_WORKFLOW_READ.get_workspace_knowledge_permission(),
+            PermissionConstants.KNOWLEDGE_WORKFLOW_READ.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
@@ -204,8 +226,8 @@ class KnowledgeWorkflowView(APIView):
             tags=[_('Knowledge Base')]  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.KNOWLEDGE_READ.get_workspace_knowledge_permission(),
-            PermissionConstants.KNOWLEDGE_READ.get_workspace_permission_workspace_manage_role(),
+            PermissionConstants.KNOWLEDGE_WORKFLOW_READ.get_workspace_knowledge_permission(),
+            PermissionConstants.KNOWLEDGE_WORKFLOW_READ.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
@@ -232,8 +254,8 @@ class KnowledgeWorkflowVersionView(APIView):
         tags=[_('Knowledge Base')]  # type: ignore
     )
     @has_permissions(
-        PermissionConstants.KNOWLEDGE_READ.get_workspace_knowledge_permission(),
-        PermissionConstants.KNOWLEDGE_READ.get_workspace_permission_workspace_manage_role(),
+        PermissionConstants.KNOWLEDGE_WORKFLOW_READ.get_workspace_knowledge_permission(),
+        PermissionConstants.KNOWLEDGE_WORKFLOW_READ.get_workspace_permission_workspace_manage_role(),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         ViewPermission(
             [RoleConstants.USER.get_workspace_role()],
@@ -260,8 +282,8 @@ class McpServers(APIView):
         responses=SpeechToTextAPI.get_response(),
         tags=[_('Knowledge Base')]  # type: ignore
     )
-    @has_permissions(PermissionConstants.KNOWLEDGE_READ.get_workspace_application_permission(),
-                     PermissionConstants.KNOWLEDGE_READ.get_workspace_permission_workspace_manage_role(),
+    @has_permissions(PermissionConstants.KNOWLEDGE_WORKFLOW_READ.get_workspace_application_permission(),
+                     PermissionConstants.KNOWLEDGE_WORKFLOW_READ.get_workspace_permission_workspace_manage_role(),
                      ViewPermission([RoleConstants.USER.get_workspace_role()],
                                     [PermissionConstants.KNOWLEDGE.get_workspace_application_permission()],
                                     CompareConstants.AND),

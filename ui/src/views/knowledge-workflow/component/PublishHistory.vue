@@ -42,7 +42,10 @@
                     </el-button>
                     <template #dropdown>
                       <el-dropdown-menu>
-                        <el-dropdown-item @click.stop="openEditVersion(row)">
+                        <el-dropdown-item
+                          v-if="permissionPrecise.workflow_edit(id)"
+                          @click.stop="openEditVersion(row)"
+                        >
                           <AppIcon iconName="app-edit" class="color-secondary"></AppIcon>
                           {{ $t('common.edit') }}
                         </el-dropdown-item>
@@ -75,9 +78,11 @@ import { datetimeFormat } from '@/utils/time'
 import { MsgSuccess, MsgError } from '@/utils/message'
 import { t } from '@/locales'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import permissionMap from '@/permission'
+
 const route = useRoute()
 const {
-  params: { id },
+  params: { id, folderId },
 } = route as any
 const apiType = computed(() => {
   if (route.path.includes('shared')) {
@@ -87,6 +92,10 @@ const apiType = computed(() => {
   } else {
     return 'workspace'
   }
+})
+
+const permissionPrecise = computed(() => {
+  return permissionMap['knowledge'][apiType.value]
 })
 
 const emit = defineEmits(['click', 'refreshVersion'])

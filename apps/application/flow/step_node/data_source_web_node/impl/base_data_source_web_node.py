@@ -65,7 +65,7 @@ class BaseDataSourceWebNode(IDataSourceWebNode):
         try:
             ForkManage(source_url, selector.split(" ") if selector is not None else []).fork(3, set(), collect_handler)
 
-            return NodeResult({'document_list': document_list},
+            return NodeResult({'document_list': document_list,'source_url': source_url, 'selector': selector},
                               self.workflow_manage.params.get('knowledge_base') or {})
 
         except Exception as e:
