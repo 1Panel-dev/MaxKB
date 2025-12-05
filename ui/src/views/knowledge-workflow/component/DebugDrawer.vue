@@ -10,7 +10,7 @@
     :close-on-press-escape="false"
   >
     <div style="height: calc(100% - 57px)" v-loading="loading">
-      <keep-alive :key="key" :include="['data_source', 'knowledge_base']">
+      <keep-alive :key="key" :include="['DataSource', 'KnowledgeBase']">
         <component
           ref="ActionRef"
           :is="ak[active]"
