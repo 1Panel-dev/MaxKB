@@ -168,8 +168,13 @@ function renderTemplate(template: string, data: any) {
 }
 
 const loadNode = (node: Node, resolve: (nodeData: Tree[]) => void) => {
+  const get_extra = inject('get_extra') as any
   request_call(request, {
-    url: renderTemplate(attrs.url, props.otherParams),
+    url: renderTemplate(
+      '/workspace/${current_workspace_id}/knowledge/${current_knowledge_id}/datasource/tool/${current_tool_id}/' +
+        attrs.fetch_list_function,
+      { ...props.otherParams, ...(get_extra ? get_extra() : {}) },
+    ),
     body: { current_node: node.level == 0 ? undefined : node.data },
     then: (res: any) => {
       resolve(res.data)

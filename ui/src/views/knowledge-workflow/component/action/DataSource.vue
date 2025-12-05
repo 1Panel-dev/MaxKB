@@ -43,7 +43,7 @@
   </DynamicsForm>
 </template>
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, provide } from 'vue'
 import { WorkflowKind, WorkflowType } from '@/enums/application'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
 import type { FormField } from '@/components/dynamics-form/type'
@@ -100,9 +100,18 @@ const form_data = computed({
 const source_node_list = computed(() => {
   return props.workflow?.nodes?.filter((n: any) => n.properties.kind === WorkflowKind.DataSource)
 })
+const extra = ref<any>({
+  current_tool_id: undefined,
+})
+const get_extra = () => {
+  return extra.value
+}
+provide('get_extra', get_extra)
+
 const sourceChange = (node_id: string) => {
   base_form_data.value.node_id = node_id
   const n = source_node_list.value.find((n: any) => n.id == node_id)
+  extra.value.current_tool_id = n.properties.node_data.tool_lib_id
   node_id = n
     ? [WorkflowType.DataSourceLocalNode, WorkflowType.DataSourceWebNode].includes(n.type)
       ? n.type
