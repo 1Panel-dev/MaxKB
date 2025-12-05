@@ -254,6 +254,7 @@ const editName = async (formEl: FormInstance | undefined) => {
           ?.some((node: any) => node.properties.stepName === form.value.title)
       ) {
         set(props.nodeModel.properties, 'stepName', form.value.title)
+        props.nodeModel.clear_next_node_field(true)
         nodeNameDialogVisible.value = false
         formEl.resetFields()
       } else {
