@@ -199,8 +199,8 @@ function clickNodes(item: any, data?: any) {
       })),
     }
   }
+  item['properties']['condition'] = 'OR'
   props.workflowRef?.addNode(item)
-
   emit('clickNodes', item)
 }
 
@@ -219,6 +219,7 @@ function onmousedown(item: any, data?: any) {
       })),
     }
   }
+  item['properties']['condition'] = 'OR'
   props.workflowRef?.onmousedown(item)
   emit('onmousedown', item)
 }

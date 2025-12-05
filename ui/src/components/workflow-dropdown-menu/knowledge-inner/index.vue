@@ -177,6 +177,7 @@ function clickNodes(item: any, data?: any) {
       })),
     }
   }
+  item['properties']['condition'] = 'OR'
   props.workflowRef?.addNode(item)
 
   emit('clickNodes', item)
@@ -188,6 +189,7 @@ function onmousedown(item: any, data?: any) {
     if (data.tool_type == 'DATA_SOURCE') {
       item['properties'].kind = WorkflowKind.DataSource
     }
+
     item['properties']['node_data'] = {
       ...data,
       tool_lib_id: data.id,
@@ -197,6 +199,7 @@ function onmousedown(item: any, data?: any) {
       })),
     }
   }
+  item['properties']['condition'] = 'OR'
   props.workflowRef?.onmousedown(item)
   emit('onmousedown', item)
 }
