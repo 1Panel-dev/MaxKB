@@ -1,15 +1,33 @@
 # coding=utf-8
+"""
+    @project: MaxKB
+    @Author：niu
+    @file： default_stt.py
+    @date：2025/12/5 15:12
+    @desc:
+"""
 from typing import Dict, Any
 
 from common import forms
 from common.exception.app_exception import AppApiException
 from common.forms import BaseForm
+from maxkb.settings import maxkb_logger
 from models_provider.base_model_provider import BaseModelCredential, ValidCode
 from django.utils.translation import gettext as _
-from common.utils.logger import maxkb_logger
 
-class AliyunBaiLianAsrSTTModelCredential(BaseForm, BaseModelCredential):
-    api_url = forms.TextInputField(_('API URL'), required=True)
+
+
+class AliyunBaiLianDefaultSTTModelCredential(BaseForm, BaseModelCredential):
+    type = forms.Radio(_("Type"), required=True, text_field='label', default_value='qwen', provider='', method='',
+                       value_field='value', option_list=[
+            {'label': _('Audio file recognition - Tongyi Qwen'),
+             'value': 'qwen'},
+            {'label': _('Qwen-Omni'),
+             'value': 'omni'},
+            {'label': _('Audio file recognition - Fun-ASR/Paraformer/SenseVoice'),
+             'value': 'other'}
+        ])
+    api_url = forms.TextInputField(_('API URL'), required=True, relation_show_field_dict={'type': ['qwen', 'omni']})
     api_key = forms.PasswordInputField(_('API Key'), required=True)
 
     def is_valid(self,
@@ -20,6 +38,7 @@ class AliyunBaiLianAsrSTTModelCredential(BaseForm, BaseModelCredential):
                  provider,
                  raise_exception: bool = False
                  ) -> bool:
+        model_type_list = provider.get_model_type_list()
         model_type_list = provider.get_model_type_list()
         if not any(mt.get('value') == model_type for mt in model_type_list):
             raise AppApiException(
@@ -39,6 +58,7 @@ class AliyunBaiLianAsrSTTModelCredential(BaseForm, BaseModelCredential):
 
         try:
             model = provider.get_model(model_type, model_name, model_credential)
+            model.check_auth()
         except Exception as e:
             maxkb_logger.error(f'Exception: {e}', exc_info=True)
             if isinstance(e, AppApiException):

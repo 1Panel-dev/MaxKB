@@ -8806,3 +8806,12 @@ msgstr ""
 
 msgid "Blocked unsafe redirect to internal host"
 msgstr ""
+
+msgid "Audio file recognition - Tongyi Qwen"
+msgstr ""
+
+msgid "Audio file recognition - Fun-ASR/Paraformer/SenseVoice"
+msgstr ""
+
+msgid "Qwen-Omni"
+msgstr ""

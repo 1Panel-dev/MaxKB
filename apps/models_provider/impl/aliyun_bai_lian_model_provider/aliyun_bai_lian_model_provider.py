@@ -11,26 +11,28 @@ import os
 from common.utils.common import get_file_content
 from models_provider.base_model_provider import ModelProvideInfo, ModelTypeConst, ModelInfo, IModelProvider, \
     ModelInfoManage
-from models_provider.impl.aliyun_bai_lian_model_provider.credential.asr_stt import AliyunBaiLianAsrSTTModelCredential
+from models_provider.impl.aliyun_bai_lian_model_provider.credential.stt.asr_stt import AliyunBaiLianAsrSTTModelCredential
 from models_provider.impl.aliyun_bai_lian_model_provider.credential.embedding import \
     AliyunBaiLianEmbeddingCredential
 from models_provider.impl.aliyun_bai_lian_model_provider.credential.image import QwenVLModelCredential
 from models_provider.impl.aliyun_bai_lian_model_provider.credential.itv import ImageToVideoModelCredential
 from models_provider.impl.aliyun_bai_lian_model_provider.credential.llm import BaiLianLLMModelCredential
-from models_provider.impl.aliyun_bai_lian_model_provider.credential.omni_stt import AliyunBaiLianOmiSTTModelCredential
+from models_provider.impl.aliyun_bai_lian_model_provider.credential.stt.omni_stt import AliyunBaiLianOmiSTTModelCredential
 from models_provider.impl.aliyun_bai_lian_model_provider.credential.reranker import \
     AliyunBaiLianRerankerCredential
-from models_provider.impl.aliyun_bai_lian_model_provider.credential.stt import AliyunBaiLianSTTModelCredential
+from models_provider.impl.aliyun_bai_lian_model_provider.credential.stt import AliyunBaiLianSTTModelCredential, \
+    AliyunBaiLianDefaultSTTModelCredential
 from models_provider.impl.aliyun_bai_lian_model_provider.credential.tti import QwenTextToImageModelCredential
 from models_provider.impl.aliyun_bai_lian_model_provider.credential.tts import AliyunBaiLianTTSModelCredential
 from models_provider.impl.aliyun_bai_lian_model_provider.credential.ttv import TextToVideoModelCredential
-from models_provider.impl.aliyun_bai_lian_model_provider.model.asr_stt import AliyunBaiLianAsrSpeechToText
+from models_provider.impl.aliyun_bai_lian_model_provider.model.stt.asr_stt import AliyunBaiLianAsrSpeechToText
 from models_provider.impl.aliyun_bai_lian_model_provider.model.embedding import AliyunBaiLianEmbedding
 from models_provider.impl.aliyun_bai_lian_model_provider.model.image import QwenVLChatModel
 from models_provider.impl.aliyun_bai_lian_model_provider.model.llm import BaiLianChatModel
-from models_provider.impl.aliyun_bai_lian_model_provider.model.omni_stt import AliyunBaiLianOmiSpeechToText
+from models_provider.impl.aliyun_bai_lian_model_provider.model.stt.omni_stt import AliyunBaiLianOmiSpeechToText
 from models_provider.impl.aliyun_bai_lian_model_provider.model.reranker import AliyunBaiLianReranker
-from models_provider.impl.aliyun_bai_lian_model_provider.model.stt import AliyunBaiLianSpeechToText
+from models_provider.impl.aliyun_bai_lian_model_provider.model.stt import AliyunBaiLianSpeechToText, \
+    AliyunBaiLianDefaultSpeechToText
 from models_provider.impl.aliyun_bai_lian_model_provider.model.tti import QwenTextToImageModel
 from models_provider.impl.aliyun_bai_lian_model_provider.model.tts import AliyunBaiLianTextToSpeech
 from maxkb.conf import PROJECT_DIR
@@ -43,6 +45,7 @@ aliyun_bai_lian_tts_model_credential = AliyunBaiLianTTSModelCredential()
 aliyun_bai_lian_stt_model_credential = AliyunBaiLianSTTModelCredential()
 aliyun_bai_lian_omi_stt_model_credential = AliyunBaiLianOmiSTTModelCredential()
 aliyun_bai_lian_asr_stt_model_credential = AliyunBaiLianAsrSTTModelCredential()
+aliyun_bai_lian_default_stt_model_credential = AliyunBaiLianDefaultSTTModelCredential()
 aliyun_bai_lian_embedding_model_credential = AliyunBaiLianEmbeddingCredential()
 aliyun_bai_lian_llm_model_credential = BaiLianLLMModelCredential()
 qwenvl_model_credential = QwenVLModelCredential()
@@ -137,7 +140,10 @@ model_info_manage = (
     .append_model_info_list(module_info_tti_list)
     .append_default_model_info(module_info_tti_list[0])
     .append_default_model_info(model_info_list[1])
-    .append_default_model_info(model_info_list[2])
+    .append_default_model_info(ModelInfo('default',
+                             _('default'),
+                             ModelTypeConst.STT, aliyun_bai_lian_default_stt_model_credential,
+                             AliyunBaiLianDefaultSpeechToText))
     .append_default_model_info(model_info_list[3])
     .append_default_model_info(model_info_list[4])
     .append_default_model_info(model_info_list[0])

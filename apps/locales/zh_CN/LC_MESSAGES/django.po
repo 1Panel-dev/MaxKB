@@ -8932,3 +8932,13 @@ msgstr "文件上传未启用"
 
 msgid "Blocked unsafe redirect to internal host"
 msgstr "阻止不安全的重定向到内部主机"
+msgstr "请输入Web根地址"
+
+msgid "Audio file recognition - Tongyi Qwen"
+msgstr "录音文件识别-通义千问"
+
+msgid "Audio file recognition - Fun-ASR/Paraformer/SenseVoice"
+msgstr "录音文件识别-Fun-ASR/Paraformer/SenseVoice"
+
+msgid "Qwen-Omni"
+msgstr "多模态"

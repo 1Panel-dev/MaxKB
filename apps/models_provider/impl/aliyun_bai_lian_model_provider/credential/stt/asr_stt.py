@@ -3,20 +3,13 @@ from typing import Dict, Any
 
 from common import forms
 from common.exception.app_exception import AppApiException
-from common.forms import BaseForm, PasswordInputField, TooltipLabel
+from common.forms import BaseForm
 from models_provider.base_model_provider import BaseModelCredential, ValidCode
 from django.utils.translation import gettext as _
 from common.utils.logger import maxkb_logger
 
-class AliyunBaiLianOmiSTTModelParams(BaseForm):
-    CueWord = forms.TextInputField(
-        TooltipLabel(_('CueWord'), _('If not passed, the default value is What is this audio saying? Only answer the audio content')),
-        required=True,
-        default_value='这段音频在说什么，只回答音频的内容',
-    )
 
-
-class AliyunBaiLianOmiSTTModelCredential(BaseForm, BaseModelCredential):
+class AliyunBaiLianAsrSTTModelCredential(BaseForm, BaseModelCredential):
     api_url = forms.TextInputField(_('API URL'), required=True)
     api_key = forms.PasswordInputField(_('API Key'), required=True)
 
@@ -28,7 +21,6 @@ class AliyunBaiLianOmiSTTModelCredential(BaseForm, BaseModelCredential):
                  provider,
                  raise_exception: bool = False
                  ) -> bool:
-
         model_type_list = provider.get_model_type_list()
         if not any(mt.get('value') == model_type for mt in model_type_list):
             raise AppApiException(
@@ -48,14 +40,16 @@ class AliyunBaiLianOmiSTTModelCredential(BaseForm, BaseModelCredential):
 
         try:
             model = provider.get_model(model_type, model_name, model_credential)
+            model.check_auth()
         except Exception as e:
             maxkb_logger.error(f'Exception: {e}', exc_info=True)
             if isinstance(e, AppApiException):
                 raise e
             if raise_exception:
                 raise AppApiException(
-                ValidCode.valid_error.value,
-                _('Verification failed, please check whether the parameters are correct: {error}').format(error=str(e))
+                    ValidCode.valid_error.value,
+                    _('Verification failed, please check whether the parameters are correct: {error}').format(
+                        error=str(e))
                 )
             return False
         return True
@@ -67,7 +61,6 @@ class AliyunBaiLianOmiSTTModelCredential(BaseForm, BaseModelCredential):
             'api_key': super().encryption(model.get('api_key', ''))
         }
 
-
     def get_model_params_setting_form(self, model_name):
 
-        return AliyunBaiLianOmiSTTModelParams()
+        pass
