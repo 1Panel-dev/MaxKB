@@ -848,6 +848,10 @@ export const applicationLoopMenuNodes = [
 ]
 export const knowledgeLoopMenuNodes = [
   {
+    label: t('views.tool.dataSource.title'),
+    list: [dataSourceLocalNode, dataSourceWebNode],
+  },
+  {
     label: t('workflow.nodes.classify.aiCapability'),
     list: [
       aiChatNode,
@@ -864,7 +868,7 @@ export const knowledgeLoopMenuNodes = [
   },
   {
     label: t('views.knowledge.title'),
-    list: [rerankerNode, documentExtractNode],
+    list: [documentSplitNode, knowledgeWriteNode, documentExtractNode],
   },
   {
     label: t('workflow.nodes.classify.businessLogic'),
