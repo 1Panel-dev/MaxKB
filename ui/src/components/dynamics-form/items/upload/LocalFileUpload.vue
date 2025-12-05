@@ -1,6 +1,7 @@
 <template>
   <div v-loading="loading" class="w-full">
     <el-upload
+      ref="UploadRef"
       :webkitdirectory="false"
       class="w-full"
       drag
@@ -65,7 +66,7 @@ import { computed, useAttrs, nextTick, inject, ref } from 'vue'
 import type { FormField } from '@/components/dynamics-form/type'
 import { MsgError } from '@/utils/message'
 import type { UploadFiles } from 'element-plus'
-import { filesize, getImgUrl } from '@/utils/common'
+import { filesize, getImgUrl, fileType } from '@/utils/common'
 import { t } from '@/locales'
 const upload = inject('upload') as any
 const attrs = useAttrs() as any
@@ -82,6 +83,7 @@ const onExceed = () => {
 const emit = defineEmits(['update:modelValue'])
 const fileArray = ref<any>([])
 const loading = ref<boolean>(false)
+const UploadRef = ref()
 // 上传on-change事件
 const fileHandleChange = (file: any, fileList: UploadFiles) => {
   //1、判断文件大小是否合法，文件限制不能大于100M
@@ -89,6 +91,13 @@ const fileHandleChange = (file: any, fileList: UploadFiles) => {
   if (!isLimit) {
     MsgError(t('views.document.tip.fileLimitSizeTip1') + file_size_limit.value + 'MB')
     fileList.splice(-1, 1) //移除当前超出大小的文件
+    return false
+  }
+  if (!file_type_list.value.includes(fileType(file.name).toLocaleUpperCase())) {
+    if (file?.name !== '.DS_Store') {
+      MsgError(t('views.document.upload.errorMessage2'))
+    }
+    fileList.splice(-1, 1)
     return false
   }
 
@@ -105,10 +114,7 @@ const fileHandleChange = (file: any, fileList: UploadFiles) => {
   })
 }
 function deleteFile(index: number) {
-  emit(
-    'update:modelValue',
-    props.modelValue.filter((item: any, i: number) => index != i),
-  )
+  props.modelValue.splice(index, 1)
 }
 
 const handlePreview = (bool: boolean) => {
@@ -123,7 +129,9 @@ const handlePreview = (bool: boolean) => {
 const accept = computed(() => {
   return (attrs.file_type_list || []).map((item: any) => '.' + item.toLowerCase()).join(',')
 })
-
+const file_type_list = computed(() => {
+  return attrs.file_type_list || []
+})
 const formats = computed(() => {
   return (attrs.file_type_list || []).map((item: any) => item.toUpperCase()).join('、')
 })
