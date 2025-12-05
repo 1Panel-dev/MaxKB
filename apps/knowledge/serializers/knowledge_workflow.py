@@ -44,6 +44,7 @@ class KnowledgeWorkflowActionRequestSerializer(serializers.Serializer):
 
 class KnowledgeWorkflowActionListQuerySerializer(serializers.Serializer):
     user_name = serializers.CharField(required=False, label=_('Name'), allow_blank=True, allow_null=True)
+    state = serializers.CharField(required=False, label=_("State"), allow_blank=True, allow_null=True)
 
 
 class KnowledgeWorkflowActionSerializer(serializers.Serializer):
@@ -54,6 +55,8 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
         query_set = QuerySet(KnowledgeAction).filter(knowledge_id=self.data.get('knowledge_id'))
         if instance.get("user_name"):
             query_set = query_set.filter(meta__user_name__icontains=instance.get('user_name'))
+        if instance.get('state'):
+            query_set = query_set.filter(state=instance.get('state'))
         return query_set.order_by('-create_time')
 
     def list(self, instance: Dict, is_valid=True):
@@ -61,7 +64,8 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
             self.is_valid(raise_exception=True)
             KnowledgeWorkflowActionListQuerySerializer(data=instance).is_valid(raise_exception=True)
         return [{'id': a.id, 'knowledge_id': a.knowledge_id, 'state': a.state,
-                 'meta': a.meta, 'run_time': a.run_time} for a in self.get_query_set(instance)]
+                 'meta': a.meta, 'run_time': a.run_time, 'create_time': a.create_time} for a in
+                self.get_query_set(instance)]
 
     def page(self, current_page, page_size, instance: Dict, is_valid=True):
         if is_valid:
@@ -69,7 +73,7 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
             KnowledgeWorkflowActionListQuerySerializer(data=instance).is_valid(raise_exception=True)
         return page_search(current_page, page_size, self.get_query_set(instance),
                            lambda a: {'id': a.id, 'knowledge_id': a.knowledge_id, 'state': a.state,
-                                      'meta': a.meta, 'run_time': a.run_time})
+                                      'meta': a.meta, 'run_time': a.run_time, 'create_time': a.create_time})
 
     def action(self, instance: Dict, user, with_valid=True):
         if with_valid:
