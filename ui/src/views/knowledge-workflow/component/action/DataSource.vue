@@ -111,7 +111,9 @@ provide('get_extra', get_extra)
 const sourceChange = (node_id: string) => {
   base_form_data.value.node_id = node_id
   const n = source_node_list.value.find((n: any) => n.id == node_id)
-  extra.value.current_tool_id = n.properties.node_data.tool_lib_id
+  if (n.properties.node_data && n.properties.node_data.tool_lib_id) {
+    extra.value.current_tool_id = n.properties.node_data.tool_lib_id
+  }
   node_id = n
     ? [WorkflowType.DataSourceLocalNode, WorkflowType.DataSourceWebNode].includes(n.type)
       ? n.type
