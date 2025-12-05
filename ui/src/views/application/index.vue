@@ -568,7 +568,10 @@ function settingApplication(event: any, row: any) {
     if (event?.ctrlKey) {
       event?.preventDefault()
       event.stopPropagation()
-      window.open(`/application/workspace/${row.id}/workflow`, '_blank')
+      const newUrl = router.resolve({
+        path: `/application/workspace/${row.id}/workflow`,
+      }).href
+      window.open(newUrl)
     } else {
       router.push({ path: `/application/workspace/${row.id}/workflow` })
     }
