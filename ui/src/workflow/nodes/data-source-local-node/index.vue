@@ -8,6 +8,7 @@
         label-position="top"
         require-asterisk-position="right"
         label-width="auto"
+        ref="NodeFormRef"
       >
         <el-form-item
           :label="$t('workflow.nodes.dataSourceLocalNode.fileFormat.label')"
@@ -17,6 +18,7 @@
             message: $t('workflow.nodes.dataSourceLocalNode.fileFormat.requiredMessage'),
             trigger: 'change',
           }"
+          prop="file_type_list"
         >
           <el-select
             v-model="form_data.file_type_list"
@@ -46,6 +48,7 @@
             message: $t('common.inputPlaceholder'),
             trigger: 'change',
           }"
+          prop="file_count_limit"
         >
           <el-input-number
             v-model="form_data.file_count_limit"
@@ -65,6 +68,7 @@
             message: $t('common.inputPlaceholder'),
             trigger: 'change',
           }"
+          prop="file_size_limit"
         >
           <el-input-number
             v-model="form_data.file_size_limit"
@@ -84,9 +88,9 @@
 
 <script setup lang="ts">
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { set } from 'lodash'
-
+const NodeFormRef = ref()
 const props = defineProps<{ nodeModel: any }>()
 
 const file_type_list_options = ['TXT', 'DOCX', 'PDF', 'HTML', 'XLS', 'XLSX', 'ZIP', 'CSV']
@@ -108,6 +112,13 @@ const form_data = computed({
   set: (value) => {
     set(props.nodeModel.properties, 'node_data', value)
   },
+})
+const validate = () => {
+  return NodeFormRef.value.validate()
+}
+
+onMounted(() => {
+  set(props.nodeModel, 'validate', validate)
 })
 </script>
 
