@@ -19,8 +19,8 @@
         </el-select>
         <el-select
           v-if="filter_type === 'state'"
-          v-model="query.status"
-          @change="getList"
+          v-model="query.state"
+          @change="getList(true)"
           style="width: 220px"
           clearable
         >
@@ -31,7 +31,7 @@
         <el-input
           v-else
           v-model="query.user_name"
-          @change="getList"
+          @change="getList(true)"
           :placeholder="$t('common.search')"
           prefix-icon="Search"
           style="width: 220px"
@@ -133,7 +133,7 @@ const paginationConfig = reactive({
 })
 const query = ref<any>({
   user_name: '',
-  status: '',
+  state: '',
 })
 const loading = ref(false)
 const filter_type = ref<string>('user_name')
@@ -165,38 +165,22 @@ const changePage = () => {
   getList()
 }
 
-const getList = () => {
+const getList = (clear?: boolean) => {
+  if (clear) {
+    paginationConfig.current_page = 1
+  }
   return loadSharedApi({ type: 'knowledge', systemType: apiType.value })
     .getWorkflowActionPage(active_knowledge_id.value, paginationConfig, query.value, loading)
     .then((ok: any) => {
       paginationConfig.total = ok.data?.total
-      data.value = data.value.concat(ok.data.records)
+      if (clear) {
+        data.value = ok.data.records
+      } else {
+        data.value = data.value.concat(ok.data.records)
+      }
     })
 }
 
-const setRowClass = ({ row }: any) => {
-  return currentId.value === row?.id ? 'highlight' : ''
-}
-
-/**
- * 下一页
- */
-const nextRecord = () => {
-  const index = tableIndexMap.value[currentId.value] + 1
-  if (index >= data.value.length) {
-    if (index >= paginationConfig.total - 1) {
-      return
-    }
-    paginationConfig.current_page = paginationConfig.current_page + 1
-    getList().then(() => {
-      currentId.value = data.value[index].id
-      currentContent.value = data.value[index]
-    })
-  } else {
-    currentId.value = data.value[index].id
-    currentContent.value = data.value[index]
-  }
-}
 const pre_disable = computed(() => {
   const index = tableIndexMap.value[currentId.value] - 1
   return index < 0

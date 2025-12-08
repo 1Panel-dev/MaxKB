@@ -139,7 +139,7 @@ class KnowledgeWorkflowActionView(APIView):
         def get(self, request: Request, workspace_id: str, knowledge_id: str, current_page: int, page_size: int):
             return result.success(
                 KnowledgeWorkflowActionSerializer(data={'workspace_id': workspace_id, 'knowledge_id': knowledge_id})
-                .page(current_page, page_size, request.data))
+                .page(current_page, page_size, request.query_params))
 
     class Operate(APIView):
         authentication_classes = [TokenAuth]
